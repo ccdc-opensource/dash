@@ -16,7 +16,6 @@
       double precision cen,sig
       logical gaussb
       double precision T,T0,rt,eps,target_value
-      parameter (maxfrg=20)
       common /frgcom/ nfrag,lfrag(maxfrg)
       parameter (mvar=100)
       common /gaubou/ cen(mvar),sig(mvar)
@@ -122,41 +121,37 @@ C JCC Initialise PDB output records
 	CALL PDB_SymmRecords()
 	CALL Init_MultiRun()
 
- 1    Continue ! The start point for repeats.
+ 1    CONTINUE ! The start point for repeats.
 c
 C  Set initial values.
-      num_sa_profile_plot=0
-      num_new_min=0
-      num_old_min=-1
-      n=nvar
-      npar=nvar
-      iteration=0
+      num_sa_profile_plot = 0
+      num_new_min = 0
+      num_old_min = -1
+      n = nvar
+      npar = nvar
+      iteration = 0
 
-      MAKET0 = (T0.LE.0.)
+      MAKET0 = (T0 .LE. 0.0)
       IF (MAKET0) THEN
         T=100000.0
       ELSE
         T=T0
       END IF
 c
-c	write(56,*) ' In SA: nvar & T are ',nvar,T
-c
-	 open(unit=63,file=logsa_file(1:logsa_flen),status='unknown')
+      OPEN(unit=63,file=logsa_file(1:logsa_flen),status='unknown')
 c
 !  Initialize the random number generator RANMAR.
-c	write(56,*) ' In SA: iseed 1 & 2 are ',iseed1,iseed2
 ! Increment the seeds for each SA run
       CALL RMARIN(ISEED1 + SA_Run_Number, ISEED2 + SA_Run_Number)
 !
       CALL MAKXIN(N) 
       DO IV=1,N
-        C(IV)=2.
+        C(IV)=2.0
       END DO
 C
-c	write(56,*) ' In SA: nobs is ',nobs
-      do i=1,nobs
-        ycalbest(i)=0.
-      end do
+      DO i = 1, nobs
+        ycalbest(i) = 0.0
+      END DO
       ITERATION=0
       NACC = 0
       NOBDS = 0
@@ -177,7 +172,6 @@ C
            NP=NP+1
            IP(NP)=I
          END IF
-c	write(56,*) ' In SA: i, ip & xopt(i) are ',i,ip(i),xopt(i)
 10    CONTINUE
 
       DO 20, I = 1, NEPS
@@ -199,12 +193,10 @@ C.. Here we are doing something special with torsion angles
           X(I)=MOD(DP360+X(I),DP360)
           XOPT(I)=X(I)
         END IF
-c	write(56,*) ' In SA: ltorfil(ii) ',ltorfil(ii)
       END DO
 C
 C  Evaluate the function with input X and return value as F.
       CALL FCN(N,X,F)
-c	write(56,*) ' In SA: FCN gives ',F
 C.. Evaluate the profile chi-squared as well
       call valchipro(cpb)
        call SA_PROFILE_PLOT(num_sa_profile_plot)
@@ -312,11 +304,6 @@ C      END IF
 C
       nmpert=nt*ns*np
 	 call sa_move_status(0,nmpert,0)
-c	write(56,*) ' NS and NT are ',NS,NT
-c	do i=1,nvar
-c	  write(56,*) sngl(x(i)),sngl(lb(i)),sngl(ub(i))
-c	end do
-c
       DO 400, M = 1, NT
 
 C.. MRAN RANGE IS 0 -> IM=7875
@@ -408,8 +395,6 @@ C>> Was
 C                     CHIPROBEST(iteration)=cpb
 C Changed to
 				   CHIPROBEST(iteration + 1)=cpb
-c		WRITE(84,*) CPB*float(nfit),-SNGL(FOPT)*float(maxk-2)
-c
                      FOPT = FP
                      NNEW = NNEW + 1
 C>> JCC Same point as above ...
@@ -522,55 +507,48 @@ C       END DO
 C..      END IF
 C
    	DO I=1,N
-             IF (X0SUM(I).GT.0.) THEN
-               DXVAV(I)=XSUM(I)/X0SUM(I)
-               XVSIG(I)=SQRT(MAX(DP0,
-     &         XXSUM(I)/X0SUM(I)-DXVAV(I)*DXVAV(I)))
-   	          FLAV(I)=SQRT(MAX(DP0,XDSS(I)/A0SUM(I)))
-             END IF
+        IF (X0SUM(I).GT.0.) THEN
+          DXVAV(I)=XSUM(I)/X0SUM(I)
+          XVSIG(I)=SQRT(MAX(DP0,
+     &       XXSUM(I)/X0SUM(I)-DXVAV(I)*DXVAV(I)))
+   	    FLAV(I)=SQRT(MAX(DP0,XDSS(I)/A0SUM(I)))
+        END IF
     	END DO
 c
-       ntotmov=ntotmov+nmpert
-       iteration=iteration+1
+      ntotmov=ntotmov+nmpert
+      iteration=iteration+1
 
-       tstore(iteration)=sngl(t)
-       foptstore(iteration)=-sngl(fopt)
-       fpavstore(iteration)=-sngl(fpav)
+      tstore(iteration)=sngl(t)
+      foptstore(iteration)=-sngl(fopt)
+      fpavstore(iteration)=-sngl(fpav)
 c.. corrint specific
-       chiprobest(iteration)=cpb
+      chiprobest(iteration)=cpb
 C ep added - following call to Chi_sq_plot routine. PLots Chi-sqd vs.
 C    number of moves in a child window
-       call chi_sq_plot(ntotmov, iteration, cpb) 
-c
-       if (num_new_min.ne.num_old_min) then
-
+      CALL chi_sq_plot(ntotmov, iteration, cpb) 
+      IF (num_new_min .NE. num_old_min) THEN
 C.. output the structure coordinates in different formats
-                     CALL SA_STRUCTURE_OUTPUT(t,fopt,cpb,x,ntotmov)
+        CALL SA_STRUCTURE_OUTPUT(t,fopt,cpb,x,ntotmov)
 c.. plot the profile
-                     call SA_PROFILE_PLOT(num_sa_profile_plot)
-       end if
-       num_old_min=num_new_min
-c
-       call SA_PLOT(iteration)
-       CALL SA_OUTPUT(1,SNGL(T),-sngl(fopt),-SNGL(FPAV),SNGL(FPSD),
+        CALL SA_PROFILE_PLOT(num_sa_profile_plot)
+      END IF
+      num_old_min = num_new_min
+      CALL SA_PLOT(iteration)
+      CALL SA_OUTPUT(1,SNGL(T),-SNGL(fopt),-SNGL(FPAV),SNGL(FPSD),
      &   xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,LNOBDS,NNEW,
      &   nmpert,ntotmov,iteration)
 
 c
-C.. output the structure coordinates in different formats
-c       CALL SA_STRUCTURE_OUTPUT(t,fopt,ntotmov)
-C..
-C..
 C  Check termination criteria.
 c
 C  Terminate SA if appropriate.
-         IF (.FALSE.) THEN
-            DO 420, I = 1, N
-               X(I) = XOPT(I)
-  420       CONTINUE
-            IER = 0
-            IF (.NOT. MAXLOG) FOPT = -FOPT
-         END IF
+      IF (.FALSE.) THEN
+        DO 420, I = 1, N
+          X(I) = XOPT(I)
+  420   CONTINUE
+        IER = 0
+        IF (.NOT. MAXLOG) FOPT = -FOPT
+      END IF
 C.. If we have asked for an initial temperature to be calculated then
 C.. do so
       IF (ITERATION.EQ.1) THEN
@@ -711,222 +689,6 @@ c     *30081'
          if( uni .lt. 0.0 ) uni = uni + 1.0
          RANMAR = uni
       return
-      END
-
-!U      SUBROUTINE PRT1
-!UC  This subroutine prints intermediate output, as does PRT2 through
-!UC  PRT10. Note that if SA is minimizing the function, the sign of the
-!UC  function value and the directions (up/down) are reversed in all
-!UC  output to correspond with the actual function optimization. This
-!UC  correction is because SA was written to maximize functions and
-!UC  it minimizes by maximizing the negative a function.
-!U
-!UC      WRITE(*,'(  THE STARTING VALUE (X) IS OUTSIDE THE BOUNDS ',
-!UC     1          /,'  (LB AND UB). EXECUTION TERMINATED WITHOUT ANY'
-!UC     2          /,'   OPTIMIZATION. RESPECIFY X, UB OR LB SO THAT  '
-!UC     3          /,'   LB(I) .LT. X(I) .LT. UB(I), I = 1, N. )')
-!U
-!U      RETURN
-!U      END
-!U
-!U      SUBROUTINE PRT2(MAXLOG,N,X,F)
-!U
-!U      DOUBLE PRECISION  X(*), F
-!U      INTEGER  N
-!U      LOGICAL  MAXLOG
-!U
-!UC      CALL PRTVEC(X,N,'INITIAL X')
-!U      IF (MAXLOG) THEN
-!U	   WRITE(*,*)
-!U         WRITE(*,1010) SNGL(F)
-!U      ELSE
-!U         WRITE(*,*)
-!U         WRITE(*,1010) -SNGL(F)
-!U      END IF
-!U 1010 FORMAT('  Initial chi-squared value: ', F15.5) 
-!U
-!U      RETURN
-!U      END
-!U
-!U      SUBROUTINE PRT3(MAXLOG,N,XP,X,FP,F)
-!U
-!U      DOUBLE PRECISION  XP(*), X(*), FP, F
-!U      INTEGER  N
-!U      LOGICAL  MAXLOG
-!U
-!U      CALL PRTVEC(X,N,'CURRENT X')
-!U      IF (MAXLOG) THEN
-!U         WRITE(*,1010) F
-!U      ELSE
-!U         WRITE(*,1010) -F
-!U      END IF
-!U 1010 FORMAT('  CURRENT F: ', G25.18) 
-!U      CALL PRTVEC(XP,N,'TRIAL X')
-!U      WRITE(*,*) ' POINT REJECTED SINCE OUT OF BOUNDS '
-!U
-!U      RETURN
-!U      END
-!U
-!U      SUBROUTINE PRT4(MAXLOG,N,XP,X,FP,F)
-!U
-!U      DOUBLE PRECISION  XP(*), X(*), FP, F
-!U      INTEGER  N
-!U      LOGICAL  MAXLOG
-!U
-!U      CALL PRTVEC(X,N,'CURRENT X')
-!U      IF (MAXLOG) THEN
-!U         WRITE(*,1010) F
-!U         CALL PRTVEC(XP,N,'TRIAL X')
-!U         WRITE(*,1020) FP
-!U      ELSE
-!U         WRITE(*,1010) -F
-!U         CALL PRTVEC(XP,N,'TRIAL X')
-!U         WRITE(*,1020) -FP
-!U      END IF
-!U 1010 FORMAT('   CURRENT F: ', G25.18) 
-!U 1020 FORMAT('  RESULTING F: ', G25.18) 
-!U
-!U      RETURN
-!U      END
-!U
-!U      SUBROUTINE PRT5
-!U
-!UC      WRITE(*,'(,''  TOO MANY FUNCTION EVALUATIONS; CONSIDER ''
-!UC     1          /,''  INCREASING MAXEVL OR EPS, OR DECREASING ''
-!UC     2          /,''  NT OR RT. THESE RESULTS ARE LIKELY TO BE ''
-!UC     3          /,''  POOR.'',/)')
-!U
-!U      RETURN
-!U      END
-!U
-!U      SUBROUTINE PRT6(MAXLOG)
-!U
-!U      LOGICAL  MAXLOG
-!U
-!U      IF (MAXLOG) THEN
-!U         WRITE(*,*) '  THOUGH LOWER, POINT ACCEPTED '
-!U      ELSE
-!U         WRITE(*,*) '  THOUGH HIGHER, POINT ACCEPTED '
-!U      END IF
-!U
-!U      RETURN
-!U      END
-!U
-!U      SUBROUTINE PRT7(MAXLOG)
-!U
-!U      LOGICAL  MAXLOG
-!U
-!U      IF (MAXLOG) THEN
-!U         WRITE(*,*) '  LOWER POINT REJECTED '
-!U      ELSE
-!U         WRITE(*,*) '  HIGHER POINT REJECTED '
-!U      END IF
-!U
-!U      RETURN
-!U      END
-!U
-!U      SUBROUTINE PRT8(N,VM,XOPT,X)
-!U
-!U      DOUBLE PRECISION  VM(*), XOPT(*), X(*)
-!U      INTEGER  N
-!U
-!U      WRITE(*,*) 
-!U     &' INTERMEDIATE RESULTS AFTER STEP LENGTH ADJUSTMENT'
-!U      CALL PRTVEC(VM,N,'NEW STEP LENGTH (VM)')
-!U      CALL PRTVEC(XOPT,N,'CURRENT OPTIMAL X')
-!U      CALL PRTVEC(X,N,'CURRENT X')
-!U
-!U      RETURN
-!U      END
-!U
-!U      SUBROUTINE PRT9(MAXLOG,N,T,XOPT,VM,
-!U     &FOPT,FPAV,FPSD,NUP,NDOWN,NREJ,LNOBDS,NNEW)
-!U
-!U      DOUBLE PRECISION  XOPT(*), VM(*), T, FOPT, FTEM, FPAV, FPSD
-!U      INTEGER  N, NUP, NDOWN, NREJ, LNOBDS, NNEW, TOTMOV
-!U      LOGICAL  MAXLOG
-!U      COMMON /ITRINF/ iteration
-!U
-!U      TOTMOV = NUP + NDOWN + NREJ
-!U      WRITE(*,*)
-!U      WRITE(*,*) 
-!U     &' Intermediate results before next temperature reduction'
-!U      WRITE(*,1010) SNGL(T)
-!U 1010 FORMAT   ('  Current temperature:        ',F10.3)
-!U      IF (MAXLOG) THEN
-!U         WRITE(*,1020) SNGL(FOPT),SNGL(FPAV),
-!U     &SNGL(FPSD),TOTMOV,NUP,NDOWN,NREJ,LNOBDS,NNEW
-!U 1020    FORMAT('  Maximum cost function so far:  ',F10.3,' <<<<'/,
-!U     &          '  Average for this temperature:  ',F10.3,/,
-!U     &          '   +/- standard deviation     :  ',F10.3,/,
-!U     &          '     Total moves:                  ',i8,/, 
-!U     &          '        uphill:                    ',i8,/, 
-!U     &          '        accepted downhill:         ',i8,/, 
-!U     &          '        rejected downhill:         ',i8,/, 
-!U     &          '     Out of bounds trials:         ',i8,/, 
-!U     &          '     New maxima this temperature:  ',i8) 
-!U      ELSE
-!U         WRITE(*,1030) -SNGL(FOPT),-SNGL(FPAV),
-!U     &SNGL(FPSD),TOTMOV,NUP,NDOWN,NREJ,LNOBDS,NNEW
-!U 1030    FORMAT('  Minimum chi-squared so far:    ',F10.3,' <<<<'/, 
-!U     &          '  Average for this temperature:  ',F10.3,/,
-!U     &          '   +/- standard deviation     :  ',F10.3,/,
-!U     &          '     Total moves:                ',I10,/, 
-!U     &          '        downhill:                ',I10,/, 
-!U     &          '        accepted uphill:         ',I10,/, 
-!U     &          '        rejected uphill:         ',I10,/, 
-!U     &          '     Out of bounds trials:       ',I10,/, 
-!U     &          '     New minima this temperature:',I10) 
-!U      END IF
-!Uc      iteration=iteration+1
-!Uc      write(60,*) iteration,-fopt,t
-!Uc      write(61,*) t,(sngl(xopt(i)),i=1,n)
-!UC      CALL PRTVEC(XOPT,N,'CURRENT OPTIMAL X')
-!UC      CALL PRTVEC(VM,N,'STEP LENGTH (VM)')
-!U
-!UC
-!U      CALL FCN_PRT(N,XOPT,FTEM)
-!UC
-!U      RETURN
-!U      END
-!U
-!U      SUBROUTINE PRT10
-!U
-!U      WRITE(*,*) '  SA ACHIEVED TERMINATION CRITERIA. IER = 0.'
-!U
-!U      RETURN
-!U      END
-
-      SUBROUTINE PRTVEC(VECTOR,NCOLS,NAME)
-C  This subroutine prints the double precision vector named VECTOR.
-C  Elements 1 thru NCOLS will be printed. NAME is a character variable
-C  that describes VECTOR. Note that if NAME is given in the call to
-C  PRTVEC, it must be enclosed in quotes. If there are more than 10
-C  elements in VECTOR, 10 elements will be printed on each line.
-
-      INTEGER NCOLS
-      DOUBLE PRECISION VECTOR(NCOLS)
-      CHARACTER *(*) NAME
-
-      WRITE(*,1001) NAME
-
-      IF (NCOLS .GT. 10) THEN
-         LINES = INT(NCOLS/10.)
-
-         DO 100, I = 1, LINES
-            LL = 10*(I - 1)
-            WRITE(*,1000) (VECTOR(J),J = 1+LL, 10+LL)
-  100    CONTINUE
-
-         WRITE(*,1000) (VECTOR(J),J = 11+LL, NCOLS)
-      ELSE
-         WRITE(*,1000) (VECTOR(J),J = 1, NCOLS)
-      END IF
-
- 1000 FORMAT( 10(G12.5,1X))
- 1001 FORMAT(5X,A)
-
-      RETURN
       END
 
 
