@@ -52,7 +52,7 @@ C     As long as atoms remain linear with the first
 C     two atoms, keep placing them along the z-axis
       i = 3
       if (n .gt. 3) then
-         dowhile (x(i) .eq. 0.0d0)
+         dowhile (nint(x(i)*10000) .eq. 0)
             i = i + 1
             i1 = iz1(i)
             i2 = iz2(i)
@@ -103,7 +103,7 @@ C     Constants
 C     Local
       real*8 ang_1,ang_2
       real*8 sin_1,cos_1,sin_2,cos_2
-      real*8 cosine,sine,sine2,norm,eps,sinarg
+      real*8 cosine,one_over_sine,sine2,norm,eps,sinarg
       real*8 u1(3),u2(3),u3(3),u4(3),a,b,c, rad
 c
 c     convert the angle values from degrees to radians;
@@ -140,19 +140,19 @@ c      write(6,*) (u2(1)*u2(1) + u2(2)*u2(2) + u2(3)*u2(3))
       u3(3) = u1(1)*u2(2) - u1(2)*u2(1)
       cosine = u1(1)*u2(1) + u1(2)*u2(2) + u1(3)*u2(3)
       if (abs(cosine) .lt. 1.0d0) then
-         sine = 1.0/sqrt(1.0d0 - cosine**2)
+         one_over_sine = 1.0/sqrt(1.0d0 - cosine**2)
       else
 !         write (*,10)  i
 !   10    format (' XYZATM - Undefined Dihed Angle at Atom',i6)
-c         sinarg=dmax1(small,cosine**2 - 1.0d0 )
+         sinarg=dmax1(small,cosine**2 - 1.0d0 )
 c	 write (*,*) ' cosine is ',cosine,sinarg
-c         sine = 1.0/sqrt(sinarg)
+         one_over_sine = 1.0/sqrt(sinarg)
 c	 write (*,*) ' cosine is ',cosine,sinarg
-         sine = 1.0/sqrt(cosine**2 - 1.0d0)
+c         sine = 1.0/sqrt(cosine**2 - 1.0d0)
       end if
-      u3(1) = u3(1) * sine
-      u3(2) = u3(2) * sine
-      u3(3) = u3(3) * sine
+      u3(1) = u3(1) * one_over_sine
+      u3(2) = u3(2) * one_over_sine
+      u3(3) = u3(3) * one_over_sine
       u4(1) = u3(2)*u2(3) - u3(3)*u2(2)
       u4(2) = u3(3)*u2(1) - u3(1)*u2(3)
       u4(3) = u3(1)*u2(2) - u3(2)*u2(1)
