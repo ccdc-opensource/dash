@@ -1381,6 +1381,8 @@
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
+            CASE (IDBBROWSE) ! Read unit cell
+              CALL UnitCellParametersFileBrowse
             CASE (IDB_Delabc)
               CALL Clear_UnitCell_WithConfirmation
 ! Space Group Program Interface
