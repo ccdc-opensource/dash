@@ -13,8 +13,8 @@
       COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
 
       INTEGER          NFITA, IFITA
-      REAL                                   CHIOBSA, WTSA
-      COMMON /CHISTOP/ NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP)
+      REAL                                 WTSA
+      COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN

@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE MAKEFRAC_2(CHROM)
+      SUBROUTINE MAKEFRAC(CHROM)
 
       USE ZMVAR
 
@@ -139,7 +139,7 @@
         ENDIF
       ENDDO
 
-      END SUBROUTINE MAKEFRAC_2
+      END SUBROUTINE MAKEFRAC
 !
 !*****************************************************************************
 !
