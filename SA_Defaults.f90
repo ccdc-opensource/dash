@@ -4,12 +4,14 @@
 ! JCC New subroutine to set the output file names
       SUBROUTINE sa_SetOutputFiles(FileHead)
 
+      USE VARIABLES
+
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: FileHead 
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
 
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
@@ -26,9 +28,9 @@
 ! Now point to the position just before the '.'
       POS = POS - 1
 ! We will append '.cssr', which is five characters, and after that the total length shouldn't exceed 80
-      IF (POS .GT. 75) THEN
+      IF (POS .GT. (MaxPathLength-5)) THEN
         CALL DebugErrorMessage('File name too long in sa_SetOutputFiles')
-        POS = 75
+        POS = MaxPathLength-5
       ENDIF
       cssr_file = FileHead(1:POS)//'.cssr'
       pdb_file  = FileHead(1:POS)//'.pdb'

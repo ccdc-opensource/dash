@@ -46,7 +46,7 @@
       CHARACTER*20 symline
       COMMON /symgencmn/ nsymmin, symmin(4,4,msymmin), symline(msymmin)
 
-      CHARACTER*80 TemTicFile
+      CHARACTER(MaxPathLength) TemTicFile
       LOGICAL Check_TicMark_Data
       INTEGER I, isym, LenFil
       INTEGER TicRead

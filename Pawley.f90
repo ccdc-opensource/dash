@@ -142,7 +142,7 @@
       SAVE    LastValuesSet
       LOGICAL SaveProject ! Function
       INTEGER Ilen, IER
-      CHARACTER*80 SDIFile
+      CHARACTER(MaxPathLength) SDIFile
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
@@ -775,9 +775,9 @@
 ! Initialise to error
       CreateSDIFile = 1
       LSDI = LEN_TRIM(SDIFileName)
-      IF (LSDI .GT. 80) THEN
+      IF (LSDI .GT. MaxPathLength) THEN
         CALL DebugErrorMessage('SDIFileName too long in CreateSDIFile')
-        LSDI = 80
+        LSDI = MaxPathLength
       ENDIF
       IF (LSDI .EQ. 0) THEN
         CALL ErrorMessage('Filename not provided.'//CHAR(13)//'Try again!')
@@ -873,7 +873,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=80) :: SDIFileName
+      CHARACTER(MaxPathLength) :: SDIFileName
       CHARACTER(LEN=45) :: FILTER
       INTEGER IFLAGS
 

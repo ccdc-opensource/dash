@@ -280,6 +280,8 @@
 !
       SUBROUTINE OutputChi2vsMoves
 
+      USE VARIABLES
+
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
@@ -296,8 +298,8 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
 
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
@@ -309,7 +311,7 @@
 
       LOGICAL, EXTERNAL :: Get_OutputChi2vsMoves
       INTEGER tFileHandle, iLen, I, J
-      CHARACTER*80 tFileName
+      CHARACTER(MaxPathLength) tFileName
 
       IF (.NOT. Get_OutputChi2vsMoves()) RETURN
       tFileHandle = 10

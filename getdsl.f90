@@ -328,7 +328,7 @@
       iticer = 1
       ipiker = 0
       idsler = 0
-      IF (LEN_TRIM(SDIFile) .GT. 80) THEN
+      IF (LEN_TRIM(SDIFile) .GT. MaxPathLength) THEN
         CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in SDIFileLoad')
       ENDIF
 ! Now open all the appropriate PIK, TIC and HCV files
@@ -349,27 +349,27 @@
       SELECT CASE (KeyChar(1:3))
         CASE ('tic')
           CALL ILocateString(line,isst,ised)
-          DashTicFile(1:80) = line(isst:isst+79)
+          DashTicFile = line(isst:)
           TicExists = .TRUE.
         CASE ('hcv')
           CALL ILocateString(line,isst,ised)
-          DashHcvFile(1:80) = line(isst:isst+79)
+          DashHcvFile = line(isst:)
           HcvExists = .TRUE.
         CASE ('hkl')
           CALL ILocateString(line,isst,ised)
-          DashHklFile(1:80) = line(isst:isst+79)
+          DashHklFile = line(isst:)
           HklExists = .TRUE.
         CASE ('pik')
           CALL ILocateString(line,isst,ised)
-          DashPikFile(1:80) = line(isst:isst+79)
+          DashPikFile = line(isst:)
           PikExists = .TRUE.
         CASE ('raw')
           CALL ILocateString(line,isst,ised)
-          DashRawFile(1:80) = line(isst:isst+79)
+          DashRawFile = line(isst:)
           RawExists = .TRUE.      
         CASE ('dsl')
           CALL ILocateString(line,isst,ised)
-          DashDslFile(1:80) = line(isst:isst+79)
+          DashDslFile = line(isst:)
           DslExists = .TRUE.
         CASE ('cel') ! Cell parameters
           DO I = 1, 6

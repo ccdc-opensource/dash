@@ -20,7 +20,7 @@
 
       INTEGER tFileHandle, I, kk, ifrg, ilen, II, Fixed
       REAL    R, x, lb, ub
-      CHARACTER*80 tSDIFile
+      CHARACTER(MaxPathLength) tSDIFile
       CHARACTER*17 DateStr
       REAL    MaxMoves1, tMaxMoves
       INTEGER MaxMoves2

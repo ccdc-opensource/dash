@@ -60,7 +60,7 @@
 
       IMPLICIT NONE      
 
-      CHARACTER*80 SDIFile
+      CHARACTER(LEN=MaxPathLength) SDIFile
       INTEGER      IFlags
 
 ! JCC Added in declarations
@@ -69,7 +69,8 @@
       INTEGER zmread
       INTEGER ifrg
       LOGICAL, EXTERNAL :: Confirm
-      CHARACTER*80 DirName, FileName
+      CHARACTER(LEN=MaxPathLength) DirName
+      CHARACTER*80 FileName
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -184,15 +185,15 @@
 
       IMPLICIT NONE      
 
-      CHARACTER*80 SDIFile
+      CHARACTER(LEN=MaxPathLength) SDIFile
       INTEGER      IFlags
 
       INTEGER, EXTERNAL :: Read_One_Zm
       INTEGER zmread
       INTEGER ifrg
       LOGICAL, EXTERNAL :: Confirm
-      CHARACTER*255 DirName
-      CHARACTER*80  FileName
+      CHARACTER(LEN=MaxPathLength) DirName
+      CHARACTER*80 FileName
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
