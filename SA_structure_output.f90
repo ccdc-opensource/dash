@@ -324,7 +324,7 @@
           ENDDO
         ENDIF
         NumOfAtmPerElm = 0
-        DO iFrg = 1, maxfrg
+        DO iFrg = 1, nFrag
           DO i = 1, natoms(iFrg)
             CALL INC(NumOfAtmPerElm(zmElementCSD(i,iFrg)))
           ENDDO

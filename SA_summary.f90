@@ -985,7 +985,7 @@
       iiact = 0
       itotal = 0
       ipcount = 0
-      DO iFrg = 1, maxfrg
+      DO iFrg = 1, nFrag
         itotal = iiact
 ! Write out the translation/rotation information for each residue
         IF (tSavePDB) THEN
