@@ -36,6 +36,9 @@
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       REAL ctem, tempvl
       REAL bchpro, bchmin, bpwval, avchi1, avchi2, avchi3, avchi4
       REAL tenow1, tenow2, ruler, rulex1, rulex2
@@ -43,6 +46,8 @@
       REAL, PARAMETER :: rmaxh = 0.99
       INTEGER I
 
+      IF ( in_batch ) &
+        RETURN
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WDialogPutReal(IDF_curr_temp, T, '(F8.2)')
       CALL WDialogPutReal(IDF_min_chisq, chimin, '(F8.2)')
