@@ -50,9 +50,6 @@
       REAL                                                                                      KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
 
-
-
-
       REAL            ZCAL,        ZBAK
       COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
 
@@ -112,7 +109,8 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
-! XPF_Range
+! XPF_Range(1,i)  = start of hatched area
+! XPF_Range(2,i)  = end   of hatched area
 ! IPF_Lo          = designates bin (so, pointer into XBIN) where the peak fit range starts.
 ! IPF_Hi          = designates bin (so, pointer into XBIN) where the peak fit range ends.
 ! NumPeakFitRange = Number of peak fit ranges (hatched areas on the screen)
