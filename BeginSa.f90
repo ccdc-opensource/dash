@@ -12,6 +12,9 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
 
+      LOGICAL           LOG_HYDROGENS
+      COMMON /HYDROGEN/ LOG_HYDROGENS
+
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
       INTEGER                                 MaxRuns, MaxMoves
@@ -19,6 +22,7 @@
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL    T1
       REAL    SA_Duration ! The time the SA took, in seconds
       CHARACTER*10 SA_DurationStr
@@ -29,6 +33,9 @@
         CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
         RETURN
       ENDIF
+      CALL WDialogSelect(IDD_Configuration)
+      LOG_HYDROGENS = WDialogGetCheckBoxLogical(IDF_UseHydrogens)
+      CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
       CALL WDialogSelect(IDD_SA_Action1)
 ! Check on viewer
       IF (ViewOn) THEN
@@ -53,6 +60,8 @@
   !    CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogFieldState(IDF_UseHydrogens,Enabled)
       DoSaRedraw = .FALSE.
       Ierrflag = InfoError(1)
       CALL WindowSelect(0)

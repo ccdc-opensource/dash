@@ -526,9 +526,6 @@
       INTEGER     BFIOErrorCode
       COMMON /IO/ BFIOErrorCode
 
-      LOGICAL           LOG_HYDROGENS
-      COMMON /HYDROGEN/ LOG_HYDROGENS
-
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
       INTEGER    RecNr
@@ -655,7 +652,7 @@
       CALL WDialogGetString(IDF_ViewArg,ViewArg)
       CALL FileWriteString(tFileHandle,RecNr,ViewArg)
 ! Save use hydrogens YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,LOG_HYDROGENS)
+      CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseHydrogens))
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileWriteLogical(tFileHandle,RecNr,ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
