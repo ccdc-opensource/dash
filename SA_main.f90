@@ -225,6 +225,7 @@
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
               IPTYPE = 2
+              CALL SetWizardState(1)
               RETURN
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
