@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 26/Apr/2002 14:23:29
+// Modified : 28/Apr/2002 13:00:52
 //
 ///////////////////////////////////////////////////
 //
@@ -1028,19 +1028,6 @@ BEGIN
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
 END
 
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
@@ -1798,8 +1785,8 @@ BEGIN
     CONTROL "Uphill",IDF_SA_move_type2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  124,  123,   30,    8
     CONTROL "Reject",IDF_SA_move_type3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  158,  123,   30,    8
     CONTROL "Simulated annealing run number 1 of 1",IDD_SA_RunLabel,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,   22,    8,  184,   10
-    CONTROL "Edit",IDB_Edit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  106,  158,   40,   14
-    CONTROL "Summary",IDB_Summary,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  206,  158,   40,   14
+    CONTROL "&Edit",IDB_Edit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  106,  158,   40,   14
+    CONTROL "S&olutions",IDB_Summary,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  206,  158,   40,   14
 END
 
 IDD_SA_Action1 RCDATA
