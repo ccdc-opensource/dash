@@ -14,8 +14,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE DRUID_HEADER
@@ -41,7 +41,7 @@
       INTEGER I, hFile
 
 ! Current status, initialise to 'error'
-      Load_raw_File = 0
+      Load_raw_File = 1
       hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
       OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
@@ -139,7 +139,7 @@
 ! This is definitely laboratory data
       JRadOption = 1
       CALL Upload_Source
-      Load_raw_File = 1
+      Load_raw_File = 0
       RETURN
 ! Exit code is error by default, so we can simply return
  999  CLOSE(hFile)
@@ -158,10 +158,8 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
-!
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! OUTPUT  : TheNumOfRanges = the number of valid data ranges (i.e. including those with e.g. zero data points)
+!           TitleOfRange = some sort of identifier for that range
 !
       USE WINTERACTER
       USE VARIABLES
@@ -407,8 +405,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -451,7 +449,7 @@
       LOGICAL     IsFirstRange
 
 ! Current status, initialise to 'error'
-      Load_rawBruker_File = 0
+      Load_rawBruker_File = 1
       TwoThetaStart = 0.0
       TwoThetaStep  = 0.0
       IsFirstRange = .TRUE.
@@ -708,7 +706,7 @@
           GOTO 999
       END SELECT
       NOBS = NumOfBins
-      Load_rawBruker_File = 1
+      Load_rawBruker_File = 0
 ! Exit code is error by default, so we can simply return
  999  CLOSE(hFile)
 
@@ -726,7 +724,7 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! OUTPUT  : tNumOfRanges = the number of valid data ranges (i.e. includin those with e.g. zero data points)
+! OUTPUT  : tNumOfRanges = the number of valid data ranges (i.e. including those with e.g. zero data points)
 !           TitleOfRange = some sort of identifier for that range
 !
       USE WINTERACTER
@@ -903,8 +901,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -1324,7 +1322,7 @@
 !DEC$ END OPTIONS
 
 ! Current status, initialise to 'error'
-      Load_rawSTOE_File = 0
+      Load_rawSTOE_File = 1
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 128 (=512 bytes)
       tFileHandle = 11
       OPEN(UNIT=tFileHandle,FILE=TheFileName,ACCESS='DIRECT',RECL=128,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
@@ -1375,7 +1373,7 @@
         XOBS(i) = CurrTwoTheta
         CurrTwoTheta = CurrTwoTheta + RangeInfo%Step(1)
       ENDDO
-      Load_rawSTOE_File = 1
+      Load_rawSTOE_File = 0
  999  CLOSE(tFileHandle)
 ! Exit code is error by default, so we can simply return
 

@@ -15,8 +15,8 @@
 !
 ! JvdS 18 July 2001
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data/...)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data/...)
 !           2 if user pressed cancel
 !
       USE WINTERACTER
@@ -68,8 +68,8 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE VARIABLES
 
@@ -84,7 +84,7 @@
 ! Note that FNAME is a global variable
       INTEGER ISTAT
 
-      DiffractionFileOpen = 0
+      DiffractionFileOpen = 1
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
       INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
@@ -99,7 +99,7 @@
       CALL ScrUpdateFileName
       ISTAT = DiffractionFileLoad(TheFileName)
       DiffractionFileOpen = ISTAT
-      IF (ISTAT .EQ. 0) RETURN
+      IF (ISTAT .NE. 0) RETURN
 ! Enable the appropriate menus:
       CALL SetModeMenuState(1,-1)
       DashRawFile = FNAME(1:LEN_TRIM(FNAME))
@@ -117,8 +117,8 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !           2 for user pressed cancel
 !
       USE WINTERACTER
@@ -167,7 +167,7 @@
       REAL             tYPMIN, tYPMAX
 
 ! Initialise to failure
-      DiffractionFileLoad = 0
+      DiffractionFileLoad = 1
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
 ! Find the last occurence of '.' in TheFileName
@@ -206,10 +206,10 @@
         CASE ('x01 ')
           ISTAT = Load_x01_File(TheFileName,ESDsFilled)
         CASE DEFAULT
-          ISTAT = 0
+          ISTAT = 1
       END SELECT
       DiffractionFileLoad = ISTAT
-      IF (ISTAT .EQ. 0) THEN
+      IF (ISTAT .NE. 0) THEN
         CALL ErrorMessage('Could not load the file')
         RETURN
       ENDIF
@@ -298,8 +298,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -326,7 +326,7 @@
       REAL, EXTERNAL :: FnWavelengthOfMenuOption
 
 ! Current status, initialise to 'error'
-      Load_cpi_File = 0
+      Load_cpi_File = 1
       Lambda1       = 0.0
       Anode         = 'Xx'
       TwoThetaStart = 0.0
@@ -429,7 +429,7 @@
         CALL Upload_Source
         CALL Set_Wavelength(Lambda1)
       ENDIF
-      Load_cpi_File = 1
+      Load_cpi_File = 0
 ! Exit code is error by default, so we can simply return
  999  CLOSE(hFile)
 
@@ -448,8 +448,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -474,7 +474,7 @@
       INTEGER, EXTERNAL :: GetNumOfColumns
 
 ! Current status, initialise to 'error'
-      Load_dat_File = 0
+      Load_dat_File = 1
       TwoThetaStart = 0.0
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
@@ -560,7 +560,7 @@
 ! This is probably synchrotron data
       JRadOption = 2
       CALL Upload_Source
-      Load_dat_File = 1
+      Load_dat_File = 0
 ! Exit code is error by default, so we can simply return
  999  CLOSE(hFile)
 
@@ -581,8 +581,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -609,7 +609,7 @@
       CHARACTER*2 ListIn, ListOut
 
 ! Current status, initialise to 'error'
-      Load_mdi_File = 0
+      Load_mdi_File = 1
       TwoThetaStart = 0.0
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
@@ -717,7 +717,7 @@
         CALL Upload_Source
         CALL Set_Wavelength(Lambda1)
       ENDIF
-      Load_mdi_File = 1
+      Load_mdi_File = 0
 ! Exit code is error by default, so we can simply return
  999  CLOSE(hFile)
 
@@ -740,8 +740,8 @@
 ! In this case, although the file does not contain ESDs, it does contain 
 ! an incident beam correction, so the ESDs calculated here are the 'right' ones
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -800,7 +800,7 @@
       REAL    TwoTheta, rDummy1, rDummy2, rDummy3, rDummy4, tSignal, tScale
 
 ! Initialise to failure
-      Load_pod_File = 0
+      Load_pod_File = 1
       I = 1
       hFile = 10
       OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
@@ -839,7 +839,7 @@
 ! This is definitely synchrotron data
       JRadOption = 2
       CALL Upload_Source
-      Load_pod_File = 1
+      Load_pod_File = 0
  999  CLOSE(hFile)
  
       END FUNCTION Load_pod_File
@@ -861,8 +861,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -900,7 +900,7 @@
       REAL, EXTERNAL :: WavelengthOf
 
 ! Current status, initialise to 'error'
-      Load_rd_File  = 0
+      Load_rd_File  = 1
       TwoThetaStart = 0.0
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
@@ -1075,7 +1075,7 @@
 ! If the wavelength was not present in the file, try to interpret the Anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
       CALL Set_Wavelength(Lambda1)
-      Load_rd_File = 1
+      Load_rd_File = 0
 ! Exit code is error by default, so we can simply return
   999 CLOSE(hFile)
 
@@ -1093,8 +1093,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -1224,7 +1224,7 @@
 !
 
 ! Initialise to failure
-      Load_sci_File = 0
+      Load_sci_File = 1
       TwoThetaStart = -1.0
       TwoThetaEnd   = -1.0
       TwoThetaStep  = -1.0
@@ -1392,7 +1392,7 @@
       JRadOption = 1
       CALL Upload_Source
       CALL Set_Wavelength(Lambda1)
-      Load_sci_File = 1
+      Load_sci_File = 0
  999  CLOSE(hFile)
 
       END FUNCTION Load_sci_File
@@ -1414,8 +1414,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -1441,7 +1441,7 @@
       REAL, EXTERNAL :: WavelengthOf
 
 ! Current status, initialise to 'error'
-      Load_udf_File = 0
+      Load_udf_File = 1
       TwoThetaStart = 0.0
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
@@ -1588,7 +1588,7 @@
 ! If the wavelength was not present in the file, try to interpret the Anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
       CALL Set_Wavelength(Lambda1)
-      Load_udf_File = 1
+      Load_udf_File = 0
 ! Exit code is error by default, so we can simply return
  999  CLOSE(hFile)
 
@@ -1613,8 +1613,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -1649,7 +1649,7 @@
       INTEGER       KeyWordPos, KeyWordLen, StrLen, I, hFile
 
 ! Current status, initialise to 'error'
-      Load_uxd_File = 0
+      Load_uxd_File = 1
       TwoThetaStart = 0.0
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
@@ -1881,7 +1881,7 @@
       ELSE
         CALL Set_Wavelength(Lambda1)
       ENDIF
-      Load_uxd_File = 1
+      Load_uxd_File = 0
  999  CLOSE(hFile)
 ! Exit code is error by default, so we can simply return
 
@@ -1901,8 +1901,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -1928,7 +1928,7 @@
       REAL          Lambda1
 
 ! Initialise to failure
-      Load_xye_File = 0
+      Load_xye_File = 1
       hFile         = 10
       Lambda1       = 0.0
       ReadWarning   = .FALSE.
@@ -2013,7 +2013,7 @@
         CALL Upload_Source
         CALL Set_Wavelength(Lambda1)
       ENDIF
-      Load_xye_File = 1
+      Load_xye_File = 0
  999  CLOSE(hFile)
 
       END FUNCTION Load_xye_File
@@ -2030,8 +2030,8 @@
 !
 ! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -2110,7 +2110,7 @@
 !     40.000000      180.600000
 
 ! Initialise to failure
-      Load_x01_File = 0
+      Load_x01_File = 1
       Lambda1       = WavelengthOf('Cu') ! According to Bede, this is a valid assumption
       NumOfBins     = -1
       ReadWarning   = .FALSE.
@@ -2188,7 +2188,7 @@
       JRadOption = 1
       CALL Upload_Source
       CALL Set_Wavelength(Lambda1)
-      Load_x01_File = 1
+      Load_x01_File = 0
  999  CLOSE(hFile)
 
       END FUNCTION Load_x01_File
