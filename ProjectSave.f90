@@ -8,6 +8,7 @@
 !
       USE VARIABLES
       USE ZMVAR
+      USE PRJVAR
 
       IMPLICIT NONE
 
@@ -29,36 +30,36 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      INTEGER RecNr, tFileHandle, ifrg
+      INTEGER ifrg
       CHARACTER*MaxPathLength :: tFileName
       INTEGER I, J, tInteger
       REAL    tReal
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      tFileHandle = 10
+      hPrjFile = 10
       tFileName = 'Example.dash'
-      OPEN(UNIT=tFileHandle,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
-      RecNr = 1
+      OPEN(UNIT=hPrjFile,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      iPrjRecNr = 1
 ! Store Wizard Window
 
 ! Store radiation source
-      CALL FileWriteInteger(tFileHandle,RecNr,JRadOption)
+      CALL FileWriteInteger(hPrjFile,iPrjRecNr,JRadOption)
 ! Store Wavelength
-      CALL FileWriteReal(tFileHandle,RecNr,ALambda)
+      CALL FileWriteReal(hPrjFile,iPrjRecNr,ALambda)
 ! We store the original pattern + all information to get the processed pattern:
 ! - Truncation limits
 ! - Background subtraction parameters
 ! - LBIN
-      CALL FileWriteInteger(tFileHandle,RecNr,BackupNOBS)
+      CALL FileWriteInteger(hPrjFile,iPrjRecNr,BackupNOBS)
       IF (BackupNOBS .GT. 0) THEN
 ! This is where we must decide if we want to store just the pattern, or also the .pik file
 !            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
 !        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
         DO I = 1, BackupNOBS
-          CALL FileWriteReal(tFileHandle,RecNr,BackupXOBS(I))
-          CALL FileWriteReal(tFileHandle,RecNr,BackupYOBS(I))
-          CALL FileWriteReal(tFileHandle,RecNr,BackupEOBS(I))
+          CALL FileWriteReal(hPrjFile,iPrjRecNr,BackupXOBS(I))
+          CALL FileWriteReal(hPrjFile,iPrjRecNr,BackupYOBS(I))
+          CALL FileWriteReal(hPrjFile,iPrjRecNr,BackupEOBS(I))
         ENDDO
 ! Store start / end
         CALL WDialogSelect(IDD_PW_Page5)
@@ -68,70 +69,72 @@
 ! If the user doesn't want to truncate the data, just restore the old values
           tReal = 0.0
         ENDIF
-        CALL FileWriteReal(tFileHandle,RecNr,tReal)
+        CALL FileWriteReal(hPrjFile,iPrjRecNr,tReal)
         IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
           CALL WDialogGetReal(IDF_Max2Theta,tReal)
         ELSE
 ! If the user doesn't want to truncate the data, just restore the old values
           tReal = 90.0
         ENDIF
-        CALL FileWriteReal(tFileHandle,RecNr,tReal)
+        CALL FileWriteReal(hPrjFile,iPrjRecNr,tReal)
 ! Store the parameters for the background algorithm
         CALL WDialogSelect(IDD_PW_Page6)
         CALL WDialogGetInteger(IDF_NumOfIterations,tInteger)
-        CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+        CALL FileWriteInteger(hPrjFile,iPrjRecNr,tInteger)
         CALL WDialogGetInteger(IDF_WindowWidth,tInteger)
-        CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
-        CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+        CALL FileWriteInteger(hPrjFile,iPrjRecNr,tInteger)
+        CALL FileWriteLogical(hPrjFile,iPrjRecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
 ! Store LBIN
-        CALL FileWriteInteger(tFileHandle,RecNr,LBIN)
+        CALL FileWriteInteger(hPrjFile,iPrjRecNr,LBIN)
       ENDIF
-! Store the peak fit ranges
-
 
 ! Store Crystal System
-      CALL FileWriteInteger(tFileHandle,RecNr,LatBrav)
+      CALL FileWriteInteger(hPrjFile,iPrjRecNr,LatBrav)
 ! Store unit cell
       DO I = 1, 6
-        CALL FileWriteReal(tFileHandle,RecNr,CellPar(I))
+        CALL FileWriteReal(hPrjFile,iPrjRecNr,CellPar(I))
       ENDDO
 ! Store zero-point
-      CALL FileWriteReal(tFileHandle,RecNr,ZeroPoint)
+      CALL FileWriteReal(hPrjFile,iPrjRecNr,ZeroPoint)
 ! Store space group
-      CALL FileWriteInteger(tFileHandle,RecNr,NumberSGTable)
+      CALL FileWriteInteger(hPrjFile,iPrjRecNr,NumberSGTable)
 ! Store Pawley refinement related stuff
-
+! Store the peak fit ranges
+      CALL  PrjReadWritePeakFitRanges
+! We _must_ read the Peak Fit Ranges after the data needed to generate the tickmarks (unit cell,
+! zero point, wavelength, space group, powder pattern) because it needs the tick marks
+! to assign a relection to each peak position.
 
 ! Store the Z-matrices
-      CALL FileWriteInteger(tFileHandle,RecNr,nfrag)
+      CALL FileWriteInteger(hPrjFile,iPrjRecNr,nfrag)
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          CALL FileWriteInteger(tFileHandle,RecNr,zmNumberOfCopies(iFrg))
-          CALL FileWriteString(tFileHandle,RecNr,frag_file(iFrg))
-          CALL FileWriteInteger(tFileHandle,RecNr,icomflg(iFrg))
-          CALL FileWriteInteger(tFileHandle,RecNr,natoms(iFrg))
+          CALL FileWriteInteger(hPrjFile,iPrjRecNr,zmNumberOfCopies(iFrg))
+          CALL FileWriteString(hPrjFile,iPrjRecNr,frag_file(iFrg))
+          CALL FileWriteInteger(hPrjFile,iPrjRecNr,icomflg(iFrg))
+          CALL FileWriteInteger(hPrjFile,iPrjRecNr,natoms(iFrg))
           DO J = 1, natoms(iFrg)
-            CALL FileWriteInteger(tFileHandle,RecNr,ioptb(J,iFrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,iopta(J,iFrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,ioptt(J,iFrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,iz1(J,iFrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,iz2(J,iFrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,iz3(J,iFrg))
-            CALL FileWriteReal(tFileHandle,RecNr,SNGL(blen(J,iFrg)))
-            CALL FileWriteReal(tFileHandle,RecNr,SNGL(alph(J,iFrg)))
-            CALL FileWriteReal(tFileHandle,RecNr,SNGL(bet(J,iFrg)))
-            CALL FileWriteString(tFileHandle,RecNr,asym(J,iFrg))
-            CALL FileWriteString(tFileHandle,RecNr,OriginalLabel(J,iFrg))
-            CALL FileWriteReal(tFileHandle,RecNr,tiso(J,iFrg))
-            CALL FileWriteReal(tFileHandle,RecNr,occ(J,iFrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,izmoid(J,iFrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,izmbid(J,iFrg))
+            CALL FileWriteInteger(hPrjFile,iPrjRecNr,ioptb(J,iFrg))
+            CALL FileWriteInteger(hPrjFile,iPrjRecNr,iopta(J,iFrg))
+            CALL FileWriteInteger(hPrjFile,iPrjRecNr,ioptt(J,iFrg))
+            CALL FileWriteInteger(hPrjFile,iPrjRecNr,iz1(J,iFrg))
+            CALL FileWriteInteger(hPrjFile,iPrjRecNr,iz2(J,iFrg))
+            CALL FileWriteInteger(hPrjFile,iPrjRecNr,iz3(J,iFrg))
+            CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(blen(J,iFrg)))
+            CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(alph(J,iFrg)))
+            CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(bet(J,iFrg)))
+            CALL FileWriteString(hPrjFile,iPrjRecNr,asym(J,iFrg))
+            CALL FileWriteString(hPrjFile,iPrjRecNr,OriginalLabel(J,iFrg))
+            CALL FileWriteReal(hPrjFile,iPrjRecNr,tiso(J,iFrg))
+            CALL FileWriteReal(hPrjFile,iPrjRecNr,occ(J,iFrg))
+            CALL FileWriteInteger(hPrjFile,iPrjRecNr,izmoid(J,iFrg))
+            CALL FileWriteInteger(hPrjFile,iPrjRecNr,izmbid(J,iFrg))
           ENDDO
         ENDIF
       ENDDO
 ! Save solutions
 ! Save number of solutions
-      CALL FileWriteInteger(tFileHandle,RecNr,SA_Run_Number)
+      CALL FileWriteInteger(hPrjFile,iPrjRecNr,SA_Run_Number)
       IF (SA_Run_Number .NE. 0) THEN
 
 
@@ -150,14 +153,98 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PrjReadWritePeakFitRanges(TheFileHandle,TheRecNr)
+      SUBROUTINE PrjReadWritePeakFitRanges
+!
+! Read or writes information on peak fit ranges to / from binary project file.
+!
+      USE PRJVAR
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: TheFileHandle
-      INTEGER, INTENT (INOUT) :: TheRecNr
+      INCLUDE 'PARAMS.INC'
 
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
+      REAL              PkFnVal,                      PkFnEsd,                      &
+                        PkFnCal,                                                    &
+                        PkFnVarVal,                   PkFnVarEsd,                   &
+                        PkAreaVal,                    PkAreaEsd,                    &
+                        PkPosVal,                     PkPosEsd,                     &
+                        PkPosAv
+      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+                        PkFnCal(MPkDes,Max_NPFR),                                   &
+                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+                        PkPosAv(MAX_NPFR)
+
+      INTEGER iPFR, iPeak, iPkDes, iPoint, RW
+
+! Read or Write?
+      RW = iPrjReadOrWrite
+! If no Peak Fit Ranges, write 0 and exit   
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumPeakFitRange)
+      IF (NumPeakFitRange .NE. 0) THEN
+        DO iPFR = 1, NumPeakFitRange
+          CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,XPF_Range(1,iPFR))
+          CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,XPF_Range(2,iPFR))
+          CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,RangeFitYN(iPFR))
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,IPF_Lo(iPFR))
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,IPF_Hi(iPFR))
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumInPFR(iPFR))
+          DO iPeak = 1, NumInPFR(iPFR)
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,XPF_Pos(iPeak,iPFR))
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,YPF_Pos(iPeak,iPFR))
+          ENDDO
+          IF (RangeFitYN(iPFR)) THEN
+            DO iPkDes = 1, MPkDes
+              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkFnVal(iPkDes,iPFR))
+              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkFnEsd(iPkDes,iPFR))
+              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkFnCal(iPkDes,iPFR))
+            ENDDO
+            DO iPeak = 1, NumInPFR(iPFR)
+              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkAreaVal(iPeak,iPFR))
+              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkAreaEsd(iPeak,iPFR))
+              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkPosVal(iPeak,iPFR))
+              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkPosEsd(iPeak,iPFR))
+            ENDDO
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkPosAv(iPFR))
+          ENDIF
+! Calculate IPF_Range (only necessary on read)
+          IPF_Range(iPFR) = 1 + IPF_Hi(iPFR) - IPF_Lo(iPFR)
+        ENDDO
+! Calculate IPF_RPt
+        IPF_RPt(1) = 0
+        DO iPFR = 1, NumPeakFitRange
+          IPF_RPt(iPFR+1) = IPF_RPt(iPFR) + IPF_Range(iPFR)
+        ENDDO
+        DO iPoint = 1, IPF_RPt(NumPeakFitRange+1)
+          CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,XPeakFit(iPoint))
+          CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,YPeakFit(iPoint))
+        ENDDO
+      ENDIF
+      IF (RW .EQ. cRead) THEN
+! Update 'View'|'Peak Positions'...
+        CALL Upload_Positions ! Calculates COMMON /ALLPEAKS/
+!... and 'View'|'Peak Widths' tabs
+        CALL Upload_Widths
+      ENDIF
 
       END SUBROUTINE PrjReadWritePeakFitRanges
 !
