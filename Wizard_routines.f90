@@ -697,15 +697,13 @@
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
-      INTEGER          IPMIN, IPMAX
-      COMMON /PROFIPM/ IPMIN, IPMAX
+      INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
+      COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER tInt1, tInt2, tFieldState
@@ -713,7 +711,7 @@
                        tXPGMIN,    tXPGMAX,    tYPGMIN,    tYPGMAX,      &
                        tXPGMINOLD, tXPGMAXOLD, tYPGMINOLD, tYPGMAXOLD,   &
                        tXGGMIN,    tXGGMAX
-      INTEGER          tIPMIN, tIPMAX
+      INTEGER          tIPMIN, tIPMAX, tiStart, tiStop, tnPoints
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
@@ -745,10 +743,11 @@
               tXPGMAXOLD = XPGMAXOLD
               tYPGMINOLD = YPGMINOLD
               tYPGMAXOLD = YPGMAXOLD
-              tXGGMIN    = XGGMIN
-              tXGGMAX    = XGGMAX
               tIPMIN     = IPMIN
               tIPMAX     = IPMAX
+              tiStart    = iStart
+              tiStop     = iStop
+              tnPoints   = nPoints
               CALL WizardApplyProfileRange
               IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
                 CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
@@ -772,10 +771,11 @@
               XPGMAXOLD = tXPGMAXOLD
               YPGMINOLD = tYPGMINOLD
               YPGMAXOLD = tYPGMAXOLD
-              XGGMIN    = tXGGMIN
-              XGGMAX    = tXGGMAX
               IPMIN     = tIPMIN
               IPMAX     = tIPMAX
+              iStart    = tiStart
+              iStop     = tiStop
+              nPoints   = tnPoints
               CALL Profile_Plot
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
