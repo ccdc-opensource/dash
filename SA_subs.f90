@@ -10,7 +10,6 @@
       USE PO_VAR
       USE ZMVAR
       USE SOLVAR
-!O      USE REFVAR
 
       IMPLICIT NONE
 
@@ -103,13 +102,12 @@
 
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, CheckXInBounds
-     ! CHARACTER*(20) :: Integer2String
       INTEGER NACC
       LOGICAL MAKET0
       DOUBLE PRECISION FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
       DOUBLE PRECISION F, FP, P, PP, RATIO, DX
       DOUBLE PRECISION RANIN
-      INTEGER NUP, NDOWN, NREJ, H, I, J, M, II, IV
+      INTEGER NUP, NDOWN, NREJ, H, I, J, M, II
       INTEGER MRAN, MRAN1, IARR, IAR1
       DOUBLE PRECISION T
       INTEGER NumTrialsPar(MVAR)
@@ -222,15 +220,11 @@
 ! Initialise all degrees of freedom either to a preset value or to
 ! a random value
       CALL MAKXIN(nvar)
-      DO IV = 1, nvar
-        C(IV) = 2.0
-      ENDDO
       NACC = 0
       NTOTMOV = 0
       DO I = 1, nvar
         XOPT(I) = X(I)
-        NACP(I) = 0
-        NumTrialsPar(I) = 0
+        C(I) = 2.0
       ENDDO
 ! Evaluate the function with input X and return value as F.
       IF (PrefParExists) CALL PO_PRECFC(SNGL(X(iPrfPar)))
@@ -243,7 +237,7 @@
 ! Evaluate the profile chi-squared as well
       CALL valchipro(CHIPROBEST)
       PrevRejected = .TRUE.
-! plot the profile
+! Plot the profile
       CALL Profile_Plot
       FOPT = F
       MRAN  = ISEED1 + Curr_SA_Run
@@ -278,6 +272,10 @@
 !   Starting point for multiple moves
 ! ##########################################
       DO M = 1, NT
+        DO I = 1, nvar
+          NACP(I) = 0
+          NumTrialsPar(I) = 0
+        ENDDO
 ! MRAN RANGE IS 0 -> IM=7875
         MRAN = MOD(MRAN*IA+IC,IM)
         IARR = MRAN + 1
@@ -304,7 +302,7 @@
                   XP(H) = XP(H) + 180.00
                   CALL ThreeSixtyToOneEighty(XP(H))
                 ELSE
-                  XP(H) = (-1) * (XP(H))
+                  XP(H) = -XP(H)
                 ENDIF
               ENDIF            
               IARR = IARR + 1 
@@ -316,12 +314,12 @@
               ELSEIF ((RANARR(IARR) .GE. 0.66) .AND. (RANARR(IARR).LT. 1.00)) THEN
                 xtem = xtem + 240.00
               ENDIF
+              IARR = IARR + 1
               IF (Xtem .GE. 360.00) THEN
                 Xtem = xtem - 360.00
               END IF
               CALL ThreeSixtyToOneEighty(xtem)
               XP(H) = xtem
-              IARR = IARR + 1
             ENDIF
 
 !O! If translation, adjust to be between 0.0 and 1.0
@@ -376,31 +374,30 @@
                     ELSE
                       IARR = IARR + 1
                       xtem = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
-                      IF (sgn .lt. 0.0) THEN
+                      IF (sgn .LT. 0.0) THEN
                         xtem = xtem + 180.00
                       ENDIF
                     ENDIF
-                    IF (xtem .gt. 360.00) THEN
+                    IARR = IARR + 1 
+                    IF (xtem .GT. 360.00) THEN
                       xtem = xtem - 360.00
                     ENDIF
                     CALL ThreeSixtyToOneEighty(xtem)
                     XP(H) = xtem
-                    IARR = IARR + 1 
                   ELSEIF (UB(H) * LB(H) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
                     Sgn = SIGN(1.0, XP(H))
                     IF (RANARR(IARR) .LT. 0.5) THEN
                       IARR = IARR + 1
                       XP(H) = LB(H) + (RULB(H) * RANARR(IARR))
-                      XP(H) = XP(H) * ((-1)*Sgn)
+                      XP(H) = XP(H) * (-Sgn)
                     ELSE
                       IARR = IARR + 1 
-                      XP(H) = (-1)*LB(H) - (RULB(H) * RANARR(IARR))
+                      XP(H) = -LB(H) - (RULB(H) * RANARR(IARR))
                       XP(H) = XP(H) * Sgn
                     ENDIF 
                     IARR = IARR + 1
                   ENDIF
                 ENDIF
-
               CASE(3) !trimodal ranges
                 IF (CheckXinBounds(H, XP(H))) THEN ! calculate new value in one of three allowed ranges
                   xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
@@ -417,7 +414,6 @@
                 ENDIF
                 XP(H) = xtem
             END SELECT
-
             CurrIsPO = (kzmpar2(H) .EQ. 7)
             IF (PrefParExists) THEN
 ! Evaluate the function with the trial point XP and return as FP.
@@ -444,25 +440,20 @@
               CALL FCN(XP,FP,0)
             ENDIF
             PrevWasPO = CurrIsPO
-
             FPSUM0 = FPSUM0 + 1.0
             FPSUM1 = FPSUM1 + FP
             FPSUM2 = FPSUM2 + FP*FP
             A0SUM(H) = A0SUM(H) + 1.0
             XDSS(H) = XDSS(H) + (FP-F)**2
             PrevRejected = .FALSE.
-
-            IF (FP.LE.F) THEN
+            IF (FP .LE. F) THEN
               X(H) = XP(H)
               F = FP
               NACC = NACC + 1
               NACP(H) = NACP(H) + 1
-              X0SUM(H) = X0SUM(H) + 1.0
-              XSUM(H) = XSUM(H) + X(H)
-              XXSUM(H) = XXSUM(H) + X(H)**2
               NUP = NUP + 1
 ! If lower than any other point, record as new optimum.
-              IF (FP.LT.FOPT) THEN
+              IF (FP .LT. FOPT) THEN
                 DO I = 1, nvar
                   XOPT(I) = XP(I)
                 ENDDO
@@ -484,23 +475,20 @@
               P = EXPREP((F-FP)/T)
               PP = RANARR(IARR)
               IARR = IARR + 1
-              IF (PP.LT.P) THEN
+              IF (PP .LT. P) THEN
                 X(H) = XP(H)
                 F = FP
                 NACC = NACC + 1
                 NACP(H) = NACP(H) + 1
-                X0SUM(H) = X0SUM(H) + 1.0
-                XSUM(H) = XSUM(H) + X(H)
-                XXSUM(H) = XXSUM(H) + X(H)**2
                 NDOWN = NDOWN + 1
               ELSE
                 NREJ = NREJ + 1
                 PrevRejected = .TRUE.
-!O                X0SUM(H) = X0SUM(H) + 1.0
-!O                XSUM(H) = XSUM(H) + X(H)
-!O                XXSUM(H) = XXSUM(H) + X(H)**2
               ENDIF
             ENDIF
+            X0SUM(H) = X0SUM(H) + 1.0
+            XSUM(H) = XSUM(H) + X(H)
+            XXSUM(H) = XXSUM(H) + X(H)**2
           ENDDO ! Loop over parameters
           CALL sa_move_status(nmpert,m*NPAR*ns)
         ENDDO ! Loop over NS
@@ -519,9 +507,6 @@
           IF (VM(I).LT.0.01*RULB(I)) THEN
             VM(I) = 0.01*RULB(I)
           ENDIF
-
-          NACP(I) = 0
-          NumTrialsPar(I) = 0
         ENDDO
         CALL PeekEvent
         DO WHILE (iMyExit .EQ. 6) ! Pause
@@ -534,19 +519,17 @@
           ENDIF
         ENDDO
         IF (iMyExit .NE. 0) GOTO 999 ! Exit all loops and jump straight to the end
-
       ENDDO ! Loop over moves per iteration (NT)
-
       Last_NDOWN = NDOWN
       Last_NUP   = NUP
 ! Calculate the average energy and deviation
       FPAV = FPSUM1/FPSUM0
       FPSD = SQRT(MAX(DP0,(FPSUM2/FPSUM0)-(FPAV**2)))
       DO I = 1, nvar
-        IF (X0SUM(I).GT.0.) THEN
-          DXVAV(I) = XSUM(I)/X0SUM(I)
-          XVSIG(I) = SQRT(MAX(DP0,(XXSUM(I)/X0SUM(I))-(DXVAV(I)*DXVAV(I))))
-          FLAV(I) = SQRT(MAX(DP0,XDSS(I)/A0SUM(I)))
+        IF (X0SUM(I) .GT. 0.0) THEN
+          DXVAV(I) = 1.0 !XSUM(I)/X0SUM(I)
+          XVSIG(I) = 1.0 !SQRT(MAX(DP0,(XXSUM(I)/X0SUM(I))-(DXVAV(I)*DXVAV(I))))
+          FLAV(I) = 1.0 !SQRT(MAX(DP0,XDSS(I)/A0SUM(I)))
         ENDIF
       ENDDO
       ntotmov = ntotmov + nmpert
@@ -573,10 +556,6 @@
         X(I) = XOPT(I)
       ENDDO
       F = FOPT
-!O      CALL PO_PRECFC
-!O      CALL FCN(XOPT,F,0)
-!O      FOPT = F
-!O      CALL valchipro(CHIPROBEST)
   999 CONTINUE ! This is where we jump to if the user pressed 'Stop' during the SA
                ! The variable imyexit has been set to 3, 4 or 5  (3 = stop SA, 4 = start next run, 5 = Edit)
                ! If we didn't jump to this point, just passed it, imyexit is 0
@@ -750,7 +729,7 @@
           GOTO 10
         ENDIF
       ENDDO
-!.. rin is between yran(jn) and yran(jn+1) now iterate
+! rin is between yran(jn) and yran(jn+1) now iterate
    10 xl = xs*FLOAT(jn-1)
       xsn = 0.5*xs
       xm = xl + xsn
@@ -812,6 +791,7 @@
       INCLUDE 'PARAMS.INC' 
 
       INTEGER, INTENT (IN   ) :: N
+
       DOUBLE PRECISION RULB
       COMMON /RULB/ RULB(Mvar)
 
@@ -828,7 +808,6 @@
       CALL WDialogSelect(IDD_SA_Modal_input2)
       IF (WDialogGetCheckBoxLogical(IDF_RandomInitVal)) THEN
         DO IV = 1, N
-!ELNA          X(IV) = LB(IV) + (UB(IV)-LB(IV))*RANMAR()
           X(IV) = LB(IV) + RULB(IV)*RANMAR()
         ENDDO
       ELSE
@@ -897,7 +876,7 @@
             tempLower = SNGL(LB(I))
             CALL OneEightyToThreeSixty(tempUpper)
             CALL OneEightyToThreeSixty(tempLower)
-            RULB(I) = ABS(tempUpper - tempLower)
+            RULB(I) = DBLE(ABS(tempUpper - tempLower))
           ENDIF
         ENDIF
         IF (ModalFlag(I) .EQ. 3) THEN
@@ -911,7 +890,7 @@
             tempLower = SNGL(LB(I))
             CALL OneEightyToThreeSixty(TempUpper)
             CALL OneEightyToThreeSixty(TempLower)
-            RULB(I) = ABS(TempUpper - TempLower)
+            RULB(I) = DBLE(ABS(TempUpper - TempLower))
           ENDIF
         ENDIF
       ENDDO
