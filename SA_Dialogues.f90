@@ -551,6 +551,7 @@
                   IF ((iAtomNr .LT. 1) .OR. (iAtomNr .GT. natoms(CurrentlyEditedFrag))) THEN
                     CALL ErrorMessage("Please enter a correct atom number for the centre of rotation.")
                     CALL PopActiveWindowID
+                    RETURN
                   ENDIF
                   COM(1) = axyzo(1,izmbid(iAtomNr,iFrg))
                   COM(2) = axyzo(2,izmbid(iAtomNr,iFrg))
