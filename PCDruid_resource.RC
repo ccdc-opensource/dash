@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 10/Oct/2001 09:13:57
+// Modified : 14/Oct/2001 15:46:34
 //
 ///////////////////////////////////////////////////
 //
@@ -192,7 +192,6 @@
 #define IDF_PWa_Data_Group               1261
 #define IDF_PWa_Data_fFilename           1262
 #define IDF_PWa_DataFileName_String      1263
-#define ID_PWa_DF_Browse                 1264
 #define IDF_PW_Option2                   1252
 #define IDF_PW_Option3                   1253
 #define IDF_PW_Option4                   1254
@@ -501,6 +500,15 @@
 #define IDB_ZMatrixView3                 1248
 #define IDB_ZMatrixView4                 1249
 #define IDB_ZMatrixView5                 1250
+#define ID_Configuration                40016
+#define IDD_Configuration                 147
+#define IDF_ViewArg                      1256
+#define IDF_ViewExe                      1257
+#define IDBBROWSE                        1258
+#define IDF_AutoLocalOptimise            1259
+#define IDF_OutputCSSR                   1260
+#define IDF_OutputCCL                    1277
+#define IDF_UseHydrogens                 1296
 
 ///////////////////////////////////////////////////
 //
@@ -904,6 +912,19 @@ BEGIN
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
 END
 
+IDD_Width_Equations RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
@@ -1263,11 +1284,24 @@ BEGIN
     CONTROL "Diffraction data",IDF_PWa_Data_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  110,   24,  178,   52
     CONTROL "File",IDF_PWa_Data_fFilename,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  122,   40,   20,    8
     CONTROL "",IDF_PWa_DataFileName_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,  148,   36,  130,   14
-    CONTROL "&Browse...",ID_PWa_DF_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  208,   56,   40,   14
+    CONTROL "&Browse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  208,   56,   40,   14
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  128,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  128,   40,   14
     CONTROL "&Finish",IDFINISH,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  205,  128,   40,   14
     CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  158,   56,   40,   14
+END
+
+IDD_PW_Page3 RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
 END
 
 IDD_Pawley_Status DIALOG 0, 0,  306,  185
@@ -2051,6 +2085,19 @@ BEGIN
     CONTROL "View fit list file",ID_Edit_PawleyLog,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  136,   68,   50,   14
 END
 
+IDD_Pawley_ErrorLog RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
 IDD_SA_Multi_Completed DIALOG 0, 0,  472,  143
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
@@ -2437,6 +2484,42 @@ BEGIN
 ,0
 END
 
+IDD_Configuration DIALOG 0, 0,  281,  161
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Configuration"
+BEGIN
+    CONTROL "Debug message",IDF_ViewExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   39,    9,  180,   14
+    CONTROL "Debug message",IDF_ViewArg,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,   81,   27,   73,   14
+    CONTROL "Browse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  228,    8,   40,   14
+    CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   11,   25,    8
+    CONTROL "Arguments for viewer",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   12,   30,   66,    8
+    CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  120,  138,   40,   14
+    CONTROL "Auto local optimise",IDF_AutoLocalOptimise,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   78,   74,   14
+    CONTROL "Output .cssr",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   92,   48,   14
+    CONTROL "Output .ccl",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  106,   42,   14
+    CONTROL "Use hydrogens",IDF_UseHydrogens,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   64,   60,   14
+END
+
+IDD_Configuration RCDATA
+BEGIN
+"[Checks] \n"
+" 1259 1 \n"
+" 1260 0 \n"
+" 1277 0 \n"
+" 1296 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+" 1257   255 \n"
+" 1256    20 \n"
+,0
+END
+
 ///////////////////////////////////////////////////
 //
 // Menus
@@ -2470,6 +2553,7 @@ BEGIN
     POPUP "&Options"
     BEGIN
         MENUITEM "Plot Options...",                          ID_plot_options
+        MENUITEM "Configuration...",                         ID_Configuration
     END
     POPUP "&Help"
     BEGIN
