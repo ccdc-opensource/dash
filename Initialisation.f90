@@ -59,23 +59,13 @@
 
       IMPLICIT NONE
 
-      CALL WDialogLoad(IDD_LicenceAgreement)
-      CALL WDialogLoad(IDD_License_Dialog)
       CALL WDialogLoad(IDD_Background_Fit)
       CALL WDialogLoad(IDD_Structural_Information)
-      CALL WDialogLoad(IDD_SA_Action1)
-      CALL WDialogLoad(IDD_Plot_Option_Dialog)
       CALL WDialogLoad(IDD_Configuration)
-      CALL WDialogLoad(IDD_Peak_Positions)
       CALL WDialogLoad(IDD_Index_Preparation)
+      CALL WDialogLoad(IDD_DV_Results)
 ! Set the colours of the grid manually
       CALL WDialogLoad(IDD_Plot_Option_Dialog)
-      CALL WDialogLoad(IDD_Crystal_Symmetry)
-      CALL WDialogLoad(IDD_Data_Properties)
-      CALL WDialogLoad(IDD_Sigma_info)
-      CALL WDialogLoad(IDD_Gamma_info)
-      CALL WDialogLoad(IDD_HPSL_info)
-      CALL WDialogLoad(IDD_HMSL_info)
       CALL WDialogLoad(IDD_Polyfitter_Wizard_01)
       CALL WDialogLoad(IDD_PW_Page1)
       CALL WDialogLoad(IDD_PW_Page2)
@@ -85,11 +75,11 @@
       CALL WDialogLoad(IDD_PW_Page5)
       CALL WDialogLoad(IDD_PW_Page6)
       CALL WDialogLoad(IDD_PW_Page7)
-      CALL WDialogLoad(IDD_DICVOLRunning)
       CALL WDialogLoad(IDD_PW_Page8)
       CALL WDialogLoad(IDD_PW_Page9)
       CALL WDialogLoad(IDD_PW_Page10)
       CALL WDialogLoad(IDD_Pawley_Status)
+      CALL WDialogLoad(IDD_Pawley_ErrorLog)
       CALL WDialogLoad(IDD_ExclRegions)
       CALL WDialogLoad(IDD_SAW_Page1)
       CALL WDialogLoad(IDD_zmEdit)
@@ -97,18 +87,11 @@
       CALL WDialogLoad(IDD_SAW_Page2)
       CALL WDialogLoad(IDD_SA_input2)
       CALL WDialogLoad(IDD_SA_input3)
-      CALL WDialogLoad(IDD_SAW_Page5)
+      CALL WDialogLoad(IDD_SA_Action1)
       CALL WDialogLoad(IDD_Summary)
-      CALL WDialogLoad(IDD_Pawley_ErrorLog)
-      CALL WDialogLoad(IDD_DV_Results)
+      CALL WDialogLoad(IDD_SAW_Page5)
       CALL WDialogLoad(IDD_Parameter_Status_2)
       CALL WDialogLoad(IDD_Rietveld)
-      CALL WDialogLoad(IDD_RRsubZmatrices)
-      CALL WDialogLoad(IDD_RRsubBonds)
-      CALL WDialogLoad(IDD_RRsubAngles)
-      CALL WDialogLoad(IDD_RRsubTorsions)
-      CALL WDialogLoad(IDD_RRsubAtoms)
-      CALL WDialogLoad(IDD_RRsubData)
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
@@ -268,7 +251,7 @@
       INTEGER I, J
       INTEGER iRed, iGreen, iBlue, iRGBvalue
       REAL    UM, TH
-      LOGICAL MercuryExists
+!O      LOGICAL MercuryExists
 
       LOGICAL            ShowAgain
       COMMON  / DBGMSG / ShowAgain
