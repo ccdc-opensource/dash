@@ -1785,12 +1785,12 @@
       USE VARIABLES
       USE WINTERACTER
       USE DRUID_HEADER
-      CHARACTER *(*) filename
-      CHARACTER *7   cmobs
-      INTEGER        len_filename
+      CHARACTER*(*) filename
+      CHARACTER*7   cmobs
+      INTEGER       len_filename
 
       len_filename = LEN_TRIM(filename)
-      WRITE(cmobs,'(i7)' ) Npoints
+      WRITE(cmobs,'(I7)') Npoints
       CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
         " The file "//filename(1:len_filename)//" contains greater than "//cmobs(1:LEN_TRIM(cmobs))//char(13)//&
         " data points. Only the first "//cmobs(1:LEN_TRIM(cmobs))//" points were read",&
@@ -1846,7 +1846,7 @@
       CALL WDialogSelect(ID_Background_Fit)
 ! Initialise the background
       CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-      CALL BackFit(IBpass)
+      CALL BackMCBruckner(IBpass)
       CALL Profile_Plot(IPTYPE)
       CALL WDialogShow(-1,-1,0,Modeless)
 ! JvdS The next line queries the current status, but is it handled properly?
@@ -1861,7 +1861,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Background_Apply)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-              CALL BackFit(IBpass)
+              CALL BackMCBruckner(IBpass)
               CALL Profile_Plot(IPTYPE)
             CASE (IDF_Background_Accept)
 ! Subtract the background
