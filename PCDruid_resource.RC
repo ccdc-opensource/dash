@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 02/Nov/2001 18:31:01
+// Modified : 03/Nov/2001 18:00:55
 //
 ///////////////////////////////////////////////////
 //
@@ -49,7 +49,6 @@
 #define ID_Polyfitter_Tips              40033
 #define ID_Druid_Mode_Menu              40022
 #define ID_Peak_Fitting_Mode            40023
-#define ID_Default_Mode                 40028
 #define ID_Structure_Solution_Mode      40010
 #define ID_Pawley_Refinement_Mode       40040
 #define ID_Options                      40048
@@ -493,6 +492,16 @@
 #define IDF_PlotPeakFitDif               1133
 #define ID_ClearPeakFitRanges           40018
 #define IDB_ShowOverlap                  1137
+#define IDB_ZmatrixDelete1               1145
+#define IDB_ZmatrixDelete2               1146
+#define IDB_ZmatrixDelete3               1147
+#define IDB_ZmatrixDelete4               1148
+#define IDB_ZmatrixDelete5               1149
+#define IDF_UseOriginal                  1164
+#define IDF_UseSolutionNr                1178
+#define IDF_ColourByElement              1200
+#define IDF_GROUP3                       1202
+#define IDF_ColourBySolution             1216
 
 ///////////////////////////////////////////////////
 //
@@ -900,6 +909,19 @@ BEGIN
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
 END
 
+IDD_Width_Equations RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
@@ -1265,6 +1287,19 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  128,   40,   14
     CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  167,   62,   40,   14
     CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  128,   40,   14
+END
+
+IDD_PW_Page3 RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
 END
 
 IDD_Pawley_Status DIALOG 0, 0,  306,  185
@@ -1982,43 +2017,61 @@ BEGIN
     CONTROL "View fit list file",ID_Edit_PawleyLog,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  136,   68,   50,   14
 END
 
-IDD_SAW_Page1 DIALOG 0, 0,  391,  147
+IDD_Pawley_ErrorLog RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_SAW_Page1 DIALOG 0, 0,  408,  147
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Molecular Z-Matrices"
 BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  128,   40,   14
-    CONTROL "Open existing project file",IDF_SA_project_name_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   98,    4,   80,    8
-    CONTROL "",IDF_SA_Project_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   98,   16,  200,   14
-    CONTROL "Browse...",IDB_SA_Project_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  346,   16,   36,   14
+    CONTROL "DASH Pawley file",IDF_SA_project_name_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   98,    4,   60,    8
+    CONTROL "",IDF_SA_Project_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   98,   14,  200,   14
+    CONTROL "Browse...",IDB_SA_Project_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  346,   14,   36,   14
     CONTROL "",IDF_ZMatrix_file1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,   98,   40,  200,   14
     CONTROL "",IDF_ZMatrix_file2,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,   98,   56,  200,   14
     CONTROL "",IDF_ZMatrix_file3,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,   98,   72,  200,   14
     CONTROL "",IDF_ZMatrix_file4,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,   98,   88,  200,   14
     CONTROL "",IDF_ZMatrix_file5,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,   98,  104,  200,   14
-    CONTROL "",IDB_ZMatrix_Browse1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   41,   16,   12
-    CONTROL "",IDB_ZMatrix_Browse2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   57,   16,   12
-    CONTROL "",IDB_ZMatrix_Browse3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   73,   16,   12
-    CONTROL "",IDB_ZMatrix_Browse4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   89,   16,   12
-    CONTROL "",IDB_ZMatrix_Browse5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,  105,   16,   12
-    CONTROL "",IDF_ZM_pars1,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  364,   40,   16,   14
-    CONTROL "",IDF_ZM_pars2,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  364,   56,   16,   14
-    CONTROL "",IDF_ZM_pars3,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  364,   72,   16,   14
-    CONTROL "",IDF_ZM_pars4,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  364,   88,   16,   14
-    CONTROL "",IDF_ZM_pars5,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  364,  104,   16,   14
-    CONTROL "",IDF_ZM_allpars,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  364,  126,   16,   14
-    CONTROL "Molecular Z-matrix files",IDF_ZM_file_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   98,   32,   80,    8
-    CONTROL "Total number of parameters =",IDF_ZM_allpars_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  274,  129,   88,    8
-    CONTROL "Open",IDB_SA_Project_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  302,   16,   40,   14
+    CONTROL "",IDB_ZMatrix_Browse1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  325,   41,   16,   12
+    CONTROL "",IDB_ZMatrix_Browse2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  325,   57,   16,   12
+    CONTROL "",IDB_ZMatrix_Browse3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  325,   73,   16,   12
+    CONTROL "",IDB_ZMatrix_Browse4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  325,   89,   16,   12
+    CONTROL "",IDB_ZMatrix_Browse5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  325,  105,   16,   12
+    CONTROL "",IDF_ZM_pars1,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,   40,   16,   14
+    CONTROL "",IDF_ZM_pars2,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,   56,   16,   14
+    CONTROL "",IDF_ZM_pars3,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,   72,   16,   14
+    CONTROL "",IDF_ZM_pars4,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,   88,   16,   14
+    CONTROL "",IDF_ZM_pars5,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,  104,   16,   14
+    CONTROL "",IDF_ZM_allpars,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,  126,   16,   14
+    CONTROL "Molecular Z-matrix files",IDF_ZM_file_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   98,   31,   80,    8
+    CONTROL "Number of degrees of freedom =",IDF_ZM_allpars_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  283,  129,   98,    8
+    CONTROL "Open",IDB_SA_Project_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  302,   14,   40,   14
     CONTROL "Import...",IDB_SA_Project_Import,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  226,  128,   38,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,    3,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "<&Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  128,   40,   14
-    CONTROL "View",IDB_ZMatrixView1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  326,   40,   30,   14
-    CONTROL "View",IDB_ZMatrixView2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  326,   56,   30,   14
-    CONTROL "View",IDB_ZMatrixView3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  326,   72,   30,   14
-    CONTROL "View",IDB_ZMatrixView4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  326,   88,   30,   14
-    CONTROL "View",IDB_ZMatrixView5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  326,  104,   30,   14
+    CONTROL "View",IDB_ZMatrixView1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  347,   40,   30,   14
+    CONTROL "View",IDB_ZMatrixView2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  347,   56,   30,   14
+    CONTROL "View",IDB_ZMatrixView3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  347,   72,   30,   14
+    CONTROL "View",IDB_ZMatrixView4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  347,   88,   30,   14
+    CONTROL "View",IDB_ZMatrixView5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  347,  104,   30,   14
     CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  128,   40,   14
+    CONTROL "",IDB_ZmatrixDelete1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   41,   16,   12
+    CONTROL "",IDB_ZmatrixDelete2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   57,   16,   12
+    CONTROL "",IDB_ZmatrixDelete3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   73,   16,   12
+    CONTROL "",IDB_ZmatrixDelete4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   89,   16,   12
+    CONTROL "",IDB_ZmatrixDelete5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,  105,   16,   12
 END
 
 IDD_SAW_Page1 RCDATA
@@ -2040,26 +2093,67 @@ BEGIN
 ,0
 END
 
-IDD_SA_Multi_completed_ep DIALOG 0, 0,  466,  158
+IDD_SA_Multi_completed_ep DIALOG 0, 0,  462,  184
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Results from Simulated Annealing"
 BEGIN
-    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   17,   37,  421,   80
-    CONTROL "Simulated Annealing completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  125,   16,  220,   12
-    CONTROL "OK",IDOK_ep,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   99,  136,   40,   14
-    CONTROL "Show the solutions I just ticked nicely aligned and coloured in a single unit cell",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  173,  136,  240,   14
+    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,   13,   24,  435,   80
+    CONTROL "Simulated Annealing completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  121,    7,  220,   10
+    CONTROL "OK",IDOK_ep,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   99,  159,   40,   14
+    CONTROL "Show the solutions I just ticked nicely aligned and coloured in a single unit cell",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  173,  159,  240,   14
+    CONTROL "Element symbol + solution number",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  114,  118,  114,   14
+    CONTROL "Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  114,  132,  114,   14
+    CONTROL "By solution number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  298,  118,   70,   14
+    CONTROL "By element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  298,  132,   70,   14
+    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  106,  108,  128,   42
+    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  290,  108,   88,   42
 END
 
 IDD_SA_Multi_completed_ep RCDATA
 BEGIN
 "[Checks] \n"
+" 1178 1 \n"
+" 1164 0 \n"
+" 1216 1 \n"
+" 1200 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
 " 1136     5     30   128 \n"
+"   14 \n"
+"1 \n"
+"2 \n"
+"3 \n"
+"4 \n"
+"5 \n"
+"6 \n"
+"7 \n"
+"8 \n"
+"9 \n"
+"10 \n"
+"11 \n"
+"12 \n"
+"13 \n"
+"14 \n"
+"15 \n"
+"16 \n"
+"17 \n"
+"18 \n"
+"19 \n"
+"20 \n"
+"21 \n"
+"22 \n"
+"23 \n"
+"24 \n"
+"25 \n"
+"26 \n"
+"27 \n"
+"28 \n"
+"29 \n"
+"30 \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
@@ -2259,12 +2353,12 @@ BEGIN
 ,0
 END
 
-IDD_DV_Results DIALOG 0, 0,  469,  158
+IDD_DV_Results DIALOG 0, 0,  484,  158
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Results from DICVOL"
 BEGIN
-    CONTROL "",IDF_DV_Summary_0,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   15,   46,  438,   79
+    CONTROL "",IDF_DV_Summary_0,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,   15,   46,  452,   79
     CONTROL "DICVOL completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  125,   11,  200,   10
     CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  215,  137,   40,   14
     CONTROL "Import a solution into DASH by pressing the 'Import' button. When done, press 'Close'.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  104,   24,  261,   10
@@ -2279,6 +2373,37 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1232    11     30   146 \n"
+"   14 \n"
+"1 \n"
+"2 \n"
+"3 \n"
+"4 \n"
+"5 \n"
+"6 \n"
+"7 \n"
+"8 \n"
+"9 \n"
+"10 \n"
+"11 \n"
+"12 \n"
+"13 \n"
+"14 \n"
+"15 \n"
+"16 \n"
+"17 \n"
+"18 \n"
+"19 \n"
+"20 \n"
+"21 \n"
+"22 \n"
+"23 \n"
+"24 \n"
+"25 \n"
+"26 \n"
+"27 \n"
+"28 \n"
+"29 \n"
+"30 \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
@@ -2481,12 +2606,12 @@ BEGIN
 ,0
 END
 
-IDD_PW_Page9 DIALOG 0, 0,  451,  147
+IDD_PW_Page9 DIALOG 0, 0,  466,  147
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Results from DICVOL"
 BEGIN
-    CONTROL "",IDF_DV_Summary_0,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   92,   40,  348,   79
+    CONTROL "",IDF_DV_Summary_0,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,   92,   40,  362,   79
     CONTROL "DICVOL completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  173,    9,  200,   10
     CONTROL "Import a solution into DASH by pressing the 'Import' button. When done, press 'Next >'.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  142,   22,  263,   10
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,    3,   70,  140,WS_EX_DLGMODALFRAME
@@ -2504,6 +2629,37 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1232    11     30   152 \n"
+"   14 \n"
+"1 \n"
+"2 \n"
+"3 \n"
+"4 \n"
+"5 \n"
+"6 \n"
+"7 \n"
+"8 \n"
+"9 \n"
+"10 \n"
+"11 \n"
+"12 \n"
+"13 \n"
+"14 \n"
+"15 \n"
+"16 \n"
+"17 \n"
+"18 \n"
+"19 \n"
+"20 \n"
+"21 \n"
+"22 \n"
+"23 \n"
+"24 \n"
+"25 \n"
+"26 \n"
+"27 \n"
+"28 \n"
+"29 \n"
+"30 \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
@@ -2581,8 +2737,6 @@ BEGIN
     END
     POPUP "&Mode"
     BEGIN
-        MENUITEM "&Default\aAlt+M",                          ID_Default_Mode, GRAYED
-        MENUITEM SEPARATOR
         MENUITEM "&Peak Fitting\aAlt+P",                     ID_Peak_Fitting_Mode, CHECKED
         MENUITEM "Pawley &Refinement\aAlt+R",                ID_Pawley_Refinement_Mode
         MENUITEM "&Structure Solution\aAlt+S",               ID_Structure_Solution_Mode
@@ -2633,7 +2787,6 @@ END
 //
 IDR_MENU1 ACCELERATORS
 BEGIN
-  77        , ID_Default_Mode                ,NOINVERT,VIRTKEY,ALT
   80        , ID_Peak_Fitting_Mode           ,NOINVERT,VIRTKEY,ALT
   82        , ID_Pawley_Refinement_Mode      ,NOINVERT,VIRTKEY,ALT
   83        , ID_Structure_Solution_Mode     ,NOINVERT,VIRTKEY,ALT
@@ -2653,6 +2806,11 @@ IDB_ZMatrix_Browse2             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse3             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse4             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse5             BITMAP DISCARDABLE "res\\OpenFile.bmp"
+IDB_ZmatrixDelete1              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
+IDB_ZmatrixDelete2              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
+IDB_ZmatrixDelete3              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
+IDB_ZmatrixDelete4              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
+IDB_ZmatrixDelete5              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
 
 ///////////////////////////////////////////////////
 //
@@ -2669,7 +2827,6 @@ BEGIN
     ID_HELP_ABOUT                   "Help"
     ID_FILE_EXIT                    "Exit"
     ID_PolyFitter_Help              "Help"
-    ID_Default_Mode                 "Default Mode"
     ID_Peak_Fitting_Mode            "Peak fitting mode"
     ID_Structure_Solution_Mode      "Structure solution mode"
     ID_Pawley_Refinement_Mode       "Pawley refinement mode"
@@ -2695,7 +2852,6 @@ BEGIN
    ID_import_dpj_file,
    ID_import_xye_file,0,
    ID_Remove_Background,0,
-   ID_Default_Mode,
    ID_Peak_Fitting_Mode,
    ID_Pawley_Refinement_Mode,
    ID_Structure_Solution_Mode,0,
