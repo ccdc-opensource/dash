@@ -1657,21 +1657,21 @@
 ! Firstly if we are centric then calculate only cosine terms
       IF (CENTRC) THEN
         DO N = 1, NATOM
-          SUM = 0.
+          SUMA = 0.0
 ! SUM OVER SYMMETRY EQUIVALENTS:
           DO I = 1, NOPC
 ! V is 2pi*(h*x+t)
             V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
             IV = V
             PV = V - FLOAT(IV)
-            SUM = SUM + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
+            SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
           ENDDO
-          AFCALC = AFCALC + SUM*FOB(N,IR)
+          AFCALC = AFCALC + SUMA*FOB(N,IR)
         ENDDO
         FFCALC_DEFAULT = AFCALC*AFCALC
       ELSE
 ! Deal with the non-centric case
-        BFCALC = 0.
+        BFCALC = 0.0
         DO N = 1, NATOM
           SUMA = 0.0
           SUMB = 0.0
