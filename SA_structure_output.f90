@@ -59,8 +59,8 @@
       CHARACTER*20             cpdbops
       COMMON /pdbops/ npdbops, cpdbops(mpdbops)
 
-      DOUBLE PRECISION f2cpdb
-      COMMON /pdbcat/  f2cpdb(3,3)
+      REAL            f2cpdb
+      COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
       INTEGER              iMyExit, num_new_min
       COMMON / CMN000001 / iMyExit, num_new_min
@@ -384,12 +384,12 @@
               ENDIF
               IF (tSavePDB) THEN
 ! The PDB atom lines
-                xc = XAtmCoords(1,ii,Curr_SA_Run) * SNGL(f2cpdb(1,1)) + &
-                     XAtmCoords(2,ii,Curr_SA_Run) * SNGL(f2cpdb(1,2)) + &
-                     XAtmCoords(3,ii,Curr_SA_Run) * SNGL(f2cpdb(1,3))
-                yc = XAtmCoords(2,ii,Curr_SA_Run) * SNGL(f2cpdb(2,2)) + &
-                     XAtmCoords(3,ii,Curr_SA_Run) * SNGL(f2cpdb(2,3))
-                zc = XAtmCoords(3,ii,Curr_SA_Run) * SNGL(f2cpdb(3,3))
+                xc = XAtmCoords(1,ii,Curr_SA_Run) * f2cpdb(1,1) + &
+                     XAtmCoords(2,ii,Curr_SA_Run) * f2cpdb(1,2) + &
+                     XAtmCoords(3,ii,Curr_SA_Run) * f2cpdb(1,3)
+                yc = XAtmCoords(2,ii,Curr_SA_Run) * f2cpdb(2,2) + &
+                     XAtmCoords(3,ii,Curr_SA_Run) * f2cpdb(2,3)
+                zc = XAtmCoords(3,ii,Curr_SA_Run) * f2cpdb(3,3)
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
                 IF (asym(iOrig,iFrg)(2:2).EQ.' ') THEN
@@ -482,13 +482,13 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SA_STRUCTURE_OUTPUT_PDB
+      SUBROUTINE SA_STRUCTURE_OUTPUT_PDB(TheRunNr)
 !
 ! This subroutine writes out a single solution to the file 'SA_best.pdb' for viewing.
 ! It is a combination of SA_STRUCTURE_OUTPUT() and SA_STRUCTURE_OUTPUT_OVERLAP()
 !
 ! It relies on XAtmCoords being up to date
-! Uses Curr_SA_Run to determine which solution to output
+! Uses TheRunNr to determine which solution to output
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -496,6 +496,8 @@
       USE ATMVAR
 
       IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheRunNr
 
       INCLUDE 'PARAMS.INC'
 
@@ -505,14 +507,8 @@
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
-
-! Use standard PDB orthogonalisation
-      DOUBLE PRECISION f2cpdb
-      COMMON /pdbcat/ f2cpdb(3,3)
+      REAL            f2cpdb
+      COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
       INTEGER TotNumBonds, NumOfAtomsSoFar
       INTEGER I, iFrg, iFrgCopy, J, iAtom
@@ -533,12 +529,12 @@
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 1, natoms(iFrg)
               iAtom = iAtom + 1
-              xc = XAtmCoords(1,OrderedAtm(iAtom),Curr_SA_Run) * SNGL(f2cpdb(1,1)) + &
-                   XAtmCoords(2,OrderedAtm(iAtom),Curr_SA_Run) * SNGL(f2cpdb(1,2)) + &
-                   XAtmCoords(3,OrderedAtm(iAtom),Curr_SA_Run) * SNGL(f2cpdb(1,3))
-              yc = XAtmCoords(2,OrderedAtm(iAtom),Curr_SA_Run) * SNGL(f2cpdb(2,2)) + &
-                   XAtmCoords(3,OrderedAtm(iAtom),Curr_SA_Run) * SNGL(f2cpdb(2,3))
-              zc = XAtmCoords(3,OrderedAtm(iAtom),Curr_SA_Run) * SNGL(f2cpdb(3,3))
+              xc = XAtmCoords(1,OrderedAtm(iAtom),TheRunNr) * f2cpdb(1,1) + &
+                   XAtmCoords(2,OrderedAtm(iAtom),TheRunNr) * f2cpdb(1,2) + &
+                   XAtmCoords(3,OrderedAtm(iAtom),TheRunNr) * f2cpdb(1,3)
+              yc = XAtmCoords(2,OrderedAtm(iAtom),TheRunNr) * f2cpdb(2,2) + &
+                   XAtmCoords(3,OrderedAtm(iAtom),TheRunNr) * f2cpdb(2,3)
+              zc = XAtmCoords(3,OrderedAtm(iAtom),TheRunNr) * f2cpdb(3,3)
 ! Note that elements are right-justified
               IF (asym(i,iFrg)(2:2).EQ.' ') THEN
                 WRITE (hFilePDB,1120,ERR=999) iAtom, OriginalLabel(i,iFrg)(1:3), xc, yc, zc, &
@@ -604,9 +600,8 @@
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 ! NumOf_SA_Runs holds the number of completed multiruns
 
-! Use standard PDB orthogonalisation
-      DOUBLE PRECISION f2cpdb
-      COMMON /pdbcat/  f2cpdb(3,3)
+      REAL            f2cpdb
+      COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
       INTEGER RunNr, TickedRunNr, NumOfOverlaidStructures
       INTEGER pdbBond(1:maxbnd_2*maxcopies*maxfrg,1:2)
@@ -623,7 +618,7 @@
       INTEGER, EXTERNAL :: WritePDBCommon
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
+      CALL WDialogSelect(IDD_SAW_Page5)
       hFilePDB = 65
 ! Write the file headers first
       OPEN (UNIT=hFilePDB,FILE='Overlap_Temp.pdb',STATUS='unknown',ERR=999)
@@ -710,12 +705,12 @@
                 DO i = 1, natoms(iFrg)
                   iiact = iiact + 1
                   iAtom = iAtom + 1
-                  xc = XAtmCoords(1,OrderedAtm(iAtom),RunNr) * SNGL(f2cpdb(1,1)) + &
-                       XAtmCoords(2,OrderedAtm(iAtom),RunNr) * SNGL(f2cpdb(1,2)) + &
-                       XAtmCoords(3,OrderedAtm(iAtom),RunNr) * SNGL(f2cpdb(1,3))
-                  yc = XAtmCoords(2,OrderedAtm(iAtom),RunNr) * SNGL(f2cpdb(2,2)) + &
-                       XAtmCoords(3,OrderedAtm(iAtom),RunNr) * SNGL(f2cpdb(2,3))
-                  zc = XAtmCoords(3,OrderedAtm(iAtom),RunNr) * SNGL(f2cpdb(3,3))
+                  xc = XAtmCoords(1,OrderedAtm(iAtom),RunNr) * f2cpdb(1,1) + &
+                       XAtmCoords(2,OrderedAtm(iAtom),RunNr) * f2cpdb(1,2) + &
+                       XAtmCoords(3,OrderedAtm(iAtom),RunNr) * f2cpdb(1,3)
+                  yc = XAtmCoords(2,OrderedAtm(iAtom),RunNr) * f2cpdb(2,2) + &
+                       XAtmCoords(3,OrderedAtm(iAtom),RunNr) * f2cpdb(2,3)
+                  zc = XAtmCoords(3,OrderedAtm(iAtom),RunNr) * f2cpdb(3,3)
 ! Note that elements are right-justified
                   IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
                     IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
@@ -795,16 +790,15 @@
       CHARACTER*20             cpdbops(mpdbops)
       COMMON /pdbops/ npdbops, cpdbops
 
-! Use standard PDB orthogonalisation
-      DOUBLE PRECISION f2cpdb
-      COMMON /pdbcat/  f2cpdb(3,3)
+      REAL            f2cpdb
+      COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
       INTEGER ii
-      DOUBLE PRECISION inv(3,3)
+      REAL    inv(3,3)
 
 ! Initialise to failure
       WritePDBCommon = 1
-      CALL sagminv(f2cpdb,inv,3)
+      CALL InverseMatrix(f2cpdb,inv,3)
 ! Add in a Header record
       WRITE (hFilePDB,1050,ERR=999) (CellPar(ii),ii=1,6), SGHMaStr(NumberSGTable)
  1050 FORMAT ('CRYST1',3F9.3,3F7.2,X,A12)
