@@ -1,4 +1,4 @@
-! Winteracter module created : 25/Nov/2001 17:07:38
+! Winteracter module created : 26/Nov/2001 10:20:51
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -475,7 +475,6 @@
           INTEGER, PARAMETER :: IDF_MaxMoves2                   =  1235
           INTEGER, PARAMETER :: IDD_PW_Page10                   =   119
           INTEGER, PARAMETER :: IDF_OutputPRO                   =  1043
-          INTEGER, PARAMETER :: IDF_LABEL20                     =  1100
           INTEGER, PARAMETER :: IDF_ShowRange                   =  1217
           INTEGER, PARAMETER :: IDF_ShowTicked                  =  1218
           INTEGER, PARAMETER :: IDF_Limit1                      =  1219
