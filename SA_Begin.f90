@@ -182,7 +182,7 @@
 !
 !*****************************************************************************
 !
-! JCC Check the files before we trash them  
+! Check the files before we trash them  
       INTEGER FUNCTION CheckOverwriteSaOutput()
 
       USE WINTERACTER

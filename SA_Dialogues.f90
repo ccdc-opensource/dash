@@ -1872,7 +1872,6 @@
               ENDIF
               ModalFlag(RowNumber) = 2
 
-
             CASE (IDF_TriModalRadio)
               CALL WDialogGetReal(IDF_ModalUpper, xtem)
               CALL DetermineTrimodalBounds(xtem, Upper)               
@@ -1896,7 +1895,7 @@
                TempPrevlb = LB(RowNumber)               
                lb(RowNumber) = DBLE(xtem)
                CALL WDialogPutReal(IDF_ModalLower,SNGL(lb(RowNumber)),'(F12.5)')
-!              How ranges are calculated depends on state of Modal RadioButton  
+! How ranges are calculated depends on state of Modal RadioButton  
                CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
                  SELECT CASE (ISET) !bimodal radiobutton active
                    CASE (1)
@@ -1932,7 +1931,7 @@
                  END SELECT
              
             CASE (IDF_ModalUpper)
- ! JCC Check the bounding - only update if parameter is set to vary
+! Check the bounding - only update if parameter is set to vary
               CALL WDialogGetReal(IDF_ModalUpper,xtem)
               xtem = MAX(SNGL(lb(RowNumber)),xtem)
               TempPrevUb = UB(RowNumber)             
@@ -2023,7 +2022,6 @@
       CALL PopActiveWindowID
           
       END SUBROUTINE DealWithBimodalDialog
-
 !
 !*****************************************************************************
 !
