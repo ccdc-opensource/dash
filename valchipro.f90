@@ -57,7 +57,7 @@
         I = IFITA(II)
         YCBIN(I) = RESCL * YCBIN(I)
         CVP = CVP + WTSA(I) * (YOBIN(I) - YCBIN(I))**2
-        CummChiSqd(I) = 10.0*CVP  /FLOAT(NFITA-2)
+        CummChiSqd(I) = CVP
       ENDDO
       LastValue = 0.0
       DO i = 1, NBIN
