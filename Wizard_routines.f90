@@ -41,7 +41,7 @@
       IF (.NOT. NoData) CALL SetModeMenuState(1,0,0)
 
       CALL PushActiveWindowID
-      CALL UserSetCrystalSystem(LatBrav)
+      CALL Upload_CrystalSystem
       CALL Upload_Cell_Constants()
       CALL Upload_Range()
       CALL PopActiveWindowID
@@ -271,7 +271,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_PW_LabX_Source,IDF_PW_SynX_Source,IDF_PW_CWN_Source,IDF_PW_TOF_source)
               CALL WDialogGetRadioButton(IDF_PW_LabX_Source,JRadOption)
-              CALL SetSourceDataState(JRadOption)
+              CALL Upload_Source
               CALL Generate_TicMarks 
             CASE (IDF_PW_wavelength1)
               CALL WDialogGetReal(IDF_PW_wavelength1,Temp)
@@ -534,11 +534,11 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Space_Group_Menu)
-              CALL Update_Space_Group(IDD_PW_Page1)
+              CALL Download_SpaceGroup(IDD_PW_Page1)
               NumPawleyRef = 0
             CASE (IDF_Crystal_System_Menu)
               CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
-              CALL UserSetCrystalSystem(LatBrav)
+              CALL Upload_CrystalSystem
               CALL Generate_TicMarks
             CASE (IDF_a_latt)
               CALL WDialogGetReal(IDF_a_latt,CellPar(1))
@@ -614,7 +614,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_PW_LabX_Source,IDF_PW_SynX_Source,IDF_PW_CWN_Source,IDF_PW_TOF_source)
               CALL WDialogGetRadioButton(IDF_PW_LabX_Source,JRadOption)
-              CALL SetSourceDataState(JRadOption)
+              CALL Upload_Source
               CALL Generate_TicMarks 
             CASE (IDF_PW_wavelength1)
               CALL WDialogGetReal(IDF_PW_wavelength1,Temp)

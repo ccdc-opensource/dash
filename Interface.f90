@@ -1,9 +1,38 @@
 ! This file contains routines that form the layer between DASH and Winteracter and
 ! mutually exchange variables.
 !
+! Download_XXXXX = retrieves variable(s) XXXXX from a Winteracter dialogue and stores it in
+!                  the corresponding global variable(s) in DASH
+! As it is no use downloading a global variable without updating the other Winteracter dialogues,
+! these subroutines always update that variable
+!
+! Upload_XXXXX   = stores the global variable(s) XXXXX from DASH in the corresponding
+!                  variable(s) in all Winteracter dialogues
+!
+!U!
+!U!*****************************************************************************
+!U!
+!U      SUBROUTINE Upload_Zero_Point()
+!U
+!U      USE WINTERACTER
+!U      USE DRUID_HEADER
+!U
+!U      INCLUDE 'Lattice.inc'
+!U
+!U      CALL PushActiveWindowID
+!U      CALL WDialogSelect(IDD_Peak_Positions)
+!U      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+!U      CALL WDialogSelect(IDD_Crystal_Symmetry)
+!U      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+!U      CALL WDialogSelect(IDD_Index_Preparation)
+!U      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+!U      CALL PopActiveWindowID
+
+!U      END SUBROUTINE Upload_Zero_Point
+!
 !*****************************************************************************
 !
-      SUBROUTINE Upload_Zero_Point()
+      SUBROUTINE Upload_ZeroPoint()
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -18,7 +47,8 @@
       CALL WDialogSelect(IDD_Index_Preparation)
       CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL PopActiveWindowID
-      END SUBROUTINE Upload_Zero_Point
+
+      END SUBROUTINE Upload_ZeroPoint
 !
 !*****************************************************************************
 !
@@ -70,7 +100,7 @@
             CALL WDialogPutReal(CellParID(I),CellPar(I),'(F10.3)')
           ENDIF
         ENDDO
-!Update their Enabled/Disabled state depending on whether they are constrained by the crystal system
+! Update their Enabled/Disabled state depending on whether they are constrained by the crystal system
         IF (WindowNr .NE. 3) THEN
           DO I = 1, 6
             IF (CellParConstrained(I)) THEN
@@ -106,6 +136,7 @@
       CALL WDialogGetReal(IDF_alp_latt,CellPar(4))      
       CALL WDialogGetReal(IDF_bet_latt,CellPar(5))      
       CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
+      CALL UpdateCell
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL PopActiveWindowID
 
@@ -157,7 +188,6 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -223,35 +253,81 @@
       USE WINTERACTER
       USE DRUID_HEADER 
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR), &
-        IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR),NumPeakFitRange, &
-        CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), & 
-        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+      REAL              XPF_Range
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
-      COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),PkFnEsd(MPkDes,Max_NPFR), &
-        PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &
-        PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-        PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),PkPosAv(MAX_NPFR)
+      REAL              PkFnVal,                      PkFnEsd,                      &
+                        PkFnCal,                                                    &
+                        PkFnVarVal,                   PkFnVarEsd,                   &
+                        PkAreaVal,                    PkAreaEsd,                    &
+                        PkPosVal,                     PkPosEsd,                     &
+                        PkPosAv
+      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+                        PkFnCal(MPkDes,Max_NPFR),                                   &
+                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+                        PkPosAv(MAX_NPFR)
 
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
-      COMMON /ALLPEAKS/ NTPeak, AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak), &
-        PkProb(MTPeak), IOrdTem(MTPeak), IHPk(3,MTPeak)
+      INTEGER           NTPeak
+      REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              PkProb
+      INTEGER           IOrdTem
+      INTEGER           IHPk
+      COMMON /ALLPEAKS/ NTPeak,                                                  &
+                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        PkProb(MTPeak),                                          &
+                        IOrdTem(MTPeak),                                         &
+                        IHPk(3,MTPeak)
 
       REAL    PkArgK(MTPeak), PkTicDif(MTPeak)
       REAL    TwoThetaDiff, AbsTwoThetaDiff
       INTEGER IArgK(MTPeak)
+      INTEGER J, I, II, IR, IR1, IA, IRef1, IRef2, IOrd, Item
+      REAL    xnew, anew, SigmDif, PfTDMin, PfTDMax, DifTem, ProbTot, ProbTop, DifMin
+      REAL    DifMinSq, ArgBot, ArgTop, ProbAdd
 
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Peak_Positions)
+      CALL WDialogClearField(IDF_Peak_Positions_Grid)
+      NTPeak = 0
+      IF (NumPeakFitRange .EQ. 0) THEN
+! Winteracter doesn't seem able to cope with setting the number of rows in a grid to zero,
+! so instead I set it such that it fills the screen but doesn't allow scrolling down.
+        CALL WGridRows(IDF_Peak_Positions_Grid,4)
+        CALL WDialogFieldState(ID_Index_Output,Disabled)
+        CALL PopActiveWindowID
+        RETURN
+      ENDIF
 ! JvdS Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
 ! Store all peaks thus found in one flat array: AllPkPosVal
 ! I don't understand why PkPosVal(I,J) is used for this, I would have used XPF_Pos
-      NTPeak = 0
-      Do J = 1, NumPeakFitRange
-        Do I = 1, NumInPFR(J)
+      DO J = 1, NumPeakFitRange
+        DO I = 1, NumInPFR(J)
           NTPeak = NTPeak + 1
           AllPkPosVal(NTPeak) = PkPosVal(I,J)
           AllPkPosEsd(NTPeak) = PkPosEsd(I,J)
@@ -322,15 +398,11 @@
         END DO
       END IF
 ! Write out all the peak positions in an ordered list ...
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Peak_Positions)
-      CALL WDialogClearField(IDD_Peak_Positions_Grid)
-      CALL WDialogSelect(IDD_Peak_Positions)
       CALL WGridRows(IDF_Peak_Positions_Grid,NTPeak)
       IF (NTPeak .GT. 0) THEN
         CALL WDialogFieldState(ID_Index_Output,Enabled)
         DO I = 1, NTPeak
-          IOrd=IOrdTem(i)
+          IOrd=IOrdTem(I)
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,1,I,AllPkPosVal(IOrd),'(F12.4)')
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,2,I,AllPkPosEsd(IOrd),'(F12.4)')
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,3,I,PkArgK(I),'(F12.4)')
@@ -342,12 +414,7 @@
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,8,I,PkProb(IOrd),'(F8.3)')
         END DO
       ELSE
-! JvdS This should never be necessary: CALL WDialogClearField(IDD_Peak_Positions_Grid)
-! should have taken care of all this
         CALL WDialogFieldState(ID_Index_Output,Disabled)
-        DO I = 1, 8
-          CALL WGridClearCell(IDF_Peak_Positions_Grid,I,1)
-        END DO
       END IF
 ! Now do a refinement ...
       CALL RefineLattice()
@@ -360,140 +427,147 @@
 ! Subroutine to set the state of the global variable JRadOption to either synchrotron or lab data.
 ! This is updated in the main dialogue window and in the wizard.
 
-      SUBROUTINE SetSourceDataState(tIRadOption)
+      SUBROUTINE Upload_Source
 
       USE WINTERACTER
       USE DRUID_HEADER 
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: tIRadOption
-      
       INCLUDE 'GLBVAR.INC' ! Contains JRadOption
 
 ! JvdS @ this can be reduced by a factor of three
-      JRadOption = tIRadOption
       CALL PushActiveWindowID
-      SELECT CASE (JRadOption)
-        CASE (1) ! Lab X-ray
-          CALL WDialogSelect(IDD_PW_Page2)
-          CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
-          CALL WDialogFieldState(IDF_PW_radiation_label,Enabled)
-          CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
-          CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
-          CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
-          CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
-          CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
-          CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
-          CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
-          CALL WDialogPutRadioButton(IDF_PW_LabX_Source)
-          CALL WDialogSelect(IDD_PW_Page4)
-          CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
-          CALL WDialogFieldState(IDF_PW_radiation_label,Enabled)
-          CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
-          CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
-          CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
-          CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
-          CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
-          CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
-          CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
-          CALL WDialogPutRadioButton(IDF_PW_LabX_Source)
-          CALL WDialogSelect(IDD_Data_Properties)
-          CALL WDialogFieldState(IDF_CW_group,Enabled)
-          CALL WDialogFieldState(IDF_radiation_label,Enabled)
-          CALL WDialogFieldState(IDF_wavelength1,Enabled)
-          CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
-          CALL WDialogFieldState(IDF_TOF_group,Disabled)
-          CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
-          CALL WDialogFieldState(IDF_flight_path,Disabled)
-          CALL WDialogFieldState(IDF_2theta_label,Disabled)
-          CALL WDialogFieldState(IDF_2theta0,Disabled)
-          CALL WDialogPutRadioButton(IDF_LabX_Source)
-        CASE (2,3) ! Synchrotron X-ray & CW neutron  
-          CALL WDialogSelect(IDD_PW_Page2)
-          CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
-          CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-          CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-          CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
-          CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
-          CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
-          CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
-          CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
-          CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
-          IF (JRadOption .EQ. 2) THEN
-            CALL WDialogPutRadioButton(IDF_PW_SynX_Source)
-          ELSE
-            CALL WDialogPutRadioButton(IDF_PW_CWN_Source)
-          END IF
-          CALL WDialogSelect(IDD_PW_Page4)
-          CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
-          CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-          CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-          CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
-          CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
-          CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
-          CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
-          CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
-          CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
-          IF (JRadOption .EQ. 2) THEN
-            CALL WDialogPutRadioButton(IDF_PW_SynX_Source)
-          ELSE
-            CALL WDialogPutRadioButton(IDF_PW_CWN_Source)
-          END IF
-          CALL WDialogSelect(IDD_Data_Properties)
-          CALL WDialogFieldState(IDF_CW_group,Enabled)
-          CALL WDialogFieldState(IDF_radiation_label,Disabled)
-          CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-          CALL WDialogFieldState(IDF_wavelength1,Enabled)
-          CALL WDialogFieldState(IDF_TOF_group,Disabled)
-          CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
-          CALL WDialogFieldState(IDF_flight_path,Disabled)
-          CALL WDialogFieldState(IDF_2theta_label,Disabled)
-          CALL WDialogFieldState(IDF_2theta0,Disabled)
-          IF (JRadOption .EQ. 2) THEN
-            CALL WDialogPutRadioButton(IDF_SynX_Source)
-          ELSE
-            CALL WDialogPutRadioButton(IDF_CWN_Source)
-          END IF
-        CASE (4) ! TOF neutron
-          CALL WDialogSelect(IDD_PW_Page2)
-          CALL WDialogFieldState(IDF_PW_CW_group,Disabled)
-          CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-          CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-          CALL WDialogFieldState(IDF_PW_wavelength1,Disabled)
-          CALL WDialogFieldState(IDF_PW_TOF_group,Enabled)
-          CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Enabled)
-          CALL WDialogFieldState(IDF_PW_flight_path,Enabled)
-          CALL WDialogFieldState(IDF_PW_2theta_label,Enabled)
-          CALL WDialogFieldState(IDF_PW_2theta0,Enabled)
-          CALL WDialogPutRadioButton(IDF_PW_TOF_source)
-          CALL WDialogSelect(IDD_PW_Page4)
-          CALL WDialogFieldState(IDF_PW_CW_group,Disabled)
-          CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-          CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-          CALL WDialogFieldState(IDF_PW_wavelength1,Disabled)
-          CALL WDialogFieldState(IDF_PW_TOF_group,Enabled)
-          CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Enabled)
-          CALL WDialogFieldState(IDF_PW_flight_path,Enabled)
-          CALL WDialogFieldState(IDF_PW_2theta_label,Enabled)
-          CALL WDialogFieldState(IDF_PW_2theta0,Enabled)
-          CALL WDialogPutRadioButton(IDF_PW_TOF_source)
-          CALL WDialogSelect(IDD_Data_Properties)
-          CALL WDialogFieldState(IDF_CW_group,Disabled)
-          CALL WDialogFieldState(IDF_radiation_label,Disabled)
-          CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-          CALL WDialogFieldState(IDF_wavelength1,Disabled)
-          CALL WDialogFieldState(IDF_TOF_group,Enabled)
-          CALL WDialogFieldState(IDF_Flight_Path_Label,Enabled)
-          CALL WDialogFieldState(IDF_flight_path,Enabled)
-          CALL WDialogFieldState(IDF_2theta_label,Enabled)
-          CALL WDialogFieldState(IDF_2theta0,Enabled)
-          CALL WDialogPutRadioButton(IDF_TOF_source)
-      END SELECT
-      CALL PopActiveWindowID
-      RETURN
+!U      DO WindowNr = 1, 3
+!U        SELECT CASE (WindowNr)
+!U          CASE (1) 
+!U            CALL WDialogSelect(IDD_PW_Page2)
+!U          CASE (2) 
+!U            CALL WDialogSelect(IDD_PW_Page4)
+!U          CASE (3) 
+!U            CALL WDialogSelect(IDD_Data_Properties)
+!U        END SELECT
 
-      END SUBROUTINE SetSourceDataState
+        SELECT CASE (JRadOption)
+          CASE (1) ! Lab X-ray
+            CALL WDialogSelect(IDD_PW_Page2)
+            CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
+            CALL WDialogFieldState(IDF_PW_radiation_label,Enabled)
+            CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
+            CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
+            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
+            CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
+            CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
+            CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
+            CALL WDialogPutRadioButton(IDF_PW_LabX_Source)
+            CALL WDialogSelect(IDD_PW_Page4)
+            CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
+            CALL WDialogFieldState(IDF_PW_radiation_label,Enabled)
+            CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
+            CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
+            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
+            CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
+            CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
+            CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
+            CALL WDialogPutRadioButton(IDF_PW_LabX_Source)
+            CALL WDialogSelect(IDD_Data_Properties)
+            CALL WDialogFieldState(IDF_CW_group,Enabled)
+            CALL WDialogFieldState(IDF_radiation_label,Enabled)
+            CALL WDialogFieldState(IDF_wavelength1,Enabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
+            CALL WDialogFieldState(IDF_TOF_group,Disabled)
+            CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
+            CALL WDialogFieldState(IDF_flight_path,Disabled)
+            CALL WDialogFieldState(IDF_2theta_label,Disabled)
+            CALL WDialogFieldState(IDF_2theta0,Disabled)
+            CALL WDialogPutRadioButton(IDF_LabX_Source)
+          CASE (2,3) ! Synchrotron X-ray & CW neutron  
+            CALL WDialogSelect(IDD_PW_Page2)
+            CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
+            CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
+            CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
+            CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
+            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
+            CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
+            CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
+            CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
+            IF (JRadOption .EQ. 2) THEN
+              CALL WDialogPutRadioButton(IDF_PW_SynX_Source)
+            ELSE
+              CALL WDialogPutRadioButton(IDF_PW_CWN_Source)
+            END IF
+            CALL WDialogSelect(IDD_PW_Page4)
+            CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
+            CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
+            CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
+            CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
+            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
+            CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
+            CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
+            CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
+            IF (JRadOption .EQ. 2) THEN
+              CALL WDialogPutRadioButton(IDF_PW_SynX_Source)
+            ELSE
+              CALL WDialogPutRadioButton(IDF_PW_CWN_Source)
+            END IF
+            CALL WDialogSelect(IDD_Data_Properties)
+            CALL WDialogFieldState(IDF_CW_group,Enabled)
+            CALL WDialogFieldState(IDF_radiation_label,Disabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
+            CALL WDialogFieldState(IDF_wavelength1,Enabled)
+            CALL WDialogFieldState(IDF_TOF_group,Disabled)
+            CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
+            CALL WDialogFieldState(IDF_flight_path,Disabled)
+            CALL WDialogFieldState(IDF_2theta_label,Disabled)
+            CALL WDialogFieldState(IDF_2theta0,Disabled)
+            IF (JRadOption .EQ. 2) THEN
+              CALL WDialogPutRadioButton(IDF_SynX_Source)
+            ELSE
+              CALL WDialogPutRadioButton(IDF_CWN_Source)
+            END IF
+          CASE (4) ! TOF neutron
+            CALL WDialogSelect(IDD_PW_Page2)
+            CALL WDialogFieldState(IDF_PW_CW_group,Disabled)
+            CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
+            CALL WDialogFieldState(IDF_PW_wavelength1,Disabled)
+            CALL WDialogFieldState(IDF_PW_TOF_group,Enabled)
+            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Enabled)
+            CALL WDialogFieldState(IDF_PW_flight_path,Enabled)
+            CALL WDialogFieldState(IDF_PW_2theta_label,Enabled)
+            CALL WDialogFieldState(IDF_PW_2theta0,Enabled)
+            CALL WDialogPutRadioButton(IDF_PW_TOF_source)
+            CALL WDialogSelect(IDD_PW_Page4)
+            CALL WDialogFieldState(IDF_PW_CW_group,Disabled)
+            CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
+            CALL WDialogFieldState(IDF_PW_wavelength1,Disabled)
+            CALL WDialogFieldState(IDF_PW_TOF_group,Enabled)
+            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Enabled)
+            CALL WDialogFieldState(IDF_PW_flight_path,Enabled)
+            CALL WDialogFieldState(IDF_PW_2theta_label,Enabled)
+            CALL WDialogFieldState(IDF_PW_2theta0,Enabled)
+            CALL WDialogPutRadioButton(IDF_PW_TOF_source)
+            CALL WDialogSelect(IDD_Data_Properties)
+            CALL WDialogFieldState(IDF_CW_group,Disabled)
+            CALL WDialogFieldState(IDF_radiation_label,Disabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
+            CALL WDialogFieldState(IDF_wavelength1,Disabled)
+            CALL WDialogFieldState(IDF_TOF_group,Enabled)
+            CALL WDialogFieldState(IDF_Flight_Path_Label,Enabled)
+            CALL WDialogFieldState(IDF_flight_path,Enabled)
+            CALL WDialogFieldState(IDF_2theta_label,Enabled)
+            CALL WDialogFieldState(IDF_2theta0,Enabled)
+            CALL WDialogPutRadioButton(IDF_TOF_source)
+        END SELECT
+!U      ENDDO
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Upload_Source
 !
 !*****************************************************************************
 !
@@ -579,9 +653,9 @@
 ! This function takes the number of a space group in the Winteracter space group menu
 ! determines its number in the tables (1 - 530) (assuming that that the correct crystal system has been set)
 !
-! INPUT   : The number of a space group (1 - 530)
+! INPUT   : The number of that space group in the space group menu
 !
-! RETURNS : The number of that space group in the space group menu
+! RETURNS : The number of a space group (1 - 530)
 !
       IMPLICIT NONE
 
@@ -643,7 +717,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Update_Space_Group(IUploadFrom)
+      SUBROUTINE Download_SpaceGroup(IUploadFrom)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -669,33 +743,22 @@
       CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
       CALL PopActiveWindowID
 
-      END SUBROUTINE Update_Space_Group
+      END SUBROUTINE Download_SpaceGroup
 !
 !*****************************************************************************
 !
-      SUBROUTINE UserSetCrystalSystem(TheCrystalSystem)
-! 
-! This subroutine is only called when the user explicitly requested this crystal system
-! therefore, the angles etc. can be changed to the corresponding values
-!
+      SUBROUTINE Upload_CrystalSystem
+
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: TheCrystalSystem
-
       INCLUDE 'Lattice.inc'
 
-      IF ((TheCrystalSystem .GE. 1) .AND. (TheCrystalSystem .LE. 10)) THEN
-        LatBrav = TheCrystalSystem
-      ELSE
-        CALL DebugErrorMessage('Crystal Sytem out of range in UserSetCrystalSystem()')
-        LatBrav = 1
-      END IF
-      CellParConstrained = .FALSE.
       CALL PushActiveWindowID
+      CellParConstrained = .FALSE.
       SELECT CASE (LatBrav)
         CASE ( 1) ! Triclinic
         CASE ( 2) ! Monoclinic a
@@ -721,42 +784,31 @@
           CellParConstrained(5) = .TRUE.
           CellParConstrained(6) = .TRUE.
         CASE ( 6) ! Tetragonal
-          CellPar(2) = CellPar(1)
           CellPar(4) =  90.0
           CellPar(5) =  90.0
           CellPar(6) =  90.0
-          CellParConstrained(2) = .TRUE.
-          CellParConstrained(4) = .TRUE.
-          CellParConstrained(5) = .TRUE.
-          CellParConstrained(6) = .TRUE.
+          CellParConstrained = .TRUE.
+          CellParConstrained(1) = .FALSE.
+          CellParConstrained(3) = .FALSE.
         CASE ( 7, 9) ! Trigonal / Hexagonal
-          CellPar(2) = CellPar(1)
           CellPar(4) =  90.0
           CellPar(5) =  90.0
           CellPar(6) = 120.0
-          CellParConstrained(2) = .TRUE.
-          CellParConstrained(4) = .TRUE.
-          CellParConstrained(5) = .TRUE.
-          CellParConstrained(6) = .TRUE.
+          CellParConstrained = .TRUE.
+          CellParConstrained(1) = .FALSE.
+          CellParConstrained(3) = .FALSE.
         CASE ( 8) ! Rhombohedral
-          CellPar(2) = CellPar(1)
-          CellPar(3) = CellPar(1)
-          CellPar(5) = CellPar(4)
-          CellPar(6) = CellPar(4)
-          CellParConstrained(2) = .TRUE.
-          CellParConstrained(3) = .TRUE.
-          CellParConstrained(5) = .TRUE.
-          CellParConstrained(6) = .TRUE.
+          CellParConstrained = .TRUE.
+          CellParConstrained(1) = .FALSE.
+          CellParConstrained(4) = .FALSE.
         CASE (10) ! Cubic
-          CellPar(2) = CellPar(1)
-          CellPar(3) = CellPar(1)
           CellPar(4) =  90.0
           CellPar(5) =  90.0
           CellPar(6) =  90.0
           CellParConstrained = .TRUE.
           CellParConstrained(1) = .FALSE.
       END SELECT
-      CALL Upload_Cell_Constants
+      CALL UpdateCell
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
       CALL WDialogSelect(IDD_PW_Page1)
@@ -764,7 +816,7 @@
       CALL SetSpaceGroupMenu
       CALL PopActiveWindowID
 
-      END SUBROUTINE UserSetCrystalSystem
+      END SUBROUTINE Upload_CrystalSystem
 !
 !*****************************************************************************
 !

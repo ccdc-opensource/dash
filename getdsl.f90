@@ -5,22 +5,21 @@
 ! radiation type/wavelength etc.
 !
 !//////////////////////////////////////////////////////////////////////////
-       SUBROUTINE GETDSL(FileName,LenFn,Ierr)
+      SUBROUTINE GETDSL(FileName,LenFn,Ierr)
 
-       USE WINTERACTER
-       USE DRUID_HEADER
-
-       INCLUDE 'Lattice.inc'
-       INCLUDE 'GLBVAR.INC'
-
-       CHARACTER*(*) FileName
-       CHARACTER*128 line
-       CHARACTER*3   KeyChar
-       INTEGER       LenFn, Idum, nl
-       REAL          Temp
-       INTEGER       Itemp
+      USE WINTERACTER
+      USE DRUID_HEADER
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+
+      CHARACTER*(*) FileName
+      CHARACTER*128 line
+      CHARACTER*3   KeyChar
+      INTEGER       LenFn, Idum, nl
+      REAL          Temp
+      INTEGER       Itemp
 
       COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),PkFnEsd(MPkDes,Max_NPFR), &
         PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &
@@ -39,15 +38,17 @@
         SELECT CASE(KeyChar(1:LEN_TRIM(keychar)))
           CASE ('rad')
             I = InfoError(1) ! reset the errors
+! Read the wavelength
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999
             CALL INextInteger(line,itemp)
             IF (InfoError(1) .EQ. 0) THEN
-              CALL SetSourceDataState(itemp)
+              JRadOption = itemp
             ELSE
 ! default = X-ray lab data
-              CALL SetSourceDataState(1)
+              JRadOption = 1
             END IF
+            CALL Upload_Source
 ! Now we know all there is to know about the wavelength and source: update it
             CALL UpdateWavelength(Temp)
 
@@ -115,7 +116,7 @@
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999
             ZeroPoint = Temp
-            CALL Upload_Zero_Point
+            CALL Upload_ZeroPoint
           CASE ('sli')
 ! Pawley SLIM parameter
             I = InfoError(1) ! reset the errors
