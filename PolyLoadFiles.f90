@@ -2158,7 +2158,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (INOUT) :: TheFileName
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
@@ -2208,15 +2208,16 @@
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
       INCLUDE 'statlog.inc'
 
-      CHARACTER(LEN = MaxPathLength) :: line, subline
+      CHARACTER(LEN = MaxPathLength) :: line
 
       INTEGER nl
       CHARACTER*12 KeyChar
 
       INTEGER i, KLEN
-      INTEGER ihcver,iticer,ipiker,iloger,idsler, isst, ised, iactsgnum
+      INTEGER ihcver,iticer,ipiker,iloger,idsler, isst, ised
       INTEGER GetCrystalSystem ! Function
       INTEGER GETTIC ! Function
+      INTEGER tFileHandle
 
 !C>> JCC Set to success in all cases
       ihcver = 0
@@ -2225,10 +2226,11 @@
       ipiker = 0
       idsler = 0
       IF (LEN_TRIM(SDIFile) .GT. 80) THEN
-        CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in OPENHCVPIKTIC')
+        CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in SDIFileLoad')
       ENDIF
 ! Now open all the appropriate PIK, TIC and HCV files
-      OPEN(11,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
+      tFileHandle = 10
+      OPEN(tFileHandle,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
       CALL sa_SetOutputFiles(SDIFile)
       TicExists = .FALSE.
       HcvExists = .FALSE.
@@ -2236,7 +2238,7 @@
       RawExists = .FALSE.
       DslExists = .FALSE.
  10   line = ' '
-      READ(11,'(A)',END=100) line
+      READ(tFileHandle,'(A)',END=100) line
       nl = LEN_TRIM(line)
       CALL ILowerCase(line(:nl))
       CALL INextString(line,keychar)
@@ -2268,17 +2270,6 @@
           CALL Upload_Cell_Constants()
         CASE ('spa')
           CALL INextInteger(line,NumberSGTable)
-!C>> JCC Need to set space group info in the menus
-! Get the lattice number
-          CALL INextString(line,subline)
-! Chop out ":" char if present
-          DO i = 1, LEN_TRIM(subline)
-            IF (subline(i:i) .EQ. ':') THEN
-              subline(i:i) = ' '
-              EXIT
-            END IF
-          END DO
-          CALL INextInteger(subline,IActSGNum)
 ! Set the lattice numbers
           LatBrav = GetCrystalSystem(NumberSGTable)
           CALL Upload_CrystalSystem
@@ -2289,6 +2280,7 @@
       END SELECT
       GOTO 10 
  100  CONTINUE
+      CLOSE(tFileHandle)
       IF (DslExists) THEN
         CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
         DslExists = (idsler .EQ. 0)
