@@ -236,7 +236,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETDSL(TheFileName,iErr)
+      SUBROUTINE GETDSL(TheFileName, iErr)
 ! Routines for reading a 'DSL' file. This file contains
 ! The additional data that is part of the Winteracter front end: Namely
 ! radiation type/wavelength etc.
