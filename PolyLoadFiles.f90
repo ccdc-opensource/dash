@@ -20,7 +20,6 @@
 !           2 if user pressed cancel
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -303,7 +302,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -454,7 +452,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -588,7 +585,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -748,7 +744,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -870,7 +865,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1103,7 +1097,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1425,7 +1418,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1625,7 +1617,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1914,7 +1905,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -2043,7 +2033,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -2281,9 +2270,6 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
-      INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
-      COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
-
       INTEGER I
       REAL ESD_SUM
  
@@ -2304,8 +2290,6 @@
       XPGMAXOLD = XPMAX
       YPGMINOLD = YPMIN
       YPGMAXOLD = YPMAX
-      IPMIN = 1
-      IPMAX = NBIN
       ! Calculate average ESD
       ESD_SUM = 0.0
       DO I = 1, NBIN
@@ -2320,7 +2304,6 @@
       SUBROUTINE ProfileRead_TruncationWarning(filename, Npoints)
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       CHARACTER*(*) filename

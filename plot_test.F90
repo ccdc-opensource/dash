@@ -11,7 +11,6 @@
 !  for each child window (iHandle) is stored
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
       USE SOLVAR
       USE PO_VAR
@@ -116,7 +115,6 @@
       SUBROUTINE plot_pro_file(iHandle)
 
       USE WINTERACTER
-      USE DRUID_HEADER
 
       IMPLICIT NONE
 
