@@ -487,15 +487,15 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL)
-              CALL WDialogHide()
+              CALL WDialogHide
             CASE (ID_Indexing_Create)
               CALL WDialogGetReal(IDF_wavelength1,Temp)
               IF (Temp .LT. 0.00001) THEN
                 CALL ErrorMessage("The radiation wavelength has not been entered!")
               ELSE                 
-                CALL Create_DicvolIndexFile()
+                CALL Create_DicvolIndexFile
                 CALL WDialogSelect(IDD_Index_Preparation)
-                CALL WDialogHide()
+                CALL WDialogHide
               END IF
             CASE (IDF_RunDICVOL)
               CALL RunDICVOL
@@ -747,8 +747,8 @@
       INTEGER iHandle
       REAL    Epsilon
       REAL    MaxLen
-      LOGICAL Confirm ! Function
-      REAL    TwoTheta2dSpacing ! Function
+      LOGICAL, EXTERNAL :: Confirm
+      REAL, EXTERNAL :: TwoTheta2dSpacing
       REAL    MaxSinBeta
       REAL    tBeta
       INTEGER NumDoF
@@ -761,8 +761,8 @@
       CALL WDialogGetReal(IDF_Indexing_Maxa, amax)
       CALL WDialogGetReal(IDF_Indexing_Maxb, Bmax)
       CALL WDialogGetReal(IDF_Indexing_Maxc, Cmax)
-      CALL WDialogGetReal       (IDF_Indexing_MinAng,      Bemin)
-      CALL WDialogGetReal       (IDF_Indexing_MaxAng,      Bemax)
+      CALL WDialogGetReal(IDF_Indexing_MinAng, Bemin)
+      CALL WDialogGetReal(IDF_Indexing_MaxAng, Bemax)
       IF (Bemin .GT. Bemax) THEN
         tBeta = Bemin
         Bemin = Bemax
@@ -771,12 +771,12 @@
       CALL WDialogGetReal       (IDF_Indexing_Density,     Rdens)
       CALL WDialogGetReal       (IDF_Indexing_MolWt,       Rmolwt)
       CALL WDialogGetReal       (IDF_ZeroPoint,            Rexpzp)
-      CALL WDialogGetCheckBox(IDF_Indexing_Cubic,Isystem(1))
-      CALL WDialogGetCheckBox(IDF_Indexing_Tetra,Isystem(2))
-      CALL WDialogGetCheckBox(IDF_Indexing_Hexa,Isystem(3))
-      CALL WDialogGetCheckBox(IDF_Indexing_Ortho,Isystem(4))
-      CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic,Isystem(5))
-      CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,Isystem(6))
+      CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      Isystem(1))
+      CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      Isystem(2))
+      CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       Isystem(3))
+      CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      Isystem(4))
+      CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, Isystem(5))
+      CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  Isystem(6))
       CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,   UseErr)
       CALL WDialogGetReal       (IDF_eps,                  Epsilon)
       CALL WDialogGetReal       (IDF_Indexing_Fom,         fom)
@@ -837,7 +837,7 @@
       IF (UseErr .EQ. 2) THEN
         epst = 0.0
         DO I = 1, n
-          IOrd = IOrdTem(I)
+          iOrd = IOrdTem(I)
           IF (AllPkPosEsd(IOrd) .LE. 0.0001) THEN
             epsil(I) = 0.001
           ELSE 
@@ -867,7 +867,7 @@
       CALL SetChildWinAutoClose(iHandle)
       IF (NumOfDICVOLSolutions .EQ. 0) THEN
         CALL WDialogSelect(IDD_DV_Results)
-        CALL WDialogHide()
+        CALL WDialogHide
         CALL ErrorMessage('No solutions were found.')
         GOTO 999
       ENDIF
