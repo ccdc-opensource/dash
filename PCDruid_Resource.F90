@@ -1,4 +1,4 @@
-! Winteracter module created : 25/Sep/2001 16:11:20
+! Winteracter module created : 28/Sep/2001 10:00:11
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -377,7 +377,6 @@
           INTEGER, PARAMETER :: IDF_Indexing_CellRange          =  1335
           INTEGER, PARAMETER :: IDF_Indexing_CellAngle          =  1336
           INTEGER, PARAMETER :: ID_Indexing_Create              =  1337
-          INTEGER, PARAMETER :: IDF_Indexing_chemgroup          =  1339
           INTEGER, PARAMETER :: IDF_Indexing_Misc               =  1340
           INTEGER, PARAMETER :: IDF_Indexing_Density_Label      =  1341
           INTEGER, PARAMETER :: IDF_Indexing_MolWt_Label        =  1342
@@ -475,4 +474,6 @@
           INTEGER, PARAMETER :: IDF_RADIO1                      =  1140
           INTEGER, PARAMETER :: IDF_Indexing_UseErrors          =  1142
           INTEGER, PARAMETER :: IDF_eps                         =  1172
+          INTEGER, PARAMETER :: IDF_LABEL16                     =  1207
+          INTEGER, PARAMETER :: IDF_Indexing_ScaleFactor        =  1208
       END MODULE Druid_Header
