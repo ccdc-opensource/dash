@@ -350,6 +350,7 @@
         READ(LINE(1:NLIN),*,END=998,ERR=998) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
 !C F2 and sig(F2)
         WTJ(iR) = 1.0 / WTJ(iR)
+   !F     WTJ(iR) = 1.0 / (MAX(SQRT(MAX(0.0,AJOBS(iR))),WTJ(iR)))
         KK = iR
       ENDDO
   100 NumOfRef = KK
