@@ -16,7 +16,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
-      REAL              PF_FWHM
+      REAL              PF_FWHM,                    PF_IntBreadth
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -25,7 +25,7 @@
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
-                        PF_FWHM(MAX_NPFR)
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
       
       INTEGER     MPeak
       PARAMETER ( MPeak = 10 )
@@ -57,7 +57,7 @@
       DO I = 1, N
         P2(I) = X(I)
       ENDDO
-      PF_FWHM(CurrentRange) = FWHM()
+      CALL Calculate_FWHM(PF_FWHM(CurrentRange), PF_IntBreadth(CurrentRange))
       RangeFitYN(CurrentRange) = .TRUE.
       DO I = 1, N
         II = I + (I-1)*N
@@ -147,7 +147,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
-      REAL              PF_FWHM
+      REAL              PF_FWHM,                    PF_IntBreadth
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -156,7 +156,7 @@
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
-                        PF_FWHM(MAX_NPFR)
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -261,7 +261,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
-      REAL              PF_FWHM
+      REAL              PF_FWHM,                    PF_IntBreadth
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -270,7 +270,7 @@
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
-                        PF_FWHM(MAX_NPFR)
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
@@ -404,7 +404,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
-      REAL              PF_FWHM
+      REAL              PF_FWHM,                    PF_IntBreadth
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -413,7 +413,7 @@
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
-                        PF_FWHM(MAX_NPFR)
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
