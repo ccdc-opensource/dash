@@ -1,4 +1,3 @@
-!*==READ_ONE_ZM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -109,6 +108,13 @@
      &        ioptb(i,ifrg), alph(i,ifrg), iopta(i,ifrg), bet(i,ifrg),&
      &        ioptt(i,ifrg), iz1(i,ifrg), iz2(i,ifrg), iz3(i,ifrg),   &
      &        tiso(i,ifrg), occ(i,ifrg)
+! Adjust torsion angle to be between -180.0 and +180.0
+        DO WHILE (bet(i,ifrg) .LT. -180.0)
+          bet(i,ifrg) = bet(i,ifrg) + 360.0
+        ENDDO
+        DO WHILE (bet(i,ifrg) .GT.  180.0)
+          bet(i,ifrg) = bet(i,ifrg) - 360.0
+        ENDDO
 ! Remove what we have just read from the string
         DO J = 1, 11
           CALL GetSubString(Line,' ',tSubString)
