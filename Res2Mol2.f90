@@ -35,6 +35,8 @@
 
       INCLUDE 'Lattice.inc'
 
+      LOGICAL, EXTERNAL :: ChrIsLetter
+      INTEGER, EXTERNAL :: WriteMol2, ElmSymbol2CSD
       CHARACTER*2  AtmElement(MAXATM_2)
       INTEGER      i
       REAL         Coordinates(3,MAXATM_2)
@@ -48,8 +50,6 @@
       REAL         tX, tY, tZ
       LOGICAL      IsFractional
       REAL         tCellPar(1:6)
-      LOGICAL, EXTERNAL :: ChrIsLetter
-      INTEGER, EXTERNAL :: WriteMol2, ElmSymbol2CSD
 
 ! Initialise to 'failure'
       CSSR2Mol2 = 0
@@ -175,12 +175,12 @@
 
       INCLUDE 'Lattice.inc'
 
+      LOGICAL, EXTERNAL :: FnUnitCellOK
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
       CHARACTER*4 sybatom(1:MAXATM_2)
       CHARACTER*2 BondStr(0:9)
       CHARACTER*2 HybridisationStr
-      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
       INTEGER      ii, I, J, Ilen, OutputFile
-      LOGICAL, EXTERNAL :: FnUnitCellOK
       LOGICAL      tIncludeUnitCell
       REAL         tLattice(1:3,1:3), tRecLattice(1:3,1:3), tLattice_2(1:3,1:3)
       REAL         tX, tY, tZ
@@ -305,11 +305,13 @@
 
       USE ATMVAR
 
+      IMPLICIT NONE
+
       CHARACTER*2, INTENT (IN   ) :: TheElementSymbol
 
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
       INTEGER I
       CHARACTER*2 tElem
-      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
 
       tElem(1:1) = ChrUpperCase(TheElementSymbol(1:1))
       tElem(2:2) = ChrLowerCase(TheElementSymbol(2:2))
@@ -324,6 +326,32 @@
       ElmSymbol2CSD = MaxElm
 
       END FUNCTION ElmSymbol2CSD
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION ElmNumber2CSD(TheElementNumber)
+! This function takes an element number (e.g. 6 for carbon) and converts it to the corresponding CSD element number
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheElementNumber
+
+      CHARACTER*(20), EXTERNAL :: Integer2String
+      INTEGER I
+
+      DO I = 1, MaxElm
+        IF (TheElementNumber .EQ. atnr(I)) THEN
+          ElmNumber2CSD = I
+          RETURN
+        ENDIF
+      ENDDO
+      CALL WarningMessage('Unknown element '//Integer2String(TheElementNumber)//'.'//CHAR(13)//&
+                          'Element has been set to Dummy.')
+      ElmNumber2CSD = MaxElm
+
+      END FUNCTION ElmNumber2CSD
 !
 !*****************************************************************************
 !
