@@ -183,7 +183,85 @@
       ENDIF
 
       END SUBROUTINE GetSubString
+!
+!*****************************************************************************
+!
+      SUBROUTINE StrClean(TheString, TheLength)
+!
+! This function cleans up a string
+! Spaces from start and end are stripped
+! Each tab is converted into a space (this could be made much more general:
+! we could have a separate routine that takes a list of characters that are to be
+! interpreted as delimiters and convert all of them to one character [not necessarily a space])
+! Multiple spaces are replaced by a single space
+!
+! JvdS 9 Oct 2001
+!
+! INPUT   : TheString = the string
+!        
+! OUTPUT  : TheString = the cleaned up version of the string
+!           TheLength = the length of the final string
+!
+      IMPLICIT NONE
 
+      CHARACTER*(*), INTENT (INOUT) :: TheString
+      INTEGER,       INTENT (  OUT) :: TheLength
+
+      INTEGER POS, NewPos, J
+      INTEGER StrLen, OriginalLength
+      LOGICAL LastCharWasSpace
+
+      StrLen = LEN_TRIM(TheString)
+      OriginalLength = StrLen
+      IF (StrLen .EQ. 0) THEN
+        TheLength = 0
+        RETURN
+      ENDIF
+! Replace tabs by spaces
+      DO POS = 1, StrLen
+        IF (TheString(POS:POS) .EQ. CHAR(9)) TheString(POS:POS) = ' '
+      ENDDO
+      StrLen = LEN_TRIM(TheString)
+      IF (StrLen .EQ. 0) THEN
+        TheLength = 0
+        RETURN
+      ENDIF
+! Skip spaces at start
+      POS = 1
+      DO WHILE (TheString(POS:POS) .EQ. ' ')
+        POS = POS + 1
+      ENDDO
+      IF (POS .NE. 1) THEN
+        POS = POS - 1
+        DO J = 1, StrLen-POS
+          TheString(J:J) = TheString(J+POS:J+POS)
+        ENDDO
+        StrLen = StrLen-POS
+      ENDIF
+! Replace multiple occurrences of a space by a single space
+      LastCharWasSpace = .FALSE.
+      NewPos = 1
+      DO POS = 1, StrLen
+        IF (TheString(POS:POS) .EQ. ' ') THEN
+          IF (.NOT. LastCharWasSpace) THEN
+            TheString(NewPos:NewPos) = TheString(POS:POS)
+            NewPos = NewPos + 1
+            LastCharWasSpace = .TRUE.
+          ENDIF
+        ELSE
+          TheString(NewPos:NewPos) = TheString(POS:POS)
+          NewPos = NewPos + 1
+          LastCharWasSpace = .FALSE.
+        ENDIF
+      ENDDO
+      TheLength = NewPos - 1
+      IF (TheLength .EQ. OriginalLength) RETURN
+! Pad rest of the old string with spaces
+      DO J = TheLength+1, OriginalLength
+        TheString(J:J) = ' '
+      ENDDO
+
+      END SUBROUTINE StrClean
 !
 !*****************************************************************************
 !
