@@ -243,65 +243,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Plot_Observed_Profile()
-
-      USE WINTERACTER
-
-      INCLUDE 'POLY_COLOURS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'PARAMS.INC'
-
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-      LOGICAL PlotErrorBars ! Function
-
-      CALL IGrColourN(KolNumMain)
-      CALL IPgYLabelLeft('Observed profile','C9')
-! Do the error bars - we've precalculated the min & max pointers
-      CALL IGrColourN(KolNumObs)
-      IF ( PlotErrorBars() ) THEN
-        DO I = IPMIN, IPMAX
-          xtem = XBIN(I)
-          ytem = MAX(YOBIN(I)-EBIN(I),ypgmin)
-          ytem = MIN(ytem,ypgmax)
-          CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-          CALL IGrMoveTo(xgtem,ygtem)
-          ytem = MIN(YOBIN(I)+EBIN(I),ypgmax)
-          ytem = MAX(ytem,ypgmin)
-          CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-          CALL IGrLineTo(xgtem,ygtem)
-        END DO
-      END IF
-!      CALL IPgNewGraph(1,NBIN,' ',' ','XY')
-! Must allow options here ...      CALL IPgStyle(1,0,3,0,KolNumCal,KolNumObs)
-      CALL IPgNewPlot(PgScatterPlot,1,NBIN)
-      CALL IPgStyle(1,14,3,0,0,KolNumObs)
-! 13 specifies a square
-      CALL IPgMarker( 1, 13)
-      sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
-      sizmtem = MIN(marker_size,sizmtem)
-      CALL IGrCharSize(sizmtem,sizmtem)
-      CALL IPgScatterPlot(XBIN,YOBIN)
-!      CALL IPgXYPairs(XBIN,YOBIN)
-      CALL IGrColourN(KolNumMain)
-!
-      ENDSUBROUTINE Plot_Observed_Profile
-!
-!*****************************************************************************
-!
       SUBROUTINE Plot_Background()
 
       USE WINTERACTER
@@ -333,6 +274,76 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE Plot_Observed_Profile()
+
+      USE WINTERACTER
+
+      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'PARAMS.INC'
+
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
+      LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
+
+      CALL IGrColourN(KolNumMain)
+      CALL IPgYLabelLeft('Observed profile','C9')
+! Do the error bars - we've precalculated the min & max pointers
+      CALL IGrColourN(KolNumObs)
+      IF ( PlotErrorBars() ) THEN
+        DO I = IPMIN, IPMAX
+          xtem = XBIN(I)
+          ytem = MAX(YOBIN(I)-EBIN(I),ypgmin)
+          ytem = MIN(ytem,ypgmax)
+          CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+          CALL IGrMoveTo(xgtem,ygtem)
+          ytem = MIN(YOBIN(I)+EBIN(I),ypgmax)
+          ytem = MAX(ytem,ypgmin)
+          CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+          CALL IGrLineTo(xgtem,ygtem)
+        ENDDO
+      ENDIF
+!      CALL IPgNewGraph(1,NBIN,' ',' ','XY')
+! Must allow options here ...      CALL IPgStyle(1,0,3,0,KolNumCal,KolNumObs)
+      IF (ConnectPointsObs()) THEN
+        CALL IPgNewPlot(PgPolyLine,   1,NBIN)
+      ELSE
+        CALL IPgNewPlot(PgScatterPlot,1,NBIN)
+      ENDIF
+      IF (ConnectPointsObs()) THEN
+        CALL IPgStyle(1,14,3,0,KolNumObs,KolNumObs)
+      ELSE
+        CALL IPgStyle(1,14,3,0,0,KolNumObs)
+      ENDIF
+! 13 specifies a square
+      CALL IPgMarker( 1, 13)
+      sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
+      sizmtem = MIN(marker_size,sizmtem)
+      CALL IGrCharSize(sizmtem,sizmtem)
+      IF (ConnectPointsObs()) THEN
+        CALL IPgXYPairs(XBIN,YOBIN)
+      ELSE
+        CALL IPgScatterPlot(XBIN,YOBIN)
+      ENDIF
+      CALL IGrColourN(KolNumMain)
+
+      ENDSUBROUTINE Plot_Observed_Profile
+!
+!*****************************************************************************
+!
       SUBROUTINE Plot_ObsCalc_Profile()
 
       USE WINTERACTER
@@ -357,8 +368,8 @@
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
-      LOGICAL PlotErrorBars ! Function
       REAL YDIF(MOBS)
+      LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
 
       CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
@@ -371,7 +382,7 @@
       CALL IPgNewPlot(PgPolyLine,3,NBIN)
       CALL IPgStyle(1,0,0,0,KolNumDif,0)
 ! Q & D hack
-      IF (ConnectPointsObs) THEN
+      IF (ConnectPointsObs()) THEN
         CALL IPgStyle(2,0,3,0,KolNumObs,KolNumObs)
       ELSE
         CALL IPgStyle(2,0,3,0,0,KolNumObs)
