@@ -133,10 +133,6 @@
 ! When the wavelength is set, this variable is tested and the wavelength is
 ! written to the file.
 
-      LOGICAL UsePreferredOrientation
-      REAL G1
-      REAL PO_Axis(1:3) ! Normalised and converted to orthogonal co-ordinates
-
       END MODULE VARIABLES
 !
 !*****************************************************************************

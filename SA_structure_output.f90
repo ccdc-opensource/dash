@@ -220,7 +220,7 @@
             ENDIF
           ENDDO ! loop over atoms
         ENDIF
-      ENDDO ! loop over z-matrices
+      ENDDO ! loop over Z-matrices
       IF (tSaveCSSR) CLOSE (64)
       IF (tSavePDB) THEN
         WRITE (65,"('END')")

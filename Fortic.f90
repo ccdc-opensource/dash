@@ -147,6 +147,7 @@
 !
 !*****************************************************************************
 !
+
       SUBROUTINE MAKRHM
 ! Makes a number of matrices to speed up the default calculation
 
@@ -158,9 +159,7 @@
       LOGICAL CENTRC
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
       COMMON /symsto/ sctrh(24,MFCSTO), rhsto(3,24,MFCSTO)
-!
-!           CALL ROTSYM(H,RH,I,-1)
-!           F1=SCALPR(X(1,N),RH)+SCALPR(TRANS(1,I),H)
+
       DO ir = 1, maxk
         DO ii = 1, 3
           h(ii) = irefh(ii,ir)
