@@ -86,11 +86,11 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: Get_HydrogenTreatment
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER IFLAGS, IFTYPE
       CHARACTER*MaxPathLength tFileName
       CHARACTER*75  FILTER
-      INTEGER, EXTERNAL :: Get_HydrogenTreatment
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
@@ -379,8 +379,8 @@
       INCLUDE 'LATTICE.INC'
 
       INTEGER, EXTERNAL :: SGNrMenu2Table
-      REAL    tReal
       LOGICAL, EXTERNAL :: Confirm, ValidCellAxisLength, NearlyEqual
+      REAL    tReal
       INTEGER ISPosSG
 
       IF (PastPawley) RETURN
@@ -584,13 +584,13 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
+      LOGICAL, EXTERNAL :: Confirm
+      REAL, EXTERNAL :: TwoTheta2dSpacing
       REAL    Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
       INTEGER Isystem(6), UseErr, I, Iord
       INTEGER iHandle
       REAL    Epsilon
       REAL    MaxLen
-      LOGICAL, EXTERNAL :: Confirm
-      REAL, EXTERNAL :: TwoTheta2dSpacing
       REAL    MaxSinBeta
       REAL    tBeta
       INTEGER NumDoF

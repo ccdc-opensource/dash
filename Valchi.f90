@@ -47,8 +47,6 @@
       INTEGER         NStPar
       COMMON /pextra/ NStPar
 
-      REAL    SUM1, SUM2, RESCL, DELI, DELJ, CHIADD
-      INTEGER iR, iK, II, JJ
       REAL, EXTERNAL :: FFCALC_001, FFCALC_002, FFCALC_039, FFCALC_040, FFCALC_044, FFCALC_050, &
                         FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061, FFCALC_064, FFCALC_065
       REAL, EXTERNAL :: FFCALC_066, FFCALC_067, FFCALC_069, FFCALC_112, FFCALC_115, FFCALC_116, &
@@ -57,6 +55,8 @@
                         FFCALC_365, FFCALC_369, FFCALC_430, FFCALC_431, FFCALC_432, FFCALC_433
       REAL, EXTERNAL :: FFCALC_434, FFCALC_435, FFCALC_449, FFCALC_451, FFCALC_462, FFCALC_468, &
                         FFCALC_469, FFCALC_471, FFCALC_481, FFCALC_483, FFCALC_485, FFCALC_DEFAULT
+      REAL    SUM1, SUM2, RESCL, DELI, DELJ, CHIADD
+      INTEGER iR, iK, II, JJ
      
 ! We have two types of parameters: those affecting the fractional co-ordinates and the
 ! preferred orientation. If the current parameter is the preferred orientation, there is

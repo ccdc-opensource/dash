@@ -162,10 +162,10 @@
       REAL, INTENT (IN   ) :: TheVector2(1:3)
 
       LOGICAL, EXTERNAL :: VectorIsNullVector
+      REAL, EXTERNAL :: VectorGetLength
       REAL    tVector(1:3)
       REAL    Coefficient
       REAL    OriginalLength
-      REAL, EXTERNAL :: VectorGetLength
 
       IF (VectorIsNullVector(TheVector1) .OR. VectorIsNullVector(TheVector2)) RETURN
       OriginalLength = VectorGetLength(TheVector1)

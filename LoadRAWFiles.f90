@@ -28,12 +28,12 @@
 
       INCLUDE 'GLBVAR.INC'
 
+      CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*4 C4
       INTEGER iRange, CurrRange
       INTEGER Load_rawSTOE_File, Load_rawBruker_File ! Functions
       INTEGER tNumOfRanges
       CHARACTER*80 TitleOfRange(250) ! 8 = maximum number of ranges in a STOE file
-      CHARACTER*20, EXTERNAL :: Integer2String
       REAL    t2ThetaStep(250)
       INTEGER iHighlightList(250)
       LOGICAL LoadRange(250), AtLeastOneSelected

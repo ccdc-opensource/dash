@@ -176,13 +176,13 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: Get_DashSerialNumber, DateToday
       CHARACTER*(*) LString
       TYPE (License_Info) Info
       INTEGER v(2), w(2), cs
       INTEGER*2 tCheckSum
       EQUIVALENCE (tCheckSum,cs)
       INTEGER*2 checksum
-      INTEGER, EXTERNAL :: Get_DashSerialNumber, DateToday
 
       Info%Valid = 1
 ! JvdS Next lines very dirty: v is INTEGER*4, but their XOR is INTEGER*2. Not possible.

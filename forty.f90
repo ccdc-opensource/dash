@@ -171,14 +171,12 @@
 
       CHARACTER*10    filnam_root
       COMMON /commun/ filnam_root
-!
-! JCC add error handling declarations
-      INTEGER IEOCC
-      INTEGER, EXTERNAL :: PREFIN
-! JCC This is for testing for mathematical errors in the CCSL that used to STOP the program
+
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
+      INTEGER, EXTERNAL :: PREFIN
+      INTEGER IEOCC
       EXTERNAL RUNPAR, VARSPR
       INTEGER ISCR, NFLIP, Npt30, IPT, NTEM
       INTEGER K1, K2, KK

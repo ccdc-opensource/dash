@@ -141,10 +141,10 @@
       INTEGER, INTENT (INOUT) :: TheDate           ! '20010215' for 15 Feb 2001
       INTEGER, INTENT (IN   ) :: TheNumberOfDays
 
+      LOGICAL, EXTERNAL :: IsLeapYear
       INTEGER DaysOfMonth(1:12)
       DATA DaysOfMonth / 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /
       INTEGER Day, Month, Year
-      LOGICAL, EXTERNAL :: IsLeapYear
       INTEGER tNumberOfDays ! call by reference / call by value ambiguity
 
       tNumberOfDays = TheNumberOfDays
@@ -189,12 +189,12 @@
 
       INTEGER, INTENT (IN   ) :: TheDate1, TheDate2           ! '20010215' for 15 Feb 2001
 
+      LOGICAL, EXTERNAL :: IsLeapYear
       INTEGER DaysOfMonth(1:12)
       DATA DaysOfMonth / 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /
       INTEGER Day, Month, Year
       INTEGER StartDate, EndDate, tStartDate
       INTEGER tDaysElapsed
-      LOGICAL, EXTERNAL :: IsLeapYear
       LOGICAL neg
 
       IF (TheDate1 .GT. TheDate2) THEN

@@ -430,8 +430,7 @@
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
-      REAL Chisq_Sigma
-      EXTERNAL Chisq_Sigma
+      REAL, EXTERNAL :: Chisq_Sigma
       INTEGER I, II
       REAL    rDummy
 
@@ -462,8 +461,7 @@
 
       INTEGER, INTENT (IN   ) :: N
 
-      REAL Chisq_Gamma
-      EXTERNAL Chisq_Gamma
+      REAL, EXTERNAL :: Chisq_Gamma
 
       INCLUDE 'PARAMS.INC'
 
@@ -505,8 +503,7 @@
       INTEGER, INTENT (IN   ) :: N
       INTEGER, INTENT (IN   ) :: IPtPS
 
-      REAL Chisq_Constant
-      EXTERNAL Chisq_Constant
+      REAL, EXTERNAL :: Chisq_Constant
 
       INCLUDE 'PARAMS.INC'
 

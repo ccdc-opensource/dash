@@ -1,16 +1,17 @@
       
       SUBROUTINE SpaceGroupDeterminationCode(LatBrav, PawleyChiSqd)
+
       USE VARIABLES
       USE WINTERACTER
       
       IMPLICIT NONE
+
       INTEGER LatBrav
       CHARACTER(MaxPathLength) :: CurrentDirectory
       INTEGER IHANDLE
       REAL PawleyChiSqd
       REAL Correction
       LOGICAL Exists
-      EXTERNAL ErrorMessage
 
       INQUIRE(FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//DIRSPACER//'ExtinctionSymbol.exe',EXIST=exists)
       IF (.NOT. exists) GOTO 777

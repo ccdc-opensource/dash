@@ -31,8 +31,8 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      INTEGER I
       LOGICAL, EXTERNAL :: Get_SavePRO
+      INTEGER I
       INTEGER    hFile
 
       IF (.NOT. Get_SavePRO()) RETURN

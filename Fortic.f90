@@ -80,9 +80,9 @@
       REAL            sctrh,            rhsto
       COMMON /symsto/ sctrh(24,MaxRef), rhsto(3,24,MaxRef)
 
+      REAL, EXTERNAL :: SCALPR
       REAL H(3)
       INTEGER iR, ii, i
-      REAL, EXTERNAL :: SCALPR
 
       DO iR = 1, NumOfRef
         DO ii = 1, 3

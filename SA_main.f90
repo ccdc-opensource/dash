@@ -19,15 +19,15 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
+      CHARACTER*20, EXTERNAL :: Integer2String
+      INTEGER, EXTERNAL :: DateToday
       INTEGER tFileHandle, I, kk, iFrg, ilen, II, Fixed
       REAL    R, x, lb, ub
       CHARACTER(MaxPathLength) tSDIFile
       CHARACTER*17 DateStr
       REAL    MaxMoves1, tMaxMoves
       INTEGER MaxMoves2, tLen
-      CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*20 MaxMovesStr
-      INTEGER, EXTERNAL :: DateToday
       CHARACTER*36 tString36
 
       WriteSAParametersToFile = 1 ! Error
@@ -583,12 +583,12 @@
       CHARACTER(80), INTENT (  OUT) :: TheZmatrices
       DIMENSION TheZmatrices(10)
 
+      INTEGER, EXTERNAL :: CSSR2Mol2
       INTEGER iLen, iPos
       CHARACTER*4 ExtensionStr
       CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
       CHARACTER(5) fmt
       INTEGER iStat, iStart, I
-      INTEGER, EXTERNAL :: CSSR2Mol2
 
       TheNumOfZmatrices = 0
       tInputFile = TheInputFile
