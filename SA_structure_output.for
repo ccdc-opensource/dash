@@ -23,22 +23,22 @@ C
      &  ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),
      &  iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
 
-      character*36 czmpar
-      common /zmnpar/ izmtot,izmpar(maxfrg),
+      CHARACTER*36 czmpar
+      COMMON /zmnpar/ izmtot,izmpar(maxfrg),
      &   czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
 
-      integer ipcount
-      integer CheckedFragNo
+      INTEGER ipcount
+      INTEGER CheckedFragNo
 
-      common /frgcom/ nfrag,lfrag(maxfrg)
-      double precision a,b,c,al,be,ga,chrg
-      common /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),
+      COMMON /frgcom/ nfrag,lfrag(maxfrg)
+      DOUBLE PRECISION a,b,c,al,be,ga,chrg
+      COMMON /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),
      &  al(maxfrg),be(maxfrg),ga(maxfrg),chrg(maxatm,maxfrg)
-      double precision blen,alph,bet,f2cmat
-      common /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),
+      DOUBLE PRECISION blen,alph,bet,f2cmat
+      COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),
      &  bet(maxatm,maxfrg),f2cmat(3,3)
-      double precision inv(3,3)
-      common /posopt/ XATOPT(3,150)
+      DOUBLE PRECISION inv(3,3)
+      COMMON /posopt/ XATOPT(3,150)
       COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),
      & TF(150),KTF(150),SITE(150),KSITE(150),
      & ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
@@ -50,16 +50,16 @@ C
       COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
      &log_flen,pro_flen
 
-      parameter (mpdbops=192)
-      character*20 cpdbops(mpdbops)
-      common /pdbops/ npdbops,cpdbops
+      PARAMETER (mpdbops=192)
+      CHARACTER*20 cpdbops(mpdbops)
+      COMMON /pdbops/ npdbops,cpdbops
 
 C>> JCC the original atom ids to list in the labels and the back mapping
-      common /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
+      COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
 C>> JCC Use standard PDB orthogonalisation
-      double precision f2cpdb, c2fpdb
-      real qvals(4), qnrm
-      common /pdbcat/ f2cpdb(3,3), c2fpdb(3,3)
+      DOUBLE PRECISION f2cpdb, c2fpdb
+      REAL qvals(4), qnrm
+      COMMON /pdbcat/ f2cpdb(3,3), c2fpdb(3,3)
 c
       ntem=NumberSGTable
 
@@ -74,53 +74,53 @@ C
 C       Write the file headers first
 C
 C       The CSSR file first
-      open(unit=64,file=cssr_file(1:cssr_flen),status='unknown')
-      open(unit=65,file=pdb_file(1:pdb_flen),status='unknown')
-      open(unit=66,file=ccl_file(1:ccl_flen),status='unknown')
+      OPEN(UNIT=64,file=cssr_file(1:cssr_flen),status='unknown')
+      OPEN(UNIT=65,file=pdb_file(1:pdb_flen),status='unknown')
+      OPEN(UNIT=66,file=ccl_file(1:ccl_flen),status='unknown')
 c        write(64,1000) a(nfrag),b(nfrag),c(nfrag)
 c        write(64,1010) al(nfrag),be(nfrag),ga(nfrag),
 c     &                 SGNumStr(Ntem)(1:3)
-      write(64,1000) (cellpar(ii),ii=1,3)
-      write(64,1010) (cellpar(ii),ii=4,6),
+      WRITE(64,1000) (CellPar(ii),ii=1,3)
+      WRITE(64,1010) (CellPar(ii),ii=4,6),
      &                 SGNumStr(Ntem)(1:3)
-      write(64,1020) natom
-      write(64,1030) sngl(t),-sngl(fopt),cpb,ntotmov      
+      WRITE(64,1020) natom
+      WRITE(64,1030) SNGL(t),-SNGL(fopt),cpb,ntotmov      
 C       Now the PDB...
 C>> JCC included again
-      call sagminv(f2cpdb,inv,3)
+      CALL sagminv(f2cpdb,inv,3)
 
 C>> Add in a Header record
 
-      write(65,1036)
-      write(65,1040) sngl(t),-sngl(fopt),cpb,ntotmov
-      write(65,1050) (cellpar(ii),ii=1,6),SGHMaStr(NTem)
+      WRITE(65,1036)
+      WRITE(65,1040) SNGL(t),-SNGL(fopt),cpb,ntotmov
+      WRITE(65,1050) (cellpar(ii),ii=1,6),SGHMaStr(NTem)
 
 C>> JCC Add in V2 pdb records to store space group and symmetry
 
-      write(65,1380)
-      write(65,1381)
-      write(65,1382) SGHMaStr(NTem)
-      write(65,1380)
-      write(65,1383)
-      write(65,1384)
-      do i = 1, npdbops
-        write(65,1385) (i*1000 + 555), cpdbops(i)
-      end do
-      write(65,1380)
-      write(65,1386)
-      write(65,1387)
-      write(65,1380)
-      write(65,1388)
+      WRITE(65,1380)
+      WRITE(65,1381)
+      WRITE(65,1382) SGHMaStr(NTem)
+      WRITE(65,1380)
+      WRITE(65,1383)
+      WRITE(65,1384)
+      DO i = 1, npdbops
+        WRITE(65,1385) (i*1000 + 555), cpdbops(i)
+      END DO
+      WRITE(65,1380)
+      WRITE(65,1386)
+      WRITE(65,1387)
+      WRITE(65,1380)
+      WRITE(65,1388)
 
 C>> JCC included again
-      write(65,1060) inv(1,1),inv(1,2),inv(1,3)
-      write(65,1070) inv(2,1),inv(2,2),inv(2,3)
-      write(65,1080) inv(3,1),inv(3,2),inv(3,3)
+      WRITE(65,1060) inv(1,1),inv(1,2),inv(1,3)
+      WRITE(65,1070) inv(2,1),inv(2,2),inv(2,3)
+      WRITE(65,1080) inv(3,1),inv(3,2),inv(3,3)
 C       And the CCL
-      write(66,1090) sngl(t),-sngl(fopt),cpb,ntotmov
+      WRITE(66,1090) SNGL(t),-SNGL(fopt),cpb,ntotmov
 c        write(66,1100) a(nfrag),b(nfrag),c(nfrag),
 c     &                 al(nfrag),be(nfrag),ga(nfrag)
-      write(66,1100) (cellpar(ii),ii=1,6)
+      WRITE(66,1100) (cellpar(ii),ii=1,6)
 
 C>> Was 
 C       ii = 0
@@ -129,43 +129,43 @@ C       ii = 0
       ipcount = 0
 C>> To revert this code, set ii to iiact and iorig to i
       CheckedFragNo = 0
-      do j=1,nfrag
+      DO j = 1, nfrag
         itotal = iiact
-        do while ( CheckedFragNo .LE. CheckSize )
+        DO WHILE ( CheckedFragNo .LE. CheckSize )
           CheckedFragNo = CheckedFragNo + 1
           IF ( IZMCheck(CheckedFragNo) .EQ. 1 ) EXIT ! the loop
-        end do
+        END DO
 
 C>> Write out the translation/rotation information for each residue
-        write(65,1039) j
-        write(65,1037) 
-     &   (sngl(parvals(ij)),ij = ipcount + 1, ipcount + 3)
-         if ( natoms(CheckedFragNo) .GT. 1) then
+        WRITE(65,1039) j
+        WRITE(65,1037) 
+     &   (SNGL(parvals(ij)),ij = ipcount + 1, ipcount + 3)
+        IF ( natoms(CheckedFragNo) .GT. 1) THEN
 
 C>> Normalise the Q-rotations before writing them out ...
-            qvals(1) = sngl( parvals(ipcount + 4) )
-            qvals(2) = sngl( parvals(ipcount + 5) )
-            qvals(3) = sngl( parvals(ipcount + 6) )
-            qvals(4) = sngl( parvals(ipcount + 7) )
-            qnrm =  sqrt(qvals(1)*qvals(1) + 
-     &            qvals(2)*qvals(2) + 
-     &            qvals(3)*qvals(3) +
-     &            qvals(4)*qvals(4))
-          do ij = 1,4
-                  qvals(ij) = qvals(ij)/qnrm
-          end do
-            write(65,1038)    (qvals(ij),ij = 1,4)
+          qvals(1) = SNGL( parvals(ipcount + 4) )
+          qvals(2) = SNGL( parvals(ipcount + 5) )
+          qvals(3) = SNGL( parvals(ipcount + 6) )
+          qvals(4) = SNGL( parvals(ipcount + 7) )
+          qnrm =  SQRT(qvals(1)*qvals(1) + 
+     &                 qvals(2)*qvals(2) + 
+     &                 qvals(3)*qvals(3) +
+     &                 qvals(4)*qvals(4))
+          DO ij = 1,4
+            qvals(ij) = qvals(ij)/qnrm
+          END DO
+          WRITE(65,1038)    (qvals(ij),ij = 1,4)
           ipcount = ipcount + izmpar(CheckedFragNo)
-         endif
-         do i=1,natoms(CheckedFragNo) 
+        ENDIF
+        DO i = 1, natoms(CheckedFragNo) 
 C>> Was   ii = ii + 1
-          iiact=iiact+1
-            ii = itotal + izmbid(i,CheckedFragNo)
+          iiact = iiact + 1
+          ii = itotal + izmbid(i,CheckedFragNo)
           iorig = izmbid(i,CheckedFragNo)
 C         
 C         The CSSR atom lines
 C>> Was          write(64,1110) ii,asym(i,j),(xatopt(k,ii),k=1,3)
-            write(64,1110) 
+          WRITE(64,1110) 
      &    iiact,asym( iorig , CheckedFragNo),(xatopt(k,ii),k=1,3)
 C       The PDB atom lines
 
@@ -201,21 +201,20 @@ C          else
 C            write(65,1130) ii,asym(i,j),xc,yc,zc
 C          endif
 C>> Now
-          if (asym(iorig,CheckedFragNo)(2:2).eq.' ') then
-            write(65,1120) iiact,asym(iorig,CheckedFragNo),xc,yc,zc
-          else
-            write(65,1130) iiact,asym(iorig,CheckedFragNo),xc,yc,zc
-          endif
+          IF (asym(iorig,CheckedFragNo)(2:2) .EQ. ' ') THEN
+            WRITE(65,1120) iiact,asym(iorig,CheckedFragNo),xc,yc,zc
+          ELSE
+            WRITE(65,1130) iiact,asym(iorig,CheckedFragNo),xc,yc,zc
+          ENDIF
 C       The CCL atom lines
-          write(66,1033) asym(iorig,CheckedFragNo),(xatopt(k,ii),k=1,3)
-       end do
-        end do
-
-      write(65,1400)
-      close(64)
-      close(65)
-      close(66)
-      Call UpdateViewer()
+          WRITE(66,1033) asym(iorig,CheckedFragNo),(xatopt(k,ii),k=1,3)
+        END DO
+      END DO
+      WRITE(65,1400)
+      CLOSE(64)
+      CLOSE(65)
+      CLOSE(66)
+      CALL UpdateViewer()
 C
 1000  format(' REFERENCE STRUCTURE = 00000   A,B,C =',3F8.3)
 1010  format('   ALPHA,BETA,GAMMA =',3F8.3,'   SPGR = ',A3)

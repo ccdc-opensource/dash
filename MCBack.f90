@@ -156,7 +156,7 @@
       REAL,    DIMENSION(-200:MOBS+200)   :: ys
       INTEGER, DIMENSION(MOBS)            :: jft
       REAL                                tRandomNumber
-      INTEGER I, II, IIII, I1, I2, KK, jf1, jf0, jfp1, jfn, n0, ndiv
+      INTEGER I, II, I1, I2, KK, jf1, jf0, jfp1, jfn, n0, ndiv
       INTEGER iter, IILO, IIHI, nsep, ninsep, ngood
       INTEGER knotem, npartem
       INTRINSIC MOD
@@ -178,7 +178,6 @@
         ii = NBIN + I
         ys(ii) = yobin(NBIN)
       END DO
-      IIII = 0
       DO iter = 1, mbruckiter
 ! Loop over data points
         DO I = 1, NBIN
@@ -283,12 +282,8 @@
       CALL SplVal(xdel,u,nkn)
       nd1 = ndat-1
       nk1 = nkn-1
-      DO j = 1, nkn
-        bvec(j) = 0.0 
-        DO k = 1, nkn
-          hess(j,k) = 0.0 
-        END DO
-      END DO
+      bvec = 0.0
+      hess = 0.0
       DO i = 1, ndat
         j0 = MIN(nkn-1,jfs(i)-jf0)
         j1 = j0 + 1
@@ -350,16 +345,12 @@
       REAL*8  u(m,m)
 
       REAL*8  A(m,m),b(m,m),c(m,m)
-      INTEGER I, J
+      INTEGER I
 
 ! Initialise all entries of A, b and c to 0.0
-      DO J = 1, m
-        DO I = 1, m
-          A(I,J) = 0.0
-          b(I,J) = 0.0
-          c(I,J) = 0.0
-        END DO
-      END DO
+      A = 0.0
+      b = 0.0
+      c = 0.0
       A(1,1) = 1.0
       A(m,m) = 1.0
       DO I = 2, m-1
@@ -399,11 +390,7 @@
       INTEGER         I, J
 
 ! Initialise b with values from a
-      DO I = 1, N
-        DO J = 1, N
-          B(I,J) = A(I,J)
-        ENDDO
-      ENDDO
+      B = A
       D = 1.0
       IS = N - 1
       DO K = 1, N
