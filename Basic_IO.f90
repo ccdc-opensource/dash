@@ -53,7 +53,7 @@
       
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
-      !RETURN
+      RETURN
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Debug Error")
 
       END SUBROUTINE DebugErrorMessage
