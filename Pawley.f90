@@ -908,6 +908,11 @@
 
       IMPLICIT NONE
 
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
       INTEGER, EXTERNAL :: CreateSDIFile
       CHARACTER(MaxPathLength) :: SDIFileName
       CHARACTER(LEN=45) :: FILTER
@@ -917,7 +922,7 @@
       SaveProject = .FALSE.
       IFLAGS = SaveDialog + AppendExt + PromptOn
       FILTER = 'Diffraction information files (*.sdi)|*.sdi|'
-      SDIFileName = ' '
+      SDIFileName = OutputFilesBaseName
       CALL WSelectFile(FILTER, IFLAGS, SDIFileName, 'Save diffraction information for structure solution')
       IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(SDIFileName) .NE. 0)) THEN
         IF (CreateSDIFile(SDIFileName) .EQ. 0) THEN
