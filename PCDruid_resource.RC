@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 20/Apr/2004 18:21:48
+// Modified : 21/Apr/2004 10:09:52
 //
 ///////////////////////////////////////////////////
 //
@@ -490,10 +490,6 @@
 #define IDF_a1                           1145
 #define IDF_b1                           1146
 #define IDF_c1                           1217
-#define IDD_TabDataDefaults               170
-#define IDD_TabSAsetup                    167
-#define IDD_TabSAOutput                   169
-#define IDD_TabPlotOptions                168
 #define ID_Delabc                       40019
 #define IDB_Delabc                       1410
 #define IDD_DICVOLRunning                 171
@@ -515,15 +511,9 @@
 #define ID_FitPeaks                     40020
 #define IDF_RR_ZmatrixGrid               1397
 #define IDB_Refine                       1398
-#define IDD_RRsubBonds                    180
-#define IDD_RRsubZmatrices                173
 #define IDF_RR_AngleGrid                 1438
 #define IDF_RR_TorsionGrid               1440
-#define IDD_RRsubAngles                   182
-#define IDD_RRsubTorsions                 183
-#define IDD_RRsubAtoms                    185
 #define IDF_RR_BondGrid                  1441
-#define IDD_RRsubData                     174
 #define IDB_Open                        40024
 #define IDB_Edit                         1468
 #define IDB_Summary                      1469
@@ -1514,7 +1504,7 @@ BEGIN
     CONTROL "&Solve >",IDF_PawRef_Solve,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  136,  150,   40,   14
     CONTROL "Re&ject",IDB_PawRef_Reject,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  304,  150,   40,   14
     CONTROL "&Accept",IDB_PawRef_Accept,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  264,  150,   40,   14
-    CONTROL "Sa&ve as...",IDB_PawRef_Save,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  350,  150,   40,   14
+    CONTROL "Sa&ve as...",IDB_PawRef_Save,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  349,  150,   44,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   36,   14
     CONTROL "N(back)  =",IDF_PawRef_NBack_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  321,   19,   32,    8
@@ -3408,7 +3398,7 @@ BEGIN
     CONTROL "",IDF_Xtal_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   94,   62,  200,   14
     CONTROL "B&rowse...",IDB_xtal_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  343,   62,   36,   14
     CONTROL "O&pen",IDB_xtal_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  299,   62,   40,   14
-    CONTROL "Please note that these crystal structure files do not contain any information about restrictions on rotations or multiple copies of Z-matrices, and these have been reset to default values.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   93,   93,  288,   24
+    CONTROL "Please note that these crystal structure files do not contain any information about restrictions on Z-matrices, and these have been reset to default values.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   93,   93,  288,   24
     CONTROL "In order to retain this information, save/load solutions to/from a dash solutions file (file extension .dash), accessible from the ""Analyse Solutions"" window.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   93,  117,  288,   24
     CONTROL "Start SA",IDB_Restart,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  288,  150,   40,   14
 END
