@@ -343,7 +343,9 @@
       INCLUDE 'statlog.inc'
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -1714,13 +1716,16 @@
       REAL          FnWavelengthOfMenuOption ! Function
       INTEGER       GetNumOfColumns ! Function
       REAL          Lambda1
+      REAL          Temp
+      LOGICAL       OK
+      INTEGER       IRadSelection
 
 ! Initialise to failure
       Load_xye_File = 0
       Lambda1       = 0.0
       ReadWarning   = .FALSE.
       FLEN = LEN_TRIM(TheFileName)
-      OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',err=999)
+      OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
       I = 1
 ! Check if wavelength available on very first line
       READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
@@ -1731,29 +1736,88 @@
            GOTO 999
         ENDIF
         CALL UpdateWavelength(Lambda1)
-
+! JvdS Q & D hack enabling the cell parameters to be stored on the second line of the .xye file.
+! ####################
         READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
         IF (GetNumOfColumns(Cline) .EQ. 6) THEN
           READ(Cline,*,ERR=999,END=999) CellPar(1), CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6)
           CALL Upload_Cell_Constants
+        ELSE
+          CLOSE(10)
+          OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+          READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
         ENDIF
-
+! JvdS End of Q & D hack.
+! ####################
       ELSE
-        READ(Cline,*, IOSTAT = IS) XOBS(I),YOBS(I),EOBS(I)
-        IF (IS .NE. 0) THEN
-          READ(Cline,*, ERR=999,END=999) XOBS(I),YOBS(I)
-          IF (ABS(YOBS(I)) .LT. 0.0000001) THEN
-            EOBS(I) = 1
-          ELSE IF (YOBS(I) .GE. 0.0000001) THEN
-            EOBS(I) = SQRT(YOBS(I))
+! If we are here, the .xye file didn't contain the wavelength: ask the user if he wants to include it now
+        CALL PushActiveWindowID
+        CALL WDialogLoad(IDD_XYE)
+        CALL WDialogSelect(IDD_XYE)
+        CALL WDialogShow(-1,-1,IDOK,SemiModeless)
+        OK = .FALSE.
+        DO WHILE (.TRUE.)
+          CALL WMessage(EventType,EventInfo)
+          SELECT CASE (EventType)
+            CASE (PushButton)
+              SELECT CASE (EventInfo%VALUE1)
+                CASE (IDOK)
+                  OK = .TRUE.
+                  CALL WDialogGetReal(IDF_wavelength,Temp)
+                  CALL UpdateWavelength(Temp) ! Wavelength now in ALambda
+                  GOTO 11
+                CASE (IDCANCEL)
+                  OK = .FALSE.
+                  GOTO 11
+              END SELECT
+            CASE (FieldChanged)
+              SELECT CASE (EventInfo%VALUE1)
+                CASE (IDF_Wavelength_Menu) ! Wavelength menu selection
+                  CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
+                  Temp = FnWavelengthOfMenuOption(IRadSelection)
+                  CALL WDialogPutReal(IDF_wavelength,Temp)
+                CASE (IDF_wavelength)
+                  ! Do nothing 
+              END SELECT
+          END SELECT
+        ENDDO
+ 11     CALL WDialogSelect(IDD_XYE)
+        CALL WDialogUnload
+        CALL PopActiveWindowID
+        CLOSE(10)
+        OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+        OPEN(UNIT=64,FILE='TempFile.xye',ERR=12)
+        GOTO 13
+  12    CONTINUE
+        CALL ErrorMessage('Error: no changes made.')
+        CLOSE(64)
+        OK = .FALSE.
+  13    CONTINUE
+        IF (OK) THEN
+! This simply assumes that it was a valid .xye file
+          WRITE(64,'(F9.5)') ALambda
+! Read a line from the original file
+  14      READ(UNIT=10,FMT='(A)',ERR=12,END=15) Cline
+! Write the trimmed version to another file          
+          WRITE(64,'(A)') Cline(1:LEN_TRIM(Cline))
+          GOTO 14
+  15      CONTINUE ! EoF
+          CLOSE(64)
+          CLOSE(10)
+! Delete old .xye file
+          CALL IOsDeleteFile(TheFileName)
+! Move temp file to old .xye
+          CALL IOsRenameFile('TempFile.xye',TheFileName)
+          OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+          I = 1
+! Check if wavelength available on very first line
+          READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
+          IF (GetNumOfColumns(Cline) .NE. 1) THEN
+            CLOSE(10)
+            OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+            GOTO 12
           ENDIF
         ENDIF
-! Skip negative 2-theta data and negative intensities
-        IF (XOBS(I) .LE. 0.0) GOTO 10
-        IF (YOBS(I) .LT. 0.0) GOTO 10
-! Skip points with zero esd
-        IF (EOBS(I) .LE. 0.0) GOTO 10
-        I = I + 1
       ENDIF
 !C>> Modified to handle files without esds - used to read in YOBS as the esd
  10   READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
@@ -1826,7 +1890,9 @@
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -1921,7 +1987,9 @@
 
       REAL tXOBS(MOBS),tYOBS(MOBS),tYCAL(MOBS),tYBAK(MOBS),tEOBS(MOBS)
 
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -2154,8 +2222,8 @@
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
-      REAL    PAWLEYCHISQ,RWPOBS,RWPEXP
-      COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
       INCLUDE 'statlog.inc'
 
       CHARACTER(LEN = MaxPathLength) :: line, subline
@@ -2235,7 +2303,7 @@
           NumPawleyRef = 0
           CALL FillSymmetry()
         CASE ('paw')
-          CALL INextReal(line,PawleyChiSq)
+          CALL INextReal(line,PAWLEYCHISQ)
       END SELECT
       GOTO 10 
  100  CONTINUE
@@ -2293,12 +2361,7 @@
       REAL    ARGK
       REAL    DSTAR
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-! MTIC  = 10000
-! NTIC  = number of tick marks
-! IH    = h, k and l
-! ARGK  = 2 theta value
-! DSTAR = d*
-! Exaclty the same information is held in two other common blocks.
+
       INTEGER I, II
 
 !>> JCC - set return status

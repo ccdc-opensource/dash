@@ -1,4 +1,4 @@
-! Winteracter module created : 19/Sep/2001 16:11:42
+! Winteracter module created : 20/Sep/2001 11:32:19
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -280,7 +280,6 @@
           INTEGER, PARAMETER :: IDF_PawRef_RefZero_Check        =  1293
           INTEGER, PARAMETER :: IDB_PawRef_Accept               =  1287
           INTEGER, PARAMETER :: IDF_PawRef_Line                 =  1299
-          INTEGER, PARAMETER :: IDB_PawRef_Skip                 =  1300
           INTEGER, PARAMETER :: IDF_Pawley_Options_Group        =  1302
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_ChiSq_Label1   =  1317
           INTEGER, PARAMETER :: ID_get_crystal_symmetry         = 40041
@@ -467,4 +466,6 @@
           INTEGER, PARAMETER :: IDF_gamm1_label2                =  1072
           INTEGER, PARAMETER :: IDB_ConvertT2R                  =  1098
           INTEGER, PARAMETER :: IDB_ConvertR2T                  =  1099
+          INTEGER, PARAMETER :: IDD_XYE                         =   130
+          INTEGER, PARAMETER :: IDF_wavelength                  =  1100
       END MODULE Druid_Header

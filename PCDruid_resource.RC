@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 19/Sep/2001 16:11:42
+// Modified : 20/Sep/2001 11:32:19
 //
 ///////////////////////////////////////////////////
 //
@@ -293,7 +293,6 @@
 #define IDF_PawRef_RefZero_Check         1293
 #define IDB_PawRef_Accept                1287
 #define IDF_PawRef_Line                  1299
-#define IDB_PawRef_Skip                  1300
 #define IDF_Pawley_Options_Group         1302
 #define IDF_Pawley_Cycle_ChiSq_Label1    1317
 #define ID_get_crystal_symmetry         40041
@@ -480,6 +479,8 @@
 #define IDF_gamm1_label2                 1072
 #define IDB_ConvertT2R                   1098
 #define IDB_ConvertR2T                   1099
+#define IDD_XYE                           130
+#define IDF_wavelength                   1100
 
 ///////////////////////////////////////////////////
 //
@@ -960,8 +961,8 @@ STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_HPSL_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  217,   78
-    CONTROL "HPSL =",IDF_HPSL_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   14,    7,   48,    8
-    CONTROL "",IDF_HPSL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   66,    4,   40,   14
+    CONTROL "HPSL =",IDF_HPSL_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   68,    7,   30,    8
+    CONTROL "",IDF_HPSL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  100,    4,   40,   14
 END
 
 IDD_HPSL_info RCDATA
@@ -1027,8 +1028,8 @@ STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_HMSL_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  217,   78
-    CONTROL "HMSL =",IDF_HMSL_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   14,    7,   48,    8
-    CONTROL "",IDF_HMSL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   66,    4,   40,   14
+    CONTROL "HMSL =",IDF_HMSL_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   68,    7,   30,    8
+    CONTROL "",IDF_HMSL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  100,    4,   40,   14
 END
 
 IDD_HMSL_Info RCDATA
@@ -1273,7 +1274,7 @@ BEGIN
     CONTROL "",IDF_Pawley_Refinement_Number,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  276,  108,   16,   12
     CONTROL "N(back)  =",IDF_PawRef_NBack_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  188,   31,   32,    8
     CONTROL "",IDF_PawRef_Line,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,   72,  308,    0
-    CONTROL "Close",IDB_PawRef_Skip,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   50,  164,   40,   14
+    CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   50,  164,   40,   14
     CONTROL "Refine",IDF_PawRef_Refine,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,    4,  164,   40,   14
     CONTROL "3",IDF_Pawley_Total_Cycles,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  106,  108,   25,   12
     CONTROL "Re-use refined intensities?",IDF_PawRef_UseInts_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   72,   14,  100,   14
@@ -2308,6 +2309,43 @@ BEGIN
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_XYE DIALOG 0, 0,  284,  146
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Add wavelength to .xye"
+BEGIN
+    CONTROL "or alternatively, the anode (if laboratory data) :",IDF_PW_radiation_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   38,   92,  142,   10
+    CONTROL "",IDF_Wavelength_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  183,   90,   60,   64
+    CONTROL "1.5406",IDF_wavelength,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  183,   69,   40,   14
+    CONTROL "Please enter the experimental wavelength with which this powder diffraction pattern was recorded. This wavelength will then be written to the first line of the .xye file and read in whenever this file is opened.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   20,   36,  246,   26
+    CONTROL "For ease of use, DASH now interprets a single number on the first line of an .xye file as a wavelength. The file you are trying to load does not contain a wavelength yet.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   20,   10,  246,   18
+    CONTROL "Å",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  224,   71,    8,    8
+    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   82,  118,   40,   14
+    CONTROL "CANCEL",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  162,  118,   40,   14
+    CONTROL "Experimental wavelength (Angstrom) :",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   67,   71,  113,    8
+END
+
+IDD_XYE RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+" 1045     6     2 \n"
+"<...> \n"
+"Cu Ka1 \n"
+"Mo Ka1 \n"
+"Co Ka1 \n"
+"Cr Ka1 \n"
+"Fe Ka1 \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1100     0.10000E-002      20.000      \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
