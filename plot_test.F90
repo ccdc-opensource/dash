@@ -159,8 +159,8 @@
 !  Draw main title
 !
       CALL IGrCharSet('H')
-      CALL IGrCharFont(       1)
-      CALL IGrCharSpacing('F')
+      CALL IGrCharFont(3)
+      CALL IGrCharSpacing('P')
       CALL IGrCharSize(  .75,  0.75)
       CALL IGrColourN(KolNumMain)
       CALL IPgTitle('Simulated Annealing Results','C')
