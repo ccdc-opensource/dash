@@ -130,6 +130,10 @@ C
      &                MaxRuns, MinMoves, MaxMoves,ChiMult
 
 	LOGICAL CheckTerm
+C ep Required to keep a record of the child windows opened for Chi-sqd
+C    vs. Number of moves plots
+	INTEGER ChiSqdChildWindows
+      COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin)
 
 C JCC Initialise PDB output records 
 
@@ -548,7 +552,8 @@ c
        fpavstore(iteration)=-sngl(fpav)
 c.. corrint specific
        chiprobest(iteration)=cpb
-c ep added - following call to Chi_sq_plot routine.
+C ep added - following call to Chi_sq_plot routine. PLots Chi-sqd vs.
+C    number of moves in a child window
        call chi_sq_plot(ntotmov, iteration, cpb) 
 c
        if (num_new_min.ne.num_old_min) then
@@ -615,9 +620,14 @@ C.. We will use the energy fluctuation to reduce the temperature
       IF (RESTART) THEN
 		IF ( CheckTerm(NTOTMOV, CHIPROBEST(iteration) ) ) THEN
 			CALL AddMultiSolution(cpb,sngl(-fopt))
-C  ep added.  The following will close the Chi-sqd vs. no moves window.  At
-C  this point it will be the only child window open.
-	        call WindowCloseChild(1)
+C  ep added.  Before the next SA run starts close the Chi-sqd vs. no moves window opened
+C in the subroutine Chi_sq_plot.  
+	                 DO i = 1,MaxNumChildWin
+                          IF (ChiSqdChildWindows(i).eq.1) THEN 
+                              CALL WindowCloseChild(i)
+	                        ChiSqdChildWindows(i) = 0
+	                    END IF
+                       END DO
 			IF ( SA_Run_Number .LT. MaxRuns ) GOTO 1
 	    ELSE
 	        GO TO 100
