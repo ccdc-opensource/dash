@@ -27,7 +27,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'DialogPosCmn.inc'
+      INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
+      COMMON /DialoguePosCmn/ IXPos_IDD_Wizard, IYPos_IDD_Wizard
 
       LOGICAL         InWizard, InWizardWindow
       INTEGER                                   CurrentWizardWindow
@@ -53,7 +54,8 @@
 
       INTEGER, INTENT (IN   ) :: TheDialogID
 
-      INCLUDE 'DialogPosCmn.inc'
+      INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
+      COMMON /DialoguePosCmn/ IXPos_IDD_Wizard, IYPos_IDD_Wizard
  
       LOGICAL         InWizard, InWizardWindow
       INTEGER                                   CurrentWizardWindow
