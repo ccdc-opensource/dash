@@ -24,42 +24,42 @@
               SelectedColour = KolObs
               CALL WSelectColour(SelectedColour)
               IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
-                CALL IGrPaletteRGB(KolNumObs,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                CALL IGrPaletteRGB(KolNumObs, SelectedColour%IRed,SelectedColour%IGreen, SelectedColour%IBlue)
                 KolObs = SelectedColour
               ENDIF
             CASE (IDF_CalculatedData_Colour)
               SelectedColour = KolCal
               CALL WSelectColour(SelectedColour)
               IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
-                CALL IGrPaletteRGB(KolNumCal,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                CALL IGrPaletteRGB(KolNumCal, SelectedColour%IRed,SelectedColour%IGreen, SelectedColour%IBlue)
                 KolCal = SelectedColour
               ENDIF
             CASE (IDF_DifferenceData_Colour)
               SelectedColour = KolDif
               CALL WSelectColour(SelectedColour)
               IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
-                CALL IGrPaletteRGB(KolNumDif,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                CALL IGrPaletteRGB(KolNumDif, SelectedColour%IRed, SelectedColour%IGreen, SelectedColour%IBlue)
                 KolDif = SelectedColour
               ENDIF
             CASE (IDF_Axes_Colour)
               SelectedColour = KolMain
               CALL WSelectColour(SelectedColour)
               IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
-                CALL IGrPaletteRGB(KolNumMain,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                CALL IGrPaletteRGB(KolNumMain, SelectedColour%IRed, SelectedColour%IGreen, SelectedColour%IBlue)
                 KolMain = SelectedColour
               ENDIF
             CASE (IDF_TickMark_Colour)
               SelectedColour = KolCTic
               CALL WSelectColour(SelectedColour)
               IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
-                CALL IGrPaletteRGB(KolNumCTic,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                CALL IGrPaletteRGB(KolNumCTic, SelectedColour%IRed, SelectedColour%IGreen, SelectedColour%IBlue)
                 KolCTic = SelectedColour
               ENDIF
             CASE (IDF_PeakFitting_Colour)
               SelectedColour = KolPeakFit
               CALL WSelectColour(SelectedColour)
               IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
-                CALL IGrPaletteRGB(KolNumPeakFit,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                CALL IGrPaletteRGB(KolNumPeakFit, SelectedColour%IRed, SelectedColour%IGreen, SelectedColour%IBlue)
                 KolPeakFit = SelectedColour
               ENDIF
           END SELECT
@@ -106,11 +106,11 @@
 ! IFTYPE specifies which of the file types in the list is the default
               IFTYPE = 2
               tFileName = ViewExe
-              CALL WSelectFile(FILTER,IFLAGS,tFileName,'Select Viewer',IFTYPE)
+              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select Viewer', IFTYPE)
 ! Did the user press cancel?
               IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOK) THEN
                 VIEWEXE = tFileName
-                CALL WDialogPutString(IDF_ViewExe,VIEWEXE)
+                CALL WDialogPutString(IDF_ViewExe, VIEWEXE)
               ENDIF
           END SELECT
         CASE (FieldChanged)
@@ -159,7 +159,7 @@
               CASE (IDOK) ! The 'OK' button
                 CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
                 CALL WDialogSelect(IDD_Crystal_Symmetry)
-                CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+                CALL WDialogGetReal(IDF_ZeroPoint, ZeroPoint)
                 CALL Upload_ZeroPoint               
                 CALL DownloadWavelength(IDD_Data_Properties)
                 CALL Generate_TicMarks
@@ -216,8 +216,8 @@
           CALL Profile_Plot
         CASE (FieldChanged)
             SELECT CASE (EventInfo%VALUE1)
-              CASE (IDF_LabX_Source,IDF_SynX_Source,IDF_CWN_Source,IDF_TOF_source)
-                CALL WDialogGetRadioButton(IDF_LabX_Source,JRadOption)
+              CASE (IDF_LabX_Source, IDF_SynX_Source, IDF_CWN_Source, IDF_TOF_source)
+                CALL WDialogGetRadioButton(IDF_LabX_Source, JRadOption)
                 CALL Upload_Source
                 CALL Generate_TicMarks 
               CASE (IDF_Wavelength_Menu) ! Wavelength menu selection
@@ -257,11 +257,11 @@
 ! If this is synchrotron data, then set the default error in the peak positions to 0.02 rahter than 0.03.
 ! This decreases the number of solutions and increases the speed of the search.
               IF (JRadOption .EQ. 2) THEN
-                CALL WDialogPutReal(IDF_eps,0.02,'(F5.3)')
+                CALL WDialogPutReal(IDF_eps, 0.02, '(F5.3)')
               ELSE
-                CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
+                CALL WDialogPutReal(IDF_eps, 0.03, '(F5.3)')
               ENDIF
-              CALL WDialogShow(-1,-1,0,Modeless)
+              CALL WDialogShow(-1, -1, 0, Modeless)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -305,7 +305,7 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL WdialogHide
               CALL WDialogSelect(IDD_SA_Action1)
-              CALL WDialogFieldState(IDB_Summary,Enabled)
+              CALL WDialogFieldState(IDB_Summary, Enabled)
 ! Closes all SA profile child windows which are still open when OK button clicked
               DO i = 1, MaxNumChildWin
                 IF (SAUsedChildWindows(i).EQ.1) THEN
@@ -328,20 +328,20 @@
               IF (iLimit1 .LT.               1) iLimit1 =               1
               DO iRow = 1, NumOf_SA_Runs+1
                 IF ((iRow .GE. iLimit1) .AND. (iRow .LE. iLimit2)) THEN
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Checked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iRow, Checked)
                 ELSE
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iRow, Unchecked)
                 ENDIF
               ENDDO
               CALL WDialogPutInteger(IDF_Limit1, iLimit1)
               CALL WDialogPutInteger(IDF_Limit2, iLimit2)
             CASE (IDF_InvertSelection)
-              DO iRow = 1, NumOf_SA_Runs
-                CALL WGridGetCellCheckBox(IDF_SA_summary,3,iRow,istatus)
+              DO iRow = 1, NumOf_SA_Runs+1
+                CALL WGridGetCellCheckBox(IDF_SA_summary, 3, iRow, istatus)
                 IF (istatus .EQ. 1) THEN
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iRow, Unchecked)
                 ELSE
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Checked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iRow, Checked)
                 ENDIF
               ENDDO
             CASE (IDB_ShowOverlap)
@@ -352,14 +352,14 @@
 !ep allows you to view pdb file of SA Solutions, each clicked
 !   check box in fresh mercury window
       DO iRow = 1, NumOf_SA_Runs+1
-        CALL WGridGetCellCheckBox(IDF_SA_summary,2,iRow,istatus)
+        CALL WGridGetCellCheckBox(IDF_SA_summary, 2, iRow, istatus)
         IF (istatus .EQ. 1) THEN
 ! calls subroutine which opens Mercury window with .pdb file
           CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow))
           CALL ViewStructure('SA_best.pdb')
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
 !          IF (.NOT. InSA) CALL organise_sa_result_data(iRow)
-          CALL WGridPutCellCheckBox(IDF_SA_Summary,2,iRow,Unchecked)
+          CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
         ENDIF
       ENDDO
       CALL PopActiveWindowID
