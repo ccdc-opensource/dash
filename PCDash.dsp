@@ -294,7 +294,6 @@ SOURCE=.\Generate_TicMarks.f90
 DEP_F90_GENER=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
-	".\statlog.inc"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -331,6 +330,7 @@ DEP_F90_GETHC=\
 SOURCE=.\getpik.f90
 DEP_F90_GETPI=\
 	".\params.inc"\
+	".\Variables.mod"\
 	
 # End Source File
 # Begin Source File
@@ -554,6 +554,8 @@ DEP_F90_PROFI=\
 
 SOURCE=.\ProjectSave.f90
 DEP_F90_PROJE=\
+	".\Debug\ZMVAR.MOD"\
+	".\params.inc"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -627,15 +629,6 @@ DEP_F90_SA_OU=\
 	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\SA_Profile_Plot.f90
-DEP_F90_SA_PR=\
-	".\GLBVAR.INC"\
-	".\params.inc"\
-	".\statlog.inc"\
 	
 # End Source File
 # Begin Source File
@@ -766,7 +759,6 @@ SOURCE=.\Utilities.f90
 
 SOURCE=.\Valchi.f90
 DEP_F90_VALCH=\
-	".\AllFFCalc.inc"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
 	".\statlog.inc"\
@@ -776,11 +768,7 @@ DEP_F90_VALCH=\
 
 SOURCE=.\valchipro.f90
 DEP_F90_VALCHI=\
-	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
 	".\params.inc"\
-	".\statlog.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -828,10 +816,6 @@ DEP_F90_ZMVAR=\
 # Begin Group "Body Includes"
 
 # PROP Default_Filter "inc;INC"
-# Begin Source File
-
-SOURCE=.\AllFFCalc.inc
-# End Source File
 # Begin Source File
 
 SOURCE=.\GLBVAR.INC
