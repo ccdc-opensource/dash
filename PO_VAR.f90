@@ -18,8 +18,7 @@
 ! PrefPars(1:3) = Orientation (to be replaced by something called 'PO_Direction(1:3)
 ! PrefPars(4)   = Extent of preferred orientation
 
-
-      REAL PrefCsqa(48,10000) ! 10000 = MSAREF
+      REAL PrefCsqa(48,10000) ! 10000 = MFCSTO
 
       END MODULE PO_VAR
 !
