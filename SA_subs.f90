@@ -80,6 +80,9 @@
       LOGICAL           Resume_SA
       COMMON /RESUMESA/ Resume_SA
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       REAL, EXTERNAL :: EXPREP
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
@@ -107,7 +110,12 @@
       REAL XP(MVAR)
       REAL xtem, tempupper, templower, tempupper2
       REAL Initial_T ! As calculated during intial run, not as set by the user.
+      LOGICAL UseSemiLamarckian ! If true, random local minimisations will occur.
+      INTEGER SL_Frequency ! SemiLamarckian frequency: how often per run
+      REAL    SL_Threshold ! To compare the random number against: greater means "do not accept"
       
+      UseSemiLamarckian = .TRUE.
+      SL_Frequency = 10
       WasMinimised = .FALSE.
       NumParPerTrial = 1
       TotNumTrials = 0
@@ -148,6 +156,7 @@
         ENDIF
       ENDDO
       nmpert = NT * NS * NPAR ! Number of Moves per Temperature
+      SL_Threshold = 1/((MaxMoves/FLOAT(SL_Frequency))/nmpert)
 ! vm is adjusted during the SA. So re-initialise every time the SA is started to
 ! ensure that starting the SA more than once with the same parameters will give
 ! identical results.
@@ -184,75 +193,24 @@
 ! Set initial values.
       iMyExit = 0
       Curr_SA_Run = Curr_SA_Run + 1
-      WRITE (SA_RunNumberStr, '(I3.3)') Curr_SA_Run
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Action1)
-      WRITE(CNruns, '(I3)') Curr_SA_Run
-      WRITE(CMruns, '(I3)') MaxRuns
-      CNruns = ADJUSTL(CNruns)
-      CMruns = ADJUSTL(CMruns)
-      CALL WDialogPutString(IDD_SA_RunLabel,'Simulated annealing run number '//CNRuns(1:LEN_TRIM(CNruns))// &
-                                            ' of '//CMRuns(1:LEN_TRIM(CMRuns)))
-      CALL PopActiveWindowID
+      IF ( .NOT. in_batch ) THEN
+        WRITE (SA_RunNumberStr, '(I3.3)') Curr_SA_Run
+        CALL PushActiveWindowID
+        CALL WDialogSelect(IDD_SA_Action1)
+        WRITE(CNruns, '(I3)') Curr_SA_Run
+        WRITE(CMruns, '(I3)') MaxRuns
+        CNruns = ADJUSTL(CNruns)
+        CMruns = ADJUSTL(CMruns)
+        CALL WDialogPutString(IDD_SA_RunLabel,'Simulated annealing run number '//CNRuns(1:LEN_TRIM(CNruns))// &
+                                              ' of '//CMRuns(1:LEN_TRIM(CMRuns)))
+        CALL PopActiveWindowID
+      ENDIF
+
       MAKET0 = (T0.LE.0.0)  ! T0 is estimated each run of a multirun
       IF (MAKET0) THEN
         T = 100000.0
-! vm is adjusted during the SA. So re-initialise every time the SA is started to
-! ensure that starting the SA more than once with the same parameters will give
-! identical results.
-    !O    kk = 0
-    !O    DO iFrg = 1, nFrag
-    !O      DO ii = 1, izmpar(iFrg)
-    !O        kk = kk + 1
-    !O        SELECT CASE (kzmpar(ii,iFrg))
-    !O          CASE (1) ! translation
-    !O            vm(kk) = 1.0
-    !O          CASE (2) ! quaternion
-    !O            vm(kk) = 1.0
-    !O          CASE (3) ! torsion
-    !O            vm(kk) = 180.0
-    !O          CASE (4) ! angle
-    !O            vm(kk) = 1.0
-    !O          CASE (5) ! bond
-    !O            vm(kk) = 0.1*(ub(kk)-lb(kk))
-    !O          CASE (6) ! single rotation axis
-    !O            vm(kk) = 0.1
-    !O        END SELECT
-    !O      ENDDO
-    !O    ENDDO
-    !O    IF (PrefParExists) THEN
-    !O      kk = kk + 1
-    !O      vm(kk) = 0.1
-    !O    ENDIF
       ELSE
         T = T0
-! vm is adjusted during the SA. So re-initialise every time the SA is started to
-! ensure that starting the SA more than once with the same parameters will give
-! identical results.
-  !O      kk = 0
-  !O      DO iFrg = 1, nFrag
-  !O        DO ii = 1, izmpar(iFrg)
-  !O          kk = kk + 1
-  !O          SELECT CASE (kzmpar(ii,iFrg))
-  !O            CASE (1) ! translation
-  !O              vm(kk) = 0.1
-  !O            CASE (2) ! quaternion
-  !O              vm(kk) = 0.1
-  !O            CASE (3) ! torsion
-  !O              vm(kk) = 10.0
-  !O            CASE (4) ! angle
-  !O              vm(kk) = 1.0
-  !O            CASE (5) ! bond
-  !O              vm(kk) = 0.1*(ub(kk)-lb(kk))
-  !O            CASE (6) ! single rotation axis
-  !O              vm(kk) = 0.1
-  !O          END SELECT
-  !O        ENDDO
-  !O      ENDDO
-  !O      IF (PrefParExists) THEN
-  !O        kk = kk + 1
-  !O        vm(kk) = 0.01
-  !O      ENDIF
       ENDIF
 ! Initialise the random number generator RANMAR.
 ! Increment the seeds for each SA run
@@ -277,20 +235,22 @@
       NewOptimumFound = .FALSE.
 ! Evaluate the profile chi-squared as well
       CALL valchipro(CHIPROBEST)
-      CALL ChiSqPlot_UpdateIterAndChiProBest(1)
-      CALL WDialogSelect(IDD_Summary)
-      CALL WGridRows(IDF_SA_Summary, Curr_SA_Run)
-      WRITE(RowLabelStr,'(I2)') Curr_SA_Run
-      CALL WGridLabelRow(IDF_SA_summary, Curr_SA_Run, RowLabelStr)
-      CALL WGridPutCellInteger (IDF_SA_Summary, 1, Curr_SA_Run, NumOf_SA_Runs+1) 
-      CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, Curr_SA_Run, 1)
-      CALL WGridPutCellReal    (IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
-      CALL WGridPutCellReal    (IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
-      CALL WDialogPutInteger(IDF_Limit1, 1)
-      CALL WDialogPutInteger(IDF_Limit2, Curr_SA_Run)
-      PrevRejected = .TRUE.
+      IF ( .NOT. in_batch ) THEN
+        CALL ChiSqPlot_UpdateIterAndChiProBest(1)
+        CALL WDialogSelect(IDD_Summary)
+        CALL WGridRows(IDF_SA_Summary, Curr_SA_Run)
+        WRITE(RowLabelStr,'(I2)') Curr_SA_Run
+        CALL WGridLabelRow(IDF_SA_summary, Curr_SA_Run, RowLabelStr)
+        CALL WGridPutCellInteger (IDF_SA_Summary, 1, Curr_SA_Run, NumOf_SA_Runs+1) 
+        CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, Curr_SA_Run, 1)
+        CALL WGridPutCellReal    (IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
+        CALL WGridPutCellReal    (IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
+        CALL WDialogPutInteger(IDF_Limit1, 1)
+        CALL WDialogPutInteger(IDF_Limit2, Curr_SA_Run)
 ! Plot the profile
-      CALL Profile_Plot
+        CALL Profile_Plot
+      ENDIF
+      PrevRejected = .TRUE.
       MRAN  = ISEED1 + Curr_SA_Run
       MRAN1 = ISEED2 + Curr_SA_Run
       Last_NUP   = nmpert / 2
@@ -305,7 +265,6 @@
 ! ##########################################
   100 CONTINUE
       Curr_SA_Iteration = Curr_SA_Iteration + 1
-
       NUP = 0
       NDOWN = 0
       DO II = 1, nvar
@@ -561,7 +520,7 @@
         ENDIF
       ENDDO
       ntotmov = ntotmov + nmpert
-      IF (NewOptimumFound) CALL Profile_Plot ! plot the profile
+      IF ( NewOptimumFound ) CALL Profile_Plot ! plot the profile
       NewOptimumFound = .FALSE.
       CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,FLAV,nvar,Last_NUP,Last_NDOWN,ntotmov)
 ! If we have asked for an initial temperature to be calculated then do so
@@ -574,40 +533,20 @@
         CALL MAKXIN
         MAKET0 = .FALSE.
         CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
-  !O      kk = 0
-  !O      DO iFrg = 1, nFrag
-  !O        DO ii = 1, izmpar(iFrg)
-  !O          kk = kk + 1
-  !O          SELECT CASE (kzmpar(ii,iFrg))
-  !O            CASE (1) ! translation
-  !O              vm(kk) = 0.1
-  !O            CASE (2) ! quaternion
-  !O              vm(kk) = 0.1
-  !O            CASE (3) ! torsion
-  !O              vm(kk) = 10.0
-  !O            CASE (4) ! angle
-  !O              vm(kk) = 1.0
-  !O            CASE (5) ! bond
-  !O              vm(kk) = 0.1*(ub(kk)-lb(kk))
-  !O            CASE (6) ! single rotation axis
-  !O              vm(kk) = 0.1
-  !O          END SELECT
-  !O        ENDDO
-  !O      ENDDO
-  !O      IF (PrefParExists) THEN
-  !O        kk = kk + 1
-  !O        vm(kk) = 0.01
-  !O      ENDIF
-  !O      DO I = 1, nvar
-  !O        NACP(I) = 0
-  !O        NumTrialsPar(I) = 0
-  !O      ENDDO
         GOTO 100
       ENDIF
 ! If termination criteria are not met, prepare for another loop.
 ! We will use the energy fluctuation to reduce the temperature
       T = T/(1.0+(RT*T)/(3.0*FPSD))
+
+      ! Following two lines randomly add in local minimisations at a preset average frequency
+   !   IF ( RANARR(IARR) .LT. SL_Threshold ) CALL LocalMinimise(.TRUE.)
+   !   IARR = IARR + 1
+
    !   IF (MOD(Curr_SA_Iteration,5) .EQ. 0) CALL LocalMinimise(.TRUE.)
+
+   !   CALL LocalMinimise(.TRUE.)
+
       DO I = 1, nvar
         X(I) = XOPT(I)
       ENDDO
@@ -851,7 +790,7 @@
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: Get_RandomInitVal
       REAL, EXTERNAL :: RANMAR
       INTEGER I, II
 
@@ -860,7 +799,7 @@
       DO I = 1, NVAR
         CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X(I))
       ENDDO
-      IF (WDialogGetCheckBoxLogical(IDF_RandomInitVal)) THEN
+      IF ( Get_RandomInitVal() ) THEN
         DO II = 1, NPAR
           I = IP(II)
           X(I) = LB(I) + RULB(I)*RANMAR()
