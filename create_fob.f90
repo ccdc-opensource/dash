@@ -138,7 +138,7 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION AScFac(ss,TheElemNumber)
+      REAL FUNCTION AScFac(ss, TheElemNumber)
 !
 ! INPUT   : ss            = angle dependence of the atomic scattering factor
 !           TheElemNumber = the CSD element number (1 = Carbon, 2 = Hydrogen, etc.)
