@@ -1,27 +1,28 @@
 # This is a generated file.
-# Editing SEED1 and SEED2 is safe and may be necessary,
+# Editing SDI, OUT, SEED1, SEED2, NRUNS, MAXMOVES and MULTIPLIER is safe and may be necessary,
 # editing the items near the end of the file is bound to crash your DASH run.
 # Input file
 SDI C:\Program Files\CCDC\DASH 3.0\Documentation\Example.sdi
 # Ouput file
 OUT C:\Program Files\CCDC\DASH 3.0\Documentation\Example.dash
-T0 0.0
-COOL 0.020
-N1 20
-N2 25
 # When starting multiple jobs with the same .sdi file, make sure that
 # SEED1 and SEED2 have different values in every file.
 # DASH increments SEED1 and SEED2 with the number of the run at the start of
 # each run.
 SEED1 315
 SEED2 159
-# On a distributed system, this should probably be set to:
+# On a distributed system, NRUNS should probably be set to:
 #     (total number of runs / number of processors)
 NRUNS 3
 # Maximum number of moves: real followed by integer e.g. "3.0 7" means "3.0E7"
 MAXMOVES 1.0 7
 # Termination criterion: SA stops when chi-sqrd lower than MULTIPLIER times Pawley chi-sqrd
 MULTIPLIER 5.0
+# Changing settings below this point is probably not necessary
+T0 0.0
+COOL 0.020
+N1 20
+N2 25
 # Randomise initial values
 RANDOMISE TRUE
 # Use crystallographic Centre of Mass
