@@ -43,19 +43,19 @@
       INTEGER OneDay ! The number of seconds in one day
       CHARACTER*20 tIntStr
 
-      OneDay = 24 * 60 * 60
       IF (CheckOverwriteSaOutput() .EQ. 0) THEN
         CALL WizardWindowShow(IDD_SA_input3)
         RETURN
       ENDIF
-      CALL Create_AtomicWeightings
-      CALL FillSymmetry_2
-      CALL GET_LOGREF
+      OneDay = 24 * 60 * 60
 ! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
 ! changed while the SA is running).
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
       LOG_HYDROGENS = Get_UseHydrogens()
+      CALL Create_AtomicWeightings
+      CALL FillSymmetry_2
+      CALL GET_LOGREF
 ! Ungrey the "Save... chi sqrd progress"
       CALL WDialogSelect(IDD_OutputSolutions)
       CALL WDialogFieldState(IDF_GROUP2,Enabled)
@@ -71,6 +71,7 @@
       CALL Init_MultiRun
 ! Grey out "start next" button if not multirun
       CALL WDialogFieldStateLogical(IDF_StartNext,RESTART)
+      CALL WDialogFieldState(IDB_Summary,Enabled)
       IPTYPE = 2
 !C Clear Chi-sqd array between starting sets of SA Runs
       Chi_sqd = 0.0
