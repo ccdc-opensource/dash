@@ -243,3 +243,95 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE TimeElapsed(StartDate, StartTime, EndDate, EndTime, DurationString, StrLen)
+
+      IMPLICIT NONE
+
+      INTEGER,       INTENT (IN   ) :: StartDate, StartTime
+      INTEGER,       INTENT (IN   ) :: EndDate, EndTime
+      CHARACTER*(*), INTENT (  OUT) :: DurationString
+      INTEGER,       INTENT (  OUT) :: StrLen
+
+      INTEGER, EXTERNAL :: DateDaysElapsed
+      CHARACTER*20, EXTERNAL :: Integer2String
+      INTEGER DaysElapsed, NItems
+      INTEGER DiffSecs, nweeks, nhours, nminutes
+      INTEGER OneDay ! The number of seconds in one day
+      CHARACTER*20 tIntStr
+
+      OneDay = 24 * 60 * 60
+      DaysElapsed = DateDaysElapsed(StartDate, EndDate)
+      DurationString = ""
+      StrLen = LEN_TRIM(DurationString)
+      NItems = 0
+      DiffSecs = EndTime - StartTime
+      IF (DaysElapsed .GT. 0) THEN
+        IF (DiffSecs .LT. 0) THEN
+          DaysElapsed = DaysElapsed - 1
+          DiffSecs = DiffSecs + OneDay
+        ENDIF
+!C Divide number of days into weeks and days
+        nweeks = DaysElapsed / 7
+        IF (nweeks .NE. 0) THEN
+          DaysElapsed = DaysElapsed - nweeks*7
+          tIntStr = Integer2String(nweeks)
+          DurationString = DurationString(1:StrLen)//tIntStr(1:LEN_TRIM(tIntStr))//" weeks"
+          StrLen = LEN_TRIM(DurationString)
+          IF (nweeks .EQ. 1) StrLen = StrLen - 1
+          NItems = NItems + 1
+        ENDIF
+        IF (DaysElapsed .NE. 0) THEN
+          IF (NItems .GT. 0) THEN
+            DurationString = DurationString(1:StrLen)//", "
+            StrLen = StrLen + 2
+          ENDIF
+          tIntStr = Integer2String(DaysElapsed)
+          DurationString = DurationString(1:StrLen)//tIntStr(1:LEN_TRIM(tIntStr))//" days"
+          StrLen = LEN_TRIM(DurationString)
+          IF (DaysElapsed .EQ. 1) StrLen = StrLen - 1
+          NItems = NItems + 1
+        ENDIF
+      ENDIF
+!C Divide number of seconds into hours, minutes and seconds
+      nhours = DiffSecs / 3600
+      IF (nhours .NE. 0) THEN
+        DiffSecs = DiffSecs - nhours*3600
+        IF (NItems .GT. 0) THEN
+          DurationString = DurationString(1:StrLen)//", "
+          StrLen = StrLen + 2
+        ENDIF
+        tIntStr = Integer2String(nhours)
+        DurationString = DurationString(1:StrLen)//tIntStr(1:LEN_TRIM(tIntStr))//" hours"
+        StrLen = LEN_TRIM(DurationString)
+        IF (nhours .EQ. 1) StrLen = StrLen - 1
+        NItems = NItems + 1
+      ENDIF
+      nminutes = DiffSecs / 60
+      IF (nminutes .NE. 0) THEN
+        DiffSecs = DiffSecs - nminutes*60
+        IF (NItems .GT. 0) THEN
+          DurationString = DurationString(1:StrLen)//", "
+          StrLen = StrLen + 2
+        ENDIF
+        tIntStr = Integer2String(nminutes)
+        DurationString = DurationString(1:StrLen)//tIntStr(1:LEN_TRIM(tIntStr))//" minutes"
+        StrLen = LEN_TRIM(DurationString)
+        IF (nminutes .EQ. 1) StrLen = StrLen - 1
+        NItems = NItems + 1
+      ENDIF
+      IF (DiffSecs .NE. 0) THEN
+        IF (NItems .GT. 0) THEN
+          DurationString = DurationString(1:StrLen)//", "
+          StrLen = StrLen + 2
+        ENDIF
+        tIntStr = Integer2String(DiffSecs)
+        DurationString = DurationString(1:StrLen)//tIntStr(1:LEN_TRIM(tIntStr))//" seconds"
+        StrLen = LEN_TRIM(DurationString)
+        IF (DiffSecs .EQ. 1) StrLen = StrLen - 1
+        NItems = NItems + 1
+      ENDIF
+
+      END SUBROUTINE TimeElapsed
+!
+!*****************************************************************************
+!

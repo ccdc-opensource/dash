@@ -35,14 +35,10 @@
 
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput, DateToday, DateDaysElapsed, &
                            TimeNowSeconds, Get_HydrogenTreatment
-      CHARACTER*20, EXTERNAL :: Integer2String
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       CHARACTER*100 SA_DurationStr
-      INTEGER StartDate, EndDate, DaysElapsed, DSLen
-      INTEGER StartTime, EndTime, NItems
-      INTEGER DiffSecs, nweeks, nhours, nminutes
-      INTEGER OneDay ! The number of seconds in one day
-      CHARACTER*20 tIntStr
+      INTEGER StartDate, EndDate, DSLen
+      INTEGER StartTime, EndTime
 
       IF (CheckOverwriteSaOutput() .EQ. 0) THEN
         CALL WizardWindowShow(IDD_SA_input3_2)
@@ -53,7 +49,6 @@
       ! angle that is allowed to vary over its full range. Because if so, e.g. a translation of, say, 1.10
       ! should be renormalised to 0.10 during the SA
       CALL InitRenormalisationLogicals
-      OneDay = 24 * 60 * 60
 ! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
 ! changed while the SA is running).
       CALL WDialogSelect(IDD_Configuration)
@@ -89,76 +84,7 @@
       InSA = .FALSE.
       EndDate = DateToday()
       EndTime = TimeNowSeconds()
-      DaysElapsed = DateDaysElapsed(StartDate, EndDate)
-      SA_DurationStr = ""
-      DSLen = LEN_TRIM(SA_DurationStr)
-      NItems = 0
-      DiffSecs = EndTime - StartTime
-      IF (DaysElapsed .GT. 0) THEN
-        IF (DiffSecs .LT. 0) THEN
-          DaysElapsed = DaysElapsed - 1
-          DiffSecs = DiffSecs + OneDay
-        ENDIF
-!C Divide number of days into weeks and days
-        nweeks = DaysElapsed / 7
-        IF (nweeks .NE. 0) THEN
-          DaysElapsed = DaysElapsed - nweeks*7
-          tIntStr = Integer2String(nweeks)
-          SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" weeks"
-          DSLen = LEN_TRIM(SA_DurationStr)
-          IF (nweeks .EQ. 1) DSLen = DSLen - 1
-          NItems = NItems + 1
-        ENDIF
-        IF (DaysElapsed .NE. 0) THEN
-          IF (NItems .GT. 0) THEN
-            SA_DurationStr = SA_DurationStr(1:DSLen)//", "
-            DSLen = DSLen + 2
-          ENDIF
-          tIntStr = Integer2String(DaysElapsed)
-          SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" days"
-          DSLen = LEN_TRIM(SA_DurationStr)
-          IF (DaysElapsed .EQ. 1) DSLen = DSLen - 1
-          NItems = NItems + 1
-        ENDIF
-      ENDIF
-!C Divide number of seconds into hours, minutes and seconds
-      nhours = DiffSecs / 3600
-      IF (nhours .NE. 0) THEN
-        DiffSecs = DiffSecs - nhours*3600
-        IF (NItems .GT. 0) THEN
-          SA_DurationStr = SA_DurationStr(1:DSLen)//", "
-          DSLen = DSLen + 2
-        ENDIF
-        tIntStr = Integer2String(nhours)
-        SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" hours"
-        DSLen = LEN_TRIM(SA_DurationStr)
-        IF (nhours .EQ. 1) DSLen = DSLen - 1
-        NItems = NItems + 1
-      ENDIF
-      nminutes = DiffSecs / 60
-      IF (nminutes .NE. 0) THEN
-        DiffSecs = DiffSecs - nminutes*60
-        IF (NItems .GT. 0) THEN
-          SA_DurationStr = SA_DurationStr(1:DSLen)//", "
-          DSLen = DSLen + 2
-        ENDIF
-        tIntStr = Integer2String(nminutes)
-        SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" minutes"
-        DSLen = LEN_TRIM(SA_DurationStr)
-        IF (nminutes .EQ. 1) DSLen = DSLen - 1
-        NItems = NItems + 1
-      ENDIF
-      IF (DiffSecs .NE. 0) THEN
-        IF (NItems .GT. 0) THEN
-          SA_DurationStr = SA_DurationStr(1:DSLen)//", "
-          DSLen = DSLen + 2
-        ENDIF
-        tIntStr = Integer2String(DiffSecs)
-        SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" seconds"
-        DSLen = LEN_TRIM(SA_DurationStr)
-        IF (DiffSecs .EQ. 1) DSLen = DSLen - 1
-        NItems = NItems + 1
-      ENDIF
+      CALL TimeElapsed(StartDate, StartTime, EndDate, EndTime, SA_DurationStr, DSLen)
       CALL InfoMessage('The Simulated Annealing took '//SA_DurationStr(1:DSLen))
 !C After completion, save the list of solutions
       CALL SaveMultiRun_LogData
