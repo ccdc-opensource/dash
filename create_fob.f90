@@ -96,6 +96,59 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE CreateFobITF
+
+      USE ATMVAR
+      USE ZMVAR
+      USE REFVAR
+      USE RRVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL            FOB
+      COMMON /FCSTOR/ FOB(MaxAtm_3,MFCSTO)
+
+      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
+
+      INTEGER item, tNumHydrogens, tNumNonHydrogens, iFrg, iFrgCopy, i, iRef
+      INTEGER tElemNumber
+      REAL atem, btem, ssq
+      REAL, EXTERNAL :: ascfac
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
+
+      item = 0
+      tNumHydrogens = 0
+      tNumNonHydrogens = 0
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 1, natoms(iFrg)
+              IF (asym(i,iFrg).EQ.'H  ') THEN
+                tNumHydrogens = tNumHydrogens + 1
+                item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
+              ELSE
+                tNumNonHydrogens = tNumNonHydrogens + 1
+                item = tNumNonHydrogens
+              ENDIF
+              tElemNumber = ElmSymbol2CSD(asym(i,iFrg)(1:2))
+              DO iRef = 1, NumOfRef
+                ssq = 0.25*DSTAR(iRef)**2
+                atem = occ(i,iFrg) * AScFac(ssq,tElemNumber)
+                btem = tiso(i,iFrg)*ssq
+                FOB(item,iRef) = atem*EXP(-RR_ITF*btem)
+              ENDDO
+            ENDDO
+          ENDDO
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE CreateFobITF
+!
+!*****************************************************************************
+!
       REAL FUNCTION AScFac(ss,TheElemNumber)
 !
 ! INPUT   : ss            = angle dependence of the atomic scattering factor
