@@ -1,36 +1,39 @@
-      subroutine sa_Defaults()
+!
+!*****************************************************************************
+!
+      SUBROUTINE sa_Defaults()
 
       CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
       COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
       INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
       COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
 
-      logical outfilset
-      common /outfileset/ outfilset
-      data outfilset/ .FALSE. /
-!
-    logsa_file='Druid.lsa'
-      logsa_flen=len_trim(logsa_file)
-      IF ( .NOT. outfilset ) THEN
-          cssr_file='SA_best.cssr'
-            pdb_file='SA_best.pdb'
-            ccl_file='SA_best.ccl'
-            log_file='SA_best.log'
+      LOGICAL outfilset
+      COMMON /outfileset/ outfilset
+      DATA outfilset/ .FALSE. /
+
+      logsa_file = 'DASH.lsa'
+      logsa_flen = LEN_TRIM(logsa_file)
+      IF (.NOT. outfilset) THEN
+        cssr_file = 'SA_best.cssr'
+        pdb_file  = 'SA_best.pdb'
+        ccl_file  = 'SA_best.ccl'
+        log_file  = 'SA_best.log'
 ! ep appended
-        pro_file='SA_best.pro'
-!
-            cssr_flen=len_trim(cssr_file)
-            pdb_flen=len_trim(pdb_file)
-            ccl_flen=len_trim(ccl_file)
-            log_flen=len_trim(ccl_file)
+        pro_file  = 'SA_best.pro'
+        cssr_flen = LEN_TRIM(cssr_file)
+        pdb_flen  = LEN_TRIM(pdb_file)
+        ccl_flen  = LEN_TRIM(ccl_file)
+        log_flen  = LEN_TRIM(ccl_file)
 ! ep appended
-        pro_flen=len_trim(pro_file)
+        pro_flen  = LEN_TRIM(pro_file)
       END IF
+
+      END SUBROUTINE sa_Defaults
 !
-    end
-
+!*****************************************************************************
+!
 !C>> JCC New subroutine to set the output file names
-
       SUBROUTINE sa_SetOutputFiles(FileHead)
 
       IMPLICIT NONE
@@ -84,3 +87,6 @@
       outfilset = .TRUE.
 
       END SUBROUTINE sa_SetOutputFiles
+!
+!*****************************************************************************
+!

@@ -1,7 +1,6 @@
       SUBROUTINE SimulatedAnnealing(imyexit)
 !
       EXTERNAL FCN
-!
 
       INCLUDE 'PARAMS.INC'
 
@@ -45,7 +44,7 @@
       DOUBLE PRECISION DXVAV(100),XVSIG(100),FLAV(100)
       double precision X0SUM(100),XSUM(100),XXSUM(100)
       DOUBLE PRECISION XDSS(100),A0SUM(100)
-	 DOUBLE PRECISION WSUM(100),XWSUM(100),XXWSUM(100)
+      DOUBLE PRECISION WSUM(100),XWSUM(100),XXWSUM(100)
 C.. We have set RANGEN to limited dimensions in MVAR
 C.. Really should reduce MVAR all round - to do!
       DOUBLE PRECISION RANGEN(30000,20)
@@ -120,7 +119,6 @@ C JCC Initialise PDB output records
 
 	CALL PDB_SymmRecords()
 	CALL Init_MultiRun()
-
  1    CONTINUE ! The start point for repeats.
 c
 C  Set initial values.
@@ -130,15 +128,12 @@ C  Set initial values.
       n = nvar
       npar = nvar
       iteration = 0
-
       MAKET0 = (T0 .LE. 0.0)
       IF (MAKET0) THEN
         T=100000.0
       ELSE
         T=T0
       END IF
-c
-      OPEN(unit=63,file=logsa_file(1:logsa_flen),status='unknown')
 c
 !  Initialize the random number generator RANMAR.
 ! Increment the seeds for each SA run
@@ -148,7 +143,6 @@ c
       DO IV=1,N
         C(IV)=2.0
       END DO
-C
       DO i = 1, nobs
         ycalbest(i) = 0.0
       END DO
@@ -161,7 +155,6 @@ C
       do i=1,maxiter
         xiter(i)=i
       end do
-C
       NP=0
       RFIX=1E-3
       DO 10, I = 1, N
@@ -173,12 +166,9 @@ C
            IP(NP)=I
          END IF
 10    CONTINUE
-
       DO 20, I = 1, NEPS
          FSTAR(I) = 1.0D+20
 20    CONTINUE 
-
-
 C.. Here we are doing something special with torsion angles
       DP360=360.
       DP1=1.
@@ -194,7 +184,6 @@ C.. Here we are doing something special with torsion angles
           XOPT(I)=X(I)
         END IF
       END DO
-C
 C  Evaluate the function with input X and return value as F.
       CALL FCN(N,X,F)
 C.. Evaluate the profile chi-squared as well
@@ -218,10 +207,8 @@ C.. Use a quick and dirty one from NR
       IA=1255
       IC=6173
       JRAN=1
-c
       CALL RANX2I
       CALL RANXGI
-c
       DO I=1,30000
         JRAN=MOD(JRAN*IA+IC,IM)
         RANARR(I)=FLOAT(JRAN)/FLOAT(IM)
@@ -230,7 +217,6 @@ c
         CALL RANX2E(RANIN,RANAR1(I))
         CALL RANX2G(RANIN,RANGAR(I))
       END DO
-c
       DO J=1,N
         IF (LTORFIL(J)) THEN
           OPEN(20,FILE=TORFILE(J),STATUS='OLD')
@@ -238,6 +224,8 @@ c
           DO I=1,30000
             JRAN=MOD(JRAN*IA+IC,IM)
             RANIN=FLOAT(JRAN)/FLOAT(IM)
+! JvdS @ Next line is very odd: this is the only line of code in DASH
+! where the variable RANGEN is used.
             CALL RANX2GEN(RANIN,RANGEN(I,J))
           END DO
 C.. Now store the transformation from linear to torsion file
@@ -255,20 +243,15 @@ C.. Now store the transformation from linear to torsion file
  202      CLOSE(20)
         END IF
       END DO
-C
       NS_STORE=NS
       NT_STORE=NT
-c
       IM=7875
       IA=211
       IC=1663
-C
       MRAN=ISEED1
       MRAN1=ISEED2
       MRANG=ISEED2
       MRANGEN=ISEED1
-C
-
 100   NUP = 0
       NREJ = 0
       NNEW = 0
@@ -284,7 +267,6 @@ C
 	  XWSUM(II)=0.
 	  XXWSUM(II)=0.
 	END DO
-C
       FPSUM0=0.
       FPSUM1=0.
       FPSUM2=0.
@@ -305,7 +287,6 @@ C
       nmpert=nt*ns*np
 	 call sa_move_status(0,nmpert,0)
       DO 400, M = 1, NT
-
 C.. MRAN RANGE IS 0 -> IM=7875
          MRAN=MOD(MRAN*IA+IC,IM)
          IARR=MRAN+1
@@ -315,9 +296,6 @@ C.. MRAN RANGE IS 0 -> IM=7875
          IARG=MRANG+1
          MRANGEN=MOD(MRANGEN*IA+IC,IM)
          IARGEN=MRANGEN+1
-c
-c
-c
          DO 300, J = 1, NS
             DO 200, IH = 1, NP
                H=IP(IH)
@@ -325,7 +303,6 @@ C  Generate XP, the trial value of X. Note use of VM to choose XP.
                DO 110, I = 1, N
                      XP(I) = X(I)
 110            CONTINUE
-               
                IF (LTORFIL(H)) THEN
                  DX = DP1 + RANAPM(IARR) * VM(H)
                  IARR=IARR+1
@@ -348,7 +325,6 @@ C  If XP is out of bounds, select a point in bounds for the trial.
                   NOBDS = NOBDS + 1
                  END IF
                END IF
-
 C  Evaluate the function with the trial point XP and return as FP.
                CALL FCN(N,XP,FP)
                FP = -FP
@@ -357,7 +333,6 @@ C  Evaluate the function with the trial point XP and return as FP.
                FPSUM2=FPSUM2+FP*FP
                A0SUM(H)=A0SUM(H)+1
 	         XDSS(H)=XDSS(H)+(FP-F)**2
-
 C  Accept the new point if the function value increases.
                IF ( FP .GE. F ) THEN
                   X(H) = XP(H)
@@ -373,7 +348,6 @@ C  Accept the new point if the function value increases.
 	            XXWSUM(H)=XXWSUM(H)+EWAIT*X(H)**2
 	            WSUM(H)=WSUM(H)+EWAIT
                   NUP = NUP + 1
-
 C  If greater than any other point, record as new optimum.
                   IF (FP .GT. FOPT) THEN
                      DO 130, I = 1, N
@@ -431,7 +405,6 @@ C  acceptance or rejection.
                      NREJ = NREJ + 1
                   END IF
                END IF
-
 200         CONTINUE
             movenow=m*np*ns
             call sa_move_status(1,nmpert,movenow)
@@ -448,9 +421,7 @@ C Now
 	        ENDIF
 			goto 998 ! terminate and close the log file.
 	      end if
-
 300      CONTINUE
-
 C  Adjust VM so that approximately half of all evaluations are accepted.
          DO 310, II = 1, NP
             I=IP(II)
@@ -467,8 +438,6 @@ C  Adjust VM so that approximately half of all evaluations are accepted.
                VM(I) = 0.01*RULB(I)
             END IF
 310      CONTINUE
-
-
          DO 320, I = 1, N
             NACP(I) = 0
 320      CONTINUE
@@ -476,7 +445,6 @@ C  Adjust VM so that approximately half of all evaluations are accepted.
 C.. Calculate the average energy and deviation
       FPAV=FPSUM1/FPSUM0
       FPSD=SQRT(MAX(DP0,FPSUM2/FPSUM0-FPAV**2))
-C      WRITE(63,*) NTOTMOV,SNGL(T),-SNGL(FOPT),-SNGL(FPAV),SNGL(FPSD),CPB
 C..      IF (ITERATION.EQ.0) THEN
 C       DO KKK=1,KKOR
 C        PRJAV=PRJMAT1(KKK)/PRJMAT0
@@ -514,10 +482,8 @@ C
    	    FLAV(I)=SQRT(MAX(DP0,XDSS(I)/A0SUM(I)))
         END IF
     	END DO
-c
       ntotmov=ntotmov+nmpert
       iteration=iteration+1
-
       tstore(iteration)=sngl(t)
       foptstore(iteration)=-sngl(fopt)
       fpavstore(iteration)=-sngl(fpav)
@@ -537,7 +503,6 @@ c.. plot the profile
       CALL SA_OUTPUT(1,SNGL(T),-SNGL(fopt),-SNGL(FPAV),SNGL(FPSD),
      &   xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,LNOBDS,NNEW,
      &   nmpert,ntotmov,iteration)
-
 c
 C  Check termination criteria.
 c
@@ -572,7 +537,6 @@ C  If termination criteria is not met, prepare for another loop.
 C.. We will use the energy fluctuation to reduce the temperature
       T = T/(1.+(RT*T)/(3.*FPSD))
 
-
       DO 430, I = NEPS, 2, -1
          FSTAR(I) = FSTAR(I-1)
 430   CONTINUE
@@ -598,7 +562,6 @@ C in the subroutine Chi_sq_plot.
 	END IF
 	imyexit = 3
  998  CONTINUE
- 999  CLOSE(UNIT=63,STATUS='DELETE',IOSTAT=ISTAT)
       END
 
       FUNCTION  EXPREP(RDUM)
@@ -618,9 +581,9 @@ C  EXPREP are such that they has no effect on the algorithm.
       END IF
 
       RETURN
-      END
+      END FUNCTION  EXPREP
 
-      subroutine RMARIN(IJ,KL)
+      SUBROUTINE RMARIN(IJ,KL)
 C  This subroutine and the next function generate random numbers. See
 C  the comments for SA for more information. The only changes from the
 C  orginal code is that (1) the test to make sure that RMARIN runs first
@@ -670,7 +633,7 @@ c     *30081'
       I97 = 97
       J97 = 33
       return
-      end
+      end SUBROUTINE RMARIN
 
       function ranmar()
       real U(97), C, CD, CM
@@ -689,10 +652,7 @@ c     *30081'
          if( uni .lt. 0.0 ) uni = uni + 1.0
          RANMAR = uni
       return
-      END
-
-
-C
+      END function ranmar
 C
 C
       subroutine RANX2E(DRIN,DROUT)
@@ -743,7 +703,7 @@ c.. rin is between yran(jn) and yran(jn+1) now iterate
       drout=dble(rout)
 c
       return
-      end
+      end subroutine RANX2E
 c
 c
 c
@@ -753,14 +713,11 @@ c
 c
       xs=0.1
       do i=1,200
-c
         xi=xs*float(i-1)
         yran(i)=1.-(0.5*xi*xi+xi+1.)*exp(-xi)
-c
       end do
-c
       return
-      end
+      end subroutine ranx2i
 C
 C
 C
@@ -812,7 +769,7 @@ c.. rin is between yran(jn) and yran(jn+1) now iterate
       drout=dble(rout)
 c
       return
-      end
+      end subroutine RANX2G
 c
 c
 c
@@ -829,7 +786,7 @@ c
       end do
 c
       return
-      end
+      end subroutine ranxgi
 c
 c
 c
@@ -842,7 +799,7 @@ c
       erf=1.-erf
       if(x.lt.0) erf=-erf
 c
-      end
+      end function erf
 C
 C
 C
@@ -877,8 +834,7 @@ c
         y(i+1)=sumt/sumv
       end do
 c
-c
-      end
+      end SUBROUTINE RANSETGEN
 c
 c
 c
@@ -943,7 +899,7 @@ c.. rin is between y(jn) amd y(jn+1) now iterate
       goto 15
  20   drout=dble(xm)
 c
-      end
+      end subroutine RANX2GEN
 c
 c
 c
@@ -956,7 +912,6 @@ c
       do ii=-2,2
         jt=1+mod(jn+ii+npt-1,npt)
 	  yt(ii)=y(jt)
-c	write(6,*) jt(ii)
       end do
 c
       pm2=p-2
@@ -981,7 +936,7 @@ c
         yintpl=yintpl+vt(i)*yt(i)
       end do
 c
-      end
+      end function yintpl
 c
 c
 c
@@ -1000,7 +955,7 @@ c
      &             +del*rantorsto(ival+1,i)
       end if
 c
-      end
+      end function rantorget
 c
 c
 c
@@ -1023,7 +978,8 @@ C
         END DO
       END IF
       RETURN
-      END
+
+      END SUBROUTINE MAKXIN
 
 
 
