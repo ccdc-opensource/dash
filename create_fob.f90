@@ -108,7 +108,7 @@
       IMPLICIT NONE
 
       REAL,    INTENT (IN   ) :: ss
-      INTEGER, INTENT (INOUT) :: TheElemNumber
+      INTEGER, INTENT (IN   ) :: TheElemNumber
 
       AScFac = A1(TheElemNumber) * EXP(-B1(TheElemNumber)*ss) +        &
                A2(TheElemNumber) * EXP(-B2(TheElemNumber)*ss) +        &
