@@ -3,7 +3,7 @@
 !
       SUBROUTINE VALCHIPRO(chivalpro)
 !
-! Must be called after VALCHI, because it needs the AICALC to have been set up.
+! Must be called after VALCHI, because it needs the BICALC to have been set up.
 !
       IMPLICIT NONE
 
@@ -22,9 +22,12 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      INTEGER         KREFT,         KNIPT
-      REAL                                             PIKVAL
-      COMMON /FPINF1/ KREFT(MOBS), KNIPT(50,MOBS), PIKVAL(50,MOBS)
+      INTEGER         KNIPT
+      REAL                            PIKVAL
+      COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
+
+      INTEGER         KREFT
+      COMMON /FPINF2/ KREFT(MOBS)
 
       REAL SUM1, SUM2, YCALC, RESCL, CVP
       INTEGER II, I, K, KK
