@@ -73,7 +73,7 @@
         CASE (10)       ! Cubic
           NDD = 2
       END SELECT
-! NVal is the number of peaks indexed with a probability over 95%
+! NVal is the number of peaks indexed with a probability over 95% (the Number of VALid peaks)
       IF (NVal .EQ. 0) THEN
         IF (NTPeak .GT. NDD) CALL ErrorMessage('Problems with cell refinement.'//CHAR(13)// &
                                                'Are the unit cell parameters correct?')
