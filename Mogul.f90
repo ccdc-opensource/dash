@@ -426,7 +426,7 @@
       ENDIF
 
       IF (.NOT. Assigned) THEN
-        MogulText = 'Cannot process data'
+        MogulText = 'No recommendation'
         ModalFlag(IFRow) = 1
       ENDIF
 
