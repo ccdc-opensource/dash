@@ -31,13 +31,13 @@
       REAL ta, tb, tc, talpha, tbeta, tgamma
       INTEGER I, J, NumCol
       INTEGER GetNumOfColumns ! Function
-      CHARACTER*1 ChrLowerCase, ChrUpperCase ! Functions
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
       INTEGER II, izm, IKK, nlin, natof
       INTEGER AsymLen, IDlen
       CHARACTER*3 tIDstr
       REAL*8 CART(1:3,1:MAXATM)
-      CHARACTER*2  AtmElement(1:MAXATM_2)
       INTEGER BondNr
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
 ! JCC Initialise return value to successful (zero)
 ! If the return value is non-zero, then an error occurred. The return status corresponds
@@ -57,6 +57,10 @@
 ! IAT = non-zero : use atom nr. IAT   (necessary if atom on special position).
 !  59   0
       READ (19,*,ERR=999,IOSTAT=ErrorStatus) natof, icomflg(iFrg)
+      IF (natof .GT. maxatm) THEN
+        CALL WarningMessage('Z-matrix contains too many atoms--truncated.')
+        natof = maxatm
+      ENDIF
       natoms(iFrg) = natof
       izmpar(iFrg) = 7 ! always reserve 4 parameters for rotations, whether quaternion or single axis
       czmpar(1,iFrg) = ' x(frag )'
@@ -197,14 +201,12 @@
       natcry = NATOMS(iFrg)
       CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),      &
                      IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
-! Conversion of asym to aelem : very dirty, but works
       DO I = 1, natcry
         axyzo(I,1) = SNGL(CART(1,I))
         axyzo(I,2) = SNGL(CART(2,I))
         axyzo(I,3) = SNGL(CART(3,I))
-        AtmElement(I)(1:2) = asym(I,iFrg)(1:2)
+        aelem(I) = ElmSymbol2CSD(asym(I,iFrg)(1:2))
       ENDDO
-      CALL AssignCSDElement(AtmElement)
 ! Calculate bonds and assign bond types.
       CALL SAMABO
 ! OUTPUT : nbocry             = number of bonds
