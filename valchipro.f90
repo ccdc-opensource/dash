@@ -22,6 +22,9 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
+      REAL            CummChiSqd
+      COMMON /CMN007/ CummChiSqd(MOBS)
+
       INTEGER         KNIPT
       REAL                            PIKVAL
       COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
@@ -29,13 +32,14 @@
       INTEGER         KREFT
       COMMON /FPINF2/ KREFT(MOBS)
 
-      REAL SUM1, SUM2, YCALC, RESCL, CVP
+      REAL    SUM1, SUM2, YCALC, RESCL, CVP, LastValue
       INTEGER II, I, K, KK
 
 ! JvdS VALCHIPRO, which calculates the profile chi-squared, is always
 ! called after VALCHI. VALCHI already fills BICALC in COMMON /SAREFLN2/
       SUM1 = 0.0
       SUM2 = 0.0
+      CummChiSqd = -1.0
       DO II = 1, NFITA
         I = IFITA(II)
         YCALC = 0.0
@@ -53,7 +57,16 @@
         I = IFITA(II)
         YCBIN(I) = RESCL * YCBIN(I)
         CVP = CVP + WTSA(I) * (YOBIN(I) - YCBIN(I))**2
-      END DO
+        CummChiSqd(I) = 10.0*CVP  /FLOAT(NFITA-2)
+      ENDDO
+      LastValue = 0.0
+      DO i = 1, NBIN
+        IF (CummChiSqd(i) .LT. 0.0) THEN
+          CummChiSqd(i) = LastValue
+        ELSE
+          LastValue = CummChiSqd(i)
+        ENDIF
+      ENDDO
       CHIVALPRO = CVP/FLOAT(NFITA-2)
 
       END SUBROUTINE VALCHIPRO
