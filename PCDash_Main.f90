@@ -105,7 +105,7 @@
       REAL xpgdif, ypgdif
       INTEGER ISTAT, IBpass
       INTEGER, EXTERNAL :: DiffractionFileBrowse, PrjSave, PrjSaveAs
-      INTEGER I, iDummy
+      INTEGER iDummy
 
 !   Branch depending on chosen menu item
 
@@ -157,34 +157,19 @@
           CALL SelectMode(IDB_AnalyseSolutions)
           CALL WizardWindowShow(IDD_SAW_Page5)
         CASE (ID_FitPeaks)
-! Check if we have any peak fit ranges at all
-          IF (NumPeakFitRange .EQ. 0) THEN
-            CALL ErrorMessage('No peak fitting ranges.')
-          ELSE
-! Find first range that has been swept but not fitted
-   10       CurrentRange = 0
-            DO I = 1, NumPeakFitRange
-              IF (.NOT. RangeFitYN(I)) THEN
-                CurrentRange = I
-                EXIT
-              ENDIF
-            ENDDO
-            IF (CurrentRange .NE. 0) THEN
-!O              CALL InfoMessage('All peak fitting ranges have been fitted.')
-!O            ELSE
-! We're ready to fit the Bragg peaks
-! One or more peaks to be fitted - initial positions determined by user
-! If NumInPFR(InRange).EQ.0 we're going to search & fit a single peak
-              CALL WCursorShape(CurHourGlass)
+          CALL WCursorShape(CurHourGlass)
+          DO CurrentRange = 1, NumPeakFitRange
+            IF (.NOT. RangeFitYN(CurrentRange)) THEN
               CALL MultiPeak_Fitter
-              CALL WCursorShape(CurCrossHair)
               CALL Profile_Plot
-! Disable Pawley refinement button and 'Next >' button in Wizard window
-              CALL CheckIfWeCanDoAPawleyRefinement
-              CALL CheckIfWeCanIndex
-              GOTO 10
             ENDIF
-          ENDIF
+          ENDDO
+          CALL WCursorShape(CurCrossHair)
+! Grey out 'Fit Peaks' button on toolbar
+          CALL UpdateFitPeaksButtonState
+! Disable Pawley refinement button and 'Next >' button in Wizard window
+          CALL CheckIfWeCanDoAPawleyRefinement
+          CALL CheckIfWeCanIndex
         CASE (ID_ClearPeakFitRanges)
           IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Clear_PeakFitRanges
         CASE (ID_Delabc)
