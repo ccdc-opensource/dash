@@ -1117,8 +1117,7 @@
         ENDDO
 ! Fill Preferred Orientation part
         IF (PrefParExists) THEN
-          X(iPrfPar) = DBLE(BestValuesDoF(iPrfPar,tRunNr))
-          CALL PO_PRECFC
+          CALL PO_PRECFC(BestValuesDoF(iPrfPar,tRunNr))
         ENDIF
 ! VALCHI fills BICALC
         tLOG_HYDROGENS = LOG_HYDROGENS

@@ -69,7 +69,7 @@
       REAL, EXTERNAL :: SA_FCN
       LOGICAL tAccept, tLOG_HYDROGENS
       REAL    FTEM
-      DOUBLE PRECISION tX147, DFTEM
+      DOUBLE PRECISION DFTEM
 
       IF (Auto .AND. (.NOT. Get_AutoLocalMinimisation())) RETURN
       CALL WCursorShape(CurHourGlass)
@@ -78,18 +78,10 @@
         LOG_HYDROGENS = .TRUE.
       ENDIF
       N = NPAR
-      IF (PrefParExists) THEN
-! Jvds 4 July 2002. Problem here: PO_PRECFC() uses X(MVAR), the current values, whereas we want to use 
-! XOPT(MVAR), the best values so far.
-! Quick fix...
-        tX147 = X(iPrfPar)
-        X(iPrfPar) = XOPT(iPrfPar)
-      ENDIF
       DO II = 1, N
         I = IP(II)
         XSIM(II) = SNGL(XOPT(I))
 ! DXSIM = initial step sizes.
-!!ep        DXSIM(II) = SA_SimplexDampingFactor*0.1*SNGL(UB(I) - LB(I))
         DXSIM(II) = SA_SimplexDampingFactor*0.1*SNGL(RULB(I))
       ENDDO
       CALL SA_SIMOPT(XSIM,DXSIM,N,FTEM)
@@ -128,8 +120,7 @@
   !U      ENDDO
       ELSE
         IF (PrefParExists) THEN
-          X(iPrfPar) = tX147
-          CALL PO_PRECFC
+          CALL PO_PRECFC(SNGL(X(iPrfPar)))
           CALL FCN(X,DFTEM,0)
         ENDIF
       ENDIF
@@ -173,9 +164,7 @@
         DBLEP(I) = DBLE(P(II))
       ENDDO
       IF (PrefParExists) THEN
-! PO_PRECFC() uses X(MVAR)
-        X(iPrfPar) = DBLEP(iPrfPar)
-        CALL PO_PRECFC
+        CALL PO_PRECFC(SNGL(DBLEP(iPrfPar)))
       ENDIF
       CALL FCN(DBLEP,CHIANS,0)
       SA_FCN = SNGL(CHIANS)
