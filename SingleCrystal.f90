@@ -142,7 +142,7 @@
             CASE (ID_PW_DF_Open)
               CALL WDialogGetString(IDF_PW_DataFileName_String, CTEMP)
               iErr = HKLFFileOpen(CTEMP)
-              CALL WDialogFieldStateLogical(IDBSAVE, iErr .EQ. 1)
+              CALL WDialogFieldStateLogical(IDBSAVE, iErr .EQ. 0)
             CASE (IDBBROWSE)
               iErr = HKLFFileBrowse()
 ! Don't change if the user pressed 'Cancel' (ISTAT = 2)
@@ -336,7 +336,6 @@
       hFile = 121
       OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       KK = 0
-      KKOR = 0
       DO iR = 1, MFCSTO
         READ(hFile,'(Q,A)',END=100,ERR=999) NLIN, LINE
 !.. No cross correlation ...
@@ -344,12 +343,6 @@
 !.. F2 and sig(F2)
         WTJ(iR) = 1.0 / WTJ(iR)
         KK = iR
-! Now work out which terms should be kept for the chi-squared calculation
-!O        KKOR = KKOR + 1
-!O        IKKOR(KKOR) = iR
-!O        JKKOR(KKOR) = iR
-!O        NKKOR(KKOR) = 100
-!O        WRITE(76,*) ' reflections ',kk,(jHKL(I,iR),I=1,3), AJOBS(iR)
       ENDDO
   100 NumOfRef = KK
 !O      WRITE(76,*) ' Number of reflections ',NumOfRef
@@ -402,6 +395,7 @@
           KXIMAX(I) = K
         ENDDO
       ENDDO
+      NFITA = 0
       DO I = 1, NBIN
         XBIN(I) = ARGIMIN + FLOAT(I-1)*ARGISTP
         YOBIN(I) = 0.0
@@ -426,7 +420,7 @@
             YOBIN(I) = YOBIN(I) + AIOBS(K)*PIKVAL(J,I)
 !		  EBIN(I)=EBIN(I)+PIKVAL(J,I)/WTI(I)
           ENDDO
-          EBIN(I) = 0.1 * YOBIN(I)
+          EBIN(I) = MAX(1.0, 0.1*ABS(YOBIN(I)))
           WTSA(I) = 1.0 / EBIN(I)**2
 !		EBIN(I)=SQRT(EBIN(I))
         ENDIF
