@@ -1,15 +1,13 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CHKMAXREF(PCXX)
+      SUBROUTINE CHKMAXREF
 !
 ! Checks if the maximum number of reflections has been exceeded
 !
       USE REFVAR
 
       IMPLICIT NONE
-
-      EXTERNAL PCXX
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'REFLNS.INC'
@@ -46,8 +44,8 @@
         ENDIF
       ENDIF
       know = NumOfRef
-! Calculate peak centre of know in argk, and its derivatives
-      CALL PCXX(2)
+! Calculate peak centre of KNOW in ARGK, and its derivatives
+      CALL PCCN01(2)
 ! argk now contains the peak position of the last reflection
       NPTS = 1
       DO WHILE ((XBIN(NPTS) .LT. argk) .AND. (NPTS .LT. MOBS))
