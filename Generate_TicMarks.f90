@@ -20,7 +20,6 @@
 !
       IMPLICIT NONE
 
-      INCLUDE 'statlog.inc'
       INCLUDE 'Lattice.inc'
       INCLUDE 'GLBVAR.INC'
 

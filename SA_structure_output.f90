@@ -6,6 +6,8 @@
 
       USE VARIABLES
       USE ZMVAR
+
+      IMPLICIT NONE
 !
 !       Called when a new minimum is found
 !
@@ -17,10 +19,10 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
 
       DOUBLE PRECISION inv(3,3)
 
+      REAL            XATOPT
       COMMON /posopt/ XATOPT(3,150)
 
       INTEGER         NATOM
@@ -45,6 +47,7 @@
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
 
+      INTEGER    mpdbops
       PARAMETER (mpdbops=192)
       CHARACTER*20 cpdbops(mpdbops)
       COMMON /pdbops/ npdbops, cpdbops
@@ -56,6 +59,8 @@
       LOGICAL tSavePDB, tSaveCSSR, tSaveCCL
       INTEGER ipcount
       LOGICAL, EXTERNAL :: SaveCSSR, SaveCCL
+      INTEGER I, II, K, npdbops, iiact, iTotal, ifrg, IJ, iOrig
+      REAL xc, yc, zc
 
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.

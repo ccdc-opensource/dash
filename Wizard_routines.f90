@@ -874,7 +874,6 @@
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
-      INCLUDE 'statlog.inc'
 
       INTEGER IRadSelection
       CHARACTER(LEN=MaxPathLength) CTEMP
