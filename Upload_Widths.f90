@@ -237,7 +237,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
+      INTEGER     MPAR,        MMPAR
+      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
       REAL X(MPAR),DX(MPAR),COV(MMPAR)
 
       REAL              XPF_Range
@@ -269,10 +270,10 @@
 ! Observations
       NVAL=NumPeakFitRange
       DO I = 1, NVal
-        XVal(I)=PkPosAv(I)
-        YVal(I)=PkFnVal(1,I)
-        Emin=0.01*ABS(YVal(I))
-        EVal(I)=MAX(Emin,PkFnEsd(1,I))
+        XVal(I) = PkPosAv(I)
+        YVal(I) = PkFnVal(1,I)
+        Emin = 0.01 * ABS(YVal(I))
+        EVal(I) = MAX(Emin,PkFnEsd(1,I))
       ENDDO
 ! Variables
       N = 2
@@ -282,8 +283,8 @@
       DX(2) = 0.01
       CALL SIMOPT(X,DX,COV,N,Chisq_Sigma)
       DO I = 1, N
-        II=I+(I-1)*N
-        DX(I)=SQRT(AMAX1(0.,COV(II)))
+        II = I + (I-1)*N
+        DX(I) = SQRT(AMAX1(0.,COV(II)))
       ENDDO
       DO I = 1, NVal
         PkFnCal(1,I) = ZVal(I)
@@ -300,7 +301,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
+      INTEGER     MPAR,        MMPAR
+      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
       REAL X(MPAR),DX(MPAR),COV(MMPAR)
 
       REAL              XPF_Range
@@ -330,26 +332,26 @@
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
 ! Observations
-      NVAL=NumPeakFitRange
-      DO I=1,NVal
-        XVal(I)=PkPosAv(I)
-        YVal(I)=PkFnVal(2,I)
-        Emin=ABS(0.01*YVal(I))
-        EVal(I)=MAX(Emin,PkFnEsd(2,I))
+      NVAL = NumPeakFitRange
+      DO I = 1, NVal
+        XVal(I) = PkPosAv(I)
+        YVal(I) = PkFnVal(2,I)
+        Emin = ABS(0.01*YVal(I))
+        EVal(I) = MAX(Emin,PkFnEsd(2,I))
       ENDDO
 ! Variables
-      N=2
-      X(1)=0.01
-      DX(1)=0.01
-      X(2)=0.01
-      DX(2)=0.01
+      N = 2
+      X(1) = 0.01
+      DX(1) = 0.01
+      X(2) = 0.01
+      DX(2) = 0.01
       CALL SIMOPT(X,DX,COV,N,Chisq_Gamma)
-      DO I=1,N
-        II=I+(I-1)*N
-        DX(I)=SQRT(AMAX1(0.,COV(II)))
+      DO I = 1, N
+        II = I + (I-1)*N
+        DX(I) = SQRT(AMAX1(0.,COV(II)))
       ENDDO
-      Do I=1,NVal
-        PkFnCal(2,I)=ZVal(I)
+      Do I = 1, NVal
+        PkFnCal(2,I) = ZVal(I)
       ENDDO
 
       END SUBROUTINE Fit_Gamma
@@ -363,7 +365,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
+      INTEGER     MPAR,        MMPAR
+      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
       REAL X(MPAR),DX(MPAR),COV(MMPAR)
 
       REAL              XPF_Range
@@ -399,18 +402,18 @@
 
 ! Observations
       NVAL=NumPeakFitRange
-      DO I=1,NVal
-        XVal(I)=PkPosAv(I)
-        YVal(I)=PkFnVal(IPtPS,I)
-        Emin=0.01*ABS(YVal(i))
-        EVal(I)=MAX(Emin,PkFnEsd(IPtPS,I))
+      DO I = 1, NVal
+        XVal(I) = PkPosAv(I)
+        YVal(I) = PkFnVal(IPtPS,I)
+        Emin = 0.01 * ABS(YVal(i))
+        EVal(I) = MAX(Emin,PkFnEsd(IPtPS,I))
       ENDDO
 ! Variables
-      N=1
-      X(1)=0.01
-      DX(1)=0.01
+      N = 1
+      X(1) = 0.01
+      DX(1) = 0.01
       CALL SIMOPT(X,DX,COV,N,Chisq_Constant)
-        IF (IBMBER .EQ. 1) RETURN
+      IF (IBMBER .EQ. 1) RETURN
       DO I=1,N
         II=I+(I-1)*N
         DX(I)=SQRT(AMAX1(0.,COV(II)))
@@ -425,7 +428,8 @@
 !
       FUNCTION Chisq_Sigma(N,P)
 
-      PARAMETER (MPAR=50)
+      INTEGER     MPAR
+      PARAMETER ( MPAR = 100 )
       REAL Chisq_Sigma,P(MPAR)
       PARAMETER (MVAL=50)
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
@@ -448,21 +452,22 @@
 !
       FUNCTION Chisq_Gamma(N,P)
 
-      PARAMETER (MPAR=50)
+      INTEGER     MPAR
+      PARAMETER ( MPAR = 100 )
       REAL Chisq_Gamma,P(MPAR)
       PARAMETER (MVAL=50)
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
       Chisq_Gamma = 0.0
-      DO I=1,NVAL
-        XI=XVAL(I)
-        halfxi=0.5*xi
-        secth=1./COSD(halfxi)
-        tanth=TAND(halfxi)
-        ZI=P(1)*secth+P(2)*tanth
-        zval(i)=zi
-        CTEM=(ZI-YVAL(I))/EVAL(I)
-        Chisq_Gamma=Chisq_Gamma+CTEM*CTEM
+      DO I = 1, NVAL
+        XI = XVAL(I)
+        halfxi = 0.5 * xi
+        secth = 1.0 / COSD(halfxi)
+        tanth = TAND(halfxi)
+        ZI = P(1) * secth + P(2) * tanth
+        zval(i) = zi
+        CTEM = (ZI-YVAL(I)) / EVAL(I)
+        Chisq_Gamma = Chisq_Gamma + CTEM * CTEM
       ENDDO
 
       END FUNCTION Chisq_Gamma
@@ -471,18 +476,19 @@
 !
       FUNCTION Chisq_Constant(N,P)
 
-      PARAMETER (MPAR=50)
-      REAL Chisq_Constant,P(MPAR)
+      INTEGER     MPAR
+      PARAMETER ( MPAR = 100 )
+      REAL Chisq_Constant, P(MPAR)
       PARAMETER (MVAL=50)
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
       Chisq_Constant = 0.0
-      DO I=1,NVAL
-        XI=XVAL(I)
-        ZI=P(1)
-        zval(i)=zi
-        CTEM=(ZI-YVAL(I))/EVAL(I)
-        Chisq_Constant=Chisq_Constant+CTEM*CTEM
+      DO I = 1, NVAL
+        XI = XVAL(I)
+        ZI = P(1)
+        zval(i) = zi
+        CTEM = (ZI-YVAL(I)) / EVAL(I)
+        Chisq_Constant = Chisq_Constant + CTEM * CTEM
       ENDDO
 
       END FUNCTION Chisq_Constant
