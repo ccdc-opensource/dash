@@ -166,14 +166,14 @@
           xpgdif = xpgmax - xpgmin
           xpgmin = MAX(xpmin,xpgmin-0.02*xpgdif)
           xpgmax = xpgmin + xpgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyPageRight)
 ! We're going to move the graph to the right if we can
           xpgdif = xpgmax - xpgmin
           xpgmax = MIN(xpmax,xpgmax+0.02*xpgdif)
           xpgmin = xpgmax - xpgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyCursorLeft)
 ! We're going to move the graph to the left if we can
@@ -187,21 +187,21 @@
           xpgdif = xpgmax - xpgmin
           xpgmax = MIN(xpmax,xpgmax+0.25*xpgdif)
           xpgmin = xpgmax - xpgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyLeftExtreme)
 ! We're going to move the graph as far left as we can
           xpgdif = xpgmax - xpgmin
           xpgmin = xpmin
           xpgmax = xpgmin + xpgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyRightExtreme)
 ! We're going to move the graph as far right as we can
           xpgdif = xpgmax - xpgmin
           xpgmax = xpmax
           xpgmin = xpgmax - xpgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot      
         CASE (KeyPageDown)
 ! We're going to expand the xscale by sqrt(2) if we can
@@ -217,7 +217,7 @@
             xpgmax = xpmax
             xpgmin = xpgmax - 2.0 * xtem
           ENDIF
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyPageUp)
 ! We're going to contract the xscale by sqrt(2)
@@ -226,7 +226,7 @@
           xtem = 0.3536 * xpgdif
           xpgmin = xpgav - xtem
           xpgmax = xpgav + xtem
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyCursorDown)
 ! We're going to move the graph down if we can
@@ -240,7 +240,7 @@
           ypgdif = ypgmax - ypgmin
           ypgmax = MIN(ypmax,ypgmax+0.25*ypgdif)
           ypgmin = ypgmax - ypgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyUpExtreme)
 ! We're going to scale to min/max y over the current range
@@ -253,7 +253,7 @@
               ypgmax = MAX(YOBIN(ii),ypgmax)
             ENDIF
           ENDDO
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyBackspace)
 ! Undo last zoom action
@@ -269,7 +269,7 @@
           xpgmaxold = xpgmaxt
           ypgminold = ypgmint
           ypgmaxold = ypgmaxt
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyHome)
 ! Back to full profile range
@@ -277,7 +277,7 @@
           xpgmax = xpmax
           ypgmin = ypmin
           ypgmax = ypmax
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot     
       END SELECT
 
@@ -385,10 +385,10 @@
       ygcur(1) = EventInfo%GY
       CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
       XCurFirst = xcur(1)
-! The first WMessage loop is solely concerned with determining the range
+! The GetEvent() loop is solely concerned with determining the range
 ! over which we will fit the Bragg peak(s) so we will only check out
-! Expose, Resize, MouseMove, MouseButUp and a very limited number of
-! KeyDown options at this first stage
+! MouseMove, MouseButUp and a very limited number of
+! KeyDown options at this stage
       xgcurold = xgcur(1)
       CALL IGrPlotMode('EOR')
       CALL IGrColourN(KolNumLargeCrossHair)
@@ -445,21 +445,23 @@
 ! Determine peak fitting range
             IPFL1 = 1
             DO ii = 1, NBIN
-              IF (XBIN(ii).GE.XPFR1) THEN
+              IF (XBIN(ii) .GE. XPFR1) THEN
                 IPFL1 = ii
                 GOTO 55
               ENDIF
             ENDDO
    55       IPFL2 = NBIN
             DO ii = NBIN, 1, -1
-              IF (XBIN(ii).LE.XPFR2) THEN
+              IF (XBIN(ii) .LE. XPFR2) THEN
                 IPFL2 = ii
                 GOTO 60
               ENDIF
             ENDDO
    60       CONTINUE
             IPFRANGE = 1 + IPFL2 - IPFL1
-            IF (IPFRANGE .LT. 15) THEN
+            IF (IPFRANGE .EQ. 0) THEN
+              CALL InfoMessage('To select a peak, drag the mouse while pressing the right mouse button.')
+            ELSE IF (IPFRANGE .LT. 15) THEN
               CALL ErrorMessage('Not enough points for peak fitting!'//CHAR(13)//'Try a larger range.')
             ELSE
               NumPeakFitRange = NumPeakFitRange + 1
@@ -478,8 +480,6 @@
               IPF_Hi(NumPeakFitRange) = IPFL2
               IPF_Range(NumPeakFitRange) = 1 + IPF_Hi(NumPeakFitRange) - IPF_Lo(NumPeakFitRange)
               NumInPFR(NumPeakFitRange) = 0
-!F! Reserve these points in the calculated-points arrays
-!F              IPF_RPt(NumPeakFitRange+1) = IPF_RPt(NumPeakFitRange) + IPF_Range(NumPeakFitRange)
 ! Now we have the range in terms of the profile point index
               DO ISB = 2, 3
                 statbarstr(isb) = '          '
@@ -664,7 +664,7 @@
 ! Next peak
             IF (NTPeak .EQ. (NumInPFR(CurrentRange) + 1)) CALL INC(NumInPFR(CurrentRange))
             IF (NTPeak .LE. NumInPFR(CurrentRange)) THEN
-              ReplotNecessary        = .TRUE.
+              ReplotNecessary = .TRUE.
               IF (RangeFitYN(CurrentRange)) RecalculationNecessary = .TRUE.
 ! When we are here, we are either adding a peak or shifting an old one.
 ! Either way, mark the hatched area as 'not fitted'
