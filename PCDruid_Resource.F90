@@ -1,4 +1,4 @@
-! Winteracter module created : 13/May/2002 11:00:32
+! Winteracter module created : 13/May/2002 14:41:51
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -150,7 +150,6 @@
           INTEGER, PARAMETER :: IDF_PW_Option1                  =  1199
           INTEGER, PARAMETER :: IDF_PW_Logo1                    =  1204
           INTEGER, PARAMETER :: IDB_SA_Project_Import           =  1214
-          INTEGER, PARAMETER :: IDF_PW_Flight_Path_Label        =  1248
           INTEGER, PARAMETER :: IDD_PW_Page3                    =   124
           INTEGER, PARAMETER :: IDF_PWa_Data_Group              =  1261
           INTEGER, PARAMETER :: IDF_PWa_Data_fFilename          =  1262
@@ -615,4 +614,5 @@
           INTEGER, PARAMETER :: IDD_ViewPawley                  =   127
           INTEGER, PARAMETER :: IDB_ClearAll                    =  1406
           INTEGER, PARAMETER :: IDM_ViewPawley                  = 40030
+          INTEGER, PARAMETER :: IDF_PO_G1                       =  1407
       END MODULE Druid_Header
