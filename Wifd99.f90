@@ -171,29 +171,28 @@
 !
       SUBROUTINE HCVOUT(HKL,IC,X,HX,N,NCORL,POSDEF)
 
+      IMPLICIT NONE
+
       REAL    HKL(3,*)
       INTEGER IC(*)
+      INTEGER N
       REAL    X(*), HX(N,N)
-      INTEGER N, NCORL
+      INTEGER NCORL
       LOGICAL POSDEF
 
-      INTEGER ICOR(15)
-
-      PARAMETER (IREFSM=2000)
+      INTEGER     IREFSM
+      PARAMETER ( IREFSM = 2000 )
+      INTEGER         LCV, ICORL,            ICLUMP
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
+      INTEGER         IHCOV
       COMMON /CORHES/ IHCOV(30,10000)
+      INTEGER         KOUNT
       COMMON /COUNTE/ KOUNT
 
-! JvdS While playing around with excluded regions, it struck me that the output from this routine was corrupt.
-! the IHCOV written out are often FFFFFFFFh, leading to problems with formatting leading to problems in the SA.
-! ICOR(15) is a local variable here, not EQUIVALENCED as far as I can tell, and it
-! is assigned values, but never used.
-! In GetHCV, where the file that is written out here is read in, ICOR is read in instead of IHCOV
-! Combining the above, I think that ICOR should be written out.
-! Also note the number of zeros present in the .pik and .hcv file: they are not necessary, as the
-! routines that read those files check the number of columns to be read.
-! Also note that the dimension of the number of correlations in the COMMON blocks is different:
-! ICOR thinks it should be 15, IHCOV thinks it should be 30, and ICOR in GetHCV thinks it should be 20.
+      INTEGER J
+      REAL    SIGX, SIGXX
+      INTEGER I, K
+      INTEGER NumOfCorrel
 
       DO J = 1, N
         SIGXX = HX(J,J)
@@ -203,20 +202,13 @@
           SIGX = SQRT(SIGXX)
           IF (.NOT.POSDEF) SIGX = -SIGX
         ENDIF
-        DO I = 1, NCORL
-          ICOR(I) = 0
-        ENDDO
-        IMAX = N - J
-        IF (IMAX.GT.NCORL) IMAX = NCORL
-        II = 1
-        DO I = J + 1, J + IMAX
-          CXIJ = ABS(SIGXX*HX(I,I)) + 1.0E-20
-          ICOR(II) = NINT(100.0*HX(I,J)/SQRT(CXIJ))
-          II = II + 1
-        ENDDO
         KOUNT = KOUNT + 1
-!O        WRITE (LCV,100) (NINT(HKL(I,J)),I=1,3), X(J), SIGX, IC(J), (IHCOV(K,KOUNT),K=1,NCORL)
-        WRITE (LCV,100) (NINT(HKL(I,J)),I=1,3), X(J), SIGX, IC(J), (ICOR(K),K=1,NCORL)
+! Starting at the end, count the number of zeros (these needn't be written out)
+        NumOfCorrel = NCORL
+        DO WHILE ((NumOfCorrel .GE. 2) .AND. (IHCOV(NumOfCorrel,KOUNT) .EQ. 0))
+          NumOfCorrel = NumOfCorrel - 1
+        ENDDO
+        WRITE (LCV,100) (NINT(HKL(I,J)),I=1,3), X(J), SIGX, IC(J), (IHCOV(K,KOUNT),K=1,NumOfCorrel)
   100   FORMAT (3I5,1X,F12.3,1X,F12.4,1X,I5,15I4)
       ENDDO
 
