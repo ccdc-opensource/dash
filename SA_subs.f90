@@ -123,10 +123,8 @@
 
       LOGICAL OutOfBounds
       REAL xtem, tempupper, templower, tempupper2, templower2
-      INTEGER Upper, Lower
+      REAL Sgn
 
-      Upper = 1
-      Lower = 2
 
 !O      NumOfRef = 10
       CALL OpenChiSqPlotWindow
@@ -214,7 +212,7 @@
       CALL RMARInit(ISEED1+Curr_SA_Run,ISEED2+Curr_SA_Run)
 ! Initialise all degrees of freedom either to a preset value or to
 ! a random value
-      CALL FillRULB(nvar)
+      CALL FillRULB(nvar) !calcs upper and lower bounds for parameters
       CALL MAKXIN(nvar)
       DO IV = 1, nvar
         C(IV) = 2.0
@@ -280,6 +278,7 @@
 ! ##########################################
 !   Starting point for multiple moves
 ! ##########################################
+
       DO M = 1, NT
 ! MRAN RANGE IS 0 -> IM=7875
         MRAN = MOD(MRAN*IA+IC,IM)
@@ -298,8 +297,8 @@
             DX = RANAR1(IAR1) * VM(H)
             IAR1 = IAR1 + 1
             XP(H) = X(H) + DX
-!! If Modal ranges defined for torsions use random number to
-!  select from which range the value of XP will be derived.
+! If modal ranges defined for torsions use random number to
+! select from which range the value of XP will be derived.
             IF (ModalFlag(H) .EQ. 2) THEN !Bimodal
               IF (RANARR(IARR) .GT. 0.5) THEN
                 IF (UB(H) * LB(H) .LT. 0.00) THEN
@@ -318,7 +317,6 @@
               ELSEIF ((RANARR(IARR) .GE. 0.66) .AND. (RANARR(IARR).LT. 1.00)) THEN
                 xtem = xtem + 240.00
               ENDIF
-
               IF (Xtem .GE. 360.00) THEN
                 Xtem = xtem - 360.00
               END IF
@@ -355,25 +353,34 @@
                   IARR = IARR + 1
                 ENDIF   
               CASE (2) ! bimodal ranges
+! Complicated-looking calcs of inbounds torsion angles is to try and guarantee a good
+! sampling of all user defined ranges.  
                 CALL CheckXInBounds(H, XP(H), OutOfBounds)
-                IF (OutOfBOunds) THEN
-                IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
-                  TempUpper = SNGL(UB(H))         ! so use 0-360 degree scale
-                  TempLower = SNGL(LB(H))
-                  TempLower2 = TempUpper - 180.00
-                  TempUpper2 = TempLower + 180.00
-                  CALL OneEightyToThreeSixty(TempUpper)
-                  CALL OneEightyToThreeSixty(TempLower)
-                  CALL OneEightyToThreeSixty(TempUpper2)
-                  CALL OneEightyToThreeSixty(TempLower2)
-                  xtem = XP(H)
-                  CALL OneEightytoThreeSixty(xtem)
-                    IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
-                      IARR = IARR + 1
+                IF (OutOfBounds) THEN
+                  IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
+                    TempUpper = SNGL(UB(H))         ! so use 0-360 degree scale
+                    TempLower = SNGL(LB(H))
+                    TempLower2 = TempUpper - 180.00
+                    TempUpper2 = TempLower + 180.00
+                    CALL OneEightyToThreeSixty(TempUpper)
+                    CALL OneEightyToThreeSixty(TempLower)
+                    CALL OneEightyToThreeSixty(TempUpper2)
+                    CALL OneEightyToThreeSixty(TempLower2)
+                    xtem = XP(H)
+                    CALL OneEightytoThreeSixty(xtem)
+                    Sgn = SIGN(1.0, XP(H))
+                    IF (RANARR(IARR) .LT. 0.5) THEN 
+                      IARR = IARR + 1               
                       xtem = MAX(TempUpper, TempUpper2) + (RULB(H) * RANARR(IARR))
+                      IF (sgn .LT. 0.0) THEN
+                        xtem = xtem -180.00
+                      ENDIF
                     ELSE
                       IARR = IARR + 1
                       xtem = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
+                      IF (sgn .lt. 0.0) THEN
+                        xtem = xtem + 180.00
+                      ENDIF
                     ENDIF
                     IF (xtem .gt. 360.00) THEN
                       xtem = xtem - 360.00
@@ -381,20 +388,23 @@
                     CALL ThreeSixtyToOneEighty(xtem)
                     XP(H) = xtem
                     IARR = IARR + 1 
-                ELSEIF (UB(H) * LB(H) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
-                  IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
+                  ELSEIF (UB(H) * LB(H) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
+                    Sgn = SIGN(1.0, XP(H))
+                    IF (RANARR(IARR) .LT. 0.5) THEN
+                      IARR = IARR + 1
+                      XP(H) = LB(H) + (RULB(H) * RANARR(IARR))
+                      XP(H) = XP(H) * ((-1)*Sgn)
+                    ELSE
+                      IARR = IARR + 1 
+                      XP(H) = (-1)*LB(H) - (RULB(H) * RANARR(IARR))
+                      XP(H) = XP(H) * Sgn
+                    ENDIF 
                     IARR = IARR + 1
-                    XP(H) = LB(H) + RULB(H) * RANARR(IARR)
-                  ELSE
-                    IARR = IARR + 1 
-                    XP(H) = (-1)*LB(H) - RULB(H) * RANARR(IARR)
-                  ENDIF 
-                  IARR = IARR + 1
+                  ENDIF
                 ENDIF
-               ENDIF
 
               CASE(3) !trimodal ranges
-                CALL CheckXinBounds(H, XP(H), OUtofBOunds)
+                CALL CheckXinBounds(H, XP(H), OutOfBounds)
                 IF (OutOfBounds) THEN ! calculate new value in one of three allowed ranges
                   xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
                   IARR = IARR + 1
@@ -862,6 +872,9 @@
 !*****************************************************************************
 !
       SUBROUTINE FillRULB(nvar)
+
+! This subroutine determines the upper and lower bounds for all parameters including
+! modal torsion angles.
 
       IMPLICIT NONE
 
