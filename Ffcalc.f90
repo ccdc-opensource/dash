@@ -1459,7 +1459,7 @@
 !	 Structure factor calculations for space group P6/m
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1486,8 +1486,8 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
 !
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1522,8 +1522,8 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
 !
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1561,8 +1561,8 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1604,7 +1604,7 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
 !
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1630,15 +1630,32 @@
 !
       REAL FUNCTION FFCALC_DEFAULT(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      USE REFVAR
 
-      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      IMPLICIT NONE
 
-      LOGICAL CENTRC
+      INTEGER, INTENT (IN   ) :: iR
+
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+      REAL            FOB
+      COMMON /FCSTOR/ FOB(150,MaxRef)
+
+      INTEGER         NOP, NCENT, NOPC, NLAT, NGEN
+      LOGICAL                                       CENTRC
+      INTEGER                                               KOM13
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
-
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 
       REAL            sctrh,            rhsto
       COMMON /symsto/ sctrh(24,MaxRef), rhsto(3,24,MaxRef)
@@ -1653,6 +1670,9 @@
       REAL            SINAR0,           SINAR1,           SINAR2
       COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC), SINAR2(-NBC:NBC)
 
+      REAL AFCALC, BFCALC, SUMA, SUMB, V, PV
+      INTEGER N, I, IV
+
       AFCALC = 0.0
 ! Firstly if we are centric then calculate only cosine terms
       IF (CENTRC) THEN
@@ -1661,9 +1681,12 @@
 ! SUM OVER SYMMETRY EQUIVALENTS:
           DO I = 1, NOPC
 ! V is 2pi*(h*x+t)
+!C RHSTO holds the reciprocal space vector (h,k,l) per symmetry operator per reflection
+!C (so in a way, it's the h,k,l that are transformed rather than the atomic co-ordinates)
             V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
             IV = V
             PV = V - FLOAT(IV)
+!C The COSARs are just a look-up table to speed up the goniometric calculations
             SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
           ENDDO
           AFCALC = AFCALC + SUMA*FOB(N,IR)
