@@ -289,7 +289,6 @@
       INTEGER, INTENT (IN   ) :: iFrg
 
       INTEGER I, BondNr
-      REAL CART(1:3,1:MAXATM)
 
       CALL WDialogSelect(IDD_zmEdit)
       CurrentlyEditedFrag = iFrg
@@ -300,11 +299,8 @@
 ! In order to be able to delete atoms from the Z-matrix at random, we need their
 ! Cartesian co-ordinates.
       natcry = natoms(iFrg)
-      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),axyzo)
       DO I = 1, natcry
-        axyzo(I,1) = CART(1,I)
-        axyzo(I,2) = CART(2,I)
-        axyzo(I,3) = CART(3,I)
         aelem(I) = zmElementCSD(I, iFrg)
         atomlabel(I) = OriginalLabel(I, iFrg)
       ENDDO
@@ -488,9 +484,9 @@
 ! If not last atom in list, shuffle remaining
                 IF (iAtomNr .NE. natcry) THEN 
                   DO I = iAtomNr, natcry-1
-                    axyzo(I,1)   = axyzo(I+1,1)
-                    axyzo(I,2)   = axyzo(I+1,2)
-                    axyzo(I,3)   = axyzo(I+1,3)
+                    axyzo(1,I) = axyzo(1,I+1)
+                    axyzo(2,I) = axyzo(2,I+1)
+                    axyzo(3,I) = axyzo(3,I+1)
                   ENDDO
                 ENDIF
                 natcry = natcry - 1
@@ -547,12 +543,12 @@
 
       IMPLICIT NONE      
 
-      INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State, iAtomNr
       INTEGER, EXTERNAL :: WriteMol2
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
       REAL, EXTERNAL :: Degrees2Radians
+      INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State, iAtomNr
       REAL    Alpha, Beta, Gamma, Q(0:3)
-      REAL    taxyzo(1:MAXATM_2,1:3)
+      REAL    taxyzo(1:3, 1:MAXATM_2)
       CHARACTER(50) temp_file
       REAL    RotMat(1:3,1:3)
       REAL    COM(1:3), tX, tY, tZ
@@ -584,9 +580,9 @@
             CASE (IDB_View)
               natcry = NATOMS(iFrg)
               DO iAtomNr = 1, natcry
-                taxyzo(iAtomNr,1) = axyzo(iAtomNr,1)
-                taxyzo(iAtomNr,2) = axyzo(iAtomNr,2)
-                taxyzo(iAtomNr,3) = axyzo(iAtomNr,3)
+                taxyzo(1,iAtomNr) = axyzo(1,iAtomNr)
+                taxyzo(2,iAtomNr) = axyzo(2,iAtomNr)
+                taxyzo(3,iAtomNr) = axyzo(3,iAtomNr)
               ENDDO
 ! Subtract origin from co-ordinates
               CALL WDialogGetRadioButton(IDF_RotOrgCOM,iOption)
@@ -597,29 +593,29 @@
                   IF (Get_UseCrystallographicCoM()) THEN
                     CALL zmCreate_AtomicWeightings(iFrg)
                     DO iAtomNr = 1, natcry
-                      COM(1) = COM(1) + AtomicWeighting(iAtomNr,iFrg)*axyzo(iAtomNr,1)
-                      COM(2) = COM(2) + AtomicWeighting(iAtomNr,iFrg)*axyzo(iAtomNr,2)
-                      COM(3) = COM(3) + AtomicWeighting(iAtomNr,iFrg)*axyzo(iAtomNr,3)
+                      COM(1) = COM(1) + AtomicWeighting(iAtomNr,iFrg)*axyzo(1,iAtomNr)
+                      COM(2) = COM(2) + AtomicWeighting(iAtomNr,iFrg)*axyzo(2,iAtomNr)
+                      COM(3) = COM(3) + AtomicWeighting(iAtomNr,iFrg)*axyzo(3,iAtomNr)
                     ENDDO
                   ELSE
                     DO iAtomNr = 1, natcry
-                      COM(1) = COM(1) + axyzo(iAtomNr,1)
-                      COM(2) = COM(2) + axyzo(iAtomNr,2)
-                      COM(3) = COM(3) + axyzo(iAtomNr,3)
+                      COM(1) = COM(1) + axyzo(1,iAtomNr)
+                      COM(2) = COM(2) + axyzo(2,iAtomNr)
+                      COM(3) = COM(3) + axyzo(3,iAtomNr)
                     ENDDO
                     COM = COM / FLOAT(natcry)
                   ENDIF
 ! Otherwise, use atom number ICFRG
                 CASE (2) ! Use atom nr.
                   CALL WDialogGetInteger(IDF_RotOrgAtomNr, iAtomNr)
-                  COM(1) = axyzo(izmbid(iAtomNr,iFrg),1)
-                  COM(2) = axyzo(izmbid(iAtomNr,iFrg),2)
-                  COM(3) = axyzo(izmbid(iAtomNr,iFrg),3)
+                  COM(1) = axyzo(1,izmbid(iAtomNr,iFrg))
+                  COM(2) = axyzo(2,izmbid(iAtomNr,iFrg))
+                  COM(3) = axyzo(3,izmbid(iAtomNr,iFrg))
               END SELECT
               DO iAtomNr = 1, natcry
-                axyzo(iAtomNr,1) = axyzo(iAtomNr,1) - COM(1)
-                axyzo(iAtomNr,2) = axyzo(iAtomNr,2) - COM(2)
-                axyzo(iAtomNr,3) = axyzo(iAtomNr,3) - COM(3)
+                axyzo(1,iAtomNr) = axyzo(1,iAtomNr) - COM(1)
+                axyzo(2,iAtomNr) = axyzo(2,iAtomNr) - COM(2)
+                axyzo(3,iAtomNr) = axyzo(3,iAtomNr) - COM(3)
               ENDDO
 ! Apply initial orientation
               CALL WDialogGetReal(IDF_Q0,Q(0))
@@ -628,12 +624,12 @@
               CALL WDialogGetReal(IDF_Q3,Q(3))
               CALL ROTMAK(Q, RotMat)
               DO I = 1, natcry
-                tX = axyzo(I,1) * RotMat(1,1) + axyzo(I,2) * RotMat(1,2) + axyzo(I,3) * RotMat(1,3)
-                tY = axyzo(I,1) * RotMat(2,1) + axyzo(I,2) * RotMat(2,2) + axyzo(I,3) * RotMat(2,3)
-                tZ = axyzo(I,1) * RotMat(3,1) + axyzo(I,2) * RotMat(3,2) + axyzo(I,3) * RotMat(3,3)
-                axyzo(I,1) = tX
-                axyzo(I,2) = tY
-                axyzo(I,3) = tZ
+                tX = axyzo(1,I) * RotMat(1,1) + axyzo(2,I) * RotMat(1,2) + axyzo(3,I) * RotMat(1,3)
+                tY = axyzo(1,I) * RotMat(2,1) + axyzo(2,I) * RotMat(2,2) + axyzo(3,I) * RotMat(2,3)
+                tZ = axyzo(1,I) * RotMat(3,1) + axyzo(2,I) * RotMat(3,2) + axyzo(3,I) * RotMat(3,3)
+                axyzo(1,I) = tX
+                axyzo(2,I) = tY
+                axyzo(3,I) = tZ
               ENDDO
               DO iAtomNr = 1, natcry
                 atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
@@ -653,9 +649,9 @@
               IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) CALL ViewStructure(temp_file)
               CALL IOSDeleteFile(temp_file)
               DO iAtomNr = 1, natcry
-                axyzo(iAtomNr,1) = taxyzo(iAtomNr,1)
-                axyzo(iAtomNr,2) = taxyzo(iAtomNr,2)
-                axyzo(iAtomNr,3) = taxyzo(iAtomNr,3)
+                axyzo(1,iAtomNr) = taxyzo(1,iAtomNr)
+                axyzo(2,iAtomNr) = taxyzo(2,iAtomNr)
+                axyzo(3,iAtomNr) = taxyzo(3,iAtomNr)
               ENDDO
           END SELECT
         CASE (FieldChanged)
@@ -1048,22 +1044,18 @@
 
       INTEGER, INTENT (IN   ) :: iFrg
 
-      INTEGER I
-      CHARACTER(MaxPathLength) temp_file
-      REAL CART(1:3,1:MAXATM)
       INTEGER, EXTERNAL :: WriteMol2
       LOGICAL, EXTERNAL :: Get_ColourFlexibleTorsions
+      INTEGER I
+      CHARACTER(MaxPathLength) temp_file
       INTEGER atom
       INTEGER Element
       INTEGER NumOfFlexTorsions
       INTEGER tLength, BondNr
 
       natcry = NATOMS(iFrg)
-      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),axyzo)
       DO I = 1, natcry
-        axyzo(I,1) = CART(1,I)
-        axyzo(I,2) = CART(2,I)
-        axyzo(I,3) = CART(3,I)
         aelem(I) = zmElementCSD(I,iFrg)
         atomlabel(I) = OriginalLabel(I,iFrg)
       ENDDO
