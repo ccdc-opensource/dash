@@ -23,8 +23,6 @@
 !C>> Function defn
 	  integer CheckOverwriteSaOutput
 !
-!C>> JCC      CALL WDialogLoad(IDD_SA_Action1)
- !C>> JCC     CALL WDialogLoad(IDD_SA_Action2)
       Call WDialogSelect(IDD_SA_Action1)
 !
 !      Call WDialogFieldState(IDF_Pause_Annealing,Disabled)
