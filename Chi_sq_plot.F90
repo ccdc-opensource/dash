@@ -286,8 +286,8 @@
         CALL IPgXYPairs(Xarray, chi_sqd(1,Curr_SA_Run))
       ENDIF
 ! Plot line which indicates endpoint
-      XEndPoint(1) = XArray(1)
-      XEndPoint(2) = XArray(MaxIterationSoFar)
+      XEndPoint(1) = chi_x_min
+      XEndPoint(2) = chi_x_max
 ! Y Values for endpoint line
       DO j = 1,2
         EndPoint(j) = PAWLEYCHISQ * ChiMult
