@@ -1,18 +1,13 @@
 ! JvdS The following routine is 733 lines
 !
       SUBROUTINE SA_MAIN()
-!
+
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 !
 ! Define some parameters to match those in the resource file
 !
-!
-! Declare window-type and message variables
-!
-
-
       CHARACTER*80 SDIFile
       CHARACTER*80 pikfile,ticfile,hcvfile
       REAL         rpos
@@ -20,21 +15,21 @@
       INTEGER      IFlags
 
       INCLUDE 'IZMCheck.inc'
+      INCLUDE 'DialogPosCmn.inc'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'statlog.inc'
+
       INTEGER IDFZMCheck(CheckSize),IZMNumber(CheckSize)
 
       INTEGER IDBZMBrowse(CheckSize),IDFZMpars(CheckSize),IDFZMFile(CheckSize)
       INTEGER II
-      INCLUDE 'DialogPosCmn.inc'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
-!
-!
+
       PARAMETER (NMAX = 100, MXEPS = 10)
       DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
       COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
-!
+
       INTEGER  MAXEVL, IPRINT
-!
+
       DOUBLE PRECISION cen,sig
       LOGICAL       gaussb
       DOUBLE PRECISION T0,rt,eps,target_value
@@ -54,13 +49,13 @@
       COMMON /presetr/ xpreset(mvar)
       LOGICAL log_preset
       COMMON /presetl/ log_preset
-!
+
       COMMON /saparl/ T0,rt,eps,target_value
       INTEGER  NS, NT, IER, ISEED1, ISEED2
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
       COMMON /shadl/ log_shad(mvar)
       COMMON /shadi/ kshad(mvar)
-!
+
       PARAMETER (maxatm=100)
       PARAMETER (maxfrg=20)
       DOUBLE PRECISION a, b, c, al, be, ga
@@ -86,7 +81,7 @@
         czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
-!
+
       COMMON /POSNS/NATOM,XATO(3,150),KX(3,150),AMULT(150),&
         TF(150),KTF(150),SITE(150),KSITE(150),&
         ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
@@ -134,14 +129,7 @@
       IDFZMpars(3)=IDF_ZM_pars3
       IDFZMpars(4)=IDF_ZM_pars4
       IDFZMpars(5)=IDF_ZM_pars5
-!>> JCC 
-!>> This following section of code makes no sense, and causes array bounds to exceed
-!>>
-!  DO ii=1,5
-!    IZMNumber(IDBZMBrowse(ii))=ii
-!  End Do
-!>>
-!>> So I've changed it to what I think it should be ..., i.e. a copy of the flags used
+!>> copy the flags used
       DO ii = 1, 5
         IZMNumber(ii) = IDBZMBrowse(ii)
       END DO
@@ -176,17 +164,17 @@
       ELSE
         CALL WDialogFieldState(IDF_SA_Project_Import,Disabled)
       END IF
-! Let's check the z-matrix check boxes
-      DO II = 1, 5
-        CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
-      END DO
+!U! Let's check the z-matrix check boxes
+!U      DO II = 1, 5
+!U        CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
+!U      END DO
       ZmStateChanged = .TRUE.
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       DO                   ! Loop until user terminates
 ! Let's check the z-matrix check boxes
         IF (ZmStateChanged) THEN
           DO II = 1, 5
-            CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
+            CALL WDialogGetCheckBox(IDFZMCheck(II),IZMCheck(II))
           END DO
           DO II = 1, 5
             IF ((IZMCheck(II) .EQ. Checked) .OR. gotzmfile(II) ) THEN
@@ -239,8 +227,6 @@
 !.. Interact with the main window and look at the Pawley refinement...
           CASE (MouseButDown)
             CALL Plot_Alter
-          CASE (KeyDown)
-            CALL Check_KeyDown
           CASE (PushButton)
             SELECT CASE (EventInfo%VALUE1)
 !C>> JCC Add in new 'clear' button
@@ -404,14 +390,6 @@
         CALL GetEvent
         SELECT CASE (EventType)
 !.. Interact with the main window and look at the Pawley refinement...
-!U          CASE (Expose, Resize)
-!U            IF (EventInfo%WIN .EQ. 0) THEN
-!U              CALL Redraw()
-!U            END IF
-          CASE (MouseButDown)
-            CALL Plot_Alter
-          CASE (KeyDown)
-            CALL Check_KeyDown
           CASE (PushButton)
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDF_SA2_cancel)
@@ -567,39 +545,31 @@
         IYPos_IDD_SA_Input = WInfoDialog(7)
         CALL GetEvent
         SELECT CASE (EventType)
-!U          CASE (Expose, Resize)
-!U            IF (EventInfo%WIN .EQ. 0)  THEN
-!U              CALL ReDraw()
-!U            END IF
 !.. Interact with the main window and look at the Pawley refinement...
-          CASE (MouseButDown)
-            CALL Plot_Alter
-          CASE (KeyDown)
-            CALL Check_KeyDown
           CASE (PushButton)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_SA3_cancel,IDCANCEL)
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDF_SA3_cancel,IDCANCEL)
 ! Go back to the Pawley refinement or the initial wizard
-              IPTYPE = 2
+                IPTYPE = 2
 ! Window is going to be removed: save current position
-              IXPos_IDD_Wizard = WInfoDialog(6)
-              IYPos_IDD_Wizard = WInfoDialog(7)
-              CALL WDialogHide()
-              RETURN
-            CASE (IDB_SA3_back)
+                IXPos_IDD_Wizard = WInfoDialog(6)
+                IYPos_IDD_Wizard = WInfoDialog(7)
+                CALL WDialogHide()
+                RETURN
+              CASE (IDB_SA3_back)
 ! Go back to the 2nd window
 ! Window is going to be removed: save current position
-              IXPos_IDD_Wizard = WInfoDialog(6)
-              IYPos_IDD_Wizard = WInfoDialog(7)
-              CALL WDialogHide()
-              GOTO 444
-            CASE (IDB_SA3_finish)
+                IXPos_IDD_Wizard = WInfoDialog(6)
+                IYPos_IDD_Wizard = WInfoDialog(7)
+                CALL WDialogHide()
+                GOTO 444
+              CASE (IDB_SA3_finish)
 ! We've finished the SA input
 ! Window is going to be removed: save current position
-              IXPos_IDD_Wizard = WInfoDialog(6)
-              IYPos_IDD_Wizard = WInfoDialog(7)
-              CALL WDialogHide()
-              GOTO 888
+                IXPos_IDD_Wizard = WInfoDialog(6)
+                IYPos_IDD_Wizard = WInfoDialog(7)
+                CALL WDialogHide()
+                GOTO 888
             END SELECT
           CASE (FieldChanged)
             SELECT CASE (EventInfo%VALUE1)
@@ -830,7 +800,7 @@
         END IF
       END IF
 !C>>  update the file name of the project in the SA pop up
-      CALL SetSAFileName(SDIFile(:LEN_TRIM(SDIFile)))
+      CALL SetSAFileName(SDIFile(1:LEN_TRIM(SDIFile)))
 !
  999  END SUBROUTINE OPENHCVPIKTIC
 !
@@ -843,48 +813,48 @@
 
       IMPLICIT NONE
 
-      INTEGER klen
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
       INTEGER Load_Tic_File ! Function
       INTEGER ipiker, iloger, iticer, ihcver
+      INTEGER klen
 
-        IF (PikExists) THEN
-          CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
-          IF (ipiker .EQ. 0) THEN
-            CALL INF_UPLOAD()
-          ELSE
-            PikExists = .FALSE.
-          END IF
+      IF (PikExists) THEN
+        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
+        IF (ipiker .EQ. 0) THEN
+          CALL INF_UPLOAD()
+        ELSE
+          PikExists = .FALSE.
         END IF
+      END IF
 ! Load the TIC file
-        klen = LEN_TRIM(DashTicFile)
-        IF (TicExists) THEN
-          CALL GET_LOGREF(DashTicFile,klen,iloger)
-          iticer = Load_Tic_File(klen,DashTicFile)
-          IF (iticer .EQ. 0) TicExists = .FALSE.
+      klen = LEN_TRIM(DashTicFile)
+      IF (TicExists) THEN
+        CALL GET_LOGREF(DashTicFile,klen,iloger)
+        iticer = Load_Tic_File(klen,DashTicFile)
+        IF (iticer .EQ. 0) TicExists = .FALSE.
+      END IF
+      IF (HcvExists) THEN
+        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
+        IF (Ihcver .EQ. 1) THEN
+          HcvExists = .FALSE.
+        ELSE 
+          CALL INF_UPLOAD()
         END IF
-        IF (HcvExists) THEN
-          CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
-          IF (Ihcver .EQ. 1) THEN
-            HcvExists = .FALSE.
-          ELSE 
-            CALL INF_UPLOAD()
-          END IF
-        END IF
+      END IF
 !C>> JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
 !C>> I moved it, since i wanted to check that all the data read in ok before calling it
         IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
 !C>> JCC before, this just didnt plot anything, even though in theory we should be able
 !C>> to observe the full profile. Firstly have to synchronize the common blocks though
-          CALL Synchronize_Data()
-          NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
-          Iptype = 2
-          CALL Profile_Plot(IPTYPE) 
-          NoData = .FALSE.
-        ENDIF
+        CALL Synchronize_Data()
+        NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
+        Iptype = 2
+        CALL Profile_Plot(IPTYPE) 
+        NoData = .FALSE.
+      ENDIF
       RETURN
 
       END SUBROUTINE Load_DashDataFiles
@@ -892,79 +862,80 @@
 !*****************************************************************************
 !
       SUBROUTINE SA_Parameter_Set(CheckSize, IZMCheck)
-!
-!
+
       USE WINTERACTER
       USE DRUID_HEADER
+
 !C>> JCC Add in checking: only use z-matrices that the user has selected!
-      INTEGER CheckSize
-      INTEGER IZMCheck(CheckSize)
-!
+      INTEGER, INTENT (IN   ) :: CheckSize
+      INTEGER, INTENT (IN   ) :: IZMCheck(CheckSize)
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
+
       PARAMETER (NMAX = 100, MXEPS = 10)
       DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
-      common /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
-!
+      COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
+
       INTEGER  NS, NT, ISEED1, ISEED2
       INTEGER  MAXEVL, IPRINT
-!
-      double precision cen,sig
-      logical gaussb
-      double precision T0,rt,eps,target_value
-!
-      parameter (maxatm=100)
-      parameter (maxfrg=20)
-      double precision a,b,c,al,be,ga
-      double precision tiso,occ
-      double precision blen,alph,bet,f2cmat
+
+      DOUBLE PRECISION cen,sig
+      LOGICAL gaussb
+      DOUBLE PRECISION T0,rt,eps,target_value
+
+      PARAMETER (maxatm=100)
+      PARAMETER (maxfrg=20)
+      DOUBLE PRECISION a,b,c,al,be,ga
+      DOUBLE PRECISION tiso,occ
+      DOUBLE PRECISION blen,alph,bet,f2cmat
 !>> JCC Handle via the PDB standard
-      double precision f2cpdb
-      common /pdbcat/ f2cpdb(3,3)
-      character*3 asym
-      integer ioptb,iopta,ioptt,iz1,iz2,iz3
-      common /zmcomi/ ntatm,natoms(maxfrg),&
+      DOUBLE PRECISION f2cpdb
+      COMMON /pdbcat/ f2cpdb(3,3)
+      CHARACTER*3 asym
+      INTEGER ioptb,iopta,ioptt,iz1,iz2,iz3
+      COMMON /zmcomi/ ntatm,natoms(maxfrg),&
         ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
         iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
-      common /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
+      COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
         bet(maxatm,maxfrg),f2cmat(3,3)
-      common /zmcomc/ asym(maxatm,maxfrg)
-      common /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),&
+      COMMON /zmcomc/ asym(maxatm,maxfrg)
+      COMMON /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),&
         al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),&
         occ(maxatm,maxfrg)
-!
-      common /frgcom/ nfrag,lfrag(maxfrg)
-      parameter (mvar=100)
-      common /gaubou/ cen(mvar),sig(mvar)
-      common /gaulog/ gaussb(mvar)
-      character*80  torfile
-      logical ltorfil
-      common /torfcm/ torfile(mvar)
-      common /torlog/ ltorfil(mvar)
-      common /jitter/ rjittr
-      double precision x,lb,ub,vm,xpreset
-      common /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
 
-      double precision prevub, prevlb ! For saving the previous range
-      common /pvalues/ prevub(mvar), prevlb(mvar)
+      COMMON /frgcom/ nfrag,lfrag(maxfrg)
+      PARAMETER (mvar=100)
+      COMMON /gaubou/ cen(mvar),sig(mvar)
+      COMMON /gaulog/ gaussb(mvar)
+      CHARACTER*80  torfile
+      LOGICAL ltorfil
+      COMMON /torfcm/ torfile(mvar)
+      COMMON /torlog/ ltorfil(mvar)
+      COMMON /jitter/ rjittr
+      DOUBLE PRECISION x,lb,ub,vm,xpreset
+      COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
 
-      common /presetr/ xpreset(mvar)
-      logical log_preset
-      common /presetl/ log_preset
-!
-      common /saparl/ T0,rt,eps,target_value
-      common /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-      common /shadl/ log_shad(mvar)
-      common /shadi/ kshad(mvar)
-!
-      character*36 parlabel(mvar)
-!
-      character*36 czmpar
-      common /zmnpar/ izmtot,izmpar(maxfrg),&
+      DOUBLE PRECISION prevub, prevlb ! For saving the previous range
+      COMMON /pvalues/ prevub(mvar), prevlb(mvar)
+
+      COMMON /presetr/ xpreset(mvar)
+      LOGICAL log_preset
+      COMMON /presetl/ log_preset
+
+      COMMON /saparl/ T0,rt,eps,target_value
+      COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
+      COMMON /shadl/ log_shad(mvar)
+      COMMON /shadi/ kshad(mvar)
+
+      CHARACTER*36 parlabel(mvar)
+
+      CHARACTER*36 czmpar
+      COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
             czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
-      logical gotzmfile
-      common /zmlgot/ gotzmfile(maxfrg)
-!
-      INCLUDE 'GLBVAR.INC' ! Contains ALambda
-      INCLUDE 'lattice.inc'
+      LOGICAL gotzmfile
+      COMMON /zmlgot/ gotzmfile(maxfrg)
+
       DOUBLE PRECISION dcel(6)
 
       DO I = 1, 6
@@ -984,56 +955,51 @@
             x(kk)=xzmpar(ii,ifrg)
             parlabel(kk)=czmpar(ii,ifrg)
             SELECT CASE(kzmpar(ii,ifrg))
-            CASE(1)
-!.. position
-              lb(kk)=0.0
-              ub(kk)=1.0
-              vm(kk)=0.1
-            CASE(2)
-!.. quaternion
-              lb(kk)=-1.0
-              ub(kk)=1.0
-              vm(kk)=0.1
-            CASE(3)
-!.. torsion
+              CASE (1) !.. position
+                lb(kk)=0.0
+                ub(kk)=1.0
+                vm(kk)=0.1
+              CASE(2) !.. quaternion
+                lb(kk)=-1.0
+                ub(kk)=1.0
+                vm(kk)=0.1
+              CASE(3) !.. torsion
 !C>> JCC - need to factor in the sign of the wee beasty, otherwise the front end gets in a paddy!
 !              lb(kk)=0.0
 !              ub(kk)=360.0
-              IF      (x(kk) .LT. 0. .AND. x(kk) .GT. -180.0) THEN
-                lb(kk) =  -180.0
-                ub(kk) =   180.0
-              ELSE IF (x(kk) .GT. 0. .AND. x(kk) .LT.  360.0) THEN
-                lb(kk) =  0.0
-                ub(kk) =  360.0
-              ELSE 
-                lb(kk) = x(kk) - 180.0
-                ub(kk) = x(kk) + 180.0
-              END IF              
-              vm(kk)=10.0
-            CASE(4)
-!.. angle
-              lb(kk)=x(kk)-10.0
-              ub(kk)=x(kk)+10.0
-              vm(kk)=1.0
-            CASE(5)
-!.. bond
-              lb(kk)=0.9*x(kk)
-              ub(kk)=x(kk)/0.9
-              vm(kk)=0.1*(ub(kk)-lb(kk))
-          END SELECT
-        END DO
+                IF      (x(kk) .LT. 0. .AND. x(kk) .GT. -180.0) THEN
+                  lb(kk) =  -180.0
+                  ub(kk) =   180.0
+                ELSE IF (x(kk) .GT. 0. .AND. x(kk) .LT.  360.0) THEN
+                  lb(kk) =   0.0
+                  ub(kk) = 360.0
+                ELSE 
+                  lb(kk) = x(kk) - 180.0
+                  ub(kk) = x(kk) + 180.0
+                END IF              
+                vm(kk)=10.0
+              CASE (4) !.. angle
+                lb(kk) = x(kk) - 10.0
+                ub(kk) = x(kk) + 10.0
+                vm(kk) = 1.0
+              CASE (5) !.. bond
+                lb(kk) = 0.9*x(kk)
+                ub(kk) = x(kk)/0.9
+                vm(kk) = 0.1*(ub(kk)-lb(kk))
+            END SELECT
+          END DO
 !C>> JCC End of check on selection
-         END IF
+        END IF
       END DO
       nvar = kk
 !.. Now fill the grid
-      Call WDialogSelect(IDD_SA_input2)
-      Call WGridRows(IDF_parameter_grid,nvar)
-      Do i=1,nvar
+      CALL WDialogSelect(IDD_SA_input2)
+      CALL WGridRows(IDF_parameter_grid,nvar)
+      DO i = 1, nvar
          CALL WGridLabelRow(IDF_parameter_grid,i,parlabel(i))
-         CALL WGridPutCellReal(IDF_parameter_grid,1,i,sngl(x(i)),'(F12.5)')
-         CALL WGridPutCellReal(IDF_parameter_grid,2,i,sngl(lb(i)),'(F12.5)')
-         CALL WGridPutCellReal(IDF_parameter_grid,3,i,sngl(ub(i)),'(F12.5)')
+         CALL WGridPutCellReal(IDF_parameter_grid,1,i,SNGL(x(i)),'(F12.5)')
+         CALL WGridPutCellReal(IDF_parameter_grid,2,i,SNGL(lb(i)),'(F12.5)')
+         CALL WGridPutCellReal(IDF_parameter_grid,3,i,SNGL(ub(i)),'(F12.5)')
          CALL WGridPutCellCheckBox(IDF_parameter_grid,4,i,Unchecked)
          CALL WGridPutCellCheckBox(IDF_parameter_grid,5,i,Checked)
          CALL WGridStateCell(IDF_parameter_grid,1,i,Enabled)
@@ -1048,148 +1014,29 @@
 !
 !*****************************************************************************
 !
-!      subroutine SA_Parameter_Update(CheckSize,IZMCheck)
-!
-!      USE WINTERACTER
-!      USE DRUID_HEADER
-!      INTEGER CheckSize
-!      INTEGER IZMCheck(CheckSize)
-!
-!      PARAMETER (NMAX = 100, MXEPS = 10)
-!      DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
-!      COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
-!
-!      INTEGER  NACP(NMAX), NS, NT, NFCNEV, IER, ISEED1, ISEED2
-!      INTEGER MAXEVL, IPRINT, NACC, NOBDS
-!      LOGICAL  MAXLOG,RESTART,MAKET0
-!
-!      character*132 line
-!      character*80  sa_file
-!      logical   log_inf_file,log_nvar,log_bounds,log_reduce
-!      logical log_eps,log_ns,log_nt,log_neps,log_maxevl,log_iprint
-!      logical log_iseed1,log_iseed2,log_T0,log_target_value
-!      logical log_frag_file
-!      double precision cen,sig
-!      logical gaussb
-!      character*80  inf_file,zm_file
-!      double precision T,T0,rt,eps,target_value
-!      common /inffil/ lfinf,lfzm,inf_file,zm_file
-!
-!      parameter (maxatm=100)
-!      parameter (maxfrg=20)
-!      double precision a,b,c,al,be,ga
-!      double precision tiso,occ
-!      double precision blen,alph,bet,f2cmat
-!      character*3 asym
-!      integer ioptb,iopta,ioptt,iz1,iz2,iz3
-!      common /zmcomi/ ntatm,natoms(maxfrg),&
-!     ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
-!     iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
-!      common /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
-!     bet(maxatm,maxfrg),f2cmat(3,3)
-!      common /zmcomc/ asym(maxatm,maxfrg)
-!      common /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),&
-!     al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),&
-!     occ(maxatm,maxfrg)
-!
-!      common /frgcom/ nfrag,lfrag(maxfrg)
-!      character*80 frag_file
-!      common /frgcha/ frag_file(maxfrg)
-!      parameter (mvar=100)
-!      common /gaubou/ cen(mvar),sig(mvar)
-!      common /gaulog/ gaussb(mvar)
-!      character*80  torfile
-!      logical ltorfil
-!      common /torfcm/ torfile(mvar)
-!      common /torlog/ ltorfil(mvar)
-!      common /jitter/ rjittr
-!      double precision x,lb,ub,vm,xpreset
-!      common /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
-!      common /presetr/ xpreset(mvar)
-!      logical log_preset
-!      common /presetl/ log_preset
-!
-!      common /saparl/ T0,rt,eps,target_value
-!      common /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-!      common /shadl/ log_shad(mvar)
-!      common /shadi/ kshad(mvar)
-!
-!      character*36 parlabel(mvar)
-!
-!      character*36 czmpar
-!      common /zmnpar/ izmtot,izmpar(maxfrg),&
-!            czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
-!      logical gotzmfile
-!      common /zmlgot/ gotzmfile(maxfrg)
-!
-!      INCLUDE 'GLBVAR.INC' ! Contains ALambda
-!       COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
-!
-!      kk = 0
-!C>> JCC Only use those that are checked
-!      DO ifrg = 1, CheckSize
-!        IF (IZMCheck(ifrg) .EQ. Checked) THEN
-!          DO ii = 1, izmpar(ifrg)
-!            kk = kk + 1
-!C!>> Leave these alone - save the edits
-!          x(kk)=xzmpar(ii,ifrg)
-!          parlabel(kk)=czmpar(ii,ifrg)
-!!     sngl(x(kk)),sngl(lb(kk)),sngl(ub(kk)),sngl(vm(kk))
-!          END DO
-!!C>> JCC Check
-!        ENDIF
-!      END DO
-!      nvar = kk
-!!.. Now fill the grid
-!      CALL WDialogSelect(IDD_SA_input2)
-!      CALL WGridRows(IDF_parameter_grid,nvar)
-!      DO i = 1, nvar
-!         CALL WGridLabelRow(IDF_parameter_grid,i,parlabel(i))
-!         CALL WGridPutCellReal(IDF_parameter_grid,1,i,sngl(x(i)),'(F12.5)')
-!         CALL WGridPutCellReal(IDF_parameter_grid,2,i,sngl(lb(i)),'(F12.5)')
-!         CALL WGridPutCellReal(IDF_parameter_grid,3,i,sngl(ub(i)),'(F12.5)')
-!!         CALL WGridPutCellCheckBox(IDF_parameter_grid,4,i,Unchecked)
-!!         CALL WGridPutCellCheckBox(IDF_parameter_grid,5,i,Checked)
-!      END DO
-!!      Call WDialogHide()      
-!      RETURN
-!
-!      END SUBROUTINE SA_Parameter_Update
-
-           
 !C>> JCC This subroutine handles the various types of status error that can arise 
 !C>> during a reading of a file and produces a suitable message to say what went wrong.
       SUBROUTINE FileErrorPopup(FileName, ErrorStatus)
 
-      USE Winteracter
+      USE WINTERACTER
+
       INCLUDE 'iosdef.for'
+
       INTEGER       ErrorStatus
       CHARACTER*(*) FileName
       INTEGER       lenstr
 
       lenstr = LEN_TRIM(FileName)
-      
       SELECT CASE(ErrorStatus)
         CASE (FOR$IOS_FILNOTFOU) 
-          CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                           "The file "//CHAR(13)//FileName(1:lenstr)//CHAR(13)//" does not exist", &
-                           "No Such File")
-          RETURN
+          CALL ErrorMessage("The file "//CHAR(13)//FileName(1:lenstr)//CHAR(13)//" does not exist.")
         CASE (FOR$IOS_OPEFAI)
-          CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                           "The file "//CHAR(13)//FileName(1:lenstr)//CHAR(13)//" could not be opened", &
-                           "Cannot Open File")
-          RETURN
-        CASE  (FOR$IOS_PERACCFIL)
-          CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                           "You do not have permission to access the file "//FileName(1:lenstr), &
-                           "Permission Denied")
-          RETURN
+          CALL ErrorMessage("The file "//CHAR(13)//FileName(1:lenstr)//CHAR(13)//" could not be opened.")
+        CASE (FOR$IOS_PERACCFIL)
+          CALL ErrorMessage("You do not have permission to access the file "//FileName(1:lenstr))
+        CASE DEFAULT
+          CALL ErrorMessage("The file "//CHAR(13)//FileName(1:lenstr)//CHAR(13)//"was not read successfully.")
       END SELECT
-! Catch all error statement
-      CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                       "The file "//CHAR(13)//FileName(1:lenstr)//CHAR(13)//"was not read successfully", &
-                       "Bad File")
 
       END SUBROUTINE FileErrorPopup
 !
@@ -1334,11 +1181,11 @@
       INTEGER            I, IFlags, ISEL, Ilen, Istart, Istat, Nzm
       INTEGER            POS
       CHARACTER(LEN=4)   :: EXT4
-      CHARACTER(LEN=255)  :: FilterStr, F
+      CHARACTER(LEN=255) :: FilterStr, F
       CHARACTER(LEN=512) :: Zmfiles
       CHARACTER(LEN=5)   :: fmt     
-      CHARACTER(LEN=512) :: Info = 'You can import molecules from mol2,mol or pdb files into DASH.'//CHAR(13)//&
-                                   'When you click on Ok, you will be prompted for a file in one'//CHAR(13)//&
+      CHARACTER(LEN=512) :: Info = 'You can import molecules from mol2, mol or pdb files into DASH.'//CHAR(13)//&
+                                   'When you click on OK, you will be prompted for a file in one'//CHAR(13)//&
                                    'of these formats. DASH will create separate z-matrix files for'//CHAR(13)//&
                                    'each chemical residue present in the first entry in the file.'//CHAR(13)//&
                                    'In multiple entry files the first entry will be read only.'
@@ -1346,11 +1193,8 @@
       CALL WMessageBox(OKCancel, InformationIcon, CommonOK, Info, "Create Z-matrix")
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
       IFlags = LoadDialog + DirChange + AppendExt
-! JvdS Was:
-!O      FilterStr = "pdb files|*.pdb|Mol2 files|*.mol2;*.ml2|mdl mol files|*.mol; *.mdl; *.sdi|"
-!O      ISEL = 1
       FilterStr = "All files (*.*)|*.*|"//&
-                  "All molecular model files (*.pdb, *.mol2, *.ml2, *.mol, *.mdl)|*.pdb;*.mol2;*.ml2;*.mol;*.mdl|"//&
+                  "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl|"//&
                   "Protein DataBank files (*.pdb)|*.pdb|"//&
                   "Mol2 files (*.mol2, *.ml2)|*.mol2;*.ml2|"//&
                   "mdl mol files|*.mol;*.mdl|"
@@ -1397,12 +1241,12 @@
         Ilen = 1
         DO WHILE (Ilen .LT. 512)
           Nzm = Nzm + 1
-          READ (145,'(a)',ERR=20,END=20) F
+          READ (145,'(A)',ERR=20,END=20) F
           ZmFiles(Ilen:512) = CHAR(13)//F(1:LEN_TRIM(F))
-          Ilen = LEN_TRIM(ZmFiles)
+          Ilen = LEN_TRIM(ZmFiles) + 1
         END DO
  20     CONTINUE
-        CALL WMessageBox(OkOnly, InformationICon, CommonOk, &
+        CALL WMessageBox(OKOnly, InformationICon, CommonOk, &
                          "Generated the following zmatrices successfully:"//CHAR(13)//&
                          ZmFiles(1:Ilen)//CHAR(13)//CHAR(13)//&
                          "You can load them by clicking on the zmatrix browse buttons"//CHAR(13)//&
@@ -1413,3 +1257,6 @@
       RETURN
 
       END SUBROUTINE ImportZmatrix
+!
+!*****************************************************************************
+!
