@@ -1,6 +1,34 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE OpenChiSqPlotWindow
+
+      USE DRUID_HEADER
+      USE WINTERACTER
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER                    ChiSqdChildWindows,                 ChiHandle
+      COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
+      DATA  ChiSqdChildWindows / 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 /
+      DATA  ChiHandle / 1 /
+! Variables used to specify Child Window position
+      INTEGER Ix, Iy
+      COMMON /WindowPosition/ Ix, Iy
+      DATA Ix /10/, Iy /450/
+
+      EXTERNAL DealWithChiSqdPlot
+
+      CALL WindowOpenChild(ChiHandle,SysMenuOn+MinButton+AlwaysOnTop, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
+      ChiSqdChildWindows(ChiHandle) = 1
+      CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
+
+      END SUBROUTINE OpenChiSqPlotWindow
+!
+!*****************************************************************************
+!
       SUBROUTINE PrepareChiSqPlotData(iteration)
 !
 !
@@ -31,12 +59,6 @@
 
       INTEGER                    ChiSqdChildWindows,                 ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
-      DATA  ChiSqdChildWindows / 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 /
-      DATA  ChiHandle / 1 /
-! Variables used to specify Child Window position
-      INTEGER Ix, Iy
-      COMMON /WindowPosition/ Ix, Iy
-      DATA Ix /10/, Iy /450/
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
@@ -49,33 +71,20 @@
       INTEGER                                                            MaxIterationSoFar
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
 
-      EXTERNAL DealWithChiSqdPlot
       INTEGER  J
 
 ! chi_sqd is initialised to all zeros in BeginSa()
 
       it_count = iteration
       IF (iteration .GT. MaxIterationSoFar) MaxIterationSoFar = iteration
-
 ! Record chi-sqd value in array.  Chi-sqd values following it_count entry
 ! set to last Chi-sqd value entered.
       chi_sqd(iteration, Curr_SA_Run) = CHIPROBEST
       DO J = iteration+1, MaxIter
         Chi_sqd(J, Curr_SA_Run) = CHIPROBEST
       ENDDO
-
-! If first iteration...
-      IF (iteration.EQ.1) THEN
-! ...record y_max for graph
-        y_max = chi_sqd(1, Curr_SA_Run)*1.25
-      ENDIF
- 
-! If this is the first SA run and 2 points for the line graph have been determined, open Child Window
-      IF ((Curr_SA_Run.EQ.1) .AND. (iteration.EQ.2)) THEN
-        CALL WindowOpenChild(ChiHandle,SysMenuOn+MinButton+AlwaysOnTop, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
-        ChiSqdChildWindows(ChiHandle) = 1
-        CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
-      ENDIF
+! If first iteration, record y_max for graph
+      IF (iteration.EQ.1) y_max = chi_sqd(1, Curr_SA_Run)*1.25
       IF ((ChiSqdChildWindows(ChiHandle).EQ.1).AND.(iteration.GE.2)) CALL plotting_chi_sqd(ChiHandle)
 
       END SUBROUTINE PrepareChiSqPlotData
@@ -94,9 +103,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'poly_colours.inc'
 
-      REAL           :: x_max
-      REAL, DIMENSION(MaxIter+1) :: Xarray
-
       REAL                    chi_sqd
       INTEGER                                           it_count
       REAL                                                        y_max
@@ -114,6 +120,8 @@
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
       INTEGER J, ISET
+      REAL   x_max
+      REAL   Xarray(MaxIter+1)
 
       CALL WindowSelect(ChiHandle)
       CALL WindowClear()
