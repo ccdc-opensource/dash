@@ -669,12 +669,12 @@
         RETURN
       ENDIF
       IF (NoWavelengthInXYE) THEN
+! Only ask this once per file.
+        NoWavelengthInXYE = .FALSE.
         IF (Confirm('For ease of use, DASH now interprets a single number on the first line of an .xye file as a wavelength.'//CHAR(13)// &
                     'The file you are using does not contain a wavelength yet.'//CHAR(13)// &
                     'Would you like to write the wavelength you have just entered to the file'//CHAR(13)// &
                     FNAME(1:LEN_TRIM(FNAME))//' ?')) THEN
-! Only ask this once per file.
-          NoWavelengthInXYE = .FALSE.
           tFileHandle = 10
           OPEN(UNIT=tFileHandle,FILE=FNAME(1:LEN_TRIM(FNAME)),ERR=999)
           WRITE(tFileHandle,'(F9.5)') TheWaveLength
