@@ -62,8 +62,10 @@
                 CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
                 CALL WDialogPutRadioButton(IDF_PW_Option4)
                 CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+                CALL SelectMode(ID_Peak_Fitting_Mode)
               ELSE
                 CALL WizardWindowShow(IDD_SA_input3)
+                CALL SelectMode(ID_Structure_Solution_Mode)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL WDialogSelect(IDD_OutputSolutions)
