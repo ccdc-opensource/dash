@@ -245,6 +245,7 @@
                 CASE (6) ! Rietveld refinement
                   CALL WizardWindowShow(IDD_SAW_Page6)
                   CALL WDialogFieldState(IDNEXT, Disabled)
+                  CALL WDialogFieldState(IDB_Restart, Disabled)
               END SELECT
           END SELECT
       END SELECT
