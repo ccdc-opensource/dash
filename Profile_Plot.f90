@@ -70,6 +70,59 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE Plot_Initialise
+
+      USE WINTERACTER
+
+      IMPLICIT NONE
+
+      INCLUDE 'POLY_COLOURS.INC'
+
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+
+      REAL            XPG1, XPG2, YPG1, YPG2
+      COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
+
+      INTEGER ISB
+      CHARACTER*(80) STATBARSTR(4:7)
+
+      CALL IGrSelect(1,0)
+      CALL IGrArea(0.0,0.0,1.0,1.0)
+      CALL IGrUnits(0.0,0.0,1.0,1.0)
+      CALL IGrAreaClear
+      CALL IGrCharSpacing('P') ! Proportional
+      CALL IGrCharFont(3)
+      CALL IGrColourN(KolNumMain)
+      CALL IPgScaling('LIN','LIN')
+! Draw axes and add scales
+      CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
+      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
+      CALL IRealToString(xpgmin,statbarstr(4)(1:),'(F10.3)')
+      CALL IRealToString(xpgmax,statbarstr(5)(1:),'(F10.3)')
+      IF ((ypgmax-ypgmin) .LE. 100.0) THEN      
+        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(F10.3)')
+        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(F10.3)')
+      ELSE
+        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(F10.1)')
+        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(F10.1)')
+      END IF
+      DO ISB = 4, 7
+        CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
+      END DO
+      CALL IPgClipRectangle('P')
+      CALL IPgBorder
+
+      END SUBROUTINE Plot_Initialise
+!
+!*****************************************************************************
+!
       SUBROUTINE Plot_Calculated_Tics
 
       USE WINTERACTER
@@ -148,59 +201,6 @@
       CALL IGrRectangle(XPG1,YPG1,XPG2,YPG2)
 
       END SUBROUTINE Plot_Panel
-!
-!*****************************************************************************
-!
-      SUBROUTINE Plot_Initialise
-
-      USE WINTERACTER
-
-      IMPLICIT NONE
-
-      INCLUDE 'POLY_COLOURS.INC'
-
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
-
-      REAL            XPG1, XPG2, YPG1, YPG2
-      COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
-
-      INTEGER ISB
-      CHARACTER*(80) STATBARSTR(4:7)
-
-      CALL IGrSelect(1,0)
-      CALL IGrArea(0.0,0.0,1.0,1.0)
-      CALL IGrUnits(0.0,0.0,1.0,1.0)
-      CALL IGrAreaClear
-      CALL IGrCharSpacing('P') ! Proportional
-      CALL IGrCharFont(3)
-      CALL IGrColourN(KolNumMain)
-      CALL IPgScaling('LIN','LIN')
-! Draw axes and add scales
-      CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
-      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
-      CALL IRealToString(xpgmin,statbarstr(4)(1:),'(F10.3)')
-      CALL IRealToString(xpgmax,statbarstr(5)(1:),'(F10.3)')
-      IF ((ypgmax-ypgmin) .LE. 100.0) THEN      
-        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(F10.3)')
-        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(F10.3)')
-      ELSE
-        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(F10.1)')
-        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(F10.1)')
-      END IF
-      DO ISB = 4, 7
-        CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-      END DO
-      CALL IPgClipRectangle('P')
-      CALL IPgBorder
-
-      END SUBROUTINE Plot_Initialise
 !
 !*****************************************************************************
 !
@@ -301,7 +301,11 @@
       LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
       INTEGER I
       REAL sizmtem, xtem, ytem, xgtem, ygtem
+      INTEGER iStart, iStop, nPoints
 
+      iStart = MAX(   1, IPMIN-1)
+      iStop  = MIN(NBIN, IPMAX+1)
+      nPoints = 1 + iStop - iStart
       CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
 ! Do the error bars - we've precalculated the min & max pointers
@@ -319,12 +323,10 @@
           CALL IGrLineTo(xgtem,ygtem)
         ENDDO
       ENDIF
-!      CALL IPgNewGraph(1,NBIN,' ',' ','XY')
-! Must allow options here ...      CALL IPgStyle(1,0,3,0,KolNumCal,KolNumObs)
       IF (ConnectPointsObs()) THEN
-        CALL IPgNewPlot(PgPolyLine,   1,NBIN)
+        CALL IPgNewPlot(PgPolyLine,   1,nPoints)
       ELSE
-        CALL IPgNewPlot(PgScatterPlot,1,NBIN)
+        CALL IPgNewPlot(PgScatterPlot,1,nPoints)
       ENDIF
       IF (ConnectPointsObs()) THEN
         CALL IPgStyle(1,14,3,0,KolNumObs,KolNumObs)
@@ -332,14 +334,14 @@
         CALL IPgStyle(1,14,3,0,0,KolNumObs)
       ENDIF
 ! 13 specifies a square
-      CALL IPgMarker( 1, 13)
-      sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
+      CALL IPgMarker(1, 13)
+      sizmtem = marker_size*FLOAT(500)/FLOAT(IPMAX-IPMIN)
       sizmtem = MIN(marker_size,sizmtem)
       CALL IGrCharSize(sizmtem,sizmtem)
       IF (ConnectPointsObs()) THEN
-        CALL IPgXYPairs(XBIN,YOBIN)
+        CALL IPgXYPairs(XBIN(iStart:),YOBIN(iStart:))
       ELSE
-        CALL IPgScatterPlot(XBIN,YOBIN)
+        CALL IPgScatterPlot(XBIN(iStart:),YOBIN(iStart:))
       ENDIF
       CALL IGrColourN(KolNumMain)
 
@@ -384,26 +386,30 @@
       INTEGER I, II 
       REAL    sizmtem, xtem, ytem, xgtem, ygtem
       LOGICAL tGet_ShowCumChiSqd, tGet_DivideByEsd
+      INTEGER iStart, iStop, nPoints
 
       tGet_ShowCumChiSqd = Get_ShowCumChiSqd()
       tGet_DivideByEsd = Get_DivideByEsd()
       CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
+      iStart = MAX(   1, IPMIN-1)
+      iStop  = MIN(NBIN, IPMAX+1)
+      nPoints = 1 + iStop - iStart
 ! The y-values of the difference profile.
       YADD = 0.5*(YPGMAX+YPGMIN)
       IF (tGet_DivideByEsd) THEN
-        DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
+        DO II = iStart, iStop
           YDIF(II) = YADD + (YOBIN(II) - YCBIN(II))*AVGESD/EBIN(II)
         ENDDO
       ELSE
-        DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
+        DO II = iStart, iStop
           YDIF(II) = YADD + YOBIN(II) - YCBIN(II)
         ENDDO
       ENDIF
       IF (tGet_ShowCumChiSqd) THEN
-        CALL IPgNewPlot(PgPolyLine,4,NBIN)
+        CALL IPgNewPlot(PgPolyLine,4,nPoints)
       ELSE
-        CALL IPgNewPlot(PgPolyLine,3,NBIN)
+        CALL IPgNewPlot(PgPolyLine,3,nPoints)
       ENDIF
       CALL IPgStyle(2,0,0,0,KolNumDif,0)
 ! Q & D hack
@@ -414,18 +420,18 @@
       ENDIF
 ! Calculated
       CALL IPgStyle(3,0,0,0,KolNumCal,0)
-! Cummulative profile chi-squared
+! Cumulative profile chi-squared
       IF (tGet_ShowCumChiSqd) CALL IPgStyle(4,0,0,0,KolNumMTic,0)
 ! The following four lines set the markers for the observed profile.
       CALL IPgMarker( 2, 13)
-      sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
+      sizmtem = marker_size*FLOAT(500)/FLOAT(IPMAX-IPMIN)
       sizmtem = MIN(marker_size,sizmtem)
       CALL IGrCharSize(sizmtem,sizmtem)
 ! Draw the observed profile. Markers can still be used. Consecutive data points are joined 
 ! by lines. These can be straight or splines
-      CALL IPgXYPairs(XBIN,YOBIN)
+      CALL IPgXYPairs(XBIN(iStart:),YOBIN(iStart:))
 ! Now draw the difference plofile
-      CALL IPgXYPairs(XBIN,YDIF)
+      CALL IPgXYPairs(XBIN(iStart:),YDIF(iStart:))
 ! Do the error bars - we've precalculated the min & max pointers
       CALL IGrColourN(KolNumObs)
       IF (PlotErrorBars()) THEN
@@ -441,8 +447,8 @@
           CALL IGrLineTo(xgtem,ygtem)
         ENDDO
       ENDIF
-      CALL IPgXYPairs(XBIN,YCBIN)
-      IF (tGet_ShowCumChiSqd) CALL IPgXYPairs(XBIN,CummChiSqd)
+      CALL IPgXYPairs(XBIN(iStart:),YCBIN(iStart:))
+      IF (tGet_ShowCumChiSqd) CALL IPgXYPairs(XBIN(iStart:),CummChiSqd(iStart:))
       CALL IGrCharSize(1.0,1.0)
       CALL IGrColourN(KolNumMain)
 
@@ -514,19 +520,19 @@
       iord_peak = 0
       DO i = 1, NumPeakFitRange
 ! Draw the hatched rectangle indicating the area swept out by the user
-        CALL IGrColourN(KolNumPanelDark)
-        CALL IGrFillPattern(Hatched,Medium,DiagUp)
         CALL IPgUnitsToGrUnits(XPF_Range(1,i),ypgmin,gxleft,gybot)
         CALL IPgUnitsToGrUnits(XPF_Range(2,i),ypgmax,gxright,gytop)
         gxleft  = MAX(gxleft,xggmin)
         gxleft  = MIN(gxleft,xggmax)
         gxright = MIN(gxright,xggmax)
         gxright = MAX(gxright,xggmin)
+        CALL IGrColourN(KolNumPanelDark)
+        CALL IGrFillPattern(Hatched,Medium,DiagUp)
         CALL IGrRectangle(gxleft,gybot,gxright,gytop) 
 ! Then the fitted peak
         ipf1 = IPF_RPt(i) + 1
         ipf2 = IPF_RPt(i+1)
-! Now we do a quick check to see if the range has been set
+! Now we do a quick check to see if the range has been fitted
         IF (RangeFitYN(i)) THEN
           IF (XPeakFit(ipf2) .GT. xpgmin .AND. XPeakFit(ipf1) .LT. xpgmax) THEN
 ! We can plot the calculated fit
