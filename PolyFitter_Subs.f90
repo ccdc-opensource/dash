@@ -285,7 +285,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Get_IPMaxMin()
+      SUBROUTINE Get_IPMaxMin
 
       INCLUDE 'PARAMS.INC'
 
@@ -672,6 +672,26 @@
             ENDIF
           ENDIF
 ! We've got ourselves a new initial peak position
+        CASE (KeyInsert)
+! Insert next peak
+! Are we in a peak range?
+          CALL DetermineCurrentPeakFitRange(XCur(2))
+          IF (CurrentRange .NE. 0) THEN
+            NTPeak = NumInPFR(CurrentRange) + 1
+            CALL INC(NumInPFR(CurrentRange))
+! Add a peak, mark the hatched area as 'not fitted'
+            RangeFitYN(CurrentRange) = .FALSE.
+            XPF_Pos(NTPeak,CurrentRange) = XCur(2)
+            ATem = ABS(XCur(2)-XBIN(IPF_Lo(CurrentRange)))
+            DO IP = IPF_Lo(CurrentRange), IPF_Hi(CurrentRange)
+              ANew = ABS(XCur(2)-XBIN(IP))
+              IF (ANew.LE.ATem) THEN
+                ATem = ANew
+                YPF_Pos(NTPeak,CurrentRange) = YOBIN(IP)
+              ENDIF
+            ENDDO
+            CALL Profile_Plot
+          ENDIF
         CASE (48,KeyReturn)
 ! KeyNumber=0 or KeyReturn: get ready to fit peaks ...
 ! Check if in a peak range - if not tell the user...
