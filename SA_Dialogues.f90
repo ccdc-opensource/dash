@@ -90,16 +90,24 @@
 ! Go to the next stage of the SA input
 ! Grey out 'Load DASH Pawley file' button on toolbar
               CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOff)
+              CALL WDialogSelect(IDD_SAW_Page1)
+              DO iFrg = 1, maxfrg
+                IF (gotzmfile(iFrg)) THEN
+! Get the number of copies to use. If zero, set gotzmfile to .FALSE.
+                  CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+                  IF (zmNumberOfCopies(iFrg) .EQ. 0) gotzmfile(iFrg) = .FALSE.
+                ENDIF
+              ENDDO
+              CALL SA_Parameter_Set
+              CALL WizardWindowShow(IDD_SA_input2)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizardPastPawley
+            CASE (IDB_PO)
+! Go to the next stage of the SA input
+! Grey out 'Load DASH Pawley file' button on toolbar
+              CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOff)
 ! Initialise the 'Additional SA Parameters' dialogue
               CALL WDialogSelect(IDD_SAW_Page2)
-! Set PO checkbox to 'Do not use preferred orientation'
-              CALL WDialogPutCheckBoxLogical(IDF_Use_PO,.FALSE.)
-              CALL WDialogFieldState(IDF_PO_a,Disabled)
-              CALL WDialogFieldState(IDF_PO_b,Disabled)
-              CALL WDialogFieldState(IDF_PO_c,Disabled)
-              CALL WDialogFieldState(IDF_LABELa,Disabled)
-              CALL WDialogFieldState(IDF_LABELb,Disabled)
-              CALL WDialogFieldState(IDF_LABELc,Disabled)
               DO iFrg = 1, maxfrg
                 IF (gotzmfile(iFrg)) THEN
 ! Get the number of copies to use. If zero, set gotzmfile to .FALSE.
@@ -128,8 +136,6 @@
                 ENDIF
               ENDDO
               CALL WizardWindowShow(IDD_SAW_Page2)
-            CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizardPastPawley
             CASE (IDB_SA_Project_Browse)
               CALL SDIFileBrowse
             CASE (IDB_SA_Project_Open)
