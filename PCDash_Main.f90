@@ -120,6 +120,7 @@
       SUBROUTINE ProcessMenu
 !
 !   This subroutine processes the menu selections
+! This includes the toolbar
 !
       USE WINTERACTER
       USE DRUID_HEADER
@@ -180,11 +181,13 @@
           IF (NumPawleyRef .EQ. 0) THEN
             IF (.NOT. Confirm('Lattice constants may not have been refined'//CHAR(13)//&
                               'Do you wish to continue?')) RETURN
-          END IF
+          ENDIF
           CALL SelectMode(ID_Pawley_Refinement_Mode)
           CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)
           CALL ShowWizardWindowZmatrices
+        CASE (ID_ClearPeakFitRanges)
+          IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Init_PeakFitRanges
         CASE (ID_get_crystal_symmetry)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
