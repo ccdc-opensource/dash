@@ -197,7 +197,6 @@
       OPEN(UNIT=hPrjFile,FILE=ThePrjFile,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       iPrjRecNr = 1
 ! Read / Write the header
-! @@ Reading this string will go wrong if we read a version like "DASH 2.1.2" into a CHARACTER*(8)
       tString = ProgramVersion//' project file'
       CALL FileRWString(hPrjFile,iPrjRecNr,RW,tString)
 ! Read / Write radiation source
