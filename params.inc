@@ -92,3 +92,8 @@
 
       INTEGER     MaxAtm_4
       PARAMETER	( MaxAtm_4 = 150)
+! Maximum number of atoms
+
+      INTEGER     MaxNumT
+      PARAMETER	( MaxNumT = 50)
+! Maximum number of Temperatures for parallel tempering
