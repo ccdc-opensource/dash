@@ -1,586 +1,3 @@
-! JvdS The following routine is 733 lines
-!
-      SUBROUTINE SA_MAIN()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-!
-! Define some parameters to match those in the resource file
-!
-      CHARACTER*80 SDIFile
-      REAL         rpos
-      INTEGER      ipos
-      INTEGER      IFlags
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'IZMCheck.inc'
-      INCLUDE 'DialogPosCmn.inc'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
-
-      INTEGER IDFZMCheck(CheckSize)
-      INTEGER IDBZMBrowse(CheckSize),IDFZMpars(CheckSize),IDFZMFile(CheckSize)
-      INTEGER II
-
-      PARAMETER (NMAX = 100, MXEPS = 10)
-      DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
-      COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
-
-      INTEGER  MAXEVL, IPRINT
-
-      PARAMETER (mvar=100)
-      DOUBLE PRECISION x,lb,ub,vm,xpreset
-      COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
-
-      DOUBLE PRECISION prevub, prevlb ! For saving the previous range
-      COMMON /pvalues/ prevub(mvar), prevlb(mvar)
-      COMMON /presetr/ xpreset(mvar)
-      LOGICAL log_preset
-      COMMON /presetl/ log_preset
-
-      DOUBLE PRECISION T0,rt
-      COMMON /saparl/ T0,rt
-      INTEGER  NS, NT, IER, ISEED1, ISEED2
-      COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-
-      REAL tiso, occ
-      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
-      DOUBLE PRECISION blen, alph, bet, f2cmat
-      INTEGER ioptb, iopta, ioptt, iz1, iz2, iz3
-      COMMON /zmcomi/ ntatm, natoms(maxfrg), &
-        ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
-        iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
-      COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
-        bet(maxatm,maxfrg),f2cmat(3,3)
-      CHARACTER*3     asym
-      CHARACTER*5                          OriginalLabel
-      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
-      INTEGER nfrag
-      COMMON /frgcom/ nfrag
-      CHARACTER*80 frag_file
-      COMMON /frgcha/ frag_file(maxfrg)
-      CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmpar(maxfrg),&
-        czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
-      LOGICAL gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
-
-      COMMON /POSNS/NATOM,XATO(3,150),KX(3,150),AMULT(150),&
-        TF(150),KTF(150),SITE(150),KSITE(150),&
-        ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
-!
-! JCC Added in declarations
-! The implementation has changed - this is now a function
-      INTEGER Read_One_Zm
-      INTEGER zmread
-      INTEGER NextEnabled
-      LOGICAL LimsChanged
-      DATA LimsChanged / .FALSE. /
-      SAVE LimsChanged
-      LOGICAL ZmStateChanged
-      LOGICAL NoZmatrix
-      LOGICAL Confirm ! Function
-      INTEGER IHANDLE
-      INTEGER IZMVB(1:CheckSize)
-
-!.. If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
-      IF (FromPawleyFit) THEN
-! JvdS GET_LOGREF and GETTIC do the same thing.
-        CALL GET_LOGREF(DashTicFile,LEN_TRIM(DashTicFile),IER)
-        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),IER)
-        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
-      END IF
-      CALL SA_Defaults()
-      IDFZMCheck(1)=IDF_ZM_file_check1
-      IDFZMCheck(2)=IDF_ZM_file_check2
-      IDFZMCheck(3)=IDF_ZM_file_check3
-      IDFZMCheck(4)=IDF_ZM_file_check4
-      IDFZMCheck(5)=IDF_ZM_file_check5
-      IDFZMFile(1)=IDF_ZMatrix_file1
-      IDFZMFile(2)=IDF_ZMatrix_file2
-      IDFZMFile(3)=IDF_ZMatrix_file3
-      IDFZMFile(4)=IDF_ZMatrix_file4
-      IDFZMFile(5)=IDF_ZMatrix_file5
-      IDBZMBrowse(1)=IDB_ZMatrix_Browse1
-      IDBZMBrowse(2)=IDB_ZMatrix_Browse2
-      IDBZMBrowse(3)=IDB_ZMatrix_Browse3
-      IDBZMBrowse(4)=IDB_ZMatrix_Browse4
-      IDBZMBrowse(5)=IDB_ZMatrix_Browse5
-      IDFZMpars(1)=IDF_ZM_pars1
-      IDFZMpars(2)=IDF_ZM_pars2
-      IDFZMpars(3)=IDF_ZM_pars3
-      IDFZMpars(4)=IDF_ZM_pars4
-      IDFZMpars(5)=IDF_ZM_pars5
-      IZMVB(1) = IDB_ZMatrixView1
-      IZMVB(2) = IDB_ZMatrixView2
-      IZMVB(3) = IDB_ZMatrixView3
-      IZMVB(4) = IDB_ZMatrixView4
-      IZMVB(5) = IDB_ZMatrixView5
-
-! Message loop for the first SA window
-! JvdS Started to add SA to Wizard
-!      CALL WDialogSelect(IDD_SA_input1)
-      CALL WDialogSelect(IDD_SAW_Page1)
-! JCC I've moved this lot to a separate subroutine. We want to 
-! Remember the files/data etc, so only call this on first entry
-      CALL ClearZmatrices(IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse)
-      NoZmatrix = .TRUE.
- 222  CONTINUE
-! JvdS Started to add SA to Wizard
-!      CALL WDialogSelect(IDD_SA_input1)
-      CALL WDialogSelect(IDD_SAW_Page1)
-      IF (FromPawleyFit) THEN
-! JCC Added
-        NoData = .FALSE.
-        CALL WDialogClearField(IDF_SA_Project_Name)
-        CALL WDialogFieldState(IDF_SA_Project_Name,Disabled)
-        CALL WDialogFieldState(IDB_SA_Project_Browse,Disabled)
-        CALL WDialogFieldState(IDB_SA_Project_Open,Disabled)
-        CALL WDialogFieldState(IDF_SA_project_name_label,Disabled)
-      ELSE
-        CALL WDialogFieldState(IDF_SA_Project_Name,Enabled)
-        CALL WDialogFieldState(IDB_SA_Project_Browse,Enabled)
-        CALL WDialogFieldState(IDB_SA_Project_Open,Enabled)
-        CALL WDialogFieldState(IDF_SA_project_name_label,Enabled)
-      END IF
-      IF (ConvOn) THEN
-        CALL WDialogFieldState(IDF_SA_Project_Import,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDF_SA_Project_Import,Disabled)
-      END IF
-      ZmStateChanged = .TRUE.
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-      DO WHILE (.TRUE.)                  ! Loop until user terminates
-! Let's check the z-matrix check boxes
-        IF (ZmStateChanged) THEN
-          DO II = 1, CheckSize
-            CALL WDialogGetCheckBox(IDFZMCheck(II),IZMCheck(II))
-          END DO
-          DO II = 1, CheckSize
-            IF ((IZMCheck(II) .EQ. Checked) .OR. gotzmfile(II) ) THEN
-              CALL WDialogFieldState(IDFZMFile(II),Enabled)
-              CALL WDialogFieldState(IDBZMBrowse(II),Enabled)
-              CALL WDialogFieldState(IDFZMPars(II),Enabled)
-              NextEnabled = II + 1
-            ELSE
-              CALL WDialogFieldState(IDFZMFile(II),Disabled)
-              CALL WDialogFieldState(IDBZMBrowse(II),Disabled)
-              CALL WDialogFieldState(IDFZMPars(II),Disabled)
-              IF (II .LT. 5) THEN
-                DO jj = II + 1, CheckSize
-                  CALL WDialogFieldState(IDFZMCheck(jj),Disabled)
-                  CALL WDialogPutCheckBox(IDFZMCheck(jj),Unchecked)
-                  CALL WDialogFieldState(IDFZMFile(jj),Disabled)
-                  CALL WDialogFieldState(IDBZMBrowse(jj),Disabled)
-                  CALL WDialogFieldState(IDFZMPars(jj),Disabled)
-                END DO
-              END IF
-            END IF
-          END DO
-          IF (NextEnabled .LT. CheckSize) THEN
-            CALL WDialogPutCheckBox(IDFZMCheck(NextEnabled),Unchecked)
-          END IF
-          ZmStateChanged = .FALSE.
-        END IF
-        CALL WDialogSelect(IDD_SAW_Page1)
-! Enable or disable the "Next" button
-        IF (NoZmatrix) THEN
-          CALL WDialogFieldState(IDNEXT,Disabled)
-        ELSE
-          CALL WDialogFieldState(IDNEXT,Enabled)
-        END IF
-! Start the message loop
-        CALL GetEvent
-        SELECT CASE (EventType)
-          CASE (PushButton)
-            SELECT CASE (EventInfo%VALUE1)
-! JCC Add in new 'clear' button
-            CASE (IDF_clear_zmatrix)
-              CALL ClearZmatrices(IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse)
-              NoZmatrix = .TRUE.
-              ZmStateChanged = .TRUE.                               
-            CASE (IDBACK)
-! Go back to the Pawley refinement or the initial wizard
-! JvdS Started to add SA to Wizard
-!              CALL WDialogSelect(IDD_SA_input1)
-              CALL WDialogSelect(IDD_SAW_Page1)
-! Window will be removed, save current position
-              IXPos_IDD_Wizard = WInfoDialog(6)
-              IYPos_IDD_Wizard = WInfoDialog(7)
-              CALL WDialogHide()
-              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-              IPTYPE = 2
-              RETURN
-            CASE (IDCANCEL, IDCLOSE)
-              CALL WDialogSelect(IDD_SAW_Page1)
-              CALL EndWizardCommon
-              IPTYPE = 2
-              RETURN
-            CASE (IDNEXT)
-! Go to the next stage of the SA input
-! JvdS Started to add SA to Wizard
-!      CALL WDialogSelect(IDD_SA_input1)
-              CALL WDialogSelect(IDD_SAW_Page1)
-! Window will be removed, save current position
-              IXPos_IDD_Wizard = WInfoDialog(6)
-              IYPos_IDD_Wizard = WInfoDialog(7)
-              CALL WDialogHide()
-              CALL SA_Parameter_Set
-              GOTO 444
-            CASE (IDB_SA_Project_Browse)
-             IF (.NOT. FromPawleyFit) CALL SDIFileBrowse
-            CASE (IDB_SA_Project_Open)
-              CALL WDialogSelect(IDD_SAW_Page1)
-              SDIFile = ' '
-              CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
-              CALL SDIFileOpen(SDIFile)
-            CASE (IDB_SA_Project_Import)
-!>> JCC Import .. convert a mol/pdb/mol2 file into a zmatrix
-              CALL ImportZmatrix
-            CASE (IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, &
-                  IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
-              ZmStateChanged = .TRUE.
-              ifrg = 1
-              DO WHILE (ifrg .LT. CheckSize .AND. IDBZMBrowse(ifrg) .NE. EventInfo%VALUE1)
-                ifrg = ifrg + 1
-              ENDDO
-! JvdS @ The following contains too many errors for a quick fix: needs rewriting
-              gotzmfile(ifrg) = .FALSE.
-              frag_file(ifrg) = ' '
-              IFlags = PromptOn + DirChange + AppendExt
-              CALL WSelectFile('z-matrix file (*.zmatrix)|*.zmatrix|', &
-                   IFlags,frag_file(ifrg),'Load z-matrix file')
-! JCC Need to check here to see if the user hit cancel
-! So I added a check here
-              IF (frag_file(ifrg) .NE. ' ') THEN
-                zmread = Read_One_ZM(ifrg)
-                IF (zmread .EQ. 0) THEN ! successful read
-! JvdS Started to add SA to Wizard
-!      CALL WDialogSelect(IDD_SA_input1)
-                  CALL WDialogSelect(IDD_SAW_Page1)
-                  CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
-! done within Read_One_ZM >>              gotzmfile(ifrg)=.true.
-! Now update the front end widget
-                  DO II = 1, CheckSize
-                    CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
-                  END DO
-                  CALL UpdateZmatrixSelection(IDFZMPars)
-! Set the next dialogue on
-                  IF (ifrg .LT. CheckSize) THEN
-                    CALL WDialogFieldState(IDFZMCheck(ifrg+1),Enabled)
-                    CALL WDialogFieldState(IDFZMCheck(ifrg+1),Enabled)
-                  END IF
-! JCC traps for zmatrix reading
-                  NoZmatrix = .FALSE.
-                ELSE 
-                   CALL FileErrorPopup(frag_file(ifrg),zmread)
-                END IF ! If the read on the zmatrix was ok
-              END IF  ! If the user selected a file
-! View individual z-matrices in Mercury
-            CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
-              ifrg = 1
-              DO WHILE (ifrg .LT. CheckSize .AND. IZMVB(ifrg) .NE. EventInfo%VALUE1)
-                ifrg = ifrg + 1
-              ENDDO
-              IF (.NOT. gotzmfile(ifrg)) THEN
-                CALL ErrorMessage('File not found.')
-              ELSE
-                CALL ViewZmatrix(ifrg)
-              ENDIF
-          END SELECT
-          CASE (FieldChanged)
-            SELECT CASE(EventInfo%VALUE1)
-! JCC Also act on selection of check box
-              CASE (IDF_ZM_file_check1,IDF_ZM_file_check2,IDF_ZM_file_check3,&
-                IDF_ZM_file_check4,IDF_ZM_file_check5)
-! Update the selection
-                DO II = 1, 5
-                  CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
-                END DO
-                CALL UpdateZmatrixSelection(IDFZMPars)
-                ZmStateChanged = .TRUE.        
-            END SELECT
-        END SELECT
-      END DO
-! We are now on window number 2
- 444  CALL WDialogSelect(IDD_SA_input2)
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-      DO WHILE (.TRUE.)                                ! Loop until user terminates
-        CALL GetEvent
-        SELECT CASE (EventType)
-! Interact with the main window and look at the Pawley refinement...
-          CASE (PushButton)
-            SELECT CASE (EventInfo%VALUE1)
-              CASE (IDCANCEL, IDCLOSE)
-                CALL EndWizardCommon
-                IPTYPE = 2
-                RETURN
-              CASE (IDBACK)
-! Go back to the 1st window
-! JCC Check if the limits have changed and warn about it 
-                IF (LimsChanged) THEN
-                  IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
-                END IF
-                IF (.NOT. LimsChanged) THEN
-                  IXPos_IDD_Wizard = WInfoDialog(6)
-                  IYPos_IDD_Wizard = WInfoDialog(7)
-                  CALL WDialogHide()
-                  GOTO 222
-                END IF
-              CASE (IDNEXT)
-! Go to the next stage of the SA input
-                IXPos_IDD_Wizard = WInfoDialog(6)
-                IYPos_IDD_Wizard = WInfoDialog(7)
-                CALL WDialogHide() 
-                GOTO 777
-            END SELECT
-          CASE (FieldChanged)
-            SELECT CASE (EventInfo%VALUE1)
-              CASE (IDF_parameter_grid)
-                CALL WGridPos(EventInfo%X,IFCol,IFRow)
-                SELECT CASE (IFCol)
-                CASE (1)
-!.. parameter
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid,5,IFRow,ICHK)
-                  IF (ICHK .EQ. Checked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid,IFCol,IFRow,xtem)
-                    xtem = MAX(SNGL(lb(IFRow)),xtem)
-                    IF (ABS(xtem - x(IFRow)) .GT. 0.000001) LimsChanged = .TRUE.
-                    X(IFRow)=DBLE(MIN(SNGL(ub(IFRow)),xtem))
-                    CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,sngl(x(IFRow)),'(F12.5)')
-                  END IF
-                CASE (2)
-!.. lower bound
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid,5,IFRow,ICHK)
-                  IF (ICHK .EQ. Checked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid,IFCol,IFRow,xtem)
-                    xtem = MIN(SNGL(ub(IFRow)),xtem)
-                    IF (ABS(xtem - lb(IFRow)) .GT. 0.000001) LimsChanged = .TRUE.
-                    lb(IFRow) = DBLE(xtem)
-                    prevlb(IFRow) = lb(IFRow)
-                    CALL WGridPutCellReal(IDF_parameter_grid,2,IFRow,SNGL(lb(IFRow)),'(F12.5)')
-                    xtem = MAX(lb(IFRow),x(IFRow))
-                    X(IFRow) = DBLE(xtem)
-                    CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,SNGL(x(IFRow)),'(F12.5)')
-                  END IF
-                CASE (3)
-!.. upper bound
-! JCC Check the bounding - only update if parameter is set to vary
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid,5,IFRow,ICHK)
-                  IF (ICHK .EQ. Checked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid,IFCol,IFRow,xtem)
-                    xtem = MAX(SNGL(lb(IFRow)),xtem)
-                    IF (ABS(xtem - ub(IFRow)) .GT. 0.000001) LimsChanged = .TRUE.
-                    ub(IFRow) = DBLE(xtem)
-                    prevub(IFRow) = ub(IFRow)
-                    CALL WGridPutCellReal(IDF_parameter_grid,3,IFRow,SNGL(ub(IFRow)),'(F12.5)')
-                    xtem = MIN(ub(IFRow),x(IFRow))
-                    X(IFRow) = DBLE(xtem)
-                    CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,SNGL(x(IFRow)),'(F12.5)')
-                  END IF
-                CASE (4, 5)
-!.. fix or vary
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid,IFCol,IFRow,ICHK)
-                  IF ( (IFCol .EQ. 4 .AND. ICHK .EQ. Checked) .OR. &
-                       (IFCol .EQ. 5 .AND. ICHK .EQ. UnChecked) ) THEN
-                    CALL WGridPutCellCheckBox(IDF_parameter_grid,4,IFRow,Checked)
-                    CALL WGridPutCellCheckBox(IDF_parameter_grid,5,IFRow,UnChecked)
-                    CALL WGridGetCellReal(IDF_parameter_grid,1,IFRow,xtem)
-                    lb(IFRow) = DBLE(xtem-1.e-5)
-                    ub(IFRow) = DBLE(xtem+1.e-5)
-                    CALL WGridPutCellReal(IDF_parameter_grid,2,IFRow,SNGL(lb(IFRow)),'(F12.5)')
-                    CALL WGridPutCellReal(IDF_parameter_grid,3,IFRow,SNGL(ub(IFRow)),'(F12.5)')
-                    CALL WGridStateCell(IDF_parameter_grid,1,IFRow,DialogReadOnly)
-                    CALL WGridStateCell(IDF_parameter_grid,2,IFRow,DialogReadOnly)
-                    CALL WGridStateCell(IDF_parameter_grid,3,IFRow,DialogReadOnly)
-                  ELSE
-                    CALL WGridPutCellCheckBox(IDF_parameter_grid,4,IFRow,UnChecked)
-                    CALL WGridPutCellCheckBox(IDF_parameter_grid,5,IFRow,Checked)
-                    lb(IFRow)=prevlb(IFRow)
-                    ub(IFRow)=prevub(IFRow)
-                    CALL WGridPutCellReal(IDF_parameter_grid,2,IFRow,SNGL(lb(IFRow)),'(F12.5)')
-                    CALL WGridPutCellReal(IDF_parameter_grid,3,IFRow,SNGL(ub(IFRow)),'(F12.5)')
-                    CALL WGridStateCell(IDF_parameter_grid,1,IFRow,Enabled)
-                    CALL WGridStateCell(IDF_parameter_grid,2,IFRow,Enabled)
-                    CALL WGridStateCell(IDF_parameter_grid,3,IFRow,Enabled)
-                  END IF
-                  LimsChanged = .TRUE.
-!                Case(5)
-!.. vary
-!                  Call WGridGetCellCheckBox(IDF_parameter_grid,IFCol,IFRow,ICHK)
-
-! JCC Check the status here. This ensures that only messages that yield this grid position
-! are processed if the parameter is actually checked.
-!                         IF (ICHK .EQ. Checked) THEN
-!                       JCHK=1-ICHK
-!                               Call WGridPutCellCheckBox(IDF_parameter_grid,4,IFRow,JCHK)
-!                               lb(IFRow)=prevlb(IFRow)
-!                               ub(IFRow)=prevub(IFRow)  
-!                               CALL WGridPutCellReal(IDF_parameter_grid,2,IFRow,sngl(lb(IFRow)),'(F12.5)')
-!                               CALL WGridPutCellReal(IDF_parameter_grid,3,IFRow,sngl(ub(IFRow)),'(F12.5)')
-!                               CALL WGridStateCell(IDF_parameter_grid,1,IFRow,Enabled)
-!                               CALL WGridStateCell(IDF_parameter_grid,2,IFRow,Enabled)
-!                               CALL WGridStateCell(IDF_parameter_grid,3,IFRow,Enabled)
-
-!                               LimsChanged = .TRUE.
-!                         END IF
-                END SELECT ! IFCol
-            END SELECT ! EventInfo%Value1 Field Changed Options
-        END SELECT  ! ITYPE
-      ENDDO
-!.. We are now on window number 3
- 777  CALL WDialogSelect(IDD_SA_input3)
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-      T0 = 0.0
-      RPOS = T0
-      CALL WDialogPutReal(IDF_SA_T0,RPOS,'(F7.2)')
-      IPOS = 1000 - NINT(RPOS)
-      CALL WDialogPutTrackbar(IDF_SA_T0_trackbar,IPOS)
-      RT = 0.02
-      RPOS = RT
-      CALL WDialogPutReal(IDF_SA_Tredrate,RPOS,'(F6.3)')
-      IPOS = 501 - NINT(1000.*RPOS)
-      CALL WDialogPutTrackbar(IDF_SA_Tredrate_trackbar,IPOS)
-      JPOS = 20
-      CALL WDialogPutInteger(IDF_SA_NS,JPOS)
-      IPOS = 101 - JPOS
-      NS = JPOS
-      CALL WDialogPutTrackbar(IDF_SA_NS_trackbar,IPOS)
-      JPOS = 25
-      CALL WDialogPutInteger(IDF_SA_NT,JPOS)
-      IPOS = 101 - JPOS
-      NT = JPOS
-      CALL WDialogPutTrackbar(IDF_SA_NT_trackbar,IPOS)
-      NMoves = NT * NS * NVAR
-      CALL WDialogPutInteger(IDF_SA_Moves,NMoves)
-      DO WHILE (.TRUE.)                                ! Loop until user terminates
-        CALL GetEvent
-        SELECT CASE (EventType)
-!.. Interact with the main window and look at the Pawley refinement...
-          CASE (PushButton)
-            SELECT CASE (EventInfo%VALUE1)
-              CASE (IDCANCEL, IDCLOSE)
-                CALL EndWizardCommon
-                IPTYPE = 2
-                RETURN
-              CASE (IDBACK)
-! Go back to the 2nd window
-! Window is going to be removed: save current position
-                IXPos_IDD_Wizard = WInfoDialog(6)
-                IYPos_IDD_Wizard = WInfoDialog(7)
-                CALL WDialogHide()
-                GOTO 444
-              CASE (IDF_PrintSA)
-                CALL WriteSAParametersToFile
-                CALL WindowOpenChild(IHANDLE)
-                CALL WEditFile('SA_PARAMS.TXT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
-                CALL SetChildWinAutoClose(IHANDLE)
-              CASE (IDB_SA3_finish)
-! We've finished the SA input
-! Window is going to be removed: save current position
-                IXPos_IDD_Wizard = WInfoDialog(6)
-                IYPos_IDD_Wizard = WInfoDialog(7)
-                CALL WDialogHide()
-                GOTO 888
-            END SELECT
-          CASE (FieldChanged)
-            SELECT CASE (EventInfo%VALUE1)
-              CASE(IDF_SA_T0_trackbar)
-                IF (EventInfo%VALUE2 .EQ. IDF_SA_T0_trackbar) THEN
-                  CALL WDialogSelect(IDD_SA_input3)
-                  CALL WDialogGetTrackBar(IDF_SA_T0_trackbar,IPOS)
-                  RPOS = 1000 - IPOS
-                  T0 = RPOS
-                  CALL WDialogPutReal(IDF_SA_T0,RPOS,'(F7.2)')
-                END IF
-              CASE (IDF_SA_T0) 
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetReal(IDF_SA_T0,RPOS)
-                T0 = RPOS
-                IPOS=1000 - NINT(RPOS)
-                CALL WDialogPutTrackbar(IDF_SA_T0_trackbar,IPOS)
-              CASE (IDF_SA_Tredrate_trackbar)
-                IF (EventInfo%VALUE2 .EQ. IDF_SA_Tredrate_trackbar) THEN
-                  CALL WDialogSelect(IDD_SA_input3)
-                  CALL WDialogGetTrackBar(IDF_SA_Tredrate_trackbar,IPOS)
-                  RPOS = 0.001 * (501.-FLOAT(IPOS))
-                  RT = RPOS
-                  CALL WDialogPutReal(IDF_SA_Tredrate,RPOS,'(F6.3)')
-                END IF
-              CASE (IDF_SA_Tredrate) 
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetReal(IDF_SA_Tredrate,RPOS)
-                RT = RPOS
-                IPOS = 501 - NINT(1000.0 * RPOS)
-                CALL WDialogPutTrackbar(IDF_SA_Tredrate_trackbar,IPOS)
-              CASE (IDF_SA_NS_trackbar)
-                IF (EventInfo%VALUE2 .EQ. IDF_SA_NS_trackbar) THEN
-                  CALL WDialogSelect(IDD_SA_input3)
-                  CALL WDialogGetTrackBar(IDF_SA_NS_trackbar,IPOS)
-                  JPOS = 101 - IPOS
-                  CALL WDialogPutInteger(IDF_SA_NS,JPOS)
-                  NS = JPOS
-                  KPOS = NS * NT * NVAR
-                  CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
-                END IF
-              CASE (IDF_SA_NS) 
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetInteger(IDF_SA_NS,JPOS)
-                IPOS =101 - JPOS
-                NS = JPOS
-                CALL WDialogPutTrackbar(IDF_SA_NS_trackbar,IPOS)
-                KPOS = NS * NT * NVAR
-                CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
-              CASE (IDF_SA_NT_trackbar)
-                IF (EventInfo%VALUE2 .EQ. IDF_SA_NT_trackbar) THEN
-                  CALL WDialogSelect(IDD_SA_input3)
-                  CALL WDialogGetTrackBar(IDF_SA_NT_trackbar,IPOS)
-                  JPOS = 101 - IPOS
-                  CALL WDialogPutInteger(IDF_SA_NT,JPOS)
-                  NT = JPOS
-                  KPOS = NS * NT * NVAR
-                  CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
-                END IF
-              CASE (IDF_SA_NT) 
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetInteger(IDF_SA_NT,JPOS)
-                IPOS = 101 - JPOS
-                NT = JPOS
-                CALL WDialogPutTrackbar(IDF_SA_NT_trackbar,IPOS)
-                KPOS = NS * NT * NVAR
-                CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
-              CASE (IDF_SA_RandomSeed1) 
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetInteger(IDF_SA_RandomSeed1,ISeed1)
-              CASE (IDF_SA_RandomSeed2) 
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetInteger(IDF_SA_RandomSeed2,ISeed2)
-              CASE (IDF_SA_RandomSeed3) 
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetInteger(IDF_SA_RandomSeed3,ISeed3)
-            END SELECT
-        END SELECT
-      ENDDO ! End of Message loop
-!... We've finished the three SA input pages
- 888  CONTINUE
-      CALL MakRHm()
-      CALL CalCosArx()
-      CALL Create_AtomicWeightings
-      CALL BeginSA(IMyExit)
-      JMyExit = IMyExit
-      IMyExit = 0
-      SELECT CASE (JMyExit)
-        CASE(1)
-          GOTO 222
-        CASE(2)
-          GOTO 444
-        CASE(3)
-          GOTO 777
-      END SELECT
-
-      END SUBROUTINE SA_MAIN
 !
 !*****************************************************************************
 !
@@ -596,25 +13,80 @@
       CHARACTER*80    frag_file
       COMMON /frgcha/ frag_file(maxfrg)
 
-      INTEGER tFileHandle, I
-      REAL    R
+      INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+
+      INTEGER         izmpar
+      CHARACTER*36                    czmpar
+      INTEGER                                                kzmpar
+      REAL                                                                          xzmpar
+      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
+      
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+
+      LOGICAL         gotzmfile
+      COMMON /zmlgot/ gotzmfile(maxfrg)
+ 
+      INTEGER tFileHandle, I, kk, ifrg, ilen, II, Fixed
+      REAL    R, x, lb, ub
 
       CALL PushActiveWindowID
       tFileHandle = 10
       OPEN(tFileHandle,FILE='SA_PARAMS.TXT',ERR=999)
-      WRITE(tFileHandle,'("Parameters for simulated annealing in DASH")',ERR=999)
+      WRITE(tFileHandle,'("  Parameters for simulated annealing in DASH")',ERR=999)
+      CALL WDialogSelect(IDD_SA_input2)
+      kk = 0
+      DO ifrg = 1, maxfrg
+        IF (gotzmfile(ifrg)) THEN
+! Write the name of the file
+          ilen = LEN_TRIM(frag_file(ifrg))
+          WRITE(tFileHandle,*,ERR=999) '  Z-matrix '//frag_file(ifrg)(1:ilen)
+          DO ii = 1, izmpar(ifrg)
+            kk = kk + 1
+            ilen = LEN_TRIM(czmpar(ii,ifrg))
+            CALL WGridGetCellReal    (IDF_parameter_grid,1,kk,x)
+            CALL WGridGetCellCheckBox(IDF_parameter_grid,4,kk,Fixed)
+            IF (Fixed .EQ. 1) THEN
+              WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,A5)",ERR=999) czmpar(ii,ifrg),x,'Fixed'
+            ELSE
+              CALL WGridGetCellReal(IDF_parameter_grid,2,kk,lb)
+              CALL WGridGetCellReal(IDF_parameter_grid,3,kk,ub)
+              WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,F12.5,1X,F12.5)",ERR=999) czmpar(ii,ifrg),x,lb,ub
+            ENDIF
+          ENDDO
+        ENDIF
+      ENDDO
       CALL WDialogSelect(IDD_SA_input3)
       CALL WDialogGetInteger(IDF_SA_RandomSeed1,I)
-      WRITE(tFileHandle,'("Random seed 1 = ",I5)',ERR=999)  I
+      WRITE(tFileHandle,'("  Random seed 1 = ",I5)',ERR=999) I
       CALL WDialogGetInteger(IDF_SA_RandomSeed2,I)
-      WRITE(tFileHandle,'("Random seed 2 = ",I5)',ERR=999)  I
+      WRITE(tFileHandle,'("  Random seed 2 = ",I5)',ERR=999) I
       CALL WDialogGetReal(IDF_SA_T0,R)
       IF (R .EQ. 0.0) THEN
-        WRITE(tFileHandle,'("Initial temperature to be estimated by DASH")',ERR=999)
+        WRITE(tFileHandle,'("  Initial temperature = to be estimated by DASH")',ERR=999)
       ELSE
-        WRITE(tFileHandle,'("Initial temperature = ",F)',ERR=999)  R
+        WRITE(tFileHandle,'("  Initial temperature = ",F9.2)',ERR=999) R
       ENDIF
-
+      CALL WDialogGetReal(IDF_SA_Tredrate,R)
+      WRITE(tFileHandle,'("  Cooling rate = ",F8.4)',ERR=999) R
+      CALL WDialogGetInteger(IDF_SA_NS,I)
+      WRITE(tFileHandle,'("  N1 = ",I5)',ERR=999) I
+      CALL WDialogGetInteger(IDF_SA_NT,I)
+      WRITE(tFileHandle,'("  N2 = ",I5)',ERR=999) I
+      CALL WDialogGetInteger(IDF_SA_Moves,I)
+      WRITE(tFileHandle,'("  Number of moves at each temperature = ",I5)',ERR=999) I
+      CALL WDialogGetInteger(IDF_SA_MaxRepeats,I) ! Number of runs
+      IF (I .EQ. 1) THEN
+        WRITE(tFileHandle,'("  Single run, runs until user stops it")',ERR=999)
+      ELSE
+        WRITE(tFileHandle,'("  Number of runs = ",I5)',ERR=999) I
+        CALL WDialogGetInteger(IDF_SA_MaxMoves,I)
+        WRITE(tFileHandle,'("  Maximum number of moves per run = ",I10)',ERR=999) I
+        CALL WDialogGetReal(IDF_SA_ChiTest,R)
+        WRITE(tFileHandle,'("  A run will stop when the profile chi² is less than ",   &
+                F6.2," · ",F7.3," = ",F8.4)',ERR=999) R, PAWLEYCHISQ, R*PAWLEYCHISQ
+      ENDIF
 
       CLOSE(tFileHandle)
       CALL PopActiveWindowID
@@ -684,9 +156,9 @@
       ENDDO
       CALL AssignCSDElement(AtmElement)
 ! Show the mol2 file
-      IF (WriteMol2(temp_file(1:LEN_TRIM(temp_file))) .EQ. 1) CALL ViewStructure(temp_file(1:LEN_TRIM(temp_file)))
+      IF (WriteMol2(temp_file) .EQ. 1) CALL ViewStructure(temp_file)
 ! Show the z-matrix file in an editor window
-  999 CALL WindowOpenChild(IHANDLE)
+      CALL WindowOpenChild(IHANDLE)
       CALL WEditFile(frag_file(ifrg),Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
       CALL SetChildWinAutoClose(IHANDLE)
 
@@ -703,14 +175,11 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
-      INCLUDE 'IZMCheck.inc'
 
-      PARAMETER (NMAX = 100, MXEPS = 10)
-      DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
-      COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
+      PARAMETER (NMAX = 100)
+      DOUBLE PRECISION XOPT,CSH,XP,FOPT
+      COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),XP(NMAX),FOPT
 
-      REAL tiso, occ
-      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen,alph,bet,f2cmat
 ! JCC Handle via the PDB standard
       DOUBLE PRECISION f2cpdb
@@ -740,16 +209,14 @@
 
       DOUBLE PRECISION T0,rt
       COMMON /saparl/ T0,rt
-      INTEGER  NS, NT, ISEED1, ISEED2
-      INTEGER  MAXEVL, IPRINT
-      COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
+      INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
 
       CHARACTER*36 parlabel(mvar)
 
       CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmpar(maxfrg),&
-            czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
-      LOGICAL gotzmfile
+      COMMON /zmnpar/ izmpar(maxfrg),czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
+      LOGICAL         gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
 
       DOUBLE PRECISION dcel(6)
@@ -762,13 +229,13 @@
       CALL CREATE_FOB()
       kk = 0
 ! JCC Run through all possible fragments
-      DO ifrg = 1, CheckSize
+      DO ifrg = 1, maxfrg
 ! Only include those that are now checked
-        IF (IZMCheck(ifrg) .EQ. Checked) THEN
+        IF (gotzmfile(ifrg)) THEN
           DO ii = 1, izmpar(ifrg)
             kk = kk + 1
-            x(kk)=xzmpar(ii,ifrg)
-            parlabel(kk)=czmpar(ii,ifrg)
+            x(kk) = xzmpar(ii,ifrg)
+            parlabel(kk) = czmpar(ii,ifrg)
             SELECT CASE(kzmpar(ii,ifrg))
               CASE (1) !.. position
                 lb(kk) = 0.0
@@ -799,26 +266,26 @@
                 ub(kk) = x(kk)/0.9
                 vm(kk) = 0.1*(ub(kk)-lb(kk))
             END SELECT
-          END DO
+          ENDDO
 !JCC End of check on selection
-        END IF
-      END DO
+        ENDIF
+      ENDDO
       nvar = kk
 !.. Now fill the grid
       CALL WDialogSelect(IDD_SA_input2)
       CALL WGridRows(IDF_parameter_grid,nvar)
       DO i = 1, nvar
-         CALL WGridLabelRow(IDF_parameter_grid,i,parlabel(i))
-         CALL WGridPutCellReal(IDF_parameter_grid,1,i,SNGL(x(i)),'(F12.5)')
-         CALL WGridPutCellReal(IDF_parameter_grid,2,i,SNGL(lb(i)),'(F12.5)')
-         CALL WGridPutCellReal(IDF_parameter_grid,3,i,SNGL(ub(i)),'(F12.5)')
-         CALL WGridPutCellCheckBox(IDF_parameter_grid,4,i,Unchecked)
-         CALL WGridPutCellCheckBox(IDF_parameter_grid,5,i,Checked)
-         CALL WGridStateCell(IDF_parameter_grid,1,i,Enabled)
-         CALL WGridStateCell(IDF_parameter_grid,2,i,Enabled)
-         CALL WGridStateCell(IDF_parameter_grid,3,i,Enabled)
-         prevub(i) = ub(i)
-         prevlb(i) = lb(i)
+        CALL WGridLabelRow(IDF_parameter_grid,i,parlabel(i))
+        CALL WGridPutCellReal(IDF_parameter_grid,1,i,SNGL(x(i)),'(F12.5)')
+        CALL WGridPutCellReal(IDF_parameter_grid,2,i,SNGL(lb(i)),'(F12.5)')
+        CALL WGridPutCellReal(IDF_parameter_grid,3,i,SNGL(ub(i)),'(F12.5)')
+        CALL WGridPutCellCheckBox(IDF_parameter_grid,4,i,Unchecked)
+        CALL WGridPutCellCheckBox(IDF_parameter_grid,5,i,Checked)
+        CALL WGridStateCell(IDF_parameter_grid,1,i,Enabled)
+        CALL WGridStateCell(IDF_parameter_grid,2,i,Enabled)
+        CALL WGridStateCell(IDF_parameter_grid,3,i,Enabled)
+        prevub(i) = ub(i)
+        prevlb(i) = lb(i)
       ENDDO
 
       END SUBROUTINE SA_Parameter_Set
@@ -853,7 +320,24 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ClearZmatrices(IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse)
+      SUBROUTINE ClearZmatrices
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      LOGICAL         gotzmfile
+      COMMON /zmlgot/ gotzmfile(maxfrg)
+
+! Blow away the selected z-matrices
+      gotzmfile = .FALSE.
+      CALL UpdateZmatrixSelection
+
+      END SUBROUTINE ClearZmatrices
+!
+!*****************************************************************************
+!
+      SUBROUTINE UpdateZmatrixSelection
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -861,21 +345,9 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'IZMCheck.inc'
 
-      INTEGER IDFZMFile(CheckSize), IDFZMPars(CheckSize)
-      INTEGER IDFZMCheck(CheckSize), IDBZMBrowse(CheckSize)
-      INTEGER nfrag
-      COMMON /frgcom/ nfrag
-
-      INTEGER         izmpar
-      CHARACTER*36                    czmpar
-      INTEGER                                                kzmpar
-      REAL                                                                          xzmpar
-      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
-
-      LOGICAL gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
+      CHARACTER*80    frag_file
+      COMMON /frgcha/ frag_file(maxfrg)
 
       INTEGER         ntatm, natoms
       INTEGER         ioptb,                iopta,                ioptt
@@ -884,91 +356,72 @@
      &                ioptb(maxatm,maxfrg), iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),  &
      &                iz1(maxatm,maxfrg),   iz2(maxatm,maxfrg),   iz3(maxatm,maxfrg)
 
-      INTEGER II
-
-      CALL PushActiveWindowID
-! Blow away the selected z-matrices
-! JvdS Started to add SA to Wizard
-!      CALL WDialogSelect(IDD_SA_input1)
-      CALL WDialogSelect(IDD_SAW_Page1)
-      DO II = 1, 5
-        izmpar(ii) = 0
-        natoms(ii) = 0
-        IF (gotzmfile(ii)) THEN
-          CALL WDialogClearField(IDFZMFile(ii))
-          CALL WDialogClearField(IDFZMPars(ii))
-          CALL WDialogPutCheckBox(IDFZMCheck(ii),Unchecked)
-        ENDIF
-        CALL WDialogFieldState(IDFZMFile(II),Disabled)
-        CALL WDialogFieldState(IDFZMCheck(II),Disabled)
-        CALL WDialogFieldState(IDBZMBrowse(II),Disabled)
-        CALL WDialogFieldState(IDFZMPars(II),Disabled)
-      END DO
-      DO ii = 1, maxfrg
-        gotzmfile(ii) = .FALSE.
-      END DO
-      CALL WDialogFieldState(IDFZMFile(1),Enabled)
-      CALL WDialogPutCheckBox(IDFZMCheck(1),checked)
-      CALL WDialogFieldState(IDFZMCheck(1),ReadOnly)
-      CALL WDialogFieldState(IDBZMBrowse(1),Enabled)
-      CALL WDialogClearField(IDF_ZM_allpars)
-      CALL UpdateZmatrixSelection(IDFZMpars)
-      CALL WDialogSelect(IDD_SA_input2)
-! Clear the grid too
-      CALL WDialogClearField(IDF_parameter_grid)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE ClearZmatrices
-!
-!*****************************************************************************
-!
-      SUBROUTINE UpdateZmatrixSelection(IDFZMpars)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'IZMCheck.inc'
-
-      INTEGER IDFZMpars(CheckSize)
-      REAL tiso, occ
-      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
-      DOUBLE PRECISION blen, alph, bet, f2cmat
-      INTEGER     ioptb, iopta, ioptt, iz1, iz2, iz3
-      COMMON /zmcomi/ ntatm,natoms(maxfrg),&
-        ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
-        iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
-      COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
-        bet(maxatm,maxfrg),f2cmat(3,3)
-      INTEGER nfrag
+      INTEGER         nfrag
       COMMON /frgcom/ nfrag
-      CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmpar(maxfrg),&
-        czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
-      LOGICAL gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
-      COMMON /POSNS/NATOM,XATO(3,150),KX(3,150),AMULT(150),&
-        TF(150),KTF(150),SITE(150),KSITE(150),&
-        ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
 
-      INTEGER izmtot
+      INTEGER         izmpar
+      CHARACTER*36                    czmpar
+      INTEGER                                                kzmpar
+      REAL                                                                          xzmpar
+      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
+
+      LOGICAL         gotzmfile
+      COMMON /zmlgot/ gotzmfile(maxfrg)
+
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+      INTEGER        IDFZMFile,           IDBZMBrowse,             &
+                     IDFZMpars,           IZMVB
+      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),   &
+                     IDFZMpars(1:maxfrg), IZMVB(1:maxfrg)
+
+      INTEGER NumberOfDOF, izmtot, ifrg
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
       nfrag  = 0
       izmtot = 0
       ntatm  = 0
-! JCC Changes here - account for unchecked zmatrices which have been read in but are unselected
-      DO ii = 1, 5
-        IF (gotzmfile(ii) .AND. IZMCheck(ii) .EQ. Checked) THEN
+      DO ifrg = 1, maxfrg
+        IF (gotzmfile(ifrg)) THEN
           nfrag = nfrag + 1
-          ntatm = ntatm + natoms(ii)
-          izmtot = izmtot + izmpar(ii)
-          CALL WDialogPutInteger(IDFZMpars(ii),izmpar(ii))
-        END IF
-      END DO
-      natom = ntatm             
-      CALL WDialogPutInteger(IDF_ZM_allpars,izmtot)
+          ntatm = ntatm + natoms(ifrg)
+          IF (natoms(ifrg) .EQ. 1) THEN
+            NumberOfDOF = 3 ! It's an atom
+          ELSE
+            NumberOfDOF = izmpar(ifrg) - 1 ! Count the quaternions as three, not four
+          ENDIF
+          izmtot = izmtot + NumberOfDOF
+          CALL WDialogPutInteger(IDFZMpars(ifrg),NumberOfDOF)
+          CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
+! Enable 'View' button
+          CALL WDialogFieldState(IZMVB(ifrg),Enabled)
+        ELSE
+          izmpar(ifrg) = 0
+          natoms(ifrg) = 0
+          CALL WDialogClearField(IDFZMpars(ifrg))
+          CALL WDialogClearField(IDFZMFile(ifrg))
+! Disable 'View' button
+          CALL WDialogFieldState(IZMVB(ifrg),Disabled)
+        ENDIF
+      ENDDO
+      natom = ntatm
+      IF (izmtot .EQ. 0) THEN            
+        CALL WDialogClearField(IDF_ZM_allpars)
+      ELSE
+        CALL WDialogPutInteger(IDF_ZM_allpars,izmtot)
+      ENDIF
       CALL PopActiveWindowID
 
       END SUBROUTINE UpdateZmatrixSelection
