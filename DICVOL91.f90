@@ -57,10 +57,7 @@
 !
 !          N               NUMBER OF LINES USED.
 !          ITYPE           SPACING DATA TYPE.
-!                      =1  THETA BRAGG IN DEGREES.
 !                      =2  2-THETA ANGLE IN DEGREES.
-!                      =3  D-SPACING IN ANGSTROMS.
-!                      =4  Q SPECIFIED IN Q-UNITS AS E+04/D**2.
 !          JC          =0  CUBIC SYSTEM IS NOT TESTED.
 !                      =1  CUBIC SYSTEM IS TESTED.
 !          JT          =0  TETRAGONAL SYSTEM IS NOT TESTED.
@@ -276,7 +273,7 @@
 !
 ! global variables : lowercase
 !
-      SUBROUTINE DICVOL91(Jc, Jt, Jh, Jo, Jm, Jtr, Volmin, Volmax)
+      SUBROUTINE DICVOL91(Jc, Jt, Jh, Jo, Jm, Jtr, Volmin, Volmax, Poimol, Dens, Delden)
 
       USE DICVAR
 
@@ -284,29 +281,27 @@
 
       INTEGER, INTENT (IN   ) :: Jc, Jt, Jh, Jo, Jm, Jtr
       REAL,    INTENT (INOUT) :: Volmin, Volmax
+      REAL,    INTENT (IN   ) :: Poimol, Dens, Delden
 !
 ! Local variables
 !
       REAL, INTRINSIC :: AMAX1, AMIN1
       REAL :: Amaxi, Angulo, Avog, Bmaxi, Cmaxi,   &
-     &        Delden, Dens, Di, Difvol, Dos, Dosinv, Epsili, Epsqi, Pasvol, Pasvol1,       &
-     &        Petiamaxi, Peticmax, Peticmaxi, Poimol, Pr, Q11, Qi, Thi, Vmax, Vmin, Vmoi, &
+     &        Di, Difvol, Dos, Dosinv, Epsili, Epsqi, Pasvol, Pasvol1,       &
+     &        Petiamaxi, Peticmax, Peticmaxi, Pr, Q11, Qi, Thi, Vmax, Vmin, Vmoi, &
      &        Vn, Voinf, Volmaxc, Vosup, Vplu, Vsupm, Vunitm, Vunitp, Vv, Wave, X, Zb, Zz
       INTEGER :: I, Ichoix, Jfl, Klv, Kvol, Kz1, Kz2, Kzt, Na, Nac, Nb, Nc, Nr, Nvol
       INTEGER, INTRINSIC :: NINT
 !
 !     Reading of the data
-      ir = 10
-      OPEN(ir,FILE='DICVOL.IN',ERR=1900)
       iw = 117
       OPEN(iw,FILE='DICVOL.OUT',ERR=1900)
 99001 FORMAT (A)
-      READ (ir,*,ERR=1900) Wave, Poimol, Dens, Delden
       IF ( amax.EQ.0.0 ) amax = 20.0
       IF ( Bmax.EQ.0.0 ) Bmax = 20.0
       IF ( Cmax.EQ.0.0 ) Cmax = 20.0
       IF ( Volmax.EQ.0.0 ) Volmax = 1500.0
-      wave2 = Wave / 2.0
+      Wave = wave2 * 2
       pas = 0.4
       IF ( fom .EQ. 0.0 ) fom = 5.0
 !     preparation and writing out of the data
@@ -891,7 +886,6 @@
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS'/2X,37('*'))
       GOTO 2000
  1900 CALL ErrorMessage('Error accessing input / output file')
-      CLOSE (IR)
       CLOSE (IW)
       RETURN
  2000 WRITE (iw,99019)
@@ -920,6 +914,5 @@
      &        F8.3)
 !99037 FORMAT (8X,'TRICLINIC SYSTEM')
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS')
-      CLOSE(IR)
       CLOSE(IW)
       END SUBROUTINE DICVOL91

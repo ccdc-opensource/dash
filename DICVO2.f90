@@ -5,8 +5,6 @@
       USE DICVAR
       IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
-!
 ! Dummy arguments
 !
       REAL :: Amoi, Aplu, Cmoi, Cplu, Csm, Csp
@@ -20,9 +18,7 @@
       REAL :: F
       INTEGER :: I, J, Jj, K, Kj, Kk, Kqqm, Kqqp, La1, Lc0, M, Mcarh, Mcark, Mcarl, Mm1, Mm2, Mm3,&
      &           Mp1, Mp2, Mp3, Mprohl, Mxl, Ne, Ng, Nx, Ny, Nz
-!
-!*** End of declarations rewritten by SPAG
-!
+
       F(Nx,Ny,Nz,Dd,Ne,Ng) = Nx + Ny + Nz - Dd*Ne*Ng
       nt = 0
       Kk = K1 - 1
@@ -140,11 +136,10 @@
 ! Local variables
 !
       REAL :: Aare,     &
-     &        Aw, Carl, Ram7, Rap7, Vap, Vtestm, Vtestp
-      INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ind, Jj, Kram1, Kram2, Kram3, Kram4,       &
+     &        Aw, Ram7, Rap7, Vap, Vtestm, Vtestp
+      INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ind, Kram1, Kram2, Kram3, Kram4,       &
      &           Kram5, Kram6, Kram7, Krap1, Krap2, Krap3, Krap4, Krap5, Krap6, Krap7, Nrind
 
-!99001 FORMAT (' ',8X,'A=',F8.5,8X,'VOLUME DE LA MAILLE ELEMENTAIRE =',F9.3,5X,'Z=',I2)
       DO I = 1, 7
         Ndich(I) = 0
       ENDDO
@@ -257,18 +252,16 @@
                                          Aare = aa
                                          aa = Amoi7 + (pas64/2.)
                                          Vap = aa*aa*aa
-                                         DO I = 1, n
-                                           Jj = irj(I,7)
+                                    !     DO I = 1, n
+                                   !        Jj = irj(I,7)
                                    !        DO J = 1, Jj
                                     !         Carl = ih(I,J,7)**2 + ik(I,J,7)**2 + il(I,J,7)**2
                                      !      ENDDO
-                                         ENDDO
+                                      !   ENDDO
                                          Ind = 1
                                          Nrind = 1
                                          CALL AFFPAR(Ind,Nrind,Vap)
                                          IF ( fwolff.NE.-1000. ) THEN
-!                                         WRITE (iw,99002)
-!99002                                    FORMAT (' ',50X,9('-')/)
                                          ELSE
                                          aa = Aare
                                          ENDIF
@@ -309,8 +302,6 @@
       USE DICVAR
       IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
-!
 ! Dummy arguments
 !
       INTEGER :: Kram, Krap
@@ -319,9 +310,7 @@
 ! Local variables
 !
       INTEGER :: I, Jj, K, Kqqm, Kqqp, M, Mcarh, Mcark, Mcarl, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       DO I = 1, n
         irj(I,1) = 0
@@ -388,8 +377,6 @@
       USE DICVAR
       IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
-!
 ! Dummy arguments
 !
       INTEGER :: K1, Kram, Krap
@@ -398,9 +385,7 @@
 ! Local variables
 !
       INTEGER :: I, J, Jj, K, Kj, Kk, Kqqm, Kqqp, M, Mcarl, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       Kk = K1 - 1
       DO I = 1, n
@@ -437,8 +422,6 @@
       USE DICVAR
       IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
-!
 ! Dummy arguments
 !
       INTEGER :: Ichoix, Nc
@@ -450,14 +433,11 @@
      &         Atest, Aw, Ccre,   &
      &        Const, Contr, Contr1, Covol, Ctest, Cw,&
      &        Ra, Ram7, Rap7, Rcm7, Rcp7, Sam, Vap, Vtestm, Vtestp
-      INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ic, Ic2, Ic3, Ic4, Ic5, Ic6, Ic7, Ind, J,   &
-     &           Jj, Kram1, Kram2, Kram3, Kram4, Kram5, Kram6, Kram7, Krap1, Krap2, Krap3, Krap4,      &
+      INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ic, Ic2, Ic3, Ic4, Ic5, Ic6, Ic7, Ind,  &
+     &           Kram1, Kram2, Kram3, Kram4, Kram5, Kram6, Kram7, Krap1, Krap2, Krap3, Krap4,      &
      &           Krap5, Krap6, Krap7, Krcm1, Krcm2, Krcm3, Krcm4, Krcm5, Krcm6, Krcm7, Krcp1, Krcp2,   &
-     &           Krcp3, Krcp4, Krcp5, Krcp6, Krcp7, Nphk, Nrind
-!
-!*** End of declarations rewritten by SPAG
-!
-! FORMAT (' ',10X,'A=',F8.5,10X,'C=',F8.5/10X,'VOLUME DE LA MAILLEELEMENTAIRE =,'F10.3,5X,'Z=',I2)
+     &           Krcp3, Krcp4, Krcp5, Krcp6, Krcp7, Nrind
+
       DO I = 1, 7
         Ndich(I) = 0
       ENDDO
@@ -645,19 +625,17 @@
                                          IF ( Ichoix.EQ.1 ) Vap = Vap*SQRT(3.)/2.
                                          Sam = 0.
                                          IF ( Ichoix.EQ.1 ) Sam = 1.
-                                         DO I = 1, n
-                                         Jj = irj(I,7)
-                                           DO J = 1, Jj
-                                             Nphk = Sam*ih(I,J,7)*ik(I,J,7)
-                                           ENDDO
-                                         ENDDO
+                                    !     DO I = 1, n
+                                    !     Jj = irj(I,7)
+                                     !      DO J = 1, Jj
+                                    !         Nphk = Sam*ih(I,J,7)*ik(I,J,7)
+                                     !      ENDDO
+                                    !     ENDDO
                                          Ind = 2
                                          Nrind = 2
                                          IF ( Ichoix.GT.0 ) Ind = 3
                                          CALL AFFPAR(Ind,Nrind,Vap)
                                          IF ( fwolff.NE.-1000. ) THEN
-!                                         WRITE (iw,99002)
-!99002                                    FORMAT (' ',50X,9('-')/)
                                          ELSE
                                          aa = Aare
                                          cc = Ccre
@@ -705,8 +683,6 @@
       USE DICVAR
       IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
-!
 ! Dummy arguments
 !
       INTEGER :: Ichoix, Kram, Krap, Krcm, Krcp
@@ -715,9 +691,7 @@
 ! Local variables
 !
       INTEGER :: I, Jj, K, Kqqm, Kqqp, Ksom, M, Mcarh, Mcark, Mcarl, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       DO I = 1, n
         irj(I,1) = 0
@@ -796,8 +770,6 @@
       USE DICVAR
       IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
-!
 ! Dummy arguments
 !
       INTEGER :: Ichoix, K1, Kram, Krap, Krcm, Krcp
@@ -806,9 +778,7 @@
 ! Local variables
 !
       INTEGER :: I, J, Jj, K, Kj, Kk, Kqqm, Kqqp, Ksom, M, Mcark, Mcarl, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       Kk = K1 - 1
       DO I = 1, n
@@ -852,8 +822,6 @@
       USE DICVAR
       IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
-!
 ! Dummy arguments
 !
       INTEGER :: Na, Nb, Nc
@@ -870,11 +838,7 @@
      &           Krbm5, Krbm6, Krbm7, Krbp1, Krbp2, Krbp3, Krbp4, Krbp5, Krbp6, Krbp7, Krcm1, Krcm2,   &
      &           Krcm3, Krcm4, Krcm5, Krcm6, Krcm7, Krcp1, Krcp2, Krcp3, Krcp4, Krcp5, Krcp6, Krcp7,   &
      &           Nrind
-!
-!*** End of declarations rewritten by SPAG
-!
-!99001 FORMAT (' ',10X,'A=',F8.5,10X,'B=',F8.5,10X,'C=',F8.5/10X,'VOLUME DE LA MAILLE ELEMENTAIRE =',F10.3,5X,'Z=', &
-!     &        I2)
+
       DO I = 1, 7
         Ndich(I) = 0
       ENDDO
@@ -1112,8 +1076,6 @@
                                          Nrind = 3
                                          CALL AFFPAR(Ind,Nrind,Vap)
                                          IF ( fwolff.NE.-1000. ) THEN
-!                                         WRITE (iw,99002)
-!99002                                    FORMAT (' ',50X,9('-')/)
                                          ELSE
                                          aa = Aare
                                          bb = Bbre
@@ -1310,8 +1272,6 @@
       USE DICVAR
       IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
-!
 ! Dummy arguments
 !
       INTEGER :: Na, Nb, Nc
@@ -1326,13 +1286,11 @@
       REAL :: Db, Dc, Pab16, Pab2, Pab32, Pab4, Pab8, Pasbe, Pp, Vap, Vtestm, Vtestp
       INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ib, Ib2, Ib3, Ib4, Ib5, Ib6, Ib7, Ibet1,     &
      &           Ibet2, Ibet3, Ibet4, Ibet5, Ibet6, Ibet7, Ic, Ic2, Ic3, Ic4, Ic5, Ic6, Ic7, Ind, J,&
-     &           Jj, Kamcp, Kapcm, Kracm, Kracms, Kracp, Kracps, Kram1, Kram2, Kram3, Kram4, Kram5,    &
+     &           Kamcp, Kapcm, Kracm, Kracms, Kracp, Kracps, Kram1, Kram2, Kram3, Kram4, Kram5,    &
      &           Kram6, Kram7, Krap1, Krap2, Krap3, Krap4, Krap5, Krap6, Krap7, Krbm1, Krbm2, Krbm3,   &
      &           Krbm4, Krbm5, Krbm6, Krbm7, Krbp1, Krbp2, Krbp3, Krbp4, Krbp5, Krbp6, Krbp7, Krcm,    &
      &           Krcp, Nbeta, Nrind
-!
-!*** End of declarations rewritten by SPAG
-!
+
       DO I = 1, 7
         Ndich(I) = 0
       ENDDO
@@ -1738,23 +1696,21 @@
                                          bebe = Beinf7 + (pab64/2.)
                                          Vap = aa*bb*cc/SIN(bebe)
                                          beta = pideg*bebe
-                                         DO I = 1, n
-                                           Jj = irj(I,7)
+                                      !   DO I = 1, n
+                                        !   Jj = irj(I,7)
                                         !   DO J = 1, Jj
                                         !     Carh  = ih(I,J,7)*ih(I,J,7)
                                         !     Cark  = ik(I,J,7)*ik(I,J,7)
                                         !     Carl  = il(I,J,7)*il(I,J,7)
                                         !     Prohl = il(I,J,7)*ih(I,J,7)
                                         !   ENDDO
-                                         ENDDO
+                                      !   ENDDO
                                          Ind = 5
                                          Nrind = 4
                                          CALL AFFPAR(Ind,Nrind,Vap)
                                          aa = aa*SIN(bebe)
                                          cc = cc*SIN(bebe)
                                          IF ( fwolff.NE.-1000. ) THEN
-                                         WRITE (iw,99001)
-99001                                    FORMAT (' ',50X,9('-')/)
                                          ELSE
                                          aa = Aare
                                          bb = Bbre
@@ -1829,8 +1785,6 @@
       USE DICVAR
       IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
-!
 ! Dummy arguments
 !
       REAL :: Amoi, Aplu, Cmoi, Cplu, Csm, Csp
@@ -1844,9 +1798,7 @@
       REAL :: F
       INTEGER :: I, Jj, K, Kborin, Kborsu, Kqqm, Kqqp, La1, Lc0, M, Mcarh, Mcark, Mcarl, Mdl, Mdl2, &
      &           Mm1, Mm2, Mm3, Mp1, Mp2, Mp3, Mprohl, Mxl, Ne, Ng, Nx, Ny, Nz
-!
-!*** End of declarations rewritten by SPAG
-!
+
       F(Nx,Ny,Nz,Dd,Ne,Ng) = Nx + Ny + Nz - Dd*Ne*Ng
       nt = 0
       DO I = 1, n
@@ -1953,7 +1905,7 @@
  100    ENDDO
       ENDDO
       DO I = 1, 5
-        IF ( irj(I,1).EQ.0. ) THEN
+        IF ( irj(I,1).EQ.0 ) THEN
           nt = -1
           GOTO 99999
         ENDIF

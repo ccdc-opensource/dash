@@ -394,7 +394,7 @@
       REAL, INTRINSIC :: AMAX1, AMIN1
       REAL :: Ed1, Ed2, Ed3, Ed4, Ef1, Ef2, Ef3, Ef4, Emoir, Eplur, Fd1, Fd2, Fd3, Fd4, Fm1, Fm2,  &
      &        Fm3, Fm4, Fm5, Fm6, Fm7, Fm8, Fp1, Fp2, Fp3, Fp4, Fp5, Fp6, Fp7, Fp8, O, P1, Q1,    &
-     &        Vmoi, Vplu, Vtestm, Vtestp, Vvr, X, Y, Z
+     &        Vmoi, Vplu, Vtestm, Vtestp, X, Y, Z
       REAL :: FX1, FX2
 
       FX1(X,Y,O,P1,Q1) = .25*(4.*O*P1*Q1-O*X*X-P1*Y*Y+X*X*Y*Y/4./Q1)
@@ -411,7 +411,6 @@
           Vmoi = AMAX1(6.25E-8,Vmoi)
           Vtestp = 1/Vmoi
           Vtestm = 1/Vplu
-          Vvr = AMAX1(ABS(SQRT(vr2)-SQRT(Vtestp)),ABS(SQRT(vr2)-SQRT(Vtestm)))
           vmoii = SQRT(Vmoi)
           IF ( Vtestm.GT.vmax2 ) THEN
             ly = -1
@@ -470,7 +469,6 @@
           Vmoi = AMAX1(6.25E-8,Vmoi)
           Vtestp = 1/Vmoi
           Vtestm = 1/Vplu
-          Vvr = AMAX1(ABS(SQRT(vr2)-SQRT(Vtestp)),ABS(SQRT(vr2)-SQRT(Vtestm)))
           vmoii = SQRT(Vmoi)
           IF ( Vtestm.GT.vmax2 ) THEN
             ly = -1
