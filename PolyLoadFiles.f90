@@ -1690,52 +1690,49 @@
 !
 !*****************************************************************************
 !
-!>> JCC - Was
-!     SUBROUTINE Load_CCL_File(FLEN,TheFileName)
-!>> Now
-      INTEGER FUNCTION Load_CCL_File(FLEN,TheFileName)
-!
-      CHARACTER(LEN=256),           INTENT (IN) :: TheFileName
-      INTEGER,                      INTENT (IN) :: FLEN
-      CHARACTER(LEN=80) CCL_LINE
-      INCLUDE 'GLBVAR.INC' ! Contains ALambda
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
-      INTEGER I
-      REAL  WaveLengthOf ! Function
-!
-!>> JCC Initialise return value
-!
-      Load_CCL_File = 1
-      ZEROPOINT = 0.0
-      ALambda = WaveLengthOf('Cu')
-!
-!>> JCC Add in Error trap
-!                          
-      OPEN(11,FILE=TheFileName(:FLEN),STATUS='OLD', ERR = 999)
-!>> JCC Set SA Output files
-      CALL sa_SetOutputFiles(TheFileName)
-   10 READ(11,5000,ERR=100,END=100) NLCCL,CCL_LINE
- 5000 FORMAT(Q,A)
-      IF (CCL_LINE(1:1) .EQ. 'C') THEN
-        READ(CCL_LINE(2:NLCCL),*) (CELLPAR(I),I=1,6)
-      ELSE IF (CCL_LINE(1:1) .EQ. 'L') THEN
-        IF (CCL_LINE(3:6) .EQ. 'WVLN') THEN
-          READ(CCL_LINE(7:NLCCL),*) ALambda
-        ELSE IF (CCL_LINE(3:6) .EQ. 'ZERO') THEN
-          READ(CCL_LINE(7:NLCCL),*) zeropoint
-        END IF
-      END IF
-      GOTO 10
-  100 CLOSE(11)
-!
-      CALL UpLoad_Crystal_Data()
-!
-!>> JCC Added in next few lines
-      RETURN
- 999  Load_CCL_File = 0
-      RETURN
-      END FUNCTION Load_CCL_File
-!
+!U      INTEGER FUNCTION Load_CCL_File(FLEN,TheFileName)
+!U!
+!U      CHARACTER(LEN=256),           INTENT (IN) :: TheFileName
+!U      INTEGER,                      INTENT (IN) :: FLEN
+!U      CHARACTER(LEN=80) CCL_LINE
+!U      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+!U      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
+!U      INTEGER I
+!U      REAL  WaveLengthOf ! Function
+!U!
+!U!>> JCC Initialise return value
+!U!
+!U      Load_CCL_File = 1
+!U      ZEROPOINT = 0.0
+!U      ALambda = WaveLengthOf('Cu')
+!U!
+!U!>> JCC Add in Error trap
+!U!                          
+!U      OPEN(11,FILE=TheFileName(:FLEN),STATUS='OLD', ERR = 999)
+!U!>> JCC Set SA Output files
+!U      CALL sa_SetOutputFiles(TheFileName)
+!U   10 READ(11,5000,ERR=100,END=100) NLCCL,CCL_LINE
+!U 5000 FORMAT(Q,A)
+!U      IF (CCL_LINE(1:1) .EQ. 'C') THEN
+!U        READ(CCL_LINE(2:NLCCL),*) (CELLPAR(I),I=1,6)
+!U      ELSE IF (CCL_LINE(1:1) .EQ. 'L') THEN
+!U        IF (CCL_LINE(3:6) .EQ. 'WVLN') THEN
+!U          READ(CCL_LINE(7:NLCCL),*) ALambda
+!U        ELSE IF (CCL_LINE(3:6) .EQ. 'ZERO') THEN
+!U          READ(CCL_LINE(7:NLCCL),*) zeropoint
+!U        END IF
+!U      END IF
+!U      GOTO 10
+!U  100 CLOSE(11)
+!U!
+!U      CALL UpLoad_Crystal_Data()
+!U!
+!U!>> JCC Added in next few lines
+!U      RETURN
+!U 999  Load_CCL_File = 0
+!U      RETURN
+!U      END FUNCTION Load_CCL_File
+!U
 !*****************************************************************************
 !
 !>> JCC  Routine to truncate data to a particular data range
