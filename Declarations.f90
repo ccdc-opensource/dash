@@ -216,6 +216,17 @@
 ! NMAX = mvar = 100
 ! XOPT = values of the parameters of the best SA solution so far
 
+      INTEGER         KKOR, WTIJ,         IKKOR,         JKKOR
+      COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
+
+      INTEGER         MAXK
+      REAL                  FOB
+      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+
+      INTEGER         NP, IP
+      REAL                         PSTORE
+      COMMON /SIMSTO/ NP, IP(100), PSTORE(100)
+
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
       INTEGER                                 MaxRuns, MaxMoves
