@@ -492,8 +492,6 @@
       INTEGER I
       LOGICAL FnUnitCellOK ! Function
       REAL, PARAMETER :: SmallVal = 1.0E-6
-!C>> JCC Added this: initialise to one
-      DATA LatBrav / 1 / ! The default setting
 ! Check if cell parameters are available and make sense
       IF (.NOT. FnUnitCellOK()) RETURN
 ! C>> JCC run check on last Cell
