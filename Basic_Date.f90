@@ -42,9 +42,9 @@
 
       tDate = TheDate
       Year  = tDate / 10000
-      tDate = tDate - Year
+      tDate = tDate - Year * 10000
       Month = tDate /   100
-      tDate = tDate - Month
+      tDate = tDate - Month * 100
       Day   = tDate
       TheDateString = ''
       WRITE (C2,'(I2)') Day
