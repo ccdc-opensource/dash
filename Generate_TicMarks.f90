@@ -78,7 +78,7 @@
       ENDIF
       WRITE (42,4240,ERR=999)
  4240 FORMAT ('I NCYC 6 PRCV 14 MCOR 0 FRIE 1'/'L REFI RIET'/'L SORC SYNX'/'L WGHT 3')
-      WRITE (42,4245,ERR=999) xpmin, xpmax
+      WRITE (42,4245,ERR=999) xpmin-ZeroPoint, xpmax-ZeroPoint
  4245 FORMAT ('L RTYP    2 ',2F10.3,'   0.001')
       WRITE (42,4250,ERR=999) ALambda
  4250 FORMAT ('L WVLN ',F10.5)
