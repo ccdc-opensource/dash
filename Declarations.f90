@@ -244,9 +244,6 @@
 
 ! Note that the variable names in this COMMON block are not consistent.
 
-      INTEGER           iHMUL
-      COMMON /SAREFLN3/ iHMUL(MFCSTO)
-
       DOUBLE PRECISION XOPT,       C,       XP,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
 

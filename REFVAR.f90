@@ -40,6 +40,10 @@
       REAL    WTI(MaxRef)
 ! Weight of the reflection
 
+      INTEGER iHMUL(MaxRef)
+
+
+
 !O! JCC GGCALC dimension increased to 500
 !O      REAL            rHKL,           AMUL
 !O      REAL            ESDOBS,         SOMEGA,       GGCALC
