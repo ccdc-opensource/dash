@@ -8,12 +8,6 @@
       INTEGER MFCSPE
       PARAMETER ( MFCSPE = 10000 )
 
-
-! For common block FCSPC2
-
-      INTEGER MFCSP2
-      PARAMETER ( MFCSP2 = 10000 )
-
 ! For common block SAREFLNS
 
       INTEGER MSAREF
