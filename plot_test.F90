@@ -17,18 +17,6 @@
 !
       INCLUDE 'PARAMS.INC'
 
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
       INTEGER                                 MaxRuns, MaxMoves
@@ -47,8 +35,15 @@
       LOGICAL          PRO_saved
       COMMON /PROCOM/  PRO_saved(1:30)
 
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+
       INTEGER irow, iz, temprow
       REAL yadd, ydif
+      REAL Ymin
+      REAL Ymax
       CHARACTER*255 Grid_Buffer
       CHARACTER*75 filename
       DIMENSION xobsep(MOBS)
@@ -61,9 +56,6 @@
 !
 !   reading in the data from the saved .pro files
 !
-
-
-
       temprow = irow
       CALL WGridGetCellString(IDF_SA_Summary,1,temprow,Grid_Buffer)
       Iz = LEN_TRIM(Grid_Buffer)
@@ -85,7 +77,8 @@
       Iz = Iz-4
       filename = grid_buffer(1:Iz)//'.pro'
       OPEN(unit=61, file=filename, status = 'old', err=999)
-      DO i = ipmin,ipmax
+!!      DO i = ipmin,ipmax
+       DO i = 1, nbin
         READ(61,20) xobsep(i), yobsep(i), ycalcep(i)
 20      FORMAT(3(x, f12.4))
       ENDDO
@@ -93,8 +86,11 @@
 !
 !   calculate the offset for the difference plot
 !
-      YADD=0.5*(YPGMAX+YPGMIN)
-      DO II = IPMIN, IPMAX
+
+      YMin = MINVAL(yobsep)
+      YMax = MAXVAL(yobsep)
+      YADD=0.5*(YMax+YMin)
+      DO II = 1, nbin
         YDIF(II) = YADD + yobsep(II) - ycalcep(II)
       ENDDO
 !
@@ -111,7 +107,7 @@
 !
 !   configuring y data for plotting
 !
-      DO in = ipmin, ipmax
+      DO in = 1, nbin
         store_ycalc(in,(ihandle)) = ycalcep(in)
         store_diff(in,(ihandle)) = ydif(in)
       ENDDO      
@@ -138,23 +134,19 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Poly_Colours.inc'
 
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       REAL                      store_ycalc,                      store_diff
       COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
+      REAL Ymax, Ymin
+      REAL Xmax, Xmin
+
+      YMin = MINVAL(YOBIN)
+      YMax = MAXVAL(YOBIN)
+      Xmin = XBIN(1)
+      Xmax = XBIN(nbin)
 
       CALL WindowSelect(ihandle)
 !  Start of all the plotting calls
@@ -164,7 +156,7 @@
 !
 !  Start new presentation graphics plot
 !
-      CALL IPgNewPlot(PgPolyLine,NSETS,ipmax,0,1)
+      CALL IPgNewPlot(PgPolyLine,NSETS,nbin,0,1)
 !   Set Clipping Rectangle
 !
       CALL IPgClipRectangle('P')
@@ -180,8 +172,8 @@
 !
 !  Set units for plot
 !
-      CALL IPgUnits(      xpmin,    ypmin, &
-                          xpmax,    ypmax)
+      CALL IPgUnits(      xmin,    ymin, &
+                          xmax,    ymax)
 !
 !  Set presentation graphics area
 !
@@ -239,12 +231,14 @@
 !
 !  Draw graph.
 !
-!      DO ISET = 1,NSETS
-!          CALL IPgXYPairs(store_x(1,ISET),store_y(link(ihandle),(link(ihandle)-1+ISET)))
-!      END DO
       CALL IPgXYPairs(XBIN(1),YOBIN(1))
       CALL IPgXYPairs(XBIN(1),store_ycalc(ihandle,ihandle))
       CALL IPgXYPairs(XBIN(1),store_diff(ihandle,ihandle))
+
+!  Draw axes
+!
+      CALL IGrColourN(KolNumMain)
+      CALL IPgBorder()
 
       END SUBROUTINE plot_pro_file
 !
