@@ -176,15 +176,63 @@
               DO WHILE (IDBzmEdit(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
-              CALL WDialogSelect(IDD_zmEdit)
-              CALL WDialogShow(-1,-1,0,SemiModeLess)
-!              CALL ViewZmatrix(iFrg)
+              CALL ShowEditZMatrixWindow(iFrg)
           END SELECT
       END SELECT
   999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowZmatrices
+!
+!*****************************************************************************
+!
+      SUBROUTINE ShowEditZMatrixWindow(iFrg)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iFrg
+
+      INTEGER iAtomNr, iBondNr
+
+      CALL WDialogSelect(IDD_zmEdit)
+      CurrentlyEditedFrag = iFrg
+! Make temporary copy
+      frag_file(0) = frag_file(iFrg)
+      icomflg(0)   = icomflg(iFrg)
+      natoms(0)    = natoms(iFrg)
+      DO iAtomNr = 1, natoms(iFrg)
+        ioptb(iAtomNr,0)         = ioptb(iAtomNr,iFrg)
+        iopta(iAtomNr,0)         = iopta(iAtomNr,iFrg)
+        ioptt(iAtomNr,0)         = ioptt(iAtomNr,iFrg)
+        iz1(iAtomNr,0)           = iz1(iAtomNr,iFrg)
+        iz2(iAtomNr,0)           = iz2(iAtomNr,iFrg)
+        iz3(iAtomNr,0)           = iz3(iAtomNr,iFrg)
+        blen(iAtomNr,0)          = blen(iAtomNr,iFrg)
+        alph(iAtomNr,0)          = alph(iAtomNr,iFrg)
+        bet(iAtomNr,0)           = bet(iAtomNr,iFrg)
+        asym(iAtomNr,0)          = asym(iAtomNr,iFrg)
+        OriginalLabel(iAtomNr,0) = OriginalLabel(iAtomNr,iFrg)
+        tiso(iAtomNr,0)          = tiso(iAtomNr,iFrg)
+        occ(iAtomNr,0)           = occ(iAtomNr,iFrg)
+        izmoid(iAtomNr,0)        = izmoid(iAtomNr,iFrg)
+        izmbid(iAtomNr,0)        = izmbid(iAtomNr,iFrg)
+      ENDDO
+      NumberOfBonds(0) = NumberOfBonds(iFrg)
+      IF (NumberOfBonds(iFrg) .GT. 0) THEN
+        DO iBondNr = 1, NumberOfBonds(iFrg)
+          BondType(iBondNr,0) = BondType(iBondNr,iFrg)
+          Bonds(1,iBondNr,0)  = Bonds(1,iBondNr,iFrg)
+          Bonds(2,iBondNr,0)  = Bonds(2,iBondNr,iFrg)
+        ENDDO
+      ENDIF
+      CALL zmCopyTemp2Dialog
+      CALL WDialogShow(-1,-1,0,SemiModeLess)
+
+      END SUBROUTINE ShowEditZMatrixWindow
 !
 !*****************************************************************************
 !
@@ -197,45 +245,138 @@
 
       IMPLICIT NONE      
 
-      INTEGER tFieldState
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      INTEGER iFrg
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
+      iFrg = CurrentlyEditedFrag
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDBACK)
-! Ungrey 'Load DASH Pawley file' button on toolbar
-              CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOn)
-              CALL WizardWindowShow(IDD_SAW_Page1)
-            CASE (IDNEXT)
-              CALL SA_Parameter_Set
-              CALL WizardWindowShow(IDD_SA_input2)
+            CASE (IDB_Relabel)
+              CALL zmCopyDialog2Temp
+              CALL zmRelabel(0)
+              CALL zmCopyTemp2Dialog
+            CASE (IDOK)
+              CALL WDialogHide()
             CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide()
+            CASE (IDB_SaveAs)
+            CASE (IDB_View)
+              CALL zmCopyDialog2Temp
+              CALL ViewZmatrix(0)
           END SELECT
-        CASE (FieldChanged)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_RotationsGrid)
-            CASE (IDF_Use_PO)
-              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
-                tFieldState = Enabled
-              ELSE
-                tFieldState = Disabled
-              ENDIF
-              CALL WDialogFieldState(IDF_PO_a,tFieldState)
-              CALL WDialogFieldState(IDF_PO_b,tFieldState)
-              CALL WDialogFieldState(IDF_PO_c,tFieldState)
-              CALL WDialogFieldState(IDF_LABELa,tFieldState)
-              CALL WDialogFieldState(IDF_LABELb,tFieldState)
-              CALL WDialogFieldState(IDF_LABELc,tFieldState)
-          END SELECT ! EventInfo%Value1 Field Changed Options
+!O        CASE (FieldChanged)
+!O          SELECT CASE (EventInfo%VALUE1)
+!O            CASE (IDF_RotationsGrid)
+!O            CASE (IDF_Use_PO)
+!O          END SELECT ! EventInfo%Value1 Field Changed Options
       END SELECT
-  999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithEditZMatrixWindow
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmCopyTemp2Dialog
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE ZMVAR
+
+      IMPLICIT NONE 
+      
+      CHARACTER(3) RowLabelStr
+      INTEGER iFrg, iAtomNr, iOrig     
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_zmEdit)
+      iFrg = 0
+! Show filename
+      CALL WDialogPutString(IDF_FileName,frag_file(iFrg))
+! Fill grid with atom properties
+! Set number of rows
+      CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
+      DO iAtomNr = 1, natoms(iFrg)
+        iOrig = izmbid(iAtomNr,iFrg)
+! Show the number of the atom in the zeroth column
+        WRITE(RowLabelStr,'(I3)') iAtomNr
+        CALL WGridLabelRow(IDF_AtomPropGrid,iAtomNr,RowLabelStr)
+! Show atom labels
+        CALL WGridPutCellString(IDF_AtomPropGrid,1,iAtomNr,OriginalLabel(iOrig,iFrg))
+! Show atom elements
+        CALL WGridPutCellString(IDF_AtomPropGrid,2,iAtomNr,asym(iOrig,iFrg))
+! Show Uiso
+        CALL WGridPutCellReal(IDF_AtomPropGrid,3,iAtomNr,tiso(iOrig,iFrg),'(F5.3)')
+! Show occupancies
+        CALL WGridPutCellReal(IDF_AtomPropGrid,4,iAtomNr,occ(iOrig,iFrg),'(F5.3)')
+      ENDDO
+      CALL PopActiveWindowID
+
+      END SUBROUTINE zmCopyTemp2Dialog
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmCopyDialog2Temp
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE ZMVAR
+
+      IMPLICIT NONE 
+      
+      INTEGER iFrg, iAtomNr, iOrig     
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_zmEdit)
+      iFrg = 0
+! Show filename
+      CALL WDialogGetString(IDF_FileName,frag_file(iFrg))
+! Fill grid with atom properties
+!U! Set number of rows
+!U      CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
+      DO iAtomNr = 1, natoms(iFrg)
+        iOrig = izmbid(iAtomNr,iFrg)
+! Show atom labels
+        CALL WGridGetCellString(IDF_AtomPropGrid,1,iAtomNr,OriginalLabel(iOrig,iFrg))
+! Show atom elements
+        CALL WGridGetCellString(IDF_AtomPropGrid,2,iAtomNr,asym(iOrig,iFrg))
+! Show Uiso
+        CALL WGridGetCellReal(IDF_AtomPropGrid,3,iAtomNr,tiso(iOrig,iFrg))
+! Show occupancies
+        CALL WGridGetCellReal(IDF_AtomPropGrid,4,iAtomNr,occ(iOrig,iFrg))
+      ENDDO
+      CALL PopActiveWindowID
+
+      END SUBROUTINE zmCopyDialog2Temp
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmRelabel(iFrg)
+
+! This routine re-labels atoms in Z-matrix number iFrg
+! The new label consists of element + sequential number per element
+
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER, INTENT (IN   ) :: iFrg
+
+!      INTEGER LastNumberSoFar(1:109) ! 1 for each element
+      INTEGER iAtomNr, iLen, iOrig
+      CHARACTER*3 LastNumberSoFarStr
+
+      DO iAtomNr = 1, natoms(iFrg)
+        iOrig = izmoid(iAtomNr,iFrg)
+        WRITE(LastNumberSoFarStr,'(I3)') iOrig
+! Left-justify this string: " 12" => "12 "
+        CALL StrClean(LastNumberSoFarStr,iLen)
+        OriginalLabel(iAtomNr,iFrg) = asym(iAtomNr,iFrg)(1:LEN_TRIM(asym(iAtomNr,iFrg)))// &
+                                      LastNumberSoFarStr(1:LEN_TRIM(LastNumberSoFarStr))
+      ENDDO
+
+      END SUBROUTINE zmRelabel
 !
 !*****************************************************************************
 !
