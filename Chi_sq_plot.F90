@@ -25,14 +25,14 @@
         integer           :: iteration
         real              :: cpb
         integer           :: it_count
-        integer           :: ChiHandle
-        DATA  ChiHandle /3/
         real           :: x_max
         real           :: x_min
         real           :: y_max
        real, dimension(10000) :: num_moves
        real, dimension(10000)    :: chi_sqd
        INTEGER ChiSqdChildWindows
+        integer           :: ChiHandle
+        DATA  ChiHandle /3/
        COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
 ! Variables used to specify Child Window position
        INTEGER Ix, Iy
@@ -168,10 +168,14 @@
 !******************************************************************************************
       
       SUBROUTINE Close_Chisq_Plot
+
       USE WINTERACTER
+
       INCLUDE 'params.inc'
+
       INTEGER ChiSqdChildWindows
-      COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin)
+      INTEGER ChiHandle
+      COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
       INTEGER Ix, Iy
       COMMON /WindowPosition/ Ix, Iy
 
