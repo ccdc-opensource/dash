@@ -591,7 +591,7 @@
       INTEGER TotNumBonds, NumOfAtomsSoFar
       CHARACTER*4 LabelStr
       CHARACTER*2 ColourStr
-      CHARACTER*2 RunStr
+      CHARACTER*2 SolStr
       INTEGER AtomLabelOption, AtomColourOption
       INTEGER I, iFrg, iFrgCopy, J, iiact, ISTATUS, BondNr, ilen
       REAL    xc, yc, zc
@@ -630,8 +630,8 @@
       TickedRunNr = 0
       NumOfOverlaidStructures = 0
       DO iSol = 1, NumOf_SA_Runs
-        WRITE(RunStr,'(I2)',ERR=999) iSolOrder(iSol)
-        CALL StrClean(RunStr,ilen) ! Left justify
+        WRITE(SolStr,'(I2)',ERR=999) iSol
+        CALL StrClean(SolStr,ilen) ! Left justify
         CALL WGridGetCellCheckBox(IDF_SA_summary,3,iSol,istatus)
         IF (istatus .EQ. 1) THEN
           NumOfOverlaidStructures = NumOfOverlaidStructures + 1
@@ -684,7 +684,7 @@
                     ENDIF
                   ENDIF
                   IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
-                    LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//RunStr
+                    LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
                   ELSE  ! Orignal atom labels
                     LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
                   ENDIF

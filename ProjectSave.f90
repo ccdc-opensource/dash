@@ -732,7 +732,10 @@
           CALL zmGenerateBonds(iFrg)
         ENDIF
       ENDDO
-      IF (RW .EQ. cRead) CALL UpdateZmatrixSelection
+      IF (RW .EQ. cRead) THEN 
+        CALL UpdateZmatrixSelection
+        CALL Create_AtomicWeightings
+      ENDIF
 
       END SUBROUTINE PrjReadWriteZmatrices
 !
