@@ -248,7 +248,8 @@
       INTEGER         MN, MN2
       COMMON /ZSTOR2/ MN, MN2
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -420,7 +421,8 @@
                         PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
                         PkPosAv(MAX_NPFR)
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
