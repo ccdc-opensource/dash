@@ -66,11 +66,11 @@
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
       LOGICAL tSavePDB, tSaveCSSR, tSaveCCL, tSaveCIF, tSaveRES
-      INTEGER ipcount
+      INTEGER ipcount, iScat, tElement, k1
       LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, SaveCCL, SaveCIF, SaveRES
       INTEGER hFileCSSR, hFilePDB, hFileCCL, hFileCIF, hFileRES
       INTEGER I, J, II, K, iiact, iTotal, iFrg, iFrgCopy, IJ, iOrig
-      REAL xc, yc, zc
+      REAL    xc, yc, zc
       INTEGER TotNumBonds, NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen, iRadSelection
       CHARACTER(MaxPathLength) tFileName
       CHARACTER(8) TemperatureStr
@@ -78,6 +78,8 @@
       CHARACTER*2  LATT
       CHARACTER*1, EXTERNAL :: ChrLowerCase
       REAL, EXTERNAL :: UnitCellVolume
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
+      INTEGER NumOfAtmPerElm(1:MaxElm)
 
       IF (T .GT. 999.9) THEN
         TemperatureStr = 'T=******'
@@ -98,7 +100,7 @@
         tSaveCSSR = SaveCSSR()
         tSaveCCL  = SaveCCL()
         tSaveCIF  = SaveCIF()
-        tSaveRES  = .TRUE. ! SaveRES()
+        tSaveRES  = SaveRES()
       ENDIF
 !
 !       Output a CSSR file to fort.64
@@ -337,7 +339,25 @@
             WRITE (hFileRES,"('SYMM ',A)") tString(1:tLen)
           ENDDO
         ENDIF
-        WRITE (hFileRES,"('SFAC C')") ! Needs something better: this sets all scatterers to Carbon
+        NumOfAtmPerElm = 0
+        DO iFrg = 1, maxfrg
+          IF (gotzmfile(iFrg)) THEN
+            DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+              DO i = 1, natoms(iFrg)
+                CALL INC(NumOfAtmPerElm(ElmSymbol2CSD(asym(i,iFrg)(1:2))))
+              ENDDO
+            ENDDO
+          ENDIF
+        ENDDO
+        tString = 'SFAC'
+        tLen = LEN_TRIM(tString)
+        DO i = 1, MaxElm
+          IF (NumOfAtmPerElm(i) .GE. 1) THEN
+            tString = tString(1:tLen)//' '//ElementStr(i)
+            tLen = LEN_TRIM(tString)
+          ENDIF
+        ENDDO
+        WRITE (hFileRES,'(A)') tString(1:tLen)
       ENDIF
       iiact = 0
       itotal = 0
@@ -353,7 +373,7 @@
               WRITE (hFilePDB,1037) (SNGL(parvals(ij)),ij=ipcount+1,ipcount+3)
  1037         FORMAT ('REMARK Translations: ',3F10.6)
             ENDIF
-            IF (natoms(iFrg).GT.1) THEN
+            IF (natoms(iFrg) .GT. 1) THEN
 ! Normalise the Q-rotations before writing them out ...
               qvals(1) = SNGL(parvals(ipcount+4))
               qvals(2) = SNGL(parvals(ipcount+5))
@@ -373,7 +393,7 @@
               iorig = izmbid(i,iFrg)
 ! The CSSR atom lines
               IF (tSaveCSSR) THEN
-                WRITE (hFileCSSR,1110) iiact, OriginalLabel(iorig,iFrg)(1:4),(xatopt(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
+                WRITE (hFileCSSR,1110) iiact, OriginalLabel(iOrig,iFrg)(1:4),(xatopt(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
  1110           FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
               ENDIF
 ! The PDB atom lines
@@ -383,22 +403,22 @@
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
               IF (tSavePDB) THEN
-                IF (asym(iorig,ifrg)(2:2).EQ.' ') THEN
-                  WRITE (hFilePDB,1120) iiact, OriginalLabel(iorig,ifrg)(1:3), xc, yc, zc, &
-                                  occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:1)
+                IF (asym(iOrig,iFrg)(2:2).EQ.' ') THEN
+                  WRITE (hFilePDB,1120) iiact, OriginalLabel(iOrig,iFrg)(1:3), xc, yc, zc, &
+                                  occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:1)
  1120             FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
                 ELSE
-                  WRITE (hFilePDB,1130) iiact, OriginalLabel(iorig,ifrg)(1:4), xc, yc, zc, &
-                                  occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:2)
+                  WRITE (hFilePDB,1130) iiact, OriginalLabel(iOrig,iFrg)(1:4), xc, yc, zc, &
+                                  occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:2)
  1130             FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
                 ENDIF
-                pdbAtmCoords(1,iorig,iFrgCopy,iFrg,Curr_SA_Run) = xc
-                pdbAtmCoords(2,iorig,iFrgCopy,iFrg,Curr_SA_Run) = yc
-                pdbAtmCoords(3,iorig,iFrgCopy,iFrg,Curr_SA_Run) = zc
+                pdbAtmCoords(1,iOrig,iFrgCopy,iFrg,Curr_SA_Run) = xc
+                pdbAtmCoords(2,iOrig,iFrgCopy,iFrg,Curr_SA_Run) = yc
+                pdbAtmCoords(3,iOrig,iFrgCopy,iFrg,Curr_SA_Run) = zc
               ENDIF
 ! The CCL atom lines
               IF (tSaveCCL) THEN
-                WRITE (hFileCCL,1033) asym(iorig,iFrg), (xatopt(k,ii),k=1,3), tiso(iorig,iFrg), occ(iorig,iFrg) 
+                WRITE (hFileCCL,1033) asym(iOrig,iFrg), (xatopt(k,ii),k=1,3), tiso(iOrig,iFrg), occ(iOrig,iFrg) 
  1033           FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
               ENDIF
 ! The CIF atom lines
@@ -414,12 +434,18 @@
 !C      C1     -0.10853   0.45223   0.14604  1.0 Biso 3.0
 !C      C2     -0.05898   0.41596   0.27356  1.0 Biso 3.0
               IF (tSaveCIF) THEN
-                WRITE (hFileCIF,1034) OriginalLabel(iorig,iFrg), (xatopt(k,ii),k=1,3), occ(iorig,iFrg), tiso(iorig,iFrg) 
+                WRITE (hFileCIF,1034) OriginalLabel(iOrig,iFrg), (xatopt(k,ii),k=1,3), occ(iOrig,iFrg), tiso(iOrig,iFrg) 
  1034           FORMAT ('  ',A5,1X,3(F10.5,1X),F4.2,' Biso ',F4.2)
               ENDIF
               IF (tSaveRES) THEN
-                WRITE (hFileRES,1035) OriginalLabel(iorig,iFrg), (xatopt(k,ii),k=1,3), occ(iorig,iFrg), tiso(iorig,iFrg) 
- 1035           FORMAT (A5,1X,'1',1X,3(F10.5,1X),F4.2,1X,F4.2)
+! Determine this atom's entry number in the scattering factor list
+                tElement = ElmSymbol2CSD(asym(iOrig,iFrg)(1:2))
+                iScat = 0
+                DO k1 = 1, tElement
+                  IF (NumOfAtmPerElm(k1) .NE. 0) iScat = iScat + 1
+                ENDDO
+                WRITE (hFileRES,1035) OriginalLabel(iOrig,iFrg), iScat, (xatopt(k,ii),k=1,3), occ(iOrig,iFrg), tiso(iOrig,iFrg) 
+ 1035           FORMAT (A5,1X,I2,1X,3(F10.5,1X),F4.2,1X,F4.2)
               ENDIF
             ENDDO ! loop over atoms
           ENDDO ! Loop over copies
@@ -457,46 +483,15 @@
       ENDIF
       IF (tSaveCCL) CLOSE (hFileCCL)
       IF (tSaveCIF) CLOSE (hFileCIF)
-      IF (tSaveRES) CLOSE (hFileRES)
+      IF (tSaveRES) THEN
+        WRITE (hFileRES,"('END')")
+        CLOSE (hFileRES)
+      ENDIF
       RETURN
  1380 FORMAT ('REMARK 290 ')
   999 CALL ErrorMessage('Error while writing SA output files.')
 
       END SUBROUTINE SA_STRUCTURE_OUTPUT
-!O!
-!O!*****************************************************************************
-!O!
-!O      SUBROUTINE MakeAtmPropForRES
-!O!
-!O! SHELX .res files need two lines summarising the properties of all the atoms
-!O!
-!O      USE ZMVAR
-!O
-!O      IMPLICIT NONE
-!O
-!O      INTEGER NumOfAtmPerElm(1:MaxElm)
-!O      INTEGER, EXTERNAL :: ElmSymbol2CSD
-!O
-!O      TotNumOfAtoms = 0
-!O      NumOfHydrogens = 0
-!O      NumOfNonHydrogens = 0
-!O      DO iFrg = 1, maxfrg
-!O        IF (gotzmfile(iFrg)) THEN
-!O          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-!O            DO i = 1, natoms(iFrg)
-!O              ElmSymbol2CSD(asym(i,iFrg)(1:2))
-!O              TotNumOfAtoms = TotNumOfAtoms + 1
-!O              IF (asym(i,iFrg).EQ.'H  ') THEN
-!O                NumOfHydrogens = NumOfHydrogens + 1
-!O              ELSE
-!O                NumOfNonHydrogens = NumOfNonHydrogens + 1
-!O              ENDIF
-!O            ENDDO
-!O          ENDDO
-!O        ENDIF
-!O      ENDDO
-!O
-!O      END SUBROUTINE MakeAtmPropForRES
 !
 !*****************************************************************************
 !
