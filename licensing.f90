@@ -14,7 +14,7 @@
 
       CALL WDialogLoad(IDD_LicenceAgreement)
       CALL WDialogLoad(IDD_License_Dialog)
-      CALL ReadLicenceValid(Info)
+      CALL ReadLicenceFile(Info)
       DO WHILE (Info%Valid .LE. 0) 
         SELECT CASE (Info%Valid)
           CASE (-1)
@@ -27,8 +27,8 @@
           CASE (-4)
             CALL ErrorMessage("Your DASH licence is invalid for this machine.")
         END SELECT
-        CALL LicencePopup(Info)
-        CALL ReadLicenceValid(Info)
+        CALL GetLicenceKeyDialogue(Info)
+        CALL ReadLicenceFile(Info)
       ENDDO
       IF (Info%DaysLeft .LE. 7) THEN
         WRITE(Exp,'(I2)') Info%DaysLeft
@@ -43,7 +43,36 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE LicencePopup(Info)
+      SUBROUTINE ReadLicenceFile(Info)
+
+      USE VARIABLES  
+
+      IMPLICIT NONE
+
+      TYPE(License_Info) Info
+
+      CHARACTER*80 line, CLString
+      INTEGER      dummy, hFile
+
+      Info%Valid = -1
+      Info%KeyStr = ''
+      hFile = 10
+      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='OLD',ERR=999)
+   10 READ(hFile,'(A)',ERR=999,END=999) line
+      IF (line(1:1) .EQ. '#') GOTO 10
+      CALL INextString(line,CLString)
+      Info%KeyStr = CLString
+      CALL DecodeLicence(CLString,Info)
+      IF (Info%Valid .EQ. 1) THEN
+        IF (Info%LicenceType .EQ. DemoKey) CALL ShowLicenceAgreement(Info)
+      ENDIF
+  999 CLOSE(hFile,iostat=dummy)
+
+      END SUBROUTINE ReadLicenceFile
+!
+!*****************************************************************************
+!
+      SUBROUTINE GetLicenceKeyDialogue(Info)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -132,170 +161,7 @@
    99 CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogHide
 
-      END SUBROUTINE LicencePopup
-!
-!*****************************************************************************
-!
-      SUBROUTINE decipher(v,w)
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: v(2)
-      INTEGER, INTENT (  OUT) :: w(2)
-
-      INTEGER y,  z
-      INTEGER a, b, c, d
-      INTEGER n 
-      INTEGER sum
-      INTEGER :: delta = 16#9E3779B9
-
-      sum = 16#C6EF3720
-      n = 32
-      y = v(1)
-      z = v(2)
-      a = 2453
-      b = 1768
-      c = 4567
-      d = 1453
-      DO WHILE (n .GT. 0)
-        n = n - 1
-        z = z - (ISHFT(y,4)) - IEOR(c,y) - IEOR(sum,ISHFT(y,-5)) - d
-        y = y - (ISHFT(z,4)) - IEOR(a,z) - IEOR(sum,ISHFT(z,-5)) - b
-        sum = sum - delta
-      ENDDO
-      w(1) = y
-      w(2) = z
-
-      END SUBROUTINE decipher
-!
-!*****************************************************************************
-!
-      SUBROUTINE DecodeLicence(LString, Info)
-
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      INTEGER, EXTERNAL :: Get_DiskSerialNumber, DateToday, DateDaysElapsed
-      CHARACTER*(*) LString
-      TYPE (License_Info) Info
-      INTEGER v(2), w(2), cs
-      INTEGER*2 tCheckSum
-      EQUIVALENCE (tCheckSum,cs)
-      INTEGER*2 checksum
-
-      Info%Valid = 1
-! JvdS Next lines very dirty: v is INTEGER*4, but their XOR is INTEGER*2. Not possible.
-      READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
-      cs = IEOR(v(1),v(2))
-! ### Version dependent lines
-      cs = IEOR(cs,16#CCDC)
-! Check the checksum
-      IF (tCheckSum .NE. checksum) THEN
-! If the checksum is invalid, then that's the end of our checks.
-        Info%Valid = -2
-        RETURN
-      ENDIF
-      CALL decipher(v,w)
-      Info%SerialNumber = w(1)
-      Info%LicenceType  = w(2)/100000000
-      Info%ExpiryDate   = w(2) - Info%LicenceType*100000000
-      IF (Info%LicenceType .EQ. SiteKey) Info%SerialNumber = Info%SerialNumber - 145789123 ! demangle into a site number
-      Info%DaysLeft = MAX(0, DateDaysElapsed(DateToday(), Info%ExpiryDate))
-      IF (Info%DaysLeft .EQ. 0) THEN
-! If the licence key has expired, then that's the end of our checks.
-        Info%Valid = -3
-        RETURN
-      ENDIF
-      IF (Info%LicenceType .EQ. NodeKey) THEN
-! For node-locked licences check the serial id. Site-Wide licences just encode a serial id for our reference
-! so if we catch any non-authorized users using the key, we know where it came from. Perhaps we may want to make
-! the user key in this site code on installation for checking purposes.
-        IF (Info%SerialNumber .NE. Get_DiskSerialNumber("C:\\"C)) Info%Valid = -4
-      ENDIF
-      RETURN
-   99 Info%Valid = -2
-
-      END SUBROUTINE DecodeLicence
-!
-!*****************************************************************************
-!
-      SUBROUTINE ReadLicenceValid(Info)
-
-      USE VARIABLES  
-
-      IMPLICIT NONE
-
-      TYPE(License_Info) Info
-
-      CHARACTER*80 line, CLString
-      INTEGER      dummy, hFile
-
-      Info%Valid = -1
-      Info%KeyStr = ''
-      hFile = 10
-      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='OLD',ERR=999)
-   10 READ(hFile,'(A)',ERR=999,END=999) line
-      IF (line(1:1) .EQ. '#') GOTO 10
-      CALL INextString(line,CLString)
-      Info%KeyStr = CLString
-      CALL DecodeLicence(CLString,Info)
-      IF (Info%Valid .EQ. 1) THEN
-        IF (Info%LicenceType .EQ. DemoKey) CALL ShowLicenceAgreement(Info)
-      ENDIF
-  999 CLOSE(hFile,iostat=dummy)
-
-      END SUBROUTINE ReadLicenceValid
-!
-!*****************************************************************************
-!
-      SUBROUTINE WriteLicenceFile(LString)
-
-      USE WINTERACTER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      CHARACTER*(*)  LString
-      CHARACTER*11   Ctypestr
-      TYPE (License_Info) Info
-      CHARACTER(17) DateStr
-      INTEGER       hFile, tLen
-
-      CALL DecodeLicence(LString,Info)
-      IF (Info%Valid .LE. 0) GOTO 99
-      SELECT CASE ( Info%LicenceType ) 
-        CASE (DemoKey)
-          Ctypestr = 'Demo'
-        CASE (NodeKey)
-          Ctypestr = 'Node Locked'
-        CASE (SiteKey)
-          Ctypestr = 'Site'
-        CASE DEFAULT
-          GOTO 99
-      END SELECT
-      hFile = 10
-      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='UNKNOWN',ERR=99)
-      WRITE(hFile,'(A)',ERR=99)     "# Licence File for "//ProgramVersion
-      WRITE(hFile,'(A)',ERR=99)     "#"
-      WRITE(hFile,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' licence '
-      IF      (Info%LicenceType .EQ. NodeKey) THEN
-        WRITE(hFile,'(A,Z8)',ERR=99) '# Your DASH Serial ID for this machine is ',Info%SerialNumber
-      ELSE IF (Info%LicenceType .EQ. SiteKey) THEN
-        WRITE(hFile,'(A,Z8)',ERR=99) '# Your DASH Site ID is ',Info%SerialNumber
-      ENDIF
-      IF (Info%ExpiryDate .EQ. 99990000) THEN
-        WRITE(hFile,'(A)',ERR=99)'# The licence is non-expiring'
-      ELSE
-        CALL Date2String(Info%ExpiryDate,DateStr,tLen)
-        WRITE(hFile,'(A)',ERR=99) '# The licence expires on '//DateStr(1:tLen)
-      ENDIF
-      WRITE(hFile,'(A)',ERR=99)"# Licence key follows :"
-      WRITE(hFile,'(A)',ERR=99) LString(1:LEN_TRIM(LString))
-   99 CONTINUE
-      CLOSE(hFile)
-
-      END SUBROUTINE WriteLicenceFile
+      END SUBROUTINE GetLicenceKeyDialogue
 !
 !*****************************************************************************
 !
@@ -509,6 +375,196 @@
       ENDDO
 
       END SUBROUTINE ShowLicenceAgreement
+!
+!*****************************************************************************
+!
+      SUBROUTINE decipher(v,w)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: v(2)
+      INTEGER, INTENT (  OUT) :: w(2)
+
+      INTEGER y,  z
+      INTEGER a, b, c, d
+      INTEGER n 
+      INTEGER sum
+      INTEGER :: delta = 16#9E3779B9
+
+      sum = 16#C6EF3720
+      n = 32
+      y = v(1)
+      z = v(2)
+      a = 2453
+      b = 1768
+      c = 4567
+      d = 1453
+      DO WHILE (n .GT. 0)
+        n = n - 1
+        z = z - (ISHFT(y,4)) - IEOR(c,y) - IEOR(sum,ISHFT(y,-5)) - d
+        y = y - (ISHFT(z,4)) - IEOR(a,z) - IEOR(sum,ISHFT(z,-5)) - b
+        sum = sum - delta
+      ENDDO
+      w(1) = y
+      w(2) = z
+
+      END SUBROUTINE decipher
+!
+!*****************************************************************************
+!
+      SUBROUTINE DecodeLicence(LString, Info)
+
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER, EXTERNAL :: Get_DiskSerialNumber, DateToday, DateDaysElapsed
+      CHARACTER*(*) LString
+      TYPE (License_Info) Info
+      INTEGER v(2), w(2), cs
+      INTEGER*2 tCheckSum
+      EQUIVALENCE (tCheckSum,cs)
+      INTEGER*2 checksum
+
+      Info%Valid = 1
+! JvdS Next lines very dirty: v is INTEGER*4, but their XOR is INTEGER*2. Not possible.
+      READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
+      cs = IEOR(v(1),v(2))
+! ### Version dependent lines
+      cs = IEOR(cs,16#CCDC)
+! Check the checksum
+      IF (tCheckSum .NE. checksum) THEN
+! If the checksum is invalid, then that's the end of our checks.
+        Info%Valid = -2
+        RETURN
+      ENDIF
+      CALL decipher(v,w)
+      Info%SerialNumber = w(1)
+      Info%LicenceType  = w(2)/100000000
+      Info%ExpiryDate   = w(2) - Info%LicenceType*100000000
+      IF (Info%LicenceType .EQ. SiteKey) Info%SerialNumber = Info%SerialNumber - 145789123 ! demangle into a site number
+      Info%DaysLeft = MAX(0, DateDaysElapsed(DateToday(), Info%ExpiryDate))
+      IF (Info%DaysLeft .EQ. 0) THEN
+! If the licence key has expired, then that's the end of our checks.
+        Info%Valid = -3
+        RETURN
+      ENDIF
+      IF (Info%LicenceType .EQ. NodeKey) THEN
+! For node-locked licences check the serial id. Site-Wide licences just encode a serial id for our reference
+! so if we catch any non-authorized users using the key, we know where it came from. Perhaps we may want to make
+! the user key in this site code on installation for checking purposes.
+        IF (Info%SerialNumber .NE. Get_DiskSerialNumber("C:\\"C)) Info%Valid = -4
+      ENDIF
+      RETURN
+   99 Info%Valid = -2
+
+      END SUBROUTINE DecodeLicence
+!
+!*****************************************************************************
+!
+      SUBROUTINE encipher(v,w)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: v(2)
+      INTEGER, INTENT (  OUT) :: w(2)
+
+      INTEGER y,  z
+      INTEGER a, b, c, d
+      INTEGER n, sum
+      INTEGER :: delta = 16#9E3779B9
+
+      n = 32
+      y = v(1)
+      z = v(2)
+      a = 2453
+      b = 1768
+      c = 4567
+      d = 1453
+      sum = 0
+      DO WHILE (n .GT. 0)
+        n = n - 1
+        sum = sum + delta
+        y = y + (ISHFT(z,4)) + IEOR(a,z) + IEOR(sum,ISHFT(z,-5)) + b
+        z = z + (ISHFT(y,4)) + IEOR(c,y) + IEOR(sum,ISHFT(y,-5)) + d
+      ENDDO
+      w(1) = y
+      w(2) = z
+
+      END SUBROUTINE encipher
+!
+!*****************************************************************************
+!
+      SUBROUTINE WriteLicenceFile(LString)
+
+      USE WINTERACTER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER, EXTERNAL :: Get_DiskSerialNumber
+      CHARACTER*(*)  LString
+      CHARACTER*11   Ctypestr
+      TYPE (License_Info) Info
+      CHARACTER(17) DateStr
+      INTEGER       hFile, tLen
+      INTEGER v(2), w(2)
+      INTEGER*2 CheckSum
+      INTEGER*2 VersionDependentMangler
+
+      CALL DecodeLicence(LString,Info)
+      IF (Info%Valid .LE. 0) GOTO 99
+      SELECT CASE ( Info%LicenceType ) 
+        CASE (DemoKey)
+          Ctypestr = 'Demo'
+        CASE (NodeKey)
+          Ctypestr = 'Node Locked'
+        CASE (SiteKey)
+          Ctypestr = 'Site'
+        CASE DEFAULT
+          GOTO 99
+      END SELECT
+      hFile = 10
+      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='UNKNOWN',ERR=99)
+      WRITE(hFile,'(A)',ERR=99)     "# Licence File for "//ProgramVersion
+      WRITE(hFile,'(A)',ERR=99)     "#"
+      WRITE(hFile,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' licence '
+      IF      (Info%LicenceType .EQ. NodeKey) THEN
+        WRITE(hFile,'(A,Z8)',ERR=99) '# Your DASH Serial ID for this machine is ',Info%SerialNumber
+      ELSE IF (Info%LicenceType .EQ. SiteKey) THEN
+!        WRITE(hFile,'(A,Z8)',ERR=99) '# Your DASH Site ID is ',Info%SerialNumber
+      ENDIF
+      IF (Info%ExpiryDate .EQ. 99990000) THEN
+        WRITE(hFile,'(A)',ERR=99)'# The licence is non-expiring'
+      ELSE
+        CALL Date2String(Info%ExpiryDate,DateStr,tLen)
+        WRITE(hFile,'(A)',ERR=99) '# The licence expires on '//DateStr(1:tLen)
+      ENDIF
+      WRITE(hFile,'(A)',ERR=99)"# Licence key follows :"
+      ! If it is a site licence, write out a node-locked licence.
+      ! This is necessary because otherwise the site-licence file would be copyable
+      ! and work on every machine.
+      IF (Info%LicenceType .EQ. SiteKey) THEN
+        v(1) = Get_DiskSerialNumber("C:\\"C)
+        v(2) = NodeKey*100000000 + Info%ExpiryDate
+        CALL encipher(v, w)
+        checksum = IEOR(w(1), w(2))
+! ### Version dependent lines
+        IF ( ProgramVersion(6:6) .EQ. '3' ) THEN
+          IF ( ProgramVersion(8:8) .EQ. '0' ) THEN ! DASH 3.0
+            VersionDependentMangler = 16#CCDC
+          ELSE IF ( ProgramVersion(8:8) .EQ. '1' ) THEN ! DASH 3.1
+            VersionDependentMangler = 16#CCDC
+          ENDIF
+        ENDIF
+        checksum = IEOR(checksum, VersionDependentMangler)
+        WRITE(LString, '(2Z8.8,Z4.4)') w(1), w(2), checksum
+      ENDIF
+      WRITE(hFile,'(A)',ERR=99) LString(1:LEN_TRIM(LString))
+   99 CONTINUE
+      CLOSE(hFile)
+
+      END SUBROUTINE WriteLicenceFile
 !
 !*****************************************************************************
 !
