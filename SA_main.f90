@@ -53,8 +53,9 @@
         iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
         bet(maxatm,maxfrg),f2cmat(3,3)
-      CHARACTER*3 asym
-      COMMON /zmcomc/ asym(maxatm,maxfrg)
+      CHARACTER*3     asym
+      CHARACTER*5                          OriginalLabel
+      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
       INTEGER nfrag
       COMMON /frgcom/ nfrag
       CHARACTER*80 frag_file
@@ -253,6 +254,7 @@
               DO WHILE (ifrg .LT. CheckSize .AND. IZMNumber(ifrg) .NE. EventInfo%VALUE1)
                 ifrg = ifrg + 1
               ENDDO
+! JvdS @ The following contains too many errors for a quick fix: needs rewriting
               gotzmfile(ifrg) = .FALSE.
               frag_file(ifrg) = ' '
               IFlags = PromptOn + DirChange + AppendExt
@@ -582,6 +584,7 @@
  888  CONTINUE
       CALL MakRHm()
       CALL CalCosArx()
+      CALL Create_AtomicWeightings
       CALL BeginSA(IMyExit)
       JMyExit = IMyExit
       IMyExit = 0
@@ -672,20 +675,19 @@
      &                bet(maxatm,maxfrg), f2cmat(3,3)
 
       INTEGER         icomflg
-      COMMON /zmcomg/ icomflg(maxfrg)
+      REAL                             AtomicWeighting
+      COMMON /zmcomg/ icomflg(maxfrg), AtomicWeighting(maxatm,maxfrg)
 
       CHARACTER*3     asym
-      COMMON /zmcomc/ asym(maxatm,maxfrg)
-
+      CHARACTER*5                          OriginalLabel
+      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
 
       INTEGER I,J,M
       LOGICAL exists
       CHARACTER*17 temp_file
       DATA temp_file /'Temp_Zmatrix.mol2'/
 
-
       CHARACTER*255 dirname, filename, curdir
-
 
       REAL*8 CART(MAXATM,3)
       REAL*8 XC, YC, ZC, XNORM
@@ -741,13 +743,13 @@
       
       OutputFile = 3
       OPEN(UNIT=OutputFile,file='Temp_Zmatrix.res',form='formatted',ERR=999)
-      WRITE(OutputFile,'(A)') 'TITL Temporary file written by DASH'
-      WRITE(OutputFile,'(A)') 'CELL 1.54 1.0 1.0 1.0 90.0 90.0 90.0'
+      WRITE(OutputFile,'(A)',ERR=999) 'TITL Temporary file written by DASH'
+      WRITE(OutputFile,'(A)',ERR=999) 'CELL 1.54 1.0 1.0 1.0 90.0 90.0 90.0'
       DO I = 1, NATS
-        WRITE(OutputFile,333,ERR=999) asym(I,IFRG), CART(I,1), CART(I,2), CART(I,3)
-  333   FORMAT(A3,1X,'0',1X,F10.5,1X,F10.5,1X,F10.5,1X,'1.00000    1.00000')
+        WRITE(OutputFile,333,ERR=999) OriginalLabel(I,IFRG), CART(I,1), CART(I,2), CART(I,3)
+  333   FORMAT(A5,1X,'0',1X,F10.5,1X,F10.5,1X,F10.5,1X,'1.00000    1.00000')
       ENDDO
-      WRITE(OutputFile,'(A)') 'END'
+      WRITE(OutputFile,'(A)',ERR=999) 'END'
       CLOSE(OutputFile)
 ! Convert .res to mol2
       I = Res2Mol2('Temp_Zmatrix.res')
@@ -827,8 +829,9 @@
         iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
         bet(maxatm,maxfrg),f2cmat(3,3)
-      CHARACTER*3 asym
-      COMMON /zmcomc/ asym(maxatm,maxfrg)
+      CHARACTER*3     asym
+      CHARACTER*5                          OriginalLabel
+      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
 
       COMMON /frgcom/ nfrag
       PARAMETER (mvar=100)
@@ -976,8 +979,9 @@
         iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
         bet(maxatm,maxfrg),f2cmat(3,3)
-      CHARACTER*3 asym
-      COMMON /zmcomc/ asym(maxatm,maxfrg)
+      CHARACTER*3     asym
+      CHARACTER*5                          OriginalLabel
+      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
       INTEGER nfrag
       COMMON /frgcom/ nfrag
       CHARACTER*36 czmpar
@@ -1044,8 +1048,9 @@
         iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
         bet(maxatm,maxfrg),f2cmat(3,3)
-      CHARACTER*3 asym
-      COMMON /zmcomc/ asym(maxatm,maxfrg)
+      CHARACTER*3     asym
+      CHARACTER*5                          OriginalLabel
+      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
       INTEGER nfrag
       COMMON /frgcom/ nfrag
       CHARACTER*36 czmpar
