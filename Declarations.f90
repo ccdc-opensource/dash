@@ -371,6 +371,11 @@
 !         'C:\Program Files\CCDC\DASH 2.0\benzene_001.cif'
 !         'C:\Program Files\CCDC\DASH 2.0\benzene_001.res'
 ! where 001 = SA_RunNumberStr = SA_Run_Number in format '(I3.3)'
+!
+! The status of OutputFilesBaseName has been upgraded from basis-for-SA-output to
+! basis-for-all-output. Its name is therefore now wrong. It is the default name for
+! all .sdi, .hkl, .dash etc. etc. files.
+
 
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX

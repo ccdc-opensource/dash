@@ -25,6 +25,7 @@
       IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
         PrjFileName = tFileName
         CALL PrjReadWrite(PrjFileName, cWrite)
+        CALL sa_SetOutputFiles(PrjFileName)
         PrjSaveAs = 0 ! Yeah, right
       ENDIF
 
@@ -103,13 +104,14 @@
 
       CHARACTER*(*), INTENT (IN   ) :: ThePrjFile
 
-      CALL PrjReadWrite(ThePrjFile,cRead)
+      CALL PrjReadWrite(ThePrjFile, cRead)
+      CALL sa_SetOutputFiles(ThePrjFile)
 
       END SUBROUTINE PrjFileLoad
 !
 !*****************************************************************************
 !
-      SUBROUTINE PrjReadWrite(ThePrjFile,ReadOrWrite)
+      SUBROUTINE PrjReadWrite(ThePrjFile, ReadOrWrite)
 !
 ! This subroutine saves the project file.
 !
