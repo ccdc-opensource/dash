@@ -118,7 +118,7 @@
       DiffractionFileOpen = ISTAT
       IF (ISTAT .EQ. 0) RETURN
 ! Enable the appropriate menus:
-      CALL SetModeMenuState(1,-1)
+      CALL SetModeMenuState(1,-1,-1)
       DashRawFile = FNAME(1:LEN_TRIM(FNAME))
 ! Set minimum and maximum truncation values in Wizard in accordance with data read in
       CALL PushActiveWindowID
@@ -299,6 +299,7 @@
 ! Assume no knowledge on background
       CALL Clear_BackGround
       CALL Clear_Bins
+      CALL Clear_SA
       CALL Rebin_Profile
       IPTYPE = 1
       NoData = .FALSE.

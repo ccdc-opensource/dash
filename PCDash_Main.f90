@@ -24,7 +24,7 @@
       CALL WMenuToolbar(ID_TOOLBAR1)
       CALL WCursorShape(CurCrossHair)
 ! Disable the menu buttons
-      CALL SetModeMenuState(1,-1)
+      CALL SetModeMenuState(1,-1,-1)
 ! Setup array of widths for status bar
       IWIDTHS(1) = 3800
       DO IWID = 2, 7
@@ -40,9 +40,9 @@
 ! Initialise space group information
       CALL PolyFitterInitialise
       CALL InitialiseVariables
-      CALL Check_Licence
       CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(TabChanged, Enabled)
+      CALL Check_Licence
 ! Main message loop
 ! Go through the PolyFitter wizard
 ! Comment this next line out to remove the wizard
