@@ -1,4 +1,4 @@
-! Winteracter module created : 13/May/2002 14:41:51
+! Winteracter module created : 14/May/2002 15:11:22
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -615,4 +615,5 @@
           INTEGER, PARAMETER :: IDB_ClearAll                    =  1406
           INTEGER, PARAMETER :: IDM_ViewPawley                  = 40030
           INTEGER, PARAMETER :: IDF_PO_G1                       =  1407
+          INTEGER, PARAMETER :: IDF_CHECK7                      =  1248
       END MODULE Druid_Header
