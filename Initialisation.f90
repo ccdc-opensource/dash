@@ -234,18 +234,18 @@
       USE VARIABLES
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'statlog.inc'
+      INCLUDE 'lattice.inc'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Poly_Colours.inc'
+      INCLUDE 'DialogPosCmn.inc'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-
-      INCLUDE 'statlog.inc'
-      INCLUDE 'lattice.inc'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Poly_Colours.inc'
-      INCLUDE 'DialogPosCmn.inc'
+      COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
 
       REAL    WaveLengthOf ! Function
 

@@ -26,6 +26,7 @@
         real              :: cpb
         integer           :: it_count
         integer           :: ChiHandle
+        DATA  ChiHandle /3/
         real           :: x_max
         real           :: x_min
         real           :: y_max
