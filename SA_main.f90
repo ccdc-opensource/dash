@@ -444,7 +444,7 @@
 
       IMPLICIT NONE
 
-      INTEGER            I, IFlags, ISEL, Ilen, Istart, Istat
+      INTEGER            I, iFlags, iSelection, Ilen, Istart, Istat
       INTEGER            POS
       CHARACTER(LEN=4)   :: EXT4
       CHARACTER(LEN=255) :: FilterStr, F
@@ -459,7 +459,7 @@
 
       CALL InfoMessage(Info)
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
-      IFlags = LoadDialog + DirChange + AppendExt
+      iFlags = LoadDialog + DirChange + AppendExt
       FilterStr = "All files (*.*)|*.*|"//&
                   "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"//&
                   "Protein DataBank files (*.pdb)|*.pdb|"//&
@@ -467,9 +467,9 @@
                   "mdl mol files|*.mol;*.mdl|"//&
                   "SHELX files (*.res)|*.res|"//&
                   "cssr files (*.cssr)|*.cssr|"
-      ISEL = 2
+      iSelection = 2
       FNAME = ' '
-      CALL WSelectFile(FilterStr, IFLAGS, FNAME,"Select a file for conversion",ISEL)
+      CALL WSelectFile(FilterStr, iFlags, FNAME,"Select a file for conversion",iSelection)
       Ilen = LEN_TRIM(FNAME)
       IF (Ilen .EQ. 0) RETURN
 ! Find the last occurence of '.' in TheFileName

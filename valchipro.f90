@@ -2,7 +2,9 @@
 !*****************************************************************************
 !
       SUBROUTINE VALCHIPRO(chivalpro)
-
+!
+! Must be called after VALCHI, because it needs the AICALC to have been set up.
+!
       IMPLICIT NONE
 
       REAL, INTENT (  OUT) :: chivalpro
@@ -51,7 +53,6 @@
         YCBIN(I) = RESCL * YCBIN(I)
         CVP = CVP + WTSA(I) * (YOBIN(I) - YCBIN(I))**2
       END DO
-!      CHIVALPRO=CHIOBS!-SUM2*SUM2/SUM1
       CHIVALPRO = CVP/FLOAT(NFITA-2)
 
       END SUBROUTINE VALCHIPRO

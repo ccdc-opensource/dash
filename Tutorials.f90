@@ -1,5 +1,6 @@
-
-
+!
+!*****************************************************************************
+!
       SUBROUTINE LaunchTutorial(Tutorial_ID)
 
       USE WINTERACTER
@@ -39,6 +40,8 @@
       CALL IOsDirChange(CurDir(1:LEN_TRIM(CurDir)))
       CALL WHelpFile(' ') ! In case the help file is open already
       CALL WHelpFile(DirString(1:LEN_TRIM(DirString))//DIRSPACER//"index.htm")
-      RETURN
 
-      END
+      END SUBROUTINE LaunchTutorial
+!
+!*****************************************************************************
+!
