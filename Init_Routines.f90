@@ -116,6 +116,7 @@
 
 ! Blow away the Z-matrices
       gotzmfile = .FALSE.
+      zmFileChanged = .FALSE.
       zmNumberOfCopies = 0
       CALL UpdateZmatrixSelection
 
