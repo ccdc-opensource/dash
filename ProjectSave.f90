@@ -164,9 +164,17 @@
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       INTEGER, EXTERNAL :: GetCrystalSystem
       INTEGER I, j, RW
-      CHARACTER*(255) tString 
+      CHARACTER*(255) tString
+      CHARACTER*(10) Version  ! We have patch releases like "DASH 2.1.1"
 
       ErrCounter = 0
       CALL PushActiveWindowID
@@ -178,11 +186,19 @@
 ! Read / Write the header
       tString = ProgramVersion//' project file'
       CALL FileRWString(hPrjFile, iPrjRecNr, RW, tString)
+      ! If read, store program version for later reference
+      IF (RW .EQ. cRead) THEN
+        IF ( tString(9:9) .EQ. " " ) THEN
+          Version = tString(1:8)
+        ELSE
+          Version = tString(1:10)
+        ENDIF
+      ENDIF
 ! Read / Write radiation source
       CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, JRadOption)
 ! Read / Write Wavelength
       CALL FileRWReal(hPrjFile, iPrjRecNr, RW, ALambda)
-      IF (RW .EQ. cRead) THEN
+      IF ( (RW .EQ. cRead) .AND. (.NOT. in_batch) ) THEN
         CALL Upload_Source
         CALL Upload_Wavelength
       ENDIF
@@ -192,10 +208,11 @@
       ENDDO
 ! Read / Write zero-point
       CALL FileRWReal(hPrjFile, iPrjRecNr, RW, ZeroPoint)
-      IF (RW .EQ. cRead) CALL Upload_ZeroPoint
+      IF ( (RW .EQ. cRead) .AND. (.NOT. in_batch) ) &
+        CALL Upload_ZeroPoint
 ! Read / Write space group
       CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumberSGTable)
-      IF (RW .EQ. cRead) THEN
+      IF ( (RW .EQ. cRead) .AND. (.NOT. in_batch) ) THEN
         LatBrav = GetCrystalSystem(NumberSGTable)
         CALL Upload_CrystalSystem
       ENDIF
@@ -216,7 +233,7 @@
 ! Read / Write the .pik file
 !            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
 !        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
-      IF (RW .EQ. cRead) CALL WizardWindowShow(IDD_SAW_Page5)
+      IF ( (RW .EQ. cRead) .AND. (.NOT. in_batch) ) CALL WizardWindowShow(IDD_SAW_Page5)
 ! Read / Write observed pattern minus the background fitted during the Pawley refinement.
 ! This is the observed pattern read in by GETPIK.
       CALL PrjErrTrace
@@ -267,7 +284,7 @@
           IFITA(NFITA) = I
         ENDIF
       ENDDO
-      IF (RW .EQ. cRead) THEN
+      IF ( (RW .EQ. cRead) .AND. (.NOT. in_batch) ) THEN
         NoData = .FALSE.
         CALL GetProfileLimits
         CALL Get_IPMaxMin 
@@ -283,11 +300,16 @@
       CALL PrjReadWriteIntensities
       CALL PrjErrTrace
 ! Read / Write the Z-matrices
+! Must read/write hydrogen treatment first, because that is necessary to
+! calculate the atomic weightings. This wasn't written out in version 3.0, so need
+! to add a check.
+  !F    IF ( (RW .EQ. cWrite) .OR. (Version(6:8) .NE. "3.0") ) &
+  !F      CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, HydrogenTreatment)
       CALL PrjReadWriteZmatrices
       CALL PrjErrTrace
 ! Read / Write Preferred Orientation
       CALL PrjReadWritePO
-      IF (RW .EQ. cRead) THEN
+      IF ( (RW .EQ. cRead) .AND. (.NOT. in_batch) ) THEN
         CALL FillSymmetry_2
         CALL GET_LOGREF
         CALL MakRHm
@@ -298,7 +320,7 @@
 ! Read / Write solutions
       CALL PrjReadWriteSolutions
       CALL PrjErrTrace
-      IF (RW .EQ. cRead) THEN
+      IF ( (RW .EQ. cRead) .AND. (.NOT. in_batch) ) THEN
 ! Grey out the "Save... chi sqrd progress"
         CALL WDialogSelect(IDD_OutputSolutions)
         CALL WDialogFieldState(IDF_GROUP2, Disabled)
