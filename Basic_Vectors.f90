@@ -67,6 +67,73 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE LatticeCellParameters2Lattice_2(a, b, c, tAlpha, tBeta, tGamma, TheLattice)
+!
+! To be used when writing out mol2 files only
+!
+! mol2 files contain an unresolved ambiguity: atom co-ordinates are given wrt. the 
+! the orthogonal axes, but the unit cell is given as a, b, c, alpha, beta, gamma.
+! It is not specified how the unit cell is to be constructed from the unit cell parameters.
+! Mercury turns out to chose: a along x. Everywhere else in DASH, we have used c along z
+!
+! Calculates right-handed lattice from cell parameters, a along x, b in xy plane
+!
+! The left-most subscript must vary most rapidly
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: a, b, c, tAlpha, tBeta, tGamma
+      REAL, INTENT (  OUT) :: TheLattice(1:3,1:3)
+
+      REAL, EXTERNAL :: Degrees2Radians
+      LOGICAL, EXTERNAL :: ValidCellAxisLength
+      REAL    aSTAR(1:3)
+      REAL    alpha, beta, gamma ! to resolve call by value / call by reference conflict
+
+      IF (.NOT. ValidCellAxisLength(a)) THEN
+        CALL ErrorMessage('Invalid length of a axis')
+        RETURN
+      ENDIF
+      IF (.NOT. ValidCellAxisLength(b)) THEN
+        CALL ErrorMessage('Invalid length of b axis')
+        RETURN
+      ENDIF
+      IF (.NOT. ValidCellAxisLength(c)) THEN
+        CALL ErrorMessage('Invalid length of c axis')
+        RETURN
+      ENDIF
+      alpha = Degrees2Radians(tAlpha)
+      beta  = Degrees2Radians(tBeta)
+      gamma = Degrees2Radians(tGamma)
+! a-axis
+      TheLattice(1,1) = a
+      TheLattice(2,1) = 0.0
+      TheLattice(3,1) = 0.0
+! b-axis
+      TheLattice(1,2) = b * COS(gamma)
+      TheLattice(2,2) = b * SIN(gamma)
+      TheLattice(3,2) = 0.0
+! c-axis
+      TheLattice(1,3) = c * COS(beta)
+! Maybe an odd way to do this, but it works:
+! the projection of c on the "a*b*" plane equals the projection of c on the xy plane:
+! (ac)a* + (bc)b* = (cx)x + (cy)y
+! Multiplying from the right by y* yields:
+! (ac)(a*y) + (bc)(b*y) = cy
+! Note that y = y* and z = z*
+! Since b* = y/|b|, b*y = 1/|b|:
+! (ac)(a*y) + c(cos(alpha)) = cy
+! We know ac and y and can calculate a*, leaving the unknown cy
+      aSTAR = TheLattice(:,1)
+      CALL VectorOrthogonalise(aSTAR,TheLattice(:,2))
+      CALL VectorSetLength(aSTAR,1.0/a)
+      TheLattice(2,3) = (a*c*COS(beta)) * aSTAR(2)   +   c * COS(alpha)
+      TheLattice(3,3) = SQRT(c**2-TheLattice(1,3)**2-TheLattice(2,3)**2)
+
+      END SUBROUTINE LatticeCellParameters2Lattice_2
+!
+!*****************************************************************************
+!
       SUBROUTINE VectorNormalise(TheVector)
 !
 ! Normalises a vector to 1
