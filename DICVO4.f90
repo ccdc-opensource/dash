@@ -1,12 +1,14 @@
-!*==TRICLINI2.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !    -------------------------------------------------------
 !    |		     T R I C L I N I C 2		   |				   |
 !    -------------------------------------------------------
       SUBROUTINE TRICLINI2
+
       USE DICVAR
+
       IMPLICIT NONE
-!
-!*** Start of declarations rewritten by SPAG
 !
 ! Local variables
 !
@@ -17,9 +19,7 @@
       INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ib, Ib2, Ib3, Ib4, Ic, Ic2, Ic3, Ic4, Id, Id2, Id3, Id4,   &
      &           Ie, Ie2, Ie3, Ie4, Imf, Imf2, Imf3, Imf4, J, Jj, Jjl, Jjl1, Na, Nb, Nc, Nd, Ne,  &
      &           Nf
-!
-!*** End of declarations rewritten by SPAG
-!
+
       Na = (amax-amin)/pasa
       Nb = (bmax-bmin)/pasb
       Nc = (cmax-cmin)/pasc
@@ -678,4 +678,8 @@
  2300 IF ( iiaa.EQ.0 ) GOTO 99999
  2400 Ia = Ia + 1
       IF ( Ia.LE.Na ) GOTO 100
+
 99999 END SUBROUTINE TRICLINI2
+!
+!*****************************************************************************
+!

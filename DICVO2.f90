@@ -1,8 +1,11 @@
-!*==MODHKL1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE MODHKL2(Kram,Krap,Krcm,Krcp,Kracm,Kracp,Krbm,Krbp,Kamcp,Kapcm,Csm,Csp,Amoi,Aplu,Cmoi,Cplu,Kracms, &
      &                   Kracps,K1)
  
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -116,11 +119,11 @@
           GOTO 99999
         ENDIF
       ENDDO
+
 99999 END SUBROUTINE MODHKL2
-
-
-
-!*==CUBIQU.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     |                         C U B I Q U E                          |
 !     ------------------------------------------------------------------
@@ -137,8 +140,7 @@
 !
 ! Local variables
 !
-      REAL :: Aare,     &
-     &        Aw, Ram7, Rap7, Vap, Vtestm, Vtestp
+      REAL :: Aare, Aw, Ram7, Rap7, Vap, Vtestm, Vtestp
       INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ind, Kram1, Kram2, Kram3, Kram4,       &
      &           Kram5, Kram6, Kram7, Krap1, Krap2, Krap3, Krap4, Krap5, Krap6, Krap7, Nrind
 
@@ -293,10 +295,15 @@
  100  ENDDO
 !      WRITE (iw,99003) (Ndich(I),I=1,7)
 !99003 FORMAT (//,2X,'ITERATION NUMBER AT EACH DICHOTOMY LEVEL :',7I5)
+
       END SUBROUTINE CUBIQU
-!*==CUDHKL.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE CUDHKL(Kram,Krap)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -368,10 +375,15 @@
           ENDDO
  100    ENDDO
       ENDDO
+
 99999 END SUBROUTINE CUDHKL
-!*==CUDHKL1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE CUDHKL1(Kram,Krap,K1)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -410,13 +422,18 @@
           GOTO 99999
         ENDIF
       ENDDO
+
 99999 END SUBROUTINE CUDHKL1
-!*==TETHEX.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     |          T E T R A G O N A L   E T   H E X A G O N A L         |
 !     ------------------------------------------------------------------
       SUBROUTINE TETHEX(Nc,Ichoix)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -426,9 +443,7 @@
 !
 ! Local variables
 !
-      REAL :: Aare,       &
-     &         Atest, Aw, Ccre,   &
-     &        Const, Contr, Contr1, Covol, Ctest, Cw,&
+      REAL :: Aare, Atest, Aw, Ccre, Const, Contr, Contr1, Covol, Ctest, Cw,&
      &        Ra, Ram7, Rap7, Rcm7, Rcp7, Sam, Vap, Vtestm, Vtestp
       INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ic, Ic2, Ic3, Ic4, Ic5, Ic6, Ic7, Ind,  &
      &           Kram1, Kram2, Kram3, Kram4, Kram5, Kram6, Kram7, Krap1, Krap2, Krap3, Krap4,      &
@@ -622,12 +637,6 @@
                                          IF ( Ichoix.EQ.1 ) Vap = Vap*SQRT(3.)/2.
                                          Sam = 0.
                                          IF ( Ichoix.EQ.1 ) Sam = 1.
-                                    !     DO I = 1, n
-                                    !     Jj = irj(I,7)
-                                     !      DO J = 1, Jj
-                                    !         Nphk = Sam*ih(I,J,7)*ik(I,J,7)
-                                     !      ENDDO
-                                    !     ENDDO
                                          Ind = 2
                                          Nrind = 2
                                          IF ( Ichoix.GT.0 ) Ind = 3
@@ -675,10 +684,15 @@
  100  ENDDO
 !      WRITE (iw,99003) (Ndich(I),I=1,7)
 !99003 FORMAT (//,2X,'ITERATION NUMBER AT EACH DICHOTOMY LEVEL :',7I5)
+
       END SUBROUTINE TETHEX
-!*==TEDHKL.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE TEDHKL(Kram,Krap,Krcm,Krcp,Ichoix)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -762,10 +776,15 @@
           ENDDO
  100    ENDDO
       ENDDO
+
 99999 END SUBROUTINE TEDHKL
-!*==TEDHKL1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE TEDHKL1(Kram,Krap,Krcm,Krcp,Ichoix,K1)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -811,13 +830,18 @@
           GOTO 99999
         ENDIF
       ENDDO
+
 99999 END SUBROUTINE TEDHKL1
-!*==ORTHOR.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     |                   O R T H O R H O M B I Q U E                  |
 !     ------------------------------------------------------------------
       SUBROUTINE ORTHOR(Na,Nb,Nc)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -827,8 +851,7 @@
 !
 ! Local variables
 !
-      REAL :: Aare,  Atest, Aw, Bbre,  &
-     &        Btest, Bw, Ccre, Ctest, Cw, &
+      REAL :: Aare,  Atest, Aw, Bbre, Btest, Bw, Ccre, Ctest, Cw, &
      &        Ram7, Rap7, Rbm7, Rbp7, Rcm7, Rcp7, Vap, Vtestm, Vtestp
       INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ib, Ib2, Ib3, Ib4, Ib5, Ib6, Ib7, Ic, Ic2,  &
      &           Ic3, Ic4, Ic5, Ic6, Ic7, Ind, Kram1, Kram2, Kram3, Kram4, Kram5, Kram6,      &
@@ -1124,8 +1147,11 @@
  100  ENDDO
 !      WRITE (iw,99003) (Ndich(I),I=1,7)
 !99003 FORMAT (//,2X,'ITERATION NUMBER AT EACH DICHOTOMY LEVEL :',7I5)
+
       END SUBROUTINE ORTHOR
-!*==ORDHKL.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE ORDHKL(Kram,Krap,Krbm,Krbp,Krcm,Krcp)
 
       USE DICVAR
@@ -1221,10 +1247,15 @@
           ENDDO
  150    ENDDO
  200  ENDDO
+
 99999 END SUBROUTINE ORDHKL
-!*==ORDHKL1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE ORDHKL1(Kram,Krap,Krbm,Krbp,Krcm,Krcp,K1)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -1262,8 +1293,11 @@
           GOTO 99999
         ENDIF
       ENDDO
+
 99999 END SUBROUTINE ORDHKL1
-!*==MONOC1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     | 		   M O N O C L I N I C 1		       |
 !     ------------------------------------------------------------------
@@ -1695,15 +1729,6 @@
                                          bebe = Beinf7 + (pab64/2.)
                                          Vap = aa*bb*cc/SIN(bebe)
                                          beta = pideg*bebe
-                                      !   DO I = 1, n
-                                        !   Jj = irj(I,7)
-                                        !   DO J = 1, Jj
-                                        !     Carh  = ih(I,J,7)*ih(I,J,7)
-                                        !     Cark  = ik(I,J,7)*ik(I,J,7)
-                                        !     Carl  = il(I,J,7)*il(I,J,7)
-                                        !     Prohl = il(I,J,7)*ih(I,J,7)
-                                        !   ENDDO
-                                      !   ENDDO
                                          Ind = 5
                                          Nrind = 4
                                          CALL AFFPAR(Ind,Nrind,Vap)
@@ -1775,14 +1800,20 @@
  100      ENDDO
         ENDDO
  200  ENDDO
- 300  CONTINUE ! WRITE (iw,99003) (Ndich(I),I=1,7)
+ 300  CONTINUE
+!      WRITE (iw,99003) (Ndich(I),I=1,7)
 !99003 FORMAT (//,2X,'ITERATION NUMBER AT EACH DICHOTOMY LEVEL :',7I5)
 !99002 FORMAT (' ',2X,'ANGLE RANGE SCANNED :',2X,'BETA MIN=',F7.3,' Deg.  BETA MAX=',F7.3,' Deg.')
+
       END SUBROUTINE MONOC1
-!*==MODHKL.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE MODHKL(Kram,Krap,Krcm,Krcp,Kracm,Kracp,Krbm,Krbp,Kamcp,Kapcm,Csm,Csp,Amoi,Aplu,Cmoi,Cplu,Kracms,  &
      &                  Kracps)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -2010,4 +2041,8 @@
  160      ENDDO
  200    ENDDO
       ENDDO
+
 99999 END SUBROUTINE MODHKL
+!
+!*****************************************************************************
+!
