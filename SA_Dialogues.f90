@@ -89,7 +89,6 @@
                      IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
                      IDFZMpars(1:maxfrginterface)
 
-
       INTEGER, EXTERNAL :: Read_One_Zm
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       INTEGER        iFlags
@@ -103,6 +102,9 @@
       INTEGER        tNextzmNum
       CHARACTER*(7)  tExtension
 
+      LOGICAL           Resume_SA
+      COMMON /RESUMESA/ Resume_SA
+
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
       SELECT CASE (EventType)
@@ -113,6 +115,7 @@
               CALL EndWizardPastPawley
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT, IDB_PO)
+              Resume_SA = .FALSE. ! Initialisation
 ! Go to the next stage of the SA input
 ! Grey out 'Load DASH Pawley file' button on toolbar
               CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOff)
