@@ -1,4 +1,4 @@
-! Winteracter module created : 12/Jul/2002 15:54:00
+! Winteracter module created : 17/Jul/2002 13:07:39
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -629,4 +629,6 @@
           INTEGER, PARAMETER :: IDF_egLine5                     =  1486
           INTEGER, PARAMETER :: IDF_egLine0                     =  1487
           INTEGER, PARAMETER :: IDB_Configuration               =  1488
+          INTEGER, PARAMETER :: IDB_Prog3                       =  1489
+          INTEGER, PARAMETER :: IDB_Prog2                       =  1493
       END MODULE Druid_Header

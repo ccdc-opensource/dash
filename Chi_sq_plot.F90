@@ -33,6 +33,10 @@
       ChiSqdChildWindows(ChiHandle) = 1
       CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
       Zoomed = .FALSE.
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_Action1)
+      CALL WDialogFieldState(IDB_Prog3,Disabled)
+      CALL PopActiveWindowID
 
       END SUBROUTINE OpenChiSqPlotWindow
 !
@@ -290,8 +294,10 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
+
       INTEGER                    ChiSqdChildWindows,                 ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
+
       REAL                    chi_sqd
       INTEGER                                           it_count
       REAL                                                        chi_y_max
@@ -304,21 +310,19 @@
       SELECT CASE (EventType)
 ! will close the profile plot window
         CASE (CloseRequest)
-          CALL WindowCloseChild(EventInfo%win)
-          ChiSqdChildWindows(EventInfo%win) = 0
-          CALL UnRegisterChildWindow(EventInfo%win)
+          CALL Close_Chisq_Plot
 ! exposing or resizing of profile plot windows 
-        CASE (expose, resize)
+        CASE (Expose, Resize)
           CALL Plotting_chi_sqd(EventInfo%win)
 !
         CASE (MouseButDown)
           IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
             CALL Plotting_Chi_Sqd(EventInfo%win)
             CALL ZoomChiSqdPlot(EventInfo%win)
-           ENDIF
+          ENDIF
 !
         CASE (KeyDown) ! home key resets the plot to original axes
-           IF (EventInfo%VALUE1 .eq. KeyHome) THEN 
+           IF (EventInfo%VALUE1 .EQ. KeyHome) THEN 
              Zoomed = .FALSE.   
              CALL plotting_Chi_Sqd(EventInfo%win)
            ENDIF
@@ -359,6 +363,10 @@
           ChiSqdChildWindows(I) = 0
         ENDIF
       ENDDO
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_Action1)
+      CALL WDialogFieldState(IDB_Prog3,Enabled)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Close_Chisq_Plot
 !
