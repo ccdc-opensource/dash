@@ -302,8 +302,8 @@
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       INTEGER  DIF_TR
       INTEGER  DIF_BB
@@ -795,8 +795,8 @@
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       INTEGER     I, Shift, FLEN ! Length of TheFileName
       REAL*8      TwoThetaStart, TwoThetaStep, CurrTwoTheta
