@@ -11,6 +11,8 @@
 !
 ! The left-most subscript must vary most rapidly
 !
+! Corresponding subroutine in CCSL: ORTHG()
+! See also ORTHO()
       IMPLICIT NONE
 
       REAL, INTENT (IN   ) :: a, b, c, tAlpha, tBeta, tGamma
@@ -62,25 +64,6 @@
       TheLattice(1,1) = SQRT(a**2-TheLattice(2,1)**2-TheLattice(3,1)**2)
 
       END SUBROUTINE LatticeCellParameters2Lattice
-!
-!*****************************************************************************
-!
-      SUBROUTINE LatticeGetReciprocal(TheRealLattice, TheReciprocalLattice)
-!
-! This routine uses Gram-Schmidt orthogonalisation to calculate the reciprocal lattice
-!
-! The left-most subscript must vary most rapidly
-!
-      IMPLICIT NONE
-
-      REAL, INTENT (IN   ) :: TheRealLattice(1:3,1:3)
-      REAL, INTENT (INOUT) :: TheReciprocalLattice(1:3,1:3)
-
-
-
-
-
-      END SUBROUTINE LatticeGetReciprocal
 !
 !*****************************************************************************
 !
