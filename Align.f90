@@ -351,8 +351,9 @@
 ! can be applied to a molecule and then the axes which are not infinite translation axes reset
 ! with symmetry operations.  However the infinite translation axes still carries the inversion
 ! and (0.5)^2 = (-0.5)^2.  So this quick and dirty fix looks at infinite translation axes and
-! reflects the molecule upon an arbitrary criterion.
-     IF(inversion.eq.1) THEN
+! reflects the molecule upon an arbitrary criterion.  Only applied to cases where there is one
+! infinite axes.
+     IF((inversion.eq.1).and.(iinfiniteaxes.eq.1)) THEN
        IF (InfiniteAxes(3).eq.1) THEN
         AtomOnez = FinalMol(3,1)
         Atomtwoz = FinalMol(3,Natom)
