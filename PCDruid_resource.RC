@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/Sep/2001 18:54:54
+// Modified : 10/Sep/2001 21:00:50
 //
 ///////////////////////////////////////////////////
 //
@@ -2373,7 +2373,7 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAM
 FONT    8, "MS Sans Serif"
 CAPTION "Results from Simulated Annealing"
 BEGIN
-    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   29,   43,  410,   76
+    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   29,   43,  411,   76
     CONTROL "Simulated Annealing completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  125,   16,  220,   12
     CONTROL "OK",IDOK_ep,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  215,  133,   40,   14
 END
