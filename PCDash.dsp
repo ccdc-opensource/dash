@@ -103,14 +103,12 @@ LINK32=link.exe
 
 SOURCE=.\Align.f90
 DEP_F90_ALIGN=\
+	".\Debug\ATMVAR.MOD"\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\Variables.mod"\
-	
-NODEP_F90_ALIGN=\
-	".\Debug\ATMVAR.MOD"\
-	".\Debug\ZMVAR.MOD"\
 	
 # End Source File
 # Begin Source File
@@ -149,6 +147,7 @@ SOURCE=.\Basic_Vectors.f90
 
 SOURCE=.\Ccslmain.f90
 DEP_F90_CCSLM=\
+	".\Debug\REFVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\Reflns.inc"\
@@ -171,6 +170,7 @@ DEP_F90_CHI_S=\
 SOURCE=.\create_fob.f90
 DEP_F90_CREAT=\
 	".\Debug\ATMVAR.MOD"\
+	".\Debug\REFVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\params.inc"\
 	
@@ -276,6 +276,7 @@ SOURCE=.\Fcn.f90
 
 SOURCE=.\Ffcalc.f90
 DEP_F90_FFCAL=\
+	".\Debug\REFVAR.MOD"\
 	".\params.inc"\
 	".\SGinc\ffcalctop.inc"\
 	
@@ -284,6 +285,7 @@ DEP_F90_FFCAL=\
 
 SOURCE=.\Fortic.f90
 DEP_F90_FORTI=\
+	".\Debug\REFVAR.MOD"\
 	".\params.inc"\
 	".\SGinc\ffcalctop.inc"\
 	
@@ -292,6 +294,7 @@ DEP_F90_FORTI=\
 
 SOURCE=.\forty.f90
 DEP_F90_FORTY=\
+	".\Debug\REFVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\Reflns.inc"\
@@ -310,6 +313,7 @@ SOURCE=.\Frac2cart.f90
 
 SOURCE=.\Generate_TicMarks.f90
 DEP_F90_GENER=\
+	".\Debug\REFVAR.MOD"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
@@ -321,6 +325,7 @@ DEP_F90_GENER=\
 SOURCE=.\get_logref.f90
 DEP_F90_GET_L=\
 	".\Debug\ATMVAR.MOD"\
+	".\Debug\REFVAR.MOD"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
 	
@@ -329,6 +334,7 @@ DEP_F90_GET_L=\
 
 SOURCE=.\getdsl.f90
 DEP_F90_GETDS=\
+	".\Debug\REFVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
@@ -342,6 +348,7 @@ DEP_F90_GETDS=\
 SOURCE=.\gethcv.f90
 DEP_F90_GETHC=\
 	".\Debug\ATMVAR.MOD"\
+	".\Debug\REFVAR.MOD"\
 	".\params.inc"\
 	
 # End Source File
@@ -349,7 +356,6 @@ DEP_F90_GETHC=\
 
 SOURCE=.\getpik.f90
 DEP_F90_GETPI=\
-	".\Debug\ATMVAR.MOD"\
 	".\params.inc"\
 	".\Variables.mod"\
 	
@@ -370,6 +376,7 @@ DEP_F90_INIT_=\
 
 SOURCE=.\Initialisation.f90
 DEP_F90_INITI=\
+	".\Debug\REFVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -385,6 +392,7 @@ DEP_F90_INITI=\
 
 SOURCE=.\Interface.f90
 DEP_F90_INTER=\
+	".\Debug\REFVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
@@ -455,6 +463,7 @@ DEP_F90_MONKE=\
 SOURCE=.\multipeak_chisq.f90
 DEP_F90_MULTI=\
 	".\params.inc"\
+	".\Reflns.inc"\
 	
 # End Source File
 # Begin Source File
@@ -462,6 +471,7 @@ DEP_F90_MULTI=\
 SOURCE=.\multipeak_fitter.f90
 DEP_F90_MULTIP=\
 	".\params.inc"\
+	".\Reflns.inc"\
 	
 # End Source File
 # Begin Source File
@@ -481,6 +491,7 @@ SOURCE=.\Mvec.f90
 
 SOURCE=.\Pawley.f90
 DEP_F90_PAWLE=\
+	".\Debug\REFVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
@@ -517,6 +528,7 @@ SOURCE=.\PCDruid_Resource.F90
 
 SOURCE=.\Pf.f90
 DEP_F90_PF_F9=\
+	".\Debug\REFVAR.MOD"\
 	".\params.inc"\
 	".\Reflns.inc"\
 	
@@ -569,6 +581,7 @@ DEP_F90_POLYL=\
 
 SOURCE=.\Pr.f90
 DEP_F90_PR_F9=\
+	".\Debug\REFVAR.MOD"\
 	".\params.inc"\
 	".\Reflns.inc"\
 	
@@ -577,6 +590,7 @@ DEP_F90_PR_F9=\
 
 SOURCE=.\Profile_Plot.f90
 DEP_F90_PROFI=\
+	".\Debug\REFVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
@@ -603,6 +617,10 @@ DEP_F90_READ_=\
 	".\Debug\SAMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	
+# End Source File
+# Begin Source File
+
+SOURCE=.\REFVAR.f90
 # End Source File
 # Begin Source File
 
@@ -634,6 +652,7 @@ SOURCE=.\SA_Begin.f90
 DEP_F90_SA_BE=\
 	".\Debug\ATMVAR.MOD"\
 	".\Debug\PO_VAR.mod"\
+	".\Debug\REFVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
@@ -730,6 +749,15 @@ SOURCE=.\SAMVAR.f90
 # Begin Source File
 
 SOURCE=.\SGDecode.f90
+# End Source File
+# Begin Source File
+
+SOURCE=.\SpaceGroupDetermination.f90
+DEP_F90_SPACE=\
+	".\DRUID_HEADER.mod"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
 # End Source File
 # Begin Source File
 
@@ -857,6 +885,7 @@ SOURCE=.\Vicar.f90
 
 SOURCE=.\Wifd99.f90
 DEP_F90_WIFD9=\
+	".\Debug\REFVAR.MOD"\
 	".\params.inc"\
 	".\Reflns.inc"\
 	
