@@ -20,7 +20,7 @@
       INTEGER KK, JQ, JQS, i
       INTEGER iFrg
       INTEGER iFrgCopy
-      INTEGER iRow, iCol
+      INTEGER iRow, iCol, nRows, iField
       REAL QQSUM, QDEN, QUATER(1:4)
       REAL Duonion(0:1)
 
@@ -97,99 +97,113 @@
       CALL WDialogSelect(IDD_Rietveld2)
       iRow = 1
       iCol = 1
+      iField = IDF_RR_ZmatrixGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             ! Translations
-            CALL WGridLabelRow(IDF_RR_ZmatrixGrid, iRow, 'x')
-            CALL WGridPutCellReal(IDF_RR_ZmatrixGrid, iCol, iRow, RR_tran(1,iFrg,iFrgCopy), "(F7.5)")
+            CALL WGridLabelRow(iField, iRow, 'x')
+            CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(1,iFrg,iFrgCopy), "(F7.5)")
             iRow = iRow + 1
-            CALL WGridLabelRow(IDF_RR_ZmatrixGrid, iRow, 'y')
-            CALL WGridPutCellReal(IDF_RR_ZmatrixGrid, iCol, iRow, RR_tran(2,iFrg,iFrgCopy), "(F7.5)")
+            CALL WGridLabelRow(iField, iRow, 'y')
+            CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(2,iFrg,iFrgCopy), "(F7.5)")
             iRow = iRow + 1
-            CALL WGridLabelRow(IDF_RR_ZmatrixGrid, iRow, 'z')
-            CALL WGridPutCellReal(IDF_RR_ZmatrixGrid, iCol, iRow, RR_tran(3,iFrg,iFrgCopy), "(F7.5)")
+            CALL WGridLabelRow(iField, iRow, 'z')
+            CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(3,iFrg,iFrgCopy), "(F7.5)")
             iRow = iRow + 1
             ! Rotations
-            IF (natoms(iFrg) .EQ. 1) THEN
-! Single atom: no rotations
-            ELSE IF (UseQuaternions(iFrg)) THEN
-              CALL WGridLabelRow(IDF_RR_ZmatrixGrid, iRow, 'Q0')
-              CALL WGridPutCellReal(IDF_RR_ZmatrixGrid, iCol, iRow, RR_rot(1,iFrg,iFrgCopy), "(F7.5)")
+            IF (natoms(iFrg) .NE. 1) THEN
+              CALL WGridLabelRow(iField, iRow, 'Q0')
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(1,iFrg,iFrgCopy), "(F7.5)")
               iRow = iRow + 1
-              CALL WGridLabelRow(IDF_RR_ZmatrixGrid, iRow, 'Q1')
-              CALL WGridPutCellReal(IDF_RR_ZmatrixGrid, iCol, iRow, RR_rot(2,iFrg,iFrgCopy), "(F7.5)")
+              CALL WGridLabelRow(iField, iRow, 'Q1')
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(2,iFrg,iFrgCopy), "(F7.5)")
               iRow = iRow + 1
-              CALL WGridLabelRow(IDF_RR_ZmatrixGrid, iRow, 'Q2')
-              CALL WGridPutCellReal(IDF_RR_ZmatrixGrid, iCol, iRow, RR_rot(3,iFrg,iFrgCopy), "(F7.5)")
-              iRow = iRow + 1
-              CALL WGridLabelRow(IDF_RR_ZmatrixGrid, iRow, 'Q3')
-              CALL WGridPutCellReal(IDF_RR_ZmatrixGrid, iCol, iRow, RR_rot(4,iFrg,iFrgCopy), "(F7.5)")
-              iRow = iRow + 1
-            ELSE
-! Molecule with rotation restricted to a single axis
-              CALL WGridLabelRow(IDF_RR_ZmatrixGrid, iRow, 'Q0')
-              CALL WGridPutCellReal(IDF_RR_ZmatrixGrid, iCol, iRow, RR_rot(1,iFrg,iFrgCopy), "(F7.5)")
-              iRow = iRow + 1
-              CALL WGridLabelRow(IDF_RR_ZmatrixGrid, iRow, 'Q1')
-              CALL WGridPutCellReal(IDF_RR_ZmatrixGrid, iCol, iRow, RR_rot(2,iFrg,iFrgCopy), "(F7.5)")
-              iRow = iRow + 1
+              IF (UseQuaternions(iFrg)) THEN
+                CALL WGridLabelRow(iField, iRow, 'Q2')
+                CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(3,iFrg,iFrgCopy), "(F7.5)")
+                iRow = iRow + 1
+                CALL WGridLabelRow(iField, iRow, 'Q3')
+                CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(4,iFrg,iFrgCopy), "(F7.5)")
+                iRow = iRow + 1
+              ENDIF
             ENDIF
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(IDF_RR_ZmatrixGrid,iRow-1)
+      nRows = iRow-1
+      CALL WGridRows(iField, nRows)
+      iCol = 2
+      DO iRow = 1, nRows
+        CALL WGridPutCellCheckBox(iField, iCol, iRow, 0)
+      ENDDO
       iRow = 1
       iCol = 1
+      iField = IDF_RR_TorsionGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 4, natoms(iFrg)
-              CALL WGridLabelRow(IDF_RR_TorsionGrid, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
+              CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
                                     OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
                                     OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg)))//':'// &
                                     OriginalLabel(iz3(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz3(i,iFrg),iFrg))))
-              CALL WGridPutCellReal(IDF_RR_TorsionGrid, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
               iRow = iRow + 1
             ENDDO
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(IDF_RR_TorsionGrid,iRow-1)
+      nRows = iRow-1
+      CALL WGridRows(iField, nRows)
+      iCol = 2
+      DO iRow = 1, nRows
+        CALL WGridPutCellCheckBox(iField, iCol, iRow, 0)
+      ENDDO
       iRow = 1
       iCol = 1
+      iField = IDF_RR_AngleGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 3, natoms(iFrg)
-              CALL WGridLabelRow(IDF_RR_AngleGrid, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
+              CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
                                   OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
                                   OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg))))
-              CALL WGridPutCellReal(IDF_RR_AngleGrid, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
               iRow = iRow + 1
             ENDDO
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(IDF_RR_AngleGrid,iRow-1)
+      nRows = iRow-1
+      CALL WGridRows(iField, nRows)
+      iCol = 2
+      DO iRow = 1, nRows
+        CALL WGridPutCellCheckBox(iField, iCol, iRow, 0)
+      ENDDO
       iRow = 1
       iCol = 1
+      iField = IDF_RR_BondGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 2, natoms(iFrg)
-              CALL WGridLabelRow(IDF_RR_BondGrid, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))// &
+              CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))// &
                 ':'//OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg))))
-              CALL WGridPutCellReal(IDF_RR_BondGrid, iCol, iRow, RR_blen(i,iFrg,iFrgCopy), "(F7.5)")
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy), "(F7.5)")
               iRow = iRow + 1
             ENDDO
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(IDF_RR_BondGrid,iRow-1)
+      nRows = iRow-1
+      CALL WGridRows(iField, nRows)
+      iCol = 2
+      DO iRow = 1, nRows
+        CALL WGridPutCellCheckBox(iField, iCol, iRow, 0)
+      ENDDO
       CALL WDialogShow(-1,-1,0,ModeLess)
-
-
 
       END SUBROUTINE ShowWindowRietveld
 !
@@ -212,7 +226,6 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_Refine)
               CALL RietveldRefinement
-
             CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide
             CASE (IDB_View)

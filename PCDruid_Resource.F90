@@ -1,4 +1,4 @@
-! Winteracter module created : 31/Mar/2003 14:53:59
+! Winteracter module created : 31/Mar/2003 15:28:07
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -229,7 +229,6 @@
           INTEGER, PARAMETER :: IDD_Parameter_Status            =   136
           INTEGER, PARAMETER :: IDD_Anneal_Status               =   138
           INTEGER, PARAMETER :: IDD_Profile_Status              =   139
-          INTEGER, PARAMETER :: IDF_Viewer                      =  1514
           INTEGER, PARAMETER :: IDD_DIALOG001                   =   132
           INTEGER, PARAMETER :: IDF_PawRef_Refine               =  1301
           INTEGER, PARAMETER :: IDF_IDF_PawRef_NBack            =  1291
