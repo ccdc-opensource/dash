@@ -5094,45 +5094,6 @@ C
 !
 !*****************************************************************************
 !
-      SUBROUTINE Rebin_Profile()
-!
-! Rebins the profile
-!
-      INCLUDE 'PARAMS.INC'
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-
-      INCLUDE 'statlog.inc'
-!
-      NBIN=(NOBS/LBIN)
-      DO I=1,NBIN
-        IST=(I-1)*LBIN
-        XADD=0.
-        YOADD=0.
-        YCADD=0.
-        YBADD=0.
-        VADD=0.
-        DO J=1,LBIN
-          JJ=J+IST
-          XADD=XADD+XOBS(JJ)
-          YOADD=YOADD+YOBS(JJ)
-          YCADD=YCADD+YCAL(JJ)
-          YBADD=YBADD+YBAK(JJ)
-          VADD=VADD+EOBS(JJ)**2
-        END DO
-        XBIN(I)=XADD/FLOAT(LBIN)
-        YOBIN(I)=YOADD/FLOAT(LBIN)
-        YCBIN(I)=YCADD/FLOAT(LBIN)
-        YBBIN(I)=YBADD/FLOAT(LBIN)
-        EBIN(I)=SQRT(VADD)/FLOAT(LBIN)
-      END DO
-      DataSetChange=DataSetChange+1
-      CALL Get_IPMaxMin() 
-
-      END SUBROUTINE Rebin_Profile
-!
-!*****************************************************************************
-!
 ! Originally in Wizard_routines.f90
 !
       SUBROUTINE PolyFitter_Wizard
