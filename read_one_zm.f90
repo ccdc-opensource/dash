@@ -119,14 +119,14 @@
       CLOSE (19)
       gotzmfile(iFrg) = .TRUE.
 ! Initialise all the stuff that isn't present in a .zmatrix file
-      zmNumberOfCopies(iFrg) = 1
       UseQuaternions(iFrg) = .TRUE.
       zmInitialQs(0,iFrg) = 1.0
       zmInitialQs(1,iFrg) = 0.0
       zmInitialQs(2,iFrg) = 0.0
       zmInitialQs(3,iFrg) = 0.0
       zmSingleRotAxDef(iFrg) = 2  ! 2 = fractional co-ordinates
-      zmSingleRotAxAtm(iFrg) = 1
+      zmSingleRotAxAtm(1,iFrg) = 1
+      zmSingleRotAxAtm(2,iFrg) = 1
       zmSingleRotAxFrac(1,iFrg) = 0.0
       zmSingleRotAxFrac(2,iFrg) = 0.0
       zmSingleRotAxFrac(3,iFrg) = 1.0

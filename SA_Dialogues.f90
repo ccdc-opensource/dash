@@ -75,6 +75,8 @@
 
       IMPLICIT NONE      
 
+      INTEGER, EXTERNAL :: Read_One_Zm
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       INTEGER        iFlags
       INTEGER        zmread
       INTEGER        iFrg, iSelection
@@ -86,24 +88,20 @@
       INTEGER        tNextzmNum
       INTEGER        tCounter
       CHARACTER*(7)  tExtension
-      INTEGER, EXTERNAL :: Read_One_Zm
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
 
 ! The following variables are there to allow the dialogue fields in the
 ! window dealing with Z-matrices to be handled by DO...ENDDO loops.
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
 ! but these mappings are.
 
-      INTEGER        IDFZMNumber,                    IDFZMFile,                &
+      INTEGER        IDFZMFile,                                                &
                      IDBZMDelete,                    IDBZMBrowse,              &
                      IDBZMView,                      IDBZMEdit,                &
-                     IDFZMpars,                                                &
-                     IDBZMUp,                        IDBZMDown
-      COMMON /IDFZM/ IDFZMNumber(1:maxfrginterface), IDFZMFile(1:maxfrginterface),      &
+                     IDFZMpars
+      COMMON /IDFZM/ IDFZMFile(1:maxfrginterface),                                      &
                      IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
                      IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
-                     IDFZMpars(1:maxfrginterface),                                      &
-                     IDBZMUp(1:maxfrginterface),     IDBZMDown(1:maxfrginterface)
+                     IDFZMpars(1:maxfrginterface)
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -118,14 +116,6 @@
 ! Go to the next stage of the SA input
 ! Grey out 'Load DASH Pawley file' button on toolbar
               CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOff)
-              CALL WDialogSelect(IDD_SAW_Page1)
-              DO iFrg = 1, maxfrg
-                IF (gotzmfile(iFrg)) THEN
-! Get the number of copies to use. If zero, set gotzmfile to .FALSE.
-                  CALL WDialogGetInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
-                  IF (zmNumberOfCopies(iFrg) .EQ. 0) gotzmfile(iFrg) = .FALSE.
-                ENDIF
-              ENDDO
 ! If the user has requested preferred orientation, make sure we pass the pertinent Wizard window
               CALL WDialogSelect(IDD_SAW_Page2)
               IF ((EventInfo%VALUE1 .EQ. IDB_PO) .OR. WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
@@ -186,8 +176,6 @@
                 zmread = Read_One_ZM(iFrg)
                 IF (zmread .EQ. 0) THEN ! successful read
                   gotzmfile(iFrg) = .TRUE.
-! Initialise 'Number of' field to 1
-                  CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
 ! traps for Z-matrix reading
                 ELSE 
                   gotzmfile(iFrg) = .FALSE. 
@@ -202,8 +190,6 @@
                 zmread = Read_One_ZM(iFrg)
                 IF (zmread .EQ. 0) THEN ! successful read
                   gotzmfile(iFrg) = .TRUE.
-! Initialise 'Number of' field to 1
-                  CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
 ! Find next free slot ("iFrg")
                   tCounter = 1
                   DO WHILE ((gotzmfile(iFrg)) .AND. (tCounter .LT. maxfrg))
@@ -241,34 +227,8 @@
                 iFrg = iFrg + 1
               ENDDO
               CALL ShowEditZMatrixWindow(iFrg)
-! The "Up" and "Down" spinners for the number of Z-matrices are emulated,
-! because that gives us more control over them
-            CASE (IDB_Up1, IDB_Up2, IDB_Up3, IDB_Up4, IDB_Up5, IDB_Up6)
-              iFrg = 1
-              DO WHILE (IDBZMUp(iFrg) .NE. EventInfo%VALUE1)
-                iFrg = iFrg + 1
-              ENDDO
-              CALL WDialogGetInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
-              zmNumberOfCopies(iFrg) = MIN(8, zmNumberOfCopies(iFrg) + 1)
-              CALL WDialogPutInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
-            CASE (IDB_Down1, IDB_Down2, IDB_Down3, IDB_Down4, IDB_Down5, IDB_Down6)
-              iFrg = 1
-              DO WHILE (IDBZMDown(iFrg) .NE. EventInfo%VALUE1)
-                iFrg = iFrg + 1
-              ENDDO
-              CALL WDialogGetInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
-              zmNumberOfCopies(iFrg) = MAX(1, zmNumberOfCopies(iFrg) - 1)
-              CALL WDialogPutInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
           END SELECT
         CASE (FieldChanged)
-          DO iFrg = 1, maxfrginterface
-            IF ((EventInfo%VALUE1 .EQ. IDFzmNumber(iFrg)) .OR. (EventInfo%VALUE2 .EQ. IDFzmNumber(iFrg))) THEN
-              ! Winteracter doesn't allow us to keep track of the "number of copies" input box
-              ! having been changed, and we need to have updated the internal variables before
-              ! calling UpdateZmatrixSelection(), so we will read out those boxes now.
-              CALL WDialogGetInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
-            ENDIF
-          ENDDO
       END SELECT
   999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
@@ -331,10 +291,10 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: zmSave, zmSaveAs, WriteMol2, zmRebuild
       INTEGER iFrg, iOption, iColumn, iAtomNr, iDummy, iBondNr, iRow, iCol
       REAL    tReal
       LOGICAL ThisOne
-      INTEGER, EXTERNAL :: zmSave, zmSaveAs, WriteMol2, zmRebuild
       INTEGER tLength, I, iBondNr2
       CHARACTER(MaxPathLength) temp_file
 
@@ -565,19 +525,7 @@
               CALL WDialogHide
             CASE (IDCANCEL)
               CALL WDialogHide
-            CASE (IDB_Convert) ! Convert Euler angles to quaternions
-              CALL WDialogGetReal(IDF_Alpha,Alpha)
-              CALL WDialogGetReal(IDF_Beta,Beta)
-              CALL WDialogGetReal(IDF_Gamma,Gamma)
-              Q(0) = COS(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha+Gamma))
-              Q(1) = SIN(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha-Gamma))
-              Q(2) = SIN(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha-Gamma))
-              Q(3) = COS(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha+Gamma))
-              CALL WDialogPutReal(IDF_Q0,Q(0))
-              CALL WDialogPutReal(IDF_Q1,Q(1))
-              CALL WDialogPutReal(IDF_Q2,Q(2))
-              CALL WDialogPutReal(IDF_Q3,Q(3))
-            CASE (IDB_View)
+            CASE (IDB_ViewRot, IDB_View)
               natcry = NATOMS(iFrg)
               DO iAtomNr = 1, natcry
                 taxyzo(1,iAtomNr) = axyzo(1,iAtomNr)
@@ -585,7 +533,7 @@
                 taxyzo(3,iAtomNr) = axyzo(3,iAtomNr)
               ENDDO
 ! Subtract origin from co-ordinates
-              CALL WDialogGetRadioButton(IDF_RotOrgCOM,iOption)
+              CALL WDialogGetRadioButton(IDF_RotOrgCOM, iOption)
               SELECT CASE (iOption)
                 CASE (1) ! C.O.M.
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
@@ -608,6 +556,10 @@
 ! Otherwise, use atom number ICFRG
                 CASE (2) ! Use atom nr.
                   CALL WDialogGetInteger(IDF_RotOrgAtomNr, iAtomNr)
+                  IF ((iAtomNr .LT. 1) .OR. (iAtomNr .GT. natoms(CurrentlyEditedFrag))) THEN
+                    CALL ErrorMessage("Please enter a correct atom number for the centre of rotation.")
+                    CALL PopActiveWindowID
+                  ENDIF
                   COM(1) = axyzo(1,izmbid(iAtomNr,iFrg))
                   COM(2) = axyzo(2,izmbid(iAtomNr,iFrg))
                   COM(3) = axyzo(3,izmbid(iAtomNr,iFrg))
@@ -618,10 +570,24 @@
                 axyzo(3,iAtomNr) = axyzo(3,iAtomNr) - COM(3)
               ENDDO
 ! Apply initial orientation
-              CALL WDialogGetReal(IDF_Q0,Q(0))
-              CALL WDialogGetReal(IDF_Q1,Q(1))
-              CALL WDialogGetReal(IDF_Q2,Q(2))
-              CALL WDialogGetReal(IDF_Q3,Q(3))
+              CALL WDialogGetRadioButton(IDF_IniOrQuater, iOption)
+              SELECT CASE (iOption)
+                CASE (1) ! Define from axis (only possible when axis is defined from atoms, not from another axis)
+
+                CASE (2) ! Defined as Euler angles => convert to Quaternions
+                  CALL WDialogGetReal(IDF_Alpha, Alpha)
+                  CALL WDialogGetReal(IDF_Beta, Beta)
+                  CALL WDialogGetReal(IDF_Gamma, Gamma) ! Gamma is irrelevant
+                  Q(0) = COS(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha+Gamma))
+                  Q(1) = SIN(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha-Gamma))
+                  Q(2) = SIN(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha-Gamma))
+                  Q(3) = COS(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha+Gamma))
+                CASE (3) ! Defined as quaternions
+                  CALL WDialogGetReal(IDF_Q0, Q(0))
+                  CALL WDialogGetReal(IDF_Q1, Q(1))
+                  CALL WDialogGetReal(IDF_Q2, Q(2))
+                  CALL WDialogGetReal(IDF_Q3, Q(3))
+              END SELECT
               CALL ROTMAK(Q, RotMat)
               DO I = 1, natcry
                 tX = axyzo(1,I) * RotMat(1,1) + axyzo(2,I) * RotMat(1,2) + axyzo(3,I) * RotMat(1,3)
@@ -646,7 +612,7 @@
 !C! Takes bonds              from bond      in SAMVAR
 !C! Takes bond types         from btype     in SAMVAR
 !C! and writes out a .mol2 file
-              IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) CALL ViewStructure(temp_file)
+              IF (WriteMol2(temp_file, .TRUE., iFrg) .EQ. 1) CALL ViewStructure(temp_file)
               CALL IOSDeleteFile(temp_file)
               DO iAtomNr = 1, natcry
                 axyzo(1,iAtomNr) = taxyzo(1,iAtomNr)
@@ -693,13 +659,16 @@
                     iOpt3State = Enabled
                 END SELECT
               ENDIF
-              CALL WDialogFieldState(IDF_AtomNr,       iOpt1State)
+              CALL WDialogFieldState(IDF_AtomNr1,       iOpt1State)
               CALL WDialogFieldState(IDF_LABELa,       iOpt2State)
               CALL WDialogFieldState(IDF_LABELb,       iOpt2State)
               CALL WDialogFieldState(IDF_LABELc,       iOpt2State)
-              CALL WDialogFieldState(IDF_a,            iOpt2State)
-              CALL WDialogFieldState(IDF_b,            iOpt2State)
-              CALL WDialogFieldState(IDF_c,            iOpt2State)
+              CALL WDialogFieldState(IDF_a1,            iOpt2State)
+              CALL WDialogFieldState(IDF_b1,            iOpt2State)
+              CALL WDialogFieldState(IDF_c1,            iOpt2State)
+              CALL WDialogFieldState(IDF_a2,            iOpt2State)
+              CALL WDialogFieldState(IDF_b2,            iOpt2State)
+              CALL WDialogFieldState(IDF_c2,            iOpt2State)
               CALL WDialogFieldState(IDF_RotAxPlnAtm1, iOpt3State)
               CALL WDialogFieldState(IDF_RotAxPlnAtm2, iOpt3State)
               CALL WDialogFieldState(IDF_RotAxPlnAtm3, iOpt3State)
@@ -728,7 +697,8 @@
       icomflg(iFrg2)   = icomflg(iFrg1)
       UseQuaternions(iFrg2)         = UseQuaternions(iFrg1)
       zmSingleRotAxDef(iFrg2)       = zmSingleRotAxDef(iFrg1)
-      zmSingleRotAxAtm(iFrg2)       = zmSingleRotAxAtm(iFrg1)
+      zmSingleRotAxAtm(1,iFrg2)     = zmSingleRotAxAtm(1,iFrg1)
+      zmSingleRotAxAtm(2,iFrg2)     = zmSingleRotAxAtm(2,iFrg1)
       zmSingleRotAxFrac(:,iFrg2)    = zmSingleRotAxFrac(:,iFrg1)
       zmSingleRotAxAtms(:,iFrg2)    = zmSingleRotAxAtms(:,iFrg1)
       zmInitialQs(:,iFrg2)          = zmInitialQs(:,iFrg1)
@@ -777,8 +747,8 @@
 
       IMPLICIT NONE      
 
-      INTEGER iFrg
       INTEGER, EXTERNAL :: Read_One_ZM, WriteMol2
+      INTEGER iFrg
       INTEGER tNumZMatrices, iAtomNr
       CHARACTER(80) tZmatrices
       DIMENSION tZmatrices(10)
@@ -908,13 +878,17 @@
       CALL WDialogFieldStateLogical(IDF_RotAxAtom,      .NOT. UseQuaternions(iFrg))
       CALL WDialogFieldStateLogical(IDF_RotAxFrac,      .NOT. UseQuaternions(iFrg))
       CALL WDialogFieldStateLogical(IDF_RotAxPln,       .NOT. UseQuaternions(iFrg))
-      CALL WDialogPutInteger(IDF_AtomNr,izmoid(zmSingleRotAxAtm(iFrg),iFrg))
-      CALL WDialogPutReal(IDF_a,zmSingleRotAxFrac(1,iFrg))
-      CALL WDialogPutReal(IDF_b,zmSingleRotAxFrac(2,iFrg))
-      CALL WDialogPutReal(IDF_c,zmSingleRotAxFrac(3,iFrg))
-      CALL WDialogPutInteger(IDF_RotAxPlnAtm1,izmoid(zmSingleRotAxAtms(1,iFrg),iFrg))
-      CALL WDialogPutInteger(IDF_RotAxPlnAtm2,izmoid(zmSingleRotAxAtms(2,iFrg),iFrg))
-      CALL WDialogPutInteger(IDF_RotAxPlnAtm3,izmoid(zmSingleRotAxAtms(3,iFrg),iFrg))
+      CALL WDialogPutInteger(IDF_AtomNr1, izmoid(zmSingleRotAxAtm(1,iFrg), iFrg))
+      CALL WDialogPutInteger(IDF_AtomNr2, izmoid(zmSingleRotAxAtm(2,iFrg), iFrg))
+      CALL WDialogPutReal(IDF_a1, zmSingleRotAxFrac(1,iFrg))
+      CALL WDialogPutReal(IDF_b1, zmSingleRotAxFrac(2,iFrg))
+      CALL WDialogPutReal(IDF_c1, zmSingleRotAxFrac(3,iFrg))
+      CALL WDialogPutReal(IDF_a2, zmSingleRotAxFrac(1,iFrg))
+      CALL WDialogPutReal(IDF_b2, zmSingleRotAxFrac(2,iFrg))
+      CALL WDialogPutReal(IDF_c2, zmSingleRotAxFrac(3,iFrg))
+      CALL WDialogPutInteger(IDF_RotAxPlnAtm1, izmoid(zmSingleRotAxAtms(1,iFrg), iFrg))
+      CALL WDialogPutInteger(IDF_RotAxPlnAtm2, izmoid(zmSingleRotAxAtms(2,iFrg), iFrg))
+      CALL WDialogPutInteger(IDF_RotAxPlnAtm3, izmoid(zmSingleRotAxAtms(3,iFrg), iFrg))
       iOpt1State = Disabled
       iOpt2State = Disabled
       iOpt3State = Disabled
@@ -934,13 +908,17 @@
         iOpt2State = Disabled
         iOpt3State = Disabled
       ENDIF
-      CALL WDialogFieldState(IDF_AtomNr,       iOpt1State)
+      CALL WDialogFieldState(IDF_AtomNr1,       iOpt1State)
+      CALL WDialogFieldState(IDF_AtomNr2,       iOpt1State)
       CALL WDialogFieldState(IDF_LABELa,       iOpt2State)
       CALL WDialogFieldState(IDF_LABELb,       iOpt2State)
       CALL WDialogFieldState(IDF_LABELc,       iOpt2State)
-      CALL WDialogFieldState(IDF_a,            iOpt2State)
-      CALL WDialogFieldState(IDF_b,            iOpt2State)
-      CALL WDialogFieldState(IDF_c,            iOpt2State)
+      CALL WDialogFieldState(IDF_a1,            iOpt2State)
+      CALL WDialogFieldState(IDF_b1,            iOpt2State)
+      CALL WDialogFieldState(IDF_c1,            iOpt2State)
+      CALL WDialogFieldState(IDF_a2,            iOpt2State)
+      CALL WDialogFieldState(IDF_b2,            iOpt2State)
+      CALL WDialogFieldState(IDF_c2,            iOpt2State)
       CALL WDialogFieldState(IDF_RotAxPlnAtm1, iOpt3State)
       CALL WDialogFieldState(IDF_RotAxPlnAtm2, iOpt3State)
       CALL WDialogFieldState(IDF_RotAxPlnAtm3, iOpt3State)
@@ -958,8 +936,8 @@
 
       IMPLICIT NONE
 
-      INTEGER iFrg, iRow, iAtomNr
       INTEGER, EXTERNAL :: ElmSymbol2CSD
+      INTEGER iFrg, iRow, iAtomNr
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
@@ -995,8 +973,8 @@
 
       IMPLICIT NONE 
       
-      INTEGER iFrg, iOption, tInteger
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER iFrg, iOption, tInteger
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
@@ -1005,7 +983,7 @@
       CALL WDialogGetReal(IDF_Q1, zmInitialQs(1,iFrg))
       CALL WDialogGetReal(IDF_Q2, zmInitialQs(2,iFrg))
       CALL WDialogGetReal(IDF_Q3, zmInitialQs(3,iFrg))
-      CALL WDialogGetRadioButton(IDF_RotOrgCOM,iOption)
+      CALL WDialogGetRadioButton(IDF_RotOrgCOM, iOption)
       SELECT CASE (iOption)
         CASE (1) ! C.O.M.
           icomflg(iFrg) = 0
@@ -1014,18 +992,23 @@
           icomflg(iFrg) = izmbid(tInteger,iFrg)
       END SELECT
       UseQuaternions(iFrg) = .NOT. WDialogGetCheckBoxLogical(IDF_UseSingleAxis)
-      CALL WDialogGetInteger(IDF_AtomNr,tInteger)
-      zmSingleRotAxAtm(iFrg) = izmbid(tInteger,iFrg)
-      CALL WDialogGetReal(IDF_a,zmSingleRotAxFrac(1,iFrg))
-      CALL WDialogGetReal(IDF_b,zmSingleRotAxFrac(2,iFrg))
-      CALL WDialogGetReal(IDF_c,zmSingleRotAxFrac(3,iFrg))
-      CALL WDialogGetInteger(IDF_RotAxPlnAtm1,tInteger)
+      CALL WDialogGetInteger(IDF_AtomNr1, tInteger)
+      zmSingleRotAxAtm(1,iFrg) = izmbid(tInteger,iFrg)
+      CALL WDialogGetInteger(IDF_AtomNr2, tInteger)
+      zmSingleRotAxAtm(2,iFrg) = izmbid(tInteger,iFrg)
+      CALL WDialogGetReal(IDF_a1, zmSingleRotAxFrac(1,iFrg))
+      CALL WDialogGetReal(IDF_b1, zmSingleRotAxFrac(2,iFrg))
+      CALL WDialogGetReal(IDF_c1, zmSingleRotAxFrac(3,iFrg))
+      CALL WDialogGetReal(IDF_a2, zmSingleRotAxFrac(1,iFrg))
+      CALL WDialogGetReal(IDF_b2, zmSingleRotAxFrac(2,iFrg))
+      CALL WDialogGetReal(IDF_c2, zmSingleRotAxFrac(3,iFrg))
+      CALL WDialogGetInteger(IDF_RotAxPlnAtm1, tInteger)
       zmSingleRotAxAtms(1,iFrg) = izmbid(tInteger,iFrg)
-      CALL WDialogGetInteger(IDF_RotAxPlnAtm2,tInteger)
+      CALL WDialogGetInteger(IDF_RotAxPlnAtm2, tInteger)
       zmSingleRotAxAtms(2,iFrg) = izmbid(tInteger,iFrg)
-      CALL WDialogGetInteger(IDF_RotAxPlnAtm3,tInteger)
+      CALL WDialogGetInteger(IDF_RotAxPlnAtm3, tInteger)
       zmSingleRotAxAtms(3,iFrg) = izmbid(tInteger,iFrg)
-      CALL WDialogGetRadioButton(IDF_RotAxAtom,zmSingleRotAxDef(iFrg))
+      CALL WDialogGetRadioButton(IDF_RotAxAtom, zmSingleRotAxDef(iFrg))
       CALL zmDoAdmin(iFrg)
       CALL PopActiveWindowID
 
@@ -1230,10 +1213,10 @@
 
       INTEGER, INTENT (IN   ) :: iFrg
 
+      INTEGER, EXTERNAL :: zmSave
       CHARACTER(MaxPathLength) :: zmFileName
       CHARACTER(LEN=45) :: FILTER
       INTEGER iFLAGS
-      INTEGER, EXTERNAL :: zmSave
       
 ! Save the Z-matrix
       zmSaveAs = 1 ! Failure
@@ -1268,8 +1251,8 @@
 
       INTEGER, INTENT (IN   ) :: iFrg
 
-      INTEGER tFileHandle, i
       INTEGER, EXTERNAL :: zmRebuild
+      INTEGER tFileHandle, i
       
 ! Save the Z-matrix
       zmSave = 1 ! Failure
@@ -1316,8 +1299,8 @@
 
       IMPLICIT NONE      
 
-      INTEGER tFieldState
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      INTEGER tFieldState
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page2)
@@ -1374,10 +1357,10 @@
       LOGICAL                                                   LimsChanged
       COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
 
+      CHARACTER*20, EXTERNAL :: Integer2String
       INTEGER I, iCheck, iFrg, KK
       CHARACTER(LEN=3) :: MenuOptions(1:maxfrg+1)
       CHARACTER*20 tStr
-      CHARACTER*20, EXTERNAL :: Integer2String
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
@@ -1443,10 +1426,9 @@
       LOGICAL, EXTERNAL :: NearlyEqual
       REAL    xtem
       INTEGER NMOVES, IFCOl, IFRow, ICHK
-      REAL    RPOS
       INTEGER tMaxRuns, I
       INTEGER iRow, iStatus
-      INTEGER iFrg, iFrgCopy
+      INTEGER iFrg
       INTEGER kk, iOption, jFrg
       CHARACTER*36 parlabel(mvar)
 
@@ -1481,10 +1463,8 @@
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL WDialogSelect(IDD_SA_input3_2)
-              RPOS = T0
-              CALL WDialogPutReal(IDF_SA_T0, RPOS, '(F7.2)')
-              RPOS = RT
-              CALL WDialogPutReal(IDF_SA_Tredrate, RPOS, '(F6.3)')
+              CALL WDialogPutReal(IDF_SA_T0, T0, '(F7.2)')
+              CALL WDialogPutReal(IDF_SA_Tredrate, RT, '(F6.3)')
               NS = 20
               CALL WDialogPutInteger(IDF_SA_NS, NS)
               NT = 25
@@ -1519,11 +1499,9 @@
               DO iFrg = 1, maxfrg
                 ! Only include those that are now checked
                 IF (gotzmfile(iFrg)) THEN
-                  DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-                    DO i = 1, izmpar(iFrg)
-                      kk = kk + 1
-                      parlabel(kk) = czmpar(i,iFrg)
-                    ENDDO
+                  DO i = 1, izmpar(iFrg)
+                    kk = kk + 1
+                    parlabel(kk) = czmpar(i,iFrg)
                   ENDDO
                 ENDIF
               ENDDO
@@ -1657,8 +1635,8 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      INTEGER IHANDLE, KPOS
       INTEGER, EXTERNAL :: WriteSAParametersToFile
+      INTEGER IHANDLE, KPOS
 
 ! We are now on window number 3
       CALL PushActiveWindowID
@@ -1698,6 +1676,8 @@
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_SA_T0) 
+              CALL WDialogGetReal(IDF_SA_T0, T0)
             CASE (IDF_SA_NS) 
               CALL WDialogGetInteger(IDF_SA_NS, NS)
               KPOS = NS * NT * NVAR
@@ -1751,7 +1731,7 @@
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
       INTEGER ICol, NumColumns
-      INTEGER i,j,k, dof, copy, frag
+      INTEGER i, k, dof, frag
       INTEGER Upper, Lower
       REAL    Zero, OneEighty, xtem
 
@@ -1763,21 +1743,16 @@
       Zero = 0.0000
       OneEighty = 180.0000
 !     Given the number of the parameter want to know
-!     which zmatrix, fragment, copy it belongs to.
+!     which zmatrix, fragment it belongs to.
       dof = 0
       frag = 0
-      copy = 0
       DO i = 1, maxDOF
-        DO j = 1, maxcopies
-          DO k = 1, nfrag
-            IF (IFRow .EQ. zm2par(i,j,k)) THEN
-              dof = i
-              copy = j
-              frag = k
-              EXIT
-            ENDIF
-          ENDDO
-          IF (copy .NE. 0) EXIT
+        DO k = 1, nfrag
+          IF (IFRow .EQ. zm2par(i,k)) THEN
+            dof = i
+            frag = k
+            EXIT
+          ENDIF
         ENDDO
         IF (frag .NE. 0) EXIT
       ENDDO
@@ -2144,8 +2119,7 @@
       Upper = 1
       Lower = 2
       OneEightyScale = .TRUE.
-
-      DO I = 1,3
+      DO I = 1, 3
        IF (Tempbounds(I,Upper) * Tempbounds(I, Lower) .LT. 0.00) THEN
          IF (ABS(TempBounds(I,Upper)) .GT. 90.00) THEN
            OneEightyScale = .FALSE.
@@ -2158,7 +2132,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CheckBimodalBounds(row,OneEightyScale)
+      SUBROUTINE CheckBimodalBounds(row, OneEightyScale)
 
 ! Determines whether it is appropriate to use a -180 to 0 and 0 to 180 degree 
 ! scale.  A 0-360 degree scale may be more appropriate (OneEightyScale = .FALSE.)
@@ -2174,7 +2148,6 @@
       LOGICAL OneEightyScale
 
       OneEightyScale = .TRUE.
-
       IF (UB(row) * LB(row) .LT. 0.00) THEN
         IF (ABS(UB(Row)) .GT. 90.00) THEN
           OneEightyScale = .FALSE.
@@ -2207,7 +2180,6 @@
       COMMON /TriModalBounds/  TempBounds 
            
       INTEGER I, Upper, Lower
-
       LOGICAL OneEightyScale
       REAL xtem, tempupper, templower, tempupper2, templower2
 

@@ -71,7 +71,7 @@
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER I, iSol
-      INTEGER iFrg, iFrgCopy
+      INTEGER iFrg
       INTEGER KK, KK1, KK2, KK3, JQ, JQS
       REAL QQSUM, QDEN
       REAL Duonion(0:1)
@@ -90,53 +90,51 @@
 ! Loop over all the fragments
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            KK1 = KK + 1     ! x-translation
-            KK2 = KK + 2     ! y-translation
-            KK3 = KK + 3     ! z-translation
-            BestValuesDoF(KK1,Curr_SA_Run) = BestValuesDoF(KK1,Curr_SA_Run) - INT(BestValuesDoF(KK1,Curr_SA_Run))  ! Position centre of mass inside unit cell
-            BestValuesDoF(KK2,Curr_SA_Run) = BestValuesDoF(KK2,Curr_SA_Run) - INT(BestValuesDoF(KK2,Curr_SA_Run))
-            BestValuesDoF(KK3,Curr_SA_Run) = BestValuesDoF(KK3,Curr_SA_Run) - INT(BestValuesDoF(KK3,Curr_SA_Run))
-            KK = KK + 3
+          KK1 = KK + 1     ! x-translation
+          KK2 = KK + 2     ! y-translation
+          KK3 = KK + 3     ! z-translation
+          BestValuesDoF(KK1,Curr_SA_Run) = BestValuesDoF(KK1,Curr_SA_Run) - INT(BestValuesDoF(KK1,Curr_SA_Run))  ! Position centre of mass inside unit cell
+          BestValuesDoF(KK2,Curr_SA_Run) = BestValuesDoF(KK2,Curr_SA_Run) - INT(BestValuesDoF(KK2,Curr_SA_Run))
+          BestValuesDoF(KK3,Curr_SA_Run) = BestValuesDoF(KK3,Curr_SA_Run) - INT(BestValuesDoF(KK3,Curr_SA_Run))
+          KK = KK + 3
 ! If more than one atom then proceed
-            IF (natoms(iFrg) .GT. 1) THEN
+          IF (natoms(iFrg) .GT. 1) THEN
 ! If we have at least two atoms, there are two options:
 ! 1. Rotate the whole molecule freely, using quaternions
 ! 2. Specify the rotation axis (e.g. if molecule on mirror plane)
-              IF (UseQuaternions(iFrg)) THEN
-                QQSUM = 0.0
-                DO JQ = 0, 3
-                  JQS = 1 + JQ + KK
-                  QQSUM = QQSUM + BestValuesDoF(JQS,Curr_SA_Run)**2
-                ENDDO
+            IF (UseQuaternions(iFrg)) THEN
+              QQSUM = 0.0
+              DO JQ = 0, 3
+                JQS = 1 + JQ + KK
+                QQSUM = QQSUM + BestValuesDoF(JQS,Curr_SA_Run)**2
+              ENDDO
 ! QQSUM now holds the sum of the squares of the quaternions
-                QDEN = 1.0 / SQRT(QQSUM)
-                DO JQ = 0, 3
-                  JQS = 1 + JQ + KK
-                  BestValuesDoF(JQS,Curr_SA_Run) = QDEN * BestValuesDoF(JQS,Curr_SA_Run)
-                ENDDO
-                KK = KK + 4
-              ELSE
+              QDEN = 1.0 / SQRT(QQSUM)
+              DO JQ = 0, 3
+                JQS = 1 + JQ + KK
+                BestValuesDoF(JQS,Curr_SA_Run) = QDEN * BestValuesDoF(JQS,Curr_SA_Run)
+              ENDDO
+              KK = KK + 4
+            ELSE
 ! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
-                Duonion(0) = BestValuesDoF(KK+1,Curr_SA_Run)
-                Duonion(1) = BestValuesDoF(KK+2,Curr_SA_Run)
-                QDEN = 1.0 / SQRT(Duonion(0)**2 + Duonion(1)**2)
-                BestValuesDoF(KK+1,Curr_SA_Run) = BestValuesDoF(KK+1,Curr_SA_Run) * QDEN 
-                BestValuesDoF(KK+2,Curr_SA_Run) = BestValuesDoF(KK+2,Curr_SA_Run) * QDEN 
-                KK = KK + 2
-              ENDIF
+              Duonion(0) = BestValuesDoF(KK+1, Curr_SA_Run)
+              Duonion(1) = BestValuesDoF(KK+2, Curr_SA_Run)
+              QDEN = 1.0 / SQRT(Duonion(0)**2 + Duonion(1)**2)
+              BestValuesDoF(KK+1,Curr_SA_Run) = BestValuesDoF(KK+1,Curr_SA_Run) * QDEN 
+              BestValuesDoF(KK+2,Curr_SA_Run) = BestValuesDoF(KK+2,Curr_SA_Run) * QDEN 
+              KK = KK + 2
             ENDIF
-            DO I = 1, natoms(iFrg)
-              IF (IOPTB(I,iFrg) .EQ. 1) THEN
-                KK = KK + 1
-              ENDIF
-              IF (IOPTA(I,iFrg) .EQ. 1) THEN
-                KK = KK + 1
-              ENDIF
-              IF (IOPTT(I,iFrg) .EQ. 1) THEN
-                KK = KK + 1
-              ENDIF
-            ENDDO
+          ENDIF
+          DO I = 1, natoms(iFrg)
+            IF (IOPTB(I,iFrg) .EQ. 1) THEN
+              KK = KK + 1
+            ENDIF
+            IF (IOPTA(I,iFrg) .EQ. 1) THEN
+              KK = KK + 1
+            ENDIF
+            IF (IOPTT(I,iFrg) .EQ. 1) THEN
+              KK = KK + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO

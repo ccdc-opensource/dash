@@ -27,25 +27,20 @@
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
 ! but these mappings are.
 
-      INTEGER        IDFZMNumber,                    IDFZMFile,                &
+      INTEGER        IDFZMFile,                                                &
                      IDBZMDelete,                    IDBZMBrowse,              &
                      IDBZMView,                      IDBZMEdit,                &
-                     IDFZMpars,                                                &
-                     IDBZMUp,                        IDBZMDown
-      COMMON /IDFZM/ IDFZMNumber(1:maxfrginterface), IDFZMFile(1:maxfrginterface),      &
+                     IDFZMpars
+      COMMON /IDFZM/ IDFZMFile(1:maxfrginterface),                                      &
                      IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
                      IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
-                     IDFZMpars(1:maxfrginterface),                                      &
-                     IDBZMUp(1:maxfrginterface),     IDBZMDown(1:maxfrginterface)
-      DATA IDFzmNumber / IDF_zmNumOf1,  IDF_zmNumOf2,  IDF_zmNumOf3,  IDF_zmNumOf4,  IDF_zmNumOf5,  IDF_zmNumOf6  /
+                     IDFZMpars(1:maxfrginterface)
       DATA IDFZMFile   / IDF_zmFile1,   IDF_zmFile2,   IDF_zmFile3,   IDF_zmFile4,   IDF_zmFile5,   IDF_zmFile6   /
       DATA IDBZMDelete / IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4, IDB_zmDelete5, IDB_zmDelete6 /
       DATA IDBZMBrowse / IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4, IDB_zmBrowse5, IDB_zmBrowse6 /
       DATA IDBZMView   / IDB_zmView1,   IDB_zmView2,   IDB_zmView3,   IDB_zmView4,   IDB_zmView5,   IDB_zmView6   /
       DATA IDBzmEdit   / IDB_zmEdit1,   IDB_zmEdit2,   IDB_zmEdit3,   IDB_zmEdit4,   IDB_zmEdit5,   IDB_zmEdit6   /
       DATA IDFZMpars   / IDF_ZM_pars1,  IDF_ZM_pars2,  IDF_ZM_pars3,  IDF_ZM_pars4,  IDF_ZM_pars5,  IDF_ZM_pars6  /
-      DATA IDBZMUp     / IDB_Up1,       IDB_Up2,       IDB_Up3,       IDB_Up4,       IDB_Up5,       IDB_Up6       /
-      DATA IDBZMDown   / IDB_Down1,     IDB_Down2,     IDB_Down3,     IDB_Down4,     IDB_Down5,     IDB_Down6       /
 
 ! Initialise Winteracter
       CALL WInitialise(' ')

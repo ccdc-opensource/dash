@@ -1,4 +1,4 @@
-! Winteracter module created : 28/Oct/2003 19:09:52
+! Winteracter module created : 29/Oct/2003 10:53:29
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -433,7 +433,6 @@
           INTEGER, PARAMETER :: IDD_Parameter_Status_2          =   156
           INTEGER, PARAMETER :: IDD_DIALOG004                   =   158
           INTEGER, PARAMETER :: IDD_SAW_Page1                   =   159
-          INTEGER, PARAMETER :: IDF_zmNumOf1                    =  1298
           INTEGER, PARAMETER :: IDB_Down1                       =  1299
           INTEGER, PARAMETER :: IDB_Up2                         =  1307
           INTEGER, PARAMETER :: IDF_LABEL10                     =  1465
@@ -478,10 +477,10 @@
           INTEGER, PARAMETER :: IDF_RotOrgAtomNr                =  1122
           INTEGER, PARAMETER :: IDF_RotAxPlnAtm1                =  1118
           INTEGER, PARAMETER :: IDF_RotAxPlnAtm2                =  1119
-          INTEGER, PARAMETER :: IDF_AtomNr                      =  1121
-          INTEGER, PARAMETER :: IDF_a                           =  1145
-          INTEGER, PARAMETER :: IDF_b                           =  1146
-          INTEGER, PARAMETER :: IDF_c                           =  1217
+          INTEGER, PARAMETER :: IDF_AtomNr2                     =  1121
+          INTEGER, PARAMETER :: IDF_a1                          =  1145
+          INTEGER, PARAMETER :: IDF_b1                          =  1146
+          INTEGER, PARAMETER :: IDF_c1                          =  1217
           INTEGER, PARAMETER :: IDD_DIALOG048                   =   166
           INTEGER, PARAMETER :: IDD_TabDataDefaults             =   170
           INTEGER, PARAMETER :: IDD_TabSAsetup                  =   167
@@ -683,18 +682,13 @@
           INTEGER, PARAMETER :: IDB_SaveSol                     =  1406
           INTEGER, PARAMETER :: IDB_LoadSol                     =  1535
           INTEGER, PARAMETER :: IDB_Down2                       =  1300
-          INTEGER, PARAMETER :: IDF_zmNumOf2                    =  1301
           INTEGER, PARAMETER :: IDB_Up1                         =  1536
-          INTEGER, PARAMETER :: IDF_zmNumOf3                    =  1302
           INTEGER, PARAMETER :: IDB_Down3                       =  1303
           INTEGER, PARAMETER :: IDB_Up3                         =  1537
-          INTEGER, PARAMETER :: IDF_zmNumOf4                    =  1308
           INTEGER, PARAMETER :: IDB_Down4                       =  1313
           INTEGER, PARAMETER :: IDB_Up4                         =  1538
-          INTEGER, PARAMETER :: IDF_zmNumOf5                    =  1314
           INTEGER, PARAMETER :: IDB_Down5                       =  1315
           INTEGER, PARAMETER :: IDB_Up5                         =  1539
-          INTEGER, PARAMETER :: IDF_zmNumOf6                    =  1316
           INTEGER, PARAMETER :: IDB_Down6                       =  1317
           INTEGER, PARAMETER :: IDB_Up6                         =  1540
           INTEGER, PARAMETER :: IDF_MENU1                       =  1546
@@ -715,9 +709,12 @@
           INTEGER, PARAMETER :: IDB_1st                         =  1150
           INTEGER, PARAMETER :: IDF_RecalcESDs                  =  1154
           INTEGER, PARAMETER :: IDB_FindPeaks                   =  1155
-          INTEGER, PARAMETER :: IDF_IniOrAtom                   =  1156
+          INTEGER, PARAMETER :: IDF_IniOrAxis                   =  1156
           INTEGER, PARAMETER :: IDF_IniOrEuler                  =  1157
           INTEGER, PARAMETER :: IDF_IniOrQuater                 =  1380
-          INTEGER, PARAMETER :: IDF_AtomNr2                     =  1124
+          INTEGER, PARAMETER :: IDF_AtomNr1                     =  1548
           INTEGER, PARAMETER :: IDB_ViewRot                     =  1488
+          INTEGER, PARAMETER :: IDF_a2                          =  1147
+          INTEGER, PARAMETER :: IDF_b2                          =  1148
+          INTEGER, PARAMETER :: IDF_c2                          =  1219
       END MODULE Druid_Header
