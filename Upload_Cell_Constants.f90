@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE RefineLattice()
+      SUBROUTINE RefineLattice
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -66,7 +66,7 @@
       DO I = 1, NTPeak
         iOrd = IOrdTem(I) ! iOrd is now a pointer into AllPkPosVal, sorted
 ! Use peak only when probability > 0.95
-        IF (PkProb(Iord) .GT. 0.95) THEN
+        IF (PkProb(iOrd) .GT. 0.95) THEN
           CALL INC(NVal)
           DO II = 1, 3
 ! Yet another place where h, k and l are stored
@@ -207,7 +207,7 @@
       CALL Upload_Cell_Constants()
       CALL Upload_ZeroPoint()
 !  First ensure that we have the plotting mode correct
-      CALL Generate_TicMarks()
+      CALL Generate_TicMarks
       IF (NVal .LE. NDD+2) RETURN
 ! Now attempt a quick Pawley refinement
       CALL ShowPawleyFitWindow
@@ -218,8 +218,10 @@
 !
       REAL FUNCTION ChiGetLattice(N,P)
 
-      INTEGER     MVAR
-      PARAMETER ( MVAR = 100 )
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
       REAL P(MVAR)
 
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
@@ -228,6 +230,9 @@
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
       COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
+
+      REAL zp, p1, p2, p3, p4, p5, p6, vh, vk, vl, dd, tthc, ctem
+      INTEGER I, N
 
       ChiGetLattice = 0.0
 ! Zero point
@@ -279,9 +284,9 @@
         CASE (10) ! Cubic
       END SELECT
       DO I = 1, NVAL
-        vh = IHLR(1,I)
-        vk = IHLR(2,I)
-        vl = IHLR(3,I)
+        vh = FLOAT(IHLR(1,I))
+        vk = FLOAT(IHLR(2,I))
+        vl = FLOAT(IHLR(3,I))
 ! d-value
         dd = vh*vh*p1 + vk*vk*p2 + vl*vl*p3 + 2.0 * (vh*vk*p4 + vh*vl*p5 + vk*vl*p6)
 ! 2 theta value
