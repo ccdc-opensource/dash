@@ -126,10 +126,6 @@
       REAL xtem, tempupper, templower, tempupper2, templower2
       INTEGER Upper, Lower
 
-! Write parameter_input file to working directory
-
-
-
       Upper = 1
       Lower = 2
 
