@@ -80,6 +80,8 @@
       CALL WDialogSelect(IDD_SAW_Page1)
       CALL WDialogGetString(IDF_SA_Project_Name,tSDIFile)
       WRITE(tFileHandle,'("  SDI file = ",A)',ERR=999) tSDIFile(1:LEN_TRIM(tSDIFile))
+! Profile range (including maximum resolution), wavelength, unit cell parameters, zero point
+
       CALL WDialogSelect(IDD_SA_input2)
       kk = 0
       DO ifrg = 1, maxfrg
@@ -102,6 +104,8 @@
           ENDDO
         ENDIF
       ENDDO
+! Total number of parameters for this problem
+! Number of atoms
       CALL WDialogSelect(IDD_SA_input3)
       CALL WDialogGetInteger(IDF_SA_RandomSeed1,I)
       WRITE(tFileHandle,'("  Random seed 1 = ",I5)',ERR=999) I
@@ -472,10 +476,12 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      INTEGER        IDFZMFile,           IDBZMBrowse,             &
-                     IDFZMpars,           IZMVB
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),   &
-                     IDFZMpars(1:maxfrg), IZMVB(1:maxfrg)
+      INTEGER        IDFZMFile,           IDBZMBrowse,                &
+                     IDFZMpars,           IDBZMView,                  &
+                     IDBZMDelete
+      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
+                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
+                     IDBZMDelete(1:maxfrg)
 
       INTEGER NumberOfDOF, izmtot, ifrg
 
@@ -497,14 +503,14 @@
           CALL WDialogPutInteger(IDFZMpars(ifrg),NumberOfDOF)
           CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
 ! Enable 'View' button
-          CALL WDialogFieldState(IZMVB(ifrg),Enabled)
+          CALL WDialogFieldState(IDBZMView(ifrg),Enabled)
         ELSE
           izmpar(ifrg) = 0
           natoms(ifrg) = 0
           CALL WDialogClearField(IDFZMpars(ifrg))
           CALL WDialogClearField(IDFZMFile(ifrg))
 ! Disable 'View' button
-          CALL WDialogFieldState(IZMVB(ifrg),Disabled)
+          CALL WDialogFieldState(IDBZMView(ifrg),Disabled)
         ENDIF
       ENDDO
       natom = ntatm

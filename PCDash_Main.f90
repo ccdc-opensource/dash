@@ -109,7 +109,6 @@
 ! Update the menu
       CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
       IDCurrent_Cursor_mode = TheMode
-      IF (IDCurrent_Cursor_mode .EQ. ID_Default_Mode) IDCurrent_Cursor_mode = ID_Peak_Fitting_Mode
       CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
 ! Update the toolbar
       
