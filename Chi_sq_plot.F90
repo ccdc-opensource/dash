@@ -301,11 +301,11 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER(MaxPathLength) OutputFilesBaseName
+      INTEGER                                       OFBN_Len
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
       REAL            bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
@@ -313,15 +313,13 @@
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
       LOGICAL, EXTERNAL :: Get_OutputChi2vsMoves
-      INTEGER tFileHandle, iLen, I, J
+      INTEGER tFileHandle, I, J
       CHARACTER(MaxPathLength) tFileName
 
       IF (.NOT. Get_OutputChi2vsMoves()) RETURN
       tFileHandle = 10
-      tFileName = pdb_file
-      iLen = LEN_TRIM(tFileName)
-      tFileName = tFileName(1:iLen-3)//'chi'
-      OPEN(UNIT=tFileHandle,FILE=tFileName(1:iLen),ERR=999)
+      tFileName = OutputFilesBaseName(1:OFBN_Len)//'.chi'
+      OPEN(UNIT=tFileHandle,FILE=tFileName(1:OFBN_Len+4),ERR=999)
       DO I = 1, MaxIterationSoFar
         WRITE(tFileHandle,'(I10,1X,99(F9.2,1X))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,SA_Run_Number) ! SA_Run_Number = last completed SA run
       ENDDO

@@ -22,11 +22,10 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
-
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      CHARACTER(MaxPathLength) OutputFilesBaseName
+      INTEGER                                       OFBN_Len
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
@@ -44,16 +43,16 @@
       PRO_saved(SA_Run_Number) = .FALSE.
       IF (.NOT. Get_SavePRO()) RETURN
       tFileHandle = 61
-      OPEN(UNIT=tFileHandle,FILE=pro_file(1:pro_flen),status='unknown',ERR=999)
+      OPEN(UNIT=tFileHandle,FILE=OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pro',status='unknown',ERR=999)
       DO I = 1, NBIN
         WRITE(tFileHandle,12,ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), YCBIN(I), CHAR(9), EBIN(I)
-12      FORMAT(F12.4,3(A,F12.4))
+   12   FORMAT(F12.4,3(A,F12.4))
       ENDDO
 ! to overwrite:
       CLOSE(tFileHandle)
       PRO_saved(SA_Run_Number) = .TRUE.
       RETURN
-  999 CALL ErrorMessage('Error while writing .pro file.')
+  999 CALL ErrorMessage('Error writing .pro file.')
       CLOSE(tFileHandle)
 
       END SUBROUTINE SA_soln_store
