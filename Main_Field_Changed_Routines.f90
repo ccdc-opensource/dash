@@ -468,6 +468,90 @@
 !
 !*****************************************************************************
 !
+      DOUBLE PRECISION FUNCTION F(X)
+
+      IMPLICIT NONE
+
+      DOUBLE PRECISION, INTENT (IN   ) :: X
+
+      INCLUDE 'GLBVAR.INC'
+
+      DOUBLE PRECISION TwoTheta1, TwoTheta2
+      INTEGER                               I, J
+      COMMON /Newton/  TwoTheta1, TwoTheta2, I, J
+
+      DOUBLE PRECISION Part1, Part2, a
+      REAL, EXTERNAL :: Degrees2Radians, TwoTheta2dSpacing
+
+      a = Degrees2Radians((TwoTheta1 - x) / 2)
+      Part1 = DBLE(i)*(ALambda / (2*DSin(a)))
+      IF (ABS(Part1 - (FLOAT(i)*TwoTheta2dSpacing(TwoTheta1 - x))) .GT. 0.001 ) CALL DebugErrorMessage('Mistake 1')
+      a = Degrees2Radians((TwoTheta2 - x) / 2)
+      Part2 = DBLE(j)*(ALambda / (2*DSin(a)))
+      IF (DABS(Part2 - (DBLE(j)*TwoTheta2dSpacing(TwoTheta2 - x))) .GT. 0.001 ) CALL DebugErrorMessage('Mistake 2')
+      F = Part1 - Part2
+
+      END FUNCTION F
+!
+!*****************************************************************************
+!
+      DOUBLE PRECISION FUNCTION dfdx(X)
+
+      IMPLICIT NONE
+
+      DOUBLE PRECISION, INTENT (IN   ) :: X
+
+      INCLUDE 'GLBVAR.INC'
+
+      DOUBLE PRECISION TwoTheta1, TwoTheta2
+      INTEGER                               I, J
+      COMMON /Newton/  TwoTheta1, TwoTheta2, I, J
+
+      DOUBLE PRECISION Part1, Part2, a
+      REAL, EXTERNAL :: Degrees2Radians
+
+      a = Degrees2Radians((TwoTheta1 - x) / 2)
+      Part1 = ((-DBLE(i)*ALambda) / 4.0) * (DCos(a) / (DSin(a)**2))
+      a = Degrees2Radians((TwoTheta2 - x) / 2)
+      Part2 = ((-DBLE(j)*ALambda) / 4.0) * (DCos(a) / (DSin(a)**2))
+      dfdx = Part1 - Part2
+
+      END FUNCTION dfdx
+!
+!*****************************************************************************
+!
+      SUBROUTINE QuickNewton(x) ! just for calculating the zeropoint
+
+      IMPLICIT NONE 
+
+      DOUBLE PRECISION, INTENT (  OUT) :: x
+
+      DOUBLE PRECISION Xold, Shift
+      DOUBLE PRECISION, EXTERNAL :: f, dfdx
+
+      x = 0.0
+      Xold = x + 1.0
+      DO WHILE (DABS(Xold-x) .GT. 0.00001) ! Convergence
+        IF (DABS(dfdx(x)) .LT. 0.00001) THEN
+          x = 1.1
+          RETURN
+        ENDIF
+! Calculate the shift
+        Shift = -f(x) / (dfdx(x)*100.0)
+! The zero point should be very small, less than 1.0
+! Our initial estimate is always zero, so if the shift is more than 1.0, just stop
+        IF (DABS(Shift) .GT. 1.0) THEN
+          x = 1.1
+          RETURN
+        ENDIF
+        Xold = x
+        x = x + shift      
+      ENDDO
+
+      END SUBROUTINE QuickNewton
+!
+!*****************************************************************************
+!
       SUBROUTINE EstimateZeroPointError
 !
 ! Experiment: can we estimate the zero point assuming that several
@@ -493,31 +577,45 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
-      REAL    ZeroPointError(1:800) ! Enough for N=40 peaks [ (N**2 - N)/2 ]
-      REAL    TwoTheta2dSpacing ! Function
-      INTEGER I, Peak1, Peak2, IOrd1, IOrd2, Order1, Order2
-      REAL    dSpacing1, dSpacing2
+      REAL            TwoTheta1, TwoTheta2
+      INTEGER                               I, J
+      COMMON /Newton/ TwoTheta1, TwoTheta2, I, J
+
+      REAL    ZeroPointError(1:80000)
+      INTEGER Peak1, Peak2, IOrd1, IOrd2, II
+      DOUBLE PRECISION    zp
 
       IF (NTPeak .LT. 2) THEN
         CALL DebugErrorMessage("Can't estimate zero point from less than 2 peaks.")
         RETURN
       ENDIF
+      II = 0
 ! Peaks are ordered: d-spacing(N) > d-spacing(N+1)
-      I = 0
-      OPEN(10,FILE='ZeroPoint.txt',ERR=999)
       DO Peak1 = 1, NTPeak-1
         IOrd1 = IOrdTem(Peak1)
+        TwoTheta1 = AllPkPosVal(IOrd1)
         DO Peak2 = Peak1+1, NTPeak
           IOrd2 = IOrdTem(Peak2)
-          dSpacing1 = TwoTheta2dSpacing(AllPkPosVal(IOrd1))
-          dSpacing2 = TwoTheta2dSpacing(AllPkPosVal(IOrd2))
-          DO Order1 = 1, 9
-            DO Order2 = Order1+1, 10
+          TwoTheta2 = AllPkPosVal(IOrd2)
+          DO I = 1, 9
+            DO J = I+1, 10
 ! Now calculate zeropoint
-
+              CALL QuickNewton(zp)
+              IF (DABS(zp) .LT. 1.0) THEN
+                II = II + 1
+                IF (II .GT. 80000) THEN
+                  CALL DebugErrorMessage('ZeroPointError-array out of bounds')
+                ELSE
+                  ZeroPointError(II) = zp
+                ENDIF
+              ENDIF
             ENDDO
           ENDDO
         ENDDO
+      ENDDO
+      OPEN(10,FILE='ZeroPoint.txt',ERR=999)
+      DO Peak1 = 1, II
+        WRITE(10,'(F8.6)') ZeroPointError(Peak1)
       ENDDO
       CLOSE(10)
       RETURN
@@ -581,12 +679,12 @@
       CALL WDialogGetReal       (IDF_Indexing_Density,     Rdens)
       CALL WDialogGetReal       (IDF_Indexing_MolWt,       Rmolwt)
       CALL WDialogGetReal       (IDF_ZeroPoint,            Rexpzp)
-      CALL WDialogGetCheckBox   (IDF_Indexing_Cubic,       Isystem(1))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Tetra,       Isystem(2))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Hexa,        Isystem(3))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Ortho,       Isystem(4))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Monoclinic,  Isystem(5))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Triclinic,   Isystem(6))
+      CALL WDialogGetCheckBox(IDF_Indexing_Cubic,Isystem(1))
+      CALL WDialogGetCheckBox(IDF_Indexing_Tetra,Isystem(2))
+      CALL WDialogGetCheckBox(IDF_Indexing_Hexa,Isystem(3))
+      CALL WDialogGetCheckBox(IDF_Indexing_Ortho,Isystem(4))
+      CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic,Isystem(5))
+      CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,Isystem(6))
       CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,   UseErr)
       CALL WDialogGetReal       (IDF_eps,                  Epsilon)
       CALL WDialogGetReal       (IDF_Indexing_Fom,         fom)
@@ -672,7 +770,7 @@
       CALL WCursorShape(CurCrossHair)
 ! Pop up a window showing the DICVOL output file in a text editor
       CALL WindowOpenChild(IHANDLE)
-      CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+      CALL WEditFile('DICVOL.OUT',Modeless,0,0,4)
       CALL SetChildWinAutoClose(IHANDLE)
       IF (NumOfDICVOLSolutions .EQ. 0) THEN
         CALL WDialogSelect(IDD_DV_Results)

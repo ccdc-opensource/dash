@@ -367,21 +367,19 @@
 
       IMPLICIT NONE
 
-      INTEGER ISTATE
       REAL    tReal
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
-      CALL WDialogGetCheckBox(IDF_TruncateStartYN,ISTATE)
-      IF (ISTATE .EQ. 1) THEN
+      IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
         CALL WDialogGetReal(IDF_Min2Theta,tReal)
       ELSE
 ! If the user doesn't want to truncate the data, just restore the old values
         tReal = 0.0
       ENDIF
       CALL TruncateDataStart(tReal)
-      CALL WDialogGetCheckBox(IDF_TruncateEndYN,ISTATE)
-      IF (ISTATE .EQ. 1) THEN
+      IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
         CALL WDialogGetReal(IDF_Max2Theta,tReal)
       ELSE
 ! If the user doesn't want to truncate the data, just restore the old values
@@ -409,6 +407,7 @@
       REAL TwoTheta2dSpacing ! Function
       REAL dSpacing2TwoTheta ! Function
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER tFieldState
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
@@ -448,12 +447,14 @@
             CASE (IDF_TruncateEndYN)
 ! If set to 'TRUE', ungrey value fields and vice versa
               IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
-                CALL WDialogFieldState(IDF_Max2Theta,Enabled)
-                CALL WDialogFieldState(IDF_MaxResolution,Enabled)
+                tFieldState = Enabled
               ELSE
-                CALL WDialogFieldState(IDF_Max2Theta,Disabled)
-                CALL WDialogFieldState(IDF_MaxResolution,Disabled)
+                tFieldState = Disabled
               ENDIF
+              CALL WDialogFieldState(IDF_Max2Theta,tFieldState)
+              CALL WDialogFieldState(IDF_MaxResolution,tFieldState)
+              CALL WDialogFieldState(IDB_ConvertT2R,tFieldState)
+              CALL WDialogFieldState(IDB_ConvertR2T,tFieldState)
             CASE (IDF_Max2Theta)
 ! When entering a maximum value for 2 theta, update maximum value for the resolution
               CALL WDialogGetReal(IDF_Max2Theta,tReal)
@@ -529,7 +530,7 @@
             CASE (IDF_Preview)
               CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
               CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-              CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
+              CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
                                                   WDialogGetCheckBoxLogical(IDF_UseSplineYN))
               CALL Profile_Plot(IPTYPE)
           END SELECT
@@ -728,7 +729,7 @@
             wave2 = (Lambda / 2) * DV_ScaleFactor
             epst = Epsilon + 0.015
             DO I = 1, n
-              epsil(I) = Epsilon
+              epsil(I) = Epsilon * DV_ScaleFactor
             ENDDO
             DO I = 1, NTPeak
               IOrd = IOrdTem(I)
@@ -740,7 +741,7 @@
             CALL WCursorShape(CurCrossHair)
 ! Pop up a window showing the DICVOL output file in a text editor
             CALL WindowOpenChild(IHANDLE)
-            CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+            CALL WEditFile('DICVOL.OUT',Modeless,0,0,4)
             CALL SetChildWinAutoClose(IHANDLE)
             IF (NumOfDICVOLSolutions .EQ. 0) THEN
               CALL ErrorMessage('No solutions were found.')
@@ -867,12 +868,21 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCLOSE, IDCANCEL)
               CALL EndWizard
+              CALL Download_SpaceGroup(IDD_PW_Page1)
+              CALL Download_Cell_Constants(IDD_PW_Page1)
+              NumPawleyRef = 0
             CASE (IDBACK)
               CALL WizardWindowHide
+              CALL Download_SpaceGroup(IDD_PW_Page1)
+              CALL Download_Cell_Constants(IDD_PW_Page1)
+              NumPawleyRef = 0
               CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDNEXT)
               CALL WizardWindowHide
+              CALL Download_SpaceGroup(IDD_PW_Page1)
+              CALL Download_Cell_Constants(IDD_PW_Page1)
+              NumPawleyRef = 0
               CALL WDialogSelect(IDD_PW_Page2)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDAPPLY)

@@ -316,9 +316,6 @@
       CALL WDialogGetReal(IDF_Indexing_Maxa, Rcpar(1))
       CALL WDialogGetReal(IDF_Indexing_Maxb, Rcpar(2))
       CALL WDialogGetReal(IDF_Indexing_Maxc, Rcpar(3))
-! JvdS @ add in very quick check: is the d-spacing belonging to the first peak greater
-! than the maximum cell length requested? If so, tell user he is a moron.
-!     Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
       CALL WDialogGetReal(IDF_Indexing_MinAng, Rcpar(4))
       CALL WDialogGetReal(IDF_Indexing_MaxAng, Rcpar(5))
       CALL WDialogGetReal(IDF_Indexing_Density, Rdens)

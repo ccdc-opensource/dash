@@ -388,12 +388,13 @@
       LOGICAL FnWaveLengthOK ! Function
       REAL    WavelengthOf ! Function
       INTEGER NTCycles
-      INTEGER JNB, NBLIN, INB, ITEM, ISYM, IRTYP, ISIGM1, ISIGM2, IGAMM1, IGAMM2
+      INTEGER JNB, NBLIN, INB, ITEM, ISYM, IRTYP
       INTEGER N1, N2, K1, KNB
       INTEGER tFileHandle
       LOGICAL UsePrevious, FirstVaryLine
       INTEGER nl
       CHARACTER*255 Line
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
 ! Are these checks in place here? If one of them fails, we shouldn't have been here in the first place.
 !
@@ -456,21 +457,14 @@
               CASE ('VARY')
                 IF (FirstVaryLine) THEN
                   WRITE(42,'(A)') 'L VARY ONLY ALL INTS'
-                  CALL WDialogGetCheckBox(IDF_PawRef_RefBack_Check,Item)
-                  IF (Item .EQ. 1) WRITE(42,'(A)') 'L VARY ALL BACK '
-                  CALL WDialogGetCheckBox(IDF_PawRef_RefCell_Check,Item)
-                  IF (Item .EQ. 1) WRITE(42,'(A)') 'L VARY ALL CELL '
-                  CALL WDialogGetCheckBox(IDF_PawRef_RefZero_Check,Item)
-                  IF (Item .EQ. 1) WRITE(42,'(A)') 'L VARY ZERO 1 '
-                  CALL WDialogGetCheckBox(IDF_PawRef_RefSigm1_Check,ISigm1)
-                  CALL WDialogGetCheckBox(IDF_PawRef_RefSigm2_Check,ISigm2)
-                  CALL WDialogGetCheckBox(IDF_PawRef_RefGamm1_Check,IGamm1)
-                  CALL WDialogGetCheckBox(IDF_PawRef_RefGamm2_Check,IGamm2)
-                  IF (ISigm1.EQ.1) WRITE(42,'(A)') 'L VARY SIGM 1'
-                  IF (ISigm2.EQ.1) WRITE(42,'(A)') 'L VARY SIGM 2'
-                  IF (IGamm1.EQ.1) WRITE(42,'(A)') 'L VARY GAMM 1'
-                  IF (IGamm2.EQ.1) WRITE(42,'(A)') 'L VARY GAMM 2'
-                END IF
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check)) WRITE(42,'(A)') 'L VARY ALL BACK '
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check)) WRITE(42,'(A)') 'L VARY ALL CELL '
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check)) WRITE(42,'(A)') 'L VARY ZERO 1 '
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(42,'(A)') 'L VARY SIGM 1'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(42,'(A)') 'L VARY SIGM 2'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(42,'(A)') 'L VARY GAMM 1'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(42,'(A)') 'L VARY GAMM 2'
+                ENDIF
                 FirstVaryLine = .FALSE.
               CASE ('BACK')
                 CALL WDialogGetCheckBox(IDF_PawRef_RefBack_Check,Item)
@@ -589,21 +583,14 @@
           WRITE(tFileHandle,'(A)') backstr
         ENDDO
         WRITE(tFileHandle,'(A)') 'L VARY ONLY ALL INTS'
-        CALL WDialogGetCheckBox(IDF_PawRef_RefBack_Check,Item)
-        IF (Item .EQ. 1) WRITE(tFileHandle,'(A)') 'L VARY ALL BACK '
-        CALL WDialogGetCheckBox(IDF_PawRef_RefCell_Check,Item)
-        IF (Item .EQ. 1) WRITE(tFileHandle,'(A)') 'L VARY ALL CELL '
-        CALL WDialogGetCheckBox(IDF_PawRef_RefZero_Check,Item)
-        IF (Item .EQ. 1) WRITE(tFileHandle,'(A)') 'L VARY ZERO 1 '
-        CALL WDialogGetCheckBox(IDF_PawRef_RefSigm1_Check,ISigm1)
-        CALL WDialogGetCheckBox(IDF_PawRef_RefSigm2_Check,ISigm2)
-        CALL WDialogGetCheckBox(IDF_PawRef_RefGamm1_Check,IGamm1)
-        CALL WDialogGetCheckBox(IDF_PawRef_RefGamm2_Check,IGamm2)
-        IF (ISigm1.EQ.1) WRITE(tFileHandle,'(A)') 'L VARY SIGM 1'
-        IF (ISigm2.EQ.1) WRITE(tFileHandle,'(A)') 'L VARY SIGM 2'
-        IF (IGamm1.EQ.1) WRITE(tFileHandle,'(A)') 'L VARY GAMM 1'
-        IF (IGamm2.EQ.1) WRITE(tFileHandle,'(A)') 'L VARY GAMM 2'
-        CLOSE(tFileHandle)   
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(tFileHandle,'(A)') 'L VARY ALL BACK'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check )) WRITE(tFileHandle,'(A)') 'L VARY ALL CELL'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check )) WRITE(tFileHandle,'(A)') 'L VARY ZERO 1 '
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(tFileHandle,'(A)') 'L VARY SIGM 1'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(tFileHandle,'(A)') 'L VARY SIGM 2'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(tFileHandle,'(A)') 'L VARY GAMM 1'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(tFileHandle,'(A)') 'L VARY GAMM 2'
+        CLOSE(tFileHandle)
       ENDIF   
 
       END SUBROUTINE WritePawleyRefinementFile
