@@ -1,6 +1,155 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE FourierPattern(Xbegin, Xeind)
+!
+! This subroutine calculates the Fourier transform of the pattern, allowing application of
+! low and high pass filters for removing background and noise.
+!
+! This routine assumes that the two theta range has a uniform stepsize.
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: Xbegin, Xeind
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Poly_Colours.inc'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      INTEGER        FT_N
+      DOUBLE PRECISION                 HulpData
+      COMMON /FTPRO/ FT_N, HulpData(1:MOBS,1:2)
+
+      REAL            Smoothed
+      COMMON /SMOOTH/ Smoothed(MOBS)
+! COMMON block holding the Fourier transform of the profile
+! HulpData(1:MOBS,1) = magnitudes
+! HulpData(1:MOBS,2) = phases
+
+      INTEGER Re, Im
+      PARAMETER ( Re = 1, Im = 2 )
+
+      INTEGER     :: N
+      DOUBLE PRECISION :: F(Re:Im)
+      INTEGER     :: Nu, Tau, Tau2
+      DOUBLE PRECISION        :: Fx
+      DOUBLE PRECISION        :: NxPi
+      INTEGER     :: tXbegin, tXeind ! to emulate call by value
+      DOUBLE PRECISION           Amplitude
+      REAL           MinX, MinY, MaxX, MaxY
+      INTEGER        IHANDLE
+      REAL           Step ! Step size in 2 theta
+      INTEGER        I
+      DOUBLE PRECISION           Phase
+      REAL           PlotData(1:MOBS)
+
+      RETURN
+      CALL WCursorShape(CurHourGlass)
+      tXbegin = Xbegin
+      tXeind  = Xeind
+      tXbegin = 1
+      tXeind  = NBIN
+      N = 1 + tXeind - tXbegin
+! If necessary, make number of points even by omitting last point
+      IF (MOD(N,2) .EQ. 1) THEN
+        N = N -1
+        tXeind = tXeind - 1
+      ENDIF
+      FT_N = N
+! Assuming that the powder pattern has been recorded with a fixed step size, we can calculate it
+      Step = (XBIN(N)-XBIN(1)) / (N-1)
+      MinX = 1.0
+      MaxX = SNGL(FT_N)
+      HulpData = 0.0D0
+!      NxPi = 2.0D0 * 3.14159265358979323846D0 / DBLE(N)
+      NxPi = 8.0D0 * DATAN(1.0D0) / DBLE(N)
+      MinY = 0.0
+      MaxY = 0.0
+      DO Nu = 0, N-1
+        F(Re) = 0.0D0
+        F(Im) = 0.0D0
+        DO Tau = (-N / 2), (N / 2)-1
+          IF (Tau .LT. 0) THEN
+            Tau2 = Tau + N 
+          ELSE 
+            Tau2 = Tau
+          ENDIF
+          Tau2 = Tau2 + tXbegin
+          Fx = DBLE(YOBIN(Tau2))
+          F(Re) = F(Re) + (Fx*DCOS(NxPi*Nu*Tau))
+          F(Im) = F(Im) - (Fx*DSIN(NxPi*Nu*Tau))
+        ENDDO
+
+        F(Re) = F(Re) / DBLE(N)
+        F(Im) = F(Im) / DBLE(N)
+        Amplitude = DSQRT(F(Re)**2 + F(Im)**2)
+        MinY = MIN(MinY,SNGL(Amplitude))
+        MaxY = MAX(MaxY,SNGL(Amplitude))
+        HulpData(tXbegin+Nu,1) = Amplitude          ! Amplitude
+        HulpData(tXbegin+Nu,2) = DATAN2(F(Im),F(Re)) ! Phase
+      ENDDO
+      Smoothed = 0.0D0
+      DO Tau = (-N / 2), (N / 2)-1
+        IF (Tau .LT. 0) THEN
+          Tau2 = Tau + N 
+        ELSE 
+          Tau2 = Tau
+        ENDIF
+        Tau2 = Tau2 + tXbegin
+        DO Nu = 0, N-1
+          Amplitude = HulpData(tXbegin+Nu,1) 
+          Phase     = HulpData(tXbegin+Nu,2)
+!          IF ((DABS(Nu/(DBLE(N)*Tau)) .GT. ) .AND. (DABS(Nu/(DBLE(N)*Tau)) .LT. )) 
+          Smoothed(Tau2) = Smoothed(Tau2) + Amplitude * DCOS(NxPi*Nu*Tau+Phase)
+        ENDDO
+      ENDDO
+      CALL WCursorShape(CurCrossHair)
+      OPEN(10,FILE='Fourier.xye')
+      WRITE(10,*) ALambda
+      DO I = 1, FT_N
+        WRITE(10,*) XBIN(I), Smoothed(I), EBIN(I)
+      ENDDO
+      CLOSE(10)
+      RETURN
+! The coefficients are now in HulpData
+	CALL WindowOpenChild(IHANDLE)
+!      CALL IGrArea(0.0, 0.0, 1.0, 1.0)
+!	CALL IGrUnits(0.0, 0.0, 1.0, 1.0)		
+!
+!  Start new presentation graphics plot
+!!
+!  Set marker number for data sets not using default marker
+!
+!
+!  Set units for plot
+!
+      CALL IPgUnits(MinX*0.9, MinY*0.9, MaxX*1.1, MaxY*1.1)
+!  Draw axes
+!
+      CALL IGrColourN(KolNumMain)
+      CALL IPgBorder()
+!
+!  Draw graph.
+!
+      CALL IPgNewPlot(PgLinePlot,1,FT_N)
+      CALL IPgStyle(1,0,0,0,KolNumBack,0)
+      DO I = 1, FT_N
+        PlotData(I) = SNGL(HulpData(I,1))
+      ENDDO
+      CALL IPgLinePlot(PlotData(1))
+
+      END SUBROUTINE FourierPattern
+!
+!*****************************************************************************
+!
       SUBROUTINE SubtractBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
 
       USE WINTERACTER
