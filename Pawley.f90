@@ -9,9 +9,10 @@
 !
 !   Type declarations
 !
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'DialogPosCmn.inc'
-      INCLUDE 'params.inc'
       INCLUDE 'lattice.inc'
+      INCLUDE 'statlog.inc'
 
       LOGICAL PawleyOptionChosen 
 
@@ -32,7 +33,25 @@
      & CELESD(6,6,2),CELLSD(6,6),KOM4
       COMMON /PRZERO/ZEROSP(6,9,5),KZROSP(6,                            &
      & 9,5),DKDZER(6),NZERSP(9,5)
+      REAL    CHISQ,RWPOBS,RWPEXP
       COMMON /PRCHISQ/ CHISQ,RWPOBS,RWPEXP
+
+      INTEGER CurrentRange 
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                          &
+     &IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR),                                &
+     &NumPeakFitRange,CurrentRange,                                     &
+     &IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR),                           &
+     &XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR),            &
+     &IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+
+      COMMON /ZSTORE/ NPTS,ZARGI(MPPTS),ZOBS(MPPTS),ZDOBS(MPPTS),       &
+     &ZWT(MPPTS),ICODEZ(MPPTS),KOBZ(MPPTS)
+      COMMON /YSTORE/ ZCAL(MPPTS),ZBAK(MPPTS)
+      COMMON /ZSTOR1/ ZXDELT,IIMIN,IIMAX,XDIFT,XMINT
+
+      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),     &
+     &itypot(mobstic),iordot(mobstic),                                  &
+     &uobstic(20,mobstic),zobstic(20,mobstic)
 
 ! Save the boxes from Pawley fit to Pawley fit
       REAL RLastValues(3)
@@ -40,18 +59,18 @@
       DATA RLastValues / 0.0,0.0,0.0 /
       DATA ILastValues / 0,0/
       SAVE RLastValues,ILastValues
-
+      CHARACTER(LEN=80) :: SDIFile
 ! Local variables logging errors in the pawley fit
       INTEGER PawleyEigError
       INTEGER PawleyErrorLog  
-
-      INCLUDE 'statlog.inc'
+      INTEGER KLEN
+      INTEGER ihcver,iticer,ipiker,iloger,idsler
+      INTEGER GETTIC ! Function
 
       ItemX=IXPos_IDD_Pawley_Status
       ItemY=IYPos_IDD_Pawley_Status
       CALL WDialogSelect(IDD_Pawley_Status)
       CALL WDialogShow(ITemX,ItemY,0,Modeless)
-
       CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
       CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
  555  CALL WDialogClearField(IDF_Pawley_Cycle_Number)
@@ -62,9 +81,10 @@
 !      CALL WDialogClearField(IDF_Pawley_Cycle_ChiSq)
 !      CALL WDialogClearField(IDF_Pawley_Cycle_NumPts)
 !      CALL WDialogClearField(IDF_Pawley_Cycle_NumRefs)
-
       PawleyEigError = PawleyErrorLog(2) ! Reset the log messages
+
       CALL Quick_Pawley_Preparation 
+
       IF (SkipPawleyRef) THEN
 !.. We don't want to stay in Pawley mode anymore - back to peak fitting mode
         CALL WDialogHide()
@@ -90,10 +110,7 @@
             CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
             CALL retrieve_polybackup()
           END IF
-
 !>> JCC Need to back-copy the arrays here 
-
-
 !>> Also decrement the number of Pawley refinements since it failed
             NumPawleyRef = NumPawleyRef - 1
             GOTO 555
@@ -111,12 +128,9 @@
 !                 CALL TruncateData(20.0)
 !         END IF
           RETURN
-
         ELSE
-            PawleyEigError = PawleyErrorLog(2) ! Check the log messages and reset
-          IF ( PawleyEigError .GT. 0) THEN
-                  CALL PawleyWarning
-          END IF
+          PawleyEigError = PawleyErrorLog(2) ! Check the log messages and reset
+          IF (PawleyEigError .GT. 0) CALL PawleyWarning
 ! Question - should we get the backup back here rather than allow users to continue
 ! with this?
         ENDIF
@@ -126,69 +140,115 @@
         CALL WDialogFieldState(IDB_PawRef_Skip,Disabled)
         CALL WDialogFieldState(IDB_PawRef_Accept,Enabled)
         CALL WDialogFieldState(IDB_PawRef_Reject,Enabled)
-
 !       IF (.NOT.LastValuesSet) THEN
             CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
             CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
 !       END IF
-        PawleyOptionChosen=.false.
-        DO WHILE(.NOT.PawleyOptionChosen)
-            CALL GetEvent
-            SELECT CASE (EventType)
-              CASE (PushButton)
-                IDNumber=EventInfo%Value1
-                SELECT CASE (IDNumber)
-                  CASE(IDB_PawRef_Reject)
-                    PawleyOptionChosen=.true.
+        PawleyOptionChosen = .FALSE.
+        DO WHILE(.NOT. PawleyOptionChosen)
+          CALL GetEvent
+          SELECT CASE (EventType)
+            CASE (PushButton)
+              IDNumber=EventInfo%Value1
+              SELECT CASE (IDNumber)
+                CASE (IDB_PawRef_Reject)
+                  PawleyOptionChosen = .TRUE.
 !>> JCC Err, if we reject, we should not enable structure solution
 !>> go back to the start of the loop
 ! Was                    goto 444
 ! Now
-                  CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
-                  CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
+                CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
+                CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
 !>> JCC Reset the R-values if possible
-                  IF (LastValuesSet) THEN
-                        CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(F12.2)') 
-                        call WDialogPutReal(IDF_Pawley_Cycle_ChiSq,RLastValues(2),'(F12.3)')
-                          call WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3),'(F12.2)')
-                                    call WDialogPutInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
-                                    call WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
-                                    CALL retrieve_polybackup
-                            END IF
-                              goto 555
-                  CASE(IDB_PawRef_Accept)
+                IF (LastValuesSet) THEN
+                  CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(F12.2)') 
+                  CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,RLastValues(2),'(F12.3)')
+                  CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3),'(F12.2)')
+                  CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
+                  CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
+                  CALL retrieve_polybackup
+                END IF
+                GOTO 555
+                CASE (IDB_PawRef_Accept)
+!T! This should be logically equivalent to saving the .sdi file
+!T! and retrieving it.
 !.. update the profile and stay with the Pawley refinement
 !.. upload the cell constants and zeropoint from the Pawley refinement
-                    DO II=1,3
-                      CELLPAR(II)=CELL(II,1,1)
-                      JJ=II+3
-                      CELLPAR(JJ)=DEGREE(ARCCOS(CELL(II,2,1)))
-                    END DO
-                    ZEROPOINT = ZEROSP(1,1,1)
-                    CALL Upload_Cell_Constants()
-                    CALL Upload_Zero_Point() 
-                  call Generate_TicMarks()
-                  call Load_Pawley_Pro
-!>> JCC Save the settings
-                        CALL WDialogSelect(IDD_Pawley_Status)
-                      CALL WDialogGetReal(IDF_Pawley_Cycle_Rwp,         &
-     &                         RLastValues(1)) 
-                        call WDialogGetReal(IDF_Pawley_Cycle_ChiSq,     &
-     &                         RLastValues(2))
-                  call WDialogGetReal(IDF_Pawley_Cycle_RwpExp,          &
-     &                         RLastValues(3))
-                        call WDialogGetInteger(                         &
-     &                         IDF_Pawley_Cycle_NumPts,ILastValues(1))
-                        call WDialogGetInteger(                         &
-     &                         IDF_Pawley_Cycle_NumRefs,ILastValues(2))
-                        LastValuesSet = .TRUE.
-                    call make_polybackup
-!>> Set the file names to point to the poly files
-                        call set_saFileNames('polyp')
+                  DO II=1,3
+                    CELLPAR(II)=CELL(II,1,1)
+                    JJ=II+3
+                    CELLPAR(JJ)=DEGREE(ARCCOS(CELL(II,2,1)))
+                  END DO
+                  CALL Upload_Cell_Constants()
+                  ZEROPOINT = ZEROSP(1,1,1)
+                  CALL Upload_Zero_Point() 
 
+
+!T!.. Save the project
+!T                  SDIFile = 'TempFile.sdi'
+!T                  CALL CreateSDIFile(SDIFile)
+      
+                  CALL Generate_TicMarks()
+                  CALL Load_Pawley_Pro
+
+!T        DashDslFile = 'TempFile.dsl'
+!T        CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
+!T        DslExists = (idsler .EQ. 0)
+!T        IF (.NOT. DslExists) CALL DebugErrorMessage('Could not read DSL')
+!T
+!T!                  GOTO 5
+!T
+!T!C>> JCC Set to success in all cases
+!T      ihcver = 0
+!T      iloger = 0
+!T      iticer = 1
+!T      ipiker = 0
+!T! Now open all the appropriate PIK, TIC and HCV files
+!T
+!T        DashTicFile = 'TempFile.tic'
+!T        DashHcvFile = 'TempFile.hcv'
+!T        DashPikFile = 'TempFile.pik'
+!T        klen = LEN_TRIM(DashTicFile)
+!T        iticer = GETTIC(klen,DashTicFile)
+!T        IF (iticer .EQ. 0) TicExists = .FALSE.
+!T        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
+!T        HcvExists = (ihcver .EQ. 0)
+!T        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
+!T        PikExists = (ipiker .EQ. 0)
+!T!U      NOBS=NPTS
+!T!U      NBIN=NPTS
+!T!U      DO I=1,NBIN
+!T!U        XBIN(I)=ZARGI(I)
+!T!U        YOBIN(I)=ZOBS(I)
+!T!U        YCBIN(I)=ZCAL(I)
+!T!U        YBBIN(I)=ZBAK(I)
+!T!U        EBIN(I)=ZDOBS(I)
+!T!U        XOBS(I)=ZARGI(I)
+!T!U        YOBS(I)=ZOBS(I)
+!T!U        YCAL(I)=ZCAL(I)
+!T!U        YBAK(I)=ZBAK(I)
+!T!U        EOBS(I)=ZDOBS(I)
+!T!U      END DO
+!T        CALL Synchronize_Data()
+!T      IPTYPE=2
+!T      CALL Profile_Plot(IPTYPE)
+!T
+!T 5    CONTINUE
+
+!>> JCC Save the settings
+                  CALL WDialogSelect(IDD_Pawley_Status)
+                  CALL WDialogGetReal(IDF_Pawley_Cycle_Rwp,RLastValues(1)) 
+                  CALL WDialogGetReal(IDF_Pawley_Cycle_ChiSq,RLastValues(2))
+                  CALL WDialogGetReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3))
+                  CALL WDialogGetInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
+                  CALL WDialogGetInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
+                  LastValuesSet = .TRUE.
+                  CALL make_polybackup
+!>> Set the file names to point to the poly files
+                  CALL set_saFileNames('polyp')
 !>> Disable the Solve button until the user does a Save
-                    CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
-                  goto 444
+                  CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+                  GOTO 444
               END SELECT
           END SELECT
       END DO
@@ -196,8 +256,8 @@
 !.. update and on to structure solution
  444  CALL WDialogSelect(IDD_Pawley_Status)
       IF (LastValuesSet) THEN
-!           CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
-            CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
+!        CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
+        CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
       END IF
       CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
       CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
@@ -274,14 +334,12 @@
       REAL    WavelengthOf ! Function
 
       IF (.NOT. BACKREF) THEN
-            NPawBack = 2
-          CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
-      END IF
-!
+        NPawBack = 2
+        CALL WDialogFieldState(IDF_IDF_PawRef_NBack,Disabled)
+      ENDIF
 !... Check what's happening in IDD_Pawley_Status
-!
-        CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
-        CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
+      CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
+      CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
 ! Now check on which button was pressed ...
       IF (NumPawleyRef .EQ. 0) THEN
         CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Disabled)
@@ -292,7 +350,6 @@
         CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Disabled)
-!
         CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Unchecked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Unchecked)
@@ -306,79 +363,55 @@
 !>> JCC Only change the setting if this is the second Pawley fit
       ELSE IF (NumPawleyRef .EQ. 1) THEN
         CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Enabled)
-!
         CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Checked)
         CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefSigm1_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefSigm2_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefGamm1_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefGamm2_Check,Unchecked)
         NTCycles=5
         CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
-      ELSE
-        CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Enabled)
-!
-        CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
-        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
       END IF
-      IF (.NOT. BACKREF) THEN
-        CALL WDialogFieldState(IDF_IDF_PawRef_NBack,Disabled)
-      ENDIF
+      CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
       CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
-      SkipPawleyRef=.false.
+      SkipPawleyRef = .FALSE.
       CALL delete_polybackup
-      DO WHILE(.NOT.SkipPawleyRef)
+      DO WHILE (.NOT. SkipPawleyRef)
         CALL GetEvent
         SELECT CASE (EventType)
           CASE (PushButton)
-            IDNumber=EventInfo%Value1
+            IDNumber = EventInfo%Value1
             SELECT CASE (IDNumber)
-              CASE(IDF_PawRef_Refine)
-                Goto 888
-              CASE(IDB_PawRef_Skip)
-                SkipPawleyRef=.true.
-              CASE(IDB_PawRef_Save)
-                    IF ( SaveProject() .EQ. 1) THEN
-                    CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
-                    CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
+              CASE (IDF_PawRef_Refine)
+                GOTO 888
+              CASE (IDB_PawRef_Skip)
+                SkipPawleyRef = .TRUE.
+              CASE (IDB_PawRef_Save)
+                IF (SaveProject() .EQ. 1) THEN
+                  CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
+                  CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
                 END IF
-              CASE(IDF_PawRef_Solve)
+              CASE (IDF_PawRef_Solve)
                 CALL Load_Pawley_Pro
                 CALL WDialogHide()
                 IXPos_IDD_Pawley_Status = WInfoDialog(6)
                 IYPos_IDD_Pawley_Status = WInfoDialog(7)
                 IXPos_IDD_SA_Input = IXPos_IDD_Pawley_Status
                 IYPos_IDD_SA_Input = IYPos_IDD_Pawley_Status
-                FromPawleyFit=.true.
+                FromPawleyFit = .TRUE.
                 CALL Pawley_Limits_Save()
                 CALL SA_Main()
 !.. Reload the Pawley profile ...
                 CALL Pawley_Limits_Restore()
                 CALL Load_Pawley_Pro
-                SkipPawleyRef=.true.
+                SkipPawleyRef = .TRUE.
             END SELECT
         END SELECT
       END DO
       IF (SkipPawleyRef) RETURN
- 888  NumPawleyRef=NumPawleyRef+1
+ 888  NumPawleyRef = NumPawleyRef + 1
       CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOn)
       CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
       CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
@@ -417,7 +450,7 @@
           DO i=1,nbin
             IF (xbin(i) .GT. xranmax) GOTO 4110
             WRITE(41,4100) xbin(i),yobin(i),ebin(i)
- 4100       FORMAT(f10.4,2f12.2)
+ 4100       FORMAT(F10.4,2F12.2)
           END DO
  4110     CLOSE(41)
         END IF
@@ -451,7 +484,7 @@
       CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
       IRtyp = 2-Item
       WRITE(42,4245) IRTYP,xranmin,xranmax
- 4245 FORMAT('L RTYP  'i3,2f10.3,'  0.001')
+ 4245 FORMAT('L RTYP  'I3,2F10.3,'  0.001')
       IF (.NOT. FnWaveLengthOK()) ALambda = WavelengthOf('Cu')
       WRITE(42,4250) ALambda
  4250 FORMAT('L WVLN ',F10.5)
@@ -477,7 +510,6 @@
      &'L PKFN LIMS 0.005')
 !>> JCC Need to check these variables, and set them to some decent defaults
 !>> Currently the default values are all zero, which invariably fail.
-! JvdS @ PkFnVarVal(1,3) and PkFnVarVal(1,4) seem to switch somewhere: which is which?
       WRITE(42,4271) PkFnVarVal(1,1),PkFnVarVal(2,1)
       WRITE(42,4272) PkFnVarVal(1,2),PkFnVarVal(2,2)
       WRITE(42,4273) PkFnVarVal(1,3)
@@ -513,7 +545,7 @@
         DO jnb=1,n2
           k1=knb+12*(jnb-1)
           kk=kk+1
-          WRITE(backstr(k1:k1+11),'(f11.3)') backgd(kk,1)
+          WRITE(backstr(k1:k1+11),'(F11.3)') backgd(kk,1)
         END DO
         WRITE(42,4280) backstr
  4280 FORMAT(a)
@@ -533,10 +565,10 @@
       CALL WDialogGetCheckBox(IDF_PawRef_RefSigm2_Check,ISigm2)
       CALL WDialogGetCheckBox(IDF_PawRef_RefGamm1_Check,IGamm1)
       CALL WDialogGetCheckBox(IDF_PawRef_RefGamm2_Check,IGamm2)
-      IF (ISigm1.eq.1) WRITE(42,4410)
-      IF (ISigm2.eq.1) WRITE(42,4420)
-      IF (IGamm1.eq.1) WRITE(42,4430)
-      IF (IGamm2.eq.1) WRITE(42,4440)
+      IF (ISigm1.EQ.1) WRITE(42,4410)
+      IF (ISigm2.EQ.1) WRITE(42,4420)
+      IF (IGamm1.EQ.1) WRITE(42,4430)
+      IF (IGamm2.EQ.1) WRITE(42,4440)
  4410 FORMAT('L VARY SIGM 1')
  4420 FORMAT('L VARY SIGM 2')
  4430 FORMAT('L VARY GAMM 1')
@@ -547,19 +579,14 @@
 !
 !*****************************************************************************
 !
-!>> JCC Was
-! LEVEL 50      subroutine Quick_Pawley_Fit
-!      subroutine Quick_Pawley_Fit
-!>> Now
       INTEGER FUNCTION Quick_Pawley_Fit
-!>> JCC 
+
       USE WINTERACTER
-!>> Changed to allow the return of an error status
 
 ! DIMENSION OF ALSQ BELOW, AND SETTING OF MATSZ, TO BE ALTERED TO BE SOMETHING
 ! A LITTLE LARGER THAN N*(N+3)/2 WHERE THERE WILL BE N BASIC VARIABLES
 !
-      INCLUDE 'params.inc'
+      INCLUDE 'PARAMS.INC'
       
       EXTERNAL PCCN01,PFCN03,DUMMY,CALPR
       COMMON /GLOBAL/NINIT,NBATCH,NSYSTM,MULFAS,MULSOU,MULONE
@@ -622,7 +649,7 @@
      &itypot(mobstic),iordot(mobstic),                                  &
      &uobstic(20,mobstic),zobstic(20,mobstic)
 
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+!      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
       NOBS=NPTS
       NBIN=NPTS
@@ -640,249 +667,8 @@
       END DO
       IPTYPE=2
       CALL Profile_Plot(IPTYPE)
- 999  CONTINUE
 
       END SUBROUTINE Load_Pawley_PRO
-!
-!*****************************************************************************
-!
-!U      INTEGER FUNCTION New_Pawley_Refinement()
-!U
-!U      USE WINTERACTER
-!U      USE DRUID_HEADER
-!U
-!U      INCLUDE 'DialogPosCmn.inc'
-!U
-!U      CALL WDialogSelect(IDD_Pawley_Status)
-!U      CALL WDialogShow(IXPos_IDD_Pawley_Status,                         &
-!U     &IYPos_IDD_Pawley_Status,0,Modeless)
-!U
-!U      CALL Quick_Pawley_ReRefine() 
-!U      New_Pawley_Refinement = Quick_Pawley_Fit()
-!U
-!U      END FUNCTION New_Pawley_Refinement
-!
-!*****************************************************************************
-!
-      SUBROUTINE Quick_Pawley_ReRefine
-!.. This is the routine that reads the CCN file, checks for changes from 
-!.. the Pawley status dialogue and writes out a new CCL file
-!..
-!.. Multiple checks before attempting to perform quick Pawley
-!.. We need 
-!..    (i)   lattice constants
-!..    (ii)  space group
-!..    (iii) wavelength
-!..    (iv)  diffraction file for range limits 
-!..            (strictly not necessary - we could put in a 2 theta max of 60 degrees
-!..             and redo the tic marks when we load in the data.)
-!..   Check the lattice constants
-!..   Check the wavelength
-!..   Check the space group
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-!
-!   Type declarations
-!
-      INTEGER :: IDNUMBER
-      INCLUDE 'statlog.inc'
-      INCLUDE 'params.inc'
-      INCLUDE 'Lattice.inc'
-!
-      CHARACTER(LEN=80) :: Line
-      LOGICAL :: FirstVaryLine
-!
-      COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),                        &
-     &PkFnEsd(MPkDes,Max_NPFR),PkFnCal(MPkDes,Max_NPFR),                &
-     &PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes),                        &
-     &PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR),        &
-     &PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),          &
-     &PkPosAv(MAX_NPFR)
-
-      PARAMETER (msymmin=10)
-      CHARACTER*20 symline
-      common /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
-
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),                      &
-     &YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),                            &
-     &YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,           &
-     &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD,            &
-     &XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-      COMMON /PAWREFCMN/ XRANMIN,XRANMAX,NPawBack
-
-      IF (.NOT. BACKREF) NPawBack = 2
-!
-!... Check what's happening in IDD_Pawley_Status
-!
-! Now check on which button was pressed ...
-      If (NumPawleyRef.EQ.0) THEN
-        CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Disabled)
-        CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefWid_Check,Disabled)
-!
-        CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
-        NTCycles=3
-        CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
-        IF (.NOT. BACKREF) THEN
-            CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
-          CALL WDialogFieldState(IDF_IDF_PawRef_NBack,Disabled)
-        ENDIF
-      ELSE
-        CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefWid_Check,Enabled)
-!
-        CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
-        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
-        NTCycles=5
-        CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
-        IF (.NOT. BACKREF) THEN
-          CALL WDialogFieldState(IDF_IDF_PawRef_NBack,Disabled)
-        ENDIF
-      END IF
-      CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
-      SkipPawleyRef=.false.
-      DO WHILE(.NOT.SkipPawleyRef)
-        CALL GetEvent
-        SELECT CASE (EventType)
-          CASE (PushButton)
-            IDNumber=EventInfo%Value1
-            SELECT CASE (EventInfo%Value1)
-              CASE(IDF_PawRef_Refine)
-                Goto 888
-              CASE(IDB_PawRef_Skip)
-                SkipPawleyRef=.true.
-            END SELECT
-!          CASE(FieldChanged)
-!            IDNumber=EventInfo%Value1
-!            SELECT CASE (IDNumber)
-!              CASE (IDF_IDF_PawRef_NBack)
-!                CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
-!              CASE (IDF_Pawley_Total_Cycles)
-!                CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)
-!              CASE (IDF_PawRef_UseInts_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Checked)
-!              CASE (IDF_PawRef_RefInts_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefInts_Check,Checked)
-!              CASE (IDF_PawRef_RefBack_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefBack_Check,Checked)
-!              CASE (IDF_PawRef_RefCell_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefCell_Check,Checked)
-!              CASE (IDF_PawRef_RefZero_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefZero_Check,Checked)
-!              CASE (IDF_PawRef_RefWid_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
-!            END SELECT
-        END SELECT
-      END DO
-      If (SkipPawleyRef) RETURN
- 888  NumPawleyRef = NumPawleyRef + 1
-      Call WDialogGetCheckBox(IDF_PawRef_RefWid_Check,IWid_Check)
-      If (IWid_Check.EQ.Checked) CALL WDialogGetRadioButton(IDF_PawRef_RefWid_Radio1,IWid_Option)
-      CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
-      CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
-!
-!... End of check in IDD_Pawley_Status
-!
-!.. We should only proceed with this if we have good cell constants 
-!.. If no wavelength then assume Cu Ka1 wvln=1.54051
-!..
-!
-      OPEN(42,file='polyp.ccl',status='unknown')
-      OPEN(43,file='polyp.ccn',status='old')
-      FirstVaryLine=.true.
-!..
-   10 READ(43,5300,END=900) nl,line
- 5300 FORMAT(q,a)
-      SELECT CASE (line(1:1))
-        CASE ('I')
-          WRITE(42,4240) NTCycles
- 4240     FORMAT('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0')
-        CASE ('L')
-          SELECT CASE (line(3:6))
-            CASE('RTYP')
-              CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
-              IRtyp=2-Item
-              WRITE(42,4245) IRTYP,xranmin,xranmax
- 4245         FORMAT('L RTYP  'i3,2f10.3,'  0.001')
-            CASE('VARY')
-              IF (FirstVaryLine) THEN
-                WRITE(42,4300) 
- 4300 FORMAT('L VARY ONLY ALL INTS')
-                CALL WDialogGetCheckBox(IDF_PawRef_RefBack_Check,Item)
-                IF (Item.eq.1) WRITE(42,4310)
- 4310 FORMAT('L VARY ALL BACK ')
-                CALL WDialogGetCheckBox(IDF_PawRef_RefCell_Check,Item)
-                IF (Item.eq.1) WRITE(42,4320)
- 4320 FORMAT('L VARY ALL CELL ')
-                CALL WDialogGetCheckBox(IDF_PawRef_RefZero_Check,Item)
-                IF (Item.eq.1) WRITE(42,4330)
- 4330 FORMAT('L VARY ZERO 1 ')
-             CALL WDialogGetCheckBox(IDF_PawRef_RefWid_Check,IWid_Check)
-                IF (IWid_Check.eq.Checked) THEN
-        CALL WDialogGetRadioButton(IDF_PawRef_RefWid_Radio1,IWid_Option)
-                  SELECT CASE (IWid_Option)
-                    CASE(1)
-                      WRITE(42,4410)
- 4410     FORMAT('L VARY SIGM 1')
-                    CASE(2)
-                      WRITE(42,4420)
- 4420     FORMAT('L VARY SIGM 2')
-                    CASE(3)
-                      WRITE(42,4430)
- 4430     FORMAT('L VARY GAMM 1')
-                    CASE(4)
-                      WRITE(42,4440)
- 4440     FORMAT('L VARY GAMM 2')
-                  END SELECT 
-                END IF
-              END IF
-              FirstVaryLine=.FALSE.
-            CASE DEFAULT
-              WRITE(42,5310) line(:nl)              
-          END SELECT
-        CASE DEFAULT
-          WRITE(42,5310) line(:nl)
- 5310     FORMAT(a)
-      END SELECT
-!      nblin=1+(NPawBack-1)/5
-!      do inb=1,nblin
-!        n1=5*(inb-1)
-!        n2=min(n1+5,NPawBack)-n1
-!        backstr='L BACK 2'
-!        knb=7
-!        if (inb.eq.1) knb=9
-!        do jnb=1,n2
-!          k1=knb+4*(jnb-1)
-!          backstr(k1:k1+4)=' 0.0'
-!        end do
-!        write(42,4280) backstr
-! 4280 format(a)
-!      end do
-      GOTO 10
- 900  CLOSE(42)
-      CLOSE(43)    
-
-      END
 !
 !*****************************************************************************
 !
@@ -896,8 +682,7 @@
 
       COMMON /PAWPROFRAN/ XPPMIN,XPPMAX,YPPMIN,YPPMAX,                  &
      &XPPGMIN,XPPGMAX,                                                  &
-     &YPPGMIN,YPPGMAX,XPPGMINOLD,XPPGMAXOLD,YPPGMINOLD,YPPGMAXOLD,      &
-     &XPGGMIN,XPGGMAX,YPGGMIN,YPGGMAX
+     &YPPGMIN,YPPGMAX,XPPGMINOLD,XPPGMAXOLD,YPPGMINOLD,YPPGMAXOLD
       COMMON /PAWPROFIPM/ IPPMIN,IPPMAX,IPPMINOLD,IPPMAXOLD
       COMMON /PAWPROFMOR/ NPPFR 
     
@@ -934,7 +719,7 @@
 !
       SUBROUTINE PAWLEY_LIMITS_RESTORE
 
-      INCLUDE 'params.inc'
+      INCLUDE 'PARAMS.INC'
 
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,           &
      &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD,            &
@@ -943,8 +728,7 @@
 
       COMMON /PAWPROFRAN/ XPPMIN,XPPMAX,YPPMIN,YPPMAX,                  &
      &XPPGMIN,XPPGMAX,                                                  &
-     &YPPGMIN,YPPGMAX,XPPGMINOLD,XPPGMAXOLD,YPPGMINOLD,YPPGMAXOLD,      &
-     &XPGGMIN,XPGGMAX,YPGGMIN,YPGGMAX
+     &YPPGMIN,YPPGMAX,XPPGMINOLD,XPPGMAXOLD,YPPGMINOLD,YPPGMAXOLD
       COMMON /PAWPROFIPM/ IPPMIN,IPPMAX,IPPMINOLD,IPPMAXOLD
       COMMON /PAWPROFMOR/ NPPFR 
    
@@ -1166,7 +950,6 @@
       FILTER = 'Diffraction information files (*.sdi)|*.sdi|'
       SDIFileName = ' '
       CALL WSelectFile(FILTER,IFLAGS,SDIFileName,'Save diffraction information for structure solution')
-
 !.. Go back to original directory
 !      CALL IOsDirChange(Currentdir)
       IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (SDIFileName .NE. ' ')) THEN

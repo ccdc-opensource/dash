@@ -1,83 +1,3 @@
-!*==CHIQUAD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!
-!
-!
-      FUNCTION CHIQUAD(N,P)
-      PARAMETER (MPAR=50)
-      REAL CHIQUAD, P(MPAR)
-      PARAMETER (MVAL=50)
-      COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL),         &
-     &                EVAL(MVAL)
-!
-      CHIQUAD = 0.
-!
-      DO I = 1, NVAL
-        XI = XVAL(I)
-        ZI = P(1)*XI*XI + P(2)*XI + P(3)
-        CTEM = (ZI-YVAL(I))/EVAL(I)
-        CHIQUAD = CHIQUAD + CTEM*CTEM
-      ENDDO
-!
-      RETURN
-      END FUNCTION CHIQUAD
-!*==SIMOPT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!
-!
-!***********************************************************************
-!
-!U      FUNCTION ROBCHI_CREF(DAT,SIG,FIT,NDAT)
-!UC     ---------------------------------
-!UC
-!U      PARAMETER (MPAR=50)
-!U      REAL ROBCHI_CREF,P(MPAR)
-!U      PARAMETER (MVAL=50)
-!U      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
-!U
-!U      REAL DAT(*),SIG(*),FIT(*)
-!U      DATA RT2,YJ0,YJ1 /0.7071067814,0.120782238,0.333333333/
-!U      DATA ERSMAL,ERFBIG,SMALL /0.03,3.0,1.0E-20/
-!UC
-!U      CHI=0.0
-!U      DO 10 I=1,NVAL
-!UC.. Include the d*^2 calculated function on the following line
-!UC        FITI= ...
-!U! JvdS The following line generated a compiler error (Warning: Variable FITI is used before its value has been defined).
-!U! JvdS I assume that FITI = FIT(I).
-!U! JvdS FIT(*) is one of the arguments to this routine and is not used anywhere else,
-!U! JvdS also, it is inside a loop over I.
-!U
-!U! JvdS Note that due to this typo, ***NONE*** of the arguments passed to this routine was used.
-!U
-!U! JvdS The good news is: this function isn't used anywhere anyway.
-!U
-!U!JvdS the line of code was:
-!U!        DIF=RT2*ABS(YVAL(I)-FITI)/EVAL(I)
-!U! JvdS and now it is:
-!U        DIF=RT2*ABS(YVAL(I)-FIT(I))/EVAL(I)
-!U        IF (DIF.LT.ERSMAL) THEN
-!U          CHI=CHI+YJ0-YJ1*DIF**2
-!U        ELSEIF (DIF.GT.ERFBIG) THEN
-!U          CHI=CHI-LOG(DIF)
-!U        ELSE
-!U          CHI=CHI-LOG(DIF)+LOG(ABS(1.0-ERFC_FUN(DIF))+SMALL)
-!U        ENDIF
-!U        IF (CHI.LE.-1.0E15) GOTO 1
-!U  10  CONTINUE
-!U   1  ROBCHI_CREF=-2.0*CHI
-!U      END
-!UC
-!UC
-!U      FUNCTION ERFC_FUN(X)
-!UC     ----------------
-!UC
-!U      Z=ABS(X)
-!U      T=1.0/(1.0+0.5*Z)
-!U      ERFC_FUN=T*EXP(-Z*Z-1.26551223+T*(1.00002368+T*(0.37409196+
-!U     *     T*(0.09678418+T*(-0.18628806+T*(0.27886807+T*(-1.13520398+
-!U     *     T*(1.48851587+T*(-0.82215223+T*0.17087277)))))))))
-!U      IF (X.LT.0) ERFC_FUN=2.0-ERFC_FUN
-!U      END
-!UC
 !***********************************************************************
 !
 !
@@ -142,7 +62,6 @@
 !
       CALL VCOPY(EX,V,N)
       CHI = CHIFUN(N,V)
-!      write(76,*) ' chi',iter,chi
 !
 !      IF ((1.0-CHI/CHIMIN).GT.0.0001) THEN
       IF ((1.0-CHI/CHIMIN).GT.0.01) THEN
