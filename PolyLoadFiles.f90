@@ -1,3 +1,6 @@
+!
+!*****************************************************************************
+!
 ! This file contains routines to read powder diffraction files.
 
       SUBROUTINE ScrUpdateFileName
@@ -316,7 +319,12 @@
 ! initialised when a file is read in: all the old tick marks etc. are still there.
 ! I think that reading in a new powder diffraction file should initialise all other
 ! data to 'unknown'.
-      DashRawFile = FNAME
+      IF (LEN_TRIM(FNAME) .GT. 80) THEN
+        CALL DebugErrorMessage('FNAME too long in Diffraction_File_Open')
+        DashRawFile = FNAME(1:80)
+      ELSE
+        DashRawFile = FNAME(1:LEN_TRIM(FNAME))
+      ENDIF
       RETURN
 
       END SUBROUTINE Diffraction_File_Open
@@ -1616,11 +1624,9 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'GLBVAR.INC'
       CHARACTER(LEN=40) :: FILTER
       INTEGER           :: IFLAGS
-
-      INCLUDE 'GLBVAR.INC'
-
       LOGICAL FExists
       INTEGER Iflen
       LOGICAL Confirm ! Function
@@ -1663,8 +1669,8 @@
 !
       INTEGER FUNCTION Load_TIC_File(FLEN,TheFileName)
 
-      CHARACTER(LEN=256),  INTENT (IN) :: TheFileName
-      INTEGER,             INTENT (IN) :: FLEN
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      INTEGER,       INTENT (IN   ) :: FLEN
 
       INCLUDE 'PARAMS.INC'
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
@@ -1680,59 +1686,12 @@
       GOTO 10
  100  NTIC=I-1
       CLOSE(11)
-!
-!      CALL View_Tic_File(FLEN,TheFileName)
-!
       RETURN
  999  Load_TIC_File = 0
       RETURN
+
       END FUNCTION Load_TIC_File
 !
-!*****************************************************************************
-!
-!U      INTEGER FUNCTION Load_CCL_File(FLEN,TheFileName)
-!U!
-!U      CHARACTER(LEN=256),           INTENT (IN) :: TheFileName
-!U      INTEGER,                      INTENT (IN) :: FLEN
-!U      CHARACTER(LEN=80) CCL_LINE
-!U      INCLUDE 'GLBVAR.INC' ! Contains ALambda
-!U      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
-!U      INTEGER I
-!U      REAL  WaveLengthOf ! Function
-!U!
-!U!>> JCC Initialise return value
-!U!
-!U      Load_CCL_File = 1
-!U      ZEROPOINT = 0.0
-!U      ALambda = WaveLengthOf('Cu')
-!U!
-!U!>> JCC Add in Error trap
-!U!                          
-!U      OPEN(11,FILE=TheFileName(:FLEN),STATUS='OLD', ERR = 999)
-!U!>> JCC Set SA Output files
-!U      CALL sa_SetOutputFiles(TheFileName)
-!U   10 READ(11,5000,ERR=100,END=100) NLCCL,CCL_LINE
-!U 5000 FORMAT(Q,A)
-!U      IF (CCL_LINE(1:1) .EQ. 'C') THEN
-!U        READ(CCL_LINE(2:NLCCL),*) (CELLPAR(I),I=1,6)
-!U      ELSE IF (CCL_LINE(1:1) .EQ. 'L') THEN
-!U        IF (CCL_LINE(3:6) .EQ. 'WVLN') THEN
-!U          READ(CCL_LINE(7:NLCCL),*) ALambda
-!U        ELSE IF (CCL_LINE(3:6) .EQ. 'ZERO') THEN
-!U          READ(CCL_LINE(7:NLCCL),*) zeropoint
-!U        END IF
-!U      END IF
-!U      GOTO 10
-!U  100 CLOSE(11)
-!U!
-!U      CALL UpLoad_Crystal_Data()
-!U!
-!U!>> JCC Added in next few lines
-!U      RETURN
-!U 999  Load_CCL_File = 0
-!U      RETURN
-!U      END FUNCTION Load_CCL_File
-!U
 !*****************************************************************************
 !
 !>> JCC  Routine to truncate data to a particular data range
@@ -1954,3 +1913,6 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE Background_Fit
+!
+!*****************************************************************************
+!
