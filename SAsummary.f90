@@ -15,6 +15,8 @@
       INCLUDE 'PARAMS.INC' 
        
 !ep    need the common block to identify the number rows in the grid          
+      LOGICAL RESTART
+      INTEGER SA_Run_Number
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
 !     required to handle the profile graphs plotted in child windows
       INTEGER  SAUsedChildWindows
@@ -70,89 +72,74 @@
 ! This subroutine is the Viewbest subroutine (in sa_refresh.for) hacked about a bit.
 ! Each time a "View" button is clicked in the summary window, this subroutine will
 ! open a new Mercury window and display the relevant .pdb file
-        USE WINTERACTER
-        USE DRUID_HEADER
-        USE VARIABLES
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
 
-        INTEGER IROW
+      INTEGER IROW
       INTEGER I,M
-!       INTEGER K,L
-        LOGICAL exists
-        CHARACTER*255 Grid_Buffer
-        CHARACTER*255 dirname, filename, curdir
-!      
+      LOGICAL exists
+      CHARACTER*255 Grid_Buffer
+      CHARACTER*255 dirname, filename, curdir
+      
       I = len_trim(ViewExe)
-!       J = len_trim(ViewArg)
-
-
+!      J = len_trim(ViewArg)
 !     Get grid_buffer which contains the name of the correct pdb file
-
-        Call WDialogSelect(IDD_SA_Multi_completed_ep)
-        CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)      
-        INQUIRE(FILE = ViewExe(1:I), EXIST=exists)
-        IF (exists) THEN
+      CALL WDialogSelect(IDD_SA_Multi_completed_ep)
+      CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)      
+      INQUIRE(FILE = ViewExe(1:I), EXIST=exists)
+      IF (exists) THEN
 ! Splitpath returns with the directory in which Mercury resides (dirname) and 
 ! filename = mercury.exe
-            CALL SplitPath(ViewExe,dirname, filename)     
+        CALL SplitPath(ViewExe,dirname, filename)     
 !
 ! gets working directory name i.e. where .pdb files have been saved
-          CALL IOsDirName(curdir)
-
-
+        CALL IOsDirName(curdir)
         CALL IOsDirChange(dirname)
-          M = InfoError(1)
-
-
+        M = InfoError(1)
 !ep     By taking out the if, then statement, mercury will open with a fresh window
 !           for each SA solution check box clicked.
-
-
-        
 !ep       IF (J.GT.0) THEN
 !                 CALL IOSCommand( &
 !                 filename(1:len_trim(filename))//' '//ViewArg(1:J)//' '// &
 !                 '"'//curdir(1:len_trim(curdir))//DIRSPACER//temp_file(1:len_trim(temp_file))//'"',0)
-
-
 !ep     if want to open each SA solution in same mercury window then uncomment
 !           the if, then statement and use the following 3 lines
-
-
 !ep               CALL IOSCommand( &
 !                 filename(1:len_trim(filename))//' '//ViewArg(1:J)//' '// &
 !                 '"'//grid_buffer(1:len_trim(grid_buffer))//'"',0)
-
 !ep       ELSE
 !                 CALL IOSCommand( &
 !                 filename(1:len_trim(filename))//' '// &
 !                 '"'//curdir(1:len_trim(curdir))//DIRSPACER//temp_file(1:len_trim(temp_file))//'"',0)
 
 ! opens Mercury with the file specified through grid_buffer, filename = mercury.exe
-                  CALL IOSCommand( &
-                  filename(1:len_trim(filename))//' '// &
-                  '"'//grid_buffer(1:len_trim(grid_buffer))//'"',0)
+               CALL IOSCommand(filename(1:LEN_TRIM(filename))//' '// &
+                '"'//grid_buffer(1:LEN_TRIM(grid_buffer))//'"',0)
 !         END IF
         CALL IOsDirChange(curdir)
 
-          M = InfoError(1)
-          IF ( M .EQ. ErrOSCommand) THEN
-                  CALL WMessageBox(OkOnly, InformationIcon, CommonOk, &
-                  "DASH could not launch your viewer. The viewer executable is currently configured"//&
-  CHAR(13)//"to launch the program "//ViewExe(1:I)//&
-  CHAR(13)//"To change the configuration you should edit the file "//&
-  CHAR(13)//INSTDIR(1:len_trim(INSTDIR))//DIRSPACER//"Dash.cfg"//&
-  CHAR(13)//"and then restart DASH","Viewer incorrectly installed")
+        M = InfoError(1)
+        IF (M .EQ. ErrOSCommand) THEN
+          CALL WMessageBox(OkOnly, InformationIcon, CommonOk, &
+                    "DASH could not launch your viewer. The viewer executable is currently configured"//&
+                CHAR(13)//"to launch the program "//ViewExe(1:I)//&
+                CHAR(13)//"To change the configuration you should edit the file "//&
+                CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Dash.cfg"//&
+                CHAR(13)//"and then restart DASH","Viewer incorrectly installed")
         ELSE IF (M.EQ.0) THEN
-                  ViewAct = .TRUE.
+          ViewAct = .TRUE.
         END IF
-        ELSE
-               CALL WMessageBox(OkOnly, InformationIcon, CommonOk, &
-                  "DASH could not find your viewer. The viewer executable is currently configured"//&
-  CHAR(13)//"to launch the program "//ViewExe(1:I)//&
-  CHAR(13)//"To change the configuration you should edit the file "//&
-  CHAR(13)//INSTDIR(1:len_trim(INSTDIR))//DIRSPACER//"Dash.cfg"//&
-  CHAR(13)//"and then restart DASH","No such viewer")
-            
+      ELSE
+        CALL WMessageBox(OkOnly, InformationIcon, CommonOk, &
+             "DASH could not find your viewer. The viewer executable is currently configured"//&
+             CHAR(13)//"to launch the program "//ViewExe(1:I)//&
+             CHAR(13)//"To change the configuration you should edit the file "//&
+             CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Dash.cfg"//&
+             CHAR(13)//"and then restart DASH","No such viewer")
       END IF
-        END  SUBROUTINE Viewpdb
 
+      END  SUBROUTINE Viewpdb
+!
+!*******************************************************************************
+!
