@@ -237,12 +237,25 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
+
+      REAL XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+
+      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+
+
       LOGICAL    FExists
       INTEGER    KLEN
 ! Note that FNAME is a global variable
       INTEGER    ISTAT
       INTEGER    DiffractionFileLoad ! Function
       LOGICAL    Confirm ! Function
+      REAL       tMaxResolutionAttainable, tMaxResolution
+      REAL       TwoTheta2dSpacing ! Function
+      LOGICAL    FnWavelengthOK ! Function
 
       DiffractionFileOpen = 0
       KLEN = LEN_TRIM(TheFileName)
@@ -280,12 +293,27 @@
 ! I think that reading in a new powder diffraction file should initialise all other
 ! data to 'unknown'.
       IF (LEN_TRIM(FNAME) .GT. 80) THEN
-        CALL DebugErrorMessage('FNAME too long in Diffraction_File_Open')
+        CALL DebugErrorMessage('FNAME too long in DiffractionFileOpen')
         DashRawFile = FNAME(1:80)
       ELSE
         DashRawFile = FNAME(1:LEN_TRIM(FNAME))
       ENDIF
-      RETURN
+! Set minimum and maximum truncation values in Wizard in accordance with data read in
+      IF (.NOT. FnWavelengthOK()) RETURN
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page5)
+      CALL WDialogPutReal(IDF_Min2Theta,XPMIN,'(F6.3)')
+! If truncation resolution not attainable with current data range / wavelength, adjust the maximum resolution
+      tMaxResolutionAttainable = TwoTheta2dSpacing(XPMAX)
+      tMaxResolution = MAX(tMaxResolutionAttainable,DefaultMaxResolution)
+!T      CALL WDialogGetReal(IDF_MaxResolution,tReal)
+!T      IF (dSpacing2TwoTheta(tReal) .GT. XPMAX) THEN
+!T        CALL WDialogPutReal(IDF_Max2Theta,XPMAX)
+!T        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(XPMAX))
+!T      ELSE
+!T        CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
+!T      ENDIF
+      CALL PopActiveWindowID
 
       END FUNCTION DiffractionFileOpen
 !
@@ -345,8 +373,6 @@
       INTEGER          I, J, JJ
       INTEGER          POS
       LOGICAL          ESDsFilled
-      REAL             tReal
-      REAL             dSpacing2TwoTheta ! Function
 
       BACKREF = .TRUE.
 ! Initialise to failure
@@ -473,19 +499,6 @@
       IPMAXOLD = IPMAX
       IPTYPE = 1
       CALL Profile_Plot(IPTYPE)
-! Set minimum and maximum truncation values in Wizard in accordance with data read in
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page5)
-      CALL WDialogPutReal(IDF_Min2Theta,XPMIN,'(F6.3)')
-! If truncation resolution not attainable with current data range / wavelength, adjust the maximum resolution
-      CALL WDialogGetReal(IDF_MaxResolution,tReal)
-      IF (dSpacing2TwoTheta(tReal) .GT. XPMAX) THEN
-        CALL WDialogPutReal(IDF_Max2Theta,XPMAX)
-        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(XPMAX))
-      ELSE
-        CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
-      ENDIF
-      CALL PopActiveWindowID
       NoData = .FALSE.
       CALL ScrUpdateFileName
 
@@ -1832,7 +1845,9 @@
 
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
       REAL RMaxTTheta
@@ -1922,6 +1937,7 @@
 
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
  
       INTEGER I, J, JJ, Shift
@@ -2150,7 +2166,7 @@
 
       INTEGER i, KLEN
       INTEGER ihcver,iticer,ipiker,iloger,idsler, isst, ised, iactsgnum
-      INTEGER GetCrystalSystem_2 ! Function
+      INTEGER GetCrystalSystem ! Function
       INTEGER GETTIC ! Function
 
 !C>> JCC Set to success in all cases
@@ -2215,7 +2231,7 @@
           END DO
           CALL INextInteger(subline,IActSGNum)
 ! Set the lattice numbers
-          LatBrav = GetCrystalSystem_2(NumberSGTable)
+          LatBrav = GetCrystalSystem(NumberSGTable)
           CALL UserSetCrystalSystem(LatBrav)
           NumPawleyRef = 0
           CALL FillSymmetry()
@@ -2231,6 +2247,7 @@
       klen = LEN_TRIM(DashTicFile)
       IF (TicExists) THEN
         CALL GET_LOGREF(DashTicFile,klen,iloger)
+! JvdS I think that GET_LOGREF already loaded the DashTicFile
         iticer = GETTIC(klen,DashTicFile)
         IF (iticer .EQ. 0) TicExists = .FALSE.
       ENDIF
@@ -2282,6 +2299,7 @@
 ! IH    = h, k and l
 ! ARGK  = 2 theta value
 ! DSTAR = d*
+! Exaclty the same information is held in two other common blocks.
       INTEGER I, II
 
 !>> JCC - set return status

@@ -99,7 +99,6 @@
       CALL WDialogLoad(IDD_Background_Fit)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
       it = InfoError(1)
-      RETURN
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
@@ -403,7 +402,6 @@
 
 
   999 CLOSE(10)
-      RETURN
 
       END SUBROUTINE SaveConfigurationFile
 !
@@ -423,6 +421,7 @@
       INCLUDE 'DialogPosCmn.inc'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
@@ -447,9 +446,11 @@
       NumInternalDSC = -1
       ZeroPoint = 0.0
       CALL UpdateWavelength(WaveLengthOf('Cu'))
+! Now initialise the maximum resolution
       CALL WDialogSelect(IDD_PW_Page5)
-      CALL WDialogGetReal(IDF_MaxResolution,tReal)
-      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
+      DefaultMaxResolution = 2.0
+      CALL WDialogPutReal(IDF_MaxResolution,DefaultMaxResolution)
+      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(DefaultMaxResolution))
       CALL WDialogSelect(IDD_SA_input3)
       ISeed1 = 314
       ISeed2 = 159
@@ -564,6 +565,7 @@
       CALL IGrPaletteRGB(KolNumBack,   KolBack%IRed,&
                                        KolBack%IGreen,&
                                        KolBack%IBlue)
+      ConnectPointsObs = .FALSE.
 
       END SUBROUTINE InitialiseVariables
 !
@@ -628,7 +630,6 @@
         //CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))&
         //CHAR(13)//CHAR(13)//"or in your current working directory", "Installation failure")
       PolyFitter_OpenSpaceGroupSymbols = errstat
-      RETURN
 
       END FUNCTION PolyFitter_OpenSpaceGroupSymbols
 !
