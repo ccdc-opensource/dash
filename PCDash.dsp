@@ -407,6 +407,7 @@ DEP_F90_LOADS=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
+	".\Reflns.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -517,6 +518,10 @@ DEP_F90_PCDAS=\
 # Begin Source File
 
 SOURCE=.\PCDruid_Resource.F90
+# End Source File
+# Begin Source File
+
+SOURCE=.\PeakFind.f90
 # End Source File
 # Begin Source File
 
@@ -719,7 +724,6 @@ SOURCE=.\SA_main.f90
 DEP_F90_SA_MA=\
 	".\Debug\DRUID_HEADER.mod"\
 	".\Debug\PO_VAR.mod"\
-	".\Debug\SAMVAR.MOD"\
 	".\Debug\VARIABLES.mod"\
 	".\Debug\ZMVAR.MOD"\
 	".\Lattice.inc"\
@@ -798,6 +802,7 @@ DEP_F90_SA_SU=\
 	".\Debug\ATMVAR.mod"\
 	".\Debug\DRUID_HEADER.mod"\
 	".\Debug\PO_VAR.mod"\
+	".\Debug\RRVAR.mod"\
 	".\Debug\SOLVAR.mod"\
 	".\Debug\VARIABLES.mod"\
 	".\Debug\ZMVAR.MOD"\
