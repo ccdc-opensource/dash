@@ -902,37 +902,37 @@
 !-- Final check over for valence error on C N O S
 !-- Tidy up by assigning double/single or delocalised 
 
-! JvdS I don't think the following loop was finished yet: it doesn't do anything.
-      DO I = 1, natcry
-        CALL SAMCON(I,Ncon,Icon,Icob,Ipib)
-        V = 0.0 ! 'Valence'
-        Nmetal = 0
-!--    Icob is :  1 = single  2= double  3=triple  4=quadruple
-!--               5 = aromatic      6 = polymeric single
-!--               7 = delocalised   9 = pi-bond
-        DO K = 1, Ncon
-          IF (Icob(K).GE.1 .AND. Icob(K).LE.4) V = V + FLOAT(Icob(K))
-          IF (Icob(K).EQ.5 .OR.  Icob(K).EQ.7) V = V + 1.50
-          IF (Icob(K).EQ.6)                    V = V + 1.0
-          Kat = Icon(K)
-          IF (hybr(Kat).GT.100) Nmetal = Nmetal + 1
-        ENDDO
-!-- valence check on elements  --  if problem set M=1
-        M = 0
-!-- carbon
-        IF (aelem(I).EQ.1) THEN
-          IF (hybr(I).EQ.2 .AND. NINT(V).NE.4) M = 1
-          IF (NINT(V).GT.4) M = 1
-        ENDIF
-!-- nitrogen
-        IF (aelem(I).EQ.56) THEN
-          IF (hybr(I).EQ.2 .AND. NINT(V).NE.3) M = 1
-          IF (NINT(V).GE.5) M = 1
-        ENDIF
-!-- oxygen & sulphur
-        IF (aelem(I).EQ.64 .AND. (NINT(V)-Nmetal.GT.2)) M = 1
-        IF (aelem(I).EQ.81 .AND. (NINT(V)-Nmetal.GT.2)) M = 1
-      ENDDO
+!U! JvdS I don't think the following loop was finished yet: it doesn't do anything.
+!U      DO I = 1, natcry
+!U        CALL SAMCON(I,Ncon,Icon,Icob,Ipib)
+!U        V = 0.0 ! 'Valence'
+!U        Nmetal = 0
+!U!--    Icob is :  1 = single  2= double  3=triple  4=quadruple
+!U!--               5 = aromatic      6 = polymeric single
+!U!--               7 = delocalised   9 = pi-bond
+!U        DO K = 1, Ncon
+!U          IF (Icob(K).GE.1 .AND. Icob(K).LE.4) V = V + FLOAT(Icob(K))
+!U          IF (Icob(K).EQ.5 .OR.  Icob(K).EQ.7) V = V + 1.50
+!U          IF (Icob(K).EQ.6)                    V = V + 1.0
+!U          Kat = Icon(K)
+!U          IF (hybr(Kat).GT.100) Nmetal = Nmetal + 1
+!U        ENDDO
+!U!-- valence check on elements  --  if problem set M=1
+!U        M = 0
+!U!-- carbon
+!U        IF (aelem(I).EQ.1) THEN
+!U          IF (hybr(I).EQ.2 .AND. NINT(V).NE.4) M = 1
+!U          IF (NINT(V).GT.4) M = 1
+!U        ENDIF
+!U!-- nitrogen
+!U        IF (aelem(I).EQ.56) THEN
+!U          IF (hybr(I).EQ.2 .AND. NINT(V).NE.3) M = 1
+!U          IF (NINT(V).GE.5) M = 1
+!U        ENDIF
+!U!-- oxygen & sulphur
+!U        IF (aelem(I).EQ.64 .AND. (NINT(V)-Nmetal.GT.2)) M = 1
+!U        IF (aelem(I).EQ.81 .AND. (NINT(V)-Nmetal.GT.2)) M = 1
+!U      ENDDO
 ! Now re-assess hybr, including 4 = aromatic
       DO Iat = 1, natcry
         SELECT CASE (aelem(Iat))
@@ -1135,7 +1135,7 @@
 !*****************************************************************************
 !
       SUBROUTINE SAMANF(Iat,Jat,Kat,Aval)
-!--Function:  Get  angle for i-j-k in atom list coords XO.
+!--Function:  Get angle for i-j-k in atom list coords XO.
 !--Version:  21.10.94     Sam Motherwell
 !--Arguments:
 !-- IAT,JAT,KAT  define atom number for torsion anngle i-j-k
@@ -1152,7 +1152,6 @@
       REAL, DIMENSION(3) :: X1, X2, X3
 
       Aval = 0.0
-      IF(Iat.LE.0 .OR. Jat.LE.0 .OR. Kat.LE.0)RETURN
       DO K = 1, 3
         X1(K) = Axyzo(Iat,K)
         X2(K) = Axyzo(Jat,K)
@@ -1172,13 +1171,14 @@
 !-- IAT,JAT input define atom number for bond in IBOC
 !-- NTOR    output number of tor angles found
 !-- TORANG  output list of tor angles
+
       USE SAMVAR
 
       IMPLICIT NONE
 
       INTEGER :: Iat, Jat, Ntor
       REAL, DIMENSION(30) :: Torang
-      INTENT (OUT) Torang
+      INTENT (  OUT) Torang
       INTENT (INOUT) Ntor
 
       REAL :: Aval
@@ -1187,7 +1187,6 @@
 
       Ntor = 0
       Ipib = -1
-      IF(Iat.LE.0 .OR. Jat.LE.0)RETURN
 !--  Iat - get list of connections  to atom Kat
 !--  Jat - get list of connections  to atom Lat
       CALL SAMCON(Iat,Nconk,Iconk,Icobk,Ipib)
@@ -1195,22 +1194,22 @@
 !-- systematically generate torsion angles k-i-j-l
       DO N = 1, Nconk
         Kat = Iconk(N)
-        IF(Kat.NE.Jat)THEN
+        IF (Kat.NE.Jat) THEN
           DO M = 1, Nconl
             Lat = Iconl(M)
-            IF(Lat.NE.Iat)THEN
-              IF(Kat.GT.0 .AND. Lat.GT.0)THEN
+            IF (Lat.NE.Iat) THEN
+              IF (Kat.GT.0 .AND. Lat.GT.0) THEN
                 CALL SAMTOX(Kat,Iat,Jat,Lat,Aval)
                 Ntor = Ntor + 1
                 Torang(Ntor) = Aval
-                IF(Ntor.GE.30)GOTO 99999
+                IF (Ntor.GE.30) RETURN
               ENDIF
             ENDIF
           ENDDO
         ENDIF
       ENDDO
 
-99999 END SUBROUTINE SAMTOB
+      END SUBROUTINE SAMTOB
 !*==SAMTOX.f90  processed by SPAG 6.11Dc at 13:53 on  5 Oct 2001
 !
 !*****************************************************************************
@@ -1286,20 +1285,24 @@
 !-- local
 !-- V, U         unit vector
 !--
+
       USE SAMVAR
+
       IMPLICIT NONE
-      REAL X1(3),X2(3),X3(3),ANGLE
-      REAL U(3),V(3),DU,DV,COSA
+
+      REAL X1(3), X2(3), X3(3), ANGLE
+      REAL U(3), V(3), DU, DV, COSA
       REAL RTOL
       PARAMETER (RTOL=0.000001)
+      REAL Radians2Degrees ! Function
 
       CALL SAMVEC(X2,X1,U,DU)
       CALL SAMVEC(X2,X3,V,DV)
       IF(DU.LT.RTOL .OR. DV.LT.RTOL) THEN
         ANGLE=-360.0
       ELSE
-        COSA=U(1)*V(1)+U(2)*V(2)+U(3)*V(3)
-        ANGLE=ACOS(COSA)
+        COSA = U(1)*V(1) + U(2)*V(2) + U(3)*V(3)
+        ANGLE = Radians2Degrees(ACOS(COSA))
       ENDIF
 
       END SUBROUTINE SAMANG
