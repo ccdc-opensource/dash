@@ -1,4 +1,4 @@
-! Winteracter module created : 24/Oct/2003 15:25:39
+! Winteracter module created : 28/Oct/2003 19:09:52
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -714,4 +714,10 @@
           INTEGER, PARAMETER :: IDF_SmoothWindow                =  1149
           INTEGER, PARAMETER :: IDB_1st                         =  1150
           INTEGER, PARAMETER :: IDF_RecalcESDs                  =  1154
+          INTEGER, PARAMETER :: IDB_FindPeaks                   =  1155
+          INTEGER, PARAMETER :: IDF_IniOrAtom                   =  1156
+          INTEGER, PARAMETER :: IDF_IniOrEuler                  =  1157
+          INTEGER, PARAMETER :: IDF_IniOrQuater                 =  1380
+          INTEGER, PARAMETER :: IDF_AtomNr2                     =  1124
+          INTEGER, PARAMETER :: IDB_ViewRot                     =  1488
       END MODULE Druid_Header
