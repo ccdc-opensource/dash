@@ -53,30 +53,32 @@
     If (cellok) Call Upload_Cell_Constants
    END SUBROUTINE Upload_Lattice_Only
 !
+!*****************************************************************************
 !
-!
-     subroutine Upload_Data_Properties()
-!
+! JvdS @ This routine uses an uninitialised variable to initialise the X-ray source.
+      SUBROUTINE Upload_Data_Properties()
+
       USE WINTERACTER
-      USE druid_header
-!
+      USE DRUID_HEADER
+
       IMPLICIT NONE
+
+!      LOGICAL NoData
+!      INTEGER IPTYPE,JPTYPE
+!      COMMON /PLTYPE/ IPTYPE
+!      INTEGER IDCurrent_Cursor_Mode
+!      COMMON /CURSOR_MODE/ IDCurrent_Cursor_Mode
 !
-      LOGICAL NoData
-      INTEGER IPTYPE,JPTYPE
-      COMMON /PLTYPE/ IPTYPE
-      INTEGER IDCurrent_Cursor_Mode
-      COMMON /CURSOR_MODE/ IDCurrent_Cursor_Mode
+!      REAL :: CELLPAR,ZEROPOINT,ALAMBDA
+!      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
 !
-      REAL :: CELLPAR,ZEROPOINT,ALAMBDA
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
+!      CHARACTER(LEN=80) STATBARSTR
+!      COMMON /STATBAR/ STATBARSTR(10)
+!      include 'statlog.inc'
+       INTEGER IRadOption
 !
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
-      include 'statlog.inc'
-!
-!	write(76,*) ' In Upload Data Properties  ',IRadOption,INWOption
-	   CALL SetSourceDataState(IRadOption)
+! @ IRadOption is never initialised       
+         CALL SetSourceDataState(IRadOption)
 !          SELECT CASE (IRadOption)
 !            CASE(1)
 ! Lab X-ray
@@ -140,9 +142,7 @@
 !              CALL WDialogPutRadioButton(IDF_TOF_source)
 !          END SELECT
 !
-   end subroutine Upload_Data_Properties
-!
-!
+      END SUBROUTINE Upload_Data_Properties
 !
 !*****************************************************************************
 !
@@ -201,31 +201,46 @@
       chrfmt(inext:inext)=')'
       CALL WDialogPutReal(IDF_ymin,ypmin,chrfmt(1:inext))
       CALL WDialogPutReal(IDF_ymax,ypmax,chrfmt(1:inext))
-!
+
       endsubroutine UPLOAD_RANGE
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION PlotErrorBars
 
+      USE WINTERACTER
+      USE DRUID_HEADER
 
-	  integer function PlotErrorBars
-	  use winteracter
-	  use druid_header
+      INTEGER ICurSel
 
-	  integer ICurSel
-	  ICurSel = WinfoDialog(CurrentDialog)
+      ICurSel = WinfoDialog(CurrentDialog)
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
       CALL WDialogGetCheckBox(IDF_ErrorBar_Check,PlotErrorBars) 
-	  IF (ICurSel .NE. -1) CALL WDialogSelect(ICurSel)
-	  end function PlotErrorBars
+      IF (ICurSel .NE. -1) CALL WDialogSelect(ICurSel)
 
+      END FUNCTION PlotErrorBars
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION PlotBackground
+!
+! This function retrieves the value of the 'plot background' checkbox in the plot options panel
+!
+! JvdS 22 July 2001
+!
+! RETURNS : .TRUE.  if user requested the background     to be plotted
+!           .FALSE. if user requested the background not to be plotted
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
 
+      INTEGER ICurSel
+      INTEGER tPlotBackground
 
-	  integer function PlotBackground
-	  use winteracter
-	  use druid_header
-
-	  integer ICurSel
-	  ICurSel = WinfoDialog(CurrentDialog)
+      ICurSel = WInfoDialog(CurrentDialog)
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      CALL WDialogGetCheckBox(IDF_background_check,PlotBackground)
+      CALL WDialogGetCheckBox(IDF_background_check,tPlotBackground)
+      PlotBackground = (tPlotBackground .EQ. 1)
+      IF (ICurSel .NE. -1) CALL WDialogSelect(ICurSel)
 
-	  IF (ICurSel .NE. -1) CALL WDialogSelect(ICurSel)
-	  end function PlotBackground
+      END FUNCTION PlotBackground
