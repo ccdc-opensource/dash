@@ -8251,7 +8251,7 @@
 !D NOPFIL is set to the logical unit assigned.
 !D NOPFIL=0 indicates that no data have been given in response to the
 !D interactive request for a file name. This may be useful as a way
-!D  of reading several files in sequence, with RETURN given as response when no
+!D of reading several files in sequence, with RETURN given as response when no
 !D more are wanted.
 !
 !D If on exit NOPFIL=-1, an error has occurred from which recovery was not
@@ -8294,12 +8294,13 @@
 !     in from FORTY via common block commun.
       COMMON /commun/ filnam_root
       CHARACTER*10 filnam_root
+
       LOGICAL, EXTERNAL :: Confirm
 
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
-!  UNSCRAMBLE MODE
+! UNSCRAMBLE MODE
       M = MODE
       MODE5 = M/10000
       M = M - MODE5*10000
@@ -8309,11 +8310,11 @@
       M = M - MODE3*100
       MODE2 = M/10
       MODE1 = M - MODE2*10
-!  SET DEFAULTS FORMATTED, SEQUENTIAL, AND NEW FOR WRITE, OLD FOR READ
+! SET DEFAULTS FORMATTED, SEQUENTIAL, AND NEW FOR WRITE, OLD FOR READ
       IS = MODE1
       IA = 1
       IF = 1
-!  SET FORMAT AND ACCESS
+! SET FORMAT AND ACCESS
       IF (MODE1.EQ.4) THEN
 ! APPEND
         IS = 3
@@ -8326,14 +8327,15 @@
 ! IO SET FOR INPUT OR OUTPUT FILE MESSAGE
       IO = 1
       IF (MODE1.GT.1) IO = 2
-!  NOW FIND A UNIT
+! NOW FIND A UNIT
       DO IU = 1, 15
         IF (IOTAB(IU).EQ.0) GOTO 2
       ENDDO
-      GOTO 51
+      CALL ERRMES(1,0,'*** ERROR No more logical units available')
+      IF (IBMBER .NE. 0) RETURN
     2 LUN = LUNTAB(IU)
       IF (MODE1.EQ.5) THEN
-!  OPEN SCRATCH FILE
+! OPEN SCRATCH FILE
         IF (IA.EQ.1) OPEN (UNIT=LUN,ACCESS=FILACC(IA),FORM=FILFOR(IF),STATUS='SCRATCH')
 ! FOR NOW, IF DIRECT ACCESS, RECL=80 - THIS WILL NEED ATTENTION
         IF (IA.EQ.2) OPEN (UNIT=LUN,ACCESS=FILACC(IA),FORM=FILFOR(IF),STATUS='SCRATCH',RECL=80)
@@ -8422,8 +8424,6 @@
       ENDIF
       NOPFIL = 0
       GOTO 100
-   51 CALL ERRMES(1,0,'*** ERROR No more logical units available')
-      IF (IBMBER .NE. 0) RETURN
 ! 'OPEN' ERROR - CHECK FIRST FOR BRUCE BLIP:
    52 IF (BRUCE .OR. MODE.NE.111) GOTO 152
       BRUCE = .TRUE.
