@@ -23,6 +23,8 @@ c      do i=1,n
 c      write (6,*) iz1(i),iz2(i),iz3(i)
 c      end do
 
+c cosmetic change to demo cvs
+
       rad = 1.0/radian
 c     First atom is placed at the origin
       if (n .ge. 1) then
