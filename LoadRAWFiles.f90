@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_raw_File(TheFileName,ESDsFilled)
+      INTEGER FUNCTION Load_raw_File(TheFileName, ESDsFilled)
 !
 ! This function tries to load a *.raw file (binary format from either STOE or Bruker machines).
 ! The routine basically assumes that the file is OK.
@@ -72,7 +72,7 @@
             CALL PushActiveWindowID
             CALL WDialogLoad(IDD_DataRangeSTOE)
             CALL WDialogSelect(IDD_DataRangeSTOE)
-            CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,1)
+            CALL WDialogPutMenu(IDF_DataRangeMenu, TitleOfRange, tNumOfRanges, 1)
             CALL WDialogShow(-1, -1, IDOK, Modal)
             IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
               Load_raw_File = 2
@@ -81,17 +81,18 @@
               RETURN
             ENDIF
             CALL WDialogGetMenu(IDF_DataRangeMenu,iRange)
-! irange is the data range to be read.
+! iRange is the data range to be read.
             CALL WDialogUnload
             CALL PopActiveWindowID
           ENDIF
-          Load_raw_File = Load_rawSTOE_File(TheFileName,iRange)
-          ESDsFilled = .FALSE.
+          Load_raw_File = Load_rawSTOE_File(TheFileName, iRange)
+          ESDsFilled = .FALSE. ! This should change to TRUE once it becomes possible to read
+          ! multiple data ranges.
           IF (Load_raw_File .NE. 1) RETURN
         CASE (' ','1','2')
 ! Bruker files can contain multiple data ranges.
 ! Scan the file, get the number of data ranges and their titles.
-          CALL GetDataRangesBruker(TheFileName,tNumOfRanges,TitleOfRange,t2ThetaStep)
+          CALL GetDataRangesBruker(TheFileName, tNumOfRanges, TitleOfRange, t2ThetaStep)
           IF (tNumOfRanges .EQ. 0) THEN
             CALL ErrorMessage('File contains no data.')
             RETURN
@@ -105,7 +106,7 @@
             DO CurrRange = 1, tNumOfRanges 
               iHighlightList(CurrRange) = 1
             ENDDO
-            CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,iHighlightList)
+            CALL WDialogPutMenu(IDF_DataRangeMenu, TitleOfRange, tNumOfRanges, iHighlightList)
             CALL WDialogShow(-1, -1, IDOK, Modal)
             IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
               Load_raw_File = 2
@@ -113,7 +114,7 @@
               CALL PopActiveWindowID
               RETURN
             ENDIF
-            CALL WDialogGetMenu(IDF_DataRangeMenu,iHighlightList)
+            CALL WDialogGetMenu(IDF_DataRangeMenu, iHighlightList)
 ! The array iHighlightList now contains '1' for every data range to be read, '0' otherwise.
             CALL WDialogUnload
             CALL PopActiveWindowID
@@ -132,7 +133,7 @@
             IF (t2ThetaStep(I) .LT. Smallest2ThetaStep) Smallest2ThetaStep = t2ThetaStep(I)
           ENDDO
           Smallest2ThetaStep = Smallest2ThetaStep - 0.00005 ! In case of rounding errors
-          Load_raw_File = Load_rawBruker_File(TheFileName,LoadRange,Smallest2ThetaStep)
+          Load_raw_File = Load_rawBruker_File(TheFileName, LoadRange, Smallest2ThetaStep)
           ESDsFilled = .TRUE.
           IF (Load_raw_File .NE. 1) RETURN
       END SELECT
@@ -355,7 +356,7 @@
               OffSet = Offset + 1 + (SizeOfHeader / 4)
 ! Due to the way integer division in FORTRAN works, 
 ! the fractional part of SizeOfHeader / 4 is discarded
-              Shift = SizeOfHeader - MOD(SizeOfHeader,4)
+              Shift = MOD(SizeOfHeader,4)
               READ(hFile,REC=Offset,ERR=999) I4
               DO I = 1, NumOfBins
                 READ(hFile,REC=Offset+I,ERR=999) I4_2
@@ -659,9 +660,8 @@
             READ(hFile,REC=Offset+4,ERR=999) R4
             TwoThetaStep = R4
             IF (TwoThetaStep .LT. 0.000001) RETURN
-! Six times the start points of the range
-! @@@@ Which one is 2 theta ?????
-            READ(hFile,REC=Offset+6,ERR=999) R4
+! Six times the start points of the range, the first one is 2 theta
+            READ(hFile,REC=Offset+5,ERR=999) R4 ! 2theta
             TwoThetaStart = R4
 ! Fill the 2 theta values
             CurrTwoTheta = TwoThetaStart
@@ -677,7 +677,7 @@
               OffSet = Offset + 1 + (SizeOfHeader / 4)
 ! Due to the way integer division in FORTRAN works, 
 ! the fractional part of SizeOfHeader / 4 is discarded
-              Shift = SizeOfHeader - MOD(SizeOfHeader,4)
+              Shift = MOD(SizeOfHeader,4)
               READ(hFile,REC=Offset,ERR=999) I4
               DO I = 1, NumOfBins
                 READ(hFile,REC=Offset+I,ERR=999) I4_2
@@ -701,6 +701,9 @@
             ENDIF
           ENDDO
 ! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+          DO I = 1, NumOfBins
+            EOBS(I) = MAX(4.4, SQRT(MAX(0.0, YOBS(I))))
+          ENDDO
         CASE DEFAULT
           CALL ErrorMessage('Unrecognised *.raw format.')
           GOTO 999
