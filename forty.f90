@@ -24,6 +24,9 @@
 !A CALROU is the routine to give the calculated function.  At present expected
 !A        settings for this are CALPRM for magnetic, CALPR for non-magnetic.
 !
+      USE WINTERACTER
+      USE DRUID_HEADER
+
 !
 !
 !.. Interaction here with Winteracter !!!!!!
