@@ -27,7 +27,8 @@
       COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5),    &
      &                KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
       LOGICAL ZBAKIN
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
@@ -62,7 +63,6 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24

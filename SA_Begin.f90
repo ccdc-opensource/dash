@@ -51,7 +51,7 @@
       CALL SimulatedAnnealing
       SA_Duration = SECNDS(T1)
       WRITE(SA_DurationStr,'(F10.1)') SA_Duration
-  !    CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
+      CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       CALL OutputChi2vsMoves
@@ -179,7 +179,8 @@
 ! We need to determine the number of symmetry operators etc.
       LOGICAL SDREAD
       COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),ICDN(26,9),IERR,IO10,SDREAD
-      common/iounit/lpt,iti,ito,iplo,luni,iout
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       CHARACTER*6 xxx
       CHARACTER*10 fname
 

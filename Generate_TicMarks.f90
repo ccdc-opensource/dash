@@ -121,7 +121,8 @@
       LOGICAL SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
 
-      COMMON /iounit/ lpt, iti, ito, iplo, luni, iout
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 
       INTEGER matsz
       CHARACTER*6 xxx

@@ -216,6 +216,14 @@
                 JJ=II+3
                 CELLPAR(JJ) = DEGREE(ACOS(CELL(II,2,1)))
               ENDDO
+! The new peak shape parameters are now in 
+!        PKFNSP(L,I,JPHASE,JSOURC)
+! L = 1 : 'SIGM', I = 1, 2
+! L = 2 : 'GAMM', I = 1, 2
+! L = 3 : 'HPSL', I = 1
+! L = 4 : 'HMSL', I = 1
+! JPHASE = 1, JSOURC = 1
+
               CALL Upload_Cell_Constants()
               ZeroPoint = ZEROSP(1,1,1)
               CALL Upload_ZeroPoint() 
@@ -610,7 +618,8 @@
       DIMENSION ALSQ(QPFDIM)
       COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),ICDN(26,9),IERR,IO10,SDREAD
       LOGICAL SDREAD
-      COMMON/iounit/lpt,iti,ito,iplo,luni,iout
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       INTEGER matsz
       CHARACTER*6 xxx
       CHARACTER*10 fname

@@ -23,6 +23,11 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       INTEGER RecNr, tFileHandle, ifrg
       CHARACTER*MaxPathLength :: tFileName
@@ -87,6 +92,9 @@
       CALL FileWriteReal(tFileHandle,RecNr,ZeroPoint)
 ! Store space group
       CALL FileWriteInteger(tFileHandle,RecNr,NumberSGTable)
+! Store Pawley refinement related stuff
+
+
 ! Store the Z-matrices
       CALL FileWriteInteger(tFileHandle,RecNr,nfrag)
       DO ifrg = 1, maxfrg
@@ -114,7 +122,14 @@
         ENDIF
       ENDDO
 ! Save solutions
+! Save number of solutions
+      CALL FileWriteInteger(tFileHandle,RecNr,SA_Run_Number)
+      IF (SA_Run_Number .NE. 0) THEN
 
+
+
+
+      ENDIF
 
 
 
