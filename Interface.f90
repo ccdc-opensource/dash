@@ -1678,7 +1678,7 @@
       INCLUDE 'GLBVAR.INC'
 
       CALL PushActiveWindowID
-      IF (WMenuGetState(TheMode,ItemEnabled) .EQ. Disabled) THEN
+      IF (WMenuGetState(TheMode, ItemEnabled) .EQ. Disabled) THEN
         CALL DebugErrorMessage('Programming error: requested menu item is greyed out')
         CALL WMenuSetState(TheMode, ItemEnabled, Enabled)
       ENDIF
