@@ -261,8 +261,8 @@
       INCLUDE 'POLY_COLOURS.INC'
 
       INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       CALL IPgNewPlot(PgPolyLine,1,NBIN)
       CALL IPgStyle(1,0,0,0,KolNumBack,0)
@@ -283,8 +283,8 @@
       INCLUDE 'POLY_COLOURS.INC'
 
       INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -358,8 +358,8 @@
       INCLUDE 'POLY_COLOURS.INC'
 
       INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -380,19 +380,26 @@
       COMMON /CMN007/ CummChiSqd(MOBS)
 
       REAL    YDIF(MOBS), YADD
-      LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs, Get_ShowCumChiSqd
+      LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs, Get_ShowCumChiSqd, Get_DivideByEsd
       INTEGER I, II 
       REAL    sizmtem, xtem, ytem, xgtem, ygtem
-      LOGICAL tGet_ShowCumChiSqd
+      LOGICAL tGet_ShowCumChiSqd, tGet_DivideByEsd
 
       tGet_ShowCumChiSqd = Get_ShowCumChiSqd()
+      tGet_DivideByEsd = Get_DivideByEsd()
       CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
 ! The y-values of the difference profile.
       YADD = 0.5*(YPGMAX+YPGMIN)
-      DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
-        YDIF(II) = YADD + YOBIN(II) - YCBIN(II)
-      ENDDO
+      IF (tGet_DivideByEsd) THEN
+        DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
+          YDIF(II) = YADD + (YOBIN(II) - YCBIN(II))*AVGESD/EBIN(II)
+        ENDDO
+      ELSE
+        DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
+          YDIF(II) = YADD + YOBIN(II) - YCBIN(II)
+        ENDDO
+      ENDIF
       IF (tGet_ShowCumChiSqd) THEN
         CALL IPgNewPlot(PgPolyLine,4,NBIN)
       ELSE
@@ -460,9 +467,9 @@
       INCLUDE 'POLY_COLOURS.INC'
 
       INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-      
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &

@@ -715,7 +715,7 @@
             DO i = 2, natoms(iFrg)
               IF (RR_ioptb(i,iFrg,iFrgCopy) .EQ. 1) THEN
                 RR_Params(iParam) = RR_blen(i,iFrg,iFrgCopy)
-                RR_InitSteps(iParam) = 10.0 * Damping
+                RR_InitSteps(iParam) = 5.0 * Damping
                 iParam = iParam + 1
               ENDIF
             ENDDO
@@ -1174,8 +1174,8 @@
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
       INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:RR_maxatm)

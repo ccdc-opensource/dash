@@ -221,8 +221,8 @@
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
 
       INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
@@ -543,7 +543,7 @@
                            PlotPeakFitDifferenceProfile,                  &
                            WDialogGetCheckBoxLogical,                     &
                            Get_UseHydrogens, Get_SavePRO, Get_OutputChi2vsMoves, &
-                           Get_AutoLocalMinimisation
+                           Get_AutoLocalMinimisation, Get_DivideByEsd
       LOGICAL, EXTERNAL :: UseHydrogensDuringAuto, Get_ShowCumChiSqd
       REAL, EXTERNAL :: WavelengthOf
       INTEGER*4 tInteger
@@ -711,6 +711,8 @@
       CALL FileWriteLogical(hFile,RecNr,UseHydrogensDuringAuto())
 ! Plot cumulative chi-squared      
       CALL FileWriteLogical(hFile,RecNr,Get_ShowCumChiSqd())
+! Divide difference by ESDs      
+      CALL FileWriteLogical(hFile,RecNr,Get_DivideByEsd())
   999 CLOSE(hFile)
 
       END SUBROUTINE WriteConfigurationFile
@@ -953,6 +955,9 @@
       CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
       CALL WDialogPutCheckBoxLogical(IDF_ShowCumChiSqd,tLogical)
+! Divide difference by ESDs      
+      CALL FileReadLogical(hFile,RecNr,tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_DivDiffByEsd,tLogical)
       CLOSE(hFile)
       RETURN
   999 CALL DebugErrorMessage('Error while opening config file')

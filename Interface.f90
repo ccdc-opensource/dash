@@ -264,6 +264,26 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION Get_DivideByEsd
+
+! When .TRUE., the points of the difference curve are divided by their ESDs
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      Get_DivideByEsd = WDialogGetCheckBoxLogical(IDF_DivDiffByEsd)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_DivideByEsd
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION UseHydrogensDuringAuto
 
 ! When .TRUE., hydrogen atoms are included in the structure factor calculations during the
