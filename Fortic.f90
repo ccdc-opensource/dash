@@ -99,8 +99,14 @@
       CHARACTER*10 filnmr
       COMMON /commun/ filnam_root
       CHARACTER*10 filnam_root
-      filnam_root = filnmr
+      
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
+      INTEGER OldNBin
+
+      filnam_root = filnmr
       CALL PREFIN(PNAME)
 ! SET UP PRECISE PROBLEM, AND READ MOST L CARDS:
       CALL REFSET
@@ -113,7 +119,9 @@
 ! MAKE LIST OF REFLECTION INDICES:
       CALL INRFPR(PCXX,PFXX)
 ! Check if we have too many reflections
+      OldNBin = NBIN
       CALL CHKMAXREF(PCXX)
+      NBIN = OldNBin
 ! OUTPUT H,K,L IF REQUIRED:
       CALL HKLOUT(PCXX,ALSQ,MATSZ)
 
