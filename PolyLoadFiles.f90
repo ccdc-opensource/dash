@@ -182,7 +182,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=MaxPathLength), INTENT (INOUT) :: TheFileName
+      CHARACTER*(*), INTENT (INOUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -192,6 +192,10 @@
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+! Not too pretty, but safe
+      INTEGER                BackupNOBS
+      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
+      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
@@ -241,11 +245,10 @@
       INTEGER          Load_uxd_File ! Function
       INTEGER          Load_xye_File ! Function
       INTEGER          ISTAT
-      INTEGER          I, J, JJ
+      INTEGER          I
       INTEGER          POS
       LOGICAL          ESDsFilled
-      INTEGER          INTEGRATED_GUESS, MAX_INTENSITY_INDEX, IST
-      REAL             XADD, YOADD, VADD
+      INTEGER          INTEGRATED_GUESS, MAX_INTENSITY_INDEX
 
 ! Initialise to failure
       DiffractionFileLoad = 0
@@ -330,22 +333,14 @@
       ENDIF
       OriginalNOBS = NOBS
       EndNOBS = OriginalNOBS
-      NBIN = (NOBS/LBIN)
+      BackupNOBS = NOBS
+      DO I = 1, NOBS
+        BackupXOBS(I) = XOBS(I)
+        BackupYOBS(I) = YOBS(I)
+        BackupEOBS(I) = EOBS(I)
+      ENDDO
+      CALL Rebin_Profile
       DO I = 1, NBIN
-        IST = (I-1)*LBIN
-        XADD  = 0.0
-        YOADD = 0.0
-        VADD  = 0.0
-        DO J = 1, LBIN
-          JJ = J + IST
-          XADD  = XADD+XOBS(JJ)
-          YOADD = YOADD+YOBS(JJ)
-          VADD  = VADD+EOBS(JJ)**2
-        ENDDO
-        XBIN(I)  = XADD/FLOAT(LBIN)
-        YOBIN(I) = YOADD/FLOAT(LBIN)
-        YCBIN(I) = YOBIN(I)
-        EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
 ! JvdS Assume no knowledge on background
         YBBIN(I) = 0.0
       ENDDO
@@ -1459,63 +1454,40 @@
 
       USE VARIABLES
 
-      INCLUDE 'PARAMS.INC'
+      IMPLICIT NONE
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-      NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-      XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-      IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
 
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
       REAL RMaxTTheta
-      INTEGER I, J, JJ
+      INTEGER I
 
       DO I = 1, EndNOBS
         IF (XOBS(I) .GT. RMaxTTheta) EXIT
       ENDDO
       IF (I .LE. 1) RETURN
       NOBS = I - 1
-      NBIN=(NOBS/LBIN)
-      DO I = 1, NBIN
-        IST=(I-1)*LBIN
-        XADD=0.
-        YOADD=0.
-        YCADD=0.
-        YBADD=0.
-        VADD=0.
-        DO J = 1, LBIN
-          JJ=J+IST
-          XADD=XADD+XOBS(JJ)
-          YOADD=YOADD+YOBS(JJ)
-          YCADD=YCADD+YCAL(JJ)
-          YBADD=YBADD+YBAK(JJ)
-          VADD=VADD+EOBS(JJ)**2
-        ENDDO
-        XBIN(I)=XADD/FLOAT(LBIN)
-        YOBIN(I)=YOADD/FLOAT(LBIN)
-        YCBIN(I)=YCADD/FLOAT(LBIN)
-        YBBIN(I)=YBADD/FLOAT(LBIN)
-        EBIN(I)=SQRT(VADD)/FLOAT(LBIN)
-      ENDDO
+      CALL Rebin_Profile
       XPMIN=XOBS(1)
       XPMAX=XOBS(1)
       YPMIN=YOBS(1)
@@ -1549,39 +1521,36 @@
 
       USE VARIABLES
 
+      IMPLICIT NONE
+
       REAL, INTENT (IN   ) :: TheMin2Theta
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
 
       REAL tXOBS(MOBS),tYOBS(MOBS),tYCAL(MOBS),tYBAK(MOBS),tEOBS(MOBS)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-          XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-      IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
  
-      INTEGER I, J, JJ, Shift
+      INTEGER I, Shift
 
 ! We might have been through this routine before: undo that (in case the user wants to 
 ! truncate at a 2 theta value lower than currently visible) and store the result (i.e. the
@@ -1629,28 +1598,7 @@
         ENDDO
       ENDIF
       NOBS = NOBS - Shift
-      NBIN=(NOBS/LBIN)
-      DO I = 1, NBIN
-        IST=(I-1)*LBIN
-        XADD  = 0.0
-        YOADD = 0.0
-        YCADD = 0.0
-        YBADD = 0.0
-        VADD  = 0.0
-        DO J = 1, LBIN
-          JJ = J + IST
-          XADD  = XADD  + XOBS(JJ)
-          YOADD = YOADD + YOBS(JJ)
-          YCADD = YCADD + YCAL(JJ)
-          YBADD = YBADD + YBAK(JJ)
-          VADD  = VADD  + EOBS(JJ)**2
-        ENDDO
-        XBIN(I)  =  XADD/FLOAT(LBIN)
-        YOBIN(I) = YOADD/FLOAT(LBIN)
-        YCBIN(I) = YCADD/FLOAT(LBIN)
-        YBBIN(I) = YBADD/FLOAT(LBIN)
-        EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
-      ENDDO
+      CALL Rebin_Profile
       XPMIN = XOBS(1)
       XPMAX = XOBS(1)
       YPMIN = YOBS(1)
@@ -1696,6 +1644,56 @@
         " data points. Only the first "//cmobs(1:LEN_TRIM(cmobs))//" points were read")
 
       END SUBROUTINE ProfileRead_TruncationWarning
+!
+!*****************************************************************************
+!
+      SUBROUTINE Rebin_Profile()
+!
+! Rebins the profile
+!
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      INCLUDE 'statlog.inc'
+
+      INTEGER I, J, JJ, IST
+      REAL XADD, YOADD, YCADD, YBADD, VADD
+
+      NBIN = (NOBS/LBIN)
+      DO I = 1, NBIN
+        IST = (I-1) * LBIN
+        XADD  = 0.0
+        YOADD = 0.0
+        YCADD = 0.0
+        YBADD = 0.0
+        VADD  = 0.0
+        DO J = 1, LBIN
+          JJ = J + IST
+          XADD  = XADD  + XOBS(JJ)
+          YOADD = YOADD + YOBS(JJ)
+          YCADD = YCADD + YCAL(JJ)
+          YBADD = YBADD + YBAK(JJ)
+          VADD  = VADD  + EOBS(JJ)**2
+        ENDDO
+        XBIN(I)  =  XADD/FLOAT(LBIN)
+        YOBIN(I) = YOADD/FLOAT(LBIN)
+        YCBIN(I) = YCADD/FLOAT(LBIN)
+        YBBIN(I) = YBADD/FLOAT(LBIN)
+        EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
+      ENDDO
+      DataSetChange = DataSetChange + 1
+      CALL Get_IPMaxMin() 
+
+      END SUBROUTINE Rebin_Profile
 !
 !*****************************************************************************
 !

@@ -238,8 +238,7 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
-      INTEGER I, J, JJ, IST
-      REAL XADD, YOADD, VADD
+      INTEGER I
 
       NOBS = BackupNOBS
       DO I = 1, NOBS
@@ -259,22 +258,8 @@
       ENDDO
       OriginalNOBS = NOBS
       EndNOBS = OriginalNOBS
-      NBIN = (NOBS/LBIN)
+      CALL Rebin_Profile
       DO I = 1, NBIN
-        IST = (I-1)*LBIN
-        XADD  = 0.0
-        YOADD = 0.0
-        VADD  = 0.0
-        DO J = 1, LBIN
-          JJ = J + IST
-          XADD  = XADD+XOBS(JJ)
-          YOADD = YOADD+YOBS(JJ)
-          VADD  = VADD+EOBS(JJ)**2
-        ENDDO
-        XBIN(I)  = XADD/FLOAT(LBIN)
-        YOBIN(I) = YOADD/FLOAT(LBIN)
-        YCBIN(I) = YOBIN(I)
-        EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
 ! JvdS Assume no knowledge on background
         YBBIN(I) = 0.0
       ENDDO
@@ -291,6 +276,7 @@
       IPMAX = NBIN
       IPMINOLD = IPMIN
       IPMAXOLD = IPMAX
+      CALL Profile_Plot(IPTYPE)
 
       END SUBROUTINE WizardApplyDiffractionFileInput
 !
@@ -312,13 +298,8 @@
       REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
 
-! Not too pretty, but safe
-      INTEGER                BackupNOBS
-      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
-      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
-
       CHARACTER(MaxPathLength) CTEMP
-      INTEGER ISTAT, I
+      INTEGER ISTAT
       INTEGER DiffractionFileBrowse ! Function
       INTEGER DiffractionFileOpen ! Function
 
@@ -349,12 +330,6 @@
 ! Don't change if the user pressed 'Cancel' (ISTAT = 2)
               IF      (ISTAT .EQ. 1) THEN
                 CALL WDialogFieldState(IDNEXT,Enabled)
-                BackupNOBS = NOBS
-                DO I = 1, NOBS
-                  BackupXOBS(I) = XOBS(I)
-                  BackupYOBS(I) = YOBS(I)
-                  BackupEOBS(I) = EOBS(I)
-                ENDDO
               ELSE IF (ISTAT .EQ. 0) THEN
                 CALL WDialogFieldState(IDNEXT,Disabled)
               ENDIF
@@ -426,6 +401,8 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'GLBVAR.INC'
+
       REAL    tReal
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
@@ -446,6 +423,7 @@
       ENDIF
       CALL TruncateData(tReal)
       CALL PopActiveWindowID
+      CALL Profile_Plot(IPTYPE)
 
       END SUBROUTINE WizardApplyProfileRange
 !
