@@ -39,7 +39,7 @@
 !               'DASH powder diffraction files (*.xye)|*.xye|'//&
 !               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
       FILTER = 'All files (*.*)|*.*|'//&
-               'All powder diffraction files|*.cpi;*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye;*.x01|'//&
+               'All powder diffraction files|*.cpi;*.mdi;*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye;*.x01|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
@@ -176,6 +176,7 @@
       CHARACTER(LEN=4) EXT4
       INTEGER, EXTERNAL :: Load_cpi_File
       INTEGER, EXTERNAL :: Load_dat_File
+      INTEGER, EXTERNAL :: Load_mdi_File
       INTEGER, EXTERNAL :: Load_raw_File
       INTEGER, EXTERNAL :: Load_pod_File
       INTEGER, EXTERNAL :: Load_rd_File
@@ -215,6 +216,8 @@
           ISTAT = Load_cpi_File(TheFileName,ESDsFilled)
         CASE ('dat ', 'txt ')
           ISTAT = Load_dat_File(TheFileName,ESDsFilled)
+        CASE ('mdi ')
+          ISTAT = Load_mdi_File(TheFileName,ESDsFilled)
         CASE ('pod ')
           ISTAT = Load_pod_File(TheFileName,ESDsFilled)
         CASE ('raw ')
@@ -596,6 +599,167 @@
 !
 !*****************************************************************************
 !
+      INTEGER FUNCTION Load_mdi_File(TheFileName,ESDsFilled)
+!
+! This function tries to load a *.mdi file (ASCII format from Materials Data Inc.).
+! The routine basically assumes that the file is OK.
+!
+! Note that this function should only be called from DiffractionFileLoad
+!
+! JvdS June 2002
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+!
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data)
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      LOGICAL,       INTENT (  OUT) :: ESDsFilled
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
+      CHARACTER*255 tString ! String containing last line read from file
+      CHARACTER*255 tSubString
+      INTEGER       I, NumOfBins, hFile, iDummy
+      REAL          Lambda1
+      REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta, rDummy
+      CHARACTER*2   Anode
+      REAL, EXTERNAL :: WavelengthOf, FnWavelengthOfMenuOption
+      CHARACTER*2 ListIn, ListOut
+
+! Current status, initialise to 'error'
+      Load_mdi_File = 0
+      TwoThetaStart = 0.0
+      TwoThetaEnd   = 0.0
+      TwoThetaStep  = 0.0
+      Anode         = 'Xx'
+      Lambda1       = 0.0
+      hFile         = 10
+      OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
+! *.mdi files look like this:
+
+!       09/11/91 DIF Demo08: 10-173
+! 10.000 0.0400  4.0 CU  1.540598 100.000   2251
+!     120     124     108     112     128     120     112     112
+!     112     120     120     120     116     120     108     116
+! <SNIP>
+!     168     168     160     148     160     160     176     176
+!     168     176     168      -1
+!.
+
+! Read the header lines
+      READ(hFile,'(A)',ERR=999,END=999) tString
+      READ(hFile,*,ERR=999,END=999) TwoThetaStart, TwoThetaStep, rDummy, Anode, Lambda1, TwoThetaEnd, NumOfBins
+! The number of counts per 2theta should commence from here.
+! Calculate how many bins we expect.
+! Quick check if values have been read at all.
+      IF (TwoThetaStart .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta starting value not found.')
+        GOTO 999
+      ENDIF
+      IF (TwoThetaEnd   .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta end value not found.')
+        GOTO 999
+      ENDIF
+      IF (TwoThetaStep  .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta step size not found.')
+        GOTO 999
+      ENDIF
+! Check if number of points consistent
+! Note that NINT correctly rounds to the nearest whole number
+      IF (NumOfBins .NE. (1 + NINT((TwoThetaEnd - TwoThetaStart) / TwoThetaStep)) ) THEN
+        CALL WarningMessage('Number of data points inconsistent.')
+        NumOfBins = MIN(NumOfBins,(1 + NINT((TwoThetaEnd - TwoThetaStart) / TwoThetaStep)))
+      ENDIF
+! Check that we will not read more than MOBS data points
+      IF (NumOfBins .GT. MOBS) THEN
+! Warn the user
+        CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+        NumOfBins = MOBS
+      ENDIF
+! Check that we will not read less than 1 data point
+      IF (NumOfBins .EQ. 0) THEN
+! The user should be warned here
+        CALL ErrorMessage("The file does not contain enough data points.")
+        GOTO 999
+      ENDIF
+! Fill the 2theta values first
+      CurrTwoTheta = TwoThetaStart
+      DO I = 1, NumOfBins
+        XOBS(I) = CurrTwoTheta
+        CurrTwoTheta = CurrTwoTheta + TwoThetaStep
+      ENDDO
+      I = 1
+   20 READ(hFile,FMT='(A)',ERR=999,END=100) tString
+! Replace tabs by spaces
+      ListIn(1:1) = CHAR(8)
+      ListIn(2:2) = '.'
+      ListOut(1:1) = ' '
+      ListOut(2:2) = '.'
+      CALL StrReplace(tString,ListIn,ListOut)
+      CALL StrClean(tString, iDummy)
+      CALL GetSubString(tString,' ',tSubString)
+      DO WHILE (LEN_TRIM(tSubString) .NE. 0)
+        IF (I .GT. MOBS) GOTO 100
+        READ(tSubString,*,ERR=999) YOBS(I)
+        I = I + 1
+        CALL GetSubString(tString,' ',tSubString)
+      ENDDO
+! Fetch the next line from the file
+      GOTO 20
+  100 CLOSE(hFile)
+      NOBS = I - 1
+! Last value read should be -1: remove that point
+      IF (ABS(YOBS(NOBS) + 1.0) .LT. 0.000001) NOBS = NOBS - 1
+      IF (NOBS .LT. NumOfBins) CALL WarningMessage('File contained less data points than expected.'//CHAR(13)// &
+                                                   'Will continue with points actually read only.')
+      IF (NOBS .GT. NumOfBins) THEN
+        CALL WarningMessage('File contained more data points than expected.'//CHAR(13)// &
+                            'Will continue with expected points only.')
+        NOBS = NumOfBins
+      ENDIF
+      IF (NOBS .EQ. 0) THEN
+! The user should be warned here
+        CALL ErrorMessage("The file does not contain enough data points.")
+        GOTO 999
+      ENDIF
+      ESDsFilled = .FALSE.
+! If the wavelength was not present in the file, try to interpret the Anode material
+      IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
+! If wavelength present in file add in a test: if wavelength close to known anode material,
+! set source to laboratory. Otherwise, source is synchrotron.
+      IF (Lambda1 .GT. 0.01) THEN
+! Initialise source material to synchrotron
+        JRadOption = 2
+        DO I = 2, 6
+          IF (ABS(Lambda1 - FnWavelengthOfMenuOption(I)) .LT. 0.0003) JRadOption = 1
+        ENDDO
+        CALL Upload_Source
+        CALL Set_Wavelength(Lambda1)
+      ENDIF
+      Load_mdi_File = 1
+      RETURN
+ 999  CONTINUE
+! Exit code is error by default, so we can simply return
+      CLOSE(hFile)
+
+      END FUNCTION Load_mdi_File
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION Load_pod_File(TheFileName,ESDsFilled)
 !
 ! This function tries to load a *.pod file (ASCII format from Daresbury).
@@ -666,18 +830,17 @@
 !   70000.       0.       0.   19094.       0.    1185.   0.7856
 !SCAN ENDED
 
-      INTEGER I, FLEN
+      INTEGER I
       CHARACTER*255 tString, tSubString
       INTEGER hFile, tLen
       REAL    TwoTheta, rDummy1, rDummy2, rDummy3, rDummy4, tSignal, tScale
 
 ! Initialise to failure
       Load_pod_File = 0
-      FLEN = LEN_TRIM(TheFileName)
       I = 1
       hFile = 10
-      OPEN(UNIT=hFile,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-! Skip start.
+      OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
+! Skip start
       tSubString = ''
       DO WHILE (tSubString .NE. 'TWOTHETA')
         READ(hFile,FMT='(A)',ERR=999,END=999) tString
@@ -756,7 +919,7 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
-      INTEGER      I, NumOfBins, FLEN ! Length of TheFileName
+      INTEGER      I, NumOfBins
       REAL         Lambda1
       REAL*8       TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       CHARACTER*2  Anode
@@ -783,9 +946,8 @@
       TwoThetaStep  = 0.0
       Lambda1       = 0.0
       Anode         = 'Xx'
-      FLEN = LEN_TRIM(TheFileName)
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=10,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      OPEN(UNIT=10,FILE=TheFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
       READ(UNIT=10,REC=1,ERR=999) C4
       Version = C4(1:2)
       IF ((Version .NE. 'V5') .AND. (Version .NE. 'D3') .AND. (Version .NE. 'V3')) THEN
@@ -1003,7 +1165,7 @@
       REAL          Lambda1
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       CHARACTER*2   Anode
-      REAL          WavelengthOf ! Function
+      REAL, EXTERNAL :: WavelengthOf
 
 ! Current status, initialise to 'error'
       Load_udf_File = 0
@@ -1212,7 +1374,7 @@
       INTEGER       COUNTS, THETACOUNTS, THETACOUNTSTIME
       PARAMETER    (COUNTS = 1, THETACOUNTS = 2, THETACOUNTSTIME = 3)
       INTEGER       MaxNumOfColumns, NumOfColumns2Read
-      INTEGER       GetNumOfColumns ! Function
+      INTEGER, EXTERNAL :: GetNumOfColumns
       CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
       REAL, EXTERNAL :: WavelengthOf
       INTEGER       KeyWordPos, KeyWordLen, StrLen, I
