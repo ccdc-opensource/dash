@@ -75,55 +75,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Diffraction_File_Browse
-!
-! This routine lets the user browse a directory for a diffraction file.
-! If a valid file has been selected, it will be opened automatically.
-! Effectively, this routine is just a wrap around a file_open routine
-! such that it lets the user visually select a file first.
-! This way, all diffraction-file-opening is dealt with by a single routine.
-!
-! JvdS 18 July 2001
-!
-      USE WINTERACTER
-      USE VARIABLES
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      CHARACTER(LEN=512) :: FILTER
-      INTEGER               IFLAGS
-      INTEGER               IFTYPE    ! Needed for Winteracter routine
-      CHARACTER(LEN=MaxPathLength) tFileName ! Temporary filename
-
-      IFLAGS = LoadDialog + DirChange + PromptOn
-! It seems that Winteracter cannot cope with strings of this length
-!      FILTER = 'All files (*.*)|*.*|'//&
-!               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
-!               'Bruker powder diffraction files (*.raw, *.uxd)|*.raw;*.uxd|'//&
-!               'DASH powder diffraction files (*.xye)|*.xye|'//&
-!               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
-      FILTER = 'All files (*.*)|*.*|'//&
-               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
-               'DASH powder diffraction files (*.xye)|*.xye|'
-      tFileName = ' '
-! IFTYPE specifies which of the file types in the list is the default
-      IFTYPE = 2
-      CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open Powder Diffraction File',IFTYPE)
-! Did the user press cancel?
-      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
-! Note that up to this point, none of the global variables had changed. Baling out was no problem.
-! Try to open the file. This can be removed, of course, and relocated to places in the code where
-! the current subroutine is called.
-! Actually, that is how it works in practice under windows (try 'Start' -> 'Run...' -> 'Browse...'
-! it will not actually open the file, just select it).
-      CALL Diffraction_File_Open(tFileName)
-      RETURN
-
-      END SUBROUTINE Diffraction_File_Browse
-!
-!*****************************************************************************
-!
       REAL FUNCTION Radians2Degrees(TheAngle)     
 
       IMPLICIT NONE
@@ -207,7 +158,56 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Diffraction_File_Open(TheFileName)
+      SUBROUTINE DiffractionFileBrowse
+!
+! This routine lets the user browse a directory for a diffraction file.
+! If a valid file has been selected, it will be opened automatically.
+! Effectively, this routine is just a wrap around a file_open routine
+! such that it lets the user visually select a file first.
+! This way, all diffraction-file-opening is dealt with by a single routine.
+!
+! JvdS 18 July 2001
+!
+      USE WINTERACTER
+      USE VARIABLES
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      CHARACTER(LEN=512) :: FILTER
+      INTEGER               IFLAGS
+      INTEGER               IFTYPE    ! Needed for Winteracter routine
+      CHARACTER(LEN=MaxPathLength) tFileName ! Temporary filename
+
+      IFLAGS = LoadDialog + DirChange + PromptOn
+! It seems that Winteracter cannot cope with strings of this length
+!      FILTER = 'All files (*.*)|*.*|'//&
+!               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
+!               'Bruker powder diffraction files (*.raw, *.uxd)|*.raw;*.uxd|'//&
+!               'DASH powder diffraction files (*.xye)|*.xye|'//&
+!               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
+      FILTER = 'All files (*.*)|*.*|'//&
+               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
+               'DASH powder diffraction files (*.xye)|*.xye|'
+      tFileName = ' '
+! IFTYPE specifies which of the file types in the list is the default
+      IFTYPE = 2
+      CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open Powder Diffraction File',IFTYPE)
+! Did the user press cancel?
+      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
+! Note that up to this point, none of the global variables had changed. Baling out was no problem.
+! Try to open the file. This can be removed, of course, and relocated to places in the code where
+! the current subroutine is called.
+! Actually, that is how it works in practice under windows (try 'Start' -> 'Run...' -> 'Browse...'
+! it will not actually open the file, just select it).
+      CALL DiffractionFileOpen(tFileName)
+      RETURN
+
+      END SUBROUTINE DiffractionFileBrowse
+!
+!*****************************************************************************
+!
+      SUBROUTINE DiffractionFileOpen(TheFileName)
 !
 ! This routine tries to open a diffraction file.
 !
@@ -225,10 +225,6 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
-
-      INTEGER NBIN, LBIN
-      REAL    XBIN, YOBIN, YCBIN, YBBIN, EBIN
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
 
       LOGICAL    FExists
       INTEGER    KLEN
@@ -278,7 +274,7 @@
       ENDIF
       RETURN
 
-      END SUBROUTINE Diffraction_File_Open
+      END SUBROUTINE DiffractionFileOpen
 !
 !*****************************************************************************
 !
@@ -1593,86 +1589,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SDI_File_Browse
-!
-!   This subroutine processes Open selection
-!
-      USE WINTERACTER
-      USE VARIABLES
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INCLUDE 'GLBVAR.INC'
-      CHARACTER(LEN=40) :: FILTER
-      INTEGER           :: IFLAGS
-      LOGICAL FExists
-      INTEGER Iflen
-      LOGICAL Confirm ! Function
-
-! Check if file needs saving
-      IF (SAVEF) THEN
-        IF (.NOT. Confirm('Program contains an unsaved project.'//CHAR(13)//'Do you wish to '// &
-          'continue?')) RETURN
-      END IF
-! If answer 'Yes'
-      SAVEF = .FALSE.
-      IFLAGS = LoadDialog + DirChange + PromptOn
-      FILTER = 'DASH Pawley files (*.sdi)|*.sdi|'
-! JvdS The next line resets the global variable to 'no file'
-! This is wrong if the user presses 'cancel' in the open file window.
-      FNAME=' '
-      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Open DASH pawley file')
-      IFlen = LEN_TRIM(FNAME)
-      IF (IFlen .EQ. 0) RETURN
-      INQUIRE(FILE=FNAME(1:IFlen),EXIST=FExists)
-      IF (.NOT. FExists) THEN
-        CALL ErrorMessage("The file "//FNAME(1:IFlen)//" does not exist!")
-        RETURN
-      ENDIF
-      CALL OpenHCVPIKTIC(FNAME(1:IFlen)) 
-      IF (NoData) THEN
-        CALL ErrorMessage("Could not read the project file "//FNAME(1:IFlen)//&
-                          CHAR(13)//"successfully.")
-        RETURN
-      END IF
-      STATBARSTR(1)=FNAME
-      CALL WindowOutStatusBar(1,STATBARSTR(1))
-! Enable all menu functions
-      CALL SetModeMenuState(1,1,1)
-      RETURN
-
-      END SUBROUTINE SDI_File_Browse
-!
-!*****************************************************************************
-!
-      INTEGER FUNCTION Load_TIC_File(FLEN,TheFileName)
-
-      CHARACTER*(*), INTENT (IN   ) :: TheFileName
-      INTEGER,       INTENT (IN   ) :: FLEN
-
-      INCLUDE 'PARAMS.INC'
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-      INTEGER I, II
-
-!>> JCC - set return status
-      Load_TIC_File = 1
-!>> JCC - add in an error trap for bad file opening
-      OPEN(11,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-      I=1
- 10   READ(11,*,ERR=100,END=100) (IH(II,I),II=1,3),ARGK(I),DSTAR(I)
-      I=I+1
-      GOTO 10
- 100  NTIC=I-1
-      CLOSE(11)
-      RETURN
- 999  Load_TIC_File = 0
-      RETURN
-
-      END FUNCTION Load_TIC_File
-!
-!*****************************************************************************
-!
 !>> JCC  Routine to truncate data to a particular data range
 !>> In practice, this varies the NOBS value so the data is not lost, just
 !>> Hidden. The routine should not be called with RMaxTTheta greater
@@ -1907,6 +1823,116 @@
         "Data truncation on read in")
 
       END SUBROUTINE ProfileRead_TruncationWarning
+!
+!*****************************************************************************
+!
+      SUBROUTINE SDIFileOpen(TheFileName)
+!
+! This routine tries to open an SDI file.
+!
+! INPUT   : TheFileName = the file name
+!
+      USE WINTERACTER
+      USE VARIABLES
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      CHARACTER(LEN=MaxPathLength), INTENT (INOUT) :: TheFileName
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL FExists
+      INTEGER KLEN
+
+      KLEN = LEN_TRIM(TheFileName)
+      IF (KLEN .EQ. 0) RETURN
+      INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
+      IF (.NOT. FExists) THEN
+        CALL ErrorMessage("The file "//TheFileName(1:KLEN)//" does not exist!")
+        RETURN
+      ENDIF
+! This is the point of no return: the selected file will be new file, valid data or not
+! Change global variable FNAME
+      FNAME = TheFileName
+      CALL OpenHCVPIKTIC(FNAME(1:KLEN)) 
+      IF (NoData) THEN
+        CALL ErrorMessage("Could not read the project file "//FNAME(1:KLEN)//&
+                          CHAR(13)//"successfully.")
+        RETURN
+      END IF
+      STATBARSTR(1) = FNAME
+      CALL WindowOutStatusBar(1,STATBARSTR(1))
+! Enable all menu functions
+      CALL SetModeMenuState(1,1,1)
+      RETURN
+      
+      END SUBROUTINE SDIFileOpen
+!
+!*****************************************************************************
+!
+      SUBROUTINE SDIFileBrowse
+!
+! This routine lets the user browse a directory for an SDI file.
+! If a valid file has been selected, it will be opened automatically.
+! Effectively, this routine is just a wrap around a file_open routine
+! such that it lets the user visually select a file first.
+!
+      USE WINTERACTER
+      USE VARIABLES
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      CHARACTER(LEN=60) FILTER
+      INTEGER           IFLAGS, IFTYPE 
+      CHARACTER(LEN=MaxPathLength) tFileName
+
+      IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
+      FILTER = 'All files (*.*)|*.*|'//&
+               'DASH Pawley files (*.sdi)|*.sdi|'
+      tFileName = ' '
+! IFTYPE specifies which of the file types in the list is the default
+      IFTYPE = 2
+      CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open DASH Pawley file',IFTYPE)
+! Did the user press cancel?
+      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
+! Note that up to this point, none of the global variables had changed. Baling out was no problem.
+! Try to open the file. This can be removed, of course, and relocated to places in the code where
+! the current subroutine is called.
+! Actually, that is how it works in practice under windows (try 'Start' -> 'Run...' -> 'Browse...'
+! it will not actually open the file, just select it).
+      CALL SDIFileOpen(tFileName)
+      RETURN
+
+      END SUBROUTINE SDIFileBrowse
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION Load_TIC_File(FLEN,TheFileName)
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      INTEGER,       INTENT (IN   ) :: FLEN
+
+      INCLUDE 'PARAMS.INC'
+      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER I, II
+
+!>> JCC - set return status
+      Load_TIC_File = 1
+!>> JCC - add in an error trap for bad file opening
+      OPEN(11,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+      I=1
+ 10   READ(11,*,ERR=100,END=100) (IH(II,I),II=1,3),ARGK(I),DSTAR(I)
+      I=I+1
+      GOTO 10
+ 100  NTIC=I-1
+      CLOSE(11)
+      RETURN
+ 999  Load_TIC_File = 0
+      RETURN
+
+      END FUNCTION Load_TIC_File
 !
 !*****************************************************************************
 !

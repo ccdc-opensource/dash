@@ -40,10 +40,12 @@
       COMMON / EXTDIR / INSTDIR
 
 ! File information; Names of files used by DASH For I/O
-      CHARACTER(LEN = 80) :: DashRawFile
-      CHARACTER(LEN = 80) :: DashHcvFile
-      CHARACTER(LEN = 80) :: DashPikFile
+      CHARACTER*80 :: DashRawFile
+      CHARACTER*80 :: DashHcvFile
+      CHARACTER*80 :: DashPikFile
       CHARACTER*80 :: DashTicFile
+      CHARACTER*80 :: DashDslFile
+
       LOGICAL RawExists
       LOGICAL HcvExists
       LOGICAL PikExists
@@ -222,9 +224,9 @@
       CALL WindowOutStatusBar(8,STATBARSTR(8))
       SELECT CASE (EventInfo%VALUE1)
         CASE (ID_import_dpj_file)
-          CALL SDI_file_Browse
+          CALL SDIFileBrowse
         CASE (ID_import_xye_file)
-          CALL Diffraction_File_Browse
+          CALL DiffractionFileBrowse
         CASE (ID_Remove_Background)
           CALL Background_Fit
         CASE (ID_FILE_PRINT)

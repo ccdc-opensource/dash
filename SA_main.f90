@@ -89,9 +89,8 @@
 !C>> JCC Added in declarations
 ! The implementation has changed - this is now a function
       INTEGER Read_One_Zm
-      INTEGER zmread,ilenf
+      INTEGER zmread
       INTEGER NextEnabled
-      LOGICAL FExists
       LOGICAL LimsChanged
       DATA LimsChanged / .FALSE. /
       SAVE LimsChanged
@@ -164,10 +163,6 @@
       ELSE
         CALL WDialogFieldState(IDF_SA_Project_Import,Disabled)
       END IF
-!U! Let's check the z-matrix check boxes
-!U      DO II = 1, 5
-!U        CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
-!U      END DO
       ZmStateChanged = .TRUE.
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       DO                   ! Loop until user terminates
@@ -202,31 +197,16 @@
           END IF
           ZmStateChanged = .FALSE.
         END IF
-! JvdS Started to add SA to Wizard
-!        CALL WDialogSelect(IDD_SA_input1)
         CALL WDialogSelect(IDD_SAW_Page1)
+! Enable or disable the "Next" button
         IF (NoZmatrix) THEN
           CALL WDialogFieldState(IDNEXT,Disabled)
         ELSE
           CALL WDialogFieldState(IDNEXT,Enabled)
         END IF
 ! Start the message loop
-        IXPos_IDD_SA_Input = WInfoDialog(6)
-        IYPos_IDD_SA_Input = WInfoDialog(7)
         CALL GetEvent
-! Enable or disable the "Next" button
-! JvdS Started to add SA to Wizard
-!      CALL WDialogSelect(IDD_SA_input1)
-        CALL WDialogSelect(IDD_SAW_Page1)
-        IF (NoZmatrix) THEN
-          CALL WDialogFieldState(IDNEXT,Disabled)
-        ELSE
-          CALL WDialogFieldState(IDNEXT,Enabled)
-        END IF
         SELECT CASE (EventType)
-!.. Interact with the main window and look at the Pawley refinement...
-          CASE (MouseButDown)
-            CALL Plot_Alter
           CASE (PushButton)
             SELECT CASE (EventInfo%VALUE1)
 !C>> JCC Add in new 'clear' button
@@ -267,108 +247,57 @@
               CALL SA_Parameter_Set(CheckSize,IZMCheck)
               GOTO 444
             CASE (IDB_SA_Project_Browse)
-! Look for a .SDI file which will contain the following format
-! PIK <file1>.pik
-! HCV <file2>.hcv
-! TIC <file3>.tic
-             IF (.NOT. FromPawleyFit) THEN
-! JvdS Started to add SA to Wizard
-!               CALL WDialogSelect(IDD_SA_input1)
-               CALL WDialogSelect(IDD_SAW_Page1)
-               SDIFile = ' '
-               CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
-               IFlags = PromptOn + DirChange + AppendExt
-               CALL WSelectFile('Diffraction information file (*.sdi)|*.sdi|', &
-                       IFlags,SDIFile,'Load diffraction information file')
-               ilenf = LEN_TRIM(SDIFile)
-               IF (ilenf .GT. 0) THEN
-                 INQUIRE(FILE=SDIFile(1:Ilenf),EXIST=FExists)
-                 IF (.NOT. FExists) THEN
-                   CALL ErrorMessage("The file "//SDIFile(1:Ilenf)//" does not exist!")
-                   ilenf = 0 ! Dont read it if it doesnt exist
-                 ENDIF
-               END IF
-               IF (ilenf .NE. 0) THEN
-                 NoData = .TRUE.
-                 CALL OpenHCVPIKTIC(SDIFile)
-                 IF (NoData) THEN
-                   CALL WMessageBox(OKOnly,ExclamationIcon, CommonOk,&
-                                   "Could not read the pawley file "//SDIFile(:ilenf)//&
-                                    CHAR(13)//"successfully."//CHAR(13)//&
-                                    "If you have moved this project to a new directory you may "//CHAR(13)//&
-                                    "need to edit the file names in the pawley file","Failed to read project")
-!                             ELSE
-!                                   CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
-                 END IF
-               END IF
-             END IF
-!>> JCC Open
+             IF (.NOT. FromPawleyFit) CALL SDIFileBrowse
             CASE (IDB_SA_Project_Open)
-! JvdS Started to add SA to Wizard
-!               CALL WDialogSelect(IDD_SA_input1)
               CALL WDialogSelect(IDD_SAW_Page1)
               SDIFile = ' '
               CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
-              ilenf = LEN_TRIM(SDIFile)
-              INQUIRE(FILE=SDIFile(1:Ilenf),EXIST=FExists)
-              IF (.NOT. FExists) THEN
-                CALL ErrorMessage("The file "//SDIFile(1:Ilenf)//" does not exist!")
-                ilenf = 0 ! Dont read it if it doesnt exist
-              ENDIF
-              IF (ilenf .NE. 0) THEN
-                NoData = .TRUE.
-                CALL OpenHCVPIKTIC(SDIFile)
-                IF (NoData) THEN
-                  CALL ErrorMessage("Could not read the pawley file "//SDIFile(:ilenf)//CHAR(13)//"successfully")
-                 END IF
-               END IF
+              CALL SDIFileOpen(SDIFile)
             CASE (IDB_SA_Project_Import)
 !>> JCC Import .. convert a mol/pdb/mol2 file into a zmatrix
               CALL ImportZmatrix
-            CASE (IDB_ZMatrix_Browse1,IDB_ZMatrix_Browse2,IDB_ZMatrix_Browse3,&
-                 IDB_ZMatrix_Browse4,IDB_ZMatrix_Browse5)
+            CASE (IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, &
+                  IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
               ZmStateChanged = .TRUE.
-!>> JCC This doesnt work Im afraid: Need to loop through and find the message
-!              ifrg=IZMNumber(EventInfo%VALUE1)
-               ifrg = 1
-               DO WHILE (ifrg .LT. 5 .AND. IZMNumber(ifrg) .NE. EventInfo%VALUE1)
-                 ifrg = ifrg + 1
-               ENDDO
-               gotzmfile(ifrg) = .FALSE.
-               frag_file(ifrg) = ' '
-               IFlags = PromptOn + DirChange + AppendExt
-               CALL WSelectFile('z-matrix file (*.zmatrix)|*.zmatrix|', &
+              ifrg = 1
+              DO WHILE (ifrg .LT. 5 .AND. IZMNumber(ifrg) .NE. EventInfo%VALUE1)
+                ifrg = ifrg + 1
+              ENDDO
+              gotzmfile(ifrg) = .FALSE.
+              frag_file(ifrg) = ' '
+              IFlags = PromptOn + DirChange + AppendExt
+              CALL WSelectFile('z-matrix file (*.zmatrix)|*.zmatrix|', &
                    IFlags,frag_file(ifrg),'Load z-matrix file')
 !C>> JCC Need to check here to see if the user hit cancel
 ! So I added a check here
-               IF (frag_file(ifrg) .NE. ' ') THEN
-                 lfrag(ifrg) = LEN_TRIM(frag_file(ifrg))
-                 zmread = Read_One_ZM(ifrg)
-                 IF (zmread .EQ. 0) THEN ! successful read
+              IF (frag_file(ifrg) .NE. ' ') THEN
+                lfrag(ifrg) = LEN_TRIM(frag_file(ifrg))
+                zmread = Read_One_ZM(ifrg)
+                IF (zmread .EQ. 0) THEN ! successful read
 ! JvdS Started to add SA to Wizard
 !      CALL WDialogSelect(IDD_SA_input1)
-                   CALL WDialogSelect(IDD_SAW_Page1)
-                   CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
+                  CALL WDialogSelect(IDD_SAW_Page1)
+                  CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
 ! done within Read_One_ZM >>              gotzmfile(ifrg)=.true.
 !>> Now update the front end widget
-                   DO II = 1, 5
-                     CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
-                   END DO
-                   CALL UpdateZmatrixSelection(CheckSize, IZMCheck, IDFZMPars)
+                  DO II = 1, 5
+                    CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
+                  END DO
+                  CALL UpdateZmatrixSelection(CheckSize, IZMCheck, IDFZMPars)
 ! Set the next dialogue on
-                   IF (ifrg .LT. 5) THEN
-                     CALL WDialogFieldState(IDFZMCheck(ifrg+1),Enabled)
-                     CALL WDialogFieldState(IDFZMCheck(ifrg+1),Enabled)
-                   END IF
+                  IF (ifrg .LT. 5) THEN
+                    CALL WDialogFieldState(IDFZMCheck(ifrg+1),Enabled)
+                    CALL WDialogFieldState(IDFZMCheck(ifrg+1),Enabled)
+                  END IF
 !>> JCC traps for zmatrix reading
-                   NoZmatrix = .FALSE.
-                 ELSE 
-                    CALL FileErrorPopup(frag_file(ifrg),zmread)
-                 END IF ! If the read on the zmatrix was ok
-               END IF  ! If the user selected a file
+                  NoZmatrix = .FALSE.
+                ELSE 
+                   CALL FileErrorPopup(frag_file(ifrg),zmread)
+                END IF ! If the read on the zmatrix was ok
+              END IF  ! If the user selected a file
 !>> JCC Also act on selection of check box
             END SELECT
-       CASE (FieldChanged)
+          CASE (FieldChanged)
             SELECT CASE(EventInfo%VALUE1)
               CASE (IDF_ZM_file_check1,IDF_ZM_file_check2,IDF_ZM_file_check3,&
                 IDF_ZM_file_check4,IDF_ZM_file_check5)
@@ -385,8 +314,6 @@
  444  CALL WDialogSelect(IDD_SA_input2)
       CALL WDialogShow(IXPos_IDD_SA_Input,IYPos_IDD_SA_Input,0,Modeless)
       DO                                 ! Loop until user terminates
-        IXPos_IDD_SA_Input = WInfoDialog(6)
-        IYPos_IDD_SA_Input = WInfoDialog(7)
         CALL GetEvent
         SELECT CASE (EventType)
 !.. Interact with the main window and look at the Pawley refinement...
@@ -394,6 +321,8 @@
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDF_SA2_cancel)
 ! Go back to the Pawley refinement or the initial wizard
+                IXPos_IDD_SA_Input = WInfoDialog(6)
+                IYPos_IDD_SA_Input = WInfoDialog(7)
                 CALL WDialogHide()
                 IPTYPE = 2
                 RETURN
@@ -404,11 +333,15 @@
                   IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
                 END IF
                 IF (.NOT. LimsChanged) THEN
+                  IXPos_IDD_SA_Input = WInfoDialog(6)
+                  IYPos_IDD_SA_Input = WInfoDialog(7)
                   CALL WDialogHide()
                   GOTO 222
                 END IF
               CASE (IDNEXT)
 ! Go to the next stage of the SA input
+                IXPos_IDD_SA_Input = WInfoDialog(6)
+                IYPos_IDD_SA_Input = WInfoDialog(7)
                 CALL WDialogHide() 
 !C>> JCC               Call SA_Parameter_Update(CheckSize,IZMCheck)
                 GOTO 777
@@ -541,8 +474,6 @@
       NMoves = NT * NS * NVAR
       CALL WDialogPutInteger(IDF_SA_Moves,NMoves)
       DO                                 ! Loop until user terminates
-        IXPos_IDD_SA_Input = WInfoDialog(6)
-        IYPos_IDD_SA_Input = WInfoDialog(7)
         CALL GetEvent
         SELECT CASE (EventType)
 !.. Interact with the main window and look at the Pawley refinement...
@@ -677,21 +608,19 @@
 
       IMPLICIT NONE
 
+      CHARACTER*(*), INTENT (IN   ) ::  SDIFile
+
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       REAL    PAWLEYCHISQ,RWPOBS,RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
       INCLUDE 'statlog.inc'
-!
-!O      CHARACTER(LEN = 255)            ::  SDIFile, dslfile
-      CHARACTER*(*), INTENT (IN   ) ::  SDIFile
+
       CHARACTER(LEN = 80)           ::   dslfile
       CHARACTER(LEN = MaxPathLength) :: line, subline
 
       INTEGER nl
       CHARACTER*12 KeyChar
-
-!C>> JCC Declaration
 
       INTEGER i
       INTEGER ihcver,iticer,ipiker,iloger,idsl, isst, ised, iactsgnum
@@ -706,7 +635,6 @@
       idsl = 0
       IF (LEN_TRIM(SDIFile) .GT. 80) THEN
         CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in OPENHCVPIKTIC')
-
       ENDIF
 ! Now open all the appropriate PIK, TIC and HCV files
       OPEN(11,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
@@ -723,15 +651,11 @@
       CALL INextString(line,keychar)
       SELECT CASE (KeyChar(1:3))
         CASE ('pik')
-!C>> JCC Cant use this, since file paths can have spaces in under windows
-!          call INextString(line,pikfile)
           CALL ILocateString(line,isst,ised)
 !O          WRITE(DashPikFile,*) line(isst:nl)
           DashPikFile(1:80) = line(isst:isst+79)
           PikExists = .TRUE.
         CASE ('tic')
-!C>> JCC Cant use this, since file paths can have spaces in under windows
-!         call INextString(line,ticfile)
           CALL ILocateString(line,isst,ised)
 ! JvdS I get strange results here when I use the debugger.
 ! DashTicFile is 255 characters long. But not always.
@@ -739,8 +663,6 @@
           DashTicFile(1:80) = line(isst:isst+79)
           TicExists = .TRUE.
         CASE ('hcv')
-!C>> JCC Cant use this, since file paths can have spaces in under windows
-!          call INextString(line,hcvfile)
           CALL ILocateString(line,isst,ised)
 !O          WRITE(DashHcvFile,*) line(isst:nl)
           DashHcvFile(1:80) = line(isst:isst+79)
@@ -813,7 +735,6 @@
 
       IMPLICIT NONE
 
-
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
@@ -846,7 +767,7 @@
       END IF
 !C>> JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
 !C>> I moved it, since i wanted to check that all the data read in ok before calling it
-        IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
+      IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
 !C>> JCC before, this just didnt plot anything, even though in theory we should be able
 !C>> to observe the full profile. Firstly have to synchronize the common blocks though
         CALL Synchronize_Data()
@@ -1008,8 +929,7 @@
          prevub(i) = ub(i)
          prevlb(i) = lb(i)
       END DO
-!      Call WDialogHide()      
-!
+
       END SUBROUTINE SA_Parameter_Set
 !
 !*****************************************************************************
