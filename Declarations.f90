@@ -5,7 +5,7 @@
 !
 ! This subroutines holds type declarations and descriptions of variables in common blocks.
 ! By making it into a subroutine, it will be compiled and can be browsed with the source browser.
-! Theoretically, if you want to know a variables use, just type its name in the source browser
+! Theoretically, if you want to know a variable's use, just type its name in the source browser
 ! and jump to its entry in the file declarations.f90.
 !
       USE ATMVAR
@@ -68,7 +68,7 @@
 ! ZOBS = YOBIN
 ! ZDOBS = EBIN
 ! KOBZ holds for each reflection the data point closest to it.
-!!! ???? Is that true? Than why not KOBZ(MFCSTO) ???
+!!! ???? Is that true? Then why not KOBZ(MFCSTO) ???
 
       REAL            ZCAL
       COMMON /YSTORE/ ZCAL(MOBS)
@@ -104,7 +104,7 @@
 ! iStart = bin number (so, pointer into XBIN) of the first bin that should be drawn, i.e. MAX(IPMIN-1,1)
 !          only useful when the user has zoomed in, otherwise iStart = 1
 ! iStop = bin number (so, pointer into XBIN) of the last bin that should be drawn, i.e. MIN(IPMAX+1,NBIN)
-!          only useful when the user has zoomed in, otherwise iStop = NBIN
+!         only useful when the user has zoomed in, otherwise iStop = NBIN
 ! nPoints = 1 + iStop - iStart
 
 
@@ -389,6 +389,11 @@
       COMMON /RESUMESA/ Resume_SA
 ! Flag set in the Analyse Solutions Window to indicate that the user has pressed the
 ! "Resume SA" button.
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+! in_batch indicates that we are in batch mode, i.e. no user input can be expected.
 
       END SUBROUTINE FoolCompiler
 !

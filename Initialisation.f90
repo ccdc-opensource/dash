@@ -272,6 +272,9 @@
       INTEGER                                           nPeaksFound
       COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
       PARAMETER (iWidth = 300, iHeight = 1)
@@ -282,6 +285,7 @@
 
 ! The initialisations should be split up into 'one off initialisations' (at the start up
 ! of DASH only) and 'whenever a new project file is opened'
+      in_batch = .FALSE.
       CALL WDialogSelect(IDD_SA_input3_2)
       NS = 20
       CALL WDialogPutInteger(IDF_SA_NS, NS)
