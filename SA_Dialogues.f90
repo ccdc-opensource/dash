@@ -95,11 +95,13 @@
       INTEGER        IDFZMNumber,                    IDFZMFile,                &
                      IDBZMDelete,                    IDBZMBrowse,              &
                      IDBZMView,                      IDBZMEdit,                &
-                     IDFZMpars
+                     IDFZMpars,                                                &
+                     IDBZMUp,                        IDBZMDown
       COMMON /IDFZM/ IDFZMNumber(1:maxfrginterface), IDFZMFile(1:maxfrginterface),      &
                      IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
                      IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
-                     IDFZMpars(1:maxfrginterface)
+                     IDFZMpars(1:maxfrginterface),                                      &
+                     IDBZMUp(1:maxfrginterface),     IDBZMDown(1:maxfrginterface)
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -237,6 +239,24 @@
                 iFrg = iFrg + 1
               ENDDO
               CALL ShowEditZMatrixWindow(iFrg)
+! The "Up" and "Down" spinners for the number of Z-matrices are emulated,
+! because that gives us more control over them
+            CASE (IDB_Up1, IDB_Up2, IDB_Up3, IDB_Up4, IDB_Up5, IDB_Up6)
+              iFrg = 1
+              DO WHILE (IDBZMUp(iFrg) .NE. EventInfo%VALUE1)
+                iFrg = iFrg + 1
+              ENDDO
+              CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+              zmNumberOfCopies(iFrg) = MIN(8, zmNumberOfCopies(iFrg) + 1)
+              CALL WDialogPutInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+            CASE (IDB_Down1, IDB_Down2, IDB_Down3, IDB_Down4, IDB_Down5, IDB_Down6)
+              iFrg = 1
+              DO WHILE (IDBZMDown(iFrg) .NE. EventInfo%VALUE1)
+                iFrg = iFrg + 1
+              ENDDO
+              CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+              zmNumberOfCopies(iFrg) = MAX(1, zmNumberOfCopies(iFrg) - 1)
+              CALL WDialogPutInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
           END SELECT
         CASE (FieldChanged)
           DO iFrg = 1, maxfrginterface

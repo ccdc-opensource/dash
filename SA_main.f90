@@ -570,11 +570,13 @@
       INTEGER        IDFZMNumber,                    IDFZMFile,                &
                      IDBZMDelete,                    IDBZMBrowse,              &
                      IDBZMView,                      IDBZMEdit,                &
-                     IDFZMpars
+                     IDFZMpars,                                                &
+                     IDBZMUp,                        IDBZMDown
       COMMON /IDFZM/ IDFZMNumber(1:maxfrginterface), IDFZMFile(1:maxfrginterface),      &
                      IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
                      IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
-                     IDFZMpars(1:maxfrginterface)
+                     IDFZMpars(1:maxfrginterface),                                      &
+                     IDBZMUp(1:maxfrginterface),     IDBZMDown(1:maxfrginterface)
 
       INTEGER NumberOfDOF, izmtot, iFrg
       CHARACTER*(MaxPathLength) DirName
@@ -599,6 +601,8 @@
           izmtot = izmtot + NumberOfDOF
 ! Enable 'Number of' field
           CALL WDialogFieldState(IDFzmNumber(iFrg),Enabled)
+          CALL WDialogFieldState(IDBZMUp(iFrg),Enabled)
+          CALL WDialogFieldState(IDBZMDown(iFrg),Enabled)
 ! Due to lack of space: display the name of file only, without its full path
           CALL SplitPath(frag_file(iFrg),DirName,FileName)
           CALL WDialogPutString(IDFZMFile(iFrg),FileName)
@@ -616,6 +620,8 @@
           CALL WDialogPutInteger(IDFzmNumber(iFrg),0)
 ! Disable 'Number of' field
           CALL WDialogFieldState(IDFzmNumber(iFrg),Disabled)
+          CALL WDialogFieldState(IDBZMUp(iFrg),Disabled)
+          CALL WDialogFieldState(IDBZMDown(iFrg),Disabled)
           CALL WDialogClearField(IDFZMFile(iFrg))
 ! Disable 'View' button
           CALL WDialogFieldState(IDBZMView(iFrg),Disabled)
