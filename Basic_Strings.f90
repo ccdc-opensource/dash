@@ -186,6 +186,39 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE StrReplace(TheString,TheListIn,TheListOut)
+!
+! This subroutine replaces all occurences of a list of characters by another list of characters
+!
+! INPUT   : TheString  = the string
+!           TheListIn  = the list of characters that should be replaced
+!           TheListOut = the list of characters they should be replaced with
+!
+! OUTPUT  : TheString  = the string with the replacements made
+!
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (INOUT) :: TheString
+      CHARACTER*(*), INTENT (IN   ) :: TheListIn, TheListOut
+
+      INTEGER iStrPos, iListPos, tListLen, tStrLen
+
+      tListLen = LEN_TRIM(TheListIn)
+      IF (tListLen .NE. LEN_TRIM(TheListOut)) THEN
+        CALL DebugErrorMessage('tListLen .NE. LEN_TRIM(TheListOut) in StrReplace()')
+        RETURN
+      ENDIF
+      tStrLen = LEN_TRIM(TheString)
+      DO iStrPos = 1, tStrLen
+        DO iListPos = 1, tListLen
+          IF (TheString(iStrPos:iStrPos) .EQ. TheListIn(iListPos:iListPos)) TheString(iStrPos:iStrPos) = TheListOut(iListPos:iListPos)
+        ENDDO
+      ENDDO
+
+      END SUBROUTINE StrReplace
+!
+!*****************************************************************************
+!
       SUBROUTINE StrClean(TheString, TheLength)
 !
 ! This function cleans up a string
