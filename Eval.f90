@@ -7,13 +7,10 @@
 
       IMPLICIT NONE
 
-      INTEGER MVAR
-      PARAMETER (mvar=100)
       REAL*8 CHROM(*)
-      REAL*8 CKK1, CKK2, CKK3
-      REAL*8 TRAN(3), ROTA(3,3), CART(1:3,1:MAXATM)
-      REAL*8 QUATER(4), QQSUM, QDEN, QUATT(MVAR)
-      REAL*8 XC, YC, ZC, ZERO, ONE, V1, V2, V3
+
+      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
 
       INTEGER         NATOM
       REAL                   X
@@ -28,6 +25,13 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
       DATA ZERO, ONE/0.0D0, 1.0D0/
+
+      INTEGER MVAR
+      PARAMETER (mvar=100)
+      REAL*8 CKK1, CKK2, CKK3
+      REAL*8 TRAN(3), ROTA(3,3), CART(1:3,1:MAXATM)
+      REAL*8 QUATER(4), QQSUM, QDEN, QUATT(MVAR)
+      REAL*8 XC, YC, ZC, ZERO, ONE, V1, V2, V3
       LOGICAL UseCrystallographicCentreOfMass
       INTEGER KK, KATOM, ifrg, NATS, KK1, KK2, KK3, JQ, JQS, I, ICFRG, KI
 
@@ -85,7 +89,7 @@
             ENDIF
           ENDDO
           CALL MAKEXYZ_2(NATS,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),        &
-                       IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART)
+                         IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART)
 ! Determine origin for rotations
           ICFRG = ICOMFLG(ifrg)
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
@@ -131,9 +135,9 @@
             CART(2,I) = (CART(2,I)-CART(1,I)*F2CMAT(1,2))*V2
             CART(3,I) = (CART(3,I)-CART(1,I)*F2CMAT(1,3)-CART(2,I)*F2CMAT(2,3))*V3
             KI = KATOM + I
-            X(1,KI) = SNGL(CART(1,I))
-            X(2,KI) = SNGL(CART(2,I))
-            X(3,KI) = SNGL(CART(3,I))
+            X(1,OrderedAtm(KI)) = SNGL(CART(1,I))
+            X(2,OrderedAtm(KI)) = SNGL(CART(2,I))
+            X(3,OrderedAtm(KI)) = SNGL(CART(3,I))
           ENDDO
           KATOM = KATOM + NATS
         ENDIF
