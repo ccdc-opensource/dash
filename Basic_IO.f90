@@ -305,6 +305,9 @@
         CASE (IDD_SA_input3)
           CALL DealWithWizardWindowSASettings
           GOTO 10
+        CASE (IDD_SA_Multi_Completed_ep)
+          CALL DealWithSaSummary
+          GOTO 10
       END SELECT
       DealWithEvent = .FALSE.
       RETURN
