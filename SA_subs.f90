@@ -83,9 +83,9 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
@@ -184,7 +184,7 @@
             END SELECT
           ENDDO
         ENDDO
-        IF (PrefParExists) THEN
+        IF ( PrefParExists ) THEN
           kk = kk + 1
           VM(kk) = 0.01
         ENDIF
@@ -313,7 +313,7 @@
               XP(H) = XP(H) + DX
 ! If modal ranges defined for torsions use random number to
 ! select from which range the value of XP will be derived.
-              IF (ModalFlag(H) .EQ. 2) THEN !Bimodal
+              IF (ModalFlag(H) .EQ. 2) THEN ! Bimodal
                 IF (RANARR(IARR) .GT. 0.5) THEN
                   IF (UB(H) * LB(H) .LT. 0.0) THEN
                     XP(H) = XP(H) + 180.0
@@ -323,12 +323,12 @@
                 ENDIF            
                 IARR = IARR + 1 
                 CALL ThreeSixtyToOneEighty(XP(H))
-              ELSEIF (ModalFlag(H) .EQ. 3) THEN !Trimodal
+              ELSEIF (ModalFlag(H) .EQ. 3) THEN ! Trimodal
                 xtem = XP(H)
                 CALL OneEightyToThreeSixty(xtem)
-                IF ((RANARR(IARR) .GE. 0.333) .AND. (RANARR(IARR).LT. 0.667)) THEN
+                IF ((RANARR(IARR) .GE. 1.0/3.0) .AND. (RANARR(IARR).LT. 2.0/3.0)) THEN
                   xtem = xtem + 120.00
-                ELSEIF ((RANARR(IARR) .GE. 0.667) .AND. (RANARR(IARR).LT. 1.0)) THEN
+                ELSEIF ( RANARR(IARR) .GE. 2.0/3.0 ) THEN
                   xtem = xtem + 240.00
                 ENDIF
                 IARR = IARR + 1
@@ -356,8 +356,8 @@
                       IARR = IARR + 1
                     ENDIF
                   ENDIF
-                CASE (2) ! bimodal ranges
-! Complicated-looking calcs of inbounds torsion angles is to try and guarantee a good
+                CASE (2) ! Bimodal ranges
+! Complicated-looking calcs of inbounds torsion angles is to try to guarantee a good
 ! sampling of all user defined ranges.  
                   IF (OutOfBounds(H, XP(H))) THEN
                     IF (UB(H) * LB(H) .LT. 0.0) THEN ! Range such as -170 to 170 defined                                                  
@@ -382,13 +382,13 @@
                     ENDIF
                     CALL ThreeSixtyToOneEighty(XP(H))
                   ENDIF
-                CASE (3) !trimodal ranges
-                  IF (OutOfBounds(H, XP(H))) THEN ! calculate new value in one of three allowed ranges
+                CASE (3) ! Trimodal ranges
+                  IF (OutOfBounds(H, XP(H))) THEN ! Calculate new value in one of three allowed ranges
                     xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
                     IARR = IARR + 1
-                    IF ((RANARR(IARR) .GT. 0.33) .AND. (RANARR(IARR) .LE. 0.66)) THEN
+                    IF ((RANARR(IARR) .GT. 1.0/3.0) .AND. (RANARR(IARR) .LE. 2.0/3.0)) THEN
                       xtem = xtem - 120.00
-                    ELSEIF ((RANARR(IARR) .GT. 0.66) .AND. (RANARR(IARR) .LE. 1.00)) THEN
+                    ELSEIF ( RANARR(IARR) .GT. 2.0/3.0 ) THEN
                       xtem = xtem -240.00
                       IF (xtem .LT. -180.00) THEN
                         xtem = 360.00 + xtem
@@ -793,15 +793,21 @@
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
+      REAL, DIMENSION (3,2) :: TempBounds
+      COMMON /TriModalBounds/  TempBounds
+
       REAL, EXTERNAL :: RANMAR
+      LOGICAL, EXTERNAL :: OutOfBounds
+      REAL random_number
+      REAL xtem, tempupper, templower, tempupper2
       INTEGER I, II
 
       CALL PushActiveWindowID
@@ -818,6 +824,42 @@
 !F! select from which range the value of XP will be derived.
 !F            CALL AdjustSamplingForOtherRanges(x_unique(I), I, RANMAR())
 !F          ENDIF
+          IF ( ModalFlag(I) .EQ. 2 ) THEN ! Bimodal ranges
+! Complicated-looking calcs of inbounds torsion angles is to try and guarantee a good
+! sampling of all user defined ranges.  
+            IF ( OutOfBounds(I, x_unique(I)) ) THEN
+              IF ( UB(I)*LB(I) .LT. 0.0 ) THEN ! Range such as -170 to 170 defined                                                  
+                TempLower = LB(I)              ! so use 0 to 360 degree scale
+                TempUpper = UB(I)
+                TempUpper2 = TempLower + 180.0
+                CALL OneEightyToThreeSixty(TempUpper)
+                CALL OneEightyToThreeSixty(TempUpper2)
+                IF ( RANMAR() .LT. 0.5 ) THEN 
+                  x_unique(I) = MAX(TempUpper, TempUpper2) + (RULB(I) * RANMAR())
+                ELSE
+                  x_unique(I) = MIN(TempUpper, TempUpper2) - (RULB(I) * RANMAR())
+                ENDIF
+              ELSE ! Range such as 30 to 90 degs or -30 to -90 defined
+                x_unique(I) = LB(I) + (RULB(I)*RANMAR())
+                IF (RANMAR() .LT. 0.5) x_unique(I) = -x_unique(I)
+              ENDIF
+              CALL ThreeSixtyToOneEighty(x_unique(I))
+            ENDIF
+          ELSE IF ( ModalFlag(I) .EQ. 3 ) THEN ! Trimodal ranges
+            IF ( OutOfBounds(I, x_unique(I)) ) THEN ! calculate new value in one of three allowed ranges
+              xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(I)*RANMAR() 
+              random_number = RANMAR()
+              IF ( (random_number .GT. 1.0/3.0) .AND. (random_number .LE. 2.0/3.0) ) THEN
+                xtem = xtem - 120.0
+              ELSEIF ( random_number .GT. 2.0/3.0 ) THEN
+                xtem = xtem -240.0
+                IF ( xtem .LT. -180.0 ) THEN
+                  xtem = 360.0 + xtem
+                ENDIF
+              ENDIF
+            ENDIF
+            x_unique(I) = xtem
+          ENDIF
         ENDDO
       ENDIF
       CALL PopActiveWindowID
