@@ -60,7 +60,7 @@
       READ (19,*,ERR=999,IOSTAT=ErrorStatus) natof, item
       natoms(ifrg) = natof
       icomflg(ifrg) = item
-      izmpar(ifrg) = 7
+      izmpar(ifrg) = 7 ! always reserve 4 parameters for rotations, whether quaternion or single axis
       czmpar(1,ifrg) = ' x(frag )'
       czmpar(2,ifrg) = ' y(frag )'
       czmpar(3,ifrg) = ' z(frag )'
@@ -72,20 +72,32 @@
         kzmpar(ii,ifrg) = 1
         xzmpar(ii,ifrg) = 0.5
       ENDDO
+!################################ T E S T I N G ##############################################
+
+   !     UseQuaternions(ifrg) = .FALSE.
+
+!###########################################################################################
       czmpar(4,ifrg) = 'Q1(frag )'
       czmpar(5,ifrg) = 'Q2(frag )'
       czmpar(6,ifrg) = 'Q3(frag )'
       czmpar(7,ifrg) = 'Q4(frag )'
-      DO ii = 4, 7
-        kzmpar(ii,ifrg) = 2
-        xzmpar(ii,ifrg) = 0.5
-      ENDDO
+      IF (UseQuaternions(ifrg)) THEN
+        DO ii = 4, 7
+          kzmpar(ii,ifrg) = 2 ! Quaternion
+          xzmpar(ii,ifrg) = 0.5
+        ENDDO
+      ELSE
+        DO ii = 4, 7
+          kzmpar(ii,ifrg) = 6 ! single rotation axis
+          xzmpar(ii,ifrg) = SQRT(0.5)
+        ENDDO
+      ENDIF
       DO i = 1, 7
         WRITE (czmpar(i,ifrg)(8:8),880) ifrg
       ENDDO
-      ikk = 7
+      ikk = 7 ! always reserve 4 parameters for rotations, whether quaternion or single axis
       DO i = 1, natof
-! Remaining lines contain the z-matrix
+! Remaining lines contain the Z-matrix
 !  C      1.5152617  0  113.2370014  0 -179.8250018  0   54   51   48  3.0  1.0   58 C6 C7 C8 C9
         READ (19,1900,ERR=999,IOSTAT=ErrorStatus) nlin, line
 ! JCC Added in traps on internal read
