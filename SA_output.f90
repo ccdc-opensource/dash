@@ -63,7 +63,7 @@
 !U      CALL WDialogSelect(IDD_Parameter_Status)
 !U      DO I = 1, n
 !U        CALL WGridPutCellReal(IDF_CPL_grid,1,I,SNGL(xopt(i)),'(F12.5)')
-!U      END DO
+!U      ENDDO
 !U      IF (kopt .EQ. 1) THEN
 !U        DO I = 1, n
 !U          CALL WGridPutCellReal(IDF_CPL_grid,2,I,SNGL(flav(i)),'(F12.5)')
@@ -72,8 +72,8 @@
 !U          CALL WGridPutCellReal(IDF_CPL_grid,5,I,SNGL(xvsig(i)),'(F12.5)')
 !U          CALL WGridPutCellReal(IDF_CPL_grid,6,I,SNGL(lb(i)),'(F12.5)')
 !U          CALL WGridPutCellReal(IDF_CPL_grid,7,I,SNGL(ub(i)),'(F12.5)')
-!U        END DO
-!U      END IF
+!U        ENDDO
+!U      ENDIF
 
       END SUBROUTINE SA_OUTPUT
 !

@@ -273,9 +273,7 @@
               IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
             CASE (IDF_PawRef_Solve)
               CALL Load_Pawley_Pro
-              IXPos_IDD_Wizard = WInfoDialog(6)
-              IYPos_IDD_Wizard = WInfoDialog(7)
-              CALL WDialogHide()
+              CALL WizardWindowHide
 ! Emulate loading .SDI file for next window
               CALL WDialogSelect(IDD_SAW_Page1)
 ! If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
@@ -299,9 +297,6 @@
 ! ########################################################
 
           END SELECT
-        CASE (FieldChanged)
-        CASE DEFAULT
-          CALL DebugErrorMessage('Forgot to handle event in DealWithPawleyFitWindow')
       END SELECT
       CALL PopActiveWindowID
 
@@ -682,7 +677,7 @@
 
       USE WINTERACTER
 
-      LOGICAL copypik, copytic, copyhcv, copyhkl
+      LOGICAL           copypik, copytic, copyhcv, copyhkl
       COMMON / PBCKUP / copypik, copytic, copyhcv, copyhkl
 
       copypik = .FALSE.
@@ -722,7 +717,7 @@
 !
       SUBROUTINE retrieve_polybackup
 
-      LOGICAL copypik, copytic, copyhcv, copyhkl
+      LOGICAL           copypik, copytic, copyhcv, copyhkl
       COMMON / PBCKUP / copypik, copytic, copyhcv, copyhkl
 
       IF (copypik) CALL IOsCopyFile('polyp.pbk','polyp.pik')
@@ -740,7 +735,7 @@
 !
       SUBROUTINE delete_polybackup
 
-      LOGICAL copypik, copytic, copyhcv, copyhkl
+      LOGICAL           copypik, copytic, copyhcv, copyhkl
       COMMON / PBCKUP / copypik, copytic, copyhcv, copyhkl
 
       IF (copypik) CALL IOsDeleteFile('polyp.pbk')

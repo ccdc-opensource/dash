@@ -866,12 +866,10 @@
               CALL EndWizard
             CASE (IDBACK)
               CALL WizardWindowHide
-              CALL WDialogSelect(IDD_PW_Page8)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+              CALL WizardWindowShow(IDD_PW_Page8)
             CASE (IDNEXT)
               CALL WizardWindowHide
-              CALL WDialogSelect(IDD_PW_Page1)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+              CALL WizardWindowShow(IDD_PW_Page1)
           END SELECT
           CALL PopActiveWindowID
           RETURN
@@ -928,12 +926,10 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL WizardWindowHide
-              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
               CALL WizardWindowHide
-              CALL WDialogSelect(IDD_PW_Page1)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+              CALL WizardWindowShow(IDD_PW_Page1)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (ID_PW_DF_Open)
