@@ -31,11 +31,10 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'lattice.inc' ! Cellpar, space group strings and NumberSGTable
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
-!
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
       PARAMETER (mpdbops=192)
       COMMON /fullsymmops/ rpdb(4,4,mpdbops) !Symmetry operations
 ! Required for NATOM
@@ -60,7 +59,6 @@
       DOUBLE PRECISION xx,lb,ub,vm
       COMMON /values/ xx(mvar),lb(mvar),ub(mvar),vm(mvar)
 
-!
       INTEGER MaxNumAtom !in an include somewhere??
       PARAMETER (MaxNumAtom = 150)
 
