@@ -160,6 +160,10 @@
                   gotzmfile(iFrg) = .TRUE.
 ! Initialise 'Number of' field to 1
                   CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
+                  zmInitialQs(0,iFrg) = 1.0
+                  zmInitialQs(1,iFrg) = 0.0
+                  zmInitialQs(2,iFrg) = 0.0
+                  zmInitialQs(3,iFrg) = 0.0
 ! JCC traps for Z-matrix reading
                 ELSE 
                   gotzmfile(iFrg) = .FALSE. 
@@ -297,8 +301,8 @@
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_Set)
-              CALL WDialogGetReal(IDF_UisoOccValue,tReal)
-              CALL WDialogGetMenu(IDF_UisoOccMenu,iOption)
+              CALL WDialogGetReal(IDF_BisoOccValue,tReal)
+              CALL WDialogGetMenu(IDF_BisoOccMenu,iOption)
               SELECT CASE (iOption)
                 CASE (1)
                   iColumn = 4 ! Biso
@@ -369,7 +373,7 @@
 !C! Takes bonds              from bond      in SAMVAR
 !C! Takes bond types         from btype     in SAMVAR
 !C! and writes out a .mol2 file
-              IF (WriteMol2(temp_file) .EQ. 1) CALL ViewStructure(temp_file)
+              IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) CALL ViewStructure(temp_file)
               CALL IOSDeleteFile(temp_file)
             CASE (IDB_Rotations)
               CALL ShowEditZMatrixRotationsWindow
@@ -473,6 +477,7 @@
 
       IMPLICIT NONE
 
+      CALL zmCopyDialog2Temp
       CALL zmRotCopyTemp2Dialog
       CALL WDialogSelect(IDD_zmEditRotations)
       CALL WDialogShow(-1,-1,0,SemiModeLess)
@@ -487,13 +492,22 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
+      USE SAMVAR
 
       IMPLICIT NONE      
 
-      INTEGER iFrg, iOption, iOpt1State, iOpt2State, iOpt3State
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State, iAtomNr
+      INTEGER, EXTERNAL :: ElmSymbol2CSD, WriteMol2
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
+      REAL, EXTERNAL :: Degrees2Radians
+      REAL    Alpha, Beta, Gamma, Q(0:3)
+      REAL    taxyzo(1:MAXATM_2,1:3)
+      CHARACTER(50) temp_file
+      REAL    RotMat(1:3,1:3)
+      REAL    COM(1:3), tX, tY, tZ
+      REAL*8  DQ(0:3), DRotMat(1:3,1:3)
 
-      iFrg = CurrentlyEditedFrag
+      iFrg = 0
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       SELECT CASE (EventType)
@@ -504,7 +518,96 @@
               CALL WDialogHide
             CASE (IDCANCEL)
               CALL WDialogHide
+            CASE (IDB_Convert) ! Convert Euler angles to quaternions
+              CALL WDialogGetReal(IDF_Alpha,Alpha)
+              CALL WDialogGetReal(IDF_Beta,Beta)
+              CALL WDialogGetReal(IDF_Gamma,Gamma)
+              Q(0) = COS(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha+Gamma))
+              Q(1) = SIN(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha-Gamma))
+              Q(2) = SIN(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha-Gamma))
+              Q(3) = COS(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha+Gamma))
+              CALL WDialogPutReal(IDF_Q0,Q(0))
+              CALL WDialogPutReal(IDF_Q1,Q(1))
+              CALL WDialogPutReal(IDF_Q2,Q(2))
+              CALL WDialogPutReal(IDF_Q3,Q(3))
             CASE (IDB_View)
+              natcry = NATOMS(iFrg)
+              DO iAtomNr = 1, natcry
+                taxyzo(iAtomNr,1) = axyzo(iAtomNr,1)
+                taxyzo(iAtomNr,2) = axyzo(iAtomNr,2)
+                taxyzo(iAtomNr,3) = axyzo(iAtomNr,3)
+              ENDDO
+! Subtract origin from co-ordinates
+              CALL WDialogGetRadioButton(IDF_RotOrgCOM,iOption)
+              SELECT CASE (iOption)
+                CASE (1) ! C.O.M.
+! If user set centre of mass flag to 0, then use the molecule's centre of mass
+                  COM = 0.0
+                  IF (Get_UseCrystallographicCoM()) THEN
+                    CALL zmCreate_AtomicWeightings(iFrg)
+                    DO iAtomNr = 1, natcry
+                      COM(1) = COM(1) + AtomicWeighting(iAtomNr,iFrg)*axyzo(iAtomNr,1)
+                      COM(2) = COM(2) + AtomicWeighting(iAtomNr,iFrg)*axyzo(iAtomNr,2)
+                      COM(3) = COM(3) + AtomicWeighting(iAtomNr,iFrg)*axyzo(iAtomNr,3)
+                    ENDDO
+                  ELSE
+                    DO iAtomNr = 1, natcry
+                      COM(1) = COM(1) + axyzo(iAtomNr,1)
+                      COM(2) = COM(2) + axyzo(iAtomNr,2)
+                      COM(3) = COM(3) + axyzo(iAtomNr,3)
+                    ENDDO
+                    COM = COM / FLOAT(natcry)
+                  ENDIF
+! Otherwise, use atom number ICFRG
+                CASE (2) ! Use atom nr.
+                  CALL WDialogGetInteger(IDF_RotOrgAtomNr,iAtomNr)
+                  COM(1) = axyzo(izmbid(iAtomNr,iFrg),1)
+                  COM(2) = axyzo(izmbid(iAtomNr,iFrg),2)
+                  COM(3) = axyzo(izmbid(iAtomNr,iFrg),3)
+              END SELECT
+              DO iAtomNr = 1, natcry
+                axyzo(iAtomNr,1) = axyzo(iAtomNr,1) - COM(1)
+                axyzo(iAtomNr,2) = axyzo(iAtomNr,2) - COM(2)
+                axyzo(iAtomNr,3) = axyzo(iAtomNr,3) - COM(3)
+              ENDDO
+! Apply initial orientation
+              CALL WDialogGetReal(IDF_Q0,Q(0))
+              CALL WDialogGetReal(IDF_Q1,Q(1))
+              CALL WDialogGetReal(IDF_Q2,Q(2))
+              CALL WDialogGetReal(IDF_Q3,Q(3))
+              DQ = DBLE(Q)
+              CALL ROTMAK(DQ,DRotMat)
+              RotMat = SNGL(DRotMat)
+              DO I = 1, natcry
+                tX = axyzo(I,1) * RotMat(1,1) + axyzo(I,2) * RotMat(1,2) + axyzo(I,3) * RotMat(1,3)
+                tY = axyzo(I,1) * RotMat(2,1) + axyzo(I,2) * RotMat(2,2) + axyzo(I,3) * RotMat(2,3)
+                tZ = axyzo(I,1) * RotMat(3,1) + axyzo(I,2) * RotMat(3,2) + axyzo(I,3) * RotMat(3,3)
+                axyzo(I,1) = tX
+                axyzo(I,2) = tY
+                axyzo(I,3) = tZ
+              ENDDO
+              DO iAtomNr = 1, natcry
+                atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
+                aelem(iAtomNr) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+              ENDDO
+              temp_file = 'temp.mol2'
+! Show the mol2 file
+!C      INTEGER FUNCTION WriteMol2(TheFileName)
+!C!
+!C! Takes number of atoms    from natcry    in SAMVAR
+!C! Takes atomic coordinates from axyzo     in SAMVAR  (orthogonal)
+!C! Takes element types      from aelem     in SAMVAR  (CSD style)
+!C! Takes atom labels        from atomlabel in SAMVAR
+!C! Takes bonds              from bond      in SAMVAR
+!C! Takes bond types         from btype     in SAMVAR
+!C! and writes out a .mol2 file
+              IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) CALL ViewStructure(temp_file)
+              CALL IOSDeleteFile(temp_file)
+              DO iAtomNr = 1, natcry
+                axyzo(iAtomNr,1) = taxyzo(iAtomNr,1)
+                axyzo(iAtomNr,2) = taxyzo(iAtomNr,2)
+                axyzo(iAtomNr,3) = taxyzo(iAtomNr,3)
+              ENDDO
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -568,6 +671,7 @@
       zmSingleRotAxAtm(iFrg2)       = zmSingleRotAxAtm(iFrg1)
       zmSingleRotAxFrac(:,iFrg2)    = zmSingleRotAxFrac(:,iFrg1)
       zmSingleRotAxAtms(:,iFrg2)    = zmSingleRotAxAtms(:,iFrg1)
+      zmInitialQs(:,iFrg2)          = zmInitialQs(:,iFrg1)
       DO iAtomNr = 1, natoms(iFrg1)
         ioptb(iAtomNr,iFrg2)         = ioptb(iAtomNr,iFrg1)
         iopta(iAtomNr,iFrg2)         = iopta(iAtomNr,iFrg1)
@@ -627,7 +731,7 @@
         zmRebuild = 0
         RETURN
       ENDIF
-      IF (WriteMol2('temp.mol2') .NE. 1) RETURN ! Writing mol2 file failed
+      IF (WriteMol2('temp.mol2',.FALSE.,iFrg) .NE. 1) RETURN ! Writing mol2 file failed
       CALL zmConvert('temp.mol2',tNumZMatrices,tZmatrices)
 ! Check that we still have 1 Z-matrix
       IF (tNumZMatrices .EQ. 0) RETURN ! Conversion failed
@@ -698,6 +802,10 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       iFrg = 0
+      CALL WDialogPutReal(IDF_Q0,zmInitialQs(0,iFrg))
+      CALL WDialogPutReal(IDF_Q1,zmInitialQs(1,iFrg))
+      CALL WDialogPutReal(IDF_Q2,zmInitialQs(2,iFrg))
+      CALL WDialogPutReal(IDF_Q3,zmInitialQs(3,iFrg))
       CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr,icomflg(iFrg) .NE. 0)
       IF (icomflg(iFrg) .EQ. 0) THEN ! Use centre of mass
 ! Set radio button
@@ -783,7 +891,7 @@
         CALL WGridGetCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr,iFrg))
 ! atom elements
         CALL WGridGetCellString(IDF_AtomPropGrid,3,iRow,asym(iAtomNr,iFrg))
-! Uiso
+! Biso
         CALL WGridGetCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr,iFrg))
 ! occupancies
         CALL WGridGetCellReal(IDF_AtomPropGrid,5,iRow,occ(iAtomNr,iFrg))
@@ -808,6 +916,10 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       iFrg = 0
+      CALL WDialogGetReal(IDF_Q0,zmInitialQs(0,iFrg))
+      CALL WDialogGetReal(IDF_Q1,zmInitialQs(1,iFrg))
+      CALL WDialogGetReal(IDF_Q2,zmInitialQs(2,iFrg))
+      CALL WDialogGetReal(IDF_Q3,zmInitialQs(3,iFrg))
       CALL WDialogGetRadioButton(IDF_RotOrgCOM,iOption)
       SELECT CASE (iOption)
         CASE (1) ! C.O.M.
