@@ -104,7 +104,7 @@
 ! On entry A is a square NxN real matrix
 ! On exit  B is its inverse
 !
-      DIMENSION II(100), IL(100), IG(100), A(N,N), B(N,N)
+      DIMENSION II(N), IL(N), IG(N), A(N,N), B(N,N)
 
 ! Initialise b with values from a
       B = A
@@ -185,7 +185,7 @@
 ! On exit  B is its inverse
 !
       IMPLICIT REAL (A-H,O-Z)
-      INTEGER         II(500), IL(500), IG(500)
+      INTEGER         II(N), IL(N), IG(N)
       REAL          A(N,N), B(N,N)
       INTEGER         I, J, IS, K
 
