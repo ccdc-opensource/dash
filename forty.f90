@@ -110,7 +110,8 @@
       COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XDIFT, XMINT
 !
-      COMMON /PRCHISQ/ CHISQ, RWPOBS, RWPEXP
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 !
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
@@ -378,9 +379,9 @@
         IF (DONE) CALL NWINPR(PCXX,PFXX,MAGROU)
 !
 !.. *** Winteracter calls ***
-        CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,ChiSq,'(F12.3)')
-        CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RWpObs,'(F12.2)')
-        CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RWpExp,'(F12.2)')
+        CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
+        CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RWPOBS,'(F12.2)')
+        CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RWPEXP,'(F12.2)')
 !
 !
       ENDDO
