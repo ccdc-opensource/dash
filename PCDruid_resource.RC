@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/Sep/2003 16:06:08
+// Modified : 10/Sep/2003 14:19:15
 //
 ///////////////////////////////////////////////////
 //
@@ -208,7 +208,6 @@
 #define IDF_av_chisq                     1431
 #define IDF_avchisq_label                1432
 #define IDF_profchi2_label               1185
-#define IDD_input_parameters              140
 #define IDF_SA_Tredrate                  1179
 #define IDF_SA_T0_label1                 1161
 #define IDF_SA_Tredrate_trackbar         1148
@@ -232,9 +231,6 @@
 #define IDF_SA_MaxRepeats                1374
 #define IDF_MaxMoves1                    1139
 #define IDF_SA_MaxMoves_Label            1376
-#define IDF_npar_label                   1478
-#define IDF_npar                         1479
-#define IDF_parameter_grid               1480
 #define IDF_LABEL7                       1463
 #define IDF_StopSA                       1195
 #define IDF_Pause_Annealing              1495
@@ -242,7 +238,6 @@
 #define IDD_Parameter_Status              136
 #define IDD_Anneal_Status                 138
 #define IDD_Profile_Status                139
-#define IDD_DIALOG001                     132
 #define IDF_PawRef_Refine                1301
 #define IDF_IDF_PawRef_NBack             1291
 #define IDF_PawRef_Solve                 1283
@@ -734,6 +729,7 @@
 #define IDF_PW_Option6                   1549
 #define IDD_SX_Page1                      120
 #define IDD_SX_Page2                      141
+#define IDF_ITF                          1478
 
 ///////////////////////////////////////////////////
 //
@@ -925,7 +921,7 @@ IDD_Peak_Positions DIALOG 0, 0,  279,  111
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_Peak_Positions_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,    8,    4,  265,   66
+    CONTROL "",IDF_Peak_Positions_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,    8,    4,  264,   66
     CONTROL "",IDF_a_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    6,   92,   30,   12
     CONTROL "",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  178,   92,   36,   12
     CONTROL "",IDF_c_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   72,   92,   28,   12
@@ -1649,100 +1645,6 @@ BEGIN
 "  136  parameter values \n"
 "  138  annealing status \n"
 "  139  profile fit \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_input_parameters DIALOG 0, 0,  445,  174
-STYLE WS_CHILD | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Number of parameters",IDF_npar_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   16,   10,   80,    8
-    CONTROL "8",IDF_npar,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  118,    8,   44,   14
-    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  203,  152,   40,   14
-    CONTROL "",IDF_parameter_grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_WRAP,   14,   28,  405,  116
-END
-
-IDD_input_parameters RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-" 1479               1              50 \n"
-"[Trackbars] \n"
-"[Grids] \n"
-" 1480     7     40   132 \n"
-"   16 \n"
-"1 \n"
-"2 \n"
-"3 \n"
-"4 \n"
-"5 \n"
-"6 \n"
-"7 \n"
-"8 \n"
-"9 \n"
-"10 \n"
-"11 \n"
-"12 \n"
-"13 \n"
-"14 \n"
-"15 \n"
-"16 \n"
-"17 \n"
-"18 \n"
-"19 \n"
-"20 \n"
-"21 \n"
-"22 \n"
-"23 \n"
-"24 \n"
-"25 \n"
-"26 \n"
-"27 \n"
-"28 \n"
-"29 \n"
-"30 \n"
-"31 \n"
-"32 \n"
-"33 \n"
-"34 \n"
-"35 \n"
-"36 \n"
-"37 \n"
-"38 \n"
-"39 \n"
-"40 \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_DIALOG001 DIALOG 0, 0, 1000,   16
-STYLE DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "name",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   80,   14
-    CONTROL "lower bound",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "upper bound",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "initial step size",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "fixed",ISS5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT | BS_PUSHLIKE,    0,    0,   30,   14
-    CONTROL "preset",ISS6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT | BS_PUSHLIKE,    0,    0,   30,   14
-    CONTROL "preset value",ISS7,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-END
-
-IDD_DIALOG001 RCDATA
-BEGIN
-"[Checks] \n"
-" 1069 0 \n"
-" 1070 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
@@ -2636,19 +2538,21 @@ BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "<&Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "0",IDF_PO_a,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  215,   72,   40,   14
-    CONTROL "0",IDF_PO_b,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  261,   72,   40,   14
-    CONTROL "1",IDF_PO_c,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  307,   72,   40,   14
-    CONTROL "a*",IDF_LABELa,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  229,   62,   14,    8
-    CONTROL "b*",IDF_LABELb,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  275,   62,   14,    8
-    CONTROL "c*",IDF_LABELc,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  321,   62,   14,    8
-    CONTROL "Include preferred orientation axis",IDF_Use_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_LEFT,   94,   73,  115,   14
+    CONTROL "0",IDF_PO_a,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  215,   48,   40,   14
+    CONTROL "0",IDF_PO_b,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  261,   48,   40,   14
+    CONTROL "1",IDF_PO_c,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  307,   48,   40,   14
+    CONTROL "a*",IDF_LABELa,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,  229,   38,   14,    8
+    CONTROL "b*",IDF_LABELb,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | SS_LEFT,  275,   38,   14,    8
+    CONTROL "c*",IDF_LABELc,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | SS_LEFT,  321,   38,   14,    8
+    CONTROL "Include preferred orientation axis",IDF_Use_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_LEFT,   94,   49,  117,   14
+    CONTROL "Optimise global isotropic thermal factor",IDF_ITF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   94,  100,  140,   14
 END
 
 IDD_SAW_Page2 RCDATA
 BEGIN
 "[Checks] \n"
 " 1240 0 \n"
+" 1478 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -2957,7 +2861,7 @@ BEGIN
     CONTROL "1.0000",IDF_c,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  177,  193,   30,   14
     CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   68,  260,   40,   14
     CONTROL "Axis direction",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  147,  208,  105
-    CONTROL "Restrict rotation around a single axis",IDF_UseSingleAxis,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    8,   58,  120,   14
+    CONTROL "Restrict rotation around a single axis",IDF_UseSingleAxis,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    8,   58,  132,   14
     CONTROL "From centre of rotation to atom number",IDF_RotAxAtom,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   16,  162,  136,   14
     CONTROL "Fractional co-ordinates",IDF_RotAxFrac,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   16,  188,   88,   14
     CONTROL "Normal to plane defined by atom numbers",IDF_RotAxPln,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   16,  214,  146,   14
@@ -3743,10 +3647,10 @@ BEGIN
     CONTROL "Sigma (strain)",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,   16,   32,   48,   10
     CONTROL "Gamma (size)",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,  108,   17,   52,   10
     CONTROL "Gamma (strain)",IDF_LABEL9,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,  108,   32,   52,   10
-    CONTROL "",IDF_Sigma1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   69,   15,   30,   14
-    CONTROL "",IDF_Sigma2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   69,   30,   30,   14
-    CONTROL "",IDF_Gamma1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  165,   15,   30,   14
-    CONTROL "",IDF_Gamma2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  165,   30,   30,   14
+    CONTROL "",IDF_Sigma1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   69,   15,   30,   14
+    CONTROL "",IDF_Sigma2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   69,   30,   30,   14
+    CONTROL "",IDF_Gamma1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  165,   15,   30,   14
+    CONTROL "",IDF_Gamma2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  165,   30,   30,   14
     CONTROL "Resolution",IDF_LABEL10,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   24,   64,   44,    8
     CONTROL "0.0",IDF_MaxResolution,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   72,   62,   32,   14
     CONTROL "A",IDF_LABEL11,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  107,   64,   10,    8
@@ -3997,9 +3901,9 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLO
 FONT    8, "MS Sans Serif"
 CAPTION "Rigid-Body Rietveld Refinement"
 BEGIN
-    CONTROL "",IDF_RR_ZmatrixGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   10,   15,   92,  104
-    CONTROL "",IDF_RR_TorsionGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  107,   15,  129,  104
-    CONTROL "",IDF_RR_AngleGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  241,   15,  114,  104
+    CONTROL "",IDF_RR_ZmatrixGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   10,   15,   91,  104
+    CONTROL "",IDF_RR_TorsionGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  107,   15,  128,  104
+    CONTROL "",IDF_RR_AngleGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  241,   15,  113,  104
     CONTROL "",IDF_RR_BondGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  360,   15,  103,  104
     CONTROL "Torsions",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  133,    4,   77,    8
     CONTROL "Angles",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  258,    4,   77,    8

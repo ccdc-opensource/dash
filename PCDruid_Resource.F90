@@ -1,4 +1,4 @@
-! Winteracter module created : 09/Sep/2003 16:06:08
+! Winteracter module created : 10/Sep/2003 14:19:15
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -195,7 +195,6 @@
           INTEGER, PARAMETER :: IDF_av_chisq                    =  1431
           INTEGER, PARAMETER :: IDF_avchisq_label               =  1432
           INTEGER, PARAMETER :: IDF_profchi2_label              =  1185
-          INTEGER, PARAMETER :: IDD_input_parameters            =   140
           INTEGER, PARAMETER :: IDF_SA_Tredrate                 =  1179
           INTEGER, PARAMETER :: IDF_SA_T0_label1                =  1161
           INTEGER, PARAMETER :: IDF_SA_Tredrate_trackbar        =  1148
@@ -219,9 +218,6 @@
           INTEGER, PARAMETER :: IDF_SA_MaxRepeats               =  1374
           INTEGER, PARAMETER :: IDF_MaxMoves1                   =  1139
           INTEGER, PARAMETER :: IDF_SA_MaxMoves_Label           =  1376
-          INTEGER, PARAMETER :: IDF_npar_label                  =  1478
-          INTEGER, PARAMETER :: IDF_npar                        =  1479
-          INTEGER, PARAMETER :: IDF_parameter_grid              =  1480
           INTEGER, PARAMETER :: IDF_LABEL7                      =  1463
           INTEGER, PARAMETER :: IDF_StopSA                      =  1195
           INTEGER, PARAMETER :: IDF_Pause_Annealing             =  1495
@@ -229,7 +225,6 @@
           INTEGER, PARAMETER :: IDD_Parameter_Status            =   136
           INTEGER, PARAMETER :: IDD_Anneal_Status               =   138
           INTEGER, PARAMETER :: IDD_Profile_Status              =   139
-          INTEGER, PARAMETER :: IDD_DIALOG001                   =   132
           INTEGER, PARAMETER :: IDF_PawRef_Refine               =  1301
           INTEGER, PARAMETER :: IDF_IDF_PawRef_NBack            =  1291
           INTEGER, PARAMETER :: IDF_PawRef_Solve                =  1283
@@ -721,4 +716,5 @@
           INTEGER, PARAMETER :: IDF_PW_Option6                  =  1549
           INTEGER, PARAMETER :: IDD_SX_Page1                    =   120
           INTEGER, PARAMETER :: IDD_SX_Page2                    =   141
+          INTEGER, PARAMETER :: IDF_ITF                         =  1478
       END MODULE Druid_Header
