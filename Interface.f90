@@ -1541,27 +1541,8 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SetWizardState(State)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: State
-
-      IF (State .EQ. 1) THEN
-        CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOn)
-      ELSE
-        CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOff)
-      ENDIF
-
-      END SUBROUTINE SetWizardState
-!
-!*****************************************************************************
-!
 ! JCC Subroutine for controlling the configuration of the menus and tool buttons in DASH
-      SUBROUTINE SetModeMenuState(PeakOn,PawleyOn)
+      SUBROUTINE SetModeMenuState(PeakOn,PawleyOn,StrucSolOn)
 ! If PeakOn is positive then peak fitting will be enabled
 ! If PawleyOn is positive then Pawley fitting will be enabled
 ! If PeakOn is negative then peak fitting will be disabled
@@ -1574,7 +1555,15 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: PeakOn, PawleyOn
+      INTEGER, INTENT (IN   ) :: PeakOn, PawleyOn, StrucSolOn
+
+      LOGICAL         RESTART
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      LOGICAL         InSA
+      COMMON /SADATA/ InSA
 
       IF (PeakOn .GT. 0) THEN
         CALL WMenuSetState(ID_Peak_Fitting_Mode,ItemEnabled,WintOn)
@@ -1585,6 +1574,16 @@
         CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOn)
       ELSE IF (PawleyOn .LT. 0) THEN
         CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOff)
+      ENDIF
+!O      IF (StrucSolOn .GT. 0) THEN
+!O        CALL WMenuSetState(IDB_AnalyseSolutions,ItemEnabled,WintOn)
+!O      ELSE IF (StrucSolOn .LT. 0) THEN
+!O        CALL WMenuSetState(IDB_AnalyseSolutions,ItemEnabled,WintOff)
+!O      ENDIF
+      IF ((NumOf_SA_Runs .EQ. 0) .OR. InSA) THEN
+        CALL WMenuSetState(IDB_AnalyseSolutions,ItemEnabled,WintOff)
+      ELSE
+        CALL WMenuSetState(IDB_AnalyseSolutions,ItemEnabled,WintOn)
       ENDIF
 
       END SUBROUTINE SetModeMenuState
