@@ -3,9 +3,13 @@
 !
       REAL FUNCTION MULTIPEAK_CHISQ(NPAR,P)
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
-      DIMENSION C3FN(3)
+      INTEGER, INTENT (IN   ) :: NPAR
+      REAL,    INTENT (IN   ) :: P(MVAR)
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
@@ -15,12 +19,6 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /WWPRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),       &
-     &                  LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),    &
-     &                  NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
-      DIMENSION NGENS(6), NSPC(6)
-      EQUIVALENCE (NGENS(1),NGENPS(1,1))
-      EQUIVALENCE (NSPC(1),NSPCPS(1,1))
       REAL            ARGK, PKCNSP
       INTEGER                              KPCNSP
       REAL                                                DTDPCN,    DTDWL
@@ -28,7 +26,6 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-
 
       REAL            ARGI, YNORM, PKFNSP,          KPFNSP
       REAL            DERPFN
@@ -41,13 +38,14 @@
       REAL                          TOLR
       INTEGER                                  NFFT
       REAL                                           AKNOTS
-      INTEGER         NBASF4,             L4END,    L6ST, L6END
+      INTEGER         NBASF4,             L4END
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
                       DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
                       NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
-                      NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+                      NBASF4(MPRPKF,2,9), L4END(9)
 
+      REAL              PKCONV
       COMMON /WWPRSAVZ/ PKCONV(2048,9)
 
       INCLUDE 'REFLNS.INC'
@@ -71,16 +69,27 @@
       REAL            ZCAL
       COMMON /YSTORE/ ZCAL(MOBS)
 
+      REAL            ZXDELT
+      INTEGER                 IIMIN, IIMAX
+      REAL                                  XMINT
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
+
+      INTEGER         MN, MN2
       COMMON /ZSTOR2/ MN, MN2
-      REAL P(MVAR)
-      PARAMETER (MPT=2000)
-      COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
-      PARAMETER (MPeak=10)
-      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
+
+      INTEGER     MPeak
+      PARAMETER ( MPeak = 10 )
+
+      INTEGER         NPEAK
+      REAL                   AREA,        XPOS
+      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK)
 
       LOGICAL         LERANL
       COMMON /PKCOM3/ LERANL
+
+      INTEGER I, II, III, JJ, JARGI, KK, IV, NPEAK2, IARGI
+      REAL    DTARG, CCHI, TARGI, YBACK, POFF, PKTEM, YCALC, CHIADD, PTEM
+      REAL    C3FN(3)
 
 ! Profile refinement stage:
 ! Single peak-fitting code
@@ -90,8 +99,7 @@
         ZARGK(I) = P(KK+2)
       ENDDO
       DO IV = 1, NPKGEN(1,1) !JPHASE,JSOURC)
-        IVV = IV + 2
-        PKFNVA(IV) = P(IVV)
+        PKFNVA(IV) = P(IV + 2)
       ENDDO
 ! FFT CALCULATION STAGE IN PROFILE REFINEMENT
 ! THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
@@ -101,7 +109,7 @@
       CALL PF_FCSUB3(MN)
 ! FFT OVER
 ! FIND THE PEAK MAXIMUM VALUE AND THEN WORK OUT THE PEAK LIMITS
-      CCHI = 0.
+      CCHI = 0.0
       DO II = IIMIN, IIMAX
         TARGI = ZARGI(II)
         YBACK = P(1) + P(2)*(TARGI-XMINT) !/XDIFT
@@ -185,12 +193,12 @@
       REAL                          TOLR
       INTEGER                                  NFFT
       REAL                                           AKNOTS
-      INTEGER         NBASF4,             L4END,    L6ST, L6END
+      INTEGER         NBASF4,             L4END
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
                       DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
                       NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
-                      NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+                      NBASF4(MPRPKF,2,9), L4END(9)
 
       COMMON /WWPRSAVZ/ PKCONV(2048,9)
 

@@ -119,9 +119,6 @@
       iloger = 0
       ipiker = 0
       idsler = 0
-      IF (LEN_TRIM(SDIFile) .GT. MaxPathLength) THEN
-        CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in SDIFileLoad')
-      ENDIF
 ! Now open all the appropriate PIK and HCV files
       tFileHandle = 10
       OPEN(tFileHandle,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
@@ -130,6 +127,7 @@
       HcvExists = .FALSE.
       PikExists = .FALSE.
       DslExists = .FALSE.
+      CALL Clear_PeakFitRanges
  10   line = ' '
       READ(tFileHandle,'(A)',END=100) line
       nl = LEN_TRIM(line)
@@ -194,7 +192,6 @@
           CALL ScrUpdateFileName
         ENDIF
       ENDIF
-      CALL Clear_PeakFitRanges
       IPTYPE = 1
       CALL Profile_Plot
 ! enable the buttons,
@@ -210,7 +207,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETDSL(TheFileName,Ierr)
+      SUBROUTINE GETDSL(TheFileName,iErr)
 ! Routines for reading a 'DSL' file. This file contains
 ! The additional data that is part of the Winteracter front end: Namely
 ! radiation type/wavelength etc.
@@ -225,16 +222,17 @@
       INCLUDE 'Lattice.inc'
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
-      INTEGER,       INTENT (  OUT) :: Ierr
+      INTEGER,       INTENT (  OUT) :: iErr
+
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
       CHARACTER*128 line
       CHARACTER*3   KeyChar
-      INTEGER       Idum, nl
       REAL          Temp
-      INTEGER       Itemp
-      INTEGER I, hFile
+      INTEGER       nl, iTem, I, hFile
 
-      Ierr = 0
+      iErr = 1
 ! Open the file
       hFile = 77
       OPEN (UNIT=hFile, FILE=TheFileName, STATUS='OLD', ERR=999)
@@ -250,16 +248,58 @@
 ! Read the wavelength
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999
-            CALL INextInteger(line,itemp)
-            IF (InfoError(1) .EQ. 0) THEN
-              JRadOption = itemp
-            ELSE
-! default = X-ray lab data
-              JRadOption = 1
-            END IF
+            CALL INextInteger(line,iTem)
+            IF (InfoError(1) .NE. 0) GOTO 999
+            JRadOption = iTem
             CALL Upload_Source
 ! Now we know all there is to know about the wavelength and source: update it
             CALL Set_Wavelength(Temp)
+          CASE ('sig') ! Sigma
+! Sigma 1
+            I = InfoError(1) ! reset the errors
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999
+            PeakShapeSigma(1) = Temp
+            CALL INextReal(line,Temp) ! ESD
+            IF (InfoError(1) .NE. 0) GOTO 999  
+! Sigma 2
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeSigma(2) = Temp
+            CALL WDialogSelect(IDD_ViewPawley)
+            CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
+            CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
+          CASE ('gam') ! Gamma
+! Gamma 1
+            I = InfoError(1) ! reset the errors
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeGamma(1) =  Temp
+            CALL INextReal(line,Temp) ! ESD
+            IF (InfoError(1) .NE. 0) GOTO 999  
+! Gamma 2
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeGamma(2) = Temp
+            CALL WDialogSelect(IDD_ViewPawley)
+            CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
+            CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
+          CASE ('asy') ! HMSL/HPSL asymmetry parameters
+
+            CALL WDialogSelect(IDD_HPSL_info)
+            I = InfoError(1) ! reset the errors
+            CALL INextReal(line,Temp) ! HPSL
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeHPSL = Temp
+            CALL WDialogPutReal(IDF_HPSL1,PeakShapeHPSL,'(F10.4)')
+            CALL INextReal(line,Temp) ! ESD
+            IF (InfoError(1) .NE. 0) GOTO 999  
+! HMSL
+            CALL WDialogSelect(IDD_HMSL_info)
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeHMSL = Temp
+            CALL WDialogPutReal(IDF_HMSL1,PeakShapeHMSL,'(F10.4)')
           CASE ('zer')
 ! Zero point
             I = InfoError(1) ! reset the errors
@@ -281,14 +321,10 @@
             IF (InfoError(1) .NE. 0) GOTO 999                          
             ScalFac = Temp        
         END SELECT
-      END DO       
- 100  CONTINUE
-      BACKREF = .FALSE.
-      CLOSE(77)
-      RETURN
-! Error if we get here
-  999 Ierr = 1
-      CLOSE(77,IOSTAT=IDUM)
+      ENDDO       
+ 100  BACKREF = .FALSE.
+      iErr = 0
+  999 CLOSE(hFile)
 
       END SUBROUTINE GETDSL
 !
@@ -320,15 +356,14 @@
         CALL INC(NumOfRef)
       ENDDO
   200 CONTINUE
-      CLOSE(hFile)
       GETTIC = 0
- 999  RETURN
+ 999  CLOSE(hFile)
 
       END FUNCTION GETTIC
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETHCV(TheFileName,ier)
+      SUBROUTINE GETHCV(TheFileName,iErr)
 
       USE ATMVAR
       USE REFVAR
@@ -336,7 +371,7 @@
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
-      INTEGER,       INTENT (  OUT) :: ier
+      INTEGER,       INTENT (  OUT) :: iErr
 
       INCLUDE 'PARAMS.INC'
 
@@ -353,17 +388,19 @@
 
       INTEGER KK, I, NLIN, NCOR, iR, II, JJ, IK, MINCOR, KL
       INTEGER, EXTERNAL :: GetNumOfColumns
+      INTEGER hFile
 
-      OPEN (121,FILE=TheFileName,STATUS='OLD',ERR=998)
+      hFile = 121
+      OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       KK = 0
       KKOR = 0
       MINCOR = 20
-      IER = 0
+      iErr = 1
       DO iR = 1, MFCSTO
-        READ (121,2121,END=100,ERR=998) NLIN, LINE
+        READ(hFile,2121,END=100,ERR=999) NLIN, LINE
    2121 FORMAT (Q,A)
         NCOR = GetNumOfColumns(LINE) - 6
-        READ (LINE(1:NLIN),*,END=998,ERR=998) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
+        READ(LINE(1:NLIN),*,END=999,ERR=999) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
         KK = iR
 ! Now work out which terms should be kept for the chi-squared calculation
         KKOR = KKOR + 1
@@ -389,22 +426,21 @@
           WTIJ(IK) = 0.02*WTI(II)*WTI(JJ)*FLOAT(NKKOR(IK))
         ENDIF
       ENDDO
-      GOTO 999
-  998 ier = 1
-  999 CLOSE (121)
+      iErr = 0
+  999 CLOSE (hFile)
 
       END SUBROUTINE GETHCV
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETPIK(TheFileName,ier)
+      SUBROUTINE GETPIK(TheFileName,iErr)
 
       USE VARIABLES
       
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
-      INTEGER,       INTENT (  OUT) :: ier
+      INTEGER,       INTENT (  OUT) :: iErr
 
       INCLUDE 'PARAMS.INC'
 
@@ -431,15 +467,16 @@
       INTEGER tKNIPT(1:500)
       REAL tPIKVAL(1:500)
       LOGICAL WrongValuesPresent
-      INTEGER KTEM
+      INTEGER KTEM, hFile
 
       WrongValuesPresent = .FALSE.
-      ier = 0
-      OPEN (21,FILE=TheFileName,STATUS='OLD',ERR=998)
+      iErr = 1
+      hFile = 21
+      OPEN (hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       NFITA = 0
       NOBS = 0
       DO I = 1, MOBS
-        READ (21,*,END=200,ERR=998) XOBS(I), YOBS(I), EOBS(I), KTEM
+        READ (hFile,*,END=200,ERR=999) XOBS(I), YOBS(I), EOBS(I), KTEM
 ! JvdS Rather a serious error here, I think. KTEM can be as much as 70.
 ! Some of the reflections contribute 0.000000E+00 ???
         IF (KTEM .GT. 50) WrongValuesPresent = .TRUE.
@@ -447,7 +484,7 @@
         NOBS = NOBS + 1
         WTSA(I) = 1.0/EOBS(I)**2
         IF (KTEM.GT.0) THEN
-          READ (21,*,ERR=998) (tKNIPT(K),tPIKVAL(K),K=1,KTEM)
+          READ (hFile,*,ERR=999) (tKNIPT(K),tPIKVAL(K),K=1,KTEM)
           DO j = 1, MIN(50,KTEM)
             KNIPT(j,I)  = tKNIPT(j)
             PIKVAL(j,I) = tPIKVAL(j)
@@ -457,7 +494,6 @@
         ENDIF
       ENDDO
   200 CONTINUE
-      CLOSE (21)
       BackupXOBS = 0.0
       BackupYOBS = 0.0
       BackupEOBS = 0.0
@@ -472,9 +508,8 @@
       CALL Clear_Bins
       CALL Rebin_Profile
       IF (WrongValuesPresent) CALL DebugErrorMessage('>50 contributing reflections encountered at least once.')
-      RETURN
-  998 ier = 1
-      CLOSE (21)
+      iErr = 0
+  999 CLOSE (hFile)
 
       END SUBROUTINE GETPIK
 !
