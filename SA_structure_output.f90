@@ -309,7 +309,7 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
 ! Write the file headers first
-      OPEN (UNIT=65,FILE='Test_Overlap.pdb',STATUS='unknown',ERR=999)
+      OPEN (UNIT=65,FILE='Overlap_Temp.pdb',STATUS='unknown',ERR=999)
 ! JCC included again
       CALL sagminv(f2cpdb,inv,3)
 ! Add in a Header record
@@ -468,7 +468,7 @@
       ENDDO ! loop over runs
       WRITE (65,"('END')")
       CLOSE (65)
-      CALL ViewStructure('Test_Overlap.pdb')
+      CALL ViewStructure('Overlap_Temp.pdb')
       CALL PopActiveWindowID
       RETURN
  1380 FORMAT ('REMARK 290 ')

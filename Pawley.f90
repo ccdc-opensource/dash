@@ -1004,6 +1004,7 @@
       IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (SDIFileName .NE. ' ')) THEN
         CALL CreateSDIFile(SDIFileName)
         CALL Set_saFileNames(SDIFileName(1:LEN_TRIM(SDIFileName) - 4))
+        CALL sa_SetOutputFiles(SDIFileName)
         SaveProject = .TRUE.
       ENDIF
 

@@ -82,7 +82,7 @@
       CHARACTER*80 filehead
 !ep added extpro
       LOGICAL extcssr, extpdb, extccl, extpro
-!
+
       INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
       IF (extcssr) GOTO 10
       DO I = 1, 30

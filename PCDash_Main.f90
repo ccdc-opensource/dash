@@ -393,6 +393,7 @@
       CALL IOsDeleteFile('DICVOL.OUT')
       CALL IOSDeleteFile('MakeZmatrix.log')
       CALL IOSDeleteFile('SA_PARAMS.TXT')
+      CALL IOSDeleteFile('Overlap_Temp.pdb')
       CALL IDebugLevel(DbgMsgBox)
 
       END SUBROUTINE DeleteTempFiles
