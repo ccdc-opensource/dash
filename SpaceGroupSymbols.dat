@@ -364,7 +364,7 @@
     88:1      I 41/a:1       I 4bw -1bw       ITC$I1A063$P4C063            0    1 hz
     88:2      I 41/a:2      -I 4ad            ITC$I1A000$P4C933            0    1 hz
     89        P 4 2 2        P 4 2            PTN$P4C000$P2A000            1    2 hxhy hz
-    90        P 42 1 2       P 4ab 2ab        PTN$P4C660$P2A660            1    2 hxhy hz
+    90        P 4 21 2       P 4ab 2ab        PTN$P4C660$P2A660            1    2 hxhy hz
     91        P 41 2 2       P 4w 2c          PTN$P4C003$P2A006            0    2 hxhy hz
     92        P 41 21 2      P 4abw 2nw       PTN$P4C663$P2A669            0    2 hxhy hz
     93        P 42 2 2       P 4c 2           PTN$P4C006$P2A000            1    2 hxhy hz
