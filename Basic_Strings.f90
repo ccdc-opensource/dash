@@ -233,7 +233,8 @@
       tStrLen = LEN_TRIM(TheString)
       DO iStrPos = 1, tStrLen
         DO iListPos = 1, tListLen
-          IF (TheString(iStrPos:iStrPos) .EQ. TheListIn(iListPos:iListPos)) TheString(iStrPos:iStrPos) = TheListOut(iListPos:iListPos)
+          IF (TheString(iStrPos:iStrPos) .EQ. TheListIn(iListPos:iListPos)) &
+            TheString(iStrPos:iStrPos) = TheListOut(iListPos:iListPos)
         ENDDO
       ENDDO
 
