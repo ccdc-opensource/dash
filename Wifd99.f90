@@ -199,12 +199,24 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
@@ -573,14 +585,27 @@
 !
       SUBROUTINE QNUMPP
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -591,7 +616,7 @@
       LOGICAL         PFNVAR
       COMMON /PFNINF/ PFNVAR(8,9,5)
 
-      INTEGER NUMPFP
+      INTEGER NUMPFP, JSOURC, I, J
 
 ! FOR NOW, IMPOSE PHASE 1, SOURCE 1 WHICH WE HOPE STAY THERE:
       JPHASE = 1
