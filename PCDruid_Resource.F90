@@ -1,4 +1,4 @@
-! Winteracter module created : 31/Mar/2002 16:46:35
+! Winteracter module created : 31/Mar/2002 18:11:04
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -615,4 +615,12 @@
           INTEGER, PARAMETER :: IDF_LBIN                        =  1472
           INTEGER, PARAMETER :: IDF_SGDet                       =  1473
           INTEGER, PARAMETER :: IDB_New                         = 40028
+          INTEGER, PARAMETER :: IDF_OutputPDB                   =  1457
+          INTEGER, PARAMETER :: IDF_OutputRES                   =  1461
+          INTEGER, PARAMETER :: IDF_OutputCIF                   =  1462
+          INTEGER, PARAMETER :: IDF_UseHydrogensAuto            =  1474
+          INTEGER, PARAMETER :: IDF_DivPFdiff                   =  1475
+          INTEGER, PARAMETER :: IDF_MultPFdiff                  =  1476
+          INTEGER, PARAMETER :: IDF_REAL1                       =  1477
+          INTEGER, PARAMETER :: IDF_CHECK11                     =  1481
       END MODULE Druid_Header

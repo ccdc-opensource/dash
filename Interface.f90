@@ -643,6 +643,46 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION SaveCIF
+
+! When .TRUE., a file in .cif format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      SaveCIF = .FALSE. ! WDialogGetCheckBoxLogical(IDF_OutputCIF)
+      CALL PopActiveWindowID
+
+      END FUNCTION SaveCIF
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION SaveRES
+
+! When .TRUE., a file in .res format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      SaveRES = .FALSE. ! WDialogGetCheckBoxLogical(IDF_OutputRES)
+      CALL PopActiveWindowID
+
+      END FUNCTION SaveRES
+!
+!*****************************************************************************
+!
       SUBROUTINE Upload_ZeroPoint()
 
       USE WINTERACTER
