@@ -135,14 +135,14 @@
       zmSingleRAIniOrQuater(2, iFrg) = 0.0 ! The quaternions
       zmSingleRAIniOrQuater(3, iFrg) = 0.0 ! The quaternions
       zmSingleRotAxDef(iFrg) = 2  ! 2 = Fractional co-ordinates
-      zmSingleRotAxAtm(1, iFrg) = 1
-      zmSingleRotAxAtm(2, iFrg) = 1
+      zmSingleRotAxAtm(1, iFrg) = izmbid(1, iFrg)
+      zmSingleRotAxAtm(2, iFrg) = izmbid(2, iFrg)
       zmSingleRotAxFrac(1, iFrg) = 0.0
       zmSingleRotAxFrac(2, iFrg) = 0.0
       zmSingleRotAxFrac(3, iFrg) = 1.0
-      zmSingleRotAxPlnAtm(1, iFrg) = 1
-      zmSingleRotAxPlnAtm(2, iFrg) = 2
-      zmSingleRotAxPlnAtm(3, iFrg) = 3
+      zmSingleRotAxPlnAtm(1, iFrg) = izmbid(1, iFrg)
+      zmSingleRotAxPlnAtm(2, iFrg) = izmbid(2, iFrg)
+      zmSingleRotAxPlnAtm(3, iFrg) = izmbid(3, iFrg)
       zmSingleRotationQs(0, iFrg) = 1.0
       zmSingleRotationQs(1, iFrg) = 0.0
       zmSingleRotationQs(2, iFrg) = 0.0
