@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 21/Jan/2002 16:02:21
+// Modified : 22/Jan/2002 16:57:35
 //
 ///////////////////////////////////////////////////
 //
@@ -1284,7 +1284,7 @@ END
 IDD_Pawley_Status DIALOG 0, 0,  400,  185
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "Pawley Refinement Status"
+CAPTION "DASH Wizard : Pawley Refinement Step 2"
 BEGIN
     CONTROL "0",IDF_Pawley_Progress_Bar,"MSCTLS_PROGRESS32",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP,  104,  124,  278,   10,WS_EX_CLIENTEDGE
     CONTROL "Cycle number",IDF_Pawley_Cycle_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,  110,   46,    8
