@@ -1056,7 +1056,7 @@
 !C      C2     -0.05898   0.41596   0.27356  1.0 Biso 3.0
               IF (tSaveCIF) THEN
                 WRITE (hFileCIF,1034,ERR=999) OriginalLabel(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), occ(iOrig,iFrg), tiso(iOrig,iFrg) 
- 1034           FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F4.2)
+ 1034           FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F5.3)
               ENDIF
               IF (tSaveRES) THEN
 ! Determine this atom's entry number in the scattering factor list
