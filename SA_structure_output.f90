@@ -773,9 +773,9 @@
         SGHMaStr(NumberSGTable)(1:1) = "H"
       ENDIF
       IF (SGHMaStr(NumberSGTable)(tLen-1:tLen-1) .EQ. ":") tLen = tLen - 2
-      WRITE (hFilePDB,1050,ERR=999) (CellPar(ii),ii=1,6), SGHMaStr(NumberSGTable)
- 1050 FORMAT ('CRYST1',3F9.3,3F7.2,X,A12)
-! JCC Add in V2 pdb records to store space group and symmetry
+      WRITE (hFilePDB,1050,ERR=999) (CellPar(ii),ii=1,6), SGHMaStr(NumberSGTable)(1:tLen)
+ 1050 FORMAT ('CRYST1',3F9.3,3F7.2,X,A10)
+! Add in V2 pdb records to store space group and symmetry
       WRITE (hFilePDB,1380,ERR=999)
       WRITE (hFilePDB,1381,ERR=999)
  1381 FORMAT ('REMARK 290 CRYSTALLOGRAPHIC SYMMETRY')
