@@ -114,7 +114,7 @@
           CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow))
           CALL ViewStructure('SA_best.pdb')
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
-          CALL organise_sa_result_data(iSol2Run(iRow))
+          CALL organise_sa_result_data(iRow)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,2,iRow,Unchecked)
         ENDIF
       ENDDO
