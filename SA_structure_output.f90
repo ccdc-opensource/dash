@@ -105,7 +105,7 @@
         tSaveCSSR = SaveCSSR()
         tSaveCCL  = SaveCCL()
         tSaveCIF  = SaveCIF()
-        tSaveRES  = .TRUE. ! SaveRES()
+        tSaveRES  = SaveRES()
       ENDIF
 !
 !       Output a CSSR file to fort.64
@@ -446,7 +446,7 @@
 !C      C2     -0.05898   0.41596   0.27356  1.0 Biso 3.0
               IF (tSaveCIF) THEN
                 WRITE (hFileCIF,1034) OriginalLabel(iOrig,iFrg), (xatopt(k,ii),k=1,3), occ(iOrig,iFrg), tiso(iOrig,iFrg) 
- 1034           FORMAT ('  ',A5,1X,3(F10.5,1X),F4.2,' Biso ',F4.2)
+ 1034           FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F4.2)
               ENDIF
               IF (tSaveRES) THEN
 ! Determine this atom's entry number in the scattering factor list
@@ -457,7 +457,7 @@
                 ENDDO
                 WRITE (hFileRES,1035) OriginalLabel(iOrig,iFrg), iScat, (xatopt(k,ii),k=1,3), &
                                       occ(iOrig,iFrg), tiso(iOrig,iFrg)/(8.0*(PI**2)) 
- 1035           FORMAT (A5,1X,I2,1X,3(F10.5,1X),F4.3,1X,F4.3)
+ 1035           FORMAT (A5,1X,I2,1X,3(F10.5,1X),F5.3,1X,F5.3)
               ENDIF
             ENDDO ! loop over atoms
           ENDDO ! Loop over copies
