@@ -70,7 +70,6 @@ C
           B(I,J)=A(I,J)
         END DO
       END DO
-C      CALL GMEQ(A,B,N,N)
       D=1.
       IS=N-1
       DO 10 K=1,N

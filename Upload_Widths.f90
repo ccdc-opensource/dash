@@ -29,11 +29,9 @@
 	COMMON / CCSLER / IBMBER 
 
 !
-!	write(76,*) ' In Upload widths with ',NumPeakFitRange,' ranges'
       CALL SORT_REAL(PkPosAv,IOrdTem,NumPeakFitRange)
 !
 ! Write out sigmas
-!C>> JCC       call WDialogLoad(IDD_Sigma_info)
 
       ICurSel = WinfoDialog(CurrentDialog)
 
@@ -70,7 +68,6 @@
 !
 !
 ! Write out gammas
-!C>> JCC      call WDialogLoad(IDD_Gamma_info)
       CALL WDialogSelect(IDD_Gamma_info)
       CALL WDialogClearField(IDD_Gamma_Grid)
       CALL WGridRows(IDF_Gamma_Grid,NumPeakFitRange)
@@ -106,7 +103,6 @@
 	  END IF
 !
 ! Write out HPSL
-!C>> JCC      call WDialogLoad(IDD_HPSL_info)
       CALL WDialogSelect(IDD_HPSL_info)
 	  CALL WDialogClearField(IDD_HPSL_Grid)
       CALL WGridRows(IDF_HPSL_Grid,NumPeakFitRange)
@@ -151,7 +147,6 @@
 !
 !
 ! Write out HMSL
-!C>> JCC     call WDialogLoad(IDD_HMSL_info)
       CALL WDialogSelect(IDD_HMSL_info)
 	  CALL WDialogClearField(IDD_HMSL_Grid)
       CALL WGridRows(IDF_HMSL_Grid,NumPeakFitRange)

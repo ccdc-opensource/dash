@@ -116,7 +116,6 @@
       End If
 !
 ! Write out all the peak positions in an ordered list ...
-!C>>      call WDialogLoad(IDD_Peak_Positions)
       ICurSel = WinfoDialog(CurrentDialog)
 	  CALL WDialogSelect(IDD_Peak_Positions)
 	  CALL WDialogClearField(IDD_Peak_Positions_Grid)
@@ -148,10 +147,8 @@
 
 !  
 ! Now do a refinement ...
-!C>> JCC       call WDialogLoad(IDD_Crystal_Symmetry)
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       Call WDialogGetMenu(IDF_Crystal_System_Menu,IPtGp,ChPtGp)
-!      Write(76,*) 'Crystal system ',IPtGp
       Call RefineLattice()
 	  IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
 !
