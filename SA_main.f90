@@ -150,7 +150,6 @@
       CHARACTER(MaxPathLength) temp_file
       CHARACTER*2  AtmElement(1:MAXATM_2)
       REAL*8 CART(1:3,1:MAXATM)
-      INTEGER IHANDLE
       INTEGER, EXTERNAL :: WriteMol2
       LOGICAL, EXTERNAL :: Get_ColourFlexibleTorsions
       INTEGER atom
@@ -217,10 +216,6 @@
 ! Show the mol2 file
       IF (WriteMol2(temp_file) .EQ. 1) CALL ViewStructure(temp_file)
       CALL IOSDeleteFile(temp_file)
-! Show the Z-matrix file in an editor window
-      CALL WindowOpenChild(IHANDLE)
-      CALL WEditFile(frag_file(ifrg),Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
-      CALL SetChildWinAutoClose(IHANDLE)
 
       END SUBROUTINE ViewZmatrix
 !
