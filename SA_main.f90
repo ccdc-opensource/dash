@@ -64,7 +64,7 @@
 ! Preferred Orientation
       IF (PrefParExists) THEN
         WRITE(tFileHandle,'("  March-Dollase preferred orientation correction will be applied.")',ERR=999)
-        WRITE(tFileHandle,'("  Orientation: a* = ",F6.3,", b* = ",F6.3,", c* = ",F6.3)',ERR=999) (PrefPars(ii),ii=1,3)
+        WRITE(tFileHandle,'("  Orientation: a* = ",I3,", b* = ",I3,", c* = ",I3)',ERR=999) (PO_Direction(ii),ii=1,3)
         kk = kk + 1
         CALL WGridGetCellReal(IDF_parameter_grid_modal,2,kk,lb)
         CALL WGridGetCellReal(IDF_parameter_grid_modal,3,kk,ub)
@@ -191,7 +191,7 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: Degrees2Radians
       CHARACTER*36 parlabel(mvar)
-      INTEGER I, II, kk, iFrg, iH, iK, iL
+      INTEGER I, II, kk, iFrg
       REAL    Point1(1:3), Point2(1:3), Point3(1:3) 
       REAL    Axis(1:3)
       REAL    Q(0:3)
@@ -336,13 +336,10 @@
       CALL WDialogSelect(IDD_SAW_Page2)
       PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
 ! Set up preferred orientation. This can't be the first parameter: it must be appended to the rest.
-      IF (PrefParExists) THEN
-        CALL WDialogGetInteger(IDF_PO_a, iH)
-        CALL WDialogGetInteger(IDF_PO_b, iK)
-        CALL WDialogGetInteger(IDF_PO_c, iL)
-        PrefPars(1) = FLOAT(iH)
-        PrefPars(2) = FLOAT(iK)
-        PrefPars(3) = FLOAT(iL)
+      IF ( PrefParExists ) THEN
+        CALL WDialogGetInteger(IDF_PO_a, PO_Direction(1))
+        CALL WDialogGetInteger(IDF_PO_b, PO_Direction(2))
+        CALL WDialogGetInteger(IDF_PO_c, PO_Direction(3))
         kk = kk + 1
         Par2iFrg(kk) = 0
         kzmpar2(kk) = 7 ! preferred orientation

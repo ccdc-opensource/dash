@@ -15,14 +15,14 @@
 ! window is closed, state must be reset to original state.
 
       LOGICAL SA_PrefParExists
-      REAL    SA_PrefPars(1:3)
+      INTEGER SA_PO_Direction(1:3)
 ! For use in Rietveld only, to enable restoring original state after closing Rietveld window.
 
       INTEGER iPrfPar
 ! The number of the SA parameter corresponding to the extent of preferred orientation.
 
-      REAL PrefPars(1:3)
-! PrefPars(1:3) = Orientation (to be replaced by something called 'PO_Direction(1:3).
+      INTEGER PO_Direction(1:3)
+! Orientation
 
       REAL PrefCsqa(48, 10000) ! 10000 = MFCSTO
 ! Precalculated preferred orientation corrections (generalised multiplicities).
