@@ -12,6 +12,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 !
 !  Definitions and array declarations.
 !
@@ -47,8 +48,8 @@
       REAL yadd
       REAL Ymin
       REAL Ymax
-      CHARACTER*255 Grid_Buffer
-      CHARACTER*75 filename
+      CHARACTER*MaxPathLength Grid_Buffer
+      CHARACTER*MaxPathLength filename
       EXTERNAL DealWithProfilePlot
       CHARACTER*2 RunStr
       INTEGER I, II, RunNr, tFileHandle, iHandle
