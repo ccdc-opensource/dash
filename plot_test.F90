@@ -122,6 +122,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE SOLVAR
 !
 !  Definitions and array declarations.
 !
@@ -151,9 +152,6 @@
       REAL, DIMENSION (20):: Xmax
       REAL, DIMENSION (20):: Xmin
       COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
-
-      REAL                XAtmCoords
-      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:MaxAtm_4,1:MaxRun)
 
       INTEGER         NATOM
       REAL                   Xato
