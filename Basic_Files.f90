@@ -5,6 +5,20 @@
 !
 !*****************************************************************************
 ! 
+      INTEGER FUNCTION GetBFIOError
+
+      IMPLICIT NONE
+
+      INTEGER     BFIOErrorCode
+      COMMON /IO/ BFIOErrorCode
+
+      GetBFIOError = BFIOErrorCode
+      BFIOErrorCode = 0
+
+      END FUNCTION GetBFIOError
+!
+!*****************************************************************************
+! 
       SUBROUTINE FileWriteString(TheFileHandle, TheRecNr, TheString)
 !
 ! Routine to write a string to a binary file.
