@@ -238,6 +238,8 @@
             CASE (CloseRequest)
               CALL WExit
               GOTO 10
+!F            CASE (MouseMove)
+!F              CALL HighLightPFR
             CASE (MouseButDown)
               IF (NoData) GOTO 10
               IF (MseBtnPressed) GOTO 10
