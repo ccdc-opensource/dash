@@ -296,6 +296,9 @@
 ! Read / Write Pawley refinement related stuff
 ! Read / Write the peak fit ranges
       CALL PrjReadWritePeakFitRanges
+
+      CALL PrjErrTrace
+
 ! We _must_ read the Peak Fit Ranges after the data needed to generate the tick marks (unit cell,
 ! zero point, wavelength, space group, powder pattern) because it needs the tick marks
 ! to assign a reflection to each peak position.
@@ -304,12 +307,8 @@
 !        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
       IF (RW .EQ. cRead) THEN
         CALL WizardWindowShow(tCurrentWizardWindow)
-! Is this "PastPawley"? (has consequences for e.g. drawing of peak fit ranges)
-        PastPawley = ((CurrentWizardWindow .EQ. IDD_SAW_Page1) .OR.     &
-                      (CurrentWizardWindow .EQ. IDD_SAW_Page2) .OR.     &
-                      (CurrentWizardWindow .EQ. IDD_SA_input2) .OR.     &
-                      (CurrentWizardWindow .EQ. IDD_SA_input3))
       ENDIF
+      CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,PastPawley)
       IF (PastPawley) THEN
         CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PAWLEYCHISQ)
 ! If we are this way down the file, NBIN was determined by original pattern + truncation + LBIN.
@@ -318,6 +317,9 @@
         CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NBIN)
 ! Read / Write observed pattern minus the background fitted during the Pawley refinement.
 ! This is the observed pattern read in by GETPIK.
+
+        CALL PrjErrTrace
+
         DO I = 1, NBIN
           CALL FileRWReal(hPrjFile,iPrjRecNr,RW,YOBIN(I))
         ENDDO
@@ -383,9 +385,9 @@
 !
 ! Read or writes information on peak fit ranges to / from binary project file.
 !
+      USE WINTERACTER
+      USE DRUID_HEADER
       USE PRJVAR
-      USE ZMVAR
-      USE ATMVAR
       USE SOLVAR
 
       IMPLICIT NONE
@@ -396,6 +398,7 @@
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                                    ChiMult
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
@@ -440,6 +443,10 @@
             ENDDO
           ENDIF
         ENDDO
+        IF (iPrjReadOrWrite .EQ. cRead) THEN
+          iSolTicked = 1
+          CALL Update_Solutions
+        ENDIF
       ENDIF
 
       END SUBROUTINE PrjReadWriteSolutions
