@@ -267,6 +267,7 @@
       LOGICAL            ShowAgain
       COMMON  / DBGMSG / ShowAgain
 
+      CALL Clear_SA
       ShowAgain = .TRUE.
       PI     = 4.0*ATAN(1.0)
       RAD    = PI/180.0
