@@ -126,6 +126,10 @@
       REAL xtem, tempupper, templower, tempupper2, templower2
       INTEGER Upper, Lower
 
+! Write parameter_input file to working directory
+
+
+
       Upper = 1
       Lower = 2
 
@@ -140,6 +144,7 @@
       IA = 1255
       IC = 6173
       JRAN = 1
+
       DO I = 1, 30000
         JRAN = MOD(JRAN*IA+IC,IM)
         RANARR(I) = FLOAT(JRAN)/FLOAT(IM) ! RANARR now between  0.0 and 1.0
@@ -381,7 +386,7 @@
                     CALL ThreeSixtyToOneEighty(xtem)
                     XP(H) = xtem
                     IARR = IARR + 1 
-                ELSEIF (UB(H) * LB(H) .GT. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
+                ELSEIF (UB(H) * LB(H) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
                   IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
                     IARR = IARR + 1
                     XP(H) = LB(H) + RULB(H) * RANARR(IARR)
@@ -410,6 +415,7 @@
                 XP(H) = xtem
                 IARR = IARR + 1
             END SELECT
+
             CurrIsPO = (kzmpar2(H) .EQ. 7)
             IF (PrefParExists) THEN
 ! Evaluate the function with the trial point XP and return as FP.
@@ -531,6 +537,7 @@
         IF (iMyExit .NE. 0) GOTO 999 ! Exit all loops and jump straight to the end
 
       ENDDO ! Loop over moves per iteration (NT)
+
       Last_NDOWN = NDOWN
       Last_NUP   = NUP
 ! Calculate the average energy and deviation
