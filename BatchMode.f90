@@ -409,7 +409,7 @@
       SUBROUTINE MergeDASHFiles(DirName, OutputFileName)
 
 ! Note: at the end of the day, we will have to be able to read everything into DASH. DASH is
-! limited to 99 (= MaxRun) solutions, so this routine will also always be limited to 99 solutions at a time.
+! limited to 999 (= MaxRun) solutions, so this routine will also always be limited to 999 solutions at a time.
 
       USE WINTERACTER
       USE PRJVAR
