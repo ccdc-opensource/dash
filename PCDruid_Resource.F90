@@ -1,4 +1,4 @@
-! Winteracter module created : 20/Apr/2004 18:21:48
+! Winteracter module created : 21/Apr/2004 10:09:52
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -477,10 +477,6 @@
           INTEGER, PARAMETER :: IDF_a1                          =  1145
           INTEGER, PARAMETER :: IDF_b1                          =  1146
           INTEGER, PARAMETER :: IDF_c1                          =  1217
-          INTEGER, PARAMETER :: IDD_TabDataDefaults             =   170
-          INTEGER, PARAMETER :: IDD_TabSAsetup                  =   167
-          INTEGER, PARAMETER :: IDD_TabSAOutput                 =   169
-          INTEGER, PARAMETER :: IDD_TabPlotOptions              =   168
           INTEGER, PARAMETER :: ID_Delabc                       = 40019
           INTEGER, PARAMETER :: IDB_Delabc                      =  1410
           INTEGER, PARAMETER :: IDD_DICVOLRunning               =   171
@@ -502,15 +498,9 @@
           INTEGER, PARAMETER :: ID_FitPeaks                     = 40020
           INTEGER, PARAMETER :: IDF_RR_ZmatrixGrid              =  1397
           INTEGER, PARAMETER :: IDB_Refine                      =  1398
-          INTEGER, PARAMETER :: IDD_RRsubBonds                  =   180
-          INTEGER, PARAMETER :: IDD_RRsubZmatrices              =   173
           INTEGER, PARAMETER :: IDF_RR_AngleGrid                =  1438
           INTEGER, PARAMETER :: IDF_RR_TorsionGrid              =  1440
-          INTEGER, PARAMETER :: IDD_RRsubAngles                 =   182
-          INTEGER, PARAMETER :: IDD_RRsubTorsions               =   183
-          INTEGER, PARAMETER :: IDD_RRsubAtoms                  =   185
           INTEGER, PARAMETER :: IDF_RR_BondGrid                 =  1441
-          INTEGER, PARAMETER :: IDD_RRsubData                   =   174
           INTEGER, PARAMETER :: IDB_Open                        = 40024
           INTEGER, PARAMETER :: IDB_Edit                        =  1468
           INTEGER, PARAMETER :: IDB_Summary                     =  1469
