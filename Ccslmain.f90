@@ -15105,7 +15105,7 @@
 !A        parameter.  It should be replaced by PARRUN in the single-
 !A        crystal applications, RUNPAR for Profile Refinement.
 !A VARSXX is the dummy name for a subroutine to be obeyed when all the
-!A        variables have been designated, to record "which variable" is this
+!A        variables have been designated, to record "which variable is this
 !A        parameter" against all possible parameters for this application.
 !A        This method of recording the information is new to MK4.
 !
