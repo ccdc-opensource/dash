@@ -703,7 +703,7 @@
                 ENDDO
               ENDIF
             ENDDO
-            KR=0
+            KR = 0
             NumPeakFitRange = NumPeakFitRange - 1
             IF (NumPeakFitRange.EQ.0) THEN
 ! Grey out 'Delete all peak fit ranges' button on toolbar
@@ -766,9 +766,9 @@
       ELSE IF (EventInfo%VALUE1.GE.49 .AND. EventInfo%VALUE1.LE.57) THEN
 ! KeyNumber=1-9: locating peak positions...
 ! Are we in a peak range?
-        IF (NumPeakFitRange.GT.0) then
-          InRange=0
-          DO II=1,NumPeakFitRange
+        IF (NumPeakFitRange.GT.0) THEN
+          InRange = 0
+          DO II = 1, NumPeakFitRange
             IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II) ) THEN
 ! The cursor is sitting inside a peak range - go for it!
               InRange=II
@@ -781,8 +781,8 @@
 ! We've gone for too big a number - ignore
             ELSE IF(NTPeak.EQ.NTem) THEN
 ! Here's the next peak
-              NumInPFR(InRange)=NTem
-              XPF_Pos(NTem,InRange)=XCur(2)
+              NumInPFR(InRange) = NTem
+              XPF_Pos(NTem,InRange) = XCur(2)
               ATem = ABS(XCur(2)-XBin(IPF_Lo(InRange)))
               DO IP = IPF_Lo(InRange), IPF_Hi(InRange)
                 ANew = ABS(XCur(2)-XBin(IP))
@@ -793,13 +793,13 @@
               ENDDO
             ELSE
 ! Reposition an existing peak
-              XPF_Pos(NTPeak,InRange)=XCur(2)
-              ATem=ABS(XCur(2)-XBin(IPF_Lo(InRange)))
-              DO IP=IPF_Lo(InRange),IPF_Hi(InRange)
-                ANew=ABS(XCur(2)-XBin(IP))
-                IF (ANew.le.ATem) THEN
-                  ATem=ANew
-                  YPF_Pos(NTPeak,InRange)=YOBin(IP)
+              XPF_Pos(NTPeak,InRange) = XCur(2)
+              ATem = ABS(XCur(2) - XBin(IPF_Lo(InRange)))
+              DO IP = IPF_Lo(InRange), IPF_Hi(InRange)
+                ANew = ABS(XCur(2) - XBin(IP))
+                IF (ANew.LE.ATem) THEN
+                  ATem = ANew
+                  YPF_Pos(NTPeak,InRange) = YOBin(IP)
                 ENDIF
               ENDDO
             ENDIF ! NTPeak.eq.NTem
@@ -809,7 +809,7 @@
         CALL IGrPlotMode(' ')
         CALL Profile_Plot
         CALL IGrPlotMode('EOR')
-      ELSE IF (EventInfo%VALUE1.EQ.48 .or. EventInfo%VALUE1.EQ.KeyReturn) THEN
+      ELSE IF (EventInfo%VALUE1.EQ.48 .OR. EventInfo%VALUE1.EQ.KeyReturn) THEN
 ! KeyNumber=0 or KeyReturn: get ready to fit peaks ...
 ! Check if in a peak range - if not tell the user...
         IF (NumPeakFitRange.GT.0) then
@@ -817,7 +817,7 @@
           DO II = 1, NumPeakFitRange
             IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II) ) THEN
 ! The cursor is sitting inside a peak range - go for it!
-              InRange=II
+              InRange = II
             ENDIF
           ENDDO
           IF (InRange .EQ. 0) THEN
@@ -839,12 +839,13 @@
         CALL IGrPlotMode(' ')
       ENDIF
       CALL CheckIfWeCanDoAPawleyRefinement
+      CALL CheckIfWeCanIndex
 
       END SUBROUTINE Check_KeyDown_PeakFit_Inner
 !
 !*****************************************************************************
 !
-      SUBROUTINE CheckIfWeCanDoAPawleyRefinement
+      SUBROUTINE CheckIfWeCanIndex
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -870,6 +871,43 @@
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
+      INTEGER I, NPeaksFitted
+      INTEGER IndexOption
+
+      NPeaksFitted = 0
+      DO I = 1, NumPeakFitRange
+        NPeaksFitted = NPeaksFitted + NumInPFR(I)
+      ENDDO
+      CALL PushActiveWindowID
+      IF (NPeaksFitted .GE. 10) THEN
+        CALL WDialogSelect(IDD_PW_Page7)
+        CALL WDialogFieldState(IDNEXT,Enabled)
+        CALL WDialogSelect(IDD_PW_Page8)
+        CALL WDialogFieldState(IDNEXT,Enabled) ! The 'Run >' button
+      ELSE
+        CALL WDialogSelect(IDD_PW_Page7)
+        CALL WDialogGetRadioButton(IDF_RADIO3,IndexOption) ! 'Index now' or 'Enter known cell'
+        IF (IndexOption .EQ. 2) THEN
+          CALL WDialogFieldState(IDNEXT,Enabled)
+        ELSE
+          CALL WDialogFieldState(IDNEXT,Disabled)
+        ENDIF
+        CALL WDialogSelect(IDD_PW_Page8)
+        CALL WDialogFieldState(IDNEXT,Disabled) ! The 'Run >' button
+      ENDIF
+      CALL PopActiveWindowID
+
+      END SUBROUTINE CheckIfWeCanIndex
+!
+!*****************************************************************************
+!
+      SUBROUTINE CheckIfWeCanDoAPawleyRefinement
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
 
       LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
 
@@ -912,7 +950,7 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
-      LOGICAL Check_TicMark_Data ! Function
+      LOGICAL, EXTERNAL :: Check_TicMark_Data
       INTEGER I, NPeaksFitted
 
 ! JCC Track the number of fittable peaks

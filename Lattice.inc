@@ -1,6 +1,4 @@
 
-!C>> JCC The next common allows low-level setting of SLIM (not accessible through the front
-!C     end, but may be in future. I've allowed reading via the dsl file)
       REAL SLIMVALUE, SCALFAC
       LOGICAL BACKREF
       COMMON /PWLYST/ SLIMVALUE, SCALFAC, BACKREF
@@ -13,7 +11,7 @@
       PARAMETER (MVAL=50)
       INTEGER LatBrav
       INTEGER IHLR
-      COMMON /LATREFCMN/ LatBrav,IHLR(3,MVAL) 
+      COMMON /LATREFCMN/ LatBrav, IHLR(3,MVAL) 
 
 ! LatBrav is the crystal system (NOT the Bravais lattice)
 !

@@ -115,3 +115,8 @@
 
 ! maxiter = maximum number of simulated annealing iterations (per individual run when multi run).
 
+       INTEGER MaxRun
+	   PARAMETER ( MaxRun = 99)
+! Maximum number of runs in a multirun.
+! Don't forget to update the Winteracter grids accordingly.
+! Note the difference with MaxRuns: that's the number of runs requested by the user.

@@ -55,6 +55,7 @@
       CALL PopActiveWindowID
 ! Disable Pawley refinement button and 'Next >' button in Wizard window
       CALL CheckIfWeCanDoAPawleyRefinement
+      CALL CheckIfWeCanIndex
 
       END SUBROUTINE Init_PeakFitRanges
 !

@@ -646,24 +646,47 @@
 !*****************************************************************************
 !
       SUBROUTINE Set_Wavelength(TheWaveLength)
-! Should be renamed to 'SetWavelength'/'UploadWavelength'
 
-      USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
-
+      
       IMPLICIT NONE
 
       REAL, INTENT (IN   ) :: TheWaveLength
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
-      LOGICAL, EXTERNAL :: NearlyEqual
+      INTEGER                BackupNOBS
+      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
+      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
+
+
+      LOGICAL, EXTERNAL :: NearlyEqual, Confirm
+      INTEGER tFileHandle, I
 
       IF ((TheWaveLength .LT. 0.01) .OR. (TheWaveLength .GT. 20.0)) THEN
         CALL ErrorMessage('Invalid wavelength')
         RETURN
       ENDIF
+      IF (NoWavelengthInXYE) THEN
+        IF (Confirm('For ease of use, DASH now interprets a single number on the first line of an .xye file as a wavelength.'//CHAR(13)// &
+                    'The file you are using does not contain a wavelength yet.'//CHAR(13)// &
+                    'Would you like to write the wavelength you have just entered to the file'//CHAR(13)// &
+                    FNAME(1:LEN_TRIM(FNAME))//' ?')) THEN
+! Only ask this once per file.
+          NoWavelengthInXYE = .FALSE.
+          tFileHandle = 10
+          OPEN(UNIT=tFileHandle,FILE=FNAME(1:LEN_TRIM(FNAME)),ERR=999)
+          WRITE(tFileHandle,'(F9.5)') TheWaveLength
+          DO I = 1, BackupNOBS
+            WRITE(tFileHandle,'(F6.3,X,F11.3,X,F12.5)',ERR=999) BackupXOBS(I), BackupYOBS(I), BackupEOBS(I)
+          ENDDO
+          CLOSE(tFileHandle)
+        ENDIF
+      ENDIF
+      GOTO 10
+  999 CALL ErrorMessage('Error accessing file '//FNAME(1:LEN_TRIM(FNAME)))
+   10 CLOSE(tFileHandle)
       IF (NearlyEqual(TheWaveLength,ALambda)) RETURN
       ALambda = TheWaveLength
       CALL Upload_Wavelength

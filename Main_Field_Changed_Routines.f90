@@ -157,6 +157,7 @@
                 CALL DownloadWavelength(IDD_Data_Properties)
                 CALL Generate_TicMarks
                 CALL WDialogSelect(IDD_Structural_Information)
+                CALL CheckUnitCellConsistency
                 CALL WDialogHide()
               CASE (IDCANCEL)
                 CALL WDialogHide()
@@ -308,6 +309,7 @@
               CALL Upload_ZeroPoint
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
               CALL Generate_TicMarks
+              CALL CheckUnitCellConsistency
           END SELECT
           CALL Profile_Plot
         CASE (FieldChanged)
@@ -320,6 +322,7 @@
               IF (.NOT. NearlyEqual(tReal,CellPar(1))) THEN
                 CellPar(1) = tReal
                 CALL UpdateCell
+                CALL CheckUnitCellConsistency
               ELSE ! Following line just in case user typed -9999.0
                 IF (.NOT. ValidCellAxisLength(tReal)) CALL WDialogClearField(IDF_a_latt)
               ENDIF
@@ -328,6 +331,7 @@
               IF (.NOT. NearlyEqual(tReal,CellPar(2))) THEN
                 CellPar(2) = tReal
                 CALL UpdateCell
+                CALL CheckUnitCellConsistency
               ELSE ! Following line just in case user typed -9999.0
                 IF (.NOT. ValidCellAxisLength(tReal)) CALL WDialogClearField(IDF_b_latt)
               ENDIF
@@ -336,18 +340,22 @@
               IF (.NOT. NearlyEqual(tReal,CellPar(3))) THEN
                 CellPar(3) = tReal
                 CALL UpdateCell
+                CALL CheckUnitCellConsistency
               ELSE ! Following line just in case user typed -9999.0
                 IF (.NOT. ValidCellAxisLength(tReal)) CALL WDialogClearField(IDF_c_latt)
               ENDIF
             CASE (IDF_alp_latt)
               CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
               CALL UpdateCell
+              CALL CheckUnitCellConsistency
             CASE (IDF_bet_latt)
               CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
               CALL UpdateCell
+              CALL CheckUnitCellConsistency
             CASE (IDF_gam_latt)
               CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
               CALL UpdateCell               
+              CALL CheckUnitCellConsistency
             CASE (IDF_Crystal_System_Menu)
               IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
                 CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)

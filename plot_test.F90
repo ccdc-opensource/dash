@@ -37,7 +37,7 @@
       COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
 
       LOGICAL          PRO_saved
-      COMMON /PROCOM/  PRO_saved(1:30)
+      COMMON /PROCOM/  PRO_saved(1:MaxRun)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN

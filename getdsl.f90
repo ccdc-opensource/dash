@@ -326,6 +326,7 @@
       CALL sa_SetOutputFiles(SDIFile)
       TicExists = .FALSE.
       HcvExists = .FALSE.
+      HklExists = .FALSE.
       PikExists = .FALSE.
       RawExists = .FALSE.
       DslExists = .FALSE.
@@ -343,6 +344,10 @@
           CALL ILocateString(line,isst,ised)
           DashHcvFile(1:80) = line(isst:isst+79)
           HcvExists = .TRUE.
+        CASE ('hkl')
+          CALL ILocateString(line,isst,ised)
+          DashHklFile(1:80) = line(isst:isst+79)
+          HklExists = .TRUE.
         CASE ('pik')
           CALL ILocateString(line,isst,ised)
           DashPikFile(1:80) = line(isst:isst+79)
