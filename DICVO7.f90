@@ -5,6 +5,8 @@
       SUBROUTINE AFFPAR(Ind,Nrind,Vap)
 
       USE DICVAR
+      USE WINTERACTER
+      USE DRUID_HEADER
 
       IMPLICIT NONE
 !
@@ -35,8 +37,13 @@
         Dir(I) = 0.0
       ENDDO
       jcount = jcount + 1
+! The following stopped DICVOL from generating more than 30 solutions
       IF ( jcount.GT.30 ) THEN
         WRITE (iw,99023) n, fom
+99023 FORMAT (10X,'W A R N I N G   :'/6X,'THE NUMBER OF SOLUTIONS FOUND,WITH M(',I2,') .GT.',F5.2,                 &
+     &        ', IS GREATER THAN 30.'/29X,'THE CALCULATION HAS BEEN STOPPED.'/29X,                                 &
+     &        'PLEASE, CHECK YOUR INPUT DATA !')
+        DICVOL_Error = cDICVOL_TooManySolutions
         RETURN
       ENDIF
       DO I = 1, 3
@@ -184,7 +191,7 @@
       DO I = 2, Nrind
         L = I - 1
         DO J = 1, L
-          A(I,J) = 0.
+          A(I,J) = 0.0
         ENDDO
       ENDDO
       A(1,1) = 1.0/SQRT(A(1,1))
@@ -298,13 +305,13 @@
       nposs = -1
       Qnc = q(n) + epsq(n)
       SELECT CASE (Ind)
-      CASE (1:4)
-      CASE (6)
-        Cosa = COS(pirad*par(4))
-        Cosb = COS(pirad*par(5))
-        Cosg = COS(pirad*par(6))
-      CASE DEFAULT
-        Cosb = COS(pirad*par(4))
+        CASE (1:4)
+        CASE (6)
+          Cosa = COS(pirad*par(4))
+          Cosb = COS(pirad*par(5))
+          Cosg = COS(pirad*par(6))
+        CASE DEFAULT
+          Cosb = COS(pirad*par(4))
       END SELECT
       M1 = 0
       K1 = 0
@@ -463,7 +470,7 @@
         ENDIF
       ENDDO
 !
-!     I M P R E S S I O N   D E S   R E S U L T A T S
+!     Output of the results
 !
       Ktestwolff = 1
       Kclef = 1
@@ -474,18 +481,16 @@
         Ae2 = Ae*Ae
         Be2 = Be*Be
         Ce2 = Ce*Ce
-!
         SELECT CASE (Ind)
-        CASE (1,2,3,4)
-        CASE (6)
-          Cosa = COS(pirad*par(4))
-          Cosb = COS(pirad*par(5))
-          Cosg = COS(pirad*par(6))
-        CASE DEFAULT
-          Cosb = COS(pirad*par(4))
+          CASE (1,2,3,4)
+          CASE (6)
+            Cosa = COS(pirad*par(4))
+            Cosb = COS(pirad*par(5))
+            Cosg = COS(pirad*par(6))
+          CASE DEFAULT
+            Cosb = COS(pirad*par(4))
         END SELECT
       ENDIF
-!
       SELECT CASE (Ind)
       CASE (2)
         Vol = Dir(1)**2*Dir(2)
@@ -560,7 +565,7 @@
 99014     FORMAT (/6X,'NUMBER OF MOLECULES IN THE UNIT CELL :  ',7X,'Z=',I3/)
         ENDIF
         WRITE (iw,99015)
-99015   FORMAT (/3X,'H',3X,'K',3X,'L',4X,'DOBS',5X,'DCAL',3X,'DOBS-DCAL',2X,'2TH.OBS',2X,      &
+99015   FORMAT (/3X,'H',4X,'K',4X,'L',4X,'DOBS',5X,'DCAL',3X,'DOBS-DCAL',2X,'2TH.OBS',2X,      &
      &          '2TH.CAL',1X,'DIF.2TH.'/)
       ENDIF
       Dtheta = 0.
@@ -601,10 +606,10 @@
           IF ( Ktestwolff.NE.1 ) THEN
             IF ( Key.EQ.1 ) THEN
               WRITE (iw,99016) ih(I,J,8), ik(I,J,8), il(I,J,8), d(I), Dcal, Difd, th(I), Tcal, Dift
-99016         FORMAT (1X,I3,1X,2I4,2(F9.5),1X,F9.5,1X,F8.3,1X,F8.3,1X,F7.3)
+99016         FORMAT (1X,I3,1X,I4,1X,I4,F9.5,F9.5,1X, F9.5,1X,F8.3,1X,F8.3,1X,F7.3)
             ELSE
-              WRITE (iw,99017) ih(I,J,8), ik(I,J,8), il(I,J,8), Dcal, Difd, Tcal, Dift
-99017         FORMAT (1X,I3,2I4,10X,F8.5,1X,F9.5,5X,8X,F8.3,1X,F7.3)
+              WRITE (iw,99017) ih(I,J,8), ik(I,J,8), il(I,J,8),       Dcal, Difd,        Tcal, Dift
+99017         FORMAT (1X,I3,1X,I4,1X,I4,9X,1X,F8.5,1X,F9.5,1X,8X,  1X,F8.3,1X,F7.3)
             ENDIF
           ENDIF
           IF ( Difq1.LT.Difq ) THEN
@@ -616,12 +621,14 @@
         Deltaq = Difq + Deltaq
         Dtheta = Dtet + Dtheta
       ENDDO
-!     F I G U R E S   D E   M E R I T E
+!     Figures of merit
       Deltaq = Deltaq/nini
       Dtheta = Dtheta/nini
       fwolff = q(n)/(2.*nposs*Deltaq)
+      CALL AddDICVOL_F(fwolff)
       IF ( Ktestwolff.EQ.0 ) THEN
         Findex = nini/(nposs*Dtheta)
+        CALL AddDICVOL_M(Findex)
         Fvar = 100.*(1.-(nposs*Dtheta*Dtheta/(2.*nini*dth*dth)))
         IF ( Fvar.LE.0.1 ) Fvar = 0.0
         WRITE (iw,99018) nini, nposs
@@ -677,9 +684,6 @@
  600  v = Vol
       WRITE (iw,99022) v, nini, fwolff, nini, Findex, Dtheta, nposs
 99022 FORMAT (2x,'=====>  CELL VOLUME = ',F7.1,' A**3     M(',I2,')=',F6.1,'  F(',I2,')=',F6.1,'(',F6.4,',',I3,')')
-99023 FORMAT (10X,'W A R N I N G   :'/6X,'THE NUMBER OF SOLUTIONS FOUND,WITH M(',I2,') .GT.',F5.2,                 &
-     &        ', IS GREATER THAN 30.'/29X,'THE CALCULATION HAS BEEN STOPPED.'/29X,                                 &
-     &        'PLEASE, CHECK YOUR INPUT DATA !')
 99999 END SUBROUTINE AFFPAR
 !*==PASAJE.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
       SUBROUTINE PASAJE(Ind)

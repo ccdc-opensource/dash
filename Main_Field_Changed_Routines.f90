@@ -203,6 +203,8 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'GLBVAR.INC'
+
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Peak_Positions)
       SELECT CASE (EventType)
@@ -213,6 +215,13 @@
 ! Set the wavelength
               CALL DownLoadWavelength(IDD_Data_Properties)
               CALL WDialogSelect(IDD_Index_Preparation)
+! If this is synchrotron data, then set the default error in the peak positions to 0.02 rahter than 0.03.
+! This decreases the number of solutions and increases the speed of the search.
+              IF (JRadOption .EQ. 2) THEN
+                CALL WDialogPutReal(IDF_eps,0.02,'(F5.3)')
+              ELSE
+                CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
+              ENDIF
               CALL WDialogShow(-1,-1,0,Modeless)
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithPeakPositionsPane 1')
@@ -353,41 +362,17 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      USE DICVAR
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
-
-      INTEGER           NTPeak
-      REAL              AllPkPosVal,         AllPkPosEsd
-      REAL              PkProb
-      INTEGER           IOrdTem
-      INTEGER           IHPk
-
-      COMMON /ALLPEAKS/ NTPeak,                                                  &
-                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
-                        PkProb(MTPeak),                                          &
-                        IOrdTem(MTPeak),                                         &
-                        IHPk(3,MTPeak)
-
-      REAL Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
-      INTEGER Isystem(6), UseErr, I, Iord
       REAL    Temp
-      INTEGER IHANDLE
-      REAL    Epsti
-      REAL    Epsilon
-      REAL    MaxLen
-      LOGICAL Confirm ! Function
-      REAL    TwoTheta2dSpacing ! Function
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Index_Preparation)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
 ! Which button was pressed is now in EventInfo%VALUE1
-! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL)
               CALL WDialogHide()
@@ -401,66 +386,9 @@
                 CALL WDialogHide()
               END IF
             CASE (IDF_RunDICVOL)
-              CALL WDialogGetReal(IDF_Indexing_Lambda, Lambda)
-              CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
-              CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
-              CALL WDialogGetReal(IDF_Indexing_Maxa, amax)
-              CALL WDialogGetReal(IDF_Indexing_Maxb, Bmax)
-              CALL WDialogGetReal(IDF_Indexing_Maxc, Cmax)
-              MaxLen = MAX(amax,Bmax)
-              MaxLen = MAX(MaxLen,Cmax)
-! JvdS Add in very quick check: is the d-spacing belonging to the first peak greater
-! than the maximum cell length requested? If so, tell user he is a moron.
-!     Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
-              IF (TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1))) .GT. MaxLen) THEN
-                IF (.NOT. Confirm('WARNING: the maximum cell axis length is shorter than required for indexing the first peak.'//CHAR(13)// &
-                'Do you wish to continue anyway?')) RETURN
-              ENDIF
-              CALL WDialogGetReal(IDF_Indexing_MinAng, Bemin)
-              CALL WDialogGetReal(IDF_Indexing_MaxAng, Bemax)
-              CALL WDialogGetReal(IDF_Indexing_Density, Rdens)
-              CALL WDialogGetReal(IDF_Indexing_MolWt,   Rmolwt)
-              CALL WDialogGetReal(IDF_Indexing_Fom,     fom)
-              CALL WDialogGetReal(IDF_ZeroPoint,        Rexpzp)
-              CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      Isystem(1))
-              CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      Isystem(2))
-              CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       Isystem(3))
-              CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      Isystem(4))
-              CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, Isystem(5))
-              CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  Isystem(6))
-              CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
-              CALL WDialogGetReal(IDF_eps,Epsilon)
-              n = NTPeak
-              wave2 = Lambda / 2
-              IF (UseErr .EQ. 2) THEN
-                epst = 0.0
-                DO I = 1, n
-                  IOrd = IOrdTem(I)
-                  IF (AllPkPosEsd(IOrd) .LE. 0.0001) THEN
-                    epsil(I) = 0.001
-                  ELSE 
-                    epsil(I) = AllPkPosEsd(IOrd) * 10.0
-                  ENDIF
-                  Epsti = epsil(I) + 0.015
-                  IF (Epsti .GT. epst) epst = Epsti
-                ENDDO
-              ELSE
-                epst = Epsilon + 0.015
-                DO I = 1, n
-                  epsil(I) = Epsilon
-                ENDDO
-              ENDIF
-              DO I = 1, NTPeak
-                IOrd = IOrdTem(I)
-                d(I) = AllPkPosVal(IOrd) - Rexpzp
-              END DO
-              CALL WCursorShape(CurHourGlass)
-              CALL DICVOL91(Isystem(1),Isystem(2),Isystem(3),Isystem(4),Isystem(5),Isystem(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
-              CALL WCursorShape(CurCrossHair)
-              CALL WindowOpenChild(IHANDLE)
-              CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+              CALL RunDICVOL
             CASE DEFAULT
-              CALL DebugErrorMessage('Forgot to handle something in DealWithIndexPreparation 1')
+!              CALL DebugErrorMessage('Forgot to handle something in DealWithIndexPreparation 1')
           END SELECT
           CALL Profile_Plot(IPTYPE)
         CASE (FieldChanged)
@@ -469,16 +397,197 @@
               CALL DownloadWavelength(IDD_Index_Preparation)
               CALL Generate_TicMarks   
             CASE (IDD_Index_Preparation)
-              CALL DebugErrorMessage('Something unexpected happened in DealWithIndexPreparation')
+!              CALL DebugErrorMessage('Something unexpected happened in DealWithIndexPreparation')
             CASE DEFAULT
-              CALL DebugErrorMessage('Forgot to handle FieldChanged in DealWithIndexPreparation')
+!              CALL DebugErrorMessage('Forgot to handle FieldChanged in DealWithIndexPreparation')
           END SELECT
         CASE DEFAULT
-          CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
+!          CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
       END SELECT
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithIndexPreparation
+!
+!*****************************************************************************
+!
+      SUBROUTINE RunDICVOL
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE DICVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER           NTPeak
+      REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              PkProb
+      INTEGER           IOrdTem
+      INTEGER           IHPk
+      COMMON /ALLPEAKS/ NTPeak,                                                  &
+                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        PkProb(MTPeak),                                          &
+                        IOrdTem(MTPeak),                                         &
+                        IHPk(3,MTPeak)
+
+      REAL Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
+      INTEGER Isystem(6), UseErr, I, Iord
+      INTEGER IHANDLE
+      REAL    Epsti
+      REAL    Epsilon
+      REAL    MaxLen
+      LOGICAL Confirm ! Function
+      REAL    TwoTheta2dSpacing ! Function
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Index_Preparation)
+      CALL WDialogGetReal(IDF_Indexing_Lambda, Lambda)
+      CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
+      CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
+      CALL WDialogGetReal(IDF_Indexing_Maxa, amax)
+      CALL WDialogGetReal(IDF_Indexing_Maxb, Bmax)
+      CALL WDialogGetReal(IDF_Indexing_Maxc, Cmax)
+! Add in very quick check: is the d-spacing belonging to the first peak greater
+! than the maximum cell length requested? If so, tell the user he/she is a moron.
+      MaxLen = MAX(amax,Bmax)
+      MaxLen = MAX(MaxLen,Cmax)
+! Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
+      IF (TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1))) .GT. MaxLen) THEN
+        IF (.NOT. Confirm('WARNING: the maximum cell axis length is shorter than required for indexing the first peak.'//CHAR(13)// &
+        'Do you wish to continue anyway?')) RETURN
+      ENDIF
+      CALL WDialogGetReal       (IDF_Indexing_MinAng,     Bemin)
+      CALL WDialogGetReal       (IDF_Indexing_MaxAng,     Bemax)
+      CALL WDialogGetReal       (IDF_Indexing_Density,    Rdens)
+      CALL WDialogGetReal       (IDF_Indexing_MolWt,      Rmolwt)
+      CALL WDialogGetReal       (IDF_Indexing_Fom,        fom)
+      CALL WDialogGetReal       (IDF_ZeroPoint,           Rexpzp)
+      CALL WDialogGetCheckBox   (IDF_Indexing_Cubic,      Isystem(1))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Tetra,      Isystem(2))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Hexa,       Isystem(3))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Ortho,      Isystem(4))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Monoclinic, Isystem(5))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Triclinic,  Isystem(6))
+      CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
+      CALL WDialogGetReal       (IDF_eps,                 Epsilon)
+      n = NTPeak
+      wave2 = Lambda / 2
+      IF (UseErr .EQ. 2) THEN
+        epst = 0.0
+        DO I = 1, n
+          IOrd = IOrdTem(I)
+          IF (AllPkPosEsd(IOrd) .LE. 0.0001) THEN
+            epsil(I) = 0.001
+          ELSE 
+            epsil(I) = AllPkPosEsd(IOrd) * 10.0
+          ENDIF
+          Epsti = epsil(I) + 0.015
+          IF (Epsti .GT. epst) epst = Epsti
+        ENDDO
+      ELSE
+        epst = Epsilon + 0.015
+        DO I = 1, n
+          epsil(I) = Epsilon
+        ENDDO
+      ENDIF
+      DO I = 1, NTPeak
+        IOrd = IOrdTem(I)
+        d(I) = AllPkPosVal(IOrd) - Rexpzp
+      END DO
+      NumOfDICVOLSolutions = 0
+      CALL WCursorShape(CurHourGlass)
+      CALL DICVOL91(Isystem(1),Isystem(2),Isystem(3),Isystem(4),Isystem(5),Isystem(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
+      IF (DICVOL_Error .EQ. cDICVOL_TooManySolutions) THEN
+! If there are too many solutions, this might be due to the errors being set too high
+! A quick check would be:
+! a) is this synchrotron data? (if so, errors can be assumed to be smaller than the default value 0.03)
+! b) were the errors set to 0.03?
+! c) were at least 18 lines tried? (bit arbitrary, but < 10 lines is clearly nonsensical)
+!
+
+      ENDIF
+      CALL WCursorShape(CurCrossHair)
+      CALL WindowOpenChild(IHANDLE)
+      CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE RunDICVOL
+!
+!*****************************************************************************
+!
+      SUBROUTINE AddDICVOLSolution(TheCrystalSystem,a,b,c,alpha,beta,gamma)
+!
+! This routine adds a solution generated by DICVOL to an array in DASH
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheCrystalSystem
+      REAL,    INTENT (IN   ) :: a, b, c, alpha, beta, gamma
+
+      NumOfDICVOLSolutions = NumOfDICVOLSolutions + 1
+      DICVOLSolutions(NumOfDICVOLSolutions)%CrystalSystem = TheCrystalSystem
+      DICVOLSolutions(NumOfDICVOLSolutions)%a     = a
+      DICVOLSolutions(NumOfDICVOLSolutions)%b     = b
+      DICVOLSolutions(NumOfDICVOLSolutions)%c     = c
+      DICVOLSolutions(NumOfDICVOLSolutions)%alpha = alpha
+      DICVOLSolutions(NumOfDICVOLSolutions)%beta  = beta
+      DICVOLSolutions(NumOfDICVOLSolutions)%gamma = gamma
+      DICVOLSolutions(NumOfDICVOLSolutions)%F = -1.0
+      DICVOLSolutions(NumOfDICVOLSolutions)%M = -1.0
+! F and M are calculated in a different part and added only subject to 
+! certain conditions. Therefore, they are initialised to silly values and
+! we can check later on if they have been calculated.
+
+      END SUBROUTINE AddDICVOLSolution
+!
+!*****************************************************************************
+!
+      SUBROUTINE AddDICVOL_F(TheF)
+!
+! This routine adds a solution generated by DICVOL to an array in DASH
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      REAL,    INTENT (IN   ) :: TheF
+
+      DICVOLSolutions(NumOfDICVOLSolutions)%F = TheF
+! F and M are calculated in a different part and added only subject to 
+! certain conditions. Therefore, they are initialised to silly values and
+! we can check later on if they have been calculated.
+
+      END SUBROUTINE AddDICVOL_F
+!
+!*****************************************************************************
+!
+      SUBROUTINE AddDICVOL_M(TheM)
+!
+! This routine adds a solution generated by DICVOL to an array in DASH
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      REAL,    INTENT (IN   ) :: TheM
+
+      DICVOLSolutions(NumOfDICVOLSolutions)%M = TheM
+! F and M are calculated in a different part and added only subject to 
+! certain conditions. Therefore, they are initialised to silly values and
+! we can check later on if they have been calculated.
+
+      END SUBROUTINE AddDICVOL_M
 !
 !*****************************************************************************
 !
