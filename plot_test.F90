@@ -22,18 +22,18 @@
 	DIMENSION yobsep(MOBS)
 	DIMENSION ycalcep(MOBS)
 	DIMENSION ydif(MOBS)
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
-      YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+
 ! Used to manage the child windows which display the profile plots
       INTEGER SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
@@ -123,8 +123,11 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
 	COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
-      YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       REAL store_ycalc, store_diff
       COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
 
@@ -214,8 +217,8 @@
 !      DO ISET = 1,NSETS
 !          CALL IPgXYPairs(store_x(1,ISET),store_y(link(ihandle),(link(ihandle)-1+ISET)))
 !      END DO
-          CALL IPgXYPairs(xobs(1),yobs(1))
-          CALL IPgXYPairs(xobs(1),store_ycalc(ihandle,ihandle))
-          CALL IPgXYPairs(xobs(1),store_diff(ihandle,ihandle))
+          CALL IPgXYPairs(XBIN(1),YOBIN(1))
+          CALL IPgXYPairs(XBIN(1),store_ycalc(ihandle,ihandle))
+          CALL IPgXYPairs(XBIN(1),store_diff(ihandle,ihandle))
 
       end subroutine plot_pro_file
