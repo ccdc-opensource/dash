@@ -54,6 +54,10 @@
 
 ! RR_nvar = RR_npar for Rietveld refinement
 
+      REAL RR_XATO_Orig(1:3,1:RR_maxatm)
+
+! The original atomic co-ordinates before Rietveld refinement, for comparison.
+
       END MODULE RRVAR
 !
 !*****************************************************************************

@@ -21,13 +21,26 @@
 
       INCLUDE "GLBVAR.INC"
 
-      INTEGER KK, JQ, JQS, i
+      INTEGER KK, JQ, JQS, i, J
       INTEGER iFrg
       INTEGER iFrgCopy
       INTEGER iRow, iCol, iField
       REAL QQSUM, QDEN, QUATER(1:4)
       REAL Duonion(0:1)
       REAL ChiSqd, ChiProSqd 
+
+      INTEGER         NATOM
+      REAL                   XATO
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, XATO(3,150), KX(3,150), AMULT(150), TF(150),  &
+     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
@@ -117,6 +130,7 @@
       RR_ioptPO = 0
 ! Fill and display dialogue
       CALL WDialogSelect(IDD_Rietveld2)
+! First set labels and number of rows
       iRow = 1
       iCol = 1
       iField = IDF_RR_ZmatrixGrid
@@ -211,6 +225,12 @@
       CALL CreateFobITF
       ! Initialise XATO(1:3,1:150)
       CALL RR_MAKEFRAC
+      ! Store initial crystal structure for comparison
+      DO I = 1, NATOM
+        DO J = 1, 3
+          RR_XATO_Orig(J,I) = XATO(J,I)
+        ENDDO
+      ENDDO
       CALL RR_VALCHI(ChiSqd)
       CALL VALCHIPRO(ChiProSqd)
       CALL WDialogPutReal(IDR_INTCHI, ChiSqd, "(F9.2)")
@@ -282,6 +302,8 @@
               ENDDO
               CALL SA_STRUCTURE_OUTPUT_PDB(0)
               CALL ViewStructure('SA_best.pdb')
+            CASE (IDB_Compare)
+              CALL RR_Compare
           END SELECT
         CASE (FieldChanged)
       END SELECT
@@ -473,7 +495,6 @@
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(iField, iRow-1)
       iRow = 1
       iCol = 1
       iField = IDF_RR_BondGrid
@@ -488,7 +509,6 @@
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(iField, iRow-1)
       iRow = 1
       iCol = 1
       iField = IDF_RR_AngleGrid
@@ -503,7 +523,6 @@
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(iField, iRow-1)
       iRow = 1
       iCol = 1
       iField = IDF_RR_TorsionGrid
@@ -518,7 +537,6 @@
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(iField, iRow-1)
       CALL WDialogPutCheckBox(IDC_ITF,RR_ioptITF)
       CALL WDialogPutReal(IDR_ITF,RR_ITF)
       CALL WDialogPutCheckBox(IDC_PO,RR_ioptPO)
@@ -745,8 +763,6 @@
 !
 ! Fills REAL XATO(1:3,1:150) using variables from RRVAR
 !
-! For the refinement, this should be preceded by a step that translates the
-! list of parameters to RR_tran, RR_rot etc.
       SUBROUTINE RR_MAKEFRAC
 
       USE VARIABLES
@@ -939,12 +955,18 @@
 
       REAL POSIN(3)
       INTEGER I, J
+      INTEGER K, L
 
       DO J = 1, NATOMS
         DO I = 1, 3
           POSIN(I) = POS(I,J)
         ENDDO
-        CALL RR_ROTCAR(POSIN,POS(1,J),ROTA)
+        DO K = 1, 3
+          POS(K,J) = 0.0
+          DO L = 1, 3
+            POS(K,J) = POS(K,J) + ROTA(K,L)*POSIN(L)
+          ENDDO
+        ENDDO
         DO I = 1, 3
           POS(I,J) = POS(I,J) + TRANS(I)
         ENDDO
@@ -954,23 +976,178 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE RR_ROTCAR(XORTO,XORTN,ROTA)
+      SUBROUTINE RR_Compare
+
+      USE ZMVAR
+      USE ATMVAR
+      USE RRVAR
 
       IMPLICIT NONE
 
-      REAL,  INTENT (IN   ) :: XORTO(3), ROTA(3,3)
-      REAL,  INTENT (  OUT) :: XORTN(3)
+! Writes out original and Rietveld refined crystal structure to pdb file for visual comparison
+      INCLUDE 'PARAMS.INC'
 
-      INTEGER I, J
+      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
-      DO I = 1, 3
-        XORTN(I) = 0.0
-        DO J = 1, 3
-          XORTN(I) = XORTN(I) + ROTA(I,J)*XORTO(J)
+      INTEGER         NATOM
+      REAL                   Xato
+      INTEGER                             KX
+      REAL                                           AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
+                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+      REAL            f2cpdb
+      COMMON /pdbcat/ f2cpdb(1:3,1:3)
+
+      INTEGER iSol
+      INTEGER pdbBond(1:maxbnd_2*maxcopies*maxfrg,1:2)
+      INTEGER TotNumBonds, NumOfAtomsSoFar
+      CHARACTER*4 LabelStr
+      CHARACTER*2 ColourStr
+      CHARACTER*2 SolStr
+      INTEGER AtomLabelOption, AtomColourOption
+      INTEGER I, iFrg, iFrgCopy, J, iiact, BondNr, ilen
+      REAL    xc, yc, zc
+      INTEGER iAtom
+      INTEGER hFilePDB
+      INTEGER, EXTERNAL :: WritePDBCommon
+
+      CALL PushActiveWindowID
+      hFilePDB = 65
+! Write the file headers first
+      OPEN (UNIT=hFilePDB,FILE='Overlap_Temp.pdb',STATUS='unknown',ERR=999)
+! Add in a Header record
+      WRITE (hFilePDB,1036,ERR=999)
+ 1036 FORMAT ('HEADER    PDB Solution File generated by DASH')
+      IF (WritePDBCommon(hFilePDB) .NE. 0) GOTO 999
+!C! Get atom label option from dialogue. Two options: 
+!C! 1. "Element + solution #"
+!C! 2. "Original atom labels"
+!C      CALL WDialogGetRadioButton(IDF_UseSolutionNr,AtomLabelOption)
+      AtomLabelOption = 2
+!C! Get atom colour option from dialogue. Two options: 
+!C! 1. "By solution number"
+!C! 2. "By element"
+!C      CALL WDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
+      AtomColourOption = 2
+
+! Original structure
+      iiact = 0
+      SolStr = "_O"
+! Note that elements are right-justified
+      IF (AtomColourOption .EQ. 1) THEN ! Colour by solution
+        ColourStr = 'Co'  ! Cobalt        Blue
+      ENDIF
+      iAtom = 0
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 1, natoms(iFrg)
+              iiact = iiact + 1
+              iAtom = iAtom + 1
+              xc = RR_XATO_Orig(1,OrderedAtm(iAtom)) * f2cpdb(1,1) + &
+                   RR_XATO_Orig(2,OrderedAtm(iAtom)) * f2cpdb(1,2) + &
+                   RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(1,3)
+              yc = RR_XATO_Orig(2,OrderedAtm(iAtom)) * f2cpdb(2,2) + &
+                   RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(2,3)
+              zc = RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(3,3)
+! Note that elements are right-justified
+              IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
+                IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
+                  ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
+                ELSE
+                  ColourStr(1:2) = asym(i,iFrg)(1:2)
+                ENDIF
+              ENDIF
+              IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
+                LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
+              ELSE  ! Orignal atom labels
+                LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
+              ENDIF
+              WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
+ 1120         FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+            ENDDO ! loop over atoms
+          ENDDO
+        ENDIF
+      ENDDO ! loop over Z-matrices
+
+      ! Rietveld refined structure
+      SolStr = "_N"
+! Note that elements are right-justified
+      IF (AtomColourOption .EQ. 1) THEN ! Colour by solution
+        ColourStr = ' O'  ! Oxygen        Red
+      ENDIF
+      iAtom = 0
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 1, natoms(iFrg)
+              iiact = iiact + 1
+              iAtom = iAtom + 1
+              xc = Xato(1,OrderedAtm(iAtom)) * f2cpdb(1,1) + &
+                   Xato(2,OrderedAtm(iAtom)) * f2cpdb(1,2) + &
+                   Xato(3,OrderedAtm(iAtom)) * f2cpdb(1,3)
+              yc = Xato(2,OrderedAtm(iAtom)) * f2cpdb(2,2) + &
+                   Xato(3,OrderedAtm(iAtom)) * f2cpdb(2,3)
+              zc = Xato(3,OrderedAtm(iAtom)) * f2cpdb(3,3)
+! Note that elements are right-justified
+              IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
+                IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
+                  ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
+                ELSE
+                  ColourStr(1:2) = asym(i,iFrg)(1:2)
+                ENDIF
+              ENDIF
+              IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
+                LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
+              ELSE  ! Orignal atom labels
+                LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
+              ENDIF
+              WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
+            ENDDO ! loop over atoms
+          ENDDO
+        ENDIF
+      ENDDO ! loop over Z-matrices
+
+! Per Z-matrix, determine the connectivity. This has to be done only once.
+      TotNumBonds = 0
+      NumOfAtomsSoFar = 0
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            IF (NumberOfBonds(iFrg) .GT. 0) THEN
+              DO J = 1, NumberOfBonds(iFrg)
+                pdbBond(J+TotNumBonds,1) = Bonds(1,J,iFrg) + NumOfAtomsSoFar
+                pdbBond(J+TotNumBonds,2) = Bonds(2,J,iFrg) + NumOfAtomsSoFar
+              ENDDO
+            ENDIF
+            NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
+            TotNumBonds = TotNumBonds + NumberOfBonds(iFrg)
+          ENDDO
+        ENDIF
+      ENDDO ! loop over Z-matrices
+      DO iSol = 1, 2
+        DO BondNr = 1, TotNumBonds
+          WRITE(hFilePDB,'(A6,I5,I5)',ERR=999) 'CONECT', (pdbBond(BondNr,1)+NATOM*(iSol-1)), (pdbBond(BondNr,2)+NATOM*(iSol-1))
         ENDDO
-      ENDDO
+      ENDDO ! loop over "runs"
+      WRITE (hFilePDB,"('END')",ERR=999)
+      CLOSE (hFilePDB)
+      CALL ViewStructure('Overlap_Temp.pdb')
+      CALL PopActiveWindowID
+      RETURN
+  999 CALL ErrorMessage('Error writing temporary file.')
+      CLOSE (hFilePDB)
+      CALL PopActiveWindowID
 
-      END SUBROUTINE RR_ROTCAR
+      END SUBROUTINE RR_Compare
 !
 !*****************************************************************************
 !
