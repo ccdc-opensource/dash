@@ -328,7 +328,7 @@
       INTEGER KXIMIN(MOBS), KXIMAX(MOBS)
       INTEGER KK, I, NLIN, iR, J, K, hFile
       INTEGER KTEM, K1, K2
-      REAL    ARGIMIN, ARGIMAX, ARGISTP, ARGT, FWHM, C0, Gaussian, Lorentzian
+      REAL    ARGIMIN, ARGIMAX, ARGISTP, ARGT, FWHM, C0, Gaussian !, Lorentzian
       CHARACTER*150 LINE
 
       HKLFFileLoad = 1
