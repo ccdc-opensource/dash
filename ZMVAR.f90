@@ -13,6 +13,9 @@
       INTEGER maxatm
       PARAMETER ( maxatm = 100 )
 
+      INTEGER maxcopies
+      PARAMETER ( maxcopies = 8 )
+
       INTEGER maxfrg
       PARAMETER ( maxfrg = 5 )
 
@@ -34,18 +37,20 @@
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
 ! but these mappings are.
 
-      INTEGER        IDFZMFile,                                       &
+      INTEGER        IDFZMNumber,           IDFZMFile,                &
                      IDBZMDelete,           IDBZMBrowse,              &
                      IDBZMView,             IDBZMEdit,                &
                      IDFZMpars
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg),                             &
+      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),                             &
                      IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
-                     IDBZMView(1:maxfrg),                             &
+                     IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
                      IDFZMpars(1:maxfrg)
+!F      DATA IDFzmNumber / IDF_zmNumOf1,   IDF_zmNumOf2,   IDF_zmNumOf3,   IDF_zmNumOf4,   IDF_zmNumOf5   /
       DATA IDFZMFile   / IDF_ZMatrix_file1,   IDF_ZMatrix_file2,   IDF_ZMatrix_file3,   IDF_ZMatrix_file4,   IDF_ZMatrix_file5   /
       DATA IDBZMDelete / IDB_ZmatrixDelete1,  IDB_ZmatrixDelete2,  IDB_ZmatrixDelete3,  IDB_ZmatrixDelete4,  IDB_ZmatrixDelete5  /
       DATA IDBZMBrowse / IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5 /
       DATA IDBZMView   / IDB_ZMatrixView1,    IDB_ZMatrixView2,    IDB_ZMatrixView3,    IDB_ZMatrixView4,    IDB_ZMatrixView5    /
+!F      DATA IDBzmEdit   / IDB_zmEdit1,    IDB_zmEdit2,    IDB_zmEdit3,    IDB_zmEdit4,    IDB_zmEdit5    /
       DATA IDFZMpars   / IDF_ZM_pars1,        IDF_ZM_pars2,        IDF_ZM_pars3,        IDF_ZM_pars4,        IDF_ZM_pars5        /
 
       INTEGER         nfrag
@@ -56,7 +61,19 @@
 
 ! frag_file = name of the .zmatrix file containing fragment number ifrag
 
-      LOGICAL         gotzmfile(1:maxfrg)
+      INTEGER         zmNumberOfCopies(1:maxfrg)
+
+! zmNumberOfCopies  =  number of copies of this Z-matrix used during the SA.
+!                      This way, it is easy e.g. to solve salts or solve structures in P1
+!                      Each copy is identical (including occupancies / single axis) except for:
+!                      1. its translation x, y, z
+!                      2. its quaternions
+!                      3. its torsion angles
+
+      LOGICAL         gotzmfile(1:maxfrg), zmFileChanged(1:maxfrg)
+
+! zmFileChanged Set to .TRUE.  when Z-matrix opened/deleted.
+!               Set to .FALSE. after SA parameter boundaries dialogue has been initialised
 
       INTEGER          icomflg(1:maxfrg)
       REAL             AtomicWeighting(1:maxatm,1:maxfrg)
@@ -101,18 +118,21 @@
       INTEGER         iz1(1:maxatm,1:maxfrg), iz2(1:maxatm,1:maxfrg), iz3(1:maxatm,1:maxfrg)
 
 ! ntatm  = total number of atoms. Must be equal to NATOM in /POSNS/
-! natoms = number of atoms in this fragment (=z-matrix)
+! natoms = number of atoms in this fragment (=Z-matrix)
 ! ioptb  = optimise bond length 1=YES, 0=NO. Not implemented.
 ! iopta  = optimise valence angle 1=YES, 0=NO. Not implemented.
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
-! iz1, iz2, iz3 = atoms with respect to which the current atom is defined in the z-matrix
+! iz1, iz2, iz3 = atoms with respect to which the current atom is defined in the Z-matrix
 
       DOUBLE PRECISION blen(1:maxatm,1:maxfrg), alph(1:maxatm,1:maxfrg), bet(1:maxatm,1:maxfrg)
-      DOUBLE PRECISION f2cmat(1:3,1:3), c2fmat(1:3,1:3)
+!F      DOUBLE PRECISION blen(1:maxatm,1:maxfrg), alph(1:maxatm,1:maxfrg), bet(1:maxatm,1:maxcopies,1:maxfrg)
 
 ! blen   = bond length     (wrt iz1)
 ! alph   = valence angle   (wrt iz1 & iz2)
 ! bet    = torsion angle   (wrt iz1, iz2 & iz3)
+
+      DOUBLE PRECISION f2cmat(1:3,1:3), c2fmat(1:3,1:3)
+
 ! f2cmat = 3x3 matrix for conversion from fractional to Cartesian  coordinates 
 ! c2fmat = 3x3 matrix for conversion from Cartesian  to fractional coordinates 
 
