@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      PROGRAM PCDruid_Main
+      PROGRAM PCDash_Main
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -16,8 +16,8 @@
       INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'STATLOG.INC'
 
-      INTEGER           :: IWIDTHS(10)
-      INTEGER           :: IWID
+      INTEGER :: IWIDTHS(10)
+      INTEGER :: IWID
 
       CALL WInitialise(' ')
       CALL Init_StdOut()
@@ -76,7 +76,7 @@
         CALL GetEvent
       END DO
 
-      END PROGRAM PCDruid_Main
+      END PROGRAM PCDash_Main
 !
 !*****************************************************************************
 !
@@ -409,16 +409,9 @@
         OnOrOff = WintOff
       ENDIF
       CALL WMenuSetState(ID_Import_dpj_file,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_get_data_properties,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_get_peak_positions,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_get_crystal_symmetry,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_get_peak_widths,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_plot_options,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_PolyFitter_Help,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_Polyfitter_Tips,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_help_about_Polyfitter,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_import_xye_file,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_import_pro_file,ItemEnabled,OnOrOff)
       IF (OnOff .EQ. 1) THEN
         CALL SetModeMenuState(PeakOn,PawleyOn,SolutionOn)
       ELSE
