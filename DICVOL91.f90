@@ -1,4 +1,6 @@
-!*==DICVOL91.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !
 !       ======================================================================
 !     ==========================================================================
@@ -306,7 +308,7 @@
       Wave = wave2 * 2.0
       pas = 0.4
       IF ( fom .EQ. 0.0 ) fom = 5.0
-!     preparation and writing out of the data
+! preparation and writing out of the data
  100  bb = 0.0
       cc = 0.0
       beta = 0.0
@@ -559,7 +561,7 @@
 !        WRITE (iw,99032)
 !99032 FORMAT (//3X,'SEARCH OF MONOCLINIC SOLUTION(S)'/3X,32('*')/)
 !        WRITE (iw,99027)
-!99027 FORMAT (8X,'MONOCLINIC SYSTEM'/8X,17('-'))
+!99027 FORMAT (8X,'MONOCLINIC SYSTEM')
         Bemin = Bemin*pirad
         Bemax = Bemax*pirad
         Petiamaxi = amax
@@ -707,7 +709,7 @@
       Volmaxc = AMIN1(Volmaxc,v)
  1200 IF ( Jt.NE.0 .OR. Jh.NE.0 .OR. Jo.NE.0 ) THEN
 !        WRITE (iw,99031)
-!99031 FORMAT (//3X,'SEARCH OF TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SOLUTION(S)'/3X,69('*')/)
+!99031 FORMAT (3X,'TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SYSTEM')
         DO kz = 1, 50
           vinf = kz*Vunitm
           vsup = kz*Vunitp
@@ -730,9 +732,6 @@
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
-!                TetragonalSolutionFound = .FALSE.
-              ELSE
-!                TetragonalSolutionFound = .TRUE.
               ENDIF
             ENDIF
             IF ( Jh.NE.0 ) THEN
@@ -746,9 +745,6 @@
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
-!                HexagonalSolutionFound = .FALSE.
-              ELSE
-!                HexagonalSolutionFound = .TRUE.
               ENDIF
             ENDIF
             IF ( Jo.NE.0 ) THEN
@@ -759,10 +755,8 @@
               IF (DICVOL_Error .NE. 0) GOTO 999
               Difvol = ABS(Vv-v)
               IF ( Difvol.GT.1E-12 ) THEN
-!                OrthorhombicSolutionFound = .TRUE.
                 GOTO 1250
               ELSE
-!                OrthorhombicSolutionFound = .FALSE.
 !                WRITE (iw,99021)
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
               ENDIF
@@ -777,7 +771,7 @@
 !      WRITE (iw,99032)
 !99032 FORMAT (//3X,'SEARCH OF MONOCLINIC SOLUTION(S)'/3X,32('*')/)
 !      WRITE (iw,99027)
-!99027 FORMAT (8X,'MONOCLINIC SYSTEM'/8X,17('-'))
+!99027 FORMAT (8X,'MONOCLINIC SYSTEM')
       Bemin = Bemin*pirad
       Bemax = Bemax*pirad
       Petiamaxi = amax
@@ -904,14 +898,14 @@
       CLOSE (IW)
       DICVOL_Error = cDICVOL_ErrorOnWrite
       RETURN
-!99020 FORMAT (8X,'CUBIC SYSTEM')
+!U99020 FORMAT (8X,'CUBIC SYSTEM')
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
-!99022 FORMAT (8X,'TETRAGONAL SYSTEM')
-!99023 FORMAT (8X,'HEXAGONAL SYSTEM')
-!99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
+!U99022 FORMAT (8X,'TETRAGONAL SYSTEM')
+!U99023 FORMAT (8X,'HEXAGONAL SYSTEM')
+!U99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
 !99025 FORMAT (/2X,'END OF SEARCH FOR CUBIC SOLUTION(S)')
 !99026 FORMAT (//2X,'END OF SEARCH FOR TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SOLUTION(S)'/2X,77('*'))
-!99027 FORMAT (8X,'MONOCLINIC SYSTEM'/8X,17('-'))
+!U99027 FORMAT (8X,'MONOCLINIC SYSTEM')
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,  &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
 !99029 FORMAT (/2X,'END OF SEARCH FOR MONOCLINIC SOLUTIONS')
@@ -924,7 +918,7 @@
 99036 FORMAT (/,3X,'EXTENSION OF THE SEARCH OF MONOCLINIC SOLUTION(S)'/3X,                                         &
      &        'WITHIN THE LIMITS ON LINEAR PARAMETERS :'/14X,'A MAX =',F8.3,6X,'B MAX =',F8.3,6X,'C MAX =',F8.3,6X,&
      &        F8.3)
-!99037 FORMAT (8X,'TRICLINIC SYSTEM')
+!U99037 FORMAT (8X,'TRICLINIC SYSTEM')
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS')
   999 WRITE (iw,"(/14X,'DICVOL : Useful References'/14X,'------'/16X,                     &
      &            '1 D. Louër & M. Louër      (1972). J. Appl. Cryst.  5, 271-275.'/16X,  &
@@ -935,3 +929,6 @@
       CLOSE(IW)
 
       END SUBROUTINE DICVOL91
+!
+!*****************************************************************************
+!
