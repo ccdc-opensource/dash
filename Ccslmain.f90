@@ -67,7 +67,7 @@
       ENDDO
 ! NEW ANGLE - COUNT NUMBER OF BOND ANGLES:
       CALL ERRCHK(2,NUMANG,100,1,'angles for geometric constraints')
-! CHECK NAME OF ANGLE DOES NOT CLASH WITH ANY ATOM  OR BOND NAMES:
+! CHECK NAME OF ANGLE DOES NOT CLASH WITH ANY ATOM OR BOND NAMES:
       L1 = 0
       IF (NTARNM.GT.0) L1 = NCFIND(NAME,ATTNAM,NTARNM)
       L2 = NCFIND(NAME,BONNAM,NUMBON)
@@ -308,6 +308,9 @@
      &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
      &                KTPCON(200)
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! ADDING ENTRY:
       IADD = 1
       GOTO 1
@@ -363,6 +366,7 @@
       IF (IADD.EQ.-1) GOTO 100
 ! IT IS A REALLY NEW CONSTRAINT - ADD IT:
       CALL ERRCHK(2,NUMCON,200,0,'LSQ constraints')
+      IF (IBMBER .NE. 0) RETURN
       KPTCON(NUMCON+1) = KPTCON(NUMCON) + NPAR
       DO I = 1, NPAR
         KKCON(KPTCON(NUMCON)+I-1) = KK3(I)
@@ -882,8 +886,14 @@
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   KOM26
       COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),  KOM22
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! ARRANGE INPUT OF "S" CARDS IF NOT DONE
-      IF (INREAD(19).GT.0) CALL SYMOP
+      IF (INREAD(19).GT.0) THEN
+        CALL SYMOP
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
 ! SET "A CARDS READ":
       INREAD(1) = -IABS(INREAD(1))
 ! INITIALISE NAME TABLES FOR ATOM AND SCATT NAMES:
@@ -894,7 +904,7 @@
       NATOM = 0
       IF (NACARD.EQ.0) THEN
         CALL MESS(LPT,1,'No atomic positions have been read from Crystal Data File')
-        GOTO 100
+        RETURN
       ENDIF
       CALL MESS(LPT,1,'Atoms in the unit cell are')
       CALL MESS(LPT,0,' Mult Name       X         Y         Z        ITF      Site  Scat Fac Sub-Group')
@@ -918,6 +928,7 @@
         ENDIF
 ! ATOMIC POSITON:
         CALL ERRCHK(2,NATOM,150,0,'atomic positions')
+        IF (IBMBER .NE. 0) RETURN
         NATO(JPHASE) = NATOM
         CALL GMEQ(XIN,X(1,N),1,3)
         TF(N) = TIN
@@ -1355,12 +1366,18 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       NYZ = 0
 ! CHECK NOT TRYING TO READ SILLY RECORD:
       ILOW = 0
       IF (JPHASE.GT.1) ILOW = NTOTAL(JPHASE-1)
       IHI = NTOTAL(JPHASE)
-      IF (IDEN.LE.ILOW .OR. IDEN.GT.IHI) CALL ERRIN2(IDEN,0,'record ',' requested from crystal data is not there')!
+      IF (IDEN.LE.ILOW .OR. IDEN.GT.IHI) THEN
+        CALL ERRIN2(IDEN,0,'record ',' requested from crystal data is not there')!
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
 ! CATCH ALSO CDFS ENDING IN Y OR Z CARDS:
     1 IF (IDEN+NYZ.GT.IHI) GOTO 101
       READ (IO10,REC=IDEN+NYZ,FMT=1001) ICARD
@@ -1430,6 +1447,9 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       IDIN = ID
       ENDIP = .FALSE.
       N1 = NUMCDF
@@ -1486,6 +1506,7 @@
       GOTO 8
 ! ERROR ON SHUFFLED CARDS:
     6 CALL ERRCH2(ICARD(1:1),0,'more than one group of cards labelled ',' found on crystal data file')
+      IF (IBMBER .NE. 0) RETURN
 ! END OF CRYSTAL DATA:
     2 ENDIP = .TRUE.
    12 IF (.NOT.ENDIP .AND. ID.EQ.IDIN) GOTO 8
@@ -2055,6 +2076,9 @@
       COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48), VEC(3)
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       NN = N
       DO I = 1, NN
         DO J = 1, 3
@@ -2071,15 +2095,16 @@
         IF (IS.EQ.0) GOTO 6
         NL1 = L
         CALL EQPOS(ALAT,VEC,NL1,NL2,4)
+        IF (IBMBER .NE. 0) RETURN
         IF (NL2.EQ.L+1) L = L + 1
     6   N = I
-        GOTO 100
+        RETURN
     1 ENDDO
 ! A NEW ROTATION MATRIX HAS BEEN FOUND:
       CALL ERRCHK(2,N,48,0,'symmetry operators')
+      IF (IBMBER .NE. 0) RETURN
       CALL GMEQ(R,TSYM(1,1,N),3,3)
       CALL GMEQ(T,TTRANS(1,N),1,3)
-  100 RETURN
 
       END SUBROUTINE EQOP
 !
@@ -2306,7 +2331,7 @@
 !A   IABS(NACT)=1 just gives atom name
 !A   IABS(NACT)=2 also writes out ICARD from /SCRACH
 !A On entry MESS is the message specific to this error state
-!O Writes message on units LPT and ITO.
+!O Writes message on unit LPT.
 !
       CHARACTER*(*) MESS
       CHARACTER*4 NAME
@@ -2355,7 +2380,7 @@
 !A On entry MESS1 is the message before WORD
 !A On entry MESS2 is the message after WORD
 !P If ABS(NACT)=2, ICARD in /SCRACH/ must contain the A80 card read
-!O Writes message on units LPT and ITO.
+!O Writes message on unit LPT.
 !
       CHARACTER*34 FORM
       CHARACTER*(*) MESS1, MESS2
@@ -2415,7 +2440,7 @@
 !
 !D The error message starts " ERROR ** ", and finishes with MESS.
 !D If NTYP=1, NVALUE is printed.
-!O Outputs the required message on units LPT and ITO
+!O Outputs the required message on unit LPT
 !
       CHARACTER*(*) MESS
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
@@ -2428,7 +2453,7 @@
       COMMON /IOUNIT/ LPT, LUNI
 
       IF (NTYP.NE.1) NVALUE = NVALUE + 1
-      IF (NVALUE.LE.NBOUND) GOTO 100
+      IF (NVALUE.LE.NBOUND) RETURN
       IF (NACT.GT.0) IERR = IERR + 1
       L = LENGT(MESS)
       IF (NTYP.EQ.1) THEN
@@ -2436,7 +2461,6 @@
       ENDIF
       WRITE (LPT,3000) NBOUND, (MESS(I:I),I=1,L)
       IF (NACT.EQ.0) CALL BMBOUT
-  100 RETURN
  3001 FORMAT (/' ',I6,80A1)
  3000 FORMAT (/' ERROR ** there is an upper limit of',I6,' on number of ',80A1)
 
@@ -2461,7 +2485,7 @@
 !A   IABS(NACT)=2 means also print contents of /SCRACH/
 !A On entry MESS1 is the message before INT
 !A On entry MESS2 is the message after INT
-!O Writes message on units LPT and ITO.
+!O Writes message on unit LPT.
 !
       CHARACTER*33 FORM
       CHARACTER*(*) MESS1, MESS2
@@ -2647,6 +2671,9 @@
 !
       CHARACTER*(*) IBUF, OBUF
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       L = LENGT(IBUF)
       M = LEN(OBUF)
       I = 1
@@ -2676,6 +2703,7 @@
         J = LENGT(OBUF)
         J = J + 1
         CALL ERRCHK(1,J,M,0,'Expanded path name too long')
+        IF (IBMBER .NE. 0) RETURN
       ENDIF
       IF (I.LE.L) GOTO 1
   100 RETURN
@@ -2833,12 +2861,15 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       IF (L.EQ.1) GOTO 1
       IF (L.EQ.6) GOTO 2
       IF (L.EQ.20) GOTO 3
       CALL ERRIN2(L,0,'F2NEW entered with L=',' ')
-!
+      IF (IBMBER .NE. 0) RETURN
 ! 'A' CARD:
     1 CALL INPUTA(0,LABA,LBALEN,LABS,LBSLEN,A,TOLD,SOLD,IER)
 ! REREAD CARD TO FIND OUT WHICH ATOM, AND WHETHER SCAT LABEL EXPLICIT OR NOT:
@@ -3453,6 +3484,10 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 !VMS
       DATA IMTAB, JTAB, JMTAB/4, 1, 2, 3, 2, 4, 3, 1, 2, 3, 4, 1/
       DATA IPOS/1, 5, 17, 23, 61/
@@ -3492,6 +3527,7 @@
 ! ADD FILE PART
       L = LENGT(BUFF) + IFP - 1
       CALL ERRCHK(1,L,100,0,'File path too long')
+      IF (IBMBER .NE. 0) RETURN
       NAMFIL(IFP:) = BUFF
       IFP = L + 1
 ! CHECK FOR EXTENSION
@@ -3504,11 +3540,13 @@
    31 IF (.NOT.DOT) THEN
         L = L + LENGT(DEFT(1:4))
         CALL ERRCHK(1,L,100,0,'File path too long')
+        IF (IBMBER .NE. 0) RETURN
         CALL UPONE(DEFT(1:4),NSYSTM)
         NAMFIL(IFP:) = DEFT(1:4)
       ENDIF
       LFIL = L - I
       CALL ERRCHK(1,LFIL,10,0,'Leaf name too long')
+      IF (IBMBER .NE. 0) RETURN
       FILNAM(IU) = NAMFIL(I+1:L)
       LFIL = L
       GOTO 100
@@ -3786,14 +3824,17 @@
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       IF (NDO.GT.0) GOTO 1
       J = -NDO
-      IF (NSTAT(J).EQ.0) GOTO 100
+      IF (NSTAT(J).EQ.0) RETURN
 ! REMOVE PLANE IF THERE:
       NSTAT(J) = 0
       NOPL = NOPL - 1
-      GOTO 100
+      RETURN
 ! ADD PLANE A IF POSSIBLE;  IF NONE THERE ALREADY, SIMPLY ACCEPT:
     1 CALL FCTOR(A,N)
       IF (NOPL.GT.0) GOTO 2
@@ -3811,7 +3852,7 @@
     3 DO I = 1, 4
         IF (NSTAT(I).EQ.0) GOTO 4
         CALL VECPRD(A,ASY(1,I),PTEMP)
-        IF (VCTMOD(1.0,PTEMP,1).LT.0.0001) GOTO 100
+        IF (VCTMOD(1.0,PTEMP,1).LT.0.0001) RETURN
     4 ENDDO
 ! A IS NEW;  ADD IT, EVEN IF FOR NOW TO POSITION 4:
       DO NNEW = 1, 4
@@ -3827,6 +3868,7 @@
 ! NOW TEST NEW CONFIGURATION - IF 4 PLANES JOIN PART WHICH TAKES ONLY 3:
    10 IF (NOPL.GE.4) GOTO 11
       CALL TRYUNI(0)
+      IF (IBMBER .NE. 0) RETURN
       IF (NICE) 12, 100, 13
 ! PLANE NOT TO BE USED - REMOVE:
    12 NOPL = NOPL - 1
@@ -3850,6 +3892,7 @@
         NSTATS = NSTAT(I)
         NSTAT(I) = 0
         CALL TRYUNI(0)
+        IF (IBMBER .NE. 0) RETURN
         IF (NICE) 5, 100, 15
 ! IF NICE EVER BECOMES -1, OMIT NEW PLANE:
     5   NSTAT(I) = NSTATS
@@ -3921,7 +3964,10 @@
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
       DATA FV/'fix', 'vary'/
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! EITHER FIX OR VARY, GIVEN FAMILY, GENUS & SPECIES WITH PHASE & SOURCE
       KK = KPAK(IFAM,IGEN,ISPC,KP,KS)
       FIX = FX
@@ -3965,12 +4011,14 @@
       GOTO 100
 ! A NEW REQUEST - ACCEPT IT:
     2 CALL ERRCHK(2,NUMFV,200,0,'fix or vary requests')
+      IF (IBMBER .NE. 0) RETURN
       N = NUMFV
       KKFV(N) = KK
 ! RECORD WHETHER OR NOT KK COMPLETE:
       KTYPFV(N) = 0
       IF (.NOT.KWHOLE(KK,K)) THEN
         CALL ERRCHK(2,NUMPAK,30,0,'incomplete fix/vary requests')
+        IF (IBMBER .NE. 0) RETURN
         KTYPFV(N) = NUMPAK
         CALL GMEQ(K,KUNPFV(1,NUMPAK),1,5)
       ENDIF
@@ -3979,6 +4027,7 @@
       IF (.NOT.FIX) KSTFV(N) = -NSTAT
       KTIME(N) = NTICK(NTIME)
   100 RETURN
+
       END SUBROUTINE FIXVAR
 !
 !*****************************************************************************
@@ -4190,7 +4239,7 @@
       IF (K) 1, 31, 2
 ! K +VE - A PACKED PARAMETER SPEC:
     2 IER = IERR
-      CALL ERRCHK(2,NFUDGE,20,0,'fudge factors')
+      CALL ERRCHK(2,NFUDGE,20,1,'fudge factors')
       IF (IER.NE.IERR) GOTO 100
 ! READ FUDGE FACTOR:
       IFDGPT(NFUDGE) = K
@@ -4579,7 +4628,10 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       GOTO (91,92), N + 1
 ! SET UP AS IF NO GEOMETRIC SLACK CONSTRAINTS:
    91 NSLAK(1) = 0
@@ -4588,7 +4640,6 @@
       NUMANG = 0
       NUMTOR = 0
       SLONLY = .FALSE.
-!
 ! SEEK L SLAK CARD:
       CALL FINDCD('L','SLAK',4,0,L)
       IF (L.LE.0) THEN
@@ -4613,8 +4664,7 @@
         SLAKWT(1) = 1.
         GOTO 40
       ELSE
-        CALL MESS(LPT,1,'Refinement using bond slack constraints '//    &
-     &            'and conventional observations')
+        CALL MESS(LPT,1,'Refinement using bond slack constraints and conventional observations')
         GOTO 20
       ENDIF
    98 CALL ERRIN2(NSTYP,2,'slack constraint type','not allowed')
@@ -4661,6 +4711,7 @@
       CALL RDREAL(BOBS(NSLAK(1)+1),IPT,IPT,80,IER)
       IF (IER.EQ.100) GOTO 2
       CALL ERRCHK(2,NSLAK(1),500,0,'geometric slack constraints')
+      IF (IBMBER .NE. 0) RETURN
       CALL RDREAL(EOBS(NSLAK(1)),IPT,IPT,80,IER)
 ! COUNT ALSO TOTAL CONSTRAINTS:
       NSKTOT = NSKTOT + 1
@@ -4695,6 +4746,7 @@
       CALL RDREAL(BOBS(NSLAK(1)+1),IPT,IPT,80,IER)
       IF (IER.EQ.100) GOTO 6
       CALL ERRCHK(2,NSLAK(1),500,0,'geometric slack constraints')
+      IF (IBMBER .NE. 0) RETURN
       CALL RDREAL(EOBS(NSLAK(1)),IPT,IPT,80,IER)
 ! COUNT ALSO TOTAL CONSTRAINTS:
       NSKTOT = NSKTOT + 1
@@ -4728,6 +4780,7 @@
       GOTO 63
 ! RECORD CONSTRAINT
    12 CALL ERRCHK(2,NSLAK(1),500,0,'geometric slack constraints')
+      IF (IBMBER .NE. 0) RETURN
 ! THE OBS IS ZERO HERE:
       BOBS(NSLAK(1)) = 0.
       CALL RDREAL(EOBS(NSLAK(1)),IPT,IPT,80,IER)
@@ -4752,6 +4805,7 @@
       IF (IE.NE.0) GOTO 64
 ! RECORD CONSTRAINT:
       CALL ERRCHK(2,NSLAK(1),500,0,'geometric slack constraints')
+      IF (IBMBER .NE. 0) RETURN
       BOBS(NSLAK(1)) = 0.
       CALL RDREAL(EOBS(NSLAK(1)),IPT,IPT,80,IER)
 ! COUNT ALSO TOTAL CONSTRAINTS:
@@ -4796,6 +4850,7 @@
       CALL RDREAL(BOBS(NSLAK(1)+1),IPT,IPT,80,IER)
       IF (IER.EQ.100) GOTO 65
       CALL ERRCHK(2,NSLAK(1),500,0,'geometric slack constraints')
+      IF (IBMBER .NE. 0) RETURN
       CALL RDREAL(EOBS(NSLAK(1)),IPT,IPT,80,IER)
 ! COUNT ALSO TOTAL CONSTRAINTS:
       NSKTOT = NSKTOT + 1
@@ -4812,8 +4867,7 @@
       WRITE (LPT,2051) ANAME, BONNAM(N1), BONNAM(N3)
  2051 FORMAT (/' TORS slack constraint ',A4,' between bonds ',1X,A4, ' and ',A4,':')
       WRITE (LPT,2052) BONNAM(N2), BOBS(NSLAK(1)), EOBS(NSLAK(1))
- 2052 FORMAT ('   with common axis ',A4/'           "Observed" angle =',&
-     &        F10.1,' with esd ',F10.2)
+ 2052 FORMAT ('   with common axis ',A4/'           "Observed" angle =',F10.1,' with esd ',F10.2)
       GOTO 65
 ! READ L EQUA CARDS:
    56 K = 0
@@ -4832,6 +4886,7 @@
       GOTO 66
 ! RECORD CONSTRAINT
    25 CALL ERRCHK(2,NSLAK(1),500,0,'geometric slack constraints')
+      IF (IBMBER .NE. 0) RETURN
 ! THE OBS IS ZERO HERE:
       BOBS(NSLAK(1)) = 0.
       CALL RDREAL(EOBS(NSLAK(1)),IPT,IPT,80,IER)
@@ -4860,9 +4915,10 @@
       N = 0
       IPT = 7
    31 CALL RDWORD(ANAME,LEN,IPT,IPT,80,0,IER)
-!* USE THE ENTRY WHICH DETECTS A READ NUMBER, & SET EOBS
+! USE THE ENTRY WHICH DETECTS A READ NUMBER, & SET EOBS
       IF (IER.EQ.100) GOTO 32
       CALL ERRCHK(2,N,20,0,'atoms constrained to be planar')
+      IF (IBMBER .NE. 0) RETURN
       NIN(N) = NCFIND(ANAME,ATTNAM,NTARNM)
       IF (NIN(N).EQ.0) THEN
         CALL ERRATM(ANAME,2,'L PLAN card')
@@ -4870,7 +4926,7 @@
       ENDIF
       GOTO 31
    32 CALL ADDPLN(NIN,N)
-!*      ITYPSK( ETC TO BE SET EITHER HERE OR IN ADDPLN
+!      ITYPSK( ETC TO BE SET EITHER HERE OR IN ADDPLN
       GOTO 67
   100 RETURN
 
@@ -6431,7 +6487,10 @@
       DIMENSION U(3), H(3), ANS(3), VEC(3,2), COMPA(3,2)
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! SET UP DEFAULT VALUES:
       CALL GMZER(VEC,3,2)
 ! EXAMINE ELEMENTS OF INCOMING PLANE;  NZ=NO. OF ZEROS+1,
@@ -6446,7 +6505,10 @@
     5   LN = I
     4 ENDDO
 ! SET IH,IK,IL TO POINT CYCLICALLY 1,2,3 AS APPROPRIATE
-      IF (NZ.GT.3) CALL ERRMES(-1,0,'zero vector given to INVENT')
+      IF (NZ.GT.3) THEN
+        CALL ERRMES(-1,0,'zero vector given to INVENT')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
       IH = LN
       IF (NZ.EQ.2) IH = LZ
       IK = MOD(IH,3) + 1
@@ -8166,6 +8228,9 @@
       CHARACTER*10 filnam_root
       LOGICAL, EXTERNAL :: Confirm
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 !  UNSCRAMBLE MODE
       M = MODE
       MODE5 = M/10000
@@ -8290,6 +8355,7 @@
       NOPFIL = 0
       GOTO 100
    51 CALL ERRMES(1,0,'*** ERROR No more logical units available')
+      IF (IBMBER .NE. 0) RETURN
 ! 'OPEN' ERROR - CHECK FIRST FOR BRUCE BLIP:
    52 IF (BRUCE .OR. MODE.NE.111) GOTO 152
       BRUCE = .TRUE.
@@ -8372,7 +8438,13 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LENINT/ NBITS
 
-      IF (N.LE.0) CALL ERRIN2(N,0,'misuse of NPACK - N=',' ')
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
+      IF (N.LE.0) THEN
+        CALL ERRIN2(N,0,'misuse of NPACK - N=',' ')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
       GOTO (21,22,23), MODE + 1
 ! SETTING UP:
    21 AM = 1.
@@ -8691,12 +8763,14 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LOONEY/ IOTAB(15), LUNTAB(15)
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       IF (L.EQ.-9999) THEN
         L = NOPFIL(M)
         RETURN
       ENDIF
 ! REQUEST TO OPEN SPECIFIC UNIT NUMBER:
-!
 ! L MUST BE IN TABLE SO THAT NOPFIL CAN FIND IT:
     1 LL = 0
       K = 0
@@ -8717,31 +8791,24 @@
       FILNAM(LL) = FILNAM(K)
       FILNAM(K) = FILTEM
       GOTO 4
-!
 ! L NOT IN TABLE - CHECK SUITABILITY:
     3 IF (L.LT.0) CALL ERRIN2(L,0,'cannot open unit','in OPNFIL')
+      IF (IBMBER .NE. 0) RETURN
       LUNTAB(K) = L
     4 CONTINUE
-!VMS
       INQUIRE (L,NAMED=HASNAM,NAME=FILTEM,OPENED=ISOPEN)
-!VMS
       IOTAB(K) = 0
-!VMS
       IF (.NOT.ISOPEN) GOTO 7
-!VMS
       IOTAB(K) = M
-!VMS
       IF (HASNAM) FILNAM(K) = FILTEM
-      GOTO 100
+      RETURN
 ! NOTE TO PRUNE FILTEM IF NECESSARY
     7 L1 = NOPFIL(M)
-      IF (L1.EQ.L) GOTO 100
+      IF (L1.EQ.L) RETURN
       WRITE (LPT,3001) L, L1
-      CALL BMBOUT
-      RETURN
-!
-  100 RETURN
  3001 FORMAT (/' *** PROGRAM ERROR ** OPNFIL CALL OF NOPFIL HAS RETURNED ',2I5)
+      CALL BMBOUT
+
       END SUBROUTINE OPNFIL
 !
 !*****************************************************************************
@@ -8775,12 +8842,9 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-      COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48),         &
-     &                TRANS1(3), TEMSYM(3,3)
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
-      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
+      COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48), TRANS1(3), TEMSYM(3,3)
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
+      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3), KOM22
 
 ! SET UP X Y Z AND H K L IN ARRAY LET:
       DO I = 1, 3
@@ -8809,7 +8873,6 @@
             CALL NUMDEN(ALAT(J,I),NNUM,NDEN,1,IRR)
             IF (IRR.EQ.0) GOTO 14
             IF (IRR.NE.1) GOTO 15
-!
             INUM(J) = IDIGIT(NNUM)
             IDEN(J) = IDIGIT(NDEN)
             IMID(J) = '/'
@@ -8836,7 +8899,7 @@
           CALL GMEQ(SYM(1,1,INVERS(NO)),TEMSYM,3,3)
           CALL TRANSQ(TEMSYM,3)
         ELSE
-! IF REAL SPACE , USE OPERATOR AS STORED:
+! IF REAL SPACE, USE OPERATOR AS STORED:
           CALL GMEQ(TRANS(1,NO),TRANS1,1,3)
           CALL GMEQ(SYM(1,1,NO),TEMSYM,3,3)
         ENDIF
@@ -9005,12 +9068,14 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       DO I = 1, 20
         IF (IIREAD(I).EQ.'CYC1') GOTO 2
       ENDDO
       GOTO 8
-!
 ! CYC1 READ:
 ! REPLACE BY CURRENTLY REQUIRED CYC1
     2 IPT1 = 2
@@ -9029,7 +9094,7 @@
 ! WAIT UNTIL THIS HAPPENS:
       IF (ICARD(80:80).EQ.' ') GOTO 7
       CALL ERRMES(-1,0,'new I card cannot be written')
-      GOTO 100
+      RETURN
     7 CALL INTCHR(IDIG,NDIG,ITEMP(IPT:IPT),80-IPT,0)
       ITEMP(IPT+NDIG+1:80) = ICARD(IPT1:IPT1+IPT+NDIG+1)
       ICARD = ITEMP
@@ -9113,6 +9178,9 @@
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       MM = M
       IPNAM1 = ' '
       IPNAM2 = ' '
@@ -9130,6 +9198,7 @@
 ! BRANCH ON FAMILY:
       GOTO (11,12,13,14,15,16), IFAM
       CALL ERRIN2(IFAM,0,'PARNAM asked for name in family',' ')
+      IF (IBMBER .NE. 0) RETURN
 ! FAMILY 3 - SET ISP TO BE ITS SPECIES TYPE:
    13 ISP = LF3SP(IGEN,KPHASE,KSOURC)
       GOTO 30
@@ -9393,7 +9462,10 @@
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       CALL GMEQ(AXI(1,I,2),A,1,3)
       CALL GMEQ(AXI(1,J,2),B,1,3)
       CALL GMEQ(AXI(1,K,2),C,1,3)
@@ -9405,9 +9477,12 @@
       CALL VECPRD(C,A,PL2)
       CALL VECPRD(A,B,PL3)
       CALL FIXUNI(PL1,3)
+      IF (IBMBER .NE. 0) RETURN
       CALL FIXUNI(PL2,3)
+      IF (IBMBER .NE. 0) RETURN
       CALL FIXUNI(PL3,3)
-      RETURN
+      IF (IBMBER .NE. 0) RETURN
+
       END SUBROUTINE PLN3AD
 !
 !*****************************************************************************
@@ -9424,7 +9499,7 @@
 !P POLUNI is called from the end of SYMUNI, and would not be useful
 !P outside this context.
 !
-!D Sets the array MARK in /GUNIT/ to indicate the exact treat ment of
+!D Sets the array MARK in /GUNIT/ to indicate the exact treatment of
 !D faces and edges of the reciprocal cell asymmetric unit in order to
 !D deduce the multiplicites of reflections occurring on them.
 !
@@ -10502,6 +10577,9 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       IOU = -9999
       READTI = 0
     4 READ (NUNIT,1000,END=100) ICARD
@@ -10515,7 +10593,10 @@
         IF (M.EQ.5) GOTO 3
         IF (M.GT.0) THEN
 ! ASSUME TITLE GIVEN:
-          IF (IN.LT.0 .OR. READTI.EQ.1) CALL ERRMES(1,0,'letters on data file')
+          IF (IN.LT.0 .OR. READTI.EQ.1) THEN
+            CALL ERRMES(1,0,'letters on data file')
+            IF (IBMBER .NE. 0) RETURN
+          ENDIF
           CALL INPUTN(-1)
           READTI = 1
           GOTO 4
@@ -10609,6 +10690,9 @@
      &                NPCSOU(9,5)
       DATA NFV/'FIX', 'VARY'/
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! COUNT CARDS - MAY BE NONE:
       IN = 0
 ! LOOK FOR EITHER L FIX OR L VARY:
@@ -10647,6 +10731,7 @@
       GOTO (11,12,13,14,13,13,13), I100
 ! UNFORSEEN VALUE:
       CALL ERRMES(1,0,'unforseen word in RDFV')
+      IF (IBMBER .NE. 0) RETURN
 ! 'ONLY'
    11 IF (IONLY(JPHASE).NE.0) GOTO 7
       IONLY(JPHASE) = 1
@@ -10663,6 +10748,7 @@
       I1 = IABS(IFAM)
       GOTO (21,22,21,24,25,21), I1
       CALL ERRMES(1,0,'unforseen word after ALL in RDFV')
+      IF (IBMBER .NE. 0) RETURN
 ! ALL XYZB:
    25 L1 = 1
       GOTO 19
@@ -11260,9 +11346,15 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       NOUT = N
       MM = M
-      IF ((NOUT.NE.1) .AND. (NOUT.NE.2)) CALL ERRMES(-1,0,'RECELL entry neither 1 nor 2')
+      IF ((NOUT.NE.1) .AND. (NOUT.NE.2)) THEN
+        CALL ERRMES(-1,0,'RECELL entry neither 1 nor 2')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
       IN = 3 - NOUT
       IF (MM.EQ.2) GOTO 5
 ! IF WE HAVE A,B, OR A* B* ETC. WE MUST FIRST MAKE FROM THEM THE
@@ -11388,11 +11480,20 @@
       DATA HEADNG/'Symmetry constraints on lattice parameters'/
       DATA LABEL/'  a', '  b', '  c', 'alpha', ' beta', 'gamma'/
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       HEAD = .FALSE.
-      IF (INREAD(19).GT.0) CALL SYMOP
+      IF (INREAD(19).GT.0) THEN
+        CALL SYMOP
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
 ! READ C CARDS:
       NCELL = ICDNO(3)
-      IF (NCELL.EQ.0) CALL ERRMES(3,0,'starting "C" with cell parameters')
+      IF (NCELL.EQ.0) THEN
+        CALL ERRMES(3,0,'starting "C" with cell parameters')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
       ID = IABS(INREAD(3))
       DO IC = 1, NCELL
         CALL INPUTC(ID,CIN)
@@ -11417,9 +11518,11 @@
 ! COMPLAIN IF EITHER a FIXED OR a NOT GIVEN ON CARD
       IF (IPTCEL(1).NE.0) GOTO 30
    10 CALL ERRCH2(LABEL(IP),0,'in symmetry in RECIP -','would be fixed')
+      IF (IBMBER .NE. 0) RETURN
    30 IF (CELL(1,1,1).NE.0.) GOTO 31
 ! ERROR IF ANY ESSENTIAL ITEM MISSING FROM C CARD:
    21 CALL ERRCH2(LABEL(IP),0,'in symmetry in RECIP - ','found zero')
+      IF (IBMBER .NE. 0) RETURN
 ! NOW b and c:
    31 DO IP = 2, 3
         IF (IPTCEL(IP).NE.9999) GOTO 8
@@ -11435,7 +11538,10 @@
         IF (IP1-IP) 13, 11, 12
 ! CELL SIDE RELATION MUST BE SIMPLE EQUALITY:
    13   A = SQRT((AMCELL(IP1)/AMCELL(IP)))
-        IF (ABS(A-1.).GT.0.0001) CALL ERRMES(-1,0,'cell side relation found other than equality')
+        IF (ABS(A-1.).GT.0.0001) THEN 
+          CALL ERRMES(-1,0,'cell side relation found other than equality')
+          IF (IBMBER .NE. 0) RETURN
+        ENDIF
         IF (.NOT.HEAD) CALL MESS(LPT,1,HEADNG)
         HEAD = .TRUE.
         WRITE (LPT,2002) LABEL(IP), LABEL(IP1)
@@ -11813,8 +11919,12 @@
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       GOTO (1,2,3,4,5,6), IN
       CALL ERRIN2(IN,0,'in RFACS call - type','not written')
+      IF (IBMBER .NE. 0) RETURN
 ! INITIAL ENTRY
     1 RNUM = 0.0
       RDEN = 0.0
@@ -12478,7 +12588,7 @@
       GOTO 9
 ! HERE ON TYPE 3 - READ POSSIBLY SEVERAL MORE F CARDS
    23 IF (NT(LFAC).LT.40) GOTO 8
-   35 CALL ERRCH2(LABF,1,'more than %FTAB% entries in table for factor',' ')
+   35 CALL ERRCH2(LABF,1,'more than 40 entries in table for factor',' ')
       GOTO 6
 ! READ HOWEVER MANY NUMBERS THERE ARE ON THE CARD:
     8 IPKEEP = IPT
@@ -12813,7 +12923,10 @@
 !           7:    1/4  1/4  1/4              16:     0    0    0
 !           8:    1/4  1/4   0               17:     0   1/2   0
 !           9:    1/4  3/4   0               18:    1/2  1/2  1/2
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 !     READ THE SYMBOL, DETERMINE BRAVAIS LATTICE AND CRYSTAL FAMILY.
       JS = 1
       JR = 0
@@ -12828,8 +12941,12 @@
         IF (NT(IS:IS).NE.' ') GOTO 10
       ENDDO
       CALL ERRMES(1,0,'No space group symbol')
+      IF (IBMBER .NE. 0) RETURN
    10 NBR = NCFIND(NT(IS:IS),LATLET,7)
-      IF (NBR.EQ.0) CALL ERRCH2(NT(IS:IS),0,'lattice letter','not recognised')
+      IF (NBR.EQ.0) THEN
+        CALL ERRCH2(NT(IS:IS),0,'lattice letter','not recognised')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
       AFACE = (NBR.EQ.1)
       BFACE = (NBR.EQ.2)
       CFACE = (NBR.EQ.3)
@@ -12844,6 +12961,7 @@
         IF (IN(JS:JS).EQ.'-') THEN
           IF (JS.NE.1) THEN
             CALL ERRMES(1,0,'Minus other than at start of first symbol')
+            IF (IBMBER .NE. 0) RETURN
           ELSE
             MINUS = .TRUE.
             JS = JS - 1
@@ -12852,6 +12970,7 @@
         IF (IN(JS:JS).EQ.'/') THEN
           IF (JS.NE.2 .AND. JS.NE.3) THEN
             CALL ERRMES(1,0,'Slash other than within first symbol')
+            IF (IBMBER .NE. 0) RETURN
           ELSE
             SLASH = .TRUE.
           ENDIF
@@ -12872,7 +12991,10 @@
         EMPTY(J) = IN(I:I).EQ.'0'
         LETT1(J) = (NCFIND(IN(I:I),SPALET,6).GT.0)
       ENDDO
-      IF (EMPTY(1)) CALL ERRMES(1,0,'No space group symbols')
+      IF (EMPTY(1)) THEN
+        CALL ERRMES(1,0,'No space group symbols')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
       DO I = 1, 6
         FIRDIG(I) = (FIRST(1:1).EQ.NDIGS(I+1))
       ENDDO
@@ -13676,9 +13798,12 @@
      &                , JTAB(48), NNORD(48), D(3,3)
       COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3), KOM22
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! FIRST LOOK FOR CENTRE OF SYMMETRY:
       CALL SYMCEN(NC)
-!
+      IF (IBMBER .NE. 0) RETURN
 ! CLEAR TABLE OF ORDERS OF ELEMENTS:
       DO N = 1, NOP
         NNORD(N) = 1
@@ -13842,6 +13967,9 @@
       COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48), R(3,3), T(3)
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! INPUT NUMBER OF S CARDS:
       NNSYM = ICDNO(19)
 ! SET "S CARDS READ":
@@ -13873,6 +14001,7 @@
         NO = NOP
 ! DISCOVER WHETHER R,T IS A NEW OPERATOR:
         CALL EQOP(R,T,NO,NLAT)
+        IF (IBMBER .NE. 0) RETURN
         IF (NO.LE.NOP) GOTO 4
 ! IF HERE, NEW OPERATOR:
     5   NOP = NOP + 1
@@ -13887,6 +14016,7 @@
             CALL FRAC3(T)
             NP = NO
             CALL EQOP(R,T,NP,NLAT)
+            IF (IBMBER .NE. 0) RETURN
 ! FILL IN MULTIPLICATION TABLE - THIS IS WHY WE NEED TO KNOW WHICH OPERATOR
 ! IT WAS IF THERE IS A MATCH IN EQOP:
             MLTAB(N1,N2) = NP
@@ -13912,6 +14042,7 @@
         CALL GMPRD(TSYM(1,1,N),ALAT(1,2),T,3,3,1)
         CALL FRAC3(T)
         CALL EQPOS(ALAT,T,M1,M2,4)
+        IF (IBMBER .NE. 0) RETURN
         IF (M2.GT.NLAT) NLAT = M2
       ENDDO
       J = 2
@@ -13920,6 +14051,7 @@
       CALL GMADD(ALAT(1,I),ALAT(1,J),T,1,3)
       CALL FRAC3(T)
       CALL EQPOS(ALAT,T,M1,M2,4)
+      IF (IBMBER .NE. 0) RETURN
       IF (M2.GT.NLAT) NLAT = M2
       J = J + 1
       IF (J.LE.NLAT) GOTO 1
@@ -13927,7 +14059,10 @@
       J = I
       IF (I.LE.NLAT) GOTO 1
 !  COMPLETE GROUP FORMED - NOW FIND GENERATORS
-  102 IF (IERR.NE.0) CALL ERRMES(1,0,'on S cards')
+  102 IF (IERR.NE.0) THEN
+        CALL ERRMES(1,0,'on S cards')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
       CALL SYMGEN
 
       END SUBROUTINE SYMOP
@@ -14181,6 +14316,9 @@
      &                KOM22
       DATA XAX, ZAX/1.0, 0., 0., 0., 0., 1./
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! READ IN POSSIBLE U CARD GIVING 3 TYPICAL INDICES REQUIRED BY USER TO
 ! BE WITHIN THE FINISHED ASYMMETRIC UNIT.  IF NO U CARD USE 13,11,10:
       CALL INPUTU(HT)
@@ -14197,15 +14335,14 @@
       IF (NOPC.GT.1) GOTO 2
 ! SPECIAL FOR P-1 OR P1 WITH FRIEDEL - PUT IN 0 0 1 AND ACCEPT:
       CALL FIXUNI(ZAX,1)
+      IF (IBMBER .NE. 0) RETURN
       GOTO 102
-!
 ! HERE FOR MONOCLINIC ONWARDS:
 ! SET UP AXES OF SYMMETRY ELEMENTS, AND MARK MIRROR PLANES IF THEY EXIST:
 ! NOTE LASTAX=NO. OF LAST ELEMENT OF LIST (IRRELEVANT ELEMENTS ARE ALREADY 0)
 ! NP2 = FIRST "2", NP3 = FIRST "3" (THERE ARE NO -3) AND NP4 = FIRST "4"
 ! AND COUNT "3" AXES IN N3, BEAUSE CUBIC HAS 4 OF THESE AND NOTHING ELSE HAS >1
 ! ALSO, NPP2 IS SET TO POINT TO THE FIRST +2 (NOT -2) FOR THE SPECIAL CASE -3M.
-!
     2 LASTAX = 0
       N3 = 0
       NP2 = 0
@@ -14249,6 +14386,7 @@
       CALL VECPRD(AXI(1,NP4,2),AXI(1,NP3,2),PL1)
 ! AND INSIST ON KEEPING IT:
       CALL FIXUNI(PL1,2)
+      IF (IBMBER .NE. 0) RETURN
 ! NOW DISTINGUISH BETWEEN M3M AND THE REST;  4 3 3 FOR M3M IS NOT SMALL ENOUGH:
       NSTART = NP3 + 1
       NS = 3
@@ -14262,11 +14400,15 @@
         CALL VECPRD(AXI(1,J,2),AXI(1,NP4,2),PL1)
         CALL VECPRD(AXI(1,NP3,2),AXI(1,J,2),PL2)
         CALL FIXUNI(PL1,1)
+        IF (IBMBER .NE. 0) RETURN
         CALL FIXUNI(PL2,1)
+        IF (IBMBER .NE. 0) RETURN
         IF (NICE) 8, 102, 8
 ! IF NICE IS EVER 0 WE ARE HOME - OTHERWISE TAKE NEXT 3RD AXIS:
     8   CALL FIXUNI(PL1,-2)
+        IF (IBMBER .NE. 0) RETURN
         CALL FIXUNI(PL2,-3)
+        IF (IBMBER .NE. 0) RETURN
     7 ENDDO
 !  SHOULD NOT GET HERE:
       GOTO 11
@@ -14296,8 +14438,11 @@
           IF (NICE) 10, 102, 10
 ! IF DO NOT MAKE GOOD CELL, TAKE ALL 3 OUT AGAIN:
    10     CALL FIXUNI(PL1,-1)
+          IF (IBMBER .NE. 0) RETURN
           CALL FIXUNI(PL2,-2)
+          IF (IBMBER .NE. 0) RETURN
           CALL FIXUNI(PL3,-3)
+          IF (IBMBER .NE. 0) RETURN
    39   ENDDO
     9 ENDDO
 ! SHOULD HAVE MADE GOOD UNIT BY NOW:
@@ -14308,6 +14453,7 @@
     5 DO N = 2, LASTAX
         IF (MIRROR(N).EQ.0) GOTO 12
         CALL FIXUNI(AXI(1,N,1),1)
+        IF (IBMBER .NE. 0) RETURN
         IF (NICE) 12, 102, 12
    12 ENDDO
 ! MIRRORS INADEQUATE - PICK OUT THOSE WITH ONLY 1 SYMMETRY ELEMENT (OTHER THAN
@@ -14320,6 +14466,7 @@
       IF (VCTMOD(1.0,PL1,1).LT.0.0001) CALL VECPRD(AXI(1,2,2),ZAX,PL1)
 ! MAKE THIS FIRST PLANE MANDATORY:
       CALL FIXUNI(PL1,2)
+      IF (IBMBER .NE. 0) RETURN
       IF (NICE) 15, 102, 15
 ! NEED ANOTHER PLANE - SWING IT:
    15 DO I = 2, NOPC
@@ -14329,6 +14476,7 @@
    14 ENDDO
 ! SHOULD BE ENOUGH:
       CALL ERRMES(-1,0,'in SYMUNI - single axis not enough')
+      IF (IBMBER .NE. 0) RETURN
 ! HAVE PRINCIPAL AXES PLUS OTHERS - ARE THERE ANY 2'S?
    13 IF (NPP2.EQ.0) GOTO 16
 ! MAKE PLANES THROUGH PRINCIPAL AND A 2 AND OFFER IN TURN:
@@ -14336,16 +14484,22 @@
         IF (NORD(J).NE.2) GOTO 17
         CALL VECPRD(AXI(1,2,2),AXI(1,J,2),PL1)
         CALL FIXUNI(PL1,1)
+        IF (IBMBER .NE. 0) RETURN
         IF (NICE) 17, 102, 17
    17 ENDDO
 ! THIS CONTINUAL OFFERING DOES NOT REMOVE THE PLANES IT DOES NOT LIKE, AND
 ! MAY CAUSE TROUBLE.
-! SHOULD HAVE BEEN ENOUGH - IF NOT ONLY CASE  SHOULD BE CENTRE NOT AT ORIGIN:
+! SHOULD HAVE BEEN ENOUGH - IF NOT ONLY CASE SHOULD BE CENTRE NOT AT ORIGIN:
       IF (.NOT.CENTRC) GOTO 18
       CALL ERRMES(-1,0,'in SYMUNI - principal axis plus 2 axes not enough')
+      IF (IBMBER .NE. 0) RETURN
 ! WE SHOULD BE AT -3M HERE, WITH 2 MIRRORS, BUT UNIT TOO BIG.  HALVE IT:
    16 CALL FIXUNI(AXI(1,2,1),1)
-      IF (NICE.NE.0) CALL ERRMES(-1,0,'reached end of SYMUNI')
+      IF (IBMBER .NE. 0) RETURN
+      IF (NICE.NE.0) THEN
+        CALL ERRMES(-1,0,'reached end of SYMUNI')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
 ! SUCCESSFUL UNIT - TIDY IT AND TRANSFORM TO HOLD TYPICAL REFLECTION:
   102 CALL UNITID
 ! FINAL UNIT - MARK EDGES FOR MULTIPLICITY:
@@ -14577,16 +14731,25 @@
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       NASYM = NOPL
-      IF (NASYM.LE.0 .OR. NASYM.GE.4) CALL ERRIN2(NASYM,0,'in PROGRAM using TRYUNI with NOPL=',' ')
+      IF (NASYM.LE.0 .OR. NASYM.GE.4) THEN
+        CALL ERRIN2(NASYM,0,'in PROGRAM using TRYUNI with NOPL=',' ')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
       I = 1
       DO J = 1, NASYM
     3   IF (NSTAT(I).NE.0) GOTO 4
         I = I + 1
         IF (I.LT.5) GOTO 3
         CALL ERRMES(-1,0,'TRYUNI not given enough planes')
+        IF (IBMBER .NE. 0) RETURN
     4   CALL GMEQ(ASY(1,I),ASYM(1,J),1,3)
-        NNSTAT(I) = NSTAT(J)
+! I think this is wrong: I runs from 1 - 4, J runs from 1 - 3.
+!O        NNSTAT(I) = NSTAT(J)
+        NNSTAT(J) = NSTAT(I)
         I = I + 1
       ENDDO
 ! SET UP PI/3 FOR DETECTION OF ANGLE, NICE INITIALISED TO 'TOO BIG', AND
@@ -14912,6 +15075,9 @@
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! START COUNTS OF VARIABLES AND BASIC VARIABLES:
       LVARV = 0
       LVARB = 0
@@ -14968,6 +15134,7 @@
 ! RECORD KK FOR "CERTAINLY FIXED" (OF WHICH THE OPPOSITE IS "PROBABLY VARIED")
       IF (FX) THEN
         CALL ERRCHK(2,LFIX,2000,0,'LSQ parameters in VARMAK')
+        IF (IBMBER .NE. 0) RETURN
         KPRVR(LFIX) = KK
       ENDIF
 ! NEXT PARAMETER
@@ -14987,7 +15154,7 @@
           IF (NFIND(KKCON(K),KKCOL,NPAR).GT.0) GOTO 42
 ! ADD TO LIST:
    43     CALL ERRCHK(2,NPAR,500,0,'parameters in strict constraints')
-!
+          IF (IBMBER .NE. 0) RETURN
 ! IN DESCENDING SEQUENCE (SO THAT REDUNDANTS WILL BE LATER PARAMETERS)
           DO J = 1, NPAR - 1
             IF (KKCOL(J).GT.KKCON(K)) GOTO 44
@@ -15012,6 +15179,7 @@
       DO I = 1, NUMCON
         IF (KSTCON(I).EQ.0) GOTO 51
         CALL ERRCHK(2,NCON,200,0,'strict constraints')
+        IF (IBMBER .NE. 0) RETURN
         DO K = KPTCON(I), KPTCON(I+1) - 1
 ! NOT IF ALREADY FIXED:
           IF (LFIX.EQ.0) GOTO 53
@@ -15074,6 +15242,7 @@
         ENDDO
 ! HERE WE HAVE DISCOVERED THAT THE PARAMETER IS ACTUALLY FIXED:
         CALL ERRCHK(2,LFIX,2000,0,'LSQ parameters in VARMAK')
+        IF (IBMBER .NE. 0) RETURN
         KPRVR(LFIX) = KKCOL(I)
         KREDUN(I) = 0
         GOTO 68
@@ -15093,7 +15262,7 @@
       IF (NFIND(KK,KPRVR,LFIX).GT.0) GOTO 21
 ! IF NOT DESIGNATED "FIX" IT MUST BE A VARIABLE:
    23 CALL ERRCHK(2,LVARV,500,0,'variables in LSQ')
-!
+      IF (IBMBER .NE. 0) RETURN
 ! COUNT VARIABLES/FAMILY/PHASE:
       NVARF(IFAM,JPHASE,JSOURC) = NVARF(IFAM,JPHASE,JSOURC) + 1
 ! RECORD STARTS OF FAMILIES IN ANY VARIABLES VECTOR, -1:
@@ -15115,6 +15284,7 @@
       ENDIF
 ! MAKE IT BASIC:
       CALL ERRCHK(2,LVARB,MaxBVar,0,'basic variables in LSQ')
+      IF (IBMBER .NE. 0) RETURN
 ! RECORD CROSS POINTERS FOR VARIABLES AND BASIC VARIABLES:
       LVRBS(LVARV) = LVARB
       LBSVR(LVARB) = LVARV
@@ -15158,6 +15328,7 @@
         LV = KREDUN(I)
         IF (LV.EQ.0) GOTO 30
         CALL ERRCHK(2,JCONST,300,0,'strict constraints')
+        IF (IBMBER .NE. 0) RETURN
 ! RECORD CROSS POINTERS FOR VARIABLES AND REDUNDANT VARIABLES:
         LVRBS(LV) = -JCONST
         LRDVR(JCONST) = LV
@@ -15251,9 +15422,13 @@
       COMMON /WDSPC / IWDNUM, IWDSPC(60)
       COMMON /WORDS / LSQWD(60)
       CHARACTER*4 LSQWD
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! CHECK ARRAY SIZES:
       CALL ERRCHK(1,IWDNUM+NW,60,0,'words specifying LSQ problem')
+      IF (IBMBER .NE. 0) RETURN
       DO I = 1, NW
         LSQWD(I+IWDNUM) = WORD(I)
         IF (MEAN(1,I).LT.0) THEN
