@@ -74,8 +74,8 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt /winapp
-# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /check:bounds /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:0 /traceback /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
-# SUBTRACT F90 /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations
+# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /traceback /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
+# SUBTRACT F90 /check:bounds /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /MTd /W4 /Gm /GX /ZI /O2 /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -107,7 +107,6 @@ DEP_F90_ALIGN=\
 	".\Debug\SOLVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\Variables.mod"\
@@ -325,7 +324,7 @@ SOURCE=.\get_logref.f90
 DEP_F90_GET_L=\
 	".\Debug\ATMVAR.MOD"\
 	".\Debug\REFVAR.MOD"\
-	".\GLBVAR.INC"\
+	".\Lattice.inc"\
 	".\params.inc"\
 	
 # End Source File
@@ -338,7 +337,6 @@ DEP_F90_INIT_=\
 	".\Debug\SOLVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -431,7 +429,6 @@ DEP_F90_MAIN_=\
 SOURCE=.\MCBack.f90
 DEP_F90_MCBAC=\
 	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\Variables.mod"\
@@ -534,6 +531,7 @@ DEP_F90_PF_SI=\
 
 SOURCE=.\plot_test.F90
 DEP_F90_PLOT_=\
+	".\Debug\PO_VAR.mod"\
 	".\Debug\SOLVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
@@ -656,7 +654,6 @@ SOURCE=.\RRVAR.f90
 
 SOURCE=.\SA_Begin.f90
 DEP_F90_SA_BE=\
-	".\Debug\ATMVAR.MOD"\
 	".\Debug\PO_VAR.mod"\
 	".\Debug\REFVAR.MOD"\
 	".\DRUID_HEADER.mod"\
@@ -696,7 +693,6 @@ DEP_F90_SA_MA=\
 	".\Debug\SAMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\Variables.mod"\
@@ -725,6 +721,7 @@ DEP_F90_SA_SO=\
 SOURCE=.\SA_structure_output.f90
 DEP_F90_SA_ST=\
 	".\Debug\ATMVAR.MOD"\
+	".\Debug\PO_VAR.mod"\
 	".\Debug\SOLVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
@@ -741,7 +738,6 @@ SOURCE=.\SA_summary.f90
 DEP_F90_SA_SU=\
 	".\Debug\SOLVAR.MOD"\
 	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
 	".\params.inc"\
 	".\POLY_COLOURS.INC"\
 	".\Variables.mod"\
@@ -805,6 +801,7 @@ DEP_F90_TSA_S=\
 SOURCE=.\tSA_simplex.f90
 DEP_F90_TSA_SI=\
 	".\Debug\ATMVAR.MOD"\
+	".\Debug\PO_VAR.mod"\
 	".\Debug\SOLVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
@@ -880,7 +877,7 @@ DEP_F90_VALCH=\
 	".\Debug\PO_VAR.mod"\
 	".\Debug\REFVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
-	".\GLBVAR.INC"\
+	".\Lattice.inc"\
 	".\params.inc"\
 	".\Variables.mod"\
 	
@@ -889,6 +886,7 @@ DEP_F90_VALCH=\
 
 SOURCE=.\valchipro.f90
 DEP_F90_VALCHI=\
+	".\Debug\REFVAR.MOD"\
 	".\params.inc"\
 	
 # End Source File
