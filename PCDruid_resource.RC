@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 24/Nov/2001 15:09:35
+// Modified : 25/Nov/2001 17:07:38
 //
 ///////////////////////////////////////////////////
 //
@@ -494,6 +494,7 @@
 #define IDF_Limit1                       1219
 #define IDF_Limit2                       1220
 #define IDF_InvertSelection              1221
+#define IDF_OutputChi2vsMoves            1099
 
 ///////////////////////////////////////////////////
 //
@@ -2382,15 +2383,16 @@ BEGIN
     CONTROL "Debug message",IDF_ViewExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   39,    9,  180,   14
     CONTROL "Debug message",IDF_ViewArg,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,   81,   27,   73,   14
     CONTROL "B&rowse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  228,    9,   40,   14
-    CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   11,   25,    8
-    CONTROL "Arguments for viewer",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   12,   30,   66,    8
+    CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    9,   11,   27,    8
+    CONTROL "Arguments for viewer",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,    9,   30,   68,    8
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  120,  138,   40,   14
     CONTROL "Auto local &minimise",IDF_AutoLocalOptimise,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  122,   74,   14
     CONTROL "Output .c&ssr",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   80,   54,   14
     CONTROL "Output .cc&l",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   94,   54,   14
-    CONTROL "Use &hydrogens",IDF_UseHydrogens,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   52,   60,   14
-    CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   66,   80,   14
+    CONTROL "Use &hydrogens",IDF_UseHydrogens,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   52,   62,   14
+    CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   66,   84,   14
     CONTROL "Output .pro",IDF_OutputPRO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  108,   54,   14
+    CONTROL "Output chi-squared vs. moves",IDF_OutputChi2vsMoves,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  130,   52,  110,   14
 END
 
 IDD_Configuration RCDATA
@@ -2402,6 +2404,7 @@ BEGIN
 " 1296 0 \n"
 " 1131 0 \n"
 " 1043 1 \n"
+" 1099 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"

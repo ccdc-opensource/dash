@@ -55,6 +55,7 @@
   !    CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
+      CALL OutputChi2vsMoves
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Enabled)
       DoSaRedraw = .FALSE.

@@ -48,14 +48,15 @@
       REAL, DIMENSION(MaxIter,MaxRun) :: chi_sqd
       INTEGER           :: it_count
       INTEGER           :: Run_Number
-      COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, Run_Number
+      INTEGER        ::NumDynamicX
+      COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, Run_Number, NumDynamicX
 
       EXTERNAL DealWithChiSqdPlot
 
       Run_Number = SA_Run_Number + 1
 !
 ! Clear Chi-sqd array between starting sets of SA Runs
-      IF ((Iteration.EQ.1).and.(Run_Number.EQ.1)) Chi_sqd = 0.0
+      IF ((Iteration.EQ.1).AND.(Run_Number.EQ.1)) Chi_sqd = 0.0
       it_count = iteration
 !
 ! Record chi-sqd value in array.  Chi-sqd values following it_count entry
@@ -68,7 +69,7 @@
       y_max = chi_sqd(1, Run_Number)*1.25
 !
 ! If first iteration then record number of moves for minimum value of x axis on graph
-      IF (It_count.EQ.1) x_min = ntotmov
+      IF (It_count.EQ.1) x_min = FLOAT(ntotmov)
  
 ! If this is the first SA run and 2 points for the line graph have been determined, open Child Window
       IF ((Run_Number.EQ.1) .AND. (it_count.EQ.2)) THEN
@@ -77,7 +78,7 @@
         CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
       ENDIF
 
-      IF ((ChiSqdChildWindows(ChiHandle).EQ.1).and.(It_count.GE.2)) CALL plotting_chi_sqd(ChiHandle)
+      IF ((ChiSqdChildWindows(ChiHandle).EQ.1).AND.(It_count.GE.2)) CALL plotting_chi_sqd(ChiHandle)
 
       END SUBROUTINE PrepareChiSqPlotData
 !
@@ -90,23 +91,25 @@
 
       IMPLICIT NONE
 
+      INTEGER, INTENT (IN  ) :: ChiHandle
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'poly_colours.inc'
 
-      INTEGER        :: Run_Number
-      INTEGER        :: it_count
       INTEGER        :: ixaxis
       REAL           :: x_max
-      REAL           :: x_min
-      REAL           :: y_max
-      REAL, DIMENSION(MaxIter, MaxRun) :: chi_sqd
       REAL, DIMENSION(MaxIter+1) :: Xarray
       REAL           ::DynamicMaxX
+      DATA  DynamicMaxX / 0.0 /
       REAL           ::TempMaxX
       INTEGER        ::NumDynamicX
-      DATA  DynamicMaxX / 0.0 /
-      INTEGER ChiHandle
-      COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, Run_Number
+
+      REAL, DIMENSION(MaxIter, MaxRun) :: chi_sqd
+      REAL           :: x_min
+      INTEGER        :: it_count
+      REAL           :: y_max
+      INTEGER        :: Run_Number
+      COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, Run_Number, NumDynamicX
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
@@ -127,9 +130,9 @@
 
 ! calculate array of x values for graph
       ixaxis = NINT(MaxMoves/(x_min))
-        DO j = 1, (ixaxis+1)
-           Xarray(j) = j*(x_min)
-        ENDDO
+      DO j = 1, (ixaxis+1)
+        Xarray(j) = j*(x_min)
+      ENDDO
 !
 ! Set x_max for graph.  When have dynamic x-axis (first SA Run) the maximum value possible for 
 ! the xaxis is the maximum number of moves
@@ -139,9 +142,8 @@
         ELSE
           x_max = Xarray(it_count)
         ENDIF
-      ENDIF
+      ELSE
 ! Xaxis max is largest value of x recorded so far
-      IF (Run_Number.gt.1) THEN
         x_max = DynamicMaxX
       ENDIF
 
@@ -241,7 +243,7 @@
           TempMaxX = it_count*x_min
             IF(TempMaxX.GT.DynamicMaxX) THEN
               DynamicMaxX = TempMaxX
-              NumDynamicX = DynamicMaxX/x_min
+              NumDynamicX = NINT(DynamicMaxX/x_min)
             ENDIF
         ENDIF
 
@@ -300,6 +302,54 @@
       ENDDO
 
       END SUBROUTINE Close_Chisq_Plot
+!
+!*****************************************************************************
+!
+      SUBROUTINE OutputChi2vsMoves
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL, DIMENSION(MaxIter, MaxRun) :: chi_sqd
+      REAL           :: x_min
+      INTEGER        :: it_count
+      REAL           :: y_max
+      INTEGER        :: Run_Number
+      INTEGER        ::NumDynamicX
+      COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, Run_Number, NumDynamicX
+
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file
+
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
+
+      LOGICAL, EXTERNAL :: Get_OutputChi2vsMoves
+      INTEGER tFileHandle, iLen, I, J
+      CHARACTER*80 tFileName
+
+      IF (.NOT. Get_OutputChi2vsMoves()) RETURN
+      tFileHandle = 10
+      tFileName = pdb_file
+      iLen = LEN_TRIM(tFileName)
+      tFileName = tFileName(1:iLen-3)//'chi'
+      OPEN(UNIT=tFileHandle,FILE=tFileName(1:iLen),ERR=999)
+      DO I = 1, NumDynamicX
+        WRITE(tFileHandle,'(99(F9.2,1X))',ERR=999) (chi_sqd(I,J),J=1,SA_Run_Number) ! SA_Run_Number = last completed SA run
+      ENDDO
+      CLOSE(tFileHandle)
+      RETURN
+  999 CALL ErrorMessage('Could not access profile chi-squared versus moves file.')
+      CLOSE(tFileHandle)
+
+      END SUBROUTINE OutputChi2vsMoves
 !
 !*****************************************************************************
 !
