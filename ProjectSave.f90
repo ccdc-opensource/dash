@@ -97,27 +97,28 @@
 
 ! Store the Z-matrices
       CALL FileWriteInteger(tFileHandle,RecNr,nfrag)
-      DO ifrg = 1, maxfrg
-        IF (gotzmfile(ifrg)) THEN
-          CALL FileWriteString(tFileHandle,RecNr,frag_file(ifrg))
-          CALL FileWriteInteger(tFileHandle,RecNr,icomflg(ifrg))
-          CALL FileWriteInteger(tFileHandle,RecNr,natoms(ifrg))
-          DO J = 1, natoms(ifrg)
-            CALL FileWriteInteger(tFileHandle,RecNr,ioptb(J,ifrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,iopta(J,ifrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,ioptt(J,ifrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,iz1(J,ifrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,iz2(J,ifrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,iz3(J,ifrg))
-            CALL FileWriteReal(tFileHandle,RecNr,SNGL(blen(J,ifrg)))
-            CALL FileWriteReal(tFileHandle,RecNr,SNGL(alph(J,ifrg)))
-            CALL FileWriteReal(tFileHandle,RecNr,SNGL(bet(J,ifrg)))
-            CALL FileWriteString(tFileHandle,RecNr,asym(J,ifrg))
-            CALL FileWriteString(tFileHandle,RecNr,OriginalLabel(J,ifrg))
-            CALL FileWriteReal(tFileHandle,RecNr,tiso(J,ifrg))
-            CALL FileWriteReal(tFileHandle,RecNr,occ(J,ifrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,izmoid(J,ifrg))
-            CALL FileWriteInteger(tFileHandle,RecNr,izmbid(J,ifrg))
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          CALL FileWriteInteger(tFileHandle,RecNr,zmNumberOfCopies(iFrg))
+          CALL FileWriteString(tFileHandle,RecNr,frag_file(iFrg))
+          CALL FileWriteInteger(tFileHandle,RecNr,icomflg(iFrg))
+          CALL FileWriteInteger(tFileHandle,RecNr,natoms(iFrg))
+          DO J = 1, natoms(iFrg)
+            CALL FileWriteInteger(tFileHandle,RecNr,ioptb(J,iFrg))
+            CALL FileWriteInteger(tFileHandle,RecNr,iopta(J,iFrg))
+            CALL FileWriteInteger(tFileHandle,RecNr,ioptt(J,iFrg))
+            CALL FileWriteInteger(tFileHandle,RecNr,iz1(J,iFrg))
+            CALL FileWriteInteger(tFileHandle,RecNr,iz2(J,iFrg))
+            CALL FileWriteInteger(tFileHandle,RecNr,iz3(J,iFrg))
+            CALL FileWriteReal(tFileHandle,RecNr,SNGL(blen(J,iFrg)))
+            CALL FileWriteReal(tFileHandle,RecNr,SNGL(alph(J,iFrg)))
+            CALL FileWriteReal(tFileHandle,RecNr,SNGL(bet(J,iFrg)))
+            CALL FileWriteString(tFileHandle,RecNr,asym(J,iFrg))
+            CALL FileWriteString(tFileHandle,RecNr,OriginalLabel(J,iFrg))
+            CALL FileWriteReal(tFileHandle,RecNr,tiso(J,iFrg))
+            CALL FileWriteReal(tFileHandle,RecNr,occ(J,iFrg))
+            CALL FileWriteInteger(tFileHandle,RecNr,izmoid(J,iFrg))
+            CALL FileWriteInteger(tFileHandle,RecNr,izmbid(J,iFrg))
           ENDDO
         ENDIF
       ENDDO
