@@ -144,25 +144,23 @@
 ! identical results.
       kk = 0
       DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          DO ii = 1, izmpar(iFrg)
-            kk = kk + 1
-            SELECT CASE (kzmpar(ii,iFrg))
-              CASE (1) ! translation
-                vm(kk) = 0.1
-              CASE (2) ! quaternion
-                vm(kk) = 0.1
-              CASE (3) ! torsion
-                vm(kk) = 10.0
-              CASE (4) ! angle
-                vm(kk) = 1.0
-              CASE (5) ! bond
-                vm(kk) = 0.1*(ub(kk)-lb(kk))
-              CASE (6) ! single rotation axis
-                vm(kk) = 0.1
-            END SELECT
-          ENDDO
-        ENDIF
+        DO ii = 1, izmpar(iFrg)
+          kk = kk + 1
+          SELECT CASE (kzmpar(ii,iFrg))
+            CASE (1) ! translation
+              vm(kk) = 0.1
+            CASE (2) ! quaternion
+              vm(kk) = 0.1
+            CASE (3) ! torsion
+              vm(kk) = 10.0
+            CASE (4) ! angle
+              vm(kk) = 1.0
+            CASE (5) ! bond
+              vm(kk) = 0.1*(ub(kk)-lb(kk))
+            CASE (6) ! single rotation axis
+              vm(kk) = 0.1
+          END SELECT
+        ENDDO
       ENDDO
       IF (PrefParExists) THEN
         kk = kk + 1

@@ -962,12 +962,10 @@
           ENDDO
         ENDIF
         NumOfAtmPerElm = 0
-        DO iFrg = 1, maxfrg
-          IF (gotzmfile(iFrg)) THEN
-            DO i = 1, natoms(iFrg)
-              CALL INC(NumOfAtmPerElm(zmElementCSD(i,iFrg)))
-            ENDDO
-          ENDIF
+        DO iFrg = 1, nFrag
+          DO i = 1, natoms(iFrg)
+            CALL INC(NumOfAtmPerElm(zmElementCSD(i,iFrg)))
+          ENDDO
         ENDDO
         tString1 = 'SFAC'
         tString2 = 'UNIT'
@@ -988,63 +986,62 @@
       itotal = 0
       ipcount = 0
       DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          itotal = iiact
+        itotal = iiact
 ! Write out the translation/rotation information for each residue
-          IF (tSavePDB) THEN
-            WRITE (hFilePDB,1039,ERR=999) iFrg
- 1039       FORMAT ('REMARK Start of molecule number ',I6)
-            WRITE (hFilePDB,1037,ERR=999) (BestValuesDoF(ij,tRunNr),ij=ipcount+1,ipcount+3)
- 1037       FORMAT ('REMARK Translations: ',3F10.6)
-          ENDIF
-          IF (natoms(iFrg) .GT. 1) THEN
+        IF (tSavePDB) THEN
+          WRITE (hFilePDB,1039,ERR=999) iFrg
+ 1039     FORMAT ('REMARK Start of molecule number ',I6)
+          WRITE (hFilePDB,1037,ERR=999) (BestValuesDoF(ij,tRunNr),ij=ipcount+1,ipcount+3)
+ 1037     FORMAT ('REMARK Translations: ',3F10.6)
+        ENDIF
+        IF (natoms(iFrg) .GT. 1) THEN
 ! Normalise the Q-rotations before writing them out ...
-            qvals(1) = BestValuesDoF(ipcount+4,tRunNr)
-            qvals(2) = BestValuesDoF(ipcount+5,tRunNr)
-            qvals(3) = BestValuesDoF(ipcount+6,tRunNr)
-            qvals(4) = BestValuesDoF(ipcount+7,tRunNr)
-            qnrm = SQRT(qvals(1)**2 + qvals(2)**2 + qvals(3)**2 + qvals(4)**2)
-            qvals = qvals / qnrm
-            IF (tSavePDB) THEN
-              WRITE (hFilePDB,1038,ERR=999) (qvals(ij),ij=1,4)
- 1038         FORMAT ('REMARK Q-Rotations : ',4F10.6)
-            ENDIF
-            ipcount = ipcount + izmpar(iFrg)
+          qvals(1) = BestValuesDoF(ipcount+4,tRunNr)
+          qvals(2) = BestValuesDoF(ipcount+5,tRunNr)
+          qvals(3) = BestValuesDoF(ipcount+6,tRunNr)
+          qvals(4) = BestValuesDoF(ipcount+7,tRunNr)
+          qnrm = SQRT(qvals(1)**2 + qvals(2)**2 + qvals(3)**2 + qvals(4)**2)
+          qvals = qvals / qnrm
+          IF (tSavePDB) THEN
+            WRITE (hFilePDB,1038,ERR=999) (qvals(ij),ij=1,4)
+ 1038       FORMAT ('REMARK Q-Rotations : ',4F10.6)
           ENDIF
-          DO i = 1, natoms(iFrg)
-            iiact = iiact + 1
-            iOrig = izmbid(i,iFrg)
-            ii = OrderedAtm(itotal + iOrig)
+          ipcount = ipcount + izmpar(iFrg)
+        ENDIF
+        DO i = 1, natoms(iFrg)
+          iiact = iiact + 1
+          iOrig = izmbid(i,iFrg)
+          ii = OrderedAtm(itotal + iOrig)
 ! The CSSR atom lines
-            IF (tSaveCSSR) THEN
-              WRITE (hFileCSSR,1110,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4),(XAtmCoords(k,ii,tRunNr),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
- 1110         FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
-            ENDIF
-            IF (tSavePDB) THEN
+          IF (tSaveCSSR) THEN
+            WRITE (hFileCSSR,1110,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4),(XAtmCoords(k,ii,tRunNr),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
+ 1110       FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
+          ENDIF
+          IF (tSavePDB) THEN
 ! The PDB atom lines
-              xc = XAtmCoords(1,ii,tRunNr) * f2cpdb(1,1) + &
-                   XAtmCoords(2,ii,tRunNr) * f2cpdb(1,2) + &
-                   XAtmCoords(3,ii,tRunNr) * f2cpdb(1,3)
-              yc = XAtmCoords(2,ii,tRunNr) * f2cpdb(2,2) + &
-                   XAtmCoords(3,ii,tRunNr) * f2cpdb(2,3)
-              zc = XAtmCoords(3,ii,tRunNr) * f2cpdb(3,3)
+            xc = XAtmCoords(1,ii,tRunNr) * f2cpdb(1,1) + &
+                 XAtmCoords(2,ii,tRunNr) * f2cpdb(1,2) + &
+                 XAtmCoords(3,ii,tRunNr) * f2cpdb(1,3)
+            yc = XAtmCoords(2,ii,tRunNr) * f2cpdb(2,2) + &
+                 XAtmCoords(3,ii,tRunNr) * f2cpdb(2,3)
+            zc = XAtmCoords(3,ii,tRunNr) * f2cpdb(3,3)
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
-              IF (asym(iOrig,iFrg)(2:2).EQ.' ') THEN
-                WRITE (hFilePDB,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), xc, yc, zc, &
-                                occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:1)
- 1120           FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
-              ELSE
-                WRITE (hFilePDB,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), xc, yc, zc, &
-                                occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:2)
- 1130           FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
-              ENDIF
+            IF (asym(iOrig,iFrg)(2:2).EQ.' ') THEN
+              WRITE (hFilePDB,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), xc, yc, zc, &
+                              occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:1)
+ 1120         FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
+            ELSE
+              WRITE (hFilePDB,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), xc, yc, zc, &
+                              occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:2)
+ 1130         FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
             ENDIF
+          ENDIF
 ! The CCL atom lines
-            IF (tSaveCCL) THEN
-              WRITE (hFileCCL,1033,ERR=999) asym(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), tiso(iOrig,iFrg), occ(iOrig,iFrg) 
- 1033         FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
-            ENDIF
+          IF (tSaveCCL) THEN
+            WRITE (hFileCCL,1033,ERR=999) asym(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), tiso(iOrig,iFrg), occ(iOrig,iFrg) 
+ 1033       FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
+          ENDIF
 ! The CIF atom lines
 !C # 9. ATOMIC COORDINATES AND DISPLACEMENT PARAMETERS
 !C loop_
@@ -1057,48 +1054,45 @@
 !C        _atom_site_B_iso_or_equiv
 !C      C1     -0.10853   0.45223   0.14604  1.0 Biso 3.0
 !C      C2     -0.05898   0.41596   0.27356  1.0 Biso 3.0
-            IF (tSaveCIF) THEN
-              WRITE (hFileCIF,1034,ERR=999) OriginalLabel(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), occ(iOrig,iFrg), tiso(iOrig,iFrg) 
- 1034         FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F5.2)
-            ENDIF
-            IF (tSaveRES) THEN
+          IF (tSaveCIF) THEN
+            WRITE (hFileCIF,1034,ERR=999) OriginalLabel(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), occ(iOrig,iFrg), tiso(iOrig,iFrg) 
+ 1034       FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F5.2)
+          ENDIF
+          IF (tSaveRES) THEN
 ! Determine this atom's entry number in the scattering factor list
-              tElement = zmElementCSD(iOrig,iFrg)
-              iScat = 0
-              DO k1 = 1, tElement
-                IF (NumOfAtmPerElm(k1) .NE. 0) iScat = iScat + 1
-              ENDDO
-              WRITE (hFileRES,1035,ERR=999) OriginalLabel(iOrig,iFrg), iScat, (XAtmCoords(k,ii,tRunNr),k=1,3), &
-                                    occ(iOrig,iFrg), tiso(iOrig,iFrg)/(8.0*(PI**2)) 
- 1035         FORMAT (A5,1X,I2,1X,3(F10.5,1X),F5.3,1X,F5.3)
-            ENDIF
-          ENDDO ! loop over atoms
-        ENDIF
+            tElement = zmElementCSD(iOrig,iFrg)
+            iScat = 0
+            DO k1 = 1, tElement
+              IF (NumOfAtmPerElm(k1) .NE. 0) iScat = iScat + 1
+            ENDDO
+            WRITE (hFileRES,1035,ERR=999) OriginalLabel(iOrig,iFrg), iScat, (XAtmCoords(k,ii,tRunNr),k=1,3), &
+                                  occ(iOrig,iFrg), tiso(iOrig,iFrg)/(8.0*(PI**2)) 
+ 1035       FORMAT (A5,1X,I2,1X,3(F10.5,1X),F5.3,1X,F5.3)
+          ENDIF
+        ENDDO ! loop over atoms
       ENDDO ! loop over Z-matrices
       IF (tSaveCSSR) CLOSE (hFileCSSR)
       IF (tSavePDB) THEN
 ! Per Z-matrix, write out the connectivity.
         TotNumBonds = 0
         NumOfAtomsSoFar = 0
-        DO iFrg = 1, maxfrg
-          IF (gotzmfile(iFrg)) THEN
-            IF (NumberOfBonds(iFrg) .GT. 0) THEN
-              DO J = 1, NumberOfBonds(iFrg)
+        DO iFrg = 1, nFrag
+          IF (NumberOfBonds(iFrg) .GT. 0) THEN
+            DO J = 1, NumberOfBonds(iFrg)
 ! Due to the backmapping, it is possible that the original number of the first atom is greater than the
 ! original number of the second atom. Mercury can't always read pdb files where this is the case.
-                iBond1 = izmoid(Bonds(1,J,iFrg),iFrg)+NumOfAtomsSoFar
-                iBond2 = izmoid(Bonds(2,J,iFrg),iFrg)+NumOfAtomsSoFar
-                IF (iBond1 .GT. iBond2) THEN
-                  iTem   = iBond1
-                  iBond1 = iBond2
-                  iBond2 = iTem
-                ENDIF
-                WRITE(hFilePDB,'(A6,I5,I5)',ERR=999) 'CONECT', iBond1, iBond2
-              ENDDO
-            ENDIF
-            NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
-            TotNumBonds = TotNumBonds + NumberOfBonds(iFrg)
+              iBond1 = izmoid(Bonds(1,J,iFrg),iFrg)+NumOfAtomsSoFar
+              iBond2 = izmoid(Bonds(2,J,iFrg),iFrg)+NumOfAtomsSoFar
+              IF (iBond1 .GT. iBond2) THEN
+                iTem   = iBond1
+                iBond1 = iBond2
+                iBond2 = iTem
+              ENDIF
+              WRITE(hFilePDB,'(A6,I5,I5)',ERR=999) 'CONECT', iBond1, iBond2
+            ENDDO
           ENDIF
+          NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
+          TotNumBonds = TotNumBonds + NumberOfBonds(iFrg)
         ENDDO ! loop over Z-matrices
         WRITE (hFilePDB,"('END')",ERR=999)
         CLOSE (hFilePDB)
