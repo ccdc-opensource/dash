@@ -33,6 +33,8 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
+      INCLUDE 'Lattice.inc'
+
       CHARACTER*2  AtmElement(MAXATM_2)
       INTEGER      i
       REAL         Coordinates(3,MAXATM_2)
@@ -43,15 +45,17 @@
       CHARACTER*50 tString
       INTEGER*4    SERIAL
       CHARACTER*4  NAME(MAXATM_2)
-      LOGICAL, EXTERNAL :: ChrIsLetter
       REAL         tX, tY, tZ
+      LOGICAL      IsFractional
+      REAL         tCellPar(1:6)
+      LOGICAL, EXTERNAL :: ChrIsLetter
       INTEGER, EXTERNAL :: WriteMol2, ElmSymbol2CSD
 
 ! Initialise to 'failure'
       CSSR2Mol2 = 0
       natcry = 0
       InputFile = 10
-      OPEN(UNIT=InputFile,file=TheFileName,form='formatted',status='old',err=998)
+      OPEN(UNIT=InputFile,file=TheFileName,form='formatted',status='old',err=999)
 ! Initialise cell parameters to invalid values
 ! If no valid values are read, then the atomic co-ordinates must be orthogonal
       a = 0.0
@@ -61,44 +65,45 @@
       beta  = 0.0
       gamma = 0.0
 ! Record # 1 : unit cell lengths
-      READ(InputFile,'(38X,3F8.3)',ERR=10,END=999) a, b, c ! On error, just continue
+      READ(InputFile,'(38X,3F8.3)',ERR=999,END=999) a, b, c
 ! Record # 2 : unit cell angles
-   10 READ(InputFile,'(21X,3F8.3)',ERR=20,END=999) alpha, beta, gamma ! On error, just continue
+   10 READ(InputFile,'(21X,3F8.3)',ERR=999,END=999) alpha, beta, gamma
 ! Record # 3 : number of atoms and co-ordinate system.
 ! INORM = 0   =>   fractional co-ordinates
 ! INORM = 1   =>   orthogonal co-ordinates
-   20 READ(InputFile,'(2I4)',ERR=990,END=999) natcry, INORM
+   20 READ(InputFile,'(2I4)',ERR=999,END=999) natcry, INORM
       IF (natcry .EQ. 0) THEN
         CALL ErrorMessage('No Atoms found.')
         RETURN
       ENDIF
-      IF (INORM .EQ. 1) THEN
-        a = 1.0
-        b = 1.0
-        c = 1.0
-        alpha = 90.0
-        beta  = 90.0
-        gamma = 90.0
-      ENDIF
-      CALL LatticeCellParameters2Lattice(a, b, c, alpha, beta, gamma, tLattice)
+      IsFractional = (INORM .EQ. 0)
+      IF (IsFractional) CALL LatticeCellParameters2Lattice(a, b, c, alpha, beta, gamma, tLattice)
 ! Record # 4 : second title, just skip.
       READ(InputFile,'(A50)',ERR=30,END=999) tString ! On error, just continue
    30 CONTINUE
       DO I = 1, natcry
-        READ(InputFile,'(I4,1X,A4,2X,F9.5,1X,F9.5,1X,F9.5)',ERR=990,END=999) SERIAL, NAME(I), &
+        READ(InputFile,'(I4,1X,A4,2X,F9.5,1X,F9.5,1X,F9.5)',ERR=999,END=999) SERIAL, NAME(I), &
                                                             Coordinates(1,I), Coordinates(2,I), Coordinates(3,I)
       ENDDO
+      CLOSE(InputFile)
 ! The variable X holds the atomic fractional co-ordinates, the mol2 file
 ! needs orthogonal co-ordinates => convert
-      DO I = 1, natcry
-        tX = Coordinates(1,I) * tLattice(1,1) + Coordinates(2,I) * tLattice(1,2) + Coordinates(3,I) * tLattice(1,3)
-        tY = Coordinates(1,I) * tLattice(2,1) + Coordinates(2,I) * tLattice(2,2) + Coordinates(3,I) * tLattice(2,3)
-        tZ = Coordinates(1,I) * tLattice(3,1) + Coordinates(2,I) * tLattice(3,2) + Coordinates(3,I) * tLattice(3,3)
-        axyzo(I,1) = tX
-        axyzo(I,2) = tY
-        axyzo(I,3) = tZ
-      ENDDO
-      CLOSE(InputFile)
+      IF (IsFractional) THEN
+        DO I = 1, natcry
+          tX = Coordinates(1,I) * tLattice(1,1) + Coordinates(2,I) * tLattice(1,2) + Coordinates(3,I) * tLattice(1,3)
+          tY = Coordinates(1,I) * tLattice(2,1) + Coordinates(2,I) * tLattice(2,2) + Coordinates(3,I) * tLattice(2,3)
+          tZ = Coordinates(1,I) * tLattice(3,1) + Coordinates(2,I) * tLattice(3,2) + Coordinates(3,I) * tLattice(3,3)
+          axyzo(I,1) = tX
+          axyzo(I,2) = tY
+          axyzo(I,3) = tZ
+        ENDDO
+      ELSE
+        DO I = 1, natcry
+          axyzo(I,1) = Coordinates(1,I)
+          axyzo(I,2) = Coordinates(2,I)
+          axyzo(I,3) = Coordinates(3,I)
+        ENDDO
+      ENDIF
 ! The variable NAME now holds 'Cl6 ' etc. for every atom. 
 ! We must extract the element from that
       DO I = 1, natcry
@@ -117,14 +122,20 @@
         izmbid(i,0) = i
         izmoid(i,0) = i
       ENDDO
-      CSSR2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-4)//'mol2',.FALSE.,0)
+      !C For Rietveld Refinement, we will need the unit cell parameters. WriteMol2() takes
+      !C these from the global variables CellPar. Therefore, these must temporarily be replaced
+      !C with the unit cell parameters from the .cssr file.
+      tCellPar = CellPar
+      CellPar(1) = a
+      CellPar(2) = b
+      CellPar(3) = c
+      CellPar(4) = alpha
+      CellPar(5) = beta
+      CellPar(6) = gamma
+      CSSR2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-4)//'mol2',.TRUE.,0)
+      CellPar = tCellPar
       RETURN
-  990 CALL ErrorMessage('Error while reading input file.')
-      RETURN
-  998 CALL ErrorMessage('Error opening input file.')
-      RETURN
-  999 CALL ErrorMessage('Unexpected end of input file.')
-      RETURN
+  999 CALL ErrorMessage('Error reading input file.')
 
       END FUNCTION CSSR2Mol2
 !
