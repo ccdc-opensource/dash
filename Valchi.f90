@@ -17,10 +17,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
-      INTEGER         NLGREF
-      LOGICAL                 LOGREF
-      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
-
       INTEGER         KKOR
       REAL                  WTIJ
       INTEGER                             IKKOR,         JKKOR
@@ -318,6 +314,8 @@
 !
       USE ATMVAR
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
       INTEGER         NATOM
@@ -339,10 +337,6 @@
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
-      INTEGER         NLGREF
-      LOGICAL                 LOGREF
-      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
-
       REAL            COSQS,               SINQS
       COMMON /CSQSTO/ COSQS(-20:20,3,150), SINQS(-20:20,3,150)
 
@@ -355,10 +349,13 @@
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
+      INTEGER N, IH, IH1, IK, IK1, IL, IL1
+      REAL    C1N, C2N, C3N, S1N, S2N, S3N
+
 !
-!     cosqs(a,1,c) holds hx terms
-!     cosqs(a,2,c) holds ky terms
-!     cosqs(a,3,c) holds lz terms
+!     COSQS(a,1,c) holds hx terms
+!     COSQS(a,2,c) holds ky terms
+!     COSQS(a,3,c) holds lz terms
 !
 ! The Xs (the co-ordinates) have been ordered in MAKEFRAC.
 ! NATOM must be set to the appropriate number.
