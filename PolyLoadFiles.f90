@@ -11,20 +11,19 @@
       USE VARIABLES
       USE DRUID_HEADER
 
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
-      INTEGER CurrSelect
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
 
 ! Note that FNAME is a global variable in VARIABLES, defined in PCDruid_Main.f90
 
 ! Remember current dialogue window
-      CurrSelect = WInfoDialog(CurrentDialog)
-! Is it allowed to update the Wizard if it doesn't exist/isn't visible?    
+      CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page3)
       CALL WDialogPutString(IDF_PWa_DataFileName_String,FNAME)
       CALL WDialogSelect(IDD_PW_Page2)
       CALL WDialogPutString(IDF_PW_DataFileName_String,FNAME)
-      IF (CurrSelect .NE. 0) CALL WDialogSelect(CurrSelect)
+      CALL PopActiveWindowID
 ! Update the status bar at the bottom of the screen.
       STATBARSTR(1) = FNAME
       CALL WindowOutStatusBar(1,STATBARSTR(1))
@@ -33,41 +32,24 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION FnWavelengthOK
-!
-! Checks if wavelength available and acceptable
-!
-! JvdS 29 July 2001
-!
-! RETURNS : .TRUE. if the value of 'alambda' can be used
-!           .FALSE. if the value of 'alambda' is ridiculous
-
-      INCLUDE 'lattice.inc' ! Contains wavelength
-
-      FnWavelengthOK = ((alambda .GT. 0.1) .AND. (alambda .LT. 20))
-
-      END FUNCTION FnWavelengthOK
-!
-!*****************************************************************************
-!
       CHARACTER*1 FUNCTION ChrLowerCase(TheChar)
 
-      CHARACTER*1, INTENT (IN) :: TheChar
+      IMPLICIT NONE
+
+      CHARACTER*1, INTENT (IN   ) :: TheChar
 
       CHARACTER*26 lc, UC
       PARAMETER (lc = 'abcdefghijklmnopqrstuvwxyz')
       PARAMETER (UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
       INTEGER POS
 
-      POS = 1
-      DO WHILE ((POS .LE. 26) .AND. (UC(POS:POS) .NE. TheChar))
-        POS = POS + 1
+      ChrLowerCase = TheChar
+      DO POS = 1, 26
+        IF (UC(POS:POS) .EQ. TheChar) THEN
+          ChrLowerCase = lc(POS:POS)
+          RETURN
+        ENDIF
       END DO
-      IF (UC(POS:POS) .EQ. TheChar) THEN
-        ChrLowerCase = lc(POS:POS)
-      ELSE
-        ChrLowerCase = TheChar
-      ENDIF
 
       END FUNCTION ChrLowerCase
 !
@@ -75,22 +57,22 @@
 !
       CHARACTER*1 FUNCTION ChrUpperCase(TheChar)
 
-      CHARACTER*1, INTENT (IN) :: TheChar
+      IMPLICIT NONE
+
+      CHARACTER*1, INTENT (IN   ) :: TheChar
 
       CHARACTER*26 lc, UC
       PARAMETER (lc = 'abcdefghijklmnopqrstuvwxyz')
       PARAMETER (UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
       INTEGER POS
 
-      POS = 1
-      DO WHILE ((POS .LE. 26) .AND. (lc(POS:POS) .NE. TheChar))
-        POS = POS + 1
+      ChrUpperCase = TheChar
+      DO POS = 1, 26
+        IF (lc(POS:POS) .EQ. TheChar) THEN
+          ChrUpperCase = UC(POS:POS)
+          RETURN
+        ENDIF
       END DO
-      IF (lc(POS:POS) .EQ. TheChar) THEN
-        ChrUpperCase = UC(POS:POS)
-      ELSE
-        ChrUpperCase = TheChar
-      ENDIF
 
       END FUNCTION ChrUpperCase
 !
@@ -109,14 +91,15 @@
 !
       IMPLICIT NONE
 
-      CHARACTER*2 TheAnodeMaterial ! Chemical symbol for anode material, e.g. 'Cu'
+      CHARACTER*2, INTENT (IN   ) :: TheAnodeMaterial ! Chemical symbol for anode material, e.g. 'Cu'
 
       CHARACTER*1 ChrUpperCase ! Function
       CHARACTER*1 ChrLowerCase ! Function
+      CHARACTER*2 tAnodeMaterial ! To remove call by value / call by reference ambiguity
 
-      TheAnodeMaterial(1:1) = ChrUpperCase(TheAnodeMaterial(1:1))
-      TheAnodeMaterial(2:2) = ChrLowerCase(TheAnodeMaterial(2:2))
-      SELECT CASE (TheAnodeMaterial)
+      tAnodeMaterial(1:1) = ChrUpperCase(TheAnodeMaterial(1:1))
+      tAnodeMaterial(2:2) = ChrLowerCase(TheAnodeMaterial(2:2))
+      SELECT CASE (tAnodeMaterial)
            CASE ('Cu')
              WavelengthOf = 1.54056
            CASE ('Mo')
@@ -231,13 +214,23 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION Rad2Degrees(TheAngle)     
+      REAL FUNCTION Radians2Degrees(TheAngle)     
 
       REAL, INTENT (IN) :: TheAngle
 
-      Rad2Degrees = TheAngle * (30.0 / ASIN(0.5))
+      Radians2Degrees = TheAngle * (30.0 / ASIN(0.5))
 
-      END FUNCTION Rad2Degrees
+      END FUNCTION Radians2Degrees
+!
+!*****************************************************************************
+!
+      REAL FUNCTION Degrees2Radians(TheAngle)     
+
+      REAL, INTENT (IN) :: TheAngle
+
+      Degrees2Radians = TheAngle * (ASIN(0.5) / 30.0)
+
+      END FUNCTION Degrees2Radians
 !
 !*****************************************************************************
 !
@@ -257,51 +250,43 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'lattice.inc' ! Contains alambda, the wavelength
-
       LOGICAL,                      INTENT (IN OUT) :: NoData
       CHARACTER(LEN=MaxPathLength), INTENT (IN OUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC' ! Contains alambda, the wavelength
 
       INTEGER NBIN, LBIN
       REAL    XBIN, YOBIN, YCBIN, YBBIN, EBIN
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
 
       LOGICAL            FExists
-      INTEGER       ::   IFLAGS, KLEN
-      INTEGER            IFTYPE
-      CHARACTER(LEN=3)   EXT3
+      INTEGER       ::   KLEN
 ! Note that FNAME is a global variable
       INTEGER            ISTAT
       INTEGER            Diffraction_File_Load ! Function
       LOGICAL            FnWavelengthOK ! Function
       REAL               UpperResolution
       REAL               tMax2Theta
-      REAL               Rad2Degrees ! Function
+      REAL               Radians2Degrees ! Function
+      LOGICAL            Confirm ! Function
 
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
       INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
       IF (.NOT. FExists) THEN
-        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-          "The file "//TheFileName(1:KLEN)//" does not exist!",&
-          "No Such File")
+        CALL ErrorMessage("The file "//TheFileName(1:KLEN)//" does not exist!")
         RETURN
       ENDIF
 !   Check if file needs saving
       IF (SAVEF) THEN
-        CALL WMessageBox(YesNo,QuestionIcon,CommonOK,'Program contains an'//&
-          ' unsaved project.'//CHAR(13)//'Do you wish to '// &
-          'continue?','Open Project')
-!   If answer 'No', return
-        IF (WInfoDialog(ExitButtonCommon) .EQ. CommonNo) RETURN
+        IF (.NOT. Confirm('Program contains an unsaved project.'//CHAR(13)//'Do you wish to '// &
+          'continue?')) RETURN
       END IF
 !   If answer 'Yes'
 ! It is slightly odd that SAVEF is set to .FALSE. here. We are about to load the powder patttern:
 ! how much more necessary to save a project file can it get?
       SAVEF = .FALSE.
-      CALL FieldUpdate()
 ! This is the point of no return: the selected file will be new file, valid data or not
 ! Change global variable FNAME
       FNAME = TheFileName
@@ -314,16 +299,14 @@
 ! It's a good idea to subtract the background before truncating: that way, after the SA, the
 ! whole pattern can be Rietveld-refined without changing the background.
 ! Check if the wavelength is available.
-!C      UpperResolution = 1.5 ! d-value in Angstrom
-!C      IF (FnWavelengthOK()) THEN
-! @ Note that with wavelengths > 3.0 A, this resolution is impossible
-!C        tMax2Theta = 2 * Rad2Degrees(ASIN(alambda/(2*UpperResolution)))
-!C        IF (XBIN(NBIN) .GT. tMax2Theta) THEN
-!C          CALL WMessageBox(YesNo,QuestionIcon,CommonOK,'Would you like to truncate the data '//&
-!C                           'to 1.5 A resolution (recommended)?','Question')
-!C          IF (WInfoDialog(ExitButtonCommon) .NE. CommonNo) CALL TruncateData(tMax2Theta)
-!C        ENDIF
-!C      ENDIF
+      UpperResolution = 1.5 ! d-value in Angstrom
+      IF (FnWavelengthOK() .AND. (ALambda .LT. 2.5)) THEN
+        tMax2Theta = 2 * Radians2Degrees(ASIN(ALambda/(2*UpperResolution)))
+        IF (XBIN(NBIN) .GT. tMax2Theta) THEN
+          IF (Confirm('Would you like to truncate the data '//&
+                      'to 1.5 A resolution (recommended)?')) CALL TruncateData(tMax2Theta)
+        ENDIF
+      ENDIF
 ! Enable the appropriate menus:
       CALL SetModeMenuState(1,-1,-1)
 ! JvdS Was:
@@ -374,7 +357,6 @@
 
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-      COMMON /PLTYPE/ IPTYPE
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
@@ -389,19 +371,18 @@
       LOGICAL BACKREF
       COMMON /PWLYST/ SLIMVALUE, SCALFAC, BACKREF
 
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
-! Note that FNAME is a global variable
-!      INTEGER          Load_PRO_File ! Function
       INTEGER          Load_raw_File ! Function
       INTEGER          Load_rd_File  ! Function
       INTEGER          Load_udf_File ! Function
       INTEGER          Load_uxd_File ! Function
       INTEGER          Load_xye_File ! Function
       INTEGER          ISTAT
-      INTEGER          I
+      INTEGER          I, J, JJ
       INTEGER          POS
       LOGICAL          ESDsFilled
 
@@ -423,8 +404,6 @@
       ISTAT = 0
       ESDsFilled = .FALSE.
       SELECT CASE (EXT4)
-!        CASE ('pro ')
-!          ISTAT = Load_PRO_File(TheFileName)
         CASE ('raw ')
           ISTAT = Load_raw_File(TheFileName,ESDsFilled)
         CASE ('rd  ','sd  ')
@@ -438,7 +417,7 @@
       END SELECT
       Diffraction_File_Load = ISTAT
       IF (ISTAT .EQ. 0) THEN
-        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOK,'Error: Could not load the file','Error')
+        CALL ErrorMessage('Could not load the file')
 ! When we arrive here, the state of the program becomes a little bit undetermined.
 ! This wasn't too bad in the old DASH code, as none of the variables was updated properly anyway,
 ! but it starts to become a problem since some variables are now properly initialised and some aren't
@@ -447,6 +426,8 @@
 !        CALL ScrUpdateFileName
         RETURN
       ENDIF
+!C>>JCC Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
+      CALL sa_SetOutputFiles(TheFileName)
 ! Fill the E.S.D.s if that hasn't been taken care of yet
       IF (.NOT. ESDsFilled) THEN
         DO I = 1, NOBS
@@ -554,19 +535,20 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-!      IMPLICIT NONE
+      IMPLICIT NONE
 
       CHARACTER(LEN=MaxPathLength), INTENT (IN)  :: TheFileName
       LOGICAL,                      INTENT (OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
 
+      INTEGER NOBS
+      REAL    XOBS, YOBS, YCAL, YBAK, EOBS
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
 
       INCLUDE 'statlog.inc'
 
-      INTEGER     IS, I, Shift, FLEN ! Length of TheFileName
-      INTEGER     CurrSelect
+      INTEGER     I, Shift, FLEN ! Length of TheFileName
       REAL*8      TwoThetaStart, TwoThetaStep, CurrTwoTheta
       REAL        Lambda1
       INTEGER*4   I4, NumOfBins
@@ -591,24 +573,20 @@
       FLEN = LEN_TRIM(TheFileName)
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
       OPEN(UNIT=10,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
-!C>>JCC Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
-      CALL sa_SetOutputFiles(TheFileName)
 ! First check the version, which follows from the third byte in the file. Bytes 1-3 are: RAW
 ! "RAW " = version 1. The oldest version, requested by Bruker not the be supported any more.
 ! "RAW2" = version 2.
 ! "RAW1" = version 3. The most recent version.
       READ(UNIT=10,REC=1,ERR=999) C4
       IF (C4(1:3) .NE. 'RAW') THEN
-        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                         "Error: Not a valid Bruker .raw file.","Bad Data File")
+        CALL ErrorMessage("Not a valid Bruker .raw file.")
         RETURN
       ENDIF
       SELECT CASE (C4(4:4))
         CASE (' ')
 ! Warn the user
-          CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                           "Error: This version of the .raw format is no longer supported."//&
-                           CHAR(13)//"Please convert to a newer version and try again.","Old Data File")
+          CALL ErrorMessage("This version of the .raw format is no longer supported."//&
+                           CHAR(13)//"Please convert to a newer version and try again.")
           RETURN
         CASE ('1')
 ! A version 3 file, the most recent and most complicated format
@@ -616,8 +594,7 @@
           READ(UNIT=10,REC=3,ERR=999) I4
           IF (I4 .NE. 1) THEN
 ! The user should be warned here
-            CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                             "Error: Current file status is Active, Aborted or Interrupted.","Bad Data File")
+            CALL ErrorMessage("Current file status is Active, Aborted or Interrupted.")
             RETURN
           ENDIF
 ! Number of completed data ranges. I assume that that is the number of powder patterns in this file
@@ -638,8 +615,7 @@
             READ(UNIT=10,REC=Offset+1,ERR=999) I4
             IF (I4 .NE. 304) THEN
 ! The user should be warned here
-              CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                               "Error: Length of Range Header Structure must be 304.","Bad Data File")
+              CALL ErrorMessage("Length of Range Header Structure must be 304.")
               RETURN
             ENDIF
 ! Number of 'data records'
@@ -653,8 +629,7 @@
 ! Check that we will not read less than 1 data point
             IF (NumOfBins .EQ. 0) THEN
 ! The user should be warned here
-              CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                               "Error: The file contains no valid data.","Bad Data File")
+              CALL ErrorMessage("The file contains no valid data.")
               RETURN
             ENDIF
 ! Starting angle for 2 theta drive in degrees
@@ -682,18 +657,15 @@
             READ(UNIT=10,REC=Offset+64,ERR=999) I4
             IF (I4 .NE. 4) THEN
 ! The user should be warned here
-              CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                               "Error: Record length must be 4.","Bad Data File")
+              CALL ErrorMessage("Record length must be 4.")
               RETURN
             ENDIF
 ! Length of supplementary header (bytes)
             READ(UNIT=10,REC=Offset+65,ERR=999) I4
 ! Check if length of supplementary header is a multiple of four.
-! I hope the compiler doesn't optimise this out
-            IF ( ((I4 / 4) * 4) .NE. I4) THEN
+            IF (MOD(I4,4) .NE. 0) THEN
 ! The user should be warned here
-              CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                               "Error: Length of Supplementary Header is not a multiple of 4.","Bad Data File")
+              CALL ErrorMessage("Length of Supplementary Header is not a multiple of 4.")
               RETURN
             ENDIF
 ! Skip all supplementary headers of the current data range
@@ -751,8 +723,7 @@
 ! Check that we will not read less than 1 data point
             IF (NumOfBins .EQ. 0) THEN
 ! The user should be warned here
-              CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                               "Error: The file contains no valid data.","Bad Data File")
+              CALL ErrorMessage("The file contains no valid data.")
               RETURN
             ENDIF
 ! The step size. A REAL*4 in this format
@@ -772,12 +743,12 @@
 ! Now we can start reading the raw data. The complete header can consist of any number
 ! of bytes, and we can only read per four. The data is in REAL*4 format. This may require some
 ! shifting of the bytes read in. It is actually possible that the last datapoint cannot be read.
-            IF (((SizeOfHeader / 4) * 4) .NE. SizeOfHeader) THEN
+            IF (MOD(SizeOfHeader,4) .NE. 0) THEN
               NumOfBins = NumOfBins - 1
               OffSet = Offset + 1 + (SizeOfHeader / 4)
 ! Due to the way integer division in FORTRAN works, 
 ! the fractional part of SizeOfHeader / 4 is discarded
-              Shift = SizeOfHeader - ( 4 * (SizeOfHeader / 4) )
+              Shift = SizeOfHeader - MOD(SizeOfHeader,4)
               READ(UNIT=10,REC=Offset,ERR=999) I4
               DO I = 1, NumOfBins
                 READ(UNIT=10,REC=Offset+I,ERR=999) I4_2
@@ -802,18 +773,14 @@
           END DO
 ! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
         CASE DEFAULT
+          CALL ErrorMessage('Unrecognised *.raw format.')
           RETURN
       END SELECT
       CLOSE(10)
       NOBS = NumOfBins
       ESDsFilled = .FALSE.
-! This is definately laboratory data
-! @ Next five lines are very dirty: why do I need 5 lines of code to update a single variable?
-      CurrSelect = WInfoDialog(CurrentDialog)
-      CALL WDialogSelect(IDD_Data_Properties)
+! This is definitely laboratory data
       CALL SetSourceDataState(1)
-      CALL WDialogPutRadioButton(IDF_LabX_Source)
-      CALL WDialogSelect(CurrSelect)
       Load_raw_File = 1
       RETURN
  999  CONTINUE
@@ -860,11 +827,10 @@
 
       INCLUDE 'statlog.inc'
 
-      INTEGER      I, J, NumOfBins, FLEN ! Length of TheFileName
+      INTEGER      I, NumOfBins, FLEN ! Length of TheFileName
       REAL         Lambda1
       REAL*8       TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       CHARACTER*2  Anode
-      INTEGER      CurrSelect
       INTEGER*4    I4
       INTEGER*4    I4_2
       INTEGER*4    I4_3
@@ -891,27 +857,21 @@
       FLEN = LEN_TRIM(TheFileName)
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
       OPEN(UNIT=10,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
-!C>>JCC Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
-      CALL sa_SetOutputFiles(TheFileName)
       READ(UNIT=10,REC=1,ERR=999) C4
       Version = C4(1:2)
       IF ((Version .NE. 'V5') .AND. (Version .NE. 'D3') .AND. (Version .NE. 'V3')) THEN
-        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                         "Error: Not a valid Philips .rd/.sd file.","Bad Data File")
+        CALL ErrorMessage("Not a valid Philips .rd/.sd file.")
         RETURN
       ENDIF
       SELECT CASE (C4(3:4))
         CASE ('DI')
-          CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                           "Error: This file contains peak positions, not a powder pattern.","Bad Data File")
+          CALL ErrorMessage("This file contains peak positions, not a powder pattern.")
           RETURN
         CASE ('BK')
-          CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                           "Error: This file contains a background, not a powder pattern.","Bad Data File")
+          CALL ErrorMessage("This file contains a background, not a powder pattern.")
           RETURN
         CASE ('2D')
-          CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                           "Error: This file contains a second derivative, not a powder pattern.","Bad Data File")
+          CALL ErrorMessage("This file contains a second derivative, not a powder pattern.")
           RETURN
       END SELECT
 ! Anode material
@@ -1017,8 +977,7 @@
 ! Check that we will not read less than 1 data point
       IF (NumOfBins .EQ. 0) THEN
 ! The user should be warned here
-        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                         "Error: The file contains no valid data.","Bad Data File")
+        CALL ErrorMessage("The file contains no valid data.")
         RETURN
       ENDIF
       IF (Version .EQ. 'V5') THEN
@@ -1035,7 +994,7 @@
 ! Raw data counts are stored per two bytes across a two byte boundary.
 ! It is possible that the last data point cannot be read.
 ! This is the case if the number of data points is even
-      IF ((2 * (NumOfBins / 2)) .EQ. NumOfBins) NumOfBins = NumOfBins - 1
+      IF (MOD(NumOfBins,2) .EQ. 0) NumOfBins = NumOfBins - 1
 ! Read first data point
       READ(UNIT=10,REC=Offset,ERR=999) I4
 ! Due to EQUIVALENCE, the first data point is now in I2(2)
@@ -1049,13 +1008,8 @@
       CLOSE(10)
       NOBS = NumOfBins
       ESDsFilled = .FALSE.
-! This is definately laboratory data
-! @ Next five lines are very dirty: why do I need 5 lines of code to update a single variable?
-      CurrSelect = WInfoDialog(CurrentDialog)
-      CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogPutRadioButton(IDF_LabX_Source)
+! This is definitely laboratory data
       CALL SetSourceDataState(1)
-      CALL WDialogSelect(CurrSelect)
 ! Try to set the wavelength
 ! If the wavelength was not present in the file, try to interpret the Anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
@@ -1093,13 +1047,15 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-!      IMPLICIT NONE
+      IMPLICIT NONE
 
       CHARACTER(LEN=MaxPathLength), INTENT (IN)  :: TheFileName
       LOGICAL,                      INTENT (OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
 
+      INTEGER NOBS
+      REAL    XOBS, YOBS, YCAL, YBAK, EOBS
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
 
       INCLUDE 'statlog.inc'
@@ -1111,7 +1067,6 @@
       INTEGER*4     TempInput(1:8)
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       CHARACTER*2   Anode
-      INTEGER       CurrSelect
       REAL          WavelengthOf ! Function
 
 ! Current status, initialise to 'error'
@@ -1123,8 +1078,6 @@
       Lambda1       = 0.0
       FLEN = LEN_TRIM(TheFileName)
       OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-!C>>JCC Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
-      CALL sa_SetOutputFiles(TheFileName)
 ! *.udf files look like this:
 !
 !SampleIdent,AgCOOC5H11 ,/
@@ -1195,8 +1148,7 @@
 ! Check that we will not read less than 1 data point
       IF (NumOfBins .EQ. 0) THEN
 ! The user should be warned here
-        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                         "Error: The file contains no valid data.","Bad Data File")
+        CALL ErrorMessage("The file contains no valid data.")
         RETURN
       ENDIF
 ! Integer division: fractional part is discarded. NumOfLines contains the number of
@@ -1230,13 +1182,8 @@
       CLOSE(10)
       NOBS = NumOfBins
       ESDsFilled = .FALSE.
-! This is definately laboratory data
-! @ Next five lines are very dirty: why do I need 5 lines of code to update a single variable?
-      CurrSelect = WInfoDialog(CurrentDialog)
-      CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogPutRadioButton(IDF_LabX_Source)
+! This is definitely laboratory data
       CALL SetSourceDataState(1)
-      CALL WDialogSelect(CurrSelect)
 ! Try to set the wavelength
 ! If the wavelength was not present in the file, try to interpret the Anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
@@ -1276,23 +1223,24 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-!      IMPLICIT NONE
+      IMPLICIT NONE
 
       CHARACTER(LEN=MaxPathLength), INTENT (IN)  :: TheFileName
       LOGICAL,                      INTENT (OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
 
+      INTEGER NOBS
+      REAL    XOBS, YOBS, YCAL, YBAK, EOBS
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
 
       INCLUDE 'statlog.inc'
 
       CHARACTER*511 Cline ! String containing last line read from file
-      INTEGER       J, MaxNumOfBins, CurrLineNr, FLEN ! Length of TheFileName
+      INTEGER       J, MaxNumOfBins, FLEN ! Length of TheFileName
       REAL          Lambda1
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       CHARACTER*2   Anode
-      INTEGER       CurrSelect
       INTEGER       POS
       CHARACTER*511 KeyWord
       REAL          TempInput(17) ! Max. num. of columns is 16 excluding 2theta
@@ -1303,6 +1251,7 @@
       INTEGER       GetNumOfColumns ! Function
       CHARACTER*1   ChrLowerCase, ChrUpperCase ! Functions
       REAL          WavelengthOf ! Function
+      INTEGER       KeyWordPos, KeyWordLen, StrLen, I
 
 ! Current status, initialise to 'error'
       Load_uxd_File = 0
@@ -1316,9 +1265,48 @@
       MaxNumOfColumns = 16
       FLEN = LEN_TRIM(TheFileName)
       OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-!C>>JCC Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
-      CALL sa_SetOutputFiles(TheFileName)
       I = 1
+! A .uxd file has an infinite number of variations, one of them is:
+!
+!; J:\DIFFDAT1\Xtals-R-Us\2-hydroxyphenoxyacetic\2hpoxya-acid-psd-5-65.raw(Diffrac Plus V1.01 file) converted by XCH V1.0
+!_FILEVERSION=2
+!_SAMPLE='2-Hydroxyphenoxyacetic acid, light grind, 0.7mm boro, 1mm,'
+!_+SAMPLE='This configuration file has been created by the Bruker AXS Config       Program imitating the old SAG-free format style for compatibility to'
+!_SITE='University of Strathclyde GBR'
+!_USER='Administrator'
+!_MONOCHROMATOR=1
+!; Transmission
+!_SOLLER_SLITS_2='Y'
+!_BETA_FILTER='N'
+!_FIXED_ANTISLIT=0.000000
+!_ANALYZER_CODE=0
+!; None
+!_DATEMEASURED='28-Apr-2001 02:35:57'
+!_RUNTIME=41390.000000
+!_WL1=1.540600
+!_WL2=1.544390
+!_WL3=1.392220
+!_WLRATIO=0.500000
+!_ANODE='Cu'
+!; (Data for Range number 1)
+!_DRIVE='PSDSCAN'
+!_STEPTIME=10.000000
+!_STEPSIZE=0.014489
+!_STEPMODE='C'
+!_START=5.000000
+!_THETA=2.500000
+!_2THETA=5.000000
+!_PHI=0.000000
+!_RANGE_WL=1.540600
+!_COUNTS
+!       7662        7506        7597        7640        7603        7543        7582        7433
+!       7553        7517        7463        7317        7302        7336        7379        7303
+!       7287        7335        7299        7310        7200        7143        7230        7188
+! <SNIP>
+!       1282        1221        1324        1197        1310        1346        1309        1352
+!       1224        1366        1344        1255        1271        1376        1404        1346
+!       1353        1385        1400
+!
  10   READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
 ! Test if line empty
       StrLen = LEN_TRIM(Cline)
@@ -1344,6 +1332,7 @@
           KeyWordLen = KeyWordPos - 1
           SELECT CASE (KeyWord(1:KeyWordLen))
             CASE ('_ACTUAL_I100','_D-I','_2THETA-I') ! It's a peak list, not a powder pattern
+              CALL ErrorMessage('The file contains a peak list, not a powder diffraction pattern.')
               RETURN
             CASE ('_ANODE') ! Anode material
 ! There should follow a '=' followed by the anode material e.g. "'Cu'" (including the single quotes).
@@ -1391,8 +1380,7 @@
 ! Check that we will not read less than 1 data point
               IF (MaxNumOfBins .EQ. 0) THEN
 ! The user should be warned here
-                CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                       "Error: The file contains no valid data.","Bad Data File")
+                CALL ErrorMessage("The file contains no valid data.")
                 RETURN
               ENDIF
             CASE ('_START')
@@ -1481,17 +1469,11 @@
       ESDsFilled = .FALSE.
 ! Check for number of observations = 0
       IF (NOBS .EQ. 0) THEN
-        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                         "Error: The file contains no valid data.","Bad Data File")
+        CALL ErrorMessage("The file contains no valid data.")
         RETURN
       ENDIF
-! This is definately laboratory data
-! @ Next five lines are very dirty: why do I need 5 lines of code to update a single variable?
-      CurrSelect = WInfoDialog(CurrentDialog)
-      CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogPutRadioButton(IDF_LabX_Source)
+! This is definitely laboratory data
       CALL SetSourceDataState(1)
-      CALL WDialogSelect(CurrSelect)
 ! Try to set the wavelength
 ! If the wavelength was not present in the file, try to interpret the anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
@@ -1526,11 +1508,15 @@
       USE DRUID_HEADER
       USE VARIABLES
 
+      IMPLICIT NONE
+
       CHARACTER(LEN=MaxPathLength), INTENT (IN)  :: TheFileName
       LOGICAL,                      INTENT (OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
 
+      INTEGER NOBS
+      REAL    XOBS, YOBS, YCAL, YBAK, EOBS
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
 
       CHARACTER*255 Cline
@@ -1539,14 +1525,12 @@
       INTEGER       GetNumOfColumns ! Function
       REAL          Lambda1
 
-!>> JCC - set return value. 1 for success
-      Load_xye_File = 1
+! Initialise to failure
+      Load_xye_File = 0
       ReadWarning   = .FALSE.
       FLEN = LEN_TRIM(TheFileName)
       OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',err=999)
       I = 1
-!C>>JCC Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
-      CALL sa_SetOutputFiles(TheFileName)
 ! Check if wavelength available on very first line
       READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
       IF (GetNumOfColumns(Cline) .EQ. 1) THEN
@@ -1589,11 +1573,9 @@
         IF (ABS(XOBS(I) - XOBS(I-1)) .LT. 0.0000001) THEN
           IF (.NOT. ReadWarning) THEN
             ReadWarning = .TRUE.
-            CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                             "Warning: The data file contains "//&
-                             "multiple observations for the same "//&
-                             "2-theta"//CHAR(13)//"Only the first observation"//&
-                             "will be used","Bad Data File")
+            CALL ErrorMessage("Warning: The data file contains multiple observations for the same "//&
+                              "2-theta"//CHAR(13)//"Only the first observation"//&
+                              "will be used")
           END IF
           GOTO 10
         END IF
@@ -1610,14 +1592,12 @@
       ESDsFilled = .TRUE.
 ! JvdS Added check for number of observations = 0
       IF (NOBS .EQ. 0) THEN
-        Load_xye_File = 0
+        CALL ErrorMessage("The file contains no valid data.")
         RETURN
       ENDIF
-!>> JCC added in the return to prevent getting to 999 except in error
+      Load_xye_File = 1
       RETURN
  999  CONTINUE
-!>> JCC added in return status
-      Load_xye_File = 0
       RETURN
 
       END FUNCTION Load_xye_File
@@ -1638,23 +1618,20 @@
 
       CHARACTER(LEN=256) :: FILTER
       INTEGER            :: IFLAGS
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
+
+      INCLUDE 'GLBVAR.INC'
 
       LOGICAL FExists
       INTEGER Iflen
+      LOGICAL Confirm ! Function
 
 ! Check if file needs saving
       IF (SAVEF) THEN
-        CALL WMessageBox(YesNo,QuestionIcon,CommonOK,'Program contains an'//&
-          ' unsaved project.'//CHAR(13)//'Do you wish to '// &
-          'continue?','Open Project')
-! If answer 'No', return
-        IF (WInfoDialog(4) .EQ. 2) RETURN
+        IF (.NOT. Confirm('Program contains an unsaved project.'//CHAR(13)//'Do you wish to '// &
+          'continue?')) RETURN
       END IF
 ! If answer 'Yes'
       SAVEF = .FALSE.
-      CALL FieldUpdate()
       IFLAGS = LoadDialog + DirChange + PromptOn
       FILTER = 'DASH Pawley files (*.sdi)|*.sdi|'
 ! JvdS The next line resets the global variable to 'no file'
@@ -1665,16 +1642,13 @@
       IF (IFlen .EQ. 0) RETURN
       INQUIRE(FILE=FNAME(1:IFlen),EXIST=FExists)
       IF (.NOT. FExists) THEN
-        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-          "The file "//FNAME(1:IFlen)//" does not exist!",&
-          "No such file")
+        CALL ErrorMessage("The file "//FNAME(1:IFlen)//" does not exist!")
         RETURN
       ENDIF
-      CALL OpenHCVPIKTIC(FNAME(1:IFlen),0,NoData) 
+      CALL OpenHCVPIKTIC(FNAME(1:IFlen),NoData) 
       IF (NODATA) THEN
-        CALL WMessageBox(OKOnly,ExclamationIcon, CommonOk,&
-          "Could not read the project file "//FNAME(:IFlen)//&
-          CHAR(13)//"successfully","Failed to read project")
+        CALL ErrorMessage("Could not read the project file "//FNAME(1:IFlen)//&
+                          CHAR(13)//"successfully.")
         RETURN
       END IF
       STATBARSTR(1)=FNAME
@@ -1687,124 +1661,6 @@
 !
 !*****************************************************************************
 !
-!>> JCC - was
-!      SUBROUTINE Load_PRO_File(TheFileName)
-!>> Changed to
-!      INTEGER FUNCTION Load_PRO_File(TheFileName,NoData)
-!
-!      CHARACTER(LEN=256), INTENT (IN)     :: TheFileName
-
-!      INCLUDE 'PARAMS.INC'
-
-!      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-!      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-!      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-!        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-!        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-!      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-!      INTEGER CurrentRange 
-!      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-!        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-!        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-!        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-!
-!      COMMON /PLTYPE/ IPTYPE
-!
-!      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-!        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-
-!      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-!      INCLUDE 'statlog.inc'
-
-!      INTEGER FLEN
-
-!>> JCC - set return value. 1 for success
-!      Load_PRO_File = 1
-!      FLEN = LEN_TRIM(TheFileName)
-!      OPEN(10,FILE=TheFileName(:FLEN),STATUS='OLD',Err=999)
-!      I=1
-!>> JCC Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
-!      CALL sa_SetOutputFiles(TheFileName)
-! 10   READ(10,*,ERR=999,END=100) XOBS(I),YBAK(I),YOBS(I),YCAL(I),EOBS(I)
-!      I=I+1
-!>> JCC Only read in a maximum of MOBS points
-!      IF (I .GT. MOBS) THEN
-!        CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
-!        GOTO 100
-!      END IF
-!      GOTO 10
-! 100  NOBS = I-1
-!      CLOSE(10)
-!      DataSetChange = DataSetChange+1
-!      NumPawleyRef = 0
-!      NumObsTic = 0
-!      NTic=0
-!      CurrentRange=0
-!      NumPeakFitRange=0
-!      Do I=1,MAX_NPFR
-!        NumInPFR(I)=0
-!        IPF_RPt(I)=0
-!      End Do
-!      NBIN = (NOBS/LBIN)
-!      DO I = 1, NBIN
-!        IST = (I-1)*LBIN
-!        XADD  = 0.0
-!        YOADD = 0.0
-!        YCADD = 0.0
-!        YBADD = 0.0
-!        VADD  = 0.0
-!        DO J = 1, LBIN
-!          JJ = J + IST
-!          XADD  = XADD  + XOBS(JJ)
-!          YOADD = YOADD + YOBS(JJ)
-!          YCADD = YCADD + YCAL(JJ)
-!          YBADD = YBADD + YBAK(JJ)
-!          VADD  = VADD  + EOBS(JJ)**2
-!        END DO
-!        XBIN(I)  = XADD/FLOAT(LBIN)
-!        YOBIN(I) = YOADD/FLOAT(LBIN)
-!        YCBIN(I) = YCADD/FLOAT(LBIN)
-!        YBBIN(I) = YBADD/FLOAT(LBIN)
-!        EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
-!      END DO
-!      XPMIN = XOBS(1)
-!      XPMAX = XOBS(1)
-!      YPMIN = YOBS(1)
-!      YPMAX = YOBS(1)
-!      DO I = 1, NOBS
-!        XPMIN = MIN(XOBS(I),XPMIN)
-!        XPMAX = MAX(XOBS(I),XPMAX)
-!        YPMIN = MIN(YOBS(I),YPMIN)
-!        YPMAX = MAX(YOBS(I),YPMAX)
-!      END DO
-!      XPGMIN = XPMIN
-!      XPGMAX = XPMAX
-!      YPGMIN = YPMIN
-!      YPGMAX = YPMAX
-!      CALL UPLOAD_RANGE()
-!      XPGMINOLD = XPMIN
-!      XPGMAXOLD = XPMAX
-!      YPGMINOLD = YPMIN
-!      YPGMAXOLD = YPMAX
-!      IPMIN = 1
-!      IPMAX = NBIN
-!      IPMINOLD = IPMIN
-!      IPMAXOLD = IPMAX
-!      IPTYPE = 2
-!      CALL Profile_Plot(IPTYPE)
-!>> JCC added in the return to prevent getting to 999 except in error
-!      RETURN
-! 999  CONTINUE
-!      Load_PRO_File = 0
-!      RETURN
-!      END FUNCTION Load_PRO_File
-!
-!*****************************************************************************
-!
-!>> JCC - Was
-!>>      SUBROUTINE Load_TIC_File(FLEN,TheFileName)
-!>> is now
       INTEGER FUNCTION Load_TIC_File(FLEN,TheFileName)
 
       CHARACTER(LEN=256),  INTENT (IN) :: TheFileName
@@ -1812,12 +1668,12 @@
 
       INCLUDE 'PARAMS.INC'
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-      COMMON /PLTYPE/ IPTYPE
+      INTEGER I, II
 
 !>> JCC - set return status
       Load_TIC_File = 1
 !>> JCC - add in an error trap for bad file opening
-      OPEN(11,FILE=TheFileName(:FLEN),STATUS='OLD',ERR=999)
+      OPEN(11,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
       I=1
  10   READ(11,*,ERR=100,END=100) (IH(II,I),II=1,3),ARGK(I),DSTAR(I)
       I=I+1
@@ -1825,12 +1681,8 @@
  100  NTIC=I-1
       CLOSE(11)
 !
-!C>> JCC Doing this here can cause problems, so I've moved it
-!C      CALL Profile_Plot(iptype)
-!
 !      CALL View_Tic_File(FLEN,TheFileName)
 !
-!>> JCC Added in the next 2 lines
       RETURN
  999  Load_TIC_File = 0
       RETURN
@@ -1846,32 +1698,35 @@
       CHARACTER(LEN=256),           INTENT (IN) :: TheFileName
       INTEGER,                      INTENT (IN) :: FLEN
       CHARACTER(LEN=80) CCL_LINE
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
+      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
+      INTEGER I
+      REAL  WaveLengthOf ! Function
 !
 !>> JCC Initialise return value
 !
       Load_CCL_File = 1
-      ZEROPOINT = 0.
-      ALAMBDA = 1.5404
+      ZEROPOINT = 0.0
+      ALambda = WaveLengthOf('Cu')
 !
 !>> JCC Add in Error trap
-!
+!                          
       OPEN(11,FILE=TheFileName(:FLEN),STATUS='OLD', ERR = 999)
 !>> JCC Set SA Output files
       CALL sa_SetOutputFiles(TheFileName)
- 10   READ(11,5000,ERR=100,END=100) NLCCL,CCL_LINE
+   10 READ(11,5000,ERR=100,END=100) NLCCL,CCL_LINE
  5000 FORMAT(Q,A)
       IF (CCL_LINE(1:1) .EQ. 'C') THEN
         READ(CCL_LINE(2:NLCCL),*) (CELLPAR(I),I=1,6)
       ELSE IF (CCL_LINE(1:1) .EQ. 'L') THEN
         IF (CCL_LINE(3:6) .EQ. 'WVLN') THEN
-          READ(CCL_LINE(7:NLCCL),*) ALAMBDA
+          READ(CCL_LINE(7:NLCCL),*) ALambda
         ELSE IF (CCL_LINE(3:6) .EQ. 'ZERO') THEN
           READ(CCL_LINE(7:NLCCL),*) zeropoint
         END IF
       END IF
       GOTO 10
- 100  CLOSE(11)
+  100 CLOSE(11)
 !
       CALL UpLoad_Crystal_Data()
 !
@@ -1880,31 +1735,6 @@
  999  Load_CCL_File = 0
       RETURN
       END FUNCTION Load_CCL_File
-!
-!*****************************************************************************
-!
-!      SUBROUTINE View_TIC_File(FLEN,TheFileName)
-!
-!      USE WINTERACTER
-!      USE DRUID_HEADER
-!      TYPE(WIN_STYLE) MYWIN
-!      CHARACTER(LEN=256),     INTENT (IN) :: TheFileName
-!      INTEGER,                INTENT (IN) :: FLEN
-!
-!      MYWIN%FLAGS  = SysMenuOn +  &       ! Turn on system menu
-!                     MinButton +  &       ! Show minimize button
-!                     MaxButton            ! Show maximize button
-!
-!      MYWIN%X      = -1                      
-!      MYWIN%Y      = 100                  ! Put window 100 pixels down
-!      MYWIN%WIDTH  = 500                      
-!      MYWIN%HEIGHT = 500                  ! Make window 500 pixels deep
-!      MYWIN%TITLE  = 'Tic file'//TheFileName(:FLEN)            
-! Create child window that exists outside of the main window
-!      CALL WindowOpenChild(MYWIN, IHAND1)
-!      CALL WEditFile(TheFileName(:FLEN),Modeless,0,ViewOnly,CourierNew)
-!
-!      END SUBROUTINE View_TIC_File
 !
 !*****************************************************************************
 !
@@ -1930,15 +1760,15 @@
       NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
       XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
       IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-!
-      COMMON /PLTYPE/ IPTYPE
-!
+
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
       REAL RMaxTTheta
-!
+      INTEGER I, J, JJ
+
       DO I = 1,NOBS
         IF (XOBS(I) .GT. RMaxTTheta) EXIT
       END DO
@@ -2035,43 +1865,28 @@
         XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
         IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
 
-      COMMON /PLTYPE/ IPTYPE
-
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
       INCLUDE 'statlog.inc'
 
-      INTEGER ICurSel, IXPos, IYPos, IField, IType, IBpass, Iret1
-      LOGICAL process_mainwindow_message
-      LOGICAL Quit
-      TYPE(WIN_MESSAGE) :: MESSAGE
+      INTEGER I, IT, J, IBpass
+      LOGICAL QUIT
 
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
 ! JvdS When called from within the Wizard, this entire routine should just be a step
 ! JvdS within the Wizard. It's quite stand-alone now.
 
 ! Remember current dialogue window
-      ICurSel = WInfoDialog(CurrentDialog)
-
-!c      CALL WDialogSelect(ID_Fit_Data_request)
-!c      CALL WDialogShow(-1,-1,0,Modal)
-!c      Iret = WInfoDialog(ExitButton)
-
-!c      CALL WDialogSelect(ID_Fit_Data_request)
-!c      CALL WDialogHide()
-!c      CALL Profile_Plot(IPTYPE)
-!c      IF (.NOT. (Iret .EQ. IDF_Fit_Now)) THEN
-!c        IF (ICurSel .NE. -1) CALL WDialogSelect(ICurSel)
-!c        RETURN
-!c      END IF
-
+      CALL PushActiveWindowID
 ! Grey out all other menus
       CALL ToggleMenus(0)
 ! The reason behind this greying out seems to be that the next dialogue
 ! window cannot be made modal because it needs to draw the calculated background 
-! to the main screen.
+! to the main screen. And the user should be able to zoom in on parts of the graph
+! to decide whether or not to accept the background.
       CALL WDialogSelect(ID_Background_Fit)
 ! Initialise the background
       CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
@@ -2082,12 +1897,12 @@
       IT = InfoError(1)
       QUIT = .FALSE.
       DO WHILE(.NOT. QUIT)
-        CALL WMessage(ITYPE,MESSAGE)
-        IF (MESSAGE%WIN .EQ. 0) THEN
-          QUIT = process_mainwindow_message(ITYPE,MESSAGE)
-        ELSE IF (ITYPE .EQ. PushButton) THEN
+        CALL GetEvent
+        IF (EventInfo%WIN .EQ. 0) THEN
+          CALL process_mainwindow_message
+        ELSE IF (EventType .EQ. PushButton) THEN
 ! Process it
-          SELECT CASE (MESSAGE%VALUE1)
+          SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Background_Apply)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
               CALL BackFit(IBpass)
@@ -2139,6 +1954,6 @@
 ! It is now possible to load another .xye file through the icon on the main menu.
 ! That causes some states to be defined twice, and the wizard window locks up.
       CALL ToggleMenus(1)
-      IF (ICurSel .NE. -1) CALL WDialogSelect(ICurSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Background_Fit

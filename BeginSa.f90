@@ -8,19 +8,15 @@
 	  LOGICAL DoSaRedraw
 	  COMMON /SARDRW/ DoSaRedraw
 
-	  LOGICAL process_mainwindow_message
 !
 ! Declare window-type and message variables
 !
   TYPE(WIN_STYLE)    WINDOW
-  TYPE(WIN_MESSAGE)  MESSAGE
 !
   include 'DialogPosCmnF90.inc'
 !
       parameter (mvar=100)
       common /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-      integer ihandle
-      common /winwifd/ ihandle(20)
 !C>> Function defn
 	  integer CheckOverwriteSaOutput
 	  integer test
@@ -105,6 +101,7 @@
 !ep			    END SELECT
 !ep		    END IF
 !ep	  END DO
+
 	  CALL ToggleMenus(1)
 
 	  Ierrflag =  InfoError(1)
@@ -127,6 +124,7 @@
 !ep added extpro
 	logical extcssr,extpdb,extccl, extpro
 !
+!      CALL Redraw()
 	INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
 	IF (.NOT.extcssr) THEN
 	  DO I = 1,100

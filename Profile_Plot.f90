@@ -1,12 +1,12 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Profile_Plot(IPTYPE)
+      SUBROUTINE Profile_Plot(TheIPTYPE)
 
       USE WINTERACTER
       USE VARIABLES
 
-      INTEGER,           INTENT (IN) :: IPTYPE
+      INTEGER, INTENT (IN   ) :: TheIPTYPE
 
       INCLUDE 'PARAMS.INC'
 
@@ -24,22 +24,21 @@
       INCLUDE 'POLY_COLOURS.INC'
 
       LOGICAL PlotBackground ! Function
-!
+
 !   Setup hardcopy options
-      IF (IPTYPE .LT. 0) THEN
+      IF (TheIPTYPE .LT. 0) THEN
         CALL IGrInit('HP')
         CALL IGrHardCopyOptions(1,700)
         CALL IGrHardCopyOptions(2,375)
         CALL IGrHardCopy(' ')
       END IF
-      IPLT = ABS(IPTYPE)
       CALL Plot_Initialise()
       CALL Plot_Panel()
-      CALL Plot_Custom_Axes(IPLT)
+      CALL Plot_Custom_Axes()
 ! Plot peakfit ranges
       IF (NumPeakFitRange .GT. 0) CALL Plot_PeakFit_Info()
 ! Observed profile
-      SELECT CASE(IPLT)
+      SELECT CASE(ABS(TheIPTYPE))
        CASE(1) 
          CALL Plot_Observed_Profile()
        CASE(2) 
@@ -52,7 +51,7 @@
       CALL IPgBorder()
       PLOTT = .TRUE.
 !   Switch off hardcopy
-      IF (IPTYPE .LT. 0) THEN
+      IF (TheIPTYPE .LT. 0) THEN
         CALL IGrHardCopy('S')
         CALL IGrInit('P')
       END IF
@@ -202,8 +201,9 @@
         YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
         XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
+
+      INCLUDE 'GLBVAR.INC'
+
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
 
       CALL IGrSelect(1,0)
@@ -241,7 +241,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Plot_Custom_Axes(IPLT)
+      SUBROUTINE Plot_Custom_Axes
 
       USE WINTERACTER
 
@@ -298,7 +298,7 @@
       REAL CHAR_SIZE,MARKER_SIZE
       LOGICAL ERROR_BAR
       COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
-        INTEGER PlotErrorBars
+      LOGICAL PlotErrorBars ! Function
 
       CALL IPgYLabelLeft('Observed profile','C9')
 ! Do the error bars - we've precalculated the min & max pointers
@@ -379,7 +379,7 @@
       REAL CHAR_SIZE,MARKER_SIZE
       LOGICAL ERROR_BAR
       COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
-      INTEGER PlotErrorBars
+      LOGICAL PlotErrorBars ! Function
       REAL YDIF(MOBS),YCTEM(MOBS)
 !
       CALL IPgYLabelLeft('Observed profile','C9')
@@ -427,33 +427,6 @@
       CALL IGrColourN(KolNumMain)
 
       END SUBROUTINE Plot_ObsCalc_Profile
-!
-!*****************************************************************************
-!
-      SUBROUTINE PLOT_OPTIONS(IPTYPE)
-!
-! Enables the plot options to be altered ... 
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-!
-      INTEGER,           INTENT (IN) :: IPTYPE
-!      INTEGER IHANDLE(20)
-!
-!      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-!      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-!      XGGMIN,XGGMAX,YGGMIN,YGGMAX
-!      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-!
-!
-!$      CALL WDialogLoad(IDD_Plot_Option_Dialog)
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      CALL WDialogShow(-1,-1,0,Modeless)
-!
-!      IHANDLE(1)=0
-!      CALL WBitmapGet(IHANDLE(1),0)
-!
-      ENDSUBROUTINE PLOT_OPTIONS
 !
 !*****************************************************************************
 !
@@ -713,9 +686,6 @@
       COMMON /YSTORE/ ZCAL(MPPTS),ZBAK(MPPTS)
       COMMON /ZSTOR1/ ZXDELT,IIMIN,IIMAX,XDIFT,XMINT
 !
-      COMMON /PLTYPE/ IPTYPE
-!
-
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
      itypot(mobstic),iordot(mobstic),&
      uobstic(20,mobstic),zobstic(20,mobstic)
