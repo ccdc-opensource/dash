@@ -397,12 +397,7 @@
                 CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
                 CALL GETHCV(DashHcvFile,IER)
                 CALL GETPIK(DashPikFile,IER)
-                CALL WDialogSelect(IDD_ExclRegions)
-                CALL WDialogHide
                 CALL ShowWizardWindowZmatrices
-!O            CASE (IDB_ExclRegions)
-!O              CALL WDialogSelect(IDD_ExclRegions)
-!O              CALL WDialogShow(-1,-1,0,Modeless)
               ENDIF
           END SELECT
         CASE (FieldChanged)
@@ -420,31 +415,6 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithPawleyFitWindow
-!
-!*****************************************************************************
-!
-      SUBROUTINE DealWithExclRegionsWindow
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_ExclRegions)
-      SELECT CASE (EventType)
-        CASE (PushButton) ! one of the buttons was pushed
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDB_ClearAll)
-              CALL Clear_ExclRegions
-            CASE (IDCANCEL, IDCLOSE)
-              CALL WDialogHide
-          END SELECT
-      END SELECT
-      CALL PopActiveWindowID
-
-      END SUBROUTINE DealWithExclRegionsWindow
 !
 !*****************************************************************************
 !
@@ -512,14 +482,7 @@
       INTEGER NTCycles
       INTEGER ITEM, ISYM, IRTYP
       INTEGER tFileHandle, hFile
-      INTEGER iRow, ii, J
-      REAL    tReal
-! Following variables are needed to sort out the excluded regions
-      INTEGER iOrd(1:10)
-      REAL    rStart(1:10), rEnd(1:10)
-      REAL    trStart(1:10), trEnd(1:10)
-      INTEGER NumUsed
-      LOGICAL Used(1:10)
+      INTEGER J
 
 ! Are these checks in place here? If one of them fails, we shouldn't have been here in the first place.
 !
@@ -541,75 +504,6 @@
       NumInternalDSC = DataSetChange
       NumPawleyRef = NumPawleyRef + 1
       CALL PushActiveWindowID
-! Get Excluded regions from dialogue
-      CALL WDialogSelect(IDD_ExclRegions)
-      Used = .TRUE.
-      NumUsed = 0
-      DO iRow = 1, 10
-        CALL WGridGetCellReal(IDF_ExclRegionsGrid,1,iRow,rStart(iRow))
-        CALL WGridGetCellReal(IDF_ExclRegionsGrid,2,iRow,rEnd(iRow))
-! If either invalid, mark as unused
-        IF ((rStart(iRow) .LT. 0.0) .OR. (rEnd(iRow) .LT. 0.0)) Used(iRow) = .FALSE.
-! make Start < End
-        IF (rStart(iRow) .GT. rEnd(iRow)) THEN
-          tReal = rStart(iRow)
-          rStart(iRow) = rEnd(iRow)
-          rEnd(iRow) = tReal
-        ENDIF
-! Check Start not lower than start of data
-        IF (rStart(iRow) .LT. XBIN(1)   ) rStart(iRow) = XBIN(1)
-! Check End not greater than end of data
-        IF (rEnd(iRow)   .GT. XBIN(NBIN)) rEnd(iRow)   = XBIN(NBIN)
-! Check Start and End not same
-        IF ( NearlyEqual(rStart(iRow),rEnd(iRow))) Used(iRow) = .FALSE.
-! If not used, set Start to 200.0, that way they will end up at the end of the list
-        IF (Used(iRow)) THEN
-          NumUsed = NumUsed + 1
-        ELSE
-          rStart(iRow) = 200.0
-        ENDIF
-      ENDDO
-! Now sort
-      CALL SORT_REAL(rStart,iOrd,10)
-      DO iRow = 1, 10
-        trStart(iRow) = rStart(iOrd(iRow))
-        trEnd(iRow)   = rEnd(iOrd(iRow))
-      ENDDO
-      DO iRow = 1, 10
-        rStart(iRow) = trStart(iRow)
-        rEnd(iRow)   = trEnd(iRow)
-      ENDDO
-      Used = .TRUE.
-      IF (NumUsed .LT. 10) THEN
-        DO iRow = NumUsed+1, 10
-          Used(iRow) = .FALSE.
-        ENDDO
-      ENDIF
-! now check for overlap
-      iRow = 1
-   20 IF ((iRow+1) .LE. NumUsed) THEN
-        IF (rStart(iRow+1) .LE. (rEnd(iRow)+0.0001)) THEN
-          rEnd(iRow) = MAX(rEnd(iRow),rEnd(iRow+1))
-! Shift remaining by -1
-          IF ((iRow+1) .NE. NumUsed) THEN
-            DO ii = iRow+1, NumUsed-1
-              rStart(ii) = rStart(ii+1)
-              rEnd(ii)   = rEnd(ii+1)
-            ENDDO
-          ENDIF
-          NumUsed = NumUsed - 1
-        ELSE
-          iRow = iRow + 1
-        ENDIF
-        GOTO 20
-      ENDIF
-! End of Excluded Regions processing, NumUsed, rStart and rEnd have now been filled
-! Now update this to the user:
-      CALL WDialogClearField(IDF_ExclRegionsGrid)
-      DO iRow = 1, NumUsed
-        CALL WGridPutCellReal(IDF_ExclRegionsGrid,1,iRow,rStart(iRow))
-        CALL WGridPutCellReal(IDF_ExclRegionsGrid,2,iRow,rEnd(iRow))
-      ENDDO
       CALL WDialogSelect(IDD_Pawley_Status)
       CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
       CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
@@ -645,9 +539,6 @@
       IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
       WRITE(hFile,4260,ERR=999) ZeroPoint
  4260 FORMAT('L ZERO ',F10.5)
-      DO iRow = 1, NumUsed
-        WRITE(hFile,"('L EXCL ',F7.3,1X,F7.3)",ERR=999) rStart(iRow), rEnd(iRow)
-      ENDDO
       CALL WDialogGetReal(IDF_Slim_Parameter,SLIMVALUE)
       WRITE(hFile,4270,ERR=999) SCALFAC, SLIMVALUE
  4270 FORMAT('L SCAL   ',F7.5,/                                         &

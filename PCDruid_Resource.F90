@@ -1,4 +1,4 @@
-! Winteracter module created : 15/Jul/2003 09:38:29
+! Winteracter module created : 15/Jul/2003 10:59:22
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -490,9 +490,6 @@
           INTEGER, PARAMETER :: IDF_FileName                    =  1393
           INTEGER, PARAMETER :: IDF_BisoOccValue                =  1394
           INTEGER, PARAMETER :: IDF_LABEL3                      =  1395
-          INTEGER, PARAMETER :: IDD_ExclRegions                 =   163
-          INTEGER, PARAMETER :: IDD_TEMPLATE015                 =   164
-          INTEGER, PARAMETER :: IDF_ExclRegionsGrid             =  1396
           INTEGER, PARAMETER :: IDB_ReOrder                     =  1400
           INTEGER, PARAMETER :: IDBSAVE                         =  1403
           INTEGER, PARAMETER :: IDB_Rotations                   =  1405
@@ -604,7 +601,6 @@
           INTEGER, PARAMETER :: IDF_Beta                        =  1249
           INTEGER, PARAMETER :: IDF_Gamma                       =  1250
           INTEGER, PARAMETER :: IDD_ViewPawley                  =   127
-          INTEGER, PARAMETER :: IDB_ClearAll                    =  1406
           INTEGER, PARAMETER :: IDM_ViewPawley                  = 40030
           INTEGER, PARAMETER :: IDF_CHECK7                      =  1248
           INTEGER, PARAMETER :: IDF_ShowCumChiSqd               =  1408
