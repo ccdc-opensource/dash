@@ -190,9 +190,9 @@
           END DO
           ybbin(I) = (ybbin(I)-ys(I))/FLOAT(2 * nbruckwin)
         END DO
-! Use a Monte Carlo algorithm to find the correct height of the background
         IF (UseMC) THEN
           DO I = 1, NBIN
+! Use a Monte Carlo algorithm to find the correct height of the background
 ! rat = ratio?
             rat = (ybbin(I)-ys(I))/ebin(I)
             stem = 1.0 / (1.0 + EXP(MIN(20.0,-rat)))  
@@ -202,7 +202,7 @@
           END DO
         ELSE
           DO I = 1, NBIN
-            ys(I) = ybbin(I)
+            ys(I) = MIN(ybbin(I),ys(I))
           END DO
         ENDIF
       END DO
