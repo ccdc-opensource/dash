@@ -1291,9 +1291,9 @@
             CASE (IDBBROWSE)
               ISTAT = DiffractionFileBrowse()
 ! Don't change if the user pressed 'Cancel' (ISTAT = 2)
-              IF      (ISTAT .EQ. 1) THEN
+              IF      (ISTAT .EQ. 0) THEN
                 CALL WDialogFieldState(IDNEXT, Enabled)
-              ELSE IF (ISTAT .EQ. 0) THEN
+              ELSE IF (ISTAT .EQ. 1) THEN
                 CALL WDialogFieldState(IDNEXT, Disabled)
               ENDIF
           END SELECT
