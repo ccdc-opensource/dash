@@ -4052,8 +4052,8 @@ IDB_Prog3                       BITMAP DISCARDABLE "res\\ChiSqd3.bmp"
 // Icons
 //
 icon1                           ICON   DISCARDABLE "res\\DASH.ico"
-IDF_BimodalIcon                 ICON   DISCARDABLE "C:\\wint\\bin\\bimodal.ico"
-IDF_TriModalIcon                ICON   DISCARDABLE "C:\\wint\\bin\\trimodal.ico"
+IDF_BimodalIcon                 ICON   DISCARDABLE "res\\bimodal.ico"
+IDF_TriModalIcon                ICON   DISCARDABLE "res\\trimodal.ico"
 
 ///////////////////////////////////////////////////
 //
