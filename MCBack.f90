@@ -1,95 +1,98 @@
 
       SUBROUTINE BackFit(FilterWidth)
+
+      USE WINTERACTER
+
       INCLUDE 'PARAMS.INC'
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
 
       INTEGER FilterWidth
 
+      CALL WCursorShape(CurHourGlass)
 ! Calculate values in common array
       CALL BackMCBruckner(XBIN,YOBIN,EBIN,NBIN,FilterWidth,YBBIN)
+      CALL WCursorShape(CurArrow)
 
       END SUBROUTINE BackFit
 !
 !*****************************************************************************
 !
-      SUBROUTINE BackMCBruckner(xbin,yobin,ebin,ndat,nbruckwin,ybbin)
-!
+      SUBROUTINE BackMCBruckner(XBIN,YOBIN,EBIN,ndat,nbruckwin,ybbin)
+
       INCLUDE 'PARAMS.INC'
 
-      PARAMETER (MAXSSPL=5000)
-      PARAMETER (MXRAN=10000)
-!
-      REAL,    DIMENSION(MAXSSPL)                 :: xkt
-      INTEGER, DIMENSION(MAXSSPL)                 :: ikt
-      INTEGER, DIMENSION(MAXSSPL)                 :: ipartem
-!
-      REAL,    DIMENSION(MOBS), INTENT(IN)      :: xbin,yobin,ebin
-      REAL,    DIMENSION(MOBS)            :: ybbin
+      REAL,    DIMENSION(MOBS), INTENT(IN   ) :: XBIN, YOBIN, EBIN
+      INTEGER,                  INTENT(IN   ) :: NDAT
+      INTEGER,                  INTENT(IN   ) :: nbruckwin
+      REAL,    DIMENSION(MOBS), INTENT(  OUT) :: ybbin
 ! JvdS New, local copies of ybbin etc. are created here, but that's not necessary
-      REAL,    DIMENSION(MOBS)            :: yst,es
+
+      PARAMETER (MAXSSPL=5000)
+      REAL,    DIMENSION(MAXSSPL)         :: xkt
+      INTEGER, DIMENSION(MAXSSPL)         :: ikt
+      INTEGER, DIMENSION(MAXSSPL)         :: ipartem
+      REAL,    DIMENSION(MOBS)            :: es
       REAL,    DIMENSION(-200:MOBS+200)   :: ys
       INTEGER, DIMENSION(MOBS)            :: jft
-!
-      INTEGER                             :: IRAN
-      REAL, DIMENSION(MXRAN)              :: RANVAL
+      REAL                                tRandomNumber
+
 !
 !  This subroutine determines the background using a smoothing
-!  procedure published by Sergio Bruckner in J. Appl. Cryst. (2000) 33, 977-979
+!  procedure published by Sergio Brueckner in J. Appl. Cryst. (2000) 33, 977-979
 !  Modified by WIFD to smooth residual noise using SplineSmooth 
 !  and raise background to correct value using a Monte Carlo sampling procedure)
 !
-      mbruckiter = 20
-      iran = 1
-      CALL Random_Number(RanVal)
-      DO i = -nbruckwin, 0
-        ii = ndat + i
-        ys(i) = yobin(1)
+      mbruckiter = 30
+      DO I = -nbruckwin, 0
+        ys(I) = yobin(1)
       END DO
-      DO i = 1, ndat
-        ys(i) = yobin(i)
+      DO I = 1, ndat
+        ys(I) = yobin(I)
       END DO
-      DO i = 1, nbruckwin
-        ii = ndat + i
+      DO I = 1, nbruckwin
+        ii = ndat + I
         ys(ii) = yobin(ndat)
       END DO
-      item = 2 * nbruckwin
+      IIII = 0
       DO iter = 1, mbruckiter
-        DO i = 1, ndat
-          iilo = i - nbruckwin
-          iihi = i + nbruckwin
-          ybbin(i) = 0.0
-          DO ii = iilo, iihi
-            ybbin(i) = ybbin(i) + ys(ii)
+! Loop over data points
+        DO I = 1, ndat
+          iilo = I - nbruckwin
+          iihi = I + nbruckwin
+          ybbin(I) = 0.0
+! Loop over window around current data point
+          DO II = iilo, iihi
+            ybbin(I) = ybbin(I) + ys(II)
           END DO
-          ybbin(i) = (ybbin(i)-ys(i))/FLOAT(item)
+          ybbin(I) = (ybbin(I)-ys(I))/FLOAT(2 * nbruckwin)
         END DO
-        DO i = 1, ndat
-          rat = (ybbin(i)-ys(i))/ebin(i)
-          stem=1./(1.+EXP(MIN(20.,-rat)))  
-          iran=1+MOD(iran+1,mxran)
-          IF (ranval(iran) .LT. stem) THEN
-            ybbin(i)=ys(i)
-          END IF
-          ys(i)=ybbin(i)
+        DO I = 1, ndat
+! rat = ratio?
+          rat = (ybbin(I)-ys(I))/ebin(I)
+          stem = 1.0 / (1.0 + EXP(MIN(20.0,-rat)))  
+          CALL RANDOM_NUMBER(tRandomNumber)
+          IF (tRandomNumber .LT. stem) ybbin(I) = ys(I)
+          ys(I) = ybbin(I)
         END DO
       END DO
-!
 !.. Now we should do some spline smoothing to remove the noise 
-!   
       nsep    =  5
       ninsep  = 10
       ngood   =  0
-      knotem  =  0
+      knotem  =  0  
       npartem =  0
       DO i = 1, ndat
         IF (ybbin(i) .EQ. yobin(i)) THEN
-          es(i)=1.e6*ebin(i)
+          es(i) = 1.E6 * ebin(i)
         ELSE
           es(i) = ebin(i)
-          IF (ngood.eq.nsep*(ngood/nsep)) THEN
-            IF (knotem.eq.ninsep*(knotem/ninsep)) THEN
+! JvdS should the following lines be replaced by
+!           IF (MOD(ngood,nsep) .EQ. 0) THEN
+!            IF (MOD(knotem,ninsep) .EQ. 0) THEN
+! ?
+          IF (ngood .EQ. nsep*(ngood/nsep)) THEN
+            IF (knotem .EQ. ninsep*(knotem/ninsep)) THEN
               npartem = npartem + 1
               ipartem(npartem) = knotem + 1
             END IF
@@ -104,14 +107,14 @@
       ipartem(npartem) = knotem
       jft(1) = 1
       jft(ndat) = knotem - 1
-      DO kk=1,knotem-1
-        i1=ikt(kk)
-        i2=ikt(kk+1)-1
-        DO i=i1,i2
-          jft(i)=kk
+      DO kk = 1, knotem-1
+        i1 = ikt(kk)
+        i2 = ikt(kk+1) - 1
+        DO i = i1, i2
+          jft(i) = kk
         END DO
       END DO
-      DO i = 1, npartem - 1
+      DO i = 1, npartem-1
         jf1 = ipartem(i)
         jf0 = jf1-1
         jfp1 = ipartem(i+1)
@@ -120,83 +123,90 @@
         ndiv = 1 + ikt(jfp1) - n0
         CALL SplineSmooth(xbin(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,ybbin(n0))
       END DO
-!
+
       END SUBROUTINE BackMCBruckner
 !
 !*****************************************************************************
 !
       SUBROUTINE SplineSmooth(x,y,e,ndat,jf0,jfs,xkk,nkn,smo)
-!
-      REAL xkk(nkn)
-      REAL x(ndat),y(ndat),e(ndat)
+
+      REAL    x(ndat),y(ndat),e(ndat)
+      INTEGER NDAT
       INTEGER jfs(ndat)
-!
-      REAL*8 xdel(nkn),u(nkn,nkn)
-      REAL*8 bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
-!
-      REAL*8 xdd
-      REAL*8 a(ndat),b(ndat),c(ndat),d(ndat)
-!
-      REAL*8 deri(nkn),ans(nkn)
-      REAL   smo(ndat)
-      REAL*8 w
-      REAL*8 qj, qj1
-!
-      DO j=1,nkn-1
-        xdel(j)=DBLE(xkk(j+1)-xkk(j))
+      REAL    xkk(nkn)
+      REAL    smo(ndat)
+
+      REAL*8  xdel(nkn),u(nkn,nkn)
+      REAL*8  bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
+
+      REAL*8  xdd
+      REAL*8  a(ndat),b(ndat),c(ndat),d(ndat)
+
+      REAL*8  deri(nkn),ans(nkn)
+      REAL*8  w
+      REAL*8  qj, qj1
+      REAL*8  TempResult
+
+      DO J = 1, nkn-1
+        xdel(J) = DBLE(xkk(J+1)-xkk(J))
       END DO
       CALL SplVal(xdel,u,nkn)
-      nd1=ndat-1
-      nk1=nkn-1
-      DO j=1,nkn
-        bvec(j)=0. 
-        DO k=1,nkn
-          hess(j,k)=0. 
+      nd1 = ndat-1
+      nk1 = nkn-1
+      DO j = 1, nkn
+        bvec(j) = 0.0 
+        DO k = 1, nkn
+          hess(j,k) = 0.0 
         END DO
       END DO
-      DO i=1,ndat
-        j0=MIN(nkn-1,jfs(i)-jf0)
-        j1=j0+1
-        w= DBLE(e(i))**-2
+      DO i = 1, ndat
+        j0 = MIN(nkn-1,jfs(i)-jf0)
+        j1 = j0 + 1
+        w = DBLE(e(i))**-2
 !       b(i)=(dble(x(i))-xkk(j0))/xdel(j0)
-        b(i)= ( DBLE( x(i)-xkk(j0) ) )/xdel(j0)
-        a(i)=1.-b(i)
-        ab=-a(i)*b(i)/6.
-        xdd=xdel(j0)**2
-        c(i)=ab*(1.+a(i))*xdd
-        d(i)=ab*(1.+b(i))*xdd
-        DO j=1,nkn
-          deri(j)=0.
+        b(i) = ( DBLE( x(i)-xkk(j0) ) )/xdel(j0)
+        a(i) = 1.0-b(i)
+        ab = -a(i)*b(i)/6.0
+        xdd = xdel(j0)**2
+        c(i) = ab*(1.0 + a(i))*xdd
+        d(i) = ab*(1.0 + b(i))*xdd
+        DO j = 1, nkn
+          deri(j) = 0.0
         END DO
-        deri(j0)=a(i)
-        deri(j1)=b(i)
-        DO j=1,nkn
-          deri(j)=deri(j)+c(i)*u(j0,j)+d(i)*u(j1,j)
+        deri(j0) = a(i)
+        deri(j1) = b(i)
+        DO j = 1, nkn
+          deri(j) = deri(j)+c(i)*u(j0,j)+d(i)*u(j1,j)
         END DO
-        do j=1,nkn
-          bvec(j)=bvec(j)+w*dble(y(i))*deri(j)
-          do k=1,nkn
-            hess(j,k)=hess(j,k)+w*deri(j)*deri(k)
-          end do
-        end do
-      end do
-      call DGMINV(hess,covar,nkn)
-      do i=1,nkn
-        ans(i)=0.
-        do j=1,nkn
-          ans(i)=ans(i)+covar(i,j)*bvec(j)
-        end do
-      end do
-      do i=1,ndat
-        j0=jfs(i)-jf0
-        j1=j0+1
-        qj=0.
-        qj1=0.
-        do k=1,nkn
-          qj=qj+u(j0,k)*ans(k)
-          qj1=qj1+u(j1,k)*ans(k)
-        end do
-        smo(i)=sngl(a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1)
+        DO j = 1, nkn
+          bvec(j) = bvec(j)+w*DBLE(y(i))*deri(j)
+          DO k = 1, nkn
+            hess(j,k) = hess(j,k)+w*deri(j)*deri(k)
+          END DO
+        END DO
+      END DO
+      CALL DGMINV(hess,covar,nkn)
+      DO I = 1, nkn
+        ans(i) = 0.0
+        DO j = 1, nkn
+          ans(i) = ans(i) + covar(i,j) * bvec(j)
+        END DO
+      END DO
+      DO I = 1, ndat
+        j0 = jfs(i) - jf0
+        j1 = j0 + 1
+        qj  = 0.0
+        qj1 = 0.0
+        DO k = 1, nkn
+          qj  = qj  + u(j0,k)*ans(k)
+          qj1 = qj1 + u(j1,k)*ans(k)
+        END DO
+! JvdS Was:
+!O        smo(i) = SNGL(a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1)
+! This caused an underflow error
+        TempResult = a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1
+        IF (TempResult .LT. 0.000001) TempResult = 0.0
+        smo(i) = SNGL(TempResult)
       END DO
 !
       END SUBROUTINE SplineSmooth
@@ -204,35 +214,40 @@
 !*****************************************************************************
 !
       SUBROUTINE SplVal(XDEL,U,M)
-!
-      REAL*8 xdel(m)
-      REAL*8 u(m,m)
-      REAL*8 a(m,m),b(m,m),c(m,m)
-!
-      do j=1,m
-        do i=1,m
-          a(i,j)=0.
-          b(i,j)=0.
-          c(i,j)=0.
-        end do
-      end do
-      a(1,1)=1.
-      a(m,m)=1.
-      DO i=2,m-1
-        im1=i-1
-        ip1=i+1
-        a(i,im1)=xdel(im1)/6.0
-        a(i,ip1)=xdel(i)/6.0
-        a(i,i)=2.*(a(i,im1)+a(i,ip1))
-        c(i,im1)=1./xdel(im1)
-        c(i,ip1)=1./xdel(i)
-        c(i,i)=-(c(i,im1)+c(i,ip1))
-      end do
-!
-      call DGMINV(a,b,m)
-      call DGMPRD(b,c,u,m,m,m)
-!
-      end subroutine SplVal
+
+      INTEGER M
+      REAL*8  xdel(m)
+      REAL*8  u(m,m)
+
+      REAL*8  A(m,m),b(m,m),c(m,m)
+      INTEGER I, J
+
+! Initialise all entries of A, b and c to 0.0
+      DO J = 1, m
+        DO I = 1, m
+          A(I,J) = 0.0
+          b(I,J) = 0.0
+          c(I,J) = 0.0
+        END DO
+      END DO
+      A(1,1) = 1.0
+      A(m,m) = 1.0
+      DO I = 2, m-1
+!        Im1 = I - 1
+!        Ip1 = I + 1
+        A(I,I-1) = xdel(I-1) / 6.0
+        A(I,I+1) = xdel(I  ) / 6.0
+        A(I,I  ) = 2.0 * (A(I,I-1)+A(I,I+1))
+        c(I,I-1) = 1.0 / xdel(I-1)
+        c(I,I+1) = 1.0 / xdel(I)
+        c(I,I)   = -(c(I,I-1)+c(I,I+1))
+      END DO
+! Invert matrix A. Answer is in b
+      CALL DGMINV(A,b,m)
+! Multiply matrix b by matrix c. Result is in u
+      CALL MultiplyMatrices(b,c,u,m,m,m)
+
+      END SUBROUTINE SplVal
 !
 !*****************************************************************************
 !
@@ -249,124 +264,108 @@
 !D Based on SID
 !
       IMPLICIT REAL*8 (A-H,O-Z)
-      INTEGER           II(500),IL(500),IG(500)
-      REAL*8            A(N,N),B(N,N)
-!
-      CALL DGMEQ(A,B,N,N)
-      D=1.
-      IS=N-1
-      DO 10 K=1,N
-      IL(K)=0
-   10 IG(K)=K
-!
-      DO 150 K=1,N
-      R=0.
-      DO 40 I=1,N
-      IF (IL(I) .NE. 0) GO TO 40
-      W=B(I,K)
-      X=ABS(W)
-      IF (R .GT. X) GO TO 40
-      R=X
-      P=W
-      KF=I
-   40 CONTINUE
-      II(K)=KF
-      IL(KF)=KF
-      D=D*P
-      IF (D .EQ. 0.) D=1.e-6
-!
-      DO 80 I=1,N
-      IF (I .EQ. KF) THEN
-      B(I,K)=1./P
-      ELSE
-      B(I,K)=-B(I,K)/P
-      ENDIF
-   80 CONTINUE
-!
-      DO 140 J=1,N
-        IF (J .EQ. K) GO TO 140
-        W=B(KF,J)
-        IF (W .EQ. 0.) GO TO 140
-        DO 130 I=1,N
+      INTEGER         II(500),IL(500),IG(500)
+      REAL*8          A(N,N),B(N,N)
+      INTEGER         I, J
+
+! Initialise b with values from a
+      DO I = 1, N
+        DO J = 1, N
+          B(I,J) = A(I,J)
+        ENDDO
+      ENDDO
+      D = 1.0
+      IS = N - 1
+      DO K = 1, N
+        IL(K) = 0
+        IG(K) = K
+      ENDDO
+      DO 150 K = 1, N
+        R = 0.0
+        DO 40 I = 1, N
+          IF (IL(I) .NE. 0) GOTO 40
+          W = B(I,K)
+          X = ABS(W)
+          IF (R .GT. X) GOTO 40
+          R  = X
+          P  = W
+          KF = I
+   40   CONTINUE
+        II(K) = KF
+        IL(KF) = KF
+        D = D * P
+        IF (D .EQ. 0.0) D = 1.0E-6
+        DO 80 I = 1, N
           IF (I .EQ. KF) THEN
-            B(I,J)=W/P
+            B(I,K) = 1.0/P
           ELSE
-            B(I,J)=B(I,J)+W*B(I,K)
+            B(I,K) = -B(I,K)/P
           ENDIF
-  130   CONTINUE
-  140 CONTINUE
-!
+   80   CONTINUE
+        DO 140 J = 1, N
+          IF (J .EQ. K) GOTO 140
+          W = B(KF,J)
+          IF (W .EQ. 0.0) GOTO 140
+          DO 130 I = 1, N
+            IF (I .EQ. KF) THEN
+              B(I,J) = W/P
+            ELSE
+              B(I,J) = B(I,J)+W*B(I,K)
+            ENDIF
+  130     CONTINUE
+  140   CONTINUE
   150 CONTINUE
-!.....
-!
-      DO 190 K=1,IS
-      KF=II(K)
-      KL=IL(KF)
-      KG=IG(K)
-      IF(KF .EQ. KG) GO TO 190
-      DO 170 I=1,N
-      R=B(I,KF)
-      B(I,KF)=B(I,KG)
-  170 B(I,KG)=R
-      DO 180 J=1,N
-      R=B(K,J)
-      B(K,J)=B(KL,J)
-  180 B(KL,J)=R
-      IL(KF)=K
-      IL(KG)=KL
-      IG(KL)=IG(K)
-      IG(K)=KF
-      D=-D
+      DO 190 K = 1, IS
+        KF = II(K)
+        KL = IL(KF)
+        KG = IG(K)
+        IF(KF .EQ. KG) GOTO 190
+        DO 170 I = 1, N
+          R = B(I,KF)
+          B(I,KF) = B(I,KG)
+  170     B(I,KG) = R
+        DO 180 J = 1, N
+          R = B(K,J)
+          B(K,J) = B(KL,J)
+  180     B(KL,J) = R
+        IL(KF) = K
+        IL(KG) = KL
+        IG(KL) = IG(K)
+        IG(K) = KF
+        D = -D
   190 CONTINUE
       RETURN
-      END
-!
-!
-! LEVEL 1      SUBROUTINE DGMEQ(A,B,NI,NJ)
-      SUBROUTINE DGMEQ(A,B,NI,NJ)
-!
-! *** GMEQ by PJB/JCM 28 Jun 83 ***
-!
-!X
-!C 12C
-!H Sets matrix B = matrix A.
-!A On exit  B is a real matrix equal to A
-!N NI and NJ must be at least 1
-!
-      REAL*8 A(NI,NJ),B(NI,NJ)
-
-      DO 1 I=1,NI
-        DO 1 J=1,NJ
-    1 B(I,J)=A(I,J)
-      RETURN
-      END
+      END SUBROUTINE DGMINV
 !
 !*****************************************************************************
 !
-! LEVEL 1      SUBROUTINE DGMPRD(A,B,C,NI,NJ,NK)
-      SUBROUTINE DGMPRD(A,B,C,NI,NJ,NK)
+      SUBROUTINE MultiplyMatrices(A,B,C,Dim1,Dim2,Dim3)
 !
-! *** GMPRD by JCM ***
+! This subroutine multiplies two matrices A and B
 !
-!X
+! INPUT  : A, B = the matrices to be multiplied
+!          Dim1, Dim2, Dim3 : Dimensions of the matrices.
+!          A is a Dim1 x Dim2 matrix
+!          B is a Dim2 x Dim3 matrix
 !
-!H Sets matrix C = matrix A times matrix B.
-!A On entry A is a real NIxNJ matrix
-!A          B is a real NJxNK matrix
-!A On exit  C is a real NIxNK matrix holding A times B
+! OUTPUT : C = A x B
 !
-      IMPLICIT REAL*8 (A-H,O-Z)
-      REAL*8 A(*),B(*),C(*)
-      DO 2 I = 1, NI
-      IK = I
-      JK = 1
-      DO 2 K = 1, NK
-        IJ = I
-        C(IK) = 0.
-        DO 1 J = 1,NJ
-          C(IK) = C(IK) + A(IJ)*B(JK)
-          IJ = IJ + NI
-    1   JK = JK + 1
-    2 IK = IK + NI
-      RETURN
-      END
+      IMPLICIT NONE
+
+      INTEGER Dim1, Dim2, Dim3
+      REAL*8  A(Dim1,Dim2), B(Dim2,Dim3), C(Dim1,Dim3)
+      INTEGER I, J, K
+
+      DO I = 1, Dim1
+        DO J = 1, Dim3
+          C(I,J) = 0.0
+          DO K = 1, Dim2
+            C(I,J) =  C(I,J) + A(I,K)*B(K,J)
+          ENDDO
+        ENDDO
+      ENDDO
+
+      END SUBROUTINE MultiplyMatrices
+!
+!*****************************************************************************
+!
