@@ -1,4 +1,4 @@
-! Winteracter module created : 02/Feb/2002 17:58:57
+! Winteracter module created : 05/Feb/2002 12:23:33
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -528,8 +528,26 @@
           INTEGER, PARAMETER :: IDF_zmFile2                     =  1389
           INTEGER, PARAMETER :: IDF_zmFile3                     =  1390
           INTEGER, PARAMETER :: IDF_zmFile4                     =  1391
+          INTEGER, PARAMETER :: IDB_Set                         =  1392
           INTEGER, PARAMETER :: IDF_FileName                    =  1393
+          INTEGER, PARAMETER :: IDF_UisoOccValue                =  1394
           INTEGER, PARAMETER :: IDF_LABEL3                      =  1395
-          INTEGER, PARAMETER :: IDF_REAL1                       =  1396
-          INTEGER, PARAMETER :: IDF_BUTTON10                    =  1397
+          INTEGER, PARAMETER :: IDD_ExclRegions                 =   163
+          INTEGER, PARAMETER :: IDD_TEMPLATE015                 =   164
+          INTEGER, PARAMETER :: IDF_ExclRegionsFrid             =  1396
+          INTEGER, PARAMETER :: IDF_OrderZM                     =  1397
+          INTEGER, PARAMETER :: IDF_DelLatAtm                   =  1398
+          INTEGER, PARAMETER :: IDF_OrderOrig                   =  1399
+          INTEGER, PARAMETER :: IDB_ReOrder                     =  1400
+          INTEGER, PARAMETER :: IDBSAVE                         =  1403
+          INTEGER, PARAMETER :: IDB_Rotations                   =  1405
+          INTEGER, PARAMETER :: IDD_zmEditRotations             =   165
+          INTEGER, PARAMETER :: IDF_CHECK1                      =  1406
+          INTEGER, PARAMETER :: IDF_INTEGER1                    =  1407
+          INTEGER, PARAMETER :: IDF_RADIO5                      =  1408
+          INTEGER, PARAMETER :: IDF_RADIO6                      =  1409
+          INTEGER, PARAMETER :: IDF_INTEGER2                    =  1413
+          INTEGER, PARAMETER :: IDF_a2                          =  1415
+          INTEGER, PARAMETER :: IDF_b2                          =  1416
+          INTEGER, PARAMETER :: IDF_c2                          =  1417
       END MODULE Druid_Header

@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 02/Feb/2002 17:58:57
+// Modified : 05/Feb/2002 12:23:33
 //
 ///////////////////////////////////////////////////
 //
@@ -541,10 +541,28 @@
 #define IDF_zmFile2                      1389
 #define IDF_zmFile3                      1390
 #define IDF_zmFile4                      1391
+#define IDB_Set                          1392
 #define IDF_FileName                     1393
+#define IDF_UisoOccValue                 1394
 #define IDF_LABEL3                       1395
-#define IDF_REAL1                        1396
-#define IDF_BUTTON10                     1397
+#define IDD_ExclRegions                   163
+#define IDD_TEMPLATE015                   164
+#define IDF_ExclRegionsFrid              1396
+#define IDF_OrderZM                      1397
+#define IDF_DelLatAtm                    1398
+#define IDF_OrderOrig                    1399
+#define IDB_ReOrder                      1400
+#define IDBSAVE                          1403
+#define IDB_Rotations                    1405
+#define IDD_zmEditRotations               165
+#define IDF_CHECK1                       1406
+#define IDF_INTEGER1                     1407
+#define IDF_RADIO5                       1408
+#define IDF_RADIO6                       1409
+#define IDF_INTEGER2                     1413
+#define IDF_a2                           1415
+#define IDF_b2                           1416
+#define IDF_c2                           1417
 
 ///////////////////////////////////////////////////
 //
@@ -2734,7 +2752,7 @@ BEGIN
     CONTROL "a*",IDF_LABELa,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  241,   20,   14,    8
     CONTROL "b*",IDF_LABELb,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  294,   20,   14,    8
     CONTROL "c*",IDF_LABELc,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  346,   20,   14,    8
-    CONTROL "",IDF_RotationsGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   95,   61,  292,   79
+    CONTROL "",IDF_RotationsGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   95,   61,  292,   66
     CONTROL "Include preferred orientation axis",IDF_Use_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_LEFT,  104,   31,  115,   14
 END
 
@@ -2750,7 +2768,7 @@ BEGIN
 " 1237            -100             100 \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1238     4      5   135 \n"
+" 1238     4      4   135 \n"
 "   92 \n"
 "[Colours] \n"
 "[Lengths] \n"
@@ -2952,30 +2970,39 @@ BEGIN
 ,0
 END
 
-IDD_zmEdit DIALOG 0, 0,  268,  325
+IDD_zmEdit DIALOG 0, 0,  268,  342
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Edit Atomic Properties / Z-Matrix"
 BEGIN
-    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   78,  302,   40,   14
-    CONTROL "&Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  138,  302,   40,   14
-    CONTROL "&View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  198,  278,   40,   14
-    CONTROL "Save &As...",IDB_SaveAs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  148,  278,   40,   14
-    CONTROL "",IDF_AtomPropGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   39,   25,  190,  204
-    CONTROL "Re-&label",IDB_Relabel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   30,  278,   40,   14
-    CONTROL "Debug message",IDF_FileName,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,   34,    7,  200,   14
-    CONTROL "Uiso / Occpancies",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  238,  250,   32
-    CONTROL "",IDF_WhichAtomMenu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  112,  251,   80,   40
-    CONTROL "to",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  197,  253,   10,    8
-    CONTROL "0.0",IDF_REAL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  213,  250,   35,   14
-    CONTROL "of",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   98,  253,   10,    8
-    CONTROL "&Set",IDF_BUTTON10,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   15,  250,   30,   14
-    CONTROL "",IDF_UisoOccMenu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,   52,  251,   40,   40
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  116,  319,   40,   14
+    CONTROL "&Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  167,  319,   40,   14
+    CONTROL "&View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   11,  293,   42,   14
+    CONTROL "Save &As...",IDB_SaveAs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   63,  293,   42,   14
+    CONTROL "",IDF_AtomPropGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   39,   22,  190,  204
+    CONTROL "Re-&label",IDB_Relabel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   11,  272,   42,   14
+    CONTROL "Debug message",IDF_FileName,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,   34,    7,  200,   12
+    CONTROL "Uiso / Occupancies",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  232,  250,   33
+    CONTROL "",IDF_WhichAtomMenu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  112,  245,   80,   40
+    CONTROL "to",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  198,  247,   10,    8
+    CONTROL "3.0000",IDF_UisoOccValue,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  213,  244,   35,   14
+    CONTROL "of",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   97,  247,   10,    8
+    CONTROL "&Set",IDB_Set,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   15,  244,   30,   14
+    CONTROL "",IDF_UisoOccMenu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,   52,  245,   40,   40
+    CONTROL "Ori&ginal",IDF_OrderOrig,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  202,  278,   45,   14
+    CONTROL "&Z-matrix",IDF_OrderZM,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  202,  292,   45,   14
+    CONTROL "Order",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  192,  269,   60,   40
+    CONTROL "Delete last &atom",IDF_DelLatAtm,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  115,  272,   64,   14
+    CONTROL "Sa&ve",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   63,  319,   42,   14
+    CONTROL "Re-or&der",IDB_ReOrder,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   63,  272,   42,   14
+    CONTROL "&Rotations...",IDB_Rotations,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  115,  293,   50,   14
 END
 
 IDD_zmEdit RCDATA
 BEGIN
 "[Checks] \n"
+" 1399 1 \n"
+" 1397 0 \n"
 "[Menus] \n"
 " 1382     3     2 \n"
 "All atoms \n"
@@ -2986,6 +3013,7 @@ BEGIN
 "Occ. \n"
 "[Tabs] \n"
 "[Ranges] \n"
+" 1394      0.0000           10.000      \n"
 "[Trackbars] \n"
 "[Grids] \n"
 " 1381     4    150   161 \n"
@@ -3058,7 +3086,7 @@ BEGIN
     CONTROL "Sigma(strain)",IDF_PawRef_RefSigm2_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  104,   60,   54,   14
     CONTROL "Gamma(size)",IDF_PawRef_RefGamm1_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  161,   46,   54,   14
     CONTROL "Gamma(strain)",IDF_PawRef_RefGamm2_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  161,   60,   60,   14
-    CONTROL "Refined control",IDF_Pawley_Options_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,    7,  298,   72
+    CONTROL "Refinement control",IDF_Pawley_Options_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,    7,  298,   72
     CONTROL "&Solve >",IDF_PawRef_Solve,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  349,  150,   40,   14
     CONTROL "2",IDF_Pawley_Cycle_ChiSq_Label2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  348,  126,    5,    8
     CONTROL "Re&ject",IDB_PawRef_Reject,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  246,  150,   40,   14
@@ -3092,6 +3120,93 @@ BEGIN
 " 1291               2              20 \n"
 " 1007     0.25000           3.0000      \n"
 " 1095     0.10000E-001      5.0000      \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_ExclRegions DIALOG 0, 0,  257,  162
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Excluded Regions"
+BEGIN
+    CONTROL "",IDF_ExclRegionsFrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   24,   16,  196,  108
+END
+
+IDD_ExclRegions RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+" 1396     2     10   164 \n"
+"   20 \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_TEMPLATE015 DIALOG 0, 0, 1000,   16
+STYLE DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Start",ISS1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
+    CONTROL "End",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
+END
+
+IDD_TEMPLATE015 RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1021      0.0000           90.000      \n"
+" 1066      0.0000           90.000      \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_zmEditRotations DIALOG 0, 0,  243,  168
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Edit Rotations / Z-Matrix"
+BEGIN
+    CONTROL "Use molecular centre of mass",IDF_RADIO3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   22,   21,  110,   14
+    CONTROL "Use atom number",IDF_RADIO4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   22,   35,   75,   14
+    CONTROL "0",IDF_INTEGER1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   97,   35,   36,   14
+    CONTROL "Centre of rotation",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   12,    9,  136,   48
+    CONTROL "Fractional co-ordinates",IDF_RADIO5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   32,  108,   90,   14
+    CONTROL "Atom number",IDF_RADIO6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   32,   94,   60,   14
+    CONTROL "a",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  115,  112,   30,    8
+    CONTROL "b",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  151,  112,   30,    8
+    CONTROL "c",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  187,  112,   30,    8
+    CONTROL "0",IDF_INTEGER2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   92,   94,   41,   14
+    CONTROL "0.0",IDF_a2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  115,  122,   30,   14
+    CONTROL "0.0",IDF_b2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  151,  122,   30,   14
+    CONTROL "1.0000",IDF_c2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  187,  122,   30,   14
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  101,  148,   40,   14
+    CONTROL "Axis direction",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   22,   82,  208,   60
+    CONTROL "Restrict rotation about a single axis",IDF_CHECK1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   65,  120,   14
+END
+
+IDD_zmEditRotations RCDATA
+BEGIN
+"[Checks] \n"
+" 1129 1 \n"
+" 1130 0 \n"
+" 1408 1 \n"
+" 1409 0 \n"
+" 1406 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
