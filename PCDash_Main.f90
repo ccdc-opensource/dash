@@ -358,7 +358,7 @@
 
       INTEGER ISTAT
 
-      CALL SaveConfigurationFile
+      CALL WriteConfigurationFile
       CLOSE(UNIT=12,STATUS='DELETE',IOSTAT=ISTAT)
       CLOSE(UNIT=6,STATUS='DELETE',IOSTAT=ISTAT)
       CALL DeleteTempFiles
