@@ -50,7 +50,7 @@
         II = I + (I-1)*N
         DX(I) = SQRT(AMAX1(0.0,COV(II)))
       ENDDO
-      CALL OUTPUT_PRO(N,X,DX)
+      CALL OUTPUT_PRO(X,DX)
 
       END SUBROUTINE MULTIPEAK_FITTER
 !
@@ -225,15 +225,27 @@
 
       REAL            ZCAL
       COMMON /YSTORE/ ZCAL(MOBS)
+
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
       COMMON /ZSTOR2/ MN, MN2
-      COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
-     &                  DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),       &
-     &                  NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ,      &
-     &                  REFUSE, CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,  &
-     &                  NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
 
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END,    L6ST, L6END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
 
       INCLUDE 'REFLNS.INC'
 
@@ -346,9 +358,9 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE OUTPUT_PRO(NVAR,VARVAL,VARESD)
+      SUBROUTINE OUTPUT_PRO(VARVAL,VARESD)
 
-      INTEGER NVAR
+      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
 
@@ -394,15 +406,26 @@
                         PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
                         PkPosAv(MAX_NPFR)
 
-      LOGICAL REFUSE, CYC1, NOPKRF
-      COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
-                        DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),       &
-                        NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ,      &
-                        REFUSE, CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,  &
-                        NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END,    L6ST, L6END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
 
-      PARAMETER (MPeak=10)
-      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
+      REAL    xranav, atem, anewt
+      INTEGER I, II, IP, JP, iTem
 
 ! Set the ranges correctly
       xranav = 0.0
@@ -416,34 +439,34 @@
         YPeakFit(II) = ZCAL(I)
       ENDDO
       DO IP = 1, NPKGEN(1,1)
-        jp = ip + 2
-        PkFnVal(ip,CurrentRange) = varval(jp)
-        IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.02
-        PkFnEsd(ip,CurrentRange) = varesd(jp)
+        JP = IP + 2
+        PkFnVal(IP,CurrentRange) = varval(JP)
+        IF (varesd(JP).LT.1.E-5) varesd(JP) = 0.02
+        PkFnEsd(IP,CurrentRange) = varesd(JP)
       ENDDO
       DO I = 1, NumInPFR(CurrentRange)
-        jp = 1 + NPKGEN(1,1) + 2*I
-        PkAreaVal(i,CurrentRange) = varval(jp)
-        IF (varesd(jp).LT.1.E-5) varesd(jp) = MAX(0.001,0.1*ABS(varval(jp)))
-        PkAreaEsd(i,CurrentRange) = varesd(jp)
-        jp = jp + 1
-        PkPosVal(i,CurrentRange) = varval(jp)
-        XPF_Pos(i,CurrentRange) = varval(jp)
-        xranav = xranav + PkPosVal(i,CurrentRange)
-        IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.003
-        PkPosEsd(i,CurrentRange) = varesd(jp)
-        atem = ABS(varval(jp)-zargi(1))
-        DO ii = 1, NPTS
-          anewt = ABS(varval(jp)-zargi(ii))
-          IF (anewt.LE.atem) THEN
+        JP = 1 + NPKGEN(1,1) + 2*I
+        PkAreaVal(I,CurrentRange) = varval(JP)
+        IF (varesd(JP).LT.1.E-5) varesd(jp) = MAX(0.001,0.1*ABS(varval(JP)))
+        PkAreaEsd(I,CurrentRange) = varesd(JP)
+        JP = JP + 1
+        PkPosVal(I,CurrentRange) = varval(JP)
+        XPF_Pos(I,CurrentRange) = varval(JP)
+        xranav = xranav + PkPosVal(I,CurrentRange)
+        IF (varesd(JP).LT.1.E-5) varesd(JP) = 0.003
+        PkPosEsd(I,CurrentRange) = varesd(JP)
+        atem = ABS(varval(JP)-zargi(1))
+        iTem = 1
+        DO II = 2, NPTS
+          anewt = ABS(varval(JP)-zargi(II))
+          IF (anewt .LE. atem) THEN
             atem = anewt
-            item = ii
+            iTem = II
           ENDIF
         ENDDO
-        YPF_Pos(i,CurrentRange) = zcal(item)
+        YPF_Pos(I,CurrentRange) = zcal(iTem)
       ENDDO
-!O      xranav = 0.5*(XPF_Range(1,CurrentRange)+XPF_Range(2,CurrentRange))
-      xranav = xranav / SNGL(NumInPFR(CurrentRange))
+      xranav = xranav / FLOAT(NumInPFR(CurrentRange))
       PkPosAv(CurrentRange) = xranav
       CALL Upload_Positions
       CALL Upload_Widths
