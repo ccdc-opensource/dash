@@ -27,7 +27,7 @@
 ! JvdS This window popping up automatically makes it impossible to 
 ! play around with indexing. Therefore: when in one of the indexing windows, ignore
 ! this routine.
-      IF ((CurrentWizardWindow .EQ. IDD_PW_Page9) .OR. (CurrentWizardWindow .EQ. IDD_PW_Page8)) RETURN
+      IF ((CurrentWizardWindow .EQ. IDD_PW_Page7) .OR. (CurrentWizardWindow .EQ. IDD_PW_Page8) .OR. (CurrentWizardWindow .EQ. IDD_PW_Page9)) RETURN
       CALL SetModeMenuState(-1,1)
       CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
