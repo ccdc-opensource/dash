@@ -40,6 +40,9 @@
 ! AIOBS = observed intensity, per reflection
 ! AICALC = part of the calculated intensity due to structural parameters (atoms)
 
+      REAL WTI(MaxRef)
+! Weight of the reflection
+
 !O! JCC GGCALC dimension increased to 500
 !O      REAL            rHKL,           AMUL
 !O      REAL            ESDOBS,         SOMEGA,       GGCALC
