@@ -15,7 +15,40 @@
 !      CALL Update_Bins
 
       END SUBROUTINE Clear_Bins
+!
+!*****************************************************************************
+!
+      SUBROUTINE Delete_SA_run(TheRunNr)
+! Deleting an SA run involves updating the iSol2Run variable--this routine takes care of that.
 
+      USE SOLVAR
+
+      IMPLICIT NONE
+
+      INTEGER,       INTENT (IN   ) :: TheRunNr
+
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      INTEGER iSol, SolForRun
+
+      ! Find the solution that points to the run that is to be deleted
+      DO iSol = 1, NumOf_SA_Runs
+        IF ( iSol2Run(iSol) .EQ. TheRunNr ) &
+          SolForRun = iSol
+      ENDDO
+      ! Remove this solution from the list by reshuffling the solutions that follow
+      DO iSol = SolForRun, NumOf_SA_Runs-1
+        iSol2Run(iSol) = iSol2Run(iSol+1)
+      ENDDO
+      ! Now update the run numbers: decrement if greater than the run number that is removed
+      DO iSol = 1, NumOf_SA_Runs-1
+        IF ( iSol2Run(iSol) .GT. TheRunNr ) &
+          iSol2Run(iSol) = iSol2Run(iSol) - 1
+      ENDDO
+
+      END SUBROUTINE Delete_SA_run
 !
 !*****************************************************************************
 !
