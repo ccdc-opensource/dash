@@ -2,7 +2,6 @@
 !
       use winteracter
       use druid_header
-      type (win_message) message
       character*80 linstr
 !
       parameter (maxiter=10000)
