@@ -498,7 +498,6 @@
 ! Uses TheRunNr to determine which solution to output
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE ZMVAR
       USE ATMVAR
       USE SOLVAR

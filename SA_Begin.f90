@@ -189,7 +189,6 @@
       INTEGER FUNCTION CheckOverwriteSaOutput()
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
