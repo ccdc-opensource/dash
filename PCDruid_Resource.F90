@@ -1,4 +1,4 @@
-! Winteracter module created : 19/Apr/2004 11:35:46
+! Winteracter module created : 20/Apr/2004 10:14:50
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -670,8 +670,6 @@
           INTEGER, PARAMETER :: IDD_RR_PO_Dialog                =   196
           INTEGER, PARAMETER :: IDF_STRING2                     =  1543
           INTEGER, PARAMETER :: IDD_SA_input3_2                 =   197
-          INTEGER, PARAMETER :: IDF_NumDoFPerMove               =  1351
-          INTEGER, PARAMETER :: IDF_LABEL20                     =  1544
           INTEGER, PARAMETER :: IDB_More                        =  1545
           INTEGER, PARAMETER :: IDD_FWHM_info                   =   163
           INTEGER, PARAMETER :: IDD_DIALOG011                   =   164
@@ -700,11 +698,6 @@
           INTEGER, PARAMETER :: IDF_a2                          =  1147
           INTEGER, PARAMETER :: IDF_b2                          =  1148
           INTEGER, PARAMETER :: IDF_c2                          =  1219
-          INTEGER, PARAMETER :: IDC_UseRene                     =  1299
-          INTEGER, PARAMETER :: IDF_MinStep                     =  1300
-          INTEGER, PARAMETER :: IDF_Width                       =  1303
-          INTEGER, PARAMETER :: IDC_UseESD                      =  1380
-          INTEGER, PARAMETER :: IDC_UseRelease                  =  1536
           INTEGER, PARAMETER :: IDF_UCVol                       =  1540
           INTEGER, PARAMETER :: IDF_MogulExe                    =  1551
           INTEGER, PARAMETER :: IDBBROWSE2                      =  1552
