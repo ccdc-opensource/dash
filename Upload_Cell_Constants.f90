@@ -44,7 +44,7 @@
       DATA KELPT /2,3,4,5,6,7, 2,3,4,5,10,10, 2,3,4,10,5,10, 2,3,4,10,10,5, &
       2,3,4,10,10,10, 2,2,3,10,10,10, 2,2,3,9,10,10, 2,2,2,3,3,3, 2,2,3,9,10,10, 2,2,2,10,10,10/ 
       LOGICAL FnWaveLengthOK, FnUnitCellOK ! Function
-      INTEGER I, II, Iord, NDD
+      INTEGER I, II, iOrd, NDD
       REAL    DDMAX
 
       INTEGER         IBMBER
@@ -64,16 +64,16 @@
           (CurrentWizardWindow .EQ. IDD_PW_Page9)) RETURN
       NVal = 0
       DO I = 1, NTPeak
-        IOrd = IOrdTem(I) ! IOrd is now a pointer into AllPkPosVal, sorted
+        iOrd = IOrdTem(I) ! iOrd is now a pointer into AllPkPosVal, sorted
 ! Use peak only when probability > 0.95
         IF (PkProb(Iord) .GT. 0.95) THEN
-          NVal = NVal + 1
+          CALL INC(NVal)
           DO II = 1, 3
 ! Yet another place where h, k and l are stored
             IHLR(II,NVal) = IHPk(II,I)
           ENDDO
-          YVal(NVal) = AllPkPosVal(IOrd)
-          EVal(NVal) = AllPkPosEsd(IOrd)
+          YVal(NVal) = AllPkPosVal(iOrd)
+          EVal(NVal) = AllPkPosEsd(iOrd)
         ENDIF
       ENDDO
 ! JCC Updated to the correct values ...!
@@ -132,45 +132,45 @@
             NOCREF = NOCREF .OR. (IASS(I) .EQ. 0)
           ENDDO
         CASE ( 2) ! Monoclinic a
-          XDD(3)=GREC(2,2) 
-          XDD(4)=GREC(3,3)
-          XDD(5)=GREC(2,3)
-          NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(6).EQ.0)
+          XDD(3) = GREC(2,2) 
+          XDD(4) = GREC(3,3)
+          XDD(5) = GREC(2,3)
+          NOCREF = (IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(6).EQ.0)
         CASE ( 3) ! Monoclinic b
-          XDD(3)=GREC(2,2) 
-          XDD(4)=GREC(3,3)
-          XDD(5)=GREC(1,3)
-          NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(5).EQ.0)
+          XDD(3) = GREC(2,2) 
+          XDD(4) = GREC(3,3)
+          XDD(5) = GREC(1,3)
+          NOCREF = (IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(5).EQ.0)
         CASE ( 4) ! Monoclinic c
-          XDD(3)=GREC(2,2) 
-          XDD(4)=GREC(3,3)
-          XDD(5)=GREC(1,2)
+          XDD(3) = GREC(2,2) 
+          XDD(4) = GREC(3,3)
+          XDD(5) = GREC(1,2)
           NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(4).EQ.0)
         CASE ( 5) ! Orthorhombic
-          XDD(3)=GREC(2,2) 
-          XDD(4)=GREC(3,3)
-          NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0)
+          XDD(3) = GREC(2,2) 
+          XDD(4) = GREC(3,3)
+          NOCREF = (IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0)
         CASE ( 6) ! Tetragonal
-          XDD(3)=GREC(3,3)
-          NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
+          XDD(3) = GREC(3,3)
+          NOCREF = ((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
         CASE ( 7) ! Trigonal
-          XDD(3)=GREC(3,3)
-          NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
+          XDD(3) = GREC(3,3)
+          NOCREF = ((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
         CASE ( 8) ! Rhombohedral
-          XDD(2)=GREC(1,1)
-          XDD(3)=GREC(1,2)
-          NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0).AND.(IASS(3).EQ.0)) & 
+          XDD(2) = GREC(1,1)
+          XDD(3) = GREC(1,2)
+          NOCREF = ((IASS(1).EQ.0).AND.(IASS(2).EQ.0).AND.(IASS(3).EQ.0)) & 
                .OR. ((IASS(4).EQ.0).AND.(IASS(5).EQ.0).AND.(IASS(6).EQ.0))
         CASE ( 9) ! Hexagonal
-          XDD(3)=GREC(3,3)
-          NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
+          XDD(3) = GREC(3,3)
+          NOCREF = ((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
         CASE (10) ! Cubic
       END SELECT
-      IF (NoCRef) RETURN
+      IF (NOCREF) RETURN
       IF (NVal .LE. NDD) RETURN
       DDMAX = 0.0
       DO I = 2, NDD
-        DDMAX = MAX(DDMAX,1.e-4*ABS(XDD(I)))
+        DDMAX = MAX(DDMAX,1.0E-4*ABS(XDD(I)))
       ENDDO
       DO I = 2, NDD
         DXDD(I) = DDMAX
@@ -225,7 +225,9 @@
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
       INCLUDE 'lattice.inc'
 
-      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
+      INTEGER         NVAL
+      REAL                  XVAL,       YVAL,       ZVAL,       EVAL
+      COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
 
       ChiGetLattice = 0.0
 ! Zero point
