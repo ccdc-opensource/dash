@@ -79,7 +79,7 @@
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
       INTEGER I, Iflags
-      CHARACTER*80 filehead
+      CHARACTER*80 filehead, tDirName
 !ep added extpro
       LOGICAL extcssr, extpdb, extccl, extpro
 
@@ -114,9 +114,11 @@
       ENDDO
    10 CheckOverwriteSaOutput = 1
       DO WHILE (extcssr .OR. extpdb .OR. extccl .OR. extpro)
+        CALL SplitPath(pdb_file,tDirName,filehead)
         CALL WMessageBox(YesNoCancel, QuestionIcon, CommonYes, &
-                    "Do you wish to overwrite existing files? "//CHAR(13) &
-                    //"(Hit No to enter a new filename)", &
+                    "Do you wish to overwrite existing files?"//CHAR(13)//CHAR(13)// &
+                    "Current base for filenames: "//filehead(1:LEN_TRIM(filehead)-4)//CHAR(13)//CHAR(13)// &
+                    "(Hit No to enter a new filename)", &
                     "Overwrite Output Files?")
         IF (WInfoDialog(4) .EQ. 1) THEN ! Yes - Overwrite
           RETURN 
