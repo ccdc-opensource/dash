@@ -79,8 +79,8 @@
         II = II + 1
       ENDDO
       NPTS = II ! NPTS is the number of points used for Pawley refinement.
-      NBIN = II
-      CALL GetProfileLimits
+!      NBIN = II
+!      CALL GetProfileLimits
       argmax(1) = armx
 
       END SUBROUTINE CHKMAXREF
