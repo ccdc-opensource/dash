@@ -67,15 +67,15 @@
       CALL WindowStatusBarParts(8,IWIDTHS)
     !  CALL IDebugLevel(DbgMsgBox)
       CALL WMessageEnable(PushButton, Enabled)
+      CALL WMessageEnable(FieldChanged, Enabled)
+      CALL CheckLicence
 ! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues
 ! Initialise space group information
       CALL PolyFitterInitialise
       CALL InitialiseVariables
-      CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(TabChanged, Enabled)
       CALL WMessageEnable(MouseMove, Enabled)
-      CALL CheckLicence
 ! Main message loop
       IF (NARGS() .GT. 1) THEN
         CALL GetArg(1,ArgString) 
