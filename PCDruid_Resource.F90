@@ -1,4 +1,4 @@
-! Winteracter module created : 15/Oct/2001 17:17:18
+! Winteracter module created : 16/Oct/2001 21:19:00
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -496,4 +496,6 @@
           INTEGER, PARAMETER :: IDF_OutputCSSR                  =  1260
           INTEGER, PARAMETER :: IDF_OutputCCL                   =  1277
           INTEGER, PARAMETER :: IDF_UseHydrogens                =  1296
+          INTEGER, PARAMETER :: IDD_DataRangeSTOE               =   148
+          INTEGER, PARAMETER :: IDF_DataRangeMenu               =  1264
       END MODULE Druid_Header
