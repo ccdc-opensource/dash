@@ -268,6 +268,7 @@
       REAL*8  CART(1:3,1:MAXATM)
       REAL    Origin(1:3)
       REAL    Point1(1:3), Point2(1:3), Point3(1:3) 
+      REAL    zmSingleRotationAxis(1:3)
 
       CALL PushActiveWindowID
 ! Calculate the unit cell axes in terms of the orthogonal lattice from
@@ -319,19 +320,19 @@
                   Origin(2) = SNGL(CART(2,icomflg(iFrg)))
                   Origin(3) = SNGL(CART(3,icomflg(iFrg)))
                 ENDIF
-                zmSingleRotationAxis(1,iFrg) = SNGL(CART(1,zmSingleRotAxAtm(iFrg))) - Origin(1)
-                zmSingleRotationAxis(2,iFrg) = SNGL(CART(2,zmSingleRotAxAtm(iFrg))) - Origin(2)
-                zmSingleRotationAxis(3,iFrg) = SNGL(CART(3,zmSingleRotAxAtm(iFrg))) - Origin(3)
+                zmSingleRotationAxis(1) = SNGL(CART(1,zmSingleRotAxAtm(iFrg))) - Origin(1)
+                zmSingleRotationAxis(2) = SNGL(CART(2,zmSingleRotAxAtm(iFrg))) - Origin(2)
+                zmSingleRotationAxis(3) = SNGL(CART(3,zmSingleRotAxAtm(iFrg))) - Origin(3)
               CASE (2) ! Fractional
 ! The variable zmSingleRotationAxis holds the fractional co-ordinates,
 ! we need orthogonal co-ordinates => convert
-                zmSingleRotationAxis(1,iFrg) = zmSingleRotAxFrac(1,iFrg)*tLattice(1,1) +     &
+                zmSingleRotationAxis(1) = zmSingleRotAxFrac(1,iFrg)*tLattice(1,1) +     &
                                                zmSingleRotAxFrac(2,iFrg)*tLattice(1,2) +     &
                                                zmSingleRotAxFrac(3,iFrg)*tLattice(1,3)
-                zmSingleRotationAxis(2,iFrg) = zmSingleRotAxFrac(1,iFrg)*tLattice(2,1) +     &
+                zmSingleRotationAxis(2) = zmSingleRotAxFrac(1,iFrg)*tLattice(2,1) +     &
                                                zmSingleRotAxFrac(2,iFrg)*tLattice(2,2) +     &
                                                zmSingleRotAxFrac(3,iFrg)*tLattice(2,3)
-                zmSingleRotationAxis(3,iFrg) = zmSingleRotAxFrac(1,iFrg)*tLattice(3,1) +     &
+                zmSingleRotationAxis(3) = zmSingleRotAxFrac(1,iFrg)*tLattice(3,1) +     &
                                                zmSingleRotAxFrac(2,iFrg)*tLattice(3,2) +     &
                                                zmSingleRotAxFrac(3,iFrg)*tLattice(3,3)
               CASE (3) ! Normal to plane defined by three atoms
@@ -342,31 +343,31 @@
                 Point3 = SNGL(CART(:,zmSingleRotAxAtms(3,iFrg)))
                 Point1 = Point1 - Point2
                 Point3 = Point3 - Point2
-                CALL VectorCrossProduct(Point1,Point3,zmSingleRotationAxis(1,iFrg))
+                CALL VectorCrossProduct(Point1,Point3,zmSingleRotationAxis(1))
             END SELECT
 ! Normalise the axis
-            Length = SQRT(zmSingleRotationAxis(1,iFrg)**2 + &
-                          zmSingleRotationAxis(2,iFrg)**2 + &
-                          zmSingleRotationAxis(3,iFrg)**2     )
+            Length = SQRT(zmSingleRotationAxis(1)**2 + &
+                          zmSingleRotationAxis(2)**2 + &
+                          zmSingleRotationAxis(3)**2     )
             DO iAxis = 1, 3
-              zmSingleRotationAxis(iAxis,iFrg) = zmSingleRotationAxis(iAxis,iFrg) / Length
-              IF (zmSingleRotationAxis(iAxis,iFrg) .GT.  0.99999) zmSingleRotationAxis(iAxis,iFrg) =  0.99999
-              IF (zmSingleRotationAxis(iAxis,iFrg) .LT. -0.99999) zmSingleRotationAxis(iAxis,iFrg) = -0.99999
+              zmSingleRotationAxis(iAxis) = zmSingleRotationAxis(iAxis) / Length
+              IF (zmSingleRotationAxis(iAxis) .GT.  0.99999) zmSingleRotationAxis(iAxis) =  0.99999
+              IF (zmSingleRotationAxis(iAxis) .LT. -0.99999) zmSingleRotationAxis(iAxis) = -0.99999
             ENDDO
 ! Calculate the orientation of the axis
 ! Note: Alpha_m and Beta_m in radians
-            Beta_m  = ACOS(zmSingleRotationAxis(3,iFrg))
-            IF (ABS(zmSingleRotationAxis(3,iFrg)) .GT. 0.99998) THEN
+            Beta_m  = ACOS(zmSingleRotationAxis(3))
+            IF (ABS(zmSingleRotationAxis(3)) .GT. 0.99998) THEN
 ! The axis coincides with the z-axis, so alpha becomes undefined: set alpha to 0.0
               Alpha_m = 0.0
 ! It turns out that we can get problems with rounding errors here
-            ELSE IF ((-zmSingleRotationAxis(2,iFrg)/SIN(Beta_m)) .GT.  0.99999) THEN
+            ELSE IF ((-zmSingleRotationAxis(2)/SIN(Beta_m)) .GT.  0.99999) THEN
               Alpha_m = 0.0
-            ELSE IF ((-zmSingleRotationAxis(2,iFrg)/SIN(Beta_m)) .LT. -0.99999) THEN
+            ELSE IF ((-zmSingleRotationAxis(2)/SIN(Beta_m)) .LT. -0.99999) THEN
               Alpha_m = PI
             ELSE
-              Alpha_m = ACOS(-zmSingleRotationAxis(2,iFrg)/SIN(Beta_m))
-              IF ((ASIN((zmSingleRotationAxis(1,iFrg)))/SIN(Beta_m)) .LT. 0.0) Alpha_m = TWOPI - Alpha_m
+              Alpha_m = ACOS(-zmSingleRotationAxis(2)/SIN(Beta_m))
+              IF ((ASIN((zmSingleRotationAxis(1)))/SIN(Beta_m)) .LT. 0.0) Alpha_m = TWOPI - Alpha_m
             ENDIF
 ! It's an axis, so Gamma_m can be set to 0.0
             q0m = COS(0.5*Beta_m) * COS(0.5*Alpha_m)
