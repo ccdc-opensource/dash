@@ -42,10 +42,19 @@
       CALL Upload_Positions()
 !... and 'View'|'Peak Widths' tabs
       CALL Upload_Widths()
+! Signal to Pawley refinement that we should start with a clean slate
+      CALL IOsDeleteFile('polyp.niw')
 ! Redraw
       CALL Profile_Plot(IPTYPE)
 ! Grey out 'Delete all peak fit ranges' button on toolbar
       CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
+! Grey out 'Clear Peaks' button in Wizard window
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page10)
+      CALL WDialogFieldState(IDF_ClearPeakFitRanges,Disabled)
+      CALL PopActiveWindowID
+! Disable Pawley refinement button and 'Next >' button in Wizard window
+      CALL CheckIfWeCanDoAPawleyRefinement
 
       END SUBROUTINE Init_PeakFitRanges
 !

@@ -562,6 +562,11 @@
               NumPeakFitRange = NumPeakFitRange + 1
 ! Ungrey 'Delete all peak fit ranges' button on toolbar
               CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
+! Ungrey 'Clear Peaks' button in Wizard window
+              CALL PushActiveWindowID
+              CALL WDialogSelect(IDD_PW_Page10)
+              CALL WDialogFieldState(IDF_ClearPeakFitRanges,Enabled)
+              CALL PopActiveWindowID
               XPF_Range(1,NumPeakFitRange) = XPFR1
               XPF_Range(2,NumPeakFitRange) = XPFR2
               IPF_Lo(NumPeakFitRange) = IPFL1
@@ -703,6 +708,11 @@
             IF (NumPeakFitRange.EQ.0) THEN
 ! Grey out 'Delete all peak fit ranges' button on toolbar
               CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
+! Grey out 'Clear Peaks' button in Wizard window
+              CALL PushActiveWindowID
+              CALL WDialogSelect(IDD_PW_Page10)
+              CALL WDialogFieldState(IDF_ClearPeakFitRanges,Disabled)
+              CALL PopActiveWindowID
             ELSE
               DO II=1,NumPeakFitRange
                 KK=II
