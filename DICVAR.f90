@@ -6,6 +6,9 @@
 
       IMPLICIT NONE
 
+      CHARACTER(10) :: DV_FileName
+      DATA DV_FileName / 'DASHDV.TMP' /
+
       INTEGER DICVOL_Error
 
       INTEGER     cDICVOL_ErrorOnWrite

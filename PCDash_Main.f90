@@ -391,6 +391,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE DICVAR
 
 ! Remove redundant files 
       CALL IDebugLevel(DbgSilent)
@@ -413,7 +414,7 @@
       CALL IOsDeleteFile('polyp.hbk')
       CALL IOsDeleteFile('polyp.hbl')
       CALL IOsDeleteFile('SA_best.pdb')
-      CALL IOsDeleteFile('DICVOL.OUT')
+      CALL IOsDeleteFile(DV_FileName)
       CALL IOSDeleteFile('MakeZmatrix.log')
       CALL IOSDeleteFile('SA_PARAMS.TXT')
       CALL IOSDeleteFile('Overlap_Temp.pdb')
