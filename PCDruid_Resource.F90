@@ -1,4 +1,4 @@
-! Winteracter module created : 14/Oct/2003 13:05:35
+! Winteracter module created : 14/Oct/2003 18:11:37
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -195,22 +195,15 @@
           INTEGER, PARAMETER :: IDF_profchi2_label              =  1185
           INTEGER, PARAMETER :: IDF_SA_Tredrate                 =  1179
           INTEGER, PARAMETER :: IDF_SA_T0_label1                =  1161
-          INTEGER, PARAMETER :: IDF_SA_Tredrate_trackbar        =  1148
-          INTEGER, PARAMETER :: IDF_SA_NS_trackbar              =  1149
-          INTEGER, PARAMETER :: IDF_SA_NT_trackbar              =  1150
           INTEGER, PARAMETER :: IDF_SA_T0                       =  1151
           INTEGER, PARAMETER :: IDF_SA_NS                       =  1152
-          INTEGER, PARAMETER :: IDF_SA_T0_label                 =  1154
           INTEGER, PARAMETER :: IDF_LABEL4                      =  1458
           INTEGER, PARAMETER :: IDF_SA_NT                       =  1153
-          INTEGER, PARAMETER :: IDF_SA_TRR_label                =  1155
           INTEGER, PARAMETER :: IDF_LABEL12                     =  1467
           INTEGER, PARAMETER :: IDF_LABEL5                      =  1459
-          INTEGER, PARAMETER :: IDF_SA_TRR_label2               =  1156
           INTEGER, PARAMETER :: IDF_LABEL11                     =  1466
           INTEGER, PARAMETER :: IDF_SA_cool_label               =  1162
           INTEGER, PARAMETER :: IDF_SA_NS_label                 =  1159
-          INTEGER, PARAMETER :: IDF_SA_TRR_label3               =  1157
           INTEGER, PARAMETER :: IDF_LABEL6                      =  1460
           INTEGER, PARAMETER :: IDF_SA_Repeat_Lab               =  1373
           INTEGER, PARAMETER :: IDF_SA_MaxRepeats               =  1374
@@ -254,10 +247,8 @@
           INTEGER, PARAMETER :: IDF_ZM_pars4                    =  1127
           INTEGER, PARAMETER :: IDF_ZM_allpars_label            =  1135
           INTEGER, PARAMETER :: IDF_SA2_label                   =  1141
-          INTEGER, PARAMETER :: IDD_SA_input3                   =   142
           INTEGER, PARAMETER :: IDB_SA3_finish                  =  1144
           INTEGER, PARAMETER :: IDF_SA_RandomSeed1              =  1163
-          INTEGER, PARAMETER :: IDF_SA_T0_trackbar              =  1147
           INTEGER, PARAMETER :: IDF_SA_Moves                    =  1158
           INTEGER, PARAMETER :: IDF_SA_NT_label                 =  1160
           INTEGER, PARAMETER :: IDF_SA_RandomSeed2              =  1165
@@ -332,7 +323,6 @@
           INTEGER, PARAMETER :: IDF_Pawley_ErrorLog_intro3      =  1371
           INTEGER, PARAMETER :: ID_Edit_PawleyLog               =  1372
           INTEGER, PARAMETER :: IDF_SA_ChiTest                  =  1378
-          INTEGER, PARAMETER :: IDF_SA_Input3_termhead          =  1380
           INTEGER, PARAMETER :: IDF_SA_ChiTest_Label            =  1377
           INTEGER, PARAMETER :: IDD_SA_RunLabel                 =  1383
           INTEGER, PARAMETER :: ID_Tutorial_1                   = 40038
@@ -607,7 +597,6 @@
           INTEGER, PARAMETER :: IDF_egLine4                     =  1485
           INTEGER, PARAMETER :: IDF_egLine5                     =  1486
           INTEGER, PARAMETER :: IDF_egLine0                     =  1487
-          INTEGER, PARAMETER :: IDB_Configuration               =  1488
           INTEGER, PARAMETER :: IDB_Prog3                       =  1489
           INTEGER, PARAMETER :: IDB_PrevRes                     =  1490
           INTEGER, PARAMETER :: IDD_Pause                       =   135
