@@ -17,9 +17,6 @@
       YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),&
       YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD,& 
-      XGGMIN,XGGMAX,YGGMIN,YGGMAX
 
       CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
       COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
