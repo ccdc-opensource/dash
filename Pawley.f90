@@ -864,10 +864,6 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      CHARACTER(MaxPathLength)  InputFilesBaseName
-      INTEGER                                       IFBN_Len
-      COMMON /ibasnam/          InputFilesBaseName, IFBN_Len
-
       INTEGER LSDI, iDot, I, L1, L4, iDummy
       INTEGER, EXTERNAL :: WRTDSL
 
