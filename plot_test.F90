@@ -6,7 +6,7 @@
 !   called from SASummary.f90
 !     This subroutine manipulates the data required to plot the observed  
 !   diffraction pattern with the calculated pattern and difference.  The
-!   data is read in from the .pro file and stored in COMMON BLOCK ProFilePLotStore
+!   data is read in from the .bin file and stored in COMMON BLOCK ProFilePLotStore
 !  ihandle is used to identify the column of the store_ arrays where the data
 !  for each child window (ihandle) is stored
 
@@ -16,6 +16,8 @@
 !  Definitions and array declarations.
 !
       IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: irow
 
       INCLUDE 'PARAMS.INC'
 
@@ -42,24 +44,21 @@
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
 
-      INTEGER irow, iz, temprow
+      INTEGER iz
       REAL yadd
       REAL Ymin
       REAL Ymax
       CHARACTER*255 Grid_Buffer
       CHARACTER*75 filename
-      REAL xobsep(MOBS)
-      REAL yobsep(MOBS)
-      REAL ycalcep(MOBS)
-      REAL ydif(MOBS)
       EXTERNAL DealWithProfilePlot
       CHARACTER*2 RunStr
-      INTEGER I, II, IN, RecNr, RunNr, tFileHandle, iHandle
+      INTEGER I, II, RecNr, RunNr, tFileHandle, iHandle
+      INTEGER iDummy
+      INTEGER, EXTERNAL :: GetBFIOError
 !
-!   reading in the data from the saved .pro files
+!   reading in the data from the saved .bin files
 !
-      temprow = irow
-      CALL WGridGetCellString(IDF_SA_Summary,1,temprow,Grid_Buffer)
+      CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)
       Iz = LEN_TRIM(Grid_Buffer)
 ! As it is now possible to switch saving .pro files on/off, even during SA,
 ! we must now test if the .pro requested has been saved.
@@ -76,56 +75,46 @@
         READ(RunStr,'(I2)') RunNr
       ENDIF
       IF (.NOT. PRO_saved(RunNr)) RETURN
-      Iz = Iz-4
-!O      filename = grid_buffer(1:Iz)//'.pro'
-!O      OPEN(unit=61, file=filename, status = 'old', err=999)
-!O      DO i = 1, nbin
-!O        READ(61,20) xobsep(i), yobsep(i), ycalcep(i)
-!O20      FORMAT(3(X, F12.4))
-!O      ENDDO
-!O      CLOSE(61)
-      filename = grid_buffer(1:Iz)//'.bin'
-      tFileHandle = 10
-! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=tFileHandle,FILE=filename,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
-      RecNr = 1
-      DO I = 1, NBIN
-        CALL FileReadReal(tFileHandle,RecNr,xobsep (I))
-        CALL FileReadReal(tFileHandle,RecNr,yobsep (I))
-        CALL FileReadReal(tFileHandle,RecNr,ycalcep(I))
-      ENDDO
-      CLOSE(tFileHandle)
-!
-!   calculate the offset for the difference plot
-!
-      YMin = MINVAL(yobsep(1:NBIN))
-      YMax = MAXVAL(yobsep(1:NBIN))
-      YADD=0.5*(YMax+YMin)
-      DO II = 1, nbin
-        YDIF(II) = YADD + yobsep(II) - ycalcep(II)
-      ENDDO
 !
 !   open the plotting window, ihandle is the window's unique identifier
 !     
       CALL WindowOpenChild(ihandle, x=10, y=450, width=800, height=400, title=filename)
-      IF(ihandle.eq.-1) THEN
-        CALL ErrorMessage("Exceeded Maximum Number of Allowed Windows.  Close a profile window.")
+      IF (ihandle.EQ.-1) THEN
+        CALL ErrorMessage("Exceeded maximum number of allowed windows.  Close a profile window.")
         RETURN
       ENDIF 
       CALL RegisterChildWindow(ihandle,DealWithProfilePlot)
       SAUsedChildWindows(ihandle) = 1
       CALL WindowSelect(ihandle)
 !
-!   configuring y data for plotting
+!   open the file
+!     
+      Iz = Iz-4
+      filename = grid_buffer(1:Iz)//'.bin'
+      tFileHandle = 10
+! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
+      OPEN(UNIT=tFileHandle,FILE=filename,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      RecNr = 1
+      iDummy = GetBFIOError() ! reset errors to zero
+      DO I = 1, NBIN
+        CALL FileReadReal(tFileHandle,RecNr,store_ycalc(I,ihandle))
+      ENDDO
+      CLOSE(tFileHandle)
+! This should be tested after every FileReadReal...  this way, we will only catch an EoF error
+      IF (GetBFIOError() .NE. 0) GOTO 999
 !
-      DO in = 1, nbin
-        store_ycalc(in,(ihandle)) = ycalcep(in)
-        store_diff(in,(ihandle)) = ydif(in)
-      ENDDO      
+!   calculate the offset for the difference plot
+!
+      YMin = MINVAL(YOBIN(1:NBIN))
+      YMax = MAXVAL(YOBIN(1:NBIN))
+      YADD = 0.5 * (YMax+YMin)
+      DO II = 1, NBIN
+        store_diff(II,ihandle) = YADD + YOBIN(II) - store_ycalc(II,ihandle)
+      ENDDO
 !   call subroutine which plots data
       CALL plot_pro_file(ihandle)
       RETURN
-999   CALL ErrorMessage('The .pro file could not be opened.')
+999   CALL ErrorMessage('Error while accessing .bin file.')
 
       END SUBROUTINE organise_sa_result_data
 !
@@ -151,13 +140,14 @@
 
       REAL                      store_ycalc,                      store_diff
       COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
+
       REAL Ymax, Ymin
       REAL Xmax, Xmin
 
       YMin = MINVAL(YOBIN(1:NBIN))
       YMax = MAXVAL(YOBIN(1:NBIN))
       Xmin = XBIN(1)
-      Xmax = XBIN(nbin)
+      Xmax = XBIN(NBIN)
 
       CALL WindowSelect(ihandle)
 !  Start of all the plotting calls
@@ -167,7 +157,7 @@
 !
 !  Start new presentation graphics plot
 !
-      CALL IPgNewPlot(PgPolyLine,NSETS,nbin,0,1)
+      CALL IPgNewPlot(PgPolyLine,NSETS,NBIN,0,1)
 !   Set Clipping Rectangle
 !
       CALL IPgClipRectangle('P')
@@ -243,8 +233,8 @@
 !  Draw graph.
 !
       CALL IPgXYPairs(XBIN(1),YOBIN(1))
-      CALL IPgXYPairs(XBIN(1),store_ycalc(ihandle,ihandle))
-      CALL IPgXYPairs(XBIN(1),store_diff(ihandle,ihandle))
+      CALL IPgXYPairs(XBIN(1),store_ycalc(1,ihandle))
+      CALL IPgXYPairs(XBIN(1),store_diff(1,ihandle))
 
 !  Draw axes
 !
