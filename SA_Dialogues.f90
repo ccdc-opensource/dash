@@ -85,6 +85,7 @@
               CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOff)
               CALL SA_Parameter_Set
               CALL WizardWindowShow(IDD_SA_input2)
+!T              CALL WizardWindowShow(IDD_SAW_Page2)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_SA_Project_Browse)

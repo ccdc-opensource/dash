@@ -261,7 +261,7 @@
 
       CHARACTER*36 parlabel(mvar)
       DOUBLE PRECISION dcel(6)
-      INTEGER I, II, KK, ifrg, tk
+      INTEGER I, II, KK, ifrg, tk, iOption
 
       CALL PushActiveWindowID
       DO I = 1, 6
@@ -270,6 +270,19 @@
       CALL frac2cart(f2cmat,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL CREATE_FOB()
+! Per Z-matrix, determine whether to use quaternions or a single axis
+      CALL WDialogSelect(IDD_SAW_Page2)
+      DO ifrg = 1, maxfrg
+        IF (gotzmfile(ifrg)) THEN
+          CALL WGridGetCellMenu(IDF_RotationsGrid,1,ifrg,iOption)
+          UseQuaternions(ifrg) = (iOption .NE. 3)
+          IF (.NOT. UseQuaternions(ifrg)) THEN
+            CALL WGridGetCellReal(IDF_RotationsGrid,2,ifrg,zmSingleRotationAxis(1,ifrg))
+            CALL WGridGetCellReal(IDF_RotationsGrid,3,ifrg,zmSingleRotationAxis(2,ifrg))
+            CALL WGridGetCellReal(IDF_RotationsGrid,4,ifrg,zmSingleRotationAxis(3,ifrg))
+          ENDIF
+        ENDIF
+      ENDDO
       kk = 0
       tk = 0
 ! JCC Run through all possible fragments
@@ -280,13 +293,33 @@
             kk = kk + 1
             x(kk) = xzmpar(ii,ifrg)
             parlabel(kk) = czmpar(ii,ifrg)
-            SELECT CASE(kzmpar(ii,ifrg))
+            SELECT CASE (kzmpar(ii,ifrg))
               CASE (1) ! position
                 lb(kk) = 0.0
                 ub(kk) = 1.0
-              CASE (2) ! quaternion
-                lb(kk) = -1.0
-                ub(kk) =  1.0
+              CASE (2,6) ! quaternion
+                IF (UseQuaternions(ifrg)) THEN
+                  kzmpar(ii,ifrg) = 2 ! quaternion instead of single axis 
+                  lb(kk) = -1.0
+                  ub(kk) =  1.0
+                ELSE
+                  kzmpar(ii,ifrg) = 6 ! single axis instead of quaternion 
+! At the moment a Z-matrix containing more than one atom is read in, four
+! parameters are reserved for 'rotations'. When the rotation is restricted to
+! a single axis, only two of these parameters are necessary. By setting
+! upper bound - lower bound to 0.000001, these parameters will be considered 'fixed'
+! and will not be picked during the SA, nor will they be optimised during the simpex minimisation.
+                  tk = tk + 1
+                  SELECT CASE (tk)
+                    CASE (1,2) 
+                      lb(kk) = -1.0
+                      ub(kk) =  1.0
+                    CASE (3,4) 
+                      lb(kk) =  0.0
+                      ub(kk) =  0.000001
+                  END SELECT
+                  IF (tk .EQ. 4) tk = 0
+                ENDIF
               CASE (3) ! torsion
                 IF      (x(kk) .LT. 0.0 .AND. x(kk) .GT. -180.0) THEN
                   lb(kk) =  -180.0
@@ -305,28 +338,6 @@
               CASE (5) ! bond
                 lb(kk) = 0.9*x(kk)
                 ub(kk) = x(kk)/0.9
-              CASE (6) ! single rotation axis
-! At the moment a Z-matrix containing more than one atom is read in, four
-! parameters are reserved for 'rotations'. When the rotation is restricted to
-! a single axis, only two of these parameters are necessary. By setting
-! upper bound - lower bound to 0.000001, these parameters will be considered 'fixed'
-! and will not be picked during the SA.
-                tk = tk + 1
-                SELECT CASE (tk)
-                  CASE (1) 
-                    lb(kk) = -1.0
-                    ub(kk) =  1.0
-                  CASE (2)
-                    lb(kk) = -1.0
-                    ub(kk) =  1.0
-                  CASE (3) 
-                    lb(kk) =  0.0
-                    ub(kk) =  0.000001
-                  CASE (4)
-                    lb(kk) =  0.0
-                    ub(kk) =  0.000001
-                END SELECT
-                IF (tk .EQ. 4) tk = 0
             END SELECT
           ENDDO
 !JCC End of check on selection
