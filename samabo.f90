@@ -114,6 +114,9 @@
 ! PARAMETERS ALL UPPER CASE,
 ! Local Variables Initial Capital, Rest Lower Case.
 !
+! Code for dealing with suppressed atoms has been removed
+! Code to assign hybridisation type 'aromatic' has been added
+!
 ! 1. This makes a best guess at the bond types using standard ranges
 !    for various atom pairs between  C N O S P.  If a bond type can
 !    not be assigned with confidence the type is set in BTYPE(i)=0
