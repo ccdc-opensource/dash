@@ -534,6 +534,7 @@
       LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
 
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
@@ -632,7 +633,8 @@
       ENDIF
       ESDsFilled = .FALSE.
 ! This is probably synchrotron data
-      CALL SetSourceDataState(2)
+      JRadOption = 2
+      CALL Upload_Source
       Load_dat_File = 1
       RETURN
  999  CONTINUE
@@ -914,7 +916,8 @@
       NOBS = NumOfBins
       ESDsFilled = .FALSE.
 ! This is definitely laboratory data
-      CALL SetSourceDataState(1)
+      JRadOption = 1
+      CALL Upload_Source
       Load_raw_File = 1
       RETURN
  999  CONTINUE
@@ -953,6 +956,7 @@
       LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
 
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
@@ -1149,7 +1153,8 @@
       NOBS = NumOfBins
       ESDsFilled = .FALSE.
 ! This is definitely laboratory data
-      CALL SetSourceDataState(1)
+      JRadOption = 1
+      CALL Upload_Source
 ! Try to set the wavelength
 ! If the wavelength was not present in the file, try to interpret the Anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
@@ -1192,6 +1197,7 @@
       LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
 
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
@@ -1348,7 +1354,8 @@
       ENDIF
       ESDsFilled = .FALSE.
 ! This is definitely laboratory data
-      CALL SetSourceDataState(1)
+      JRadOption = 1
+      CALL Upload_Source
 ! Try to set the wavelength
 ! If the wavelength was not present in the file, try to interpret the Anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
@@ -1393,6 +1400,7 @@
       LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
 
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
@@ -1635,7 +1643,8 @@
         RETURN
       ENDIF
 ! This is definitely laboratory data
-      CALL SetSourceDataState(1)
+      JRadOption = 1
+      CALL Upload_Source
 ! Try to set the wavelength
 ! If the wavelength was not present in the file, try to interpret the anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
@@ -1836,12 +1845,13 @@
 ! If wavelength not present in file, initialise to Cu
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf('Cu')
 ! Initialise source material to synchrotron
-      CALL SetSourceDataState(2)
+      JRadOption = 2
 ! Now add in a test: if wavelength close to known anode material,
 ! set source to laboratory. Otherwise, source is synchrotron.
       DO I = 2, 6
-        IF (ABS(ALambda - FnWavelengthOfMenuOption(I)) .LT. 0.0003) CALL SetSourceDataState(1)
+        IF (ABS(ALambda - FnWavelengthOfMenuOption(I)) .LT. 0.0003) JRadOption = 1
       END DO
+      CALL Upload_Source
       Load_xye_File = 1
       RETURN
  999  CONTINUE
@@ -2271,7 +2281,7 @@
           CALL INextInteger(subline,IActSGNum)
 ! Set the lattice numbers
           LatBrav = GetCrystalSystem(NumberSGTable)
-          CALL UserSetCrystalSystem(LatBrav)
+          CALL Upload_CrystalSystem
           NumPawleyRef = 0
           CALL FillSymmetry()
         CASE ('paw')

@@ -255,8 +255,8 @@
                     CELLPAR(JJ)=DEGREE(ARCCOS(CELL(II,2,1)))
                   END DO
                   CALL Upload_Cell_Constants()
-                  ZEROPOINT = ZEROSP(1,1,1)
-                  CALL Upload_Zero_Point() 
+                  ZeroPoint = ZEROSP(1,1,1)
+                  CALL Upload_ZeroPoint() 
                   CALL Generate_TicMarks()
 ! JvdS The background is lost after this.
 ! Q & D hack: subtract the background now

@@ -174,7 +174,7 @@
       CellPar(6) = ACOSD(GReal(1,2)/(CellPar(1)*CellPar(2)))
       ZeroPoint  = XDD(1)
       CALL Upload_Cell_Constants()
-      CALL Upload_Zero_Point()
+      CALL Upload_ZeroPoint()
 !  First ensure that we have the plotting mode correct
       CALL IGrPlotMode(' ') 
       CALL Generate_TicMarks()

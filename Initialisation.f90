@@ -173,7 +173,8 @@
 ! Initialise space group to P 1
       NumberSGTable = 1
 ! Initialise crystal system to Triclinic, LatBrav = 1
-      CALL UserSetCrystalSystem(1)
+      LatBrav = 1
+      CALL Upload_CrystalSystem
       RETURN
  999  CONTINUE
 ! Failure, so exit gracefully
