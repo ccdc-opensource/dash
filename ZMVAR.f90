@@ -21,7 +21,13 @@
       INTEGER maxfrg
       PARAMETER ( maxfrg = 32 )
 
-! maxfrg = Maximum number of fragments = individual Z-matrices
+      INTEGER maxfrginterface
+      PARAMETER ( maxfrginterface = 6 )
+
+! maxfrg = Maximum number of fragments = individual Z-matrices.
+! maxfrginterface = Maximum number of fragments in the interface
+! maxfrg and maxfrginterface can be different when a crystal structure has been reaad in from file
+! for Rietveld refinement.
 ! At the moment the maximum number of fragments is limited by the interface
 ! In variables declared as (0:maxfrg), position 0 is reserved for a temporary copy
 ! used when editing a Z-matrix.
