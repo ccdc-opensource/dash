@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 03/Nov/2001 18:00:55
+// Modified : 04/Nov/2001 16:53:04
 //
 ///////////////////////////////////////////////////
 //
@@ -502,6 +502,21 @@
 #define IDF_ColourByElement              1200
 #define IDF_GROUP3                       1202
 #define IDF_ColourBySolution             1216
+#define IDB_ZMatrixEdit1                 1234
+#define IDB_ZMatrixEdit2                 1235
+#define IDB_ZMatrixEdit3                 1236
+#define IDB_ZMatrixEdit4                 1237
+#define IDB_ZMatrixEdit5                 1238
+#define IDD_EditZMatrix                   155
+#define IDBZMatrixView                   1240
+#define IDSAVEAS                         1243
+#define IDD_TEMPLATE013                   156
+#define IDF_ZMatrixGrid                  1251
+#define IDF_Occupancy                    1294
+#define IDB_AddDummy                     1298
+#define IDB_SetAllOcc                    1300
+#define IDF_RADIO2                       1303
+#define IDF_INTEGER1                     1304
 
 ///////////////////////////////////////////////////
 //
@@ -2030,7 +2045,7 @@ BEGIN
 ,0
 END
 
-IDD_SAW_Page1 DIALOG 0, 0,  408,  147
+IDD_SAW_Page1 DIALOG 0, 0,  445,  147
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Molecular Z-Matrices"
@@ -2049,14 +2064,14 @@ BEGIN
     CONTROL "",IDB_ZMatrix_Browse3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  325,   73,   16,   12
     CONTROL "",IDB_ZMatrix_Browse4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  325,   89,   16,   12
     CONTROL "",IDB_ZMatrix_Browse5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  325,  105,   16,   12
-    CONTROL "",IDF_ZM_pars1,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,   40,   16,   14
-    CONTROL "",IDF_ZM_pars2,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,   56,   16,   14
-    CONTROL "",IDF_ZM_pars3,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,   72,   16,   14
-    CONTROL "",IDF_ZM_pars4,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,   88,   16,   14
-    CONTROL "",IDF_ZM_pars5,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,  104,   16,   14
-    CONTROL "",IDF_ZM_allpars,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  383,  126,   16,   14
+    CONTROL "",IDF_ZM_pars1,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  419,   40,   16,   14
+    CONTROL "",IDF_ZM_pars2,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  419,   56,   16,   14
+    CONTROL "",IDF_ZM_pars3,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  419,   72,   16,   14
+    CONTROL "",IDF_ZM_pars4,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  419,   88,   16,   14
+    CONTROL "",IDF_ZM_pars5,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  419,  104,   16,   14
+    CONTROL "",IDF_ZM_allpars,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  419,  126,   16,   14
     CONTROL "Molecular Z-matrix files",IDF_ZM_file_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   98,   31,   80,    8
-    CONTROL "Number of degrees of freedom =",IDF_ZM_allpars_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  283,  129,   98,    8
+    CONTROL "Number of degrees of freedom =",IDF_ZM_allpars_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  320,  129,   98,    8
     CONTROL "Open",IDB_SA_Project_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  302,   14,   40,   14
     CONTROL "Import...",IDB_SA_Project_Import,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  226,  128,   38,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,    3,   70,  140,WS_EX_DLGMODALFRAME
@@ -2072,6 +2087,11 @@ BEGIN
     CONTROL "",IDB_ZmatrixDelete3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   73,   16,   12
     CONTROL "",IDB_ZmatrixDelete4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,   89,   16,   12
     CONTROL "",IDB_ZmatrixDelete5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  303,  105,   16,   12
+    CONTROL "Edit...",IDB_ZMatrixEdit1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  383,   40,   30,   14
+    CONTROL "Edit...",IDB_ZMatrixEdit2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  383,   56,   30,   14
+    CONTROL "Edit...",IDB_ZMatrixEdit3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  383,   72,   30,   14
+    CONTROL "Edit...",IDB_ZMatrixEdit4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  383,   88,   30,   14
+    CONTROL "Edit...",IDB_ZMatrixEdit5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  383,  104,   30,   14
 END
 
 IDD_SAW_Page1 RCDATA
@@ -2123,7 +2143,7 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1136     5     30   128 \n"
-"   14 \n"
+"   16 \n"
 "1 \n"
 "2 \n"
 "3 \n"
@@ -2373,7 +2393,7 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1232    11     30   146 \n"
-"   14 \n"
+"   16 \n"
 "1 \n"
 "2 \n"
 "3 \n"
@@ -2629,7 +2649,7 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1232    11     30   152 \n"
-"   14 \n"
+"   16 \n"
 "1 \n"
 "2 \n"
 "3 \n"
@@ -2717,6 +2737,69 @@ BEGIN
 "[Grids] \n"
 "[Colours] \n"
 "[Lengths] \n"
+,0
+END
+
+IDD_EditZMatrix DIALOG 0, 0,  387,  127
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Edit Z-Matrix"
+BEGIN
+    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   18,  100,   40,   14
+    CONTROL "View",IDBZMatrixView,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  131,  100,   40,   14
+    CONTROL "Save As...",IDSAVEAS,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  178,  100,   40,   14
+    CONTROL "",IDF_ZMatrixGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   14,    9,  218,   80
+    CONTROL "1.0000",IDF_Occupancy,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  337,   35,   40,   14
+    CONTROL "Add dummy @ c.o.m.",IDB_AddDummy,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  251,   15,   80,   14
+    CONTROL "Set all occupancies to",IDB_SetAllOcc,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  251,   35,   80,   14
+    CONTROL "Use centre of mass",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  256,   71,   70,   14
+    CONTROL "Use atom number",IDF_RADIO2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  256,   85,   65,   14
+    CONTROL "0",IDF_INTEGER1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  321,   84,   30,   14
+    CONTROL "Centre of rotation",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  246,   58,  114,   48
+    CONTROL "Cancel",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   79,  103,   40,    8
+END
+
+IDD_EditZMatrix RCDATA
+BEGIN
+"[Checks] \n"
+" 1140 1 \n"
+" 1303 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+" 1251     4    100   156 \n"
+"   12 \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_TEMPLATE013 DIALOG 0, 0, 1000,   16
+STYLE DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Label",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   30,   14
+    CONTROL "Element",ISS2,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   35,   14
+    CONTROL "Temp.Fac.",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   40,   14
+    CONTROL "Occ.",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   40,   14
+END
+
+IDD_TEMPLATE013 RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1068      0.0000           50.000      \n"
+" 1067      0.0000           8.0000      \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+" 1021     5 \n"
+" 1066     2 \n"
 ,0
 END
 
