@@ -15,10 +15,6 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER    MVAR
-      PARAMETER (MVAR = 100)
-! Maximum number of 'parameters' / 'variables' (= degrees of freedom) in the SA
-
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
@@ -217,8 +213,8 @@
       LOGICAL                                                                                      ZBAKIN
       COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5), KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
 
-      INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       INTEGER         NATOM
       REAL                   X
@@ -285,9 +281,9 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
-      REAL            bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4
+      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4, &
+      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
       INTEGER         NStPar

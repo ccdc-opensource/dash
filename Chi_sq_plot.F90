@@ -110,9 +110,9 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      REAL            bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4
+      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4, &
+      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
       INTEGER J, ISET
@@ -309,9 +309,9 @@
       COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
 
-      REAL            bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4
+      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4, &
+      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
       LOGICAL, EXTERNAL :: Get_OutputChi2vsMoves
