@@ -148,7 +148,6 @@
 
       INTEGER I
       CHARACTER(MaxPathLength) temp_file
-      CHARACTER*2  AtmElement(1:MAXATM_2)
       REAL*8 CART(1:3,1:MAXATM)
       INTEGER, EXTERNAL :: WriteMol2
       LOGICAL, EXTERNAL :: Get_ColourFlexibleTorsions
@@ -156,18 +155,17 @@
       INTEGER Element
       INTEGER NumOfFlexTorsions
       INTEGER tLength, BondNr
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
       natcry = NATOMS(iFrg)
       CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
-! Conversion of asym to aelem : very dirty, but works
       DO I = 1, natcry
         axyzo(I,1) = SNGL(CART(1,I))
         axyzo(I,2) = SNGL(CART(2,I))
         axyzo(I,3) = SNGL(CART(3,I))
-        AtmElement(I)(1:2) = asym(I,iFrg)(1:2)
+        aelem(I) = ElmSymbol2CSD(asym(I,iFrg)(1:2))
         atomlabel(I) = OriginalLabel(I,iFrg)
       ENDDO
-      CALL AssignCSDElement(AtmElement)
       nbocry = NumberOfBonds(iFrg)
       DO BondNr = 1, nbocry
         btype(BondNr)  = BondType(BondNr,iFrg)
@@ -592,70 +590,118 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ImportZmatrix
- 
+      SUBROUTINE ImportZmatrix(TheFileName)
+!
+! If TheFileName is empty, user will be prompted for a file.
+! 
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
 
-      INTEGER            I, iFlags, iSelection, Ilen, Istart, Istat
-      INTEGER            POS
-      CHARACTER(LEN=4)   :: EXT4
-      CHARACTER(LEN=255) :: FilterStr, F
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+
+      INTEGER            I, iFlags, iSelection
+      CHARACTER(LEN=255) :: FilterStr
       CHARACTER(LEN=512) :: Zmfiles
-      CHARACTER(LEN=5)   :: fmt     
       CHARACTER(LEN=512) :: Info = 'You can import molecules from res, cssr, mol2, mol or pdb files into DASH.'//CHAR(13)//&
                                    'When you click on OK, you will be prompted for a file in one'//CHAR(13)//&
                                    'of these formats. DASH will create separate Z-matrix files for'//CHAR(13)//&
                                    'each chemical residue present in the first entry in the file.'//CHAR(13)//&
                                    'In multiple entry files the first entry will be read only.'
       INTEGER, EXTERNAL :: Res2Mol2, CSSR2Mol2
+      CHARACTER(MaxPathLength) tFileName
+      INTEGER tNumZMatrices
+      CHARACTER(80) tZmatrices
+      DIMENSION tZmatrices(10)
+      
+      tFileName = TheFileName
+      IF (LEN_TRIM(tFileName) .EQ. 0) THEN
+        CALL InfoMessage(Info)
+        IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
+        iFlags = LoadDialog + DirChange + AppendExt
+        FilterStr = "All files (*.*)|*.*|"//&
+                    "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"//&
+                    "Protein DataBank files (*.pdb)|*.pdb|"//&
+                    "Mol2 files (*.mol2, *.ml2)|*.mol2;*.ml2|"//&
+                    "mdl mol files|*.mol;*.mdl|"//&
+                    "SHELX files (*.res)|*.res|"//&
+                    "cssr files (*.cssr)|*.cssr|"
+        iSelection = 2
+        tFileName = ''
+        CALL WSelectFile(FilterStr, iFlags, tFileName,"Select a file for conversion",iSelection)
+        IF ((WInfoDialog(ExitButtonCommon) .NE. CommonOK) .OR. (LEN_TRIM(tFileName) .EQ. 0)) RETURN
+      ENDIF
+      CALL zmConvert(tFileName,tNumZMatrices,tZmatrices)
+      IF (tNumZMatrices .EQ. 0) THEN
+! An error occurred
+        CALL ErrorMessage("Sorry, could not create Z-matrices.")
+! Prompt with files created
+      ELSE
+        ZmFiles = ''
+        DO I = 1, tNumZMatrices    
+          ZmFiles = ZmFiles(1:LEN_TRIM(ZmFiles))//CHAR(13)//tZmatrices(I)(1:LEN_TRIM(tZmatrices(I)))
+        ENDDO
+        CALL InfoMessage("Generated the following Z-matrices successfully:"//CHAR(13)//&
+                         ZmFiles(1:LEN_TRIM(ZmFiles))//CHAR(13)//CHAR(13)//&
+                         "You can load them by clicking on the Z-matrix browse buttons"//CHAR(13)//&
+                         "in the Molecular Z-Matrices window.")
+      ENDIF
 
-      CALL InfoMessage(Info)
-      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
-      iFlags = LoadDialog + DirChange + AppendExt
-      FilterStr = "All files (*.*)|*.*|"//&
-                  "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"//&
-                  "Protein DataBank files (*.pdb)|*.pdb|"//&
-                  "Mol2 files (*.mol2, *.ml2)|*.mol2;*.ml2|"//&
-                  "mdl mol files|*.mol;*.mdl|"//&
-                  "SHELX files (*.res)|*.res|"//&
-                  "cssr files (*.cssr)|*.cssr|"
-      iSelection = 2
-      FNAME = ' '
-      CALL WSelectFile(FilterStr, iFlags, FNAME,"Select a file for conversion",iSelection)
-      Ilen = LEN_TRIM(FNAME)
-      IF (Ilen .EQ. 0) RETURN
-! Find the last occurence of '.' in TheFileName
-      POS = Ilen-1 ! Last character of TheFileName is not tested
-! The longest extension allowed is four
-      DO WHILE ((POS .NE. 0) .AND. (FNAME(POS:POS) .NE. '.') .AND. (POS .NE. (Ilen-5)))
-        POS = POS - 1
+      END SUBROUTINE ImportZmatrix
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmConvert(TheInputFile,TheNumOfZmatrices,TheZmatrices)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheInputFile
+      INTEGER,       INTENT (  OUT) :: TheNumOfZmatrices
+      CHARACTER(80), INTENT (  OUT) :: TheZmatrices
+      DIMENSION TheZmatrices(10)
+
+      INTEGER iLen, iPos
+      CHARACTER*4 ExtensionStr
+      INTEGER, EXTERNAL :: Res2Mol2, CSSR2Mol2
+      CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
+      CHARACTER(5) fmt
+      INTEGER iStat, iStart, I
+
+      TheNumOfZmatrices = 0
+      tInputFile = TheInputFile
+      iLen = LEN_TRIM(tInputFile)
+! Find the last occurence of '.' in tInputFile
+      iPos = iLen - 1 ! Last character of tInputFile is not tested
+! The longest extension possible is four
+      DO WHILE ((iPos .NE. 0) .AND. (tInputFile(iPos:iPos) .NE. '.') .AND. (iPos .NE. (iLen-5)))
+        iPos = iPos - 1
       ENDDO
 ! If we haven't found a '.' by now, we cannot deal with the extension anyway
-      IF (FNAME(POS:POS) .NE. '.') THEN
-        CALL ErrorMessage('Invalid extension.')
+      IF (tInputFile(iPos:iPos) .NE. '.') THEN
+        CALL ErrorMessage('Invalid extension.') 
         RETURN
       ENDIF
-      EXT4 = '    '
-      EXT4 = FNAME(POS+1:Ilen)
-      CALL ILowerCase(EXT4)
-      SELECT CASE (EXT4)
+      ExtensionStr = '    '
+      ExtensionStr = tInputFile(iPos+1:iLen)
+      CALL ILowerCase(ExtensionStr)
+      SELECT CASE (ExtensionStr)
         CASE ('cssr')
-          ISTAT = CSSR2Mol2(FNAME)
-          IF (ISTAT .NE. 1) RETURN
+          IF (CSSR2Mol2(tInputFile) .NE. 1) RETURN
 ! Replace 'cssr' by 'mol2'
-          FNAME = FNAME(1:Ilen-4)//'mol2'
-          Ilen = LEN_TRIM(FNAME)
+          tInputFile = tInputFile(1:iLen-4)//'mol2'
+          iLen = LEN_TRIM(tInputFile)
           fmt = '-mol2'
         CASE ('res ')
-          ISTAT = Res2Mol2(FNAME)
-          IF (ISTAT .NE. 1) RETURN
+          IF (Res2Mol2(tInputFile) .NE. 1) RETURN
 ! Replace 'res' by 'mol2'
-          FNAME = FNAME(1:Ilen-3)//'mol2'
-          Ilen = LEN_TRIM(FNAME)
+          tInputFile = tInputFile(1:iLen-3)//'mol2'
+          iLen = LEN_TRIM(tInputFile)
           fmt = '-mol2'
         CASE ('pdb ')
           fmt = '-pdb'
@@ -666,42 +712,40 @@
       END SELECT
 ! Run silently, 
       CALL IOSDeleteFile('MakeZmatrix.log')
-      Istat = InfoError(1) ! Clear any errors 
-      Istart = 1
-      DO I = 1, Ilen
-        IF (FNAME(I:I) .EQ. DIRSPACER) Istart = I + 1
+      iStat = InfoError(1) ! Clear any errors 
+      iStart = 1
+      DO I = 1, iLen
+        IF (tInputFile(I:I) .EQ. DIRSPACER) iStart = I + 1
       ENDDO
       CALL WCursorShape(CurHourGlass)
       CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'zmconv.exe'// &
-        ' '//fmt(1:LEN_TRIM(fmt))//' "'//FNAME(Istart:Ilen)//'"',3)
+        ' '//fmt(1:LEN_TRIM(fmt))//' "'//tInputFile(iStart:iLen)//'"',3)
 ! Check return status
-      OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = ISTAT)
-      CALL WCursorShape(CurCrossHair)
-      IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (ISTAT .NE. 0)) THEN
+      OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = iStat)
+      IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (iStat .NE. 0)) THEN
+        CALL WCursorShape(CurCrossHair)
 ! An error occurred
         CALL ErrorMessage("Sorry, could not create Z-matrices.")
 ! Prompt with files created
-      ELSE ! All Ok: Need to read in the file names
-        F = ''
-        Ilen = 1
-        DO WHILE (Ilen .LT. 512)
-          READ (145,'(A)',ERR=20,END=20) F
-          ZmFiles(Ilen:512) = CHAR(13)//F(1:LEN_TRIM(F))
-          Ilen = LEN_TRIM(ZmFiles) + 1
+      ELSE ! All OK: Need to read in the file names
+        CALL WCursorShape(CurCrossHair)
+        DO WHILE (TheNumOfZmatrices .LT. 10)
+          READ (145,'(A)',ERR=20,END=20) TheZmatrices(TheNumOfZmatrices+1)
+          IF (LEN_TRIM(TheZmatrices(TheNumOfZmatrices+1)) .NE. 0) CALL INC(TheNumOfZmatrices)
         ENDDO
  20     CONTINUE
-        IF (LEN_TRIM(F) .EQ. 0) THEN
-          CALL ErrorMessage("Sorry, could not create Z-matrices.")
-        ELSE
-          CALL InfoMessage("Generated the following Z-matrices successfully:"//CHAR(13)//&
-                           ZmFiles(1:Ilen)//CHAR(13)//CHAR(13)//&
-                           "You can load them by clicking on the Z-matrix browse buttons"//CHAR(13)//&
-                           "in the Molecular Z-Matrices window.")
-        ENDIF
+!O        IF (LEN_TRIM(F) .EQ. 0) THEN
+!O          CALL ErrorMessage("Sorry, could not create Z-matrices.")
+!O        ELSE
+!O          CALL InfoMessage("Generated the following Z-matrices successfully:"//CHAR(13)//&
+!O                           ZmFiles(1:Ilen)//CHAR(13)//CHAR(13)//&
+!O                           "You can load them by clicking on the Z-matrix browse buttons"//CHAR(13)//&
+!O                           "in the Molecular Z-Matrices window.")
+!O        ENDIF
         CLOSE(145)
       ENDIF
 
-      END SUBROUTINE ImportZmatrix
+      END SUBROUTINE zmConvert
 !
 !*****************************************************************************
 !
