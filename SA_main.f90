@@ -939,7 +939,9 @@
       DO I = 1, Ilen
         IF (FNAME(I:I) .EQ. DIRSPACER) Istart = I + 1
       END DO
+      CALL WCursorShape(CurHourGlass)
       CALL IOSCommand(CONVEXE(1:LEN_TRIM(CONVEXE))//' '//fmt(1:LEN_TRIM(fmt))//' "'//FNAME(Istart:Ilen)//'"',3)
+      CALL WCursorShape(CurCrossHair)
 ! Check return status
       OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = ISTAT)
       IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (ISTAT .NE. 0)) THEN
