@@ -20,11 +20,6 @@
       INTEGER MCHIHS
       PARAMETER ( MCHIHS = 40000 )
 
-! For common blocks CHIFS1
-
-      INTEGER MCHFS1
-      PARAMETER ( MCHFS1 = 40000 )
-
 ! For common block FPINF, FPINF1
 
       INTEGER MFPINF

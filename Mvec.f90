@@ -653,8 +653,9 @@
         IO = IO + IO
         IF (IO-IT) 3, 4, 99
     3 ENDDO
-! ERROR EXIT - IT NOT A POWER OF 2, OR TOO BIG:
+! ERROR EXIT - IF NOT A POWER OF 2, OR TOO BIG:
    99 INV = -1
+      CALL DebugErrorMessage('NOT A POWER OF 2, OR TOO BIG in FT01A')
       GOTO 100
     4 IO = I
       II = IO

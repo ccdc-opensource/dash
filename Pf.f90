@@ -54,8 +54,9 @@
 !
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
 !
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
@@ -85,7 +86,6 @@
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
 !
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -137,8 +137,9 @@
       INCLUDE 'PARAMS.INC'
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
 !
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
@@ -168,7 +169,6 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -234,8 +234,9 @@
 !
       INCLUDE 'PARAMS.INC'
 !
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -263,7 +264,6 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -337,8 +337,9 @@
 !
       INCLUDE 'PARAMS.INC'
 !
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -366,7 +367,6 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -449,8 +449,9 @@
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -478,7 +479,6 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -566,8 +566,9 @@
 !
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -594,7 +595,6 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -674,7 +674,9 @@
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -796,8 +798,9 @@
       DIMENSION CREFH(6)
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -1600,8 +1603,9 @@
       EQUIVALENCE (STHLMX,STHMXX(1))
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -1662,7 +1666,9 @@
 !
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5), DIFANG(6)
       EQUIVALENCE (STHLMX,STHMXX(1))
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
@@ -1746,8 +1752,9 @@
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
      &                DSTAR2, TWOTHD(5), DIFANG(6)
       EQUIVALENCE (STHLMX,STHMXX(1))
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI

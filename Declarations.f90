@@ -62,9 +62,11 @@
 
 ! NPTS is approximately NBIN.
 ! These variables hold the profile during peak fitting and Pawley refinement.
+! KOBZ holds for each reflection the data point closest to it.
+! As such, it should have been dimensioned KOBZ(REFDIM)
 
-      REAL            ZCAL !,        ZBAK
-      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
+      REAL            ZCAL
+      COMMON /YSTORE/ ZCAL(MPPTS)
 
 ! Hold output from Pawley refinement and multi-peak fitter.
 
