@@ -47,11 +47,11 @@
       INTEGER         NStPar
       COMMON /pextra/ NStPar
 
-      LOGICAL         UseRene, UseESD
-      INTEGER                          nwidth
-      REAL                                     width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                       InPeak
-      COMMON / RENE / UseRene, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      LOGICAL         UseRene, UseRelease, UseESD
+      INTEGER                                     nwidth
+      REAL                                                width, minstep, rwidth, SqrtCorrObs 
+      LOGICAL                                                                                   InPeak
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
 
       REAL, EXTERNAL :: FFCALC_001, FFCALC_002, FFCALC_039, FFCALC_040, FFCALC_044, FFCALC_050, &
                         FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061, FFCALC_064, FFCALC_065
@@ -291,7 +291,11 @@
       ENDIF
 ! BICALC(1:NumOfRef) now contains the calculated intensities corrected for preferred orientation
       IF (UseRene) THEN
-        CALL CalculateSimilarity(CHIVAL)
+        IF (UseRelease) THEN
+          CALL CalculateSimilarity_1(CHIVAL)
+        ELSE
+          CALL CalculateSimilarity(CHIVAL)
+        ENDIF
       ELSE
         SUM1 = 0.0
         SUM2 = 0.0
