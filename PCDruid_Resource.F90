@@ -1,4 +1,4 @@
-! Winteracter module created : 12/Mar/2002 10:34:35
+! Winteracter module created : 14/Mar/2002 13:00:20
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -608,4 +608,7 @@
           INTEGER, PARAMETER :: ID_Save                         = 40027
           INTEGER, PARAMETER :: ID_New                          = 40024
           INTEGER, PARAMETER :: ID_Open                         = 40026
+          INTEGER, PARAMETER :: IDF_SGdetGROUP                  =  1457
+          INTEGER, PARAMETER :: IDF_Paw_Ref_SGDet_Proceed       =  1461
+          INTEGER, PARAMETER :: IDF_SGDet_LABEL                 =  1462
       END MODULE Druid_Header
