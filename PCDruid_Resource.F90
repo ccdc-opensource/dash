@@ -1,4 +1,4 @@
-! Winteracter module created : 21/Feb/2002 17:49:57
+! Winteracter module created : 27/Feb/2002 13:51:57
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -535,9 +535,6 @@
           INTEGER, PARAMETER :: IDD_ExclRegions                 =   163
           INTEGER, PARAMETER :: IDD_TEMPLATE015                 =   164
           INTEGER, PARAMETER :: IDF_ExclRegionsFrid             =  1396
-          INTEGER, PARAMETER :: IDF_OrderZM                     =  1397
-          INTEGER, PARAMETER :: IDF_DelLatAtm                   =  1398
-          INTEGER, PARAMETER :: IDF_OrderOrig                   =  1399
           INTEGER, PARAMETER :: IDB_ReOrder                     =  1400
           INTEGER, PARAMETER :: IDBSAVE                         =  1403
           INTEGER, PARAMETER :: IDB_Rotations                   =  1405
