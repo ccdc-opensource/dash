@@ -109,6 +109,8 @@
       INTEGER III, IH, KK, iFrg, iFrgCopy
       INTEGER Last_NUP, Last_NDOWN
       CHARACTER*3 CNruns,CMruns
+      LOGICAL PrevRejected, CurrIsPO, PrevWasPO
+      DOUBLE PRECISION tX147
 
       CALL OpenChiSqPlotWindow
       Curr_SA_Run = 0
@@ -224,6 +226,7 @@
       ENDDO
 ! Evaluate the profile chi-squared as well
       CALL valchipro(CHIPROBEST)
+      PrevRejected = .TRUE.
 ! plot the profile
       CALL Profile_Plot
 !  If the function is to be minimised, switch the sign of the function.
@@ -299,18 +302,47 @@
 !O              ENDDO
 !O            ENDIF
 ! If XP is out of bounds, select a point in bounds for the trial.
-              IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
-                XP(H) = LB(H) + RULB(H) * RANARR(IARR)
-                IARR = IARR + 1
-              ENDIF
+            IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
+              XP(H) = LB(H) + RULB(H) * RANARR(IARR)
+              IARR = IARR + 1
+            ENDIF
+            CurrIsPO = (kzmpar2(H) .EQ. 7)
+            IF (PrefParExists) THEN
 ! Evaluate the function with the trial point XP and return as FP.
-            CALL FCN(XP,FP,H)
+              tX147 = X(iPrfPar)
+              X(iPrfPar) = XP(iPrfPar) 
+              IF (PrevRejected) THEN
+                IF (PrevWasPO) THEN
+                  IF (CurrIsPO) THEN
+                    CALL FCN(XP,FP,iPrfPar)
+                  ELSE
+                    CALL PO_PRECFC
+                    CALL FCN(XP,FP,0)
+                  ENDIF
+                ELSE
+                  IF (CurrIsPO) THEN
+                    CALL PO_PRECFC
+                    CALL FCN(XP,FP,0)
+                  ELSE
+                    CALL FCN(XP,FP,0)
+                  ENDIF
+                ENDIF
+              ELSE
+                CALL FCN(XP,FP,H)
+              ENDIF
+              X(iPrfPar) = tX147
+            ELSE
+              CALL FCN(XP,FP,0)
+            ENDIF
+            PrevWasPO = CurrIsPO
+
             FP = -FP
             FPSUM0 = FPSUM0 + 1.0
             FPSUM1 = FPSUM1 + FP
             FPSUM2 = FPSUM2 + FP*FP
             A0SUM(H) = A0SUM(H) + 1.0
             XDSS(H) = XDSS(H) + (FP-F)**2
+            PrevRejected = .FALSE.
 ! Accept the new point if the function value increases.
             IF (FP.GE.F) THEN
               X(H) = XP(H)
@@ -355,6 +387,7 @@
                 NDOWN = NDOWN + 1
               ELSE
                 NREJ = NREJ + 1
+                PrevRejected = .TRUE.
 !O                X0SUM(H) = X0SUM(H) + 1.0
 !O                XSUM(H) = XSUM(H) + X(H)
 !O                XXSUM(H) = XXSUM(H) + X(H)**2
