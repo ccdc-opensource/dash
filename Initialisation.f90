@@ -14,9 +14,9 @@
       IMPLICIT NONE
 
       INTEGER :: IFlags
-      CHARACTER(LEN=MaxPathLength) :: Dirname
-      CHARACTER*MaxPathLength tString
-      CHARACTER*255 tFile
+      CHARACTER(MaxPathLength) :: Dirname
+      CHARACTER(MaxPathLength) tString
+      CHARACTER(MaxPathLength) tFile
       INTEGER*4 tProcess, tSize
 
 ! Determine the directory where DASH.exe resides and store it in "InstallationDirectory"
@@ -35,7 +35,7 @@
         Dirname = ' '
         CALL WSelectDir(IFlags,Dirname,"Select working directory for DASH...")
         IF (LEN_TRIM(Dirname) .EQ. 0) THEN
-          CALL WindowClose()
+          CALL WindowClose
           STOP
         ENDIF
 ! Open the file
@@ -267,7 +267,8 @@
       INTEGER tData(1:iWidth,1:iHeight)
       INTEGER I, J
       INTEGER iRed, iGreen, iBlue, iRGBvalue
-      REAL UM, TH
+      REAL    UM, TH
+      LOGICAL MercuryExists
 
       LOGICAL            ShowAgain
       COMMON  / DBGMSG / ShowAgain
@@ -296,7 +297,24 @@
       CALL CalCosArx
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
-      CALL GetPathToMercuryFromRegistry
+      VIEWARG = ''
+! In order to facilitate distributing an installed version of DASH on a CD together with
+! an installed version of Mercury: test if DASH was launched from the directory on the CD
+! and if Mercury is in the directory that we will burn onto the CD.
+! If it does, for now, assume that that is where we will get Mercury from: do not check the registry.
+! The reason for not checking the registry is, that that might come up with an old version of Mercury,
+! whereas we want to use the CD to show off the latest version.
+      MercuryExists = .FALSE.
+! First, check that the DASH installation directory is the directory we put on the CD.
+      IF (InstallationDirectory(3:LEN_TRIM(InstallationDirectory)) .EQ. '\CCDC\DASH 2.0\') THEN
+! Check if \CCDC\Mercury 1.1\Mercury.exe exists on this drive
+        VIEWEXE = InstallationDirectory(1:2)//'\CCDC\Mercury 1.1\Mercury.exe'
+        INQUIRE(FILE=VIEWEXE,EXIST=MercuryExists) 
+      ENDIF
+      IF (.NOT. MercuryExists) THEN
+        VIEWEXE = ''
+        CALL GetPathToMercuryFromRegistry
+      ENDIF
       DO I = 0, maxfrg
         izmoid(0,I) = 0
         izmbid(0,I) = 0
