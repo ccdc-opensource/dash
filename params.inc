@@ -20,21 +20,10 @@
       INTEGER MCHIHS
       PARAMETER ( MCHIHS = 40000 )
 
-! For common block CHISTOP and CHIBEST
-! Although it looks like an independent parameter, must be equal to MOBS
-
-      INTEGER MCHSTP
-      PARAMETER ( MCHSTP = 15000 )
-
 ! For common blocks CHIFS1
 
       INTEGER MCHFS1
       PARAMETER ( MCHFS1 = 40000 )
-
-! For common block CHIFS2
-
-      INTEGER MCHFS2
-      PARAMETER ( MCHFS2 = 10000 )
 
 ! For common block FPINF, FPINF1
 
@@ -46,11 +35,6 @@
 
       INTEGER MAXPIK, MPTS
       PARAMETER ( MAXPIK = 200000, MPTS = 15000 )
-
-! For use in common block POSCMN
-
-      INTEGER MPSCMN
-      PARAMETER (MPSCMN = 10000) 
 
 ! For use in common block F4PARS
 
@@ -68,8 +52,7 @@
       INTEGER MOBS
       PARAMETER ( MOBS = 15000 )
 
-! Note: The following paramters seem to be related to MOBS (i.e., should probably have the same value)
-! MCHSTP
+! Note: The following parameters seem to be related to MOBS (i.e., should probably have the same value)
 ! MPPTS
 ! MFPINF
 

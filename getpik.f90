@@ -35,15 +35,15 @@
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
-      LOGICAL IHMINLT0, IKMINLT0, ILMINLT0
+      LOGICAL         IHMINLT0, IKMINLT0, ILMINLT0
       COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0
 
       INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
       COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
 
       INTEGER          NFITA, IFITA
-      REAL                                   CHIOBSA, WTSA
-      COMMON /CHISTOP/ NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP)
+      REAL                                 WTSA
+      COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
@@ -55,12 +55,10 @@
 
       ier = 0
       OPEN (21,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998,IOSTAT=Istat)
-      CHIOBSA = 0.
       NFITA = 0
       NBIN = 0
-      MMOBS = MCHSTP
       ittem = 0
-      DO I = 1, MMOBS
+      DO I = 1, MOBS
         READ (21,*,END=200) XBIN(I), YOBIN(I), EBIN(I), KTEM
         KREFT(I) = KTEM
         NBIN = NBIN + 1
@@ -71,7 +69,6 @@
           READ (21,*,ERR=998) (KNIPT(K,I),PIKVAL(K,I),K=1,KTEM)
           NFITA = NFITA + 1
           IFITA(NFITA) = I
-          CHIOBSA = CHIOBSA + WTSA(I) * YOBIN(I)**2
         ENDIF
       ENDDO
   200 CONTINUE

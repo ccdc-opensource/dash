@@ -225,9 +225,8 @@
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
 
-      INTEGER         NP, IP
-      REAL                         PSTORE
-      COMMON /SIMSTO/ NP, IP(100), PSTORE(100)
+      INTEGER         NPAR, IP
+      COMMON /SIMSTO/ NPAR, IP(100)
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number

@@ -1,13 +1,13 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE FCN(N,THETA,H)
+      SUBROUTINE FCN(X,H)
 
-      DOUBLE PRECISION THETA(*), H
+      DOUBLE PRECISION X(*), H
 
       REAL snglh
 
-      CALL makefrac_2(theta)
+      CALL makefrac(X)
       CALL valchi(snglh)
       h = DBLE(snglh)
 
