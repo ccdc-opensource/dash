@@ -374,9 +374,7 @@
       CALL IPgYLabelLeft('Observed profile','C9')
       CALL IPgNewPlot(PgPolyLine,3,NBIN)
       YADD = 0.5*(YPGMAX+YPGMIN)
-! I think that the bounds of this loop are wrong: if a point is not inside the plotting area,
-! it might still be needed when its neighbour is inside the plot area
-      DO II = IPMIN, IPMAX
+      DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
         YDIF(II) = YADD + YOBIN(II) - YCBIN(II)
       END DO
       CALL IPgStyle(1,0,0,0,KolNumDif,0)
@@ -479,7 +477,7 @@
               END IF
             END DO
  120        CALL IPgNewPlot(PgPolyLine,1, (1+ix2-ix1) )
-            CALL IPgStyle(1,0,0,0,KolNumCTic,0)
+            CALL IPgStyle(1,0,0,0,KolNumMTic,0)
             CALL IPgXYPairs(xpeakfit(ix1),ypeakfit(ix1))
           END IF
         END IF
@@ -564,7 +562,6 @@
         WTSA(MCHSTP),XOBSA(MCHSTP),YOBSA(MCHSTP),YCALA(MCHSTP),ESDA(MCHSTP)
       COMMON /chibest/ ycalbest(MCHSTP)
 
-      LBIN = 1
       NOBS = NOBSA
       NBIN = NOBSA
       YOSUM = 0.0
