@@ -43,7 +43,7 @@
       REAL    tScale
 
 ! JvdS VALCHIPRO, which calculates the profile chi-squared, is always
-! called after VALCHI. VALCHI already fills BICALC in COMMON /SAREFLN2/
+! called after VALCHI. VALCHI already fills BICALC.
       SUM1 = 0.0
       SUM2 = 0.0
       CummChiSqd = -1.0
