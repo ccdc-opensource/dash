@@ -573,7 +573,7 @@
 ! End of a run in a multi-run. This is the place for a final local minimisation
           NumOf_SA_Runs = Curr_SA_Run
 ! Get AutoLocalMinimisation from the Configuration Window
-          IF (Get_AutoLocalMinimisation()) THEN
+          IF ((iMyExit .NE. 5) .AND. Get_AutoLocalMinimisation()) THEN
             CALL LocalMinimise(.TRUE.)
             CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
           ENDIF
