@@ -2327,6 +2327,7 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'statlog.inc'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS
@@ -2335,8 +2336,6 @@
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
-
-      INCLUDE 'statlog.inc'
 
       INTEGER I, J, JJ, IST
       REAL XADD, YOADD, EADD

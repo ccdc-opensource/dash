@@ -65,7 +65,7 @@
  4220 FORMAT ('C ',3F10.5,3F10.3)
       WRITE (42,4230,ERR=999)
  4230 FORMAT ('F C 2 2.31 20.8439 1.02 10.2075 1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0')
-      IF (NumberSGTable.GE.1) THEN
+      IF (NumberSGTable .GE. 1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin.GT.0) THEN
           DO isym = 1, nsymmin
