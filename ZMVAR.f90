@@ -11,7 +11,7 @@
       IMPLICIT NONE
 
       INTEGER maxatm
-      PARAMETER ( maxatm = 100 )
+      PARAMETER ( maxatm = 150 )
 
       INTEGER maxcopies
       PARAMETER ( maxcopies = 8 )
@@ -187,13 +187,13 @@
 !     9 = pi-bond
 
       INTEGER CurrentlyEditedFrag
-      INTEGER CurrentOrderOption
+      LOGICAL zmAtomDeleted
 
 ! CurrentlyEditedFrag Holds the number of the Z-matrix which is being edited 
 !                     if the Z-matrix edit dialogue is active.
-! CurrentOrderOption  Due to the way WinterActer works, we cannot detect real changes,
-!                     so we must keep record of the old value and compare.
-
+! zmAtomDeleted       We don't want to remake a Z-matrix if not necessary (it might be
+!                     a hand-made Z-matrix). This variable is set if an atom was deleted
+!                     in the Edit Z-matrix window.
   
       END MODULE ZMVAR
 !
