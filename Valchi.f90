@@ -424,7 +424,6 @@
 ! March-Dollase correction for Preferred Orientation
 !
       USE PO_VAR
-      USE ATMVAR
       USE REFVAR
       
       IMPLICIT NONE
@@ -433,9 +432,6 @@
 
       DOUBLE PRECISION x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
-
-      INTEGER           iHMUL
-      COMMON /SAREFLN3/ iHMUL(MFCSTO)
 
       INTEGER iR, i
       REAL    PrfPar, prfcor, csqa, ssqa
