@@ -12,15 +12,16 @@
       REAL cpb
       DOUBLE PRECISION parvals(*) ! The current torsion parameters (cant be called X here)
       INTEGER ntotmov
-!
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
       INCLUDE 'IZMCheck.inc'
-!
-      CHARACTER*3 asym
-      COMMON /zmcomc/ asym(maxatm,maxfrg)
+
+      CHARACTER*3     asym
+      CHARACTER*5                          OriginalLabel
+      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
       COMMON /zmcomi/ ntatm, natoms(maxfrg), ioptb(maxatm,maxfrg),      &
      &                iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),       &
      &                iz1(maxatm,maxfrg), iz2(maxatm,maxfrg),           &
