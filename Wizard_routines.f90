@@ -730,8 +730,8 @@
               DO I = 1, NBIN
                 YOBIN(I) = YOBIN(I) / EBIN(I)
               ENDDO
-      CALL GetProfileLimits
-      CALL Get_IPMaxMin 
+              CALL GetProfileLimits
+              CALL Get_IPMaxMin 
               CALL Profile_Plot
             CASE (IDB_Smooth)
               CALL WDialogGetInteger(IDF_SmoothWindow, Window)
@@ -748,8 +748,8 @@
                 YOBIN(I) = tYOBIN(I+Window)
                 BackupYOBS(I) = tYOBIN(I+Window)
               ENDDO
-      CALL GetProfileLimits
-      CALL Get_IPMaxMin 
+              CALL GetProfileLimits
+              CALL Get_IPMaxMin 
               CALL Profile_Plot
             CASE (IDB_1st)  
               DO I = 2, NBIN
@@ -759,8 +759,8 @@
               DO I = 1, NBIN
                 YOBIN(I) = tYOBIN(I)
               ENDDO
-      CALL GetProfileLimits
-      CALL Get_IPMaxMin 
+              CALL GetProfileLimits
+              CALL Get_IPMaxMin 
               CALL Profile_Plot
             CASE (IDB_Preview)
               tXPMIN     = XPMIN
