@@ -587,6 +587,23 @@
       REAL rpdb(4,4,mpdbops), rtmp(4,4)
       LOGICAL cmp
       LOGICAL PDB_CmpMat
+
+!ep added 
+      REAL SymOpNumber
+      DIMENSION SymOpNumber(1,3)
+      CHARACTER*1 SymOpSign
+      DIMENSION SymOpSign(1,3) 
+      INTEGER, DIMENSION(1,3) :: SymOpAxis
+! Use DeCodeSymOps Common to pass decoded sym ops one at a time to SOSign 
+! and SoNumber
+      COMMON /DecodeSymOps/ SymOpNumber, SymOpSign, SymOpAxis
+      REAL SONumber
+      DIMENSION SONumber(50,3)
+      CHARACTER*1 SOSign
+      DIMENSION SOSign(50,3)
+      INTEGER SOAxis
+      DIMENSION SoAxis(50,3)
+      COMMON/SYMOPS/SOSign, SONumber, SOAxis
 !
 ! Expand the symmetry generators into a list of symm ops by cross-multiplication
       DO i = 1, 4
@@ -634,6 +651,12 @@
           m = m + 1
         ENDDO
         cpdbops(k) = stout(m:20)
+!ep added
+        DO i = 1,3
+         SOSign(k,i) = SymOpSign(1,i)
+         SONumber(k,i) = SymOpNumber(1,i)
+         SOAxis(k,i) = SymOpAxis(1,i)
+        END DO
       ENDDO
 
       END SUBROUTINE PDB_SYMMRECORDS
