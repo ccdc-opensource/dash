@@ -21,12 +21,12 @@
 !
       Real FitPar(MPkDes),FitEsd(MPkDes)
       Integer IOrdTem(MAX_NPFR)
-	  INTEGER ICurSel
+        INTEGER ICurSel
 
 !C>> JCC This is for testing for mathematical errors used to PAUSE the program: THe pause seemed to#
 !C>> be causing a repeated CMD window to appear on screen ....
-	INTEGER IBMBER
-	COMMON / CCSLER / IBMBER 
+      INTEGER IBMBER
+      COMMON / CCSLER / IBMBER 
 
 !
       CALL SORT_REAL(PkPosAv,IOrdTem,NumPeakFitRange)
@@ -36,9 +36,9 @@
       ICurSel = WinfoDialog(CurrentDialog)
 
       CALL WDialogSelect(IDD_Sigma_info)
-	  CALL WDialogClearField(IDD_Sigma_Grid)
+        CALL WDialogClearField(IDD_Sigma_Grid)
       CALL WGridRows(IDF_Sigma_Grid,NumPeakFitRange)
-	  IF (NumPeakFitRange .GT. 0) THEN
+        IF (NumPeakFitRange .GT. 0) THEN
         DO I=1,NumPeakFitRange
           iord=IOrdTem(i)
           CALL WGridPutCellReal(IDF_Sigma_Grid,1,i,PkPosAv(iord),'(F12.3)')
@@ -57,14 +57,14 @@
           call WDialogPutReal(IDF_Sigma2,PkFnVarVal(2,1),'(f10.4)')
           DO I=1,NumPeakFitRange
             iord=IOrdTem(i)
-		    CALL WGridPutCellReal(IDF_Sigma_Grid,4,i,PkFnCal(1,iord),'(F12.5)')
+                CALL WGridPutCellReal(IDF_Sigma_Grid,4,i,PkFnCal(1,iord),'(F12.5)')
           END DO
         End If
-	  ELSE
-	    DO I = 1,4
-			CALL WGridClearCell(IDF_Sigma_Grid,i,1)
-		END DO
-	  END IF
+        ELSE
+          DO I = 1,4
+                  CALL WGridClearCell(IDF_Sigma_Grid,i,1)
+            END DO
+        END IF
 !
 !
 ! Write out gammas
@@ -72,7 +72,7 @@
       CALL WDialogClearField(IDD_Gamma_Grid)
       CALL WGridRows(IDF_Gamma_Grid,NumPeakFitRange)
 
-	  IF (NumPeakFitRange .GT. 0) THEN
+        IF (NumPeakFitRange .GT. 0) THEN
 
         DO I=1,NumPeakFitRange
           iord=IOrdTem(i)
@@ -97,16 +97,16 @@
         End If
 
       ELSE
-	    DO I = 1,4
-			CALL WGridClearCell(IDF_Gamma_Grid,i,1)
-		END DO
-	  END IF
+          DO I = 1,4
+                  CALL WGridClearCell(IDF_Gamma_Grid,i,1)
+            END DO
+        END IF
 !
 ! Write out HPSL
       CALL WDialogSelect(IDD_HPSL_info)
-	  CALL WDialogClearField(IDD_HPSL_Grid)
+        CALL WDialogClearField(IDD_HPSL_Grid)
       CALL WGridRows(IDF_HPSL_Grid,NumPeakFitRange)
-	  IF (NumPeakFitRange .GT. 0) THEN
+        IF (NumPeakFitRange .GT. 0) THEN
         DO I=1,NumPeakFitRange
           iord=IOrdTem(i)
           CALL WGridPutCellReal(IDF_HPSL_Grid,1,i,PkPosAv(iord),'(F12.3)')
@@ -118,39 +118,39 @@
 ! Let's fit HPSL
           NumHPSLPar=1
           IPtPS=3
-	  	  IBMBER = 0
+              IBMBER = 0
           call Fit_Constant(FitPar,FitEsd,NumHPSLPar,IPtPS)
 
 !C>> JCC If you have two ranges selected, but only no peaks fitted, this goes wrong
 !C>> So trap for a numerical error
 
-		  IF (IBMBER .EQ. 1) THEN
-			IBMBER = 0
-			 IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
-			RETURN
-		  ENDIF
+              IF (IBMBER .EQ. 1) THEN
+                  IBMBER = 0
+                   IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
+                  RETURN
+              ENDIF
 
-		  PkFnVarVal(1,3)=max(0.0002,FitPar(1))
-		  PkFnVarEsd(1,3)=FitEsd(1)
-		  call WDialogPutReal(IDF_HPSL1,PkFnVarVal(1,3),'(f10.4)')
-		  DO I=1,NumPeakFitRange
-			iord=IOrdTem(i)
-			CALL WGridPutCellReal(IDF_HPSL_Grid,4,i,PkFnCal(3,iord),'(F12.5)')
-		  END DO
+              PkFnVarVal(1,3)=max(0.0002,FitPar(1))
+              PkFnVarEsd(1,3)=FitEsd(1)
+              call WDialogPutReal(IDF_HPSL1,PkFnVarVal(1,3),'(f10.4)')
+              DO I=1,NumPeakFitRange
+                  iord=IOrdTem(i)
+                  CALL WGridPutCellReal(IDF_HPSL_Grid,4,i,PkFnCal(3,iord),'(F12.5)')
+              END DO
 
-	    END IF
-	  ELSE
-	    DO I = 1,4
-			CALL WGridClearCell(IDF_HPSL_Grid,i,1)
-		END DO
-	  END IF
+          END IF
+        ELSE
+          DO I = 1,4
+                  CALL WGridClearCell(IDF_HPSL_Grid,i,1)
+            END DO
+        END IF
 !
 !
 ! Write out HMSL
       CALL WDialogSelect(IDD_HMSL_info)
-	  CALL WDialogClearField(IDD_HMSL_Grid)
+        CALL WDialogClearField(IDD_HMSL_Grid)
       CALL WGridRows(IDF_HMSL_Grid,NumPeakFitRange)
-	  IF (NumPeakFitRange .GT. 0) THEN
+        IF (NumPeakFitRange .GT. 0) THEN
         DO I=1,NumPeakFitRange
           iord=IOrdTem(i)
           CALL WGridPutCellReal(IDF_HMSL_Grid,1,i,PkPosAv(iord),'(F12.3)')
@@ -161,17 +161,17 @@
         If (NumPeakFitRange.ge.2) then
           NumHMSLPar=1
           IPtPS=4
-	  	  IBMBER = 0
+              IBMBER = 0
           call Fit_Constant(FitPar,FitEsd,NumHMSLPar,IPtPS)
 
 !C>> JCC If you have two ranges selected, but only no peaks fitted, this goes wrong
 !C>> So trap for a numerical error
 
-		  IF (IBMBER .EQ. 1) THEN
-			IBMBER = 0
-			IF (ICurSel .GT. 0 ) CALL WDialogSelect(ICurSel)
-			RETURN
-		  ENDIF
+              IF (IBMBER .EQ. 1) THEN
+                  IBMBER = 0
+                  IF (ICurSel .GT. 0 ) CALL WDialogSelect(ICurSel)
+                  RETURN
+              ENDIF
 
 
           PkFnVarVal(1,4)=max(0.0001,FitPar(1))
@@ -182,16 +182,16 @@
             CALL WGridPutCellReal(IDF_HMSL_Grid,4,i,PkFnCal(4,iord),'(F12.5)')
           END DO
         End If
-	  ELSE
-	    DO I = 1,4
-			CALL WGridClearCell(IDF_HMSL_Grid,i,1)
-		END DO
-	  END IF
+        ELSE
+          DO I = 1,4
+                  CALL WGridClearCell(IDF_HMSL_Grid,i,1)
+            END DO
+        END IF
 !
 !.. Warn if HPSL is less than HMSL
       If (NumPeakFitRange.ge.2) then
         If (PkFnVarVal(1,4).gt.PkFnVarVal(1,3)) Then
-!          CALL WMessageBox(YesNo,ExclamationIcon,CommonYes	, &
+!          CALL WMessageBox(YesNo,ExclamationIcon,CommonYes , &
 !         'HMSL is greater than HPSL.'//CHAR(13)//&
 !         'Check for bad values in peak width list.'//CHAR(13)// &
 !         'An expediency: do you wish to swap values?', &
@@ -205,7 +205,7 @@
         End If
       End If
 
-	  IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
+        IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
 
 !       
 !
@@ -355,8 +355,8 @@
 
 !C>> JCC This is for testing for mathematical errors used to PAUSE the program: THe pause seemed to#
 !C>> be causing a repeated CMD window to appear on screen ....
-	INTEGER IBMBER
-	COMMON / CCSLER / IBMBER 
+      INTEGER IBMBER
+      COMMON / CCSLER / IBMBER 
 !
 !.. Observations
       NVAL=NumPeakFitRange
@@ -373,7 +373,7 @@
       DX(1)=0.01
       CALL SIMOPT(X,DX,COV,N,Chisq_Constant)
 !
-	  IF (IBMBER .EQ. 1) RETURN
+        IF (IBMBER .EQ. 1) RETURN
       DO I=1,N
         II=I+(I-1)*N
         DX(I)=SQRT(AMAX1(0.,COV(II)))
