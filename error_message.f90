@@ -46,7 +46,7 @@
       IF (maxk .GT. 360) THEN
 ! We've too many reflections ... must reduce
         IF (.NOT. routine_called) THEN
-          CALL InfoMessage('DASH has a maximium limit of 350 reflections.'//CHAR(13)//&
+          CALL InfoMessage('DASH has a maximum limit of 350 reflections.'//CHAR(13)//&
                            'Only the 350 lowest angle reflections will be indexed and used.')
           routine_called = .TRUE.
         ENDIF
@@ -75,9 +75,12 @@
 ! We are adding aadd in order to extend the profile as far as possible including the whole peak.
       armx = argk + aadd
       II = 1
-      DO WHILE ((XBIN(II) .LT. armx) .AND. (II .LT. NBIN))
+      DO WHILE ((XBIN(II) .LT. armx) .AND. (II .LT. MOBS))
         II = II + 1
       ENDDO
+      NPTS = II ! NPTS is the number of points used for Pawley refinement.
+      NBIN = II
+      CALL GetProfileLimits
       argmax(1) = armx
 
       END SUBROUTINE CHKMAXREF
