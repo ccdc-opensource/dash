@@ -493,6 +493,9 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
+!F      INTEGER        CurrHiLiPFR
+!F      COMMON /HLPFR/ CurrHiLiPFR
+
       CHARACTER*1 ChrPkNum
       CHARACTER*2 ChrPkNum2
 
@@ -598,6 +601,8 @@
         CALL IGrColourN(IPresColN)
       ENDDO
       CALL IGrFillPattern(Outline)
+!F      CurrHiLiPFR = 0
+!F      CALL HighLightPFR
 
       ENDSUBROUTINE Plot_PeakFit_Info
 !
