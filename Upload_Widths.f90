@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Upload_Widths()
+      SUBROUTINE Upload_Widths
 
       USE WINTERACTER
       USE DRUID_HEADER 
@@ -50,8 +50,9 @@
       INTEGER IBMBER
       COMMON / CCSLER / IBMBER 
 
-      INTEGER NTPeak, I, J, NumFittedPFR
+      INTEGER NTPeak, I, J, NumFittedPFR, NumRows
 
+      CALL PushActiveWindowID
       IBMBER = 0
       NTPeak = 0
       NumFittedPFR = 0 ! The number of Peak Fit Ranges that have actually been fitted
@@ -66,42 +67,44 @@
           ENDIF
         ENDDO
       ENDIF
-      IF (NumFittedPFR .EQ. 0) THEN
+! Clear all fields.
 ! Winteracter doesn't seem able to cope with setting the number of rows in a grid to zero,
-! so instead I set it such that it fills the screen but doesn't allow scrolling down.
-        CALL PushActiveWindowID
-! Write out sigmas
-        CALL WDialogSelect(IDD_Sigma_info)
-        CALL WGridRows(IDF_Sigma_Grid,5)
-        CALL WDialogClearField(IDF_Sigma_Grid)
-        CALL WDialogClearField(IDF_Sigma1)
-        CALL WDialogClearField(IDF_sigma2)
-! Write out gammas
-        CALL WDialogSelect(IDD_Gamma_info)
-        CALL WGridRows(IDF_Gamma_Grid,5)
-        CALL WDialogClearField(IDF_Gamma_Grid)
-        CALL WDialogClearField(IDF_Gamma1)
-        CALL WDialogClearField(IDF_Gamma2)
-! Write out HPSL
-        CALL WDialogSelect(IDD_HPSL_info)
-        CALL WGridRows(IDF_HPSL_Grid,5)
-        CALL WDialogClearField(IDF_HPSL_Grid)
-        CALL WDialogClearField(IDF_HPSL1)
-! Write out HMSL
-        CALL WDialogSelect(IDD_HMSL_info)
-        CALL WGridRows(IDF_HMSL_Grid,5)
-        CALL WDialogClearField(IDF_HMSL_Grid)
-        CALL WDialogClearField(IDF_HMSL1)
+! so if no PFRs, the number of rows is set such that it fills the screen but doesn't allow scrolling down.
+      IF (NumFittedPFR .EQ. 0) THEN
+        NumRows = 5
+      ELSE
+        NumRows = NumFittedPFR
+      ENDIF
+! Clear sigmas
+      CALL WDialogSelect(IDD_Sigma_info)
+      CALL WGridRows(IDF_Sigma_Grid,NumRows)
+      CALL WDialogClearField(IDF_Sigma_Grid)
+      CALL WDialogClearField(IDF_Sigma1)
+      CALL WDialogClearField(IDF_sigma2)
+! Clear gammas
+      CALL WDialogSelect(IDD_Gamma_info)
+      CALL WGridRows(IDF_Gamma_Grid,NumRows)
+      CALL WDialogClearField(IDF_Gamma_Grid)
+      CALL WDialogClearField(IDF_Gamma1)
+      CALL WDialogClearField(IDF_Gamma2)
+! Clear HPSL
+      CALL WDialogSelect(IDD_HPSL_info)
+      CALL WGridRows(IDF_HPSL_Grid,NumRows)
+      CALL WDialogClearField(IDF_HPSL_Grid)
+      CALL WDialogClearField(IDF_HPSL1)
+! Clear HMSL
+      CALL WDialogSelect(IDD_HMSL_info)
+      CALL WGridRows(IDF_HMSL_Grid,NumRows)
+      CALL WDialogClearField(IDF_HMSL_Grid)
+      CALL WDialogClearField(IDF_HMSL1)
+      IF (NumFittedPFR .EQ. 0) THEN
         CALL PopActiveWindowID
         RETURN
       ENDIF
 ! Sort all peak fit ranges. Those that haven't been fitted have been set to 200.0 and will appear after the others.
       CALL SORT_REAL(PkPosAv,IOrdTem,NumPeakFitRange)
-      CALL PushActiveWindowID
 ! Write out sigmas
       CALL WDialogSelect(IDD_Sigma_info)
-      CALL WGridRows(IDF_Sigma_Grid,NumFittedPFR)
-      CALL WDialogClearField(IDF_Sigma_Grid)
 ! Only update those that have actually been fitted--we wouldn't have sensible values to show for the others anyway.
       DO I = 1, NumFittedPFR
         iord = IOrdTem(I)
@@ -131,8 +134,6 @@
       ENDIF
 ! Write out gammas
       CALL WDialogSelect(IDD_Gamma_info)
-      CALL WGridRows(IDF_Gamma_Grid,NumFittedPFR)
-      CALL WDialogClearField(IDF_Gamma_Grid)
       DO I = 1, NumFittedPFR
         iord = IOrdTem(I)
         CALL WGridPutCellReal(IDF_Gamma_Grid,1,I,PkPosAv(iord),'(F12.3)')
@@ -161,8 +162,6 @@
       ENDIF
 ! Write out HPSL
       CALL WDialogSelect(IDD_HPSL_info)
-      CALL WGridRows(IDF_HPSL_Grid,NumFittedPFR)
-      CALL WDialogClearField(IDF_HPSL_Grid)
       DO I = 1, NumFittedPFR
         iord = IOrdTem(I)
         CALL WGridPutCellReal(IDF_HPSL_Grid,1,I,PkPosAv(iord),'(F12.3)')
@@ -189,8 +188,6 @@
       ENDIF
 ! Write out HMSL
       CALL WDialogSelect(IDD_HMSL_info)
-      CALL WGridRows(IDF_HMSL_Grid,NumFittedPFR)
-      CALL WDialogClearField(IDF_HMSL_Grid)
       DO I = 1, NumFittedPFR
         iord = IOrdTem(I)
         CALL WGridPutCellReal(IDF_HMSL_Grid,1,i,PkPosAv(iord),'(F12.3)')
