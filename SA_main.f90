@@ -143,7 +143,10 @@
 !*****************************************************************************
 !
       SUBROUTINE SA_Parameter_Set
-
+!
+! This routine initialises things after all Z-matrices are known. So that is 1. when
+! leaving the Z-matrices window, 2. when loading a project file.
+!
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -277,9 +280,10 @@
         DO ii = 1, izmpar(iFrg)
           kk = kk + 1
           zm2Par(ii,iFrg) = kk
-          Par2iFrg(kk)     = iFrg
+          Par2iFrg(kk)    = iFrg
           x(kk) = xzmpar(ii,iFrg)
           parlabel(kk) = czmpar(ii,iFrg)
+          ModalFlag(kk) = 0 ! Initialise to 0 meaning "not a torsion"
           SELECT CASE (kzmpar(ii,iFrg))
             CASE (1) ! position
               kzmpar2(kk) = 1
@@ -299,6 +303,7 @@
               ENDIF
             CASE (3) ! torsion
               kzmpar2(kk) = 3
+              ModalFlag(kk) = 1
               IF      ((x(kk) .GT. -180.0) .AND. (x(kk) .LT. 180.0)) THEN
                 lb(kk) =  -180.0
                 ub(kk) =   180.0
@@ -356,7 +361,6 @@
         CALL WGridStateCell(IDF_parameter_grid_modal, 3, i, Enabled)
 !        prevub(i) = ub(i) ! taken out of this version of DASH by CJ?
 !        prevlb(i) = lb(i)
-        ModalFlag(i) = 1
       ENDDO
 ! Tick "Randomise initial values"
       CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .TRUE.)
