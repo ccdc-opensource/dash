@@ -88,10 +88,10 @@
 
       CHARACTER*85 new_fname
 
-      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
-      COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
-      INTEGER cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
-      COMMON /outfillen/ cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
       INTEGER I, Iflags, Idummy
       CHARACTER*80 filehead
@@ -184,7 +184,7 @@
  
       OPEN(42,file='polys.ccl',status='unknown')
       WRITE(42,4210) 
- 4210 FORMAT('N Determining the space group ')
+ 4210 FORMAT('N DeterMining the space group ')
       IF (NumberSGTable .GE. 1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin .GT. 0) THEN
