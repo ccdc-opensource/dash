@@ -253,7 +253,6 @@
 
       REAL*8  CART(1:3,1:MAXATM)
       INTEGER I, BondNr
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
       natcry = NATOMS(iFrg)
       CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),      &
@@ -262,7 +261,7 @@
         axyzo(I,1) = SNGL(CART(1,I))
         axyzo(I,2) = SNGL(CART(2,I))
         axyzo(I,3) = SNGL(CART(3,I))
-        aelem(I) = ElmSymbol2CSD(asym(I,iFrg)(1:2))
+        aelem(I) = zmElementCSD(I,iFrg)
       ENDDO
 ! Calculate bonds and assign bond types.
       CALL SAMABO

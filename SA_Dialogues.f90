@@ -242,7 +242,6 @@
 
       INTEGER I, BondNr
       REAL*8 CART(1:3,1:MAXATM)
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
       CALL WDialogSelect(IDD_zmEdit)
       CurrentlyEditedFrag = iFrg
@@ -258,7 +257,7 @@
         axyzo(I,1) = SNGL(CART(1,I))
         axyzo(I,2) = SNGL(CART(2,I))
         axyzo(I,3) = SNGL(CART(3,I))
-        aelem(I) = ElmSymbol2CSD(asym(I,iFrg)(1:2))
+        aelem(I) = zmElementCSD(I,iFrg)
         atomlabel(I) = OriginalLabel(I,iFrg)
       ENDDO
       nbocry = NumberOfBonds(iFrg)
@@ -294,7 +293,6 @@
       INTEGER, EXTERNAL :: zmSave, zmSaveAs, WriteMol2, zmRebuild
       INTEGER tLength, I, iBondNr2
       CHARACTER(MaxPathLength) temp_file
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
@@ -359,7 +357,7 @@
               natcry = NATOMS(iFrg)
               DO iAtomNr = 1, natcry
                 atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
-                aelem(iAtomNr) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+                aelem(iAtomNr) = zmElementCSD(iAtomNr,iFrg)
               ENDDO
               tLength = LEN_TRIM(frag_file(iFrg))
               temp_file = frag_file(iFrg)(1:tLength-8)//'_temp.mol2'
@@ -497,7 +495,7 @@
       IMPLICIT NONE      
 
       INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State, iAtomNr
-      INTEGER, EXTERNAL :: ElmSymbol2CSD, WriteMol2
+      INTEGER, EXTERNAL :: WriteMol2
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
       REAL, EXTERNAL :: Degrees2Radians
       REAL    Alpha, Beta, Gamma, Q(0:3)
@@ -589,7 +587,7 @@
               ENDDO
               DO iAtomNr = 1, natcry
                 atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
-                aelem(iAtomNr) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+                aelem(iAtomNr) = zmElementCSD(iAtomNr,iFrg)
               ENDDO
               temp_file = 'temp.mol2'
 ! Show the mol2 file
@@ -738,7 +736,6 @@
       INTEGER tNumZMatrices, iAtomNr
       CHARACTER(80) tZmatrices
       DIMENSION tZmatrices(10)
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
       CHARACTER(MaxPathLength) tOldFileName
 
 ! Initialise to failure
@@ -753,7 +750,7 @@
       tOldFileName = frag_file(iFrg)
       DO iAtomNr = 1, natcry
         atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
-        aelem(iAtomNr) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+        aelem(iAtomNr) = zmElementCSD(iAtomNr,iFrg)
       ENDDO
       IF (WriteMol2('Rebuild_temp.mol2',.FALSE.,iFrg) .NE. 1) GOTO 999 ! Writing mol2 file failed
       CALL zmConvert('Rebuild_temp.mol2',tNumZMatrices,tZmatrices)

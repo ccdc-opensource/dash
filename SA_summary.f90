@@ -698,7 +698,6 @@
       CHARACTER*2               LATT
       CHARACTER*1, EXTERNAL  :: ChrLowerCase
       REAL, EXTERNAL         :: UnitCellVolume
-      INTEGER, EXTERNAL      :: ElmSymbol2CSD
       INTEGER                   NumOfAtmPerElm(1:MaxElm)
       CHARACTER*20, EXTERNAL :: Integer2String
       INTEGER, EXTERNAL      :: WritePDBCommon
@@ -959,7 +958,7 @@
           IF (gotzmfile(iFrg)) THEN
             DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
               DO i = 1, natoms(iFrg)
-                CALL INC(NumOfAtmPerElm(ElmSymbol2CSD(asym(i,iFrg)(1:2))))
+                CALL INC(NumOfAtmPerElm(zmElementCSD(i,iFrg)))
               ENDDO
             ENDDO
           ENDIF
@@ -1059,7 +1058,7 @@
               ENDIF
               IF (tSaveRES) THEN
 ! Determine this atom's entry number in the scattering factor list
-                tElement = ElmSymbol2CSD(asym(iOrig,iFrg)(1:2))
+                tElement = zmElementCSD(iOrig,iFrg)
                 iScat = 0
                 DO k1 = 1, tElement
                   IF (NumOfAtmPerElm(k1) .NE. 0) iScat = iScat + 1
@@ -1258,54 +1257,54 @@
 !!      CALL IGrColourN(InfoGrScreen(PrevColReq))
       DO WHILE (.TRUE.)
 !Can't use PeekEvent since the following events aren't handled for ChildWindows
-         CALL WMessagePeek(EventType, EventInfo)
-         IF (EventType .NE. (-1)) THEN
-           IF (EventInfo%WIN .GT. 0) THEN
-           CALL WindowSelect(iHandle)
-           CALL IGrUnits(0.0,0.0,1.0,1.0)
-           CALL IPgArea(0.1,0.1,0.9,0.9)
-           CALL IPgUnits(xmin(iHandle),ymin(iHandle),xmax(iHandle),ymax(iHandle))
-           CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
-          SELECT CASE (EventType)
-            CASE (MouseMove)
-              xgcur(2) = EventInfo%GX
-              ygcur(2) = EventInfo%GY
-              CALL IGrPlotMode('EOR')
-              CALL IGrColourN(KolNumRectSelect)
-              CALL IGrFillPattern(0,1,1)
-              ! Remove old
-              CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
-              ! Draw new
-              CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
-              xgcurold = xgcur(2)
-              ygcurold = ygcur(2)
-              CALL IGrPlotMode('Normal')
-              CALL IGrColourN(InfoGrScreen(PrevColReq))
-            CASE (MouseButUp)
-              xgcur(2) = EventInfo%GX
-              ygcur(2) = EventInfo%GY
-              CALL WMessageEnable(MouseMove, Disabled)
-              CALL WMessageEnable(MouseButUp, Disabled)
-              IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
-                CALL IGrColourN(KolNumRectSelect)
+        CALL WMessagePeek(EventType, EventInfo)
+        IF (EventType .NE. (-1)) THEN
+          IF (EventInfo%WIN .GT. 0) THEN
+            CALL WindowSelect(iHandle)
+            CALL IGrUnits(0.0,0.0,1.0,1.0)
+            CALL IPgArea(0.1,0.1,0.9,0.9)
+            CALL IPgUnits(xmin(iHandle),ymin(iHandle),xmax(iHandle),ymax(iHandle))
+            CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
+            SELECT CASE (EventType)
+              CASE (MouseMove)
+                xgcur(2) = EventInfo%GX
+                ygcur(2) = EventInfo%GY
                 CALL IGrPlotMode('EOR')
+                CALL IGrColourN(KolNumRectSelect)
                 CALL IGrFillPattern(0,1,1)
                 ! Remove old
                 CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+                ! Draw new
+                CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
+                xgcurold = xgcur(2)
+                ygcurold = ygcur(2)
                 CALL IGrPlotMode('Normal')
                 CALL IGrColourN(InfoGrScreen(PrevColReq))
-                IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(xmax(iHandle)-Xmin(iHandle))) RETURN
-                IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(YMAX(iHandle)-YMIN(iHandle))) RETURN
-                XMin(iHandle) = MIN(XCUR(1),XCUR(2))
-                XMax(iHandle) = MAX(XCUR(1),XCUR(2))  
-                YMin(iHandle) = MIN(YCUR(1),YCUR(2))
-                YMax(iHandle) = MAX(YCUR(1),YCUR(2))
-              ENDIF
-              CALL WindowClear()
-              CALL Plot_pro_file(iHandle)
-              RETURN  
-          END SELECT
-        ENDIF
+              CASE (MouseButUp)
+                xgcur(2) = EventInfo%GX
+                ygcur(2) = EventInfo%GY
+                CALL WMessageEnable(MouseMove, Disabled)
+                CALL WMessageEnable(MouseButUp, Disabled)
+                IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
+                  CALL IGrColourN(KolNumRectSelect)
+                  CALL IGrPlotMode('EOR')
+                  CALL IGrFillPattern(0,1,1)
+                  ! Remove old
+                  CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+                  CALL IGrPlotMode('Normal')
+                  CALL IGrColourN(InfoGrScreen(PrevColReq))
+                  IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(xmax(iHandle)-Xmin(iHandle))) RETURN
+                  IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(YMAX(iHandle)-YMIN(iHandle))) RETURN
+                  XMin(iHandle) = MIN(XCUR(1),XCUR(2))
+                  XMax(iHandle) = MAX(XCUR(1),XCUR(2))  
+                  YMin(iHandle) = MIN(YCUR(1),YCUR(2))
+                  YMax(iHandle) = MAX(YCUR(1),YCUR(2))
+                ENDIF
+                CALL WindowClear()
+                CALL Plot_pro_file(iHandle)
+                RETURN  
+            END SELECT
+          ENDIF
         ENDIF
       ENDDO
 
@@ -1330,10 +1329,10 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      REAL, DIMENSION (20):: Ymin
-      REAL, DIMENSION (20):: Ymax
-      REAL, DIMENSION (20):: Xmax
-      REAL, DIMENSION (20):: Xmin
+      REAL, DIMENSION (20) :: Ymin
+      REAL, DIMENSION (20) :: Ymax
+      REAL, DIMENSION (20) :: Xmax
+      REAL, DIMENSION (20) :: Xmin
       COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
 
       YMin(iHandle) = MINVAL(YOBIN(1:NBIN))
