@@ -108,6 +108,7 @@ DEP_F90_ALIGN=\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
+	".\params.inc"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -249,12 +250,9 @@ DEP_F90_DICVOL=\
 # End Source File
 # Begin Source File
 
-SOURCE=.\DoAtomPositions.f90
-# End Source File
-# Begin Source File
-
 SOURCE=.\error_message.f90
 DEP_F90_ERROR=\
+	".\Debug\REFVAR.MOD"\
 	".\params.inc"\
 	".\Reflns.inc"\
 	
@@ -265,6 +263,7 @@ SOURCE=.\Eval.f90
 DEP_F90_EVAL_=\
 	".\Debug\ATMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
+	".\params.inc"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -513,6 +512,7 @@ DEP_F90_PAWLEY=\
 
 SOURCE=.\PCDash_Main.f90
 DEP_F90_PCDAS=\
+	".\Debug\PRJVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
@@ -536,6 +536,9 @@ DEP_F90_PF_F9=\
 # Begin Source File
 
 SOURCE=.\PF_Simplex.f90
+DEP_F90_PF_SI=\
+	".\params.inc"\
+	
 # End Source File
 # Begin Source File
 
@@ -588,6 +591,10 @@ DEP_F90_PR_F9=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\PRJVAR.f90
+# End Source File
+# Begin Source File
+
 SOURCE=.\Profile_Plot.f90
 DEP_F90_PROFI=\
 	".\Debug\REFVAR.MOD"\
@@ -603,11 +610,14 @@ DEP_F90_PROFI=\
 
 SOURCE=.\ProjectSave.f90
 DEP_F90_PROJE=\
+	".\Debug\PRJVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
+	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -676,6 +686,7 @@ DEP_F90_SA_DI=\
 	".\Debug\SAMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
+	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -690,6 +701,7 @@ DEP_F90_SA_MA=\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
+	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -772,7 +784,6 @@ DEP_F90_TSA_M=\
 SOURCE=.\tSA_refresh.f90
 DEP_F90_TSA_R=\
 	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -780,11 +791,14 @@ DEP_F90_TSA_R=\
 # Begin Source File
 
 SOURCE=.\tSA_simopt.f90
+DEP_F90_TSA_S=\
+	".\params.inc"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\tSA_simplex.f90
-DEP_F90_TSA_S=\
+DEP_F90_TSA_SI=\
 	".\Debug\ATMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
