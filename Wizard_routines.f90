@@ -377,6 +377,13 @@
       REAL    tReal
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
+! Should be rewritten:
+! 1. Restore original whole pattern first (this is always available in BackupYOBS)
+!    (we could even move that part to the truncation routine itself: that's where this is done
+!    implicitly anyway)
+! 2. merge TruncateDataStart and TruncateData to give a single routine that truncates the data
+!    from both sides.
+
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
       IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
@@ -525,6 +532,8 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDF_Preview)
+              CALL WizardApplyDiffractionFileInput
+              CALL WizardApplyProfileRange
               CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
               CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
               CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
