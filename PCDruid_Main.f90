@@ -81,8 +81,15 @@
 ! OriginalNOBS is never changed, so the point between EndNOBS and Original NOBS are
 ! data points that were reomved from the start of the pattern.
 
+      LOGICAL UseConfigFile
+! This is the first item read from the configuration file (if present).
+! If set to .FALSE., the rest of the configuration file will be skipped.
+      
       LOGICAL SavePDB, SaveCSSR, SaveCCL, SaveMOL2, SaveRES
 ! Flags to decide which molecular model files are written out when a best solution is found
+
+      LOGICAL AutoLocalMinimisation
+! When set, each run in a multi run ends with a local minimisation
 
       END MODULE VARIABLES
 !
@@ -228,6 +235,8 @@
       LOGICAL FromPeakFit
       LOGICAL Confirm ! Function
       REAL xpgdif, ypgdif
+      INTEGER ISTAT
+      INTEGER DiffractionFileBrowse ! Function
 
       FromPeakFit = .FALSE.
 !
@@ -240,7 +249,7 @@
         CASE (ID_import_dpj_file)
           CALL SDIFileBrowse
         CASE (ID_import_xye_file)
-          CALL DiffractionFileBrowse
+          ISTAT = DiffractionFileBrowse()
         CASE (ID_Remove_Background)
           CALL Background_Fit
         CASE (ID_FILE_PRINT)

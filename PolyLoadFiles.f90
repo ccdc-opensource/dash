@@ -158,7 +158,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE DiffractionFileBrowse
+      INTEGER FUNCTION DiffractionFileBrowse
 !
 ! This routine lets the user browse a directory for a diffraction file.
 ! If a valid file has been selected, it will be opened automatically.
@@ -168,16 +168,21 @@
 !
 ! JvdS 18 July 2001
 !
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data/...)
+!           2 if user pressed cancel
+!
       USE WINTERACTER
       USE VARIABLES
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=512) :: FILTER
-      INTEGER               IFLAGS
-      INTEGER               IFTYPE    ! Needed for Winteracter routine
+      CHARACTER(LEN=512)  FILTER
+      INTEGER             IFLAGS
+      INTEGER             IFTYPE    ! Needed for Winteracter routine
       CHARACTER(LEN=MaxPathLength) tFileName ! Temporary filename
+      INTEGER DiffractionFileOpen ! Function
 
       IFLAGS = LoadDialog + DirChange + PromptOn
 ! It seems that Winteracter cannot cope with strings of this length
@@ -194,26 +199,32 @@
       IFTYPE = 2
       CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open Powder Diffraction File',IFTYPE)
 ! Did the user press cancel?
-      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
+      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) THEN
+        DiffractionFileBrowse = 2
+        RETURN
+      ENDIF
 ! Note that up to this point, none of the global variables had changed. Baling out was no problem.
 ! Try to open the file. This can be removed, of course, and relocated to places in the code where
 ! the current subroutine is called.
 ! Actually, that is how it works in practice under windows (try 'Start' -> 'Run...' -> 'Browse...'
 ! it will not actually open the file, just select it).
-      CALL DiffractionFileOpen(tFileName)
+      DiffractionFileBrowse = DiffractionFileOpen(tFileName)
       RETURN
 
-      END SUBROUTINE DiffractionFileBrowse
+      END FUNCTION DiffractionFileBrowse
 !
 !*****************************************************************************
 !
-      SUBROUTINE DiffractionFileOpen(TheFileName)
+      INTEGER FUNCTION DiffractionFileOpen(TheFileName)
 !
 ! This routine tries to open a diffraction file.
 !
 ! JvdS 18 July 2001
 !
 ! INPUT   : TheFileName = the file name
+!
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -233,6 +244,7 @@
       INTEGER    DiffractionFileLoad ! Function
       LOGICAL    Confirm ! Function
 
+      DiffractionFileOpen = 0
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
       INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
@@ -255,6 +267,7 @@
 ! Update this throughout the program (Wizard + status bar)
       CALL ScrUpdateFileName
       ISTAT = DiffractionFileLoad(TheFileName)
+      DiffractionFileOpen = ISTAT
       IF (ISTAT .EQ. 0) RETURN
 ! Enable the appropriate menus:
       CALL SetModeMenuState(1,-1,-1)
@@ -274,7 +287,7 @@
       ENDIF
       RETURN
 
-      END SUBROUTINE DiffractionFileOpen
+      END FUNCTION DiffractionFileOpen
 !
 !*****************************************************************************
 !
@@ -336,6 +349,7 @@
       REAL             dSpacing2TwoTheta ! Function
 
       BACKREF = .TRUE.
+! Initialise to failure
       DiffractionFileLoad = 0
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
@@ -377,7 +391,7 @@
 !        CALL ScrUpdateFileName
         RETURN
       ENDIF
-!C>>JCC Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
+! Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
       CALL sa_SetOutputFiles(TheFileName)
 ! Fill the E.S.D.s if that hasn't been taken care of yet
       IF (.NOT. ESDsFilled) THEN
