@@ -21,20 +21,27 @@
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                                    ChiMult
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
-!     required to handle the profile graphs plotted in child windows
 
+      LOGICAL         InSA
+      COMMON /SADATA/ InSA
+
+!     required to handle the profile graphs plotted in child windows
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
       INTEGER RangeOption, I, iRow, iStatus
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
+      CALL WDialogSelect(IDD_SAW_Page5)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+! Go back to the Pawley refinement or the initial wizard
+              CALL EndWizardPastPawley
+              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDCANCEL, IDCLOSE)
-              CALL WDialogHide()
+              CALL EndWizardPastPawley
               CALL WDialogSelect(IDD_SA_Action1)
               CALL WDialogFieldState(IDB_Summary,Enabled)
 ! Closes all SA profile child windows which are still open when OK button clicked
@@ -50,7 +57,7 @@
               CALL PopActiveWindowID
               RETURN
             CASE (IDF_InvertSelection)
-              DO iRow = 1, MaxRuns
+              DO iRow = 1, NumOf_SA_Runs
                 CALL WGridGetCellCheckBox(IDF_SA_summary,3,iRow,istatus)
                 IF (istatus .EQ. 1) THEN
                   CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
@@ -80,14 +87,10 @@
         CALL WGridGetCellCheckBox(IDF_SA_summary,2,iRow,istatus)
         IF (istatus .EQ. 1) THEN
 ! calls subroutine which opens Mercury window with .pdb file
-!C          CALL WGridGetCellString(IDF_SA_Summary,1,iRow,Grid_Buffer)
-!C          CALL ViewStructure(Grid_Buffer)
-! @@ at the moment, this is wrong. But the solutions should be sorted against chi-sqrd.
-          Curr_SA_Run = iRow
-          CALL SA_STRUCTURE_OUTPUT_PDB
+          CALL SA_STRUCTURE_OUTPUT_PDB(iRow)
           CALL ViewStructure('SA_best.pdb')
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
-          CALL organise_sa_result_data(iRow)
+          IF (.NOT. InSA) CALL organise_sa_result_data(iRow)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,2,iRow,Unchecked)
         ENDIF
       ENDDO

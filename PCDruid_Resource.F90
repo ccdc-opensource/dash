@@ -1,4 +1,4 @@
-! Winteracter module created : 04/Apr/2002 13:53:05
+! Winteracter module created : 09/Apr/2002 13:37:57
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -258,24 +258,12 @@
           INTEGER, PARAMETER :: IDF_PawRef_RefGamm2_Check       =  1323
           INTEGER, PARAMETER :: IDF_SA_Project_Name             =  1110
           INTEGER, PARAMETER :: IDF_ZM_allpars                  =  1111
-          INTEGER, PARAMETER :: IDF_SA_project_name_label       =  1112
           INTEGER, PARAMETER :: IDB_SA_Project_Browse           =  1113
-          INTEGER, PARAMETER :: IDF_ZMatrix_file1               =  1114
-          INTEGER, PARAMETER :: IDF_ZMatrix_file2               =  1115
-          INTEGER, PARAMETER :: IDF_ZMatrix_file3               =  1116
-          INTEGER, PARAMETER :: IDF_ZMatrix_file4               =  1117
-          INTEGER, PARAMETER :: IDF_ZMatrix_file5               =  1118
-          INTEGER, PARAMETER :: IDB_ZMatrix_Browse1             =  1119
-          INTEGER, PARAMETER :: IDB_ZMatrix_Browse2             =  1120
-          INTEGER, PARAMETER :: IDB_ZMatrix_Browse3             =  1121
-          INTEGER, PARAMETER :: IDB_ZMatrix_Browse4             =  1122
           INTEGER, PARAMETER :: IDB_ZMatrix_Browse5             =  1123
           INTEGER, PARAMETER :: IDF_ZM_pars1                    =  1124
           INTEGER, PARAMETER :: IDF_ZM_pars2                    =  1125
           INTEGER, PARAMETER :: IDF_ZM_pars3                    =  1126
           INTEGER, PARAMETER :: IDF_ZM_pars4                    =  1127
-          INTEGER, PARAMETER :: IDF_ZM_pars5                    =  1128
-          INTEGER, PARAMETER :: IDF_ZM_file_label               =  1134
           INTEGER, PARAMETER :: IDF_ZM_allpars_label            =  1135
           INTEGER, PARAMETER :: IDD_SA_input2                   =   120
           INTEGER, PARAMETER :: IDD_TEMPLATE009                 =   141
@@ -370,7 +358,6 @@
           INTEGER, PARAMETER :: ID_Tutorial_3                   = 40044
           INTEGER, PARAMETER :: ID_Tutorial_4                   = 40045
           INTEGER, PARAMETER :: ID_Tutorial_5                   = 40002
-          INTEGER, PARAMETER :: IDD_SAW_Page1_old               =   102
           INTEGER, PARAMETER :: IDBACK                          =  1001
           INTEGER, PARAMETER :: IDNEXT                          =  1040
           INTEGER, PARAMETER :: IDD_SA_Multi_completed_ep       =   127
@@ -426,11 +413,6 @@
           INTEGER, PARAMETER :: ISS10                           =  1241
           INTEGER, PARAMETER :: ISS11                           =  1242
           INTEGER, PARAMETER :: IDF_PrintSA                     =  1244
-          INTEGER, PARAMETER :: IDB_ZMatrixView1                =  1246
-          INTEGER, PARAMETER :: IDB_ZMatrixView2                =  1247
-          INTEGER, PARAMETER :: IDB_ZMatrixView3                =  1248
-          INTEGER, PARAMETER :: IDB_ZMatrixView4                =  1249
-          INTEGER, PARAMETER :: IDB_ZMatrixView5                =  1250
           INTEGER, PARAMETER :: ID_Configuration                = 40016
           INTEGER, PARAMETER :: IDD_Configuration               =   147
           INTEGER, PARAMETER :: IDF_ViewArg                     =  1256
@@ -453,10 +435,6 @@
           INTEGER, PARAMETER :: IDF_PlotPeakFitDif              =  1133
           INTEGER, PARAMETER :: ID_ClearPeakFitRanges           = 40018
           INTEGER, PARAMETER :: IDB_ShowOverlap                 =  1137
-          INTEGER, PARAMETER :: IDB_ZmatrixDelete1              =  1145
-          INTEGER, PARAMETER :: IDB_ZmatrixDelete2              =  1146
-          INTEGER, PARAMETER :: IDB_ZmatrixDelete3              =  1147
-          INTEGER, PARAMETER :: IDB_ZmatrixDelete4              =  1148
           INTEGER, PARAMETER :: IDB_ZmatrixDelete5              =  1149
           INTEGER, PARAMETER :: IDF_UseOriginal                 =  1164
           INTEGER, PARAMETER :: IDF_UseSolutionNr               =  1178
@@ -624,4 +602,7 @@
           INTEGER, PARAMETER :: IDF_REAL1                       =  1477
           INTEGER, PARAMETER :: IDF_CHECK11                     =  1481
           INTEGER, PARAMETER :: IDB_PO                          =  1482
+          INTEGER, PARAMETER :: IDD_SAW_Page5                   =   102
+          INTEGER, PARAMETER :: IDD_TEMPLATE021                 =   176
+          INTEGER, PARAMETER :: IDB_AnalyseSolutions            = 40029
       END MODULE Druid_Header

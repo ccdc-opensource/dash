@@ -93,7 +93,7 @@
       CALL WDialogLoad(IDD_SAW_Page2)
       CALL WDialogLoad(IDD_SA_input2)
       CALL WDialogLoad(IDD_SA_input3)
-      CALL WDialogLoad(IDD_SA_Multi_completed_ep)
+      CALL WDialogLoad(IDD_SAW_Page5)
       CALL WDialogLoad(IDD_License_Dialog)
       CALL WDialogLoad(IDD_Background_Fit)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
@@ -253,6 +253,9 @@
       COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
+      LOGICAL         InSA
+      COMMON /SADATA/ InSA
+
       REAL            UR,     UI
       COMMON /FFTDA / UR(15), UI(15)
 
@@ -293,6 +296,7 @@
 ! Initialise arrays to do with administration of open child windows
       ChildWinAutoClose = .FALSE.
       ChildWinHandlerSet = .FALSE.
+      InSA = .FALSE.
       DashRawFile = ' '
       DashHcvFile = ' '
       DashHklFile = ' '
@@ -496,12 +500,13 @@
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
       INTEGER    RecNr
-      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, SavePDB, SaveCSSR, SaveCCL, &
-                           Get_ColourFlexibleTorsions, ConnectPointsObs, &
-                           PlotErrorBars, PlotBackground,            &
-                           PlotPeakFitDifferenceProfile,             &
-                           WDialogGetCheckBoxLogical,                &
-                           Get_UseHydrogens, Get_SavePRO, Get_OutputChi2vsMoves
+      LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, SaveCCL, SaveCIF, SaveRES,  &
+                           Get_ColourFlexibleTorsions, ConnectPointsObs,  &
+                           PlotErrorBars, PlotBackground,                 &
+                           PlotPeakFitDifferenceProfile,                  &
+                           WDialogGetCheckBoxLogical,                     &
+                           Get_UseHydrogens, Get_SavePRO, Get_OutputChi2vsMoves, &
+                           Get_AutoLocalMinimisation
       REAL, EXTERNAL :: WavelengthOf
       INTEGER*4 tInteger
       REAL*4    tReal
@@ -625,11 +630,11 @@
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileWriteLogical(hFile,RecNr,Get_ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
-      CALL FileWriteLogical(hFile,RecNr,SavePDB())    ! 1. .pdb  ?
+      CALL FileWriteLogical(hFile,RecNr,SavePDB())  ! 1. .pdb  ?
       CALL FileWriteLogical(hFile,RecNr,SaveCSSR()) ! 2. .cssr ?
       CALL FileWriteLogical(hFile,RecNr,SaveCCL())  ! 3. .ccl  ?
-      CALL FileWriteLogical(hFile,RecNr,.FALSE.)    ! 4. .res  ? (not possible yet)
-      CALL FileWriteLogical(hFile,RecNr,.FALSE.)    ! 5. .mol2 ? (not possible yet)
+      CALL FileWriteLogical(hFile,RecNr,SaveCIF())  ! 4. .cif  ?
+      CALL FileWriteLogical(hFile,RecNr,SaveRES())  ! 5. .res  ?
 ! Save YES / NO if .pro file is to be written out when a best solution is found
       CALL FileWriteLogical(hFile,RecNr,Get_SavePRO())
 ! Auto local minimisation at the end of every run in multirun YES / NO
@@ -652,10 +657,10 @@
       CALL FileWriteReal(hFile,RecNr,tReal)
       CALL WDialogGetInteger(IDF_MaxMoves2,tInteger)
       CALL FileWriteInteger(hFile,RecNr,tInteger)
-      CALL WDialogSelect(IDD_SA_Multi_completed_ep)
+      CALL WDialogSelect(IDD_SAW_Page5)
 ! Atom labels for SA solutions overlay. Two options: 
 ! 1. "Element symbol + solution number"
-! 2. "Orignal atom labels"
+! 2. "Original atom labels"
       CALL WDialogGetRadioButton(IDF_UseSolutionNr,tInteger)
       CALL FileWriteInteger(hFile,RecNr,tInteger)
 ! Atom colours for SA solutions overlay. Two options: 
@@ -692,15 +697,15 @@
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
       CHARACTER*MaxPathLength tFileName
-      INTEGER    RecNr, RW
-      INTEGER    hFile
+      INTEGER   RecNr, RW
+      INTEGER   hFile
       REAL, EXTERNAL :: WavelengthOf
       CHARACTER*MaxPathLength tString
       INTEGER*4 tInteger
       LOGICAL*4 tLogical
       REAL*4    tReal
       REAL, EXTERNAL :: dSpacing2TwoTheta
-      LOGICAL FExists
+      LOGICAL   FExists
 
       RW = 1
       tFileName = 'D3.cfg'
@@ -833,14 +838,16 @@
       CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
 ! Read YES / NO which molecular file formats are to be written out when a best solution is found
-      CALL FileReadLogical(hFile,RecNr,tLogical)    ! 1. .pdb  ?
-  !F    CALL WDialogPutCheckBoxLogical(IDF_OutputPDB,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)   ! 1. .pdb  ?
+      CALL WDialogPutCheckBoxLogical(IDF_OutputPDB,tLogical)
       CALL FileReadLogical(hFile,RecNr,tLogical)   ! 2. .cssr ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,tLogical)
       CALL FileReadLogical(hFile,RecNr,tLogical)   ! 3. .ccl  ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,tLogical)
-      CALL FileReadLogical(hFile,RecNr,tLogical)   ! 4. .res  ? (not possible yet)
-      CALL FileReadLogical(hFile,RecNr,tLogical)   ! 5. .mol2 ? (not possible yet)
+      CALL FileReadLogical(hFile,RecNr,tLogical)   ! 4. .cif  ?
+      CALL WDialogPutCheckBoxLogical(IDF_OutputCIF,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)   ! 5. .res  ?
+      CALL WDialogPutCheckBoxLogical(IDF_OutputRES,tLogical)
 ! Read YES / NO if .pro file is to be written out when a best solution is found
       CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL Set_SavePRO(tLogical)
@@ -866,10 +873,10 @@
       CALL WDialogPutReal(IDF_MaxMoves1,tReal)
       CALL FileReadInteger(hFile,RecNr,tInteger)
       CALL WDialogPutInteger(IDF_MaxMoves2,tInteger)
-      CALL WDialogSelect(IDD_SA_Multi_completed_ep)
+      CALL WDialogSelect(IDD_SAW_Page5)
 ! Atom labels for SA solutions overlay. Two options: 
 ! 1. "Element symbol + solution number"
-! 2. "Orignal atom labels"
+! 2. "Original atom labels"
       CALL FileReadInteger(hFile,RecNr,tInteger)
       SELECT CASE (tInteger)
         CASE (1)
@@ -887,6 +894,15 @@
         CASE (2)
           CALL WDialogPutRadioButton(IDF_ColourByElement)
       END SELECT
+      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL WDialogGetRadioButton(IDF_ShowRange,tInteger)
+      IF (tInteger .EQ. 1) THEN ! "Show Selected"
+        CALL WDialogFieldState(IDF_Limit1,Enabled)
+        CALL WDialogFieldState(IDF_Limit2,Enabled)
+      ELSE
+        CALL WDialogFieldState(IDF_Limit1,Disabled)
+        CALL WDialogFieldState(IDF_Limit2,Disabled)
+      ENDIF
 
 
       CLOSE(hFile)
