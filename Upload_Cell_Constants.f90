@@ -42,11 +42,13 @@
       REAL    GReal(3,3), GRec(3,3)
       INTEGER KELPT(6,10)
       DATA KELPT /2,3,4,5,6,7, 2,3,4,5,10,10, 2,3,4,10,5,10, 2,3,4,10,10,5, &
-      2,3,4,10,10,10, 2,2,3,10,10,10, 2,2,3,9,10,10, &
-      2,2,2,3,3,3, 2,2,3,9,10,10, 2,2,2,10,10,10/ 
+      2,3,4,10,10,10, 2,2,3,10,10,10, 2,2,3,9,10,10, 2,2,2,3,3,3, 2,2,3,9,10,10, 2,2,2,10,10,10/ 
       LOGICAL FnWaveLengthOK, FnUnitCellOK ! Function
       INTEGER I, II, Iord, NDD
       REAL    DDMAX
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 
 ! JCC Check the wavelength: if the user has not set it, then
 ! we should not be here!
@@ -174,9 +176,15 @@
         DXDD(I) = DDMAX
       ENDDO
 ! Perform simplex
+      IBMBER = 0
       CALL WCursorShape(CurHourGlass)
       CALL SIMOPT(XDD,DXDD,COVDD,NDD,ChiGetLattice)
       CALL WCursorShape(CurCrossHair)
+      IF (IBMBER .NE. 0) THEN
+        IBMBER = 0
+        CALL DebugErrorMessage('Simplex optimisation of cell parameters failed.')
+        RETURN
+      ENDIF
       XDD(9) = 0.5 * XDD(2)
       XDD(10) = 0.0
       DO I = 1, 3
@@ -277,8 +285,8 @@
 ! 2 theta value
         tthc = 2.0 * ASIND(0.5 * ALambda * SQRT(dd))
 ! Correct for zero-point error
-        ZI = tthc + zp
-        CTem = (ZI - YVal(I)) / EVal(I)
+        ZVAL(I) = tthc + zp
+        CTem = (ZVAL(I) - YVAL(I)) / EVAL(I)
         ChiGetLattice = ChiGetLattice + CTem * CTem
       ENDDO
 
