@@ -326,6 +326,9 @@
         CALL WDialogFieldState(IDB_OutputChiSqd,Disabled)
         CALL WDialogFieldState(IDF_LABEL5,Disabled)
         CALL WDialogFieldState(IDF_LABEL3,Disabled)
+        CALL CloseOutputSolutionsChildWindows
+        CALL WDialogSelect(IDD_SAW_Page5)
+        CALL WDialogFieldState(IDB_Prog3,Disabled)
         CALL WDialogSelect(IDD_ViewPawley)
         CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
         CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
