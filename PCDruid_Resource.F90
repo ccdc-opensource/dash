@@ -1,4 +1,4 @@
-! Winteracter module created : 15/Aug/2001 14:42:15
+! Winteracter module created : 04/Sep/2001 20:16:00
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -547,4 +547,22 @@
           INTEGER, PARAMETER :: IDD_TEMPLATE011                 =   128
           INTEGER, PARAMETER :: IDF_SA_Summary                  =  1136
           INTEGER, PARAMETER :: IDOK_ep                         =  1139
+          INTEGER, PARAMETER :: IDD_PW_Page5                    =   131
+          INTEGER, PARAMETER :: IDF_MaxResolution               =  1205
+          INTEGER, PARAMETER :: IDF_TruncateEndYN               =  1206
+          INTEGER, PARAMETER :: IDF_TruncateStartYN             =  1222
+          INTEGER, PARAMETER :: IDF_Max2Theta                   =  1223
+          INTEGER, PARAMETER :: IDF_Min2Theta                   =  1209
+          INTEGER, PARAMETER :: IDF_LABEL8                      =  1464
+          INTEGER, PARAMETER :: IDD_PW_Page4                    =   144
+          INTEGER, PARAMETER :: IDD_PW_page6                    =   145
+          INTEGER, PARAMETER :: IDF_NumOfIterations             =  1211
+          INTEGER, PARAMETER :: IDF_WindowWidth                 =  1212
+          INTEGER, PARAMETER :: IDF_UseMCYN                     =  1213
+          INTEGER, PARAMETER :: IDF_UseSplineYN                 =  1215
+          INTEGER, PARAMETER :: ID_Remove_Background            = 40003
+          INTEGER, PARAMETER :: IDF_LABEL9                      =  1226
+          INTEGER, PARAMETER :: IDAPPLY                         =  1227
+          INTEGER, PARAMETER :: IDF_Preview                     =  1230
+          INTEGER, PARAMETER :: IDF_ZeroPoint                   =  1231
       END MODULE Druid_Header

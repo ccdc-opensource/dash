@@ -82,6 +82,18 @@
             CASE (CloseRequest)
               CALL WExit
               GOTO 10
+            CASE (MouseButDown)
+              IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
+                CALL Plot_Alter
+              ELSE IF(EventInfo%VALUE1 .EQ. RightButton) THEN
+! Get to work on the cross-hair movement - fitting this time
+                CALL Move_CrossHair_Fit
+              END IF
+              GOTO 10
+            CASE (KeyDown)
+              CALL Check_KeyDown
+              CALL Check_KeyDown_PeakFit_Inner
+              GOTO 10
           END SELECT
           CASE (IDD_Plot_Option_Dialog)
             CALL DealWithPlotOptionsWindow
@@ -110,11 +122,20 @@
           CASE (IDD_PW_Page3)
             CALL DealWithWizardWindowDiffractionFileInput
             GOTO 10
+          CASE (IDD_PW_Page4)
+            CALL DealWithWizardWindowDiffractionSetup
+            GOTO 10
+          CASE (IDD_PW_Page5)
+            CALL DealWithWizardWindowProfileRange
+            GOTO 10
+          CASE (IDD_PW_Page6)
+            CALL DealWithWizardWindowBackground
+            GOTO 10
           CASE (IDD_PW_Page1)
             CALL DealWithWizardWindowUnitCellParameters
             GOTO 10
           CASE (IDD_PW_Page2)
-            CALL DealWithWizardWindowDiffractionSetup
+            CALL DealWithWizardWindowDiffractionSetup2
             GOTO 10
       END SELECT
 
@@ -148,6 +169,18 @@
               CASE (CloseRequest)
                 CALL WExit
                 GOTO 10
+              CASE (MouseButDown)
+                IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
+                  CALL Plot_Alter
+                ELSE IF(EventInfo%VALUE1 .EQ. RightButton) THEN
+! Get to work on the cross-hair movement - fitting this time
+                  CALL Move_CrossHair_Fit
+                END IF
+                GOTO 10
+              CASE (KeyDown)
+                CALL Check_KeyDown
+                CALL Check_KeyDown_PeakFit_Inner
+                GOTO 10
             END SELECT
           CASE (IDD_Plot_Option_Dialog)
             CALL DealWithPlotOptionsWindow
@@ -176,11 +209,20 @@
           CASE (IDD_PW_Page3)
             CALL DealWithWizardWindowDiffractionFileInput
             GOTO 10
+          CASE (IDD_PW_Page4)
+            CALL DealWithWizardWindowDiffractionSetup
+            GOTO 10
+          CASE (IDD_PW_Page5)
+            CALL DealWithWizardWindowProfileRange
+            GOTO 10
+          CASE (IDD_PW_Page6)
+            CALL DealWithWizardWindowBackground
+            GOTO 10
           CASE (IDD_PW_Page1)
             CALL DealWithWizardWindowUnitCellParameters
             GOTO 10
           CASE (IDD_PW_Page2)
-            CALL DealWithWizardWindowDiffractionSetup
+            CALL DealWithWizardWindowDiffractionSetup2
             GOTO 10
         END SELECT
       ENDIF

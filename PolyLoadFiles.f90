@@ -186,14 +186,12 @@
       IFLAGS = LoadDialog + DirChange + PromptOn
 ! It seems that Winteracter cannot cope with strings of this length
 !      FILTER = 'All files (*.*)|*.*|'//&
-!               'All powder diffraction files (*.raw, *.rd, '//&
-!               '*.sd, *.udf, *.uxd, *.xye)|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
+!               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
 !               'Bruker powder diffraction files (*.raw, *.uxd)|*.raw;*.uxd|'//&
 !               'DASH powder diffraction files (*.xye)|*.xye|'//&
 !               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
       FILTER = 'All files (*.*)|*.*|'//&
-               'All powder diffraction files (*.raw, *.rd, '//&
-               '*.sd, *.udf, *.uxd, *.xye)|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
+               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
       tFileName = ' '
 ! IFTYPE specifies which of the file types in the list is the default
@@ -215,7 +213,9 @@
 !
       REAL FUNCTION Radians2Degrees(TheAngle)     
 
-      REAL, INTENT (IN) :: TheAngle
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheAngle
 
       Radians2Degrees = TheAngle * (30.0 / ASIN(0.5))
 
@@ -225,11 +225,72 @@
 !
       REAL FUNCTION Degrees2Radians(TheAngle)     
 
-      REAL, INTENT (IN) :: TheAngle
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheAngle
 
       Degrees2Radians = TheAngle * (ASIN(0.5) / 30.0)
 
       END FUNCTION Degrees2Radians
+!
+!*****************************************************************************
+!
+      REAL FUNCTION TwoTheta2dSpacing(TheTwoTheta)     
+!
+! Calculates the d-spacing for the given 2 theta value using the wavelength in ALambda
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheTwoTheta
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL FnWaveLengthOK ! Function
+      REAL Degrees2Radians ! Function
+      REAL WavelengthOf ! Function
+
+      IF (.NOT. FnWaveLengthOK()) THEN
+        CALL ErrorMessage('Wavelength invalid, will be set to Cu')
+        CALL UpdateWavelength(WavelengthOf('Cu'))
+      ENDIF
+      IF (TheTwoTheta .LT. 0.01) THEN
+        TwoTheta2dSpacing = 1000000.0
+        CALL DebugErrorMessage('TheTwoTheta .LT. 0.1 in TwoTheta2dSpacing')
+      ELSE
+        TwoTheta2dSpacing = ALambda / (2*SIN(Degrees2Radians(TheTwoTheta/2)))
+      ENDIF
+
+      END FUNCTION TwoTheta2dSpacing
+!
+!*****************************************************************************
+!
+      REAL FUNCTION dSpacing2TwoTheta(ThedSpacing)     
+!
+! Calculates 2 theta for the given d-spacing using the wavelength in ALambda
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: ThedSpacing
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL FnWaveLengthOK ! Function
+      REAL WavelengthOf ! Function
+      REAL TwoTheta2dSpacing ! Function
+      REAL Radians2Degrees ! Function
+
+      IF (.NOT. FnWaveLengthOK()) THEN
+        CALL ErrorMessage('Wavelength invalid, will be set to Cu')
+        CALL UpdateWavelength(WavelengthOf('Cu'))
+      ENDIF
+! Calculate minimum d-spacing for the given wavelength
+      IF (ThedSpacing .LT. TwoTheta2dSpacing(89.9999)) THEN
+        dSpacing2TwoTheta = 90.0
+      ELSE
+        dSpacing2TwoTheta = 2 * Radians2Degrees(ASIN(ALambda/(2*ThedSpacing)))
+      ENDIF
+
+      END FUNCTION dSpacing2TwoTheta
 !
 !*****************************************************************************
 !
@@ -256,16 +317,12 @@
       REAL    XBIN, YOBIN, YCBIN, YBBIN, EBIN
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
 
-      LOGICAL            FExists
-      INTEGER       ::   KLEN
+      LOGICAL    FExists
+      INTEGER    KLEN
 ! Note that FNAME is a global variable
-      INTEGER            ISTAT
-      INTEGER            Diffraction_File_Load ! Function
-      LOGICAL            FnWavelengthOK ! Function
-      REAL               UpperResolution
-      REAL               tMax2Theta
-      REAL               Radians2Degrees ! Function
-      LOGICAL            Confirm ! Function
+      INTEGER    ISTAT
+      INTEGER    Diffraction_File_Load ! Function
+      LOGICAL    Confirm ! Function
 
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
@@ -290,19 +347,6 @@
       CALL ScrUpdateFileName
       ISTAT = Diffraction_File_Load(TheFileName)
       IF (ISTAT .EQ. 0) RETURN
-! A pattern has been loaded, and the background may have been subtracted. This is the rigth time
-! to truncate the data to, say, 1.5 A resolution.
-! It's a good idea to subtract the background before truncating: that way, after the SA, the
-! whole pattern can be Rietveld-refined without changing the background.
-! Check if the wavelength is available.
-      UpperResolution = 1.5 ! d-value in Angstrom
-      IF (FnWavelengthOK() .AND. (ALambda .LT. 2.5)) THEN
-        tMax2Theta = 2 * Radians2Degrees(ASIN(ALambda/(2*UpperResolution)))
-        IF (XBIN(NBIN) .GT. tMax2Theta) THEN
-          IF (Confirm('Would you like to truncate the data '//&
-                      'to 1.5 A resolution (recommended)?')) CALL TruncateData(tMax2Theta)
-        ENDIF
-      ENDIF
 ! Enable the appropriate menus:
       CALL SetModeMenuState(1,-1,-1)
 ! JvdS Was:
@@ -345,6 +389,9 @@
       CHARACTER(LEN=MaxPathLength), INTENT (INOUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
+      INCLUDE 'statlog.inc'
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
@@ -363,9 +410,6 @@
         NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
         XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
         IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
 
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
@@ -465,6 +509,7 @@
       ELSE IF (YPMAX .GT. 100000) THEN
         SCALFAC = 0.01 * YPMAX/100000
       END IF
+      OriginalNOBS = NOBS
       NBIN = (NOBS/LBIN)
       DO I = 1, NBIN
         IST = (I-1)*LBIN
@@ -501,7 +546,6 @@
       CALL Profile_Plot(IPTYPE)
       NoData = .FALSE.
       CALL ScrUpdateFileName
-      CALL Background_Fit
 
       END FUNCTION Diffraction_File_Load
 !
@@ -1019,6 +1063,64 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE GetSubString(TheString, TheDelimiter, TheSubString)
+!
+! This subroutine returns the substring of a string until a certain character is found.
+! This way, individual fields delimited by a character can be extracted from a string.
+!
+! JvdS 24 Aug 2001
+!
+! INPUT  : TheString    = the string that should be scanned.
+!          TheDelimiter = the character that separates fields. The beginning and the end of TheString
+!                         are separators as well.
+!
+! OUTPUT : TheSubString contains the substring, excluding the delimiter
+!          TheString    has the substring and the delimiter removed on exit.
+!
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (INOUT) :: TheString
+      CHARACTER    , INTENT (IN   ) :: TheDelimiter
+      CHARACTER*(*), INTENT (  OUT) :: TheSubString
+
+      INTEGER POS, tLEN, I, tPOS
+
+      tLEN = LEN_TRIM(TheString)
+      TheSubString = ' '
+      IF (tLEN .EQ. 0) RETURN
+! Find first occurrence of TheDelimiter
+      POS = 1
+      DO WHILE ((POS .LT. tLEN) .AND. (TheString(POS:POS) .NE. TheDelimiter))
+        POS = POS + 1
+      ENDDO
+! The delimiter itself should not be copied
+      IF (TheString(POS:POS) .EQ. TheDelimiter) THEN
+        tPOS = POS - 1
+      ELSE
+        tPOS = POS
+      ENDIF
+      IF (tPOS .NE. 0) THEN
+! Fill the substring
+        TheSubString(1:tPOS) = TheString(1:tPOS)
+      ENDIF
+! Remove the substring, including the delimiter, from the string
+      IF (POS .EQ. tLEN) THEN
+        TheString = ' '
+      ELSE
+        DO I = 1, tLEN-POS
+          TheString(I:I) = TheString(I+POS:I+POS)
+        ENDDO
+! Overwrite remainder with spaces
+        DO I = 1+(tLEN-POS), tLEN
+          TheString(I:I) = ' '
+        ENDDO
+      ENDIF
+
+      END SUBROUTINE GetSubString
+
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION Load_udf_File(TheFileName,ESDsFilled)
 !
 ! This function tries to load a *.udf file (ASCII format from Philips machines).
@@ -1043,8 +1145,8 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=MaxPathLength), INTENT (IN)  :: TheFileName
-      LOGICAL,                      INTENT (OUT) :: ESDsFilled
+      CHARACTER(LEN=MaxPathLength), INTENT (IN   ) :: TheFileName
+      LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
 
@@ -1053,10 +1155,9 @@
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
 
       CHARACTER*255 Cline ! String containing last line read from file
-      INTEGER       J, NumOfBins, CurrLineNr, FLEN ! Length of TheFileName
-      INTEGER       NumOfLines
+      CHARACTER*255 tSubString
+      INTEGER       I, NumOfBins, FLEN ! Length of TheFileName
       REAL          Lambda1
-      INTEGER*4     TempInput(1:8)
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       CHARACTER*2   Anode
       REAL          WavelengthOf ! Function
@@ -1100,35 +1201,68 @@
 !      858,      790,      847,      900,      876,      847,/
 !
 !12345678911234567892123456789312345678941234567895123456789612345678971234567898
+!
+! Unfortunately, the widths of the fields are not fixed (although I expect that
+! they were supposed to be) and it is necessary to scan for fields using the ',' as a separator.
+!
+! Also note that the '/' is not always present after the last data point (although I suspect
+! that it was supposed to be).
+!
+! There can be a comma at the end of every row of counts.
+!
 
 ! Read the header lines
-   9  READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
+    9 READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
       IF (Cline(1:5) .EQ. 'Anode') THEN ! Anode,Cu,/
         READ(Cline,FMT='(6X,A2)',ERR=999) Anode
         GOTO 9
       ENDIF
       IF (Cline(1:11) .EQ. 'LabdaAlpha1') THEN ! LabdaAlpha1, 1.54060,/
-        READ(Cline,FMT='(12X,F8.5)',ERR=999) Lambda1
+! Remove 'LabdaAlpha1,'
+        CALL GetSubString(Cline,',',tSubString)
+! Read next field, should be ' 1.54060'
+        CALL GetSubString(Cline,',',tSubString)
+        READ(tSubString,*,ERR=999) Lambda1
         GOTO 9
       ENDIF
       IF (Cline(1:14) .EQ. 'DataAngleRange') THEN ! DataAngleRange,   3.0100,  89.9900,/
-        READ(Cline,FMT='(15X,F9.4,1X,F9.4)',ERR=999) TwoThetaStart, TwoThetaEnd
+! Remove 'DataAngleRange,'
+        CALL GetSubString(Cline,',',tSubString)
+! Read next field, should be '   3.0100'
+        CALL GetSubString(Cline,',',tSubString)
+        READ(tSubString,*,ERR=999) TwoThetaStart
+! Read next field, should be '  89.9900'
+        CALL GetSubString(Cline,',',tSubString)
+        READ(tSubString,*,ERR=999) TwoThetaEnd
         GOTO 9
       ENDIF
       IF (Cline(1:12) .EQ. 'ScanStepSize') THEN ! ScanStepSize,   0.020,/
-        READ(Cline,FMT='(13X,F8.3)',ERR=999) TwoThetaStep
+! Remove 'ScanStepSize,'
+        CALL GetSubString(Cline,',',tSubString)
+! Read next field, should be '   0.020'
+        CALL GetSubString(Cline,',',tSubString)
+        READ(tSubString,*,ERR=999) TwoThetaStep
         GOTO 9
       ENDIF
       IF (Cline(1:7) .EQ. 'RawScan') GOTO 10
       GOTO 9
 ! Here is where we can start to read the data
- 10   CONTINUE
+   10 CONTINUE
 ! The number of counts per 2theta should commence from here.
 ! Calculate how many bins we expect.
 ! Quick check if values have been read at all.
-      IF (TwoThetaStart .LT. 0.000001) RETURN
-      IF (TwoThetaEnd   .LT. 0.000001) RETURN
-      IF (TwoThetaStep  .LT. 0.000001) RETURN
+      IF (TwoThetaStart .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta starting value not found.')
+        RETURN
+      ENDIF
+      IF (TwoThetaEnd   .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta end value not found.')
+        RETURN
+      ENDIF
+      IF (TwoThetaStep  .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta step size not found.')
+        RETURN
+      ENDIF
 ! Note that NINT correctly rounds to the nearest whole number
       NumOfBins = 1 + NINT((TwoThetaEnd - TwoThetaStart) / TwoThetaStep)
 ! Check that we will not read more than MOBS data points
@@ -1140,39 +1274,35 @@
 ! Check that we will not read less than 1 data point
       IF (NumOfBins .EQ. 0) THEN
 ! The user should be warned here
-        CALL ErrorMessage("The file contains no valid data.")
+        CALL ErrorMessage("The file does not contain enough data points.")
         RETURN
       ENDIF
-! Integer division: fractional part is discarded. NumOfLines contains the number of
-! lines containing 8 columns
-      NumOfLines = NumOfBins / 8
 ! Fill the 2theta values first
       CurrTwoTheta = TwoThetaStart
-      DO CurrLineNr = 1, NumOfBins
-        XOBS(CurrLineNr) = CurrTwoTheta
+      DO I = 1, NumOfBins
+        XOBS(I) = CurrTwoTheta
         CurrTwoTheta = CurrTwoTheta + TwoThetaStep
       ENDDO
-      DO CurrLineNr = 1, NumOfLines
-        READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
-        READ(Cline,FMT='(7(I9,1X),I9)',ERR=999) TempInput
-! Next couple of lines rather clumsy, but safe.
-        DO J = 1, 8
-          YOBS(((CurrLineNr - 1) * 8) + J) = FLOAT(TempInput(J))
-        ENDDO
+      I = 1
+   20 READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
+      CALL GetSubString(Cline,',',tSubString)
+      DO WHILE ((LEN_TRIM(tSubString) .NE. 0) .AND. (tSubString(1:LEN_TRIM(tSubString)) .NE. '/'))
+        IF (I .GT. MOBS) GOTO 100
+        READ(tSubString,*,ERR=999) YOBS(I)
+        I = I + 1
+        CALL GetSubString(Cline,',',tSubString)
       ENDDO
-! The loop could take care of lines containing 8 columns,
-! there might be 1 line left containing less than 8 columns
-      READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
-! The following line worked perfectly for a week, then suddenly gave a fatal error ????
-!      READ(Cline,FMT='(I9,1X)',ERR=999) TempInput(1:(NumOfBins - (NumOfLines * 8)))
-      READ(Cline,FMT='(7(I9,1X),I9)',ERR=999) TempInput(1:(NumOfBins - (NumOfLines * 8)))
-! Next couple of lines rather clumsy, but safe.
-      CurrLineNr = NumOfLines + 1
-      DO J = 1, (NumOfBins - (NumOfLines * 8))
-        YOBS(((CurrLineNr - 1) * 8) + J) = FLOAT(TempInput(J))
-      ENDDO
-      CLOSE(10)
-      NOBS = NumOfBins
+! Fetch the next line from the file
+      GOTO 20
+  100 CLOSE(10)
+      NOBS = I - 1
+      IF (NOBS .LT. NumOfBins) CALL ErrorMessage('File contained less data points than expected.'//CHAR(13)// &
+                                                 'Will continue with points actually read only.')
+      IF (NOBS .EQ. 0) THEN
+! The user should be warned here
+        CALL ErrorMessage("The file does not contain enough data points.")
+        RETURN
+      ENDIF
       ESDsFilled = .FALSE.
 ! This is definitely laboratory data
       CALL SetSourceDataState(1)
@@ -1216,8 +1346,8 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=MaxPathLength), INTENT (IN)  :: TheFileName
-      LOGICAL,                      INTENT (OUT) :: ESDsFilled
+      CHARACTER(LEN=MaxPathLength), INTENT (IN   ) :: TheFileName
+      LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
 
@@ -1677,8 +1807,10 @@
 !>> Hidden. The routine should not be called with RMaxTTheta greater
 !>> than the maximum value read in
 ! JvdS And how about discarding data from the beginning of the diffraction pattern
-! (when varibale slits have been used, for example).
+! (when variable slits have been used, for example).
       SUBROUTINE TruncateData(RMaxTTheta)
+
+      USE VARIABLES
 
       INCLUDE 'PARAMS.INC'
 
@@ -1703,7 +1835,7 @@
       REAL RMaxTTheta
       INTEGER I, J, JJ
 
-      DO I = 1,NOBS
+      DO I = 1, OriginalNOBS
         IF (XOBS(I) .GT. RMaxTTheta) EXIT
       END DO
       IF (I .LE. 1) RETURN
@@ -1759,6 +1891,101 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE TruncateDataStart(TheMin2Theta)
+
+      USE VARIABLES
+
+      REAL, INTENT (IN   ) :: TheMin2Theta
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'statlog.inc'
+
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
+      INTEGER CurrentRange 
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
+        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
+          XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
+      IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+
+      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
+        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+ 
+      INTEGER I, J, JJ, Shift
+
+      DO I = 1, OriginalNOBS
+        IF (XOBS(I) .GT. TheMin2Theta) EXIT
+      END DO
+      IF (I .LE. 1) RETURN
+      Shift = I-1
+!@ Very dirty: loose all data lower than TheMin2Theta
+      OriginalNOBS = OriginalNOBS - Shift
+      DO I = 1, OriginalNOBS
+        XOBS(I) = XOBS(I+Shift)
+        YOBS(I) = YOBS(I+Shift)
+        YCAL(I) = YCAL(I+Shift)
+        YBAK(I) = YBAK(I+Shift)
+        EOBS(I) = EOBS(I+Shift)
+      ENDDO
+      NOBS = NOBS - Shift
+      NBIN=(NOBS/LBIN)
+      DO I = 1, NBIN
+        IST=(I-1)*LBIN
+        XADD  = 0.0
+        YOADD = 0.0
+        YCADD = 0.0
+        YBADD = 0.0
+        VADD  = 0.0
+        DO J = 1, LBIN
+          JJ = J + IST
+          XADD  = XADD  + XOBS(JJ)
+          YOADD = YOADD + YOBS(JJ)
+          YCADD = YCADD + YCAL(JJ)
+          YBADD = YBADD + YBAK(JJ)
+          VADD  = VADD  + EOBS(JJ)**2
+        END DO
+        XBIN(I)  =  XADD/FLOAT(LBIN)
+        YOBIN(I) = YOADD/FLOAT(LBIN)
+        YCBIN(I) = YCADD/FLOAT(LBIN)
+        YBBIN(I) = YBADD/FLOAT(LBIN)
+        EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
+      END DO
+      XPMIN = XOBS(1)
+      XPMAX = XOBS(1)
+      YPMIN = YOBS(1)
+      YPMAX = YOBS(1)
+      DO I = 1, NOBS
+        XPMIN = MIN(XOBS(I),XPMIN)
+        XPMAX = MAX(XOBS(I),XPMAX)
+        YPMIN = MIN(YOBS(I),YPMIN)
+        YPMAX = MAX(YOBS(I),YPMAX)
+      END DO
+      XPGMIN = XPMIN
+      XPGMAX = XPMAX
+      YPGMIN = YPMIN
+      YPGMAX = YPMAX
+      CALL UPLOAD_RANGE()
+      XPGMINOLD = XPMIN
+      XPGMAXOLD = XPMAX
+      YPGMINOLD = YPMIN
+      YPGMAXOLD = YPMAX
+      IPMIN = 1
+      IPMAX = NBIN
+      IPMINOLD = IPMIN
+      IPMAXOLD = IPMAX
+      CALL Profile_Plot(IPTYPE)
+
+      END SUBROUTINE TruncateDataStart
+!
+!*****************************************************************************
+!
       SUBROUTINE ProfileRead_TruncationWarning(filename, Npoints)
       USE VARIABLES
       USE WINTERACTER
@@ -1785,6 +2012,9 @@
       USE DRUID_HEADER
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+      INCLUDE 'statlog.inc'
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
@@ -1802,13 +2032,9 @@
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-      INCLUDE 'statlog.inc'
 
-      INTEGER I, IT, J, IBpass
+      INTEGER I, J, IBpass
       LOGICAL QUIT
-
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
 
 ! JvdS When called from within the Wizard, this entire routine should just be a step
 ! JvdS within the Wizard. It's quite stand-alone now.
@@ -1824,22 +2050,18 @@
       CALL WDialogSelect(ID_Background_Fit)
 ! Initialise the background
       CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-      CALL BackMCBruckner(IBpass)
+      CALL BackMCBruckner(IBpass,20,.TRUE.,.TRUE.)
       CALL Profile_Plot(IPTYPE)
       CALL WDialogShow(-1,-1,0,Modeless)
-! JvdS The next line queries the current status, but is it handled properly?
-      IT = InfoError(1)
       QUIT = .FALSE.
       DO WHILE(.NOT. QUIT)
         CALL GetEvent
-        IF (EventInfo%WIN .EQ. 0) THEN
-          CALL process_mainwindow_message
-        ELSE IF (EventType .EQ. PushButton) THEN
+        IF (EventType .EQ. PushButton) THEN
 ! Process it
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Background_Apply)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-              CALL BackMCBruckner(IBpass)
+              CALL BackMCBruckner(IBpass,20,.TRUE.,.TRUE.)
               CALL Profile_Plot(IPTYPE)
             CASE (IDF_Background_Accept)
 ! Subtract the background
