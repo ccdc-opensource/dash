@@ -21,7 +21,7 @@
 !          bond(1:MAXBND,1:2) = the atoms connected by the bond
 !
 ! In order to be able to deal with dummy atoms, element symbol 'Du', each atom with element
-! type aelem = 109 is ignored.
+! type aelem = 106 is ignored.
 !
 ! The code has been SPAGged.
 ! global variables all lower case,
@@ -29,23 +29,9 @@
 ! Local Variables Initial Capital, Rest Lower Case.
 
       USE SAMVAR
+      USE ATMVAR
 
       IMPLICIT NONE
-
-! Bonding radii
-      REAL BondRadius(1:109)
-      DATA BondRadius /                                                                 &
-                 0.68,  0.23,  1.88,  1.59,  1.35,  1.51,  1.61,  1.21,  0.00,  1.50,   &
-                 0.83,  1.34,  0.35,  1.54,  0.00,  1.21,  0.99,  1.69,  1.83,  0.00,   &
-                 0.99,  0.00,  1.33,  1.35,  1.67,  1.52,  0.23,  1.75,  1.73,  0.00,   &
-                 1.99,  0.64,  1.34,  0.00,  0.00,  1.22,  1.79,  1.17,  0.00,  1.57,   &
-                 1.70,  1.74,  1.40,  1.63,  1.32,  1.33,  0.00,  1.87,  0.68,  1.72,   &
-                 0.00,  0.00,  1.10,  1.35,  1.47,  0.68,  0.97,  1.48,  1.81,  0.00,   &
-                 1.50,  0.00,  1.55,  0.68,  1.37,  1.05,  1.61,  1.54,  1.50,  1.80,   &
-                 1.68,  1.82,  1.50,  1.53,  1.90,  1.47,  1.35,  1.45,  0.00,  1.40,   &
-                 1.02,  1.46,  1.44,  1.22,  1.20,  1.80,  1.46,  1.12,  1.43,  1.76,   &
-                 1.35,  1.47,  1.79,  1.47,  1.55,  1.72,  1.58,  1.33,  1.37,  0.00,   &
-                 1.62,  1.78,  1.94,  0.00,  1.45,  1.56,  0.00,  0.68,  0.25/
 
       REAL    Tol, Distance
       INTEGER Iat, Jat
@@ -55,7 +41,7 @@
       Tol = 0.5
       DO Iat = 1, natcry-1
         DO Jat = Iat+1, natcry
-          IF ((aelem(Iat) .NE. 109) .AND. (aelem(Jat) .NE. 109)) THEN ! is either a dummy atom?
+          IF ((aelem(Iat) .NE. MaxElm) .AND. (aelem(Jat) .NE. MaxElm)) THEN ! is either a dummy atom?
             CALL PLUDIJ(Iat,Jat,Distance)
             IF (Distance .LT. (BondRadius(aelem(Iat))+BondRadius(aelem(Jat))+Tol)) THEN
               nbocry = nbocry + 1
