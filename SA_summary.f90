@@ -40,7 +40,7 @@
 
       LOGICAL, EXTERNAL :: Get_AutoAlign
       INTEGER, EXTERNAL :: PrjSaveAs
-      INTEGER IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption, iDummy
+      INTEGER IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iDummy
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
