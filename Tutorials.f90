@@ -21,15 +21,15 @@
       CALL IOsDirName(CurDir)
       SELECT CASE (Tutorial_ID)
         CASE (ID_Tutorial_1)
-          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial1"
+          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial1"
         CASE (ID_Tutorial_2)
-          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial2"
+          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial2"
         CASE (ID_Tutorial_3)
-          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial3"
+          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial3"
         CASE (ID_Tutorial_4)
-          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial4"
+          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial4"
         CASE (ID_Tutorial_5)
-          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial5"
+          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial5"
       END SELECT
       FileDir = DirString(1:LEN_TRIM(DirString))//DIRSPACER//"data files"
       CALL IOsDirList(FileDir(1:LEN_TRIM(FileDir)),"",Files,Nfiles)

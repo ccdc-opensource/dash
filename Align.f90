@@ -97,23 +97,21 @@
 !--------- Check to see if align algorithm should be applied-----------
 ! For now, if the space group is trigonal or hexagonal does not attempt alignment.  Space
 ! group decoding currently does not handle x-y type instructions       
-      IF ((NumberSGTable.ge.430).and.(NumberSGTable.le.488)) THEN
+      IF ((NumberSGTable.GE.430).AND.(NumberSGTable.LE.488)) THEN
        RETURN
       END IF       
 ! If number of zmatrices greater than 1, do not align
-      IF (nfrag.gt.1) THEN
+      IF (nfrag.GT.1) THEN
         RETURN
       ENDIF
 ! Check if any x,y,z coords have been fixed or upper and lower bounds changed from defaults.
 ! If they have then do not align
       DO j = 1,3
-        IF ((lb(j).ne.0.0000).or.(ub(j).ne.1.000)) THEN
-        RETURN
-        ENDIF
-      END DO
+        IF ((lb(j).NE.0.0000).OR.(ub(j).NE.1.000)) RETURN
+      ENDDO
 !--------- End of Checks ----------
 
-      OPEN(220,file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'SGSymbandShift.txt',status='old', err = 10)
+      OPEN(220,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'SGSymbandShift.txt',STATUS='OLD', ERR = 10)
       DO j = 1,(NumberSGTable-1)
         READ (220, 50) nlin, line
 50      FORMAT(q,a)
@@ -122,7 +120,7 @@
 55    FORMAT(28x, I1, 4x, I1, x, A40)
         DO j = 1,NumofShifts
           Shift(j) = ShiftString(((j*5)-4):(j*5))
-        END DO 
+        ENDDO 
       CLOSE(220)
 
 ! Clear Sumx, sumy and sumz

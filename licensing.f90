@@ -20,7 +20,7 @@
           MessageStr = "Demo license not valid."
         ELSE IF (valid_license .LE. -2) THEN
           MessageStr = "DASH problem: could not find or open the license file"//CHAR(13)//&
-            INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"License.dat."
+            InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"License.dat."
         ELSE IF (valid_license .EQ. -1) THEN
           MessageStr = "DASH problem: Your DASH license is invalid for this machine."
         ELSE IF (valid_license .EQ.  0) THEN
@@ -208,7 +208,7 @@
       INTEGER tRead_License_Valid, ttRead_License_Valid
 
       Read_License_Valid = -2
-      OPEN(UNIT=117,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'License.dat',STATUS='OLD',ERR=99)
+      OPEN(UNIT=117,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='OLD',ERR=99)
       DO WHILE (Read_License_Valid .LE. 0)
         READ(117,'(A)',ERR=99,END=99) line
         IF (line(1:1) .NE. '#') THEN
@@ -286,7 +286,7 @@
         CASE DEFAULT
           GOTO 99
       END SELECT
-      OPEN(UNIT=IUN,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'License.dat',STATUS='UNKNOWN',ERR=99)
+      OPEN(UNIT=IUN,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='UNKNOWN',ERR=99)
       WRITE(iun,'(A)',ERR=99)     "# License File for DASH"
       WRITE(iun,'(A)',ERR=99)     "#"
       WRITE(iun,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' license '
