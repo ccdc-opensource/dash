@@ -734,7 +734,7 @@
         IF (DICVOLSolutions(I)%M .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,10,I,DICVOLSolutions(I)%M,'(F7.1)')
         IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,11,I,DICVOLSolutions(I)%F,'(F7.1)')
       ENDDO
-      CALL WDialogShow(-1,-1,0,Modeless)
+      CALL WDialogShow(-1, -1, 0, Modeless)
   999 CALL PopActiveWindowID
 
       END SUBROUTINE RunDICVOL

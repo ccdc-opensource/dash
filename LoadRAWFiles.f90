@@ -73,7 +73,7 @@
             CALL WDialogLoad(IDD_DataRangeSTOE)
             CALL WDialogSelect(IDD_DataRangeSTOE)
             CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,1)
-            CALL WDialogShow(-1,-1,IDOK,Modal)
+            CALL WDialogShow(-1, -1, IDOK, Modal)
             IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
               Load_raw_File = 2
               CALL WDialogUnload
@@ -106,7 +106,7 @@
               iHighlightList(CurrRange) = 1
             ENDDO
             CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,iHighlightList)
-            CALL WDialogShow(-1,-1,IDOK,Modal)
+            CALL WDialogShow(-1, -1, IDOK, Modal)
             IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
               Load_raw_File = 2
               CALL WDialogUnload

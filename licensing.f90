@@ -51,24 +51,24 @@
 
       IMPLICIT NONE
 
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       LOGICAL     INLOOP
       INTEGER     ICode
       CHARACTER*MaxPathLength ClString
       TYPE (License_Info) Info
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       INLOOP = .TRUE.
       Info%Valid = 0
       CALL WDialogSelect(IDD_License_Dialog)
-      CALL WDialogShow(-1,-1,0,SemiModeless)
-      CALL WDialogPutString(IDF_License_String,Info%KeyStr)
-      CALL WMessageEnable(FieldChanged,Enabled)
+      CALL WDialogShow(-1, -1, 0, SemiModeless)
+      CALL WDialogPutString(IDF_License_String, Info%KeyStr)
+      CALL WMessageEnable(FieldChanged, Enabled)
       IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
-        CALL WDialogFieldState(IDF_License_SiteCode,Enabled)
-        CALL WDialogFieldState(IDF_License_SiteCodeLabel,Enabled)
+        CALL WDialogFieldState(IDF_License_SiteCode, Enabled)
+        CALL WDialogFieldState(IDF_License_SiteCodeLabel, Enabled)
       ELSE
-        CALL WDialogFieldState(IDF_License_SiteCode,Disabled)
-        CALL WDialogFieldState(IDF_License_SiteCodeLabel,Disabled)
+        CALL WDialogFieldState(IDF_License_SiteCode, Disabled)
+        CALL WDialogFieldState(IDF_License_SiteCodeLabel, Disabled)
       ENDIF
       DO WHILE (INLOOP)
         CALL GetEvent
@@ -79,7 +79,7 @@
                 CALL DoExit
               CASE (IDOK)
                 CALL WDialogGetString(IDF_License_String, CLString)
-                CALL DecodeLicence(CLString,Info)
+                CALL DecodeLicence(CLString, Info)
                 IF (Info%Valid .LT. 0 ) THEN
                   SELECT CASE (Info%Valid)
                     CASE (-2) ! Checksum not OK
@@ -481,7 +481,7 @@
                 ' option below. After making your selection, please click OK to proceed.'
       CALL WDialogSelect(IDD_LicenceAgreement)
       CALL WDialogPutString(IDF_Agreement,kString)
-      CALL WDialogShow(-1,-1,0,SemiModeless)
+      CALL WDialogShow(-1, -1, 0, SemiModeless)
       DO WHILE (.TRUE.)
         CALL GetEvent
         SELECT CASE (EventType)
@@ -492,7 +492,7 @@
               CASE (IDB_Here)
                 Info%Valid = -5
               CASE (IDOK)
-                CALL WDialogGetRadioButton(IDF_IDoNotAgree,iOption)
+                CALL WDialogGetRadioButton(IDF_IDoNotAgree, iOption)
                 SELECT CASE (iOption)
                   CASE (1)
                     CALL DoExit
