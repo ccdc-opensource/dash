@@ -2,9 +2,6 @@
 !
 !*****************************************************************************
 !
-!
-!*****************************************************************************
-!
       SUBROUTINE GETPIK(FILE,lenfil,ier)
 !
       CHARACTER*(*), INTENT(IN) :: FILE
@@ -31,7 +28,6 @@
      &                 XOBS(MCHSTP), YOBS(MCHSTP), YCAL(MCHSTP),        &
      &                 ESD(MCHSTP)
 !
-      COMMON /FPINF / PIK(0:50,MFPINF), KMINST(MFPINF), KMAXST(MFPINF)
       COMMON /FPINF1/ KREFT(MFPINF), KNIPT(50,MFPINF), PIKVAL(50,MFPINF)
       COMMON /FPINF2/ NTERMS
 !
@@ -82,3 +78,6 @@
   999 RETURN
 !
       END SUBROUTINE GETPIK
+!
+!*****************************************************************************
+!

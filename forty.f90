@@ -66,8 +66,6 @@
      &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
      &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
       LOGICAL REFUSE, CYC1, NOPKRF
-      COMMON /PRSAVE/ KPOINT(200), SAVP2(200), SAVDER(300,200),         &
-     &                SAVPRC(200), SAVDPC(200), SAVFCN(200)
       COMMON /PRSTAT/ SMYC, SMYD, SMYO, SMIO, SMID, SMWYOS, IZCT, P5,   &
      &                IOP1, IOP2, KMI(9), KMA(9)
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
@@ -126,10 +124,6 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
      &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
      &                ARGSTP(5), PCON
-!
-!..   For debug
-      COMMON /CCOUNT/ ICalled
-!
 !
 !----------------------
 !

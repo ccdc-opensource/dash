@@ -37,8 +37,6 @@
      &                 XOBS(MCHSTP), YOBS(MCHSTP), YCAL(MCHSTP),        &
      &                 ESD(MCHSTP)
 !
-      COMMON /FPINF / PIK(0:50,MFPINF), KMINST(MFPINF), KMAXST(MFPINF)
-!
 !     These declarations are needed for the get_logref.inc
 !     file to work correctly
 !     The following integers represent h,k,l,h+k,h+l,k+l and h+k+l

@@ -36,8 +36,6 @@
      &                 XOBS(MCHSTP), YOBS(MCHSTP), YCAL(MCHSTP),        &
      &                 ESD(MCHSTP)
 !
-      COMMON /FPINF / PIK(0:50,MFPINF), KMINST(MFPINF), KMAXST(MFPINF)
-!
       OPEN (121,FILE=FILENAM(:Lenfil),STATUS='OLD',ERR=998)
       KK = 0
       MREF = MSAREF
