@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 28/Sep/2001 15:33:38
+// Modified : 30/Sep/2001 18:58:25
 //
 ///////////////////////////////////////////////////
 //
@@ -490,7 +490,11 @@
 #define IDF_LABEL16                      1207
 #define IDF_Indexing_ScaleFactor         1208
 #define IDD_DV_Results                    133
-#define IDF_DV_Summary                   1244
+#define IDD_DIALOG005                     146
+#define IDF_DV_Summary_0                 1232
+#define ISS9                             1233
+#define ISS10                            1241
+#define ISS11                            1242
 
 ///////////////////////////////////////////////////
 //
@@ -2360,15 +2364,15 @@ BEGIN
 ,0
 END
 
-IDD_DV_Results DIALOG 0, 0,  470,  161
+IDD_DV_Results DIALOG 0, 0,  469,  158
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "Solutions from DICVOL"
+CAPTION "Results from DICVOL"
 BEGIN
-    CONTROL "",IDF_DV_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   19,   44,  433,   79
-    CONTROL "DICVOL completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  137,   12,  200,   12
-    CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  217,  136,   40,   14
-    CONTROL "Import one into DASH by pressing 'Import' or press Cancel.",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  147,   25,  180,   13
+    CONTROL "",IDF_DV_Summary_0,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   15,   46,  437,   79
+    CONTROL "DICVOL completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  125,   11,  200,   10
+    CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  215,  137,   40,   14
+    CONTROL "Import one into DASH by pressing the 'Import' button or press 'Cancel'.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  115,   24,  240,   10
 END
 
 IDD_DV_Results RCDATA
@@ -2379,7 +2383,38 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1244    11     30   146 \n"
+" 1232    11     30   146 \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_DIALOG005 DIALOG 0, 0, 1000,   16
+STYLE DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Import",ISS1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   30,   14
+    CONTROL "Crystal System",ISS2,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   80,   14
+    CONTROL "a",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    0,    0,   35,   14
+    CONTROL "b",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    0,    0,   35,   14
+    CONTROL "c",ISS5,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    0,    0,   35,   14
+    CONTROL "alpha",ISS6,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    0,    0,   35,   14
+    CONTROL "beta",ISS7,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    0,    0,   35,   14
+    CONTROL "gamma",ISS8,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    0,    0,   35,   14
+    CONTROL "Volume",ISS9,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    0,    0,   40,   14
+    CONTROL "M",ISS10,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    0,    0,   35,   14
+    CONTROL "F",ISS11,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    0,    0,   35,   14
+END
+
+IDD_DIALOG005 RCDATA
+BEGIN
+"[Checks] \n"
+" 1021 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
