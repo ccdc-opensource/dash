@@ -123,7 +123,7 @@
       zmInitialQs(1, iFrg) = 0.0
       zmInitialQs(2, iFrg) = 0.0
       zmInitialQs(3, iFrg) = 0.0
-      zmSingleRAIniOrDef(iFrg) = 3 ! Quaternions
+      zmSingleRAIniOrDef(iFrg) = 1 ! 1 = Align with axis (only possible when axis itself is defined from atoms)
       zmSingleRAIniOrFrac(1, iFrg) = 0.0 ! Fractional co-ords of axis to align with
       zmSingleRAIniOrFrac(2, iFrg) = 0.0 ! Fractional co-ords of axis to align with
       zmSingleRAIniOrFrac(3, iFrg) = 1.0 ! Fractional co-ords of axis to align with
@@ -134,7 +134,7 @@
       zmSingleRAIniOrQuater(1, iFrg) = 0.0 ! The quaternions
       zmSingleRAIniOrQuater(2, iFrg) = 0.0 ! The quaternions
       zmSingleRAIniOrQuater(3, iFrg) = 0.0 ! The quaternions
-      zmSingleRotAxDef(iFrg) = 2  ! 2 = Fractional co-ordinates
+      zmSingleRotAxDef(iFrg) = 3  ! 3 = normal to plane
       zmSingleRotAxAtm(1, iFrg) = izmbid(1, iFrg)
       zmSingleRotAxAtm(2, iFrg) = izmbid(2, iFrg)
       zmSingleRotAxFrac(1, iFrg) = 0.0
