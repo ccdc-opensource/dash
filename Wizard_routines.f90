@@ -24,7 +24,6 @@
       INCLUDE 'GLBVAR.INC' ! Contains JRadOption which replaces SourceState and IRadOption
       INTEGER IDummy
 
-      INTEGER :: KPosSG,Isp,ISGShow(530)
       LOGICAL FnUnitCellOK ! Function
 
       SKIP = .FALSE.
@@ -133,10 +132,12 @@
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDF_PW_Space_Group_Menu)
                 CALL Update_Space_Group(IDD_PW_Page1, IDummy, IDummy)
-              CASE (IDF_PW_Crystal_System_Menu)
-                CALL WDialogGetMenu(IDF_PW_Crystal_System_Menu,LatBrav)
-                CALL Set_Crystal_Symmetry(LatBrav)
-                CALL Set_Space_Group(IDD_PW_Page1)
+                NumPawleyRef = 0
+              CASE (IDF_Crystal_System_Menu)
+                CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
+                CALL SetCrystalSystem(LatBrav)
+                CALL SetSpaceGroupMenu(LatBrav)
+                CALL Generate_TicMarks
               CASE (IDF_a_latt)
                 CALL WDialogGetReal(IDF_a_latt,CellPar(1))
                 CALL UpdateCell(IDD_PW_Page1)
@@ -287,14 +288,22 @@
 
       IMPLICIT NONE
 
-! JvdS @ I don't think the following two lines are necessary
-      CALL WDialogSelect(IDD_Structural_Information)
-      CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Crystal_Symmetry)
-      CALL Upload_Crystal_Symmetry()
-! JvdS @ I don't think the following two lines are necessary
-      CALL WDialogSelect(IDD_Structural_Information)
-      CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Data_Properties)
+      INCLUDE 'Lattice.inc'
+
+      CALL PushActiveWindowID
+      CALL SetCrystalSystem(LatBrav)
+      NumBrSG = MAX(1,(LPosSG(LatBrav+1)-LPosSG(LatBrav)))
+      DO ISG = 1, NumBrSG
+        JSG = LPosSG(LatBrav)+ISG-1
+        SGHMaBrStr(ISG)( 1:12) = SGNumStr(JSG)(1:12)
+        SGHMaBrStr(ISG)(13:24) = SGHMaStr(JSG)(1:12)
+      END DO
+      ISPosSG=1+IPosSG-LposSG(LatBrav)
+      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+! JvdS @ Why isn't NumberSGTable updated ?
+      CALL Upload_Cell_Constants()
       CALL Upload_Range()
+      CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Wizard_Information      
 !

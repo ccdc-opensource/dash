@@ -726,6 +726,7 @@
       INTEGER i
       INTEGER ihcver,iticer,ipiker,iloger,idsl, isst, ised, iactsgnum
       LOGICAL gotdslfile
+      INTEGER GetCrystalSystem_2 ! Function
 
 !C>> JCC Set to success in all cases
       ihcver = 0
@@ -777,12 +778,11 @@
           DO I = 1, 6
             CALL INextReal(line,cellpar(i))
           END DO
-          CALL Upload_Lattice_Only()
+          CALL Upload_Cell_Constants()
         CASE ('spa')
           CALL INextInteger(line,NumberSGTable)
 !C>> JCC Need to set space group infor in the menus
 ! Get the lattice number
-          NumSG = NumberSGTable
           CALL INextString(line,subline)
 !             call INextInteger(line,IActSGNum)
 ! Chop out ":" char if present
@@ -794,10 +794,11 @@
           END DO
           CALL INextInteger(subline,IActSGNum)
 ! Set the lattice numbers
-          LatBrav = LatticeNumber(IActSGNum,NumSG)
-          CALL Set_Crystal_Symmetry(LatBrav)
+          LatBrav = GetCrystalSystem_2(IActSGNum,NumberSGTable)
+          CALL SetCrystalSystem(LatBrav)
 ! Last but not least set the space group
           CALL Update_Space_Group(-1,LatBrav,NumberSGTable)
+          NumPawleyRef = 0
           CALL FillSymmetry()
         CASE ('paw')
           CALL INextReal(line,PawleyChiSq)

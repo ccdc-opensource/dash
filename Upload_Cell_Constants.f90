@@ -1,26 +1,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Upload_Crystal_Data()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      INCLUDE 'lattice.inc'
-      INCLUDE 'GLBVAR.INC' ! Contains ALambda
-
-! Update all the cell constants ...
-      CALL Upload_Cell_Constants
-      CALL Upload_Zero_Point
-      CALL UpdateWavelength(ALambda)
-! Let's do a symmetry check
-      CALL Check_Crystal_Symmetry()
-      CALL RefineLattice()           
-
-      END SUBROUTINE Upload_Crystal_Data
-!
-!*****************************************************************************
-!
       SUBROUTINE Upload_Zero_Point()
 
       USE WINTERACTER
@@ -44,31 +24,106 @@
 
       INCLUDE 'Lattice.inc'
 
+
+! JvdS @ I did this. Needs cleaning up
+
       CALL PushActiveWindowID
 ! Update all the cell constants ...
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
-      CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')      
-      CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')      
-      CALL WDialogPutReal(IDF_alp_latt,CellPar(4),'(F10.3)')      
-      CALL WDialogPutReal(IDF_bet_latt,CellPar(5),'(F10.3)')      
-      CALL WDialogPutReal(IDF_gam_latt,CellPar(6),'(F10.3)')
+      IF (CellPar(1) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_a_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
+      ENDIF
+      IF (CellPar(2) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_b_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')
+      ENDIF
+      IF (CellPar(3) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_c_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')
+      ENDIF
+      IF (CellPar(4) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_alp_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_alp_latt,CellPar(4),'(F10.3)')
+      ENDIF
+      IF (CellPar(5) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_bet_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_bet_latt,CellPar(5),'(F10.3)')
+      ENDIF
+      IF (CellPar(6) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_gam_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_gam_latt,CellPar(6),'(F10.3)')
+      ENDIF
 !C>> And in the wizard too
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
-      CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')      
-      CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')      
-      CALL WDialogPutReal(IDF_alp_latt,CellPar(4),'(F10.3)')      
-      CALL WDialogPutReal(IDF_bet_latt,CellPar(5),'(F10.3)')      
-      CALL WDialogPutReal(IDF_gam_latt,CellPar(6),'(F10.3)')
+      IF (CellPar(1) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_a_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
+      ENDIF
+      IF (CellPar(2) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_b_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')
+      ENDIF
+      IF (CellPar(3) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_c_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')
+      ENDIF
+      IF (CellPar(4) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_alp_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_alp_latt,CellPar(4),'(F10.3)')
+      ENDIF
+      IF (CellPar(5) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_bet_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_bet_latt,CellPar(5),'(F10.3)')
+      ENDIF
+      IF (CellPar(6) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_gam_latt)
+      ELSE
+        CALL WDialogPutReal(IDF_gam_latt,CellPar(6),'(F10.3)')
+      ENDIF
 !C>> And in the peak positions box
       CALL WDialogSelect(IDD_Peak_Positions)
-      CALL WDialogPutReal(IDF_a_refine,CellPar(1),'(F10.5)')
-      CALL WDialogPutReal(IDF_b_refine,CellPar(2),'(F10.5)')      
-      CALL WDialogPutReal(IDF_c_refine,CellPar(3),'(F10.5)')      
-      CALL WDialogPutReal(IDF_alp_refine,CellPar(4),'(F10.3)')      
-      CALL WDialogPutReal(IDF_bet_refine,CellPar(5),'(F10.3)')      
-      CALL WDialogPutReal(IDF_gam_refine,CellPar(6),'(F10.3)')
+      IF (CellPar(1) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_a_refine)
+      ELSE
+        CALL WDialogPutReal(IDF_a_refine,CellPar(1),'(F10.5)')
+      ENDIF
+      IF (CellPar(2) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_b_refine)
+      ELSE
+        CALL WDialogPutReal(IDF_b_refine,CellPar(2),'(F10.5)')
+      ENDIF
+      IF (CellPar(3) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_c_refine)
+      ELSE
+        CALL WDialogPutReal(IDF_c_refine,CellPar(3),'(F10.5)')
+      ENDIF
+      IF (CellPar(4) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_alp_refine)
+      ELSE
+        CALL WDialogPutReal(IDF_alp_refine,CellPar(4),'(F10.3)')
+      ENDIF
+      IF (CellPar(5) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_bet_refine)
+      ELSE
+        CALL WDialogPutReal(IDF_bet_refine,CellPar(5),'(F10.3)')
+      ENDIF
+      IF (CellPar(6) .LT. 0.00001) THEN
+        CALL WDialogClearField(IDF_gam_refine)
+      ELSE
+        CALL WDialogPutReal(IDF_gam_refine,CellPar(6),'(F10.3)')
+      ENDIF
       CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Cell_Constants
@@ -114,53 +169,46 @@
       USE DRUID_HEADER
 
       INCLUDE 'Lattice.inc'
-      INTEGER OldLatBrav
 
-      CALL PushActiveWindowID
-! The routine is called Check_Crystal_Symmetry, but it seems to fill the cell parameters
-! The following piece of code is a bit odd. It downloads the cell parameters from a dialogue window
-! a. There is a special routine to do so, why isn't it used?
-! b. There are two dialogue windows: which one to download from?
-! c. Why aren't the global variables CellPar() themselves used?
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogGetReal(IDF_a_latt,CellPar(1))
-      CALL WDialogGetReal(IDF_b_latt,CellPar(2))      
-      CALL WDialogGetReal(IDF_c_latt,CellPar(3))      
-      CALL WDialogGetReal(IDF_alp_latt,CellPar(4))      
-      CALL WDialogGetReal(IDF_bet_latt,CellPar(5))      
-      CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
-!C>> JCC Changed to call Check_Lattice_Type
-      OldLatBrav = LatBrav
-      CALL Check_Lattice_Type
-      IF (OldLatBrav .NE. LatBrav) CALL Set_Crystal_Symmetry(LatBrav)
-      CALL PopActiveWindowID
+      INTEGER tNewCrystalSystem
+      INTEGER GetCrystalSystemFromUnitCell ! Function
+
+      CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
+! GetCrystalSystem() determines the crystal system from the unit cell parameters
+      tNewCrystalSystem = GetCrystalSystemFromUnitCell()
+      IF (tNewCrystalSystem .NE. LatBrav) CALL SetCrystalSystem(tNewCrystalSystem)
 
       END SUBROUTINE Check_Crystal_Symmetry
 !
 !*****************************************************************************
 !
-      SUBROUTINE Set_Crystal_Symmetry(TheLatticeSystem)
+      SUBROUTINE SetCrystalSystem(TheCrystalSystem)
+! This routine sets the menus in the main window and in the wizard to a new
+! crystal system. No checks on consistency are performed.
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: TheLatticeSystem
+      INTEGER, INTENT (IN   ) :: TheCrystalSystem
 
       INCLUDE 'Lattice.inc'
 
-      IF ((TheLatticeSystem .GE. 1) .AND. (TheLatticeSystem .LE. 11)) THEN
-        CALL PushActiveWindowID
-        LatBrav = TheLatticeSystem
-        CALL WDialogSelect(IDD_Crystal_Symmetry)
-        CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
-        CALL WDialogSelect(IDD_PW_Page1)
-        CALL WDialogPutOption(IDF_PW_Crystal_System_Menu,LatBrav)
-        CALL PopActiveWindowID
+      IF ((TheCrystalSystem .GE. 1) .AND. (TheCrystalSystem .LE. 11)) THEN
+        LatBrav = TheCrystalSystem
+      ELSE
+        CALL DebugErrorMessage('Crystal Sytem out of range in SetCrystalSystem()')
+        LatBrav = 1
       END IF
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL PopActiveWindowID
 
-      END SUBROUTINE Set_Crystal_Symmetry
+      END SUBROUTINE SetCrystalSystem
 !
 !*****************************************************************************
 !
@@ -176,9 +224,6 @@
       REAL XDD(MPAR),DXDD(MPAR),COVDD(MMPAR)
 
       INCLUDE 'lattice.inc'
-!O      PARAMETER (MVAL=50)
-!O      COMMON /LATREFCMN/ LatBrav,IHLR(3,MVAL)
-!O      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
@@ -188,7 +233,7 @@
       PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
       IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)
 
-      COMMON /AASVAL/ AAS(6),AASLO(6),AASHI(6)
+!U      COMMON /AASVAL/ AAS(6),AASLO(6),AASHI(6)
       INTEGER IASS(6)
       LOGICAL NOCREF
 
@@ -250,16 +295,16 @@
       CALL InverseMatrix(GREAL,GREC,3)
       XDD(1) = ZeroPoint
       DXDD(1) = 0.01*ABS(zeropoint)+0.001
-      DO I = 1, 3
-        AAS(I) = GREC(I,I)
-      END DO
-      AAS(4) = GREC(1,2)
-      AAS(5) = GREC(1,3)
-      AAS(6) = GREC(2,3)
-      DO I = 1, 6
-        AASLO(I) = 0.9*AAS(I)
-        AASHI(I) = 1.1*AAS(I)
-      END DO
+!U      DO I = 1, 3
+!U        AAS(I) = GREC(I,I)
+!U      END DO
+!U      AAS(4) = GREC(1,2)
+!U      AAS(5) = GREC(1,3)
+!U      AAS(6) = GREC(2,3)
+!U      DO I = 1, 6
+!U        AASLO(I) = 0.9*AAS(I)
+!U        AASHI(I) = 1.1*AAS(I)
+!U      END DO
       DO I = 1, 6
         IASS(I) = 0
       END DO
@@ -371,7 +416,7 @@
       Cellpar(5)=ACOSD(GReal(1,3)/(CellPar(1)*CellPar(3)))            
       Cellpar(6)=ACOSD(GReal(1,2)/(CellPar(1)*CellPar(2)))
       ZeroPoint=XDD(1)
- 999  CONTINUE
+!U 999  CONTINUE
       CALL Upload_Cell_Constants()
       CALL Upload_Zero_Point()
 !  First ensure that we have the plotting mode correct
@@ -392,12 +437,9 @@
 
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
       INCLUDE 'lattice.inc'
-!O      PARAMETER (MVAL=50)
-!O      COMMON /LATREFCMN/ LatBrav,IHLR(3,MVAL)
-!O      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
-      COMMON /AASVAL/ AAS(6),AASLO(6),AASHI(6)
+!U      COMMON /AASVAL/ AAS(6),AASLO(6),AASHI(6)
 
       ChiGetLattice = 0.0
       zp=p(1)
@@ -447,7 +489,7 @@
         p2=p(2)
         p3=p(3)
 !>> JCC Wrong parameter extracted        p6=0.5*p(2)
-          p4=0.5*p(2)
+        p4=0.5*p(2)
       Else If (LatBrav.eq.9) Then
 ! Rhombohedral
         p1=p(2)
@@ -461,7 +503,7 @@
         p1=p(2)
         p2=p(2)
         p3=p(3)
-            p4=0.5*p(2)
+        p4=0.5*p(2)
 !>> JCC Wrong parameter extracted        p6=0.5*p(2)
       Else If (LatBrav.eq.11) Then
 ! Cubic
