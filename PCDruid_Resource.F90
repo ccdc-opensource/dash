@@ -1,4 +1,4 @@
-! Winteracter module created : 04/Apr/2001 16:04:56
+! Winteracter module created : 30/Jul/2001 17:28:44
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -156,19 +156,14 @@
           INTEGER, PARAMETER :: IDF_CellRefinement_Label        =  1109
           INTEGER, PARAMETER :: ID_import_ccl_file              = 40104
           INTEGER, PARAMETER :: IDD_Polyfitter_Wizard_01        =   121
-          INTEGER, PARAMETER :: IDF_PW1_Back                    =  1196
           INTEGER, PARAMETER :: IDF_PW01_Text1                  =  1197
           INTEGER, PARAMETER :: IDB_SA_Project_Open             =  1198
-          INTEGER, PARAMETER :: IDF_PW0_Next                    =  1205
-          INTEGER, PARAMETER :: IDF_PW0_Back                    =  1206
           INTEGER, PARAMETER :: IDF_PW0_Skip                    =  1216
           INTEGER, PARAMETER :: IDF_PW_Logo2                    =  1207
           INTEGER, PARAMETER :: IDF_PW_Logo3                    =  1208
-          INTEGER, PARAMETER :: IDF_PW1_Next                    =  1209
           INTEGER, PARAMETER :: ID_PW_DF_Open                   =  1210
           INTEGER, PARAMETER :: IDF_PW1_Skip                    =  1211
-          INTEGER, PARAMETER :: IDF_PW2_Back                    =  1212
-          INTEGER, PARAMETER :: IDF_PW2_Next                    =  1213
+          INTEGER, PARAMETER :: IDFINISH                        =  1048
           INTEGER, PARAMETER :: IDD_PW_Page1                    =   122
           INTEGER, PARAMETER :: IDD_PW_Page2                    =   123
           INTEGER, PARAMETER :: IDF_PW_Data_Group               =  1239
@@ -179,7 +174,6 @@
           INTEGER, PARAMETER :: IDF_PW_Option1                  =  1199
           INTEGER, PARAMETER :: IDF_PW_Logo1                    =  1204
           INTEGER, PARAMETER :: IDB_SA_Project_Import           =  1214
-          INTEGER, PARAMETER :: IDF_PW2_Skip                    =  1215
           INTEGER, PARAMETER :: IDF_PW_lattice_constant_group   =  1217
           INTEGER, PARAMETER :: IDF_PW_Crystal_system_group     =  1218
           INTEGER, PARAMETER :: IDF_PW_Space_Group_Group        =  1219
@@ -213,8 +207,6 @@
           INTEGER, PARAMETER :: IDF_PW_2theta0                  =  1251
           INTEGER, PARAMETER :: IDD_PW_Page3                    =   124
           INTEGER, PARAMETER :: IDF_PW_Logo4                    =  1256
-          INTEGER, PARAMETER :: IDF_PW3_Back                    =  1257
-          INTEGER, PARAMETER :: IDF_PW3_Next                    =  1258
           INTEGER, PARAMETER :: IDF_PW3_Finish                  =  1259
           INTEGER, PARAMETER :: IDF_PWa_Data_Group              =  1261
           INTEGER, PARAMETER :: IDF_PWa_Data_fFilename          =  1262
@@ -434,8 +426,6 @@
           INTEGER, PARAMETER :: IDB_SA1_next                    =  1137
           INTEGER, PARAMETER :: IDF_SA1_picture                 =  1138
           INTEGER, PARAMETER :: IDD_TEMPLATE009                 =   141
-          INTEGER, PARAMETER :: IDB_SA2_back                    =  1136
-          INTEGER, PARAMETER :: IDB_SA2_next                    =  1139
           INTEGER, PARAMETER :: IDF_SA2_picture                 =  1140
           INTEGER, PARAMETER :: IDF_SA2_label                   =  1141
           INTEGER, PARAMETER :: IDD_SA_input3                   =   142
@@ -569,4 +559,7 @@
           INTEGER, PARAMETER :: ID_Tutorial_3                   = 40044
           INTEGER, PARAMETER :: ID_Tutorial_4                   = 40045
           INTEGER, PARAMETER :: ID_Tutorial_5                   = 40002
+          INTEGER, PARAMETER :: IDD_SAW_Page1                   =   102
+          INTEGER, PARAMETER :: IDBACK                          =  1001
+          INTEGER, PARAMETER :: IDNEXT                          =  1040
       END MODULE Druid_Header
