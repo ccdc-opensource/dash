@@ -74,8 +74,8 @@
 ! Disable Pawley refinement button if we are 'PastPawley'
       IF (PastPawley) CALL SetModeMenuState(-1,-1)
       CALL WindowOutStatusBar(1,FNAME)
-! update the file name of the project in the SA pop up
-      CALL SetSAFileName(FNAME(1:KLEN))
+! Update the file name of the project in the SA pop up
+      CALL ScrUpdateFileNameSDIFile(FNAME(1:KLEN))
       
       END SUBROUTINE SDIFileOpen
 !
