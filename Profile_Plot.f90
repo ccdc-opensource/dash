@@ -15,7 +15,11 @@
       INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'PARAMS.INC'
 
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       INTEGER CurrentRange 
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
@@ -31,12 +35,10 @@
         CALL IGrHardCopyOptions(1,700)
         CALL IGrHardCopyOptions(2,375)
         CALL IGrHardCopy(' ')
-      END IF
+      ENDIF
       CALL Plot_Initialise()
       CALL Plot_Panel()
       CALL Plot_Custom_Axes()
-! Plot peakfit ranges
-      IF (NumPeakFitRange .GT. 0) CALL Plot_PeakFit_Info()
 ! Observed profile
       SELECT CASE (ABS(TheIPTYPE))
         CASE (1) 
@@ -44,16 +46,18 @@
         CASE (2) 
           CALL Plot_ObsCalc_Profile()
       END SELECT
+! Plot peakfit ranges
+      IF (NumPeakFitRange .GT. 0) CALL Plot_PeakFit_Info()
       IF (PlotBackground()) CALL Plot_Background()
 !  Plot tic marks etc. if appropriate
-      IF (Ntic .NE. 0) CALL Plot_Calculated_Tics()
+      IF (NTIC .NE. 0) CALL Plot_Calculated_Tics()
       CALL IPgBorder()
       PLOTT = .TRUE.
 !   Switch off hardcopy
       IF (TheIPTYPE .LT. 0) THEN
         CALL IGrHardCopy('S')
         CALL IGrInit('P')
-      END IF
+      ENDIF
 
       END SUBROUTINE Profile_Plot
 !
@@ -63,10 +67,16 @@
 
       USE WINTERACTER
 
+      IMPLICIT NONE
+
       INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'PARAMS.INC'
 
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -77,7 +87,9 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
+      REAL    YPGDIF, YTIC1, YTIC2, xgtem, ygtem
+      INTEGER II
 
       CALL IGrColourN(KolNumCTic)
       YPGDIF = (YPGMAX-YPGMIN)
@@ -89,8 +101,8 @@
           CALL IGrMoveTo(xgtem,ygtem)
           CALL IPgUnitsToGrUnits(ARGK(II),ytic2,xgtem,ygtem)
           CALL IGrLineTo(xgtem,ygtem)
-        END IF
-      END DO
+        ENDIF
+      ENDDO
       CALL IGrColourN(KolNumMain)
 
       END SUBROUTINE Plot_Calculated_Tics
@@ -159,7 +171,7 @@
       CALL IGrArea(0.0,0.0,1.0,1.0)
       CALL IGrUnits(0.0,0.0,1.0,1.0)
       CALL IGrAreaClear
-      CALL IGrCharSpacing('P')
+      CALL IGrCharSpacing('P') ! Proportional
       CALL IGrCharFont(3)
       CALL IGrColourN(KolNumMain)
       CALL IPgScaling('LIN','LIN')
@@ -402,39 +414,55 @@
 !
       SUBROUTINE Plot_PeakFit_Info()
 !
-!... Plots all the information about the Peak Fitting Option
+! Plots all the information about the Peak Fitting Option
 ! Highlight (recolour) the peak fit range and label the peaks.
 ! If already fitted then show the fitted profile as well.
 !
       USE WINTERACTER
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'PARAMS.INC'
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-      NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-      XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-      IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+      REAL              XPF_Range
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
       CHARACTER*1 ChrPkNum
       CHARACTER*2 ChrPkNum2
+
+      REAL Difference(1:MAX_FITPT)
+      INTEGER JJ
 
       iord_peak = 0
       DO i = 1, NumPeakFitRange
@@ -458,31 +486,40 @@
             DO II = ipf1, ipf2
               IF (XpeakFit(II) .GE. xpgmin) THEN
 ! If this two theta is within the drawing area, and the previous wasn't
-! then we need to start at the _previous_ point. Unless that point doesn't exist, of course.
+! then we need to start at the _previous_ point. Unless that point isn't part of this peak, of course.
                 ix1 = MAX(II-1,ipf1)
                 GOTO 110
-              END IF
-            END DO
+              ENDIF
+            ENDDO
+! ix1 is now a pointer into XPeakFit, YPeakFit, pointing to the start of the range
  110        DO II = ipf2, ipf1, -1
               IF (XpeakFit(II) .LE. xpgmax) THEN
                 ix2 = MIN(II+1,ipf2)
                 GOTO 120
-              END IF
-            END DO
- 120        CALL IPgNewPlot(PgPolyLine,1, (1+ix2-ix1) )
+              ENDIF
+            ENDDO
+! ix2 is now a pointer into XPeakFit, YPeakFit, pointing to the end of the range
+ 120        CONTINUE
+            DO JJ = ipf1, ipf2
+               Difference(JJ) = YOBIN(IPF_Lo(i)+JJ-ipf1) - YPeakFit(JJ) + (0.5*YPF_Pos(1,i))
+            ENDDO
+!O            CALL IPgNewPlot(PgPolyLine,1, (1+ix2-ix1) )
+            CALL IPgNewPlot(PgPolyLine,2, (1+ix2-ix1) )
             CALL IPgStyle(1,0,0,0,KolNumMTic,0)
-            CALL IPgXYPairs(xpeakfit(ix1),ypeakfit(ix1))
-          END IF
-        END IF
-        IPresColN=InfoGrScreen(ColourReq)
-! label the peaks in this peak fit range with their number
+            CALL IPgStyle(2,0,0,0,KolNumCal,0)
+            CALL IPgXYPairs(XPeakFit(ix1),YPeakFit(ix1))
+            CALL IPgXYPairs(XPeakFit(ix1),Difference(ix1))
+          ENDIF
+        ENDIF
+        IPresColN = InfoGrScreen(ColourReq)
+! label the peaks in this peak fit range with their numbers
         DO j = 1, NumInPFR(i)
           iord_peak = iord_peak + 1
           IF (iord_peak .LT. 10) THEN
             CALL IntegerToString(iord_peak,ChrPkNum,'(I1)')
           ELSE
             CALL IntegerToString(iord_peak,ChrPkNum2,'(I2)')
-          END IF
+          ENDIF
           CALL IGrColourN(KolNumPeakFit)
           CALL IGrCharSize(Char_Size,Char_Size)
           CALL IPgUnitsToGrUnits(XPF_Pos(j,i),YPF_Pos(j,i),xgtem,ygtem)
@@ -506,21 +543,21 @@
                 CALL IGrCharOut(xgtem,ygtem,ChrPkNum)
               ELSE
                 CALL IGrCharOut(xgtem,ygtem,ChrPkNum2)
-              END IF
-            END IF
-          END IF   
-        END DO
+              ENDIF
+            ENDIF
+          ENDIF   
+        ENDDO
         CALL IGrColourN(IPresColN)
-      END DO
+      ENDDO
       CALL IGrFillPattern(Outline)
 
       ENDSUBROUTINE Plot_PeakFit_Info
 !
 !*****************************************************************************
 !
-!C>> JCC Subroutine that cross-references the two sets of common
-!C>> blocks so that the profile ones contain the data thats been
-!C>> read in. Basically hacked out of SA_Profile_Plot.
+! JCC Subroutine that cross-references the two sets of common
+! blocks so that the profile ones contain the data thats been
+! read in. Basically hacked out of SA_Profile_Plot.
       SUBROUTINE Synchronize_Data
 
       USE WINTERACTER
@@ -529,37 +566,54 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'statlog.inc'
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
-        YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),&
-        IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR),&
-        NumPeakFitRange,CurrentRange,&
-        IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR),&
-        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR),&
-        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+
+      REAL              XPF_Range
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
       COMMON /ZSTORE/ NPTS,ZARGI(MPPTS),ZOBS(MPPTS),ZDOBS(MPPTS),&
         ZWT(MPPTS),ICODEZ(MPPTS),KOBZ(MPPTS)
+
       COMMON /YSTORE/ ZCAL(MPPTS),ZBAK(MPPTS)
+
       COMMON /ZSTOR1/ ZXDELT,IIMIN,IIMAX,XDIFT,XMINT
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
       COMMON /CHISTOP/ NOBSA,NFITA,IFITA(MCHSTP),CHIOBSA,&
         WTSA(MCHSTP),XOBSA(MCHSTP),YOBSA(MCHSTP),YCALA(MCHSTP),ESDA(MCHSTP)
+
       COMMON /chibest/ ycalbest(MCHSTP)
 
       NOBS = NOBSA
@@ -570,11 +624,11 @@
         I = IFITA(II)
         YOSUM = YOSUM + YOBSA(I)
         YCSUM = YCSUM + YCALbest(I)
-      END DO
+      ENDDO
       RESCL = YOSUM / YCSUM
       DO I = 1, NOBS
         YCALbest(I) = RESCL * YCALbest(I)
-      END DO
+      ENDDO
       DO I = 1, NBIN
         XBIN(I)  = XOBSA(I)
         YOBIN(I) = YOBSA(I)
