@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 24/Sep/2003 16:30:01
+// Modified : 14/Oct/2003 13:05:35
 //
 ///////////////////////////////////////////////////
 //
@@ -3816,15 +3816,9 @@ BEGIN
 "[Checks] \n"
 " 1361 1 \n"
 "[Menus] \n"
-" 1546     8     1 \n"
-"1 \n"
-"2 \n"
-"3 \n"
-"4 \n"
-"5 \n"
-"6 \n"
-"7 \n"
-"All \n"
+" 1546     2     1 \n"
+"Debug message \n"
+" \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
