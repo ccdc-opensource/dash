@@ -95,6 +95,8 @@
 ! Set to .TRUE. whenever an .xye file is loaded that doesn't contain the wavelength
 ! When the wavelength is set, this variable is tested and the wavelength is
 ! written to the file.
+      LOGICAL SpaceGroupDetermination
+      DATA SpaceGroupDetermination / .FALSE./
 
       END MODULE VARIABLES
 !

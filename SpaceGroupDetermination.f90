@@ -1,5 +1,5 @@
       
-      SUBROUTINE SpaceGroupDetermination(LatBrav, PawleyChiSqd)
+      SUBROUTINE SpaceGroupDeterminationCode(LatBrav, PawleyChiSqd)
       USE DRUID_HEADER
       USE VARIABLES
       USE WINTERACTER
@@ -133,7 +133,7 @@
      RETURN
 777  CALL ErrorMessage('ExtinctionSymbol.exe not found in installation directory')
      RETURN
-     END SUBROUTINE SpaceGroupDetermination
+     END SUBROUTINE SpaceGroupDeterminationCode
 
 
       
