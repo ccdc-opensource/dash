@@ -432,7 +432,7 @@
 !DEC$ ENDIF
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
                'Copyright July 2004'
-      CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
+      CALL WMessageBox(OkOnly, InformationIcon, CommonOk, CABOUT, 'About DASH')
 
       END SUBROUTINE About
 !
@@ -459,8 +459,8 @@
       INTEGER ISTAT
 
       CALL WriteConfigurationFile
-      CLOSE(UNIT=12,STATUS='DELETE',IOSTAT=ISTAT)
-      CLOSE(UNIT=6,STATUS='DELETE',IOSTAT=ISTAT)  ! dash.out
+      CLOSE(UNIT=12, STATUS='DELETE', IOSTAT=ISTAT)
+      CLOSE(UNIT=6, STATUS='DELETE', IOSTAT=ISTAT)  ! dash.out
       CALL DeleteTempFiles
       CALL WindowClose
       STOP
