@@ -266,9 +266,12 @@
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
 ! JCC Reset the R-values if possible
               IF (LastValuesSet) THEN
-                CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(F12.2)') 
+                CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(F12.2)')
+                RWPOBS = RLastValues(1)
                 CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,RLastValues(2),'(F12.3)')
+                PAWLEYCHISQ = RLastValues(2)
                 CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3),'(F12.2)')
+                RWPEXP = RLastValues(3)
                 CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
                 CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
                 CALL retrieve_polybackup
