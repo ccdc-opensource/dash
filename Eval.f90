@@ -1,15 +1,10 @@
 !*==MAKEFRAC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!
       SUBROUTINE MAKEFRAC(CHROM)
-                                       !,NATS,ICOM)
-!     -------------------------------------------
-!
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'IZMcheck.inc'
-!
+
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen, alph, bet, f2cmat
@@ -24,37 +19,33 @@
       INTEGER         icomflg
       REAL                             AtomicWeighting
       COMMON /zmcomg/ icomflg(maxfrg), AtomicWeighting(maxatm,maxfrg)
-!
+
       PARAMETER (mvar=100)
       REAL*8 CHROM(*)
       REAL*8 CKK1, CKK2, CKK3
       REAL*8 TRAN(3), ROTA(3,3), POS(3,MAXATM), CART(MAXATM,3)
       REAL*8 QUATER(4), QQSUM, QDEN, QUATT(MVAR)
       REAL*8 XC, YC, ZC, ZERO, ONE, XNORM, V1, V2, V3
-!
-!      COMMON  /ZMCOMI/ NATOMS,IOPTT(MAXATM),IZ1(MAXATM),IZ2(MAXATM),IZ3(MAXATM)
-!      COMMON  /ZMCOMR/ BLEN(MAXATM),ALPH(MAXATM),BET(MAXATM),F2CMAT(3,3)
+
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
       DATA ZERO, ONE/0.0D0, 1.0D0/
-!
+
       KK = 0
       KATOM = 0
 !.. Loop over all the fragments
       IFRG = 0
       DO JJJ = 1, NFRAG
-!
         DO WHILE (ifrg.LE.CheckSize)
           ifrg = ifrg + 1
           IF (IZMCheck(ifrg).EQ.1) EXIT       ! the loop since we have a fragment we are using
         ENDDO
-!
         NATS = NATOMS(IFRG)
-        KK1 = KK + 1
-        KK2 = KK + 2
-        KK3 = KK + 3
-        CHROM(KK1) = CHROM(KK1) - INT(CHROM(KK1))
+        KK1 = KK + 1     ! x-translation
+        KK2 = KK + 2     ! y-translation
+        KK3 = KK + 3     ! z-translation
+        CHROM(KK1) = CHROM(KK1) - INT(CHROM(KK1))  ! Position centre of mass inside unit cell
         CHROM(KK2) = CHROM(KK2) - INT(CHROM(KK2))
         CHROM(KK3) = CHROM(KK3) - INT(CHROM(KK3))
         CKK1 = CHROM(KK1)
