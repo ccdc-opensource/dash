@@ -165,14 +165,6 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
-
-      REAL            BestValuesDoF
-      COMMON /SOLCOM/ BestValuesDoF(1:mvar,1:MaxRun)
-
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
@@ -186,9 +178,6 @@
       INTEGER          NFITA, IFITA
       REAL                                 WTSA
       COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
-
-      INTEGER         nvar, ns, nt, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       INTEGER         ErrCounter
       COMMON /CMN008/ ErrCounter
@@ -372,16 +361,8 @@
 
 ! Read / Write range and fixed yes/no per parameter
       CALL SA_Parameter_Set
-! Read / Write number of solutions
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumOf_SA_Runs)
 ! Read / Write solutions
-      IF (NumOf_SA_Runs .NE. 0) THEN
-        DO I = 1, NumOf_SA_Runs
-          DO J = 1, nvar
-            CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BestValuesDoF(J,I))
-          ENDDO
-        ENDDO
-      ENDIF
+      CALL PrjReadWriteSolutions
 
       CALL PrjErrTrace
 
@@ -395,6 +376,76 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE PrjReadWrite
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjReadWriteSolutions
+!
+! Read or writes information on peak fit ranges to / from binary project file.
+!
+      USE PRJVAR
+      USE ZMVAR
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      LOGICAL         RESTART
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      REAL            BestValuesDoF
+      COMMON /SOLCOM/ BestValuesDoF(1:mvar,1:MaxRun)
+
+      REAL                XAtmCoords
+      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:maxatm,1:MaxRun)
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INTEGER         NATOM
+      REAL                   Xato
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
+                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+      INTEGER ii, I, J, RW
+      DOUBLE PRECISION X(MVAR)
+
+! Read or Write?
+      RW = iPrjReadOrWrite
+! Number of solutions
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumOf_SA_Runs)
+! Read / Write solutions
+      IF (NumOf_SA_Runs .NE. 0) THEN
+        DO I = 1, NumOf_SA_Runs
+          DO J = 1, nvar
+            CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BestValuesDoF(J,I))
+            X(J) = DBLE(BestValuesDoF(J,I))
+          ENDDO
+          IF (iPrjReadOrWrite .EQ. cRead) THEN
+! Fill pdbAtmCoords
+            CALL makefrac(X)
+! Fractional co-ordinates are now in Xato.
+            DO ii = 1, NATOM
+              XAtmCoords(1,ii,I) = Xato(1,ii)
+              XAtmCoords(2,ii,I) = Xato(2,ii)
+              XAtmCoords(3,ii,I) = Xato(3,ii)
+            ENDDO
+          ENDIF
+        ENDDO
+      ENDIF
+
+      END SUBROUTINE PrjReadWriteSolutions
 !
 !*****************************************************************************
 !
