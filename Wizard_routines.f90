@@ -531,8 +531,6 @@
         IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
           CALL WDialogPutReal(IDF_Max2Theta, tMax)
           CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
-          CALL WDialogSelect(IDD_ViewPawley)
-          CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
         ENDIF
         CALL WDialogSelect(IDD_ViewPawley)
         CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
