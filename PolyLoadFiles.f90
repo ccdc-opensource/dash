@@ -159,7 +159,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Diffraction_File_Browse(NoData)
+      SUBROUTINE Diffraction_File_Browse
 !
 ! This routine lets the user browse a directory for a diffraction file.
 ! If a valid file has been selected, it will be opened automatically.
@@ -177,7 +177,7 @@
 
       IMPLICIT NONE
 
-      LOGICAL, INTENT (IN OUT) :: NoData
+!O      LOGICAL, INTENT (IN OUT) :: NoData
 
       CHARACTER(LEN=512) :: FILTER
       INTEGER       ::   IFLAGS
@@ -207,7 +207,7 @@
 ! the current subroutine is called.
 ! Actually, that is how it works in practice under windows (try 'Start' -> 'Run...' -> 'Browse...'
 ! it will not actually open the file, just select it).
-      CALL Diffraction_File_Open(tFileName,NoData)
+      CALL Diffraction_File_Open(tFileName)
       RETURN
 
       END SUBROUTINE Diffraction_File_Browse
@@ -234,7 +234,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Diffraction_File_Open(TheFileName,NoData)
+      SUBROUTINE Diffraction_File_Open(TheFileName)
 !
 ! This routine tries to open a diffraction file.
 !
@@ -250,7 +250,7 @@
 
       IMPLICIT NONE
 
-      LOGICAL,                      INTENT (IN OUT) :: NoData
+!O      LOGICAL,                      INTENT (IN OUT) :: NoData
       CHARACTER(LEN=MaxPathLength), INTENT (IN OUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
@@ -292,7 +292,7 @@
       FNAME = TheFileName
 ! Update this throughout the program (Wizard + status bar)
       CALL ScrUpdateFileName
-      ISTAT = Diffraction_File_Load(TheFileName,NoData)
+      ISTAT = Diffraction_File_Load(TheFileName)
       IF (ISTAT .EQ. 0) RETURN
 ! A pattern has been loaded, and the background may have been subtracted. This is the rigth time
 ! to truncate the data to, say, 1.5 A resolution.
@@ -324,7 +324,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Diffraction_File_Load(TheFileName,NoData)
+      INTEGER FUNCTION Diffraction_File_Load(TheFileName)
 !
 ! This routine tries to load a diffraction file.
 !
@@ -343,7 +343,7 @@
 
 !      IMPLICIT NONE
 
-      LOGICAL,                      INTENT (IN OUT) :: NoData
+!O      LOGICAL,                      INTENT (IN OUT) :: NoData
       CHARACTER(LEN=MaxPathLength), INTENT (IN OUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
@@ -1604,7 +1604,7 @@
 !
 !*****************************************************************************
 !
-    SUBROUTINE SDI_file_Open(NoData)
+      SUBROUTINE SDI_File_Browse
 !
 !   This subroutine processes Open selection
 !
@@ -1614,10 +1614,8 @@
 
       IMPLICIT NONE
 
-      LOGICAL, INTENT (IN OUT) :: NoData
-
-      CHARACTER(LEN=256) :: FILTER
-      INTEGER            :: IFLAGS
+      CHARACTER(LEN=40) :: FILTER
+      INTEGER           :: IFLAGS
 
       INCLUDE 'GLBVAR.INC'
 
@@ -1645,8 +1643,8 @@
         CALL ErrorMessage("The file "//FNAME(1:IFlen)//" does not exist!")
         RETURN
       ENDIF
-      CALL OpenHCVPIKTIC(FNAME(1:IFlen),NoData) 
-      IF (NODATA) THEN
+      CALL OpenHCVPIKTIC(FNAME(1:IFlen)) 
+      IF (NoData) THEN
         CALL ErrorMessage("Could not read the project file "//FNAME(1:IFlen)//&
                           CHAR(13)//"successfully.")
         RETURN
@@ -1657,7 +1655,7 @@
       CALL SetModeMenuState(1,1,1)
       RETURN
 
-      END SUBROUTINE SDI_file_Open
+      END SUBROUTINE SDI_File_Browse
 !
 !*****************************************************************************
 !

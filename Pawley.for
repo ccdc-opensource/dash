@@ -8,9 +8,10 @@ c
 !
       INCLUDE 'DialogPosCmn.inc'
 	INCLUDE 'params.inc'
+	INCLUDE 'lattice.inc'
 c
       character*80 profile
-      logical nodata,PawleyOptionChosen 
+      logical PawleyOptionChosen 
 c
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),
@@ -25,8 +26,6 @@ c
 C>> JCC Declarations
 	INTEGER ieocc
 	INTEGER Quick_Pawley_Fit
-      REAL :: CELLPAR,ZEROPOINT
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
 C
 C.. CCSL common blocks included - take care!
       COMMON /CELPAR/CELL(3,3,2),V(2),ORTH(3,3,2),CPARS(6,2),KCPARS(6),
@@ -38,11 +37,9 @@ C.. CCSL common blocks included - take care!
 C>> JCC Save the boxes from Pawley fit to Pawley fit
 	REAL RLastValues(3)
 	INTEGER ILastValues(2)
-	LOGICAL LastValuessSet
 	DATA RLastValues / 0.0,0.0,0.0 /
 	DATA ILastValues / 0,0/
-	DATA LastValuesSet / .FALSE. /
-	SAVE RLastValues,ILastValues,LastValuesSet
+	SAVE RLastValues,ILastValues
 
 C>> Local variables logging errors in the pawley fit
       INTEGER PawleyEigError
@@ -52,15 +49,6 @@ C
 C
       INCLUDE 'statlog.inc'
 C
-
-!C>> JCC The next common allows low-level setting of SLIM (not accessible through the front
-!C     end, but may be in future. I've allowed reading via the dsl file)
-	  REAL SLIMVALUE, SCALFAC
-	  LOGICAL BACKREF
-	  COMMON /PWLYST/ SLIMVALUE, SCALFAC, BACKREF
-
-
-c
 
       ItemX=IXPos_IDD_Pawley_Status
       ItemY=IYPos_IDD_Pawley_Status
@@ -111,7 +99,6 @@ C>> JCC Reset the R-values if possible
 			call WDialogPutInteger(
      &                         IDF_Pawley_Cycle_NumRefs,ILastValues(2))
 
-!			CALL Unload_Pawley_Pro()
 			CALL retrieve_polybackup()
 		END IF
 
@@ -162,14 +149,10 @@ c
         DO WHILE(.NOT.PawleyOptionChosen)
             CALL GetEvent
             SELECT CASE (EventType)
-              CASE (Expose,Resize)
-				CALL Redraw()
-! 
               CASE (MouseButDown)
                     CALL Plot_Alter
               CASE (KeyDown)
                     CALL Check_KeyDown
-!
               CASE (PushButton)
                 IDNumber=EventInfo%Value1
                 SELECT CASE (IDNumber)
@@ -278,7 +261,6 @@ C..   Check the space group
 !
 !   Type declarations
 !
-      LOGICAL :: NODATA
       LOGICAL           :: SKIP    = .FALSE.
       INTEGER           :: I,IDNUMBER
      
@@ -420,14 +402,10 @@ C
         CALL GetEvent
 
         SELECT CASE (EventType)
-          CASE (Expose,Resize)
-            CALL Redraw()
-!
               CASE (MouseButDown)
                     CALL Plot_Alter
               CASE (KeyDown)
                   CALL Check_KeyDown
-!
           CASE (PushButton)
             IDNumber=EventInfo%Value1
             SELECT CASE (IDNumber)
@@ -445,12 +423,8 @@ C
                 call WDialogHide()
                 IXPos_IDD_Pawley_Status = WInfoDialog(6)
                 IYPos_IDD_Pawley_Status = WInfoDialog(7)
-!                IWidth_IDD_Pawley_Status = WInfoDialog(8)
-!                IHeight_IDD_Pawley_Status = WInfoDialog(9)
                 IXPos_IDD_SA_Input = IXPos_IDD_Pawley_Status
                 IYPos_IDD_SA_Input = IYPos_IDD_Pawley_Status
-!                IWidth_IDD_SA_Input = IWidth_IDD_Pawley_Status
-!                IHeight_IDD_SA_Input = IHeight_IDD_Pawley_Status
                 FromPawleyFit=.true.
                 CALL Pawley_Limits_Save()
                 call SA_Main()
@@ -591,7 +565,6 @@ C Now
           end do
         End If
       End If
-!        write(76,*) ' NPawBack ',NPawBack
         nblin=1+(NPawBack-1)/5
         kk=0
         do inb=1,nblin
@@ -606,7 +579,6 @@ C Now
             write(backstr(k1:k1+11),'(f11.3)') backgd(kk,1)
           end do
           write(42,4280) backstr
-!          write(76,4280) backstr
  4280 format(a)
         end do
       write(42,4300) 
@@ -746,7 +718,7 @@ C
       IPTYPE=2
       CALL Profile_Plot(IPTYPE)
 !
-      NoData=.false.
+!U      NoData=.false.
  999  Continue
       END SUBROUTINE Load_Pawley_PRO
 c
@@ -796,7 +768,6 @@ C..   Check the space group
 !
 !   Type declarations
 !
-      LOGICAL :: NODATA
       LOGICAL           :: SKIP    = .FALSE.
       INTEGER           :: I,IDNUMBER
       INCLUDE 'statlog.inc'
@@ -889,8 +860,8 @@ C
       DO WHILE(.NOT.SkipPawleyRef)
         CALL GetEvent
         SELECT CASE (EventType)
-          CASE (Expose,Resize)
-            CALL Redraw()
+!U          CASE (Expose,Resize)
+!U            CALL Redraw()
 !
               CASE (MouseButDown)
                     CALL Plot_Alter

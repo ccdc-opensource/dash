@@ -34,7 +34,7 @@
 !
       INTEGER  MAXEVL, IPRINT
 !
-      LOGICAL :: NODATA = .FALSE.
+!O      LOGICAL :: NODATA = .FALSE.
       DOUBLE PRECISION cen,sig
       LOGICAL       gaussb
       DOUBLE PRECISION T0,rt,eps,target_value
@@ -104,7 +104,6 @@
       LOGICAL NoZmatrix
       LOGICAL Confirm ! Function
 
-      CALL WMessageEnable(FieldChanged,1)
 !.. If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
       IF (FromPawleyFit) THEN
         pikfile = DashPikFile
@@ -182,7 +181,7 @@
         CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
       END DO
       ZmStateChanged = .TRUE.
-      CALL WDialogShow(IXPos_IDD_SA_Input,IYPos_IDD_SA_Input,0,SemiModeless)
+      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       DO                   ! Loop until user terminates
 ! Let's check the z-matrix check boxes
         IF (ZmStateChanged) THEN
@@ -211,8 +210,6 @@
             END IF
           END DO
           IF (NextEnabled .LT. 5) THEN
-! JvdS @ Is it correct that the next two lines do the same?
-            CALL WDialogPutCheckBox(IDFZMCheck(NextEnabled),Unchecked)
             CALL WDialogPutCheckBox(IDFZMCheck(NextEnabled),Unchecked)
           END IF
           ZmStateChanged = .FALSE.
@@ -244,10 +241,10 @@
             CALL Plot_Alter
           CASE (KeyDown)
             CALL Check_KeyDown
-          CASE (Expose, Resize)
-            IF (EventInfo%WIN .EQ. 0) THEN
-              CALL Redraw()
-            END IF
+!U          CASE (Expose, Resize)
+!U            IF (EventInfo%WIN .EQ. 0) THEN
+!U              CALL Redraw()
+!U            END IF
           CASE (PushButton)
             SELECT CASE (EventInfo%VALUE1)
 !C>> JCC Add in new 'clear' button
@@ -264,6 +261,8 @@
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
+              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
               IPTYPE = 2
               RETURN
             CASE (IDCANCEL)
@@ -273,8 +272,6 @@
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
               IPTYPE = 2
-! JvdS We shouldn't just return to the Wizard: the whole Wizard must disappear.
-! That's not possible yet however.
               RETURN
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
@@ -311,7 +308,7 @@
                END IF
                IF (ilenf .NE. 0) THEN
                  NoData = .TRUE.
-                 CALL OpenHCVPIKTIC(SDIFile,NoData)
+                 CALL OpenHCVPIKTIC(SDIFile)
                  IF (NoData) THEN
                    CALL WMessageBox(OKOnly,ExclamationIcon, CommonOk,&
                                    "Could not read the pawley file "//SDIFile(:ilenf)//&
@@ -338,8 +335,8 @@
               ENDIF
               IF (ilenf .NE. 0) THEN
                 NoData = .TRUE.
-                CALL OpenHCVPIKTIC(SDIFile,NoData)
-                IF (NODATA) THEN
+                CALL OpenHCVPIKTIC(SDIFile)
+                IF (NoData) THEN
                   CALL ErrorMessage("Could not read the pawley file "//SDIFile(:ilenf)//CHAR(13)//"successfully")
                  END IF
                END IF
@@ -411,10 +408,10 @@
         CALL GetEvent
         SELECT CASE (EventType)
 !.. Interact with the main window and look at the Pawley refinement...
-          CASE (Expose, Resize)
-            IF (EventInfo%WIN .EQ. 0) THEN
-              CALL Redraw()
-            END IF
+!U          CASE (Expose, Resize)
+!U            IF (EventInfo%WIN .EQ. 0) THEN
+!U              CALL Redraw()
+!U            END IF
           CASE (MouseButDown)
             CALL Plot_Alter
           CASE (KeyDown)
@@ -574,10 +571,10 @@
         IYPos_IDD_SA_Input = WInfoDialog(7)
         CALL GetEvent
         SELECT CASE (EventType)
-          CASE (Expose, Resize)
-            IF (EventInfo%WIN .EQ. 0)  THEN
-              CALL ReDraw()
-            END IF
+!U          CASE (Expose, Resize)
+!U            IF (EventInfo%WIN .EQ. 0)  THEN
+!U              CALL ReDraw()
+!U            END IF
 !.. Interact with the main window and look at the Pawley refinement...
           CASE (MouseButDown)
             CALL Plot_Alter
@@ -706,7 +703,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE OPENHCVPIKTIC(SDIFile,NoData)
+      SUBROUTINE OPENHCVPIKTIC(SDIFile)
 !
 !C>> JCC Cell/Lattice declarations now in an include file
 
@@ -811,7 +808,7 @@
       GOTO 10 
  100  CONTINUE
         IF (GotDSLFile) CALL GETDSL(dslfile,LEN_TRIM(dslfile),idsl)
-      CALL Load_DashDataFiles(NoData)
+      CALL Load_DashDataFiles
 !C>>  enable the buttons,
       IF (.NOT. NoData) THEN
         IF (idsl .EQ. 0) THEN
@@ -827,14 +824,14 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Load_DashDataFiles(NoData)
+      SUBROUTINE Load_DashDataFiles
 
-      USE VARIABLES
       USE WINTERACTER
+      USE VARIABLES
 
       IMPLICIT NONE
 
-      LOGICAL NoData
+!O      LOGICAL NoData
       INTEGER klen
 
       INCLUDE 'GLBVAR.INC'
@@ -960,7 +957,7 @@
       common /zmlgot/ gotzmfile(maxfrg)
 !
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
+      INCLUDE 'lattice.inc'
       DOUBLE PRECISION dcel(6)
 
       DO I = 1, 6

@@ -114,7 +114,6 @@
       IPTYPE=2
       CALL Profile_Plot(IPTYPE)
 !
-      NoData=.false.
  999  Continue
       END SUBROUTINE Load_SA_PRO
 

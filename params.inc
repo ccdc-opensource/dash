@@ -117,7 +117,11 @@
 	INTEGER WWREFDIM
 	PARAMETER (WWREFDIM = 10000)
 
+! For use in common block ALLPEAKS
+       INTEGER MTPeak
+       PARAMETER (MTPeak=100)
+
 ! The Maximumn number of Child Windows allowed (determined by Winteracter)
 ! Used in common blocks SACHILDWINDOWS and CHISQDWINDOWSUSED
-	INTEGER MaxNumChildWin
-	PARAMETER (MaxNumChildWin = 20)
+      INTEGER MaxNumChildWin
+      PARAMETER (MaxNumChildWin = 20)
