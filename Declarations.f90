@@ -224,11 +224,13 @@
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              AllPkAreaVal
       REAL              PkProb
       INTEGER           IOrdTem
       INTEGER           IHPk
       COMMON /ALLPEAKS/ NTPeak,                                                  &
                         AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        AllPkAreaVal(MTPeak),                                    &
                         PkProb(MTPeak),                                          &
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
@@ -240,6 +242,7 @@
 ! NTPeak        = Total number of peaks
 ! AllPkPosVal   = position of the peak
 ! AllPkPosEsd   = estimated standard deviation of the peak
+! AllPkAreaVal  = Area of the peak
 ! PkProb        = probability that this peak position belongs to the reflection indices stored in IHPk
 ! IOrdTem       = list of pointers into AllPkPosVal ordered in ascending order
 !                 so: 
