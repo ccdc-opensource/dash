@@ -237,6 +237,9 @@
             CALL Handler
             GOTO 10
           ENDIF
+        CASE (IDD_Background_Fit)
+          CALL Background_Fit
+          GOTO 10
         CASE (IDD_Plot_Option_Dialog)
           CALL DealWithPlotOptionsWindow
           GOTO 10

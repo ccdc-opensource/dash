@@ -102,7 +102,7 @@
 ! JCC data to indicate whether we are coming out of peak-fitting mode
       LOGICAL Confirm ! Function
       REAL xpgdif, ypgdif
-      INTEGER ISTAT
+      INTEGER ISTAT, IBpass
       INTEGER DiffractionFileBrowse ! Function
 
 !   Branch depending on chosen menu item
@@ -115,7 +115,14 @@
         CASE (ID_import_xye_file)
           ISTAT = DiffractionFileBrowse()
         CASE (ID_Remove_Background)
-          CALL Background_Fit
+          CALL PushActiveWindowID
+          CALL WDialogSelect(IDD_Background_Fit)
+! Initialise the background
+          CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
+          CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
+          CALL Profile_Plot
+          CALL WDialogShow(-1,-1,0,SemiModeless)
+          CALL PopActiveWindowID
         CASE (ID_FILE_PRINT)
           IPTYPE = -IPTYPE
           CALL Profile_Plot

@@ -1,7 +1,3 @@
-!*==GENERATE_TICMARKS.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!
-!
-!
 !
 !*****************************************************************************
 !
@@ -23,11 +19,11 @@
 !..   Check the space group
 !
       IMPLICIT NONE
-!
+
       INCLUDE 'statlog.inc'
       INCLUDE 'Lattice.inc'
       INCLUDE 'GLBVAR.INC'
-!
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -37,14 +33,14 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-!
+
       INTEGER msymmin
       PARAMETER (msymmin=10)
       INTEGER nsymmin
       REAL symmin
       CHARACTER*20 symline
       COMMON /symgencmn/ nsymmin, symmin(4,4,msymmin), symline(msymmin)
-!
+
       CHARACTER*80 TemTicFile
       LOGICAL Check_TicMark_Data
       INTEGER I, isym, LenFil
@@ -101,9 +97,8 @@
       lenfil = 9
       TicRead = GETTIC(9,TemTicFile)
       IF (TicRead.EQ.1) CALL Profile_Plot
-!
+
       END SUBROUTINE GENERATE_TICMARKS
-!*==GENERATE_TICMARKS_CCSLCODE.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -118,13 +113,13 @@
       LOGICAL SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
      &                ICDN(26,9), IERR, IO10, SDREAD
-!
+
       COMMON /iounit/ lpt, iti, ito, iplo, luni, iout
-!
+
       INTEGER matsz
       CHARACTER*6 xxx
       CHARACTER*10 fname
-!
+
       fname = 'polyf'
       xxx = 'CN11LS'
       MATSZ = 100000
@@ -133,14 +128,13 @@
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
-!
+
       END SUBROUTINE GENERATE_TICMARKS_CCSLCODE
-!*==CHECK_TICMARK_DATA.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
       LOGICAL FUNCTION Check_TicMark_Data
-!
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -150,11 +144,14 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-!
+
       LOGICAL FnUnitCellOK ! Function
       LOGICAL FnWaveLengthOK ! Function
-!
+
       Check_TicMark_Data = (XPMAX-XPMIN).GT.0.1      ! Check that we have some data
       Check_TicMark_Data = Check_TicMark_Data .AND. FnUnitCellOK() .AND. FnWaveLengthOK()
-!
+
       END FUNCTION CHECK_TICMARK_DATA
+!
+!*****************************************************************************
+!

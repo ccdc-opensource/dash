@@ -408,7 +408,6 @@
       IXPos_IDD_Wizard = 0.1  * WInfoScreen(1)
       IYPos_IDD_Wizard = 0.06 * WInfoScreen(2)
       NTIC = 0
-      LBIN = 1
       CALL Init_PeakFitRanges
       MARKER_SIZE = 0.35
       CHAR_SIZE = 1.0
