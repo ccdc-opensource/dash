@@ -1,16 +1,17 @@
 !
 !*****************************************************************************
 !
-       SUBROUTINE check_license
-       USE WINTERACTER
-       USE DRUID_HEADER
-       USE VARIABLES
+      SUBROUTINE check_license
 
-       INTEGER valid_license
-       INTEGER Read_License_Valid
-       CHARACTER*2 Exp
-       CHARACTER*200 MessageStr
-       LOGICAL, EXTERNAL :: Confirm
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      INTEGER valid_license
+      INTEGER, EXTERNAL :: Read_License_Valid
+      CHARACTER*2 Exp
+      CHARACTER*200 MessageStr
+      LOGICAL, EXTERNAL :: Confirm
 
       valid_license = 0
       DO WHILE (valid_license .LE. 0) 
@@ -27,9 +28,9 @@
           MessageStr = MessageStr(1:LEN_TRIM(MessageStr))//CHAR(13)//&
                        "Would you like to enter a new license?"
           IF (Confirm(MessageStr)) THEN
-            CALL LicensePopup()
+            CALL LicensePopup
           ELSE
-            CALL WExit
+            CALL DoExit
           ENDIF
         ENDIF
       ENDDO
@@ -51,16 +52,16 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-      LOGICAL           :: INLOOP = .TRUE.
+      LOGICAL    :: INLOOP = .TRUE.
       INTEGER     Valid, ICode
       CHARACTER*MaxPathLength ClString
       TYPE (License_Info) Info
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER, EXTERNAL :: DateToday
 
       Info%Valid = 0
       CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogShow(-1,-1,0,SemiModeless)
-      CALL WDialogFieldState(ID_Enter_License,Enabled)
       CALL WMessageEnable(FieldChanged,Enabled)
       IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
         CALL WDialogFieldState(IDF_License_SiteCode,Enabled)
@@ -74,11 +75,9 @@
         SELECT CASE (EventType)
           CASE (PushButton)
             SELECT CASE(EventInfo%VALUE1)
-              CASE (ID_Licensing_Exit)
-                CALL DoExit()
-              CASE (IDCANCEL)
-                CALL WExit
-              CASE (ID_Enter_License)
+              CASE (IDCANCEL, ID_Licensing_Exit)
+                CALL DoExit
+              CASE (IDOK)
                 CALL WDialogGetString(IDF_License_String, CLString)
                 CALL Decode_License(CLString,Info)
                 IF (Info%Valid .LT. 0 ) THEN
@@ -92,9 +91,7 @@
                   Valid = License_Valid(Info)
                   IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
                     CALL WDialogGetInteger(IDF_License_SiteCode, ICode) 
-                    IF (Info%SerialNumber .NE. ICode) THEN
-                      Valid = -99
-                    ENDIF
+                    IF (Info%SerialNumber .NE. ICode) Valid = -99
                   ENDIF
                   IF (Valid .GT. 0) THEN
                     CALL Write_License_File(CLString)
@@ -123,18 +120,17 @@
             ENDIF
         END SELECT
       ENDDO
-      CALL WDialogSelect(IDD_License_Dialog)
-      CALL WDialogHide()
+   99 CALL WDialogSelect(IDD_License_Dialog)
+      CALL WDialogHide
 
       END SUBROUTINE LicensePopup
 !
 !*****************************************************************************
 !
-      SUBROUTINE decipher(v,w,k)
+      SUBROUTINE decipher(v,w)
 
-      INTEGER, INTENT (in   ) ::  v(2)
-      INTEGER, INTENT (  out) ::  w(2)
-      INTEGER, INTENT (in   ) ::  k(4)
+      INTEGER, INTENT (IN   ) :: v(2)
+      INTEGER, INTENT (  OUT) :: w(2)
 
       INTEGER y,  z
       INTEGER a, b, c, d
@@ -146,10 +142,10 @@
       n = 32
       y = v(1)
       z = v(2)
-      a = k(1)
-      b = k(2)
-      c = k(3)
-      d = k(4)
+      a = 2453
+      b = 1768
+      c = 4567
+      d = 1453
       DO WHILE (n .GT. 0)
         n = n - 1
         z = z - (ISHFT(y,4)) - IEOR(c,y) - IEOR(sum,ISHFT(y,-5)) - d
@@ -171,26 +167,22 @@
 
       CHARACTER*(*) LString
       TYPE (License_Info) Info
-      INTEGER v(2), w(2), k(4), cs
+      INTEGER v(2), w(2), cs
       INTEGER*2 tCheckSum
       EQUIVALENCE (tCheckSum,cs)
       INTEGER*2 checksum
 
-      k(1) = 2453
-      k(2) = 1768
-      k(3) = 4567
-      k(4) = 1453
       Info%Valid = 1
 ! JvdS Next lines very dirty: v is INTEGER*4, but their XOR is INTEGER*2. Not possible.
       READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
       cs = IEOR(v(1),v(2))
-      IF (tCheckSum .NE. checksum) GOTO 99
 ! Check the checksum
-      CALL decipher(v,w,k)
+      IF (tCheckSum .NE. checksum) GOTO 99
+      CALL decipher(v,w)
       Info%SerialNumber = w(1)
       Info%LicenseType  = w(2)/100000000
       Info%DateCode     = w(2) - Info%LicenseType*100000000
-      Info%Year         = Info%DateCode/10000
+      Info%Year         =  Info%DateCode/10000
       Info%Month        = (Info%DateCode - Info%Year*10000)/100
       Info%Day          = (Info%DateCode - Info%Year*10000 - Info%Month*100)
       IF (Info%LicenseType .EQ. SiteKey) Info%SerialNumber = Info%SerialNumber - 145789123 ! demangle into a site number
@@ -214,15 +206,16 @@
       Read_License_Valid = -2
       OPEN(UNIT=117,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'License.dat',STATUS='OLD',ERR=99)
       DO WHILE (Read_License_Valid .LE. 0)
-        READ(117,'(A)',err=99,END=99) line
+        READ(117,'(A)',ERR=99,END=99) line
         IF (line(1:1) .NE. '#') THEN
           CALL INextString(line,clstring)
           CALL Decode_License(CLString,Info)
           IF (Info%Valid) THEN
             Read_License_Valid = License_Valid(Info)
-          END IF
-        END IF
-      END DO
+            IF (Info%LicenseType .EQ. DemoKey) CALL ShowLicenceAgreement
+          ENDIF
+        ENDIF
+      ENDDO
 ! Have a decodable key ...
  99   CONTINUE
       CLOSE(117,iostat=dummy)
@@ -235,16 +228,14 @@
 
       USE VARIABLES
 
-      INTEGER      today, snum
-      INTEGER      Get_DashSerialNumber
-      CHARACTER*8  dt
-      TYPE(License_Info) Info
+      TYPE(License_Info)   Info
+
+      INTEGER, EXTERNAL :: DateToday
+      INTEGER              snum
+      INTEGER              Get_DashSerialNumber
 
 ! Check the date
-      License_Valid = 0
-      CALL DATE_AND_TIME(dt)
-      READ(dt,*,ERR=99) today
-      License_Valid = MAX(0, Info%DateCode - today)
+      License_Valid = MAX(0, Info%DateCode - DateToday())
 ! For node-locked licenses check the serial id. Site-Wide licenses just encode a serial id for our reference
 ! so if we catch any non-authorized users using the key, we know where it came from. Perhaps we may want to make
 ! the user key in this site code on installation for checking purposes.
@@ -252,7 +243,6 @@
         snum = Get_DashSerialNumber("C:\\"C)
         IF (snum .NE. Info%SerialNumber) License_Valid = -1
       ENDIF       
- 99   RETURN
 
       END FUNCTION License_Valid 
 !
@@ -286,12 +276,9 @@
         CASE DEFAULT
           GOTO 99
       END SELECT
-      OPEN(FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'License.dat', &
-           UNIT=IUN,&
-           STATUS='UNKNOWN',&
-           ERR=99)
-      WRITE(iun,'(A)',ERR=99)         "# License File for DASH"
-      WRITE(iun,'(A)',ERR=99)         "#"
+      OPEN(UNIT=IUN,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'License.dat',STATUS='UNKNOWN',ERR=99)
+      WRITE(iun,'(A)',ERR=99)     "# License File for DASH"
+      WRITE(iun,'(A)',ERR=99)     "#"
       WRITE(iun,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' license '
       IF      (Info%LicenseType .EQ. NodeKey) THEN
         WRITE(iun,'(A,z8)',ERR=99) '# Your DASH Serial ID for this machine is ',Info%SerialNumber
@@ -301,12 +288,12 @@
       IF (Info%Year .EQ. 9999) THEN
         WRITE(iun,'(A)',ERR=99)'# The license is non-expiring'
       ELSE
-        WRITE(iun,2,ERR=99)Info%Day, Months(Info%Month),Info%Year
-  2     FORMAT('# The license expires on ',i3,1x,A,1x,i4)
+        WRITE(iun,2,ERR=99)Info%Day, Months(Info%Month), Info%Year
+    2   FORMAT('# The license expires on ',I3,1X,A,1X,I4)
       ENDIF
       WRITE(iun,'(A)',ERR=99)"# License key follows :"
-      WRITE(iun,'(A)',ERR=99) LString
- 99   CONTINUE
+      WRITE(iun,'(A)',ERR=99) LString(1:LEN_TRIM(LString))
+   99 CONTINUE
       CLOSE(iun)
 
       END SUBROUTINE Write_License_File
@@ -327,32 +314,31 @@
       IFlags = SaveDialog + DirChange + AppendExt
       fstr = 'Text files|*.txt|All files|*.*|'
       fname = ' '
-! JvdS Added
       Idummy = 1
       CALL WSelectFile(fstr,IFlags,Fname,"Please enter a filename",Idummy)
       IF (Fname(1:1) .EQ. ' ') RETURN
       OPEN(unit = Iun, file = Fname(1:LEN_TRIM(Fname)),status = 'unknown',err=99)
       Sn = Get_DashSerialNumber("C:\\"C)
-      WRITE(Iun,'(A)',ERR=100)'This file is provided to submit requests for DASH licenses'
-      WRITE(Iun,'(A)',ERR=100)'A DASH evaluation  will allow you to run DASH on any PC'
-      WRITE(Iun,'(A)',ERR=100)'A site license will allow you to install DASH on any PC on your own site'
-      WRITE(Iun,'(A)',ERR=100)'Most licenses, however, are node-locked. For this, we use a unique identifier'
-      WRITE(Iun,'(A,z8)',ERR=100)'For this PC, this is ',Sn
+      WRITE(Iun,'(A)',ERR=100) 'This file is provided to submit requests for DASH licenses'
+      WRITE(Iun,'(A)',ERR=100) 'A DASH evaluation  will allow you to run DASH on any PC'
+      WRITE(Iun,'(A)',ERR=100) 'A site license will allow you to install DASH on any PC on your own site'
+      WRITE(Iun,'(A)',ERR=100) 'Most licenses, however, are node-locked. For this, we use a unique identifier'
+      WRITE(Iun,'(A,Z8)',ERR=100)'For this PC, this is ',Sn
       WRITE(Iun,*,ERR=100)
-      WRITE(Iun,'(A)',ERR=100)'Please complete as applicable:'
+      WRITE(Iun,'(A)',ERR=100) 'Please complete as applicable:'
       WRITE(Iun,*)
-      WRITE(Iun,'(A)',ERR=100)'I would like to evaluate/purchase DASH'
+      WRITE(Iun,'(A)',ERR=100) 'I would like to evaluate/purchase DASH'
       WRITE(Iun,*,ERR=100)
-      WRITE(Iun,'(A)',ERR=100)'I work in industry/an academic institution'
+      WRITE(Iun,'(A)',ERR=100) 'I work in industry/an academic institution'
       WRITE(Iun,*,ERR=100)
-      WRITE(Iun,'(A)',ERR=100)'Please enter your address here: '
+      WRITE(Iun,'(A)',ERR=100) 'Please enter your address here: '
       WRITE(Iun,*,ERR=100)
-      WRITE(Iun,'(A)',ERR=100)'Name: '
-      WRITE(Iun,'(A)',ERR=100)'Address: '
-      WRITE(Iun,'(A)',ERR=100)'         '
-      WRITE(Iun,'(A)',ERR=100)'         '
-      WRITE(Iun,'(A)',ERR=100)'         '
-      WRITE(Iun,'(A)',ERR=100)'You should send the completed contents of this file to software@ccdc.cam.ac.uk'
+      WRITE(Iun,'(A)',ERR=100) 'Name: '
+      WRITE(Iun,'(A)',ERR=100) 'Address: '
+      WRITE(Iun,'(A)',ERR=100) '         '
+      WRITE(Iun,'(A)',ERR=100) '         '
+      WRITE(Iun,'(A)',ERR=100) '         '
+      WRITE(Iun,'(A)',ERR=100) 'You should send the completed contents of this file to software@ccdc.cam.ac.uk'
       WRITE(Iun,*,ERR=100)
       CLOSE(iun,iostat=idummy)
       CALL WMessageBox(YesNo,InformationIcon,CommonYes,&
@@ -361,16 +347,15 @@
         "software@ccdc.cam.ac.uk"//CHAR(13)//CHAR(13)//&
         "Would you like to edit this file now?","Edit license request file")
       IF (WinfoDialog(4) .EQ. 1) THEN
-        CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,&
-          'Edit license request file'),IHan)
+        CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,'Edit license request file'),IHan)
         CALL WEditFile(Fname(1:LEN_TRIM(Fname)), Modal, 0, 0, SystemFixed)
       ENDIF
       RETURN
- 99   CONTINUE
+   99 CONTINUE
       CALL ErrorMessage("Sorry, could not open the file "//CHAR(13)//fname(1:LEN_TRIM(Fname)))
       CLOSE(iun,iostat=idummy)
       RETURN            
- 100  CONTINUE
+  100 CONTINUE
       CALL ErrorMessage("Sorry, could not write to the file "//CHAR(13)//fname(1:LEN_TRIM(Fname)))
       CLOSE(iun,iostat=idummy)      
 
@@ -394,21 +379,52 @@
       CHARACTER*50    Volume
 
       nSystemNameSize   = 100
-!     lpszSystemName      = lpszSystemName
       lpszSerialNumber    = 1
       ret = lstrcpy(lpszSystemName, "                               "C)
-      bRC = GetVolumeInformation(                                       &
-                           lpszdrivename,                              &
-                           Volume,                                     &
-                           50,                                         &
-                           LOC(lpszSerialNumber),                      &
-                           NULL,                                       &
-                           NULL,                                       &
-                           lpszSystemName,                             &
+      bRC = GetVolumeInformation(                            &
+                           lpszdrivename,                    &
+                           Volume,                           &
+                           50,                               &
+                           LOC(lpszSerialNumber),            &
+                           NULL,                             &
+                           NULL,                             &
+                           lpszSystemName,                   &
                            nSystemNameSize)
       Get_DashSerialNumber = IEOR(lpszSerialNumber,Mangler)
 
       END FUNCTION Get_DashSerialNumber
+!
+!*****************************************************************************
+!
+      SUBROUTINE ShowLicenceAgreement
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*5000 kString
+
+      kString = 'Your licence agreement here.'
+      CALL WDialogSelect(IDD_LicenceAgreement)
+      CALL WDialogPutString(IDF_Agreement,kString)
+      CALL WDialogShow(-1,-1,0,SemiModeless)
+      DO WHILE (.TRUE.)
+        CALL GetEvent
+        SELECT CASE (EventType)
+          CASE (PushButton) ! one of the buttons was pushed
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDCANCEL, ID_Licensing_Exit)
+                CALL DoExit
+              CASE (IDB_IAgree)
+                CALL WDialogHide
+                RETURN
+            END SELECT
+        END SELECT
+      ENDDO
+
+      END SUBROUTINE ShowLicenceAgreement
 !
 !*****************************************************************************
 !
