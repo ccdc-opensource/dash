@@ -472,7 +472,8 @@
 
       COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
      &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS), JOCCR(MPTS)
-      COMMON /CMN300/ ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK), KARGO(MAXPIK), KARGK(MAXPIK)
+! O      COMMON /CMN300/ ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK), KARGO(MAXPIK), KARGK(MAXPIK)
+      DIMENSION ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK), KARGO(MAXPIK), KARGK(MAXPIK)
 
       DATA WDCN03/'SIGM', 'GAMM', 'HPSL', 'HMSL'/
       DATA IWCN03/3, 3, 0, 3, 4, 0, 3, 5, 0, 3, 6, 0/
@@ -840,7 +841,7 @@
 ! When we arrive here, the limits of the peak were actually outside the powder pattern
         IIMIN = 1
  3544   DO II = IIMIN, IIMAX
-          KOUNT = KOUNT + 1
+          KOUNT = KOUNT + 1 ! IF (KOUNT .GT. MAXPIK) CALL DebugErrorMessage('KOUNT .GT. MAXPIK')
           KARGO(KOUNT) = II
           KARGK(KOUNT) = KNOW
           IOCCR(II) = IOCCR(II) + 1
@@ -878,7 +879,7 @@
                 DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKCONV(III,NPKD1)
               ENDDO
             ELSE
-          !    CALL DebugErrorMessage('(III.LE.512 .AND. III.GT.0) in forty.f90, III = '//Integer2String(III))
+              CALL DebugErrorMessage('(III.LE.512 .AND. III.GT.0) in forty.f90, III = '//Integer2String(III))
 ! JCC End of hack ...
             ENDIF
           ENDDO

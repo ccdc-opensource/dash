@@ -134,7 +134,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ViewZmatrix(ifrg)
+      SUBROUTINE ViewZmatrix(iFrg)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -144,7 +144,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: ifrg
+      INTEGER, INTENT (IN   ) :: iFrg
 
       INTEGER I
       CHARACTER(MaxPathLength) temp_file
@@ -157,22 +157,22 @@
       INTEGER NumOfFlexTorsions
       INTEGER tLength, BondNr
 
-      natcry = NATOMS(ifrg)
-      CALL MAKEXYZ_2(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART)
+      natcry = NATOMS(iFrg)
+      CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
 ! Conversion of asym to aelem : very dirty, but works
       DO I = 1, natcry
         axyzo(I,1) = SNGL(CART(1,I))
         axyzo(I,2) = SNGL(CART(2,I))
         axyzo(I,3) = SNGL(CART(3,I))
-        AtmElement(I)(1:2) = asym(I,ifrg)(1:2)
-        atomlabel(I) = OriginalLabel(I,ifrg)
+        AtmElement(I)(1:2) = asym(I,iFrg)(1:2)
+        atomlabel(I) = OriginalLabel(I,iFrg)
       ENDDO
       CALL AssignCSDElement(AtmElement)
-      nbocry = NumberOfBonds(ifrg)
+      nbocry = NumberOfBonds(iFrg)
       DO BondNr = 1, nbocry
-        btype(BondNr)  = BondType(BondNr,ifrg)
-        bond(BondNr,1) = Bonds(1,BondNr,ifrg)
-        bond(BondNr,2) = Bonds(2,BondNr,ifrg)
+        btype(BondNr)  = BondType(BondNr,iFrg)
+        bond(BondNr,1) = Bonds(1,BondNr,iFrg)
+        bond(BondNr,2) = Bonds(2,BondNr,iFrg)
       ENDDO
 ! Q & D hack to display flexible torsion angles in different colors by forcing different
 ! element types.
@@ -205,14 +205,14 @@
                 Element = 66 ! Phosphorus
             END SELECT
             aelem(atom) = Element
-            aelem(IZ1(atom,ifrg)) = Element
-            aelem(IZ2(atom,ifrg)) = Element
-            aelem(IZ3(atom,ifrg)) = Element
+            aelem(IZ1(atom,iFrg)) = Element
+            aelem(IZ2(atom,iFrg)) = Element
+            aelem(IZ3(atom,iFrg)) = Element
           ENDIF
         ENDDO
       ENDIF
-      tLength = LEN_TRIM(frag_file(ifrg))
-      temp_file = frag_file(ifrg)(1:tLength-8)//'_temp.mol2'
+      tLength = LEN_TRIM(frag_file(iFrg))
+      temp_file = frag_file(iFrg)(1:tLength-8)//'_temp.mol2'
 ! Show the mol2 file
       IF (WriteMol2(temp_file) .EQ. 1) CALL ViewStructure(temp_file)
       CALL IOSDeleteFile(temp_file)
