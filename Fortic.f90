@@ -24,8 +24,9 @@
       REAL ALSQ(MATSZ)
 
       CHARACTER*10 filnmr
+
+      CHARACTER*10    filnam_root
       COMMON /commun/ filnam_root
-      CHARACTER*10 filnam_root
       
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
@@ -61,10 +62,12 @@
 !*****************************************************************************
 !
       SUBROUTINE MAKRHM
+
 ! Makes a number of matrices to speed up the default calculation
 
+      USE REFVAR
 
-      INCLUDE 'SGinc\FFCALCTOP.INC'
+      IMPLICIT NONE
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -79,7 +82,7 @@
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 
       REAL            sctrh,            rhsto
-      COMMON /symsto/ sctrh(24,MFCSTO), rhsto(3,24,MFCSTO)
+      COMMON /symsto/ sctrh(24,MaxRef), rhsto(3,24,MaxRef)
 
       REAL H(3)
       INTEGER iR, ii, i
