@@ -310,6 +310,13 @@ SOURCE=.\Frac2cart.f90
 # End Source File
 # Begin Source File
 
+SOURCE=.\FWPROG.f90
+DEP_F90_FWPRO=\
+	".\params.inc"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\Generate_TicMarks.f90
 DEP_F90_GENER=\
 	".\GLBVAR.INC"\
@@ -337,7 +344,6 @@ DEP_F90_INIT_=\
 	".\params.inc"\
 	".\Release\DRUID_HEADER.mod"\
 	".\Release\PO_VAR.mod"\
-	".\Release\PRJVAR.mod"\
 	".\Release\SOLVAR.MOD"\
 	".\Release\ZMVAR.MOD"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -457,6 +463,7 @@ SOURCE=.\multipeak_fitter.f90
 DEP_F90_MULTIP=\
 	".\params.inc"\
 	".\Reflns.inc"\
+	".\Release\VARIABLES.mod"\
 	
 # End Source File
 # Begin Source File
