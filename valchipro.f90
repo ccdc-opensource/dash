@@ -73,7 +73,7 @@
         IF (CummChiSqd(i) .LT. 0.0) THEN
           CummChiSqd(i) = LastValue
         ELSE
-! Rescale cummulative profile chi-squared
+! Rescale cumulative profile chi-squared
           CummChiSqd(i) = CummChiSqd(i) * tScale
           LastValue = CummChiSqd(i)
         ENDIF
