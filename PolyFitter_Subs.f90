@@ -464,6 +464,7 @@
             ELSE
               NumPeakFitRange = NumPeakFitRange + 1
               RangeFitYN(NumPeakFitRange) = .FALSE.
+              CALL UpdateFitPeaksButtonState
 ! Ungrey 'Delete all peak fit ranges' button on toolbar
               CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
 ! Ungrey 'Clear Peaks' button in Wizard window
@@ -664,6 +665,8 @@
 ! Next peak
             IF (NTPeak .EQ. (NumInPFR(CurrentRange) + 1)) CALL INC(NumInPFR(CurrentRange))
             IF (NTPeak .LE. NumInPFR(CurrentRange)) THEN
+! Ungrey 'Fit Peaks' button on toolbar
+              CALL WMenuSetState(ID_FitPeaks,ItemEnabled,WintOn)
               ReplotNecessary        = .TRUE.
               IF (RangeFitYN(CurrentRange)) RecalculationNecessary = .TRUE.
 ! When we are here, we are either adding a peak or shifting an old one.
@@ -704,6 +707,7 @@
         CALL Upload_Widths
       ENDIF
       IF (ReplotNecessary) CALL Profile_Plot
+      CALL UpdateFitPeaksButtonState
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL CheckIfWeCanIndex
 
@@ -756,6 +760,51 @@
       ENDDO
 
       END SUBROUTINE DetermineCurrentPeakFitRange
+!
+!*****************************************************************************
+!
+      SUBROUTINE UpdateFitPeaksButtonState
+!
+! This routine determines whether the Fit Peaks button should be greyed out or not.
+! The button is ungreyed if at least one non-fitted peak fit range exists
+!
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
+      INTEGER I, iState
+
+      iState = WintOff
+      IF (NumPeakFitRange .NE. 0) THEN
+        DO I = 1, NumPeakFitRange
+          IF (.NOT. RangeFitYN(I)) iState = WintOn
+        ENDDO
+      ENDIF
+      CALL WMenuSetState(ID_FitPeaks,ItemEnabled,iState)
+
+      END SUBROUTINE UpdateFitPeaksButtonState
 !
 !*****************************************************************************
 !
