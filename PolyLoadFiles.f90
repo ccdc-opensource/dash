@@ -331,8 +331,8 @@
       CALL Clear_BackGround
       CALL GetProfileLimits
       IPTYPE = 1
-      CALL Profile_Plot
       NoData = .FALSE.
+      CALL Profile_Plot
       CALL ScrUpdateFileName
 !      CALL FourierPattern(1,1000)
 

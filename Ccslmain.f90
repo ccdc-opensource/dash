@@ -3150,16 +3150,18 @@
       GOTO 100
 ! TO CLEAR ALL FAMILY 2 VARIABLES TO BE FIXED:
       ENTRY F2VAR9
-      DO IR = 1, NATOM
+      DO IR = 1, 150
         DO I = 1, 3
           KX(I,IR) = 0
-        ENDDO
-        DO I = 1, 6
-          KATF(I,IR) = 0
         ENDDO
         KCMULT(IR) = 0
         KSITE(IR) = 0
         KTF(IR) = 0
+      ENDDO
+      DO IR = 1, 50
+        DO I = 1, 6
+          KATF(I,IR) = 0
+        ENDDO
       ENDDO
   100 RETURN
 
