@@ -284,8 +284,8 @@
 !N The function RADIAN(X) does the degrees to radians conversion.
 !N In routines where time matters, it is quicker to declare the COMMON
 !N /CONSTA/ and multiply X by DEG.
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 !
       DEGREE = DEG*X
       RETURN
@@ -642,8 +642,8 @@
 !
       DIMENSION TR(1024), TI(1024)
       EXTERNAL FFTADD
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /FFTDA / KJUMP, UR(15), UI(15)
 !
       GOTO (1,2), KJUMP
@@ -1163,11 +1163,11 @@
 !N In routines where time matters, it is quicker to declare the COMMON
 !N /CONSTA/ and multiply X by RAD.
 !
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
-!
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+
       RADIAN = RAD*X
-      RETURN
+
       END FUNCTION RADIAN
 !*==RCMPRD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
