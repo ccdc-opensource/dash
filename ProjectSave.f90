@@ -1,8 +1,143 @@
-! Subroutines concerned with saving the project file
+! Subroutines concerned with the project file
 !
 !*****************************************************************************
 !
-      SUBROUTINE PrjReadWrite(ReadOrWrite)
+      INTEGER FUNCTION PrjSaveAs
+
+! A wrapper around PrjSave to let the user choose the filename.
+!
+! RETURNS 0 for success
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE PRJVAR
+
+      IMPLICIT NONE      
+
+      CHARACTER(MaxPathLength) :: tFileName
+      CHARACTER(LEN=45) :: FILTER
+      INTEGER iFLAGS
+      INTEGER, EXTERNAL :: PrjSave
+      
+! Save the project file
+      PrjSaveAs = 1 ! Failure
+      iFLAGS = SaveDialog + AppendExt + PromptOn
+      FILTER = 'Project files (*.dash)|*.dash|'
+      tFileName = PrjFileName
+      CALL WSelectFile(FILTER,iFLAGS,tFileName,'Save project file')
+      IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
+        PrjSaveAs = PrjSave()
+      ENDIF
+
+      END FUNCTION PrjSaveAs
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION PrjSave
+!
+! If project file name exists, overwrite without warning.
+! If project file name blank, ask for a name.
+!
+! RETURNS 0 for success
+!
+      USE PRJVAR
+
+      IMPLICIT NONE
+
+      INTEGER, EXTERNAL :: PrjSaveAs
+
+      IF (LEN_TRIM(PrjFileName) .EQ. 0) THEN
+        PrjSave = PrjSaveAs()
+      ELSE
+        CALL PrjReadWrite(PrjFileName,cRead)
+        PrjSave = 0 ! Yeah, right
+      ENDIF
+
+      END FUNCTION PrjSave
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjFileBrowse
+!
+! This routine lets the user browse a directory for a project file.
+! If a valid file has been selected, it will be opened automatically.
+! Effectively, this routine is just a wrapper around the PrjFileOpen routine
+! such that it lets the user visually select a file first.
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE PRJVAR
+
+      IMPLICIT NONE
+
+      CHARACTER(LEN=60) FILTER
+      INTEGER           IFLAGS, iFType 
+      CHARACTER(LEN=MaxPathLength) tFileName
+
+      IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
+      FILTER = 'All files (*.*)|*.*|'//&
+               'DASH project files (*.dash)|*.dash|'
+      tFileName = ''
+! IFTYPE specifies which of the file types in the list is the default
+      iFType = 2
+      tFileName = PrjFileName
+      CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open DASH project file',iFType)
+! Did the user press cancel?
+      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
+! Note that up to this point, none of the global variables had changed. Baling out was no problem.
+! Try to open the file. This can be removed, of course, and relocated to places in the code where
+! the current subroutine is called.
+! Actually, that is how it works in practice under Windows (try 'Start' -> 'Run...' -> 'Browse...'
+! it will not actually open the file, just select it).
+      CALL PrjFileOpen(tFileName)
+
+      END SUBROUTINE PrjFileBrowse
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjFileOpen(ThePrjFile)
+!
+! This routine tries to open a project file.
+!
+! INPUT   : ThePrjFile = the project file name
+!
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: ThePrjFile
+
+      LOGICAL FExists
+      INTEGER iLen
+
+      iLen = LEN_TRIM(ThePrjFile)
+      IF (iLen .EQ. 0) RETURN
+      INQUIRE(FILE=ThePrjFile(1:iLen),EXIST=FExists)
+      IF (.NOT. FExists) THEN
+        CALL ErrorMessage("The file "//ThePrjFile(1:iLen)//" does not exist.")
+        RETURN
+      ENDIF
+      CALL PrjFileLoad(ThePrjFile) 
+      
+      END SUBROUTINE PrjFileOpen
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjFileLoad(ThePrjFile)
+
+      USE PRJVAR
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: ThePrjFile
+
+      CALL PrjReadWrite(ThePrjFile,cRead)
+
+      END SUBROUTINE PrjFileLoad
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjReadWrite(ThePrjFile,ReadOrWrite)
 !
 ! This subroutine saves the project file.
 !
@@ -14,7 +149,8 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: ReadOrWrite
+      CHARACTER*(*), INTENT (IN   ) :: ThePrjFile
+      INTEGER,       INTENT (IN   ) :: ReadOrWrite
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -29,10 +165,9 @@
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       REAL            BestValuesDoF
       COMMON /SOLCOM/ BestValuesDoF(1:mvar,1:MaxRun)
@@ -51,7 +186,9 @@
       REAL                                 WTSA
       COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
 
-      CHARACTER*MaxPathLength :: tFileName
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
       INTEGER I, j, tInteger, RW, tCurrentWizardWindow
       LOGICAL tLogical
       REAL    tReal
@@ -62,8 +199,7 @@
       iPrjReadOrWrite = ReadOrWrite
       RW = iPrjReadOrWrite
       hPrjFile = 10
-      tFileName = 'Example.dash'
-      OPEN(UNIT=hPrjFile,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=hPrjFile,FILE=ThePrjFile,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       iPrjRecNr = 1
 ! Read / Write Wizard Window
       IF (RW .EQ. cWrite) THEN
@@ -215,12 +351,13 @@
 ! Do we want the range and fixed yes/no per parameter as well?
 ! Read / Write solutions
 ! Read / Write number of solutions
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,SA_Run_Number)
-      IF (SA_Run_Number .NE. 0) THEN
-
-
-
-
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumOf_SA_Runs)
+      IF (NumOf_SA_Runs .NE. 0) THEN
+        DO I = 1, NumOf_SA_Runs
+          DO J = 1, nvar
+            CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BestValuesDoF(J,I))
+          ENDDO
+        ENDDO
       ENDIF
 
 
