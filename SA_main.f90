@@ -694,10 +694,8 @@
         atomlabel(I) = OriginalLabel(I,IFRG)
       ENDDO
       CALL AssignCSDElement(AtmElement)
-      I = WriteMol2(temp_file(1:LEN_TRIM(temp_file)))
-      IF (I .EQ. 0) GOTO 999
 ! Show the mol2 file
-      CALL ViewStructure(temp_file(1:LEN_TRIM(temp_file)))
+      IF (WriteMol2(temp_file(1:LEN_TRIM(temp_file))) .EQ. 1) CALL ViewStructure(temp_file(1:LEN_TRIM(temp_file)))
 ! Show the z-matrix file in an editor window
   999 CALL WindowOpenChild(IHANDLE)
       CALL WEditFile(frag_file(ifrg),Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
@@ -769,7 +767,7 @@
 
       DO I = 1, 6
         dcel(I) = DBLE(CellPar(I))
-      END DO
+      ENDDO
       CALL frac2cart(f2cmat,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL CREATE_FOB()
@@ -832,7 +830,7 @@
          CALL WGridStateCell(IDF_parameter_grid,3,i,Enabled)
          prevub(i) = ub(i)
          prevlb(i) = lb(i)
-      END DO
+      ENDDO
 
       END SUBROUTINE SA_Parameter_Set
 !
@@ -1063,7 +1061,7 @@
       Istart = 1
       DO I = 1, Ilen
         IF (FNAME(I:I) .EQ. DIRSPACER) Istart = I + 1
-      END DO
+      ENDDO
       CALL WCursorShape(CurHourGlass)
       CALL IOSCommand(CONVEXE(1:LEN_TRIM(CONVEXE))//' '//fmt(1:LEN_TRIM(fmt))//' "'//FNAME(Istart:Ilen)//'"',3)
       CALL WCursorShape(CurCrossHair)

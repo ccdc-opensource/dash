@@ -29,7 +29,6 @@
 !
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
 
-
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
 ! JCC Set the scale correctly. 
@@ -444,31 +443,31 @@
       NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
       XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
       IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-!
+ 
+      INTEGER IMOV
+      SAVE IMOV
+
+      REAL xgcurold
+      SAVE xgcurold
+
 ! Get ready to put up the big cursor
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
-      CALL WCursorShape(CurCrossHair)
+!      CALL WCursorShape(CurCrossHair)
       CALL IPgUnitsToGrUnits(xpgmin,ypgmin,gxmin,gymin)
       CALL IPgUnitsToGrUnits(xpgmax,ypgmax,gxmax,gymax)
-!
-      gxav=0.5*(gxmax+gxmin)
-      gyav=0.5*(gymax+gymin)
-      gxwd=0.001*(gxmax-gxmin)
-      gywd=0.001*(gymax-gymin)
-
       xgcur(1) = EventInfo%GX
       ygcur(1) = EventInfo%GY
       CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
       XCurFirst = xcur(1)
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
-!
 ! The first WMessage loop is solely concerned with determining the range
 ! over which we will fit the Bragg peak(s) so we will only check out
 ! Expose,Resize, MouseMove, MouseButUp and a very limited number of
 ! KeyDown options at this first stage
       IMOV = 0
+      xgcurold = xgcur(1)
       DO WHILE (.TRUE.)
         CALL GetEvent
           xgcur(2) = EventInfo%GX
@@ -479,84 +478,85 @@
               CALL Check_KeyDown_PeakFit_Inner
             CASE (MouseButDown)
               imov=0
+              xgcurold = xgcur(2)
             CASE (MouseMove)
 ! Set up the cross-hairs for peak finding
-                  imov=imov+1
-                  if (imov.eq.1) then
+                  imov = imov + 1
+                  IF (imov.EQ.1) THEN
 ! Draw cross-hair
                     CALL IGrColourN(KolNumLargeCrossHair)
                     CALL IGrFillPattern(Hatched,Medium,DiagUp)
                     CALL IGrRectangle(xgcur(1),gymin,xgcur(2),gymax)
                     CALL IGrFillPattern(Outline,Medium,DiagUp)
-                  else
+                  ELSE
 ! Remove old cross-hair
-                    if (imov.eq.2) then
-                      call profile_plot(IPTYPE)
+                    IF (imov.EQ.2) THEN
+                      CALL profile_plot(IPTYPE)
                       CALL IGrPlotMode('EOR')
-                    else
+                    ELSE
                       CALL IGrFillPattern(Hatched,Medium,DiagUp)
                       CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
                       CALL IGrFillPattern(Outline,Medium,DiagUp)
-                    endif
+                    ENDIF
 ! Paint new cross-hair
                     CALL IGrColourN(KolNumLargeCrossHair)
                     CALL IGrFillPattern(Hatched,Medium,DiagUp)
                     CALL IGrRectangle(xgcur(1),gymin,xgcur(2),gymax)
                     CALL IGrFillPattern(Outline,Medium,DiagUp)
-                  END IF
+                  ENDIF
                   xgcurold=xgcur(2)
                   CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.3)')
                 IF (ypgmax-ypgmin.le.100.) THEN
                   CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.3)')
                 ELSE
                   CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.1)')
-                END IF
-                DO ISB=2,3
+                ENDIF
+                DO ISB = 2, 3
                   CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-                END DO 
+                ENDDO 
             CASE (MouseButUp)
 ! MouseButUp action for selecting the peak fitting region
 ! Remove old cross-hair
-                CALL IGrFillPattern(Hatched,Medium,DiagUp)
-                CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
-                CALL IGrFillPattern(Outline,Medium,DiagUp)
-                XPFR1=MIN(xcur(1),xcur(2))
-                XPFR2=MAX(xcur(1),xcur(2))
+              CALL IGrFillPattern(Hatched,Medium,DiagUp)
+              CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
+              CALL IGrFillPattern(Outline,Medium,DiagUp)
+              XPFR1 = MIN(xcur(1),xcur(2))
+              XPFR2 = MAX(xcur(1),xcur(2))
 ! Determine peak fitting range
-                IPFL1=1
-                DO ii=1,nbin
-                  IF (xbin(ii).ge.XPFR1) THEN
-                    IPFL1=ii
-                    GOTO 55
-                  END IF
-                END DO
- 55             IPFL2=nbin
-                DO ii=nbin,1,-1
-                  IF (xbin(ii).le.XPFR2) THEN
-                    IPFL2=ii
-                    GOTO 60
-                  END IF
-                END DO
- 60             CONTINUE
-                IPFRANGE=1+IPFL2-IPFL1
-             IF (IPFRANGE .LT. 15) THEN
-               CALL ErrorMessage('Not enough points for peak fitting!'//CHAR(13)//'Try a larger range.')
-               CALL IGrPlotMode(' ')
-             ELSE
-                NumPeakFitRange=NumPeakFitRange+1
-                XPF_Range(1,NumPeakFitRange)=XPFR1
-                XPF_Range(2,NumPeakFitRange)=XPFR2
-                IPF_Lo(NumPeakFitRange)=IPFL1
-                IPF_Hi(NumPeakFitRange)=IPFL2
-                IPF_Range(NumPeakFitRange)=1+IPF_Hi(NumPeakFitRange)-IPF_Lo(NumPeakFitRange)
+              IPFL1 = 1
+              DO ii = 1, NBIN
+                IF (XBIN(ii).GE.XPFR1) THEN
+                  IPFL1 = ii
+                  GOTO 55
+                ENDIF
+              ENDDO
+ 55           IPFL2 = NBIN
+              DO ii = NBIN, 1, -1
+                IF (XBIN(ii).LE.XPFR2) THEN
+                  IPFL2 = ii
+                  GOTO 60
+                ENDIF
+              ENDDO
+ 60           CONTINUE
+              IPFRANGE = 1 + IPFL2 - IPFL1
+           IF (IPFRANGE .LT. 15) THEN
+             CALL ErrorMessage('Not enough points for peak fitting!'//CHAR(13)//'Try a larger range.')
+             CALL IGrPlotMode(' ')
+           ELSE
+              NumPeakFitRange = NumPeakFitRange + 1
+              XPF_Range(1,NumPeakFitRange) = XPFR1
+              XPF_Range(2,NumPeakFitRange) = XPFR2
+              IPF_Lo(NumPeakFitRange) = IPFL1
+              IPF_Hi(NumPeakFitRange) = IPFL2
+              IPF_Range(NumPeakFitRange)=1+IPF_Hi(NumPeakFitRange)-IPF_Lo(NumPeakFitRange)
 ! Now we have the range in terms of the profile point index
-                CALL IGrPlotMode(' ')
-                DO ISB=2,3
-                  statbarstr(isb)='          '
-                  CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-                END DO                
-                CALL Profile_Plot(IPTYPE)
-              END IF
+              CALL IGrPlotMode(' ')
+              DO ISB = 2, 3
+                statbarstr(isb)='          '
+                CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
+              ENDDO                
+              CALL Profile_Plot(IPTYPE)
+            ENDIF
             RETURN 
         END SELECT
       END DO 
@@ -669,7 +669,7 @@
             END DO
             KR=0
             NumPeakFitRange=NumPeakFitRange-1
-            If (NumPeakFitRange.gt.0) then
+            IF (NumPeakFitRange.GT.0) THEN
               DO II=1,NumPeakFitRange
                 KK=II
                 XPF_Range(1,II)=XXFTEM(1,KK)
@@ -702,7 +702,7 @@
             II=NumPeakFitRange+1
             NumInPFR(II)=0
             IPF_RPt(II)=KR
-!>> JCC Next line to zero the deleted range value completely
+! JCC Next line to zero the deleted range value completely
             IPF_RPt(II+1)=0 
             XPF_Range(1,II)=-9999.0 
             XPF_Range(2,II)=-9999.0
@@ -828,7 +828,7 @@
       INTEGER I, NPeaksFitted
 
       IF ( Check_TicMark_Data() ) THEN
-!>> JCC Track the number of fittable peaks
+! JCC Track the number of fittable peaks
         NPeaksFitted = 0
         DO I = 1, NumPeakFitRange
           NPeaksFitted = NPeaksFitted + NumInPFR(I)
