@@ -196,43 +196,62 @@
 
       INTEGER, INTENT (IN   ) :: iFrg
 
-      INTEGER iAtomNr, iBondNr
-
       CALL WDialogSelect(IDD_zmEdit)
       CurrentlyEditedFrag = iFrg
 ! Make temporary copy
-      frag_file(0) = frag_file(iFrg)
-      icomflg(0)   = icomflg(iFrg)
-      natoms(0)    = natoms(iFrg)
-      DO iAtomNr = 1, natoms(iFrg)
-        ioptb(iAtomNr,0)         = ioptb(iAtomNr,iFrg)
-        iopta(iAtomNr,0)         = iopta(iAtomNr,iFrg)
-        ioptt(iAtomNr,0)         = ioptt(iAtomNr,iFrg)
-        iz1(iAtomNr,0)           = iz1(iAtomNr,iFrg)
-        iz2(iAtomNr,0)           = iz2(iAtomNr,iFrg)
-        iz3(iAtomNr,0)           = iz3(iAtomNr,iFrg)
-        blen(iAtomNr,0)          = blen(iAtomNr,iFrg)
-        alph(iAtomNr,0)          = alph(iAtomNr,iFrg)
-        bet(iAtomNr,0)           = bet(iAtomNr,iFrg)
-        asym(iAtomNr,0)          = asym(iAtomNr,iFrg)
-        OriginalLabel(iAtomNr,0) = OriginalLabel(iAtomNr,iFrg)
-        tiso(iAtomNr,0)          = tiso(iAtomNr,iFrg)
-        occ(iAtomNr,0)           = occ(iAtomNr,iFrg)
-        izmoid(iAtomNr,0)        = izmoid(iAtomNr,iFrg)
-        izmbid(iAtomNr,0)        = izmbid(iAtomNr,iFrg)
-      ENDDO
-      NumberOfBonds(0) = NumberOfBonds(iFrg)
-      IF (NumberOfBonds(iFrg) .GT. 0) THEN
-        DO iBondNr = 1, NumberOfBonds(iFrg)
-          BondType(iBondNr,0) = BondType(iBondNr,iFrg)
-          Bonds(1,iBondNr,0)  = Bonds(1,iBondNr,iFrg)
-          Bonds(2,iBondNr,0)  = Bonds(2,iBondNr,iFrg)
-        ENDDO
-      ENDIF
+      CALL zmCopy(iFrg,0)
       CALL zmCopyTemp2Dialog
+      CALL WDialogPutRadioButton(IDF_OrderOrig)
+      CurrentOrderOption = 1
+      CALL WDialogFieldState(IDF_DelLatAtm,Disabled)
       CALL WDialogShow(-1,-1,0,SemiModeLess)
 
       END SUBROUTINE ShowEditZMatrixWindow
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmCopy(iFrg1,iFrg2)
+
+! Copies Z-matrix 1 to Z-matrix 2
+
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iFrg1, iFrg2
+
+      INTEGER iAtomNr, iBondNr
+
+      frag_file(iFrg2) = frag_file(iFrg1)
+      icomflg(iFrg2)   = icomflg(iFrg1)
+      natoms(iFrg2)    = natoms(iFrg1)
+      DO iAtomNr = 1, natoms(iFrg1)
+        ioptb(iAtomNr,iFrg2)         = ioptb(iAtomNr,iFrg1)
+        iopta(iAtomNr,iFrg2)         = iopta(iAtomNr,iFrg1)
+        ioptt(iAtomNr,iFrg2)         = ioptt(iAtomNr,iFrg1)
+        iz1(iAtomNr,iFrg2)           = iz1(iAtomNr,iFrg1)
+        iz2(iAtomNr,iFrg2)           = iz2(iAtomNr,iFrg1)
+        iz3(iAtomNr,iFrg2)           = iz3(iAtomNr,iFrg1)
+        blen(iAtomNr,iFrg2)          = blen(iAtomNr,iFrg1)
+        alph(iAtomNr,iFrg2)          = alph(iAtomNr,iFrg1)
+        bet(iAtomNr,iFrg2)           = bet(iAtomNr,iFrg1)
+        asym(iAtomNr,iFrg2)          = asym(iAtomNr,iFrg1)
+        OriginalLabel(iAtomNr,iFrg2) = OriginalLabel(iAtomNr,iFrg1)
+        tiso(iAtomNr,iFrg2)          = tiso(iAtomNr,iFrg1)
+        occ(iAtomNr,iFrg2)           = occ(iAtomNr,iFrg1)
+        izmoid(iAtomNr,iFrg2)        = izmoid(iAtomNr,iFrg1)
+        izmbid(iAtomNr,iFrg2)        = izmbid(iAtomNr,iFrg1)
+      ENDDO
+      NumberOfBonds(iFrg2) = NumberOfBonds(iFrg1)
+      IF (NumberOfBonds(iFrg1) .GT. 0) THEN
+        DO iBondNr = 1, NumberOfBonds(iFrg1)
+          BondType(iBondNr,iFrg2) = BondType(iBondNr,iFrg1)
+          Bonds(1,iBondNr,iFrg2)  = Bonds(1,iBondNr,iFrg1)
+          Bonds(2,iBondNr,iFrg2)  = Bonds(2,iBondNr,iFrg1)
+        ENDDO
+      ENDIF
+
+      END SUBROUTINE zmCopy
 !
 !*****************************************************************************
 !
@@ -245,36 +264,151 @@
 
       IMPLICIT NONE      
 
-      INTEGER iFrg
+      INTEGER iFrg, iOption, iColumn, iAtomNr, iDummy, iBondNr
+      REAL    tReal
+      LOGICAL ThisOne
+      INTEGER, EXTERNAL :: zmSaveAs
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
-      iFrg = CurrentlyEditedFrag
+      iFrg = 0
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
+            CASE (IDB_Set)
+              CALL WDialogGetMenu(IDF_UisoOccMenu,iOption)
+              SELECT CASE (iOption)
+                CASE (1)
+                  iColumn = 3 ! Uiso
+                CASE (2)
+                  iColumn = 4 ! Occupancies
+              END SELECT
+              CALL WDialogGetReal(IDF_UisoOccValue,tReal)
+! Check its value
+              
+              CALL WDialogGetMenu(IDF_WhichAtomMenu,iOption)
+              DO iAtomNr = 1, natoms(iFrg)
+! Uiso / occupancies
+                SELECT CASE (iOption)
+                  CASE (1) ! All atoms
+                    ThisOne = .TRUE.
+                  CASE (2) ! All non-hydrogens
+                    ThisOne = (asym(izmbid(iAtomNr,iFrg),iFrg) .NE. 'H  ')
+                  CASE (3) ! All hydrogens
+                    ThisOne = (asym(izmbid(iAtomNr,iFrg),iFrg) .EQ. 'H  ')
+                END SELECT
+                IF (ThisOne) CALL WGridPutCellReal(IDF_AtomPropGrid,iColumn,iAtomNr,tReal,'(F5.3)')
+              ENDDO
+              CALL zmCopyDialog2Temp
             CASE (IDB_Relabel)
               CALL zmCopyDialog2Temp
               CALL zmRelabel(0)
               CALL zmCopyTemp2Dialog
+            CASE (IDB_ReOrder)
+              CALL zmCopyDialog2Temp
+              CALL zmReOrder(0)
+              CALL zmCopyTemp2Dialog
+              CALL WDialogPutRadioButton(IDF_OrderOrig)
+              CALL WDialogFieldState(IDF_DelLatAtm,Disabled)
             CASE (IDOK)
+              CALL zmCopyDialog2Temp
+              CALL zmCopy(0,CurrentlyEditedFrag)
               CALL WDialogHide()
             CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide()
+            CASE (IDBSAVE)
+              CALL zmCopyDialog2Temp
+              CALL zmSave(iFrg)
             CASE (IDB_SaveAs)
+              CALL zmCopyDialog2Temp
+              iDummy = zmSaveAs(0)
+            CASE (IDF_DelLatAtm)
+! Remove any bonds this atom was involved in
+              IF (NumberOfBonds(iFrg) .GT. 0) THEN
+                DO iBondNr = 1, NumberOfBonds(iFrg)
+                  IF ((Bonds(1,iBondNr,iFrg) .EQ. natoms(iFrg)) .OR. (Bonds(2,iBondNr,iFrg) .EQ. natoms(iFrg))) THEN
+! If this is not the last bond in the list, then replace it with the last bond in the list
+                    IF (iBondNr .LT. NumberOfBonds(iFrg)) THEN                   
+                      BondType(iBondNr,iFrg) = BondType(NumberOfBonds(iFrg),iFrg)
+                      Bonds(1,iBondNr,iFrg)  = Bonds(1,NumberOfBonds(iFrg),iFrg)
+                      Bonds(2,iBondNr,iFrg)  = Bonds(2,NumberOfBonds(iFrg),iFrg)
+                    ENDIF
+                    NumberOfBonds(iFrg) = NumberOfBonds(iFrg) - 1
+                  ENDIF
+                ENDDO
+              ENDIF
+! If this was the pivot atom, use centre of mass
+              IF (icomflg(iFrg) .EQ. natoms(iFrg)) icomflg(iFrg) = 0 
+              IF (natoms(iFrg) .NE. 0) THEN
+                CALL WGridSetCell(IDF_AtomPropGrid,1,1)
+                natoms(iFrg) = natoms(iFrg) - 1
+              ENDIF
+              IF (natoms(iFrg) .NE. 0) THEN
+! The last atom in the Z-matrix corresponds to a random atom in the original ordering.
+! It is now very likely that we have ended up with one of the atoms having an 'orignal ID' that
+! is greater than the current number of atoms. This would give boundary overflows.
+! We can retain the original order (minus one atom) but that involves subtracting 1
+! from atom IDs following the one we have deleted
+                DO iAtomNr = 1, natoms(iFrg)
+                  IF (izmoid(iAtomNr,iFrg) .GT. izmoid(natoms(iFrg)+1,iFrg)) izmoid(iAtomNr,iFrg) = izmoid(iAtomNr,iFrg) - 1
+                  izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the backward mapping
+                ENDDO
+              ENDIF
+              CALL zmCopyTemp2Dialog
             CASE (IDB_View)
               CALL zmCopyDialog2Temp
               CALL ViewZmatrix(0)
+            CASE (IDB_Rotations)
+              CALL WDialogSelect(IDD_zmEditRotations)
+              CALL WDialogShow(-1,-1,0,SemiModeLess)
           END SELECT
-!O        CASE (FieldChanged)
-!O          SELECT CASE (EventInfo%VALUE1)
-!O            CASE (IDF_RotationsGrid)
-!O            CASE (IDF_Use_PO)
-!O          END SELECT ! EventInfo%Value1 Field Changed Options
+        CASE (FieldChanged)
+          CALL WDialogGetRadioButton(IDF_OrderOrig,iOption)
+          IF (iOption .NE. CurrentOrderOption) THEN
+            SELECT CASE (iOption)
+              CASE (1) ! Original
+                CurrentOrderOption = 1
+                CALL WDialogFieldState(IDF_DelLatAtm,Disabled)
+              CASE (2) ! Z-matrix
+                CurrentOrderOption = 2
+                IF (natoms(iFrg) .NE. 0) CALL WDialogFieldState(IDF_DelLatAtm,Enabled)
+            END SELECT
+            CALL zmCopyTemp2Dialog
+          ENDIF
       END SELECT
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithEditZMatrixWindow
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithEditZMatrixRotationsWindow
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      CHARACTER(LEN=MaxPathLength) SDIFile
+      INTEGER      IFlags
+
+      INTEGER iFrg
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_zmEditRotations)
+      SELECT CASE (EventType)
+        CASE (PushButton)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDOK, IDCANCEL)
+              CALL WDialogHide()
+          END SELECT
+        CASE (FieldChanged)
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithEditZMatrixRotationsWindow
 !
 !*****************************************************************************
 !
@@ -292,23 +426,27 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
       iFrg = 0
-! Show filename
+! filename
       CALL WDialogPutString(IDF_FileName,frag_file(iFrg))
 ! Fill grid with atom properties
 ! Set number of rows
       CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
       DO iAtomNr = 1, natoms(iFrg)
-        iOrig = izmbid(iAtomNr,iFrg)
+        IF (CurrentOrderOption .EQ. 2) THEN
+          iOrig = iAtomNr
+        ELSE
+          iOrig = izmbid(iAtomNr,iFrg)
+        ENDIF
 ! Show the number of the atom in the zeroth column
         WRITE(RowLabelStr,'(I3)') iAtomNr
         CALL WGridLabelRow(IDF_AtomPropGrid,iAtomNr,RowLabelStr)
-! Show atom labels
+! atom labels
         CALL WGridPutCellString(IDF_AtomPropGrid,1,iAtomNr,OriginalLabel(iOrig,iFrg))
-! Show atom elements
+! atom elements
         CALL WGridPutCellString(IDF_AtomPropGrid,2,iAtomNr,asym(iOrig,iFrg))
-! Show Uiso
+! Uiso
         CALL WGridPutCellReal(IDF_AtomPropGrid,3,iAtomNr,tiso(iOrig,iFrg),'(F5.3)')
-! Show occupancies
+! occupancies
         CALL WGridPutCellReal(IDF_AtomPropGrid,4,iAtomNr,occ(iOrig,iFrg),'(F5.3)')
       ENDDO
       CALL PopActiveWindowID
@@ -330,20 +468,24 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
       iFrg = 0
-! Show filename
+! filename
       CALL WDialogGetString(IDF_FileName,frag_file(iFrg))
 ! Fill grid with atom properties
 !U! Set number of rows
 !U      CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
       DO iAtomNr = 1, natoms(iFrg)
-        iOrig = izmbid(iAtomNr,iFrg)
-! Show atom labels
+        IF (CurrentOrderOption .EQ. 2) THEN
+          iOrig = iAtomNr
+        ELSE
+          iOrig = izmbid(iAtomNr,iFrg)
+        ENDIF
+! atom labels
         CALL WGridGetCellString(IDF_AtomPropGrid,1,iAtomNr,OriginalLabel(iOrig,iFrg))
-! Show atom elements
+! atom elements
         CALL WGridGetCellString(IDF_AtomPropGrid,2,iAtomNr,asym(iOrig,iFrg))
-! Show Uiso
+! Uiso
         CALL WGridGetCellReal(IDF_AtomPropGrid,3,iAtomNr,tiso(iOrig,iFrg))
-! Show occupancies
+! occupancies
         CALL WGridGetCellReal(IDF_AtomPropGrid,4,iAtomNr,occ(iOrig,iFrg))
       ENDDO
       CALL PopActiveWindowID
@@ -368,7 +510,11 @@
       CHARACTER*3 LastNumberSoFarStr
 
       DO iAtomNr = 1, natoms(iFrg)
-        iOrig = izmoid(iAtomNr,iFrg)
+        IF (CurrentOrderOption .EQ. 2) THEN
+          iOrig = iAtomNr
+        ELSE
+          iOrig = izmoid(iAtomNr,iFrg)
+        ENDIF
         WRITE(LastNumberSoFarStr,'(I3)') iOrig
 ! Left-justify this string: " 12" => "12 "
         CALL StrClean(LastNumberSoFarStr,iLen)
@@ -377,6 +523,139 @@
       ENDDO
 
       END SUBROUTINE zmRelabel
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmReOrder(iFrg)
+
+! This routine re-orders atoms in the temporary Z-matrix (iFrg = 0)
+! The new order is: Carbons first, rest in alphabetical order, Hydrogens last
+! Extremely simple implementation: keep swapping two entries until no more swaps
+
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER, INTENT (IN   ) :: iFrg
+
+      INTEGER iAtomNr
+      INTEGER iTem
+      LOGICAL Swaps, ShouldBeSwapped
+
+      Swaps = .TRUE. ! Stupid initialisation to emulate 'REPEAT ... UNTIL' in restricted FORTRAN syntax.
+      DO WHILE (Swaps)
+        Swaps = .FALSE.
+        DO iAtomNr = 1, natoms(iFrg)-1
+! Compare entry to next
+! Never swap if same
+          IF ((asym(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. asym(izmbid(iAtomNr+1,iFrg),iFrg))) THEN
+            ShouldBeSwapped = .FALSE.
+! Otherwise, never swap if first is Carbon or second is Hydrogen
+          ELSE IF ((asym(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. 'C  ') .OR. (asym(izmbid(iAtomNr+1,iFrg),iFrg) .EQ. 'H  ')) THEN
+            ShouldBeSwapped = .FALSE.
+! Otherwise, always swap if second is Carbon or first is Hydrogen
+          ELSE IF ((asym(izmbid(iAtomNr+1,iFrg),iFrg) .EQ. 'C  ') .OR. (asym(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. 'H  ')) THEN
+            ShouldBeSwapped = .TRUE.
+! Otherwise, swap if first > second
+          ELSE IF ((asym(izmbid(iAtomNr  ,iFrg),iFrg) .GT. asym(izmbid(iAtomNr+1,iFrg),iFrg))) THEN
+            ShouldBeSwapped = .TRUE.
+          ELSE
+            ShouldBeSwapped = .FALSE.
+          ENDIF
+          IF (ShouldBeSwapped) THEN
+            iTem                   = izmbid(iAtomNr  ,iFrg)
+            izmbid(iAtomNr  ,iFrg) = izmbid(iAtomNr+1,iFrg)
+            izmbid(iAtomNr+1,iFrg) = iTem
+            Swaps = .TRUE.
+          ENDIF
+        ENDDO
+      ENDDO
+      DO iAtomNr = 1, natoms(iFrg)
+        izmoid(izmbid(iAtomNr,iFrg),iFrg) = iAtomNr ! the backward mapping
+      ENDDO
+
+      END SUBROUTINE zmReOrder
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION zmSaveAs(iFrg)
+
+! This routine saves Z-matrix number iFrg
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER, INTENT (IN   ) :: iFrg
+
+      CHARACTER(MaxPathLength) :: zmFileName
+      CHARACTER(LEN=45) :: FILTER
+      INTEGER iFLAGS
+      INTEGER, EXTERNAL :: zmSave
+      
+! Save the Z-matrix
+      zmSaveAs = 1 ! Failure
+      iFLAGS = SaveDialog + AppendExt + PromptOn
+      FILTER = 'Z-matrix files (*.zmatrix)|*.zmatrix|'
+      zmFileName = frag_file(iFrg)
+      CALL WSelectFile(FILTER,iFLAGS,zmFileName,'Save Z-matrix')
+      IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(zmFileName) .NE. 0)) THEN
+        frag_file(iFrg) = zmFileName
+        zmSaveAs = zmSave(iFrg)
+      ENDIF
+
+      END FUNCTION zmSaveAs
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION zmSave(iFrg)
+
+! This routine saves Z-matrix number iFrg
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER, INTENT (IN   ) :: iFrg
+
+      INTEGER tFileHandle, i
+      
+! Save the Z-matrix
+      zmSave = 1 ! Failure
+      tFileHandle = 19
+      OPEN (UNIT=tFileHandle,FILE=frag_file(iFrg),ERR=999)
+! First line is a title
+      WRITE (tFileHandle,'(A)',ERR=999) 'Z-matrix generated by '//ProgramVersion
+! Second line contains unit cell parameters
+!1.0 1.0 1.0 90.0 90.0 90.0
+! These are never used, so just write dummy values.
+      WRITE (tFileHandle,'(A)',ERR=999) '1.0 1.0 1.0 90.0 90.0 90.0'
+! Third line contains number of atoms and an integer IAT, defining the centre for the rotations.
+! IAT = 0        : use centre of mass
+! IAT = non-zero : use atom nr. IAT   (necessary if atom on special position).
+!  59   0
+      WRITE (tFileHandle,'(1X,I3,1X,I3)',ERR=999) natoms(iFrg), icomflg(iFrg)
+! Remaining lines contain the Z-matrix
+!  C      1.5152617  0  113.2370014  0 -179.8250018  0   54   51   48  3.0  1.0   58 C6 C7 C8 C9
+      DO i = 1, natoms(iFrg)
+        WRITE (tFileHandle,'(2X,A3,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5)',ERR=999)  Asym(i,iFrg), &
+              blen(i,iFrg), ioptb(i,iFrg), alph(i,iFrg), iopta(i,iFrg), bet(i,iFrg), ioptt(i,iFrg), &
+              iz1(i,iFrg), iz2(i,iFrg), iz3(i,iFrg),   &
+              tiso(i,iFrg), occ(i,iFrg), izmoid(i,iFrg), OriginalLabel(i,iFrg)
+
+      ENDDO
+      CLOSE(tFileHandle,ERR=999)
+      zmSave = 0 ! Success
+      RETURN
+  999 CALL ErrorMessage('Error while saving Z-matrix file.')
+
+      END FUNCTION zmSave
 !
 !*****************************************************************************
 !
