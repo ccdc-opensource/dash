@@ -18,7 +18,7 @@
           ChrLowerCase = lc(POS:POS)
           RETURN
         ENDIF
-      END DO
+      ENDDO
 
       END FUNCTION ChrLowerCase
 !
@@ -41,7 +41,7 @@
           ChrUpperCase = UC(POS:POS)
           RETURN
         ENDIF
-      END DO
+      ENDDO
 
       END FUNCTION ChrUpperCase
 !
@@ -58,7 +58,7 @@
 
       DO I = 1, LEN_TRIM(TheString)
         TheString(I:I) = ChrUpperCase(TheString(I:I))
-      END DO
+      ENDDO
 
       END SUBROUTINE StrUpperCase
 !
@@ -115,14 +115,14 @@
 ! Skip spaces
         DO WHILE ((POS .LE. StrLen) .AND. ((TheString(POS:POS) .EQ. ' ') .OR. (TheString(POS:POS) .EQ. CHAR(9))))
           POS = POS + 1
-        END DO
+        ENDDO
 ! If we hit a non-space: it's a column
         IF ((POS .LE. StrLen) .AND. ((TheString(POS:POS) .NE. ' ') .AND. (TheString(POS:POS) .NE. CHAR(9)))) tNumOfColumns = tNumOfColumns + 1
 ! Scan past rest of column (find next space / end of string)
         DO WHILE ((POS .LE. StrLen) .AND. ((TheString(POS:POS) .NE. ' ') .AND. (TheString(POS:POS) .NE. CHAR(9))))
           POS = POS + 1
-        END DO
-      END DO
+        ENDDO
+      ENDDO
       GetNumOfColumns = tNumOfColumns
 
       END FUNCTION GetNumOfColumns
