@@ -11,7 +11,7 @@
        USE DRUID_HEADER
 
        INCLUDE 'Lattice.inc'
-       INCLUDE 'GLBVAR.INC' ! Contains ALambda
+       INCLUDE 'GLBVAR.INC'
 
        CHARACTER*(*) FileName
        CHARACTER*128 line
@@ -148,6 +148,7 @@
 !C Error if we get here
   999 Ierr = 1
       CLOSE(77,IOSTAT=IDUM)
+
       END SUBROUTINE GETDSL
 !
 !*****************************************************************************
@@ -159,7 +160,7 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
-      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+      INCLUDE 'GLBVAR.INC'
 
       CHARACTER*(*) FileName
       INTEGER       LenFn, Idum, nl

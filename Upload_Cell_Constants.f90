@@ -181,13 +181,12 @@
       INCLUDE 'lattice.inc'
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
-      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+      INCLUDE 'GLBVAR.INC'
 
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
       PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
       IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)
 
-!U      COMMON /AASVAL/ AAS(6),AASLO(6),AASHI(6)
       INTEGER IASS(6)
       LOGICAL NOCREF
 
@@ -249,16 +248,6 @@
       CALL InverseMatrix(GREAL,GREC,3)
       XDD(1) = ZeroPoint
       DXDD(1) = 0.01*ABS(zeropoint)+0.001
-!U      DO I = 1, 3
-!U        AAS(I) = GREC(I,I)
-!U      END DO
-!U      AAS(4) = GREC(1,2)
-!U      AAS(5) = GREC(1,3)
-!U      AAS(6) = GREC(2,3)
-!U      DO I = 1, 6
-!U        AASLO(I) = 0.9*AAS(I)
-!U        AASHI(I) = 1.1*AAS(I)
-!U      END DO
       DO I = 1, 6
         IASS(I) = 0
       END DO
@@ -271,75 +260,54 @@
         IASS(6) = IASS(6) + (IHLR(2,I) * IHLR(3,I))**2
       END DO
       XDD(2)=GREC(1,1)
-      IF (LatBrav .EQ. 1) THEN
-! Triclinic
-        XDD(3) = GREC(2,2) 
-        XDD(4) = GREC(3,3)
-        XDD(5) = GREC(1,2)
-        XDD(6) = GREC(1,3)
-        XDD(7) = GREC(2,3)
-        NOCREF = .FALSE.
-        DO I = 1, 6
-          NOCREF = NOCREF .OR. (IASS(I) .EQ. 0)
-        END DO
-!C>> JCC And here
-      ELSE IF (LatBrav .EQ. 2) THEN
-! Monoclinic (a-axis)
-        XDD(3)=GREC(2,2) 
-        XDD(4)=GREC(3,3)
-        XDD(5)=GREC(2,3)
-        NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(6).EQ.0)
-!C>> JCC And here
-      Else If (LatBrav.eq.3) Then
-! Monoclinic (b-axis)
-        XDD(3)=GREC(2,2) 
-        XDD(4)=GREC(3,3)
-        XDD(5)=GREC(1,3)
-        NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(5).EQ.0)
-!C>> JCC And here
-      Else If (LatBrav.eq.4) Then
-! Monoclinic (c-axis)
-        XDD(3)=GREC(2,2) 
-        XDD(4)=GREC(3,3)
-        XDD(5)=GREC(1,2)
-        NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(4).EQ.0)
-!C>> JCC And here
-      Else If (LatBrav.eq.5) Then
-! Orthorhombic
-        XDD(3)=GREC(2,2) 
-        XDD(4)=GREC(3,3)
-        NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0)
-!C>> JCC And here
-      Else If (LatBrav.eq.6) Then
-! Tetragonal
-        XDD(3)=GREC(3,3)
-        NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
-!C>> JCC And here
-      Else If (LatBrav.eq.7) Then
-! Trigonal
-        XDD(3)=GREC(3,3)
-        NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
-!C>> JCC And here
-      Else If (LatBrav.eq.8) Then
-! Rhombohedral
-        XDD(2)=GREC(1,1)
-        XDD(3)=GREC(1,2)
-        NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0).AND.(IASS(3).EQ.0)) & 
+      SELECT CASE (LatBrav)
+        CASE ( 1) ! Triclinic
+          XDD(3) = GREC(2,2) 
+          XDD(4) = GREC(3,3)
+          XDD(5) = GREC(1,2)
+          XDD(6) = GREC(1,3)
+          XDD(7) = GREC(2,3)
+          NOCREF = .FALSE.
+          DO I = 1, 6
+            NOCREF = NOCREF .OR. (IASS(I) .EQ. 0)
+          END DO
+        CASE ( 2) ! Monoclinic a
+          XDD(3)=GREC(2,2) 
+          XDD(4)=GREC(3,3)
+          XDD(5)=GREC(2,3)
+          NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(6).EQ.0)
+        CASE ( 3) ! Monoclinic b
+          XDD(3)=GREC(2,2) 
+          XDD(4)=GREC(3,3)
+          XDD(5)=GREC(1,3)
+          NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(5).EQ.0)
+        CASE ( 4) ! Monoclinic c
+          XDD(3)=GREC(2,2) 
+          XDD(4)=GREC(3,3)
+          XDD(5)=GREC(1,2)
+          NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(4).EQ.0)
+        CASE ( 5) ! Orthorhombic
+          XDD(3)=GREC(2,2) 
+          XDD(4)=GREC(3,3)
+          NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0)
+        CASE ( 6) ! Tetragonal
+          XDD(3)=GREC(3,3)
+          NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
+        CASE ( 7) ! Trigonal
+          XDD(3)=GREC(3,3)
+          NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
+        CASE ( 8) ! Rhombohedral
+          XDD(2)=GREC(1,1)
+          XDD(3)=GREC(1,2)
+          NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0).AND.(IASS(3).EQ.0)) & 
                .OR. ((IASS(4).EQ.0).AND.(IASS(5).EQ.0).AND.(IASS(6).EQ.0))
-!C>> JCC And here
-      Else If (LatBrav.eq.9) Then
-! Hexagonal
-        XDD(3)=GREC(3,3)
-        NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
-!C>> JCC And here
-      Else If (LatBrav.eq.10) Then
-! Cubic
-      End If
+        CASE ( 9) ! Hexagonal
+          XDD(3)=GREC(3,3)
+          NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
+        CASE (10) ! Cubic
+      END SELECT
       IF (NoCRef) RETURN
       IF (NVal .LE. NDD) RETURN
-!
-!>> JCC Does this fix the rhombohedral problem?
-!      MAXDD=0.
       DDMAX=0.
       DO I=2,NDD
         DDMAX = MAX(DDMAX,1.e-4*ABS(XDD(I)))
@@ -391,78 +359,56 @@
       INCLUDE 'lattice.inc'
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
-!U      COMMON /AASVAL/ AAS(6),AASLO(6),AASHI(6)
-
       ChiGetLattice = 0.0
-      zp=p(1)
-      p4=0.
-      p5=0.
-      p6=0.
-!C>> JCC Changed to correct settings of LatBrav
-      If (LatBrav.eq.1) Then
-! Triclinic
-        p1=p(2)
-        p2=p(3)
-        p3=p(4)
-        p4=p(5)
-        p5=p(6)
-        p6=p(7)
-      Else If (LatBrav.eq.2) Then
-! Monoclinic - a axis unique
-        p1=p(2)
-        p2=p(3)
-        p3=p(4)
-        p6=p(5)
-      Else If (LatBrav.eq.3) Then
-! Monoclinic - b axis unique
-        p1=p(2)
-        p2=p(3)
-        p3=p(4)
-        p5=p(5)
-      Else If (LatBrav.eq.4) Then
-! Monoclinic - c axis unique
-        p1=p(2)
-        p2=p(3)
-        p3=p(4)
-        p4=p(5)
-      Else If (LatBrav.eq.5) Then
-! Orthorhombic
-        p1=p(2)
-        p2=p(3)
-        p3=p(4)
-      Else If (LatBrav.eq.6) Then
-! Tetragonal
-        p1=p(2)
-        p2=p(2)
-        p3=p(3)
-      Else If (LatBrav.eq.7) Then
-! Trigonal
-        p1=p(2)
-        p2=p(2)
-        p3=p(3)
-!>> JCC Wrong parameter extracted        p6=0.5*p(2)
-        p4=0.5*p(2)
-      Else If (LatBrav.eq.8) Then
-! Rhombohedral
-        p1=p(2)
-        p2=p(2)
-        p3=p(2)
-        p4=p(3)
-        p5=p(3)
-        p6=p(3)
-      Else If (LatBrav.eq.9) Then
-! Hexagonal
-        p1=p(2)
-        p2=p(2)
-        p3=p(3)
-        p4=0.5*p(2)
-!>> JCC Wrong parameter extracted        p6=0.5*p(2)
-      Else If (LatBrav.eq.10) Then
-! Cubic
-        p1=p(2)
-        p2=p(2)
-        p3=p(2)
-      End If
+! Zero point
+      zp = p(1)
+! Assume cubic
+!
+! p1, p2 and p3 are the dot products aa, bb and cc
+! setting them to the same value means: a = b = c
+      p1=p(2)
+      p2=p(2)
+      p3=p(2)
+! p4, p5 and p6 are the dot products ab, ac and ab
+! setting them to zero means: angle is 90.0
+      p4 = 0.0
+      p5 = 0.0
+      p6 = 0.0
+! Correct values if not cubic
+      SELECT CASE (LatBrav)
+        CASE ( 1) ! Triclinic
+          p2=p(3)
+          p3=p(4)
+          p4=p(5)
+          p5=p(6)
+          p6=p(7)
+        CASE ( 2) ! Monoclinic a
+          p2=p(3)
+          p3=p(4)
+          p6=p(5)
+        CASE ( 3) ! Monoclinic b
+          p2=p(3)
+          p3=p(4)
+          p5=p(5)
+        CASE ( 4) ! Monoclinic c
+          p2=p(3)
+          p3=p(4)
+          p4=p(5)
+        CASE ( 5) ! Orthorhombic
+          p2=p(3)
+          p3=p(4)
+        CASE ( 6) ! Tetragonal
+          p3=p(3)
+        CASE ( 7, 9) ! Trigonal / Hexagonal
+          p3=p(3)
+          p4=0.5*p(2)
+        CASE ( 8) ! Rhombohedral
+          p4=p(3)
+          p5=p(3)
+          p6=p(3)
+        CASE (10) ! Cubic
+      END SELECT
+
 !
 !      p1=min(aashi(1),p1)
 !      p1=max(aaslo(1),p1)
