@@ -5,7 +5,10 @@
       COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),                &
      & TF(150),KTF(150),SITE(150),KSITE(150),                           &
      & ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
-      COMMON /FCSTOR/ MAXK,FOB(150,MFCSTO)
+
+      INTEGER         MAXK
+      REAL                  FOB
+      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
 
       INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF
