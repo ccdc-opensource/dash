@@ -113,6 +113,7 @@
       XMIN = X(1)
       XMAX = X(NPT)
       XDIF = XMAX - XMIN
+      XDELT = XDIF / (FLOAT(NPT)-1.0)
       V(1) = Y(1)
       V(2) = (Y(NPT)-Y(1))/XDIF
       YMXB = V(1) + V(2)*(X(IMAX)-X(1))
@@ -147,7 +148,7 @@
         YB = V(1) + V(2)*(X(I)-X(1))
         TOTAREA = TOTAREA + Y(I) - YB
       ENDDO
-      XDELT = X(IMAX) - X(IMAX-1)
+!O      XDELT = X(IMAX) - X(IMAX-1)
       TOTAREA = TOTAREA*XDELT
       YHSUM = 0.
       DO IP = 1, NPEAK
