@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 21/Apr/2004 16:48:45
+// Modified : 22/Apr/2004 10:11:01
 //
 ///////////////////////////////////////////////////
 //
@@ -3124,7 +3124,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1363     5     60   162 \n"
+" 1363     5     99   162 \n"
 "  100 \n"
 "[Colours] \n"
 "[Lengths] \n"
