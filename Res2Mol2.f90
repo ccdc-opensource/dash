@@ -358,7 +358,7 @@
       USE SAMVAR
 
       INTEGER maxelm
-      PARAMETER (maxelm=108)
+      PARAMETER (maxelm=109)
 
       CHARACTER*2 AtmElement(MAXATM_2)
   
@@ -374,7 +374,7 @@
            'PR','PT','PU','RA','RB','RE','RH','RN','RU','S ','SB','SC', &
            'SE','SI','SM','SN','SR','TA','TB','TC','TE','TH','TI','TL', &
            'TM','U ','V ','W ','X ','XE','Y ','YB','Z ','ZN','ZR','ZZ', &
-           'ME'/
+           'ME','DU'/
 
       INTEGER I, J
       LOGICAL FOUND
