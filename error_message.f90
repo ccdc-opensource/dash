@@ -5,6 +5,7 @@
 !
 ! Checks if the maximum number of reflections has been exceeded
 !
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -35,49 +36,26 @@
       SAVE    routine_called
       DATA    routine_called / .FALSE. /
 
-      INTEGER iorda(10)
-      REAL    ardif(10) ! Difference
-      REAL    aadd ! Add
-      REAL    arrt ! Relative: holds the d-spacing of the previous reflections
-      REAL    armx
-      INTEGER II
-
-      aadd = 0.0
-      IF (maxk .GT. 360) THEN
-! We've too many reflections ... must reduce
+      NumOfRef = maxk
+      IF (NumOfRef .GT. 350) THEN
+        NumOfRef = 350
         IF (.NOT. routine_called) THEN
           CALL InfoMessage('DASH has a maximum limit of 350 reflections.'//CHAR(13)//&
                            'Only the 350 lowest angle reflections will be indexed and used.')
           routine_called = .TRUE.
         ENDIF
-        know = 350   ! know is a global variable used by PCXX
-        CALL PCXX(2) ! Changes argk
-        arrt = argk
-! Search for the maximum difference in 2 theta between two reflections between reflections 350 and 360
-        DO II = 1, 10
-          know = 350 + II ! know is a global variable
-          CALL PCXX(2)
-          ardif(II) = argk - arrt ! argk is a global variable
-          arrt = argk
-        ENDDO
-        CALL SORT_REAL(ardif,iorda,10)
-        maxk = 349 + iorda(10)
-        aadd = ardif(iorda(10))
       ENDIF
-      know = maxk
+      NumOfRef = MIN(NumOfRef,350)
+      know = NumOfRef
 ! Calculate peak centre of know in argk, and its derivatives
-      CALL pcxx(2)
-! argk already contains the peak position of the very very last reflection
-! We are adding aadd in order to extend the profile as far as possible including the whole peak.
-      armx = argk + aadd
-      II = 1
-      DO WHILE ((XBIN(II) .LT. armx) .AND. (II .LT. MOBS))
-        II = II + 1
+      CALL PCXX(2)
+! argk now contains the peak position of the last reflection
+      NPTS = 1
+      DO WHILE ((XBIN(NPTS) .LT. argk) .AND. (NPTS .LT. MOBS))
+        CALL INC(NPTS) ! NPTS is the number of points used for Pawley refinement.
       ENDDO
-      NPTS = II ! NPTS is the number of points used for Pawley refinement.
-!      NBIN = II
-!      CALL GetProfileLimits
-      argmax(1) = armx
+      argmax(1) = argk
+      maxk = NumOfRef
 
       END SUBROUTINE CHKMAXREF
 !
