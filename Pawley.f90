@@ -378,8 +378,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
       
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       INTEGER          NTIC
       INTEGER                IH

@@ -220,6 +220,7 @@
               ENDIF
               GOTO 10
             CASE (KeyDown)
+              IF (MseBtnPressed) GOTO 10
               CALL Check_KeyDown
               CALL Check_KeyDown_PeakFit_Inner
               GOTO 10

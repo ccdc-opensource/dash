@@ -176,8 +176,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
 
@@ -226,8 +226,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       REAL YGGMIN, YGGMAX
 
@@ -304,8 +304,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
       INTEGER I
@@ -379,8 +379,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       REAL YDIF(MOBS), YADD
       LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
@@ -465,8 +465,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN

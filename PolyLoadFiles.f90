@@ -97,7 +97,7 @@
 ! Note that FNAME is a global variable
       INTEGER    ISTAT
       INTEGER    DiffractionFileLoad ! Function
-      LOGICAL    Confirm ! Function
+!      LOGICAL    Confirm ! Function
       REAL       tMaxResolution
       REAL       TwoTheta2dSpacing, dSpacing2TwoTheta ! Function
       LOGICAL    FnWavelengthOK ! Function
@@ -194,8 +194,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       INTEGER          NTIC
       INTEGER                IH
@@ -1246,12 +1246,12 @@
       CHARACTER*255 Cline
       INTEGER       I, IS, FLEN ! Length of TheFileName
       LOGICAL       ReadWarning
-      REAL          WavelengthOf ! Function
+!      REAL          WavelengthOf ! Function
       REAL          FnWavelengthOfMenuOption ! Function
       INTEGER       GetNumOfColumns ! Function
       REAL          Lambda1
-      LOGICAL       OK
-      INTEGER       IRadSelection
+!      LOGICAL       OK
+!      INTEGER       IRadSelection
 
 ! Initialise to failure
       Load_xye_File = 0
@@ -1483,8 +1483,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       INTEGER I
  
@@ -1507,8 +1507,6 @@
       YPGMAXOLD = YPMAX
       IPMIN = 1
       IPMAX = NBIN
-      IPMINOLD = IPMIN
-      IPMAXOLD = IPMAX
 
       END SUBROUTINE GetProfileLimits
 !

@@ -1063,6 +1063,8 @@
 
       IMPLICIT NONE
 
+      LOGICAL, EXTERNAL :: Confirm
+
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page10)
       SELECT CASE (EventType)
@@ -1075,7 +1077,7 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDF_ClearPeakFitRanges)
-              CALL Init_PeakFitRanges
+              IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Init_PeakFitRanges
           END SELECT
       END SELECT
       CALL PopActiveWindowID
