@@ -1064,6 +1064,7 @@
                                    'of these formats. DASH will create separate z-matrix files for'//CHAR(13)//&
                                    'each chemical residue present in the first entry in the file.'//CHAR(13)//&
                                    'In multiple entry files the first entry will be read only.'
+      INTEGER CSSR2Mol2 ! Function
 
       CALL WMessageBox(OKCancel, InformationIcon, CommonOK, Info, "Create Z-matrix")
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
@@ -1072,7 +1073,9 @@
                   "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl|"//&
                   "Protein DataBank files (*.pdb)|*.pdb|"//&
                   "Mol2 files (*.mol2, *.ml2)|*.mol2;*.ml2|"//&
-                  "mdl mol files|*.mol;*.mdl|"
+                  "mdl mol files|*.mol;*.mdl|"//&
+                  "cssr files|*.cssr|"
+
       ISEL = 2
       FNAME = ' '
       CALL WSelectFile(FilterStr, IFLAGS, FNAME,"Select a file for conversion",ISEL)
@@ -1090,6 +1093,11 @@
       EXT4 = FNAME(POS+1:Ilen)
       CALL ILowerCase(EXT4)
       SELECT CASE (EXT4)
+        CASE ('cssr')
+          ISTAT = CSSR2Mol2(FNAME)
+          IF (ISTAT .NE. 1) RETURN
+          FNAME = 'Temp.mol2'
+          fmt = '-mol2'
         CASE ('pdb ')
           fmt = '-pdb'
         CASE ('mol2','ml2 ')
