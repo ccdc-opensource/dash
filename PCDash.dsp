@@ -57,7 +57,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 version.lib kernel32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 winter.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"D:\cvsDASH\dash\Debug\DASH.exe" /libpath:"c:\wint\lib.vf"
+# ADD LINK32 winter.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"Debug\DASH.exe" /libpath:"c:\wint\lib.vf"
 # SUBTRACT LINK32 /profile
 
 !ELSEIF  "$(CFG)" == "PCDash - Win32 Debug"
@@ -499,6 +499,7 @@ DEP_F90_PAWLEY=\
 
 SOURCE=.\PCDash_Main.f90
 DEP_F90_PCDAS=\
+	".\Debug\DICVAR.mod"\
 	".\Debug\PRJVAR.mod"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -721,6 +722,7 @@ DEP_F90_SA_OU=\
 SOURCE=.\SA_refresh.f90
 DEP_F90_SA_RE=\
 	".\DRUID_HEADER.mod"\
+	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -798,6 +800,7 @@ DEP_F90_SA_SUM=\
 
 SOURCE=.\samabo.f90
 DEP_F90_SAMAB=\
+	".\Debug\ATMVAR.mod"\
 	".\Debug\SAMVAR.MOD"\
 	
 # End Source File
