@@ -55,9 +55,6 @@
                       KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      DOUBLE PRECISION x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
-
       EXTERNAL DealWithProfilePlot
       INTEGER  I, iHandle, TheRunNr
       REAL     rDummy
@@ -84,8 +81,7 @@
       ENDDO
 ! Fill Preferred Orientation part
       IF (PrefParExists) THEN
-        X(iPrfPar) = BestValuesDoF(iPrfPar,TheRunNr)
-        CALL PO_PRECFC
+        CALL PO_PRECFC(SNGL(BestValuesDoF(iPrfPar,TheRunNr)))
       ENDIF
 ! VALCHI fills BICALC
       CALL VALCHI(rDummy,0)    ! Structural part

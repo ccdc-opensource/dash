@@ -120,7 +120,6 @@
       INTEGER Last_NUP, Last_NDOWN
       CHARACTER*3 CNruns,CMruns
       LOGICAL PrevRejected, CurrIsPO, PrevWasPO
-      DOUBLE PRECISION tX147
 
       LOGICAL OutOfBounds
       REAL xtem, tempupper, templower, tempupper2, templower2
@@ -238,7 +237,7 @@
       ENDDO
       nmpert = nt * ns * NPAR ! Number of Moves per Temperature
 ! Evaluate the function with input X and return value as F.
-      IF (PrefParExists) CALL PO_PRECFC
+      IF (PrefParExists) CALL PO_PRECFC(SNGL(X(iPrfPar)))
       CALL FCN(X,F,0)
       DO II = 1, NATOM
         DO III = 1, 3
@@ -415,19 +414,17 @@
             CurrIsPO = (kzmpar2(H) .EQ. 7)
             IF (PrefParExists) THEN
 ! Evaluate the function with the trial point XP and return as FP.
-              tX147 = X(iPrfPar)
-              X(iPrfPar) = XP(iPrfPar) 
               IF (PrevRejected) THEN
                 IF (PrevWasPO) THEN
                   IF (CurrIsPO) THEN
                     CALL FCN(XP,FP,iPrfPar)
                   ELSE
-                    CALL PO_PRECFC
+                    CALL PO_PRECFC(SNGL(XP(iPrfPar)))
                     CALL FCN(XP,FP,0)
                   ENDIF
                 ELSE
                   IF (CurrIsPO) THEN
-                    CALL PO_PRECFC
+                    CALL PO_PRECFC(SNGL(XP(iPrfPar)))
                     CALL FCN(XP,FP,0)
                   ELSE
                     CALL FCN(XP,FP,0)
@@ -436,7 +433,6 @@
               ELSE
                 CALL FCN(XP,FP,H)
               ENDIF
-              X(iPrfPar) = tX147
             ELSE
               CALL FCN(XP,FP,0)
             ENDIF

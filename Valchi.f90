@@ -17,6 +17,9 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
 
+      DOUBLE PRECISION xpar,       lb,       ub,       vm
+      COMMON /values/  xpar(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+
       INTEGER         KKOR
       REAL                  WTIJ
       INTEGER                             IKKOR,         JKKOR
@@ -265,7 +268,7 @@
 ! If we are here, the parameter that has been changed didn't affect the fractional co-ordinates.
 ! In the current set-up, that means that it must have been the preferred orientation.
 ! So: recalculate the preferred orientation correction factors.
-        CALL PO_PRECFC
+        CALL PO_PRECFC(SNGL(xpar(iPrfPar)))
       ENDIF
 ! AICALC(1:NumOfRef) now contains the structural part of the calculated intensities
 ! XICALC(1:NumOfRef) now contains the preferred orientation part of the calculated intensities
@@ -417,26 +420,23 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PO_PRECFC
+      SUBROUTINE PO_PRECFC(PrfPar)
 !
 ! Pre-calculates the Preferred Orientation part of the intensities
 ! I.e., this routine fills XICALC
 ! March-Dollase correction for Preferred Orientation
+! PrfPar = value of the extent of the preferred orientation
 !
       USE PO_VAR
       USE REFVAR
       
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-
-      DOUBLE PRECISION x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL, INTENT (IN   ) :: PrfPar
 
       INTEGER iR, i
-      REAL    PrfPar, prfcor, csqa, ssqa
+      REAL    prfcor, csqa, ssqa
 
-      PrfPar = SNGL(X(iPrfPar)) ! current value of the extent of the preferred orientation
       DO iR = 1, NumOfRef
         prfcor = 0.0
         DO i = 1, iHMUL(iR)
