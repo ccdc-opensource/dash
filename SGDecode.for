@@ -276,7 +276,7 @@ C	END SELECT
 	  if ( kk .eq.-1) then
 	    stem(ipt+1:ipt+2)='-z'
 	    ipt=ipt+2
-	  else if (  kk .eq. 1.) then
+	  else if (  kk .eq. 1) then
 	    if (ipt.eq.0) then
 	      stem(ipt+1:ipt+1)='z'
 	      ipt=ipt+1
