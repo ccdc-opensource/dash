@@ -40,7 +40,7 @@
       INTEGER MVAR
       PARAMETER (mvar=100)
 !!can't call first common block member x
-      DOUBLE PRECISION xx,lb,ub,vm,xpreset
+      DOUBLE PRECISION xx,lb,ub,vm
       COMMON /values/ xx(mvar),lb(mvar),ub(mvar),vm(mvar)
 
 !
@@ -92,7 +92,26 @@
       COMMON/symops/SOSign, SONumber, SOAxis
        
       EXTERNAL ErrorMessage
-   
+
+!        
+!--------- Check to see if align algorithm should be applied-----------
+! For now, if the space group is trigonal or hexagonal does not attempt alignment.  Space
+! group decoding currently does not handle x-y type instructions       
+      IF ((NumberSGTable.ge.430).and.(NumberSGTable.le.488)) THEN
+       RETURN
+      END IF       
+! If number of zmatrices greater than 1, do not align
+      IF (nfrag.gt.1) THEN
+        RETURN
+      ENDIF
+! Check if any x,y,z coords have been fixed or upper and lower bounds changed from defaults.
+! If they have then do not align
+      DO j = 1,3
+        IF ((lb(j).ne.0.0000).or.(ub(j).ne.1.000)) THEN
+        RETURN
+        ENDIF
+      END DO
+!--------- End of Checks ----------
 
       OPEN(220,file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'SGSymbandShift.txt',status='old', err = 10)
       DO j = 1,(NumberSGTable-1)
@@ -105,25 +124,6 @@
           Shift(j) = ShiftString(((j*5)-4):(j*5))
         END DO 
       CLOSE(220)
-!        
-!--------- Check to see if align algorithm should be applied-----------
-! For now, if the space group is trigonal or hexagonal does not attempt alignment.  Space
-! group decoding currently does not handle x-y type instructions       
-      IF ((NumberSGTable.ge.430).and.(NumberSGTable.le.488)) THEN
-       RETURN
-      END IF       
-! Check if any x,y,z coords have been fixed or upper and lower bounds changed from defaults.
-! If they have then do not align
-      DO j = 1,3
-        IF ((lb(j).ne.0.0000).or.(ub(j).ne.1.000)) THEN
-        RETURN
-        ENDIF
-      END DO
-! If number of zmatrices greater than 1, do not align
-      IF (nfrag.gt.1) THEN
-        RETURN
-      ENDIF
-!--------- End of Checks ----------
 
 ! Clear Sumx, sumy and sumz
       Sumx = 0.0
