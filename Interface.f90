@@ -137,7 +137,7 @@
       CALL WDialogPutString(IDF_PW_DataFileName_String, FNAME)
       CALL PopActiveWindowID
 ! Update the status bar at the bottom of the screen.
-      CALL WindowOutStatusBar(1,FNAME)
+      CALL WindowOutStatusBar(1, FNAME)
 
       END SUBROUTINE ScrUpdateFileName
 !
