@@ -175,7 +175,7 @@
         CASE (KeyDown) ! home key resets the plot to original axes
            IF (EventInfo%VALUE1 .eq. KeyHome) THEN 
              CALL ResetProfPlotAxes(EventInfo%win)
-             CALL WindowClear()
+             CALL WindowClear
              CALL plot_pro_file(EventInfo%win)
            ENDIF
       END SELECT
