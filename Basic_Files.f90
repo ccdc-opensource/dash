@@ -397,6 +397,9 @@
       ELSE
         Extension = FileName(iPos+1:iLen)
         ExtLength = LEN_TRIM(Extension)
+        DO I = iPos, iLen
+          FileName(I:I) = " "
+        ENDDO
       ENDIF
 
       END SUBROUTINE SplitPath2
