@@ -88,8 +88,63 @@
       ENDIF
       RETURN
    20 CONTINUE
-! Second attempt: HKCU\Software\CCDC\Mercury\1.0\InstallDir
       i = RegCloseKey(hKey) ! Close the key handle.
+! Second attempt: HKCR\Applications\mercury.exe\shell\open\command
+      cbValueName = MAX_VALUE_NAME
+      dwcClassLen = MAX_PATH
+      hKeyRoot = HKEY_CLASSES_ROOT
+      RegPath = 'Applications\mercury.exe\shell\open\command'//CHAR(0)
+! Use RegOpenKeyEx() with the new Registry path to get an open handle
+! to the child key you want to enumerate.
+      retCode = RegOpenKeyEx(hKeyRoot,    &
+                             RegPath,     &
+                             0,           &
+                             KEY_EXECUTE, &
+                             LOC(hKey))
+      IF (retCode .NE. ERROR_SUCCESS) GOTO 30
+! ADD A QUERY AND ALLOCATE A BUFFER FOR BDATA.
+      retCode = RegQueryInfoKey(hKey,                 &  ! Key handle returned from RegOpenKeyEx.
+                                ClassName,            &  ! Buffer for class name.
+                                LOC(dwcClassLen),     &  ! Length of class string.
+                                NULL,                 &  ! Reserved.
+                                LOC(dwcSubKeys),      &  ! Number of sub keys.
+                                LOC(dwcMaxSubKey),    &  ! Longest sub key size.
+                                LOC(dwcMaxClass),     &  ! Longest class string.
+                                LOC(dwcValues),       &  ! Number of values for this key.
+                                LOC(dwcMaxValueName), &  ! Longest Value name.
+                                LOC(dwcMaxValueData), &  ! Longest Value data.
+                                LOC(dwcSecDesc),      &  ! Security descriptor.
+                                ftLastWriteTime)         ! Last write time.
+      IF (retCode .NE. ERROR_SUCCESS) GOTO 30
+      cbData = dwcMaxValueData
+! ENUMERATE THE KEY.
+      dwLBIndex = 0 ! I'm guessing here
+      retCode = RegEnumValue (hKey,             & ! Key handle returned from RegOpenKeyEx.
+                              dwLBIndex,        & ! Value index, taken from listbox.
+                              ValueName,        & ! Name of value.
+                              LOC(cbValueName), & ! Size of value name.
+                              NULL,             & ! Reserved, dword = NULL.
+                              LOC(dwType),      & ! Type of data.
+                              LOC(bData),       & ! Data buffer.
+                              LOC(cbData))        ! Size of data buffer.
+      IF (retCode .NE. ERROR_SUCCESS) GOTO 30
+      IF (dwType .NE. REG_SZ) GOTO 30
+      i = RegCloseKey(hKey) ! Close the key handle.
+! Remove first double quote
+      VIEWEXE(1:cbData-1) = bData(2:cbData)
+! Find second
+      i = 1
+      DO WHILE ((VIEWEXE(i:i) .NE. '"') .AND. (i .LT. cbData))
+        i = i + 1
+      ENDDO
+      IF (VIEWEXE(i:i) .EQ. '"') THEN
+        DO j = i, MaxPathLength
+          VIEWEXE(j:j) = ' '
+        ENDDO
+      ENDIF
+      RETURN
+   30 CONTINUE
+! Failure...
 
       END SUBROUTINE GetPathToMercuryFromRegistry
 
