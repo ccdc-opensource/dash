@@ -1934,7 +1934,6 @@
 
       USE REFVAR
 
-!
 ! *** HKLOUT updated by PJB 1 Feb 1994 ***
 !
 !H Writes h,k,l list, possibly plus other info, to unit LKH
