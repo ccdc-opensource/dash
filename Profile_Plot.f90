@@ -64,7 +64,6 @@
       ENDIF
 !  Plot tic marks etc. if appropriate
       IF (NTIC .NE. 0) CALL Plot_Calculated_Tics()
-      PLOTT = .TRUE.
 !   Switch off hardcopy
       IF (IPTYPE .LT. 0) THEN
         CALL IGrHardCopy('S')
