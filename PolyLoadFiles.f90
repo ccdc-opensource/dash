@@ -1691,6 +1691,7 @@
       LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
 
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
@@ -1699,11 +1700,14 @@
       CHARACTER*255 Cline
       INTEGER       I, IS, FLEN ! Length of TheFileName
       LOGICAL       ReadWarning
+      REAL          WavelengthOf ! Function
+      REAL          FnWavelengthOfMenuOption ! Function
       INTEGER       GetNumOfColumns ! Function
       REAL          Lambda1
 
 ! Initialise to failure
       Load_xye_File = 0
+      Lambda1       = 0.0
       ReadWarning   = .FALSE.
       FLEN = LEN_TRIM(TheFileName)
       OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',err=999)
@@ -1776,6 +1780,15 @@
         CALL ErrorMessage("The file contains no valid data.")
         RETURN
       ENDIF
+! If wavelength not present in file, initialise to Cu
+      IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf('Cu')
+! Initialise source material to synchrotron
+      CALL SetSourceDataState(2)
+! Now add in a test: if wavelength close to known anode material,
+! set source to laboratory. Otherwise, source is synchrotron.
+      DO I = 2, 6
+        IF (ABS(ALambda - FnWavelengthOfMenuOption(I)) .LT. 0.0003) CALL SetSourceDataState(1)
+      END DO
       Load_xye_File = 1
       RETURN
  999  CONTINUE
