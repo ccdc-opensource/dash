@@ -180,7 +180,7 @@
         ENDDO
         NumOfFlexTorsions = 0
         DO atom = 4, natcry
-          IF (ioptt(atom,ifrg) .EQ. 1) THEN
+          IF (ioptt(atom,iFrg) .EQ. 1) THEN
             NumOfFlexTorsions = NumOfFlexTorsions + 1
             SELECT CASE(NumOfFlexTorsions)
               CASE (1)
@@ -212,7 +212,7 @@
       tLength = LEN_TRIM(frag_file(iFrg))
       temp_file = frag_file(iFrg)(1:tLength-8)//'_temp.mol2'
 ! Show the mol2 file
-      IF (WriteMol2(temp_file) .EQ. 1) CALL ViewStructure(temp_file)
+      IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) CALL ViewStructure(temp_file)
       CALL IOSDeleteFile(temp_file)
 
       END SUBROUTINE ViewZmatrix
@@ -258,7 +258,7 @@
       DOUBLE PRECISION dcel(6)
       INTEGER I, II, kk, iFrg, iFrgCopy, tk, iH, iK, iL
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
-      REAL    tLattice(1:3,1:3), tRecLattice(1:3,1:3)
+      REAL    tLattice(1:3,1:3)
       REAL    Beta_m, Alpha_m, q0m, q1m, q2m, q3m
       REAL    Length
       INTEGER iAxis, iAtmNr
@@ -277,13 +277,13 @@
       f2cmat = DBLE(tLattice)
 ! Calculate the reciprocal lattice
       CALL DGMINV(f2cmat,c2fmat,3)
-      tRecLattice = SNGL(c2fmat)
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL CREATE_FOB
       CALL Create_AtomicWeightings
 ! Per Z-matrix, determine whether to use quaternions or a single axis
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
+          CALL zmDoAdmin(iFrg)
           IF (.NOT. UseQuaternions(iFrg)) THEN
 ! Initialise the parts of the quaternions of the single rotation axis that are due to the axis
             SELECT CASE (zmSingleRotAxDef(iFrg))
