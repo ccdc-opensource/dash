@@ -32,12 +32,12 @@
       Cartesian(2,1) = 0.0D0
       Cartesian(3,1) = 0.0D0
 ! Second atom is placed along the z-axis
-      IF (N.LT.2) GOTO 999
+      IF (N.LT.2) RETURN
       Cartesian(1,2) = 0.0D0
       Cartesian(2,2) = 0.0D0
       Cartesian(3,2) = blen(2)
 ! Third atom is placed in the x,z-plane
-      IF (N.LT.3) GOTO 999
+      IF (N.LT.3) RETURN
       Cartesian(1,3) = blen(3)*SIN(alph(3)*rad)
       Cartesian(2,3) = 0.0D0
       IF (iz1(3).EQ.1) THEN
@@ -76,7 +76,6 @@
           CALL xyzatm_2(Cartesian,i,i1,bond,i2,angle1,i3,angle2)
         ENDDO
       ENDIF
-  999 RETURN
 
       END SUBROUTINE MAKEXYZ_2
 !
