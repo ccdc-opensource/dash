@@ -41,6 +41,7 @@
       LOGICAL, EXTERNAL :: Get_AutoAlign, Confirm
       INTEGER, EXTERNAL :: PrjSaveAs
       INTEGER IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iDummy
+      CHARACTER*(15) file_name
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
@@ -119,8 +120,8 @@
         IF (iStatus .EQ. 1) THEN
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
 ! Calls subroutine which opens Mercury window with .pdb file
-          CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow))
-          CALL ViewStructure('SA_best.pdb')
+          CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow), file_name)
+          CALL ViewStructure(file_name)
 ! Calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(iRow)
           CALL PopActiveWindowID

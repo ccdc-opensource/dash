@@ -419,6 +419,7 @@
       REAL ChiSqd, ChiProSqd 
       INTEGER iValues(1:100), NVALUES
       INTEGER Num
+      CHARACTER*(15) file_name
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
@@ -462,8 +463,8 @@
                   XAtmCoords(J,I,0) = XATO(J,I)
                 ENDDO
               ENDDO
-              CALL SA_STRUCTURE_OUTPUT_PDB(0)
-              CALL ViewStructure('SA_best.pdb')
+              CALL SA_STRUCTURE_OUTPUT_PDB(0, file_name)
+              CALL ViewStructure(file_name)
             CASE (IDB_Compare)
               CALL Dialog2RRVAR
               CALL RR_MAKEFRAC

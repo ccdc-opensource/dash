@@ -304,12 +304,13 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-!     required to handle the profile graphs plotted in child windows
+! Required to handle the profile graphs plotted in child windows
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
       LOGICAL, EXTERNAL :: Get_AutoAlign
       INTEGER I, iRow, iStatus, iLimit1, iLimit2, tInteger
+      CHARACTER*(15) file_name
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Summary)
@@ -364,16 +365,14 @@
           END SELECT
         CASE (FieldChanged)
       END SELECT
-!ep allows you to view pdb file of SA Solutions, each clicked
-!   check box in fresh mercury window
+!ep Allows you to view pdb file of SA Solutions, each clicked
+! check box in fresh Mercury window.
       DO iRow = 1, NumOf_SA_Runs+1
         CALL WGridGetCellCheckBox(IDF_SA_summary, 2, iRow, istatus)
         IF (istatus .EQ. 1) THEN
-! calls subroutine which opens Mercury window with .pdb file
-          CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow))
-          CALL ViewStructure('SA_best.pdb')
-! calls subroutine which plots observed diffraction pattern with calculated pattern
-!          IF (.NOT. InSA) CALL organise_sa_result_data(iRow)
+! Calls subroutine which opens Mercury window with .pdb file.
+          CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow), file_name)
+          CALL ViewStructure(file_name)
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
         ENDIF
       ENDDO
@@ -555,7 +554,7 @@
       DO irow = 1, NumOfDICVOLSolutions
         CALL WGridGetCellCheckBox(IDF_DV_Summary_0,1,irow,istatus)
         IF (istatus .EQ. 1) THEN
-! Import the unit cell parameters into DASH
+! Import the unit-cell parameters into DASH
           CellPar(1) = DICVOLSolutions(irow)%a
           CellPar(2) = DICVOLSolutions(irow)%b
           CellPar(3) = DICVOLSolutions(irow)%c

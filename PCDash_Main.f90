@@ -145,7 +145,6 @@
         END SELECT
       ELSE
 ! Go through the PolyFitter wizard
-! Comment this next line out to remove the wizard
         CALL StartWizard
       ENDIF
       DO WHILE (.TRUE.)
@@ -207,7 +206,7 @@
       INTEGER ISTAT, tInt1, tInt2
       INTEGER tCurrentRange
 
-!   Branch depending on chosen menu item
+! Branch depending on chosen menu item
 
       SELECT CASE (EventInfo%VALUE1)
         CASE (IDB_Open)
@@ -482,27 +481,13 @@
 
 ! Remove redundant files 
       CALL IDebugLevel(DbgSilent)
-      CALL IOsDeleteFile('polyf.tic')
-      CALL IOsDeleteFile('polyf.ccl')
-      CALL IOsDeleteFile('polyf.lis')
-      CALL IOsDeleteFile('polyf.hkl')
-      CALL IOsDeleteFile('polyp.tic')
-      CALL IOsDeleteFile('polyp.hkl')
-      CALL IOsDeleteFile('polyp.ccl')
-      CALL IOsDeleteFile('polyp.ccn')
-      CALL IOsDeleteFile('polyp.pik')
-      CALL IOsDeleteFile('polyp.hcv')
-      CALL IOsDeleteFile('polyp.dat')
-      CALL IOsDeleteFile('polyp.lis')
+      CALL IOsDeleteFile('polyf.*')
+      CALL IOsDeleteFile('polyp.*')
       CALL IOsDeleteFile('polys.ccl')
       CALL IOsDeleteFile('polys.lis')
-      CALL IOsDeleteFile('polyp.pbk')
-      CALL IOsDeleteFile('polyp.tbk')
-      CALL IOsDeleteFile('polyp.hbk')
-      CALL IOsDeleteFile('polyp.hbl')
       CALL IOsDeleteFile('polyo.ccl')
       CALL IOsDeleteFile('polyo.lis')
-      CALL IOsDeleteFile('SA_best.pdb')
+!      CALL IOsDeleteFile('SA_best.pdb')
       CALL IOsDeleteFile(DV_FileName)
       CALL IOSDeleteFile('MakeZmatrix.log')
       CALL IOSDeleteFile('SA_PARAMS.TXT')
@@ -510,6 +495,7 @@
       CALL IOSDeleteFile('Rebuild_temp*.zmatrix')
       CALL IOSDeleteFile('*.glob')
       CALL IOSDeleteFile('Rebuild_temp.mol2')
+      CALL IOSDeleteFile('DASH_tmp*.pdb')
 
       END SUBROUTINE DeleteTempFiles
 !
