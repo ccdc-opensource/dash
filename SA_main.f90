@@ -546,6 +546,19 @@
 
       IMPLICIT NONE
 
+      INTEGER         NATOM
+      REAL                   Xato
+      INTEGER                             KX
+      REAL                                           AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
+                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
       INTEGER NumberOfDOF, izmtot, iFrg, tInteger
       CHARACTER(MaxPathLength) DirName
       CHARACTER*80 FileName
@@ -554,12 +567,12 @@
       CALL WDialogSelect(IDD_SAW_Page1)
       nfrag  = 0
       izmtot = 0
-      ntatm  = 0
+      NATOM  = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           nfrag = nfrag + 1
           CALL WDialogGetInteger(IDFzmNumber(iFrg),tInteger)
-          ntatm = ntatm + tInteger * natoms(iFrg)
+          NATOM = NATOM + tInteger * natoms(iFrg)
           IF (natoms(iFrg) .EQ. 1) THEN
             NumberOfDOF = 3 ! It's an atom
           ELSE
