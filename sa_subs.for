@@ -469,7 +469,7 @@ C Now
 			ELSE
 				Call AddSingleSolution(cpb,-sngl(fopt))
 	        ENDIF
-			return
+			goto 998 ! terminate and close the log file.
 	      end if
 
 300      CONTINUE
@@ -618,11 +618,12 @@ C.. We will use the energy fluctuation to reduce the temperature
 		END IF
 	ELSE IF (iteration .LT. MaxIter .AND. T .GT. 0.0) THEN
 		GO TO 100
+	ELSE
 		CALL AddSingleSolution(cpb,-sngl(fopt))
 	END IF
 	imyexit = 3
-
- 999  CLOSE(63)
+ 998  CONTINUE
+ 999  CLOSE(UNIT=63,STATUS='DELETE',IOSTAT=ISTAT)
       END
 
       FUNCTION  EXPREP(RDUM)
