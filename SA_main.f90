@@ -162,8 +162,8 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -179,8 +179,8 @@
 
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  
-      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
-      
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
+
       LOGICAL           Resume_SA
       COMMON /RESUMESA/ Resume_SA
 
@@ -288,7 +288,7 @@
           kk = kk + 1
           zm2Par(ii,iFrg) = kk
           Par2iFrg(kk)    = iFrg
-          x(kk) = xzmpar(ii,iFrg)
+          x_unique(kk) = xzmpar(ii,iFrg)
           parlabel(kk) = czmpar(ii,iFrg)
           ModalFlag(kk) = 0 ! Initialise to 0 meaning "not a torsion"
           SELECT CASE (kzmpar(ii,iFrg))
@@ -311,24 +311,24 @@
             CASE (3) ! torsion
               kzmpar2(kk) = 3
               ModalFlag(kk) = 1
-              IF      ((x(kk) .GT. -180.0) .AND. (x(kk) .LT. 180.0)) THEN
+              IF      ((x_unique(kk) .GT. -180.0) .AND. (x_unique(kk) .LT. 180.0)) THEN
                 lb(kk) =  -180.0
                 ub(kk) =   180.0
-              ELSE IF (x(kk) .GT. 0.0 .AND. x(kk) .LT.  360.0) THEN
+              ELSE IF (x_unique(kk) .GT. 0.0 .AND. x_unique(kk) .LT.  360.0) THEN
                 lb(kk) =   0.0
                 ub(kk) = 360.0
               ELSE 
-                lb(kk) = x(kk) - 180.0
-                ub(kk) = x(kk) + 180.0
+                lb(kk) = x_unique(kk) - 180.0
+                ub(kk) = x_unique(kk) + 180.0
               ENDIF              
             CASE (4) ! angle
               kzmpar2(kk) = 4
-              lb(kk) = x(kk) - 10.0
-              ub(kk) = x(kk) + 10.0
+              lb(kk) = x_unique(kk) - 10.0
+              ub(kk) = x_unique(kk) + 10.0
             CASE (5) ! bond
               kzmpar2(kk) = 5
-              lb(kk) = 0.9*x(kk)
-              ub(kk) = x(kk)/0.9
+              lb(kk) = 0.9*x_unique(kk)
+              ub(kk) = x_unique(kk)/0.9
           END SELECT
         ENDDO
       ENDDO
@@ -343,7 +343,7 @@
         kk = kk + 1
         Par2iFrg(kk) = 0
         kzmpar2(kk) = 7 ! preferred orientation
-        x(kk) = 1.0 ! preferred orientation
+        x_unique(kk) = 1.0 ! preferred orientation
         parlabel(kk) = 'Preferred Orientation'
         lb(kk) =  0.5
         ub(kk) =  2.0
@@ -355,7 +355,7 @@
       CALL WGridRows(IDF_parameter_grid_modal, nvar)
       DO i = 1, nvar
         CALL WGridLabelRow(IDF_parameter_grid_modal, i, parlabel(i))
-        CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, i, x(i), '(F12.5)')
+        CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, i, x_unique(i), '(F12.5)')
         CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, i, lb(i), '(F12.5)')
         CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, i, ub(i), '(F12.5)')
         CALL WGridPutCellCheckBox(IDF_parameter_grid_modal, 4, i, Unchecked)

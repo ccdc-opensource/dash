@@ -1537,8 +1537,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
@@ -1595,6 +1595,11 @@
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               RandomInitVal = WDialogGetCheckBoxLogical(IDF_RandomInitVal)
+              DO I = 1, NVAR
+                CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X_init(I))
+                ! Have LB and UB been filled yet???????? ############ TODO ##############
+          !      CALL ParseRawInput(I)
+              ENDDO
               CALL ShowWithWizardWindowSASettings
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
@@ -1791,6 +1796,8 @@
 
       INTEGER, EXTERNAL :: WriteSAParametersToFile
       INTEGER IHANDLE, KPOS
+      REAL    MaxMoves1, tMaxMoves
+      INTEGER MaxMoves2
 
 ! We are now on window number 3
       CALL PushActiveWindowID
@@ -1802,12 +1809,25 @@
 ! Go back to the 2nd window
               CALL WizardWindowShow(IDD_SA_Modal_input2)
             CASE (IDNEXT)
+              CALL WDialogGetReal(IDF_MaxMoves1, MaxMoves1)
+              IF (MaxMoves1 .LT.   0.001) MaxMoves1 =   0.001
+              IF (MaxMoves1 .GT. 100.0  ) MaxMoves1 = 100.0
+              CALL WDialogGetInteger(IDF_MaxMoves2, MaxMoves2)
+              IF (MaxMoves2 .LT. 1) MaxMoves2 = 1
+              IF (MaxMoves2 .GT. 8) MaxMoves2 = 8
+              tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
+              IF (tMaxMoves .LT. 10.0) tMaxMoves = 10.0
+              IF (tMaxMoves .GT.  2.0E9) tMaxMoves = 2.0E9
+              MaxMoves = NINT(tMaxMoves)
+              CALL WDialogGetReal(IDF_SA_ChiTest, ChiMult)
               ! It is possible to click "Resume SA" after having completed all runs and to
               ! forget to specify more runs. That way, we will already have completed all runs.
               CALL WDialogGetInteger(IDF_SA_MaxRepeats, MaxRuns)
               IF (Resume_SA .AND. (NumOf_SA_Runs .GE. MaxRuns)) THEN
                 CALL InfoMessage("Number of requested runs already completed: please increase number of runs.")
               ELSE
+                CALL WDialogSelect(IDD_SAW_Page5)
+                CALL WDialogClearField(IDF_SA_Summary)
                 CALL WizardWindowShow(IDD_SA_input4)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
@@ -1865,8 +1885,9 @@
       INTEGER                                                            HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
 
+      INTEGER, EXTERNAL :: BatchFileSaveAs
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      INTEGER tInteger
+      INTEGER tInteger, iDummy
 
 ! ##### TODO: when *resuming* the SA, it is probably smart not to allow changing of the settings for
 ! hydrogen treatment.
@@ -1892,7 +1913,7 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_BatchFile)
-              CALL WriteBatchFile
+              iDummy = BatchFileSaveAs()
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -1926,8 +1947,8 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
@@ -2020,10 +2041,11 @@
         ENDIF
       ENDIF
       CALL WDialogShow(-1, -1, 0, SemiModeless)
+      CALL WDialogSelect(IDD_SA_Modal_input2)
       RowNumber = IFRow
-      iUB = UB(IFRow)
-      iLB = LB(IFRow)
-      ix = X(IFRow)
+      CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, RowNumber, iX)
+      CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, RowNumber, iLB)
+      CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, RowNumber, iUB) 
       iRadio = ModalFlag(IFRow)
 
       END SUBROUTINE ShowBimodalDialog
@@ -2044,8 +2066,8 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
@@ -2108,8 +2130,8 @@
               CALL WDialogGetReal(IDF_Initial, xtem)       
               TempPrevx = xtem
               xtem = MAX(lb(RowNumber),xtem)
-              X(RowNumber) = (MIN(ub(RowNumber),xtem))
-              CALL WDialogPutReal(IDF_Initial, x(RowNumber), '(F12.5)')
+              X_init(RowNumber) = (MIN(ub(RowNumber),xtem))
+              CALL WDialogPutReal(IDF_Initial, X_init(RowNumber), '(F12.5)')
             CASE (IDF_ModalLower)
               CALL WDialogGetReal(IDF_ModalLower, xtem)
               xtem = MIN(ub(RowNumber),xtem)
@@ -2192,11 +2214,11 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK)
 !             Record parameters in appropriate arrays
-              CALL WDialogGetReal(IDF_Initial, X(RowNumber))
+              CALL WDialogGetReal(IDF_Initial, X_init(RowNumber))
               CALL WDialogGetReal(IDF_ModalLower, lb(RowNumber))
               CALL WDialogGetReal(IDF_ModalUpper, ub(RowNumber))
 !             Check that x is in bounds
-              IF (OutOfBounds(RowNumber, X(RowNumber))) THEN
+              IF (OutOfBounds(RowNumber, X_init(RowNumber))) THEN
                 CALL WarningMessage('Initial value does not fall within defined ranges')
                 IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOk) THEN
                   CALL PopActiveWindowID
@@ -2211,14 +2233,14 @@
             CASE (IDCANCEL)
               UB(RowNumber) = iUB
               LB(RowNumber) = iLB
-              X(RowNumber) = iX
+              X_init(RowNumber) = iX
               ModalFlag(RowNumber) = iRadio
               CALL WDialogHide
 !           Return to "unimodal" mode. Modal torsion angle is no longer applied
             CASE (IDF_BiModalReset)
               ub(RowNumber) = OneEighty
               lb(RowNumber) = (-1) * OneEighty
-              X(RowNumber) = iX
+              X_init(RowNumber) = iX
               ModalFlag(RowNumber) = 1 
               CALL WDialogHide
               CALL WDialogSelect(IDD_SA_Modal_Input2)
@@ -2228,7 +2250,7 @@
           prevub(RowNumber) = UB(RowNumber)
           prevlb(RowNumber) = LB(RowNumber)
           CALL WDialogSelect(IDD_SA_Modal_Input2)
-          CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, RowNumber, X(RowNumber))
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, RowNumber, X_init(RowNumber))
           CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, RowNumber, LB(RowNumber))
           CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, RowNumber, UB(RowNumber)) 
           CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5, RowNumber, UnChecked)                          
@@ -2333,8 +2355,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       INTEGER row
       LOGICAL OneEightyScale
@@ -2362,8 +2384,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  

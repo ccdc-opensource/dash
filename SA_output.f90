@@ -33,8 +33,8 @@
       INTEGER         nmpert, bmIHANDLE
       COMMON /sagdat/ nmpert, bmIHANDLE
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch

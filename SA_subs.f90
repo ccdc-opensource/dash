@@ -20,8 +20,8 @@
       REAL              XOPT,       C,       FOPT
       COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       REAL            T0, RT
       COMMON /saparl/ T0, RT
@@ -87,6 +87,9 @@
       INTEGER                                                            HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
 
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+
       REAL, EXTERNAL :: EXPREP
       LOGICAL, EXTERNAL :: IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
@@ -114,7 +117,10 @@
       REAL XP(MVAR)
       REAL xtem, tempupper, templower, tempupper2
       REAL Initial_T ! As calculated during intial run, not as set by the user.
-      
+      REAL VM(MVAR)
+      REAL InitialProChiSqrd
+      REAL ProgressIndicator ! 0.0 = just begun, 1.0 = best profile chi-sqrd <= Pawley chi-sqrd
+
       WasMinimised = .FALSE.
       NumParPerTrial = 1
       TotNumTrials = 0
@@ -137,7 +143,7 @@
         JRAN = MOD(JRAN*IA+IC,IM)
         RANARR(I) = FLOAT(JRAN)/FLOAT(IM) ! RANARR now between  0.0 and 1.0
         RANIN = 2.0 * RANARR(I) - 1.0     ! RANIN  now between -1.0 and 1.0
-        CALL RANX2E(RANIN,RANAR1(I))
+        CALL RANX2E(RANIN,RANAR1(I))      ! RANAR1(I) now follows a Maxwell distribution
       ENDDO
       IM = 7875
       IA = 211
@@ -164,23 +170,23 @@
             kk = kk + 1
             SELECT CASE (kzmpar(ii,iFrg))
               CASE (1) ! translation
-                vm(kk) = 0.1
+                VM(kk) = 0.1
               CASE (2) ! quaternion
-                vm(kk) = 0.1
+                VM(kk) = 0.1
               CASE (3) ! torsion
-                vm(kk) = 10.0
+                VM(kk) = 10.0
               CASE (4) ! angle
-                vm(kk) = 1.0
+                VM(kk) = 1.0
               CASE (5) ! bond
-                vm(kk) = 0.1*(ub(kk)-lb(kk))
+                VM(kk) = 0.1*(ub(kk)-lb(kk))
               CASE (6) ! single rotation axis
-                vm(kk) = 0.1
+                VM(kk) = 0.1
             END SELECT
           ENDDO
         ENDDO
         IF (PrefParExists) THEN
           kk = kk + 1
-          vm(kk) = 0.01
+          VM(kk) = 0.01
         ENDIF
       CALL OpenChiSqPlotWindow
       Resume_SA = .FALSE.
@@ -218,12 +224,12 @@
       NTOTMOV = 0
       CALL MAKXIN
       DO I = 1, nvar
-        XOPT(I) = X(I)
+        XOPT(I) = x_unique(I)
         C(I) = 2.0
       ENDDO
 ! Evaluate the function with input X and return value as F.
-      IF (PrefParExists) CALL PO_PRECFC(X(iPrfPar))
-      CALL FCN(X,F,0)
+      IF (PrefParExists) CALL PO_PRECFC(x_unique(iPrfPar))
+      CALL FCN(x_unique,F,0)
       DO II = 1, NATOM
         DO III = 1, 3
           XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
@@ -233,6 +239,7 @@
       NewOptimumFound = .FALSE.
 ! Evaluate the profile chi-squared as well
       CALL valchipro(CHIPROBEST)
+      InitialProChiSqrd = CHIPROBEST
       IF ( .NOT. in_batch ) THEN
         CALL ChiSqPlot_UpdateIterAndChiProBest(1)
         CALL WDialogSelect(IDD_Summary)
@@ -263,6 +270,8 @@
 ! ##########################################
   100 CONTINUE
       Curr_SA_Iteration = Curr_SA_Iteration + 1
+      ! Next line is wrong for single crystal, which should use the intensity chi-sqrd
+      ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
       NUP = 0
       NDOWN = 0
       DO II = 1, nvar
@@ -290,7 +299,7 @@
         DO J = 1, NS
           DO IH = 1, NPAR
             DO I = 1, nvar
-              XP(I) = X(I)
+              XP(I) = x_unique(I)
             ENDDO
             CurrParsInclPO = .FALSE.
             DO iParNum = 1, NumParPerTrial
@@ -391,7 +400,6 @@
               END SELECT
               IF (kzmpar2(H) .EQ. 7) CurrParsInclPO = .TRUE.
             ENDDO
-
 ! Evaluate the function with the trial point XP and return as FP.
             IF (NumParPerTrial .EQ. 1) THEN
               IF (PrevRejected) THEN
@@ -422,7 +430,7 @@
             XDSS(H) = XDSS(H) + (FP-F)**2
             PrevRejected = .FALSE.
             IF (FP .LE. F) THEN
-              X(H) = XP(H)
+              x_unique(H) = XP(H)
               F = FP
               NACP(H) = NACP(H) + 1
               NUP = NUP + 1
@@ -438,6 +446,7 @@
                 ENDDO
                 NewOptimumFound = .TRUE.
                 CALL valchipro(CHIPROBEST)
+                ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
                 FOPT = FP
                 CALL WDialogSelect(IDD_Summary)
                 CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
@@ -452,7 +461,7 @@
               PP = RANARR(IARR)
               IARR = IARR + 1
               IF (PP .LT. P) THEN
-                X(H) = XP(H)
+                x_unique(H) = XP(H)
                 F = FP
                 NACP(H) = NACP(H) + 1
                 NDOWN = NDOWN + 1
@@ -466,8 +475,8 @@
       !O      A0SUM(H) = A0SUM(H) + 1.0
 
             X0SUM(H) = X0SUM(H) + 1.0
-            XSUM(H) = XSUM(H) + X(H)
-            XXSUM(H) = XXSUM(H) + X(H)**2
+            XSUM(H) = XSUM(H) + x_unique(H)
+            XXSUM(H) = XXSUM(H) + x_unique(H)**2
           ENDDO ! Loop over parameters
           CALL sa_move_status(nmpert,m*NPAR*NS)
         ENDDO ! Loop over NS
@@ -542,7 +551,7 @@
    !   CALL LocalMinimise(.TRUE.)
 
       DO I = 1, nvar
-        X(I) = XOPT(I)
+        x_unique(I) = XOPT(I)
       ENDDO
       F = FOPT
   999 CONTINUE ! This is where we jump to if the user pressed 'Stop' during the SA
@@ -778,8 +787,8 @@
       REAL          RULB
       COMMON /RULB/ RULB(Mvar)
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
@@ -788,18 +797,27 @@
       INTEGER                                                            HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
 
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
+
       REAL, EXTERNAL :: RANMAR
       INTEGER I, II
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
       DO I = 1, NVAR
-        CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X(I))
+        x_unique(I) = X_init(I)
       ENDDO
       IF ( RandomInitVal ) THEN
         DO II = 1, NPAR
           I = IP(II)
-          X(I) = LB(I) + RULB(I)*RANMAR()
+          x_unique(I) = LB(I) + RULB(I)*RANMAR()
+!F          IF (ModalFlag(I) .EQ. 2 .OR. ModalFlag(I) .EQ. 3) THEN
+!F! If modal ranges defined for torsions use random number to
+!F! select from which range the value of XP will be derived.
+!F            CALL AdjustSamplingForOtherRanges(x_unique(I), I, RANMAR())
+!F          ENDIF
         ENDDO
       ENDIF
       CALL PopActiveWindowID
@@ -859,16 +877,16 @@
       REAL          RULB
       COMMON /RULB/ RULB(Mvar)
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       INTEGER                ModalFlag,       RowNumber, iRadio
-      REAL                                                       iX, iUB, iLB  
-      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
+      REAL                                                                        iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
       REAL TempUpper, TempLower
       INTEGER I
-      LOGICAL ONeEightyScale
+      LOGICAL OneEightyScale
 
       DO I = 1, nvar
         RULB(I) = UB(I) - LB(I)

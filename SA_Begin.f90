@@ -70,7 +70,6 @@
 !O      CALL WDialogShow(-1, -1, 0, Modeless)
       StartDate = DateToday()
       StartTime = TimeNowSeconds()
-      CALL Init_MultiRun
       CALL WDialogFieldState(IDB_Summary, Enabled)
       IPTYPE = 2
 !C Clear Chi-sqd array between starting sets of SA Runs
@@ -310,11 +309,11 @@
       INTEGER         nvar, NS, NT, iSeed1, iSeed2
       COMMON /sapars/ nvar, NS, NT, iSeed1, iSeed2
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       INTEGER                ModalFlag,       RowNumber, iRadio
-      REAL                                                       iX, iUB, iLB  
+      REAL                                                                          iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
       INTEGER iPar
