@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 21/Sep/2001 12:02:50
+// Modified : 24/Sep/2001 16:15:08
 //
 ///////////////////////////////////////////////////
 //
@@ -481,6 +481,7 @@
 #define IDB_ConvertR2T                   1099
 #define IDD_XYE                           130
 #define IDF_wavelength                   1100
+#define IDF_RunDICVOL                    1101
 
 ///////////////////////////////////////////////////
 //
@@ -530,7 +531,7 @@ FONT    8, "MS Sans Serif"
 CAPTION "Structural Information"
 BEGIN
     CONTROL "",IDF_Structural_Information_tab,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   14,    8,  285,  138
-    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  138,  152,   30,   15
+    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  138,  152,   40,   14
 END
 
 IDD_Structural_Information RCDATA
@@ -1892,8 +1893,8 @@ BEGIN
     CONTROL "30.0",IDF_Indexing_MaxLen,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  100,   40,   14
     CONTROL "90.0",IDF_Indexing_MinAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   80,  116,   40,   14
     CONTROL "125.0",IDF_Indexing_MaxAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  116,   40,   14
-    CONTROL "Save DICVOL File ...",ID_Indexing_Create,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   96,  208,   82,   14
-    CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  198,  208,   40,   14
+    CONTROL "Save DICVOL File ...",ID_Indexing_Create,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  123,  208,   82,   14
+    CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  227,  208,   40,   14
     CONTROL "Chemistry (Optional)",IDF_Indexing_chemgroup,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  148,  172,   48
     CONTROL "Other Settings (optional)",IDF_Indexing_Misc,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  196,  148,  126,   48
     CONTROL "Measured density of compound",IDF_Indexing_Density_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,  164,  114,    8
@@ -1906,6 +1907,7 @@ BEGIN
     CONTROL "Experimental zero-point",IDF_Indexing_zpt,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  202,  128,   76,    8
     CONTROL "0.0",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  282,  124,   36,   12
     CONTROL "Experimental Details",IDF_Indexing_exp,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  196,  100,  126,   40
+    CONTROL "Run DICVOL",IDF_RunDICVOL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   40,  208,   60,   14
 END
 
 IDD_Index_Preparation RCDATA

@@ -1,4 +1,4 @@
-! Winteracter module created : 21/Sep/2001 12:02:50
+! Winteracter module created : 24/Sep/2001 16:15:08
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -468,4 +468,5 @@
           INTEGER, PARAMETER :: IDB_ConvertR2T                  =  1099
           INTEGER, PARAMETER :: IDD_XYE                         =   130
           INTEGER, PARAMETER :: IDF_wavelength                  =  1100
+          INTEGER, PARAMETER :: IDF_RunDICVOL                   =  1101
       END MODULE Druid_Header
