@@ -443,11 +443,9 @@
           CellPar(5) = DICVOLSolutions(irow)%beta
           CellPar(6) = DICVOLSolutions(irow)%gamma
           LatBrav = DICVOLSolutions(irow)%CrystalSystem
+          CALL WGridPutCellCheckBox(IDF_DV_Summary_0,1,irow,0)
           CALL Upload_CrystalSystem
           CALL UpdateCell()
-          CALL WDialogHide()
-! Unload the dialogue from memory
-          CALL WDialogUnload
           CALL PopActiveWindowID
           RETURN
         ENDIF
@@ -613,7 +611,6 @@
       CALL WDialogSelect(IDD_DV_Results)
 ! Clear all fields in the grid
       CALL WDialogClearField(IDF_DV_Summary_0)
-!      CALL WDialogSelect(IDD_DV_Results) ! I don't think this is necessary
 ! Set the number of rows in the grid to the number of solutions.
       CALL WGridRows(IDF_DV_Summary_0,NumOfDICVOLSolutions)
       DO I = 1, NumOfDICVOLSolutions
