@@ -345,7 +345,6 @@
                 IXPos_IDD_SA_Input = WInfoDialog(6)
                 IYPos_IDD_SA_Input = WInfoDialog(7)
                 CALL WDialogHide() 
-!C>> JCC               Call SA_Parameter_Update(CheckSize,IZMCheck)
                 GOTO 777
             END SELECT
           CASE (FieldChanged)
@@ -379,7 +378,7 @@
                   END IF
                 CASE(3)
 !.. upper bound
-!>> JCC Check the bounding - only update if parameter is set to vary
+! JCC Check the bounding - only update if parameter is set to vary
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,5,IFRow,ICHK)
                   IF (ICHK .EQ. Checked) THEN
                     CALL WGridGetCellReal(IDF_parameter_grid,IFCol,IFRow,xtem)
@@ -397,7 +396,6 @@
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,IFCol,IFRow,ICHK)
                   IF ( (IFCol .EQ. 4 .AND. ICHK .EQ. Checked) .OR. &
                        (IFCol .EQ. 5 .AND. ICHK .EQ. UnChecked) ) THEN
-!                   JCHK = 1 - ICHK
                     CALL WGridPutCellCheckBox(IDF_parameter_grid,4,IFRow,Checked)
                     CALL WGridPutCellCheckBox(IDF_parameter_grid,5,IFRow,UnChecked)
                     CALL WGridGetCellReal(IDF_parameter_grid,1,IFRow,xtem)
@@ -409,7 +407,6 @@
                     CALL WGridStateCell(IDF_parameter_grid,2,IFRow,DialogReadOnly)
                     CALL WGridStateCell(IDF_parameter_grid,3,IFRow,DialogReadOnly)
                   ELSE
-!                     JCHK=1-ICHK
                     CALL WGridPutCellCheckBox(IDF_parameter_grid,4,IFRow,UnChecked)
                     CALL WGridPutCellCheckBox(IDF_parameter_grid,5,IFRow,Checked)
                     lb(IFRow)=prevlb(IFRow)
@@ -650,6 +647,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE SAMVAR
 
       IMPLICIT NONE
 
@@ -673,10 +671,6 @@
       COMMON /zmcomr/ blen(maxatm,maxfrg), alph(maxatm,maxfrg),         &
      &                bet(maxatm,maxfrg), f2cmat(3,3)
 
-      INTEGER         icomflg
-      REAL                             AtomicWeighting
-      COMMON /zmcomg/ icomflg(maxfrg), AtomicWeighting(maxatm,maxfrg)
-
       CHARACTER*3     asym
       CHARACTER*5                          OriginalLabel
       COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
@@ -685,73 +679,29 @@
       LOGICAL exists
       CHARACTER*17 temp_file
       DATA temp_file /'Temp_Zmatrix.mol2'/
+      CHARACTER*2  AtmElement(1:MAXATM_2)
 
       CHARACTER*255 dirname, filename, curdir
 
       REAL*8 CART(MAXATM,3)
-      REAL*8 XC, YC, ZC, XNORM
 
-      INTEGER IHANDLE, NATS, ICFRG, OutputFile
-      INTEGER Res2Mol2 ! Function
+      INTEGER IHANDLE
+      INTEGER WriteMol2 ! Function
 
-      NATS = NATOMS(IFRG)
-      CALL MAKEXYZ(NATS,BLEN(1,IFRG),ALPH(1,IFRG),BET(1,IFRG),        &
+      natcry = NATOMS(IFRG)
+      CALL MAKEXYZ(natcry,BLEN(1,IFRG),ALPH(1,IFRG),BET(1,IFRG),      &
      &             IZ1(1,IFRG),IZ2(1,IFRG),IZ3(1,IFRG),CART(1,1),     &
      &             CART(1,2),CART(1,3))
-! Determine origin for rotations
-      ICFRG = ICOMFLG(IFRG)
-! If user set centre of mass flag to 0, then use the molecule's centre of mass
-      IF (ICFRG.EQ.0) THEN
-        XC = 0.0D0
-        YC = 0.0D0
-        ZC = 0.0D0
-        DO I = 1, NATS
-          XC = XC + CART(I,1)
-          YC = YC + CART(I,2)
-          ZC = ZC + CART(I,3)
-        ENDDO
-        XNORM = 1.0D0/DFLOAT(NATS)
-        XC = XC*XNORM
-        YC = YC*XNORM
-        ZC = ZC*XNORM
-! Otherwise, use atom number ICFRG
-      ELSE
-        XC = CART(ICFRG,1)
-        YC = CART(ICFRG,2)
-        ZC = CART(ICFRG,3)
-      ENDIF
-! Subtract the origin from all atom positions
-      DO I = 1, NATS
-        CART(I,1) = CART(I,1) - XC
-        CART(I,2) = CART(I,2) - YC
-        CART(I,3) = CART(I,3) - ZC
+! Conversion of asym to aelem : very dirty, but works
+      DO I = 1, natcry
+        axyzo(I,1) = SNGL(CART(I,1))
+        axyzo(I,2) = SNGL(CART(I,2))
+        axyzo(I,3) = SNGL(CART(I,3))
+        AtmElement(I)(1:2) = asym(I,IFRG)(1:2)
+        atomlabel(I) = OriginalLabel(I,IFRG)
       ENDDO
-
-! Now write  'Temp_Zmatrix.res'
-!TITLBA09_2                                  
-!CELL   0.0000   4.0207   4.5938  21.0298  90.7123  69.6944  80.3612
-!LATT  1
-!O1    0    0.19295   -0.33996    0.06295    1.00000    0.02476
-!O2    0   -0.17961   -0.00616    0.13265    1.00000    0.02000
-!C3    0   -0.10381   -0.30317    0.43567    1.00000    0.08073
-!H4    0   -0.29456   -0.41679    0.45015    1.00000    0.10000
-!H5    0    0.14042   -0.43747    0.42625    1.00000    0.10000
-!AG19  0   -0.28653    0.22594    0.03911    1.00000    0.04943
-!H20   0   -0.13171   -0.14728    0.47266    1.00000    0.10000
-!END 
-      
-      OutputFile = 3
-      OPEN(UNIT=OutputFile,file='Temp_Zmatrix.res',form='formatted',ERR=999)
-      WRITE(OutputFile,'(A)',ERR=999) 'TITL Temporary file written by DASH'
-      WRITE(OutputFile,'(A)',ERR=999) 'CELL 1.54 1.0 1.0 1.0 90.0 90.0 90.0'
-      DO I = 1, NATS
-        WRITE(OutputFile,333,ERR=999) OriginalLabel(I,IFRG), CART(I,1), CART(I,2), CART(I,3)
-  333   FORMAT(A5,1X,'0',1X,F10.5,1X,F10.5,1X,F10.5,1X,'1.00000    1.00000')
-      ENDDO
-      WRITE(OutputFile,'(A)',ERR=999) 'END'
-      CLOSE(OutputFile)
-! Convert .res to mol2
-      I = Res2Mol2('Temp_Zmatrix.res')
+      CALL AssignCSDElement(AtmElement)
+      I = WriteMol2(temp_file(1:LEN_TRIM(temp_file)))
       IF (I .EQ. 0) GOTO 999
 ! Show the mol2 file 
       I = LEN_TRIM(ViewExe)
@@ -806,7 +756,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-!C>> JCC Add in checking: only use z-matrices that the user has selected!
+! JCC Add in checking: only use z-matrices that the user has selected!
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
@@ -819,7 +769,7 @@
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen,alph,bet,f2cmat
-!>> JCC Handle via the PDB standard
+! JCC Handle via the PDB standard
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
 
@@ -868,9 +818,9 @@
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL CREATE_FOB()
       kk = 0
-!C>> JCC Run through all possible fragments
+! JCC Run through all possible fragments
       DO ifrg = 1, CheckSize
-!C>> Only include those that are now checked
+! Only include those that are now checked
         IF (IZMCheck(ifrg) .EQ. Checked) THEN
           DO ii = 1, izmpar(ifrg)
             kk = kk + 1
@@ -907,7 +857,7 @@
                 vm(kk) = 0.1*(ub(kk)-lb(kk))
             END SELECT
           END DO
-!C>> JCC End of check on selection
+!JCC End of check on selection
         END IF
       END DO
       nvar = kk
@@ -932,8 +882,8 @@
 !
 !*****************************************************************************
 !
-!C>> JCC This subroutine handles the various types of status error that can arise 
-!C>> during a reading of a file and produces a suitable message to say what went wrong.
+! JCC This subroutine handles the various types of status error that can arise 
+! during a reading of a file and produces a suitable message to say what went wrong.
       SUBROUTINE FileErrorPopup(FileName, ErrorStatus)
 
       USE WINTERACTER
@@ -1067,7 +1017,7 @@
       nfrag  = 0
       izmtot = 0
       ntatm  = 0
-!C>> JCC Changes here - account for unchecked zmatrices which have been read in but are unselected
+! JCC Changes here - account for unchecked zmatrices which have been read in but are unselected
       DO ii = 1, 5
         IF (gotzmfile(ii) .AND. IZMCheck(ii) .EQ. Checked) THEN
           nfrag = nfrag + 1
@@ -1078,7 +1028,6 @@
       END DO
       natom = ntatm             
       CALL WDialogPutInteger(IDF_ZM_allpars,izmtot)
-      RETURN
 
       END SUBROUTINE UpdateZmatrixSelection
 !
@@ -1187,7 +1136,6 @@
                          "Generation Successful")
         CLOSE(145)
       END IF
-      RETURN
 
       END SUBROUTINE ImportZmatrix
 !
