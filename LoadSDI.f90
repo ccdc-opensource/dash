@@ -174,25 +174,25 @@
           LatBrav = GetCrystalSystem(NumberSGTable)
           CALL Upload_CrystalSystem
         CASE ('paw')
-          CALL INextReal(line,PAWLEYCHISQ)
+          CALL INextReal(line, PAWLEYCHISQ)
         CASE ('sin') ! Single crystal
           Is_SX = .TRUE.
       END SELECT
       GOTO 10 
  100  CLOSE(iHandle)
       IF (DslExists) THEN
-        CALL GETDSL(DashDslFile,idsler)
+        CALL GETDSL(DashDslFile, idsler)
         DslExists = (idsler .EQ. 0)
       ENDIF
       IF (TicExists) THEN
         TicExists = (GETTIC(DashTicFile) .EQ. 0)
       ENDIF
       IF (HcvExists) THEN
-        CALL GETHCV(DashHcvFile,ihcver)
+        CALL GETHCV(DashHcvFile, ihcver)
         HcvExists = (ihcver .EQ. 0)
       ENDIF
       IF (PikExists) THEN
-        CALL GETPIK(DashPikFile,ipiker)
+        CALL GETPIK(DashPikFile, ipiker)
         PikExists = (ipiker .EQ. 0)
         IF (PikExists) THEN
           FNAME = ''
@@ -201,7 +201,7 @@
       ENDIF
       IPTYPE = 1
       CALL Profile_Plot
-! enable the buttons,
+! Enable the buttons,
       IF (.NOT. NoData) THEN
         IF (idsler .EQ. 0) THEN
           CALL SetModeMenuState(0,1)
