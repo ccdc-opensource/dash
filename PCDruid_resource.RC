@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 23/Nov/2001 15:56:12
+// Modified : 23/Nov/2001 18:24:18
 //
 ///////////////////////////////////////////////////
 //
@@ -491,11 +491,11 @@
 #define IDD_PW_Page10                     119
 #define IDF_OutputPRO                    1043
 #define IDF_LABEL20                      1100
-#define IDF_ShowChi2                     1217
+#define IDF_ShowRange                    1217
 #define IDF_ShowTicked                   1218
-#define IDF_REAL1                        1219
-#define IDF_REAL2                        1220
-#define IDF_LABEL3                       1221
+#define IDF_Limit1                       1219
+#define IDF_Limit2                       1220
+#define IDF_InvertSelection              1221
 
 ///////////////////////////////////////////////////
 //
@@ -2058,23 +2058,23 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAM
 FONT    8, "MS Sans Serif"
 CAPTION "Results from Simulated Annealing"
 BEGIN
-    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,   14,   24,  435,   80
+    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   14,   24,  435,   80
     CONTROL "Simulated Annealing completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  121,    8,  220,   10
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  165,  160,   40,   14
-    CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  236,  160,   60,   14
-    CONTROL "E&lement symbol + solution number",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   21,  121,  122,   14
-    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   21,  135,  122,   14
-    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  169,  121,   75,   14
-    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  169,  135,   75,   14
-    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   13,  111,  138,   42
-    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  161,  111,   94,   42
-    CONTROL "Solution range for overlay",IDF_GROUP5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  266,  111,  180,   42
-    CONTROL "Show chi",IDF_ShowChi2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  273,  121,   48,   14
-    CONTROL "Show selected",IDF_ShowTicked,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  273,  135,   70,   14
-    CONTROL "0.0",IDF_REAL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  326,  120,   36,   14
-    CONTROL "0.0",IDF_REAL2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  400,  120,   36,   14
-    CONTROL "through",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  367,  123,   28,    8
-    CONTROL "2",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  310,  121,    8,    8
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  165,  162,   40,   14
+    CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  236,  162,   60,   14
+    CONTROL "E&lement symbol + solution number",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   21,  119,  122,   14
+    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   21,  136,  122,   14
+    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  169,  119,   75,   14
+    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  169,  136,   75,   14
+    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   13,  109,  138,   46
+    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  161,  109,   94,   46
+    CONTROL "Solution range for overlay",IDF_GROUP5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  266,  109,  180,   46
+    CONTROL "Show solutions",IDF_ShowRange,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  273,  119,   60,   14
+    CONTROL "Show selected",IDF_ShowTicked,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  273,  136,   60,   14
+    CONTROL "through",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  368,  121,   30,    8
+    CONTROL "1",IDF_Limit1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  334,  119,   32,   14
+    CONTROL "1",IDF_Limit2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  402,  119,   32,   14
+    CONTROL "&Invert Selection",IDF_InvertSelection,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  334,  136,   60,   14
 END
 
 IDD_SA_Multi_completed_ep RCDATA
@@ -2089,109 +2089,12 @@ BEGIN
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
+" 1219               1              99 \n"
+" 1220               1              99 \n"
 "[Trackbars] \n"
 "[Grids] \n"
 " 1136     5     99   128 \n"
 "   16 \n"
-"1 \n"
-"2 \n"
-"3 \n"
-"4 \n"
-"5 \n"
-"6 \n"
-"7 \n"
-"8 \n"
-"9 \n"
-"10 \n"
-"11 \n"
-"12 \n"
-"13 \n"
-"14 \n"
-"15 \n"
-"16 \n"
-"17 \n"
-"18 \n"
-"19 \n"
-"20 \n"
-"21 \n"
-"22 \n"
-"23 \n"
-"24 \n"
-"25 \n"
-"26 \n"
-"27 \n"
-"28 \n"
-"29 \n"
-"30 \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
-" \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0

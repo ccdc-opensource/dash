@@ -26,6 +26,7 @@
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
       CHARACTER*255 Grid_Buffer
+      INTEGER RangeOption
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
@@ -47,8 +48,29 @@
               CALL WizardWindowShow(IDD_SA_input3)
               CALL PopActiveWindowID
               RETURN
+            CASE (IDF_InvertSelection)
+              DO irow = 1, MaxRuns
+                CALL WGridGetCellCheckBox(IDF_SA_summary,3,irow,istatus)
+                IF (istatus .EQ. 1) THEN
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,irow,Unchecked)
+                ELSE
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,irow,Checked)
+                ENDIF
+              ENDDO
             CASE (IDB_ShowOverlap)
               CALL SA_STRUCTURE_OUTPUT_OVERLAP
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_ShowRange, IDF_ShowTicked)
+              CALL WDialogGetRadioButton(IDF_ShowRange,RangeOption)
+              IF (RangeOption .EQ. 1) THEN ! "Show Selected"
+                CALL WDialogFieldState(IDF_Limit1,Enabled)
+                CALL WDialogFieldState(IDF_Limit2,Enabled)
+              ELSE
+                CALL WDialogFieldState(IDF_Limit1,Disabled)
+                CALL WDialogFieldState(IDF_Limit2,Disabled)
+              ENDIF
           END SELECT
       END SELECT
 !ep allows you to view pdb file of SA Solutions, each clicked
@@ -62,11 +84,10 @@
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(irow)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,2,irow,Unchecked)
-          istatus = 0
         ENDIF
-      ENDDO               
+      ENDDO
       CALL PopActiveWindowID
- 
+
       END SUBROUTINE DealWithSaSummary
 !
 !*******************************************************************************

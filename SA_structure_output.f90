@@ -298,18 +298,21 @@
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
 
-      INTEGER RunNr, TickedRunNr
+      INTEGER RunNr, TickedRunNr, NumOfOverlaidStructures
       INTEGER  pdbBond(1:maxbnd_2*maxfrg,1:2)
       INTEGER TotNumBonds, NumOfAtomsSoFar
       CHARACTER*4 LabelStr
       CHARACTER*2 ColourStr
       CHARACTER*2 RunStr
       LOGICAL, EXTERNAL :: ChrIsLetter
-      INTEGER AtomLabelOption, AtomColourOption
+      INTEGER AtomLabelOption, AtomColourOption, RangeOption
       INTEGER GridRowNr
       CHARACTER*100 tString
       INTEGER II, I, ifrg, J, iiact, ISTATUS, BondNr, ilen
       REAL xc, yc, zc
+      LOGICAL UseThisSolution
+      INTEGER Limit1, Limit2
+      INTEGER tInteger
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
@@ -374,10 +377,18 @@
 ! 2. "By element"
       CALL WDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
 ! Get atom colour option from dialogue. Two options: 
-! 1. "By solution number"
-! 2. "By element"
-!U      CALL WDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
-
+! 1. "Show Solutions p through q"
+! 2. "Show Selected"
+      CALL WDialogGetRadioButton(IDF_ShowRange,RangeOption)
+      IF (RangeOption .EQ. 1) THEN ! "Show Solutions p through q"
+        CALL WDialogGetInteger(IDF_Limit1,Limit1)
+        CALL WDialogGetInteger(IDF_Limit2,Limit2)
+        IF (Limit1 .GT. Limit2) THEN
+          tInteger = Limit2
+          Limit2 = Limit1
+          Limit1 = tInteger
+        ENDIF
+      ENDIF
 ! JvdS Oct 2001
 ! Note that for the following code--which can colour an atom assigning a dummy element while retaining
 ! the original atom label even if this contains the contradictory element symbol--relies
@@ -390,9 +401,16 @@
 ! In short: works only with Mercury.
       iiact = 0
       TickedRunNr = 0
+      NumOfOverlaidStructures = 0
       DO GridRowNr = 1, SA_Run_Number
-        CALL WGridGetCellCheckBox(IDF_SA_summary,3,GridRowNr,istatus)
-        IF (istatus .EQ. 1) THEN
+        IF (RangeOption .EQ. 1) THEN ! "Show Solutions p through q"
+          UseThisSolution = ((GridRowNr .GE. Limit1) .AND. (GridRowNr .LE. Limit2))
+        ELSE ! "Show Selected"
+          CALL WGridGetCellCheckBox(IDF_SA_summary,3,GridRowNr,istatus)
+          UseThisSolution = (istatus .EQ. 1)
+        ENDIF
+        IF (UseThisSolution) THEN
+          NumOfOverlaidStructures = NumOfOverlaidStructures + 1
 ! The solutions have been ordered wrt chi**2. We must parse the original run nr from the
 ! number of the .pdb file. Unless we didn't do a multirun of course.
           IF (MaxRuns .EQ. 1) THEN
@@ -465,15 +483,10 @@
           ENDDO ! loop over z-matrices
         ENDIF ! Was this solution ticked to be displayed?
       ENDDO ! loop over runs
-      TickedRunNr = 0
-      DO RunNr = 1, SA_Run_Number
-        CALL WGridGetCellCheckBox(IDF_SA_summary,3,RunNr,istatus)
-        IF (istatus .EQ. 1) THEN
-          TickedRunNr = TickedRunNr + 1
-          DO BondNr = 1, TotNumBonds
-            WRITE(65,'(A6,I5,I5)') 'CONECT', (pdbBond(BondNr,1)+NATOM*(TickedRunNr-1)), (pdbBond(BondNr,2)+NATOM*(TickedRunNr-1))
-          ENDDO
-        ENDIF
+      DO RunNr = 1, NumOfOverlaidStructures
+        DO BondNr = 1, TotNumBonds
+          WRITE(65,'(A6,I5,I5)') 'CONECT', (pdbBond(BondNr,1)+NATOM*(RunNr-1)), (pdbBond(BondNr,2)+NATOM*(RunNr-1))
+        ENDDO
       ENDDO ! loop over runs
       WRITE (65,"('END')")
       CLOSE (65)
@@ -485,7 +498,6 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE SA_STRUCTURE_OUTPUT_OVERLAP
-!*==SAGMINV.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -559,7 +571,6 @@
   190 ENDDO
 
       END SUBROUTINE SAGMINV
-!*==SAGMEQ.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -578,7 +589,6 @@
       ENDDO
 
       END SUBROUTINE SAGMEQ
-!*==PDB_SYMMRECORDS.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -613,7 +623,7 @@
       INTEGER SOAxis
       DIMENSION SoAxis(50,3)
       COMMON/SYMOPS/SOSign, SONumber, SOAxis
-!
+
 ! Expand the symmetry generators into a list of symm ops by cross-multiplication
       DO i = 1, 4
         DO j = 1, 4
@@ -669,7 +679,6 @@
       ENDDO
 
       END SUBROUTINE PDB_SYMMRECORDS
-!*==PDB_MATMUL.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -684,7 +693,6 @@
       ENDDO
 
       END SUBROUTINE PDB_MATMUL
-!*==PDB_CMPMAT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -699,9 +707,8 @@
         ENDDO
       ENDDO
       PDB_CmpMat = .TRUE.
-!
+
       END FUNCTION PDB_CMPMAT
-!*==PDB_POSTRANS.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -725,7 +732,6 @@
       r(4,4) = 1.0
 
       END SUBROUTINE PDB_POSTRANS
-!*==ADDSINGLESOLUTION.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -749,7 +755,6 @@
       CALL Log_SARun_Entry(pdb_file,ProfileChi,IntensityChi)
 
       END SUBROUTINE ADDSINGLESOLUTION
-!*==ADDMULTISOLUTION.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -792,7 +797,6 @@
       CALL Log_SARun_Entry(new_fname,ProfileChi,IntensityChi)
 
       END SUBROUTINE ADDMULTISOLUTION
-!*==APPENDNUMTOFILENAME.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -833,7 +837,6 @@
       ENDDO
 
       END SUBROUTINE APPENDNUMTOFILENAME
-!*==UPDATEVIEWER.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
