@@ -273,7 +273,7 @@
         EOBS(I) = BackupEOBS(I)
       ENDDO
 ! JvdS Assume no knowledge on background
-      CALL Init_BackGround
+      CALL Clear_BackGround
       CALL Rebin_Profile
       CALL GetProfileLimits
 
@@ -373,6 +373,8 @@
               IF (.NOT. FnWavelengthOK()) THEN
                 CALL ErrorMessage('Invalid wavelength.')
               ELSE
+                CALL WDialogGetReal(IDF_wavelength1,Temp)
+                CALL Set_Wavelength(Temp)
 ! Set allowed range for resolution
                 CALL WDialogSelect(IDD_PW_Page5)
                 CALL WDialogRangeReal(IDF_MaxResolution,TwoTheta2dSpacing(XBIN(NBIN)),50.0)
@@ -511,14 +513,21 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'lattice.inc'
+
       INTEGER tInt1, tInt2
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
-      CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
-      CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-      CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+      IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
+        CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
+        CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
+        CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+      ELSE
+        CALL Clear_BackGround
+        BACKREF = .TRUE.
+      ENDIF
       CALL PopActiveWindowID
 
       END SUBROUTINE WizardApplyBackground
@@ -533,7 +542,7 @@
 
       IMPLICIT NONE
 
-      INTEGER tInt1, tInt2
+      INTEGER tInt1, tInt2, tFieldState
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
@@ -558,9 +567,13 @@
             CASE (IDF_Preview)
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
-              CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
-              CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-              CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+              IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
+                CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
+                CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
+                CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+              ELSE
+                CALL Clear_BackGround
+              ENDIF
 ! Force display of background
               CALL WDialogSelect(IDD_Plot_Option_Dialog)
               CALL WDialogPutCheckBoxLogical(IDF_background_check,.TRUE.)
@@ -570,6 +583,27 @@
               CALL WizardApplyProfileRange
               CALL WizardApplyBackground
               CALL Profile_Plot
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_SubtractBackground)
+! If set to 'TRUE', ungrey value field and vice versa
+              IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
+                tFieldState = Enabled
+              ELSE
+                tFieldState = Disabled
+                CALL WizardApplyDiffractionFileInput
+                CALL WizardApplyProfileRange
+                CALL Clear_BackGround
+                CALL Profile_Plot
+              ENDIF
+              CALL WDialogFieldState(IDF_LABEL7,tFieldState)
+              CALL WDialogFieldState(IDF_NumOfIterations,tFieldState)
+              CALL WDialogFieldState(IDF_LABEL8,tFieldState)
+              CALL WDialogFieldState(IDF_WindowWidth,tFieldState)
+              CALL WDialogFieldState(IDF_UseMCYN,tFieldState)
+              CALL WDialogFieldState(IDF_Preview,tFieldState)
+              CALL WDialogFieldState(IDAPPLY,tFieldState)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -1082,7 +1116,7 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDF_ClearPeakFitRanges)
-              IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Init_PeakFitRanges
+              IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Clear_PeakFitRanges
           END SELECT
       END SELECT
       CALL PopActiveWindowID
