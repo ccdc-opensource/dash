@@ -351,7 +351,7 @@
       nvar = kk
 ! Now fill the grid
       CALL WDialogSelect(IDD_SA_Modal_input2)
-      CALL WGridRows(IDF_parameter_grid_modal,nvar)
+      CALL WGridRows(IDF_parameter_grid_modal, nvar)
       DO i = 1, nvar
         CALL WGridLabelRow(IDF_parameter_grid_modal, i, parlabel(i))
         CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, i, x(i), '(F12.5)')
