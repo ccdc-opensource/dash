@@ -1,4 +1,4 @@
-! @ The validity of tLattice is never checked !!!
+! @@ The validity of tLattice is never checked !!!
 !
 !*****************************************************************************
 !
@@ -33,19 +33,20 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      CHARACTER*2  AtmElement(1:MAXATM_2)
+      CHARACTER*2  AtmElement
       INTEGER      i
       REAL         Coordinates(1:3,1:MAXATM_2)
       INTEGER      InputFile
       REAL         a, b, c, alpha, beta, gamma
       REAL         tLattice(1:3,1:3)
       INTEGER      NewLength
-      LOGICAL      ChrIsLetter ! Function
+      LOGICAL, EXTERNAL :: ChrIsLetter
       REAL         tX, tY, tZ
       CHARACTER*255 tString, tSubString
       REAL         DummyReal
       INTEGER      DummyInteger
       INTEGER, EXTERNAL :: WriteMol2
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
 ! Initialise to 'failure'
       Res2Mol2 = 0
@@ -78,9 +79,10 @@
               ChrIsLetter(tString(3:3)) .AND.            &
               ChrIsLetter(tString(4:4))) GOTO 10
 ! From now on, we assume it was an atom. Atomic element symbols can only have 2 characters in DASH
-          natcry = natcry + 1
-          AtmElement(natcry)(1:2) = tString(1:2)
-          IF (.NOT. ChrIsLetter(tString(2:2))) AtmElement(natcry)(2:2) = ' '
+          CALL INC(natcry)
+          AtmElement(1:2) = tString(1:2)
+          IF (.NOT. ChrIsLetter(tString(2:2))) AtmElement(2:2) = ' '
+          aelem(natcry) = ElmSymbol2CSD(AtmElement)
           CALL StrClean(tString,NewLength)
           CALL GetSubString(tString,' ',tSubString)
           atomlabel(natcry) = tSubString(1:5)
@@ -104,8 +106,6 @@
         axyzo(I,3) = tZ
       ENDDO
       CLOSE(InputFile)
-! Given the element, assign the CSD element (fill aelem(1:MAXATM))
-      CALL AssignCSDElement(AtmElement)
       CALL SAMABO
       Res2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-3)//'mol2')
       RETURN
@@ -158,7 +158,7 @@
       CHARACTER*50 tString
       INTEGER*4    SERIAL
       CHARACTER*4  NAME(MAXATM_2)
-      LOGICAL      ChrIsLetter ! Function
+      LOGICAL, EXTERNAL :: ChrIsLetter
       REAL         tX, tY, tZ
       INTEGER, EXTERNAL :: WriteMol2
 
@@ -240,6 +240,7 @@
 !*****************************************************************************
 !
       INTEGER FUNCTION WriteMol2(TheFileName)
+!
 ! Takes number of atoms    from natcry    in SAMVAR
 ! Takes atomic coordinates from axyzo     in SAMVAR  (orthogonal)
 ! Takes element types      from aelem     in SAMVAR  (CSD style)
@@ -247,8 +248,12 @@
 ! Takes bonds              from bond      in SAMVAR
 ! Takes bond types         from btype     in SAMVAR
 ! and writes out a .mol2 file
+!
+! RETURNS 0 for failure
+!         1 for success
 
       USE SAMVAR
+      USE ATMVAR
 
       IMPLICIT NONE
 
@@ -257,23 +262,8 @@
       CHARACTER*4 sybatom(1:MAXATM_2)
       CHARACTER*2 BondStr(0:9)
       CHARACTER*2 HybridisationStr
-      CHARACTER*1 ChrLowerCase, ChrUpperCase ! Functions
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
       INTEGER I, J, Ilen, OutputFile
-
-      CHARACTER*3 ElementStr(1:109)
-
-      DATA        ElementStr                                                            &
-               /'C  ', 'H  ', 'Ac ', 'Ag ', 'Al ', 'Am ', 'Ar ', 'As ', 'At ', 'Au ',   &
-                'B  ', 'Ba ', 'Be ', 'Bi ', 'Bk ', 'Br ', 'Ca ', 'Cd ', 'Ce ', 'Cf ',   &
-                'Cl ', 'Cm ', 'Co ', 'Cr ', 'Cs ', 'Cu ', 'D  ', 'Dy ', 'Er ', 'Es ',   &
-                'Eu ', 'F  ', 'Fe ', 'Fm ', 'Fr ', 'Ga ', 'Gd ', 'Ge ', 'He ', 'Hf ',   &
-                'Hg ', 'Ho ', 'I  ', 'In ', 'Ir ', 'K  ', 'Kr ', 'La ', 'Li ', 'Lu ',   &
-                'Lw ', 'Md ', 'Mg ', 'Mn ', 'Mo ', 'N  ', 'Na ', 'Nb ', 'Nd ', 'Ne ',   &
-                'Ni ', 'No ', 'Np ', 'O  ', 'Os ', 'P  ', 'Pa ', 'Pb ', 'Pd ', 'Pm ',   &
-                'Po ', 'Pr ', 'Pt ', 'Pu ', 'Ra ', 'Rb ', 'Re ', 'Rh ', 'Rn ', 'Ru ',   &
-                'S  ', 'Sb ', 'Sc ', 'Se ', 'Si ', 'Sm ', 'Sn ', 'Sr ', 'Ta ', 'Tb ',   &
-                'Tc ', 'Te ', 'Th ', 'Ti ', 'Tl ', 'Tm ', 'U  ', 'V  ', 'W  ', 'X  ',   &
-                'Xe ', 'Y  ', 'Yb ', 'Z  ', 'Zn ', 'Zr ', 'Zz ', 'Me ', 'Du '/
 
 !    The CSD bond types are:  1 = single  2= double  3=triple  4=quadruple
 !                             5 = aromatic      6 = polymeric single
@@ -299,7 +289,6 @@
       BondStr(7) = 'un'
       BondStr(8) = 'un'
       BondStr(9) = 'un'
-      
 ! Initialise to failure
       WriteMol2 = 0
       DO I = 1, natcry
@@ -326,27 +315,26 @@
       ENDDO
       Ilen = LEN_TRIM(TheFileName)
       OutputFile = 3
-      OPEN(UNIT=OutputFile,file=TheFileName(1:Ilen),form='formatted',err=997)
-      WRITE(OutputFile,"('@<TRIPOS>MOLECULE')",ERR=996)
-      WRITE(OutputFile,'(A)',ERR=996) 'Temporary file created by DASH'
-      WRITE(OutputFile,"(2(I5,1X),'    1     0     0')",ERR=996) natcry, nbocry
-      WRITE(OutputFile,"('SMALL')",ERR=996)
-      WRITE(OutputFile,"('NO_CHARGES')",ERR=996)
-      WRITE(OutputFile,"('@<TRIPOS>ATOM')",ERR=996)
+      OPEN(UNIT=OutputFile,file=TheFileName(1:Ilen),form='formatted',ERR=999)
+      WRITE(OutputFile,"('@<TRIPOS>MOLECULE')",ERR=999)
+      WRITE(OutputFile,'(A)',ERR=999) 'Temporary file created by DASH'
+      WRITE(OutputFile,"(2(I5,1X),'    1     0     0')",ERR=999) natcry, nbocry
+      WRITE(OutputFile,"('SMALL')",ERR=999)
+      WRITE(OutputFile,"('NO_CHARGES')",ERR=999)
+      WRITE(OutputFile,"('@<TRIPOS>ATOM')",ERR=999)
       DO I = 1, natcry
-        WRITE(OutputFile,270,ERR=996) I,atomlabel(I),(axyzo(I,j),j=1,3),sybatom(I)
-  270 FORMAT(I3,1X,A5,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
+        WRITE(OutputFile,270,ERR=999) I,atomlabel(I),(axyzo(I,j),j=1,3),sybatom(I)
+  270   FORMAT(I3,1X,A5,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
       ENDDO
-      WRITE(OutputFile,"('@<TRIPOS>BOND')",ERR=996)
+      WRITE(OutputFile,"('@<TRIPOS>BOND')",ERR=999)
       DO i = 1, nbocry
-        WRITE(OutputFile,'(3(I3,1X),A2)',ERR=996) i,bond(i,1),bond(i,2),BondStr(btype(I))
+        WRITE(OutputFile,'(3(I3,1X),A2)',ERR=999) i,bond(i,1),bond(i,2),BondStr(btype(I))
       ENDDO
       CLOSE(OutputFile)
       WriteMol2 = 1
       RETURN
-  997 CALL ErrorMessage('Error opening mol2 file.')
-      RETURN 
-  996 CALL ErrorMessage('Error while writing mol2 file.')
+  999 CALL ErrorMessage('Error writing mol2 file.')
+      CLOSE(OutputFile)
       RETURN
 
       END FUNCTION WriteMol2
@@ -357,46 +345,44 @@
 
       USE SAMVAR
 
-      INTEGER maxelm
-      PARAMETER (maxelm=109)
-
       CHARACTER*2 AtmElement(MAXATM_2)
-  
-      CHARACTER*2  el(maxelm)
 
-! Elements (plus other CSD 'element' definitions What's 'ZZ'??)
-      DATA el  /'C ','H ','AC','AG','AL','AM','AR','AS','AT','AU','B ', &
-           'BA','BE','BI','BK','BR','CA','CD','CE','CF','CL','CM','CO', &
-           'CR','CS','CU','D ','DY','ER','ES','EU','F ','FE','FM','FR', &
-           'GA','GD','GE','HE','HF','HG','HO','I ','IN','IR','K ','KR', &
-           'LA','LI','LU','LW','MD','MG','MN','MO','N ','NA','NB','ND', &
-           'NE','NI','NO','NP','O ','OS','P ','PA','PB','PD','PM','PO', &
-           'PR','PT','PU','RA','RB','RE','RH','RN','RU','S ','SB','SC', &
-           'SE','SI','SM','SN','SR','TA','TB','TC','TE','TH','TI','TL', &
-           'TM','U ','V ','W ','X ','XE','Y ','YB','Z ','ZN','ZR','ZZ', &
-           'ME','DU'/
-
-      INTEGER I, J
-      LOGICAL FOUND
-      CHARACTER*2 tElem
-      CHARACTER*1 ChrUpperCase ! Function
+      INTEGER I
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
 ! We know AtmElement, now get the CSD element number
       DO I = 1, natcry
-        FOUND = .FALSE.
-        tElem(1:1) = ChrUpperCase(AtmElement(I)(1:1))
-        tElem(2:2) = ChrUpperCase(AtmElement(I)(2:2))
-        DO J = 1, maxelm
-          IF (tElem(1:2) .EQ. el(J)(1:2)) THEN
-             aelem(I) = J
-             FOUND = .TRUE.
-             EXIT
-          ENDIF
-        ENDDO
-        IF (.NOT. FOUND) CALL DebugErrorMessage('Element '//AtmElement(I)(1:2)//' not found')
+        aelem(I) = ElmSymbol2CSD(AtmElement(I))
       ENDDO
 
       END SUBROUTINE AssignCSDElement
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION ElmSymbol2CSD(TheElementSymbol)
+! This function takes an element symbol (e.g. 'Ag') and converts it to the corresponding CSD element number
+
+      USE ATMVAR
+
+      CHARACTER*2, INTENT (IN   ) :: TheElementSymbol
+
+      INTEGER I
+      CHARACTER*2 tElem
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
+
+      tElem(1:1) = ChrUpperCase(TheElementSymbol(1:1))
+      tElem(2:2) = ChrLowerCase(TheElementSymbol(2:2))
+      DO I = 1, maxelm
+        IF (tElem(1:2) .EQ. ElementStr(I)(1:2)) THEN
+          ElmSymbol2CSD = I
+          RETURN
+        ENDIF
+      ENDDO
+      CALL DebugErrorMessage('Element '//TheElementSymbol(1:2)//' not found')
+      ElmSymbol2CSD = 109
+
+      END FUNCTION ElmSymbol2CSD
 !
 !*****************************************************************************
 !
