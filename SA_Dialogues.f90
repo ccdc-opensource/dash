@@ -315,9 +315,12 @@
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
 
+      INTEGER         JMyExit
+      COMMON /MyExit/ JMyExit
+
+      INTEGER IHANDLE, JPOS, KPOS
       REAL         rpos
       INTEGER      ipos
-      INTEGER IHANDLE, JMyExit, JPOS, KPOS
       INTEGER, EXTERNAL :: WriteSAParametersToFile
 
 ! We are now on window number 3
@@ -355,14 +358,6 @@
               CALL CalCosArx()
               CALL Create_AtomicWeightings
               CALL BeginSA(JMyExit)
-              SELECT CASE (JMyExit)
-                CASE (2)
-                  CALL WDialogSelect(IDD_SA_input2)
-                  CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-                CASE (3)
-                  CALL WDialogSelect(IDD_SA_input3)
-                  CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-              END SELECT
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
