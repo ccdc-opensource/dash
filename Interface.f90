@@ -143,6 +143,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -150,8 +151,20 @@
 
       INCLUDE 'GLBVAR.INC'
 
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
+      REAL    tMaxResolution
       INTEGER I, IRadSelection
       REAL    FnWavelengthOfMenuOption ! Function
+      REAL    TwoTheta2dSpacing, dSpacing2TwoTheta ! Function
 
       IF ((TheWaveLength .LT. 0.01) .OR. (TheWaveLength .GT. 20.0)) THEN
         CALL ErrorMessage('Invalid wavelength')
@@ -161,6 +174,17 @@
       ALambda = TheWaveLength
       CALL PushActiveWindowID
 ! This is the right place to update the maximum resolution (even if it's not necessary)
+! In principle, set resolution so as to truncate after DefaultMaxResolution.
+! However, if truncation resolution not attainable with current data range / wavelength,
+! adjust the setting of the maximum resolution to maximum possible.
+      CALL WDialogSelect(IDD_PW_Page5)
+      IF (NoData) THEN
+        tMaxResolution = DefaultMaxResolution
+      ELSE
+        tMaxResolution = MAX(TwoTheta2dSpacing(XPMAX),DefaultMaxResolution)
+      ENDIF
+      CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
+      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tMaxResolution))
 
       CALL WDialogSelect(IDD_Data_Properties)
       CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
@@ -210,9 +234,6 @@
         PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
         PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),PkPosAv(MAX_NPFR)
 
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
@@ -229,22 +250,17 @@
           AllPkPosEsd(NTPeak) = PkPosEsd(I,J)
         END DO
       END DO
-      DO I = 1, NumObsTic
-        NTPeak = NTPeak + 1
-        AllPkPosVal(NTPeak) = XObsTic(I)
-        AllPkPosEsd(NTPeak) = 0.005
-      END DO
       CALL SORT_REAL(AllPkPosVal,IOrdTem,NTPeak)
       IF (NTic .NE. 0) THEN
 !.. Let's find the closest peaks and their distribution around the observed peak positions
         IR1 = 1
         DO I = 1, NTPeak
           IOrd = IOrdTem(I)
-          xtem = ArgK(IR1)-AllPkPosVal(IOrd)
+          xtem = ARGK(IR1)-AllPkPosVal(IOrd)
           atem = ABS(xtem)
           item = IR1
           DO IR = IR1, NTic
-            xnew = ArgK(IR) - AllPkPosVal(IOrd)
+            xnew = ARGK(IR) - AllPkPosVal(IOrd)
             anew = ABS(xnew)
             IF (anew .LE. atem) THEN
               item = IR
@@ -260,7 +276,7 @@
           DO II = 1, 3
             IHPk(II,I) = IH(II,item)
           END DO
-          PkArgK(I) = ArgK(Item)
+          PkArgK(I) = ARGK(Item)
           IArgK(I) = Item
         END DO
         IF (NTPeak .EQ. 1) THEN
@@ -285,7 +301,7 @@
           DifMinSq = DifMin**2
           ArgBot = 0.5/(SigmDif**2+AllPkPosEsd(IOrd)**2)
           DO IR = IRef1, IRef2
-            ArgTop=(AllPkPosVal(IOrd)-ArgK(IR))**2
+            ArgTop=(AllPkPosVal(IOrd)-ARGK(IR))**2
             ProbAdd=EXP(-ArgTop*ArgBot)
             IF (ABS(ArgTop-DifMinSq).LT.1.e-10) THEN
               ProbTop=ProbTop+ProbAdd
@@ -343,6 +359,7 @@
       
       INCLUDE 'GLBVAR.INC' ! Contains JRadOption
 
+! JvdS @ this can be reduced by a factor of three
       JRadOption = tIRadOption
       CALL PushActiveWindowID
       SELECT CASE (JRadOption)
@@ -465,6 +482,455 @@
       RETURN
 
       END SUBROUTINE SetSourceDataState
+!
+!*****************************************************************************
+!
+      SUBROUTINE UpdateCell
+! 
+! This routine takes the unit cell parameters as they are in the global variables
+! CellPar and updates other menus accordingly.
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'statlog.inc'
+      INCLUDE 'lattice.inc'
+
+      LOGICAL FnUnitCellOK ! Function
+
+      CALL PushActiveWindowID
+! Update values of constrained cell parameters to match the parameters they're constrained to
+      SELECT CASE (LatBrav)
+        CASE ( 1) ! Triclinic
+        CASE ( 2) ! Monoclinic a
+        CASE ( 3) ! Monoclinic b
+        CASE ( 4) ! Monoclinic c
+        CASE ( 5) ! Orthorhombic
+        CASE ( 6) ! Tetragonal
+          CellPar(2) = CellPar(1)
+        CASE ( 7, 9) ! Trigonal / Hexagonal
+          CellPar(2) = CellPar(1)
+        CASE ( 8) ! Rhombohedral
+          CellPar(2) = CellPar(1)
+          CellPar(3) = CellPar(1)
+          CellPar(5) = CellPar(4)
+          CellPar(6) = CellPar(4)
+        CASE (10) ! Cubic
+          CellPar(2) = CellPar(1)
+          CellPar(3) = CellPar(1)
+      END SELECT
+! Update all windows so that they show the contents of the global variables.
+! This is in the cell parameters tab, in the wizard, and in the peak positions tab.
+      CALL Upload_Cell_Constants()
+      CALL WDialogSelect(IDD_PW_Page1)
+      IF (FnUnitCellOK()) THEN
+! Enable the wizard next button
+        CALL WDialogFieldState(IDNEXT,Enabled)
+      ELSE
+! Disable the wizard next button
+        CALL WDialogFieldState(IDNEXT,Disabled)
+      END IF
+      CALL Generate_TicMarks
+      CALL PopActiveWindowID
+
+      END SUBROUTINE UpdateCell
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION SGNrTable2Menu(TheTableNr)
+!
+! This function takes the number of a space group (1 - 530) and determines its
+! number in the Winteracter space group menu (assuming that that the correct crystal system has been set)
+!
+! INPUT   : The number of a space group (1 - 530)
+!
+! RETURNS : The number of that space group in the space group menu
+!
+! Note: LatBrav must have been set correctly
+!
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheTableNr
+
+      INCLUDE 'Lattice.inc'
+
+      SGNrTable2Menu = TheTableNr - LPosSG(LatBrav) + 1
+
+      END FUNCTION SGNrTable2Menu
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION SGNrMenu2Table(TheMenuNr)
+!
+! This function takes the number of a space group in the Winteracter space group menu
+! determines its number in the tables (1 - 530) (assuming that that the correct crystal system has been set)
+!
+! INPUT   : The number of a space group (1 - 530)
+!
+! RETURNS : The number of that space group in the space group menu
+!
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheMenuNr
+
+      INCLUDE 'Lattice.inc'
+
+      SGNrMenu2Table = TheMenuNr + LPosSG(LatBrav) - 1
+
+      END FUNCTION SGNrMenu2Table
+!
+!*****************************************************************************
+!
+      SUBROUTINE SetSpaceGroupMenu
+!
+! This subroutine determines which space groups are possible given the crystal system
+! as held in the global variable LatBrav and
+! updates the space-group menus in the main window and the wizard to contain
+! only those space groups
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+      INCLUDE 'statlog.inc'
+
+! JvdS MaxSPGR is set to 530 in 'lattice.inc'
+! Not necessary any more: with 'crystal system = unknown' eliminated,
+! the number of possible space groups is always a subset determined by the
+! crystal system. It's only a local variable, and it's safer this way, so just leave it for now.
+      CHARACTER(LEN=24) :: SGHMaBrStr(MaxSPGR)
+      INTEGER tISG, tJSG, ISPosSG, NumBrSG
+
+      CALL PushActiveWindowID
+      NumBrSG = LPosSG(LatBrav+1) - LPosSG(LatBrav)
+      DO tISG = 1, NumBrSG
+        tJSG = LPosSG(LatBrav) + tISG - 1
+        SGHMaBrStr(tISG)( 1:12) = SGNumStr(tJSG)(1:12)
+        SGHMaBrStr(tISG)(13:24) = SGHMaStr(tJSG)(1:12)
+      END DO
+      IF ((NumberSGTable .LT. LPosSg(LatBrav)) .OR. (NumberSGTable .GE. LPosSg(LatBrav+1))) THEN
+! Current space group not possible in this crystal system: so update the space group to the first
+! in the list of possibilities.
+        NumberSGTable = LPosSG(LatBrav)
+        ISPosSG = 1
+      ELSE
+        ISPosSG = NumberSGTable - LPosSG(LatBrav) + 1
+      END IF
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+      CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE SetSpaceGroupMenu
+!
+!*****************************************************************************
+!
+      SUBROUTINE Update_Space_Group(IUploadFrom)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: IUploadFrom
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'statlog.inc'
+      INCLUDE 'Lattice.inc'
+
+      INTEGER SGNrMenu2Table ! Function
+      INTEGER ISPosSG
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IUploadFrom)
+      CALL WDialogGetMenu(IDF_Space_Group_Menu,ISPosSG)
+      NumberSGTable = SGNrMenu2Table(ISPosSG)
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
+      CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Update_Space_Group
+!
+!*****************************************************************************
+!
+      SUBROUTINE UserSetCrystalSystem(TheCrystalSystem)
+! 
+! This subroutine is only called when the user explicitly requested this crystal system
+! therefore, the angles etc. can be changed to the corresponding values
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheCrystalSystem
+
+      INCLUDE 'Lattice.inc'
+
+      IF ((TheCrystalSystem .GE. 1) .AND. (TheCrystalSystem .LE. 10)) THEN
+        LatBrav = TheCrystalSystem
+      ELSE
+        CALL DebugErrorMessage('Crystal Sytem out of range in UserSetCrystalSystem()')
+        LatBrav = 1
+      END IF
+      CellParConstrained = .FALSE.
+      CALL PushActiveWindowID
+      SELECT CASE (LatBrav)
+        CASE ( 1) ! Triclinic
+        CASE ( 2) ! Monoclinic a
+          CellPar(5) =  90.0
+          CellPar(6) =  90.0
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
+        CASE ( 3) ! Monoclinic b
+          CellPar(4) =  90.0
+          CellPar(6) =  90.0
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(6) = .TRUE.
+        CASE ( 4) ! Monoclinic c
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+        CASE ( 5) ! Orthorhombic
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+          CellPar(6) =  90.0
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
+        CASE ( 6) ! Tetragonal
+          CellPar(2) = CellPar(1)
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+          CellPar(6) =  90.0
+          CellParConstrained(2) = .TRUE.
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
+        CASE ( 7, 9) ! Trigonal / Hexagonal
+          CellPar(2) = CellPar(1)
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+          CellPar(6) = 120.0
+          CellParConstrained(2) = .TRUE.
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
+        CASE ( 8) ! Rhombohedral
+          CellPar(2) = CellPar(1)
+          CellPar(3) = CellPar(1)
+          CellPar(5) = CellPar(4)
+          CellPar(6) = CellPar(4)
+          CellParConstrained(2) = .TRUE.
+          CellParConstrained(3) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
+        CASE (10) ! Cubic
+          CellPar(2) = CellPar(1)
+          CellPar(3) = CellPar(1)
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+          CellPar(6) =  90.0
+          CellParConstrained = .TRUE.
+          CellParConstrained(1) = .FALSE.
+      END SELECT
+      CALL Upload_Cell_Constants
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL SetSpaceGroupMenu
+      CALL PopActiveWindowID
+
+      END SUBROUTINE UserSetCrystalSystem
+!
+!*****************************************************************************
+!
+      SUBROUTINE SetWavelengthToSelection(Iselection)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: Iselection
+
+      REAL FnWavelengthOfMenuOption ! Function
+
+! Winteracter menu:
+!     1 = <...>
+!     2 = Cu      <==  DEFAULT
+!     3 = Mo
+!     4 = Co
+!     5 = Cr
+!     6 = Fe
+
+      IF ((Iselection .GE. 2) .AND. (Iselection .LE. 6)) THEN
+        CALL UpdateWavelength(FnWavelengthOfMenuOption(Iselection))
+      ELSE
+        CALL DebugErrorMessage('Non-existing item addressed in anode material menu')
+      ENDIF
+
+      END SUBROUTINE SetWavelengthToSelection
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FnWavelengthOfMenuOption(TheOption)
+!
+! This function returns the wavelength that goes with the anode material as selected
+! from the Winteracter menus:
+
+! Winteracter menu:
+!     1 = <...>
+!     2 = Cu      <==  DEFAULT
+!     3 = Mo
+!     4 = Co
+!     5 = Cr
+!     6 = Fe
+!
+! INPUT   : TheOption = the number of the selected option, e.g. 'Cu' = 2
+!
+! RETURNS : The wavelength of the anode material of that menu option in Angstrom
+!           ErrorMessage if TheOption not in range (should never happen)
+!
+! NOTE don't call this function with TheOption 1, because that will initialise the wavelength to 0.0
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheOption
+
+      REAL WavelengthOf ! Function
+
+      SELECT CASE (TheOption)
+        CASE (2)
+          FnWavelengthOfMenuOption = WavelengthOf('Cu')
+        CASE (3)
+          FnWavelengthOfMenuOption = WavelengthOf('Mo')
+        CASE (4)
+          FnWavelengthOfMenuOption = WavelengthOf('Co')
+        CASE (5)
+          FnWavelengthOfMenuOption = WavelengthOf('Cr')
+        CASE (6)
+          FnWavelengthOfMenuOption = WavelengthOf('Fe')
+        CASE DEFAULT
+          CALL DebugErrorMessage('Programming error in FnWavelengthOfMenuOption')
+          FnWavelengthOfMenuOption = 0.0
+      END SELECT
+
+      END FUNCTION FnWavelengthOfMenuOption
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION GetCrystalSystem(IDashSg)
+!
+! This function determines the crystal system given one of the 530 space groups in DASH
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: IDashSg
+
+      INCLUDE 'Lattice.inc'
+
+      INTEGER I
+
+      DO I = 2, 11
+        IF (IDashSg .LT. LPosSG(I)) THEN
+          GetCrystalSystem = I - 1
+          RETURN
+        ENDIF
+      ENDDO
+      CALL DebugErrorMessage('Space group out of range.')
+      GetCrystalSystem = 1 ! Triclininc
+
+      END FUNCTION GetCrystalSystem
+!
+!*****************************************************************************
+!
+      SUBROUTINE SetSAFileName(filename)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      CHARACTER*(*) filename
+
+      CALL PushActiveWindowID
+! JvdS Started to add SA to Wizard
+!      CALL WDialogSelect(IDD_SA_input1)
+      CALL WDialogSelect(IDD_SAW_Page1)
+      CALL WDialogPutString(IDF_SA_Project_Name,filename)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE SetSAFileName
+!
+!*****************************************************************************
+!
+      SUBROUTINE SetWizardState(State)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: State
+
+      IF (State .EQ. 1) THEN
+        CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOn)
+      ELSE
+        CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOff)
+      END IF
+
+      END SUBROUTINE SetWizardState
+!
+!*****************************************************************************
+!
+!>> JCC Subroutine for controlling the configuration of the menus and tool buttons in DASH
+      SUBROUTINE SetModeMenuState(PeakOn,PawleyOn,SolutionOn)
+!>> If PeakOn is positive then peak fitting will be enabled
+!>> If PawleyOn is positive then Pawley fitting will be enabled
+!>> Is SolutionOn is positive solving will be enabled
+!>> If PeakOn is negative then peak fitting will be disabled
+!>> If PawleyOn is negative then Pawley fitting will be disabled
+!>> Is SolutionOn is negative solving will be disabled
+!>> If PeakOn is zero then the peak fitting state is left as is
+!>> If PawleyOn is zero then the Pawley fitting state is left as is
+!>> Is SolutionOn is zero then the solving state is left as is
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: PeakOn, PawleyOn, SolutionOn
+
+      IF (PeakOn .GT. 0) THEN
+        CALL WMenuSetState(ID_Peak_Fitting_Mode,ItemEnabled,WintOn)
+      ELSE IF (PeakOn .LT. 0) THEN
+        CALL WMenuSetState(ID_Peak_Fitting_Mode,ItemEnabled,WintOff)
+      END IF
+      IF (PawleyOn .GT. 0) THEN
+        CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOn)
+      ELSE IF (PawleyOn .LT. 0) THEN
+        CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOff)
+      END IF
+      IF (SolutionOn .GT. 0) THEN
+        CALL WMenuSetState(ID_Structure_Solution_Mode,ItemEnabled,WintOn)
+      ELSE IF (SolutionOn .LT. 0) THEN
+        CALL WMenuSetState(ID_Structure_Solution_Mode,ItemEnabled,WintOff)
+      END IF
+
+      END SUBROUTINE SetModeMenuState
 !
 !*****************************************************************************
 !
