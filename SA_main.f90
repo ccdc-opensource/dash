@@ -568,6 +568,20 @@
       CHARACTER(MaxPathLength) DirName
       CHARACTER*80 FileName
 
+! The following variables are there to allow the dialogue fields in the
+! window dealing with Z-matrices to be handled by DO...ENDDO loops.
+! The field identifiers assigned by Winteracter are not necessarily consecutive, 
+! but these mappings are.
+
+      INTEGER        IDFZMNumber,           IDFZMFile,                &
+                     IDBZMDelete,           IDBZMBrowse,              &
+                     IDBZMView,             IDBZMEdit,                &
+                     IDFZMpars
+      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),      &
+                     IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
+                     IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
+                     IDFZMpars(1:maxfrg)
+
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
       nfrag  = 0

@@ -622,6 +622,7 @@
 !
       SUBROUTINE SA_structure_output_2(TheSolutionNr,TheFileName,TheFileType)
 
+      USE DRUID_HEADER
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR
