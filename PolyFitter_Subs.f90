@@ -585,7 +585,7 @@
         END SELECT
       ENDDO 
 
-      END SUBROUTINE MOVE_CROSSHAIR_FIT
+      END SUBROUTINE Move_CrossHair_Fit
 !
 !*****************************************************************************
 !

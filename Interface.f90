@@ -1605,7 +1605,7 @@
 !
 !*****************************************************************************
 !
-! JCC Subroutine for controlling the configuration of the menus and tool buttons in DASH
+! Subroutine for controlling the configuration of the menus and tool buttons in DASH
       SUBROUTINE SetModeMenuState(PeakOn,PawleyOn,StrucSolOn)
 ! If PeakOn is positive then peak fitting will be enabled
 ! If PawleyOn is positive then Pawley fitting will be enabled
