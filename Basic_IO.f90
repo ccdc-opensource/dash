@@ -93,6 +93,55 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE RegisterChildWindow(TheIHANDLE,TheSubroutine)
+!
+! This routine 'registers' a child window with the GetEvent routines.
+! For each child window, it stores the address of the subroutine
+! that deals with that child window.
+! The registration must be undone manually by a call to UnRegisterChildWindow.
+!
+      IMPLICIT NONE
+
+      INTEGER,  INTENT (IN   ) :: TheIHANDLE
+      EXTERNAL TheSubroutine
+
+      INTEGER*4         ChildWinHandler
+      LOGICAL                                  ChildWinHandlerSet
+      COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
+
+      IF ((TheIHANDLE.LT.1) .OR. (TheIHANDLE.GT.20)) THEN
+        CALL DebugErrorMessage('Invalid Child Window ID in RegisterChildWindow')
+        RETURN
+      ENDIF
+      ChildWinHandler(TheIHANDLE)    = LOC(TheSubroutine)
+      ChildWinHandlerSet(TheIHANDLE) = .TRUE.
+
+      END SUBROUTINE RegisterChildWindow
+!
+!*****************************************************************************
+!
+      SUBROUTINE UnRegisterChildWindow(TheIHANDLE)
+!
+! This routine undoes the action of RegisterChildWindow
+!
+      IMPLICIT NONE
+
+      INTEGER,  INTENT (IN   ) :: TheIHANDLE
+
+      INTEGER*4         ChildWinHandler
+      LOGICAL                                  ChildWinHandlerSet
+      COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
+
+      IF ((TheIHANDLE.LT.1) .OR. (TheIHANDLE.GT.20)) THEN
+        CALL DebugErrorMessage('Invalid Child Window ID in UnRegisterChildWindow')
+        RETURN
+      ENDIF
+      ChildWinHandlerSet(TheIHANDLE) = .FALSE.
+
+      END SUBROUTINE UnRegisterChildWindow
+!
+!*****************************************************************************
+!
       SUBROUTINE GetEvent
 !
 ! Fetches the last event from Winteracter and places it in two global variables
@@ -115,8 +164,16 @@
 ! (all other events for editor child windows are handled automatically by Winteracter)
 ! is the CloseRequest. By 'registering' a child window with GetEvent, by setting the
 ! ChildWinAutoClose variable for that child window to true, GetEvent will take care of that.
-      LOGICAL         ChildWinAutoClose
-      COMMON /ChWAC/  ChildWinAutoClose(1:20)
+      LOGICAL           ChildWinAutoClose
+      COMMON /ChWinAC/  ChildWinAutoClose(1:20)
+
+      INTEGER*4         ChildWinHandler
+      LOGICAL                                  ChildWinHandlerSet
+      COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
+
+      EXTERNAL Handler
+
+      POINTER (p, Handler)
 
   10  CALL WMessage(EventType,EventInfo)
       SELECT CASE (EventInfo%WIN)
@@ -151,11 +208,18 @@
               GOTO 10
           END SELECT
         CASE (1:20)
-          IF ((EventType.EQ.CloseRequest) .AND. ChildWinAutoClose(EventInfo%WIN)) THEN
-            CALL PushActiveWindowID
-            CALL WindowCloseChild(EventInfo%WIN)
-            ChildWinAutoClose(EventInfo%WIN) = .FALSE.
-            CALL PopActiveWindowID
+          IF (EventType.EQ.CloseRequest) THEN
+            IF (ChildWinAutoClose(EventInfo%WIN)) THEN
+              CALL PushActiveWindowID
+              CALL WindowCloseChild(EventInfo%WIN)
+              ChildWinAutoClose(EventInfo%WIN) = .FALSE.
+              CALL PopActiveWindowID
+              GOTO 10
+            ENDIF
+          ENDIF
+          IF (ChildWinHandlerSet(EventInfo%WIN)) THEN
+            p = ChildWinHandler(EventInfo%WIN)
+            CALL Handler
             GOTO 10
           ENDIF
         CASE (IDD_Plot_Option_Dialog)
@@ -233,6 +297,21 @@
 ! with a mouse button press. 
       COMMON /JvdS1/ MseBtnPressed
 
+! For child windows that are an editor, the only event DASH has to handle itself
+! (all other events for editor child windows are handled automatically by Winteracter)
+! is the CloseRequest. By 'registering' a child window with GetEvent, by setting the
+! ChildWinAutoClose variable for that child window to true, GetEvent will take care of that.
+      LOGICAL           ChildWinAutoClose
+      COMMON /ChWinAC/  ChildWinAutoClose(1:20)
+
+      INTEGER*4         ChildWinHandler
+      LOGICAL                                  ChildWinHandlerSet
+      COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
+
+      EXTERNAL Handler
+
+      POINTER (p, Handler)
+
   10  CALL WMessagePeek(EventType,EventInfo)
       IF (EventType .NE. NoMessage) THEN
         SELECT CASE (EventInfo%WIN)
@@ -267,10 +346,18 @@
                 GOTO 10
             END SELECT
           CASE (1:20)
-            IF (EventType .EQ. CloseRequest) THEN
-              CALL PushActiveWindowID
-              CALL WindowCloseChild(EventInfo%WIN)
-              CALL PopActiveWindowID
+            IF (EventType.EQ.CloseRequest) THEN
+              IF (ChildWinAutoClose(EventInfo%WIN)) THEN
+                CALL PushActiveWindowID
+                CALL WindowCloseChild(EventInfo%WIN)
+                ChildWinAutoClose(EventInfo%WIN) = .FALSE.
+                CALL PopActiveWindowID
+                GOTO 10
+              ENDIF
+            ENDIF
+            IF (ChildWinHandlerSet(EventInfo%WIN)) THEN
+              p = ChildWinHandler(EventInfo%WIN)
+              CALL Handler
               GOTO 10
             ENDIF
           CASE (IDD_Plot_Option_Dialog)
@@ -354,7 +441,10 @@
       COMMON /COMWS/ WinStackPtr, WinStack(1:MaxWinStack)
 
 ! Check if stack full
-      IF (WinStackPtr .EQ. 0) RETURN
+      IF (WinStackPtr .EQ. 0) THEN
+        CALL DebugErrorMessage('WinStack full.')
+        RETURN
+      ENDIF
 ! If not, store current window ID
       WinStack(WinStackPtr) = WInfoDialog(CurrentDialog)
 ! Dec(StackPtr)
