@@ -12,16 +12,15 @@
 
       IMPLICIT NONE
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       REAL    MaxMoves1, tMaxMoves
       INTEGER MaxMoves2
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Input3)
+      CALL WDialogSelect(IDD_SA_Input3_2)
       CALL WDialogGetInteger(IDF_SA_MaxRepeats,MaxRuns)
       CALL WDialogGetReal(IDF_MaxMoves1,MaxMoves1)
       IF (MaxMoves1 .LT.   0.001) MaxMoves1 =   0.001
@@ -34,7 +33,6 @@
       IF (tMaxMoves .GT.  2.0E9) tMaxMoves = 2.0E9
       MaxMoves = NINT(tMaxMoves)
       CALL WDialogGetReal(IDF_SA_ChiTest,   ChiMult)
-      RESTART = ((MaxRuns .GT. 1) .AND. (ChiMult .GT. 0.0))
       CALL WDialogSelect(IDD_SAW_Page5)
       CALL WDialogClearField(IDF_SA_Summary)
       CALL PopActiveWindowID
@@ -68,10 +66,9 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER I, iSol
       INTEGER iFrg, iFrgCopy
@@ -168,10 +165,9 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER iSol, hFile
 

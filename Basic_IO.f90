@@ -434,7 +434,7 @@
         CASE (IDD_SA_Modal_input2)
           CALL DealWithWizardWindowParameterBounds
           GOTO 10
-        CASE (IDD_SA_input3)
+        CASE (IDD_SA_input3_2)
           CALL DealWithWizardWindowSASettings
           GOTO 10
         CASE (IDD_SA_Action1)

@@ -325,12 +325,10 @@
 ! NPAR is the number of degrees of freedom that have not been fixed by the user
 ! IP is their mapping
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-! RESTART = logical indicating whether multirun or not
 ! Curr_SA_Run = The number of the current SA run
 ! NumOf_SA_Runs = number of completed SA runs
 ! MaxRuns = maximum number of runs requested by the user. (Note difference with MaxRun)

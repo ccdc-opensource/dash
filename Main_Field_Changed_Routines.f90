@@ -286,11 +286,10 @@
 
       INCLUDE 'PARAMS.INC' 
 
-!ep    need the common block to identify the number rows in the grid          
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+!ep    need the common block to identify the number of rows in the grid          
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
 !     required to handle the profile graphs plotted in child windows
       INTEGER                 SAUsedChildWindows
