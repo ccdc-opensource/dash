@@ -249,17 +249,15 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
-      USE SAMVAR
-!
-!       Called at the end of the SA
-!
-      INCLUDE 'PARAMS.INC'
+
+      IMPLICIT NONE
+
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
 
       DOUBLE PRECISION inv(3,3)
 
+      REAL            XATOPT
       COMMON /posopt/ XATOPT(3,150)
 
       INTEGER         NATOM
@@ -278,8 +276,10 @@
       REAL                pdbAtmCoords
       COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:30)
 
-      PARAMETER (mpdbops=192)
-      CHARACTER*20 cpdbops(mpdbops)
+      INTEGER     mpdbops
+      PARAMETER ( mpdbops = 192 )
+      INTEGER         npdbops
+      CHARACTER*20             cpdbops(mpdbops)
       COMMON /pdbops/ npdbops, cpdbops
 
       LOGICAL         RESTART
@@ -292,10 +292,9 @@
 ! Use standard PDB orthogonalisation
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
+
       INTEGER RunNr, TickedRunNr
-      REAL*8 CART(MAXATM,3)
-      CHARACTER*2  AtmElement(1:MAXATM_2)
-      INTEGER  pdbBond(1:MAXBND*maxfrg,1:2)
+      INTEGER  pdbBond(1:maxbnd_2*maxfrg,1:2)
       INTEGER TotNumBonds, NumOfAtomsSoFar
       CHARACTER*4 LabelStr
       CHARACTER*2 ColourStr
@@ -304,6 +303,8 @@
       INTEGER AtomLabelOption, AtomColourOption
       INTEGER GridRowNr
       CHARACTER*100 tString
+      INTEGER II, I, ifrg, J, iiact, ISTATUS, BondNr, ilen
+      REAL xc, yc, zc
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
@@ -346,33 +347,18 @@
  1070 FORMAT ('SCALE2    ',3F10.5,'      0.00000')
       WRITE (65,1080) inv(3,1), inv(3,2), inv(3,3)
  1080 FORMAT ('SCALE3    ',3F10.5,'      0.00000')
+
 ! Per z-matrix, determine the connectivity. This has to be done only once.
       TotNumBonds = 0
       NumOfAtomsSoFar = 0
       DO ifrg = 1, maxfrg
         IF (gotzmfile(ifrg)) THEN
-          natcry = NATOMS(ifrg)
-          CALL MAKEXYZ(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),      &
-         &             IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART(1,1),     &
-         &             CART(1,2),CART(1,3))
-! Conversion of asym to aelem : very dirty, but works
-          DO I = 1, natcry
-            axyzo(I,1) = SNGL(CART(I,1))
-            axyzo(I,2) = SNGL(CART(I,2))
-            axyzo(I,3) = SNGL(CART(I,3))
-            AtmElement(I)(1:2) = asym(I,ifrg)(1:2)
-          ENDDO
-          CALL AssignCSDElement(AtmElement)
-! Calculate bonds
-          CALL MakeBonds
-! OUTPUT : nbocry             = number of bonds
-!          bond(1:MAXBND,1:2) = the atoms connected by the bond
-          DO J = 1, nbocry
-            pdbBond(J+TotNumBonds,1) = bond(J,1) + NumOfAtomsSoFar
-            pdbBond(J+TotNumBonds,2) = bond(J,2) + NumOfAtomsSoFar
+          DO J = 1, NumberOfBonds(ifrg)
+            pdbBond(J+TotNumBonds,1) = Bonds(1,J,ifrg) + NumOfAtomsSoFar
+            pdbBond(J+TotNumBonds,2) = Bonds(2,J,ifrg) + NumOfAtomsSoFar
           ENDDO
           NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
-          TotNumBonds = TotNumBonds + nbocry
+          TotNumBonds = TotNumBonds + NumberOfBonds(ifrg)
         ENDIF
       ENDDO ! loop over z-matrices
 ! Get atom label option from dialogue. Two options: 
@@ -435,7 +421,7 @@
                 ColourStr = ' P'  ! Phosphorus
             END SELECT
           ENDIF
-          WRITE(RunStr,'(I2)') RunNr
+          WRITE(RunStr,'(I2)') GridRowNr
           CALL StrClean(RunStr,ilen) ! Left justify
           LabelStr = LabelStr(1:LEN_TRIM(LabelStr))//RunStr
           DO ifrg = 1, maxfrg
