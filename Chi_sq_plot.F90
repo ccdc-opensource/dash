@@ -32,6 +32,10 @@
 
       EXTERNAL DealWithChiSqdPlot
 
+      IF (ChiHandle .NE. -1) THEN
+        CALL DebugErrorMessage('OpenChiSqPlotWindow() while ChiHandle .NE. -1')
+        RETURN
+      ENDIF
       CALL WindowOpenChild(ChiHandle,SysMenuOn+MinButton+OwnedByRoot, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
       CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
       Zoomed = .FALSE.
@@ -40,7 +44,10 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WDialogFieldState(IDB_Prog3,Disabled)
+      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL WDialogFieldState(IDB_Prog3,Disabled)
       CALL PopActiveWindowID
+      CALL plotting_Chi_sqd
 
       END SUBROUTINE OpenChiSqPlotWindow
 !
@@ -280,12 +287,12 @@
       ENDIF
 ! Plot line which indicates endpoint
       XEndPoint(1) = XArray(1)
-      XEndPoint(2) = XArray(MaxIterationSoFar) 
+      XEndPoint(2) = XArray(MaxIterationSoFar)
 ! Y Values for endpoint line
       DO j = 1,2
         EndPoint(j) = PAWLEYCHISQ * ChiMult
-      END DO
-      CALL IPgNewPlot(PgPolyLine,1,2,0,1)               
+      ENDDO
+      CALL IPgNewPlot(PgPolyLine,1,2,0,1)
       CALL IPgStyle(  1,  0,  0,  0,  KolNumDif)
       CALL IPgXYPairs(XEndPoint, EndPoint)
 
@@ -363,10 +370,7 @@
       INTEGER Ix, Iy
       COMMON /WindowPosition/ Ix, Iy
 
-      IF (ChiHandle .EQ. -1) THEN
-         CALL DebugErrorMessage("Close_Chisq_Plot() called while window not open")
-         RETURN
-      ENDIF
+      IF (ChiHandle .EQ. -1) RETURN
 ! save position of window before close.
       CALL WindowSelect(ChiHandle)
 ! JvdS If the window has been minimised, this turns out to return negative values
@@ -379,6 +383,8 @@
       ChiHandle = -1
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Action1)
+      CALL WDialogFieldState(IDB_Prog3,Enabled)
+      CALL WDialogSelect(IDD_SAW_Page5)
       CALL WDialogFieldState(IDB_Prog3,Enabled)
       CALL PopActiveWindowID
 
@@ -461,8 +467,8 @@
                 CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
                 CALL IGrPlotMode('Normal')
                 CALL IGrColourN(InfoGrScreen(PrevColReq))
-                IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(chi_x_max - chi_x_min)) RETURN
-                IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(chi_y_max - chi_y_min)) RETURN
+                IF (ABS(XCUR(2)-XCUR(1)).LT.0.006*(chi_x_max - chi_x_min)) RETURN
+                IF (ABS(YCUR(2)-YCUR(1)).LT.0.006*(chi_y_max - chi_y_min)) RETURN
                 chi_x_min = MIN(XCUR(1),XCUR(2))
                 chi_x_max = MAX(XCUR(1),XCUR(2))  
                 chi_y_min = MIN(YCUR(1),YCUR(2))
