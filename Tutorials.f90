@@ -31,8 +31,8 @@
         CASE (ID_Tutorial_5)
           NumberStr = '5'
       END SELECT
-      DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial"//NumberStr
-      FileDir = DirString(1:LEN_TRIM(DirString))//DIRSPACER//"data files"
+      DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"Tutorial"//NumberStr
+      FileDir = DirString(1:LEN_TRIM(DirString))//DIRSPACER//"Data files"
       CALL IOsDirList(FileDir(1:LEN_TRIM(FileDir)),"",Files,Nfiles)
       CALL IOsDirChange(FileDir(1:LEN_TRIM(FileDir)))
       DO I = 1, Nfiles
