@@ -233,9 +233,8 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
-! JCC Handle via the PDB standard
-      DOUBLE PRECISION f2cpdb
-      COMMON /pdbcat/ f2cpdb(3,3)
+      REAL            f2cpdb
+      COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
       DOUBLE PRECISION x,       lb,       ub,       vm
       COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
@@ -259,7 +258,7 @@
       DOUBLE PRECISION dcel(6)
       INTEGER I, II, kk, iFrg, iFrgCopy, tk, iOption, iH, iK, iL
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      REAL tLattice(1:3,1:3), tRecLattice(1:3,1:3), tX, tY, tZ
+      REAL    tLattice(1:3,1:3), tRecLattice(1:3,1:3), tX, tY, tZ
       REAL    Beta_m, Alpha_m, q0m, q1m, q2m, q3m
       REAL    Length
       INTEGER iAxis
