@@ -77,7 +77,7 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
       DO iSol = 1, NumOf_SA_Runs-1
-        CALL WGridGetCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSolOrder(iSol)))
+        CALL WGridGetCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSol2Run(iSol)))
       ENDDO
 ! Add this solution to the list
       DO I = 1, nvar
@@ -87,7 +87,7 @@
       ProfileChiSqd(Curr_SA_Run) = CHIPROBEST
       iSolTicked(Curr_SA_Run) = 1
 ! Now sort the list according to Profile chi sqd
-      CALL SORT_REAL(ProfileChiSqd,iSolOrder,NumOf_SA_Runs)
+      CALL SORT_REAL(ProfileChiSqd,iSol2Run,NumOf_SA_Runs)
       CALL Update_Solutions
       CALL PopActiveWindowID
 
@@ -121,9 +121,9 @@
       OPEN(UNIT=hFile, FILE=OutputFilesBaseName(1:OFBN_Len)//'.log', status = 'unknown',ERR=999)
       WRITE(hFile,*,ERR=999) 'Run number, Profile Chi Squared, Intensity Chi Squared'
       DO iSol = 1, NumOf_SA_Runs
-        WRITE(hFile,10,ERR=999) iSolOrder(iSol),                  &
-                                ProfileChiSqd(iSolOrder(iSol)),   &
-                                IntensityChiSqd(iSolOrder(iSol))
+        WRITE(hFile,10,ERR=999) iSol2Run(iSol),                  &
+                                ProfileChiSqd(iSol2Run(iSol)),   &
+                                IntensityChiSqd(iSol2Run(iSol))
       ENDDO
  10   FORMAT(I3.3,',',F10.4,',',F10.4)
       CLOSE (hFile)

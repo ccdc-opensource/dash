@@ -7,7 +7,7 @@
 
       IMPLICIT NONE
 
-      INTEGER iSolOrder(1:99)
+      INTEGER iSol2Run(1:99)
 
       INTEGER iSolTicked(1:99)
 
