@@ -2,7 +2,7 @@
 !*****************************************************************************
 !
       SUBROUTINE SA_OUTPUT(T,CHIMIN,CHIAV,CHIESD,&
-      xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,&
+      xopt,dxvav,xvsig,flav,N,NUP,NDOWN,NREJ,&
       ntotmov)
 
       USE WINTERACTER
@@ -11,8 +11,8 @@
       IMPLICIT NONE
 
       REAL T, CHIMIN, CHIAV, CHIESD
-      INTEGER n, NUP, NDOWN, NREJ, ntotmov
-      REAL*8 xopt(*),dxvav(*),xvsig(*),flav(*),lb(*),ub(*),vm(*)
+      INTEGER N, NUP, NDOWN, NREJ, ntotmov
+      REAL*8 xopt(*),dxvav(*),xvsig(*),flav(*)
 
       INCLUDE 'PARAMS.INC'
 
@@ -34,6 +34,9 @@
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
       COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
+
+      DOUBLE PRECISION x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       REAL ctem, tempvl
       REAL tenow1, tenow2, ruler, rulex1, rulex2
@@ -144,10 +147,10 @@
 ! Following lines write values to dialogue that hasn't been loaded into memory,
 ! nor is it displayed.
 !U      CALL WDialogSelect(IDD_Parameter_Status_2)
-!U      DO I = 1, n
+!U      DO I = 1, N
 !U        CALL WGridPutCellReal(IDF_CPL_grid,1,I,SNGL(xopt(i)),'(F12.5)')
 !U      ENDDO
-!U      DO I = 1, n
+!U      DO I = 1, N
 !U        CALL WGridPutCellReal(IDF_CPL_grid,2,I,SNGL(flav(i)),'(F12.5)')
 !U        CALL WGridPutCellReal(IDF_CPL_grid,3,I,SNGL(vm(i)),'(F12.5)')
 !U        CALL WGridPutCellReal(IDF_CPL_grid,4,I,SNGL(dxvav(i)),'(F12.5)')
