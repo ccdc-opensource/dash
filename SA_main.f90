@@ -366,20 +366,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ClearZmatrices
-
-      USE ZMVAR
-
-      IMPLICIT NONE
-
-! Blow away the z-matrices
-      gotzmfile = .FALSE.
-      CALL UpdateZmatrixSelection
-
-      END SUBROUTINE ClearZmatrices
-!
-!*****************************************************************************
-!
       SUBROUTINE UpdateZmatrixSelection
 
       USE WINTERACTER
