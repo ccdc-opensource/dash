@@ -898,37 +898,20 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
       LOGICAL, EXTERNAL :: Check_TicMark_Data
-      INTEGER I, NumFittedPFR
 
-      NumFittedPFR = 0 ! The number of Peak Fit Ranges that have actually been fitted
-! Loop over all hatched areas.
-      IF (NumPeakFitRange .GT. 0) THEN
-        DO I = 1, NumPeakFitRange
-          IF (RangeFitYN(I)) CALL INC(NumFittedPFR)
-        ENDDO
-      ENDIF
-      WeCanDoAPawleyRefinement = (Check_TicMark_Data() .AND. (NumFittedPFR .GE. 3))
+      WeCanDoAPawleyRefinement = .FALSE.
+      IF (.NOT. Check_TicMark_Data()) RETURN
+      IF (PeakShapeSigma(1) .LT. -900.0) RETURN
+      IF (PeakShapeSigma(2) .LT. -900.0) RETURN
+      IF (PeakShapeGamma(1) .LT. -900.0) RETURN
+      IF (PeakShapeGamma(2) .LT. -900.0) RETURN
+      IF (PeakShapeHPSL     .LT. -900.0) RETURN
+      IF (PeakShapeHMSL     .LT. -900.0) RETURN
+      WeCanDoAPawleyRefinement = .TRUE.
 
       END FUNCTION WeCanDoAPawleyRefinement
 !
@@ -940,29 +923,40 @@
       USE DRUID_HEADER
       USE VARIABLES
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
-      COMMON /ALLPEAKS/ NTPeak, AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak), &
-        PkProb(MTPeak), IOrdTem(MTPeak), IHPk(3,MTPeak)
+      INTEGER           NTPeak
+      REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              PkProb
+      INTEGER           IOrdTem
+      INTEGER           IHPk
+      COMMON /ALLPEAKS/ NTPeak,                                                  &
+                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        PkProb(MTPeak),                                          &
+                        IOrdTem(MTPeak),                                         &
+                        IHPk(3,MTPeak)
 
       INTEGER IFTYPE
-      INTEGER IFLAGS, KLEN
+      INTEGER iFlags
       CHARACTER(LEN=75) :: FILTER
       REAL    Rvpar(2), Rcpar(5), Lambda, Rdens, Rmolwt, Rfom, Rexpzp, Reps
-      INTEGER Isystem(6), UseErr, I, Iord
+      INTEGER Isystem(6), UseErr, I, iOrd, hFile
       REAL    Epsilon
+      CHARACTER(MaxPathLength) tFileName
 
 ! Get a file name
 
 ! Extract the information from the dialog
-      CALL PushActiveWindowID
-      IFLAGS = SaveDialog  + PromptOn + AppendExt
+      iFlags = SaveDialog  + PromptOn + AppendExt
       FILTER = 'All files (*.*)|*.*|DICVOL files (*.dat)|*.dat|'
-      FNAME=' '
+      tFileName = ' '
       IFTYPE = 2
-      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Enter DICVOL file name',IFTYPE)
-      KLEN = LEN_TRIM(FNAME)
-      IF (KLEN .EQ. 0) RETURN
+      hFile = 117
+      CALL WSelectFile(FILTER,iFlags,tFileName,'Enter DICVOL file name',IFTYPE)
+      IF ((LEN_TRIM(tFileName) .EQ. 0) .OR. (WInfoDialog(ExitButtonCommon) .NE. CommonOK)) RETURN
+      CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Index_Preparation)
       CALL WDialogGetReal(IDF_wavelength1, Lambda)
       CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
@@ -985,37 +979,33 @@
       CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
       CALL WDialogGetReal(IDF_eps,Epsilon)
 ! Write it out 
-      OPEN(UNIT=117,FILE=FNAME(1:KLEN),STATUS='UNKNOWN',ERR=99)
-      WRITE(117,*,ERR=100) 'DICVOL input file created by DASH'
-      WRITE(117,'(8(I3,1X))',ERR=100)  NTPeak, 2, (Isystem(i),i=1,6)
-      WRITE(117,'(7(F8.2,1X))',ERR=100)  Rcpar(1),Rcpar(2),Rcpar(3),Rvpar(1),Rvpar(2),Rcpar(4),Rcpar(5)
-      WRITE(117,'(F10.6,1X,3(F8.4,1X))',ERR=100)  Lambda, Rmolwt, Rdens, Rdens/50.0
+      OPEN(UNIT=hFile,FILE=tFileName,STATUS='UNKNOWN',ERR=999)
+      WRITE(hFile,*,ERR=999) 'DICVOL input file created by DASH'
+      WRITE(hFile,'(8(I3,1X))',ERR=999)  NTPeak, 2, (Isystem(i),i=1,6)
+      WRITE(hFile,'(7(F8.2,1X))',ERR=999)  Rcpar(1),Rcpar(2),Rcpar(3),Rvpar(1),Rvpar(2),Rcpar(4),Rcpar(5)
+      WRITE(hFile,'(F10.6,1X,3(F8.4,1X))',ERR=999)  Lambda, Rmolwt, Rdens, Rdens/50.0
       IF (UseErr .EQ. 2) THEN
         Reps = 1.0
       ELSE
         Reps = Epsilon
       ENDIF
-      WRITE(117,'(F5.3,1X,F6.2,1X,F9.6)',ERR=100) Reps, Rfom, Rexpzp
+      WRITE(hFile,'(F5.3,1X,F6.2,1X,F9.6)',ERR=999) Reps, Rfom, Rexpzp
       IF (UseErr .EQ. 2) THEN
         DO I = 1, NTPeak
-          IOrd = IOrdTem(i)
-          WRITE(117,'(F12.4,1X,F12.4)',ERR=100) AllPkPosVal(IOrd), AllPkPosEsd(IOrd)*10.0
+          iOrd = iOrdTem(i)
+          WRITE(hFile,'(F12.4,1X,F12.4)',ERR=999) AllPkPosVal(iOrd), AllPkPosEsd(iOrd)*10.0
         ENDDO
       ELSE
         DO I = 1, NTPeak
-          IOrd = IOrdTem(i)
-          WRITE(117,'(F12.4)',ERR=100) AllPkPosVal(IOrd)
+          iOrd = iOrdTem(i)
+          WRITE(hFile,'(F12.4)',ERR=999) AllPkPosVal(iOrd)
         ENDDO
       ENDIF        
-      CLOSE(117)
+      CLOSE(hFile)
       CALL PopActiveWindowID
       RETURN
- 99   CONTINUE
-      CALL ErrorMessage("Sorry, could not open the file"//CHAR(13)//FNAME(1:KLEN))
-      CALL PopActiveWindowID
-      RETURN
- 100  CONTINUE
-      CALL ErrorMessage("Sorry, could not write to the file"//CHAR(13)//FNAME(1:KLEN))
+ 999  CALL ErrorMessage("Error writing DICVOL input file.")
+      CLOSE(hFile)
       CALL PopActiveWindowID
 
       END SUBROUTINE Create_DicvolIndexFile
