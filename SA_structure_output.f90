@@ -5,6 +5,7 @@
       SUBROUTINE SA_structure_output(T,fopt,cpb,parvals,ntotmov,RunNr)
 
       USE VARIABLES
+      USE ZMVAR
 !
 !       Called when a new minimum is found
 !
@@ -17,32 +18,6 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
-
-      CHARACTER*3     asym
-      CHARACTER*5                          OriginalLabel
-      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
-
-      INTEGER         ntatm, natoms
-      INTEGER         ioptb,                iopta,                ioptt
-      INTEGER         iz1,                  iz2,                  iz3
-      COMMON /zmcomi/ ntatm, natoms(maxfrg),                                             &
-     &                ioptb(maxatm,maxfrg), iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),  &
-     &                iz1(maxatm,maxfrg),   iz2(maxatm,maxfrg),   iz3(maxatm,maxfrg)
-
-      INTEGER         izmpar
-      CHARACTER*36                    czmpar
-      INTEGER                                                kzmpar
-      REAL                                                                          xzmpar
-      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
-
-      INTEGER         nfrag
-      COMMON /frgcom/ nfrag
-
-      DOUBLE PRECISION blen,                alph,                bet,                f2cmat
-      COMMON /zmcomr/  blen(maxatm,maxfrg), alph(maxatm,maxfrg), bet(maxatm,maxfrg), f2cmat(3,3)
-
-      REAL            tiso,                occ
-      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
 
       DOUBLE PRECISION inv(3,3)
 
@@ -69,15 +44,9 @@
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
-
       PARAMETER (mpdbops=192)
       CHARACTER*20 cpdbops(mpdbops)
       COMMON /pdbops/ npdbops, cpdbops
-
-! The original atom ids to list in the labels and the back mapping
-      COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
 
       REAL qvals(4), qnrm
 ! Use standard PDB orthogonalisation
@@ -279,6 +248,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR
       USE SAMVAR
 !
 !       Called at the end of the SA
@@ -287,32 +257,6 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
-
-      CHARACTER*3     asym
-      CHARACTER*5                          OriginalLabel
-      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
-
-      INTEGER         ntatm, natoms
-      INTEGER         ioptb,                iopta,                ioptt
-      INTEGER         iz1,                  iz2,                  iz3
-      COMMON /zmcomi/ ntatm, natoms(maxfrg),                                             &
-     &                ioptb(maxatm,maxfrg), iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),  &
-     &                iz1(maxatm,maxfrg),   iz2(maxatm,maxfrg),   iz3(maxatm,maxfrg)
-
-      INTEGER         izmpar
-      CHARACTER*36                    czmpar
-      INTEGER                                                kzmpar
-      REAL                                                                          xzmpar
-      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
-
-      INTEGER         nfrag
-      COMMON /frgcom/ nfrag
-
-      DOUBLE PRECISION blen,                alph,                bet,                f2cmat
-      COMMON /zmcomr/  blen(maxatm,maxfrg), alph(maxatm,maxfrg), bet(maxatm,maxfrg), f2cmat(3,3)
-
-      REAL            tiso,                occ
-      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
 
       DOUBLE PRECISION inv(3,3)
 
@@ -334,19 +278,15 @@
       REAL                pdbAtmCoords
       COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:30)
 
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
-
       PARAMETER (mpdbops=192)
       CHARACTER*20 cpdbops(mpdbops)
       COMMON /pdbops/ npdbops, cpdbops
 
-! The original atom ids to list in the labels and the back mapping
-      COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
-
-      LOGICAL RESTART
-      INTEGER SA_Run_Number, I
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 ! SA_Run_Number now holds the number of the last completed multirun
 
 ! Use standard PDB orthogonalisation
@@ -362,6 +302,8 @@
       CHARACTER*2 RunStr
       LOGICAL, EXTERNAL :: ChrIsLetter
       INTEGER AtomLabelOption, AtomColourOption
+      INTEGER GridRowNr
+      CHARACTER*100 tString
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
@@ -453,33 +395,44 @@
 ! In short: works only with Mercury.
       iiact = 0
       TickedRunNr = 0
-      DO RunNr = 1, SA_Run_Number
-        CALL WGridGetCellCheckBox(IDF_SA_summary,3,RunNr,istatus)
+      DO GridRowNr = 1, SA_Run_Number
+        CALL WGridGetCellCheckBox(IDF_SA_summary,3,GridRowNr,istatus)
         IF (istatus .EQ. 1) THEN
-          TickedRunNr = TickedRunNr + 1
+! The solutions have been ordered wrt chi**2. We must parse the original run nr from the
+! number of the .pdb file
+          CALL WGridGetCellString(IDF_SA_Summary,1,GridRowNr,tString)
+          ilen = LEN_TRIM(tString)
+          RunStr = tString(ilen-5:ilen-4)
+          IF (RunStr(1:1) .EQ. '0') THEN
+            RunStr(1:1) = RunStr(2:2)
+            RunStr(2:2) = ' '
+          ENDIF
+          READ(RunStr,'(I2)') RunNr
+          TickedRunNr = TickedRunNr + 1 ! Number of ticked runs, counter used for choosing the colour
+          IF (TickedRunNr .EQ. 11) TickedRunNr = 1 ! Re-use colours.
 ! Note that elements are right-justified
           IF (AtomColourOption .EQ. 1) THEN ! Colour by solution
-            SELECT CASE(TickedRunNr)
+            SELECT CASE (TickedRunNr)
               CASE ( 1)
-                ColourStr = 'Co' ! Cobalt        Blue
+                ColourStr = 'Co'  ! Cobalt        Blue
               CASE ( 2)
-                ColourStr = ' O '  ! Oxygen        Red
+                ColourStr = ' O'  ! Oxygen        Red
               CASE ( 3)
-                ColourStr = ' S '  ! Sulphur       Yellow
+                ColourStr = ' S'  ! Sulphur       Yellow
               CASE ( 4)
-                ColourStr = 'Cl' ! Chlorine      Green
+                ColourStr = 'Cl'  ! Chlorine      Green
               CASE ( 5)
-                ColourStr = ' N '  ! Nitrogen      Light blue
+                ColourStr = ' N'  ! Nitrogen      Light blue
               CASE ( 6)
-                ColourStr = 'Br' ! Bromine       Brown
+                ColourStr = 'Br'  ! Bromine       Brown
               CASE ( 7)
-                ColourStr = ' I '  ! Iodine        Pink
+                ColourStr = ' I'  ! Iodine        Pink
               CASE ( 8)
-                ColourStr = ' C '  ! Carbon        Grey
+                ColourStr = ' C'  ! Carbon        Grey
               CASE ( 9)
-                ColourStr = ' H '  ! Hydrogen      White
+                ColourStr = ' H'  ! Hydrogen      White
               CASE (10)
-                ColourStr = ' P '  ! Phosphorus
+                ColourStr = ' P'  ! Phosphorus
             END SELECT
           ENDIF
           WRITE(RunStr,'(I2)') RunNr
@@ -489,7 +442,7 @@
             IF (gotzmfile(ifrg)) THEN
               DO i = 1, natoms(ifrg)
                 iiact = iiact + 1
-                xc = pdbAtmCoords(1,i,ifrg,RunNr)        ! We could replace (ii) by (orig,ifrg) and get rid of ii and itotal
+                xc = pdbAtmCoords(1,i,ifrg,RunNr)
                 yc = pdbAtmCoords(2,i,ifrg,RunNr)
                 zc = pdbAtmCoords(3,i,ifrg,RunNr)
 ! Note that elements are right-justified
@@ -777,11 +730,16 @@
 !
       SUBROUTINE AddMultiSolution(ProfileChi,IntensityChi)
 
+      IMPLICIT NONE
+
       REAL ProfileChi, IntensityChi
 
-      LOGICAL RESTART
-      INTEGER SA_Run_Number
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+
       CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
       COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen

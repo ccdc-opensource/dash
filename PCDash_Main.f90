@@ -11,9 +11,6 @@
 
       TYPE(WIN_STYLE)   :: MAIN_WINDOW
 
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
-      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'STATLOG.INC'
 
       INTEGER :: IWIDTHS(10)
@@ -128,7 +125,6 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -177,10 +173,6 @@
         CASE (ID_Peak_Fitting_Mode)
           CALL SelectMode(ID_Peak_Fitting_Mode)
         CASE (ID_Pawley_Refinement_Mode)
-          IF (NumPawleyRef .EQ. 0) THEN
-            IF (.NOT. Confirm('Lattice constants may not have been refined'//CHAR(13)//&
-                              'Do you wish to continue?')) RETURN
-          ENDIF
           CALL SelectMode(ID_Pawley_Refinement_Mode)
           CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)

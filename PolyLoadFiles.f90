@@ -304,7 +304,6 @@
         ENDDO
       ENDIF
       DataSetChange = DataSetChange + 1
-      NumPawleyRef = 0
       BackRef = .TRUE.
       CALL Init_PeakFitRanges
       XPMIN = XOBS(1)

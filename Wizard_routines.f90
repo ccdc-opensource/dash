@@ -868,10 +868,10 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'lattice.inc'
-      INCLUDE 'statlog.inc'
+
+      INTEGER IOption
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page1)
@@ -882,32 +882,39 @@
               CALL EndWizard
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
-              NumPawleyRef = 0
             CASE (IDBACK)
               CALL WizardWindowHide
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
-              NumPawleyRef = 0
+! There were three ways to get here:
+!   1. choose option 2 in main Wizard window
+!   2. choose 'Enter known cell' in wizard window Indexing I
+!   3. after DICVOL, after choosing 'Index now' in wizard window Indexing I
+! Did we get here from the main wizard window?
               CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+              CALL WDialogGetRadioButton(IDF_PW_Option1,IOption)
+              IF (IOption .NE. 2) THEN
+! Did we get here from 'Enter known cell' in wizard window Indexing I?
+                CALL WDialogSelect(IDD_PW_Page7)
+                CALL WDialogGetRadioButton(IDF_RADIO3,IOption) ! 'Index now' or 'Enter known cell'
+                IF (IOption .EQ. 1) CALL WDialogSelect(IDD_PW_Page9)
+              ENDIF
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDNEXT)
               CALL WizardWindowHide
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
-              NumPawleyRef = 0
               CALL WDialogSelect(IDD_PW_Page2)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDAPPLY)
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
-              NumPawleyRef = 0
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Space_Group_Menu)
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Generate_TicMarks
-              NumPawleyRef = 0
             CASE (IDF_Crystal_System_Menu)
               CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
               CALL Upload_CrystalSystem
