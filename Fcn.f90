@@ -7,9 +7,10 @@
 
       REAL snglh
 
-      call makefrac(theta)
-      call valchi(snglh)
-      h=dble(snglh)
+!O      CALL makefrac(theta)
+      CALL makefrac_2(theta)
+      CALL valchi(snglh)
+      h = DBLE(snglh)
 
       END SUBROUTINE FCN
 !
