@@ -10,7 +10,6 @@
 !
       USE WINTERACTER
       USE VARIABLES
-      USE DRUID_HEADER
 
       IMPLICIT NONE
 
@@ -45,7 +44,6 @@
 ! INPUT   : TheFileName = the file name
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE

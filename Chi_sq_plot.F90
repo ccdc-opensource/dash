@@ -52,9 +52,6 @@
 !
 !  USE module containing routine definitions and symbolic names.
 !
-      USE DRUID_HEADER
-      USE WINTERACTER
-
       IMPLICIT NONE
 !
 !  Definitions and array declarations.
@@ -121,7 +118,6 @@
 !
       SUBROUTINE plotting_Chi_sqd(ChiHandle)
 
-      USE DRUID_HEADER
       USE WINTERACTER
 
       IMPLICIT NONE

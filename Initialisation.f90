@@ -117,7 +117,6 @@
       SUBROUTINE PolyFitterInitialise
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -279,6 +278,7 @@
       ENDDO
       ShowAgain = .TRUE.
       Counter   = 0
+      CALL Clear_Zmatrices
       PI     = 4.0*ATAN(1.0)
       RAD    = PI/180.0
       DEG    = 180.0/PI
