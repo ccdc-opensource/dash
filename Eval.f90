@@ -17,7 +17,7 @@
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
       INTEGER         NATOM
-      REAL                   X
+      REAL                   XATO
       INTEGER                          KX
       REAL                                        AMULT,      TF
       INTEGER         KTF
@@ -25,7 +25,7 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+      COMMON /POSNS / NATOM, XATO(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
       DATA ZERO / 0.0D0 /
@@ -169,9 +169,9 @@
               KI = KATOM + I
 ! Note that we must reorder the atoms such that the hydrogens are appended after the 
 ! non-hydrogens.
-              X(1,OrderedAtm(KI)) = SNGL(tX)
-              X(2,OrderedAtm(KI)) = SNGL(tY)
-              X(3,OrderedAtm(KI)) = SNGL(tZ)
+              XATO(1,OrderedAtm(KI)) = SNGL(tX)
+              XATO(2,OrderedAtm(KI)) = SNGL(tY)
+              XATO(3,OrderedAtm(KI)) = SNGL(tZ)
             ENDDO
             KATOM = KATOM + NATS
           ENDDO
