@@ -1797,7 +1797,7 @@
 
       INTEGER, EXTERNAL :: WriteSAParametersToFile
       INTEGER IHANDLE, KPOS
-      REAL    MaxMoves1, tMaxMoves
+      REAL    MaxMoves1
       INTEGER MaxMoves2
 
 ! We are now on window number 3
@@ -1811,15 +1811,8 @@
               CALL WizardWindowShow(IDD_SA_Modal_input2)
             CASE (IDNEXT)
               CALL WDialogGetReal(IDF_MaxMoves1, MaxMoves1)
-              IF (MaxMoves1 .LT.   0.001) MaxMoves1 =   0.001
-              IF (MaxMoves1 .GT. 100.0  ) MaxMoves1 = 100.0
               CALL WDialogGetInteger(IDF_MaxMoves2, MaxMoves2)
-              IF (MaxMoves2 .LT. 1) MaxMoves2 = 1
-              IF (MaxMoves2 .GT. 8) MaxMoves2 = 8
-              tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
-              IF (tMaxMoves .LT. 10.0) tMaxMoves = 10.0
-              IF (tMaxMoves .GT.  2.0E9) tMaxMoves = 2.0E9
-              MaxMoves = NINT(tMaxMoves)
+              CALL RealInt2NMoves(MaxMoves1, MaxMoves2, MaxMoves)
               CALL WDialogGetReal(IDF_SA_ChiTest, ChiMult)
               ! It is possible to click "Resume SA" after having completed all runs and to
               ! forget to specify more runs. That way, we will already have completed all runs.

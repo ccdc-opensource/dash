@@ -37,7 +37,7 @@
       CHARACTER*255 line, keyword, tString
       INTEGER iTem, hFile, nl, I, iLen, iFrg, iDummy
       REAL    rTem
-      REAL    MaxMoves1, tMaxMoves
+      REAL    MaxMoves1
       INTEGER MaxMoves2
 
       in_batch = .TRUE.
@@ -106,20 +106,7 @@
             CALL INextInteger(line, MaxMoves2)
             IF (InfoError(1) .NE. 0) &
               GOTO 999
-            IF (MaxMoves1 .LT.   0.001) &
-              MaxMoves1 =   0.001
-            IF (MaxMoves1 .GT. 100.0  ) &
-              MaxMoves1 = 100.0
-            IF (MaxMoves2 .LT. 1) &
-              MaxMoves2 = 1
-            IF (MaxMoves2 .GT. 8) &
-              MaxMoves2 = 8
-            tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
-            IF (tMaxMoves .LT. 10.0) &
-              tMaxMoves = 10.0
-            IF (tMaxMoves .GT.  2.0E9) &
-              tMaxMoves = 2.0E9
-            MaxMoves = NINT(tMaxMoves)
+            CALL RealInt2NMoves(MaxMoves1, MaxMoves2, MaxMoves)
           CASE ('MULTIPLIER') ! Termination criterion: profile chi-sqrd multiplier
             I = InfoError(1) ! reset the errors
             CALL INextReal(line, rTem)
@@ -184,14 +171,14 @@
                   CALL IUpperCase(line(:nl))
                   iDummy = InfoError(1) ! reset the errors
                   CALL INextReal(line, X_init(i)) ! This is the initial value
-                  IF (InfoError(1) .NE. 0) GOTO 999
+                  IF ( InfoError(1) .NE. 0 ) GOTO 999
                   CALL INextString(line, tString)
                   SELECT CASE(tString(1:LEN_TRIM(tString)))
                     CASE ('LBUB') ! Lower Bound/Upper Bound pair
                       CALL INextReal(line, LB(i)) ! Lower bound
-                      IF (InfoError(1) .NE. 0) GOTO 999
+                      IF ( InfoError(1) .NE. 0 ) GOTO 999
                       CALL INextReal(line, UB(i)) ! Upper bound
-                      IF (InfoError(1) .NE. 0) GOTO 999
+                      IF ( InfoError(1) .NE. 0 ) GOTO 999
                     CASE ('FIXED') ! Fixed
                     CASE ('BIMODAL') ! Bimodal
                     CASE ('TRIMODAL') ! Trimodal
@@ -201,8 +188,6 @@
                 ENDIF
               ENDIF
             ENDDO
-
-
         END SELECT
       ENDDO       
   100 CONTINUE 
@@ -321,6 +306,8 @@
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
       INTEGER iHandle, i, iFrg
+      REAL    tReal
+      INTEGER tInt
 
       CALL DownLoadSAOPT
       iHandle = 10
@@ -342,8 +329,8 @@
       WRITE(iHandle,'(A)',ERR=999) '#     (total number of runs / number of processors)'
       WRITE(iHandle,'(A,X,I2)',ERR=999) 'NRUNS', MaxRuns
       WRITE(iHandle,'(A)',ERR=999) '# Maximum number of moves: real followed by integer e.g. "3.0 7" means "3.0E7"'
-      ! TODO ##################
-      WRITE(iHandle,'(A,X,F9.5,X,I1)',ERR=999) 'MAXMOVES', 1.0, 7
+      CALL NMoves2RealInt(MaxMoves, tReal, tInt)
+      WRITE(iHandle,'(A,X,F9.5,X,I2)',ERR=999) 'MAXMOVES', tReal, tInt
       WRITE(iHandle,'(A)',ERR=999) '# Termination criterion: a Simulated Annealing run stops when '
       WRITE(iHandle,'(A)',ERR=999) '# the profile chi-sqrd is lower than MULTIPLIER times the Pawley chi-sqrd'
       WRITE(iHandle,'(A,X,F9.5)',ERR=999) 'MULTIPLIER', ChiMult

@@ -1760,3 +1760,55 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE RealInt2NMoves(tReal, tInt, nmoves)
+
+      IMPLICIT NONE
+
+      REAL,    INTENT (IN   ) :: tReal
+      INTEGER, INTENT (IN   ) :: tInt
+      INTEGER, INTENT (  OUT) :: nmoves
+
+      REAL    MaxMoves1, tMaxMoves
+      INTEGER MaxMoves2
+
+      MaxMoves1 = tReal
+      MaxMoves2 = tInt
+      IF (MaxMoves1 .LT.   0.001) &
+        MaxMoves1 =   0.001
+      IF (MaxMoves1 .GT. 100.0  ) &
+        MaxMoves1 = 100.0
+      IF (MaxMoves2 .LT. 1) &
+        MaxMoves2 = 1
+      IF (MaxMoves2 .GT. 8) &
+        MaxMoves2 = 8
+      tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
+      IF (tMaxMoves .LT. 10.0) &
+        tMaxMoves = 10.0
+      IF (tMaxMoves .GT.  2.0E9) &
+        tMaxMoves = 2.0E9
+      nmoves = NINT(tMaxMoves)
+
+      END SUBROUTINE RealInt2NMoves
+!
+!*****************************************************************************
+!
+      SUBROUTINE NMoves2RealInt(nmoves, tReal, tInt)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: nmoves
+      REAL,    INTENT (  OUT) :: tReal
+      INTEGER, INTENT (  OUT) :: tInt
+
+      CHARACTER*20, EXTERNAL :: Integer2String
+      CHARACTER*20 tString
+
+      tString = Integer2String(nmoves)
+      tInt = LEN_TRIM(tString) 
+      tInt = tInt - 1
+      tReal = FLOAT(nmoves)/FLOAT(10**tInt)
+
+      END SUBROUTINE NMoves2RealInt
+!
+!*****************************************************************************
+!
