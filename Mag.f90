@@ -54,7 +54,7 @@
         CALL CGMEQ(TVEC,VEC1,3,1)
         CALL CGMEQ(TVEC2,VEC2,3,1)
       ENDIF
-      RETURN
+
       END SUBROUTINE CENTRO
 !
 !*****************************************************************************
@@ -112,21 +112,21 @@
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
       COMMON /QCAL  / Q(3,12)
       COMPLEX Q
       COMMON /SATELL/ PROP(3), KPROP(3), KSTAB(24), NKSTAR, IPROP,      &
-     &                FKSTAR, NKC, KCENT, INCOM, KOM21
+                      FKSTAR, NKC, KCENT, INCOM, KOM21
       LOGICAL INCOM
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
+                      KOM26
       COMMON /SYMMAG/ MTSYM(25), MSTAB(24), NMSYM, NFAC, OTRSYM(3,3,25),&
-     &                MTYP, NDOM, FERO, FERA, HELI, AMOD, ANTI, MODUL,  &
-     &                KOM20
+                      MTYP, NDOM, FERO, FERA, HELI, AMOD, ANTI, MODUL,  &
+                      KOM20
       LOGICAL FERO, FERA, HELI, AMOD, ANTI, MODUL
       COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
+                      KOM22
 
 ! CLEAR ALL ANSWERS IN CASE ABSENT:
 ! CLEAR MODULUS AND SQUARE:
@@ -181,7 +181,6 @@
 ! IF NOT, GET IT
             IFF = NMFORM(IM)
             FORM = FORMFA(STHL,IFF)
-!
 !  CALCULATE FOR EACH COMPONENT OF THE HELIX IN TURN
     2       DO ICOMP = 1, IHELIX
               CALL CGMZER(SUM1,3,1)
@@ -236,7 +235,6 @@
                   IF (PSI) CALL CGMSCA(TVEC,TVEC,PSIFAC,3,1)
                 ENDIF
                 CALL CGMADD(SUM1,TVEC,SUM1,1,3)
-!
 ! INCREMENT COUNT OF OPERATORS USED
                 NFAC = NFAC + 1
 ! END OF INNERMOST CYCLE OVER SYMMETRY
@@ -308,13 +306,16 @@
      &                FKSTAR, NKC, KCENT, INCOM, KOM21
       LOGICAL INCOM
       COMMON /TEMGEN/ HF(3)
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       IF (NFLAG.EQ.-9999) THEN
 ! INITIAL ENTRY:
-!
         IF (NKSTAR.GT.1) THEN
           CALL SUBSYM(KSTAB)
           CALL SYMUNI
+          IF (IBMBER .NE. 0) RETURN
         ENDIF
 !  INCREASE SINTHETA LIMIT TO ALLOW FOR PROPAGATION VECTOR
         SDIF = VCTMOD(0.5,PROP,2)
@@ -323,11 +324,10 @@
 ! FIRST PRESENT 0,0,0 AS FUNDAMENTAL:
         CALL GMZER(HF,1,3)
         NOMORE = .FALSE.
-!
 ! ENTRIES OTHER THAN INITIAL - EXPECT NFLAG SET:
       ELSEIF (NFLAG.EQ.0) THEN
         CALL GETGEN(HF,NOMORE)
-        IF (NOMORE) GOTO 100
+        IF (NOMORE) RETURN
       ELSE
         CALL GMSUB(HF,PROP,H,3,1)
         NFLAG = 0
@@ -344,7 +344,7 @@
       NFLAG = 1
     3 CALL ASUNIT(H,HT,N,MUL)
       CALL GMEQ(HT,H,3,1)
-  100 RETURN
+
       END SUBROUTINE GENMAG
 !
 !*****************************************************************************
@@ -1348,6 +1348,7 @@
       IF (IBMBER .NE. 0) RETURN
       CALL OPSYM(1)
       CALL RECIP
+      IF (IBMBER .NE. 0) RETURN
       CALL ATOPOS
 ! TO BE RESET IF MULTIPOLE ROUTINES ARE USED:
       MPL = .FALSE.

@@ -136,8 +136,12 @@
       LOGICAL STRKT
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP, NSKTOT, KOM24
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       NSKTOT = NSKTOT + 1
       CALL ERRCHK(2,NSLAK(NSLTYP),1000,0,'Pawley-type slack constraints')
+      IF (IBMBER .NE. 0) RETURN
       NSLTEM = NSLAK(NSLTYP)
       IGSLAK(NSLTEM) = ISGEN
       ISPSLK(1,NSLTEM) = ISP(1)
@@ -285,10 +289,12 @@
 ! BRANCH ON FAMILY:
         GOTO (11,12,13,14,15,16), IFAM
         CALL ERRMES(-1,0,'family too big in APSHPR')
+        IF (IBMBER .NE. 0) RETURN
 ! FAMILY 1, GENUS 1 - MISCELLANEOUS SINGLY NAMED SPECIES (TFAC, A* ETC,
 ! EXTN,PROR,SPHA)
    11   GOTO (31,35,35,35,35,35,35,36,37,38,39,39,39), ISPC
         CALL ERRMES(-1,0,'species too big in APSHPR')
+        IF (IBMBER .NE. 0) RETURN
 ! TFAC:
    31   CALL LLTFAC(3)
         GOTO 40
@@ -313,9 +319,11 @@
 ! FAMILY 6: MISCELLANEOUS SOURCE DEPENDENT;
    16   GOTO (61,62,63), IGEN
         CALL ERRMES(-1,0,'genus too big in APSHPR')
+        IF (IBMBER .NE. 0) RETURN
 ! FAMILY 6 GENUS 1 - SINGLY NAMED, SOURCE-DEPENDENT SPECIES (SCAL,TTHM)
    61   GOTO (51,52), ISPC
         CALL ERRMES(-1,0,'species too big in APSHPR')
+        IF (IBMBER .NE. 0) RETURN
 ! FAMILY 6, GENUS 1, SPECIES 1 - SCALE FOR SOURCE, SCAL:
    51   CALL LSSCAL(3)
         GOTO 40
@@ -2593,6 +2601,7 @@
         ENDDO
         IER = IERR
         CALL ERRCHK(2,MIS,100,0,'omitted reflections')
+        IF (IBMBER .NE. 0) RETURN
         IF (IER.NE.IERR) GOTO 3
         CALL INDFLO(AMISS(1,MIS),IH)
         WRITE (LPT,2000) IH
@@ -2808,6 +2817,7 @@
         ENDIF
 ! HERE TO ACCEPT A SET OF INDICES:
         CALL ERRCHK(2,MAXKK(JPHASE),ITMREF,0,'reflections')
+        IF (IBMBER .NE. 0) RETURN
         CALL GMEQ(H,TEMREF(1,MAXKK(JPHASE)),1,3)
         TEMMUL(MAXKK(JPHASE)) = FLOAT(MUL)
         ARG(MAXKK(JPHASE)) = ARGK
@@ -2815,7 +2825,10 @@
 ! ALL INDICES STORED NOW
     4   IF (MMODER.EQ.1) CALL CLOFIL(INHKL)
       ENDDO
-      IF (MAXKK(JPHASE).LE.0) CALL ERRMES(1,0,'no reflections found in data limits')
+      IF (MAXKK(JPHASE).LE.0) THEN
+        CALL ERRMES(1,0,'no reflections found in data limits')
+        IF (IBMBER .NE. 0) RETURN
+      ENDIF
 ! SORT INTO ORDER
       CALL SORT_REAL(ARG,IORDER,MAXKK(JPHASE))
       IF (TIC .OR. (IPRNT(2).GT.0)) THEN
@@ -2909,6 +2922,7 @@
 ! MAGNETIC (-VE) INTENSITIES.
             IF (TIC) THEN
               CALL ERRCHK(2,KTIC,ITMREF,0,'intensity contributions')
+              IF (IBMBER .NE. 0) RETURN
               AICALC(KTIC) = ARGK
               AIOBS(KTIC) = FAC*FCSQ*FLOAT(MUL)
             ENDIF
@@ -2920,6 +2934,7 @@
             CALL FMCALC(REFH(1,KNOW),FMCMOD,FMCSQR)
             IF (TIC) THEN
               CALL ERRCHK(2,KTIC,ITMREF,0,'intensity contributions')
+              IF (IBMBER .NE. 0) RETURN
               AICALC(KTIC) = ARGK
               AIOBS(KTIC) = -FAC*FMCSQR*FLOAT(MUL)
             ENDIF
@@ -2951,6 +2966,7 @@
 ! MAGNETIC (-VE) REFLECTIONS.
               IF (TIC) THEN
                 CALL ERRCHK(2,KTIC,ITMREF,0,'intensity contributions')
+                IF (IBMBER .NE. 0) RETURN
                 AICALC(KTIC) = ARGK
                 AIOBS(KTIC) = 100.*MUL
               ENDIF
@@ -2959,6 +2975,7 @@
             IF (MAG .AND. .NOT.MAGABS(REFH(J,KNOW),IKK)) THEN
               IF (TIC) THEN
                 CALL ERRCHK(2,KTIC,ITMREF,0,'intensity contributions')
+                IF (IBMBER .NE. 0) RETURN
                 AICALC(KTIC) = ARGK
                 AIOBS(KTIC) = -100.*MUL
               ENDIF
@@ -3273,6 +3290,9 @@
       COMMON /WORDS / LSQWD(60)
       CHARACTER*4 LSQWD
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
 ! ONLY ENTRY IF SINGLE PHASE, OR FIRST ENTRY IF MULTIPHASE:
       IF (JPHASE.EQ.1) THEN
         MFAM = 0
@@ -3285,6 +3305,7 @@
         KPTCON(1) = 1
       ENDIF
       CALL ERRCHK(1,NFAM,6,0,'LSQ families of parameters')
+      IF (IBMBER .NE. 0) RETURN
 ! STARTS OF FAMILIES OF PARAMETERS:
       IF (NFAM.GT.MFAM) MFAM = NFAM
       DO I = 1, NFAM
@@ -4562,6 +4583,9 @@
      &     'Synchrotron X-Ray', 'Energy Dispersive'/
       DATA TYPEWD/'RIET', 'PAWL', 'SAPS', 'APES', 'RAPS', 'PEWS'/
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       CALL WRLINE(1,60,'-',1)
       DO JPHASE = 1, NPHASE
 ! ARRANGE TO ADDRESS THE CORRECT CRYSTAL DATA FILE:
@@ -4584,6 +4608,7 @@
     3     CALL RDWORD(WORD,LEN,IPT,IPT,80,0,IER)
           IF (IER.EQ.100) GOTO 4
           CALL ERRCHK(2,NSOURC,5,0,'PR data sources')
+          IF (IBMBER .NE. 0) RETURN
           NDASOU(NSOURC) = NCFIND(WORD,SWORDS,5)
           IF (NDASOU(NSOURC).EQ.0) THEN
             I = 2
@@ -4645,7 +4670,7 @@
           CALL RDWORD(WORD,LEN,7,IPT,80,0,IER)
           METHOD(JPHASE) = NCFIND(WORD,TYPEWD,6)
           IF (METHOD(JPHASE).EQ.0) THEN
-            CALL ERRCH2(WORD,0,'refinement type word','not recognised - assuming Rietveld analysis')
+            CALL ERRCH2(WORD,2,'refinement type word','not recognised - assuming Rietveld analysis')
             METHOD(JPHASE) = 1
           ELSE
             IF (MULFAS) THEN
@@ -5209,6 +5234,9 @@
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       DO JSOUR = 1, NSOURC
         JSOURC = JSOUR
         CALL LOGSOU(JSOURC)
@@ -5229,8 +5257,10 @@
           CALL PROPAG(1,INOUT)
           MAG = (INOUT.EQ.1)
         ENDIF
+        IF (IBMBER .NE. 0) RETURN
 ! SET UP ASYMMETRIC UNIT:
         CALL SYMUNI
+        IF (IBMBER .NE. 0) RETURN
 ! READ I AND MOST L CARDS:
         IF (.NOT.MULFAS) CALL STLSP0(PCXX,PFXX)
         CALL STLSPR(PCXX,PFXX)
