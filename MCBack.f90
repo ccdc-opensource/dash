@@ -26,7 +26,7 @@
 
       INTEGER        FT_N
       DOUBLE PRECISION                 HulpData
-      COMMON /FTPRO/ FT_N, HulpData(1:MOBS,1:2)
+      COMMON /FTPRO/ HulpData(1:MOBS,1:2), FT_N
 
       REAL            Smoothed
       COMMON /SMOOTH/ Smoothed(MOBS)
