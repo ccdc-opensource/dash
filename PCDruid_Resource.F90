@@ -1,4 +1,4 @@
-! Winteracter module created : 12/Sep/2001 16:26:21
+! Winteracter module created : 12/Sep/2001 20:24:40
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -299,15 +299,12 @@
           INTEGER, PARAMETER :: IDD_Parameter_Status            =   136
           INTEGER, PARAMETER :: IDD_Anneal_Status               =   138
           INTEGER, PARAMETER :: IDD_Profile_Status              =   139
-          INTEGER, PARAMETER :: IDF_Status_Graph                =  1500
           INTEGER, PARAMETER :: IDF_Profile_Plot                =  1501
           INTEGER, PARAMETER :: IDF_ProfileType_Radio1          =  1408
           INTEGER, PARAMETER :: IDF_ProfileType_Radio2          =  1503
           INTEGER, PARAMETER :: IDF_Profile_Zoom_Button         =  1414
           INTEGER, PARAMETER :: IDF_Profile_FullRange_Button    =  1415
           INTEGER, PARAMETER :: IDF_SA1_cancel                  =  1178
-          INTEGER, PARAMETER :: IDF_Anneal_LogY                 =  1497
-          INTEGER, PARAMETER :: IDF_Anneal_LinY                 =  1499
           INTEGER, PARAMETER :: IDF_peakcont_label              =  1502
           INTEGER, PARAMETER :: IDF_pikfile_browse_button       =  1504
           INTEGER, PARAMETER :: IDF_reffile                     =  1505
