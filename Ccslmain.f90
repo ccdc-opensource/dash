@@ -2513,7 +2513,7 @@
 !A    NACT -ve means complain and exit
 !A    NACT =0 means complain and stop
 !A On entry MESS is the message specific to this error state
-!O Writes message on units LPT and ITO.
+!O Writes message on unit LPT.
 !
       CHARACTER*(*) MESS
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
@@ -2528,6 +2528,7 @@
       IF (NTYP.EQ.0) THEN
         IF (IERR.NE.0) THEN
           WRITE (LPT,3000) IERR, (MESS(I:I),I=1,L)
+ 3000     FORMAT (///' *** ',I4,' fatal error(s) in input ',80A1)
           CALL BMBOUT
           RETURN
         ENDIF
@@ -2535,20 +2536,18 @@
       IF (NACT.GT.0) IERR = IERR + 1
       IF (NTYP.EQ.1) THEN
         WRITE (LPT,3001) (MESS(I:I),I=1,L)
+ 3001   FORMAT (/' ERROR ** ',80A1)
       ELSEIF (IABS(NTYP).EQ.2) THEN
         WRITE (LPT,3002) (MESS(I:I),I=1,L)
+ 3002   FORMAT (/' ERROR ** need ',80A1)
       ELSEIF (IABS(NTYP).EQ.3) THEN
         WRITE (LPT,3003) (MESS(I:I),I=1,L)
+ 3003   FORMAT (/' ERROR ** need card ',80A1)
       ELSEIF (NTYP.EQ.-1) THEN
         WRITE (LPT,3004) (MESS(I:I),I=1,L)
+ 3004   FORMAT (/' PROGRAM ERROR ** ',80A1)
       ENDIF
       IF (NACT.EQ.0) CALL BMBOUT
-  100 RETURN
- 3000 FORMAT (///' *** ',I4,' fatal error(s) in input ',80A1)
- 3001 FORMAT (/' ERROR ** ',80A1)
- 3002 FORMAT (/' ERROR ** need ',80A1)
- 3003 FORMAT (/' ERROR ** need card ',80A1)
- 3004 FORMAT (/' PROGRAM ERROR ** ',80A1)
 
       END SUBROUTINE ERRMES
 !
@@ -2571,7 +2570,7 @@
 !A   IABS(NACT)=2 means also print contents of /SCRACH/
 !A On entry MESS1 is the message before X
 !A On entry MESS2 is the message after X
-!O Writes message on units LPT and ITO.
+!O Writes message on unit LPT.
 !
       CHARACTER*36 FORM
       CHARACTER*(*) MESS1, MESS2
@@ -2647,7 +2646,7 @@
 !N to hold the expanded path
 !
       CHARACTER*(*) IBUF, OBUF
-!
+
       L = LENGT(IBUF)
       M = LEN(OBUF)
       I = 1
@@ -5939,14 +5938,15 @@
       COMMON /EXTRAE/ DOMRI(3), FOVLP, KDOMRI(3), KFOVLP
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-!
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       INREAD(5) = -IABS(INREAD(5))
       GOTO (1,2), ICDNO(5) + 1
       CALL ERRMES(1,0,'only one E card allowed')
-!
+      IF (IBMBER .NE. 0) RETURN
     1 IEXTYP = 0
       GOTO 10
-!
     2 CALL GMZER(DOMRI,3,1)
       CALL CARDIN(IABS(INREAD(5)))
       CALL RDINTG(IEXTYP,2,IPT,80,IER)
@@ -14189,8 +14189,7 @@
 ! PART 4 - TIDY UP INFORMATION INTO PERMANENT SPACE:
   101 CALL SYMTID(NC)
       RETURN
- 3000 FORMAT (' ERROR ** in SYMGEN - operator',I4,' not found',         &
-     &        ' in table MLTAB;  no. of generators so far -',I4)
+ 3000 FORMAT (' ERROR ** in SYMGEN - operator',I4,' not found in table MLTAB;  no. of generators so far -',I4)
 
       END SUBROUTINE SYMGEN
 !
@@ -15967,7 +15966,7 @@
 ! implements a pseudo-error throwing mechanism. We cant have STOP being called while
 ! the GUI is running, since this will annoy users a lot
 !
-      INTEGER IBMBER
+      INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
       DATA IBMBER/0/
 !

@@ -229,6 +229,8 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 
       IF (SIMUL) GOTO 100
       WRITE (LPT,2000) ICYC
@@ -2247,6 +2249,8 @@
       DATA LTICTB/'RTYP', 'PKCN', 'ZERO', 'WVLN', 'THE2'/
       DATA INEX/'In', 'Ex'/
       DATA ARGTYP/'Time of flight', '2 theta'/
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 
 ! SET 'NO L CARDS READ':
       CALL JGMZER(ILREAD,1,22)
@@ -2484,6 +2488,8 @@
       DATA LPHNTB/'TFAC', 'PKFN', 'SLIM', 'OMIT', 'SPHA', 'REFK'/
       DATA INEX/'In', 'Ex'/
       DATA ARGTYP/'Time of flight', '2 theta'/
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 !
 !C SET 'NO L CARDS READ':
 !
@@ -2707,6 +2713,8 @@
      &'(/'' Reflections to be used:''/'' Serial  h'',3X,''k'',3X,''l'',2&
      &X,''  Argument  D-spacing M'',3X,''    F*F   '',6X,    ''Q*Q      &
      &  Intensity'')'/
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 !
 ! DECIDE WHETHER INDICES MAY HAVE FRACTIONAL PARTS:
 !
@@ -3370,6 +3378,8 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 
       IF (N.EQ.0) THEN
         CALL ERRMES(3,1,'L SCAL')
@@ -5355,6 +5365,8 @@
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
       COMMON /SPLBCK/ SCOEFF(100,5)
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6), NZERSP(9,5)
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 
 ! READ THE I CARDS AND ALL THE (RELEVANT) L CARDS.
       IF (INREAD(9).GT.0) CALL INPUTI
@@ -5522,6 +5534,8 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
       COMMON /SPLBCK/ SCOEFF(100,5)
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 
 ! READ AND INTERPRET ALL L CARDS EXCEPT SLAK ETC., FUDG,REFI, FIX,
 ! VARY, RELA:

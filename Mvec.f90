@@ -784,8 +784,11 @@
 !A On exit  B is its inverse
 !D Based on SID
 !
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       DIMENSION II(100), IL(100), IG(100), A(N,N), B(N,N)
-!
+
       CALL GMEQ(A,B,N,N)
       D = 1.
       IS = N - 1
@@ -793,7 +796,6 @@
         IL(K) = 0
         IG(K) = K
       ENDDO
-!
       DO K = 1, N
         R = 0.
         DO I = 1, N
@@ -809,7 +811,6 @@
         IL(KF) = KF
         D = D*P
         IF (D.EQ.0.) CALL ERRMES(1,0,'Zero determinant')
-!
         DO I = 1, N
           IF (I.EQ.KF) THEN
             B(I,K) = 1./P
@@ -817,7 +818,6 @@
             B(I,K) = -B(I,K)/P
           ENDIF
         ENDDO
-!
         DO J = 1, N
           IF (J.EQ.K) GOTO 140
           W = B(KF,J)
@@ -830,10 +830,7 @@
             ENDIF
           ENDDO
   140   ENDDO
-!
       ENDDO
-!.....
-!
       DO K = 1, IS
         KF = II(K)
         KL = IL(KF)
@@ -855,7 +852,7 @@
         IG(K) = KF
         D = -D
   190 ENDDO
-      RETURN
+
       END SUBROUTINE GMINV
 !
 !*****************************************************************************
@@ -886,7 +883,7 @@
           IK = IK + NI
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE GMPRD
 !
 !*****************************************************************************
@@ -908,7 +905,7 @@
           B(I,J) = -A(I,J)
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE GMREV
 !
 !*****************************************************************************
@@ -931,13 +928,13 @@
 !A      and .FALSE. otherwise
 !
       DIMENSION A(N), B(N)
-!
+
       GMSAME = .FALSE.
       DO I = 1, N
-        IF (ABS(A(I)-B(I)).GT.TOLER) GOTO 100
+        IF (ABS(A(I)-B(I)).GT.TOLER) RETURN
       ENDDO
       GMSAME = .TRUE.
-  100 RETURN
+
       END FUNCTION GMSAME
 !
 !*****************************************************************************
@@ -955,6 +952,7 @@
 !N A and B may be the same matrix
 !
       DIMENSION A(1), B(1)
+
       NIJ = NI*NJ
       DO I = 1, NIJ
         B(I) = SCALE*A(I)
@@ -1017,16 +1015,17 @@
 !A On exit  A is a square real matrix of dimension NIxNI, set to a unit matrix
 !
       DIMENSION A(NI,NI)
+
       DO I = 1, NI
         A(I,I) = 1.
         I1 = I + 1
-        IF (I1.GT.NI) GOTO 100
+        IF (I1.GT.NI) RETURN
         DO J = I1, NI
           A(I,J) = 0.
           A(J,I) = 0.
         ENDDO
       ENDDO
-  100 RETURN
+
       END SUBROUTINE GMUNI
 !
 !*****************************************************************************
@@ -1042,9 +1041,10 @@
 !A On exit  A is a real matrix of dimension NIxNJ all cleared to zero.
 !
       DIMENSION A(1)
+
       NIJ = NI*NJ
       DO I = 1, NIJ
-        A(I) = 0.
+        A(I) = 0.0
       ENDDO
 
       END SUBROUTINE GMZER
@@ -1062,6 +1062,7 @@
 !A On exit  JB = integer matrix being a copy of JA
 !
       DIMENSION JA(NI,NJ), JB(NI,NJ)
+
       DO I = 1, NI
         DO J = 1, NJ
           JB(I,J) = JA(I,J)
@@ -1131,7 +1132,7 @@
 !
       DIMENSION A(1)
       COMPLEX B(1), C(1)
-!
+
       DO II = 1, I
         IK = II
         JK = 1
@@ -1146,7 +1147,7 @@
           IK = IK + I
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE RCMPRD
 !
 !*****************************************************************************
@@ -1162,12 +1163,13 @@
 !D The function value is the real product (A.Conjg(B) + Conjg(A).B)/2
 !
       COMPLEX A(3), B(3), P
+
       P = CMPLX(0.,0.)
       DO I = 1, 3
         P = P + A(I)*CONJG(B(I))
       ENDDO
       RSCALP = REAL(P)
-      RETURN
+
       END FUNCTION RSCALP
 !
 !*****************************************************************************
@@ -1187,9 +1189,10 @@
 !N The function SCLPRD gives the scalar product using the cell parameters.
 !
       DIMENSION A(3), B(3), C(1)
+
       CALL GMPRD(A,B,C,1,3,1)
       SCALPR = C(1)
-      RETURN
+
       END FUNCTION SCALPR
 !
 !*****************************************************************************
@@ -1280,14 +1283,12 @@
         A(3*I) = H2
         D(I) = 3.0*(F(I+1)*H2*H2+F(I)*(H1*H1-H2*H2)-F(I-1)*H1*H1)
         GOTO 2
-!
    10   H1 = 1./(X(J)-X(J-1))
         H2 = 1./(X(J+1)-X(J))
         A(3*I-2) = H1*H1
         A(3*I-1) = H1*H1 - H2*H2
         A(3*I) = -H2*H2
-        D(I) = 2.*(F(J)*(H2*H2*H2+H1*H1*H1)-F(J+1)*H2*H2*H2-F(J-1)      &
-     &         *H1*H1*H1)
+        D(I) = 2.*(F(J)*(H2*H2*H2+H1*H1*H1)-F(J+1)*H2*H2*H2-F(J-1)*H1*H1*H1)
     2 ENDDO
       P = A(4)/A(1)
       A(5) = A(5) - P*A(2)
@@ -1304,7 +1305,6 @@
         A(K+6) = A(K+7)
         D(N) = D(N) - P*D(N-2)
     4 ENDDO
-!
       D(N) = D(N)/A(3*N-1)
       DO I = 3, N
         J = N + 2 - I
@@ -1458,10 +1458,9 @@
       LOGICAL BOTH
       DIMENSION D(NP), E(NP), Z(NP,NP)
 !
-!>> JCC Numerical trap
-      INTEGER IBMBER
+      INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
-!
+
       IF (N.LE.1) GOTO 100
       DO I = 2, N
         E(I-1) = E(I)
@@ -1510,7 +1509,7 @@
               ENDIF
             ELSE
 !>> Ok: An error has occurred in the passed data
-              IBMBER = 1
+              CALL BMBOUT
               RETURN
             ENDIF
             G = D(I+1) - P
