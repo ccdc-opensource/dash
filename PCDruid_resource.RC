@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 07/Sep/2001 11:48:42
+// Modified : 07/Sep/2001 15:18:42
 //
 ///////////////////////////////////////////////////
 //
@@ -578,6 +578,10 @@
 #define IDAPPLY                          1227
 #define IDF_Preview                      1230
 #define IDF_ZeroPoint                    1231
+#define IDD_AddWavelengthToXYE            146
+#define IDF_REAL3                        1232
+#define IDF_LABEL3                       1233
+#define ID_Home                         40009
 
 ///////////////////////////////////////////////////
 //
@@ -2376,7 +2380,7 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAM
 FONT    8, "MS Sans Serif"
 CAPTION "Results from Simulated Annealing"
 BEGIN
-    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   29,   43,  411,   76
+    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   29,   43,  410,   76
     CONTROL "Simulated Annealing completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  125,   16,  220,   12
     CONTROL "OK",IDOK_ep,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  215,  133,   40,   14
 END
@@ -2538,6 +2542,30 @@ BEGIN
 "[Ranges] \n"
 " 1211               1             100 \n"
 " 1212               1             500 \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_AddWavelengthToXYE DIALOG 0, 0,  205,   88
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Add Wavelength to .xye"
+BEGIN
+    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   64,   40,   14
+    CONTROL "0.0",IDF_REAL3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  130,   48,   40,   14
+    CONTROL "Experimental wavelength (Angstrom)",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    8,   50,  116,    8
+    CONTROL "Please enter the experimental wavelength with which this powder diffraction pattern was recorded. This wavelength will then be written to the first line of the .xye file and read in whenever this file is opened.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   14,    8,  178,   36
+END
+
+IDD_AddWavelengthToXYE RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
@@ -2784,6 +2812,7 @@ BEGIN
     ID_Remove_Background            "Remove background"
     ID_import_dpj_file              "Open DASH Pawley file"
     ID_import_xye_file              "Open powder diffraction file"
+    ID_Home                         "Home (reset view)"
 END
 
 ///////////////////////////////////////////////////
@@ -2801,6 +2830,7 @@ BEGIN
    ID_Pawley_Refinement_Mode,
    ID_Structure_Solution_Mode,0,
    ID_Start_Wizard,0,
+   ID_Home,0,
    ID_PolyFitter_Help,0,
    ID_FILE_EXIT,
 0,0

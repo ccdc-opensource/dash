@@ -212,6 +212,15 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
+      REAL XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+      INTEGER IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
 !C>> JCC data to indicate whether we are coming out of peak-fitting mode
       LOGICAL FromPeakFit
       LOGICAL Confirm ! Function
@@ -295,6 +304,14 @@
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Widths)
           CALL PopActiveWindowID
+        CASE (ID_Home)
+! Back to full profile range
+           xpgmin=xpmin
+           xpgmax=xpmax
+           ypgmin=ypmin
+           ypgmax=ypmax
+           CALL Get_IPMaxMin() 
+           CALL Profile_Plot(IPTYPE)        
         CASE (ID_PolyFitter_Help)
           CALL LaunchHelp()
         CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5)
