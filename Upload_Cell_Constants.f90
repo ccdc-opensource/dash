@@ -145,7 +145,7 @@
           XDD(3) = GREC(2,2) 
           XDD(4) = GREC(3,3)
           XDD(5) = GREC(1,2)
-          NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(4).EQ.0)
+          NOCREF = (IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(4).EQ.0)
         CASE ( 5) ! Orthorhombic
           XDD(3) = GREC(2,2) 
           XDD(4) = GREC(3,3)
@@ -204,8 +204,8 @@
       CellPar(5) = ACOSD(GReal(1,3)/(CellPar(1)*CellPar(3)))            
       CellPar(6) = ACOSD(GReal(1,2)/(CellPar(1)*CellPar(2)))
       ZeroPoint  = XDD(1)
-      CALL Upload_Cell_Constants()
-      CALL Upload_ZeroPoint()
+      CALL Upload_Cell_Constants
+      CALL Upload_ZeroPoint
 !  First ensure that we have the plotting mode correct
       CALL Generate_TicMarks
       IF (NVal .LE. NDD+2) RETURN
