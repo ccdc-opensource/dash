@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 20/Oct/2003 18:36:50
+// Modified : 23/Oct/2003 16:07:04
 //
 ///////////////////////////////////////////////////
 //
@@ -4132,7 +4132,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1396     2     20   164 \n"
+" 1396     3     20   164 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -4165,6 +4165,7 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "Position",ISS1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   48,   14
     CONTROL "Observed",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   48,   14
+    CONTROL "Beta",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   48,   14
 END
 
 IDD_DIALOG011 RCDATA

@@ -139,7 +139,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
-      REAL              PF_FWHM
+      REAL              PF_FWHM,                    PF_IntBreadth
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -148,7 +148,7 @@
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
-                        PF_FWHM(MAX_NPFR)
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
 ! Clear all variables
       NumPeakFitRange = 0

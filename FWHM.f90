@@ -5,11 +5,14 @@
 !       PROGRAM TO FIND FULL WIDTHS OF FUNCTIONS
 !       ************************************************
 !
-      REAL FUNCTION FWHM
+      SUBROUTINE Calculate_FWHM(FWHM, IntBreadth)
 
 !C CAN ONLY BE CALLED FROM MULTIPEAK_FITTER()
 
       IMPLICIT NONE
+
+      REAL, INTENT (  OUT) :: FWHM ! Full Width at Half Maximum
+      REAL, INTENT (  OUT) :: IntBreadth ! Integral breadth
 
       INCLUDE 'PARAMS.INC'
 
@@ -47,8 +50,9 @@
       IF (IBMBER .NE. 0) RETURN
 !C OUTPUT
       FWHM = V - W
+      IntBreadth = 1.0 / TOP
 
-      END FUNCTION FWHM
+      END SUBROUTINE Calculate_FWHM
 !
 !*****************************************************************************
 !
