@@ -47,7 +47,7 @@
 ! Go through the PolyFitter wizard
 ! Comment this next line out to remove the wizard
       CALL StartWizard
-      CALL ShowWindowRietveld
+!      CALL ShowWindowRietveld
       DO WHILE (.TRUE.)
         CALL GetEvent
       ENDDO
@@ -212,6 +212,12 @@
           CALL WDialogSelect(IDD_Structural_Information)
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Widths)
+          CALL PopActiveWindowID
+        CASE (IDM_ViewPawley)
+          CALL PushActiveWindowID
+          CALL WDialogSelect(IDD_Structural_Information)
+          CALL WDialogShow(-1,-1,0,Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_ViewPawley)
           CALL PopActiveWindowID
         CASE (ID_Left)
 ! We're going to move the graph to the left if we can
