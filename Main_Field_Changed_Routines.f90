@@ -14,10 +14,6 @@
       INTEGER IRadSelection
 
       SELECT CASE (IDNumber)
-        CASE (IDD_Data_Properties)
-          CALL DebugErrorMessage('fksdhfrwiugf')
-          CALL DownloadWavelength(IDD_Data_Properties)
-          CALL Generate_TicMarks
         CASE (IDF_Indexing_Lambda,IDD_Index_Preparation)
           CALL DownloadWavelength(IDD_Index_Preparation)
           CALL Generate_TicMarks   
@@ -133,6 +129,7 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
+      INCLUDE 'statlog.inc'
 
       INTEGER IDummy
 
@@ -148,7 +145,7 @@
 ! Which button was pressed is now in EventInfo%VALUE1
 ! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Dismiss_StrInf) ! The 'OK' button
+            CASE (IDOK) ! The 'OK' button
               CALL Check_Crystal_Symmetry()
               CALL DownloadWavelength(IDD_Data_Properties)
               CALL WDialogSelect(IDD_Structural_Information)
@@ -173,6 +170,7 @@
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
               CALL UpdateCell(IDD_Crystal_Symmetry)
               CALL Update_Space_Group(IDD_Crystal_Symmetry, IDummy, IDummy)
+              NumPawleyRef = 0
               CALL Generate_TicMarks             
             CASE (IDD_Peak_Widths)
             CASE DEFAULT
@@ -215,9 +213,6 @@
 ! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Data_Download) ! The 'Apply' button
-! @ Does the following do what it is supposed to do
-! Download the data from the structural information pages
-              CALL Check_Crystal_Symmetry()
               CALL DownloadWavelength(IDD_Data_Properties)    
 ! JvdS @ Why isn't there a CALL Generate_TicMarks here?
             CASE DEFAULT
@@ -264,6 +259,7 @@
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'LATTICE.INC'
+      INCLUDE 'statlog.inc'
 
       INTEGER IDummy
 
@@ -279,10 +275,8 @@
 ! Which button was pressed is now in EventInfo%VALUE1
 ! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Data_Download)
+            CASE (IDF_Data_Download) ! The 'Apply' button
               CALL Check_Crystal_Symmetry()
-! JvdS @ Following line is very weird: we're in a completely different window
-              CALL DownloadWavelength(IDD_Data_Properties)        
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 1')
           END SELECT
@@ -310,11 +304,13 @@
               CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
               CALL UpdateCell(IDD_Crystal_Symmetry)               
             CASE (IDF_Crystal_System_Menu)
-              CALL Set_Space_Group(IDD_Crystal_Symmetry)
-!C>> JCC If the system is reset then regenerate the tic marks
+              CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
+              CALL SetCrystalSystem(LatBrav)
+              CALL SetSpaceGroupMenu(LatBrav)
               CALL Generate_TicMarks
             CASE (IDF_Space_Group_Menu)  
               CALL Update_Space_Group(IDD_Crystal_Symmetry, IDummy, IDummy)
+              NumPawleyRef = 0
               CALL Generate_TicMarks
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 2')
@@ -339,15 +335,20 @@
 
       INCLUDE 'statlog.inc'
       LOGICAL FnUnitCellOK ! Function
+      INTEGER GetCrystalSystemFromUnitCell ! Function
 
       CALL PushActiveWindowID
+      CALL Upload_Cell_Constants()
       CALL WDialogSelect(IDD_PW_Page1)
       IF (FnUnitCellOK()) THEN
 ! Enable the wizard next button
         CALL WDialogFieldState(IDNEXT,Enabled)
-        CALL Upload_Cell_Constants()
-        CALL Check_Crystal_Symmetry()
-        CALL Set_Space_Group(IUploadFrom)
+!O        CALL Check_Crystal_Symmetry()
+        CALL SetCrystalSystem(GetCrystalSystemFromUnitCell())
+        CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
+        CALL SetCrystalSystem(LatBrav)
+        CALL SetSpaceGroupMenu(LatBrav)
+        CALL Generate_TicMarks
       ELSE
 ! Disable the wizard next button
         CALL WDialogFieldState(IDNEXT,Disabled)
@@ -359,201 +360,186 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Set_Space_Group(IUploadFrom)
+!U!O      NumBrSG = LPosSG(LatBrav+1) - LPosSG(LatBrav)
+!U!O! Only update if the current setting is not of the correct lattice type
+!U!O      IF ((LatBrav .EQ. 1) .OR. &
+!U!O          (IPosSg .GE. LPosSg(LatBrav) .AND. IPosSg .LT. LPosSg(LatBrav) + NumBrSg) ) THEN
+!U!O! Selection of same lattice so retain current space group
+!U!O        CALL PopActiveWindowID
+!U!O        RETURN
+!U!O      END IF
+!
+!*****************************************************************************
+!
+      SUBROUTINE SetSpaceGroupMenu(TheCrystalSystem)
+!
+! This subroutine determines which space groups are possible given the crystal system and
+! updates the space-group menus in the main window and the wizard to contain
+! only those space groups
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheCrystalSystem
+
+      INCLUDE 'Lattice.inc'
+      INCLUDE 'statlog.inc'
+
+      INTEGER tISG, tJSG
+
+      CALL PushActiveWindowID
+! If crystal system unknown, allow only P 1
+      IF (TheCrystalSystem .EQ. 1) THEN
+        NumBrSG = 1
+      ELSE
+        NumBrSG = LPosSG(TheCrystalSystem+1) - LPosSG(TheCrystalSystem)
+      ENDIF
+      ISPosSG = 1
+      DO tISG = 1, NumBrSG
+        tJSG = LPosSG(TheCrystalSystem) + tISG - 1
+        SGHMaBrStr(tISG)( 1:12) = SGNumStr(tJSG)(1:12)
+        SGHMaBrStr(tISG)(13:24) = SGHMaStr(tJSG)(1:12)
+      END DO
+      IPosSG = LPosSG(TheCrystalSystem)
+      NumberSGTable = IPosSG
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,1)
+      CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutMenu(IDF_PW_Space_Group_Menu,SGHMaBrStr,NumBrSG,1)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE SetSpaceGroupMenu
+!
+!*****************************************************************************
+!
+      SUBROUTINE Update_Space_Group(IUploadFrom, TheCrystalSystem, ISgnum)
+! JvdS A number of things is odd about this routine:
+! 2. The subroutine has both the space group and the crystal system as arguments:
+!    a. Is their consistency checked?
+!    b. The crystal system is determined by the space group => redundant info
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-!C>> JCC Now Cell/Lattice in an include file
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
-      INTEGER IUploadFrom
-      INTEGER ICurSg
-
-      CALL PushActiveWindowID
-      IF (IUpLoadFrom .EQ. IDD_Crystal_Symmetry) THEN
-        CALL WDialogSelect(IDD_Crystal_Symmetry)
-        CALL WDialogGetMenu(IDF_Crystal_System_Menu,IOption)
-!        Call WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
-!        Call WDialogGetMenu(IDF_Space_Group_Menu,ICurSg)
-      ELSE
-        CALL WDialogSelect(IDD_PW_Page1)
-        CALL WDialogGetMenu(IDF_PW_Crystal_System_Menu,IOption)
-!        Call WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
-!        Call WDialogGetMenu(IDF_PW_Space_Group_Menu,ICurSg)
-      END IF
-!      Call WDialogPutMenu(IDF_PW_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
-11    NumBrSG = LPosSG(IOption+1) - LPosSG(IOption)
-!      IActSg = ICurSG + LPosSG(IOption)
-! Only update if the current setting is not of the correct lattice type
-      IF ((IOption .EQ. 1) .OR. &
-          (IPosSg .GE. LPosSg(IOption) .AND. IPosSg .LT. LPosSg(IOption) + NumBrSg) ) THEN
-! Selection of same lattice so retain current space group
-!C>> Reset to whatever was previously selected
-        CALL PopActiveWindowID
-        RETURN
-      END IF
-      ISPosSG = 1
-      DO ISG = 1, NumBrSG
-        JSG = LPosSG(IOption) + ISG - 1
-        SGHMaBrStr(ISG)(1:12)  = SGNumStr(JSG)(1:12)
-        SGHMaBrStr(ISG)(13:24) = SGHMaStr(JSG)(1:12)
-      END DO
-      IPosSG = LPosSG(IOption)
-      NumberSGTable = IPosSG
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-!O      CALL WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,IOption)
-      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-! JvdS @ Next line should be obsolete
-!U      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
-!C>> JCC Set in the wizard too
-      CALL WDialogSelect(IDD_PW_Page1)
-!O      CALL WDialogPutMenu(IDF_PW_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
-      CALL WDialogPutOption(IDF_PW_Crystal_System_Menu,IOption)
-      CALL WDialogPutMenu(IDF_PW_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-! JvdS @ Next line should be obsolete
-!U      CALL WDialogPutOption(IDF_PW_Space_Group_Menu,ISPosSG)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Set_Space_Group
-!
-!*****************************************************************************
-!
-!C>> Sets the space group selected
-      SUBROUTINE Update_Space_Group(IUploadFrom, TheLatticeSystem, ISgnum)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      INTEGER TheLatticeSystem
+      INTEGER, INTENT (IN   ) :: IUploadFrom
+      INTEGER, INTENT (IN   ) :: TheCrystalSystem
+      INTEGER, INTENT (IN   ) :: ISgnum
 
       INCLUDE 'statlog.inc'
       INCLUDE 'Lattice.inc'
-      INTEGER IUploadFrom
-
 
       CALL PushActiveWindowID
       IF (IUploadFrom .EQ. IDD_Crystal_Symmetry) THEN
         CALL WDialogSelect(IDD_Crystal_Symmetry)
-        CALL WDialogGetMenu(IDF_Crystal_System_Menu,IOption)
+        CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
         CALL WDialogGetMenu(IDF_Space_Group_Menu,ISPosSG)
       ELSE IF (IUploadFrom .EQ. IDD_PW_Page1) THEN
         CALL WDialogSelect(IDD_PW_Page1)
-        CALL WDialogGetMenu(IDF_PW_Crystal_System_Menu,IOption)
+        CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
         CALL WDialogGetMenu(IDF_PW_Space_Group_Menu,ISPosSG)
       ELSE
-        IOption = TheLatticeSystem
-        ISPosSG = ISgnum - LPosSG(IOption) + 1
+        LatBrav = TheCrystalSystem
+        ISPosSG = ISgnum - LPosSG(LatBrav) + 1
       END IF
-!.. Trap 0 for unknown and make it P 1
-      NumBrSG = MAX(1,(LPosSG(IOption+1)-LPosSG(IOption)))
-      DO ISG = 1, NumBrSG
-       JSG = LPosSG(IOption) + ISG - 1
-       SGHMaBrStr(ISG)(1:12)  = SGNumStr(JSG)(1:12)
-       SGHMaBrStr(ISG)(13:24) = SGHMaStr(JSG)(1:12)
-      END DO
-      IPosSG = LPosSG(IOption) + ISPosSg - 1
-      NumberSGTable = IPosSG
+      CALL SetSpaceGroupMenu(LatBrav)
+! Actual space group has been reset to the first of the list belonging to this crystal system,
+! reset it to its original value
+      NumberSGTable = LPosSG(LatBrav) + ISPosSG - 1 
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,IOption)
-      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-! Set in the wizard too
+      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutOption(IDF_PW_Crystal_System_Menu,IOption)
-      CALL WDialogPutMenu(IDF_PW_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-! Finally set the number of pawley refinements to zero
-      NumPawleyRef = 0
+      CALL WDialogPutOption(IDF_PW_Space_Group_Menu,ISPosSG)
+      CALL SetCrystalSystem(LatBrav)
       CALL PopActiveWindowID
 
       END SUBROUTINE Update_Space_Group
 !
 !*****************************************************************************
 !
-!C>> JCC Added this in as a single function
-      SUBROUTINE  Check_Lattice_Type
-! Although called 'Check_Lattice_Type, it sets the lattice type really
+      INTEGER FUNCTION GetCrystalSystemFromUnitCell
+!
+! This function determines the crystal system (Unk/Tri/Mon/...) from the unit cell parameters
+! In DASH, the crystal system is kept in variable LatBrav
+!
+! RETURNS :  1 = Unknown
+!            2 = Triclinic
+!            3 = Monoclinic-a
+!            4 = Monoclinic-b
+!            5 = Monoclinic-c
+!            6 = Orthorhombic
+!            7 = Tetragonal
+!          ( 8 = Trigonal          Never returned )
+!            9 = Rhombohedral
+!           10 = Hexagonal
+!           11 = Cubic
+!
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
       INCLUDE 'Lattice.inc'
-      LOGICAL ABC_Same,AB_Same,AC_Same,BC_Same,Ang_Same,Alp_90,Bet_90,Gam_90,Gam_120
 
-!C>> JCC save static local copies of the previous cell. Only update things if the cell changes on call to
-!C>> this routine
-
-      REAL LastCellPar(6)
-      DATA LastCellPar / 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 /
-      SAVE LastCellPar
+      LOGICAL ABC_Same, AB_Same, AC_Same, BC_Same, Ang_Same, Alp_90, Bet_90, Gam_90, Gam_120
       INTEGER I
       LOGICAL FnUnitCellOK ! Function
       REAL, PARAMETER :: SmallVal = 1.0E-6
-! Check if cell parameters are available and make sense
-      IF (.NOT. FnUnitCellOK()) RETURN
-! C>> JCC run check on last Cell
-      IF (   ABS( CellPar(1) - LastCellPar(1) ) .LE. SmallVal  &
-       .AND. ABS( CellPar(2) - LastCellPar(2) ) .LE. SmallVal  &   
-       .AND. ABS( CellPar(3) - LastCellPar(3) ) .LE. SmallVal  &
-       .AND. ABS( CellPar(4) - LastCellPar(4) ) .LE. SmallVal  &
-       .AND. ABS( CellPar(5) - LastCellPar(5) ) .LE. SmallVal  &
-       .AND. ABS( CellPar(6) - LastCellPar(6) ) .LE. SmallVal ) RETURN
-      DO I = 1, 6
-        LastCellPar(I) = CellPar(I)
-      END DO      
-      AB_Same  = ABS(CellPar(2)-CellPar(1)) .LE. SmallVal 
-      BC_Same  = ABS(CellPar(3)-CellPar(2)) .LE. SmallVal 
-      AC_Same  = ABS(CellPar(3)-CellPar(1)) .LE. SmallVal 
-      ABC_Same = AB_Same .AND. BC_Same 
-      Alp_90   = (ABS(CellPar(4)-90.0) .LE. SmallVal)
-      Bet_90   = (ABS(CellPar(5)-90.0) .LE. SmallVal)
-      Gam_90   = (ABS(CellPar(6)-90.0) .LE. SmallVal)
-      Gam_120  = (ABS(CellPar(6)-120.0) .LE. SmallVal)
-      Ang_Same = ABS(CellPar(6)-CellPar(5)) .LE. SmallVal &
-           .AND. ABS(CellPar(5)-CellPar(4)) .LE. SmallVal
-!
-! Unk=1, Tri=2,Mon_a=3,Mon_b=4,Mon_c=5,Ort=6,Tet=7,Tri=8,Rho=9,Hex=10,Cub=11
-! JvdS @ Note that this routine can never return Tri=8
 
+! Check if cell parameters are available and make sense, otherwise set crystal system to unknown
+      IF (.NOT. FnUnitCellOK()) THEN
+        GetCrystalSystemFromUnitCell = 1 ! Unknown
+        RETURN
+      ENDIF
+      AB_Same  = (ABS(CellPar(2)-CellPar(1)) .LE. SmallVal)
+      BC_Same  = (ABS(CellPar(3)-CellPar(2)) .LE. SmallVal)
+      AC_Same  = (ABS(CellPar(3)-CellPar(1)) .LE. SmallVal)
+      ABC_Same = (AB_Same .AND. BC_Same)
+      Alp_90   = (ABS(CellPar(4)- 90.0) .LE. SmallVal)
+      Bet_90   = (ABS(CellPar(5)- 90.0) .LE. SmallVal)
+      Gam_90   = (ABS(CellPar(6)- 90.0) .LE. SmallVal)
+      Gam_120  = (ABS(CellPar(6)-120.0) .LE. SmallVal)
+      Ang_Same = (ABS(CellPar(6)-CellPar(5)) .LE. SmallVal) .AND. &
+                 (ABS(CellPar(5)-CellPar(4)) .LE. SmallVal)
       IF (ABC_Same .AND. Ang_Same) THEN
         IF (Alp_90) THEN
-          LatBrav = 11 ! Cubic
+          GetCrystalSystemFromUnitCell = 11 ! Cubic
           RETURN
         ELSE
-          LatBrav = 9 ! Rhombohedral
+          GetCrystalSystemFromUnitCell = 9 ! Rhombohedral
           RETURN
         END IF
       END IF
       IF (AB_Same) THEN
         IF (Ang_Same .AND. Alp_90) THEN
-          LatBrav = 7 ! Tetragonal
+          GetCrystalSystemFromUnitCell = 7 ! Tetragonal
           RETURN
         ELSE IF (Alp_90 .AND. Bet_90 .AND. Gam_120) THEN
-          LatBrav = 10 ! Hexagonal
+          GetCrystalSystemFromUnitCell = 10 ! Hexagonal
           RETURN
         END IF
       END IF
       IF (Ang_Same .AND. Alp_90) THEN
-        LatBrav = 6 ! Orthorhombic
+        GetCrystalSystemFromUnitCell = 6 ! Orthorhombic
         RETURN
       END IF
       IF      (      Alp_90 .AND.       Bet_90 .AND. .NOT. Gam_90) THEN
-        LatBrav = 5 ! Monoclinic c
+        GetCrystalSystemFromUnitCell = 5 ! Monoclinic c
         RETURN
       ELSE IF (      Alp_90 .AND. .NOT. Bet_90 .AND.       Gam_90) THEN
-        LatBrav = 4 ! Monoclinic b
+        GetCrystalSystemFromUnitCell = 4 ! Monoclinic b
         RETURN
       ELSE IF (.NOT. Alp_90 .AND.       Bet_90 .AND.       Gam_90) THEN
-        LatBrav = 3 ! Monoclinic a
+        GetCrystalSystemFromUnitCell = 3 ! Monoclinic a
         RETURN
       END IF
-      LatBrav = 2 ! Triclinic
+      GetCrystalSystemFromUnitCell = 2 ! Triclinic
       RETURN
 
-      END SUBROUTINE Check_Lattice_Type
+      END FUNCTION GetCrystalSystemFromUnitCell
 !
 !*****************************************************************************
 !
@@ -661,7 +647,7 @@
 !*****************************************************************************
 !
       SUBROUTINE UpdateWavelength(TheWaveLength)
-! Should be renamed to 'SetWavelength'
+! Should be renamed to 'SetWavelength'/'UploadWavelength'
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -704,46 +690,16 @@
 !
 !*****************************************************************************
 !
-!C>> JCC Not used anymore
-!C>> JCC Sets the popup to contain the defaults for the selected lattice 
-!      subroutine Set_Main_Crystal_Symmetry()
-!
-!
-!      use Winteracter
-!      use druid_header
-!
-!C>> JCC Lattice declarations now in an include file 
-!       INCLUDE 'Lattice.inc'
-!
-!      Call WDialogSelect(IDD_Crystal_Symmetry)
-!C>> JCC Not needed any more
-!Was
-! 50  Listbrav=Latbrav+1
-! now
-! 50   continue
-!C>> JCC Was
-!      Call WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,ListBrav)
-! Now
-!       Call WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,LatBrav)
-!      Call WDialogGetMenu(IDF_Crystal_System_Menu,IOption)
-!      NumBrSG=max(1,(LPosSG(IOption+1)-LPosSG(IOption)))
-!      Do ISG=1,NumBrSG
-!         JSG=LPosSG(IOption)+ISG-1
-!         SGHMaBrStr(ISG)(1:12) =SGNumStr(JSG)(1:12)
-!         SGHMaBrStr(ISG)(13:24)=SGHMaStr(JSG)(1:12)
-!      End Do
-!      ISG=1
-!      IPosSG=LPosSG(IOption)
-!      Call WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumSG,ISG)
-!
-!      endsubroutine Set_Main_Crystal_Symmetry
-!
-!*****************************************************************************
-!
 !C>> ID Lattice from space group number
-      INTEGER FUNCTION LatticeNumber(ISpaceGroup,IDashSg)
+      INTEGER FUNCTION GetCrystalSystem_2(ISpaceGroup,IDashSg)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: ISpaceGroup
+      INTEGER, INTENT (IN   ) :: IDashSg
 
       INCLUDE 'Lattice.inc'
+
       INTEGER,PARAMETER ::  TricLim =   2
       INTEGER,PARAMETER ::  MonoLim =  15
       INTEGER,PARAMETER ::  OrthLim =  74
@@ -751,53 +707,55 @@
       INTEGER,PARAMETER ::  TrigLim = 167
       INTEGER,PARAMETER ::  HexaLim = 194
 
+      INTEGER I
+
       IF      (ISpaceGroup .LE. TricLim) THEN
-        LatticeNumber = 2
+        GetCrystalSystem_2 = 2
       ELSE IF (ISpaceGroup .LE. MonoLim) THEN
 ! More work required: a, b or c?
-        LatticeNumber = 3
+        GetCrystalSystem_2 = 3
         DO I = LEN_TRIM(SGNumStr(IDashSg)),1,-1
           SELECT CASE(SGNumStr(IDashSg)(I:I)) 
             CASE ('a')
-              LatticeNumber = 3
+              GetCrystalSystem_2 = 3
             CASE ('b')
-              LatticeNumber = 4
+              GetCrystalSystem_2 = 4
             CASE ('c')
-              LatticeNumber = 5
+              GetCrystalSystem_2 = 5
             CASE (':')
               GOTO 1
           END SELECT
         END DO
    1    CONTINUE
       ELSE IF (ISpaceGroup .LE. OrthLim) THEN
-        LatticeNumber = 6
+        GetCrystalSystem_2 = 6
       ELSE IF (ISpaceGroup .LE. TetrLim) THEN
-        LatticeNumber = 7
+        GetCrystalSystem_2 = 7
       ELSE IF (ISpaceGroup .LE. TrigLim) THEN
 ! More work required - trigonal or rhombohedral
-        LatticeNumber = 8
+        GetCrystalSystem_2 = 8
         DO I = LEN_TRIM(SGNumStr(IDashSg)),1,-1
           SELECT CASE(SGNumStr(IDashSg)(I:I)) 
             CASE ('H')
-              LatticeNumber = 8
+              GetCrystalSystem_2 = 8
             CASE ('R')
-              LatticeNumber = 9
+              GetCrystalSystem_2 = 9
             CASE (':')
               GOTO 2
           END SELECT
         END DO
    2    CONTINUE
       ELSE IF (ISpaceGroup .LE. HexaLim) THEN
-        LatticeNumber = 10
+        GetCrystalSystem_2 = 10
+      ELSE IF (ISpaceGroup .LE. 230) THEN
+        GetCrystalSystem_2 = 11
+      ELSE
+        CALL ErrorMessage('Space group out of range.')
+        GetCrystalSystem_2 = 1 ! Unknown
       ENDIF
-! JvdS @ How can this function ever assign 11 ( = Cubic) to a 
-! 'kristalstelsel'? (The variable LatBrav, probably short for 'Lattice Bravais'
-! is used throughout DASH, but there are 14 Bravais lattices, so that's not
-! what's kept in the variable).
-
       RETURN
 
-      END FUNCTION LatticeNumber
+      END FUNCTION GetCrystalSystem_2
 !
 !*****************************************************************************
 !

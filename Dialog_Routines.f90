@@ -1,38 +1,3 @@
-      SUBROUTINE Upload_Crystal_Symmetry()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-!
-!C>> JCC The declarations are now in a include file since they are used in > 1 place
-      INCLUDE 'Lattice.inc'
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-!O      CALL WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,LatBrav)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
-      NumBrSG = MAX(1,(LPosSG(LatBrav+1)-LPosSG(LatBrav)))
-      DO ISG = 1, NumBrSG
-        JSG = LPosSG(LatBrav)+ISG-1
-        SGHMaBrStr(ISG)( 1:12) = SGNumStr(JSG)(1:12)
-        SGHMaBrStr(ISG)(13:24) = SGHMaStr(JSG)(1:12)
-      END DO
-      ISPosSG=1+IPosSG-LposSG(LatBrav)
-      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-      CALL Upload_Lattice_Only()
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Upload_Crystal_Symmetry
-!
-!*****************************************************************************
-!
-      SUBROUTINE Upload_Lattice_Only()
-
-      LOGICAL FnUnitCellOK ! Function
-
-      IF (FnUnitCellOK()) CALL Upload_Cell_Constants
-      RETURN
-
-      END SUBROUTINE Upload_Lattice_Only
 !
 !*****************************************************************************
 !
@@ -106,7 +71,6 @@
 ! RETURNS : .TRUE.  if user requested the error bars     to be plotted
 !           .FALSE. if user requested the error bars not to be plotted
 !
-
       USE WINTERACTER
       USE DRUID_HEADER
 
