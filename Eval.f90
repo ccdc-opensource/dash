@@ -32,8 +32,8 @@
       REAL*8 TRAN(3), ROTA(3,3), CART(1:3,1:MAXATM)
       REAL*8 QUATER(4), QQSUM, QDEN, QUATT(MVAR)
       REAL*8 XC, YC, ZC, ZERO, ONE, V1, V2, V3
-      LOGICAL UseCrystallographicCentreOfMass
       INTEGER KK, KATOM, ifrg, NATS, KK1, KK2, KK3, JQ, JQS, I, ICFRG, KI
+      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
 
       KK = 0
       KATOM = 0
@@ -97,8 +97,7 @@
             XC = ZERO
             YC = ZERO
             ZC = ZERO
-            UseCrystallographicCentreOfMass = .TRUE.
-            IF (UseCrystallographicCentreOfMass) THEN
+            IF (Get_UseCrystallographicCoM()) THEN
               DO I = 1, NATS
                 XC = XC + AtomicWeighting(I,ifrg)*CART(1,I)
                 YC = YC + AtomicWeighting(I,ifrg)*CART(2,I)

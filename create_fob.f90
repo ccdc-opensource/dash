@@ -1,4 +1,3 @@
-!*==CREATE_FOB.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -43,7 +42,7 @@
       REAL ssq, atem, btem
       REAL, EXTERNAL :: ascfac
 
-! JvdS Attempt to order all atoms such that the Hydrogen atoms are always at
+! JvdS Order all atoms such that the Hydrogen atoms are always at
 ! the end of the atom list. That way, if we don't want to use hydrogens
 ! we can simply subtract the number of hydrogens from the number of atoms and
 ! everything works
@@ -82,12 +81,12 @@
               tNumNonHydrogens = tNumNonHydrogens + 1
               item = tNumNonHydrogens
             ENDIF
-            OrderedAtm(tAtomNumber) = item
-            DO iref = 1, maxk
-              ssq = 0.25*dstar(iref)**2
+            OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
+            DO IREF = 1, MAXK
+              ssq = 0.25*DSTAR(iref)**2
               atem = occ(i,ifrg)*ascfac(asym(i,ifrg),ssq)
               btem = tiso(i,ifrg)*ssq
-              fob(item,iref) = atem*EXP(-btem)
+              FOB(item,iref) = atem*EXP(-btem)
             ENDDO
           ENDDO
         ENDIF
@@ -286,14 +285,14 @@
       DO I = 1, melem
         IF (asym.EQ.symba(I)) THEN
           ascfac = a1(I)*EXP(-b1(I)*ss) + a2(I)*EXP(-b2(I)*ss) + a3(I)  &
-     &             *EXP(-b3(I)*ss) + a4(I)*EXP(-b4(I)*ss) + cv(I)
+                   *EXP(-b3(I)*ss) + a4(I)*EXP(-b4(I)*ss) + cv(I)
           RETURN
         ENDIF
       ENDDO
       CALL WarningMessage('Unknown element for calculation of atomic scattering factors.')
 ! default is a dummy.
       ascfac = a1(99)*EXP(-b1(99)*ss) + a2(99)*EXP(-b2(99)*ss) + a3(99)      &
-     &         *EXP(-b3(99)*ss) + a4(99)*EXP(-b4(99)*ss) + cv(99)
+               *EXP(-b3(99)*ss) + a4(99)*EXP(-b4(99)*ss) + cv(99)
 
       END FUNCTION ASCFAC
 !
@@ -301,14 +300,11 @@
 !
       SUBROUTINE Create_AtomicWeightings
 ! This routine sets the weights for the atoms used when calculating the centre of mass
-! of a z-matrix.
+! of a Z-matrix.
 ! The weights are set such that the 'crystallographic' centre of mass,
 ! i.e. the centre of scattering power, is used for rotations.
 ! The scattering power of an atom is the square of the number of its electrons,
 ! which is taken to be Z, its atomic number, i.e. we are neglecting ions.
-! Just for mathematical rigor, the atomic weights of a z-matrix for which the origin
-! of rotation has been fixed to coincide with an atom (because it is on a special position)
-! are all set to 0.0, except for the atom at the origin which is assigned a weight 1.0
 ! Ideally, we would want hydrogens to have weight 0.0 when not taken into account.
 
       USE ZMVAR
@@ -346,39 +342,26 @@
 
       INTEGER ifrg, I, J
       REAL    TotalAtomicWeighting
-      LOGICAL UseCrystallographicCentreOfMass
 
-      UseCrystallographicCentreOfMass = .TRUE.
       DO ifrg = 1, maxfrg
         IF (gotzmfile(ifrg)) THEN
           IF (icomflg(ifrg) .EQ. 0)  THEN
-            IF (UseCrystallographicCentreOfMass) THEN
-              DO I = 1, natoms(ifrg)
-                DO J = 1, 109
-                  IF (asym(I,ifrg) .EQ. el(J)) THEN
-                    AtomicWeighting(I,ifrg) = FLOAT(atnr(J))**2
-                    EXIT
-                  ENDIF
-                ENDDO
-              ENDDO
-            ELSE
-              DO I = 1, natoms(ifrg)
-                AtomicWeighting(I,ifrg) = 1.0
-              ENDDO
-            ENDIF
-          ELSE
             DO I = 1, natoms(ifrg)
-              AtomicWeighting(I,ifrg) = 0.0
+              DO J = 1, 109
+                IF (asym(I,ifrg) .EQ. el(J)) THEN
+                  AtomicWeighting(I,ifrg) = FLOAT(atnr(J))**2
+                  EXIT
+                ENDIF
+              ENDDO
             ENDDO
-            AtomicWeighting(icomflg(ifrg),ifrg) = 1.0
+            TotalAtomicWeighting = 0.0
+            DO I = 1, natoms(ifrg)
+              TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(I,ifrg) 
+            ENDDO
+            DO I = 1, natoms(ifrg)
+              AtomicWeighting(I,ifrg) = AtomicWeighting(I,ifrg) / TotalAtomicWeighting 
+            ENDDO
           ENDIF
-          TotalAtomicWeighting = 0.0
-          DO I = 1, natoms(ifrg)
-            TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(I,ifrg) 
-          ENDDO
-          DO I = 1, natoms(ifrg)
-            AtomicWeighting(I,ifrg) = AtomicWeighting(I,ifrg) / TotalAtomicWeighting 
-          ENDDO
         ENDIF
       ENDDO
 
