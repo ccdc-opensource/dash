@@ -144,7 +144,7 @@
 !
 !*****************************************************************************
 !
-!C>> Sequence of subroutines that handle the downloading of each field in turn
+! Sequence of subroutines that handle the downloading of each field in turn
       SUBROUTINE DownLoadWavelength(From)
 
       USE WINTERACTER
@@ -325,7 +325,7 @@
       ENDIF
 ! JvdS Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
 ! Store all peaks thus found in one flat array: AllPkPosVal
-! I don't understand why PkPosVal(I,J) is used for this, I would have used XPF_Pos
+! @ I don't understand why PkPosVal(I,J) is used for this, I would have used XPF_Pos
       DO J = 1, NumPeakFitRange
         DO I = 1, NumInPFR(J)
           NTPeak = NTPeak + 1
@@ -337,7 +337,7 @@
 ! IOrdTem now contains and oredered list of pointers into AllPkPosVal
 ! JvdS @ why not order the list itself?
       IF (NTic .NE. 0) THEN
-!.. Let's find the closest peaks and their distribution around the observed peak positions
+! Let's find the closest peaks and their distribution around the observed peak positions
         IR1 = 1 ! Pointer into list of reflections
         DO I = 1, NTPeak
           IOrd = IOrdTem(I) ! IOrd is now a pointer into AllPkPosVal to the next peak position
