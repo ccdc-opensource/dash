@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 29/Jul/2003 14:35:42
+// Modified : 29/Jul/2003 15:58:03
 //
 ///////////////////////////////////////////////////
 //
@@ -4027,7 +4027,6 @@ BEGIN
     CONTROL "/",IDF_LABEL18,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  393,  139,    8,    8
     CONTROL "Axis...",IDB_PO_Settings,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   97,  170,   40,   14
     CONTROL "Re&label",IDB_Relabel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  314,  154,   40,   14
-    CONTROL "Restart",IDB_Restart,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  314,  171,   40,   14
 END
 
 IDD_Rietveld2 RCDATA
