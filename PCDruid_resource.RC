@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 26/Feb/2001 11:20:04
+// Modified : 21/Mar/2001 12:51:02
 //
 ///////////////////////////////////////////////////
 //
@@ -788,7 +788,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1020     8    50   108 \n"
+" 1020     8     50   108 \n"
 "   20 \n"
 "1 \n"
 "2 \n"
@@ -922,7 +922,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1074     4    20   111 \n"
+" 1074     4     20   111 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -1000,7 +1000,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1075     4    20   117 \n"
+" 1075     4     20   117 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -1067,7 +1067,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1019     4    20   116 \n"
+" 1019     4     20   116 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -1134,7 +1134,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1076     4    20   118 \n"
+" 1076     4     20   118 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -1486,7 +1486,7 @@ BEGIN
 " 1479               1              50 \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1480     7    40   132 \n"
+" 1480     7     40   132 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -1618,7 +1618,7 @@ BEGIN
 " 1488               1              10 \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1489     3    20   135 \n"
+" 1489     3     20   135 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -1684,7 +1684,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1401     8    40   137 \n"
+" 1401     8     40   137 \n"
 "   80 \n"
 "parameter 1 \n"
 "parameter 2 \n"
@@ -1892,7 +1892,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1480     5    40   141 \n"
+" 1480     5     40   141 \n"
 "  100 \n"
 "[Colours] \n"
 "[Lengths] \n"
@@ -2276,7 +2276,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1379     3   100   159 \n"
+" 1379     3    100   159 \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
