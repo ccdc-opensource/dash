@@ -218,6 +218,7 @@
 ! Warn if HPSL is less than HMSL
       IF (NumFittedPFR .GE. 2) THEN
         IF (PkFnVarVal(1,4) .GT. PkFnVarVal(1,3)) THEN
+          CALL DebugErrorMessage('HMSL is greater than HPSL.')
 !U         IF (Confirm('HMSL is greater than HPSL.'//CHAR(13)//&
 !U         'Check for bad values in peak width list.'//CHAR(13)// &
 !U         'An expediency: do you wish to swap values?')) THEN
