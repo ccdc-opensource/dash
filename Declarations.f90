@@ -92,8 +92,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
 ! Various maxima and minima related to graphics
-! XPMIN = XBIN(1)
-! XPMAX = XBIN(NBIN)
+! XPMIN = XBIN(1), always, regardless of zoom
+! XPMAX = XBIN(NBIN), always, regardless of zoom
 
       INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
       COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
