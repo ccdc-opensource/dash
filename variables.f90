@@ -69,9 +69,6 @@
 ! This is the first item read from the configuration file (if present).
 ! If set to .FALSE., the rest of the configuration file will be skipped.
       
-      LOGICAL SavePDB
-! Flag to decide which molecular model files are written out when a best solution is found
-
       REAL SA_SimplexDampingFactor
 ! Damping factor for the local minimisation during / after a simulated annealing run
 
