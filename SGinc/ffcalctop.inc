@@ -2,8 +2,6 @@
 
       USE REFVAR
 
-      INCLUDE 'PARAMS.INC'
-
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -18,11 +16,7 @@
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
       REAL            FOB
-      COMMON /FCSTOR/ FOB(150,MFCSTO)
-
-      INTEGER         NLGREF
-      LOGICAL                 LOGREF
-      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
+      COMMON /FCSTOR/ FOB(150,MaxRef)
 
       REAL            COSQS,               SINQS
       COMMON /CSQSTO/ COSQS(-20:20,3,150), SINQS(-20:20,3,150)
