@@ -297,11 +297,10 @@
         BackupYOBS(I) = YOBS(I)
         BackupEOBS(I) = EOBS(I)
       ENDDO
-      LBIN = 1
-      CALL Rebin_Profile
 ! JvdS Assume no knowledge on background
       CALL Clear_BackGround
-      CALL GetProfileLimits
+      LBIN = 1
+      CALL Rebin_Profile
       IPTYPE = 1
       NoData = .FALSE.
       CALL Profile_Plot
@@ -1501,7 +1500,6 @@
       ENDDO
       NOBS = NOBS - Shift
       CALL Rebin_Profile
-      CALL GetProfileLimits
 
       END SUBROUTINE TruncateData
 !
@@ -1574,7 +1572,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Rebin_Profile()
+      SUBROUTINE Rebin_Profile
 !
 ! Rebins the profile
 !
@@ -1616,6 +1614,7 @@
         EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
       ENDDO
       DataSetChange = DataSetChange + 1
+      CALL GetProfileLimits
       CALL Get_IPMaxMin() 
 
       END SUBROUTINE Rebin_Profile

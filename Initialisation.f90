@@ -78,6 +78,7 @@
       CALL WDialogLoad(IDD_PW_Page1)
       CALL WDialogLoad(IDD_PW_Page2)
       CALL WDialogLoad(IDD_PW_Page3)
+      CALL WDialogLoad(IDD_PW_Page3a)
       CALL WDialogLoad(IDD_PW_Page4)
       CALL WDialogLoad(IDD_PW_Page5)
       CALL WDialogLoad(IDD_PW_Page6)
