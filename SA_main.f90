@@ -174,9 +174,9 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-!!ELNA
-      INTEGER                 ModalFlag
-      COMMON / ModalTorsions/ ModalFlag(mvar)
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_HydrogenTreatment
       REAL, EXTERNAL :: Degrees2Radians
