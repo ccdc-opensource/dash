@@ -123,6 +123,7 @@
       INTEGER IBMBER
       COMMON /CCSLER/ IBMBER
 
+      IBMBER = 0
   !    CALL DebugRoutine
 ! JvdS I set ZBAKIN to .TRUE.
 ! With the excluded regions code reinstated, this is necessary to 
