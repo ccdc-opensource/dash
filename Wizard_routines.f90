@@ -426,8 +426,6 @@
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
-      INTEGER :: IDummy
-
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page1)
       SELECT CASE (EventType)
@@ -463,22 +461,22 @@
               CALL Generate_TicMarks
             CASE (IDF_a_latt)
               CALL WDialogGetReal(IDF_a_latt,CellPar(1))
-              CALL UpdateCell(IDD_PW_Page1)
+              CALL UpdateCell
             CASE (IDF_b_latt)
               CALL WDialogGetReal(IDF_b_latt,CellPar(2))
-              CALL UpdateCell(IDD_PW_Page1)
+              CALL UpdateCell
             CASE (IDF_c_latt)
               CALL WDialogGetReal(IDF_c_latt,CellPar(3))
-              CALL UpdateCell(IDD_PW_Page1)
+              CALL UpdateCell
             CASE (IDF_alp_latt)
               CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
-              CALL UpdateCell(IDD_PW_Page1)
+              CALL UpdateCell
             CASE (IDF_bet_latt)
               CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
-              CALL UpdateCell(IDD_PW_Page1)
+              CALL UpdateCell
             CASE (IDF_gam_latt)
               CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
-              CALL UpdateCell(IDD_PW_Page1)
+              CALL UpdateCell
           END SELECT                
         CASE DEFAULT
           CALL DebugErrorMessage('Forgot to handle event in DealWithWizardWindowUnitCellParameters')
@@ -567,14 +565,7 @@
 
       CALL PushActiveWindowID
       CALL SetCrystalSystem(LatBrav)
-      NumBrSG = LPosSG(LatBrav+1) - LPosSG(LatBrav)
-      DO ISG = 1, NumBrSG
-        JSG = LPosSG(LatBrav)+ISG-1
-        SGHMaBrStr(ISG)( 1:12) = SGNumStr(JSG)(1:12)
-        SGHMaBrStr(ISG)(13:24) = SGHMaStr(JSG)(1:12)
-      END DO
-      ISPosSG=1+NumberSGTable-LposSG(LatBrav)
-      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+      CALL SetSpaceGroupMenu
       CALL Upload_Cell_Constants()
       CALL Upload_Range()
       CALL PopActiveWindowID
