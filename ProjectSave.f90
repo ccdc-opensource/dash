@@ -10,6 +10,7 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE PRJVAR
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -39,11 +40,23 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
+      INTEGER         KREFT
+      COMMON /FPINF2/ KREFT(MOBS)
+
+      INTEGER         KNIPT
+      REAL                            PIKVAL
+      COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
+
+      INTEGER          NFITA, IFITA
+      REAL                                 WTSA
+      COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
+
       CHARACTER*MaxPathLength :: tFileName
-      INTEGER I, tInteger, RW
+      INTEGER I, j, tInteger, RW, tCurrentWizardWindow
       LOGICAL tLogical
       REAL    tReal
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER, EXTERNAL :: GetCrystalSystem
 
       CALL PushActiveWindowID
       iPrjReadOrWrite = ReadOrWrite
@@ -56,8 +69,7 @@
       IF (RW .EQ. cWrite) THEN
         CALL FileWriteInteger(hPrjFile,iPrjRecNr,CurrentWizardWindow)
       ELSE
-        CALL FileReadInteger(hPrjFile,iPrjRecNr,tInteger)
-        CALL WizardWindowShow(tInteger)
+        CALL FileReadInteger(hPrjFile,iPrjRecNr,tCurrentWizardWindow)
       ENDIF
 ! Read / Write radiation source
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,JRadOption)
@@ -125,8 +137,6 @@
           IPTYPE = 1
         ENDIF
       ENDIF
-! Read / Write Crystal System
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,LatBrav)
 ! Read / Write unit cell
       DO I = 1, 6
         CALL FileRWReal(hPrjFile,iPrjRecNr,RW,CellPar(I))
@@ -137,14 +147,12 @@
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumberSGTable)
 ! Calculate tick marks
       IF (RW .EQ. cRead) THEN
+        LatBrav = GetCrystalSystem(NumberSGTable)
+        CALL Upload_CrystalSystem
+        CALL FillSymmetry
         PastPawley = .FALSE.
         CALL Generate_TicMarks
       ENDIF
-! Is this "PastPawley"? (has consequences for e.g. drawing of peak fit ranges)
-      PastPawley = ((CurrentWizardWindow .EQ. IDD_SAW_Page1) .OR.     &
-                    (CurrentWizardWindow .EQ. IDD_SAW_Page2) .OR.     &
-                    (CurrentWizardWindow .EQ. IDD_SA_input2) .OR.     &
-                    (CurrentWizardWindow .EQ. IDD_SA_input3))
 ! Read / Write Pawley refinement related stuff
 ! Read / Write the peak fit ranges
       CALL PrjReadWritePeakFitRanges
@@ -154,12 +162,57 @@
 ! Read / Write the .pik file
 !            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
 !        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
-
-
-
+      IF (RW .EQ. cRead) THEN
+        CALL WizardWindowShow(tCurrentWizardWindow)
+! Is this "PastPawley"? (has consequences for e.g. drawing of peak fit ranges)
+        PastPawley = ((CurrentWizardWindow .EQ. IDD_SAW_Page1) .OR.     &
+                      (CurrentWizardWindow .EQ. IDD_SAW_Page2) .OR.     &
+                      (CurrentWizardWindow .EQ. IDD_SA_input2) .OR.     &
+                      (CurrentWizardWindow .EQ. IDD_SA_input3))
+      ENDIF
+      IF (PastPawley) THEN
+! If we are this way down the file, NBIN was determined by original pattern + truncation + LBIN.
+! However, after we have done a Pawley fit, data points beyond the 350th reflection have been discarded,
+! and NBIN has a new value.
+        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NBIN)
+! Read / Write observed pattern minus the background fitted during the Pawley refinement.
+! This is the observed pattern read in by GETPIK.
+        DO I = 1, NBIN
+          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,YOBIN(I))
+        ENDDO
+        IF (RW .EQ. cRead) THEN
+          DO I = 1, NBIN
+            WTSA(I) = 1.0/EBIN(I)**2
+          ENDDO
+        ENDIF
+        NFITA = 0
+        DO I = 1, NBIN
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,KREFT(I))
+          IF (KREFT(I).GT.0) THEN
+            DO j = 1, KREFT(I)
+              CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,KNIPT(j,I))
+              CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PIKVAL(j,I))
+            ENDDO
+            NFITA = NFITA + 1
+            IFITA(NFITA) = I
+          ENDIF
+        ENDDO
+      ENDIF
       IF (RW .EQ. cRead) CALL Profile_Plot
+      IF (PastPawley) THEN
+        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumOfRef)
+        DO I = 1, NumOfRef
+          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,AIOBS(I))
+! @@ plus correlations
+
+        ENDDO
+! Read / Write Preferred Orientation
+
+
+      ENDIF
 ! Read / Write the Z-matrices
       CALL PrjReadWriteZmatrices
+! Do we want the range and fixed yes/no per parameter as well?
 ! Read / Write solutions
 ! Read / Write number of solutions
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,SA_Run_Number)
@@ -171,10 +224,11 @@
       ENDIF
 
 
-
+      CLOSE(hPrjFile)
       CALL PopActiveWindowID
       RETURN
   999 CALL ErrorMessage('Error writing project file.')
+      CLOSE(hPrjFile)
       CALL PopActiveWindowID
 
       END SUBROUTINE PrjReadWrite
