@@ -1,13 +1,12 @@
 !
 !*****************************************************************************
 !
-     SUBROUTINE SA_OUTPUT(kopt,T,CHIMIN,CHIAV,CHIESD,&
-     xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,&
-     nmpert,ntotmov,iteration)
+      SUBROUTINE SA_OUTPUT(kopt,T,CHIMIN,CHIAV,CHIESD,&
+      xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,&
+      nmpert,ntotmov,iteration)
 
       USE WINTERACTER
       USE DRUID_HEADER
-
 
       REAL*8 xopt(*),dxvav(*),xvsig(*),flav(*),lb(*),ub(*),vm(*)
 
@@ -24,25 +23,25 @@
                 nd2, nd3, nd4
 
       CALL WDialogSelect(IDD_SA_Completed)
-      CALL WDialogPutReal(IDF_SA_Complete_pcs,CHIPROBEST(iteration),'(f8.2)')
-      CALL WDialogPutReal(IDF_SA_Complete_ics,chimin,'(f8.2)')
+      CALL WDialogPutReal(IDF_SA_Complete_pcs,CHIPROBEST(iteration),'(F8.2)')
+      CALL WDialogPutReal(IDF_SA_Complete_ics,chimin,'(F8.2)')
       CALL WDialogSelect(IDD_SA_Action1)
-      CALL WDialogPutReal(IDF_curr_temp,T,'(f8.2)')
-      CALL WDialogPutReal(IDF_min_chisq,chimin,'(f8.2)')
-      CALL WDialogPutReal(IDF_profile_chisq2,CHIPROBEST(iteration),'(f8.2)')
+      CALL WDialogPutReal(IDF_curr_temp,T,'(F8.2)')
+      CALL WDialogPutReal(IDF_min_chisq,chimin,'(F8.2)')
+      CALL WDialogPutReal(IDF_profile_chisq2,CHIPROBEST(iteration),'(F8.2)')
 
 !.. best chi-squared scale ...
-        bchmin=alog10(max(1.,chimin))
-        temin=0.0
-        temax=4.0
+      bchmin=alog10(max(1.0,chimin))
+      temin = 0.0
+      temax = 4.0
  
 !.. profile chi-squared scale ...
   
-      bpwval = alog10(max(1.,PawleyChiSq))
-      bchpro = alog10(max(1.,CHIPROBEST(iteration)))
-      if (kopt.eq.1) then
-        CALL WDialogPutReal(IDF_av_chisq,chiav,'(f8.2)')
-        CALL WDialogPutReal(IDF_rms_chisq,chiesd,'(f8.2)')
+      bpwval = alog10(MAX(1.0,PawleyChiSq))
+      bchpro = alog10(MAX(1.0,CHIPROBEST(iteration)))
+      IF (kopt .EQ. 1) THEN
+        CALL WDialogPutReal(IDF_av_chisq,chiav,'(F8.2)')
+        CALL WDialogPutReal(IDF_rms_chisq,chiesd,'(F8.2)')
         CALL WDialogPutInteger(IDF_total_moves,ntotmov)
         CALL WDialogPutInteger(IDF_moves_per_T,nmpert)
         CALL WDialogPutInteger(IDF_downhill_moves,ndown)
@@ -50,15 +49,15 @@
         CALL WDialogPutInteger(IDF_acc_up_moves,nup)
         CALL WDialogPutInteger(IDF_SA_total_moves_label,nmpert)
 !.. Temperature scale ...
-        tempvl=alog10(max(1.,t))
-        avchi1=alog10(max(1.,chiav-chiesd))
-        ctem=max(1.,chiav+chiesd)
-        avchi2=alog10(min(10000.,ctem))
-        temin=0.0
-        temax=4.0
-        avchi3=alog10(max(1.,chiav-0.1*chiesd))
-        ctem=MAX(1.0,chiav+0.1*chiesd)
-        avchi4=alog10(min(10000.,ctem))
+        tempvl = alog10(MAX(1.0,t))
+        avchi1 = alog10(MAX(1.0,chiav-chiesd))
+        ctem = MAX(1.0,chiav+chiesd)
+        avchi2 = alog10(MIN(10000.0,ctem))
+        temin = 0.0
+        temax = 4.0
+        avchi3 = alog10(MAX(1.0,chiav-0.1*chiesd))
+        ctem = MAX(1.0,chiav+0.1*chiesd)
+        avchi4 = alog10(MIN(10000.0,ctem))
         nd1 = ndown
         nd2 = nmpert
         nd3 = ntotmov
@@ -105,10 +104,8 @@
       REAL, PARAMETER ::  rminh = 0.01
       REAL, PARAMETER ::  rmaxh = 0.99
 
-
-      temperfile= INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Images'//DIRSPACER//'temperature1.bmp'
+      temperfile = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Images'//DIRSPACER//'temperature1.bmp'
       ilt = LEN_TRIM(temperfile)
-
 
       CALL IGrSelect(3,IDF_minchisq_picture)
       CALL IGrFillPattern(Solid)
