@@ -779,8 +779,8 @@
       IF (tNumZMatrices .GT. 1) THEN
         CALL WarningMessage('More than 1 Z-matrix generated.'//&
                             'Only the first will be retained.')
-        CALL IOsCopyFile('Rebuild_temp_1.zmatrix','Rebuild_temp.zmatrix')
       ENDIF
+      CALL IOsCopyFile('Rebuild_temp_1.zmatrix','Rebuild_temp.zmatrix')
       frag_file(iFrg) = 'Rebuild_temp.zmatrix'
 ! Reading a Z-matrix is going to reset all the rotational stuff that isn't present in a .zmatrix file
       CALL zmRotCopyTemp2Dialog
