@@ -266,9 +266,9 @@
       INTEGER                    ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiHandle
 
-      REAL                PeakFindPos
-      INTEGER                                           nPeaksFound
-      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+  !    REAL                PeakFindPos
+  !    INTEGER                                           nPeaksFound
+  !    COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -339,7 +339,7 @@
       ENDDO
       CALL Clear_SA ! Sets NumOf_SA_Runs to 0
       CALL Update_Solutions
-      nPeaksFound = 0
+!      nPeaksFound = 0
       CALL WDialogSelect(IDD_SAW_Page5)
       CALL WDialogFieldState(IDB_Prog3, Disabled)
       UseQuaternions = .TRUE.

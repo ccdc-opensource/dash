@@ -57,7 +57,7 @@
         END SELECT
         IF (.NOT. PastPawley) THEN
 ! Plot peaks found
-          CALL PlotPeaksFound
+ !         CALL PlotPeaksFound
 ! Plot peakfit ranges
           IF (NumPeakFitRange .GT. 0) CALL Plot_PeakFit_Info
 ! Plot Background
@@ -595,44 +595,44 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PlotPeaksFound
-
-      USE WINTERACTER
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'POLY_COLOURS.INC'
-
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
-
-      REAL                PeakFindPos
-      INTEGER                                           nPeaksFound
-      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
-
-      INTEGER I
-      REAL xptem, yptem, xgtem, ygtem
-
-      IF (nPeaksFound .EQ. 0) RETURN
-      CALL IGrColourN(KolNumCal)
-      DO I = 1, nPeaksFound
-        xptem = PeakFindPos(I)
-        IF ((xptem .LT. XPGMAX) .AND. (xptem .GT. XPGMIN)) THEN
-          yptem = ypgmin
-          CALL IPgUnitsToGrUnits(xptem, yptem, xgtem, ygtem)
-          CALL IGrMoveTo(xgtem, ygtem)
-          yptem = ypgmax
-          CALL IPgUnitsToGrUnits(xptem, yptem, xgtem, ygtem)
-          CALL IGrLineTo(xgtem, ygtem)
-        ENDIF
-      ENDDO
-
-      END SUBROUTINE PlotPeaksFound
+  !C    SUBROUTINE PlotPeaksFound
+  !C
+  !C    USE WINTERACTER
+  !C
+  !C    IMPLICIT NONE
+  !C
+  !C    INCLUDE 'PARAMS.INC'
+  !C    INCLUDE 'POLY_COLOURS.INC'
+  !C
+  !C    REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+  !C                     XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+  !C                     XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+  !C    COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+  !C                     XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+  !C                     XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+  !C
+  !C!    REAL                PeakFindPos
+  !C!    INTEGER                                           nPeaksFound
+  !C!    COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+  !C
+  !C    INTEGER I
+  !C    REAL xptem, yptem, xgtem, ygtem
+  !C
+  !C    IF (nPeaksFound .EQ. 0) RETURN
+  !C    CALL IGrColourN(KolNumCal)
+  !C    DO I = 1, nPeaksFound
+  !C      xptem = PeakFindPos(I)
+  !C      IF ((xptem .LT. XPGMAX) .AND. (xptem .GT. XPGMIN)) THEN
+  !C        yptem = ypgmin
+  !C        CALL IPgUnitsToGrUnits(xptem, yptem, xgtem, ygtem)
+  !C        CALL IGrMoveTo(xgtem, ygtem)
+  !C        yptem = ypgmax
+  !C        CALL IPgUnitsToGrUnits(xptem, yptem, xgtem, ygtem)
+  !C        CALL IGrLineTo(xgtem, ygtem)
+  !C      ENDIF
+  !C    ENDDO
+  !C
+  !C    END SUBROUTINE PlotPeaksFound
 !
 !*****************************************************************************
 !
