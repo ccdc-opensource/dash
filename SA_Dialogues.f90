@@ -773,6 +773,7 @@
       zmAtomDeleted = .FALSE.
       zmRebuild = 0
   999 CALL zmRotCopyDialog2Temp
+      CALL zmDoAdmin(iFrg)
       frag_file(iFrg) = tOldFileName
 
       END FUNCTION zmRebuild
