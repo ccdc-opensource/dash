@@ -111,7 +111,6 @@
       REAL             zmSingleRotAxFrac(1:3,0:maxfrg)
       INTEGER          zmSingleRotAxAtms(1:3,0:maxfrg)
 
-      REAL             zmSingleRotationAxis(1:3,0:maxfrg)
       DOUBLE PRECISION zmSingleRotationQs(0:3,0:maxfrg)
 
 ! icomflg         = Centre of mass flag.
