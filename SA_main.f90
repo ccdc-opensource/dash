@@ -233,6 +233,8 @@
               CASE (7)
                 Element = 43 ! Iodine        Pink
               CASE (8)
+                Element =  2 ! Hydrogen      White
+              CASE (9)
                 Element = 66 ! Phosphorus
             END SELECT
             aelem(atom) = Element
