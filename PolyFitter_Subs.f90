@@ -1045,15 +1045,40 @@
 !
       LOGICAL FUNCTION WeCanDoAPawleyRefinement
 
+      USE DRUID_HEADER
+
       IMPLICIT NONE
 
       REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
       COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
+      REAL    tPeakShapeSigma(1:2), tPeakShapeGamma(1:2)
       LOGICAL, EXTERNAL :: Check_TicMark_Data
 
       WeCanDoAPawleyRefinement = .FALSE.
       IF (.NOT. Check_TicMark_Data()) RETURN
+
+
+
+!C Try to get the peak shape parameters from the View Pawley dialogue. If this fails, use the
+!C values in memory.
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_ViewPawley)
+      CALL WDialogGetReal(IDF_Sigma1, tPeakShapeSigma(1))
+      CALL WDialogGetReal(IDF_Sigma2, tPeakShapeSigma(2))
+      CALL WDialogGetReal(IDF_Gamma1, tPeakShapeGamma(1))
+      CALL WDialogGetReal(IDF_Gamma2, tPeakShapeGamma(2))
+      IF ((tPeakShapeSigma(1) .GT. -100.0)  .AND. (tPeakShapeSigma(1) .LT. 100.0) .AND.   &
+          (tPeakShapeSigma(2) .GT. -100.0)  .AND. (tPeakShapeSigma(2) .LT. 100.0) .AND.   &
+          (tPeakShapeGamma(1) .GT. -100.0)  .AND. (tPeakShapeGamma(1) .LT. 100.0) .AND.   &
+          (tPeakShapeGamma(2) .GT. -100.0)  .AND. (tPeakShapeGamma(2) .LT. 100.0)) THEN
+        PeakShapeSigma(1) = tPeakShapeSigma(1)
+        PeakShapeSigma(2) = tPeakShapeSigma(2)
+        PeakShapeGamma(1) = tPeakShapeGamma(1)
+        PeakShapeGamma(2) = tPeakShapeGamma(2)
+      ENDIF
+      CALL PopActiveWindowID
+
       IF (PeakShapeSigma(1) .LT. -900.0) RETURN
       IF (PeakShapeSigma(2) .LT. -900.0) RETURN
       IF (PeakShapeGamma(1) .LT. -900.0) RETURN
