@@ -398,6 +398,7 @@
       CALL IOsDeleteFile('SA_best.pdb')
       CALL IOsDeleteFile('DICVOL.OUT')
       CALL IOSDeleteFile('MakeZmatrix.log')
+      CALL IOSDeleteFile('SA_PARAMS.TXT')
       CALL IDebugLevel(DbgMsgBox)
 
       END SUBROUTINE DeleteTempFiles
