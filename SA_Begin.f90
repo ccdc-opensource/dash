@@ -233,3 +233,94 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE PO_Init   
+
+      USE PO_VAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+
+      INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
+      LOGICAL                                                                             SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
+
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
+
+      INTEGER     msymmin
+      PARAMETER ( msymmin = 10 )
+      INTEGER            nsymmin
+      REAL                        symmin
+      CHARACTER*20                                           symline
+      COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
+
+      INTEGER         MAXK
+      REAL                  FOB
+      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+
+      INTEGER         NLGREF, iREFH
+      LOGICAL                                  LOGREF
+      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
+
+      INTEGER           iHMUL
+      COMMON /SAREFLN3/ iHMUL(MSAREF)
+
+      INTEGER         NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+      COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
+      CHARACTER*10 filnam_root
+      COMMON /commun/ filnam_root
+ 
+      CHARACTER*6  PNAME
+      REAL phases(1:48), RefHT(1:3,1:48)
+      REAL PrfDir(1:3), H(1:3), RefLen
+      INTEGER i, ii, iR, isym
+      REAL, EXTERNAL :: VCTMOD, SCLPRD
+
+      IF (.NOT. PrefParExists) RETURN
+      OPEN(42,file='polyx.ccl',status='unknown')
+      WRITE(42,4210) 
+ 4210 FORMAT('N Handles preferred orientation')
+      WRITE(42,4220) (CellPar(i),i=1,6)
+ 4220 FORMAT('C ',3F9.5,3F9.3)
+      IF (NumberSGTable .GE. 1) THEN
+        CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
+        IF (nsymmin .GT. 0) THEN
+          DO isym = 1, nsymmin
+            WRITE(42,4235) symline(isym)
+ 4235       FORMAT('S ',a)
+          ENDDO
+        ENDIF
+      ENDIF
+      CLOSE(42)
+      pname = 'EXTMAK'
+      filnam_root = 'polyx'
+      NINIT = 1
+      CALL PREFIN(PNAME)
+      CALL SYMOP
+      CALL RECIP
+      DO i = 1, 3
+        PrfDir(i) = PrefPars(i)
+      ENDDO
+      CALL VectorNormalise(PrfDir)
+      DO iR = 1, MAXK
+        DO ii = 1, 3
+          H(ii) = SNGL(iREFH(ii,iR))
+        ENDDO
+        RefLen = VCTMOD(1.0,H,2) ! Calculate length of reciprocal-space vector
+        CALL SYMREF(H,RefHT,iHMUL(iR),phases)
+        DO ii = 1, iHMUL(iR)
+          PrefCsqa(ii,iR) = (SCLPRD(PrfDir,RefHT(1,ii),2)/RefLen)**2
+        ENDDO
+      ENDDO
+      CALL CLOFIL(ICRYDA)
+      CALL CLOFIL(IO10)
+      CALL CLOFIL(LPT)
+
+      END  SUBROUTINE PO_Init
+!
+!*****************************************************************************
+!

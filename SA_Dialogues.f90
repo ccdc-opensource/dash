@@ -108,7 +108,7 @@
                 ELSE
 ! Its label
                   CALL WGridLabelRow(IDF_RotationsGrid,iFrg,'')
-! Initialise "None" | "Quaternions" | "Single axis" menu to quaternions
+! Initialise "None" | "Quaternions" | "Single axis" menu to none
                   CALL WGridPutCellOption(IDF_RotationsGrid,1,iFrg,1)
 ! Grey out all "a or alpha" fields
                   CALL WGridStateCell(IDF_RotationsGrid,2,iFrg,DialogReadOnly)
@@ -231,7 +231,7 @@
                 ELSE
 ! Its label
                   CALL WGridLabelRow(IDF_RotationsGrid,iFrg,'')
-! Initialise "None" | "Quaternions" | "Single axis" menu to quaternions
+! Initialise "None" | "Quaternions" | "Single axis" menu to none
                   CALL WGridPutCellOption(IDF_RotationsGrid,1,iFrg,1)
 ! Grey out all "a or alpha" fields
                   CALL WGridStateCell(IDF_RotationsGrid,2,iFrg,DialogReadOnly)
@@ -512,6 +512,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE PO_VAR
       USE ZMVAR
 
       IMPLICIT NONE      
@@ -544,6 +545,10 @@
               CALL MakRHm()
               CALL CalCosArx()
               CALL Create_AtomicWeightings
+              IF (PrefParExists) THEN
+                CALL PO_Init
+                CALL PO_PRECFC
+              ENDIF
               CALL BeginSA
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
@@ -552,7 +557,7 @@
                 CALL WindowOpenChild(IHANDLE)
                 CALL WEditFile('SA_PARAMS.TXT',Modeless,0,FileMustExist,4)
 ! Note that the implementation of this editor child window is different from those used for
-! the z-matrix and the DICVOL results. This editor window is not 'ViewOnly', which has three consequences:
+! the Z-matrix and the DICVOL results. This editor window is not 'ViewOnly', which has three consequences:
 ! 1. The file can be edited. The user can add a titel, for instance.
 ! 2. The file can be saved using the 'Save as...' option from the menu.
 ! 3. The file cannot be accessed by DASH while it is being viewed by the user. This

@@ -1,14 +1,16 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE VALCHI(CHIVAL)
+      SUBROUTINE VALCHI(CHIVAL,CurrentParameter)
 
       USE ZMVAR
+      USE PO_VAR
       USE VARIABLES
 
       IMPLICIT NONE
 
-      REAL, INTENT (  OUT) :: CHIVAL
+      REAL,    INTENT (  OUT) :: CHIVAL
+      INTEGER, INTENT (IN   ) :: CurrentParameter
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -17,9 +19,9 @@
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
 
-      INTEGER         NLGREF, IREFH
+      INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
+      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
 
       INTEGER         KKOR
       REAL                  WTIJ
@@ -28,6 +30,8 @@
 
       REAL              AIOBS,         AICALC
       COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
+      REAL              BICALC,         XICALC
+      COMMON /SAREFLN2/ BICALC(MSAREF), XICALC(MSAREF)
 
       INTEGER         NATOM
       REAL                   X
@@ -48,6 +52,9 @@
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
       
+      INTEGER         NStPar
+      COMMON /pextra/ NStPar
+
       REAL    SUM1, SUM2, RESCL, DELI, DELJ, CHIADD
       INTEGER iR, iK, II, JJ
       REAL, EXTERNAL :: FFCALC_001, FFCALC_002, FFCALC_039, FFCALC_040, FFCALC_044, FFCALC_050, &
@@ -61,243 +68,248 @@
       REAL Vector1(1:3), Vector2(1:3)
       REAL tDotProduct
 
-      CALL PRECFC
-      SUM1 = 0.0
-      SUM2 = 0.0
-      IF (LOG_HYDROGENS) THEN
+     
+! We have two types of parameters: those affecting the fractional co-ordinates and the
+! preferred orientation. If the current parameter is the preferred orientation, there is
+! no need to re-do al the structure factor calculations
+      IF (CurrentParameter .LE. NStPar) THEN
+        CALL PRECFC
+        IF (LOG_HYDROGENS) THEN
+          NATOM = TotNumOfAtoms
+        ELSE
+          NATOM = NumOfNonHydrogens
+        ENDIF
+        SELECT CASE (NumberSGTable)
+          CASE (1)             ! P1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_001(IR)
+            ENDDO
+          CASE (2)             ! P-1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_002(IR)
+            ENDDO
+          CASE (39)            ! P 1 21 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_039(IR)
+            ENDDO
+          CASE (40)             ! C 1 2 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_040(IR)
+            ENDDO
+          CASE (44)             ! P 1 c 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_044(IR)
+            ENDDO
+          CASE (50)            ! C 1 c 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_050(IR)
+            ENDDO
+          CASE (52)            ! I 1 a 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_052(IR)
+            ENDDO
+          CASE (57)            ! P 1 21/m 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_057(IR)
+            ENDDO
+          CASE (58)            ! C 1 2/m 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_058(IR)
+            ENDDO
+          CASE (61)            ! P 1 2/c 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_061(IR)   
+            ENDDO
+          CASE (64)            ! P 1 21/c 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_064(IR)   
+            ENDDO
+          CASE (65)            ! P 1 21/n 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_065(IR)
+            ENDDO
+          CASE (66)            ! P 1 21/a 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_066(IR)
+            ENDDO
+          CASE (67)            ! C 1 2/c 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_067(IR)
+            ENDDO
+          CASE (69)            ! I 1 2/a 1
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_069(IR)
+            ENDDO
+          CASE (112)           ! P 21 21 2
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_112(IR)
+            ENDDO
+          CASE (115)           ! P 21 21 21
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_115(IR)
+            ENDDO
+          CASE (116)           ! C 2 2 21
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_116(IR)
+            ENDDO
+          CASE (143)           ! P c a 21
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_143(IR)
+            ENDDO
+          CASE (164)           ! P n a 21
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_164(IR)
+            ENDDO
+          CASE (176)            ! C m c 21
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_176(IR)
+            ENDDO
+          CASE (212)            ! F d d 2
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_212(IR)
+            ENDDO
+          CASE (266)            ! P c c n
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_266(IR)
+            ENDDO
+          CASE (269)            ! P b c m
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_269(IR)
+            ENDDO
+          CASE (284)           ! P b c n
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_284(IR)
+            ENDDO
+          CASE (290)           ! P b c a
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_290(IR)
+            ENDDO
+          CASE (292)           ! P n m a
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_292(IR)
+            ENDDO
+          CASE (298)           ! C m c m
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_298(IR)
+            ENDDO
+          CASE (304)           ! C m c a
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_304(IR)
+            ENDDO
+          CASE (356)           ! I -4
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_356(IR)
+            ENDDO
+          CASE (365)           ! I 41/a (origin choice 2)
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_365(IR)
+            ENDDO
+          CASE (369)           ! P 41 21 2
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_369(IR)
+            ENDDO
+  ! Obscure from here on in !
+          CASE (430)           ! P3
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_430(IR)
+            ENDDO
+          CASE (431)           ! P31
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_431(IR)
+            ENDDO
+          CASE (432)           ! P32
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_432(IR)
+            ENDDO
+          CASE (433)           ! R3 hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_433(IR)
+            ENDDO
+          CASE (434)           ! P-3
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_434(IR)
+            ENDDO
+          CASE (435)           ! R-3 hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_435(IR)
+            ENDDO
+          CASE (449)           ! P-31m hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_449(IR)
+            ENDDO
+          CASE (451)           ! P-3m1 hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_451(IR)
+            ENDDO
+          CASE (462)           ! P6 hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_462(IR)
+            ENDDO
+          CASE(468)           ! P-6 hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_468(IR)
+            ENDDO
+          CASE (469)           ! P6/m hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_469(IR)
+            ENDDO
+          CASE (471)           ! P622 hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_471(IR)
+            ENDDO
+          CASE (481)           ! P-6m2 hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_481(IR)
+            ENDDO
+          CASE (483)           ! P-62m hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_483(IR)
+            ENDDO
+          CASE (485)           ! P6/mmm hexagonal axes
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_485(IR)
+            ENDDO
+          CASE DEFAULT
+            DO IR = 1, MAXK
+              AICALC(IR) = FFCALC_DEFAULT(IR)
+            ENDDO
+        END SELECT
         NATOM = TotNumOfAtoms
       ELSE
-        NATOM = NumOfNonHydrogens
+! If we are here, the parameter that has been changed didn't affect the fractional co-ordinates.
+! In the current set-up, that means that it must have been the preferred orientation.
+! So: recalculate the preferred orientation correction factors.
+        CALL PO_PRECFC
       ENDIF
-      SELECT CASE (NumberSGTable)
-        CASE (1)             ! P1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_001(IR)
-          ENDDO
-        CASE (2)             ! P-1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_002(IR)
-          ENDDO
-        CASE (39)            ! P 1 21 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_039(IR)
-          ENDDO
-        CASE (40)             ! C 1 2 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_040(IR)
-          ENDDO
-        CASE (44)             ! P 1 c 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_044(IR)
-          ENDDO
-        CASE (50)            ! C 1 c 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_050(IR)
-          ENDDO
-        CASE (52)            ! I 1 a 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_052(IR)
-          ENDDO
-        CASE (57)            ! P 1 21/m 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_057(IR)
-          ENDDO
-        CASE (58)            ! C 1 2/m 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_058(IR)
-          ENDDO
-        CASE (61)            ! P 1 2/c 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_061(IR)   
-          ENDDO
-        CASE (64)            ! P 1 21/c 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_064(IR)   
-          ENDDO
-        CASE (65)            ! P 1 21/n 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_065(IR)
-          ENDDO
-        CASE (66)            ! P 1 21/a 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_066(IR)
-          ENDDO
-        CASE (67)            ! C 1 2/c 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_067(IR)
-          ENDDO
-        CASE (69)            ! I 1 2/a 1
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_069(IR)
-          ENDDO
-        CASE (112)           ! P 21 21 2
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_112(IR)
-          ENDDO
-        CASE (115)           ! P 21 21 21
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_115(IR)
-          ENDDO
-        CASE (116)           ! C 2 2 21
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_116(IR)
-          ENDDO
-        CASE (143)           ! P c a 21
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_143(IR)
-          ENDDO
-        CASE (164)           ! P n a 21
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_164(IR)
-          ENDDO
-        CASE (176)            ! C m c 21
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_176(IR)
-          ENDDO
-        CASE (212)            ! F d d 2
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_212(IR)
-          ENDDO
-        CASE (266)            ! P c c n
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_266(IR)
-          ENDDO
-        CASE (269)            ! P b c m
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_269(IR)
-          ENDDO
-        CASE (284)           ! P b c n
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_284(IR)
-          ENDDO
-        CASE (290)           ! P b c a
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_290(IR)
-          ENDDO
-        CASE (292)           ! P n m a
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_292(IR)
-          ENDDO
-        CASE (298)           ! C m c m
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_298(IR)
-          ENDDO
-        CASE (304)           ! C m c a
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_304(IR)
-          ENDDO
-        CASE (356)           ! I -4
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_356(IR)
-          ENDDO
-        CASE (365)           ! I 41/a (origin choice 2)
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_365(IR)
-          ENDDO
-        CASE (369)           ! P 41 21 2
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_369(IR)
-          ENDDO
-! Obscure from here on in !
-        CASE (430)           ! P3
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_430(IR)
-          ENDDO
-        CASE (431)           ! P31
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_431(IR)
-          ENDDO
-        CASE (432)           ! P32
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_432(IR)
-          ENDDO
-        CASE (433)           ! R3 hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_433(IR)
-          ENDDO
-        CASE (434)           ! P-3
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_434(IR)
-          ENDDO
-        CASE (435)           ! R-3 hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_435(IR)
-          ENDDO
-        CASE (449)           ! P-31m hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_449(IR)
-          ENDDO
-        CASE (451)           ! P-3m1 hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_451(IR)
-          ENDDO
-        CASE (462)           ! P6 hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_462(IR)
-          ENDDO
-        CASE(468)           ! P-6 hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_468(IR)
-          ENDDO
-        CASE (469)           ! P6/m hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_469(IR)
-          ENDDO
-        CASE (471)           ! P622 hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_471(IR)
-          ENDDO
-        CASE (481)           ! P-6m2 hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_481(IR)
-          ENDDO
-        CASE (483)           ! P-62m hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_483(IR)
-          ENDDO
-        CASE (485)           ! P6/mmm hexagonal axes
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_485(IR)
-          ENDDO
-        CASE DEFAULT
-          DO IR = 1, MAXK
-            AICALC(IR) = FFCALC_DEFAULT(IR)
-          ENDDO
-      END SELECT
-      NATOM = TotNumOfAtoms
-! March-Dollase correction for Preferred Orientation
-      IF (UsePreferredOrientation) THEN
-! All this should be done much more efficiently, of course. We could precalculate tDotProduct(1:MAXK)
+! AICALC(1:MAXK) now contains the structural part of the calculated intensities
+! XICALC(1:MAXK) now contains the preferred orientation part of the calculated intensities
+! If we are using preferred orientation: correct for it.
+! If not: use the calculated intensities as is
+      IF (PrefParExists) THEN
         DO iR = 1, MAXK
-! Calculate angle between PO axis and this reflection
-          Vector1(1) = FLOAT(IREFH(1,iR))
-          Vector1(2) = FLOAT(IREFH(2,iR))
-          Vector1(3) = FLOAT(IREFH(3,iR))
-! Convert Vector1 expressed in reciprocal co-ordinates to orthogonal co-ordinates.
-          Vector2(1) = Vector1(1) * c2fmat(1,1) + Vector1(2) * c2fmat(1,2) + Vector1(3) * c2fmat(1,3)
-          Vector2(2) = Vector1(1) * c2fmat(2,1) + Vector1(2) * c2fmat(2,2) + Vector1(3) * c2fmat(2,3)
-          Vector2(3) = Vector1(1) * c2fmat(3,1) + Vector1(2) * c2fmat(3,2) + Vector1(3) * c2fmat(3,3)
-! Vector2 now contains the orientation of this reflection in orthogonal co-ordinates
-          CALL VectorNormalise(Vector2)
-! PO_Axis has already been converted to orth. and normalised, and so is Vector2 now.
-          tDotProduct = DOT_PRODUCT(PO_Axis,Vector2)
-! G1 is the SA parameter and must have been set in MAKEFRAC()
-          AICALC(iR) = AICALC(iR) * (  (G1**2) * tDotProduct + (1-tDotProduct) / G1  )**(-3.0/2.0)
+          BICALC(iR) = XICALC(iR) * AICALC(iR)
+        ENDDO
+      ELSE
+        DO iR = 1, MAXK
+          BICALC(iR) = AICALC(iR)
         ENDDO
       ENDIF
+! BICALC(1:MAXK) now contains the calculated intensities corrected for preferred orientation
+      SUM1 = 0.0
+      SUM2 = 0.0
       DO IK = 1, KKOR
         II = IKKOR(IK)
         JJ = JKKOR(IK)
-        SUM1 = SUM1 + AICALC(II)*WTIJ(IK)*AIOBS(JJ) + AICALC(JJ)*WTIJ(IK)*AIOBS(II)
-        SUM2 = SUM2 + AICALC(II)*WTIJ(IK)*AICALC(JJ)
+        SUM1 = SUM1 + BICALC(II)*WTIJ(IK)*AIOBS(JJ) + BICALC(JJ)*WTIJ(IK)*AIOBS(II)
+        SUM2 = SUM2 + BICALC(II)*WTIJ(IK)*BICALC(JJ)
       ENDDO
       RESCL = 0.5*SUM1/SUM2
-      CHIVAL = 0.
+      CHIVAL = 0.0
       DO IK = 1, KKOR
         II = IKKOR(IK)
         JJ = JKKOR(IK)
-        DELI = AIOBS(II) - RESCL*AICALC(II)
-        DELJ = AIOBS(JJ) - RESCL*AICALC(JJ)
+        DELI = AIOBS(II) - RESCL*BICALC(II)
+        DELJ = AIOBS(JJ) - RESCL*BICALC(JJ)
         CHIADD = DELI*WTIJ(IK)*DELJ
         CHIVAL = CHIVAL + CHIADD
       ENDDO
@@ -336,9 +348,9 @@
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
 
-      INTEGER         NLGREF, IREFH
+      INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
+      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
 
       COMMON /CSQSTO/ COSQS(-20:20,3,150), SINQS(-20:20,3,150)
 
@@ -415,6 +427,52 @@
       NATOM = TotNumOfAtoms
 
       END SUBROUTINE PRECFC
+!
+!*****************************************************************************
+!
+      SUBROUTINE PO_PRECFC
+!
+! Pre-calculates the Preferred Orientation part of the intensities
+! I.e., this routine fills XICALC
+! March-Dollase correction for Preferred Orientation
+!
+      USE PO_VAR
+      
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER    MVAR
+      PARAMETER (MVAR = 100)
+
+      INTEGER         MAXK
+      REAL                  FOB
+      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+
+      DOUBLE PRECISION x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+
+      REAL              BICALC,         XICALC
+      COMMON /SAREFLN2/ BICALC(MSAREF), XICALC(MSAREF)
+
+      INTEGER           iHMUL
+      COMMON /SAREFLN3/ iHMUL(MSAREF)
+
+      INTEGER iR, i
+      REAL PrfPar, prfcor, csqa, ssqa
+
+      PrfPar = X(iPrfPar) ! current value of the extent of the preferred orientation
+      DO iR = 1, MAXK
+        prfcor = 0.0
+        DO i = 1, iHMUL(iR)
+          csqa = PrefCsqa(i,iR)
+          ssqa = 1.0 - csqa
+          prfcor = prfcor + (csqa*(PrfPar**2) + ssqa/PrfPar)**(-1.5)
+        ENDDO
+        XICALC(iR) = prfcor / FLOAT(iHMUL(iR))
+      ENDDO
+
+      END SUBROUTINE PO_PRECFC
 !
 !*****************************************************************************
 !
