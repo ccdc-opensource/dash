@@ -22,12 +22,12 @@
       INTEGER, PARAMETER :: MaxPathLength =  255
       LOGICAL                       :: PLOTT = .FALSE. ! Graphic plotted?
       CHARACTER(LEN=MaxPathLength)  :: FNAME = ' '     ! Current filename
-!C>> JCC Added these in for portability reasons       
+! Added these in for portability reasons       
       CHARACTER(LEN=MaxPathLength)  :: INSTDIR =     'C:\Program Files\DASH' ! Default installation directory
       CHARACTER(LEN=21)             :: SPACEGROUPS = 'SpaceGroupSymbols.dat' ! Table name
       CHARACTER                     :: DIRSPACER   = '\' ! Windows spacer
       CHARACTER(LEN=8)              :: CONFIG      = 'Dash.cfg'
-!C>> External binaries
+! External binaries
       CHARACTER(LEN=MaxPathLength)  :: VIEWEXE     = 'C:\Program Files\DASH\mercury.exe'
       CHARACTER(LEN=MaxPathLength)  :: CONVEXE     = 'C:\Program Files\DASH\zmconv.exe'
       CHARACTER(LEN=20)             :: VIEWARG     = ''
@@ -39,7 +39,7 @@
       COMMON / EXTPRG / ViewOn, ConvOn,  ViewAct,  AutoUpdate, ViewExe, ConvExe, ViewArg
       COMMON / EXTDIR / INSTDIR
 
-!C>> File information; Names of files used by DASH For I/O
+! File information; Names of files used by DASH For I/O
       CHARACTER(LEN = 80) :: DashRawFile
       CHARACTER(LEN = 80) :: DashHcvFile
       CHARACTER(LEN = 80) :: DashPikFile
@@ -49,7 +49,7 @@
       LOGICAL PikExists
       LOGICAL TicExists
 
-!C>> New license information structure    
+! New license information structure    
       TYPE License_Info
         INTEGER          :: Day
         INTEGER          :: Month
@@ -107,7 +107,7 @@
 !   Initialise Winteracter
       XBSWidth  = WInfoScreen(1)
       XBSHeight = WInfoScreen(2)
-!>> Try to redirect stdout - change working directory if unsuccessful
+! Try to redirect stdout - change working directory if unsuccessful
 
 !   Set up root window options
 !
