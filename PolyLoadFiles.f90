@@ -1476,8 +1476,8 @@
       CHARACTER*255 Cline, tString, tSubString
       INTEGER       I, NumOfBins, hFile, tLen
       LOGICAL       ReadWarning
-      REAL, EXTERNAL :: FnWavelengthOfMenuOption
       INTEGER, EXTERNAL :: GetNumOfColumns, StrFind
+      REAL, EXTERNAL :: WavelengthOf
       REAL          Lambda1
       REAL          cps
 
@@ -1535,20 +1535,23 @@
 
 ! Initialise to failure
       Load_x01_File = 0
-      Lambda1       = 0.0
+      Lambda1       = WavelengthOf('Cu') ! According to Bede, this is a valid assumption
+      NumOfBins     = -1
       ReadWarning   = .FALSE.
+      cps = 1.0
       hFile = 10
       OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       I = 1
     9 READ(hFile,FMT='(A)',ERR=999,END=999) tString
+      CALL StrUpperCase(tString)
       CALL StrClean(tString,tLen)
-      IF (StrFind(tString,tLen,'Wavelength:',11) .NE. 0) THEN
+      IF (StrFind(tString,tLen,'WAVELENGTH:',11) .NE. 0) THEN
 ! Extract wavelength
         CALL GetSubString(tString,' ',tSubString)
         CALL GetSubString(tString,' ',tSubString)
-        READ (tSubString,*) Lambda1
+        READ (tSubString,*,ERR=999) Lambda1
       ENDIF
-      IF (StrFind(tString,tLen,'Counting time per point:',24) .NE. 0) THEN
+      IF (StrFind(tString,tLen,'COUNTING TIME PER POINT:',24) .NE. 0) THEN
 ! Extract expected number of points and counting time per point
         CALL GetSubString(tString,' ',tSubString)
         CALL GetSubString(tString,' ',tSubString)
@@ -1561,10 +1564,10 @@
         CALL GetSubString(tString,' ',tSubString)
         CALL GetSubString(tString,' ',tSubString)
         CALL GetSubString(tString,' ',tSubString)
-        READ (tSubString,*) cps
+        READ (tSubString,*,ERR=999) cps
       ENDIF
 ! Detect start of data
-      IF (StrFind(tString,tLen,'Position Count',14) .NE. 0) GOTO 10
+      IF (StrFind(tString,tLen,'POSITION C',10) .NE. 0) GOTO 10
       GOTO 9
  10   READ(UNIT=hFile,FMT='(A)',ERR=999,END=100) Cline
       READ(Cline,*,ERR=999,END=100) XOBS(I), YOBS(I)
@@ -1591,12 +1594,14 @@
       GOTO 10
  100  NOBS = I - 1
       CLOSE(hFile)
-      IF (NOBS .LT. NumOfBins) CALL WarningMessage('File contained less data points than expected.'//CHAR(13)// &
-                                                   'Will continue with points actually read only.')
-      IF (NOBS .GT. NumOfBins) THEN
-        CALL WarningMessage('File contained more data points than expected.'//CHAR(13)// &
-                            'Excess points will be ignored.')
-        NOBS = NumOfBins
+      IF (NumOfBins .NE. -1) THEN
+        IF (NOBS .LT. NumOfBins) CALL WarningMessage('File contained less data points than expected.'//CHAR(13)// &
+                                                     'Will continue with points actually read only.')
+        IF (NOBS .GT. NumOfBins) THEN
+          CALL WarningMessage('File contained more data points than expected.'//CHAR(13)// &
+                              'Excess points will be ignored.')
+          NOBS = NumOfBins
+        ENDIF
       ENDIF
       ESDsFilled = .FALSE.
 ! JvdS Added check for number of observations = 0
