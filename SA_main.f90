@@ -24,7 +24,7 @@
       CHARACTER(MaxPathLength) tSDIFile
       CHARACTER*17 DateStr
       REAL    MaxMoves1, tMaxMoves
-      INTEGER MaxMoves2
+      INTEGER MaxMoves2, tLen
       CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*20 MaxMovesStr
       INTEGER, EXTERNAL :: DateToday
@@ -35,8 +35,8 @@
       tFileHandle = 10
       OPEN(tFileHandle,FILE=TheFileName,ERR=999)
       WRITE(tFileHandle,'("  Parameters for simulated annealing in ",A8)',ERR=999) ProgramVersion
-      CALL Date2String(DateToday(),DateStr)
-      WRITE(tFileHandle,'(A)',ERR=999) "  Date = "//DateStr(1:LEN_TRIM(DateStr))
+      CALL Date2String(DateToday(),DateStr,tLen)
+      WRITE(tFileHandle,'(A)',ERR=999) "  Date = "//DateStr(1:tLen)
       CALL WDialogSelect(IDD_SAW_Page1)
       CALL WDialogGetString(IDF_SA_Project_Name,tSDIFile)
       WRITE(tFileHandle,'("  SDI file = ",A)',ERR=999) tSDIFile(1:LEN_TRIM(tSDIFile))
