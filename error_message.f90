@@ -45,7 +45,6 @@
           routine_called = .TRUE.
         ENDIF
       ENDIF
-      NumOfRef = MIN(NumOfRef,350)
       know = NumOfRef
 ! Calculate peak centre of know in argk, and its derivatives
       CALL PCXX(2)
