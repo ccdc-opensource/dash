@@ -62,7 +62,7 @@
       CALL WizardWindowHide
       CALL WDialogSelect(TheDialogID)
       CurrentWizardWindow = TheDialogID
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,IDNEXT,Modeless)
       CALL SetWizardState(-1)
 
       END SUBROUTINE WizardWindowShow
@@ -653,7 +653,7 @@
       INCLUDE 'GLBVAR.INC'
 
       INTEGER IndexOption
-      LOGICAL FnUnitCellOK ! Function
+      LOGICAL, EXTERNAL :: FnUnitCellOK
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page7)
