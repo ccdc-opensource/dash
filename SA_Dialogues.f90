@@ -63,15 +63,19 @@
 
       IMPLICIT NONE      
 
-      CHARACTER(LEN=MaxPathLength) SDIFile
-      INTEGER      IFlags
-
+      INTEGER       iFlags
       INTEGER, EXTERNAL :: Read_One_Zm
-      INTEGER zmread
-      INTEGER ifrg
+      INTEGER       zmread
+      INTEGER       iFrg, iSelection
       LOGICAL, EXTERNAL :: Confirm
-      CHARACTER(LEN=MaxPathLength) DirName
-      CHARACTER*80 FileName
+      CHARACTER(MaxPathLength) SDIFile, DirName, tFileName
+      CHARACTER*80  FileName
+      CHARACTER*150 FilterStr
+      INTEGER tNumZMatrices, tLen
+      CHARACTER(80) tZmatrices
+      DIMENSION tZmatrices(10)
+      INTEGER tNextzmNum
+      INTEGER tCounter
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -133,7 +137,7 @@
               CALL SDIFileOpen(SDIFile)
             CASE (IDB_SA_Project_Import)
 ! JCC Import .. convert a mol/pdb/mol2 file into a Z-matrix
-              CALL ImportZmatrix
+              CALL ImportZmatrix('')
             CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
                 iFrg = 1
@@ -147,25 +151,69 @@
               DO WHILE (IDBZMBrowse(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
-              IFlags = PromptOn + DirChange + AppendExt
-              CALL WSelectFile('Z-matrix files (*.zmatrix)|*.zmatrix|',IFlags,frag_file(iFrg),'Load Z-matrix file')
+              iFlags = LoadDialog + PromptOn + DirChange + AppendExt
+              FilterStr = "All files (*.*)|*.*|"//&
+                          "Z-matrix files (*.zmatrix)|*.zmatrix|"//&
+                          "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"
+              iSelection = 2
+              CALL WSelectFile(FilterStr, iFlags, tFileName,'Load Z-matrix file',iSelection)
 ! Did the user press cancel?
               IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) GOTO 999
 ! I don't think the following answer is allowed by Winteracter
-              IF (LEN_TRIM(frag_file(iFrg)) .EQ. 0) THEN
+              IF (LEN_TRIM(tFileName) .EQ. 0) THEN
                 gotzmfile(iFrg) = .FALSE.
                 GOTO 999
               ENDIF
-              zmread = Read_One_ZM(iFrg)
-              IF (zmread .EQ. 0) THEN ! successful read
-                gotzmfile(iFrg) = .TRUE.
+              CALL SplitPath(tFileName,DirName,FileName)
+! Determine the extension. If Z-matrix, load it
+              tLen = LEN_TRIM(FileName)
+! @@ case sensitive
+              IF ((tLen .GE. 9) .AND. (FileName(tLen-6:tLen) .EQ. 'zmatrix')) THEN
+                frag_file(iFrg) = tFileName
+                zmread = Read_One_ZM(iFrg)
+                IF (zmread .EQ. 0) THEN ! successful read
+                  gotzmfile(iFrg) = .TRUE.
 ! Initialise 'Number of' field to 1
-                CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
+                  CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
 ! JCC traps for Z-matrix reading
-              ELSE 
-                gotzmfile(iFrg) = .FALSE. 
-                CALL FileErrorPopup(frag_file(iFrg),zmread)
-              ENDIF ! If the read on the Z-matrix was ok
+                ELSE 
+                  gotzmfile(iFrg) = .FALSE. 
+                  CALL FileErrorPopup(frag_file(iFrg),zmread)
+                ENDIF ! If the read on the Z-matrix was ok
+              ELSE
+                CALL zmConvert(tFileName,tNumZMatrices,tZmatrices)
+                IF (tNumZMatrices .EQ. 0) RETURN
+                tNextzmNum  = 1
+   10           CONTINUE
+                frag_file(iFrg) = DirName(1:LEN_TRIM(DirName))//tZmatrices(tNextzmNum)
+                zmread = Read_One_ZM(iFrg)
+                IF (zmread .EQ. 0) THEN ! successful read
+                  gotzmfile(iFrg) = .TRUE.
+! Initialise 'Number of' field to 1
+                  CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
+! Find next free slot ("iFrg")
+                  tCounter = 1
+                  DO WHILE ((gotzmfile(iFrg)) .AND. (tCounter .LT. maxfrg))
+                    CALL INC(tCounter)
+                    CALL INC(iFrg)
+                    IF (iFrg .GT. maxfrg) iFrg = 1
+                  ENDDO
+                ELSE 
+                  gotzmfile(iFrg) = .FALSE. 
+                  CALL FileErrorPopup(frag_file(iFrg),zmread)
+! Slot still free, so iFrg still OK.
+                ENDIF 
+! More Z-matrices to read?
+                CALL INC(tNextzmNum)
+                IF (tNextzmNum .GT. tNumZMatrices) GOTO 999
+! If no free slot found, exit
+                IF (gotzmfile(iFrg)) THEN
+                  CALL InfoMessage('File contained more Z-matrices than available slots.')
+                  GOTO 999
+                ENDIF
+! Read next Z-matrix.
+                GOTO 10
+              ENDIF
 ! View individual Z-matrices in e.g. Mercury
             CASE (IDB_zmView1, IDB_zmView2, IDB_zmView3, IDB_zmView4)
               iFrg = 1
@@ -173,7 +221,7 @@
                 iFrg = iFrg + 1
               ENDDO
               CALL ViewZmatrix(iFrg)
-! View individual Z-matrices in e.g. Mercury
+! Edit individual Z-matrices
             CASE (IDB_zmEdit1, IDB_zmEdit2, IDB_zmEdit3, IDB_zmEdit4)
               iFrg = 1
               DO WHILE (IDBzmEdit(iFrg) .NE. EventInfo%VALUE1)
@@ -194,19 +242,44 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE ZMVAR
+      USE SAMVAR
 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: iFrg
 
+      INTEGER I, BondNr
+      REAL*8 CART(1:3,1:MAXATM)
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
+
       CALL WDialogSelect(IDD_zmEdit)
       CurrentlyEditedFrag = iFrg
 ! Make temporary copy
       CALL zmCopy(iFrg,0)
+      zmAtomDeleted = .FALSE.
       CALL zmCopyTemp2Dialog
-      CALL WDialogPutRadioButton(IDF_OrderOrig)
-      CurrentOrderOption = 1
-      CALL WDialogFieldState(IDF_DelLatAtm,Disabled)
+! In order to be able to delete atoms from the Z-matrix at random, we need their
+! Cartesian co-ordinates.
+      natcry = NATOMS(iFrg)
+      CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+      DO I = 1, natcry
+        axyzo(I,1) = SNGL(CART(1,I))
+        axyzo(I,2) = SNGL(CART(2,I))
+        axyzo(I,3) = SNGL(CART(3,I))
+        aelem(I) = ElmSymbol2CSD(asym(I,iFrg)(1:2))
+        atomlabel(I) = OriginalLabel(I,iFrg)
+      ENDDO
+      nbocry = NumberOfBonds(iFrg)
+      DO BondNr = 1, nbocry
+        btype(BondNr)  = BondType(BondNr,iFrg)
+        bond(BondNr,1) = Bonds(1,BondNr,iFrg)
+        bond(BondNr,2) = Bonds(2,BondNr,iFrg)
+      ENDDO
+! Bonds have already been calculated and will be updated automatically: there is no option
+! to add atoms, so we can only remove atoms and their bonds.
+! Only problem: changing a hydrogen into, say, a carbon
+! might give rise to new bonds that will not be taken into account.
+! Oh, and removing an atom can change a bond type, e.g. from "aromatic" to "double"
       CALL WDialogShow(-1,-1,0,SemiModeLess)
 
       END SUBROUTINE ShowEditZMatrixWindow
@@ -264,13 +337,21 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
+      USE SAMVAR
 
       IMPLICIT NONE      
 
-      INTEGER iFrg, iOption, iColumn, iAtomNr, iDummy, iBondNr
+      INTEGER iFrg, iOption, iColumn, iAtomNr, iDummy, iBondNr, iRow, iCol
       REAL    tReal
       LOGICAL ThisOne
-      INTEGER, EXTERNAL :: zmSaveAs
+      INTEGER, EXTERNAL :: zmSaveAs, Read_One_ZM, WriteMol2
+      INTEGER tLength, I, zmRead, iBondNr2
+      CHARACTER(MaxPathLength) temp_file
+      INTEGER tNumZMatrices
+      CHARACTER(80) tZmatrices
+      DIMENSION tZmatrices(10)
+      CHARACTER(MaxPathLength) tOldFileName
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
@@ -282,9 +363,9 @@
               CALL WDialogGetMenu(IDF_UisoOccMenu,iOption)
               SELECT CASE (iOption)
                 CASE (1)
-                  iColumn = 3 ! Uiso
+                  iColumn = 4 ! Uiso
                 CASE (2)
-                  iColumn = 4 ! Occupancies
+                  iColumn = 5 ! Occupancies
               END SELECT
               CALL WDialogGetReal(IDF_UisoOccValue,tReal)
 ! Check its value
@@ -305,17 +386,44 @@
               CALL zmCopyDialog2Temp
             CASE (IDB_Relabel)
               CALL zmCopyDialog2Temp
-              CALL zmRelabel(0)
+              CALL zmRelabel(iFrg)
               CALL zmCopyTemp2Dialog
             CASE (IDB_ReOrder)
               CALL zmCopyDialog2Temp
-              CALL zmReOrder(0)
+              CALL zmReOrder(iFrg)
               CALL zmCopyTemp2Dialog
-              CALL WDialogPutRadioButton(IDF_OrderOrig)
-              CALL WDialogFieldState(IDF_DelLatAtm,Disabled)
             CASE (IDOK)
               CALL zmCopyDialog2Temp
-              CALL zmCopy(0,CurrentlyEditedFrag)
+! If an atom has been deleted, rebuild the Z-matrix.
+              IF (.NOT. zmAtomDeleted) THEN
+                CALL zmCopy(0,CurrentlyEditedFrag)
+              ELSE
+                IF (WriteMol2('temp.mol2') .NE. 1) THEN
+                  CALL ErrorMessage('Error writing mol2, no changes made.')
+                  RETURN
+                ENDIF
+                CALL zmConvert('temp.mol2',tNumZMatrices,tZmatrices)
+              ENDIF
+! Check that we still have 1 Z-matrix
+              IF (tNumZMatrices .EQ. 0) THEN
+                CALL ErrorMessage('Could not generate Z-matrix.')
+              ELSE
+                IF (tNumZMatrices .GT. 1) THEN
+                  CALL WarningMessage('More than 1 Z-matrix generated.'//&
+                                      'Only the first will be retained.')
+                  CALL IOsCopyFile('temp_1.zmatrix','temp.zmatrix')
+                ENDIF
+                tOldFileName = frag_file(CurrentlyEditedFrag)
+                frag_file(CurrentlyEditedFrag) = 'temp.zmatrix'
+                zmRead = Read_One_ZM(CurrentlyEditedFrag)
+                IF (zmRead .NE. 0) THEN ! reading failed
+                  gotzmfile(CurrentlyEditedFrag) = .FALSE. 
+                  CALL FileErrorPopup(frag_file(CurrentlyEditedFrag),zmRead)
+                  CALL UpdateZmatrixSelection
+                ELSE
+                  frag_file(CurrentlyEditedFrag) = tOldFileName
+                ENDIF
+              ENDIF
               CALL WDialogHide()
             CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide()
@@ -324,59 +432,107 @@
               CALL zmSave(iFrg)
             CASE (IDB_SaveAs)
               CALL zmCopyDialog2Temp
-              iDummy = zmSaveAs(0)
-            CASE (IDF_DelLatAtm)
-! Remove any bonds this atom was involved in
-              IF (NumberOfBonds(iFrg) .GT. 0) THEN
-                DO iBondNr = 1, NumberOfBonds(iFrg)
-                  IF ((Bonds(1,iBondNr,iFrg) .EQ. natoms(iFrg)) .OR. (Bonds(2,iBondNr,iFrg) .EQ. natoms(iFrg))) THEN
-! If this is not the last bond in the list, then replace it with the last bond in the list
-                    IF (iBondNr .LT. NumberOfBonds(iFrg)) THEN                   
-                      BondType(iBondNr,iFrg) = BondType(NumberOfBonds(iFrg),iFrg)
-                      Bonds(1,iBondNr,iFrg)  = Bonds(1,NumberOfBonds(iFrg),iFrg)
-                      Bonds(2,iBondNr,iFrg)  = Bonds(2,NumberOfBonds(iFrg),iFrg)
-                    ENDIF
-                    NumberOfBonds(iFrg) = NumberOfBonds(iFrg) - 1
-                  ENDIF
-                ENDDO
-              ENDIF
-! If this was the pivot atom, use centre of mass
-              IF (icomflg(iFrg) .EQ. natoms(iFrg)) icomflg(iFrg) = 0 
-              IF (natoms(iFrg) .NE. 0) THEN
-                CALL WGridSetCell(IDF_AtomPropGrid,1,1)
-                natoms(iFrg) = natoms(iFrg) - 1
-              ENDIF
-              IF (natoms(iFrg) .NE. 0) THEN
-! The last atom in the Z-matrix corresponds to a random atom in the original ordering.
-! It is now very likely that we have ended up with one of the atoms having an 'orignal ID' that
-! is greater than the current number of atoms. This would give boundary overflows.
-! We can retain the original order (minus one atom) but that involves subtracting 1
-! from atom IDs following the one we have deleted
-                DO iAtomNr = 1, natoms(iFrg)
-                  IF (izmoid(iAtomNr,iFrg) .GT. izmoid(natoms(iFrg)+1,iFrg)) izmoid(iAtomNr,iFrg) = izmoid(iAtomNr,iFrg) - 1
-                  izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the backward mapping
-                ENDDO
-              ENDIF
-              CALL zmCopyTemp2Dialog
+              iDummy = zmSaveAs(iFrg)
             CASE (IDB_View)
               CALL zmCopyDialog2Temp
-              CALL ViewZmatrix(0)
+              natcry = NATOMS(iFrg)
+              DO iAtomNr = 1, natcry
+                atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
+                aelem(iAtomNr) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+              ENDDO
+              tLength = LEN_TRIM(frag_file(iFrg))
+              temp_file = frag_file(iFrg)(1:tLength-8)//'_temp.mol2'
+! Show the mol2 file
+!C      INTEGER FUNCTION WriteMol2(TheFileName)
+!C!
+!C! Takes number of atoms    from natcry    in SAMVAR
+!C! Takes atomic coordinates from axyzo     in SAMVAR  (orthogonal)
+!C! Takes element types      from aelem     in SAMVAR  (CSD style)
+!C! Takes atom labels        from atomlabel in SAMVAR
+!C! Takes bonds              from bond      in SAMVAR
+!C! Takes bond types         from btype     in SAMVAR
+!C! and writes out a .mol2 file
+              IF (WriteMol2(temp_file) .EQ. 1) CALL ViewStructure(temp_file)
+              CALL IOSDeleteFile(temp_file)
             CASE (IDB_Rotations)
               CALL WDialogSelect(IDD_zmEditRotations)
               CALL WDialogShow(-1,-1,0,SemiModeLess)
           END SELECT
         CASE (FieldChanged)
-          CALL WDialogGetRadioButton(IDF_OrderOrig,iOption)
-          IF (iOption .NE. CurrentOrderOption) THEN
-            SELECT CASE (iOption)
-              CASE (1) ! Original
-                CurrentOrderOption = 1
-                CALL WDialogFieldState(IDF_DelLatAtm,Disabled)
-              CASE (2) ! Z-matrix
-                CurrentOrderOption = 2
-                IF (natoms(iFrg) .NE. 0) CALL WDialogFieldState(IDF_DelLatAtm,Enabled)
-            END SELECT
-            CALL zmCopyTemp2Dialog
+          IF (EventInfo%VALUE2 .EQ. IDF_AtomPropGrid) THEN
+            CALL WGridPos(EventInfo%Y,iCol,iRow)
+            IF (iCol .EQ. 2) THEN
+              CALL zmCopyDialog2Temp
+              zmAtomDeleted = .TRUE.
+! Delete the atom
+              iAtomNr = izmbid(iRow,iFrg)
+! It is very likely that we will end up with one of the atoms having an 'orignal ID' that
+! is greater than the current number of atoms. This would give boundary overflows.
+! We can retain the original order (minus one atom) but that involves subtracting 1
+! from atom IDs following the one we have deleted
+              DO i = 1, natoms(iFrg)
+                IF (izmoid(i,iFrg) .GT. izmoid(iAtomNr,iFrg)) izmoid(i,iFrg) = izmoid(i,iFrg) - 1
+              ENDDO
+! Remove any bonds this atom was involved in
+              IF (NumberOfBonds(iFrg) .GT. 0) THEN
+                iBondNr = 1
+                DO WHILE (iBondNr .LE. NumberOfBonds(iFrg))
+                  IF ((Bonds(1,iBondNr,iFrg) .EQ. iAtomNr) .OR. (Bonds(2,iBondNr,iFrg) .EQ. iAtomNr)) THEN
+                    DO iBondNr2 = iBondNr, NumberOfBonds(iFrg)-1
+                      BondType(iBondNr2,iFrg) = BondType(iBondNr2+1,iFrg)
+                      Bonds(1,iBondNr2,iFrg)  = Bonds(1,iBondNr2+1,iFrg)
+                      Bonds(2,iBondNr2,iFrg)  = Bonds(2,iBondNr2+1,iFrg)
+                    ENDDO
+                    NumberOfBonds(iFrg) = NumberOfBonds(iFrg) - 1
+                  ELSE
+                    CALL INC(iBondNr)
+                  ENDIF
+                ENDDO
+                IF (NumberOfBonds(iFrg) .GT. 0) THEN
+                  DO iBondNr = 1, NumberOfBonds(iFrg)
+                    IF (Bonds(1,iBondNr,iFrg) .GT. iAtomNr) Bonds(1,iBondNr,iFrg) = Bonds(1,iBondNr,iFrg) - 1
+                    IF (Bonds(2,iBondNr,iFrg) .GT. iAtomNr) Bonds(2,iBondNr,iFrg) = Bonds(2,iBondNr,iFrg) - 1
+                  ENDDO
+                ENDIF
+              ENDIF
+! If not last atom in list, shuffle remaining
+              IF (iAtomNr .NE. NATOMS(iFrg)) THEN 
+                DO I = iAtomNr, NATOMS(iFrg)-1
+                  asym(I,iFrg) = asym(I+1,iFrg)
+                  tiso(I,iFrg) = tiso(I+1,iFrg)
+                  occ(I,iFrg)  = occ(I+1,iFrg)
+                  OriginalLabel(I,iFrg) = OriginalLabel(I+1,iFrg)
+                  izmoid(I,iFrg) = izmoid(I+1,iFrg)
+                ENDDO
+              ENDIF
+              natcry = NATOMS(iFrg)
+! If not last atom in list, shuffle remaining
+              IF (iAtomNr .NE. natcry) THEN 
+                DO I = iAtomNr, natcry-1
+                  axyzo(I,1)   = axyzo(I+1,1)
+                  axyzo(I,2)   = axyzo(I+1,2)
+                  axyzo(I,3)   = axyzo(I+1,3)
+                ENDDO
+              ENDIF
+              natcry = natcry - 1
+              nbocry = NumberOfBonds(iFrg)
+              DO iBondNr = 1, nbocry
+                btype(iBondNr)  = BondType(iBondNr,iFrg)
+                bond(iBondNr,1) = Bonds(1,iBondNr,iFrg)
+                bond(iBondNr,2) = Bonds(2,iBondNr,iFrg)
+              ENDDO
+! If this was the pivot atom, use centre of mass
+              IF (icomflg(iFrg) .EQ. iAtomNr) icomflg(iFrg) = 0 
+              IF (natoms(iFrg) .NE. 0) THEN
+                CALL WGridSetCell(IDF_AtomPropGrid,1,1)
+                natoms(iFrg) = natoms(iFrg) - 1
+              ENDIF
+              DO i = 1, natoms(iFrg)
+                izmbid(izmoid(i,iFrg),iFrg) = i ! the back mapping
+              ENDDO
+              CALL zmCopyTemp2Dialog
+              CALL WGridPutCellCheckBox(IDF_AtomPropGrid,2,irow,Unchecked)
+            ENDIF
           ENDIF
       END SELECT
       CALL PopActiveWindowID
@@ -422,7 +578,7 @@
       IMPLICIT NONE 
       
       CHARACTER(3) RowLabelStr
-      INTEGER iFrg, iAtomNr, iOrig     
+      INTEGER iFrg, iRow, iAtomNr     
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
@@ -432,23 +588,19 @@
 ! Fill grid with atom properties
 ! Set number of rows
       CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
-      DO iAtomNr = 1, natoms(iFrg)
-        IF (CurrentOrderOption .EQ. 2) THEN
-          iOrig = iAtomNr
-        ELSE
-          iOrig = izmbid(iAtomNr,iFrg)
-        ENDIF
+      DO iRow = 1, natoms(iFrg)
+        iAtomNr = izmbid(iRow,iFrg)
 ! Show the number of the atom in the zeroth column
-        WRITE(RowLabelStr,'(I3)') iAtomNr
-        CALL WGridLabelRow(IDF_AtomPropGrid,iAtomNr,RowLabelStr)
+        WRITE(RowLabelStr,'(I3)') iRow
+        CALL WGridLabelRow(IDF_AtomPropGrid,iRow,RowLabelStr)
 ! atom labels
-        CALL WGridPutCellString(IDF_AtomPropGrid,1,iAtomNr,OriginalLabel(iOrig,iFrg))
+        CALL WGridPutCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr,iFrg))
 ! atom elements
-        CALL WGridPutCellString(IDF_AtomPropGrid,2,iAtomNr,asym(iOrig,iFrg))
+        CALL WGridPutCellString(IDF_AtomPropGrid,3,iRow,asym(iAtomNr,iFrg))
 ! Uiso
-        CALL WGridPutCellReal(IDF_AtomPropGrid,3,iAtomNr,tiso(iOrig,iFrg),'(F5.3)')
+        CALL WGridPutCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr,iFrg),'(F5.3)')
 ! occupancies
-        CALL WGridPutCellReal(IDF_AtomPropGrid,4,iAtomNr,occ(iOrig,iFrg),'(F5.3)')
+        CALL WGridPutCellReal(IDF_AtomPropGrid,5,iRow,occ(iAtomNr,iFrg),'(F5.3)')
       ENDDO
       CALL PopActiveWindowID
 
@@ -464,7 +616,7 @@
 
       IMPLICIT NONE 
       
-      INTEGER iFrg, iAtomNr, iOrig     
+      INTEGER iFrg, iRow, iAtomNr     
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
@@ -474,20 +626,16 @@
 ! Fill grid with atom properties
 !U! Set number of rows
 !U      CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
-      DO iAtomNr = 1, natoms(iFrg)
-        IF (CurrentOrderOption .EQ. 2) THEN
-          iOrig = iAtomNr
-        ELSE
-          iOrig = izmbid(iAtomNr,iFrg)
-        ENDIF
+      DO iRow = 1, natoms(iFrg)
+        iAtomNr = izmbid(iRow,iFrg)
 ! atom labels
-        CALL WGridGetCellString(IDF_AtomPropGrid,1,iAtomNr,OriginalLabel(iOrig,iFrg))
+        CALL WGridGetCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr,iFrg))
 ! atom elements
-        CALL WGridGetCellString(IDF_AtomPropGrid,2,iAtomNr,asym(iOrig,iFrg))
+        CALL WGridGetCellString(IDF_AtomPropGrid,3,iRow,asym(iAtomNr,iFrg))
 ! Uiso
-        CALL WGridGetCellReal(IDF_AtomPropGrid,3,iAtomNr,tiso(iOrig,iFrg))
+        CALL WGridGetCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr,iFrg))
 ! occupancies
-        CALL WGridGetCellReal(IDF_AtomPropGrid,4,iAtomNr,occ(iOrig,iFrg))
+        CALL WGridGetCellReal(IDF_AtomPropGrid,5,iRow,occ(iAtomNr,iFrg))
       ENDDO
       CALL PopActiveWindowID
 
@@ -498,7 +646,7 @@
       SUBROUTINE zmRelabel(iFrg)
 
 ! This routine re-labels atoms in Z-matrix number iFrg
-! The new label consists of element + sequential number per element
+! The new label consists of element + sequential number
 
       USE ZMVAR
 
@@ -506,16 +654,11 @@
 
       INTEGER, INTENT (IN   ) :: iFrg
 
-!      INTEGER LastNumberSoFar(1:109) ! 1 for each element
       INTEGER iAtomNr, iLen, iOrig
       CHARACTER*3 LastNumberSoFarStr
 
       DO iAtomNr = 1, natoms(iFrg)
-        IF (CurrentOrderOption .EQ. 2) THEN
-          iOrig = iAtomNr
-        ELSE
-          iOrig = izmoid(iAtomNr,iFrg)
-        ENDIF
+        iOrig = izmoid(iAtomNr,iFrg)
         WRITE(LastNumberSoFarStr,'(I3)') iOrig
 ! Left-justify this string: " 12" => "12 "
         CALL StrClean(LastNumberSoFarStr,iLen)
@@ -529,9 +672,9 @@
 !
       SUBROUTINE zmReOrder(iFrg)
 
-! This routine re-orders atoms in the temporary Z-matrix (iFrg = 0)
+! This routine re-orders atoms in Z-matrix iFrg
 ! The new order is: Carbons first, rest in alphabetical order, Hydrogens last
-! Extremely simple implementation: keep swapping two entries until no more swaps
+! Extremely simple implementation: keep swapping two consecutive entries until no more swaps
 
       USE ZMVAR
 
