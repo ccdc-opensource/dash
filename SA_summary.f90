@@ -1217,14 +1217,10 @@
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
       REAL xgcurold, ygcurold
 
-      REAL, DIMENSION (20):: Ymin
-      REAL, DIMENSION (20):: Ymax
-      REAL, DIMENSION (20):: Xmax
-      REAL, DIMENSION (20):: Xmin
-      COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
+      REAL                  Ymin,                   Ymax,                   XMin,                   XMax
+      COMMON /PROFPLOTAXES/ Ymin(1:MaxNumChildWin), Ymax(1:MaxNumChildWin), XMin(1:MaxNumChildWin), XMax(1:MaxNumChildWin)
 
       CALL WindowSelect(Ihandle)
-      CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
 ! Set the scale correctly. 
       CALL IGrUnits(0.0, 0.0, 1.0, 1.0)
@@ -1271,7 +1267,6 @@
               CASE (MouseButUp)
                 xgcur(2) = EventInfo%GX
                 ygcur(2) = EventInfo%GY
-!                CALL WMessageEnable(MouseMove, Disabled)
                 CALL WMessageEnable(MouseButUp, Disabled)
                 IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
                   CALL IGrColourN(KolNumRectSelect)
@@ -1316,11 +1311,8 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-      REAL, DIMENSION (20) :: Ymin
-      REAL, DIMENSION (20) :: Ymax
-      REAL, DIMENSION (20) :: Xmax
-      REAL, DIMENSION (20) :: Xmin
-      COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
+      REAL                  Ymin,                   Ymax,                   XMin,                   XMax
+      COMMON /PROFPLOTAXES/ Ymin(1:MaxNumChildWin), Ymax(1:MaxNumChildWin), XMin(1:MaxNumChildWin), XMax(1:MaxNumChildWin)
 
       YMin(iHandle) = MINVAL(YOBIN(1:NBIN))
       YMax(iHandle) = MAXVAL(YOBIN(1:NBIN))
