@@ -587,38 +587,3 @@
 !
 !*****************************************************************************
 !
-! JCC Subroutine that cross-references the two sets of common
-! blocks so that the profile ones contain the data that's been
-! read in.
-      SUBROUTINE Synchronize_Data
-
-      INCLUDE 'PARAMS.INC'
-
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-
-      INTEGER          NOBSA, NFITA, IFITA
-      REAL                                          CHIOBSA, WTSA
-      REAL             XOBSA,         YOBSA,         YCALA,         ESDA
-      COMMON /CHISTOP/ NOBSA, NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP),    &
-                       XOBSA(MCHSTP), YOBSA(MCHSTP), YCALA(MCHSTP), ESDA(MCHSTP)
-
-      INTEGER I
-
-! This routine doesn't seem to be aware of the difference between NOBS and NBIN
-! Treat as though we are reading XBIN etc. (this routine is called after the Pawley stage)
-
-      NBIN = NOBSA
-      DO I = 1, NBIN
-        XBIN(I)  = XOBSA(I)
-        YOBIN(I) = YOBSA(I)
-        YBBIN(I) = 0.0
-        EBIN(I)  = ESDA(I)
-      ENDDO
-      CALL GetProfileLimits
-
-      END SUBROUTINE Synchronize_Data
-!
-!*****************************************************************************
-!
