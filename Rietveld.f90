@@ -50,6 +50,7 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
+      CALL WDialogSelect(IDD_Rietveld2)
       LOG_HYDROGENS = .TRUE.
 ! Load all values of all bonds, angles etc. into RRVAR variables
       KK = 0
@@ -128,9 +129,13 @@
       ENDIF
       RR_iopttran = 0
       RR_ioptrot = 0
+      CALL WDialogPutInteger(IDI_Num1,0)
       RR_ioptb = 0
+      CALL WDialogPutInteger(IDI_Num4,0)
       RR_iopta = 0
+      CALL WDialogPutInteger(IDI_Num3,0)
       RR_ioptt = 0
+      CALL WDialogPutInteger(IDI_Num2,0)
       RR_ioptITF = 1
       RR_ioptPO = 0
       ! Fill RR_Show_bond etc.
@@ -138,7 +143,6 @@
       CALL Set_Show_angle
       CALL Set_Show_torsion
 ! Fill and display dialogue
-      CALL WDialogSelect(IDD_Rietveld2)
 ! First set labels and number of rows
       iRow = 1
       iCol = 1
@@ -214,6 +218,7 @@
 
       INTEGER iFrg, i, iFrgCopy
       INTEGER iRow, iCol, iField
+      INTEGER Num
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
@@ -231,9 +236,25 @@
         RR_Show_bond = .TRUE.
       ENDIF
       ! Now update the dialogue
+      ! Determine number of rows
+      iRow = 1
+      iField = IDF_RR_BondGrid
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 2, natoms(iFrg)
+              IF (RR_Show_bond(i, iFrg)) THEN
+                iRow = iRow + 1
+              ENDIF
+            ENDDO
+          ENDDO
+        ENDIF
+      ENDDO
+      CALL WGridRows(iField, iRow-1)
+      ! Fill the rows
       iRow = 1
       iCol = 1
-      iField = IDF_RR_BondGrid
+      Num = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
@@ -243,13 +264,15 @@
                   ':'//OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg))))
                 CALL WGridPutCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy), "(F7.5)")
                 CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg,iFrgCopy))
+                IF (RR_ioptb(i,iFrg,iFrgCopy) .EQ. 1) Num = Num + 1
                 iRow = iRow + 1
               ENDIF
             ENDDO
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(iField, iRow-1)
+      CALL WGridSetCell(iField,1,1)
+      CALL WDialogPutInteger(IDI_Num4,Num)
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_Show_bond
@@ -265,6 +288,7 @@
 
       INTEGER iFrg, i, iFrgCopy
       INTEGER iRow, iCol, iField
+      INTEGER Num
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
@@ -283,9 +307,25 @@
         RR_Show_angle = .TRUE.
       ENDIF
       ! Now update the dialogue
+      ! Determine number of rows
+      iRow = 1
+      iField = IDF_RR_AngleGrid
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 3, natoms(iFrg)
+              IF (RR_Show_angle(i, iFrg)) THEN
+                iRow = iRow + 1
+              ENDIF
+            ENDDO
+          ENDDO
+        ENDIF
+      ENDDO
+      CALL WGridRows(iField, iRow-1)
+      ! Fill the rows
       iRow = 1
       iCol = 1
-      iField = IDF_RR_AngleGrid
+      Num = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
@@ -296,13 +336,15 @@
                                     OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg))))
                 CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
                 CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg,iFrgCopy))
+                IF (RR_iopta(i,iFrg,iFrgCopy) .EQ. 1) Num = Num + 1
                 iRow = iRow + 1
               ENDIF
             ENDDO
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(iField, iRow-1)
+      CALL WGridSetCell(iField,1,1)
+      CALL WDialogPutInteger(IDI_Num3,Num)
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_Show_angle
@@ -318,6 +360,7 @@
 
       INTEGER iFrg, i, iFrgCopy
       INTEGER iRow, iCol, iField
+      INTEGER Num
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
@@ -337,9 +380,25 @@
         RR_Show_torsion = .TRUE.
       ENDIF
       ! Now update the dialogue
+      ! Determine number of rows
+      iRow = 1
+      iField = IDF_RR_TorsionGrid
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 4, natoms(iFrg)
+              IF (RR_Show_torsion(i, iFrg)) THEN
+                iRow = iRow + 1
+              ENDIF
+            ENDDO
+          ENDDO
+        ENDIF
+      ENDDO
+      CALL WGridRows(iField, iRow-1)
+      ! Fill the rows
       iRow = 1
       iCol = 1
-      iField = IDF_RR_TorsionGrid
+      Num = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
@@ -351,13 +410,15 @@
                                       OriginalLabel(iz3(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz3(i,iFrg),iFrg))))
                 CALL WGridPutCellReal(iField, iCol, iRow, RR_bet(i,iFrg,iFrgCopy), "(F10.5)")
                 CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg,iFrgCopy))
+                IF (RR_ioptt(i,iFrg,iFrgCopy) .EQ. 1) Num = Num + 1
                 iRow = iRow + 1
               ENDIF
             ENDDO
           ENDDO
         ENDIF
       ENDDO
-      CALL WGridRows(iField, iRow-1)
+      CALL WGridSetCell(iField,1,1)
+      CALL WDialogPutInteger(IDI_Num2,Num)
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_Show_torsion
@@ -390,7 +451,8 @@
 
       INTEGER I, J
       REAL ChiSqd, ChiProSqd 
-      INTEGER iValues(1:100)
+      INTEGER iValues(1:100), NVALUES
+      INTEGER Num
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
@@ -415,8 +477,12 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide
             CASE (IDB_SaveAs)
+              CALL Dialog2RRVAR
+              CALL RR_MAKEFRAC
               CALL RR_SaveAs
             CASE (IDB_View)
+              CALL Dialog2RRVAR
+              CALL RR_MAKEFRAC
 ! Calls subroutine which opens Mercury window with .pdb file
               ! Fill XAtmCoords(1:3,1:150,0)
               DO I = 1, NATOM
@@ -433,27 +499,43 @@
             CASE (IDB_Clear1)
               iValues = 0
               CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid,2,iValues,100)
+              CALL WDialogPutInteger(IDI_Num1,0)
             CASE (IDB_Clear2)
               iValues = 0
               CALL WGridPutCheckBox(IDF_RR_TorsionGrid,2,iValues,100)
+              CALL WDialogPutInteger(IDI_Num2,0)
             CASE (IDB_Clear3)
               iValues = 0
               CALL WGridPutCheckBox(IDF_RR_AngleGrid,2,iValues,100)
+              CALL WDialogPutInteger(IDI_Num3,0)
             CASE (IDB_Clear4)
               iValues = 0
               CALL WGridPutCheckBox(IDF_RR_BondGrid,2,iValues,100)
+              CALL WDialogPutInteger(IDI_Num4,0)
             CASE (IDB_Set1)
               iValues = 1
-              CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid,2,iValues,100)
+              NVALUES = 100
+              CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid,2,iValues,NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_ZmatrixGrid,2,iValues,NVALUES)
+              CALL WDialogPutInteger(IDI_Num1,NVALUES)
             CASE (IDB_Set2)
               iValues = 1
-              CALL WGridPutCheckBox(IDF_RR_TorsionGrid,2,iValues,100)
+              NVALUES = 100
+              CALL WGridPutCheckBox(IDF_RR_TorsionGrid,2,iValues,NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_TorsionGrid,2,iValues,NVALUES)
+              CALL WDialogPutInteger(IDI_Num2,NVALUES)
             CASE (IDB_Set3)
               iValues = 1
-              CALL WGridPutCheckBox(IDF_RR_AngleGrid,2,iValues,100)
+              NVALUES = 100
+              CALL WGridPutCheckBox(IDF_RR_AngleGrid,2,iValues,NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_AngleGrid,2,iValues,NVALUES)
+              CALL WDialogPutInteger(IDI_Num3,NVALUES)
             CASE (IDB_Set4)
               iValues = 1
-              CALL WGridPutCheckBox(IDF_RR_BondGrid,2,iValues,100)
+              NVALUES = 100
+              CALL WGridPutCheckBox(IDF_RR_BondGrid,2,iValues,NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_BondGrid,2,iValues,NVALUES)
+              CALL WDialogPutInteger(IDI_Num4,NVALUES)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -463,6 +545,38 @@
               CALL Set_Show_angle
             CASE (IDC_HideH4)
               CALL Set_Show_bond
+            CASE (IDF_RR_ZmatrixGrid)
+              NVALUES = 100
+              CALL WGridGetCheckBox(IDF_RR_ZmatrixGrid,2,iValues,NVALUES)
+              Num = 0
+              DO i = 1, NVALUES
+                IF (iValues(i) .EQ. 1) Num = Num + 1
+              ENDDO
+              CALL WDialogPutInteger(IDI_Num1,Num)
+            CASE (IDF_RR_TorsionGrid)
+              NVALUES = 100
+              CALL WGridGetCheckBox(IDF_RR_TorsionGrid,2,iValues,NVALUES)
+              Num = 0
+              DO i = 1, NVALUES
+                IF (iValues(i) .EQ. 1) Num = Num + 1
+              ENDDO
+              CALL WDialogPutInteger(IDI_Num2,Num)
+            CASE (IDF_RR_AngleGrid)
+              NVALUES = 100
+              CALL WGridGetCheckBox(IDF_RR_AngleGrid,2,iValues,NVALUES)
+              Num = 0
+              DO i = 1, NVALUES
+                IF (iValues(i) .EQ. 1) Num = Num + 1
+              ENDDO
+              CALL WDialogPutInteger(IDI_Num3,Num)
+            CASE (IDF_RR_BondGrid)
+              NVALUES = 100
+              CALL WGridGetCheckBox(IDF_RR_BondGrid,2,iValues,NVALUES)
+              Num = 0
+              DO i = 1, NVALUES
+                IF (iValues(i) .EQ. 1) Num = Num + 1
+              ENDDO
+              CALL WDialogPutInteger(IDI_Num4,Num)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
