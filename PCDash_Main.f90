@@ -15,7 +15,7 @@
 ! Initialise Winteracter
       CALL WInitialise(' ')
 ! Try to redirect stdout - change working directory if unsuccessful
-      CALL Init_StdOut()
+      CALL Init_StdOut
 ! Open root window
       CALL WindowOpen(FLAGS = SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
                       Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
@@ -39,15 +39,15 @@
 ! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues()
 ! Initialise space group information
-      CALL PolyFitterInitialise()
+      CALL PolyFitterInitialise
       CALL InitialiseVariables
-      CALL Check_License()
+      CALL Check_License
       CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(TabChanged, Enabled)
 ! Main message loop
 ! Go through the PolyFitter wizard
 ! Comment this next line out to remove the wizard
-      CALL StartWizard()
+      CALL StartWizard
       CALL ShowWindowRietveld
       DO WHILE (.TRUE.)
         CALL GetEvent
@@ -105,20 +105,22 @@
       LOGICAL, EXTERNAL :: Confirm
       REAL xpgdif, ypgdif
       INTEGER ISTAT, IBpass
-      INTEGER, EXTERNAL :: DiffractionFileBrowse
-      INTEGER I
+      INTEGER, EXTERNAL :: DiffractionFileBrowse, PrjSave, PrjSaveAs
+      INTEGER I, iDummy
 
 !   Branch depending on chosen menu item
 
       STATBARSTR(8)=' '
       CALL WindowOutStatusBar(8,STATBARSTR(8))
       SELECT CASE (EventInfo%VALUE1)
-        CASE (ID_New)
+        CASE (IDB_New)
           CALL Clear_Project
-        CASE (ID_Open)
-          CALL PrjReadWrite(cRead)
-        CASE (ID_Save)
-          CALL PrjReadWrite(cWrite)
+        CASE (IDB_Open)
+          CALL PrjFileBrowse
+        CASE (IDB_Save)
+          iDummy = PrjSave()
+        CASE (IDB_SaveAs)
+          iDummy = PrjSaveAs()
         CASE (ID_import_xye_file)
           ISTAT = DiffractionFileBrowse()
         CASE (ID_Remove_Background)
@@ -172,7 +174,7 @@
 ! One or more peaks to be fitted - initial positions determined by user
 ! If NumInPFR(InRange).EQ.0 we're going to search & fit a single peak
               CALL WCursorShape(CurHourGlass)
-              CALL MultiPeak_Fitter()
+              CALL MultiPeak_Fitter
               CALL WCursorShape(CurCrossHair)
               CALL Profile_Plot
 ! Disable Pawley refinement button and 'Next >' button in Wizard window
@@ -214,28 +216,28 @@
           xpgdif = xpgmax - xpgmin
           xpgmin = MAX(xpmin,xpgmin-0.25*xpgdif)
           xpgmax = xpgmin + xpgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (ID_Right)
 ! We're going to move the graph to the right if we can
           xpgdif = xpgmax - xpgmin
           xpgmax = MIN(xpmax,xpgmax+0.25*xpgdif)
           xpgmin = xpgmax - xpgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (ID_Down)
 ! We're going to move the graph down if we can
           ypgdif = ypgmax - ypgmin
           ypgmin = MAX(ypmin,ypgmin-0.25*ypgdif)
           ypgmax = ypgmin + ypgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (ID_Up)
 ! We're going to move the graph up if we can
           ypgdif = ypgmax - ypgmin
           ypgmax = MIN(ypmax,ypgmax+0.25*ypgdif)
           ypgmin = ypgmax - ypgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin
           CALL Profile_Plot
         CASE (ID_Home)
 ! Back to full profile range
@@ -243,23 +245,23 @@
           xpgmax = xpmax
           ypgmin = ypmin
           ypgmax = ypmax
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin 
           CALL Profile_Plot 
         CASE (ID_PolyFitter_Help)
-          CALL LaunchHelp()
+          CALL LaunchHelp
         CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5)
           CALL LaunchTutorial(EventInfo%VALUE1)
         CASE (ID_help_about_Polyfitter)
-          CALL About()
+          CALL About
         CASE(ID_Start_Wizard)
-          CALL StartWizard()
+          CALL StartWizard
       END SELECT
 
       END SUBROUTINE ProcessMenu
 !
 !*****************************************************************************
 !
-      SUBROUTINE LaunchHelp()
+      SUBROUTINE LaunchHelp
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -272,7 +274,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE About()
+      SUBROUTINE About
 !
 !   This subroutine processes About selection
 !
@@ -370,7 +372,6 @@
       CALL IOSDeleteFile('MakeZmatrix.log')
       CALL IOSDeleteFile('SA_PARAMS.TXT')
       CALL IOSDeleteFile('Overlap_Temp.pdb')
-      CALL IDebugLevel(DbgMsgBox)
 
       END SUBROUTINE DeleteTempFiles
 !
