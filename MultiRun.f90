@@ -129,6 +129,17 @@
                 KK = KK + 2
               ENDIF
             ENDIF
+            DO I = 1, natoms(iFrg)
+              IF (IOPTB(I,iFrg) .EQ. 1) THEN
+                KK = KK + 1
+              ENDIF
+              IF (IOPTA(I,iFrg) .EQ. 1) THEN
+                KK = KK + 1
+              ENDIF
+              IF (IOPTT(I,iFrg) .EQ. 1) THEN
+                KK = KK + 1
+              ENDIF
+            ENDDO
           ENDDO
         ENDIF
       ENDDO
