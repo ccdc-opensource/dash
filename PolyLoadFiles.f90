@@ -1966,15 +1966,16 @@
       READ(Cline,*, IOSTAT = IS) XOBS(I),YOBS(I),EOBS(I)
       IF (IS .NE. 0) THEN
         READ(Cline,*, ERR=100,END=100) XOBS(I),YOBS(I)
+! Skip negative intensities without ESD
+        IF (YOBS(I) .LT. 0.0) GOTO 10
         IF (ABS(YOBS(I)) .LT. 0.0000001) THEN
           EOBS(I) = 1
         ELSE IF (YOBS(I) .GE. 0.0000001) THEN
           EOBS(I) = SQRT(YOBS(I))
         ENDIF
       ENDIF
-! Skip negative 2-theta data and negative intensities
+! Skip negative 2-theta data
       IF (XOBS(I) .LE. 0.0) GOTO 10
-      IF (YOBS(I) .LT. 0.0) GOTO 10
 ! Skip points with zero esd
       IF (EOBS(I) .LE. 0.0) GOTO 10
       IF (I .GT. 1) THEN
