@@ -72,10 +72,10 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt /winapp
-# ADD F90 /browser /check:bounds /check:format /check:power /check:output_conversion /check:overflow /check:underflow /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:0 /traceback /warn:argument_checking /warn:nofileopt /warn:unused
-# SUBTRACT F90 /assume:buffered_io /assume:noaccuracy_sensitive /warn:declarations /warn:truncated_source /fast
+# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /traceback /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
+# SUBTRACT F90 /check:bounds /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W4 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /W4 /Gm /GX /ZI /O2 /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "_DEBUG"
@@ -149,7 +149,6 @@ DEP_F90_CHI_S=\
 
 SOURCE=.\create_fob.f90
 DEP_F90_CREAT=\
-	".\IZMCheck.inc"\
 	".\params.inc"\
 	
 # End Source File
@@ -240,7 +239,6 @@ DEP_F90_ERROR=\
 
 SOURCE=.\Eval.f90
 DEP_F90_EVAL_=\
-	".\IZMCheck.inc"\
 	".\params.inc"\
 	
 # End Source File
@@ -337,6 +335,7 @@ DEP_F90_GENER=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\statlog.inc"\
+	".\Variables.mod"\
 	
 # End Source File
 # Begin Source File
@@ -356,6 +355,8 @@ DEP_F90_GETDS=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
+	".\statlog.inc"\
+	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -397,6 +398,17 @@ DEP_F90_INTER=\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\statlog.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\LoadRAWFiles.f90
+DEP_F90_LOADR=\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -587,15 +599,26 @@ SOURCE=.\SA_Defaults.f90
 # End Source File
 # Begin Source File
 
-SOURCE=.\SA_main.f90
-DEP_F90_SA_MA=\
+SOURCE=.\SA_Dialogues.f90
+DEP_F90_SA_DI=\
 	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
-	".\IZMCheck.inc"\
-	".\Lattice.inc"\
 	".\params.inc"\
 	".\statlog.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\SA_main.f90
+DEP_F90_SA_MA=\
+	".\Debug\SAMVAR.MOD"\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
+	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -631,10 +654,8 @@ DEP_F90_SA_PR=\
 
 SOURCE=.\sa_refresh.f90
 DEP_F90_SA_RE=\
-	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
-	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -658,7 +679,6 @@ DEP_F90_SA_SI=\
 SOURCE=.\SA_structure_output.f90
 DEP_F90_SA_ST=\
 	".\GLBVAR.INC"\
-	".\IZMCheck.inc"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\statlog.inc"\
@@ -795,10 +815,12 @@ DEP_F90_WIFD9=\
 
 SOURCE=.\Wizard_routines.f90
 DEP_F90_WIZAR=\
+	".\Debug\DICVAR.MOD"\
 	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
+	".\params.inc"\
 	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -819,10 +841,6 @@ SOURCE=.\DialogPosCmn.inc
 # Begin Source File
 
 SOURCE=.\GLBVAR.INC
-# End Source File
-# Begin Source File
-
-SOURCE=.\IZMCheck.inc
 # End Source File
 # Begin Source File
 
