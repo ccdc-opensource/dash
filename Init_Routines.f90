@@ -29,15 +29,12 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
-      INTEGER I
-
 ! Clear all variables
       CurrentRange = 0
       NumPeakFitRange = 0
-      DO I = 1, MAX_NPFR
-        NumInPFR(I) = 0
-        IPF_RPt(I) = 0
-      ENDDO
+      NumInPFR = 0
+      IPF_RPt = 0
+      RangeFitYN = .FALSE.
 ! Update 'View'|'Peak Positions'...
       CALL Upload_Positions()
 !... and 'View'|'Peak Widths' tabs
@@ -85,6 +82,18 @@
       ENDDO
 
       END SUBROUTINE Clear_BackGround
+!
+!*****************************************************************************
+!
+      SUBROUTINE Clear_UnitCell_WithConfirmation 
+
+      IMPLICIT NONE
+      
+      LOGICAL, EXTERNAL :: Confirm
+           
+      IF (Confirm('Do you wish to clear all cell parameters?')) CALL Clear_UnitCell
+
+      END SUBROUTINE Clear_UnitCell_WithConfirmation
 !
 !*****************************************************************************
 !
