@@ -306,7 +306,8 @@
       DO i = 1, 3
         PrfDir(i) = PrefPars(i)
       ENDDO
-      CALL VectorNormalise(PrfDir)
+      RefLen = VCTMOD(1.0,PrfDir,2)
+      PrfDir = PrfDir / RefLen
       DO iR = 1, MAXK
         DO ii = 1, 3
           H(ii) = SNGL(iREFH(ii,iR))
