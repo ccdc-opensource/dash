@@ -255,9 +255,6 @@
       DOUBLE PRECISION x,       lb,       ub,       vm
       COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
 
-      DOUBLE PRECISION prevub,       prevlb       ! For saving the previous range
-      COMMON /pvalues/ prevub(mvar), prevlb(mvar)
-
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
@@ -499,9 +496,9 @@
         CALL WGridStateCell(IDF_parameter_grid,1,i,Enabled)
         CALL WGridStateCell(IDF_parameter_grid,2,i,Enabled)
         CALL WGridStateCell(IDF_parameter_grid,3,i,Enabled)
-        prevub(i) = ub(i)
-        prevlb(i) = lb(i)
       ENDDO
+! Tick "Randomise initial values"
+      CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal,.TRUE.)
       CALL PopActiveWindowID
 
       END SUBROUTINE SA_Parameter_Set
@@ -637,7 +634,8 @@
       INTEGER            I, iFlags, iSelection
       CHARACTER(LEN=255) :: FilterStr
       CHARACTER(LEN=512) :: Zmfiles
-      CHARACTER(LEN=512) :: Info = 'You can import molecules from res, cssr, mol2, mol or pdb files into DASH.'//CHAR(13)//&
+      CHARACTER(LEN=512) :: Info = 'You can import molecules from cif, res, cssr, mol2, mol'//CHAR(13)//&
+                                   'or pdb files into DASH.'//CHAR(13)//&
                                    'When you click on OK, you will be prompted for a file in one'//CHAR(13)//&
                                    'of these formats. DASH will create separate Z-matrix files for'//CHAR(13)//&
                                    'each chemical residue present in the first entry in the file.'//CHAR(13)//&
