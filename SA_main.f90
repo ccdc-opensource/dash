@@ -41,7 +41,6 @@
       CALL WDialogGetString(IDF_SA_Project_Name,tSDIFile)
       WRITE(tFileHandle,'("  SDI file = ",A)',ERR=999) tSDIFile(1:LEN_TRIM(tSDIFile))
 ! Profile range (including maximum resolution), wavelength, unit cell parameters, zero point
-!!O      CALL WDialogSelect(IDD_SA_input2)
       CALL WDialogSelect(IDD_SA_Modal_input2)
       kk = 0
       DO iFrg = 1, maxfrg
