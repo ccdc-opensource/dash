@@ -10,7 +10,7 @@
 
       CALL SetWizardState(-1)
       CALL SelectMode(ID_Peak_Fitting_Mode)
-      CALL SetModeMenuState(0,-1,-1)
+!      CALL SetModeMenuState(0,-1,-1)
       CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
 
       END SUBROUTINE StartWizard
@@ -138,11 +138,12 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
    
       CALL EndWizardCommon
+      CALL SelectMode(ID_Peak_Fitting_Mode)
       PastPawley = .FALSE.
 ! Ungrey 'Delete all peak fit ranges' button on toolbar
       IF (NumPeakFitRange .GT. 0) CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
-! Ungrey 'Remove Background' button on toolbar
-      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
+! Ungrey 'Remove background' button on toolbar
+      IF (.NOT. NoData) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
 ! Ungrey 'Load diffraction pattern' button on toolbar
       CALL WMenuSetState(ID_import_xye_file,ItemEnabled,WintOn)
 ! Make unit cell etc. read only under 'View' 
@@ -163,8 +164,6 @@
 ! @@ ?
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
-! Ungrey 'Remove background' button on toolbar
-      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
 
       END SUBROUTINE EndWizardPastPawley
 !
@@ -236,11 +235,7 @@
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
-   
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-   
+      
 ! Not too pretty, but safe
       INTEGER                BackupNOBS
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
@@ -253,14 +248,12 @@
         XOBS(I) = BackupXOBS(I)
         YOBS(I) = BackupYOBS(I)
         EOBS(I) = BackupEOBS(I)
+! JvdS Assume no knowledge on background
+        YBAK(I) = 0.0
       ENDDO
       OriginalNOBS = NOBS
       EndNOBS = OriginalNOBS
       CALL Rebin_Profile
-      DO I = 1, NBIN
-! JvdS Assume no knowledge on background
-        YBBIN(I) = 0.0
-      ENDDO
       CALL GetProfileLimits
       CALL Profile_Plot
 

@@ -268,6 +268,8 @@
 ! Change global variable FNAME
       FNAME = TheFileName
       CALL SDIFileLoad(FNAME(1:KLEN)) 
+! Next line is necessary due to the way ScrUpdateFileName in SDIFileLoad works
+      FNAME = TheFileName
       IF (NoData) THEN
         CALL ErrorMessage("Could not read the project file "//FNAME(1:KLEN)//&
                           CHAR(13)//"successfully.")
@@ -276,7 +278,7 @@
       STATBARSTR(1) = FNAME
       CALL WindowOutStatusBar(1,STATBARSTR(1))
 !  update the file name of the project in the SA pop up
-      CALL SetSAFileName(TheFileName(1:LEN_TRIM(TheFileName)))
+      CALL SetSAFileName(FNAME(1:KLEN))
       
       END SUBROUTINE SDIFileOpen
 !
@@ -290,8 +292,21 @@
 
       CHARACTER*(*), INTENT (IN   ) ::  SDIFile
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      INTEGER          NOBSA, NFITA, IFITA
+      REAL                                          CHIOBSA, WTSA
+      REAL             XOBSA,         YOBSA,         YCALA,         ESDA
+      COMMON /CHISTOP/ NOBSA, NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP),    &
+                       XOBSA(MCHSTP), YOBSA(MCHSTP), YCALA(MCHSTP), ESDA(MCHSTP)
+
+
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
@@ -384,20 +399,25 @@
       ENDIF
       IF (PikExists) THEN
         CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
-! Now:
-! None of the arrays in PROFOBS has been filled: the arrays in CHISTOP were filled instead.
-! YCAL has been reset to 0.0
         PikExists = (ipiker .EQ. 0)
+        IF (PikExists) THEN
+! Now:
+! None of the arrays in PROFBIN has been filled: the arrays in CHISTOP were filled instead.
+! YCAL has been reset to 0.0
+          NBIN = NOBSA
+          DO I = 1, NBIN
+            XBIN(I)  = XOBSA(I)
+            YOBIN(I) = YOBSA(I)
+            YBBIN(I) = 0.0
+            EBIN(I)  = ESDA(I)
+          ENDDO
+          NoData = .FALSE.
+          CALL GetProfileLimits
+          FNAME = ''
+          CALL ScrUpdateFileName
+        ENDIF
       ENDIF
       CALL Init_PeakFitRanges
-! JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
-! I moved it, since i wanted to check that all the data read in ok before calling it
-      IF (PikExists) THEN
-! JCC before, this just didnt plot anything, even though in theory we should be able
-! to observe the full profile. Firstly have to synchronize the common blocks though
-        CALL Synchronize_Data()
-        NoData = .FALSE.
-      ENDIF
       IPTYPE = 1
       CALL Profile_Plot
 ! enable the buttons,
