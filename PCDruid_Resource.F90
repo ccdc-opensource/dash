@@ -1,4 +1,4 @@
-! Winteracter module created : 09/Apr/2002 17:18:43
+! Winteracter module created : 11/Apr/2002 15:35:43
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -360,8 +360,6 @@
           INTEGER, PARAMETER :: ID_Tutorial_5                   = 40002
           INTEGER, PARAMETER :: IDBACK                          =  1001
           INTEGER, PARAMETER :: IDNEXT                          =  1040
-          INTEGER, PARAMETER :: IDD_SA_Multi_completed_ep       =   127
-          INTEGER, PARAMETER :: IDD_TEMPLATE011                 =   128
           INTEGER, PARAMETER :: IDF_SA_Summary                  =  1136
           INTEGER, PARAMETER :: IDD_PW_Page5                    =   131
           INTEGER, PARAMETER :: IDF_MaxResolution               =  1205
@@ -446,8 +444,6 @@
           INTEGER, PARAMETER :: IDF_MaxMoves2                   =  1235
           INTEGER, PARAMETER :: IDD_PW_Page10                   =   119
           INTEGER, PARAMETER :: IDF_OutputPRO                   =  1043
-          INTEGER, PARAMETER :: IDF_ShowRange                   =  1217
-          INTEGER, PARAMETER :: IDF_ShowTicked                  =  1218
           INTEGER, PARAMETER :: IDF_Limit1                      =  1219
           INTEGER, PARAMETER :: IDF_Limit2                      =  1220
           INTEGER, PARAMETER :: IDF_InvertSelection             =  1221
@@ -605,4 +601,7 @@
           INTEGER, PARAMETER :: IDD_SAW_Page5                   =   102
           INTEGER, PARAMETER :: IDD_TEMPLATE021                 =   176
           INTEGER, PARAMETER :: IDB_AnalyseSolutions            = 40029
+          INTEGER, PARAMETER :: IDD_Summary                     =   177
+          INTEGER, PARAMETER :: IDD_DIALOG009                   =   178
+          INTEGER, PARAMETER :: IDB_Select                      =  1112
       END MODULE Druid_Header

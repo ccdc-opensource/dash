@@ -59,6 +59,9 @@
 
       IMPLICIT NONE
 
+      CALL WDialogLoad(IDD_LicenceAgreement)
+      CALL WDialogLoad(IDD_License_Dialog)
+      CALL WDialogLoad(IDD_Background_Fit)
       CALL WDialogLoad(IDD_Structural_Information)
       CALL WDialogLoad(IDD_SA_Action1)
       CALL WDialogLoad(IDD_Plot_Option_Dialog)
@@ -94,11 +97,9 @@
       CALL WDialogLoad(IDD_SA_input2)
       CALL WDialogLoad(IDD_SA_input3)
       CALL WDialogLoad(IDD_SAW_Page5)
-      CALL WDialogLoad(IDD_License_Dialog)
-      CALL WDialogLoad(IDD_Background_Fit)
+      CALL WDialogLoad(IDD_Summary)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
       CALL WDialogLoad(IDD_DV_Results)
-      CALL WDialogLoad(IDD_LicenceAgreement)
       CALL WDialogLoad(IDD_Parameter_Status_2)
       CALL WDialogLoad(IDD_Rietveld)
       CALL WDialogLoad(IDD_RRsubZmatrices)
@@ -894,15 +895,6 @@
         CASE (2)
           CALL WDialogPutRadioButton(IDF_ColourByElement)
       END SELECT
-      CALL WDialogSelect(IDD_SAW_Page5)
-      CALL WDialogGetRadioButton(IDF_ShowRange,tInteger)
-      IF (tInteger .EQ. 1) THEN ! "Show Selected"
-        CALL WDialogFieldState(IDF_Limit1,Enabled)
-        CALL WDialogFieldState(IDF_Limit2,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDF_Limit1,Disabled)
-        CALL WDialogFieldState(IDF_Limit2,Disabled)
-      ENDIF
 
 
       CLOSE(hFile)
