@@ -17,22 +17,6 @@
 ! Note that its value can be set when the anode material is known through the use of a
 ! function, e.g.: ALambda = WavelengthOf('Cu')
 
-	  CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
-
-! STATBARSTR stores the status bar shown at the bottom of the main window in DASH.
-!
-!  STATBARSTR ( 1) = Filename
-!  STATBARSTR ( 2) =
-!  STATBARSTR ( 3) =
-!  STATBARSTR ( 4) =
-!  STATBARSTR ( 5) =
-!  STATBARSTR ( 6) =
-!  STATBARSTR ( 7) =
-!  STATBARSTR ( 8) =
-!  STATBARSTR ( 9) =
-!  STATBARSTR (10) =
-
       INTEGER         IPTYPE
       COMMON /PLTYPE/ IPTYPE
 
