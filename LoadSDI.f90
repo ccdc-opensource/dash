@@ -151,8 +151,6 @@
         CASE ('hcv')
           DashHcvFile = line(ILocateChar(line):)
           HcvExists = .TRUE.
-        CASE ('hkl')
-          DashHklFile = line(ILocateChar(line):)
         CASE ('pik')
           DashPikFile = line(ILocateChar(line):)
           PikExists = .TRUE.

@@ -37,7 +37,6 @@
 ! File information; Names of files used by DASH For I/O
       CHARACTER(MaxPathLength)  DashTicFile
       CHARACTER(MaxPathLength)  DashHcvFile
-      CHARACTER(MaxPathLength)  DashHklFile
       CHARACTER(MaxPathLength)  DashPikFile
       CHARACTER(MaxPathLength)  DashRawFile
       CHARACTER(MaxPathLength)  DashDslFile
