@@ -43,9 +43,7 @@
 
       INTEGER          NFITA, IFITA
       REAL                                   CHIOBSA, WTSA
-      REAL             YCALA
-      COMMON /CHISTOP/ NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP),    &
-                       YCALA(MCHSTP)
+      COMMON /CHISTOP/ NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
@@ -53,15 +51,12 @@
 
       COMMON /FPINF1/ KREFT(MFPINF), KNIPT(50,MFPINF), PIKVAL(50,MFPINF)
 
-      COMMON /FPINF2/ NTERMS
-
       INTEGER I
 
       ier = 0
       OPEN (21,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998,IOSTAT=Istat)
       CHIOBSA = 0.
       NFITA = 0
-      NTERMS = 0
       NBIN = 0
       MMOBS = MCHSTP
       ittem = 0
@@ -71,10 +66,8 @@
         NBIN = NBIN + 1
 !..        ESDA(I)=1./SQRT(WTSA(I))
         WTSA(I) = 1.0/EBIN(I)**2
-        YCALA(I) = 0.0
 !..        KTEM=KMAXST(I)-KMINST(I)
         IF (KTEM.GT.0) THEN
-          NTERMS = NTERMS + KTEM
           READ (21,*,ERR=998) (KNIPT(K,I),PIKVAL(K,I),K=1,KTEM)
           NFITA = NFITA + 1
           IFITA(NFITA) = I

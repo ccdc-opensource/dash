@@ -3,33 +3,18 @@
 !
       SUBROUTINE VALCHIPRO(chivalpro)
 
-      USE WINTERACTER
-      USE DRUID_HEADER
-
       IMPLICIT NONE
 
       REAL, INTENT (  OUT) :: chivalpro
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
-
-      INTEGER         NLGREF, IREFH
-      LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
-
-      INTEGER         MAXK
-      REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
 
       REAL              AIOBS,         AICALC
       COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
 
       INTEGER          NFITA, IFITA
       REAL                                   CHIOBSA, WTSA
-      REAL             YCALA
-      COMMON /CHISTOP/ NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP),    &
-                       YCALA(MCHSTP)
+      COMMON /CHISTOP/ NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
