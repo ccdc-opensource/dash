@@ -345,13 +345,16 @@
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
 ! but these mappings are.
       INTEGER        IDFZMFile,           IDBZMBrowse,                &
-                     IDFZMpars,           IZMVB
+                     IDFZMpars,           IDBZMView,                  &
+                     IDBZMDelete
       COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg), IZMVB(1:maxfrg)
+                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
+                     IDBZMDelete(1:maxfrg)
       DATA IDFZMFile   / IDF_ZMatrix_file1,   IDF_ZMatrix_file2,   IDF_ZMatrix_file3,   IDF_ZMatrix_file4,   IDF_ZMatrix_file5   /
       DATA IDBZMBrowse / IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5 /
       DATA IDFZMpars   / IDF_ZM_pars1,        IDF_ZM_pars2,        IDF_ZM_pars3,        IDF_ZM_pars4,        IDF_ZM_pars5        /
-      DATA IZMVB       / IDB_ZMatrixView1,    IDB_ZMatrixView2,    IDB_ZMatrixView3,    IDB_ZMatrixView4,    IDB_ZMatrixView5    /
+      DATA IDBZMView   / IDB_ZMatrixView1,    IDB_ZMatrixView2,    IDB_ZMatrixView3,    IDB_ZMatrixView4,    IDB_ZMatrixView5    /
+      DATA IDBZMDelete / IDB_ZmatrixDelete1,  IDB_ZmatrixDelete2,  IDB_ZmatrixDelete3,  IDB_ZmatrixDelete4,  IDB_ZmatrixDelete5  /
 
       LOGICAL         MseBtnPressed, OldEventWaiting
       COMMON /Events/ MseBtnPressed, OldEventWaiting
