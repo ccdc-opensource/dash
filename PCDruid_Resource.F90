@@ -1,4 +1,4 @@
-! Winteracter module created : 01/Feb/2001 09:41:24
+! Winteracter module created : 26/Feb/2001 10:30:50
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -564,4 +564,8 @@
           INTEGER, PARAMETER :: IDF_SA_Completed_label          =  1382
           INTEGER, PARAMETER :: IDF_SA_ChiTest_Label            =  1377
           INTEGER, PARAMETER :: IDD_SA_RunLabel                 =  1383
+          INTEGER, PARAMETER :: ID_Tutorial_1                   = 40038
+          INTEGER, PARAMETER :: ID_Tutorial_2                   = 40039
+          INTEGER, PARAMETER :: ID_Tutorial_3                   = 40044
+          INTEGER, PARAMETER :: ID_Tutorial_4                   = 40045
       END MODULE Druid_Header

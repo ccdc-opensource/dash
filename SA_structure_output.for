@@ -219,6 +219,8 @@ C
 	close(64)
 	close(65)
 	close(66)
+
+	Call UpdateViewer()
 C
 1000    format(' REFERENCE STRUCTURE = 00000   A,B,C =',3f8.3)
 1010    format('   ALPHA,BETA,GAMMA =',3f8.3,'   SPGR = ',a3)
@@ -639,3 +641,14 @@ c
 
 	End Subroutine AppendNumToFileName
 
+
+	Subroutine UpdateViewer()
+      USE WINTERACTER
+      USE DRUID_HEADER
+!>> JCC 
+      USE VARIABLES
+
+	IF (AutoUpdate .AND. ViewAct) THEN
+		CALL ViewBest
+	END IF
+	end Subroutine UpdateViewer

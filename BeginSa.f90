@@ -185,6 +185,7 @@
 !
 !
 	SUBROUTINE FillSymmetry()
+
 ! Covers the eventuality of the default space group option.
 ! We need to determine the number of symmetry operators etc.
       COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),&
@@ -222,5 +223,6 @@
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(lpt)
+
 	return
 	END SUBROUTINE FillSymmetry

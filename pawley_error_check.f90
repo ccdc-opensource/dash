@@ -42,7 +42,7 @@
 	IF (IRetVal .EQ. ID_Edit_PawleyLog) THEN
 	    CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,&
 									   'View pawley fit log file'),IHan)
-		CALL WEditFile('polyp.lis', Modal)
+		CALL WEditFile('polyp.lis', Modal, 0, 0, SystemFixed)
 		IRetVal =  InfoError(1)
 	ENDIF 
 

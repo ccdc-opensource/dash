@@ -502,10 +502,10 @@ C.. Allow a maximum of 300 reflections
 
 
 ! JCCOriginal code - seems to cause the reflection loss bug
-        xranmax=xbin(nbin)
+!        xranmax=xbin(nbin)
 
 ! Substituting with this line seems to fix this bug? Is this a reasonable fix?
-!	  xranmax=xpmax
+	  xranmax=xpmax
 
 
         if (NumInternalDSC.ne.DataSetChange) then

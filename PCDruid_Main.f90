@@ -14,11 +14,11 @@
 		  CHARACTER                     :: DIRSPACER   = '\' ! Windows spacer
 		  CHARACTER(LEN=8)              :: CONFIG      = 'Dash.cfg'
 !C>> External binaries
-		  CHARACTER(LEN=255)            :: VIEWEXE     = 'C:\Program Files\WLViewerLite35\MSViewer.exe'
+		  CHARACTER(LEN=255)            :: VIEWEXE     = 'C:\Program Files\DASH\mercury.exe'
 		  CHARACTER(LEN=255)            :: CONVEXE     = 'C:\Program Files\DASH\zmconv.exe'
-		  CHARACTER(LEN=20)             :: VIEWARG     = ' '
-    	  LOGICAL ViewOn, ConvOn
-		  COMMON / EXTPRG / ViewOn, ConvOn, ViewExe, ConvExe, ViewArg
+		  CHARACTER(LEN=20)             :: VIEWARG     = '-client'
+    	  LOGICAL ViewOn, ConvOn, ViewAct, AutoUpdate
+		  COMMON / EXTPRG / ViewOn, ConvOn,  ViewAct,  AutoUpdate, ViewExe, ConvExe, ViewArg
 		  COMMON / EXTDIR / INSTDIR
 
 !C>> File information; Names of files used by DASH For I/O
@@ -137,7 +137,7 @@
 !
 !   Open root window
 !
-      CALL WindowOpen(MAIN_WINDOW)
+      CALL WindowOpen(MAIN_WINDOW,128)
 !
 !   Load and display the toolbar
 !
@@ -371,9 +371,9 @@
             CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Widths)
 !          CASE (ID_get_peak_intensities)
           CASE (ID_PolyFitter_Help)
-             CALL LaunchHelp(1)
-          CASE (ID_PolyFitter_Tips)
-             CALL LaunchHelp(2)
+             CALL LaunchHelp()
+		  CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4)
+			 CALL LaunchTutorial(IDENT)
           CASE (ID_help_about_Polyfitter)
               CALL About()
 		  CASE(ID_Start_Wizard)
@@ -399,16 +399,13 @@
 !      ret = WinHelp (hWnd, lpszHelpFileName, HELP_KEY, LOC(lpszContents) )
 !	  END SUBROUTINE LaunchWinHelp
 
-	  SUBROUTINE LaunchHelp(Mode)
+	  SUBROUTINE LaunchHelp()
 	  USE WINTERACTER
       USE druid_header
 	  USE VARIABLES
 
-	  IF (Mode .EQ. 1) THEN
-	  	  CALL WHelpFile(INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Documentation'//DIRSPACER//'html'//DIRSPACER//'dash.html')
-	  ELSE
-	  	  CALL WHelpFile(INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Documentation'//DIRSPACER//'html'//DIRSPACER//'dash_tutorials.html')
-	  END IF
+	  CALL WHelpFile(INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Documentation'//DIRSPACER//'manual'//DIRSPACER//'dash.html')
+	 
 	  
 
 	  END SUBROUTINE LaunchHelp
@@ -449,7 +446,9 @@
           CASE (ID_FILE_EXIT)
               CALL WExit(QUIT)
           CASE (ID_PolyFitter_Help)
-              CALL WHelpFile('Ppoly.hlp')
+              CALL LaunchHelp()
+		  CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4)
+			  CALL LaunchTutorial(IDENT)
           CASE (ID_Help_About)
               CALL About()
       END SELECT
@@ -496,7 +495,7 @@
       SAVEF  = .FALSE.
       CALL FieldUpdate()
       IFLAGS = LoadDialog + DirChange + PromptOn
-      FILTER = 'Powder diffraction files (*.xye)|*.xye|Powder profile files (*.pro)|*.pro|'
+      FILTER = 'Powder diffraction files (*.xye)|*.xye|'
       FNAME=' '
       CALL WSelectFile(FILTER,IFLAGS,FNAME,'Open powder diffraction file')
 	  CALL WDialogSelect(IDD_PW_Page3)
@@ -599,7 +598,7 @@
       SAVEF  = .FALSE.
       CALL FieldUpdate()
       IFLAGS = LoadDialog + DirChange + PromptOn
-      FILTER = 'Powder diffraction files|*.xye|'
+      FILTER = 'Powder diffraction files (*.xye)|*.xye|'
       FNAME=' '
       CALL WSelectFile(FILTER,IFLAGS,FNAME,'Open powder diffraction file')
 !
@@ -919,8 +918,10 @@
       CABOUT = 'DASH: A structure solution package for X-ray powder '//CHAR(13)//&
 	           'diffraction, developed and distributed in collaboration'//CHAR(13)//&
 	           'between the ISIS Facility of the Rutherford Appleton'//CHAR(13)//&
-	           'Laboratory and the Cambridge Crystallographic Data'//CHAR(13)//&
-			   'Centre'//CHAR(13)//&
+	           'Laboratory and the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
+			   'Access to this software product is permitted only under the'//CHAR(13)//&
+			   'terms and conditions of a valid software licence, obtainable'//CHAR(13)//&
+			   'from the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
 			   CHAR(13)//&
 			   'Copyright February 2001'
 
@@ -1169,8 +1170,10 @@
 	character*3 KeyChar
     integer nl,is,ie,dlen
 
-    ViewOn = .FALSE.
-	ConvOn = .FALSE.
+    ViewOn     = .FALSE.
+	ViewAct    = .FALSE.
+	AutoUpdate = .FALSE.
+	ConvOn     = .FALSE.
 	lval = GETENVQQ("DASH_DIR",DashDir)
 	if (lval.LE. len(DashDir) .AND. lval .GT. 0) then
 	    CONVEXE = DashDir(1:len_trim(DashDir))//DIRSPACER//'zmconv.exe'
@@ -1206,8 +1209,10 @@
 					VIEWEXE = line(IlocateChar(line):nl)
 				case ('con')
 					CONVEXE = line(IlocateChar(line):nl)
-				case  ('arg')
+				case ('arg')
 				    VIEWARG = line(IlocateChar(line):nl) ! Arguments for the viewer
+				case ('rel')
+					AUTOUPDATE = .TRUE.
 			end select
 	END DO		
  30 continue
@@ -1740,7 +1745,7 @@
 	 IF (WinfoDialog(4) .EQ. 1) THEN
 	    CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,&
 									   'Edit license request file'),IHan)
-		CALL WEditFile(Fname(1:len_trim(Fname)), Modal)
+		CALL WEditFile(Fname(1:len_trim(Fname)), Modal, 0, 0, SystemFixed)
 	 END IF
 	 return
  99  continue

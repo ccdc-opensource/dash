@@ -263,6 +263,11 @@
   Call WDialogPutMenu(IDF_PW_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
   Call WDialogPutMenu(IDF_PW_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
   Call WDialogPutOption(IDF_PW_Space_Group_Menu,ISPosSG)
+
+! Finally set the number of pawley refinements to zero
+
+  NumPawleyRef = 0
+
   IF (ICurSel .NE. 0) Call WDialogSelect(ICurSel)
 
   end subroutine Update_Space_Group

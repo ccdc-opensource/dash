@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 01/Feb/2001 09:41:24
+// Modified : 26/Feb/2001 10:30:50
 //
 ///////////////////////////////////////////////////
 //
@@ -577,6 +577,10 @@
 #define IDF_SA_Completed_label           1382
 #define IDF_SA_ChiTest_Label             1377
 #define IDD_SA_RunLabel                  1383
+#define ID_Tutorial_1                   40038
+#define ID_Tutorial_2                   40039
+#define ID_Tutorial_3                   40044
+#define ID_Tutorial_4                   40045
 
 ///////////////////////////////////////////////////
 //
@@ -590,12 +594,12 @@ BEGIN
     CONTROL "1.0",IDF_CharacterSize,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   12,    4,   40,   14
     CONTROL "0.5",IDF_SymbolSize,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   12,   20,   40,   14
     CONTROL "show error bars",IDF_ErrorBar_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,    8,   78,    8
-    CONTROL "Observed Profile",IDF_ObservedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   52,   66,   14
-    CONTROL "Calculated Profile",IDF_CalculatedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   52,   66,   14
-    CONTROL "Difference Profile",IDF_DifferenceData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   52,   66,   14
-    CONTROL "Axes Colour",IDF_Axes_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   68,   66,   14
-    CONTROL "Tick Mark Colour",IDF_TickMark_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   68,   66,   14
-    CONTROL "Peak Fitting Colour",IDF_PeakFitting_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   68,   66,   14
+    CONTROL "Observed Profile...",IDF_ObservedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   52,   66,   14
+    CONTROL "Calculated Profile...",IDF_CalculatedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   52,   66,   14
+    CONTROL "Difference Profile...",IDF_DifferenceData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   52,   66,   14
+    CONTROL "Axes Colour...",IDF_Axes_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   68,   66,   14
+    CONTROL "Tick Mark Colour...",IDF_TickMark_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   68,   66,   14
+    CONTROL "Peak Fitting Colour...",IDF_PeakFitting_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   68,   66,   14
     CONTROL "OK",IDF_dismiss_plot_options,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,   92,   40,   14
     CONTROL "Colours",IDF_Colour_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   12,   40,  228,   48
     CONTROL "symbol size",IDF_SymbolSize_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   58,   22,   62,   12
@@ -726,7 +730,7 @@ BEGIN
     CONTROL "",IDF_wavelength1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  224,   60,   40,   14
     CONTROL "",IDF_2theta0,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  232,   96,   40,   14
     CONTROL "",IDF_flight_path,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  154,   96,   40,   14
-    CONTROL "Wavelength for angle dispersive  X-ray/neutron in Å",IDF_CW_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   84,   44,  192,   42
+    CONTROL "Wavelength for angle dispersive  X-ray data in Å",IDF_CW_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   84,   44,  192,   42
     CONTROL "",IDF_Wavelength_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP | CBS_DROPDOWN | CBS_HASSTRINGS,  148,   60,   60,   64
     CONTROL "Radiation",IDF_radiation_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   98,   62,   34,    8
 END
@@ -739,14 +743,11 @@ BEGIN
 " 1024 0 \n"
 " 1025 0 \n"
 "[Menus] \n"
-" 1045     7     1 \n"
+" 1045     4     1 \n"
 "<...> \n"
 "Cu Ka1 \n"
-"Cu Ka1/2 \n"
 "Co Ka1 \n"
-"Co Ka1/2 \n"
 "Mo Ka1 \n"
-"Mo Ka1/2 \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
@@ -1271,10 +1272,10 @@ BEGIN
     CONTROL "CW neutron",IDF_PW_CWN_Source,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  116,   72,   60,   14
     CONTROL "TOF neutron",IDF_PW_TOF_source,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  116,   96,   60,   14
     CONTROL "Diffraction data (.xye)",IDF_PW_Data_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  186,    4,  194,   48
-    CONTROL "Wavelength for angle dispersive  X-ray/neutron in Å",IDF_PW_CW_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  188,   56,  192,   48
-    CONTROL "Radiation",IDF_PW_radiation_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  200,   80,   28,    8
+    CONTROL "Wavelength for angle dispersive  X-ray data in Å",IDF_PW_CW_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  188,   56,  192,   48
+    CONTROL "Radiation",IDF_PW_radiation_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  196,   78,   34,    8
     CONTROL "",IDF_PW_Wavelength_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWN | CBS_HASSTRINGS,  236,   76,   60,   64
-    CONTROL "",IDF_PW_wavelength1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  302,   76,   40,   14
+    CONTROL "",IDF_PW_wavelength1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  302,   74,   40,   14
     CONTROL "Time-of-flight neutron",IDF_PW_TOF_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | BS_GROUPBOX | BS_TEXT | BS_LEFT,  188,  108,  192,   30
     CONTROL "flight path (m.)",IDF_PW_Flight_Path_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,  198,  120,   48,    8
     CONTROL "",IDF_PW_flight_path,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  258,  116,   40,   14
@@ -1283,10 +1284,10 @@ BEGIN
     CONTROL "",IDF_PW_Logo3,"STATIC",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   16,    3,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "File",IDF_PW_Data_fFilename,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  198,   20,   20,    8
     CONTROL "",IDF_PW_DataFileName_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,  224,   16,  130,   14
-    CONTROL "Browse",ID_PW_DF_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  290,   32,   40,   14
+    CONTROL "Browse...",ID_PW_DF_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  290,   32,   40,   14
     CONTROL "< &Back",IDF_PW2_Back,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  108,  144,   40,   14
     CONTROL "&Next >",IDF_PW2_Next,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  156,  144,   40,   14
-    CONTROL "&Close",IDF_PW2_Skip,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  206,  144,   40,   14
+    CONTROL "&Finish",IDF_PW2_Skip,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  206,  144,   40,   14
     CONTROL "Open",ID_PW_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,   32,   40,   14
 END
 
@@ -1298,14 +1299,11 @@ BEGIN
 " 1237 0 \n"
 " 1238 0 \n"
 "[Menus] \n"
-" 1246     7     1 \n"
+" 1246     4     1 \n"
 "<...> \n"
 "Cu Ka1 \n"
-"Cu Ka1/2 \n"
 "Co Ka1 \n"
-"Co Ka1/2 \n"
 "Mo Ka1 \n"
-"Mo Ka1/2 \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
@@ -1337,7 +1335,7 @@ FONT    8, "MS Sans Serif"
 CAPTION "Pawley Refinement Status"
 BEGIN
     CONTROL "0",IDF_Pawley_Progress_Bar,"MSCTLS_PROGRESS32",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP,   14,  124,  278,   10,WS_EX_CLIENTEDGE
-    CONTROL "cycle number",IDF_Pawley_Cycle_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   14,  110,   46,    8
+    CONTROL "Cycle number",IDF_Pawley_Cycle_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   14,  110,   46,    8
     CONTROL "",IDF_Pawley_Cycle_Number,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   66,  108,   16,   12
     CONTROL "of",IDF_Pawley_Cycle_Label2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   88,  110,   12,    8
     CONTROL "reflections",IDF_Pawley_Cycle_Refs_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   40,  142,   36,    8
@@ -1346,12 +1344,12 @@ BEGIN
     CONTROL "",IDF_Pawley_Cycle_NumPts,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   78,  140,   24,   12
     CONTROL "chi",IDF_Pawley_Cycle_ChiSq_Label1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  244,  142,   12,    8
     CONTROL "",IDF_Pawley_Cycle_ChiSq,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  264,  140,   28,   12
-    CONTROL "refinement status",IDF_Pawley_Status_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    4,   96,  300,   60
+    CONTROL "Refinement status",IDF_Pawley_Status_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    4,   96,  300,   60
     CONTROL "Rwp",IDF_Pawley_Cycle_Rwp_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  130,  142,   16,    8
     CONTROL "",IDF_Pawley_Cycle_Rwp,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  150,  140,   28,   12
     CONTROL "R(exp)",IDF_Pawley_Cycle_RwpExp_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  182,  142,   24,    8
     CONTROL "",IDF_Pawley_Cycle_RwpExp,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  208,  140,   28,   12
-    CONTROL "refinement number",IDF_Pawley_RefNum_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  208,  110,   62,    8
+    CONTROL "Refinement number",IDF_Pawley_RefNum_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  208,  110,   62,    8
     CONTROL "",IDF_Pawley_Refinement_Number,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  276,  108,   16,   12
     CONTROL "N(back) =",IDF_PawRef_NBack_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  188,   32,   36,    8
     CONTROL "",IDF_PawRef_Line,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,   72,  308,    0
@@ -1818,7 +1816,7 @@ FONT    8, "MS Sans Serif"
 CAPTION "DASH - Simulated Annealing"
 BEGIN
     CONTROL "Next >",IDB_SA1_next,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   50,  120,   36,   14
-    CONTROL "open existing project file",IDF_SA_project_name_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    8,    4,   80,    8
+    CONTROL "Open existing project file",IDF_SA_project_name_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    8,    4,   80,    8
     CONTROL "",IDF_SA_Project_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,    8,   16,  200,   14
     CONTROL "Browse...",IDB_SA_Project_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  256,   16,   36,   14
     CONTROL "",IDF_ZMatrix_file1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_WANTRETURN,    8,   40,  200,   14
@@ -1842,7 +1840,7 @@ BEGIN
     CONTROL "",IDF_ZM_file_check4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_LEFT | BS_RIGHT | BS_CENTER | BS_TOP | BS_BOTTOM | BS_VCENTER,  212,   88,   12,   12
     CONTROL "",IDF_ZM_file_check5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_LEFT | BS_RIGHT | BS_CENTER | BS_TOP | BS_BOTTOM | BS_VCENTER,  212,  104,   12,   12
     CONTROL "",IDF_ZM_allpars,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  272,  120,   16,   14
-    CONTROL "molecular z-matrix files",IDF_ZM_file_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    8,   32,   80,    8
+    CONTROL "Molecular Z-matrix files",IDF_ZM_file_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    8,   32,   80,    8
     CONTROL "total number of parameters =",IDF_ZM_allpars_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  176,  124,   92,    8
     CONTROL "Cancel",IDF_SA1_cancel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   16,  120,   32,   14
     CONTROL "Clear",IDF_clear_zmatrix,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   88,  120,   40,   14
@@ -1882,7 +1880,7 @@ BEGIN
     CONTROL "",IDF_parameter_grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS | GS_WRAP,   10,   20,  272,  104,WS_EX_DLGMODALFRAME
     CONTROL "< Back",IDB_SA2_back,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   10,  128,   40,   14
     CONTROL "Next >",IDB_SA2_next,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  110,  128,   40,   14
-    CONTROL "simulated annealing parameter setup",IDF_SA2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   10,    8,  132,    8
+    CONTROL "Simulated annealing parameter setup",IDF_SA2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   10,    8,  132,    8
     CONTROL "Cancel",IDF_SA2_cancel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   60,  128,   40,   14
 END
 
@@ -1905,9 +1903,9 @@ IDD_TEMPLATE009 DIALOG 0, 0, 1000,   16
 STYLE DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "initial",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,    0,    0,   48,   14
-    CONTROL "lower",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,    0,    0,   48,   14
-    CONTROL "upper",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,    0,    0,   48,   14
+    CONTROL "Initial",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,    0,    0,   48,   14
+    CONTROL "Lower",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,    0,    0,   48,   14
+    CONTROL "Upper",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,    0,    0,   48,   14
     CONTROL "F",ISS1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT,    0,    0,   14,   14
     CONTROL "V",ISS5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT,    0,    0,   14,   14
 END
@@ -1941,7 +1939,7 @@ BEGIN
     CONTROL "0.02",IDF_SA_Tredrate,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,   58,  108,   28,   14
     CONTROL "15",IDF_SA_Tredrate_trackbar,"MSCTLS_TRACKBAR32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TBS_AUTOTICKS | TBS_VERT | TBS_TOP | TBS_ENABLESELRANGE,   64,   12,   20,   96
     CONTROL "0.5",IDF_SA_TRR_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   54,   16,   10,    8
-    CONTROL "moves",IDF_LABEL11,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  182,   88,   20,    8
+    CONTROL "Moves",IDF_LABEL11,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  182,   88,   20,    8
     CONTROL "N1",IDF_SA_NS_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  110,    4,   16,   10
     CONTROL "20",IDF_SA_NS,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,   98,  108,   28,   14
     CONTROL "15",IDF_SA_NS_trackbar,"MSCTLS_TRACKBAR32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TBS_AUTOTICKS | TBS_VERT | TBS_TOP | TBS_ENABLESELRANGE,  104,   12,   20,   96
@@ -1955,9 +1953,9 @@ BEGIN
     CONTROL "",IDF_SA_Moves,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  178,  108,   30,   14
     CONTROL "N2",IDF_SA_NT_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  150,    4,   16,   10
     CONTROL "T0",IDF_SA_T0_label1,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   30,    4,   16,   10
-    CONTROL "cool",IDF_SA_cool_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   68,    4,   16,   10
-    CONTROL "random",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  178,   16,   24,    8
-    CONTROL "seeds",IDF_LABEL13,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  178,   24,   24,    8
+    CONTROL "Cool",IDF_SA_cool_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   68,    4,   16,   10
+    CONTROL "Random",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  178,   16,   28,    8
+    CONTROL "seeds",IDF_LABEL13,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  180,   24,   24,    8
     CONTROL "each T",IDF_LABEL14,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  180,   96,   24,    8
     CONTROL "Cancel",IDF_SA3_cancel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   82,  204,   40,   14
     CONTROL "314",IDF_SA_RandomSeed1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  176,   35,   40,   14
@@ -2009,13 +2007,13 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAM
 FONT    8, "MS Sans Serif"
 CAPTION "DASH - Simulated Annealing Status"
 BEGIN
-    CONTROL "temperature",IDF_curr_temp_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   18,   35,   40,   12
+    CONTROL "Temperature",IDF_curr_temp_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   18,   35,   40,   12
     CONTROL "",IDF_curr_temp,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,   32,   32,   12
-    CONTROL "minimum chi",IDF_min_chisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,   49,   40,   12
+    CONTROL "Minimum chi",IDF_min_chisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,   49,   40,   12
     CONTROL "",IDF_min_chisq,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,   46,   32,   12
-    CONTROL "average chi",IDF_avchisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,   63,   40,   12
+    CONTROL "Average chi",IDF_avchisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,   63,   40,   12
     CONTROL "",IDF_av_chisq,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,   60,   32,   12
-    CONTROL "total moves",IDF_total_moves_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   18,  102,   40,   12
+    CONTROL "Total moves",IDF_total_moves_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   18,  102,   40,   12
     CONTROL "",IDF_total_moves,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,  100,   32,   12
     CONTROL "Pause",IDF_Pause_Annealing,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   18,  152,   36,   20
     CONTROL "Local minimisation",IDF_SA_Simplex_Button,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_MULTILINE,  152,  152,   44,   20
@@ -2031,19 +2029,19 @@ BEGIN
     CONTROL "",IDF_SAMove_picture,"STATIC",WS_CHILD | WS_VISIBLE | SS_BLACKRECT | SS_NOTIFY | SS_CENTERIMAGE,   62,  114,  152,    8,WS_EX_CLIENTEDGE
     CONTROL "2",IDF_minchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   52,   47,    8,    8
     CONTROL "2",IDF_avchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   52,   60,    8,    8
-    CONTROL "profile chi",IDF_profchisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,   77,   40,   12
+    CONTROL "Profile chi",IDF_profchisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,   77,   40,   12
     CONTROL "2",IDF_profchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   52,   74,    8,    8
     CONTROL "",IDF_profile_chisq2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,   74,   32,   12
     CONTROL "",IDF_SATotalMoves_picture,"STATIC",WS_CHILD | WS_VISIBLE | SS_BLACKRECT | SS_NOTIFY | SS_CENTERIMAGE,   62,  102,  152,    8,WS_EX_CLIENTEDGE
-    CONTROL "downhill",IDF_SA_move_type,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   88,  134,   30,    8
+    CONTROL "Downhill",IDF_SA_move_type,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   88,  134,   30,    8
     CONTROL "moves/iteration",IDF_iteration_moves_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,  114,   48,   12
     CONTROL "",IDF_TBarGroup1,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT | BS_LEFT | BS_FLAT,   64,   32,   39,   53
     CONTROL "",IDF_TBarGroup2,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT | BS_LEFT | BS_FLAT,  102,   32,   39,   53
     CONTROL "",IDF_TBarGroup3,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT | BS_LEFT | BS_FLAT,  140,   32,   39,   53
     CONTROL "",IDF_TBarGroup4,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT | BS_LEFT | BS_FLAT,  178,   32,   38,   53
     CONTROL "Stop && Edit",IDF_SA_NewAnneal_Button,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_MULTILINE,  102,  152,   46,   20
-    CONTROL "uphill",IDF_SA_move_type2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  124,  134,   30,    8
-    CONTROL "reject",IDF_SA_move_type3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  158,  134,   30,    8
+    CONTROL "Uphill",IDF_SA_move_type2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  124,  134,   30,    8
+    CONTROL "Reject",IDF_SA_move_type3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  158,  134,   30,    8
     CONTROL "Simulated annealing run number 1 of 1",IDD_SA_RunLabel,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,   22,   16,  184,   10
 END
 
@@ -2314,12 +2312,8 @@ IDR_MENU1 MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "Import pawley fit file",                   ID_import_dpj_file
-        MENUITEM SEPARATOR
-        POPUP "Import profile data"
-        BEGIN
-            MENUITEM ".xye format (ASCII)",                      ID_import_xye_file
-        END
+        MENUITEM "Import Pawley Fit File...",                ID_import_dpj_file
+        MENUITEM "Import Profile Data...",                   ID_import_xye_file
         MENUITEM SEPARATOR
         MENUITEM "&Print",                                   ID_FILE_PRINT
         MENUITEM SEPARATOR
@@ -2329,26 +2323,32 @@ BEGIN
     BEGIN
         MENUITEM "&Default\aAlt+M",                          ID_Default_Mode, CHECKED
         MENUITEM SEPARATOR
-        MENUITEM "&Peak fitting\aAlt+P",                     ID_Peak_Fitting_Mode
-        MENUITEM "Pawley &refinement\aAlt+R",                ID_Pawley_Refinement_Mode
-        MENUITEM "&Structure solution\aAlt+S",               ID_Structure_Solution_Mode
+        MENUITEM "&Peak Fitting\aAlt+P",                     ID_Peak_Fitting_Mode
+        MENUITEM "Pawley &Refinement\aAlt+R",                ID_Pawley_Refinement_Mode
+        MENUITEM "&Structure Solution\aAlt+S",               ID_Structure_Solution_Mode
     END
     POPUP "&View"
     BEGIN
-        MENUITEM "&Data attributes",                         ID_get_data_properties
-        MENUITEM "&Peak positions",                          ID_get_peak_positions
-        MENUITEM "&Crystal symmetry",                        ID_get_crystal_symmetry
-        MENUITEM "Peak &widths",                             ID_get_peak_widths
+        MENUITEM "&Data Attributes",                         ID_get_data_properties
+        MENUITEM "&Peak Positions",                          ID_get_peak_positions
+        MENUITEM "&Crystal Symmetry",                        ID_get_crystal_symmetry
+        MENUITEM "Peak &Widths",                             ID_get_peak_widths
     END
     POPUP "&Options"
     BEGIN
-        MENUITEM "Plot",                                     ID_plot_options
+        MENUITEM "Plot Options...",                          ID_plot_options
     END
     POPUP "&Help"
     BEGIN
         MENUITEM "DASH &Help\aCtrl-H",                       ID_PolyFitter_Help
         MENUITEM SEPARATOR
-        MENUITEM "DASH &Tutorials",                          ID_Polyfitter_Tips, GRAYED
+        POPUP "DASH &Tutorials", GRAYED
+        BEGIN
+            MENUITEM "Tutorial 1:  Hydrochlorothiazide",         ID_Tutorial_1
+            MENUITEM "Tutorial 2: Chloropropamide",              ID_Tutorial_2
+            MENUITEM "Tutorial 3: Cimetidine",                   ID_Tutorial_3
+            MENUITEM "Tutorial 4: Decafluoroquaterphenyl",       ID_Tutorial_4
+        END
         MENUITEM SEPARATOR
         MENUITEM "About &DASH",                              ID_help_about_Polyfitter
     END
@@ -2357,11 +2357,11 @@ END
 IDR_MENU1 RCDATA
 BEGIN
 ID_FILE,1,0
-ID_import_data,1,3,0
 ID_Druid_Mode_Menu,2,0
 ID_ViewMenu,3,0
 ID_Options,4,0
 ID_HELP,5,0
+ID_Polyfitter_Tips,5,3,0
 0
 END
 
@@ -2455,59 +2455,59 @@ END
 //
 // Bitmaps
 //
-IDF_Width_Equations             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\WidthEquations.bmp"
-IDF_PW_Logo1                    BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizard.bmp"
-IDF_PW_Logo2                    BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizard.bmp"
-IDF_PW_Logo3                    BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizard.bmp"
-IDF_WelcomeWizard               BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\WizardWelcome.bmp"
-IDF_PW_Logo4                    BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizard.bmp"
-IDF_Pawley_Status_Pic           BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\EmbossedProfile.bmp"
-IDF_Profile_Zoom_Button         BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\zoom.bmp"
-IDF_Profile_FullRange_Button    BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\fullrange.bmp"
-IDF_PawRefOptionsPicture        BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PawRefOptions.bmp"
-ID_TOOLBAR1                     BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\toolbar1.bmp"
-ID_BITMAP1                      BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\WidthEquations.bmp"
-ID_BITMAP2                      BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizard.bmp"
-ID_BITMAP3                      BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizard.bmp"
-ID_BITMAP4                      BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizard.bmp"
-ID_BITMAP5                      BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\WizardWelcome.bmp"
-ID_BITMAP6                      BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizard.bmp"
-ID_BITMAP7                      BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizardSmall.bmp"
-ID_BITMAP8                      BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\zoom.bmp"
-ID_BITMAP9                      BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\fullrange.bmp"
-ID_BITMAP10                     BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PawRefOptions.bmp"
-IDF_StrInf_Picture              BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizardFull.bmp"
-IDB_ZMatrix_Browse1             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\OpenFile.bmp"
-IDB_ZMatrix_Browse2             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\OpenFile.bmp"
-IDB_ZMatrix_Browse3             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\OpenFile.bmp"
-IDB_ZMatrix_Browse4             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\OpenFile.bmp"
-IDB_ZMatrix_Browse5             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\OpenFile.bmp"
-IDF_SA1_picture                 BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizardFull.bmp"
-IDF_SA2_picture                 BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizardFull.bmp"
-IDF_SA3_picture                 BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\PolyFitterWizardFull.bmp"
-IDF_T_picture                   BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\temperature1.bmp"
-IDF_avchisq_picture             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\temperature1.bmp"
-IDF_minchisq_picture            BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\temperature1.bmp"
-IDF_prochisq_picture            BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\temperature1.bmp"
-IDF_SA_Stop_Button              BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\stop.bmp"
-IDF_SA_Pause_Button             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\pause.bmp"
-IDF_SA_Play_Button              BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\play.bmp"
-IDF_SA_Simplex_Button           BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\fast_forward.BMP"
-IDF_Pause_Annealing             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\pause.bmp"
-IDF_SA_Reanneal_Button          BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\back.bmp"
-IDF_SA_Eject_Button             BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\eject.BMP"
-IDF_SA_NewAnneal_Button         BITMAP DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\previous_track.BMP"
+IDF_Width_Equations             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\WidthEquations.bmp"
+IDF_PW_Logo1                    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+IDF_PW_Logo2                    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+IDF_PW_Logo3                    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+IDF_WelcomeWizard               BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\WizardWelcome.bmp"
+IDF_PW_Logo4                    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+IDF_Pawley_Status_Pic           BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\EmbossedProfile.bmp"
+IDF_Profile_Zoom_Button         BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\zoom.bmp"
+IDF_Profile_FullRange_Button    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\fullrange.bmp"
+IDF_PawRefOptionsPicture        BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PawRefOptions.bmp"
+ID_TOOLBAR1                     BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\toolbar1.bmp"
+ID_BITMAP1                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\WidthEquations.bmp"
+ID_BITMAP2                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+ID_BITMAP3                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+ID_BITMAP4                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+ID_BITMAP5                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\WizardWelcome.bmp"
+ID_BITMAP6                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+ID_BITMAP7                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardSmall.bmp"
+ID_BITMAP8                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\zoom.bmp"
+ID_BITMAP9                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\fullrange.bmp"
+ID_BITMAP10                     BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PawRefOptions.bmp"
+IDF_StrInf_Picture              BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
+IDB_ZMatrix_Browse1             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDB_ZMatrix_Browse2             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDB_ZMatrix_Browse3             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDB_ZMatrix_Browse4             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDB_ZMatrix_Browse5             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDF_SA1_picture                 BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
+IDF_SA2_picture                 BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
+IDF_SA3_picture                 BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
+IDF_T_picture                   BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\temperature1.bmp"
+IDF_avchisq_picture             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\temperature1.bmp"
+IDF_minchisq_picture            BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\temperature1.bmp"
+IDF_prochisq_picture            BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\temperature1.bmp"
+IDF_SA_Stop_Button              BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\stop.bmp"
+IDF_SA_Pause_Button             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\pause.bmp"
+IDF_SA_Play_Button              BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\play.bmp"
+IDF_SA_Simplex_Button           BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\fast_forward.BMP"
+IDF_Pause_Annealing             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\pause.bmp"
+IDF_SA_Reanneal_Button          BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\back.bmp"
+IDF_SA_Eject_Button             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\eject.BMP"
+IDF_SA_NewAnneal_Button         BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\previous_track.BMP"
 
 ///////////////////////////////////////////////////
 //
 // Icons
 //
-icon1                           ICON   DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\Druid.ico"
-ID_ICON1                        ICON   DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\Druid.ico"
-ID_ICON2                        ICON   DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\Druid.ico"
-ID_ICON3                        ICON   DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\Druid.ico"
-IDF_Done_icon                   ICON   DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\Done.ico"
-ID_Wizard_Icon                  ICON   DISCARDABLE "Y:\\cole\\PCDruid_v0.9\\res\\wizard.ico"
+icon1                           ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Druid.ico"
+ID_ICON1                        ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Druid.ico"
+ID_ICON2                        ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Druid.ico"
+ID_ICON3                        ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Druid.ico"
+IDF_Done_icon                   ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Done.ico"
+ID_Wizard_Icon                  ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\wizard.ico"
 
 ///////////////////////////////////////////////////
 //

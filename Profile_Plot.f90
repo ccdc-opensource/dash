@@ -530,44 +530,48 @@
           call IGrMoveTo(xgtem,ygtem)
           CALL IGrColourN(KolNumCTic)
 ! Software clipping - there must be a better way
-
-! JCC. This over-runs the array bound, since ip3 does not exist ... (and is thus zero by default)
 !
+! JCC - I've totally recoded this so that its clearer. It will be a bit slower, since it recalculates both
+! points on every iteration, but it does now work!
+		  
+          do ip=ix1+1,ix2
+! Get the coordinates between the 2 current points
+		    call IPgUnitsToGrUnits(xpeakfit(ip - 1),ypeakfit(ip - 1),xg_coord1,yg_coord1)
+            call IPgUnitsToGrUnits(xpeakfit(ip),    ypeakfit(ip),    xg_coord2,yg_coord2)
+			
+! Check the y-coordinate ranges
 
-! JCC Fitted profiles are drawn here. It seems that this only works some of the time
+! 1. All out of box so ignore
+			if ( yg_coord1 .lt. gybot .and. yg_coord2 .lt. gybot) cycle
+			if ( yg_coord1 .gt. gytop .and. yg_coord2 .gt. gytop) cycle
 
-!          xgtemold=xbin(ip3)
-		  xgtemold=xbin(ix1)
-          ygtemold=0.5*(gybot+gytop)
-          do ip=ix1,ix2
-            call IPgUnitsToGrUnits(xpeakfit(ip),ypeakfit(ip),xgtem,ygtem)
-            if (ygtem.ge.gybot.and.ygtem.le.gytop) then
-              if (ygtemold.gt.gytop) then
-                xtem=xgtemold+(xgtem-xgtemold)*(gytop-ygtemold)/(ygtem-ygtemold)
-                call IGrMoveTo(xtem,gytop)
-              else if (ygtemold.lt.gybot) then
-                xtem=xgtemold+(xgtem-xgtemold)*(gybot-ygtemold)/(ygtem-ygtemold)
-                call IGrMoveTo(xtem,gybot)
-              end if
-              call IGrLineTo(xgtem,ygtem)
-            else
-              if (ygtemold.ge.gybot.and.ygtemold.le.gytop) then
-                if (ygtem.ge.gytop) then
-                  xtem=xgtemold+(xgtem-xgtemold)*(gytop-ygtemold)/(ygtem-ygtemold)
-                  call IGrLineTo(xtem,gytop)
-                else if (ygtem.le.gybot) then
-                  xtem=xgtemold+(xgtem-xgtemold)*(gybot-ygtemold)/(ygtem-ygtemold)
-                  call IGrLineTo(xtem,gybot)
-                end if
-              else
-                call IGrMoveTo(xgtem,ygtem)
-              end if
-            end if
-            xgtemold=xgtem
-            ygtemold=ygtem
+			call IGrMoveTo(xg_coord1, yg_coord1)
+
+			if ( yg_coord1 .lt. gybot) then
+! Move the start point to the intercept point in the box
+				xtem=     xg_coord1 + (xg_coord2 - xg_coord1)*(gybot-yg_coord1)/(yg_coord2-yg_coord1)
+				call IGrMoveTo(xtem,gybot)
+			else if ( yg_coord2 .lt. gybot) then
+! Move the end point to the intercept point in the box
+				xg_coord2 = xg_coord2 + (xg_coord2 - xg_coord1)*(gybot-yg_coord1)/(yg_coord2-yg_coord1)
+				yg_coord2 = gybot
+			endif
+
+			if ( yg_coord1 .gt. gytop) then
+! Move the start point to the intercept point in the box
+				xtem = xg_coord1 + (xg_coord2 - xg_coord1)*(gytop-yg_coord1)/(yg_coord2-yg_coord1)
+				call IGrMoveTo(xtem,gytop)
+			else if ( yg_coord2 .gt. gytop) then
+! Move the end point to the intercept point in the box
+				xg_coord2 = xg_coord2  + (xg_coord2 - xg_coord1)*(gytop-yg_coord1)/(yg_coord2-yg_coord1)
+				yg_coord2 = gytop
+			end if
+            call IGrLineTo(xg_coord2,yg_coord2)
+
           end do
          end if
         end if
+
         IPresColN=InfoGrScreen(ColourReq)
         do j=1,NumInPFR(i)
             iord_peak=iord_peak+1
@@ -584,11 +588,15 @@
                yt1=max(ypmin,0.)
                yt1=min(yt1,ypmax)
                CALL IPgUnitsToGrUnits(XPF_Pos(j,i),yt1,xg1,yg1)
+			   yg1 = min(yg1,gytop)
+			   yg1 = max(yg1,gybot)
                CALL IGrMoveTo(xg1,yg1)
                CALL IGrColourN(KolNumPeakPos)
                yt2=max(ypmin,YPF_Pos(j,i))
                yt2=min(yt2,ypmax)
                CALL IPgUnitsToGrUnits(XPF_Pos(j,i),yt2,xg1,yg2)
+			   yg2 = min(yg2,gytop)
+			   yg2 = max(yg2,gybot)
                CALL IGrLineTo(xg1,yg2)
                if (ygtem.gt.gybot.and.ygtem.lt.gytop) then
                  if (iord_peak.lt.10) then

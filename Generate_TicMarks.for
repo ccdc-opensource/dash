@@ -116,6 +116,7 @@ C      call Load_Tic_File(9,ticfile)
 C>> Now
 	TicRead =  Load_Tic_File(9,ticfile)
 	IF (TicRead .EQ. 1) CALL Profile_Plot(Iptype)
+
       end
 C
 C LEVEL 50      subroutine Generate_TicMarks_CCSLcode
@@ -152,4 +153,3 @@ c
 	Check_TicMark_Data = Check_TicMark_Data .AND. CELLOK.AND.WVLNOK
 	return
 	end function Check_TicMark_Data
-

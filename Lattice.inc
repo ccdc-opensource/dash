@@ -16,14 +16,12 @@
 	  Data CS_Options(11)/'Cubic'/
 !C>> JCC Add some radiation type strings
 
-	  integer,parameter:: NRad_Types = 6
+	  integer,parameter:: NRad_Types = 3
 	  REAL :: RadWaveLengths(NRad_Types)
 	  Data RadWaveLengths(1)/1.5405/
-	  Data RadWaveLengths(2)/1.5418/
-	  Data RadWaveLengths(3)/1.7889/
-	  Data RadWaveLengths(4)/1.7905/
-	  Data RadWaveLengths(5)/0.7093/
-	  Data RadWaveLengths(6)/0.7107/
+	  Data RadWaveLengths(2)/1.7889/
+	  Data RadWaveLengths(3)/0.7093/
+
 
 !C>> JCC The next common allows low-level setting of SLIM (not accessible through the front
 !C     end, but may be in future. I've allowed reading via the dsl file)
