@@ -501,7 +501,7 @@
           PkPosEsd(i,CurrentRange) = varesd(jp)
           XPF_Pos(i,CurrentRange) = varval(jp)
           atem = ABS(varval(jp)-zargi(1))
-          DO ii = 1, npts
+          DO ii = 1, NPTS
             anewt = ABS(varval(jp)-zargi(ii))
             IF (anewt.LE.atem) THEN
               atem = anewt
@@ -540,7 +540,7 @@
           PkPosEsd(i,CurrentRange) = varesd(jp)
           XPF_Pos(i,CurrentRange) = varval(jp)
           atem = ABS(varval(jp)-zargi(1))
-          DO ii = 1, npts
+          DO ii = 1, NPTS
             anewt = ABS(varval(jp)-zargi(ii))
             IF (anewt.LE.atem) THEN
               atem = anewt

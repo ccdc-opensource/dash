@@ -3,18 +3,9 @@
 !CSL Mark 4 Update 54 4-July-95
 !
 !
-!
-!
-!
 !               C A M B R I D G E   C R Y S T A L L O G R A P H Y
 !
 !                      S U B R O U T I N E   L I B R A R Y
-!
-!
-!
-!
-!
-!
 !
 !
 !
@@ -39,13 +30,8 @@
 !
 !
 !
-!.. FCSUB3 HERE
-! LEVEL 1      SUBROUTINE FCSUB3(MNS)
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 2      SUBROUTINE FDCN01(IOPT)
       SUBROUTINE FDCN01(IOPT)
 !
 !  *** FDCN01 updated by JCM/WIFD 2 Mar 89 ***
@@ -127,12 +113,9 @@
       DERPFN(1,3) = 1.
   100 RETURN
       END SUBROUTINE FDCN01
-!*==FDCN03.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FDCN03(IOPT)
       SUBROUTINE FDCN03(IOPT)
 !
 !
@@ -232,13 +215,9 @@
       DERPFN(4,1) = 1.
   100 RETURN
       END SUBROUTINE FDCN03
-!*==FDLX01.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 2      SUBROUTINE FDLX01(IOPT)
       SUBROUTINE FDLX01(IOPT)
 !
 ! *** FDLX01 updated by WIFD/JCM 7 Mar 89 ***
@@ -318,12 +297,9 @@
       DERPFN(1,3) = 1.
   100 RETURN
       END SUBROUTINE FDLX01
-!*==FDLX02.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FDLX02(IOPT)
       SUBROUTINE FDLX02(IOPT)
 !
 ! *** FDLX02 updated by WIFD/JCM 7 Mar 89 ***
@@ -415,12 +391,9 @@
       DERPFN(2,2) = SECTH
   100 RETURN
       END SUBROUTINE FDLX02
-!*==FDTF01.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FDTF01(IOPT)
       SUBROUTINE FDTF01(IOPT)
 !
 ! *** FDTF01 updated by WIFD/JCM 1 Jun 89 ***
@@ -518,12 +491,9 @@
       DERPFN(4,3) = WSQ*WSQ*D41
   100 RETURN
       END SUBROUTINE FDTF01
-!*==FDTF02.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FDTF02(IOPT)
       SUBROUTINE FDTF02(IOPT)
 !
 ! *** FDTF02 updated by WIFD/JCM 7 Mar 89 ***
@@ -627,12 +597,9 @@
       DERPFN(5,3) = WSQ
   100 RETURN
       END SUBROUTINE FDTF02
-!*==FDTF03.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FDTF03(IOPT)
       SUBROUTINE FDTF03(IOPT)
 !
 ! *** FDTF03 updated by WIFD/JCM 1 Jun 89 ***
@@ -748,12 +715,9 @@
       DERPFN(6,1) = D61
   100 RETURN
       END SUBROUTINE FDTF03
-!*==FDTF04.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FDTF04(IOPT)
       SUBROUTINE FDTF04(IOPT)
 !
 ! *** FDTF04 updated by WIFD May 89 ***
@@ -867,12 +831,9 @@
       ENDIF
       RETURN
       END SUBROUTINE FDTF04
-!*==FDTF05.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FDTF05(IOPT)
       SUBROUTINE FDTF05(IOPT)
 !
 ! *** FDTF05 updated by WIFD/JCM 7 Mar 89 ***
@@ -1011,12 +972,9 @@
       DERPFN(8,1) = 1.
   100 RETURN
       END SUBROUTINE FDTF05
-!*==FDTF08.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FDTF08(IOPT)
       SUBROUTINE FDTF08(IOPT)
 !
 ! *** FDTF08 (formerly 04) updated by WIFD May 89 ***
@@ -1157,12 +1115,9 @@
       ENDIF
   100 RETURN
       END SUBROUTINE FDTF08
-!*==FDTF12.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FDTF12(IOPT)
       SUBROUTINE FDTF12(IOPT)
 !
 ! *** FDTF12 by JBF 2 March 94 ***
@@ -1307,12 +1262,9 @@
       DERPFN(7,3) = WSQ
   100 RETURN
       END SUBROUTINE FDTF12
-!*==FTSB12.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FTSB12(MNS)
       SUBROUTINE FTSB12(MNS)
 !
 ! *** FTSB12 by JBF MAR 94 For N and M peaks with different SIGM and GAMM ***
@@ -1397,7 +1349,7 @@
         DI(I,5) = 0.
       ENDDO
 !
-!.. NOW FORM PRODUCTS IN FOURIER SPACE
+! NOW FORM PRODUCTS IN FOURIER SPACE
       DO I = 1, MNS
 ! LIMITS ARE SPECIFIC TO THIS VERSION WHERE EITHER 4&5 OR 6&7 ARE APPROPRIATE
         DO J = 2, NPKGEN(JPHASE,JSOURC) - 2
@@ -1421,7 +1373,7 @@
         FIT(I) = AIMAG(CFT)
       ENDDO
 !
-!.. DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
+! DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
       INV = 1
       CALL FT01A(MNS,INV,FRE,FIE)
       CALL FT01A(MNS,INV,FRT,FIT)
@@ -1430,7 +1382,7 @@
       DO J = 2, NPKGEN(JPHASE,JSOURC) - 2
         CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
       ENDDO
-!.. WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
+! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
       XTEM = 1./XPKDEL(KMOD)
       DO I = 1, MNS
         II = MOD(I+MN2M1,MNS) + 1
@@ -1441,7 +1393,6 @@
 !      JJ=J+1
 !      PKADD(II,JJ)= DR(I,J)*XTEM
 !   7  CONTINUE
-!
         PKADD(II,3) = DR(I,2)*XTEM
         PKADD(II,4) = DR(I,3)*XTEM
         IF (ISMAG(KNOW).EQ.0) THEN
@@ -1456,21 +1407,17 @@
           PKADD(II,8) = DR(I,5)*XTEM
         ENDIF
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE FTSB12
-!*==FTSUB2.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FTSUB2(MNS)
       SUBROUTINE FTSUB2(MNS)
 !
 ! *** FTSUB2 by WIFD Jun 88 ***
 !
       INCLUDE 'PARAMS.INC'
-!
+
       COMPLEX CFFT, DFFT, DDT, CFE, CFT
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -1485,7 +1432,6 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
@@ -1493,47 +1439,45 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       SW = PKFNVA(1)
       TAUF = PKFNVA(2)
       TAUS = PKFNVA(3)
       SIG = PKFNVA(4)
       GAM = PKFNVA(5)
       SW1 = 1. - SW
-!
       C2TEM = PI/(FLOAT(MNS)*XPKDEL(KMOD))
       CTEM = 2.*C2TEM
       FTEMF = CTEM*TAUF
       FTEMS = CTEM*TAUS
       GTEM = CTEM*SIG
       CLTEM = C2TEM*GAM
-!
       MN2 = MNS/2
       MN2M1 = MN2 - 1
       MN2P1 = MN2 + 1
       DO I = 1, MNS
         II = MOD(I+MN2,MNS) - MN2P1
-!.. FAST EXPONENTIAL DECAY
+! FAST EXPONENTIAL DECAY
         ARG = FTEMF*FLOAT(II)
         FR(I,2) = 1./(1.+ARG*ARG)
         FI(I,2) = ARG*FR(I,2)
         ATEMF = CTEM*FLOAT(II)*FR(I,2)**2
         DR(I,2) = -2.*ARG*ATEMF
         DI(I,2) = (1.-ARG*ARG)*ATEMF
-!.. SLOW EXPONENTIAL DECAY
+! SLOW EXPONENTIAL DECAY
         ARG = FTEMS*FLOAT(II)
         FR(I,3) = 1./(1.+ARG*ARG)
         FI(I,3) = ARG*FR(I,3)
         ATEMS = CTEM*FLOAT(II)*FR(I,3)**2
         DR(I,3) = -2.*ARG*ATEMS
         DI(I,3) = (1.-ARG*ARG)*ATEMS
-!.. GAUSSIAN
+! GAUSSIAN
         ARG = GTEM*FLOAT(II)
         FR(I,4) = EXP(-0.5*ARG*ARG)
         FI(I,4) = 0.
         DR(I,4) = -ARG*ARG*FR(I,4)/SIG
         DI(I,4) = 0.
-!.. LORENTZIAN
+! LORENTZIAN
         AFII = ABS(FLOAT(II))
         ARG = CLTEM*AFII
         FR(I,5) = EXP(-ARG)
@@ -1541,8 +1485,7 @@
         DR(I,5) = -C2TEM*AFII*FR(I,5)
         DI(I,5) = 0.
       ENDDO
-!
-!.. NOW FORM PRODUCTS IN FOURIER SPACE
+! NOW FORM PRODUCTS IN FOURIER SPACE
       DO I = 1, MNS
         DO J = 2, NPKGEN(JPHASE,JSOURC)
           CFFT(J) = CMPLX(FR(I,J),FI(I,J))
@@ -1563,16 +1506,14 @@
         FRT(I) = REAL(CFT)
         FIT(I) = AIMAG(CFT)
       ENDDO
-!
-!.. DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
+! DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
       INV = 1
       CALL FT01A(MNS,INV,FRE,FIE)
       CALL FT01A(MNS,INV,FRT,FIT)
-!
       DO J = 2, NPKGEN(JPHASE,JSOURC)
         CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
       ENDDO
-!.. WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
+! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
       XTEM = 1./XPKDEL(KMOD)
       DO I = 1, MNS
         II = MOD(I+MN2M1,MNS) + 1
@@ -1583,21 +1524,17 @@
           PKADD(II,JJ) = DR(I,J)*XTEM
         ENDDO
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE FTSUB2
-!*==FTSUB3.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FTSUB3(MNS)
       SUBROUTINE FTSUB3(MNS)
 !
 ! *** FTSUB2 by WIFD ***
 !
       INCLUDE 'PARAMS.INC'
-!
+
       COMPLEX CFFT, DFFT, DDT, CFE, CFT
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -1612,7 +1549,6 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
@@ -1620,9 +1556,9 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       LOGICAL CANSMA
-!
+
       SW = PKFNVA(1)
       TAUF = PKFNVA(2)
       TAUS = PKFNVA(3)
@@ -1631,7 +1567,6 @@
       CAN = PKFNVA(6)
       CANSMA = PKFNVA(6).LT.0.01*XPKDEL(KMOD)
       SW1 = 1. - SW
-!
       C2TEM = PI/(FLOAT(MNS)*XPKDEL(KMOD))
       CTEM = 2.*C2TEM
       FTEMF = CTEM*TAUF
@@ -1639,40 +1574,39 @@
       GTEM = CTEM*SIG
       CLTEM = C2TEM*GAM
       CATEM = CTEM*CAN
-!
       MN2 = MNS/2
       MN2M1 = MN2 - 1
       MN2P1 = MN2 + 1
       DO I = 1, MNS
         II = MOD(I+MN2,MNS) - MN2P1
-!.. FAST EXPONENTIAL DECAY
+! FAST EXPONENTIAL DECAY
         ARG = FTEMF*FLOAT(II)
         FR(I,2) = 1./(1.+ARG*ARG)
         FI(I,2) = ARG*FR(I,2)
         ATEMF = CTEM*FLOAT(II)*FR(I,2)**2
         DR(I,2) = -2.*ARG*ATEMF
         DI(I,2) = (1.-ARG*ARG)*ATEMF
-!.. SLOW EXPONENTIAL DECAY
+! SLOW EXPONENTIAL DECAY
         ARG = FTEMS*FLOAT(II)
         FR(I,3) = 1./(1.+ARG*ARG)
         FI(I,3) = ARG*FR(I,3)
         ATEMS = CTEM*FLOAT(II)*FR(I,3)**2
         DR(I,3) = -2.*ARG*ATEMS
         DI(I,3) = (1.-ARG*ARG)*ATEMS
-!.. GAUSSIAN
+! GAUSSIAN
         ARG = GTEM*FLOAT(II)
         FR(I,4) = EXP(-0.5*ARG*ARG)
         FI(I,4) = 0.
         DR(I,4) = -ARG*ARG*FR(I,4)/SIG
         DI(I,4) = 0.
-!.. LORENTZIAN
+! LORENTZIAN
         AFII = ABS(FLOAT(II))
         ARG = CLTEM*AFII
         FR(I,5) = EXP(-ARG)
         FI(I,5) = 0.
         DR(I,5) = -C2TEM*AFII*FR(I,5)
         DI(I,5) = 0.
-!.. TRUNCATED QUADRATIC FUNCTION
+! TRUNCATED QUADRATIC FUNCTION
         ARG = CATEM*FLOAT(II)
         IF (CANSMA .OR. II.EQ.0) THEN
           FR(I,6) = 1.
@@ -1694,9 +1628,7 @@
           DI(I,6) = TCAN*(CVT3*SINARG+CVT4*COSARG)
         ENDIF
       ENDDO
-!
-!
-!.. NOW FORM PRODUCTS IN FOURIER SPACE
+! NOW FORM PRODUCTS IN FOURIER SPACE
       DO I = 1, MNS
         DO J = 2, NPKGEN(JPHASE,JSOURC)
           CFFT(J) = CMPLX(FR(I,J),FI(I,J))
@@ -1718,16 +1650,14 @@
         FRT(I) = REAL(CFT)
         FIT(I) = AIMAG(CFT)
       ENDDO
-!
-!.. DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
+! DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
       INV = 1
       CALL FT01A(MNS,INV,FRE,FIE)
       CALL FT01A(MNS,INV,FRT,FIT)
-!
       DO J = 2, NPKGEN(JPHASE,JSOURC)
         CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
       ENDDO
-!.. WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
+! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
       XTEM = 1./XPKDEL(KMOD)
       DO I = 1, MNS
         II = MOD(I+MN2M1,MNS) + 1
@@ -1738,15 +1668,11 @@
           PKADD(II,JJ) = DR(I,J)*XTEM
         ENDDO
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE FTSUB3
-!*==FTSUB4.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE FTSUB4(MNS)
       SUBROUTINE FTSUB4(MNS)
 !
 ! *** FTSUB4 BY WIFD MAY 89***
@@ -1755,7 +1681,7 @@
 !C 19B
 !H
       INCLUDE 'PARAMS.INC'
-!
+
       COMPLEX CFFT, DFFT, DDT, CFE, CFT, CFED, CFEDI, DFED, CIARG, DPED
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -1770,7 +1696,6 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -1778,7 +1703,7 @@
       DIMENSION CFFT(8), DFFT(8), DDT(8), FR(256,8), FI(256,8),         &
      &          DR(256,8), DI(256,8), FRE(256), FIE(256), FRT(256),     &
      &          FIT(256)
-!
+
       SW = PKFNVA(1)
       TAUF = PKFNVA(2)
       TAUS = PKFNVA(3)
@@ -1787,20 +1712,18 @@
       POW = PKFNVA(6)
       POW1 = POW + 1.
       SW1 = 1. - SW
-!
       C2TEM = PI/(FLOAT(MNS)*XPKDEL(KMOD))
       CTEM = 2.*C2TEM
       FTEMF = CTEM*TAUF
       FTEMS = CTEM*TAUS
       GTEM = CTEM*SIG
       CLTEM = C2TEM*GAM
-!
       MN2 = MNS/2
       MN2M1 = MN2 - 1
       MN2P1 = MN2 + 1
       DO I = 1, MNS
         II = MOD(I+MN2,MNS) - MN2P1
-!.. FAST EXPONENTIAL DECAY
+! FAST EXPONENTIAL DECAY
         ARG = FTEMF*FLOAT(II)
         CFEDI = CMPLX(1.,-ARG)
         CFED = CFEDI**(-POW1)
@@ -1813,20 +1736,20 @@
         DPED = -CFED*CLOG(CFEDI)
         DR(I,6) = REAL(DPED)
         DI(I,6) = AIMAG(DPED)
-!.. SLOW EXPONENTIAL DECAY
+! SLOW EXPONENTIAL DECAY
         ARG = FTEMS*FLOAT(II)
         FR(I,3) = 1./(1.+ARG*ARG)
         FI(I,3) = ARG*FR(I,3)
         ATEMS = CTEM*FLOAT(II)*FR(I,3)**2
         DR(I,3) = -2.*ARG*ATEMS
         DI(I,3) = (1.-ARG*ARG)*ATEMS
-!.. GAUSSIAN
+! GAUSSIAN
         ARG = GTEM*FLOAT(II)
         FR(I,4) = EXP(-0.5*ARG*ARG)
         FI(I,4) = 0.
         DR(I,4) = -ARG*ARG*FR(I,4)/SIG
         DI(I,4) = 0.
-!.. LORENTZIAN
+! LORENTZIAN
         AFII = ABS(FLOAT(II))
         ARG = CLTEM*AFII
         FR(I,5) = EXP(-ARG)
@@ -1834,8 +1757,7 @@
         DR(I,5) = -C2TEM*AFII*FR(I,5)
         DI(I,5) = 0.
       ENDDO
-!
-!.. NOW FORM PRODUCTS IN FOURIER SPACE
+! NOW FORM PRODUCTS IN FOURIER SPACE
       DO I = 1, MNS
         DO J = 2, NPKGEN(JPHASE,JSOURC)
           IF (J.NE.6) CFFT(J) = CMPLX(FR(I,J),FI(I,J))
@@ -1859,16 +1781,14 @@
         FRT(I) = REAL(CFT)
         FIT(I) = AIMAG(CFT)
       ENDDO
-!
-!.. DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
+! DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
       INV = 1
       CALL FT01A(MNS,INV,FRE,FIE)
       CALL FT01A(MNS,INV,FRT,FIT)
-!
       DO J = 2, NPKGEN(JPHASE,JSOURC)
         CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
       ENDDO
-!.. WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
+! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
       XTEM = 1./XPKDEL(KMOD)
       DO I = 1, MNS
         II = MOD(I+MN2M1,MNS) + 1
@@ -1879,21 +1799,17 @@
           PKADD(II,JJ) = DR(I,J)*XTEM
         ENDDO
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE FTSUB4
-!*==FTSUB5.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE FTSUB5(MNS)
       SUBROUTINE FTSUB5(MNS)
 !
 ! *** FTSUB5 by WIFD Jun 88 ***
 !
       INCLUDE 'PARAMS.INC'
-!
+
       COMPLEX CFFT, DFFT, DDT, CFE, CFT, CTM1, CTM2, CFE2, CFT2, CF67
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -1908,7 +1824,6 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
@@ -1917,7 +1832,7 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       SW = PKFNVA(1)
       TAUF = PKFNVA(2)
       TAUS = PKFNVA(3)
@@ -1928,7 +1843,6 @@
       SZ = PKFNVA(8)
       SW1 = 1. - SW
       SZ1 = 1. - SZ
-!
       C2TEM = PI/(FLOAT(MNS)*XPKDEL(KMOD))
       CTEM = 2.*C2TEM
       FTEMF = CTEM*TAUF
@@ -1937,40 +1851,39 @@
       CLTEM = C2TEM*GAM
       EGTEM = CTEM*ESIG
       STEM = CTEM*SHFT
-!
       MN2 = MNS/2
       MN2M1 = MN2 - 1
       MN2P1 = MN2 + 1
       DO I = 1, MNS
         II = MOD(I+MN2,MNS) - MN2P1
-!.. FAST EXPONENTIAL DECAY
+! FAST EXPONENTIAL DECAY
         ARG = FTEMF*FLOAT(II)
         FR(I,2) = 1./(1.+ARG*ARG)
         FI(I,2) = ARG*FR(I,2)
         ATEMF = CTEM*FLOAT(II)*FR(I,2)**2
         DR(I,2) = -2.*ARG*ATEMF
         DI(I,2) = (1.-ARG*ARG)*ATEMF
-!.. SLOW EXPONENTIAL DECAY
+! SLOW EXPONENTIAL DECAY
         ARG = FTEMS*FLOAT(II)
         FR(I,3) = 1./(1.+ARG*ARG)
         FI(I,3) = ARG*FR(I,3)
         ATEMS = CTEM*FLOAT(II)*FR(I,3)**2
         DR(I,3) = -2.*ARG*ATEMS
         DI(I,3) = (1.-ARG*ARG)*ATEMS
-!.. GAUSSIAN
+! GAUSSIAN
         ARG = GTEM*FLOAT(II)
         FR(I,4) = EXP(-0.5*ARG*ARG)
         FI(I,4) = 0.
         DR(I,4) = -ARG*ARG*FR(I,4)/SIG
         DI(I,4) = 0.
-!.. LORENTZIAN
+! LORENTZIAN
         AFII = ABS(FLOAT(II))
         ARG = CLTEM*AFII
         FR(I,5) = EXP(-ARG)
         FI(I,5) = 0.
         DR(I,5) = -C2TEM*AFII*FR(I,5)
         DI(I,5) = 0.
-!.. EXTRA GAUSSIAN
+! EXTRA GAUSSIAN
         ARG = EGTEM*FLOAT(II)
         FR(I,6) = EXP(-0.5*ARG*ARG)
         FI(I,6) = 0.
@@ -1980,15 +1893,14 @@
           DR(I,6) = -ARG*ARG*FR(I,6)/ESIG
         ENDIF
         DI(I,6) = 0.
-!.. SHIFT
+! SHIFT
         ARG = STEM*FLOAT(II)
         FR(I,7) = COS(ARG)
         FI(I,7) = SIN(ARG)
         DR(I,7) = -CTEM*FI(I,7)
         DI(I,7) = CTEM*FR(I,7)
       ENDDO
-!
-!.. NOW FORM PRODUCTS IN FOURIER SPACE
+! NOW FORM PRODUCTS IN FOURIER SPACE
       DO I = 1, MNS
         DO J = 2, NPKGEN(JPHASE,JSOURC) - 1
           CFFT(J) = CMPLX(FR(I,J),FI(I,J))
@@ -2020,18 +1932,16 @@
         FRT2(I) = REAL(CFT2)
         FIT2(I) = AIMAG(CFT2)
       ENDDO
-!
-!.. DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
+! DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
       INV = 1
       CALL FT01A(MNS,INV,FRE,FIE)
       CALL FT01A(MNS,INV,FRT,FIT)
       CALL FT01A(MNS,INV,FRE2,FIE2)
       CALL FT01A(MNS,INV,FRT2,FIT2)
-!
       DO J = 2, NPKGEN(JPHASE,JSOURC) - 1
         CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
       ENDDO
-!.. WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
+! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
       XTEM = 1./XPKDEL(KMOD)
       DO I = 1, MNS
         II = MOD(I+MN2M1,MNS) + 1
@@ -2044,17 +1954,13 @@
           PKADD(II,JJ) = DR(I,J)*XTEM
         ENDDO
         PKADD(II,NPKGEN(JPHASE,JSOURC)+1)                               &
-     &    = ((SW*FRE(I)+SW1*FRT(I))-(SW*FRE2(I)+SW1*FRT2(I)))*XTEM
+         = ((SW*FRE(I)+SW1*FRT(I))-(SW*FRE2(I)+SW1*FRT2(I)))*XTEM
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE FTSUB5
-!*==FTSUB8.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FTSUB8(MNS)
       SUBROUTINE FTSUB8(MNS)
 !
 ! *** FTSUB8 (formerly 4) by WIFD May 89 ***
@@ -2074,7 +1980,6 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
@@ -2082,7 +1987,7 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       SW = PKFNVA(1)
       TAUF = PKFNVA(2)
       TAUS = PKFNVA(3)
@@ -2090,7 +1995,6 @@
       GAM1 = PKFNVA(5)
       GAM2 = PKFNVA(6)
       SW1 = 1. - SW
-!
       C2TEM = PI/(FLOAT(MNS)*XPKDEL(KMOD))
       CTEM = 2.*C2TEM
       FTEMF = CTEM*TAUF
@@ -2098,40 +2002,39 @@
       GTEM = CTEM*SIG
       CLTEM1 = C2TEM*GAM1
       CLTEM2 = C2TEM*GAM2
-!
       MN2 = MNS/2
       MN2M1 = MN2 - 1
       MN2P1 = MN2 + 1
       DO I = 1, MNS
         II = MOD(I+MN2,MNS) - MN2P1
-!.. FAST EXPONENTIAL DECAY
+! FAST EXPONENTIAL DECAY
         ARG = FTEMF*FLOAT(II)
         FR(I,2) = 1./(1.+ARG*ARG)
         FI(I,2) = ARG*FR(I,2)
         ATEMF = CTEM*FLOAT(II)*FR(I,2)**2
         DR(I,2) = -2.*ARG*ATEMF
         DI(I,2) = (1.-ARG*ARG)*ATEMF
-!.. SLOW EXPONENTIAL DECAY
+! SLOW EXPONENTIAL DECAY
         ARG = FTEMS*FLOAT(II)
         FR(I,3) = 1./(1.+ARG*ARG)
         FI(I,3) = ARG*FR(I,3)
         ATEMS = CTEM*FLOAT(II)*FR(I,3)**2
         DR(I,3) = -2.*ARG*ATEMS
         DI(I,3) = (1.-ARG*ARG)*ATEMS
-!.. GAUSSIAN
+! GAUSSIAN
         ARG = GTEM*FLOAT(II)
         FR(I,4) = EXP(-0.5*ARG*ARG)
         FI(I,4) = 0.
         DR(I,4) = -ARG*ARG*FR(I,4)/SIG
         DI(I,4) = 0.
-!.. LORENTZIAN - STRAIN
+! LORENTZIAN - STRAIN
         AFII = ABS(FLOAT(II))
         ARG = CLTEM1*AFII
         FR(I,5) = EXP(-ARG)
         FI(I,5) = 0.
         DR(I,5) = -C2TEM*AFII*FR(I,5)
         DI(I,5) = 0.
-!.. LORENTZIAN - PARTICLE SIZE
+! LORENTZIAN - PARTICLE SIZE
         AFII = ABS(FLOAT(II))
         ARG = CLTEM2*AFII
         FR(I,6) = EXP(-ARG)
@@ -2139,8 +2042,7 @@
         DR(I,6) = -C2TEM*AFII*FR(I,6)
         DI(I,6) = 0.
       ENDDO
-!
-!.. NOW FORM PRODUCTS IN FOURIER SPACE
+! NOW FORM PRODUCTS IN FOURIER SPACE
       DO I = 1, MNS
         DO J = 2, NPKGEN(JPHASE,JSOURC)
           CFFT(J) = CMPLX(FR(I,J),FI(I,J))
@@ -2162,16 +2064,14 @@
         FRT(I) = REAL(CFT)
         FIT(I) = AIMAG(CFT)
       ENDDO
-!
-!.. DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
+! DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
       INV = 1
       CALL FT01A(MNS,INV,FRE,FIE)
       CALL FT01A(MNS,INV,FRT,FIT)
-!
       DO J = 2, NPKGEN(JPHASE,JSOURC)
         CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
       ENDDO
-!.. WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
+! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
       XTEM = 1./XPKDEL(KMOD)
       DO I = 1, MNS
         II = MOD(I+MN2M1,MNS) + 1
@@ -2182,15 +2082,11 @@
           PKADD(II,JJ) = DR(I,J)*XTEM
         ENDDO
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE FTSUB8
-!*==PCCN01.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE PCCN01(N)
       SUBROUTINE PCCN01(N)
 !
 ! *** PCCN01 updated by JCM 28 Feb 88 ***
@@ -2205,7 +2101,6 @@
 !A N=6: Set SRGK=maximum sin theta/lambda, given ARGMAX(JSOURC) = max 2theta.
 !A N=7: (Not used yet) set up to use PFXX(7)
 !P For entries 2,5, WLGTH must hold lambda, and DSTAR(KNOW) d*
-!
 !
       INCLUDE 'PARAMS.INC'
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
@@ -2230,14 +2125,12 @@
      &                ARGSTP(5), PCON
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6),          &
      &                NZERSP(9,5)
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       GOTO (100,2,100,100,2,6,100), N
-!
 ! N=2OR 5:
 ! ARGK=ZERO+ARCSIN(......)
     2 TEM = 0.5*WLGTH*DSTAR(KNOW)
@@ -2251,15 +2144,13 @@
       DKDDS = DEGREE(DKDDS)
       DKDZER(1) = 1.
       GOTO 100
-!
 ! MAX SIN THETA/LAMBDA:
     6 STHMXX(JSOURC) = SIN(RADIAN(ARGMAX(JSOURC)/2.))/WLGTH
   100 RETURN
       END SUBROUTINE PCCN01
-!*==PCLX01.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-! LEVEL 3      SUBROUTINE PCLX01(N)
       SUBROUTINE PCLX01(N)
 !
 ! *** PCLX01 updated by WIFD/JCM 28 Feb 88 ***
@@ -2291,15 +2182,13 @@
      &                ARGSTP(5), PCON
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6),          &
      &                NZERSP(9,5)
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
       COMMON /XRAYC / ARGK2
-!
+
       GOTO (100,2,100,100,2,6,100), N
-!
 ! N=2 OR 5:
 ! ARGK=ZERO+ARCSIN(......)
     2 TEM1 = 0.5*ALAMBD(1,JSOURC)*DSTAR(KNOW)
@@ -2312,15 +2201,14 @@
       DKDDS = DEGREE(0.5*WLGTH/(DSTAR(KNOW)*SQRT(1.-TEM1*TEM2)))
       DKDZER(1) = 1.
       GOTO 100
-!
 ! MAX SIN THETA/LAMBDA:
     6 STHMXX(JSOURC) = SIN(RADIAN(ARGMAX(JSOURC)/2.))/WLGTH
   100 RETURN
+
       END SUBROUTINE PCLX01
-!*==PCTF01.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-! LEVEL 6      SUBROUTINE PCTF01(N)
       SUBROUTINE PCTF01(N)
 !
 ! *** PCTF01 updated by JCM 28 Feb 88 ***
@@ -2408,12 +2296,9 @@
      &                 *PCON/(ARGMIN(JSOURC)-ZEROSP(1,JPHASE,JSOURC))
   100 RETURN
       END SUBROUTINE PCTF01
-!*==PCTF91.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE PCTF91(N)
       SUBROUTINE PCTF91(N)
 !
 ! *** PCTF91 updated by JCM 28 Feb 88 ***
@@ -2510,12 +2395,9 @@
 !
   100 RETURN
       END SUBROUTINE PCTF91
-!*==PFCN01.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE PFCN01(N)
       SUBROUTINE PFCN01(N)
 !
 ! *** PFCN01 updated by JCM 27 May 89 ***
@@ -2633,17 +2515,9 @@
 !
   100 RETURN
       END SUBROUTINE PFCN01
-!*==PFLX01.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!.. Insert PFCN03 here
-! LEVEL 6      SUBROUTINE PFCN03(N)
-!
-!
-!
-!
-! LEVEL 6      SUBROUTINE PFLX01(N)
       SUBROUTINE PFLX01(N)
 !
 ! *** PFLX01 updated by JCM 27 May 89 ***
@@ -2792,12 +2666,9 @@
 !
   100 RETURN
       END SUBROUTINE PFLX01
-!*==PFLX02.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE PFLX02(N)
       SUBROUTINE PFLX02(N)
 !
 ! *** PFLX02 updated by JCM 27 May 89 ***
@@ -2944,14 +2815,9 @@
 !
   100 RETURN
       END SUBROUTINE PFLX02
-!*==PFTF01.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-! LEVEL 6      SUBROUTINE PFTF01(N)
       SUBROUTINE PFTF01(N)
 !
 ! *** PFTF01 updated by JCM 27 May 89 ***
@@ -3214,14 +3080,9 @@
       GOTO 100
   100 RETURN
       END SUBROUTINE PFTF01
-!*==PFTF02.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-! LEVEL 6      SUBROUTINE PFTF02(N)
       SUBROUTINE PFTF02(N)
 !
 ! *** PFTF02 updated by JCM 27 May 89 ***
@@ -3395,8 +3256,6 @@
           ENDDO
         ENDDO
       ENDIF
-!
-!
 !.. FFT OVER
 !... DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
    26 JARGI = NINT((ARGI-ARGK)/XPKDEL(KMOD))
@@ -3410,11 +3269,9 @@
       C3DN(1) = POFF - 0.5
       C3DN(2) = -2.*POFF
       C3DN(3) = POFF + 0.5
-!
       YNORM = 0.
       DYNDKQ = 0.
       CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
-!
       DO I = 1, 3
         II = IARGI + I - 2
         PKTEM = PKLIST(II,1,KMOD)
@@ -3425,8 +3282,7 @@
           DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKLIST(II,NPKD1,KMOD)
         ENDDO
       ENDDO
-!
-!.. NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
+! NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
       IF (TESTOV(2.,YNORM)) THEN
         DYNDKQ = 0.
         CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
@@ -3435,7 +3291,6 @@
         CALL GMSCA(DYNDVQ,DYNDVQ,1./YNORM,1,NPKGEN(JPHASE,JSOURC))
       ENDIF
       GOTO 100
-!
 ! PRE-PROFILE REFINEMENT STAGE
     5 CALL FDTF02(1)
       DEL = ARGI - ARGK
@@ -3448,9 +3303,7 @@
   510 TEMLIM = CAULIM + SQRT(TEMSQ)
       REFUSE = ABS(DEL).GT.TEMLIM
       GOTO 100
-!
 ! N=6 *** CAILS *** SETTING UP SLACK AND STRICT CONSTRAINTS
-!
     6 CALL FDTF02(1)
       DELT = ABS(AKLO-AKHI)
       AVTAU = PKFNVA(1)*PKFNVA(2) + (1.-PKFNVA(1))*PKFNVA(3)
@@ -3461,18 +3314,15 @@
       IF (DELT.GE.SLKTOL*FWHME) GOTO 100
       SLACK = EXP(1.-(DELT/(SLKTOL*FWHME))**2)
       GOTO 100
-!
     7 CALL FDTF02(1)
       F4PAR(2,KNOW) = PKFNVA(4)
       GOTO 100
   100 RETURN
+
       END SUBROUTINE PFTF02
-!*==PFTF03.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE PFTF03(N)
       SUBROUTINE PFTF03(N)
 !
 ! *** PFTF03 updated by JCM 29 May 89 ***
@@ -3489,8 +3339,8 @@
 !A      by a strict or slack relationship.
 !A N=7: SAPS entry to obey FDXXXX to set up a value(s) for PKFNVA
 !
-!
       INCLUDE 'PARAMS.INC'
+
       LOGICAL TESTOV
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -3517,13 +3367,11 @@
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
      &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
      &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -3536,7 +3384,6 @@
       DATA IWTF03/3, 3, 0, 3, 4, 0, 3, 5, 0, 3, 6, 0, 3, 7, 0, 3, 8, 0/
 !
       GOTO (10,1,2,100,100,5,6,7), N + 1
-!
 ! N=0: SET UP "DATA SOURCE TOF, PEAK TYPE 03"
    10 NPKGEN(JPHASE,JSOURC) = 6
       NGEN4(JPHASE,JSOURC) = 2
@@ -3551,24 +3398,21 @@
         PWD(I,JPHASE,JSOURC) = WDTF03(I)
       ENDDO
       GOTO 100
-!
 ! N=1: ADD PACKED VOCABULARY FOR THIS SOURCE, THIS PHASE, TO THE MAIN LIST:
     1 CALL VOCAB(WDTF03,IWTF03,NW)
       GOTO 100
-!
 ! PROFILE REFINEMENT STAGE:
     2 CALL FDTF03(2)
-!.. FIRSTLY DECIDE WHETHER THE KTH PEAK IS ALREADY STORED IN THE
-!.. ARRAY PKLIST. AT THIS POINT REFUSE = (K .EQ. KPOINT(KMOD))
-!.. DETERMINED IN SUBROUTINE CALTF1 WHICH CALLS THIS ENTRY (IOPT=2)
+! FIRSTLY DECIDE WHETHER THE KTH PEAK IS ALREADY STORED IN THE
+! ARRAY PKLIST. AT THIS POINT REFUSE = (K .EQ. KPOINT(KMOD))
+! DETERMINED IN SUBROUTINE CALTF1 WHICH CALLS THIS ENTRY (IOPT=2)
       IF (REFUSE) GOTO 26
+! THE PEAK HAS NOT OCCURRED ALREADY - CALCULATE THE COMPLETE PEAK
+! SHAPE OF THE KTH PEAK BY FFT.
 !
-!.. THE PEAK HAS NOT OCCURRED ALREADY - CALCULATE THE COMPLETE PEAK
-!.. SHAPE OF THE KTH PEAK BY FFT.
+! FFT CALCULATION STAGE IN PROFILE REFINEMENT
 !
-!.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
-!
-!.. FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
+! FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
       MN = 64
       MN2 = MN/2
       TEMSQ = (TOLER(4,JPHASE,JSOURC)*PKFNVA(4))**2
@@ -3578,11 +3422,9 @@
       CAULIM = TOLER(5,JPHASE,JSOURC)*PKFNVA(5) + TOLER(6,JPHASE,JSOURC)&
      &         *PKFNVA(6)
       XPKDEL(KMOD) = (SQRT(TEMSQ)+CAULIM)/FLOAT(MN2)
-!
-!.. NOW SET UP FAST FOURIER TRANSFORM
-!.. THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
-!.. DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
-!
+! NOW SET UP FAST FOURIER TRANSFORM
+! THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
+! DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
       IEAGLE = NFFT
       IF (IEAGLE.EQ.0) IEAGLE = NINT(TOLER(1,JPHASE,JSOURC))
       IF (IEAGLE.EQ.3) THEN
@@ -3643,27 +3485,22 @@
           ENDDO
         ENDDO
       ENDIF
-!
-!
-!
-!.. FFT OVER
-!... DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
+! FFT OVER
+! DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
    26 JARGI = NINT((ARGI-ARGK)/XPKDEL(KMOD))
       IARGI = JARGI + MN2 + 1
-!.. WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
+! WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
       POFF = (ARGI-ARGK)/XPKDEL(KMOD) - FLOAT(JARGI)
-!.. WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
+! WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
       C3FN(1) = 0.5*POFF*(POFF-1.)
       C3FN(2) = 1. - POFF**2
       C3FN(3) = 0.5*POFF*(POFF+1.)
       C3DN(1) = POFF - 0.5
       C3DN(2) = -2.*POFF
       C3DN(3) = POFF + 0.5
-!
       YNORM = 0.
       DYNDKQ = 0.
       CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
-!
       DO I = 1, 3
         II = IARGI + I - 2
         PKTEM = PKLIST(II,1,KMOD)
@@ -3674,7 +3511,6 @@
           DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKLIST(II,NPKD1,KMOD)
         ENDDO
       ENDDO
-!
 !.. NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
       IF (TESTOV(2.,YNORM)) THEN
         DYNDKQ = 0.
@@ -3684,7 +3520,6 @@
         CALL GMSCA(DYNDVQ,DYNDVQ,1./YNORM,1,NPKGEN(JPHASE,JSOURC))
       ENDIF
       GOTO 100
-!
 ! PRE-PROFILE REFINEMENT STAGE
     5 CALL FDTF03(1)
       DEL = ARGI - ARGK
@@ -3698,9 +3533,7 @@
   510 TEMLIM = CAULIM + SQRT(TEMSQ)
       REFUSE = ABS(DEL).GT.TEMLIM
       GOTO 100
-!
 ! N=6 *** CAILS *** SETTING UP SLACK AND STRICT CONSTRAINTS
-!
     6 CALL FDTF03(1)
       DELT = ABS(AKLO-AKHI)
       AVTAU = PKFNVA(1)*PKFNVA(2) + (1.-PKFNVA(1))*PKFNVA(3)
@@ -3711,18 +3544,15 @@
       IF (DELT.GE.SLKTOL*FWHME) GOTO 100
       SLACK = EXP(1.-(DELT/(SLKTOL*FWHME))**2)
       GOTO 100
-!
     7 CALL FDTF03(1)
       F4PAR(2,KNOW) = PKFNVA(4)
       GOTO 100
   100 RETURN
+
       END SUBROUTINE PFTF03
-!*==PFTF04.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE PFTF04(N)
       SUBROUTINE PFTF04(N)
 !
 ! *** PFTF04 updated by WIFD/JCM 19 Jul 88 ***
@@ -3991,17 +3821,11 @@
       F4PAR(3,KNOW) = PKFNVA(4)
       GOTO 100
   100 RETURN
+
       END SUBROUTINE PFTF04
-!*==PFTF05.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!** NB DIFFERENT NAMES FOR GENERA OF FAMILY 4 - SETTLE THIS WITH STEVE & BILL
-!**     A'INTS','SWHS','SIGS',
-!**     A4,1,0, 4,2,0, 4,3,0,
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 4      SUBROUTINE PFTF05(N)
       SUBROUTINE PFTF05(N)
 !
 ! *** PFTF05 updated by JCM 27 May 89 ***
@@ -4088,18 +3912,15 @@
       C1D3 = 1./3.
       C4D3 = 4./3.
       GOTO 100
-!
 ! N=1: ADD PACKED VOCABULARY FOR THIS SOURCE, THIS PHASE, TO THE MAIN LIST:
     1 CALL VOCAB(WDTF05,IWTF05,NW)
       GOTO 100
-!
 ! PROFILE REFINEMENT STAGE:
     2 CALL FDTF05(2)
 !.. FIRSTLY DECIDE WHETHER THE KTH PEAK IS ALREADY STORED IN THE
 !.. ARRAY PKLIST. AT THIS POINT REFUSE = (K .EQ. KPOINT(KMOD))
 !.. DETERMINED IN SUBROUTINE CALTF1 WHICH CALLS THIS ENTRY (IOPT=2)
       IF (REFUSE) GOTO 26
-!
 !.. THE PEAK HAS NOT OCCURRED ALREADY - CALCULATE THE COMPLETE PEAK
 !.. SHAPE OF THE KTH PEAK BY FFT.
 !
@@ -4180,8 +4001,6 @@
           ENDDO
         ENDDO
       ENDIF
-!
-!
 !.. FFT OVER
 !... DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
    26 JARGI = NINT((ARGI-ARGK)/XPKDEL(KMOD))
@@ -4210,7 +4029,6 @@
           DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKLIST(II,NPKD1,KMOD)
         ENDDO
       ENDDO
-!
 !.. NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
       IF (TESTOV(2.,YNORM)) THEN
         DYNDKQ = 0.
@@ -4220,7 +4038,6 @@
         CALL GMSCA(DYNDVQ,DYNDVQ,1./YNORM,1,NPKGEN(JPHASE,JSOURC))
       ENDIF
       GOTO 100
-!
 ! PRE-PROFILE REFINEMENT STAGE
     5 CALL FDTF05(1)
       DEL = ARGI - ARGK
@@ -4236,9 +4053,7 @@
       TEMLIM = CAULIM + SQRT(TEMSQ)
       REFUSE = ABS(DEL).GT.TEMLIM
       GOTO 100
-!
 ! N=6 *** CAILS *** SETTING UP SLACK AND STRICT CONSTRAINTS
-!
     6 CALL FDTF05(1)
       DELT = ABS(AKLO-AKHI)
       AVTAU = PKFNVA(1)*PKFNVA(2) + (1.-PKFNVA(1))*PKFNVA(3)
@@ -4254,13 +4069,11 @@
       F4PAR(2,KNOW) = PKFNVA(4)
       GOTO 100
   100 RETURN
+
       END SUBROUTINE PFTF05
-!*==PFTF08.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE PFTF08(N)
       SUBROUTINE PFTF08(N)
 !
 ! *** PFTF08 (formerly 04) updated by JCM 29 May 89 ***
@@ -4445,11 +4258,9 @@
       C3DN(1) = POFF - 0.5
       C3DN(2) = -2.*POFF
       C3DN(3) = POFF + 0.5
-!
       YNORM = 0.
       DYNDKQ = 0.
       CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
-!
       DO I = 1, 3
         II = IARGI + I - 2
         PKTEM = PKLIST(II,1,KMOD)
@@ -4460,7 +4271,6 @@
           DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKLIST(II,NPKD1,KMOD)
         ENDDO
       ENDDO
-!
 !.. NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
       IF (TESTOV(2.,YNORM)) THEN
         DYNDKQ = 0.
@@ -4470,7 +4280,6 @@
         CALL GMSCA(DYNDVQ,DYNDVQ,1./YNORM,1,NPKGEN(JPHASE,JSOURC))
       ENDIF
       GOTO 100
-!
 ! PRE-PROFILE REFINEMENT STAGE
     5 CALL FDTF08(1)
       DEL = ARGI - ARGK
@@ -4484,9 +4293,7 @@
   510 TEMLIM = CAULIM + SQRT(TEMSQ)
       REFUSE = ABS(DEL).GT.TEMLIM
       GOTO 100
-!
 ! N=6 *** CAILS *** SETTING UP SLACK AND STRICT CONSTRAINTS
-!
     6 CALL FDTF08(1)
       DELT = ABS(AKLO-AKHI)
       AVTAU = PKFNVA(1)*PKFNVA(2) + (1.-PKFNVA(1))*PKFNVA(3)
@@ -4497,316 +4304,16 @@
       IF (DELT.GE.SLKTOL*FWHME) GOTO 100
       SLACK = EXP(1.-(DELT/(SLKTOL*FWHME))**2)
       GOTO 100
-!
     7 CALL FDTF08(1)
       F4PAR(2,KNOW) = PKFNVA(5) + PKFNVA(6)
       F4PAR(3,KNOW) = PKFNVA(4)
       GOTO 100
   100 RETURN
+
       END SUBROUTINE PFTF08
-!*==PFTF12.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE PFTF12(N)
-      SUBROUTINE PFTF12(N)
-!
-! *** PFTF12 by JBF March 94 ***
-!
-!H Multiple entry Time of Flight Peak Function (type 12) routine with FFT
-!H and Voigt double exponential peak function
-!A On entry N=0,1,2,5,6 or 7:
-!A On entry N=0 sets up DATA SOURCE TOF, PEAK TYPE 12
-!A Entry N=1 adds packed vocabulary for this source and phase to the main list
-!A and reads and interprets the L PKFN cards.  These cards have a second word:
-!A     SWCH
-!A     TAUF
-!A     TAUS
-!A     SIGM    For nuclear peaks
-!A     GAMM    For nuclear peaks
-!A     MSIG    SIGM for magnetic peaks
-!A     MGAM    GAMM for magnetic peaks
-!A followed by the width parameters involved in this particular peak
-!A descriptor.
-!A
-!A COMMON/REFLNS/ISMAG=0 are for nuclear peaks (SIGM); entries with ISMAG =1
-!A are for magnetic peaks and use SMIG parameters for SIGM. EXTEND VALUES OF
-!A THIS SEMAPHORE AT A LATER DATE!
-!A
-!A Entry N=2 forms the normalised peak function, and puts it in YNORM.  It also
-!A gives all necessary derivatives of YNORM with respect to anything that could
-!A be a parameter.
-!A
-!A Entry N=5 sets LOGICAL REFUSE to say whether or not reflection to be used,
-!A i.e. whether this reflection is near enough to this intensity to contribute
-!A to it.
-!A
-!A Entry N=6: CAILS entry to determine whether near reflections should be
-!A related by a strict or slack relationship.
-!A
-!A Entry N=7: SAPS entry to obey FDXXXX to set up a value(s) for PKFNVA
-!
-!
-      INCLUDE 'PARAMS.INC'
-      LOGICAL TESTOV
-      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
-     &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-      COMMON /FFCONS/ C1D45, C20D45, C64D45, C1D3, C4D3
-      COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
-     &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
-     &                WTSLAK(1000), WEELEV, KOM16
-      LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
-      COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
-     &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
-     &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
-      DIMENSION NGENS(6), NSPC(6)
-      EQUIVALENCE (NGENS(1),NGENPS(1,1))
-      EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
-      LOGICAL REFUSE, CYC1, NOPKRF
-      COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
-     &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-      COMMON /PWORDS/ PWD(10,9,5)
-      CHARACTER*4 PWD
-!>> JCC Moved to an include file
-      INCLUDE 'REFLNS.INC'
-      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-      COMMON /SCRAT / C3FN(3), C3DN(3)
-!
-      PARAMETER (NW=7)
-      CHARACTER*4 WDTF12(NW)
-      DIMENSION IWTF12(3,NW)
-      DATA WDTF12/'SWCH', 'TAUF', 'TAUS', 'SIGM', 'GAMM', 'MSIG',       &
-     &     'MGAM'/
-      DATA IWTF12/3, 3, 0, 3, 4, 0, 3, 5, 0, 3, 6, 0, 3, 7, 0, 3, 8, 0, &
-     &     3, 9, 0/
-!
-      GOTO (10,1,2,100,100,5,6,7), N + 1
-!
-! N=0: SET UP "DATA SOURCE TOF, PEAK TYPE 12 NUCLEAR & MAGNETIC"
-   10 NPKGEN(JPHASE,JSOURC) = 7
-      NGEN4(JPHASE,JSOURC) = 3
-      LF3SP(3,JPHASE,JSOURC) = -2
-      LF3SP(4,JPHASE,JSOURC) = -2
-      LF3SP(5,JPHASE,JSOURC) = -2
-      LF3SP(6,JPHASE,JSOURC) = -3
-      LF3SP(7,JPHASE,JSOURC) = -3
-      LF3SP(8,JPHASE,JSOURC) = -3
-      LF3SP(9,JPHASE,JSOURC) = -3
-      LF6SP(1,JSOURC) = 1
-      DO I = 1, NPKGEN(JPHASE,JSOURC)
-        PWD(I,JPHASE,JSOURC) = WDTF12(I)
-      ENDDO
-      C1D45 = 1./45.
-      C20D45 = 20./45.
-      C64D45 = 64./45.
-      C1D3 = 1./3.
-      C4D3 = 4./3.
-      GOTO 100
-!
-! N=1: ADD PACKED VOCABULARY FOR THIS SOURCE, THIS PHASE, TO THE MAIN LIST:
-    1 CALL VOCAB(WDTF12,IWTF12,NW)
-      GOTO 100
-!
-! PROFILE REFINEMENT STAGE:
-    2 CALL FDTF12(2)
-!.. FIRSTLY DECIDE WHETHER THE KTH PEAK IS ALREADY STORED IN THE
-!.. ARRAY PKLIST. AT THIS POINT REFUSE = (K .EQ. KPOINT(KMOD))
-!.. DETERMINED IN SUBROUTINE CALTF1 WHICH CALLS THIS ENTRY (IOPT=2)
-      IF (REFUSE) GOTO 26
-!
-!.. THE PEAK HAS NOT OCCURRED ALREADY - CALCULATE THE COMPLETE PEAK
-!.. SHAPE OF THE KTH PEAK BY FFT.
-!
-!.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
-!
-!.. FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
-      MN = 64
-      MN2 = MN/2
-! THIS WILL BE MADE MORE GENERAL IN FUTURE - AT MOMENT WILL DEAL WITH HELI
-! STRUCTURES
-      IF (ISMAG(KNOW).EQ.0) THEN
-        TEMSQ = (TOLER(4,JPHASE,JSOURC)*PKFNVA(4))**2
-        CAULIM = TOLER(5,JPHASE,JSOURC)*PKFNVA(5)
-      ELSE
-        TEMSQ = (TOLER(6,JPHASE,JSOURC)*PKFNVA(6))**2
-        CAULIM = TOLER(7,JPHASE,JSOURC)*PKFNVA(7)
-      ENDIF
-      AVTAU = TOLER(2,JPHASE,JSOURC)*PKFNVA(2) + PKFNVA(1)              &
-     &        *TOLER(3,JPHASE,JSOURC)*PKFNVA(3)
-      TEMSQ = TEMSQ + AVTAU*AVTAU
-      XPKDEL(KMOD) = (SQRT(TEMSQ)+CAULIM)/FLOAT(MN2)
-!
-!.. NOW SET UP FAST FOURIER TRANSFORM
-!.. THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
-!.. DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
-!
-!*      IEAGLE=NFFT
-!*      IF (IEAGLE .EQ. 0) IEAGLE=NINT(TOLER(1,JPHASE,JSOURC))
-      IEAGLE = NINT(TOLER(1,JPHASE,JSOURC))
-      IF (IEAGLE.EQ.3) THEN
-        MNS = MN
-        CALL FTSB12(MNS)
-        II = MNS/2 - MN2
-        DO I = 1, MN
-          II = II + 1
-          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
-            PKLIST(I,J,KMOD) = (C1D45)*PKADD(II,J)
-          ENDDO
-        ENDDO
-        MNS = 2*MN
-        CALL FTSB12(MNS)
-        II = MNS/2 - MN2
-        DO I = 1, MN
-          II = II + 1
-          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
-            PKLIST(I,J,KMOD) = PKLIST(I,J,KMOD) - (C20D45)*PKADD(II,J)
-          ENDDO
-        ENDDO
-        MNS = 4*MN
-        CALL FTSB12(MNS)
-        II = MNS/2 - MN2
-        DO I = 1, MN
-          II = II + 1
-          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
-            PKLIST(I,J,KMOD) = PKLIST(I,J,KMOD) + (C64D45)*PKADD(II,J)
-          ENDDO
-        ENDDO
-      ELSEIF (IEAGLE.EQ.2) THEN
-        MNS = MN
-        CALL FTSB12(MNS)
-        II = MNS/2 - MN2
-        DO I = 1, MN
-          II = II + 1
-          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
-            PKLIST(I,J,KMOD) = -(C1D3)*PKADD(II,J)
-          ENDDO
-        ENDDO
-        MNS = 2*MN
-        CALL FTSB12(MNS)
-        II = MNS/2 - MN2
-        DO I = 1, MN
-          II = II + 1
-          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
-            PKLIST(I,J,KMOD) = PKLIST(I,J,KMOD) + (C4D3)*PKADD(II,J)
-          ENDDO
-        ENDDO
-      ELSE
-        MNS = MN
-        CALL FTSB12(MNS)
-        II = MNS/2 - MN2
-        DO I = 1, MN
-          II = II + 1
-          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
-            PKLIST(I,J,KMOD) = PKADD(II,J)
-          ENDDO
-        ENDDO
-      ENDIF
-!
-!
-!.. FFT OVER
-!... DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
-   26 JARGI = NINT((ARGI-ARGK)/XPKDEL(KMOD))
-      IARGI = JARGI + MN2 + 1
-!.. WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
-      POFF = (ARGI-ARGK)/XPKDEL(KMOD) - FLOAT(JARGI)
-!.. WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
-      C3FN(1) = 0.5*POFF*(POFF-1.)
-      C3FN(2) = 1. - POFF**2
-      C3FN(3) = 0.5*POFF*(POFF+1.)
-      C3DN(1) = POFF - 0.5
-      C3DN(2) = -2.*POFF
-      C3DN(3) = POFF + 0.5
-!
-      YNORM = 0.
-      DYNDKQ = 0.
-      CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
-!
-      DO I = 1, 3
-        II = IARGI + I - 2
-        PKTEM = PKLIST(II,1,KMOD)
-        YNORM = YNORM + C3FN(I)*PKTEM
-        DYNDKQ = DYNDKQ - C3DN(I)*PKTEM
-        DO NPKD = 1, NPKGEN(JPHASE,JSOURC)
-          NPKD1 = NPKD + 1
-          DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKLIST(II,NPKD1,KMOD)
-        ENDDO
-      ENDDO
-!
-!.. NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
-      IF (TESTOV(2.,YNORM)) THEN
-        DYNDKQ = 0.
-        CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
-      ELSE
-        DYNDKQ = DYNDKQ/(YNORM*XPKDEL(KMOD))
-        CALL GMSCA(DYNDVQ,DYNDVQ,1./YNORM,1,NPKGEN(JPHASE,JSOURC))
-      ENDIF
-      GOTO 100
-!
-! PRE-PROFILE REFINEMENT STAGE
-    5 CALL FDTF12(1)
-      DEL = ARGI - ARGK
-! THIS WILL BE MADE MORE GENERAL IN FUTURE - AT MOMENT WILL DEAL WITH HELI
-! STRUCTURES
-      IF (ISMAG(KNOW).EQ.0) THEN
-        TEMSQ = (TOLER(4,JPHASE,JSOURC)*PKFNVA(4))**2
-        CAULIM = TOLER(5,JPHASE,JSOURC)*PKFNVA(5)
-      ELSE
-        TEMSQ = (TOLER(6,JPHASE,JSOURC)*PKFNVA(6))**2
-        CAULIM = TOLER(7,JPHASE,JSOURC)*PKFNVA(5)
-      ENDIF
-      IF (DEL) 510, 510, 520
-  520 AVTAU = PKFNVA(1)*TOLER(2,JPHASE,JSOURC)*PKFNVA(2)                &
-     &        + (1.-PKFNVA(1))*TOLER(3,JPHASE,JSOURC)*PKFNVA(3)
-      TEMSQ = TEMSQ + AVTAU*AVTAU
-  510 TEMLIM = CAULIM + SQRT(TEMSQ)
-      REFUSE = ABS(DEL).GT.TEMLIM
-      GOTO 100
-!
-! N=6 *** CAILS *** SETTING UP SLACK AND STRICT CONSTRAINTS
-!
-    6 CALL FDTF12(1)
-      DELT = ABS(AKLO-AKHI)
-      AVTAU = PKFNVA(1)*PKFNVA(2) + (1.-PKFNVA(1))*PKFNVA(3)
-! SQRT 8 LOG 2 AND LOG 2:
-      IF (ISMAG(KNOW).EQ.0) THEN
-        FWHME = SQL2X8*PKFNVA(4) + ALOG2*AVTAU
-      ELSE
-        FWHME = SQL2X8*PKFNVA(6) + ALOG2*AVTAU
-      ENDIF
-      STRKT = DELT.LT.STRTOL*FWHME
-      SLACK = 0.
-      IF (DELT.GE.SLKTOL*FWHME) GOTO 100
-      SLACK = EXP(1.-(DELT/(SLKTOL*FWHME))**2)
-      GOTO 100
-!
-    7 CALL FDTF12(1)
-      F4PAR(2,KNOW) = PKFNVA(4)
-      GOTO 100
-  100 RETURN
-      END SUBROUTINE PFTF12
-!*==PFTF92.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!
-!
-!
-!
-! LEVEL 7      SUBROUTINE PFTF92(N)
       SUBROUTINE PFTF92(N)
 !
 ! *** PFTF92 updated by JCM 27 May 89 ***
@@ -4938,14 +4445,12 @@
       C3DN(1) = POFF - 0.5
       C3DN(2) = -2.*POFF
       C3DN(3) = POFF + 0.5
-!
       YNORM = 0.
       DYNDKQ = 0.
 !      CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
       DO I = 1, NPKGEN(JPHASE,JSOURC)
         DYNDVQ(I) = 0
       ENDDO
-!
       DO I = 1, 3
         II = IARGI + I - 2
         PKTEM = PKLIST(II,1,KMOD)
@@ -4956,7 +4461,6 @@
           DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKLIST(II,NPKD1,KMOD)
         ENDDO
       ENDDO
-!
 !.. NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
       IF (TESTOV(2.,YNORM)) THEN
         DYNDKQ = 0.
@@ -4974,7 +4478,6 @@
         ENDIF
       ENDIF
       GOTO 100
-!
 !.. CALCULATE THE COMPLETE PEAK SHAPE OF THE SELECTED PEAK BY FFT.
 !
 !.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
@@ -5002,11 +4505,9 @@
         XPDKNT(KNOT) = (SQRT(TEMSQ)+CAULIM)/FLOAT(MN2)
         KMOD = 1
         XPKDEL(KMOD) = XPDKNT(KNOT)
-!
 !.. NOW SET UP FAST FOURIER TRANSFORM
 !.. THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
 !.. DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
-!
         IEAGLE = NFFT
         IF (IEAGLE.EQ.0) IEAGLE = NINT(TOLER(1,JPHASE,JSOURC))
         IF (IEAGLE.EQ.3) THEN
@@ -5068,10 +4569,8 @@
           ENDDO
         ENDIF
       ENDDO
-!
 !.. FFT OVER
       GOTO 100
-!
 ! PRE-PROFILE REFINEMENT STAGE
     5 CALL FDTF02(1)
       DEL = ARGI - ARGK
@@ -5084,9 +4583,7 @@
   510 TEMLIM = CAULIM + SQRT(TEMSQ)
       REFUSE = ABS(DEL).GT.TEMLIM
       GOTO 100
-!
 ! N=6 *** CAILS *** SETTING UP SLACK AND STRICT CONSTRAINTS
-!
     6 CALL FDTF02(1)
       DELT = ABS(AKLO-AKHI)
       AVTAU = PKFNVA(1)*PKFNVA(2) + (1.-PKFNVA(1))*PKFNVA(3)
@@ -5102,4 +4599,8 @@
       F4PAR(2,KNOW) = PKFNVA(4)
       GOTO 100
   100 RETURN
+
       END SUBROUTINE PFTF92
+!
+!*****************************************************************************
+!

@@ -16,10 +16,9 @@
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
-      LOGICAL         InWizard, InWizardWindow
-      INTEGER                                   CurrentWizardWindow
-      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
-
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
+           
       INTEGER PawleyErrorLog ! Function
       INTEGER IDUMMY
       INTEGER NTCycles
@@ -27,7 +26,9 @@
 ! JvdS This window popping up automatically makes it impossible to 
 ! play around with indexing. Therefore: when in one of the indexing windows, ignore
 ! this routine.
-      IF ((CurrentWizardWindow .EQ. IDD_PW_Page7) .OR. (CurrentWizardWindow .EQ. IDD_PW_Page8) .OR. (CurrentWizardWindow .EQ. IDD_PW_Page9)) RETURN
+      IF ((CurrentWizardWindow .EQ. IDD_PW_Page7) .OR.       &
+          (CurrentWizardWindow .EQ. IDD_PW_Page8) .OR.       &
+          (CurrentWizardWindow .EQ. IDD_PW_Page9)) RETURN
       CALL SetModeMenuState(-1,1)
       CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
@@ -124,11 +125,6 @@
       INTEGER                                                                    ICODEZ
       REAL                                                                                      KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-
-      REAL            ZXDELT
-      INTEGER                 IIMIN, IIMAX
-      REAL                                  XDIFT, XMINT
-      COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XDIFT, XMINT
 
 ! Save the boxes from Pawley fit to Pawley fit
       REAL RLastValues(3)
@@ -374,9 +370,6 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
       
-      INTEGER          IPMIN, IPMAX
-      COMMON /PROFIPM/ IPMIN, IPMAX
-
       INTEGER          NTIC
       INTEGER                IH
       REAL                               ARGK
@@ -386,17 +379,13 @@
       REAL XRANMIN, XRANMAX
       SAVE XRANMIN, XRANMAX
       INTEGER NPawBack
-
       INTEGER NPawBack_OLD
       SAVE    NPawBack_OLD ! To test if number of background parameters has changed
-
       CHARACTER*4 ChRadOption(4)
       DATA CHRADOPTION /'LABX','SYNX','SYNX','TOFN'/
-
       INTEGER I
-      LOGICAL FnUnitCellOK ! Function
-      LOGICAL FnWaveLengthOK ! Function
-      REAL    WavelengthOf ! Function
+      LOGICAL, EXTERNAL :: FnUnitCellOK, FnWaveLengthOK, FnPatternOK
+      REAL, EXTERNAL :: WavelengthOf
       INTEGER NTCycles
       INTEGER JNB, NBLIN, INB, ITEM, ISYM, IRTYP
       INTEGER N1, N2, K1, KNB
@@ -408,15 +397,15 @@
 
 ! Are these checks in place here? If one of them fails, we shouldn't have been here in the first place.
 !
-!.. We should only proceed with this if we have good cell constants 
-!.. If no wavelength then assume Cu Ka1 wvln=1.54051
-!..
-!.. Write out the data file ...
-!.. We should check if there are data to write out!
-      IF (NBIN .LE. 0) RETURN
+! We should only proceed with this if we have good cell constants 
+! If no wavelength then assume Cu Ka1 wvln=1.54051
+!
+! Write out the data file ...
+! We should check if there are data to write out!
+      IF (.NOT. FnPatternOK()) RETURN
       IF (.NOT. FnUnitCellOK()) RETURN
       IF (NTIC .EQ. 0) RETURN
-!.. Allow a maximum of 300 reflections
+! Allow a maximum of 300 reflections
 ! JvdS Why?
       IF (NTIC .GT. 300) THEN
         xranmax = MIN(xpmax,ARGK(300))
@@ -428,7 +417,7 @@
 !        xranmax=xbin(nbin)
 
 ! Substituting with this line seems to fix this bug? Is this a reasonable fix?
-! JvdS @ Doesn't this undo all of the above range checking?
+! JvdS @@ Doesn't this undo all of the above range checking?
 ! JvdS if there >300 reflections / tic marks, all of them will be included this way?
       xranmax = xpmax
       IF (NumInternalDSC .NE. DataSetChange) THEN
@@ -560,11 +549,11 @@
         CALL WDialogGetReal(IDF_Slim_Parameter,SLIMVALUE)
         WRITE(tFileHandle,4270) SCALFAC, SLIMVALUE
  4270   FORMAT('L SCAL   ',F7.5,/                                         &
-     &  'L SLIM ',F5.2,' '/                                               &
-     &  'L REFK 10.0'/                                                    &
-     &  'L PKCN TYPE 1'/                                                  &
-     &  'L PKFN TYPE 3'/                                                  &
-     &  'L PKFN LIMS 0.005')
+        'L SLIM ',F5.2,' '/                                               &
+        'L REFK 10.0'/                                                    &
+        'L PKCN TYPE 1'/                                                  &
+        'L PKFN TYPE 3'/                                                  &
+        'L PKFN LIMS 0.005')
         WRITE(tFileHandle,4271) PkFnVarVal(1,1), PkFnVarVal(2,1)
         WRITE(tFileHandle,4272) PkFnVarVal(1,2), PkFnVarVal(2,2)
         WRITE(tFileHandle,4273) PkFnVarVal(1,3)
@@ -877,7 +866,7 @@
 
       INTEGER, EXTERNAL :: CreateSDIFile
       
-!.. Save the project
+! Save the project
       SaveProject = .FALSE.
       IFLAGS = SaveDialog + AppendExt + PromptOn
       FILTER = 'Diffraction information files (*.sdi)|*.sdi|'

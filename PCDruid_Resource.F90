@@ -1,4 +1,4 @@
-! Winteracter module created : 02/Dec/2001 17:29:05
+! Winteracter module created : 04/Dec/2001 10:43:29
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -482,6 +482,5 @@
           INTEGER, PARAMETER :: IDF_CrystallographicCoM         =  1215
           INTEGER, PARAMETER :: IDF_Align                       =  1224
           INTEGER, PARAMETER :: IDF_Agreement                   =  1225
-          INTEGER, PARAMETER :: IDB_DemoLicence                 =  1229
           INTEGER, PARAMETER :: IDB_IAgree                      =  1228
       END MODULE Druid_Header

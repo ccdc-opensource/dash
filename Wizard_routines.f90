@@ -8,9 +8,8 @@
 
       IMPLICIT NONE
 
-      LOGICAL         InWizard, InWizardWindow
-      INTEGER                                   CurrentWizardWindow
-      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
 
       CALL SetModeMenuState(1,0)
       CALL SelectMode(ID_Peak_Fitting_Mode)
@@ -30,16 +29,15 @@
       INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
       COMMON /DialoguePosCmn/ IXPos_IDD_Wizard, IYPos_IDD_Wizard
 
-      LOGICAL         InWizard, InWizardWindow
-      INTEGER                                   CurrentWizardWindow
-      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
 
-      IF (.NOT. InWizardWindow) RETURN
+      IF (CurrentWizardWindow .EQ. 0) RETURN
       CALL WDialogSelect(CurrentWizardWindow)
       IXPos_IDD_Wizard = WInfoDialog(6)
       IYPos_IDD_Wizard = WInfoDialog(7)
       CALL WDialogHide()
-      InWizardWindow = .FALSE.
+      CurrentWizardWindow = 0
 
       END SUBROUTINE WizardWindowHide
 !
@@ -57,18 +55,15 @@
       INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
       COMMON /DialoguePosCmn/ IXPos_IDD_Wizard, IYPos_IDD_Wizard
  
-      LOGICAL         InWizard, InWizardWindow
-      INTEGER                                   CurrentWizardWindow
-      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
 
 ! Hide any visible Wizard window
       CALL WizardWindowHide
       CALL WDialogSelect(TheDialogID)
       CurrentWizardWindow = TheDialogID
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-      InWizardWindow = .TRUE.
       CALL SetWizardState(-1)
-      InWizard = .TRUE.
 
       END SUBROUTINE WizardWindowShow
 !
@@ -81,9 +76,8 @@
 
       IMPLICIT NONE
 
-      LOGICAL         InWizard, InWizardWindow
-      INTEGER                                   CurrentWizardWindow
-      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
 
       LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
 
@@ -95,7 +89,6 @@
       ENDIF
       CALL SelectMode(ID_Peak_Fitting_Mode)
       CALL SetWizardState(1)
-      InWizard = .FALSE.
 
       END SUBROUTINE EndWizardCommon
 !
@@ -256,8 +249,8 @@
       INCLUDE 'PARAMS.INC'
    
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
       
 ! Not too pretty, but safe
       INTEGER                BackupNOBS
@@ -483,10 +476,11 @@
             CASE (IDF_TruncateStartYN)
 ! If set to 'TRUE', ungrey value field and vice versa
               IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
-                CALL WDialogFieldState(IDF_Min2Theta,Enabled)
+                tFieldState = Enabled
               ELSE
-                CALL WDialogFieldState(IDF_Min2Theta,Disabled)
+                tFieldState = Disabled
               ENDIF
+              CALL WDialogFieldState(IDF_Min2Theta,tFieldState)
             CASE (IDF_TruncateEndYN)
 ! If set to 'TRUE', ungrey value fields and vice versa
               IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
@@ -496,6 +490,7 @@
               ENDIF
               CALL WDialogFieldState(IDF_Max2Theta,tFieldState)
               CALL WDialogFieldState(IDF_MaxResolution,tFieldState)
+              CALL WDialogFieldState(IDB_Convert,tFieldState)
             CASE (IDF_Max2Theta)
 ! When entering a maximum value for 2 theta, update maximum value for the resolution
               CALL WDialogGetReal(IDF_Max2Theta,tReal)
