@@ -40,10 +40,14 @@
       COMMON / EXTDIR / INSTDIR
 
 !C>> File information; Names of files used by DASH For I/O
-      CHARACTER(LEN = MaxPathLength) :: DashRawFile
-      CHARACTER(LEN = MaxPathLength) :: DashHcvFile
-      CHARACTER(LEN = MaxPathLength) :: DashPikFile
-      CHARACTER(LEN = MaxPathLength) :: DashTicFile
+!O      CHARACTER(LEN = MaxPathLength) :: DashRawFile
+!O      CHARACTER(LEN = MaxPathLength) :: DashHcvFile
+!O      CHARACTER(LEN = MaxPathLength) :: DashPikFile
+!O      CHARACTER(LEN = MaxPathLength) :: DashTicFile
+      CHARACTER(LEN = 80) :: DashRawFile
+      CHARACTER(LEN = 80) :: DashHcvFile
+      CHARACTER(LEN = 80) :: DashPikFile
+      CHARACTER*80 :: DashTicFile
       LOGICAL RawExists
       LOGICAL HcvExists
       LOGICAL PikExists
@@ -89,7 +93,6 @@
 !
 !   Variable declarations
 !
-!O      LOGICAL           :: NoData  = .TRUE.
       INTEGER           :: IWIDTHS(10)
       INTEGER           :: IWID
 
@@ -98,14 +101,16 @@
       INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'STATLOG.INC'
 
-!O      LOGICAL Run_Wizard
+      DashRawFile = ' '
+      DashHcvFile = ' '
+      DashPikFile = ' '
+      DashTicFile = ' '
 
       CALL WInitialise(' ')
       CALL Init_StdOut()
 !   Initialise Winteracter
       XBSWidth   = WInfoScreen(1)
       XBSHeight  = WInfoScreen(2)
-      XBSColours = WInfoScreen(3)
 !>> JCC
 !>> Try to redirect stdout - change working directory if unsuccessful
 
@@ -137,9 +142,10 @@
         IWIDTHS(IWID) = 800
       END DO
       IWIDTHS(8)= 1500 
+!      OPEN (UNIT=76,FILE='D:\cvsDASH\dash\Debug\output.log')
 !   Split status bar into more than one part
       CALL WindowStatusBarParts(8,IWIDTHS)
-      CALL WMessageEnable(PushButton  , Enabled)
+      CALL WMessageEnable(PushButton, Enabled)
 ! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues()
 ! Initialise space group information
@@ -646,7 +652,7 @@
 !      CALL WMenuSetState(ID_get_peak_widths,ItemEnabled,OnOrOff)
 !      CALL WMenuSetState(ID_plot_options,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_PolyFitter_Help,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_Polyfitter_Tips,ItemEnabled,OnOrOff)
+!      CALL WMenuSetState(ID_Polyfitter_Tips,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_help_about_Polyfitter,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_import_xye_file,ItemEnabled,OnOrOff)
 !      CALL WMenuSetState(ID_import_pro_file,ItemEnabled,OnOrOff)
