@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 28/Jan/2002 13:22:41
+// Modified : 30/Jan/2002 13:51:36
 //
 ///////////////////////////////////////////////////
 //
@@ -1886,16 +1886,16 @@ END
 IDD_License_Dialog DIALOG 0, 0,  269,  147
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "Aquiring a license"
+CAPTION "Aquiring a licence"
 BEGIN
-    CONTROL "You need to enter a valid license for DASH to run on this machine. To do this, either enter your licence key in the box provided or create a licence request form and e-mail it to software@ccdc.cam.ac.uk",IDF_License_Info,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   16,  238,   28
+    CONTROL "You need to enter a valid licence for DASH to run on this machine. To do this, either enter your licence key in the box provided or create a licence request form and e-mail it to software@ccdc.cam.ac.uk",IDF_License_Info,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   16,  238,   28
     CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   38,  120,   38,   14
-    CONTROL "Enter License Key:",IDF_License_Key,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   56,   94,    8
+    CONTROL "Enter Licence Key:",IDF_License_Key,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   56,   94,    8
     CONTROL "",IDF_License_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,  120,   52,  132,   14
     CONTROL "E&xit",ID_Licensing_Exit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   95,  120,   40,   14
     CONTROL "Generate &Request",ID_Licence_Request,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  156,  120,   74,   14
     CONTROL "Site Code",IDF_License_SiteCodeLabel,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,   12,   96,   94,    8
-    CONTROL "&Site License",IDF_License_Site,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   76,   94,    8
+    CONTROL "&Site Licence",IDF_License_Site,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   76,   94,    8
     CONTROL "",IDF_License_SiteCode,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  120,   92,  132,   12
 END
 
