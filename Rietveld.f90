@@ -55,9 +55,9 @@
 ! Loop over all the fragments
       DO iFrg = 1, nFrag
         ! Position centre of mass inside unit cell
-        RR_tran(1,iFrg) = BestValuesDoF(KK+1,Curr_SA_Run)
-        RR_tran(2,iFrg) = BestValuesDoF(KK+2,Curr_SA_Run)
-        RR_tran(3,iFrg) = BestValuesDoF(KK+3,Curr_SA_Run)
+        RR_tran(1, iFrg) = BestValuesDoF(KK+1, Curr_SA_Run)
+        RR_tran(2, iFrg) = BestValuesDoF(KK+2, Curr_SA_Run)
+        RR_tran(3, iFrg) = BestValuesDoF(KK+3, Curr_SA_Run)
         KK = KK + 3
 ! If more than one atom then proceed
         IF (natoms(iFrg) .GT. 1) THEN
@@ -65,36 +65,36 @@
 ! 1. Rotate the whole molecule freely, using quaternions
 ! 2. Specify the rotation axis (e.g. if molecule on mirror plane)
           IF (UseQuaternions(iFrg)) THEN
-            RR_rot(1,iFrg) = BestValuesDoF(KK+1,Curr_SA_Run)
-            RR_rot(2,iFrg) = BestValuesDoF(KK+2,Curr_SA_Run)
-            RR_rot(3,iFrg) = BestValuesDoF(KK+3,Curr_SA_Run)
-            RR_rot(4,iFrg) = BestValuesDoF(KK+4,Curr_SA_Run)
+            RR_rot(1, iFrg) = BestValuesDoF(KK+1, Curr_SA_Run)
+            RR_rot(2, iFrg) = BestValuesDoF(KK+2, Curr_SA_Run)
+            RR_rot(3, iFrg) = BestValuesDoF(KK+3, Curr_SA_Run)
+            RR_rot(4, iFrg) = BestValuesDoF(KK+4, Curr_SA_Run)
             KK = KK + 4
           ELSE
 ! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
-            RR_rot(1,iFrg) = BestValuesDoF(KK+1,Curr_SA_Run)
-            RR_rot(2,iFrg) = BestValuesDoF(KK+2,Curr_SA_Run)
+            RR_rot(1, iFrg) = BestValuesDoF(KK+1, Curr_SA_Run)
+            RR_rot(2, iFrg) = BestValuesDoF(KK+2, Curr_SA_Run)
             KK = KK + 2
           ENDIF
         ENDIF
         DO I = 1, natoms(iFrg)
-          IF (IOPTB(i,iFrg) .EQ. 1) THEN
+          IF (IOPTB(i, iFrg) .EQ. 1) THEN
             KK = KK + 1
-            RR_blen(i,iFrg) = BestValuesDoF(KK,Curr_SA_Run)
+            RR_blen(i, iFrg) = BestValuesDoF(KK, Curr_SA_Run)
           ELSE
-            RR_blen(i,iFrg) = blen(i,iFrg)
+            RR_blen(i, iFrg) = blen(i,iFrg)
           ENDIF
-          IF (IOPTA(i,iFrg) .EQ. 1) THEN
+          IF (IOPTA(i, iFrg) .EQ. 1) THEN
             KK = KK + 1
-            RR_alph(i,iFrg) = BestValuesDoF(KK, Curr_SA_Run)
+            RR_alph(i, iFrg) = BestValuesDoF(KK, Curr_SA_Run)
           ELSE
-            RR_alph(i,iFrg) = alph(i,iFrg)
+            RR_alph(i, iFrg) = alph(i,iFrg)
           ENDIF
-          IF (IOPTT(i,iFrg) .EQ. 1) THEN
+          IF (IOPTT(i, iFrg) .EQ. 1) THEN
             KK = KK + 1
-            RR_bet(i,iFrg) = BestValuesDoF(KK, Curr_SA_Run)
+            RR_bet(i, iFrg) = BestValuesDoF(KK, Curr_SA_Run)
           ELSE
-            RR_bet(i,iFrg) = bet(i,iFrg)
+            RR_bet(i, iFrg) = bet(i, iFrg)
           ENDIF
         ENDDO
       ENDDO
@@ -258,7 +258,7 @@
           ENDIF
         ENDDO
       ENDDO
-      CALL WGridSetCell(iField,1,1)
+      CALL WGridSetCell(iField, 1, 1)
       CALL WDialogPutInteger(IDI_Num4,Num)
       CALL PopActiveWindowID
 
@@ -383,8 +383,8 @@
           ENDIF
         ENDDO
       ENDDO
-      CALL WGridSetCell(iField,1,1)
-      CALL WDialogPutInteger(IDI_Num2,Num)
+      CALL WGridSetCell(iField, 1, 1)
+      CALL WDialogPutInteger(IDI_Num2, Num)
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_Show_torsion
@@ -1076,10 +1076,10 @@
 ! Loop over all the fragments
       DO iFrg = 1, nFrag
         ! Position centre of mass inside unit cell
-        RR_tran(1,iFrg) = RR_tran(1,iFrg) - INT(RR_tran(1,iFrg))
-        RR_tran(2,iFrg) = RR_tran(2,iFrg) - INT(RR_tran(2,iFrg))
-        RR_tran(3,iFrg) = RR_tran(3,iFrg) - INT(RR_tran(3,iFrg))
-        CALL PremultiplyVectorByMatrix(f2cmat, RR_tran(1,iFrg), TRAN)
+        RR_tran(1, iFrg) = RR_tran(1, iFrg) - INT(RR_tran(1, iFrg))
+        RR_tran(2, iFrg) = RR_tran(2, iFrg) - INT(RR_tran(2, iFrg))
+        RR_tran(3, iFrg) = RR_tran(3, iFrg) - INT(RR_tran(3 ,iFrg))
+        CALL PremultiplyVectorByMatrix(f2cmat, RR_tran(1, iFrg), TRAN)
 ! If more than one atom then proceed
         IF (natoms(iFrg) .GT. 1) THEN
 ! If we have at least two atoms, there are two options:
@@ -1088,27 +1088,27 @@
           IF (UseQuaternions(iFrg)) THEN
             QQSUM = 0.0
             DO JQ = 1, 4
-              QQSUM = QQSUM + RR_rot(JQ,iFrg)**2
+              QQSUM = QQSUM + RR_rot(JQ, iFrg)**2
             ENDDO
 ! QQSUM now holds the sum of the squares of the quaternions
             QDEN = 1.0 / SQRT(QQSUM)
             DO JQ = 0, 3
-              QUATER(JQ) = QDEN * RR_rot(JQ+1,iFrg)
+              QUATER(JQ) = QDEN * RR_rot(JQ+1, iFrg)
             ENDDO
 ! QUATER now holds the normalised quaternions
             CALL Quaternion2Matrix(QUATER, ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the quaternions
           ELSE
 ! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
-            Duonion(0) = RR_rot(1,iFrg)
-            Duonion(1) = RR_rot(2,iFrg)
+            Duonion(0) = RR_rot(1, iFrg)
+            Duonion(1) = RR_rot(2, iFrg)
             QDEN = 1.0 / SQRT(Duonion(0)**2 + Duonion(1)**2)
             Duonion(0) = Duonion(0) * QDEN 
             Duonion(1) = Duonion(1) * QDEN 
-            QUATER(0) = Duonion(0) * zmSingleRotationQs(0,iFrg)
-            QUATER(1) = Duonion(1) * zmSingleRotationQs(1,iFrg)
-            QUATER(2) = Duonion(1) * zmSingleRotationQs(2,iFrg)
-            QUATER(3) = Duonion(1) * zmSingleRotationQs(3,iFrg)
+            QUATER(0) = Duonion(0) * zmSingleRotationQs(0, iFrg)
+            QUATER(1) = Duonion(1) * zmSingleRotationQs(1, iFrg)
+            QUATER(2) = Duonion(1) * zmSingleRotationQs(2, iFrg)
+            QUATER(3) = Duonion(1) * zmSingleRotationQs(3, iFrg)
 ! QUATER now holds the normalised quaternion corresponding to the single rotation axis
 ! Now premultiply with the original molecular orientation (JvdS I don't understand why
 ! they must be premultiplied: I would say they should be postmultiplied)
@@ -1217,9 +1217,9 @@
       CALL PushActiveWindowID
       hFilePDB = 65
 ! Write the file headers first
-      OPEN (UNIT=hFilePDB,FILE='Overlap_Temp.pdb',STATUS='unknown',ERR=999)
+      OPEN (UNIT=hFilePDB, FILE='Overlap_Temp.pdb', STATUS='unknown', ERR=999)
 ! Add in a Header record
-      WRITE (hFilePDB,1036,ERR=999)
+      WRITE (hFilePDB, 1036, ERR=999)
  1036 FORMAT ('HEADER    PDB Solution File generated by DASH')
       IF (WritePDBCommon(hFilePDB) .NE. 0) GOTO 999
 !C! Get atom label option from dialogue. Two options: 
@@ -1520,14 +1520,15 @@
               tLen = tLen + 4
               WRITE (hFile,"(A)",ERR=999) tString(1:tLen)
             ENDDO
-            WRITE (hFile,'("_cell_length_a    ", F8.4)',ERR=999) CellPar(1)
-            WRITE (hFile,'("_cell_length_b    ", F8.4)',ERR=999) CellPar(2)
-            WRITE (hFile,'("_cell_length_c    ", F8.4)',ERR=999) CellPar(3)
-            WRITE (hFile,'("_cell_angle_alpha ", F8.4)',ERR=999) CellPar(4)
-            WRITE (hFile,'("_cell_angle_beta  ", F8.4)',ERR=999) CellPar(5)
-            WRITE (hFile,'("_cell_angle_gamma ", F8.4)',ERR=999) CellPar(6)
-            WRITE (hFile,'("_cell_volume",F7.1)',ERR=999) UnitCellVolume(CellPar(1),CellPar(2),CellPar(3),CellPar(4),CellPar(5),CellPar(6))
-            WRITE (hFile,'("_cell_formula_units_Z  ?")',ERR=999)
+            WRITE (hFile, '("_cell_length_a    ", F8.4)', ERR=999) CellPar(1)
+            WRITE (hFile, '("_cell_length_b    ", F8.4)', ERR=999) CellPar(2)
+            WRITE (hFile, '("_cell_length_c    ", F8.4)', ERR=999) CellPar(3)
+            WRITE (hFile, '("_cell_angle_alpha ", F8.4)', ERR=999) CellPar(4)
+            WRITE (hFile, '("_cell_angle_beta  ", F8.4)', ERR=999) CellPar(5)
+            WRITE (hFile, '("_cell_angle_gamma ", F8.4)', ERR=999) CellPar(6)
+            WRITE (hFile, '("_cell_volume",F7.1)',ERR=999) UnitCellVolume(CellPar(1), &
+                  CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6))
+            WRITE (hFile, '("_cell_formula_units_Z  ?")',ERR=999)
             SELECT CASE (JRadOption)
               CASE (1) ! X-ray lab data
                 CALL PushActiveWindowID
@@ -1555,25 +1556,25 @@
               CASE (4) ! Time-of-Flight Neutrons
             END SELECT
             tLen = LEN_TRIM(tString)
-            WRITE (hFile,'("_diffrn_radiation_type ",A)',ERR=999) tString(1:tLen)
-            WRITE (hFile,'("_diffrn_radiation_wavelength",F10.5)',ERR=999) ALambda
+            WRITE (hFile, '("_diffrn_radiation_type ",A)', ERR=999) tString(1:tLen)
+            WRITE (hFile, '("_diffrn_radiation_wavelength",F10.5)', ERR=999) ALambda
   !@@          WRITE (hFile,'("_refine_ls_goodness_of_fit_all ",F7.3)',ERR=999) SQRT(MAX(0.0,FOPT))
             IF (PrefParExists) THEN
-              WRITE (hFile,'("_pd_proc_ls_pref_orient_corr")',ERR=999)               
-              WRITE (hFile,'(";")',ERR=999)
-              WRITE (hFile,'("  March-Dollase function")',ERR=999)
-              WRITE (hFile,'("  Orientation =",3(1X,F6.3))',ERR=999) (PrefPars(ii),ii=1,3)
-              WRITE (hFile,'("  Magnitude   = ",F6.3)',ERR=999) RR_PO
-              WRITE (hFile,'(";")',ERR=999)
+              WRITE (hFile, '("_pd_proc_ls_pref_orient_corr")', ERR=999)               
+              WRITE (hFile, '(";")',ERR=999)
+              WRITE (hFile, '("  March-Dollase function")', ERR=999)
+              WRITE (hFile, '("  Orientation =",3(1X,F6.3))', ERR=999) (PrefPars(ii),ii=1,3)
+              WRITE (hFile, '("  Magnitude   = ",F6.3)',ERR=999) RR_PO
+              WRITE (hFile ,'(";")', ERR=999)
             ENDIF
-            WRITE (hFile,'("loop_")',ERR=999)
-            WRITE (hFile,'("  _atom_site_label")',ERR=999)
-            WRITE (hFile,'("  _atom_site_fract_x")',ERR=999)
-            WRITE (hFile,'("  _atom_site_fract_y")',ERR=999)
-            WRITE (hFile,'("  _atom_site_fract_z")',ERR=999)
-            WRITE (hFile,'("  _atom_site_occupancy")',ERR=999)
-            WRITE (hFile,'("  _atom_site_adp_type")',ERR=999)
-            WRITE (hFile,'("  _atom_site_B_iso_or_equiv")',ERR=999)
+            WRITE (hFile ,'("loop_")', ERR=999)
+            WRITE (hFile, '("  _atom_site_label")', ERR=999)
+            WRITE (hFile, '("  _atom_site_fract_x")', ERR=999)
+            WRITE (hFile, '("  _atom_site_fract_y")', ERR=999)
+            WRITE (hFile, '("  _atom_site_fract_z")', ERR=999)
+            WRITE (hFile, '("  _atom_site_occupancy")', ERR=999)
+            WRITE (hFile, '("  _atom_site_adp_type")', ERR=999)
+            WRITE (hFile, '("  _atom_site_B_iso_or_equiv")', ERR=999)
             iiact = 0
             itotal = 0
             DO iFrg = 1, nFrag
@@ -1623,7 +1624,7 @@
               DO i = 2, npdbops ! " +X, +Y, +Z" must be left out
                 tString = cpdbops(i)
                 tLen = LEN_TRIM(tString)
-                WRITE (hFile,"('SYMM ',A)",ERR=999) tString(1:tLen)
+                WRITE (hFile, "('SYMM ',A)", ERR=999) tString(1:tLen)
               ENDDO
             ENDIF
             NumOfAtmPerElm = 0
@@ -1644,8 +1645,8 @@
                 tLen2 = tLen2 + 4
               ENDIF
             ENDDO
-            WRITE (hFile,'(A)',ERR=999) tString1(1:tLen1)
-            WRITE (hFile,'(A)',ERR=999) tString2(1:tLen2)
+            WRITE (hFile, '(A)', ERR=999) tString1(1:tLen1)
+            WRITE (hFile, '(A)', ERR=999) tString2(1:tLen2)
             iiact = 0
             itotal = 0
             DO iFrg = 1, nFrag
@@ -1665,21 +1666,21 @@
  1035           FORMAT (A5,1X,I2,1X,3(F10.5,1X),F5.3,1X,F5.3)
               ENDDO ! loop over atoms
             ENDDO ! loop over Z-matrices
-            WRITE (hFile,"('END ')",ERR=999)
+            WRITE (hFile, "('END ')", ERR=999)
           CASE (6) ! pro
 !            WRITE(hFile,'(2(A,F7.2))',ERR=999) "Intensity chi-sqrd = ", tIntChiSqd, ", profile chi-sqrd = ", tProChiSqd
             IF (Get_DivideByEsd()) THEN
-              WRITE(hFile,'(A)',ERR=999) "      2theta"//CHAR(9)//"        Yobs"//CHAR(9)//"   ESD(Yobs)"//CHAR(9)//"       Ycalc"//CHAR(9)//"(Yobs - Ycalc) * <ESD> / ESD(Yobs)"
+              WRITE(hFile, '(A)', ERR=999) "      2theta"//CHAR(9)//"        Yobs"//CHAR(9)//"   ESD(Yobs)"//CHAR(9)//"       Ycalc"//CHAR(9)//"(Yobs - Ycalc) * <ESD> / ESD(Yobs)"
               DO I = 1, NBIN
-                WRITE(hFile,12,ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), EBIN(I), CHAR(9), YCBIN(I), CHAR(9), (YOBIN(I)-YCBIN(I))*AVGESD/EBIN(I)
+                WRITE(hFile, 12, ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), EBIN(I), CHAR(9), YCBIN(I), CHAR(9), (YOBIN(I)-YCBIN(I))*AVGESD/EBIN(I)
               ENDDO
             ELSE
-              WRITE(hFile,'(A)',ERR=999) "      2theta"//CHAR(9)//"        Yobs"//CHAR(9)//"   ESD(Yobs)"//CHAR(9)//"       Ycalc"//CHAR(9)//"Yobs - Ycalc"
+              WRITE(hFile, '(A)', ERR=999) "      2theta"//CHAR(9)//"        Yobs"//CHAR(9)//"   ESD(Yobs)"//CHAR(9)//"       Ycalc"//CHAR(9)//"Yobs - Ycalc"
               DO I = 1, NBIN
-                WRITE(hFile,12,ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), EBIN(I), CHAR(9), YCBIN(I), CHAR(9), (YOBIN(I)-YCBIN(I))
+                WRITE(hFile, 12, ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), EBIN(I), CHAR(9), YCBIN(I), CHAR(9), (YOBIN(I)-YCBIN(I))
               ENDDO
             ENDIF
-   12       FORMAT(F12.4,4(A,F12.4))
+   12       FORMAT(F12.4, 4(A,F12.4))
         END SELECT
         CLOSE(hFile)
       ENDIF
