@@ -58,8 +58,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      DOUBLE PRECISION XOPT,       C,       XP,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
+      DOUBLE PRECISION XOPT,       C,       FOPT
+      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
