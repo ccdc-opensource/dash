@@ -413,10 +413,7 @@
           NumOfOverlaidStructures = NumOfOverlaidStructures + 1
 ! The solutions have been ordered wrt chi**2. We must parse the original run nr from the
 ! number of the .pdb file. Unless we didn't do a multirun of course.
-          IF (MaxRuns .EQ. 1) THEN
-            RunStr = '1 '
-            RunNr  = 1
-          ELSE
+          IF (RESTART) THEN
             CALL WGridGetCellString(IDF_SA_Summary,1,GridRowNr,tString)
             ilen = LEN_TRIM(tString)
             RunStr = tString(ilen-5:ilen-4)
@@ -425,6 +422,9 @@
               RunStr(2:2) = ' '
             ENDIF
             READ(RunStr,'(I2)') RunNr
+          ELSE
+            RunStr = '1 '
+            RunNr  = 1
           ENDIF
           TickedRunNr = TickedRunNr + 1 ! Number of ticked runs, counter used for choosing the colour
           IF (TickedRunNr .EQ. 11) TickedRunNr = 1 ! Re-use colours.
