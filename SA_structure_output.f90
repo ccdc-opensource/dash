@@ -109,10 +109,10 @@
 !
 ! The original atom ids to list in the labels and the back mapping
       COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
-! Use standard PDB orthogonalisation
-      DOUBLE PRECISION f2cpdb, c2fpdb
       REAL qvals(4), qnrm
-      COMMON /pdbcat/ f2cpdb(3,3), c2fpdb(3,3)
+! Use standard PDB orthogonalisation
+      DOUBLE PRECISION f2cpdb
+      COMMON /pdbcat/ f2cpdb(3,3)
       LOGICAL tSavePDB, tSaveCSSR, tSaveCCL, tSaveRES
 !
       ntem = NumberSGTable
