@@ -35,8 +35,6 @@
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       DoSaRedraw = .FALSE.
-! Automatic end so pop up a message to say what happened
-!       Call WDialogSelect(IDD_SA_Completed)
       Ierrflag = InfoError(1)
       CALL WindowSelect(0)
       Ierrflag = InfoError(1)

@@ -49,9 +49,6 @@
       END DO
 !      CHIVALPRO=CHIOBS!-SUM2*SUM2/SUM1
       CHIVALPRO = CVP/FLOAT(NFIT-2)
-! Now output the new chi-squared
-      CALL WDialogSelect(IDD_Profile_Status)
-      CALL WDialogPutReal(IDF_profile_chisq,chivalpro,'(F15.2)')
 
       END SUBROUTINE VALCHIPRO
 !
