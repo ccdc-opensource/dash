@@ -520,6 +520,7 @@
                            WDialogGetCheckBoxLogical,                     &
                            Get_UseHydrogens, Get_SavePRO, Get_OutputChi2vsMoves, &
                            Get_AutoLocalMinimisation
+      LOGICAL, EXTERNAL :: UseHydrogensDuringAuto, Get_ShowCumChiSqd
       REAL, EXTERNAL :: WavelengthOf
       INTEGER*4 tInteger
       REAL*4    tReal
@@ -681,9 +682,11 @@
 ! 2. "By element"
       CALL WDialogGetRadioButton(IDF_ColourBySolution,tInteger)
       CALL FileWriteInteger(hFile,RecNr,tInteger)
-
-
-
+! Following is new in DASH 2.1
+! Use hydrogens for auto local minimise
+      CALL FileWriteLogical(hFile,RecNr,UseHydrogensDuringAuto())
+! Plot cumulative chi-squared      
+      CALL FileWriteLogical(hFile,RecNr,Get_ShowCumChiSqd())
   999 CLOSE(hFile)
 
       END SUBROUTINE WriteConfigurationFile
@@ -717,6 +720,7 @@
       LOGICAL*4 tLogical
       REAL*4    tReal
       REAL, EXTERNAL :: dSpacing2TwoTheta
+      INTEGER, EXTERNAL :: GetBFIOError
       LOGICAL   FExists
 
       RW = 1
@@ -912,8 +916,19 @@
         CASE (2)
           CALL WDialogPutRadioButton(IDF_ColourByElement)
       END SELECT
-
-
+! Following is new in DASH 2.1
+! Use hydrogens for auto local minimise
+      CALL FileReadLogical(hFile,RecNr,tLogical)
+      IF (GetBFIOError() .NE. 0) THEN
+        CLOSE(hFile)
+        RETURN
+      ENDIF
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogPutCheckBoxLogical(IDF_UseHydrogensAuto,tLogical)
+! Plot cumulative chi-squared 
+      CALL FileReadLogical(hFile,RecNr,tLogical)
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      CALL WDialogPutCheckBoxLogical(IDF_ShowCumChiSqd,tLogical)
       CLOSE(hFile)
       RETURN
   999 CALL DebugErrorMessage('Error while opening config file')
