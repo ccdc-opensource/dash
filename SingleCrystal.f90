@@ -38,6 +38,8 @@
               CALL CheckUnitCellConsistency
             CASE (IDB_Delabc)
               CALL Clear_UnitCell_WithConfirmation
+            CASE (IDBBROWSE) ! Read unit cell
+              CALL UnitCellParametersFileBrowse
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -88,6 +90,8 @@
 
       IMPLICIT NONE
 
+      REAL Resolution
+
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SX_Page1a)
       SELECT CASE (EventType)
@@ -98,6 +102,9 @@
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_SX_Page1)
             CASE (IDNEXT)
+              CALL WDialogGetReal(IDF_MaxResolution, Resolution)
+              CALL WDialogSelect(IDD_ViewPawley)
+              CALL WDialogPutReal(IDF_MaxResolution, Resolution)
               CALL WDialogSelect(IDD_SX_Page2)
               CALL WDialogFieldStateLogical(IDNEXT, .FALSE.)
               PastPawley = .TRUE.
@@ -136,23 +143,28 @@
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_SX_Page1a)
             CASE (IDNEXT)
-              CALL ShowWizardWindowZmatrices
+              IF (SaveProject()) CALL ShowWizardWindowZmatrices
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (ID_PW_DF_Open)
               CALL WDialogGetString(IDF_PW_DataFileName_String, CTEMP)
               iErr = HKLFFileOpen(CTEMP)
-              CALL WDialogFieldStateLogical(IDBSAVE, iErr .EQ. 0)
+          !O    CALL WDialogFieldStateLogical(IDBSAVE, iErr .EQ. 0)
             CASE (IDBBROWSE)
               iErr = HKLFFileBrowse()
 ! Don't change if the user pressed 'Cancel' (ISTAT = 2)
+          !O    IF      (iErr .EQ. 0) THEN
+          !O      CALL WDialogFieldState(IDBSAVE, Enabled)
+          !O    ELSE IF (iErr .EQ. 1) THEN
+          !O      CALL WDialogFieldState(IDBSAVE, Disabled)
+          !O    ENDIF
               IF      (iErr .EQ. 0) THEN
-                CALL WDialogFieldState(IDBSAVE, Enabled)
+                CALL WDialogFieldState(IDNEXT, Enabled)
               ELSE IF (iErr .EQ. 1) THEN
-                CALL WDialogFieldState(IDBSAVE, Disabled)
+                CALL WDialogFieldState(IDNEXT, Disabled)
               ENDIF
-            CASE (IDBSAVE)
-              IF (SaveProject()) CALL WDialogFieldState(IDNEXT, Enabled)
+          !O  CASE (IDBSAVE)
+          !O    IF (SaveProject()) CALL WDialogFieldState(IDNEXT, Enabled)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -277,7 +289,7 @@
 !
       INTEGER FUNCTION HKLFFileLoad(TheFileName)
 !
-!.. Gets single crystal data and generates a false diffraction pattern
+! Gets single crystal data and generates a false diffraction pattern
 !
 ! 0 = OK
 ! 1 = error
@@ -330,43 +342,77 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER ISIG5, IArgKK
       INTEGER KXIMIN(MOBS), KXIMAX(MOBS)
-      INTEGER KK, I, NLIN, iR, J, K, hFile
+      INTEGER KK, I, NLIN, iR, jR, J, K, hFile
       INTEGER KTEM, K1, K2
       REAL    ARGIMIN, ARGIMAX, ARGISTP, ARGT, FWHM, C0, Gaussian !, Lorentzian
       CHARACTER*150 LINE
-      LOGICAL RecalculateESDs
+      LOGICAL RecalculateESDs, IgnoreLT, AvgFriedelPairs
+      REAL    CutOff
+      LOGICAL Keep(1:MFCSTO)
 
       HKLFFileLoad = 1
       hFile = 121
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SX_Page2)
       RecalculateESDs = WDialogGetCheckBoxLogical(IDF_RecalcESDs)
+      IgnoreLT = WDialogGetCheckBoxLogical(IDF_IgnLT)
+      IF (IgnoreLT) CALL WDialogGetReal(IDF_CutOff, CutOff)
+      AvgFriedelPairs = WDialogGetCheckBoxLogical(IDF_AvgFriedelPairs)
       CALL PopActiveWindowID
       Is_SX = .TRUE.
-      OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=998)
-      KK = 0
-      DO iR = 1, MFCSTO
-        READ(hFile,'(Q,A)',END=100,ERR=998) NLIN, LINE
+      OPEN(hFile, FILE=TheFileName, STATUS='OLD', ERR=998)
+      iR = 1
+      DO KK = 1, MFCSTO
+        READ(hFile, '(Q,A)', END=100, ERR=998) NLIN, LINE
+        IF (LEN_TRIM(LINE) .NE. 0) THEN
 !C SHELX .hkl files are terminated by a line containing h = k = l = 0 or h = k = l = 99
-        READ(LINE(1:NLIN),*,END=998,ERR=998) (jHKL(I,iR),I=1,3)
-        IF (((jHKL(1,iR) .EQ.  0) .AND. &
-             (jHKL(2,iR) .EQ.  0) .AND. &
-             (jHKL(3,iR) .EQ.  0)) .OR. &
-            ((jHKL(1,iR) .EQ. 99) .AND. &
-             (jHKL(2,iR) .EQ. 99) .AND. &
-             (jHKL(3,iR) .EQ. 99)))     &
-             GOTO 100
+          READ(LINE(1:NLIN), *, END=998, ERR=998) (jHKL(I,iR),I=1,3)
+          IF (((jHKL(1,iR) .EQ.  0) .AND. &
+               (jHKL(2,iR) .EQ.  0) .AND. &
+               (jHKL(3,iR) .EQ.  0)) .OR. &
+              ((jHKL(1,iR) .EQ. 99) .AND. &
+               (jHKL(2,iR) .EQ. 99) .AND. &
+               (jHKL(3,iR) .EQ. 99)))     &
+               GOTO 100
 !C No cross correlation ...
-        READ(LINE(1:NLIN),*,END=998,ERR=998) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
+          READ(LINE(1:NLIN), *, END=998, ERR=998) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
 !C F2 and sig(F2)
-        IF (RecalculateESDs) WTJ(iR) = MAX(SQRT(MAX(0.0, AJOBS(iR))), WTJ(iR))
-        WTJ(iR) = 1.0 / WTJ(iR)
-        KK = iR
+          IF (RecalculateESDs) WTJ(iR) = MAX(MAX(4.4, SQRT(MAX(0.0, AJOBS(iR)))), WTJ(iR))
+          IF (.NOT. (IgnoreLT .AND. ((AJOBS(iR)/WTJ(iR)) .LT. CutOff))) THEN
+            WTJ(iR) = 1.0 / WTJ(iR)
+            iR = iR + 1
+          ENDIF
+        ENDIF
       ENDDO
-  100 NumOfRef = KK
+  100 NumOfRef = iR-1
+      IF (NumOfRef .EQ. 0) THEN
+        CALL ErrorMessage("No reflections found.")
+        RETURN
+      ENDIF
+! Average Friedel related pairs
+      DO iR = 1, NumOfRef
+        Keep(iR) = .TRUE.
+      ENDDO
+      IF (AvgFriedelPairs) THEN
+        DO iR = 1, NumOfRef-1
+          IF (Keep(iR)) THEN
+            DO jR = iR+1, NumOfRef
+              IF (Keep(jR)) THEN
+                IF ( (jHKL(1,iR) .EQ. -jHKL(1,jR)) .AND. &
+                     (jHKL(2,iR) .EQ. -jHKL(2,jR)) .AND. &
+                     (jHKL(3,iR) .EQ. -jHKL(3,jR)) ) THEN
+                  AJOBS(iR) = (AJOBS(iR) + AJOBS(jR)) / 2.0
+                  WTJ(iR) = 1.0/SQRT((1.0/WTJ(iR))**2 + (1.0/WTJ(jR))**2)
+                  Keep(jR) = .FALSE.
+                ENDIF
+              ENDIF
+            ENDDO
+          ENDIF
+        ENDDO
+      ENDIF
 !C We've got the lattice constants, symmetry etc. already.
 !C Let's order the reflections in increasing 2 theta and fill the array ArgKK
-      CALL OrderReflections
+      CALL OrderReflections(Keep)
       DO iR = 1, NumOfRef
         IKKOR(iR) = iR
         JKKOR(iR) = iR
@@ -460,6 +506,7 @@
       CALL GET_LOGREF
       IPTYPE = 1
       CALL Profile_Plot
+      CALL sa_SetOutputFiles(TheFileName)
       HKLFFileLoad = 0
       RETURN
   998 CLOSE(hFile)
@@ -472,11 +519,13 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE OrderReflections
+      SUBROUTINE OrderReflections(Keep)
 
 ! Calculates 2 theta for every reflection.
 
       IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: Keep(*)
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
@@ -489,7 +538,7 @@
       COMMON /IOUNIT/ LPT, LUNI
 
       CHARACTER*6 xxx
-      CHARACTER*10 fname
+      CHARACTER*10 fname_2
 
       INTEGER     msymmin
       PARAMETER ( msymmin = 10 )
@@ -519,9 +568,9 @@
       WRITE(42,4240) (cellpar(I),I=1,6)
  4240 FORMAT('C ',6f10.5)
       CLOSE(42)
-      fname = 'polyo'
+      fname_2 = 'polyo'
       xxx = 'ORDREF'
-      CALL FORORD(xxx,fname)
+      CALL FORORD(xxx, fname_2, Keep)
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
@@ -530,13 +579,15 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE FORORD(pname,filnmr)
+      SUBROUTINE FORORD(pname,filnmr,Keep)
 
       USE WINTERACTER
       USE DRUID_HEADER
       USE REFVAR
 
       IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: Keep(*)
 
       CHARACTER*6 PNAME
       CHARACTER*10 filnmr
@@ -561,8 +612,8 @@
       COMMON /SXFSTO/ jHKL(3,MFCSTO), WTJ(MFCSTO), AJOBS(MFCSTO)
 
       REAL   DStarTem(MFCSTO)
-      INTEGER iR, jR, I, hFile, NewNumOfRef
-      INTEGER iOrdTem(MFCSTO)
+      INTEGER iR, jR, I, hFile
+      INTEGER iOrdTem(MFCSTO), KK
       REAL    H(1:3), DERS(1:6), ArgKKtem(MFCSTO), Resolution, cut_off_2theta
 
       filnam_root = filnmr
@@ -595,21 +646,23 @@
       CALL WDialogGetReal(IDF_MaxResolution, Resolution)
       CALL PopActiveWindowID
       cut_off_2theta = 2.0 * ASIND(1.0/(2.0*Resolution))
-      NewNumOfRef = 0
+      KK = 0
       DO iR = 1, NumOfRef
         jR = iOrdTem(iR)
-        IF (ArgKKTem(jR) .LE. cut_off_2theta) THEN
-          NewNumOfRef = NewNumOfRef + 1
-          AIOBS(iR) = AJOBS(jR)
-          WTi(iR) = WTj(jR)
-          DSTAR(iR) = dstartem(jR)
-          RefArgK(iR) = ArgKKTem(jR)
-          DO I = 1, 3
-            iHKL(I,iR) = jHKL(i,jR)
-          ENDDO
+        IF (Keep(jR)) THEN
+          IF (ArgKKTem(jR) .LE. cut_off_2theta) THEN
+            KK = KK + 1
+            AIOBS(KK) = AJOBS(jR)
+            WTi(KK) = WTj(jR)
+            DSTAR(KK) = dstartem(jR)
+            RefArgK(KK) = ArgKKTem(jR)
+            DO I = 1, 3
+              iHKL(I,KK) = jHKL(i,jR)
+            ENDDO
+          ENDIF
         ENDIF
       ENDDO
-      NumOfRef = NewNumOfRef
+      NumOfRef = KK
 !C Write out a fake .tic file
       hFile = 121
       OPEN(UNIT=hFile,FILE='polyp.tic',STATUS='UNKNOWN',ERR=999)
