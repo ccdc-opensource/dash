@@ -382,7 +382,6 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Poly_Colours.inc'
 
       REAL                    chi_sqd
@@ -398,7 +397,6 @@
       REAL xgcurold, ygcurold
 
       INTEGER Ihandle
-
 
       CALL WindowSelect(Ihandle)
       CALL WMessageEnable(MouseMove, Enabled)

@@ -23,7 +23,7 @@
 
       INTEGER, INTENT (IN   ) :: Curr_SA_Run 
 
-      INCLUDE "GLBVAR.INC"
+      INCLUDE 'GLBVAR.INC'
 
       INTEGER         NATOM
       REAL                   XATO
