@@ -1,3 +1,6 @@
+!
+!*****************************************************************************
+!
 ! JvdS The following global variables seem to be needed:
 !
 ! - start of profile (to indicate range)
@@ -5,7 +8,6 @@
 ! - filename (this is now done partially by 'FNAME', which is also used as a dummy)
 
 ! NoData is regularly set to .FALSE. but is it ever set to .TRUE.?
-! Many bugs when selecting space group
 
       MODULE VARIABLES
 
@@ -69,6 +71,15 @@
       LOGICAL NoData
 ! .TRUE. when a powder diffraction pattern has been read in
 
+      INTEGER OriginalNOBS ! Original number of data points read in for the raw powder pattern
+
+!U      INTEGER FirstDataPointUsed
+!U      INTEGER LastDataPointUsed
+!U! FirstDataPointUsed & LastDataPointUsed : due to the binning mechanism, it is
+!U! possible to rebin the original pattern using only a part of it. These two variables are pointers
+!U! to the first and the last data point in the original powder pattern that are actually binned and
+!U! therefore actually used by DASH.
+
       END MODULE VARIABLES
 !
 !*****************************************************************************
@@ -80,27 +91,22 @@
       USE VARIABLES
 
       IMPLICIT NONE
-!
-!   Type declarations
-!
+
       TYPE(WIN_STYLE)   :: MAIN_WINDOW
-!
-!   Variable declarations
-!
-      INTEGER           :: IWIDTHS(10)
-      INTEGER           :: IWID
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
       INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'STATLOG.INC'
 
+      INTEGER           :: IWIDTHS(10)
+      INTEGER           :: IWID
+
       CALL WInitialise(' ')
       CALL Init_StdOut()
 !   Initialise Winteracter
       XBSWidth  = WInfoScreen(1)
       XBSHeight = WInfoScreen(2)
-!>> JCC
 !>> Try to redirect stdout - change working directory if unsuccessful
 
 !   Set up root window options
@@ -124,7 +130,7 @@
 !   Load and display the toolbar
       CALL WMenuToolbar(ID_TOOLBAR1)
 ! Disable the menu buttons
-      CALL SetModeMenuState(-1,-1,-1)
+      CALL SetModeMenuState(1,-1,-1)
 !   Setup array of widths for status bar
       IWIDTHS(1) = 3800
       DO IWID = 2, 7
@@ -147,29 +153,48 @@
 !   Go through the PolyFitter wizard
 !c>> Comment this next line out to remove the wizard
       CALL StartWizard()
-      DO WHILE(.TRUE.)
+      DO WHILE (.TRUE.)
         CALL GetEvent
-        CALL process_mainwindow_message
       END DO
 
       END PROGRAM PCDruid_Main
 !
 !*****************************************************************************
 !
-      SUBROUTINE process_mainwindow_message
-
-      USE VARIABLES
-      USE DRUID_HEADER
+      SUBROUTINE SelectMode(TheMode)
+!
+! This subroutine selects "peak fitting" / "Pawley refinement" / "structure solution" mode,
+! ensuring that exactly one mode is active at all times and
+! updating the current mode in the menu and in the toolbar.
+!
       USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      IMPLICIT NONE
 
-      SELECT CASE (EventType)
-        CASE (MouseButDown)
-          CALL Plot_Alter
-        CASE (KeyDown)
-          CALL Check_KeyDown
+      INTEGER, INTENT (IN   ) :: TheMode
+
+      INCLUDE 'GLBVAR.INC'
+
+! Update the status bar
+      SELECT CASE (TheMode)
+        CASE (ID_Peak_Fitting_Mode)
+          STATBARSTR(8)='Peak fitting mode'
+        CASE (ID_Pawley_Refinement_Mode)
+          STATBARSTR(8)='Pawley refinement mode'
+        CASE (ID_Structure_Solution_Mode)
+          STATBARSTR(8)='Structure solution mode'
       END SELECT
-
-      END SUBROUTINE process_mainwindow_message
+      CALL WindowOutStatusBar(8,STATBARSTR(8))
+! Update the menu
+      CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
+      IDCurrent_Cursor_mode = TheMode
+      IF (IDCurrent_Cursor_mode .EQ. ID_Default_Mode) IDCurrent_Cursor_mode = ID_Peak_Fitting_Mode
+      CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+! Update the toolbar
+      
+      END SUBROUTINE SelectMode
 !
 !*****************************************************************************
 !
@@ -198,12 +223,12 @@
       STATBARSTR(8)=' '
       CALL WindowOutStatusBar(8,STATBARSTR(8))
       SELECT CASE (EventInfo%VALUE1)
-        CASE (ID_import_xye_file)
-          CALL Diffraction_File_Browse
         CASE (ID_import_dpj_file)
           CALL SDI_file_Browse
-        CASE (ID_Structure_Solution_Mode)
-          CALL SA_Main()
+        CASE (ID_import_xye_file)
+          CALL Diffraction_File_Browse
+        CASE (ID_Remove_Background)
+          CALL Background_Fit
         CASE (ID_FILE_PRINT)
           CALL Profile_Plot(-IPTYPE)
         CASE (ID_FILE_EXIT)
@@ -213,18 +238,16 @@
           CALL WDialogSelect(IDD_Plot_Option_Dialog)
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL PopActiveWindowID
-        CASE (ID_Default_Mode)
-          STATBARSTR(8)='Default visualisation mode'
-          CALL WindowOutStatusBar(8,STATBARSTR(8))
-          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-          IDCurrent_Cursor_mode=ID_Default_Mode
-          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+!U        CASE (ID_Default_Mode)
+!U          STATBARSTR(8)='Default visualisation mode'
+!U          CALL WindowOutStatusBar(8,STATBARSTR(8))
+!U          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
+!U          IDCurrent_Cursor_mode = ID_Default_Mode
+!U          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
         CASE (ID_Peak_Fitting_Mode)
           STATBARSTR(8)='Peak fitting mode'
           CALL WindowOutStatusBar(8,STATBARSTR(8))
-          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-          IDCurrent_Cursor_mode=ID_Peak_Fitting_Mode
-          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+          CALL SelectMode(ID_Peak_Fitting_Mode)
           FromPeakFit = .TRUE.
           CALL PeakFit(EventInfo%VALUE1)
           GOTO 10
@@ -233,25 +256,20 @@
             IF (.NOT. Confirm('Lattice constants may not have been refined'//CHAR(13)//&
                               'Do you wish to continue?')) RETURN
           END IF
-          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-          IDCurrent_Cursor_mode=ID_Pawley_Refinement_Mode
-          CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemChecked,WintOn)
           STATBARSTR(8)='Pawley refinement mode'
           CALL WindowOutStatusBar(8,STATBARSTR(8))
-          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-          IDCurrent_Cursor_mode=ID_Pawley_Refinement_Mode
-          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+          CALL SelectMode(ID_Pawley_Refinement_Mode)
           CALL Quick_Pawley()
 !.. Now go back to the PeakFit mode
           IF (FromPeakFit) THEN
             STATBARSTR(8)='Peak fitting mode'
             CALL WindowOutStatusBar(8,STATBARSTR(8))
-            CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-            IDCurrent_Cursor_mode = ID_Peak_Fitting_Mode
-            CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+            CALL SelectMode(ID_Peak_Fitting_Mode)
             CALL PeakFit(EventInfo%VALUE1)
             GOTO 10
           END IF
+        CASE (ID_Structure_Solution_Mode)
+          CALL SA_Main()
         CASE (ID_get_crystal_symmetry)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
@@ -326,8 +344,8 @@
                CHAR(13)//&
                'Copyright February 2001'
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
-
       RETURN
+
       END SUBROUTINE About
 !
 !*****************************************************************************
@@ -363,7 +381,7 @@
 !                 CALL IGrPlotMode('E')
 !       END SELECT                        
 !           
-      RETURN
+      RETURN  
 
       END SUBROUTINE Redraw
 !
@@ -457,14 +475,11 @@
 !      CALL WMenuSetState(ID_import_pro_file,ItemEnabled,OnOrOff)
       IF (OnOff .EQ. 1) THEN
         CALL SetModeMenuState(PeakOn,PawleyOn,SolutionOn)
-!O        CALL SetWizardState(WizardOn)
       ELSE
         PeakOn     = WMenuGetState(ID_Peak_Fitting_Mode,ItemEnabled)
         PawleyOn   = WMenuGetState(ID_Pawley_Refinement_Mode,ItemEnabled)
         SolutionOn = WMenuGetState(ID_Structure_Solution_Mode,ItemEnabled)
-!O        WizardOn   = WMenuGetState(ID_Start_Wizard,ItemEnabled)
         CALL SetModeMenuState(-1,-1,-1)
-!O        CALL SetWizardState(-1)
       ENDIF
 
       END SUBROUTINE ToggleMenus
@@ -492,3 +507,6 @@
       CALL IOsDeleteFile('polys.lis')
 
       END SUBROUTINE DeleteTempFiles
+!
+!*****************************************************************************
+!
