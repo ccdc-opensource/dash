@@ -1,5 +1,5 @@
 !
-	SUBROUTINE CHKMAXREF(PCXX)
+	SUBROUTINE CHKMAXREF_2(PCXX)
 ! Checks if the maximum number of reflections has been exceeded
 !
     USE WINTERACTER
@@ -59,10 +59,12 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CHKMAXREF_2(PCXX)
+      SUBROUTINE CHKMAXREF(PCXX)
+!
 ! Checks if the maximum number of reflections has been exceeded
 !
-      USE WINTERACTER
+
+      IMPLICIT NONE
 
       EXTERNAL PCXX
 
@@ -75,59 +77,64 @@
       REAL                                                                                      KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
 
-      COMMON /PRPKCN/ARGK,PKCNSP(6,9,5), KPCNSP(6,9,5),DTDPCN(6),DTDWL,&
-      NPKCSP(9,5),ARGMIN(5),ARGMAX(5), ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
+
+      LOGICAL routine_called
+      SAVE    routine_called
+      DATA    routine_called / .FALSE. /
 
       INTEGER iorda(10)
       REAL    ardif(10) ! Difference
       REAL    aadd ! Add
-      REAL    arrt ! Relative
+      REAL    arrt ! Relative: holds the d-spacing of the previous reflections
+      REAL    armx
+      INTEGER II
 
-      LOGICAL routine_called
-      SAVE routine_called
-      DATA routine_called / .FALSE. /
-!
       aadd = 0.0
       IF (maxk .GT. 360) THEN
-!.. We've too many reflections ... must reduce
+! We've too many reflections ... must reduce
         IF (.NOT. routine_called) THEN
-          CALL WMessageBox(OKOnly,InformationIcon,CommonOK,  &
-               'DASH has a maximium limit of 350 reflections.'//CHAR(13)//&
-               'Only the 350 lowest angle reflections will be indexed and used','File truncation')
+          CALL InfoMessage('DASH has a maximium limit of 350 reflections.'//CHAR(13)//&
+                           'Only the 350 lowest angle reflections will be indexed and used.')
           routine_called = .TRUE.
         ENDIF
         know = 350   ! know is a global variable used by PCXX
         CALL PCXX(2) ! Changes argk
         arrt = argk
-! JvdS I don't understand the following lines at all: it seems to search for the maximum _difference_
-! in 2 theta between two reflections between reflections 350 and 360. WHY!?
-!
+! Search for the maximum difference in 2 theta between two reflections between reflections 350 and 360
 ! JvdS was:
-!       DO II = 1, 1
+!O      DO II = 1, 1
         DO II = 1, 10
           know = 350 + II ! know is a global variable
           CALL PCXX(2)
-          ardif(II) = argk - arrt  ! argk is a global variable
+          ardif(II) = argk - arrt ! argk is a global variable
           arrt = argk
-        END DO
+        ENDDO
         CALL sortx(ardif,iorda,10)
         maxk = 349 + iorda(10)
-        aadd = ardif(10)
-      END IF
+! JvdS was:
+!O      aadd = ardif(10)
+        aadd = ardif(iorda(10))
+      ENDIF
       know = maxk
 ! Calculate peak centre of know in argk, and its derivatives
       CALL pcxx(2)
-! argk already contains the peak position of the very very last reflection because
-! maxk has already been updated: why are we adding aadd again?
+! argk already contains the peak position of the very very last reflection
+! We are adding aadd in order to extend the profile as far as possible including the whole peak.
       armx = argk + aadd
       II = 1
-      DO WHILE ((zargi(II) .LT. armx) .AND. (II .LE. MPPTS))
+      DO WHILE ((zargi(II) .LT. armx) .AND. (II .LT. npts))
         II = II + 1
-      END DO
-      npts = MIN(npts,II)
+      ENDDO
       IF (aadd .NE. 0.0) argmax(1) = armx
 
-      END SUBROUTINE CHKMAXREF_2
+      END SUBROUTINE CHKMAXREF
 !
 !*****************************************************************************
 !
