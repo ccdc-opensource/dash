@@ -374,6 +374,7 @@
                     IF (XP(H) .GT. 1.0) XP(H) = XP(H) - 1.0
                   ELSE IF (IsFullRangeTorsion(H)) THEN
 ! We don't actually have to do anything here: just skipping the out-of-bounds test suffices
+                    XP(H) = MOD(XP(H), 360.0)
                     IF (XP(H) .LT. -180.0) XP(H) = XP(H) + 360.0
                     IF (XP(H) .GT. +180.0) XP(H) = XP(H) - 360.0
                   ELSE
