@@ -29,26 +29,31 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
-      INTEGER     FLEN ! Length of TheFileName
       CHARACTER*4 C4
-      INTEGER     irange
+      INTEGER iRange, CurrRange
       INTEGER Load_rawSTOE_File, Load_rawBruker_File ! Functions
       INTEGER tNumOfRanges
-      CHARACTER*80 TitleOfRange(8) ! 8 = maximum number of ranges in a STOE file
+      CHARACTER*80 TitleOfRange(250) ! 8 = maximum number of ranges in a STOE file
+      CHARACTER*20, EXTERNAL :: Integer2String
+      REAL    t2ThetaStart(250), t2ThetaStep(250), t2ThetaEnd(250)
+      INTEGER iHighlightList(250)
+      LOGICAL LoadRange(250)
+      REAL    Smallest2ThetaStep
+      INTEGER I, hFile
 
 ! Current status, initialise to 'error'
       Load_raw_File = 0
-      FLEN = LEN_TRIM(TheFileName)
+      hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=10,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
 ! Check if true RAW file, and which type
-      READ(UNIT=10,REC=1,ERR=999) C4
-      CLOSE(10)
+      READ(UNIT=hFile,REC=1,ERR=999) C4
+      CLOSE(hFile)
       IF (C4(1:3) .NE. 'RAW') THEN
         CALL ErrorMessage('Not a valid STOE or Bruker .raw file.')
         RETURN
       ENDIF
-! First check the version, which follows from the third byte in the file. Bytes 1-3 are: RAW
+! First check the version, which follows from the fourth byte in the file. Bytes 1-3 are: RAW
 ! "RAW_" = STOE
 ! "RAW " = Bruker version 1. The oldest version, requested by Bruker not the be supported any more.
 ! "RAW2" = Bruker version 2.
@@ -63,25 +68,58 @@
             RETURN
           ENDIF
           IF (tNumOfRanges .EQ. 1) THEN
-            irange = 1
+            iRange = 1
           ELSE
             CALL PushActiveWindowID
             CALL WDialogLoad(IDD_DataRangeSTOE)
             CALL WDialogSelect(IDD_DataRangeSTOE)
             CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,1)
             CALL WDialogShow(-1,-1,IDOK,Modal)
-            CALL WDialogGetMenu(IDF_DataRangeMenu,irange)
+            CALL WDialogGetMenu(IDF_DataRangeMenu,iRange)
 ! irange is the data range to be read.
             CALL WDialogUnload(IDD_DataRangeSTOE)
-            CALL PushActiveWindowID
+            CALL PopActiveWindowID
           ENDIF
-          Load_raw_File = Load_rawSTOE_File(TheFileName,irange)
+          Load_raw_File = Load_rawSTOE_File(TheFileName,iRange)
+          ESDsFilled = .FALSE.
           IF (Load_raw_File .NE. 1) RETURN
         CASE (' ','1','2')
-          Load_raw_File = Load_rawBruker_File(TheFileName)
+! Bruker files can contain multiple data ranges.
+! Scan the file, get the number of data ranges and their titles.
+          CALL GetDataRangesBruker(TheFileName,tNumOfRanges,t2ThetaStart,t2ThetaStep,t2ThetaEnd)
+          IF (tNumOfRanges .EQ. 0) THEN
+            CALL ErrorMessage('File contains no data.')
+            RETURN
+          ENDIF
+          IF (tNumOfRanges .EQ. 1) THEN
+            LoadRange(1) = .TRUE.
+          ELSE
+            CALL PushActiveWindowID
+            CALL WDialogLoad(IDD_DataRangeBruker)
+            CALL WDialogSelect(IDD_DataRangeBruker)
+            DO CurrRange = 1, tNumOfRanges 
+              TitleOfRange(CurrRange) = "Range "//Integer2String(CurrRange)
+              iHighlightList(CurrRange) = 1
+            ENDDO
+            CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,iHighlightList)
+            CALL WDialogShow(-1,-1,IDOK,Modal)
+            CALL WDialogGetMenu(IDF_DataRangeMenu,iHighlightList)
+! The array iHighlightList now contains '1' for every data range to be read, '0' otherwise.
+            CALL WDialogUnload(IDD_DataRangeBruker)
+            CALL PopActiveWindowID
+            DO I = 1, tNumOfRanges
+              LoadRange(I) = (iHighlightList(I) .EQ. 1)
+            ENDDO
+          ENDIF
+          Smallest2ThetaStep = 90.0
+          DO I = 1, tNumOfRanges
+            IF (t2ThetaStep(I) .LT. Smallest2ThetaStep) Smallest2ThetaStep = t2ThetaStep(I)
+          ENDDO
+          Smallest2ThetaStep = Smallest2ThetaStep - 0.00005 ! In case of rounding errors
+          Load_raw_File = Load_rawBruker_File(TheFileName,LoadRange,Smallest2ThetaStep)
+          ESDsFilled = .TRUE.
           IF (Load_raw_File .NE. 1) RETURN
       END SELECT
-      ESDsFilled = .FALSE.
 ! This is definitely laboratory data
       JRadOption = 1
       CALL Upload_Source
@@ -89,9 +127,572 @@
       RETURN
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
-      CLOSE(10)
+      CLOSE(hFile)
 
       END FUNCTION Load_raw_File
+!
+!*****************************************************************************
+!
+      SUBROUTINE GetDataRangesBruker(TheFileName, TheNumOfRanges, The2ThetaStart, The2ThetaStep, The2ThetaEnd)
+!
+! This function tries to build a list of 'dataranges' present in a *.raw file (binary format from Bruker machines).
+! The routine basically assumes that the file is OK.
+!
+! Note that this function should only be called from Load_raw_File
+!
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+!
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data)
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      INTEGER,       INTENT (  OUT) :: TheNumOfRanges
+      REAL,       INTENT (  OUT) :: The2ThetaStart(*), The2ThetaStep(*), The2ThetaEnd(*)
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
+      INTEGER     I, Shift, hFile
+      REAL*8      TwoThetaStart, TwoThetaStep
+      REAL        Lambda1
+      INTEGER*4   I4, NumOfBins
+      INTEGER*4   I4_2
+      REAL*4      R4
+      INTEGER*2   I2(1:4)
+      INTEGER*1   I1(1:8)
+      EQUIVALENCE (I1(1),I2(1),I4,R4)
+      EQUIVALENCE (I2(3),I4_2)
+      REAL*8      R8
+      INTEGER*4   RecReal(1:2)
+      EQUIVALENCE (R8,RecReal(1))  ! This way we can read a REAL*8 from a file with record length 4
+      CHARACTER*4 C4
+      INTEGER*4   NumOfDataRanges  ! 1 data range = 1 powder pattern
+      INTEGER*4   Offset, CurrDataRange
+      INTEGER*2   SizeOfHeader
+
+      TwoThetaStart = 0.0
+      TwoThetaStep  = 0.0
+      hFile = 10
+! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
+      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+! First check the version, which follows from the fourth byte in the file. Bytes 1-3 are: RAW
+! "RAW " = version 1. The oldest version, requested by Bruker not the be supported any more.
+! "RAW2" = version 2.
+! "RAW1" = version 3. The most recent version.
+      READ(hFile,REC=1,ERR=999) C4
+      SELECT CASE (C4(4:4))
+        CASE (' ')
+! Warn the user
+          CALL ErrorMessage("This version of the .raw format is no longer supported."//&
+                           CHAR(13)//"Please convert to a newer version and try again.")
+        CASE ('1')
+! A version 3 file, the most recent and most complicated format
+! Number of completed data ranges.
+! There seem to be 2 uses for this:
+! 1. Measure the same range over and over again (time series)
+! 2. Measure different ranges at different resolutions / counting times
+          READ(hFile,REC=4,ERR=999) NumOfDataRanges
+          TheNumOfRanges = NumOfDataRanges
+! The complete file header is 712 bytes, so start reading at record (712 DIV 4) + RecNumber
+          Offset = 178
+! Loop over the number of data ranges
+          DO CurrDataRange = 1, NumOfDataRanges
+! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+! Length of Range Header Structure in bytes. Must be 304.
+            READ(hFile,REC=Offset+1,ERR=999) I4
+            IF (I4 .NE. 304) THEN
+! The user should be warned here
+              CALL ErrorMessage("Length of Range Header Structure must be 304.")
+              GOTO 999
+            ENDIF
+! Number of 'data records'
+            READ(hFile,REC=Offset+2,ERR=999) NumOfBins
+! Check that we will not read less than 1 data point
+            IF (NumOfBins .EQ. 0) THEN
+              CALL ErrorMessage("The file contains no valid data.")
+              GOTO 999
+            ENDIF
+! Starting angle for 2 theta drive in degrees
+            READ(hFile,REC=Offset+5,ERR=999) RecReal(1)
+            READ(hFile,REC=Offset+6,ERR=999) RecReal(2)
+! Due to the EQUIVALENCE statement, R8 now holds the starting angle in degrees
+            TwoThetaStart = R8
+            The2ThetaStart(CurrDataRange) = SNGL(TwoThetaStart)
+! Read scan mode: 0 = step, 1 = continuous
+            READ(hFile,REC=Offset+43,ERR=999) I4
+! Step size in degrees
+            READ(hFile,REC=Offset+45,ERR=999) RecReal(1)
+            READ(hFile,REC=Offset+46,ERR=999) RecReal(2)
+! Due to the EQUIVALENCE statement, R8 now holds the step size in degrees
+            TwoThetaStep = R8
+            IF (TwoThetaStep .LT. 0.000001) RETURN
+            The2ThetaStep(CurrDataRange) = SNGL(TwoThetaStep)
+            The2ThetaEnd(CurrDataRange) = SNGL(TwoThetaStart) + SNGL(TwoThetaStep) * NumOfBins
+! Next REAL*8 contains primary wavelength (Angstroms) for this data range
+! Assuming a monochromated beam, this is the wavelength we would want
+            READ(hFile,REC=Offset+61,ERR=999) RecReal(1)
+            READ(hFile,REC=Offset+62,ERR=999) RecReal(2)
+! Due to the EQUIVALENCE statement, R8 now holds the wavelength in Angstroms
+            Lambda1 = R8
+! Check that the same wavelength has been used for all data ranges
+            IF (CurrDataRange .EQ. 1) THEN
+! Store this value as the experimental wavelength
+              CALL Set_Wavelength(Lambda1)
+            ELSE
+              IF (ABS(Lambda1-ALambda) .GT. 0.0001) THEN
+                CALL ErrorMessage('More than one wavelength used, reading aborted.')
+                GOTO 999
+              ENDIF
+            ENDIF
+! Data record length. Must be 4.
+            READ(hFile,REC=Offset+64,ERR=999) I4
+            IF (I4 .NE. 4) THEN
+! The user should be warned here
+              CALL ErrorMessage("Record length must be 4.")
+              GOTO 999
+            ENDIF
+! Length of supplementary header (bytes)
+            READ(hFile,REC=Offset+65,ERR=999) I4
+! Check if length of supplementary header is a multiple of four.
+            IF (MOD(I4,4) .NE. 0) THEN
+! The user should be warned here
+              CALL ErrorMessage("Length of Supplementary Header is not a multiple of 4.")
+              GOTO 999
+            ENDIF
+! Skip all supplementary headers of the current data range
+            Offset = Offset + I4 / 4
+! Skip the header of the current data range
+            Offset = Offset + 76
+! The data begin from here as REAL*4 records
+! Next data range starts after this one
+            Offset = Offset + NumOfBins
+! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+          ENDDO
+        CASE ('2')
+! A version 2 file.
+! Next two bytes are the number of data ranges
+          READ(hFile,REC=2,ERR=999) I4
+! Due to the EQUIVALENCE statement, I2(1) holds the first two bytes of I4.
+! Because of 'backwords storage', this should work.
+          NumOfDataRanges = I2(1)
+          TheNumOfRanges = NumOfDataRanges
+! The next thing we need from the file header is Lambda 1
+! Unfortunately, mean while one data item had a length of two bytes.
+! Due to some EQUIVALENCE statements, this can be read as follows:
+          READ(hFile,REC=48,ERR=999) I4
+          READ(hFile,REC=49,ERR=999) I4_2
+! Shift by two bytes
+          I2(1) = I2(2)
+          I2(2) = I2(3)
+! R4 now holds the wavelength
+          Lambda1 = R4
+          CALL Set_Wavelength(Lambda1)
+! The complete file header is 256 bytes, so start reading at record (256 DIV 4) + RecNumber
+          Offset = 64
+! @ Now there should be a loop over the number of data ranges
+          DO CurrDataRange = 1, NumOfDataRanges
+! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+! The next two bytes are the length of the Range Header in bytes.
+            READ(hFile,REC=Offset+1,ERR=999) I4
+! Due to EQUIVALENCE, I2(1) holds the header length
+            SizeOfHeader = I2(1)
+! Due to EQUIVALENCE, I2(2) holds the number of 'data records'
+            NumOfBins = I2(2)
+! Check that we will not read less than 1 data point
+            IF (NumOfBins .EQ. 0) THEN
+! The user should be warned here
+              CALL ErrorMessage("The file contains no valid data.")
+              GOTO 999
+            ENDIF
+! The step size. A REAL*4 in this format
+            READ(hFile,REC=Offset+4,ERR=999) R4
+            TwoThetaStep = R4
+            The2ThetaStep(CurrDataRange) = TwoThetaStep
+            IF (TwoThetaStep .LT. 0.000001) RETURN
+! Six times the start points of the range
+! @@@@ Which one is 2 theta ?????
+            READ(hFile,REC=Offset+6,ERR=999) R4
+            TwoThetaStart = R4
+            The2ThetaStart(CurrDataRange) = TwoThetaStart
+! Now we can start reading the raw data. The complete header can consist of any number
+! of bytes, and we can only read per four. The data is in REAL*4 format. This may require some
+! shifting of the bytes read in. It is actually possible that the last datapoint cannot be read.
+            IF (MOD(SizeOfHeader,4) .NE. 0) THEN
+              NumOfBins = NumOfBins - 1
+
+              OffSet = Offset + 1 + (SizeOfHeader / 4)
+! Due to the way integer division in FORTRAN works, 
+! the fractional part of SizeOfHeader / 4 is discarded
+              Shift = SizeOfHeader - MOD(SizeOfHeader,4)
+              READ(hFile,REC=Offset,ERR=999) I4
+              DO I = 1, NumOfBins
+                READ(hFile,REC=Offset+I,ERR=999) I4_2
+                I1(1) = I1(1+Shift)
+                I1(2) = I1(2+Shift)
+                I1(3) = I1(3+Shift)
+                I1(4) = I1(4+Shift)
+                YOBS(I) = R4
+                I1(1) = I1(1+(4-Shift))
+                I1(2) = I1(2+(4-Shift))
+                I1(3) = I1(3+(4-Shift))
+                I1(4) = I1(4+(4-Shift))
+
+              ENDDO
+            ELSE
+! When we are here, the size of the header was a multiple of 4 and we can read the data easily
+              OffSet = Offset + SizeOfHeader / 4
+
+              DO I = 1, NumOfBins
+                READ(hFile,REC=Offset+I,ERR=999) R4
+                YOBS(I) = R4
+              ENDDO
+
+            ENDIF
+
+          ENDDO
+! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+        CASE DEFAULT
+          CALL ErrorMessage('Unrecognised *.raw format.')
+      END SELECT
+ 999  CLOSE(hFile)
+
+      END SUBROUTINE GetDataRangesBruker
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION Load_rawBruker_File(TheFileName,LoadRange,Smallest2ThetaStep)
+!
+! This function tries to load a *.raw file (binary format from Bruker machines).
+! The routine basically assumes that the file is OK.
+!
+! Note that this function should only be called from Load_raw_File
+!
+! JvdS 23 July 2001
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+!
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data)
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      LOGICAL,       INTENT (IN   ) :: LoadRange(*)
+      REAL,          INTENT (IN   ) :: Smallest2ThetaStep
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
+      INTEGER     tNOBS1, tNOBS2, hFile
+      REAL        tXOBS1(2*MOBS), tYOBS1(2*MOBS), tEOBS1(2*MOBS)
+      REAL        tXOBS2(2*MOBS), tYOBS2(2*MOBS), tEOBS2(2*MOBS)
+      INTEGER     iP(2*MOBS)
+      INTEGER     I, Shift
+      REAL*8      TwoThetaStart, TwoThetaStep, CurrTwoTheta
+      REAL        Lambda1
+      INTEGER*4   I4, NumOfBins
+      INTEGER*4   I4_2
+      REAL*4      R4
+      INTEGER*2   I2(1:4)
+      INTEGER*1   I1(1:8)
+      EQUIVALENCE (I1(1),I2(1),I4,R4)
+      EQUIVALENCE (I2(3),I4_2)
+      REAL*8      R8
+      INTEGER*4   RecReal(1:2)
+      EQUIVALENCE (R8,RecReal(1))  ! This way we can read a REAL*8 from a file with record length 4
+      CHARACTER*4 C4
+      INTEGER*4   NumOfDataRanges  ! 1 data range = 1 powder pattern
+      INTEGER*4   Offset, CurrDataRange
+      INTEGER*2   SizeOfHeader
+      REAL        StepTime, Last2Theta
+      LOGICAL     IsFirstRange
+
+! Current status, initialise to 'error'
+      Load_rawBruker_File = 0
+      TwoThetaStart = 0.0
+      TwoThetaStep  = 0.0
+      IsFirstRange = .TRUE.
+      tNOBS1 = 0
+      hFile = 10
+! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
+      OPEN(hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+! First check the version, which follows from the fourth byte in the file. Bytes 1-3 are: RAW
+! "RAW " = version 1. The oldest version, requested by Bruker not the be supported any more.
+! "RAW2" = version 2.
+! "RAW1" = version 3. The most recent version.
+      READ(hFile,REC=1,ERR=999) C4
+      SELECT CASE (C4(4:4))
+        CASE (' ')
+! Warn the user
+          CALL ErrorMessage("This version of the .raw format is no longer supported."//&
+                           CHAR(13)//"Please convert to a newer version and try again.")
+          GOTO 999
+        CASE ('1')
+! A version 3 file, the most recent and most complicated format
+!? 'current file status'. 1 = done, 2 = active, 3 = aborted, 4 = interrupted
+!?          READ(UNIT=10,REC=3,ERR=999) I4
+!?          IF (I4 .NE. 1) THEN
+!?! The user should be warned here
+!?            CALL ErrorMessage("Current file status is Active, Aborted or Interrupted.")
+!?            RETURN
+!?          ENDIF
+! Number of completed data ranges.
+! There seem to be 2 uses for this:
+! 1. Measure the same range over and over again (time series)
+! 2. Measure different ranges at different resolutions / counting times
+          READ(hFile,REC=4,ERR=999) NumOfDataRanges
+! The complete file header is 712 bytes, so start reading at record (712 DIV 4) + RecNumber
+          Offset = 178
+! Loop over the number of data ranges
+          DO CurrDataRange = 1, NumOfDataRanges
+! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+! Length of Range Header Structure in bytes. Must be 304.
+            READ(hFile,REC=Offset+1,ERR=999) I4
+            IF (I4 .NE. 304) THEN
+! The user should be warned here
+              CALL ErrorMessage("Length of Range Header Structure must be 304.")
+              GOTO 999
+            ENDIF
+! Number of 'data records'
+            READ(hFile,REC=Offset+2,ERR=999) NumOfBins
+! Check that we will not read more than MOBS data points
+            IF (NumOfBins .GT. MOBS) THEN
+! Warn the user
+              CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+              NumOfBins = MOBS
+            ENDIF
+! Check that we will not read less than 1 data point
+            IF (NumOfBins .EQ. 0) THEN
+              CALL ErrorMessage("The file contains no valid data.")
+              GOTO 999
+            ENDIF
+! Starting angle for 2 theta drive in degrees
+            READ(hFile,REC=Offset+5,ERR=999) RecReal(1)
+            READ(hFile,REC=Offset+6,ERR=999) RecReal(2)
+! Due to the EQUIVALENCE statement, R8 now holds the starting angle in degrees
+            TwoThetaStart = R8
+! Read scan mode: 0 = step, 1 = continuous
+            READ(hFile,REC=Offset+43,ERR=999) I4
+! Step size in degrees
+            READ(hFile,REC=Offset+45,ERR=999) RecReal(1)
+            READ(hFile,REC=Offset+46,ERR=999) RecReal(2)
+! Due to the EQUIVALENCE statement, R8 now holds the step size in degrees
+            TwoThetaStep = R8
+            IF (TwoThetaStep .LT. 0.000001) RETURN
+            READ(hFile,REC=Offset+49,ERR=999) StepTime
+! Next REAL*8 contains primary wavelength (Angstroms) for this data range
+! Assuming a monochromated beam, this is the wavelength we would want
+            READ(hFile,REC=Offset+61,ERR=999) RecReal(1)
+            READ(hFile,REC=Offset+62,ERR=999) RecReal(2)
+! Due to the EQUIVALENCE statement, R8 now holds the wavelength in Angstroms
+            Lambda1 = R8
+! Check that the same wavelength has been used for all data ranges
+            IF (LoadRange(CurrDataRange)) THEN
+              IF (IsFirstRange) THEN
+! Store this value as the experimental wavelength
+                CALL Set_Wavelength(Lambda1)
+                IsFirstRange = .FALSE.
+              ELSE
+                IF (ABS(Lambda1-ALambda) .GT. 0.0001) THEN
+                  CALL ErrorMessage('More than one wavelength used, reading aborted.')
+                  GOTO 999
+                ENDIF
+              ENDIF
+            ENDIF
+! Data record length. Must be 4.
+            READ(hFile,REC=Offset+64,ERR=999) I4
+            IF (I4 .NE. 4) THEN
+! The user should be warned here
+              CALL ErrorMessage("Record length must be 4.")
+              GOTO 999
+            ENDIF
+! Length of supplementary header (bytes)
+            READ(hFile,REC=Offset+65,ERR=999) I4
+! Check if length of supplementary header is a multiple of four.
+            IF (MOD(I4,4) .NE. 0) THEN
+! The user should be warned here
+              CALL ErrorMessage("Length of Supplementary Header is not a multiple of 4.")
+              GOTO 999
+            ENDIF
+! Skip all supplementary headers of the current data range
+            Offset = Offset + I4 / 4
+! Skip the header of the current data range
+            Offset = Offset + 76
+! The data begin from here as REAL*4 records
+            IF (LoadRange(CurrDataRange)) THEN
+! Append to existing data
+! Fill the 2 theta values first
+              CurrTwoTheta = TwoThetaStart
+              DO I = 1, NumOfBins
+                tXOBS1(tNOBS1 + I) = CurrTwoTheta
+                CurrTwoTheta = CurrTwoTheta + TwoThetaStep
+              ENDDO
+              DO I = 1, NumOfBins
+                READ(hFile,REC=Offset+I,ERR=999) R4
+                tYOBS1(tNOBS1 + I) = R4 / StepTime
+                tEOBS1(tNOBS1 + I) = SQRT(R4) / StepTime
+              ENDDO
+              tNOBS2 = tNOBS1 + NumOfBins
+! Now sort the resulting data according to 2 theta
+              CALL SORT_REAL(tXOBS1,iP,tNOBS2)
+! Now write sorted data to tXOBS2, tYOBS2, tEOBS2
+              DO I = 1, tNOBS2
+                tXOBS2(I) = tXOBS1(iP(I))
+                tYOBS2(I) = tYOBS1(iP(I))
+                tEOBS2(I) = tEOBS1(iP(I))
+              ENDDO
+! Now compare consecutive datapoints to see if they should be merged (i.e., have nearly equal 2 theta values)
+              tXOBS1(1) = tXOBS2(1)
+              tYOBS1(1) = tYOBS2(1)
+              tEOBS1(1) = tEOBS2(1)
+              Last2Theta = tXOBS2(1)
+              tNOBS1 = 1
+              DO I = 2, tNOBS2
+                IF (ABS(tXOBS2(I) - Last2Theta) .LT. Smallest2ThetaStep) THEN
+! Merge
+                  tXOBS1(tNOBS1) = (tXOBS1(tNOBS1) + tXOBS2(I)) / 2.0
+                  tYOBS1(tNOBS1) = (tYOBS1(tNOBS1) + tYOBS2(I)) / 2.0
+                  tEOBS1(tNOBS1) = SQRT(tEOBS1(tNOBS1)**2 + tEOBS2(I)**2) / 2.0
+                ELSE
+! New
+                  tNOBS1 = tNOBS1 + 1
+                  tXOBS1(tNOBS1) = tXOBS2(I)
+                  tYOBS1(tNOBS1) = tYOBS2(I)
+                  tEOBS1(tNOBS1) = tEOBS2(I)
+                  Last2Theta = tXOBS2(I)
+                ENDIF
+              ENDDO
+            ENDIF
+! Next data range starts after this one
+            Offset = Offset + NumOfBins
+! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+          ENDDO
+          NumOfBins = tNOBS1
+          DO I = 1, NumOfBins
+            XOBS(I) = tXOBS1(I)
+            YOBS(I) = tYOBS1(I)
+            EOBS(I) = tEOBS1(I)
+          ENDDO
+        CASE ('2')
+! A version 2 file.
+! Next two bytes are the number of data ranges
+          READ(hFile,REC=2,ERR=999) I4
+! Due to the EQUIVALENCE statement, I2(1) holds the first two bytes of I4.
+! Because of 'backwords storage', this should work.
+          NumOfDataRanges = I2(1)
+! The next thing we need from the file header is Lambda 1
+! Unfortunately, mean while one data item had a length of two bytes.
+! Due to some EQUIVALENCE statements, this can be read as follows:
+          READ(hFile,REC=48,ERR=999) I4
+          READ(hFile,REC=49,ERR=999) I4_2
+! Shift by two bytes
+          I2(1) = I2(2)
+          I2(2) = I2(3)
+! R4 now holds the wavelength
+          Lambda1 = R4
+          CALL Set_Wavelength(Lambda1)
+! The complete file header is 256 bytes, so start reading at record (256 DIV 4) + RecNumber
+          Offset = 64
+! @ Now there should be a loop over the number of data ranges
+          DO CurrDataRange = 1, NumOfDataRanges
+! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+! The next two bytes are the length of the Range Header in bytes.
+            READ(hFile,REC=Offset+1,ERR=999) I4
+! Due to EQUIVALENCE, I2(1) holds the header length
+            SizeOfHeader = I2(1)
+! Due to EQUIVALENCE, I2(2) holds the number of 'data records'
+            NumOfBins = I2(2)
+! Check that we will not read more than MOBS data points
+            IF (NumOfBins .GT. MOBS) THEN
+! Warn the user
+              CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+              NumOfBins = MOBS
+            ENDIF
+! Check that we will not read less than 1 data point
+            IF (NumOfBins .EQ. 0) THEN
+! The user should be warned here
+              CALL ErrorMessage("The file contains no valid data.")
+              GOTO 999
+            ENDIF
+! The step size. A REAL*4 in this format
+            READ(hFile,REC=Offset+4,ERR=999) R4
+            TwoThetaStep = R4
+            IF (TwoThetaStep .LT. 0.000001) RETURN
+! Six times the start points of the range
+! @@@@ Which one is 2 theta ?????
+            READ(hFile,REC=Offset+6,ERR=999) R4
+            TwoThetaStart = R4
+! Fill the 2 theta values
+            CurrTwoTheta = TwoThetaStart
+            DO I = 1, NumOfBins
+              XOBS(I) = CurrTwoTheta
+              CurrTwoTheta = CurrTwoTheta + TwoThetaStep
+            ENDDO
+! Now we can start reading the raw data. The complete header can consist of any number
+! of bytes, and we can only read per four. The data is in REAL*4 format. This may require some
+! shifting of the bytes read in. It is actually possible that the last datapoint cannot be read.
+            IF (MOD(SizeOfHeader,4) .NE. 0) THEN
+              NumOfBins = NumOfBins - 1
+              OffSet = Offset + 1 + (SizeOfHeader / 4)
+! Due to the way integer division in FORTRAN works, 
+! the fractional part of SizeOfHeader / 4 is discarded
+              Shift = SizeOfHeader - MOD(SizeOfHeader,4)
+              READ(hFile,REC=Offset,ERR=999) I4
+              DO I = 1, NumOfBins
+                READ(hFile,REC=Offset+I,ERR=999) I4_2
+                I1(1) = I1(1+Shift)
+                I1(2) = I1(2+Shift)
+                I1(3) = I1(3+Shift)
+                I1(4) = I1(4+Shift)
+                YOBS(I) = R4
+                I1(1) = I1(1+(4-Shift))
+                I1(2) = I1(2+(4-Shift))
+                I1(3) = I1(3+(4-Shift))
+                I1(4) = I1(4+(4-Shift))
+              ENDDO
+            ELSE
+! When we are here, the size of the header was a multiple of 4 and we can read the data easily
+              OffSet = Offset + SizeOfHeader / 4
+              DO I = 1, NumOfBins
+                READ(hFile,REC=Offset+I,ERR=999) R4
+                YOBS(I) = R4
+              ENDDO
+            ENDIF
+          ENDDO
+! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+        CASE DEFAULT
+          CALL ErrorMessage('Unrecognised *.raw format.')
+          GOTO 999
+      END SELECT
+      NOBS = NumOfBins
+      Load_rawBruker_File = 1
+! Exit code is error by default, so we can simply return
+ 999  CLOSE(hFile)
+
+      END FUNCTION Load_rawBruker_File
 !
 !*****************************************************************************
 !
@@ -233,17 +834,16 @@
       TYPE(RAW_HEADER) Header
       TYPE(RANGE_INFO) RangeInfo
 
-      INTEGER FLEN, tFileHandle
+      INTEGER hFile
       CHARACTER*128 tString
       INTEGER RangeNr, NumberOfRanges
 !DEC$ END OPTIONS
 
       tNumOfRanges = 0
-      FLEN = LEN_TRIM(TheFileName)
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 128 (=512 bytes)
-      tFileHandle = 11
-      OPEN(UNIT=tFileHandle,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=128,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
-      READ(UNIT=tFileHandle,REC=1,ERR=999) Header
+      hFile = 11
+      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=128,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      READ(hFile,REC=1,ERR=999) Header
       IF (Header%NTotal .EQ. 0) THEN
         CALL ErrorMessage('File contains no data.')
         GOTO 999
@@ -255,7 +855,7 @@
       ENDIF
       DO RangeNr = 1, NumberOfRanges
 ! Read the header for this range
-        READ(UNIT=tFileHandle,REC=Header%HeadRec(RangeNr),ERR=999) RangeInfo
+        READ(hFile,REC=Header%HeadRec(RangeNr),ERR=999) RangeInfo
         IF (RangeInfo%NPoints .NE. 0) THEN
           tNumOfRanges = tNumOfRanges + 1
           tString = ' '
@@ -264,7 +864,7 @@
           TitleOfRange(tNumOfRanges)(1:80) = tString(1:80)
         ENDIF
       ENDDO
- 999  CLOSE(tFileHandle)
+ 999  CLOSE(hFile)
 ! Exit code is error by default, so we can simply return
 
       END SUBROUTINE GetDataRangesSTOE
@@ -701,16 +1301,15 @@
 
       REAL*4  factor
       INTEGER nblk, RecNr, k, j, n
-      INTEGER I, FLEN, tFileHandle
+      INTEGER I, tFileHandle
       REAL    CurrTwoTheta, Lambda1
 !DEC$ END OPTIONS
 
 ! Current status, initialise to 'error'
       Load_rawSTOE_File = 0
-      FLEN = LEN_TRIM(TheFileName)
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 128 (=512 bytes)
       tFileHandle = 11
-      OPEN(UNIT=tFileHandle,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=128,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      OPEN(UNIT=tFileHandle,FILE=TheFileName,ACCESS='DIRECT',RECL=128,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
       READ(UNIT=tFileHandle,REC=1,ERR=999) Header
       IF (Header%NTotal .EQ. 0) THEN
         CALL ErrorMessage('File contains no data.')
@@ -763,289 +1362,6 @@
 ! Exit code is error by default, so we can simply return
 
       END FUNCTION Load_rawSTOE_File
-!
-!*****************************************************************************
-!
-      INTEGER FUNCTION Load_rawBruker_File(TheFileName)
-!
-! This function tries to load a *.raw file (binary format from Bruker machines).
-! The routine basically assumes that the file is OK.
-!
-! Note that this function should only be called from Load_raw_File
-!
-! JvdS 23 July 2001
-!
-! INPUT   : TheFileName = the file name
-!
-! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
-!
-! RETURNS : 1 for success
-!           0 for error (could be file not found/file in use/no valid data)
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      CHARACTER*(*), INTENT (IN   ) :: TheFileName
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-
-      INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
-
-      INTEGER     I, Shift, FLEN ! Length of TheFileName
-      REAL*8      TwoThetaStart, TwoThetaStep, CurrTwoTheta
-      REAL        Lambda1
-      INTEGER*4   I4, NumOfBins
-      INTEGER*4   I4_2
-      REAL*4      R4
-      INTEGER*2   I2(1:4)
-      INTEGER*1   I1(1:8)
-      EQUIVALENCE (I1(1),I2(1),I4,R4)
-      EQUIVALENCE (I2(3),I4_2)
-      REAL*8      R8
-      INTEGER*4   RecReal(1:2)
-      EQUIVALENCE (R8,RecReal(1))  ! This way we can read a REAL*8 from a file with record length 4
-      CHARACTER*4 C4
-      INTEGER*4   NumOfDataRanges  ! 1 data range = 1 powder pattern
-      INTEGER*4   Offset, CurrDataRange
-      INTEGER*2   SizeOfHeader
-
-! Current status, initialise to 'error'
-      Load_rawBruker_File = 0
-      TwoThetaStart = 0.0
-      TwoThetaStep  = 0.0
-      FLEN = LEN_TRIM(TheFileName)
-! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=10,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
-! First check the version, which follows from the third byte in the file. Bytes 1-3 are: RAW
-! "RAW " = version 1. The oldest version, requested by Bruker not the be supported any more.
-! "RAW2" = version 2.
-! "RAW1" = version 3. The most recent version.
-      READ(UNIT=10,REC=1,ERR=999) C4
-      SELECT CASE (C4(4:4))
-        CASE (' ')
-! Warn the user
-          CALL ErrorMessage("This version of the .raw format is no longer supported."//&
-                           CHAR(13)//"Please convert to a newer version and try again.")
-          GOTO 999
-        CASE ('1')
-! A version 3 file, the most recent and most complicated format
-!? 'current file status'. 1 = done, 2 = active, 3 = aborted, 4 = interrupted
-!?          READ(UNIT=10,REC=3,ERR=999) I4
-!?          IF (I4 .NE. 1) THEN
-!?! The user should be warned here
-!?            CALL ErrorMessage("Current file status is Active, Aborted or Interrupted.")
-!?            RETURN
-!?          ENDIF
-! Number of completed data ranges.
-! There seem to be 2 uses for this:
-! 1. Measure the same range over and over again (time series)
-! 2. Measure different ranges at different resolutions / counting times
-! I don't think the former will be used for solving structures.
-          READ(UNIT=10,REC=4,ERR=999) NumOfDataRanges
-          IF (NumOfDataRanges .GT. 1) THEN
-            CALL InfoMessage('This file contains more than one datarange: only the first will be read.')
-            NumOfDataRanges = 1
-          ENDIF
-! The complete file header is 712 bytes, so start reading at record (712 DIV 4) + RecNumber
-          Offset = 178
-! @ Now there should be a loop over the number of data ranges
-          DO CurrDataRange = 1, NumOfDataRanges
-! @ If there's more than one data range, they must be summed. Weights should probably be applied?
-! ################################################################################################
-! NOTE THAT MULTIPLE SELECTION MENUS ARE POSSIBLE IN WINTERACTER: THAT'S WHAT WE SHOULD USE
-! TO SELECT THE DATA RANGES WE WANT TO SUM.
-! ################################################################################################
-!
-! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-! Length of Range Header Structure in bytes. Must be 304.
-            READ(UNIT=10,REC=Offset+1,ERR=999) I4
-            IF (I4 .NE. 304) THEN
-! The user should be warned here
-              CALL ErrorMessage("Length of Range Header Structure must be 304.")
-              GOTO 999
-            ENDIF
-! Number of 'data records'
-            READ(UNIT=10,REC=Offset+2,ERR=999) NumOfBins
-! Check that we will not read more than MOBS data points
-            IF (NumOfBins .GT. MOBS) THEN
-! Warn the user
-              CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
-              NumOfBins = MOBS
-            ENDIF
-! Check that we will not read less than 1 data point
-            IF (NumOfBins .EQ. 0) THEN
-              CALL ErrorMessage("The file contains no valid data.")
-              GOTO 999
-            ENDIF
-! Starting angle for 2 theta drive in degrees
-            READ(UNIT=10,REC=Offset+5,ERR=999) RecReal(1)
-            READ(UNIT=10,REC=Offset+6,ERR=999) RecReal(2)
-! Due to the EQUIVALENCE statement, R8 now holds the starting angle in degrees
-            TwoThetaStart = R8
-! Read scan mode: 0 = step, 1 = continuous
-            READ(UNIT=10,REC=Offset+43,ERR=999) I4
-! Step size in degrees
-            READ(UNIT=10,REC=Offset+45,ERR=999) RecReal(1)
-            READ(UNIT=10,REC=Offset+46,ERR=999) RecReal(2)
-! Due to the EQUIVALENCE statement, R8 now holds the step size in degrees
-            TwoThetaStep = R8
-            IF (TwoThetaStep .LT. 0.000001) RETURN
-! Next REAL*8 contains primary wavelength (Angstroms) for this data range
-! Assuming a monochromated beam, this is the wavelength we would want
-            READ(UNIT=10,REC=Offset+61,ERR=999) RecReal(1)
-            READ(UNIT=10,REC=Offset+62,ERR=999) RecReal(2)
-! Due to the EQUIVALENCE statement, R8 now holds the wavelength in Angstroms
-            Lambda1 = R8
-! Check that the same wavelength has been used for all data ranges
-            IF (CurrDataRange .EQ. 1) THEN
-! Store this value as the experimental wavelength
-              CALL Set_Wavelength(Lambda1)
-            ELSE
-              IF (ABS(Lambda1-ALambda) .LE. 0.0001) THEN
-                CALL ErrorMessage('More than one wavelength used, reading aborted.')
-                GOTO 999
-              ENDIF
-            ENDIF
-! Data record length. Must be 4.
-            READ(UNIT=10,REC=Offset+64,ERR=999) I4
-            IF (I4 .NE. 4) THEN
-! The user should be warned here
-              CALL ErrorMessage("Record length must be 4.")
-              GOTO 999
-            ENDIF
-! Length of supplementary header (bytes)
-            READ(UNIT=10,REC=Offset+65,ERR=999) I4
-! Check if length of supplementary header is a multiple of four.
-            IF (MOD(I4,4) .NE. 0) THEN
-! The user should be warned here
-              CALL ErrorMessage("Length of Supplementary Header is not a multiple of 4.")
-              GOTO 999
-            ENDIF
-! Skip all supplementary headers of the current data range
-            Offset = Offset + I4 / 4
-! Skip the header of the current data range
-            Offset = Offset + 76
-! The data begin from here as REAL*4 records
-! Fill the 2 theta values first
-            CurrTwoTheta = TwoThetaStart
-            DO I = 1, NumOfBins
-              XOBS(I) = CurrTwoTheta
-              CurrTwoTheta = CurrTwoTheta + TwoThetaStep
-            ENDDO
-            DO I = 1, NumOfBins
-              READ(UNIT=10,REC=Offset+I,ERR=999) R4
-              YOBS(I) = R4
-            END DO
-! Next data range start after this one
-            Offset = Offset + NumOfBins
-! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-          END DO
-        CASE ('2')
-! A version 2 file.
-! Next two bytes are the number of data ranges
-          READ(UNIT=10,REC=2,ERR=999) I4
-! Due to the EQUIVALENCE statement, I2(1) holds the first two bytes of I4.
-! Because of 'backwords storage', this should work.
-          NumOfDataRanges = I2(1)
-! The next thing we need from the file header is Lambda 1
-! Unfortunately, mean while one data item had a length of two bytes.
-! Due to some EQUIVALENCE statements, this can be read as follows:
-          READ(UNIT=10,REC=48,ERR=999) I4
-          READ(UNIT=10,REC=49,ERR=999) I4_2
-! Shift by two bytes
-          I2(1) = I2(2)
-          I2(2) = I2(3)
-! R4 now holds the wavelength
-          Lambda1 = R4
-          CALL Set_Wavelength(Lambda1)
-! The complete file header is 256 bytes, so start reading at record (256 DIV 4) + RecNumber
-          Offset = 64
-! @ Now there should be a loop over the number of data ranges
-          DO CurrDataRange = 1, NumOfDataRanges
-! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-! The next two bytes are the length of the Range Header in bytes.
-            READ(UNIT=10,REC=Offset+1,ERR=999) I4
-! Due to EQUIVALENCE, I2(1) holds the header length
-            SizeOfHeader = I2(1)
-! Due to EQUIVALENCE, I2(2) holds the number of 'data records'
-            NumOfBins = I2(2)
-! Check that we will not read more than MOBS data points
-            IF (NumOfBins .GT. MOBS) THEN
-! Warn the user
-              CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
-              NumOfBins = MOBS
-            ENDIF
-! Check that we will not read less than 1 data point
-            IF (NumOfBins .EQ. 0) THEN
-! The user should be warned here
-              CALL ErrorMessage("The file contains no valid data.")
-              GOTO 999
-            ENDIF
-! The step size. A REAL*4 in this format
-            READ(UNIT=10,REC=Offset+4,ERR=999) R4
-            TwoThetaStep = R4
-            IF (TwoThetaStep .LT. 0.000001) RETURN
-! Six times the start points of the range
-! @@@@ Which one is 2 theta ?????
-            READ(UNIT=10,REC=Offset+6,ERR=999) R4
-            TwoThetaStart = R4
-! Fill the 2 theta values
-            CurrTwoTheta = TwoThetaStart
-            DO I = 1, NumOfBins
-              XOBS(I) = CurrTwoTheta
-              CurrTwoTheta = CurrTwoTheta + TwoThetaStep
-            END DO
-! Now we can start reading the raw data. The complete header can consist of any number
-! of bytes, and we can only read per four. The data is in REAL*4 format. This may require some
-! shifting of the bytes read in. It is actually possible that the last datapoint cannot be read.
-            IF (MOD(SizeOfHeader,4) .NE. 0) THEN
-              NumOfBins = NumOfBins - 1
-              OffSet = Offset + 1 + (SizeOfHeader / 4)
-! Due to the way integer division in FORTRAN works, 
-! the fractional part of SizeOfHeader / 4 is discarded
-              Shift = SizeOfHeader - MOD(SizeOfHeader,4)
-              READ(UNIT=10,REC=Offset,ERR=999) I4
-              DO I = 1, NumOfBins
-                READ(UNIT=10,REC=Offset+I,ERR=999) I4_2
-                I1(1) = I1(1+Shift)
-                I1(2) = I1(2+Shift)
-                I1(3) = I1(3+Shift)
-                I1(4) = I1(4+Shift)
-                YOBS(I) = R4
-                I1(1) = I1(1+(4-Shift))
-                I1(2) = I1(2+(4-Shift))
-                I1(3) = I1(3+(4-Shift))
-                I1(4) = I1(4+(4-Shift))
-              END DO
-            ELSE
-! When we are here, the size of the header was a multiple of 4 and we can read the data easily
-              OffSet = Offset + SizeOfHeader / 4
-              DO I = 1, NumOfBins
-                READ(UNIT=10,REC=Offset+I,ERR=999) R4
-                YOBS(I) = R4
-              END DO
-            ENDIF
-          END DO
-! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-        CASE DEFAULT
-          CALL ErrorMessage('Unrecognised *.raw format.')
-          GOTO 999
-      END SELECT
-      CLOSE(10)
-      NOBS = NumOfBins
-      Load_rawBruker_File = 1
-      RETURN
- 999  CONTINUE
-! Exit code is error by default, so we can simply return
-      CLOSE(10)
-
-      END FUNCTION Load_rawBruker_File
 !
 !*****************************************************************************
 !
