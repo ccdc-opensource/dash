@@ -210,7 +210,7 @@
       USE VARIABLES
 
       CALL WHelpFile(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))// &
-       'Documentation'//DIRSPACER//'manual'//DIRSPACER//'dash.html')
+       'Documentation'//DIRSPACER//'manual'//DIRSPACER//'DASH HTMLhelp.chm')
 !T      CALL WHelpFile('C:\Program Files\CCDC\Mercury 1.0\docs\Mercury.chm')
 
       END SUBROUTINE LaunchHelp
@@ -327,6 +327,8 @@
       CALL IOsDeleteFile('polyp.tbk')
       CALL IOsDeleteFile('polyp.hbk')
       CALL IOsDeleteFile('polyp.hbl')
+      CALL IOsDeleteFile('polyx.ccl')
+      CALL IOsDeleteFile('polyx.lis')
       CALL IOsDeleteFile('SA_best.pdb')
       CALL IOsDeleteFile('DICVOL.OUT')
       CALL IOSDeleteFile('MakeZmatrix.log')
