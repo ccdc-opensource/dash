@@ -110,14 +110,14 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE organise_sa_result_data(TheRunNr)
+      SUBROUTINE organise_sa_result_data(TheSolutionNr)
 !ep July 2001
 !   called from SASummary.f90
 !     This subroutine manipulates the data required to plot the observed  
 !   diffraction pattern with the calculated pattern and difference.  The
-!   data is read in from the .pro file and stored in COMMON BLOCK ProFilePLotStore
-!  ihandle is used to identify the column of the store_ arrays where the data
-!  for each child window (ihandle) is stored
+!   data is read in from the .pro file and stored in COMMON BLOCK ProFilePlotStore
+!  iHandle is used to identify the column of the store_ arrays where the data
+!  for each child window (iHandle) is stored
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -128,7 +128,7 @@
 !
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: TheRunNr
+      INTEGER, INTENT (IN   ) :: TheSolutionNr
 
       INCLUDE 'PARAMS.INC'
 
@@ -166,14 +166,15 @@
                       KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      REAL yadd
       EXTERNAL DealWithProfilePlot
-      INTEGER I, iHandle
-      REAL rDummy
+      INTEGER  I, iHandle, TheRunNr
+      REAL     rDummy
+      CHARACTER(20), EXTERNAL :: Integer2String
 !
-!   open the plotting window, ihandle is the window's unique identifier
+!   open the plotting window, iHandle is the window's unique identifier
 !     
-      CALL WindowOpenChild(iHandle, x=10, y=450, width=800, height=400, title='Profile')
+      TheRunNr = iSol2Run(TheSolutionNr)
+      CALL WindowOpenChild(iHandle, x=10, y=450, width=800, height=400, title='Solution number '//Integer2String(TheSolutionNr))
       IF (iHandle.EQ.-1) THEN
         CALL ErrorMessage("Exceeded maximum number of allowed windows.  Close a profile window.")
         RETURN
@@ -219,12 +220,12 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE plot_pro_file(ihandle)
+      SUBROUTINE plot_pro_file(iHandle)
 
       USE WINTERACTER
       USE DRUID_HEADER
 
-      INTEGER, INTENT (IN   ) :: ihandle
+      INTEGER, INTENT (IN   ) :: iHandle
 !
 !  Definitions and array declarations.
 !
@@ -249,11 +250,11 @@
 !
 !  Calculate offset for difference plot.  Position will move as zoom in on profile plot.
 !
-      YADD = 0.5 * (YMax(ihandle)+YMin(ihandle))
+      YADD = 0.5 * (YMax(iHandle)+YMin(iHandle))
       DO II = 1, NBIN
-        store_diff(II,ihandle) = YADD + YOBIN(II) - store_ycalc(II,ihandle)
+        store_diff(II,iHandle) = YADD + YOBIN(II) - store_ycalc(II,iHandle)
       ENDDO
-      CALL WindowSelect(ihandle)
+      CALL WindowSelect(iHandle)
 !
 !  Start of all the plotting calls
 !
@@ -278,8 +279,8 @@
 !
 !  Set units for plot
 !
-      CALL IPgUnits(      xmin(ihandle),    ymin(ihandle), &
-                          xmax(ihandle),    ymax(ihandle))
+      CALL IPgUnits(      xmin(iHandle),    ymin(iHandle), &
+                          xmax(iHandle),    ymax(iHandle))
 !
 !  Set presentation graphics area
 !
@@ -307,7 +308,7 @@
 !  Draw axes
 !
       CALL IGrColourN(KolNumMain)
-      CALL IPgBorder()
+      CALL IPgBorder
 !
 !  Adjust tick position for X Axes
 !
@@ -338,13 +339,13 @@
 !  Draw graph.
 !
       CALL IPgXYPairs(XBIN(1),YOBIN(1))
-      CALL IPgXYPairs(XBIN(1),store_ycalc(1,ihandle))
-      CALL IPgXYPairs(XBIN(1),store_diff(1,ihandle))
+      CALL IPgXYPairs(XBIN(1),store_ycalc(1,iHandle))
+      CALL IPgXYPairs(XBIN(1),store_diff(1,iHandle))
 
 !  Draw axes
 !
       CALL IGrColourN(KolNumMain)
-      CALL IPgBorder()
+      CALL IPgBorder
 
       END SUBROUTINE plot_pro_file
 !
