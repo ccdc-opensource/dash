@@ -95,16 +95,11 @@
       INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'STATLOG.INC'
 
-      DashRawFile = ' '
-      DashHcvFile = ' '
-      DashPikFile = ' '
-      DashTicFile = ' '
-
       CALL WInitialise(' ')
       CALL Init_StdOut()
 !   Initialise Winteracter
-      XBSWidth   = WInfoScreen(1)
-      XBSHeight  = WInfoScreen(2)
+      XBSWidth  = WInfoScreen(1)
+      XBSHeight = WInfoScreen(2)
 !>> JCC
 !>> Try to redirect stdout - change working directory if unsuccessful
 
@@ -209,18 +204,10 @@
           CALL SDI_file_Browse
         CASE (ID_Structure_Solution_Mode)
           CALL SA_Main()
-!        CASE (ID_FILE_SAVE)
-!          CALL Save(0)
-!        CASE (ID_FILE_SAVEAS)
-!          CALL Save(1)
         CASE (ID_FILE_PRINT)
           CALL Profile_Plot(-IPTYPE)
         CASE (ID_FILE_EXIT)
           CALL WExit
-!        CASE (ID_EDIT_DIAG)
-!          CALL Edit()
-!        CASE (ID_PLOT)
-!          CALL Profile_Plot(IPTYPE)
         CASE (ID_Plot_Options)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Plot_Option_Dialog)
@@ -232,14 +219,6 @@
           CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
           IDCurrent_Cursor_mode=ID_Default_Mode
           CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-!        CASE (ID_CrossHair_Cursor_Mode)
-!          STATBARSTR(8)='Cursor Mode'
-!          CALL WindowOutStatusBar(8,STATBARSTR(8))
-!          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-!          IDCurrent_Cursor_mode=ID_CrossHair_Cursor_Mode
-!          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-!          CALL PeakFind_Manual(IDENT)
-!          Goto 10
         CASE (ID_Peak_Fitting_Mode)
           STATBARSTR(8)='Peak fitting mode'
           CALL WindowOutStatusBar(8,STATBARSTR(8))
@@ -297,7 +276,6 @@
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Widths)
           CALL PopActiveWindowID
-!        CASE (ID_get_peak_intensities)
         CASE (ID_PolyFitter_Help)
           CALL LaunchHelp()
         CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5)
@@ -425,22 +403,6 @@
 !
 !*****************************************************************************
 !
-!U      SUBROUTINE Run_Wizard
-!U
-!U      USE VARIABLES
-!U
-!U      CALL SetWizardState(-1)
-!U      CALL ToggleMenus(0)
-!U      CALL PolyFitter_Wizard
-!U      CALL ToggleMenus(1)
-!U      IF (.NOT. NoData) CALL SetModeMenuState(1,0,0)
-!U      IF (.NOT. NoData) CALL Upload_Wizard_Information()
-!U      CALL SetWizardState(1)
-!U
-!U      END SUBROUTINE Run_Wizard
-!
-!*****************************************************************************
-!
       SUBROUTINE ToggleMenus(OnOff)
 ! JvdS This routine emulates 'modal' by greying out all menus, buttons etc.
 ! It is necessary when a window pops up that should still be able to communicate
@@ -465,12 +427,11 @@
       IMPLICIT NONE
 
       INTEGER OnOff
-      INTEGER  PeakOn, PawleyOn, SolutionOn, WizardOn
-      SAVE PeakOn, PawleyOn, SolutionOn, WizardOn
+      INTEGER  PeakOn, PawleyOn, SolutionOn
+      SAVE PeakOn, PawleyOn, SolutionOn
       DATA PeakOn / 1 /
       DATA PawleyOn / 0 /
       DATA SolutionOn / 0 /
-      DATA WizardOn / 1 /
       INTEGER OnOrOff
 
 ! WintOn and WintOff are Winteracter constants
