@@ -1,6 +1,7 @@
       SUBROUTINE VALCHI(CHIVAL)
 C
-	include 'params.inc'
+	INCLUDE 'PARAMS.INC'
+
       COMMON /FCSPEC/ NLGREF,IREFH(3,MFCSPE),LOGREF(8,MFCSPE)
 
       COMMON /CHISTO/ KKOR,WTIJ(MCHIHS),S2S(MCHIHS),S4S(MCHIHS),
@@ -19,9 +20,6 @@ C
       INCLUDE 'GLBVAR.INC'
       include 'statlog.inc'
 C
-      LOGICAL USEREF
-      COMMON /CHIFS1/ KKORSH,IPRJAV(MCHFS1),SPRJAV(MCHFS1)
-      COMMON /CHIFS2/ USEREF(MCHFS2)
       COMMON /ITRINF/ iteration
 c
 	common /temtemtem/ kpp
@@ -30,7 +28,7 @@ c
       SUM1=0.
       SUM2=0.
 C
-      include 'AllFFCalc.inc'
+      INCLUDE 'AllFFCalc.inc'
 C
         DO IK=1,KKOR
           II=IKKOR(IK)
@@ -42,8 +40,6 @@ C
 c
 	lpp=lpp+1
 	if (lpp.eq.1) then
-!	write(56,*) ' In ValChi ',NumberSGTable
-!	write(56,*) ' In ValChi ',kpp,kkor,sum1,sum2
 	end if
 C
         RESCL=0.5*SUM1/SUM2
@@ -72,7 +68,8 @@ C
 C... Pre-calculates sin and cosine terms for the structure factor calculation
 C
 C
-	include 'params.inc'
+	INCLUDE 'PARAMS.INC'
+
       COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),
      & TF(150),KTF(150),SITE(150),KSITE(150),
      & ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
@@ -103,7 +100,6 @@ C
         SINQS(0,1,N)=0.
         SINQS(0,2,N)=0.
         SINQS(0,3,N)=0.
-
 C.. IH
         DO IH=1,IHMAX
           IH1=IH-1
@@ -116,7 +112,6 @@ C.. IH
             SINQS(IH,1,N)=-SINQS(-IH,1,N)
           END DO
         END IF
-C>> JCC	   write(56,*) 'ihmax = ', ihmax, ' and ihmin = ',ihmin
 C.. IK
         DO IK=1,IKMAX
           IK1=IK-1
@@ -144,7 +139,5 @@ C.. IL
 C
       END DO
 C
-C   	 write(89,*)ihmax,ikmax,ilmax,iimax
-C 	 write(89,*)ihmin,ikmin,ilmin,iimin
       RETURN
       END
