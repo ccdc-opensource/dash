@@ -27,7 +27,19 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-      COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
+
+
+
+! JvdS should be the same thing
+!O      COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
+      INTEGER NTIC
+      INTEGER IH
+      REAL    ARGK
+      REAL    DSTAR
+      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
+
+
       LOGICAL HYDNOT
       COMMON /HIDDAT/ HYDNOT(150), nsatom, isatom(150)
 !
