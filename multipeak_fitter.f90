@@ -3,17 +3,46 @@
 !
       SUBROUTINE MULTIPEAK_FITTER()
 
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
       REAL, EXTERNAL :: MULTIPEAK_CHISQ
       INTEGER     MPAR,        MMPAR
       PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
       REAL X(MPAR), DX(MPAR), COV(MMPAR)
+      INTEGER N, I, II
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 
 ! Do all the initialisation
       CALL INITSP(N,X,DX)
 ! Get variables
       CALL GETVAR(N,X,DX)
 ! Perform simplex
+      IBMBER = 0
       CALL SIMOPT(X,DX,COV,N,MULTIPEAK_CHISQ)
+      IF (IBMBER .NE. 0) RETURN
+      RangeFitYN(CurrentRange) = .TRUE.
       DO I = 1, N
         II = I + (I-1)*N
         DX(I) = SQRT(AMAX1(0.0,COV(II)))
@@ -33,8 +62,10 @@
       REAL V(MPAR), D(MPAR)
       PARAMETER (MPT=2000)
       COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
       REAL YHITE(MPEAK)
@@ -57,22 +88,19 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
-      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),                       &
-     &                  PkFnEsd(MPkDes,Max_NPFR),                       &
-     &                  PkFnCal(MPkDes,Max_NPFR), PkFnVarVal(3,MPkDes), &
-     &                  PkFnVarEsd(3,MPkDes),                           &
-     &                  PkAreaVal(MAX_NPPR,MAX_NPFR),                   &
-     &                  PkAreaEsd(MAX_NPPR,MAX_NPFR),                   &
-     &                  PkPosVal(MAX_NPPR,MAX_NPFR),                    &
-     &                  PkPosEsd(MAX_NPPR,MAX_NPFR), PkPosAv(MAX_NPFR)
+      REAL              PkFnVal,                      PkFnEsd,                      &
+                        PkFnCal,                                                    &
+                        PkFnVarVal,                   PkFnVarEsd,                   &
+                        PkAreaVal,                    PkAreaEsd,                    &
+                        PkPosVal,                     PkPosEsd,                     &
+                        PkPosAv
+      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+                        PkFnCal(MPkDes,Max_NPFR),                                   &
+                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+                        PkPosAv(MAX_NPFR)
 
-      PI = 4.*ATAN(1.)
-      RAD = PI/180.
-      DEG = 1./RAD
-      TWOPI = 2.*PI
-      FOURPI = 4.*PI
-      PIBY2 = 0.5*PI
-      ALOG2 = LOG(2.)
       YMAX = Y(1)
       IMAX = 1
       DO I = 1, NPT
@@ -89,7 +117,7 @@
       YMXB = V(1) + V(2)*(X(IMAX)-X(1))
       YPMX = YMAX - YMXB
       YPMX50 = 0.5*YPMX
-!.. Estimate GAMM & SIGM
+! Estimate GAMM & SIGM
       DO I = IMAX, NPT
         YBT = V(1) + V(2)*(X(I)-X(1))
         YPT = Y(I) - YBT
@@ -100,7 +128,7 @@
       ENDDO
    15 GAMM = 2.*XHWHMU
       SIGM = 0.2*GAMM
-!.. Now estimate HPSL & HMSL
+! Now estimate HPSL & HMSL
       YPMX20 = 0.2*YPMX
       DO I = IMAX, 1, -1
         YBT = V(1) + V(2)*(X(I)-X(1))
@@ -312,7 +340,14 @@
 !
       SUBROUTINE OUTPUT_PRO(NVAR,VARVAL,VARESD)
 
+      INTEGER NVAR
+
+      INTEGER     MPAR
+      PARAMETER ( MPAR = 100 )
+      REAL VARVAL(MPAR), VARESD(MPAR)
+
       INCLUDE 'PARAMS.INC'
+
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
       INTEGER           IPF_Lo,                     IPF_Hi
@@ -332,114 +367,75 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
-     &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      REAL            ZCAL !,        ZBAK
-      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
+                      ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
 
-      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),                       &
-     &                  PkFnEsd(MPkDes,Max_NPFR),                       &
-     &                  PkFnCal(MPkDes,Max_NPFR), PkFnVarVal(3,MPkDes), &
-     &                  PkFnVarEsd(3,MPkDes),                           &
-     &                  PkAreaVal(MAX_NPPR,MAX_NPFR),                   &
-     &                  PkAreaEsd(MAX_NPPR,MAX_NPFR),                   &
-     &                  PkPosVal(MAX_NPPR,MAX_NPFR),                    &
-     &                  PkPosEsd(MAX_NPPR,MAX_NPFR), PkPosAv(MAX_NPFR)
+      REAL            ZCAL
+      COMMON /YSTORE/ ZCAL(MPPTS)
 
-      COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
-     &                  DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),       &
-     &                  NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ,      &
-     &                  REFUSE, CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,  &
-     &                  NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+      REAL              PkFnVal,                      PkFnEsd,                      &
+                        PkFnCal,                                                    &
+                        PkFnVarVal,                   PkFnVarEsd,                   &
+                        PkAreaVal,                    PkAreaEsd,                    &
+                        PkPosVal,                     PkPosEsd,                     &
+                        PkPosAv
+      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+                        PkFnCal(MPkDes,Max_NPFR),                                   &
+                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+                        PkPosAv(MAX_NPFR)
+
       LOGICAL REFUSE, CYC1, NOPKRF
+      COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
+                        DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),       &
+                        NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ,      &
+                        REFUSE, CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,  &
+                        NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
 
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
 
-      INTEGER     MPAR
-      PARAMETER ( MPAR = 100 )
-      REAL VARVAL(MPAR), VARESD(MPAR)
-!
-! ... Set the ranges correctly
+! Set the ranges correctly
+      xranav = 0.0
       IPF_RPt(1) = 0
       DO II = 1, NumPeakFitRange
         IPF_RPt(II+1) = IPF_RPt(II) + IPF_Range(II)
       ENDDO
       IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange) + IPF_Range(CurrentRange)
-      IF (CurrentRange.EQ.NumPeakFitRange) THEN
-!.. We just need to add on to the end of the list
-        ITEM = IPF_Lo(CurrentRange) - 1
-        DO I = 1, NPTS
-          II = IPF_RPt(CurrentRange) + I
-          XPeakFit(II) = ZARGI(I)
-          YPeakFit(II) = ZCAL(I)
+      DO I = 1, NPTS
+        II = IPF_RPt(CurrentRange) + I
+        XPeakFit(II) = ZARGI(I)
+        YPeakFit(II) = ZCAL(I)
+      ENDDO
+      DO IP = 1, NPKGEN(1,1)
+        jp = ip + 2
+        PkFnVal(ip,CurrentRange) = varval(jp)
+        IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.02
+        PkFnEsd(ip,CurrentRange) = varesd(jp)
+      ENDDO
+      DO I = 1, NumInPFR(CurrentRange)
+        jp = 1 + NPKGEN(1,1) + 2*I
+        PkAreaVal(i,CurrentRange) = varval(jp)
+        IF (varesd(jp).LT.1.E-5) varesd(jp) = MAX(0.001,0.1*ABS(varval(jp)))
+        PkAreaEsd(i,CurrentRange) = varesd(jp)
+        jp = jp + 1
+        PkPosVal(i,CurrentRange) = varval(jp)
+        XPF_Pos(i,CurrentRange) = varval(jp)
+        xranav = xranav + PkPosVal(i,CurrentRange)
+        IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.003
+        PkPosEsd(i,CurrentRange) = varesd(jp)
+        atem = ABS(varval(jp)-zargi(1))
+        DO ii = 1, NPTS
+          anewt = ABS(varval(jp)-zargi(ii))
+          IF (anewt.LE.atem) THEN
+            atem = anewt
+            item = ii
+          ENDIF
         ENDDO
-        DO IP = 1, NPKGEN(1,1)
-          jp = ip + 2
-          PkFnVal(ip,CurrentRange) = varval(jp)
-          IF (varesd(jp).LT.1.E-6) varesd(jp) = 0.02
-          PkFnEsd(ip,CurrentRange) = varesd(jp)
-        ENDDO
-        DO I = 1, NumInPFR(CurrentRange)
-          jp = 1 + NPKGEN(1,1) + 2*I
-          PkAreaVal(i,CurrentRange) = varval(jp)
-          IF (varesd(jp).LT.1.E-6) varesd(jp) = MAX(0.001,0.1*ABS(varval(jp)))
-          PkAreaEsd(i,CurrentRange) = varesd(jp)
-          jp = jp + 1
-          PkPosVal(i,CurrentRange) = varval(jp)
-          IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.003
-          PkPosEsd(i,CurrentRange) = varesd(jp)
-          XPF_Pos(i,CurrentRange) = varval(jp)
-          atem = ABS(varval(jp)-zargi(1))
-          DO ii = 1, NPTS
-            anewt = ABS(varval(jp)-zargi(ii))
-            IF (anewt.LE.atem) THEN
-              atem = anewt
-              item = ii
-            ENDIF
-          ENDDO
-          YPF_Pos(i,CurrentRange) = zcal(item)
-        ENDDO
-      ELSE ! It's an old range that we are refitting
-!
-! JCC Hmm - problem here. What if we have not fitted the range, only swept it out?
-! attempt to solve by re-calculating the next range's value every time rather than assuming it is set
-! (it won't be set if we've not already got into this routine before for this peak)
-!
-!
-! We just need to modify a few variables
-        DO I = 1, NPTS
-          II = IPF_RPt(CurrentRange) + I
-          XPeakFit(II) = ZARGI(I)
-          YPeakFit(II) = ZCAL(I)
-        ENDDO
-        DO IP = 1, NPKGEN(1,1)
-          jp = ip + 2
-          PkFnVal(ip,CurrentRange) = varval(jp)
-          IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.02
-          PkFnEsd(ip,CurrentRange) = varesd(jp)
-        ENDDO
-        DO I = 1, NumInPFR(CurrentRange)
-          jp = 1 + NPKGEN(1,1) + 2*I
-          PkAreaVal(i,CurrentRange) = varval(jp)
-          IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.1*ABS(varval(jp))
-          PkAreaEsd(i,CurrentRange) = varesd(jp)
-          jp = jp + 1
-          PkPosVal(i,CurrentRange) = varval(jp)
-          IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.003
-          PkPosEsd(i,CurrentRange) = varesd(jp)
-          XPF_Pos(i,CurrentRange) = varval(jp)
-          atem = ABS(varval(jp)-zargi(1))
-          DO ii = 1, NPTS
-            anewt = ABS(varval(jp)-zargi(ii))
-            IF (anewt.LE.atem) THEN
-              atem = anewt
-              item = ii
-            ENDIF
-          ENDDO
-          YPF_Pos(i,CurrentRange) = zcal(item)
-        ENDDO
-      ENDIF
-      xranav = 0.5*(XPF_Range(1,CurrentRange)+XPF_Range(2,CurrentRange))
+        YPF_Pos(i,CurrentRange) = zcal(item)
+      ENDDO
+!O      xranav = 0.5*(XPF_Range(1,CurrentRange)+XPF_Range(2,CurrentRange))
+      xranav = xranav / SNGL(NumInPFR(CurrentRange))
       PkPosAv(CurrentRange) = xranav
       CALL Upload_Positions()
       CALL Upload_Widths()
