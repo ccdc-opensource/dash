@@ -32,7 +32,6 @@
               CALL SA_STRUCTURE_OUTPUT_PDB(Curr_SA_Run)
               CALL ViewStructure('SA_best.pdb')
             CASE (IDF_Pause_Annealing) ! 'Pause'
-!O              CALL WMessageBox(OKOnly,ExclamationIcon,CommonOK,'Press OK to continue','Pause')
               iMyExit = 6
               CALL WDialogLoad(IDD_Pause)
               CALL WDialogSelect(IDD_Pause)
