@@ -252,6 +252,9 @@
                 CASE (4) ! Analyse solutions
                   CALL WizardWindowShow(IDD_SAW_Page5)
                   CALL SelectMode(IDB_AnalyseSolutions)
+                CASE (5) ! Rietveld refinement
+                  CALL WizardWindowShow(IDD_SAW_Page6)
+       !           CALL SelectMode(IDB_AnalyseSolutions)
               END SELECT
           END SELECT
       END SELECT
@@ -1386,7 +1389,7 @@
               CALL CheckUnitCellConsistency
               IF (NumberSGTable .EQ. LPosSG(LatBrav)) CALL WarningMessage('Space-group symmetry has not been reset.')
               CALL WDialogSelect(IDD_PW_Page10)
-              CALL WDialogPutString(IDF_Label5, 'The next step is Pawley Refinement') 
+              CALL WDialogPutString(IDF_LABEL5, 'The next step is Pawley Refinement')  
               CALL WizardWindowShow(IDD_PW_Page10)
             CASE (IDAPPLY)
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
@@ -1404,7 +1407,7 @@
                CALL Download_SpaceGroup(IDD_PW_Page1) 
                SpaceGroupDetermination = .TRUE.
                CALL WDialogSelect(IDD_PW_Page10)
-               CALL WDialogPutString(IDF_Label5, 'The next step in Space Group Determination is Pawley Refinement') 
+               CALL WDialogPutString(IDF_LABEL5, 'The next step in Space Group Determination is Pawley Refinement')
                CALL WizardWindowShow(IDD_PW_Page10)
           END SELECT
         CASE (FieldChanged)

@@ -1,4 +1,4 @@
-! Winteracter module created : 07/May/2003 14:09:39
+! Winteracter module created : 21/May/2003 14:47:11
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -157,7 +157,7 @@
           INTEGER, PARAMETER :: IDF_PW_Option2                  =  1252
           INTEGER, PARAMETER :: IDF_PW_Option3                  =  1253
           INTEGER, PARAMETER :: IDF_PW_Option4                  =  1254
-          INTEGER, PARAMETER :: IDF_PW_Option_Group             =  1255
+          INTEGER, PARAMETER :: IDF_PW_Option5                  =  1255
           INTEGER, PARAMETER :: IDF_PW_Page2_title              =  1265
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_Rwp_Label      =  1279
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_Rwp            =  1280
@@ -323,7 +323,6 @@
           INTEGER, PARAMETER :: IDF_Indexing_zpt                =  1349
           INTEGER, PARAMETER :: IDF_Indexing_exp                =  1350
           INTEGER, PARAMETER :: IDD_License_Dialog              =   154
-          INTEGER, PARAMETER :: IDF_License_Info                =  1351
           INTEGER, PARAMETER :: IDF_License_String              =  1352
           INTEGER, PARAMETER :: IDF_License_Key                 =  1353
           INTEGER, PARAMETER :: ID_Licence_Request              =  1354
@@ -679,4 +678,47 @@
           INTEGER, PARAMETER :: IDF_LABEL14                     =  1468
           INTEGER, PARAMETER :: IDF_LABEL17                     =  1208
           INTEGER, PARAMETER :: IDF_LABEL18                     =  1209
+          INTEGER, PARAMETER :: IDD_SAW_Page6                   =   194
+          INTEGER, PARAMETER :: IDF_Xtal_File_Name              =  1542
+          INTEGER, PARAMETER :: IDB_xtal_file_Browse            =  1527
+          INTEGER, PARAMETER :: IDB_xtal_file_Open              =  1519
+          INTEGER, PARAMETER :: IDB_SDI_file_Open               =  1515
+          INTEGER, PARAMETER :: IDB_SDI_file_Browse             =  1523
+          INTEGER, PARAMETER :: IDB_PO_Settings                 =  1534
+          INTEGER, PARAMETER :: IDD_RR_PO_Settings              =   195
+          INTEGER, PARAMETER :: IDF_RADIO2                      =  1535
+          INTEGER, PARAMETER :: IDF_RADIO5                      =  1536
+          INTEGER, PARAMETER :: IDF_PO_a2                       =  1230
+          INTEGER, PARAMETER :: IDF_PO_b2                       =  1238
+          INTEGER, PARAMETER :: IDF_PO_c2                       =  1239
+          INTEGER, PARAMETER :: IDF_PO_a3                       =  1231
+          INTEGER, PARAMETER :: IDF_PO_b3                       =  1240
+          INTEGER, PARAMETER :: IDF_PO_c3                       =  1241
+          INTEGER, PARAMETER :: IDF_PO_a4                       =  1232
+          INTEGER, PARAMETER :: IDF_PO_b4                       =  1242
+          INTEGER, PARAMETER :: IDF_PO_c4                       =  1244
+          INTEGER, PARAMETER :: IDF_PO_a5                       =  1233
+          INTEGER, PARAMETER :: IDF_PO_b5                       =  1245
+          INTEGER, PARAMETER :: IDF_PO_c5                       =  1246
+          INTEGER, PARAMETER :: IDF_REAL2                       =  1537
+          INTEGER, PARAMETER :: IDF_REAL3                       =  1538
+          INTEGER, PARAMETER :: IDF_REAL4                       =  1539
+          INTEGER, PARAMETER :: IDF_REAL5                       =  1540
+          INTEGER, PARAMETER :: IDF_zmFile5                     =  1392
+          INTEGER, PARAMETER :: IDB_zmBrowse5                   =  1357
+          INTEGER, PARAMETER :: IDF_ZM_pars5                    =  1128
+          INTEGER, PARAMETER :: IDB_zmView5                     =  1328
+          INTEGER, PARAMETER :: IDB_zmDelete5                   =  1369
+          INTEGER, PARAMETER :: IDF_zmNumOf5                    =  1307
+          INTEGER, PARAMETER :: IDB_zmEdit5                     =  1311
+          INTEGER, PARAMETER :: IDF_zmFile6                     =  1393
+          INTEGER, PARAMETER :: IDB_zmBrowse6                   =  1358
+          INTEGER, PARAMETER :: IDF_ZM_pars6                    =  1129
+          INTEGER, PARAMETER :: IDB_zmView6                     =  1329
+          INTEGER, PARAMETER :: IDB_zmDelete6                   =  1370
+          INTEGER, PARAMETER :: IDF_zmNumOf6                    =  1308
+          INTEGER, PARAMETER :: IDB_zmEdit6                     =  1312
+          INTEGER, PARAMETER :: IDF_SDI_File_Name               =  1541
+          INTEGER, PARAMETER :: IDD_RR_PO_Dialog                =   196
+          INTEGER, PARAMETER :: IDF_STRING2                     =  1543
       END MODULE Druid_Header

@@ -263,7 +263,7 @@
       NATOM = TotNumOfAtoms
 ! recalculate the preferred orientation correction factors.
 ! Fill Preferred Orientation part
-      IF (RR_ioptPO) CALL PO_PRECFC(RR_Params(RR_var2PO))
+      IF (RR_ioptPO) CALL PO_PRECFC(RR_PO)
 ! AICALC(1:NumOfRef) now contains the structural part of the calculated intensities
 ! XICALC(1:NumOfRef) now contains the preferred orientation part of the calculated intensities
 ! If we are using preferred orientation: correct for it.

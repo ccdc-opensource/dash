@@ -26,14 +26,6 @@
 
       INCLUDE "GLBVAR.INC"
 
-      INTEGER KK, JQ, JQS, i, J
-      INTEGER iFrg
-      INTEGER iFrgCopy
-      INTEGER iRow, iCol, iField
-      REAL QQSUM, QDEN, QUATER(1:4)
-      REAL Duonion(0:1)
-      REAL ChiSqd, ChiProSqd 
-
       INTEGER         NATOM
       REAL                   XATO
       INTEGER                          KX
@@ -49,6 +41,15 @@
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
+
+      INTEGER KK, JQ, JQS, i, J
+      INTEGER iFrg
+      INTEGER iFrgCopy
+      INTEGER iRow, iCol, iField
+      REAL QQSUM, QDEN, QUATER(1:4)
+      REAL Duonion(0:1)
+      REAL ChiSqd, ChiProSqd 
+      INTEGER tFieldState
 
       CALL WDialogSelect(IDD_Rietveld2)
       LOG_HYDROGENS = .TRUE.
@@ -183,10 +184,20 @@
       IF (PrefParExists) THEN
         CALL WDialogFieldState(IDC_PO,Enabled)
         CALL WDialogFieldState(IDR_PO,Enabled)
+        tFieldState = Enabled
       ELSE
         CALL WDialogFieldState(IDC_PO,Disabled)
         CALL WDialogFieldState(IDR_PO,Disabled)
+        tFieldState = Disabled
       ENDIF
+      CALL WDialogSelect(IDD_RR_PO_Dialog)
+      CALL WDialogFieldState(IDF_PO_a,tFieldState)
+      CALL WDialogFieldState(IDF_PO_b,tFieldState)
+      CALL WDialogFieldState(IDF_PO_c,tFieldState)
+      CALL WDialogFieldState(IDF_LABELa,tFieldState)
+      CALL WDialogFieldState(IDF_LABELb,tFieldState)
+      CALL WDialogFieldState(IDF_LABELc,tFieldState)
+      CALL WDialogSelect(IDD_Rietveld2)
       ! Initialise PO
       IF (PrefParExists) CALL PO_PRECFC(RR_PO)
       ! Initialise ITF
@@ -462,8 +473,9 @@
               CALL RietveldRefinement
             CASE (IDB_Calculate)
               CALL Dialog2RRVAR
+         !     CALL RRVAR2Params
               ! Initialise PO
-              IF (PrefParExists) CALL PO_PRECFC(RR_Params(RR_var2PO))
+              IF (PrefParExists) CALL PO_PRECFC(RR_PO)
               ! Initialise ITF
               CALL CreateFobITF
               ! Initialise XATO(1:3,1:150)
@@ -535,6 +547,9 @@
               CALL WGridPutCheckBox(IDF_RR_BondGrid,2,iValues,NVALUES)
               CALL WGridGetCheckBox(IDF_RR_BondGrid,2,iValues,NVALUES)
               CALL WDialogPutInteger(IDI_Num4,NVALUES)
+            CASE (IDB_PO_Settings)
+              CALL WDialogSelect(IDD_RR_PO_Dialog)
+              CALL WDialogShow(-1,-1,0,SemiModeLess)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -581,6 +596,97 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWindowRietveld
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithRR_PO_Settings
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE PO_VAR
+      USE REFVAR
+      USE RRVAR
+
+      IMPLICIT NONE      
+
+      INTEGER tFieldState, I, iH, iK, iL, II, iR
+      REAL phases(1:48), RefHT(1:3,1:48)
+      REAL PrfDir(1:3), H(1:3), RefLen
+      REAL ChiSqd, ChiProSqd 
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      REAL, EXTERNAL :: VCTMOD, SCLPRD
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_RR_PO_Dialog)
+      SELECT CASE (EventType)
+        CASE (PushButton)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDOK, IDCANCEL)
+              CALL WDialogHide
+              !C Update the main Rietveld window
+              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                tFieldState = Enabled
+              ELSE
+                tFieldState = Disabled
+              ENDIF
+              CALL WDialogSelect(IDD_Rietveld2)
+              CALL WDialogFieldState(IDC_PO,tFieldState)
+              CALL WDialogFieldState(IDR_PO,tFieldState)
+              CALL WDialogSelect(IDD_RR_PO_Dialog)
+              !C Initialise preferred orientation and recalculate pattern + chi-sqrds
+              PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
+              ! Initialise PO
+              IF (PrefParExists) THEN
+  !              CALL WDialogGetInteger(IDF_PO_a,iH)
+  !              CALL WDialogGetInteger(IDF_PO_b,iK)
+  !              CALL WDialogGetInteger(IDF_PO_c,iL)
+  !              PrefPars(1) = FLOAT(iH)
+  !              PrefPars(2) = FLOAT(iK)
+  !              PrefPars(3) = FLOAT(iL)
+  !              DO i = 1, 3
+  !                PrfDir(i) = PrefPars(i)
+  !              ENDDO
+  !              RefLen = VCTMOD(1.0,PrfDir,2)
+  !              PrfDir = PrfDir / RefLen
+  !              DO iR = 1, NumOfRef
+  !                DO ii = 1, 3
+  !                  H(ii) = SNGL(iHKL(ii,iR))
+  !                ENDDO
+  !                RefLen = VCTMOD(1.0,H,2) ! Calculate length of reciprocal-space vector
+  !                CALL SYMREF(H,RefHT,iHMUL(iR),phases)
+  !                DO ii = 1, iHMUL(iR)
+  !                  PrefCsqa(ii,iR) = (SCLPRD(PrfDir,RefHT(1,ii),2)/RefLen)**2
+  !                ENDDO
+  !              ENDDO
+                CALL FillSymmetry_2
+                CALL PO_PRECFC(RR_PO)
+              ENDIF
+              CALL RR_VALCHI(ChiSqd)
+              CALL VALCHIPRO(ChiProSqd)
+              CALL WDialogPutReal(IDR_INTCHI, ChiSqd, "(F9.2)")
+              CALL WDialogPutReal(IDR_PROCHI, ChiProSqd, "(F9.2)")
+              CALL Profile_Plot
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_Use_PO)
+              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                tFieldState = Enabled
+              ELSE
+                tFieldState = Disabled
+              ENDIF
+              CALL WDialogFieldState(IDF_PO_a,tFieldState)
+              CALL WDialogFieldState(IDF_PO_b,tFieldState)
+              CALL WDialogFieldState(IDF_PO_c,tFieldState)
+              CALL WDialogFieldState(IDF_LABELa,tFieldState)
+              CALL WDialogFieldState(IDF_LABELb,tFieldState)
+              CALL WDialogFieldState(IDF_LABELc,tFieldState)
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithRR_PO_Settings
 !
 !*****************************************************************************
 !
@@ -1827,6 +1933,53 @@
       CLOSE(hFile)
 
       END SUBROUTINE RR_SaveAs
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardRietveldRefinement
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER(MaxPathLength) SDIFile, XtalFile
+      INTEGER Curr_SA_Run
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SAW_Page6)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+! Go back to the first Wizard window
+              CALL EndWizardPastPawley
+              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+            CASE (IDNEXT)
+              Curr_SA_Run = 1
+              CALL WDialogHide ! @@ Hide current window. Should probably be WizardWindowHide
+              CALL ShowWindowRietveld(Curr_SA_Run)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (IDB_SDI_file_Browse)
+              CALL SDIFileBrowse
+            CASE (IDB_SDI_file_Open)
+              CALL WDialogGetString(IDF_SDI_File_Name,SDIFile)
+              CALL SDIFileOpen(SDIFile)
+            CASE (IDB_xtal_file_Browse)
+              CALL XtalFileBrowse
+            CASE (IDB_xtal_file_Open)
+              CALL WDialogGetString(IDF_Xtal_File_Name,XtalFile)
+              CALL XtalFileOpen(XtalFile)
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardRietveldRefinement
 !
 !*****************************************************************************
 !

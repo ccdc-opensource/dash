@@ -45,7 +45,6 @@
       SUBROUTINE DebugErrorMessage(TheMessage)
 !
 ! Displays an error message that should be ignored in the release version of DASH.
-! Before release, this subroutine should simply RETURN without doing anything.
 !
 ! INPUT   : TheMessage = The message to be displayed
 !
@@ -391,6 +390,9 @@
         CASE (IDD_SAW_Page5)
           CALL DealWithAnalyseSolutionsWindow
           GOTO 10
+        CASE (IDD_SAW_Page6)
+          CALL DealWithWizardRietveldRefinement
+          GOTO 10
         CASE (IDD_OutputSolutions)
           CALL DealWithOutputSolutions
           GOTO 10
@@ -399,6 +401,9 @@
           GOTO 10
         CASE (IDD_Rietveld2)
           CALL DealWithWindowRietveld
+          GOTO 10
+        CASE (IDD_RR_PO_Dialog)
+          CALL DealWithRR_PO_Settings
           GOTO 10
       END SELECT
       DealWithEvent = .FALSE.

@@ -1596,6 +1596,8 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
       CALL WDialogPutString(IDF_SA_Project_Name,filename)
+      CALL WDialogSelect(IDD_SAW_Page6)
+      CALL WDialogPutString(IDF_SDI_File_Name,filename)
       CALL PopActiveWindowID
 
       END SUBROUTINE SetSAFileName
