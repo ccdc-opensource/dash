@@ -254,6 +254,7 @@ DEP_F90_ERROR=\
 SOURCE=.\Eval.f90
 DEP_F90_EVAL_=\
 	".\Debug\ZMVAR.MOD"\
+	".\Variables.mod"\
 	
 # End Source File
 # Begin Source File
@@ -521,6 +522,10 @@ DEP_F90_PLOT_=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\PO_VAR.f90
+# End Source File
+# Begin Source File
+
 SOURCE=.\PolyFitter_Subs.f90
 DEP_F90_POLYF=\
 	".\DRUID_HEADER.mod"\
@@ -723,6 +728,7 @@ SOURCE=.\tSA_subs.f90
 DEP_F90_TSA_SU=\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
+	".\Lattice.inc"\
 	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -777,8 +783,10 @@ SOURCE=.\Utilities.f90
 
 SOURCE=.\Valchi.f90
 DEP_F90_VALCH=\
+	".\Debug\ZMVAR.MOD"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
+	".\Variables.mod"\
 	
 # End Source File
 # Begin Source File
