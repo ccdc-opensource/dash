@@ -1,4 +1,3 @@
-!*==GET_LOGREF.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -94,15 +93,9 @@
       IHMINLT0 = IHMIN.LT.0
       IKMINLT0 = IKMIN.LT.0
       ILMINLT0 = ILMIN.LT.0
-      IF (ABS(ihmin).GT.ABS(ihmax)) THEN
-        ihmax = ABS(ihmin)
-      ENDIF
-      IF (ABS(ikmin).GT.ABS(ikmax)) THEN
-        ikmax = ABS(ikmin)
-      ENDIF
-      IF (ABS(ilmin).GT.ABS(ilmax)) THEN
-        ilmax = ABS(ilmin)
-      ENDIF
+      IF (ABS(ihmin).GT.ABS(ihmax)) ihmax = ABS(ihmin)
+      IF (ABS(ikmin).GT.ABS(ikmax)) ikmax = ABS(ikmin)
+      IF (ABS(ilmin).GT.ABS(ilmax)) ilmax = ABS(ilmin)
 !
 ! JvdS Replaced include by its contents (the include file was used only once)
 !O      include 'GET_LOGREF.inc'
@@ -379,3 +372,6 @@
   999 CLOSE (31)
 
       END SUBROUTINE GET_LOGREF
+!
+!*****************************************************************************
+!

@@ -115,7 +115,6 @@
                                 'Trigonal    ', 'Rhombohedral', 'Hexagonal   ', &
                                 'Cubic       '/
 
-      DoSaRedraw = .FALSE.
       LPosSG( 1) =   1
       LPosSG( 2) =   3
       LPosSG( 3) =  38 
@@ -197,8 +196,6 @@
       CALL GetModuleFileName(tProcess,tString,LOC(tSize))
 ! tString should now contain the full path to PCDash.exe irrespective of the way
 ! DASH has been invoked.
-      ViewOn     = .FALSE.
-      ViewAct    = .FALSE.
       ConvOn     = .FALSE.
       lval = GETENVQQ("DASH_DIR",DashDir)
       IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
@@ -400,15 +397,15 @@
       CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,.FALSE.)
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
-      CALL ClearZmatrices
+      CALL Clear_Zmatrices
       SLIMVALUE = 1.0
       SCALFAC   = 0.01
       BACKREF   = .TRUE.
       JRadOption = 1 ! Initialise to X-ray lab data
-      IXPos_IDD_Wizard = 0.1  * WInfoScreen(1)
-      IYPos_IDD_Wizard = 0.06 * WInfoScreen(2)
+      IXPos_IDD_Wizard = 0.5  * (WInfoScreen(1) - 756.0)
+      IYPos_IDD_Wizard = 0.01 * WInfoScreen(2)
       NTIC = 0
-      CALL Init_PeakFitRanges
+      CALL Clear_PeakFitRanges
       MARKER_SIZE = 0.35
       CHAR_SIZE = 1.0
       XPG1 = 0.12
@@ -454,7 +451,6 @@
 
       CALL ReadConfigurationFile
       CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
-      INQUIRE(FILE=VIEWEXE(1:LEN_TRIM(VIEWEXE)),EXIST=ViewOn)
       INQUIRE(FILE=CONVEXE(1:LEN_TRIM(CONVEXE)),EXIST=ConvOn)
 
       CALL WDialogSelect(IDD_SAW_Page1)

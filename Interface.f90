@@ -870,7 +870,7 @@
       NTPeak = 0
 ! JvdS Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
 ! Store all peaks thus found in one flat array: AllPkPosVal
-! @ I don't understand why PkPosVal(I,J) is used for this, I would have used XPF_Pos
+! @@ I don't understand why PkPosVal(I,J) is used for this, I would have used XPF_Pos
       IF (NumPeakFitRange .GE. 1) THEN
         DO J = 1, NumPeakFitRange
           IF (NumInPFR(J) .GE. 1) THEN
@@ -892,7 +892,7 @@
       ENDIF
       CALL SORT_REAL(AllPkPosVal,IOrdTem,NTPeak)
 ! IOrdTem now contains and ordered list of pointers into AllPkPosVal
-! JvdS @ why not order the list itself?
+! JvdS @@ why not order the list itself?
       IF (NTic .NE. 0) THEN
 ! Let's find the closest peaks and their distribution around the observed peak positions
         IR1 = 1 ! Pointer into list of reflections
@@ -949,9 +949,9 @@
             IF (ABS(ArgTop-DifMinSq).LT.1.e-10) THEN
               ProbTop=ProbTop+ProbAdd
             ENDIF
-            ProbTot=ProbTot+ProbAdd
+            ProbTot = ProbTot + ProbAdd
           ENDDO
-          PkProb(IOrd)=ProbTop/ProbTot
+          PkProb(IOrd) = ProbTop / ProbTot
         ENDDO
       ENDIF
 ! Write out all the peak positions in an ordered list ...
@@ -959,7 +959,7 @@
       IF (NTPeak .GT. 0) THEN
         CALL WDialogFieldState(ID_Index_Output,Enabled)
         DO I = 1, NTPeak
-          IOrd=IOrdTem(I)
+          IOrd = IOrdTem(I)
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,1,I,AllPkPosVal(IOrd),'(F12.4)')
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,2,I,AllPkPosEsd(IOrd),'(F12.4)')
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,3,I,PkArgK(I),'(F12.4)')
