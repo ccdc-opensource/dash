@@ -143,6 +143,31 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE ScrUpdateFileNameSDIFile(filename)
+!
+! This routine updates all occurrences of the SDI filename, both
+! on the status bar and in the wizard.
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: filename
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SAW_Page1)
+      CALL WDialogPutString(IDF_SA_Project_Name, filename)
+      CALL WDialogSelect(IDD_SAW_Page6)
+      CALL WDialogPutString(IDF_SDI_File_Name, filename)
+      CALL PopActiveWindowID
+! Update the status bar at the bottom of the screen.
+      CALL WindowOutStatusBar(1, filename)
+
+      END SUBROUTINE ScrUpdateFileNameSDIFile
+!
+!*****************************************************************************
+!
       REAL FUNCTION WavelengthOf(TheAnodeMaterial)
 !
 ! This function return the wavelength of an X-ray tube given the material the anode is made of.
@@ -1585,26 +1610,6 @@
       GetCrystalSystem = 1 ! Triclininc
 
       END FUNCTION GetCrystalSystem
-!
-!*****************************************************************************
-!
-      SUBROUTINE SetSAFileName(filename)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      CHARACTER*(*) filename
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page1)
-      CALL WDialogPutString(IDF_SA_Project_Name,filename)
-      CALL WDialogSelect(IDD_SAW_Page6)
-      CALL WDialogPutString(IDF_SDI_File_Name,filename)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE SetSAFileName
 !
 !*****************************************************************************
 !
