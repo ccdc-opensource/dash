@@ -126,6 +126,13 @@
 !           can be dealt with.
 ! xzmpar = initial value of parameter
 
+      LOGICAL IsFullRangeTrans(1:MVAR_2)
+      LOGICAL IsFullRangeTorsion(1:MVAR_2)
+! If IsFullRangeTrans is .TRUE., this parameter is a translation that is allowed to vary over 
+! its full range. Because if so, a random value of, say, 1.10 during the SA should be reset to 0.10
+! If IsFullRangeTorsion is .TRUE., this parameter is a torsion that is allowed to vary over 
+! its full range. Because if so, a random value of, say, 370.0 during the SA should be reset to 10.0
+
       INTEGER          natoms(0:maxfrg)
       INTEGER          ioptb(1:maxatm, 0:maxfrg), iopta(1:maxatm, 0:maxfrg), ioptt(1:maxatm, 0:maxfrg)
       INTEGER          iz1(1:maxatm, 0:maxfrg), iz2(1:maxatm, 0:maxfrg), iz3(1:maxatm, 0:maxfrg)
