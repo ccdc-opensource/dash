@@ -123,10 +123,10 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
       INTEGER         NPTS
-      REAL                  ZARGI,        ZOBS,        ZDOBS,        ZWT
-      INTEGER                                                                    ICODEZ
-      REAL                                                                                      KOBZ
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
 ! Save the boxes from Pawley fit to Pawley fit
       REAL RLastValues(3)
@@ -330,6 +330,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -373,12 +374,6 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
       
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
-
       REAL XRANMIN, XRANMAX
       SAVE XRANMIN, XRANMAX
       INTEGER NPawBack
@@ -408,11 +403,11 @@
 ! We should check if there are data to write out!
       IF (.NOT. FnPatternOK()) RETURN
       IF (.NOT. FnUnitCellOK()) RETURN
-      IF (NTIC .EQ. 0) RETURN
+      IF (NumOfRef .EQ. 0) RETURN
 ! Allow a maximum of 300 reflections
 ! JvdS Why?
-      IF (NTIC .GT. 300) THEN
-        xranmax = MIN(xpmax,ARGK(300))
+      IF (NumOfRef .GT. 300) THEN
+        xranmax = MIN(xpmax,RefArgK(300))
       ELSE
         xranmax = xpmax
       ENDIF

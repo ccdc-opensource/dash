@@ -237,6 +237,7 @@
 
       USE ATMVAR
       USE PO_VAR
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -262,12 +263,12 @@
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
-      INTEGER         NLGREF, iREFH
-      LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
+      INTEGER         NLGREF
+      LOGICAL                 LOGREF
+      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
 
       INTEGER           iHMUL
-      COMMON /SAREFLN3/ iHMUL(MSAREF)
+      COMMON /SAREFLN3/ iHMUL(MFCSTO)
 
       INTEGER         NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
@@ -310,7 +311,7 @@
       PrfDir = PrfDir / RefLen
       DO iR = 1, MAXK
         DO ii = 1, 3
-          H(ii) = SNGL(iREFH(ii,iR))
+          H(ii) = SNGL(iHKL(ii,iR))
         ENDDO
         RefLen = VCTMOD(1.0,H,2) ! Calculate length of reciprocal-space vector
         CALL SYMREF(H,RefHT,iHMUL(iR),phases)

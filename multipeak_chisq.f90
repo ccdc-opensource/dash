@@ -8,18 +8,26 @@
       DIMENSION C3FN(3)
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /WWPHASE/ NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),       &
-     &                 SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /WWPRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),       &
      &                  LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),    &
      &                  NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /WWPRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),  &
-     &                  DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),       &
-     &                  ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
      &                  DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),       &
      &                  NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ,      &
@@ -27,20 +35,28 @@
      &                  NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /WWPRSAVZ/ PKCONV(2048,9)
-      COMMON /WWREFLNS/ REFH(3,WWREFDIM), AMUL(WWREFDIM),               &
-     &                  AICALC(WWREFDIM), AIOBS(WWREFDIM),              &
-     &                  ESDOBS(WWREFDIM), SOMEGA(WWREFDIM), GGCALC(300),&
-     &                  MAXKK(9), KMIN, KMAX, KMOD, KNOW,               &
-     &                  DSTAR(WWREFDIM), ISMAG(WWREFDIM), DKDDS, KOM23
-      EQUIVALENCE (MAXK,MAXKK(1))
-      COMMON /WWSOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),   &
-     &                  NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
-!.. Note only 3 phases specifically hardwired here
-      COMMON /WWREFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
-     &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
+
+      INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
+      REAL            ZARGK,         ZXDEL
+      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
+
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
+
       REAL            ZCAL
-      COMMON /YSTORE/ ZCAL(MPPTS)
+      COMMON /YSTORE/ ZCAL(MOBS)
+
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
       COMMON /ZSTOR2/ MN, MN2
       INTEGER     MPAR
@@ -51,7 +67,7 @@
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
 
-      LOGICAL LERANL
+      LOGICAL         LERANL
       COMMON /PKCOM3/ LERANL
 
 ! Profile refinement stage:
@@ -131,12 +147,20 @@
       COMPLEX CFFT, CFF
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /WWPHASE/ NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),       &
-     &                 SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
-      COMMON /WWPRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),  &
-     &                  DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),       &
-     &                  ARGSTP(5), PCON
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
      &                  DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),       &
      &                  NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ,      &
@@ -144,19 +168,19 @@
      &                  NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /WWPRSAVZ/ PKCONV(2048,9)
-!      COMMON /WWPRSAVF/PKLIST(2048,9,200),ZXDEL(200),PKCONV(2048,9),
-!     & ARGNOT(50),PKNOT(64,9,50),XPDKNT(50)
-!
-      COMMON /WWREFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-      COMMON /WWREFLNS/ REFH(3,WWREFDIM), AMUL(WWREFDIM),               &
-     &                  AICALC(WWREFDIM), AIOBS(WWREFDIM),              &
-     &                  ESDOBS(WWREFDIM), SOMEGA(WWREFDIM), GGCALC(300),&
-     &                  MAXKK(9), KMIN, KMAX, KMOD, KNOW,               &
-     &                  DSTAR(WWREFDIM), ISMAG(WWREFDIM), DKDDS, KOM23
-      EQUIVALENCE (MAXK,MAXKK(1))
-      COMMON /WWSOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),   &
-     &                  NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),    &
-     &                  NPCSOU(9,5)
+
+      REAL            ZARGK,         ZXDEL
+      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
+
+      INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       DIMENSION CFFT(8), FR(2048,8), FI(2048,8), FRT(2048), FIT(2048)
 
       LOGICAL LERANL

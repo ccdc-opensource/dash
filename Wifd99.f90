@@ -173,7 +173,7 @@
 
       IMPLICIT NONE
 
-      REAL    HKL(3,*)
+      REAL HKL(3,*)
       INTEGER IC(*)
       INTEGER N
       REAL    X(*), HX(N,N)
@@ -217,6 +217,7 @@
 !*****************************************************************************
 !
       SUBROUTINE HESCOR(ALSQ,MATSZ)
+
 !
 ! *** HESCOR from HKLOUT ***
 !
@@ -237,9 +238,13 @@
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -265,8 +270,14 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       COMMON /CORHES/ IHCOV(30,10000)
 
       DIMENSION IH(3), ADIAG(MaxBVar), ICOV(30)
@@ -282,14 +293,14 @@
         ENDDO
       ENDIF
       DO I = 1, MAXKK(JPHASE)
-        IF (FIXED) CALL INDFIX(REFH(1,I),IH)
+        IF (FIXED) CALL INDFIX(rHKL(1,I),IH)
 ! CAIL:
         IF (CAIL) THEN
           IF (IPRNT(5).EQ.0) THEN
             IF (FIXED) THEN
               WRITE (LKH,FMT2) IH, F4PAR(1,I), F4PESD(1,I)
             ELSE
-              WRITE (LKH,FMT2) (REFH(J,I),J=1,3), F4PAR(1,I), F4PESD(1,I)
+              WRITE (LKH,FMT2) (rHKL(J,I),J=1,3), F4PAR(1,I), F4PESD(1,I)
             ENDIF
           ENDIF
           IF (IPRNT(5).GT.0) THEN
@@ -329,15 +340,21 @@
 !
       SUBROUTINE HKL2HCV(NCORL)
 
+      USE REFVAR
+
       INCLUDE 'PARAMS.INC'
 
       INTEGER IB(2001)
       REAL HESSY(50,50), COVARY(50,50)
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       INCLUDE 'REFLNS.INC'
       PARAMETER (IREFSM=2000)
       REAL SIGI(IREFSM), FSQV(IREFSM)
@@ -372,7 +389,7 @@
         J = IB(I)
         NJ = IB(I+1) - J
         CALL HBLOCK(ICLUMP(J),SIGI(J),ICORL(1,J),COVARY,HESSY,NJ,NCORL,J,POSDEF,MLTP(J))
-        CALL HCVOUT(REFH(1,J),ICLUMP(J),FSQV(J),HESSY,NJ,NCORL,POSDEF)
+        CALL HCVOUT(rHKL(1,J),ICLUMP(J),FSQV(J),HESSY,NJ,NCORL,POSDEF)
       ENDDO
 
       END SUBROUTINE HKL2HCV
@@ -497,14 +514,21 @@
 !*****************************************************************************
 !
       SUBROUTINE XDELPR
-!.. Calculates the value of XPKDEL for each reflection
+! Calculates the value of XPKDEL for each reflection
+
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'REFLNS.INC'
-      INCLUDE 'params.inc'
-!.. Note only 3 phases specifically hardwired here
-      COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
-     &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      REAL XIDEL(MPPTS)
+
+      REAL            ZARGK,         ZXDEL
+      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
+
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
+
+      REAL XIDEL(MOBS)
 
       DO I = 1, NPTS - 1
         XIDEL(I) = 0.5*(ZARGI(I+1)-ZARGI(I))
@@ -538,9 +562,13 @@
      &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
      &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
       LOGICAL REFUSE, CYC1, NOPKRF
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       LOGICAL         PFNVAR
       COMMON /PFNINF/ PFNVAR(8,9,5)
 
