@@ -344,19 +344,7 @@
 ! JvdS Assume no knowledge on background
         YBBIN(I) = 0.0
       ENDDO
-      XPGMIN = XPMIN
-      XPGMAX = XPMAX
-      YPGMIN = YPMIN
-      YPGMAX = YPMAX
-      XPGMINOLD = XPMIN
-      XPGMAXOLD = XPMAX
-      YPGMINOLD = YPMIN
-      YPGMAXOLD = YPMAX
-      CALL UPLOAD_RANGE()
-      IPMIN = 1
-      IPMAX = NBIN
-      IPMINOLD = IPMIN
-      IPMAXOLD = IPMAX
+      CALL GetProfileLimits
       IPTYPE = 1
       CALL Profile_Plot(IPTYPE)
       NoData = .FALSE.
@@ -1486,29 +1474,7 @@
       IF (I .LE. 1) RETURN
       NOBS = I - 1
       CALL Rebin_Profile
-      XPMIN=XOBS(1)
-      XPMAX=XOBS(1)
-      YPMIN=YOBS(1)
-      YPMAX=YOBS(1)
-      DO I=1,NOBS
-        XPMIN=MIN(XOBS(I),XPMIN)
-        XPMAX=MAX(XOBS(I),XPMAX)
-        YPMIN=MIN(YOBS(I),YPMIN)
-        YPMAX=MAX(YOBS(I),YPMAX)
-      ENDDO
-      XPGMIN=XPMIN
-      XPGMAX=XPMAX
-      YPGMIN=YPMIN
-      YPGMAX=YPMAX
-      CALL UPLOAD_RANGE()
-      XPGMINOLD=XPMIN
-      XPGMAXOLD=XPMAX
-      YPGMINOLD=YPMIN
-      YPGMAXOLD=YPMAX
-      IPMIN=1
-      IPMAX=NBIN
-      IPMINOLD=IPMIN
-      IPMAXOLD=IPMAX
+      CALL GetProfileLimits
       CALL Profile_Plot(IPTYPE)
 
       END SUBROUTINE TruncateData
@@ -1597,15 +1563,44 @@
       ENDIF
       NOBS = NOBS - Shift
       CALL Rebin_Profile
-      XPMIN = XOBS(1)
-      XPMAX = XOBS(1)
-      YPMIN = YOBS(1)
-      YPMAX = YOBS(1)
-      DO I = 1, NOBS
-        XPMIN = MIN(XOBS(I),XPMIN)
-        XPMAX = MAX(XOBS(I),XPMAX)
-        YPMIN = MIN(YOBS(I),YPMIN)
-        YPMAX = MAX(YOBS(I),YPMAX)
+      CALL GetProfileLimits
+      CALL Profile_Plot(IPTYPE)
+
+      END SUBROUTINE TruncateDataStart
+!
+!*****************************************************************************
+!
+      SUBROUTINE GetProfileLimits
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+
+      INTEGER I
+ 
+      XPMIN = XBIN(1)
+      XPMAX = XBIN(NBIN)
+      YPMIN = XBIN(1)
+      YPMAX = XBIN(1)
+      DO I = 1, NBIN
+        YPMIN = MIN(YOBIN(I),YPMIN)
+        YPMAX = MAX(YOBIN(I),YPMAX)
       ENDDO
       XPGMIN = XPMIN
       XPGMAX = XPMAX
@@ -1620,9 +1615,8 @@
       IPMAX = NBIN
       IPMINOLD = IPMIN
       IPMAXOLD = IPMAX
-      CALL Profile_Plot(IPTYPE)
 
-      END SUBROUTINE TruncateDataStart
+      END SUBROUTINE GetProfileLimits
 !
 !*****************************************************************************
 !
