@@ -44,7 +44,6 @@
 ! Loop over all the fragments
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             NATS = NATOMS(iFrg)
             KK1 = KK + 1     ! x-translation
@@ -175,7 +174,6 @@
               X(3,OrderedAtm(KI)) = SNGL(tZ)
             ENDDO
             KATOM = KATOM + NATS
-
           ENDDO
         ENDIF
       ENDDO
@@ -215,27 +213,11 @@
 ! 1 * j =  j    i * j =  k    j * j = -1    k * j = -i
 ! 1 * k =  k    i * k = -j    j * k =  i    k * k = -1
 !
-
       IMPLICIT NONE
 
-!O      REAL*8 DC4(4), EL(4,4), ROTA(3,3)
       REAL*8 DC4(0:3), EL(0:3,0:3), ROTA(1:3,1:3)
       INTEGER I, J
 
-!O      DO I = 1, 4
-!O        DO J = I, 4
-!O          EL(I,J) = 2.0 * DC4(I) * DC4(J)
-!O        ENDDO
-!O      ENDDO
-!O      ROTA(1,1) = 1.0 - (EL(2,2) + EL(3,3))
-!O      ROTA(2,2) = 1.0 - (EL(1,1) + EL(3,3))
-!O      ROTA(3,3) = 1.0 - (EL(1,1) + EL(2,2))
-!O      ROTA(1,2) = EL(1,2) - EL(3,4)
-!O      ROTA(1,3) = EL(1,3) + EL(2,4)
-!O      ROTA(2,3) = EL(2,3) - EL(1,4)
-!O      ROTA(2,1) = EL(1,2) + EL(3,4)
-!O      ROTA(3,1) = EL(1,3) - EL(2,4)
-!O      ROTA(3,2) = EL(2,3) + EL(1,4)
       DO I = 0, 3
         DO J = I, 3
           EL(I,J) = 2.0 * DC4(I) * DC4(J)
@@ -252,6 +234,39 @@
       ROTA(3,2) = EL(2,3) - EL(0,1)
 
       END SUBROUTINE ROTMAK
+!
+!*****************************************************************************
+!
+      SUBROUTINE DO_ATOM_POS(TRANS,ROTA,POS,NATOMS)
+
+      REAL*8 TRANS(3), ROTA(3,3), POSIN(3), POS(3,*)
+
+      DO J = 1, NATOMS
+        DO I = 1, 3
+          POSIN(I) = POS(I,J)
+        ENDDO
+        CALL ROTCAR(POSIN,POS(1,J),ROTA)
+        DO I = 1, 3
+          POS(I,J) = POS(I,J) + TRANS(I)
+        ENDDO
+      ENDDO
+
+      END SUBROUTINE DO_ATOM_POS
+!
+!*****************************************************************************
+!
+      SUBROUTINE ROTCAR(XORTO,XORTN,ROTA)
+
+      REAL*8 XORTO(3), XORTN(3), ROTA(3,3)
+
+      DO I = 1, 3
+        XORTN(I) = 0.
+        DO J = 1, 3
+          XORTN(I) = XORTN(I) + ROTA(I,J)*XORTO(J)
+        ENDDO
+      ENDDO
+
+      END SUBROUTINE ROTCAR
 !
 !*****************************************************************************
 !
