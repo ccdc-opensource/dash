@@ -839,7 +839,7 @@
       REAL rtmp(4,4)
       LOGICAL cmp
       LOGICAL PDB_CmpMat
-      INTEGER I, J, K, M, iLast, iPrev, lstout
+      INTEGER I, J, K, M, iLast, iPrev
       CHARACTER*50 stout
 
 ! Expand the symmetry generators into a list of symm ops by cross-multiplication
@@ -865,10 +865,10 @@
         iprev = npdbops + 1
         DO i = 1, npdbops
           DO j = ilast, npdbops
-            CALL PDB_MatMul(rpdb(1,1,i),rpdb(1,1,j),rtmp)
+            CALL PDB_MatMul(rpdb(1,1,i), rpdb(1,1,j), rtmp)
             CALL PDB_PosTrans(rtmp)
             DO k = 1, npdbops
-              cmp = PDB_CmpMat(rpdb(1,1,k),rtmp)
+              cmp = PDB_CmpMat(rpdb(1,1,k), rtmp)
               IF (cmp) GOTO 11
             ENDDO
             npdbops = npdbops + 1
@@ -882,7 +882,7 @@
         ENDDO
       ENDDO
       DO k = 1, npdbops
-        CALL M2S_SYMCON(rpdb(1,1,k),stout,lstout)
+        CALL M2S_SYMCON(rpdb(1,1,k),stout)
         m = 1
         DO WHILE (stout(m:m).EQ.' ' .AND. m.LE.20)
           m = m + 1
@@ -926,17 +926,17 @@
 !
       SUBROUTINE PDB_PosTrans(r)
 
-      REAL r(4,4)
+      REAL, INTENT (INOUT) :: r(4,4)
 
       DO i = 1, 3
 ! Tidy up any rounding errors on the translations
         r(i,4) = FLOAT(NINT(r(i,4)*10000.0))/10000.0
         IF (r(i,4).LT.-0.01) THEN
-          DO WHILE (r(i,4).LT.-0.01)
+          DO WHILE (r(i,4) .LT. -0.01)
             r(i,4) = r(i,4) + 1.0
           ENDDO
         ELSE
-          DO WHILE (r(i,4).GT.0.999)
+          DO WHILE (r(i,4) .GT. 0.999)
             r(i,4) = r(i,4) - 1.0
           ENDDO
         ENDIF
