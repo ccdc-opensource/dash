@@ -187,6 +187,7 @@
       REAL    Q(0:3)
       REAL    v1(1:3), v2(1:3)
       REAL    Alpha, Beta, Gamma
+      REAL    Q1(0:3), Q2(0:3)
 
       CALL PushActiveWindowID
 ! Calculate the unit cell axes in terms of the orthogonal lattice from
@@ -208,8 +209,8 @@
 ! We need the Cartesian co-ordinates of these two atoms
               CALL makexyz(natoms(iFrg), BLEN(1,iFrg), ALPH(1,iFrg), BET(1,iFrg), IZ1(1,iFrg), IZ2(1,iFrg), IZ3(1,iFrg), axyzo)
               Axis(1) = axyzo(1,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
-              Axis(2) = axyzo(2,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
-              Axis(3) = axyzo(3,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
+              Axis(2) = axyzo(2,zmSingleRotAxAtm(2,iFrg)) - axyzo(2,zmSingleRotAxAtm(1,iFrg))
+              Axis(3) = axyzo(3,zmSingleRotAxAtm(2,iFrg)) - axyzo(3,zmSingleRotAxAtm(1,iFrg))
             CASE (2) ! Fractional
 ! The variable zmSingleRotAxFrac holds the fractional co-ordinates,
 ! we need orthogonal co-ordinates => convert
@@ -231,9 +232,10 @@
               v1(2) = Axis(2)
               v1(3) = Axis(3)
               CALL PremultiplyVectorByMatrix(f2cmat, zmSingleRAIniOrFrac(1,iFrg), v2) ! frac -> cart
-      !        CALL Vector2Quaternion(v1, )
-      !        CALL Vector2Quaternion(v2, )
-
+              CALL Vector2Quaternion(v1, Q1)
+              CALL Vector2Quaternion(v2, Q2)
+              CALL QuaternionInverse(Q1)
+              CALL QuaternionMultiply(Q2, Q1, zmInitialQs(0, iFrg))
             CASE (2) ! Defined as Euler angles => convert to Quaternions
               Alpha = zmSingleRAIniOrEuler(1, iFrg)
               Beta  = zmSingleRAIniOrEuler(2, iFrg)
