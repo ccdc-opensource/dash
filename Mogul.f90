@@ -280,12 +280,13 @@
       INTEGER nlin, I
       CHARACTER*255 line
       CHARACTER*12 Distribution
+      CHARACTER*2 Colon
       CHARACTER*40 MogulText
       LOGICAL exists
       LOGICAL Assigned
       LOGICAL blank
       INTEGER, DIMENSION(180) :: TC
-      INTEGER NumberofBins
+      INTEGER NumberofBins, HalfBins, UpperBins, MaxAngle, MinAngle, Bin
       INTEGER Lmarker1, Hmarker1, LMarker2, HMarker2
       INTEGER LIndex1(1), HIndex1(1), LIndex2(1), HIndex2(1)
       INTEGER TotalSum, TempSum
@@ -297,15 +298,11 @@
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
-! The following code pretty much relies on the fact that there are 18
-! bins.  This needs more thought if we think there is a chance that  
-! bin number is something the user will get access to.
-
       MogulText = ' '
       
       INQUIRE(FILE = MogulOutputFile,EXIST=exists)
       IF (.NOT. exists) GOTO 999
-      NumberofBins = 18 ! not read from output file currently
+      NumberofBins = 0 
       OPEN(240,FILE=MogulOutputFile,STATUS='UNKNOWN', ERR = 999)
       I = 0
       DO WHILE (I .EQ. 0)
@@ -313,17 +310,22 @@
 10      FORMAT (q,a)
         IF ((line(1:6) .EQ. "NOHITS") .OR. (line(1:6) .EQ. "ERROR")) GOTO 888
         IF (line(1:5).eq."STATS") THEN
-          READ(240,*) (Distribution, TC(1:NumberofBins)) !! assuming bin size is 18
-          I = 1
+          READ(240,*) Distribution, MinAngle, MaxAngle, Bin, NumberofBins, Colon, TC(1:NumberofBins)
+          I = 1 
         ENDIF
       ENDDO
+      
       TotalSum = 0
       DO I = 1,NumberOfBins
         TotalSum = TotalSum + TC(I) ! number of hits in histogram
       ENDDO
+      
+      HalfBins = NumberofBins/2
+      UpperBins = HalfBins + (Halfbins/3)*2
+   
 
-      CALL MinimumValue(TC, 1,9,LMarker1, LIndex1)
-      CALL MaximumValue(TC, 1,9,HMarker1, HIndex1)
+      CALL MinimumValue(TC, 1,HalfBins,LMarker1, LIndex1, Halfbins)
+      CALL MaximumValue(TC, 1,HalfBins,HMarker1, HIndex1, Halfbins)
 
       Assigned = .FALSE.
       Blank = .FALSE.
@@ -335,8 +337,8 @@
 
       IF (HIndex1(1) .LE. LIndex1(1)) THEN ! Peak, Trough - 4 possible scenarios
         
-        CALL MaximumValue(TC, 10, Numberofbins, HMarker2, HIndex2)
-        IF (HIndex2(1) .GT. 15) THEN ! Peak above 150 degs
+        CALL MaximumValue(TC, Halfbins+1, Numberofbins, HMarker2, HIndex2, Halfbins)
+        IF (HIndex2(1) .GT. Upperbins) THEN ! Peak above 150 degs
           IF (.NOT. Blank) THEN
             MogulText = 'Planar, Bimodal'
             ModalFlag(IFRow) = 2
@@ -351,7 +353,7 @@
             Assigned = .TRUE.
           ENDIF
         ENDIF
-        IF ((HIndex2(1) .GT. 10) .AND. (HIndex2(1) .LT. 15)) THEN !second peak of trimodal
+        IF ((HIndex2(1) .GT. HalfBins+1) .AND. (HIndex2(1) .LT. UpperBins)) THEN !second peak of trimodal
           MogulText = 'Trimodal -30 to 30 degrees'
           ModalFlag(IFRow) = 3
           LB(IFRow) = -30.00
@@ -370,9 +372,9 @@
 
       IF (LIndex1(1) .LT. HIndex1(1)) THEN !Trough, Peak - 3 scenarios
        
-       CALL MaximumValue(TC, 10, NumberofBins, HMarker2, Hindex2)
-       IF (HIndex2(1) .GT. 15) THEN !Peak above 150 degs
-         CALL MinimumValue(TC, 10, NumberofBins, LMarker2, Lindex2)
+       CALL MaximumValue(TC, HalfBins+1, NumberofBins, HMarker2, Hindex2,Halfbins)
+       IF (HIndex2(1) .GT. UpperBins) THEN !Peak above 150 degs
+         CALL MinimumValue(TC, HalfBins+1, NumberofBins, LMarker2, Lindex2, Halfbins)
          IF ((LMarker2 .EQ. 0) .OR. (REAL(LMarker2)/REAL(TotalSum) .LT. 0.05)) THEN ! minimum inbetween peaks         
            IF (.NOT. Blank) THEN
              MogulText = 'Trimodal +150 to -150'
@@ -393,7 +395,7 @@
            Assigned = .TRUE.
          ENDIF
        ENDIF
-       IF (HIndex2(1) .LT. 15) THEN ! Bimodal- single bump
+       IF (HIndex2(1) .LT. UpperBins) THEN ! Bimodal- single bump
          MogulText = 'Bimodal'
          ModalFlag(IFRow) = 2
          LB(IFRow) = 45.00
@@ -429,7 +431,7 @@
 
 !*********************************************************************************
 
-      SUBROUTINE MinimumValue(TC, Lower, Upper, Lmarker, Lindex)
+      SUBROUTINE MinimumValue(TC, Lower, Upper, Lmarker, Lindex, Halfbins)
 
       USE DRUID_HEADER
       USE VARIABLES
@@ -438,6 +440,7 @@
       IMPLICIT NONE
 
       INTEGER, DIMENSION(180), INTENT(IN   ) ::  TC
+      INTEGER,                 INTENT(IN   ) ::  Halfbins
       INTEGER Lower, Upper
       INTEGER LMarker
       INTEGER LIndex(1)
@@ -445,14 +448,14 @@
       Lmarker = MINVAL(TC(Lower: Upper))
       LIndex = MINLOC(TC(Lower: Upper))
 
-      IF (Lower .GT. 9) Lindex(1) = Lindex(1) + (Lower - 1)
+      IF (Lower .GT. Halfbins) Lindex(1) = Lindex(1) + (Lower - 1)
 
       
       END SUBROUTINE MinimumValue
 
 !*********************************************************************************
 
-      SUBROUTINE MaximumValue(TC, Lower, Upper, Hmarker, HIndex)
+      SUBROUTINE MaximumValue(TC, Lower, Upper, Hmarker, HIndex, Halfbins)
 
       USE DRUID_HEADER
       USE VARIABLES
@@ -461,6 +464,7 @@
       IMPLICIT NONE
 
       INTEGER, DIMENSION(180), INTENT(IN   ) ::  TC
+      INTEGER,                 INTENT(IN   ) ::  Halfbins
       INTEGER Lower, Upper
       INTEGER Hmarker
       INTEGER HIndex(1)
@@ -468,7 +472,7 @@
       Hmarker = MAXVAL(TC(Lower: Upper))
       HIndex = MAXLOC(TC(Lower: Upper))
 
-      IF (Lower .GT. 9) Hindex(1) = Hindex(1) + (Lower - 1)
+      IF (Lower .GT. Halfbins) Hindex(1) = Hindex(1) + (Lower - 1)
 
       
       END SUBROUTINE MaximumValue
