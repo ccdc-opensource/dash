@@ -368,8 +368,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheSubString
       INTEGER,       INTENT (IN   ) :: TheSubLen
 
-      CHARACTER*20 tString
-      INTEGER POS, J
+      INTEGER POS
 
       DO POS = 0, TheLen-TheSubLen
         IF (TheString(POS+1:POS+TheSubLen) .EQ. TheSubString(1:TheSubLen)) THEN
