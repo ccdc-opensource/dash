@@ -15,6 +15,8 @@
 !
 !  Definitions and array declarations.
 !
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
       LOGICAL         RESTART
@@ -41,18 +43,18 @@
 
 
       INTEGER irow, iz, temprow
-      REAL yadd, ydif
+      REAL yadd
       REAL Ymin
       REAL Ymax
       CHARACTER*255 Grid_Buffer
       CHARACTER*75 filename
-      DIMENSION xobsep(MOBS)
-      DIMENSION yobsep(MOBS)
-      DIMENSION ycalcep(MOBS)
-      DIMENSION ydif(MOBS)
+      REAL xobsep(MOBS)
+      REAL yobsep(MOBS)
+      REAL ycalcep(MOBS)
+      REAL ydif(MOBS)
       EXTERNAL DealWithProfilePlot
       CHARACTER*2 RunStr
-      INTEGER RunNr
+      INTEGER I, II, IN, RecNr, RunNr, tFileHandle, iHandle
 !
 !   reading in the data from the saved .pro files
 !
@@ -75,20 +77,29 @@
       ENDIF
       IF (.NOT. PRO_saved(RunNr)) RETURN
       Iz = Iz-4
-      filename = grid_buffer(1:Iz)//'.pro'
-      OPEN(unit=61, file=filename, status = 'old', err=999)
-!!      DO i = ipmin,ipmax
-       DO i = 1, nbin
-        READ(61,20) xobsep(i), yobsep(i), ycalcep(i)
-20      FORMAT(3(x, f12.4))
+!O      filename = grid_buffer(1:Iz)//'.pro'
+!O      OPEN(unit=61, file=filename, status = 'old', err=999)
+!O      DO i = 1, nbin
+!O        READ(61,20) xobsep(i), yobsep(i), ycalcep(i)
+!O20      FORMAT(3(X, F12.4))
+!O      ENDDO
+!O      CLOSE(61)
+      filename = grid_buffer(1:Iz)//'.bin'
+      tFileHandle = 10
+! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
+      OPEN(UNIT=tFileHandle,FILE=filename,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      RecNr = 1
+      DO I = 1, NBIN
+        CALL FileReadReal(tFileHandle,RecNr,xobsep (I))
+        CALL FileReadReal(tFileHandle,RecNr,yobsep (I))
+        CALL FileReadReal(tFileHandle,RecNr,ycalcep(I))
       ENDDO
-      CLOSE(61)
+      CLOSE(tFileHandle)
 !
 !   calculate the offset for the difference plot
 !
-
-      YMin = MINVAL(yobsep)
-      YMax = MAXVAL(yobsep)
+      YMin = MINVAL(yobsep(1:NBIN))
+      YMax = MAXVAL(yobsep(1:NBIN))
       YADD=0.5*(YMax+YMin)
       DO II = 1, nbin
         YDIF(II) = YADD + yobsep(II) - ycalcep(II)
@@ -98,7 +109,7 @@
 !     
       CALL WindowOpenChild(ihandle, x=10, y=450, width=800, height=400, title=filename)
       IF(ihandle.eq.-1) THEN
-        CALL ErrorMessage("Exceeded Maximum Number of Allowed Windows.  Close a profile window")
+        CALL ErrorMessage("Exceeded Maximum Number of Allowed Windows.  Close a profile window.")
         RETURN
       ENDIF 
       CALL RegisterChildWindow(ihandle,DealWithProfilePlot)
