@@ -127,6 +127,8 @@
           iDummy = PrjSaveAs()
         CASE (ID_import_xye_file)
           ISTAT = DiffractionFileBrowse()
+        CASE (ID_import_dpj_file)
+          CALL SDIFileBrowse
         CASE (ID_Remove_Background)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Background_Fit)
@@ -330,7 +332,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=512)  :: CABOUT
+      CHARACTER(LEN=512) :: CABOUT
 !
 !   Set about message
 !
@@ -410,8 +412,6 @@
       CALL IOsDeleteFile('polyp.tbk')
       CALL IOsDeleteFile('polyp.hbk')
       CALL IOsDeleteFile('polyp.hbl')
-      CALL IOsDeleteFile('polyx.ccl')
-      CALL IOsDeleteFile('polyx.lis')
       CALL IOsDeleteFile('SA_best.pdb')
       CALL IOsDeleteFile('DICVOL.OUT')
       CALL IOSDeleteFile('MakeZmatrix.log')
