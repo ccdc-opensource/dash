@@ -8,6 +8,8 @@
 ! Theoretically, if you want to know a variables use, just type its name in the source browser
 ! and jump to its entry in the file declarations.f90.
 !
+      USE VARIABLES
+      
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
@@ -290,6 +292,24 @@
 ! nvar   = number of variables
 ! npar   = number of parameters
 ! NStPar = number of structural parameters (i.e. those changing the fractional co-ordinates)
+
+      CHARACTER(MaxPathLength) OutputFilesBaseName
+      INTEGER                                       OFBN_Len
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
+
+
+! OutputFilesBaseName = basename for output files.
+!         E.g., if OutputFilesBaseName = 'C:\Program Files\CCDC\DASH 2.0\benzene'
+!         then the following files can be written out:
+!         'C:\Program Files\CCDC\DASH 2.0\benzene_001.pdb'
+!         'C:\Program Files\CCDC\DASH 2.0\benzene_001.ccl'
+!         'C:\Program Files\CCDC\DASH 2.0\benzene_001.cssr'
+!         'C:\Program Files\CCDC\DASH 2.0\benzene_001.pro'
+!         'C:\Program Files\CCDC\DASH 2.0\benzene_001.log'
+!         'C:\Program Files\CCDC\DASH 2.0\benzene_001.chi'
+!         'C:\Program Files\CCDC\DASH 2.0\benzene_001.cif'
+! where 001 = SA_RunNumberStr = SA_Run_Number in format '(I3.3)'
 
       END SUBROUTINE FoolCompiler
 !

@@ -32,7 +32,6 @@
       REAL    T1
       REAL    SA_Duration ! The time the SA took, in seconds
       CHARACTER*10 SA_DurationStr
-      INTEGER Ierrflag
       INTEGER I, RangeOption
       CHARACTER*2 RowLabelStr
 
@@ -59,14 +58,13 @@
 ! Clear Chi-sqd array between starting sets of SA Runs
       Chi_sqd = 0.0
       MaxIterationSoFar = 0
-
-!T      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
-!T      CALL WDialogShow(-1,-1,0,Modeless)
-
+      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
+      CALL WDialogShow(-1,-1,0,Modeless)
       CALL SimulatedAnnealing
       SA_Duration = SECNDS(T1)
       WRITE(SA_DurationStr,'(F10.1)') SA_Duration
       CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
+      CALL WizardWindowShow(IDD_SA_input3)
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       CALL OutputChi2vsMoves
@@ -80,7 +78,6 @@
 !O      DO WHILE (WinfoWindow(WindowState) .EQ. WinMinimised)
 !O        CALL IOsWait(50) ! wait half a sec
 !O      ENDDO
-      CALL WizardWindowHide
 !ep SASummary presents a grid summarising results of the Simulated
 !   Annealing runs.  
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
@@ -99,7 +96,6 @@
         CALL WDialogFieldState(IDF_Limit2,Disabled)
       ENDIF
       CALL WDialogShow(-1,-1,0,Modeless)
-      Ierrflag =  InfoError(1)
 
       END SUBROUTINE BeginSa
 !
@@ -114,80 +110,67 @@
 
       IMPLICIT NONE
 
-      CHARACTER(MaxPathLength) new_fname
+      INCLUDE 'PARAMS.INC'
 
-      CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER(MaxPathLength) OutputFilesBaseName
+      INTEGER                                       OFBN_Len
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      INTEGER I, iFlags
+      CHARACTER(MaxPathLength) filehead, tDirName, tFileName
+      LOGICAL OutputExists
+      CHARACTER(3) NumStr
 
-      INTEGER I, Iflags
-      CHARACTER(MaxPathLength) filehead, tDirName
-!ep added extpro
-      LOGICAL extcssr, extpdb, extccl, extpro
-
-      INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
-      IF (extcssr) GOTO 10
-      DO I = 1, 30
-        CALL AppendNumToFileName(I,cssr_file,new_fname)
-        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extcssr) 
-        IF (extcssr) GOTO 10
+! Try all possible output names, when match, set OutputExists to .TRUE.
+    1 DO I = 1, MaxRun
+        WRITE (NumStr,'(I3.3)') I
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.cssr'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.pdb'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.ccl'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
+! ep added.  Pro_file contains the powder diffraction data and fit....
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.pro'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
       ENDDO
-      INQUIRE(FILE=pdb_file(1:pdb_flen),  EXIST=extpdb)
-      IF (extpdb) GOTO 10
-      DO I = 1, 30
-        CALL AppendNumToFileName(I,pdb_file,new_fname)
-        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extpdb) 
-        IF (extpdb) GOTO 10
-      ENDDO
-      INQUIRE(FILE=ccl_file(1:ccl_flen),  EXIST=extccl)
-      IF (extccl) GOTO 10
-      DO I = 1, 30
-        CALL AppendNumToFileName(I,ccl_file,new_fname)
-        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extccl) 
-        IF (extccl) GOTO 10
-      ENDDO
-!     ep added.  Pro_file contains the powder diffraction data and fit....
-      INQUIRE(FILE=pro_file(1:pro_flen),  EXIST=extpro)
-      IF (extpro) GOTO 10
-      DO I = 1, 30
-        CALL AppendNumToFileName(I,pro_file,new_fname)
-        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extpro) 
-        IF (extpro) GOTO 10
-      ENDDO
-   10 CheckOverwriteSaOutput = 1
-      DO WHILE (extcssr .OR. extpdb .OR. extccl .OR. extpro)
-        CALL SplitPath(pdb_file,tDirName,filehead)
-        CALL WMessageBox(YesNoCancel, QuestionIcon, CommonYes, &
+! When we are here, none of the filenames we generated clashed with an existing one
+      CheckOverwriteSaOutput = 1
+      RETURN
+! When we are here, at least one of the filenames we generated clashed
+! ask user if (s)he wants to overwrite
+   10 CALL SplitPath(OutputFilesBaseName,tDirName,filehead)
+      CALL WMessageBox(YesNoCancel, QuestionIcon, CommonYes, &
                     "Do you wish to overwrite existing files?"//CHAR(13)//CHAR(13)// &
-                    "Current base for filenames: "//filehead(1:LEN_TRIM(filehead)-4)//CHAR(13)//CHAR(13)// &
+                    "Current base for filenames: "//filehead(1:LEN_TRIM(filehead))//CHAR(13)//CHAR(13)// &
                     "(Hit No to enter a new filename)", &
                     "Overwrite Output Files?")
-        IF (WInfoDialog(4) .EQ. 1) THEN ! Yes - Overwrite
-          RETURN 
-        ELSEIF (WinfoDialog(4) .EQ. 2) THEN ! No - so enter a new file name
-          Iflags = SaveDialog + NonExPath + DirChange + AppendExt
-          filehead = ''
-!ep appended
-          CALL WSelectFile('pdb files|*.pdb|ccl files|*.ccl|cssr files|*.cssr|pro files|*.pro|',&
-                           Iflags,filehead,'Choose SA output file name')
-          IF ((WinfoDialog(4) .NE. CommonOk) .OR. (LEN_TRIM(filehead) .EQ. 0)) THEN
-            CheckOverwriteSaOutput = 0
-            RETURN
-          ELSE
-            CALL sa_SetOutputFiles(filehead)
-          ENDIF
-        ELSE ! Cancel
+      IF (WInfoDialog(4) .EQ. 1) THEN ! Yes - Overwrite
+        CheckOverwriteSaOutput = 1
+        RETURN 
+      ELSEIF (WinfoDialog(4) .EQ. 2) THEN ! No - so enter a new file name
+        iFlags = SaveDialog + NonExPath + DirChange + AppendExt
+        filehead = ''
+! ep appended
+        CALL WSelectFile('pdb files|*.pdb|ccl files|*.ccl|cssr files|*.cssr|pro files|*.pro|',&
+                         iFlags,filehead,'Choose SA output file name')
+        IF ((WinfoDialog(4) .NE. CommonOk) .OR. (LEN_TRIM(filehead) .EQ. 0)) THEN ! Cancel
           CheckOverwriteSaOutput = 0
           RETURN
+        ELSE
+          CALL sa_SetOutputFiles(filehead)
+! New checks necessary: does the new name exist?
+          GOTO 1
         ENDIF
-        INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
-        INQUIRE(FILE=pdb_file(1:pdb_flen),  EXIST=extpdb)
-        INQUIRE(FILE=ccl_file(1:ccl_flen),  EXIST=extccl)
-        INQUIRE(FILE=pro_file(1:pro_flen),  EXIST=extpro)
-! Read in a new file name
-      ENDDO
+      ELSE ! Cancel
+        CheckOverwriteSaOutput = 0
+        RETURN
+      ENDIF
 
       END FUNCTION CheckOverwriteSaOutput
 !
@@ -238,11 +221,11 @@
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
       IF (IBMBER .NE. 0) THEN
+! Set the crystal system
         LatBrav = GetCrystalSystem(NumberSGTable)
         NumberSGTable = 1 ! P1
         CALL Upload_CrystalSystem
         CALL ErrorMessage('Error while determining space group: space group reset.')
-! Set the crystal system
         GOTO 10
       ENDIF
 

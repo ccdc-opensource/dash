@@ -62,17 +62,13 @@
 ! As it is now possible to switch saving .pro files on/off, even during SA,
 ! we must now test if the .pro requested has been saved.
 ! The solutions have been ordered wrt chi**2. We must parse the original run nr from the
-! number of the .pdb file. Unless we didn't do a multirun of course.
-      IF (RESTART) THEN
-        RunStr = Grid_Buffer(Iz-5:Iz-4)
-        IF (RunStr(1:1) .EQ. '0') THEN
-          RunStr(1:1) = RunStr(2:2)
-          RunStr(2:2) = ' '
-        ENDIF
-        READ(RunStr,'(I2)') RunNr
-      ELSE
-        RunNr  = 1
+! number of the .pdb file.
+      RunStr = Grid_Buffer(Iz-5:Iz-4)
+      IF (RunStr(1:1) .EQ. '0') THEN
+        RunStr(1:1) = RunStr(2:2)
+        RunStr(2:2) = ' '
       ENDIF
+      READ(RunStr,'(I2)') RunNr
       IF (.NOT. PRO_saved(RunNr)) RETURN
 !
 !   open the plotting window, ihandle is the window's unique identifier
