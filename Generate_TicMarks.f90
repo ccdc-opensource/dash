@@ -53,38 +53,38 @@
 ! so I added in these checks. Everything should be bonafide before
 ! we try to add any tick marks in the GUI.
 !
-      IF (.NOT.Check_TicMark_Data()) THEN
+      IF (.NOT. Check_TicMark_Data()) THEN
         NumOfRef = 0
         CALL Profile_Plot
         RETURN
       ENDIF
       IF (PastPawley) RETURN
    10 IBMBER = 0
-      OPEN (42,FILE='polyf.ccl',STATUS='unknown')
-      WRITE (42,4210)
+      OPEN (42,FILE='polyf.ccl',STATUS='unknown',ERR=999)
+      WRITE (42,4210,ERR=999)
  4210 FORMAT ('N Polyfitter file')
-      WRITE (42,4220) (CellPar(I),I=1,6)
+      WRITE (42,4220,ERR=999) (CellPar(I),I=1,6)
  4220 FORMAT ('C ',3F10.5,3F10.3)
-      WRITE (42,4230)
+      WRITE (42,4230,ERR=999)
  4230 FORMAT ('F C 2 2.31 20.8439 1.02 10.2075 1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0')
       IF (NumberSGTable.GE.1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin.GT.0) THEN
           DO isym = 1, nsymmin
-            WRITE (42,4235) symline(isym)
+            WRITE (42,4235,ERR=999) symline(isym)
  4235       FORMAT ('S ',A)
           ENDDO
         ENDIF
       ENDIF
-      WRITE (42,4240)
+      WRITE (42,4240,ERR=999)
  4240 FORMAT ('I NCYC 6 PRCV 14 MCOR 0 FRIE 1'/'L REFI RIET'/'L SORC SYNX'/'L WGHT 3')
-      WRITE (42,4245) xpmin, xpmax
+      WRITE (42,4245,ERR=999) xpmin, xpmax
  4245 FORMAT ('L RTYP    2 ',2F10.3,'   0.001')
-      WRITE (42,4250) ALambda
+      WRITE (42,4250,ERR=999) ALambda
  4250 FORMAT ('L WVLN ',F10.5)
-      WRITE (42,4260) ZeroPoint
+      WRITE (42,4260,ERR=999) ZeroPoint
  4260 FORMAT ('L ZERO ',F10.5)
-      WRITE (42,4270)
+      WRITE (42,4270,ERR=999)
  4270 FORMAT ('L SCAL   0.10000'/'L SLIM 2.0'/'L PKCN TYPE 1'/          &
               'L PKFN TYPE 3'/'L PKFN LIMS 0.005'/                      &
               'L PKFN SIGM    0.0051    0.0001'/                        &
@@ -102,6 +102,9 @@
         GOTO 10
       ENDIF
       IF (GETTIC('polyf.tic') .EQ. 0) CALL Profile_Plot
+      RETURN
+  999 CALL ErrorMessage('Error writing temporary file for tick marks: disk full or no write permission?')
+      CLOSE (42)
 
       END SUBROUTINE GENERATE_TICMARKS
 !
