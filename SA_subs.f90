@@ -143,7 +143,7 @@
 ! ensure that starting the SA more than once with the same parameters will give
 ! identical results.
       kk = 0
-      DO iFrg = 1, maxfrg
+      DO iFrg = 1, nFrag
         DO ii = 1, izmpar(iFrg)
           kk = kk + 1
           SELECT CASE (kzmpar(ii,iFrg))
