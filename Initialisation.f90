@@ -266,6 +266,10 @@
       INTEGER iRed, iGreen, iBlue, iRGBvalue
       REAL UM, TH
 
+      LOGICAL            ShowAgain
+      COMMON  / DBGMSG / ShowAgain
+
+      ShowAgain = .TRUE.
       PI     = 4.0*ATAN(1.0)
       RAD    = PI/180.0
       DEG    = 180.0/PI

@@ -53,8 +53,15 @@
       
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
+      LOGICAL            ShowAgain
+      COMMON  / DBGMSG / ShowAgain
+
+      LOGICAL, EXTERNAL :: Confirm
+
       !RETURN
-      CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Debug Error")
+      IF (ShowAgain) THEN
+        ShowAgain = Confirm('Debug error : '//TheMessage(1:LEN_TRIM(TheMessage))//CHAR(13)//'More Debug Error messages?')
+      ENDIF
 
       END SUBROUTINE DebugErrorMessage
 !
