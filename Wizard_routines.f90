@@ -72,7 +72,6 @@
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_PW0_Skip, IDCANCEL) ! The 'Close' button
               CALL EndWizard
@@ -132,25 +131,127 @@
 
       IMPLICIT NONE
 
-      CHARACTER(MaxPathLength) CTEMP
-      INTEGER ISTAT
-      INTEGER DiffractionFileLoad ! Function
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page3)
-      CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
-      CALL PopActiveWindowID
-      ISTAT = DiffractionFileLoad(CTEMP)
-! Should never fail: the finish button can only be ungreyed if we have loaded this pattern 
-! before. Even if it fails, the pattern should still be in memory.
-! This only fails if the user went '<Back' and 'Next>' through the windows applying
-! truncation and background.
-      IF (ISTAT .NE. 1) CALL ErrorMessage('Could not load powder diffraction pattern.')
+      CALL WizardApplyDiffractionFileInput
       CALL WizardApplyProfileRange
       CALL WizardApplyBackground
       CALL EndWizard
 
-      END
+      END SUBROUTINE WizardApplyFinish_1
+!
+!*****************************************************************************
+!
+      SUBROUTINE WizardApplyDiffractionFileInput
+
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
+      INCLUDE 'statlog.inc'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
+
+      REAL              XPF_Range
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
+! Not too pretty, but safe
+      INTEGER                BackupNOBS
+      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
+      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
+
+      INTEGER I, J, JJ, IST
+      REAL XADD, YOADD, VADD
+
+      NOBS = BackupNOBS
+      XOBS = BackupXOBS
+      YOBS = BackupYOBS
+      EOBS = BackupEOBS
+      XPMIN = XOBS(1)
+      XPMAX = XOBS(1)
+      YPMIN = YOBS(1)
+      YPMAX = YOBS(1)
+      DO I = 1, NOBS
+        XPMIN = MIN(XOBS(I),XPMIN)
+        XPMAX = MAX(XOBS(I),XPMAX)
+        YPMIN = MIN(YOBS(I),YPMIN)
+        YPMAX = MAX(YOBS(I),YPMAX)
+      ENDDO
+      OriginalNOBS = NOBS
+      EndNOBS = OriginalNOBS
+      NBIN = (NOBS/LBIN)
+      DO I = 1, NBIN
+        IST = (I-1)*LBIN
+        XADD  = 0.0
+        YOADD = 0.0
+        VADD  = 0.0
+        DO J = 1, LBIN
+          JJ = J + IST
+          XADD  = XADD+XOBS(JJ)
+          YOADD = YOADD+YOBS(JJ)
+          VADD  = VADD+EOBS(JJ)**2
+        ENDDO
+        XBIN(I)  = XADD/FLOAT(LBIN)
+        YOBIN(I) = YOADD/FLOAT(LBIN)
+        YCBIN(I) = YOBIN(I)
+        EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
+! JvdS Assume no knowledge on background
+        YBBIN(I) = 0.0
+      ENDDO
+      XPGMIN = XPMIN
+      XPGMAX = XPMAX
+      YPGMIN = YPMIN
+      YPGMAX = YPMAX
+      XPGMINOLD = XPMIN
+      XPGMAXOLD = XPMAX
+      YPGMINOLD = YPMIN
+      YPGMAXOLD = YPMAX
+      CALL UPLOAD_RANGE()
+      IPMIN = 1
+      IPMAX = NBIN
+      IPMINOLD = IPMIN
+      IPMAXOLD = IPMAX
+
+      END SUBROUTINE WizardApplyDiffractionFileInput
 !
 !*****************************************************************************
 !
@@ -162,8 +263,18 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+
+! Not too pretty, but safe
+      INTEGER                BackupNOBS
+      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
+      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
       CHARACTER(MaxPathLength) CTEMP
       INTEGER ISTAT
@@ -202,12 +313,16 @@
                 CALL WDialogFieldState(IDNEXT,Disabled)
                 CALL WDialogFieldState(IDFINISH,Disabled)
               ENDIF
-            CASE (ID_PWa_DF_Browse)
+            CASE (IDBBROWSE)
               ISTAT = DiffractionFileBrowse()
-! Only change if the user didn't press 'Cancel'
+! Don't change if the user pressed 'Cancel' (ISTAT = 2)
               IF      (ISTAT .EQ. 1) THEN
                 CALL WDialogFieldState(IDNEXT,Enabled)
                 CALL WDialogFieldState(IDFINISH,Enabled)
+                BackupNOBS = NOBS
+                BackupXOBS = XOBS
+                BackupYOBS = YOBS
+                BackupEOBS = EOBS
               ELSE IF (ISTAT .EQ. 0) THEN
                 CALL WDialogFieldState(IDNEXT,Disabled)
                 CALL WDialogFieldState(IDFINISH,Disabled)
@@ -229,7 +344,6 @@
 !
 ! Effectively, the user is asked to provide / confirm the wavelength
 !
-
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -246,7 +360,6 @@
       CALL WDialogSelect(IDD_PW_Page4)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
               CALL WizardApplyFinish_1
