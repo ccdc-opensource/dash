@@ -156,12 +156,17 @@
             CART(2,I) = CART(2,I) - YC
             CART(3,I) = CART(3,I) - ZC
           ENDDO
+! Apply rotation and translation to the atoms of this Z-matrix
           CALL DO_ATOM_POS(TRAN,ROTA,CART,NATS)
+! When we are here, we have the actual co-ordinates of all the atoms in this Z-matrix
+! in Cartesian (orthogonal) co-ordinates. We need fractional co-ordinates: convert.
           DO I = 1, NATS
             tX = CART(1,I)*c2fmat(1,1) + CART(2,I)*c2fmat(1,2) + CART(3,I)*c2fmat(1,3)
             tY = CART(1,I)*c2fmat(2,1) + CART(2,I)*c2fmat(2,2) + CART(3,I)*c2fmat(2,3)
             tZ = CART(1,I)*c2fmat(3,1) + CART(2,I)*c2fmat(3,2) + CART(3,I)*c2fmat(3,3)
             KI = KATOM + I
+! Note that we must reorder the atoms such that the hydrogens are appended after the 
+! non-hydrogens.
             X(1,OrderedAtm(KI)) = SNGL(tX)
             X(2,OrderedAtm(KI)) = SNGL(tY)
             X(3,OrderedAtm(KI)) = SNGL(tZ)
