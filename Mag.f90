@@ -848,9 +848,9 @@
       CALL TRANSQ(OTRSYM(1,1,1),3)
       DO NO = 2, NOPC
         IF (MTSYM(NO).EQ.0) GOTO 27
-        CALL GMPRD(SYM(1,1,NO),ORTH(1,1,2),TEMP,3,3,3)
+        CALL MultiplyMatrices(SYM(1,1,NO),ORTH(1,1,2),TEMP,3,3,3)
         IF (MTSYM(NO)*NORD(NO).LT.0.) CALL GMREV(TEMP,TEMP,3,3)
-        CALL GMPRD(OTRSYM(1,1,1),TEMP,OTRSYM(1,1,NO),3,3,3)
+        CALL MultiplyMatrices(OTRSYM(1,1,1),TEMP,OTRSYM(1,1,NO),3,3,3)
    27 ENDDO
       CALL GMUNI(OTRSYM(1,1,1),3)
       CALL FACTGP(MJTAB,MSTAB,NFAC)
@@ -875,7 +875,7 @@
             CALL ERRMES(-1,0,'Logical error in MAGSYM - bad tables')
             IF (IBMBER .NE. 0) RETURN
           ENDIF
-          CALL GMPRD(OTRSYM(1,1,IX),OTRSYM(1,1,IOPP),OTRSYM(1,1,NO),3,3,3)
+          CALL MultiplyMatrices(OTRSYM(1,1,IX),OTRSYM(1,1,IOPP),OTRSYM(1,1,NO),3,3,3)
         ENDIF
         IF (MSTAB(NO).LT.0) CALL GMREV(OTRSYM(1,1,NO),OTRSYM(1,1,NO),3,3)
    43 ENDDO
@@ -887,7 +887,7 @@
         CALL GMEQ(S,RS,3,3)
       ELSE
         DO I = 1, 3
-          CALL GMPRD(OTRSYM(1,1,IOP),S(1,I),RS(1,I),3,3,1)
+          CALL MultiplyMatrices(OTRSYM(1,1,IOP),S(1,I),RS(1,I),3,3,1)
         ENDDO
       ENDIF
   100 RETURN
