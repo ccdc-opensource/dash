@@ -223,6 +223,16 @@
       LOGICAL                                                                                      ZBAKIN
       COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5), KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
 
+! IBACK  = background type? (e.g. Fourier, polynomial)
+! NBACK  = Number of BACKground parameters, per source
+!
+! BACKGD = the actual background parameters, per source
+!
+! NBK    = Number of Background Cards
+! LBKD   = number of parameters per background card
+! ZBAKIN = whether or not to include background contributions to profile chi squared for
+!          regions without peak contributions.
+
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
