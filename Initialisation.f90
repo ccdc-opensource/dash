@@ -241,9 +241,9 @@
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
       REAL            bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nd2, nd3, nd4, bmIHANDLE
+      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
       COMMON /sagdat/ bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nd2, nd3, nd4, bmIHANDLE
+                      nd1, nmpert, nd3, nd4, bmIHANDLE
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
