@@ -293,7 +293,6 @@
         UR(I) = COS(TH)
         UI(I) = SIN(TH)
       ENDDO
-      CALL MakRHm
       CALL CalCosArx
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
