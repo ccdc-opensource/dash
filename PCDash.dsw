@@ -15,6 +15,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "Encoder"=.\Encoder\Encoder.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "PCDash"=.\PCDash.dsp - Package Owner=<4>
 
 Package=<5>
