@@ -1833,7 +1833,7 @@
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
       SAVE   /ModalTorsions/
 
-      LOGICAL, EXTERNAL :: CheckXInBounds
+      LOGICAL, EXTERNAL :: OutOfBounds
       INTEGER ICol, NumColumns, ISET
       INTEGER Upper, Lower
       REAL    Zero, OneEighty, xtem, ttem
@@ -1983,7 +1983,7 @@
               CALL WDialogGetDouble(IDF_ModalUpper, tempdouble)
               ub(RowNumber) = tempdouble
 !             Check that x is in bounds
-              IF (CheckXInBounds(RowNumber, X(RowNumber))) THEN
+              IF (OutOfBounds(RowNumber, X(RowNumber))) THEN
                 CALL WarningMessage('Initial value does not fall within defined ranges')
                 IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOk) THEN
                   CALL PopActiveWindowID
@@ -2154,17 +2154,20 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION CheckXInBounds(npar, XIn)
+      LOGICAL FUNCTION OutOfBounds(npar, XIn)
 
 ! This Subroutine determines if a trial torsion angle value is within
 ! modal torsion angle ranges defined.
 
       IMPLICIT NONE      
 
+      INTEGER,          INTENT (IN   ) :: npar
+      DOUBLE PRECISION, INTENT (INOUT) :: XIn
+
       INCLUDE 'PARAMS.INC'
 
-      DOUBLE PRECISION x,lb,ub,vm
-      COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
+      DOUBLE PRECISION x,       lb,       ub,       vm
+      COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
 
       INTEGER                ModalFlag,       RowNumber      
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNUmber
@@ -2172,16 +2175,15 @@
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds 
            
-      INTEGER npar, I, Upper, Lower
+      INTEGER I, Upper, Lower
 
       LOGICAL OneEightyScale
       REAL xtem, tempupper, templower, tempupper2, templower2
-      DOUBLE PRECISION, INTENT (INOUT) :: XIn
 
       Upper = 1
       Lower = 2
-      CheckXInBounds = .FALSE.
-      SELECT  CASE(ModalFlag(npar))
+      OutOfBounds = .FALSE.
+      SELECT CASE(ModalFlag(npar))
         CASE (2) ! bimodal ranges
           IF (UB(npar) * LB(npar) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
             TempUpper = SNGL(UB(npar))         ! so use 0-360 degree scale
@@ -2194,23 +2196,23 @@
             CALL OneEightyToThreeSixty(TempLower2)
             xtem = XIn                                                                                     
             IF ((xtem .LT. -180.00) .OR. (xtem .GT. 180.00)) THEN
-              CheckXInBounds = .TRUE.
+              OutOfBounds = .TRUE.
             ELSE
               CALL OneEightytoThreeSixty(xtem)
               IF (((xtem .LT. MAX(TempLower, TempLower2)) .AND. &
                    (xtem .GT. MIN(TempLower, TempLower2))) .OR. &
                   ((xtem .LT. MAX(TempUpper, TempUpper2)) .AND. &
                    (xtem .GT. MIN(TempUpper, TempUpper2)))) THEN
-                CheckXInBounds = .TRUE.                                       
+                OutOfBounds = .TRUE.                                       
               ENDIF
             ENDIF
           ELSEIF (UB(npar) * LB(npar) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
               IF ((XIn .LT. -180.00) .OR. (XIn .GT. 180.00)) THEN
-                CheckXInBounds = .TRUE.     
+                OutOfBounds = .TRUE.     
               ELSE
                 IF ((XIn .LT. LB(npar)) .OR. (XIn .GT. UB(npar))) THEN
                   IF (((XIn .LT. (-1)*UB(npar)) .OR. (XIn .GT. (-1)*LB(npar)))) THEN !out of bounds            
-                    CheckXInBounds = .TRUE.
+                    OutOfBounds = .TRUE.
                   ENDIF
                 ENDIF
               ENDIF
@@ -2220,7 +2222,7 @@
           CALL DetermineTriModalBounds(SNGL(UB(npar)), Upper)
           CALL DetermineTriModalBounds(SNGL(LB(npar)), Lower)
           IF ((xtem .LT. -180.00) .OR. (xtem .GT.180.00)) THEN
-            CheckXInBounds = .TRUE.
+            OutOfBounds = .TRUE.
           ELSE                 
             CALL CheckTriModalBounds(OneEightyScale)
             IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
@@ -2240,14 +2242,14 @@
                 TempUpper = MAX(Tempbounds(3,Upper), Tempbounds(3,Lower))
                 TempLower = MIN(Tempbounds(3,Upper), Tempbounds(3,Lower))
                 IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN        
-                  CheckXInBounds = .TRUE.
+                  OutOfBounds = .TRUE.
                 ENDIF
               ENDIF
             ENDIF
           ENDIF
       END SELECT
 
-      END FUNCTION CheckXInBounds
+      END FUNCTION OutOfBounds
 !
 !*****************************************************************************
 !
