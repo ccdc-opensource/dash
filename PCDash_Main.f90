@@ -398,7 +398,7 @@
       tLen = LEN_TRIM(CABOUT)
 !DEC$ ENDIF
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
-               'Copyright July 2004'
+               'Copyright July 2005'
       CALL WMessageBox(OkOnly, InformationIcon, CommonOk, CABOUT, 'About DASH')
 
       END SUBROUTINE About
