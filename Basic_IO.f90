@@ -97,7 +97,7 @@
       tLen = LEN_TRIM(tMessage)
       tMessage = tMessage(1:tLen)//" "//Integer2String(Counter)
       tLen = LEN_TRIM(tMessage)
-      CALL WindowOutStatusBar(1,tMessage(1:tLen))
+      CALL WindowOutStatusBar(1, tMessage(1:tLen))
 !DEC$ ENDIF
 
       END SUBROUTINE DebugShow
