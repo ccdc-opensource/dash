@@ -294,7 +294,7 @@
      &        Vn, Voinf, Volmaxc, Vosup, Vplu, Vsupm, Vunitm, Vunitp, Vv, Wave, X, Zb, Zz
       INTEGER :: I, Ichoix, Jfl, Klv, Kvol, Kz1, Kz2, Kzt, Na, Nac, Nb, Nc, Nr, Nvol
       INTEGER, INTRINSIC :: NINT
-!
+
 !     Reading of the data
       iw = 117
       DICVOL_Error = 0 ! Success
