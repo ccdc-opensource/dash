@@ -114,12 +114,25 @@
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
                               chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
 
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
       REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
       COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
+      REAL             XOPT,       C,       FOPT
+      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
+
+      REAL Curr_CHI
+
       Curr_Iter = TheIter
+      IF (Is_SX) THEN
+        Curr_CHI = FOPT
+      ELSE
+        Curr_CHI = CHIPROBEST
+      ENDIF
       IF (Curr_Iter .LE. 0) RETURN
 ! chi_sqd is initialised to all zeros in BeginSa()
       IF (Curr_Iter .GT. MaxIterationSoFar) THEN
@@ -128,9 +141,9 @@
       ENDIF
 ! Record chi-sqd value in array.
 ! Ensure that profile chi-sqd value never increases....
-      chi_sqd(Curr_Iter, Curr_SA_Run) = CHIPROBEST
+      chi_sqd(Curr_Iter, Curr_SA_Run) = Curr_CHI
       IF (Curr_Iter .GT. 1) THEN
-        IF (CHIPROBEST .GT. chi_sqd(Curr_Iter-1, Curr_SA_Run)) THEN
+        IF (Curr_CHI .GT. chi_sqd(Curr_Iter-1, Curr_SA_Run)) THEN
           chi_sqd(Curr_Iter, Curr_SA_Run) = Chi_sqd(Curr_Iter-1, Curr_SA_Run)
         ENDIF
       ENDIF

@@ -143,8 +143,8 @@
       IntensityChiSqd(Curr_SA_Run) = FOPT
       ProfileChiSqd(Curr_SA_Run) = CHIPROBEST
       iSolTicked(Curr_SA_Run) = 1
-! Now sort the list according to Profile chi sqd
-      CALL SORT_REAL(ProfileChiSqd,iSol2Run,NumOf_SA_Runs)
+! Now sort the list according to intensity chi sqd
+      CALL SORT_REAL(IntensityChiSqd, iSol2Run, NumOf_SA_Runs)
       CALL Update_Solutions
       CALL PopActiveWindowID
 
