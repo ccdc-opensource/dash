@@ -290,6 +290,7 @@
         PastPawley = .FALSE.
         CALL Generate_TicMarks
         CALL GET_LOGREF
+        CALL MakRHm
       ENDIF
 ! Excluded regions
 
