@@ -1,5 +1,3 @@
-!*==DO_ATOM_POS.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 !
 !*****************************************************************************
 !

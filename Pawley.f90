@@ -211,9 +211,9 @@
 ! update the profile and stay with the Pawley refinement
               IPTYPE = 2
 ! upload the cell constants and zeropoint from the Pawley refinement
-              DO II=1,3
+              DO II = 1, 3
                 CELLPAR(II) = CELL(II,1,1)
-                JJ=II+3
+                JJ = II + 3
                 CELLPAR(JJ) = DEGREE(ACOS(CELL(II,2,1)))
               ENDDO
 ! The new peak shape parameters are now in 
