@@ -1,6 +1,8 @@
 ! Variables for DICVOL
       MODULE DICVAR
+
       IMPLICIT NONE
+
       INTEGER DICVOL_Error
 
       INTEGER cDICVOL_ErrorOnWrite
@@ -12,8 +14,11 @@
       
       REAL DV_ScaleFactor
 ! To scale all the data, so that large unit cells can be treated as though they were small.
-! implementation: the wavelength is multiplied by this factor before being fed to DICVOL,
-! all a, b, and c output by DICVOL are divided by it. 
+! implementation: 
+! 1. the wavelength is multiplied by this factor before being fed to DICVOL.
+! 2. All peak position errors are multiplied by this factor
+! 3. all a, b, and c output by DICVOL are divided by it. 
+! 4. The volume is divided by DV_ScaleFactor**3
 
       REAL coeff
       PARAMETER ( coeff = 1.E+08 )
