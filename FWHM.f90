@@ -18,8 +18,7 @@
   
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
-      INTEGER                                                                ICODEZ
-      REAL                                                                                 KOBZ
+      INTEGER                                                                ICODEZ,       KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       REAL            ZXDELT

@@ -155,8 +155,7 @@
 
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
-      INTEGER                                                                ICODEZ
-      REAL                                                                                 KOBZ
+      INTEGER                                                                ICODEZ,       KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
@@ -570,8 +569,7 @@
 
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
-      INTEGER                                                                ICODEZ
-      REAL                                                                                 KOBZ
+      INTEGER                                                                ICODEZ,       KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       REAL ZTEM(MOBS), RTEM(3,MFCSTO), TF4PAR(MF4PAR)
@@ -1129,7 +1127,7 @@
       IF (.NOT.NEAR90) THEN
         TANRA = ABS(TAN(RAD*ARGK))
         DENASY = 0.5*(HPS-HMS)*(HPS+HMS)
-! BET1 AND NETPI CHANGE SIGN AT 90 DEGREES
+! BET1 AND BETPI CHANGE SIGN AT 90 DEGREES
 ! BET2, BETP, BETM, BETP2 AND BETM2 DO NOT
         BET1 = 0.5*RAD*DENTEM*TANRA
         BET2 = SQRT(BET1)
