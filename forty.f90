@@ -374,7 +374,9 @@
         CALL RFACS(6)
 ! IF CAIL, OUTPUT EIGENVALUES & EIGENVECTORS IF REQUIRED BY "I PREE"
         IF (DONE) CALL EIGEN(ALSQ,MATSZ)
-        IF (DONE) CALL HESCOR(ALSQ,MATSZ)
+!O JvdS The following line used to be the old code. I moved it to out of the loop 7 May 2002
+!O because it crashed DASH (some values set to FFFFFFFFh)
+!O        IF (DONE) CALL HESCOR(ALSQ,MATSZ)
 ! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 ! INVERT MATRIX:
@@ -390,13 +392,15 @@
         DONE = (AMAXSH.LT.CONV .OR. ICYC.EQ.LASTCY-1 .OR. NCYC.EQ.1)
 ! OUTPUT NEW CRYSTAL DATA FOR PENULTIMATE CYCLE:
         IF (DONE) CALL NWINPR(PCXX,PFXX,MAGROU)
-!.. *** Winteracter calls ***
+! *** Winteracter calls ***
         CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
         CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RWPOBS,'(F12.2)')
         CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RWPEXP,'(F12.2)')
       ENDDO
 ! PRINT CORRELATION MATRIX:
    39 CALL MATCOR(ALSQ,MATSZ)
+! Used to be inside the loop (see comment)  
+      CALL HESCOR(ALSQ,MATSZ)
 ! OUTPUT H,K,L IF REQUIRED:
       CALL HKLOUT(PCXX,ALSQ,MATSZ)
       CALL CLOFIL(ISCR)
