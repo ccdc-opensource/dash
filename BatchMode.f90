@@ -6,10 +6,13 @@
       USE WINTERACTER
       USE ZMVAR
       USE PRJVAR
+      USE PO_VAR
 
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: ArgString
+
+      INCLUDE 'PARAMS.INC'
 
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
@@ -27,6 +30,9 @@
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       CHARACTER*255 line, keyword, tString
       INTEGER iTem, hFile, nl, I, iLen, iFrg, iDummy
@@ -150,6 +156,15 @@
             iFrg = iFrg + 1
             frag_file(iFrg) = line(:nl)
             CALL Read_One_Zm(iFrg)
+          CASE ('PO_DIR')
+            I = InfoError(1) ! reset the errors
+            CALL INextInteger(line, PO_Direction(1))
+            IF (InfoError(1) .NE. 0) GOTO 999
+            CALL INextInteger(line, PO_Direction(2))
+            IF (InfoError(1) .NE. 0) GOTO 999
+            CALL INextInteger(line, PO_Direction(3))
+            IF (InfoError(1) .NE. 0) GOTO 999
+            PrefParExists = .TRUE.
           CASE ('LIMITS')
             nFrag = iFrg
             CALL SA_Parameter_Set
@@ -158,20 +173,20 @@
             IF (InfoError(1) .NE. 0) GOTO 999
             DO I = 1, iTem
               READ(hFile, '(A)', END=100, ERR=999) line
-              nl = LEN_TRIM(line)
+              nl = LEN_TRIM(line)  ! Since we only read iTem lines, this would crash
               IF ( nl .NE. 0 ) THEN ! Blank line
                 IF ( line(1:1) .NE. "#" ) THEN ! It's a comment
                   CALL IUpperCase(line(:nl))
                   iDummy = InfoError(1) ! reset the errors
-                  CALL INextReal(line, rTem) ! This is the initial value
-                  !...
+                  CALL INextReal(line, X_init(i)) ! This is the initial value
+                  IF (InfoError(1) .NE. 0) GOTO 999
                   CALL INextString(line, tString)
                   SELECT CASE(tString(1:LEN_TRIM(tString)))
                     CASE ('LBUB') ! Lower Bound/Upper Bound pair
-                      CALL INextReal(line, rTem) ! Lower bound
-                      !...
-                      CALL INextReal(line, rTem) ! Upper bound
-                      !...
+                      CALL INextReal(line, LB(i)) ! Lower bound
+                      IF (InfoError(1) .NE. 0) GOTO 999
+                      CALL INextReal(line, UB(i)) ! Upper bound
+                      IF (InfoError(1) .NE. 0) GOTO 999
                     CASE ('FIXED') ! Fixed
                     CASE ('BIMODAL') ! Bimodal
                     CASE ('TRIMODAL') ! Trimodal
@@ -203,9 +218,174 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE WriteBatchFile
+      INTEGER FUNCTION BatchFileSaveAs
+!
+! RETURNS 0 for success
+!
+      USE WINTERACTER
+      USE VARIABLES
+
+      IMPLICIT NONE      
+
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
+      CHARACTER(MaxPathLength) :: tFileName
+      CHARACTER(LEN=45) :: FILTER
+      INTEGER iFLAGS
+      
+! Save the batch file
+      BatchFileSaveAs = 1 ! Failure
+      iFLAGS = SaveDialog + AppendExt + PromptOn
+      FILTER = 'DASH batch files (*.duff)|*.duff|'
+      tFileName = OutputFilesBaseName(1:OFBN_Len)//'.duff'
+      CALL WSelectFile(FILTER,iFLAGS,tFileName,'Save project file')
+      IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
+        CALL WriteBatchFile(tFileName)
+        BatchFileSaveAs = 0
+      ENDIF
+
+      END FUNCTION BatchFileSaveAs
+!
+!*****************************************************************************
+!
+      SUBROUTINE WriteBatchFile(FileName)
+
+      USE VARIABLES
+      USE PO_VAR
+      USE ZMVAR
 
       IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: FileName
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
+
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                                          iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
+
+      INTEGER iHandle, i, iFrg
+
+      ! TODO ##################
+      ! Problem here: we haven't fetched the values from the current dialogue yet: everything
+      ! in COMMON block SAOPT is wrong.
+      iHandle = 10
+      OPEN(UNIT=iHandle, FILE=FileName, ERR=999)
+      WRITE(iHandle,'(A)',ERR=999) '# This is a generated file.'
+      WRITE(iHandle,'(A)',ERR=999) '# Editing OUT, SEED1, SEED2 and NRUNS is safe and may be necessary,'
+      WRITE(iHandle,'(A)',ERR=999) '# editing the items near the end of the file is bound to crash your DASH run.'
+      WRITE(iHandle,'(A)',ERR=999) '# Input file'
+      WRITE(iHandle,'(A)',ERR=999) 'SDI '//OutputFilesBaseName(1:OFBN_Len)//'.sdi'
+      WRITE(iHandle,'(A)',ERR=999) '# Ouput file'
+      WRITE(iHandle,'(A)',ERR=999) 'OUT '//OutputFilesBaseName(1:OFBN_Len)//'.dash'
+      WRITE(iHandle,'(A)',ERR=999) '# When starting multiple jobs with the same .sdi file, make sure that'
+      WRITE(iHandle,'(A)',ERR=999) '# SEED1 and SEED2 have different values in every file.'
+      WRITE(iHandle,'(A)',ERR=999) '# DASH increments SEED1 and SEED2 with the number of the run at the start of'
+      WRITE(iHandle,'(A)',ERR=999) '# each run.'
+      WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED1', iseed1
+      WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED2', iseed2
+      WRITE(iHandle,'(A)',ERR=999) '# On a distributed system, NRUNS should probably be set to:'
+      WRITE(iHandle,'(A)',ERR=999) '#     (total number of runs / number of processors)'
+      WRITE(iHandle,'(A,X,I2)',ERR=999) 'NRUNS', MaxRuns
+      WRITE(iHandle,'(A)',ERR=999) '# Maximum number of moves: real followed by integer e.g. "3.0 7" means "3.0E7"'
+      ! TODO ##################
+      WRITE(iHandle,'(A,X,F9.5,X,I1)',ERR=999) 'MAXMOVES', 1.0, 7
+      WRITE(iHandle,'(A)',ERR=999) '# Termination criterion: a Simulated Annealing run stops when '
+      WRITE(iHandle,'(A)',ERR=999) '# the profile chi-sqrd is lower than MULTIPLIER times the Pawley chi-sqrd'
+      WRITE(iHandle,'(A,X,F9.5)',ERR=999) 'MULTIPLIER', ChiMult
+      WRITE(iHandle,'(A)',ERR=999) '# Changing settings below this point is probably not necessary'
+      WRITE(iHandle,'(A,X,F9.5)',ERR=999) 'T0', T0
+      WRITE(iHandle,'(A,X,F9.5)',ERR=999) 'COOL', RT
+      WRITE(iHandle,'(A,X,I3)',ERR=999) 'N1', NS
+      WRITE(iHandle,'(A,X,I3)',ERR=999) 'N2', NT
+      WRITE(iHandle,'(A)',ERR=999) '# Randomise initial values'
+      IF ( RandomInitVal ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'RANDOMISE TRUE'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) 'RANDOMISE FALSE'
+      ENDIF
+      WRITE(iHandle,'(A)',ERR=999) '# Use crystallographic Centre of Mass'
+      IF ( UseCCoM ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'USECCOM TRUE'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) 'USECCOM FALSE'
+      ENDIF
+      WRITE(iHandle,'(A)',ERR=999) '# 1 = ignore, 2 = absorb, 3 = explicit'
+      WRITE(iHandle,'(A,X,I2)',ERR=999) 'HYDROGEN', HydrogenTreatment
+      WRITE(iHandle,'(A)',ERR=999) '# Auto local minimise'
+      IF ( AutoMinimise ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'AUTOMIN TRUE'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) 'AUTOMIN FALSE'
+      ENDIF
+      WRITE(iHandle,'(A)',ERR=999) '# Use Hydrogens for auto local minimise'
+      IF ( UseHAutoMin ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'MINIMISEHYDR TRUE'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) 'MINIMISEHYDR FALSE'
+      ENDIF
+      WRITE(iHandle,'(A)',ERR=999) '# Auto align'
+      ! TODO ##################
+      IF ( RandomInitVal ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'AUTOALIGN TRUE'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) 'AUTOALIGN FALSE'
+      ENDIF
+      WRITE(iHandle,'(A)',ERR=999) '# WARNING beyond this point the number and order of the lines becomes important.'
+      WRITE(iHandle,'(A)',ERR=999) '# Do not edit beyond this point.'
+      IF ( PrefParExists ) THEN
+        WRITE(iHandle,'(A)',ERR=999) '#Preferred Orientation DIRection'
+        WRITE(iHandle,'(A,3(X,I3))',ERR=999) '#PO_DIR', (PO_Direction(i),i=1,3)
+      ENDIF
+      DO iFrg = 1, nfrag
+        WRITE(iHandle,'(A)',ERR=999) frag_file(iFrg)(1:LEN_TRIM(frag_file(iFrg)))
+      ENDDO
+!C Need limits for all parameters. Since these are by index, we need to write all of them out
+      WRITE(iHandle,'(A,X,I3)',ERR=999) 'LIMITS', nvar
+      DO i = 1, nvar
+        SELECT CASE ( ModalFlag(i) )
+          CASE ( 0, 1 ) ! Not a torsion/ a unimodal torsion
+            WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5)',ERR=999) X_init(i), 'LBUB', LB(i), UB(i)
+          CASE ( 2 ) ! Bimodal torsion
+            WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5)',ERR=999) X_init(i), 'BIMODAL', LB(i), UB(i)
+          CASE ( 3 ) ! Trimodal torsion
+            WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5)',ERR=999) X_init(i), 'TRIMODAL', LB(i), UB(i)
+        END SELECT
+      ENDDO
+!C  0.0000 LBUB 0.000 1.000
+!C  0.0000 FIXED
+!C  0.0000 BIMODAL 120.000 150.000
+!C  0.0000 TRIMODAL -30.000 30.000
+
+      CLOSE(iHandle) 
+      RETURN
+ 999  CALL ErrorMessage('Error writing .duff file.')
+      CLOSE(iHandle) 
 
       END SUBROUTINE WriteBatchFile
 !
