@@ -10,8 +10,8 @@
 ! such that it lets the user visually select a file first.
 !
       USE WINTERACTER
-      USE VARIABLES
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
