@@ -1,12 +1,11 @@
-!*==DECODESGSYMBOL.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
       SUBROUTINE DecodeSGSymbol(SGsymb)
 !
-!... This program decodes the explicit space group symbols in Vol.B
+! This program decodes the explicit space group symbols in Vol.B
       CHARACTER*24 SGsymb
-!
+
       REAL rotmat(3,3,10), tran(3,10), alat(3,10)
       INTEGER idol(5)
       INTEGER matsym(3,3,12)
@@ -20,13 +19,12 @@
 !	data latvec/ 6,0,0, 0,6,0, 0,0,6, 6,6,6, 6,6,0, 6,0,6, 8,4,4/
 !	the above latvec is all wrong, but the one below only works
 !	for A,B,C and I centering
-      DATA latvec/0, 6, 6, 6, 0, 6, 6, 6, 0, 6, 6, 6, 8, 4, 4, 4, 8, 8, &
-     &     0, 0, 0/
+      DATA latvec/0, 6, 6, 6, 0, 6, 6, 6, 0, 6, 6, 6, 8, 4, 4, 4, 8, 8, 0, 0, 0/
       PARAMETER (msymmin=10)
       CHARACTER*20 symline
       COMMON /symgencmn/ nsymmin, symmin(4,4,msymmin), symline(msymmin)
       CHARACTER*50 stout
-!
+
       nele = 1
       ns = 24
       DO i = 1, ns
@@ -73,7 +71,6 @@
           ENDDO
         ENDDO
       ENDIF
-!
       nlat = isym
       IF (nlat.GT.0) THEN
         DO ilat = 1, nlat
@@ -85,12 +82,10 @@
           ENDDO
         ENDDO
       ENDIF
-!
       DO jj = 2, nele
         id1 = idol(jj-1) + 1
         id2 = idol(jj) - 1
 ! 1+id2-id1=6 always
-!
         isym = isym + 1
         SELECT CASE (SGsymb(id1+1:id1+2))
         CASE ('1A')
@@ -142,7 +137,6 @@
           IF (Num12th.EQ.5) Tran(i,isym) = 2.*Tran(i,isym)
         ENDDO
       ENDDO
-!
 !.. Now make the Jones faithful representation
       nsymmin = isym
 !      write(76,*) ' Number of symmetry generators ',nsymmin
@@ -161,14 +155,10 @@
  4000   FORMAT (i5,5x,a)
         symline(js) = stout(:20)
       ENDDO
-!
+
       END SUBROUTINE DECODESGSYMBOL
-!*==M2S_SYMCON.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
-!
-!
-!
+!*****************************************************************************
 !
       SUBROUTINE M2S_SYMCON(symtem,stout,lstout)
 ! Makes the Jones faithful representation from the 4 by 4 matrix
@@ -181,18 +171,15 @@
       DATA strtran/'   ', '   ', '1/6', '1/4', '1/3', '   ', '1/2',     &
      &     '   ', '2/3', '3/4', '5/6', '   '/
       INTEGER kk
-!
-      lstout = 0
 
+      lstout = 0
       DO i = 1, 3
-!
         ipt = 0
-!
-        item = 1 + nint(12.*symtem(i,4))
+        item = 1 + NINT(12.*symtem(i,4))
         jpt = ipt + lentran(item)
         stem(ipt+1:jpt) = strtran(item)
         ipt = jpt
-        kk = nint(symtem(i,1))
+        kk = NINT(symtem(i,1))
         IF (kk.EQ.-1) THEN
           stem(ipt+1:ipt+2) = '-x'
           ipt = ipt + 2
@@ -205,9 +192,7 @@
             ipt = ipt + 2
           ENDIF
         ENDIF
-!
-!
-        kk = nint(symtem(i,2))
+        kk = NINT(symtem(i,2))
         IF (kk.EQ.-1) THEN
           stem(ipt+1:ipt+2) = '-y'
           ipt = ipt + 2
@@ -220,8 +205,7 @@
             ipt = ipt + 2
           ENDIF
         ENDIF
-!
-        kk = nint(symtem(i,3))
+        kk = NINT(symtem(i,3))
         IF (kk.EQ.-1) THEN
           stem(ipt+1:ipt+2) = '-z'
           ipt = ipt + 2
@@ -238,10 +222,12 @@
         lstout = lstout + ipt
         lstout = lstout + 1
         stoutt(lstout:lstout) = ','
-!
       ENDDO
       lstout = lstout - 1
       stout = ' '
       stout(21-lstout:20) = stoutt(1:lstout)
-!
+
       END SUBROUTINE M2S_SYMCON
+!
+!*****************************************************************************
+!
