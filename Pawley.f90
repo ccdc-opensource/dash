@@ -667,7 +667,7 @@
         EOBS(I)  = ZDOBS(I)
       ENDDO
       IPTYPE = 2
-      CALL Profile_Plot(IPTYPE)
+      CALL Profile_Plot
 
       END SUBROUTINE Load_Pawley_PRO
 !

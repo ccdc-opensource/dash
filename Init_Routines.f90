@@ -45,7 +45,7 @@
 ! Signal to Pawley refinement that we should start with a clean slate
       CALL IOsDeleteFile('polyp.niw')
 ! Redraw
-      CALL Profile_Plot(IPTYPE)
+      CALL Profile_Plot
 ! Grey out 'Delete all peak fit ranges' button on toolbar
       CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
 ! Grey out 'Clear Peaks' button in Wizard window

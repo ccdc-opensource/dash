@@ -100,7 +100,7 @@
       TemTicFile = 'polyf.tic'
       lenfil = 9
       TicRead = GETTIC(9,TemTicFile)
-      IF (TicRead.EQ.1) CALL Profile_Plot(IPTYPE)
+      IF (TicRead.EQ.1) CALL Profile_Plot
 !
       END SUBROUTINE GENERATE_TICMARKS
 !*==GENERATE_TICMARKS_CCSLCODE.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001

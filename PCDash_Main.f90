@@ -85,7 +85,6 @@
 !
       USE WINTERACTER
       USE DRUID_HEADER
-      USE VARIABLES
       
       IMPLICIT NONE
 
@@ -115,7 +114,7 @@
 !
       SUBROUTINE ProcessMenu
 !
-!   This subroutine processes the menu selections
+! This subroutine processes the menu selections
 ! This includes the toolbar
 !
       USE WINTERACTER
@@ -156,7 +155,9 @@
         CASE (ID_Remove_Background)
           CALL Background_Fit
         CASE (ID_FILE_PRINT)
-          CALL Profile_Plot(-IPTYPE)
+          IPTYPE = -IPTYPE
+          CALL Profile_Plot
+          IPTYPE = -IPTYPE
         CASE (ID_FILE_EXIT)
           CALL WExit
         CASE (ID_Plot_Options)
@@ -208,28 +209,28 @@
           xpgmin=MAX(xpmin,xpgmin-0.25*xpgdif)
           xpgmax=xpgmin+xpgdif
           CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)
+          CALL Profile_Plot
         CASE (ID_Right)
 ! We're going to move the graph to the right if we can
           xpgdif=xpgmax-xpgmin
           xpgmax=MIN(xpmax,xpgmax+0.25*xpgdif)
           xpgmin=xpgmax-xpgdif
           CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)
+          CALL Profile_Plot
         CASE (ID_Down)
 ! We're going to move the graph down if we can
           ypgdif=ypgmax-ypgmin
           ypgmin=MAX(ypmin,ypgmin-0.25*ypgdif)
           ypgmax=ypgmin+ypgdif
           CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)
+          CALL Profile_Plot
         CASE (ID_Up)
 ! We're going to move the graph up if we can
           ypgdif=ypgmax-ypgmin
           ypgmax=MIN(ypmax,ypgmax+0.25*ypgdif)
           ypgmin=ypgmax-ypgdif
           CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)
+          CALL Profile_Plot
         CASE (ID_Home)
 ! Back to full profile range
           xpgmin=xpmin
@@ -237,7 +238,7 @@
           ypgmin=ypmin
           ypgmax=ypmax
           CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)        
+          CALL Profile_Plot 
         CASE (ID_PolyFitter_Help)
           CALL LaunchHelp()
         CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5)
@@ -307,7 +308,7 @@
 !
 !      ICurPlotMode = InfoGrScreen(PlotModeReq)
       CALL IGrPlotMode('N')
-      IF (PLOTT) CALL Profile_Plot(IPTYPE)
+      IF (PLOTT) CALL Profile_Plot
       IF (DoSaRedraw) CALL sa_output_gr()
 
 !       SELECT CASE (ICurPlotMode)
