@@ -22,14 +22,11 @@
       REAL                                                                    ChiMult
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      LOGICAL         InSA
-      COMMON /SADATA/ InSA
-
 !     required to handle the profile graphs plotted in child windows
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
-      INTEGER I, iRow, iStatus, iLimit1, iLimit2, tInteger
+      INTEGER I, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
@@ -37,9 +34,29 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-! Go back to the Pawley refinement or the initial wizard
-              CALL EndWizardPastPawley
-              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+! Closes all SA profile child windows which are still open when OK button clicked
+              DO i = 1, MaxNumChildWin
+                IF (SAUsedChildWindows(i).EQ.1) THEN
+                  CALL WindowCloseChild(i)
+                  SAUsedChildWindows(i) = 0
+                  CALL UnRegisterChildWindow(i)
+                ENDIF
+              ENDDO
+! Close Chi-sqd plot 
+              CALL Close_Chisq_Plot
+! Go back to the Pawley refinement or the initial Wizard
+! If we got here from the main Wizard window (option four), return to that window.
+! Return to SA input otherwise
+              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+              CALL WDialogGetRadioButton(IDF_PW_Option1,iOption)
+              IF (iOption .EQ. 4) THEN
+                CALL EndWizardPastPawley
+                CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+                CALL WDialogPutRadioButton(IDF_PW_Option4)
+                CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+              ELSE
+                CALL WizardWindowShow(IDD_SA_input3)
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
               CALL WDialogSelect(IDD_SA_Action1)
