@@ -1,9 +1,11 @@
+!
+!*****************************************************************************
+!
       SUBROUTINE GETPIK(FILE,lenfil,ier)
-C
-!O      character*80  file
+
       CHARACTER*(*), INTENT (IN   ) :: FILE
 
-	INCLUDE 'params.inc'
+      INCLUDE 'PARAMS.INC'
 
       COMMON /FCSTOR/MAXK,FOB(150,MFCSTO)
       LOGICAL LOGREF
@@ -15,24 +17,24 @@ C
       COMMON /SAREFLNS/AIOBS(MSAREF),AICALC(MSAREF)
       COMMON /CHISTO/ KKOR,WTIJ(MCHIHS),S2S(MCHIHS),S4S(MCHIHS),
      &IKKOR(MCHIHS),JKKOR(MCHIHS)
-C
+
       LOGICAL IHMINLT0,IKMINLT0,ILMINLT0
       COMMON /CSQLOG/ IHMINLT0,IKMINLT0,ILMINLT0
       COMMON /CSQINT/ IHMIN,IHMAX,IKMIN,IKMAX,ILMIN,ILMAX,IIMIN,IIMAX
-c
+
       COMMON /CHISTOP/ NOBS,NFIT,IFIT(MCHSTP),CHIOBS,
      &WT(MCHSTP),XOBS(MCHSTP),YOBS(MCHSTP),YCAL(MCHSTP),ESD(MCHSTP)
 
       COMMON /FPINF/PIK(0:50,MFPINF),KMINST(MFPINF),KMAXST(MFPINF)
       COMMON /FPINF1/ KREFT(MFPINF),KNIPT(50,MFPINF),PIKVAL(50,MFPINF)
       COMMON /FPINF2/ NTERMS
-c
+
       COMMON /sappcmn/ xpmin,xpmax,ypmin,ypmax
-c
+
       COMMON /sapgcmn/ xpgmin,xpgmax,ypgmin,ypgmax
-c
-	ier = 0
-      OPEN(21,FILE=FILE(:Lenfil),STATUS='OLD',err=998, Iostat = Istat)
+
+      ier = 0
+      OPEN(21,FILE=FILE(1:Lenfil),STATUS='OLD',err=998, Iostat = Istat)
       CHIOBS=0.
       NFIT=0
       xpmin= 1.e20
@@ -42,8 +44,8 @@ c
       NTERMS=0
       NOBS=0
       MMOBS=MCHSTP
-		ittem=0
-      DO I=1,MMOBS
+      ittem=0
+      DO I = 1, MMOBS
         READ(21,*,end=200) XOBS(I),YOBS(I),ESD(I),KTEM
         KREFT(I)=KTEM
         NOBS=NOBS+1
@@ -58,10 +60,10 @@ c..        KTEM=KMAXST(I)-KMINST(I)
            IFIT(NFIT)=I
            CHIOBS=CHIOBS+WT(I)*YOBS(I)**2
         END IF
-        xpmin=min(xpmin,xobs(i))
-        xpmax=max(xpmax,xobs(i))
-        ypmin=min(ypmin,yobs(i))
-        ypmax=max(ypmax,yobs(i))
+        xpmin=MIN(xpmin,xobs(i))
+        xpmax=MAX(xpmax,xobs(i))
+        ypmin=MIN(ypmin,yobs(i))
+        ypmax=MAX(ypmax,yobs(i))
       END DO
  200  xpgmin=xpmin
       xpgmax=xpmax
@@ -72,4 +74,8 @@ c..        KTEM=KMAXST(I)-KMINST(I)
  998  ier=1
       CLOSE(21,IOSTAT=ISTAT)
  999  RETURN
-      END
+
+      END SUBROUTINE GETPIK
+!
+!*****************************************************************************
+!
