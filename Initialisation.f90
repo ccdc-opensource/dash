@@ -26,7 +26,7 @@
         IF (LEN_TRIM(Dirname) .EQ. 0) THEN
           CALL WindowClose()
           STOP
-        END IF
+        ENDIF
         DirNameLc = DirName
         CALL ILowerCase(DirNameLc)
         Ilen = LEN_TRIM(DirNameLc)
@@ -60,7 +60,6 @@
       CALL WDialogLoad(IDD_SA_Action1)
       CALL WDialogLoad(IDD_Plot_Option_Dialog)
       CALL WDialogLoad(IDD_Configuration)
-!      CALL WDialogLoad(IDD_About_Polyfitter)
       CALL WDialogLoad(IDD_Pawley_Status)
       CALL WDialogLoad(IDD_Peak_Positions)
       CALL WDialogLoad(IDD_Index_Preparation)
@@ -96,7 +95,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PolyFitterInitialise()
+      SUBROUTINE PolyFitterInitialise
 
       USE WINTERACTER
       USE VARIABLES
@@ -108,7 +107,8 @@
       INCLUDE 'Lattice.inc'
 
       CHARACTER(LEN=128) lintem
-      INTEGER I, II, nl, OpenFail, PolyFitter_OpenSpaceGroupSymbols
+      INTEGER I, II, nl
+      INTEGER, EXTERNAL :: PolyFitter_OpenSpaceGroupSymbols
 !O      DATA LPosSG/1,1,3,38,73,108,349,430,455,462,489,531/
       DATA CrystalSystemString /'Triclinic   ', 'Monoclinic-a', 'Monoclinic-b', &
                                 'Monoclinic-c', 'Orthorhombic', 'Tetragonal  ', &
@@ -130,18 +130,17 @@
 ! JCC Init the viewing etc
       CALL PolyFitter_EnableExternal
 ! Get the space group symbols ...
-      OpenFail = PolyFitter_OpenSpaceGroupSymbols()
-      IF (OpenFail .NE. 0) GOTO 999 ! fail gracefully!
+      IF (PolyFitter_OpenSpaceGroupSymbols() .NE. 0) GOTO 999 ! fail gracefully!
       i=0
  10   lintem=' '
-      READ(110,1100,END=100) nl,lintem
+      READ(110,1100,END=100) nl, lintem
  1100 FORMAT(Q,A)
       IF (lintem(1:1) .EQ. '-') GOTO 100
       IF (nl .LT. 70) THEN
         DO ii=nl+1,70
           lintem(ii:ii)=' '
-        END DO
-      END IF
+        ENDDO
+      ENDIF
       i=i+1
 !    14:a1     P 21/b 1 1    -P 2xab           PMC$I1A000$P2A660 
 !    14:a2     P 21/n 1 1    -P 2xn            PMC$I1A000$P2A666 
@@ -186,19 +185,15 @@
       INTEGER       lval
       CHARACTER*255 DashDir
       CHARACTER*255 line
-      CHARACTER*3   KeyChar
-      INTEGER       nl
       CHARACTER*255 tDir, tFile
 
       ViewOn     = .FALSE.
       ViewAct    = .FALSE.
-      AutoUpdate = .FALSE.
       ConvOn     = .FALSE.
-      CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
       lval = GETENVQQ("DASH_DIR",DashDir)
       IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
-        CONVEXE = DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//'zmconv.exe'
         OPEN(121, FILE=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 10)
+        INSTDIR = DashDir
         GOTO 25
       ENDIF
    10 OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 20)
@@ -206,30 +201,14 @@
    20 CALL GetArg(0,line)
       CALL SplitPath(line,tDir,tFile)
       IF (LEN_TRIM(tDir) .EQ. 0) tDir = '.'//DIRSPACER
-      OPEN(121, FILE=tDir(1:LEN_TRIM(tDir))//CONFIG, STATUS='OLD', ERR = 30)
+      OPEN(121,FILE=tDir(1:LEN_TRIM(tDir))//CONFIG, STATUS='OLD',ERR=30)
 ! Remove '\' at end
       tDir(LEN_TRIM(tDir):LEN_TRIM(tDir)) = ' '
       INSTDIR = tDir
 ! Read it
-   25 CONTINUE
-      DO WHILE ( .TRUE. )
-      READ(121,'(a)',END=30,ERR=30) line
-        nl=LEN_TRIM(line)
-        CALL INextString(line,keychar)
-        CALL ILowerCase(keychar(1:3))
-        SELECT CASE (KeyChar(1:3))
-          CASE ('vie')
-            VIEWEXE = line(IlocateChar(line):nl)
-          CASE ('con')
-            CONVEXE = line(IlocateChar(line):nl)
-          CASE ('arg')
-            VIEWARG = line(IlocateChar(line):nl) ! Arguments for the viewer
-          CASE ('rel')
-            AUTOUPDATE = .TRUE.
-        END SELECT
-      END DO            
- 30   INQUIRE(FILE=VIEWEXE(1:LEN_TRIM(VIEWEXE)),EXIST=ViewOn)
-      INQUIRE(FILE=CONVEXE(1:LEN_TRIM(CONVEXE)),EXIST=ConvOn)
+   25 CONTINUE                  
+   30 CONTINUE
+      CLOSE(121)
 
       END SUBROUTINE PolyFitter_EnableExternal
 !
@@ -470,6 +449,10 @@
       KolBack           = Win_RGB(164,211,105)
 
       CALL ReadConfigurationFile
+      CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
+      INQUIRE(FILE=VIEWEXE(1:LEN_TRIM(VIEWEXE)),EXIST=ViewOn)
+      INQUIRE(FILE=CONVEXE(1:LEN_TRIM(CONVEXE)),EXIST=ConvOn)
+
 
       CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
                                         KolPGWindow%IGreen,&
@@ -768,7 +751,10 @@
 ! Read the header
       CALL FileReadString(tFileHandle,RecNr,tString)
       CALL FileReadLogical(tFileHandle,RecNr,UseConfigFile)
-      IF (.NOT. UseConfigFile) GOTO 999
+      IF (.NOT. UseConfigFile) THEN
+        CALL DebugErrorMessage('Config file not used.')
+        GOTO 999
+      ENDIF
 ! Read all colour definitions
       CALL FileReadInteger(tFileHandle,RecNr,KolNumPGWindow)
       CALL FileReadInteger(tFileHandle,RecNr,KolPGWindow%IRed)
@@ -940,8 +926,10 @@
       END SELECT
 
 
-
-  999 CLOSE(tFileHandle)
+      CLOSE(tFileHandle)
+      RETURN
+  999 CALL DebugErrorMessage('Error while opening config file')
+      CLOSE(tFileHandle)
 
       END SUBROUTINE ReadConfigurationFile
 !
