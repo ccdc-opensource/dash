@@ -3,6 +3,8 @@
 !
       SUBROUTINE GET_LOGREF(FILE,lenfil,ier)
 
+      USE ATMVAR
+
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: FILE
@@ -14,7 +16,7 @@
 
       INTEGER         MAXK
       REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
       INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF

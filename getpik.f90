@@ -3,6 +3,7 @@
 !
       SUBROUTINE GETPIK(FILE,lenfil,ier)
 
+      USE ATMVAR
       USE VARIABLES
       
       CHARACTER*(*), INTENT (IN   ) :: FILE
@@ -11,7 +12,9 @@
 
       INCLUDE 'PARAMS.INC'
 
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+      INTEGER         MAXK
+      REAL                  FOB
+      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
       INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF
@@ -57,7 +60,6 @@
       REAL tPIKVAL(1:500)
       LOGICAL WrongValuesPresent
 
-      
       WrongValuesPresent = .FALSE.
       ier = 0
       OPEN (21,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998,IOSTAT=Istat)

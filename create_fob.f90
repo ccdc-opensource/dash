@@ -3,6 +3,7 @@
 !
       SUBROUTINE create_fob()
 
+      USE ATMVAR
       USE ZMVAR
 
       IMPLICIT NONE
@@ -11,10 +12,10 @@
 
       INTEGER         MAXK
       REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
-      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
       INTEGER         NATOM
       REAL                   X
@@ -123,19 +124,26 @@
       REAL a3(melem), b3(melem), a4(melem), b4(melem)
       REAL cv(melem)
 
-      DATA SYMBA/       'H  ', 'He ', 'Li ', 'Be ', 'B  ', 'C  ', 'N  ',      &
-                 'O  ', 'F  ', 'Ne ', 'Na ', 'Mg ', 'Al ', 'Si ', 'P  ',      &
-                 'S  ', 'Cl ', 'Ar ', 'K  ', 'Ca ', 'Sc ', 'Ti ', 'V  ',      &
-                 'Cr ', 'Mn ', 'Fe ', 'Co ', 'Ni ', 'Cu ', 'Zn ', 'Ga ',      &
-                 'Ge ', 'As ', 'Se ', 'Br ', 'Kr ', 'Rb ', 'Sr ', 'Y  ',      &
-                 'Zr ', 'Nb ', 'Mo ', 'Tc ', 'Ru ', 'Rh ', 'Pd ', 'Ag ',      &
-                 'Cd ', 'In ', 'Sn ', 'Sb ', 'Te ', 'I  ', 'Xe ', 'Cs ',      &
-                 'Ba ', 'La ', 'Ce ', 'Pr ', 'Nd ', 'Pm ', 'Sm ', 'Eu ',      &
-                 'Gd ', 'Tb ', 'Dy ', 'Ho ', 'Er ', 'Tm ', 'Yb ', 'Lu ',      &
-                 'Hf ', 'Ta ', 'W  ', 'Re ', 'Os ', 'Ir ', 'Pt ', 'Au ',      &
-                 'Hg ', 'Tl ', 'Pb ', 'Bi ', 'Po ', 'At ', 'Rn ', 'Fr ',      &
-                 'Ra ', 'Ac ', 'Th ', 'Pa ', 'U  ', 'Np ', 'Pu ', 'Am ',      &
-                 'Cm ', 'Bk ', 'Cf ', 'Du '/
+      DATA SYMBA/   'H  ',     'He ',     'Li ',     'Be ',     'B  ',     &
+                    'C  ',     'N  ',     'O  ',     'F  ',     'Ne ',     &
+                    'Na ',     'Mg ',     'Al ',     'Si ',     'P  ',     &
+                    'S  ',     'Cl ',     'Ar ',     'K  ',     'Ca ',     &
+                    'Sc ',     'Ti ',     'V  ',     'Cr ',     'Mn ',     &
+                    'Fe ',     'Co ',     'Ni ',     'Cu ',     'Zn ',     &
+                    'Ga ',     'Ge ',     'As ',     'Se ',     'Br ',     &
+                    'Kr ',     'Rb ',     'Sr ',     'Y  ',     'Zr ',     &
+                    'Nb ',     'Mo ',     'Tc ',     'Ru ',     'Rh ',     &
+                    'Pd ',     'Ag ',     'Cd ',     'In ',     'Sn ',     &
+                    'Sb ',     'Te ',     'I  ',     'Xe ',     'Cs ',     &
+                    'Ba ',     'La ',     'Ce ',     'Pr ',     'Nd ',     &
+                    'Pm ',     'Sm ',     'Eu ',     'Gd ',     'Tb ',     &
+                    'Dy ',     'Ho ',     'Er ',     'Tm ',     'Yb ',     &
+                    'Lu ',     'Hf ',     'Ta ',     'W  ',     'Re ',     &
+                    'Os ',     'Ir ',     'Pt ',     'Au ',     'Hg ',     &
+                    'Tl ',     'Pb ',     'Bi ',     'Po ',     'At ',     &
+                    'Rn ',     'Fr ',     'Ra ',     'Ac ',     'Th ',     &
+                    'Pa ',     'U  ',     'Np ',     'Pu ',     'Am ',     &
+                    'Cm ',     'Bk ',     'Cf ',     'Du '/
 
       DATA A1 /   0.48992,   0.87340,   1.12820,   1.59190,   2.05450,     &
                   2.31000,  12.21260,   3.04850,   3.53920,   3.95530,     &
@@ -362,24 +370,11 @@
 ! Ideally, we would want hydrogens to have weight 0.0 when not taken into account.
 
       USE ZMVAR
+      USE ATMVAR
 
       IMPLICIT NONE
 
-      CHARACTER*3 el(1:109)
-      INTEGER     atnr(1:109)
-! Elements (plus other CSD 'element' definitions What's 'Zz'??)
-! Me = methyl, Du = Dummy
-      DATA el  /'C  ', 'H  ', 'Ac ', 'Ag ', 'Al ', 'Am ', 'Ar ', 'As ', 'At ', 'Au ',   &
-                'B  ', 'Ba ', 'Be ', 'Bi ', 'Bk ', 'Br ', 'Ca ', 'Cd ', 'Ce ', 'Cf ',   &
-                'Cl ', 'Cm ', 'Co ', 'Cr ', 'Cs ', 'Cu ', 'D  ', 'Dy ', 'Er ', 'Es ',   &
-                'Eu ', 'F  ', 'Fe ', 'Fm ', 'Fr ', 'Ga ', 'Gd ', 'Ge ', 'He ', 'Hf ',   &
-                'Hg ', 'Ho ', 'I  ', 'In ', 'Ir ', 'K  ', 'Kr ', 'La ', 'Li ', 'Lu ',   &
-                'Lw ', 'Md ', 'Mg ', 'Mn ', 'Mo ', 'N  ', 'Na ', 'Nb ', 'Nd ', 'Ne ',   &
-                'Ni ', 'No ', 'Np ', 'O  ', 'Os ', 'P  ', 'Pa ', 'Pb ', 'Pd ', 'Pm ',   &
-                'Po ', 'Pr ', 'Pt ', 'Pu ', 'Ra ', 'Rb ', 'Re ', 'Rh ', 'Rn ', 'Ru ',   &
-                'S  ', 'Sb ', 'Sc ', 'Se ', 'Si ', 'Sm ', 'Sn ', 'Sr ', 'Ta ', 'Tb ',   &
-                'Tc ', 'Te ', 'Th ', 'Ti ', 'Tl ', 'Tm ', 'U  ', 'V  ', 'W  ', 'X  ',   &
-                'Xe ', 'Y  ', 'Yb ', 'Z  ', 'Zn ', 'Zr ', 'Zz ', 'Me ', 'Du '/
+      INTEGER     atnr(1:MaxElm)
 
 ! Elements (plus other CSD 'element' definitions What's 'Zz'??)
       DATA atnr/    6,     1,    89,    47,    13,    95,    18,    33,    85,    79,   &
@@ -394,26 +389,26 @@
                    43,    52,    90,    22,    81,    69,    92,    23,    74,     0,   &
                    54,    39,    70,     0,    30,    40,     0,     0,     0/
 
-      INTEGER ifrg, I, J
+      INTEGER iFrg, I, J
       REAL    TotalAtomicWeighting
 
-      DO ifrg = 1, maxfrg
-        IF (gotzmfile(ifrg)) THEN
-          IF (icomflg(ifrg) .EQ. 0)  THEN
-            DO I = 1, natoms(ifrg)
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          IF (icomflg(iFrg) .EQ. 0)  THEN
+            DO I = 1, natoms(iFrg)
               DO J = 1, 109
-                IF (asym(I,ifrg) .EQ. el(J)) THEN
-                  AtomicWeighting(I,ifrg) = FLOAT(atnr(J))**2
+                IF (asym(I,iFrg) .EQ. ElementStr(J)) THEN
+                  AtomicWeighting(I,iFrg) = FLOAT(atnr(J))**2
                   EXIT
                 ENDIF
               ENDDO
             ENDDO
             TotalAtomicWeighting = 0.0
-            DO I = 1, natoms(ifrg)
-              TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(I,ifrg) 
+            DO I = 1, natoms(iFrg)
+              TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(I,iFrg) 
             ENDDO
-            DO I = 1, natoms(ifrg)
-              AtomicWeighting(I,ifrg) = AtomicWeighting(I,ifrg) / TotalAtomicWeighting 
+            DO I = 1, natoms(iFrg)
+              AtomicWeighting(I,iFrg) = AtomicWeighting(I,iFrg) / TotalAtomicWeighting 
             ENDDO
           ENDIF
         ENDIF

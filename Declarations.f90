@@ -8,6 +8,7 @@
 ! Theoretically, if you want to know a variables use, just type its name in the source browser
 ! and jump to its entry in the file declarations.f90.
 !
+      USE ATMVAR
       USE VARIABLES
       
       IMPLICIT NONE
@@ -245,7 +246,7 @@
       COMMON /SAREFLN3/ iHMUL(MSAREF)
 
       REAL            XATOPT
-      COMMON /posopt/ XATOPT(3,150)
+      COMMON /posopt/ XATOPT(3,MaxAtm_3)
 
 ! Co-ordinates of the atoms of the asymmetric unit of the best SA solution so far.
 
@@ -262,7 +263,7 @@
 
       INTEGER         MAXK
       REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
@@ -297,7 +298,6 @@
       INTEGER                                       OFBN_Len
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
-
 
 ! OutputFilesBaseName = basename for output files.
 !         E.g., if OutputFilesBaseName = 'C:\Program Files\CCDC\DASH 2.0\benzene'
