@@ -85,7 +85,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 version.lib kernel32.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 winter.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /pdbtype:sept /libpath:"c:\wint\lib.vf"
+# ADD LINK32 winter.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /out:"Debug/DASH.exe" /pdbtype:sept /libpath:"c:\wint\lib.vf"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -101,11 +101,16 @@ LINK32=link.exe
 
 SOURCE=.\Align.f90
 DEP_F90_ALIGN=\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\Variables.mod"\
 	
+# End Source File
+# Begin Source File
+
+SOURCE=.\Basic_Date.f90
 # End Source File
 # Begin Source File
 
@@ -239,7 +244,6 @@ SOURCE=.\error_message.f90
 DEP_F90_ERROR=\
 	".\params.inc"\
 	".\Reflns.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -294,6 +298,7 @@ SOURCE=.\Generate_TicMarks.f90
 DEP_F90_GENER=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
+	".\params.inc"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -303,7 +308,6 @@ SOURCE=.\get_logref.f90
 DEP_F90_GET_L=\
 	".\GLBVAR.INC"\
 	".\params.inc"\
-	".\statlog.inc"\
 	
 # End Source File
 # Begin Source File
@@ -337,8 +341,10 @@ DEP_F90_GETPI=\
 
 SOURCE=.\Init_Routines.f90
 DEP_F90_INIT_=\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
+	".\Lattice.inc"\
 	".\params.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -416,7 +422,6 @@ DEP_F90_MCBAC=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
-	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -474,7 +479,6 @@ SOURCE=.\PCDash_Main.f90
 DEP_F90_PCDAS=\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
-	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -664,7 +668,6 @@ DEP_F90_SA_ST=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
-	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -730,7 +733,6 @@ DEP_F90_UPLOA=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
-	".\statlog.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -747,8 +749,12 @@ DEP_F90_UPLOAD=\
 
 SOURCE=.\UserInputChecks.f90
 DEP_F90_USERI=\
+	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
+	".\params.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -761,7 +767,6 @@ SOURCE=.\Valchi.f90
 DEP_F90_VALCH=\
 	".\GLBVAR.INC"\
 	".\params.inc"\
-	".\statlog.inc"\
 	
 # End Source File
 # Begin Source File
@@ -799,7 +804,6 @@ DEP_F90_WIZAR=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
-	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
