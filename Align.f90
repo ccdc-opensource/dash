@@ -3,7 +3,7 @@
 ! Doesn't treat Sohnke groups any differently from any other space group and
 ! therefore sometimes get "unaligned" solutions.  Not everything behaves well 
 ! all the time, for example Pca21 has caused problems.
-! Nov2001 added nasty fix which will help with cases like Pca21
+! NOV2001 added nasty fix which will help with cases like Pca21
 ! TODO Trigonal and hexagonal space groups ignored since x-y type symmetry 
 !      operations are not decoded correctly
 !      Three equivalent axes (i.e. cubic groups) are not taken account of 
@@ -12,6 +12,7 @@
 
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR            !Number of zmatrices, nfrag
 !      IMPLICIT NONE
       INCLUDE 'GLBVAR.INC' !NumberSGTable
       INCLUDE 'lattice.inc'!Cellpar and space group strings
@@ -35,9 +36,16 @@
       PARAMETER (mpdbops=192)
       CHARACTER*20 cpdbops(mpdbops)
       COMMON /pdbops/ npdbops, cpdbops
+!Required to check if x,y, or z have been fixed or bounds changed from defaults
+      INTEGER MVAR
+      PARAMETER (mvar=100)
+!!can't call first common block member x
+      DOUBLE PRECISION xx,lb,ub,vm,xpreset
+      COMMON /values/ xx(mvar),lb(mvar),ub(mvar),vm(mvar)
+
 !
       INTEGER MaxNumAtom !in an include somewhere??
-      PARAMETER (MaxNumAtom = 150)
+      PARAMETER (MaxNumAtom = 100)
 
 ! Local Variables
       CHARACTER(len = 80) :: line
@@ -70,6 +78,7 @@
       REAL, DIMENSION(3,MaxNumAtom) ::FinalMol
       REAL, DIMENSION(3,MaxNumAtom) ::ConnArray
 
+
 !  COMMON BLOCK Created
 
 !  SOSign, SOnumber and SOAxis are matrices which contain the symmetry operators 
@@ -95,13 +104,27 @@
         DO j = 1,NumofShifts
           Shift(j) = ShiftString(((j*5)-4):(j*5))
         END DO 
-      CLOSE(220)  
+      CLOSE(220)
+!        
+!--------- Check to see if align algorithm should be applied-----------
 ! For now, if the space group is trigonal or hexagonal does not attempt alignment.  Space
 ! group decoding currently does not handle x-y type instructions       
       IF ((NumberSGTable.ge.430).and.(NumberSGTable.le.488)) THEN
        RETURN
       END IF       
-!
+! Check if any x,y,z coords have been fixed or upper and lower bounds changed from defaults.
+! If they have then do not align
+      DO j = 1,3
+        IF ((lb(j).ne.0.0000).or.(ub(j).ne.1.000)) THEN
+        RETURN
+        ENDIF
+      END DO
+! If number of zmatrices greater than 1, do not align
+      IF (nfrag.gt.1) THEN
+        RETURN
+      ENDIF
+!--------- End of Checks ----------
+
 ! Clear Sumx, sumy and sumz
       Sumx = 0.0
       Sumy = 0.0
@@ -350,7 +373,7 @@
 ! present the centre of mass coordinate for that axes is set to 0.5.  In some cases an inversion
 ! can be applied to a molecule and then the axes which are not infinite translation axes reset
 ! with symmetry operations.  However the infinite translation axes still carries the inversion
-! and (0.5)^2 = (-0.5)^2.  So this quick and dirty fix looks at infinite translation axes and
+! and (0.5)^2 = (-0.5)^2.  So this quick and dirty fix looks at infinite translation axis and
 ! reflects the molecule upon an arbitrary criterion.  Only applied to cases where there is one
 ! infinite axes.
      IF((inversion.eq.1).and.(iinfiniteaxes.eq.1)) THEN
