@@ -10,20 +10,19 @@
 
       IMPLICIT NONE
 
-      INTEGER :: IFlags, I, IPASS, Ilen, Instlen, Idashlen
-      CHARACTER(LEN=255) :: Dirname, DashDir, InstDirLc, DashDirLc, DirNameLc
+      INTEGER :: IFlags, I, Ilen, Instlen, Idashlen
+      CHARACTER(LEN=MaxPathLength) :: Dirname, DashDir, InstDirLc, DashDirLc, DirNameLc
       LOGICAL Confirm ! Function
 
       Idashlen = GETENVQQ("DASH_DIR",DashDir)
       Instlen = LEN_TRIM(INSTDIR)
-      IPASS = 0
       InstDirLc = InstDir
       DashDirLc = DashDir
       CALL ILowerCase(DashDirLc)
       CALL ILowerCase(InstDirLc)
 ! JvdS @ Rewrite using GOTOs
       LOOP_DIRECTORY_SELECT : DO WHILE (.TRUE.)
-        IFlags = DirChange+DirCreate
+        IFlags = DirChange + DirCreate
         Dirname = ' '
         CALL WSelectDir(IFlags,Dirname,"Select working directory for DASH...")
         IF (LEN_TRIM(Dirname) .EQ. 0) THEN
@@ -118,27 +117,27 @@
       USE VARIABLES
       USE DRUID_HEADER
 
+      IMPLICIT NONE
+
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
       CHARACTER(LEN=128) lintem
-      INTEGER OpenFail, PolyFitter_OpenSpaceGroupSymbols
+      INTEGER I, II, nl, OpenFail, PolyFitter_OpenSpaceGroupSymbols
 !O      DATA LPosSG/1,1,3,38,73,108,349,430,455,462,489,531/
 
       DoSaRedraw = .FALSE.
       LPosSG( 1) =   1
-      LPosSG( 2) =   1
-      LPosSG( 3) =   3
-      LPosSG( 4) =  38 
-      LPosSG( 5) =  73
-      LPosSG( 6) = 108
-      LPosSG( 7) = 349
-      LPosSG( 8) = 430
-      LPosSG( 9) = 455
-      LPosSG(10) = 462
-      LPosSG(11) = 489
-      LPosSG(12) = MaxSPGR+1
-      IPosSG = 1
+      LPosSG( 2) =   3
+      LPosSG( 3) =  38 
+      LPosSG( 4) =  73
+      LPosSG( 5) = 108
+      LPosSG( 6) = 349
+      LPosSG( 7) = 430
+      LPosSG( 8) = 455
+      LPosSG( 9) = 462
+      LPosSG(10) = 489
+      LPosSG(11) = MaxSPGR+1
 !>> JCC Init the viewing etc
       CALL PolyFitter_EnableExternal
 ! Get the space group symbols ...
@@ -165,13 +164,12 @@
         GOTO 999
       ENDIF
       CLOSE(110)
-! Initialise crystal system to unknown, LatBrav = 1
+! Initialise crystal system to Triclinic, LatBrav = 1
       CALL SetCrystalSystem(1)
+      NumberSGTable = 1
 ! Initialise the space group menus in the main window and the wizard.
-! As the crystal system has been set to unknown, only space group P 1 is allowed
-! @ we could change this one day: as it is, the user MUST enter the crystal system before
-! being able to enter the space group.
-      CALL SetSpaceGroupMenu(LatBrav)
+      CALL SetSpaceGroupMenu
+
       RETURN
  999  CONTINUE
 ! Failure, so exit gracefully
