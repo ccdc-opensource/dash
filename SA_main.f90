@@ -39,8 +39,8 @@
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
-      DOUBLE PRECISION T0,rt,eps,target_value
-      COMMON /saparl/ T0,rt,eps,target_value
+      DOUBLE PRECISION T0,rt,eps
+      COMMON /saparl/ T0,rt,eps
       INTEGER  NS, NT, IER, ISEED1, ISEED2
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
       COMMON /shadi/ kshad(mvar)
@@ -84,6 +84,7 @@
 
 !.. If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
       IF (FromPawleyFit) THEN
+! JvdS GET_LOGREF and GETTIC do the same thing.
         CALL GET_LOGREF(DashTicFile,LEN_TRIM(DashTicFile),IER)
         CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),IER)
         CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
@@ -623,8 +624,8 @@
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
-      DOUBLE PRECISION T0,rt,eps,target_value
-      COMMON /saparl/ T0,rt,eps,target_value
+      DOUBLE PRECISION T0,rt,eps
+      COMMON /saparl/ T0,rt,eps
       INTEGER  NS, NT, ISEED1, ISEED2
       INTEGER  MAXEVL, IPRINT
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
