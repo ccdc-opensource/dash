@@ -241,7 +241,7 @@
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
       COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
 
-      REAL zp, p1, p2, p3, p4, p5, p6, vh, vk, vl, dd, tthc, ctem
+      REAL zp, p1, p2, p3, p4, p5, p6, vh, vk, vl, dd, tthc, ctem, SinArg
       INTEGER I, N
 
       ChiGetLattice = 0.0
@@ -300,7 +300,10 @@
 ! d-value
         dd = vh*vh*p1 + vk*vk*p2 + vl*vl*p3 + 2.0 * (vh*vk*p4 + vh*vl*p5 + vk*vl*p6)
 ! 2 theta value
-        tthc = 2.0 * ASIND(0.5 * ALambda * SQRT(dd))
+        SinArg = 0.5 * ALambda * SQRT(dd)
+        IF (SinArg .GT.  1.0) SinArg =  1.0
+        IF (SinArg .LT. -1.0) SinArg = -1.0
+        tthc = 2.0 * ASIND(SinArg)
 ! Correct for zero-point error
         ZVAL(I) = tthc + zp
         CTem = (ZVAL(I) - YVAL(I)) / EVAL(I)
