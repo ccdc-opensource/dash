@@ -67,7 +67,9 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       REAL            ARGK, PKCNSP
       INTEGER                              KPCNSP
       REAL                                                DTDPCN,    DTDWL
@@ -173,7 +175,9 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       REAL            ARGK, PKCNSP
       INTEGER                              KPCNSP
       REAL                                                DTDPCN,    DTDWL
