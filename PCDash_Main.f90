@@ -100,8 +100,6 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
-
-! JCC data to indicate whether we are coming out of peak-fitting mode
       LOGICAL, EXTERNAL :: Confirm
       REAL xpgdif, ypgdif
       INTEGER ISTAT, IBpass
@@ -162,7 +160,6 @@
               ENDIF
             ENDDO
             IF (CurrentRange .EQ. 0) THEN
-! Tell the user to place the cursor in the range to be fitted.
               CALL InfoMessage('All peak fitting ranges have been fitted.')
             ELSE
 ! We're ready to fit the Bragg peaks
