@@ -15,7 +15,6 @@ C
       END DO
       CALL FCN(NPAR,DBLEP,CHIANS)
       SACCHI=SNGL(CHIANS)
-      CALL PutSimplexChisq(SACCHI)
 C
       RETURN
       END
