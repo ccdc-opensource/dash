@@ -9,7 +9,6 @@
 ! RETURNS 0 for success
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
       USE PRJVAR
 
@@ -198,6 +197,7 @@
       OPEN(UNIT=hPrjFile,FILE=ThePrjFile,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       iPrjRecNr = 1
 ! Read / Write the header
+! @@ Reading this string will go wrong if we read a version like "DASH 2.1.2" into a CHARACTER*(8)
       tString = ProgramVersion//' project file'
       CALL FileRWString(hPrjFile,iPrjRecNr,RW,tString)
 ! Read / Write radiation source
@@ -353,7 +353,6 @@
 !
 ! Read or writes information on solutions to / from binary project file.
 !
-      USE DRUID_HEADER
       USE PRJVAR
       USE SOLVAR
 
@@ -555,40 +554,22 @@
 !
 ! Reads or writes information on Z-matrices to / from binary project file.
 !
-      USE DRUID_HEADER
       USE PRJVAR
       USE ZMVAR
 
       IMPLICIT NONE
 
       INTEGER, EXTERNAL :: ElmSymbol2CSD
-      INTEGER iFrg, RW, iAtomNr
+      INTEGER iFrg, RW, iAtomNr, BondNr
       REAL    tReal
-
-! The following variables are there to allow the dialogue fields in the
-! window dealing with Z-matrices to be handled by DO...ENDDO loops.
-! The field identifiers assigned by Winteracter are not necessarily consecutive, 
-! but these mappings are.
-
-      INTEGER        IDFZMNumber,           IDFZMFile,                &
-                     IDBZMDelete,           IDBZMBrowse,              &
-                     IDBZMView,             IDBZMEdit,                &
-                     IDFZMpars
-      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),      &
-                     IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
-                     IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg)
 
 ! Read or Write?
       RW = iPrjReadOrWrite
-      CALL WDialogSelect(IDD_SAW_Page1)
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,nfrag)
       DO iFrg = 1, maxfrg
         CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,gotzmfile(iFrg))
         IF (gotzmfile(iFrg)) THEN
-          IF (RW .EQ. cWrite) CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
           CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmNumberOfCopies(iFrg))
-          IF (RW .EQ. cRead ) CALL WDialogPutInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
           CALL FileRWString (hPrjFile,iPrjRecNr,RW,frag_file(iFrg))
           CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,izmpar(iFrg))
           CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,icomflg(iFrg))
@@ -661,9 +642,15 @@
               zmSingleRotationQs(3,iFrg) = DBLE(tReal)
             ENDIF
           ENDDO
-          CALL zmDoAdmin(iFrg)
-! Precalculate the bonds
-          CALL zmGenerateBonds(iFrg)
+          IF (RW .EQ. cRead) THEN
+            CALL zmDoAdmin(iFrg)
+          ENDIF
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumberOfBonds(iFrg))
+          DO BondNr = 1, NumberOfBonds(iFrg)
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,BondType(BondNr,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,Bonds(1,BondNr,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,Bonds(2,BondNr,iFrg))
+          ENDDO
         ENDIF
       ENDDO
       IF (RW .EQ. cRead) THEN 
