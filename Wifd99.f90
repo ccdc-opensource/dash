@@ -192,7 +192,7 @@
         KOUNT = KOUNT + 1
         WRITE (LCV,100) (NINT(HKL(I,J)),I=1,3), X(J), SIGX, IC(J),      &
      &                  (IHCOV(K,KOUNT),K=1,NCORL)
-  100   FORMAT (3I5,F10.3,F10.4,I5,15I4)
+  100   FORMAT (3I5,1X,F12.3,1X,F12.4,1X,I5,15I4)
       ENDDO
       END SUBROUTINE HCVOUT
 !*==HESCOR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
