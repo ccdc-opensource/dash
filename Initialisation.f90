@@ -205,7 +205,7 @@
       INTEGER*4 I4(64)
       EQUIVALENCE (I4,TempString)
 
-      tFileName = 'DASH.cfg'
+      tFileName = 'D3.cfg'
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
       OPEN(UNIT=10,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
@@ -395,10 +395,7 @@
 ! 3. .ccl ?
       WRITE(10,REC=RecNr,ERR=999) SaveCCL
       RecNr = RecNr + 1
-! 4. .mol2 ?
-      WRITE(10,REC=RecNr,ERR=999) SaveMOL2
-      RecNr = RecNr + 1
-! 5. .res ?
+! 4. .res ?
       WRITE(10,REC=RecNr,ERR=999) SaveRES
       RecNr = RecNr + 1
 ! Auto local minimisation at the end of every run in multirun YES / NO
@@ -442,7 +439,6 @@
       SavePDB  = .TRUE.
       SaveCSSR = .TRUE.
       SaveCCL  = .TRUE.
-      SaveMOL2 = .TRUE.
       SaveRES  = .TRUE.
       AutoLocalMinimisation = .TRUE.
       UseConfigFile = .TRUE.
@@ -501,8 +497,10 @@
       KolNumBack           = 236
       KolPGWindow       = Win_RGB(253,253,248)
       KolMain           = Win_RGB(20,20,150)
-      KolObs            = Win_RGB(161,0,0)
-      KolCal            = Win_RGB(10,70,10)
+!O      KolObs            = Win_RGB(161,0,0)
+      KolObs            = Win_RGB(255,0,0)
+!O      KolCal            = Win_RGB(10,70,10)
+      KolCal            = Win_RGB(0,0,255)
       KolDif            = Win_RGB(200,100,200)
       KolMTic           = Win_RGB(191,0,0)
       KolCTic           = Win_RGB(0,131,131)

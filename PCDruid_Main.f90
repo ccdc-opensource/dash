@@ -36,8 +36,6 @@
       LOGICAL ConvOn       ! Set if external z-matix conversion program available
       LOGICAL ViewAct
       LOGICAL AutoUpdate
-      COMMON / EXTPRG / ViewOn, ConvOn,  ViewAct,  AutoUpdate, ViewExe, ConvExe, ViewArg
-      COMMON / EXTDIR / INSTDIR
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER*80 :: DashTicFile
@@ -85,7 +83,7 @@
 ! This is the first item read from the configuration file (if present).
 ! If set to .FALSE., the rest of the configuration file will be skipped.
       
-      LOGICAL SavePDB, SaveCSSR, SaveCCL, SaveMOL2, SaveRES
+      LOGICAL SavePDB, SaveCSSR, SaveCCL, SaveRES
 ! Flags to decide which molecular model files are written out when a best solution is found
 
       LOGICAL AutoLocalMinimisation

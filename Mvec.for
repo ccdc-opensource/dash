@@ -2577,6 +2577,7 @@ C
       ITER=0
    1  DO 12 M=L,N-1
       DD=ABS(D(M))+ABS(D(M+1))
+! @ JvdS Isn't the following test very odd? Isn't it effectively testing E(M) = 0.0 ?
       IF (ABS(E(M))+DD.EQ.DD) GO TO 2
   12  CONTINUE
 C
@@ -2594,7 +2595,7 @@ C
         DO 14 I=M-1,L,-1
         F=S*E(I)
         B=C*E(I)
-C>> JCC It seems that the next line causes numerous crashes in the Pawley refinement.
+C>> @ JCC It seems that the next line causes numerous crashes in the Pawley refinement.
 C>> As such, Ive added in a check on the values of G and F to prevent it happening
 C>> This ought to be tested - why is it causing the crash: the input data must be corrupt
 C>> somehow.
