@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 16/Jan/2002 18:22:03
+// Modified : 21/Jan/2002 16:02:21
 //
 ///////////////////////////////////////////////////
 //
@@ -502,6 +502,8 @@
 #define IDF_LABELa                       1243
 #define IDF_LABELb                       1251
 #define IDF_LABELc                       1294
+#define IDD_Parameter_Status_2            156
+#define IDD_DIALOG004                     158
 
 ///////////////////////////////////////////////////
 //
@@ -2682,6 +2684,97 @@ BEGIN
 "None \n"
 "Quaternions \n"
 "Single axis \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_Parameter_Status_2 DIALOG 0, 0,  290,  138
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "SA Parameter Status"
+BEGIN
+    CONTROL "",IDF_CPL_GRID,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,   15,   12,  260,  115
+END
+
+IDD_Parameter_Status_2 RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+" 1401     8     40   158 \n"
+"   80 \n"
+"parameter 1 \n"
+"parameter 2 \n"
+"parameter 3 \n"
+"parameter 4 \n"
+"parameter 5 \n"
+"parameter 6 \n"
+"parameter 7 \n"
+"parameter 8 \n"
+"parameter 9 \n"
+"parameter 10 \n"
+"parameter 11 \n"
+"parameter 12 \n"
+"parameter 13 \n"
+"parameter 14 \n"
+"parameter 15 \n"
+"parameter 16 \n"
+"parameter 17 \n"
+"parameter 18 \n"
+"parameter 19 \n"
+"parameter 20 \n"
+"parameter 21 \n"
+"parameter 22 \n"
+"parameter 23 \n"
+"parameter 24 \n"
+"parameter 25 \n"
+"parameter 26 \n"
+"parameter 27 \n"
+"parameter 28 \n"
+"parameter 29 \n"
+"parameter 30 \n"
+"parameter 31 \n"
+"parameter 32 \n"
+"parameter 33 \n"
+"parameter 34 \n"
+"parameter 35 \n"
+"parameter 36 \n"
+"parameter 37 \n"
+"parameter 38 \n"
+"parameter 39 \n"
+"parameter 40 \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_DIALOG004 DIALOG 0, 0, 1000,   16
+STYLE DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Best value",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
+    CONTROL "<fluctuation>",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
+    CONTROL "Step size",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
+    CONTROL "Average",ISS5,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
+    CONTROL "+/- sigma",ISS6,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
+    CONTROL "Lower bound",ISS7,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
+    CONTROL "Upper bound",ISS8,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
+    CONTROL "Fixed",ISS1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   60,   14
+END
+
+IDD_DIALOG004 RCDATA
+BEGIN
+"[Checks] \n"
+" 1021 0 \n"
+"[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"

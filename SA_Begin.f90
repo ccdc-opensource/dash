@@ -48,6 +48,8 @@
 ! Pop up the SA status window
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WizardWindowShow(IDD_SA_Action1)
+!O      CALL WDialogSelect(IDD_Parameter_Status_2)
+!O      CALL WDialogShow(-1,-1,0,Modeless)
       T1 = SECNDS(0.0)
       CALL PDB_SymmRecords()
       CALL Init_MultiRun()
