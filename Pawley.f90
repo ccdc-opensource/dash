@@ -134,12 +134,12 @@
       INTEGER ILastValues(2)
       DATA RLastValues / 0.0,0.0,0.0 /
       DATA ILastValues / 0,0/
-      SAVE RLastValues,ILastValues
+      SAVE RLastValues, ILastValues
 ! Local variables logging errors in the pawley fit
       INTEGER IDUMMY, ipt
       INTEGER PawleyErrorLog  
       INTEGER, EXTERNAL :: Quick_Pawley_Fit
-      REAL    DEGREE ! Function
+      REAL, EXTERNAL :: DEGREE
       INTEGER ieocc, II, JJ
       LOGICAL LastValuesSet
       SAVE    LastValuesSet
@@ -200,7 +200,7 @@
 ! Return to data viewing
                   CALL EndWizardCommon
 ! This handles cases where the number of reflections is exceeded
-                  CALL ErrorMessage("Sorry, can only Pawley refine a maximum of 400 reflections."//CHAR(13)// &
+                  CALL ErrorMessage("Sorry, can only Pawley refine a maximum of 350 reflections."//CHAR(13)// &
                                     "You must truncate your data set.")
                   CALL PopActiveWindowID
                   RETURN
