@@ -44,8 +44,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /compile_only /include:"Release/" /nologo /warn:nofileopt /winapp
-# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /compile_only /include:"Release/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /warn:nofileopt /fast
-# SUBTRACT F90 /browser /fpp /winapp
+# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /compile_only /fpp /include:"Release/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /warn:nofileopt /fast
+# SUBTRACT F90 /browser /winapp
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -74,8 +74,8 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt /winapp
-# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /check:bounds /compile_only /debug:full /define:"ONTBUG" /fpp /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /libs:static /math_library:fast /nologo /traceback /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
-# SUBTRACT F90 /check:format /check:output_conversion /check:overflow /check:underflow /nodefine /warn:declarations
+# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /check:bounds /compile_only /debug:full /define:"ONTBUG" /fpp /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /traceback /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
+# SUBTRACT F90 /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /MTd /W4 /Gm /GX /ZI /O2 /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -107,7 +107,7 @@ DEP_F90_ALIGN=\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\Release\ATMVAR.mod"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	
@@ -337,7 +337,7 @@ DEP_F90_INIT_=\
 	".\params.inc"\
 	".\Release\PO_VAR.mod"\
 	".\Release\PRJVAR.mod"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Release\ZMVAR.MOD"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -419,7 +419,7 @@ DEP_F90_MAIN_=\
 	".\params.inc"\
 	".\POLY_COLOURS.INC"\
 	".\Release\DICVAR.mod"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -464,7 +464,7 @@ SOURCE=.\MultiRun.f90
 DEP_F90_MULTIR=\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -535,7 +535,7 @@ DEP_F90_PLOT_=\
 	".\params.inc"\
 	".\POLY_COLOURS.INC"\
 	".\Release\PO_VAR.mod"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -606,7 +606,7 @@ DEP_F90_PROJE=\
 	".\Release\PO_VAR.mod"\
 	".\Release\PRJVAR.mod"\
 	".\Release\REFVAR.mod"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -733,7 +733,7 @@ DEP_F90_SA_SI=\
 	".\params.inc"\
 	".\Release\ATMVAR.mod"\
 	".\Release\PO_VAR.mod"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -756,7 +756,7 @@ DEP_F90_SA_ST=\
 	".\params.inc"\
 	".\Release\ATMVAR.mod"\
 	".\Release\PO_VAR.mod"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -771,7 +771,7 @@ DEP_F90_SA_SU=\
 	".\params.inc"\
 	".\Release\ATMVAR.mod"\
 	".\Release\PO_VAR.mod"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -788,7 +788,7 @@ DEP_F90_SA_SUM=\
 	".\POLY_COLOURS.INC"\
 	".\Release\ATMVAR.mod"\
 	".\Release\PO_VAR.mod"\
-	".\Release\SOLVAR.MOD"\
+	".\Release\SOLVAR.mod"\
 	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
