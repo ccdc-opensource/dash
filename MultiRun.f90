@@ -164,10 +164,10 @@
 
       IMPLICIT NONE
 
-      CHARACTER(MaxPathLength) OutputFilesBaseName
-      INTEGER                                       OFBN_Len
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
       CHARACTER(3)                                            SA_RunNumberStr
-      COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves

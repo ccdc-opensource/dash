@@ -315,10 +315,10 @@
 ! npar   = number of parameters
 ! NStPar = number of structural parameters (i.e. those changing the fractional co-ordinates)
 
-      CHARACTER(MaxPathLength) OutputFilesBaseName
-      INTEGER                                       OFBN_Len
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
       CHARACTER(3)                                            SA_RunNumberStr
-      COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
 ! OutputFilesBaseName = basename for output files.
 !         E.g., if OutputFilesBaseName = 'C:\Program Files\CCDC\DASH 2.0\benzene'

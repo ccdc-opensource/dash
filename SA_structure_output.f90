@@ -50,10 +50,10 @@
                       KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      CHARACTER(MaxPathLength) OutputFilesBaseName
-      INTEGER                                       OFBN_Len
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
       CHARACTER(3)                                            SA_RunNumberStr
-      COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
       INTEGER     mpdbops
       PARAMETER ( mpdbops = 192 )
