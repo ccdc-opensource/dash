@@ -1928,6 +1928,7 @@
       REAL TempAngle
 
       IF ((Angle .GE. 0.00) .AND. (Angle .LE. 180.00)) RETURN
+      IF ((Angle .GT. 180.00) .AND. (Angle .LE. 360.00)) RETURN
 
       IF ((Angle .LT. 0.00) .AND. (Angle .GE. -180.00)) THEN
         TempAngle = 360.00 + Angle
@@ -1989,6 +1990,7 @@
        IF (Tempbounds(I,Upper) * Tempbounds(I, Lower) .LT. 0.00) THEN
          IF (ABS(TempBounds(I,Upper)) .GT. 90.00) THEN
            OneEightyScale = .FALSE.
+           EXIT
          ENDIF
        ENDIF
       ENDDO
