@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 27/Jun/2002 14:36:15
+// Modified : 28/Jun/2002 11:56:01
 //
 ///////////////////////////////////////////////////
 //
@@ -3736,16 +3736,18 @@ BEGIN
 ,0
 END
 
-IDD_DataRangeBruker DIALOG 0, 0,  304,  144
+IDD_DataRangeBruker DIALOG 0, 0,  240,  165
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Select Data Range"
 BEGIN
-    CONTROL "",IDF_DataRangeMenu,"LISTBOX",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP | LBS_NOTIFY | LBS_MULTIPLESEL | LBS_HASSTRINGS | LBS_USETABSTOPS,   27,   33,  250,   71
-    CONTROL "This file contains more than one data range.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   75,    8,  154,    8
-    CONTROL "Please select the ranges you would like to use.",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   78,   18,  148,    8
-    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   82,  121,   40,   14
-    CONTROL "&Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  186,  121,   40,   14
+    CONTROL "",IDF_DataRangeMenu,"LISTBOX",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP | LBS_NOTIFY | LBS_MULTIPLESEL | LBS_HASSTRINGS | LBS_USETABSTOPS,   20,   43,  200,   71
+    CONTROL "This file contains more than one data range.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   43,    7,  154,    8
+    CONTROL "Please select the ranges to be summed.",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   46,   17,  148,    8
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   65,  139,   40,   14
+    CONTROL "&Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  135,  139,   40,   14
+    CONTROL "  No.                Start            End              Step         Time",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   20,   32,  200,    8
+    CONTROL "Intensities and ESDs will be re-scaled to counts per second.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   20,  120,  200,   10
 END
 
 IDD_DataRangeBruker RCDATA
