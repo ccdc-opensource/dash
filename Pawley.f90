@@ -68,7 +68,6 @@
       CALL IOsDeleteFile('polyp.niw')
       CALL WizardWindowShow(IDD_Pawley_Status)
       CALL PopActiveWindowID
-      IPTYPE = 2
 
       END SUBROUTINE ShowPawleyFitWindow
 !
@@ -214,6 +213,7 @@
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
             CASE (IDB_PawRef_Accept)
 ! update the profile and stay with the Pawley refinement
+              IPTYPE = 2
 ! upload the cell constants and zeropoint from the Pawley refinement
               DO II=1,3
                 CELLPAR(II) = CELL(II,1,1)
@@ -240,9 +240,7 @@
 ! Disable the Solve button until the user does a Save
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
               CALL WDialogSelect(IDD_Pawley_Status)
-              IF (LastValuesSet) THEN
-                CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
-              ENDIF
+              IF (LastValuesSet) CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
@@ -649,14 +647,26 @@
 
       USE WINTERACTER
 
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
       LOGICAL           copypik, copytic, copyhcv, copyhkl
       COMMON / PBCKUP / copypik, copytic, copyhcv, copyhkl
+
+      REAL             YCBINP,       YBBINP
+      COMMON /PBCKUP2/ YCBINP(MOBS), YBBINP(MOBS)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      INTEGER inferr
 
       copypik = .FALSE.
       copytic = .FALSE.
       copyhcv = .FALSE.
       copyhkl = .FALSE.
-
 ! Make a backup copy of the polyp.pik file to recover in event of an error
       INQUIRE(FILE = 'polyp.pik', exist=copypik)
       inferr = InfoError(1)
@@ -682,6 +692,8 @@
         CALL IOsCopyFile('polyp.hkl', 'polyp.hbl')
         IF (InfoError(1) .NE. 0) copyhkl = .FALSE.
       ENDIF
+      YCBINP = YCBIN
+      YBBINP = YBBIN
 
       END SUBROUTINE make_polybackup
 !
@@ -689,8 +701,21 @@
 !
       SUBROUTINE retrieve_polybackup
 
+      USE WINTERACTER
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
       LOGICAL           copypik, copytic, copyhcv, copyhkl
       COMMON / PBCKUP / copypik, copytic, copyhcv, copyhkl
+
+      REAL             YCBINP,       YBBINP
+      COMMON /PBCKUP2/ YCBINP(MOBS), YBBINP(MOBS)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       IF (copypik) CALL IOsCopyFile('polyp.pbk','polyp.pik')
       IF (InfoError(1) .NE. 0) CALL DebugErrorMessage('cp polyp.pbk polyp.pik unsuccessful')
@@ -700,6 +725,8 @@
       IF (InfoError(1) .NE. 0) CALL DebugErrorMessage('cp polyp.hbk polyp.hcv unsuccessful')
       IF (copyhkl) CALL IOsCopyFile('polyp.hbl','polyp.hkl')
       IF (InfoError(1) .NE. 0) CALL DebugErrorMessage('cp polyp.hbl polyp.hkl unsuccessful')
+      YCBIN = YCBINP
+      YBBIN = YBBINP
 
       END SUBROUTINE retrieve_polybackup
 !
