@@ -757,20 +757,23 @@
         atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
         aelem(iAtomNr) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
       ENDDO
-      IF (WriteMol2('Rebuild_temp.mol2',.FALSE.,iFrg) .NE. 1) GOTO 700 ! Writing mol2 file failed
+      IF (WriteMol2('Rebuild_temp.mol2',.FALSE.,iFrg) .NE. 1) GOTO 999 ! Writing mol2 file failed
       CALL zmConvert('Rebuild_temp.mol2',tNumZMatrices,tZmatrices)
 ! Check that we still have 1 Z-matrix
-      IF (tNumZMatrices .EQ. 0) GOTO 700 ! Conversion failed
+      IF (tNumZMatrices .EQ. 0) GOTO 999 ! Conversion failed
       IF (tNumZMatrices .GT. 1) THEN
         CALL WarningMessage('More than 1 Z-matrix generated.'//&
                             'Only the first will be retained.')
         CALL IOsCopyFile('Rebuild_temp_1.zmatrix','Rebuild_temp.zmatrix')
       ENDIF
       frag_file(iFrg) = 'Rebuild_temp.zmatrix'
-      IF (Read_One_ZM(iFrg) .NE. 0) GOTO 700 ! reading failed
+! Reading a Z-matrix is going to reset all the rotational stuff that isn't present in a .zmatrix file
+      CALL zmRotCopyTemp2Dialog
+      IF (Read_One_ZM(iFrg) .NE. 0) GOTO 999 ! reading failed
       zmAtomDeleted = .FALSE.
       zmRebuild = 0
-  700 frag_file(iFrg) = tOldFileName
+  999 CALL zmRotCopyDialog2Temp
+      frag_file(iFrg) = tOldFileName
 
       END FUNCTION zmRebuild
 !
