@@ -42,13 +42,6 @@
       CHARACTER(MaxPathLength)  DashRawFile
       CHARACTER(MaxPathLength)  DashDslFile
 
-      LOGICAL TicExists
-      LOGICAL HcvExists
-      LOGICAL HklExists
-      LOGICAL PikExists
-      LOGICAL RawExists
-      LOGICAL DslExists
-
 ! New license information structure    
       TYPE License_Info
         INTEGER   Day
