@@ -47,6 +47,47 @@
 !
 !*****************************************************************************
 !
+      CHARACTER*(*) FUNCTION StrUpperCase(TheString)
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheString
+
+      INTEGER I
+      CHARACTER*1 ChrUpperCase
+
+      StrUpperCase = TheString
+      DO I = 1, LEN_TRIM(TheString)
+        StrUpperCase(I:I) = ChrUpperCase(TheString(I:I))
+      END DO
+
+      END FUNCTION StrUpperCase
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION ChrIsLetter(TheChar)
+
+      IMPLICIT NONE
+
+      CHARACTER*1, INTENT (IN   ) :: TheChar
+
+      CHARACTER*26 lc, UC
+      PARAMETER (lc = 'abcdefghijklmnopqrstuvwxyz')
+      PARAMETER (UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+      INTEGER POS
+
+      ChrIsLetter = .FALSE.
+      DO POS = 1, 26
+        IF ((TheChar .EQ. lc(POS:POS)) .OR. (TheChar .EQ. UC(POS:POS))) THEN
+          ChrIsLetter = .TRUE.
+          RETURN
+        ENDIF
+      ENDDO
+
+      END FUNCTION ChrIsLetter
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION GetNumOfColumns(TheString)
 !
 ! This function determines the number of columns in a string
