@@ -394,11 +394,10 @@
                 CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
               ELSE
 ! Emulate loading .SDI file for next window
-                CALL WDialogSelect(IDD_SAW_Page1)
-! Read in the HCV, PIK and TIC files from POLYP
                 Ilen = LEN_TRIM(DashPikFile)
                 SDIFile = DashPikFile(1:Ilen-3)//'sdi'
-                CALL WDialogPutString(IDF_SA_Project_Name, SDIFile)
+                CALL SetSAFileName(SDIFile)
+! Read in the HCV, PIK and TIC files from POLYP
                 CALL GETHCV(DashHcvFile, IER)
                 CALL GETPIK(DashPikFile, IER)
                 CALL ShowWizardWindowZmatrices
@@ -949,6 +948,7 @@
       CALL WSelectFile(FILTER,IFLAGS,SDIFileName,'Save diffraction information for structure solution')
       IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(SDIFileName) .NE. 0)) THEN
         IF (CreateSDIFile(SDIFileName) .EQ. 0) THEN
+          CALL SetSAFileName(SDIFileName)
           CALL sa_SetOutputFiles(SDIFileName)
           SaveProject = .TRUE.
         ENDIF
