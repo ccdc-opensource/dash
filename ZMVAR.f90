@@ -150,12 +150,10 @@
 !           can be dealt with.
 ! xzmpar = initial value of parameter
 
-      INTEGER         ntatm
       INTEGER         natoms(0:maxfrg)
       INTEGER         ioptb(1:maxatm,0:maxfrg), iopta(1:maxatm,0:maxfrg), ioptt(1:maxatm,0:maxfrg)
       INTEGER         iz1(1:maxatm,0:maxfrg), iz2(1:maxatm,0:maxfrg), iz3(1:maxatm,0:maxfrg)
 
-! ntatm  = total number of atoms. Must be equal to NATOM in /POSNS/
 ! natoms = number of atoms in this fragment (=Z-matrix)
 ! ioptb  = optimise bond length 1=YES, 0=NO. Not implemented.
 ! iopta  = optimise valence angle 1=YES, 0=NO. Not implemented.
