@@ -10,7 +10,6 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmn.inc'
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
@@ -42,7 +41,7 @@
       ELSE
         CALL WDialogFieldState(IDF_Viewer,Disabled)
       ENDIF
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+      CALL WizardWindowShow(IDD_SA_Action1)
       DoSaRedraw = .TRUE.
       T1 = SECNDS(0.0)
       CALL PDB_SymmRecords()
