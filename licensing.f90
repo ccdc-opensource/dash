@@ -340,13 +340,13 @@
       WRITE(Iun,'(A)',ERR=100) '         '
       WRITE(Iun,'(A)',ERR=100) '         '
       WRITE(Iun,'(A)',ERR=100) '         '
-      WRITE(Iun,'(A)',ERR=100) 'You should send the completed contents of this file to support@ccdc.cam.ac.uk'
+      WRITE(Iun,'(A)',ERR=100) 'You should send the completed contents of this file to admin@ccdc.cam.ac.uk'
       WRITE(Iun,*,ERR=100)
       CLOSE(iun,iostat=idummy)
       CALL WMessageBox(YesNo,InformationIcon,CommonYes,&
         "A file "//fname_2(1:LEN_TRIM(fname_2))//" has been created."//CHAR(13)//&
         "You should edit this file and then send it to"//CHAR(13)//CHAR(13)//&
-        "support@ccdc.cam.ac.uk"//CHAR(13)//CHAR(13)//&
+        "admin@ccdc.cam.ac.uk"//CHAR(13)//CHAR(13)//&
         "Would you like to edit this file now?","Edit licence request file")
       IF (WinfoDialog(4) .EQ. 1) THEN
         CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,'Edit licence request file'),IHan)
