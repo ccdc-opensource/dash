@@ -1,11 +1,13 @@
-!*==I_PREPROCESS.f90  created by SPAG 6.11Dc at 13:53 on  5 Oct 2001
+!
+!*****************************************************************************
+!
       MODULE SAMVAR
 
       IMPLICIT NONE
 
 ! PARAMETER definitions
 
-      INTEGER, PARAMETER :: MAXATM_2 = 100
+      INTEGER, PARAMETER :: MAXATM_2 = 150
       INTEGER, PARAMETER :: MAXBND   = 1500
 
       REAL atchg(1:MAXATM_2)
@@ -61,3 +63,6 @@
 ! hybr      estimate of hybridisation 1 = sp1 2=sp2 3=sp3 4 = aromatic  >100 = metal
 
       END MODULE SAMVAR
+!
+!*****************************************************************************
+!
