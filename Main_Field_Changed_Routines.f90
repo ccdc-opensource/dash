@@ -74,6 +74,8 @@
                 CALL Profile_Plot(IPTYPE)
               CASE (IDF_Background_Check)
                 CALL Profile_Plot(IPTYPE)
+              CASE (IDF_ConnectObsPoints)
+                CALL Profile_Plot(IPTYPE)
             END SELECT
           ENDIF
       END SELECT
