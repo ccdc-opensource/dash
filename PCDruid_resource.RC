@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 21/May/2003 14:47:11
+// Modified : 22/May/2003 16:09:25
 //
 ///////////////////////////////////////////////////
 //
@@ -734,6 +734,10 @@
 #define IDF_SDI_File_Name                1541
 #define IDD_RR_PO_Dialog                  196
 #define IDF_STRING2                      1543
+#define IDD_SA_input3_2                   197
+#define IDF_NumDoFPerMove                1351
+#define IDF_LABEL20                      1544
+#define IDB_More                         1545
 
 ///////////////////////////////////////////////////
 //
@@ -4371,6 +4375,63 @@ BEGIN
 " 1229            -100             100 \n"
 " 1236            -100             100 \n"
 " 1237            -100             100 \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_SA_input3_2 DIALOG 0, 0,  385,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Simulated Annealing Protocol"
+BEGIN
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Solve >",IDB_SA3_finish,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "0.0",IDF_SA_T0,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,   99,  119,   28,   14
+    CONTROL "0.02",IDF_SA_Tredrate,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  135,  119,   28,   14
+    CONTROL "Moves each T",IDF_LABEL11,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  261,  108,   26,   18
+    CONTROL "N1",IDF_SA_NS_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  171,  107,   28,   10
+    CONTROL "20",IDF_SA_NS,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  171,  119,   28,   14
+    CONTROL "20",IDF_SA_NT,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  207,  119,   28,   14
+    CONTROL "",IDF_SA_Moves,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY,  259,  127,   30,   14
+    CONTROL "N2",IDF_SA_NT_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  207,  107,   28,   10
+    CONTROL "T0",IDF_SA_T0_label1,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   99,  107,   28,   10
+    CONTROL "Cool",IDF_SA_cool_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  135,  107,   28,   10
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "10",IDF_SA_MaxRepeats,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  324,   26,   32,   14
+    CONTROL "Number of SA runs",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  235,   28,   85,   10
+    CONTROL "Max. number of moves / run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  239,   70,   52,   20
+    CONTROL "Profile chi-sqd multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,  235,   47,   85,   10
+    CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  324,   45,   32,   14
+    CONTROL "&Print...",IDF_PrintSA,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  236,  150,   40,   14
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  299,   73,   30,   12
+    CONTROL "x  10",IDF_LABEL21,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  330,   74,   18,    8
+    CONTROL "7",IDF_MaxMoves2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE,  351,   67,   22,   12
+    CONTROL "1",IDF_NumDoFPerMove,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  190,   83,   30,   14
+    CONTROL "# of DoF changed / move",IDF_LABEL20,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   98,   85,   90,    8
+    CONTROL "&More >",IDB_More,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  314,  150,   40,   14
+    CONTROL "Termination criteria",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  230,   12,  152,   84
+END
+
+IDD_SA_input3_2 RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1151      0.0000           1000.0      \n"
+" 1179     0.10000E-002     0.50000      \n"
+" 1152               1             100 \n"
+" 1153               1             100 \n"
+" 1158               1           50000 \n"
+" 1374               1              99 \n"
+" 1378      1.0000          0.34028E+039 \n"
+" 1139     0.10000E-002      100.00      \n"
+" 1235               1               9 \n"
+" 1351               1              10 \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"

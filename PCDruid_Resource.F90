@@ -1,4 +1,4 @@
-! Winteracter module created : 21/May/2003 14:47:11
+! Winteracter module created : 22/May/2003 16:09:25
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -721,4 +721,8 @@
           INTEGER, PARAMETER :: IDF_SDI_File_Name               =  1541
           INTEGER, PARAMETER :: IDD_RR_PO_Dialog                =   196
           INTEGER, PARAMETER :: IDF_STRING2                     =  1543
+          INTEGER, PARAMETER :: IDD_SA_input3_2                 =   197
+          INTEGER, PARAMETER :: IDF_NumDoFPerMove               =  1351
+          INTEGER, PARAMETER :: IDF_LABEL20                     =  1544
+          INTEGER, PARAMETER :: IDB_More                        =  1545
       END MODULE Druid_Header

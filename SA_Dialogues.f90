@@ -1309,8 +1309,8 @@
       LOGICAL                                                   LimsChanged
       COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
 
-      INTEGER                ModalFlag
-      COMMON /ModalTorsions/ ModalFlag(mvar)
+      INTEGER                ModalFlag,       RowNumber
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber
       SAVE   /ModalTorsions/      
       
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
@@ -1341,12 +1341,15 @@
 ! Go back to the 1st window
 ! JCC Check if the limits have changed and warn about it 
               IF (LimsChanged) THEN
-                IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
+                IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) THEN
+                  LimsChanged = .FALSE. 
+                  DO I = 1, nvar
+                    ModalFlag(I) = 1
+                    CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
+                  ENDDO
+                ENDIF                 
               ENDIF
-              DO I = 1, nvar
-                ModalFlag(I) = 1
-                CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
-              ENDDO
+     
               IF (.NOT. LimsChanged) THEN
 ! If the user has requested preferred orientation, make sure we pass the pertinent Wizard window
                 CALL WDialogSelect(IDD_SAW_Page2)
@@ -1454,17 +1457,15 @@
                     CALL WGridStateCell(IDF_parameter_grid_modal,2,IFRow,DialogReadOnly)
                     CALL WGridStateCell(IDF_parameter_grid_modal,3,IFRow,DialogReadOnly)
                     CALL WGridStateCell(IDF_parameter_grid_modal,5,IFRow,Disabled)
-!                   If value fixed then remove modal torsion angle ranges
-                    ModalFlag(IFRow) = 1
-                    CALL WGridColourRow(IDF_parameter_grid_modal, IFROW, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
-           
                   ELSE
                     lb(IFRow) = prevlb(IFRow)
                     ub(IFRow) = prevub(IFRow)
                     CALL WGridStateCell(IDF_parameter_grid_modal,1,IFRow,Enabled)
                     CALL WGridStateCell(IDF_parameter_grid_modal,2,IFRow,Enabled)
                     CALL WGridStateCell(IDF_parameter_grid_modal,3,IFRow,Enabled)
-                    CALL WGridStateCell(IDF_parameter_grid_modal,5,IFRow,Enabled)
+                    IF (kzmpar2(IFRow) .EQ. 3) THEN
+                      CALL WGridStateCell(IDF_parameter_grid_modal,5,IFRow,Enabled)
+                    ENDIF
                   ENDIF
                   CALL WGridPutCellReal(IDF_parameter_grid_modal,2,IFRow,SNGL(lb(IFRow)),'(F12.5)')
                   CALL WGridPutCellReal(IDF_parameter_grid_modal,3,IFRow,SNGL(ub(IFRow)),'(F12.5)')
@@ -1472,12 +1473,8 @@
                 CASE (5) !Modal Torsion Angle Button
                   CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, IFCol, IFRow, ICHK)
                   IF (ICHK .EQ. Checked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)
-                    CALL DealWithBimodalDialog(IFRow, xtem)
-                    CALL WDialogSelect(IDD_SA_Modal_input2)
-                    CALL WGridPutCellReal(IDF_parameter_grid_modal,1,IFRow,SNGL(x(IFRow)),'(F12.5)')
-                    CALL WGridPutCellReal(IDF_parameter_grid_modal,2,IFRow,SNGL(lb(IFRow)),'(F12.5)')
-                    CALL WGridPutCellReal(IDF_parameter_grid_modal,3,IFRow,SNGL(ub(IFRow)),'(F12.5)')  
+                    CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)                 
+                    CALL ShowBiModalDialog(IFRow, xtem)
                   ENDIF
               END SELECT ! IFCol
           END SELECT ! EventInfo%Value1 Field Changed Options
@@ -1639,12 +1636,13 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowSASettings
+
+
 !
 !*****************************************************************************
 !
 
-      SUBROUTINE DealWithBimodalDialog(IFrow, Xinitial)
-
+      SUBROUTINE ShowBimodalDialog(IFrow, Xinitial)
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -1667,21 +1665,20 @@
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds
 
-      INTEGER                ModalFlag
-      COMMON /ModalTorsions/ ModalFlag(mvar)
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
       SAVE   /ModalTorsions/
 
       CHARACTER*36 parlabel(mvar)
 
       INTEGER, INTENT(INOUT):: IFrow
-      INTEGER ICol, NumColumns, ISET
+      INTEGER ICol, NumColumns
       INTEGER i,j,k, dof, copy, frag
       INTEGER Upper, Lower
-      REAL    Zero, OneEighty, xtem, ttem
-      DOUBLE PRECISION TempDouble
-      REAL TempPrevub, TempPrevlb, TempPrevx
+      REAL    Zero, OneEighty, xtem
       REAL Xinitial
-      LOGICAL OutOfBounds
+
 
 ! Initialise variables          
       ICol = 0
@@ -1768,18 +1765,64 @@
           CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))          
         ENDIF
       ENDIF
-
-      TempPrevub = UB(IFRow)
-      TempPrevlb = LB(IFRow)
-      TempPrevx = Xinitial
-
       CALL WDialogShow(-1, -1, IDD_ModalDialog, SemiModeless)
-      CALL PushActiveWindowID
+      RowNumber = IFRow
+      iUB = UB(IFRow)
+      iLB = LB(IFRow)
+      ix = X(IFRow)
+      iRadio = ModalFlag(IFRow)
+      END SUBROUTINE
 
-!     Dialog's responses 
-      DO
-10    CONTINUE
-      CALL GetEvent
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithBimodalDialog()
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INCLUDE 'PARAMS.INC'
+
+      DOUBLE PRECISION x,lb,ub,vm
+      COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
+
+      REAL             prevx,       prevlb,       prevub
+      LOGICAL                                                   LimsChanged
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
+
+      REAL, DIMENSION (3,2) :: TempBounds
+      COMMON /TriModalBounds/  TempBounds
+
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
+      SAVE   /ModalTorsions/
+
+      INTEGER ICol, NumColumns, ISET
+      INTEGER Upper, Lower
+      REAL    Zero, OneEighty, xtem, ttem
+      DOUBLE PRECISION TempDouble
+      REAL TempPrevub, TempPrevlb, TempPrevx
+      LOGICAL OutOfBounds
+
+! Initialise variables          
+      ICol = 0
+      NumColumns = 3
+      Upper = 1
+      Lower = 2
+      Zero = 0.0000
+      OneEighty = 180.0000
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_ModalDialog)
+
       SELECT CASE (EventType) 
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -1800,7 +1843,8 @@
                 CALL WDialogGetReal(IDF_ModalLower, xtem)
                 CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
               ENDIF
-              ModalFlag(IFRow) = 2
+              ModalFlag(RowNumber) = 2
+
 
             CASE (IDF_TriModalRadio)
               CALL WDialogGetReal(IDF_ModalUpper, xtem)
@@ -1810,21 +1854,21 @@
               CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
               CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
               CALL WDialogPutReal(IDF_ReportLower1, Tempbounds(2,Lower))
-              CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))
-              ModalFlag(IFRow) = 3             
-             
+              CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))            
+              ModalFlag(RowNumber) = 3 
+                          
             CASE (IDF_Initial)
               CALL WDialogGetReal(IDF_Initial, xtem)       
               TempPrevx = xtem
-              xtem = MAX(SNGL(lb(IFrow)),xtem)
-              X(IFrow)=DBLE(MIN(SNGL(ub(IFrow)),xtem))
-              CALL WDialogPutReal(IDF_Initial, SNGL(x(IFRow)), '(F12.5)')
+              xtem = MAX(SNGL(lb(RowNumber)),xtem)
+              X(RowNumber)=DBLE(MIN(SNGL(ub(RowNumber)),xtem))
+              CALL WDialogPutReal(IDF_Initial, SNGL(x(RowNumber)), '(F12.5)')
             CASE (IDF_ModalLower)
                CALL WDialogGetReal(IDF_ModalLower, xtem)
-               xtem = MIN(SNGL(ub(IFrow)),xtem)
-               TempPrevlb = LB(IFRow)               
-               lb(IFRow) = DBLE(xtem)
-               CALL WDialogPutReal(IDF_ModalLower,SNGL(lb(IFrow)),'(F12.5)')
+               xtem = MIN(SNGL(ub(RowNumber)),xtem)
+               TempPrevlb = LB(RowNumber)               
+               lb(RowNumber) = DBLE(xtem)
+               CALL WDialogPutReal(IDF_ModalLower,SNGL(lb(RowNumber)),'(F12.5)')
 !              How ranges are calculated depends on state of Modal RadioButton  
                CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
                  SELECT CASE (ISET) !bimodal radiobutton active
@@ -1845,7 +1889,7 @@
                         CALL WDialogGetReal(IDF_ModalLower, xtem)
                         CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
                       ENDIF
-                    ModalFlag(IFRow) = 2  
+                    ModalFlag(RowNumber) = 2  
                                      
                    CASE (2) !Trimodal radiobutton active           
                      CALL WDialogGetReal(IDF_ModalLower, xtem)
@@ -1857,16 +1901,16 @@
                      CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
                      CALL WDialogPutReal(IDF_ReportLower1, Tempbounds(2,Lower))
                      CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))
-                     ModalFlag(IFRow) = 3
+                     ModalFlag(RowNumber) = 3
                  END SELECT
              
             CASE (IDF_ModalUpper)
  ! JCC Check the bounding - only update if parameter is set to vary
               CALL WDialogGetReal(IDF_ModalUpper,xtem)
-              xtem = MAX(SNGL(lb(IFrow)),xtem)
-              TempPrevUb = UB(IFRow)             
-              ub(IFrow) = DBLE(xtem)
-              CALL WDialogPutReal(IDF_ModalUpper,SNGL(ub(IFrow)),'(F12.5)')
+              xtem = MAX(SNGL(lb(RowNumber)),xtem)
+              TempPrevUb = UB(RowNumber)             
+              ub(RowNumber) = DBLE(xtem)
+              CALL WDialogPutReal(IDF_ModalUpper,SNGL(ub(RowNumber)),'(F12.5)')
 !             How ranges are calculated depends on state of Modal RadioButton      
               CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
                  SELECT CASE (ISET) ! Bimodal Radiobutton active
@@ -1887,13 +1931,13 @@
                         CALL WDialogGetReal(IDF_ModalLower, xtem)
                         CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
                       ENDIF
-                      ModalFlag(IFRow) = 2
+                      ModalFlag(RowNumber) = 2
                    CASE (2) !Trimodal Radiobutton active
                      CALL WDialogGetReal(IDF_ModalUpper, xtem)
                      CALL DetermineTrimodalBounds(xtem, Upper)               
                      CALL WDialogGetReal(IDF_ModalLower, xtem)
                      CALL DetermineTrimodalBounds(xtem, Lower)
-                     ModalFlag(IFRow) = 3
+                     ModalFlag(RowNumber) = 3
                      CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
                      CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
                      CALL WDialogPutReal(IDF_ReportLower1, Tempbounds(2,Lower))
@@ -1906,45 +1950,51 @@
             CASE (IDOK)
 !             Record parameters in appropriate arrays
               CALL WDialogGetDouble(IDF_Initial, tempdouble)
-              X(IFRow) = tempdouble
+              X(RowNumber) = tempdouble
               CALL WDialogGetDouble(IDF_ModalLower, tempdouble)
-              lb(IFRow) = tempdouble                                                                               
+              lb(RowNumber) = tempdouble                                                                               
               CALL WDialogGetDouble(IDF_ModalUpper, tempdouble)
-              ub(IFRow) = tempdouble
+              ub(RowNumber) = tempdouble
 !             Check that x is in bounds
-              CALL CheckXInBounds(IFRow, X(IFRow), OutOfBounds)
+              CALL CheckXInBounds(RowNumber, X(RowNumber), OutOfBounds)
               IF(OutofBounds) THEN
                CALL WarningMessage('Initial value does not fall within defined ranges')
                  IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOk) THEN
-                 GOTO 10
+                 RETURN
                ENDIF 
               ENDIF
+              CALL WDialogHide()
               CALL WDialogSelect(IDD_SA_Modal_Input2)
-              CALL WGridColourRow(IDF_parameter_grid_modal, IFRow, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))
+              CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))  
               LimsChanged = .TRUE.
 !           Return bounds to previous values
             CASE (IDCANCEL)
-              ub(IFRow) = tempprevub
-              lb(IFRow) = tempprevlb
+              UB(RowNumber) = iUB
+              LB(RowNumber) = iLB
+              X(RowNumber) = iX
+              ModalFlag(RowNumber) = iRadio
+              CALL WDialogHide()
 !           Return to "unimodal" mode. Modal torsion angle is no longer applied
             CASE (IDF_BiModalReset)
-              ub(IFrow) = OneEighty
-              lb(IFrow) = (-1) * OneEighty
-              X(IFRow) = tempprevx
-              ModalFlag(IFRow) = 1 
+              ub(RowNumber) = OneEighty
+              lb(RowNumber) = (-1) * OneEighty
+              X(RowNumber) = iX
+              ModalFlag(RowNumber) = 1 
+              CALL WDialogHide()
               CALL WDialogSelect(IDD_SA_Modal_Input2)
-              CALL WGridColourRow(IDF_parameter_grid_modal, IFRow, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))                                              
+              CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))                                              
           END SELECT
-          CALL PopActiveWindowID 
-          CALL WDialogHide()
-          prevub(IFRow) = UB(IFRow)
-          prevlb(IFRow) = LB(IFRow)
+          prevub(RowNumber) = UB(RowNumber)
+          prevlb(RowNumber) = LB(RowNumber)
           CALL WDialogSelect(IDD_SA_Modal_Input2)
-          CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5, IFRow, UnChecked)            
-          RETURN              
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, RowNumber, SNGL(X(RowNumber)))
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, RowNumber, SNGL(LB(RowNumber)))
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, RowNumber, SNGL(UB(RowNumber))) 
+          CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5, RowNumber, UnChecked)                          
       END SELECT
-      ENDDO
-
+ 
+      CALL PopActiveWindowID
+          
       END SUBROUTINE DealWithBimodalDialog
 
 !
@@ -2109,8 +2159,8 @@
       DOUBLE PRECISION x,lb,ub,vm
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
 
-      INTEGER                ModalFlag
-      COMMON /ModalTorsions/ ModalFlag(mvar)
+      INTEGER                ModalFlag,       RowNumber      
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNUmber
       SAVE   /ModalTorsions/    
 
       REAL, DIMENSION (3,2) :: TempBounds
