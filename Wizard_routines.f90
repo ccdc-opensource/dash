@@ -400,7 +400,7 @@
       IMPLICIT NONE
 
       REAL    tMin, tMax
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
       REAL, EXTERNAL :: TwoTheta2dSpacing
 
       CALL PushActiveWindowID
@@ -418,16 +418,18 @@
         tMax = 90.0
       ENDIF
       CALL TruncateData(tMin,tMax)
-! Now update the values in the min/max fields to reflect what has actually happened
-! (e.g. in case min was .GT. max)
-      IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
-        CALL WDialogPutReal(IDF_Min2Theta,tMin)
-      ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
-        CALL WDialogPutReal(IDF_Max2Theta,tMax)
-        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
-      ENDIF
 ! Now check if we have reasonable data left. If not, don't allow pressing 'Next >'
+      IF (FnPatternOK()) THEN
+! Update the values in the min/max fields to reflect what has actually happened
+! (e.g. in case min was .GT. max)
+        IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
+          CALL WDialogPutReal(IDF_Min2Theta,tMin)
+        ENDIF
+        IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
+          CALL WDialogPutReal(IDF_Max2Theta,tMax)
+          CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
+        ENDIF
+      ENDIF
       CALL PopActiveWindowID
 
       END SUBROUTINE WizardApplyProfileRange
@@ -442,7 +444,13 @@
 
       IMPLICIT NONE
 
-      REAL tReal
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER                BackupNOBS
+      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
+      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
+
+      REAL tReal, tMin, tMax
       REAL, EXTERNAL :: TwoTheta2dSpacing, dSpacing2TwoTheta
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
       INTEGER tFieldState
@@ -458,17 +466,27 @@
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDNEXT)
               CALL WizardApplyProfileRange
-              CALL Profile_Plot
-! Now check if we have reasonable data left. If not, don't allow pressing 'Next >'
-              IF (.NOT. FnPatternOK()) THEN
-                CALL ErrorMessage('Invalid profile range.')
-              ELSE
+! Check if we have reasonable data left. If not, don't allow pressing 'Next >'
+              IF (FnPatternOK()) THEN
                 CALL WizardWindowShow(IDD_PW_Page6)
+              ELSE
+                CALL ErrorMessage('Invalid profile range.')
+                tMin = 0.0
+                tMax = 90.0
+                CALL TruncateData(tMin,tMax)
               ENDIF
+              CALL Profile_Plot
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
+! Check if we have reasonable data left. If not, don't allow the truncation
+              IF (.NOT. FnPatternOK()) THEN
+                CALL ErrorMessage('Invalid profile range.')
+                tMin = 0.0
+                tMax = 90.0
+                CALL TruncateData(tMin,tMax)
+              ENDIF
               CALL Profile_Plot
           END SELECT
         CASE (FieldChanged)
@@ -491,14 +509,29 @@
               CALL WDialogFieldState(IDF_Max2Theta,tFieldState)
               CALL WDialogFieldState(IDF_MaxResolution,tFieldState)
               CALL WDialogFieldState(IDB_Convert,tFieldState)
+            CASE (IDF_Min2Theta)
+              CALL WDialogGetReal(IDF_Min2Theta,tMin)
+              IF (tMin .LT. BackupXOBS(1)) tMin = BackupXOBS(1)
+              CALL WDialogGetReal(IDF_Max2Theta,tMax)
+              IF (tMin .GT. tMax) tMin = tMax
+              CALL WDialogPutReal(IDF_Min2Theta,tMin)
             CASE (IDF_Max2Theta)
 ! When entering a maximum value for 2 theta, update maximum value for the resolution
-              CALL WDialogGetReal(IDF_Max2Theta,tReal)
-              CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tReal))
+              CALL WDialogGetReal(IDF_Max2Theta,tMax)
+              IF (tMax .GT. BackupXOBS(BackupNOBS)) tMax = BackupXOBS(BackupNOBS)
+              CALL WDialogGetReal(IDF_Min2Theta,tMin)
+              IF (tMax .LT. tMin) tMax = tMin
+              CALL WDialogPutReal(IDF_Max2Theta,tMax)
+              CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
             CASE (IDF_MaxResolution)
 ! When entering a maximum value for the resolution, update maximum value for 2 theta
               CALL WDialogGetReal(IDF_MaxResolution,tReal)
-              CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
+              tMax = dSpacing2TwoTheta(tReal)
+              IF (tMax .GT. BackupXOBS(BackupNOBS)) tMax = BackupXOBS(BackupNOBS)
+              CALL WDialogGetReal(IDF_Min2Theta,tMin)
+              IF (tMax .LT. tMin) tMax = tMin
+              CALL WDialogPutReal(IDF_Max2Theta,tMax)
+              CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -999,6 +1032,7 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
       INTEGER IOption
@@ -1038,6 +1072,7 @@
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
+              IF (NumberSGTable .EQ. LPosSG(LatBrav)) CALL WarningMessage('Space-group symmetry has not been reset.')
               CALL WizardWindowShow(IDD_PW_Page10)
             CASE (IDAPPLY)
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
