@@ -152,9 +152,10 @@
           CALL WDialogSelect(IDD_SAW_Page5)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,6,iRow,Unchecked)
 ! Fill SA Parameter Bounds Wizard Window with the values from this solution.
-          CALL WDialogSelect(IDD_SA_input2)
+!O         CALL WDialogSelect(IDD_SA_input2)
+          CALL WDialogSelect(IDD_SA_Modal_input2)
           DO IV = 1, NVAR
-            CALL WGridPutCellReal(IDF_parameter_grid,1,IV,BestValuesDoF(IV,iSol2Run(iRow)))
+            CALL WGridPutCellReal(IDF_parameter_grid_modal,1,IV,BestValuesDoF(IV,iSol2Run(iRow)))
           ENDDO
 ! Untick "Randomise initial values"
           CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal,.FALSE.)

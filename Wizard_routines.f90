@@ -1342,6 +1342,9 @@
 
       INCLUDE 'Lattice.inc'
 
+      LOGICAL SpaceGroupDetermination
+      COMMON /SGFLAG/ SpaceGroupDetermination
+
       INTEGER IOption
       LOGICAL, EXTERNAL :: Confirm
 
@@ -1382,6 +1385,7 @@
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
               IF (NumberSGTable .EQ. LPosSG(LatBrav)) CALL WarningMessage('Space-group symmetry has not been reset.')
+              CALL WDialogPutString(IDF_Label5, 'The next step is Pawley Refinement') 
               CALL WizardWindowShow(IDD_PW_Page10)
             CASE (IDAPPLY)
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
@@ -1398,6 +1402,7 @@
                CALL Generate_TicMarks
                CALL Download_SpaceGroup(IDD_PW_Page1) 
                SpaceGroupDetermination = .TRUE.
+               CALL WDialogPutString(IDF_Label5, 'The next step in Space Group Determination is Pawley Refinement') 
                CALL WizardWindowShow(IDD_PW_Page10)
           END SELECT
         CASE (FieldChanged)
@@ -1453,18 +1458,24 @@
 
       IMPLICIT NONE
 
+      LOGICAL SpaceGroupDetermination
+      COMMON /SGFLAG/ SpaceGroupDetermination
+
+
       LOGICAL, EXTERNAL :: Confirm
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page10)
       SELECT CASE (EventType)
-        CASE (PushButton) ! one of the buttons was pushed
+        CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
+              SpaceGroupDetermination = .FALSE.
               CALL WizardWindowShow(IDD_PW_Page1)
             CASE (IDNEXT)
               CALL ShowPawleyFitWindow
             CASE (IDCANCEL, IDCLOSE)
+              SpaceGroupDetermination = .FALSE.
               CALL EndWizard
             CASE (IDF_ClearPeakFitRanges)
               IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Clear_PeakFitRanges

@@ -1,4 +1,4 @@
-! Winteracter module created : 23/Dec/2002 17:08:33
+! Winteracter module created : 07/Feb/2003 09:15:25
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -632,4 +632,21 @@
           INTEGER, PARAMETER :: IDF_RandomInitVal               =  1361
           INTEGER, PARAMETER :: IDB_SaveTBL                     =  1362
           INTEGER, PARAMETER :: IDF_OutputSolMenu2              =  1414
+          INTEGER, PARAMETER :: IDD_SA_Modal_input2             =   137
+          INTEGER, PARAMETER :: IDD_DIALOG003                   =   162
+          INTEGER, PARAMETER :: IDF_parameter_grid_modal        =  1363
+          INTEGER, PARAMETER :: IDD_ModalDialog                 =   186
+          INTEGER, PARAMETER :: IDF_BimodalRadio                =  1491
+          INTEGER, PARAMETER :: IDF_TriModalRadio               =  1492
+          INTEGER, PARAMETER :: IDF_TorsionName                 =  1493
+          INTEGER, PARAMETER :: IDF_Initial                     =  1494
+          INTEGER, PARAMETER :: IDF_ModalLower                  =  1496
+          INTEGER, PARAMETER :: IDF_ModalUpper                  =  1497
+          INTEGER, PARAMETER :: IDF_ReportLower1                =  1499
+          INTEGER, PARAMETER :: IDF_ReportUpper1                =  1500
+          INTEGER, PARAMETER :: IDF_ReportLower2                =  1501
+          INTEGER, PARAMETER :: IDF_ReportUpper2                =  1502
+          INTEGER, PARAMETER :: IDF_BimodalReset                =  1503
+          INTEGER, PARAMETER :: IDF_BimodalIcon                 =  1504
+          INTEGER, PARAMETER :: IDF_TriModalIcon                =  1505
       END MODULE Druid_Header

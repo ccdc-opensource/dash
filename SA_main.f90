@@ -41,8 +41,8 @@
       CALL WDialogGetString(IDF_SA_Project_Name,tSDIFile)
       WRITE(tFileHandle,'("  SDI file = ",A)',ERR=999) tSDIFile(1:LEN_TRIM(tSDIFile))
 ! Profile range (including maximum resolution), wavelength, unit cell parameters, zero point
-
-      CALL WDialogSelect(IDD_SA_input2)
+!!O      CALL WDialogSelect(IDD_SA_input2)
+      CALL WDialogSelect(IDD_SA_Modal_input2)
       kk = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
@@ -267,6 +267,11 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
+!!ELNA
+      INTEGER ModalFlag
+      COMMON / ModalTorsions/ ModalFlag(mvar)
+
+
       CHARACTER*36 parlabel(mvar)
       DOUBLE PRECISION dcel(6)
       INTEGER I, II, kk, iFrg, iFrgCopy, iH, iK, iL
@@ -485,17 +490,22 @@
       ENDIF
       nvar = kk
 ! Now fill the grid
-      CALL WDialogSelect(IDD_SA_input2)
-      CALL WGridRows(IDF_parameter_grid,nvar)
+
+      CALL WDialogSelect(IDD_SA_Modal_input2)
+      CALL WGridRows(IDF_parameter_grid_modal,nvar)
       DO i = 1, nvar
-        CALL WGridLabelRow(IDF_parameter_grid,i,parlabel(i))
-        CALL WGridPutCellReal(IDF_parameter_grid,1,i,SNGL(x(i)),'(F12.5)')
-        CALL WGridPutCellReal(IDF_parameter_grid,2,i,SNGL(lb(i)),'(F12.5)')
-        CALL WGridPutCellReal(IDF_parameter_grid,3,i,SNGL(ub(i)),'(F12.5)')
-        CALL WGridPutCellCheckBox(IDF_parameter_grid,4,i,Unchecked)
-        CALL WGridStateCell(IDF_parameter_grid,1,i,Enabled)
-        CALL WGridStateCell(IDF_parameter_grid,2,i,Enabled)
-        CALL WGridStateCell(IDF_parameter_grid,3,i,Enabled)
+        CALL WGridLabelRow(IDF_parameter_grid_modal,i,parlabel(i))
+        CALL WGridPutCellReal(IDF_parameter_grid_modal,1,i,SNGL(x(i)),'(F12.5)')
+        CALL WGridPutCellReal(IDF_parameter_grid_modal,2,i,SNGL(lb(i)),'(F12.5)')
+        CALL WGridPutCellReal(IDF_parameter_grid_modal,3,i,SNGL(ub(i)),'(F12.5)')
+        CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,4,i,Unchecked)
+        CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5,i,Unchecked)
+        CALL WGridStateCell(IDF_parameter_grid_modal,1,i,Enabled)
+        CALL WGridStateCell(IDF_parameter_grid_modal,2,i,Enabled)
+        CALL WGridStateCell(IDF_parameter_grid_modal,3,i,Enabled)
+!        prevub(i) = ub(i) ! taken out of this version of DASH by CJ?
+!        prevlb(i) = lb(i)
+        ModalFlag(i) = 1
       ENDDO
 ! Tick "Randomise initial values"
       CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal,.TRUE.)

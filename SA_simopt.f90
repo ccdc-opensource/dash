@@ -22,6 +22,9 @@
       DOUBLE PRECISION x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
+      DOUBLE PRECISION RULB
+      COMMON /RULB/    RULB(Mvar)
+
       REAL*4 XSIM(MVAR), DXSIM(MVAR)
 
       INTEGER         NPAR, IP
@@ -86,7 +89,8 @@
         I = IP(II)
         XSIM(II) = SNGL(XOPT(I))
 ! DXSIM = initial step sizes.
-        DXSIM(II) = SA_SimplexDampingFactor*0.1*SNGL(UB(I) - LB(I))
+!!ep        DXSIM(II) = SA_SimplexDampingFactor*0.1*SNGL(UB(I) - LB(I))
+        DXSIM(II) = SA_SimplexDampingFactor*0.1*SNGL(RULB(I))
       ENDDO
       CALL SA_SIMOPT(XSIM,DXSIM,N,FTEM)
       IF (Auto) THEN

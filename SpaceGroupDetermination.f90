@@ -84,7 +84,7 @@
       WRITE(220,'("----------------------")')
 !      WRITE(220,'("1.0         increase error")')
       WRITE(220, 230) Correction
-230   FORMAT(F4.1)
+230   FORMAT(F5.1)
       WRITE(220,*)
       WRITE(220,*)
       WRITE(220,'("ADJUST EXECUTION SPEED AND ACCURACY OF CALCULATED NUMBERS")')

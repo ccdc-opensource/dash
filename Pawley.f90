@@ -22,6 +22,9 @@
       REAL                        PR_BackGround
       COMMON /PRBACK/ PR_NumBack, PR_BackGround(1:10)
 
+      LOGICAL SpaceGroupDetermination
+      COMMON /SGFLAG/ SpaceGroupDetermination
+
       INTEGER, EXTERNAL :: PawleyErrorLog
       INTEGER IDUMMY
 
@@ -168,6 +171,10 @@
 
       REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
       COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
+
+      LOGICAL SpaceGroupDetermination
+      DATA    SpaceGroupDetermination /.FALSE./
+      COMMON /SGFLAG/ SpaceGroupDetermination
 
 ! Save the boxes from Pawley fit to Pawley fit
       REAL RLastValues(3)

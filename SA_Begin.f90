@@ -88,7 +88,9 @@
       CALL WDialogSelect(IDD_Summary)
       CALL WDialogHide
       IF (iMyExit .EQ. 5) THEN
-        CALL WizardWindowShow(IDD_SA_input2)
+!!O        CALL WizardWindowShow(IDD_SA_input2)
+        CALL WizardWindowShow(IDD_SA_Modal_input2)
+
       ELSE
         CALL SelectMode(IDB_AnalyseSolutions)
         CALL WDialogSelect(IDD_SAW_Page5)
