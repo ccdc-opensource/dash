@@ -1,4 +1,4 @@
-! Winteracter module created : 16/May/2002 16:43:47
+! Winteracter module created : 17/May/2002 15:24:35
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -616,4 +616,10 @@
           INTEGER, PARAMETER :: IDF_PO_G1                       =  1407
           INTEGER, PARAMETER :: IDF_CHECK7                      =  1248
           INTEGER, PARAMETER :: IDF_ShowCumChiSqd               =  1408
+          INTEGER, PARAMETER :: IDD_OutputSolutions             =   128
+          INTEGER, PARAMETER :: IDB_Output2                     =  1409
+          INTEGER, PARAMETER :: IDF_OutputSolMenu               =  1413
+          INTEGER, PARAMETER :: IDB_OutputChiSqd                =  1415
+          INTEGER, PARAMETER :: IDF_Directory                   =  1416
+          INTEGER, PARAMETER :: IDF_BaseName                    =  1417
       END MODULE Druid_Header

@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 16/May/2002 16:43:47
+// Modified : 17/May/2002 15:24:35
 //
 ///////////////////////////////////////////////////
 //
@@ -629,6 +629,12 @@
 #define IDF_PO_G1                        1407
 #define IDF_CHECK7                       1248
 #define IDF_ShowCumChiSqd                1408
+#define IDD_OutputSolutions               128
+#define IDB_Output2                      1409
+#define IDF_OutputSolMenu                1413
+#define IDB_OutputChiSqd                 1415
+#define IDF_Directory                    1416
+#define IDF_BaseName                     1417
 
 ///////////////////////////////////////////////////
 //
@@ -1040,19 +1046,6 @@ BEGIN
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
 END
 
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
@@ -1416,13 +1409,13 @@ FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Powder Diffraction File"
 BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "Diffraction data",IDF_PWa_Data_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  119,   45,  231,   52
-    CONTROL "File",IDF_PWa_Data_fFilename,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  131,   61,   20,    8
-    CONTROL "",IDF_PWa_DataFileName_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,  157,   57,  160,   14
-    CONTROL "B&rowse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  217,   77,   40,   14
+    CONTROL "Diffraction data",IDF_PWa_Data_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  102,   45,  258,   55
+    CONTROL "File",IDF_PWa_Data_fFilename,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  110,   61,   20,    8
+    CONTROL "",IDF_PWa_DataFileName_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,  136,   58,  214,   14
+    CONTROL "B&rowse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  217,   79,   40,   14
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  167,   77,   40,   14
+    CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  167,   79,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "Rebin >",IDB_Bin,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  264,  150,   40,   14
 END
@@ -3150,7 +3143,7 @@ BEGIN
     CONTROL "",IDF_LabProgMonoclinic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   65,   50,   10
     CONTROL "",IDF_LabProgTriclinic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   75,   50,   10
     CONTROL "Pause",IDBPAUSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  126,   95,   40,   14
-    CONTROL "# Solutions && status",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  180,   13,   72,    8
+    CONTROL "# Solutions",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  180,   13,   72,    8
     CONTROL "",IDF_PicHourglass,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   13,    8,   93,  117
 END
 
@@ -3686,6 +3679,53 @@ BEGIN
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_OutputSolutions DIALOG 0, 0,  239,  223
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Output Solutions"
+BEGIN
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   99,  199,   40,   14
+    CONTROL "Output .c&ssr",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  166,   43,   54,   14
+    CONTROL "Output .cc&l",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  166,   57,   54,   14
+    CONTROL "Output .&pro",IDF_OutputPRO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  166,  102,   54,   14
+    CONTROL "Output .pd&b",IDF_OutputPDB,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  166,   29,   54,   14
+    CONTROL "Output .&res",IDF_OutputRES,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  166,   85,   54,   14
+    CONTROL "Output .c&if",IDF_OutputCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  166,   71,   54,   14
+    CONTROL "Output",IDB_Output2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   14,   13,   40,   14
+    CONTROL "",IDF_OutputSolMenu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,   60,   13,   80,   40
+    CONTROL "Output",IDB_OutputChiSqd,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   14,  129,   40,   14
+    CONTROL "chi-squared versus number of moves",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   59,  131,  120,   10
+    CONTROL "in the following formats:",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  145,   15,   80,   10
+    CONTROL "String",IDF_Directory,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   11,  154,  200,   14
+    CONTROL "String",IDF_BaseName,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,   11,  176,  100,   14
+END
+
+IDD_OutputSolutions RCDATA
+BEGIN
+"[Checks] \n"
+" 1260 0 \n"
+" 1277 0 \n"
+" 1043 0 \n"
+" 1457 0 \n"
+" 1461 0 \n"
+" 1462 0 \n"
+"[Menus] \n"
+" 1413     3     1 \n"
+"the best solution \n"
+"selected solutions \n"
+"all solutions \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1260      1.0000           9.0000      \n"
+" 1277      1.0000           9.0000      \n"
+" 1043      1.0000           9.0000      \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
