@@ -67,6 +67,7 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
@@ -81,11 +82,31 @@
       INTEGER          IPMIN, IPMAX
       COMMON /PROFIPM/ IPMIN, IPMAX
 
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
+
 ! JCC data to indicate whether we are coming out of peak-fitting mode
-      LOGICAL Confirm ! Function
+      LOGICAL, EXTERNAL :: Confirm
       REAL xpgdif, ypgdif
       INTEGER ISTAT, IBpass
-      INTEGER DiffractionFileBrowse ! Function
+      INTEGER, EXTERNAL :: DiffractionFileBrowse
+      INTEGER I
 
 !   Branch depending on chosen menu item
 
@@ -127,10 +148,39 @@
           CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)
           CALL ShowWizardWindowZmatrices
+        CASE (ID_FitPeaks)
+! Check if we have any peak fit ranges at all
+          IF (NumPeakFitRange .EQ. 0) THEN
+            CALL ErrorMessage('No peak fitting ranges.')
+          ELSE
+! Find first range that has been swept but not fitted
+            CurrentRange = 0
+            DO I = 1, NumPeakFitRange
+              IF (.NOT. RangeFitYN(I)) THEN
+                CurrentRange = I
+                EXIT
+              ENDIF
+            ENDDO
+            IF (CurrentRange .EQ. 0) THEN
+! Tell the user to place the cursor in the range to be fitted.
+              CALL InfoMessage('All peak fitting ranges have been fitted.')
+            ELSE
+! We're ready to fit the Bragg peaks
+! One or more peaks to be fitted - initial positions determined by user
+! If NumInPFR(InRange).eq.0 we're going to search & fit a single peak
+              CALL WCursorShape(CurHourGlass)
+              CALL MultiPeak_Fitter()
+              CALL WCursorShape(CurCrossHair)
+              CALL Profile_Plot
+! Disable Pawley refinement button and 'Next >' button in Wizard window
+              CALL CheckIfWeCanDoAPawleyRefinement
+              CALL CheckIfWeCanIndex
+            ENDIF
+          ENDIF
         CASE (ID_ClearPeakFitRanges)
           IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Clear_PeakFitRanges
         CASE (ID_Delabc)
-          IF (Confirm('Do you wish to clear all cell parameters?')) CALL Clear_UnitCell
+          CALL Clear_UnitCell_WithConfirmation
         CASE (ID_get_crystal_symmetry)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
@@ -253,9 +303,6 @@
 !
 !   This subroutine processes the close requests
 !
-      USE WINTERACTER
-      USE VARIABLES
-
       IMPLICIT NONE
 
       LOGICAL, EXTERNAL :: Confirm
