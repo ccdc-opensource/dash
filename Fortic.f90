@@ -54,8 +54,6 @@
      &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
      &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
       LOGICAL REFUSE, CYC1, NOPKRF
-      COMMON /PRSAVE/ KPOINT(200), SAVP2(200), SAVDER(300,200),         &
-     &                SAVPRC(200), SAVDPC(200), SAVFCN(200)
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
