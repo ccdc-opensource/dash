@@ -37,7 +37,6 @@
       INTEGER tNumHydrogens, tNumNonHydrogens, tAtomNumber
       REAL ssq
       REAL, EXTERNAL :: ascfac
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
 ! JvdS Order all atoms such that the Hydrogen atoms are always at
 ! the end of the atom list. That way, if we don't want to use hydrogens
