@@ -21,7 +21,6 @@
 !
       SUBROUTINE Update_Solutions
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE SOLVAR
 
@@ -100,7 +99,6 @@
 !
       SUBROUTINE Update_PO
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE PO_VAR
 
@@ -271,7 +269,6 @@
 ! This routine should be called whenever a new pattern is loaded, so that can
 ! be a new powder pattern, a .sdi file or a .dash file
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
