@@ -471,9 +471,9 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SA_STRUCTURE_OUTPUT_PDB(TheRunNr)
+      SUBROUTINE SA_STRUCTURE_OUTPUT_PDB(TheRunNr, file_name)
 !
-! This subroutine writes out a single solution to the file 'SA_best.pdb' for viewing.
+! This subroutine writes out a single solution to a temporary file for viewing.
 ! It is a combination of SA_STRUCTURE_OUTPUT() and SA_STRUCTURE_OUTPUT_OVERLAP()
 !
 ! It relies on XAtmCoords being up to date
@@ -486,7 +486,8 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: TheRunNr
+      INTEGER,        INTENT (IN   ) :: TheRunNr
+      CHARACTER*(15), INTENT (  OUT) :: file_name
 
       INCLUDE 'PARAMS.INC'
 
@@ -504,12 +505,12 @@
       CHARACTER(2) RunStr
 
       hFilePDB = 65
+      WRITE(RunStr, '(I2.2)') TheRunNr
 ! Write the file headers first
-      OPEN (UNIT=hFilePDB,FILE='SA_best.pdb',STATUS='unknown',ERR=999)
-      WRITE(RunStr,'(I2)') TheRunNr
-      IF (TheRunNr .LT. 10) RunStr(1:1) = '0'
+      file_name = "DASH_tmp"//RunStr//".pdb"
+      OPEN (UNIT=hFilePDB, FILE=file_name, STATUS='unknown', ERR=999)
 ! Add in a Header record
-      WRITE (hFilePDB,"('HEADER    CSD ENTRY RUNNUM',A2)",ERR=999) RunStr
+      WRITE (hFilePDB, "('HEADER    CSD ENTRY RUNNUM',A2)", ERR=999) RunStr
       IF (WritePDBCommon(hFilePDB) .NE. 0) GOTO 999
       iAtom = 0
       DO iFrg = 1, nFrag

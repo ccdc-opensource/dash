@@ -19,6 +19,8 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      CHARACTER*(15) file_name
+
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Action1)
       SELECT CASE (EventType)
@@ -26,8 +28,8 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_View) ! 'View'
 ! Calls subroutine which opens Mercury window with .pdb file
-              CALL SA_STRUCTURE_OUTPUT_PDB(Curr_SA_Run)
-              CALL ViewStructure('SA_best.pdb')
+              CALL SA_STRUCTURE_OUTPUT_PDB(Curr_SA_Run, file_name)
+              CALL ViewStructure(file_name)
             CASE (IDF_Pause_Annealing) ! 'Pause'
               CALL WDialogFieldState(IDF_Pause_Annealing,Disabled)
               iMyExit = 6
