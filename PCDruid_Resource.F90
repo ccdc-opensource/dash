@@ -1,4 +1,4 @@
-! Winteracter module created : 08/Aug/2001 16:55:19
+! Winteracter module created : 09/Aug/2001 20:34:31
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -182,7 +182,6 @@
           INTEGER, PARAMETER :: IDF_PW_bet_latt_label           =  1225
           INTEGER, PARAMETER :: IDF_PW_c_latt_label             =  1228
           INTEGER, PARAMETER :: IDF_PW_gam_latt_label           =  1229
-          INTEGER, PARAMETER :: IDF_PW_Crystal_System_Menu      =  1232
           INTEGER, PARAMETER :: IDF_PW_Space_Group_Menu         =  1233
           INTEGER, PARAMETER :: IDF_PW_Source_Group             =  1234
           INTEGER, PARAMETER :: IDF_PW_LabX_Source              =  1235
@@ -383,7 +382,6 @@
           INTEGER, PARAMETER :: IDF_StrInf_Picture              =  1318
           INTEGER, PARAMETER :: ID_get_crystal_symmetry         = 40041
           INTEGER, PARAMETER :: ID_get_data_properties          = 40042
-          INTEGER, PARAMETER :: IDF_Dismiss_StrInf              =  1319
           INTEGER, PARAMETER :: IDF_PawRef_RefSigm1_Check       =  1320
           INTEGER, PARAMETER :: IDF_PawRef_RefSigm2_Check       =  1321
           INTEGER, PARAMETER :: IDF_PawRef_RefGamm1_Check       =  1322

@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 08/Aug/2001 16:55:19
+// Modified : 09/Aug/2001 20:34:31
 //
 ///////////////////////////////////////////////////
 //
@@ -195,7 +195,6 @@
 #define IDF_PW_bet_latt_label            1225
 #define IDF_PW_c_latt_label              1228
 #define IDF_PW_gam_latt_label            1229
-#define IDF_PW_Crystal_System_Menu       1232
 #define IDF_PW_Space_Group_Menu          1233
 #define IDF_PW_Source_Group              1234
 #define IDF_PW_LabX_Source               1235
@@ -396,7 +395,6 @@
 #define IDF_StrInf_Picture               1318
 #define ID_get_crystal_symmetry         40041
 #define ID_get_data_properties          40042
-#define IDF_Dismiss_StrInf               1319
 #define IDF_PawRef_RefSigm1_Check        1320
 #define IDF_PawRef_RefSigm2_Check        1321
 #define IDF_PawRef_RefGamm1_Check        1322
@@ -615,7 +613,7 @@ FONT    8, "MS Sans Serif"
 CAPTION "Structural Information"
 BEGIN
     CONTROL "",IDF_Structural_Information_tab,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   14,    8,  285,  138
-    CONTROL "OK",IDF_Dismiss_StrInf,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  138,  152,   30,   15
+    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  138,  152,   30,   15
 END
 
 IDD_Structural_Information RCDATA
@@ -1222,7 +1220,7 @@ BEGIN
     CONTROL "",IDF_alp_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  146,   56,   40,   14
     CONTROL "",IDF_bet_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  220,   56,   40,   14
     CONTROL "",IDF_gam_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  296,   56,   40,   14
-    CONTROL "",IDF_PW_Crystal_System_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  122,   92,   80,   48
+    CONTROL "",IDF_Crystal_System_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  122,   92,   80,   48
     CONTROL "",IDF_PW_Space_Group_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  248,   92,   80,   50
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  128,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  128,   40,   14
@@ -1242,7 +1240,7 @@ IDD_PW_Page1 RCDATA
 BEGIN
 "[Checks] \n"
 "[Menus] \n"
-" 1232    11     1 \n"
+" 1064    11     1 \n"
 "Unknown \n"
 "Triclinic \n"
 "Monoclinic (a-axis) \n"
