@@ -16,6 +16,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -23,9 +24,17 @@
                         NumInPFR(MAX_NPFR),                                      & 
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
+      
+      INTEGER     MPeak
+      PARAMETER ( MPeak = 10 )
 
-      REAL, EXTERNAL :: MULTIPEAK_CHISQ
+      INTEGER         NPEAK
+      REAL                   AREA,        XPOS       , P2
+      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), P2(MVAR)
+
+      REAL, EXTERNAL :: MULTIPEAK_CHISQ, FWHM
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
       REAL X(MVAR), DX(MVAR), COV(MMPAR)
@@ -45,6 +54,10 @@
         CALL DebugErrorMessage('Error fitting peak.')
         RETURN
       ENDIF
+      DO I = 1, N
+        P2(I) = X(I)
+      ENDDO
+      PF_FWHM(CurrentRange) = FWHM()
       RangeFitYN(CurrentRange) = .TRUE.
       DO I = 1, N
         II = I + (I-1)*N
@@ -78,8 +91,8 @@
       PARAMETER ( MPeak = 10 )
 
       INTEGER         NPEAK
-      REAL                   AREA,        XPOS
-      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK)
+      REAL                   AREA,        XPOS       , P2
+      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), P2(MVAR)
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -90,6 +103,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -97,7 +111,8 @@
                         NumInPFR(MAX_NPFR),                                      & 
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
@@ -225,9 +240,6 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
 
@@ -286,8 +298,8 @@
       PARAMETER ( MPeak = 10 )
 
       INTEGER         NPEAK
-      REAL                   AREA,        XPOS
-      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK)
+      REAL                   AREA,        XPOS       , P2
+      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), P2(MVAR)
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -298,6 +310,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -305,7 +318,8 @@
                         NumInPFR(MAX_NPFR),                                      & 
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -355,7 +369,10 @@
       ISPMIN = 1
       ISPMAX = NPTS
       NPT2 = NPTS/2
-      ZXDELT = (1.0 / 1.2)*(ZARGI(NPT2)-ZARGI(NPT2-1))
+! ######### @@ JvdS 21 July 2003 ####################
+! Where does the 1.0/1.2 come from? What's wrong with 1.0 ?
+!O      ZXDELT = (1.0 / 1.2)*(ZARGI(NPT2)-ZARGI(NPT2-1))
+      ZXDELT = ZARGI(NPT2)-ZARGI(NPT2-1)
       ZXDEL(KNOW) = ZXDELT
       KOBZ(1) = ISPMIN
       ZOBSMAX = ZOBS(ISPMIN)
@@ -390,6 +407,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -397,7 +415,8 @@
                         NumInPFR(MAX_NPFR),                                      & 
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
 
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
@@ -471,20 +490,22 @@
         xranav = xranav + PkPosVal(I,CurrentRange)
         IF (varesd(JP).LT.1.E-5) varesd(JP) = 0.003
         PkPosEsd(I,CurrentRange) = varesd(JP)
-        atem = ABS(varval(JP)-zargi(1))
+        atem = ABS(varval(JP)-ZARGI(1))
         iTem = 1
         DO II = 2, NPTS
-          anewt = ABS(varval(JP)-zargi(II))
+          anewt = ABS(varval(JP)-ZARGI(II))
           IF (anewt .LE. atem) THEN
             atem = anewt
             iTem = II
           ENDIF
         ENDDO
-        YPF_Pos(I,CurrentRange) = zcal(iTem)
+        YPF_Pos(I,CurrentRange) = ZCAL(iTem)
       ENDDO
       xranav = xranav / FLOAT(NumInPFR(CurrentRange))
       PkPosAv(CurrentRange) = xranav
       CALL Upload_Positions
+! Now do a refinement ...
+      CALL RefineLattice
       CALL Upload_Widths
 
       END SUBROUTINE OUTPUT_PRO

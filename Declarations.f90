@@ -69,9 +69,18 @@
 ! ZOBS = YOBIN
 ! ZDOBS = EBIN
 ! KOBZ holds for each reflection the data point closest to it.
+!!! ???? Is that true? Than why not KOBZ(MFCSTO) ???
 
       REAL            ZCAL
       COMMON /YSTORE/ ZCAL(MOBS)
+
+! ZCAL = YCBIN
+
+      REAL            ZARGK,         ZXDEL
+      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
+
+! ZARGK = 2 theta per reflection ?
+
 
 ! Hold output from Pawley refinement and multi-peak fitter.
 
@@ -124,6 +133,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -131,7 +141,8 @@
                         NumInPFR(MAX_NPFR),                                      & 
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
 
 ! These variables have to do with the peak fit ranges as selected by the user
 !
@@ -154,6 +165,7 @@
 ! MAX_FITPT (= 10,000) = MAXimum number of FIT PoinTs
 ! XPeakFit        = 2 theta of points of calculated peak (should all be equal to their corresponding XOBS/XBIN)
 ! YPeakFit        = y-values of points of calculated peaks
+! PF_FWHM         = Normalised Full Width at Half Maximum for the peaks in this hatched area
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
