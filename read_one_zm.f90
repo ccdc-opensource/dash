@@ -36,7 +36,7 @@
       INTEGER item, II, izm, IKK, nlin, natof
       INTEGER AsymLen, IDlen
       CHARACTER*3 tIDstr
-      REAL*8 CART(3,MAXATM)
+      REAL*8 CART(1:3,1:MAXATM)
       CHARACTER*2  AtmElement(1:MAXATM_2)
       INTEGER BondNr
 

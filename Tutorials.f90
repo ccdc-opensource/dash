@@ -35,7 +35,7 @@
       CALL IOsDirChange(FileDir(1:LEN_TRIM(FileDir)))
       DO I = 1, Nfiles
         CALL IOsCopyFile(Files(I)(1:LEN_TRIM(Files(I))),CURDIR(1:LEN_TRIM(CURDIR))//DIRSPACER)
-      END DO
+      ENDDO
       CALL IOsDirChange(CurDir(1:LEN_TRIM(CurDir)))
       CALL WHelpFile(' ') ! In case the help file is open already
       CALL WHelpFile(DirString(1:LEN_TRIM(DirString))//DIRSPACER//"index.htm")

@@ -85,7 +85,15 @@
       INTEGER                                   CurrentWizardWindow
       COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
 
+      LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
+
       CALL WizardWindowHide
+      IF (WeCanDoAPawleyRefinement()) THEN
+        CALL SetModeMenuState(1,1)
+      ELSE
+        CALL SetModeMenuState(1,-1)
+      ENDIF
+      CALL SelectMode(ID_Peak_Fitting_Mode)
       CALL SetWizardState(1)
       InWizard = .FALSE.
 
@@ -152,12 +160,6 @@
    
       CALL EndWizardCommon
       PastPawley = .FALSE.
-      IF (WeCanDoAPawleyRefinement()) THEN
-        CALL SetModeMenuState(1,1)
-      ELSE
-        CALL SetModeMenuState(1,-1)
-      ENDIF
-      CALL SelectMode(ID_Peak_Fitting_Mode)
 ! Ungrey 'Delete all peak fit ranges' button on toolbar
       IF (NumPeakFitRange .GT. 0) CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
 ! Ungrey 'Remove background' button on toolbar
@@ -206,7 +208,7 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizard
+              CALL EndWizardCommon
             CASE (IDNEXT)
 ! We're off the main page and on to new pages depending on the option.
               CALL WDialogGetRadioButton(IDF_PW_Option1,IPW_Option)
@@ -214,7 +216,7 @@
                 CASE (1) ! View data / determine peaks positions
                   CALL WDialogSelect(IDD_PW_Page3)
                   CALL WDialogGetString(IDF_PWa_DataFileName_String,tString)
-! If no filename provided => grey out buttons 'Next' and 'Finish'
+! If no filename provided => grey out 'Next >' button
                   IF (LEN_TRIM(tString) .EQ. 0) THEN
                     CALL WDialogFieldState(IDNEXT,Disabled)
                   ELSE
@@ -223,7 +225,7 @@
                   CALL WizardWindowShow(IDD_PW_Page3)
                 CASE (2) ! Preparation for Pawley refinement
                   CALL WDialogSelect(IDD_PW_Page2)
-! If we have loaded a powder pattern, the Next> button should be enabled
+! If we have loaded a powder pattern, the Next > button should be enabled
                   IF (NoData) THEN
                     CALL WDialogFieldState(IDNEXT,Disabled)
                   ELSE
