@@ -43,15 +43,11 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
 ! Clear all variables
-      CurrentRange = 0
       NumPeakFitRange = 0
-      NumInPFR = 0
-      IPF_RPt = 0
-      RangeFitYN = .FALSE.
 ! Update 'View'|'Peak Positions'...
-      CALL Upload_Positions()
+      CALL Upload_Positions
 !... and 'View'|'Peak Widths' tabs
-      CALL Upload_Widths()
+      CALL Upload_Widths
 ! Signal to Pawley refinement that we should start with a clean slate
       CALL IOsDeleteFile('polyp.niw')
 ! Redraw
