@@ -116,3 +116,8 @@
 ! For use in common block WWREFLN (cf common block in REFLNS.INC)
 	INTEGER WWREFDIM
 	PARAMETER (WWREFDIM = 10000)
+
+! The Maximumn number of Child Windows allowed (determined by Winteracter)
+! Used in common blocks SACHILDWINDOWS and CHISQDWINDOWSUSED
+	INTEGER MaxNumChildWin
+	PARAMETER (MaxNumChildWin = 20)
