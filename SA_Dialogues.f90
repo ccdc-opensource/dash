@@ -473,9 +473,30 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE ZMVAR
 
       IMPLICIT NONE
 
+      INCLUDE 'lattice.inc'  
+
+      LOGICAL, EXTERNAL :: FnUnitCellOK
+
+! Calculate the unit cell axes in terms of the orthogonal lattice from
+! the unit cell parameters
+      IF (FnUnitCellOK()) THEN
+        CALL LatticeCellParameters2Lattice(CellPar(1), CellPar(2), CellPar(3), &
+                                           CellPar(4), CellPar(5), CellPar(6), f2cmat)
+      ELSE
+        f2cmat(1,1) = 1.0
+        f2cmat(1,2) = 0.0
+        f2cmat(1,3) = 0.0
+        f2cmat(2,1) = 0.0
+        f2cmat(2,2) = 1.0
+        f2cmat(2,3) = 0.0
+        f2cmat(3,1) = 0.0
+        f2cmat(3,2) = 0.0
+        f2cmat(3,3) = 1.0
+      ENDIF
       CALL zmCopyDialog2Temp
       CALL zmRotCopyTemp2Dialog
       CALL WDialogSelect(IDD_zmEditRotations)
@@ -494,21 +515,18 @@
       USE SAMVAR
 
       IMPLICIT NONE    
-      
-      INCLUDE 'lattice.inc'  
 
       INTEGER, EXTERNAL :: WriteMol2, Get_HydrogenTreatment
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
       REAL, EXTERNAL :: Degrees2Radians
-      INTEGER I, iFrg, iOption, iOption2, iOpt1State, iOpt2State, iOpt3State
-      INTEGER iAtomNr, iAtomNr1, iAtomNr2, iAtomNr3
-      REAL    Alpha, Beta, Gamma, Q(0:3)
+      INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State
+      INTEGER iAtomNr
+      REAL    Alpha, Beta, Gamma
       REAL    taxyzo(1:3, 1:MAXATM_2)
       CHARACTER(50) temp_file
       REAL    RotMat(1:3,1:3)
       REAL    COM(1:3), v(1:3), v1(1:3), v2(1:3)
       LOGICAL tUseSingleAxis
-      REAL    Angle, Axis(1:3)
       REAL    Point1(1:3), Point2(1:3), Point3(1:3) 
 
       iFrg = 0
@@ -523,14 +541,7 @@
             CASE (IDCANCEL)
               CALL WDialogHide
             CASE (IDB_ViewRot, IDB_View)
-
-! @@ Why do I not just call zmRotCopyDialog2Temp() here and use the routines that we use later on with the
-! "real" Z-matrix?
-
-! Calculate the unit cell axes in terms of the orthogonal lattice from
-! the unit cell parameters
-              CALL LatticeCellParameters2Lattice(CellPar(1), CellPar(2), CellPar(3), &
-                                         CellPar(4), CellPar(5), CellPar(6), f2cmat)
+              CALL zmRotCopyDialog2Temp
               natcry = NATOMS(iFrg)
               DO iAtomNr = 1, natcry
                 taxyzo(1,iAtomNr) = axyzo(1,iAtomNr)
@@ -573,50 +584,40 @@
                 axyzo(3,iAtomNr) = axyzo(3,iAtomNr) - COM(3)
               ENDDO
 ! Apply initial orientation
-              CALL WDialogGetRadioButton(IDF_IniOrQuater, iOption)
-              SELECT CASE (iOption)
+              SELECT CASE (zmSingleRAIniOrDef(iFrg))
                 CASE (1) ! Define from axis (only possible when axis is defined from atoms, not from another axis)
-                  CALL WDialogGetRadioButton(IDF_IniOrQuater, iOption2)
-                  SELECT CASE (iOption2)
-                    CASE (IDF_RotAxAtom)
-                      CALL WDialogGetInteger(IDF_AtomNr1, iAtomNr1)
-                      CALL WDialogGetInteger(IDF_AtomNr2, iAtomNr2)
-                      v1(1) = axyzo(1,izmbid(iAtomNr2, iFrg)) - axyzo(1,izmbid(iAtomNr1, iFrg))
-                      v1(2) = axyzo(2,izmbid(iAtomNr2, iFrg)) - axyzo(2,izmbid(iAtomNr1, iFrg))
-                      v1(3) = axyzo(3,izmbid(iAtomNr2, iFrg)) - axyzo(3,izmbid(iAtomNr1, iFrg))
-                    CASE (IDF_RotAxPln)
-                      CALL WDialogGetInteger(IDF_RotAxPlnAtm1, iAtomNr1)
-                      CALL WDialogGetInteger(IDF_RotAxPlnAtm2, iAtomNr2)
-                      CALL WDialogGetInteger(IDF_RotAxPlnAtm3, iAtomNr3)
-                      Point1 = axyzo(:, izmbid(iAtomNr1, iFrg))
-                      Point2 = axyzo(:, izmbid(iAtomNr2, iFrg))
-                      Point3 = axyzo(:, izmbid(iAtomNr3, iFrg))
+                  SELECT CASE (zmSingleRotAxDef(iFrg))
+                    CASE (1)
+                      v1(1) = axyzo(1,zmSingleRotAxAtm(2, iFrg)) - axyzo(1,zmSingleRotAxAtm(1, iFrg))
+                      v1(2) = axyzo(2,zmSingleRotAxAtm(2, iFrg)) - axyzo(2,zmSingleRotAxAtm(1, iFrg))
+                      v1(3) = axyzo(3,zmSingleRotAxAtm(2, iFrg)) - axyzo(3,zmSingleRotAxAtm(1, iFrg))
+                    CASE (3)
+                      Point1 = axyzo(:, zmSingleRotAxPlnAtm(1, iFrg))
+                      Point2 = axyzo(:, zmSingleRotAxPlnAtm(2, iFrg))
+                      Point3 = axyzo(:, zmSingleRotAxPlnAtm(3, iFrg))
                       Point1 = Point1 - Point2
                       Point3 = Point3 - Point2
                       CALL VectorCrossProduct(Point1, Point3, v1)
                   END SELECT
-                  CALL WDialogGetReal(IDF_a2, Axis(1))
-                  CALL WDialogGetReal(IDF_b2, Axis(2))
-                  CALL WDialogGetReal(IDF_c2, Axis(3))
-                  CALL PremultiplyVectorByMatrix(f2cmat, Axis, v2) ! frac -> cart
+                  CALL PremultiplyVectorByMatrix(f2cmat, zmSingleRAIniOrFrac(1,iFrg), v2) ! frac -> cart
           !        CALL Vector2Quaternion(v1, )
           !        CALL Vector2Quaternion(v2, )
 
                 CASE (2) ! Defined as Euler angles => convert to Quaternions
-                  CALL WDialogGetReal(IDF_Alpha, Alpha)
-                  CALL WDialogGetReal(IDF_Beta, Beta)
-                  CALL WDialogGetReal(IDF_Gamma, Gamma) ! Gamma is irrelevant
-                  Q(0) = COS(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha+Gamma))
-                  Q(1) = SIN(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha-Gamma))
-                  Q(2) = SIN(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha-Gamma))
-                  Q(3) = COS(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha+Gamma))
+                  Alpha = zmSingleRAIniOrEuler(1, iFrg)
+                  Beta  = zmSingleRAIniOrEuler(2, iFrg)
+                  Gamma = zmSingleRAIniOrEuler(3, iFrg)
+                  zmInitialQs(0, iFrg) = COS(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha+Gamma))
+                  zmInitialQs(1, iFrg) = SIN(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha-Gamma))
+                  zmInitialQs(2, iFrg) = SIN(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha-Gamma))
+                  zmInitialQs(3, iFrg) = COS(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha+Gamma))
                 CASE (3) ! Defined as quaternions
-                  CALL WDialogGetReal(IDF_Q0, Q(0))
-                  CALL WDialogGetReal(IDF_Q1, Q(1))
-                  CALL WDialogGetReal(IDF_Q2, Q(2))
-                  CALL WDialogGetReal(IDF_Q3, Q(3))
+                  zmInitialQs(0, iFrg) = zmSingleRAIniOrQuater(0,iFrg)
+                  zmInitialQs(1, iFrg) = zmSingleRAIniOrQuater(1,iFrg)
+                  zmInitialQs(2, iFrg) = zmSingleRAIniOrQuater(2,iFrg)
+                  zmInitialQs(3, iFrg) = zmSingleRAIniOrQuater(3,iFrg)
               END SELECT
-              CALL Quaternion2Matrix(Q, RotMat)
+              CALL Quaternion2Matrix(zmInitialQs(0, iFrg), RotMat)
               DO I = 1, natcry
                 CALL PremultiplyVectorByMatrix(RotMat, axyzo(1,I), v)
                 axyzo(1,I) = v(1)
