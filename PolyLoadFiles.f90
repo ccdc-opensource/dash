@@ -252,6 +252,8 @@
 ! Number of counts can be zero, especially at low theta due to a variable slit
 ! @ quick fix
           EOBS(I) = SQRT(MAX(1.0,YOBS(I)))
+! The minimum error is approx. 1%
+!F          EOBS(I) = MAX(SQRT(MAX(1.0,YOBS(I))),0.01*YOBS(I))
         ENDDO
       ENDIF
 ! Reset points that have not been read to zero.
