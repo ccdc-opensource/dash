@@ -45,7 +45,7 @@ RSC=rc.exe
 # PROP Target_Dir ""
 # ADD BASE F90 /compile_only /include:"Release/" /nologo /warn:nofileopt /winapp
 # ADD F90 /alignment:commons /assume:buffered_io /assume:noaccuracy_sensitive /compile_only /include:"Release/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /warn:nofileopt
-# SUBTRACT F90 /browser /fpp /winapp /fast
+# SUBTRACT F90 /browser /fltconsistency /fpp /winapp /fast
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -310,8 +310,8 @@ SOURCE=.\Frac2cart.f90
 # End Source File
 # Begin Source File
 
-SOURCE=.\FWPROG.f90
-DEP_F90_FWPRO=\
+SOURCE=.\FWHM.f90
+DEP_F90_FWHM_=\
 	".\params.inc"\
 	
 # End Source File
@@ -463,7 +463,6 @@ SOURCE=.\multipeak_fitter.f90
 DEP_F90_MULTIP=\
 	".\params.inc"\
 	".\Reflns.inc"\
-	".\Release\VARIABLES.mod"\
 	
 # End Source File
 # Begin Source File
