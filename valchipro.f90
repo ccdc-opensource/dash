@@ -18,7 +18,10 @@
       COMMON /chibest/ ycalbest(MCHSTP)
       COMMON /FPINF1/ KREFT(MFPINF),KNIPT(50,MFPINF),PIKVAL(50,MFPINF)
 
-      INCLUDE 'AllFFCalc.inc'
+! JvdS VALCHIPRO, which calculates the profile chi-squared, is always
+! called after VALCHI. VALCHI already fills AICALC in COMMON /SAREFLNS/ (the COMMON block needs
+! to be specified here: they are kept in COMMON /REFLNS/ in Reflns.inc as well)). 
+  !    INCLUDE 'AllFFCalc.inc'
       SUM1 = 0.0
       SUM2 = 0.0
       DO II = 1, NFIT
@@ -27,7 +30,7 @@
         DO K = 1, KREFT(I)
           KK = KNIPT(K,I)
           YCALC = YCALC+AICALC(KK)*PIKVAL(K,I)
-        END DO
+        ENDDO
 !!        DO K=KMINST(I),KMAXST(I)
 !!          KD=K-KMINST(I)
 !!          YCALC=YCALC+AICALC(K)*PIK(KD,I)
@@ -38,7 +41,7 @@
         YCAL(I)=YCALC
         SUM1=SUM1+YCALC
         SUM2=SUM2+YOBS(I)
-      END DO
+      ENDDO
       RESCL = SUM2 / SUM1
       CVP = 0.0
       DO II = 1, NFIT
