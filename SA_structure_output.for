@@ -37,9 +37,11 @@ C
       COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),
      & TF(150),KTF(150),SITE(150),KSITE(150),
      & ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
-        character*80 logsa_file,cssr_file,pdb_file,ccl_file
-        common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file
-        common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen
+        character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+        common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
+     &                     log_file
+        common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
+     &                     log_flen
 c
 C>> JCC Cell/Lattice declarations now in an include file
 
@@ -553,9 +555,9 @@ C Expand the symmetry generators into a list of symm ops by cross-multiplication
       Subroutine AddSingleSolution(ProfileChi,IntensityChi)
 
 	REAL ProfileChi,IntensityChi
-      character*80 logsa_file,cssr_file,pdb_file,ccl_file
-      common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file
-      common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen
+      character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+      common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
+      common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen
 	LOGICAL RESTART
 	INTEGER SA_Run_Number
 	COMMON /MULRUN/ RESTART, SA_Run_Number, 
@@ -576,8 +578,8 @@ C Expand the symmetry generators into a list of symm ops by cross-multiplication
 	COMMON /MULRUN/ RESTART, SA_Run_Number, 
      &                MaxRuns,  MinMoves, MaxMoves, ChiMult
 
-      character*80 logsa_file,cssr_file,pdb_file,ccl_file
-      common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file
+      character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+      common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
       common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen
 c
 	character*85 new_fname

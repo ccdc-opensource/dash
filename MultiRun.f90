@@ -117,3 +117,37 @@
 
 
 	END SUBROUTINE Log_SARun_Entry
+
+
+	SUBROUTINE SaveMultiRun_LogData
+	USE WINTERACTER
+	USE DRUID_HEADER
+    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
+    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen
+
+	LOGICAL RESTART
+	INTEGER SA_Run_Number, I
+	COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+
+    REAL Grid_ProfileChi, Grid_IntesityChi
+	CHARACTER*255 Grid_Buffer
+
+	ICurSel = WinfoDialog(CurrentDialog)
+
+    CALL WDialogSelect(IDD_SA_Multi_Completed)
+
+	OPEN(unit=101, file=log_file(1:log_flen), status = 'unknown', err = 99)
+	WRITE(101,*) 'File name,Profile Chi Squared,Intensity Chi Squared'
+    DO I = 1, SA_Run_Number
+		CALL WGridGetCellReal(IDF_SA_Solution_Grid,3,I,Grid_ProfileChi)
+		CALL WGridGetCellString(IDF_SA_Solution_Grid,1,I,Grid_Buffer)
+		CALL WGridGetCellReal(IDF_SA_Solution_Grid,2,I,Grid_IntensityChi)
+		WRITE(101,10) Grid_Buffer(1:len_trim(Grid_Buffer)),Grid_ProfileChi,Grid_IntensityChi
+	END DO
+
+ 10 FORMAT(A,',',F10.4,',',F10.4)
+    CLOSE (101)
+ 99 RETURN
+ 
+    END SUBROUTINE SaveMultiRun_LogData

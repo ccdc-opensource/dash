@@ -105,9 +105,11 @@ c
       common /sappcmn/ xpmin,xpmax,ypmin,ypmax
       common /chibest/ ycalbest(MCHSTP)
 c
-        character*80 logsa_file,cssr_file,pdb_file,ccl_file
-        common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file
-        common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen
+        character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+        common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
+     &                     log_file
+        common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
+     &                     log_flen
 C
       DOUBLE PRECISION PRJAV,PRJSD
       DOUBLE PRECISION PRJMAT0,PRJMAT1,PRJMAT2

@@ -58,6 +58,9 @@
       DoSaRedraw = .TRUE.
 	  CALL SimulatedAnnealing(imyexit)
 
+! After completion, save the list of solutions
+      CALL SaveMultiRun_LogData
+
       DoSaRedraw = .FALSE.
 
 !>> JCC Automatic end so pop up a message to say what happened
@@ -80,7 +83,6 @@
 	  CALL WDialogHide()
 
 	  CALL ToggleMenus(0)
-
 
 
       Call WDialogSelect(IDD_SA_Multi_Completed)
@@ -113,9 +115,9 @@
 	USE WINTERACTER
 	USE DRUID_HEADER
 	character*85 new_fname
-    character*80 logsa_file,cssr_file,pdb_file,ccl_file
-    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file
-    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen
+    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
+    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen
 	integer Iflags,Idummy
 	character*80 filehead
 	logical extcssr,extpdb,extccl

@@ -1,8 +1,8 @@
     subroutine sa_Defaults()
 !
-    character*80 logsa_file,cssr_file,pdb_file,ccl_file
-    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file
-    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen
+    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
+    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen
 	logical outfilset
 	common /outfileset/ outfilset
 	data outfilset/ .FALSE. /
@@ -13,10 +13,12 @@
 	    cssr_file='SA_best.cssr'
 		pdb_file='SA_best.pdb'
 		ccl_file='SA_best.ccl'
+		log_file='SA_best.log'
 !
 		cssr_flen=len_trim(cssr_file)
 		pdb_flen=len_trim(pdb_file)
 		ccl_flen=len_trim(ccl_file)
+		log_flen=len_trim(ccl_file)
 	END IF
 !
     end
@@ -26,9 +28,9 @@
 	subroutine sa_SetOutputFiles(filehead)
 !
 	character*75 filehead ! Maximum permissible length.
-    character*80 logsa_file,cssr_file,pdb_file,ccl_file
-    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file
-    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen
+    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
+    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen
 !
 	logical outfilset
 	common /outfileset/ outfilset
@@ -46,9 +48,10 @@
     cssr_file= filehead(1:i)//'.cssr'
     pdb_file=  filehead(1:i)//'.pdb'
     ccl_file=  filehead(1:i)//'.ccl'
-	
+    log_file=  filehead(1:i)//'.log'	
     cssr_flen=len_trim(cssr_file)
     pdb_flen=len_trim(pdb_file)
-    ccl_flen=len_trim(ccl_file)	
+    ccl_flen=len_trim(ccl_file)
+	log_flen=len_trim(log_file)
 	outfilset = .TRUE.
 	end subroutine sa_SetOutputFiles
