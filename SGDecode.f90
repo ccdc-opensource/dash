@@ -151,6 +151,7 @@
  4000   FORMAT (i5,5x,a)
         symline(js) = stout(:20)
       ENDDO
+      CALL PDB_SymmRecords
 
       END SUBROUTINE DECODESGSYMBOL
 !

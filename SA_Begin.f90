@@ -55,7 +55,6 @@
 !O      CALL WDialogSelect(IDD_Parameter_Status_2)
 !O      CALL WDialogShow(-1,-1,0,Modeless)
       T1 = SECNDS(0.0)
-      CALL PDB_SymmRecords
       CALL Init_MultiRun
 ! Grey out "start next" button if not multirun
       CALL WDialogFieldStateLogical(IDF_StartNext,RESTART)
