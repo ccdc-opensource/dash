@@ -148,13 +148,17 @@
         CALL WCursorShape(CurCrossHair)
 ! Check return status
       OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = iStat)
-      IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (iStat .NE. 0)) CALL ErrorMessage("Sorry, could not create Z-matrices.")
+      CLOSE(145)
+      IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (iStat .NE. 0)) THEN
+        CALL ErrorMessage("Sorry, could not create Z-matrices.")
+        RETURN
+      ENDIF
       !C Replace extension by .glob
       ExtLen = 5 ! Maximum length of a valid extension
       CALL FileGetExtension(TheFileName, ExtensionStr, ExtLen)
       IF ((ExtLen .LT. 1) .OR. (ExtLen .GT. 5)) THEN
-        CALL DebugErrorMessage("Error parsing file extension")
-        GOTO 999
+        CALL ErrorMessage("Error parsing file extension")
+        RETURN
       ENDIF
       iLen = LEN_TRIM(tFileName)
       globFile = tFileName(1:iLen-ExtLen)//"glob"
