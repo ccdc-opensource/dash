@@ -29,7 +29,6 @@
       INTEGER knotem, npartem
       INTRINSIC MOD
       REAL rat, stem
-
 !
 !  This subroutine determines the background using a smoothing
 !  procedure published by Sergio Brueckner in J. Appl. Cryst. (2000) 33, 977-979
@@ -48,11 +47,6 @@
         ys(ii) = yobin(NBIN)
       END DO
       IIII = 0
-
-!U      DO I = 1, NBIN
-!U        ybbin(I) = 0.0
-!U      END DO
-
       DO iter = 1, mbruckiter
 ! Loop over data points
         DO I = 1, NBIN
