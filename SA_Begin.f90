@@ -27,8 +27,10 @@
       INTEGER                                           Curr_Iter, MaxIterationSoFar
       REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
       LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
 
       LOGICAL         InSA
       COMMON /SADATA/ InSA
