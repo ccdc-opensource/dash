@@ -427,7 +427,7 @@
         JKKOR(KKOR) = iR
         NKKOR(KKOR) = 100
         DO I = 1, NCOR
-          IF (ABS(IHCOV(I,iR)).GE.MINCOR) THEN
+          IF (ABS(IHCOV(I,iR)) .GE. MINCOR) THEN
             KKOR = KKOR + 1
             IKKOR(KKOR) = iR
             JKKOR(KKOR) = iR + I
