@@ -510,7 +510,10 @@
         POS = POS - 1
       ENDDO
 ! If we haven't found a '.' by now, we cannot deal with the extension anyway
-      IF (FNAME(POS:POS) .NE. '.') RETURN
+      IF (FNAME(POS:POS) .NE. '.') THEN
+        CALL ErrorMessage('Invalid extension.')
+        RETURN
+      ENDIF
       EXT4 = '    '
       EXT4 = FNAME(POS+1:Ilen)
       CALL ILowerCase(EXT4)
@@ -550,23 +553,26 @@
 ! Check return status
       OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = ISTAT)
       IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (ISTAT .NE. 0)) THEN
-! An error occurred: get the return status
-! IECODE = InfoError(3)
-        CALL ErrorMessage("Sorry, could not create Z-matrices")
+! An error occurred
+        CALL ErrorMessage("Sorry, could not create Z-matrices.")
 ! Prompt with files created
       ELSE ! All Ok: Need to read in the file names
+        F = ''
         Ilen = 1
         DO WHILE (Ilen .LT. 512)
-!          Nzm = Nzm + 1
           READ (145,'(A)',ERR=20,END=20) F
           ZmFiles(Ilen:512) = CHAR(13)//F(1:LEN_TRIM(F))
           Ilen = LEN_TRIM(ZmFiles) + 1
         ENDDO
  20     CONTINUE
-        CALL InfoMessage("Generated the following Z-matrices successfully:"//CHAR(13)//&
-                         ZmFiles(1:Ilen)//CHAR(13)//CHAR(13)//&
-                         "You can load them by clicking on the Z-matrix browse buttons"//CHAR(13)//&
-                         "in the Molecular Z-Matrices window.")
+        IF (LEN_TRIM(F) .EQ. 0) THEN
+          CALL ErrorMessage("Sorry, could not create Z-matrices.")
+        ELSE
+          CALL InfoMessage("Generated the following Z-matrices successfully:"//CHAR(13)//&
+                           ZmFiles(1:Ilen)//CHAR(13)//CHAR(13)//&
+                           "You can load them by clicking on the Z-matrix browse buttons"//CHAR(13)//&
+                           "in the Molecular Z-Matrices window.")
+        ENDIF
         CLOSE(145)
       ENDIF
 
