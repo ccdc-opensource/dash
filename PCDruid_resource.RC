@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 23/Jan/2002 16:51:14
+// Modified : 26/Jan/2002 15:57:30
 //
 ///////////////////////////////////////////////////
 //
@@ -491,7 +491,7 @@
 #define IDF_CrystallographicCoM          1215
 #define IDF_Align                        1224
 #define IDF_Agreement                    1225
-#define IDB_IAgree                       1228
+#define IDF_IAgree                       1228
 #define IDD_SAW_Page2                     134
 #define IDF_PO_a                         1229
 #define IDF_PO_b                         1236
@@ -534,6 +534,7 @@
 #define IDF_BUTTON5                      1382
 #define IDF_BUTTON6                      1384
 #define IDB_Relabel                      1385
+#define IDF_IDoNotAgree                  1386
 
 ///////////////////////////////////////////////////
 //
@@ -2671,19 +2672,22 @@ BEGIN
 ,0
 END
 
-IDD_LicenceAgreement DIALOG 0, 0,  298,  199
+IDD_LicenceAgreement DIALOG 0, 0,  298,  231
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Licence Agreement"
 BEGIN
-    CONTROL "Accept",IDB_IAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   79,  172,   38,   16
-    CONTROL "Do NOT accept",ID_Licensing_Exit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  172,  172,   58,   16
     CONTROL "",IDF_Agreement,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE | ES_READONLY,   18,   16,  262,  144
+    CONTROL "I do NOT agree",IDF_IDoNotAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   60,  170,   60,   14
+    CONTROL "I have read the full text above and I Agree",IDF_IAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   60,  184,  175,   14
+    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  129,  208,   40,   14
 END
 
 IDD_LicenceAgreement RCDATA
 BEGIN
 "[Checks] \n"
+" 1386 1 \n"
+" 1228 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -2762,12 +2766,12 @@ BEGIN
 ,0
 END
 
-IDD_Parameter_Status_2 DIALOG 0, 0,  290,  138
+IDD_Parameter_Status_2 DIALOG 0, 0,  483,  138
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "SA Parameter Status"
 BEGIN
-    CONTROL "",IDF_CPL_GRID,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,   15,   12,  260,  115
+    CONTROL "",IDF_CPL_GRID,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,   15,   12,  452,  115
 END
 
 IDD_Parameter_Status_2 RCDATA
@@ -2779,7 +2783,7 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1401     8     40   158 \n"
-"   80 \n"
+"   60 \n"
 "parameter 1 \n"
 "parameter 2 \n"
 "parameter 3 \n"
@@ -2829,14 +2833,14 @@ IDD_DIALOG004 DIALOG 0, 0, 1000,   16
 STYLE DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "Best value",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "<fluctuation>",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "Step size",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "Average",ISS5,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "+/- sigma",ISS6,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "Lower bound",ISS7,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "Upper bound",ISS8,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   60,   14
-    CONTROL "Fixed",ISS1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   60,   14
+    CONTROL "Best value",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   50,   14
+    CONTROL "<fluctuation>",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   50,   14
+    CONTROL "Step size",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   50,   14
+    CONTROL "Average",ISS5,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   50,   14
+    CONTROL "+/- sigma",ISS6,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   50,   14
+    CONTROL "Lower bound",ISS7,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   50,   14
+    CONTROL "Upper bound",ISS8,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   50,   14
+    CONTROL "Fixed",ISS1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   40,   14
 END
 
 IDD_DIALOG004 RCDATA
