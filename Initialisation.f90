@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Init_StdOut()
+      SUBROUTINE Init_StdOut
 ! Selects the 'working directory' (which is changed every time the directory is changed
 ! when e.g. a Z-matrix is loaded, so this is not really '_the_' working directory).
 ! Checks if in that directory (but, as said, that directory changes all the time)
@@ -260,7 +260,7 @@
       INTEGER iWidth, iHeight
       PARAMETER (iWidth = 300, iHeight = 1)
       INTEGER tData(1:iWidth,1:iHeight)
-      INTEGER I, J, ifrg
+      INTEGER I, J
       INTEGER iRed, iGreen, iBlue, iRGBvalue
       REAL UM, TH
 
@@ -285,9 +285,7 @@
         UR(I) = COS(TH)
         UI(I) = SIN(TH)
       ENDDO
-      DO iFrg = 1, maxfrg
-        UseQuaternions(iFrg) = .TRUE.
-      ENDDO
+      UseQuaternions = .TRUE.
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
       CALL GetPathToMercuryFromRegistry
@@ -299,7 +297,6 @@
       DashHklFile = ' '
       DashPikFile = ' '
       DashTicFile = ' '
-      SavePDB  = .TRUE.
       UseConfigFile = .TRUE.
       IDCurrent_Cursor_Mode = ID_Peak_Fitting_Mode
       DataSetChange = 0
@@ -331,7 +328,7 @@
       SA_SimplexDampingFactor = 0.1
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
-      CALL Clear_Zmatrices
+      CALL Clear_Project
       SLIMVALUE = 1.0
       SCALFAC   = 0.01
       BACKREF   = .TRUE.
@@ -339,7 +336,6 @@
       IXPos_IDD_Wizard = 0.5  * (WInfoScreen(1) - 756.0)
       IYPos_IDD_Wizard = 0.01 * WInfoScreen(2)
       NumOfRef = 0
-      CALL Clear_PeakFitRanges
       MARKER_SIZE = 0.35
       CHAR_SIZE = 1.0
       XPG1 = 0.12
@@ -499,7 +495,7 @@
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
       INTEGER    RecNr
-      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, SaveCSSR, SaveCCL, &
+      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, SavePDB, SaveCSSR, SaveCCL, &
                            Get_ColourFlexibleTorsions, ConnectPointsObs, &
                            PlotErrorBars, PlotBackground,            &
                            PlotPeakFitDifferenceProfile,             &
@@ -628,7 +624,7 @@
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileWriteLogical(hFile,RecNr,Get_ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
-      CALL FileWriteLogical(hFile,RecNr,SavePDB)    ! 1. .pdb  ?
+      CALL FileWriteLogical(hFile,RecNr,SavePDB())    ! 1. .pdb  ?
       CALL FileWriteLogical(hFile,RecNr,SaveCSSR()) ! 2. .cssr ?
       CALL FileWriteLogical(hFile,RecNr,SaveCCL())  ! 3. .ccl  ?
       CALL FileWriteLogical(hFile,RecNr,.FALSE.)    ! 4. .res  ? (not possible yet)
@@ -836,7 +832,8 @@
       CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
 ! Read YES / NO which molecular file formats are to be written out when a best solution is found
-      CALL FileReadLogical(hFile,RecNr,SavePDB)    ! 1. .pdb  ?
+      CALL FileReadLogical(hFile,RecNr,tLogical)    ! 1. .pdb  ?
+  !F    CALL WDialogPutCheckBoxLogical(IDF_OutputPDB,tLogical)
       CALL FileReadLogical(hFile,RecNr,tLogical)   ! 2. .cssr ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,tLogical)
       CALL FileReadLogical(hFile,RecNr,tLogical)   ! 3. .ccl  ?
