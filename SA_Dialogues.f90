@@ -521,6 +521,9 @@
         f2cmat(3,1) = 0.0
         f2cmat(3,2) = 0.0
         f2cmat(3,3) = 1.0
+        CALL InfoMessage("It is recommended that the .sdi file is loaded first, because"//CHAR(13)// &
+                         "the unit-cell parameters are required to view the origin and"//CHAR(13)// &
+                         "the initial orientation of the Z-matrix in the unit cell.")
       ENDIF
       CALL zmCopyDialog2Temp
       CALL zmRotCopyTemp2Dialog
@@ -561,6 +564,10 @@
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
+            CASE (IDB_Relabel)
+              CALL zmCopyDialog2Temp
+              CALL zmRelabel(iFrg)
+              CALL zmCopyTemp2Dialog
             CASE (IDOK)
               CALL zmRotCopyDialog2Temp
               CALL WDialogHide
@@ -877,24 +884,22 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
       iFrg = 0
-! filename
-      CALL WDialogPutString(IDF_FileName,frag_file(iFrg))
 ! Fill grid with atom properties
 ! Set number of rows
-      CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
+      CALL WGridRows(IDF_AtomPropGrid, natoms(iFrg))
       DO iRow = 1, natoms(iFrg)
         iAtomNr = izmbid(iRow, iFrg)
 ! Show the number of the atom in the zeroth column
         WRITE(RowLabelStr,'(I3)') iRow
-        CALL WGridLabelRow(IDF_AtomPropGrid,iRow,RowLabelStr)
+        CALL WGridLabelRow(IDF_AtomPropGrid, iRow, RowLabelStr)
 ! atom labels
-        CALL WGridPutCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr, iFrg))
+        CALL WGridPutCellString(IDF_AtomPropGrid, 1, iRow, OriginalLabel(iAtomNr, iFrg))
 ! atom elements
-        CALL WGridPutCellString(IDF_AtomPropGrid,3,iRow,ElementStr(zmElementCSD(iAtomNr, iFrg)))
+        CALL WGridPutCellString(IDF_AtomPropGrid, 3, iRow, ElementStr(zmElementCSD(iAtomNr, iFrg)))
 ! Biso
-        CALL WGridPutCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr, iFrg),'(F5.3)')
+        CALL WGridPutCellReal(IDF_AtomPropGrid, 4, iRow, tiso(iAtomNr, iFrg), '(F5.3)')
 ! occupancies
-        CALL WGridPutCellReal(IDF_AtomPropGrid,5,iRow,occ(iAtomNr, iFrg),'(F5.3)')
+        CALL WGridPutCellReal(IDF_AtomPropGrid, 5, iRow, occ(iAtomNr, iFrg), '(F5.3)')
       ENDDO
 ! If only a single atom left, grey out "Rotations..." and "Re-order"
       CALL WDialogFieldStateLogical(IDB_Rotations, natoms(iFrg) .GT. 1)
@@ -1025,8 +1030,6 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
       iFrg = 0
-! filename
-      CALL WDialogGetString(IDF_FileName,frag_file(iFrg))
 ! Fill grid with atom properties
 !U! Set number of rows
 !U      CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
@@ -1315,10 +1318,6 @@
       CALL WSelectFile(FILTER, iFLAGS, zmFileName, 'Save Z-matrix')
       IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(zmFileName) .NE. 0)) THEN
         frag_file(iFrg) = zmFileName
-        CALL PushActiveWindowID
-        CALL WDialogSelect(IDD_zmEdit)
-        CALL WDialogPutString(IDF_FileName, frag_file(iFrg))
-        CALL PopActiveWindowID
         zmSaveAs = zmSave(iFrg)
       ENDIF
 
@@ -1451,7 +1450,6 @@
               CALL WDialogFieldState(IDF_LABELc, tFieldState)
           END SELECT
       END SELECT
-  999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowAdditionalSAParams
@@ -1496,7 +1494,11 @@
 ! Disable modal button for everything but torsion angles, angles and bonds
 ! This allows angles and bonds to be searched in Mogul too.
 !O        IF (ModalFlag(i) .EQ. 0) CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
-         IF ((kzmpar2(i) .LT. 3) .OR. (kzmpar2(i) .GT. 5)) CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
+         IF ((kzmpar2(i) .LT. 3) .OR. (kzmpar2(i) .GT. 5)) THEN
+           CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
+         ELSE
+           CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, Enabled)
+         ENDIF
       ENDDO
       LimsChanged = .FALSE.
       KK = 0
