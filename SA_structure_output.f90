@@ -17,9 +17,6 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
-      INTEGER    MVAR
-      PARAMETER (MVAR = 100)
-
       DOUBLE PRECISION inv(3,3)
 
       REAL             CHIPROBEST

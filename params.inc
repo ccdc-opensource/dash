@@ -83,3 +83,7 @@
 ! This is the number of elements in the least squares refinement matrix.
 ! The extra 20000 looks a bit stupid, but it was there in the original code so I left it in.
 ! Should not be necessary at all.
+
+      INTEGER     MVAR
+      PARAMETER ( MVAR = 100 )
+! Maximum number of 'parameters' / 'variables' (= degrees of freedom) in the SA
