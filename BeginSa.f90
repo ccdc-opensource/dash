@@ -22,19 +22,18 @@
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: Get_UseHydrogens
       REAL    T1
       REAL    SA_Duration ! The time the SA took, in seconds
       CHARACTER*10 SA_DurationStr
       INTEGER Ierrflag
 
       IF (CheckOverwriteSaOutput() .EQ. 0) THEN
-        CALL WDialogSelect(IDD_SA_input3)
-        CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+        CALL WizardWindowShow(IDD_SA_input3)
         RETURN
       ENDIF
+      LOG_HYDROGENS = Get_UseHydrogens()
       CALL WDialogSelect(IDD_Configuration)
-      LOG_HYDROGENS = WDialogGetCheckBoxLogical(IDF_UseHydrogens)
       CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
       CALL WDialogSelect(IDD_SA_Action1)
 ! Check on viewer

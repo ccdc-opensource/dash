@@ -535,7 +535,8 @@
                            ColourFlexibleTorsions, ConnectPointsObs, &
                            PlotErrorBars, PlotBackground,            &
                            PlotPeakFitDifferenceProfile,             &
-                           WDialogGetCheckBoxLogical
+                           WDialogGetCheckBoxLogical,                &
+                           Get_UseHydrogens
       REAL, EXTERNAL :: WavelengthOf
       INTEGER*4 tInteger
 
@@ -652,7 +653,7 @@
       CALL WDialogGetString(IDF_ViewArg,ViewArg)
       CALL FileWriteString(tFileHandle,RecNr,ViewArg)
 ! Save use hydrogens YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseHydrogens))
+      CALL FileWriteLogical(tFileHandle,RecNr,Get_UseHydrogens())
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileWriteLogical(tFileHandle,RecNr,ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
@@ -833,7 +834,7 @@
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
 ! Read use hydrogens YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,LOG_HYDROGENS)
-      CALL WDialogPutCheckBoxLogical(IDF_UseHydrogens,LOG_HYDROGENS)
+      CALL Set_UseHydrogens(LOG_HYDROGENS)
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
