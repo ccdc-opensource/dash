@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE check_license
+      SUBROUTINE check_licence
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -44,7 +44,7 @@
       CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogUnload
 
-      END SUBROUTINE check_license
+      END SUBROUTINE check_licence
 !
 !*****************************************************************************
 !
