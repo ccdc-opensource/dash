@@ -1636,11 +1636,20 @@
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
-      COMMON /symsto/ sctrh(24,10000), rhsto(3,24,10000)
-      PARAMETER (NAC=256,NBC=100*NAC,FARCOS=256.)
+
+      REAL            sctrh,            rhsto
+      COMMON /symsto/ sctrh(24,MFCSTO), rhsto(3,24,MFCSTO)
+
+      INTEGER     NAC,       NBC
+      REAL                                  FARCOS
+      PARAMETER ( NAC = 256, NBC = 100*NAC, FARCOS = 256.0 )
+
+      REAL            COSAR0,           COSAR1,           COSAR2
       COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC), COSAR2(-NBC:NBC)
+
+      REAL            SINAR0,           SINAR1,           SINAR2
       COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC), SINAR2(-NBC:NBC)
-!
+
       AFCALC = 0.0
 ! Firstly if we are centric then calculate only cosine terms
       IF (CENTRC) THEN
@@ -1684,27 +1693,35 @@
 !
       SUBROUTINE CALCOSARX
 
-      INTEGER     NAC,     NBC
-      PARAMETER ( NAC=256, NBC=100*NAC, FARCOS=256.0 )
+      IMPLICIT NONE
 
+      INTEGER     NAC,       NBC
+      REAL                                  FARCOS
+      PARAMETER ( NAC = 256, NBC = 100*NAC, FARCOS = 256.0 )
+
+      REAL            COSAR0,           COSAR1,           COSAR2
       COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC), COSAR2(-NBC:NBC)
 
+      REAL            SINAR0,           SINAR1,           SINAR2
       COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC), SINAR2(-NBC:NBC)
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
-      AMUL = TWOPI/FARCOS
+      REAL AMUL, X, XP, XM
+      INTEGER I
+
+      AMUL = TWOPI / FARCOS
       DO I = -NBC, NBC
-        X = AMUL*FLOAT(I)
-        XP = AMUL*FLOAT(I+1)
-        XM = AMUL*FLOAT(I-1)
+        X  = AMUL * FLOAT(I)
+        XP = AMUL * FLOAT(I+1)
+        XM = AMUL * FLOAT(I-1)
         COSAR0(I) = COS(X)
-        COSAR1(I) = 0.5*(COS(XP)-COS(XM))
-        COSAR2(I) = 0.5*(COS(XP)+COS(XM)-2.*COSAR0(I))
+        COSAR1(I) = 0.5 * (COS(XP) - COS(XM))
+        COSAR2(I) = 0.5 * (COS(XP) + COS(XM) - 2.0 * COSAR0(I))
         SINAR0(I) = SIN(X)
-        SINAR1(I) = 0.5*(SIN(XP)-SIN(XM))
-        SINAR2(I) = 0.5*(SIN(XP)+SIN(XM)-2.*SINAR0(I))
+        SINAR1(I) = 0.5 * (SIN(XP) - SIN(XM))
+        SINAR2(I) = 0.5 * (SIN(XP) + SIN(XM) - 2.0 * SINAR0(I))
       ENDDO
 
       END SUBROUTINE CALCOSARX
