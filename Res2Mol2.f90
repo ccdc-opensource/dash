@@ -266,7 +266,7 @@
         ENDDO
       ENDIF
       DO I = 1, natcry
-        WRITE(OutputFile,270,ERR=999) I,atomlabel(izmbid(I,iFrg)),(NEWaxyzo(izmbid(I,iFrg),j),j=1,3),sybatom(izmbid(I,iFrg))
+        WRITE(OutputFile,270,ERR=999) I,atomlabel(izmbid(I,iFrg)),(NEWaxyzo(j,izmbid(I,iFrg)),j=1,3),sybatom(izmbid(I,iFrg))
   270   FORMAT(I3,1X,A5,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
       ENDDO
       WRITE(OutputFile,"('@<TRIPOS>BOND')",ERR=999)
