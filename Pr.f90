@@ -785,7 +785,7 @@
 !D We write GCALC = P1*P2*P3* . . . where:
 !D    P1 is an outside multiplying factor containing scale, Lp, multiplicity,
 !D       overal tf, etc - it does not contain any structure parameters
-!D    P2 is a fuction of the structure factor, usually Fc squared.
+!D    P2 is a function of the structure factor, usually Fc squared.
 !D    P3 is an extinction correction
 !D    P4 is an absorption correction
 !D    P5 is the peak function
@@ -839,6 +839,7 @@
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -851,6 +852,7 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
       COMMON /PRABSC/ NABTYP(5), ABSPR(2,5), KABSPR(2,5), ABSCOR,       &
      &                DERABQ(2), NABSPR(5)
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
@@ -949,54 +951,54 @@
         L1ST = LVFST1(1,JPHASE,1)
 ! FORM P1 AND SOME FAMILY 1 QUOTIENT DERIVATIVES (ALL /P1):
 ! EACH DATA TYPE HAS DIFFERENT FACTOR:
-        IF (TOF) FAC = 1./(DSTAR2*DSTAR2)
-        IF (CN) FAC = 1./(SIN(RAD*ARGK)*SIN(0.5*RAD*ARGK))
-        IF (SR) FAC = 1./(SIN(RAD*ARGK)*SIN(0.5*RAD*ARGK))
+        IF (TOF) FAC = 1.0/(DSTAR2*DSTAR2)
+        IF (CN) FAC = 1.0/(SIN(RAD*ARGK)*SIN(0.5*RAD*ARGK))
+        IF (SR) FAC = 1.0/(SIN(RAD*ARGK)*SIN(0.5*RAD*ARGK))
         IF (LX) FAC = ALPCOR
 !	This next line was the original line, but it's been commented
 !	out for numerical stability reasons and replaced by
 !	the line above
-!      IF (LX) FAC=ALPCOR*V(2)*V(2)
-        P1 = SCALEP(JPHASE)*SCALES(JSOURC)*EXP(-2.*SSQRD*TFAC) *AMUL(KNOW)*FAC
+!        IF (LX) FAC=ALPCOR*V(2)*V(2) ! V(2) = Volume of reciprocal unit cell.
+        P1 = SCALEP(JPHASE)*SCALES(JSOURC)*EXP(-2.0*SSQRD*TFAC)*AMUL(KNOW)*FAC
 ! TFAC DERIVATIVE:
         L = KTFAC
-        IF (L.NE.0) DERIVA(L) = -2.*SSQRD
+        IF (L.NE.0) DERIVA(L) = -2.0*SSQRD
 ! SCALE DERIVATIVES:
         L = KSCALS(JSOURC)
-        IF (L.NE.0) DERIVA(L) = 1./SCALES(JSOURC)
+        IF (L .NE. 0) DERIVA(L) = 1.0/SCALES(JSOURC)
         L = KSCALP(JPHASE)
-        IF (L.NE.0) DERIVA(L) = 1./SCALEP(JPHASE)
+        IF (L .NE. 0) DERIVA(L) = 1.0/SCALEP(JPHASE)
 ! PREFERRED ORIENTATION:
-        IF (NPRTYP.GT.0) THEN
+        IF (NPRTYP .GT. 0) THEN
           L = KPRFPR
           CALL PREFOR(2)
-          P1 = P1*PRFCOR
-          IF (L.NE.0) DERIVA(L) = DERPRQ
+          P1 = P1 * PRFCOR
+          IF (L .NE. 0) DERIVA(L) = DERPRQ
         ENDIF
 ! IF X-RAY, MONOCHROMATOR ANGLE:
         IF (LX) THEN
           L = KTHMON(JSOURC)
-          IF (L.NE.0) DERIVA(L) = DLPCOR
+          IF (L .NE. 0) DERIVA(L) = DLPCOR
         ENDIF
 ! NEXT DO P2, THE PART DEPENDENT ON THE STRUCTURE FACTOR:
 ! IF CAIL, P2 IS SIMPLY F4PAR(1,KNOW):
         IF (CAIL .OR. APES) THEN
-          IF (KF4PAR(1,KNOW).EQ.0) THEN
-            F4PAR(1,KNOW) = 1.
+          IF (KF4PAR(1,KNOW) .EQ. 0) THEN
+            F4PAR(1,KNOW) = 1.0
           ELSE
-            DERIV4(1) = 1.
+            DERIV4(1) = 1.0
           ENDIF
-          IF (F4PAR(1,KNOW).NE.0.) DERIV4(1) = 1./F4PAR(1,KNOW)
+          IF (F4PAR(1,KNOW) .NE. 0.0) DERIV4(1) = 1.0/F4PAR(1,KNOW)
           P2 = F4PAR(1,KNOW)
         ELSE
 ! SET BASE FOR DERIVATIVES:
           III = LVFST1(2,JPHASE,1)
 ! NEW K:
 ! IF NO FAMILY 2 VARIABLES, NO NEED FOR LFCALC:
-          IF (L2.GT.0) THEN
+          IF (L2 .GT. 0) THEN
             CALL LFCALC(rHKL(1,KNOW))
-            F = 0.
-            IF (.NOT.TESTOV(2.,FCMOD)) F = 2./FCMOD
+            F = 0.0
+            IF (.NOT. TESTOV(2.0,FCMOD)) F = 2.0/FCMOD
             P2 = FCMOD*FCMOD
 ! CONVERT DERIVATIVES FOR FAMILY 2 FROM BEING 'OF FCMOD' TO 'OF P2'
 ! DP2/DV = DMODFC/DV * DP2/DMODFC - AND ALL ARE DIVIDED BY P2
@@ -6230,7 +6232,7 @@
       WRITE (LPT,2000) TTHMON(JSOURC)
  2000 FORMAT (/' Monochromator 2 theta angle = ',F10.5)
       GOTO 19
-! ENTRY FROM CALPR FOR LP CORRECTION:
+! Entry from CALPR for Lorentz-Polarisation correction for Lab X-ray data:
     2 DTEM = RADIAN(ARGI-ZEROSP(1,JPHASE,JSOURC))
       STEM = SIN(DTEM)
       CTEM = COS(DTEM)
