@@ -1,4 +1,4 @@
-! Winteracter module created : 12/Apr/2002 10:46:34
+! Winteracter module created : 25/Apr/2002 17:22:07
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -259,7 +259,6 @@
           INTEGER, PARAMETER :: IDF_SA_Project_Name             =  1110
           INTEGER, PARAMETER :: IDF_ZM_allpars                  =  1111
           INTEGER, PARAMETER :: IDB_SA_Project_Browse           =  1113
-          INTEGER, PARAMETER :: IDB_ZMatrix_Browse5             =  1123
           INTEGER, PARAMETER :: IDF_ZM_pars1                    =  1124
           INTEGER, PARAMETER :: IDF_ZM_pars2                    =  1125
           INTEGER, PARAMETER :: IDF_ZM_pars3                    =  1126
@@ -433,7 +432,6 @@
           INTEGER, PARAMETER :: IDF_PlotPeakFitDif              =  1133
           INTEGER, PARAMETER :: ID_ClearPeakFitRanges           = 40018
           INTEGER, PARAMETER :: IDB_ShowOverlap                 =  1137
-          INTEGER, PARAMETER :: IDB_ZmatrixDelete5              =  1149
           INTEGER, PARAMETER :: IDF_UseOriginal                 =  1164
           INTEGER, PARAMETER :: IDF_UseSolutionNr               =  1178
           INTEGER, PARAMETER :: IDF_ColourByElement             =  1200
@@ -457,8 +455,6 @@
           INTEGER, PARAMETER :: IDF_PO_a                        =  1229
           INTEGER, PARAMETER :: IDF_PO_b                        =  1236
           INTEGER, PARAMETER :: IDF_PO_c                        =  1237
-          INTEGER, PARAMETER :: IDD_TEMPLATE012                 =   135
-          INTEGER, PARAMETER :: IDF_RotationsGrid               =  1238
           INTEGER, PARAMETER :: IDF_Use_PO                      =  1240
           INTEGER, PARAMETER :: IDF_LABELa                      =  1243
           INTEGER, PARAMETER :: IDF_LABELb                      =  1251
@@ -513,14 +509,14 @@
           INTEGER, PARAMETER :: IDBSAVE                         =  1403
           INTEGER, PARAMETER :: IDB_Rotations                   =  1405
           INTEGER, PARAMETER :: IDD_zmEditRotations             =   165
-          INTEGER, PARAMETER :: IDF_CHECK1                      =  1406
-          INTEGER, PARAMETER :: IDF_INTEGER1                    =  1407
-          INTEGER, PARAMETER :: IDF_RADIO5                      =  1408
-          INTEGER, PARAMETER :: IDF_RADIO6                      =  1409
-          INTEGER, PARAMETER :: IDF_INTEGER2                    =  1413
-          INTEGER, PARAMETER :: IDF_a2                          =  1415
-          INTEGER, PARAMETER :: IDF_b2                          =  1416
-          INTEGER, PARAMETER :: IDF_c2                          =  1417
+          INTEGER, PARAMETER :: IDF_UseSingleAxis               =  1123
+          INTEGER, PARAMETER :: IDF_RotOrgAtomNr                =  1122
+          INTEGER, PARAMETER :: IDF_RotAxPlnAtm1                =  1118
+          INTEGER, PARAMETER :: IDF_RotAxPlnAtm2                =  1119
+          INTEGER, PARAMETER :: IDF_AtomNr                      =  1121
+          INTEGER, PARAMETER :: IDF_a                           =  1145
+          INTEGER, PARAMETER :: IDF_b                           =  1146
+          INTEGER, PARAMETER :: IDF_c                           =  1217
           INTEGER, PARAMETER :: IDD_DIALOG048                   =   166
           INTEGER, PARAMETER :: IDD_TabDataDefaults             =   170
           INTEGER, PARAMETER :: IDD_TabSAsetup                  =   167
@@ -606,4 +602,12 @@
           INTEGER, PARAMETER :: IDB_Select                      =  1112
           INTEGER, PARAMETER :: IDF_LABEL13                     =  1114
           INTEGER, PARAMETER :: ID_SaveXYE                      = 40027
+          INTEGER, PARAMETER :: IDF_RotAxAtom                   =  1115
+          INTEGER, PARAMETER :: IDF_RotAxFrac                   =  1116
+          INTEGER, PARAMETER :: IDF_RotAxPln                    =  1117
+          INTEGER, PARAMETER :: IDF_RotAxPlnAtm3                =  1120
+          INTEGER, PARAMETER :: IDF_RotOrgCOM                   =  1128
+          INTEGER, PARAMETER :: IDF_RotOrgAtom                  =  1134
+          INTEGER, PARAMETER :: IDB_ZMatrix_Browse5             = 20001
+          INTEGER, PARAMETER :: IDB_ZmatrixDelete5              = 20002
       END MODULE Druid_Header
