@@ -3,6 +3,7 @@
 ! Doesn't treat Sohnke groups any differently from any other space group and
 ! therefore sometimes get "unaligned" solutions.  Not everything behaves well 
 ! all the time, for example Pca21 has caused problems.
+!Nov2001 added nasty fix which will help with cases like Pca21
 !********************************************************************************
 	SUBROUTINE ALIGN()
 
@@ -165,7 +166,7 @@
 
      DO j = 1,3
        IF(InfiniteAxes(j) .EQ. 1) THEN
-        CoMMatrix(1,j) = 0.0
+        CoMMatrix(1,j) = 0.5
        END IF
      END DO
 
@@ -479,13 +480,13 @@
 
     SELECT CASE (Shift)
       CASE ('t')
-          CentreOfMass(3) = 0.000
+          CentreOfMass(3) = 0.500
           InfiniteAxes(3) = 1
       CASE ('s')
-          CentreOfMass(2) = 0.000
+          CentreOfMass(2) = 0.500
           InfiniteAxes(2) = 1        
       CASE ('r')
-          CentreOfMass(1) = 0.000
+          CentreOfMass(1) = 0.500
           InfiniteAxes(1) = 1
     END SELECT
     
