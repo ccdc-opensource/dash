@@ -528,7 +528,7 @@
       'L REFI PAWL'/                                                    &
       'L SORC ', A4/                                                    &
       'L WGHT 3')
-      CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
+      CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check, Item)
       IRtyp = 2 - Item
       WRITE(hFile,4246,ERR=999) IRTYP, XPMIN, XPMAX
  4246 FORMAT('L RTYP  'I3,2F10.3,'  0.001')
@@ -538,7 +538,7 @@
       IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
       WRITE(hFile,4260,ERR=999) ZeroPoint
  4260 FORMAT('L ZERO ',F10.5)
-      CALL WDialogGetReal(IDF_Slim_Parameter,SlimValue)
+      CALL WDialogGetReal(IDF_Slim_Parameter, SlimValue)
       WRITE(hFile,4270,ERR=999) ScalFac, SlimValue
  4270 FORMAT('L SCAL   ',F7.5,/                                         &
       'L SLIM ',F5.2,' '/                                               &
