@@ -14,7 +14,7 @@
 !  Definitions and array declarations.
 !
       INTEGER irow, iz, temprow
-      REAL yadd
+      REAL yadd, ydif
 	CHARACTER*255 Grid_Buffer
 	CHARACTER*75 filename
 	INCLUDE 'PARAMS.INC'
@@ -48,7 +48,7 @@
 	OPEN(unit=61, file=filename, status = 'old', err=999)
 	DO i = ipmin,ipmax
 		READ(61,20) xobsep(i), yobsep(i), ycalcep(i)
-20		FORMAT(3(f12.6))
+20		FORMAT(3(x, f12.4))
 	END DO
 	CLOSE(61)
 !
