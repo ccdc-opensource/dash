@@ -9,7 +9,6 @@
 ! Define some parameters to match those in the resource file
 !
       CHARACTER*80 SDIFile
-      CHARACTER*80 pikfile,ticfile,hcvfile
       REAL         rpos
       INTEGER      ipos
       INTEGER      IFlags
@@ -20,7 +19,6 @@
       INCLUDE 'statlog.inc'
 
       INTEGER IDFZMCheck(CheckSize),IZMNumber(CheckSize)
-
       INTEGER IDBZMBrowse(CheckSize),IDFZMpars(CheckSize),IDFZMFile(CheckSize)
       INTEGER II
 
@@ -100,12 +98,9 @@
 
 !.. If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
       IF (FromPawleyFit) THEN
-        pikfile = DashPikFile
-        ticfile = DashTicFile
-        hcvfile = DashHcvFile
-        CALL GETPIK(pikfile,LEN_TRIM(pikfile),IER)
-        CALL GET_LOGREF(ticfile,LEN_TRIM(ticfile),IER)
-        CALL GETHCV(hcvfile,LEN_TRIM(hcvfile),IER)
+        CALL GET_LOGREF(DashTicFile,LEN_TRIM(DashTicFile),IER)
+        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),IER)
+        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
       END IF
       CALL SA_Defaults()
       IDFZMCheck(1)=IDF_ZM_file_check1
@@ -600,9 +595,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE OPENHCVPIKTIC(SDIFile)
-!
-!C>> JCC Cell/Lattice declarations now in an include file
+      SUBROUTINE SDIFileLoad(SDIFile)
 
       USE VARIABLES
 
@@ -616,73 +609,67 @@
       COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
       INCLUDE 'statlog.inc'
 
-      CHARACTER(LEN = 80)           ::   dslfile
       CHARACTER(LEN = MaxPathLength) :: line, subline
 
       INTEGER nl
       CHARACTER*12 KeyChar
 
-      INTEGER i
-      INTEGER ihcver,iticer,ipiker,iloger,idsl, isst, ised, iactsgnum
-      LOGICAL gotdslfile
+      INTEGER i, KLEN
+      INTEGER ihcver,iticer,ipiker,iloger,idsler, isst, ised, iactsgnum
       INTEGER GetCrystalSystem_2 ! Function
+      INTEGER GETTIC ! Function
 
 !C>> JCC Set to success in all cases
       ihcver = 0
       iloger = 0
       iticer = 1
       ipiker = 0
-      idsl = 0
+      idsler = 0
       IF (LEN_TRIM(SDIFile) .GT. 80) THEN
         CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in OPENHCVPIKTIC')
       ENDIF
 ! Now open all the appropriate PIK, TIC and HCV files
       OPEN(11,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
       CALL sa_SetOutputFiles(SDIFile)
+      TicExists = .FALSE.
+      HcvExists = .FALSE.
       PikExists = .FALSE.
       RawExists = .FALSE.
-      HcvExists = .FALSE.
-      TicExists = .FALSE.
-! JvdS isn't gotdslfile initialised?
+      DslExists = .FALSE.
  10   line = ' '
       READ(11,'(A)',END=100) line
       nl = LEN_TRIM(line)
       CALL ILowerCase(line(:nl))
       CALL INextString(line,keychar)
       SELECT CASE (KeyChar(1:3))
-        CASE ('pik')
-          CALL ILocateString(line,isst,ised)
-!O          WRITE(DashPikFile,*) line(isst:nl)
-          DashPikFile(1:80) = line(isst:isst+79)
-          PikExists = .TRUE.
         CASE ('tic')
           CALL ILocateString(line,isst,ised)
-! JvdS I get strange results here when I use the debugger.
-! DashTicFile is 255 characters long. But not always.
-!O          WRITE(DashTicFile,*) line(isst:nl)
           DashTicFile(1:80) = line(isst:isst+79)
           TicExists = .TRUE.
         CASE ('hcv')
           CALL ILocateString(line,isst,ised)
-!O          WRITE(DashHcvFile,*) line(isst:nl)
           DashHcvFile(1:80) = line(isst:isst+79)
           HcvExists = .TRUE.
-!C>> JCC Additional file: 'dsl'. The selection file.
-!C>> This lists the peak selection data, shape parameters and experimental 
-!C>> data such as wavelength.
+        CASE ('pik')
+          CALL ILocateString(line,isst,ised)
+          DashPikFile(1:80) = line(isst:isst+79)
+          PikExists = .TRUE.
+        CASE ('raw')
+          CALL ILocateString(line,isst,ised)
+          DashRawFile(1:80) = line(isst:isst+79)
+          RawExists = .TRUE.      
         CASE ('dsl')
           CALL ILocateString(line,isst,ised)
-!O          WRITE(dslfile,*) line(isst:nl)
-          dslfile(1:80) = line(isst:isst+79)
-          gotdslfile = .TRUE.
+          DashDslFile(1:80) = line(isst:isst+79)
+          DslExists = .TRUE.
         CASE ('cel')
           DO I = 1, 6
-            CALL INextReal(line,cellpar(i))
+            CALL INextReal(line,CellPar(i))
           END DO
           CALL Upload_Cell_Constants()
         CASE ('spa')
           CALL INextInteger(line,NumberSGTable)
-!C>> JCC Need to set space group infor in the menus
+!C>> JCC Need to set space group info in the menus
 ! Get the lattice number
           CALL INextString(line,subline)
 !             call INextInteger(line,IActSGNum)
@@ -703,68 +690,27 @@
           CALL FillSymmetry()
         CASE ('paw')
           CALL INextReal(line,PawleyChiSq)
-        CASE ('raw')
-          CALL ILocateString(line,isst,ised)
-!O          WRITE(DashRawFile,*) line(isst:nl)
-          DashRawFile(1:80) = line(isst:isst+79)
-          RawExists = .TRUE.      
       END SELECT
       GOTO 10 
  100  CONTINUE
-        IF (GotDSLFile) CALL GETDSL(dslfile,LEN_TRIM(dslfile),idsl)
-      CALL Load_DashDataFiles
-!C>>  enable the buttons,
-      IF (.NOT. NoData) THEN
-        IF (idsl .EQ. 0) THEN
-          CALL SetModeMenuState(1,1,1)
-        ELSE
-          CALL SetModeMenuState(1,-1,1)
-        END IF
-      END IF
-!C>>  update the file name of the project in the SA pop up
-      CALL SetSAFileName(SDIFile(1:LEN_TRIM(SDIFile)))
-!
- 999  END SUBROUTINE OPENHCVPIKTIC
-!
-!*****************************************************************************
-!
-      SUBROUTINE Load_DashDataFiles
-
-      USE WINTERACTER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
-
-      INTEGER Load_Tic_File ! Function
-      INTEGER ipiker, iloger, iticer, ihcver
-      INTEGER klen
-
-      IF (PikExists) THEN
-        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
-        IF (ipiker .EQ. 0) THEN
-          CALL INF_UPLOAD()
-        ELSE
-          PikExists = .FALSE.
-        END IF
-      END IF
-! Load the TIC file
+      IF (DslExists) THEN
+        CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
+        DslExists = (idsler .EQ. 0)
+      ENDIF
       klen = LEN_TRIM(DashTicFile)
       IF (TicExists) THEN
         CALL GET_LOGREF(DashTicFile,klen,iloger)
-        iticer = Load_Tic_File(klen,DashTicFile)
+        iticer = GETTIC(klen,DashTicFile)
         IF (iticer .EQ. 0) TicExists = .FALSE.
-      END IF
+      ENDIF
       IF (HcvExists) THEN
         CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
-        IF (Ihcver .EQ. 1) THEN
-          HcvExists = .FALSE.
-        ELSE 
-          CALL INF_UPLOAD()
-        END IF
-      END IF
+        HcvExists = (ihcver .EQ. 0)
+      ENDIF
+      IF (PikExists) THEN
+        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
+        PikExists = (ipiker .EQ. 0)
+      ENDIF
 !C>> JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
 !C>> I moved it, since i wanted to check that all the data read in ok before calling it
       IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
@@ -776,9 +722,18 @@
         CALL Profile_Plot(IPTYPE) 
         NoData = .FALSE.
       ENDIF
-      RETURN
-
-      END SUBROUTINE Load_DashDataFiles
+!C>>  enable the buttons,
+      IF (.NOT. NoData) THEN
+        IF (idsler .EQ. 0) THEN
+          CALL SetModeMenuState(1,1,1)
+        ELSE
+          CALL SetModeMenuState(1,-1,1)
+        END IF
+      END IF
+!C>>  update the file name of the project in the SA pop up
+      CALL SetSAFileName(SDIFile(1:LEN_TRIM(SDIFile)))
+!
+ 999  END SUBROUTINE SDIFileLoad
 !
 !*****************************************************************************
 !
@@ -860,7 +815,7 @@
       DOUBLE PRECISION dcel(6)
 
       DO I = 1, 6
-        dcel(I) = DBLE(cellpar(I))
+        dcel(I) = DBLE(CellPar(I))
       END DO
       CALL frac2cart(f2cmat,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
@@ -994,7 +949,7 @@
         czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
-!
+
 ! Blow away the selected z-matrices
 ! JvdS Started to add SA to Wizard
 !      CALL WDialogSelect(IDD_SA_input1)

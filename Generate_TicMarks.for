@@ -16,35 +16,37 @@ C..   Check the lattice constants
 C..   Check the wavelength
 C..   Check the space group
 
+      IMPLICIT NONE
+
       INCLUDE 'statlog.inc' 
       INCLUDE 'Lattice.inc'
       INCLUDE 'GLBVAR.INC'
 
+      REAL XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,
+     &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, 
+     &XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,
      &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, 
      &XGGMIN,XGGMAX,YGGMIN,YGGMAX
 
+      INTEGER msymmin
       PARAMETER (msymmin=10)
+	INTEGER      nsymmin
+	REAL         symmin
       CHARACTER*20 symline
       COMMON /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
 
-      CHARACTER*80 ticfile
+      CHARACTER*80 TemTicFile
       LOGICAL Check_TicMark_Data
-      LOGICAL FnWavelengthOK ! Function
-      REAL    WavelengthOf ! Function
-      INTEGER I
+      INTEGER I, isym,  LenFil
       INTEGER TicRead
+	INTEGER GETTIC ! Function
 C
 !      write(76,*) ' Space group number         : ',SGNumStr(IPosSg)
 !      write(76,*) ' Space Group (IT tables)    : ',SGHMaStr(IPosSg)
 !      write(76,*) ' Space Group Hall symbol    : ',SGHalStr(IPosSg)
 !      write(76,*) ' Space Group explicit symbol: ',SGShmStr(IPosSg)
 C
-C.. We should only proceed with this if we have good cell constants 
-C.. If no wavelength then assume Cu Ka1 wvln=1.54056
-C..
-   
-C>> JCC
 C>> Need more checks here.
 C>> I think that everything should be set to continue
 C>> so I added in these checks. Everything should be bonafide before
@@ -55,15 +57,15 @@ C>> Now call fuller checking function
       OPEN(42,file='polyf.ccl',status='unknown')
       WRITE(42,4210) 
  4210 FORMAT('N Polyfitter file')
-      WRITE(42,4220) (CellPar(i),i=1,6)
- 4220 FORMAT ('C ',3f10.5,3f10.3)
+      WRITE(42,4220) (CellPar(I),I=1,6)
+ 4220 FORMAT ('C ',3F10.5,3F10.3)
       WRITE(42,4230) 
  4230 FORMAT('F C 2 2.31 20.8439 1.02 10.2075 ',
      &'1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0')
       IF (NumberSGTable .GE. 1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
-        IF (nsymmin.gt.0) THEN
-          DO isym=1,nsymmin
+        IF (nsymmin .GT. 0) THEN
+          DO isym = 1, nsymmin
             WRITE(42,4235) symline(isym)
  4235       FORMAT('S ',a)
           END DO
@@ -75,8 +77,7 @@ C>> Now call fuller checking function
      &'L SORC SYNX'/
      &'L WGHT 3')
       WRITE(42,4245) xpmin,xpmax
- 4245 FORMAT('L RTYP    2 ',2f10.3,'   0.001')
-      IF (.NOT. FnWavelengthOK()) ALambda = WavelengthOf('Cu')
+ 4245 FORMAT('L RTYP    2 ',2F10.3,'   0.001')
       WRITE(42,4250) ALambda
  4250 FORMAT('L WVLN ',F10.5)
       IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint=0.0
@@ -97,12 +98,9 @@ C>> Now call fuller checking function
      &'L VARY ALL BACK ')
       CLOSE(42)
       CALL Generate_TicMarks_CCSLcode
-      ticfile = 'polyf.tic'
+      TemTicFile = 'polyf.tic'
       lenfil = 9
-C>> JCC Was
-C      call Load_Tic_File(9,ticfile)
-C>> Now
-      TicRead =  Load_Tic_File(9,ticfile)
+      TicRead = GETTIC(9,TemTicFile)
       IF (TicRead .EQ. 1) CALL Profile_Plot(IPTYPE)
 
       END SUBROUTINE Generate_TicMarks
