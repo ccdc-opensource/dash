@@ -40,7 +40,7 @@
 
 
       CHARACTER(8) :: ProgramVersion
-      DATA ProgramVersion / 'DASH 4.0' /
+      DATA ProgramVersion / 'DASH 3.0' /
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER(MaxPathLength)  DashTicFile
