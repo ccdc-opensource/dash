@@ -149,7 +149,7 @@
 !                 so: 
 !                      AllPkPosVal(IOrdTem(     1)) = lowest  2 theta at which a peak has been fitted
 !                      AllPkPosVal(IOrdTem(NTPeak)) = highest 2 theta at which a peak has been fitted
-! IHPk          = the most probably h, k, l indices for this peak.
+! IHPk          = the most probable h, k, l indices for this peak.
 !
 ! Calculations are done in Upload_Positions()
 ! Note that they use a mixture of variables from /PEAKFIT1/, /PEAKFIT2/ and /ALLPEAKS/ 

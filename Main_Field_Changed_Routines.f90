@@ -409,7 +409,7 @@
               CALL WDialogGetReal(IDF_Indexing_Maxc, Cmax)
               MaxLen = MAX(amax,Bmax)
               MaxLen = MAX(MaxLen,Cmax)
-! JvdS @ add in very quick check: is the d-spacing belonging to the first peak greater
+! JvdS Add in very quick check: is the d-spacing belonging to the first peak greater
 ! than the maximum cell length requested? If so, tell user he is a moron.
 !     Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
               IF (TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1))) .GT. MaxLen) THEN
