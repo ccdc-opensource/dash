@@ -131,6 +131,7 @@
           ENDDO
           CALL VCOPY(EX,V,N)
           C(1) = CHIFUN(N,V(1,1))
+          !C Error: DSMALL does not exist, it should probably be D
           CALL SIMP0(V,DSMALL,C,IR,N,CHIFUN)
           CMIN = C(IR(N+1))
         ELSE
@@ -174,6 +175,7 @@
       ENDIF
       IF (CMIN.GT.CAIM .AND. .NOT.SLOW) GOTO 10
       CALL VCOPY(V(1,IR(N+1)),EX,N)
+
       END SUBROUTINE SIMPLEX
 !
 !*****************************************************************************
