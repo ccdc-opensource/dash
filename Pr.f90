@@ -5340,8 +5340,7 @@
               WRITE (LPT,2001) JPHASE, TYPEWD(METHOD(JPHASE))
  2001         FORMAT (/' Phase',I3,' : Refinement type ',A27)
             ELSE
-              CALL MESS(LPT,1,'Refinement type '//TYPEWD(METHOD(JPHASE))&
-     &                  )
+              CALL MESS(LPT,1,'Refinement type '//TYPEWD(METHOD(JPHASE)))
             ENDIF
           ENDIF
         ENDIF

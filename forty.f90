@@ -1,14 +1,10 @@
 !*==FORTY.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+      INTEGER FUNCTION FORTY(PNAME,ALSQ,MATSZ,PCXX,PFXX,MAGROU,CALROU,filnmr)
 !
+! This is the subroutine that does the Pawley refinement.
 !
-! LEVEL 14      SUBROUTINE FORTY(PNAME,ALSQ,MATSZ,PCXX,PFXX,MAGROU,CALROU)
-!>> JCC Was
-!      SUBROUTINE FORTY(PNAME,ALSQ,MATSZ,PCXX,PFXX,MAGROU,CALROU,filnmr)
-!>> Now
-      INTEGER FUNCTION FORTY(PNAME,ALSQ,MATSZ,PCXX,PFXX,MAGROU,CALROU,  &
-     &                       filnmr)
-!>> The declaration here is changed to a function, to enable the return
+! RETURNS : 1 for success
 !
 ! *** FORTY updated by JCM 15 JAN 93 ***
 !

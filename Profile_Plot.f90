@@ -16,6 +16,7 @@
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       INTEGER CurrentRange 
@@ -25,10 +26,6 @@
         IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT) 
 
       LOGICAL PlotBackground ! Function
-
-! IGrArea
-! IPgArea
-! IPgClipRectangle
 
 !   Setup hardcopy options
       IF (TheIPTYPE .LT. 0) THEN
@@ -128,6 +125,7 @@
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
         YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
         XGGMIN,XGGMAX,YGGMIN,YGGMAX
@@ -205,7 +203,7 @@
 
       CALL IGrSelect(1,0)
       CALL IGrArea(0.0,0.0,1.0,1.0)
-      CALL IGrUnits(0.,0.,1.,1.)
+      CALL IGrUnits(0.0,0.0,1.0,1.0)
       CALL IGrAreaClear
       CALL IGrCharSpacing('P')
       CALL IGrCharFont(3)
@@ -215,18 +213,18 @@
       CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
       CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
       IF ((xpgmax-xpgmin) .LE. 200.0) THEN
-        CALL IRealToString(xpgmin,statbarstr(4)(1:),'(f10.3)')
-        CALL IRealToString(xpgmax,statbarstr(5)(1:),'(f10.3)')
+        CALL IRealToString(xpgmin,statbarstr(4)(1:),'(F10.3)')
+        CALL IRealToString(xpgmax,statbarstr(5)(1:),'(F10.3)')
       ELSE
-        CALL IRealToString(xpgmin,statbarstr(4)(1:),'(f10.1)')
-        CALL IRealToString(xpgmax,statbarstr(5)(1:),'(f10.1)')
+        CALL IRealToString(xpgmin,statbarstr(4)(1:),'(F10.1)')
+        CALL IRealToString(xpgmax,statbarstr(5)(1:),'(F10.1)')
       END IF
       IF ((ypgmax-ypgmin) .LE. 100.0) THEN      
-        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(f10.3)')
-        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(f10.3)')
+        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(F10.3)')
+        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(F10.3)')
       ELSE
-        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(f10.1)')
-        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(f10.1)')
+        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(F10.1)')
+        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(F10.1)')
       END IF
       DO ISB = 4, 7
         CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
@@ -321,8 +319,8 @@
       sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
       sizmtem = MIN(marker_size,sizmtem)
       CALL IGrCharSize(sizmtem,sizmtem)
-      CALL IPgScatterPlot(xbin,yobin)
-!      CALL IPgXYPairs(xbin,yobin)
+      CALL IPgScatterPlot(XBIN,YOBIN)
+!      CALL IPgXYPairs(XBIN,YOBIN)
       CALL IGrColourN(KolNumMain)
 !
       ENDSUBROUTINE Plot_Observed_Profile
@@ -355,6 +353,7 @@
       SUBROUTINE Plot_ObsCalc_Profile()
 
       USE WINTERACTER
+      USE VARIABLES
 
       INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -372,16 +371,23 @@
 
       CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
-      CALL IPgNewPlot(PgPolyLine,3,NBIN)
+! The y-values of the difference profile.
       YADD = 0.5*(YPGMAX+YPGMIN)
       DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
         YDIF(II) = YADD + YOBIN(II) - YCBIN(II)
       END DO
+
+      CALL IPgNewPlot(PgPolyLine,3,NBIN)
       CALL IPgStyle(1,0,0,0,KolNumDif,0)
-      CALL IPgStyle(2,0,3,0,0,KolNumObs)
+! Q & D hack
+      IF (ConnectPointsObs) THEN
+        CALL IPgStyle(2,0,3,0,KolNumObs,KolNumObs)
+      ELSE
+        CALL IPgStyle(2,0,3,0,0,KolNumObs)
+      ENDIF
       CALL IPgStyle(3,0,0,0,KolNumCal,0)
 ! Now draw the difference plofile
-      CALL IPgXYPairs(XBIN,ydif)
+      CALL IPgXYPairs(XBIN,YDIF)
 ! The following four lines set the markers for the observed profile.
       CALL IPgMarker( 2, 13)
       sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
@@ -557,7 +563,9 @@
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),&
         uobstic(20,mobstic),zobstic(20,mobstic)
+
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
       COMMON /CHISTOP/ NOBSA,NFITA,IFITA(MCHSTP),CHIOBSA,&
         WTSA(MCHSTP),XOBSA(MCHSTP),YOBSA(MCHSTP),YCALA(MCHSTP),ESDA(MCHSTP)
       COMMON /chibest/ ycalbest(MCHSTP)
