@@ -216,15 +216,15 @@
       CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
       CALL WDialogPutReal(IDF_HPSL,   PeakShapeHPSL,     '(F10.4)')
       CALL WDialogPutReal(IDF_HMSL,   PeakShapeHMSL,     '(F10.4)')
-      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NOBS)
-      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,NumOfRef)
+      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts, NOBS)
+      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs, NumOfRef)
       MAXK = NumOfRef
       WLGTH = ALambda
-      CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
+      CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq, PAWLEYCHISQ, '(F12.3)')
       CALL Clear_SA
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
       CALL WDialogSelect(IDD_PW_Page8)
-      CALL WDialogFieldState(IDB_PrevRes,Disabled)
+      CALL WDialogFieldState(IDB_PrevRes, Disabled)
       CALL Update_TruncationLimits
       RETURN
  999  CALL ErrorMessage('Error reading .sdi file.')
