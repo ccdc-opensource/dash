@@ -254,7 +254,6 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
 
       LOGICAL FExists
       INTEGER KLEN
@@ -281,7 +280,6 @@
       CALL SetModeMenuState(1,1,1)
 !  update the file name of the project in the SA pop up
       CALL SetSAFileName(TheFileName(1:LEN_TRIM(TheFileName)))
-      NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
       
       END SUBROUTINE SDIFileOpen
 !
@@ -300,7 +298,6 @@
       INCLUDE 'Lattice.inc'
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
-      INCLUDE 'statlog.inc'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -385,7 +382,6 @@
 ! Set the crystal system
           LatBrav = GetCrystalSystem(NumberSGTable)
           CALL Upload_CrystalSystem
-          NumPawleyRef = 0
           CALL FillSymmetry()
         CASE ('paw')
           CALL INextReal(line,PAWLEYCHISQ)
@@ -412,12 +408,7 @@
         CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
         PikExists = (ipiker .EQ. 0)
       ENDIF
-      CurrentRange = 0
-      NumPeakFitRange = 0
-      DO I = 1, MAX_NPFR
-        NumInPFR(I) = 0
-        IPF_RPt(I) = 0
-      ENDDO
+      CALL Init_PeakFitRanges
 ! JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
 ! I moved it, since i wanted to check that all the data read in ok before calling it
       IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
@@ -443,6 +434,8 @@
 !*****************************************************************************
 !
       INTEGER FUNCTION GETTIC(FLEN,TheFileName)
+
+      IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (IN   ) :: FLEN
