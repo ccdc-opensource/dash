@@ -753,9 +753,6 @@
             CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtms(1,iFrg))
             CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtms(2,iFrg))
             CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtms(3,iFrg))
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotationAxis(1,iFrg))
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotationAxis(2,iFrg))
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotationAxis(3,iFrg))
             IF (RW .EQ. cWrite) THEN
               CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(0,iFrg)))
               CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(1,iFrg)))
