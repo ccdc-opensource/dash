@@ -247,7 +247,9 @@
                'terms and conditions of a valid software licence, obtainable'//CHAR(13)//&
                'from the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
                CHAR(13)//&
-               'Copyright February 2001'
+               'Version 2.0'//CHAR(13)//&
+               CHAR(13)//&
+               'Copyright February 2002'
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
 
       END SUBROUTINE About
