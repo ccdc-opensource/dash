@@ -34,8 +34,8 @@
 
       REAL ctem
       REAL tenow1, tenow2, ruler, rulex1, rulex2
-      REAL, PARAMETER ::  rminh = 0.01
-      REAL, PARAMETER ::  rmaxh = 0.99
+      REAL, PARAMETER :: rminh = 0.01
+      REAL, PARAMETER :: rmaxh = 0.99
       INTEGER I
 
       CALL WDialogSelect(IDD_SA_Action1)
