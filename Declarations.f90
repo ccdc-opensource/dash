@@ -319,6 +319,7 @@
 !         'C:\Program Files\CCDC\DASH 2.0\benzene_001.log'
 !         'C:\Program Files\CCDC\DASH 2.0\benzene_001.chi'
 !         'C:\Program Files\CCDC\DASH 2.0\benzene_001.cif'
+!         'C:\Program Files\CCDC\DASH 2.0\benzene_001.res'
 ! where 001 = SA_RunNumberStr = SA_Run_Number in format '(I3.3)'
 
       END SUBROUTINE FoolCompiler
