@@ -628,7 +628,8 @@
             CASE (IDOK, IDCANCEL)
               CALL WDialogHide
               !C Update the main Rietveld window
-              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+              PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
+              IF (PrefParExists) THEN
                 tFieldState = Enabled
               ELSE
                 tFieldState = Disabled
@@ -636,9 +637,7 @@
               CALL WDialogSelect(IDD_Rietveld2)
               CALL WDialogFieldState(IDC_PO,tFieldState)
               CALL WDialogFieldState(IDR_PO,tFieldState)
-              CALL WDialogSelect(IDD_RR_PO_Dialog)
               !C Initialise preferred orientation and recalculate pattern + chi-sqrds
-              PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
               ! Initialise PO
               IF (PrefParExists) THEN
   !              CALL WDialogGetInteger(IDF_PO_a,iH)
