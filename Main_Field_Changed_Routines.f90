@@ -602,7 +602,9 @@
 ! Pop up a window showing the DICVOL output file in a text editor
       CALL WindowOpenChild(IHANDLE)
       CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+      CALL SetChildWinAutoClose(IHANDLE)
       IF (NumOfDICVOLSolutions .EQ. 0) THEN
+        CALL ErrorMessage('No solutions were found.')
         CALL PopActiveWindowID
         RETURN
       ENDIF

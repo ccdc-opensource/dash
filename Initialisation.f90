@@ -428,16 +428,28 @@
       INCLUDE 'Poly_Colours.inc'
       INCLUDE 'DialogPosCmn.inc'
 
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
+
+      LOGICAL         ChildWinAutoClose
+      COMMON /ChWAC/  ChildWinAutoClose(1:20)
 
       REAL    WaveLengthOf ! Function
 
+      DO I = 1, 20
+        ChildWinAutoClose(I) = .FALSE.
+      ENDDO
       DashRawFile = ' '
       DashHcvFile = ' '
       DashPikFile = ' '
