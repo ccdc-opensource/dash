@@ -3,10 +3,9 @@
 !   called from SASummary.for
 !	This subroutine manipulates the data required to plot the observed  
 !   diffraction pattern with the calculated pattern and difference.  The
-!   data is read in from the .pro file and stored in COMMON BLOCK Plotlink
-!   as x_store and y_store.  The array Link (also stored in Plotlink common
-!   block) relates the childwindow identifier to the correct y data.
-
+!   data is read in from the .pro file and stored in COMMON BLOCK ProFilePLotStore
+!  ihandle is used to identify the column of the store_ arrays where the data
+!  for each child window (ihandle) is stored
 
       USE WINTERACTER
 	  USE Druid_header
@@ -16,25 +15,30 @@
 !
       INTEGER irow, iz, temprow
       REAL yadd
-	  CHARACTER*255 Grid_Buffer
-	  CHARACTER*75 filename
-	  INCLUDE 'PARAMS.INC'
-	  DIMENSION xobsep(MOBS)
-	  DIMENSION yobsep(MOBS)
-	  DIMENSION ycalcep(MOBS)
-	  DIMENSION ydif(MOBS)
+	CHARACTER*255 Grid_Buffer
+	CHARACTER*75 filename
+	INCLUDE 'PARAMS.INC'
+	DIMENSION xobsep(MOBS)
+	DIMENSION yobsep(MOBS)
+	DIMENSION ycalcep(MOBS)
+	DIMENSION ydif(MOBS)
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
       YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
       XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-        INTEGER link
-	  REAL store_x, store_y
-!     the store_y array size means a maximum of 30 runs can be performed at once
-	  COMMON /plotlink/ link(30), store_x(MOBS,3), store_y(MOBS,90)
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
+      YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+! Used to manage the child windows which display the profile plots
+      INTEGER SAUsedChildWindows
+      COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
+      REAL store_ycalc, store_diff
+! the number of columns in the store-arrays is set to the maximum number of 
+! child windows allowed
+      COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
 !
 !   reading in the data from the saved .pro files
 !
-	temprow = irow
+      temprow = irow
 !
 	CALL WGridGetCellString(IDF_SA_Summary,1,temprow,Grid_Buffer)
 	Iz = len_trim(Grid_Buffer)
@@ -55,31 +59,23 @@
       YDIF(II)=YADD+yobsep(II)-ycalcep(II)
       END DO
 !
-!   Configure the x data for plotting function
-!
-	DO ik = ipmin,ipmax
-		DO ij = 1, 3
-        store_x(ik,ij) = xobsep(ik)
-		END DO
-	END DO
 !
 !   open the plotting window, ihandle is the window's unique identifier
 !	
 	CALL WindowOpenChild(ihandle, x=10, y=450, width=800, height=400, title=filename)
-	CALL WindowSelect(ihandle)
+      IF(ihandle.eq.-1) THEN
+        CALL ErrorMessage("Exceeded Maximum Number of Allowed Windows.  Close a profile window")
+        RETURN
+      END IF 
+      SAUsedChildWindows(ihandle) = 1
+      CALL WindowSelect(ihandle)
 !
-!   Calculate link(ihandle). The Link array provides a link between the child window
-!   identifier (ihandle) and its store_y data. There are 3 columns of store_y data for
-!   each childwindow, and link(ihandle) is the number of the first column of data. 
-! 
-    link(ihandle) = (ihandle*3)-2
 !
 !   configuring y data for plotting
 !
 	DO in = ipmin, ipmax
-       store_y(in,link(ihandle)) = yobsep(in)
-	   store_y(in,(link(ihandle)+1)) = ycalcep(in)
-	   store_y(in,(link(ihandle)+2)) = ydif(in)
+	   store_ycalc(in,(ihandle)) = ycalcep(in)
+	   store_diff(in,(ihandle)) = ydif(in)
 	END DO   	
 !   call subroutine which plots data
     CALL plot_pro_file(ihandle)    
@@ -90,27 +86,6 @@
       RETURN
       END SUBROUTINE organise_sa_result_data
 
-!***********************************************************************************
-     
-	 
-	  subroutine replot_pro_file(ihandle)
-! ep July 2001
-!     When the profile plots, generated from the "view" button of the 
-!     IDD_SA_Multi_completed_ep grid are resized or exposed this subroutine 
-!     handles the replotting of them 
-
-      USE WINTERACTER
-	  Use Druid_header
-!
-      integer ihandle
-!
-!  select the correct window for redrawing	
-	 call windowselect(ihandle)
-!    
-	 call plot_pro_file(ihandle)
-	 end subroutine replot_pro_file
-
-
 !*************************************************************************************************
 
 
@@ -119,6 +94,8 @@
 
 	  USE WINTERACTER
 	  Use Druid_header
+
+	integer, INTENT (IN   ) :: ihandle
 !
 !
 !  Definitions and array declarations.
@@ -126,15 +103,18 @@
       INTEGER,PARAMETER :: NSETS   =     3
       INTEGER           :: ISET
       INCLUDE 'PARAMS.INC'
-	integer ihandle
+      INCLUDE 'Poly_Colours.inc'
+
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
       YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
       XGGMIN,XGGMAX,YGGMIN,YGGMAX
 	COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      INTEGER Link
-      REAL store_x, store_y
-	COMMON /plotlink/ link(30), store_x(MOBS,3), store_y(MOBS,90)
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
+      YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      REAL store_ycalc, store_diff
+      COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
 
+      call WindowSelect(ihandle)
 !  Start of all the plotting calls
 
 	call IGrArea(0.0, 0.0, 1.0, 1.0)
@@ -149,9 +129,9 @@
 !
 !  Set style for each data set
 !
-      CALL IPgStyle(  1,  1,  0,  0,      32,      64)
-      CALL IPgStyle(  2,  0,  0,  0,     223,     101)
-      CALL IPgStyle(  3,  0,  0,  0,     176,     139)
+      CALL IPgStyle(  1,  1,  0,  0,     KolNumObs)
+      CALL IPgStyle(  2,  0,  0,  0,     KolNumCal)
+      CALL IPgStyle(  3,  0,  0,  0,     KolNumDif)
 !
 !  Set marker number for data sets not using default marker
 !
@@ -171,7 +151,7 @@
       CALL IGrCharFont(       1)
       CALL IGrCharSpacing('F')
       CALL IGrCharSize(  .75,  0.75)
-      CALL IGrColourN(223)
+      CALL IGrColourN(KolNumMain)
       CALL IPgTitle('Simulated Annealing Results','C')
 !
 !  Label bottom X axis
@@ -186,12 +166,12 @@
 !
 !  Draw axes
 !
-      CALL IGrColourN(223)
+      CALL IGrColourN(KolNumMain)
       CALL IPgBorder()
 !
 !  Adjust tick position for X Axes
 !
-      CALL IPgXTickPos(     0.0000    ,     1.0000    )
+!     CALL IPgXTickPos(     0.0000    ,     1.0000    )
 !
 !  Scale for bottom X Axis
 !
@@ -204,7 +184,7 @@
 !
 !  Adjust tick position for Y Axes
 !
-      CALL IPgYTickPos(     0.0000    ,     1.0000    )
+!      CALL IPgYTickPos(     0.0000    ,     1.0000    )
 !
 !  Scale for left Y Axis
 !
@@ -217,8 +197,11 @@
 !
 !  Draw graph.
 !
-      DO ISET = 1,NSETS
-          CALL IPgXYPairs(store_x(1,ISET),store_y(link(ihandle),(link(ihandle)-1+ISET)))
-      END DO
+!      DO ISET = 1,NSETS
+!          CALL IPgXYPairs(store_x(1,ISET),store_y(link(ihandle),(link(ihandle)-1+ISET)))
+!      END DO
+          CALL IPgXYPairs(xobs(1),yobs(1))
+          CALL IPgXYPairs(xobs(1),store_ycalc(ihandle,ihandle))
+          CALL IPgXYPairs(xobs(1),store_diff(ihandle,ihandle))
 
       end subroutine plot_pro_file
