@@ -123,11 +123,11 @@
       INTEGER IBMBER
       COMMON /CCSLER/ IBMBER
 
+  !    CALL DebugRoutine
 ! JvdS I set ZBAKIN to .TRUE.
 ! With the excluded regions code reinstated, this is necessary to 
 ! ensure that we obtain the same results as with the release version.
       ZBAKIN = .TRUE.
-      ICalled = 0
 ! JCC Initialise return value to successful (=1) any other value is failure
       FORTY = 1
       IPK = 0
@@ -195,11 +195,13 @@
 ! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
         IF (.NOT.RIET) CALL FAM4PR(2,PCXX,PFXX)
+        IF (IBMBER.GT.0) GOTO 950
         CALL VARMAK(DFLTPR,RUNPAR,VARSPR)
 !* this won't actually do - we want varspm if magnetic
 ! FOR NOW, IMPOSE PHASE 1, SOURCE 1 WHICH WE HOPE STAY THERE:
         JPHASE = 1
         JSOURC = 1
+        IF (IBMBER.GT.0) GOTO 950
 ! IF ANY SLACK CONSTRAINTS, SET UP:
         CALL GEOMCO(1)
 ! JCC Trap for any problems
@@ -356,6 +358,7 @@
 ! JCC Trap for any problems
 	IF (IBMBER .GT. 0) CALL DebugErrorMessage('Error in FORTY after HKLOUT')
       IBMBER = 0   ! Ignore a problem that can occur in HKLOUT - Ken/Bill to check out please
+  !    CALL DebugRoutine
       RETURN
 ! JCC Added in error handling here
   900 CONTINUE

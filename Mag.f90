@@ -818,22 +818,17 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
       COMMON /SYMMAG/ MTSYM(25), MSTAB(24), NMSYM, NFAC, OTRSYM(3,3,25),&
-     &                MTYP, NDOM, FERO, FERA, HELI, AMOD, ANTI, MODUL,  &
-     &                KOM20
+     &                MTYP, NDOM, FERO, FERA, HELI, AMOD, ANTI, MODUL, KOM20
       LOGICAL FERO, FERA, HELI, AMOD, ANTI, MODUL
-      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
+      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3), KOM22
 !
       IF (MODE.EQ.1) GOTO 20
-!
 !  INITIALISE
       CALL JGMZER(MTSYM,1,NOPC)
       CALL JGMZER(MSTAB,1,NOPC)
       GOTO 100
-!
 !  ENTRY TO PUT IN ONE MAGNETIC SYMMETRY OPERATOR
       ENTRY MELIN(IOP,VAL)
       IO = IABS(IOP)
@@ -849,7 +844,6 @@
         MSTAB(IO) = ISIGN(1,IFIX(VAL))
       ENDIF
       GOTO 100
-!
 !  ENTRY TO ADD A NON-SYMMETRIC ROTATION
       ENTRY NELIN(IOP,SROT)
       IO = IOP
@@ -859,7 +853,6 @@
       IF (IOP.EQ.-1) IOP = 1
       MSTAB(IOP) = 100
       GOTO 100
-!
 ! FORM THE REST OF THE MAGNETIC OPERATORS FROM THE MULTIPLICATION TABLE
    20 DO IO = 1, NOPC
         IF (MSTAB(IO).EQ.100) THEN
@@ -877,19 +870,15 @@
         IF (MSTAB(1).EQ.0) THEN
           CALL MESS(LPT,1,'No centre of symmetry in the magnetic group')
           IF (NSTAB(1).EQ.0) THEN
-            CALL ERRMES(1,2,                                            &
-     &    'No spin rotation given for centrosymmetrically related atoms'&
-     &    )
+            CALL ERRMES(1,2,'No spin rotation given for centrosymmetrically related atoms')
           ELSE
             WRITE (LPT,2031) ((OTRSYM(I,J,25),I=1,3),J=1,3)
- 2031       FORMAT (/' Spin rotation for centro-symmetrically related', &
-     &              ' atoms is: ',3F6.2,2(/58X,3F6.2))
+ 2031       FORMAT (/' Spin rotation for centro-symmetrically related',' atoms is: ',3F6.2,2(/58X,3F6.2))
           ENDIF
         ELSE
           CALL GMUNI(OTRSYM(1,1,25),3)
           MSTAB(1) = ISIGN(1,MSTAB(1))
-          IF (MSTAB(1).LT.0) CALL GMREV(OTRSYM(1,1,25),OTRSYM(1,1,25),3,&
-     &                                  3)
+          IF (MSTAB(1).LT.0) CALL GMREV(OTRSYM(1,1,25),OTRSYM(1,1,25),3,3)
           MTSYM(25) = MSTAB(1)
         ENDIF
       ENDIF
@@ -911,11 +900,8 @@
 ! NUMBER OF ORIENTATION DOMAINS
       NDOM = NOPC/NMSYM
       MJTAB(1) = MSTAB(1)
-!
-!
       WRITE (LPT,2001) (I,MTSYM(I),I=1,NOPC)
- 2001 FORMAT (/' Magnetic symmetry operators: ',12(I3,' =',I3)/31X,     &
-     &        12(I3,' =',I3))
+ 2001 FORMAT (/' Magnetic symmetry operators: ',12(I3,' =',I3)/31X,12(I3,' =',I3))
       IF (CENTRC) WRITE (LPT,2002) MSTAB(1)
  2002 FORMAT (/31X,' Centre of symmetry =',I3)
 !
@@ -930,11 +916,9 @@
         CALL GMPRD(OTRSYM(1,1,1),TEMP,OTRSYM(1,1,NO),3,3,3)
    27 ENDDO
       CALL GMUNI(OTRSYM(1,1,1),3)
-!
       CALL FACTGP(MJTAB,MSTAB,NFAC)
       WRITE (LPT,2003) (I,MSTAB(I),I=1,NOPC)
- 2003 FORMAT (/' Magnetic symmetry table : ',12(I3,' =',I3)/28X,        &
-     &        12(I3,' =',I3))
+ 2003 FORMAT (/' Magnetic symmetry table : ',12(I3,' =',I3)/28X,12(I3,' =',I3))
 !
 !  NOW DEAL WITH NON-SYMMETRIC ROTATIONS
       DO NO = 2, NOPC
@@ -942,9 +926,7 @@
         IF (IOPP.EQ.1) GOTO 43
         IF (IOPP.EQ.NO) THEN
           IF (NSTAB(NO).NE.1) THEN
-            CALL ERRIN2(NO,1,                                           &
-     &          'Missing non-symmetric spin rotation for element number'&
-     &          ,' ')
+            CALL ERRIN2(NO,1,'Missing non-symmetric spin rotation for element number',' ')
           ELSE
             WRITE (LPT,2004) NO, ((OTRSYM(I,J,NO),I=1,3),J=1,3)
  2004       FORMAT (/' Non-symmetric spin rotation for element number', &
@@ -952,17 +934,12 @@
           ENDIF
         ELSE
           IX = MULTAB(NO,INVERS(IOPP))
-          IF (MSTAB(IX).EQ.0)                                           &
-     &         CALL ERRMES(-1,0,'Logical error in MAGSYM - bad tables')
-!
-          CALL GMPRD(OTRSYM(1,1,IX),OTRSYM(1,1,IOPP),OTRSYM(1,1,NO),3,3,&
-     &               3)
+          IF (MSTAB(IX).EQ.0) CALL ERRMES(-1,0,'Logical error in MAGSYM - bad tables')
+          CALL GMPRD(OTRSYM(1,1,IX),OTRSYM(1,1,IOPP),OTRSYM(1,1,NO),3,3,3)
         ENDIF
-        IF (MSTAB(NO).LT.0) CALL GMREV(OTRSYM(1,1,NO),OTRSYM(1,1,NO),3, &
-     &                                 3)
+        IF (MSTAB(NO).LT.0) CALL GMREV(OTRSYM(1,1,NO),OTRSYM(1,1,NO),3,3)
    43 ENDDO
       GOTO 100
-!
 !  ENTRY TO OPERATE WITH MAGNETIC SYMMETRY
       ENTRY ROTMAG(S,RS,IOP)
 !  DONT ROTATE IF FERROMAGNETIC
@@ -973,8 +950,6 @@
           CALL GMPRD(OTRSYM(1,1,IOP),S(1,I),RS(1,I),3,3,1)
         ENDDO
       ENDIF
-      GOTO 100
-!
   100 RETURN
       END SUBROUTINE MAGSYM
 !*==MF5ADD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
@@ -1067,8 +1042,7 @@
    10 CALL FINDCD('Q','PROP',4,0,LCD)
       IF (LCD.GT.0) THEN
         CALL RDNUMS(FIX3,7,3,NUM,IER)
-        IF (IER.NE.0 .OR. NUM.NE.3)                                     &
-     &       CALL ERRMES(1,1,'reading propagation vector')
+        IF (IER.NE.0 .OR. NUM.NE.3) CALL ERRMES(1,1,'reading propagation vector')
         CALL PROPER(FIX3)
         INOUT = 1
       ELSE
@@ -1082,7 +1056,6 @@
       DO K = 1, 3
         NFIX3(K) = 9999
       ENDDO
-!
       IF (IPROP.LE.0 .OR. IPROP.EQ.2) GOTO 23
       CALL JGMZER(ITAB,1,NOPC)
       ITAB(1) = 1
@@ -1105,7 +1078,6 @@
         CALL FIXPAR(I,NFIX3)
       ENDDO
       GOTO 26
-!
 ! TAKE FIRST (OF POSSIBLE 2) SYMMETRY ELEMENTS MAKING THIS POSITION SPECIAL:
    24 DO I = 2, 3
         K = IABS(JGEN(I))
@@ -1122,12 +1094,10 @@
       ENDDO
       CALL FIXREL(3,NFIX3,FIX3,NCOUNT,5)
       GOTO 100
-!
 ! APPLY SHIFT
    30 IF (INOUT.GT.3) GOTO 100
       CALL ADJUST(PROP(INOUT))
       GOTO 100
-!
 ! WRITE NEW Q PROP CARD
    40 IF (ICARD(3:6).NE.'PROP') THEN
         L = LENGT(ICARD)
@@ -1138,7 +1108,6 @@
  4000   FORMAT ('Q PROP',3F10.4)
       ENDIF
       GOTO 100
-!
 ! TO SET ALL COMPONENTS FIXED, OR VARY ONE:
    60 N = IABS(MODE)
       IF (N.EQ.0) THEN
@@ -1149,7 +1118,6 @@
         IF (N.GT.3) GOTO 100
         KPROP(N) = INOUT
       ENDIF
-!
   100 RETURN
       END SUBROUTINE PROPAG
 !*==PROPER.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
@@ -1199,13 +1167,10 @@
       COMMON /SATELL/ PROP(3), KPROP(3), KSTAB(24), NKSTAR, IPROP,      &
      &                FKSTAR, NKC, KCENT, INCOM, KOM21
       LOGICAL INCOM
-!
       KSTARS = .FALSE.
       GOTO 2
-!
       ENTRY KSTAR(AKVEC,BKSTAR)
       KSTARS = .TRUE.
-!
     2 CALL GMEQ(AKVEC,PROP,3,1)
       IPROP = 0
       IF (ABS(PROP(1))+ABS(PROP(2))+ABS(PROP(3)).LT..00001) GOTO 3
@@ -1238,7 +1203,6 @@
           KSTAB(I) = M*ISIG
         ENDIF
       ENDDO
-!
       NKC = MN
 !  CHECK CENTRE OF SYMMETRY
       KCENT = 1
@@ -1251,7 +1215,6 @@
       ELSE
         KSTAB(1) = MN
       ENDIF
-!
       WRITE (LPT,2000) (KSTAB(I),I=1,NOPC)
  2000 FORMAT (' Group of K :',24I4)
       WRITE (LPT,2001) ((AKSTAR(I,J),I=1,3),J=1,NKC)
@@ -1263,7 +1226,7 @@
       FKSTAR = FKSTAR/FLOAT(KCENT)
       INCOM = (KCENT.EQ.2)
       IF (KSTARS) CALL GMEQ(AKSTAR,BKSTAR,3,NKC)
-      RETURN
+
       END SUBROUTINE PROPER
 !*==PSICON.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -1350,7 +1313,6 @@
       CALL JGMZER(IPSFIX,NPSI,1)
       ICENT = 1
       IF (CENTRC .AND. MSTAB(1).GT.0) ICENT = 2
-!
 ! LOOP OVER ELEMENTS NOT IN THE MAGNETIC GROUP
       N = 1
       ISIG = 1
@@ -1370,8 +1332,7 @@
         ENDIF
         CALL EQPPOS(XEQ,XR,N,M,24)
         IF (M.GT.N) THEN
-          CALL ERRCHK(1,M,NPSI,1,'non-equivalent sublattices for'//     &
-     &                ATNAME(IAT))
+          CALL ERRCHK(1,M,NPSI,1,'non-equivalent sublattices for'//ATNAME(IAT))
         ENDIF
         CALL GMSUB(XEQ(1,M),XR,CELLT,3,1)
 ! Caution this is in radians!
@@ -1381,8 +1342,7 @@
           TPTAB(NOPC+1,MGAT) = T
           IF (M.GT.N) THEN
             N = 2*N
-            CALL ERRCHK(1,N,NPSI,1,'non-equivalent sublattices for'//   &
-     &                  ATNAME(IAT))
+            CALL ERRCHK(1,N,NPSI,1,'non-equivalent sublattices for'//ATNAME(IAT))
           ENDIF
 ! SET IPTAB(NOPC+1) TO GIVE THE OFFSET OF THE SUBLATTICE NUMBERS
 ! OF THE CENTROSYMMETRIC OPERATORS
@@ -1398,9 +1358,7 @@
         ENDIF
     2 ENDDO
       NPHI(MGAT) = N
-!
 ! NOW AMALGAMATE INFORMATION READ WITH THESE RELATIONSHIPS
-!
       DO I = 1, NPSI
 ! FIND THE OPERATOR NUMBER
         NO = LTPHI(I)
@@ -1409,8 +1367,7 @@
           DO J = 1, I - 1
             IF (NO.EQ.LTPHI(J)) THEN
               CALL ERRIN2(NO,-1,                                        &
-     &                'Phase given for sublattice generated by operator'&
-     &                ,' is redundant')
+     &                'Phase given for sublattice generated by operator',' is redundant')
               GOTO 10
             ENDIF
           ENDDO
@@ -1421,7 +1378,7 @@
           IPSFIX(IPSI) = IPSI
         ENDIF
    10 ENDDO
-      RETURN
+
       END SUBROUTINE PSICON
 !*==SETFCM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -1479,7 +1436,7 @@
       CALL SETFOR
       CALL SETANI
       IF (IERR.NE.0) CALL ERRMES(1,0,'in SETFCM')
-      RETURN
+
       END SUBROUTINE SETFCM
 !*==SPHELI.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -1544,7 +1501,6 @@
             KK(M) = KPAK(2,IM,12+NPSI+N,1,1)
     1     ENDDO
         ENDDO
-!
         IF (M.LE.1) GOTO 100
 ! SCALED SHIFTS MUST ADD TO ZERO
         C(1) = -C(1)
@@ -1581,7 +1537,7 @@
 !A             columns 2 and 3.
 !
       DIMENSION SD(3,MODE)
-!
+
       SA1 = SIN(RADIAN(ANG1))
       SA2 = SIN(RADIAN(ANG2))
       CA1 = COS(RADIAN(ANG1))
@@ -1598,6 +1554,5 @@
         SD(2,3) = RADIAN(SA1*CA2)
         SD(3,3) = 0.
       ENDIF
-!
-      RETURN
+
       END SUBROUTINE SPHPOL

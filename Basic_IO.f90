@@ -1,33 +1,28 @@
-!
-!*****************************************************************************
-!
-      SUBROUTINE DebugRoutine(ALSQ,MATSZ)
-
-      IMPLICIT NONE
-
-      INTEGER MATSZ
-      REAL ALSQ
-      DIMENSION ALSQ(MATSZ)
-
-      INCLUDE 'PARAMS.INC'
-
-      INTEGER         MATPNT
-      REAL                         BLSQ
-      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
-    
-      INTEGER I
-
-      OPEN(UNIT=10,FILE='Debug.txt',ERR=999)
-      WRITE(10,'(A,I3)',ERR=999) 'MATSZ = ',MATSZ
-      DO I = 1, MATSZ
-        WRITE(10,'(F15.9)',ERR=999) ALSQ(I)
-      ENDDO
-      CLOSE(10)
-      RETURN
-  999 CALL DebugErrorMessage('Error while accessing debug file')
-      CLOSE(10)
-
-      END SUBROUTINE DebugRoutine
+!U!
+!U!*****************************************************************************
+!U!
+!U      SUBROUTINE DebugRoutine
+!U
+!U      IMPLICIT NONE
+!U
+!U      INCLUDE 'PARAMS.INC'
+!U
+!U      INTEGER         MATPNT
+!U      REAL                         BLSQ
+!U      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
+!U    
+!U      INTEGER I
+!U
+!U      OPEN(UNIT=10,FILE='Debug.txt',ERR=999)
+!U      DO I = 1, MaxBVar
+!U        WRITE(10,'(F15.9)',ERR=999) BLSQ(I)
+!U      ENDDO
+!U      CLOSE(10)
+!U      RETURN
+!U  999 CALL DebugErrorMessage('Error while accessing debug file')
+!U      CLOSE(10)
+!U
+!U      END SUBROUTINE DebugRoutine
 !
 !*****************************************************************************
 !
@@ -58,7 +53,7 @@
       
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
-      !RETURN
+      RETURN
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Debug Error")
 
       END SUBROUTINE DebugErrorMessage
