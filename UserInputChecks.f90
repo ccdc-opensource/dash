@@ -7,11 +7,11 @@
 !
 ! JvdS 29 July 2001
 !
-! RETURNS : .TRUE.  if the value of 'alambda' can be used
-!           .FALSE. if the value of 'alambda' is ridiculous
+! RETURNS : .TRUE.  if the value of 'ALambda' can be used
+!           .FALSE. if the value of 'ALambda' is ridiculous
 !
-      INCLUDE 'lattice.inc' ! Contains wavelength
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
+      INCLUDE 'lattice.inc' ! Contains wavelength
 
       FnWavelengthOK = ((ALambda .GT. 0.1) .AND. (ALambda .LT. 20.0))
 
@@ -38,6 +38,31 @@
 !
 !*****************************************************************************
 !
+      REAL FUNCTION UnitCellVolume(The_a, The_b, The_c, TheAlpha, TheBeta, TheGamma)
+!
+! Calculates the unit cell volume given the unit cell parameters.
+!
+! JvdS Oct 2001
+!
+! RETURNS : Unit cell volume
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) ::  The_a, The_b, The_c, TheAlpha, TheBeta, TheGamma
+
+      REAL    calp, cbet, cgam, arg
+      REAL, EXTERNAL :: Degrees2Radians
+      
+      calp = COS(Degrees2Radians(TheAlpha))
+      cbet = COS(Degrees2Radians(TheBeta))
+      cgam = COS(Degrees2Radians(TheGamma))
+      arg = 1.0 + 2.0*calp*cbet*cgam-(calp**2+cbet**2+cgam**2)
+      UnitCellVolume = The_a*The_b*The_c*SQRT(MAX(0.0,arg))
+
+      END FUNCTION UnitCellVolume
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION FnUnitCellOK()
 !
 ! Checks if all cell parameters available and acceptable
@@ -53,32 +78,21 @@
       INCLUDE 'lattice.inc'
 
       INTEGER I
-      REAL    a,b,c,d2r,calp,cbet,cgam,arg,vcell
-      LOGICAL ValidCellAxisLength ! Function
+      LOGICAL, EXTERNAL :: ValidCellAxisLength
+      REAL,    EXTERNAL :: UnitCellVolume
       
 ! Initialise to 'unit cell is not OK'
       FnUnitCellOK = .FALSE.
 ! Check if the user has at least entered a value for every cell parameter
       DO I = 1, 3
         IF (.NOT. ValidCellAxisLength(CellPar(I))) RETURN
-      END DO
+      ENDDO
       DO I = 4, 6
-        IF (CellPar(I) .LT. 0.000001) RETURN
-      END DO
+        IF (CellPar(I) .LT. 0.001) RETURN
+      ENDDO
 ! Check if the unit cell volume makes sense
-! d2r converts degrees to radians
-      d2r = ATAN(1.0)/45.0
-      a = cellpar(1)
-      b = cellpar(2)
-      c = cellpar(3)
-      calp = COS(d2r*cellpar(4))
-      cbet = COS(d2r*cellpar(5))
-      cgam = COS(d2r*cellpar(6))
-      arg = 1.0 + 2.0*calp*cbet*cgam-(calp**2+cbet**2+cgam**2)
-      VCELL = a*b*c*SQRT(MAX(0.0,arg))
-      IF (VCELL .LT. 10) RETURN
+      IF (UnitCellVolume(CellPar(1),CellPar(2),CellPar(3),CellPar(4),CellPar(5),CellPar(6)) .LT. 10.0) RETURN
       FnUnitCellOK = .TRUE.
-      RETURN
 
       END FUNCTION FnUnitCellOK
 !
