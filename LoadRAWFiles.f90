@@ -600,7 +600,7 @@
                   tNOBS1 = tNOBS1 + 1
                   Last2Theta = tXOBS2(I)
                 ENDIF
-                tXOBS1(tNOBS1) = (tYOBS1(tNOBS1)*tXOBS1(tNOBS1) + tYOBS2(I)*tXOBS2(I)) / (tYOBS1(tNOBS1)+tYOBS2(I))
+                tXOBS1(tNOBS1) = (tSECS1(tNOBS1)*tXOBS1(tNOBS1) + tSECS2(I)*tXOBS2(I)) / (tSECS1(tNOBS1)+tSECS2(I))
                 tYOBS1(tNOBS1) = tYOBS1(tNOBS1) + tYOBS2(I)
                 tSECS1(tNOBS1) = tSECS1(tNOBS1) + tSECS2(I)
               ENDDO
