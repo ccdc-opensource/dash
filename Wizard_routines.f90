@@ -29,6 +29,9 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+      INCLUDE 'statlog.inc'
       INCLUDE 'DialogPosCmn.inc'
 
       IXPos_IDD_Wizard = WInfoDialog(6)
@@ -36,7 +39,13 @@
       CALL WDialogHide()
       CALL ToggleMenus(1)
       IF (.NOT. NoData) CALL SetModeMenuState(1,0,0)
-      CALL Upload_Wizard_Information()
+
+      CALL PushActiveWindowID
+      CALL UserSetCrystalSystem(LatBrav)
+      CALL Upload_Cell_Constants()
+      CALL Upload_Range()
+      CALL PopActiveWindowID
+
       CALL Generate_TicMarks
       CALL SetWizardState(1)
 
@@ -485,7 +494,6 @@
             CASE (IDF_Crystal_System_Menu)
               CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
               CALL UserSetCrystalSystem(LatBrav)
-              CALL SetSpaceGroupMenu
               CALL Generate_TicMarks
             CASE (IDF_a_latt)
               CALL WDialogGetReal(IDF_a_latt,CellPar(1))

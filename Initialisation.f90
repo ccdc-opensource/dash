@@ -177,11 +177,10 @@
         GOTO 999
       ENDIF
       CLOSE(110)
-! Initialise crystal system to Triclinic, LatBrav = 1
-      CALL SetCrystalSystem(1)
+! Initialise space group to P 1
       NumberSGTable = 1
-! Initialise the space group menus in the main window and the wizard.
-      CALL SetSpaceGroupMenu
+! Initialise crystal system to Triclinic, LatBrav = 1
+      CALL UserSetCrystalSystem(1)
       RETURN
  999  CONTINUE
 ! Failure, so exit gracefully
@@ -268,6 +267,13 @@
       CALL WDialogSelect(IDD_PW_Page5)
       CALL WDialogGetReal(IDF_MaxResolution,tReal)
       CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
+      CALL WDialogSelect(IDD_SA_input3)
+      ISeed1 = 314
+      ISeed2 = 159
+      ISeed3 = 265
+      CALL WDialogPutInteger(IDF_SA_RandomSeed1,ISeed1)
+      CALL WDialogPutInteger(IDF_SA_RandomSeed2,ISeed2)
+      CALL WDialogPutInteger(IDF_SA_RandomSeed3,ISeed3)
       SLIMVALUE = 1.0
       SCALFAC   = 0.01
       BACKREF   = .TRUE.
