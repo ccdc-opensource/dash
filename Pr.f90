@@ -1191,8 +1191,7 @@
 
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
-      INTEGER                                                                ICODEZ
-      REAL                                                                                 KOBZ
+      INTEGER                                                                ICODEZ,       KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
 ! NON-ZERO CODE FOR EXCLUDED REGIONS:
@@ -4449,17 +4448,17 @@
                       NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
       IF (TOF) THEN
-        IF (NPFSOU(JPHASE,JSOURC).EQ.1) CALL PFTF01(N)
-        IF (NPFSOU(JPHASE,JSOURC).EQ.2) CALL PFTF02(N)
-        IF (NPFSOU(JPHASE,JSOURC).EQ.3) CALL PFTF03(N)
-        IF (NPFSOU(JPHASE,JSOURC).EQ.4) CALL PFTF04(N)
-        IF (NPFSOU(JPHASE,JSOURC).EQ.5) CALL PFTF05(N)
-        IF (NPFSOU(JPHASE,JSOURC).EQ.8) CALL PFTF08(N)
-        IF (NPFSOU(JPHASE,JSOURC).EQ.92) CALL PFTF92(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.1) CALL PFTF01(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.2) CALL PFTF02(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.3) CALL PFTF03(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.4) CALL PFTF04(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.5) CALL PFTF05(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.8) CALL PFTF08(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.92) CALL PFTF92(N)
       ELSEIF (CN) THEN
-        IF (NPFSOU(JPHASE,JSOURC).EQ.1) CALL PFCN01(N)
-        IF (NPFSOU(JPHASE,JSOURC).EQ.2) CALL PFCN03(N)
-        IF (NPFSOU(JPHASE,JSOURC).EQ.3) CALL PFCN03(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.1) CALL PFCN01(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.2) CALL PFCN03(N)
+     !   IF (NPFSOU(JPHASE,JSOURC).EQ.3) CALL PFCN03(N)
       ELSEIF (LX) THEN
         IF (NPFSOU(JPHASE,JSOURC).EQ.1) CALL PFCN01(N)
         IF (NPFSOU(JPHASE,JSOURC).EQ.2) CALL PFCN03(N)
@@ -5290,8 +5289,7 @@
 
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
-      INTEGER                                                                ICODEZ
-      REAL                                                                                 KOBZ
+      INTEGER                                                                ICODEZ,       KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       SAVE SMYOB, SWYOBS
