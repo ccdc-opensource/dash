@@ -2530,8 +2530,8 @@
           WRITE (LPT,3000) IERR, (MESS(I:I),I=1,L)
  3000     FORMAT (///' *** ',I4,' fatal error(s) in input ',80A1)
           CALL BMBOUT
-          RETURN
         ENDIF
+        RETURN
       ENDIF
       IF (NACT.GT.0) IERR = IERR + 1
       IF (NTYP.EQ.1) THEN
