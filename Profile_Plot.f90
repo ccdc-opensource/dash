@@ -535,13 +535,13 @@
                  Difference(JJ) = YOBIN(IPF_Lo(i)+JJ-ipf1) - YPeakFit(JJ) + 0.5*(YPGMAX+YPGMIN)
               ENDDO
               CALL IPgNewPlot(PgPolyLine,2, (1+ix2-ix1) )
-              CALL IPgStyle(1,0,0,0,KolNumMTic,0)
+              CALL IPgStyle(1,0,0,0,KolNumPeakFit,0)
               CALL IPgStyle(2,0,0,0,KolNumCal,0)
               CALL IPgXYPairs(XPeakFit(ix1),YPeakFit(ix1))
               CALL IPgXYPairs(XPeakFit(ix1),Difference(ix1))
             ELSE
               CALL IPgNewPlot(PgPolyLine,1, (1+ix2-ix1) )
-              CALL IPgStyle(1,0,0,0,KolNumMTic,0)
+              CALL IPgStyle(1,0,0,0,KolNumPeakFit,0)
               CALL IPgXYPairs(XPeakFit(ix1),YPeakFit(ix1))
             ENDIF
           ENDIF
@@ -555,7 +555,6 @@
           ELSE
             CALL IntegerToString(iord_peak,ChrPkNum2,'(I2)')
           ENDIF
-          CALL IGrColourN(KolNumPeakFit)
           CALL IGrCharSize(Char_Size,Char_Size)
           CALL IPgUnitsToGrUnits(XPF_Pos(j,i),YPF_Pos(j,i),xgtem,ygtem)
           ygtem = MIN(gytop,ygtem+0.05*ABS(gytop-gybot))
