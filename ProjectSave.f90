@@ -2,15 +2,18 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ProjectSave
+      SUBROUTINE PrjReadWrite(ReadOrWrite)
 !
 ! This subroutine saves the project file.
 !
+      USE WINTERACTER
+      USE DRUID_HEADER
       USE VARIABLES
-      USE ZMVAR
       USE PRJVAR
 
       IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: ReadOrWrite
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -30,111 +33,128 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      INTEGER ifrg
+      REAL            BestValuesDoF
+      COMMON /SOLCOM/ BestValuesDoF(1:mvar,1:MaxRun)
+
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
+
       CHARACTER*MaxPathLength :: tFileName
-      INTEGER I, J, tInteger
+      INTEGER I, tInteger, RW
+      LOGICAL tLogical
       REAL    tReal
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
+      iPrjReadOrWrite = ReadOrWrite
+      RW = iPrjReadOrWrite
       hPrjFile = 10
       tFileName = 'Example.dash'
       OPEN(UNIT=hPrjFile,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       iPrjRecNr = 1
-! Store Wizard Window
-
-! Store radiation source
-      CALL FileWriteInteger(hPrjFile,iPrjRecNr,JRadOption)
-! Store Wavelength
-      CALL FileWriteReal(hPrjFile,iPrjRecNr,ALambda)
-! We store the original pattern + all information to get the processed pattern:
+! Read / Write Wizard Window
+      IF (RW .EQ. cWrite) THEN
+        CALL FileWriteInteger(hPrjFile,iPrjRecNr,CurrentWizardWindow)
+      ELSE
+        CALL FileReadInteger(hPrjFile,iPrjRecNr,tInteger)
+        CALL WizardWindowShow(tInteger)
+      ENDIF
+! Read / Write radiation source
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,JRadOption)
+! Read / Write Wavelength
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ALambda)
+      IF (RW .EQ. cRead) THEN
+        CALL Upload_Source
+        CALL Upload_Wavelength
+      ENDIF
+! We Read / Write the original pattern + all information to get the processed pattern:
 ! - Truncation limits
 ! - Background subtraction parameters
 ! - LBIN
-      CALL FileWriteInteger(hPrjFile,iPrjRecNr,BackupNOBS)
-      IF (BackupNOBS .GT. 0) THEN
-! This is where we must decide if we want to store just the pattern, or also the .pik file
-!            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
-!        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,BackupNOBS)
+      IF (BackupNOBS .EQ. 0) THEN
+        NoData = .TRUE.
+      ELSE
+        NoData = .FALSE.
         DO I = 1, BackupNOBS
-          CALL FileWriteReal(hPrjFile,iPrjRecNr,BackupXOBS(I))
-          CALL FileWriteReal(hPrjFile,iPrjRecNr,BackupYOBS(I))
-          CALL FileWriteReal(hPrjFile,iPrjRecNr,BackupEOBS(I))
+          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BackupXOBS(I))
+          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BackupYOBS(I))
+          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BackupEOBS(I))
         ENDDO
-! Store start / end
+! Read / Write LBIN
+        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,LBIN)
+! Read / Write start / end
         CALL WDialogSelect(IDD_PW_Page5)
-        IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
+        IF (RW .EQ. cWrite) THEN
+          CALL FileWriteLogical(hPrjFile,iPrjRecNr,WDialogGetCheckBoxLogical(IDF_TruncateStartYN))
           CALL WDialogGetReal(IDF_Min2Theta,tReal)
-        ELSE
-! If the user doesn't want to truncate the data, just restore the old values
-          tReal = 0.0
-        ENDIF
-        CALL FileWriteReal(hPrjFile,iPrjRecNr,tReal)
-        IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
+          CALL FileWriteReal(hPrjFile,iPrjRecNr,tReal)
+          CALL FileWriteLogical(hPrjFile,iPrjRecNr,WDialogGetCheckBoxLogical(IDF_TruncateEndYN))
           CALL WDialogGetReal(IDF_Max2Theta,tReal)
+          CALL FileWriteReal(hPrjFile,iPrjRecNr,tReal)
         ELSE
-! If the user doesn't want to truncate the data, just restore the old values
-          tReal = 90.0
+          CALL FileReadLogical(hPrjFile,iPrjRecNr,tLogical)
+          CALL WDialogPutCheckBoxLogical(IDF_TruncateStartYN,tLogical)
+          CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+          CALL WDialogPutReal(IDF_Min2Theta,tReal)
+          CALL FileReadLogical(hPrjFile,iPrjRecNr,tLogical)
+          CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN,tLogical)
+          CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+          CALL WDialogPutReal(IDF_Max2Theta,tReal)
         ENDIF
-        CALL FileWriteReal(hPrjFile,iPrjRecNr,tReal)
-! Store the parameters for the background algorithm
+! Read / Write the parameters for the background algorithm
         CALL WDialogSelect(IDD_PW_Page6)
-        CALL WDialogGetInteger(IDF_NumOfIterations,tInteger)
-        CALL FileWriteInteger(hPrjFile,iPrjRecNr,tInteger)
-        CALL WDialogGetInteger(IDF_WindowWidth,tInteger)
-        CALL FileWriteInteger(hPrjFile,iPrjRecNr,tInteger)
-        CALL FileWriteLogical(hPrjFile,iPrjRecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
-! Store LBIN
-        CALL FileWriteInteger(hPrjFile,iPrjRecNr,LBIN)
+        IF (RW .EQ. cWrite) THEN
+          CALL WDialogGetInteger(IDF_NumOfIterations,tInteger)
+          CALL FileWriteInteger(hPrjFile,iPrjRecNr,tInteger)
+          CALL WDialogGetInteger(IDF_WindowWidth,tInteger)
+          CALL FileWriteInteger(hPrjFile,iPrjRecNr,tInteger)
+          CALL FileWriteLogical(hPrjFile,iPrjRecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+        ELSE
+          CALL FileReadInteger(hPrjFile,iPrjRecNr,tInteger)
+          CALL WDialogPutInteger(IDF_NumOfIterations,tInteger)
+          CALL FileReadInteger(hPrjFile,iPrjRecNr,tInteger)
+          CALL WDialogPutInteger(IDF_WindowWidth,tInteger)
+          CALL FileReadLogical(hPrjFile,iPrjRecNr,tLogical)
+          CALL WDialogPutCheckBoxLogical(IDF_UseMCYN,tLogical)
+        ENDIF
+        IF (RW .EQ. cRead) THEN
+          CALL WizardApplyDiffractionFileInput  ! @@ Error here with LBIN (is reset to 1 ?)
+          CALL WizardApplyProfileRange
+          CALL WizardApplyBackground
+          IPTYPE = 1
+        ENDIF
       ENDIF
-
-! Store Crystal System
-      CALL FileWriteInteger(hPrjFile,iPrjRecNr,LatBrav)
-! Store unit cell
+! Read / Write Crystal System
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,LatBrav)
+! Read / Write unit cell
       DO I = 1, 6
-        CALL FileWriteReal(hPrjFile,iPrjRecNr,CellPar(I))
+        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,CellPar(I))
       ENDDO
-! Store zero-point
-      CALL FileWriteReal(hPrjFile,iPrjRecNr,ZeroPoint)
-! Store space group
-      CALL FileWriteInteger(hPrjFile,iPrjRecNr,NumberSGTable)
-! Store Pawley refinement related stuff
-! Store the peak fit ranges
-      CALL  PrjReadWritePeakFitRanges
+! Read / Write zero-point
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ZeroPoint)
+! Read / Write space group
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumberSGTable)
+! Calculate tick marks
+      IF (RW .EQ. cRead) CALL Generate_TicMarks 
+! Read / Write Pawley refinement related stuff
+! Read / Write the peak fit ranges
+      CALL PrjReadWritePeakFitRanges
 ! We _must_ read the Peak Fit Ranges after the data needed to generate the tickmarks (unit cell,
 ! zero point, wavelength, space group, powder pattern) because it needs the tick marks
-! to assign a relection to each peak position.
+! to assign a reflection to each peak position.
+! Read / Write the .pik file
+!            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
+!        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
 
-! Store the Z-matrices
-      CALL FileWriteInteger(hPrjFile,iPrjRecNr,nfrag)
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          CALL FileWriteInteger(hPrjFile,iPrjRecNr,zmNumberOfCopies(iFrg))
-          CALL FileWriteString(hPrjFile,iPrjRecNr,frag_file(iFrg))
-          CALL FileWriteInteger(hPrjFile,iPrjRecNr,icomflg(iFrg))
-          CALL FileWriteInteger(hPrjFile,iPrjRecNr,natoms(iFrg))
-          DO J = 1, natoms(iFrg)
-            CALL FileWriteInteger(hPrjFile,iPrjRecNr,ioptb(J,iFrg))
-            CALL FileWriteInteger(hPrjFile,iPrjRecNr,iopta(J,iFrg))
-            CALL FileWriteInteger(hPrjFile,iPrjRecNr,ioptt(J,iFrg))
-            CALL FileWriteInteger(hPrjFile,iPrjRecNr,iz1(J,iFrg))
-            CALL FileWriteInteger(hPrjFile,iPrjRecNr,iz2(J,iFrg))
-            CALL FileWriteInteger(hPrjFile,iPrjRecNr,iz3(J,iFrg))
-            CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(blen(J,iFrg)))
-            CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(alph(J,iFrg)))
-            CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(bet(J,iFrg)))
-            CALL FileWriteString(hPrjFile,iPrjRecNr,asym(J,iFrg))
-            CALL FileWriteString(hPrjFile,iPrjRecNr,OriginalLabel(J,iFrg))
-            CALL FileWriteReal(hPrjFile,iPrjRecNr,tiso(J,iFrg))
-            CALL FileWriteReal(hPrjFile,iPrjRecNr,occ(J,iFrg))
-            CALL FileWriteInteger(hPrjFile,iPrjRecNr,izmoid(J,iFrg))
-            CALL FileWriteInteger(hPrjFile,iPrjRecNr,izmbid(J,iFrg))
-          ENDDO
-        ENDIF
-      ENDDO
-! Save solutions
-! Save number of solutions
-      CALL FileWriteInteger(hPrjFile,iPrjRecNr,SA_Run_Number)
+
+
+      IF (RW .EQ. cRead) CALL Profile_Plot
+! Read / Write the Z-matrices
+      CALL PrjReadWriteZmatrices
+! Read / Write solutions
+! Read / Write number of solutions
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,SA_Run_Number)
       IF (SA_Run_Number .NE. 0) THEN
 
 
@@ -149,7 +169,7 @@
   999 CALL ErrorMessage('Error writing project file.')
       CALL PopActiveWindowID
 
-      END SUBROUTINE ProjectSave
+      END SUBROUTINE PrjReadWrite
 !
 !*****************************************************************************
 !
@@ -247,6 +267,60 @@
       ENDIF
 
       END SUBROUTINE PrjReadWritePeakFitRanges
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjReadWriteZmatrices
+!
+! Read or writes information on peak fit ranges to / from binary project file.
+!
+      USE PRJVAR
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER iFrg, RW, iAtomNr
+      REAL    tReal
+
+! Read or Write?
+      RW = iPrjReadOrWrite
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,nfrag)
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmNumberOfCopies(iFrg))
+          CALL FileRWString (hPrjFile,iPrjRecNr,RW,frag_file(iFrg))
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,icomflg(iFrg))
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,natoms(iFrg))
+          DO iAtomNr = 1, natoms(iFrg)
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,ioptb(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iopta(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,ioptt(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iz1(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iz2(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iz3(iAtomNr,iFrg))
+            IF (RW .EQ. cWrite) THEN
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(blen(iAtomNr,iFrg)))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(alph(iAtomNr,iFrg)))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(bet(iAtomNr,iFrg)))
+            ELSE
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              blen(iAtomNr,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              alph(iAtomNr,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              bet(iAtomNr,iFrg) = DBLE(tReal)
+            ENDIF
+            CALL FileRWString (hPrjFile,iPrjRecNr,RW,asym(iAtomNr,iFrg))
+            CALL FileRWString (hPrjFile,iPrjRecNr,RW,OriginalLabel(iAtomNr,iFrg))
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,tiso(iAtomNr,iFrg))
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,occ(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,izmoid(iAtomNr,iFrg))
+            izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the back mapping
+          ENDDO
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE PrjReadWriteZmatrices
 !
 !*****************************************************************************
 !
