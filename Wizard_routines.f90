@@ -343,8 +343,19 @@
 
       INCLUDE 'GLBVAR.INC'
 
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+
       REAL Temp
       INTEGER IRadSelection
+      REAL, EXTERNAL :: TwoTheta2dSpacing
+      LOGICAL, EXTERNAL :: FnWavelengthOK
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page4)
@@ -354,7 +365,14 @@
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_PW_Page3)
             CASE (IDNEXT)
-              CALL WizardWindowShow(IDD_PW_Page5)
+              IF (.NOT. FnWavelengthOK()) THEN
+                CALL ErrorMessage('Invalid wavelength.')
+              ELSE
+! Set allowed range for resolution
+                CALL WDialogSelect(IDD_PW_Page5)
+                CALL WDialogRangeReal(IDF_MaxResolution,TwoTheta2dSpacing(XPMIN),TwoTheta2dSpacing(XPMAX))
+                CALL WizardWindowShow(IDD_PW_Page5)
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
           END SELECT

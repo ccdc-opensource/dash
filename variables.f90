@@ -17,9 +17,6 @@
 !
       IMPLICIT NONE
 
-      LOGICAL               :: SAVEF
-      DATA SAVEF / .FALSE. / ! File needs saving
-
       INTEGER MaxPathLength
       PARAMETER (MaxPathLength = 255)
 
