@@ -199,10 +199,12 @@
         ENDIF
       ENDIF
       CALL WDialogSelect(IDD_ViewPawley)
-      CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
-      CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
-      CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
-      CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
+      CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
+      CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
+      CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
+      CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
+      CALL WDialogPutReal(IDF_HPSL,   PeakShapeHPSL,     '(F10.4)')
+      CALL WDialogPutReal(IDF_HMSL,   PeakShapeHMSL,     '(F10.4)')
       CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NOBS)
       CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,NumOfRef)
       CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
@@ -267,8 +269,8 @@
 ! Now we know all there is to know about the wavelength and source: update it
             CALL Set_Wavelength(Temp)
           CASE ('sig') ! Sigma
-! Sigma 1
             I = InfoError(1) ! reset the errors
+! Sigma 1
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999
             PeakShapeSigma(1) = Temp
@@ -279,8 +281,8 @@
             IF (InfoError(1) .NE. 0) GOTO 999                          
             PeakShapeSigma(2) = Temp
           CASE ('gam') ! Gamma
-! Gamma 1
             I = InfoError(1) ! reset the errors
+! Gamma 1
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999                          
             PeakShapeGamma(1) =  Temp
@@ -291,21 +293,21 @@
             IF (InfoError(1) .NE. 0) GOTO 999                          
             PeakShapeGamma(2) = Temp
           CASE ('asy') ! HMSL/HPSL asymmetry parameters
-
-            CALL WDialogSelect(IDD_HPSL_info)
             I = InfoError(1) ! reset the errors
+! HPSL
             CALL INextReal(line,Temp) ! HPSL
             IF (InfoError(1) .NE. 0) GOTO 999                          
             PeakShapeHPSL = Temp
-            CALL WDialogPutReal(IDF_HPSL1,PeakShapeHPSL,'(F10.4)')
+            CALL WDialogSelect(IDD_HPSL_info)
+            CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
             CALL INextReal(line,Temp) ! ESD
             IF (InfoError(1) .NE. 0) GOTO 999  
 ! HMSL
-            CALL WDialogSelect(IDD_HMSL_info)
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999                          
             PeakShapeHMSL = Temp
-            CALL WDialogPutReal(IDF_HMSL1,PeakShapeHMSL,'(F10.4)')
+            CALL WDialogSelect(IDD_HMSL_info)
+            CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
           CASE ('zer')
 ! Zero point
             I = InfoError(1) ! reset the errors
