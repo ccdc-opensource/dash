@@ -10,12 +10,11 @@
 
       IMPLICIT NONE
 
-      INTEGER :: IFlags, Ilen, Instlen, Idashlen
+      INTEGER :: IFlags, Ilen, Idashlen
       CHARACTER(LEN=MaxPathLength) :: Dirname, DashDir, InstDirLc, DashDirLc, DirNameLc
       LOGICAL Confirm ! Function
 
       Idashlen = GETENVQQ("DASH_DIR",DashDir)
-      Instlen = LEN_TRIM(INSTDIR)
       InstDirLc = InstDir
       DashDirLc = DashDir
       CALL ILowerCase(DashDirLc)
@@ -33,30 +32,23 @@
         Ilen = LEN_TRIM(DirNameLc)
         IF ( (DirNameLc(1:Ilen) .EQ. DashDirLc(1:LEN_TRIM(DashDirLc))) .OR.  &
              (DirNameLc(1:Ilen) .EQ. InstDirLc(1:LEN_TRIM(InstDirLc))) ) THEN
-          IF (.NOT. Confirm("Are you sure you wish to start Dash in"//CHAR(13)//"the installation directory "//&
-            CHAR(13)//DirNameLc(1:Ilen)//" ?")) GOTO 10
+          IF (.NOT. Confirm("Are you sure you wish to start DASH in"//CHAR(13)//"the installation directory "//&
+            CHAR(13)//DirName(1:Ilen)//" ?")) GOTO 10
         END IF
 ! Open the file
         OPEN(UNIT = 6, FILE = 'dash.out', STATUS = 'UNKNOWN', ERR = 110)
         RETURN
- 110    CONTINUE
-        CALL WMessageBox(OKCancel,ExclamationIcon,CommonOk, &
-          "DASH problem: Could not open temporary files"//&
-          CHAR(13)//"in the directory "//DirName(4:Ilen)//CHAR(13)//&
-          "Please pick an alternative directory for your DASH run",&
-          "File-open failure")
-        IF (WInfoDialog(4) .NE. CommonOK) THEN
-          CALL WindowClose()
-          STOP
-        END IF
+ 110    CALL ErrorMessage("DASH problem: Could not open temporary files"//CHAR(13)// &
+                          "in the directory "//DirName(4:Ilen)//CHAR(13)//&
+                          "Please pick an alternative directory for your DASH run")
       END DO
 
       END SUBROUTINE Init_StdOut
 !
 !*****************************************************************************
 !
-!C>> JCC Rather than continually load/unload the various widgets, upload them all only once
-!C>> This way, the state can be memorised from session to session
+! JCC Rather than continually load/unload the various widgets, upload them all only once
+! This way, the state can be memorised from session to session
       SUBROUTINE PolyFitter_UploadDialogues
 
       USE WINTERACTER
@@ -137,7 +129,7 @@
       LPosSG( 9) = 462
       LPosSG(10) = 489
       LPosSG(11) = MaxSPGR+1
-!>> JCC Init the viewing etc
+! JCC Init the viewing etc
       CALL PolyFitter_EnableExternal
 ! Get the space group symbols ...
       OpenFail = PolyFitter_OpenSpaceGroupSymbols()
@@ -687,41 +679,37 @@
       CHARACTER*255 DashDir
       CHARACTER*255 line
       CHARACTER*3   KeyChar
-      INTEGER       nl, dlen
+      INTEGER       nl
+      CHARACTER*255 tDir, tFile
 
       ViewOn     = .FALSE.
       ViewAct    = .FALSE.
       AutoUpdate = .FALSE.
       ConvOn     = .FALSE.
+      CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
       lval = GETENVQQ("DASH_DIR",DashDir)
       IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
         CONVEXE = DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//'zmconv.exe'
         OPEN(121, FILE=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 10)
-        GOTO 20
- 10     OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 30)
- 20     CONTINUE
-      ELSE
-        OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 22)
-        GOTO 24
- 22     CONTINUE
-        CALL Getarg(0,line)
-        dlen = LEN_TRIM(line)
-        DO WHILE (line(dlen:dlen) .NE. DIRSPACER)
-          dlen = dlen - 1
-        END DO
-        dlen = dlen - 1
-        OPEN(121, FILE=line(1:dlen)//DIRSPACER//CONFIG, STATUS='OLD', ERR = 30)
-        INSTDIR = line(1:dlen)
- 24     CONTINUE
-        CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
-      END IF
+        GOTO 25
+      ENDIF
+   10 OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 20)
+      GOTO 25
+   20 CALL GetArg(0,line)
+      CALL SplitPath(line,tDir,tFile)
+      IF (LEN_TRIM(tDir) .EQ. 0) tDir = '.'//DIRSPACER
+      OPEN(121, FILE=tDir(1:LEN_TRIM(tDir))//CONFIG, STATUS='OLD', ERR = 30)
+! Remove '\' at end
+      tDir(LEN_TRIM(tDir):LEN_TRIM(tDir)) = ' '
+      INSTDIR = tDir
 ! Read it
+   25 CONTINUE
       DO WHILE ( .TRUE. )
- 25     READ(121,'(a)',END=30,ERR=30) line
+      READ(121,'(a)',END=30,ERR=30) line
         nl=LEN_TRIM(line)
-        CALL ILowerCase(line(:nl))
         CALL INextString(line,keychar)
-        SELECT CASE (KeyChar)
+        CALL ILowerCase(keychar(1:3))
+        SELECT CASE (KeyChar(1:3))
           CASE ('vie')
             VIEWEXE = line(IlocateChar(line):nl)
           CASE ('con')
@@ -732,8 +720,7 @@
             AUTOUPDATE = .TRUE.
         END SELECT
       END DO            
- 30   CONTINUE
-      INQUIRE(FILE=VIEWEXE(1:LEN_TRIM(VIEWEXE)),EXIST=ViewOn)
+ 30   INQUIRE(FILE=VIEWEXE(1:LEN_TRIM(VIEWEXE)),EXIST=ViewOn)
       INQUIRE(FILE=CONVEXE(1:LEN_TRIM(CONVEXE)),EXIST=ConvOn)
 
       END SUBROUTINE PolyFitter_EnableExternal
