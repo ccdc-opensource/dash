@@ -199,6 +199,14 @@
 ! 2. beta  about the x-axis
 ! 3. alpha about the z-axis
 !
+! quaternion A times quaternion B:
+!
+! {A0*1 + A1*i + A2*j + A3*k} * {B0*1 + B1*i + B2*j + B3*k} =
+!   (A0*B0 - A1*B1 - A2*B2 - A3*B3)*1 +
+!   (A0*B1 + A1*B0 + A2*B3 - A3*B2)*i +
+!   (A0*B2 - A1*B3 + A2*B0 + A3*B1)*j +
+!   (A0*B3 + A1*B2 - A2*B1 + A3*B0)*k
+!
 ! Inverse of   1*q0 + i*q1 + j*q2 + k*q3   =   1*q0 - i*q1 - j*q2 - k*q3
 !
 ! unity   q0 = 1
