@@ -145,6 +145,9 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
       INTEGER, EXTERNAL :: Load_cpi_File
@@ -168,6 +171,7 @@
 
 ! Initialise to failure
       DiffractionFileLoad = 1
+      Is_SX = .FALSE. ! Should not be necessary
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
 ! Find the last occurence of '.' in TheFileName
