@@ -1,16 +1,15 @@
-C.. Common blocks to be included in the various FFCALC function calls
-C..
+!.. Common blocks to be included in the various FFCALC function calls
+!..
       INCLUDE 'PARAMS.INC'
-      COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),
-     & TF(150),KTF(150),SITE(150),KSITE(150),
+      COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),                &
+     & TF(150),KTF(150),SITE(150),KSITE(150),                           &
      & ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
       COMMON /FCSTOR/ MAXK,FOB(150,MFCSTO)
       LOGICAL LOGREF
       COMMON /FCSPEC/ NLGREF,IREFH(3,MFCSPE),LOGREF(8,MFCSPE)
       COMMON /CSQSTO/ COSQS(-20:20,3,150),SINQS(-20:20,3,150)
-C
+
       LOGICAL HYDNOT
       COMMON /HIDDAT/ HYDNOT(150),NSATOM,ISATOM(150)
       LOGICAL LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
-C
