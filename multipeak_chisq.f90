@@ -1,8 +1,10 @@
-!*==MULTIPEAK_CHISQ.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
+!
       REAL FUNCTION MULTIPEAK_CHISQ(NPAR,P)
-!
+
       INCLUDE 'PARAMS.INC'
-!
+
       PARAMETER (NW=4)
       DIMENSION C3FN(3)
       COMMON /WWCARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),     &
@@ -11,9 +13,8 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
-!
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /WWPHASE/ NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),       &
      &                 SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
@@ -23,41 +24,33 @@
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-!
       COMMON /WWPRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),  &
      &                  DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),       &
      &                  ARGSTP(5), PCON
-!
       COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
      &                  DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),       &
      &                  NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ,      &
      &                  REFUSE, CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,  &
      &                  NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /WWPRSAVZ/ PKCONV(2048,9)
-!
       COMMON /WWREFLNS/ REFH(3,WWREFDIM), AMUL(WWREFDIM),               &
      &                  AICALC(WWREFDIM), AIOBS(WWREFDIM),              &
      &                  ESDOBS(WWREFDIM), SOMEGA(WWREFDIM), GGCALC(300),&
      &                  MAXKK(9), KMIN, KMAX, KMOD, KNOW,               &
      &                  DSTAR(WWREFDIM), ISMAG(WWREFDIM), DKDDS, KOM23
-!
       EQUIVALENCE (MAXK,MAXKK(1))
       COMMON /WWSOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),   &
      &                  NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),    &
      &                  NPCSOU(9,5)
-!
 !.. Note only 3 phases specifically hardwired here
       COMMON /WWREFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-!
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
       REAL            ZCAL !,        ZBAK
       COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XDIFT, XMINT
       COMMON /ZSTOR2/ MN, MN2
-!
       PARAMETER (MPAR=50)
       REAL P(MPAR)
       PARAMETER (MPT=2000)
@@ -118,7 +111,6 @@
         CHIADD = (ZOBS(II)-ZCAL(II))/ZDOBS(II)
         CCHI = CCHI + CHIADD*CHIADD
       ENDDO  !  II LOOP
-!
 !.. Penalise against any negative peak widths
       IF (.NOT.LERANL) THEN
         DO IV = 1, NPKGEN(1,1)
@@ -127,27 +119,23 @@
         ENDDO
       ENDIF
       MULTIPEAK_CHISQ = CCHI
-!
+
       END FUNCTION MULTIPEAK_CHISQ
-!*==PF_FCSUB3.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
-!
-!
+!*****************************************************************************
 !
       SUBROUTINE PF_FCSUB3(MNS)
-!
 !
 !X   For use with PFCN03 constant wavelength data with finite detector height
 !C 19B
 !H
 !
       INCLUDE 'PARAMS.INC'
-!
+
       LOGICAL NEAR90
       COMPLEX CFFT, CFF
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /WWPHASE/ NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),       &
      &                 SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
@@ -165,7 +153,6 @@
 !     & ARGNOT(50),PKNOT(64,9,50),XPDKNT(50)
 !
       COMMON /WWREFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-!
       COMMON /WWREFLNS/ REFH(3,WWREFDIM), AMUL(WWREFDIM),               &
      &                  AICALC(WWREFDIM), AIOBS(WWREFDIM),              &
      &                  ESDOBS(WWREFDIM), SOMEGA(WWREFDIM), GGCALC(300),&
@@ -176,7 +163,7 @@
      &                  NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),    &
      &                  NPCSOU(9,5)
       DIMENSION CFFT(8), FR(2048,8), FI(2048,8), FRT(2048), FIT(2048)
-!
+
       LOGICAL LERANL
       COMMON /PKCOM3/ LERANL
 
@@ -191,7 +178,6 @@
         HPS = PKFNVA(3)
         HMS = PKFNVA(4)
       ENDIF
-!
       DENTEM = (FLOAT(MNS)*ZXDEL(KNOW))
       C2TEM = PI/DENTEM
       CTEM = 2.*C2TEM
@@ -214,7 +200,6 @@
         BETM2 = PIBY2*BETM*BETM
         BETPI = BET1/PI
       ENDIF
-!
       MN2 = MNS/2
       MN2M1 = MN2 - 1
       MN2P1 = MN2 + 1
@@ -247,8 +232,8 @@
           SVAL = SII/VAL
           ARGP1 = BETP*SII
           ARGM1 = BETM*SII
-          CALL PF_FRENEL(ARGP1,FRCP,FRSP)
-          CALL PF_FRENEL(ARGM1,FRCM,FRSM)
+          CALL FRENEL(ARGP1,FRCP,FRSP)
+          CALL FRENEL(ARGM1,FRCM,FRSM)
           FRCP = FRCP*BET2/SII
           FRSP = FRSP*BET2*SVAL
           FRCM = FRCM*BET2/SII
@@ -312,35 +297,8 @@
 !!!      PKCONV(II,JJ)=DR(I,J)*XTEM
 !!!   7  CONTINUE
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE PF_FCSUB3
-!*==PF_FRENEL.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE PF_FRENEL(Z,FRCOS,FRSIN)
-      SUBROUTINE PF_FRENEL(Z,FRCOS,FRSIN)
-!
-! *** PF_FRENEL by WIFD 23 Feb 93 ***
-!
-!X
-!C 9C
-!H Calculates ?
-!A On entry Z holds the argument
-!A On exit FRCOS, FRSIN hold ?
-!
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-!
-      FZ = (1.+Z*0.926)/(2.+Z*(1.792+Z*3.104))
-      GZ = 1./(2.+Z*(4.142+Z*(3.492+Z*6.670)))
-!
-      ARG = PIBY2*Z*Z
-      SINARG = SIN(ARG)
-      COSARG = COS(ARG)
-      FRCOS = 0.5 + FZ*SINARG - GZ*COSARG
-      FRSIN = 0.5 - FZ*COSARG - GZ*SINARG
-!
-      RETURN
-      END SUBROUTINE PF_FRENEL
