@@ -247,7 +247,7 @@
 ! GREC = Reciprocal space vectors
       CALL InverseMatrix(GREAL,GREC,3)
       XDD(1) = ZeroPoint
-      DXDD(1) = 0.01*ABS(zeropoint)+0.001
+      DXDD(1) = 0.01*ABS(ZeroPoint)+0.001
       DO I = 1, 6
         IASS(I) = 0
       END DO

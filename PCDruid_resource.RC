@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 07/Sep/2001 11:27:25
+// Modified : 07/Sep/2001 11:48:42
 //
 ///////////////////////////////////////////////////
 //
@@ -2553,7 +2553,7 @@ IDR_MENU1 MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "Open Pawley Fit File...",                  ID_import_dpj_file
+        MENUITEM "Open DASH Pawley File...",                 ID_import_dpj_file
         MENUITEM "Open Diffraction File...",                 ID_import_xye_file
         MENUITEM SEPARATOR
         MENUITEM "&Print",                                   ID_FILE_PRINT
@@ -2780,10 +2780,10 @@ BEGIN
     ID_Peak_Fitting_Mode            "Peak fitting mode"
     ID_Structure_Solution_Mode      "Structure solution mode"
     ID_Pawley_Refinement_Mode       "Pawley refinement mode"
-    ID_import_dpj_file              "Import DASH project file"
     ID_Start_Wizard                 "Launch the DASH Wizard"
-    ID_import_xye_file              "Open powder diffraction file"
     ID_Remove_Background            "Remove background"
+    ID_import_dpj_file              "Open DASH Pawley file"
+    ID_import_xye_file              "Open powder diffraction file"
 END
 
 ///////////////////////////////////////////////////

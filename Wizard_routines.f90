@@ -11,6 +11,8 @@
       INCLUDE 'DialogPosCmn.inc'
 
       CALL SetWizardState(-1)
+      CALL SelectMode(ID_Peak_Fitting_Mode)
+      CALL SetModeMenuState(0,-1,-1)
       CALL ToggleMenus(0)
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
@@ -34,7 +36,7 @@
       CALL WDialogHide()
       CALL ToggleMenus(1)
       IF (.NOT. NoData) CALL SetModeMenuState(1,0,0)
-      IF (.NOT. NoData) CALL Upload_Wizard_Information()
+      CALL Upload_Wizard_Information()
       CALL Generate_TicMarks
       CALL SetWizardState(1)
 
@@ -73,6 +75,8 @@
                 SELECT CASE (IPW_Option)
                   CASE (1) ! View data / determine peaks positions
                     CALL WDialogSelect(IDD_PW_Page3)
+                    CALL WDialogFieldState(IDFINISH,Disabled)
+                    CALL WDialogFieldState(IDNEXT,Disabled)
                     CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
                   CASE (2) ! Preparation for Pawley refinement
                     CALL WDialogSelect(IDD_PW_Page1)
@@ -143,10 +147,12 @@
               CALL DiffractionFileOpen(CTEMP)
 !@ Should test for success here
               CALL WDialogFieldState(IDNEXT,Enabled)
+              CALL WDialogFieldState(IDFINISH,Enabled)
             CASE (ID_PWa_DF_Browse)
               CALL DiffractionFileBrowse
 !@ Should test for success here
               CALL WDialogFieldState(IDNEXT,Enabled)
+              CALL WDialogFieldState(IDFINISH,Enabled)
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowDiffractionFileInput 1')
           END SELECT
