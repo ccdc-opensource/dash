@@ -197,7 +197,6 @@
 !
       SUBROUTINE DealWithMainWizardWindow
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -294,7 +293,6 @@
 !
       SUBROUTINE DealWithWizardWindowDiffractionFileInput
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -347,7 +345,6 @@
 !
       SUBROUTINE WizardApplyRebin
 
-      USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
@@ -376,7 +373,6 @@
 !
       SUBROUTINE DealWithWizardWindowRebin
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -426,7 +422,6 @@
 !
 ! Effectively, the user is asked to provide / confirm the wavelength
 !
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -493,7 +488,6 @@
 !
       SUBROUTINE WizardApplyProfileRange
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -540,7 +534,6 @@
 !
       SUBROUTINE DealWithWizardWindowProfileRange
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -643,7 +636,6 @@
 !
       SUBROUTINE WizardApplyBackground
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -672,7 +664,6 @@
 !
       SUBROUTINE DealWithWizardWindowBackground
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -793,7 +784,6 @@
 !
       SUBROUTINE DealWithWizardWindowIndexing1
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -844,7 +834,6 @@
 !
       SUBROUTINE DealWithDICVOLRunning
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE DICVAR
@@ -873,7 +862,6 @@
 ! Called when DICVOL has finished searching a crystal system. Updates the
 ! "DICVOL Running..." dialogue.
 !
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE DICVAR
@@ -920,7 +908,6 @@
 !
       SUBROUTINE DealWithWizardWindowIndexing2
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE DICVAR

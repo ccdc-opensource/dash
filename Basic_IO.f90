@@ -77,9 +77,7 @@
 ! Displays a debug message in the lower window bar that should be ignored in the release version of DASH.
 !
 ! INPUT   : TheMessage = The message to be displayed
-!
-      USE WINTERACTER
-      
+!      
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
@@ -241,7 +239,6 @@
 !
       LOGICAL FUNCTION DealWithEvent
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
@@ -465,7 +462,6 @@
 ! Fetches the last event from Winteracter and places it in two global variables
 ! called EventType and EventInfo (both in VARIABLES)
 !
-      USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -497,7 +493,6 @@
 ! If an event is waiting, it is placed in two global variables
 ! called EventType and EventInfo (both in VARIABLES)
 !
-      USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -529,7 +524,6 @@
 ! It tries to emulate _not_ removing the events from the queu by
 ! setting a flag, 'OldEventWaiting', which is used by GetEvent, PeekEvent and IsEventWaiting.
 !
-      USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
