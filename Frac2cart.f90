@@ -1,13 +1,12 @@
-!*==FRAC2CART.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!
+!*****************************************************************************
 !
       SUBROUTINE FRAC2CART(MATRIX,A,B,C,ALFA,BETA,GAMA)
-!     -------------------------------------------------
-!
+
       REAL*8 MATRIX(3,3), A, B, C, ALFA, BETA, GAMA
       REAL*8 RADEG, CA, CB, CG, SA, ASA, TERM, SMALL, ZERO
       DATA RADEG, SMALL, ZERO/1.7453292519943296D-2, 1.0D-20, 0.0D0/
-!
+
       CA = DCOS(ALFA*RADEG)
       CB = DCOS(BETA*RADEG)
       CG = DCOS(GAMA*RADEG)
@@ -23,13 +22,13 @@
       MATRIX(1,3) = A*CB
       MATRIX(2,3) = B*CA
       MATRIX(3,3) = C
+
       END SUBROUTINE FRAC2CART
-!*==FRAC2PDB.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!*****************************************************************************
 !
-!>> JCC
       SUBROUTINE FRAC2PDB(MATRIX,A,B,C,ALFA,BETA,GAMA)
+
       REAL*8 MATRIX(3,3), A, B, C, ALFA, BETA, GAMA
       REAL*8 RADEG, CA, CB, CG, SG, VOLU, ZERO
       DATA RADEG, ZERO/1.7453292519943296D-2, 0.0D0/
@@ -39,7 +38,7 @@
       CB = DCOS(BETA*RADEG)
       CG = DCOS(GAMA*RADEG)
       SG = DSIN(GAMA*RADEG)
-!
+
       VOLU = A*B*C*SQRT(1-CA*CA-CB*CB-CG*CG+2*CA*CB*CG)
       MATRIX(1,1) = A
       MATRIX(1,2) = B*CG
@@ -50,4 +49,8 @@
       MATRIX(3,1) = ZERO
       MATRIX(3,2) = ZERO
       MATRIX(3,3) = VOLU/(A*B*SG)
+
       END SUBROUTINE FRAC2PDB
+!
+!*****************************************************************************
+!

@@ -88,7 +88,7 @@
           TheString((I-1)*4+1:(I-1)*4+4) = C4(1:4)
         ENDDO
       ENDIF
-! Now write the remainder, padded with spaces
+! Now Read the remainder, padded with spaces
       Remainder = MOD(tActualLength,4)
       IF (Remainder .NE. 0) THEN
         CALL FileReadInteger(TheFileHandle,TheRecNr,I4)
