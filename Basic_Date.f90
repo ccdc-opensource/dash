@@ -84,7 +84,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Date2String(TheDate,TheDateString, TheLength)
+      SUBROUTINE Date2String(TheDate, TheDateString, TheLength)
 !
 ! INPUT  TheDate as an integer, e.g. '20010215' for 15 Feb 2001
 ! OUTPUT TheDateString, e.g. '7 March 2001'
