@@ -80,9 +80,9 @@
           GOTO 999
         ENDIF
         READ (line(1:nlin),*,ERR=999,IOSTAT=ErrorStatus) blen(i,iFrg),&
-     &        ioptb(i,iFrg), alph(i,iFrg), iopta(i,iFrg), bet(i,iFrg),&
-     &        ioptt(i,iFrg), iz1(i,iFrg), iz2(i,iFrg), iz3(i,iFrg),   &
-     &        tiso(i,iFrg), occ(i,iFrg)
+              ioptb(i,iFrg), alph(i,iFrg), iopta(i,iFrg), bet(i,iFrg),&
+              ioptt(i,iFrg), iz1(i,iFrg), iz2(i,iFrg), iz3(i,iFrg),   &
+              tiso(i,iFrg), occ(i,iFrg)
 ! Adjust torsion angle to be between -180.0 and +180.0
         DO WHILE (bet(i,iFrg) .LT. -180.0)
           bet(i,iFrg) = bet(i,iFrg) + 360.0
@@ -159,6 +159,10 @@
 
       INTEGER i, ii, izm
 
+! izmpar = number of degrees of freedom ('parameters')
+! kzmpar = type of parameter (1 = translation, 2 = rotation)
+! xzmpar = initial value of parameter
+! czmpar = Character string associated with this parameter value
       czmpar(1,iFrg) = ' x(frag )'
       czmpar(2,iFrg) = ' y(frag )'
       czmpar(3,iFrg) = ' z(frag )'
@@ -166,19 +170,25 @@
         kzmpar(ii,iFrg) = 1 ! Translation
       ENDDO
       IF (natoms(iFrg) .EQ. 1) THEN
+! Single atom: no rotations
         izmpar(iFrg) = 3
-      ELSE
-        izmpar(iFrg) = 7 ! always reserve 4 parameters for rotations, whether quaternion or single axis
-! izmpar = number of degrees of freedom ('parameters')
-! kzmpar = type of parameter (1 = translation)
-! xzmpar = initial value of parameter
-! czmpar = Character string associated with this parameter value
+      ELSE IF (UseQuaternions(iFrg)) THEN
+! Molecule with quaternions
+        izmpar(iFrg) = 7
         czmpar(4,iFrg) = 'Q0(frag )'
         czmpar(5,iFrg) = 'Q1(frag )'
         czmpar(6,iFrg) = 'Q2(frag )'
         czmpar(7,iFrg) = 'Q3(frag )'
         DO ii = 4, 7
           kzmpar(ii,iFrg) = 2 ! Quaternion
+        ENDDO
+      ELSE
+! Molecule with rotation restricted to a single axis
+        izmpar(iFrg) = 5
+        czmpar(4,iFrg) = 'Q0(frag )'
+        czmpar(5,iFrg) = 'Q1(frag )'
+        DO ii = 4, 5
+          kzmpar(ii,iFrg) = 2 ! 'Quaternion'
         ENDDO
       ENDIF
       DO ii = 1, izmpar(iFrg)

@@ -104,7 +104,7 @@
                         + QUATER(2)*zmInitialQs(1,iFrg) + QUATER(3)*zmInitialQs(0,iFrg)
                 CALL ROTMAK(tQ,ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the single rotation axis
-                KK = KK + 4 ! We always reserve 4 parameters for rotations, whether needed or not
+                KK = KK + 2
               ENDIF
             ENDIF
             DO I = 1, NATS
