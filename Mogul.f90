@@ -318,11 +318,11 @@
       OPEN(240,FILE=MogulOutputFile,STATUS='UNKNOWN', ERR = 999)
       I = 0
       DO WHILE (I .EQ. 0)
-        READ(240, 10) nlin, line
+        READ(240, 10, END=999) nlin, line
 10      FORMAT (q,a)
         IF ((line(1:6) .EQ. "NOHITS") .OR. (line(1:6) .EQ. "ERROR")) GOTO 888
         IF (line(1:5).eq."STATS") THEN
-          READ(240,*) Distribution, MinAngle, MaxAngle, Bin, NumberofBins, Colon, TC(1:NumberofBins)
+          READ(240,*, ERR = 999) Distribution, MinAngle, MaxAngle, Bin, NumberofBins, Colon, TC(1:NumberofBins)
           I = 1 
         ENDIF
       ENDDO
@@ -452,7 +452,7 @@
 
       RETURN
 
-999   CALL ErrorMessage("Mogul could not read output file.")
+999   CALL ErrorMessage("DASH could not read Mogul Output File.")
 888   ModalFlag(IFRow) = 1 ! Will not default to modal ranges in dialog
 
       END SUBROUTINE ProcessMogulOutput
