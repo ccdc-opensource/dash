@@ -1,10 +1,12 @@
 !
 !*****************************************************************************
 !
-        SUBROUTINE SA_structure_output(t,fopt,cpb,parvals,ntotmov)
-C
-C       Called when a new minimum is found
-C
+      SUBROUTINE SA_structure_output(t,fopt,cpb,parvals,ntotmov)
+
+      USE VARIABLES
+!
+!       Called when a new minimum is found
+!
       DOUBLE PRECISION t, fopt
       REAL cpb
       DOUBLE PRECISION parvals(*) ! The current torsion parameters (cant be called X here)
@@ -54,75 +56,79 @@ C
       CHARACTER*20 cpdbops(mpdbops)
       COMMON /pdbops/ npdbops,cpdbops
 
-C>> JCC the original atom ids to list in the labels and the back mapping
+!>> JCC the original atom ids to list in the labels and the back mapping
       COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
-C>> JCC Use standard PDB orthogonalisation
+!>> JCC Use standard PDB orthogonalisation
       DOUBLE PRECISION f2cpdb, c2fpdb
       REAL qvals(4), qnrm
       COMMON /pdbcat/ f2cpdb(3,3), c2fpdb(3,3)
-c
-      ntem=NumberSGTable
+!
+      ntem = NumberSGTable
 
-C     ep added.  Following subroutine saves calculated and observed
-C     diffraction patterns in .pro file
+!     ep added.  Following subroutine saves calculated and observed
+!     diffraction patterns in .pro file
       CALL Sa_soln_store
-c
-c       Output a CSSR file to fort.64
-C       Output a PDB  file to fort.65
-C       Output a CCL  file to fort.66
-C
-C       Write the file headers first
-C
-C       The CSSR file first
-      OPEN(UNIT=64,file=cssr_file(1:cssr_flen),status='unknown')
-      OPEN(UNIT=65,file=pdb_file(1:pdb_flen),status='unknown')
-      OPEN(UNIT=66,file=ccl_file(1:ccl_flen),status='unknown')
-      WRITE(64,1000) (CellPar(ii),ii=1,3)
-      WRITE(64,1010) (CellPar(ii),ii=4,6),
+
+!       LOGICAL SavePDB, SaveCSSR, SaveCCL, SaveMOL2, SaveRES
+
+!
+!       Output a CSSR file to fort.64
+!       Output a PDB  file to fort.65
+!       Output a CCL  file to fort.66
+!
+!       Write the file headers first
+!
+!       The CSSR file first
+      IF (SaveCSSR) THEN
+        OPEN(UNIT=64,file=cssr_file(1:cssr_flen),status='unknown')
+        WRITE(64,"(' ',I3,'   0  DASH solution')") natom
+        WRITE(64,1030) SNGL(t),-SNGL(fopt),cpb,ntotmov
+        WRITE(64,1000) (CellPar(ii),ii=1,3)
+        WRITE(64,1010) (CellPar(ii),ii=4,6),
      &                 SGNumStr(Ntem)(1:3)
-      WRITE(64,1020) natom
-      WRITE(64,1030) SNGL(t),-SNGL(fopt),cpb,ntotmov      
-C       Now the PDB...
-C>> JCC included again
-      CALL sagminv(f2cpdb,inv,3)
+	ENDIF
 
-C>> Add in a Header record
-
-      WRITE(65,1036)
-      WRITE(65,1040) SNGL(t),-SNGL(fopt),cpb,ntotmov
-      WRITE(65,1050) (CellPar(ii),ii=1,6),SGHMaStr(NTem)
-
-C>> JCC Add in V2 pdb records to store space group and symmetry
-
-      WRITE(65,1380)
-      WRITE(65,1381)
-      WRITE(65,1382) SGHMaStr(NTem)
-      WRITE(65,1380)
-      WRITE(65,1383)
-      WRITE(65,1384)
-      DO i = 1, npdbops
-        WRITE(65,1385) (i*1000 + 555), cpdbops(i)
-      END DO
-      WRITE(65,1380)
-      WRITE(65,1386)
-      WRITE(65,1387)
-      WRITE(65,1380)
-      WRITE(65,1388)
-
-C>> JCC included again
-      WRITE(65,1060) inv(1,1),inv(1,2),inv(1,3)
-      WRITE(65,1070) inv(2,1),inv(2,2),inv(2,3)
-      WRITE(65,1080) inv(3,1),inv(3,2),inv(3,3)
-C       And the CCL
-      WRITE(66,1090) SNGL(t),-SNGL(fopt),cpb,ntotmov
-      WRITE(66,1100) (CellPar(ii),ii=1,6)
-
-C>> Was 
-C       ii = 0
+!       Now the PDB...
+      IF (SavePDB) THEN
+        OPEN(UNIT=65,file=pdb_file(1:pdb_flen),status='unknown')
+! JCC included again
+        CALL sagminv(f2cpdb,inv,3)
+! Add in a Header record
+        WRITE(65,1036)
+        WRITE(65,1040) SNGL(t),-SNGL(fopt),cpb,ntotmov
+        WRITE(65,1050) (CellPar(ii),ii=1,6),SGHMaStr(NTem)
+! JCC Add in V2 pdb records to store space group and symmetry
+        WRITE(65,1380)
+        WRITE(65,1381)
+        WRITE(65,1382) SGHMaStr(NTem)
+        WRITE(65,1380)
+        WRITE(65,1383)
+        WRITE(65,1384)
+        DO i = 1, npdbops
+          WRITE(65,1385) (i*1000 + 555), cpdbops(i)
+        END DO
+        WRITE(65,1380)
+        WRITE(65,1386)
+        WRITE(65,1387)
+        WRITE(65,1380)
+        WRITE(65,1388)
+! JCC included again
+        WRITE(65,1060) inv(1,1),inv(1,2),inv(1,3)
+        WRITE(65,1070) inv(2,1),inv(2,2),inv(2,3)
+        WRITE(65,1080) inv(3,1),inv(3,2),inv(3,3)
+	ENDIF
+!       And the CCL
+      IF (SaveCCL) THEN
+        OPEN(UNIT=66,file=ccl_file(1:ccl_flen),status='unknown')
+        WRITE(66,1090) SNGL(t),-SNGL(fopt),cpb,ntotmov
+        WRITE(66,1100) (CellPar(ii),ii=1,6)
+	ENDIF
+! Was
+!       ii = 0
       iiact  = 0
       itotal = 0
       ipcount = 0
-C>> To revert this code, set ii to iiact and iorig to i
+! To revert this code, set ii to iiact and iorig to i
       CheckedFragNo = 0
       DO j = 1, nfrag
         itotal = iiact
@@ -130,12 +136,14 @@ C>> To revert this code, set ii to iiact and iorig to i
           CheckedFragNo = CheckedFragNo + 1
           IF ( IZMCheck(CheckedFragNo) .EQ. 1 ) EXIT ! the loop
         END DO
-C>> Write out the translation/rotation information for each residue
-        WRITE(65,1039) j
-        WRITE(65,1037) 
-     &   (SNGL(parvals(ij)),ij = ipcount + 1, ipcount + 3)
+! Write out the translation/rotation information for each residue
+        IF (SavePDB) THEN
+          WRITE(65,1039) j
+          WRITE(65,1037) 
+     &     (SNGL(parvals(ij)),ij = ipcount + 1, ipcount + 3)
+        ENDIF
         IF (natoms(CheckedFragNo) .GT. 1) THEN
-C>> Normalise the Q-rotations before writing them out ...
+! Normalise the Q-rotations before writing them out ...
           qvals(1) = SNGL( parvals(ipcount + 4) )
           qvals(2) = SNGL( parvals(ipcount + 5) )
           qvals(3) = SNGL( parvals(ipcount + 6) )
@@ -147,38 +155,42 @@ C>> Normalise the Q-rotations before writing them out ...
           DO ij = 1,4
             qvals(ij) = qvals(ij)/qnrm
           END DO
-          WRITE(65,1038)    (qvals(ij),ij = 1,4)
+          IF (SavePDB) THEN
+            WRITE(65,1038) (qvals(ij),ij = 1,4)
+          ENDIF
           ipcount = ipcount + izmpar(CheckedFragNo)
         ENDIF
         DO i = 1, natoms(CheckedFragNo) 
-C>> Was   ii = ii + 1
+! Was   ii = ii + 1
           iiact = iiact + 1
           ii = itotal + izmbid(i,CheckedFragNo)
           iorig = izmbid(i,CheckedFragNo)
-C         
-C         The CSSR atom lines
-          WRITE(64,1110) 
-     &    iiact, asym(iorig,CheckedFragNo), (xatopt(k,ii),k=1,3),0,0,
-     &    0,0,0,0,0,0,0.0
-C       The PDB atom lines
+!         
+!         The CSSR atom lines
+          IF (SaveCSSR) THEN
+            WRITE(64,1110) 
+     &      iiact, asym(iorig,CheckedFragNo), (xatopt(k,ii),k=1,3),0,0,
+     &      0,0,0,0,0,0,0.0
+	    ENDIF
+!       The PDB atom lines
 
-C>> JCC Changed to use the PDB's orthogonalisation  definition
-C>> JCC Shouldnt make any difference the next change - I've made sure that the conversion
-C>> Uses single precision, but I think this is implicit anyway 
-C>>          xc=  xatopt(1,ii)*SNGL(f2cmat(1,1))
-C>>
-C>>          yc= (xatopt(2,ii)*SNGL(f2cmat(2,2)))
-C>>     &      + (xatopt(1,ii)*SNGL(f2cmat(1,2)))
-C>>
-C>>          zc= (xatopt(3,ii)*SNGL(f2cmat(3,3)))
-C>>     &      + (xatopt(1,ii)*SNGL(f2cmat(1,3)))
-C>>     &      + (xatopt(2,ii)*SNGL(f2cmat(2,3)))
+! JCC Changed to use the PDB's orthogonalisation  definition
+! JCC Shouldnt make any difference the next change - I've made sure that the conversion
+! Uses single precision, but I think this is implicit anyway 
+!          xc=  xatopt(1,ii)*SNGL(f2cmat(1,1))
+!
+!          yc= (xatopt(2,ii)*SNGL(f2cmat(2,2)))
+!     &      + (xatopt(1,ii)*SNGL(f2cmat(1,2)))
+!
+!          zc= (xatopt(3,ii)*SNGL(f2cmat(3,3)))
+!     &      + (xatopt(1,ii)*SNGL(f2cmat(1,3)))
+!     &      + (xatopt(2,ii)*SNGL(f2cmat(2,3)))
 
-C     Now rotate cartesians about y
-c     rnew=(-1.0*(be(nfrag)-90.))*.0174533
-C>>   rnew=(-1.0*(cellpar(5)-90.))*.0174533
-C>>   xc=xc*cos(rnew) + zc*sin(rnew)
-C>>   zc=zc*cos(rnew) - xc*sin(rnew)
+!     Now rotate cartesians about y
+!     rnew=(-1.0*(be(nfrag)-90.))*.0174533
+!   rnew=(-1.0*(cellpar(5)-90.))*.0174533
+!   xc=xc*cos(rnew) + zc*sin(rnew)
+!   zc=zc*cos(rnew) - xc*sin(rnew)
       
           xc=   xatopt(1,ii)*SNGL(f2cpdb(1,1))
      &        + xatopt(2,ii)*SNGL(f2cpdb(1,2))
@@ -187,31 +199,38 @@ C>>   zc=zc*cos(rnew) - xc*sin(rnew)
      &        + xatopt(3,ii)*SNGL(f2cpdb(2,3))
           zc=   xatopt(3,ii)*SNGL(f2cpdb(3,3))
      
-C>> Was
-C          if (asym(i,j)(2:2).eq.' ') then
-C            write(65,1120) ii,asym(i,j),xc,yc,zc
-C          else
-C            write(65,1130) ii,asym(i,j),xc,yc,zc
-C          endif
-C>> Now
-          IF (asym(iorig,CheckedFragNo)(2:2) .EQ. ' ') THEN
-            WRITE(65,1120) iiact,asym(iorig,CheckedFragNo),xc,yc,zc
-          ELSE
-            WRITE(65,1130) iiact,asym(iorig,CheckedFragNo),xc,yc,zc
+! Was
+!          if (asym(i,j)(2:2).eq.' ') then
+!            write(65,1120) ii,asym(i,j),xc,yc,zc
+!          else
+!            write(65,1130) ii,asym(i,j),xc,yc,zc
+!          endif
+! Now
+          IF (SavePDB) THEN
+            IF (asym(iorig,CheckedFragNo)(2:2) .EQ. ' ') THEN
+              WRITE(65,1120) iiact,asym(iorig,CheckedFragNo),xc,yc,zc
+            ELSE
+              WRITE(65,1130) iiact,asym(iorig,CheckedFragNo),xc,yc,zc
+            ENDIF
           ENDIF
-C       The CCL atom lines
+!       The CCL atom lines
+        IF (SaveCCL) THEN
           WRITE(66,1033) asym(iorig,CheckedFragNo),(xatopt(k,ii),k=1,3)
+	  ENDIF
         END DO
       END DO
-      WRITE(65,1400)
-      CLOSE(64)
+      WRITE(65,"('END')")
+	IF (SaveCSSR) THEN
+        CLOSE(64)
+	ENDIF
       CLOSE(65)
-      CLOSE(66)
+      IF (SaveCCL) THEN
+        CLOSE(66)
+	ENDIF
       CALL UpdateViewer()
-C
+!
 1000  FORMAT(' REFERENCE STRUCTURE = 00000   A,B,C =',3F8.3)
 1010  FORMAT('   ALPHA,BETA,GAMMA =',3F8.3,'    SPGR = ',A3)
-1020  FORMAT(' ',I3,'   0  DASH solution')
 1030  FORMAT(' T=',F6.2,', chi**2=',F7.2, ' and profile chi**2=',  
      &       F7.2,' after ',I8,' moves')
 1036  FORMAT('HEADER PDB Solution File generated by DASH')
@@ -220,7 +239,7 @@ C
 1039  FORMAT('REMARK Start of molecule number ',I6)
 1040  FORMAT('REMARK T=',F6.2,', chi**2=',F7.2,' and profile chi**2=', 
      &       F7.2,' after ',I8,' moves')
-c1050  FORMAT('CRYST1',3F9.3,3F7.2,' P 21/c')
+!1050  FORMAT('CRYST1',3F9.3,3F7.2,' P 21/c')
 1050  FORMAT('CRYST1',3F9.3,3F7.2,X,A12)
 1060  FORMAT('SCALE1    ',3F10.5,'      0.00000')
 1070  FORMAT('SCALE2    ',3F10.5,'      0.00000')
@@ -243,7 +262,6 @@ c1050  FORMAT('CRYST1',3F9.3,3F7.2,' P 21/c')
 1386  FORMAT('REMARK 290     WHERE NNN -> OPERATOR NUMBER')
 1387  FORMAT('REMARK 290           MMM -> TRANSLATION VECTOR')
 1388  FORMAT('REMARK 290 REMARK:')
-1400  FORMAT('END')
       RETURN
 
       END SUBROUTINE SA_structure_output
@@ -254,14 +272,14 @@ c1050  FORMAT('CRYST1',3F9.3,3F7.2,' P 21/c')
 
       DIMENSION II(100),IL(100),IG(100)
       REAL*8 A(N,N),B(N,N)
-C
+!
       CALL SAGMEQ(A,B,N,N)
       D=1.0
       IS=N-1
       DO 10 K=1,N
       IL(K)=0
    10 IG(K)=K
-C
+!
       DO 150 K=1,N
       R=0.
       DO 40 I=1,N
@@ -276,8 +294,8 @@ C
       II(K)=KF
       IL(KF)=KF
       D=D*P
-C      IF (D .EQ. 0.) write(*,*) 'Zero determinant'
-C
+!      IF (D .EQ. 0.) write(*,*) 'Zero determinant'
+!
       DO 80 I=1,N
       IF (I .EQ. KF) THEN
       B(I,K)=1./P
@@ -285,7 +303,7 @@ C
       B(I,K)=-B(I,K)/P
       ENDIF
    80 CONTINUE
-C
+!
       DO 140 J=1,N
       IF (J .EQ. K) GO TO 140
       W=B(KF,J)
@@ -298,10 +316,10 @@ C
       ENDIF
   130 CONTINUE
   140 CONTINUE
-C
+!
   150 CONTINUE
-C.....
-C
+!.....
+!
       DO 190 K=1,IS
       KF=II(K)
       KL=IL(KF)
@@ -329,11 +347,11 @@ C
 !
       SUBROUTINE SAGMEQ(A,B,NI,NJ)
 
-CH Sets matrix B = matrix A.
-CA On entry A is a real matrix of dimension NIxNJ
-CA On exit  B is a real matrix equal to A
-CN NI and NJ must be at least 1
-C
+!H Sets matrix B = matrix A.
+!A On entry A is a real matrix of dimension NIxNJ
+!A On exit  B is a real matrix equal to A
+!N NI and NJ must be at least 1
+!
       REAL*8 A(NI,NJ),B(NI,NJ)
       DO 1 I=1,NI
       DO 1 J=1,NJ
@@ -359,7 +377,7 @@ C
       LOGICAL cmp
       LOGICAL PDB_CmpMat
 
-C Expand the symmetry generators into a list of symm ops by cross-multiplication
+! Expand the symmetry generators into a list of symm ops by cross-multiplication
       DO i = 1, 4
         DO j = 1, 4
           rpdb(i,j,1) = 0.0
@@ -510,7 +528,7 @@ C Expand the symmetry generators into a list of symm ops by cross-multiplication
       INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
       COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
      &log_flen,pro_flen
-c
+!
       CHARACTER*85 new_fname
 
       SA_Run_Number = SA_Run_Number + 1
@@ -520,7 +538,7 @@ c
       CALL AppendNumToFileName(SA_Run_Number,ccl_file,new_fname)
       CALL IOsDeleteFile(new_fname)
       CALL IOsRenameFile( ccl_file(1:LEN_TRIM(ccl_file)),new_fname)
-C ep appended
+! ep appended
       CALL AppendNumToFileName(SA_Run_Number,pro_file,new_fname)
       CALL IOsDeleteFile(new_fname)
       CALL IOsRenameFile( pro_file(1:LEN_TRIM(pro_file)),new_fname)
