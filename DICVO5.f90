@@ -528,6 +528,7 @@
                     Ind = 6
                     Nrind = 6
                     CALL AFFPAR(Ind,Nrind,Vap)
+                    IF (DICVOL_Error .NE. 0) RETURN
                     arx(kt) = ar
                     brx(kt) = br
                     crx(kt) = cr

@@ -599,6 +599,7 @@
      &                           .EQ.ik(J,1,4) .AND. il(I,1,4).EQ.il(J,1,4) ) GOTO 1272
                           ENDDO
                           CALL TRICLINI3
+                          IF (DICVOL_Error .NE. 0) RETURN
                         ENDIF
                       ENDIF
  1272                 IF ( iiff.EQ.0 ) GOTO 1274

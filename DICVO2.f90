@@ -261,6 +261,7 @@
                                          Ind = 1
                                          Nrind = 1
                                          CALL AFFPAR(Ind,Nrind,Vap)
+                                         IF (DICVOL_Error .NE. 0) RETURN
                                          IF ( fwolff.NE.-1000. ) THEN
                                          ELSE
                                          aa = Aare
@@ -635,6 +636,7 @@
                                          Nrind = 2
                                          IF ( Ichoix.GT.0 ) Ind = 3
                                          CALL AFFPAR(Ind,Nrind,Vap)
+                                         IF (DICVOL_Error .NE. 0) RETURN
                                          IF ( fwolff.NE.-1000. ) THEN
                                          ELSE
                                          aa = Aare
@@ -1075,6 +1077,7 @@
                                          Ind = 4
                                          Nrind = 3
                                          CALL AFFPAR(Ind,Nrind,Vap)
+                                         IF (DICVOL_Error .NE. 0) RETURN
                                          IF ( fwolff.NE.-1000. ) THEN
                                          ELSE
                                          aa = Aare
@@ -1708,6 +1711,7 @@
                                          Ind = 5
                                          Nrind = 4
                                          CALL AFFPAR(Ind,Nrind,Vap)
+                                         IF (DICVOL_Error .NE. 0) RETURN
                                          aa = aa*SIN(bebe)
                                          cc = cc*SIN(bebe)
                                          IF ( fwolff.NE.-1000. ) THEN
