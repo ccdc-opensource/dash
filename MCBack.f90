@@ -1,19 +1,150 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE BackMCBruckner(nbruckwin,mbruckiter,UseMC,UseSpline)
+      SUBROUTINE SubtractBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+!      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
+      LOGICAL, INTENT (IN   ) :: UseMc, UseSpline
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+      INCLUDE 'statlog.inc'
+
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
+      INTEGER CurrentRange 
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
+        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
+        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
+        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+
+      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
+        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
+! Calculate the background
+      CALL CalculateBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
+! Subtract the background
+      IOBS = 0
+      YPMIN = YOBS(1) - YBBIN(1)
+      YPMAX = YPMIN
+      DO I = 1, NBIN
+        DO J = 1, LBIN
+          IOBS = IOBS + 1
+          YOBS(IOBS) = YOBS(IOBS) - YBBIN(I)
+          YPMIN = MIN(YOBS(IOBS),YPMIN)
+          YPMAX = MAX(YOBS(IOBS),YPMAX)
+        END DO
+        YOBIN(I) = YOBIN(I) - YBBIN(I)
+        YBBIN(I) = 0.0
+      END DO
+      XPGMIN = XPMIN
+      XPGMAX = XPMAX                       
+      YPGMIN = YPMIN
+      YPGMAX = YPMAX
+      CALL UPLOAD_RANGE()
+      XPGMINOLD = XPMIN
+      XPGMAXOLD = XPMAX
+      YPGMINOLD = YPMIN
+      YPGMAXOLD = YPMAX
+      IPMIN = 1
+      IPMAX = NBIN
+      IPMINOLD = IPMIN
+      IPMAXOLD = IPMAX
+      QUIT = .TRUE. 
+      BACKREF = .FALSE.
+
+      END SUBROUTINE SubtractBackground
+!
+!*****************************************************************************
+!
+      SUBROUTINE Background_Fit
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+      INCLUDE 'statlog.inc'
+
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+
+      INTEGER I, IBpass
+      LOGICAL QUIT
+
+! Remember current dialogue window
+      CALL PushActiveWindowID
+! Grey out all other menus
+      CALL ToggleMenus(0)
+! The reason behind this greying out seems to be that the next dialogue
+! window cannot be made modal because it needs to draw the calculated background 
+! to the main screen. And the user should be able to zoom in on parts of the graph
+! to decide whether or not to accept the background.
+      CALL WDialogSelect(ID_Background_Fit)
+! Initialise the background
+      CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
+      CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
+      CALL Profile_Plot(IPTYPE)
+      CALL WDialogShow(-1,-1,0,Modeless)
+      QUIT = .FALSE.
+      DO WHILE(.NOT. QUIT)
+        CALL GetEvent
+        IF (EventType .EQ. PushButton) THEN
+! Process it
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_Background_Apply)
+              CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
+              CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
+              CALL Profile_Plot(IPTYPE)
+            CASE (IDF_Background_Accept)
+              CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
+              CALL SubtractBackground(IBpass,20,.TRUE.,.TRUE.)
+            CASE (IDCANCEL)
+! If user Cancels, assume no knowledge on background
+              DO I = 1, NBIN
+                YBBIN(I) = 0.0
+              END DO
+              QUIT = .TRUE.
+          END SELECT
+        END IF
+      END DO
+      CALL WDialogSelect(ID_Background_Fit)
+      CALL WDialogHide()
+      CALL Profile_Plot(IPTYPE)
+      CALL ToggleMenus(1)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Background_Fit
+!
+!*****************************************************************************
+!
+      SUBROUTINE CalculateBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
 
       USE WINTERACTER
 
       IMPLICIT NONE
 
+      INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
+      LOGICAL, INTENT (IN   ) :: UseMc, UseSpline
+
       INCLUDE 'PARAMS.INC'
       INTEGER  NBIN, LBIN
       REAL     XBIN, YOBIN, YCBIN, YBBIN, EBIN
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-
-      INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
-      LOGICAL, INTENT (IN   ) :: UseMc, UseSpline
 
       INTEGER MAXSSPL
       PARAMETER (MAXSSPL=5000)
@@ -122,7 +253,7 @@
       ENDIF
       CALL WCursorShape(CurArrow)
 
-      END SUBROUTINE BackMCBruckner
+      END SUBROUTINE CalculateBackground
 !
 !*****************************************************************************
 !
@@ -333,6 +464,7 @@
         D = -D
   190 CONTINUE
       RETURN
+
       END SUBROUTINE DGMINV
 !
 !*****************************************************************************
