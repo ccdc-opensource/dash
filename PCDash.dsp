@@ -313,6 +313,16 @@ DEP_F90_PAWLEY=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\PCDruid_Main.f90
+DEP_F90_PCDRU=\
+	".\DRUID_HEADER.mod"\
+	".\Lattice.inc"\
+	".\statlog.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\PCDruid_Resource.F90
 # End Source File
 # Begin Source File
@@ -490,6 +500,10 @@ SOURCE=.\res\BACK.BMP
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\done.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\Druid.ico
 # End Source File
 # Begin Source File
@@ -559,6 +573,10 @@ SOURCE=.\res\TOOLBAR1.BMP
 # Begin Source File
 
 SOURCE=.\res\WidthEquations.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\wizard.ico
 # End Source File
 # Begin Source File
 
@@ -711,16 +729,6 @@ DEP_F90_INF_U=\
 
 SOURCE=.\Main_Field_Changed_Routines.f90
 DEP_F90_MAIN_=\
-	".\DRUID_HEADER.mod"\
-	".\Lattice.inc"\
-	".\statlog.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\PCDruid_Main.f90
-DEP_F90_PCDRU=\
 	".\DRUID_HEADER.mod"\
 	".\Lattice.inc"\
 	".\statlog.inc"\
