@@ -30,7 +30,7 @@
 !U           'PR','PT','PU','RA','RB','RE','RH','RN','RU','S ','SB','SC', &
 !U           'SE','SI','SM','SN','SR','TA','TB','TC','TE','TH','TI','TL', &
 !U           'TM','U ','V ','W ','X ','XE','Y ','YB','Z ','ZN','ZR','ZZ', &
-!U           'ME'/
+!U           'ME','DU'/
 
 !U! Elements (plus other CSD 'element' definitions What's 'Zz'??)
 !U      DATA atnr/   6,   1,  89,  47,  13,  95,  18,  33,  85,  79,   5, &
@@ -42,7 +42,7 @@
 !U             59,  78,  94,  88,  37,  75,  45,  86,  44,  16,  51,  21, &
 !U             34,  14,  62,  50,  38,  73,  65,  43,  52,  90,  22,  81, &
 !U             69,  92,  23,  74,   0,  54,  39,  70,   0,  30,  40,   0, &
-!U              0/
+!U              0,   0/
 
       INTEGER, DIMENSION(MAXBND)   :: btype
       INTEGER, DIMENSION(MAXBND,2) :: bond

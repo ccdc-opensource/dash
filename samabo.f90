@@ -20,6 +20,9 @@
 !          nbocry             = number of bonds
 !          bond(1:MAXBND,1:2) = the atoms connected by the bond
 !
+! In order to be able to deal with dummy atoms, element symbol 'Du', each atom with element
+! type aelem = 109 is ignored.
+!
 ! The code has been SPAGged.
 ! global variables all lower case,
 ! PARAMETERS ALL UPPER CASE,
@@ -52,17 +55,18 @@
       Tol = 0.5
       DO Iat = 1, natcry-1
         DO Jat = Iat+1, natcry
-          CALL PLUDIJ(Iat,Jat,Distance)
-          IF (Distance .LT. (BondRadius(aelem(Iat))+BondRadius(aelem(Jat))+Tol)) THEN
-            nbocry = nbocry + 1
-            bond(nbocry,1) = Iat
-            bond(nbocry,2) = Jat
+          IF ((aelem(Iat) .NE. 109) .AND. (aelem(Jat) .NE. 109)) THEN ! is either a dummy atom?
+            CALL PLUDIJ(Iat,Jat,Distance)
+            IF (Distance .LT. (BondRadius(aelem(Iat))+BondRadius(aelem(Jat))+Tol)) THEN
+              nbocry = nbocry + 1
+              bond(nbocry,1) = Iat
+              bond(nbocry,2) = Jat
+            ENDIF
           ENDIF
         ENDDO
       ENDDO
 
       END SUBROUTINE MakeBonds
-!*==SAMABO.f90  processed by SPAG 6.11Dc at 13:53 on  5 Oct 2001
 !
 !*****************************************************************************
 !
@@ -190,6 +194,7 @@
 ! process the bonds, setting number of connections NCAC exclude terminal H
 ! Initialise all bonds to 0
 ! assign single bond to all H atoms  -element code = 2
+! assign single bond to all dummy atoms  -element code = 109
 ! Initialise number of connections NCAC = 0, number of terminal hyds NHYC = 0
       ncac = 0
       nhyc = 0
@@ -197,12 +202,12 @@
         btype(I) = 0
         Iat = bond(I,1)
         Jat = bond(I,2)
-        IF (aelem(Iat).EQ.2) THEN
+        IF ((aelem(Iat).EQ.2) .OR. (aelem(Iat).EQ.109)) THEN
           btype(I) = 1
         ELSE
           ncac(Jat) = ncac(Jat) + 1
         ENDIF
-        IF (aelem(Jat).EQ.2) THEN
+        IF ((aelem(Jat).EQ.2) .OR. (aelem(Jat).EQ.109)) THEN
           btype(I) = 1
         ELSE
           ncac(Iat) = ncac(Iat) + 1
@@ -894,7 +899,6 @@
       ENDDO
 
       END SUBROUTINE SAMABO
-!*==SAMABM.f90  processed by SPAG 6.11Dc at 13:53 on  5 Oct 2001
 !
 !*****************************************************************************
 !
@@ -954,7 +958,6 @@
 !
 !*****************************************************************************
 !
-!*==SAMCON.f90  processed by SPAG 6.11Dc at 13:53 on  5 Oct 2001
       SUBROUTINE SAMCON(Iat,Ncon,Icon,Icob,Ipib)
 ! Function: Get list of connected atoms for given atom Iat.
 ! Version:  27.9.94
@@ -1005,7 +1008,6 @@
 !
 !*****************************************************************************
 !
-!*==SAMRIT.f90  processed by SPAG 6.11Dc at 13:53 on  5 Oct 2001
       SUBROUTINE SAMRIT(Ringat,Nring,Torang,Tormax)
 ! Function: Get torsion angles for atoms in ring given
 ! Version:  6.10.94
@@ -1060,7 +1062,6 @@
       ENDDO
 
       END SUBROUTINE SAMRIT
-!*==SAMANF.f90  processed by SPAG 6.11Dc at 13:53 on  5 Oct 2001
 !
 !*****************************************************************************
 !
@@ -1090,7 +1091,6 @@
       CALL SAMANG(X1,X2,X3,Aval)
 
       END SUBROUTINE SAMANF
-!*==SAMTOB.f90  processed by SPAG 6.11Dc at 13:53 on  5 Oct 2001
 !
 !*****************************************************************************
 !
@@ -1143,7 +1143,6 @@
       ENDDO
 
       END SUBROUTINE SAMTOB
-!*==SAMTOX.f90  processed by SPAG 6.11Dc at 13:53 on  5 Oct 2001
 !
 !*****************************************************************************
 !
@@ -1173,7 +1172,6 @@
       CALL SAMTOR(X1,X2,X3,X4,Aval)
 
       END SUBROUTINE SAMTOX
-!*==SAMSBT.f90  processed by SPAG 6.11Dc at 13:53 on  5 Oct 2001
 !
 !*****************************************************************************
 !
@@ -1683,25 +1681,25 @@
 
 ! carbon only 
         IF (AELEM(I).EQ.1) THEN
-          ICASE=0
-          IAT=I
+          ICASE = 0
+          IAT = I
 ! check for valence 3  on   planar C
-          IF (HYBR(I).EQ.2 .AND. ATVAL.NE.4) ICASE=1
+          IF (HYBR(I).EQ.2 .AND. ATVAL.NE.4) ICASE = 1
 ! check for valence 5 
-          IF (ATVAL.EQ.5) ICASE=2
+          IF (ATVAL.EQ.5) ICASE = 2
 ! check for    C = C = C    and no hybridisation state known 
 ! count the double bonds b=2
           IF (HYBR(I).EQ.0 .AND. NHYC(I).EQ.0 .AND. NCAC(I).EQ.2) THEN 
-            K=0
-            KMETAL=0
+            K = 0
+            KMETAL = 0
             CALL SAMCON(IAT,NCON,ICON,  ICOB,IPIB)
             DO 210 J=1,NCON
             JAT=ICON(J)
-            IF(HYBR(JAT).GT.100) KMETAL=KMETAL+1
-            IF(ICOB(J).EQ.2) K=K+1
+            IF (HYBR(JAT).GT.100) KMETAL=KMETAL+1
+            IF (ICOB(J).EQ.2) K = K + 1
 210         CONTINUE
-            IF(K.GT.1)  ICASE=3
-            IF(KMETAL.GT.0) ICASE=0
+            IF (K.GT.1) ICASE=3
+            IF (KMETAL.GT.0) ICASE = 0
             ENDIF
 ! if C valence > 5   then probably in a metal cluster. Leave alone
           IF(ATVAL.GT.5) ICASE=0
@@ -1716,21 +1714,21 @@
             CALL SAMCON(IAT,NCON,ICON,ICOB,IPIB)
             DO 218 J=1,NCON
             JAT=ICON(J)
-            IF(AELEM(JAT).EQ.56 )  ICASE=-1
-            IF(HYBR(JAT).GT.100)  ICASE=-1
-            IF(ICOB(J).EQ.5)  ICASE=-1 
+            IF (AELEM(JAT).EQ.56 ) ICASE=-1
+            IF (HYBR(JAT).GT.100) ICASE=-1
+            IF (ICOB(J).EQ.5) ICASE = -1 
 218         CONTINUE
-            NLIST=0
-            KLIST=0
+            NLIST = 0
+            KLIST = 0
             IF(ICASE.GT.0) THEN 
               DO 220 J=1,NCON
-              JAT=ICON(J)
+              JAT = ICON(J)
               CALL PLUDIJ(IAT,JAT,D1)
               IF(D1.LT. 1.450  .AND. AELEM(JAT).NE.2)  THEN 
-                NBT=7
+                NBT = 7
                 CALL SAMSBT(IAT,JAT,NBT)
-                NLIST=NLIST+1
-                ATLIST(NLIST)=JAT
+                NLIST = NLIST + 1
+                ATLIST(NLIST) = JAT
                 ENDIF
 220           CONTINUE
               ENDIF
@@ -1740,10 +1738,10 @@
 ! This by good luck stops expansion to metal centres, or to non-conjugated
 ! bonds.  The distance 1.450  may need some experimental adjustment. 
 !
-            IF(NLIST.GT.0) THEN 
+            IF (NLIST.GT.0) THEN 
                KLIST=0
                DO 230 J=1,NLIST
-               JAT=ATLIST(J)
+               JAT = ATLIST(J)
                CALL SAMCON(JAT,MCON,JCON,JCOB,IPIB)
                DO 240 K=1,MCON
                IF(JCOB(K).EQ.7) GOTO 240
@@ -1788,38 +1786,38 @@
 ! Count number of neutral metals, and split charge evenly among them.
 ! Do not allow balancing charge -ve on metals, must be +1 , +2, etc
 ! 
-      K=CHGPLU+CHGMIN
-      J=K
-      IF (K.LT.0 ) THEN 
-        KMETAL=0
-        J=IABS(K)
-        DO 555 I=1,NATCRY
-        IF(HYBR(I).GT.100 .AND. ATCHG(I).EQ.0) THEN
+      K = CHGPLU + CHGMIN
+      J = K
+      IF (K.LT.0) THEN 
+        KMETAL = 0
+        J = IABS(K)
+        DO 555 I = 1, NATCRY
+        IF (HYBR(I).GT.100 .AND. ATCHG(I).EQ.0) THEN
         CALL SAMCON(I,NCON,ICON, ICOB,IPIB)
-          DO 556 K=1,NCON
-          IF(ICOB(K).NE.6) GOTO 557
-556       CONTINUE
+          DO K=1,NCON
+            IF (ICOB(K).NE.6) GOTO 557
+          ENDDO
 ! if here, no non-polymeric bonds, so omit this metal.
-          HYBR(I)=-IABS(HYBR(I))
+          HYBR(I) = -IABS(HYBR(I))
           GOTO 555
 557       CONTINUE
-          KMETAL=KMETAL+1
+          KMETAL = KMETAL + 1
         ENDIF
 555     CONTINUE
-        IF(KMETAL.GT.0) THEN 
-          M=J/KMETAL  
-          IF(M.EQ.0) M=1
+        IF (KMETAL.GT.0) THEN 
+          M = J / KMETAL  
+          IF (M.EQ.0) M = 1
           DO 560 I=1,NATCRY
           IF(HYBR(I).GT.100) THEN 
             ATCHG(I)=M
-            J=J-M
+            J = J - M
             IF (J.LE.0) GOTO 561
           ENDIF
 560       CONTINUE
 561       CONTINUE
           ENDIF
         ENDIF
-      IF(J.NE.0) THEN 
+      IF (J.NE.0) THEN 
 !        IF(IDEBUG.GT.0)WRITE(LU,*)'WARNING - unbalanced charge sum =', J
       ENDIF
 
@@ -1913,14 +1911,14 @@
       REAL D12, DTOL
       PARAMETER (DTOL=0.000001)
 
-      V(1)=X2(1)-X1(1)
-      V(2)=X2(2)-X1(2)
-      V(3)=X2(3)-X1(3)
-      D12=SQRT(V(1)*V(1)+V(2)*V(2)+V(3)*V(3))
+      V(1) = X2(1) - X1(1)
+      V(2) = X2(2) - X1(2)
+      V(3) = X2(3) - X1(3)
+      D12 = SQRT(V(1)*V(1)+V(2)*V(2)+V(3)*V(3))
       IF (D12.LT.DTOL) THEN
-        V(1)=1.0
-        V(2)=0.0
-        V(3)=0.0
+        V(1) = 1.0
+        V(2) = 0.0
+        V(3) = 0.0
       ELSE
         V = V / D12
       ENDIF
@@ -1999,43 +1997,43 @@
 ! ignore pi-bonds
       IPIB=-1
 !
-      DO 500 ITRY=1,999999
-        IAT=RINGAT(N)
+      DO 500 ITRY = 1, 999999
+        IAT = RINGAT(N)
         IF(IAT.NE.CAT) THEN
           CALL SAMCON(IAT,NCX,LLIG,LMIG,IPIB)
 ! record atom for which we have connections in LLIG array
-          CAT=IAT
+          CAT = IAT
         ENDIF
-        IPT(N)=IPT(N)+1
+        IPT(N) = IPT(N) + 1
         IF (IPT(N).GT.NCX) THEN
-          IBACK=1
+          IBACK = 1
         ELSE
-          JAT=LLIG(IPT(N))
+          JAT = LLIG(IPT(N))
           IF (JAT.EQ.IFROM(N)) GOTO 500
 ! reject if bond type not as required
           IF (NBTEST.GT.0) THEN
-            DO 410 L=2,NBTEST+1
+            DO L = 2, NBTEST+1
               IF(IABS(LMIG(IPT(N))).EQ.IBTYPE(L)) GOTO 420
-  410       CONTINUE
+            ENDDO
 ! bond type does not match
             GOTO 500
   420       CONTINUE
           ENDIF
 ! reject if already in the ring list - this is a secondary ring closure.
-          DO 450 L=2,N
+          DO L = 2, N
             IF (JAT.EQ.RINGAT(L)) GOTO 500
- 450      CONTINUE
+          ENDDO
 ! growth point JAT is rejected if a terminal atom
           CALL SAMCON(JAT,NCX,LLIG,LMIG,IPIB)
 ! record atom for which we have connections stored
-          CAT=JAT
+          CAT = JAT
           IF (NCX.LE.1) GOTO 500
 ! accept this as possible ring atom
-          N=N+1
-          RINGAT(N)=JAT
-          IFROM(N)=IAT
-          IPT(N)=0
-          IBACK=0
+          N = N + 1
+          RINGAT(N) = JAT
+          IFROM(N) = IAT
+          IPT(N) = 0
+          IBACK = 0
 ! test from ring closure if growth atom Jat = start atom Iat1
           IF (JAT.EQ.IAT1) GOTO 501
         ENDIF
@@ -2044,16 +2042,16 @@
 ! backtrack on trial atom N , so we can try next connect to Iat
 ! if N = 0 then stop process, no ring found
         IF (IBACK.EQ.1) THEN
-          IAT=IFROM(N)
+          IAT = IFROM(N)
           IF (IAT.LE.0) GOTO 501
-          N=N-1
+          N = N - 1
         ENDIF
 !
 ! loop on trials
 !
  500    CONTINUE
  501  CONTINUE
-      NRING=N-1
+      NRING = N - 1
 
       END SUBROUTINE SAMRIQ
 !
@@ -2117,32 +2115,32 @@
 ! each atom has a maximum of 29 connections.  (*,30) is the number of conn.
 !
 ! check that atom IAT is a transiton metal.
-      IPIBON=0
-      I1=0
-      I2=0
-      IF (.NOT.ISMET(aelem(IAT)).AND.aelem(IAT).NE.85) I1=1
-      IF (.NOT.ISMET(aelem(JAT)).AND.aelem(JAT).NE.85) I2=1      
+      IPIBON = 0
+      I1 = 0
+      I2 = 0
+      IF (.NOT.ISMET(aelem(IAT)).AND.aelem(IAT).NE.85) I1 = 1
+      IF (.NOT.ISMET(aelem(JAT)).AND.aelem(JAT).NE.85) I2 = 1      
  ! swap so Tr metal is Iat
       IF (I1.EQ.0) THEN
-        IAT1=IAT
-        JAT1=JAT
+        IAT1 = IAT
+        JAT1 = JAT
       ELSE
-        IAT1=JAT
-        JAT1=IAT
+        IAT1 = JAT
+        JAT1 = IAT
       ENDIF
       IF (aelem(JAT1).NE.1) RETURN
 ! NC is number of connections to Metal atom Iat. Search these for
 ! a Carbon   (iel=1)  which bonds to the carbon atom Jat.
 ! including bonds already assigned as pi-bonds
-      IPIB=1
+      IPIB = 1
       CALL SAMCON(IAT1,NCX,ILIG,LMIG,IPIB)
-      DO  K=1,NCX
+      DO  K = 1, NCX
         KAT=ILIG(K)
         IF (KAT.EQ.JAT1) RETURN
         IF (aelem(KAT).NE.1) RETURN
         CALL SAMCON(KAT,NCK,KLIG,LMIG,IPIB)
-        DO L=1,NCK
-          IF(KLIG(L).EQ.JAT1) IPIBON=1
+        DO L = 1, NCK
+          IF(KLIG(L).EQ.JAT1) IPIBON = 1
         ENDDO
         IF (IPIBON.GT.0) RETURN
       ENDDO
