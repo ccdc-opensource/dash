@@ -26,7 +26,8 @@
       REAL    SA_Duration ! The time the SA took, in seconds
       CHARACTER*10 SA_DurationStr
       INTEGER Ierrflag
-      INTEGER I
+      INTEGER I, RangeOption
+      CHARACTER*2 RowLabelStr
 
       IF (CheckOverwriteSaOutput() .EQ. 0) THEN
         CALL WizardWindowShow(IDD_SA_input3)
@@ -73,7 +74,17 @@
 ! Initialise all overlay checkboxes to 'Checked'
       DO I = 1, SA_Run_Number
         CALL WGridPutCellCheckBox(IDF_SA_summary,3,I,Checked)
+        WRITE(RowLabelStr,'(I2)') I
+        CALL WGridLabelRow(IDF_SA_summary,I,RowLabelStr)
       ENDDO
+      CALL WDialogGetRadioButton(IDF_ShowRange,RangeOption)
+      IF (RangeOption .EQ. 1) THEN ! "Show Selected"
+        CALL WDialogFieldState(IDF_Limit1,Enabled)
+        CALL WDialogFieldState(IDF_Limit2,Enabled)
+      ELSE
+        CALL WDialogFieldState(IDF_Limit1,Disabled)
+        CALL WDialogFieldState(IDF_Limit2,Disabled)
+      ENDIF
       CALL WDialogShow(-1,-1,0,Modeless)
       Ierrflag =  InfoError(1)
       DoSaRedraw = .FALSE.
