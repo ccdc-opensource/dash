@@ -3,10 +3,9 @@
 !
 ! JCC Re-implemented as a function
 !
-      INTEGER FUNCTION read_one_zm(iFrg)
+      INTEGER FUNCTION Read_One_Zm(iFrg)
 
       USE ZMVAR
-      USE SAMVAR
 
       IMPLICIT NONE
 
@@ -30,14 +29,11 @@
       INTEGER ErrorStatus
       REAL ta, tb, tc, talpha, tbeta, tgamma
       INTEGER I, J, NumCol
-      INTEGER GetNumOfColumns ! Function
+      INTEGER, EXTERNAL :: GetNumOfColumns
       CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
-      INTEGER II, izm, IKK, nlin, natof
+      INTEGER nlin, natof
       INTEGER AsymLen, IDlen
       CHARACTER*3 tIDstr
-      REAL*8 CART(1:3,1:MAXATM)
-      INTEGER BondNr
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
 ! JCC Initialise return value to successful (zero)
 ! If the return value is non-zero, then an error occurred. The return status corresponds
@@ -62,40 +58,16 @@
         natof = maxatm
       ENDIF
       natoms(iFrg) = natof
-      izmpar(iFrg) = 7 ! always reserve 4 parameters for rotations, whether quaternion or single axis
-      czmpar(1,iFrg) = ' x(frag )'
-      czmpar(2,iFrg) = ' y(frag )'
-      czmpar(3,iFrg) = ' z(frag )'
-! izmpar = number of degrees of freedom ('parameters')
-! kzmpar = type of parameter (1 = translation)
-! xzmpar = initial value of parameter
-! czmpar = Character string associated with this parameter value
-      DO ii = 1, 3
-        kzmpar(ii,iFrg) = 1
-        xzmpar(ii,iFrg) = 0.5
-      ENDDO
-      czmpar(4,iFrg) = 'Q1(frag )'
-      czmpar(5,iFrg) = 'Q2(frag )'
-      czmpar(6,iFrg) = 'Q3(frag )'
-      czmpar(7,iFrg) = 'Q4(frag )'
-      DO ii = 4, 7
-        kzmpar(ii,iFrg) = 2 ! Quaternion
-        xzmpar(ii,iFrg) = 0.5
-      ENDDO
-      DO i = 1, 7
-        WRITE (czmpar(i,iFrg)(8:8),880) iFrg
-      ENDDO
-      ikk = 7 ! always reserve 4 parameters for rotations, whether quaternion or single axis
-      DO i = 1, natof
+      DO i = 1, natoms(iFrg)
 ! Remaining lines contain the Z-matrix
 !  C      1.5152617  0  113.2370014  0 -179.8250018  0   54   51   48  3.0  1.0   58 C6 C7 C8 C9
         READ (19,1900,ERR=999,IOSTAT=ErrorStatus) nlin, line
 ! JCC Added in traps on internal read
         READ (line(3:5),'(A3)',ERR=999,IOSTAT=ErrorStatus) asym(i,iFrg)
         CALL StrClean(Asym,AsymLen)
-        Asym(i,ifrg)(1:1) = ChrUpperCase(Asym(i,iFrg)(1:1))
-        Asym(i,ifrg)(2:2) = ChrLowerCase(Asym(i,iFrg)(2:2))
-        Asym(i,ifrg)(3:3) = ChrLowerCase(Asym(i,iFrg)(3:3))
+        Asym(i,iFrg)(1:1) = ChrUpperCase(Asym(i,iFrg)(1:1))
+        Asym(i,iFrg)(2:2) = ChrLowerCase(Asym(i,iFrg)(2:2))
+        Asym(i,iFrg)(3:3) = ChrLowerCase(Asym(i,iFrg)(3:3))
 ! First item--the element--has been read. Rest more tricky.
 ! First, convert tabs to spaces and remove redundant spaces
         CALL StrClean(line,nlin)
@@ -143,8 +115,59 @@
         OriginalLabel(i,iFrg) = tSubString(1:5)
         izmbid(izmoid(i,iFrg),iFrg) = i   ! the backward mapping from atoms in the Z-matrix
       ENDDO
-! Broken into 2 loops now so that we can get the labels to relate to the original molecule IDs
-      DO i = 1, natof
+      CLOSE (19)
+      gotzmfile(iFrg) = .TRUE.
+      CALL zmDoAdmin(iFrg)
+! Now precalculate the bonds
+      CALL zmGenerateBonds(iFrg)
+      RETURN
+! JCC Added in return status for failed reading and failed opening
+  999 Read_One_Zm = ErrorStatus
+      RETURN
+ 1900 FORMAT (Q,A)
+  580 FORMAT (I4)
+
+      END FUNCTION Read_One_Zm
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmDoAdmin(iFrg)
+
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iFrg
+
+      INTEGER i, ii, izm
+
+      czmpar(1,iFrg) = ' x(frag )'
+      czmpar(2,iFrg) = ' y(frag )'
+      czmpar(3,iFrg) = ' z(frag )'
+      DO ii = 1, 3
+        kzmpar(ii,iFrg) = 1 ! Translation
+      ENDDO
+      IF (natoms(iFrg) .EQ. 1) THEN
+        izmpar(iFrg) = 3
+      ELSE
+        izmpar(iFrg) = 7 ! always reserve 4 parameters for rotations, whether quaternion or single axis
+! izmpar = number of degrees of freedom ('parameters')
+! kzmpar = type of parameter (1 = translation)
+! xzmpar = initial value of parameter
+! czmpar = Character string associated with this parameter value
+        czmpar(4,iFrg) = 'Q1(frag )'
+        czmpar(5,iFrg) = 'Q2(frag )'
+        czmpar(6,iFrg) = 'Q3(frag )'
+        czmpar(7,iFrg) = 'Q4(frag )'
+        DO ii = 4, 7
+          kzmpar(ii,iFrg) = 2 ! Quaternion
+        ENDDO
+      ENDIF
+      DO ii = 1, izmpar(iFrg)
+        WRITE (czmpar(ii,iFrg)(8:8),'(I1)') iFrg
+        xzmpar(ii,iFrg) = 0.5
+      ENDDO
+      DO i = 1, natoms(iFrg)
 ! IOPTB = 1 OPTIMISE BOND
         IF (ioptb(i,iFrg).EQ.1) THEN
           izmpar(iFrg) = izmpar(iFrg) + 1
@@ -184,20 +207,24 @@
           ENDIF
         ENDIF
       ENDDO
-      CLOSE (19)
-      gotzmfile(iFrg) = .TRUE.
-      IF (natof.EQ.1) THEN
-        izmpar(ifrg) = 3
-        czmpar(1,iFrg) = ' x(frag )'
-        czmpar(2,iFrg) = ' y(frag )'
-        czmpar(3,iFrg) = ' z(frag )'
-        DO ii = 1, 3
-          WRITE (czmpar(ii,iFrg)(8:8),880) iFrg
-          kzmpar(ii,iFrg) = 1
-          xzmpar(ii,iFrg) = 0.5
-        ENDDO
-      ENDIF
-! Now precalculate the bonds
+
+      END SUBROUTINE zmDoAdmin
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmGenerateBonds(iFrg)
+
+      USE SAMVAR
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iFrg
+
+      REAL*8  CART(1:3,1:MAXATM)
+      INTEGER I, BondNr
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
+
       natcry = NATOMS(iFrg)
       CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),      &
                      IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
@@ -226,15 +253,8 @@
         Bonds(1,BondNr,iFrg)  = bond(BondNr,1)
         Bonds(2,BondNr,iFrg)  = bond(BondNr,2)
       ENDDO
-      RETURN
-! JCC Added in return status for failed reading and failed opening
-  999 Read_One_Zm = ErrorStatus
-      RETURN
- 1900 FORMAT (Q,A)
-  880 FORMAT (I1)
-  580 FORMAT (I4)
 
-      END FUNCTION READ_ONE_ZM
+      END SUBROUTINE zmGenerateBonds
 !
 !*****************************************************************************
 !
