@@ -36,17 +36,17 @@
 
 !C INITIALISATION
       IBMBER = 0
-      ERRY = 0.000001  ! ACCURACY RESTRICTION FOR PEAKTOP
+      ERRY = 1.0E-5  ! ACCURACY RESTRICTION FOR PEAKTOP
       LEFT_BOUND = ZARGI(IIMIN)
       RIGHT_BOUND = ZARGI(IIMAX)
 !C FIND PEAK TOP
-      CALL PEAKTOP(LEFT_BOUND,RIGHT_BOUND,TMAX,TOP,ERRY)
+      CALL PEAKTOP(LEFT_BOUND, RIGHT_BOUND, TMAX, TOP, ERRY)
       TOP2 = 0.5*TOP
 !C FIND RHS ROOT
-      CALL HALF_WIDTH(TMAX,RIGHT_BOUND,V)
+      CALL HALF_WIDTH(TMAX, RIGHT_BOUND, V)
       IF (IBMBER .NE. 0) RETURN
 !C FIND LHS ROOT
-      CALL HALF_WIDTH(LEFT_BOUND,TMAX,W)
+      CALL HALF_WIDTH(LEFT_BOUND, TMAX, W)
       IF (IBMBER .NE. 0) RETURN
 !C OUTPUT
       FWHM = V - W
@@ -56,7 +56,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PEAKTOP(XMIN,XMAX,XAV,YTOP,YSMALL)
+      SUBROUTINE PEAKTOP(XMIN, XMAX, XAV, YTOP, YSMALL)
 ! This routine finds the maximum position of a single peak
 ! function, PKFUNC(X), in the region between XMIN and XMAX
 
@@ -70,25 +70,39 @@
       REAL    X(5), Y(5)
       INTEGER MAXITER, ITER
       INTEGER I, IMAX
-      REAL    D2Y, YMAX, SUMIIY, ATEM, SUMY
+      REAL    D2Y, YMAX
 
       MAXITER = 100
       X(1) = XMIN
+      X(3) = 0.5*(XMIN+XMAX)
       X(5) = XMAX
-      Y(1) = PKFUNC(XMIN)
-      Y(5) = PKFUNC(XMAX)
+      Y(1) = PKFUNC(X(1))
+      Y(3) = PKFUNC(X(3))
+      Y(5) = PKFUNC(X(5))
       ITER = 0
    10 ITER = ITER + 1
+      IF (ITER .EQ. MAXITER/2) THEN
+! This indicates that we have a problem
+
+      ENDIF
       IF (ITER .GT. MAXITER) THEN
         CALL DebugErrorMessage("ITER .GT. MAXITER in PEAKTOP()")
+!DEC$ IF DEFINED (ONTBUG)
+        WRITE(76,"(5F15.11)") X(1), X(2), X(3), X(4), X(5)
+        WRITE(76,"(5F15.11)") Y(1), Y(2), Y(3), Y(4), Y(5)
+        WRITE(76,"(F15.11)")  ABS(2.0-(Y(5)/Y(3)+Y(1)/Y(3)))
+        WRITE(76,"(F15.11)")  ABS(2.0-(Y(5)+Y(1))/Y(3))
+        WRITE(76,"(F15.11)")  ABS((2.0*Y(3)-Y(5)-Y(1))/Y(3))
+        CLOSE (76)
+!DEC$ ENDIF
         GOTO 100
       ENDIF
-      DO I = 2, 4
-        X(I) = X(1) + 0.2*FLOAT(I-1)*(X(5)-X(1))
-        Y(I) = PKFUNC(X(I))
-      ENDDO
+      X(2) = X(1) + 0.25*(X(5)-X(1))
+      Y(2) = PKFUNC(X(2))
+      X(4) = X(1) + 0.75*(X(5)-X(1))
+      Y(4) = PKFUNC(X(4))
 ! Test whether peak top has been reached
-      D2Y = ABS(2.-(Y(5)+Y(1))/Y(3))
+      D2Y = ABS(2.0-(Y(5)+Y(1))/Y(3))
       IF (D2Y .LT. YSMALL) GOTO 100
       YMAX = -1.0
       DO I = 1, 5
@@ -117,20 +131,14 @@
       ENDIF
       GOTO 10
  100  XAV = X(3)
-      SUMIIY = 0.0
-      SUMY = 0.0
-      DO I = 1 ,5
-        ATEM = FLOAT(I-3)
-        SUMIIY = SUMIIY + Y(I)*ATEM*ATEM
-        SUMY = SUMY + Y(I)
-      ENDDO
-      YTOP = (17.0*SUMY - 5.0*SUMIIY)/35.0
+! Savitzky-Golay
+      YTOP = (-3.0*Y(1) + 12.0*Y(2) + 17.0*Y(3) + 12.0*Y(4) - 3.0*Y(5)) / 35.0
 
       END SUBROUTINE PEAKTOP
 !
 !*****************************************************************************
 !
-      SUBROUTINE HALF_WIDTH(tX1,tX2,ROOT)
+      SUBROUTINE HALF_WIDTH(tX1, tX2, ROOT)
 ! This finds any roots of the function PKFUNC(X) in the range X1 < X < X2
 
       IMPLICIT NONE
@@ -173,7 +181,7 @@
       IF (ABS(X2-X1) .GE. 0.0001) THEN
         X3 = 0.5*(X1+X2)
       ELSE
-        X3 = (1.0/(Y2-Y1))*((X1*Y2)-(X2*Y1))
+        X3 = ((X1*Y2)-(X2*Y1))/(Y2-Y1)
       ENDIF
 ! Has accuracy limit been reached
       IF (ABS(X3-X1) .LE. 1.0E-5) THEN
