@@ -380,6 +380,9 @@
           CALL DealWithSAStatusWindow
           GOTO 10
         CASE (IDD_SAW_Page5)
+          CALL DealWithAnalyseSolutionsWindow
+          GOTO 10
+        CASE (IDD_Summary)
           CALL DealWithSaSummary
           GOTO 10
         CASE (IDD_Rietveld)

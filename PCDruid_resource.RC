@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/Apr/2002 17:18:43
+// Modified : 11/Apr/2002 15:35:43
 //
 ///////////////////////////////////////////////////
 //
@@ -373,8 +373,6 @@
 #define ID_Tutorial_5                   40002
 #define IDBACK                           1001
 #define IDNEXT                           1040
-#define IDD_SA_Multi_completed_ep         127
-#define IDD_TEMPLATE011                   128
 #define IDF_SA_Summary                   1136
 #define IDD_PW_Page5                      131
 #define IDF_MaxResolution                1205
@@ -459,8 +457,6 @@
 #define IDF_MaxMoves2                    1235
 #define IDD_PW_Page10                     119
 #define IDF_OutputPRO                    1043
-#define IDF_ShowRange                    1217
-#define IDF_ShowTicked                   1218
 #define IDF_Limit1                       1219
 #define IDF_Limit2                       1220
 #define IDF_InvertSelection              1221
@@ -618,6 +614,9 @@
 #define IDD_SAW_Page5                     102
 #define IDD_TEMPLATE021                   176
 #define IDB_AnalyseSolutions            40029
+#define IDD_Summary                       177
+#define IDD_DIALOG009                     178
+#define IDB_Select                       1112
 
 ///////////////////////////////////////////////////
 //
@@ -1397,7 +1396,7 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  167,   77,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "Bin >",IDB_Bin,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  264,  150,   40,   14
+    CONTROL "Rebin >",IDB_Bin,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  264,  150,   40,   14
 END
 
 IDD_PW_Page3 RCDATA
@@ -2067,80 +2066,6 @@ BEGIN
 "[Grids] \n"
 "[Colours] \n"
 "[Lengths] \n"
-,0
-END
-
-IDD_SA_Multi_completed_ep DIALOG 0, 0,  470,  184
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
-FONT    8, "MS Sans Serif"
-CAPTION "Results from Simulated Annealing"
-BEGIN
-    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   12,   24,  447,   80
-    CONTROL "Simulated Annealing completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  119,    8,  230,   10
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  165,  162,   40,   14
-    CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  236,  162,   60,   14
-    CONTROL "E&lement symbol + solution number",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   21,  119,  122,   14
-    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   21,  136,  122,   14
-    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  171,  119,   75,   14
-    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  171,  136,   75,   14
-    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   13,  109,  138,   46
-    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  163,  109,   94,   46
-    CONTROL "Solution range for overlay",IDF_GROUP5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  270,  109,  180,   46
-    CONTROL "Show solutions",IDF_ShowRange,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  277,  119,   60,   14
-    CONTROL "Show selected",IDF_ShowTicked,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  277,  136,   60,   14
-    CONTROL "through",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  372,  121,   30,    8
-    CONTROL "1",IDF_Limit1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  338,  119,   32,   14
-    CONTROL "1",IDF_Limit2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  406,  119,   32,   14
-    CONTROL "&Invert Selection",IDF_InvertSelection,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  338,  136,   60,   14
-END
-
-IDD_SA_Multi_completed_ep RCDATA
-BEGIN
-"[Checks] \n"
-" 1178 0 \n"
-" 1164 1 \n"
-" 1216 0 \n"
-" 1200 1 \n"
-" 1217 0 \n"
-" 1218 1 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-" 1219               1              99 \n"
-" 1220               1              99 \n"
-"[Trackbars] \n"
-"[Grids] \n"
-" 1136     5     99   128 \n"
-"   20 \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_TEMPLATE011 DIALOG 0, 0, 1000,   16
-STYLE DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Solution Filename",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY,    0,    0,  240,   14
-    CONTROL "View",ISS2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   30,   14
-    CONTROL "Overlay",ISS7,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT,    0,    0,   34,   14
-    CONTROL "Profile Chi-sqd",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   54,   14
-    CONTROL "Intensity Chi-sqd",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   60,   14
-END
-
-IDD_TEMPLATE011 RCDATA
-BEGIN
-"[Checks] \n"
-" 1066 0 \n"
-" 1093 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-" 1021   255 \n"
 ,0
 END
 
@@ -3766,7 +3691,7 @@ BEGIN
 ,0
 END
 
-IDD_SAW_Page5 DIALOG 0, 0,  440,  170
+IDD_SAW_Page5 DIALOG 0, 0,  359,  197
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Analyse Solutions"
@@ -3775,21 +3700,21 @@ BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "<&Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  269,  150,   60,   14
-    CONTROL "E&lement + solution #",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  347,   20,   75,   14
-    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  347,   37,   75,   14
-    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  347,   73,   75,   14
-    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  347,   90,   75,   14
-    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  339,   10,   90,   46
-    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  339,   63,   90,   46
-    CONTROL "Solution range for overlay",IDF_GROUP5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  122,   96,  178,   46
-    CONTROL "Show solutions",IDF_ShowRange,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  129,  106,   60,   14
-    CONTROL "Show selected",IDF_ShowTicked,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  129,  123,   60,   14
-    CONTROL "through",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  224,  108,   30,    8
-    CONTROL "1",IDF_Limit1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  190,  106,   33,   14
-    CONTROL "1",IDF_Limit2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  258,  106,   33,   14
-    CONTROL "&Invert Selection",IDF_InvertSelection,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  190,  123,   60,   14
+    CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  283,  150,   60,   14
+    CONTROL "E&lement + solution #",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  103,  106,   75,   14
+    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  103,  120,   75,   14
+    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  208,  106,   75,   14
+    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  208,  120,   75,   14
+    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   95,   96,   90,   43
+    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  200,   96,   90,   43
+    CONTROL "through",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  198,  178,   30,    8
+    CONTROL "1",IDF_Limit1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  164,  176,   34,   14
+    CONTROL "1",IDF_Limit2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  228,  176,   34,   14
+    CONTROL "&Invert Selection",IDF_InvertSelection,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  283,  176,   60,   14
     CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   92,   10,  237,   80
+    CONTROL "Select",IDB_Select,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   88,  176,   40,   14
+    CONTROL "solutions",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  128,  178,   36,    8
+    CONTROL "Save...",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  233,  150,   40,   14
 END
 
 IDD_SAW_Page5 RCDATA
@@ -3799,8 +3724,6 @@ BEGIN
 " 1164 1 \n"
 " 1216 0 \n"
 " 1200 1 \n"
-" 1217 0 \n"
-" 1218 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -3838,6 +3761,76 @@ BEGIN
 "[Grids] \n"
 "[Colours] \n"
 "[Lengths] \n"
+,0
+END
+
+IDD_Summary DIALOG 0, 0,  265,  196
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Results from Simulated Annealing"
+BEGIN
+    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   14,    8,  238,   80
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   37,  173,   40,   14
+    CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  165,  173,   60,   14
+    CONTROL "E&lement + solution #",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   41,  130,   75,   14
+    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   41,  144,   75,   14
+    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  143,  130,   75,   14
+    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  143,  144,   75,   14
+    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   33,  120,   94,   43
+    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  135,  120,   94,   43
+    CONTROL "through",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  153,  100,   30,    8
+    CONTROL "1",IDF_Limit1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  119,   98,   35,   14
+    CONTROL "1",IDF_Limit2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  183,   98,   36,   14
+    CONTROL "&Invert Selection",IDF_InvertSelection,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,  173,   60,   14
+    CONTROL "Select",IDB_Select,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   43,   97,   40,   14
+    CONTROL "solutions",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   83,  100,   36,    8
+END
+
+IDD_Summary RCDATA
+BEGIN
+"[Checks] \n"
+" 1178 0 \n"
+" 1164 1 \n"
+" 1216 0 \n"
+" 1200 1 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1219               1              99 \n"
+" 1220               1              99 \n"
+"[Trackbars] \n"
+"[Grids] \n"
+" 1136     5     99   178 \n"
+"   20 \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_DIALOG009 DIALOG 0, 0, 1000,   16
+STYLE DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Run nr.",ISS1,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   30,   14
+    CONTROL "View",ISS2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   30,   14
+    CONTROL "Overlay",ISS7,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT,    0,    0,   34,   14
+    CONTROL "Profile Chi-sqd",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   54,   14
+    CONTROL "Intensity Chi-sqd",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   60,   14
+END
+
+IDD_DIALOG009 RCDATA
+BEGIN
+"[Checks] \n"
+" 1066 0 \n"
+" 1093 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+" 1021   255 \n"
 ,0
 END
 
