@@ -2408,7 +2408,7 @@ IDB_ZMatrix_Browse5             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 //
 // Icons
 //
-icon1                           ICON   DISCARDABLE "res\\Druid_2.ico"
+icon1                           ICON   DISCARDABLE "res\\DASH.ico"
 
 ///////////////////////////////////////////////////
 //
