@@ -2,11 +2,7 @@
 !*****************************************************************************
 !
       SUBROUTINE Profile_Plot
-!
-! JvdS There is only one place in the DASH code where this function is NOT
-! called with 'IPTYPE' as argument: and that's when it's called with '-IPTYPE'
-! to produce hard copy.
-!
+
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -60,9 +56,12 @@
         CASE (2) 
           CALL Plot_ObsCalc_Profile()
       END SELECT
+      IF (.NOT. PastPawley) THEN
 ! Plot peakfit ranges
-      IF ((NumPeakFitRange .GT. 0) .AND. (.NOT. PastPawley)) CALL Plot_PeakFit_Info()
-      IF (PlotBackground()) CALL Plot_Background()
+        IF (NumPeakFitRange .GT. 0) CALL Plot_PeakFit_Info()
+! Plot Background
+        IF (PlotBackground()) CALL Plot_Background()
+      ENDIF
 !  Plot tic marks etc. if appropriate
       IF (NTIC .NE. 0) CALL Plot_Calculated_Tics()
       PLOTT = .TRUE.
