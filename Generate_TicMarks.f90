@@ -128,14 +128,14 @@
 
       INTEGER matsz
       CHARACTER*6 xxx
-      CHARACTER*10 fname
+      CHARACTER*10 fname_2
       REAL ALSQ(1)
 
-      fname = 'polyf'
+      fname_2 = 'polyf'
       xxx = 'CN11LS'
       MATSZ = 0 ! There should not be any basic variables
       NINIT = 1
-      CALL FORTIC(xxx,ALSQ,MATSZ,PCCN01,PFCN03,DUMMY,fname)
+      CALL FORTIC(xxx,ALSQ,MATSZ,PCCN01,PFCN03,DUMMY,fname_2)
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
