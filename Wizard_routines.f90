@@ -66,6 +66,7 @@
 
       INTEGER :: IPW_Option
       LOGICAL FnUnitCellOK ! Function
+      CHARACTER*MaxPathLength tString
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
@@ -84,8 +85,15 @@
                 SELECT CASE (IPW_Option)
                   CASE (1) ! View data / determine peaks positions
                     CALL WDialogSelect(IDD_PW_Page3)
-                    CALL WDialogFieldState(IDFINISH,Disabled)
-                    CALL WDialogFieldState(IDNEXT,Disabled)
+                    CALL WDialogGetString(IDF_PWa_DataFileName_String,tString)
+! If no filename provided => grey out buttons 'Next' and 'Finish'
+                    IF (LEN_TRIM(tString) .EQ. 0) THEN
+                      CALL WDialogFieldState(IDFINISH,Disabled)
+                      CALL WDialogFieldState(IDNEXT,Disabled)
+                    ELSE
+                      CALL WDialogFieldState(IDFINISH,Enabled)
+                      CALL WDialogFieldState(IDNEXT,Enabled)
+                    ENDIF
                     CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
                   CASE (2) ! Preparation for Pawley refinement
                     CALL WDialogSelect(IDD_PW_Page1)
@@ -124,7 +132,10 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
 
-      CHARACTER(LEN=MaxPathLength) :: CTEMP
+      CHARACTER(LEN=MaxPathLength) CTEMP
+      INTEGER ISTAT
+      INTEGER DiffractionFileBrowse ! Function
+      INTEGER DiffractionFileOpen ! Function
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page3)
@@ -153,15 +164,24 @@
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (ID_PWa_DF_Open)
               CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
-              CALL DiffractionFileOpen(CTEMP)
-!@ Should test for success here
-              CALL WDialogFieldState(IDNEXT,Enabled)
-              CALL WDialogFieldState(IDFINISH,Enabled)
+              ISTAT = DiffractionFileOpen(CTEMP)
+              IF (ISTAT .EQ. 1) THEN
+                CALL WDialogFieldState(IDNEXT,Enabled)
+                CALL WDialogFieldState(IDFINISH,Enabled)
+              ELSE
+                CALL WDialogFieldState(IDNEXT,Disabled)
+                CALL WDialogFieldState(IDFINISH,Disabled)
+              ENDIF
             CASE (ID_PWa_DF_Browse)
-              CALL DiffractionFileBrowse
-!@ Should test for success here
-              CALL WDialogFieldState(IDNEXT,Enabled)
-              CALL WDialogFieldState(IDFINISH,Enabled)
+              ISTAT = DiffractionFileBrowse()
+! Only change if the user didn't press 'Cancel'
+              IF      (ISTAT .EQ. 1) THEN
+                CALL WDialogFieldState(IDNEXT,Enabled)
+                CALL WDialogFieldState(IDFINISH,Enabled)
+              ELSE IF (ISTAT .EQ. 0) THEN
+                CALL WDialogFieldState(IDNEXT,Disabled)
+                CALL WDialogFieldState(IDFINISH,Disabled)
+              ENDIF
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowDiffractionFileInput 1')
           END SELECT
@@ -177,6 +197,9 @@
 !*****************************************************************************
 !
       SUBROUTINE DealWithWizardWindowDiffractionSetup
+!
+! Effectively, the user is asked to provide / confirm the wavelength
+!
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -434,8 +457,6 @@
               CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
               CALL CalculateBackground(tInt1,tInt2,tUseMC,tUseSpline)
               CALL Profile_Plot(IPTYPE)
-            CASE (IDAPPLY)
-              CALL WizardApplyBackground
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowDiffractionFileInput 1')
           END SELECT
@@ -538,8 +559,11 @@
       INCLUDE 'statlog.inc'
 
       INTEGER IRadSelection
-      CHARACTER(LEN=MaxPathLength) :: CTEMP
+      CHARACTER(LEN=MaxPathLength) CTEMP
       REAL    Temp
+      INTEGER ISTAT
+      INTEGER DiffractionFileBrowse ! Function
+      INTEGER DiffractionFileOpen ! Function
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page2)
@@ -557,9 +581,9 @@
               CALL EndWizard
             CASE (ID_PW_DF_Open)
               CALL WDialogGetString(IDF_PW_DataFileName_String,CTEMP)
-              CALL DiffractionFileOpen(CTEMP)
+              ISTAT = DiffractionFileOpen(CTEMP)
             CASE (ID_PW_DF_Browse)
-              CALL DiffractionFileBrowse
+              ISTAT = DiffractionFileBrowse()
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowDiffractionSetup 1')
           END SELECT
