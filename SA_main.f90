@@ -556,7 +556,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE zmConvert(TheInputFile,TheNumOfZmatrices,TheZmatrices)
+      SUBROUTINE zmConvert(TheInputFile, TheNumOfZmatrices, TheZmatrices)
 
       USE WINTERACTER
       USE VARIABLES
