@@ -268,7 +268,7 @@
           CALL WDialogPutCheckBoxLogical(IDF_UseMCYN,tLogical)
         ENDIF
         IF (RW .EQ. cRead) THEN
-          CALL WizardApplyDiffractionFileInput  ! @@ Error here with LBIN (is reset to 1 ?)
+          CALL WizardApplyDiffractionFileInput
           CALL WizardApplyProfileRange
           CALL WizardApplyBackground
           IPTYPE = 1
