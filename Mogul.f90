@@ -287,7 +287,7 @@
       LOGICAL blank
       INTEGER, DIMENSION(180) :: TC
       INTEGER NumberofBins, HalfBins, UpperBins, MaxAngle, MinAngle, Bin
-      INTEGER Lmarker1, Hmarker1, LMarker2, HMarker2
+      INTEGER Lmarker1, Hmarker1, LMarker2, HMarker2 !count of molecules in bin
       INTEGER LIndex1(1), HIndex1(1), LIndex2(1), HIndex2(1)
       INTEGER TotalSum, TempSum
 
@@ -319,6 +319,15 @@
       DO I = 1,NumberOfBins
         TotalSum = TotalSum + TC(I) ! number of hits in histogram
       ENDDO
+
+      IF (TotalSum .LT. 30) THEN
+        MogulText = 'No recommendation - not enough data'
+        ModalFlag(IFROW) = 1
+        Assigned = .TRUE.
+        CALL WDialogSelect(IDD_ModalDialog)
+        CALL WDialogPutString(IDF_MogulText, MogulText)
+        RETURN
+      ENDIF
       
       HalfBins = NumberofBins/2
       UpperBins = HalfBins + (Halfbins/3)*2
@@ -353,7 +362,7 @@
             Assigned = .TRUE.
           ENDIF
         ENDIF
-        IF ((HIndex2(1) .GT. HalfBins+1) .AND. (HIndex2(1) .LT. UpperBins)) THEN !second peak of trimodal
+        IF ((HIndex2(1) .GT. HalfBins+1) .AND. (HIndex2(1) .LT. UpperBins) .AND. (Blank .EQ. .FALSE.)) THEN !second peak of trimodal
           MogulText = 'Trimodal -30 to 30 degrees'
           ModalFlag(IFRow) = 3
           LB(IFRow) = -30.00
@@ -375,13 +384,15 @@
        CALL MaximumValue(TC, HalfBins+1, NumberofBins, HMarker2, Hindex2,Halfbins)
        IF (HIndex2(1) .GT. UpperBins) THEN !Peak above 150 degs
          CALL MinimumValue(TC, HalfBins+1, NumberofBins, LMarker2, Lindex2, Halfbins)
-         IF ((LMarker2 .EQ. 0) .OR. (REAL(LMarker2)/REAL(TotalSum) .LT. 0.05)) THEN ! minimum inbetween peaks         
-           IF (.NOT. Blank) THEN
-             MogulText = 'Trimodal +150 to -150'
-             ModalFlag(IFRow) = 3
-             LB(IFrow) = -150.00
-             UB(IFRow) =  150.00
-             Assigned = .TRUE.
+         IF ((LMarker2 .EQ. 0) .OR. (REAL(LMarker2)/REAL(TotalSum) .LT. 0.05)) THEN ! minimum in between peaks         
+           IF (.NOT. Blank) THEN !Peak in first half
+             IF (Hindex2(1) - Hindex1(1) .GT. (100/Bin)) THEN !Separation of peaks > 100 degs
+               MogulText = 'Trimodal +150 to -150'
+               ModalFlag(IFRow) = 3
+               LB(IFrow) = -150.00
+               UB(IFRow) =  150.00
+               Assigned = .TRUE.
+             ENDIF
            ELSE
              MogulText = 'Bimodal around 180 degrees'
              ModalFlag(IFRow) = 2
@@ -424,7 +435,7 @@
 
       RETURN
 
-999   CALL ErrorMessage("Mogul could not read file.")
+999   CALL ErrorMessage("Mogul could not read output file.")
 888   ModalFlag(IFRow) = 1 ! Will not default to modal ranges in dialog
 
       END SUBROUTINE ProcessMogulOutput
