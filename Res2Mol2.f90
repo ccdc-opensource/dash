@@ -69,7 +69,7 @@
       CALL StrUpperCase(tString)
       SELECT CASE (tString(1:4))
         CASE ('CELL')
-          READ(tString,*) DummyChar4, DummyReal, a, b, c, alpha, beta, gamma
+          READ(tString,*,ERR=990,END=990) DummyChar4, DummyReal, a, b, c, alpha, beta, gamma
           CALL LatticeCellParameters2Lattice(a, b, c, alpha, beta, gamma, tLattice)
 !        CASE ('TITL', 'ZERR', 'LATT', 'SYMM', 'SFAC', 'DISP', 'UNIT')
         CASE ('HKLF', 'END ') ! We have finished, process the data we have read
