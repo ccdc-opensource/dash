@@ -81,6 +81,9 @@
 ! OriginalNOBS is never changed, so the point between EndNOBS and Original NOBS are
 ! data points that were reomved from the start of the pattern.
 
+      LOGICAL SavePDB, SaveCSSR, SaveCCL, SaveMOL2, SaveRES
+! Flags to decide which molecular model files are written out when a best solution is found
+
       END MODULE VARIABLES
 !
 !*****************************************************************************
@@ -118,28 +121,28 @@
 !     - Status bar
 !
       MAIN_WINDOW%FLAGS  = SysMenuOn + MinButton + MaxButton + StatusBar
-!   Place window on the screen with a fractional size determined from the screen size
+! Place window on the screen with a fractional size determined from the screen size
       MAIN_WINDOW%WIDTH  = 0.8*XBSWidth
       MAIN_WINDOW%HEIGHT = 0.375*XBSHeight
       MAIN_WINDOW%X      = 0.1*XBSWidth
       MAIN_WINDOW%Y      = 0.06*FLOAT(XBSHeight)+262 !0.4*XBSHeight
-!   Set druid_header menu id and window title
+! Set druid_header menu id and window title
       MAIN_WINDOW%MENUID = IDR_MENU1
       MAIN_WINDOW%TITLE  = "DASH"
-!   Open root window
+! Open root window
       CALL WindowOpen(MAIN_WINDOW,128)
-!   Load and display the toolbar
+! Load and display the toolbar
       CALL WMenuToolbar(ID_TOOLBAR1)
 ! Disable the menu buttons
       CALL SetModeMenuState(1,-1,-1)
-!   Setup array of widths for status bar
+! Setup array of widths for status bar
       IWIDTHS(1) = 3800
       DO IWID = 2, 7
         IWIDTHS(IWID) = 800
       END DO
       IWIDTHS(8)= 1500 
 !      OPEN (UNIT=76,FILE='D:\cvsDASH\dash\Debug\output.log')
-!   Split status bar into more than one part
+! Split status bar into more than one part
       CALL WindowStatusBarParts(8,IWIDTHS)
       CALL WMessageEnable(PushButton, Enabled)
 ! Load all Winteracter dialogues into memory
@@ -150,9 +153,9 @@
       CALL Check_License()
       CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(TabChanged, Enabled)
-!   Main message loop
-!   Go through the PolyFitter wizard
-!c>> Comment this next line out to remove the wizard
+! Main message loop
+! Go through the PolyFitter wizard
+! Comment this next line out to remove the wizard
       CALL StartWizard()
       DO WHILE (.TRUE.)
         CALL GetEvent

@@ -158,13 +158,22 @@
         END DO
       END IF
       i=i+1
+!    14:a1     P 21/b 1 1    -P 2xab           PMC$I1A000$P2A660 
+!    14:a2     P 21/n 1 1    -P 2xn            PMC$I1A000$P2A666 
+!    14:a3     P 21/c 1 1    -P 2xac           PMC$I1A000$P2A606 
+!   165        P -3 c 1      -P 3 2"c          PRC$I3C000$P2F006 
+!   166:H      R -3 m:H      -R 3 2"           RRC$I3C000$P2F000 
+!   167:H      R -3 c:H      -R 3 2"c          RRC$I3C000$P2F006 
+!   146:R      R 3:R          P 3*             PRN$P3Q000 
+!12345678901234567890123456789012345678901234567890123456789012345678901234567890
+!         1         2         3         4         5         6         7         8
       SGNumStr(i) = lintem(4:13)
       SGHMaStr(i) = lintem(15:26)
 !U      SGHalStr(i) = lintem(29:46)
       SGShmStr(i) = lintem(47:70)
       GOTO 10
  100  IF (I .NE. MaxSPGR) THEN
-        CALL ErrorMessage('Number of space groups in space group file has changed.')
+        CALL ErrorMessage('Number of space groups in space-group file has changed.')
         GOTO 999
       ENDIF
       CLOSE(110)
@@ -185,7 +194,35 @@
 !
       SUBROUTINE SaveConfigurationFile
 
+      USE VARIABLES
 
+      IMPLICIT NONE
+
+! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
+  !    OPEN(UNIT=10,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+
+
+! Save all colours
+
+! Save the seeds for the random number generator
+
+! Save use hydrogens YES / NO
+
+! Save default wavelength
+
+! Save YES /NO which molecular file formats are to be written out when a best solution is found
+! 1. .pdb ?
+
+! 2. .cssr ?
+
+! 3. .ccl ?
+
+! 4. .mol2 ?
+
+! 5. .res ?
+
+
+  999 RETURN
 
       END SUBROUTINE SaveConfigurationFile
 !
@@ -195,6 +232,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       INCLUDE 'PARAMS.INC'
 
@@ -216,6 +254,11 @@
       DashHcvFile = ' '
       DashPikFile = ' '
       DashTicFile = ' '
+      SavePDB  = .TRUE.
+      SaveCSSR = .TRUE.
+      SaveCCL  = .TRUE.
+      SaveMOL2 = .TRUE.
+      SaveRES  = .TRUE.
 !O      IDCurrent_Cursor_Mode = ID_Default_Mode
       IDCurrent_Cursor_Mode = ID_Peak_Fitting_Mode
       DataSetChange = 0
