@@ -92,8 +92,8 @@
 
 ! For use in common block ZSTORE
 
-      INTEGER MPPTS, MKPTS
-      PARAMETER ( MPPTS = 15000, MKPTS = 150000 )
+      INTEGER MPPTS
+      PARAMETER ( MPPTS = 15000 )
 
 ! For use in common block TICCOMM
 
