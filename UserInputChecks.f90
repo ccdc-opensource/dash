@@ -132,15 +132,13 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CheckUnitCellConsistency
-
-      USE WINTERACTER
+      INTEGER FUNCTION proposed_crystal_system
 
       IMPLICIT NONE
 
       INCLUDE 'Lattice.inc'
 
-      LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm
+      LOGICAL, EXTERNAL :: FnUnitCellOK
       LOGICAL, EXTERNAL :: NearlyEqual
       LOGICAL ABC_Same, AB_Same, AC_Same, BC_Same, Ang_Same, Alp_90, Bet_90, Gam_90, Gam_120
       INTEGER tLatBrav
@@ -156,7 +154,10 @@
 !            9 = Hexagonal
 !           10 = Cubic
 
-      IF (.NOT. FnUnitCellOK()) RETURN
+      IF (.NOT. FnUnitCellOK()) THEN
+        proposed_crystal_system = 1
+        RETURN
+      ENDIF
       AB_Same  = NearlyEqual(CellPar(2), CellPar(1))
       BC_Same  = NearlyEqual(CellPar(3), CellPar(2))
       AC_Same  = NearlyEqual(CellPar(3), CellPar(1))
@@ -169,38 +170,56 @@
                  NearlyEqual(CellPar(5), CellPar(4))
       IF (ABC_Same .AND. Ang_Same) THEN
         IF (Alp_90) THEN
-          tLatBrav = 10 ! Cubic
-          GOTO 10
+          proposed_crystal_system = 10 ! Cubic
+          RETURN
         ELSE
-          tLatBrav = 8 ! Rhombohedral
-          GOTO 10
+          proposed_crystal_system = 8 ! Rhombohedral
+          RETURN
         ENDIF
       ENDIF
       IF (AB_Same) THEN
         IF (Ang_Same .AND. Alp_90) THEN
-          tLatBrav = 6 ! Tetragonal
-          GOTO 10
+          proposed_crystal_system = 6 ! Tetragonal
+          RETURN
         ELSE IF (Alp_90 .AND. Bet_90 .AND. Gam_120) THEN
-          tLatBrav = 9 ! Hexagonal
-          GOTO 10
+          proposed_crystal_system = 9 ! Hexagonal
+          RETURN
         ENDIF
       ENDIF
       IF (Ang_Same .AND. Alp_90) THEN
-        tLatBrav = 5 ! Orthorhombic
-        GOTO 10
+        proposed_crystal_system = 5 ! Orthorhombic
+        RETURN
       ENDIF
       IF (           Alp_90 .AND.       Bet_90 .AND. .NOT. Gam_90) THEN
-        tLatBrav = 4 ! Monoclinic-c
-        GOTO 10
+        proposed_crystal_system = 4 ! Monoclinic-c
+        RETURN
       ELSE IF (      Alp_90 .AND. .NOT. Bet_90 .AND.       Gam_90) THEN
-        tLatBrav = 3 ! Monoclinic-b
-        GOTO 10
+        proposed_crystal_system = 3 ! Monoclinic-b
+        RETURN
       ELSE IF (.NOT. Alp_90 .AND.       Bet_90 .AND.       Gam_90) THEN
-        tLatBrav = 2 ! Monoclinic-a
-        GOTO 10
+        proposed_crystal_system = 2 ! Monoclinic-a
+        RETURN
       ENDIF
-      tLatBrav = 1 ! Triclinic
-   10 CONTINUE
+      proposed_crystal_system = 1 ! Triclinic
+
+      END FUNCTION proposed_crystal_system
+!
+!*****************************************************************************
+!
+      SUBROUTINE CheckUnitCellConsistency
+
+      USE WINTERACTER
+
+      IMPLICIT NONE
+
+      INCLUDE 'Lattice.inc'
+
+      LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm
+      INTEGER, EXTERNAL :: proposed_crystal_system
+      INTEGER tLatBrav
+
+      IF (.NOT. FnUnitCellOK()) RETURN
+      tLatBrav = proposed_crystal_system()
 ! Now, tLatBrav holds the crystal system as determined from the unit cell parameters.
 ! Compare it to the crystal system as set by the user (LatBrav) and issue a warning
 ! message if they don't match.
