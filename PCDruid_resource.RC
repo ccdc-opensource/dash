@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 20/Apr/2004 17:22:34
+// Modified : 20/Apr/2004 18:21:48
 //
 ///////////////////////////////////////////////////
 //
@@ -401,7 +401,6 @@
 #define IDF_AutoLocalOptimise            1259
 #define IDF_OutputCSSR                   1260
 #define IDF_OutputCCL                    1277
-#define IDF_UseHydrogens                 1296
 #define IDD_DataRangeSTOE                 148
 #define IDF_DataRangeMenu                1264
 #define IDD_PW_Page7                      149
@@ -491,7 +490,6 @@
 #define IDF_a1                           1145
 #define IDF_b1                           1146
 #define IDF_c1                           1217
-#define IDD_DIALOG048                     166
 #define IDD_TabDataDefaults               170
 #define IDD_TabSAsetup                    167
 #define IDD_TabSAOutput                   169
@@ -515,40 +513,17 @@
 #define IDBPAUSE                         1425
 #define IDF_PicHourglass                 1430
 #define ID_FitPeaks                     40020
-#define IDD_Rietveld                      172
-#define IDF_TAB1                         1399
 #define IDF_RR_ZmatrixGrid               1397
 #define IDB_Refine                       1398
 #define IDD_RRsubBonds                    180
-#define IDD_DIALOG008                     181
 #define IDD_RRsubZmatrices                173
 #define IDF_RR_AngleGrid                 1438
 #define IDF_RR_TorsionGrid               1440
-#define IDF_RR_AtomGrid                  1439
 #define IDD_RRsubAngles                   182
-#define IDD_TEMPLATE020                   179
 #define IDD_RRsubTorsions                 183
-#define IDD_DIALOG010                     184
 #define IDD_RRsubAtoms                    185
-#define IDD_DIALOG012                     187
-#define IDD_DIALOG014                     190
 #define IDF_RR_BondGrid                  1441
-#define IDB_Invert                       1442
-#define IDB_FixAll                       1443
-#define IDB_FixNone                      1444
 #define IDD_RRsubData                     174
-#define IDF_RRa                          1445
-#define IDF_RRb                          1446
-#define IDF_RRc                          1447
-#define IDF_RRalpha                      1448
-#define IDF_RRgamma                      1449
-#define IDF_RRbeta                       1450
-#define IDF_RR_Damping                   1451
-#define IDF_RR_DataStart                 1452
-#define IDF_RR_DataEnd                   1453
-#define IDF_RR_ExclRegions               1454
-#define IDF_RR_ZeroPoint                 1455
-#define IDB_Undo                         1456
 #define IDB_Open                        40024
 #define IDB_Edit                         1468
 #define IDB_Summary                      1469
@@ -561,10 +536,6 @@
 #define IDF_OutputRES                    1461
 #define IDF_OutputCIF                    1462
 #define IDF_UseHydrogensAuto             1474
-#define IDF_DivPFdiff                    1475
-#define IDF_MultPFdiff                   1476
-#define IDF_REAL1                        1477
-#define IDF_CHECK11                      1481
 #define IDB_PO                           1482
 #define IDD_SAW_Page5                     102
 #define IDD_TEMPLATE021                   176
@@ -590,7 +561,6 @@
 #define IDF_Gamma                        1250
 #define IDD_ViewPawley                    127
 #define IDM_ViewPawley                  40030
-#define IDF_CHECK7                       1248
 #define IDF_ShowCumChiSqd                1408
 #define IDD_OutputSolutions               128
 #define IDB_Output2                      1409
@@ -2763,193 +2733,6 @@ BEGIN
 ,0
 END
 
-IDD_DIALOG048 DIALOG 0, 0,  311,  239
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
-FONT    8, "MS Sans Serif"
-CAPTION "Configuration"
-BEGIN
-    CONTROL "",IDF_TBarGroup4,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   18,   16,  274,  192
-    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  135,  216,   40,   14
-END
-
-IDD_DIALOG048 RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-" 1193     4   168 \n"
-"  168  Plot Options \n"
-"  170  Data Defaults \n"
-"  167  SA Setup \n"
-"  169  SA Output \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_TabSAsetup DIALOG 0, 0,  211,  150
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Random seeds",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  118,   96,   30,   18
-    CONTROL "314",IDF_SA_RandomSeed1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  150,   90,   44,   14
-    CONTROL "159",IDF_SA_RandomSeed2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  150,  106,   44,   14
-    CONTROL "10",IDF_SA_MaxRepeats,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  161,   23,   33,   14
-    CONTROL "Number of SA runs (<100)",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   69,   25,   86,   10
-    CONTROL "Max. number of moves / run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   63,   64,   52,   20
-    CONTROL "Profile chi-sqd multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,   71,   44,   84,   10
-    CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  161,   42,   32,   14
-    CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  123,   67,   30,   12
-    CONTROL "x  10",IDF_LABEL21,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  154,   68,   18,    8
-    CONTROL "7",IDF_MaxMoves2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE,  175,   61,   23,   12
-    CONTROL "Use &hydrogens",IDF_UseHydrogens,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  113,   62,   14
-    CONTROL "Use crystallo&graphic centre of mass",IDF_CrystallographicCoM,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  127,  130,   14
-END
-
-IDD_TabSAsetup RCDATA
-BEGIN
-"[Checks] \n"
-" 1296 0 \n"
-" 1215 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-" 1163               1           29000 \n"
-" 1165               1           29000 \n"
-" 1374               1              99 \n"
-" 1378      1.0000          0.34028E+039 \n"
-" 1139     0.10000E-002      100.00      \n"
-" 1235               1               9 \n"
-" 1296      1.0000           9.0000      \n"
-" 1215      1.0000           9.0000      \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_TabSAOutput DIALOG 0, 0,  237,  165
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Auto local &minimise",IDF_AutoLocalOptimise,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    7,   16,   76,   14
-    CONTROL "Output .c&ssr",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  120,   50,   54,   14
-    CONTROL "Output .cc&l",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  120,   64,   54,   14
-    CONTROL "Output .&pro",IDF_OutputPRO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  120,  109,   54,   14
-    CONTROL "Output chi-s&quared vs. moves",IDF_OutputChi2vsMoves,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  120,  126,  110,   14
-    CONTROL "Auto &align",IDF_Align,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    7,   47,   46,   14
-    CONTROL "Output .pd&b",IDF_OutputPDB,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  120,   22,   54,   14
-    CONTROL "Output .&res",IDF_OutputRES,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  120,   92,   54,   14
-    CONTROL "Output .c&if",IDF_OutputCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  120,   78,   54,   14
-    CONTROL "Use &Hydrogens",IDF_UseHydrogensAuto,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   15,   30,   66,   14
-    CONTROL "Write out bonds (CONECT)",IDF_CHECK11,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  129,   36,  100,   14
-END
-
-IDD_TabSAOutput RCDATA
-BEGIN
-"[Checks] \n"
-" 1259 1 \n"
-" 1260 0 \n"
-" 1277 0 \n"
-" 1043 1 \n"
-" 1099 0 \n"
-" 1224 1 \n"
-" 1457 1 \n"
-" 1461 0 \n"
-" 1462 0 \n"
-" 1474 1 \n"
-" 1481 1 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-" 1259      1.0000           9.0000      \n"
-" 1260      1.0000           9.0000      \n"
-" 1277      1.0000           9.0000      \n"
-" 1043      1.0000           9.0000      \n"
-" 1099      1.0000           9.0000      \n"
-" 1224      1.0000           9.0000      \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_TabPlotOptions DIALOG 0, 0,  243,  125
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Show &error bars",IDF_ErrorBar_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,    5,   70,   14
-    CONTROL "Obs. &Profile...",IDF_ObservedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   78,   60,   14
-    CONTROL "Calc. Profile...",IDF_CalculatedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   78,   60,   14
-    CONTROL "&Diff. Profile...",IDF_DifferenceData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   78,   60,   14
-    CONTROL "&Axes...",IDF_Axes_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   94,   60,   14
-    CONTROL "&Tick Marks...",IDF_TickMark_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   94,   60,   14
-    CONTROL "&Peak Fitting...",IDF_PeakFitting_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   94,   60,   14
-    CONTROL "Colours",IDF_Colour_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   12,   66,  221,   49
-    CONTROL "Show &background",IDF_background_check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   33,   80,   14
-    CONTROL "Connect data &points",IDF_ConnectObsPoints,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   19,   90,   14
-    CONTROL "Plot peak &fit difference",IDF_PlotPeakFitDif,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    7,    9,   90,   14
-    CONTROL "Divide by ESDs",IDF_DivPFdiff,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   15,   23,   60,   14
-    CONTROL "Multiply by",IDF_MultPFdiff,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   15,   37,   46,   14
-    CONTROL "2.5000",IDF_REAL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   61,   38,   25,   14
-    CONTROL "Show cumulative chi-sqd",IDF_CHECK7,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   47,   94,   14
-END
-
-IDD_TabPlotOptions RCDATA
-BEGIN
-"[Checks] \n"
-" 1014 1 \n"
-" 1364 1 \n"
-" 1132 0 \n"
-" 1133 0 \n"
-" 1475 1 \n"
-" 1476 1 \n"
-" 1248 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-" 1014      1.0000           9.0000      \n"
-" 1010      1.0000           9.0000      \n"
-" 1012      1.0000           9.0000      \n"
-" 1009      1.0000           9.0000      \n"
-" 1004      1.0000           9.0000      \n"
-" 1011      1.0000           9.0000      \n"
-" 1013      1.0000           9.0000      \n"
-" 1008      1.0000           9.0000      \n"
-" 1364      1.0000           9.0000      \n"
-" 1132      1.0000           9.0000      \n"
-" 1133      1.0000           9.0000      \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_TabDataDefaults DIALOG 0, 0,  251,  185
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-END
-
-IDD_TabDataDefaults RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
 IDD_DICVOLRunning DIALOG 0, 0,  273,  138
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
@@ -2977,323 +2760,6 @@ END
 IDD_DICVOLRunning RCDATA
 BEGIN
 "[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_Rietveld DIALOG 0, 0,  248,  209
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
-FONT    8, "MS Sans Serif"
-CAPTION "Rietveld Refinement"
-BEGIN
-    CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  151,  189,   40,   14
-    CONTROL "Refine",IDB_Refine,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,    9,  189,   40,   14
-    CONTROL "View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  197,  189,   40,   14
-    CONTROL "Save",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  103,  189,   40,   14
-    CONTROL "",IDF_TAB1,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   13,    8,  220,  172
-    CONTROL "Undo",IDB_Undo,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   56,  189,   40,   14
-END
-
-IDD_Rietveld RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-" 1399     6   173 \n"
-"  173  Z-matrices \n"
-"  180  Bonds \n"
-"  182  Angles \n"
-"  183  Torsions \n"
-"  185  Atoms \n"
-"  174  Data \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_RRsubZmatrices DIALOG 0, 0,  200,  155
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "",IDF_RR_ZmatrixGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  164,  129
-    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
-    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
-    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
-END
-
-IDD_RRsubZmatrices RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-" 1397     3    150   179 \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_TEMPLATE020 DIALOG 0, 0, 1000,   16
-STYLE DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "DoF",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,  100,   14
-    CONTROL "Value",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   40,   14
-    CONTROL "F",ISS2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
-END
-
-IDD_TEMPLATE020 RCDATA
-BEGIN
-"[Checks] \n"
-" 1066 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_RRsubBonds DIALOG 0, 0,  200,  155
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "",IDF_RR_BondGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  113,  129
-    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
-    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
-    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
-END
-
-IDD_RRsubBonds RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-" 1441     3    150   181 \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_DIALOG008 DIALOG 0, 0, 1000,   16
-STYLE DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Bond",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   60,   14
-    CONTROL "Value",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   30,   14
-    CONTROL "F",ISS2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
-END
-
-IDD_DIALOG008 RCDATA
-BEGIN
-"[Checks] \n"
-" 1066 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_RRsubAngles DIALOG 0, 0,  200,  155
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "",IDF_RR_AngleGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  113,  129
-    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
-    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
-    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
-END
-
-IDD_RRsubAngles RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-" 1438     3    150   184 \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_DIALOG010 DIALOG 0, 0, 1000,   16
-STYLE DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Angle",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   60,   14
-    CONTROL "Value",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   30,   14
-    CONTROL "F",ISS2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
-END
-
-IDD_DIALOG010 RCDATA
-BEGIN
-"[Checks] \n"
-" 1066 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_RRsubTorsions DIALOG 0, 0,  200,  155
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "",IDF_RR_TorsionGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  113,  129
-    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
-    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
-    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
-END
-
-IDD_RRsubTorsions RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-" 1440     3    150   187 \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_DIALOG012 DIALOG 0, 0, 1000,   16
-STYLE DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Torsion",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   60,   14
-    CONTROL "Value",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   30,   14
-    CONTROL "F",ISS2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
-END
-
-IDD_DIALOG012 RCDATA
-BEGIN
-"[Checks] \n"
-" 1066 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_RRsubAtoms DIALOG 0, 0,  200,  155
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "",IDF_RR_AtomGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  122,  129
-    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
-    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
-    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
-END
-
-IDD_RRsubAtoms RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-" 1439     5    150   190 \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_DIALOG014 DIALOG 0, 0, 1000,   16
-STYLE DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Atom",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   30,   14
-    CONTROL "Uiso",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   30,   14
-    CONTROL "F",ISS5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
-    CONTROL "Occ",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,   30,   14
-    CONTROL "F",ISS4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
-END
-
-IDD_DIALOG014 RCDATA
-BEGIN
-"[Checks] \n"
-" 1069 0 \n"
-" 1068 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-" 1021     5 \n"
-,0
-END
-
-IDD_RRsubData DIALOG 0, 0,  200,  155
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
-    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
-    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
-    CONTROL "a",IDF_RRa,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,    8,   40,   14
-    CONTROL "b",IDF_RRb,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   22,   40,   14
-    CONTROL "c",IDF_RRc,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   36,   40,   14
-    CONTROL "alpha",IDF_RRalpha,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   50,   40,   14
-    CONTROL "gamma",IDF_RRgamma,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   78,   40,   14
-    CONTROL "beta",IDF_RRbeta,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   64,   40,   14
-    CONTROL "Use Hydrogens",IDF_UseHydrogens,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   76,    8,   80,   14
-    CONTROL "Damping",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   72,   37,   40,    8
-    CONTROL "Data start",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   72,   59,   40,    8
-    CONTROL "Data end",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   72,   75,   40,    8
-    CONTROL "1.0000",IDF_RR_Damping,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  121,   35,   40,   14
-    CONTROL "3.0000",IDF_RR_DataStart,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  121,   56,   40,   14
-    CONTROL "45.000",IDF_RR_DataEnd,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  121,   72,   40,   14
-    CONTROL "Excluded Regions...",IDF_RR_ExclRegions,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   81,  106,   80,   14
-    CONTROL "Zero point",IDF_RR_ZeroPoint,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   92,   60,   14
-END
-
-IDD_RRsubData RCDATA
-BEGIN
-"[Checks] \n"
-" 1445 0 \n"
-" 1446 0 \n"
-" 1447 0 \n"
-" 1448 0 \n"
-" 1449 0 \n"
-" 1450 0 \n"
-" 1296 0 \n"
-" 1455 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
