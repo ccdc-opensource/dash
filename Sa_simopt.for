@@ -57,9 +57,7 @@ C
       REAL     V(2550),EX(150),C(51)
       INTEGER  IR(51)
       EXTERNAL SACCHI
-      DATA     NMAX /50/
 C
-C...      IF (N.GT.NMAX) STOP' Sorry, too many parameters !'
       CALL SAVCOPY(X,V,N)
       CHIMIN=SACCHI(N,V)
 c      WRITE(*,*)

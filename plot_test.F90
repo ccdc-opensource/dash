@@ -101,7 +101,6 @@
 !  Definitions and array declarations.
 !
       INTEGER,PARAMETER :: NSETS   =     3
-      INTEGER           :: ISET
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Poly_Colours.inc'
 

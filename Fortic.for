@@ -146,8 +146,7 @@ C
 	subroutine MAKRHM
 C.. Makes a number of matrices to speed up the default calculation
 C
-      COMPLEX SUM1,TERM,CFCALC
-      DIMENSION RH(3),H(3)
+      DIMENSION H(3)
       INCLUDE 'SGinc\FFCALCTOP.INC'
       COMMON /CONSTA/PI,RAD,DEG,TWOPI,FOURPI,PIBY2,ALOG2,SQL2X8,VALMUB
       COMMON /NSYM/NOP,NCENT,NOPC,NLAT,NGEN,CENTRC,KOM13
