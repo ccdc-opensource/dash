@@ -195,6 +195,11 @@
 ! YPeakFit        = y-values of points of calculated peaks
 ! PF_FWHM         = Normalised Full Width at Half Maximum for the peaks in this hatched area
 
+      INTEGER        CurrHiLiPFR
+      COMMON /HLPFR/ CurrHiLiPFR
+! CurrHiLiPFR = Current HighLighted Peak Fit Range
+! For highlighting peak fit ranges while the mouse cursor is over them.
+
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
                         PkAreaVal,                    PkAreaEsd,                    &
