@@ -168,6 +168,7 @@
       czmpar(3,iFrg) = ' z(frag )'
       DO ii = 1, 3
         kzmpar(ii,iFrg) = 1 ! Translation
+        xzmpar(ii,iFrg) = 0.5
       ENDDO
       IF (natoms(iFrg) .EQ. 1) THEN
 ! Single atom: no rotations
@@ -181,6 +182,7 @@
         czmpar(7,iFrg) = 'Q3(frag )'
         DO ii = 4, 7
           kzmpar(ii,iFrg) = 2 ! Quaternion
+          xzmpar(ii,iFrg) = 0.5
         ENDDO
       ELSE
 ! Molecule with rotation restricted to a single axis
@@ -188,12 +190,12 @@
         czmpar(4,iFrg) = 'Q0(frag )'
         czmpar(5,iFrg) = 'Q1(frag )'
         DO ii = 4, 5
-          kzmpar(ii,iFrg) = 2 ! 'Quaternion'
+          kzmpar(ii,iFrg) = 6 ! Single axis
+          xzmpar(ii,iFrg) = SQRT(0.5)
         ENDDO
       ENDIF
       DO ii = 1, izmpar(iFrg)
         WRITE (czmpar(ii,iFrg)(8:8),'(I1)') iFrg
-        xzmpar(ii,iFrg) = 0.5
       ENDDO
       DO i = 1, natoms(iFrg)
 ! IOPTB = 1 OPTIMISE BOND
