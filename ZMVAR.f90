@@ -43,7 +43,7 @@
                      IDBZMDelete,           IDBZMBrowse,              &
                      IDBZMView,             IDBZMEdit,                &
                      IDFZMpars
-      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),                             &
+      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),      &
                      IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
                      IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
                      IDFZMpars(1:maxfrg)
@@ -59,7 +59,7 @@
 
 ! nfrag = number of fragments
 
-      CHARACTER*255    frag_file(0:maxfrg)
+      CHARACTER*255   frag_file(0:maxfrg)
 
 ! frag_file = name of the .zmatrix file containing fragment number ifrag
 
@@ -171,8 +171,13 @@
 !     9 = pi-bond
 
       INTEGER CurrentlyEditedFrag
+      INTEGER CurrentOrderOption
 
-! Holds the number of the Z-matrix which is being edited if the Z-matrix edit dialogue is visible.
+! CurrentlyEditedFrag Holds the number of the Z-matrix which is being edited 
+!                     if the Z-matrix edit dialogue is active.
+! CurrentOrderOption  Due to the way WinterActer works, we cannot detect real changes,
+!                     so we must keep record of the old value and compare.
+
   
       END MODULE ZMVAR
 !
