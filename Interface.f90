@@ -143,8 +143,8 @@
 
       CHARACTER*2, INTENT (IN   ) :: TheAnodeMaterial ! Chemical symbol for anode material, e.g. 'Cu'
 
-      CHARACTER*1 ChrUpperCase ! Function
-      CHARACTER*1 ChrLowerCase ! Function
+      CHARACTER*1, EXTERNAL :: ChrUpperCase
+      CHARACTER*1, EXTERNAL :: ChrLowerCase
       CHARACTER*2 tAnodeMaterial ! To remove call by value / call by reference ambiguity
 
       tAnodeMaterial(1:1) = ChrUpperCase(TheAnodeMaterial(1:1))
