@@ -149,38 +149,16 @@
             CASE (ID_PW_DF_Open)
               CALL WDialogGetString(IDF_PW_DataFileName_String, CTEMP)
               iErr = HKLFFileOpen(CTEMP)
-          !O    CALL WDialogFieldStateLogical(IDBSAVE, iErr .EQ. 0)
+              CALL WDialogFieldStateLogical(IDNEXT, iErr .EQ. 0)
             CASE (IDBBROWSE)
               iErr = HKLFFileBrowse()
 ! Don't change if the user pressed 'Cancel' (ISTAT = 2)
-          !O    IF      (iErr .EQ. 0) THEN
-          !O      CALL WDialogFieldState(IDBSAVE, Enabled)
-          !O    ELSE IF (iErr .EQ. 1) THEN
-          !O      CALL WDialogFieldState(IDBSAVE, Disabled)
-          !O    ENDIF
               IF      (iErr .EQ. 0) THEN
                 CALL WDialogFieldState(IDNEXT, Enabled)
               ELSE IF (iErr .EQ. 1) THEN
                 CALL WDialogFieldState(IDNEXT, Disabled)
               ENDIF
-          !O  CASE (IDBSAVE)
-          !O    IF (SaveProject()) CALL WDialogFieldState(IDNEXT, Enabled)
           END SELECT
-        CASE (FieldChanged)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_LabX_Source, IDF_SynX_Source)
-              CALL WDialogGetRadioButton(IDF_LabX_Source, JRadOption)
-              CALL Upload_Source
-              CALL Generate_TicMarks 
-            CASE (IDF_wavelength1)
-              CALL WDialogGetReal(IDF_wavelength1, Temp)
-              CALL Set_Wavelength(Temp)
-              CALL Generate_TicMarks 
-            CASE (IDF_Wavelength_Menu)
-              CALL WDialogGetMenu(IDF_Wavelength_Menu, IRadSelection)
-              CALL SetWavelengthToSelection(IRadSelection)
-              CALL Generate_TicMarks 
-          END SELECT                
       END SELECT
       CALL PopActiveWindowID
 
@@ -398,9 +376,12 @@
           IF (Keep(iR)) THEN
             DO jR = iR+1, NumOfRef
               IF (Keep(jR)) THEN
-                IF ( (jHKL(1,iR) .EQ. -jHKL(1,jR)) .AND. &
+                IF (((jHKL(1,iR) .EQ. -jHKL(1,jR)) .AND. &
                      (jHKL(2,iR) .EQ. -jHKL(2,jR)) .AND. &
-                     (jHKL(3,iR) .EQ. -jHKL(3,jR)) ) THEN
+                     (jHKL(3,iR) .EQ. -jHKL(3,jR))) .OR. &
+                    ((jHKL(1,iR) .EQ.  jHKL(1,jR)) .AND. &
+                     (jHKL(2,iR) .EQ.  jHKL(2,jR)) .AND. &
+                     (jHKL(3,iR) .EQ.  jHKL(3,jR)))) THEN
                   AJOBS(iR) = (AJOBS(iR) + AJOBS(jR)) / 2.0
                   WTJ(iR) = 1.0/SQRT((1.0/WTJ(iR))**2 + (1.0/WTJ(jR))**2)
                   Keep(jR) = .FALSE.
@@ -491,9 +472,9 @@
       CLOSE(hFile)
       CALL Clear_BackGround
       NoData = .FALSE.
-      CALL Set_Wavelength(1.0)
       CALL GetProfileLimits
       CALL Get_IPMaxMin 
+      CALL Set_Wavelength(1.0)
       PAWLEYCHISQ = 1.0
       CALL WDialogSelect(IDD_ViewPawley)
  !     CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
