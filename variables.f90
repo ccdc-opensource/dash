@@ -30,6 +30,14 @@
 
       CHARACTER(MaxPathLength) :: VIEWEXE
       CHARACTER(20)            :: VIEWARG
+	  CHARACTER(MaxPathLength) :: MOGULEXE
+
+	  LOGICAL UseMogul
+	  DATA UseMogul / .TRUE. /
+! Set to false when Mogul not used for Modal Torsion Angle Ranges.
+! Stops the user constantly being reminded that there isn't a path
+! to a Mogul exe specified Mogul
+
 
       CHARACTER(8) :: ProgramVersion
       DATA ProgramVersion / 'DASH 4.0' /
