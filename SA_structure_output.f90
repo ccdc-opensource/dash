@@ -45,8 +45,8 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-      CHARACTER*80       logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/ logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 !
@@ -503,8 +503,8 @@
 !
       REAL ProfileChi, IntensityChi
 !
-      CHARACTER*80       logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/ logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 !
@@ -528,8 +528,8 @@
       LOGICAL RESTART
       INTEGER SA_Run_Number
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
-      CHARACTER*80       logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/ logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 !

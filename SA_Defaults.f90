@@ -3,16 +3,15 @@
 !
       SUBROUTINE sa_Defaults()
 
-      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
-      COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
-      INTEGER cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
-      COMMON /outfillen/ cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
       LOGICAL outfilset
       COMMON /outfileset/ outfilset
       DATA outfilset/ .FALSE. /
 
-      logsa_file = 'DASH.lsa'
       IF (.NOT. outfilset) THEN
         cssr_file = 'SA_best.cssr'
         pdb_file  = 'SA_best.pdb'
@@ -39,10 +38,10 @@
 
       CHARACTER*(*), INTENT (IN   ) :: FileHead 
 
-      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
-      COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
-      INTEGER cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
-      COMMON /outfillen/ cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
       LOGICAL outfilset
       COMMON /outfileset/ outfilset
