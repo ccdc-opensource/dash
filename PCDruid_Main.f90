@@ -72,13 +72,11 @@
 ! .TRUE. when a powder diffraction pattern has been read in
 
       INTEGER OriginalNOBS ! Original number of data points read in for the raw powder pattern
-
-!U      INTEGER FirstDataPointUsed
-!U      INTEGER LastDataPointUsed
-!U! FirstDataPointUsed & LastDataPointUsed : due to the binning mechanism, it is
-!U! possible to rebin the original pattern using only a part of it. These two variables are pointers
-!U! to the first and the last data point in the original powder pattern that are actually binned and
-!U! therefore actually used by DASH.
+      INTEGER EndNOBS
+! When truncating the powder pattern at the start, DASH stores the data points that were removed
+! _after_ the original pattern. EndNOBS points to the original end of the pattern.
+! OriginalNOBS is never changed, so the point between EndNOBS and Original NOBS are
+! data points that were reomved from the start of the pattern.
 
       END MODULE VARIABLES
 !
@@ -411,6 +409,7 @@
       USE VARIABLES
       INTEGER ISTAT
 
+      CALL SaveConfigurationFile
       CLOSE(UNIT=12,STATUS='DELETE',IOSTAT=ISTAT)
       CLOSE(UNIT=6,STATUS='DELETE',IOSTAT=ISTAT)
       CALL DeleteTempFiles
