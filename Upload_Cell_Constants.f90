@@ -102,7 +102,7 @@
         IASS(5) = IASS(5) + (IHLR(1,I) * IHLR(3,I))**2
         IASS(6) = IASS(6) + (IHLR(2,I) * IHLR(3,I))**2
       ENDDO
-      XDD(2)=GREC(1,1)
+      XDD(2) = GREC(1,1)
       SELECT CASE (LatBrav)
         CASE ( 1) ! Triclinic
           XDD(3) = GREC(2,2) 

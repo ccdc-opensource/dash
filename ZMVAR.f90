@@ -64,7 +64,7 @@
 ! icomflg         = Centre of mass flag.
 !                   0 = use centre of mass of molecule as centre of rotation
 !           otherwise = use atom number icomflg as centre of rotation (necessary if atom on special position)
-! AtomicWeigthing = Weight of that atom usied for calculating centre of mass.
+! AtomicWeigthing = Weight of that atom used for calculating centre of mass.
 !  if all weights = 1.0 : geometric centre of mass
     
       INTEGER         izmpar(1:maxfrg)

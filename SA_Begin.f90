@@ -53,6 +53,7 @@
       ELSE
         CALL WDialogFieldState(IDF_StartNext,Disabled)
       ENDIF
+      IPTYPE = 2
       CALL SimulatedAnnealing
       SA_Duration = SECNDS(T1)
       WRITE(SA_DurationStr,'(F10.1)') SA_Duration

@@ -237,26 +237,12 @@
 
       IMPLICIT NONE
 
-      INTEGER  IBpass
-      LOGICAL QUIT
+      INTEGER IBpass
 
-! Remember current dialogue window
       CALL PushActiveWindowID
-! The reason behind this greying out seems to be that the next dialogue
-! window cannot be made modal because it needs to draw the calculated background 
-! to the main screen. And the user should be able to zoom in on parts of the graph
-! to decide whether or not to accept the background.
       CALL WDialogSelect(IDD_Background_Fit)
-! Initialise the background
-      CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-      CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
-      CALL Profile_Plot
-      CALL WDialogShow(-1,-1,0,Modeless)
-      QUIT = .FALSE.
-      DO WHILE(.NOT. QUIT)
-        CALL GetEvent
-        IF (EventType .EQ. PushButton) THEN
-! Process it
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Background_Apply)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
@@ -265,17 +251,14 @@
             CASE (IDF_Background_Accept)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
               CALL SubtractBackground(IBpass,20,.TRUE.,.TRUE.)
-              QUIT = .TRUE.
+              CALL WDialogHide()
+              CALL Profile_Plot
             CASE (IDCANCEL)
 ! If user Cancels, assume no knowledge on background
               CALL Init_BackGround
-              QUIT = .TRUE.
+              CALL WDialogHide()
           END SELECT
-        END IF
-      END DO
-      CALL WDialogSelect(IDD_Background_Fit)
-      CALL WDialogHide()
-      CALL Profile_Plot
+      END SELECT
       CALL PopActiveWindowID
 
       END SUBROUTINE Background_Fit
