@@ -94,7 +94,7 @@
 
 !  Type all internal variables.
       INTEGER NACC
-      LOGICAL MAXLOG, MAKET0
+      LOGICAL MAKET0
       DOUBLE PRECISION FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
       DOUBLE PRECISION F, FP, P, PP, RATIO, DX
       DOUBLE PRECISION RANIN
@@ -339,7 +339,7 @@
             A0SUM(H) = A0SUM(H) + 1.0
             XDSS(H) = XDSS(H) + (FP-F)**2
             PrevRejected = .FALSE.
-! Accept the new point if the function value increases.
+! Accept the new point if the function value decreases.
             IF (FP.LE.F) THEN
               X(H) = XP(H)
               F = FP
@@ -349,7 +349,7 @@
               XSUM(H) = XSUM(H) + X(H)
               XXSUM(H) = XXSUM(H) + X(H)**2
               NUP = NUP + 1
-! If greater than any other point, record as new optimum.
+! If lower than any other point, record as new optimum.
               IF (FP.LT.FOPT) THEN
                 DO I = 1, nvar
                   XOPT(I) = XP(I)
@@ -366,7 +366,7 @@
                 CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),XOPT,dxvav,xvsig,flav,lb,ub,  &
                                vm,NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov,iteration)
               ENDIF
-! If the point is lower, use the Metropolis criterion to decide on
+! If the point is greater, use the Metropolis criterion to decide on
 ! acceptance or rejection.
             ELSE
               P = EXPREP((F-FP)/T)
@@ -695,15 +695,14 @@
 
       IMPLICIT NONE
 
+      INTEGER, INTENT (IN   ) :: N
+
       INCLUDE 'PARAMS.INC'
 
-      DOUBLE PRECISION x, lb, ub, vm, xpreset
-      COMMON /values/ x(mvar), lb(mvar), ub(mvar), vm(mvar)
+      DOUBLE PRECISION x,       lb,       ub,       vm
+      COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
 
-      COMMON /presetr/ xpreset(mvar)
-
-      
-      INTEGER N, IV
+      INTEGER IV
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: RANMAR
       REAL    tReal

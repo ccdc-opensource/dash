@@ -118,17 +118,14 @@
             rotmat(i,j,isym) = float(matsym(j,i,irotmat))
           ENDDO
         ENDDO
-        SELECT CASE (SGsymb(id1:id1))
-        CASE ('P')
-! Proper rotation - leave the rotation matrix unchanged
-        CASE ('I')
+        IF (SGsymb(id1:id1) .EQ. 'I') THEN
 ! Improper rotation - negate the matrix
           DO j = 1, 3
             DO i = 1, 3
               rotmat(i,j,isym) = -rotmat(i,j,isym)
             ENDDO
           ENDDO
-        END SELECT
+        ENDIF
         DO I = 1, 3
           jd = id1 + 2 + i
           READ (SGsymb(jd:jd),1400) Num12th
@@ -139,7 +136,6 @@
       ENDDO
 !.. Now make the Jones faithful representation
       nsymmin = isym
-!      write(76,*) ' Number of symmetry generators ',nsymmin
       DO js = 1, nsymmin
         DO i = 1, 3
           DO j = 1, 3
