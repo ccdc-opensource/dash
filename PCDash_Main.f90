@@ -36,11 +36,11 @@
     !  CALL IDebugLevel(DbgMsgBox)
       CALL WMessageEnable(PushButton, Enabled)
 ! Load all Winteracter dialogues into memory
-      CALL PolyFitter_UploadDialogues()
+      CALL PolyFitter_UploadDialogues
 ! Initialise space group information
       CALL PolyFitterInitialise
       CALL InitialiseVariables
-      CALL Check_License
+      CALL Check_Licence
       CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(TabChanged, Enabled)
 ! Main message loop
