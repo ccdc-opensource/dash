@@ -62,11 +62,12 @@
 	end if
 !
 	  know=maxk
+! Calculate peak centre in argk, and its derivatives
 	  call pcxx(2)
 	  armx=argk+aadd
 	  ii=1
 !	  WRITE(76,*) II,ARMX
-  	  do while (zargi(ii).lt.armx)
+  	  do while ((zargi(ii) .LT. armx) .AND. (ii .LE. MPPTS))
 	    ii=ii+1
 	  end do
 	  npts=min(npts,ii)
