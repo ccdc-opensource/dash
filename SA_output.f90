@@ -18,7 +18,7 @@
       INCLUDE 'PARAMS.INC'
 
       REAL             CHIPROBEST
-      COMMON /PLTSTO2/ CHIPROBEST(MAXITER)
+      COMMON /PLTSTO2/ CHIPROBEST
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
@@ -34,12 +34,12 @@
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WDialogPutReal(IDF_curr_temp,T,'(F8.2)')
       CALL WDialogPutReal(IDF_min_chisq,chimin,'(F8.2)')
-      CALL WDialogPutReal(IDF_profile_chisq2,CHIPROBEST(iteration),'(F8.2)')
+      CALL WDialogPutReal(IDF_profile_chisq2,CHIPROBEST,'(F8.2)')
 ! best chi-squared scale
       bchmin = ALOG10(MAX(1.0,chimin))
 ! profile chi-squared scale
       bpwval = ALOG10(MAX(1.0,PAWLEYCHISQ))
-      bchpro = ALOG10(MAX(1.0,CHIPROBEST(iteration)))
+      bchpro = ALOG10(MAX(1.0,CHIPROBEST))
 ! What is 'kopt' supposed to do?
       IF (kopt .EQ. 1) THEN
         CALL WDialogPutReal(IDF_av_chisq,chiav,'(F8.2)')
