@@ -21,11 +21,13 @@
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              AllPkAreaVal
       REAL              PkProb
       INTEGER           IOrdTem
       INTEGER           IHPk
       COMMON /ALLPEAKS/ NTPeak,                                                  &
                         AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        AllPkAreaVal(MTPeak),                                    &
                         PkProb(MTPeak),                                          &
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
@@ -87,7 +89,6 @@
           EVal(NVal) = AllPkPosEsd(iOrd)
         ENDIF
       ENDDO
-! JCC Updated to the correct values ...!
 ! Number of degrees of freedom, including the zero point.
       SELECT CASE (LatBrav)
         CASE (1)        ! Triclinic

@@ -944,11 +944,13 @@
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              AllPkAreaVal
       REAL              PkProb
       INTEGER           IOrdTem
       INTEGER           IHPk
       COMMON /ALLPEAKS/ NTPeak,                                                  &
                         AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        AllPkAreaVal(MTPeak),                                    &
                         PkProb(MTPeak),                                          &
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
