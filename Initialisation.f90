@@ -313,7 +313,9 @@
       INCLUDE 'statlog.inc'
       INCLUDE 'lattice.inc'
       INCLUDE 'Poly_Colours.inc'
-      INCLUDE 'DialogPosCmn.inc'
+
+      INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
+      COMMON /DialoguePosCmn/ IXPos_IDD_Wizard, IYPos_IDD_Wizard
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
@@ -403,8 +405,8 @@
       SCALFAC   = 0.01
       BACKREF   = .TRUE.
       JRadOption = 1 ! Initialise to X-ray lab data
-      IXPos_IDD_Wizard = 0.1  * XBSWidth
-      IYPos_IDD_Wizard = 0.06 * XBSHeight
+      IXPos_IDD_Wizard = 0.1  * WInfoScreen(1)
+      IYPos_IDD_Wizard = 0.06 * WInfoScreen(2)
       NTIC = 0
       LBIN = 1
       CALL Init_PeakFitRanges
