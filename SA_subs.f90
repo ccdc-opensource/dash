@@ -137,7 +137,6 @@
       IA = 1255
       IC = 6173
       JRAN = 1
-
       DO I = 1, 30000
         JRAN = MOD(JRAN*IA+IC,IM)
         RANARR(I) = FLOAT(JRAN)/FLOAT(IM) ! RANARR now between  0.0 and 1.0
@@ -831,7 +830,6 @@
 
 ! Get the "IDF_RandomInitVal" checkbox
       CALL PushActiveWindowID
-!O      CALL WDialogSelect(IDD_SA_input2)
       CALL WDialogSelect(IDD_SA_Modal_input2)
       IF (WDialogGetCheckBoxLogical(IDF_RandomInitVal)) THEN
         DO IV = 1, N
@@ -883,49 +881,46 @@
       INTEGER, INTENT (INOUT) :: nvar
 
       DOUBLE PRECISION RULB
-      COMMON /RULB/ RULB(mvar)  
+      COMMON /RULB/    RULB(mvar)  
 
       DOUBLE PRECISION x,       lb,       ub,       vm
       COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
 
-      INTEGER                 ModalFlag
-      COMMON / ModalTorsions/ ModalFlag(mvar)
-      SAVE   / ModalTorsions/
+      INTEGER                ModalFlag
+      COMMON /ModalTorsions/ ModalFlag(mvar)
 
       REAL TempUpper, TempLower
       INTEGER I
       LOGICAL ONeEightyScale
 
-
-      DO I = 1,nvar
+      DO I = 1, nvar
         RULB(I) = UB(I) - LB(I)
-          IF (ModalFlag(I) .EQ. 2) THEN
-            CALL CheckBiModalBounds(I, OneEightyScale)
-            IF (OneEightyScale .EQ. .FALSE.) THEN
-              tempUpper = SNGL(UB(I))
-              tempLower = SNGL(LB(I))
-              CALL OneEightyToThreeSixty(tempUpper)
-              CALL OneEightyToThreeSixty(tempLower)
-              RULB(I) = ABS(tempUpper - tempLower)
-            ENDIF
-           ENDIF
-           IF (ModalFlag(I) .EQ. 3) THEN
+        IF (ModalFlag(I) .EQ. 2) THEN
+          CALL CheckBiModalBounds(I, OneEightyScale)
+          IF (OneEightyScale .EQ. .FALSE.) THEN
             tempUpper = SNGL(UB(I))
-            CALL DetermineTriModalBounds(tempUpper, 1)
             tempLower = SNGL(LB(I))
-            CALL DetermineTriModalBounds(tempLower, 2)
-              
-            CALL CheckTriModalBounds(OneEightyScale)
+            CALL OneEightyToThreeSixty(tempUpper)
+            CALL OneEightyToThreeSixty(tempLower)
+            RULB(I) = ABS(tempUpper - tempLower)
+          ENDIF
+        ENDIF
+        IF (ModalFlag(I) .EQ. 3) THEN
+          tempUpper = SNGL(UB(I))
+          CALL DetermineTriModalBounds(tempUpper, 1)
+          tempLower = SNGL(LB(I))
+          CALL DetermineTriModalBounds(tempLower, 2)
+          CALL CheckTriModalBounds(OneEightyScale)
+          IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
+            tempUpper = SNGL(UB(I))
+            tempLower = SNGL(LB(I))
+            CALL OneEightyToThreeSixty(TempUpper)
+            CALL OneEightyToThreeSixty(TempLower)
+            RULB(I) = ABS(TempUpper - TempLower)
+          ENDIF
+        ENDIF
+      ENDDO
 
-            IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
-              tempUpper = SNGL(UB(I))
-              tempLower = SNGL(LB(I))
-              CALL OneEightyToThreeSixty(TempUpper)
-              CALL OneEightyToThreeSixty(TempLower)
-              RULB(I) = ABS(TempUpper - TempLower)
-            ENDIF
-           ENDIF
-        ENDDO
       END SUBROUTINE FillRULB
 !
 !*****************************************************************************

@@ -42,7 +42,6 @@
 
       REAL    SUM1, SUM2, YCALC, RESCL, CVP, LastValue
       INTEGER II, I, K, KK
-    !  LOGICAL, EXTERNAL :: Get_ShowCumChiSqd
       REAL    tScale
 
 ! JvdS VALCHIPRO, which calculates the profile chi-squared, is always
