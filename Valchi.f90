@@ -314,7 +314,7 @@
 !
       SUBROUTINE PRECFC
 !
-! Pre-calculates sin and cosine terms for the structure factor calculation
+! Pre-calculates sine and cosine terms for the structure factor calculation
 !
       USE ATMVAR
 

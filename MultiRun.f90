@@ -72,17 +72,12 @@
       REAL                                                                    ChiMult
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
-      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_4)
-
       INTEGER I, iSol
-      INTEGER Ticked(1:MaxRun)
-      CHARACTER*2 RowLabelStr
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
       DO iSol = 1, NumOf_SA_Runs-1
-        CALL WGridGetCellCheckBox(IDF_SA_Summary,3,iSol,Ticked(iSolOrder(iSol)))
+        CALL WGridGetCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSolOrder(iSol)))
       ENDDO
 ! Add this solution to the list
       DO I = 1, nvar
@@ -90,18 +85,10 @@
       ENDDO
       IntensityChiSqd(Curr_SA_Run) = SNGL(-FOPT)
       ProfileChiSqd(Curr_SA_Run) = CHIPROBEST
-      Ticked(Curr_SA_Run) = 1
+      iSolTicked(Curr_SA_Run) = 1
 ! Now sort the list according to Profile chi sqd
       CALL SORT_REAL(ProfileChiSqd,iSolOrder,NumOf_SA_Runs)
-      CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
-      DO iSol = 1, NumOf_SA_Runs
-        WRITE(RowLabelStr,'(I2)') iSol
-        CALL WGridLabelRow(IDF_SA_summary,iSol,RowLabelStr)
-        CALL WGridPutCellInteger (IDF_SA_Summary,1,iSol,iSolOrder(iSol)) 
-        CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iSol,Ticked(iSolOrder(iSol)))
-        CALL WGridPutCellReal    (IDF_SA_Summary,4,iSol,ProfileChiSqd(iSolOrder(iSol)),'(F7.2)')
-        CALL WGridPutCellReal    (IDF_SA_Summary,5,iSol,IntensityChiSqd(iSolOrder(iSol)),'(F7.2)')
-      ENDDO
+      CALL Update_Solutions
       CALL PopActiveWindowID
 
       END SUBROUTINE Log_SARun_Entry

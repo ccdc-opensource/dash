@@ -135,7 +135,7 @@
 !U!  Draw axes
 !U!
 !U      CALL IGrColourN(KolNumMain)
-!U      CALL IPgBorder()
+!U      CALL IPgBorder
 !U!
 !U!  Draw graph.
 !U!
@@ -165,10 +165,6 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
-      INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
-
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
@@ -182,22 +178,17 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER IOBS, I, J
+      INTEGER I
 
 ! Calculate the background
       CALL CalculateBackground(nbruckwin,mbruckiter,UseMC)
 ! Subtract the background
-      IOBS = 0
-      YPMIN = YOBS(1) - YBBIN(1)
+      YPMIN = YOBIN(1) - YBBIN(1)
       YPMAX = YPMIN
       DO I = 1, NBIN
-        DO J = 1, LBIN
-          IOBS = IOBS + 1
-          YOBS(IOBS) = YOBS(IOBS) - YBBIN(I)
-          YPMIN = MIN(YOBS(IOBS),YPMIN)
-          YPMAX = MAX(YOBS(IOBS),YPMAX)
-        ENDDO
         YOBIN(I) = YOBIN(I) - YBBIN(I)
+        YPMIN = MIN(YOBIN(I),YPMIN)
+        YPMAX = MAX(YOBIN(I),YPMAX)
       ENDDO
       CALL Clear_BackGround
       CALL GetProfileLimits
@@ -229,12 +220,12 @@
             CASE (IDF_Background_Accept)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
               CALL SubtractBackground(IBpass,20,.TRUE.)
-              CALL WDialogHide()
+              CALL WDialogHide
               CALL Profile_Plot
             CASE (IDCANCEL)
 ! If user Cancels, assume no knowledge on background
               CALL Clear_BackGround
-              CALL WDialogHide()
+              CALL WDialogHide
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -258,25 +249,25 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      INTEGER MAXSSPL
-      PARAMETER (MAXSSPL=5000)
-      REAL,    DIMENSION(MAXSSPL)         :: xkt
-      INTEGER, DIMENSION(MAXSSPL)         :: ikt
-      INTEGER, DIMENSION(MAXSSPL)         :: ipartem
-      REAL,    DIMENSION(MOBS)            :: es
-      REAL,    DIMENSION(-200:MOBS+200)   :: ys
-      INTEGER, DIMENSION(MOBS)            :: jft
-      REAL                                tRandomNumber
+      INTEGER     MAXSSPL
+      PARAMETER ( MAXSSPL = 5000 )
+
+      REAL    xkt(MAXSSPL)
+      INTEGER ikt(MAXSSPL),ipartem(MAXSSPL)
+      REAL    es(MOBS)
+      REAL    ys(-200:MOBS+200)
+      INTEGER jft(MOBS)
+      REAL    tRandomNumber
       INTEGER I, II, I1, I2, KK, jf1, jf0, jfp1, jfn, n0, ndiv
       INTEGER iter, IILO, IIHI, nsep, ninsep, ngood
       INTEGER knotem, npartem
       INTRINSIC MOD
-      REAL rat, stem
+      REAL    rat, stem
 !
 !  This subroutine determines the background using a smoothing
 !  procedure published by Sergio Brueckner in J. Appl. Cryst. (2000) 33, 977-979
 !  Modified by WIFD to smooth residual noise using SplineSmooth 
-!  and raise background to correct value using a Monte Carlo sampling procedure)
+!  and raise background to correct value using a Monte Carlo sampling procedure
 !
       CALL WCursorShape(CurHourGlass)
       DO I = -nbruckwin, 0
@@ -375,13 +366,10 @@
       INTEGER jfs(NDAT)
       REAL    xkk(nkn)
       REAL    smo(NDAT)
-
       REAL*8  xdel(nkn),u(nkn,nkn)
       REAL*8  bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
-
       REAL*8  xdd
       REAL*8  a(NDAT),b(NDAT),c(NDAT),d(NDAT)
-
       REAL*8  deri(nkn),ans(nkn)
       REAL*8  w
       REAL*8  qj, qj1
@@ -448,9 +436,11 @@
 !
       SUBROUTINE SplVal(XDEL,U,M)
 
-      INTEGER M
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: M
       REAL*8  xdel(m)
-      REAL*8  u(m,m)
+      REAL*8,  INTENT (  OUT) :: u(m,m)
 
       REAL*8  A(m,m),b(m,m),c(m,m)
       INTEGER I
@@ -475,89 +465,6 @@
       CALL MultiplyMatrices(b,c,u,m,m,m)
 
       END SUBROUTINE SplVal
-!
-!*****************************************************************************
-!
-      SUBROUTINE DGMINV(A,B,N)
-!
-! *** GMINV by JCM from SID 11 Oct 88 ***
-!
-!X
-!C 12C
-!H Inverts matrix A into matrix B.
-!A On entry A is a square NxN real matrix
-!A On exit  B is its inverse
-!D Based on SID
-!
-      IMPLICIT REAL*8 (A-H,O-Z)
-      INTEGER         II(500),IL(500),IG(500)
-      REAL*8          A(N,N),B(N,N)
-      INTEGER         I, J
-
-! Initialise b with values from a
-      B = A
-      D = 1.0
-      IS = N - 1
-      DO K = 1, N
-        IL(K) = 0
-        IG(K) = K
-      ENDDO
-      DO 150 K = 1, N
-        R = 0.0
-        DO 40 I = 1, N
-          IF (IL(I) .NE. 0) GOTO 40
-          W = B(I,K)
-          X = ABS(W)
-          IF (R .GT. X) GOTO 40
-          R  = X
-          P  = W
-          KF = I
-   40   CONTINUE
-        II(K) = KF
-        IL(KF) = KF
-        D = D * P
-        IF (D .EQ. 0.0) D = 1.0E-6
-        DO 80 I = 1, N
-          IF (I .EQ. KF) THEN
-            B(I,K) = 1.0/P
-          ELSE
-            B(I,K) = -B(I,K)/P
-          ENDIF
-   80   CONTINUE
-        DO 140 J = 1, N
-          IF (J .EQ. K) GOTO 140
-          W = B(KF,J)
-          IF (W .EQ. 0.0) GOTO 140
-          DO 130 I = 1, N
-            IF (I .EQ. KF) THEN
-              B(I,J) = W/P
-            ELSE
-              B(I,J) = B(I,J)+W*B(I,K)
-            ENDIF
-  130     CONTINUE
-  140   CONTINUE
-  150 CONTINUE
-      DO 190 K = 1, IS
-        KF = II(K)
-        KL = IL(KF)
-        KG = IG(K)
-        IF(KF .EQ. KG) GOTO 190
-        DO 170 I = 1, N
-          R = B(I,KF)
-          B(I,KF) = B(I,KG)
-  170     B(I,KG) = R
-        DO 180 J = 1, N
-          R = B(K,J)
-          B(K,J) = B(KL,J)
-  180     B(KL,J) = R
-        IL(KF) = K
-        IL(KG) = KL
-        IG(KL) = IG(K)
-        IG(K) = KF
-        D = -D
-  190 CONTINUE
-
-      END SUBROUTINE DGMINV
 !
 !*****************************************************************************
 !
