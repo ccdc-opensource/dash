@@ -91,6 +91,7 @@
 !
 ! This function determines the number of columns in a string
 ! a column is a consecutive sequence of non-blank characters embedded in two blank-characters
+! A blank character is either a space or a tab
 !
 ! JvdS 27 July 2001
 !
@@ -112,13 +113,13 @@
       POS = 1
       DO WHILE (POS .LE. StrLen)
 ! Skip spaces
-        DO WHILE ((POS .LE. StrLen) .AND. (TheString(POS:POS) .EQ. ' '))
+        DO WHILE ((POS .LE. StrLen) .AND. ((TheString(POS:POS) .EQ. ' ') .OR. (TheString(POS:POS) .EQ. CHAR(9))))
           POS = POS + 1
         END DO
 ! If we hit a non-space: it's a column
-        IF ((POS .LE. StrLen) .AND. (TheString(POS:POS) .NE. ' ')) tNumOfColumns = tNumOfColumns + 1
+        IF ((POS .LE. StrLen) .AND. ((TheString(POS:POS) .NE. ' ') .AND. (TheString(POS:POS) .NE. CHAR(9)))) tNumOfColumns = tNumOfColumns + 1
 ! Scan past rest of column (find next space / end of string)
-        DO WHILE ((POS .LE. StrLen) .AND. (TheString(POS:POS) .NE. ' '))
+        DO WHILE ((POS .LE. StrLen) .AND. ((TheString(POS:POS) .NE. ' ') .AND. (TheString(POS:POS) .NE. CHAR(9))))
           POS = POS + 1
         END DO
       END DO
