@@ -110,7 +110,7 @@
           CASE ('SDI    ')
             CALL SDIFileOpen(ArgString)
             CALL WizardWindowShow(IDD_SAW_Page1)
-          CASE ('PDB    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'CSSR   ')
+          CASE ('PDB    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'CSSR   ', 'CIF    ')
             CALL WDialogSelect(IDD_SAW_Page1)
             iFrg = 1
             CALL zmConvert(ArgString,tNumZMatrices,tZmatrices)
