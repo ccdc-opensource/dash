@@ -123,9 +123,9 @@
       RETURN
 ! JCC Added in return status for failed reading and failed opening
   999 Read_One_Zm = ErrorStatus
+      CLOSE (19)
       RETURN
  1900 FORMAT (Q,A)
-  580 FORMAT (I4)
 
       END FUNCTION Read_One_Zm
 !
