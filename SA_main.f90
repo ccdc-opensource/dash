@@ -11,11 +11,11 @@
 !
 ! Declare window-type and message variables
 !
-      TYPE(WIN_MESSAGE)  MESSAGE
-      CHARACTER*80 SDIFile
+
+      CHARACTER*255 SDIFile
       CHARACTER*80 pikfile,ticfile,hcvfile
       REAL         rpos
-      INTEGER      ipos,istart,iend,npar
+      INTEGER      ipos
       INTEGER      IFlags
 
       INCLUDE 'IZMCheck.inc'
@@ -24,6 +24,7 @@
       INTEGER      IDBZMBrowse(CheckSize),IDFZMpars(CheckSize),IDFZMFile(CheckSize)
       INTEGER      II
       INCLUDE 'DialogPosCmnF90.inc'
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 !
 !
@@ -31,21 +32,12 @@
       DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
       COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
 !
-      INTEGER  NACP(NMAX), NS, NT, NFCNEV, IER, ISEED1, ISEED2
-      INTEGER  MAXEVL, IPRINT, NACC, NOBDS
-      LOGICAL  MAXLOG,RESTART,QUIT,MAKET0
+      INTEGER  MAXEVL, IPRINT
 !
       LOGICAL :: NODATA = .FALSE.
-      CHARACTER*132 line
-      CHARACTER*80  sa_file
-      LOGICAL       log_inf_file, log_nvar, log_bounds, log_reduce
-      LOGICAL       log_eps, log_ns, log_nt, log_neps, log_maxevl, log_iprint
-      LOGICAL       log_iseed1, log_iseed2, log_T0, log_target_value
-      LOGICAL       log_frag_file
       DOUBLE PRECISION cen,sig
       LOGICAL       gaussb
-      CHARACTER*80  inf_file, zm_file
-      DOUBLE PRECISION T,T0,rt,eps,target_value
+      DOUBLE PRECISION T0,rt,eps,target_value
       PARAMETER (mvar=100)
       COMMON /gaubou/ cen(mvar),sig(mvar)
       COMMON /gaulog/ gaussb(mvar)
@@ -64,6 +56,7 @@
       COMMON /presetl/ log_preset
 !
       COMMON /saparl/ T0,rt,eps,target_value
+      INTEGER  NS, NT, IER, ISEED1, ISEED2
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
       COMMON /shadl/ log_shad(mvar)
       COMMON /shadi/ kshad(mvar)
@@ -94,7 +87,6 @@
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
 !
-      COMMON /PLTYPE/ IPTYPE
       COMMON /POSNS/NATOM,XATO(3,150),KX(3,150),AMULT(150),&
         TF(150),KTF(150),SITE(150),KSITE(150),&
         ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
@@ -109,10 +101,9 @@
       DATA LimsChanged / .FALSE. /
       SAVE LimsChanged
       LOGICAL ZmStateChanged
-      LOGICAL CheckWhat
       LOGICAL NoZmatrix
+      LOGICAL Confirm ! Function
 
-!      IHANDLE = 0
       CALL WMessageEnable(FieldChanged,1)
 !.. If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
       IF (FromPawleyFit) THEN
@@ -208,8 +199,8 @@
               CALL WDialogFieldState(IDFZMFile(II),Disabled)
               CALL WDialogFieldState(IDBZMBrowse(II),Disabled)
               CALL WDialogFieldState(IDFZMPars(II),Disabled)
-              IF (ii .LT. 5) THEN
-                DO jj = ii + 1, 5
+              IF (II .LT. 5) THEN
+                DO jj = II + 1, 5
                   CALL WDialogFieldState(IDFZMCheck(jj),Disabled)
                   CALL WDialogPutCheckBox(IDFZMCheck(jj),Unchecked)
                   CALL WDialogFieldState(IDFZMFile(jj),Disabled)
@@ -230,42 +221,35 @@
 !        CALL WDialogSelect(IDD_SA_input1)
         CALL WDialogSelect(IDD_SAW_Page1)
         IF (NoZmatrix) THEN
-! JvdS Was: CALL WDialogFieldState(IDB_SA1_next,Disabled)
           CALL WDialogFieldState(IDNEXT,Disabled)
         ELSE
-! JvdS Was: CALL WDialogFieldState(IDB_SA1_next,Enabled)
           CALL WDialogFieldState(IDNEXT,Enabled)
         END IF
 ! Start the message loop
         IXPos_IDD_SA_Input = WInfoDialog(6)
         IYPos_IDD_SA_Input = WInfoDialog(7)
-        CALL WMessage(ITYPE, MESSAGE)
-! JvdS  Next line didn't do anything
-! 10   CONTINUE
+        CALL GetEvent
 ! Enable or disable the "Next" button
 ! JvdS Started to add SA to Wizard
 !      CALL WDialogSelect(IDD_SA_input1)
         CALL WDialogSelect(IDD_SAW_Page1)
         IF (NoZmatrix) THEN
-! JvdS Was: CALL WDialogFieldState(IDB_SA1_next,Disabled)
           CALL WDialogFieldState(IDNEXT,Disabled)
         ELSE
-! JvdS Was: CALL WDialogFieldState(IDB_SA1_next,Enabled)
           CALL WDialogFieldState(IDNEXT,Enabled)
         END IF
-        SELECT CASE (ITYPE)
+        SELECT CASE (EventType)
 !.. Interact with the main window and look at the Pawley refinement...
           CASE (MouseButDown)
-            CALL Plot_Alter(MESSAGE%GX,MESSAGE%GY)
+            CALL Plot_Alter
           CASE (KeyDown)
-            CALL Check_KeyDown(MESSAGE)
+            CALL Check_KeyDown
           CASE (Expose, Resize)
-            IF (MESSAGE%WIN .EQ. 0) THEN
-! JvdS Isn't 'QUIT = process_mainwindow_message(ITYPE,MESSAGE)' missing?
+            IF (EventInfo%WIN .EQ. 0) THEN
               CALL Redraw()
             END IF
           CASE (PushButton)
-            SELECT CASE (MESSAGE%VALUE1)
+            SELECT CASE (EventInfo%VALUE1)
 !C>> JCC Add in new 'clear' button
             CASE (IDF_clear_zmatrix)
               CALL ClearZmatrices(CheckSize,IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse,IZMCheck)
@@ -280,7 +264,7 @@
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
-              IPType = 2
+              IPTYPE = 2
               RETURN
             CASE (IDCANCEL)
               CALL WDialogSelect(IDD_SAW_Page1)
@@ -288,9 +272,9 @@
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
-              IPType = 2
+              IPTYPE = 2
 ! JvdS We shouldn't just return to the Wizard: the whole Wizard must disappear.
-! That not possible yet however.
+! That's not possible yet however.
               RETURN
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
@@ -312,8 +296,6 @@
 ! JvdS Started to add SA to Wizard
 !               CALL WDialogSelect(IDD_SA_input1)
                CALL WDialogSelect(IDD_SAW_Page1)
-
-
                SDIFile = ' '
                CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
                IFlags = PromptOn + DirChange + AppendExt
@@ -323,15 +305,13 @@
                IF (ilenf .GT. 0) THEN
                  INQUIRE(FILE=SDIFile(1:Ilenf),EXIST=FExists)
                  IF (.NOT. FExists) THEN
-                   CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                                    "The file "//SDIFile(1:Ilenf)//" does not exist!",&
-                                    "No such file")
+                   CALL ErrorMessage("The file "//SDIFile(1:Ilenf)//" does not exist!")
                    ilenf = 0 ! Dont read it if it doesnt exist
                  ENDIF
                END IF
                IF (ilenf .NE. 0) THEN
                  NoData = .TRUE.
-                 CALL OpenHCVPIKTIC(SDIFile,0,NoData)
+                 CALL OpenHCVPIKTIC(SDIFile,NoData)
                  IF (NoData) THEN
                    CALL WMessageBox(OKOnly,ExclamationIcon, CommonOk,&
                                    "Could not read the pawley file "//SDIFile(:ilenf)//&
@@ -342,35 +322,27 @@
 !                                   CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
                  END IF
                END IF
-
-
              END IF
 !>> JCC Open
             CASE (IDB_SA_Project_Open)
 ! JvdS Started to add SA to Wizard
 !               CALL WDialogSelect(IDD_SA_input1)
               CALL WDialogSelect(IDD_SAW_Page1)
-
               SDIFile = ' '
               CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
               ilenf = LEN_TRIM(SDIFile)
               INQUIRE(FILE=SDIFile(1:Ilenf),EXIST=FExists)
               IF (.NOT. FExists) THEN
-                Call WMessageBox(OkOnly,ExclamationIcon,CommonOk,&
-                   "The file "//SDIFile(1:Ilenf)//" does not exist!",&
-                       "No such file")
+                CALL ErrorMessage("The file "//SDIFile(1:Ilenf)//" does not exist!")
                 ilenf = 0 ! Dont read it if it doesnt exist
               ENDIF
               IF (ilenf .NE. 0) THEN
                 NoData = .TRUE.
-                CALL OpenHCVPIKTIC(SDIFile,0,NoData)
+                CALL OpenHCVPIKTIC(SDIFile,NoData)
                 IF (NODATA) THEN
-                  CALL WMessageBox(OKOnly,ExclamationIcon, CommonOk,&
-                                   "Could not read the pawley file "//SDIFile(:ilenf)//&
-                                    CHAR(13)//"successfully","Failed to read project")
+                  CALL ErrorMessage("Could not read the pawley file "//SDIFile(:ilenf)//CHAR(13)//"successfully")
                  END IF
                END IF
-
             CASE (IDB_SA_Project_Import)
 !>> JCC Import .. convert a mol/pdb/mol2 file into a zmatrix
               CALL ImportZmatrix
@@ -378,9 +350,9 @@
                  IDB_ZMatrix_Browse4,IDB_ZMatrix_Browse5)
               ZmStateChanged = .TRUE.
 !>> JCC This doesnt work Im afraid: Need to loop through and find the message
-!              ifrg=IZMNumber(MESSAGE%VALUE1)
+!              ifrg=IZMNumber(EventInfo%VALUE1)
                ifrg = 1
-               DO WHILE (ifrg .LT. 5 .AND. IZMNumber(ifrg) .NE. MESSAGE%VALUE1)
+               DO WHILE (ifrg .LT. 5 .AND. IZMNumber(ifrg) .NE. EventInfo%VALUE1)
                  ifrg = ifrg + 1
                ENDDO
                gotzmfile(ifrg) = .FALSE.
@@ -418,7 +390,7 @@
 !>> JCC Also act on selection of check box
             END SELECT
        CASE (FieldChanged)
-            SELECT CASE(MESSAGE%VALUE1)
+            SELECT CASE(EventInfo%VALUE1)
               CASE (IDF_ZM_file_check1,IDF_ZM_file_check2,IDF_ZM_file_check3,&
                 IDF_ZM_file_check4,IDF_ZM_file_check5)
 ! Update the selection
@@ -436,34 +408,29 @@
       DO                                 ! Loop until user terminates
         IXPos_IDD_SA_Input = WInfoDialog(6)
         IYPos_IDD_SA_Input = WInfoDialog(7)
-        CALL WMessage(ITYPE, MESSAGE)
-        SELECT CASE (ITYPE)
+        CALL GetEvent
+        SELECT CASE (EventType)
 !.. Interact with the main window and look at the Pawley refinement...
           CASE (Expose, Resize)
-            IF (MESSAGE%WIN .EQ. 0) THEN
+            IF (EventInfo%WIN .EQ. 0) THEN
               CALL Redraw()
             END IF
           CASE (MouseButDown)
-            CALL Plot_Alter(MESSAGE%GX,MESSAGE%GY)
+            CALL Plot_Alter
           CASE (KeyDown)
-            CALL Check_KeyDown(MESSAGE)
+            CALL Check_KeyDown
           CASE (PushButton)
-            SELECT CASE (MESSAGE%VALUE1)
+            SELECT CASE (EventInfo%VALUE1)
               CASE (IDF_SA2_cancel)
 ! Go back to the Pawley refinement or the initial wizard
                 CALL WDialogHide()
-                IPType = 2
+                IPTYPE = 2
                 RETURN
               CASE (IDBACK)
 ! Go back to the 1st window
 !>> JCC Check if the limits have changed and warn about it 
                 IF (LimsChanged) THEN
-                  CALL WMessageBox(OKCancel,ExclamationIcon, CommonOk,&
-                                   "Note: Going back will erase the edits made to the current parameters",&
-                                   "Overwrite changes?")
-                  IF (WInfoDialog(4) .EQ. 1) THEN
-                    LimsChanged = .FALSE.
-                  END IF
+                  IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
                 END IF
                 IF (.NOT. LimsChanged) THEN
                   CALL WDialogHide()
@@ -476,9 +443,9 @@
                 GOTO 777
             END SELECT
           CASE (FieldChanged)
-            SELECT CASE (MESSAGE%VALUE1)
+            SELECT CASE (EventInfo%VALUE1)
               CASE (IDF_parameter_grid)
-                CALL WGridPos(MESSAGE%X,IFCol,IFRow)
+                CALL WGridPos(EventInfo%X,IFCol,IFRow)
                 SELECT CASE (IFCol)
                 CASE(1)
 !.. parameter
@@ -568,7 +535,7 @@
 !                               LimsChanged = .TRUE.
 !                         END IF
                 END SELECT ! IFCol
-            END SELECT ! Message%Value1 Field Changed Options
+            END SELECT ! EventInfo%Value1 Field Changed Options
         END SELECT  ! ITYPE
       END DO
 !.. We are now on window number 3
@@ -605,23 +572,22 @@
       DO                                 ! Loop until user terminates
         IXPos_IDD_SA_Input = WInfoDialog(6)
         IYPos_IDD_SA_Input = WInfoDialog(7)
-        CALL WMessage(ITYPE, MESSAGE)
-! JvdS @ Line to handle main window should be inserted
-        SELECT CASE (ITYPE)
+        CALL GetEvent
+        SELECT CASE (EventType)
           CASE (Expose, Resize)
-            IF (MESSAGE%WIN .EQ. 0)  THEN
+            IF (EventInfo%WIN .EQ. 0)  THEN
               CALL ReDraw()
             END IF
 !.. Interact with the main window and look at the Pawley refinement...
           CASE (MouseButDown)
-            CALL Plot_Alter(MESSAGE%GX,MESSAGE%GY)
+            CALL Plot_Alter
           CASE (KeyDown)
-            CALL Check_KeyDown(MESSAGE)
+            CALL Check_KeyDown
           CASE (PushButton)
-          SELECT CASE (MESSAGE%VALUE1)
+          SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_SA3_cancel,IDCANCEL)
 ! Go back to the Pawley refinement or the initial wizard
-              IPType = 2
+              IPTYPE = 2
 ! Window is going to be removed: save current position
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
@@ -643,9 +609,9 @@
               GOTO 888
             END SELECT
           CASE (FieldChanged)
-            SELECT CASE (MESSAGE%VALUE1)
+            SELECT CASE (EventInfo%VALUE1)
               CASE(IDF_SA_T0_trackbar)
-                IF (MESSAGE%VALUE2 .EQ. IDF_SA_T0_trackbar) THEN
+                IF (EventInfo%VALUE2 .EQ. IDF_SA_T0_trackbar) THEN
                   CALL WDialogSelect(IDD_SA_input3)
                   CALL WDialogGetTrackBar(IDF_SA_T0_trackbar,IPOS)
                   RPOS = 1000 - IPOS
@@ -659,7 +625,7 @@
                 IPOS=1000 - NINT(RPOS)
                 CALL WDialogPutTrackbar(IDF_SA_T0_trackbar,IPOS)
               CASE (IDF_SA_Tredrate_trackbar)
-                IF (MESSAGE%VALUE2 .EQ. IDF_SA_Tredrate_trackbar) THEN
+                IF (EventInfo%VALUE2 .EQ. IDF_SA_Tredrate_trackbar) THEN
                   CALL WDialogSelect(IDD_SA_input3)
                   CALL WDialogGetTrackBar(IDF_SA_Tredrate_trackbar,IPOS)
                   RPOS = 0.001 * (501.-FLOAT(IPOS))
@@ -673,7 +639,7 @@
                 IPOS = 501 - NINT(1000.0 * RPOS)
                 CALL WDialogPutTrackbar(IDF_SA_Tredrate_trackbar,IPOS)
               CASE (IDF_SA_NS_trackbar)
-                IF (MESSAGE%VALUE2 .EQ. IDF_SA_NS_trackbar) THEN
+                IF (EventInfo%VALUE2 .EQ. IDF_SA_NS_trackbar) THEN
                   CALL WDialogSelect(IDD_SA_input3)
                   CALL WDialogGetTrackBar(IDF_SA_NS_trackbar,IPOS)
                   JPOS = 101 - IPOS
@@ -691,7 +657,7 @@
                 KPOS = NS * NT * NVAR
                 CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
               CASE (IDF_SA_NT_trackbar)
-                IF (MESSAGE%VALUE2 .EQ. IDF_SA_NT_trackbar) THEN
+                IF (EventInfo%VALUE2 .EQ. IDF_SA_NT_trackbar) THEN
                   CALL WDialogSelect(IDD_SA_input3)
                   CALL WDialogGetTrackBar(IDF_SA_NT_trackbar,IPOS)
                   JPOS = 101 - IPOS
@@ -740,7 +706,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE OPENHCVPIKTIC(SDIFile,Mode,NoData)
+      SUBROUTINE OPENHCVPIKTIC(SDIFile,NoData)
 !
 !C>> JCC Cell/Lattice declarations now in an include file
 
@@ -750,15 +716,15 @@
       COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
       INCLUDE 'statlog.inc'
 !
-      CHARACTER(LEN = MaxPathLength) ::  SDIFile,dslfile,line,subline
+      CHARACTER(LEN = 255)            ::  SDIFile, dslfile
+      CHARACTER(LEN = MaxPathLength) :: line,subline
+
       CHARACTER*12 KeyChar
 
 !C>> JCC Declaration
 
-      INTEGER Load_TIC_File
-      INTEGER Iptype, i
+      INTEGER i
       INTEGER ihcver,iticer,ipiker,iloger,idsl, isst, ised, iactsgnum
-      COMMON /PLTYPE/ IPTYPE
       LOGICAL gotdslfile
 
 !C>> JCC Set to success in all cases
@@ -774,6 +740,7 @@
       RawExists = .FALSE.
       HcvExists = .FALSE.
       TicExists = .FALSE.
+! JvdS isn't gotdslfile initialised?
  10   line = ' '
       READ(11,1100,END=100) line
  1100 FORMAT(a)
@@ -837,12 +804,13 @@
         CASE ('raw')
           CALL ILocateString(line,isst,ised)
           WRITE(DashRawFile,*) line(isst:nl)
+! @ JvdS shouldn't the next line have been: RawExists = .TRUE. ?
           HcvExists = .TRUE.      
       END SELECT
       GOTO 10 
  100  CONTINUE
         IF (GotDSLFile) CALL GETDSL(dslfile,LEN_TRIM(dslfile),idsl)
-      CALL Load_DashDataFiles(mode,NoData)
+      CALL Load_DashDataFiles(NoData)
 !C>>  enable the buttons,
       IF (.NOT. NoData) THEN
         IF (idsl .EQ. 0) THEN
@@ -858,28 +826,22 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Load_DashDataFiles(mode,NoData)
+      SUBROUTINE Load_DashDataFiles(NoData)
 
       USE VARIABLES
       USE WINTERACTER
 
       IMPLICIT NONE
 
-      INTEGER mode
       LOGICAL NoData
-      LOGICAL FExists
       INTEGER klen
-      INTEGER Iptype,Istat
-      COMMON /PLTYPE/ IPTYPE
-      CHARACTER*3 ext3
 
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
       INTEGER Load_Tic_File ! Function
-      INTEGER Diffraction_file_Load ! Function
       INTEGER ipiker, iloger, iticer, ihcver
 
-      IF (Mode .EQ. 0) THEN
         IF (PikExists) THEN
           CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
           IF (ipiker .EQ. 0) THEN
@@ -911,10 +873,9 @@
           CALL Synchronize_Data()
           NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
           Iptype = 2
-          CALL Profile_Plot(Iptype) 
+          CALL Profile_Plot(IPTYPE) 
           NoData = .FALSE.
         ENDIF
-      END IF
       RETURN
 
       END SUBROUTINE Load_DashDataFiles
@@ -934,20 +895,13 @@
       DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
       common /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
 !
-      INTEGER  NACP(NMAX), NS, NT, NFCNEV, IER, ISEED1, ISEED2
-      INTEGER  MAXEVL, IPRINT, NACC, NOBDS
-      LOGICAL  MAXLOG,RESTART,QUIT,MAKET0
+      INTEGER  NS, NT, ISEED1, ISEED2
+      INTEGER  MAXEVL, IPRINT
 !
-      character*132 line
-      character*80  sa_file
-      logical       log_inf_file,log_nvar,log_bounds,log_reduce
-      logical log_eps,log_ns,log_nt,log_neps,log_maxevl,log_iprint
-      logical log_iseed1,log_iseed2,log_T0,log_target_value
-      logical log_frag_file
       double precision cen,sig
       logical gaussb
       character*80  inf_file,zm_file
-      double precision T,T0,rt,eps,target_value
+      double precision T0,rt,eps,target_value
       common /inffil/ lfinf,lfzm,inf_file,zm_file
 !
       parameter (maxatm=100)
@@ -1003,9 +957,9 @@
             czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
       logical gotzmfile
       common /zmlgot/ gotzmfile(maxfrg)
-      logical EnableOnward
 !
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
+      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
       DOUBLE PRECISION dcel(6)
 
       DO I = 1, 6
@@ -1089,113 +1043,113 @@
 !
 !*****************************************************************************
 !
-      subroutine SA_Parameter_Update(CheckSize,IZMCheck)
+!      subroutine SA_Parameter_Update(CheckSize,IZMCheck)
 !
-      USE WINTERACTER
-      USE DRUID_HEADER
-      INTEGER CheckSize
-      INTEGER IZMCheck(CheckSize)
+!      USE WINTERACTER
+!      USE DRUID_HEADER
+!      INTEGER CheckSize
+!      INTEGER IZMCheck(CheckSize)
 !
-      PARAMETER (NMAX = 100, MXEPS = 10)
-      DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
-      COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
+!      PARAMETER (NMAX = 100, MXEPS = 10)
+!      DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
+!      COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
 !
-      INTEGER  NACP(NMAX), NS, NT, NFCNEV, IER, ISEED1, ISEED2
-      INTEGER MAXEVL, IPRINT, NACC, NOBDS
-      LOGICAL  MAXLOG,RESTART,QUIT,MAKET0
+!      INTEGER  NACP(NMAX), NS, NT, NFCNEV, IER, ISEED1, ISEED2
+!      INTEGER MAXEVL, IPRINT, NACC, NOBDS
+!      LOGICAL  MAXLOG,RESTART,MAKET0
 !
-      character*132 line
-      character*80  sa_file
-      logical   log_inf_file,log_nvar,log_bounds,log_reduce
-      logical log_eps,log_ns,log_nt,log_neps,log_maxevl,log_iprint
-      logical log_iseed1,log_iseed2,log_T0,log_target_value
-      logical log_frag_file
-      double precision cen,sig
-      logical gaussb
-      character*80  inf_file,zm_file
-      double precision T,T0,rt,eps,target_value
-      common /inffil/ lfinf,lfzm,inf_file,zm_file
+!      character*132 line
+!      character*80  sa_file
+!      logical   log_inf_file,log_nvar,log_bounds,log_reduce
+!      logical log_eps,log_ns,log_nt,log_neps,log_maxevl,log_iprint
+!      logical log_iseed1,log_iseed2,log_T0,log_target_value
+!      logical log_frag_file
+!      double precision cen,sig
+!      logical gaussb
+!      character*80  inf_file,zm_file
+!      double precision T,T0,rt,eps,target_value
+!      common /inffil/ lfinf,lfzm,inf_file,zm_file
 !
-      parameter (maxatm=100)
-      parameter (maxfrg=20)
-      double precision a,b,c,al,be,ga
-      double precision tiso,occ
-      double precision blen,alph,bet,f2cmat
-      character*3 asym
-      integer ioptb,iopta,ioptt,iz1,iz2,iz3
-      common /zmcomi/ ntatm,natoms(maxfrg),&
-     ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
-     iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
-      common /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
-     bet(maxatm,maxfrg),f2cmat(3,3)
-      common /zmcomc/ asym(maxatm,maxfrg)
-      common /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),&
-     al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),&
-     occ(maxatm,maxfrg)
+!      parameter (maxatm=100)
+!      parameter (maxfrg=20)
+!      double precision a,b,c,al,be,ga
+!      double precision tiso,occ
+!      double precision blen,alph,bet,f2cmat
+!      character*3 asym
+!      integer ioptb,iopta,ioptt,iz1,iz2,iz3
+!      common /zmcomi/ ntatm,natoms(maxfrg),&
+!     ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
+!     iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
+!      common /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
+!     bet(maxatm,maxfrg),f2cmat(3,3)
+!      common /zmcomc/ asym(maxatm,maxfrg)
+!      common /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),&
+!     al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),&
+!     occ(maxatm,maxfrg)
 !
-      common /frgcom/ nfrag,lfrag(maxfrg)
-      character*80 frag_file
-      common /frgcha/ frag_file(maxfrg)
-      parameter (mvar=100)
-      common /gaubou/ cen(mvar),sig(mvar)
-      common /gaulog/ gaussb(mvar)
-      character*80  torfile
-      logical ltorfil
-      common /torfcm/ torfile(mvar)
-      common /torlog/ ltorfil(mvar)
-      common /jitter/ rjittr
-      double precision x,lb,ub,vm,xpreset
-      common /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
-      common /presetr/ xpreset(mvar)
-      logical log_preset
-      common /presetl/ log_preset
+!      common /frgcom/ nfrag,lfrag(maxfrg)
+!      character*80 frag_file
+!      common /frgcha/ frag_file(maxfrg)
+!      parameter (mvar=100)
+!      common /gaubou/ cen(mvar),sig(mvar)
+!      common /gaulog/ gaussb(mvar)
+!      character*80  torfile
+!      logical ltorfil
+!      common /torfcm/ torfile(mvar)
+!      common /torlog/ ltorfil(mvar)
+!      common /jitter/ rjittr
+!      double precision x,lb,ub,vm,xpreset
+!      common /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
+!      common /presetr/ xpreset(mvar)
+!      logical log_preset
+!      common /presetl/ log_preset
 !
-      common /saparl/ T0,rt,eps,target_value
-      common /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-      common /shadl/ log_shad(mvar)
-      common /shadi/ kshad(mvar)
+!      common /saparl/ T0,rt,eps,target_value
+!      common /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
+!      common /shadl/ log_shad(mvar)
+!      common /shadi/ kshad(mvar)
 !
-      character*36 parlabel(mvar)
+!      character*36 parlabel(mvar)
 !
-      character*36 czmpar
-      common /zmnpar/ izmtot,izmpar(maxfrg),&
-            czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
-      logical gotzmfile
-      common /zmlgot/ gotzmfile(maxfrg)
+!      character*36 czmpar
+!      common /zmnpar/ izmtot,izmpar(maxfrg),&
+!            czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
+!      logical gotzmfile
+!      common /zmlgot/ gotzmfile(maxfrg)
 !
-       COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
-       double precision dcel(6)
+!      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+!       COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
 !
-      kk = 0
+!      kk = 0
 !C>> JCC Only use those that are checked
-      DO ifrg = 1, CheckSize
-        IF (IZMCheck(ifrg) .EQ. Checked) THEN
-          DO ii = 1, izmpar(ifrg)
-            kk = kk + 1
+!      DO ifrg = 1, CheckSize
+!        IF (IZMCheck(ifrg) .EQ. Checked) THEN
+!          DO ii = 1, izmpar(ifrg)
+!            kk = kk + 1
 !C!>> Leave these alone - save the edits
 !          x(kk)=xzmpar(ii,ifrg)
 !          parlabel(kk)=czmpar(ii,ifrg)
-!     sngl(x(kk)),sngl(lb(kk)),sngl(ub(kk)),sngl(vm(kk))
-          END DO
-!C>> JCC Check
-        ENDIF
-      END DO
-      nvar = kk
-!.. Now fill the grid
-      CALL WDialogSelect(IDD_SA_input2)
-      CALL WGridRows(IDF_parameter_grid,nvar)
-      DO i = 1, nvar
-         CALL WGridLabelRow(IDF_parameter_grid,i,parlabel(i))
-         CALL WGridPutCellReal(IDF_parameter_grid,1,i,sngl(x(i)),'(F12.5)')
-         CALL WGridPutCellReal(IDF_parameter_grid,2,i,sngl(lb(i)),'(F12.5)')
-         CALL WGridPutCellReal(IDF_parameter_grid,3,i,sngl(ub(i)),'(F12.5)')
-!         CALL WGridPutCellCheckBox(IDF_parameter_grid,4,i,Unchecked)
-!         CALL WGridPutCellCheckBox(IDF_parameter_grid,5,i,Checked)
-      END DO
-!      Call WDialogHide()      
-      RETURN
-
-      END SUBROUTINE SA_Parameter_Update
+!!     sngl(x(kk)),sngl(lb(kk)),sngl(ub(kk)),sngl(vm(kk))
+!          END DO
+!!C>> JCC Check
+!        ENDIF
+!      END DO
+!      nvar = kk
+!!.. Now fill the grid
+!      CALL WDialogSelect(IDD_SA_input2)
+!      CALL WGridRows(IDF_parameter_grid,nvar)
+!      DO i = 1, nvar
+!         CALL WGridLabelRow(IDF_parameter_grid,i,parlabel(i))
+!         CALL WGridPutCellReal(IDF_parameter_grid,1,i,sngl(x(i)),'(F12.5)')
+!         CALL WGridPutCellReal(IDF_parameter_grid,2,i,sngl(lb(i)),'(F12.5)')
+!         CALL WGridPutCellReal(IDF_parameter_grid,3,i,sngl(ub(i)),'(F12.5)')
+!!         CALL WGridPutCellCheckBox(IDF_parameter_grid,4,i,Unchecked)
+!!         CALL WGridPutCellCheckBox(IDF_parameter_grid,5,i,Checked)
+!      END DO
+!!      Call WDialogHide()      
+!      RETURN
+!
+!      END SUBROUTINE SA_Parameter_Update
 
            
 !C>> JCC This subroutine handles the various types of status error that can arise 
@@ -1374,34 +1328,65 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-      TYPE(WIN_MESSAGE)  MESSAGE
-      INTEGER               IFlags, ISEL, Ilen, Istat, Nzm
-      CHARACTER(LEN=80)  :: FilterStr, F
+      IMPLICIT NONE
+
+      INTEGER            I, IFlags, ISEL, Ilen, Istart, Istat, Nzm
+      INTEGER            POS
+      CHARACTER(LEN=4)   :: EXT4
+      CHARACTER(LEN=255)  :: FilterStr, F
       CHARACTER(LEN=512) :: Zmfiles
       CHARACTER(LEN=5)   :: fmt     
       CHARACTER(LEN=512) :: Info = 'You can import molecules from mol2,mol or pdb files into DASH.'//CHAR(13)//&
                                    'When you click on Ok, you will be prompted for a file in one'//CHAR(13)//&
-                                   'of these formats. DASH will create separate zmatrix files for'//CHAR(13)//&
+                                   'of these formats. DASH will create separate z-matrix files for'//CHAR(13)//&
                                    'each chemical residue present in the first entry in the file.'//CHAR(13)//&
                                    'In multiple entry files the first entry will be read only.'
 
       CALL WMessageBox(OKCancel, InformationIcon, CommonOK, Info, "Create Z-matrix")
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
       IFlags = LoadDialog + DirChange + AppendExt
-      FilterStr = "pdb files|*.pdb|Mol2 files|*.mol2;*.ml2|mdl mol files|*.mol; *.mdl; *.sdi|"
-      ISEL = 1
-      Fname = ' '
-      CALL WSelectFile(FilterStr, IFLAGS, FNAME, &
-                       "Select a file for conversion",ISEL)
-      Ilen = LEN_TRIM(fname)
+! JvdS Was:
+!O      FilterStr = "pdb files|*.pdb|Mol2 files|*.mol2;*.ml2|mdl mol files|*.mol; *.mdl; *.sdi|"
+!O      ISEL = 1
+      FilterStr = "All files (*.*)|*.*|"//&
+                  "All molecular model files (*.pdb, *.mol2, *.ml2, *.mol, *.mdl)|*.pdb;*.mol2;*.ml2;*.mol;*.mdl|"//&
+                  "Protein DataBank files (*.pdb)|*.pdb|"//&
+                  "Mol2 files (*.mol2, *.ml2)|*.mol2;*.ml2|"//&
+                  "mdl mol files|*.mol;*.mdl|"
+      ISEL = 2
+      FNAME = ' '
+      CALL WSelectFile(FilterStr, IFLAGS, FNAME,"Select a file for conversion",ISEL)
+      Ilen = LEN_TRIM(FNAME)
       IF (Ilen .EQ. 0) RETURN
-      if (Isel .EQ. 1) THEN
-        fmt = '-pdb'
-      else if (Isel .EQ. 2) THEN
-        fmt = '-mol2'
-      else if (Isel .EQ. 3) THEN
-        fmt = '-mol'
-      END IF 
+! JvdS Was:
+!O      Ilen = LEN_TRIM(fname)
+!O      IF (Ilen .EQ. 0) RETURN
+!O      if (Isel .EQ. 1) THEN
+!O        fmt = '-pdb'
+!O      else if (Isel .EQ. 2) THEN
+!O        fmt = '-mol2'
+!O      else if (Isel .EQ. 3) THEN
+!O        fmt = '-mol'
+!O      END IF 
+! Find the last occurence of '.' in TheFileName
+      POS = Ilen-1 ! Last character of TheFileName is not tested
+! The longest extension allowed is four
+      DO WHILE ((POS .NE. 0) .AND. (FNAME(POS:POS) .NE. '.') .AND. (POS .NE. (Ilen-5)))
+        POS = POS - 1
+      ENDDO
+! If we haven't found a '.' by now, we cannot deal with the extension anyway
+      IF (FNAME(POS:POS) .NE. '.') RETURN
+      EXT4 = '    '
+      EXT4 = FNAME(POS+1:Ilen)
+      CALL ILowerCase(EXT4)
+      SELECT CASE (EXT4)
+        CASE ('pdb ')
+          fmt = '-pdb'
+        CASE ('mol2','ml2 ')
+          fmt = '-mol2'
+        CASE ('mol ','mdl ','sdi ')
+          fmt = '-mol'
+      END SELECT
 ! Run silently, 
       CALL IOSDeleteFile('MakeZmatrix.log')
       Istat = InfoError(1) ! Clear any errors 
@@ -1412,12 +1397,10 @@
       CALL IOSCommand(CONVEXE(1:LEN_TRIM(CONVEXE))//' '//fmt(1:LEN_TRIM(fmt))//' "'//FNAME(Istart:Ilen)//'"',3)
 ! Check return status
       OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = ISTAT)
-      IF (InfoError(1) .EQ. ErrOSCommand .OR. ISTAT .NE. 0) THEN
+      IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (ISTAT .NE. 0)) THEN
 ! An error occurred: get the return status
 ! IECODE = InfoError(3)
-        CALL WMessageBox(OkOnly, ExclamationICon, CommonOk, &
-                        "Sorry, could not create z-matrices",&
-                        "Generation Failed")
+        CALL ErrorMessage("Sorry, could not create z-matrices")
 ! Prompt with files created
       ELSE ! All Ok: Need to read in the file names
         Ilen = 1
