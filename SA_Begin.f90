@@ -54,11 +54,7 @@
       CALL PDB_SymmRecords()
       CALL Init_MultiRun()
 ! Grey out "start next" button if not multirun
-      IF (RESTART) THEN
-        CALL WDialogFieldState(IDF_StartNext,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDF_StartNext,Disabled)
-      ENDIF
+      CALL WDialogFieldStateLogical(IDF_StartNext,RESTART)
       IPTYPE = 2
 ! Clear Chi-sqd array between starting sets of SA Runs
       Chi_sqd = 0.0
@@ -76,15 +72,14 @@
       CALL OutputChi2vsMoves
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Enabled)
-      Ierrflag = InfoError(1)
-      CALL WindowSelect(0)
-      Ierrflag = InfoError(1)
-! Wait for the user to raise the window. Under NT the "WindowRaise call" 
-! Does not seem to work annoyingly, so once complete, wait for the user to
-! raise the window
-      DO WHILE (WinfoWindow(WindowState) .EQ. 0)
-        CALL IOsWait(50) ! wait half a sec
-      ENDDO
+!O      Ierrflag = InfoError(1)
+!O      CALL WindowSelect(0)
+!O! Wait for the user to raise the window. Under NT the "WindowRaise call" 
+!O! Does not seem to work annoyingly, so once complete, wait for the user to
+!O! raise the window
+!O      DO WHILE (WinfoWindow(WindowState) .EQ. WinMinimised)
+!O        CALL IOsWait(50) ! wait half a sec
+!O      ENDDO
       CALL WizardWindowHide
 !ep SASummary presents a grid summarising results of the Simulated
 !   Annealing runs.  
@@ -173,11 +168,16 @@
           RETURN 
         ELSEIF (WinfoDialog(4) .EQ. 2) THEN ! No - so enter a new file name
           Iflags = SaveDialog + NonExPath + DirChange + AppendExt
-          filehead = ' '
+          filehead = ''
 !ep appended
-          CALL WSelectFile('ccl files|*.ccl|cssr files|*.cssr|pdb files|*.pdb|pro files|*.pro|',&
+          CALL WSelectFile('pdb files|*.pdb|ccl files|*.ccl|cssr files|*.cssr|pro files|*.pro|',&
                            Iflags,filehead,'Choose SA output file name')
-          IF (filehead .NE. ' ') CALL sa_SetOutputFiles(filehead)
+          IF ((WinfoDialog(4) .NE. CommonOk) .OR. (LEN_TRIM(filehead) .EQ. 0)) THEN
+            CheckOverwriteSaOutput = 0
+            RETURN
+          ELSE
+            CALL sa_SetOutputFiles(filehead)
+          ENDIF
         ELSE ! Cancel
           CheckOverwriteSaOutput = 0
           RETURN
@@ -238,11 +238,11 @@
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
       IF (IBMBER .NE. 0) THEN
-        NumberSGTable = 1 ! P1
-        CALL ErrorMessage('Error while determining space group: space group reset to P1.')
-! Set the crystal system
         LatBrav = GetCrystalSystem(NumberSGTable)
+        NumberSGTable = 1 ! P1
         CALL Upload_CrystalSystem
+        CALL ErrorMessage('Error while determining space group: space group reset.')
+! Set the crystal system
         GOTO 10
       ENDIF
 

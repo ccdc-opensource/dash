@@ -153,16 +153,15 @@
 ! XPF_Range(1,i)  = start of hatched area
 ! XPF_Range(2,i)  = end   of hatched area
 ! RangeFitYN      = has this range been fitted Yes / No
-! @@ RangeFitYN has not been implemented yet.
 ! IPF_Lo          = designates bin (so, pointer into XBIN) where the peak fit range starts.
 ! IPF_Hi          = designates bin (so, pointer into XBIN) where the peak fit range ends.
 ! NumPeakFitRange = Number of peak fit ranges (hatched areas on the screen)
 ! CurrentRange    = global variable used to indicate which peak fit range we are
 !                   dealing with at the moment, instead of passing this as an argument
 !                   across subroutines.
-! IPF_Range       = Number of points in this range (should be IPF_Hi - IPF_Lo, I guess)
+! IPF_Range       = Number of points in this range (should be 1 + IPF_Hi - IPF_Lo)
 ! NumInPFR        = Number of peaks in this fit range (if user has indicated peak positions)
-! XPF_Pos         = 2 theta of the peak position, not sure about the difference wrt PkPosVal
+! XPF_Pos         = 2 theta of the peak position, as entered by the user. This is NOT the fitted peak position.
 ! YPF_Pos         = Calculated number of counts of the peak position
 ! IPF_RPt         = pointer into XPeakFit/YPeakFit where the calculated points for this peak start
 ! MAX_FITPT (= 10000) = MAXimum number of FIT PoinTs
