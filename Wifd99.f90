@@ -620,6 +620,9 @@
 
       INTEGER NUMPFP, JSOURC, I, J
 
+! JvdS There is something wrong with this routine:
+! the PFNVAR are always one step behind what they should be.
+
 ! FOR NOW, IMPOSE PHASE 1, SOURCE 1 WHICH WE HOPE STAY THERE:
       JPHASE = 1
       JSOURC = 1
