@@ -155,8 +155,10 @@
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
       CALL WDialogPutRadioButton(IDF_PW_Option3)
       PastPawley = .FALSE.
-! Ungrey 'Delete all peak fit ranges' button on toolbar
+! Ungrey 'Delete peak fit ranges' button on toolbar
       IF (NumPeakFitRange .GT. 0) CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
+! Ungrey 'Clear cell parameters' button on toolbar
+      CALL WMenuSetState(ID_Delabc,ItemEnabled,WintOn)
 ! Ungrey 'Remove background' button on toolbar
       IF (.NOT. NoData) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
 ! Ungrey 'Load diffraction pattern' button on toolbar
@@ -170,6 +172,7 @@
       CALL WDialogFieldState(IDF_Crystal_System_Menu,Enabled)
       CALL WDialogFieldState(IDF_ZeroPoint,Enabled)
       CALL WDialogFieldState(IDAPPLY,Enabled)
+      CALL WDialogFieldState(IDB_Delabc,Enabled)
       CALL WDialogSelect(IDD_Data_Properties)
       CALL WDialogFieldState(IDAPPLY,Enabled)
       IF (JRadOption .EQ. 1) CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
@@ -697,6 +700,30 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DealWithDICVOLRunning
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE DICVAR
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_DICVOLRunning)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBSTOP, IDCANCEL)
+              DICVOL_Error = cDICVOL_ErrorInterrupted
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithDICVOLRunning
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardWindowIndexing2
 
       USE WINTERACTER
@@ -835,7 +862,10 @@
             ENDDO
             CALL WCursorShape(CurHourGlass)
             NumOfDICVOLSolutions = 0
+            CALL WDialogSelect(IDD_DICVOLRunning)
+            CALL WDialogShow(-1,-1,0,SemiModeless)
             CALL DICVOL91(Isystem(1),Isystem(2),Isystem(3),Isystem(4),Isystem(5),Isystem(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
+            CALL WDialogHide
             CALL WCursorShape(CurCrossHair)
 ! Pop up a window showing the DICVOL output file in a text editor
             CALL WindowOpenChild(IHANDLE)
@@ -1036,6 +1066,7 @@
       INCLUDE 'lattice.inc'
 
       INTEGER IOption
+      LOGICAL, EXTERNAL :: Confirm
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page1)
@@ -1080,6 +1111,8 @@
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
+            CASE (IDB_Delabc)
+              IF (Confirm('Do you wish to clear all cell parameters?')) CALL Clear_UnitCell
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
