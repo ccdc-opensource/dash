@@ -1,23 +1,23 @@
 ! For common block FCSTOR
 
-	  INTEGER MFCSTO
+	  INTEGER     MFCSTO
       PARAMETER ( MFCSTO = 10000 )
 
 ! For common block FCSPEC
 
-      INTEGER MFCSPE
+      INTEGER     MFCSPE
       PARAMETER ( MFCSPE = MFCSTO )
 
 ! For common block SAREFLNS
 
-      INTEGER MSAREF
+      INTEGER     MSAREF
       PARAMETER ( MSAREF = MFCSTO )
 
 ! Maximum number of Simulated Annealing REFlections
 
 ! For common block CHISTO
 
-      INTEGER MCHIHS
+      INTEGER     MCHIHS
       PARAMETER ( MCHIHS = 40000 )
 
 ! For common block FPINF, FPINF1
@@ -28,91 +28,91 @@
 
 ! For use in common block CMN299
 
-      INTEGER MAXPIK, MPTS
+      INTEGER     MAXPIK,          MPTS
       PARAMETER ( MAXPIK = 200000, MPTS = 15000 )
 
 ! For use in common block F4PARS
 
-      INTEGER MF4PAR
+      INTEGER     MF4PAR
       PARAMETER ( MF4PAR = 10000 )
 
 ! For use in common block PRPKFN
 
-      INTEGER MPRPKF
+      INTEGER     MPRPKF
       PARAMETER ( MPRPKF = 10000 )
 
 ! GUI Parameters
 ! For common block PROFOBS and PROFBIN
 
-      INTEGER MOBS
+      INTEGER     MOBS
       PARAMETER ( MOBS = 15000 )
 
 ! Note: The following parameters seem to be related to MOBS (i.e., should probably have the same value)
 ! MPPTS
+! MPTS
 ! MFPINF
 
 ! For common block PROFTIC
 
-      INTEGER MTIC
+      INTEGER     MTIC
       PARAMETER ( MTIC = MFCSTO )
 
 ! For common block PEAKFIT2
 
-      INTEGER MAX_NPFR, MAX_NPPR, MAX_FITPT, MPkDes
-      PARAMETER ( MAX_NPFR = 50, MAX_NPPR = 10, MAX_FITPT = 10000 )
-      PARAMETER ( MPkDes = 6 )
+      INTEGER     MAX_NPFR,      MAX_NPPR,      MAX_FITPT,         MPkDes
+      PARAMETER ( MAX_NPFR = 50, MAX_NPPR = 10, MAX_FITPT = 10000, MPkDes = 6 )
 
 ! For use in common block ZSTORE
 
-      INTEGER MPPTS
+      INTEGER     MPPTS
       PARAMETER ( MPPTS = 15000 )
 
 ! For use in common block REFLNZ and WWREFLNZ
 
-      INTEGER MRFLNZ
+      INTEGER     MRFLNZ
       PARAMETER ( MRFLNZ = MFCSTO )
 
 ! For use in common block IPKCMN
 
-      INTEGER MIPK
+      INTEGER     MIPK
       PARAMETER ( MIPK = 500 )
 
 ! For use in common block SCRAT 
 
-      INTEGER ITMREF
+      INTEGER     ITMREF
       PARAMETER ( ITMREF = 10000 )
 
 ! For use in common block WWREFLN (cf common block in REFLNS.INC)
 
-      INTEGER WWREFDIM
+      INTEGER     WWREFDIM
       PARAMETER ( WWREFDIM = MFCSTO )
 
 ! For use in common block ALLPEAKS
 
-      INTEGER MTPeak
+      INTEGER     MTPeak
       PARAMETER ( MTPeak = 100 )
 
 ! The Maximum number of Child Windows allowed (determined by Winteracter)
 ! Used in common blocks SACHILDWINDOWS and CHISQDWINDOWSUSED
 
-      INTEGER MaxNumChildWin
+      INTEGER     MaxNumChildWin
       PARAMETER ( MaxNumChildWin = 20 )
 
 ! For use in common block PLTSTO2
 
-	  INTEGER  maxiter
+	  INTEGER     maxiter
       PARAMETER ( maxiter = 10000 )
 
 ! maxiter = maximum number of simulated annealing iterations (per individual run when multi run).
 
-       INTEGER MaxRun
-	   PARAMETER ( MaxRun = 99 )
+      INTEGER     MaxRun
+	  PARAMETER ( MaxRun = 99 )
 ! Maximum number of runs in a multirun.
 ! Don't forget to update the Winteracter grids accordingly.
 ! Note the difference with MaxRuns: that's the number of runs requested by the user.
 
-       INTEGER MaxBVar
-       PARAMETER ( MaxBVar = 400 )
+      INTEGER     MaxBVar
+      PARAMETER ( MaxBVar = 400 )
 ! Maximum number of basic variables. Not quite sure what a basic variable is,
 ! but it has to do the number of parameters that can be refined during the Pawley
 ! refinement, so this is the number that limits the number of reflections used 
@@ -121,7 +121,7 @@
 
 ! For use in Quick_Pawley
 
-      INTEGER QPFDIM
+      INTEGER     QPFDIM
       PARAMETER ( QPFDIM = (20000 + (MaxBVar * (MaxBVar+3)) / 2) )
 ! This is the number of elements in the least squares refinement matrix.
 ! The extra 20000 looks a bit stupid, but it was there in the original code so I left it in.
