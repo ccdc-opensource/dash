@@ -244,7 +244,7 @@
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
-              CALL SetModeMenuState(0,0,1)
+              CALL SetModeMenuState(0,0)
 ! JCC Only change the setting if this is the second Pawley fit
               IF (NumPawleyRef .EQ. 1) THEN
                 CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)

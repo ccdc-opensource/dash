@@ -47,7 +47,7 @@
       CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
-      CALL SetModeMenuState(-1,-1,1)
+      CALL SetModeMenuState(-1,-1)
       CALL SelectMode(ID_Structure_Solution_Mode)
       CALL Profile_Plot
 
