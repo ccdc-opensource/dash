@@ -1111,14 +1111,12 @@
       NACARD = ICDNO(1)
       NATOM = 0
       IF (NACARD.EQ.0) THEN
-        CALL MESS(LPT,1,'No atomic positions have been read from'//     &
-     &            ' Crystal Data File')
+        CALL MESS(LPT,1,'No atomic positions have been read from Crystal Data File')
         GOTO 100
       ENDIF
 !
       CALL MESS(LPT,1,'Atoms in the unit cell are')
-      CALL MESS(LPT,0,' Mult Name       X         Y         Z'//        &
-     &          '        ITF      Site  Scat Fac Sub-Group')
+      CALL MESS(LPT,0,' Mult Name       X         Y         Z        ITF      Site  Scat Fac Sub-Group')
 !
 !     NPOS=NUMBER OF GENERAL EQUIVALENT POSITIONS POSSIBLE
       NPOS = NLAT*NOP
@@ -1277,7 +1275,7 @@
         CALL INTCHR(IDIG,NDIG,CH(15:15),1,0)
         CH(16:16) = ')'
       ENDIF
-      RETURN
+
       END SUBROUTINE ATSPEC
 !*==AXIS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -1324,7 +1322,7 @@
         K = I
       ENDDO
   100 CALL FCTOR(A,N)
-      RETURN
+
       END SUBROUTINE AXIS
 !*==BINDIG.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -1344,14 +1342,14 @@
 !N NBIN is not checked;  if it is not pure binary there will be strange results.
 !
       LOGICAL EVEN
-!
+
       IF (NBIN.NE.0) THEN
         CALL PARITY(IABS(N/NBIN),I,EVEN)
         BINDIG = .NOT.EVEN
       ELSE
         BINDIG = .TRUE.
       ENDIF
-      RETURN
+
       END FUNCTION BINDIG
 !*==BONCOS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -1375,12 +1373,12 @@
 !A         DADB is a 1x3 array holding the derivatives of ANGLE wrt B1,B2,B3
 !
       DIMENSION DADB(3)
-!
+
       COSTH = (B2*B2+B3*B3-B1*B1)/(2.*B2*B3)
       CALL SINCOS(COSTH,SINTH,'BONCOS')
 ! ANGLE IN RADIANS:
       ANGLE = (ACOS(COSTH))
-!
+
 ! DERIVATIVES OF COS THETA WRT B1, THEN B2, THEN B3
       DADB(1) = -B1/(B2*B3)
       DADB(2) = 1./B3 - COSTH/B2
@@ -1389,7 +1387,7 @@
       DO I = 1, 3
         DADB(I) = (-DADB(I)/SINTH)
       ENDDO
-      RETURN
+
       END SUBROUTINE BONCOS
 !*==BONDA.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -1426,7 +1424,7 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-!
+
       DO I = 1, 3
         D12(I) = X(I,I1) - X(I,I2)
         D23(I) = X(I,I3) - X(I,I2)
@@ -1436,7 +1434,7 @@
       COSTH = SCLPRD(D12,D23,1)/(B12*B23)
       CALL SINCOS(COSTH,SINTH,'BONDA')
       BONDA = DEGREE(ATAN2(SINTH,COSTH))
-      RETURN
+
       END FUNCTION BONDA
 !*==BONDER.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -1470,7 +1468,7 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
-!
+
 ! N IS THE BOND - SET N1 & N2 TO POINT TO ITS END ATOMS:
       N1 = IATM(N,1)
       N2 = IATM(N,2)
@@ -1478,7 +1476,6 @@
       CALL GMSUB(XSLAK(1,N1),XSLAK(1,N2),DX,1,3)
 ! BOND:
       BCALC(N) = VCTMOD(1.,DX,1)
-!
 ! DERIVATIVES WRT 6 CELL QUADRATIC PRODUCTS, FIRST IN REAL SPACE:
       J = 2
       K = 3
@@ -1491,7 +1488,6 @@
 ! THEN CONVERTED TO RECIPROCAL:
       CALL GMPRD(TOSTAR,DERCEL(1,N),TEMP1,6,6,1)
       CALL GMEQ(TEMP1,DERCEL(1,N),1,6)
-!
 ! DERIVATIVES WRT GIVEN COORDS:
 ! INTO TEMP1 PUT a(a*DX + b cos gamma *DY + c cos beta *DZ)
 !                b(a cos gamma *DX + b*DY + c cos alpha *DZ)
@@ -1522,7 +1518,7 @@
           DERPOS(I,N,J) = DERPOS(I,N,J)/BCALC(N)
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE BONDER
 !*==BONTRI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -1556,7 +1552,7 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
-!
+
       IE = 0
 ! FIND THIRD BOND:
       IF (N1.GT.N2) CALL FLIP(N2,N1)
@@ -1583,13 +1579,6 @@
  3031 FORMAT (/'  ERROR ** bonds ',A4,' and ',A4,' have no common atom')
       END SUBROUTINE BONTRI
 !*==CARDIN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
-!
-!
-!
-!
-!
-!
-!
 !
 !
 !
@@ -1625,9 +1614,8 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!
+
       NYZ = 0
-!
 ! CHECK NOT TRYING TO READ SILLY RECORD:
       ILOW = 0
       IF (JPHASE.GT.1) ILOW = NTOTAL(JPHASE-1)
@@ -1640,7 +1628,6 @@
       NYZ = NYZ + 1
       IF (ICARD(1:1).EQ.'Y' .OR. ICARD(1:1).EQ.'Z') GOTO 1
       GOTO 100
-!
   101 NYZ = -1
   100 RETURN
       END SUBROUTINE CARDIN
@@ -1703,7 +1690,7 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!
+
       IDIN = ID
       ENDIP = .FALSE.
       N1 = NUMCDF
@@ -1734,21 +1721,17 @@
       L = LETTER(ICARD(1:1))
 ! THIS GIVES AN ANSWER IN RANGE 1-26, BUT ACCEPTS LOWER CASE
       IF (L.EQ.0) GOTO 12
-!
 ! LETTER RECOGNISED:
       IF (L.NE.25) GOTO 3
 ! Y CARDS COPIED ON TO OUTPUT:
       WRITE (LPT,2004) (ICARD(J:J),J=2,LEN)
  2004 FORMAT (' ',79A1)
       GOTO 7
-!
 ! Z CARDS TOTALLY IGNORED:
     3 IF (L.EQ.26) GOTO 7
-!
 ! CARDS OTHER THAN Y AND Z:
 ! JUMP IF SAME INITIAL LETTER AS PREVIOUSLY STORED CARD:
       IF (INLET.EQ.L) GOTO 4
-!
 ! NEW BLOCK - CHECK NOT HAD ANY OF THIS LETTER BEFORE:
       IF (ICDN(L,N1).NE.0) GOTO 6
       INREA(L,N1) = ID + 1
@@ -1762,10 +1745,8 @@
     7 ID = ID + 1
       WRITE (IO10,REC=ID,FMT=1000) ICARD
       GOTO 8
-!
 ! ERROR ON SHUFFLED CARDS:
     6 CALL ERRCH2(ICARD(1:1),0,'more than one group of cards labelled ',' found on crystal data file')
-!
 ! END OF CRYSTAL DATA:
     2 ENDIP = .TRUE.
    12 IF (.NOT.ENDIP .AND. ID.EQ.IDIN) GOTO 8
@@ -1829,12 +1810,10 @@
 !
       L = -1
       I = LETTER(CH)
-!
 ! IF NO CH CARDS AT ALL, EXIT:
       IF (ICDNO(I).EQ.0) GOTO 101
       ID = K + 1
       IF (K.EQ.0) ID = IABS(INREAD(I))
-!
 ! READ NEXT CARD:
     1 IF (ID.GT.NTOTAL(JPHASE)) GOTO 102
       CALL CARDIN(ID)
@@ -1854,7 +1833,7 @@
       GOTO 1
   102 L = 0
   101 LCD = L
-      RETURN
+
       END SUBROUTINE CDSCAN
 !*==CELDER.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -1883,8 +1862,8 @@
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-!
-      DSDS = 0.
+
+      DSDS = 0.0
       J = 2
       K = 3
       DO I = 1, 3
@@ -1897,7 +1876,7 @@
       SSQRD = DSDS/4.
       DSTAR2 = DSDS
       STHL = SQRT(SSQRD)
-      RETURN
+
       END SUBROUTINE CELDER
 !*==CELMAT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -1995,7 +1974,7 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!
+
 ! MAY BE SD CARD:
       IF (ICARD(3:4).EQ.'SD') THEN
         WRITE (NEWIN,2001) (CELESD(I,I,1),I=1,6)
@@ -2037,7 +2016,7 @@
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
-!
+
 ! SET UP LIST OF 6 KK VALUES:
       DO I = 1, 6
         NCOUNT(I) = KPAK(IFAM,IGEN,ISPC+I-1,JPHASE,1)
@@ -2074,7 +2053,7 @@
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
       DATA SI/'a', 'b', 'c'/
       DATA AN/'alpha', ' beta', 'gamma'/
-!
+
       CALL MATCEL(ALSQ,MATSZ)
       CALL MESS(LPT,2,' ************* LATTICE CONSTANTS *************')
       CALL NEWLIN(LPT)
@@ -2085,7 +2064,7 @@
         IF (I.GE.4) WRITE (LPT,2002) AN(I-3),DEGREE(ACOS(CELL(I-3,2,1))), C
  2002   FORMAT ('    ',A5,' = ',F8.4,' +/- ',F6.4)
       ENDDO
-!
+
       END SUBROUTINE CELSDP
 !*==CELSHF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2143,7 +2122,7 @@
 !O a "space" carriage control, centred within NWIDE spaces.
 !
       CHARACTER*(*) TXT
-!
+
       IF (N.LT.99) THEN
         DO I = 1, N
           WRITE (LUNIT,2000)
@@ -2159,7 +2138,7 @@
       IF (L.LT.NWIDE) M = (NWIDE-L)/2
       WRITE (LUNIT,2001) (' ',I=1,M), (TXT(I:I),I=1,L)
  2001 FORMAT (1X,200A1)
-      RETURN
+
       END SUBROUTINE CENTRE
 !*==CLOFIL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2222,7 +2201,7 @@
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
      &                VALMUB
-!
+
       I = IATYP(IA)
       GOTO (2,2,3,4,5), I
 ! BRANCH ON TYPE OF ATF GIVEN BY USER - THESE TYPES ARE AS IN MK2, BUT 1 WAS
@@ -2244,18 +2223,15 @@
    26 C = FAC/(CELL(1,1,2)*CELL(2,1,2))
       GOTO 101
 !
-!
 !  TYPE 4 - ONLY THE 2'S MISSING
     4 GOTO (41,41,41,42,42,42), N
    41 C = 1.0
       GOTO 101
    42 C = 2.0
       GOTO 101
-!
-!
-    5 C = 1.
+    5 C = 1.0
   101 CONATF = C
-      RETURN
+
       END FUNCTION CONATF
 !*==DEPRIN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2294,7 +2270,7 @@
       ELSE
         CALL MESS(LPT,0,'never')
       ENDIF
-      RETURN
+
       END SUBROUTINE DEPRIN
 !*==DUMMY.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2341,7 +2317,7 @@
       IND = MM(I) + J
       IF (J.LT.I) IND = MM(J) + I
       ELEMAT = ALSQ(IND)
-      RETURN
+
       END FUNCTION ELEMAT
 !*==EQOP.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2548,7 +2524,7 @@
       DIMENSION VEC1(3,1), VEC2(3), TVEC(3)
       LOGICAL LATABS
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
-!
+
       N = N1
       IF (N.LT.1) GOTO 4
       DO I = 1, N
@@ -2609,7 +2585,7 @@
       DIMENSION VEC1(3,*), VEC2(3)
       LOGICAL GMSAME
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
-!
+
       N = N1
       IF (N.LT.1) GOTO 4
       DO I = 1, N
@@ -2629,13 +2605,12 @@
 ! Now
       CALL BMBOUT
       RETURN
-!
+
 ! TO STORE NEW VECTOR:
     5 CALL GMEQ(VEC2,VEC1(1,I),1,3)
   101 N2 = I
       RETURN
- 3000 FORMAT (' ERROR ** more than',I3,'equivalent vectors ',           &
-     &        'formed - vectors so far are'/(1X,3E12.5))
+ 3000 FORMAT (' ERROR ** more than',I3,'equivalent vectors formed - vectors so far are'/(1X,3E12.5))
       END SUBROUTINE EQVEC
 !*==ERRATM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2673,7 +2648,7 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!
+
       L = LENGT(MESS)
       IF (NACT.GT.0) IERR = IERR + 1
       WRITE (LPT,3001) NAME, (MESS(I:I),I=1,L)
@@ -2682,7 +2657,7 @@
         WRITE (LPT,2001) ICARD
         WRITE (ITO,2001) ICARD
       ENDIF
-!
+
 !>> JCC Handle through extra function
 ! Was    IF (NACT .EQ. 0)  STOP
 ! Now
@@ -2690,6 +2665,7 @@
       RETURN
  3001 FORMAT (/' ERROR ** ',A4,' is not an atom name - on ',80A1)
  2001 FORMAT (' Card says:'/1X,A80)
+
       END SUBROUTINE ERRATM
 !*==ERRCH2.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2732,7 +2708,7 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
       DATA FORM/'('' ERROR ** '',80A1,1X,A4 ,1X,80A1)'/
-!
+
       LW = LENGT(WORD)
       IF (LW.EQ.0) LW = 1
       WRITE (FORM(24:25),2000) LW
@@ -2755,6 +2731,7 @@
       RETURN
  2000 FORMAT (I2)
  2001 FORMAT (' Card says:'/1X,A80)
+
       END SUBROUTINE ERRCH2
 !*==ERRCHK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2796,7 +2773,6 @@
 !
       IF (NTYP.NE.1) NVALUE = NVALUE + 1
       IF (NVALUE.LE.NBOUND) GOTO 100
-!
       IF (NACT.GT.0) IERR = IERR + 1
       L = LENGT(MESS)
       IF (NTYP.EQ.1) THEN
@@ -2812,8 +2788,8 @@
 !
   100 RETURN
  3001 FORMAT (/' ',I6,80A1)
- 3000 FORMAT (/' ERROR ** there is an upper limit of',I6,               &
-     &        ' on number of ',80A1)
+ 3000 FORMAT (/' ERROR ** there is an upper limit of',I6,' on number of ',80A1)
+
       END SUBROUTINE ERRCHK
 !*==ERRIN2.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2842,8 +2818,7 @@
 !
       CHARACTER*33 FORM
       CHARACTER*(*) MESS1, MESS2
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       LOGICAL SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
@@ -2853,7 +2828,7 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
       DATA FORM/'('' ERROR ** '',80A1,1X,I5,1X,80A1)'/
-!
+
       L1 = LENGT(MESS1)
       IF (L1.EQ.0) L1 = 1
       WRITE (FORM(15:16),2000) L1
@@ -2862,7 +2837,6 @@
       IF (NACT.GT.0) IERR = IERR + 1
       WRITE (LPT,FORM) (MESS1(I:I),I=1,L1), INT, (MESS2(I:I),I=1,L2)
       WRITE (ITO,FORM) (MESS1(I:I),I=1,L1), INT, (MESS2(I:I),I=1,L2)
-!
       IF (IABS(NACT).EQ.2) THEN
         WRITE (LPT,2001) ICARD
         WRITE (ITO,2001) ICARD
@@ -2874,6 +2848,7 @@
       IF (NACT.EQ.0) CALL BMBOUT
       RETURN
  2001 FORMAT (' Card says:'/1X,A80)
+ 
       END SUBROUTINE ERRIN2
 !*==ERRMES.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2902,14 +2877,13 @@
 !O Writes message on units LPT and ITO.
 !
       CHARACTER*(*) MESS
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       LOGICAL SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
-!
+
       L = LENGT(MESS)
       IF (NTYP.EQ.0) THEN
         IF (IERR.NE.0) THEN
@@ -2939,7 +2913,6 @@
         WRITE (ITO,3004) (MESS(I:I),I=1,L)
       ENDIF
 !
-!
 !>> JCC Handle thru' external function
 !>> Was     IF (NACT .EQ. 0) STOP
 !>> Now
@@ -2950,6 +2923,7 @@
  3002 FORMAT (/' ERROR ** need ',80A1)
  3003 FORMAT (/' ERROR ** need card ',80A1)
  3004 FORMAT (/' PROGRAM ERROR ** ',80A1)
+
       END SUBROUTINE ERRMES
 !*==ERRRE2.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -2978,8 +2952,7 @@
 !
       CHARACTER*36 FORM
       CHARACTER*(*) MESS1, MESS2
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       LOGICAL SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
@@ -2989,7 +2962,7 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
       DATA FORM/'('' ERROR ** '',80A1,1X,G12.4,1X,80A1)'/
-!
+
       L1 = LENGT(MESS1)
       IF (L1.EQ.0) L1 = 1
       WRITE (FORM(15:16),2000) L1
@@ -2998,7 +2971,6 @@
       IF (NACT.GT.0) IERR = IERR + 1
       WRITE (LPT,FORM) (MESS1(I:I),I=1,L1), X, (MESS2(I:I),I=1,L2)
       WRITE (ITO,FORM) (MESS1(I:I),I=1,L1), X, (MESS2(I:I),I=1,L2)
-!
       IF (IABS(NACT).EQ.2) THEN
         WRITE (LPT,2001) ICARD
         WRITE (ITO,2001) ICARD
@@ -3009,6 +2981,7 @@
       IF (NACT.EQ.0) CALL BMBOUT
       RETURN
  2001 FORMAT (' Card says:'/1X,A80)
+
       END SUBROUTINE ERRRE2
 !*==EXCLD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -3042,6 +3015,7 @@
         GOTO 100
     1 ENDDO
   100 RETURN
+
       END FUNCTION EXCLD
 !*==UXEXPAND.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -3063,7 +3037,6 @@
 !
       L = LENGT(IBUF)
       M = LEN(OBUF)
-!
       I = 1
       J = 1
     1 IDOLL = INDEX(IBUF(I:),'$')
@@ -3088,8 +3061,6 @@
           GOTO 3
     2   ENDDO
     3   CONTINUE
-!UNIX
-!        CALL GETENV(IBUF(IP:I-1),OBUF(J:))
         J = LENGT(OBUF)
         J = J + 1
         CALL ERRCHK(1,J,M,0,'Expanded path name too long')
