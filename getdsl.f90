@@ -202,3 +202,275 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE SDIFileBrowse
+!
+! This routine lets the user browse a directory for an SDI file.
+! If a valid file has been selected, it will be opened automatically.
+! Effectively, this routine is just a wrap around a file_open routine
+! such that it lets the user visually select a file first.
+!
+      USE WINTERACTER
+      USE VARIABLES
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      CHARACTER(LEN=60) FILTER
+      INTEGER           IFLAGS, IFTYPE 
+      CHARACTER(LEN=MaxPathLength) tFileName
+
+      IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
+      FILTER = 'All files (*.*)|*.*|'//&
+               'DASH Pawley files (*.sdi)|*.sdi|'
+      tFileName = ' '
+! IFTYPE specifies which of the file types in the list is the default
+      IFTYPE = 2
+      CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open DASH Pawley file',IFTYPE)
+! Did the user press cancel?
+      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
+! Note that up to this point, none of the global variables had changed. Baling out was no problem.
+! Try to open the file. This can be removed, of course, and relocated to places in the code where
+! the current subroutine is called.
+! Actually, that is how it works in practice under windows (try 'Start' -> 'Run...' -> 'Browse...'
+! it will not actually open the file, just select it).
+      CALL SDIFileOpen(tFileName)
+
+      END SUBROUTINE SDIFileBrowse
+!
+!*****************************************************************************
+!
+      SUBROUTINE SDIFileOpen(TheFileName)
+!
+! This routine tries to open an SDI file.
+!
+! INPUT   : TheFileName = the file name
+!
+      USE WINTERACTER
+      USE VARIABLES
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'statlog.inc'
+
+      LOGICAL FExists
+      INTEGER KLEN
+
+      KLEN = LEN_TRIM(TheFileName)
+      IF (KLEN .EQ. 0) RETURN
+      INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
+      IF (.NOT. FExists) THEN
+        CALL ErrorMessage("The file "//TheFileName(1:KLEN)//" does not exist!")
+        RETURN
+      ENDIF
+! This is the point of no return: the selected file will be new file, valid data or not
+! Change global variable FNAME
+      FNAME = TheFileName
+      CALL SDIFileLoad(FNAME(1:KLEN)) 
+      IF (NoData) THEN
+        CALL ErrorMessage("Could not read the project file "//FNAME(1:KLEN)//&
+                          CHAR(13)//"successfully.")
+        RETURN
+      ENDIF
+      STATBARSTR(1) = FNAME
+      CALL WindowOutStatusBar(1,STATBARSTR(1))
+! Enable all menu functions
+      CALL SetModeMenuState(1,1,1)
+!  update the file name of the project in the SA pop up
+      CALL SetSAFileName(TheFileName(1:LEN_TRIM(TheFileName)))
+      NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
+      
+      END SUBROUTINE SDIFileOpen
+!
+!*****************************************************************************
+!
+      SUBROUTINE SDIFileLoad(SDIFile)
+
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) ::  SDIFile
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+      INCLUDE 'statlog.inc'
+
+      REAL              XPF_Range
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
+      CHARACTER(LEN = MaxPathLength) :: line
+
+      INTEGER nl
+      CHARACTER*12 KeyChar
+
+      INTEGER i, KLEN
+      INTEGER ihcver,iticer,ipiker,iloger,idsler, isst, ised
+      INTEGER GetCrystalSystem ! Function
+      INTEGER GETTIC ! Function
+      INTEGER tFileHandle
+
+! JCC Set to success in all cases
+      ihcver = 0
+      iloger = 0
+      iticer = 1
+      ipiker = 0
+      idsler = 0
+      IF (LEN_TRIM(SDIFile) .GT. 80) THEN
+        CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in SDIFileLoad')
+      ENDIF
+! Now open all the appropriate PIK, TIC and HCV files
+      tFileHandle = 10
+      OPEN(tFileHandle,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
+      CALL sa_SetOutputFiles(SDIFile)
+      TicExists = .FALSE.
+      HcvExists = .FALSE.
+      PikExists = .FALSE.
+      RawExists = .FALSE.
+      DslExists = .FALSE.
+ 10   line = ' '
+      READ(tFileHandle,'(A)',END=100) line
+      nl = LEN_TRIM(line)
+      CALL ILowerCase(line(:nl))
+      CALL INextString(line,keychar)
+      SELECT CASE (KeyChar(1:3))
+        CASE ('tic')
+          CALL ILocateString(line,isst,ised)
+          DashTicFile(1:80) = line(isst:isst+79)
+          TicExists = .TRUE.
+        CASE ('hcv')
+          CALL ILocateString(line,isst,ised)
+          DashHcvFile(1:80) = line(isst:isst+79)
+          HcvExists = .TRUE.
+        CASE ('pik')
+          CALL ILocateString(line,isst,ised)
+          DashPikFile(1:80) = line(isst:isst+79)
+          PikExists = .TRUE.
+        CASE ('raw')
+          CALL ILocateString(line,isst,ised)
+          DashRawFile(1:80) = line(isst:isst+79)
+          RawExists = .TRUE.      
+        CASE ('dsl')
+          CALL ILocateString(line,isst,ised)
+          DashDslFile(1:80) = line(isst:isst+79)
+          DslExists = .TRUE.
+        CASE ('cel')
+          DO I = 1, 6
+            CALL INextReal(line,CellPar(i))
+          END DO
+          CALL Upload_Cell_Constants()
+        CASE ('spa')
+          CALL INextInteger(line,NumberSGTable)
+! Set the crystal system
+          LatBrav = GetCrystalSystem(NumberSGTable)
+          CALL Upload_CrystalSystem
+          NumPawleyRef = 0
+          CALL FillSymmetry()
+        CASE ('paw')
+          CALL INextReal(line,PAWLEYCHISQ)
+      END SELECT
+      GOTO 10 
+ 100  CONTINUE
+      CLOSE(tFileHandle)
+      IF (DslExists) THEN
+        CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
+        DslExists = (idsler .EQ. 0)
+      ENDIF
+      klen = LEN_TRIM(DashTicFile)
+      IF (TicExists) THEN
+        CALL GET_LOGREF(DashTicFile,klen,iloger)
+! JvdS I think that GET_LOGREF already loaded the DashTicFile
+        iticer = GETTIC(klen,DashTicFile)
+        IF (iticer .EQ. 0) TicExists = .FALSE.
+      ENDIF
+      IF (HcvExists) THEN
+        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
+        HcvExists = (ihcver .EQ. 0)
+      ENDIF
+      IF (PikExists) THEN
+        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
+        PikExists = (ipiker .EQ. 0)
+      ENDIF
+      CurrentRange = 0
+      NumPeakFitRange = 0
+      DO I = 1, MAX_NPFR
+        NumInPFR(I) = 0
+        IPF_RPt(I) = 0
+      ENDDO
+! JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
+! I moved it, since i wanted to check that all the data read in ok before calling it
+      IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
+! JCC before, this just didnt plot anything, even though in theory we should be able
+! to observe the full profile. Firstly have to synchronize the common blocks though
+        CALL Synchronize_Data()
+        Iptype = 2
+        NoData = .FALSE.
+      ENDIF
+      CALL Profile_Plot(IPTYPE) 
+! enable the buttons,
+      IF (.NOT. NoData) THEN
+        IF (idsler .EQ. 0) THEN
+          CALL SetModeMenuState(1,1,1)
+        ELSE
+          CALL SetModeMenuState(1,-1,1)
+        ENDIF
+      ENDIF
+      PastPawley = .FALSE.
+
+ 999  END SUBROUTINE SDIFileLoad
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION GETTIC(FLEN,TheFileName)
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      INTEGER,       INTENT (IN   ) :: FLEN
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER NTIC
+      INTEGER IH
+      REAL    ARGK
+      REAL    DSTAR
+      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
+      INTEGER I, II
+
+! JCC - set return status
+      GETTIC = 1
+! JCC - add in an error trap for bad file opening
+      OPEN(11,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+      I=1
+ 10   READ(11,*,ERR=100,END=100) (IH(II,I),II=1,3),ARGK(I),DSTAR(I)
+      I=I+1
+      IF (I .GT. MTIC) GOTO 100
+      GOTO 10
+ 100  NTIC=I-1
+      CLOSE(11)
+      RETURN
+ 999  GETTIC = 0
+
+      END FUNCTION GETTIC
+!
+!*****************************************************************************
+!
