@@ -56,6 +56,12 @@
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
       LOG_HYDROGENS = Get_UseHydrogens()
+! Ungrey the "Save... chi sqrd progress"
+      CALL WDialogSelect(IDD_OutputSolutions)
+      CALL WDialogFieldState(IDF_GROUP2,Enabled)
+      CALL WDialogFieldState(IDB_OutputChiSqd,Enabled)
+      CALL WDialogFieldState(IDF_LABEL5,Enabled)
+      CALL WDialogFieldState(IDF_LABEL3,Enabled)
 ! Pop up the SA status window
       CALL WizardWindowShow(IDD_SA_Action1)
 !O      CALL WDialogSelect(IDD_Parameter_Status_2)
