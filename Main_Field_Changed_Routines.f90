@@ -261,24 +261,104 @@
 
       END SUBROUTINE DealWithPeakPositionsPane
 !
-!*****************************************************************************
+!*******************************************************************************
 !
-      LOGICAL FUNCTION NearlyEqual(Value1, Value2)
-!
-! This function compares two REALs and determines if they are effectively equal
-!
-! INPUT   : Value1 and Value2 = the values to be compared
-!
-! RETURNS : .TRUE.  if Value1 and Value2 differ by less than 0.000001
-!           .FALSE. otherwise
-!
+      SUBROUTINE DealWithSaSummary
+! ep July 2001 
+! Calls window which contains summary of
+! results from simulated annealing run.  Handles messages from the window.
+! Grid includes a "view" button which allows the user to view the molecular
+! model via Mercury and the profile data in a graph window
+      
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
       IMPLICIT NONE
 
-      REAL, INTENT (IN   ) :: Value1, Value2
+      INCLUDE 'PARAMS.INC' 
 
-      NearlyEqual = (ABS(Value1 - Value2) .LT. 0.000001)
+!ep    need the common block to identify the number rows in the grid          
+      LOGICAL         RESTART
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      END FUNCTION NearlyEqual
+      LOGICAL         InSA
+      COMMON /SADATA/ InSA
+
+!     required to handle the profile graphs plotted in child windows
+      INTEGER                 SAUsedChildWindows
+      COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
+
+      INTEGER I, iRow, iStatus, iLimit1, iLimit2, tInteger
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Summary)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL WdialogHide
+              CALL WDialogSelect(IDD_SA_Action1)
+              CALL WDialogFieldState(IDB_Summary,Enabled)
+! Closes all SA profile child windows which are still open when OK button clicked
+              DO i = 1, MaxNumChildWin
+                IF (SAUsedChildWindows(i).EQ.1) THEN
+                  CALL WindowCloseChild(i)
+                  SAUsedChildWindows(i) = 0
+                  CALL UnRegisterChildWindow(i)
+                ENDIF
+              ENDDO
+              CALL PopActiveWindowID
+              RETURN
+            CASE (IDB_Select)
+              CALL WDialogGetInteger(IDF_Limit1,iLimit1)
+              CALL WDialogGetInteger(IDF_Limit2,iLimit2)
+              IF (iLimit1 .GT. iLimit2) THEN
+                tInteger = iLimit2
+                iLimit2  = iLimit1
+                iLimit1  = tInteger
+              ENDIF
+              IF (iLimit2 .GT. NumOf_SA_Runs) iLimit2 = NumOf_SA_Runs
+              IF (iLimit1 .LT.             1) iLimit1 =             1
+              DO iRow = 1, NumOf_SA_Runs
+                IF ((iRow .GE. iLimit1) .AND. (iRow .LE. iLimit2)) THEN
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Checked)
+                ELSE
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
+                ENDIF
+              ENDDO
+            CASE (IDF_InvertSelection)
+              DO iRow = 1, NumOf_SA_Runs
+                CALL WGridGetCellCheckBox(IDF_SA_summary,3,iRow,istatus)
+                IF (istatus .EQ. 1) THEN
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
+                ELSE
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Checked)
+                ENDIF
+              ENDDO
+            CASE (IDB_ShowOverlap)
+              CALL SA_STRUCTURE_OUTPUT_OVERLAP(IDD_Summary)
+          END SELECT
+        CASE (FieldChanged)
+      END SELECT
+!ep allows you to view pdb file of SA Solutions, each clicked
+!   check box in fresh mercury window
+      DO iRow = 1, NumOf_SA_Runs
+        CALL WGridGetCellCheckBox(IDF_SA_summary,2,iRow,istatus)
+        IF (istatus .EQ. 1) THEN
+! calls subroutine which opens Mercury window with .pdb file
+          CALL SA_STRUCTURE_OUTPUT_PDB(iRow)
+          CALL ViewStructure('SA_best.pdb')
+! calls subroutine which plots observed diffraction pattern with calculated pattern
+!          IF (.NOT. InSA) CALL organise_sa_result_data(iRow)
+          CALL WGridPutCellCheckBox(IDF_SA_Summary,2,iRow,Unchecked)
+        ENDIF
+      ENDDO
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithSaSummary
 !
 !*****************************************************************************
 !
