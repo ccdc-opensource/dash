@@ -12,28 +12,23 @@
 
       INTEGER, INTENT (IN   ) :: TheIPTYPE
 
+      INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-      itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-
+        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       INTEGER CurrentRange 
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-      NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-      XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-      IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT) 
-
-      INCLUDE 'POLY_COLOURS.INC'
+        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
+        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
+        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT) 
 
       LOGICAL PlotBackground ! Function
 
-!
 ! IGrArea
 ! IPgArea
 ! IPgClipRectangle
-
 
 !   Setup hardcopy options
       IF (TheIPTYPE .LT. 0) THEN
@@ -78,14 +73,14 @@
       USE WINTERACTER
 
       INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'PARAMS.INC'
 
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-      XGGMIN,XGGMAX,YGGMIN,YGGMAX
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      PARAMETER (MObsTic=50)
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-       itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
 !
 !      CALL IPgUnitsToGrUnits(xpgmin,ypgmin,xggmin,yggmin)
 !      CALL IPgUnitsToGrUnits(xpgmax,ypgmax,xggmax,yggmax)
@@ -96,28 +91,24 @@
         y0tem = MAX(y0tem,ypgmin)
         ytem  = MIN(ypgmax,yobstic(ii))
         ytem  = MAX(ytem,ypgmin)
-        CALL IPgUnitsToGrUnits(xobstic(ii),y0tem,&
-           x0gtem,y0gtem)
-        CALL IPgUnitsToGrUnits(xobstic(ii),ytem,&
-           xgtem,ygtem)
+        CALL IPgUnitsToGrUnits(xobstic(ii),y0tem,x0gtem,y0gtem)
+        CALL IPgUnitsToGrUnits(xobstic(ii),ytem,xgtem,ygtem)
         IF (itypot(ii) .EQ. 0) THEN
-          IF (xgtem.GE.xggmin.AND.xgtem.LE.xggmax) THEN
-            call IGrColourN(KolNumPeakPos)
+          IF (xgtem .GE. xggmin .AND. xgtem .LE. xggmax) THEN
+            CALL IGrColourN(KolNumPeakPos)
             CALL IGrMoveTo(x0gtem,y0gtem)
             CALL IGrLineTo(xgtem,ygtem)
-            call IGrColourN(KolNumMTic)
-            call IGrCharSize(1.0,1.0)
+            CALL IGrColourN(KolNumMTic)
+            CALL IGrCharSize(1.0,1.0)
             CALL IGrMarker(xgtem,ygtem,5)
           END IF
         ELSE IF (itypot(ii) .EQ. 1) THEN
           IF (xgtem .GE. xggmin .AND. xgtem .LE. xggmax) THEN
             CALL IGrMarker(xgtem,ygtem,4)
-            CALL IPgUnitsToGrUnits(uobstic(1,ii),zobstic(1,ii),&
-              ugtem,zgtem)
+            CALL IPgUnitsToGrUnits(uobstic(1,ii),zobstic(1,ii),ugtem,zgtem)
             CALL IGrMoveTo(ugtem,zgtem)
             DO k = 2, 9
-              CALL IPgUnitsToGrUnits(uobstic(k,ii),zobstic(k,ii),&
-                ugtem,zgtem)
+              CALL IPgUnitsToGrUnits(uobstic(k,ii),zobstic(k,ii),ugtem,zgtem)
               CALL IGrLineTo(ugtem,zgtem)
             END DO
           END IF            
@@ -125,7 +116,7 @@
       END DO
       CALL IGrColourN(KolNumMain)
 
-      ENDSUBROUTINE Plot_Manual_Tics
+      END SUBROUTINE Plot_Manual_Tics
 !
 !*****************************************************************************
 !
@@ -134,7 +125,6 @@
       USE WINTERACTER
 
       INCLUDE 'POLY_COLOURS.INC'
- 
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
@@ -155,7 +145,6 @@
           CALL IGrLineTo(xgtem,ygtem)
         END IF
       END DO
-!      CALL Spline_Background()
       CALL IGrColourN(KolNumMain)
 
       END SUBROUTINE Plot_Calculated_Tics
@@ -206,14 +195,12 @@
       USE WINTERACTER
 
       INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'GLBVAR.INC'
 
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
         YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
         XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-      INCLUDE 'GLBVAR.INC'
-
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
 
       CALL IGrSelect(1,0)
@@ -258,16 +245,15 @@
       INCLUDE 'POLY_COLOURS.INC'
 
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-      XGGMIN,XGGMAX,YGGMIN,YGGMAX
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-!
-       call IGrColourN(KolNumMain)
+
+      CALL IGrColourN(KolNumMain)
       CALL IGrCharSize(1.,1.)
       CALL IPgXScale('TN')
       CALL IPgXScaleTop('T')
-!
-       call IGrColourN(KolNumMain)
+      CALL IGrColourN(KolNumMain)
       CALL IPgUnitsToGrUnits(xpgmin,ypgmin,xggmin,yggmin)
       CALL IPgUnitsToGrUnits(xpgmax,ypgmax,xggmax,yggmax)
 ! Plot y=0 for tidiness
@@ -287,7 +273,7 @@
       ELSE
         CALL IPgXLabel('time-of-flight (microseconds)','C')
       END IF
-!
+
       ENDSUBROUTINE Plot_Custom_Axes
 !
 !*****************************************************************************
@@ -298,17 +284,18 @@
 
       INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'GLBVAR.INC'
-
       INCLUDE 'PARAMS.INC'
+
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-      XGGMIN,XGGMAX,YGGMIN,YGGMAX
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
       LOGICAL PlotErrorBars ! Function
 
-       call IGrColourN(KolNumMain)
+      CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
 ! Do the error bars - we've precalculated the min & max pointers
       CALL IGrColourN(KolNumObs)
@@ -325,11 +312,8 @@
           CALL IGrLineTo(xgtem,ygtem)
         END DO
       END IF
-!
 !      CALL IPgNewGraph(1,nbin,' ',' ','XY')
 ! Must allow options here ...      CALL IPgStyle(1,0,3,0,KolNumCal,KolNumObs)
-! JvdS IPgNewGraph is now obsolete. IPgNewPlot is preferred instead
-!      CALL IPgNewGraph(1,nbin,' ',' ','Sca')
       CALL IPgNewPlot(PgScatterPlot,1,NBIN)
       CALL IPgStyle(1,14,3,0,0,KolNumObs)
 ! 13 specifies a square
@@ -339,7 +323,6 @@
       CALL IGrCharSize(sizmtem,sizmtem)
       CALL IPgScatterPlot(xbin,yobin)
 !      CALL IPgXYPairs(xbin,yobin)
-!
       CALL IGrColourN(KolNumMain)
 !
       ENDSUBROUTINE Plot_Observed_Profile
@@ -352,8 +335,8 @@
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'POLY_COLOURS.INC'
-
       INCLUDE 'PARAMS.INC'
+
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
@@ -361,7 +344,6 @@
         XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
-!      CALL IPgNewGraph(1,nbin,' ',' ','X')
       CALL IPgNewPlot(PgPolyLine,1,NBIN)
       CALL IPgStyle(1,0,0,0,KolNumBack,0)
       CALL IPgXYPairs(xbin,ybbin)
@@ -376,7 +358,7 @@
 
       INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'GLBVAR.INC'
-!
+
       INCLUDE 'PARAMS.INC'
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
@@ -386,12 +368,10 @@
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
       LOGICAL PlotErrorBars ! Function
       REAL YDIF(MOBS)
-!
-       call IGrColourN(KolNumMain)
+
+      CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
-!      CALL IPgNewGraph(3,nbin,' ',' ','XY')
       CALL IPgNewPlot(PgPolyLine,3,NBIN)
-! JvdS I'm guessing that this plots the difference profile.
       YADD = 0.5*(YPGMAX+YPGMIN)
 ! I think that the bounds of this loop are wrong: if a point is not inside the plotting area,
 ! it might still be needed when its neighbour is inside the plot area
@@ -441,324 +421,228 @@
 !... Plots all the information about the Peak Fitting Option
 ! Highlight (recolour) the peak fit range and label the peaks.
 ! If already fitted then show the fitted profile as well.
+!
       USE WINTERACTER
 
       INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'GLBVAR.INC'
-
       INCLUDE 'PARAMS.INC'
-        COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-      XGGMIN,XGGMAX,YGGMIN,YGGMAX
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-!
 
       INTEGER CurrentRange 
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
       NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
       XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
       IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-!
-      character*1 ChrPkNum
-      character*2 ChrPkNum2
-!
-      iord_peak=0
-      do i=1,NumPeakFitRange
-        call IGrColourN(KolNumPanelDark)
-        call IGrFillPattern(Hatched,Medium,DiagUp)
-        call IPgUnitsToGrUnits(XPF_Range(1,i),ypgmin,gxleft,gybot)
-        call IPgUnitsToGrUnits(XPF_Range(2,i),ypgmax,gxright,gytop)
-        gxleft=max(gxleft,xggmin)
-        gxleft=min(gxleft,xggmax)
-        gxright=min(gxright,xggmax)
-        gxright=max(gxright,xggmin)
-        call IGrRectangle(gxleft,gybot,gxright,gytop) 
-        ipf1=IPF_RPt(i)+1
-        ipf2=IPF_RPt(i+1)
+
+      CHARACTER*1 ChrPkNum
+      CHARACTER*2 ChrPkNum2
+
+      iord_peak = 0
+      DO i = 1, NumPeakFitRange
+        CALL IGrColourN(KolNumPanelDark)
+        CALL IGrFillPattern(Hatched,Medium,DiagUp)
+        CALL IPgUnitsToGrUnits(XPF_Range(1,i),ypgmin,gxleft,gybot)
+        CALL IPgUnitsToGrUnits(XPF_Range(2,i),ypgmax,gxright,gytop)
+        gxleft  = MAX(gxleft,xggmin)
+        gxleft  = MIN(gxleft,xggmax)
+        gxright = MIN(gxright,xggmax)
+        gxright = MAX(gxright,xggmin)
+        CALL IGrRectangle(gxleft,gybot,gxright,gytop) 
+        ipf1 = IPF_RPt(i) + 1
+        ipf2 = IPF_RPt(i+1)
 ! Now we do a quick check to see if the range has been set
-        if (ipf2.ne.0) then
-         xp1=XPeakFit(ipf1)
-         xp2=XPeakFit(ipf2)
-         if (xp2.gt.xpgmin.and.xp1.lt.xpgmax) then
+        IF (ipf2 .NE. 0) THEN
+          xp1=XPeakFit(ipf1)
+          xp2=XPeakFit(ipf2)
+          IF (xp2 .GT. xpgmin .AND. xp1 .LT. xpgmax) THEN
 ! We can plot the calculated fit
-          do ii=ipf1,ipf2
-            if (XpeakFit(ii).ge.xpgmin) then
-              ix1=ii
-              goto 110
-            end if
-          end do
- 110      do ii=ipf2,ipf1,-1
-            if (XpeakFit(ii).le.xpgmax) then
-              ix2=ii
-              goto 120
-            end if
-          end do
- 120      call IPgUnitsToGrUnits(xpeakfit(ix1),ypeakfit(ix1),xgtem,ygtem)
-          call IGrMoveTo(xgtem,ygtem)
-          CALL IGrColourN(KolNumCTic)
+            DO ii = ipf1, ipf2
+              IF (XpeakFit(ii) .GE. xpgmin) THEN
+                ix1 = ii
+                GOTO 110
+              END IF
+            END DO
+ 110        DO ii = ipf2, ipf1, -1
+              IF (XpeakFit(ii) .LE. xpgmax) THEN
+                ix2 = ii
+                GOTO 120
+              END IF
+            END DO
+ 120        CALL IPgUnitsToGrUnits(xpeakfit(ix1),ypeakfit(ix1),xgtem,ygtem)
+            CALL IGrMoveTo(xgtem,ygtem)
+            CALL IGrColourN(KolNumCTic)
 ! Software clipping - there must be a better way
 !
 ! JCC - I've totally recoded this so that its clearer. It will be a bit slower, since it recalculates both
 ! points on every iteration, but it does now work!
-              
-          do ip=ix1+1,ix2
+            DO ip=ix1+1,ix2
 ! Get the coordinates between the 2 current points
-                call IPgUnitsToGrUnits(xpeakfit(ip - 1),ypeakfit(ip - 1),xg_coord1,yg_coord1)
-            call IPgUnitsToGrUnits(xpeakfit(ip),    ypeakfit(ip),    xg_coord2,yg_coord2)
-                  
+              CALL IPgUnitsToGrUnits(xpeakfit(ip - 1),ypeakfit(ip - 1),xg_coord1,yg_coord1)
+              CALL IPgUnitsToGrUnits(xpeakfit(ip),    ypeakfit(ip),    xg_coord2,yg_coord2)
 ! Check the y-coordinate ranges
-
 ! 1. All out of box so ignore
-                  if ( yg_coord1 .lt. gybot .and. yg_coord2 .lt. gybot) cycle
-                  if ( yg_coord1 .gt. gytop .and. yg_coord2 .gt. gytop) cycle
-
-                  call IGrMoveTo(xg_coord1, yg_coord1)
-
-                  if ( yg_coord1 .lt. gybot) then
+              IF (yg_coord1 .LT. gybot .AND. yg_coord2 .LT. gybot) CYCLE
+              IF (yg_coord1 .GT. gytop .AND. yg_coord2 .GT. gytop) CYCLE
+              CALL IGrMoveTo(xg_coord1, yg_coord1)
+              IF (yg_coord1 .LT. gybot) THEN
 ! Move the start point to the intercept point in the box
-                        xtem=     xg_coord1 + (xg_coord2 - xg_coord1)*(gybot-yg_coord1)/(yg_coord2-yg_coord1)
-                        call IGrMoveTo(xtem,gybot)
-                  else if ( yg_coord2 .lt. gybot) then
+                xtem = xg_coord1 + (xg_coord2 - xg_coord1)*(gybot-yg_coord1)/(yg_coord2-yg_coord1)
+                CALL IGrMoveTo(xtem,gybot)
+              ELSE IF (yg_coord2 .LT. gybot) THEN
 ! Move the end point to the intercept point in the box
-                        xg_coord2 = xg_coord2 + (xg_coord2 - xg_coord1)*(gybot-yg_coord1)/(yg_coord2-yg_coord1)
-                        yg_coord2 = gybot
-                  endif
-
-                  if ( yg_coord1 .gt. gytop) then
+                xg_coord2 = xg_coord2 + (xg_coord2 - xg_coord1)*(gybot-yg_coord1)/(yg_coord2-yg_coord1)
+                yg_coord2 = gybot
+              ENDIF
+              IF (yg_coord1 .GT. gytop) THEN
 ! Move the start point to the intercept point in the box
-                        xtem = xg_coord1 + (xg_coord2 - xg_coord1)*(gytop-yg_coord1)/(yg_coord2-yg_coord1)
-                        call IGrMoveTo(xtem,gytop)
-                  else if ( yg_coord2 .gt. gytop) then
+                xtem = xg_coord1 + (xg_coord2 - xg_coord1)*(gytop-yg_coord1)/(yg_coord2-yg_coord1)
+                CALL IGrMoveTo(xtem,gytop)
+              ELSE IF (yg_coord2 .GT. gytop) THEN
 ! Move the end point to the intercept point in the box
-                        xg_coord2 = xg_coord2  + (xg_coord2 - xg_coord1)*(gytop-yg_coord1)/(yg_coord2-yg_coord1)
-                        yg_coord2 = gytop
-                  end if
-            call IGrLineTo(xg_coord2,yg_coord2)
-
-          end do
-         end if
-        end if
-
+                xg_coord2 = xg_coord2 + (xg_coord2 - xg_coord1)*(gytop-yg_coord1)/(yg_coord2-yg_coord1)
+                yg_coord2 = gytop
+              END IF
+              CALL IGrLineTo(xg_coord2,yg_coord2)
+            END DO
+          END IF
+        END IF
         IPresColN=InfoGrScreen(ColourReq)
-        do j=1,NumInPFR(i)
-            iord_peak=iord_peak+1
-            if (iord_peak.lt.10) then
-              CALL IntegerToString(iord_peak,ChrPkNum,'(I1)')
-            else
-              CALL IntegerToString(iord_peak,ChrPkNum2,'(I2)')
-            end if
-            CALL IGrColourN(KolNumPeakFit)
-            CALL IGrCharSize(Char_Size,Char_Size)
-            CALL IPgUnitsToGrUnits(XPF_Pos(j,i),YPF_Pos(j,i),xgtem,ygtem)
-            ygtem=min(gytop,ygtem+0.05*abs(gytop-gybot))
-            IF (xgtem.gt.xggmin.and.xgtem.lt.xggmax) THEN
-               yt1=max(ypmin,0.)
-               yt1=min(yt1,ypmax)
-               CALL IPgUnitsToGrUnits(XPF_Pos(j,i),yt1,xg1,yg1)
-                     yg1 = min(yg1,gytop)
-                     yg1 = max(yg1,gybot)
-               CALL IGrMoveTo(xg1,yg1)
-               CALL IGrColourN(KolNumPeakPos)
-               yt2=max(ypmin,YPF_Pos(j,i))
-               yt2=min(yt2,ypmax)
-               CALL IPgUnitsToGrUnits(XPF_Pos(j,i),yt2,xg1,yg2)
-                     yg2 = min(yg2,gytop)
-                     yg2 = max(yg2,gybot)
-               CALL IGrLineTo(xg1,yg2)
-               if (ygtem.gt.gybot.and.ygtem.lt.gytop) then
-                 if (iord_peak.lt.10) then
-                   CALL IGrCharOut(xgtem,ygtem,ChrPkNum)
-                 else
-                   CALL IGrCharOut(xgtem,ygtem,ChrPkNum2)
-                 end if
-               end if
-            END IF   
-        end do
+        DO j = 1, NumInPFR(i)
+          iord_peak = iord_peak + 1
+          IF (iord_peak .LT. 10) THEN
+            CALL IntegerToString(iord_peak,ChrPkNum,'(I1)')
+          ELSE
+            CALL IntegerToString(iord_peak,ChrPkNum2,'(I2)')
+          END IF
+          CALL IGrColourN(KolNumPeakFit)
+          CALL IGrCharSize(Char_Size,Char_Size)
+          CALL IPgUnitsToGrUnits(XPF_Pos(j,i),YPF_Pos(j,i),xgtem,ygtem)
+          ygtem = MIN(gytop,ygtem+0.05*ABS(gytop-gybot))
+          IF (xgtem .GT. xggmin .AND. xgtem .LT. xggmax) THEN
+            yt1 = MAX(ypmin,0.)
+            yt1 = MIN(yt1,ypmax)
+            CALL IPgUnitsToGrUnits(XPF_Pos(j,i),yt1,xg1,yg1)
+            yg1 = MIN(yg1,gytop)
+            yg1 = MAX(yg1,gybot)
+            CALL IGrMoveTo(xg1,yg1)
+            CALL IGrColourN(KolNumPeakPos)
+            yt2 = MAX(ypmin,YPF_Pos(j,i))
+            yt2 = MIN(yt2,ypmax)
+            CALL IPgUnitsToGrUnits(XPF_Pos(j,i),yt2,xg1,yg2)
+            yg2 = MIN(yg2,gytop)
+            yg2 = MAX(yg2,gybot)
+            CALL IGrLineTo(xg1,yg2)
+            IF (ygtem .GT. gybot .AND. ygtem .LT. gytop) THEN
+              IF (iord_peak .LT. 10) THEN
+                CALL IGrCharOut(xgtem,ygtem,ChrPkNum)
+              ELSE
+                CALL IGrCharOut(xgtem,ygtem,ChrPkNum2)
+              END IF
+            END IF
+          END IF   
+        END DO
         CALL IGrColourN(IPresColN)
-      end do
-      call IGrFillPattern(Outline)
-!
+      END DO
+      CALL IGrFillPattern(Outline)
+
       ENDSUBROUTINE Plot_PeakFit_Info
-!
-!*****************************************************************************
-!
-!U      SUBROUTINE Plot_SA_Profile()
-!U!
-!U      USE WINTERACTER
-!U      USE DRUID_HEADER
-!U!
-!U      INCLUDE 'POLY_COLOURS.INC'
-!U
-!U      INCLUDE 'PARAMS.INC'
-!U
-!U      REAL ydif(MCHSTP)
-!U!
-!U      COMMON /CHISTOP/ NOBS,NFIT,IFIT(MCHSTP),CHIOBS,&
-!U      WT(MCHSTP),XOBS(MCHSTP),YOBS(MCHSTP),YCAL(MCHSTP),ESD(MCHSTP)
-!U!
-!U      COMMON /sappcmn/ xpmin,xpmax,ypmin,ypmax
-!U      COMMON /sapgcmn/ xpgmin,xpgmax,ypgmin,ypgmax
-!U      COMMON /chibest/ ycalbest(MCHSTP)
-!U!
-!U      BACK=0.
-!U      YOSUM=0.
-!U      YCSUM=0.
-!U      DO II=1,NFIT
-!U        I=IFIT(II)
-!U        YOSUM=YOSUM+YOBS(I)
-!U        YCSUM=YCSUM+YCALbest(I)
-!U      END DO
-!U      RESCL=YOSUM/YCSUM
-!U      DO I=1,NOBS
-!U        YCALbest(i)=RESCL*YCALbest(I)
-!U      END DO
-!U      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
-!U       call IGrColourN(KolNumMain)
-!U      CALL IPgYLabelLeft('Observed profile','C9')
-!U!
-!U!      CALL IPgNewGraph(3,nobs,' ',' ','XY')
-!U      CALL IPgNewPlot(PgPolyLine,3,NOBS)
-!U      YADD=0.5*(YPGMAX+YPGMIN)
-!U      DO II=1,NOBS!IPMIN,IPMAX
-!U        YDIF(II)=YADD+YOBS(II)-YCALBEST(II)
-!U      END DO
-!U      CALL IPgStyle(1,0,0,0,KolNumDif,0)
-!U      CALL IPgStyle(2,0,3,0,0,KolNumObs)
-!U      CALL IPgStyle(3,0,0,0,KolNumCal,0)
-!U      CALL IPgXYPairs(xobs,ydif)
-!U      CALL IGrCharSize(.3,.3)
-!U      CALL IPgMarker( 2, 13)
-!U!      sizmtem=marker_size*float(500)/float(ipmax-ipmin)
-!U!      sizmtem=min(marker_size,sizmtem)
-!U!      CALL IGrCharSize(sizmtem,sizmtem)
-!U      CALL IPgXYPairs(xobs,yobs)
-!U!
-!U! Do the error bars - we've precalculated the min & max pointers
-!U!
-!U      CALL IGrColourN(KolNumObs)
-!U      DO I=1,nobs!IPMIN,IPMAX
-!U        xtem=xobs(i)
-!U        ytem=max(yobs(i)-esd(i),ypgmin)
-!U        ytem=min(ytem,ypgmax)
-!U        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-!U        call IGrMoveTo(xgtem,ygtem)
-!U        ytem=min(yobs(i)+esd(i),ypgmax)
-!U        ytem=max(ytem,ypgmin)
-!U        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-!U        call IGrLineTo(xgtem,ygtem)
-!U      END DO
-!U      CALL IPgXYPairs(xobs,ycalbest)
-!U      CALL IGrCharSize(1.,1.)
-!U      CALL IGrColourN(KolNumMain)
-!U!
-!U      END SUBROUTINE Plot_SA_Profile
 !
 !*****************************************************************************
 !
 !C>> JCC Subroutine that cross-references the two sets of common
 !C>> blocks so that the profile ones contain the data thats been
 !C>> read in. Basically hacked out of SA_Profile_Plot.
-        SUBROUTINE Synchronize_Data
+      SUBROUTINE Synchronize_Data
 
       USE WINTERACTER
-      INCLUDE 'POLY_COLOURS.INC'
 
+      INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'statlog.inc'
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
-     YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+        YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),&
-     YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+        YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-     YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-     XGGMIN,XGGMAX,YGGMIN,YGGMAX
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
       INTEGER CurrentRange 
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),&
-     IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR),&
-     NumPeakFitRange,CurrentRange,&
-     IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR),&
-     XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR),&
-     IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-!
+        IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR),&
+        NumPeakFitRange,CurrentRange,&
+        IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR),&
+        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR),&
+        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
       COMMON /ZSTORE/ NPTS,ZARGI(MPPTS),ZOBS(MPPTS),ZDOBS(MPPTS),&
-     ZWT(MPPTS),ICODEZ(MPPTS),KOBZ(MPPTS)
+        ZWT(MPPTS),ICODEZ(MPPTS),KOBZ(MPPTS)
       COMMON /YSTORE/ ZCAL(MPPTS),ZBAK(MPPTS)
       COMMON /ZSTOR1/ ZXDELT,IIMIN,IIMAX,XDIFT,XMINT
-!
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-     itypot(mobstic),iordot(mobstic),&
-     uobstic(20,mobstic),zobstic(20,mobstic)
+        itypot(mobstic),iordot(mobstic),&
+        uobstic(20,mobstic),zobstic(20,mobstic)
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-      include 'statlog.inc'
-!
-!
       COMMON /CHISTOP/ NOBSA,NFITA,IFITA(MCHSTP),CHIOBSA,&
-      WTSA(MCHSTP),XOBSA(MCHSTP),YOBSA(MCHSTP),YCALA(MCHSTP),ESDA(MCHSTP)
-      common /chibest/ ycalbest(MCHSTP)
-!
+        WTSA(MCHSTP),XOBSA(MCHSTP),YOBSA(MCHSTP),YCALA(MCHSTP),ESDA(MCHSTP)
+      COMMON /chibest/ ycalbest(MCHSTP)
 
-       LBIN=1
-       NOBS=NOBSA
-       NBIN=NOBSA
-!
-       YOSUM=0.
-       YCSUM=0.
-!
-       DO II=1,NFITA
-        I=IFITA(II)
-        YOSUM=YOSUM+YOBSA(I)
-        YCSUM=YCSUM+YCALbest(I)
-       END DO
-! 
-       RESCL=YOSUM/YCSUM
-!
-       DO I=1,NOBS
-        YCALbest(i)=RESCL*YCALbest(I)
-       END DO
-!
-       DO I=1,NBIN
-        XBIN(I)=XOBSA(I)
-        YOBIN(I)=YOBSA(I)
-        YCBIN(I)=YCALBEST(I)
-        YBBIN(I)=0.0
-        EBIN(I)=EsdA(I)
-        XOBS(I)=XOBSA(I)
-        YOBS(I)=YOBSA(I)
-        YCAL(I)=YCALBEST(I)
-        YBAK(I)=0.0
-        EOBS(I)=EsdA(I)
-       END DO
-!
-       XPMIN=XOBSA(1)
-       XPMAX=XOBSA(1)
-       YPMIN=YOBSA(1)
-       YPMAX=YOBSA(1)
-       DO I=1,NOBS
-        XPMIN=MIN(XOBSA(I),XPMIN)
-        XPMAX=MAX(XOBSA(I),XPMAX)
-        YPMIN=MIN(YOBSA(I),YPMIN)
-        YPMAX=MAX(YOBSA(I),YPMAX)
-       END DO
-!
-       XPGMIN=XPMIN
-       XPGMAX=XPMAX
-       YPGMIN=YPMIN
-       YPGMAX=YPMAX
-!
-       CALL UPLOAD_RANGE()
-!
-      XPGMINOLD=XPMIN
-      XPGMAXOLD=XPMAX
-      YPGMINOLD=YPMIN
-      YPGMAXOLD=YPMAX
-      IPMIN=1
-      IPMAX=NBIN
-      IPMINOLD=IPMIN
-      IPMAXOLD=IPMAX
+      LBIN = 1
+      NOBS = NOBSA
+      NBIN = NOBSA
+      YOSUM = 0.0
+      YCSUM = 0.0
+      DO II = 1, NFITA
+        I = IFITA(II)
+        YOSUM = YOSUM + YOBSA(I)
+        YCSUM = YCSUM + YCALbest(I)
+      END DO
+      RESCL = YOSUM / YCSUM
+      DO I = 1, NOBS
+        YCALbest(I) = RESCL * YCALbest(I)
+      END DO
+      DO I = 1, NBIN
+        XBIN(I)  = XOBSA(I)
+        YOBIN(I) = YOBSA(I)
+        YCBIN(I) = YCALBEST(I)
+        YBBIN(I) = 0.0
+        EBIN(I)  = EsdA(I)
+        XOBS(I)  = XOBSA(I)
+        YOBS(I)  = YOBSA(I)
+        YCAL(I)  = YCALBEST(I)
+        YBAK(I)  = 0.0
+        EOBS(I)  = EsdA(I)
+      END DO
+      XPMIN = XOBSA(1)
+      XPMAX = XOBSA(1)
+      YPMIN = YOBSA(1)
+      YPMAX = YOBSA(1)
+      DO I = 1, NOBS
+        XPMIN = MIN(XOBSA(I),XPMIN)
+        XPMAX = MAX(XOBSA(I),XPMAX)
+        YPMIN = MIN(YOBSA(I),YPMIN)
+        YPMAX = MAX(YOBSA(I),YPMAX)
+      END DO
+      XPGMIN = XPMIN
+      XPGMAX = XPMAX
+      YPGMIN = YPMIN
+      YPGMAX = YPMAX
+      CALL UPLOAD_RANGE()
+      XPGMINOLD = XPMIN
+      XPGMAXOLD = XPMAX
+      YPGMINOLD = YPMIN
+      YPGMAXOLD = YPMAX
+      IPMIN = 1
+      IPMAX = NBIN
+      IPMINOLD = IPMIN
+      IPMAXOLD = IPMAX
 
       END SUBROUTINE Synchronize_Data
 !
