@@ -287,7 +287,7 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-      INCLUDE 'params.inc'
+      INCLUDE 'PARAMS.INC'
 
       COMMON /ALLPEAKS/ NTPeak, AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak), &
         PkProb(MTPeak), IOrdTem(MTPeak), IHPk(3,MTPeak)
@@ -363,7 +363,6 @@
  100  CONTINUE
       CALL ErrorMessage("Sorry, could not write to the file"//CHAR(13)//FNAME(1:KLEN))
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE Create_DicvolIndexFile
 !
