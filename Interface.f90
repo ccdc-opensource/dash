@@ -623,6 +623,7 @@
       INCLUDE 'PARAMS.INC'
 
       REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
       INTEGER           IPF_Lo,                     IPF_Hi
       INTEGER           NumPeakFitRange,            CurrentRange
       INTEGER           IPF_Range
@@ -630,7 +631,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
                         IPF_Range(MAX_NPFR),                                     &
@@ -680,7 +681,21 @@
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogClearField(IDF_Peak_Positions_Grid)
       NTPeak = 0
-      IF (NumPeakFitRange .EQ. 0) THEN
+! JvdS Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
+! Store all peaks thus found in one flat array: AllPkPosVal
+! @ I don't understand why PkPosVal(I,J) is used for this, I would have used XPF_Pos
+      IF (NumPeakFitRange .GE. 1) THEN
+        DO J = 1, NumPeakFitRange
+          IF (NumInPFR(J) .GE. 1) THEN
+            DO I = 1, NumInPFR(J)
+              NTPeak = NTPeak + 1
+              AllPkPosVal(NTPeak) = PkPosVal(I,J)
+              AllPkPosEsd(NTPeak) = PkPosEsd(I,J)
+            ENDDO
+          ENDIF
+        ENDDO
+      ENDIF
+      IF (NTPeak .EQ. 0) THEN
 ! Winteracter doesn't seem able to cope with setting the number of rows in a grid to zero,
 ! so instead I set it such that it fills the screen but doesn't allow scrolling down.
         CALL WGridRows(IDF_Peak_Positions_Grid,4)
@@ -688,18 +703,8 @@
         CALL PopActiveWindowID
         RETURN
       ENDIF
-! JvdS Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
-! Store all peaks thus found in one flat array: AllPkPosVal
-! @ I don't understand why PkPosVal(I,J) is used for this, I would have used XPF_Pos
-      DO J = 1, NumPeakFitRange
-        DO I = 1, NumInPFR(J)
-          NTPeak = NTPeak + 1
-          AllPkPosVal(NTPeak) = PkPosVal(I,J)
-          AllPkPosEsd(NTPeak) = PkPosEsd(I,J)
-        ENDDO
-      ENDDO
       CALL SORT_REAL(AllPkPosVal,IOrdTem,NTPeak)
-! IOrdTem now contains and oredered list of pointers into AllPkPosVal
+! IOrdTem now contains and ordered list of pointers into AllPkPosVal
 ! JvdS @ why not order the list itself?
       IF (NTic .NE. 0) THEN
 ! Let's find the closest peaks and their distribution around the observed peak positions
@@ -726,10 +731,10 @@
  20       PkTicDif(I) = TwoThetaDiff
           DO II = 1, 3
             IHPk(II,I) = IH(II,item)
-          END DO
+          ENDDO
           PkArgK(I) = ARGK(Item)
           IArgK(I) = Item
-        END DO
+        ENDDO
         IF (NTPeak .EQ. 1) THEN
           SigmDif = 0.01
         ELSE
