@@ -6397,6 +6397,10 @@
       DATA ISPC1/' '/
       DATA ISMBO1/'.', ',', ':', ';', '!', '?', '''', '"', '$', '/',    &
      &     '(', ')', '|', '-', '+', '=', '*', '#', '&', '>', '<'/
+
+      CHARACTER*8  tDate      ! '20010215' for 15 Feb 2001
+      CHARACTER*17 DateStr
+      CHARACTER*9  MonthStr
 !
 ! FOR THE CONVENIENCE OF THOSE WHO FIND THE ABOVE STATEMENT EYE-CROSSING,
 ! THE ELEMENTS OF THE ARRAY ISMBOL WILL BE:
@@ -6459,7 +6463,6 @@
       DO I = 1, 21
         ISMBOL(I) = ISMBO1(I)
       ENDDO
-!
 ! SET UP "SINGLE PHASE":
       NPHASE = 1
       IPHASE = 1
@@ -6472,7 +6475,6 @@
       JSOURC = 1
       KSOURC = 1
       MULSOU = .FALSE.
-!
 !  SET UP DEFAULTS FOR MACHINE DEPENDENT QUANTITIES:
 ! SET (FOR RUN TIME) THE SYSTEM FOR WHICH CCSL WAS GENERATED:
       NSYSTM = 0
@@ -6545,39 +6547,70 @@
       NDUMPS = -9999
       IOP1 = -9999
       IOP2 = -9999
-!
       STARS = '* * * * * * * * * * * *'
       DO I = 1, LENGT(MAIN)
         STARS(5+2*I:5+2*I) = MAIN(I:I)
       ENDDO
       WRITE (LPT,2000) STARS
- 2000 FORMAT (/20X,A23//8X,' Cambridge ',                               &
-     &        'Crystallography Subroutine Library     Mark 4.12')
+ 2000 FORMAT (/20X,A23//8X,' Cambridge Crystallography Subroutine Library     Mark 4.12')
 ! OBTAIN DATE AND TIME:
-!VMS
-! JvdS Was:
-!      CALL DATE(DAT)
-      DAT = '03-AUG-01'
-!UNIX
-      DAT(10:) = ' '
+      CALL DATE_AND_TIME(tDate)
+      DateStr = ''
+      IF (tDate(7:7) .EQ. '0') THEN 
+        DateStr(1:1) = tDate(8:8)       ! DateStr = '7'
+      ELSE
+        DateStr(1:2) = tDate(7:8)       ! DateStr = '12'
+      ENDIF
+      SELECT CASE (tDate(5:6))
+        CASE ('01')
+          MonthStr = 'January'
+        CASE ('02')
+          MonthStr = 'February'
+        CASE ('03')
+          MonthStr = 'March'
+        CASE ('04')
+          MonthStr = 'April'
+        CASE ('05')
+          MonthStr = 'May'
+        CASE ('06')
+          MonthStr = 'June'
+        CASE ('07')
+          MonthStr = 'July'
+        CASE ('08')
+          MonthStr = 'August'
+        CASE ('09')
+          MonthStr = 'September'
+        CASE ('10')
+          MonthStr = 'October'
+        CASE ('11')
+          MonthStr = 'November'
+        CASE ('12')
+          MonthStr = 'December'
+      END SELECT
+      DateStr = DateStr(1:LEN_TRIM(DateStr))//' '//MonthStr(1:LEN_TRIM(MonthStr))//' '//tDate(1:4)
+      DAT(1:3) = tDate(7:8)//'-'
+      DAT(4:6) = MonthStr(1:3)
+      CALL StrUpperCase(DAT(4:6))
+      DAT(7:10) = '-'//tDate(3:4)//' '
 !VMS
       CALL TIME(TIM(1))
 !VMS
-      WRITE (LPT,2001) TIM(1), DAT
+      WRITE (LPT,2001) TIM(1), DateStr(1:LEN_TRIM(DateStr))
 !VMS
- 2001 FORMAT (/20X,'Job run at ',A5,' on ',A10)
+ 2001 FORMAT (/20X,'Job run at ',A5,' on ',A)
 !
 ! CONSTANTS TO MACHINE ACCURACY:
-      PI = 4.0*ATAN(1.0)
-      RAD = PI/180.
-      DEG = 180./PI
-      TWOPI = 2.*PI
-      FOURPI = 4.*PI
-      PIBY2 = PI/2.
-      ALOG2 = ALOG(2.)
-      SQL2X8 = SQRT(8.*ALOG2)
+      PI     = 4.0*ATAN(1.0)
+      RAD    = PI/180.0
+      DEG    = 180.0/PI
+      TWOPI  = 2.0*PI
+      FOURPI = 4.0*PI
+      PIBY2  = PI/2.0
+      ALOG2  = ALOG(2.0)
+      SQL2X8 = SQRT(8.0*ALOG2)
       VALMUB = 0.2695
   100 RETURN
+
       END SUBROUTINE INITIL
 !*==INPUTA.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
