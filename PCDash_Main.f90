@@ -16,13 +16,10 @@
       INTEGER :: IWIDTHS(10)
       INTEGER :: IWID
 
-      CALL WInitialise(' ')
-      CALL Init_StdOut()
 !   Initialise Winteracter
-      XBSWidth  = WInfoScreen(1)
-      XBSHeight = WInfoScreen(2)
+      CALL WInitialise(' ')
 ! Try to redirect stdout - change working directory if unsuccessful
-
+      CALL Init_StdOut()
 !   Set up root window options
 !
 !     - System menu
@@ -32,10 +29,10 @@
 !
       MAIN_WINDOW%FLAGS  = SysMenuOn + MinButton + MaxButton + StatusBar
 ! Place window on the screen with a fractional size determined from the screen size
-      MAIN_WINDOW%WIDTH  = 0.8*XBSWidth
-      MAIN_WINDOW%HEIGHT = 0.375*XBSHeight
-      MAIN_WINDOW%X      = 0.1*XBSWidth
-      MAIN_WINDOW%Y      = 0.06*FLOAT(XBSHeight)+262 !0.4*XBSHeight
+      MAIN_WINDOW%WIDTH  = 0.8   * WInfoScreen(1)
+      MAIN_WINDOW%HEIGHT = 0.375 * WInfoScreen(2)
+      MAIN_WINDOW%X      = 0.1   * WInfoScreen(1)
+      MAIN_WINDOW%Y      = 0.06  * FLOAT(WInfoScreen(2)) + 262.0
 ! Set druid_header menu id and window title
       MAIN_WINDOW%MENUID = IDR_MENU1
       MAIN_WINDOW%TITLE  = "DASH"
