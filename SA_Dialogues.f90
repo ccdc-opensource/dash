@@ -15,7 +15,6 @@
       IMPLICIT NONE 
            
       INCLUDE 'DialogPosCmn.inc'
-      INCLUDE 'statlog.inc'
 
       CALL WDialogSelect(IDD_SAW_Page1)
 ! @ Enable or disable the "Next" button
@@ -46,6 +45,8 @@
       CALL WDialogFieldState(IDF_TOF_source,DialogReadOnly)
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
+! Grey out 'Remove background' button on toolbar
+      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
 
 
       END SUBROUTINE ShowWizardWindowZmatrices
@@ -64,13 +65,10 @@
       CHARACTER*80 SDIFile
       INTEGER      IFlags
 
-      INCLUDE 'DialogPosCmn.inc'
-
 ! JCC Added in declarations
 ! The implementation has changed - this is now a function
       INTEGER, EXTERNAL :: Read_One_Zm
       INTEGER zmread
-      LOGICAL ZmStateChanged
       INTEGER ifrg
       LOGICAL, EXTERNAL :: Confirm
 
@@ -87,9 +85,8 @@
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
-              CALL WizardWindowHide
               CALL SA_Parameter_Set
-              CALL WizardWindowShow(IDD_SA_input2)
+              CALL WizardWindowBackNext(IDD_SA_input2)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_SA_Project_Browse)
@@ -102,7 +99,6 @@
               CALL ImportZmatrix
             CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
               IF (Confirm('Do you want to clear this z-matrix?')) THEN
-                ZmStateChanged = .TRUE.
                 ifrg = 1
                 DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
                   ifrg = ifrg + 1
@@ -111,7 +107,6 @@
                 frag_file(ifrg) = ' '
               ENDIF ! Delete this z-matrix
             CASE (IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
-              ZmStateChanged = .TRUE.
               ifrg = 1
               DO WHILE (IDBZMBrowse(ifrg) .NE. EventInfo%VALUE1)
                 ifrg = ifrg + 1
@@ -143,11 +138,7 @@
               DO WHILE (IDBZMView(ifrg) .NE. EventInfo%VALUE1)
                 ifrg = ifrg + 1
               ENDDO
-              IF (.NOT. gotzmfile(ifrg)) THEN
-                CALL ErrorMessage('File not found.')
-              ELSE
-                CALL ViewZmatrix(ifrg)
-              ENDIF
+              CALL ViewZmatrix(ifrg)
           END SELECT
       END SELECT
   999 CALL UpdateZmatrixSelection
@@ -208,8 +199,7 @@
                 IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
               ENDIF
               IF (.NOT. LimsChanged) THEN
-                CALL WizardWindowHide
-                CALL WizardWindowShow(IDD_SAW_Page1)
+                CALL WizardWindowBackNext(IDD_SAW_Page1)
               ENDIF
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
@@ -341,8 +331,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the 2nd window
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_SA_input2)
+              CALL WizardWindowBackNext(IDD_SA_input2)
             CASE (IDB_SA3_finish) ! 'Solve >' button
 ! We've finished the SA input
               CALL WizardWindowHide

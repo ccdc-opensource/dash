@@ -380,7 +380,7 @@
       CALL WDialogPutString(IDF_ViewExe,ViewExe)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,.TRUE.)
-      SA_SimplexDampingFactor = 0.1
+      SA_SimplexDampingFactor = 0.25
       CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,.FALSE.)
       CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,.FALSE.)
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -389,6 +389,8 @@
       ELSE
         CALL WDialogFieldState(IDB_SA_Project_Import,Disabled)
       ENDIF
+! Grey out 'Remove background' button on toolbar
+      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
       CALL ClearZmatrices
       SLIMVALUE = 1.0
       SCALFAC   = 0.01

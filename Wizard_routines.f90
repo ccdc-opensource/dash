@@ -8,8 +8,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'DialogPosCmn.inc'
-
       CALL SetWizardState(-1)
       CALL SelectMode(ID_Peak_Fitting_Mode)
       CALL SetModeMenuState(0,-1,-1)
@@ -54,6 +52,22 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE WizardWindowBackNext(TheDialogID)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheDialogID
+ 
+      CALL WizardWindowHide
+      CALL WizardWindowShow(TheDialogID)
+
+      END SUBROUTINE WizardWindowBackNext
+!
+!*****************************************************************************
+!
       SUBROUTINE EndWizardCommon
 
       USE WINTERACTER
@@ -75,11 +89,6 @@
       USE VARIABLES
 
       IMPLICIT NONE
-
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
-      INCLUDE 'DialogPosCmn.inc'
 
       CALL EndWizardCommon
       IF (.NOT. NoData) CALL SetModeMenuState(1,0,0)
@@ -107,12 +116,31 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+   
       CALL EndWizardCommon
       PastPawley = .FALSE.
-!?! @@ Ungrey 'Delete all peak fit ranges' button on toolbar
-!?      CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
+! Ungrey 'Delete all peak fit ranges' button on toolbar
+      IF (NumPeakFitRange .GT. 0) CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
 ! Ungrey 'Remove Background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
 ! Ungrey 'Load diffraction pattern' button on toolbar
@@ -135,6 +163,8 @@
 ! @@ ?
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
+! Ungrey 'Remove background' button on toolbar
+      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
 
       END SUBROUTINE EndWizardPastPawley
 !
@@ -148,7 +178,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
 
       INTEGER :: IPW_Option
@@ -203,36 +232,15 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
-      INCLUDE 'statlog.inc'
-
+   
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
-
+   
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
-
+   
 ! Not too pretty, but safe
       INTEGER                BackupNOBS
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
@@ -246,16 +254,6 @@
         YOBS(I) = BackupYOBS(I)
         EOBS(I) = BackupEOBS(I)
       ENDDO
-      XPMIN = XOBS(1)
-      XPMAX = XOBS(1)
-      YPMIN = YOBS(1)
-      YPMAX = YOBS(1)
-      DO I = 1, NOBS
-        XPMIN = MIN(XOBS(I),XPMIN)
-        XPMAX = MAX(XOBS(I),XPMAX)
-        YPMIN = MIN(YOBS(I),YPMIN)
-        YPMAX = MAX(YOBS(I),YPMAX)
-      ENDDO
       OriginalNOBS = NOBS
       EndNOBS = OriginalNOBS
       CALL Rebin_Profile
@@ -263,20 +261,8 @@
 ! JvdS Assume no knowledge on background
         YBBIN(I) = 0.0
       ENDDO
-      XPGMIN = XPMIN
-      XPGMAX = XPMAX
-      YPGMIN = YPMIN
-      YPGMAX = YPMAX
-      XPGMINOLD = XPMIN
-      XPGMAXOLD = XPMAX
-      YPGMINOLD = YPMIN
-      YPGMAXOLD = YPMAX
-      CALL UPLOAD_RANGE()
-      IPMIN = 1
-      IPMAX = NBIN
-      IPMINOLD = IPMIN
-      IPMAXOLD = IPMAX
-      CALL Profile_Plot(IPTYPE)
+      CALL GetProfileLimits
+      CALL Profile_Plot
 
       END SUBROUTINE WizardApplyDiffractionFileInput
 !
@@ -290,14 +276,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmn.inc'
-
-      INTEGER          NOBS
-      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
-
       CHARACTER(MaxPathLength) CTEMP
       INTEGER ISTAT
       INTEGER DiffractionFileBrowse ! Function
@@ -309,12 +287,10 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+              CALL WizardWindowBackNext(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page4)
+              CALL WizardWindowBackNext(IDD_PW_Page4)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (ID_PWa_DF_Open)
@@ -352,7 +328,6 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmn.inc'
 
       REAL Temp
       INTEGER IRadSelection
@@ -363,11 +338,9 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page3)
+              CALL WizardWindowBackNext(IDD_PW_Page3)
             CASE (IDNEXT)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page5)
+              CALL WizardWindowBackNext(IDD_PW_Page5)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
           END SELECT
@@ -401,8 +374,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
-
       REAL    tReal
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
@@ -423,7 +394,7 @@
       ENDIF
       CALL TruncateData(tReal)
       CALL PopActiveWindowID
-      CALL Profile_Plot(IPTYPE)
+      CALL Profile_Plot
 
       END SUBROUTINE WizardApplyProfileRange
 !
@@ -437,12 +408,9 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmn.inc'
-
       REAL tReal
-      REAL TwoTheta2dSpacing ! Function
-      REAL dSpacing2TwoTheta ! Function
+      REAL, EXTERNAL :: TwoTheta2dSpacing
+      REAL, EXTERNAL :: dSpacing2TwoTheta
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER tFieldState
 
@@ -452,14 +420,12 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowHide
               CALL WizardApplyDiffractionFileInput
-              CALL WizardWindowShow(IDD_PW_Page4)
+              CALL WizardWindowBackNext(IDD_PW_Page4)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page6)
+              CALL WizardWindowBackNext(IDD_PW_Page6)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDB_ConvertT2R) ! Convert max. 2 theta to max. resolution
@@ -515,8 +481,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
-
       INTEGER tInt1, tInt2
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
@@ -526,7 +490,7 @@
       CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
       CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
                                           WDialogGetCheckBoxLogical(IDF_UseSplineYN))
-      CALL Profile_Plot(IPTYPE)
+      CALL Profile_Plot
       CALL PopActiveWindowID
 
       END SUBROUTINE WizardApplyBackground
@@ -541,9 +505,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmn.inc'
-
       INTEGER tInt1, tInt2
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
@@ -553,16 +514,14 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowHide
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
-              CALL WizardWindowShow(IDD_PW_Page5)
+              CALL WizardWindowBackNext(IDD_PW_Page5)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
               CALL WizardApplyBackground
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page7)
+              CALL WizardWindowBackNext(IDD_PW_Page7)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDF_Preview)
@@ -570,7 +529,7 @@
               CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
               CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
                                                    WDialogGetCheckBoxLogical(IDF_UseSplineYN))
-              CALL Profile_Plot(IPTYPE)
+              CALL Profile_Plot
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -599,8 +558,7 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page6)
+              CALL WizardWindowBackNext(IDD_PW_Page6)
             CASE (IDNEXT)
               CALL WizardWindowHide
               CALL WDialogGetRadioButton(IDF_RADIO3,IndexOption) ! 'Index now' or 'Enter known cell'
@@ -680,8 +638,7 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page7)
+              CALL WizardWindowBackNext(IDD_PW_Page7)
             CASE (IDNEXT)
 !              CALL EstimateZeroPointError
               Lambda = ALambda
@@ -852,7 +809,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'lattice.inc'
 
       INTEGER irow, istatus
@@ -865,11 +821,9 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page8)
+              CALL WizardWindowBackNext(IDD_PW_Page8)
             CASE (IDNEXT)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page1)
+              CALL WizardWindowBackNext(IDD_PW_Page1)
           END SELECT
           CALL PopActiveWindowID
           RETURN
@@ -908,7 +862,6 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
@@ -925,11 +878,9 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+              CALL WizardWindowBackNext(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page1)
+              CALL WizardWindowBackNext(IDD_PW_Page1)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (ID_PW_DF_Open)
@@ -1014,10 +965,9 @@
               ENDIF
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDNEXT)
-              CALL WizardWindowHide
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
-              CALL WizardWindowShow(IDD_PW_Page10)
+              CALL WizardWindowBackNext(IDD_PW_Page10)
             CASE (IDAPPLY)
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
@@ -1065,16 +1015,13 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'DialogPosCmn.inc'
-
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page10)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowHide
-              CALL WizardWindowShow(IDD_PW_Page1)
+              CALL WizardWindowBackNext(IDD_PW_Page1)
             CASE (IDNEXT)
               CALL WizardWindowHide
               CALL ShowPawleyFitWindow
