@@ -183,6 +183,14 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE SaveConfigurationFile
+
+
+
+      END SUBROUTINE SaveConfigurationFile
+!
+!*****************************************************************************
+!
       SUBROUTINE InitialiseVariables
 
       USE WINTERACTER
@@ -220,89 +228,57 @@
       SLIMVALUE = 1.0
       SCALFAC   = 0.01
       BACKREF   = .TRUE.
-
       JRadOption = 1 ! Initialise to X-ray lab data
-
       IXPos_IDD_Pawley_Status = 0.1  * XBSWidth
       IYPos_IDD_Pawley_Status = 0.06 * XBSHeight
       IXPos_IDD_SA_Input = 0.1  * XBSWidth
       IYPos_IDD_SA_Input = 0.06 * XBSHeight
       IXPos_IDD_Wizard = 0.1  * XBSWidth
       IYPos_IDD_Wizard = 0.06 * XBSHeight
-
       FromPawleyFit = .FALSE. 
-
       NUMOBSTIC = 0
       NTIC = 0
       LBIN = 1
-
       MARKER_SIZE = 0.35
       CHAR_SIZE = 1.0
-
       XPG1 = 0.12
       XPG2 = 0.95
       YPG1 = 0.12
       YPG2 = 0.93
-
-      KolNumPGWindow=220
-      KolNumMain=221
-      KolNumObs=222
-      KolNumCal=223
-      KolNumDif=224
-      KolNumMTic=225
-      KolNumCTic=226
-      KolNumPanelVLite=227
-      KolNumPanelLite=228
-      KolNumPanelDark=229
-      KolNumPanelVDark = 230
-      KolNumPanelOuter = 231
-      KolNumRectSelect = 232
+      KolNumPGWindow       = 220
+      KolNumMain           = 221
+      KolNumObs            = 222
+      KolNumCal            = 223
+      KolNumDif            = 224
+      KolNumMTic           = 225
+      KolNumCTic           = 226
+      KolNumPanelVLite     = 227
+      KolNumPanelLite      = 228
+      KolNumPanelDark      = 229
+      KolNumPanelVDark     = 230
+      KolNumPanelOuter     = 231
+      KolNumRectSelect     = 232
       KolNumLargeCrossHair = 233
-      KolNumPeakFit=234
-      KolNumPeakPos=235
-      KolNumBack=236
-
-      KolDefPGWindow=Win_RGB(253,253,248)
-      KolDefMain=Win_RGB(20,20,150)
-      KolDefObs=Win_RGB(161,0,0)
-      KolDefCal=Win_RGB(10,70,10)
-      KolDefDif=Win_RGB(200,100,200)
-      KolDefMTic=Win_RGB(191,0,0)
-      KolDefCTic=Win_RGB(0,131,131)
-      KolDefPanelVLite=Win_RGB(245,245,245)
-      KolDefPanelLite=Win_RGB(235,235,235)
-      KolDefPanelDark=Win_RGB(210,210,210)
-      KolDefPanelVDark=Win_RGB(170,170,170)
-      KolDefPanelOuter=Win_RGB(190,190,190)
-!      KolDefPanelVLite=Win_RGB(250,250,250)
-!      KolDefPanelLite=Win_RGB(245,245,245)
-!      KolDefPanelDark=Win_RGB(230,230,230)
-!      KolDefPanelVDark=Win_RGB(220,220,220)
-!      KolDefPanelOuter=Win_RGB(225,225,225)
-      KolDefRectSelect=Win_RGB(150,150,5)
-      KolDefLargeCrossHair=Win_RGB(150,150,5)
-      KolDefPeakFit=Win_RGB(20,20,240)
-      KolDefPeakPos=Win_RGB(50,50,200)
-      KolDefBack=Win_RGB(164,211,105)
-
-      KolPGWindow=KolDefPGWindow
-      KolMain=KolDefMain
-      KolObs=KolDefObs
-      KolCal=KolDefCal
-      KolDif=KolDefDif
-      KolMTic=KolDefMTic
-      KolCTic=KolDefCTic
-      KolPanelVLite=KolDefPanelVLite
-      KolPanelLite=KolDefPanelLite
-      KolPanelDark=KolDefPanelDark
-      KolPanelVDark=KolDefPanelVDark
-      KolPanelOuter=KolDefPanelOuter
-      KolRectSelect=KolDefRectSelect
-      KolLargeCrossHair=KolDefLargeCrossHair
-      KolPeakFit=KolDefPeakFit
-      KolPeakPos=KolDefPeakPos
-      KolBack=KolDefBack
-
+      KolNumPeakFit        = 234
+      KolNumPeakPos        = 235
+      KolNumBack           = 236
+      KolPGWindow       = Win_RGB(253,253,248)
+      KolMain           = Win_RGB(20,20,150)
+      KolObs            = Win_RGB(161,0,0)
+      KolCal            = Win_RGB(10,70,10)
+      KolDif            = Win_RGB(200,100,200)
+      KolMTic           = Win_RGB(191,0,0)
+      KolCTic           = Win_RGB(0,131,131)
+      KolPanelVLite     = Win_RGB(245,245,245)
+      KolPanelLite      = Win_RGB(235,235,235)
+      KolPanelDark      = Win_RGB(210,210,210)
+      KolPanelVDark     = Win_RGB(170,170,170)
+      KolPanelOuter     = Win_RGB(190,190,190)
+      KolRectSelect     = Win_RGB(150,150,5)
+      KolLargeCrossHair = Win_RGB(150,150,5)
+      KolPeakFit        = Win_RGB(20,20,240)
+      KolPeakPos        = Win_RGB(50,50,200)
+      KolBack           = Win_RGB(164,211,105)
       CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
                                         KolPGWindow%IGreen,&
                                         KolPGWindow%IBlue)
