@@ -245,6 +245,7 @@
                   CALL ShowWizardWindowZmatrices
                 CASE (4) ! Analyse solutions
                   CALL WizardWindowShow(IDD_SAW_Page5)
+                  CALL SelectMode(IDB_AnalyseSolutions)
               END SELECT
           END SELECT
       END SELECT
