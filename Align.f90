@@ -369,8 +369,7 @@
            FinalMol(1,i) = tempy
            FinalMol(2,i) = tempx
              IF ((Inversion.ne.1).AND. ((NumberSgTable .LT. 357) .OR. (NumberSGTable .GT. 363))) THEN
- !!              FinalMol(3,i) = (FinalMol(3,i)*(-1) + 1)
-                 FinalMol(3,i) = centre(3) - connarray(3,i)
+              FinalMol(3,i) = (FinalMol(3,i)*(-1) + 1)
              END IF
          END DO
        END IF
