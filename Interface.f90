@@ -872,7 +872,6 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
-
       LOGICAL, EXTERNAL :: NearlyEqual, Confirm
       INTEGER tFileHandle, I
 
@@ -932,41 +931,20 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
-      USE VARIABLES
 
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
 
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
-
-      REAL    tMaxResolution
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption
       INTEGER I, IRadSelection
-      REAL, EXTERNAL :: FnWavelengthOfMenuOption, TwoTheta2dSpacing, dSpacing2TwoTheta
-      LOGICAL, EXTERNAL :: FnPatternOK
 
       CALL PushActiveWindowID
 ! This is the right place to update the maximum resolution (even if it's not necessary)
 ! In principle, set resolution so as to truncate after DefaultMaxResolution.
 ! However, if truncation resolution not attainable with current data range / wavelength,
 ! adjust the setting of the maximum resolution to maximum possible.
-      IF (FnPatternOK()) THEN
-        tMaxResolution = MAX(TwoTheta2dSpacing(XPMAX),DefaultMaxResolution)
-        CALL WDialogSelect(IDD_ViewPawley)
-        CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
-      ELSE
-        tMaxResolution = DefaultMaxResolution
-      ENDIF
-      CALL WDialogSelect(IDD_PW_Page5)
-      CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
-      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tMaxResolution))
+      CALL Update_TruncationLimits
       CALL WDialogSelect(IDD_Data_Properties)
       CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_PW_Page2)

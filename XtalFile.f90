@@ -53,8 +53,6 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INCLUDE 'GLBVAR.INC'
-
       LOGICAL FExists
       INTEGER KLEN
 
@@ -106,7 +104,7 @@
       iLen = LEN_TRIM(tFileName)
 ! Find the last occurence of '.' in tFileName
       iPos = iLen - 1 ! Last character of tFileName is not tested
-! The longest extension possible is four
+! The longest extension possible is five
       DO WHILE ((iPos .NE. 0) .AND. (tFileName(iPos:iPos) .NE. '.') .AND. (iPos .NE. (iLen-5)))
         iPos = iPos - 1
       ENDDO
@@ -153,7 +151,7 @@
         CALL ErrorMessage("Sorry, could not create Z-matrices.")
         RETURN
       ENDIF
-      !C Replace extension by .glob
+!C Replace extension by .glob
       ExtLen = 5 ! Maximum length of a valid extension
       CALL FileGetExtension(TheFileName, ExtensionStr, ExtLen)
       IF ((ExtLen .LT. 1) .OR. (ExtLen .GT. 5)) THEN
@@ -162,6 +160,7 @@
       ENDIF
       iLen = LEN_TRIM(tFileName)
       globFile = tFileName(1:iLen-ExtLen)//"glob"
+!C Load .glob file
       iHandle = 10
       OPEN(iHandle,FILE=globFile(1:LEN_TRIM(globFile)),STATUS='OLD',ERR=999)
       DO iFrg = 1, maxfrg
@@ -186,14 +185,11 @@
      !     CALL Upload_Cell_Constants
         CASE ('spa')
      ! Ignore
-     !     DashHcvFile = line(ILocateChar(line):)
-     !     HcvExists = .TRUE.
         CASE ('sym')
      ! Ignore
-     !     DashHklFile = line(ILocateChar(line):)
         CASE ('z-m')                                ! Z-matrix file
           iFrg = iFrg + 1
-          ! @@ Following lines do not take copies of Z-matrices into account
+          ! Following lines do not take copies of Z-matrices into account
           zmNumberOfCopies(iFrg) = 1
           IF (iFrg .GT. maxfrg) GOTO 100
           frag_file(iFrg) = line(ILocateChar(line):)

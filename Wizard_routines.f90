@@ -979,7 +979,6 @@
               CALL CheckIfWeCanIndex
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDNEXT)
-!              CALL EstimateZeroPointError
               CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
               CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
               CALL WDialogGetReal(IDF_Indexing_Maxa,   amax)

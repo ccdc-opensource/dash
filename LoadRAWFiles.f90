@@ -26,7 +26,6 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
       CHARACTER*4 C4
