@@ -20,15 +20,14 @@
 ! displayed, moved, closed and then displayed again.
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
 
 ! MOBS  = (=15000) Maximum number of observations, i.e. data points in powder pattern
 ! NOBS  = Number of data points in powder pattern
 ! XOBS  = 2 theta
 ! YOBS  = observed number of counts ('intensity') for the corresponding 2 theta value
 !        (this should have been a 'struct'/'record', but that didn't exist yet in FORTRAN when this was programmed)
-! YCAL  = calculated number of counts ('intensity') for the corresponding 2 theta value
 ! YBAK  = background number of counts ('intensity') for the corresponding 2 theta value
 ! EOBS  = estimated standard deviation of the observed number of counts ('intensity')
 !         for the corresponding 2 theta value
@@ -56,6 +55,9 @@
       INTEGER                                                                    ICODEZ
       REAL                                                                                      KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
+
+! NPTS is approximately NBIN.
+! These variables hold the profile during peak fitting and Pawley refinement.
 
       REAL            ZCAL !,        ZBAK
       COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
@@ -233,9 +235,8 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      LOGICAL         InWizard, InWizardWindow
-      INTEGER                                   CurrentWizardWindow
-      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
 
 ! InWizard            = when .TRUE., wizard is active
 ! InWizardWindow      = when .TRUE., a wizard window is currently visible
