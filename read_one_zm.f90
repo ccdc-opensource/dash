@@ -138,7 +138,7 @@
           tSubString = Asym(i,ifrg)(1:AsymLen)//tIDstr
         ENDIF
         OriginalLabel(i,ifrg) = tSubString(1:5)
-        izmbid(izmoid(i,ifrg),ifrg) = i   ! the backward mapping from atoms in the zmatrix
+        izmbid(izmoid(i,ifrg),ifrg) = i   ! the backward mapping from atoms in the Z-matrix
       ENDDO
 ! Broken into 2 loops now so that we can get the labels to relate to the original molecule IDs
       DO i = 1, natof
