@@ -380,6 +380,11 @@
 ! single crystal uses the intensity chi-sqrd) but may also become more important later on due
 ! to the subtle differences between a real powder pattern and a powder pattern generated from single cystal data.
 
+      LOGICAL           Resume_SA
+      COMMON /RESUMESA/ Resume_SA
+! Flag set in the Analyse Solutions Window to indicate that the user has pressed the
+! "Resume SA" button.
+
       END SUBROUTINE FoolCompiler
 !
 !*****************************************************************************
