@@ -303,7 +303,10 @@
           ENDDO
         ENDDO
       ENDDO
+      hess = hess * 10000.0 ! For numerical stability: these values can be of the order 1.0E-11.
       CALL InverseMatrix(hess, covar, nkn)
+      hess = hess / 10000.0
+      covar = covar * 10000.0
       DO I = 1, nkn
         ans(i) = 0.0
         DO j = 1, nkn
