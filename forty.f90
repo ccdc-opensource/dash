@@ -24,13 +24,16 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-!      IMPLICIT NONE
+      IMPLICIT NONE
 !
 ! Interaction here with Winteracter !!!!!!
 !
+      CHARACTER*6 PNAME
       INTEGER MATSZ
+      REAL ALSQ(MATSZ)
       LOGICAL DFLTPR, PRNCYC
-      EXTERNAL DFLTPR, PCXX, PFXX, MAGROU, CALROU, RUNPAR, VARSPR, PRNCYC
+      EXTERNAL PCXX, PFXX, MAGROU, CALROU
+      CHARACTER*10 filnmr
 
       INCLUDE 'PARAMS.INC'
 
@@ -38,37 +41,48 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-      CHARACTER*6 PNAME
-      DIMENSION ALSQ(MATSZ)
+      REAL            DERIVV
+      INTEGER                      LVARV
       COMMON /DERVAR/ DERIVV(500), LVARV
+
+      INTEGER         IBACK, NBACK
+      REAL                             ARGBAK,        BACKGD
+      INTEGER         KBCKGD,        NBK, LBKD
+      LOGICAL                                       ZBAKIN
       COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5),    &
      &                KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
-      LOGICAL ZBAKIN
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
+
+      REAL            SHIFT, XOLD, XNEW, ESD
+      INTEGER                                 IFAM, IGEN, ISPC, NEWIN
+      INTEGER         KPACK, LKH
+      REAL                        SHESD
+      INTEGER                            ISHFT
+      REAL                                      AVSHFT, AMAXSH
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+
+      REAL            OBS, DOBS, GCALC, YCALC, DIFF
+      INTEGER                                        ICODE
+      REAL                                                  SUMWD
+      INTEGER                                                      NOBS
+      INTEGER         IWGH
+      REAL                     WTC,    WT, SQRTWT, WDIFF, YBACK, YPEAK
+      REAL            YMAX, CSQTOT
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
      &                YMAX, CSQTOT
+
+      INTEGER       IWGHT
       EQUIVALENCE (IWGHT,IWGH(1))
-      COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
-     &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
-     &                WTSLAK(1000), WEELEV, KOM16
-      LOGICAL STRKT
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
       INTEGER                                                               KSCALP
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
-
-      COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
-     &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
-     &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
-      DIMENSION NGENS(6), NSPC(6)
-      EQUIVALENCE (NGENS(1),NGENPS(1,1))
-      EQUIVALENCE (NSPC(1),NSPCPS(1,1))
 
       REAL            ARGI, YNORM, PKFNSP
       INTEGER                                       KPFNSP
@@ -89,29 +103,28 @@
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
                       NBASF4(MPRPKF,2,9), L4END(9)
 
+      REAL            SMYC, SMYD, SMYO, SMIO, SMID, SMWYOS
+      INTEGER                                               IZCT
+      REAL                                                        P5
+      INTEGER         IOP1, IOP2, KMI,    KMA
       COMMON /PRSTAT/ SMYC, SMYD, SMYO, SMIO, SMID, SMWYOS, IZCT, P5,   &
      &                IOP1, IOP2, KMI(9), KMA(9)
+
+      INTEGER         IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR
+      INTEGER         MODEOB,    IPRNT,     MAXCOR, IONLY
+      LOGICAL                                                 SIMUL
+      LOGICAL         MAG, MPL, FIXED, DONE
+      REAL                                   CONV
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
-      LOGICAL SIMUL, MAG, MPL, FIXED, DONE
+      INTEGER      MODER
       EQUIVALENCE (MODER,MODERR(1))
 
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
 
       INCLUDE 'REFLNS.INC'
-
-      COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP, NSKTOT, KOM24
-
-      COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
-     &                ISYM(500), ILAT(500), CELLTR(3,500), XSLAK(3,500),&
-     &                COSIN(3,3), IABASE(500), NST1, SLONLY, TOSTAR(6,6)&
-     &                , BCALC(500), DERCEL(6,500), DERPOS(3,500,2),     &
-     &                ITYPSK(500), INVBON(10,500), NINVB(500),          &
-     &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
-     &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
-      LOGICAL SLONLY
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -134,6 +147,7 @@
       INTEGER         KREFT
       COMMON /FPINF2/ KREFT(MOBS)
 
+      INTEGER         NOBSNOW
       COMMON /CMNNOW/ NOBSNOW
 
       REAL            ZARGK,         ZXDEL
@@ -151,23 +165,13 @@
       REAL            CummChiSqd
       COMMON /CMN007/ CummChiSqd(MOBS)
 
+      CHARACTER*80    MESSAG*100, NAMFIL*100
       COMMON /SCRACH/ MESSAG, NAMFIL
-      CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
+      CHARACTER*80 ICARD
       EQUIVALENCE (ICARD,MESSAG)
-      CHARACTER*10 filnmr
+
+      CHARACTER*10    filnam_root
       COMMON /commun/ filnam_root
-      CHARACTER*10 filnam_root
-!
-!------------------ For debugging only
-      REAL            ARGK, PKCNSP
-      INTEGER                              KPCNSP
-      REAL                                                DTDPCN,    DTDWL
-      INTEGER         NPKCSP
-      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
-                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-!
-!----------------------
 !
 ! JCC add error handling declarations
       INTEGER IEOCC
@@ -175,6 +179,10 @@
 ! JCC This is for testing for mathematical errors in the CCSL that used to STOP the program
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
+
+      EXTERNAL RUNPAR, VARSPR
+      INTEGER ISCR, NFLIP, Npt30, IPT, NTEM
+      INTEGER K1, K2, KK
 
       IBMBER = 0
   !    CALL DebugRoutine
@@ -233,7 +241,7 @@
 ! JCC Add in check on number of reflections here, so that code doesn't bomb out in the Pawley attempt
         IF (MAXK.GT.350) THEN
           FORTY = -1
-          IF (IPK.NE.0) CLOSE (IPK,IOSTAT=istat)
+          IF (IPK.NE.0) CLOSE (IPK)
           RETURN
         ENDIF
         IF (PRECYC .AND. ICYC.NE.NCYC1) THEN
@@ -431,10 +439,10 @@
 ! JCC Added in error handling here
   900 CONTINUE
       FORTY = 0
-      IF (IPK.NE.0) CLOSE (ipk,IOSTAT=istat)
+      IF (IPK.NE.0) CLOSE (ipk)
       RETURN
   950 FORTY = -2
-      IF (IPK.NE.0) CLOSE (ipk,IOSTAT=istat)
+      IF (IPK.NE.0) CLOSE (ipk)
       IBMBER = 0
 
       END FUNCTION FORTY
