@@ -1,4 +1,4 @@
-! Winteracter module created : 04/Oct/2001 14:35:27
+! Winteracter module created : 05/Oct/2001 10:43:29
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -483,4 +483,9 @@
           INTEGER, PARAMETER :: ISS10                           =  1241
           INTEGER, PARAMETER :: ISS11                           =  1242
           INTEGER, PARAMETER :: IDF_PrintSA                     =  1244
+          INTEGER, PARAMETER :: IDB_ZMatrixView1                =  1246
+          INTEGER, PARAMETER :: IDB_ZMatrixView2                =  1247
+          INTEGER, PARAMETER :: IDB_ZMatrixView3                =  1248
+          INTEGER, PARAMETER :: IDB_ZMatrixView4                =  1249
+          INTEGER, PARAMETER :: IDB_ZMatrixView5                =  1250
       END MODULE Druid_Header

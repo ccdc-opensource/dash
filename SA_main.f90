@@ -81,6 +81,7 @@
       LOGICAL NoZmatrix
       LOGICAL Confirm ! Function
       INTEGER IHANDLE
+      INTEGER IZMVB(1:CheckSize)
 
 !.. If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
       IF (FromPawleyFit) THEN
@@ -111,9 +112,15 @@
       IDFZMpars(4)=IDF_ZM_pars4
       IDFZMpars(5)=IDF_ZM_pars5
 !>> copy the flags used
-      DO ii = 1, 5
+      DO ii = 1, CheckSize
         IZMNumber(ii) = IDBZMBrowse(ii)
       END DO
+      IZMVB(1) = IDB_ZMatrixView1
+      IZMVB(2) = IDB_ZMatrixView2
+      IZMVB(3) = IDB_ZMatrixView3
+      IZMVB(4) = IDB_ZMatrixView4
+      IZMVB(5) = IDB_ZMatrixView5
+
 ! Message loop for the first SA window
 ! JvdS Started to add SA to Wizard
 !      CALL WDialogSelect(IDD_SA_input1)
@@ -150,10 +157,10 @@
       DO WHILE (.TRUE.)                  ! Loop until user terminates
 ! Let's check the z-matrix check boxes
         IF (ZmStateChanged) THEN
-          DO II = 1, 5
+          DO II = 1, CheckSize
             CALL WDialogGetCheckBox(IDFZMCheck(II),IZMCheck(II))
           END DO
-          DO II = 1, 5
+          DO II = 1, CheckSize
             IF ((IZMCheck(II) .EQ. Checked) .OR. gotzmfile(II) ) THEN
               CALL WDialogFieldState(IDFZMFile(II),Enabled)
               CALL WDialogFieldState(IDBZMBrowse(II),Enabled)
@@ -164,7 +171,7 @@
               CALL WDialogFieldState(IDBZMBrowse(II),Disabled)
               CALL WDialogFieldState(IDFZMPars(II),Disabled)
               IF (II .LT. 5) THEN
-                DO jj = II + 1, 5
+                DO jj = II + 1, CheckSize
                   CALL WDialogFieldState(IDFZMCheck(jj),Disabled)
                   CALL WDialogPutCheckBox(IDFZMCheck(jj),Unchecked)
                   CALL WDialogFieldState(IDFZMFile(jj),Disabled)
@@ -174,7 +181,7 @@
               END IF
             END IF
           END DO
-          IF (NextEnabled .LT. 5) THEN
+          IF (NextEnabled .LT. CheckSize) THEN
             CALL WDialogPutCheckBox(IDFZMCheck(NextEnabled),Unchecked)
           END IF
           ZmStateChanged = .FALSE.
@@ -243,7 +250,7 @@
                   IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
               ZmStateChanged = .TRUE.
               ifrg = 1
-              DO WHILE (ifrg .LT. 5 .AND. IZMNumber(ifrg) .NE. EventInfo%VALUE1)
+              DO WHILE (ifrg .LT. CheckSize .AND. IZMNumber(ifrg) .NE. EventInfo%VALUE1)
                 ifrg = ifrg + 1
               ENDDO
               gotzmfile(ifrg) = .FALSE.
@@ -262,12 +269,12 @@
                   CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
 ! done within Read_One_ZM >>              gotzmfile(ifrg)=.true.
 !>> Now update the front end widget
-                  DO II = 1, 5
+                  DO II = 1, CheckSize
                     CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
                   END DO
                   CALL UpdateZmatrixSelection(IDFZMPars)
 ! Set the next dialogue on
-                  IF (ifrg .LT. 5) THEN
+                  IF (ifrg .LT. CheckSize) THEN
                     CALL WDialogFieldState(IDFZMCheck(ifrg+1),Enabled)
                     CALL WDialogFieldState(IDFZMCheck(ifrg+1),Enabled)
                   END IF
@@ -278,8 +285,16 @@
                 END IF ! If the read on the zmatrix was ok
               END IF  ! If the user selected a file
 ! View individual z-matrices in Mercury
- !           CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
-
+            CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
+              ifrg = 1
+              DO WHILE (ifrg .LT. CheckSize .AND. IZMVB(ifrg) .NE. EventInfo%VALUE1)
+                ifrg = ifrg + 1
+              ENDDO
+              IF (.NOT. gotzmfile(ifrg)) THEN
+                CALL ErrorMessage('File not found.')
+              ELSE
+                CALL ViewZmatrix(ifrg)
+              ENDIF
           END SELECT
           CASE (FieldChanged)
             SELECT CASE(EventInfo%VALUE1)
@@ -625,6 +640,162 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE WriteSAParametersToFile
+!
+!*****************************************************************************
+!
+      SUBROUTINE ViewZmatrix(ifrg)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: ifrg
+
+      INCLUDE 'PARAMS.INC'
+
+      CHARACTER*80    frag_file
+      COMMON /frgcha/ frag_file(maxfrg)
+
+      INTEGER         nfrag
+      COMMON /frgcom/ nfrag
+
+      INTEGER ntatm, natoms, ioptb, iopta, ioptt, iz1, iz2, iz3
+      COMMON /zmcomi/ ntatm, natoms(maxfrg), ioptb(maxatm,maxfrg),      &
+     &                iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),       &
+     &                iz1(maxatm,maxfrg), iz2(maxatm,maxfrg),           &
+     &                iz3(maxatm,maxfrg)
+
+      DOUBLE PRECISION blen, alph, bet, f2cmat
+      COMMON /zmcomr/ blen(maxatm,maxfrg), alph(maxatm,maxfrg),         &
+     &                bet(maxatm,maxfrg), f2cmat(3,3)
+
+      INTEGER         icomflg
+      COMMON /zmcomg/ icomflg(maxfrg)
+
+      CHARACTER*3     asym
+      COMMON /zmcomc/ asym(maxatm,maxfrg)
+
+
+      INTEGER I,J,M
+      LOGICAL exists
+      CHARACTER*17 temp_file
+      DATA temp_file /'Temp_Zmatrix.mol2'/
+
+
+      CHARACTER*255 dirname, filename, curdir
+
+
+      REAL*8 CART(MAXATM,3)
+      REAL*8 XC, YC, ZC, XNORM
+
+      INTEGER IHANDLE, NATS, ICFRG, OutputFile
+      INTEGER Res2Mol2 ! Function
+
+      NATS = NATOMS(IFRG)
+      CALL MAKEXYZ(NATS,BLEN(1,IFRG),ALPH(1,IFRG),BET(1,IFRG),        &
+     &             IZ1(1,IFRG),IZ2(1,IFRG),IZ3(1,IFRG),CART(1,1),     &
+     &             CART(1,2),CART(1,3))
+! Determine origin for rotations
+      ICFRG = ICOMFLG(IFRG)
+! If user set centre of mass flag to 0, then use the molecule's centre of mass
+      IF (ICFRG.EQ.0) THEN
+        XC = 0.0D0
+        YC = 0.0D0
+        ZC = 0.0D0
+        DO I = 1, NATS
+          XC = XC + CART(I,1)
+          YC = YC + CART(I,2)
+          ZC = ZC + CART(I,3)
+        ENDDO
+        XNORM = 1.0D0/DFLOAT(NATS)
+        XC = XC*XNORM
+        YC = YC*XNORM
+        ZC = ZC*XNORM
+! Otherwise, use atom number ICFRG
+      ELSE
+        XC = CART(ICFRG,1)
+        YC = CART(ICFRG,2)
+        ZC = CART(ICFRG,3)
+      ENDIF
+! Subtract the origin from all atom positions
+      DO I = 1, NATS
+        CART(I,1) = CART(I,1) - XC
+        CART(I,2) = CART(I,2) - YC
+        CART(I,3) = CART(I,3) - ZC
+      ENDDO
+
+! Now write  'Temp_Zmatrix.res'
+!TITLBA09_2                                  
+!CELL   0.0000   4.0207   4.5938  21.0298  90.7123  69.6944  80.3612
+!LATT  1
+!O1    0    0.19295   -0.33996    0.06295    1.00000    0.02476
+!O2    0   -0.17961   -0.00616    0.13265    1.00000    0.02000
+!C3    0   -0.10381   -0.30317    0.43567    1.00000    0.08073
+!H4    0   -0.29456   -0.41679    0.45015    1.00000    0.10000
+!H5    0    0.14042   -0.43747    0.42625    1.00000    0.10000
+!AG19  0   -0.28653    0.22594    0.03911    1.00000    0.04943
+!H20   0   -0.13171   -0.14728    0.47266    1.00000    0.10000
+!END 
+      
+      OutputFile = 3
+      OPEN(UNIT=OutputFile,file='Temp_Zmatrix.res',form='formatted',ERR=999)
+      WRITE(OutputFile,'(A)') 'TITL Temporary file written by DASH'
+      WRITE(OutputFile,'(A)') 'CELL 1.54 1.0 1.0 1.0 90.0 90.0 90.0'
+      DO I = 1, NATS
+        WRITE(OutputFile,333,ERR=999) asym(I,IFRG), CART(I,1), CART(I,2), CART(I,3)
+  333   FORMAT(A3,1X,'0',1X,F10.5,1X,F10.5,1X,F10.5,1X,'1.00000    1.00000')
+      ENDDO
+      WRITE(OutputFile,'(A)') 'END'
+      CLOSE(OutputFile)
+! Convert .res to mol2
+      I = Res2Mol2('Temp_Zmatrix.res')
+      IF (I .EQ. 0) GOTO 999
+! Show the mol2 file 
+      I = LEN_TRIM(ViewExe)
+      J = LEN_TRIM(ViewArg)
+      INQUIRE(FILE = ViewExe(1:I), EXIST=exists)
+      IF (exists) THEN
+        CALL SplitPath(ViewExe,dirname, filename)
+        CALL IOsDirName(curdir)
+        CALL IOsDirChange(dirname)
+        M = InfoError(1)
+        IF (J .GT. 0) THEN
+          CALL IOSCommand( &
+             filename(1:LEN_TRIM(filename))//' '//ViewArg(1:J)//' '// &
+             '"'//curdir(1:LEN_TRIM(curdir))//DIRSPACER//temp_file(1:LEN_TRIM(temp_file))//'"',0)
+        ELSE
+          CALL IOSCommand( &
+               filename(1:LEN_TRIM(filename))//' '// &
+               '"'//curdir(1:LEN_TRIM(curdir))//DIRSPACER//temp_file(1:LEN_TRIM(temp_file))//'"',0)
+        END IF
+        CALL IOsDirChange(curdir)
+        M = InfoError(1)
+        IF (M .EQ. ErrOSCommand) THEN
+          CALL WMessageBox(OkOnly, InformationIcon, CommonOk, &
+                  "DASH could not launch your viewer. The viewer executable is currently configured"//&
+  CHAR(13)//"to launch the program "//ViewExe(1:I)//&
+  CHAR(13)//"To change the configuration you should edit the file "//&
+  CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Dash.cfg"//&
+  CHAR(13)//"and then restart DASH","Viewer incorrectly installed")
+        ELSE IF (M .EQ. 0) THEN
+          ViewAct = .TRUE.
+        END IF
+      ELSE
+        CALL WMessageBox(OkOnly, InformationIcon, CommonOk, &
+                  "DASH could not find your viewer. The viewer executable is currently configured"//&
+  CHAR(13)//"to launch the program "//ViewExe(1:I)//&
+  CHAR(13)//"To change the configuration you should edit the file "//&
+  CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Dash.cfg"//&
+  CHAR(13)//"and then restart DASH","No such viewer")
+      END IF
+
+! Show the z-matrix file in an editor window
+  999 CALL WindowOpenChild(IHANDLE)
+      CALL WEditFile(frag_file(ifrg),Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+
+      END SUBROUTINE ViewZmatrix
 !
 !*****************************************************************************
 !
