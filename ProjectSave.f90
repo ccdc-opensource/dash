@@ -325,24 +325,24 @@
       IF (RW .EQ. cRead) THEN
 ! Grey out the "Save... chi sqrd progress"
         CALL WDialogSelect(IDD_OutputSolutions)
-        CALL WDialogFieldState(IDF_GROUP2,Disabled)
-        CALL WDialogFieldState(IDB_OutputChiSqd,Disabled)
-        CALL WDialogFieldState(IDF_LABEL5,Disabled)
-        CALL WDialogFieldState(IDF_LABEL3,Disabled)
+        CALL WDialogFieldState(IDF_GROUP2, Disabled)
+        CALL WDialogFieldState(IDB_OutputChiSqd, Disabled)
+        CALL WDialogFieldState(IDF_LABEL5, Disabled)
+        CALL WDialogFieldState(IDF_LABEL3, Disabled)
         CALL CloseOutputSolutionsChildWindows
         CALL WDialogSelect(IDD_SAW_Page5)
         CALL WDialogFieldState(IDB_Prog3,Disabled)
         CALL WDialogSelect(IDD_ViewPawley)
-        CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
-        CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
-        CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
-        CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
-        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NBIN)
-        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,NumOfRef)
-        CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
+        CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
+        CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
+        CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
+        CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts, NBIN)
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs, NumOfRef)
+        CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq, PAWLEYCHISQ, '(F12.3)')
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
         CALL WDialogSelect(IDD_PW_Page8)
-        CALL WDialogFieldState(IDB_PrevRes,Disabled)
+        CALL WDialogFieldState(IDB_PrevRes, Disabled)
         BackRef = .FALSE.
         CALL SetModeMenuState(0,1)
 ! Change global variable FNAME
@@ -588,15 +588,9 @@
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz1(iAtomNr,iFrg))
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz2(iAtomNr,iFrg))
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz3(iAtomNr,iFrg))
-          IF (RW .EQ. cWrite) THEN
-            CALL FileWriteReal(hPrjFile, iPrjRecNr, blen(iAtomNr,iFrg))
-            CALL FileWriteReal(hPrjFile, iPrjRecNr, alph(iAtomNr,iFrg))
-            CALL FileWriteReal(hPrjFile, iPrjRecNr, bet(iAtomNr,iFrg))
-          ELSE
-            CALL FileReadReal(hPrjFile, iPrjRecNr, blen(iAtomNr,iFrg))
-            CALL FileReadReal(hPrjFile, iPrjRecNr, alph(iAtomNr,iFrg))
-            CALL FileReadReal(hPrjFile, iPrjRecNr, bet(iAtomNr,iFrg))
-          ENDIF
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, blen(iAtomNr,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, alph(iAtomNr,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, bet(iAtomNr,iFrg))
           CALL FileRWString (hPrjFile, iPrjRecNr, RW, ElSym(iAtomNr,iFrg))
           IF (RW .EQ. cRead) THEN
             zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(ElSym(iAtomNr,iFrg))
@@ -607,17 +601,6 @@
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmoid(iAtomNr,iFrg))
           izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the back mapping
           CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, UseQuaternions(iFrg))
-          IF (RW .EQ. cWrite) THEN
-            CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(0,iFrg))
-            CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(1,iFrg))
-            CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(2,iFrg))
-            CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(3,iFrg))
-          ELSE
-            CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(0,iFrg))
-            CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(1,iFrg))
-            CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(2,iFrg))
-            CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(3,iFrg))
-          ENDIF
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxDef(iFrg))
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(1,iFrg))
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(2,iFrg))
@@ -627,17 +610,25 @@
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxPlnAtm(1,iFrg))
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxPlnAtm(2,iFrg))
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxPlnAtm(3,iFrg))
-          IF (RW .EQ. cWrite) THEN
-            CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(0,iFrg))
-            CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(1,iFrg))
-            CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(2,iFrg))
-            CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(3,iFrg))
-          ELSE
-            CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(0,iFrg))
-            CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(1,iFrg))
-            CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(2,iFrg))
-            CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(3,iFrg))
-          ENDIF
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotationQs(0,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotationQs(1,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotationQs(2,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotationQs(3,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrDef(iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrFrac(1,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrFrac(2,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrFrac(3,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrEuler(1,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrEuler(2,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrEuler(3,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrQuater(0,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrQuater(1,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrQuater(2,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrQuater(3,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmInitialQs(0,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmInitialQs(1,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmInitialQs(2,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmInitialQs(3,iFrg))
         ENDDO
         IF (RW .EQ. cRead) THEN
           CALL zmDoAdmin(iFrg)
