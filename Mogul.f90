@@ -57,8 +57,6 @@
         ENDDO
         IF (iFrg .NE. 0) EXIT
       ENDDO
-
-
       natcry = NATOMS(iFrg)
       CALL makexyz(natcry,BLEN(1, iFrg),ALPH(1, iFrg),BET(1, iFrg),IZ1(1, iFrg),IZ2(1, iFrg),IZ3(1, iFrg),axyzo)
       DO I = 1, natcry
@@ -80,7 +78,6 @@
       ELSE
         CALL DebugErrorMessage('Error writing temporary file.')
       ENDIF
-
 
       END SUBROUTINE WriteMogulMol2
 
@@ -116,7 +113,6 @@
       DO I = 1,4
        Atom(I) = '     '
       END DO
-
       I = 0
       J = 1
       DO WHILE (I .LE. tLength) !length of label
@@ -134,13 +130,10 @@
           EXIT
         ENDIF
       ENDDO
-
-
       Atom(1) = TempAtomLabel(Marker(1)+1 : Marker(2)-1) 
       Atom(2) = TempAtomLabel(Marker(2)+1 : Marker(3)-1)
       Atom(3) = TempAtomLabel(Marker(3)+1 : Marker(4)-1)
       Atom(4) = TempAtomLabel(Marker(4)+1 : Marker(5)-1)
-
       DO J = 1,4 ! Mogul does not use atom labels but number of atom in Mol2 file 
         DO I = 1, MaxDoF
           IF(Atom(J) .EQ. AtomLabel(izmbid(I,IFrg))) THEN
@@ -149,7 +142,6 @@
           ENDIF
         ENDDO
       ENDDO
-
       CALL WriteMogulScript(MogulMol2, AtomID, iFRow)  
 
       END SUBROUTINE GetAtomLineNumbers
@@ -166,7 +158,6 @@
       USE WINTERACTER
       USE VARIABLES
       USE ZMVAR
-      USE SAMVAR
 
       IMPLICIT NONE
 
@@ -174,19 +165,15 @@
       CHARACTER(MaxPathLength), INTENT(IN   ) :: MogulMol2
       INTEGER, INTENT (IN   ) :: iFRow
 
-
       INTEGER I
       CHARACTER(MaxPathLength) CurrentDirectory, Script_file, MogulOutputFile
       INTEGER tLength, olength
 
       CALL IOsDirName(CurrentDirectory)
-
       tLength = LEN_TRIM(MogulMol2)
       Script_file = MogulMol2(1:tLength-10)//'script.qf'
       MogulOutputFile = MogulMol2(1:tLength-10)//'mogul.out'
-
       olength = LEN_TRIM(MogulOutputfile)
-
       OPEN(240,FILE=Script_file,STATUS='UNKNOWN', ERR = 999)
       WRITE(240,10) MogulMol2(1:tlength)
 10    FORMAT(('MOGUL MOLECULE '), A)
@@ -233,20 +220,18 @@
       USE VARIABLES
       USE ZMVAR
 
-
       IMPLICIT NONE
 
       CHARACTER(MaxPathLength), INTENT(IN   ) :: Script_file, MogulOutputFile
       INTEGER, INTENT (IN   ) :: iFRow
             
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       INTEGER I,M
       LOGICAL exists
 
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
-
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetString(IDF_MogulExe,MOGULEXE)
+      CALL WDialogGetString(IDF_MogulExe, MOGULEXE)
       CALL PopActiveWindowID
       I = LEN_TRIM(MOGULEXE)
       INQUIRE(FILE = MOGULEXE(1:I),EXIST=exists)
@@ -254,7 +239,7 @@
       M = InfoError(1) ! Clear errors
       CALL IOSCommand(MOGULEXE(1:I)//' -ins '//'"'//Script_file(1:LEN_TRIM(Script_file))//'"', ProcBlocked)
       IF (InfoError(1) .NE. 0) GOTO 999
-      IF(kzmpar2(IFRow) .EQ. 3) THEN ! Modal Torsion so try to process
+      IF (kzmpar2(IFRow) .EQ. 3) THEN ! Modal Torsion so try to process
         CALL ProcessMogulOutput(MogulOutputFile, iFRow)
       ENDIF
       RETURN
@@ -264,10 +249,7 @@
                         "This can be changed in the Configuration Window"//CHAR(13)//&
                         "under Options in the menu bar.")
 
-
       END SUBROUTINE Mogul
-
-
 
 !********************************************************************************
       
@@ -281,14 +263,13 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
 
+      CHARACTER(MaxPathLength), INTENT(IN   ) ::  MogulOutputFile
       INTEGER, INTENT (IN   ) :: iFRow
 
-      CHARACTER(MaxPathLength), INTENT(IN   ) ::  MogulOutputFile
       INTEGER nlin, I
       CHARACTER*255 line
       CHARACTER*12 Distribution
@@ -440,16 +421,12 @@
        ModalFlag(IFRow) = 1
        Assigned = .TRUE.
       ENDIF
-
       IF (.NOT. Assigned) THEN
         MogulText = 'No recommendation'
         ModalFlag(IFRow) = 1
       ENDIF
-
       CALL WDialogSelect(IDD_ModalDialog)
       CALL WDialogPutString(IDF_MogulText, MogulText)
-
-
       RETURN
 
 999   CALL ErrorMessage("DASH could not read Mogul Output File.")
@@ -461,10 +438,6 @@
 
       SUBROUTINE MinimumValue(TC, Lower, Upper, Lmarker, Lindex, Halfbins)
 
-      USE DRUID_HEADER
-      USE VARIABLES
-
-
       IMPLICIT NONE
 
       INTEGER, DIMENSION(180), INTENT(IN   ) ::  TC
@@ -475,19 +448,13 @@
 
       Lmarker = MINVAL(TC(Lower: Upper))
       LIndex = MINLOC(TC(Lower: Upper))
-
       IF (Lower .GT. Halfbins) Lindex(1) = Lindex(1) + (Lower - 1)
 
-      
       END SUBROUTINE MinimumValue
 
 !*********************************************************************************
 
       SUBROUTINE MaximumValue(TC, Lower, Upper, Hmarker, HIndex, Halfbins)
-
-      USE DRUID_HEADER
-      USE VARIABLES
-
 
       IMPLICIT NONE
 
@@ -499,8 +466,8 @@
 
       Hmarker = MAXVAL(TC(Lower: Upper))
       HIndex = MAXLOC(TC(Lower: Upper))
-
       IF (Lower .GT. Halfbins) Hindex(1) = Hindex(1) + (Lower - 1)
 
-      
       END SUBROUTINE MaximumValue
+
+!*********************************************************************************
