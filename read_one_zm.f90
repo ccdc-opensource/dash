@@ -123,7 +123,7 @@
       zmInitialQs(1,iFrg) = 0.0
       zmInitialQs(2,iFrg) = 0.0
       zmInitialQs(3,iFrg) = 0.0
-      zmSingleRotAxDef(iFrg) = 1  ! 1 = to atom
+      zmSingleRotAxDef(iFrg) = 2  ! 2 = fractional co-ordinates
       zmSingleRotAxAtm(iFrg) = 1
       zmSingleRotAxFrac(1,iFrg) = 0.0
       zmSingleRotAxFrac(2,iFrg) = 0.0
