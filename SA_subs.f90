@@ -326,6 +326,7 @@
               XP(H) = xtem
               IARR = IARR + 1
             ENDIF
+
 !O! If translation, adjust to be between 0.0 and 1.0
 !O            IF (kzmpar2(H) .EQ. 1) THEN
 !O              DO WHILE (XP(H) .LT. 0.0)
@@ -409,7 +410,6 @@
                 XP(H) = xtem
                 IARR = IARR + 1
             END SELECT
-
             CurrIsPO = (kzmpar2(H) .EQ. 7)
             IF (PrefParExists) THEN
 ! Evaluate the function with the trial point XP and return as FP.
@@ -514,6 +514,7 @@
           IF (VM(I).LT.0.01*RULB(I)) THEN
             VM(I) = 0.01*RULB(I)
           ENDIF
+
           NACP(I) = 0
           NumTrialsPar(I) = 0
         ENDDO

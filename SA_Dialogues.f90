@@ -1309,6 +1309,10 @@
               IF (LimsChanged) THEN
                 IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
               ENDIF
+              DO I = 1, nvar
+                ModalFlag(I) = 1
+                CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
+              ENDDO
               IF (.NOT. LimsChanged) THEN
 ! If the user has requested preferred orientation, make sure we pass the pertinent Wizard window
                 CALL WDialogSelect(IDD_SAW_Page2)
@@ -1318,6 +1322,7 @@
                   CALL WizardWindowShow(IDD_SAW_Page1)
                 ENDIF
               ENDIF
+
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL WDialogSelect(IDD_SA_input3)
@@ -1414,12 +1419,18 @@
                     CALL WGridStateCell(IDF_parameter_grid_modal,1,IFRow,DialogReadOnly)
                     CALL WGridStateCell(IDF_parameter_grid_modal,2,IFRow,DialogReadOnly)
                     CALL WGridStateCell(IDF_parameter_grid_modal,3,IFRow,DialogReadOnly)
+                    CALL WGridStateCell(IDF_parameter_grid_modal,5,IFRow,Disabled)
+!                   If value fixed then remove modal torsion angle ranges
+                    ModalFlag(IFRow) = 1
+                    CALL WGridColourRow(IDF_parameter_grid_modal, IFROW, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
+           
                   ELSE
                     lb(IFRow) = prevlb(IFRow)
                     ub(IFRow) = prevub(IFRow)
                     CALL WGridStateCell(IDF_parameter_grid_modal,1,IFRow,Enabled)
                     CALL WGridStateCell(IDF_parameter_grid_modal,2,IFRow,Enabled)
                     CALL WGridStateCell(IDF_parameter_grid_modal,3,IFRow,Enabled)
+                    CALL WGridStateCell(IDF_parameter_grid_modal,5,IFRow,Enabled)
                   ENDIF
                   CALL WGridPutCellReal(IDF_parameter_grid_modal,2,IFRow,SNGL(lb(IFRow)),'(F12.5)')
                   CALL WGridPutCellReal(IDF_parameter_grid_modal,3,IFRow,SNGL(ub(IFRow)),'(F12.5)')
@@ -1698,10 +1709,17 @@
         CALL WDialogPutReal(IDF_ModalUpper,SNGL(ub(IFRow)),'(F12.5)')
         IF (ModalFlag(IFRow) .EQ. 2) THEN
           CALL WDialogPutRadioButton(IDF_BiModalRadio)
-          CALL WDialogGetReal(IDF_ModalUpper, xtem)
-          CALL WDialogPutReal(IDF_ReportLower1, (xtem * (-1)))
-          CALL WDialogGetReal(IDF_ModalLower, xtem)
-          CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
+          IF ((UB(IFRow) * LB(IFRow)) .LT. 0.00) THEN
+            CALL WDialogGetReal(IDF_ModalUpper, xtem)
+            CALL WDialogPutReal(IDF_ReportLower1, (xtem - 180.00))
+            CALL WDialogGetReal(IDF_ModalLower, xtem)
+            CALL WDialogPutReal(IDF_ReportUpper1, (xtem + 180.00))
+          ELSE
+            CALL WDialogGetReal(IDF_ModalUpper, xtem)
+            CALL WDialogPutReal(IDF_ReportLower1, (xtem * (-1)))
+            CALL WDialogGetReal(IDF_ModalLower, xtem)
+            CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
+          ENDIF
         ELSEIF (ModalFlag(IFRow) .EQ. 3) THEN
           CALL WDialogPutRadioButton(IDF_TriModalRadio)
           
@@ -1874,7 +1892,9 @@
                  GOTO 10
                ENDIF 
               ENDIF
-
+              CALL WDialogSelect(IDD_SA_Modal_Input2)
+              CALL WGridColourRow(IDF_parameter_grid_modal, IFRow, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))
+              LimsChanged = .TRUE.
             CASE (IDCANCEL)
               ub(IFRow) = tempprevub
               lb(IFRow) = tempprevlb
@@ -1883,13 +1903,18 @@
               ub(IFrow) = OneEighty
               lb(IFrow) = (-1) * OneEighty
               X(IFRow) = tempprevx
-              ModalFlag(IFRow) = 1                                   
+              ModalFlag(IFRow) = 1 
+              CALL WDialogSelect(IDD_SA_Modal_Input2)
+              CALL WGridColourRow(IDF_parameter_grid_modal, IFRow, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))                                              
           END SELECT
           CALL PopActiveWindowID 
           CALL WDialogHide()
+          prevub(IFRow) = UB(IFRow)
+          prevlb(IFRow) = LB(IFRow)
           CALL WDialogSelect(IDD_SA_Modal_Input2)
           CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5, IFRow, UnChecked)          
-         
+
+  
           RETURN 
              
       END SELECT
