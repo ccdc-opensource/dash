@@ -83,7 +83,7 @@
       DO I = 1, nvar
         BestValuesDoF(I,Curr_SA_Run) = SNGL(XOPT(I))
       ENDDO
-      IntensityChiSqd(Curr_SA_Run) = SNGL(-FOPT)
+      IntensityChiSqd(Curr_SA_Run) = SNGL(FOPT)
       ProfileChiSqd(Curr_SA_Run) = CHIPROBEST
       iSolTicked(Curr_SA_Run) = 1
 ! Now sort the list according to Profile chi sqd
