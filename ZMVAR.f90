@@ -22,7 +22,7 @@
       PARAMETER ( maxcopies = 8 )
 
       INTEGER maxfrg
-      PARAMETER ( maxfrg = 4 )
+      PARAMETER ( maxfrg = 32 )
 
 ! maxfrg = Maximum number of fragments = individual Z-matrices
 ! At the moment the maximum number of fragments is limited by the interface
@@ -64,13 +64,13 @@
                      IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
                      IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
                      IDFZMpars(1:maxfrg)
-      DATA IDFzmNumber / IDF_zmNumOf1,  IDF_zmNumOf2,  IDF_zmNumOf3,  IDF_zmNumOf4  /
-      DATA IDFZMFile   / IDF_zmFile1,   IDF_zmFile2,   IDF_zmFile3,   IDF_zmFile4   /
-      DATA IDBZMDelete / IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4 /
-      DATA IDBZMBrowse / IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4 /
-      DATA IDBZMView   / IDB_zmView1,   IDB_zmView2,   IDB_zmView3,   IDB_zmView4   /
-      DATA IDBzmEdit   / IDB_zmEdit1,   IDB_zmEdit2,   IDB_zmEdit3,   IDB_zmEdit4   /
-      DATA IDFZMpars   / IDF_ZM_pars1,  IDF_ZM_pars2,  IDF_ZM_pars3,  IDF_ZM_pars4  /
+      DATA IDFzmNumber / IDF_zmNumOf1,  IDF_zmNumOf2,  IDF_zmNumOf3,  IDF_zmNumOf4,  IDF_zmNumOf5,  IDF_zmNumOf6  /
+      DATA IDFZMFile   / IDF_zmFile1,   IDF_zmFile2,   IDF_zmFile3,   IDF_zmFile4,   IDF_zmFile5,   IDF_zmFile6   /
+      DATA IDBZMDelete / IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4, IDB_zmDelete5, IDB_zmDelete6 /
+      DATA IDBZMBrowse / IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4, IDB_zmBrowse5, IDB_zmBrowse6 /
+      DATA IDBZMView   / IDB_zmView1,   IDB_zmView2,   IDB_zmView3,   IDB_zmView4,   IDB_zmView5,   IDB_zmView6   /
+      DATA IDBzmEdit   / IDB_zmEdit1,   IDB_zmEdit2,   IDB_zmEdit3,   IDB_zmEdit4,   IDB_zmEdit5,   IDB_zmEdit6   /
+      DATA IDFZMpars   / IDF_ZM_pars1,  IDF_ZM_pars2,  IDF_ZM_pars3,  IDF_ZM_pars4,  IDF_ZM_pars5,  IDF_ZM_pars6  /
 
       INTEGER          nfrag
 
@@ -121,7 +121,7 @@
 
 ! zmSingleRotAxAtm
 ! zmSingleRotAxFrac
-! zmSingleRotAxAtms : the three atoms defining a plane thenormal of which is the direction of rotation
+! zmSingleRotAxAtms : the three atoms defining a plane the normal of which is the direction of rotation
 !                     These numbers are enterd by the users according to their numbering scheme,
 !                     but stored in the DASH numbering
 ! zmSingleRotationQs   = Factors in the quaternion-expression of the rotation about a single axis
@@ -160,8 +160,11 @@
       DOUBLE PRECISION blen(1:maxatm,0:maxfrg), alph(1:maxatm,0:maxfrg), bet(1:maxatm,0:maxfrg)
 
 ! blen   = bond length     (wrt iz1)
+! No copies taken into account!!!!
 ! alph   = valence angle   (wrt iz1 & iz2)
+! No copies taken into account!!!!
 ! bet    = torsion angle   (wrt iz1, iz2 & iz3)
+! No copies taken into account!!!!
 
       CHARACTER*3     asym(1:maxatm,0:maxfrg)
       INTEGER         zmElementCSD(1:maxatm,0:maxfrg)
