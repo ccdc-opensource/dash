@@ -472,7 +472,9 @@
 !A gives all necessary derivatives of YNORM with respect to anything that could
 !A be a parameter.
 !A
-!A Entry N=3 applies a shift to genus IGEN, species ISPC.
+!A Entry N=3 forms the normalised peak function, and puts it in YNORM.  It also
+!A gives all necessary derivatives of YNORM with respect to anything that could
+!A be a parameter.
 !A
 !A Entry N=4 outputs a new L PKFN card.
 !A
@@ -573,6 +575,7 @@
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       REAL ZTEM(MOBS), RTEM(3,MFCSTO), TF4PAR(MF4PAR)
+
       LOGICAL         PFNVAR
       COMMON /PFNINF/ PFNVAR(8,9,5)
 
@@ -967,10 +970,6 @@
           CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
           DO I = 1, 3
             III = IARGI + I - 2
-! JCC @@ Can get an array bound overflow error here so I've trapped for it temporarily.
-! May want to check out why ...
-! Added a hack ...
-! JvdS It should be better now, but it's not quite solved yet.
             IF (III.LE.512 .AND. III.GT.0) THEN
               PKTEM = PKCONV(III,1)
               YNORM = YNORM + C3FN(I)*PKTEM
@@ -981,7 +980,6 @@
               ENDDO
             ELSE
               CALL DebugErrorMessage('(III.LE.512 .AND. III.GT.0) in forty.f90, III = '//Integer2String(III))
-! JCC End of hack ...
             ENDIF
           ENDDO
 ! NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
@@ -1111,6 +1109,7 @@
 
       DIMENSION CFFT(8), DFFT(8), DDT(8), FR(512,8), FI(512,8),         &
      &          DR(512,8), DI(512,8), FRT(512), FIT(512)
+
       LOGICAL         PFNVAR
       COMMON /PFNINF/ PFNVAR(8,9,5)
 
@@ -1120,7 +1119,7 @@
       HMS = PKFNVA(4)
       DENTEM = (FLOAT(MNS)*ZXDEL(KNOW))
       C2TEM = PI/DENTEM
-      CTEM = 2.*C2TEM
+      CTEM = 2.0*C2TEM
       GTEM = CTEM*SIG
       CLTEM = C2TEM*GAM
 ! TO DEAL WITH (A) 90 DEGREES AND (B) ABOVE ALL WE WILL DO IS
@@ -1148,25 +1147,25 @@
 ! GAUSSIAN
         ARG = GTEM*FLOAT(II)
         FR(I,1) = EXP(-0.5*ARG*ARG)
-        FI(I,1) = 0.
+        FI(I,1) = 0.0
         DR(I,1) = -ARG*ARG*FR(I,1)/SIG
         DI(I,1) = 0.
 ! LORENTZIAN
         AFII = ABS(FLOAT(II))
         ARG = CLTEM*AFII
         FR(I,2) = EXP(-ARG)
-        FI(I,2) = 0.
+        FI(I,2) = 0.0
         DR(I,2) = -C2TEM*AFII*FR(I,2)
-        DI(I,2) = 0.
+        DI(I,2) = 0.0
 !.. ASYMMETRY FUNCTION FOR UMBRELLA EFFECT
 ! JvdS Assuming that II is an INTEGER, it should be tested against "0", not "0."
         IF (II.EQ.0 .OR. NEAR90) THEN
-          FR(I,3) = 1.
-          DR(I,3) = 0.
-          DR(I,4) = 0.
-          FI(I,3) = 0.
-          DI(I,3) = 0.
-          DI(I,4) = 0.
+          FR(I,3) = 1.0
+          DR(I,3) = 0.0
+          DR(I,4) = 0.0
+          FI(I,3) = 0.0
+          DI(I,3) = 0.0
+          DI(I,4) = 0.0
         ELSE
           SII = SQRT(AFII)
           VAL = FLOAT(II)
@@ -1186,13 +1185,13 @@
           COSM = COS(BETM2*VAL)
 ! BET1 AND BETPI CHANGE SIGN AT 90 DEGREES
 ! BET2, BETP, BETM, BETP2 AND BETM2 DO NOT
-          FR(I,3) = ((HPS*FRCP-HMS*FRCM)-BETPK*(SINP-SINM))/DENASY
+          FR(I,3) =  ((HPS*FRCP-HMS*FRCM)-BETPK*(SINP-SINM))/DENASY
           FI(I,3) = -((HPS*FRSP-HMS*FRSM)+BETPK*(COSP-COSM))/DENASY
-          DR(I,3) = (FRCP-HPS*FR(I,3))/DENASY
+          DR(I,3) =  (FRCP-HPS*FR(I,3))/DENASY
           DI(I,3) = -(FRSP-HPS*FI(I,3))/DENASY
-          DR(I,4) = (HMS*FR(I,3)-FRCM)/DENASY
+          DR(I,4) =  (HMS*FR(I,3)-FRCM)/DENASY
           DI(I,4) = -(HMS*FI(I,3)-FRSM)/DENASY
-          IF (ARGK.GT.90.) THEN
+          IF (ARGK.GT.90.0) THEN
             FI(I,3) = -FI(I,3)
             DI(I,3) = -DI(I,3)
             DI(I,4) = -DI(I,4)
@@ -1223,8 +1222,8 @@
       DO J = 1, NPKGEN(JPHASE,JSOURC)
         IF (PFNVAR(J,JPHASE,JSOURC)) CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
       ENDDO
-! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
-      XTEM = 1./ZXDEL(KNOW)
+! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKCONV
+      XTEM = 1.0/ZXDEL(KNOW)
       DO I = 1, MNS
         II = MOD(I+MN2M1,MNS) + 1
         PKCONV(II,1) = FRT(I)*XTEM
