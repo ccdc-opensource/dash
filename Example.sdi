@@ -1,8 +1,9 @@
  TIC .\Example.tic
  HCV .\Example.hcv
+ HKL .\Example.hkl
  PIK .\Example.pik
  RAW .\Example.xye
  DSL .\Example.dsl
- Cell    9.93975   8.49913   7.31815   90.0000  111.1889   90.0000
+ Cell    9.93817   8.49777   7.31696   90.0000  111.1893   90.0000
  SpaceGroup   39      4:b       P 1 21 1    
- PawleyChiSq       2.79
+ PawleyChiSq       2.51
