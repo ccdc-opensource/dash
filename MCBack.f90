@@ -98,7 +98,7 @@
       REAL    xkt(MAXSSPL)
       INTEGER ikt(MAXSSPL),ipartem(MAXSSPL)
       REAL    es(MOBS)
-      REAL    ys(-200:MOBS+200)
+      REAL    ys(1-200:MOBS+200), tYBBIN(1:MOBS)
       INTEGER jft(MOBS)
       REAL    tRandomNumber
       INTEGER I, II, I1, I2, KK, jf1, jf0, jfp1, jfn, n0, ndiv
@@ -107,7 +107,8 @@
       INTRINSIC MOD
       REAL    rat, stem
       REAL AvgBeg
-      INTEGER Nbeg
+      INTEGER Nbeg, Window, J, iLower, iUpper
+      REAL Iavg, Imin ! Average and minimum Intensity, as mentioned in Brueckner's paper
 !
 !  This subroutine determines the background using a smoothing
 !  procedure published by Sergio Brueckner in J. Appl. Cryst. (2000) 33, 977-979
@@ -115,6 +116,13 @@
 !  and raise background to correct value using a Monte Carlo sampling procedure
 !
       CALL WCursorShape(CurHourGlass)
+      Iavg = 0.0
+      Imin = YOBIN(1)
+      DO I = 1, NBIN
+        Iavg = Iavg + YOBIN(I)
+        Imin = MIN(Imin, YOBIN(I))
+      ENDDO
+      Iavg = Iavg / FLOAT(NBIN)
       !C Calculate the average of the first Nbeg points
       AvgBeg = 0.0
       Nbeg = 1
@@ -122,16 +130,31 @@
         AvgBeg = AvgBeg + YOBIN(I)
       ENDDO
       AvgBeg = AvgBeg / Nbeg
-      DO I = -nbruckwin, 0
+      DO I = 1-nbruckwin, 0
         ys(I) = AvgBeg
       ENDDO
       DO I = 1, NBIN
         ys(I) = YOBIN(I)
       ENDDO
-      DO I = 1, nbruckwin
-        ii = NBIN + I
-        ys(ii) = YOBIN(NBIN)
+      DO I = NBIN+1, NBIN+nbruckwin
+        ys(I) = YOBIN(NBIN)
       ENDDO
+
+  !    Window = 7
+  !    DO I = 1, NBIN
+  !      Iavg = 0.0  
+  !      iLower = MAX(1-nbruckwin, I-Window)
+  !      iUpper = MIN(NBIN+nbruckwin,I+Window)
+  !      DO J = iLower, iUpper
+  !        Iavg = Iavg + YOBIN(J)
+  !      ENDDO
+  !      ys(I) = Iavg / (1+iUpper-iLower)
+  !    ENDDO
+
+
+  !    DO I = 1-nbruckwin, NBIN+nbruckwin
+  !      ys(I) = MIN(ys(I), 3.0*Iavg-2.0*Imin)
+  !    ENDDO
       DO iter = 1, mbruckiter
 ! Loop over data points
         DO I = 1, NBIN
@@ -149,19 +172,34 @@
 ! Use a Monte Carlo algorithm to find the correct height of the background
 ! rat = ratio?
             rat = (YBBIN(I)-ys(I))/EBIN(I)
+       !C     rat = (YBBIN(I)-YOBIN(I))/EBIN(I) ! This is what is used in the original paper.
             stem = 1.0 / (1.0 + EXP(MIN(20.0,-rat)))  
             CALL RANDOM_NUMBER(tRandomNumber)
             IF (tRandomNumber .LT. stem) YBBIN(I) = ys(I)
+       !C     IF (tRandomNumber .LT. stem) YBBIN(I) = YOBIN(I) ! This is what is used in the original paper.
             ys(I) = YBBIN(I)
           ENDDO
         ELSE
           DO I = 1, NBIN
             ys(I) = MIN(YBBIN(I),ys(I))
+       !C     ys(I) = MIN(YBBIN(I), YOBIN(I)) ! This is what is used in the original paper.
           ENDDO
         ENDIF
       ENDDO
-! Now we should do some spline smoothing to remove the noise 
+! Now we should do some spline smoothing to remove the noise
       IF (UseMc) THEN
+  !      Window = 35
+  !      DO I = 1, NBIN
+  !        Iavg = 0.0  
+  !        iLower = MAX(1, I-Window)
+  !        iUpper = MIN(NBIN,I+Window)
+  !        DO J = iLower, iUpper
+  !          Iavg = Iavg + YBBIN(J)
+  !        ENDDO
+  !        tYBBIN(I) = Iavg / (1+iUpper-iLower)
+  !      ENDDO
+  !      YBBIN = tYBBIN
+  !      GOTO 10
         nsep    =  5
         ninsep  = 10
         ngood   =  0
@@ -204,6 +242,7 @@
           ndiv = 1 + ikt(jfp1) - n0
           CALL SplineSmooth(XBIN(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,YBBIN(n0))
         ENDDO
+ !  10   CONTINUE
       ENDIF
       CALL WCursorShape(CurCrossHair)
 
