@@ -21,41 +21,43 @@
       CALL WizardWindowShow(IDD_SAW_Page1)
       PastPawley = .TRUE.
 ! Grey out 'Delete all peak fit ranges' button on toolbar
-      CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
+      CALL WMenuSetState(ID_ClearPeakFitRanges, ItemEnabled, WintOff)
 ! Grey out 'Fit peaks' button on toolbar
-      CALL WMenuSetState(ID_FitPeaks,ItemEnabled,WintOff)
+      CALL WMenuSetState(ID_FitPeaks, ItemEnabled, WintOff)
 ! Grey out 'Clear cell parameters' button on toolbar
-      CALL WMenuSetState(ID_Delabc,ItemEnabled,WintOff)
+      CALL WMenuSetState(ID_Delabc, ItemEnabled,WintOff)
 ! Grey out 'Remove Background' button on toolbar
-      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
+      CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOff)
 ! Grey out 'Load diffraction pattern' button on toolbar
-      CALL WMenuSetState(ID_import_xye_file,ItemEnabled,WintOff)
+      CALL WMenuSetState(ID_import_xye_file, ItemEnabled, WintOff)
 ! Make unit cell etc. read only under 'View' 
       CALL Upload_Cell_Constants
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogFieldState(IDF_Space_Group_Menu,DialogReadOnly)
-      CALL WDialogFieldState(IDF_Crystal_System_Menu,DialogReadOnly)
-      CALL WDialogFieldState(IDF_ZeroPoint,DialogReadOnly)
-      CALL WDialogFieldState(IDAPPLY,DialogReadOnly)
-      CALL WDialogFieldState(IDB_Delabc,Disabled)
+      CALL WDialogFieldState(IDF_Space_Group_Menu, DialogReadOnly)
+      CALL WDialogFieldState(IDF_Crystal_System_Menu, DialogReadOnly)
+      CALL WDialogFieldState(IDF_ZeroPoint, DialogReadOnly)
+      CALL WDialogFieldState(IDAPPLY, DialogReadOnly)
+      CALL WDialogFieldState(IDB_Delabc, Disabled)
       CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogFieldState(IDAPPLY,DialogReadOnly)
-      CALL WDialogFieldState(IDF_wavelength1,DialogReadOnly)
-      CALL WDialogFieldState(IDF_Wavelength_Menu,DialogReadOnly)
-      CALL WDialogFieldState(IDF_LabX_Source,DialogReadOnly)
-      CALL WDialogFieldState(IDF_SynX_Source,DialogReadOnly)
-      CALL WDialogFieldState(IDF_CWN_Source,DialogReadOnly)
-      CALL WDialogFieldState(IDF_TOF_source,DialogReadOnly)
+      CALL WDialogFieldState(IDAPPLY, DialogReadOnly)
+      CALL WDialogFieldState(IDF_wavelength1, DialogReadOnly)
+      CALL WDialogFieldState(IDF_Wavelength_Menu, DialogReadOnly)
+      CALL WDialogFieldState(IDF_LabX_Source, DialogReadOnly)
+      CALL WDialogFieldState(IDF_SynX_Source, DialogReadOnly)
+      CALL WDialogFieldState(IDF_CWN_Source, DialogReadOnly)
+      CALL WDialogFieldState(IDF_TOF_source, DialogReadOnly)
       CALL WDialogSelect(IDD_Peak_Positions)
-      CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
+      CALL WDialogFieldState(ID_Index_Output, DialogReadOnly)
       CALL WDialogSelect(IDD_ViewPawley)
-      CALL WDialogFieldState(IDF_Sigma1,DialogReadOnly)
-      CALL WDialogFieldState(IDF_Sigma2,DialogReadOnly)
-      CALL WDialogFieldState(IDF_Gamma1,DialogReadOnly)
-      CALL WDialogFieldState(IDF_Gamma2,DialogReadOnly)
+      CALL WDialogFieldState(IDF_Sigma1, DialogReadOnly)
+      CALL WDialogFieldState(IDF_Sigma2, DialogReadOnly)
+      CALL WDialogFieldState(IDF_Gamma1, DialogReadOnly)
+      CALL WDialogFieldState(IDF_Gamma2, DialogReadOnly)
+      CALL WDialogFieldState(IDF_HPSL, DialogReadOnly)
+      CALL WDialogFieldState(IDF_HMSL, DialogReadOnly)
 ! Grey out 'Remove background' button on toolbar
-      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
-      CALL SetModeMenuState(-1,-1)
+      CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOff)
+      CALL SetModeMenuState(-1, -1)
       CALL SelectMode(ID_Structure_Solution_Mode)
       IPTYPE = 1
       CALL Profile_Plot
@@ -115,12 +117,12 @@
             CASE (IDNEXT, IDB_PO)
 ! Go to the next stage of the SA input
 ! Grey out 'Load DASH Pawley file' button on toolbar
-              CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOff)
+              CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOff)
               CALL WDialogSelect(IDD_SAW_Page1)
               DO iFrg = 1, maxfrg
                 IF (gotzmfile(iFrg)) THEN
 ! Get the number of copies to use. If zero, set gotzmfile to .FALSE.
-                  CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+                  CALL WDialogGetInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
                   IF (zmNumberOfCopies(iFrg) .EQ. 0) gotzmfile(iFrg) = .FALSE.
                 ENDIF
               ENDDO
@@ -139,7 +141,7 @@
             CASE (IDB_SA_Project_Browse)
               CALL SDIFileBrowse
             CASE (IDB_SA_Project_Open)
-              CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
+              CALL WDialogGetString(IDF_SA_Project_Name, SDIFile)
               CALL SDIFileOpen(SDIFile)
             CASE (IDB_SA_Project_Import)
 ! Import .. convert a mol/pdb/mol2 file into a Z-matrix
@@ -163,7 +165,7 @@
                           "Z-matrix files (*.zmatrix)|*.zmatrix|"//&
                           "Molecular model files|*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"
               iSelection = 2
-              CALL WSelectFile(FilterStr, iFlags, tFileName,'Load Z-matrix file',iSelection)
+              CALL WSelectFile(FilterStr, iFlags, tFileName, 'Load Z-matrix file', iSelection)
 ! Did the user press cancel?
               IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) GOTO 999
 ! I don't think the following answer is allowed by Winteracter
@@ -171,7 +173,7 @@
                 gotzmfile(iFrg) = .FALSE.
                 GOTO 999
               ENDIF
-              CALL SplitPath(tFileName,DirName,FileName)
+              CALL SplitPath(tFileName, DirName, FileName)
 ! Determine the extension. If Z-matrix, load it
               tLen = LEN_TRIM(FileName)
               tExtension = ''
@@ -189,10 +191,10 @@
 ! traps for Z-matrix reading
                 ELSE 
                   gotzmfile(iFrg) = .FALSE. 
-                  CALL FileErrorPopup(frag_file(iFrg),zmread)
+                  CALL FileErrorPopup(frag_file(iFrg), zmread)
                 ENDIF ! If the read on the Z-matrix was ok
               ELSE
-                CALL zmConvert(tFileName,tNumZMatrices,tZmatrices)
+                CALL zmConvert(tFileName, tNumZMatrices, tZmatrices)
                 IF (tNumZMatrices .EQ. 0) RETURN
                 tNextzmNum  = 1
    10           CONTINUE
@@ -211,7 +213,7 @@
                   ENDDO
                 ELSE
                   gotzmfile(iFrg) = .FALSE.
-                  CALL FileErrorPopup(frag_file(iFrg),zmread)
+                  CALL FileErrorPopup(frag_file(iFrg), zmread)
 ! Slot still free, so iFrg still OK.
                 ENDIF
 ! More Z-matrices to read?
@@ -246,17 +248,17 @@
               DO WHILE (IDBZMUp(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
-              CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+              CALL WDialogGetInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
               zmNumberOfCopies(iFrg) = MIN(8, zmNumberOfCopies(iFrg) + 1)
-              CALL WDialogPutInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+              CALL WDialogPutInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
             CASE (IDB_Down1, IDB_Down2, IDB_Down3, IDB_Down4, IDB_Down5, IDB_Down6)
               iFrg = 1
               DO WHILE (IDBZMDown(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
-              CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+              CALL WDialogGetInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
               zmNumberOfCopies(iFrg) = MAX(1, zmNumberOfCopies(iFrg) - 1)
-              CALL WDialogPutInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+              CALL WDialogPutInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
           END SELECT
         CASE (FieldChanged)
           DO iFrg = 1, maxfrginterface
@@ -264,7 +266,7 @@
               ! Winteracter doesn't allow us to keep track of the "number of copies" input box
               ! having been changed, and we need to have updated the internal variables before
               ! calling UpdateZmatrixSelection(), so we will read out those boxes now.
-              CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+              CALL WDialogGetInteger(IDFzmNumber(iFrg), zmNumberOfCopies(iFrg))
             ENDIF
           ENDDO
       END SELECT
@@ -303,8 +305,8 @@
         axyzo(I,1) = SNGL(CART(1,I))
         axyzo(I,2) = SNGL(CART(2,I))
         axyzo(I,3) = SNGL(CART(3,I))
-        aelem(I) = zmElementCSD(I,iFrg)
-        atomlabel(I) = OriginalLabel(I,iFrg)
+        aelem(I) = zmElementCSD(I, iFrg)
+        atomlabel(I) = OriginalLabel(I, iFrg)
       ENDDO
       nbocry = NumberOfBonds(iFrg)
       DO BondNr = 1, nbocry
@@ -317,7 +319,7 @@
 ! Only problem: changing a hydrogen into, say, a carbon
 ! might give rise to new bonds that will not be taken into account.
 ! Oh, and removing an atom can change a bond type, e.g. from "aromatic" to "double"
-      CALL WDialogShow(-1,-1,0,SemiModeLess)
+      CALL WDialogShow(-1, -1, 0, SemiModeLess)
 
       END SUBROUTINE ShowEditZMatrixWindow
 !
@@ -347,8 +349,8 @@
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_Set)
-              CALL WDialogGetReal(IDF_BisoOccValue,tReal)
-              CALL WDialogGetMenu(IDF_BisoOccMenu,iOption)
+              CALL WDialogGetReal(IDF_BisoOccValue, tReal)
+              CALL WDialogGetMenu(IDF_BisoOccMenu, iOption)
               SELECT CASE (iOption)
                 CASE (1)
                   iColumn = 4 ! Biso
@@ -359,18 +361,18 @@
                   IF (tReal .LT.   0.0) tReal =  0.0
                   IF (tReal .GT.  10.0) tReal = 10.0
               END SELECT              
-              CALL WDialogGetMenu(IDF_WhichAtomMenu,iOption)
+              CALL WDialogGetMenu(IDF_WhichAtomMenu, iOption)
               DO iAtomNr = 1, natoms(iFrg)
 ! Biso / occupancies
                 SELECT CASE (iOption)
                   CASE (1) ! All atoms
                     ThisOne = .TRUE.
                   CASE (2) ! All non-hydrogens
-                    ThisOne = (zmElementCSD(izmbid(iAtomNr,iFrg),iFrg) .NE. 2)
+                    ThisOne = (zmElementCSD(izmbid(iAtomNr, iFrg), iFrg) .NE. 2)
                   CASE (3) ! All hydrogens
-                    ThisOne = (zmElementCSD(izmbid(iAtomNr,iFrg),iFrg) .EQ. 2)
+                    ThisOne = (zmElementCSD(izmbid(iAtomNr, iFrg), iFrg) .EQ. 2)
                 END SELECT
-                IF (ThisOne) CALL WGridPutCellReal(IDF_AtomPropGrid,iColumn,iAtomNr,tReal,'(F5.3)')
+                IF (ThisOne) CALL WGridPutCellReal(IDF_AtomPropGrid, iColumn, iAtomNr, tReal, '(F5.3)')
               ENDDO
               CALL zmCopyDialog2Temp
             CASE (IDB_Relabel)
@@ -402,8 +404,8 @@
               CALL zmCopyDialog2Temp
               natcry = NATOMS(iFrg)
               DO iAtomNr = 1, natcry
-                atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
-                aelem(iAtomNr) = zmElementCSD(iAtomNr,iFrg)
+                atomlabel(iAtomNr) = OriginalLabel(iAtomNr, iFrg)
+                aelem(iAtomNr) = zmElementCSD(iAtomNr, iFrg)
               ENDDO
               tLength = LEN_TRIM(frag_file(iFrg))
               temp_file = frag_file(iFrg)(1:tLength-8)//'_temp.mol2'
@@ -417,7 +419,7 @@
 !C! Takes bonds              from bond      in SAMVAR
 !C! Takes bond types         from btype     in SAMVAR
 !C! and writes out a .mol2 file
-              IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) CALL ViewStructure(temp_file)
+              IF (WriteMol2(temp_file, .TRUE., iFrg) .EQ. 1) CALL ViewStructure(temp_file)
               CALL IOSDeleteFile(temp_file)
             CASE (IDB_Rotations)
               CALL ShowEditZMatrixRotationsWindow
@@ -501,7 +503,7 @@
 ! If this was the pivot atom, use centre of mass
                 IF (icomflg(iFrg) .EQ. iAtomNr) icomflg(iFrg) = 0 
                 IF (natoms(iFrg) .NE. 0) THEN
-                  CALL WGridSetCell(IDF_AtomPropGrid,1,1)
+                  CALL WGridSetCell(IDF_AtomPropGrid, 1, 1)
                   natoms(iFrg) = natoms(iFrg) - 1
                 ENDIF
                 DO i = 1, natoms(iFrg)
@@ -509,7 +511,7 @@
                 ENDDO
                 CALL zmCopyTemp2Dialog
               ENDIF
-              CALL WGridPutCellCheckBox(IDF_AtomPropGrid,2,irow,Unchecked)
+              CALL WGridPutCellCheckBox(IDF_AtomPropGrid, 2, irow, Unchecked)
             ENDIF
           ENDIF
       END SELECT
@@ -529,7 +531,7 @@
       CALL zmCopyDialog2Temp
       CALL zmRotCopyTemp2Dialog
       CALL WDialogSelect(IDD_zmEditRotations)
-      CALL WDialogShow(-1,-1,0,SemiModeLess)
+      CALL WDialogShow(-1, -1, 0, SemiModeLess)
 
       END SUBROUTINE ShowEditZMatrixRotationsWindow
 !
