@@ -156,8 +156,6 @@
       LOGICAL FnWaveLengthOK ! Function
 !
       Check_TicMark_Data = (XPMAX-XPMIN).GT.0.1      ! Check that we have some data
-      Check_TicMark_Data = Check_TicMark_Data .AND. FnUnitCellOK() .AND.&
-     &                     FnWaveLengthOK()
-      RETURN
+      Check_TicMark_Data = Check_TicMark_Data .AND. FnUnitCellOK() .AND. FnWaveLengthOK()
 !
       END FUNCTION CHECK_TICMARK_DATA

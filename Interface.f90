@@ -24,7 +24,7 @@
 !
       SUBROUTINE Upload_Cell_Constants()
 !
-! Puts the global variables CellPar(1:6) in the Winteracter menus
+! Puts the global variables CellPar(1:6) into the Winteracter menus
 !
       USE WINTERACTER
       USE DRUID_HEADER
@@ -61,11 +61,6 @@
           ELSE
             CALL WDialogClearField(CellParID(I))
           ENDIF
-          IF (CellParConstrained(I) .OR. (WindowNr .EQ. 3)) THEN
-            CALL WDialogFieldState(CellParID(I),Disabled)
-          ELSE
-            CALL WDialogFieldState(CellParID(I),Enabled)
-          ENDIF
         ENDDO
 ! ... and the unit cell angles
         DO I = 4, 6
@@ -74,13 +69,19 @@
           ELSE
             CALL WDialogPutReal(CellParID(I),CellPar(I),'(F10.3)')
           ENDIF
-          IF (CellParConstrained(I) .OR. (WindowNr .EQ. 3)) THEN
-            CALL WDialogFieldState(CellParID(I),Disabled)
-          ELSE
-            CALL WDialogFieldState(CellParID(I),Enabled)
-          ENDIF
         ENDDO
+!Update their Enabled/Disabled state depending on whether they are constrained by the crystal system
+        IF (WindowNr .NE. 3) THEN
+          DO I = 1, 6
+            IF (CellParConstrained(I)) THEN
+              CALL WDialogFieldState(CellParID(I),Disabled)
+            ELSE
+              CALL WDialogFieldState(CellParID(I),Enabled)
+            ENDIF
+          ENDDO
+        ENDIF
       ENDDO
+      CALL CheckIfWeCanDoAPawleyRefinement
       CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Cell_Constants
@@ -105,6 +106,7 @@
       CALL WDialogGetReal(IDF_alp_latt,CellPar(4))      
       CALL WDialogGetReal(IDF_bet_latt,CellPar(5))      
       CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
+      CALL CheckIfWeCanDoAPawleyRefinement
       CALL PopActiveWindowID
 
       END SUBROUTINE Download_Cell_Constants
@@ -209,6 +211,7 @@
         CALL WDialogSelect(IDD_PW_Page4)
         CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
       ENDIF
+      CALL CheckIfWeCanDoAPawleyRefinement
       CALL PopActiveWindowID
 
       END SUBROUTINE UpdateWavelength
@@ -221,7 +224,6 @@
       USE DRUID_HEADER 
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'lattice.inc'
 
       INTEGER CurrentRange 
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR), &
@@ -242,7 +244,7 @@
 
       REAL    PkArgK(MTPeak), PkTicDif(MTPeak)
       REAL    TwoThetaDiff, AbsTwoThetaDiff
-      INTEGER ICurSel ,IArgK(MTPeak)
+      INTEGER IArgK(MTPeak)
 
 ! JvdS Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
 ! Store all peaks thus found in one flat array: AllPkPosVal
@@ -320,7 +322,7 @@
         END DO
       END IF
 ! Write out all the peak positions in an ordered list ...
-      ICurSel = WinfoDialog(CurrentDialog)
+      CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogClearField(IDD_Peak_Positions_Grid)
       CALL WDialogSelect(IDD_Peak_Positions)
@@ -332,7 +334,7 @@
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,1,I,AllPkPosVal(IOrd),'(F12.4)')
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,2,I,AllPkPosEsd(IOrd),'(F12.4)')
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,3,I,PkArgK(I),'(F12.4)')
-          DifTem = AllPkPosVal(IOrd)-PkArgK(I)
+          DifTem = AllPkPosVal(IOrd) - PkArgK(I)
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,4,I,DifTem,'(F12.4)')
           CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,5,I,IHPk(1,I))
           CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,6,I,IHPk(2,I))
@@ -347,7 +349,7 @@
       END IF
 ! Now do a refinement ...
       CALL RefineLattice()
-      IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Positions
 !
