@@ -70,7 +70,8 @@
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -391,9 +392,7 @@
         CALL RFACS(6)
 ! IF CAIL, OUTPUT EIGENVALUES & EIGENVECTORS IF REQUIRED BY "I PREE"
         IF (DONE) CALL EIGEN(ALSQ,MATSZ)
-!O JvdS The following line used to be the old code. I moved it to out of the loop 7 May 2002
-!O because it crashed DASH (some values set to FFFFFFFFh)
-!O        IF (DONE) CALL HESCOR(ALSQ,MATSZ)
+        IF (DONE) CALL HESCOR(ALSQ,MATSZ)
 ! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 ! INVERT MATRIX:
@@ -418,9 +417,8 @@
         CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RWPEXP,'(F12.2)')
       ENDDO
 ! PRINT CORRELATION MATRIX:
-   39 CALL MATCOR(ALSQ,MATSZ)
-! Used to be inside the loop (see comment)  
-      CALL HESCOR(ALSQ,MATSZ)
+   39 CONTINUE
+      CALL MATCOR(ALSQ,MATSZ)
 ! OUTPUT H,K,L IF REQUIRED:
       CALL HKLOUT(PCXX,ALSQ,MATSZ)
       CALL CLOFIL(ISCR)
@@ -523,7 +521,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -1069,7 +1068,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
