@@ -391,8 +391,6 @@
       ygcur(1) = EventInfo%GY
       CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
       XCurFirst = xcur(1)
-      CALL WMessageEnable(MouseMove, Enabled)
-      CALL WMessageEnable(MouseButUp, Enabled)
 ! The first WMessage loop is solely concerned with determining the range
 ! over which we will fit the Bragg peak(s) so we will only check out
 ! Expose, Resize, MouseMove, MouseButUp and a very limited number of
@@ -437,6 +435,8 @@
               CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
             ENDDO 
           CASE (MouseButUp)
+            CALL WMessageEnable(MouseMove, Disabled)
+            CALL WMessageEnable(MouseButUp, Disabled)
 ! MouseButUp action for selecting the peak fitting region
 ! Remove old cross-hair
             CALL IGrPlotMode('EOR')
@@ -469,6 +469,7 @@
               CALL ErrorMessage('Not enough points for peak fitting!'//CHAR(13)//'Try a larger range.')
             ELSE
               NumPeakFitRange = NumPeakFitRange + 1
+              RangeFitYN(NumPeakFitRange) = .FALSE.
 ! Ungrey 'Delete all peak fit ranges' button on toolbar
               CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
 ! Ungrey 'Clear Peaks' button in Wizard window
@@ -553,17 +554,24 @@
 
       COMMON /CURVAL/ XCurFirst
       
-      COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),PkFnEsd(MPkDes,Max_NPFR), &
-        PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &
-        PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-        PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),PkPosAv(MAX_NPFR)
+      REAL              PkFnVal,                      PkFnEsd,                      &
+                        PkFnCal,                                                    &
+                        PkFnVarVal,                   PkFnVarEsd,                   &
+                        PkAreaVal,                    PkAreaEsd,                    &
+                        PkPosVal,                     PkPosEsd,                     &
+                        PkPosAv
+      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+                        PkFnCal(MPkDes,Max_NPFR),                                   &
+                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+                        PkPosAv(MAX_NPFR)
 
       REAL PkFnValTem(MPkDes,Max_NPFR),PkFnEsdTem(MPkDes,Max_NPFR), &
-!      PkFnCalTem(MPkDes,Max_NPFR),PkFnVarValTem(3,MPkDes),PkFnVarEsdTem(3,MPkDes), &
       PkAreaValTem(MAX_NPPR,MAX_NPFR),PkAreaEsdTem(MAX_NPPR,MAX_NPFR), &
       PkPosValTem(MAX_NPPR,MAX_NPFR),PkPosEsdTem(MAX_NPPR,MAX_NPFR),PkPosAvTem(MAX_NPFR)
 
-      LOGICAL Confirm ! Function
+      LOGICAL, EXTERNAL :: Confirm
 
       xcur(1) = XCurFirst
       xgcur(2) = EventInfo%GX
@@ -583,6 +591,7 @@
                  LTEM = II
               ENDIF
             ENDDO
+! LTEM now holds the peak fit range we will delete. Shuffle all other peak fit ranges.
             KK = 0
             KR = 0
             DO II = 1, NumPeakFitRange
@@ -655,6 +664,7 @@
               ENDDO
             ENDIF
             II = NumPeakFitRange + 1
+            RangeFitYN(II) = .FALSE.
             NumInPFR(II) = 0
             IPF_RPt(II) = KR
 ! JCC Next line to zero the deleted range value completely
@@ -668,84 +678,104 @@
             ENDDO
             IPF_Range(II) = 0                            
           ENDIF ! WInfoDialog(4).EQ.CommonYes
+          CALL Profile_Plot
+          CALL Upload_Positions
+          CALL Upload_Widths
         ENDIF ! NumPeakFitRange.eq.0
-        CALL Profile_Plot
-        CALL Upload_Positions
-        CALL Upload_Widths
       ELSE IF (EventInfo%VALUE1.GE.49 .AND. EventInfo%VALUE1.LE.57) THEN
 ! KeyNumber=1-9: locating peak positions...
 ! Are we in a peak range?
-        IF (NumPeakFitRange.GT.0) THEN
-          InRange = 0
-          DO II = 1, NumPeakFitRange
-            IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II)) THEN
-! The cursor is sitting inside a peak range - go for it!
-              InRange = II
-            ENDIF
-          ENDDO
-          IF (InRange .NE. 0) THEN
-            NTPeak = EventInfo%VALUE1 - 48
-            NTem = NumInPFR(InRange) + 1
-            IF (NTPeak .GT. NTem) THEN
-! We've gone for too big a number - ignore
-            ELSE IF (NTPeak.EQ.NTem) THEN
-! Here's the next peak
-              NumInPFR(InRange) = NTem
-              XPF_Pos(NTem,InRange) = XCur(2)
-              ATem = ABS(XCur(2)-XBin(IPF_Lo(InRange)))
-              DO IP = IPF_Lo(InRange), IPF_Hi(InRange)
-                ANew = ABS(XCur(2)-XBIN(IP))
-                IF (ANew.LE.ATem) THEN
-                  ATem = ANew
-                  YPF_Pos(NTem,InRange) = YOBIN(IP)
-                ENDIF
-              ENDDO
-            ELSE
-! Reposition an existing peak
-              XPF_Pos(NTPeak,InRange) = XCur(2)
-              ATem = ABS(XCur(2) - XBIN(IPF_Lo(InRange)))
-              DO IP = IPF_Lo(InRange), IPF_Hi(InRange)
-                ANew = ABS(XCur(2) - XBIN(IP))
-                IF (ANew.LE.ATem) THEN
-                  ATem = ANew
-                  YPF_Pos(NTPeak,InRange) = YOBIN(IP)
-                ENDIF
-              ENDDO
-            ENDIF ! NTPeak.eq.NTem
-          ENDIF ! InRange.ne.0
-        ENDIF ! NumPeakFitRange.gt.0
+        CALL DetermineCurrentPeakFitRange(XCur(2))
+        IF (CurrentRange .NE. 0) THEN
+          NTPeak = EventInfo%VALUE1 - 48
+! Three cases : 1. existing peak, 2. next peak, 3. too big.
+! Next peak
+          IF (NTPeak .EQ. (NumInPFR(CurrentRange) + 1)) CALL INC(NumInPFR(CurrentRange))
+          IF (NTPeak .LE. NumInPFR(CurrentRange)) THEN
+! When we are here, we are either adding a peak or shifting an old one. Either way, mark the hatched area as 'not fitted'
+            RangeFitYN(CurrentRange) = .FALSE.
+            XPF_Pos(NTPeak,CurrentRange) = XCur(2)
+            ATem = ABS(XCur(2)-XBIN(IPF_Lo(CurrentRange)))
+            DO IP = IPF_Lo(CurrentRange), IPF_Hi(CurrentRange)
+              ANew = ABS(XCur(2)-XBIN(IP))
+              IF (ANew.LE.ATem) THEN
+                ATem = ANew
+                YPF_Pos(NTPeak,CurrentRange) = YOBIN(IP)
+              ENDIF
+            ENDDO
+            CALL Profile_Plot
+          ENDIF
+        ENDIF
 ! We've got ourselves a new initial peak position
-        CALL Profile_Plot
       ELSE IF (EventInfo%VALUE1.EQ.48 .OR. EventInfo%VALUE1.EQ.KeyReturn) THEN
 ! KeyNumber=0 or KeyReturn: get ready to fit peaks ...
 ! Check if in a peak range - if not tell the user...
-        IF (NumPeakFitRange.GT.0) then
-          InRange = 0
-          DO II = 1, NumPeakFitRange
-            IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II) ) THEN
-! The cursor is sitting inside a peak range - go for it!
-              InRange = II
-            ENDIF
-          ENDDO
-          IF (InRange .EQ. 0) THEN
+        CALL DetermineCurrentPeakFitRange(XCur(2))
+        IF (CurrentRange .EQ. 0) THEN
 ! Tell the user to place the cursor in the range to be fitted.
-            CALL ErrorMessage('Place the cursor in a peak fitting range.')
-          ELSE
+          CALL ErrorMessage('Place the cursor in a peak fitting range.')
+        ELSE
 ! We're ready to fit the Bragg peaks
-            CurrentRange = InRange
 ! One or more peaks to be fitted - initial positions determined by user
-! If NumInPFR(InRange).eq.0 we're going to search & fit a single peak
-            CALL WCursorShape(CurHourGlass)
-            CALL MultiPeak_Fitter()
-            CALL WCursorShape(CurCrossHair)
-          ENDIF ! InRange.eq.0
-        ENDIF ! NumPeakFitRange.gt.0                
-        CALL Profile_Plot
+! If NumInPFR(InRange).EQ.0 we're going to search & fit a single peak
+          CALL WCursorShape(CurHourGlass)
+          CALL MultiPeak_Fitter()
+          CALL WCursorShape(CurCrossHair)
+          CALL Profile_Plot
+        ENDIF
       ENDIF
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL CheckIfWeCanIndex
 
       END SUBROUTINE Check_KeyDown_PeakFit_Inner
+!
+!*****************************************************************************
+!
+      SUBROUTINE DetermineCurrentPeakFitRange(TheMouseCursorPosition)
+!
+! This routine determines which peak fit range the mouse cursor is currently in
+! and returns the number in the global variable CurrentRange.
+! CurrentRange is set to 0 if there are no peak fit ranges or 
+! if the mouse cursor is not inside one.
+! If peak fit ranges overlap, the most recent one is returned. This way, the sequence
+! sweep area, press return, sweep area, press return will make sense even if the mouse
+! cursor is placed in an area where the two areas overlap.
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheMouseCursorPosition
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
+      INTEGER I
+
+      CurrentRange = 0
+      IF (NumPeakFitRange .EQ. 0) RETURN
+      DO I = 1, NumPeakFitRange
+        IF (TheMouseCursorPosition.GE.XPF_Range(1,I) .AND. TheMouseCursorPosition.LE.XPF_Range(2,I)) THEN
+          CurrentRange = I
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE DetermineCurrentPeakFitRange
 !
 !*****************************************************************************
 !
@@ -780,9 +810,14 @@
       INTEGER IndexOption
 
       NPeaksFitted = 0
-      DO I = 1, NumPeakFitRange
-        NPeaksFitted = NPeaksFitted + NumInPFR(I)
-      ENDDO
+! Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
+      IF (NumPeakFitRange .GT. 0) THEN
+        DO I = 1, NumPeakFitRange
+          IF (RangeFitYN(I)) THEN
+            NPeaksFitted = NPeaksFitted + NumInPFR(I)
+          ENDIF
+        ENDDO
+      ENDIF
       CALL PushActiveWindowID
       IF (NPeaksFitted .GE. 10) THEN
         CALL WDialogSelect(IDD_PW_Page7)
@@ -792,11 +827,7 @@
       ELSE
         CALL WDialogSelect(IDD_PW_Page7)
         CALL WDialogGetRadioButton(IDF_RADIO3,IndexOption) ! 'Index now' or 'Enter known cell'
-        IF (IndexOption .EQ. 2) THEN
-          CALL WDialogFieldState(IDNEXT,Enabled)
-        ELSE
-          CALL WDialogFieldState(IDNEXT,Disabled)
-        ENDIF
+        CALL WDialogFieldStateLogical(IDNEXT,IndexOption .EQ. 2)
         CALL WDialogSelect(IDD_PW_Page8)
         CALL WDialogFieldState(IDNEXT,Disabled) ! The 'Run >' button
       ENDIF
@@ -860,14 +891,16 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
       LOGICAL, EXTERNAL :: Check_TicMark_Data
-      INTEGER I, NPeaksFitted
+      INTEGER I, NumFittedPFR
 
-! JCC Track the number of fittable peaks
-      NPeaksFitted = 0
-      DO I = 1, NumPeakFitRange
-        NPeaksFitted = NPeaksFitted + NumInPFR(I)
-      ENDDO
-      WeCanDoAPawleyRefinement = (Check_TicMark_Data() .AND. (NPeaksFitted .GE. 3))
+      NumFittedPFR = 0 ! The number of Peak Fit Ranges that have actually been fitted
+! Loop over all hatched areas.
+      IF (NumPeakFitRange .GT. 0) THEN
+        DO I = 1, NumPeakFitRange
+          IF (RangeFitYN(I)) CALL INC(NumFittedPFR)
+        ENDDO
+      ENDIF
+      WeCanDoAPawleyRefinement = (Check_TicMark_Data() .AND. (NumFittedPFR .GE. 3))
 
       END FUNCTION WeCanDoAPawleyRefinement
 !
