@@ -220,6 +220,11 @@
       CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,NumOfRef)
       CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
       CALL Clear_SA
+! Grey out the "Previous Results >" button in the DICVOL Wizard window
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page8)
+      CALL WDialogFieldState(IDB_PrevRes,Disabled)
+      CALL PopActiveWindowID
       RETURN
  999  CALL ErrorMessage('Error reading .sdi file.')
       CLOSE(tFileHandle) 

@@ -346,6 +346,9 @@
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,.TRUE.)
       SA_SimplexDampingFactor = 0.1
+! Grey out the "Previous Results >" button in the DICVOL Wizard window
+      CALL WDialogSelect(IDD_PW_Page8)
+      CALL WDialogFieldState(IDB_PrevRes,Disabled)
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
       CALL Clear_Project
