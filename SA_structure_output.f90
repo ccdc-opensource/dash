@@ -71,7 +71,7 @@
       INTEGER hFileCSSR, hFilePDB, hFileCCL, hFileCIF, hFileRES
       INTEGER I, J, II, K, iiact, iTotal, iFrg, iFrgCopy, IJ, iOrig
       REAL    xc, yc, zc
-      INTEGER TotNumBonds, NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen, iRadSelection
+      INTEGER NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen, iRadSelection
       INTEGER tLen1, tLen2
       CHARACTER(MaxPathLength) tFileName
       CHARACTER(8) TemperatureStr
@@ -79,7 +79,6 @@
       CHARACTER*2  LATT
       CHARACTER*1, EXTERNAL :: ChrLowerCase
       REAL, EXTERNAL :: UnitCellVolume
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
       INTEGER NumOfAtmPerElm(1:MaxElm)
       CHARACTER*20, EXTERNAL :: Integer2String
       INTEGER, EXTERNAL :: WritePDBCommon
@@ -122,7 +121,7 @@
         ELSE
           WRITE (hFileCSSR,"(' ',I3,'   0 DASH solution')",ERR=999) natom
         ENDIF
-        WRITE (hFileCSSR,'(A)',ERR=999) ' '//DASHRemarkStr 
+        WRITE (hFileCSSR,'(A)',ERR=999) '     1 '//DASHRemarkStr(11:61) 
       ENDIF
 ! PDB ...
       IF (tSavePDB) THEN
@@ -329,7 +328,7 @@
           IF (gotzmfile(iFrg)) THEN
             DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
               DO i = 1, natoms(iFrg)
-                CALL INC(NumOfAtmPerElm(ElmSymbol2CSD(asym(i,iFrg)(1:2))))
+                CALL INC(NumOfAtmPerElm(zmElementCSD(i,iFrg)))
               ENDDO
             ENDDO
           ENDIF
@@ -429,7 +428,7 @@
               ENDIF
               IF (tSaveRES) THEN
 ! Determine this atom's entry number in the scattering factor list
-                tElement = ElmSymbol2CSD(asym(iOrig,iFrg)(1:2))
+                tElement = zmElementCSD(iOrig,iFrg)
                 iScat = 0
                 DO k1 = 1, tElement
                   IF (NumOfAtmPerElm(k1) .NE. 0) iScat = iScat + 1
@@ -445,7 +444,6 @@
       IF (tSaveCSSR) CLOSE (hFileCSSR)
       IF (tSavePDB) THEN
 ! Per Z-matrix, write out the connectivity.
-        TotNumBonds = 0
         NumOfAtomsSoFar = 0
         DO iFrg = 1, maxfrg
           IF (gotzmfile(iFrg)) THEN
@@ -465,7 +463,6 @@
                 ENDDO
               ENDIF
               NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
-              TotNumBonds = TotNumBonds + NumberOfBonds(iFrg)
             ENDDO
           ENDIF
         ENDDO ! loop over Z-matrices
