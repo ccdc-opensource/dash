@@ -93,6 +93,7 @@
       CALL WDialogLoad(IDD_PW_Page9)
       CALL WDialogLoad(IDD_PW_Page10)
       CALL WDialogLoad(IDD_SX_Page1)
+      CALL WDialogLoad(IDD_SX_Page1a)
       CALL WDialogLoad(IDD_SX_Page2)
       CALL WDialogLoad(IDD_Pawley_Status)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)

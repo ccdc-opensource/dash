@@ -31,10 +31,7 @@
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
               IF (NumberSGTable .EQ. LPosSG(LatBrav)) CALL WarningMessage('Space-group symmetry has not been reset.')
-              CALL WDialogSelect(IDD_SX_Page2)
-              CALL WDialogFieldStateLogical(IDNEXT, .FALSE.)
-              PastPawley = .TRUE.
-              CALL WizardWindowShow(IDD_SX_Page2)
+              CALL WizardWindowShow(IDD_SX_Page1a)
             CASE (IDAPPLY)
               CALL Download_SpaceGroup(IDD_SX_Page1)
               CALL Download_Cell_Constants(IDD_SX_Page1)
@@ -83,6 +80,36 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DealWithWizardWindowSingleCrystalData1a ! Resolution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SX_Page1a)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCLOSE, IDCANCEL)
+              CALL EndWizard
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_SX_Page1)
+            CASE (IDNEXT)
+              CALL WDialogSelect(IDD_SX_Page2)
+              CALL WDialogFieldStateLogical(IDNEXT, .FALSE.)
+              PastPawley = .TRUE.
+              CALL WizardWindowShow(IDD_SX_Page2)
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowSingleCrystalData1a
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardWindowSingleCrystalData2
 
       USE WINTERACTER
@@ -107,7 +134,7 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowShow(IDD_SX_Page1)
+              CALL WizardWindowShow(IDD_SX_Page1a)
             CASE (IDNEXT)
               CALL ShowWizardWindowZmatrices
             CASE (IDCANCEL, IDCLOSE)
@@ -301,7 +328,7 @@
 
       INTEGER IARGIMIN, IARGISTP, ISIG5, IArgKK
       INTEGER KXIMIN(MOBS), KXIMAX(MOBS), IXKMIN(MFCSTO), IXKMAX(MFCSTO)
-      INTEGER KK, I, NLIN, iR, II, JJ, IK, MINCOR, J, K, hFile
+      INTEGER KK, I, NLIN, iR, J, K, hFile
       INTEGER KTEM, K1, K2
       REAL    ARGIMIN, ARGIMAX, ARGISTP, SIGMA, ADSIG, ARGT
 
@@ -310,21 +337,18 @@
       OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       KK = 0
       KKOR = 0
-      MINCOR = 20
       DO iR = 1, MFCSTO
         READ(hFile,'(Q,A)',END=100,ERR=999) NLIN, LINE
 !.. No cross correlation ...
         READ(LINE(1:NLIN),*,END=999,ERR=999) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
 !.. F2 and sig(F2)
- !O       AJOBS(iR) = AJOBS(iR)
         WTJ(iR) = 1.0 / WTJ(iR)
- !O       AJOBS(iR) = AJOBS(iR)
         KK = iR
 ! Now work out which terms should be kept for the chi-squared calculation
-        KKOR = KKOR + 1
-        IKKOR(KKOR) = iR
-        JKKOR(KKOR) = iR
-        NKKOR(KKOR) = 100
+!O        KKOR = KKOR + 1
+!O        IKKOR(KKOR) = iR
+!O        JKKOR(KKOR) = iR
+!O        NKKOR(KKOR) = 100
 !O        WRITE(76,*) ' reflections ',kk,(jHKL(I,iR),I=1,3), AJOBS(iR)
       ENDDO
   100 NumOfRef = KK
@@ -334,12 +358,17 @@
 !
 !.. Let's order the reflections in increasing 2 theta and fill the array ArgKK
       CALL OrderReflections
-      DO IK = 1, KKOR
-        II = IKKOR(IK)
-        JJ = JKKOR(IK)
+
+      DO iR = 1, NumOfRef
+        IKKOR(iR) = iR
+        JKKOR(iR) = iR
+        NKKOR(iR) = 100
+      ENDDO
+      KKOR = NumOfRef
+
+      DO iR = 1, NumOfRef
 !C No correlation, so II .EQ. JJ by definition.
-        WTIJ(IK) = WTI(II) * WTI(JJ)
-!O        WRITE(76,*) IK, II, JJ, WTIJ(IK)
+        WTIJ(iR) = WTI(iR) * WTI(iR)
       ENDDO
       CLOSE(hFile)
 !O      WRITE(76,*) ' Number of reflections ', NumOfRef
@@ -516,6 +545,8 @@
 !
       SUBROUTINE FORORD(pname,filnmr)
 
+      USE WINTERACTER
+      USE DRUID_HEADER
       USE REFVAR
 
       IMPLICIT NONE
@@ -544,9 +575,9 @@
       COMMON /SXFSTO/ jHKL(3,MCHIHS), WTJ(MCHIHS), AJOBS(MFCSTO)
 
       REAL   DStarTem(MFCSTO)
-      INTEGER iR, jR, I, hFile
+      INTEGER iR, jR, I, hFile, NewNumOfRef
       INTEGER iOrdTem(MFCSTO)
-      REAL    H(1:3), DERS(1:6), ArgKKtem(MFCSTO)
+      REAL    H(1:3), DERS(1:6), ArgKKtem(MFCSTO), Resolution, cut_off_2theta
 
       filnam_root = filnmr
       NINIT = 1
@@ -576,17 +607,27 @@
 !O        WRITE(76,*) '**>',ArgKKtem(iR)
       ENDDO
       CALL Sort_Real(ArgKKtem, iOrdTem, NumOfRef)
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SX_Page1a)
+      CALL WDialogGetReal(IDF_MaxResolution, Resolution)
+      CALL PopActiveWindowID
+      cut_off_2theta = 2.0 * ASIND(1.0/(2.0*Resolution))
+      NewNumOfRef = 0
       DO iR = 1, NumOfRef
         jR = iOrdTem(iR)
-        AIOBS(iR) = AJOBS(jR)
-        WTi(iR) = WTj(jR)
-        DSTAR(iR) = dstartem(jR)
-        RefArgK(iR) = ArgKKTem(jR)
-        DO I = 1, 3
-          iHKL(I,iR) = jHKL(i,jR)
-        ENDDO
+        IF (ArgKKTem(jR) .LE. cut_off_2theta) THEN
+          NewNumOfRef = NewNumOfRef + 1
+          AIOBS(iR) = AJOBS(jR)
+          WTi(iR) = WTj(jR)
+          DSTAR(iR) = dstartem(jR)
+          RefArgK(iR) = ArgKKTem(jR)
+          DO I = 1, 3
+            iHKL(I,iR) = jHKL(i,jR)
+          ENDDO
+        ENDIF
 !O        WRITE(76,*) '>> ',iR,'>> ', (iHKL(I,iR),I=1,3), RefArgK(iR), AIOBS(iR), 1.0/(WTI(iR))
       ENDDO
+      NumOfRef = NewNumOfRef
 !C Write out a fake .tic file
       hFile = 121
       OPEN(UNIT=hFile,FILE='polyp.tic',STATUS='UNKNOWN',ERR=999)

@@ -1,4 +1,4 @@
-! Winteracter module created : 10/Sep/2003 16:44:36
+! Winteracter module created : 22/Sep/2003 16:07:30
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -717,4 +717,5 @@
           INTEGER, PARAMETER :: IDF_ITF                         =  1478
           INTEGER, PARAMETER :: IDF_HPSL                        =  1479
           INTEGER, PARAMETER :: IDF_HMSL                        =  1480
+          INTEGER, PARAMETER :: IDD_SX_Page1a                   =   132
       END MODULE Druid_Header
