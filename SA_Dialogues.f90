@@ -543,7 +543,7 @@
 
       IMPLICIT NONE      
 
-      INTEGER, EXTERNAL :: WriteMol2
+      INTEGER, EXTERNAL :: WriteMol2, Get_HydrogenTreatment
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
       REAL, EXTERNAL :: Degrees2Radians
       INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State, iAtomNr
@@ -591,7 +591,7 @@
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
                   COM = 0.0
                   IF (Get_UseCrystallographicCoM()) THEN
-                    CALL zmCreate_AtomicWeightings(iFrg)
+                    CALL zmCreate_AtomicWeightings(iFrg, Get_HydrogenTreatment())
                     DO iAtomNr = 1, natcry
                       COM(1) = COM(1) + AtomicWeighting(iAtomNr,iFrg)*axyzo(1,iAtomNr)
                       COM(2) = COM(2) + AtomicWeighting(iAtomNr,iFrg)*axyzo(2,iAtomNr)

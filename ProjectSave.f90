@@ -566,7 +566,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
+      INTEGER, EXTERNAL :: ElmSymbol2CSD, Get_HydrogenTreatment
       INTEGER iFrg, RW, iAtomNr, BondNr
 
 ! Read or Write?
@@ -650,7 +650,7 @@
       ENDDO
       IF (RW .EQ. cRead) THEN 
         CALL UpdateZmatrixSelection
-        CALL Create_AtomicWeightings
+        CALL Create_AtomicWeightings(Get_HydrogenTreatment())
       ENDIF
 
       END SUBROUTINE PrjReadWriteZmatrices
