@@ -1600,7 +1600,7 @@
             ENDIF
             WRITE (hFile,1032,ERR=999) ALambda, (CellPar(ii),ii=1,6)
  1032       FORMAT ('CELL ',F7.5,1X,6(F8.4,1X))
-            WRITE (hFile,'("ZERR ",I2," 0.000 0.000 0.000 0.000 0.000 0.000")',ERR=999) npdbops
+            WRITE (hFile,'("ZERR ",I3," 0.000 0.000 0.000 0.000 0.000 0.000")',ERR=999) npdbops
             IF (SGShmStr(NumberSGTable)(3:3) .EQ. 'C') THEN
               LATT(1:1) = ' '
             ELSE
