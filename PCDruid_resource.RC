@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 26/Oct/2001 17:38:29
+// Modified : 26/Oct/2001 18:52:01
 //
 ///////////////////////////////////////////////////
 //
@@ -490,31 +490,33 @@
 #define IDF_RADIO4                       1130
 #define IDF_ColFlexTors                  1131
 #define IDF_ConnectObsPoints             1132
+#define IDF_PlotPeakFitDif               1133
 
 ///////////////////////////////////////////////////
 //
 // Dialogs
 //
-IDD_Plot_Option_Dialog DIALOG 0, 0,  248,  139
+IDD_Plot_Option_Dialog DIALOG 0, 0,  248,  145
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Plot Options"
 BEGIN
     CONTROL "1.0",IDF_CharacterSize,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   12,    4,   40,   14
     CONTROL "0.5",IDF_SymbolSize,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   12,   20,   40,   14
-    CONTROL "Show error bars",IDF_ErrorBar_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,    8,   70,   14
-    CONTROL "Observed Profile...",IDF_ObservedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   72,   66,   14
-    CONTROL "Calculated Profile...",IDF_CalculatedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   72,   66,   14
-    CONTROL "Difference Profile...",IDF_DifferenceData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   72,   66,   14
-    CONTROL "Axes Colour...",IDF_Axes_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   88,   66,   14
-    CONTROL "Tick Mark Colour...",IDF_TickMark_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   88,   66,   14
-    CONTROL "Peak Fitting Colour...",IDF_PeakFitting_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   88,   66,   14
-    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  104,  115,   40,   14
-    CONTROL "Colours",IDF_Colour_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   12,   60,  228,   48
+    CONTROL "Show error bars",IDF_ErrorBar_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,    5,   70,   14
+    CONTROL "Observed Profile...",IDF_ObservedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   76,   66,   14
+    CONTROL "Calculated Profile...",IDF_CalculatedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   76,   66,   14
+    CONTROL "Difference Profile...",IDF_DifferenceData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   76,   66,   14
+    CONTROL "Axes Colour...",IDF_Axes_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   92,   66,   14
+    CONTROL "Tick Mark Colour...",IDF_TickMark_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   92,   66,   14
+    CONTROL "Peak Fitting Colour...",IDF_PeakFitting_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   92,   66,   14
+    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  104,  119,   40,   14
+    CONTROL "Colours",IDF_Colour_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   12,   64,  228,   48
     CONTROL "Symbol size",IDF_SymbolSize_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   58,   22,   62,   12
     CONTROL "Character size",IDF_CharacterSize_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   58,    6,   62,   12
-    CONTROL "Show background",IDF_background_check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   22,   70,   14
-    CONTROL "Connect data points",IDF_ConnectObsPoints,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   36,   70,   14
+    CONTROL "Show background",IDF_background_check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   19,   70,   14
+    CONTROL "Connect data points",IDF_ConnectObsPoints,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   33,   70,   14
+    CONTROL "Plot peak fit difference",IDF_PlotPeakFitDif,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   47,   80,   14
 END
 
 IDD_Plot_Option_Dialog RCDATA
@@ -523,6 +525,7 @@ BEGIN
 " 1014 1 \n"
 " 1364 1 \n"
 " 1132 0 \n"
+" 1133 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
