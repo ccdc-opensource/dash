@@ -472,7 +472,7 @@
 ! Align structure.  Will get to this point whether autominimise enabled or not.
           IF (Get_AutoAlign()) CALL Align
 ! Store optimum crystal structure        
-          CALL SA_STRUCTURE_OUTPUT(T,X,ntotmov)
+          CALL SA_STRUCTURE_OUTPUT(T,XOPT,ntotmov)
           CALL Log_SARun_Entry
           IF ((Curr_SA_Run.LT.MaxRuns) .AND. (iMyExit .NE. 3) .AND. (iMyExit .NE. 5)) THEN
             GOTO 1 ! Next run
@@ -493,7 +493,7 @@
         CALL Sa_soln_store
 ! Align structure.  Will get to this point whether autominimise enabled or not.
         IF (Get_AutoAlign()) CALL Align
-        CALL SA_STRUCTURE_OUTPUT(T,X,ntotmov)
+        CALL SA_STRUCTURE_OUTPUT(T,XOPT,ntotmov)
         CALL Log_SARun_Entry
       ENDIF
 
