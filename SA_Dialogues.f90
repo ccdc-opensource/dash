@@ -73,17 +73,17 @@
 
       IMPLICIT NONE      
 
-      INTEGER       iFlags
-      INTEGER       zmread
-      INTEGER       iFrg, iSelection
+      INTEGER        iFlags
+      INTEGER        zmread
+      INTEGER        iFrg, iSelection
       CHARACTER(MaxPathLength) SDIFile, DirName, tFileName
-      CHARACTER*80  FileName
-      CHARACTER*150 FilterStr
-      INTEGER       tNumZMatrices, tLen
-      CHARACTER(80) tZmatrices(10)
-      INTEGER       tNextzmNum
-      INTEGER       tCounter
-      CHARACTER*7   tExtension
+      CHARACTER*(80) FileName
+      CHARACTER*250  FilterStr
+      INTEGER        tNumZMatrices, tLen
+      CHARACTER*(80) tZmatrices(10)
+      INTEGER        tNextzmNum
+      INTEGER        tCounter
+      CHARACTER*(7)  tExtension
       INTEGER, EXTERNAL :: Read_One_Zm
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
 
@@ -132,6 +132,8 @@
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
+            CASE (IDB_Relabel)
+              CALL zmRelabelAll
             CASE (IDB_SA_Project_Browse)
               CALL SDIFileBrowse
             CASE (IDB_SA_Project_Open)
@@ -155,6 +157,7 @@
               ENDDO
               iFlags = LoadDialog + PromptOn + DirChange + AppendExt
               FilterStr = "All files (*.*)|*.*|"//&
+                          "Z-matrix and molecular model files|*.zmatrix;*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"//&
                           "Z-matrix files (*.zmatrix)|*.zmatrix|"//&
                           "Molecular model files|*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"
               iSelection = 2
@@ -1016,6 +1019,7 @@
 
 ! This routine re-labels atoms in Z-matrix number iFrg
 ! The new labels consist of element + sequential number
+! zmDoAdmin(iFrg) should always be called, we could add it to this subroutine
 
       USE ZMVAR
 
@@ -1023,14 +1027,12 @@
 
       INTEGER, INTENT (IN   ) :: iFrg
 
-      INTEGER iAtomNr, iLen, iOrig
-      CHARACTER*3 LastNumberSoFarStr
+      CHARACTER*(20), EXTERNAL :: Integer2String
+      INTEGER iAtomNr
+      CHARACTER*(20) LastNumberSoFarStr
 
       DO iAtomNr = 1, natoms(iFrg)
-        iOrig = izmoid(iAtomNr,iFrg)
-        WRITE(LastNumberSoFarStr,'(I3)') iOrig
-! Left-justify this string: " 12" => "12 "
-        CALL StrClean(LastNumberSoFarStr,iLen)
+        LastNumberSoFarStr = Integer2String(izmoid(iAtomNr,iFrg))
         OriginalLabel(iAtomNr,iFrg) = asym(iAtomNr,iFrg)(1:LEN_TRIM(asym(iAtomNr,iFrg)))// &
                                       LastNumberSoFarStr(1:LEN_TRIM(LastNumberSoFarStr))
       ENDDO
@@ -1040,14 +1042,25 @@
 !*****************************************************************************
 !
       SUBROUTINE zmRelabelAll
-
-! This routine re-labels atoms in all Z-matrices
+!
+! This routine re-labels the atoms in all Z-matrices
 ! The new labels consist of element + sequential number
+!
+! In the interface, these labels are displayed in two dialogues:
+!  - the SA Parameter boundaries Wizard window
+!  - the Rietveld refinement window.
 
       USE ZMVAR
 
+      IMPLICIT NONE
+
+      INTEGER iFrg
+
       DO iFrg = 1, maxfrg
-        CALL zmRelabel(iFrg)
+        IF (gotzmfile(iFrg)) THEN
+          CALL zmRelabel(iFrg)
+          CALL zmDoAdmin(iFrg)
+        ENDIF
       ENDDO
 
       END SUBROUTINE zmRelabelAll
@@ -1252,6 +1265,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE ZMVAR
 
       IMPLICIT NONE      
 
@@ -1264,17 +1278,19 @@
       LOGICAL                                                   LimsChanged
       COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
 
-      INTEGER IV, iCheck
+      INTEGER I, iCheck
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
-      DO IV = 1, NVAR
-        CALL WGridGetCellReal(IDF_parameter_grid_modal,1,IV,prevx(IV))
-        CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,4,IV,iCheck)
+      DO I = 1, NVAR
+        CALL WGridGetCellReal(IDF_parameter_grid_modal,1,I,prevx(I))
+        CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,4,I,iCheck)
         IF (iCheck .EQ. UnChecked) THEN
-          CALL WGridGetCellReal(IDF_parameter_grid_modal,2,IV,prevlb(IV))
-          CALL WGridGetCellReal(IDF_parameter_grid_modal,3,IV,prevub(IV))
+          CALL WGridGetCellReal(IDF_parameter_grid_modal,2,I,prevlb(I))
+          CALL WGridGetCellReal(IDF_parameter_grid_modal,3,I,prevub(I))
         ENDIF
+! Disable modal button for everything but torsion angles
+        IF (kzmpar2(i) .NE. 3) CALL WGridStateCell(IDF_parameter_grid_modal,5,i,DialogReadOnly)
       ENDDO
       LimsChanged = .FALSE.
       CALL WizardWindowShow(IDD_SA_Modal_input2)
@@ -1293,10 +1309,10 @@
 
       IMPLICIT NONE      
 
+      INCLUDE 'PARAMS.INC'
+
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
-
-      INCLUDE 'PARAMS.INC'
 
       DOUBLE PRECISION x,lb,ub,vm
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
@@ -1318,21 +1334,15 @@
       REAL    xtem
       INTEGER JPOS, NMOVES, IFCOl, IFRow, ICHK
       REAL    rpos
-      INTEGER ipos, tMaxRuns, tFieldState
-      INTEGER i
-
+      INTEGER ipos, tMaxRuns, tFieldState, I
+      INTEGER iRow, iStatus
+      INTEGER iFrg, iFrgCopy
+      INTEGER kk
+      CHARACTER*36 parlabel(mvar)
 
 ! We are now on window number 2
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
-
-! Disable modal button for everything but torsion angles
-      DO i = 1,nvar
-        IF (kzmpar2(i) .NE. 3) THEN
-          CALL WGridStateCell(IDF_parameter_grid_modal,5,i,DialogReadOnly)
-        ENDIF
-      END DO
-
       SELECT CASE (EventType)
 ! Interact with the main window and look at the Pawley refinement...
         CASE (PushButton)
@@ -1349,7 +1359,6 @@
                   ENDDO
                 ENDIF                 
               ENDIF
-     
               IF (.NOT. LimsChanged) THEN
 ! If the user has requested preferred orientation, make sure we pass the pertinent Wizard window
                 CALL WDialogSelect(IDD_SAW_Page2)
@@ -1359,7 +1368,6 @@
                   CALL WizardWindowShow(IDD_SAW_Page1)
                 ENDIF
               ENDIF
-
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL WDialogSelect(IDD_SA_input3)
@@ -1398,6 +1406,27 @@
               CALL WizardWindowShow(IDD_SA_input3)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
+            CASE (IDB_Relabel)
+              ! Update memory
+              CALL zmRelabelAll
+              ! Update current Wizard window
+              ! Run through all possible fragments
+              kk = 0
+              DO iFrg = 1, maxfrg
+                ! Only include those that are now checked
+                IF (gotzmfile(iFrg)) THEN
+                  DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+                    DO i = 1, izmpar(iFrg)
+                      kk = kk + 1
+                      parlabel(kk) = czmpar(i,iFrg)
+                    ENDDO
+                  ENDDO
+                ENDIF
+              ENDDO
+              ! Note that we do not update "Preferred orientation"
+              DO i = 1, kk
+                CALL WGridLabelRow(IDF_parameter_grid_modal,i,parlabel(i))
+              ENDDO
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -1470,15 +1499,17 @@
                   CALL WGridPutCellReal(IDF_parameter_grid_modal,2,IFRow,SNGL(lb(IFRow)),'(F12.5)')
                   CALL WGridPutCellReal(IDF_parameter_grid_modal,3,IFRow,SNGL(ub(IFRow)),'(F12.5)')
                   LimsChanged = .TRUE.
-                CASE (5) !Modal Torsion Angle Button
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, IFCol, IFRow, ICHK)
-                  IF (ICHK .EQ. Checked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)                 
-                    CALL ShowBiModalDialog(IFRow, xtem)
-                  ENDIF
               END SELECT ! IFCol
           END SELECT ! EventInfo%Value1 Field Changed Options
       END SELECT  ! EventType
+! Modal Torsion Angle Button
+      DO iRow = 1, NVAR
+        CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,5,iRow,iStatus)
+        IF (iStatus .EQ. Checked) THEN
+          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)                 
+          CALL ShowBiModalDialog(IFRow, xtem)
+        ENDIF
+      ENDDO
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowParameterBounds      
@@ -1636,24 +1667,24 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowSASettings
-
-
 !
 !*****************************************************************************
 !
-
       SUBROUTINE ShowBimodalDialog(IFrow, Xinitial)
+
       USE WINTERACTER
       USE DRUID_HEADER
-      USE VARIABLES
       USE ZMVAR
 
       IMPLICIT NONE      
 
-      INTEGER         nvar, ns, nt, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+      INTEGER, INTENT (IN   ) :: IFrow
+      REAL,    INTENT (IN   ) :: Xinitial
 
       INCLUDE 'PARAMS.INC'
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       DOUBLE PRECISION x,lb,ub,vm
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
@@ -1668,17 +1699,11 @@
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
-      SAVE   /ModalTorsions/
 
-      CHARACTER*36 parlabel(mvar)
-
-      INTEGER, INTENT(INOUT):: IFrow
       INTEGER ICol, NumColumns
       INTEGER i,j,k, dof, copy, frag
       INTEGER Upper, Lower
       REAL    Zero, OneEighty, xtem
-      REAL Xinitial
-
 
 ! Initialise variables          
       ICol = 0
@@ -1687,7 +1712,6 @@
       Lower = 2
       Zero = 0.0000
       OneEighty = 180.0000
-
 !     Given the number of the parameter want to know
 !     which zmatrix, fragment, copy it belongs to.
       dof = 0
@@ -1703,13 +1727,12 @@
               EXIT
             ENDIF
           ENDDO
-          IF (copy .ne. 0) EXIT
+          IF (copy .NE. 0) EXIT
         ENDDO
-        IF (frag .ne. 0) EXIT
+        IF (frag .NE. 0) EXIT
       ENDDO
  
       CALL WDialogSelect(IDD_ModalDialog)
-      parlabel(IFrow) = czmpar(i,k) 
 
 !     Clear Fields
       CALL WDialogClearField(IDF_TorsionName)
@@ -1722,7 +1745,7 @@
       CALL WDialogClearField(IDF_ReportUpper2)
 
 !     Initialise fields 
-      CALL WDialogPutString(IDF_TorsionName, parlabel(IFRow))
+      CALL WDialogPutString(IDF_TorsionName, czmpar(i,k))
       CALL WDialogPutReal(IDF_Initial, Xinitial, '(F12.5)')
       IF (ModalFlag(IfRow) .EQ. 1) THEN ! Not been set before
         CALL WDialogPutRadioButton(IDF_BiModalRadio) 
@@ -1771,24 +1794,24 @@
       iLB = LB(IFRow)
       ix = X(IFRow)
       iRadio = ModalFlag(IFRow)
-      END SUBROUTINE
 
+      END SUBROUTINE
 !
 !*****************************************************************************
 !
-      SUBROUTINE DealWithBimodalDialog()
+      SUBROUTINE DealWithBimodalDialog
 
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
 
-      IMPLICIT NONE      
+      IMPLICIT NONE 
+           
+      INCLUDE 'PARAMS.INC'
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
-
-      INCLUDE 'PARAMS.INC'
 
       DOUBLE PRECISION x,lb,ub,vm
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
@@ -1822,7 +1845,6 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_ModalDialog)
-
       SELECT CASE (EventType) 
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -1958,12 +1980,13 @@
 !             Check that x is in bounds
               CALL CheckXInBounds(RowNumber, X(RowNumber), OutOfBounds)
               IF(OutofBounds) THEN
-               CALL WarningMessage('Initial value does not fall within defined ranges')
-                 IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOk) THEN
-                 RETURN
-               ENDIF 
+                CALL WarningMessage('Initial value does not fall within defined ranges')
+                IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOk) THEN
+                  CALL PopActiveWindowID
+                  RETURN
+                ENDIF 
               ENDIF
-              CALL WDialogHide()
+              CALL WDialogHide
               CALL WDialogSelect(IDD_SA_Modal_Input2)
               CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))  
               LimsChanged = .TRUE.
