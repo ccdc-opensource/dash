@@ -391,11 +391,9 @@
 
       IMPLICIT NONE      
 
-      CHARACTER(LEN=MaxPathLength) SDIFile
-      INTEGER      IFlags
-
       INTEGER iFrg
 
+      iFrg = CurrentlyEditedFrag
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       SELECT CASE (EventType)
