@@ -98,6 +98,7 @@
       CALL WDialogLoad(IDD_License_Dialog)
       CALL WDialogLoad(IDD_Background_Fit)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
+      CALL WDialogLoad(IDD_DV_Results)
       it = InfoError(1)
 
       END SUBROUTINE PolyFitter_UploadDialogues
