@@ -86,13 +86,13 @@
           ENDIF
           IF (IOPTA(i,iFrg) .EQ. 1) THEN
             KK = KK + 1
-            RR_alph(i,iFrg) = BestValuesDoF(KK,Curr_SA_Run)
+            RR_alph(i,iFrg) = BestValuesDoF(KK, Curr_SA_Run)
           ELSE
             RR_alph(i,iFrg) = alph(i,iFrg)
           ENDIF
           IF (IOPTT(i,iFrg) .EQ. 1) THEN
             KK = KK + 1
-            RR_bet(i,iFrg) = BestValuesDoF(KK,Curr_SA_Run)
+            RR_bet(i,iFrg) = BestValuesDoF(KK, Curr_SA_Run)
           ELSE
             RR_bet(i,iFrg) = bet(i,iFrg)
           ENDIF
@@ -101,19 +101,19 @@
       RR_ITF = 1.0
       IF (PrefParExists) THEN
         KK = KK + 1
-        RR_PO = BestValuesDoF(KK,Curr_SA_Run)
+        RR_PO = BestValuesDoF(KK, Curr_SA_Run)
       ELSE
         RR_PO = 1.0
       ENDIF
       RR_iopttran = 0
       RR_ioptrot = 0
-      CALL WDialogPutInteger(IDI_Num1,0)
+      CALL WDialogPutInteger(IDI_Num1, 0)
       RR_ioptb = 0
-      CALL WDialogPutInteger(IDI_Num4,0)
+      CALL WDialogPutInteger(IDI_Num4, 0)
       RR_iopta = 0
-      CALL WDialogPutInteger(IDI_Num3,0)
+      CALL WDialogPutInteger(IDI_Num3, 0)
       RR_ioptt = 0
-      CALL WDialogPutInteger(IDI_Num2,0)
+      CALL WDialogPutInteger(IDI_Num2, 0)
       RR_ioptITF = 1
       RR_ioptPO = 0
       ! Fill RR_Show_bond etc.
@@ -152,16 +152,26 @@
       CALL Set_Show_angle
       CALL Set_Show_torsion
       CALL RRVAR2Dialog
+      ! Save PO state. This is necessary because this state can be changed during Rietveld and
+      ! hence must be restored when the Rietveld window is closed.
+      SA_PrefParExists = PrefParExists
+      SA_PrefPars(1:3) = PrefPars(1:3)
+      CALL WDialogSelect(IDD_RR_PO_Dialog)
       IF (PrefParExists) THEN
         CALL WDialogFieldState(IDC_PO, Enabled)
         CALL WDialogFieldState(IDR_PO, Enabled)
+        CALL WDialogPutInteger(IDF_PO_a, NINT(PrefPars(1)))
+        CALL WDialogPutInteger(IDF_PO_b, NINT(PrefPars(2)))
+        CALL WDialogPutInteger(IDF_PO_c, NINT(PrefPars(3)))
         tFieldState = Enabled
       ELSE
         CALL WDialogFieldState(IDC_PO, Disabled)
         CALL WDialogFieldState(IDR_PO, Disabled)
+        CALL WDialogPutInteger(IDF_PO_a, 0)
+        CALL WDialogPutInteger(IDF_PO_b, 0)
+        CALL WDialogPutInteger(IDF_PO_c, 1)
         tFieldState = Disabled
       ENDIF
-      CALL WDialogSelect(IDD_RR_PO_Dialog)
       CALL WDialogPutCheckBoxLogical(IDF_Use_PO, PrefParExists)
       CALL WDialogFieldState(IDF_PO_a, tFieldState)
       CALL WDialogFieldState(IDF_PO_b, tFieldState)
@@ -430,6 +440,12 @@
               CALL WDialogPutReal(IDR_INTCHI, ChiSqd, "(F9.2)")
               CALL WDialogPutReal(IDR_PROCHI, ChiProSqd, "(F9.2)")
             CASE (IDCANCEL, IDCLOSE)
+      ! Restore PO state. This is necessary because this state can be changed during Rietveld and
+      ! hence must be restored when the Rietveld window is closed.
+              PrefParExists = SA_PrefParExists
+              PrefPars(1:1) = SA_PrefPars(1:1)
+              PrefPars(2:2) = SA_PrefPars(2:2)
+              PrefPars(3:3) = SA_PrefPars(3:3)
               CALL EndWizardPastPawley
             CASE (IDB_SaveAs)
               CALL Dialog2RRVAR
@@ -575,9 +591,9 @@
               !C Initialise preferred orientation and recalculate pattern + chi-sqrds
               !C Initialise PO
               IF (PrefParExists) THEN
-                CALL WDialogGetInteger(IDF_PO_a,iH)
-                CALL WDialogGetInteger(IDF_PO_b,iK)
-                CALL WDialogGetInteger(IDF_PO_c,iL)
+                CALL WDialogGetInteger(IDF_PO_a, iH)
+                CALL WDialogGetInteger(IDF_PO_b, iK)
+                CALL WDialogGetInteger(IDF_PO_c, iL)
                 PrefPars(1) = FLOAT(iH)
                 PrefPars(2) = FLOAT(iK)
                 PrefPars(3) = FLOAT(iL)
