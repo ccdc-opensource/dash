@@ -76,7 +76,6 @@
 ! We want to have some variables that specify the orientation of the Z-matrix when 
 ! rotation is restricted to a single axis  
     
-      REAL             zmInitialQs(0:3,0:maxfrg) ! For convenience, basically a temporary variable
 
       INTEGER          zmSingleRAIniOrDef(0:maxfrg)
 ! 1 = Align with axis (only possible when axis itself is defined from atoms)
@@ -86,6 +85,8 @@
       REAL             zmSingleRAIniOrFrac(1:3, 0:maxfrg) ! Fractional co-ords of axis to align with
       REAL             zmSingleRAIniOrEuler(1:3, 0:maxfrg) ! The Euler angles
       REAL             zmSingleRAIniOrQuater(0:3, 0:maxfrg) ! The quaternions
+
+      REAL             zmInitialQs(0:3,0:maxfrg) ! Calculated from the three variables above
 
 ! ### The single axis itself
 
