@@ -4,6 +4,7 @@
       SUBROUTINE GETHCV(FILENAM,lenfil,ier)
 
       USE ATMVAR
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -21,12 +22,12 @@
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
-      INTEGER         NLGREF, iREFH
-      LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
+      INTEGER         NLGREF
+      LOGICAL                 LOGREF
+      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
 
       REAL              AIOBS,         AICALC
-      COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
+      COMMON /SAREFLNS/ AIOBS(MFCSTO), AICALC(MFCSTO)
 
       INTEGER         KKOR
       REAL                  WTIJ
@@ -56,8 +57,8 @@
       ENDDO
       NCOR = NCOR - 1
       BACKSPACE (121)
-      DO IR = 1, MSAREF
-        READ (121,*,END=100,ERR=998) (IREFH(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (ICOR(I),I=1,NCOR)
+      DO IR = 1, MFCSTO
+        READ (121,*,END=100,ERR=998) (iHKL(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (ICOR(I),I=1,NCOR)
         KK = IR
 !
 !.. Now work out which terms should be kept for the chi-squared calculation

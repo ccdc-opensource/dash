@@ -904,6 +904,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER 
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -939,12 +940,6 @@
                         PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
                         PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
                         PkPosAv(MAX_NPFR)
-
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
@@ -992,16 +987,16 @@
       CALL SORT_REAL(AllPkPosVal,IOrdTem,NTPeak)
 ! IOrdTem now contains and ordered list of pointers into AllPkPosVal
 ! JvdS @@ why not order the list itself?
-      IF (NTic .NE. 0) THEN
+      IF (NumOfRef .NE. 0) THEN
 ! Let's find the closest peaks and their distribution around the observed peak positions
         IR1 = 1 ! Pointer into list of reflections
         DO I = 1, NTPeak
           iOrd = IOrdTem(I) ! IOrd is now a pointer into AllPkPosVal to the next peak position
-          TwoThetaDiff = ARGK(IR1) - AllPkPosVal(iOrd)
+          TwoThetaDiff = RefArgK(IR1) - AllPkPosVal(iOrd)
           AbsTwoThetaDiff = ABS(TwoThetaDiff)
           iTem = IR1
-          DO IR = IR1, NTic
-            xnew = ARGK(IR) - AllPkPosVal(iOrd)
+          DO IR = IR1, NumOfRef
+            xnew = RefArgK(IR) - AllPkPosVal(iOrd)
             anew = ABS(xnew)
             IF (anew .LE. AbsTwoThetaDiff) THEN
               iTem = IR
@@ -1016,9 +1011,9 @@
           ENDDO
  20       PkTicDif(I) = TwoThetaDiff
           DO II = 1, 3
-            IHPk(II,I) = IH(II,iTem)
+            IHPk(II,I) = iHKL(II,iTem)
           ENDDO
-          PkArgK(I) = ARGK(iTem)
+          PkArgK(I) = RefArgK(iTem)
           IArgK(I) = iTem
         ENDDO
         IF (NTPeak .EQ. 1) THEN
@@ -1036,14 +1031,14 @@
           iOrd = IOrdTem(I)
           IA = IArgK(I)
           IRef1 = MAX(1,IA-5)
-          IRef2 = MIN(NTic,IA+5)
+          IRef2 = MIN(NumOfRef,IA+5)
           ProbTot = 0.0
           ProbTop = 0.0
-          DifMin = ABS(AllPkPosVal(iOrd)-ArgK(IA))
+          DifMin = ABS(AllPkPosVal(iOrd)-RefArgK(IA))
           DifMinSq = DifMin**2
           ArgBot = 0.5/(SigmDif**2+AllPkPosEsd(iOrd)**2)
           DO IR = IRef1, IRef2
-            ArgTop = (AllPkPosVal(iOrd)-ARGK(IR))**2
+            ArgTop = (AllPkPosVal(iOrd)-RefArgK(IR))**2
             ProbAdd = EXP(-ArgTop*ArgBot)
             IF (ABS(ArgTop-DifMinSq).LT.1.0E-10) THEN
               ProbTop = ProbTop + ProbAdd

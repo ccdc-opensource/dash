@@ -90,18 +90,23 @@
       SUBROUTINE MAKRHM
 ! Makes a number of matrices to speed up the default calculation
 
-      DIMENSION H(3)
       INCLUDE 'SGinc\FFCALCTOP.INC'
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
+
       LOGICAL CENTRC
+      COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
+
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
+
       COMMON /symsto/ sctrh(24,MFCSTO), rhsto(3,24,MFCSTO)
+
+      DIMENSION H(3)
 
       DO ir = 1, maxk
         DO ii = 1, 3
-          h(ii) = irefh(ii,ir)
+          h(ii) = iHKL(ii,ir)
         ENDDO
         DO i = 1, nopc
           CALL rotsym(H,RHSTO(1,i,ir),I,-1)
