@@ -65,8 +65,7 @@
             END IF
             CALL Upload_Source
 ! Now we know all there is to know about the wavelength and source: update it
-            CALL UpdateWavelength(Temp)
-
+            CALL Set_Wavelength(Temp)
           CASE ('sig') ! Sigma
 ! Sigma 1
             CALL WDialogSelect(IDD_Sigma_info)
@@ -293,29 +292,10 @@
 
       CHARACTER*(*), INTENT (IN   ) ::  SDIFile
 
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
-
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
       CHARACTER(LEN = MaxPathLength) :: line
 
@@ -375,7 +355,7 @@
         CASE ('cel')
           DO I = 1, 6
             CALL INextReal(line,CellPar(i))
-          END DO
+          ENDDO
           CALL Upload_Cell_Constants()
         CASE ('spa')
           CALL INextInteger(line,NumberSGTable)
@@ -415,7 +395,7 @@
 ! JCC before, this just didnt plot anything, even though in theory we should be able
 ! to observe the full profile. Firstly have to synchronize the common blocks though
         CALL Synchronize_Data()
-        Iptype = 2
+        IPTYPE = 2
         NoData = .FALSE.
       ENDIF
       CALL Profile_Plot(IPTYPE) 
@@ -427,7 +407,6 @@
           CALL SetModeMenuState(1,-1,1)
         ENDIF
       ENDIF
-      PastPawley = .FALSE.
 
  999  END SUBROUTINE SDIFileLoad
 !

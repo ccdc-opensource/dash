@@ -18,8 +18,6 @@
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
-! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK,IDCANCEL)
               CALL WDialogHide()
@@ -144,37 +142,46 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Structural_Information)
-      SELECT CASE (EventType)
-        CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDOK) ! The 'OK' button
-              CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
-              CALL WDialogSelect(IDD_Crystal_Symmetry)
-              CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
-              CALL Upload_ZeroPoint               
-              CALL DownloadWavelength(IDD_Data_Properties)
-              CALL Generate_TicMarks
-              CALL WDialogSelect(IDD_Structural_Information)
-              CALL WDialogHide()
-            CASE (IDCANCEL)
-              CALL WDialogHide()
-          END SELECT
-          CALL Profile_Plot(IPTYPE)
-        CASE (FieldChanged)
+      IF (PastPawley) THEN ! Don't do anything
+        SELECT CASE (EventType)
+          CASE (PushButton) ! one of the buttons was pushed
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDOK, IDCANCEL)
+                CALL WDialogHide()
+            END SELECT
+        END SELECT
+      ELSE
+        SELECT CASE (EventType)
+          CASE (PushButton) ! one of the buttons was pushed
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDOK) ! The 'OK' button
+                CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
+                CALL WDialogSelect(IDD_Crystal_Symmetry)
+                CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+                CALL Upload_ZeroPoint               
+                CALL DownloadWavelength(IDD_Data_Properties)
+                CALL Generate_TicMarks
+                CALL WDialogSelect(IDD_Structural_Information)
+                CALL WDialogHide()
+              CASE (IDCANCEL)
+                CALL WDialogHide()
+            END SELECT
+            CALL Profile_Plot(IPTYPE)
+          CASE (FieldChanged)
 ! Do nothing
-        CASE (TabChanged)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDD_Data_Properties)
-              CALL DownloadWavelength(IDD_Data_Properties)
-              CALL Generate_TicMarks
-            CASE (IDD_Peak_Positions)
-            CASE (IDD_Crystal_Symmetry)
-              CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
-              CALL Download_SpaceGroup(IDD_Crystal_Symmetry)
-            CASE (IDD_Peak_Widths)
-          END SELECT
-      END SELECT
+          CASE (TabChanged)
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDD_Data_Properties)
+                CALL DownloadWavelength(IDD_Data_Properties)
+                CALL Generate_TicMarks
+              CASE (IDD_Peak_Positions)
+              CASE (IDD_Crystal_Symmetry)
+                CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
+                CALL Download_SpaceGroup(IDD_Crystal_Symmetry)
+              CASE (IDD_Peak_Widths)
+            END SELECT
+        END SELECT
+      ENDIF
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithStructuralInformation
@@ -193,13 +200,13 @@
                 
       INTEGER IRadSelection
 
+      IF (PastPawley) RETURN
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Data_Properties)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Data_Download) ! The 'Apply' button
+            CASE (IDAPPLY) ! The 'Apply' button
               CALL DownloadWavelength(IDD_Data_Properties)    
               CALL Generate_TicMarks
           END SELECT
@@ -234,6 +241,7 @@
 
       INCLUDE 'GLBVAR.INC'
 
+      IF (PastPawley) RETURN
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Peak_Positions)
       SELECT CASE (EventType)
@@ -294,13 +302,13 @@
       LOGICAL ValidCellAxisLength, NearlyEqual ! Functions
       INTEGER ISPosSG
 
+      IF (PastPawley) RETURN
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Data_Download) ! The 'Apply' button
+            CASE (IDAPPLY) ! The 'Apply' button
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_ZeroPoint
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
@@ -390,7 +398,7 @@
             CASE (IDCANCEL)
               CALL WDialogHide()
             CASE (ID_Indexing_Create)
-              CALL WDialogGetReal(IDF_Indexing_Lambda,Temp)
+              CALL WDialogGetReal(IDF_wavelength1,Temp)
               IF (Temp .LT. 0.00001) THEN
                 CALL ErrorMessage("The radiation wavelength has not been entered!")
               ELSE                 
@@ -404,7 +412,7 @@
           CALL Profile_Plot(IPTYPE)
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Indexing_Lambda)
+            CASE (IDF_wavelength1)
               CALL DownloadWavelength(IDD_Index_Preparation)
               CALL Generate_TicMarks   
           END SELECT
@@ -657,7 +665,7 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogGetReal(IDF_Indexing_Lambda, Lambda)
+      CALL WDialogGetReal(IDF_wavelength1, Lambda)
       CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
       CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
       CALL WDialogGetReal(IDF_Indexing_Maxa, amax)

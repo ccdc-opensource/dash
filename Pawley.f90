@@ -57,7 +57,6 @@
       CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
       CALL IOsDeleteFile('polyp.niw')
       CALL PopActiveWindowID
-      PastPawley = .FALSE.
 
       END SUBROUTINE ShowPawleyFitWindow
 !

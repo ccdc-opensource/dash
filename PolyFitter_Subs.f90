@@ -309,7 +309,7 @@
       KLEN = LEN_TRIM(FNAME)
       IF (KLEN .EQ. 0) RETURN
       CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogGetReal(IDF_Indexing_Lambda, Lambda)
+      CALL WDialogGetReal(IDF_wavelength1, Lambda)
       CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
       CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
       CALL WDialogGetReal(IDF_Indexing_Maxa, Rcpar(1))

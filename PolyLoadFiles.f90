@@ -366,7 +366,6 @@
       CALL Profile_Plot(IPTYPE)
       NoData = .FALSE.
       CALL ScrUpdateFileName
-      PastPawley = .FALSE.
 !      CALL FourierPattern(1,1000)
 
       END FUNCTION DiffractionFileLoad
@@ -738,7 +737,7 @@
 ! Try to set the wavelength
 ! If the wavelength was not present in the file, try to interpret the Anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
-      CALL UpdateWavelength(Lambda1)
+      CALL Set_Wavelength(Lambda1)
       Load_rd_File = 1
       RETURN
  999  CONTINUE
@@ -939,7 +938,7 @@
 ! Try to set the wavelength
 ! If the wavelength was not present in the file, try to interpret the Anode material
       IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
-      CALL UpdateWavelength(Lambda1)
+      CALL Set_Wavelength(Lambda1)
       Load_udf_File = 1
       RETURN
  999  CONTINUE
@@ -1232,10 +1231,10 @@
           CALL WarningMessage('This file does not specify the wavelength,'//CHAR(13)// &
                               'please update the file to contain the _WL1, _RANGE_WL or _ANODE keyword.')
         ELSE
-          CALL UpdateWavelength(WavelengthOf(Anode))
+          CALL Set_Wavelength(WavelengthOf(Anode))
         ENDIF
       ELSE
-        CALL UpdateWavelength(Lambda1)
+        CALL Set_Wavelength(Lambda1)
       ENDIF
       Load_uxd_File = 1
       RETURN
@@ -1332,7 +1331,7 @@
                 CASE (IDOK)
                   OK = .TRUE.
                   CALL WDialogGetReal(IDF_wavelength,Temp)
-                  CALL UpdateWavelength(Temp) ! Wavelength now in ALambda
+                  CALL Set_Wavelength(Temp) ! Wavelength now in ALambda
                   GOTO 11
                 CASE (IDCANCEL)
                   OK = .FALSE.
@@ -1430,7 +1429,7 @@
       ENDIF
 ! If wavelength not present in file, initialise to Cu
       IF (Lambda1 .LT. 0.00001) THEN
-        CALL UpdateWavelength(WavelengthOf('Cu'))
+        CALL Set_Wavelength(WavelengthOf('Cu'))
         JRadOption = 1
       ELSE
 ! Initialise source material to synchrotron
@@ -1442,7 +1441,7 @@
         ENDDO
       ENDIF
       CALL Upload_Source
-      CALL UpdateWavelength(Lambda1)
+      CALL Set_Wavelength(Lambda1)
       Load_xye_File = 1
       RETURN
  999  CONTINUE
