@@ -118,6 +118,10 @@
       CHARACTER(LEN=128) lintem
       INTEGER I, II, nl, OpenFail, PolyFitter_OpenSpaceGroupSymbols
 !O      DATA LPosSG/1,1,3,38,73,108,349,430,455,462,489,531/
+      DATA CrystalSystemString /'Triclinic   ', 'Monoclinic-a', 'Monoclinic-b', &
+                                'Monoclinic-c', 'Orthorhombic', 'Tetragonal  ', &
+                                'Trigonal    ', 'Rhombohedral', 'Hexagonal   ', &
+                                'Cubic       '/
 
       DoSaRedraw = .FALSE.
       LPosSG( 1) =   1

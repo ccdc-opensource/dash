@@ -3,7 +3,7 @@
 !C     end, but may be in future. I've allowed reading via the dsl file)
       REAL SLIMVALUE, SCALFAC
       LOGICAL BACKREF
-      COMMON /PWLYST/ SLIMVALUE,SCALFAC,BACKREF
+      COMMON /PWLYST/ SLIMVALUE, SCALFAC, BACKREF
 
       REAL :: CellPar, ZeroPoint
 	  LOGICAL CellParConstrained 
@@ -28,6 +28,9 @@
 !            9 = Hexagonal
 !           10 = Cubic
 !
+
+      CHARACTER*12   CrystalSystemString(10)
+	  COMMON /CrySysStr/ CrystalSystemString
 
       INTEGER MaxSPGR
       PARAMETER (MaxSPGR=530)
