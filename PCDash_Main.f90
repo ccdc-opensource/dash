@@ -130,6 +130,7 @@
             tNextzmNum = tNextzmNum + 1
             IF (tNextzmNum .LE. tNumZMatrices) GOTO 10
   999       CONTINUE
+            nFrag = iFrg - 1
             CALL ShowWizardWindowZmatrices
           CASE ('RAW    ', 'CPI    ', 'DAT    ', 'TXT    ', 'MDI    ', 'POD    ', &
                 'RD     ', 'SD     ', 'UDF    ', 'UXD    ', 'XYE    ', 'X01    ')
