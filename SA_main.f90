@@ -658,17 +658,14 @@
             parlabel(kk)=czmpar(ii,ifrg)
             SELECT CASE(kzmpar(ii,ifrg))
               CASE (1) !.. position
-                lb(kk)=0.0
-                ub(kk)=1.0
-                vm(kk)=0.1
-              CASE(2) !.. quaternion
-                lb(kk)=-1.0
-                ub(kk)=1.0
-                vm(kk)=0.1
-              CASE(3) !.. torsion
-!C>> JCC - need to factor in the sign of the wee beasty, otherwise the front end gets in a paddy!
-!              lb(kk)=0.0
-!              ub(kk)=360.0
+                lb(kk) = 0.0
+                ub(kk) = 1.0
+                vm(kk) = 0.1
+              CASE (2) !.. quaternion
+                lb(kk) = -1.0
+                ub(kk) =  1.0
+                vm(kk) =  0.1
+              CASE (3) !.. torsion
                 IF      (x(kk) .LT. 0.0 .AND. x(kk) .GT. -180.0) THEN
                   lb(kk) =  -180.0
                   ub(kk) =   180.0
@@ -679,7 +676,7 @@
                   lb(kk) = x(kk) - 180.0
                   ub(kk) = x(kk) + 180.0
                 END IF              
-                vm(kk)=10.0
+                vm(kk) = 10.0
               CASE (4) !.. angle
                 lb(kk) = x(kk) - 10.0
                 ub(kk) = x(kk) + 10.0
