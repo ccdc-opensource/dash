@@ -2530,8 +2530,6 @@
           WRITE (LPT,3000) IERR, (MESS(I:I),I=1,L)
           CALL BMBOUT
           RETURN
-        ELSE
-          GOTO 100
         ENDIF
       ENDIF
       IF (NACT.GT.0) IERR = IERR + 1
@@ -7657,7 +7655,8 @@
         IF (OVER) THEN
           DERIVB(I) = 1.
           ALSQ(IR+I) = 1.
-  !        BLSQ(I) = 0.
+! JvdS As all the other BLSQ assignments had been commented out, I decided to do this one as well.
+!          BLSQ(I) = 0.
         ENDIF
       ENDDO
 !
@@ -15278,6 +15277,9 @@
 !
       LOGICAL DEFALT
       EXTERNAL DEFALT, GETPAR, VARSXX
+
+      INCLUDE 'PARAMS.INC'
+
       LOGICAL FOUND, KSAME, FX
       DIMENSION KKCOL(500), KBVCOL(500), A(500,200), KPRVR(2000)
       DIMENSION KREDUN(200)
