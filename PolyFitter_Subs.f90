@@ -502,11 +502,7 @@
                     CALL IGrFillPattern(Outline,Medium,DiagUp)
                   END IF
                   xgcurold=xgcur(2)
-                IF (xpgmax-xpgmin.le.200.) THEN
                   CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.3)')
-                ELSE
-                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.1)')
-                END IF
                 IF (ypgmax-ypgmin.le.100.) THEN
                   CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.3)')
                 ELSE
@@ -616,8 +612,6 @@
       PkAreaValTem(MAX_NPPR,MAX_NPFR),PkAreaEsdTem(MAX_NPPR,MAX_NPFR), &
       PkPosValTem(MAX_NPPR,MAX_NPFR),PkPosEsdTem(MAX_NPPR,MAX_NPFR),PkPosAvTem(MAX_NPFR)
 
-      INTEGER NPeaksFitted
-      LOGICAL Check_TicMark_Data
       LOGICAL Confirm ! Function
 
       xcur(1) = XCurFirst
@@ -794,20 +788,47 @@
         END IF ! NumPeakFitRange.gt.0                
         CALL IGrPlotMode(' ')
         CALL Profile_Plot(IPTYPE)
-!                CALL IGrPlotMode('EOR')  
       ELSE
         CALL IGrPlotMode(' ')
       ENDIF
+      CALL CheckIfWeCanDoAPawleyRefinement
 
-! JvdS This one of the few places in the program where it is determined
-! if we can do a Pawley fit.
-! This should be in a subroutine that is called whenever something in 
-! Check_TicMark_Data is changed
+      END SUBROUTINE Check_KeyDown_PeakFit_Inner
+!
+!*****************************************************************************
+!
+      SUBROUTINE CheckIfWeCanDoAPawleyRefinement
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL              XPF_Range
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
+      LOGICAL Check_TicMark_Data ! Function
+      INTEGER I, NPeaksFitted
+
       IF ( Check_TicMark_Data() ) THEN
 !>> JCC Track the number of fittable peaks
         NPeaksFitted = 0
-        DO II = 1, NumPeakFitRange
-          NPeaksFitted = NPeaksFitted + NumInPFR(II)
+        DO I = 1, NumPeakFitRange
+          NPeaksFitted = NPeaksFitted + NumInPFR(I)
         END DO
         IF ( NPeaksFitted .GE. 3 ) THEN
           CALL SetModeMenuState(1,1,0)
@@ -818,7 +839,7 @@
         CALL SetModeMenuState(1,-1,0)
       END IF
 
-      END SUBROUTINE Check_KeyDown_PeakFit_Inner
+      END SUBROUTINE CheckIfWeCanDoAPawleyRefinement
 !
 !*****************************************************************************
 !
