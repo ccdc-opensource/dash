@@ -125,8 +125,7 @@
       GOTO 100
 !
 ! DEAL WITH ABSENCE OF 'L ABSC' CARD:
-    5 CALL MESS(LPT,1,                                                  &
-     &          'No L ABSC card - assuming no absorption correction')
+    5 CALL MESS(LPT,1,'No L ABSC card - assuming no absorption correction')
       NABTYP(JSOURC) = 0
    50 ABSPR(1,JSOURC) = 0.
       ABSPR(2,JSOURC) = 0.
@@ -5161,7 +5160,14 @@
 !H User to replace this by his own routine to read observation, if needed
 !
       LOGICAL ENDIP
-      RETURN
+! Just fooling the compiler to stop it from generating warnings
+     
+      ENDIP = .TRUE. ! end of input
+      ARGI  = 0.0
+      OBS   = 0.0
+      DOBS  = 0.0
+      ICODE = 1
+
       END SUBROUTINE QPRIN
 !*==REFSET.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !

@@ -22,15 +22,14 @@
 
       REAL FitPar(MPkDes),FitEsd(MPkDes)
       INTEGER IOrdTem(MAX_NPFR)
-      INTEGER ICurSel
 
-!C>> JCC This is for testing for mathematical errors used to PAUSE the program: THe pause seemed to#
+!C>> JCC This is for testing for mathematical errors used to PAUSE the program: The pause seemed to
 !C>> be causing a repeated CMD window to appear on screen ....
       INTEGER IBMBER
       COMMON / CCSLER / IBMBER 
 
       CALL SORT_REAL(PkPosAv,IOrdTem,NumPeakFitRange)
-      ICurSel = WinfoDialog(CurrentDialog)
+      CALL PushActiveWindowID
 ! Write out sigmas
       CALL WDialogSelect(IDD_Sigma_info)
       CALL WDialogClearField(IDD_Sigma_Grid)
@@ -114,7 +113,7 @@
 !C>> So trap for a numerical error
           IF (IBMBER .EQ. 1) THEN
             IBMBER = 0
-            IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
+            CALL PopActiveWindowID
             RETURN
           ENDIF
           PkFnVarVal(1,3) = MAX(0.0002,FitPar(1))
@@ -151,7 +150,7 @@
 !C>> So trap for a numerical error
           IF (IBMBER .EQ. 1) THEN
             IBMBER = 0
-            IF (ICurSel .GT. 0 ) CALL WDialogSelect(ICurSel)
+            CALL PopActiveWindowID
             RETURN
           ENDIF
           PkFnVarVal(1,4) = MAX(0.0001,FitPar(1))
@@ -183,7 +182,7 @@
 !         END IF
         END IF
       END IF
-      IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Widths
 !
