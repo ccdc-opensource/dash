@@ -98,7 +98,8 @@
       INTEGER                                                                                            KOM4
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2), KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -372,9 +373,9 @@
               CALL WDialogSelect(IDD_ExclRegions)
               CALL WDialogHide
               CALL ShowWizardWindowZmatrices
-            CASE (IDB_ExclRegions)
-              CALL WDialogSelect(IDD_ExclRegions)
-              CALL WDialogShow(-1,-1,0,Modeless)
+!O            CASE (IDB_ExclRegions)
+!O              CALL WDialogSelect(IDD_ExclRegions)
+!O              CALL WDialogShow(-1,-1,0,Modeless)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
