@@ -371,10 +371,14 @@
         DO iFrg = 1, maxfrg
           IF (gotzmfile(iFrg)) THEN
             DO I = 4, natoms(iFrg)
-              RR_Show_torsion(I,iFrg) = (zmElementCSD(I,iFrg) .NE. 2) .AND. &
-                                        (zmElementCSD(iz1(I,iFrg),iFrg) .NE. 2) .AND. &
-                                        (zmElementCSD(iz2(I,iFrg),iFrg) .NE. 2) .AND. &
-                                        (zmElementCSD(iz3(I,iFrg),iFrg) .NE. 2)
+              IF (ioptt(I,iFrg) .EQ. 0) THEN
+                RR_Show_torsion(I,iFrg) = .FALSE.
+              ELSE
+                RR_Show_torsion(I,iFrg) = (zmElementCSD(I,iFrg) .NE. 2) .AND. &
+                                          (zmElementCSD(iz1(I,iFrg),iFrg) .NE. 2) .AND. &
+                                          (zmElementCSD(iz2(I,iFrg),iFrg) .NE. 2) .AND. &
+                                          (zmElementCSD(iz3(I,iFrg),iFrg) .NE. 2)
+              ENDIF
             ENDDO
           ENDIF
         ENDDO
