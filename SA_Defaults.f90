@@ -18,7 +18,7 @@
       OFBN_Len = LEN_TRIM(TheFileHead)
       DO WHILE ((OFBN_Len .GT. 0) .AND. (TheFileHead(OFBN_Len:OFBN_Len) .NE. '.'))
         OFBN_Len = OFBN_Len - 1
-      END DO
+      ENDDO
 ! If no '.' present, pretend there is one after the filename
       IF (OFBN_Len .EQ. 0) OFBN_Len = LEN_TRIM(TheFileHead) + 1
 ! Now point to the position just before the '.'

@@ -34,20 +34,20 @@
 
       INTEGER I
       LOGICAL, EXTERNAL :: Get_SavePRO
-      INTEGER    tFileHandle
+      INTEGER    hFile
 
       IF (.NOT. Get_SavePRO()) RETURN
-      tFileHandle = 61
-      OPEN(UNIT=tFileHandle,FILE=OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pro',status='unknown',ERR=999)
+      hFile = 61
+      OPEN(UNIT=hFile,FILE=OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pro',status='unknown',ERR=999)
       DO I = 1, NBIN
-        WRITE(tFileHandle,12,ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), YCBIN(I), CHAR(9), EBIN(I)
+        WRITE(hFile,12,ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), YCBIN(I), CHAR(9), EBIN(I)
    12   FORMAT(F12.4,3(A,F12.4))
       ENDDO
 ! to overwrite:
-      CLOSE(tFileHandle)
+      CLOSE(hFile)
       RETURN
   999 CALL ErrorMessage('Error writing .pro file.')
-      CLOSE(tFileHandle)
+      CLOSE(hFile)
 
       END SUBROUTINE SA_soln_store
 !
