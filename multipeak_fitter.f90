@@ -446,7 +446,6 @@
 !
       SUBROUTINE OUTPUT_PRO(NVAR,VARVAL,VARESD)
 !
-!
       INCLUDE 'PARAMS.INC'
       INTEGER CurrentRange
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR), IPF_Lo(MAX_NPFR),        &
@@ -482,19 +481,15 @@
       PARAMETER (MPAR=50)
       REAL VARVAL(MPAR), VARESD(MPAR)
 !
-!
 ! ... Set the ranges correctly
       IPF_RPt(1) = 0
       DO II = 1, NumPeakFitRange
         IPF_RPt(II+1) = IPF_RPt(II) + IPF_Range(II)
       ENDDO
-!
-!
       IF (CurrentRange.EQ.NumPeakFitRange) THEN
         IPF_RPt(1) = 0
 !.. We just need to add on to the end of the list
-        IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange)                 &
-     &                            + IPF_Range(CurrentRange)
+        IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange) + IPF_Range(CurrentRange)
         ITEM = IPF_Lo(CurrentRange) - 1
         DO I = 1, NPTS
           II = IPF_RPt(CurrentRange) + I
@@ -511,8 +506,7 @@
         DO I = 1, NumInPFR(CurrentRange)
           jp = 1 + NPKGEN(1,1) + 2*I
           PkAreaVal(i,CurrentRange) = varval(jp)
-          IF (varesd(jp).LT.1.E-6) varesd(jp)                           &
-     &        = max(0.001,0.1*abs(varval(jp)))
+          IF (varesd(jp).LT.1.E-6) varesd(jp) = max(0.001,0.1*abs(varval(jp)))
           PkAreaEsd(i,CurrentRange) = varesd(jp)
           jp = jp + 1
           PkPosVal(i,CurrentRange) = varval(jp)
@@ -533,8 +527,8 @@
         IPF_RPt(1) = 0
 !
 ! JCC Hmm - problem here. What if we have not fitted the range, only swept it out?
-! attempt to solve by re-calculating the next range's value every time rather than asuuming it is set
-! (it wont be set if we've not already got into this routine before for this peak)
+! attempt to solve by re-calculating the next range's value every time rather than assuming it is set
+! (it won't be set if we've not already got into this routine before for this peak)
 !
         IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange) + IPF_Range(CurrentRange)
 !
@@ -571,7 +565,6 @@
           YPF_Pos(i,CurrentRange) = zcal(item)
         ENDDO
       ENDIF
-!
       xranav = 0.5*(XPF_Range(1,CurrentRange)+XPF_Range(2,CurrentRange))
       PkPosAv(CurrentRange) = xranav
       CALL Upload_Widths()

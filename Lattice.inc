@@ -15,7 +15,9 @@
       INTEGER IHLR
       COMMON /LATREFCMN/ LatBrav,IHLR(3,MVAL) 
 
-! LatBrav :  1 = Triclinic
+! LatBrav is the crystal system (NOT the Bravais lattice)
+!
+!            1 = Triclinic
 !            2 = Monoclinic-a
 !            3 = Monoclinic-b
 !            4 = Monoclinic-c
@@ -25,18 +27,18 @@
 !            8 = Rhombohedral
 !            9 = Hexagonal
 !           10 = Cubic
+!
 
       INTEGER MaxSPGR
       PARAMETER (MaxSPGR=530)
 ! MaxSPGR is the maximum number of space groups including all different settings.
 ! These are loaded from a file at the beginning.
 
-      INTEGER           :: LPosSG
-      CHARACTER(LEN=12) :: SGNumStr
-      CHARACTER(LEN=12) :: SGHMaStr
-      CHARACTER(LEN=24) :: SGShmStr
-      COMMON /SGStrCmn/ LPosSG(12), SGNumStr(MaxSPGR),                  &
-     &                  SGHMaStr(MaxSPGR), SGShmStr(MaxSPGR)
+      INTEGER          LPosSG
+      CHARACTER*12                  SGNumStr
+      CHARACTER*12                                     SGHMaStr
+      CHARACTER*24                                                        SGShmStr
+      COMMON /SGStrCmn/ LPosSG(12), SGNumStr(MaxSPGR), SGHMaStr(MaxSPGR), SGShmStr(MaxSPGR)
 
 ! LPosSG contains the offset per crystal system in the space group list
 ! E.g., the monoclinic-a (crystal system nr. 2) space groups start at entry 3 and
@@ -52,3 +54,8 @@
 !      LPosSG( 9) = 462
 !      LPosSG(10) = 489
 !      LPosSG(11) = MaxSPGR+1
+!
+!      Space group number         : SGNumStr(IPosSg)
+!      Space Group (IT tables)    : SGHMaStr(IPosSg)
+!      Space Group Hall symbol    : SGHalStr(IPosSg)
+!      Space Group explicit symbol: SGShmStr(IPosSg)

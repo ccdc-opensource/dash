@@ -278,7 +278,7 @@
             END IF
             IF (xnew .GT. 0.0) THEN
               IR1 = MAX(1,IR-1)
-! As both the peaks and the refelctions are ordered, the position of the next peak can only be greater
+! As both the peaks and the reflections are ordered, the position of the next peak can only be greater
               GOTO 20
             END IF
           END DO
