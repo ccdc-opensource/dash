@@ -4,6 +4,7 @@
       INTEGER FUNCTION Read_One_Zm(iFrg)
 
       USE ZMVAR
+      USE ATMVAR
 
       IMPLICIT NONE
 
@@ -66,7 +67,6 @@
         CALL StrClean(Asym,AsymLen)
         Asym(i,iFrg)(1:1) = ChrUpperCase(Asym(i,iFrg)(1:1))
         Asym(i,iFrg)(2:2) = ChrLowerCase(Asym(i,iFrg)(2:2))
-        Asym(i,iFrg)(3:3) = ChrLowerCase(Asym(i,iFrg)(3:3))
         zmElementCSD(i,iFrg) = ElmSymbol2CSD(asym(i,iFrg)(1:2))
 ! First item--the element--has been read. Rest more tricky.
 ! First, convert tabs to spaces and remove redundant spaces
@@ -110,7 +110,8 @@
 ! Emulate original atom labels by adding original atom number to element, e.g. 'C4'
           WRITE(tIDstr,'(I3)') izmoid(i,iFrg)
           CALL StrClean(tIDstr,IDlen)
-          tSubString = Asym(i,iFrg)(1:AsymLen)//tIDstr
+          tSubString = ElementStr(zmElementCSD(i,iFrg))
+          tSubString = tSubString(1:LEN_TRIM(tSubString))//tIDstr
         ENDIF
         OriginalLabel(i,iFrg) = tSubString(1:5)
         izmbid(izmoid(i,iFrg),iFrg) = i   ! the backward mapping from atoms in the Z-matrix
