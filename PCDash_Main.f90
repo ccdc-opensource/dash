@@ -47,7 +47,6 @@
         IWIDTHS(IWID) = 800
       END DO
       IWIDTHS(8)= 1500 
-!      OPEN (UNIT=76,FILE='D:\cvsDASH\dash\Debug\output.log')
 ! Split status bar into more than one part
       CALL WindowStatusBarParts(8,IWIDTHS)
     !  CALL IDebugLevel(DbgMsgBox)
@@ -286,15 +285,15 @@
 
       IMPLICIT NONE
 
-      LOGICAL Confirm ! Function
+      LOGICAL, EXTERNAL :: Confirm
 
-      IF (Confirm('Do you want to exit DASH?')) CALL DoExit()
+      IF (Confirm('Do you want to exit DASH?')) CALL DoExit
 
       END SUBROUTINE WExit
 !
 !*****************************************************************************
 !
-      SUBROUTINE DoExit()
+      SUBROUTINE DoExit
 
       USE WINTERACTER
       USE VARIABLES
@@ -307,7 +306,7 @@
       CLOSE(UNIT=12,STATUS='DELETE',IOSTAT=ISTAT)
       CLOSE(UNIT=6,STATUS='DELETE',IOSTAT=ISTAT)
       CALL DeleteTempFiles
-      CALL WindowClose()
+      CALL WindowClose
       STOP
 
       END SUBROUTINE DoExit
