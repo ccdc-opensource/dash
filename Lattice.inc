@@ -5,10 +5,9 @@
       LOGICAL BACKREF
       COMMON /PWLYST/ SLIMVALUE,SCALFAC,BACKREF
 
-! ALambda is now in GLBVAR.INC
-
-      REAL :: CELLPAR, ZEROPOINT 
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
+      REAL :: CellPar, ZeroPoint
+	  LOGICAL CellParConstrained 
+      COMMON /CELLREF/ CellPar(6), ZeroPoint, CellParConstrained(6)
 
       INTEGER MVAL
       PARAMETER (MVAL=50)
@@ -27,22 +26,10 @@
 !            9 = Hexagonal
 !           10 = Cubic
 
-!
       INTEGER MaxSPGR
       PARAMETER (MaxSPGR=530)
 ! MaxSPGR is the maximum number of space groups including all different settings.
 ! These are loaded from a file at the beginning.
-
-!O      INTEGER           :: LPosSG
-!O      CHARACTER(LEN=12) :: SGNumStr
-!O      CHARACTER(LEN=12) :: SGHMaStr
-!O!U      CHARACTER(LEN=18) :: SGHalStr
-!O      CHARACTER(LEN=24) :: SGShmStr
-!O! These are broken into three to make this include fortran and f90 compatible
-!O      COMMON /SGStrCmn1/ LPosSG(12), SGNumStr(MaxSPGR)
-!O!U      COMMON /SGStrCmn2/ SGHMaStr(MaxSPGR), SGHalStr(MaxSPGR)
-!O!U      COMMON /SGStrCmn3/ SGShmStr(MaxSPGR)
-!O      COMMON /SGStrCmn2/ SGHMaStr(MaxSPGR), SGShmStr(MaxSPGR)
 
       INTEGER           :: LPosSG
       CHARACTER(LEN=12) :: SGNumStr
