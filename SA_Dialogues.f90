@@ -71,11 +71,11 @@
       CHARACTER(MaxPathLength) SDIFile, DirName, tFileName
       CHARACTER*80  FileName
       CHARACTER*150 FilterStr
-      INTEGER tNumZMatrices, tLen
-      CHARACTER(80) tZmatrices
-      DIMENSION tZmatrices(10)
-      INTEGER tNextzmNum
-      INTEGER tCounter
+      INTEGER       tNumZMatrices, tLen
+      CHARACTER(80) tZmatrices(10)
+      INTEGER       tNextzmNum
+      INTEGER       tCounter
+      CHARACTER*7   tExtension
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -173,8 +173,12 @@
               CALL SplitPath(tFileName,DirName,FileName)
 ! Determine the extension. If Z-matrix, load it
               tLen = LEN_TRIM(FileName)
-! @@ case sensitive
-              IF ((tLen .GE. 9) .AND. (FileName(tLen-6:tLen) .EQ. 'zmatrix')) THEN
+              tExtension = ''
+              IF (tLen .GE. 9) THEN
+                tExtension = FileName(tLen-6:tLen)
+                CALL StrUpperCase(tExtension)
+              ENDIF
+              IF (tExtension .EQ. 'ZMATRIX') THEN
                 frag_file(iFrg) = tFileName
                 zmread = Read_One_ZM(iFrg)
                 IF (zmread .EQ. 0) THEN ! successful read
@@ -337,6 +341,54 @@
 !
 !*****************************************************************************
 !
+      INTEGER FUNCTION zmRebuild
+!
+! In case an atom has been deleted.
+!
+! RETURNS : 0 for success
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+      USE SAMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER iFrg, zmRead
+      INTEGER, EXTERNAL :: Read_One_ZM, WriteMol2
+      INTEGER tNumZMatrices
+      CHARACTER(80) tZmatrices
+      DIMENSION tZmatrices(10)
+
+! Initialise to failure
+      zmRebuild = 1
+      iFrg = 0
+      CALL zmCopyDialog2Temp
+! If an atom has been deleted, rebuild the Z-matrix.
+      IF (.NOT. zmAtomDeleted) THEN
+        zmRebuild = 0
+        RETURN
+      ENDIF
+      IF (WriteMol2('temp.mol2') .NE. 1) RETURN ! Writing mol2 file failed
+      CALL zmConvert('temp.mol2',tNumZMatrices,tZmatrices)
+! Check that we still have 1 Z-matrix
+      IF (tNumZMatrices .EQ. 0) RETURN ! Conversion failed
+      IF (tNumZMatrices .GT. 1) THEN
+        CALL WarningMessage('More than 1 Z-matrix generated.'//&
+                            'Only the first will be retained.')
+        CALL IOsCopyFile('temp_1.zmatrix','temp.zmatrix')
+      ENDIF
+      frag_file(iFrg) = 'temp.zmatrix'
+      zmRead = Read_One_ZM(iFrg)
+      IF (zmRead .NE. 0) RETURN ! reading failed
+      zmAtomDeleted = .FALSE.
+      zmRebuild = 0
+
+      END FUNCTION zmRebuild
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithEditZMatrixWindow
 
       USE WINTERACTER
@@ -350,12 +402,9 @@
       INTEGER iFrg, iOption, iColumn, iAtomNr, iDummy, iBondNr, iRow, iCol
       REAL    tReal
       LOGICAL ThisOne
-      INTEGER, EXTERNAL :: zmSaveAs, Read_One_ZM, WriteMol2
-      INTEGER tLength, I, zmRead, iBondNr2
+      INTEGER, EXTERNAL :: zmSaveAs, WriteMol2, zmRebuild
+      INTEGER tLength, I, iBondNr2
       CHARACTER(MaxPathLength) temp_file
-      INTEGER tNumZMatrices
-      CHARACTER(80) tZmatrices
-      DIMENSION tZmatrices(10)
       CHARACTER(MaxPathLength) tOldFileName
       INTEGER, EXTERNAL :: ElmSymbol2CSD
 
@@ -366,19 +415,21 @@
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_Set)
+              CALL WDialogGetReal(IDF_UisoOccValue,tReal)
               CALL WDialogGetMenu(IDF_UisoOccMenu,iOption)
               SELECT CASE (iOption)
                 CASE (1)
-                  iColumn = 4 ! Uiso
+                  iColumn = 4 ! Biso
+                  IF (tReal .LT. -10.0) tReal = -10.0
+                  IF (tReal .GT. 100.0) tReal = 100.0
                 CASE (2)
                   iColumn = 5 ! Occupancies
-              END SELECT
-              CALL WDialogGetReal(IDF_UisoOccValue,tReal)
-! Check its value
-              
+                  IF (tReal .LT.   0.0) tReal =  0.0
+                  IF (tReal .GT.  10.0) tReal = 10.0
+              END SELECT              
               CALL WDialogGetMenu(IDF_WhichAtomMenu,iOption)
               DO iAtomNr = 1, natoms(iFrg)
-! Uiso / occupancies
+! Biso / occupancies
                 SELECT CASE (iOption)
                   CASE (1) ! All atoms
                     ThisOne = .TRUE.
@@ -401,38 +452,16 @@
             CASE (IDOK)
               CALL zmCopyDialog2Temp
 ! If an atom has been deleted, rebuild the Z-matrix.
-              IF (.NOT. zmAtomDeleted) THEN
-                CALL zmCopy(0,CurrentlyEditedFrag)
+              tOldFileName = frag_file(CurrentlyEditedFrag)
+              IF (zmRebuild() .EQ. 1) THEN
+                CALL ErrorMessage('Could not rebuild the Z-matrix')
               ELSE
-                IF (WriteMol2('temp.mol2') .NE. 1) THEN
-                  CALL ErrorMessage('Error writing mol2, no changes made.')
-                  RETURN
-                ENDIF
-                CALL zmConvert('temp.mol2',tNumZMatrices,tZmatrices)
+                CALL WDialogHide
               ENDIF
-! Check that we still have 1 Z-matrix
-              IF (tNumZMatrices .EQ. 0) THEN
-                CALL ErrorMessage('Could not generate Z-matrix.')
-              ELSE
-                IF (tNumZMatrices .GT. 1) THEN
-                  CALL WarningMessage('More than 1 Z-matrix generated.'//&
-                                      'Only the first will be retained.')
-                  CALL IOsCopyFile('temp_1.zmatrix','temp.zmatrix')
-                ENDIF
-                tOldFileName = frag_file(CurrentlyEditedFrag)
-                frag_file(CurrentlyEditedFrag) = 'temp.zmatrix'
-                zmRead = Read_One_ZM(CurrentlyEditedFrag)
-                IF (zmRead .NE. 0) THEN ! reading failed
-                  gotzmfile(CurrentlyEditedFrag) = .FALSE. 
-                  CALL FileErrorPopup(frag_file(CurrentlyEditedFrag),zmRead)
-                  CALL UpdateZmatrixSelection
-                ELSE
-                  frag_file(CurrentlyEditedFrag) = tOldFileName
-                ENDIF
-              ENDIF
-              CALL WDialogHide()
+              frag_file(CurrentlyEditedFrag) = tOldFileName
+              CALL zmCopy(0,CurrentlyEditedFrag)
             CASE (IDCANCEL, IDCLOSE)
-              CALL WDialogHide()
+              CALL WDialogHide
             CASE (IDBSAVE)
               CALL zmCopyDialog2Temp
               CALL zmSave(iFrg)
@@ -603,7 +632,7 @@
         CALL WGridPutCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr,iFrg))
 ! atom elements
         CALL WGridPutCellString(IDF_AtomPropGrid,3,iRow,asym(iAtomNr,iFrg))
-! Uiso
+! Biso
         CALL WGridPutCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr,iFrg),'(F5.3)')
 ! occupancies
         CALL WGridPutCellReal(IDF_AtomPropGrid,5,iRow,occ(iAtomNr,iFrg),'(F5.3)')
@@ -729,7 +758,9 @@
       INTEGER FUNCTION zmSaveAs(iFrg)
 
 ! This routine saves Z-matrix number iFrg
-
+!
+! RETURNS : 0 for success
+!
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -762,7 +793,9 @@
       INTEGER FUNCTION zmSave(iFrg)
 
 ! This routine saves Z-matrix number iFrg
-
+!
+! RETURNS : 0 for success
+!
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -773,9 +806,15 @@
       INTEGER, INTENT (IN   ) :: iFrg
 
       INTEGER tFileHandle, i
+      INTEGER, EXTERNAL :: zmRebuild
       
 ! Save the Z-matrix
       zmSave = 1 ! Failure
+! If an atom has been deleted, try to rebuild the Z-matrix
+      IF (zmRebuild() .NE. 0) THEN
+        CALL ErrorMessage('Could not rebuild Z-matrix.')
+        RETURN
+      ENDIF
       tFileHandle = 19
       OPEN (UNIT=tFileHandle,FILE=frag_file(iFrg),ERR=999)
 ! First line is a title
