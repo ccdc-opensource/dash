@@ -399,12 +399,12 @@
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_PW_LabX_Source,IDF_PW_SynX_Source,IDF_PW_CWN_Source,IDF_PW_TOF_source)
-              CALL WDialogGetRadioButton(IDF_PW_LabX_Source,JRadOption)
+            CASE (IDF_LabX_Source,IDF_SynX_Source,IDF_CWN_Source,IDF_TOF_source)
+              CALL WDialogGetRadioButton(IDF_LabX_Source,JRadOption)
               CALL Upload_Source
               CALL Generate_TicMarks 
-            CASE (IDF_PW_wavelength1)
-              CALL WDialogGetReal(IDF_PW_wavelength1,Temp)
+            CASE (IDF_wavelength1)
+              CALL WDialogGetReal(IDF_wavelength1,Temp)
               CALL UpdateWavelength(Temp)
               CALL Generate_TicMarks 
             CASE (IDF_Wavelength_Menu)
@@ -710,7 +710,8 @@
       REAL    TwoTheta2dSpacing ! Function
       REAL    MaxSinBeta
       REAL    tBeta
-      INTEGER NumDoF
+      INTEGER NumDoF, ilen
+      CHARACTER*2 nStr
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page8)
@@ -839,6 +840,10 @@
             CALL WDialogSelect(IDD_PW_Page9)
 ! Clear all fields in the grid
             CALL WDialogClearField(IDF_DV_Summary_0)
+            WRITE(nStr,'(I2)') n
+            CALL StrClean(nStr,ilen)
+            CALL WGridLabelColumn(IDF_DV_Summary_0,10,'M('//nStr(1:ilen)//')')
+            CALL WGridLabelColumn(IDF_DV_Summary_0,11,'F('//nStr(1:ilen)//')')
 ! Set the number of rows in the grid to the number of solutions.
             CALL WGridRows(IDF_DV_Summary_0,NumOfDICVOLSolutions)
             DO I = 1, NumOfDICVOLSolutions
@@ -938,6 +943,8 @@
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCLOSE, IDCANCEL)
+              CALL EndWizard
             CASE (IDBACK)
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
@@ -950,8 +957,10 @@
               CALL WDialogHide()
               CALL WDialogSelect(IDD_PW_Page2)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-            CASE (IDCLOSE, IDCANCEL)
-              CALL EndWizard
+            CASE (IDAPPLY)
+              CALL Download_SpaceGroup(IDD_PW_Page1)
+              CALL Download_Cell_Constants(IDD_PW_Page1)
+              NumPawleyRef = 0
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowUnitCellParameters 1')
           END SELECT
@@ -1028,19 +1037,19 @@
             CASE (ID_PW_DF_Open)
               CALL WDialogGetString(IDF_PW_DataFileName_String,CTEMP)
               ISTAT = DiffractionFileOpen(CTEMP)
-            CASE (ID_PW_DF_Browse)
+            CASE (IDBBROWSE)
               ISTAT = DiffractionFileBrowse()
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowDiffractionSetup 1')
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_PW_LabX_Source,IDF_PW_SynX_Source,IDF_PW_CWN_Source,IDF_PW_TOF_source)
-              CALL WDialogGetRadioButton(IDF_PW_LabX_Source,JRadOption)
+            CASE (IDF_LabX_Source,IDF_SynX_Source,IDF_CWN_Source,IDF_TOF_source)
+              CALL WDialogGetRadioButton(IDF_LabX_Source,JRadOption)
               CALL Upload_Source
               CALL Generate_TicMarks 
-            CASE (IDF_PW_wavelength1)
-              CALL WDialogGetReal(IDF_PW_wavelength1,Temp)
+            CASE (IDF_wavelength1)
+              CALL WDialogGetReal(IDF_wavelength1,Temp)
               CALL UpdateWavelength(Temp)
               CALL Generate_TicMarks 
             CASE (IDF_Wavelength_Menu)
