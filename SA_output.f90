@@ -3,7 +3,7 @@
 !
       SUBROUTINE SA_OUTPUT(T,CHIMIN,CHIAV,CHIESD,&
       xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,&
-      nmpert,ntotmov,iteration)
+      ntotmov,iteration)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -11,7 +11,7 @@
       IMPLICIT NONE
 
       REAL T, CHIMIN, CHIAV, CHIESD
-      INTEGER n, NUP, NDOWN, NREJ, nmpert, ntotmov, iteration
+      INTEGER n, NUP, NDOWN, NREJ, ntotmov, iteration
       REAL*8 xopt(*),dxvav(*),xvsig(*),flav(*),lb(*),ub(*),vm(*)
 
       INCLUDE 'PARAMS.INC'
@@ -27,12 +27,10 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      REAL bchmin, bpwval, bchpro, tempvl
-      REAL avchi1, avchi2, avchi3, avchi4
-      INTEGER nd1, nd2, nd3, nd4, bmIHANDLE
-      COMMON / sagdat / bchmin, bpwval, bchpro, &
-                tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
-                nd2, nd3, nd4, bmIHANDLE
+      REAL            bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4
+      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
+      COMMON /sagdat/ bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4, &
+                      nd1, nmpert, nd3, nd4, bmIHANDLE
 
       REAL ctem
       REAL tenow1, tenow2, ruler, rulex1, rulex2
@@ -104,7 +102,7 @@
       IF (RESTART) THEN
         ruler = FLOAT(MaxMoves)
       ELSE
-        ruler = MaxIter * nd2
+        ruler = MaxIter * nmpert
       ENDIF
       CALL IGrUnits(0.0,0.0,ruler,1.0)
       CALL IGrColourN(63)  ! Yellow
@@ -117,7 +115,7 @@
       CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
 ! Uphill, downhill, rejected
       CALL IGrSelect(3,IDF_SA_move_distribution)
-      ruler = FLOAT(nd2)
+      ruler = FLOAT(nmpert)
       CALL IGrUnits(0.0,0.0,ruler,1.0)
       IF (iteration .EQ. 1) THEN
         CALL IGrColourN(208) ! Black
