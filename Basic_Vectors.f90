@@ -75,8 +75,8 @@
 
       REAL, INTENT (INOUT) :: TheVector(1:3)
 
-      LOGICAL VectorIsNullVector ! Function
-      REAL    VectorGetLength    ! Function
+      LOGICAL, EXTERNAL ::  VectorIsNullVector
+      REAL, EXTERNAL ::     VectorGetLength
 
       IF (VectorIsNullVector(TheVector)) RETURN
       TheVector = TheVector / VectorGetLength(TheVector)
@@ -94,11 +94,11 @@
       REAL, INTENT (INOUT) :: TheVector1(1:3)
       REAL, INTENT (IN   ) :: TheVector2(1:3)
 
-      LOGICAL VectorIsNullVector ! Function
+      LOGICAL, EXTERNAL :: VectorIsNullVector
       REAL    tVector(1:3)
       REAL    Coefficient
       REAL    OriginalLength
-      REAL    VectorGetLength ! Function
+      REAL, EXTERNAL :: VectorGetLength
 
       IF (VectorIsNullVector(TheVector1) .OR. VectorIsNullVector(TheVector2)) RETURN
       OriginalLength = VectorGetLength(TheVector1)
@@ -134,8 +134,8 @@
 
       REAL, INTENT (IN   ) :: TheVector(1:3)
 
-      REAL    VectorGetLength ! Function
-      LOGICAL NearlyEqual     ! Function
+      REAL, EXTERNAL ::     VectorGetLength
+      LOGICAL, EXTERNAL ::  NearlyEqual
 
       VectorIsNullVector = NearlyEqual(VectorGetLength(TheVector),0.0)
 
@@ -156,6 +156,21 @@
       TheVector = TheVector * TheLength
 
       END SUBROUTINE VectorSetLength
+!
+!*****************************************************************************
+!
+      SUBROUTINE VectorCrossProduct(Vector1, Vector2, ResultVector);
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Vector1(1:3), Vector2(1:3)
+      REAL, INTENT (  OUT) :: ResultVector(1:3)
+
+      ResultVector(1) = Vector1(2) * Vector2(3) - Vector1(3) * Vector2(2)
+      ResultVector(2) = Vector1(3) * Vector2(1) - Vector1(1) * Vector2(3)
+      ResultVector(3) = Vector1(1) * Vector2(2) - Vector1(2) * Vector2(1)
+
+      END SUBROUTINE VectorCrossProduct
 !
 !*****************************************************************************
 !
