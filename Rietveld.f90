@@ -1711,22 +1711,24 @@
             CASE (IDBACK)
 ! Go back to the first Wizard window
               CALL EndWizardPastPawley
+              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+              CALL WDialogPutRadioButton(IDF_PW_Option6)
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
               Curr_SA_Run = 1
-              CALL WDialogHide ! @@ Hide current window. Should probably be WizardWindowHide
+              CALL WizardWindowHide
               CALL ShowWizardWindowRietveld(Curr_SA_Run)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDB_SDI_file_Browse)
               CALL SDIFileBrowse
             CASE (IDB_SDI_file_Open)
-              CALL WDialogGetString(IDF_SDI_File_Name,SDIFile)
+              CALL WDialogGetString(IDF_SDI_File_Name, SDIFile)
               CALL SDIFileOpen(SDIFile)
             CASE (IDB_xtal_file_Browse)
               CALL XtalFileBrowse
             CASE (IDB_xtal_file_Open)
-              CALL WDialogGetString(IDF_Xtal_File_Name,XtalFile)
+              CALL WDialogGetString(IDF_Xtal_File_Name, XtalFile)
               CALL XtalFileOpen(XtalFile)
           END SELECT
         CASE (FieldChanged)
