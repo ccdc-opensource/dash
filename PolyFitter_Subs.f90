@@ -10,13 +10,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Poly_Colours.inc'
-
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -33,6 +27,8 @@
       REAL            XPG1, XPG2, YPG1, YPG2
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
 
+      CHARACTER*(80) STATBARSTR(4:7)
+
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
       INTEGER ISB
       REAL XMINT, XMAXT, YMINT, YMAXT, xgcurold, ygcurold
@@ -40,7 +36,7 @@
       CALL WindowSelect(0)
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
-! JCC Set the scale correctly. 
+! Set the scale correctly. 
       CALL IGrUnits(0.0,0.0,1.0,1.0)
       CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
       CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
@@ -136,6 +132,8 @@
       USE WINTERACTER
       USE VARIABLES
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
       INTEGER          NBIN, LBIN
@@ -154,6 +152,9 @@
       INTEGER          IPMIN, IPMAX
       COMMON /PROFIPM/ IPMIN, IPMAX
 
+      REAL xpgdif, xpgav, xtem, ypgdif, xpgmint, xpgmaxt, ypgmint, ypgmaxt
+      INTEGER II
+
 ! acts on various KeyDown options for the main window
       IF (EventInfo%VALUE1 .NE. KeyBackSpace) THEN
         XPGMINOLD = XPGMIN
@@ -164,28 +165,28 @@
       SELECT CASE (EventInfo%VALUE1)
         CASE (KeyPageLeft)
           xpgdif = xpgmax - xpgmin
-          xpgmin = MAX(xpmin,xpgmin-0.02*xpgdif)
+          xpgmin = MAX(XPMIN,xpgmin-0.02*xpgdif)
           xpgmax = xpgmin + xpgdif
           CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyPageRight)
 ! We're going to move the graph to the right if we can
           xpgdif = xpgmax - xpgmin
-          xpgmax = MIN(xpmax,xpgmax+0.02*xpgdif)
+          xpgmax = MIN(XPMAX,xpgmax+0.02*xpgdif)
           xpgmin = xpgmax - xpgdif
           CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyCursorLeft)
 ! We're going to move the graph to the left if we can
           xpgdif = xpgmax - xpgmin
-          xpgmin = MAX(xpmin,xpgmin-0.25*xpgdif)
+          xpgmin = MAX(XPMIN,xpgmin-0.25*xpgdif)
           xpgmax = xpgmin + xpgdif
           CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (KeyCursorRight)
 ! We're going to move the graph to the right if we can
           xpgdif = xpgmax - xpgmin
-          xpgmax = MIN(xpmax,xpgmax+0.25*xpgdif)
+          xpgmax = MIN(XPMAX,xpgmax+0.25*xpgdif)
           xpgmin = xpgmax - xpgdif
           CALL Get_IPMaxMin 
           CALL Profile_Plot
@@ -417,7 +418,6 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Poly_Colours.inc'
 
       INTEGER          NBIN, LBIN
@@ -467,6 +467,7 @@
       INTEGER iSB, ii, iPFRange, iPFL1, iPFL2
       REAL    XPFR1, XPFR2
       REAL    GXMIN, GYMIN, GXMAX, GYMAX
+      CHARACTER*(80) STATBARSTR(2:3)
 
 ! Get ready to put up the big cursor
       CALL WMessageEnable(MouseMove, Enabled)
