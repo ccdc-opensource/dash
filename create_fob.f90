@@ -21,7 +21,7 @@
      &                bet(maxatm,maxfrg), f2cmat(3,3)
       COMMON /zmcomc/ asym(maxatm,maxfrg)
 !
-      COMMON /frgcom/ nfrag, lfrag(maxfrg)
+      COMMON /frgcom/ nfrag
 !
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &

@@ -43,7 +43,6 @@
       COMMON /saparl/ T0,rt
       INTEGER  NS, NT, IER, ISEED1, ISEED2
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-      COMMON /shadi/ kshad(mvar)
 
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
@@ -56,12 +55,12 @@
         bet(maxatm,maxfrg),f2cmat(3,3)
       CHARACTER*3 asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
-      INTEGER nfrag,lfrag
-      COMMON /frgcom/ nfrag,lfrag(maxfrg)
+      INTEGER nfrag
+      COMMON /frgcom/ nfrag
       CHARACTER*80 frag_file
       COMMON /frgcha/ frag_file(maxfrg)
       CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
+      COMMON /zmnpar/ izmpar(maxfrg),&
         czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
@@ -81,6 +80,7 @@
       LOGICAL ZmStateChanged
       LOGICAL NoZmatrix
       LOGICAL Confirm ! Function
+      INTEGER IHANDLE
 
 !.. If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
       IF (FromPawleyFit) THEN
@@ -120,7 +120,7 @@
       CALL WDialogSelect(IDD_SAW_Page1)
 !C>> JCC I've moved this lot to a separate subroutine. We want to 
 !C>> Remember the files/data etc, so only call this on first entry
-      CALL ClearZmatrices(CheckSize,IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse,IZMCheck)
+      CALL ClearZmatrices(IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse)
       NoZmatrix = .TRUE.
  222  CONTINUE
 ! JvdS Started to add SA to Wizard
@@ -193,7 +193,7 @@
             SELECT CASE (EventInfo%VALUE1)
 !C>> JCC Add in new 'clear' button
             CASE (IDF_clear_zmatrix)
-              CALL ClearZmatrices(CheckSize,IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse,IZMCheck)
+              CALL ClearZmatrices(IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse)
               NoZmatrix = .TRUE.
               ZmStateChanged = .TRUE.                               
             CASE (IDBACK)
@@ -227,7 +227,7 @@
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
-              CALL SA_Parameter_Set(CheckSize,IZMCheck)
+              CALL SA_Parameter_Set
               GOTO 444
             CASE (IDB_SA_Project_Browse)
              IF (.NOT. FromPawleyFit) CALL SDIFileBrowse
@@ -254,7 +254,6 @@
 !C>> JCC Need to check here to see if the user hit cancel
 ! So I added a check here
               IF (frag_file(ifrg) .NE. ' ') THEN
-                lfrag(ifrg) = LEN_TRIM(frag_file(ifrg))
                 zmread = Read_One_ZM(ifrg)
                 IF (zmread .EQ. 0) THEN ! successful read
 ! JvdS Started to add SA to Wizard
@@ -266,7 +265,7 @@
                   DO II = 1, 5
                     CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
                   END DO
-                  CALL UpdateZmatrixSelection(CheckSize, IZMCheck, IDFZMPars)
+                  CALL UpdateZmatrixSelection(IDFZMPars)
 ! Set the next dialogue on
                   IF (ifrg .LT. 5) THEN
                     CALL WDialogFieldState(IDFZMCheck(ifrg+1),Enabled)
@@ -278,17 +277,20 @@
                    CALL FileErrorPopup(frag_file(ifrg),zmread)
                 END IF ! If the read on the zmatrix was ok
               END IF  ! If the user selected a file
-!>> JCC Also act on selection of check box
-            END SELECT
+! View individual z-matrices in Mercury
+ !           CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
+
+          END SELECT
           CASE (FieldChanged)
             SELECT CASE(EventInfo%VALUE1)
+!>> JCC Also act on selection of check box
               CASE (IDF_ZM_file_check1,IDF_ZM_file_check2,IDF_ZM_file_check3,&
                 IDF_ZM_file_check4,IDF_ZM_file_check5)
 ! Update the selection
                 DO II = 1, 5
                   CALL WDialogGetCheckBox(IDFZMCheck(ii),IZMCheck(ii))
                 END DO
-                CALL UpdateZmatrixSelection(CheckSize, IZMCheck, IDFZMPars)
+                CALL UpdateZmatrixSelection(IDFZMPars)
                 ZmStateChanged = .TRUE.        
             END SELECT
         END SELECT
@@ -471,6 +473,10 @@
                 IYPos_IDD_Wizard = WInfoDialog(7)
                 CALL WDialogHide()
                 GOTO 444
+              CASE (IDF_PrintSA)
+                CALL WriteSAParametersToFile
+                CALL WindowOpenChild(IHANDLE)
+                CALL WEditFile('SA_PARAMS.TXT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
               CASE (IDB_SA3_finish)
 ! We've finished the SA input
 ! Window is going to be removed: save current position
@@ -577,23 +583,65 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SA_Parameter_Set(CheckSize, IZMCheck)
+      SUBROUTINE WriteSAParametersToFile
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      
+      IMPLICIT NONE
+
+
+      INCLUDE 'PARAMS.INC'
+
+      CHARACTER*80    frag_file
+      COMMON /frgcha/ frag_file(maxfrg)
+
+
+      INTEGER tFileHandle, I
+      REAL    R
+
+      CALL PushActiveWindowID
+      tFileHandle = 10
+      OPEN(tFileHandle,FILE='SA_PARAMS.TXT',ERR=999)
+      WRITE(tFileHandle,'("Parameters for simulated annealing in DASH")',ERR=999)
+      CALL WDialogSelect(IDD_SA_input3)
+      CALL WDialogGetInteger(IDF_SA_RandomSeed1,I)
+      WRITE(tFileHandle,'("Random seed 1 = ",I5)',ERR=999)  I
+      CALL WDialogGetInteger(IDF_SA_RandomSeed2,I)
+      WRITE(tFileHandle,'("Random seed 2 = ",I5)',ERR=999)  I
+      CALL WDialogGetReal(IDF_SA_T0,R)
+      IF (R .EQ. 0.0) THEN
+        WRITE(tFileHandle,'("Initial temperature to be estimated by DASH")',ERR=999)
+      ELSE
+        WRITE(tFileHandle,'("Initial temperature = ",F)',ERR=999)  R
+      ENDIF
+
+
+      CLOSE(tFileHandle)
+      CALL PopActiveWindowID
+      RETURN
+  999 CALL ErrorMessage('Could not access temporary file.')
+      CLOSE(tFileHandle)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE WriteSAParametersToFile
+!
+!*****************************************************************************
+!
+      SUBROUTINE SA_Parameter_Set
 
       USE WINTERACTER
       USE DRUID_HEADER
 
 !C>> JCC Add in checking: only use z-matrices that the user has selected!
-      INTEGER, INTENT (IN   ) :: CheckSize
-      INTEGER, INTENT (IN   ) :: IZMCheck(CheckSize)
-
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
+      INCLUDE 'IZMCheck.inc'
 
       PARAMETER (NMAX = 100, MXEPS = 10)
       DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
       COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
-
 
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
@@ -611,7 +659,7 @@
       CHARACTER*3 asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
 
-      COMMON /frgcom/ nfrag,lfrag(maxfrg)
+      COMMON /frgcom/ nfrag
       PARAMETER (mvar=100)
       DOUBLE PRECISION x,lb,ub,vm,xpreset
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
@@ -628,12 +676,11 @@
       INTEGER  NS, NT, ISEED1, ISEED2
       INTEGER  MAXEVL, IPRINT
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-      COMMON /shadi/ kshad(mvar)
 
       CHARACTER*36 parlabel(mvar)
 
       CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
+      COMMON /zmnpar/ izmpar(maxfrg),&
             czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
@@ -646,7 +693,6 @@
       CALL frac2cart(f2cmat,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL CREATE_FOB()
-!      nvar=izmtot
       kk = 0
 !C>> JCC Run through all possible fragments
       DO ifrg = 1, CheckSize
@@ -740,17 +786,16 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ClearZmatrices(CheckSize,IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse,IZMCheck)
+      SUBROUTINE ClearZmatrices(IDFZMFile,IDFZMPars,IDFZMCheck,IDBZMBrowse)
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'IZMCheck.inc'
 
-      INTEGER CheckSize
       INTEGER IDFZMFile(CheckSize), IDFZMPars(CheckSize)
       INTEGER IDFZMCheck(CheckSize), IDBZMBrowse(CheckSize)
-      INTEGER IZMCheck(CheckSize)
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen,alph,bet,f2cmat
@@ -762,10 +807,10 @@
         bet(maxatm,maxfrg),f2cmat(3,3)
       CHARACTER*3 asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
-      INTEGER nfrag,lfrag
-      COMMON /frgcom/ nfrag,lfrag(maxfrg)
+      INTEGER nfrag
+      COMMON /frgcom/ nfrag
       CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
+      COMMON /zmnpar/ izmpar(maxfrg),&
         czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
@@ -798,7 +843,7 @@
       CALL WDialogFieldState(IDBZMBrowse(1),Enabled)
       CALL WDialogFieldState(IDFZMPars(1),ReadOnly)
       CALL WDialogClearField(IDF_ZM_allpars)
-      CALL UpdateZmatrixSelection(CheckSize, IZMCheck, IDFZMpars)
+      CALL UpdateZmatrixSelection(IDFZMpars)
       CALL WDialogSelect(IDD_SA_input2)
 ! Clear the grid too
       CALL WDialogClearField(IDF_parameter_grid)
@@ -810,15 +855,14 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE UpdateZmatrixSelection(CheckSize, IZMCheck, IDFZMpars)
+      SUBROUTINE UpdateZmatrixSelection(IDFZMpars)
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'IZMCheck.inc'
 
-      INTEGER CheckSize
-      INTEGER IZMcheck(CheckSize)
       INTEGER IDFZMpars(CheckSize)
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
@@ -831,16 +875,18 @@
         bet(maxatm,maxfrg),f2cmat(3,3)
       CHARACTER*3 asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
-      INTEGER nfrag,lfrag
-      COMMON /frgcom/ nfrag,lfrag(maxfrg)
+      INTEGER nfrag
+      COMMON /frgcom/ nfrag
       CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
+      COMMON /zmnpar/ izmpar(maxfrg),&
         czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
       COMMON /POSNS/NATOM,XATO(3,150),KX(3,150),AMULT(150),&
         TF(150),KTF(150),SITE(150),KSITE(150),&
         ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
+
+      INTEGER izmtot
 
       nfrag  = 0
       izmtot = 0
