@@ -62,14 +62,14 @@
         WRITE (LPT,100)
   100   FORMAT (' Poor data - try a reduced range!')
         WRITE (LPT,101) JREF, JREF + N - 1, DMIN, DMAX
-  101   FORMAT (' -ve intensity covariance eigenvalues for reflections '&
-     &          ,I4' to',I4' : ',2F15.5)
+  101   FORMAT (' -ve intensity covariance eigenvalues for reflections ',I4' to',I4' : ',2F15.5)
       ENDIF
 !      DMIN=ABS(DMIN)*1.0001
       DMIN = MAX(ABS(DMAX)*1.0E-6,ABS(DMIN)*1.5)
       DO I = 1, N
         H(I,I) = H(I,I) + DMIN
       ENDDO
+
       END SUBROUTINE CHECKP
 !
 !*****************************************************************************
@@ -100,6 +100,7 @@
         IF (J.GT.N) GOTO 2
       ENDDO
     2 NCTOT = JJ
+
       END SUBROUTINE CLUMPS
 !
 !*****************************************************************************
@@ -396,6 +397,7 @@
       DO J = 1, N
         CALL XXLUBKSB(A,N,N,INDEX,B(1,J))
       ENDDO
+
       END SUBROUTINE XXINVERT
 !
 !*****************************************************************************
@@ -427,6 +429,7 @@
         ENDIF
         B(I) = SUM/A(I,I)
       ENDDO
+
       END SUBROUTINE XXLUBKSB
 !
 !*****************************************************************************
@@ -491,6 +494,7 @@
         ENDIF
       ENDDO
       IF (A(N,N).EQ.0.0) A(N,N) = TINY
+
       END SUBROUTINE XXLUDCMP
 !
 !*****************************************************************************

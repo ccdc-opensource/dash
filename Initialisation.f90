@@ -319,6 +319,7 @@
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
+
       LOGICAL          log_preset
       COMMON /presetl/ log_preset
 
@@ -337,6 +338,7 @@
 
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+
       DOUBLE PRECISION T0, rt
       COMMON /saparl/  T0, rt
 
@@ -349,12 +351,25 @@
 
       LOGICAL         MseBtnPressed, OldEventWaiting
       COMMON /Events/ MseBtnPressed, OldEventWaiting
+
       DATA MseBtnPressed   / .FALSE. /
       DATA OldEventWaiting / .FALSE. /
+
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
       REAL    WaveLengthOf ! Function
       REAL    dSpacing2TwoTheta ! Function
 
+      PI     = 4.0*ATAN(1.0)
+      RAD    = PI/180.0
+      DEG    = 180.0/PI
+      TWOPI  = 2.0*PI
+      FOURPI = 4.0*PI
+      PIBY2  = PI/2.0
+      ALOG2  = ALOG(2.0)
+      SQL2X8 = SQRT(8.0*ALOG2)
+      VALMUB = 0.2695
       ChildWinAutoClose = .FALSE.
       ChildWinHandlerSet = .FALSE.
       DashRawFile = ' '
