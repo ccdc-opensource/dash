@@ -34,23 +34,23 @@
 
       LOGICAL         UseRene, UseRelease, UseESD
       INTEGER                                     nwidth
-      REAL                                                width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                                   InPeak
-      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      REAL                                                 width, minstep, rwidth, SqrtCorrObs 
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs
 
       REAL             YOBIN2,         PIKVAL2
       INTEGER                                            NFITA2, IFITA2
-      REAL                                                                     WidthFac
-      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS), WidthFac(-100:100)
+      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS)
 
- !     INTEGER
- !     COMMON / RENE3 / 
+      INTEGER           nCorrPoints,         CorrPoints
+      REAL                                                              WidthFac3
+      COMMON / RENE3 /  nCorrPoints(1:MOBS), CorrPoints(1:100, 1:MOBS), WidthFac3(1:100, 1:MOBS)
 
       REAL, EXTERNAL :: Correl
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL x_step
       REAL Last_X
-      INTEGER I, II, K, KK, KK2, n
+      INTEGER I, II, J, K, KK, KK2, n
+      LOGICAL InPeak(1-100:MOBS+100)
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_input3_2)
@@ -84,14 +84,25 @@
             KK2 = KNIPT(K,I)
             YOBIN2(I) = YOBIN2(I) + AIOBS(KK2) * PIKVAL(K,I) ! Using PIKVAL2 here does not seem to work (SA for Tut 1 takes about 3 times as long)
           ENDDO
+          YOBIN2(I) = YOBIN(I)
     !      IF (UseESD) YOBIN2(I) = SQRT(MAX(0.0, YOBIN2(I)))
-          IF (UseESD) YOBIN2(I) = YOBIN2(I) * (XBIN(I)-XBIN(1))/(XBIN(NBIN)-XBIN(1))
-    !      IF (UseESD) YOBIN2(I) = YOBIN2(I) / EBIN(I)
+    !      IF (UseESD) YOBIN2(I) = YOBIN2(I) * (XBIN(I)-XBIN(1))/(XBIN(NBIN)-XBIN(1))
+          IF (UseESD) YOBIN2(I) = YOBIN2(I) / EBIN(I)
         ENDIF
       ENDDO
       NFITA2 = KK
-      DO n = -nwidth+1, nwidth-1
-        WidthFac(n) = (1.0 - rwidth*ABS(FLOAT(n)))
+      DO II = 1, NFITA2
+        I = IFITA2(II)
+        KK = 0
+        DO n = -nwidth+1, nwidth-1
+          j = I + n
+          IF (InPeak(j)) THEN
+            KK = KK + 1
+            CorrPoints(KK, I) = j
+            WidthFac3(KK, I) = (1.0 - rwidth*ABS(FLOAT(n)))
+          ENDIF
+        ENDDO
+        nCorrPoints = KK
       ENDDO
       SqrtCorrObs = SQRT(Correl(YOBIN2, YOBIN2))
       CALL PopActiveWindowID
@@ -136,14 +147,12 @@
 
       LOGICAL         UseRene, UseRelease, UseESD
       INTEGER                                     nwidth
-      REAL                                                width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                                   InPeak
-      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      REAL                                                 width, minstep, rwidth, SqrtCorrObs 
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs
 
       REAL             YOBIN2,         PIKVAL2
       INTEGER                                            NFITA2, IFITA2
-      REAL                                                                     WidthFac
-      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS), WidthFac(-100:100)
+      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS)
 
       REAL, EXTERNAL :: Correl
       REAL    YCALC(1:MOBS), CorrCal, CorrCross
@@ -158,8 +167,8 @@
           YCALC(I) = YCALC(I) + BICALC(KK) * PIKVAL(K,I) ! Using PIKVAL2 here does not seem to work (SA for Tut 1 takes about 3 times as long)
         ENDDO
     !    IF (UseESD) YCALC(I) = SQRT(MAX(0.0, YCALC(I)))
-        YCALC(I) = YCALC(I) * (XBIN(I)-XBIN(1))/(XBIN(NBIN)-XBIN(1))
-    !    IF (UseESD) YCALC(I) = YCALC(I) / EBIN(I)
+    !    YCALC(I) = YCALC(I) * (XBIN(I)-XBIN(1))/(XBIN(NBIN)-XBIN(1))
+        IF (UseESD) YCALC(I) = YCALC(I) / EBIN(I)
       ENDDO
       CorrCal   = Correl(YCALC, YCALC)
       CorrCross = Correl(YOBIN2, YCALC)
@@ -179,24 +188,26 @@
 
       LOGICAL         UseRene, UseRelease, UseESD
       INTEGER                                     nwidth
-      REAL                                                width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                                   InPeak
-      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      REAL                                                 width, minstep, rwidth, SqrtCorrObs 
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs
 
       REAL             YOBIN2,         PIKVAL2
       INTEGER                                            NFITA2, IFITA2
-      REAL                                                                     WidthFac
-      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS), WidthFac(-100:100)
+      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS)
 
-      INTEGER I, II, j, n
+      INTEGER           nCorrPoints,         CorrPoints
+      REAL                                                              WidthFac3
+      COMMON / RENE3 /  nCorrPoints(1:MOBS), CorrPoints(1:100, 1:MOBS), WidthFac3(1:100, 1:MOBS)
+
+      INTEGER I, II, J, JJ
       REAL ret
 
       ret = 0.0
       DO II = 1, NFITA2
         I = IFITA2(II)
-        DO n = -nwidth+1, nwidth-1
-          j = i + n
-          IF (InPeak(j)) ret = ret + y1(i) * y2(j) * WidthFac(n)
+        DO JJ = 1, nCorrPoints(I)
+          J = CorrPoints(JJ,I)
+          ret = ret + y1(I) * y2(J) * WidthFac3(JJ,I)
         ENDDO
       ENDDO
       Correl = ret
@@ -235,14 +246,12 @@
 
       LOGICAL         UseRene, UseRelease, UseESD
       INTEGER                                     nwidth
-      REAL                                                width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                                   InPeak
-      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      REAL                                                 width, minstep, rwidth, SqrtCorrObs 
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs
 
       REAL             YOBIN2,         PIKVAL2
       INTEGER                                            NFITA2, IFITA2
-      REAL                                                                     WidthFac
-      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS), WidthFac(-100:100)
+      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS)
 
       REAL, EXTERNAL :: Correl_1
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
@@ -266,9 +275,10 @@
             KK2 = KNIPT(K,I)
             YOBIN2(KK) = YOBIN2(KK) + AIOBS(KK2) * PIKVAL(K,I) ! Using PIKVAL2 here does not seem to work (SA for Tut 1 takes about 3 times as long)
           ENDDO
-        !  IF (UseESD) YOBIN2(KK) = SQRT(MAX(0.0, YOBIN2(KK)))
-        IF (UseESD) YOBIN2(KK) = YOBIN2(KK) * (1.0+2.0*(XBIN(I)-XBIN(1))/(XBIN(NBIN)-XBIN(1)))
-       !   IF (UseESD) YOBIN2(KK) = YOBIN2(KK) / EBIN(I)
+          YOBIN2(KK) = YOBIN(I)
+       !   IF (UseESD) YOBIN2(KK) = SQRT(MAX(0.0, YOBIN2(KK)))
+       !   IF (UseESD) YOBIN2(KK) = YOBIN2(KK) * (1.0+2.0*(XBIN(I)-XBIN(1))/(XBIN(NBIN)-XBIN(1)))
+          IF (UseESD) YOBIN2(KK) = YOBIN2(KK) / EBIN(I)
         ENDIF
       ENDDO
       NFITA2 = KK
@@ -315,14 +325,12 @@
 
       LOGICAL         UseRene, UseRelease, UseESD
       INTEGER                                     nwidth
-      REAL                                                width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                                   InPeak
-      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      REAL                                                 width, minstep, rwidth, SqrtCorrObs 
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs
 
       REAL             YOBIN2,         PIKVAL2
       INTEGER                                            NFITA2, IFITA2
-      REAL                                                                     WidthFac
-      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS), WidthFac(-100:100)
+      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS)
 
       REAL, EXTERNAL :: Correl_1
       REAL    YCALC(1:MOBS), CorrCal, CorrCross
@@ -337,8 +345,8 @@
           YCALC(II) = YCALC(II) + BICALC(KK) * PIKVAL(K,I) ! Using PIKVAL2 here does not seem to work (SA for Tut 1 takes about 3 times as long)
         ENDDO
     !    YCALC(II) = SQRT(MAX(0.0, YCALC(II)))
-        YCALC(II) = YCALC(II) * (1.0+2.0*(XBIN(I)-XBIN(1))/(XBIN(NBIN)-XBIN(1)))
-    !    YCALC(II) = YCALC(II) / EBIN(I)
+    !    YCALC(II) = YCALC(II) * (1.0+2.0*(XBIN(I)-XBIN(1))/(XBIN(NBIN)-XBIN(1)))
+        YCALC(II) = YCALC(II) / EBIN(I)
       ENDDO
       CorrCal   = Correl_1(YCALC, YCALC)
       CorrCross = Correl_1(YOBIN2, YCALC)
@@ -358,8 +366,7 @@
 
       REAL             YOBIN2,         PIKVAL2
       INTEGER                                            NFITA2, IFITA2
-      REAL                                                                     WidthFac
-      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS), WidthFac(-100:100)
+      COMMON / RENE2 / YOBIN2(1:MOBS), PIKVAL2(50,MOBS), NFITA2, IFITA2(MOBS)
 
       INTEGER I
       REAL ret
