@@ -129,8 +129,10 @@
       INTEGER                                           Curr_Iter, MaxIterationSoFar
       REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
       LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
 
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
@@ -550,7 +552,7 @@
       tFileName = OutputFilesBaseName(1:OFBN_Len)//'.chi'
       OPEN(UNIT=hFile,FILE=tFileName(1:OFBN_Len+4),ERR=999)
       DO I = 1, MaxIterationSoFar
-        WRITE(hFile,'(I10,1X,99(F9.2,1X))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
+        WRITE(hFile,'(I10,(1X,F9.2))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
       ENDDO
       CLOSE(hFile)
       RETURN
