@@ -25,11 +25,10 @@
       DO I = 1, NVAR
         DBLEP(I) = XOPT(I)
       ENDDO
-      DO II = 1, NPAR
+      DO II = 1, N
         I = IP(II)
         DBLEP(I) = DBLE(P(II))
       ENDDO
-!O      CALL PO_PRECFC
       CALL FCN(DBLEP,CHIANS,0)
       SA_FCN = SNGL(CHIANS)
 
@@ -51,8 +50,8 @@
 !    DX       R*4    I       N      Initial step-lengths for X.
 !
 ! Other Requirements
-!     The user must provide a FUNCTION SA_FCN(X) which evalutes
-! Chi-squared (un-normalised) given the vector X.
+!     The user must provide a FUNCTION SA_FCN(N,X) which evalutes
+! Chi-squared (un-normalised) given the vector X(N).
 !
 ! History
 !     D. S. Sivia    9 Feb 1995  Initial release.
