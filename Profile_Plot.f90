@@ -393,16 +393,14 @@
         YDIF(II) = YADD + YOBIN(II) - YCBIN(II)
       ENDDO
       CALL IPgNewPlot(PgPolyLine,3,NBIN)
-      CALL IPgStyle(1,0,0,0,KolNumDif,0)
+      CALL IPgStyle(2,0,0,0,KolNumDif,0)
 ! Q & D hack
       IF (ConnectPointsObs()) THEN
-        CALL IPgStyle(2,0,3,0,KolNumObs,KolNumObs)
+        CALL IPgStyle(1,0,3,0,KolNumObs,KolNumObs)
       ELSE
-        CALL IPgStyle(2,0,3,0,0,KolNumObs)
+        CALL IPgStyle(1,0,3,0,0,KolNumObs)
       ENDIF
       CALL IPgStyle(3,0,0,0,KolNumCal,0)
-! Now draw the difference plofile
-      CALL IPgXYPairs(XBIN,YDIF)
 ! The following four lines set the markers for the observed profile.
       CALL IPgMarker( 2, 13)
       sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
@@ -411,13 +409,15 @@
 ! Draw the observed profile. Markers can still be used. Consecutive data points are joined 
 ! by lines. These can be straight or splines
       CALL IPgXYPairs(XBIN,YOBIN)
+! Now draw the difference plofile
+      CALL IPgXYPairs(XBIN,YDIF)
 !
 ! Do the error bars - we've precalculated the min & max pointers
 !
       CALL IGrColourN(KolNumObs)
       IF (PlotErrorBars()) THEN
         DO I = IPMIN, IPMAX
-          xtem = xbin(I)
+          xtem = XBIN(I)
           ytem = MAX(YOBIN(I)-EBIN(I),ypgmin)
           ytem = MIN(ytem,ypgmax)
           CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
