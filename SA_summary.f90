@@ -146,6 +146,10 @@
       DO iRow = 1, NumOf_SA_Runs
         CALL WGridGetCellCheckBox(IDF_SA_summary,6,iRow,iStatus)
         IF (iStatus .EQ. 1) THEN
+! Close "Save Solutions" window which may be up
+          CALL WDialogSelect(IDD_OutputSolutions)
+          CALL WDialogHide
+          CALL WDialogSelect(IDD_SAW_Page5)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,6,iRow,Unchecked)
 ! Fill SA Parameter Bounds Wizard Window with the values from this solution.
           CALL WDialogSelect(IDD_SA_input2)
