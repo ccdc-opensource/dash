@@ -272,7 +272,7 @@
 
       CHARACTER*36 parlabel(mvar)
       DOUBLE PRECISION dcel(6)
-      INTEGER I, II, kk, iFrg, iFrgCopy, tk, iH, iK, iL
+      INTEGER I, II, kk, iFrg, iFrgCopy, iH, iK, iL
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
       REAL    tLattice(1:3,1:3)
       REAL    Beta_m, Alpha_m, q0m, q1m, q2m, q3m
@@ -408,7 +408,6 @@
           ENDIF
         ENDIF
       ENDDO
-      tk = 0
       kk = 0
       TotNumZMatrices = 0
 ! JCC Run through all possible fragments
@@ -438,21 +437,8 @@
                   ELSE
                     kzmpar(ii,iFrg) = 6 ! single axis instead of quaternion 
                     kzmpar2(kk) = 6
-! At the moment a Z-matrix containing more than one atom is read in, four
-! parameters are reserved for 'rotations'. When the rotation is restricted to
-! a single axis, only two of these parameters are necessary. By setting
-! upper bound - lower bound to 0.000001, these parameters will be considered 'fixed'
-! and will not be picked during the SA, nor will they be optimised during the simplex minimisation.
-                    tk = tk + 1
-                    SELECT CASE (tk)
-                      CASE (1,2) 
-                        lb(kk) = -1.0
-                        ub(kk) =  1.0
-                      CASE (3,4) 
-                        lb(kk) =  0.0
-                        ub(kk) =  0.000001
-                    END SELECT
-                    IF (tk .EQ. 4) tk = 0
+                    lb(kk) = -1.0
+                    ub(kk) =  1.0
                   ENDIF
                 CASE (3) ! torsion
                   kzmpar2(kk) = 3
