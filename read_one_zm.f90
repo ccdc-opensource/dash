@@ -155,10 +155,10 @@
 ! kzmpar = type of parameter (1 = translation)
 ! xzmpar = initial value of parameter
 ! czmpar = Character string associated with this parameter value
-        czmpar(4,iFrg) = 'Q1(frag )'
-        czmpar(5,iFrg) = 'Q2(frag )'
-        czmpar(6,iFrg) = 'Q3(frag )'
-        czmpar(7,iFrg) = 'Q4(frag )'
+        czmpar(4,iFrg) = 'Q0(frag )'
+        czmpar(5,iFrg) = 'Q1(frag )'
+        czmpar(6,iFrg) = 'Q2(frag )'
+        czmpar(7,iFrg) = 'Q3(frag )'
         DO ii = 4, 7
           kzmpar(ii,iFrg) = 2 ! Quaternion
         ENDDO
