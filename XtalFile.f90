@@ -83,6 +83,9 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
+      INTEGER, EXTERNAL :: Read_One_Zm, Get_HydrogenTreatment
+      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
+      INTEGER, EXTERNAL :: CSSR2Mol2
       INTEGER iHandle
       CHARACTER(MaxPathLength) :: line
       CHARACTER(MaxPathLength) :: tFileName
@@ -94,9 +97,6 @@
       INTEGER iFrg, iFrgCopy
       INTEGER KK, I, ExtLen
       INTEGER iLen, iPos
-      INTEGER, EXTERNAL :: Read_One_Zm
-      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
-      INTEGER, EXTERNAL :: CSSR2Mol2
 
       tFileName = TheFileName
       iLen = LEN_TRIM(tFileName)
@@ -266,7 +266,7 @@
         ENDIF
       ENDDO
       CALL SA_Parameter_Set
-      CALL Create_AtomicWeightings
+      CALL Create_AtomicWeightings(Get_HydrogenTreatment())
       CALL FillSymmetry_2
       CALL GET_LOGREF
       RETURN

@@ -173,7 +173,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Create_AtomicWeightings
+      SUBROUTINE Create_AtomicWeightings(HydrogenTreatment)
 ! This routine sets the weights for the atoms used when calculating the centre of mass
 ! of a Z-matrix.
 ! The weights are set such that the 'crystallographic' centre of mass,
@@ -186,12 +186,14 @@
 
       IMPLICIT NONE
 
+      INTEGER, INTENT (IN   ) :: HydrogenTreatment ! 1 = ignore, 2 = absorb, 3 = explicit
+
       INTEGER iFrg
 
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           IF (icomflg(iFrg) .EQ. 0)  THEN
-            CALL zmCreate_AtomicWeightings(iFrg)
+            CALL zmCreate_AtomicWeightings(iFrg, HydrogenTreatment)
           ENDIF
         ENDIF
       ENDDO
@@ -200,7 +202,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE zmCreate_AtomicWeightings(iFrg)
+      SUBROUTINE zmCreate_AtomicWeightings(iFrg, HydrogenTreatment)
 ! This routine sets the weights for the atoms used when calculating the centre of mass
 ! of a Z-matrix.
 ! The weights are set such that the 'crystallographic' centre of mass,
@@ -215,12 +217,17 @@
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: iFrg
+      INTEGER, INTENT (IN   ) :: HydrogenTreatment ! 1 = ignore, 2 = absorb, 3 = explicit
 
-      INTEGER iAtom
+      INTEGER, EXTERNAL :: NumOfBondedHydrogens
+      INTEGER iAtom, AtomicNumber
       REAL    TotalAtomicWeighting
 
       DO iAtom = 1, natoms(iFrg)
-        AtomicWeighting(iAtom,iFrg) = FLOAT(atnr(zmElementCSD(iAtom,iFrg)))**2
+        AtomicNumber = atnr(zmElementCSD(iAtom,iFrg))
+        IF (HydrogenTreatment .EQ. 2) AtomicNumber = AtomicNumber + NumOfBondedHydrogens(iAtom, iFrg)
+        IF ((HydrogenTreatment .NE. 3) .AND. (AtomicNumber .EQ. 1)) AtomicNumber = 0
+        AtomicWeighting(iAtom,iFrg) = FLOAT(AtomicNumber)**2
       ENDDO
       TotalAtomicWeighting = 0.0
       DO iAtom = 1, natoms(iFrg)

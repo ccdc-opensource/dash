@@ -55,7 +55,7 @@
       CALL WDialogFieldState(IDR_HydrogensExplicit, Disabled)
       LOG_HYDROGENS = (Get_HydrogenTreatment() .EQ. 3)
       CALL CREATE_FOB(Get_HydrogenTreatment() .EQ. 2)
-      CALL Create_AtomicWeightings
+      CALL Create_AtomicWeightings(Get_HydrogenTreatment())
       CALL FillSymmetry_2
       CALL GET_LOGREF
 ! Ungrey the "Save... chi sqrd progress"
