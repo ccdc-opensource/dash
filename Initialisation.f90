@@ -263,8 +263,9 @@
       INTEGER                       Counter
       COMMON  / DBGMSG / ShowAgain, Counter
 
-      INTEGER                ModalFlag
-      COMMON /ModalTorsions/ ModalFlag(100)
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
 
       INTEGER                    ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiHandle
@@ -272,6 +273,10 @@
       REAL                PeakFindPos
       INTEGER                                           nPeaksFound
       COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+
+      INTEGER         nwidth
+      REAL                    rwidth, SqrtCorrObs, DummyESD
+      COMMON / RENE / nwidth, rwidth, SqrtCorrObs, DummyESD(1:MOBS)
 
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
@@ -281,10 +286,11 @@
       INTEGER iRed, iGreen, iBlue, iRGBvalue
       REAL    UM, TH
 
+      DummyESD = 1.0
 ! The initialisations should be split up into 'one off initialisations' (at the start up
 ! of DASH only) and 'whenever a new project file is opened'
-      DO I = 1,MVar
-        ModalFlag = 1
+      DO I = 1, MVAR
+        ModalFlag(I) = 1
       ENDDO
       ShowAgain = .TRUE.
       Counter   = 0
