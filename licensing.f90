@@ -115,10 +115,10 @@
                 ENDIF
               CASE (ID_Licence_Request)
                 CALL WriteLicenceRequestForm
-                CALL WExit
+                CALL DoExit
             END SELECT
           CASE (CloseRequest)
-            CALL WExit
+            CALL DoExit
           CASE (FieldChanged)
             IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
               CALL WDialogFieldState(IDF_License_SiteCode,Enabled)
@@ -170,7 +170,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE DecodeLicence(LString,Info)
+      SUBROUTINE DecodeLicence(LString, Info)
 
       USE VARIABLES
 
