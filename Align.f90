@@ -11,7 +11,10 @@
 !      Symmetry ops in P32 correctly decoded but structures not aligned - inversion
 !       on z axis??
 !      Three equivalent axes (i.e. cubic groups) are not taken account of 
-!********************************************************************************
+!
+!*****************************************************************************
+!
+
 	SUBROUTINE ALIGN()
 
       USE DRUID_HEADER
@@ -26,7 +29,13 @@
       INCLUDE 'lattice.inc' ! Cellpar and space group strings
 
 ! Required for XATOPT
-      COMMON /posopt/ XATOPT(3,MaxAtm_3)
+      REAL                XAtmCoords
+      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:maxatm,1:MaxRun)
+
+      LOGICAL         RESTART
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 !
       PARAMETER (mpdbops=192)
       COMMON /fullsymmops/ rpdb(4,4,mpdbops)!Symmetry operations
@@ -88,7 +97,6 @@
       REAL, DIMENSION(3,MaxNumAtom) ::ConnArray
       
       EXTERNAL ErrorMessage
-      INTEGER iFrg
 
 !        
 !--------- Check to see if align algorithm should be applied-----------
@@ -98,13 +106,7 @@
         RETURN
       END IF       
 ! If number of Z-matrices greater than 1, do not align
-      IF (nfrag.GT.1) THEN
-        RETURN
-      ENDIF
-! If more than one copy for any Z-matrix, do not align
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg) .AND. (zmNumberOfCopies(iFrg).GT.1)) RETURN 
-      ENDDO
+      IF (TotNumZMatrices.GT.1) RETURN
 ! Check if any x,y,z coords have been fixed or upper and lower bounds changed from defaults.
 ! If they have then alignment not carried out.  If user fixed an axis which is an infinite
 ! axis, alignment will be applied
@@ -149,9 +151,9 @@
 
 ! Calculate centre of mass for input molecule
       DO i = 1,natom
-        sumx = sumx + xatopt(1,i)
-        sumy = sumy + xatopt(2,i)
-        sumz = sumz + xatopt(3,i)
+        sumx = sumx + XAtmCoords(1,i,Curr_SA_Run)
+        sumy = sumy + XAtmCoords(2,i,Curr_SA_Run)
+        sumz = sumz + XAtmCoords(3,i,Curr_SA_Run)
       END DO
      
       CentreOfMass(1) = sumx / FLOAT(natom)
@@ -353,7 +355,7 @@
 ! too. Return with matrix (ConnArray) which describes molecule with respect to its 
 ! centre of mass
 
-     CALL MakeMol(XATOPT, isymopbest, ishiftbest, NATOM, Connarray, icount, inversion)
+     CALL MakeMol(XAtmCoords(1,1,Curr_SA_Run), isymopbest, ishiftbest, NATOM, Connarray, icount, inversion)
 ! To make final molecule add ConnArray to best centre of mass
      DO i = 1,NATOM
        DO j = 1,3
@@ -410,30 +412,29 @@
           ELSE
             AtomOnez = FinalMol(2,1)
             Atomtwoz = FinalMol(2,Natom) 
-          END IF
-            IF (Atomtwoz.LT.Atomonez) THEN
-              DO j = 1,3
-                IF(InfiniteAxes(j).eq.1) THEN
-                  DO i = 1,natom
-                     FinalMol(j,i) = centre(j) - connarray(j,i)
-                  END DO  
-                END IF
-              END DO
-            END IF
-        END IF              
+          ENDIF
+          IF (Atomtwoz.LT.Atomonez) THEN
+            DO j = 1,3
+              IF(InfiniteAxes(j).eq.1) THEN
+                DO i = 1,natom
+                   FinalMol(j,i) = centre(j) - connarray(j,i)
+                ENDDO  
+              ENDIF
+            ENDDO
+          ENDIF
+        ENDIF              
 
-! FinalMol contains the solution in fractional coordinates.  Write to Xatopt. 
-     DO J = 1, NATOM
+! FinalMol contains the solution in fractional coordinates.  Write to XAtmCoords. 
+      DO J = 1, NATOM
         DO K = 1,3
-         XATOPT(K,J) = FinalMol(K,J)
-        END DO
-     END DO
-
-     RETURN
-10   CALL ErrorMessage('Sorry, could not find the file'//CHAR(13)// 'SpaceGroupSymbols.dat' &
+          XAtmCoords(K,J,Curr_SA_Run) = FinalMol(K,J)
+        ENDDO
+      ENDDO
+      RETURN
+   10 CALL ErrorMessage('Sorry, could not find the file'//CHAR(13)// 'SpaceGroupSymbols.dat' &
                         //CHAR(13)// 'in the installation directory')
            
-     END SUBROUTINE Align
+      END SUBROUTINE Align
 
 
 !********************************************************************************************
@@ -611,18 +612,18 @@
       IF (Inversion.eq.1) THEN
 !      IF ((ishiftbest.gt.(icount/2)).and.(isymopbest.ne.1)) THEN
        IF (ishiftbest.gt.(icount/2)) THEN
-         Do k = 1, NATOM
-         DO j = 1,3
-          FinalMol(j,k) = FinalMol(j,k) * (-1)
-          END DO
-          END DO
-          END IF 
-          END IF
+         DO k = 1, NATOM
+           DO j = 1,3
+             FinalMol(j,k) = FinalMol(j,k) * (-1)
+           ENDDO
+         ENDDO
+       ENDIF 
+     ENDIF
 
 
-        Sumx = 0.0
-        sumy = 0.0
-        sumz = 0.0
+      Sumx = 0.0
+      sumy = 0.0
+      sumz = 0.0
 
       DO i = 1,NATOM
         sumx = sumx + FinalMol(1,i)
