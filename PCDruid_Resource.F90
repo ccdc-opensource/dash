@@ -1,4 +1,4 @@
-! Winteracter module created : 11/Mar/2002 09:33:43
+! Winteracter module created : 12/Mar/2002 10:34:35
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -573,14 +573,14 @@
           INTEGER, PARAMETER :: ID_FitPeaks                     = 40020
           INTEGER, PARAMETER :: IDD_Rietveld                    =   172
           INTEGER, PARAMETER :: IDF_TAB1                        =  1399
-          INTEGER, PARAMETER :: IDF_GRID1                       =  1397
+          INTEGER, PARAMETER :: IDF_RR_ZmatrixGrid              =  1397
           INTEGER, PARAMETER :: IDB_Refine                      =  1398
           INTEGER, PARAMETER :: IDD_RRsubBonds                  =   180
           INTEGER, PARAMETER :: IDD_DIALOG008                   =   181
           INTEGER, PARAMETER :: IDD_RRsubZmatrices              =   173
-          INTEGER, PARAMETER :: IDF_GRID2                       =  1439
-          INTEGER, PARAMETER :: IDF_GRID3                       =  1440
-          INTEGER, PARAMETER :: IDF_GRID4                       =  1441
+          INTEGER, PARAMETER :: IDF_RR_AngleGrid                =  1438
+          INTEGER, PARAMETER :: IDF_RR_TorsionGrid              =  1440
+          INTEGER, PARAMETER :: IDF_RR_AtomGrid                 =  1439
           INTEGER, PARAMETER :: IDD_RRsubAngles                 =   182
           INTEGER, PARAMETER :: IDD_TEMPLATE020                 =   179
           INTEGER, PARAMETER :: IDD_RRsubTorsions               =   183
@@ -588,4 +588,24 @@
           INTEGER, PARAMETER :: IDD_RRsubAtoms                  =   185
           INTEGER, PARAMETER :: IDD_DIALOG012                   =   187
           INTEGER, PARAMETER :: IDD_DIALOG014                   =   190
+          INTEGER, PARAMETER :: IDF_RR_BondGrid                 =  1441
+          INTEGER, PARAMETER :: IDB_Invert                      =  1442
+          INTEGER, PARAMETER :: IDB_FixAll                      =  1443
+          INTEGER, PARAMETER :: IDB_FixNone                     =  1444
+          INTEGER, PARAMETER :: IDD_RRsubData                   =   174
+          INTEGER, PARAMETER :: IDF_RRa                         =  1445
+          INTEGER, PARAMETER :: IDF_RRb                         =  1446
+          INTEGER, PARAMETER :: IDF_RRc                         =  1447
+          INTEGER, PARAMETER :: IDF_RRalpha                     =  1448
+          INTEGER, PARAMETER :: IDF_RRgamma                     =  1449
+          INTEGER, PARAMETER :: IDF_RRbeta                      =  1450
+          INTEGER, PARAMETER :: IDF_RR_Damping                  =  1451
+          INTEGER, PARAMETER :: IDF_RR_DataStart                =  1452
+          INTEGER, PARAMETER :: IDF_RR_DataEnd                  =  1453
+          INTEGER, PARAMETER :: IDF_RR_ExclRegions              =  1454
+          INTEGER, PARAMETER :: IDF_RR_ZeroPoint                =  1455
+          INTEGER, PARAMETER :: IDB_Undo                        =  1456
+          INTEGER, PARAMETER :: ID_Save                         = 40027
+          INTEGER, PARAMETER :: ID_New                          = 40024
+          INTEGER, PARAMETER :: ID_Open                         = 40026
       END MODULE Druid_Header
