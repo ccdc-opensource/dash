@@ -371,14 +371,7 @@
         DO iFrg = 1, maxfrg
           IF (gotzmfile(iFrg)) THEN
             DO I = 4, natoms(iFrg)
-              IF (ioptt(I,iFrg) .EQ. 0) THEN
-                RR_Show_torsion(I,iFrg) = .FALSE.
-              ELSE
-                RR_Show_torsion(I,iFrg) = (zmElementCSD(I,iFrg) .NE. 2) .AND. &
-                                          (zmElementCSD(iz1(I,iFrg),iFrg) .NE. 2) .AND. &
-                                          (zmElementCSD(iz2(I,iFrg),iFrg) .NE. 2) .AND. &
-                                          (zmElementCSD(iz3(I,iFrg),iFrg) .NE. 2)
-              ENDIF
+              RR_Show_torsion(I,iFrg) = (ioptt(I,iFrg) .EQ. 1)
             ENDDO
           ENDIF
         ENDDO
@@ -1719,7 +1712,7 @@
                     iOrig = izmbid(i,iFrg)
                     ii = OrderedAtm(itotal + iOrig)
                     WRITE (hFile,1034,ERR=999) OriginalLabel(iOrig,iFrg), (Xato(k,ii),k=1,3), occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg) 
- 1034               FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F4.2)
+ 1034               FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F5.2)
                   ENDDO ! loop over atoms
                 ENDDO ! Loop over copies
               ENDIF
