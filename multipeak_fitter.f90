@@ -13,12 +13,10 @@
 !.. Perform simplex
       CALL SIMOPT(X,DX,COV,N,MULTIPEAK_CHISQ)
 !      CALL SUBPLXOPT(X,DX,COV,N,MULTIPEAK_CHISQ)
-!
       DO I = 1, N
         II = I + (I-1)*N
         DX(I) = SQRT(AMAX1(0.,COV(II)))
       ENDDO
-!
       CALL OUTPUT_PRO(N,X,DX)
 !
       END SUBROUTINE MULTIPEAK_FITTER
@@ -39,7 +37,7 @@
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
       REAL YHITE(MPEAK)
-!
+
       INTEGER CurrentRange
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR), IPF_Lo(MAX_NPFR),        &
      &                  IPF_Hi(MAX_NPFR), NumPeakFitRange, CurrentRange,&
@@ -47,7 +45,7 @@
      &                  XPF_Pos(MAX_NPPR,MAX_NPFR),                     &
      &                  YPF_Pos(MAX_NPPR,MAX_NPFR), IPF_RPt(MAX_NPFR),  &
      &                  XPeakFit(MAX_FITPT), YPeakFit(MAX_FITPT)
-!
+
       COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),                       &
      &                  PkFnEsd(MPkDes,Max_NPFR),                       &
      &                  PkFnCal(MPkDes,Max_NPFR), PkFnVarVal(3,MPkDes), &
@@ -56,7 +54,7 @@
      &                  PkAreaEsd(MAX_NPPR,MAX_NPFR),                   &
      &                  PkPosVal(MAX_NPPR,MAX_NPFR),                    &
      &                  PkPosEsd(MAX_NPPR,MAX_NPFR), PkPosAv(MAX_NPFR)
-!
+
       PI = 4.*ATAN(1.)
       RAD = PI/180.
       DEG = 1./RAD
@@ -64,7 +62,6 @@
       FOURPI = 4.*PI
       PIBY2 = 0.5*PI
       ALOG2 = LOG(2.)
-!
       YMAX = Y(1)
       IMAX = 1
       DO I = 1, NPT
@@ -73,7 +70,6 @@
           IMAX = I
         ENDIF
       ENDDO
-!
       XMIN = X(1)
       XMAX = X(NPT)
       XDIF = XMAX - XMIN
@@ -82,7 +78,6 @@
       YMXB = V(1) + V(2)*(X(IMAX)-X(1))
       YPMX = YMAX - YMXB
       YPMX50 = 0.5*YPMX
-!
 !.. Estimate GAMM & SIGM
       DO I = IMAX, NPT
         YBT = V(1) + V(2)*(X(I)-X(1))
@@ -92,10 +87,8 @@
           GOTO 15
         ENDIF
       ENDDO
-!
    15 GAMM = 2.*XHWHMU
       SIGM = 0.2*GAMM
-!
 !.. Now estimate HPSL & HMSL
       YPMX20 = 0.2*YPMX
       DO I = IMAX, 1, -1
@@ -109,7 +102,6 @@
    20 HTEM = 2.*ABS(XTEM-GAMM)
       HPSL = MAX(0.001,SQRT(2.*RAD*HTEM*TAN(RAD*X(IMAX))))
       HMSL = 0.5*HPSL
-!
       TOTAREA = 0.
       DO I = 1, NPT
         YB = V(1) + V(2)*(X(I)-X(1))
@@ -118,7 +110,6 @@
       XDELT = X(IMAX) - X(IMAX-1)
       ZXDELT = 0.25*XDELT
       TOTAREA = TOTAREA*XDELT
-!
       YHSUM = 0.
       DO IP = 1, NPEAK
         ATEM = ABS(X(1)-XPOS(IP))
@@ -134,11 +125,9 @@
         YHITE(IP) = Y(IPOS(IP)) - YB
         YHSUM = YHSUM + YHITE(IP)
       ENDDO
-!
       DO IP = 1, NPEAK
         AREA(IP) = TOTAREA*YHITE(IP)/YHSUM
       ENDDO
-!
 !      IF (CurrentRange.eq.1) Then
       V(3) = SIGM
       V(4) = GAMM
@@ -155,7 +144,6 @@
 !          I2=I+2
 !          vi2=v(i2)
 !          V(I2)=PeakFnValue(I,XPosAvTem)
-!          write(76,*) 'Old & New PeakFnVal ',vi2,v(i2)
 !        End Do
 !      END IF
       DO I = 1, NPEAK
@@ -163,11 +151,9 @@
         V(KK+1) = AREA(I)
         V(KK+2) = XPOS(I)
       ENDDO
-!
       DO I = 1, N
         D(I) = 0.1*abs(V(I))
       ENDDO
-!
       DO IP = 1, NPEAK
         KK = 6 + 2*IP
         D(KK) = 0.002
@@ -188,12 +174,9 @@
 !C 9C
 !H Modification of Harwell Fast Fourier Transform.
 !
-!%
-!      DIMENSION TR(%FFT2%),TI(%FFT2%)
       DIMENSION TR(1024), TI(1024)
       EXTERNAL WWFFTADD
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /WWFFTDA/ KJUMP, UR(15), UI(15)
 !
       GOTO (1,2), KJUMP
@@ -205,7 +188,6 @@
         UI(I) = SIN(TH)
       ENDDO
       KJUMP = 2
-!
 ! SECOND AND SUBSEQUENT ENTRIES:
     2 UM = 1.
       IF (INV.EQ.1) UM = -1.
@@ -217,7 +199,6 @@
 ! ERROR EXIT - IT NOT A POWER OF 2, OR TOO BIG:
    99 INV = -1
       GOTO 100
-!
     4 IO = I
       II = IO
       I1 = IT/2
@@ -228,7 +209,6 @@
       WI = 0.
       KK = K
       JO = IO
-!
    12 IF (KK.EQ.0) GOTO 13
    14 JO = JO - 1
       KK1 = KK
@@ -238,10 +218,8 @@
       WI = WR*UI(JO) + WI*UR(JO)
       WR = WS
       GOTO 12
-!
    13 WI = WI*UM
       J = 0
-!
     9 L = J*I2 + K
       L1 = L + I1
       ZR = TR(L+1) + TR(L1+1)
@@ -262,7 +240,6 @@
       J = 1
       UM = 1.
       IF (INV.EQ.1) UM = 1./FLOAT(IT)
-!
     7 K = 0
       J1 = J
       DO I = 1, II
@@ -270,7 +247,6 @@
         K = 2*(K-J2) + J1
         J1 = J2
       ENDDO
-!
       IF (K.GE.J) THEN
         IF (K.EQ.J) THEN
           TR(J+1) = TR(J+1)*UM
@@ -379,15 +355,11 @@
           ENDIF
         ENDDO
       ENDIF
-!
       NPeak = NumInPFR(CurrentRange)
-!
       N = 6 + 2*NPeak
-!
       DO I = 1, NPeak
         XPos(I) = XPF_Pos(I,CurrentRange)
       ENDDO
-!
       Npt = IPF_Range(CurrentRange)
       ITEM = IPF_Lo(CurrentRange) - 1
       DO I = 1, NPT
@@ -396,11 +368,9 @@
         Y(I) = YOBIN(J)
         E(I) = EBIN(J)
       ENDDO
-!
       IXRES = 1.2
 !      DXRES=1./FLOAT(IXRES)
       DXRES = 1./IXRES
-!
       NPTS = NPT
       MN = 1
    10 MN = 2*MN
@@ -409,7 +379,6 @@
       IF (MN.LT.MNTEM) GOTO 10
       MN = MIN(2048,MN)
       MN2 = MN/2
-!
       KNOW = 1
       JPHASE = 1
       JSOURC = 1
@@ -432,7 +401,6 @@
           KOBZ(1) = I
         ENDIF
       ENDDO
-!
       IIMIN = 1
       IIMAX = NPTS
       XDIFT = ZARGI(IIMAX) - ZARGI(IIMIN)
@@ -486,14 +454,12 @@
       DO II = 1, NumPeakFitRange
         IPF_RPt(II+1) = IPF_RPt(II) + IPF_Range(II)
       ENDDO
+      IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange) + IPF_Range(CurrentRange)
       IF (CurrentRange.EQ.NumPeakFitRange) THEN
-        IPF_RPt(1) = 0
 !.. We just need to add on to the end of the list
-        IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange) + IPF_Range(CurrentRange)
         ITEM = IPF_Lo(CurrentRange) - 1
         DO I = 1, NPTS
           II = IPF_RPt(CurrentRange) + I
-!..           JJ=ITEM+I
           XPeakFit(II) = ZARGI(I)
           YPeakFit(II) = ZCAL(I)
         ENDDO
@@ -524,15 +490,13 @@
           YPF_Pos(i,CurrentRange) = zcal(item)
         ENDDO
       ELSE ! It's an old range that we are refitting
-        IPF_RPt(1) = 0
 !
 ! JCC Hmm - problem here. What if we have not fitted the range, only swept it out?
 ! attempt to solve by re-calculating the next range's value every time rather than assuming it is set
 ! (it won't be set if we've not already got into this routine before for this peak)
 !
-        IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange) + IPF_Range(CurrentRange)
 !
-!.. We just need to modify a few variables
+! We just need to modify a few variables
         DO I = 1, NPTS
           II = IPF_RPt(CurrentRange) + I
           XPeakFit(II) = ZARGI(I)
@@ -569,13 +533,5 @@
       PkPosAv(CurrentRange) = xranav
       CALL Upload_Widths()
       CALL Upload_Positions()
-!
-! JvdS I couln't find any other references to 'multi.pro', so I guess it is
-! never used (i.e. read).
-!U      OPEN (83,FILE='multi.pro',STATUS='unknown')
-!U      DO i = 1, npts
-!U        WRITE (83,*) zargi(i), zbak(i), zobs(i), zcal(i), zdobs(i)
-!U      ENDDO
-!U      CLOSE (83)
-!
+
       END SUBROUTINE OUTPUT_PRO

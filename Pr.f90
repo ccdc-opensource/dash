@@ -886,6 +886,15 @@
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -1582,10 +1591,6 @@
       DIMENSION KK1(2), AM(2), BM(2), IH(3), SUMPKN(5)
       LOGICAL TOOWEE
       REAL ARTEM(6)
-!%
-!      DIMENSION ISTRIK(%REFS%),ISLAK(%REFS%),ARCLUM(%REFS%),
-!%
-!     1ICLUMP(%REFS%),CLUMUL(%REFS%),TOOWEE(%REFS%)
       DIMENSION ISTRIK(ITMREF), ISLAK(ITMREF), ARCLUM(ITMREF),          &
      &          ICLUMP(ITMREF), CLUMUL(ITMREF), TOOWEE(ITMREF)
 !* CAN WE USE /SCRAT/ FOR THAT LOT ?? **
@@ -1945,8 +1950,6 @@
       ENTRY FM4PR9
 ! CLEAR ALL FAMILY 4 PARAMETERS TO BE FIXED (EVEN IF NONE INVOLVED):
       DO I = 1, 3
-!%
-!      DO 9 J=1,%REFS%
         DO J = 1, ITMREF
           KF4PAR(I,J) = 0
         ENDDO
@@ -4624,6 +4627,15 @@
       LOGICAL STRKT
       DIMENSION KOMM16(1)
       EQUIVALENCE (KOMM16(1),AKLO)
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17

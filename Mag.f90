@@ -118,6 +118,15 @@
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -434,8 +443,6 @@
 !P The magnetic symmetry must have been set up by calls to SYMOP and
 !P DOMAG
 !
-!%
-!      DIMENSION IPSFIX(%PSIS%)
       DIMENSION IPSFIX(4)
       LOGICAL LMFIX(3), FIRST
       COMMON /MAGDAT/ NMAG, MAGAT(150), JMAGAT(10), NMFORM(10),         &
@@ -446,8 +453,6 @@
      &                MTYP, NDOM, FERO, FERA, HELI, AMOD, ANTI, MODUL,  &
      &                KOM20
       LOGICAL FERO, FERA, HELI, AMOD, ANTI, MODUL
-!%
-!
       FIRST = .TRUE.
       DO MAT = 1, NMAG
 ! IF FERROMAGNETIC NO CONSTRAINTS
@@ -484,8 +489,6 @@
 !
       EXTERNAL DUMMY
       LOGICAL FIRST, LMFIX(3), NONE
-!%
-!      DIMENSION RMAT(3,3),NFIX(3),FIX(3),IATAB(%SYMO%),RX(3),SCON(3)
       DIMENSION RMAT(3,3), NFIX(3), FIX(3), IATAB(24), RX(3), SCON(3)
       DIMENSION VEC(3), TVEC(3,2)
       COMMON /ATNAM / ATNAME(150), ATNA(150,9)
@@ -499,6 +502,15 @@
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -801,8 +813,6 @@
 !
       EXTERNAL MTPROD
       DIMENSION S(3,3), RS(3,3), TEMP(3,3), SROT(3,3), MGEN(3)
-!%
-!      DIMENSION NSTAB(%SY+1%),TMPSYM(%SYMO%),MJTAB(%SYMO%)
       DIMENSION NSTAB(25), MJTAB(24)
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
@@ -1289,8 +1299,6 @@
 !D is negative the centre of symmetry generates new sublattices, and the entries
 !D for such sub-lattices in LPHI are negative.
 !
-!%
-!      DIMENSION XEQ(3,%SYMO%),IPSFIX(%PSIS%),TPHI(%PSIS%),LTPHI(%PSIS%)
       DIMENSION XEQ(3,24), IPSFIX(4), TPHI(4), LTPHI(4)
       DIMENSION XR(3), XT(3), CELLT(3)
       COMMON /ATNAM / ATNAME(150), ATNA(150,9)
@@ -1303,6 +1311,15 @@
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -1315,8 +1332,6 @@
      &                MTYP, NDOM, FERO, FERA, HELI, AMOD, ANTI, MODUL,  &
      &                KOM20
       LOGICAL FERO, FERA, HELI, AMOD, ANTI, MODUL
-!%
-!      DATA NPSI /%PSIS%/
       DATA NPSI/4/
 !
       IAT = JMAGAT(MGAT)
@@ -1491,8 +1506,6 @@
      &                ANGM(4,10), KANGM(4,10), SMOD(2,10), KSMOD(2,10), &
      &                PHIH(4,10), KPHIH(4,10), LPHI(4,10), NPHI(10),    &
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
-!%
-!      DATA NPSI/%PSIS%/
       DATA NPSI/4/
 !
       IF (MODE.LT.2) THEN

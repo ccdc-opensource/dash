@@ -7,25 +7,24 @@
       USE DRUID_HEADER
       USE VARIABLES
 
+      IMPLICIT NONE
+
+      INTEGER, INTENT (  OUT) :: imyexit
+
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
 
-      PARAMETER (mvar=100)
-      COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-
-      INTEGER CheckOverwriteSaOutput ! Function
-      INTEGER test                   ! Function
+      INTEGER, EXTERNAL :: CheckOverwriteSaOutput
       REAL    T1
       REAL    SA_Duration ! The time the SA took, in seconds
       CHARACTER*10 SA_DurationStr
+      INTEGER Ierrflag
 
-      test = CheckOverwriteSaOutput()
-      IF (test .EQ. 0) THEN
+      IF (CheckOverwriteSaOutput() .EQ. 0) THEN
         imyexit = 3
         RETURN
       ENDIF
       CALL WDialogSelect(IDD_SA_Action1)
-      CALL WDialogFieldState(IDF_Pause_Annealing,Enabled)
 ! Check on viewer
       IF (ViewOn) THEN
         CALL WDialogFieldState(IDF_Viewer,Enabled)
@@ -38,7 +37,7 @@
       CALL SimulatedAnnealing(imyexit)
       SA_Duration = SECNDS(T1)
       WRITE(SA_DurationStr,'(F10.1)') SA_Duration
-      CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
+  !    CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       DoSaRedraw = .FALSE.
@@ -53,12 +52,9 @@
       ENDDO
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WDialogHide()
-      CALL ToggleMenus(0)
-
 !ep SASummary presents a grid summarising results of the Simulated
 !   Annealing runs.  
       CALL SaSummary()
-      CALL ToggleMenus(1)
       Ierrflag =  InfoError(1)
       DoSaRedraw = .FALSE.
 

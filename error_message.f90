@@ -1,6 +1,6 @@
 !
 	SUBROUTINE CHKMAXREF(PCXX)
-! Checks if the maximum number of reflections have been exceeded
+! Checks if the maximum number of reflections has been exceeded
 !
     USE WINTERACTER
 	external PCXX
@@ -60,7 +60,7 @@
 !*****************************************************************************
 !
       SUBROUTINE CHKMAXREF_2(PCXX)
-! Checks if the maximum number of reflections have been exceeded
+! Checks if the maximum number of reflections has been exceeded
 !
       USE WINTERACTER
 

@@ -9,26 +9,225 @@
 ! Upload_XXXXX   = stores the global variable(s) XXXXX from DASH in the corresponding
 !                  variable(s) in all Winteracter dialogues
 !
-!U!
-!U!*****************************************************************************
-!U!
-!U      SUBROUTINE Upload_Zero_Point()
-!U
-!U      USE WINTERACTER
-!U      USE DRUID_HEADER
-!U
-!U      INCLUDE 'Lattice.inc'
-!U
-!U      CALL PushActiveWindowID
-!U      CALL WDialogSelect(IDD_Peak_Positions)
-!U      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
-!U      CALL WDialogSelect(IDD_Crystal_Symmetry)
-!U      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
-!U      CALL WDialogSelect(IDD_Index_Preparation)
-!U      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
-!U      CALL PopActiveWindowID
+!*****************************************************************************
+!
+! This file contains routines to read powder diffraction files.
 
-!U      END SUBROUTINE Upload_Zero_Point
+      SUBROUTINE ScrUpdateFileName
+!
+! This routine updates all occurrences of the filename, both
+! on the status bar and in the wizard.
+!
+! JvdS 17 July 2001
+!
+      USE WINTERACTER
+      USE VARIABLES
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+
+! Note that FNAME is a global variable in VARIABLES, defined in PCDruid_Main.f90
+
+! Remember current dialogue window
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page3)
+      CALL WDialogPutString(IDF_PWa_DataFileName_String,FNAME)
+      CALL WDialogSelect(IDD_PW_Page2)
+      CALL WDialogPutString(IDF_PW_DataFileName_String,FNAME)
+      CALL PopActiveWindowID
+! Update the status bar at the bottom of the screen.
+      STATBARSTR(1) = FNAME
+      CALL WindowOutStatusBar(1,STATBARSTR(1))
+
+      END SUBROUTINE ScrUpdateFileName
+!
+!*****************************************************************************
+!
+      REAL FUNCTION WavelengthOf(TheAnodeMaterial)
+!
+! This function return the wavelength of an X-ray tube given the material the anode is made of.
+!
+! JvdS 29 July 2001
+!
+! INPUT   : TheAnodeMaterial = the anode material, e.g. 'Cu'
+!
+! RETURNS : The wavelength as provided by the International Centre for Diffraction Data
+!           0.0 if material not recognised
+!
+      IMPLICIT NONE
+
+      CHARACTER*2, INTENT (IN   ) :: TheAnodeMaterial ! Chemical symbol for anode material, e.g. 'Cu'
+
+      CHARACTER*1 ChrUpperCase ! Function
+      CHARACTER*1 ChrLowerCase ! Function
+      CHARACTER*2 tAnodeMaterial ! To remove call by value / call by reference ambiguity
+
+      tAnodeMaterial(1:1) = ChrUpperCase(TheAnodeMaterial(1:1))
+      tAnodeMaterial(2:2) = ChrLowerCase(TheAnodeMaterial(2:2))
+      SELECT CASE (tAnodeMaterial)
+           CASE ('Cu')
+             WavelengthOf = 1.54056
+           CASE ('Mo')
+             WavelengthOf = 0.70930
+           CASE ('Co')
+             WavelengthOf = 1.78897
+           CASE ('Fe')
+             WavelengthOf = 1.93604
+           CASE ('Cr')
+             WavelengthOf = 2.28970
+           CASE DEFAULT
+             WavelengthOf = 0.0
+         END SELECT
+
+      END FUNCTION  WavelengthOf
+!
+!*****************************************************************************
+!
+      REAL FUNCTION Radians2Degrees(TheAngle)     
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheAngle
+
+      Radians2Degrees = TheAngle * (30.0 / ASIN(0.5))
+
+      END FUNCTION Radians2Degrees
+!
+!*****************************************************************************
+!
+      REAL FUNCTION Degrees2Radians(TheAngle)     
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheAngle
+
+      Degrees2Radians = TheAngle * (ASIN(0.5) / 30.0)
+
+      END FUNCTION Degrees2Radians
+!
+!*****************************************************************************
+!
+      REAL FUNCTION TwoTheta2dSpacing(TheTwoTheta)     
+!
+! Calculates the d-spacing for the given 2 theta value using the wavelength in ALambda
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheTwoTheta
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL FnWaveLengthOK ! Function
+      REAL Degrees2Radians ! Function
+      REAL WavelengthOf ! Function
+
+      IF (.NOT. FnWaveLengthOK()) THEN
+        CALL ErrorMessage('Wavelength invalid, will be set to Cu')
+        CALL UpdateWavelength(WavelengthOf('Cu'))
+      ENDIF
+      IF (TheTwoTheta .LT. 0.01) THEN
+        TwoTheta2dSpacing = 1000000.0
+        CALL DebugErrorMessage('TheTwoTheta .LT. 0.1 in TwoTheta2dSpacing')
+      ELSE
+        TwoTheta2dSpacing = ALambda / (2*SIN(Degrees2Radians(TheTwoTheta/2)))
+      ENDIF
+
+      END FUNCTION TwoTheta2dSpacing
+!
+!*****************************************************************************
+!
+      REAL FUNCTION dSpacing2TwoTheta(ThedSpacing)     
+!
+! Calculates 2 theta for the given d-spacing using the wavelength in ALambda
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: ThedSpacing
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL FnWaveLengthOK ! Function
+      REAL WavelengthOf ! Function
+      REAL TwoTheta2dSpacing ! Function
+      REAL Radians2Degrees ! Function
+
+      IF (.NOT. FnWaveLengthOK()) THEN
+        CALL ErrorMessage('Wavelength invalid, will be set to Cu')
+        CALL UpdateWavelength(WavelengthOf('Cu'))
+      ENDIF
+! Calculate minimum d-spacing for the given wavelength
+      IF (ThedSpacing .LT. TwoTheta2dSpacing(89.9999)) THEN
+        dSpacing2TwoTheta = 90.0
+      ELSE
+        dSpacing2TwoTheta = 2 * Radians2Degrees(ASIN(ALambda/(2*ThedSpacing)))
+      ENDIF
+
+      END FUNCTION dSpacing2TwoTheta
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION AutoLocalMinimisation
+
+! When .TRUE., each run in a multi run ends with a local minimisation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER I
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogGetCheckBox(IDF_AutoLocalOptimise,I)
+      CALL PopActiveWindowID
+      AutoLocalMinimisation = (I .EQ. 1)
+
+      END FUNCTION AutoLocalMinimisation
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION SaveCSSR
+
+! When .TRUE., each run in a multi run ends with a local minimisation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER I
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogGetCheckBox(IDF_OutputCSSR,I)
+      CALL PopActiveWindowID
+      SaveCSSR = (I .EQ. 1)
+
+      END FUNCTION SaveCSSR
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION SaveCCL
+
+! When .TRUE., each run in a multi run ends with a local minimisation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER I
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogGetCheckBox(IDF_OutputCCL,I)
+      CALL PopActiveWindowID
+      SaveCCL = (I .EQ. 1)
+
+      END FUNCTION SaveCCL
 !
 !*****************************************************************************
 !
@@ -104,7 +303,7 @@
         IF (WindowNr .NE. 3) THEN
           DO I = 1, 6
             IF (CellParConstrained(I)) THEN
-              CALL WDialogFieldState(CellParID(I),Disabled)
+              CALL WDialogFieldState(CellParID(I),DialogReadOnly)
             ELSE
               CALL WDialogFieldState(CellParID(I),Enabled)
             ENDIF
@@ -221,9 +420,9 @@
       CALL WDialogSelect(IDD_Data_Properties)
       CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_PW_Page2)
-      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(F10.5)')
+      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_PW_Page4)
-      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(F10.5)')
+      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_Index_Preparation)
       CALL WDialogPutReal(IDF_Indexing_Lambda,ALambda,'(F10.5)')
 ! Now add in a test: if lab data, and wavelength close to known material,
@@ -436,43 +635,20 @@
 
       INCLUDE 'GLBVAR.INC' ! Contains JRadOption
 
-! JvdS @ this can be reduced by a factor of three
-      CALL PushActiveWindowID
-!U      DO WindowNr = 1, 3
-!U        SELECT CASE (WindowNr)
-!U          CASE (1) 
-!U            CALL WDialogSelect(IDD_PW_Page2)
-!U          CASE (2) 
-!U            CALL WDialogSelect(IDD_PW_Page4)
-!U          CASE (3) 
-!U            CALL WDialogSelect(IDD_Data_Properties)
-!U        END SELECT
+      INTEGER WindowNr
 
+      CALL PushActiveWindowID
+      DO WindowNr = 1, 3
+        SELECT CASE (WindowNr)
+          CASE (1) 
+            CALL WDialogSelect(IDD_PW_Page2)
+          CASE (2) 
+            CALL WDialogSelect(IDD_PW_Page4)
+          CASE (3) 
+            CALL WDialogSelect(IDD_Data_Properties)
+        END SELECT
         SELECT CASE (JRadOption)
           CASE (1) ! Lab X-ray
-            CALL WDialogSelect(IDD_PW_Page2)
-            CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
-            CALL WDialogFieldState(IDF_PW_radiation_label,Enabled)
-            CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
-            CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
-            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
-            CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
-            CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
-            CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
-            CALL WDialogPutRadioButton(IDF_PW_LabX_Source)
-            CALL WDialogSelect(IDD_PW_Page4)
-            CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
-            CALL WDialogFieldState(IDF_PW_radiation_label,Enabled)
-            CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
-            CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
-            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
-            CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
-            CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
-            CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
-            CALL WDialogPutRadioButton(IDF_PW_LabX_Source)
-            CALL WDialogSelect(IDD_Data_Properties)
             CALL WDialogFieldState(IDF_CW_group,Enabled)
             CALL WDialogFieldState(IDF_radiation_label,Enabled)
             CALL WDialogFieldState(IDF_wavelength1,Enabled)
@@ -483,38 +659,7 @@
             CALL WDialogFieldState(IDF_2theta_label,Disabled)
             CALL WDialogFieldState(IDF_2theta0,Disabled)
             CALL WDialogPutRadioButton(IDF_LabX_Source)
-          CASE (2,3) ! Synchrotron X-ray & CW neutron  
-            CALL WDialogSelect(IDD_PW_Page2)
-            CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
-            CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-            CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
-            CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
-            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
-            CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
-            CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
-            CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
-            IF (JRadOption .EQ. 2) THEN
-              CALL WDialogPutRadioButton(IDF_PW_SynX_Source)
-            ELSE
-              CALL WDialogPutRadioButton(IDF_PW_CWN_Source)
-            END IF
-            CALL WDialogSelect(IDD_PW_Page4)
-            CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
-            CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-            CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
-            CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
-            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
-            CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
-            CALL WDialogFieldState(IDF_PW_2theta_label,Disabled)
-            CALL WDialogFieldState(IDF_PW_2theta0,Disabled)
-            IF (JRadOption .EQ. 2) THEN
-              CALL WDialogPutRadioButton(IDF_PW_SynX_Source)
-            ELSE
-              CALL WDialogPutRadioButton(IDF_PW_CWN_Source)
-            END IF
-            CALL WDialogSelect(IDD_Data_Properties)
+          CASE (2, 3) ! Synchrotron X-ray & CW neutron  
             CALL WDialogFieldState(IDF_CW_group,Enabled)
             CALL WDialogFieldState(IDF_radiation_label,Disabled)
             CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
@@ -530,29 +675,6 @@
               CALL WDialogPutRadioButton(IDF_CWN_Source)
             END IF
           CASE (4) ! TOF neutron
-            CALL WDialogSelect(IDD_PW_Page2)
-            CALL WDialogFieldState(IDF_PW_CW_group,Disabled)
-            CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-            CALL WDialogFieldState(IDF_PW_wavelength1,Disabled)
-            CALL WDialogFieldState(IDF_PW_TOF_group,Enabled)
-            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Enabled)
-            CALL WDialogFieldState(IDF_PW_flight_path,Enabled)
-            CALL WDialogFieldState(IDF_PW_2theta_label,Enabled)
-            CALL WDialogFieldState(IDF_PW_2theta0,Enabled)
-            CALL WDialogPutRadioButton(IDF_PW_TOF_source)
-            CALL WDialogSelect(IDD_PW_Page4)
-            CALL WDialogFieldState(IDF_PW_CW_group,Disabled)
-            CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-            CALL WDialogFieldState(IDF_PW_wavelength1,Disabled)
-            CALL WDialogFieldState(IDF_PW_TOF_group,Enabled)
-            CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Enabled)
-            CALL WDialogFieldState(IDF_PW_flight_path,Enabled)
-            CALL WDialogFieldState(IDF_PW_2theta_label,Enabled)
-            CALL WDialogFieldState(IDF_PW_2theta0,Enabled)
-            CALL WDialogPutRadioButton(IDF_PW_TOF_source)
-            CALL WDialogSelect(IDD_Data_Properties)
             CALL WDialogFieldState(IDF_CW_group,Disabled)
             CALL WDialogFieldState(IDF_radiation_label,Disabled)
             CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
@@ -564,7 +686,7 @@
             CALL WDialogFieldState(IDF_2theta0,Enabled)
             CALL WDialogPutRadioButton(IDF_TOF_source)
         END SELECT
-!U      ENDDO
+      ENDDO
       CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Source
@@ -930,8 +1052,6 @@
       CHARACTER*(*) filename
 
       CALL PushActiveWindowID
-! JvdS Started to add SA to Wizard
-!      CALL WDialogSelect(IDD_SA_input1)
       CALL WDialogSelect(IDD_SAW_Page1)
       CALL WDialogPutString(IDF_SA_Project_Name,filename)
       CALL PopActiveWindowID
@@ -953,23 +1073,23 @@
         CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOn)
       ELSE
         CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOff)
-      END IF
+      ENDIF
 
       END SUBROUTINE SetWizardState
 !
 !*****************************************************************************
 !
-!>> JCC Subroutine for controlling the configuration of the menus and tool buttons in DASH
+! JCC Subroutine for controlling the configuration of the menus and tool buttons in DASH
       SUBROUTINE SetModeMenuState(PeakOn,PawleyOn,SolutionOn)
-!>> If PeakOn is positive then peak fitting will be enabled
-!>> If PawleyOn is positive then Pawley fitting will be enabled
-!>> Is SolutionOn is positive solving will be enabled
-!>> If PeakOn is negative then peak fitting will be disabled
-!>> If PawleyOn is negative then Pawley fitting will be disabled
-!>> Is SolutionOn is negative solving will be disabled
-!>> If PeakOn is zero then the peak fitting state is left as is
-!>> If PawleyOn is zero then the Pawley fitting state is left as is
-!>> Is SolutionOn is zero then the solving state is left as is
+! If PeakOn is positive then peak fitting will be enabled
+! If PawleyOn is positive then Pawley fitting will be enabled
+! Is SolutionOn is positive solving will be enabled
+! If PeakOn is negative then peak fitting will be disabled
+! If PawleyOn is negative then Pawley fitting will be disabled
+! Is SolutionOn is negative solving will be disabled
+! If PeakOn is zero then the peak fitting state is left as is
+! If PawleyOn is zero then the Pawley fitting state is left as is
+! Is SolutionOn is zero then the solving state is left as is
 
       USE WINTERACTER
       USE DRUID_HEADER

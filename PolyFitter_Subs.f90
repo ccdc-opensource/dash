@@ -60,11 +60,11 @@
             ELSE
               CALL IRealToString(ymint,statbarstr(6)(1:),'(F10.1)')
               CALL IRealToString(ymaxt,statbarstr(7)(1:),'(F10.1)')
-            END IF
+            ENDIF
             DO ISB = 4, 7
               CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-            END DO
-          END IF
+            ENDDO
+          ENDIF
           SELECT CASE (EventType)
 !U            CASE (Expose,Resize)
 !U              CALL Redraw()
@@ -100,8 +100,8 @@
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
                 CALL IGrFillPattern(0,1,1)
                 CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
-                IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(XPGMAX-XPGMIN)) EXIT
-                IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(YPGMAX-YPGMIN)) EXIT
+                IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(XPGMAX-XPGMIN)) RETURN
+                IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(YPGMAX-YPGMIN)) RETURN
                 XPGMIN=MIN(XCUR(1),XCUR(2))
                 XPGMAX=MAX(XCUR(1),XCUR(2))  
                 YPGMIN=MIN(YCUR(1),YCUR(2))
@@ -111,14 +111,14 @@
 !                xpgmax=xpmax
 !                ypgmin=ypmin
 !                ypgmax=ypmax
-              END IF
+              ENDIF
               CALL IGrColourN(InfoGrScreen(PrevColReq))
               CALL Get_IPMaxMin()
               CALL Profile_Plot(IPTYPE)
-              EXIT  
+              RETURN  
           END SELECT
-        END IF
-      END DO
+        ENDIF
+      ENDDO
 
       END SUBROUTINE Plot_Alter
 !

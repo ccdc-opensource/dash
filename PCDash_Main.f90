@@ -184,7 +184,7 @@
           CALL SelectMode(ID_Pawley_Refinement_Mode)
           CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)
-          CALL SA_Main()
+          CALL ShowWizardWindowZmatrices
         CASE (ID_get_crystal_symmetry)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
@@ -369,63 +369,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ToggleMenus(OnOff)
-! JvdS This routine emulates 'modal' by greying out all menus, buttons etc.
-! It is necessary when a window pops up that should still be able to communicate
-! to the main window.
-! JvdS I checked all references to 'ToggleMenus', the argument OnOff is always
-! JvdS either 0 or 1
-! JvdS It's better to use some sort of a stack mechanism, popping and pushing
-! the state of all windows.
-! As it is, the routine is not a real 'toggle': a toggle doesn't need an argument
-! because it simply flips between two states. This introduces bugs: the series
-!
-! CALL ToggleMenus(Off)
-! CALL ToggleMenus(Off)
-! CALL ToggleMenus(On)
-!
-! does not restore the original state of the program.
-
-      USE WINTERACTER
-      USE VARIABLES
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER OnOff
-      INTEGER  PeakOn, PawleyOn, SolutionOn
-      SAVE PeakOn, PawleyOn, SolutionOn
-      DATA PeakOn / 1 /
-      DATA PawleyOn / 0 /
-      DATA SolutionOn / 0 /
-      INTEGER OnOrOff
-
-! WintOn and WintOff are Winteracter constants
-
-      RETURN
-
-      IF (OnOff .EQ. 1) THEN
-        OnOrOff = WintOn
-      ELSE
-        OnOrOff = WintOff
-      ENDIF
-      CALL WMenuSetState(ID_Import_dpj_file,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_PolyFitter_Help,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_help_about_Polyfitter,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_import_xye_file,ItemEnabled,OnOrOff)
-      IF (OnOff .EQ. 1) THEN
-        CALL SetModeMenuState(PeakOn,PawleyOn,SolutionOn)
-      ELSE
-        PeakOn     = WMenuGetState(ID_Peak_Fitting_Mode,ItemEnabled)
-        PawleyOn   = WMenuGetState(ID_Pawley_Refinement_Mode,ItemEnabled)
-        SolutionOn = WMenuGetState(ID_Structure_Solution_Mode,ItemEnabled)
-        CALL SetModeMenuState(-1,-1,-1)
-      ENDIF
-
-      END SUBROUTINE ToggleMenus
-!
-!*****************************************************************************
-!
       SUBROUTINE DeleteTempFiles
 
       USE WINTERACTER
@@ -452,6 +395,7 @@
       CALL IOsDeleteFile('polyp.tbk')
       CALL IOsDeleteFile('polyp.hbk')
       CALL IOsDeleteFile('polyp.hbl')
+      CALL IOsDeleteFile('SA_best.pdb')
       CALL IOsDeleteFile('DICVOL.OUT')
       CALL IOSDeleteFile('MakeZmatrix.log')
       CALL IDebugLevel(DbgMsgBox)

@@ -110,15 +110,13 @@
       INTEGER IR(*)
       LOGICAL SLOW
       DATA ALPHA, BETA, GAMA/1.0, 0.5, 2.0/
-!.. Original      DATA    ALPHA,BETA,GAMA/1.0,0.5,2.0/
-!
+
       SLOW = .FALSE.
       N3 = 3*N
       CAIM = 0.0
       C(1) = CHIFUN(N,V(1,1))
       CALL SIMP0(V,D,C,IR,N,CHIFUN)
       CMIN = C(IR(N+1))
-!
       ITER = 0
       NOLUCK = 0
       IRSTRT = 0
@@ -150,8 +148,7 @@
       IF (C0.LT.CL) THEN
         CALL EXPAND(CL,EX,EX(1,2),EX(1,3),N,C0,GAMA,CHIFUN)
       ELSEIF (C0.GT.CS) THEN
-        CALL CONTRACT(CH,CS,C0,C00,EX,EX(1,2),EX(1,3),V(1,IR(1)),BETA,N,&
-     &                CHIFUN)
+        CALL CONTRACT(CH,CS,C0,C00,EX,EX(1,2),EX(1,3),V(1,IR(1)),BETA,N,CHIFUN)
         IF (C00.LT.CH .AND. C00.LT.C0) THEN
           CALL VCOPY(EX(1,2),EX,N)
           C0 = C00
@@ -167,13 +164,11 @@
           ENDIF
         ENDIF
       ENDIF
-!
       CALL VCOPY(EX,V(1,IR(1)),N)
       C(IR(1)) = C0
       CALL SSORT(C,IR,N)
       IF (C(IR(N+1)).LT.CMIN) THEN
         DROP = (CMIN-C(IR(N+1)))/CMIN
-!        IF (ABS(DROP).LT.1.0E-4) SLOW=.TRUE.
         IF (ABS(DROP).LT.1.0E-4) SLOW = .TRUE.
         NOLUCK = 0
         CMIN = C(IR(N+1))
@@ -189,7 +184,7 @@
       EXTERNAL CHIFUN
       REAL V(N,*), C(*), D(*)
       INTEGER IR(*)
-!
+
       DO I = 2, N + 1
         CALL VCOPY(V,V(1,I),N)
         V(I-1,I) = V(I-1,I) + D(I-1)
@@ -204,7 +199,7 @@
 !
       REAL C(*)
       INTEGER IR(*)
-!
+
       IR(1) = 1
       DO J = 2, N + 1
         DO I = 1, J - 1
@@ -224,7 +219,7 @@
 !     ---------------------------
 !
       REAL V(N,*), XC(*)
-!
+
       XNORM = 1.0/FLOAT(N)
       DO J = 1, N + 1
         IF (J.EQ.IH) GOTO 20
@@ -291,7 +286,7 @@
       EXTERNAL CHIFUN
       REAL V(N,*), C(*)
       INTEGER IR(*)
-!
+
       DO J = 1, N + 1
         IF (J.EQ.K) GOTO 20
         DO I = 1, N
@@ -310,7 +305,7 @@
 !
       REAL V(*), DELTA(*), C0, C1(2,*), C2(N,*)
       EXTERNAL CHIFUN
-!
+
       CALL VRFILL(C2,0.0,N*N)
       C0 = CHIFUN(N,V)
       CDELTA = C0/2000.0
@@ -337,7 +332,7 @@
       EXTERNAL CHIFUN
       REAL X(*)
       DATA FRAC, SMALL, XLARGE/1.0E-6, 1.0E-20, 1.0E20/
-!
+
       X0 = X(J)
       D = FRAC*ABS(X0) + SMALL
       DO I = 1, 100
@@ -370,7 +365,7 @@
 !     ----------------------------------
 !
       REAL C0, C1(2,*), C2(N,*), D(*), HS(N,*)
-!
+
       DO J = 1, N
         DO I = J + 1, N
           HS(I,J) = (C2(I,J)-C1(2,I)-C1(2,J)+C0)/(D(I)*D(J))
@@ -385,8 +380,8 @@
 !
       REAL HESS(N,*), COVAR(N,*)
       INTEGER INDX(*)
-!>> JCC This is for testing for mathematical errors used to PAUSE the program: THe pause seemed to#
-!>> be causing a repeated CMD window to appear on screen ....
+! JCC This is for testing for mathematical errors used to PAUSE the program: The pause seemed to
+! be causing a repeated CMD window to appear on screen...
       INTEGER IBMBER
       COMMON /CCSLER/ IBMBER
 !
@@ -395,7 +390,7 @@
         COVAR(I,I) = 2.0
       ENDDO
       CALL LUDCMP(HESS,N,N,INDX,D)
-!>> JCC Trap for singular matrices
+! JCC Trap for singular matrices
       IF (IBMBER.EQ.1) RETURN
       DO I = 1, N
         CALL LUBKSB(HESS,N,N,INDX,COVAR(1,I))
@@ -413,8 +408,8 @@
 !
       PARAMETER (NMAX=100,TINY=1.0E-20)
       DIMENSION A(NP,NP), INDX(N), VV(NMAX)
-!>> JCC This is for testing for mathematical errors used to PAUSE the program: THe pause seemed to#
-!>> be causing a repeated CMD window to appear on screen ....
+! JCC This is for testing for mathematical errors used to PAUSE the program: The pause seemed to
+! be causing a repeated CMD window to appear on screen...
       INTEGER IBMBER
       COMMON /CCSLER/ IBMBER
 !
@@ -424,7 +419,7 @@
         DO J = 1, N
           IF (ABS(A(I,J)).GT.AAMAX) AAMAX = ABS(A(I,J))
         ENDDO
-!>> JCC Removed the PAUSE
+! JCC Removed the PAUSE
         IF (AAMAX.EQ.0.0) THEN
           IBMBER = 1
           RETURN
@@ -484,7 +479,7 @@
 !     --------------------------------
 !
       DIMENSION A(NP,NP), INDX(N), B(N)
-!
+
       II = 0
       DO I = 1, N
         LL = INDX(I)
@@ -508,4 +503,5 @@
         ENDIF
         B(I) = SUM/A(I,I)
       ENDDO
+
       END SUBROUTINE LUBKSB

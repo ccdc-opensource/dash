@@ -125,7 +125,9 @@
 !     |                         C U B I Q U E                          |
 !     ------------------------------------------------------------------
       SUBROUTINE CUBIQU(Na)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -252,12 +254,6 @@
                                          Aare = aa
                                          aa = Amoi7 + (pas64/2.)
                                          Vap = aa*aa*aa
-                                    !     DO I = 1, n
-                                   !        Jj = irj(I,7)
-                                   !        DO J = 1, Jj
-                                    !         Carl = ih(I,J,7)**2 + ik(I,J,7)**2 + il(I,J,7)**2
-                                     !      ENDDO
-                                      !   ENDDO
                                          Ind = 1
                                          Nrind = 1
                                          CALL AFFPAR(Ind,Nrind,Vap)
