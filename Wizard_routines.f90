@@ -280,40 +280,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Default_Crystal_Symmetry()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page1)
-!O      CALL WDialogPutMenu(IDF_PW_Crystal_System_Menu,CS_Options,NCS_Options,LatBrav)
-      CALL WDialogPutOption(IDF_PW_Crystal_System_Menu,LatBrav)
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-!O      CALL WDialogPutMenu(IDF_Crystal_System_Menu,   CS_Options,NCS_Options,LatBrav)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
-      DO ISG = 1, NumSG
-        JSG = LPosSG(LatBrav) + ISG - 1
-        SGHMaBrStr(ISG)(1:12)  = SGNumStr(JSG)(1:12)
-        SGHMaBrStr(ISG)(13:24) = SGHMaStr(JSG)(1:12)
-      END DO      
-      IPosSG = 1
-      NumberSGTable = IPosSG
-      CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutMenu(IDF_PW_Space_Group_Menu,SGHMaBrStr,NumSG,LatBrav)
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumSG,LatBrav)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Default_Crystal_Symmetry
-!
-!*****************************************************************************
-!
       SUBROUTINE Upload_Wizard_Information()
 
       USE WINTERACTER

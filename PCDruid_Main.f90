@@ -5,7 +5,9 @@
 ! - filename (this is now done partially by 'FNAME', which is also used as a dummy)
 
 ! NoData is regularly set to .FALSE. but is it ever set to .TRUE.?
-! Length of SDIFile/SDIFileName inconsistent
+! Length of SDIFile/SDIFileName inconsistent (especially suspect: Pawley.for around line 1326/1273
+! length was 255, is now 80)
+! Many bugs when selecting space group
 
       MODULE VARIABLES
 
@@ -47,17 +49,15 @@
       LOGICAL PikExists
       LOGICAL TicExists
 
-!C>> File names of data files
-!U      COMMON / FLINF1 /   DashRawFile, DashHcvFile, DashPikFile, DashTicFile
-!U      COMMON / FLINF2 /   RawExists,   HcvExists,   PikExists,   TicExists 
-            
+! JvdS @ These are needed at startup only: should be made local
 !C>> License information
       INTEGER :: EXPIRY_DAY   =   31
       INTEGER :: EXPIRY_MONTH =   12
       INTEGER :: EXPIRY_YEAR  = 2000
       CHARACTER(LEN=18) :: EXPIRY_STRING = '31st December 2000'
 
-!C>> New license information structure
+! JvdS @ These are needed at startup only: should be made local
+!C>> New license information structure    
       TYPE License_Info
         INTEGER          :: Day
         INTEGER          :: Month
@@ -74,6 +74,7 @@
 
       INTEGER           :: EventType
       TYPE(WIN_MESSAGE) :: EventInfo
+! These global variables hold the last event reported by Winteracter
 
       END MODULE VARIABLES
 !
@@ -98,6 +99,7 @@
       INTEGER           :: IWID
 
       INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
 
       INCLUDE 'STATLOG.INC'
       LOGICAL Run_Wizard
@@ -108,7 +110,6 @@
       XBSWidth   = WInfoScreen(1)
       XBSHeight  = WInfoScreen(2)
       XBSColours = WInfoScreen(3)
-      CALL PolyFitterInitialise()
 !>> JCC
 !>> Try to redirect stdout - change working directory if unsuccessful
 
@@ -146,6 +147,8 @@
       CALL WMessageEnable(PushButton  , Enabled)
 ! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues()
+! Initialise space group information
+      CALL PolyFitterInitialise()
       CALL InitialiseVariables
       CALL Default_Crystal_Symmetry
       CALL Check_License()
@@ -545,9 +548,6 @@
 
       INCLUDE 'GLBVAR.INC'
 
-      LOGICAL DoSaRedraw
-      COMMON /SARDRW/ DoSaRedraw
-
       INTEGER ICurPlotMode
 !
 !   Update window
@@ -605,309 +605,6 @@
       STOP
 
       END SUBROUTINE DoExit
-!
-!*****************************************************************************
-!
-      SUBROUTINE PolyFitterInitialise()
-
-      USE WINTERACTER
-      USE VARIABLES
-      USE druid_header
-
-!C>> JCC Cell/Lattice definitions now in an include file
-      INCLUDE 'Lattice.inc'
-      CHARACTER(LEN=128) lintem
-!C>> JCC declarations
-      INTEGER OpenFail, PolyFitter_OpenSpaceGroupSymbols
-      DATA LPosSG/1,1,3,38,73,108,349,430,455,462,489,531/
-
-      LOGICAL DoSaRedraw
-      COMMON /SARDRW/ DoSaRedraw
-
-      DoSaRedraw = .FALSE.
-!>> JCC Init the viewing etc
-      CALL PolyFitter_EnableExternal
-! Get the space group symbols ...
-!C>> JCC This assumes that the file is in the current working directory
-!C>> I've written a more general function that will handle this better
-!C>> Was
-!     open(110,file='SpaceGroupSymbols.dat',status='old')
-! Now
-      OpenFail = PolyFitter_OpenSpaceGroupSymbols(110)
-      IF (OpenFail .NE. 0) GOTO 999 ! fail gracefully!
-      i=0
- 10   lintem=' '
-      READ(110,1100,end=100) nl,lintem
- 1100 FORMAT(q,a)
-      IF (lintem(1:1) .EQ. '-') GOTO 100
-      IF (nl .LT. 70) THEN
-        DO ii=nl+1,70
-          lintem(ii:ii)=' '
-        END DO
-      END IF
-      i=i+1
-      SGNumStr(i) = lintem(4:13)
-      SGHMaStr(i) = lintem(15:26)
-      SGHalStr(i) = lintem(29:46)
-      SGShmStr(i) = lintem(47:70)
-      GOTO 10
- 100  NumSG=i
-      IPosSG=1
-      CLOSE(110)
-!C>> JCC Added in next lines
-      RETURN
- 999  CONTINUE
-! Failure, so exit gracefully
-      CALL WindowClose()
-      STOP
-      END SUBROUTINE PolyFitterInitialise
-!
-!*****************************************************************************
-!
-!C>> Handle file opening. Exit with a message to say what is wrong if all attempts fail
-! JvdS What does it return? Filehandle and 0 otherwise?
-      Integer FUNCTION PolyFitter_OpenSpaceGroupSymbols(unit)
-
-      USE WINTERACTER
-      USE VARIABLES
-      USE dflib ! Windows environment variable handling: for GETENVQQ
-      USE dfport
-
-      INTEGER       unit, errstat, lval, dlen
-      CHARACTER*255 DashDir, Command
-      PolyFitter_OpenSpaceGroupSymbols = 0
-
-!   Try the default installation directory first
-      Open(110,file=INSTDIR(1:LEN_TRIM(INSTDIR))//&
-        DIRSPACER(1:LEN_TRIM(DIRSPACER))//&
-        SPACEGROUPS,status='old', err = 10)
-      RETURN
- 10   CONTINUE
-!   Fail so look in current working directory
-      OPEN(110,file=SPACEGROUPS,status='old', err = 20, iostat = errstat)
-      dlen = GETCWD(INSTDIR)
-      RETURN
- 20   CONTINUE
-!   Failed to open in the current working directory: try getting the environment variable DASH_DIR
-      lval = GETENVQQ("DASH_DIR",DashDir)
-      IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
-!   Environment variable is set
-        Open(110,file=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//SPACEGROUPS,status='old', err = 30)
-        INSTDIR = DASHDIR
-        RETURN
- 30     CONTINUE
-! If DASH_DIR is set, then use a different message
-        Call WMessageBox(OKOnly, ExclamationIcon, CommonOk, &
-          "Sorry, DASH is not installed correctly: Could not find the file"//CHAR(13)//CHAR(13)&
-          //SPACEGROUPS//CHAR(13)//CHAR(13)//"in the default installation directory "//CHAR(13)&
-          //CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))&
-          //CHAR(13)//CHAR(13)//"in your current working directory, or in the directory "//CHAR(13)//CHAR(13)&
-          //DashDir(1:LEN_TRIM(DashDir)),"Installation failure")              
-          PolyFitter_OpenSpaceGroupSymbols = errstat
-        RETURN
-      ENDIF
-! Try looking at the command path itself and deriving the path from that
-      CALL GetArg(0,Command)
-      dlen = LEN_TRIM(Command)
-      DO WHILE (Command(dlen:dlen) .NE. DIRSPACER)
-        dlen = dlen - 1
-      END DO
-! JvdS What happens if no DIRSPACER is present?
-      dlen = dlen - 1
-      OPEN(110,File=Command(1:dlen)//DIRSPACER//SPACEGROUPS,status='old', err = 40)
-      INSTDIR = Command(1:dlen)
-      RETURN
- 40   CONTINUE
-! If we get here, all attempts failed to open the file so fail gracefully
-      CALL WMessageBox(OKOnly, ExclamationIcon, CommonOk, &
-        "Sorry, DASH is not installed correctly: Could not find the file"//CHAR(13)//CHAR(13)&
-        //SPACEGROUPS//CHAR(13)//CHAR(13)//"in the default installation directory "//CHAR(13)&
-        //CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))&
-        //CHAR(13)//CHAR(13)//"or in your current working directory", "Installation failure")
-      PolyFitter_OpenSpaceGroupSymbols = errstat
-      RETURN
-
-      END Function PolyFitter_OpenSpaceGroupSymbols
-!
-!*****************************************************************************
-! 
-      SUBROUTINE PolyFitter_EnableExternal()
-
-      USE WINTERACTER
-      USE VARIABLES
-      USE dflib ! Windows environment variable handling: for GETENVQQ
-
-      INTEGER       lval
-      CHARACTER*255 DashDir
-      CHARACTER*255 line
-      CHARACTER*3   KeyChar
-      INTEGER       nl, dlen
-
-      ViewOn     = .FALSE.
-      ViewAct    = .FALSE.
-      AutoUpdate = .FALSE.
-      ConvOn     = .FALSE.
-      lval = GETENVQQ("DASH_DIR",DashDir)
-      IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
-        CONVEXE = DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//'zmconv.exe'
-        OPEN(121, file=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//CONFIG, status='old', err = 10)
-        GOTO 20
- 10     OPEN(121, file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, status='old', err = 30)
- 20     CONTINUE
-      ELSE
-        OPEN(121, file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, status='old', err = 22)
-        GOTO 24
- 22     CONTINUE
-        CALL Getarg(0,line)
-        dlen = LEN_TRIM(line)
-        DO WHILE (line(dlen:dlen) .NE. DIRSPACER)
-          dlen = dlen - 1
-        END DO
-        dlen = dlen - 1
-        OPEN(121, file=line(1:dlen)//DIRSPACER//CONFIG, status='old', err = 30)
-        INSTDIR = line(1:dlen)
- 24     CONTINUE
-        CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
-      END IF
-! Read it
-      DO WHILE ( .TRUE. )
- 25     READ(121,'(a)',END=30,ERR=30) line
-        nl=LEN_TRIM(line)
-        CALL ILowerCase(line(:nl))
-        CALL INextString(line,keychar)
-        SELECT CASE (KeyChar)
-          CASE ('vie')
-            VIEWEXE = line(IlocateChar(line):nl)
-          CASE ('con')
-            CONVEXE = line(IlocateChar(line):nl)
-          CASE ('arg')
-            VIEWARG = line(IlocateChar(line):nl) ! Arguments for the viewer
-          CASE ('rel')
-            AUTOUPDATE = .TRUE.
-        END SELECT
-      END DO            
- 30   CONTINUE
-      INQUIRE(FILE=VIEWEXE(1:LEN_TRIM(VIEWEXE)),EXIST=ViewOn)
-      INQUIRE(FILE=CONVEXE(1:LEN_TRIM(CONVEXE)),EXIST=ConvOn)
-
-      END SUBROUTINE PolyFitter_EnableExternal
-!
-!*****************************************************************************
-!
-!C>> JCC Rather than continually load/unload the various widgets, upload them all only once
-!C>> This way, the state can be memorised from session to session
-      SUBROUTINE PolyFitter_UploadDialogues
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-!C>> SA bitmap
-      INTEGER it, Ibmhandle
-      COMMON / BMPHAN / Ibmhandle
-      REAL    WaveLengthOf ! Function
-
-      CALL WDialogLoad(IDD_Structural_Information)
-      CALL WDialogLoad(IDD_SA_Action1)
-      CALL WDialogLoad(IDD_SA_Action2)
-      CALL WDialogLoad(IDD_Plot_Option_Dialog)
-!      CALL WDialogLoad(IDD_About_Polyfitter)
-      CALL WDialogLoad(IDD_Pawley_Status)
-      CALL WDialogLoad(IDD_Peak_Positions)
-      CALL WDialogLoad(IDD_Index_Preparation)
-! Set the colours of the grid manually
-      CALL WDialogLoad(IDD_Plot_Option_Dialog)
-! JvdS Starting to add SA to Wizard
-!      CALL WDialogLoad(IDD_SA_input1)
-      CALL WDialogLoad(IDD_SAW_Page1)
-      CALL WDialogLoad(IDD_SA_input2)
-      CALL WDialogLoad(IDD_SA_input3)
-      CALL WDialogLoad(IDD_Crystal_Symmetry)
-      CALL WDialogLoad(IDD_Data_Properties)
-      CALL WDialogLoad(IDD_Sigma_info)
-      CALL WDialogLoad(IDD_Gamma_info)
-      CALL WDialogLoad(IDD_HPSL_info)
-      CALL WDialogLoad(IDD_HMSL_info)
-      CALL WDialogLoad(IDD_Polyfitter_Wizard_01)
-      CALL WDialogLoad(IDD_PW_Page1)
-      CALL WDialogLoad(IDD_PW_Page2)
-      CALL WDialogLoad(IDD_PW_Page3)
-      CALL WDialogLoad(IDD_SA_Completed)
-! ep      CALL WDialogLoad(IDD_SA_Multi_Completed) 
-      CALL WDialogLoad(IDD_SA_Multi_completed_ep)
-      CALL WDialogLoad(IDD_License_Dialog)
-      CALL WDialogLoad(ID_Background_Fit)
-      CALL WDialogLoad(IDD_Pawley_ErrorLog)
-! Upload sa bitmap into memory
-      ibmhandle = 0
-      CALL WDialogSelect(IDD_SA_Action1)
-      CALL IGrSelect(3,IDF_minchisq_picture)
-      CALL WBitmapGet(ibmhandle,0)
-      it = InfoError(1)
-! @ Initialise radiation to Cu Ka1. This is a strange place for doing this, should move.
-      CALL UpdateWavelength(WaveLengthOf('Cu'))
-      RETURN
-
-      END SUBROUTINE PolyFitter_UploadDialogues
-!
-!*****************************************************************************
-!
-      SUBROUTINE Init_StdOut()
- 
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-      USE DFLIB
-
-      IMPLICIT NONE
-
-      INTEGER :: IFlags, I, IPASS, Ilen, Instlen, Idashlen
-      CHARACTER(LEN=255) :: Dirname, DashDir, InstDirLc, DashDirLc, DirNameLc
-
-      Idashlen = GETENVQQ("DASH_DIR",DashDir)
-      Instlen = LEN_TRIM(INSTDIR)
-      IPASS = 0
-      InstDirLc = InstDir
-      DashDirLc = DashDir
-      CALL ILowerCase(DashDirLc)
-      CALL ILowerCase(InstDirLc)
-! JvdS Rewrite using GOTOs
-      LOOP_DIRECTORY_SELECT : DO WHILE (.TRUE.)
-        IFlags = DirChange+DirCreate
-        Dirname = ' '
-        CALL WSelectDir(IFlags,Dirname,"Select working directory for DASH...")
-        IF (LEN_TRIM(Dirname) .EQ. 0) THEN
-          CALL WindowClose()
-          STOP
-        END IF
-        DirNameLc = DirName
-        CALL ILowerCase(DirNameLc)
-        Ilen = LEN_TRIM(DirNameLc)
-! JvdS @ Isn't the following line wrong? Shouldn't it be InstDirLc(1:LEN_TRIM(InstDirLc)) ?
-        IF ( (DirNameLc(1:Ilen) .EQ. DashDirLc(1:LEN_TRIM(DashDirLc))) .OR.  &
-             (DirNameLc(1:Ilen) .EQ. InstDirLc(1:LEN_TRIM(DashDirLc))) ) THEN
-          CALL WMessageBox(YesNo,InformationIcon,CommonNo, &
-            "Are you sure you wish to start Dash in"//CHAR(13)//"the installation directory "//&
-            CHAR(13)//DirNameLc(1:Ilen)//" ?", &
-            "File location")
-          IF (WInfoDialog(4) .NE. CommonYes) CYCLE LOOP_DIRECTORY_SELECT
-        END IF
-! Open the file
-        OPEN(UNIT = 6, FILE = 'dash.out', STATUS = 'UNKNOWN', ERR = 110)
-        RETURN
- 110    CONTINUE
-        CALL WMessageBox(OKCancel,ExclamationIcon,CommonOk, &
-          "DASH problem: Could not open temporary files"//&
-          CHAR(13)//"in the directory "//DirName(4:Ilen)//CHAR(13)//&
-          "Please pick an alternative directory for your DASH run",&
-          "File-open failure")
-        IF (WInfoDialog(4) .NE. CommonOK) THEN
-          CALL WindowClose()
-          STOP
-        END IF
-      END DO LOOP_DIRECTORY_SELECT
-
-      END SUBROUTINE Init_StdOut
 !JvdS All of the following is licence stuff: should be in a separate file
 !
 !*****************************************************************************
