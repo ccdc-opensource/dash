@@ -1,4 +1,4 @@
-! Winteracter module created : 28/Apr/2002 13:00:52
+! Winteracter module created : 08/May/2002 11:31:25
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -380,7 +380,6 @@
           INTEGER, PARAMETER :: ID_Down                         = 40015
           INTEGER, PARAMETER :: ID_Left                         = 40004
           INTEGER, PARAMETER :: ID_Up                           = 40013
-          INTEGER, PARAMETER :: IDF_GROUP5                      =  1008
           INTEGER, PARAMETER :: IDF_FudgeFactor                 =  1095
           INTEGER, PARAMETER :: IDF_GROUP1                      =  1096
           INTEGER, PARAMETER :: IDF_GROUP2                      =  1097
@@ -486,22 +485,22 @@
           INTEGER, PARAMETER :: IDD_TEMPLATE014                 =   161
           INTEGER, PARAMETER :: IDF_AtomPropGrid                =  1381
           INTEGER, PARAMETER :: IDF_WhichAtomMenu               =  1382
-          INTEGER, PARAMETER :: IDF_UisoOccMenu                 =  1384
+          INTEGER, PARAMETER :: IDF_BisoOccMenu                 =  1384
           INTEGER, PARAMETER :: IDB_Relabel                     =  1385
           INTEGER, PARAMETER :: IDF_IDoNotAgree                 =  1386
           INTEGER, PARAMETER :: IDD_DIALOG002                   =   162
-          INTEGER, PARAMETER :: IDF_BUTTON8                     =  1387
+          INTEGER, PARAMETER :: IDB_ExclRegions                 =  1387
           INTEGER, PARAMETER :: IDF_zmFile1                     =  1388
           INTEGER, PARAMETER :: IDF_zmFile2                     =  1389
           INTEGER, PARAMETER :: IDF_zmFile3                     =  1390
           INTEGER, PARAMETER :: IDF_zmFile4                     =  1391
           INTEGER, PARAMETER :: IDB_Set                         =  1392
           INTEGER, PARAMETER :: IDF_FileName                    =  1393
-          INTEGER, PARAMETER :: IDF_UisoOccValue                =  1394
+          INTEGER, PARAMETER :: IDF_BisoOccValue                =  1394
           INTEGER, PARAMETER :: IDF_LABEL3                      =  1395
           INTEGER, PARAMETER :: IDD_ExclRegions                 =   163
           INTEGER, PARAMETER :: IDD_TEMPLATE015                 =   164
-          INTEGER, PARAMETER :: IDF_ExclRegionsFrid             =  1396
+          INTEGER, PARAMETER :: IDF_ExclRegionsGrid             =  1396
           INTEGER, PARAMETER :: IDB_ReOrder                     =  1400
           INTEGER, PARAMETER :: IDBSAVE                         =  1403
           INTEGER, PARAMETER :: IDB_Rotations                   =  1405
@@ -605,6 +604,14 @@
           INTEGER, PARAMETER :: IDF_RotAxPlnAtm3                =  1120
           INTEGER, PARAMETER :: IDF_RotOrgCOM                   =  1128
           INTEGER, PARAMETER :: IDF_RotOrgAtom                  =  1134
-          INTEGER, PARAMETER :: IDB_ZMatrix_Browse5             = 20001
-          INTEGER, PARAMETER :: IDB_ZmatrixDelete5              = 20002
+          INTEGER, PARAMETER :: IDF_Pawley_Cycle_RwpExp_Label2  =  1294
+          INTEGER, PARAMETER :: IDF_Alpha                       =  1218
+          INTEGER, PARAMETER :: IDF_Q0                          =  1238
+          INTEGER, PARAMETER :: IDF_Q1                          =  1245
+          INTEGER, PARAMETER :: IDF_Q2                          =  1246
+          INTEGER, PARAMETER :: IDF_Q3                          =  1247
+          INTEGER, PARAMETER :: IDF_Beta                        =  1249
+          INTEGER, PARAMETER :: IDF_Gamma                       =  1250
+          INTEGER, PARAMETER :: IDD_ViewPawley                  =   127
+          INTEGER, PARAMETER :: IDB_ClearAll                    =  1406
       END MODULE Druid_Header
