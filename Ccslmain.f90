@@ -111,10 +111,13 @@
 !D If not found, counts in NTARNM in /SLKGEO, and adds NAME and all
 !D other components to tables, exitting with N=NTARNM
 !
+
       CHARACTER*4 NAME, MAKNAM
+      INTEGER IA, ISA, ILA
       DIMENSION XA(3), CELA(3)
+
       INTEGER         NATOM
-      REAL                   X
+      REAL                   Xato
       INTEGER                          KX
       REAL                                        AMULT,      TF
       INTEGER         KTF
@@ -122,13 +125,23 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
       CHARACTER*4 ATTNAM, BONNAM, ANGNAM, TORNAM
+
+      INTEGER         NSTYP
+      REAL                   BOBS,      EOBS
+      INTEGER                                      IATM
+      INTEGER         ISYM,      ILAT
+      REAL                                  CELLTR,        XSLAK
+      REAL            COSIN
+      INTEGER                     IABASE,      NST1
+      LOGICAL                                        SLONLY
+      REAL                                                   TOSTAR
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
      &                ISYM(500), ILAT(500), CELLTR(3,500), XSLAK(3,500),&
      &                COSIN(3,3), IABASE(500), NST1, SLONLY, TOSTAR(6,6)&
@@ -136,7 +149,8 @@
      &                ITYPSK(500), INVBON(10,500), NINVB(500),          &
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
-      LOGICAL SLONLY
+
+      INTEGER I, J
 
 ! IF NAME IS EMPTY, SEARCH FOR THE REST:
       IF (NAME.EQ.'    ') THEN
@@ -161,7 +175,7 @@
       IF (ISA.NE.1) GOTO 2
       IF (ILA.NE.1) GOTO 2
       DO I = 1, 3
-        IF (XA(I).NE.X(I,N1)) GOTO 2
+        IF (XA(I).NE.Xato(I,N1)) GOTO 2
         IF (CELA(I).NE.0.) GOTO 2
       ENDDO
 ! ATOM IDENTICAL - OK:
