@@ -39,14 +39,14 @@
       COMMON /zmcomc/ asym(maxatm,maxfrg)
 ! asym = Atom SYMbol, e.g. 'H  ' for hydrogen, 'Ag ' for silver.
 !
-      COMMON /frgcom/ nfrag, lfrag(maxfrg)
+      COMMON /frgcom/ nfrag
       CHARACTER*80 frag_file
       COMMON /frgcha/ frag_file(maxfrg)
       COMMON /zmcomg/ icomflg(maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
       CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmtot, izmpar(maxfrg), czmpar(MaxDOF,maxfrg),    &
+      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg),    &
      &                kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
 !
 !>> JCC the original atom ids to list in the labels and the back mapping
@@ -70,7 +70,7 @@
 !..
 !>> JCC
 !>> Added in error trap for missing file/ file opening problems
-      OPEN (UNIT=19,FILE=frag_file(ifrg)(:lfrag(ifrg)),STATUS='old',    &
+      OPEN (UNIT=19,FILE=frag_file(ifrg),STATUS='old',    &
      &      ERR=999,IOSTAT=ErrorStatus)
 !>> JCC
 !>> Added in a read error trap, in case user selects incorrect file
@@ -81,7 +81,9 @@
 ! These are never used, so just read into dummy variables.
       READ (19,*,ERR=999,IOSTAT=ErrorStatus) ta, tb, tc, talpha, tbeta, &
      &      tgamma
-! Third line contains number of atoms and ????
+! Third line contains number of atoms and an integer IAT, defining the centre for the rotations.
+! IAT = 0        : use centre of mass
+! IAT = non-zero : use atom nr. IAT   (necessary if atom on special position).
 !  59   0
       READ (19,*,ERR=999,IOSTAT=Read_One_Zm) natof, item
       natoms(ifrg) = natof
@@ -91,10 +93,10 @@
       czmpar(1,ifrg) = ' x(frag )'
       czmpar(2,ifrg) = ' y(frag )'
       czmpar(3,ifrg) = ' z(frag )'
-! It looks like izmpar = number of degrees of freedom ('parameters')
-! It looks like kzmpar = type of parameter (1 = translation)
-! It looks like xzmpar = initial value of parameter
-! It looks like czmpar = Character string associated with this parameter value
+! izmpar = number of degrees of freedom ('parameters')
+! kzmpar = type of parameter (1 = translation)
+! xzmpar = initial value of parameter
+! czmpar = Character string associated with this parameter value
       DO ii = 1, 3
         kzmpar(ii,ifrg) = 1
         xzmpar(ii,ifrg) = 0.5

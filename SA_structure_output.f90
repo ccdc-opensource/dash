@@ -27,13 +27,13 @@
      &                iz3(maxatm,maxfrg)
 !
       CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmtot, izmpar(maxfrg), czmpar(MaxDOF,maxfrg),    &
+      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg),    &
      &                kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
 !
       INTEGER ipcount
       INTEGER CheckedFragNo
 !
-      COMMON /frgcom/ nfrag, lfrag(maxfrg)
+      COMMON /frgcom/ nfrag
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen, alph, bet, f2cmat
