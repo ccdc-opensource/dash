@@ -170,10 +170,45 @@
 ! It's probably better to get rid of IOrdTem and sort the list directly
 ! If the right algorithm is chosen, that would speed up multiple sorts and reduce memory.
 
+      INTEGER         nfrag
+      COMMON /frgcom/ nfrag
+
+! nfrag = number of fragments
+
+      CHARACTER*80    frag_file
+      COMMON /frgcha/ frag_file(maxfrg)
+
+! maxfrg    = (=20) ?
+! frag_file = name of the .zmatrix file containing fragment number ifrag
+
       CHARACTER*3     asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
+
 ! asym = Atom SYMbol, e.g. 'H  ' for hydrogen, 'Ag ' for silver.
-!
+
+      INTEGER         izmpar
+      CHARACTER*36                    czmpar
+      INTEGER                                                kzmpar
+      REAL                                                                          xzmpar
+      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
+
+! izmpar = number of degrees of freedom ('parameters')
+! czmpar = Character string associated with this parameter value
+! kzmpar = type of parameter
+!          1 = translation
+!          2 = rotation
+!          3 = torsion
+!          4 = valence angle
+!          5 = bond length
+! xzmpar = initial value of parameter
+
+      INTEGER         icomflg
+      COMMON /zmcomg/ icomflg(maxfrg)
+
+! icomflg = Centre of mass flag.
+!           0 = use centre of mass of molecule as centre of rotation
+!   otherwise = use atom number icomflg as centre of rotation (necessary if atom on special position)
+! Note that, confusingly, 'com' in the COMMON block name doesn't stand for COMMON in this case
 
       INTEGER         IBACK, NBACK
       REAL                             ARGBAK,        BACKGD
