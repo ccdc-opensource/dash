@@ -33,7 +33,7 @@
 ! used when editing a Z-matrix.
 
       INTEGER MaxDOF
-      PARAMETER ( MaxDOF = 30 )
+      PARAMETER ( MaxDOF = 50 )
 
 ! MaxDOF = Maximum number of degrees of freedom per fragment (= per individual Z-matrix)
 
@@ -53,7 +53,6 @@
       INTEGER zm2Par(1:MaxDOF,1:maxcopies,1:maxfrg)
 
 ! Mapping of parameters per degree of freedom per copy per Z-matrix
-
 
       INTEGER          nfrag
 
