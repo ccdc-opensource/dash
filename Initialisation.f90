@@ -195,187 +195,190 @@
       INCLUDE 'Poly_Colours.inc'
 
       CHARACTER*MaxPathLength tFileName
-      INTEGER   I
-      INTEGER   RecNr
-      INTEGER   ISEED
+      INTEGER        I
+      INTEGER        RecNr
+      INTEGER        ISEED
       CHARACTER*MaxPathLength DefaultWorkingDir
-      CHARACTER*256 TempString ! Must be multiple of 4
-      INTEGER*4 I4(64)
-      EQUIVALENCE (I4,TempString)
+      CHARACTER*256  TempString ! Must be multiple of 4
+      INTEGER*4      I4(64)
+      EQUIVALENCE   (I4,TempString)
+      INTEGER        FileHandle
 
       tFileName = 'D3.cfg'
+      FileHandle = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=10,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=FileHandle,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
-      WRITE(10,REC=RecNr,ERR=999) UseConfigFile
+      WRITE(FileHandle,REC=RecNr,ERR=999) UseConfigFile
       RecNr = RecNr + 1
       IF (.NOT. UseConfigFile) GOTO 999
 ! Save all colours
-      WRITE(10,REC=RecNr,ERR=999) KolNumPGWindow
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumPGWindow
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPGWindow%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPGWindow%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPGWindow%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPGWindow%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPGWindow%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPGWindow%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumMain
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumMain
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolMain%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolMain%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolMain%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolMain%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolMain%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolMain%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumObs
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumObs
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolObs%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolObs%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolObs%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolObs%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolObs%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolObs%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumCal
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumCal
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolCal%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolCal%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolCal%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolCal%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolCal%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolCal%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumDif
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumDif
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolDif%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolDif%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolDif%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolDif%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolDif%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolDif%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumMTic
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumMTic
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolMTic%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolMTic%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolMTic%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolMTic%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolMTic%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolMTic%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumCTic
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumCTic
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolCTic%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolCTic%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolCTic%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolCTic%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolCTic%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolCTic%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumPanelVLite
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumPanelVLite
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelVLite%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelVLite%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelVLite%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelVLite%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelVLite%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelVLite%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumPanelLite
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumPanelLite
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelLite%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelLite%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelLite%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelLite%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelLite%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelLite%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumPanelDark
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumPanelDark
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelDark%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelDark%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelDark%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelDark%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelDark%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelDark%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumPanelVDark
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumPanelVDark
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelVDark%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelVDark%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelVDark%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelVDark%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelVDark%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelVDark%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumPanelOuter
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumPanelOuter
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelOuter%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelOuter%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelOuter%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelOuter%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPanelOuter%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPanelOuter%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumRectSelect
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumRectSelect
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolRectSelect%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolRectSelect%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolRectSelect%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolRectSelect%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolRectSelect%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolRectSelect%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumLargeCrossHair
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumLargeCrossHair
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolLargeCrossHair%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolLargeCrossHair%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolLargeCrossHair%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolLargeCrossHair%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolLargeCrossHair%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolLargeCrossHair%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumPeakFit
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumPeakFit
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPeakFit%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPeakFit%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPeakFit%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPeakFit%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPeakFit%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPeakFit%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumPeakPos
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumPeakPos
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPeakPos%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPeakPos%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPeakPos%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPeakPos%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolPeakPos%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolPeakPos%IBlue
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolNumBack
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolNumBack
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolBack%IRed
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolBack%IRed
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolBack%IGreen
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolBack%IGreen
       RecNr = RecNr + 1
-      WRITE(10,REC=RecNr,ERR=999) KolBack%IBlue
+      WRITE(FileHandle,REC=RecNr,ERR=999) KolBack%IBlue
       RecNr = RecNr + 1
 ! Save the default working directory
       DefaultWorkingDir = 'D:\cvsDASH\dash\Debug'
       TempString = DefaultWorkingDir
       DO I = 1, 64
-        WRITE(10,REC=RecNr,ERR=999) I4(I)
+        WRITE(FileHandle,REC=RecNr,ERR=999) I4(I)
         RecNr = RecNr + 1
       ENDDO
 ! Save defaults for background subtraction
  ! Number of iterations
-      WRITE(10,REC=RecNr,ERR=999) 20
+      WRITE(FileHandle,REC=RecNr,ERR=999) 20
       RecNr = RecNr + 1
  ! Window
-      WRITE(10,REC=RecNr,ERR=999) 100
+      WRITE(FileHandle,REC=RecNr,ERR=999) 100
       RecNr = RecNr + 1
  ! Use Monte Carlo YES /NO
-      WRITE(10,REC=RecNr,ERR=999) .TRUE.
+      WRITE(FileHandle,REC=RecNr,ERR=999) .TRUE.
       RecNr = RecNr + 1
  ! Use spline smooth
-      WRITE(10,REC=RecNr,ERR=999) .TRUE.
+      WRITE(FileHandle,REC=RecNr,ERR=999) .TRUE.
       RecNr = RecNr + 1
 ! Save the seeds for the random number generator
+      CALL WDialogSelect(IDD_SA_input3)
       CALL WDialogGetInteger(IDF_SA_RandomSeed1,ISEED)
-      WRITE(10,REC=RecNr,ERR=999) ISEED
+      WRITE(FileHandle,REC=RecNr,ERR=999) ISEED
       RecNr = RecNr + 1
       CALL WDialogGetInteger(IDF_SA_RandomSeed2,ISEED)
-      WRITE(10,REC=RecNr,ERR=999) ISEED
+      WRITE(FileHandle,REC=RecNr,ERR=999) ISEED
       RecNr = RecNr + 1
       CALL WDialogGetInteger(IDF_SA_RandomSeed3,ISEED)
-      WRITE(10,REC=RecNr,ERR=999) ISEED
+      WRITE(FileHandle,REC=RecNr,ERR=999) ISEED
       RecNr = RecNr + 1
 ! Save use hydrogens YES / NO
 
@@ -385,23 +388,23 @@
 
 ! Save YES /NO which molecular file formats are to be written out when a best solution is found
 ! 1. .pdb ?
-      WRITE(10,REC=RecNr,ERR=999) SavePDB
+      WRITE(FileHandle,REC=RecNr,ERR=999) SavePDB
       RecNr = RecNr + 1
 ! 2. .cssr ?
-      WRITE(10,REC=RecNr,ERR=999) SaveCSSR
+      WRITE(FileHandle,REC=RecNr,ERR=999) SaveCSSR
       RecNr = RecNr + 1
 ! 3. .ccl ?
-      WRITE(10,REC=RecNr,ERR=999) SaveCCL
+      WRITE(FileHandle,REC=RecNr,ERR=999) SaveCCL
       RecNr = RecNr + 1
 ! 4. .res ?
-      WRITE(10,REC=RecNr,ERR=999) SaveRES
+      WRITE(FileHandle,REC=RecNr,ERR=999) SaveRES
       RecNr = RecNr + 1
 ! Auto local minimisation at the end of every run in multirun YES / NO
-      WRITE(10,REC=RecNr,ERR=999) AutoLocalMinimisation
+      WRITE(FileHandle,REC=RecNr,ERR=999) AutoLocalMinimisation
       RecNr = RecNr + 1
 
 
-  999 CLOSE(10)
+  999 CLOSE(FileHandle)
 
       END SUBROUTINE SaveConfigurationFile
 !
@@ -423,7 +426,9 @@
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
 
       REAL    WaveLengthOf ! Function
@@ -443,10 +448,10 @@
       DataSetChange = 0
       NumInternalDSC = -1
       ZeroPoint = 0.0
+      DefaultMaxResolution = 2.0
       CALL UpdateWavelength(WaveLengthOf('Cu'))
 ! Now initialise the maximum resolution
       CALL WDialogSelect(IDD_PW_Page5)
-      DefaultMaxResolution = 2.0
       CALL WDialogPutReal(IDF_MaxResolution,DefaultMaxResolution)
       CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(DefaultMaxResolution))
       CALL WDialogSelect(IDD_SA_input3)

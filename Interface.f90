@@ -221,6 +221,7 @@
       USE DRUID_HEADER 
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'lattice.inc'
 
       INTEGER CurrentRange 
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR), &
@@ -236,12 +237,16 @@
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
-      COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
-        PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
-        IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)
+      COMMON /ALLPEAKS/ NTPeak, AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak), &
+        PkProb(MTPeak), IOrdTem(MTPeak), IHPk(3,MTPeak)
 
-      INTEGER ICurSel
+      REAL    PkArgK(MTPeak), PkTicDif(MTPeak)
+      REAL    TwoThetaDiff, AbsTwoThetaDiff
+      INTEGER ICurSel ,IArgK(MTPeak)
 
+! JvdS Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
+! Store all peaks thus found in one flat array: AllPkPosVal
+! I don't understand why PkPosVal(I,J) is used for this, I would have used XPF_Pos
       NTPeak = 0
       Do J = 1, NumPeakFitRange
         Do I = 1, NumInPFR(J)
@@ -251,28 +256,31 @@
         END DO
       END DO
       CALL SORT_REAL(AllPkPosVal,IOrdTem,NTPeak)
+! IOrdTem now contains and oredered list of pointers into AllPkPosVal
+! JvdS @ why not order the list itself?
       IF (NTic .NE. 0) THEN
 !.. Let's find the closest peaks and their distribution around the observed peak positions
-        IR1 = 1
+        IR1 = 1 ! Pointer into list of reflections
         DO I = 1, NTPeak
-          IOrd = IOrdTem(I)
-          xtem = ARGK(IR1)-AllPkPosVal(IOrd)
-          atem = ABS(xtem)
+          IOrd = IOrdTem(I) ! IOrd is now a pointer into AllPkPosVal to the next peak position
+          TwoThetaDiff = ARGK(IR1) - AllPkPosVal(IOrd)
+          AbsTwoThetaDiff = ABS(TwoThetaDiff)
           item = IR1
           DO IR = IR1, NTic
             xnew = ARGK(IR) - AllPkPosVal(IOrd)
             anew = ABS(xnew)
-            IF (anew .LE. atem) THEN
+            IF (anew .LE. AbsTwoThetaDiff) THEN
               item = IR
-              atem = anew
-              xtem = xnew
+              AbsTwoThetaDiff = anew
+              TwoThetaDiff = xnew
             END IF
             IF (xnew .GT. 0.0) THEN
               IR1 = MAX(1,IR-1)
+! As both the peaks and the refelctions are ordered, the position of the next peak can only be greater
               GOTO 20
             END IF
           END DO
- 20       PkTicDif(I) = xtem
+ 20       PkTicDif(I) = TwoThetaDiff
           DO II = 1, 3
             IHPk(II,I) = IH(II,item)
           END DO
@@ -324,7 +332,7 @@
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,1,I,AllPkPosVal(IOrd),'(F12.4)')
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,2,I,AllPkPosEsd(IOrd),'(F12.4)')
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,3,I,PkArgK(I),'(F12.4)')
-          DifTem=AllPkPosVal(IOrd)-PkArgK(I)
+          DifTem = AllPkPosVal(IOrd)-PkArgK(I)
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,4,I,DifTem,'(F12.4)')
           CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,5,I,IHPk(1,I))
           CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,6,I,IHPk(2,I))

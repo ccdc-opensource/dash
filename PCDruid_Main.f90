@@ -1,3 +1,7 @@
+
+
+
+
 !
 !*****************************************************************************
 !
@@ -58,6 +62,7 @@
 !      OPEN (UNIT=76,FILE='D:\cvsDASH\dash\Debug\output.log')
 ! Split status bar into more than one part
       CALL WindowStatusBarParts(8,IWIDTHS)
+    !  CALL IDebugLevel(DbgMsgBox)
       CALL WMessageEnable(PushButton, Enabled)
 ! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues()
@@ -142,13 +147,12 @@
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
 !C>> JCC data to indicate whether we are coming out of peak-fitting mode
-      LOGICAL FromPeakFit
+!U      LOGICAL FromPeakFit
       LOGICAL Confirm ! Function
       REAL xpgdif, ypgdif
       INTEGER ISTAT
       INTEGER DiffractionFileBrowse ! Function
 
-      FromPeakFit = .FALSE.
 !
 !   Branch depending on chosen menu item
 !
@@ -171,36 +175,15 @@
           CALL WDialogSelect(IDD_Plot_Option_Dialog)
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL PopActiveWindowID
-!U        CASE (ID_Default_Mode)
-!U          STATBARSTR(8)='Default visualisation mode'
-!U          CALL WindowOutStatusBar(8,STATBARSTR(8))
-!U          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-!U          IDCurrent_Cursor_mode = ID_Default_Mode
-!U          CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
         CASE (ID_Peak_Fitting_Mode)
-          STATBARSTR(8)='Peak fitting mode'
-          CALL WindowOutStatusBar(8,STATBARSTR(8))
           CALL SelectMode(ID_Peak_Fitting_Mode)
-          FromPeakFit = .TRUE.
-          CALL PeakFit(EventInfo%VALUE1)
-          GOTO 10
         CASE (ID_Pawley_Refinement_Mode)
           IF (NumPawleyRef .EQ. 0) THEN
             IF (.NOT. Confirm('Lattice constants may not have been refined'//CHAR(13)//&
                               'Do you wish to continue?')) RETURN
           END IF
-          STATBARSTR(8)='Pawley refinement mode'
-          CALL WindowOutStatusBar(8,STATBARSTR(8))
           CALL SelectMode(ID_Pawley_Refinement_Mode)
           CALL Quick_Pawley()
-!.. Now go back to the PeakFit mode
-          IF (FromPeakFit) THEN
-            STATBARSTR(8)='Peak fitting mode'
-            CALL WindowOutStatusBar(8,STATBARSTR(8))
-            CALL SelectMode(ID_Peak_Fitting_Mode)
-            CALL PeakFit(EventInfo%VALUE1)
-            GOTO 10
-          END IF
         CASE (ID_Structure_Solution_Mode)
           CALL SA_Main()
         CASE (ID_get_crystal_symmetry)
@@ -272,7 +255,6 @@
         CASE(ID_Start_Wizard)
           CALL StartWizard()
       END SELECT
-      RETURN
 
       END SUBROUTINE ProcessMenu
 !
@@ -313,7 +295,6 @@
                CHAR(13)//&
                'Copyright February 2001'
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
-      RETURN
 
       END SUBROUTINE About
 !
@@ -330,11 +311,11 @@
 
       INCLUDE 'GLBVAR.INC'
 
-      INTEGER ICurPlotMode
+!      INTEGER ICurPlotMode
 !
 !   Update window
 !
-      ICurPlotMode = InfoGrScreen(PlotModeReq)
+!      ICurPlotMode = InfoGrScreen(PlotModeReq)
       CALL IGrPlotMode('N')
       IF (PLOTT) CALL Profile_Plot(IPTYPE)
       IF (DoSaRedraw) CALL sa_output_gr()
@@ -349,8 +330,6 @@
 !           CASE (PlotEor)
 !                 CALL IGrPlotMode('E')
 !       END SELECT                        
-!           
-      RETURN  
 
       END SUBROUTINE Redraw
 !
@@ -368,7 +347,6 @@
       LOGICAL Confirm ! Function
 
       IF (Confirm('Do you want to exit DASH?')) CALL DoExit()
-      RETURN
 
       END SUBROUTINE WExit
 !
@@ -378,6 +356,9 @@
 
       USE WINTERACTER
       USE VARIABLES
+
+      IMPLICIT NONE
+
       INTEGER ISTAT
 
       CALL SaveConfigurationFile
@@ -461,6 +442,7 @@
       USE DRUID_HEADER
 
 ! Remove redundant files 
+      CALL IDebugLevel(DbgSilent)
       CALL IOsDeleteFile('polyf.tic')
       CALL IOsDeleteFile('polyf.ccl')
       CALL IOsDeleteFile('polyf.lis')
@@ -474,6 +456,7 @@
       CALL IOsDeleteFile('polyp.dat')
       CALL IOsDeleteFile('polys.ccl')
       CALL IOsDeleteFile('polys.lis')
+      CALL IDebugLevel(DbgMsgBox)
 
       END SUBROUTINE DeleteTempFiles
 !

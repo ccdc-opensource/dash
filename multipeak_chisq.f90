@@ -1,7 +1,5 @@
 !*==MULTIPEAK_CHISQ.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      FUNCTION MULTIPEAK_CHISQ(NPAR,P)
-      REAL MULTIPEAK_CHISQ
-!
+      REAL FUNCTION MULTIPEAK_CHISQ(NPAR,P)
 !
       INCLUDE 'PARAMS.INC'
 !
@@ -109,11 +107,11 @@
 !.. WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
           POFF = DTARG/ZXDELT - FLOAT(JARGI)
 !.. WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS
-          C3FN(1) = 0.5*POFF*(POFF-1.)
-          C3FN(2) = 1. - POFF**2
-          C3FN(3) = 0.5*POFF*(POFF+1.)
+          C3FN(1) = 0.5*POFF*(POFF-1.0)
+          C3FN(2) = 1.0 - POFF**2
+          C3FN(3) = 0.5*POFF*(POFF+1.0)
 !
-          YNORM = 0.
+          YNORM = 0.0
           DO I = 1, 3
             III = IARGI + I - 2
             PKTEM = PKCONV(III,1)
@@ -131,7 +129,7 @@
       IF (.NOT.LERANL) THEN
         DO IV = 1, NPKGEN(1,1)
           PTEM = 100.*PKFNVA(IV)
-          IF (PTEM.LT.0.) CCHI = CCHI + PTEM*PTEM
+          IF (PTEM.LT.0.0) CCHI = CCHI + PTEM*PTEM
         ENDDO
       ENDIF
 !
@@ -145,7 +143,6 @@
 !
 !
 !
-! LEVEL 1      SUBROUTINE PF_FCSUB3(MNS)
       SUBROUTINE PF_FCSUB3(MNS)
 !
 !

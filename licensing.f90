@@ -68,8 +68,6 @@
 ! JvdS Now we can remove the licence dialogue from memory:
       CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogUnload
-      CALL WDialogSelect(0)
-      RETURN
 
       END SUBROUTINE check_license
 !

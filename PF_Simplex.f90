@@ -39,9 +39,7 @@
       EXTERNAL CHIFUN
       LOGICAL LERANL
       COMMON /PKCOM3/ LERANL
-!O      DATA     NMAX /50/
 !
-!O      IF (N.GT.NMAX) STOP' Sorry, too many parameters !'
       LERANL = .FALSE.
       CALL VCOPY(X,V,N)
       CHIMIN = CHIFUN(N,V)

@@ -1,5 +1,6 @@
-
-
+!
+!*****************************************************************************
+!
       SUBROUTINE ErrorMessage(TheMessage)
 !
 ! Displays an error message
