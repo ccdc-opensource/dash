@@ -22,10 +22,9 @@
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE

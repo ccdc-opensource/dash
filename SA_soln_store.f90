@@ -28,10 +28,9 @@
       COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       LOGICAL          PRO_saved
       COMMON /PROCOM/  PRO_saved(1:MaxRun)
@@ -40,7 +39,7 @@
       LOGICAL, EXTERNAL :: Get_SavePRO
       INTEGER    tFileHandle
 
-      PRO_saved(SA_Run_Number) = .FALSE.
+      PRO_saved(Curr_SA_Run) = .FALSE.
       IF (.NOT. Get_SavePRO()) RETURN
       tFileHandle = 61
       OPEN(UNIT=tFileHandle,FILE=OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pro',status='unknown',ERR=999)
@@ -50,7 +49,7 @@
       ENDDO
 ! to overwrite:
       CLOSE(tFileHandle)
-      PRO_saved(SA_Run_Number) = .TRUE.
+      PRO_saved(Curr_SA_Run) = .TRUE.
       RETURN
   999 CALL ErrorMessage('Error writing .pro file.')
       CLOSE(tFileHandle)

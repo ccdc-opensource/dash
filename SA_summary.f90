@@ -12,21 +12,22 @@
       USE DRUID_HEADER
       USE VARIABLES
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC' 
 
 !ep    need the common block to identify the number rows in the grid          
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 !     required to handle the profile graphs plotted in child windows
 
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
       CHARACTER*MaxPathLength Grid_Buffer
-      INTEGER RangeOption
+      INTEGER RangeOption, I, iRow, iStatus
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
@@ -35,6 +36,8 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide()
+              CALL WDialogSelect(IDD_SA_Action1)
+              CALL WDialogFieldState(IDB_Summary,Enabled)
 ! Closes all SA profile child windows which are still open when OK button clicked
               DO i = 1, MaxNumChildWin
                 IF (SAUsedChildWindows(i).EQ.1) THEN
@@ -48,12 +51,12 @@
               CALL PopActiveWindowID
               RETURN
             CASE (IDF_InvertSelection)
-              DO irow = 1, MaxRuns
-                CALL WGridGetCellCheckBox(IDF_SA_summary,3,irow,istatus)
+              DO iRow = 1, MaxRuns
+                CALL WGridGetCellCheckBox(IDF_SA_summary,3,iRow,istatus)
                 IF (istatus .EQ. 1) THEN
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,irow,Unchecked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
                 ELSE
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,irow,Checked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Checked)
                 ENDIF
               ENDDO
             CASE (IDB_ShowOverlap)
@@ -74,15 +77,15 @@
       END SELECT
 !ep allows you to view pdb file of SA Solutions, each clicked
 !   check box in fresh mercury window
-      DO irow = 1, SA_Run_Number
-        CALL WGridGetCellCheckBox(IDF_SA_summary,2,irow,istatus)
-        IF (istatus.EQ.1) THEN
+      DO iRow = 1, NumOf_SA_Runs
+        CALL WGridGetCellCheckBox(IDF_SA_summary,2,iRow,istatus)
+        IF (istatus .EQ. 1) THEN
 ! calls subroutine which opens Mercury window with .pdb file
-          CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)
+          CALL WGridGetCellString(IDF_SA_Summary,1,iRow,Grid_Buffer)
           CALL ViewStructure(Grid_Buffer)
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
-          CALL organise_sa_result_data(irow)
-          CALL WGridPutCellCheckBox(IDF_SA_Summary,2,irow,Unchecked)
+          CALL organise_sa_result_data(iRow)
+          CALL WGridPutCellCheckBox(IDF_SA_Summary,2,iRow,Unchecked)
         ENDIF
       ENDDO
       CALL PopActiveWindowID
@@ -102,25 +105,21 @@
       USE DRUID_HEADER
       USE VARIABLES
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC' 
        
-!ep    need the common block to identify the number rows in the grid          
-      LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
-!     required to handle the profile graphs plotted in child windows
+! Required to handle the profile graphs plotted in child windows
       INTEGER  SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
       SELECT CASE (EventType)
-! will close the profile plot window
+! Will close the profile plot window
         CASE (CloseRequest)
           CALL WindowCloseChild(EventInfo%win)
           SAUsedChildWindows(EventInfo%win) = 0
           CALL UnRegisterChildWindow(EventInfo%win)
-! exposing or resizing of profile plot windows - will replot
+! Exposing or resizing of profile plot windows - will replot
         CASE (expose, resize)
           CALL plot_pro_file(EventInfo%win)
       END SELECT
