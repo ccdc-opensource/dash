@@ -38,7 +38,13 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
-      CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Error")
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) THEN
+      ELSE
+        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Error")
+      ENDIF
 
       END SUBROUTINE ErrorMessage
 !
@@ -56,6 +62,9 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       LOGICAL            ShowAgain
       INTEGER                       Counter
       COMMON  / DBGMSG / ShowAgain, Counter
@@ -63,8 +72,11 @@
       LOGICAL, EXTERNAL :: Confirm
 
 !DEC$ IF DEFINED (ONTBUG)
-      IF (ShowAgain) THEN
-        ShowAgain = Confirm('Debug error : '//TheMessage(1:LEN_TRIM(TheMessage))//CHAR(13)//'More Debug Error messages?')
+      IF ( in_batch ) THEN
+      ELSE
+        IF (ShowAgain) THEN
+          ShowAgain = Confirm('Debug error : '//TheMessage(1:LEN_TRIM(TheMessage))//CHAR(13)//'More Debug Error messages?')
+        ENDIF
       ENDIF
 !DEC$ ENDIF
 
@@ -116,7 +128,13 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
-      CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Warning")
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) THEN
+      ELSE
+        CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Warning")
+      ENDIF
 
       END SUBROUTINE WarningMessage
 !
@@ -134,7 +152,13 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
-      CALL WMessageBox(OkOnly,InformationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Info")
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) THEN
+      ELSE
+        CALL WMessageBox(OkOnly,InformationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Info")
+      ENDIF
 
       END SUBROUTINE InfoMessage
 !
@@ -157,8 +181,14 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheQuestion
 
-      CALL WMessageBox(YesNo,QuestionIcon,CommonOK,TheQuestion(1:LEN_TRIM(TheQuestion)),'Confirm')
-      Confirm = (WInfoDialog(ExitButtonCommon) .EQ. CommonYes)
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) THEN
+      ELSE
+        CALL WMessageBox(YesNo, QuestionIcon, CommonOK, TheQuestion(1:LEN_TRIM(TheQuestion)), 'Confirm')
+        Confirm = (WInfoDialog(ExitButtonCommon) .EQ. CommonYes)
+      ENDIF
 
       END FUNCTION Confirm
 !
