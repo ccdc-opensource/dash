@@ -150,6 +150,7 @@
 !
 ! RETURNS : 1 for success
 !           0 for error (could be file not found/file in use/no valid data)
+!           2 for user pressed cancel
 !
       USE WINTERACTER
       USE DRUID_HEADER
@@ -244,6 +245,7 @@
 !        CALL ScrUpdateFileName
         RETURN
       ENDIF
+      IF (ISTAT .EQ. 2) RETURN ! User pressed cancel somewhere
 ! Fill the E.S.D.s if that hasn't been taken care of yet
       IF (.NOT. ESDsFilled) THEN
         DO I = 1, NOBS
@@ -2053,25 +2055,25 @@
       INCLUDE 'statlog.inc'
 
       INTEGER I, J, JJ, IST
-      REAL XADD, YOADD, VADD
+      REAL XADD, YOADD, EADD
 
       NBIN = (NOBS/LBIN)
       DO I = 1, NBIN
         IST = (I-1) * LBIN
         XADD  = 0.0
         YOADD = 0.0
-        VADD  = 0.0
+        EADD  = 0.0
         DO J = 1, LBIN
           JJ = J + IST
           XADD  = XADD  + XOBS(JJ)
           YOADD = YOADD + YOBS(JJ)
-          VADD  = VADD  + EOBS(JJ)**2
+          EADD  = EADD  + EOBS(JJ)**2
         ENDDO
         XBIN(I)  =  XADD/FLOAT(LBIN)
         YOBIN(I) = YOADD/FLOAT(LBIN)
         YCBIN(I) = 0.0
         YBBIN(I) = 0.0
-        EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
+        EBIN(I)  = SQRT(EADD) / FLOAT(LBIN)
       ENDDO
       DataSetChange = DataSetChange + 1
       CALL GetProfileLimits
