@@ -250,7 +250,6 @@
 
       IMPLICIT NONE
 
-!O      LOGICAL,                      INTENT (IN OUT) :: NoData
       CHARACTER(LEN=MaxPathLength), INTENT (IN OUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
@@ -343,7 +342,6 @@
 
 !      IMPLICIT NONE
 
-!O      LOGICAL,                      INTENT (IN OUT) :: NoData
       CHARACTER(LEN=MaxPathLength), INTENT (IN OUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
@@ -366,13 +364,9 @@
         XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
         IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
 
-!C>> JCC The next common allows setting of SLIM, and controls the background options
-      REAL SLIMVALUE, SCALFAC
-      LOGICAL BACKREF
-      COMMON /PWLYST/ SLIMVALUE, SCALFAC, BACKREF
-
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
+      INCLUDE 'lattice.inc'
 
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
@@ -541,6 +535,7 @@
       LOGICAL,                      INTENT (OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
 
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
@@ -590,26 +585,24 @@
           RETURN
         CASE ('1')
 ! A version 3 file, the most recent and most complicated format
-! 'current file status'. 1 = done, 2 = active, 3 = aborted, 4 = interrupted
-          READ(UNIT=10,REC=3,ERR=999) I4
-          IF (I4 .NE. 1) THEN
-! The user should be warned here
-            CALL ErrorMessage("Current file status is Active, Aborted or Interrupted.")
-            RETURN
-          ENDIF
-! Number of completed data ranges. I assume that that is the number of powder patterns in this file
-! (multiple data sets are possible in this file format)
+!? 'current file status'. 1 = done, 2 = active, 3 = aborted, 4 = interrupted
+!?          READ(UNIT=10,REC=3,ERR=999) I4
+!?          IF (I4 .NE. 1) THEN
+!?! The user should be warned here
+!?            CALL ErrorMessage("Current file status is Active, Aborted or Interrupted.")
+!?            RETURN
+!?          ENDIF
+! Number of completed data ranges.
+! There seem to be 2 uses for this:
+! 1. Measure the same range over and over again (time series)
+! 2. Measure different ranges at different resolutions / counting times
+! I don't think the former will be used for solving structures.
           READ(UNIT=10,REC=4,ERR=999) NumOfDataRanges
-
-! We can read the primary wavelength (Angstroms) here, but it is also specified per data range
-! Assuming a monochromated beam, this is the wavelength we would want
-!          READ(UNIT=10,REC=157,ERR=999) RecReal(1)
-!          READ(UNIT=10,REC=158,ERR=999) RecReal(2)
-! Due to the EQUIVALENCE statement, R8 now holds the wavelength in Angstroms
 ! The complete file header is 712 bytes, so start reading at record (712 DIV 4) + RecNumber
           Offset = 178
 ! @ Now there should be a loop over the number of data ranges
           DO CurrDataRange = 1, NumOfDataRanges
+! @ If there's more than one data range, they must be summed. Weights should probably be applied?
 ! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 ! Length of Range Header Structure in bytes. Must be 304.
             READ(UNIT=10,REC=Offset+1,ERR=999) I4
@@ -628,7 +621,6 @@
             ENDIF
 ! Check that we will not read less than 1 data point
             IF (NumOfBins .EQ. 0) THEN
-! The user should be warned here
               CALL ErrorMessage("The file contains no valid data.")
               RETURN
             ENDIF
@@ -638,7 +630,7 @@
 ! Due to the EQUIVALENCE statement, R8 now holds the starting angle in degrees
             TwoThetaStart = R8
 ! Read scan mode: 0 = step, 1 = continuous
- !           READ(UNIT=10,REC=Offset+43,ERR=999) I4
+            READ(UNIT=10,REC=Offset+43,ERR=999) I4
 ! Step size in degrees
             READ(UNIT=10,REC=Offset+45,ERR=999) RecReal(1)
             READ(UNIT=10,REC=Offset+46,ERR=999) RecReal(2)
@@ -650,9 +642,17 @@
             READ(UNIT=10,REC=Offset+61,ERR=999) RecReal(1)
             READ(UNIT=10,REC=Offset+62,ERR=999) RecReal(2)
 ! Due to the EQUIVALENCE statement, R8 now holds the wavelength in Angstroms
-! And now store this value as the experimental wavelength
             Lambda1 = R8
-            CALL UpdateWavelength(Lambda1)
+! Check that the same wavelength has been used for all data ranges
+            IF (CurrDataRange .EQ. 1) THEN
+! Store this value as the experimental wavelength
+              CALL UpdateWavelength(Lambda1)
+            ELSE
+              IF (ABS(Lambda1-ALambda) .LE. 0.0001) THEN
+                CALL ErrorMessage('More than one wavelength used, reading aborted.')
+                RETURN
+              ENDIF
+            ENDIF
 ! Data record length. Must be 4.
             READ(UNIT=10,REC=Offset+64,ERR=999) I4
             IF (I4 .NE. 4) THEN
@@ -683,6 +683,8 @@
               READ(UNIT=10,REC=Offset+I,ERR=999) R4
               YOBS(I) = R4
             END DO
+! Next data range start after this one
+            Offset = Offset + NumOfBins
 ! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
           END DO
         CASE ('2')
