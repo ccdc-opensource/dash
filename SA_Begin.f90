@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE BeginSa
+      SUBROUTINE BeginSA
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -16,10 +16,9 @@
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       REAL                    chi_sqd
       INTEGER                                           it_count
@@ -41,9 +40,9 @@
       ENDIF
 ! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
 ! changed while the SA is running).
-      LOG_HYDROGENS = Get_UseHydrogens()
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
+      LOG_HYDROGENS = Get_UseHydrogens()
 ! Pop up the SA status window
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WizardWindowShow(IDD_SA_Action1)
@@ -58,8 +57,7 @@
 ! Clear Chi-sqd array between starting sets of SA Runs
       Chi_sqd = 0.0
       MaxIterationSoFar = 0
-      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
-      CALL WDialogShow(-1,-1,0,Modeless)
+      CALL WDialogFieldState(IDB_Summary,Disabled)
       CALL SimulatedAnnealing
       SA_Duration = SECNDS(T1)
       WRITE(SA_DurationStr,'(F10.1)') SA_Duration
@@ -81,9 +79,7 @@
 !ep SASummary presents a grid summarising results of the Simulated
 !   Annealing runs.  
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
-! Initialise all overlay checkboxes to 'Checked'
-      DO I = 1, SA_Run_Number
-        CALL WGridPutCellCheckBox(IDF_SA_summary,3,I,Checked)
+      DO I = 1, NumOf_SA_Runs
         WRITE(RowLabelStr,'(I2)') I
         CALL WGridLabelRow(IDF_SA_summary,I,RowLabelStr)
       ENDDO
@@ -97,7 +93,7 @@
       ENDIF
       CALL WDialogShow(-1,-1,0,Modeless)
 
-      END SUBROUTINE BeginSa
+      END SUBROUTINE BeginSA
 !
 !*****************************************************************************
 !
