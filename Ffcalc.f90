@@ -954,6 +954,92 @@
 !
 !*****************************************************************************
 !
+      REAL FUNCTION FFCALC_362(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P 42/n (origin choice 2, inversion at origin)
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN ! h+k = 2n,   h+l = 2n,   k+l = 2n
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = term2*term1 + term2*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN ! h+k = 2n,   h+l = 2n,   k+l = 2n+1
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term4 = SINQS(IL,3,N)
+          term5 = term2*term1 - term4*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN ! h+k = 2n,   h+l = 2n+1, k+l = 2n
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term4 = SINQS(IL,3,N)
+          term5 = term2*term1 + term4*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN ! h+k = 2n,   h+l = 2n+1, k+l = 2n+1
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = term2*term1 - term2*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(5,IR)) THEN ! h+k = 2n+1, h+l = 2n,   k+l = 2n
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term4 = COSQS(IL,3,N)
+          term5 = -term2*term1 + term4*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(6,IR)) THEN ! h+k = 2n+1, h+l = 2n,   k+l = 2n+1
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = -term2*term1 + term2*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(7,IR)) THEN ! h+k = 2n+1, h+l = 2n+1, k+l = 2n
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = -term2*term1 - term2*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(8,IR)) THEN ! h+k = 2n+1, h+l = 2n+1, k+l = 2n+1
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term4 = COSQS(IL,3,N)
+          term5 = -term2*term1 - term4*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ENDIF
+      FFCALC_362 = AFCAL*AFCAL
+
+      END FUNCTION FFCALC_362
+!
+!*****************************************************************************
+!
       REAL FUNCTION FFCALC_365(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
@@ -1286,8 +1372,9 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! SUM OVER ATOMS IN ASYMMETRIC UNIT:
-!.. For P-3
+! Structure factor calculations for space group P-3
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
