@@ -13,10 +13,9 @@
       IMPLICIT NONE
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       REAL    MaxMoves1, tMaxMoves
       INTEGER MaxMoves2
@@ -62,10 +61,9 @@
       COMMON /PLTSTO2/ CHIPROBEST
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       CHARACTER(MaxPathLength) OutputFilesBaseName
       INTEGER                                       OFBN_Len
@@ -73,6 +71,7 @@
       COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
       REAL Grid_ProfileChi, Grid_IntensityChi
+      INTEGER Grid_Overlay
       CHARACTER*MaxPathLength Grid_Buffer
       INTEGER I
       CHARACTER*(MaxPathLength) PdbFileName
@@ -80,20 +79,23 @@
       PdbFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pdb'
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
-      CALL WGridRows(IDF_SA_Summary, SA_Run_Number)
-      DO I = SA_Run_Number - 1,1,-1
+      CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
+      DO I = NumOf_SA_Runs-1, 1, -1
         CALL WGridGetCellReal(IDF_SA_Summary,4,I,Grid_ProfileChi)
         IF (Grid_ProfileChi .GT. CHIPROBEST) THEN
-          CALL WGridGetCellString(IDF_SA_Summary,1,I,Grid_Buffer)
-          CALL WGridGetCellReal(IDF_SA_Summary,5,I,Grid_IntensityChi)
-          CALL WGridPutCellReal(IDF_SA_Summary,4,I+1,Grid_ProfileChi,'(F7.2)')
-          CALL WGridPutCellReal(IDF_SA_Summary,5,I+1,Grid_IntensityChi,'(F7.2)')
-          CALL WGridPutCellString(IDF_SA_Summary,1,I+1,Grid_Buffer)   
+          CALL WGridGetCellString  (IDF_SA_Summary,1,I,Grid_Buffer)
+          CALL WGridGetCellCheckBox(IDF_SA_Summary,3,I,Grid_Overlay)
+          CALL WGridGetCellReal    (IDF_SA_Summary,5,I,Grid_IntensityChi)
+          CALL WGridPutCellString  (IDF_SA_Summary,1,I+1,Grid_Buffer) 
+          CALL WGridPutCellCheckBox(IDF_SA_Summary,3,I+1,Grid_Overlay)
+          CALL WGridPutCellReal    (IDF_SA_Summary,4,I+1,Grid_ProfileChi,'(F7.2)')
+          CALL WGridPutCellReal    (IDF_SA_Summary,5,I+1,Grid_IntensityChi,'(F7.2)')
         ELSE
           EXIT
         ENDIF
       ENDDO
       CALL WGridPutCellString(IDF_SA_Summary,1,I+1,PdbFileName(1:LEN_TRIM(PdbFileName)))
+      CALL WGridPutCellCheckBox(IDF_SA_summary,3,I+1,Checked)
       CALL WGridPutCellReal(IDF_SA_Summary,4,  I+1,CHIPROBEST,'(F7.2)')
       CALL WGridPutCellReal(IDF_SA_Summary,5,  I+1,IntensityChiSquared,'(F7.2)')
       CALL PopActiveWindowID
@@ -116,19 +118,18 @@
       COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER I
       REAL Grid_ProfileChi, Grid_IntensityChi
       CHARACTER(MaxPathLength) Grid_Buffer
 
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
-      OPEN(unit=101, file=OutputFilesBaseName(1:OFBN_Len)//'.log', status = 'unknown',ERR=999)
+      OPEN(UNIT=101, FILE=OutputFilesBaseName(1:OFBN_Len)//'.log', status = 'unknown',ERR=999)
       WRITE(101,*,ERR=999) 'File name, Profile Chi Squared, Intensity Chi Squared'
-      DO I = 1, SA_Run_Number
+      DO I = 1, NumOf_SA_Runs
         CALL WGridGetCellString(IDF_SA_Summary,1,I,Grid_Buffer)
         CALL WGridGetCellReal(IDF_SA_Summary,4,I,Grid_ProfileChi)
         CALL WGridGetCellReal(IDF_SA_Summary,5,I,Grid_IntensityChi)
