@@ -866,6 +866,12 @@
 ! Auto local minimisation at the end of every run in multirun YES / NO
       CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,tLogical)
+      IF (LOG_HYDROGENS) THEN
+! If hydrogens are used during SA, force use of hydrogens during autominimise
+        CALL WDialogFieldState(IDF_UseHydrogensAuto,Disabled)
+      ELSE
+        CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto,tLogical)
+      ENDIF
 ! Read output profile chi**2 versus moves plot YES / NO
       CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_OutputChi2vsMoves,tLogical)
