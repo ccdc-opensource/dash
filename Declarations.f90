@@ -229,6 +229,13 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
+      REAL             prevx,       prevlb,       prevub
+      LOGICAL                                                   LimsChanged
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
+
+! These are the values from the SA Parameter Bound Wizard window, stored to track changes made
+! by the user. Must be initialised before the SA Parameter Bound Wizard window is displayed.
+
       INTEGER         NATOM
       REAL                   Xato
       INTEGER                             KX
