@@ -39,7 +39,7 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_ErrorLog)
-      CALL WDialogShow(-1,-1,0,Modal)
+      CALL WDialogShow(-1, -1, 0, Modal)
       IretVal = WInfoDialog(ExitButton)
       IF (IRetVal .EQ. ID_Edit_PawleyLog) THEN
         CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,'View pawley fit log file'),IHan)

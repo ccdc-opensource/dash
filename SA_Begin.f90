@@ -82,7 +82,7 @@
 ! Pop up the SA status window
       CALL WizardWindowShow(IDD_SA_Action1)
 !O      CALL WDialogSelect(IDD_Parameter_Status_2)
-!O      CALL WDialogShow(-1,-1,0,Modeless)
+!O      CALL WDialogShow(-1, -1, 0, Modeless)
       StartDate = DateToday()
       StartTime = TimeNowSeconds()
       CALL Init_MultiRun

@@ -71,8 +71,8 @@
               CALL PrjFileBrowse
             CASE (IDBSAVE)
               CALL WDialogSelect(IDD_OutputSolutions)
-              CALL WDialogShow(-1,-1,0,ModeLess)
-              CALL WDialogPutString(IDF_DirAndBaseName,OutputFilesBaseName(1:OFBN_Len))
+              CALL WDialogShow(-1, -1, 0, ModeLess)
+              CALL WDialogPutString(IDF_DirAndBaseName, OutputFilesBaseName(1:OFBN_Len))
               CALL UpdateOutputSolutionsWIndow
             CASE (IDB_Prog3)
               CALL OpenChiSqPlotWindow
@@ -88,19 +88,19 @@
               IF (iLimit1 .LT.             1) iLimit1 =             1
               DO iRow = 1, NumOf_SA_Runs
                 IF ((iRow .GE. iLimit1) .AND. (iRow .LE. iLimit2)) THEN
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Checked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iRow, Checked)
                 ELSE
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iRow, Unchecked)
                 ENDIF
               ENDDO
               CALL UpdateOutputSolutionsWindow
             CASE (IDF_InvertSelection)
               DO iRow = 1, NumOf_SA_Runs
-                CALL WGridGetCellCheckBox(IDF_SA_summary,3,iRow,istatus)
+                CALL WGridGetCellCheckBox(IDF_SA_summary, 3, iRow, istatus)
                 IF (istatus .EQ. 1) THEN
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iRow, Unchecked)
                 ELSE
-                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Checked)
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iRow, Checked)
                 ENDIF
               ENDDO
               CALL UpdateOutputSolutionsWindow
@@ -113,29 +113,29 @@
 !ep allows you to view pdb file of SA Solutions, each clicked
 !   check box in fresh mercury window
       DO iRow = 1, NumOf_SA_Runs
-        CALL WGridGetCellCheckBox(IDF_SA_summary,2,iRow,iStatus)
+        CALL WGridGetCellCheckBox(IDF_SA_summary, 2, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
 ! calls subroutine which opens Mercury window with .pdb file
           CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow))
           CALL ViewStructure('SA_best.pdb')
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(iRow)
-          CALL WGridPutCellCheckBox(IDF_SA_Summary,2,iRow,Unchecked)
+          CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
           CALL PopActiveWindowID
           RETURN
         ENDIF
       ENDDO
 ! Allows you to restart a run
       DO iRow = 1, NumOf_SA_Runs
-        CALL WGridGetCellCheckBox(IDF_SA_summary,6,iRow,iStatus)
+        CALL WGridGetCellCheckBox(IDF_SA_summary, 6, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
           CALL CloseOutputSolutionsChildWindows
           CALL WDialogSelect(IDD_SAW_Page5)
-          CALL WGridPutCellCheckBox(IDF_SA_Summary,6,iRow,Unchecked)
+          CALL WGridPutCellCheckBox(IDF_SA_Summary, 6, iRow, Unchecked)
 ! Fill SA Parameter Bounds Wizard Window with the values from this solution.
           CALL WDialogSelect(IDD_SA_Modal_input2)
           DO IV = 1, NVAR
-            CALL WGridPutCellReal(IDF_parameter_grid_modal,1,IV,BestValuesDoF(IV,iSol2Run(iRow)))
+            CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IV, BestValuesDoF(IV,iSol2Run(iRow)))
           ENDDO
 ! Untick "Randomise initial values"
           CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .FALSE.)
@@ -146,11 +146,11 @@
       ENDDO
 ! Rietveld refinement
       DO iRow = 1, NumOf_SA_Runs
-        CALL WGridGetCellCheckBox(IDF_SA_summary,7,iRow,iStatus)
+        CALL WGridGetCellCheckBox(IDF_SA_summary, 7, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
           CALL CloseOutputSolutionsChildWindows
           CALL WDialogSelect(IDD_SAW_Page5)
-          CALL WGridPutCellCheckBox(IDF_SA_Summary,7,iRow,Unchecked)
+          CALL WGridPutCellCheckBox(IDF_SA_Summary, 7, iRow, Unchecked)
           CALL ShowWizardWindowRietveld(iSol2Run(iRow))
           CALL PopActiveWindowID
           RETURN
@@ -256,7 +256,7 @@
               FILTER = 'Parameter table (*.tbl)|*.tbl|'
               CALL WDialogGetString(IDF_DirAndBaseName,tFileName)
               tFileName = tFileName(1:LEN_TRIM(tFileName))//'.tbl'
-              CALL WSelectFile(FILTER,iFlags,tFileName,'Save parameters')
+              CALL WSelectFile(FILTER, iFlags, tFileName, 'Save parameters')
 ! Problems here: 
 ! - quaternions are not normalised
 ! - torsion angles can be e.g. -238.8781
@@ -294,8 +294,8 @@
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_OutputPDB,IDF_OutputCSSR,IDF_OutputCCL,IDF_OutputCIF,IDF_OutputRES, &
-                  IDF_OutputPRO,IDF_OutputSolMenu,IDF_DirAndBaseName)
+            CASE (IDF_OutputPDB, IDF_OutputCSSR, IDF_OutputCCL, IDF_OutputCIF, IDF_OutputRES, &
+                  IDF_OutputPRO, IDF_OutputSolMenu, IDF_DirAndBaseName)
               CALL UpdateOutputSolutionsWIndow
           END SELECT
       END SELECT
@@ -332,7 +332,7 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_OutputSolutions)
 ! Get directory + base name and form appropriate string
-      CALL WDialogGetString(IDF_DirAndBaseName,tFileName)
+      CALL WDialogGetString(IDF_DirAndBaseName, tFileName)
       tLen = LEN_TRIM(tFileName)
 ! Maximum to be added: "_Best.cssr" = 10
 ! Total: 60
@@ -397,7 +397,7 @@
             CALL WDialogSelect(IDD_SAW_Page5)
             NumSelSol = 0
             DO iRow = 1, NumOf_SA_Runs
-              CALL WGridGetCellCheckBox(IDF_SA_summary,3,iRow,istatus)
+              CALL WGridGetCellCheckBox(IDF_SA_summary, 3, iRow, istatus)
               IF (istatus .EQ. 1) THEN
                 NumSelSol = NumSelSol + 1
                 IF (NumSelSol .LE. 5) CheckedSol(NumSelSol) = iRow
@@ -434,13 +434,13 @@
             IF (NumOf_SA_Runs*NumOfFileTypes .GT. 5) LineStr(5) = "etc."
         END SELECT
       ENDIF
-      CALL WDialogPutString(IDF_egLine0,LineStr(0))
-      CALL WDialogPutString(IDF_egLine1,LineStr(1))
-      CALL WDialogPutString(IDF_egLine2,LineStr(2))
-      CALL WDialogPutString(IDF_egLine3,LineStr(3))
-      CALL WDialogPutString(IDF_egLine4,LineStr(4))
-      CALL WDialogPutString(IDF_egLine5,LineStr(5))
-      CALL WDialogFieldStateLogical(IDB_Output2,SaveButtonAvailable)
+      CALL WDialogPutString(IDF_egLine0, LineStr(0))
+      CALL WDialogPutString(IDF_egLine1, LineStr(1))
+      CALL WDialogPutString(IDF_egLine2, LineStr(2))
+      CALL WDialogPutString(IDF_egLine3, LineStr(3))
+      CALL WDialogPutString(IDF_egLine4, LineStr(4))
+      CALL WDialogPutString(IDF_egLine5, LineStr(5))
+      CALL WDialogFieldStateLogical(IDB_Output2, SaveButtonAvailable)
       CALL PopActiveWindowID
 
       END SUBROUTINE UpdateOutputSolutionsWindow
@@ -564,7 +564,7 @@
         tLen2 = LEN_TRIM(tMessage)
         tMessage = tMessage(1:tLen2)//'Would you like to overwrite these files?'
         tLen2 = LEN_TRIM(tMessage)
-        CALL WMessageBox(YesNoCancel,QuestionIcon,CommonCancel,tMessage(1:tLen2),"Overwrite files?")
+        CALL WMessageBox(YesNoCancel, QuestionIcon, CommonCancel, tMessage(1:tLen2), "Overwrite files?")
         tExitButton = WInfoDialog(ExitButtonCommon)
         IF (tExitButton .EQ. CommonCancel) THEN
           CALL PopActiveWindowID
@@ -586,7 +586,7 @@
               INQUIRE(FILE=tFileName,EXIST=OutputExists)
               WriteThisFile = .NOT. OutputExists
             ENDIF
-            IF (WriteThisFile) CALL SA_structure_output_2(1,tFileName,Ext2Type(J))
+            IF (WriteThisFile) CALL SA_structure_output_2(1, tFileName, Ext2Type(J))
           ENDDO
         CASE (2) ! Selected Solutions
           CALL WDialogSelect(IDD_SAW_Page5)
@@ -600,7 +600,7 @@
                   INQUIRE(FILE=tFileName,EXIST=OutputExists) 
                   WriteThisFile = .NOT. OutputExists
                 ENDIF
-                IF (WriteThisFile) CALL SA_structure_output_2(I,tFileName,Ext2Type(J))
+                IF (WriteThisFile) CALL SA_structure_output_2(I, tFileName, Ext2Type(J))
               ENDDO
             ENDIF
           ENDDO
@@ -613,7 +613,7 @@
                 INQUIRE(FILE=tFileName,EXIST=OutputExists) 
                 WriteThisFile = .NOT. OutputExists
               ENDIF
-              IF (WriteThisFile) CALL SA_structure_output_2(I,tFileName,Ext2Type(J))
+              IF (WriteThisFile) CALL SA_structure_output_2(I, tFileName, Ext2Type(J))
             ENDDO
           ENDDO
       END SELECT
@@ -624,7 +624,7 @@
 !
 !*******************************************************************************
 !
-      SUBROUTINE SA_structure_output_2(TheSolutionNr,TheFileName,TheFileType)
+      SUBROUTINE SA_structure_output_2(TheSolutionNr, TheFileName, TheFileType)
 
       USE DRUID_HEADER
       USE VARIABLES

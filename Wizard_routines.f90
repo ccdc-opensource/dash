@@ -76,8 +76,8 @@
       CALL WizardWindowHide
       CALL WDialogSelect(TheDialogID)
       CurrentWizardWindow = TheDialogID
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,IDNEXT,Modeless)
-      CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOff)
+      CALL WDialogShow(IXPos_IDD_Wizard, IYPos_IDD_Wizard, IDNEXT, Modeless)
+      CALL WMenuSetState(ID_Start_Wizard, ItemEnabled, WintOff)
 
       END SUBROUTINE WizardWindowShow
 !
@@ -97,12 +97,12 @@
 
       CALL WizardWindowHide
       IF (WeCanDoAPawleyRefinement()) THEN
-        CALL SetModeMenuState(1,1)
+        CALL SetModeMenuState(1, 1)
       ELSE
-        CALL SetModeMenuState(1,-1)
+        CALL SetModeMenuState(1, -1)
       ENDIF
       CALL SelectMode(ID_Peak_Fitting_Mode)
-      CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOn)
+      CALL WMenuSetState(ID_Start_Wizard, ItemEnabled, WintOn)
 !O! Ungrey "Subtract Background" button in Toolbar
 !O      IF (FnPatternOK()) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
 
@@ -1137,13 +1137,13 @@
                 CALL WDialogFieldState(IDF_LabTriclinic        ,Disabled)
                 CALL WDialogFieldState(IDF_LabProgTriclinic    ,Disabled)
               ENDIF
-              CALL WDialogPutString(IDF_LabProgCubic,' ')
-              CALL WDialogPutString(IDF_LabProgTetragonal,' ')
-              CALL WDialogPutString(IDF_LabProgHexagonal,' ')
-              CALL WDialogPutString(IDF_LabProgOrthorhombic,' ')
-              CALL WDialogPutString(IDF_LabProgMonoclinic,' ')
-              CALL WDialogPutString(IDF_LabProgTriclinic,' ')
-              CALL WDialogShow(-1,-1,0,Modeless)
+              CALL WDialogPutString(IDF_LabProgCubic, ' ')
+              CALL WDialogPutString(IDF_LabProgTetragonal, ' ')
+              CALL WDialogPutString(IDF_LabProgHexagonal, ' ')
+              CALL WDialogPutString(IDF_LabProgOrthorhombic, ' ')
+              CALL WDialogPutString(IDF_LabProgMonoclinic, ' ')
+              CALL WDialogPutString(IDF_LabProgTriclinic, ' ')
+              CALL WDialogShow(-1, -1, 0, Modeless)
               CALL WCursorShape(CurHourGlass)
               CALL DICVOL91(system(1),system(2),system(3),system(4),system(5),system(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
               CALL WDialogSelect(IDD_DICVOLRunning)
@@ -1152,12 +1152,12 @@
               IF (NumOfDICVOLSolutions .EQ. 0) THEN
 ! Pop up a window showing the DICVOL output file in a text editor
                 CALL WindowOpenChild(iHandle)
-                CALL WEditFile(DV_FileName,Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
+                CALL WEditFile(DV_FileName,Modeless, 0, FileMustExist+ViewOnly+NoToolBar, 4)
                 CALL SetChildWinAutoClose(iHandle)
                 CALL ErrorMessage('No solutions were found.')
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
                 CALL WDialogSelect(IDD_PW_Page8)
-                CALL WDialogFieldState(IDB_PrevRes,Disabled)
+                CALL WDialogFieldState(IDB_PrevRes, Disabled)
                 GOTO 999
               ENDIF  
               IF (DICVOL_Error .EQ. cDICVOL_TooManySolutions) CALL WarningMessage('More than 30 solutions found, please check your data.')
