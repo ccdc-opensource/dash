@@ -173,7 +173,7 @@
         bond(BondNr,1) = Bonds(1,BondNr,ifrg)
         bond(BondNr,2) = Bonds(2,BondNr,ifrg)
       ENDDO
-! Q & D to display flexible torsion angles in different colors by forcing different
+! Q & D hack to display flexible torsion angles in different colors by forcing different
 ! element types.
       IF (Get_ColourFlexibleTorsions() .AND. (natcry.GE.4)) THEN
         DO I = 1, natcry
@@ -215,7 +215,7 @@
 ! Show the mol2 file
       IF (WriteMol2(temp_file) .EQ. 1) CALL ViewStructure(temp_file)
       CALL IOSDeleteFile(temp_file)
-! Show the z-matrix file in an editor window
+! Show the Z-matrix file in an editor window
       CALL WindowOpenChild(IHANDLE)
       CALL WEditFile(frag_file(ifrg),Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
       CALL SetChildWinAutoClose(IHANDLE)
@@ -261,7 +261,7 @@
 
       CHARACTER*36 parlabel(mvar)
       DOUBLE PRECISION dcel(6)
-      INTEGER I, II, KK, ifrg
+      INTEGER I, II, KK, ifrg, tk
 
       CALL PushActiveWindowID
       DO I = 1, 6
@@ -271,6 +271,7 @@
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL CREATE_FOB()
       kk = 0
+      tk = 0
 ! JCC Run through all possible fragments
       DO ifrg = 1, maxfrg
 ! Only include those that are now checked
@@ -304,6 +305,28 @@
               CASE (5) ! bond
                 lb(kk) = 0.9*x(kk)
                 ub(kk) = x(kk)/0.9
+              CASE (6) ! single rotation axis
+! At the moment a Z-matrix containing more than one atom is read in, four
+! parameters are reserved for 'rotations'. When the rotation is restricted to
+! a single axis, only two of these parameters are necessary. By setting
+! upper bound - lower bound to 0.000001, these parameters will be considered 'fixed'
+! and will not be picked during the SA.
+                tk = tk + 1
+                SELECT CASE (tk)
+                  CASE (1) 
+                    lb(kk) = -1.0
+                    ub(kk) =  1.0
+                  CASE (2)
+                    lb(kk) = -1.0
+                    ub(kk) =  1.0
+                  CASE (3) 
+                    lb(kk) =  0.0
+                    ub(kk) =  0.000001
+                  CASE (4)
+                    lb(kk) =  0.0
+                    ub(kk) =  0.000001
+                END SELECT
+                IF (tk .EQ. 4) tk = 0
             END SELECT
           ENDDO
 !JCC End of check on selection
