@@ -29,7 +29,7 @@
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
       PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
       IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)
-      Character(Len=48) ChPtGp
+!U      Character(Len=48) ChPtGp
 
 !>JCC 
       Integer ICurSel
@@ -147,8 +147,9 @@
 
 !  
 ! Now do a refinement ...
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-      Call WDialogGetMenu(IDF_Crystal_System_Menu,IPtGp,ChPtGp)
+! JvdS Following two lines didn't do anything
+!U      CALL WDialogSelect(IDD_Crystal_Symmetry)
+!U      Call WDialogGetMenu(IDF_Crystal_System_Menu,IPtGp,ChPtGp)
       Call RefineLattice()
 	  IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
 !
