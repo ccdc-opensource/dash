@@ -900,8 +900,19 @@
             CASE (ID_PW_DF_Open)
               CALL WDialogGetString(IDF_PW_DataFileName_String,CTEMP)
               ISTAT = DiffractionFileOpen(CTEMP)
+              IF (ISTAT .EQ. 1) THEN
+                CALL WDialogFieldState(IDNEXT,Enabled)
+              ELSE
+                CALL WDialogFieldState(IDNEXT,Disabled)
+              ENDIF
             CASE (IDBBROWSE)
               ISTAT = DiffractionFileBrowse()
+! Don't change if the user pressed 'Cancel' (ISTAT = 2)
+              IF      (ISTAT .EQ. 1) THEN
+                CALL WDialogFieldState(IDNEXT,Enabled)
+              ELSE IF (ISTAT .EQ. 0) THEN
+                CALL WDialogFieldState(IDNEXT,Disabled)
+              ENDIF
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)

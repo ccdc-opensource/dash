@@ -521,11 +521,11 @@
                     CALL IGrFillPattern(Outline,Medium,DiagUp)
                   ENDIF
                   xgcurold=xgcur(2)
-                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.3)')
+                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(F10.3)')
                 IF (ypgmax-ypgmin.le.100.) THEN
-                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.3)')
+                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(F10.3)')
                 ELSE
-                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.1)')
+                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(F10.1)')
                 ENDIF
                 DO ISB = 2, 3
                   CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
@@ -836,6 +836,50 @@
 !
       SUBROUTINE CheckIfWeCanDoAPawleyRefinement
 
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
+      LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page10)
+      IF (WeCanDoAPawleyRefinement()) THEN
+        CALL SetModeMenuState(1,1,0)
+        CALL WDialogFieldState(IDNEXT,Enabled)
+      ELSE
+        CALL SetModeMenuState(1,-1,0)
+        CALL WDialogFieldState(IDNEXT,Disabled)
+      ENDIF
+      CALL PopActiveWindowID
+
+      END SUBROUTINE CheckIfWeCanDoAPawleyRefinement
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION WeCanDoAPawleyRefinement
+
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
@@ -861,22 +905,14 @@
       LOGICAL Check_TicMark_Data ! Function
       INTEGER I, NPeaksFitted
 
-      IF ( Check_TicMark_Data() ) THEN
 ! JCC Track the number of fittable peaks
-        NPeaksFitted = 0
-        DO I = 1, NumPeakFitRange
-          NPeaksFitted = NPeaksFitted + NumInPFR(I)
-        ENDDO
-        IF ( NPeaksFitted .GE. 3 ) THEN
-          CALL SetModeMenuState(1,1,0)
-        ELSE
-          CALL SetModeMenuState(1,0,0)
-        ENDIF
-      ELSE
-        CALL SetModeMenuState(1,-1,0)
-      ENDIF
+      NPeaksFitted = 0
+      DO I = 1, NumPeakFitRange
+        NPeaksFitted = NPeaksFitted + NumInPFR(I)
+      ENDDO
+      WeCanDoAPawleyRefinement = (Check_TicMark_Data() .AND. (NPeaksFitted .GE. 3))
 
-      END SUBROUTINE CheckIfWeCanDoAPawleyRefinement
+      END FUNCTION WeCanDoAPawleyRefinement
 !
 !*****************************************************************************
 !
