@@ -235,6 +235,7 @@
 !
       SUBROUTINE PO_Init   
 
+      USE ATMVAR
       USE PO_VAR
 
       IMPLICIT NONE
@@ -259,7 +260,7 @@
 
       INTEGER         MAXK
       REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
       INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF

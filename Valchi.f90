@@ -3,6 +3,7 @@
 !
       SUBROUTINE VALCHI(CHIVAL,CurrentParameter)
 
+      USE ATMVAR
       USE ZMVAR
       USE PO_VAR
       USE VARIABLES
@@ -17,7 +18,7 @@
 
       INTEGER         MAXK
       REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
       INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF
@@ -50,7 +51,7 @@
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
-      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
       
       INTEGER         NStPar
       COMMON /pextra/ NStPar
@@ -320,6 +321,8 @@
 !
 ! Pre-calculates sin and cosine terms for the structure factor calculation
 !
+      USE ATMVAR
+
       INCLUDE 'PARAMS.INC'
 
       INTEGER         NATOM
@@ -337,13 +340,13 @@
 
       INTEGER         MAXK
       REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
-      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
       INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF
@@ -434,6 +437,7 @@
 ! March-Dollase correction for Preferred Orientation
 !
       USE PO_VAR
+      USE ATMVAR
       
       IMPLICIT NONE
 
@@ -444,7 +448,7 @@
 
       INTEGER         MAXK
       REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
       DOUBLE PRECISION x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
