@@ -1,27 +1,21 @@
+!
+!*****************************************************************************
+!
       SUBROUTINE organise_sa_result_data(irow)
 !ep July 2001
 !   called from SASummary.for
-!	This subroutine manipulates the data required to plot the observed  
+!     This subroutine manipulates the data required to plot the observed  
 !   diffraction pattern with the calculated pattern and difference.  The
 !   data is read in from the .pro file and stored in COMMON BLOCK ProFilePLotStore
 !  ihandle is used to identify the column of the store_ arrays where the data
 !  for each child window (ihandle) is stored
 
       USE WINTERACTER
-	  USE Druid_header
-!
+      USE DRUID_HEADER
 !
 !  Definitions and array declarations.
 !
-      INTEGER irow, iz, temprow
-      REAL yadd, ydif
-	CHARACTER*255 Grid_Buffer
-	CHARACTER*75 filename
-	INCLUDE 'PARAMS.INC'
-	DIMENSION xobsep(MOBS)
-	DIMENSION yobsep(MOBS)
-	DIMENSION ycalcep(MOBS)
-	DIMENSION ydif(MOBS)
+      INCLUDE 'PARAMS.INC'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -32,84 +26,85 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
 
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
 
 ! Used to manage the child windows which display the profile plots
-      INTEGER SAUsedChildWindows
+      INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
+
       REAL store_ycalc, store_diff
 ! the number of columns in the store-arrays is set to the maximum number of 
 ! child windows allowed
       COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
 
+      INTEGER irow, iz, temprow
+      REAL yadd, ydif
+      CHARACTER*255 Grid_Buffer
+      CHARACTER*75 filename
+      DIMENSION xobsep(MOBS)
+      DIMENSION yobsep(MOBS)
+      DIMENSION ycalcep(MOBS)
+      DIMENSION ydif(MOBS)
       EXTERNAL DealWithProfilePlot
 !
 !   reading in the data from the saved .pro files
 !
       temprow = irow
-!
-	CALL WGridGetCellString(IDF_SA_Summary,1,temprow,Grid_Buffer)
-	Iz = len_trim(Grid_Buffer)
-	Iz = Iz-4
-	filename = grid_buffer(1:Iz)//'.pro'
-!
-	OPEN(unit=61, file=filename, status = 'old', err=999)
-	DO i = ipmin,ipmax
-		READ(61,20) xobsep(i), yobsep(i), ycalcep(i)
-20		FORMAT(3(x, f12.4))
-	END DO
-	CLOSE(61)
+      CALL WGridGetCellString(IDF_SA_Summary,1,temprow,Grid_Buffer)
+      Iz = LEN_TRIM(Grid_Buffer)
+      Iz = Iz-4
+      filename = grid_buffer(1:Iz)//'.pro'
+      OPEN(unit=61, file=filename, status = 'old', err=999)
+      DO i = ipmin,ipmax
+        READ(61,20) xobsep(i), yobsep(i), ycalcep(i)
+20      FORMAT(3(x, f12.4))
+      ENDDO
+      CLOSE(61)
 !
 !   calculate the offset for the difference plot
 !
       YADD=0.5*(YPGMAX+YPGMIN)
-      DO II=IPMIN,IPMAX
-        YDIF(II)=YADD+yobsep(II)-ycalcep(II)
+      DO II = IPMIN, IPMAX
+        YDIF(II) = YADD + yobsep(II) - ycalcep(II)
       ENDDO
 !
-!
 !   open the plotting window, ihandle is the window's unique identifier
-!	
-	CALL WindowOpenChild(ihandle, x=10, y=450, width=800, height=400, title=filename)
+!     
+      CALL WindowOpenChild(ihandle, x=10, y=450, width=800, height=400, title=filename)
       IF(ihandle.eq.-1) THEN
         CALL ErrorMessage("Exceeded Maximum Number of Allowed Windows.  Close a profile window")
         RETURN
-      END IF 
+      ENDIF 
       CALL RegisterChildWindow(ihandle,DealWithProfilePlot)
       SAUsedChildWindows(ihandle) = 1
       CALL WindowSelect(ihandle)
 !
-!
 !   configuring y data for plotting
 !
-	DO in = ipmin, ipmax
-	   store_ycalc(in,(ihandle)) = ycalcep(in)
-	   store_diff(in,(ihandle)) = ydif(in)
-	END DO   	
+      DO in = ipmin, ipmax
+        store_ycalc(in,(ihandle)) = ycalcep(in)
+        store_diff(in,(ihandle)) = ydif(in)
+      ENDDO      
 !   call subroutine which plots data
-    CALL plot_pro_file(ihandle)    
-	
-			
-999	CONTINUE
+      CALL plot_pro_file(ihandle)
+999   CONTINUE
 
-      RETURN
       END SUBROUTINE organise_sa_result_data
-
-!*************************************************************************************************
-
-
-      subroutine plot_pro_file(ihandle)
-
-
-	  USE WINTERACTER
-	  Use Druid_header
-
-	integer, INTENT (IN   ) :: ihandle
 !
+!*****************************************************************************
+!
+      SUBROUTINE plot_pro_file(ihandle)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      INTEGER, INTENT (IN   ) :: ihandle
 !
 !  Definitions and array declarations.
 !
-      INTEGER,PARAMETER :: NSETS   =     3
+      INTEGER, PARAMETER :: NSETS =  3
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Poly_Colours.inc'
 
@@ -122,20 +117,20 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-	COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      REAL store_ycalc, store_diff
+      REAL                      store_ycalc,                      store_diff
       COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
 
-      call WindowSelect(ihandle)
+      CALL WindowSelect(ihandle)
 !  Start of all the plotting calls
 
-	call IGrArea(0.0, 0.0, 1.0, 1.0)
-	call IGrUnits(0.0, 0.0, 100.0, 100.0)		
+      CALL IGrArea(0.0, 0.0, 1.0, 1.0)
+      CALL IGrUnits(0.0, 0.0, 100.0, 100.0)           
 !
 !  Start new presentation graphics plot
 !
@@ -217,8 +212,11 @@
 !      DO ISET = 1,NSETS
 !          CALL IPgXYPairs(store_x(1,ISET),store_y(link(ihandle),(link(ihandle)-1+ISET)))
 !      END DO
-          CALL IPgXYPairs(XBIN(1),YOBIN(1))
-          CALL IPgXYPairs(XBIN(1),store_ycalc(ihandle,ihandle))
-          CALL IPgXYPairs(XBIN(1),store_diff(ihandle,ihandle))
+      CALL IPgXYPairs(XBIN(1),YOBIN(1))
+      CALL IPgXYPairs(XBIN(1),store_ycalc(ihandle,ihandle))
+      CALL IPgXYPairs(XBIN(1),store_diff(ihandle,ihandle))
 
-      end subroutine plot_pro_file
+      END SUBROUTINE plot_pro_file
+!
+!*****************************************************************************
+!

@@ -184,7 +184,7 @@
       REAL*8 CART(maxatm,3)
       INTEGER IHANDLE
       INTEGER, EXTERNAL :: WriteMol2
-      LOGICAL, EXTERNAL :: ColourFlexibleTorsions
+      LOGICAL, EXTERNAL :: Get_ColourFlexibleTorsions
       INTEGER atom
       INTEGER Element
       INTEGER NumOfFlexTorsions
@@ -211,7 +211,7 @@
       ENDDO
 ! Q & D to display flexible torsion angles in different colors by forcing different
 ! element types.
-      IF (ColourFlexibleTorsions() .AND. (natcry.GE.4)) THEN
+      IF (Get_ColourFlexibleTorsions() .AND. (natcry.GE.4)) THEN
         DO I = 1, natcry
           aelem(I) = 1       ! Carbon        Grey
         ENDDO
