@@ -126,9 +126,7 @@
       LOGICAL OutOfBounds
       REAL xtem, tempupper, templower, tempupper2, templower2
       INTEGER Upper, Lower
-      CHARACTER(MaxPathLength) :: CurrentDirectory
 
-      CALL IosDirName(CurrentDirectory)
       Upper = 1
       Lower = 2
 
@@ -305,8 +303,8 @@
 !  select from which range the value of XP will be derived.
             IF (ModalFlag(H) .EQ. 2) THEN !Bimodal
               IF (RANARR(IARR) .GT. 0.5) THEN
-                XP(H) = (-1) * XP(H)
-                IARR = IARR + 1
+                XP(H) = (-1) * (XP(H))
+                IARR = IARR + 1             
               ENDIF
             ELSEIF (ModalFlag(H) .EQ. 3) THEN !Trimodal
               xtem = XP(H)
@@ -353,6 +351,7 @@
                   IARR = IARR + 1
                 ENDIF   
               CASE (2) ! bimodal ranges
+! This does not sample complete range....
                 IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
                   TempUpper = SNGL(UB(H))         ! so use 0-360 degree scale
                   TempLower = SNGL(LB(H))
@@ -374,9 +373,13 @@
                   ENDIF
                   IF (OutOfBounds) THEN !calculate new value in one of the two allowed ranges
                     IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
+                      IARR = IARR + 1
                       xtem = MAX(TempUpper, TempUpper2) + (RULB(H) * RANARR(IARR))
+                      IARR = IARR + 1
                     ELSE
+                      IARR = IARR + 1
                       xtem = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
+                      IARR = IARR + 1
                     ENDIF
                     IF (xtem .gt. 360.00) THEN
                       xtem = xtem - 360.00
@@ -397,9 +400,11 @@
                   ENDIF
                   IF (OutOfBounds) THEN !calculate new value in one of the two defined ranges
                     IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
+                      IARR = IARR + 1
                       XP(H) = LB(H) + RULB(H) * RANARR(IARR)
                       IARR = IARR + 1
-                    ELSE 
+                    ELSE
+                      IARR = IARR + 1 
                       XP(H) = (-1)*LB(H) - RULB(H) * RANARR(IARR)
                       IARR = IARR + 1
                     ENDIF 
@@ -494,7 +499,7 @@
             A0SUM(H) = A0SUM(H) + 1.0
             XDSS(H) = XDSS(H) + (FP-F)**2
             PrevRejected = .FALSE.
-! Accept the new point if the function value decreases.
+
             IF (FP.LE.F) THEN
               X(H) = XP(H)
               F = FP
