@@ -5,18 +5,18 @@
 
       USE VARIABLES
 !
-!.. This is the routine that generates tic marks
-!.. Multiple checks before attempting to calculate tic marks
-!.. We need
-!..    (i)   lattice constants
-!..    (ii)  space group
-!..    (iii) wavelength
-!..    (iv)  diffraction file for range limits
-!..            (strictly not necessary - we could put in a 2 theta max of 60 degrees
-!..             and redo the tic marks when we load in the data.)
-!..   Check the lattice constants
-!..   Check the wavelength
-!..   Check the space group
+! This is the routine that generates tic marks
+! Multiple checks before attempting to calculate tic marks
+! We need
+!    (i)   lattice constants
+!    (ii)  space group
+!    (iii) wavelength
+!    (iv)  diffraction file for range limits
+!            (strictly not necessary - we could put in a 2 theta max of 60 degrees
+!             and redo the tic marks when we load in the data.)
+!   Check the lattice constants
+!   Check the wavelength
+!   Check the space group
 !
       IMPLICIT NONE
 
@@ -61,7 +61,6 @@
 ! I think that everything should be set to continue
 ! so I added in these checks. Everything should be bonafide before
 ! we try to add any tick marks in the GUI.
-! Now call fuller checking function
 !
       IF (.NOT.Check_TicMark_Data()) THEN
         NTIC = 0
@@ -120,8 +119,7 @@
       LOGICAL MULFAS, MULSOU, MULONE
       DIMENSION ALSQ(100000)
       LOGICAL SDREAD
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
 
       COMMON /iounit/ lpt, iti, ito, iplo, luni, iout
 
@@ -144,20 +142,9 @@
 !
       LOGICAL FUNCTION Check_TicMark_Data
 
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+      LOGICAL, EXTERNAL :: FnPatternOK, FnUnitCellOK, FnWaveLengthOK
 
-      LOGICAL FnUnitCellOK ! Function
-      LOGICAL FnWaveLengthOK ! Function
-
-      Check_TicMark_Data = (XPMAX-XPMIN).GT.0.1      ! Check that we have some data
-      Check_TicMark_Data = Check_TicMark_Data .AND. FnUnitCellOK() .AND. FnWaveLengthOK()
+      Check_TicMark_Data = (FnPatternOK() .AND. FnUnitCellOK() .AND. FnWaveLengthOK())
 
       END FUNCTION CHECK_TICMARK_DATA
 !
