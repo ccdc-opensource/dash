@@ -152,9 +152,6 @@
       REAL, DIMENSION (20):: Xmin
       COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
 
-      INTEGER iz
-
-
       REAL                XAtmCoords
       COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:MaxAtm_4,1:MaxRun)
 
@@ -171,10 +168,9 @@
                       KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-
       REAL yadd
       EXTERNAL DealWithProfilePlot
-      INTEGER I, II, iHandle
+      INTEGER I, iHandle
       REAL rDummy
 !
 !   open the plotting window, ihandle is the window's unique identifier
@@ -195,25 +191,31 @@
         Xato(2,I) = XAtmCoords(2,I,irow)
         Xato(3,I) = XAtmCoords(3,I,irow)
       ENDDO
-! Valchipro fills YCBIN
+! VALCHI fills BICALC
 ! @@      CALL VALCHI(rDummy,1000) ! Preferrred orientation part if appropriate
       CALL VALCHI(rDummy,0)    ! Structural part
+! Valchipro fills YCBIN
       CALL VALCHIPRO(rDummy)
 
       DO I = 1, NBIN
         store_ycalc(I,iHandle) = YCBIN(I)
       ENDDO
-
 !   Initialise the x and y max min values for the plot
 
       YMin(ihandle) = MINVAL(YOBIN(1:NBIN))
       YMax(ihandle) = MAXVAL(YOBIN(1:NBIN))
       Xmin(ihandle) = XBIN(1)
       Xmax(ihandle) = XBIN(NBIN)
+!
+! calculate the offset for the difference plot
+!
+      YADD = 0.5 * (YMax(ihandle)+YMin(ihandle))
+      DO I = 1, NBIN
+        store_diff(I,ihandle) = YADD + YOBIN(I) - store_ycalc(I,ihandle)
+      ENDDO
 
 ! call subroutine which plots data
-
-      CALL plot_pro_file(ihandle)
+      CALL plot_pro_file(iHandle)
 
       END SUBROUTINE organise_sa_result_data
 !
