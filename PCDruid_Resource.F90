@@ -1,4 +1,4 @@
-! Winteracter module created : 05/Feb/2002 12:23:33
+! Winteracter module created : 12/Feb/2002 15:18:01
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -550,4 +550,9 @@
           INTEGER, PARAMETER :: IDF_a2                          =  1415
           INTEGER, PARAMETER :: IDF_b2                          =  1416
           INTEGER, PARAMETER :: IDF_c2                          =  1417
+          INTEGER, PARAMETER :: IDD_DIALOG048                   =   166
+          INTEGER, PARAMETER :: IDD_TabDataDefaults             =   170
+          INTEGER, PARAMETER :: IDD_TabSAsetup                  =   167
+          INTEGER, PARAMETER :: IDD_TabSAOutput                 =   169
+          INTEGER, PARAMETER :: IDD_TabPlotOptions              =   168
       END MODULE Druid_Header
