@@ -27,7 +27,7 @@
       PARAMETER ( maxfrg = 32 )
 
       INTEGER     maxfrginterface
-      PARAMETER ( maxfrginterface = 6 )
+      PARAMETER ( maxfrginterface = 4 )
 
 ! maxfrg = Maximum number of fragments = individual Z-matrices.
 ! maxfrginterface = Maximum number of fragments in the interface
