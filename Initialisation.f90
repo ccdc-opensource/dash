@@ -272,12 +272,6 @@
       INTEGER                                           nPeaksFound
       COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
 
-      LOGICAL         UseRene, UseRelease, UseESD
-      INTEGER                                     nwidth
-      REAL                                                width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                                   InPeak
-      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
-
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
       PARAMETER (iWidth = 300, iHeight = 1)
@@ -289,14 +283,6 @@
 ! The initialisations should be split up into 'one off initialisations' (at the start up
 ! of DASH only) and 'whenever a new project file is opened'
       CALL WDialogSelect(IDD_SA_input3_2)
-      width = 0.0
-      CALL WDialogPutReal(IDF_Width, width, '(F7.3)')
-      minstep = 0.02
-      CALL WDialogPutReal(IDF_MinStep, minstep, '(F7.3)')
-      UseRene = .FALSE.
-      CALL WDialogPutCheckBoxLogical(IDC_UseRene, UseRene)
-      UseESD = .TRUE.
-      CALL WDialogPutCheckBoxLogical(IDC_UseESD, UseESD)
       DO I = 1, MVAR
         ModalFlag(I) = 0 ! 0 = not a torsion angle
       ENDDO
@@ -362,7 +348,7 @@
       DefaultMaxResolution = DASHDefaultMaxResolution
       CALL Update_TruncationLimits
       CALL WDialogSelect(IDD_SA_input3_2)
-      ISeed1 = 314
+      ISeed1 = 315
       ISeed2 = 159
       CALL WDialogPutInteger(IDF_SA_RandomSeed1, ISeed1)
       CALL WDialogPutInteger(IDF_SA_RandomSeed2, ISeed2)
