@@ -1,6 +1,7 @@
       SUBROUTINE GETPIK(FILE,lenfil,ier)
 C
-
+!O      character*80  file
+      CHARACTER*(*), INTENT (IN   ) :: FILE
 	INCLUDE 'params.inc'
       COMMON /FCSTOR/MAXK,FOB(150,MFCSTO)
       LOGICAL LOGREF
@@ -28,8 +29,6 @@ c
 c
       common /sapgcmn/ xpgmin,xpgmax,ypgmin,ypgmax
 c
-      character*80  file,inf_file,zm_file
-      common /inffil/ lfinf,lfzm,inf_file,zm_file
 	ier = 0
 C
       OPEN(21,FILE=FILE(:Lenfil),STATUS='OLD',err=998, Iostat = Istat)

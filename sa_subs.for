@@ -21,13 +21,9 @@
       logical log_frag_file
       double precision cen,sig
       logical gaussb
-      character*80  inf_file,zm_file
       double precision T,T0,rt,eps,target_value
-      common /inffil/ lfinf,lfzm,inf_file,zm_file
       parameter (maxfrg=20)
       common /frgcom/ nfrag,lfrag(maxfrg)
-      character*80 frag_file
-      common /frgcha/ frag_file(maxfrg)
       parameter (mvar=100)
       common /gaubou/ cen(mvar),sig(mvar)
       common /gaulog/ gaussb(mvar)

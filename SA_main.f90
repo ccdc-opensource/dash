@@ -12,21 +12,8 @@
 ! Declare window-type and message variables
 !
 
-! JvdS 
-!
-! #######################################################################
-!
-! H E L P
-!
-! The following line generates Heisenbugs
-!
 
-      CHARACTER*255 SDIFile
-
-!
-! #######################################################################
-!
-
+      CHARACTER*80 SDIFile
       CHARACTER*80 pikfile,ticfile,hcvfile
       REAL         rpos
       INTEGER      ipos
@@ -35,8 +22,8 @@
       INCLUDE 'IZMCheck.inc'
       INTEGER IDFZMCheck(CheckSize),IZMNumber(CheckSize)
 
-      INTEGER      IDBZMBrowse(CheckSize),IDFZMpars(CheckSize),IDFZMFile(CheckSize)
-      INTEGER      II
+      INTEGER IDBZMBrowse(CheckSize),IDFZMpars(CheckSize),IDFZMFile(CheckSize)
+      INTEGER II
       INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
@@ -924,9 +911,7 @@
 !
       double precision cen,sig
       logical gaussb
-      character*80  inf_file,zm_file
       double precision T0,rt,eps,target_value
-      common /inffil/ lfinf,lfzm,inf_file,zm_file
 !
       parameter (maxatm=100)
       parameter (maxfrg=20)
@@ -949,8 +934,6 @@
         occ(maxatm,maxfrg)
 !
       common /frgcom/ nfrag,lfrag(maxfrg)
-      character*80 frag_file
-      common /frgcha/ frag_file(maxfrg)
       parameter (mvar=100)
       common /gaubou/ cen(mvar),sig(mvar)
       common /gaulog/ gaussb(mvar)
@@ -1241,8 +1224,6 @@
         occ(maxatm,maxfrg)
       INTEGER nfrag,lfrag
       COMMON /frgcom/ nfrag,lfrag(maxfrg)
-      CHARACTER*80 frag_file
-      COMMON /frgcha/ frag_file(maxfrg)
       CHARACTER*36 czmpar
       COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
         czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
@@ -1315,8 +1296,6 @@
         occ(maxatm,maxfrg)
       INTEGER nfrag,lfrag
       COMMON /frgcom/ nfrag,lfrag(maxfrg)
-      CHARACTER*80 frag_file
-      COMMON /frgcha/ frag_file(maxfrg)
       CHARACTER*36 czmpar
       COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
         czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
