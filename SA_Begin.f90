@@ -9,6 +9,7 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
       LOGICAL           LOG_HYDROGENS
@@ -19,6 +20,12 @@
       INTEGER                                 MaxRuns, MaxMoves
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+
+      REAL                    chi_sqd
+      INTEGER                                           it_count
+      REAL                                                        y_max
+      INTEGER                                                            MaxIterationSoFar
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
 
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput
       LOGICAL, EXTERNAL :: Get_UseHydrogens
@@ -33,21 +40,31 @@
         CALL WizardWindowShow(IDD_SA_input3)
         RETURN
       ENDIF
+! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
+! changed while the SA is running).
       LOG_HYDROGENS = Get_UseHydrogens()
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
+! Pop up the SA status window
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WizardWindowShow(IDD_SA_Action1)
       T1 = SECNDS(0.0)
       CALL PDB_SymmRecords()
       CALL Init_MultiRun()
-! Grey out start next button if not multirun
+! Grey out "start next" button if not multirun
       IF (RESTART) THEN
         CALL WDialogFieldState(IDF_StartNext,Enabled)
       ELSE
         CALL WDialogFieldState(IDF_StartNext,Disabled)
       ENDIF
       IPTYPE = 2
+! Clear Chi-sqd array between starting sets of SA Runs
+      Chi_sqd = 0.0
+      MaxIterationSoFar = 0
+
+!T      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
+!T      CALL WDialogShow(-1,-1,0,Modeless)
+
       CALL SimulatedAnnealing
       SA_Duration = SECNDS(T1)
       WRITE(SA_DurationStr,'(F10.1)') SA_Duration
