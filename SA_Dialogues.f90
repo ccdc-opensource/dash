@@ -1452,8 +1452,10 @@
           CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, I, prevlb(I))
           CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, I, prevub(I))
         ENDIF
-! Disable modal button for everything but torsion angles
-        IF (ModalFlag(i) .EQ. 0) CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
+! Disable modal button for everything but torsion angles, angles and bonds
+! This allows angles and bonds to be searched in Mogul too.
+!O        IF (ModalFlag(i) .EQ. 0) CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
+         IF ((kzmpar2(i) .LT. 3) .OR. (kzmpar2(i) .GT. 5)) CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
       ENDDO
       LimsChanged = .FALSE.
       KK = 0
@@ -1665,15 +1667,18 @@
               END SELECT ! IFCol
           END SELECT ! EventInfo%Value1 Field Changed Options
       END SELECT  ! EventType
-! Modal Torsion Angle Button
+! Modal Button
       DO iRow = 1, NVAR
 	    iStatus = 0
         CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 5, iRow, iStatus)
         IF (iStatus .EQ. Checked) THEN
-          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem) 
-!! Mogul 	      
-		  CALL WriteMogulMol2(iFRow) 
-          CALL ShowBiModalDialog(IFRow, xtem)
+          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)  	      
+		  CALL WriteMogulMol2(iFRow) !Call Mogul
+          IF (kzmpar2(IFrow) .EQ. 3) THEN ! Modal Torsion Angle so show dialog
+            CALL ShowBiModalDialog(IFRow, xtem)
+          ELSE
+            CALL WGridPutCellCheckBox(IDF_parameter_grid_modal, 5, iRow, 0)
+          ENDIF
         ENDIF
       ENDDO
       CALL PopActiveWindowID

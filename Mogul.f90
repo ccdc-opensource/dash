@@ -2,7 +2,7 @@
       SUBROUTINE WriteMogulMol2(iFRow)
 
 ! Writes Mol2 file for MOGUL.  
-! Calls GetTorsionLineNumbers   
+! Calls GetAtomLineNumbers   
   
       USE VARIABLES
       USE ZMVAR
@@ -50,7 +50,7 @@
 
 ! Write mol2 file
       IF (WriteMol2(MogulMol2,.FALSE., iFrg) .EQ. 1) THEN
-        CALL GetTorsionLineNumbers(MogulMol2, IFrg, DoF, iFRow)
+        CALL GetAtomLineNumbers(MogulMol2, IFrg, DoF, iFRow)
       ELSE
         CALL DebugErrorMessage('Error writing temporary file.')
       ENDIF
@@ -60,9 +60,9 @@
 
 !*****************************************************************
 
-      SUBROUTINE GetTorsionLineNumbers(MogulMol2, iFrg, DoF, iFRow)
+      SUBROUTINE GetAtomLineNumbers(MogulMol2, iFrg, DoF, iFRow)
 
-! For Torsion Angle, gets corresponding line numbers of atoms from Mol2
+! For parameter, gets corresponding line numbers of atoms from Mol2
 ! file.  MOGUL does not use Atom Labels but AtomIDs.
 ! Calls WriteMogulScript.
       
@@ -77,39 +77,43 @@
 
       CHARACTER(MaxPathLength), INTENT(IN   ) :: MogulMol2
 
-      CHARACTER*36 TempTorsionLabel
+      CHARACTER*36 TempAtomLabel
       
       CHARACTER*5, Atom(4)
       INTEGER Marker(5), AtomID(4)
       INTEGER I,J
       INTEGER tLength
 
-      TempTorsionLabel = czmpar(DoF, iFrg)
-      tLength = LEN_TRIM(TempTorsionLabel)
+      TempAtomLabel = czmpar(DoF, iFrg)
+      tLength = LEN_TRIM(TempAtomLabel)
+
+      DO I = 1,4
+       Atom(I) = '     '
+      END DO
 
       I = 0
       J = 1
-      DO WHILE (I .LE. tLength) !length of torsion angle label
+      DO WHILE (I .LE. tLength) !length of label
         I = I + 1
-        IF(TempTorsionLabel(I:I) .EQ. "(" ) THEN
+        IF(TempAtomLabel(I:I) .EQ. "(" ) THEN
           Marker(J) = I
           J = J+1
         ENDIF
-        IF(TempTorsionLabel(I:I) .EQ. ":" ) THEN
+        IF(TempAtomLabel(I:I) .EQ. ":" ) THEN
           Marker(J) = I
           J = J + 1
         ENDIF       
-        IF(TempTorsionLabel(I:I) .EQ. ")" ) THEN
+        IF(TempAtomLabel(I:I) .EQ. ")" ) THEN
           Marker(J) = I
           EXIT
         ENDIF
       ENDDO
 
 
-      Atom(1) = TempTorsionLabel(Marker(1)+1 : Marker(2)-1) 
-      Atom(2) = TempTorsionLabel(Marker(2)+1 : Marker(3)-1)
-      Atom(3) = TempTorsionLabel(Marker(3)+1 : Marker(4)-1)
-      Atom(4) = TempTorsionLabel(Marker(4)+1 : Marker(5)-1)
+      Atom(1) = TempAtomLabel(Marker(1)+1 : Marker(2)-1) 
+      Atom(2) = TempAtomLabel(Marker(2)+1 : Marker(3)-1)
+      Atom(3) = TempAtomLabel(Marker(3)+1 : Marker(4)-1)
+      Atom(4) = TempAtomLabel(Marker(4)+1 : Marker(5)-1)
 
       DO J = 1,4 ! Mogul does not use atom labels but number of atom in Mol2 file 
         DO I = 1, MaxDoF
@@ -122,7 +126,7 @@
 
       CALL WriteMogulScript(MogulMol2, AtomID, iFRow)  
 
-      END SUBROUTINE GetTorsionLineNumbers
+      END SUBROUTINE GetAtomLineNumbers
      
      
 !*****************************************************************   
@@ -159,15 +163,24 @@
 
       OPEN(240,FILE=Script_file,STATUS='UNKNOWN', ERR = 999)
       WRITE(240,10) MogulMol2(1:tlength)
-!10    FORMAT(('MOGUL MOLECULE "'), A, '"')
 10    FORMAT(('MOGUL MOLECULE '), A)
       WRITE(240,20) MogulOutputFile(1:olength)
 20    FORMAT(('MOGUL OUTPUT_FILE '), A)
-!20   FORMAT(('MOGUL OUTPUT_FILE '), A, '"')
       WRITE(240,25) 
 25    FORMAT('MOGUL EDIT BOND_TYPES GUESS ALL_3D')
-      WRITE(240,30) (AtomID(I), I = 1,4)
-30    FORMAT(('TORSION '), 4(I3,1X))
+
+      SELECT CASE (kzmpar2(IFrow))
+        CASE(3) !Torsion
+          WRITE(240,30) (AtomID(I), I = 1,4)
+30        FORMAT(('TORSION '), 4(I3,1X))
+        CASE(4) ! Angle
+          WRITE(240,31) (AtomID(I), I= 1,3)
+31        FORMAT(('ANGLE '), 3(I3, 1X))
+        CASE(5) ! Bond
+          WRITE(240,32) (AtomID(I), I= 1,2)
+32        FORMAT(('BOND '), 2(I3, 1X))
+      END SELECT
+
       WRITE(240,40)
 40    FORMAT(('MOGUL GUI OPEN'))
       
@@ -190,6 +203,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR
 
 
       IMPLICIT NONE
@@ -229,7 +243,9 @@
       M = InfoError(1) ! Clear errors
       CALL IOSCommand(MOGULEXE(1:I)//' -ins '//'"'//Script_file(1:LEN_TRIM(Script_file))//'"', ProcBlocked)
       IF (InfoError(1) .NE. 0) GOTO 999
-      CALL ProcessMogulOutput(MogulOutputFile, iFRow)
+      IF(kzmpar2(IFRow) .EQ. 3) THEN ! Modal Torsion so try and process
+        CALL ProcessMogulOutput(MogulOutputFile, iFRow)
+      ENDIF
       RETURN
 999   CALL ErrorMessage("DASH could not launch Mogul. The Mogul executable is currently configured"//CHAR(13)//&
                         "to launch the program "//MOGULEXE(1:I)//CHAR(13)//&
@@ -245,7 +261,9 @@
       
       SUBROUTINE ProcessMogulOutput(MogulOutputFile, iFRow)
 
-! Calls command to execute Mogul.  Path to Mogul in Configuration Window
+! Uses simple criteria to parse the output from Mogul.  Will recommend the 
+! type of modal torsion angle range and return "standard" torsion angle ranges.
+! Works ok but is very simple (just pattern recognition) so is not 100% accurate.
       
       USE WINTERACTER
       USE DRUID_HEADER
@@ -283,9 +301,11 @@
 ! bins.  This needs more thought if we think there is a chance that  
 ! bin number is something the user will get access to.
 
+      MogulText = ' '
+      
       INQUIRE(FILE = MogulOutputFile,EXIST=exists)
       IF (.NOT. exists) GOTO 999
-      NumberofBins = 18
+      NumberofBins = 18 ! not read from output file currently
       OPEN(240,FILE=MogulOutputFile,STATUS='UNKNOWN', ERR = 999)
       I = 0
       DO WHILE (I .EQ. 0)
@@ -400,13 +420,10 @@
       CALL WDialogSelect(IDD_ModalDialog)
       CALL WDialogPutString(IDF_MogulText, MogulText)
 
-
-
       RETURN
 
-
 999   CALL ErrorMessage("Mogul could not read file.")
-888   CALL ErrorMessage("Mogul could not process fragment")
+888   ModalFlag(IFRow) = 1 ! Will not default to modal ranges in dialog
 
       END SUBROUTINE ProcessMogulOutput
 
