@@ -1719,7 +1719,7 @@
       XPGMAX = XPMAX
       YPGMIN = YPMIN
       YPGMAX = YPMAX
-      CALL UPLOAD_RANGE()
+      CALL UPLOAD_RANGE
       XPGMINOLD = XPMIN
       XPGMAXOLD = XPMAX
       YPGMINOLD = YPMIN
@@ -1793,7 +1793,7 @@
       ENDDO
       DataSetChange = DataSetChange + 1
       CALL GetProfileLimits
-      CALL Get_IPMaxMin() 
+      CALL Get_IPMaxMin 
 
       END SUBROUTINE Rebin_Profile
 !
