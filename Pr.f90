@@ -5056,6 +5056,7 @@
 !   6  GGCALC(KNOW-KMIN+1)=GCALC
 ! For now just check the bound and skip if its outside the range ..
 ! JvdS I think I have solved this by changing the assigment of KMIN at the start of CALPR
+! JvdS 25 Feb 2002. It still happened.
     6 CONTINUE
       II = KNOW - KMIN + 1
       IF (II.GT.0 .AND. II.LE.500) THEN
