@@ -10,7 +10,6 @@ c
 	INCLUDE 'params.inc'
 	INCLUDE 'lattice.inc'
 c
-      character*80 profile
       logical PawleyOptionChosen 
 c
 
@@ -44,8 +43,6 @@ C>> JCC Save the boxes from Pawley fit to Pawley fit
 C>> Local variables logging errors in the pawley fit
       INTEGER PawleyEigError
 	INTEGER PawleyErrorLog	
-C
- 
 C
       INCLUDE 'statlog.inc'
 C
@@ -162,13 +159,13 @@ C>> JCC Err, if we reject, we should not enable structure solution
 C>> go back to the start of the loop
 C Was                    goto 444
 C Now
-					CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
-					CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
+			CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
+			CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
 C>> JCC Reset the R-values if possible
-					IF (LastValuesSet) THEN
-						CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,
+			IF (LastValuesSet) THEN
+				CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,
      &                         RLastValues(1),'(f12.2)') 
-						call WDialogPutReal(IDF_Pawley_Cycle_ChiSq,
+				call WDialogPutReal(IDF_Pawley_Cycle_ChiSq,
      &                         RLastValues(2),'(F12.3)')
                           call WDialogPutReal(IDF_Pawley_Cycle_RwpExp,
      &                         RLastValues(3),'(F12.2)')
@@ -176,7 +173,6 @@ C>> JCC Reset the R-values if possible
      &                         IDF_Pawley_Cycle_NumPts,ILastValues(1))
 						call WDialogPutInteger(
      &                         IDF_Pawley_Cycle_NumRefs,ILastValues(2))
-!						CALL Unload_Pawley_Pro()
 						CALL retrieve_polybackup
 				    END IF
 					goto 555
@@ -268,7 +264,7 @@ C..   Check the space group
       INCLUDE 'DialogPosCmn.inc'
 	INCLUDE 'params.inc'
 C
-      CHARACTER(LEN=80) :: BackStr,SDIFileName
+      CHARACTER(LEN=80) :: BackStr
 !
 
       COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),
@@ -496,8 +492,8 @@ C
       write(42,4230) 
  4230 format('F C 2 2.31 20.8439 1.02 10.2075 ',
      &'1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
-      if (IPosSG.ge.1) then
-        call DecodeSGSymbol(SGShmStr(IPosSg))
+      if (NumberSGTable.ge.1) then
+        call DecodeSGSymbol(SGShmStr(NumberSGTable))
         if (nsymmin.gt.0) then
           do isym=1,nsymmin
             write(42,4235) symline(isym)
@@ -628,6 +624,7 @@ C
       DIMENSION ALSQ(QPFDIM)
       COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),
      & ICDN(26,9),IERR,IO10,SDREAD
+      LOGICAL SDREAD
       common/iounit/lpt,iti,ito,iplo,luni,iout
       integer matsz
       character*6 xxx
@@ -661,10 +658,6 @@ C
 
       SUBROUTINE Load_Pawley_PRO
 !
-!      CHARACTER(LEN=256),           INTENT (IN) :: FNAME
-!      INTEGER,                      INTENT (IN) :: FLEN
-!      LOGICAL, INTENT (IN OUT) :: NoData
-
 	include 'params.inc'
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),
@@ -860,14 +853,10 @@ C
       DO WHILE(.NOT.SkipPawleyRef)
         CALL GetEvent
         SELECT CASE (EventType)
-!U          CASE (Expose,Resize)
-!U            CALL Redraw()
-!
               CASE (MouseButDown)
                     CALL Plot_Alter
               CASE (KeyDown)
                   CALL Check_KeyDown
-!
           CASE (PushButton)
             IDNumber=EventInfo%Value1
             SELECT CASE (EventInfo%Value1)
@@ -1000,11 +989,14 @@ c
       USE WINTERACTER
       USE druid_header
 	USE Variables
-c
+
+      INCLUDE 'GLBVAR.INC'
 C>> JCC Cell/Lattice definitions now in an include file
 	INCLUDE 'Lattice.inc'
 c
-      character*80 SDIFileName,pikfile,ticfile,hcvfile,dslfile
+!O      character*80 SDIFileName,pikfile,ticfile,hcvfile,dslfile
+      CHARACTER*(*), INTENT (IN   ) :: SDIFileName
+      character*80 pikfile,ticfile,hcvfile,dslfile
       COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
       include 'statlog.inc'
 C>> JCC defns
@@ -1012,7 +1004,11 @@ C>> JCC defns
 c
 c.. First copy the .pik .tic and .hcv files
 c
-      LSDI=len_trim(SDIFileName)
+      LSDI = LEN_TRIM(SDIFileName)
+	IF (LSDI .GT. 80) THEN
+	  CALL DebugErrorMessage('SDIFileName too long in CreateSDIFile')
+	  LSDI = 80
+	ENDIF
 c
       If (LSDI.eq.0) then
         CALL WMessageBox(OKOnly,InformationIcon,CommonOK,
@@ -1058,8 +1054,8 @@ c
 C>> JCC
 	  write(81,8135) dslfile
         write(81,8140) (cellpar(i),i=1,6)
-        NSG=NumberSGTable
-        write(81,8150) NSG,SGNumStr(NSG),SGHMaStr(NSG)
+        write(81,8150) NumberSGTable,SGNumStr(NumberSGTable),
+     &                               SGHMaStr(NumberSGTable)
         write(81,8160) PawleyChiSq
  8110   format(' TIC ',a)
  8120   format(' HCV ',a)
@@ -1223,20 +1219,30 @@ C>> Make a backup copy of the polyp.pik file to recover in event of an error
 	copytic = .false.
 	copyhcv = .false.	
 	END SUBROUTINE delete_polybackup
+!
+!*****************************************************************************
+!
+      SUBROUTINE set_saFileNames(base)
 
-	SUBROUTINE set_saFileNames(base)
-	use variables
-	use winteracter
-	integer n
-	character*(*) base
-	n = len_trim(base)
-	write(DashHcvFile,'(A,A)') base(1:n),'.hcv'
-	write(DashPikFile,'(A,A)') base(1:n),'.pik'
-	write(DashTicFile,'(A,A)') base(1:n),'.tic'
+      USE VARIABLES
 
-	end SUBROUTINE set_saFileNames
+      CHARACTER*(*) base
 
+      INTEGER n
 
+      n = LEN_TRIM(base)
+      IF (n .GT. 75) THEN
+        CALL DebugErrorMessage('base too long in set_saFileNames')
+        n = 75
+      ENDIF
+      WRITE(DashHcvFile,'(A,A)') base(1:n),'.hcv'
+      WRITE(DashPikFile,'(A,A)') base(1:n),'.pik'
+      WRITE(DashTicFile,'(A,A)') base(1:n),'.tic'
+
+      END SUBROUTINE set_saFileNames
+!
+!*****************************************************************************
+!
 	integer function SaveProject
 	use winteracter
 	use druid_header
@@ -1251,17 +1257,17 @@ c.. Save the project
 c      CALL IOsDirName(Currentdir)
       IFLAGS = SaveDialog + AppendExt + PromptOn
       FILTER = 'Diffraction information files (*.sdi)|*.sdi|'
-	DO I = 1,len_trim(SDIFileName)
-	      SDIFileName(I:I)=' '
-	END DO
-
+!O	DO I = 1,len_trim(SDIFileName)
+!O	      SDIFileName(I:I)=' '
+!O	END DO
+      SDIFileName = ' '
       CALL WSelectFile(FILTER,IFLAGS,SDIFileName,
      &'Save diffraction information for structure solution')
 
 c.. Go back to original directory
 c      CALL IOsDirChange(Currentdir)
-	IF (WinfoDialog(4) .EQ. CommonOk .AND. 
-     &    SDIFileName .NE. ' ') THEN
+	IF ((WinfoDialog(4) .EQ. CommonOk) .AND. 
+     &    (SDIFileName .NE. ' ')) THEN
 		Call CreateSDIFile(SDIFileName)
 		CALL Set_saFileNames(SDIFileName(1:len_trim(SDIFileName) - 4))
 	    SaveProject = 1
