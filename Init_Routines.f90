@@ -257,3 +257,51 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE Update_TruncationLimits
+!
+! Set minimum and maximum truncation values in Wizard in accordance with data read in.
+! This routine should be called whenever a new pattern is loaded, so that can
+! be a new powder pattern, a .sdi file or a .dash file
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+
+      REAL, EXTERNAL :: TwoTheta2dSpacing, dSpacing2TwoTheta
+      LOGICAL, EXTERNAL :: FnPatternOK, FnWavelengthOK
+      REAL       tMaxResolution
+
+      CALL PushActiveWindowID
+! In principle, set resolution so as to truncate at DefaultMaxResolution.
+! However, if truncation resolution not attainable with current data range / wavelength,
+! adjust the setting of the maximum resolution to maximum possible.
+      CALL WDialogSelect(IDD_ViewPawley)
+      IF (FnPatternOK() .AND. FnWavelengthOK()) THEN
+        tMaxResolution = MAX(TwoTheta2dSpacing(XPMAX),DefaultMaxResolution)
+        CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
+      ELSE
+        tMaxResolution = DefaultMaxResolution
+        CALL WDialogClearField(IDF_MaxResolution)
+      ENDIF
+      CALL WDialogSelect(IDD_PW_Page5)
+! Initialise truncation of start of powder pattern
+      CALL WDialogPutReal(IDF_Min2Theta,XPMIN,'(F6.3)')
+      CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
+      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tMaxResolution))
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Update_TruncationLimits
+!
+!*****************************************************************************
+!
