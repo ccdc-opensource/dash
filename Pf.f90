@@ -1335,12 +1335,8 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
-!%
-!     1FR(%FFT2%,8),FI(%FFT2%,8),DR(%FFT2%,8),DI(%FFT2%,8),
-!%
-!     & FRE(%FFT2%),FIE(%FFT2%),FRT(%FFT2%),FIT(%FFT2%)
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256)
@@ -1490,12 +1486,8 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
-!%
-!     1FR(%FFT2%,8),FI(%FFT2%,8),DR(%FFT2%,8),DI(%FFT2%,8),
-!%
-!     & FRE(%FFT2%),FIE(%FFT2%),FRT(%FFT2%),FIT(%FFT2%)
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256)
@@ -1621,12 +1613,8 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
-!%
-!     1FR(%FFT2%,8),FI(%FFT2%,8),DR(%FFT2%,8),DI(%FFT2%,8),
-!%
-!     & FRE(%FFT2%),FIE(%FFT2%),FRT(%FFT2%),FIT(%FFT2%)
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256)
@@ -1788,10 +1776,6 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!%
-!     1FR(%FFT2%,8),FI(%FFT2%,8),DR(%FFT2%,8),DI(%FFT2%,8),
-!%
-!     2FRE(%FFT2%),FIE(%FFT2%),FRT(%FFT2%),FIT(%FFT2%)
       DIMENSION CFFT(8), DFFT(8), DDT(8), FR(256,8), FI(256,8),         &
      &          DR(256,8), DI(256,8), FRE(256), FIE(256), FRT(256),     &
      &          FIT(256)
@@ -1925,14 +1909,8 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
-!%
-!     & FR(%FFT2%,8),FI(%FFT2%,8),DR(%FFT2%,8),DI(%FFT2%,8),
-!%
-!     & FRE(%FFT2%),FIE(%FFT2%),FRT(%FFT2%),FIT(%FFT2%),
-!%
-!     & FRE2(%FFT2%),FIE2(%FFT2%),FRT2(%FFT2%),FIT2(%FFT2%)
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256), FRE2(256), FIE2(256)&
@@ -2097,12 +2075,8 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
-!%
-!     1FR(%FFT2%,8),FI(%FFT2%,8),DR(%FFT2%,8),DI(%FFT2%,8),
-!%
-!     & FRE(%FFT2%),FIE(%FFT2%),FRT(%FFT2%),FIT(%FFT2%)
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256)
@@ -3038,10 +3012,6 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!%
-!     & FR(%FFT2%,8),FI(%FFT2%,8),DR(%FFT2%,8),DI(%FFT2%,8),
-!%
-!     & FRE(%FFT2%),FIE(%FFT2%),FRT(%FFT2%),FIT(%FFT2%),
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256), C3FN(3), C3DN(3)
@@ -3072,8 +3042,6 @@
 !
 ! PROFILE REFINEMENT STAGE:
     2 CALL FDTF01(2)
-!%
-!      MN=%FFT1%
       MN = 64
       MN2 = MN/2
 !
@@ -3354,8 +3322,6 @@
 !.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
 !
 !.. FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
-!%
-!      MN=%FFT1%
       MN = 64
       MN2 = MN/2
       TEMSQ = (TOLER(4,JPHASE,JSOURC)*PKFNVA(4))**2
@@ -3604,8 +3570,6 @@
 !.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
 !
 !.. FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
-!%
-!      MN=%FFT1%
       MN = 64
       MN2 = MN/2
       TEMSQ = (TOLER(4,JPHASE,JSOURC)*PKFNVA(4))**2
@@ -3879,8 +3843,6 @@
 !.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
 !
 !.. FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
-!%
-!      MN=%FFT1%
       MN = 64
       MN = 64
       MN2 = MN/2
@@ -4145,8 +4107,6 @@
 !.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
 !
 !.. FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
-!%
-!      MN=%FFT1%
       MN = 64
       MN2 = MN/2
       TEMSQ = (TOLER(4,JPHASE,JSOURC)*PKFNVA(4))**2
@@ -4398,8 +4358,6 @@
 !.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
 !
 !.. FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
-!%
-!      MN=%FFT1%
       MN = 64
       MN2 = MN/2
       TEMSQ = (TOLER(4,JPHASE,JSOURC)*PKFNVA(4))**2
@@ -4680,8 +4638,6 @@
 !.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
 !
 !.. FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
-!%
-!      MN=%FFT1%
       MN = 64
       MN2 = MN/2
 ! THIS WILL BE MADE MORE GENERAL IN FUTURE - AT MOMENT WILL DEAL WITH HELI
@@ -4941,8 +4897,6 @@
 !.. ARRAY PKLIST. AT THIS POINT REFUSE = (K .EQ. KPOINT(KMOD))
 !.. DETERMINED IN SUBROUTINE CALTF1 WHICH CALLS THIS ENTRY (IOPT=2)
     2 IF (REFUSE) GOTO 26
-!%
-!      MN=%FFT1%
       MN = 64
       MN2 = MN/2
 !... THE KTH PEAK HAS NOT BEEN CALCULATED - DO SO BY INTERPOLATION
@@ -5031,8 +4985,6 @@
       RKNOT = 1./FLOAT(KNOTS)
       RATN = (ARGMAX(JSOURC)/ARGMIN(JSOURC))**RKNOT
       POFMUL = FLOAT(KNOTS)/ALOG(ARGMAX(JSOURC)/ARGMIN(JSOURC))
-!%
-!      MN=%FFT1%
       MN = 64
       MN2 = MN/2
 !.. MUST DO THIS EVERY TIME IF SIGS ETC NOT CHANGED

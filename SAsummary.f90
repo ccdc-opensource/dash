@@ -91,7 +91,7 @@
 !     Get grid_buffer which contains the name of the correct pdb file
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
       CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)
-      CALL ViewStructure(Grid_Buffer(1:LEN_TRIM(Grid_Buffer)))
+      CALL ViewStructure(Grid_Buffer)
       CALL PopActiveWindowID
 
       END  SUBROUTINE Viewpdb

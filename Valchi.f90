@@ -13,33 +13,35 @@
       DOUBLE PRECISION PRJMAT0, PRJMAT1, PRJMAT2
       COMMON /PRJMAT/ PRJMAT0, PRJMAT1(MPRJMT), PRJMAT2(MPRJMT)
 !
-      COMMON /POSNS / NATOM, XATO(3,150), KX(3,150), AMULT(150), TF(150)&
-     &                , KTF(150), SITE(150), KSITE(150), ISGEN(3,150),  &
+
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-!
+
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
-!
-      COMMON /ITRINF/ iteration
-!
+
       CALL PRECFC
       SUM1 = 0.
       SUM2 = 0.
-!
+
       INCLUDE 'AllFFCalc.inc'
-!
+
       DO IK = 1, KKOR
         II = IKKOR(IK)
         JJ = JKKOR(IK)
-        SUM1 = SUM1 + AICALC(II)*WTIJ(IK)*AIOBS(JJ) + AICALC(JJ)        &
-     &         *WTIJ(IK)*AIOBS(II)
+        SUM1 = SUM1 + AICALC(II)*WTIJ(IK)*AIOBS(JJ) + AICALC(JJ)*WTIJ(IK)*AIOBS(II)
         SUM2 = SUM2 + AICALC(II)*WTIJ(IK)*AICALC(JJ)
       ENDDO
-!
-      lpp = lpp + 1
-      IF (lpp.EQ.1) THEN
-      ENDIF
-!
       RESCL = 0.5*SUM1/SUM2
       CHIVAL = 0.
       PRJMAT0 = PRJMAT0 + 1
@@ -55,8 +57,7 @@
         PRJMAT2(IK) = PRJMAT2(IK) + PRJADD*PRJADD
       ENDDO
       CHIVAL = CHIVAL/FLOAT(MAXK-2)
-!
-      RETURN
+
       END SUBROUTINE VALCHI
 !*==PRECFC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -69,9 +70,20 @@
 !
       INCLUDE 'PARAMS.INC'
 !
+
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
       LOGICAL LOGREF
       COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
