@@ -11,8 +11,9 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER              iMyExit, num_new_min
-      COMMON / CMN000001 / iMyExit, num_new_min
+      INTEGER              iMyExit 
+      LOGICAL                       NewOptimumFound, WasMinimised
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -32,7 +33,7 @@
               iMyExit = 6
               CALL WDialogLoad(IDD_Pause)
               CALL WDialogSelect(IDD_Pause)
-              CALL WDialogShow(-1,-1,IDOK,Modeless)
+              CALL WDialogShow(-1, -1 , IDOK, Modeless)
             CASE (IDB_Prog3)
               CALL OpenChiSqPlotWindow
             CASE (IDF_StartNext) ! 'Start Next'
