@@ -426,8 +426,6 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCLOSE)
               CALL WDialogHide()
-! Unload the dialogue from memory
-              CALL WDialogUnload
               CALL PopActiveWindowID
               RETURN
           END SELECT
@@ -604,12 +602,13 @@
       CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
       CALL SetChildWinAutoClose(IHANDLE)
       IF (NumOfDICVOLSolutions .EQ. 0) THEN
+        CALL WDialogSelect(IDD_DV_Results)
+        CALL WDialogHide()
         CALL ErrorMessage('No solutions were found.')
         CALL PopActiveWindowID
         RETURN
       ENDIF
 ! Pop up a window showing the solutions, so that the user can choose one to be imported into DASH
-      CALL WDialogLoad(IDD_DV_Results)
       CALL WDialogSelect(IDD_DV_Results)
 ! Clear all fields in the grid
       CALL WDialogClearField(IDF_DV_Summary_0)
