@@ -53,7 +53,6 @@
       CHARACTER*(*) PdbFileName
       REAL ProfileChiSquared
       REAL IntensityChiSquared
-      INTEGER ICurSel
 
       LOGICAL RESTART
       INTEGER SA_Run_Number
@@ -64,47 +63,34 @@
       CHARACTER*80 SA_Label
       CHARACTER*4 CNruns,CMruns
 
-      ICurSel = WinfoDialog(CurrentDialog)
-!ep    CALL WDialogSelect(IDD_SA_Multi_Completed)
-!ep    CALL WGridRows(IDF_SA_Solution_Grid, SA_Run_Number)
+      CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
       CALL WGridRows(IDF_SA_Summary, SA_Run_Number)
       DO I = SA_Run_Number - 1,1,-1
-!ep         CALL WGridGetCellReal(IDF_SA_Solution_Grid,3,I,Grid_ProfileChi)
-!           IF (Grid_ProfileChi .GT. ProfileChiSquared) THEN
-!                 CALL WGridGetCellString(IDF_SA_Solution_Grid,1,I,Grid_Buffer)
-!                 CALL WGridGetCellReal(IDF_SA_Solution_Grid,2,I,Grid_IntensityChi)
-
-!               CALL WGridPutCellReal(IDF_SA_Solution_Grid,3,I+1,Grid_ProfileChi,'(f7.2)')
-!               CALL WGridPutCellReal(IDF_SA_Solution_Grid,2,I+1,Grid_IntensityChi,'(f7.2)')
-!                 CALL WGridPutCellString(IDF_SA_Solution_Grid,1,I+1,Grid_Buffer)
-        CALL WGridGetCellReal(IDF_SA_Summary,3,I,Grid_ProfileChi)
+        CALL WGridGetCellReal(IDF_SA_Summary,4,I,Grid_ProfileChi)
         IF (Grid_ProfileChi .GT. ProfileChiSquared) THEN
           CALL WGridGetCellString(IDF_SA_Summary,1,I,Grid_Buffer)
-          CALL WGridGetCellReal(IDF_SA_Summary,4,I,Grid_IntensityChi)
-          CALL WGridPutCellReal(IDF_SA_Summary,3,I+1,Grid_ProfileChi,'(f7.2)')
-          CALL WGridPutCellReal(IDF_SA_Summary,4,I+1,Grid_IntensityChi,'(f7.2)')
+          CALL WGridGetCellReal(IDF_SA_Summary,5,I,Grid_IntensityChi)
+          CALL WGridPutCellReal(IDF_SA_Summary,4,I+1,Grid_ProfileChi,'(f7.2)')
+          CALL WGridPutCellReal(IDF_SA_Summary,5,I+1,Grid_IntensityChi,'(f7.2)')
           CALL WGridPutCellString(IDF_SA_Summary,1,I+1,Grid_Buffer)   
         ELSE
           EXIT
         ENDIF
-      END DO
-!ep   CALL WGridPutCellString(IDF_SA_Solution_Grid,1,I+1,PdbFileName(1:len_trim(PdbFileName)))
-!     CALL WGridPutCellReal(IDF_SA_Solution_Grid,3,  I+1,ProfileChiSquared,'(f7.2)')
-!     CALL WGridPutCellReal(IDF_SA_Solution_Grid,2,  I+1,IntensityChiSquared,'(f7.2)')
+      ENDDO
       CALL WGridPutCellString(IDF_SA_Summary,1,I+1,PdbFileName(1:LEN_TRIM(PdbFileName)))
-      CALL WGridPutCellReal(IDF_SA_Summary,3,  I+1,ProfileChiSquared,'(f7.2)')
-      CALL WGridPutCellReal(IDF_SA_Summary,4,  I+1,IntensityChiSquared,'(f7.2)')
+      CALL WGridPutCellReal(IDF_SA_Summary,4,  I+1,ProfileChiSquared,'(f7.2)')
+      CALL WGridPutCellReal(IDF_SA_Summary,5,  I+1,IntensityChiSquared,'(f7.2)')
       CALL WDialogSelect(IDD_SA_Action1)
       WRITE(CNruns,'(I4)') SA_Run_Number + 1
       WRITE(CMruns,'(I4)') MaxRuns
       CMruns = ADJUSTL(CMruns)
       CNruns = ADJUSTL(CNruns)
       WRITE(SA_Label,'(A,A,A,A)') 'Simulated annealing run number ',&
-      CNRuns(1:LEN_TRIM(CNruns)),' of ',CMRuns(1:LEN_TRIM(CMRuns))
+           CNRuns(1:LEN_TRIM(CNruns)),' of ',CMRuns(1:LEN_TRIM(CMRuns))
       CALL WDialogPutString(IDD_SA_RunLabel,SA_Label)
       Ierrlab = InfoError(1)
-      IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Log_SARun_Entry
 !
