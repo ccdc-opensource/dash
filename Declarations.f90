@@ -59,8 +59,7 @@
 
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
-      INTEGER                                                                ICODEZ
-      REAL                                                                                 KOBZ
+      INTEGER                                                                ICODEZ,       KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
 ! NPTS is approximately NBIN.
@@ -107,6 +106,32 @@
 ! iStop = bin number (so, pointer into XBIN) of the last bin that should be drawn, i.e. MIN(IPMAX+1,NBIN)
 !          only useful when the user has zoomed in, otherwise iStop = NBIN
 ! nPoints = 1 + iStop - iStart
+
+
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
+! PKFNVA while fitting Peak Fit Ranges, this holds the parameters that are fitted:
+!        sigma = PKFNVA(1)
+!        gamma = PKFNVA(2)
+!        hpsl  = PKFNVA(3)
+!        hmsl  = PKFNVA(4)
 
 
 !O! JCC GGCALC dimension increased to 500
