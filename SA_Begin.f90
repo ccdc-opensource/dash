@@ -33,8 +33,12 @@
       LOGICAL         InSA
       COMMON /SADATA/ InSA
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput, DateToday, DateDaysElapsed, &
-                           TimeNowSeconds, Get_HydrogenTreatment
+                           TimeNowSeconds
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       CHARACTER*100 SA_DurationStr
       INTEGER StartDate, EndDate, DSLen
@@ -49,15 +53,9 @@
       ! angle that is allowed to vary over its full range. Because if so, e.g. a translation of, say, 1.10
       ! should be renormalised to 0.10 during the SA
       CALL InitRenormalisationLogicals
-! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
-! changed while the SA is running).
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogFieldState(IDR_HydrogensIgnore, Disabled)
-      CALL WDialogFieldState(IDR_HydrogensAbsorb, Disabled)
-      CALL WDialogFieldState(IDR_HydrogensExplicit, Disabled)
-      LOG_HYDROGENS = (Get_HydrogenTreatment() .EQ. 3)
-      CALL CREATE_FOB(Get_HydrogenTreatment() .EQ. 2)
-      CALL Create_AtomicWeightings(Get_HydrogenTreatment())
+      LOG_HYDROGENS = (HydrogenTreatment .EQ. 3)
+      CALL CREATE_FOB(HydrogenTreatment .EQ. 2)
+      CALL Create_AtomicWeightings(HydrogenTreatment)
       CALL FillSymmetry_2
       CALL GET_LOGREF
 ! Ungrey the "Save... chi sqrd progress"
@@ -90,10 +88,6 @@
       CALL SaveMultiRun_LogData
       CALL OutputChi2vsMoves
       CALL SetModeMenuState(0,0)
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogFieldState(IDR_HydrogensIgnore, Enabled)
-      CALL WDialogFieldState(IDR_HydrogensAbsorb, Enabled)
-      CALL WDialogFieldState(IDR_HydrogensExplicit, Enabled)
 !O      Ierrflag = InfoError(1)
 !O      CALL WindowSelect(0)
 !O! Wait for the user to raise the window. Under NT the "WindowRaise call" 

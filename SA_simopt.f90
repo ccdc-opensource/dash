@@ -61,8 +61,11 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
-      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, Confirm, Get_UseHydrogensDuringAuto
-      INTEGER, EXTERNAL :: Get_HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      LOGICAL, EXTERNAL :: Confirm
       REAL, EXTERNAL :: SA_FCN
       CHARACTER*80 chistr
       INTEGER I, II, III, N
@@ -72,14 +75,14 @@
       LOGICAL DesorbHydrogens
       REAL    XSIM(MVAR), DXSIM(MVAR)
 
-      IF (Auto .AND. (.NOT. Get_AutoLocalMinimisation())) RETURN
+      IF (Auto .AND. (.NOT. AutoMinimise)) RETURN
       CALL WCursorShape(CurHourGlass)
       tLOG_HYDROGENS = LOG_HYDROGENS
       DesorbHydrogens = .FALSE.
-      IF (Auto .AND. Get_UseHydrogensDuringAuto()) THEN
+      IF (Auto .AND. UseHAutoMin) THEN
         LOG_HYDROGENS = .TRUE.
 !C If we have absorbed the hydrogens and want to use them now, we must do some re-administrating.
-        IF (Get_HydrogenTreatment() .EQ. 2) THEN
+        IF (HydrogenTreatment .EQ. 2) THEN
           DesorbHydrogens = .TRUE.
           CALL create_fob(.FALSE.)
         ENDIF

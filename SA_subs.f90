@@ -83,8 +83,12 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
       REAL, EXTERNAL :: EXPREP
-      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
+      LOGICAL, EXTERNAL :: IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
       INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
       INTEGER NACP(MVAR)
@@ -561,7 +565,7 @@
 ! End of a run in a multi-run. This is the place for a final local minimisation
         NumOf_SA_Runs = Curr_SA_Run
 ! Get AutoLocalMinimisation from the Configuration Window
-        IF ((iMyExit .NE. 5) .AND. Get_AutoLocalMinimisation()) THEN
+        IF ((iMyExit .NE. 5) .AND. AutoMinimise) THEN
           CALL LocalMinimise(.TRUE.)
           CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
         ENDIF
@@ -790,7 +794,10 @@
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
 
-      LOGICAL, EXTERNAL :: Get_RandomInitVal
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
       REAL, EXTERNAL :: RANMAR
       INTEGER I, II
 
@@ -799,7 +806,7 @@
       DO I = 1, NVAR
         CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X(I))
       ENDDO
-      IF ( Get_RandomInitVal() ) THEN
+      IF ( RandomInitVal ) THEN
         DO II = 1, NPAR
           I = IP(II)
           X(I) = LB(I) + RULB(I)*RANMAR()

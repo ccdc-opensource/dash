@@ -98,8 +98,12 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INTEGER, EXTERNAL :: Read_One_Zm, Get_HydrogenTreatment
-      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM, FnUnitCellOK, nearly_equal
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      INTEGER, EXTERNAL :: Read_One_Zm
+      LOGICAL, EXTERNAL :: FnUnitCellOK, nearly_equal
       INTEGER, EXTERNAL :: CSSR2Mol2
       INTEGER iHandle
       CHARACTER(MaxPathLength) :: line
@@ -217,7 +221,7 @@
             RETURN
           ENDIF ! If the read on the Z-matrix was ok
         CASE ('cen')                                ! "Centre of mass"
-          IF (.NOT. Get_UseCrystallographicCoM()) THEN
+          IF (.NOT. UseCCoM) THEN
             IF (iFrg .NE. 0) THEN
             ! @@ This will go wrong if the filename contains a space
               CALL INextString(line, KeyChar)
@@ -228,7 +232,7 @@
             ENDIF
           ENDIF
         CASE ('cry')                                ! "Crystallographic centre of mass"
-          IF (Get_UseCrystallographicCoM()) THEN
+          IF (UseCCoM) THEN
             IF (iFrg .NE. 0) THEN
               CALL INextString(line, keychar)
               CALL INextString(line, keychar)

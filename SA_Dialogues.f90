@@ -396,7 +396,7 @@
 !C! Takes bond types         from btype     in SAMVAR
 !C! and writes out a .mol2 file
               IF (WriteMol2(temp_file, .TRUE., iFrg) .EQ. 1) CALL ViewStructure(temp_file)
-              CALL IOSDeleteFile(temp_file)
+!O              CALL IOSDeleteFile(temp_file)
             CASE (IDB_Rotations)
               CALL ShowEditZMatrixRotationsWindow
           END SELECT
@@ -547,8 +547,12 @@
 
       IMPLICIT NONE    
 
-      INTEGER, EXTERNAL :: WriteMol2, Get_HydrogenTreatment, WDialogGetRadioButtonInt
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      INTEGER, EXTERNAL :: WriteMol2, WDialogGetRadioButtonInt
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: Degrees2Radians
       INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State
       INTEGER iAtomNr
@@ -590,8 +594,8 @@
                 CASE (1) ! C.O.M.
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
                   COM = 0.0
-                  IF (Get_UseCrystallographicCoM()) THEN
-                    CALL zmCreate_AtomicWeightings(iFrg, Get_HydrogenTreatment())
+                  IF (UseCCoM) THEN
+                    CALL zmCreate_AtomicWeightings(iFrg, HydrogenTreatment)
                   ELSE
                     DO iAtomNr = 1, natcry
                       AtomicWeighting(iAtomNr, iFrg) = 1.0 / FLOAT(natcry)
@@ -677,7 +681,7 @@
 !C! Takes bond types         from btype     in SAMVAR
 !C! and writes out a .mol2 file
               IF (WriteMol2(temp_file, .TRUE., iFrg) .EQ. 1) CALL ViewStructure(temp_file)
-              CALL IOSDeleteFile(temp_file)
+!O              CALL IOSDeleteFile(temp_file)
               DO iAtomNr = 1, natcry
                 axyzo(1,iAtomNr) = taxyzo(1,iAtomNr)
                 axyzo(2,iAtomNr) = taxyzo(2,iAtomNr)
@@ -1186,7 +1190,7 @@
       ELSE
         CALL DebugErrorMessage('Error writing temporary file.')
       ENDIF
-      CALL IOSDeleteFile(temp_file)
+!      CALL IOSDeleteFile(temp_file)
 
       END SUBROUTINE zmView
 !
@@ -1502,6 +1506,9 @@
          ELSE
            CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, Enabled)
          ENDIF
+         IF (kzmpar2(i) .EQ. 3) THEN !torsion angle
+           CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
+         ENDIF
       ENDDO
       LimsChanged = .FALSE.
       KK = 0
@@ -1544,6 +1551,10 @@
       REAL                                                       iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       LOGICAL, EXTERNAL :: NearlyEqual
       REAL    xtem
@@ -1558,12 +1569,11 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
       SELECT CASE (EventType)
-! Interact with the main window and look at the Pawley refinement...
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the 1st window
-! JCC Check if the limits have changed and warn about it 
+! Check if the limits have changed and warn about it 
               IF (LimsChanged) THEN
                 IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) THEN
                   LimsChanged = .FALSE. 
@@ -1584,6 +1594,7 @@
               ENDIF
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
+              RandomInitVal = WDialogGetCheckBoxLogical(IDF_RandomInitVal)
               CALL ShowWithWizardWindowSASettings
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
@@ -1761,7 +1772,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      USE PO_VAR
       USE ZMVAR
 
       IMPLICIT NONE      
@@ -1786,22 +1796,19 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_input3_2)
       SELECT CASE (EventType)
-! Interact with the main window and look at the Pawley refinement...
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the 2nd window
               CALL WizardWindowShow(IDD_SA_Modal_input2)
-            CASE (IDB_SA3_finish) ! 'Solve >' button
-! We've finished the SA input
+            CASE (IDNEXT)
               ! It is possible to click "Resume SA" after having completed all runs and to
               ! forget to specify more runs. That way, we will already have completed all runs.
               CALL WDialogGetInteger(IDF_SA_MaxRepeats, MaxRuns)
               IF (Resume_SA .AND. (NumOf_SA_Runs .GE. MaxRuns)) THEN
                 CALL InfoMessage("Number of requested runs already completed: please increase number of runs.")
               ELSE
-                CALL WizardWindowHide
-                CALL BeginSA
+                CALL WizardWindowShow(IDD_SA_input4)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
@@ -1843,6 +1850,62 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowSASettings
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowSAOptions
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE      
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER tInteger
+
+! ##### TODO: when *resuming* the SA, it is probably smart not to allow changing of the settings for
+! hydrogen treatment.
+! We are now on window number 4
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input4)
+      SELECT CASE (EventType)
+        CASE (PushButton)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+! Go back to the 3rd window
+              CALL WizardWindowShow(IDD_SA_input3_2)
+            CASE (IDB_Solve)
+! We've finished the SA input
+              CALL WDialogGetRadioButton(IDR_HydrogensIgnore, HydrogenTreatment)
+              UseCCoM = WDialogGetCheckBoxLogical(IDF_CrystallographicCoM)
+              AutoMinimise = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
+              UseHAutoMin = WDialogGetCheckBoxLogical(IDF_UseHydrogensAuto)
+
+              ! Align ??? = WDialogGetCheckBoxLogical(IDF_Align)
+              CALL WizardWindowHide
+              CALL BeginSA
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizardPastPawley
+            CASE (IDB_BatchFile)
+              CALL WriteBatchFile
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDR_HydrogensIgnore, IDR_HydrogensAbsorb, IDR_HydrogensExplicit)
+              CALL WDialogGetRadioButton(IDR_HydrogensIgnore, tInteger)
+              CALL Set_HydrogenTreatment(tInteger)
+            CASE (IDF_AutoLocalOptimise)
+              CALL Set_AutoLocalMinimisation(WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowSAOptions
 !
 !*****************************************************************************
 !

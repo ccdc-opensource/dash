@@ -467,6 +467,9 @@
         CASE (IDD_SA_input3_2)
           CALL DealWithWizardWindowSASettings
           GOTO 10
+        CASE (IDD_SA_input4)
+          CALL DealWithWizardWindowSAOptions
+          GOTO 10
         CASE (IDD_SA_Action1)
           CALL DealWithSAStatusWindow
           GOTO 10
