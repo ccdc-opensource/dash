@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-! This module contains all z-matrix related data
+! This module contains all Z-matrix related data
 !
       MODULE ZMVAR
 
@@ -16,13 +16,13 @@
       INTEGER maxfrg
       PARAMETER ( maxfrg = 5 )
 
-! maxfrg = Maximum number of fragments = individual z-matrices
+! maxfrg = Maximum number of fragments = individual Z-matrices
 ! At the moment the maximum number of fragments is limited by the interface
 
       INTEGER MaxDOF
       PARAMETER ( MaxDOF = 30 )
 
-! MaxDOF = Maximum number of degrees of freedom per fragment (= per individual z-matrix)
+! MaxDOF = Maximum number of degrees of freedom per fragment (= per individual Z-matrix)
 
       INTEGER maxbnd_2
       PARAMETER ( maxbnd_2 = 1500 )
@@ -30,7 +30,7 @@
 ! Maximum number of bonds. Must be equal to MAXBND in SAMVAR
 
 ! The following variables are there to allow the dialogue fields in the
-! window dealing with z-matrices to be handled by DO...ENDDO loops.
+! window dealing with Z-matrices to be handled by DO...ENDDO loops.
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
 ! but these mappings are.
 
@@ -58,14 +58,22 @@
 
       LOGICAL         gotzmfile(1:maxfrg)
 
-      INTEGER         icomflg(1:maxfrg)
-      REAL            AtomicWeighting(1:maxatm,1:maxfrg)
+      INTEGER          icomflg(1:maxfrg)
+      REAL             AtomicWeighting(1:maxatm,1:maxfrg)
+      LOGICAL          UseQuaternions(1:maxfrg)
+      REAL             zmSingleRotationAxis(1:3,1:maxfrg)
+      DOUBLE PRECISION zmSingleRotationQs(0:3,1:maxfrg)
 
 ! icomflg         = Centre of mass flag.
 !                   0 = use centre of mass of molecule as centre of rotation
 !           otherwise = use atom number icomflg as centre of rotation (necessary if atom on special position)
 ! AtomicWeigthing = Weight of that atom used for calculating centre of mass.
 !  if all weights = 1.0 : geometric centre of mass
+! UseQuaternions    .TRUE.  : all rotations allowed, described by 4 quaternions
+!                   .FALSE. : only rotations about a single axis allowed (e.g. when on special position)
+! zmSingleRotationAxis = If UseQuaternions = .FALSE., this is the axis that is used
+! zmSingleRotationQs   = Factors in the quaternion-expression of the rotation about a single axis
+!                        which are due to the orientation of the single axis
     
       INTEGER         izmpar(1:maxfrg)
       CHARACTER*36    czmpar(1:MaxDOF,1:maxfrg)
@@ -75,11 +83,12 @@
 ! izmpar = number of degrees of freedom ('parameters')
 ! czmpar = Character string associated with this parameter value
 ! kzmpar = type of parameter
-!          1 = translation
-!          2 = rotation
-!          3 = torsion
+!          1 = translation (3 D.O.F.)
+!          2 = rotation with quaternions (4 D.O.F., 0 D.O.F. if single atom)
+!          3 = torsion        (1 D.O.F. per flexible torsion)
 !          4 = valence angle
 !          5 = bond length
+!          6 = rotation about a single axis (also 4 D.O.F., could be made 1 or 2)
 ! xzmpar = initial value of parameter
 
       INTEGER         ntatm

@@ -258,7 +258,7 @@
       INTEGER iWidth, iHeight
       PARAMETER (iWidth = 300, iHeight = 1)
       INTEGER tData(1:iWidth,1:iHeight)
-      INTEGER I, J
+      INTEGER I, J, ifrg
       INTEGER iRed, iGreen, iBlue, iRGBvalue
       REAL UM, TH
 
@@ -279,9 +279,13 @@
         UR(I) = COS(TH)
         UI(I) = SIN(TH)
       ENDDO
+      DO ifrg = 1, maxfrg
+        UseQuaternions(ifrg) = .TRUE.
+      ENDDO
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
       CALL GetPathToMercuryFromRegistry
+! Initialise arrays to do with administration of open child windows
       ChildWinAutoClose = .FALSE.
       ChildWinHandlerSet = .FALSE.
       SA_Run_Number = 0
