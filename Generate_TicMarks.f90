@@ -27,12 +27,10 @@
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
       INTEGER     msymmin
       PARAMETER ( msymmin = 10 )

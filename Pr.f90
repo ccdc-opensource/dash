@@ -5264,12 +5264,10 @@
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
       REAL            CummChiSqd
       COMMON /CMN007/ CummChiSqd(MOBS)

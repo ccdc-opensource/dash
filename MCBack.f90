@@ -21,24 +21,18 @@
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
       INTEGER I
 
 ! Calculate the background
       CALL CalculateBackground(nbruckwin,mbruckiter,UseMC)
 ! Subtract the background
-      YPMIN = YOBIN(1) - YBBIN(1)
-      YPMAX = YPMIN
       DO I = 1, NBIN
         YOBIN(I) = YOBIN(I) - YBBIN(I)
-        YPMIN = MIN(YOBIN(I),YPMIN)
-        YPMAX = MAX(YOBIN(I),YPMAX)
       ENDDO
       CALL Clear_BackGround
       CALL GetProfileLimits
