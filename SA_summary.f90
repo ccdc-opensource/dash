@@ -17,7 +17,7 @@
 
       INCLUDE 'PARAMS.INC' 
 
-!ep    need the common block to identify the number rows in the grid          
+! Need the common block to identify the number rows in the grid          
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                                    ChiMult
@@ -28,7 +28,7 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-!     required to handle the profile graphs plotted in child windows
+! Required to handle the profile graphs plotted in child windows
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
@@ -42,14 +42,14 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
       SELECT CASE (EventType)
-        CASE (PushButton) ! one of the buttons was pushed
+        CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL WDialogSelect(IDD_OutputSolutions)
               CALL WDialogHide
-! Closes all SA profile child windows which are still open when OK button clicked
+! Close all SA profile child windows that are still open
               DO i = 1, MaxNumChildWin
-                IF (SAUsedChildWindows(i).EQ.1) THEN
+                IF (SAUsedChildWindows(i) .EQ. 1) THEN
                   CALL WindowCloseChild(i)
                   SAUsedChildWindows(i) = 0
                   CALL UnRegisterChildWindow(i)
@@ -76,9 +76,9 @@
               CALL WDialogSelect(IDD_OutputSolutions)
               CALL WDialogHide
               CALL EndWizardPastPawley
-! Closes all SA profile child windows which are still open when OK button clicked
+! Close all SA profile child windows that are still open
               DO i = 1, MaxNumChildWin
-                IF (SAUsedChildWindows(i).EQ.1) THEN
+                IF (SAUsedChildWindows(i) .EQ. 1) THEN
                   CALL WindowCloseChild(i)
                   SAUsedChildWindows(i) = 0
                   CALL UnRegisterChildWindow(i)
@@ -153,6 +153,16 @@
 ! Close "Save Solutions" window which may be up
           CALL WDialogSelect(IDD_OutputSolutions)
           CALL WDialogHide
+! Close all SA profile child windows that are still open
+          DO i = 1, MaxNumChildWin
+            IF (SAUsedChildWindows(i) .EQ. 1) THEN
+              CALL WindowCloseChild(i)
+              SAUsedChildWindows(i) = 0
+              CALL UnRegisterChildWindow(i)
+            ENDIF
+          ENDDO
+! Close Chi-sqd plot 
+          CALL Close_Chisq_Plot
           CALL WDialogSelect(IDD_SAW_Page5)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,6,iRow,Unchecked)
 ! Fill SA Parameter Bounds Wizard Window with the values from this solution.
@@ -175,6 +185,16 @@
 ! Close "Save Solutions" window which may be up
           CALL WDialogSelect(IDD_OutputSolutions)
           CALL WDialogHide
+! Close all SA profile child windows that are still open
+          DO i = 1, MaxNumChildWin
+            IF (SAUsedChildWindows(i) .EQ. 1) THEN
+              CALL WindowCloseChild(i)
+              SAUsedChildWindows(i) = 0
+              CALL UnRegisterChildWindow(i)
+            ENDIF
+          ENDDO
+! Close Chi-sqd plot 
+          CALL Close_Chisq_Plot
           CALL WDialogSelect(IDD_SAW_Page5)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,7,iRow,Unchecked)
           CALL WDialogHide
