@@ -12,7 +12,9 @@
       INCLUDE 'PARAMS.INC'
 
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
-      LOGICAL LOGREF
+
+      INTEGER         NLGREF, IREFH
+      LOGICAL                                  LOGREF
       COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
 
       INTEGER         NATOM
@@ -39,11 +41,11 @@
       INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
       COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
 
-      INTEGER          NOBSA, NFITA, IFITA
-      REAL                                          CHIOBSA, WTSA
-      REAL             XOBSA,         YOBSA,         YCALA,         ESDA
-      COMMON /CHISTOP/ NOBSA, NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP),    &
-     &                 XOBSA(MCHSTP), YOBSA(MCHSTP), YCALA(MCHSTP), ESDA(MCHSTP)
+      INTEGER          NFITA, IFITA
+      REAL                                   CHIOBSA, WTSA
+      REAL             YCALA
+      COMMON /CHISTOP/ NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP),    &
+                       YCALA(MCHSTP)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
@@ -60,15 +62,15 @@
       CHIOBSA = 0.
       NFITA = 0
       NTERMS = 0
-      NOBSA = 0
+      NBIN = 0
       MMOBS = MCHSTP
       ittem = 0
       DO I = 1, MMOBS
-        READ (21,*,END=200) XOBSA(I), YOBSA(I), ESDA(I), KTEM
+        READ (21,*,END=200) XBIN(I), YOBIN(I), EBIN(I), KTEM
         KREFT(I) = KTEM
-        NOBSA = NOBSA + 1
+        NBIN = NBIN + 1
 !..        ESDA(I)=1./SQRT(WTSA(I))
-        WTSA(I) = 1.0/ESDA(I)**2
+        WTSA(I) = 1.0/EBIN(I)**2
         YCALA(I) = 0.0
 !..        KTEM=KMAXST(I)-KMINST(I)
         IF (KTEM.GT.0) THEN
@@ -76,20 +78,11 @@
           READ (21,*,ERR=998) (KNIPT(K,I),PIKVAL(K,I),K=1,KTEM)
           NFITA = NFITA + 1
           IFITA(NFITA) = I
-          CHIOBSA = CHIOBSA + WTSA(I) * YOBSA(I)**2
+          CHIOBSA = CHIOBSA + WTSA(I) * YOBIN(I)**2
         ENDIF
       ENDDO
   200 CONTINUE
       CLOSE (21)
-! Now:
-! None of the arrays in PROFBIN has been filled: the arrays in CHISTOP were filled instead.
-! YCAL has been reset to 0.0
-      NBIN = NOBSA
-      DO I = 1, NBIN
-        XBIN(I)  = XOBSA(I)
-        YOBIN(I) = YOBSA(I)
-        EBIN(I)  = ESDA(I)
-      ENDDO
       CALL Init_BackGround
       NoData = .FALSE.
       CALL GetProfileLimits
