@@ -254,7 +254,7 @@
       ESDsFilled = .FALSE.
       NoWavelengthInXYE = .FALSE.
       SELECT CASE (EXT4)
-        CASE ('dat ')
+        CASE ('dat ', 'txt ')
           ISTAT = Load_dat_File(TheFileName,ESDsFilled)
         CASE ('raw ')
           ISTAT = Load_raw_File(TheFileName,ESDsFilled)
