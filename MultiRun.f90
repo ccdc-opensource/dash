@@ -166,19 +166,23 @@
 
       INTEGER iSol, hFile
 
-      hFile = 101
-      OPEN(UNIT=hFile, FILE=OutputFilesBaseName(1:OFBN_Len)//'.log', status = 'unknown',ERR=999)
-      WRITE(hFile,*,ERR=999) 'Run number, Profile Chi Squared, Intensity Chi Squared'
-      DO iSol = 1, NumOf_SA_Runs
-        WRITE(hFile,10,ERR=999) iSol2Run(iSol),                  &
-                                ProfileChiSqd(iSol2Run(iSol)),   &
-                                IntensityChiSqd(iSol2Run(iSol))
-      ENDDO
- 10   FORMAT(I3.3,',',F10.4,',',F10.4)
-      CLOSE (hFile)
-      RETURN
- 999  CALL ErrorMessage('Error writing log file.')
-      CLOSE (hFile)
+      IF (OFBN_Len .EQ. 0) THEN
+        CALL DebugErrorMessage("OFBN_Len .EQ. 0 when saving .log file.")
+      ELSE
+        hFile = 101
+        OPEN(UNIT=hFile, FILE=OutputFilesBaseName(1:OFBN_Len)//'.log', status = 'unknown',ERR=999)
+        WRITE(hFile,*,ERR=999) 'Run number, Profile Chi Squared, Intensity Chi Squared'
+        DO iSol = 1, NumOf_SA_Runs
+          WRITE(hFile,10,ERR=999) iSol2Run(iSol),                  &
+                                  ProfileChiSqd(iSol2Run(iSol)),   &
+                                  IntensityChiSqd(iSol2Run(iSol))
+        ENDDO
+ 10     FORMAT(I3.3,',',F10.4,',',F10.4)
+        CLOSE (hFile)
+        RETURN
+ 999    CALL ErrorMessage('Error writing log file.')
+        CLOSE (hFile)
+      ENDIF
  
       END SUBROUTINE SaveMultiRun_LogData
 !
