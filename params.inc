@@ -67,11 +67,6 @@
       INTEGER MPRPKF
       PARAMETER ( MPRPKF = 10000 )
 
-! For use in common block FOCDAT
-
-      INTEGER MFOCDA
-      PARAMETER ( MFOCDA = 33000 )
-
 ! GUI Parameters
 ! For common block PROFOBS and PROFBIN
 
