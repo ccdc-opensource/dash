@@ -147,12 +147,6 @@ SOURCE=.\Basic_Vectors.f90
 
 SOURCE=.\BatchMode.f90
 DEP_F90_BATCH=\
-	".\GLBVAR.INC"\
-	".\params.inc"\
-	".\Release\PO_VAR.mod"\
-	".\Release\PRJVAR.mod"\
-	".\Release\SOLVAR.mod"\
-	".\Release\VARIABLES.mod"\
 	".\Release\ZMVAR.MOD"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -477,19 +471,8 @@ DEP_F90_MONKE=\
 # End Source File
 # Begin Source File
 
-SOURCE=.\MultiModal.f90
-DEP_F90_MULTI=\
-	".\params.inc"\
-	".\Release\DRUID_HEADER.mod"\
-	".\Release\VARIABLES.mod"\
-	".\Release\ZMVAR.MOD"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
 SOURCE=.\multipeak_chisq.f90
-DEP_F90_MULTIP=\
+DEP_F90_MULTI=\
 	".\params.inc"\
 	".\Reflns.inc"\
 	
@@ -497,7 +480,7 @@ DEP_F90_MULTIP=\
 # Begin Source File
 
 SOURCE=.\multipeak_fitter.f90
-DEP_F90_MULTIPE=\
+DEP_F90_MULTIP=\
 	".\params.inc"\
 	".\Reflns.inc"\
 	
@@ -748,6 +731,7 @@ DEP_F90_SA_DI=\
 	".\params.inc"\
 	".\Release\ATMVAR.mod"\
 	".\Release\DRUID_HEADER.mod"\
+	".\Release\PO_VAR.mod"\
 	".\Release\SAMVAR.MOD"\
 	".\Release\VARIABLES.mod"\
 	".\Release\ZMVAR.MOD"\
