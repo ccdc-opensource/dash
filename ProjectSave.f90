@@ -40,6 +40,8 @@
       tFileName = 'Example.dash'
       OPEN(UNIT=tFileHandle,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
+! Store Wizard Window
+
 ! Store radiation source
       CALL FileWriteInteger(tFileHandle,RecNr,JRadOption)
 ! Store Wavelength
@@ -51,6 +53,8 @@
       CALL FileWriteInteger(tFileHandle,RecNr,BackupNOBS)
       IF (BackupNOBS .GT. 0) THEN
 ! This is where we must decide if we want to store just the pattern, or also the .pik file
+!            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
+!        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
         DO I = 1, BackupNOBS
           CALL FileWriteReal(tFileHandle,RecNr,BackupXOBS(I))
           CALL FileWriteReal(tFileHandle,RecNr,BackupYOBS(I))
@@ -82,6 +86,9 @@
 ! Store LBIN
         CALL FileWriteInteger(tFileHandle,RecNr,LBIN)
       ENDIF
+! Store the peak fit ranges
+
+
 ! Store Crystal System
       CALL FileWriteInteger(tFileHandle,RecNr,LatBrav)
 ! Store unit cell
@@ -136,12 +143,23 @@
 
       CALL PopActiveWindowID
       RETURN
-  999 CALL ErrorMessage('Error while accessing project file.')
+  999 CALL ErrorMessage('Error writing project file.')
       CALL PopActiveWindowID
 
       END SUBROUTINE ProjectSave
 !
 !*****************************************************************************
 !
+      SUBROUTINE PrjReadWritePeakFitRanges(TheFileHandle,TheRecNr)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheFileHandle
+      INTEGER, INTENT (INOUT) :: TheRecNr
 
 
+
+      END SUBROUTINE PrjReadWritePeakFitRanges
+!
+!*****************************************************************************
+!
