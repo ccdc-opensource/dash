@@ -12,8 +12,8 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
@@ -229,11 +229,10 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
-      INTEGER    MVAR
-      PARAMETER (MVAR = 100)
       DOUBLE PRECISION XOPT,       C,       XP,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
 
@@ -259,8 +258,8 @@
 
       DOUBLE PRECISION T0,rt
       COMMON /saparl/ T0,rt
-      INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       CHARACTER*36 parlabel(mvar)
       DOUBLE PRECISION dcel(6)

@@ -861,11 +861,11 @@
 
       IMPLICIT NONE      
 
-      INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      INTEGER    MVAR
-      PARAMETER (MVAR = 100)
+      INCLUDE 'PARAMS.INC'
+
       DOUBLE PRECISION x,lb,ub,vm,xpreset
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
 
@@ -1023,8 +1023,8 @@
       DOUBLE PRECISION T0, rt
       COMMON /saparl/  T0, rt
 
-      INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       INTEGER IHANDLE, JPOS, KPOS
       REAL    rpos
