@@ -20,19 +20,6 @@
       INTEGER,       INTENT (IN   ) :: LenFn
       INTEGER,       INTENT (  OUT) :: Ierr
 
-!O      REAL              PkFnVal,                      PkFnEsd,                      &
-!O                        PkFnCal,                                                    &
-!O                        PkFnVarVal,                   PkFnVarEsd,                   &
-!O                        PkAreaVal,                    PkAreaEsd,                    &
-!O                        PkPosVal,                     PkPosEsd,                     &
-!O                        PkPosAv
-!O      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
-!O                        PkFnCal(MPkDes,Max_NPFR),                                   &
-!O                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
-!O                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-!O                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
-!O                        PkPosAv(MAX_NPFR)
-
       CHARACTER*128 line
       CHARACTER*3   KeyChar
       INTEGER       Idum, nl
@@ -66,64 +53,6 @@
             CALL Upload_Source
 ! Now we know all there is to know about the wavelength and source: update it
             CALL Set_Wavelength(Temp)
-!O          CASE ('sig') ! Sigma
-!O! Sigma 1
-!O            CALL WDialogSelect(IDD_Sigma_info)
-!O            I = InfoError(1) ! reset the errors
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999
-!O            CALL WDialogPutReal(IDF_Sigma1,Temp,'(F10.4)')
-!O            PkFnVarVal(1,1) = Temp
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999  
-!O            PkFnVarEsd(1,1) = Temp
-!O! Sigma 2
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999                          
-!O            CALL WDialogPutReal(IDF_Sigma2,Temp,'(F10.4)')
-!O            PkFnVarVal(2,1) = Temp
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999  
-!O            PkFnVarEsd(2,1) = Temp
-!O          CASE ('gam') ! Gamma
-!O! Gamma 1
-!O            CALL WDialogSelect(IDD_Gamma_info)
-!O            I = InfoError(1) ! reset the errors
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999                          
-!O            CALL WDialogPutReal(IDF_Gamma1,Temp,'(F10.4)')
-!O            PkFnVarVal(1,2) = Temp
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999  
-!O            PkFnVarEsd(1,2) = Temp
-!O! Gamma 2
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999                          
-!O            CALL WDialogPutReal(IDF_Gamma2,Temp,'(F10.4)')
-!O            PkFnVarVal(2,2) = Temp
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999  
-!O            PkFnVarEsd(2,2) = Temp
-!O          CASE ('asy') ! HMSL/HPSL Shape parameters
-!O! HPSL
-!O            CALL WDialogSelect(IDD_HPSL_info)
-!O            I = InfoError(1) ! reset the errors
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999                          
-!O            CALL WDialogPutReal(IDF_HPSL1,Temp,'(F10.4)')
-!O            PkFnVarVal(1,3) = MAX(0.0001,Temp)
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999  
-!O            PkFnVarEsd(1,3) = Temp
-!O! HMSL
-!O            CALL WDialogSelect(IDD_HMSL_info)
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999                          
-!O            CALL WDialogPutReal(IDF_HMSL1,Temp,'(F10.4)')
-!O            PkFnVarVal(1,4) = MAX(0.0001,Temp)
-!O            CALL INextReal(line,Temp)
-!O            IF (InfoError(1) .NE. 0) GOTO 999        
-!O            PkFnVarEsd(1,4)=Temp
           CASE ('zer')
 ! Zero point
             I = InfoError(1) ! reset the errors
