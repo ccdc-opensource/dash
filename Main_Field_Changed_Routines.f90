@@ -114,7 +114,7 @@
                        'All executables (*.exe)|*.exe|'
 ! IFTYPE specifies which of the file types in the list is the default
               IFTYPE = 2
-              tFileName = ' '
+              tFileName = ViewExe
               CALL WSelectFile(FILTER,IFLAGS,tFileName,'Select Viewer',IFTYPE)
 ! Did the user press cancel?
               IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) THEN
