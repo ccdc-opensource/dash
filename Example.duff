@@ -17,13 +17,23 @@ SEED1 315
 SEED2 159
 # On a distributed system, this should probably be set to:
 #     (total number of runs / number of processors)
-NRUNS 99
+NRUNS 3
 # Maximum number of moves: real followed by integer e.g. "3.0 7" means "3.0E7"
-MAXMOVES 3.0 7
+MAXMOVES 1.0 7
 # Termination criterion: SA stops when chi-sqrd lower than MULTIPLIER times Pawley chi-sqrd
 MULTIPLIER 5.0
 # Randomise initial values
 RANDOMISE TRUE
+# Use crystallographic Centre of Mass
+USECCOM TRUE
+# 1 = ignore, 2 = absorb, 3 = explicit
+HYDROGEN 2
+# Auto local minimise
+AUTOMIN TRUE
+# Use Hydrogens for auto local minimise
+MINIMISEHYDR TRUE
+# Auto align
+AUTOALIGN TRUE
 # WARNING beyond this point the number and order of the lines becomes important.
 # Do not edit beyond this point.
 #Preferred Orientation DIRection
