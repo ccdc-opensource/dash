@@ -12,6 +12,7 @@
 
       INTEGER :: IFlags, I, IPASS, Ilen, Instlen, Idashlen
       CHARACTER(LEN=255) :: Dirname, DashDir, InstDirLc, DashDirLc, DirNameLc
+      LOGICAL Confirm ! Function
 
       Idashlen = GETENVQQ("DASH_DIR",DashDir)
       Instlen = LEN_TRIM(INSTDIR)
@@ -20,7 +21,7 @@
       DashDirLc = DashDir
       CALL ILowerCase(DashDirLc)
       CALL ILowerCase(InstDirLc)
-! JvdS Rewrite using GOTOs
+! JvdS @ Rewrite using GOTOs
       LOOP_DIRECTORY_SELECT : DO WHILE (.TRUE.)
         IFlags = DirChange+DirCreate
         Dirname = ' '
@@ -32,14 +33,10 @@
         DirNameLc = DirName
         CALL ILowerCase(DirNameLc)
         Ilen = LEN_TRIM(DirNameLc)
-! JvdS @ Isn't the following line wrong? Shouldn't it be InstDirLc(1:LEN_TRIM(InstDirLc)) ?
         IF ( (DirNameLc(1:Ilen) .EQ. DashDirLc(1:LEN_TRIM(DashDirLc))) .OR.  &
-             (DirNameLc(1:Ilen) .EQ. InstDirLc(1:LEN_TRIM(DashDirLc))) ) THEN
-          CALL WMessageBox(YesNo,InformationIcon,CommonNo, &
-            "Are you sure you wish to start Dash in"//CHAR(13)//"the installation directory "//&
-            CHAR(13)//DirNameLc(1:Ilen)//" ?", &
-            "File location")
-          IF (WInfoDialog(4) .NE. CommonYes) CYCLE LOOP_DIRECTORY_SELECT
+             (DirNameLc(1:Ilen) .EQ. InstDirLc(1:LEN_TRIM(InstDirLc))) ) THEN
+          IF (.NOT. Confirm("Are you sure you wish to start Dash in"//CHAR(13)//"the installation directory "//&
+            CHAR(13)//DirNameLc(1:Ilen)//" ?")) CYCLE LOOP_DIRECTORY_SELECT
         END IF
 ! Open the file
         OPEN(UNIT = 6, FILE = 'dash.out', STATUS = 'UNKNOWN', ERR = 110)
@@ -71,7 +68,6 @@
 !C>> SA bitmap
       INTEGER it, Ibmhandle
       COMMON / BMPHAN / Ibmhandle
-      REAL    WaveLengthOf ! Function
 
       CALL WDialogLoad(IDD_Structural_Information)
       CALL WDialogLoad(IDD_SA_Action1)
@@ -110,8 +106,6 @@
       CALL IGrSelect(3,IDF_minchisq_picture)
       CALL WBitmapGet(ibmhandle,0)
       it = InfoError(1)
-! @ Initialise radiation to Cu Ka1. This is a strange place for doing this, should move.
-      CALL UpdateWavelength(WaveLengthOf('Cu'))
       RETURN
 
       END SUBROUTINE PolyFitter_UploadDialogues
@@ -124,12 +118,12 @@
       USE VARIABLES
       USE DRUID_HEADER
 
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
+
       CHARACTER(LEN=128) lintem
       INTEGER OpenFail, PolyFitter_OpenSpaceGroupSymbols
 !O      DATA LPosSG/1,1,3,38,73,108,349,430,455,462,489,531/
-
-      INCLUDE 'GLBVAR.INC'
 
       DoSaRedraw = .FALSE.
       LPosSG( 1) =   1
@@ -143,16 +137,8 @@
       LPosSG( 9) = 455
       LPosSG(10) = 462
       LPosSG(11) = 489
-      LPosSG(12) = 531
+      LPosSG(12) = MaxSPGR+1
       IPosSG = 1
-! Initialise crystal system to unknown
-      LatBrav = 1
-! Update Wizard
-      CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutOption(IDF_PW_Crystal_System_Menu,LatBrav)
-! Update main window menu
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
 !>> JCC Init the viewing etc
       CALL PolyFitter_EnableExternal
 ! Get the space group symbols ...
@@ -171,11 +157,21 @@
       i=i+1
       SGNumStr(i) = lintem(4:13)
       SGHMaStr(i) = lintem(15:26)
-      SGHalStr(i) = lintem(29:46)
+!U      SGHalStr(i) = lintem(29:46)
       SGShmStr(i) = lintem(47:70)
       GOTO 10
- 100  NumSG=i
+ 100  IF (I .NE. MaxSPGR) THEN
+        CALL ErrorMessage('Number of space groups in space group file has changed.')
+        GOTO 999
+      ENDIF
       CLOSE(110)
+! Initialise crystal system to unknown, LatBrav = 1
+      CALL SetCrystalSystem(1)
+! Initialise the space group menus in the main window and the wizard.
+! As the crystal system has been set to unknown, only space group P 1 is allowed
+! @ we could change this one day: as it is, the user MUST enter the crystal system before
+! being able to enter the space group.
+      CALL SetSpaceGroupMenu(LatBrav)
       RETURN
  999  CONTINUE
 ! Failure, so exit gracefully
@@ -191,7 +187,6 @@
       USE DRUID_HEADER
 !
       TYPE(WIN_STYLE)   :: MAIN_WINDOW
-!
 
       INCLUDE 'PARAMS.INC'
 
@@ -202,30 +197,26 @@
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
 
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      REAL CHAR_SIZE,MARKER_SIZE
-      LOGICAL ERROR_BAR
-      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
 
       INCLUDE 'statlog.inc'
       INCLUDE 'lattice.inc'
       INCLUDE 'GLBVAR.INC' ! Contains JRadOption
       INCLUDE 'Poly_Colours.inc'
       INCLUDE 'DialogPosCmnf90.inc'
+      REAL    WaveLengthOf ! Function
 !
-      IDCurrent_Cursor_Mode=ID_Default_Mode
-      DataSetChange=0
-      NumInternalDSC=-1
-      ZEROPOINT=0.0
+      IDCurrent_Cursor_Mode = ID_Default_Mode
+      DataSetChange = 0
+      NumInternalDSC = -1
+      ZEROPOINT = 0.0
+      CALL UpdateWavelength(WaveLengthOf('Cu'))
+
 !>>JCC Added
-      SLIMVALUE=1.0
-      SCALFAC  = 0.01
-      BACKREF =.TRUE.
+      SLIMVALUE = 1.0
+      SCALFAC   = 0.01
+      BACKREF   = .TRUE.
 !
       JRadOption = 1 ! Initialise to X-ray lab data
-! JvdS @ I think that the Bravais lattice type is initialised to unknown,
-! all unit cell parameters to unknown and now the space group that goes with it is P21/c?
-! Default on P21/c
-      NumberSGTable=64
 !
       IXPos_IDD_Pawley_Status=0.1*XBSWidth
       IYPos_IDD_Pawley_Status=0.06*XBSHeight
@@ -242,7 +233,6 @@
 !
       MARKER_SIZE=0.35
       CHAR_SIZE=1.0
-      ERROR_BAR=.FALSE.
 !
       XPG1=0.12
       XPG2=0.95
@@ -359,36 +349,8 @@
       CALL IGrPaletteRGB(KolNumBack,   KolBack%IRed,&
                                        KolBack%IGreen,&
                                        KolBack%IBlue)
-!
+
       END SUBROUTINE InitialiseVariables
-!
-!*****************************************************************************
-!
-      SUBROUTINE Default_Crystal_Symmetry()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
-
-      CALL PushActiveWindowID
-      DO ISG = 1, NumSG
-        JSG = LPosSG(LatBrav) + ISG - 1
-        SGHMaBrStr(ISG)(1:12)  = SGNumStr(JSG)(1:12)
-        SGHMaBrStr(ISG)(13:24) = SGHMaStr(JSG)(1:12)
-      END DO      
-      IPosSG = 1
-      NumberSGTable = IPosSG
-      CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutMenu(IDF_PW_Space_Group_Menu,SGHMaBrStr,NumSG,LatBrav)
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumSG,LatBrav)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Default_Crystal_Symmetry
 !
 !*****************************************************************************
 !
@@ -403,8 +365,8 @@
 
       INTEGER       unit, errstat, lval, dlen
       CHARACTER*255 DashDir, Command
-      PolyFitter_OpenSpaceGroupSymbols = 0
 
+      PolyFitter_OpenSpaceGroupSymbols = 0
 !   Try the default installation directory first
       OPEN(110,file=INSTDIR(1:LEN_TRIM(INSTDIR))//&
         DIRSPACER(1:LEN_TRIM(DIRSPACER))//&
