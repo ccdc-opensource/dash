@@ -363,11 +363,11 @@
         ENDIF
       ENDDO ! loop over z-matrices
 ! Get atom label option from dialogue. Two options: 
-! 1. "Element symbol + solution number" (default)
+! 1. "Element symbol + solution number"
 ! 2. "Orignal atom labels"
       CALL WDialogGetRadioButton(IDF_UseSolutionNr,AtomLabelOption)
 ! Get atom colour option from dialogue. Two options: 
-! 1. "By solution number" (default)
+! 1. "By solution number"
 ! 2. "By element"
       CALL WDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
 ! JvdS Oct 2001
