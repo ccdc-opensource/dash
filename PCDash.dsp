@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /compile_only /include:"Release/" /nologo /warn:nofileopt /winapp
-# ADD F90 /browser /compile_only /include:"Release/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /nologo /warn:nofileopt /winapp
+# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /compile_only /include:"Release/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /transform_loops /warn:nofileopt /winapp /fast
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -72,8 +72,8 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt /winapp
-# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /traceback /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
-# SUBTRACT F90 /check:bounds /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations
+# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
+# SUBTRACT F90 /check:bounds /check:format /check:output_conversion /check:overflow /check:underflow /traceback /warn:declarations
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /W4 /Gm /GX /ZI /O2 /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -258,53 +258,53 @@ SOURCE=.\Fcn.f90
 SOURCE=.\Ffcalc.f90
 DEP_F90_FFCAL=\
 	".\params.inc"\
-	".\SGinc\ffcalc_001.f90"\
-	".\SGinc\ffcalc_002.f90"\
-	".\SGinc\ffcalc_039.f90"\
-	".\SGinc\ffcalc_040.f90"\
-	".\SGinc\ffcalc_044.f90"\
-	".\SGinc\ffcalc_050.f90"\
-	".\SGinc\ffcalc_052.f90"\
-	".\SGinc\ffcalc_057.f90"\
-	".\SGinc\ffcalc_058.f90"\
-	".\SGinc\ffcalc_061.f90"\
-	".\SGinc\ffcalc_064.f90"\
-	".\SGinc\ffcalc_065.f90"\
-	".\SGinc\ffcalc_066.f90"\
-	".\SGinc\ffcalc_067.f90"\
-	".\SGinc\ffcalc_069.f90"\
-	".\SGinc\ffcalc_112.f90"\
-	".\SGinc\ffcalc_115.f90"\
-	".\SGinc\ffcalc_116.f90"\
-	".\SGinc\ffcalc_143.f90"\
-	".\SGinc\ffcalc_164.f90"\
-	".\SGinc\ffcalc_176.f90"\
-	".\SGinc\ffcalc_212.f90"\
-	".\SGinc\ffcalc_266.f90"\
-	".\SGinc\ffcalc_269.f90"\
-	".\SGinc\ffcalc_284.f90"\
-	".\SGinc\ffcalc_290.f90"\
-	".\SGinc\ffcalc_292.f90"\
-	".\SGinc\ffcalc_298.f90"\
-	".\SGinc\ffcalc_304.f90"\
-	".\SGinc\ffcalc_356.f90"\
-	".\SGinc\ffcalc_365.f90"\
-	".\SGinc\ffcalc_369.f90"\
-	".\SGinc\ffcalc_430.f90"\
-	".\SGinc\ffcalc_431.f90"\
-	".\SGinc\ffcalc_432.f90"\
-	".\SGinc\ffcalc_433.f90"\
-	".\SGinc\ffcalc_434.f90"\
-	".\SGinc\ffcalc_435.f90"\
-	".\SGinc\ffcalc_449.f90"\
-	".\SGinc\ffcalc_451.f90"\
-	".\SGinc\ffcalc_462.f90"\
-	".\SGinc\ffcalc_468.f90"\
-	".\SGinc\ffcalc_469.f90"\
-	".\SGinc\ffcalc_471.f90"\
-	".\SGinc\ffcalc_481.f90"\
-	".\SGinc\ffcalc_483.f90"\
-	".\SGinc\ffcalc_485.f90"\
+	".\SGinc\ffcalc_001.inc"\
+	".\SGinc\ffcalc_002.inc"\
+	".\SGinc\ffcalc_039.inc"\
+	".\SGinc\ffcalc_040.inc"\
+	".\SGinc\ffcalc_044.inc"\
+	".\SGinc\ffcalc_050.inc"\
+	".\SGinc\ffcalc_052.inc"\
+	".\SGinc\ffcalc_057.inc"\
+	".\SGinc\ffcalc_058.inc"\
+	".\SGinc\ffcalc_061.inc"\
+	".\SGinc\ffcalc_064.inc"\
+	".\SGinc\ffcalc_065.inc"\
+	".\SGinc\ffcalc_066.inc"\
+	".\SGinc\ffcalc_067.inc"\
+	".\SGinc\ffcalc_069.inc"\
+	".\SGinc\ffcalc_112.inc"\
+	".\SGinc\ffcalc_115.inc"\
+	".\SGinc\ffcalc_116.inc"\
+	".\SGinc\ffcalc_143.inc"\
+	".\SGinc\ffcalc_164.inc"\
+	".\SGinc\ffcalc_176.inc"\
+	".\SGinc\ffcalc_212.inc"\
+	".\SGinc\ffcalc_266.inc"\
+	".\SGinc\ffcalc_269.inc"\
+	".\SGinc\ffcalc_284.inc"\
+	".\SGinc\ffcalc_290.inc"\
+	".\SGinc\ffcalc_292.inc"\
+	".\SGinc\ffcalc_298.inc"\
+	".\SGinc\ffcalc_304.inc"\
+	".\SGinc\ffcalc_356.inc"\
+	".\SGinc\ffcalc_365.inc"\
+	".\SGinc\ffcalc_369.inc"\
+	".\SGinc\ffcalc_430.inc"\
+	".\SGinc\ffcalc_431.inc"\
+	".\SGinc\ffcalc_432.inc"\
+	".\SGinc\ffcalc_433.inc"\
+	".\SGinc\ffcalc_434.inc"\
+	".\SGinc\ffcalc_435.inc"\
+	".\SGinc\ffcalc_449.inc"\
+	".\SGinc\ffcalc_451.inc"\
+	".\SGinc\ffcalc_462.inc"\
+	".\SGinc\ffcalc_468.inc"\
+	".\SGinc\ffcalc_469.inc"\
+	".\SGinc\ffcalc_471.inc"\
+	".\SGinc\ffcalc_481.inc"\
+	".\SGinc\ffcalc_483.inc"\
+	".\SGinc\ffcalc_485.inc"\
 	".\SGinc\ffcalctop.inc"\
 	
 # End Source File
@@ -395,7 +395,6 @@ DEP_F90_INIT_=\
 SOURCE=.\Initialisation.f90
 DEP_F90_INITI=\
 	".\Debug\ZMVAR.MOD"\
-	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
@@ -817,7 +816,6 @@ DEP_F90_VALCH=\
 
 SOURCE=.\valchipro.f90
 DEP_F90_VALCHI=\
-	".\AllFFCalc.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
@@ -849,7 +847,6 @@ DEP_F90_WIFD9=\
 SOURCE=.\Wizard_routines.f90
 DEP_F90_WIZAR=\
 	".\Debug\DICVAR.MOD"\
-	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
@@ -874,10 +871,6 @@ DEP_F90_ZMVAR=\
 # Begin Source File
 
 SOURCE=.\AllFFCalc.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\DialogPosCmn.inc
 # End Source File
 # Begin Source File
 
@@ -943,6 +936,194 @@ SOURCE=.\res\WizardWelcome.bmp
 # Begin Group "SGinc"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_001.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_002.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_039.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_040.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_044.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_050.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_052.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_057.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_058.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_061.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_064.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_065.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_066.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_067.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_069.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_112.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_115.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_116.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_143.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_164.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_176.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_212.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_266.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_269.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_284.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_290.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_292.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_298.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_304.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_356.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_365.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_369.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_430.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_431.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_432.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_433.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_434.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_435.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_449.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_451.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_462.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_468.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_469.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_471.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_481.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_483.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SGinc\ffcalc_485.inc
+# End Source File
 # Begin Source File
 
 SOURCE=.\SGinc\ffcalctop.inc
