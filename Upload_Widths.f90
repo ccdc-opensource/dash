@@ -271,13 +271,17 @@
 !
 !
       SUBROUTINE Fit_Gamma(X,DX,N)
+
       REAL Chisq_Gamma
       EXTERNAL Chisq_Gamma
+
+
+      INCLUDE 'PARAMS.INC'
+
       PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
       REAL X(MPAR),DX(MPAR),COV(MMPAR)
 !
 !
-      PARAMETER (MAX_NPFR=50,MAX_NPPR=10, MAX_FITPT=10000)
       INTEGER CurrentRange 
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR), &
       IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR),NumPeakFitRange, &
@@ -285,7 +289,6 @@
       XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
       IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
 !
-      parameter (MPkDes=6)
       COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),PkFnEsd(MPkDes,Max_NPFR), &
       PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &
       PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
