@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 26/Sep/2004 18:46:00
+// Modified : 28/Sep/2004 16:56:09
 //
 ///////////////////////////////////////////////////
 //
@@ -661,6 +661,7 @@
 #define IDB_Up                           1149
 #define IDB_Down                         1150
 #define IDB_DeleteLastRun                1303
+#define IDB_BatchFile                    1155
 
 ///////////////////////////////////////////////////
 //
@@ -3461,6 +3462,7 @@ BEGIN
     CONTROL "Random seeds",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  139,  105,   30,   18
     CONTROL "314",IDF_SA_RandomSeed1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  171,   99,   43,   14
     CONTROL "159",IDF_SA_RandomSeed2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  171,  115,   43,   14
+    CONTROL "Create batch file...",IDB_BatchFile,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  294,  150,   80,   14
 END
 
 IDD_SA_input3_2 RCDATA
