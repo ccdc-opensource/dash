@@ -59,26 +59,6 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION FnPeakShapeOK
-!
-! Checks if sigma1, sigma2, gamma1, gamma2, HPSL and HMSL are available and acceptable
-!
-! RETURNS : .TRUE.  if more than three peak fit ranges have been fitted (fitting three peaks
-!                   in a single range will not do)
-!           .FALSE. otherwise
-!
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-      
-! JvdS @@ as no information on 'having been fitted' is ever stored, there's not
-! enough information available to make this function work.
-      FnPeakShapeOK = .TRUE.
-
-      END FUNCTION FnPeakShapeOK
-!
-!*****************************************************************************
-!
       LOGICAL FUNCTION ValidCellAxisLength(TheValue)
 !
 ! This function establishes if a REAL is a valid length for a unit cell axis
@@ -101,8 +81,6 @@
       REAL FUNCTION UnitCellVolume(The_a, The_b, The_c, TheAlpha, TheBeta, TheGamma)
 !
 ! Calculates the unit cell volume given the unit cell parameters.
-!
-! JvdS Oct 2001
 !
 ! RETURNS : Unit cell volume
 !
