@@ -20,6 +20,8 @@
       PastPawley = .TRUE.
 ! Grey out 'Delete all peak fit ranges' button on toolbar
       CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
+! Grey out 'Clear cell parameters' button on toolbar
+      CALL WMenuSetState(ID_Delabc,ItemEnabled,WintOff)
 ! Grey out 'Remove Background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
 ! Grey out 'Load diffraction pattern' button on toolbar
@@ -31,6 +33,7 @@
       CALL WDialogFieldState(IDF_Crystal_System_Menu,DialogReadOnly)
       CALL WDialogFieldState(IDF_ZeroPoint,DialogReadOnly)
       CALL WDialogFieldState(IDAPPLY,DialogReadOnly)
+      CALL WDialogFieldState(IDB_Delabc,Disabled)
       CALL WDialogSelect(IDD_Data_Properties)
       CALL WDialogFieldState(IDAPPLY,DialogReadOnly)
       CALL WDialogFieldState(IDF_wavelength1,DialogReadOnly)
