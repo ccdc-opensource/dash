@@ -1,4 +1,4 @@
-! Winteracter module created : 01/Dec/2001 14:02:04
+! Winteracter module created : 01/Dec/2001 17:47:14
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -479,4 +479,6 @@
           INTEGER, PARAMETER :: IDF_InvertSelection             =  1221
           INTEGER, PARAMETER :: IDF_OutputChi2vsMoves           =  1099
           INTEGER, PARAMETER :: IDF_SubtractBackground          =  1100
+          INTEGER, PARAMETER :: IDF_CrystallographicCoM         =  1215
+          INTEGER, PARAMETER :: IDF_Align                       =  1224
       END MODULE Druid_Header
