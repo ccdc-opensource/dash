@@ -32,8 +32,9 @@
       INTEGER     FLEN ! Length of TheFileName
       CHARACTER*4 C4
       INTEGER     irange
-
-      INTEGER  Load_rawSTOE_File, Load_rawBruker_File ! Functions
+      INTEGER Load_rawSTOE_File, Load_rawBruker_File ! Functions
+      INTEGER tNumOfRanges
+      CHARACTER*80 TitleOfRange(8) ! 8 = maximum number of ranges in a STOE file
 
 ! Current status, initialise to 'error'
       Load_raw_File = 0
@@ -54,8 +55,31 @@
 ! "RAW1" = Bruker version 3. The most recent version.
       SELECT CASE (C4(4:4))
         CASE ('_')
-! irange is the data range to be read. For now, irange = 1
-          irange = 1  
+! STOE files can contain multiple data ranges, up to a maximum of eight.
+! Scan the file, get the number of data ranges and their titles.
+          CALL GetDataRangesSTOE(TheFileName,tNumOfRanges,TitleOfRange)
+          IF (tNumOfRanges .EQ. 0) THEN
+            CALL ErrorMessage('File contains no data.')
+            RETURN
+          ENDIF
+          IF (tNumOfRanges .EQ. 1) THEN
+            irange = 1
+          ELSE
+            CALL PushActiveWindowID
+            CALL WDialogLoad(IDD_DataRangeSTOE)
+            CALL WDialogSelect(IDD_DataRangeSTOE)
+! For debugging
+  !          TitleOfRange(1) = 'Test entry nr. 1'
+  !          TitleOfRange(2) = 'Test entry nr. 2'
+  !          TitleOfRange(3) = 'Test entry nr. 3'
+  !          tNumOfRanges = 3
+            CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,1)
+            CALL WDialogShow(-1,-1,IDOK,Modal)
+            CALL WDialogGetMenu(IDF_DataRangeMenu,irange)
+! irange is the data range to be read.
+            CALL WDialogUnload(IDD_DataRangeSTOE)
+            CALL PushActiveWindowID
+          ENDIF
           Load_raw_File = Load_rawSTOE_File(TheFileName,irange)
           IF (Load_raw_File .NE. 1) RETURN
         CASE (' ','1','2')
@@ -73,6 +97,182 @@
       CLOSE(10)
 
       END FUNCTION Load_raw_File
+!
+!*****************************************************************************
+!
+      SUBROUTINE GetDataRangesSTOE(TheFileName,tNumOfRanges,TitleOfRange)
+!
+! This function tries to interpret the data ranges in a *.raw file (binary format from STOE machines).
+!
+! See Load_rawSTOE_File for comments
+!
+! JvdS Oct 2001
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : tNumOfRanges = the number of valid data ranges (i.e. includin those with e.g. zero data points)
+!           TitleOfRange = some sort of identifier for that range
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+! Prevent the compiler from realigning the records
+!DEC$ OPTIONS /ALIGN=RECORDS=PACKED
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      INTEGER,       INTENT (  OUT) :: tNumOfRanges
+      CHARACTER*80,  INTENT (  OUT) :: TitleOfRange(8)
+
+! ------------------------------------------------
+! MAX_RANGE : maximum number of ranges in one file
+! ------------------------------------------------
+
+      INTEGER    MAX_RANGE
+      PARAMETER (MAX_RANGE = 8)
+
+! -----------------------------------------------------------
+! Raw Data Header
+! -----------------------------------------------------------
+
+      TYPE RAW_HEADER
+        CHARACTER*8    Ident       ! file ID & version = RAW_REVN
+        CHARACTER*8    ProgName    ! name of creating program
+        CHARACTER*16   FileDate    ! creation date : "dd-mon-yy hh:mm"
+        CHARACTER*80   Title       ! title
+        CHARACTER*192  UserText    ! comment
+        INTEGER*2      DifrType    ! diffractometer type
+        INTEGER*2      AngResol    ! angular resolution ( steps/degree )
+        INTEGER*2      Monochrm    ! monochromator
+        INTEGER*2      Anode       ! anode material
+        INTEGER*2      Detector    ! type of detector used
+        INTEGER*2      M_Dist      ! distance monochromator to tube [mm]
+        INTEGER*2      C_Dist      ! distance sample to counter
+        INTEGER*2      Tube_kV     ! generator setting ( kV )
+        INTEGER*2      Tube_mA     ! generator setting ( mA )
+        REAL*4         Wavelen1    ! wavelength ( alpha1 )
+        REAL*4         Wavelen2    ! wavelength ( alpha2 )
+        REAL*4         DMono       ! d* of monochromator reflection
+        INTEGER*2      PSDaddr(4)  ! first & last PSD addresses
+        REAL*4         PSDstep(2)  ! PSD stepwidths
+        REAL*4         CapDiam     ! diameter of capillary
+        REAL*4         SamTrans    ! transmission factor of the sample
+        INTEGER*2      ScanMode    ! scan mode ( Transm. / Refl. / Capillary )
+        INTEGER*2      ScanType    ! scan type ( 2th:omg / 2th / omg / free )
+        INTEGER*2      PsdMode     ! PSD   mode ( stationary / moving )
+        INTEGER*2      OmgMode     ! omega mode ( fixed / moving )
+        INTEGER*2      ScanUse     ! scan usage
+        INTEGER*2      Nadd        ! number of points to add ( PSD only )
+        INTEGER*2      Correct     ! raw data correction(s) applied
+        INTEGER*2      SeqNum(2)   ! sample number .. of .., when used with
+                                   ! sample changer or other serial measurement
+        INTEGER*2      NRange      ! number of ranges to be measured
+        INTEGER*2      NR_done     ! number of ranges actually measured
+        INTEGER*2      NR_curr     ! number of range currently being measured,
+                                   ! used as 'measurement in progress' flag
+        INTEGER*2      NSample     ! number of samples
+        REAL*4         VarOmg(3)   ! Omega( begin, end, step ) for 'VAROMG'
+        REAL*4         SPos1(3)    ! SPos1( begin, end, step ) for 'SPOS'
+        REAL*4         SPos2(3)    ! SPos2( begin, end, step ) for 'SPOS'
+        INTEGER*2      FileNum     ! first file number for serial measurement
+        INTEGER*2      NFiles      ! number of files
+        INTEGER*2      SameTR      ! Multi-Sample : same title/ranges for all samples ?
+        INTEGER*2      TWait       !                waiting time [min]
+        INTEGER*2      IFree(6)    ! free space left
+        CHARACTER*16   ModDate     ! date of last modification
+        CHARACTER*6    ModProg     ! name of modifying program
+        INTEGER*2      ModSave     ! not used
+        INTEGER*2      PsdSave     ! not used
+        INTEGER*4      NTotal      ! total number of data points in the file
+        INTEGER*2      DataType    ! type of data in the file
+        INTEGER*2      History     ! bit mask showing data modification
+                                   ! for all ranges in the file
+        INTEGER*2      NDatRec     ! Number of data records
+        INTEGER*2      LastRec     ! Total file size in records
+        INTEGER*2      NExtra      ! additional records
+        INTEGER*2      HeadRec(1:MAX_RANGE) ! Record numbers of range headers ( start at 1 )
+        INTEGER*2      DataRec(1:MAX_RANGE) ! Number of data records for each range
+      END TYPE ! 512 bytes
+
+! -------------------------------------------------------
+! Range header ( for every scan range actually measured )
+! -------------------------------------------------------
+
+! background data
+      TYPE OLDBGSTUFF
+        INTEGER*2 BG_Pos(64)
+        INTEGER*4 BG_Int(64)
+      END TYPE
+
+      TYPE RANGE_INFO
+        CHARACTER*16 StartTime ! start of CD ( date and time )
+        CHARACTER*16 EndTime   ! end   of CD
+        INTEGER*2    Status    ! completion status
+        INTEGER*2    NPoints   ! number of data points measured
+        INTEGER*2    NBackgr   ! number of BG points
+        INTEGER*2    DataForm  ! data format : long / short
+        REAL*4       CntFactor ! scaling factor ( since RAW_1.05 )
+        REAL*4       Begin(2)  ! range begin ( 2theta / omega )
+        REAL*4       End(2)    ! range end
+        REAL*4       Step(2)   ! stepwidths
+        REAL*4       StepTime  ! measuring time per step
+        REAL*4       Omega     ! omega position for 'VAROMG'
+        REAL*4       SamPos1   ! sample position 1
+        REAL*4       SamPos2   ! sample position 2
+        REAL*4       T_Avg     ! average temperature of sample
+        REAL*4       T_Var     ! temperature variation
+        REAL*4       BeamInt   ! primary beam intensity ( for QUANT )
+        REAL*4       BeamVar   ! primary beam variation
+        REAL*4       DivSlBeg  ! Divergence slit width at scan begin
+        REAL*4       DivSlEnd  ! Divergence slit width at scan end
+        REAL*4       RecSlit   ! Receiving slit width ( constant )
+        REAL*4       SamArea   ! const. Sample area ( > 0 : variable div.slit )
+        INTEGER*2    NSamPos   ! number of values used with 'SAMPOS'
+        INTEGER*2    History   ! bit mask showing data modifications
+        INTEGER*4    MinCount  ! minimum count
+        INTEGER*4    MaxCount  ! maximum count
+        TYPE(OLDBGSTUFF) BACKGROUND ! We don't need the background stuff
+      END TYPE ! 512 bytes
+
+      TYPE(RAW_HEADER) Header
+      TYPE(RANGE_INFO) RangeInfo
+
+      INTEGER FLEN, tFileHandle
+      CHARACTER*128 tString
+      INTEGER RangeNr, NumberOfRanges
+!DEC$ END OPTIONS
+
+      tNumOfRanges = 0
+      FLEN = LEN_TRIM(TheFileName)
+! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 128 (=512 bytes)
+      tFileHandle = 11
+      OPEN(UNIT=tFileHandle,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=128,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      READ(UNIT=tFileHandle,REC=1,ERR=999) Header
+      IF (Header%NTotal .EQ. 0) THEN
+        CALL ErrorMessage('File contains no data.')
+        GOTO 999
+      ENDIF
+      NumberOfRanges = Header%NR_done
+      IF (NumberOfRanges .GT. MAX_RANGE) THEN
+        CALL DebugErrorMessage('NumberOfRanges .GT. MAX_RANGE in GetDataRangesSTOE')
+        NumberOfRanges = MAX_RANGE
+      ENDIF
+      DO RangeNr = 1, NumberOfRanges
+! Read the header for this range
+        READ(UNIT=tFileHandle,REC=Header%HeadRec(RangeNr),ERR=999) RangeInfo
+        IF (RangeInfo%NPoints .NE. 0) THEN
+          tNumOfRanges = tNumOfRanges + 1
+          tString = ' '
+          WRITE(tString(1:80),'(A9,I1,A12,F7.3,A3,F7.3,A7,F6.2)') &
+ 'Range nr ',tNumOfRanges,', 2 theta = ',RangeInfo%Begin(1),' - ',RangeInfo%End(1),' <T> = ',RangeInfo%T_Avg
+          TitleOfRange(tNumOfRanges)(1:80) = tString(1:80)
+        ENDIF
+      ENDDO
+ 999  CLOSE(tFileHandle)
+! Exit code is error by default, so we can simply return
+
+      END SUBROUTINE GetDataRangesSTOE
 !
 !*****************************************************************************
 !
@@ -445,14 +645,14 @@
 ! -------------------------------------------------------
 
 ! background data
-      TYPE tagOLDBGSTUFF
+      TYPE OLDBGSTUFF
         INTEGER*2 BG_Pos(64)
         INTEGER*4 BG_Int(64)
       END TYPE
 
 ! with version 1.05 the number of background points were
 ! decrease to get room for some enhancements
-      TYPE tagNEWBGSTUFF
+      TYPE NEWBGSTUFF
         INTEGER*2 BG_Pos(60)
         REAL*4    BG_Smooth
         REAL*4    BG_Factor
@@ -487,36 +687,34 @@
         INTEGER*2    History   ! bit mask showing data modifications
         INTEGER*4    MinCount  ! minimum count
         INTEGER*4    MaxCount  ! maximum count
-!O      union BACKGROUND
+!O      union BACKGROUND   ! union = EQUIVALENCE
 !O      {
-!O         tagOLDBGSTUFF background_old ! version 1.05 and below
-!O         tagNEWBGSTUFF background_new ! version 1.06
+!O         OLDBGSTUFF background_old ! version 1.05 and below
+!O         NEWBGSTUFF background_new ! version 1.06
 !O      }
-        TYPE(tagNEWBGSTUFF) BACKGROUND ! We don't need the background stuff
+        TYPE(NEWBGSTUFF) BACKGROUND ! We don't need the background stuff
       END TYPE ! 512 bytes
 
       TYPE(RAW_HEADER) Header
+      TYPE(RANGE_INFO) RangeInfo
 
       INTEGER    RAW_BLOCKSIZE
       PARAMETER (RAW_BLOCKSIZE = 512)
 
       INTEGER*2 work_I2(RAW_BLOCKSIZE/2)
       INTEGER*4 work_I4(RAW_BLOCKSIZE/4)
-
       EQUIVALENCE(work_I2(1),work_I4(1))
-      REAL*4 factor
-      TYPE(RANGE_INFO) RangeInfo
-      INTEGER nblk, RecNr, k, j, n
 
-      INTEGER     I, FLEN, tFileHandle
-      REAL        CurrTwoTheta, Lambda1
+      REAL*4  factor
+      INTEGER nblk, RecNr, k, j, n
+      INTEGER I, FLEN, tFileHandle
+      REAL    CurrTwoTheta, Lambda1
 !DEC$ END OPTIONS
 
 ! Current status, initialise to 'error'
       Load_rawSTOE_File = 0
       FLEN = LEN_TRIM(TheFileName)
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 128 (=512 bytes)
-      I = SIZEOF(Header)
       tFileHandle = 11
       OPEN(UNIT=tFileHandle,FILE=TheFileName(1:FLEN),ACCESS='DIRECT',RECL=128,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
       READ(UNIT=tFileHandle,REC=1,ERR=999) Header
@@ -557,7 +755,6 @@
         ENDIF
         k = k + nblk
       ENDDO
-      CLOSE(tFileHandle)
       Lambda1 = Header%Wavelen1
       CALL UpdateWavelength(Lambda1)
       NOBS = j
@@ -568,10 +765,8 @@
         CurrTwoTheta = CurrTwoTheta + RangeInfo%Step(1)
       ENDDO
       Load_rawSTOE_File = 1
-      RETURN
- 999  CONTINUE
+ 999  CLOSE(tFileHandle)
 ! Exit code is error by default, so we can simply return
-      CLOSE(tFileHandle)
 
       END FUNCTION Load_rawSTOE_File
 !
@@ -664,6 +859,11 @@
 ! @ Now there should be a loop over the number of data ranges
           DO CurrDataRange = 1, NumOfDataRanges
 ! @ If there's more than one data range, they must be summed. Weights should probably be applied?
+! ################################################################################################
+! NOTE THAT MULTIPLE SELECTION MENUS ARE POSSIBLE IN WINTERACTER: THAT'S WHAT WE SHOULD USE
+! TO SELECT THE DATA RANGES WE WANT TO SUM.
+! ################################################################################################
+!
 ! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 ! Length of Range Header Structure in bytes. Must be 304.
             READ(UNIT=10,REC=Offset+1,ERR=999) I4
