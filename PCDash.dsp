@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /compile_only /include:"Release/" /nologo /warn:nofileopt /winapp
-# ADD F90 /alignment:commons /assume:buffered_io /assume:noaccuracy_sensitive /compile_only /include:"Release/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /inline:speed /math_library:fast /nologo /optimize:5 /warn:nofileopt
+# ADD F90 /alignment:commons /assume:buffered_io /assume:noaccuracy_sensitive /compile_only /include:"Release/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /warn:nofileopt
 # SUBTRACT F90 /browser /fltconsistency /fpp /winapp /fast
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
 # ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /c
@@ -57,7 +57,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 version.lib kernel32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 winter.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /map /machine:I386 /out:"Debug\gDASH.exe" /libpath:"c:\wint\lib.vf"
+# ADD LINK32 winter.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /map /machine:I386 /out:"Debug\lDASH.exe" /libpath:"c:\wint\lib.vf"
 # SUBTRACT LINK32 /profile
 
 !ELSEIF  "$(CFG)" == "PCDash - Win32 Debug"
@@ -850,6 +850,16 @@ SOURCE=.\SAMVAR.f90
 # Begin Source File
 
 SOURCE=.\SGDecode.f90
+# End Source File
+# Begin Source File
+
+SOURCE=.\Similarity.f90
+DEP_F90_SIMIL=\
+	".\params.inc"\
+	".\Release\DRUID_HEADER.mod"\
+	".\Release\REFVAR.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
 # End Source File
 # Begin Source File
 
