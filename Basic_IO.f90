@@ -53,7 +53,7 @@
       
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
-      RETURN
+      !RETURN
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Debug Error")
 
       END SUBROUTINE DebugErrorMessage
@@ -350,6 +350,9 @@
           GOTO 10
         CASE (IDD_zmEdit)
           CALL DealWithEditZMatrixWindow
+          GOTO 10
+        CASE (IDD_zmEditRotations)
+          CALL DealWithEditZMatrixRotationsWindow
           GOTO 10
         CASE (IDD_SAW_Page2)
           CALL DealWithWizardWindowAdditionalSAParams
