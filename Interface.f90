@@ -18,6 +18,32 @@
 !
 !*****************************************************************************
 !
+        SUBROUTINE WDialogFieldStateLogical(TheFieldIdentifier, TheLogical)
+!
+! This subroutine provides a wrapper around the Winteracter WDialogFieldState routine,
+! which takes an integer as an argument to define the state of a field.
+! It is more natural to have a routine that takes a logical as an argument
+! to define the state of a field.
+! This is that routine.
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheFieldIdentifier
+      LOGICAL, INTENT (IN   ) :: TheLogical
+
+      IF (TheLogical) THEN
+        CALL WDialogFieldState(TheFieldIdentifier,Enabled)
+      ELSE
+        CALL WDialogFieldState(TheFieldIdentifier,Disabled)
+      ENDIF
+
+      END SUBROUTINE WDialogFieldStateLogical
+!
+!*****************************************************************************
+!
         SUBROUTINE WDialogPutCheckBoxLogical(TheFieldIdentifier, TheLogical)
 !
 ! This subroutine provides a wrapper around the Winteracter WDialogPutCheckBox routine,
@@ -1026,10 +1052,10 @@
           DifMinSq = DifMin**2
           ArgBot = 0.5/(SigmDif**2+AllPkPosEsd(IOrd)**2)
           DO IR = IRef1, IRef2
-            ArgTop=(AllPkPosVal(IOrd)-ARGK(IR))**2
-            ProbAdd=EXP(-ArgTop*ArgBot)
+            ArgTop = (AllPkPosVal(IOrd)-ARGK(IR))**2
+            ProbAdd = EXP(-ArgTop*ArgBot)
             IF (ABS(ArgTop-DifMinSq).LT.1.e-10) THEN
-              ProbTop=ProbTop+ProbAdd
+              ProbTop = ProbTop + ProbAdd
             ENDIF
             ProbTot = ProbTot + ProbAdd
           ENDDO
@@ -1179,13 +1205,8 @@
 ! This is in the cell parameters tab, in the wizard, and in the peak positions tab.
       CALL Upload_Cell_Constants()
       CALL WDialogSelect(IDD_PW_Page1)
-      IF (FnUnitCellOK()) THEN
-! Enable the wizard next button
-        CALL WDialogFieldState(IDNEXT,Enabled)
-      ELSE
-! Disable the wizard next button
-        CALL WDialogFieldState(IDNEXT,Disabled)
-      ENDIF
+! Enable/disable the wizard next button
+      CALL WDialogFieldStateLogical(IDNEXT,FnUnitCellOK())
       CALL Generate_TicMarks
       CALL PopActiveWindowID
 
