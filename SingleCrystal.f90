@@ -42,31 +42,31 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_a_latt)
-              CALL WDialogGetReal(IDF_a_latt,CellPar(1))
+              CALL WDialogGetReal(IDF_a_latt, CellPar(1))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_b_latt)
-              CALL WDialogGetReal(IDF_b_latt,CellPar(2))
+              CALL WDialogGetReal(IDF_b_latt, CellPar(2))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_c_latt)
-              CALL WDialogGetReal(IDF_c_latt,CellPar(3))
+              CALL WDialogGetReal(IDF_c_latt, CellPar(3))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_alp_latt)
-              CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
+              CALL WDialogGetReal(IDF_alp_latt, CellPar(4))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_bet_latt)
-              CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
+              CALL WDialogGetReal(IDF_bet_latt, CellPar(5))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_gam_latt)
-              CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
+              CALL WDialogGetReal(IDF_gam_latt, CellPar(6))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_Crystal_System_Menu)
-              CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
+              CALL WDialogGetMenu(IDF_Crystal_System_Menu, LatBrav)
               CALL Upload_CrystalSystem
               CALL Generate_TicMarks
             CASE (IDF_Space_Group_Menu)
@@ -294,8 +294,8 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
-      CHARACTER*150 LINE
-      INTEGER NKKOR(MCHIHS)
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
       INTEGER         KKOR
       REAL                  WTIJ
@@ -327,24 +327,29 @@
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
       INTEGER ISIG5, IArgKK
-      INTEGER KXIMIN(MOBS), KXIMAX(MOBS), IXKMIN(MFCSTO), IXKMAX(MFCSTO)
+      INTEGER KXIMIN(MOBS), KXIMAX(MOBS)
       INTEGER KK, I, NLIN, iR, J, K, hFile
       INTEGER KTEM, K1, K2
-      REAL    ARGIMIN, ARGIMAX, ARGISTP, SIGMA, ADSIG, ARGT
+      REAL    ARGIMIN, ARGIMAX, ARGISTP, ARGT, FWHM, C0, Gaussian, Lorentzian
+      CHARACTER*150 LINE
 
       HKLFFileLoad = 1
       hFile = 121
-      OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
+      OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=998)
       KK = 0
       DO iR = 1, MFCSTO
-        READ(hFile,'(Q,A)',END=100,ERR=999) NLIN, LINE
+        READ(hFile,'(Q,A)',END=100,ERR=998) NLIN, LINE
 !C SHELX .hkl files are terminated by a line containing h = k = l = 0
-        READ(LINE(1:NLIN),*,END=999,ERR=999) (jHKL(I,iR),I=1,3)
-        IF ((jHKL(1,iR) .EQ. 0) .AND. &
-            (jHKL(2,iR) .EQ. 0) .AND. &
-            (jHKL(3,iR) .EQ. 0)) GOTO 100
+        READ(LINE(1:NLIN),*,END=998,ERR=998) (jHKL(I,iR),I=1,3)
+        IF (((jHKL(1,iR) .EQ.  0) .AND. &
+             (jHKL(2,iR) .EQ.  0) .AND. &
+             (jHKL(3,iR) .EQ.  0)) .OR. &
+            ((jHKL(1,iR) .EQ. 99) .AND. &
+             (jHKL(2,iR) .EQ. 99) .AND. &
+             (jHKL(3,iR) .EQ. 99)))     &
+             GOTO 100
 !C No cross correlation ...
-        READ(LINE(1:NLIN),*,END=999,ERR=999) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
+        READ(LINE(1:NLIN),*,END=998,ERR=998) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
 !C F2 and sig(F2)
         WTJ(iR) = 1.0 / WTJ(iR)
         KK = iR
@@ -353,14 +358,11 @@
 !C We've got the lattice constants, symmetry etc. already.
 !C Let's order the reflections in increasing 2 theta and fill the array ArgKK
       CALL OrderReflections
-
       DO iR = 1, NumOfRef
         IKKOR(iR) = iR
         JKKOR(iR) = iR
-        NKKOR(iR) = 100
       ENDDO
       KKOR = NumOfRef
-
       DO iR = 1, NumOfRef
 !C No correlation, so II .EQ. JJ by definition.
         WTIJ(iR) = WTI(iR) * WTI(iR)
@@ -370,18 +372,16 @@
       NBIN = 5000
       ARGIMIN = RefArgK(1)-1.0
       ARGIMAX = RefArgK(NumOfRef)+1.0
-      ARGISTP = (ARGIMAX-ARGIMIN)/FLOAT(NBIN)
-      SIGMA = 3.0 * ARGISTP
-      ADSIG = 0.39894/SIGMA
-      ISIG5 = 15
+      ARGISTP = (ARGIMAX-ARGIMIN)/FLOAT(NBIN-1)
+      FWHM = 6.0 * ARGISTP
+      C0 = 4.0 * LOG(2.0)
+      ISIG5 = 30
       DO I = 1, NBIN
         KXIMIN(I) = 0
       ENDDO
       DO K = 1, NumOfRef
-        IArgKK = 1 + (RefArgK(K)-ARGIMIN)/ARGISTP
-        IXKMIN(K) = IArgKK - ISIG5
-        IXKMAX(K) = IArgKK + ISIG5
-        DO I = IXKMIN(K), IXKMAX(K)
+        IArgKK = 1 + NINT((RefArgK(K)-ARGIMIN)/ARGISTP)
+        DO I = MAX(1, IArgKK-ISIG5), MIN(5000, IArgKK+ISIG5)
           IF (KXIMIN(I) .EQ. 0) KXIMIN(I) = K
           KXIMAX(I) = K
         ENDDO
@@ -401,13 +401,16 @@
         ELSE
           NFITA = NFITA + 1
           IFITA(NFITA) = I
-          KREFT(I) = 1 + KXIMAX(I) - KXIMIN(I)
+          KREFT(I) = MIN(50, 1 + KXIMAX(I) - KXIMIN(I))
           J = 0
           DO K = KXIMIN(I), KXIMAX(I)
-            ARGT = (XBIN(I)-RefArgK(K)) / SIGMA
+            ARGT = (XBIN(I)-RefArgK(K)) / (FWHM)
             J = J + 1
             KNIPT(J,I) = K
-            PIKVAL(J,I) = ADSIG * EXP(-0.5*ARGT*ARGT)
+            Gaussian = (SQRT(C0)/(FWHM*SQRT(PI))) * EXP(-C0*(ARGT**2))
+        !    Lorentzian = (2.0/(PI*FWHM)) * (1.0/(1.0+(4.0*(ARGT**2))))
+            ! Now use a pseudo-Voigt
+            PIKVAL(J,I) =  Gaussian !0.125*Lorentzian + 0.875*Gaussian
             YOBIN(I) = YOBIN(I) + AIOBS(K)*PIKVAL(J,I)
           ENDDO
           EBIN(I) = MAX(1.0, 0.1*ABS(YOBIN(I)))
@@ -449,6 +452,9 @@
       IPTYPE = 1
       CALL Profile_Plot
       HKLFFileLoad = 0
+      RETURN
+  998 CLOSE(hFile)
+      CALL ErrorMessage("Error opening .hklf file.")
       RETURN
   999 CLOSE(hFile)
       CALL ErrorMessage("Error writing .pik/.hcv file.")
