@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 08/Nov/2001 09:56:14
+// Modified : 08/Nov/2001 10:38:09
 //
 ///////////////////////////////////////////////////
 //
@@ -438,7 +438,6 @@
 #define IDB_ConvertT2R                   1098
 #define IDB_ConvertR2T                   1099
 #define IDD_XYE                           130
-#define IDF_wavelength                   1100
 #define IDF_RunDICVOL                    1101
 #define IDF_Indexing_CellRange2          1338
 #define IDF_Indexing_MinLen2             1348
@@ -2282,7 +2281,7 @@ CAPTION "Add wavelength to .xye"
 BEGIN
     CONTROL "or alternatively, the anode (if laboratory data) :",IDF_PW_radiation_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   38,   92,  142,   10
     CONTROL "",IDF_Wavelength_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  183,   90,   60,   64
-    CONTROL "1.5406",IDF_wavelength,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  183,   69,   40,   14
+    CONTROL "1.5406",IDF_wavelength1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  183,   69,   40,   14
     CONTROL "Please enter the experimental wavelength with which this powder diffraction pattern was recorded. This wavelength will then be written to the first line of the .xye file and read in whenever this file is opened.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   20,   36,  246,   26
     CONTROL "For ease of use, DASH now interprets a single number on the first line of an .xye file as a wavelength. The file you are trying to load does not contain a wavelength yet.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   20,   10,  246,   18
     CONTROL "Å",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  224,   71,    8,    8
@@ -2304,7 +2303,7 @@ BEGIN
 "Fe Ka1 \n"
 "[Tabs] \n"
 "[Ranges] \n"
-" 1100     0.10000E-002      20.000      \n"
+" 1039     0.10000E-002      20.000      \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
