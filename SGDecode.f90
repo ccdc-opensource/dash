@@ -19,7 +19,7 @@
 !	data latvec/ 6,0,0, 0,6,0, 0,0,6, 6,6,6, 6,6,0, 6,0,6, 8,4,4/
 !	the above latvec is all wrong, but the one below only works
 !	for A,B,C and I centering
-      DATA latvec/0, 6, 6, 6, 0, 6, 6, 6, 0, 6, 6, 6, 8, 4, 4, 4, 8, 8, 0, 0, 0/
+      DATA latvec/0,6,6, 6,0,6, 6,6,0, 6,6,6, 8,4,4, 4,8,8, 0,0,0/
       PARAMETER (msymmin=10)
       CHARACTER*20 symline
       COMMON /symgencmn/ nsymmin, symmin(4,4,msymmin), symline(msymmin)
