@@ -91,5 +91,4 @@
           AFCAL = AFCAL - term4*fob(n,ir)
         ENDDO
       ENDIF
-!      write(76,*) ih,ik,il,afcal
       FFCALC_365 = AFCAL*AFCAL

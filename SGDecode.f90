@@ -36,34 +36,6 @@
         ENDIF
       ENDDO
       idol(nele) = Ns + 1
-!
-!... (2) Crystal system
-!
-!
-!	SELECT CASE (SGsymb(2:2))
-!	  CASE('A')
-!          write(76,*) ' Triclinic Bravais lattice'
-!	  CASE('M')
-!          write(76,*) ' Monoclinic Bravais lattice'
-!	  CASE('O')
-!          write(76,*) ' Orthorhombic Bravais lattice'
-!	  CASE('T')
-!          write(76,*) ' Tetragonal Bravais lattice'
-!	  CASE('R')
-!          write(76,*) ' Rhombohedral Bravais lattice'
-!	  CASE('H')
-!          write(76,*) ' Hexagonal/Trigonal Bravais lattice'
-!	  CASE('C')
-!          write(76,*) ' Cubic Bravais lattice'
-!	END SELECT
-!... (3) Centre of symmetry at origin or not
-!	SELECT CASE (SGsymb(3:3))
-!	  CASE('C')
-!          write(76,*) ' Centrosymmetric'
-!	  CASE('N')
-!          write(76,*) ' Non-centrosymmetric'
-!	END SELECT
-!
 !... Let's decode the first part to do with lattice translations etc.
 !... It should always be 3 letters long
 !... (1) Lattice type
@@ -88,11 +60,6 @@
         DO i = 1, 3
           alat(i,isym) = float(latvec(i,ilatar))/12.
         ENDDO
-!	  write(76,*) ' '
-!	  write(76,*) ' Lattice operation ',Isym
-!        do i=1,3
-!	    write(76,1500) (matsym(j,i,1),j=1,3),alat(i,isym)
-!	  end do
       ELSEIF (Isym.EQ.3) THEN
         DO j = 1, 3
           DO i = 1, 3
@@ -105,20 +72,6 @@
             alat(i,j) = float(latvec(i,j+4))/12.
           ENDDO
         ENDDO
-!	  write(76,*) ' '
-!	  write(76,*) ' Lattice operation ',Isym1
-!        do i=1,3
-!	    write(76,1500) (matsym(j,i,1),j=1,3),alat(i,isym1)
-!	  end do
-!	  ilatar=ilatar+1
-!	  do i=1,3
-!	    alat(i,isym)=float(latvec(i,ilatar))/12.
-!	  end do
-!	  write(76,*) ' '
-!	  write(76,*) ' Lattice operation ',Isym
-!        do i=1,3
-!	    write(76,1500) (matsym(j,i,1),j=1,3),alat(i,isym)
-!	  end do
       ENDIF
 !
       nlat = isym
@@ -188,12 +141,6 @@
           Tran(i,isym) = float(Num12th)/12.
           IF (Num12th.EQ.5) Tran(i,isym) = 2.*Tran(i,isym)
         ENDDO
-!	 write(76,*) ' '
-!	 write(76,*) ' Operator number   ',Isym
-!       do i=1,3
-!	   write(76,1500) (nint(rotmat(i,j,isym)),j=1,3),tran(i,isym)
-! 1500	   format(5x,3i4,f9.5)
-!	 end do
       ENDDO
 !
 !.. Now make the Jones faithful representation
@@ -210,12 +157,7 @@
           symmin(4,j,js) = 0.
         ENDDO
         symmin(4,4,js) = 1.
-!	do i=1,4
-!	 write(76,3900) (nint(symmin(i,j,js)),j=1,3),symmin(i,4,js)
-! 3900	 format(10x,3i5,f10.5)
-!	end do
         CALL M2S_SYMCON(symmin(1,1,js),stout,lstout)
-!	  write (76,4000) js,stout(:20)
  4000   FORMAT (i5,5x,a)
         symline(js) = stout(:20)
       ENDDO
