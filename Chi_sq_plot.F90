@@ -16,13 +16,12 @@
       DATA  ChiHandle / 1 /
       REAL                    chi_sqd
       INTEGER                                           it_count
-      REAL                                                        y_max
+      REAL                                                        chi_y_max
       INTEGER                                                            MaxIterationSoFar
-      REAL                    x_max, x_min, y_min
+      REAL                    chi_x_max, chi_x_min, chi_y_min
       LOGICAL                                      Zoomed
-      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar, &
-                              x_max, x_min, y_min, Zoomed
-
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, chi_y_max, MaxIterationSoFar, &
+                              chi_x_max, chi_x_min, chi_y_min, Zoomed
 ! Variables used to specify Child Window position
       INTEGER Ix, Iy
       COMMON /WindowPosition/ Ix, Iy
@@ -73,12 +72,12 @@
 
       REAL                    chi_sqd
       INTEGER                                           it_count
-      REAL                                                        y_max
+      REAL                                                        chi_y_max
       INTEGER                                                            MaxIterationSoFar
-      REAL                    x_max, x_min, y_min
+      REAL                    chi_x_max, chi_x_min, chi_y_min
       LOGICAL                                      Zoomed
-      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar, &
-                              x_max, x_min, y_min, Zoomed
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, chi_y_max, MaxIterationSoFar, &
+                              chi_x_max, chi_x_min, chi_y_min, Zoomed
 
       INTEGER  J
 
@@ -130,12 +129,12 @@
 !!>>>>>>> 1.28
       REAL                    chi_sqd
       INTEGER                                           it_count
-      REAL                                                        y_max
+      REAL                                                        chi_y_max
       INTEGER                                                            MaxIterationSoFar
-      REAL                    x_max, x_min, y_min
-      LOGICAL                                      zoomed
-      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar, &
-                              x_max, x_min, y_min, zoomed
+      REAL                    chi_x_max, chi_x_min, chi_y_min
+      LOGICAL                                      Zoomed
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, chi_y_max, MaxIterationSoFar, &
+                              chi_x_max, chi_x_min, chi_y_min, Zoomed
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                                    ChiMult
@@ -160,12 +159,13 @@
       ENDDO
 
       IF (.NOT. Zoomed) THEN
-        x_max = MaxIterationSoFar * FLOAT(nmpert)
-        x_min = FLOAT(nmpert)
-        y_min = 0.0
-        y_max = chi_sqd(1, Curr_SA_Run)*1.25
+        chi_x_max = MaxIterationSoFar * FLOAT(nmpert)
+        chi_x_min = FLOAT(nmpert)
+        chi_y_min = 0.0
+        chi_y_max = chi_sqd(1, Curr_SA_Run)*1.25
       END IF
-!  If zoomed, values for x_min etc taken from ChiSqdPlotData Common Block.
+!  If zoomed, values for x_min etc taken from ChiSqdPlotData Common Block - max and min
+!  values determined by mouse.
 !
 !  Start new presentation graphics plot
 !
@@ -182,8 +182,8 @@
 !
 !  Set units for plot
 !
-      CALL IPgUnits(  x_min,      y_min,   &
-                      x_max,      y_max)
+      CALL IPgUnits(  chi_x_min,      chi_y_min,   &
+                      chi_x_max,      chi_y_max)
 !
 !  Set presentation graphics area
 !
@@ -269,17 +269,16 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INTEGER Ihandle
       INTEGER                    ChiSqdChildWindows,                 ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
       REAL                    chi_sqd
       INTEGER                                           it_count
-      REAL                                                        y_max
+      REAL                                                        chi_y_max
       INTEGER                                                            MaxIterationSoFar
-      REAL                    x_max, x_min, y_min
-      LOGICAL                                      zoomed
-      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar, &
-                              x_max, x_min, y_min, zoomed
+      REAL                    chi_x_max, chi_x_min, chi_y_min
+      LOGICAL                                      Zoomed
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, chi_y_max, MaxIterationSoFar, &
+                              chi_x_max, chi_x_min, chi_y_min, Zoomed
 
       SELECT CASE (EventType)
 ! will close the profile plot window
@@ -294,8 +293,7 @@
         CASE (MouseButDown)
           IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
             CALL Plotting_Chi_Sqd(EventInfo%win)
-            Ihandle = EventInfo%win
-            CALL ZoomChiSqdPlot(Ihandle)
+            CALL ZoomChiSqdPlot(EventInfo%win)
            ENDIF
 !
         CASE (KeyDown) ! home key resets the plot to original axes
@@ -360,12 +358,12 @@
 
       REAL                    chi_sqd
       INTEGER                                           it_count
-      REAL                                                        y_max
+      REAL                                                        chi_y_max
       INTEGER                                                            MaxIterationSoFar
-      REAL                    x_max, x_min, y_min
-      LOGICAL                                      zoomed
-      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar, &
-                              x_max, x_min, y_min, zoomed
+      REAL                    chi_x_max, chi_x_min, chi_y_min
+      LOGICAL                                      Zoomed
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, chi_y_max, MaxIterationSoFar, &
+                              chi_x_max, chi_x_min, chi_y_min, Zoomed
 
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
       REAL xgcurold, ygcurold
@@ -379,7 +377,7 @@
 ! JCC Set the scale correctly. 
       CALL IGrUnits(0.0, 0.0, 1.0, 1.0)
       CALL IPgArea(0.2,0.3,0.9,0.9)
-      CALL IPgUnits(x_min,y_min,x_max,y_max)
+      CALL IPgUnits(chi_x_min, chi_y_min, chi_x_max, chi_y_max)
       xgcur(1) = EventInfo%GX
       ygcur(1) = EventInfo%GY
       CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
@@ -393,7 +391,7 @@
            CALL WindowSelect(Ihandle)
            CALL IGrUnits(0.0,0.0,1.0,1.0)
            CALL IPgArea(0.2,0.3,0.9,0.9)
-           CALL IPgUnits(x_min,y_min,x_max,y_max)
+           CALL IPgUnits(chi_x_min, chi_y_min, chi_x_max, chi_y_max)
            CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
 
            SELECT CASE (EventType)
@@ -424,12 +422,12 @@
                 CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
                 CALL IGrPlotMode('Normal')
                 CALL IGrColourN(InfoGrScreen(PrevColReq))
-                IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(x_max-X_min)) RETURN
-                IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(Y_max-Y_min)) RETURN
-                X_Min = MIN(XCUR(1),XCUR(2))
-                X_Max = MAX(XCUR(1),XCUR(2))  
-                Y_Min = MIN(YCUR(1),YCUR(2))
-                Y_Max = MAX(YCUR(1),YCUR(2))
+                IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(chi_x_max - chi_x_min)) RETURN
+                IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(chi_y_max - chi_y_min)) RETURN
+                chi_x_min = MIN(XCUR(1),XCUR(2))
+                chi_x_max = MAX(XCUR(1),XCUR(2))  
+                chi_y_min = MIN(YCUR(1),YCUR(2))
+                chi_y_max = MAX(YCUR(1),YCUR(2))
               ENDIF
               CALL WindowClear()
               Zoomed = .TRUE.
@@ -452,9 +450,12 @@
 
       REAL                    chi_sqd
       INTEGER                                           it_count
-      REAL                                                        y_max
+      REAL                                                        chi_y_max
       INTEGER                                                            MaxIterationSoFar
-      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
+      REAL                    chi_x_max, chi_x_min, chi_y_min
+      LOGICAL                                      Zoomed
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, chi_y_max, MaxIterationSoFar, &
+                              chi_x_max, chi_x_min, chi_y_min, Zoomed
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
