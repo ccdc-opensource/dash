@@ -303,7 +303,7 @@
           ENDDO
         ENDDO
       ENDDO
-      CALL DGMINV(hess,covar,nkn)
+      CALL InverseMatrix(hess, covar, nkn)
       DO I = 1, nkn
         ans(i) = 0.0
         DO j = 1, nkn
@@ -354,9 +354,9 @@
         c(I,I)   = -(c(I,I-1)+c(I,I+1))
       ENDDO
 ! Invert matrix A. Answer is in b
-      CALL DGMINV(A,b,m)
+      CALL InverseMatrix(A, b, m)
 ! Multiply matrix b by matrix c. Result is in u
-      CALL MultiplyMatrices(b,c,u,m,m,m)
+      CALL MultiplyMatrices(b, c, u, m, m, m)
 
       END SUBROUTINE SplVal
 !

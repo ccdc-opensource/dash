@@ -98,13 +98,21 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE InverseMatrix(A,B,N)
+      SUBROUTINE InverseMatrix(A, B, N)
 !
 ! Inverts matrix A into matrix B.
 ! On entry A is a square NxN real matrix
 ! On exit  B is its inverse
 !
-      DIMENSION II(N), IL(N), IG(N), A(N,N), B(N,N)
+      IMPLICIT NONE
+      
+      INTEGER, INTENT (IN   ) :: N
+      REAL,    INTENT (IN   ) :: A(N,N)
+      REAL,    INTENT (  OUT) :: B(N,N)
+
+      INTEGER II(N), IL(N), IG(N)
+      INTEGER I, J, IS, K, KF, KG, KL
+      REAL    D, R, W, X, P
 
 ! Initialise b with values from a
       B = A
@@ -175,90 +183,6 @@
   190 ENDDO
 
       END SUBROUTINE InverseMatrix
-!
-!*****************************************************************************
-!
-      SUBROUTINE DGMINV(A,B,N)
-!
-! Inverts matrix A into matrix B.
-! On entry A is a square NxN real matrix
-! On exit  B is its inverse
-!
-      IMPLICIT REAL (A-H,O-Z)
-      INTEGER         II(N), IL(N), IG(N)
-      REAL          A(N,N), B(N,N)
-      INTEGER         I, J, IS, K
-
-! Initialise b with values from a
-      B = A
-      D = 1.0
-      IS = N - 1
-      DO K = 1, N
-        IL(K) = 0
-        IG(K) = K
-      ENDDO
-      DO K = 1, N
-        R = 0.0
-        DO 40 I = 1, N
-          IF (IL(I) .NE. 0) GOTO 40
-          W = B(I,K)
-          X = ABS(W)
-          IF (R .GT. X) GOTO 40
-          R  = X
-          P  = W
-          KF = I
-   40   CONTINUE
-        II(K) = KF
-        IL(KF) = KF
-        D = D * P
-        IF (D .EQ. 0.0) THEN
-          CALL DebugErrorMessage('D .EQ. 0.0 in DGMINV()')
-          RETURN
-        ENDIF
-        DO I = 1, N
-          IF (I .EQ. KF) THEN
-            B(I,K) = 1.0/P
-          ELSE
-            B(I,K) = -B(I,K)/P
-          ENDIF
-        ENDDO
-        DO 140 J = 1, N
-          IF (J .EQ. K) GOTO 140
-          W = B(KF,J)
-          IF (W .EQ. 0.0) GOTO 140
-          DO  I = 1, N
-            IF (I .EQ. KF) THEN
-              B(I,J) = W/P
-            ELSE
-              B(I,J) = B(I,J)+W*B(I,K)
-            ENDIF
-          ENDDO
-  140   CONTINUE
-      ENDDO
-      DO K = 1, IS
-        KF = II(K)
-        KL = IL(KF)
-        KG = IG(K)
-        IF (KF .NE. KG) THEN
-          DO I = 1, N
-            R = B(I,KF)
-            B(I,KF) = B(I,KG)
-            B(I,KG) = R
-          ENDDO
-          DO J = 1, N
-            R = B(K,J)
-            B(K,J) = B(KL,J)
-            B(KL,J) = R
-          ENDDO
-          IL(KF) = K
-          IL(KG) = KL
-          IG(KL) = IG(K)
-          IG(K) = KF
-          D = -D
-        ENDIF
-      ENDDO
-
-      END SUBROUTINE DGMINV
 !
 !*****************************************************************************
 !

@@ -200,7 +200,7 @@
                                          CellPar(4), CellPar(5), CellPar(6), tLattice)
       f2cmat = tLattice
 ! Calculate the reciprocal lattice
-      CALL DGMINV(f2cmat, c2fmat, 3)
+      CALL InverseMatrix(f2cmat, c2fmat, 3)
       CALL frac2pdb(f2cpdb,CellPar(1),CellPar(2),CellPar(3),CellPar(4),CellPar(5),CellPar(6))
       CALL CREATE_FOB(Get_HydrogenTreatment() .EQ. 2)
       CALL Create_AtomicWeightings(Get_HydrogenTreatment())
