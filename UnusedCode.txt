@@ -1,6 +1,227 @@
 !
 !*****************************************************************************
 !
+! Originally in sa_subs.for
+
+      SUBROUTINE PRTVEC(VECTOR,NCOLS,NAME)
+C  This subroutine prints the double precision vector named VECTOR.
+C  Elements 1 thru NCOLS will be printed. NAME is a character variable
+C  that describes VECTOR. Note that if NAME is given in the call to
+C  PRTVEC, it must be enclosed in quotes. If there are more than 10
+C  elements in VECTOR, 10 elements will be printed on each line.
+
+      INTEGER NCOLS
+      DOUBLE PRECISION VECTOR(NCOLS)
+      CHARACTER *(*) NAME
+
+      WRITE(*,1001) NAME
+
+      IF (NCOLS .GT. 10) THEN
+         LINES = INT(NCOLS/10.)
+
+         DO 100, I = 1, LINES
+            LL = 10*(I - 1)
+            WRITE(*,1000) (VECTOR(J),J = 1+LL, 10+LL)
+  100    CONTINUE
+
+         WRITE(*,1000) (VECTOR(J),J = 11+LL, NCOLS)
+      ELSE
+         WRITE(*,1000) (VECTOR(J),J = 1, NCOLS)
+      END IF
+
+ 1000 FORMAT( 10(G12.5,1X))
+ 1001 FORMAT(5X,A)
+
+      RETURN
+      END
+
+
+      SUBROUTINE PRT1
+C  This subroutine prints intermediate output, as does PRT2 through
+C  PRT10. Note that if SA is minimizing the function, the sign of the
+C  function value and the directions (up/down) are reversed in all
+C  output to correspond with the actual function optimization. This
+C  correction is because SA was written to maximize functions and
+C  it minimizes by maximizing the negative a function.
+
+C      WRITE(*,'(  THE STARTING VALUE (X) IS OUTSIDE THE BOUNDS ',
+C     1          /,'  (LB AND UB). EXECUTION TERMINATED WITHOUT ANY'
+C     2          /,'   OPTIMIZATION. RESPECIFY X, UB OR LB SO THAT  '
+C     3          /,'   LB(I) .LT. X(I) .LT. UB(I), I = 1, N. )')
+
+      RETURN
+      END
+
+      SUBROUTINE PRT2(MAXLOG,N,X,F)
+
+      DOUBLE PRECISION  X(*), F
+      INTEGER  N
+      LOGICAL  MAXLOG
+
+C      CALL PRTVEC(X,N,'INITIAL X')
+      IF (MAXLOG) THEN
+	   WRITE(*,*)
+         WRITE(*,1010) SNGL(F)
+      ELSE
+         WRITE(*,*)
+         WRITE(*,1010) -SNGL(F)
+      END IF
+ 1010 FORMAT('  Initial chi-squared value: ', F15.5) 
+
+      RETURN
+      END
+
+      SUBROUTINE PRT3(MAXLOG,N,XP,X,FP,F)
+
+      DOUBLE PRECISION  XP(*), X(*), FP, F
+      INTEGER  N
+      LOGICAL  MAXLOG
+
+      CALL PRTVEC(X,N,'CURRENT X')
+      IF (MAXLOG) THEN
+         WRITE(*,1010) F
+      ELSE
+         WRITE(*,1010) -F
+      END IF
+ 1010 FORMAT('  CURRENT F: ', G25.18) 
+      CALL PRTVEC(XP,N,'TRIAL X')
+      WRITE(*,*) ' POINT REJECTED SINCE OUT OF BOUNDS '
+
+      RETURN
+      END
+
+      SUBROUTINE PRT4(MAXLOG,N,XP,X,FP,F)
+
+      DOUBLE PRECISION  XP(*), X(*), FP, F
+      INTEGER  N
+      LOGICAL  MAXLOG
+
+      CALL PRTVEC(X,N,'CURRENT X')
+      IF (MAXLOG) THEN
+         WRITE(*,1010) F
+         CALL PRTVEC(XP,N,'TRIAL X')
+         WRITE(*,1020) FP
+      ELSE
+         WRITE(*,1010) -F
+         CALL PRTVEC(XP,N,'TRIAL X')
+         WRITE(*,1020) -FP
+      END IF
+ 1010 FORMAT('   CURRENT F: ', G25.18) 
+ 1020 FORMAT('  RESULTING F: ', G25.18) 
+
+      RETURN
+      END
+
+      SUBROUTINE PRT5
+
+C      WRITE(*,'(,''  TOO MANY FUNCTION EVALUATIONS; CONSIDER ''
+C     1          /,''  INCREASING MAXEVL OR EPS, OR DECREASING ''
+C     2          /,''  NT OR RT. THESE RESULTS ARE LIKELY TO BE ''
+C     3          /,''  POOR.'',/)')
+
+      RETURN
+      END
+
+      SUBROUTINE PRT6(MAXLOG)
+
+      LOGICAL  MAXLOG
+
+      IF (MAXLOG) THEN
+         WRITE(*,*) '  THOUGH LOWER, POINT ACCEPTED '
+      ELSE
+         WRITE(*,*) '  THOUGH HIGHER, POINT ACCEPTED '
+      END IF
+
+      RETURN
+      END
+
+      SUBROUTINE PRT7(MAXLOG)
+
+      LOGICAL  MAXLOG
+
+      IF (MAXLOG) THEN
+         WRITE(*,*) '  LOWER POINT REJECTED '
+      ELSE
+         WRITE(*,*) '  HIGHER POINT REJECTED '
+      END IF
+
+      RETURN
+      END
+
+      SUBROUTINE PRT8(N,VM,XOPT,X)
+
+      DOUBLE PRECISION  VM(*), XOPT(*), X(*)
+      INTEGER  N
+
+      WRITE(*,*) 
+     &' INTERMEDIATE RESULTS AFTER STEP LENGTH ADJUSTMENT'
+      CALL PRTVEC(VM,N,'NEW STEP LENGTH (VM)')
+      CALL PRTVEC(XOPT,N,'CURRENT OPTIMAL X')
+      CALL PRTVEC(X,N,'CURRENT X')
+
+      RETURN
+      END
+
+      SUBROUTINE PRT9(MAXLOG,N,T,XOPT,VM,
+     &FOPT,FPAV,FPSD,NUP,NDOWN,NREJ,LNOBDS,NNEW)
+
+      DOUBLE PRECISION  XOPT(*), VM(*), T, FOPT, FTEM, FPAV, FPSD
+      INTEGER  N, NUP, NDOWN, NREJ, LNOBDS, NNEW, TOTMOV
+      LOGICAL  MAXLOG
+      COMMON /ITRINF/ iteration
+
+      TOTMOV = NUP + NDOWN + NREJ
+      WRITE(*,*)
+      WRITE(*,*) 
+     &' Intermediate results before next temperature reduction'
+      WRITE(*,1010) SNGL(T)
+ 1010 FORMAT   ('  Current temperature:        ',F10.3)
+      IF (MAXLOG) THEN
+         WRITE(*,1020) SNGL(FOPT),SNGL(FPAV),
+     &SNGL(FPSD),TOTMOV,NUP,NDOWN,NREJ,LNOBDS,NNEW
+ 1020    FORMAT('  Maximum cost function so far:  ',F10.3,' <<<<'/,
+     &          '  Average for this temperature:  ',F10.3,/,
+     &          '   +/- standard deviation     :  ',F10.3,/,
+     &          '     Total moves:                  ',i8,/, 
+     &          '        uphill:                    ',i8,/, 
+     &          '        accepted downhill:         ',i8,/, 
+     &          '        rejected downhill:         ',i8,/, 
+     &          '     Out of bounds trials:         ',i8,/, 
+     &          '     New maxima this temperature:  ',i8) 
+      ELSE
+         WRITE(*,1030) -SNGL(FOPT),-SNGL(FPAV),
+     &SNGL(FPSD),TOTMOV,NUP,NDOWN,NREJ,LNOBDS,NNEW
+ 1030    FORMAT('  Minimum chi-squared so far:    ',F10.3,' <<<<'/, 
+     &          '  Average for this temperature:  ',F10.3,/,
+     &          '   +/- standard deviation     :  ',F10.3,/,
+     &          '     Total moves:                ',I10,/, 
+     &          '        downhill:                ',I10,/, 
+     &          '        accepted uphill:         ',I10,/, 
+     &          '        rejected uphill:         ',I10,/, 
+     &          '     Out of bounds trials:       ',I10,/, 
+     &          '     New minima this temperature:',I10) 
+      END IF
+c      iteration=iteration+1
+c      write(60,*) iteration,-fopt,t
+c      write(61,*) t,(sngl(xopt(i)),i=1,n)
+C      CALL PRTVEC(XOPT,N,'CURRENT OPTIMAL X')
+C      CALL PRTVEC(VM,N,'STEP LENGTH (VM)')
+
+C
+      CALL FCN_PRT(N,XOPT,FTEM)
+C
+      RETURN
+      END
+
+      SUBROUTINE PRT10
+
+      WRITE(*,*) '  SA ACHIEVED TERMINATION CRITERIA. IER = 0.'
+
+      RETURN
+      END
+!
+!*****************************************************************************
+!
 ! Originally in inf_upload.f90
 !
       SUBROUTINE INF_UPLOAD()
@@ -142,858 +363,858 @@
 !
 ! Originally in PolyFitter_Subs.f90
 !
-!U      SUBROUTINE Check_KeyDown_PeakFind_Inner(KeyNumber,xval,yval)
-!U
-!U      USE WINTERACTER
-!U
-!U      INCLUDE 'PARAMS.INC'
-!U
-!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-!U      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-!U      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-!U        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-!U        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-!U      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-!U
-!U      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-!U        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-!U      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-!U      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
-!U
-!U      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-!U
-!U      INCLUDE 'GLBVAR.INC'
-!U
-!U      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
-!U      CHARACTER*100 HKLSTR
-!U      CHARACTER*4   CHRFORM
-!U      REAL ARGKPLT(10),DSPLT(10)
-!U      INTEGER IHPLT(3,10)
-!U      INCLUDE 'Poly_Colours.inc'
-!U      REAL CHAR_SIZE,MARKER_SIZE
-!U      LOGICAL ERROR_BAR
-!U      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
-!U
-!U      LOGICAL Confirm ! Function
-!U
-!U      xcur(2)=xval
-!U      ycur(2)=yval
-!U      IF (KeyNumber.eq.KeyReturn) THEN
-!U        numobstic=numobstic+1
-!U! Simple cursor location
-!U        itypot(numobstic)=0
-!U        xobstic(numobstic)=xcur(2)
-!U        axdif=abs(xobs(nobs)-xobs(1))
-!U        do ii=1,nobs
-!U          atem=abs(xcur(2)-xobs(ii))
-!U          if (atem.le.axdif) then
-!U            axdif=atem
-!U            yobstic(numobstic)=yobs(ii)
-!U          end if
-!U        end do
-!U                call Upload_Positions()
-!U                CALL IGrPlotMode(' ')
-!U                call Profile_Plot(IPTYPE)
-!U                CALL IGrPlotMode('EOR')
-!U              ELSE IF (KeyNumber.eq.KeyInsert) THEN
-!U                numobstic=numobstic+1
-!U                itypot(numobstic)=1
-!U! Fit to the top of the peak
-!U                call fit_peaktop(xcur(2))
-!U                CALL IGrPlotMode(' ')
-!U                call Profile_Plot(IPTYPE)
-!U                CALL IGrPlotMode('EOR')
-!U              ELSE IF (KeyNumber.eq.KeyDeleteUnder) THEN
-!U! Delete the nearest peak but ask first ...
-!U                IF (NUMOBSTIC.EQ.0) THEN
-!U                 CALL ErrorMessage('No tickmarks to delete!')
-!U                ELSE
-!U                 IF (Confirm('Do you really want to'//CHAR(13)//' delete this tickmark?')) THEN
-!U! Delete the closest tickmark ...
-!U                  ATEM=ABS(XOBSTIC(1)-XCUR(2))
-!U                  LTEM=1
-!U                  DO II=1,NUMOBSTIC
-!U                    AATEM=ABS(XOBSTIC(II)-XCUR(2))
-!U                    IF (AATEM.LT.ATEM) THEN
-!U                      LTEM=II
-!U                      ATEM=AATEM
-!U                    END IF
-!U                  END DO
-!U                  KK=0
-!U                  DO II=1,NUMOBSTIC
-!U                    IF (II.NE.LTEM) THEN
-!U                      KK=KK+1
-!U                      XXTEM(KK)=XOBSTIC(II)
-!U                      YYTEM(KK)=YOBSTIC(II)
-!U                      ITTEM(KK)=ITYPOT(II)
-!U                      IOTEM(KK)=IORDOT(II)
-!U                      DO JJ=1,9
-!U                        UUTEM(JJ,KK)=UOBSTIC(JJ,II)
-!U                        ZZTEM(JJ,KK)=ZOBSTIC(JJ,II)
-!U                      END DO
-!U                    END IF
-!U                  END DO
-!U                  NUMOBSTIC=NUMOBSTIC-1
-!U                  DO II=1,NUMOBSTIC
-!U                      KK=II
-!U                      XOBSTIC(II)=XXTEM(KK)
-!U                      YOBSTIC(II)=YYTEM(KK)
-!U                      ITYPOT(II)=ITTEM(KK)
-!U                      IORDOT(II)=IOTEM(KK)
-!U                      DO JJ=1,9
-!U                        UOBSTIC(JJ,II)=UUTEM(JJ,KK)
-!U                        ZOBSTIC(JJ,II)=ZZTEM(JJ,KK)
-!U                      END DO
-!U                  END DO                                  
-!U                 END IF
-!U                 CALL Upload_Positions()
-!U                         CALL Upload_Widths()
-!U                END IF
-!U              ELSE IF (KeyNumber.eq.77 .or. KeyNumber.eq.109) THEN
-!U! KeyNumber=M/m
-!U! Find the Miller index of the nearest Bragg peak ...
-!U                IF (NTIC.GT.0) THEN
-!U                  ATEM=ABS(ARGK(1)-XCUR(2))
-!U                  DO II=1,NTIC
-!U                    AATEM=ABS(ARGK(II)-XCUR(2))
-!U                    ATEM=MIN(ATEM,AATEM)
-!U                  END DO
-!U                  NNP=0
-!U                  DO II=1,NTIC
-!U                    AATEM=ABS(ARGK(II)-XCUR(2))
-!U                    IF (AATEM.EQ.ATEM) THEN
-!U                      NNP=NNP+1
-!U                      DO I3=1,3
-!U                       IHPLT(I3,NNP)=IH(I3,II)
-!U                      END DO
-!U                      ARGKPLT(NNP)=ARGK(II)
-!U                      DSPLT(NNP)=1./DSTAR(II)
-!U                    END IF
-!U                  END DO
-!U                  hklstr=' '
-!U                  CHRFORM='(I1)'
-!U                  ILOC=0
-!U                  DO IPP=1,NNP
-!U                    ILOC=ILOC+1
-!U                    HKLSTR(ILOC:ILOC)='('
-!U                    DO I3=1,3
-!U                      IF (IHPLT(I3,IPP).LE.-10.) THEN
-!U                        ISF=3
-!U                      ELSE IF (IHPLT(I3,IPP).LT.0.AND.IHPLT(I3,IPP).GT.-10.) THEN
-!U                        ISF=2
-!U                      ELSE IF (IHPLT(I3,IPP).GE.0.AND.IHPLT(I3,IPP).LT.10.) THEN
-!U                        ISF=1
-!U                      ELSE
-!U                        ISF=2
-!U                      END IF
-!U                      CALL IntegerToString(ISF,CHRFORM(3:3),'(I1)')
-!U                      CALL IntegerToString(IHPLT(I3,IPP),&
-!U                         HKLSTR(ILOC+1:ILOC+ISF),CHRFORM)
-!U                      ILOC=ILOC+ISF+1
-!U                      HKLSTR(ILOC:ILOC)=' '
-!U                    END DO
-!U                    HKLSTR(ILOC:ILOC)=')'
-!U                  END DO
-!U                  CALL WindowOutStatusBar(2,HKLSTR)
-!U                  CALL IGrCharJustify('L')
-!U                  CALL IGrColourN(KolNumCTic)
-!U                  CHSTEM=0.75*Char_Size
-!U                  CALL IGrCharSize(chstem,chstem)
-!U                  CALL IGrCharRotate(90.)
-!U                  xtem=xcur(2)-0.02*(xpgmax-xpgmin)
-!U                  ytem=ycur(2)+0.01*(ypgmax-ypgmin)
-!U                  CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-!U                  CALL IGrCharOut(xgtem,ygtem,HKLSTR(:LEN_TRIM(HKLSTR)))
-!U                  CALL IGrCharRotate(0.)
-!U                  hklstr=' '
-!U          IF (argkplt(nnp).ge.200.) THEN
-!U            CALL IRealToString(ARGKPLT(NNP),&
-!U            HKLSTR(1:),'(F10.2)')
-!U          ELSE
-!U            CALL IRealToString(ARGKPLT(NNP),&
-!U            HKLSTR(1:),'(F10.4)')
-!U          END IF
-!U          CALL WindowOutStatusBar(3,HKLSTR)
-!U        END IF
-!U      ELSE
-!U        CALL IGrPlotMode(' ')
-!U        RETURN
-!U      ENDIF
-!U
-!U      END SUBROUTINE Check_KeyDown_PeakFind_Inner
+      SUBROUTINE Check_KeyDown_PeakFind_Inner(KeyNumber,xval,yval)
+
+      USE WINTERACTER
+
+      INCLUDE 'PARAMS.INC'
+
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
+      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
+        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
+      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
+
+      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
+      CHARACTER*100 HKLSTR
+      CHARACTER*4   CHRFORM
+      REAL ARGKPLT(10),DSPLT(10)
+      INTEGER IHPLT(3,10)
+      INCLUDE 'Poly_Colours.inc'
+      REAL CHAR_SIZE,MARKER_SIZE
+      LOGICAL ERROR_BAR
+      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
+
+      LOGICAL Confirm ! Function
+
+      xcur(2)=xval
+      ycur(2)=yval
+      IF (KeyNumber.eq.KeyReturn) THEN
+        numobstic=numobstic+1
+! Simple cursor location
+        itypot(numobstic)=0
+        xobstic(numobstic)=xcur(2)
+        axdif=abs(xobs(nobs)-xobs(1))
+        do ii=1,nobs
+          atem=abs(xcur(2)-xobs(ii))
+          if (atem.le.axdif) then
+            axdif=atem
+            yobstic(numobstic)=yobs(ii)
+          end if
+        end do
+                call Upload_Positions()
+                CALL IGrPlotMode(' ')
+                call Profile_Plot(IPTYPE)
+                CALL IGrPlotMode('EOR')
+              ELSE IF (KeyNumber.eq.KeyInsert) THEN
+                numobstic=numobstic+1
+                itypot(numobstic)=1
+! Fit to the top of the peak
+                call fit_peaktop(xcur(2))
+                CALL IGrPlotMode(' ')
+                call Profile_Plot(IPTYPE)
+                CALL IGrPlotMode('EOR')
+              ELSE IF (KeyNumber.eq.KeyDeleteUnder) THEN
+! Delete the nearest peak but ask first ...
+                IF (NUMOBSTIC.EQ.0) THEN
+                 CALL ErrorMessage('No tickmarks to delete!')
+                ELSE
+                 IF (Confirm('Do you really want to'//CHAR(13)//' delete this tickmark?')) THEN
+! Delete the closest tickmark ...
+                  ATEM=ABS(XOBSTIC(1)-XCUR(2))
+                  LTEM=1
+                  DO II=1,NUMOBSTIC
+                    AATEM=ABS(XOBSTIC(II)-XCUR(2))
+                    IF (AATEM.LT.ATEM) THEN
+                      LTEM=II
+                      ATEM=AATEM
+                    END IF
+                  END DO
+                  KK=0
+                  DO II=1,NUMOBSTIC
+                    IF (II.NE.LTEM) THEN
+                      KK=KK+1
+                      XXTEM(KK)=XOBSTIC(II)
+                      YYTEM(KK)=YOBSTIC(II)
+                      ITTEM(KK)=ITYPOT(II)
+                      IOTEM(KK)=IORDOT(II)
+                      DO JJ=1,9
+                        UUTEM(JJ,KK)=UOBSTIC(JJ,II)
+                        ZZTEM(JJ,KK)=ZOBSTIC(JJ,II)
+                      END DO
+                    END IF
+                  END DO
+                  NUMOBSTIC=NUMOBSTIC-1
+                  DO II=1,NUMOBSTIC
+                      KK=II
+                      XOBSTIC(II)=XXTEM(KK)
+                      YOBSTIC(II)=YYTEM(KK)
+                      ITYPOT(II)=ITTEM(KK)
+                      IORDOT(II)=IOTEM(KK)
+                      DO JJ=1,9
+                        UOBSTIC(JJ,II)=UUTEM(JJ,KK)
+                        ZOBSTIC(JJ,II)=ZZTEM(JJ,KK)
+                      END DO
+                  END DO                                  
+                 END IF
+                 CALL Upload_Positions()
+                         CALL Upload_Widths()
+                END IF
+              ELSE IF (KeyNumber.eq.77 .or. KeyNumber.eq.109) THEN
+! KeyNumber=M/m
+! Find the Miller index of the nearest Bragg peak ...
+                IF (NTIC.GT.0) THEN
+                  ATEM=ABS(ARGK(1)-XCUR(2))
+                  DO II=1,NTIC
+                    AATEM=ABS(ARGK(II)-XCUR(2))
+                    ATEM=MIN(ATEM,AATEM)
+                  END DO
+                  NNP=0
+                  DO II=1,NTIC
+                    AATEM=ABS(ARGK(II)-XCUR(2))
+                    IF (AATEM.EQ.ATEM) THEN
+                      NNP=NNP+1
+                      DO I3=1,3
+                       IHPLT(I3,NNP)=IH(I3,II)
+                      END DO
+                      ARGKPLT(NNP)=ARGK(II)
+                      DSPLT(NNP)=1./DSTAR(II)
+                    END IF
+                  END DO
+                  hklstr=' '
+                  CHRFORM='(I1)'
+                  ILOC=0
+                  DO IPP=1,NNP
+                    ILOC=ILOC+1
+                    HKLSTR(ILOC:ILOC)='('
+                    DO I3=1,3
+                      IF (IHPLT(I3,IPP).LE.-10.) THEN
+                        ISF=3
+                      ELSE IF (IHPLT(I3,IPP).LT.0.AND.IHPLT(I3,IPP).GT.-10.) THEN
+                        ISF=2
+                      ELSE IF (IHPLT(I3,IPP).GE.0.AND.IHPLT(I3,IPP).LT.10.) THEN
+                        ISF=1
+                      ELSE
+                        ISF=2
+                      END IF
+                      CALL IntegerToString(ISF,CHRFORM(3:3),'(I1)')
+                      CALL IntegerToString(IHPLT(I3,IPP),&
+                         HKLSTR(ILOC+1:ILOC+ISF),CHRFORM)
+                      ILOC=ILOC+ISF+1
+                      HKLSTR(ILOC:ILOC)=' '
+                    END DO
+                    HKLSTR(ILOC:ILOC)=')'
+                  END DO
+                  CALL WindowOutStatusBar(2,HKLSTR)
+                  CALL IGrCharJustify('L')
+                  CALL IGrColourN(KolNumCTic)
+                  CHSTEM=0.75*Char_Size
+                  CALL IGrCharSize(chstem,chstem)
+                  CALL IGrCharRotate(90.)
+                  xtem=xcur(2)-0.02*(xpgmax-xpgmin)
+                  ytem=ycur(2)+0.01*(ypgmax-ypgmin)
+                  CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+                  CALL IGrCharOut(xgtem,ygtem,HKLSTR(:LEN_TRIM(HKLSTR)))
+                  CALL IGrCharRotate(0.)
+                  hklstr=' '
+          IF (argkplt(nnp).ge.200.) THEN
+            CALL IRealToString(ARGKPLT(NNP),&
+            HKLSTR(1:),'(F10.2)')
+          ELSE
+            CALL IRealToString(ARGKPLT(NNP),&
+            HKLSTR(1:),'(F10.4)')
+          END IF
+          CALL WindowOutStatusBar(3,HKLSTR)
+        END IF
+      ELSE
+        CALL IGrPlotMode(' ')
+        RETURN
+      ENDIF
+
+      END SUBROUTINE Check_KeyDown_PeakFind_Inner
 !
 !*****************************************************************************
 !
-!U      SUBROUTINE Check_KeyDown_PeakFind(MESSAGE)
-!U
-!U      USE WINTERACTER
-!U
-!U      TYPE(WIN_MESSAGE) :: MESSAGE
-!U      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-!U
-!U! acts on various KeyDown options that are specific for peakfitting
-!U      KeyNumber = MESSAGE%VALUE1
-!U      xgcur(2) = MESSAGE%GX
-!U      ygcur(2) = MESSAGE%GY
-!U      CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
-!U      CALL Check_KeyDown_PeakFind_Inner(KeyNumber,xcur(2),ycur(2))
-!U
-!U      END SUBROUTINE Check_KeyDown_PeakFind
+      SUBROUTINE Check_KeyDown_PeakFind(MESSAGE)
+
+      USE WINTERACTER
+
+      TYPE(WIN_MESSAGE) :: MESSAGE
+      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
+
+! acts on various KeyDown options that are specific for peakfitting
+      KeyNumber = MESSAGE%VALUE1
+      xgcur(2) = MESSAGE%GX
+      ygcur(2) = MESSAGE%GY
+      CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
+      CALL Check_KeyDown_PeakFind_Inner(KeyNumber,xcur(2),ycur(2))
+
+      END SUBROUTINE Check_KeyDown_PeakFind
 !
 !*****************************************************************************
 !
-!U      SUBROUTINE PeakFind_Manual(IDVal_Current)
-!U
-!U      USE WINTERACTER
-!U      USE DRUID_HEADER
-!U      USE VARIABLES
-!U
-!U      TYPE(WIN_STYLE)    WINDOW
-!U      LOGICAL FinishMenuMode
-!U
-!U      INCLUDE 'GLBVAR.INC'
-!U
-!U      DO
-!U        CALL WMessage(EventType,EventInfo)
-!U        SELECT CASE (EventType)
-!U          CASE (MouseButDown)
-!U            IF      (EventInfo%VALUE1 .EQ. LeftButton) THEN
-!U              CALL Plot_Alter(EventInfo%GX,EventInfo%GY)
-!U            ELSE IF (EventInfo%VALUE1 .EQ. RightButton) THEN
-!U! Get to work on the cross-hair movement
-!U              CALL MOVE_CROSSHAIR(EventInfo%GX,EventInfo%GY)
-!U            END IF
-!U          CASE (MenuSelect)
-!U            IDVal_Current=EventInfo%Value1               
-!U            IF (FinishMenuMode(IDVal_Current,ID_CrossHair_Cursor_Mode)) THEN
-!U              CALL WMessageEnable(MouseMove, Disabled)
-!U              CALL WMessageEnable(MouseButUp, Disabled)
-!U              STATBARSTR(8)='Standard cursor'
-!U              CALL WindowOutStatusBar(8,STATBARSTR(8))
-!U              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-!U              IDCurrent_Cursor_mode=ID_Default_Mode
-!U              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-!U              RETURN
-!U            END IF
-!U          CASE (KeyDown)                
-!U            IF (EventInfo%VALUE1 .EQ. KeyEscape) THEN
-!U              CALL WMessageEnable(MouseMove, Disabled)
-!U              CALL WMessageEnable(MouseButUp, Disabled)
-!U              STATBARSTR(8)='Standard cursor'
-!U              CALL WindowOutStatusBar(8,STATBARSTR(8))
-!U              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-!U              IDCurrent_Cursor_mode=ID_Default_Mode
-!U              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-!U              RETURN
-!U            ELSE
-!U              CALL Check_KeyDown(EventInfo)
-!U            END IF
-!U          CASE (Expose,Resize)
-!U            CALL Redraw()
-!U        END SELECT
-!U      END DO
-!U
-!U      END SUBROUTINE PeakFind_Manual
-!U!
-!U!*****************************************************************************
-!U!
-!U      SUBROUTINE MOVE_CROSSHAIR(xgtem,ygtem)
-!U!
-!U      USE WINTERACTER
-!U
-!U      TYPE(WIN_STYLE)    WINDOW
-!U      TYPE(WIN_MESSAGE)  ZMESSAGE
-!U
-!U      INCLUDE 'PARAMS.INC'
-!U
-!U      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-!U
-!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-!U      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-!U      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-!U        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-!U        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-!U      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-!U!
-!U      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-!U
-!U      INCLUDE 'GLBVAR.INC'
-!U
-!U      LOGICAL HVLINE_THERE
-!U
-!U      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-!U        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-!U      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
-!U      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
-!U      CHARACTER*100 HKLSTR
-!U      CHARACTER*4   CHRFORM
-!U      REAL     ARGKPLT(10),DSPLT(10)
-!U      INTEGER IHPLT(3,10)
-!U      INCLUDE 'Poly_Colours.inc'
-!U      REAL    CHAR_SIZE,MARKER_SIZE
-!U      LOGICAL ERROR_BAR
-!U      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE 
-!U!
-!U! Get ready to put up the big cursor
-!U      HVLINE_THERE=.FALSE.
-!U      CALL WMessageEnable(MouseMove, Enabled)
-!U      CALL WMessageEnable(MouseButUp, Enabled)
-!U      CALL WCursorShape(CurCrossHair)
-!U      CALL IPgUnitsToGrUnits(xpgmin,ypgmin,gxmin,gymin)
-!U      CALL IPgUnitsToGrUnits(xpgmax,ypgmax,gxmax,gymax)
-!U      gxav=0.5*(gxmax+gxmin)
-!U      gyav=0.5*(gymax+gymin)
-!U      gxwd=0.001*(gxmax-gxmin)
-!U      gywd=0.001*(gymax-gymin)
-!U      xgcur(1)=xgtem
-!U      ygcur(1)=ygtem
-!U      CALL IPgUnitsFromGrUnits(xgtem,ygtem,xcur(1),ycur(1))
-!U      CALL WMessageEnable(MouseMove, Enabled)
-!U      CALL WMessageEnable(MouseButUp, Enabled)
-!U      IMOV = 0
-!U      DO
-!U        CALL WMessage(IZTYPE,ZMESSAGE)
-!U          xgcur(2)=zmessage%GX
-!U          ygcur(2)=zmessage%GY
-!U          CALL IPgUnitsFromGrUnits(zmessage%GX,zmessage%GY,xcur(2),ycur(2))
-!U          SELECT CASE (IZTYPE)
-!U            CASE (Expose,Resize)
-!U              CALL Redraw()
-!U            CASE (KeyDown)
-!U              KeyNumber=ZMessage%Value1
-!U              CALL Check_KeyDown_PeakFind_Inner(KeyNumber,xcur(2),ycur(2))
-!U            CASE (MouseButDown)
-!U              IMOV = 0
-!U            CASE (MouseMove)
-!U! Set up the cross-hairs for peak finding
-!U                  imov=imov+1
-!U                  if (imov.eq.1) then
-!U! Draw cross-hair
-!U                    CALL IGrColourN(KolNumLargeCrossHair)
-!U                    gxt0=xgcur(2)
-!U                    gxt1=xgcur(2)-gxwd
-!U                    gxt2=xgcur(2)+gxwd
-!U                    gyt0=ygcur(2)
-!U                    gyt1=ygcur(2)-gywd
-!U                    gyt2=ygcur(2)+gywd
-!U                    CALL IGrMoveTo(gxt1,gyt0)
-!U                    CALL IGrLineTo(gxt2,gyt0)
-!U                    CALL IGrMoveTo(gxt0,gyt1)
-!U                    CALL IGrLineTo(gxt0,gyt2)
-!U                  else
-!U! Remove old cross-hair
-!U                    if (imov.eq.2) then
-!U                      call profile_plot(IPTYPE)
-!U                      CALL IGrPlotMode('EOR')
-!U                    else
-!U                      CALL IGrMoveTo(gxmin,ygcurold)
-!U                      CALL IGrLineTo(gxmax,ygcurold)
-!U                      CALL IGrMoveTo(xgcurold,gymin)
-!U                      CALL IGrLineTo(xgcurold,gymax)
-!U!                     CALL IGrPlotMode('EOR')
-!U                    endif
-!U! Paint new cross-hair
-!U                    CALL IGrColourN(KolNumLargeCrossHair)
-!U!                    CALL IGrColourN(224)
-!U                    CALL IGrMoveTo(gxmin,ygcur(2))
-!U                    CALL IGrLineTo(gxmax,ygcur(2))
-!U                    CALL IGrMoveTo(xgcur(2),gymin)
-!U                    CALL IGrLineTo(xgcur(2),gymax)
-!U                  end if
-!U                  xgcurold=xgcur(2)
-!U                  ygcurold=ygcur(2)
-!U                if (xpgmax-xpgmin.le.200.) then
-!U                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.3)')
-!U                else
-!U                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.1)')
-!U                end if
-!U                if (ypgmax-ypgmin.le.100.) then
-!U                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.3)')
-!U                else
-!U                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.1)')
-!U                end if
-!U                DO ISB=2,3
-!U                  CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-!U                END DO 
-!U            CASE (MouseButUp)
-!U! MouseButUp action for peak finding
-!U! Remove old cross-hair
-!U                CALL IGrMoveTo(gxmin,ygcurold)
-!U                CALL IGrLineTo(gxmax,ygcurold)
-!U                CALL IGrMoveTo(xgcurold,gymin)
-!U                CALL IGrLineTo(xgcurold,gymax)
-!U                CALL IGrPlotMode(' ')
-!U                DO ISB=2,3
-!U                 statbarstr(isb)='          '
-!U                 CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-!U                END DO                
-!U               CALL Profile_Plot(IPTYPE)
-!U               RETURN 
-!U            END SELECT
-!U          END DO 
-!U!
-!U      END SUBROUTINE MOVE_CROSSHAIR
-!U!
+      SUBROUTINE PeakFind_Manual(IDVal_Current)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      TYPE(WIN_STYLE)    WINDOW
+      LOGICAL FinishMenuMode
+
+      INCLUDE 'GLBVAR.INC'
+
+      DO
+        CALL WMessage(EventType,EventInfo)
+        SELECT CASE (EventType)
+          CASE (MouseButDown)
+            IF      (EventInfo%VALUE1 .EQ. LeftButton) THEN
+              CALL Plot_Alter(EventInfo%GX,EventInfo%GY)
+            ELSE IF (EventInfo%VALUE1 .EQ. RightButton) THEN
+! Get to work on the cross-hair movement
+              CALL MOVE_CROSSHAIR(EventInfo%GX,EventInfo%GY)
+            END IF
+          CASE (MenuSelect)
+            IDVal_Current=EventInfo%Value1               
+            IF (FinishMenuMode(IDVal_Current,ID_CrossHair_Cursor_Mode)) THEN
+              CALL WMessageEnable(MouseMove, Disabled)
+              CALL WMessageEnable(MouseButUp, Disabled)
+              STATBARSTR(8)='Standard cursor'
+              CALL WindowOutStatusBar(8,STATBARSTR(8))
+              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
+              IDCurrent_Cursor_mode=ID_Default_Mode
+              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+              RETURN
+            END IF
+          CASE (KeyDown)                
+            IF (EventInfo%VALUE1 .EQ. KeyEscape) THEN
+              CALL WMessageEnable(MouseMove, Disabled)
+              CALL WMessageEnable(MouseButUp, Disabled)
+              STATBARSTR(8)='Standard cursor'
+              CALL WindowOutStatusBar(8,STATBARSTR(8))
+              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
+              IDCurrent_Cursor_mode=ID_Default_Mode
+              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+              RETURN
+            ELSE
+              CALL Check_KeyDown(EventInfo)
+            END IF
+          CASE (Expose,Resize)
+            CALL Redraw()
+        END SELECT
+      END DO
+
+      END SUBROUTINE PeakFind_Manual
+!
 !*****************************************************************************
 !
-!U      SUBROUTINE Fit_PeakTop(xtem)
-!U!
-!U      EXTERNAL CHIQUAD
-!U      REAL CHIQUAD
-!U!
-!U      INCLUDE 'PARAMS.INC'
-!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-!U      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-!U      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-!U      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-!U      XGGMIN,XGGMAX,YGGMIN,YGGMAX
-!U      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-!U!
-!U      INCLUDE 'GLBVAR.INC'
-!U
-!U      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-!U       itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-!U!
-!U      REAL VAR(3),DVAR(3),COVAR(3,3)
-!U      PARAMETER (MVAL=50)
-!U      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
-!U!
-!U      axdif=abs(xobs(nobs)-xobs(1))
-!U      klose=1
-!U      do ii=1,nobs
-!U        atem=abs(xtem-xobs(ii))
-!U        if (atem.le.axdif) then
-!U          axdif=atem
-!U          klose=ii
-!U        end if
-!U      end do
-!U!
-!U      nval=9
-!U      imin=klose-4
-!U      imax=klose+4
-!U      if (imin.lt.1) then
-!U        imin=1
-!U        imax=9
-!U      end if
-!U      if (imax.gt.nobs) then
-!U        imax=nobs
-!U        imin=nobs-8
-!U      end if
-!U!
-!U      xav=0.5*(xobs(imax)+xobs(imin)) 
-!U      xran=0.5*(xobs(imax)-xobs(imin))      
-!U      do i=1,9
-!U        ii=imin+i-1
-!U        xval(i)=(xobs(ii)-xav)/xran
-!U        yval(i)=yobs(ii)
-!U        eval(i)=eobs(ii)
-!U      end do
-!U!
-!U      nvar=3
-!U      var(1)=0.5*(yobs(imax)+yobs(imin))-yobs(imin+3)
-!U      var(2)=0.5*(yobs(imax)-yobs(imin))
-!U      var(3)=yobs(imin+3)
-!U      dvar(1)=0.1*var(1)
-!U      dvar(2)=0.1*var(2)
-!U      dvar(3)=0.1*var(3)
-!U!
-!U      call simopt(var,dvar,covar,nvar,chiquad)
-!U      xb=-0.5*var(2)/var(1)
-!U      yb=var(1)*xb*xb+var(2)*xb+var(3)
-!U      uran=xobs(imax)-xobs(imin)
-!U      xobstic(numobstic)=xav+xran*xb
-!U      yobstic(numobstic)=yb
-!U      do i=1,9
-!U        utt=xobs(imin)+0.125*float(i-1)*uran
-!U        uobstic(i,numobstic)=utt
-!U        ut=(utt-xav)/xran
-!U        zobstic(i,numobstic)=var(1)*ut*ut+var(2)*ut+var(3)
-!U      END DO
-!U
-!U      END SUBROUTINE fit_peaktop
-!U!
+      SUBROUTINE MOVE_CROSSHAIR(xgtem,ygtem)
+!
+      USE WINTERACTER
+
+      TYPE(WIN_STYLE)    WINDOW
+      TYPE(WIN_MESSAGE)  ZMESSAGE
+
+      INCLUDE 'PARAMS.INC'
+
+      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+!
+      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL HVLINE_THERE
+
+      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
+        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
+      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
+      CHARACTER*100 HKLSTR
+      CHARACTER*4   CHRFORM
+      REAL     ARGKPLT(10),DSPLT(10)
+      INTEGER IHPLT(3,10)
+      INCLUDE 'Poly_Colours.inc'
+      REAL    CHAR_SIZE,MARKER_SIZE
+      LOGICAL ERROR_BAR
+      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE 
+!
+! Get ready to put up the big cursor
+      HVLINE_THERE=.FALSE.
+      CALL WMessageEnable(MouseMove, Enabled)
+      CALL WMessageEnable(MouseButUp, Enabled)
+      CALL WCursorShape(CurCrossHair)
+      CALL IPgUnitsToGrUnits(xpgmin,ypgmin,gxmin,gymin)
+      CALL IPgUnitsToGrUnits(xpgmax,ypgmax,gxmax,gymax)
+      gxav=0.5*(gxmax+gxmin)
+      gyav=0.5*(gymax+gymin)
+      gxwd=0.001*(gxmax-gxmin)
+      gywd=0.001*(gymax-gymin)
+      xgcur(1)=xgtem
+      ygcur(1)=ygtem
+      CALL IPgUnitsFromGrUnits(xgtem,ygtem,xcur(1),ycur(1))
+      CALL WMessageEnable(MouseMove, Enabled)
+      CALL WMessageEnable(MouseButUp, Enabled)
+      IMOV = 0
+      DO
+        CALL WMessage(IZTYPE,ZMESSAGE)
+          xgcur(2)=zmessage%GX
+          ygcur(2)=zmessage%GY
+          CALL IPgUnitsFromGrUnits(zmessage%GX,zmessage%GY,xcur(2),ycur(2))
+          SELECT CASE (IZTYPE)
+            CASE (Expose,Resize)
+              CALL Redraw()
+            CASE (KeyDown)
+              KeyNumber=ZMessage%Value1
+              CALL Check_KeyDown_PeakFind_Inner(KeyNumber,xcur(2),ycur(2))
+            CASE (MouseButDown)
+              IMOV = 0
+            CASE (MouseMove)
+! Set up the cross-hairs for peak finding
+                  imov=imov+1
+                  if (imov.eq.1) then
+! Draw cross-hair
+                    CALL IGrColourN(KolNumLargeCrossHair)
+                    gxt0=xgcur(2)
+                    gxt1=xgcur(2)-gxwd
+                    gxt2=xgcur(2)+gxwd
+                    gyt0=ygcur(2)
+                    gyt1=ygcur(2)-gywd
+                    gyt2=ygcur(2)+gywd
+                    CALL IGrMoveTo(gxt1,gyt0)
+                    CALL IGrLineTo(gxt2,gyt0)
+                    CALL IGrMoveTo(gxt0,gyt1)
+                    CALL IGrLineTo(gxt0,gyt2)
+                  else
+! Remove old cross-hair
+                    if (imov.eq.2) then
+                      call profile_plot(IPTYPE)
+                      CALL IGrPlotMode('EOR')
+                    else
+                      CALL IGrMoveTo(gxmin,ygcurold)
+                      CALL IGrLineTo(gxmax,ygcurold)
+                      CALL IGrMoveTo(xgcurold,gymin)
+                      CALL IGrLineTo(xgcurold,gymax)
+!                     CALL IGrPlotMode('EOR')
+                    endif
+! Paint new cross-hair
+                    CALL IGrColourN(KolNumLargeCrossHair)
+!                    CALL IGrColourN(224)
+                    CALL IGrMoveTo(gxmin,ygcur(2))
+                    CALL IGrLineTo(gxmax,ygcur(2))
+                    CALL IGrMoveTo(xgcur(2),gymin)
+                    CALL IGrLineTo(xgcur(2),gymax)
+                  end if
+                  xgcurold=xgcur(2)
+                  ygcurold=ygcur(2)
+                if (xpgmax-xpgmin.le.200.) then
+                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.3)')
+                else
+                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.1)')
+                end if
+                if (ypgmax-ypgmin.le.100.) then
+                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.3)')
+                else
+                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.1)')
+                end if
+                DO ISB=2,3
+                  CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
+                END DO 
+            CASE (MouseButUp)
+! MouseButUp action for peak finding
+! Remove old cross-hair
+                CALL IGrMoveTo(gxmin,ygcurold)
+                CALL IGrLineTo(gxmax,ygcurold)
+                CALL IGrMoveTo(xgcurold,gymin)
+                CALL IGrLineTo(xgcurold,gymax)
+                CALL IGrPlotMode(' ')
+                DO ISB=2,3
+                 statbarstr(isb)='          '
+                 CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
+                END DO                
+               CALL Profile_Plot(IPTYPE)
+               RETURN 
+            END SELECT
+          END DO 
+!
+      END SUBROUTINE MOVE_CROSSHAIR
+!
 !*****************************************************************************
 !
-!U      SUBROUTINE Rebin_Profile()
-!U!
-!U! Rebins the profile
-!U!
-!U      INCLUDE 'PARAMS.INC'
-!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-!U      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-!U
-!U      INCLUDE 'statlog.inc'
-!U!
-!U      NBIN=(NOBS/LBIN)
-!U      DO I=1,NBIN
-!U        IST=(I-1)*LBIN
-!U        XADD=0.
-!U        YOADD=0.
-!U        YCADD=0.
-!U        YBADD=0.
-!U        VADD=0.
-!U        DO J=1,LBIN
-!U          JJ=J+IST
-!U          XADD=XADD+XOBS(JJ)
-!U          YOADD=YOADD+YOBS(JJ)
-!U          YCADD=YCADD+YCAL(JJ)
-!U          YBADD=YBADD+YBAK(JJ)
-!U          VADD=VADD+EOBS(JJ)**2
-!U        END DO
-!U        XBIN(I)=XADD/FLOAT(LBIN)
-!U        YOBIN(I)=YOADD/FLOAT(LBIN)
-!U        YCBIN(I)=YCADD/FLOAT(LBIN)
-!U        YBBIN(I)=YBADD/FLOAT(LBIN)
-!U        EBIN(I)=SQRT(VADD)/FLOAT(LBIN)
-!U      END DO
-!U      DataSetChange=DataSetChange+1
-!U      CALL Get_IPMaxMin() 
-!U
-!U      END SUBROUTINE Rebin_Profile
+      SUBROUTINE Fit_PeakTop(xtem)
+!
+      EXTERNAL CHIQUAD
+      REAL CHIQUAD
+!
+      INCLUDE 'PARAMS.INC'
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+      XGGMIN,XGGMAX,YGGMIN,YGGMAX
+      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+!
+      INCLUDE 'GLBVAR.INC'
+
+      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
+       itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+!
+      REAL VAR(3),DVAR(3),COVAR(3,3)
+      PARAMETER (MVAL=50)
+      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
+!
+      axdif=abs(xobs(nobs)-xobs(1))
+      klose=1
+      do ii=1,nobs
+        atem=abs(xtem-xobs(ii))
+        if (atem.le.axdif) then
+          axdif=atem
+          klose=ii
+        end if
+      end do
+!
+      nval=9
+      imin=klose-4
+      imax=klose+4
+      if (imin.lt.1) then
+        imin=1
+        imax=9
+      end if
+      if (imax.gt.nobs) then
+        imax=nobs
+        imin=nobs-8
+      end if
+!
+      xav=0.5*(xobs(imax)+xobs(imin)) 
+      xran=0.5*(xobs(imax)-xobs(imin))      
+      do i=1,9
+        ii=imin+i-1
+        xval(i)=(xobs(ii)-xav)/xran
+        yval(i)=yobs(ii)
+        eval(i)=eobs(ii)
+      end do
+!
+      nvar=3
+      var(1)=0.5*(yobs(imax)+yobs(imin))-yobs(imin+3)
+      var(2)=0.5*(yobs(imax)-yobs(imin))
+      var(3)=yobs(imin+3)
+      dvar(1)=0.1*var(1)
+      dvar(2)=0.1*var(2)
+      dvar(3)=0.1*var(3)
+!
+      call simopt(var,dvar,covar,nvar,chiquad)
+      xb=-0.5*var(2)/var(1)
+      yb=var(1)*xb*xb+var(2)*xb+var(3)
+      uran=xobs(imax)-xobs(imin)
+      xobstic(numobstic)=xav+xran*xb
+      yobstic(numobstic)=yb
+      do i=1,9
+        utt=xobs(imin)+0.125*float(i-1)*uran
+        uobstic(i,numobstic)=utt
+        ut=(utt-xav)/xran
+        zobstic(i,numobstic)=var(1)*ut*ut+var(2)*ut+var(3)
+      END DO
+
+      END SUBROUTINE fit_peaktop
+!
+!*****************************************************************************
+!
+      SUBROUTINE Rebin_Profile()
+!
+! Rebins the profile
+!
+      INCLUDE 'PARAMS.INC'
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+
+      INCLUDE 'statlog.inc'
+!
+      NBIN=(NOBS/LBIN)
+      DO I=1,NBIN
+        IST=(I-1)*LBIN
+        XADD=0.
+        YOADD=0.
+        YCADD=0.
+        YBADD=0.
+        VADD=0.
+        DO J=1,LBIN
+          JJ=J+IST
+          XADD=XADD+XOBS(JJ)
+          YOADD=YOADD+YOBS(JJ)
+          YCADD=YCADD+YCAL(JJ)
+          YBADD=YBADD+YBAK(JJ)
+          VADD=VADD+EOBS(JJ)**2
+        END DO
+        XBIN(I)=XADD/FLOAT(LBIN)
+        YOBIN(I)=YOADD/FLOAT(LBIN)
+        YCBIN(I)=YCADD/FLOAT(LBIN)
+        YBBIN(I)=YBADD/FLOAT(LBIN)
+        EBIN(I)=SQRT(VADD)/FLOAT(LBIN)
+      END DO
+      DataSetChange=DataSetChange+1
+      CALL Get_IPMaxMin() 
+
+      END SUBROUTINE Rebin_Profile
 !
 !*****************************************************************************
 !
 ! Originally in Wizard_routines.f90
 !
-!U      SUBROUTINE PolyFitter_Wizard
-!U!   Open the first wizard child window
-!U      USE WINTERACTER
-!U      USE DRUID_HEADER
-!U      USE VARIABLES
-!U
-!U      IMPLICIT NONE                           
-!U!
-!U!   Variable declarations
-!U!
-!U!O      LOGICAL :: NODATA
-!U      LOGICAL :: SKIP = .FALSE.
-!U      INTEGER :: IPW_Option
-!U
-!U      INCLUDE 'statlog.inc'
-!U      INCLUDE 'DialogPosCmn.inc'
-!U      INCLUDE 'Lattice.inc'
-!U
-!U      INTEGER :: IRadSelection
-!U      REAL Temp
-!U      CHARACTER(LEN=256) :: CTEMP
-!U
-!U      INCLUDE 'GLBVAR.INC' ! Contains JRadOption which replaces SourceState and IRadOption
-!U      INTEGER IDummy
-!U
-!U      LOGICAL FnUnitCellOK ! Function
-!U
-!U      SKIP = .FALSE.
-!U!.. Set up some defaults
-!U 8    CONTINUE
-!U 1    CONTINUE
-!U      CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-!U      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-!U
-!U! JvdS Wizard is now dealt with per window
-!U      RETURN
-!U
-!U
-!U! Now check on which button was pressed ...
-!U      DO WHILE (.NOT. SKIP)
-!U        IXPos_IDD_Wizard = WInfoDialog(6)
-!U        IYPos_IDD_Wizard = WInfoDialog(7)
-!U        CALL GetEvent
-!U        SELECT CASE (EventInfo%WIN)
-!U          CASE (0)
-!U! Process main window messages
-!U            CALL process_mainwindow_message
-!U            CYCLE
-!U        END SELECT
-!U        SELECT CASE (EventType)
-!U          CASE (PushButton)
-!U            SELECT CASE (EventInfo%VALUE1)
-!U              CASE (IDNEXT)
-!U                IXPos_IDD_Wizard = WInfoDialog(6)
-!U                IYPos_IDD_Wizard = WInfoDialog(7)
-!U                CALL WDialogHide()
-!U! We're off the main page and on to new pages depending on the option.
-!U                CALL WDialogGetRadioButton(IDF_PW_Option1,IPW_Option)
-!U                SELECT CASE (IPW_Option)
-!U                  CASE(1) ! view data/ determine peak positions
-!U                    GOTO 300
-!U                  CASE(2) ! Pawley
-!U                    GOTO 100
-!U                  CASE(3) ! Simulated Annealing
-!U                    GOTO 500
-!U                  CASE(4) ! Read Druid pawley file
-!U                    GOTO 600
-!U                END SELECT
-!U              CASE (IDF_PW0_Skip,IDCANCEL)
-!U                SKIP = .TRUE.
-!U                CALL WDialogHide()
-!U                CALL ToggleMenus(1)
-!U                RETURN
-!U            END SELECT
-!U        END SELECT
-!U      END DO
-!U      CALL ToggleMenus(1)
-!U      RETURN
-!U!.. Deal here with page 1 (cases 2 and 3)
-!U 100  SKIP = .FALSE.
-!U      CALL WDialogSelect(IDD_PW_Page1)
-!U! If the cell is OK, the Next> button should be enabled
-!U      IF (FnUnitCellOK()) THEN
-!U! Enable the wizard next button
-!U        CALL WDialogFieldState(IDNEXT,Enabled)
-!U      ELSE
-!U! Disable the wizard next button
-!U        CALL WDialogFieldState(IDNEXT,Disabled)
-!U      END IF
-!U      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-!U      DO WHILE (.NOT. SKIP)
-!U        IXPos_IDD_Wizard = WInfoDialog(6)
-!U        IYPos_IDD_Wizard = WInfoDialog(7)
-!U        CALL GetEvent
-!U        SELECT CASE (EventInfo%WIN)
-!U          CASE (0)
-!U! Process main window messages
-!U            CALL process_mainwindow_message
-!U            CYCLE
-!U        END SELECT
-!U        SELECT CASE (EventType)
-!U          CASE (PushButton)
-!U            SELECT CASE (EventInfo%VALUE1)
-!U              CASE(IDBACK)
-!U                CALL WDialogHide()
-!U                GOTO 1
-!U              CASE(IDNEXT)
-!U! We're off the second page and on to the last page
-!U                CALL WDialogHide()
-!U!C>>                          CALL WDialogSelect(IDD_PW_Page1)
-!U                GOTO 200
-!U              CASE(IDCLOSE,IDCANCEL)
-!U                SKIP = .TRUE.
-!U                CALL WDialogSelect(IDD_PW_Page1)
-!U                CALL WDialogHide()
-!U                CALL ToggleMenus(1)
-!U                RETURN
-!U            END SELECT
-!U          CASE (FieldChanged)
-!U            SELECT CASE (EventInfo%VALUE1)
-!U              CASE (IDF_Space_Group_Menu)
-!U                CALL Update_Space_Group(IDD_PW_Page1, IDummy, IDummy)
-!U                NumPawleyRef = 0
-!U              CASE (IDF_Crystal_System_Menu)
-!U                CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
-!U                CALL SetCrystalSystem(LatBrav)
-!U                CALL SetSpaceGroupMenu(LatBrav)
-!U                CALL Generate_TicMarks
-!U              CASE (IDF_a_latt)
-!U                CALL WDialogGetReal(IDF_a_latt,CellPar(1))
-!U                CALL UpdateCell(IDD_PW_Page1)
-!U              CASE (IDF_b_latt)
-!U                CALL WDialogGetReal(IDF_b_latt,CellPar(2))
-!U                CALL UpdateCell(IDD_PW_Page1)
-!U              CASE (IDF_c_latt)
-!U                CALL WDialogGetReal(IDF_c_latt,CellPar(3))
-!U                CALL UpdateCell(IDD_PW_Page1)
-!U              CASE (IDF_alp_latt)
-!U                CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
-!U                CALL UpdateCell(IDD_PW_Page1)
-!U              CASE (IDF_bet_latt)
-!U                CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
-!U                CALL UpdateCell(IDD_PW_Page1)
-!U              CASE (IDF_gam_latt)
-!U                CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
-!U                CALL UpdateCell(IDD_PW_Page1)
-!U            END SELECT                
-!U        END SELECT
-!U      END DO
-!U!.. Deal here with page 2 of Pawley, i.e. Basic Diffraction Information
-!U! Now called: Diffraction Setup
-!U 200 SKIP = .FALSE.
-!U      CALL WDialogSelect(IDD_PW_Page2)
-!U! JvdS @ following line should not be necessary
-!U      CALL SetSourceDataState(JRadOption)
-!U      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-!U      DO WHILE(.NOT. SKIP)
-!U        IXPos_IDD_Wizard = WInfoDialog(6)
-!U        IYPos_IDD_Wizard = WInfoDialog(7)
-!U        CALL GetEvent
-!U        SELECT CASE (EventInfo%WIN)
-!U          CASE (0)
-!U! Process main window messages
-!U            CALL process_mainwindow_message
-!U            CYCLE
-!U        END SELECT
-!U! JvdS @ Next line is in a weird place again
-!U        CALL WDialogGetRadioButton(IDF_PW_LabX_Source,JRadOption)
-!U        CALL SetSourceDataState(JRadOption)
-!U        SELECT CASE (EventType)
-!U          CASE(FieldChanged)
-!U            SELECT CASE (EventInfo%VALUE1)
-!U              CASE (IDF_PW_wavelength1)
-!U                CALL WDialogGetReal(IDF_PW_wavelength1,Temp)
-!U                CALL UpdateWavelength(Temp)
-!U!C>> JCC Add in function  
-!U              CASE (IDF_Wavelength_Menu)
-!U                CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
-!U                CALL SetWavelengthToSelection(IRadSelection)
-!U            END SELECT
-!U          CASE (PushButton)
-!U            SELECT CASE (EventInfo%VALUE1)
-!U              CASE (ID_PW_DF_Open)
-!U!C>> JCC Add callback for Open button
-!U                CALL WDialogGetString(IDF_PW_DataFileName_String,CTEMP)
-!U                CALL Diffraction_File_Open(CTEMP)
-!U!C>> JCC Have to reselect after the file open
-!U                CALL WDialogSelect(IDD_PW_Page2)
-!U              CASE (ID_PW_DF_Browse)
-!U                CALL Diffraction_File_Browse
-!U!C>> JCC Have to reselect after the file open
-!U                CALL WDialogSelect(IDD_PW_Page2)
-!U              CASE (IDBACK)
-!U                CALL WDialogHide()
-!U                GOTO 100
-!U              CASE (IDFINISH)
-!U                SKIP = .TRUE.
-!U                CALL WDialogHide()
-!U                CALL ToggleMenus(1)
-!U                RETURN
-!U              CASE (IDCANCEL)
-!U                SKIP = .TRUE.
-!U                CALL WDialogHide()
-!U                CALL ToggleMenus(1)
-!U                RETURN
-!U            END SELECT
-!U        END SELECT
-!U      END DO
-!U!   view data/ determine peak positions
-!U!.. Deal here with page 3 - only visited for options 1 & 2
-!U 300  SKIP = .FALSE.
-!U      CALL WDialogSelect(IDD_PW_Page3)
-!U      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-!U      DO WHILE(.NOT. SKIP)
-!U        IXPos_IDD_Wizard = WInfoDialog(6)
-!U        IYPos_IDD_Wizard = WInfoDialog(7)
-!U        CALL GetEvent
-!U        SELECT CASE (EventInfo%WIN)
-!U          CASE (0)
-!U! Process main window messages
-!U            CALL process_mainwindow_message
-!U            CYCLE
-!U        END SELECT
-!U        SELECT CASE (EventType)
-!U          CASE (PushButton)
-!U            SELECT CASE (EventInfo%VALUE1)
-!U!C>> JCC Add callback for Open button
-!U              CASE(ID_PWa_DF_Open)
-!U                CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
-!U                CALL Diffraction_File_Open(CTEMP)
-!U!C>> JCC Need to reselect dialogue after the action
-!U                CALL WDialogSelect(IDD_PW_Page3)
-!U              CASE(ID_PWa_DF_Browse)
-!U                CALL Diffraction_File_Browse
-!U!C>> JCC Need to reselect dialogue after the action
-!U                CALL WDialogSelect(IDD_PW_Page3)
-!U              CASE(IDBACK)
-!U                CALL WDialogHide()
-!U                GOTO 1
-!U!C>>                  CASE(IDF_PW3_Skip)
-!U!C>>                    SKIP = .TRUE.
-!U                CALL WDialogHide()
-!U! JvdS It's kind of dirty that 'Cancel' and 'Finish' amount to the same thing.
-!U              CASE(IDFINISH,IDCANCEL)
-!U                SKIP = .TRUE.
-!U                CALL WDialogHide()
-!U                CALL ToggleMenus(1)
-!U                RETURN
-!U            END SELECT
-!U        END SELECT
-!U      END DO
-!U!.. Deal with the simulated annealing ...
-!U 500  SKIP = .FALSE.
-!U      IXPos_IDD_SA_Input = IXPos_IDD_Wizard
-!U      IYPos_IDD_SA_Input = IYPos_IDD_Wizard
-!U      CALL SA_MAIN()
-!U      GOTO 8
-!U 600  IXPos_IDD_SA_Input = WInfoDialog(6)
-!U      IYPos_IDD_SA_Input = WInfoDialog(7)
-!U      CALL SA_MAIN()
-!U      CALL ToggleMenus(1)
-!U      RETURN
-!U
-!U      END SUBROUTINE PolyFitter_Wizard
+      SUBROUTINE PolyFitter_Wizard
+!   Open the first wizard child window
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE                           
+!
+!   Variable declarations
+!
+!O      LOGICAL :: NODATA
+      LOGICAL :: SKIP = .FALSE.
+      INTEGER :: IPW_Option
+
+      INCLUDE 'statlog.inc'
+      INCLUDE 'DialogPosCmn.inc'
+      INCLUDE 'Lattice.inc'
+
+      INTEGER :: IRadSelection
+      REAL Temp
+      CHARACTER(LEN=256) :: CTEMP
+
+      INCLUDE 'GLBVAR.INC' ! Contains JRadOption which replaces SourceState and IRadOption
+      INTEGER IDummy
+
+      LOGICAL FnUnitCellOK ! Function
+
+      SKIP = .FALSE.
+!.. Set up some defaults
+ 8    CONTINUE
+ 1    CONTINUE
+      CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+
+! JvdS Wizard is now dealt with per window
+      RETURN
+
+
+! Now check on which button was pressed ...
+      DO WHILE (.NOT. SKIP)
+        IXPos_IDD_Wizard = WInfoDialog(6)
+        IYPos_IDD_Wizard = WInfoDialog(7)
+        CALL GetEvent
+        SELECT CASE (EventInfo%WIN)
+          CASE (0)
+! Process main window messages
+            CALL process_mainwindow_message
+            CYCLE
+        END SELECT
+        SELECT CASE (EventType)
+          CASE (PushButton)
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDNEXT)
+                IXPos_IDD_Wizard = WInfoDialog(6)
+                IYPos_IDD_Wizard = WInfoDialog(7)
+                CALL WDialogHide()
+! We're off the main page and on to new pages depending on the option.
+                CALL WDialogGetRadioButton(IDF_PW_Option1,IPW_Option)
+                SELECT CASE (IPW_Option)
+                  CASE(1) ! view data/ determine peak positions
+                    GOTO 300
+                  CASE(2) ! Pawley
+                    GOTO 100
+                  CASE(3) ! Simulated Annealing
+                    GOTO 500
+                  CASE(4) ! Read Druid pawley file
+                    GOTO 600
+                END SELECT
+              CASE (IDF_PW0_Skip,IDCANCEL)
+                SKIP = .TRUE.
+                CALL WDialogHide()
+                CALL ToggleMenus(1)
+                RETURN
+            END SELECT
+        END SELECT
+      END DO
+      CALL ToggleMenus(1)
+      RETURN
+!.. Deal here with page 1 (cases 2 and 3)
+ 100  SKIP = .FALSE.
+      CALL WDialogSelect(IDD_PW_Page1)
+! If the cell is OK, the Next> button should be enabled
+      IF (FnUnitCellOK()) THEN
+! Enable the wizard next button
+        CALL WDialogFieldState(IDNEXT,Enabled)
+      ELSE
+! Disable the wizard next button
+        CALL WDialogFieldState(IDNEXT,Disabled)
+      END IF
+      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+      DO WHILE (.NOT. SKIP)
+        IXPos_IDD_Wizard = WInfoDialog(6)
+        IYPos_IDD_Wizard = WInfoDialog(7)
+        CALL GetEvent
+        SELECT CASE (EventInfo%WIN)
+          CASE (0)
+! Process main window messages
+            CALL process_mainwindow_message
+            CYCLE
+        END SELECT
+        SELECT CASE (EventType)
+          CASE (PushButton)
+            SELECT CASE (EventInfo%VALUE1)
+              CASE(IDBACK)
+                CALL WDialogHide()
+                GOTO 1
+              CASE(IDNEXT)
+! We're off the second page and on to the last page
+                CALL WDialogHide()
+!C>>                          CALL WDialogSelect(IDD_PW_Page1)
+                GOTO 200
+              CASE(IDCLOSE,IDCANCEL)
+                SKIP = .TRUE.
+                CALL WDialogSelect(IDD_PW_Page1)
+                CALL WDialogHide()
+                CALL ToggleMenus(1)
+                RETURN
+            END SELECT
+          CASE (FieldChanged)
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDF_Space_Group_Menu)
+                CALL Update_Space_Group(IDD_PW_Page1, IDummy, IDummy)
+                NumPawleyRef = 0
+              CASE (IDF_Crystal_System_Menu)
+                CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
+                CALL SetCrystalSystem(LatBrav)
+                CALL SetSpaceGroupMenu(LatBrav)
+                CALL Generate_TicMarks
+              CASE (IDF_a_latt)
+                CALL WDialogGetReal(IDF_a_latt,CellPar(1))
+                CALL UpdateCell(IDD_PW_Page1)
+              CASE (IDF_b_latt)
+                CALL WDialogGetReal(IDF_b_latt,CellPar(2))
+                CALL UpdateCell(IDD_PW_Page1)
+              CASE (IDF_c_latt)
+                CALL WDialogGetReal(IDF_c_latt,CellPar(3))
+                CALL UpdateCell(IDD_PW_Page1)
+              CASE (IDF_alp_latt)
+                CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
+                CALL UpdateCell(IDD_PW_Page1)
+              CASE (IDF_bet_latt)
+                CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
+                CALL UpdateCell(IDD_PW_Page1)
+              CASE (IDF_gam_latt)
+                CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
+                CALL UpdateCell(IDD_PW_Page1)
+            END SELECT                
+        END SELECT
+      END DO
+!.. Deal here with page 2 of Pawley, i.e. Basic Diffraction Information
+! Now called: Diffraction Setup
+ 200 SKIP = .FALSE.
+      CALL WDialogSelect(IDD_PW_Page2)
+! JvdS @ following line should not be necessary
+      CALL SetSourceDataState(JRadOption)
+      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+      DO WHILE(.NOT. SKIP)
+        IXPos_IDD_Wizard = WInfoDialog(6)
+        IYPos_IDD_Wizard = WInfoDialog(7)
+        CALL GetEvent
+        SELECT CASE (EventInfo%WIN)
+          CASE (0)
+! Process main window messages
+            CALL process_mainwindow_message
+            CYCLE
+        END SELECT
+! JvdS @ Next line is in a weird place again
+        CALL WDialogGetRadioButton(IDF_PW_LabX_Source,JRadOption)
+        CALL SetSourceDataState(JRadOption)
+        SELECT CASE (EventType)
+          CASE(FieldChanged)
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDF_PW_wavelength1)
+                CALL WDialogGetReal(IDF_PW_wavelength1,Temp)
+                CALL UpdateWavelength(Temp)
+!C>> JCC Add in function  
+              CASE (IDF_Wavelength_Menu)
+                CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
+                CALL SetWavelengthToSelection(IRadSelection)
+            END SELECT
+          CASE (PushButton)
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (ID_PW_DF_Open)
+!C>> JCC Add callback for Open button
+                CALL WDialogGetString(IDF_PW_DataFileName_String,CTEMP)
+                CALL Diffraction_File_Open(CTEMP)
+!C>> JCC Have to reselect after the file open
+                CALL WDialogSelect(IDD_PW_Page2)
+              CASE (ID_PW_DF_Browse)
+                CALL Diffraction_File_Browse
+!C>> JCC Have to reselect after the file open
+                CALL WDialogSelect(IDD_PW_Page2)
+              CASE (IDBACK)
+                CALL WDialogHide()
+                GOTO 100
+              CASE (IDFINISH)
+                SKIP = .TRUE.
+                CALL WDialogHide()
+                CALL ToggleMenus(1)
+                RETURN
+              CASE (IDCANCEL)
+                SKIP = .TRUE.
+                CALL WDialogHide()
+                CALL ToggleMenus(1)
+                RETURN
+            END SELECT
+        END SELECT
+      END DO
+!   view data/ determine peak positions
+!.. Deal here with page 3 - only visited for options 1 & 2
+ 300  SKIP = .FALSE.
+      CALL WDialogSelect(IDD_PW_Page3)
+      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+      DO WHILE(.NOT. SKIP)
+        IXPos_IDD_Wizard = WInfoDialog(6)
+        IYPos_IDD_Wizard = WInfoDialog(7)
+        CALL GetEvent
+        SELECT CASE (EventInfo%WIN)
+          CASE (0)
+! Process main window messages
+            CALL process_mainwindow_message
+            CYCLE
+        END SELECT
+        SELECT CASE (EventType)
+          CASE (PushButton)
+            SELECT CASE (EventInfo%VALUE1)
+!C>> JCC Add callback for Open button
+              CASE(ID_PWa_DF_Open)
+                CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
+                CALL Diffraction_File_Open(CTEMP)
+!C>> JCC Need to reselect dialogue after the action
+                CALL WDialogSelect(IDD_PW_Page3)
+              CASE(ID_PWa_DF_Browse)
+                CALL Diffraction_File_Browse
+!C>> JCC Need to reselect dialogue after the action
+                CALL WDialogSelect(IDD_PW_Page3)
+              CASE(IDBACK)
+                CALL WDialogHide()
+                GOTO 1
+!C>>                  CASE(IDF_PW3_Skip)
+!C>>                    SKIP = .TRUE.
+                CALL WDialogHide()
+! JvdS It's kind of dirty that 'Cancel' and 'Finish' amount to the same thing.
+              CASE(IDFINISH,IDCANCEL)
+                SKIP = .TRUE.
+                CALL WDialogHide()
+                CALL ToggleMenus(1)
+                RETURN
+            END SELECT
+        END SELECT
+      END DO
+!.. Deal with the simulated annealing ...
+ 500  SKIP = .FALSE.
+      IXPos_IDD_SA_Input = IXPos_IDD_Wizard
+      IYPos_IDD_SA_Input = IYPos_IDD_Wizard
+      CALL SA_MAIN()
+      GOTO 8
+ 600  IXPos_IDD_SA_Input = WInfoDialog(6)
+      IYPos_IDD_SA_Input = WInfoDialog(7)
+      CALL SA_MAIN()
+      CALL ToggleMenus(1)
+      RETURN
+
+      END SUBROUTINE PolyFitter_Wizard
 !
 !*****************************************************************************
 !
 ! Originally in Profile_Plot.f90
 !
-!U      SUBROUTINE Plot_SA_Profile()
-!U!
-!U      USE WINTERACTER
-!U      USE DRUID_HEADER
-!U!
-!U      INCLUDE 'POLY_COLOURS.INC'
-!U
-!U      INCLUDE 'PARAMS.INC'
-!U
-!U      REAL ydif(MCHSTP)
-!U!
-!U      COMMON /CHISTOP/ NOBS,NFIT,IFIT(MCHSTP),CHIOBS,&
-!U      WT(MCHSTP),XOBS(MCHSTP),YOBS(MCHSTP),YCAL(MCHSTP),ESD(MCHSTP)
-!U!
-!U      COMMON /sappcmn/ xpmin,xpmax,ypmin,ypmax
-!U      COMMON /sapgcmn/ xpgmin,xpgmax,ypgmin,ypgmax
-!U      COMMON /chibest/ ycalbest(MCHSTP)
-!U!
-!U      BACK=0.
-!U      YOSUM=0.
-!U      YCSUM=0.
-!U      DO II=1,NFIT
-!U        I=IFIT(II)
-!U        YOSUM=YOSUM+YOBS(I)
-!U        YCSUM=YCSUM+YCALbest(I)
-!U      END DO
-!U      RESCL=YOSUM/YCSUM
-!U      DO I=1,NOBS
-!U        YCALbest(i)=RESCL*YCALbest(I)
-!U      END DO
-!U      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
-!U       call IGrColourN(KolNumMain)
-!U      CALL IPgYLabelLeft('Observed profile','C9')
-!U!
-!U!      CALL IPgNewGraph(3,nobs,' ',' ','XY')
-!U      CALL IPgNewPlot(PgPolyLine,3,NOBS)
-!U      YADD=0.5*(YPGMAX+YPGMIN)
-!U      DO II=1,NOBS!IPMIN,IPMAX
-!U        YDIF(II)=YADD+YOBS(II)-YCALBEST(II)
-!U      END DO
-!U      CALL IPgStyle(1,0,0,0,KolNumDif,0)
-!U      CALL IPgStyle(2,0,3,0,0,KolNumObs)
-!U      CALL IPgStyle(3,0,0,0,KolNumCal,0)
-!U      CALL IPgXYPairs(xobs,ydif)
-!U      CALL IGrCharSize(.3,.3)
-!U      CALL IPgMarker( 2, 13)
-!U!      sizmtem=marker_size*float(500)/float(ipmax-ipmin)
-!U!      sizmtem=min(marker_size,sizmtem)
-!U!      CALL IGrCharSize(sizmtem,sizmtem)
-!U      CALL IPgXYPairs(xobs,yobs)
-!U!
-!U! Do the error bars - we've precalculated the min & max pointers
-!U!
-!U      CALL IGrColourN(KolNumObs)
-!U      DO I=1,nobs!IPMIN,IPMAX
-!U        xtem=xobs(i)
-!U        ytem=max(yobs(i)-esd(i),ypgmin)
-!U        ytem=min(ytem,ypgmax)
-!U        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-!U        call IGrMoveTo(xgtem,ygtem)
-!U        ytem=min(yobs(i)+esd(i),ypgmax)
-!U        ytem=max(ytem,ypgmin)
-!U        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-!U        call IGrLineTo(xgtem,ygtem)
-!U      END DO
-!U      CALL IPgXYPairs(xobs,ycalbest)
-!U      CALL IGrCharSize(1.,1.)
-!U      CALL IGrColourN(KolNumMain)
-!U!
-!U      END SUBROUTINE Plot_SA_Profile
+      SUBROUTINE Plot_SA_Profile()
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+!
+      INCLUDE 'POLY_COLOURS.INC'
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL ydif(MCHSTP)
+!
+      COMMON /CHISTOP/ NOBS,NFIT,IFIT(MCHSTP),CHIOBS,&
+      WT(MCHSTP),XOBS(MCHSTP),YOBS(MCHSTP),YCAL(MCHSTP),ESD(MCHSTP)
+!
+      COMMON /sappcmn/ xpmin,xpmax,ypmin,ypmax
+      COMMON /sapgcmn/ xpgmin,xpgmax,ypgmin,ypgmax
+      COMMON /chibest/ ycalbest(MCHSTP)
+!
+      BACK=0.
+      YOSUM=0.
+      YCSUM=0.
+      DO II=1,NFIT
+        I=IFIT(II)
+        YOSUM=YOSUM+YOBS(I)
+        YCSUM=YCSUM+YCALbest(I)
+      END DO
+      RESCL=YOSUM/YCSUM
+      DO I=1,NOBS
+        YCALbest(i)=RESCL*YCALbest(I)
+      END DO
+      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
+       call IGrColourN(KolNumMain)
+      CALL IPgYLabelLeft('Observed profile','C9')
+!
+!      CALL IPgNewGraph(3,nobs,' ',' ','XY')
+      CALL IPgNewPlot(PgPolyLine,3,NOBS)
+      YADD=0.5*(YPGMAX+YPGMIN)
+      DO II=1,NOBS!IPMIN,IPMAX
+        YDIF(II)=YADD+YOBS(II)-YCALBEST(II)
+      END DO
+      CALL IPgStyle(1,0,0,0,KolNumDif,0)
+      CALL IPgStyle(2,0,3,0,0,KolNumObs)
+      CALL IPgStyle(3,0,0,0,KolNumCal,0)
+      CALL IPgXYPairs(xobs,ydif)
+      CALL IGrCharSize(.3,.3)
+      CALL IPgMarker( 2, 13)
+!      sizmtem=marker_size*float(500)/float(ipmax-ipmin)
+!      sizmtem=min(marker_size,sizmtem)
+!      CALL IGrCharSize(sizmtem,sizmtem)
+      CALL IPgXYPairs(xobs,yobs)
+!
+! Do the error bars - we've precalculated the min & max pointers
+!
+      CALL IGrColourN(KolNumObs)
+      DO I=1,nobs!IPMIN,IPMAX
+        xtem=xobs(i)
+        ytem=max(yobs(i)-esd(i),ypgmin)
+        ytem=min(ytem,ypgmax)
+        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+        call IGrMoveTo(xgtem,ygtem)
+        ytem=min(yobs(i)+esd(i),ypgmax)
+        ytem=max(ytem,ypgmin)
+        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+        call IGrLineTo(xgtem,ygtem)
+      END DO
+      CALL IPgXYPairs(xobs,ycalbest)
+      CALL IGrCharSize(1.,1.)
+      CALL IGrColourN(KolNumMain)
+!
+      END SUBROUTINE Plot_SA_Profile
 !
 !*****************************************************************************
 !
@@ -3603,48 +3824,48 @@ C
 !
 ! Originally in PolyLoadFiles.f90
 !
-!U      INTEGER FUNCTION Load_CCL_File(FLEN,TheFileName)
-!U!
-!U      CHARACTER(LEN=256),           INTENT (IN) :: TheFileName
-!U      INTEGER,                      INTENT (IN) :: FLEN
-!U      CHARACTER(LEN=80) CCL_LINE
-!U      INCLUDE 'GLBVAR.INC' ! Contains ALambda
-!U      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
-!U      INTEGER I
-!U      REAL  WaveLengthOf ! Function
-!U!
-!U!>> JCC Initialise return value
-!U!
-!U      Load_CCL_File = 1
-!U      ZEROPOINT = 0.0
-!U      ALambda = WaveLengthOf('Cu')
-!U!
-!U!>> JCC Add in Error trap
-!U!                          
-!U      OPEN(11,FILE=TheFileName(:FLEN),STATUS='OLD', ERR = 999)
-!U!>> JCC Set SA Output files
-!U      CALL sa_SetOutputFiles(TheFileName)
-!U   10 READ(11,5000,ERR=100,END=100) NLCCL,CCL_LINE
-!U 5000 FORMAT(Q,A)
-!U      IF (CCL_LINE(1:1) .EQ. 'C') THEN
-!U        READ(CCL_LINE(2:NLCCL),*) (CELLPAR(I),I=1,6)
-!U      ELSE IF (CCL_LINE(1:1) .EQ. 'L') THEN
-!U        IF (CCL_LINE(3:6) .EQ. 'WVLN') THEN
-!U          READ(CCL_LINE(7:NLCCL),*) ALambda
-!U        ELSE IF (CCL_LINE(3:6) .EQ. 'ZERO') THEN
-!U          READ(CCL_LINE(7:NLCCL),*) zeropoint
-!U        END IF
-!U      END IF
-!U      GOTO 10
-!U  100 CLOSE(11)
-!U!
-!U      CALL UpLoad_Crystal_Data()
-!U!
-!U!>> JCC Added in next few lines
-!U      RETURN
-!U 999  Load_CCL_File = 0
-!U      RETURN
-!U      END FUNCTION Load_CCL_File
+      INTEGER FUNCTION Load_CCL_File(FLEN,TheFileName)
+!
+      CHARACTER(LEN=256),           INTENT (IN) :: TheFileName
+      INTEGER,                      INTENT (IN) :: FLEN
+      CHARACTER(LEN=80) CCL_LINE
+      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
+      INTEGER I
+      REAL  WaveLengthOf ! Function
+!
+!>> JCC Initialise return value
+!
+      Load_CCL_File = 1
+      ZEROPOINT = 0.0
+      ALambda = WaveLengthOf('Cu')
+!
+!>> JCC Add in Error trap
+!                          
+      OPEN(11,FILE=TheFileName(:FLEN),STATUS='OLD', ERR = 999)
+!>> JCC Set SA Output files
+      CALL sa_SetOutputFiles(TheFileName)
+   10 READ(11,5000,ERR=100,END=100) NLCCL,CCL_LINE
+ 5000 FORMAT(Q,A)
+      IF (CCL_LINE(1:1) .EQ. 'C') THEN
+        READ(CCL_LINE(2:NLCCL),*) (CELLPAR(I),I=1,6)
+      ELSE IF (CCL_LINE(1:1) .EQ. 'L') THEN
+        IF (CCL_LINE(3:6) .EQ. 'WVLN') THEN
+          READ(CCL_LINE(7:NLCCL),*) ALambda
+        ELSE IF (CCL_LINE(3:6) .EQ. 'ZERO') THEN
+          READ(CCL_LINE(7:NLCCL),*) zeropoint
+        END IF
+      END IF
+      GOTO 10
+  100 CLOSE(11)
+!
+      CALL UpLoad_Crystal_Data()
+!
+!>> JCC Added in next few lines
+      RETURN
+ 999  Load_CCL_File = 0
+      RETURN
+      END FUNCTION Load_CCL_File
 !
 !*****************************************************************************
 !
@@ -8844,39 +9065,39 @@ C
 !
 !*****************************************************************************
 !
-!U      SUBROUTINE CCL_file_Open()
-!U
-!U!   This subroutine processes Open CCL file selection
-!U
-!U      USE WINTERACTER
-!U      USE VARIABLES
-!U
-!U      IMPLICIT NONE
-!U
-!U      CHARACTER(LEN=256) :: FILTER
-!U      INTEGER            :: IFLAGS
-!U
-!U      INCLUDE 'GLBVAR.INC'
-!U
-!U      LOGICAL Confirm ! Function
-!U
-!U!   Check if file needs saving
-!U      IF (SAVEF) THEN
-!U        IF (.NOT. Confirm('Program contains an unsaved project.'//CHAR(13)//'Do you wish to continue?')) RETURN
-!U      END IF
-!U      SAVEF  = .FALSE.
-!U      CALL FieldUpdate()
-!U      IFLAGS = LoadDialog + DirChange + PromptOn
-!U      FILTER = 'CCL crystal data files (*.ccl)|*.ccl|'
-!U      FNAME=' '
-!U      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Open CCL file')
-!U!   Place your file load code here
-!U      CALL Load_CCL_File(LEN_TRIM(FNAME),FNAME)
-!U      STATBARSTR(1)=FNAME
-!U      CALL WindowOutStatusBar(1,STATBARSTR(1))
-!U      RETURN
-!U
-!U      END SUBROUTINE CCL_file_Open
+      SUBROUTINE CCL_file_Open()
+
+!   This subroutine processes Open CCL file selection
+
+      USE WINTERACTER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER(LEN=256) :: FILTER
+      INTEGER            :: IFLAGS
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL Confirm ! Function
+
+!   Check if file needs saving
+      IF (SAVEF) THEN
+        IF (.NOT. Confirm('Program contains an unsaved project.'//CHAR(13)//'Do you wish to continue?')) RETURN
+      END IF
+      SAVEF  = .FALSE.
+      CALL FieldUpdate()
+      IFLAGS = LoadDialog + DirChange + PromptOn
+      FILTER = 'CCL crystal data files (*.ccl)|*.ccl|'
+      FNAME=' '
+      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Open CCL file')
+!   Place your file load code here
+      CALL Load_CCL_File(LEN_TRIM(FNAME),FNAME)
+      STATBARSTR(1)=FNAME
+      CALL WindowOutStatusBar(1,STATBARSTR(1))
+      RETURN
+
+      END SUBROUTINE CCL_file_Open
 !
 !*****************************************************************************
 !
@@ -8976,77 +9197,77 @@ C
 ! Originally in SplineFit.f90
 !
       SUBROUTINE Spline_Background
-!U
-!U! Algorithm:
-!U!
-!U! 1. Define all points on the profile by using user defined positions. Initially these are defined
-!U! from the unit cell reflection positions using a fitness equation (as yet undefined) or from user-given 
-!U! points in the profile
-!U!
-!U! 2. Fit a cubic spline to these points and use this for background correction
-!U!
-!U! Notes:
-!U!
-!U! This algorithm uses the information from the indexing. If your indexing is bad, then
-!U! it has no chance!
-!U
-!U      USE WINTERACTER
-!U      USE DRUID_HEADER
-!U      USE VARIABLES
-!U
-!U      INCLUDE 'POLY_COLOURS.INC'
-!U      INCLUDE 'PARAMS.INC'
-!U      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-!U
-!U      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-!U        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-!U        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-!U
-!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-!U      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-!U
-!U      REAL TicVal(Mtic),XSpline(Mtic),YSpline(Mtic),DSpline(Mtic),NSpline,Xtem,Ytem
-!U      INTEGER Npos,Count,Nstep
-!U      REAL Del
-!U
-!U      Npos = 0
-!U! Calculate the mean intensity over the profile and the mean intensity 
-!U! over the reflection positions
-!U      DO I = 1, MTIC
-!U! Modify the position 
-!U        IF (I .GT. 1) THEN
-!U          Del =  ARGK(I) - ARGK(I-1)
-!U        ELSE
-!U          Del =  ARGK(I) - XOBS(1)
-!U        ENDIF
-!U! we want points between the peaks that are well separated
-!U        IF (Del .GT. 0.25 ) THEN  ! This is selection is hard coded here but really should be
-!U                              ! dependant on the estimated peak width at this position
-!U           Npos = Npos + 1
-!U           TicVal(Npos) = ARGK(I) - (Del/2.0)
-!U        END IF
-!U      END DO
-!U      Count = 1
-!U      DO I = 1, NOBS-1
-!U        IF (XOBS(I).LE.TicVal(Count) .AND. XOBS(I+1).GE.TicVal(Count)) THEN
-!U          XSpline(Count) = XOBS(I)
-!U          YSpline(Count) = YOBS(I)
-!U          Count = Count + 1
-!U          IF (Count .GT. Npos) GOTO 99
-!U        END IF
-!U      END DO
-!U 99   CONTINUE
-!U      CALL IGrColourN(KolNumObs)
-!U! JvdS IPgNewGraph is now obsolete and should be replaced by IPgNewPlot
-!U! I don't know the equivalent of 'S'
-!U!      CALL IPgNewPlot(PgPolyLine,1,NBIN,??)
-!U      CALL IPgNewGraph(1,Npos,' ','S','X')
-!U      CALL IPgStyle(1,0,0,0,KolNumDif,0)
-!U      CALL IPgXYPairs(XSpline,YSpline)
-!U      CALL IGrColourN(KolNumMain)
-!U
+
+! Algorithm:
+!
+! 1. Define all points on the profile by using user defined positions. Initially these are defined
+! from the unit cell reflection positions using a fitness equation (as yet undefined) or from user-given 
+! points in the profile
+!
+! 2. Fit a cubic spline to these points and use this for background correction
+!
+! Notes:
+!
+! This algorithm uses the information from the indexing. If your indexing is bad, then
+! it has no chance!
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'PARAMS.INC'
+      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+
+      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+
+      REAL TicVal(Mtic),XSpline(Mtic),YSpline(Mtic),DSpline(Mtic),NSpline,Xtem,Ytem
+      INTEGER Npos,Count,Nstep
+      REAL Del
+
+      Npos = 0
+! Calculate the mean intensity over the profile and the mean intensity 
+! over the reflection positions
+      DO I = 1, MTIC
+! Modify the position 
+        IF (I .GT. 1) THEN
+          Del =  ARGK(I) - ARGK(I-1)
+        ELSE
+          Del =  ARGK(I) - XOBS(1)
+        ENDIF
+! we want points between the peaks that are well separated
+        IF (Del .GT. 0.25 ) THEN  ! This is selection is hard coded here but really should be
+                              ! dependant on the estimated peak width at this position
+           Npos = Npos + 1
+           TicVal(Npos) = ARGK(I) - (Del/2.0)
+        END IF
+      END DO
+      Count = 1
+      DO I = 1, NOBS-1
+        IF (XOBS(I).LE.TicVal(Count) .AND. XOBS(I+1).GE.TicVal(Count)) THEN
+          XSpline(Count) = XOBS(I)
+          YSpline(Count) = YOBS(I)
+          Count = Count + 1
+          IF (Count .GT. Npos) GOTO 99
+        END IF
+      END DO
+ 99   CONTINUE
+      CALL IGrColourN(KolNumObs)
+! JvdS IPgNewGraph is now obsolete and should be replaced by IPgNewPlot
+! I don't know the equivalent of 'S'
+!      CALL IPgNewPlot(PgPolyLine,1,NBIN,??)
+      CALL IPgNewGraph(1,Npos,' ','S','X')
+      CALL IPgStyle(1,0,0,0,KolNumDif,0)
+      CALL IPgXYPairs(XSpline,YSpline)
+      CALL IGrColourN(KolNumMain)
+
       END SUBROUTINE Spline_Background
-!U
+
 !
 !*****************************************************************************
 !
