@@ -1,4 +1,4 @@
-! Winteracter module created : 11/Jan/2002 10:36:32
+! Winteracter module created : 14/Jan/2002 13:06:35
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -479,4 +479,10 @@
           INTEGER, PARAMETER :: IDF_Align                       =  1224
           INTEGER, PARAMETER :: IDF_Agreement                   =  1225
           INTEGER, PARAMETER :: IDB_IAgree                      =  1228
+          INTEGER, PARAMETER :: IDD_SAW_Page2                   =   134
+          INTEGER, PARAMETER :: IDF_PO_a                        =  1229
+          INTEGER, PARAMETER :: IDF_PO_b                        =  1236
+          INTEGER, PARAMETER :: IDF_PO_c                        =  1237
+          INTEGER, PARAMETER :: IDD_TEMPLATE012                 =   135
+          INTEGER, PARAMETER :: IDF_RotationsGrid               =  1238
       END MODULE Druid_Header
