@@ -303,13 +303,9 @@
       CALL Clear_PeakFitRanges
 ! Ungrey 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
-      XPMIN = XOBS(1)
-      XPMAX = XOBS(1)
       YPMIN = YOBS(1)
       YPMAX = YOBS(1)
       DO I = 1, NOBS
-        XPMIN = MIN(XOBS(I),XPMIN)
-        XPMAX = MAX(XOBS(I),XPMAX)
         YPMIN = MIN(YOBS(I),YPMIN)
         IF (YPMAX .LT. YOBS(I)) THEN
           MAX_INTENSITY_INDEX = I

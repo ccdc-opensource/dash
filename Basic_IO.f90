@@ -1,6 +1,36 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DebugRoutine(ALSQ,MATSZ)
+
+      IMPLICIT NONE
+
+      INTEGER MATSZ
+      REAL ALSQ
+      DIMENSION ALSQ(MATSZ)
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER         MATPNT
+      REAL                         BLSQ
+      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
+    
+      INTEGER I
+
+      OPEN(UNIT=10,FILE='Debug.txt',ERR=999)
+      WRITE(10,'(A,I3)',ERR=999) 'MATSZ = ',MATSZ
+      DO I = 1, MATSZ
+        WRITE(10,'(F15.9)',ERR=999) ALSQ(I)
+      ENDDO
+      CLOSE(10)
+      RETURN
+  999 CALL DebugErrorMessage('Error while accessing debug file')
+      CLOSE(10)
+
+      END SUBROUTINE DebugRoutine
+!
+!*****************************************************************************
+!
       SUBROUTINE ErrorMessage(TheMessage)
 !
 ! Displays an error message

@@ -62,11 +62,6 @@
       PARAMETER ( MAX_NPFR = 50, MAX_NPPR = 10, MAX_FITPT = 10000 )
       PARAMETER ( MPkDes = 6 )
 
-! For use in Quick_Pawley
-
-      INTEGER QPFDIM
-      PARAMETER ( QPFDIM = 100000 )
-
 ! For use in common block ZSTORE
 
       INTEGER MPPTS
@@ -111,7 +106,23 @@
 ! maxiter = maximum number of simulated annealing iterations (per individual run when multi run).
 
        INTEGER MaxRun
-	   PARAMETER ( MaxRun = 99)
+	   PARAMETER ( MaxRun = 99 )
 ! Maximum number of runs in a multirun.
 ! Don't forget to update the Winteracter grids accordingly.
 ! Note the difference with MaxRuns: that's the number of runs requested by the user.
+
+       INTEGER MaxBVar
+       PARAMETER ( MaxBVar = 400 )
+! Maximum number of basic variables. Not quite sure what a basic variable is,
+! but it has to do the number of parameters that can be refined during the Pawley
+! refinement, so this is the number that limits the number of reflections used 
+! during the Pawley refinement. It is used implicitly in at least one other constant as well,
+! so just changing 400 to 500 won't work.
+
+! For use in Quick_Pawley
+
+      INTEGER QPFDIM
+      PARAMETER ( QPFDIM = (20000 + (MaxBVar * (MaxBVar+3)) / 2) )
+! This is the number of elements in the least squares refinement matrix.
+! The extra 20000 looks a bit stupid, but it was there in the original code so I left it in.
+! Should not be necessary at all.

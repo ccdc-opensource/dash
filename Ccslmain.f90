@@ -1,4 +1,6 @@
-!*==ADDANG.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
+!
+!*****************************************************************************
+!
 !CSL Mark 4 Update 54 4-July-95
 !
 !
@@ -7,37 +9,13 @@
 !                      S U B R O U T I N E   L I B R A R Y
 !
 !
-!   Parameter ATFS altered from 20     to 50
-!   Parameter ATOM altered from 50     to 150
-!   Parameter BVAR altered from 200    to 400
-!   Parameter CSTR altered from 20     to 300
-!   Parameter F2VA altered from 200    to 300
-!   Parameter MATS altered from 3000   to 80000
-!   Parameter OLAP altered from 70     to 200
-!   Parameter OMAX altered from 200    to 300
-!   Parameter PHAS altered from 1      to 9
-!   Parameter PSLK altered from 300    to 1000
-!   Parameter PVAR altered from 1000   to 2000
-!   Parameter REFS altered from 1000   to 10000
-!   Parameter SLAK altered from 20     to 500
-!   Parameter SORC altered from 1      to 5
-!   Parameter VVAR altered from 250    to 500
-!
 !                       M A R K  4       L I B R A R Y
 !
 !             TO BE DESCRIBED IN THE USER'S MANUAL 'CCSL MARK 4'.
 !
 !
-!U      BLOCK DATA ABSHED
-!U      COMMON /HEDABS/HEDAB
-!U      CHARACTER*104 HEDAB
-!U      DATA HEDAB/'(6X,''h'',4X,''k'',4X,''l'',5X,''   Iobs       Icor
-!U     &      Trn Fac      & Theta     Omega       Nu      ''/)'/
-!U      END
 !
 !
-!
-! LEVEL 3      SUBROUTINE ADDANG(NAME,N1,N2,N3,NA,IE)
       SUBROUTINE ADDANG(NAME,N1,N2,N3,NA,IE)
 !
 ! *** ADDANG updated by JCM 25 Jul 91 ***
@@ -71,7 +49,7 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
-!
+
       IE = 0
 ! IS ANGLE ALREADY GIVEN IN TRIANGLE N1,N2,N3 OPPOSITE N1?
       NMIN = MIN(N2,N3)
@@ -107,6 +85,7 @@
       INANG(NA,3) = NMAX
   100 RETURN
  3000 FORMAT (/' ERROR ** ',A4,' and',A4,' refer to same angle')
+
       END SUBROUTINE ADDANG
 !
 !*****************************************************************************
@@ -158,7 +137,7 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
-!
+
 ! IF NAME IS EMPTY, SEARCH FOR THE REST:
       IF (NAME.EQ.'    ') THEN
         DO I = 1, NTARNM
@@ -2025,12 +2004,21 @@
 !N ALSQ and MATSZ are passed through the whole of the LSQ system as arguments,
 !N enabling MATSZ to be set and ALSQ to be dimensioned in MAIN programs.
 !
-      DIMENSION ALSQ(MATSZ), MM(400)
-      COMMON /MATDAT/ MATPNT(401), BLSQ(400)
+      INCLUDE 'PARAMS.INC'
+
+      DIMENSION ALSQ(MATSZ), MM(MaxBVar)
+
+      INTEGER         MATPNT
+      REAL                         BLSQ
+      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
       EQUIVALENCE (MM(1),MATPNT(2))
 
-      IND = MM(I) + J
-      IF (J.LT.I) IND = MM(J) + I
+      IF ((I .GT. MaxBVar) .OR. (J .GT. MaxBVar)) CALL DebugErrorMessage('Index into ALSQ out of range in ELEMAT')
+      IF (J.LT.I) THEN
+        IND = MM(J) + I
+      ELSE
+        IND = MM(I) + J
+      ENDIF
       ELEMAT = ALSQ(IND)
 
       END FUNCTION ELEMAT
@@ -5447,7 +5435,7 @@
 !
       DIMENSION H(3)
       COMMON /FUNIT / NASYM, ASYM(3,3), EDGE(3,3), ANG(3), NMUL, KOM10
-!
+
       I = 0
       IN = 0
       IE = 3
@@ -5466,6 +5454,7 @@
       IF (I.EQ.2) IN = IE + 10
       IF (I.EQ.1) IN = IP
   100 RETURN
+
       END SUBROUTINE INBOX
 !
 !*****************************************************************************
@@ -5485,7 +5474,7 @@
       DO I = 1, 3
         K(I) = NINT(H(I))
       ENDDO
-      RETURN
+
       END SUBROUTINE INDFIX
 !
 !*****************************************************************************
@@ -5505,7 +5494,7 @@
       DO I = 1, 3
         H(I) = FLOAT(K(I))
       ENDDO
-      RETURN
+
       END SUBROUTINE INDFLO
 !
 !*****************************************************************************
@@ -5576,9 +5565,8 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-      COMMON /WHEN  / DAT, TIM(2), MAIN
+      COMMON /WHEN  / TIM(2), MAIN
       CHARACTER*5 TIM
-      CHARACTER*10 DAT
       CHARACTER*6 MAIN
       DATA IDIGI1/'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'/
       DATA LETTS/'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', &
@@ -5760,17 +5748,9 @@
         CASE ('12')
           MonthStr = 'DEC'
       END SELECT
-      DAT(1:3) = tDate(7:8)//'-'
-      DAT(4:6) = MonthStr(1:3)
-      DAT(7:10) = '-'//tDate(3:4)//' '
-!VMS
       CALL TIME(TIM(1))
-!VMS
       WRITE (LPT,2001) TIM(1), DateStr(1:LEN_TRIM(DateStr))
-!VMS
  2001 FORMAT (/20X,'Job run at ',A5,' on ',A)
-!
-! CONSTANTS TO MACHINE ACCURACY:
   100 RETURN
 
       END SUBROUTINE INITIL
@@ -7661,6 +7641,7 @@
         OVER = TESTOV(1.,ALSQ(IR+I))
         IF (OVER) THEN
           CALL PARNAM(BS,VR,1,I)
+          CALL DebugErrorMessage('Element 0.0 in MATINV')
           WRITE (LPT,3000) I, BS, VR
           DERIVB(I) = 0.
         ELSE
@@ -7676,7 +7657,7 @@
         IF (OVER) THEN
           DERIVB(I) = 1.
           ALSQ(IR+I) = 1.
-          BLSQ(I) = 0.
+  !        BLSQ(I) = 0.
         ENDIF
       ENDDO
 !
@@ -8255,9 +8236,8 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-      COMMON /WHEN  / DAT, TIM(2), MAIN
+      COMMON /WHEN  / TIM(2), MAIN
       CHARACTER*5 TIM
-      CHARACTER*10 DAT
       CHARACTER*6 MAIN
       INTEGER ISPAG
       DATA LM/13, 14/
@@ -8904,12 +8884,9 @@
   100 RETURN
  3001 FORMAT (/' *** PROGRAM ERROR ** OPNFIL CALL OF NOPFIL HAS RETURNED ',2I5)
       END SUBROUTINE OPNFIL
-!*==OPSYM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE OPSYM(ISYM)
       SUBROUTINE OPSYM(ISYM)
 !
 ! *** OPSYM by JCM 11 Apr 83 ***
@@ -8945,25 +8922,21 @@
      &                KOM26
       COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
      &                KOM22
-!
+
 ! SET UP X Y Z AND H K L IN ARRAY LET:
       DO I = 1, 3
         LET(I,1) = LETLOW(I+23)
         LET(I,2) = LETLOW(I+9)
       ENDDO
       LET(1,2) = LETLOW(8)
-!
 ! SET + OR +-
       ISIG = ISPCE
       IF (CENTRC .OR. ((ISYM.EQ.2).AND.FRIEDL)) ISIG = '-'
-!
 ! HEADING FOR RECIPROCAL SPACE:
       IF (ISYM.EQ.2) THEN
         WRITE (LPT,2000) ISIG
- 2000   FORMAT (/' Equivalent reflections are:  +',A1,20X,'with  ',     &
-     &          'relative phases 2pi times:')
+ 2000   FORMAT (/' Equivalent reflections are:  +',A1,20X,'with  ','relative phases 2pi times:')
       ELSE
-!
 ! HEADING FOR REAL SPACE:
         CALL MESS(LPT,1,'General equivalent positions are:')
         DO I = 1, NLAT
@@ -8972,7 +8945,6 @@
             IMID(J) = IDIGIT(10)
             IDEN(J) = ISPCE
 ! IN CASE IT IS ZERO
-!
 ! NOW PREPARE PRINTING OF FRACTION IN LATTICE VECTOR
 ! SET 'CONSIDER ONLY DENOMINATORS OF 2,3,4,6'
             CALL NUMDEN(ALAT(J,I),NNUM,NDEN,1,IRR)
@@ -8986,20 +8958,17 @@
           WRITE (LPT,2002) (INUM(J),IMID(J),IDEN(J),J=1,3), ISIG
  2002     FORMAT (2X,2(4X,3A1,13X),4X,3A1,4X,'  +',A1)
           GOTO 13
-!
 ! IN CASE ELEMENT OF LATTICE VECTOR NOT A FRACTION:
    15     WRITE (LPT,2003) (ALAT(J,I),J=1,3), ISIG
  2003     FORMAT (2X,2(F10.4,10X),F10.4,4X,'  +',A1)
    13   ENDDO
         WRITE (LPT,2004)
  2004   FORMAT (1X)
-!
       ENDIF
       DO NO = 1, NOPC
 ! IP COUNTS ACROSS ARRAY OF CHARACTERS FOR PHASE, IF RECIPROCAL
         IP = 0
         IF (ISYM.EQ.2) THEN
-!
 ! IF RECIPROCAL SPACE, USE INVERSE MATRIX TRANSPOSED, AND THE NEGATED
 ! TRANSLATION VECTOR CORRESPONDING TO THAT MATRIX:
           DO I = 1, 3
@@ -9008,7 +8977,6 @@
           CALL GMEQ(SYM(1,1,INVERS(NO)),TEMSYM,3,3)
           CALL TRANSQ(TEMSYM,3)
         ELSE
-!
 ! IF REAL SPACE , USE OPERATOR AS STORED:
           CALL GMEQ(TRANS(1,NO),TRANS1,1,3)
           CALL GMEQ(SYM(1,1,NO),TEMSYM,3,3)
@@ -9028,20 +8996,17 @@
               GOTO 5
     3       ENDDO
           ENDIF
-!
     5     DO M = 1, 3
             IF (TEMSYM(J,M).EQ.0) GOTO 8
             IF (TEMSYM(J,M).LT.0) THEN
               IICHAR(J,L) = '-'
             ELSE
               IICHAR(J,L) = '+'
-              IF ((L.EQ.1) .OR. ((ISYM.EQ.2).AND.(L.EQ.4))) IICHAR(J,L) &
-     &            = ISPCE
+              IF ((L.EQ.1) .OR. ((ISYM.EQ.2).AND.(L.EQ.4))) IICHAR(J,L) = ISPCE
             ENDIF
             IICHAR(J,L+1) = LET(M,ISYM)
             L = L + 2
     8     ENDDO
-!
           IF (L.NE.10) THEN
             DO K = L, 9
               IICHAR(J,K) = ISPCE
@@ -9060,14 +9025,12 @@
           IPH(IP-1:IP-1) = LET(J,2)
           IPH(IP:IP) = '+'
     2   ENDDO
-!
         IF (ISYM.EQ.2) THEN
           IF (IP.LE.0) THEN
             IPH(1:1) = IDIGIT(10)
             IP = 2
           ENDIF
           IPH(IP:15) = ' '
-!
           WRITE (LPT,2006) NO, ((IICHAR(J,K),K=1,6),J=1,3), IPH(1:14)
  2006     FORMAT (1X,I2,3(5X,6A1,6X),10X,A14)
         ELSE
@@ -9075,14 +9038,11 @@
  2005     FORMAT (1X,I2,3(5X,9A1,6X))
         ENDIF
       ENDDO
-      RETURN
+
       END SUBROUTINE OPSYM
-!*==ORTHG.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE ORTHG(IOP)
       SUBROUTINE ORTHG(IOP)
 !
 ! *** ORTHG updated by JCM 11 Aug 88 ***
@@ -9104,7 +9064,7 @@
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-!
+
       DO M = 1, 2
         DO I = 1, 3
           DO J = 1, 3
@@ -9125,14 +9085,11 @@
  2000 FORMAT (/' Matrices for transformation of vectors to',            &
      &        ' orthogonal axes'/' Real space:'/3(3F10.4/),             &
      &        /' Reciprocal space:'/3(3F10.4/))
-      RETURN
+
       END SUBROUTINE ORTHG
-!*==ORTHO.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE ORTHO(H,OH,IR)
       SUBROUTINE ORTHO(H,OH,IR)
 !
 ! *** ORTHO corrected by PJB 25 Jun 86 ***
@@ -9162,12 +9119,9 @@
       IF (IR.LT.0) CALL GMPRD(ORTH(1,1,3+IR),H,OH,3,3,1)
       RETURN
       END SUBROUTINE ORTHO
-!*==OTPUTI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE OTPUTI
       SUBROUTINE OTPUTI
 !
 ! *** OTPUTI updated by JCM 14 Jul 86 ***
@@ -9207,7 +9161,6 @@
 ! IGNORE NUMBER:
       CALL RDREAL(A,IPT,IPT1,80,IER)
       IF (WORD.NE.'CYC1') GOTO 5
-!
 ! FOUND CYC1:
       ITEMP(1:IPT-1) = ICARD(1:IPT-1)
       CALL INTDIG(LASTCY+1,IDIG,NDIG)
@@ -9218,7 +9171,6 @@
       IF (ICARD(80:80).EQ.' ') GOTO 7
       CALL ERRMES(-1,0,'new I card cannot be written')
       GOTO 100
-!
     7 CALL INTCHR(IDIG,NDIG,ITEMP(IPT:IPT),80-IPT,0)
       ITEMP(IPT+NDIG+1:80) = ICARD(IPT1:IPT1+IPT+NDIG+1)
       ICARD = ITEMP
@@ -9226,12 +9178,9 @@
  2000 FORMAT (80A1)
   100 RETURN
       END SUBROUTINE OTPUTI
-!*==PARITY.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE PARITY(N,M,EVEN)
       SUBROUTINE PARITY(N,M,EVEN)
 !
 ! *** PARITY by JCM 26 Sep 85
@@ -9251,14 +9200,11 @@
       IF (N.LE.0) EVEN = .NOT.EVEN
       M = M2
       IF (EVEN) M = M1
-      RETURN
+
       END SUBROUTINE PARITY
-!*==PARNAM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE PARNAM(IPNAM1,IPNAM2,N,M)
       SUBROUTINE PARNAM(IPNAM1,IPNAM2,N,M)
 !
 ! *** PARNAM updated by JCM 8 May 90 ***
@@ -9273,7 +9219,7 @@
 !A On exit IPNAM1 contains the A4 genus name,
 !A         IPNAM2 contains the A4 species name
 !P LSETUP must have put the vocabulary into /WORDS/ etc
-!P VARMAK must have set up varible structure and pointers
+!P VARMAK must have set up variable structure and pointers
 !D On exit KPHASE in /PHASE/ and KSOURC in /SOURCE/ have been given the
 !D current values of the phase and source.
 !D From family, genus and species, decides source of genus and species names
@@ -9307,45 +9253,35 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       MM = M
       IPNAM1 = ' '
       IPNAM2 = ' '
       GOTO (1,2,3), N
-!
 ! N=1 - M SPECIFIES BASIC VARIABLE - WHICH VARIABLE WAS IT?
     1 MM = LBSVR(MM)
-!
 ! N=2 - M SPECIFIES VARIABLE - WHICH PARAMETER WAS IT?
     2 MM = LVRPR(MM)
-!
 ! N=3 - M IS A PACKED PARAMETER - UNPACK IT:
     3 CALL KUNPAK(MM,IFAM,IGEN,ISPC,KPHASE,KSOURC)
-! THIS MENDS NON-MULTI, BUR MAY NEED ADJUSTING FOR MULTI:
+! THIS MENDS NON-MULTI, BUT MAY NEED ADJUSTING FOR MULTI:
       IF (KPHASE.EQ.0) KPHASE = 1
       IF (KSOURC.EQ.0) KSOURC = 1
       ONENAM = (IGEN.EQ.1 .AND. (IFAM.EQ.1.OR.IFAM.EQ.6))
-!
 ! BRANCH ON FAMILY:
       GOTO (11,12,13,14,15,16), IFAM
       CALL ERRIN2(IFAM,0,'PARNAM asked for name in family',' ')
-!
 ! FAMILY 3 - SET ISP TO BE ITS SPECIES TYPE:
    13 ISP = LF3SP(IGEN,KPHASE,KSOURC)
       GOTO 30
-!
 ! FAMILY 4 - "VERY LONG VECTORS" - SET SPECIES TYPE:
    14 ISP = -NSPCPS(4,KPHASE)
       GOTO 30
-!
 ! FAMILY 1 - SET ISP TO BE ITS SPECIES TYPE:
    11 ISP = LF1SP(IGEN)
       GOTO 30
-!
 ! FAMILY 6 - SET ISP TO BE SPECIES TYPE:
    16 ISP = LF6SP(IGEN,KSOURC)
-!
-!
 ! COPY GENUS NAME:
    30 IF (ONENAM) THEN
         IPNAM1 = ' '
@@ -9360,7 +9296,7 @@
 !    -VE MEANS SPECIES ARE POSITIVE INTEGERS, 1, 2 ETC, UP TO IABS(ISP)
 !     0 MEANS THERE ARE IN FACT NO SPECIES
 !    +VE MEANS THAT EACH SPECIES HAS A NAME (LIKE TFAC, ASYM, PROR  . . ,
-!   OR X, Y, Z, B11 . . . OR A*, B*, . . .) TOBE FOUND IN THE GENERAL WORD TABLE
+!   OR X, Y, Z, B11 . . . OR A*, B*, . . .) TO BE FOUND IN THE GENERAL WORD TABLE
       IF (ISP) 21, 22, 23
 !
 ! IF 0, COMPLAIN.
@@ -9372,12 +9308,10 @@
       CALL PRIWRD(IFAM,0,ISPC,IPNAM2,0)
       IF (IPNAM2.EQ.'XXXX') GOTO 22
       GOTO 100
-!
 ! IF -VE WANT TO TURN ISPC INTO DIGITS:
    21 CALL INTDIG(ISPC,LPAK,NDIG)
       CALL INTCHR(LPAK,NDIG,IPNAM2,4,0)
       GOTO 100
-!
 ! FAMILY 2 IS SPECIAL BECAUSE ITS GENUS NAMES ARE ATOM NAMES:
    12 IF (MULFAS) THEN
         IPNAM1 = ATNA(IGEN,KPHASE)
@@ -9387,7 +9321,6 @@
 !    AS IN FAMILY 1, FOR THE SPECIES WE HAVE POINTERS INTO /WORDS/.
       CALL PRIWRD(IFAM,0,ISPC,IPNAM2,0)
       GOTO 100
-!
 ! FAMILY 5 - EXPECT 1 LONG GENUS AT FIRST:
    15 CALL MF5ADD(ISPC,IG,IS,-1)
 ! GENUS NAME IS ATOM NAME : IG AT PRESENT IS MULTIPOLE ATOM NAME:
@@ -9399,15 +9332,12 @@
 ! SPECIES NAME COMES FROM TABLE:
       IPNAM2 = MPNAM(ISPC)
   100 RETURN
- 3001 FORMAT (/' ERROR ** PARNAM CANNOT FIND NAME - M,N,IFAM,',         &
-     &        'IGEN,ISPC =',5I6)
+ 3001 FORMAT (/' ERROR ** PARNAM CANNOT FIND NAME - M,N,IFAM,IGEN,ISPC =',5I6)
+
       END SUBROUTINE PARNAM
-!*==PARRD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE PARRD(IPT1,IPT2,K,IFAM,IGEN,ISPC)
       SUBROUTINE PARRD(IPT1,IPT2,K,IFAM,IGEN,ISPC)
 !
 ! *** PARRD updated by JCM 3 Aug 92 ***
@@ -9470,7 +9400,6 @@
 ! IN CASE MULTI, SET SOURCE AND PHASE AS DEFAULT:
       KPHASE = JPHASE
       KSOURC = JSOURC
-!
 ! IDENTIFY FIRST NAME - READ AND OFFER TO TBLFND:
       K = 0
       IFAM = 0
@@ -9480,8 +9409,6 @@
       CALL RDWORD(LWD1,L1,IPT1,IPT,80,1,IER)
 ! IF EMPTY WORD, END OF LINE:
       IF (IER.EQ.100) GOTO 100
-!
-!
 ! FIND WORD IF POSSIBLE:
       CALL TBLFND(LWD1,K,IFAM1,IGEN1,ISPC1,KP,KS)
 ! RECORD ANY PHASE OR SOURCE INFORMATION GLEANED BY TBLFND:
@@ -9489,7 +9416,6 @@
       IF (KS.NE.0) KSOURC = KS
 ! IF K IS ZERO, TBLFND COULD NOT RECOGNISE AT ALL:
       IF (K.EQ.0) GOTO 99
-!
 ! IF TBLFND FOUND WORD, IT HAS A PARALLEL TABLE OF INTEGERS SAYING WHAT THE
 ! WORDS ARE.  NEGATIVE K INDICATES A NON-PARAMETER WORD (LIKE ALL, ONLY
 ! - THESE TWO ARE THE ONLY ONES ALLOWED AS FIRST WORD)
@@ -9507,10 +9433,8 @@
 !
 ! 'ONLY'
       IF (K.EQ.-99) GOTO 101
-!
 ! SPECIES NAME - SPECIFICATION COMPLETE IF FAM=1 OR 6, GEN=1:
-      IF ((IFAM1.EQ.1.OR.IFAM1.EQ.6) .AND. IGEN1.EQ.1 .AND. ISPC1.NE.0) &
-     &    THEN
+      IF ((IFAM1.EQ.1.OR.IFAM1.EQ.6) .AND. IGEN1.EQ.1 .AND. ISPC1.NE.0) THEN
         IFAM = IFAM1
         IGEN = IGEN1
         ISPC = ISPC1
@@ -9521,11 +9445,9 @@
         ENDIF
         GOTO 102
       ENDIF
-!
 ! CHECK ENOUGH INFO TO PROCEED WITH SECOND WORD:
       IF (K.LT.-102) GOTO 99
       IF ((IFAM1.EQ.0.OR.IGEN1.EQ.0) .AND. (K.GT.0)) GOTO 99
-!
 ! NOW WE LOOK AT SECOND WORD AND CHECK COMPATIBLE WITH FIRST (-1 ON INPUT
 ! ALLOWS AN INTEGER TO BE READ AS A WORD):
       CALL RDWORD(LWD2,L2,IPT,IPT,80,-1,IER)
@@ -9542,7 +9464,6 @@
 !
 ! ALL COMPOSITE WORDS ARE ALLOWED EXCEPT 'ALL' AND 'ONLY':
       IF (IANS2.EQ.-100 .OR. IANS2.EQ.-99) GOTO 99
-!
 ! IF TBLFND COULD NOT FIND IT, IT MAY BELONG TO A USER'S TABLE IN FAMILY 5:
       IF (IANS2.EQ.0) THEN
 ! BUT ONLY IF MULTIPOLE:
@@ -9557,22 +9478,18 @@
         ISPC2 = ISPC2 + MPTAB(IG) - 1
         GOTO 5
       ENDIF
-!
 ! IF FIRST WORD IS 'ALL':
       IF (K.EQ.-100) THEN
         IF (IANS2.LT.0) GOTO 4
-!
 ! 'ALL' FOLLOWED BY GENUS OR SPECIES:
         IFAM = IFAM2
         IGEN = IGEN2
         ISPC = ISPC2
         GOTO 101
-!
 ! BOTH WORDS ARE COMPOSITE (EG 'ALL BIJ', 'ALL XYZ')
     4   IFAM = IANS2
         GOTO 101
       ENDIF
-!
 ! FIRST IS NOT 'ALL', SO SHOULD HAVE BEEN GENUS:
       IF (IANS2.GT.0) GOTO 5
 ! GENUS FOLLOWED BY 'XYZ' OR 'BIJ' OR 'XYZT'
@@ -9581,12 +9498,10 @@
       IGEN = IGEN1
       ISPC = ISPC1
       GOTO 101
-!
 ! CANNOT MAKE SENSE OF PARAMETER SPEC:
    99 CALL ERRIN2(IPT,2,'cannot read parameter at point',' ')
       IPT2 = 81
       GOTO 100
-!
 ! GENUS FOLLOWED BY SPECIES:
     5 IFAM = IFAM1
       IGEN = IGEN1
@@ -9594,13 +9509,11 @@
   102 K = KPAK(IFAM,IGEN,ISPC,KPHASE,KSOURC)
   101 IPT2 = IPT
   100 RETURN
+
       END SUBROUTINE PARRD
-!*==PLN3AD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE PLN3AD(I,J,K)
       SUBROUTINE PLN3AD(I,J,K)
 !
 ! *** PLN3AD by JCM 3 Oct 84 ***
@@ -10191,8 +10104,7 @@
 ! CONSTRAINT LIST:
       IF (JCONST.LE.0) GOTO 100
       WRITE (LPT,2003) JCONST
- 2003 FORMAT (/' ',I5,' constraint(s) - relations between shifts',      &
-     &        ' in variables are :'/)
+ 2003 FORMAT (/' ',I5,' constraint(s) - relations between shifts in variables are :'/)
       DO J = JCONST, 1, -1
         JROW = JROWPT(J)
         JNEXT = JROWPT(J+1) - 1
@@ -10229,8 +10141,7 @@
  2008     FORMAT (1X,A4,1X,A4,' *P',I1,' = ',F10.3,' times ',A4,1X,A4,  &
      &            ' *P',I1,(1X,A1,1X,F10.3,' times ',A4,1X,A4,' *P',I1))
         ELSE
-          IF (MULFAS) WRITE (LPT,2007) NAM1, NAM2, KP, IPR1(1), IPR2(1),&
-     &                                 K1(1)
+          IF (MULFAS) WRITE (LPT,2007) NAM1, NAM2, KP, IPR1(1), IPR2(1), K1(1)
  2007     FORMAT (1X,A4,1X,A4,' *P',I1,' = ',A4,1X,A4,' *P',I1)
           IF (.NOT.MULFAS) WRITE (LPT,2005) NAM1, NAM2, IPR1(1), IPR2(1)
  2005     FORMAT (1X,A4,1X,A4,' = ',A4,1X,A4)
@@ -10238,8 +10149,7 @@
       ENDDO
   100 RETURN
  2002 FORMAT (' ',10(A4,A1,A4,2X))
- 3000 FORMAT (/' ERROR ** redundant variable',2(A4),                    &
-     &        'related to > 8 basics - cannot yet print')
+ 3000 FORMAT (/' ERROR ** redundant variable',2(A4),'related to > 8 basics - cannot yet print')
       END SUBROUTINE PRIVAR
 !
 !*****************************************************************************
@@ -10269,36 +10179,31 @@
       COMMON /WDSPC / IWDNUM, IWDSPC(60)
       COMMON /WORDS / LSQWD(60)
       CHARACTER*4 LSQWD
-!
+
       NAME = 'XXXX'
-!
 ! THE PHASE IS IRRELEVANT - EVERY PHASE HAS THE SAME VOCABULARY HERE
 ! IF MULTISOURCE, AND FAMILY 3 THE SOURCE IS RELEVANT:
       IF (MULONE) THEN
         K = 0
         IF (IFAM.EQ.3) K = KSOURC
       ENDIF
-!
       IPACK = KPAK(IFAM,IGEN,ISPC,0,K)
       IPT = NFIND(IPACK,IWDSPC,IWDNUM)
-      IF (IPT.GT.0) THEN
-!
-        IF (MODE.EQ.0) THEN
-          NAME = LSQWD(IPT)
-        ELSE
-!
+      IF (IPT.LE.0) RETURN
+      IF (MODE.EQ.0) THEN
+        NAME = LSQWD(IPT)
+      ELSE
 ! RIGHT JUSTIFY:
-          J = 4
-          NAME = ' '
-          DO I = 4, 1, -1
-            IF (LSQWD(IPT)(I:I).NE.' ') THEN
-              NAME(J:J) = LSQWD(IPT)(I:I)
-              J = J - 1
-            ENDIF
-          ENDDO
-        ENDIF
+        J = 4
+        NAME = ' '
+        DO I = 4, 1, -1
+          IF (LSQWD(IPT)(I:I).NE.' ') THEN
+            NAME(J:J) = LSQWD(IPT)(I:I)
+            J = J - 1
+          ENDIF
+        ENDDO
       ENDIF
-      RETURN
+
       END SUBROUTINE PRIWRD
 !
 !*****************************************************************************
@@ -15607,7 +15512,7 @@
         ENDIF
       ENDIF
 ! MAKE IT BASIC:
-      CALL ERRCHK(2,LVARB,400,0,'basic variables in LSQ')
+      CALL ERRCHK(2,LVARB,MaxBVar,0,'basic variables in LSQ')
 ! RECORD CROSS POINTERS FOR VARIABLES AND BASIC VARIABLES:
       LVRBS(LVARV) = LVARB
       LBSVR(LVARB) = LVARV
