@@ -440,20 +440,14 @@
 !.. We are now on window number 3
  777  CALL WDialogSelect(IDD_SA_input3)
       CALL WDialogShow(IXPos_IDD_SA_Input,IYPos_IDD_SA_Input,0,Modeless)
-      ISeed1 = 314
-      ISeed2 = 159
-      ISeed3 = 265
-      CALL WDialogPutInteger(IDF_SA_RandomSeed1,ISeed1)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed2,ISeed2)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed3,ISeed3)
       T0 = 0.0
       RPOS = T0
-      CALL WDialogPutReal(IDF_SA_T0,RPOS,'(f7.2)')
+      CALL WDialogPutReal(IDF_SA_T0,RPOS,'(F7.2)')
       IPOS = 1000 - NINT(RPOS)
       CALL WDialogPutTrackbar(IDF_SA_T0_trackbar,IPOS)
       RT = 0.02
       RPOS = RT
-      CALL WDialogPutReal(IDF_SA_Tredrate,RPOS,'(f6.3)')
+      CALL WDialogPutReal(IDF_SA_Tredrate,RPOS,'(F6.3)')
       IPOS = 501 - NINT(1000.*RPOS)
       CALL WDialogPutTrackbar(IDF_SA_Tredrate_trackbar,IPOS)
       JPOS = 20
@@ -592,148 +586,6 @@
       END SELECT
 
       END SUBROUTINE SA_MAIN
-!
-!*****************************************************************************
-!
-      SUBROUTINE SDIFileLoad(SDIFile)
-
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      CHARACTER*(*), INTENT (IN   ) ::  SDIFile
-
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-      REAL    PAWLEYCHISQ,RWPOBS,RWPEXP
-      COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
-      INCLUDE 'statlog.inc'
-
-      CHARACTER(LEN = MaxPathLength) :: line, subline
-
-      INTEGER nl
-      CHARACTER*12 KeyChar
-
-      INTEGER i, KLEN
-      INTEGER ihcver,iticer,ipiker,iloger,idsler, isst, ised, iactsgnum
-      INTEGER GetCrystalSystem_2 ! Function
-      INTEGER GETTIC ! Function
-
-!C>> JCC Set to success in all cases
-      ihcver = 0
-      iloger = 0
-      iticer = 1
-      ipiker = 0
-      idsler = 0
-      IF (LEN_TRIM(SDIFile) .GT. 80) THEN
-        CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in OPENHCVPIKTIC')
-      ENDIF
-! Now open all the appropriate PIK, TIC and HCV files
-      OPEN(11,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
-      CALL sa_SetOutputFiles(SDIFile)
-      TicExists = .FALSE.
-      HcvExists = .FALSE.
-      PikExists = .FALSE.
-      RawExists = .FALSE.
-      DslExists = .FALSE.
- 10   line = ' '
-      READ(11,'(A)',END=100) line
-      nl = LEN_TRIM(line)
-      CALL ILowerCase(line(:nl))
-      CALL INextString(line,keychar)
-      SELECT CASE (KeyChar(1:3))
-        CASE ('tic')
-          CALL ILocateString(line,isst,ised)
-          DashTicFile(1:80) = line(isst:isst+79)
-          TicExists = .TRUE.
-        CASE ('hcv')
-          CALL ILocateString(line,isst,ised)
-          DashHcvFile(1:80) = line(isst:isst+79)
-          HcvExists = .TRUE.
-        CASE ('pik')
-          CALL ILocateString(line,isst,ised)
-          DashPikFile(1:80) = line(isst:isst+79)
-          PikExists = .TRUE.
-        CASE ('raw')
-          CALL ILocateString(line,isst,ised)
-          DashRawFile(1:80) = line(isst:isst+79)
-          RawExists = .TRUE.      
-        CASE ('dsl')
-          CALL ILocateString(line,isst,ised)
-          DashDslFile(1:80) = line(isst:isst+79)
-          DslExists = .TRUE.
-        CASE ('cel')
-          DO I = 1, 6
-            CALL INextReal(line,CellPar(i))
-          END DO
-          CALL Upload_Cell_Constants()
-        CASE ('spa')
-          CALL INextInteger(line,NumberSGTable)
-!C>> JCC Need to set space group info in the menus
-! Get the lattice number
-          CALL INextString(line,subline)
-!             call INextInteger(line,IActSGNum)
-! Chop out ":" char if present
-          DO i = 1, LEN_TRIM(subline)
-            IF (subline(i:i) .EQ. ':') THEN
-              subline(i:i) = ' '
-              EXIT
-            END IF
-          END DO
-          CALL INextInteger(subline,IActSGNum)
-! Set the lattice numbers
-          LatBrav = GetCrystalSystem_2(IActSGNum,NumberSGTable)
-          CALL SetCrystalSystem(LatBrav)
-! Last but not least set the space group
-          CALL SetSpaceGroupMenu
-          NumPawleyRef = 0
-          CALL FillSymmetry()
-        CASE ('paw')
-          CALL INextReal(line,PawleyChiSq)
-      END SELECT
-      GOTO 10 
- 100  CONTINUE
-      IF (DslExists) THEN
-        CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
-        DslExists = (idsler .EQ. 0)
-      ENDIF
-      klen = LEN_TRIM(DashTicFile)
-      IF (TicExists) THEN
-        CALL GET_LOGREF(DashTicFile,klen,iloger)
-        iticer = GETTIC(klen,DashTicFile)
-        IF (iticer .EQ. 0) TicExists = .FALSE.
-      ENDIF
-      IF (HcvExists) THEN
-        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
-        HcvExists = (ihcver .EQ. 0)
-      ENDIF
-      IF (PikExists) THEN
-        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
-        PikExists = (ipiker .EQ. 0)
-      ENDIF
-!C>> JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
-!C>> I moved it, since i wanted to check that all the data read in ok before calling it
-      IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
-!C>> JCC before, this just didnt plot anything, even though in theory we should be able
-!C>> to observe the full profile. Firstly have to synchronize the common blocks though
-        CALL Synchronize_Data()
-        NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
-        Iptype = 2
-        CALL Profile_Plot(IPTYPE) 
-        NoData = .FALSE.
-      ENDIF
-!C>>  enable the buttons,
-      IF (.NOT. NoData) THEN
-        IF (idsler .EQ. 0) THEN
-          CALL SetModeMenuState(1,1,1)
-        ELSE
-          CALL SetModeMenuState(1,-1,1)
-        END IF
-      END IF
-!C>>  update the file name of the project in the SA pop up
-      CALL SetSAFileName(SDIFile(1:LEN_TRIM(SDIFile)))
-!
- 999  END SUBROUTINE SDIFileLoad
 !
 !*****************************************************************************
 !

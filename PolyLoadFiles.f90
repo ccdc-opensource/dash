@@ -1857,51 +1857,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SDIFileOpen(TheFileName)
-!
-! This routine tries to open an SDI file.
-!
-! INPUT   : TheFileName = the file name
-!
-      USE WINTERACTER
-      USE VARIABLES
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      CHARACTER(LEN=MaxPathLength), INTENT (INOUT) :: TheFileName
-
-      INCLUDE 'GLBVAR.INC'
-
-      LOGICAL FExists
-      INTEGER KLEN
-
-      KLEN = LEN_TRIM(TheFileName)
-      IF (KLEN .EQ. 0) RETURN
-      INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
-      IF (.NOT. FExists) THEN
-        CALL ErrorMessage("The file "//TheFileName(1:KLEN)//" does not exist!")
-        RETURN
-      ENDIF
-! This is the point of no return: the selected file will be new file, valid data or not
-! Change global variable FNAME
-      FNAME = TheFileName
-      CALL SDIFileLoad(FNAME(1:KLEN)) 
-      IF (NoData) THEN
-        CALL ErrorMessage("Could not read the project file "//FNAME(1:KLEN)//&
-                          CHAR(13)//"successfully.")
-        RETURN
-      END IF
-      STATBARSTR(1) = FNAME
-      CALL WindowOutStatusBar(1,STATBARSTR(1))
-! Enable all menu functions
-      CALL SetModeMenuState(1,1,1)
-      RETURN
-      
-      END SUBROUTINE SDIFileOpen
-!
-!*****************************************************************************
-!
       SUBROUTINE SDIFileBrowse
 !
 ! This routine lets the user browse a directory for an SDI file.
@@ -1937,6 +1892,190 @@
       RETURN
 
       END SUBROUTINE SDIFileBrowse
+!
+!*****************************************************************************
+!
+      SUBROUTINE SDIFileOpen(TheFileName)
+!
+! This routine tries to open an SDI file.
+!
+! INPUT   : TheFileName = the file name
+!
+      USE WINTERACTER
+      USE VARIABLES
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (INOUT) :: TheFileName
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL FExists
+      INTEGER KLEN
+
+      KLEN = LEN_TRIM(TheFileName)
+      IF (KLEN .EQ. 0) RETURN
+      INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
+      IF (.NOT. FExists) THEN
+        CALL ErrorMessage("The file "//TheFileName(1:KLEN)//" does not exist!")
+        RETURN
+      ENDIF
+! This is the point of no return: the selected file will be new file, valid data or not
+! Change global variable FNAME
+      FNAME = TheFileName
+      CALL SDIFileLoad(FNAME(1:KLEN)) 
+      IF (NoData) THEN
+        CALL ErrorMessage("Could not read the project file "//FNAME(1:KLEN)//&
+                          CHAR(13)//"successfully.")
+        RETURN
+      END IF
+      STATBARSTR(1) = FNAME
+      CALL WindowOutStatusBar(1,STATBARSTR(1))
+! Enable all menu functions
+      CALL SetModeMenuState(1,1,1)
+      RETURN
+      
+      END SUBROUTINE SDIFileOpen
+!
+!*****************************************************************************
+!
+      SUBROUTINE SDIFileLoad(SDIFile)
+
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) ::  SDIFile
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+      REAL    PAWLEYCHISQ,RWPOBS,RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
+      INCLUDE 'statlog.inc'
+
+      CHARACTER(LEN = MaxPathLength) :: line, subline
+
+      INTEGER nl
+      CHARACTER*12 KeyChar
+
+      INTEGER i, KLEN
+      INTEGER ihcver,iticer,ipiker,iloger,idsler, isst, ised, iactsgnum
+      INTEGER GetCrystalSystem_2 ! Function
+      INTEGER GETTIC ! Function
+
+!C>> JCC Set to success in all cases
+      ihcver = 0
+      iloger = 0
+      iticer = 1
+      ipiker = 0
+      idsler = 0
+      IF (LEN_TRIM(SDIFile) .GT. 80) THEN
+        CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in OPENHCVPIKTIC')
+      ENDIF
+! Now open all the appropriate PIK, TIC and HCV files
+      OPEN(11,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
+      CALL sa_SetOutputFiles(SDIFile)
+      TicExists = .FALSE.
+      HcvExists = .FALSE.
+      PikExists = .FALSE.
+      RawExists = .FALSE.
+      DslExists = .FALSE.
+ 10   line = ' '
+      READ(11,'(A)',END=100) line
+      nl = LEN_TRIM(line)
+      CALL ILowerCase(line(:nl))
+      CALL INextString(line,keychar)
+      SELECT CASE (KeyChar(1:3))
+        CASE ('tic')
+          CALL ILocateString(line,isst,ised)
+          DashTicFile(1:80) = line(isst:isst+79)
+          TicExists = .TRUE.
+        CASE ('hcv')
+          CALL ILocateString(line,isst,ised)
+          DashHcvFile(1:80) = line(isst:isst+79)
+          HcvExists = .TRUE.
+        CASE ('pik')
+          CALL ILocateString(line,isst,ised)
+          DashPikFile(1:80) = line(isst:isst+79)
+          PikExists = .TRUE.
+        CASE ('raw')
+          CALL ILocateString(line,isst,ised)
+          DashRawFile(1:80) = line(isst:isst+79)
+          RawExists = .TRUE.      
+        CASE ('dsl')
+          CALL ILocateString(line,isst,ised)
+          DashDslFile(1:80) = line(isst:isst+79)
+          DslExists = .TRUE.
+        CASE ('cel')
+          DO I = 1, 6
+            CALL INextReal(line,CellPar(i))
+          END DO
+          CALL Upload_Cell_Constants()
+        CASE ('spa')
+          CALL INextInteger(line,NumberSGTable)
+!C>> JCC Need to set space group info in the menus
+! Get the lattice number
+          CALL INextString(line,subline)
+! Chop out ":" char if present
+          DO i = 1, LEN_TRIM(subline)
+            IF (subline(i:i) .EQ. ':') THEN
+              subline(i:i) = ' '
+              EXIT
+            END IF
+          END DO
+          CALL INextInteger(subline,IActSGNum)
+! Set the lattice numbers
+          LatBrav = GetCrystalSystem_2(NumberSGTable)
+          CALL UserSetCrystalSystem(LatBrav)
+          NumPawleyRef = 0
+          CALL FillSymmetry()
+        CASE ('paw')
+          CALL INextReal(line,PawleyChiSq)
+      END SELECT
+      GOTO 10 
+ 100  CONTINUE
+      IF (DslExists) THEN
+        CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
+        DslExists = (idsler .EQ. 0)
+      ENDIF
+      klen = LEN_TRIM(DashTicFile)
+      IF (TicExists) THEN
+        CALL GET_LOGREF(DashTicFile,klen,iloger)
+        iticer = GETTIC(klen,DashTicFile)
+        IF (iticer .EQ. 0) TicExists = .FALSE.
+      ENDIF
+      IF (HcvExists) THEN
+        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
+        HcvExists = (ihcver .EQ. 0)
+      ENDIF
+      IF (PikExists) THEN
+        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
+        PikExists = (ipiker .EQ. 0)
+      ENDIF
+!C>> JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
+!C>> I moved it, since i wanted to check that all the data read in ok before calling it
+      IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
+!C>> JCC before, this just didnt plot anything, even though in theory we should be able
+!C>> to observe the full profile. Firstly have to synchronize the common blocks though
+        CALL Synchronize_Data()
+        NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
+        Iptype = 2
+        CALL Profile_Plot(IPTYPE) 
+        NoData = .FALSE.
+      ENDIF
+!C>>  enable the buttons,
+      IF (.NOT. NoData) THEN
+        IF (idsler .EQ. 0) THEN
+          CALL SetModeMenuState(1,1,1)
+        ELSE
+          CALL SetModeMenuState(1,-1,1)
+        END IF
+      END IF
+!C>>  update the file name of the project in the SA pop up
+      CALL SetSAFileName(SDIFile(1:LEN_TRIM(SDIFile)))
+!
+ 999  END SUBROUTINE SDIFileLoad
 !
 !*****************************************************************************
 !
