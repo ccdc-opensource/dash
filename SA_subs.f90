@@ -122,7 +122,6 @@
       LOGICAL PrevRejected, CurrIsPO, PrevWasPO
       DOUBLE PRECISION tX147
 
-      LOGICAL OneEightyScale
       LOGICAL OutOfBounds
       REAL xtem, tempupper, templower, tempupper2, templower2
       INTEGER Upper, Lower
@@ -366,6 +365,7 @@
                   CALL OneEightyToThreeSixty(TempLower)
                   CALL OneEightyToThreeSixty(TempUpper2)
                   CALL OneEightyToThreeSixty(TempLower2)
+                  xtem = XP(H)
                   CALL OneEightytoThreeSixty(xtem)
                     IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
                       IARR = IARR + 1
@@ -405,10 +405,6 @@
                       xtem = 360.00 + xtem
                     ENDIF
                   ENDIF
-                ENDIF
-                CALL CheckTriModalBounds(OneEightyScale)
-                IF (OneEightyScale .EQ. .FALSE.) THEN ! Put XP back into OneEighty scale
-                  CALL ThreeSixtyToOneEighty(xtem)
                 ENDIF
                 XP(H) = xtem
                 IARR = IARR + 1
