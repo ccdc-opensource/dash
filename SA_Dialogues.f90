@@ -544,7 +544,7 @@
               CALL WDialogHide
             CASE (IDCANCEL)
               CALL WDialogHide
-            CASE (IDB_ViewRot, IDB_View)
+            CASE (IDB_View)
               CALL zmRotCopyDialog2Temp
               natcry = NATOMS(iFrg)
               DO iAtomNr = 1, natcry
