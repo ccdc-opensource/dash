@@ -114,7 +114,7 @@
                 CALL WizardWindowShow(IDD_SAW_Page2)
               ELSE
                 CALL SA_Parameter_Set
-                CALL WizardWindowShow(IDD_SA_input2)
+                CALL ShowWizardWindowParameterBounds
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
@@ -1187,7 +1187,7 @@
               CALL WizardWindowShow(IDD_SAW_Page1)
             CASE (IDNEXT)
               CALL SA_Parameter_Set
-              CALL WizardWindowShow(IDD_SA_input2)
+              CALL ShowWizardWindowParameterBounds
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
           END SELECT
@@ -1214,6 +1214,42 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE ShowWizardWindowParameterBounds
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE      
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      REAL             prevx,       prevlb,       prevub
+      LOGICAL                                                   LimsChanged
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
+
+      INTEGER IV, iCheck
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input2)
+      DO IV = 1, NVAR
+        CALL WGridGetCellReal(IDF_parameter_grid,1,IV,prevx(IV))
+        CALL WGridGetCellCheckBox(IDF_parameter_grid,4,IV,iCheck)
+        IF (iCheck .EQ. UnChecked) THEN
+          CALL WGridGetCellReal(IDF_parameter_grid,2,IV,prevlb(IV))
+          CALL WGridGetCellReal(IDF_parameter_grid,3,IV,prevub(IV))
+        ENDIF
+      ENDDO
+      LimsChanged = .FALSE.
+      CALL WizardWindowShow(IDD_SA_input2)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE ShowWizardWindowParameterBounds
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardWindowParameterBounds
 
       USE WINTERACTER
@@ -1231,17 +1267,16 @@
       DOUBLE PRECISION x,lb,ub,vm
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
 
-      DOUBLE PRECISION prevub, prevlb ! For saving the previous range
-      COMMON /pvalues/ prevub(mvar), prevlb(mvar)
 
       DOUBLE PRECISION T0, rt
       COMMON /saparl/  T0, rt
 
-      LOGICAL LimsChanged
-      DATA LimsChanged / .FALSE. /
-      SAVE LimsChanged
+      REAL             prevx,       prevlb,       prevub
+      LOGICAL                                                   LimsChanged
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
 
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: NearlyEqual
       REAL    xtem
       INTEGER JPOS, NMOVES, IFCOl, IFRow, ICHK
       REAL    rpos
@@ -1317,37 +1352,44 @@
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,4,IFRow,ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
                     CALL WGridGetCellReal(IDF_parameter_grid,IFCol,IFRow,xtem)
-                    xtem = MAX(SNGL(lb(IFRow)),xtem)
-                    IF (ABS(xtem - x(IFRow)) .GT. 0.000001) LimsChanged = .TRUE.
-                    X(IFRow)=DBLE(MIN(SNGL(ub(IFRow)),xtem))
-                    CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,sngl(x(IFRow)),'(F12.5)')
+                    xtem = MAX(xtem,prevlb(IFRow))
+                    xtem = MIN(xtem,prevub(IFRow))
+                    IF (.NOT. NearlyEqual(xtem,prevx(IFRow))) THEN
+                      LimsChanged = .TRUE.
+                      CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,xtem,'(F12.5)')
+                      prevx(IFRow) = xtem
+                    ENDIF
                   ENDIF
                 CASE (2) ! lower bound
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,4,IFRow,ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
                     CALL WGridGetCellReal(IDF_parameter_grid,IFCol,IFRow,xtem)
-                    xtem = MIN(SNGL(ub(IFRow)),xtem)
-                    IF (ABS(xtem - lb(IFRow)) .GT. 0.000001) LimsChanged = .TRUE.
-                    lb(IFRow) = DBLE(xtem)
-                    prevlb(IFRow) = lb(IFRow)
-                    CALL WGridPutCellReal(IDF_parameter_grid,2,IFRow,SNGL(lb(IFRow)),'(F12.5)')
-                    xtem = MAX(lb(IFRow),x(IFRow))
-                    X(IFRow) = DBLE(xtem)
-                    CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,SNGL(x(IFRow)),'(F12.5)')
+                    xtem = MIN(xtem,prevub(IFRow))
+                    IF (.NOT. NearlyEqual(xtem,prevlb(IFRow))) THEN
+                      LimsChanged = .TRUE.
+                      CALL WGridPutCellReal(IDF_parameter_grid,2,IFRow,xtem,'(F12.5)')
+                      prevlb(IFRow) = xtem
+                      lb(IFRow) = DBLE(xtem)
+                    ENDIF
+                    xtem = MAX(prevlb(IFRow),prevx(IFRow))
+                    CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,xtem,'(F12.5)')
+                    prevx(IFRow) = xtem
                   ENDIF
                 CASE (3) ! upper bound
 ! JCC Check the bounding - only update if parameter is set to vary
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,4,IFRow,ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
                     CALL WGridGetCellReal(IDF_parameter_grid,IFCol,IFRow,xtem)
-                    xtem = MAX(SNGL(lb(IFRow)),xtem)
-                    IF (ABS(xtem - ub(IFRow)) .GT. 0.000001) LimsChanged = .TRUE.
-                    ub(IFRow) = DBLE(xtem)
-                    prevub(IFRow) = ub(IFRow)
-                    CALL WGridPutCellReal(IDF_parameter_grid,3,IFRow,SNGL(ub(IFRow)),'(F12.5)')
-                    xtem = MIN(ub(IFRow),x(IFRow))
-                    X(IFRow) = DBLE(xtem)
-                    CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,SNGL(x(IFRow)),'(F12.5)')
+                    xtem = MAX(xtem,prevlb(IFRow))
+                    IF (.NOT. NearlyEqual(xtem,prevub(IFRow))) THEN
+                      LimsChanged = .TRUE.
+                      CALL WGridPutCellReal(IDF_parameter_grid,3,IFRow,xtem,'(F12.5)')
+                      prevub(IFRow) = xtem
+                      ub(IFRow) = DBLE(xtem)
+                    ENDIF
+                    xtem = MIN(prevub(IFRow),prevx(IFRow))
+                    CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,xtem,'(F12.5)')
+                    prevx(IFRow) = xtem
                   ENDIF
                 CASE (4) ! fix or vary
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,IFCol,IFRow,ICHK)
