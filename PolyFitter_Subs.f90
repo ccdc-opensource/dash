@@ -29,7 +29,6 @@
       REAL xgcurold, ygcurold
 
       CALL WindowSelect(0)
-      CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
 ! Set the scale correctly. 
       CALL IGrUnits(0.0,0.0,1.0,1.0)
@@ -76,7 +75,6 @@
             CASE (MouseButUp)
               xgcur(2) = EventInfo%GX
               ygcur(2) = EventInfo%GY
-!              CALL WMessageEnable(MouseMove, Disabled)
               CALL WMessageEnable(MouseButUp, Disabled)
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
                 CALL IGrColourN(KolNumRectSelect)
@@ -531,10 +529,9 @@
       REAL    GXMIN, GYMIN, GXMAX, GYMAX
 
 ! Get ready to put up the big cursor
-      CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
-      CALL IPgUnitsToGrUnits(xpgmin,ypgmin,gxmin,gymin)
-      CALL IPgUnitsToGrUnits(xpgmax,ypgmax,gxmax,gymax)
+      CALL IPgUnitsToGrUnits(xpgmin, ypgmin, gxmin, gymin)
+      CALL IPgUnitsToGrUnits(xpgmax, ypgmax, gxmax, gymax)
       xgcur(1) = EventInfo%GX
       CALL IPgUnitsFromGrUnits(xgcur(1), EventInfo%GY, xcur(1), ycur(1))
       XCurFirst = xcur(1)
@@ -572,7 +569,6 @@
             CALL IGrPlotMode('Normal')
             CALL IGrColourN(InfoGrScreen(PrevColReq))
           CASE (MouseButUp)
-!            CALL WMessageEnable(MouseMove, Disabled)
             CALL WMessageEnable(MouseButUp, Disabled)
 ! MouseButUp action for selecting the peak fitting region
 ! Remove old cross-hair
