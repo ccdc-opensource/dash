@@ -260,8 +260,6 @@
 
 ! Remember current dialogue window
       CALL PushActiveWindowID
-! Grey out all other menus
-      CALL ToggleMenus(0)
 ! The reason behind this greying out seems to be that the next dialogue
 ! window cannot be made modal because it needs to draw the calculated background 
 ! to the main screen. And the user should be able to zoom in on parts of the graph
@@ -298,7 +296,6 @@
       CALL WDialogSelect(IDD_Background_Fit)
       CALL WDialogHide()
       CALL Profile_Plot(IPTYPE)
-      CALL ToggleMenus(1)
       CALL PopActiveWindowID
 
       END SUBROUTINE Background_Fit

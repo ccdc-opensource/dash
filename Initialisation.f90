@@ -34,14 +34,14 @@
              (DirNameLc(1:Ilen) .EQ. InstDirLc(1:LEN_TRIM(InstDirLc))) ) THEN
           IF (.NOT. Confirm("Are you sure you wish to start DASH in"//CHAR(13)//"the installation directory "//&
             CHAR(13)//DirName(1:Ilen)//" ?")) GOTO 10
-        END IF
+        ENDIF
 ! Open the file
         OPEN(UNIT = 6, FILE = 'dash.out', STATUS = 'UNKNOWN', ERR = 110)
         RETURN
  110    CALL ErrorMessage("DASH problem: Could not open temporary files"//CHAR(13)// &
                           "in the directory "//DirName(4:Ilen)//CHAR(13)//&
                           "Please pick an alternative directory for your DASH run")
-      END DO
+      ENDDO
 
       END SUBROUTINE Init_StdOut
 !
@@ -68,8 +68,6 @@
       CALL WDialogLoad(IDD_Index_Preparation)
 ! Set the colours of the grid manually
       CALL WDialogLoad(IDD_Plot_Option_Dialog)
-! JvdS Starting to add SA to Wizard
-!      CALL WDialogLoad(IDD_SA_input1)
       CALL WDialogLoad(IDD_SAW_Page1)
       CALL WDialogLoad(IDD_SA_input2)
       CALL WDialogLoad(IDD_SA_input3)
@@ -181,6 +179,333 @@
       END SUBROUTINE PolyFitterInitialise
 !
 !*****************************************************************************
+! 
+      SUBROUTINE PolyFitter_EnableExternal()
+
+      USE WINTERACTER
+      USE VARIABLES
+      USE DFLIB ! Windows environment variable handling: for GETENVQQ
+
+      INTEGER       lval
+      CHARACTER*255 DashDir
+      CHARACTER*255 line
+      CHARACTER*3   KeyChar
+      INTEGER       nl
+      CHARACTER*255 tDir, tFile
+
+      ViewOn     = .FALSE.
+      ViewAct    = .FALSE.
+      AutoUpdate = .FALSE.
+      ConvOn     = .FALSE.
+      CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
+      lval = GETENVQQ("DASH_DIR",DashDir)
+      IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
+        CONVEXE = DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//'zmconv.exe'
+        OPEN(121, FILE=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 10)
+        GOTO 25
+      ENDIF
+   10 OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 20)
+      GOTO 25
+   20 CALL GetArg(0,line)
+      CALL SplitPath(line,tDir,tFile)
+      IF (LEN_TRIM(tDir) .EQ. 0) tDir = '.'//DIRSPACER
+      OPEN(121, FILE=tDir(1:LEN_TRIM(tDir))//CONFIG, STATUS='OLD', ERR = 30)
+! Remove '\' at end
+      tDir(LEN_TRIM(tDir):LEN_TRIM(tDir)) = ' '
+      INSTDIR = tDir
+! Read it
+   25 CONTINUE
+      DO WHILE ( .TRUE. )
+      READ(121,'(a)',END=30,ERR=30) line
+        nl=LEN_TRIM(line)
+        CALL INextString(line,keychar)
+        CALL ILowerCase(keychar(1:3))
+        SELECT CASE (KeyChar(1:3))
+          CASE ('vie')
+            VIEWEXE = line(IlocateChar(line):nl)
+          CASE ('con')
+            CONVEXE = line(IlocateChar(line):nl)
+          CASE ('arg')
+            VIEWARG = line(IlocateChar(line):nl) ! Arguments for the viewer
+          CASE ('rel')
+            AUTOUPDATE = .TRUE.
+        END SELECT
+      END DO            
+ 30   INQUIRE(FILE=VIEWEXE(1:LEN_TRIM(VIEWEXE)),EXIST=ViewOn)
+      INQUIRE(FILE=CONVEXE(1:LEN_TRIM(CONVEXE)),EXIST=ConvOn)
+
+      END SUBROUTINE PolyFitter_EnableExternal
+!
+!*****************************************************************************
+!
+! Handle file opening. Exit with a message to say what is wrong if all attempts fail
+! JvdS What does it return? FileHandle and 0 otherwise?
+      INTEGER FUNCTION PolyFitter_OpenSpaceGroupSymbols
+
+      USE WINTERACTER
+      USE VARIABLES
+      USE dflib ! Windows environment variable handling: for GETENVQQ
+      USE dfport
+
+      INTEGER       errstat, lval, dlen
+      CHARACTER*255 DashDir, Command
+
+      PolyFitter_OpenSpaceGroupSymbols = 0
+! Try the default installation directory first
+      OPEN(110,file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//SPACEGROUPS,status='old', err = 10)
+      RETURN
+ 10   CONTINUE
+! Fail so look in current working directory
+      OPEN(110,file=SPACEGROUPS,status='old', err = 20, iostat = errstat)
+      dlen = GETCWD(INSTDIR)
+      RETURN
+ 20   CONTINUE
+! Failed to open in the current working directory: try getting the environment variable DASH_DIR
+      lval = GETENVQQ("DASH_DIR",DashDir)
+      IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
+! Environment variable is set
+        OPEN(110,file=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//SPACEGROUPS,status='old', err = 30)
+        INSTDIR = DASHDIR
+        RETURN
+ 30     CONTINUE
+! If DASH_DIR is set, then use a different message
+        Call ErrorMessage("Sorry, DASH is not installed correctly: Could not find the file"//CHAR(13)//CHAR(13)  &
+                          //SPACEGROUPS//CHAR(13)//CHAR(13)// &
+                          "in the default installation directory "//CHAR(13)//CHAR(13)//&
+                          INSTDIR(1:LEN_TRIM(INSTDIR))//CHAR(13)//CHAR(13)//&
+                          "in your current working directory, or in the directory "//CHAR(13)//CHAR(13)&
+                          //DashDir(1:LEN_TRIM(DashDir)))              
+          PolyFitter_OpenSpaceGroupSymbols = errstat
+        RETURN
+      ENDIF
+! Try looking at the command path itself and deriving the path from that
+      CALL GetArg(0,Command)
+      dlen = LEN_TRIM(Command)
+      DO WHILE (Command(dlen:dlen) .NE. DIRSPACER)
+        dlen = dlen - 1
+      ENDDO
+! JvdS What happens if no DIRSPACER is present?
+      dlen = dlen - 1
+      OPEN(110,File=Command(1:dlen)//DIRSPACER//SPACEGROUPS,status='old', err = 40)
+      INSTDIR = Command(1:dlen)
+      RETURN
+ 40   CONTINUE
+! If we get here, all attempts failed to open the file so fail gracefully
+      CALL ErrorMessage("Sorry, DASH is not installed correctly: Could not find the file"//CHAR(13)//CHAR(13) &
+                        //SPACEGROUPS//CHAR(13)//CHAR(13)// &
+                        "in the default installation directory "//CHAR(13)//CHAR(13)// &
+                        INSTDIR(1:LEN_TRIM(INSTDIR))//CHAR(13)//CHAR(13)// &
+                        "or in your current working directory")
+      PolyFitter_OpenSpaceGroupSymbols = errstat
+
+      END FUNCTION PolyFitter_OpenSpaceGroupSymbols
+!
+!*****************************************************************************
+!
+      SUBROUTINE InitialiseVariables
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'statlog.inc'
+      INCLUDE 'lattice.inc'
+      INCLUDE 'Poly_Colours.inc'
+      INCLUDE 'DialogPosCmn.inc'
+
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
+
+      REAL            XPG1, XPG2, YPG1, YPG2
+      COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+
+      LOGICAL           ChildWinAutoClose
+      COMMON /ChWinAC/  ChildWinAutoClose(1:20)
+
+      INTEGER*4         ChildWinHandler
+      LOGICAL                                  ChildWinHandlerSet
+      COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
+
+! The following variables are there to allow the dialogue fields in the
+! window dealing with z-matrices to be handled by DO...ENDDO loops.
+! The field identifiers assigned by Winteracter are not necessarily consecutive, 
+! but these mappings are.
+      INTEGER        IDFZMFile,           IDBZMBrowse,                &
+                     IDFZMpars,           IZMVB
+      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),   &
+                     IDFZMpars(1:maxfrg), IZMVB(1:maxfrg)
+      DATA IDFZMFile   / IDF_ZMatrix_file1,   IDF_ZMatrix_file2,   IDF_ZMatrix_file3,   IDF_ZMatrix_file4,   IDF_ZMatrix_file5   /
+      DATA IDBZMBrowse / IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5 /
+      DATA IDFZMpars   / IDF_ZM_pars1,        IDF_ZM_pars2,        IDF_ZM_pars3,        IDF_ZM_pars4,        IDF_ZM_pars5        /
+      DATA IZMVB       / IDB_ZMatrixView1,    IDB_ZMatrixView2,    IDB_ZMatrixView3,    IDB_ZMatrixView4,    IDB_ZMatrixView5    /
+
+      LOGICAL         MseBtnPressed, OldEventWaiting
+      COMMON /Events/ MseBtnPressed, OldEventWaiting
+      DATA MseBtnPressed / .FALSE. /
+      DATA OldEventWaiting / .FALSE. /
+
+      REAL    WaveLengthOf ! Function
+      REAL    dSpacing2TwoTheta ! Function
+
+      ChildWinAutoClose = .FALSE.
+      ChildWinHandlerSet = .FALSE.
+      DashRawFile = ' '
+      DashHcvFile = ' '
+      DashPikFile = ' '
+      DashTicFile = ' '
+      SavePDB  = .TRUE.
+      UseConfigFile = .TRUE.
+      IDCurrent_Cursor_Mode = ID_Peak_Fitting_Mode
+      DataSetChange = 0
+      NumInternalDSC = -1
+      ZeroPoint = 0.0
+      PastPawley = .FALSE.
+      DefaultMaxResolution = 2.0
+      CALL UpdateWavelength(WaveLengthOf('Cu'))
+! Now initialise the maximum resolution in the dialogue window
+      CALL WDialogSelect(IDD_PW_Page5)
+      CALL WDialogPutReal(IDF_MaxResolution,DefaultMaxResolution)
+      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(DefaultMaxResolution))
+      CALL WDialogSelect(IDD_SA_input3)
+      ISeed1 = 314
+      ISeed2 = 159
+      CALL WDialogPutInteger(IDF_SA_RandomSeed1,ISeed1)
+      CALL WDialogPutInteger(IDF_SA_RandomSeed2,ISeed2)
+      CALL WDialogSelect(IDD_Index_Preparation)
+      CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogPutString(IDF_ViewExe,ViewExe)
+      CALL WDialogPutString(IDF_ViewArg,ViewArg)
+      CALL WDialogPutCheckBox(IDF_AutoLocalOptimise,1)
+      CALL WDialogPutCheckBox(IDF_OutputCSSR,0)
+      CALL WDialogPutCheckBox(IDF_OutputCCL,0)
+      CALL WDialogSelect(IDD_SAW_Page1)
+      IF (ConvOn) THEN
+        CALL WDialogFieldState(IDB_SA_Project_Import,Enabled)
+      ELSE
+        CALL WDialogFieldState(IDB_SA_Project_Import,Disabled)
+      ENDIF
+      CALL ClearZmatrices
+      SLIMVALUE = 1.0
+      SCALFAC   = 0.01
+      BACKREF   = .TRUE.
+      JRadOption = 1 ! Initialise to X-ray lab data
+      IXPos_IDD_Wizard = 0.1  * XBSWidth
+      IYPos_IDD_Wizard = 0.06 * XBSHeight
+      NTIC = 0
+      LBIN = 1
+      MARKER_SIZE = 0.35
+      CHAR_SIZE = 1.0
+      XPG1 = 0.12
+      XPG2 = 0.95
+      YPG1 = 0.12
+      YPG2 = 0.93
+      KolNumPGWindow       = 220
+      KolNumMain           = 221
+      KolNumObs            = 222
+      KolNumCal            = 223
+      KolNumDif            = 224
+      KolNumMTic           = 225
+      KolNumCTic           = 226
+      KolNumPanelVLite     = 227
+      KolNumPanelLite      = 228
+      KolNumPanelDark      = 229
+      KolNumPanelVDark     = 230
+      KolNumPanelOuter     = 231
+      KolNumRectSelect     = 232
+      KolNumLargeCrossHair = 233
+      KolNumPeakFit        = 234
+      KolNumPeakPos        = 235
+      KolNumBack           = 236
+      KolPGWindow       = Win_RGB(253,253,248)
+      KolMain           = Win_RGB(20,20,150)
+!O      KolObs            = Win_RGB(161,0,0)
+      KolObs            = Win_RGB(255,0,0)
+!O      KolCal            = Win_RGB(10,70,10)
+      KolCal            = Win_RGB(0,0,255)
+      KolDif            = Win_RGB(200,100,200)
+      KolMTic           = Win_RGB(191,0,0)
+      KolCTic           = Win_RGB(0,131,131)
+      KolPanelVLite     = Win_RGB(245,245,245)
+      KolPanelLite      = Win_RGB(235,235,235)
+      KolPanelDark      = Win_RGB(210,210,210)
+      KolPanelVDark     = Win_RGB(170,170,170)
+      KolPanelOuter     = Win_RGB(190,190,190)
+      KolRectSelect     = Win_RGB(150,150,5)
+      KolLargeCrossHair = Win_RGB(150,150,5)
+      KolPeakFit        = Win_RGB(20,20,240)
+      KolPeakPos        = Win_RGB(50,50,200)
+      KolBack           = Win_RGB(164,211,105)
+      CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
+                                        KolPGWindow%IGreen,&
+                                        KolPGWindow%IBlue)
+      CALL IGrPaletteRGB(KolNumMain,KolMain%IRed,&
+                                    KolMain%IGreen,&
+                                    KolMain%IBlue)
+      CALL IGrPaletteRGB(KolNumObs,KolObs%IRed,&
+                                   KolObs%IGreen,&
+                                   KolObs%IBlue)
+      CALL IGrPaletteRGB(KolNumCal,KolCal%IRed,&
+                                   KolCal%IGreen,&
+                                   KolCal%IBlue)
+      CALL IGrPaletteRGB(KolNumDif,KolDif%IRed,&
+                                   KolDif%IGreen,&
+                                   KolDif%IBlue)
+      CALL IGrPaletteRGB(KolNumMTic,KolMTic%IRed,&
+                                    KolMTic%IGreen,&
+                                    KolMTic%IBlue)
+      CALL IGrPaletteRGB(KolNumCTic,KolCTic%IRed,&
+                                    KolCTic%IGreen,&
+                                    KolCTic%IBlue)
+      CALL IGrPaletteRGB(KolNumPanelVLite,KolPanelVLite%IRed,&
+                                          KolPanelVLite%IGreen,&
+                                          KolPanelVLite%IBlue)
+      CALL IGrPaletteRGB(KolNumPanelLite,KolPanelLite%IRed,&
+                                         KolPanelLite%IGreen,&
+                                         KolPanelLite%IBlue)
+      CALL IGrPaletteRGB(KolNumPanelDark,KolPanelDark%IRed,&
+                                         KolPanelDark%IGreen,&
+                                         KolPanelDark%IBlue)
+      CALL IGrPaletteRGB(KolNumPanelVDark,KolPanelVDark%IRed,&
+                                          KolPanelVDark%IGreen,&
+                                          KolPanelVDark%IBlue)
+      CALL IGrPaletteRGB(KolNumPanelOuter,KolPanelOuter%IRed,&
+                                          KolPanelOuter%IGreen,&
+                                          KolPanelOuter%IBlue)
+      CALL IGrPaletteRGB(KolNumRectSelect,KolRectSelect%IRed,&
+                                          KolRectSelect%IGreen,&
+                                          KolRectSelect%IBlue)
+      CALL IGrPaletteRGB(KolNumLargeCrossHair,KolLargeCrossHair%IRed,&
+                                              KolLargeCrossHair%IGreen,&
+                                              KolLargeCrossHair%IBlue)
+      CALL IGrPaletteRGB(KolNumPeakFit,KolPeakFit%IRed,&
+                                       KolPeakFit%IGreen,&
+                                       KolPeakFit%IBlue)
+      CALL IGrPaletteRGB(KolNumPeakPos,KolPeakPos%IRed,&
+                                       KolPeakPos%IGreen,&
+                                       KolPeakPos%IBlue)
+      CALL IGrPaletteRGB(KolNumBack,   KolBack%IRed,&
+                                       KolBack%IGreen,&
+                                       KolBack%IBlue)
+      ConnectPointsObs = .FALSE.
+
+      END SUBROUTINE InitialiseVariables
+!
+!*****************************************************************************
 !
       SUBROUTINE SaveConfigurationFile
 
@@ -205,12 +530,20 @@
       INTEGER*4      I4(64)
       EQUIVALENCE   (I4,TempString)
       INTEGER        tFileHandle
+      LOGICAL, EXTERNAL :: AutoLocalMinimisation, SaveCSSR, SaveCCL
 
       tFileName = 'D3.cfg'
       tFileHandle = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
       OPEN(UNIT=tFileHandle,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
+! Write a header
+      TempString = 'DASH configuration file'
+      DO I = 1, 64
+        WRITE(tFileHandle,REC=RecNr,ERR=999) I4(I)
+        RecNr = RecNr + 1
+      ENDDO
+      RecNr = RecNr + 1
       WRITE(tFileHandle,REC=RecNr,ERR=999) UseConfigFile
       RecNr = RecNr + 1
       IF (.NOT. UseConfigFile) GOTO 999
@@ -379,9 +712,6 @@
       CALL WDialogGetInteger(IDF_SA_RandomSeed2,ISEED)
       WRITE(tFileHandle,REC=RecNr,ERR=999) ISEED
       RecNr = RecNr + 1
-      CALL WDialogGetInteger(IDF_SA_RandomSeed3,ISEED)
-      WRITE(tFileHandle,REC=RecNr,ERR=999) ISEED
-      RecNr = RecNr + 1
 ! Save use hydrogens YES / NO
 
 ! Save default wavelength
@@ -393,345 +723,19 @@
       WRITE(tFileHandle,REC=RecNr,ERR=999) SavePDB
       RecNr = RecNr + 1
 ! 2. .cssr ?
-      WRITE(tFileHandle,REC=RecNr,ERR=999) SaveCSSR
+      WRITE(tFileHandle,REC=RecNr,ERR=999) SaveCSSR()
       RecNr = RecNr + 1
 ! 3. .ccl ?
-      WRITE(tFileHandle,REC=RecNr,ERR=999) SaveCCL
+      WRITE(tFileHandle,REC=RecNr,ERR=999) SaveCCL()
       RecNr = RecNr + 1
 ! Auto local minimisation at the end of every run in multirun YES / NO
-      WRITE(tFileHandle,REC=RecNr,ERR=999) AutoLocalMinimisation
+      WRITE(tFileHandle,REC=RecNr,ERR=999) AutoLocalMinimisation()
       RecNr = RecNr + 1
 
 
   999 CLOSE(tFileHandle)
 
       END SUBROUTINE SaveConfigurationFile
-!
-!*****************************************************************************
-!
-      SUBROUTINE InitialiseVariables
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
-      INCLUDE 'lattice.inc'
-      INCLUDE 'Poly_Colours.inc'
-      INCLUDE 'DialogPosCmn.inc'
-
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
-
-      REAL            XPG1, XPG2, YPG1, YPG2
-      COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
-
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-
-      INTEGER         nvar, ns, nt, neps, maxevl, iprint, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, neps, maxevl, iprint, iseed1, iseed2
-
-      LOGICAL           ChildWinAutoClose
-      COMMON /ChWinAC/  ChildWinAutoClose(1:20)
-
-      INTEGER*4         ChildWinHandler
-      LOGICAL                                  ChildWinHandlerSet
-      COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
-
-      REAL    WaveLengthOf ! Function
-      REAL    dSpacing2TwoTheta ! Function
-      INTEGER ISeed3
-
-      ChildWinAutoClose = .FALSE.
-      ChildWinHandlerSet = .FALSE.
-      DashRawFile = ' '
-      DashHcvFile = ' '
-      DashPikFile = ' '
-      DashTicFile = ' '
-      SavePDB  = .TRUE.
-      SaveCSSR = .TRUE.
-      SaveCCL  = .TRUE.
-      AutoLocalMinimisation = .TRUE.
-      UseConfigFile = .TRUE.
-!O      IDCurrent_Cursor_Mode = ID_Default_Mode
-      IDCurrent_Cursor_Mode = ID_Peak_Fitting_Mode
-      DataSetChange = 0
-      NumInternalDSC = -1
-      ZeroPoint = 0.0
-      DefaultMaxResolution = 2.0
-      CALL UpdateWavelength(WaveLengthOf('Cu'))
-! Now initialise the maximum resolution in the dialogue window
-      CALL WDialogSelect(IDD_PW_Page5)
-      CALL WDialogPutReal(IDF_MaxResolution,DefaultMaxResolution)
-      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(DefaultMaxResolution))
-      CALL WDialogSelect(IDD_SA_input3)
-      ISeed1 = 314
-      ISeed2 = 159
-      ISeed3 = 265
-      CALL WDialogPutInteger(IDF_SA_RandomSeed1,ISeed1)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed2,ISeed2)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed3,ISeed3)
-      CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutString(IDF_ViewExe,ViewExe)
-      CALL WDialogPutString(IDF_ViewArg,ViewArg)
-      IF (AutoLocalMinimisation) THEN
-        CALL WDialogPutCheckBox(IDF_AutoLocalOptimise,1)
-      ELSE
-        CALL WDialogPutCheckBox(IDF_AutoLocalOptimise,0)
-      ENDIF
-      IF (SaveCSSR) THEN
-        CALL WDialogPutCheckBox(IDF_OutputCSSR,1)
-      ELSE
-        CALL WDialogPutCheckBox(IDF_OutputCSSR,0)
-      ENDIF
-      IF (SaveCCL) THEN
-        CALL WDialogPutCheckBox(IDF_OutputCCL,1)
-      ELSE
-        CALL WDialogPutCheckBox(IDF_OutputCCL,0)
-      ENDIF
-
-      SLIMVALUE = 1.0
-      SCALFAC   = 0.01
-      BACKREF   = .TRUE.
-      JRadOption = 1 ! Initialise to X-ray lab data
-      IXPos_IDD_Pawley_Status = 0.1  * XBSWidth
-      IYPos_IDD_Pawley_Status = 0.06 * XBSHeight
-      IXPos_IDD_SA_Input = 0.1  * XBSWidth
-      IYPos_IDD_SA_Input = 0.06 * XBSHeight
-      IXPos_IDD_Wizard = 0.1  * XBSWidth
-      IYPos_IDD_Wizard = 0.06 * XBSHeight
-      FromPawleyFit = .FALSE. 
-      NTIC = 0
-      LBIN = 1
-      MARKER_SIZE = 0.35
-      CHAR_SIZE = 1.0
-      XPG1 = 0.12
-      XPG2 = 0.95
-      YPG1 = 0.12
-      YPG2 = 0.93
-      KolNumPGWindow       = 220
-      KolNumMain           = 221
-      KolNumObs            = 222
-      KolNumCal            = 223
-      KolNumDif            = 224
-      KolNumMTic           = 225
-      KolNumCTic           = 226
-      KolNumPanelVLite     = 227
-      KolNumPanelLite      = 228
-      KolNumPanelDark      = 229
-      KolNumPanelVDark     = 230
-      KolNumPanelOuter     = 231
-      KolNumRectSelect     = 232
-      KolNumLargeCrossHair = 233
-      KolNumPeakFit        = 234
-      KolNumPeakPos        = 235
-      KolNumBack           = 236
-      KolPGWindow       = Win_RGB(253,253,248)
-      KolMain           = Win_RGB(20,20,150)
-!O      KolObs            = Win_RGB(161,0,0)
-      KolObs            = Win_RGB(255,0,0)
-!O      KolCal            = Win_RGB(10,70,10)
-      KolCal            = Win_RGB(0,0,255)
-      KolDif            = Win_RGB(200,100,200)
-      KolMTic           = Win_RGB(191,0,0)
-      KolCTic           = Win_RGB(0,131,131)
-      KolPanelVLite     = Win_RGB(245,245,245)
-      KolPanelLite      = Win_RGB(235,235,235)
-      KolPanelDark      = Win_RGB(210,210,210)
-      KolPanelVDark     = Win_RGB(170,170,170)
-      KolPanelOuter     = Win_RGB(190,190,190)
-      KolRectSelect     = Win_RGB(150,150,5)
-      KolLargeCrossHair = Win_RGB(150,150,5)
-      KolPeakFit        = Win_RGB(20,20,240)
-      KolPeakPos        = Win_RGB(50,50,200)
-      KolBack           = Win_RGB(164,211,105)
-      CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
-                                        KolPGWindow%IGreen,&
-                                        KolPGWindow%IBlue)
-      CALL IGrPaletteRGB(KolNumMain,KolMain%IRed,&
-                                    KolMain%IGreen,&
-                                    KolMain%IBlue)
-      CALL IGrPaletteRGB(KolNumObs,KolObs%IRed,&
-                                   KolObs%IGreen,&
-                                   KolObs%IBlue)
-      CALL IGrPaletteRGB(KolNumCal,KolCal%IRed,&
-                                   KolCal%IGreen,&
-                                   KolCal%IBlue)
-      CALL IGrPaletteRGB(KolNumDif,KolDif%IRed,&
-                                   KolDif%IGreen,&
-                                   KolDif%IBlue)
-      CALL IGrPaletteRGB(KolNumMTic,KolMTic%IRed,&
-                                    KolMTic%IGreen,&
-                                    KolMTic%IBlue)
-      CALL IGrPaletteRGB(KolNumCTic,KolCTic%IRed,&
-                                    KolCTic%IGreen,&
-                                    KolCTic%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelVLite,KolPanelVLite%IRed,&
-                                          KolPanelVLite%IGreen,&
-                                          KolPanelVLite%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelLite,KolPanelLite%IRed,&
-                                         KolPanelLite%IGreen,&
-                                         KolPanelLite%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelDark,KolPanelDark%IRed,&
-                                         KolPanelDark%IGreen,&
-                                         KolPanelDark%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelVDark,KolPanelVDark%IRed,&
-                                          KolPanelVDark%IGreen,&
-                                          KolPanelVDark%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelOuter,KolPanelOuter%IRed,&
-                                          KolPanelOuter%IGreen,&
-                                          KolPanelOuter%IBlue)
-      CALL IGrPaletteRGB(KolNumRectSelect,KolRectSelect%IRed,&
-                                          KolRectSelect%IGreen,&
-                                          KolRectSelect%IBlue)
-      CALL IGrPaletteRGB(KolNumLargeCrossHair,KolLargeCrossHair%IRed,&
-                                              KolLargeCrossHair%IGreen,&
-                                              KolLargeCrossHair%IBlue)
-      CALL IGrPaletteRGB(KolNumPeakFit,KolPeakFit%IRed,&
-                                       KolPeakFit%IGreen,&
-                                       KolPeakFit%IBlue)
-      CALL IGrPaletteRGB(KolNumPeakPos,KolPeakPos%IRed,&
-                                       KolPeakPos%IGreen,&
-                                       KolPeakPos%IBlue)
-      CALL IGrPaletteRGB(KolNumBack,   KolBack%IRed,&
-                                       KolBack%IGreen,&
-                                       KolBack%IBlue)
-      ConnectPointsObs = .FALSE.
-
-      END SUBROUTINE InitialiseVariables
-!
-!*****************************************************************************
-!
-! Handle file opening. Exit with a message to say what is wrong if all attempts fail
-! JvdS What does it return? FileHandle and 0 otherwise?
-      INTEGER FUNCTION PolyFitter_OpenSpaceGroupSymbols
-
-      USE WINTERACTER
-      USE VARIABLES
-      USE dflib ! Windows environment variable handling: for GETENVQQ
-      USE dfport
-
-      INTEGER       errstat, lval, dlen
-      CHARACTER*255 DashDir, Command
-
-      PolyFitter_OpenSpaceGroupSymbols = 0
-! Try the default installation directory first
-      OPEN(110,file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//SPACEGROUPS,status='old', err = 10)
-      RETURN
- 10   CONTINUE
-! Fail so look in current working directory
-      OPEN(110,file=SPACEGROUPS,status='old', err = 20, iostat = errstat)
-      dlen = GETCWD(INSTDIR)
-      RETURN
- 20   CONTINUE
-! Failed to open in the current working directory: try getting the environment variable DASH_DIR
-      lval = GETENVQQ("DASH_DIR",DashDir)
-      IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
-! Environment variable is set
-        Open(110,file=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//SPACEGROUPS,status='old', err = 30)
-        INSTDIR = DASHDIR
-        RETURN
- 30     CONTINUE
-! If DASH_DIR is set, then use a different message
-        Call WMessageBox(OKOnly, ExclamationIcon, CommonOk, &
-          "Sorry, DASH is not installed correctly: Could not find the file"//CHAR(13)//CHAR(13)&
-          //SPACEGROUPS//CHAR(13)//CHAR(13)//"in the default installation directory "//CHAR(13)&
-          //CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))&
-          //CHAR(13)//CHAR(13)//"in your current working directory, or in the directory "//CHAR(13)//CHAR(13)&
-          //DashDir(1:LEN_TRIM(DashDir)),"Installation failure")              
-          PolyFitter_OpenSpaceGroupSymbols = errstat
-        RETURN
-      ENDIF
-! Try looking at the command path itself and deriving the path from that
-      CALL GetArg(0,Command)
-      dlen = LEN_TRIM(Command)
-      DO WHILE (Command(dlen:dlen) .NE. DIRSPACER)
-        dlen = dlen - 1
-      END DO
-! JvdS What happens if no DIRSPACER is present?
-      dlen = dlen - 1
-      OPEN(110,File=Command(1:dlen)//DIRSPACER//SPACEGROUPS,status='old', err = 40)
-      INSTDIR = Command(1:dlen)
-      RETURN
- 40   CONTINUE
-! If we get here, all attempts failed to open the file so fail gracefully
-      CALL WMessageBox(OKOnly, ExclamationIcon, CommonOk, &
-        "Sorry, DASH is not installed correctly: Could not find the file"//CHAR(13)//CHAR(13)&
-        //SPACEGROUPS//CHAR(13)//CHAR(13)//"in the default installation directory "//CHAR(13)&
-        //CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))&
-        //CHAR(13)//CHAR(13)//"or in your current working directory", "Installation failure")
-      PolyFitter_OpenSpaceGroupSymbols = errstat
-
-      END FUNCTION PolyFitter_OpenSpaceGroupSymbols
-!
-!*****************************************************************************
-! 
-      SUBROUTINE PolyFitter_EnableExternal()
-
-      USE WINTERACTER
-      USE VARIABLES
-      USE DFLIB ! Windows environment variable handling: for GETENVQQ
-
-      INTEGER       lval
-      CHARACTER*255 DashDir
-      CHARACTER*255 line
-      CHARACTER*3   KeyChar
-      INTEGER       nl
-      CHARACTER*255 tDir, tFile
-
-      ViewOn     = .FALSE.
-      ViewAct    = .FALSE.
-      AutoUpdate = .FALSE.
-      ConvOn     = .FALSE.
-      CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
-      lval = GETENVQQ("DASH_DIR",DashDir)
-      IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
-        CONVEXE = DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//'zmconv.exe'
-        OPEN(121, FILE=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 10)
-        GOTO 25
-      ENDIF
-   10 OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 20)
-      GOTO 25
-   20 CALL GetArg(0,line)
-      CALL SplitPath(line,tDir,tFile)
-      IF (LEN_TRIM(tDir) .EQ. 0) tDir = '.'//DIRSPACER
-      OPEN(121, FILE=tDir(1:LEN_TRIM(tDir))//CONFIG, STATUS='OLD', ERR = 30)
-! Remove '\' at end
-      tDir(LEN_TRIM(tDir):LEN_TRIM(tDir)) = ' '
-      INSTDIR = tDir
-! Read it
-   25 CONTINUE
-      DO WHILE ( .TRUE. )
-      READ(121,'(a)',END=30,ERR=30) line
-        nl=LEN_TRIM(line)
-        CALL INextString(line,keychar)
-        CALL ILowerCase(keychar(1:3))
-        SELECT CASE (KeyChar(1:3))
-          CASE ('vie')
-            VIEWEXE = line(IlocateChar(line):nl)
-          CASE ('con')
-            CONVEXE = line(IlocateChar(line):nl)
-          CASE ('arg')
-            VIEWARG = line(IlocateChar(line):nl) ! Arguments for the viewer
-          CASE ('rel')
-            AUTOUPDATE = .TRUE.
-        END SELECT
-      END DO            
- 30   INQUIRE(FILE=VIEWEXE(1:LEN_TRIM(VIEWEXE)),EXIST=ViewOn)
-      INQUIRE(FILE=CONVEXE(1:LEN_TRIM(CONVEXE)),EXIST=ConvOn)
-
-      END SUBROUTINE PolyFitter_EnableExternal
 !
 !*****************************************************************************
 ! 

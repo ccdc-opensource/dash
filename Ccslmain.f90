@@ -140,6 +140,15 @@
 !
       CHARACTER*4 NAME, MAKNAM
       DIMENSION XA(3), CELA(3)
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -749,6 +758,15 @@
      &                LSK, SLK
       LOGICAL SLK, BONOUT
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -1060,6 +1078,15 @@
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -1387,6 +1414,15 @@
 !N arguments X1(1:3), X2(1:3) and X3(1:3), position coordinates.
 !
       DIMENSION D12(3), D23(3)
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -3219,6 +3255,15 @@
      &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -3352,6 +3397,15 @@
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -3474,6 +3528,15 @@
      &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -3610,8 +3673,6 @@
 !N The factors found by FACTGP need not necessarily form a complete group
 !N Note also the existence of FACGRP which extracts complete factor groups
 !
-!%
-!      DIMENSION ISTAB(%SYMO%),IFTAB(%SYMO%)
       DIMENSION ISTAB(24), IFTAB(24)
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
@@ -3680,6 +3741,15 @@
      &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -3847,15 +3917,13 @@
       CHARACTER*10 FILNAM
       COMMON /LOONEY/ IOTAB(15), LUNTAB(15)
 !
-!%
-!      I=NFIND(LUN,LUNTAB,%FILE%)
       I = NFIND(LUN,LUNTAB,15)
       IF (I.EQ.0) THEN
         CALL ERRIN2(LUN,-1,'in FILNOM - unit','not in table LUNTAB')
       ELSE
         FILNOM = FILNAM(I)
       ENDIF
-      RETURN
+
       END FUNCTION FILNOM
 !*==FILPRO.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
@@ -4244,8 +4312,6 @@
 !
       DIMENSION A(3), PTEMP(3)
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
-!%
-!      COMMON /SCRAT/AXI(3,%SYMO%,2),MIRROR(%SYMO%),D(3,3),PL1(3),PL2(3),PL3(3),
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
@@ -4458,16 +4524,12 @@
       GOTO 100
 !
 ! A NEW REQUEST - ACCEPT IT:
-!%
-!   2  CALL ERRCHK(2,NUMFV,%FXVA%,0,'fix or vary requests')
     2 CALL ERRCHK(2,NUMFV,200,0,'fix or vary requests')
       N = NUMFV
       KKFV(N) = KK
 ! RECORD WHETHER OR NOT KK COMPLETE:
       KTYPFV(N) = 0
       IF (.NOT.KWHOLE(KK,K)) THEN
-!%
-!        CALL ERRCHK(2,NUMPAK,%FVPK%,0,'incomplete fix/vary requests')
         CALL ERRCHK(2,NUMPAK,30,0,'incomplete fix/vary requests')
         KTYPFV(N) = NUMPAK
         CALL GMEQ(K,KUNPFV(1,NUMPAK),1,5)
@@ -4810,8 +4872,6 @@
 !A               generators.
 !
       LOGICAL FIRST
-!%
-!      DIMENSION NSUB(%SYMO%),ISGEN(3),ISIG(2)
       DIMENSION NSUB(24), ISGEN(3), ISIG(2)
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
@@ -5103,8 +5163,6 @@
 !D            sigma.
 !
       CHARACTER*4 NAME, ANAME, BNAME
-!%
-!      DIMENSION XS(3),CS(3),NEND(2),NIN(%PLAN%)
       DIMENSION XS(3), CS(3), NEND(2), NIN(20)
       COMMON /ATNAM / ATNAME(150), ATNA(150,9)
       CHARACTER*4 ATNA, ATNAME
@@ -5117,6 +5175,15 @@
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -5457,8 +5524,6 @@
    31 CALL RDWORD(ANAME,LEN,IPT,IPT,80,0,IER)
 !* USE THE ENTRY WHICH DETECTS A READ NUMBER, & SET EOBS
       IF (IER.EQ.100) GOTO 32
-!%
-!      CALL ERRCHK(2,N,%PLAN%,0,'atoms constrained to be planar')
       CALL ERRCHK(2,N,20,0,'atoms constrained to be planar')
       NIN(N) = NCFIND(ANAME,ATTNAM,NTARNM)
       IF (NIN(N).EQ.0) THEN
@@ -5533,6 +5598,15 @@
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
      &                YMAX, CSQTOT
       EQUIVALENCE (IWGHT,IWGH(1))
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -6446,8 +6520,6 @@
 !
 ! DEAL WITH THE LINE PRINTER OUTPUT FILE, LPT.
 !  AND INPUT OUTPUT TABLES FOR USE BY OPNFIL AND NOPFIL:
-!%
-!      DO 4 I=1,%FILE%
       DO I = 1, 15
         IOTAB(I) = 0
 !  CLEAR FILE-NAMES
@@ -6508,8 +6580,6 @@
         STARS(5+2*I:5+2*I) = MAIN(I:I)
       ENDDO
       WRITE (LPT,2000) STARS
-!%
-!     & 'Crystallography Subroutine Library     Mark %MARK%.%VERS%')
  2000 FORMAT (/20X,A23//8X,' Cambridge ',                               &
      &        'Crystallography Subroutine Library     Mark 4.12')
 ! OBTAIN DATE AND TIME:
@@ -6895,11 +6965,7 @@
         ID = ID + NYZ
         IPT = 2
 !
-!%
-!   3  IF (IIN .LE. %ICRD%) GO TO 4
     3   IF (IIN.LE.20) GOTO 4
-!%
-!      CALL ERRMES(1,1,'more than %ICRD% items on I cards')
         CALL ERRMES(1,1,'more than 20 items on I cards')
         GOTO 100
 !
@@ -8436,11 +8502,7 @@
 !A The matrix ALSQ is dimensioned everywhere except in MAIN programs as
 !A ALSQ(MATSZ), and handed through as a routine argument.
 !
-!%
-!      CHARACTER *4 IPNAM1(2),IPNAM2(2),IUPPER(%BVAR%),LOWER(%BVAR%)
       CHARACTER*4 IPNAM1(2), IPNAM2(2), IUPPER(400), LOWER(400)
-!%
-!      DIMENSION ALSQ(MATSZ),MM(%BVAR%),ICORR(%BVAR%)
       DIMENSION ALSQ(MATSZ), MM(400), ICORR(400)
       COMMON /DERBAS/ DERIVB(400), LVARB
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
@@ -8735,8 +8797,6 @@
 !N form them separately.
 !
       CHARACTER*4 BS, VR
-!%
-!      DIMENSION ALSQ(MATSZ),MM(%BVAR%),SHIFTS(%BVAR%)
       DIMENSION ALSQ(MATSZ), MM(400), SHIFTS(400)
       COMMON /DERBAS/ DERIVB(400), LVARB
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
@@ -8817,8 +8877,6 @@
 !P          SQRTWT holds the square root of the weight
 !P          SIMUL is TRUE if this is only a simulation cycle
 !
-!%
-!      DIMENSION ALSQ(MATSZ),MM(%BVAR%)
       DIMENSION ALSQ(MATSZ), MM(400)
       COMMON /DERBAS/ DERIVB(400), LVARB
       COMMON /MATDAT/ MATPNT(401), BLSQ(400)
@@ -9851,8 +9909,7 @@
       GOTO 4
 !
 ! L NOT IN TABLE - CHECK SUITABILITY:
-    3 IF (L.LT.0 .OR. L.EQ.ITI .OR. L.EQ.ITO)                           &
-     &     CALL ERRIN2(L,0,'cannot open unit','in OPNFIL')
+    3 IF (L.LT.0 .OR. L.EQ.ITI .OR. L.EQ.ITO) CALL ERRIN2(L,0,'cannot open unit','in OPNFIL')
       LUNTAB(K) = L
     4 CONTINUE
 !VMS
@@ -9915,10 +9972,6 @@
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-!%
-!      COMMON /SCRAT/TSYM(3,3,%SY*2%),TTRANS(3,%SY*2%),
-!%
-!     & MLTAB(%SY*2%,%SY*2%),TRANS1(3),TEMSYM(3,3)
       COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48),         &
      &                TRANS1(3), TEMSYM(3,3)
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
@@ -10172,8 +10225,6 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
 !
-!%
-!      DO 1 I=1,%ICRD%
       DO I = 1, 20
         IF (IIREAD(I).EQ.'CYC1') GOTO 2
       ENDDO
@@ -10601,8 +10652,6 @@
 !D are acute.
 !
       DIMENSION A(3), B(3), C(3)
-!%
-!      COMMON /SCRAT/AXI(3,%SYMO%,2),MIRROR(%SYMO%),D(3,3),PL1(3),PL2(3),PL3(3),
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
@@ -10654,8 +10703,6 @@
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-!%
-!      COMMON /SCRAT/AXI(3,%SYMO%,2),MIRROR(%SYMO%),D(3,3),PL1(3),PL2(3),PL3(3),
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
@@ -15825,8 +15872,6 @@
 !A                which produced it (in fact, the negated vector for the
 !A                inverse operator).
 !
-!%
-!      DIMENSION HIN(3),HOUT(3,%SY*2%),EH(3),PHASE(%SY*2%),TR(3)
       DIMENSION HIN(3), HOUT(3,48), EH(3), PHASE(48), TR(3)
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
@@ -16079,8 +16124,6 @@
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-!%
-!      COMMON /SCRAT/AXI(3,%SYMO%,2),MIRROR(%SYMO%),D(3,3),PL1(3),PL2(3),PL3(3),
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
@@ -17174,8 +17217,6 @@
       DO I = 1, NCON
         LV = KREDUN(I)
         IF (LV.EQ.0) GOTO 30
-!%
-!      CALL ERRCHK(2,JCONST,%CSTR%,0,'strict constraints')
         CALL ERRCHK(2,JCONST,300,0,'strict constraints')
 ! RECORD CROSS POINTERS FOR VARIABLES AND REDUNDANT VARIABLES:
         LVRBS(LV) = -JCONST

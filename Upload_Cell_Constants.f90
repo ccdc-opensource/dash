@@ -19,8 +19,16 @@
 
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
-      COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
-      PkProb(MTPeak), IOrdTem(MTPeak),IHPk(3,MTPeak)
+      INTEGER           NTPeak
+      REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              PkProb
+      INTEGER           IOrdTem
+      INTEGER           IHPk
+      COMMON /ALLPEAKS/ NTPeak,                                                  &
+                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        PkProb(MTPeak),                                          &
+                        IOrdTem(MTPeak),                                         &
+                        IHPk(3,MTPeak)
 
       INTEGER IASS(6)
       LOGICAL NOCREF
@@ -31,11 +39,11 @@
       2,2,2,3,3,3, 2,2,3,9,10,10, 2,2,2,10,10,10/ 
       LOGICAL FnWaveLengthOK, FnUnitCellOK ! Function
 
-!>> JCC Check the wavelength: if the user has not set it, then
-!>> we should not be here!
+! JCC Check the wavelength: if the user has not set it, then
+! we should not be here!
       IF (.NOT. FnWaveLengthOK()) RETURN
-!>> JvdS Check the unit cell parameters: if the user has not set them, then
-!>> we should not be here!
+! JvdS Check the unit cell parameters: if the user has not set them, then
+! we should not be here!
       IF (.NOT. FnUnitCellOK()) RETURN
       NVal = 0
       DO I = 1, NTPeak
@@ -46,12 +54,12 @@
           DO II = 1, 3
 ! Yet another place where h, k and l are stored
             IHLR(II,NVal) = IHPk(II,I)
-          END DO
+          ENDDO
           YVal(NVal) = AllPkPosVal(IOrd)
           EVal(NVal) = AllPkPosEsd(IOrd)
-        END IF
-      END DO
-!C>> JCC Updated to the correct values ...!
+        ENDIF
+      ENDDO
+! JCC Updated to the correct values ...!
 ! Number of degrees of freedom, including the zero point.
       SELECT CASE (LatBrav)
         CASE (1)        ! Triclinic
@@ -65,15 +73,15 @@
         CASE (10)       ! Cubic
           NDD = 2
       END SELECT
-      IF (NDD .EQ. 0) RETURN
+! NVal is the number of peaks indexed with a probability over 95%
       IF (NVal .EQ. 0) THEN
-        IF (NTPeak .GT. NDD) CALL ErrorMessage('Problems with cell refinement!'//CHAR(13)// &
-                                               'Have you entered the cell constants?')
+        IF (NTPeak .GT. NDD) CALL ErrorMessage('Problems with cell refinement.'//CHAR(13)// &
+                                               'Are the unit cell parameters correct?')
         RETURN
-      END IF
+      ENDIF
       DO I = 1, 3
         GREAL(I,I) = CELLPAR(I)**2
-      END DO
+      ENDDO
       GREAL(1,2) = CELLPAR(1)*CELLPAR(2)*COSD(CELLPAR(6))
       GREAL(1,3) = CELLPAR(1)*CELLPAR(3)*COSD(CELLPAR(5))     
       GREAL(2,3) = CELLPAR(2)*CELLPAR(3)*COSD(CELLPAR(4))
@@ -89,11 +97,11 @@
       DO I = 1, NVal
         DO II = 1, 3
           IASS(II) = IASS(II) + IHLR(II,I)**2
-        END DO
+        ENDDO
         IASS(4) = IASS(4) + (IHLR(1,I) * IHLR(2,I))**2
         IASS(5) = IASS(5) + (IHLR(1,I) * IHLR(3,I))**2
         IASS(6) = IASS(6) + (IHLR(2,I) * IHLR(3,I))**2
-      END DO
+      ENDDO
       XDD(2)=GREC(1,1)
       SELECT CASE (LatBrav)
         CASE ( 1) ! Triclinic
@@ -105,7 +113,7 @@
           NOCREF = .FALSE.
           DO I = 1, 6
             NOCREF = NOCREF .OR. (IASS(I) .EQ. 0)
-          END DO
+          ENDDO
         CASE ( 2) ! Monoclinic a
           XDD(3)=GREC(2,2) 
           XDD(4)=GREC(3,3)
@@ -146,11 +154,11 @@
       DDMAX = 0.0
       DO I = 2, NDD
         DDMAX = MAX(DDMAX,1.e-4*ABS(XDD(I)))
-      END DO
+      ENDDO
       DO I = 2, NDD
         DXDD(I) = DDMAX
-      END DO
-!.. Perform simplex
+      ENDDO
+! Perform simplex
       CALL WCursorShape(CurHourGlass)
       CALL SIMOPT(XDD,DXDD,COVDD,NDD,ChiGetLattice)
       CALL WCursorShape(CurCrossHair)
@@ -158,7 +166,7 @@
       XDD(10) = 0.0
       DO I = 1, 3
         GREC(I,I) = XDD(KELPT(I, LatBrav))
-      END DO
+      ENDDO
       GREC(1,2) = XDD(KELPT(4, LatBrav))
       GREC(1,3) = XDD(KELPT(5, LatBrav))     
       GREC(2,3) = XDD(KELPT(6, LatBrav))
@@ -168,7 +176,7 @@
       CALL InverseMatrix(GREC,GREAL,3)
       DO I = 1, 3
         CellPar(I) = SQRT(MAX(0.0,Greal(I,I)))
-      END DO
+      ENDDO
       CellPar(4) = ACOSD(GReal(2,3)/(CellPar(2)*CellPar(3)))  
       CellPar(5) = ACOSD(GReal(1,3)/(CellPar(1)*CellPar(3)))            
       CellPar(6) = ACOSD(GReal(1,2)/(CellPar(1)*CellPar(2)))
@@ -180,7 +188,6 @@
       CALL Generate_TicMarks()
       IF (NVal .LE. NDD+2) RETURN
 !.. Now attempt a quick Pawley refinement
-!O      CALL Quick_Pawley()                     
       CALL ShowPawleyFitWindow
 
       END SUBROUTINE RefineLattice

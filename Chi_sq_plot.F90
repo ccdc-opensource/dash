@@ -19,65 +19,66 @@
 !
 !  Definitions and array declarations.
 !
-      INCLUDE 'params.inc'
+      INCLUDE 'PARAMS.INC'
       INTEGER,PARAMETER :: NSETS   =     1
-        integer           :: ntotmov
-        integer           :: iteration
-        real              :: cpb
-        integer           :: it_count
-        real           :: x_max
-        real           :: x_min
-        real           :: y_max
-       real, dimension(10000) :: num_moves
-       real, dimension(10000)    :: chi_sqd
-       INTEGER ChiSqdChildWindows
-        integer           :: ChiHandle
-        DATA  ChiHandle /3/
-       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
+      INTEGER           :: ntotmov
+      INTEGER           :: iteration
+      REAL              :: cpb
+      INTEGER           :: it_count
+      REAL           :: x_max
+      REAL           :: x_min
+      REAL           :: y_max
+      REAL, DIMENSION(MaxIter) :: num_moves
+      REAL, DIMENSION(MaxIter) :: chi_sqd
+      INTEGER                    ChiSqdChildWindows,                 ChiHandle
+      COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
+      DATA  ChiSqdChildWindows / 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 /
+      DATA  ChiHandle / 1 /
 ! Variables used to specify Child Window position
-       INTEGER Ix, Iy
-       COMMON /WindowPosition/ Ix, Iy
-       DATA Ix /10/, Iy /450/
-!
-        it_count = iteration
-        num_moves(it_count) = ntotmov
-        chi_sqd(it_count) = cpb
-        x_min=num_moves(1)
-        x_max=num_moves(it_count)
-        y_max=chi_sqd(1)+50
+      INTEGER Ix, Iy
+      COMMON /WindowPosition/ Ix, Iy
+      DATA Ix /10/, Iy /450/
+
+      it_count = iteration
+      num_moves(it_count) = ntotmov
+      chi_sqd(it_count) = cpb
+      x_min = num_moves(1)
+      x_max = num_moves(it_count)
+      y_max = chi_sqd(1)*1.25
 ! First two interations performed both have iteration number=1.  The graph requires
 ! two points to plot a straight line and so the plot of chi-sqd vs.moves only
-! starts when i_count =2, ie iteration number 2
-        if (it_count.eq.2)then
-          call WindowOpenChild(ChiHandle, x=Ix, y=Iy, width=400, height=300, title='Chi-sqd vs. Moves')
-          ChiSqdChildWindows(ChiHandle) = 1 
-          call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
-        endif    
+! starts when it_count =2, ie iteration number 2
+      IF (it_count.EQ.2) THEN
+        CALL WindowOpenChild(ChiHandle, x=Ix, y=Iy, width=400, height=300, title='Chi-sqd vs. Moves')
+        ChiSqdChildWindows(ChiHandle) = 1 
+   !     CALL plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
+      ENDIF    
 ! If ChildWindow is open then call plotting routine.
-!        if (it_count.gt.2) then
-        IF (ChiSqdChildWindows(ChiHandle).eq.1) THEN
-          CALL WindowSelect(ChiHandle)
-          CALL WindowClear()
-          CALL plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
-        END IF
+   !   IF (it_count.GT.2) THEN
+      IF (ChiSqdChildWindows(ChiHandle).EQ.1) THEN
+        CALL WindowSelect(ChiHandle)
+        CALL WindowClear()
+        CALL plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
+      ENDIF
 
-        end subroutine Chi_sq_plot
+      END SUBROUTINE Chi_sq_plot
 
 !***********************************************************************************************
       SUBROUTINE plotting_Chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
       
       USE DRUID_HEADER
       USE WINTERACTER
-              
+      
+      INCLUDE 'PARAMS.INC'        
       INCLUDE 'poly_colours.inc'  
         
-      INTEGER,PARAMETER :: NSETS   =     1
+      INTEGER,PARAMETER :: NSETS  =  1
       INTEGER, INTENT(IN)        :: it_count
       REAL, INTENT(IN)           :: x_max
-      REAL,INTENT(IN)           :: x_min
-      REAL,INTENT(IN)           :: y_max
-      real, dimension(10000), INTENT(IN) :: num_moves
-      real, dimension(10000), INTENT(IN) :: chi_sqd
+      REAL, INTENT(IN)           :: x_min
+      REAL, INTENT(IN)           :: y_max
+      REAL, DIMENSION(MaxIter), INTENT(IN   ) :: num_moves
+      REAL, DIMENSION(MaxIter), INTENT(IN   ) :: chi_sqd
 
 !
 !  Start new presentation graphics plot
@@ -169,7 +170,7 @@
 
       USE WINTERACTER
 
-      INCLUDE 'params.inc'
+      INCLUDE 'PARAMS.INC'
 
       INTEGER ChiSqdChildWindows
       INTEGER ChiHandle
@@ -177,16 +178,16 @@
       INTEGER Ix, Iy
       COMMON /WindowPosition/ Ix, Iy
 
-      DO i = 1,MaxNumChildWin
-        IF (ChiSqdChildWindows(i) .EQ. 1) THEN
+      DO I = 1, MaxNumChildWin
+        IF (ChiSqdChildWindows(I) .EQ. 1) THEN
 ! save position of window before close.  If more than one chisqd window open (not 
 ! the case in this implementation) will save the position of the last window closed.
-          CALL WindowSelect(i)
+          CALL WindowSelect(I)
           Ix = WinfoWindow(WindowXpos)
           Iy = WinfoWindow(WindowYpos)
-          CALL WindowCloseChild(i)
-          ChiSqdChildWindows(i) = 0
+          CALL WindowCloseChild(I)
+          ChiSqdChildWindows(I) = 0
         ENDIF
       ENDDO
 
-      END SUBROUTINE Close_Chisq_Plot       			  
+      END SUBROUTINE Close_Chisq_Plot                         

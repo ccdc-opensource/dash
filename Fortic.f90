@@ -119,10 +119,9 @@
 !.. Check if we have too many reflections
       CALL CHKMAXREF(PCXX)
 !
-!
 ! OUTPUT H,K,L IF REQUIRED:
       CALL HKLOUT(PCXX,ALSQ,MATSZ)
-      RETURN
+
       END SUBROUTINE FORTIC
 !*==FORSYM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -134,11 +133,11 @@
       COMMON /commun/ filnam_root
       CHARACTER*10 filnam_root
       filnam_root = filnmr
-!
+
       CALL PREFIN(PNAME)
       CALL SYMOP
       CALL OPSYM(1)
-      RETURN
+
       END SUBROUTINE FORSYM
 !*==MAKRHM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -147,13 +146,11 @@
 !
       DIMENSION H(3)
       INCLUDE 'SGinc\FFCALCTOP.INC'
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
-      COMMON /symsto/ sctrh(24,10000), rhsto(3,24,10000)
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
+      COMMON /symsto/ sctrh(24,MFCSTO), rhsto(3,24,MFCSTO)
 !
 !           CALL ROTSYM(H,RH,I,-1)
 !           F1=SCALPR(X(1,N),RH)+SCALPR(TRANS(1,I),H)

@@ -91,7 +91,6 @@
       END FUNCTION FFCALC_069
 !*==FFCALC_112.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
       FUNCTION FFCALC_112(IR)
       INCLUDE 'SGinc\FFCALCTOP.inc'
       INCLUDE 'SGinc\FFCALC_112.f90'
@@ -242,7 +241,6 @@
       END FUNCTION FFCALC_451
 !*==FFCALC_462.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
       FUNCTION FFCALC_462(IR)
       INCLUDE 'SGinc\FFCALCTOP.inc'
       INCLUDE 'SGinc\FFCALC_462.f90'
@@ -287,35 +285,27 @@
 !
 !
       FUNCTION FFCALC_DEFAULT(IR)
-!
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
       COMMON /symsto/ sctrh(24,10000), rhsto(3,24,10000)
       PARAMETER (NAC=256,NBC=100*NAC,FARCOS=256.)
-      COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC),               &
-     &                COSAR2(-NBC:NBC)
-      COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC),               &
-     &                SINAR2(-NBC:NBC)
+      COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC), COSAR2(-NBC:NBC)
+      COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC), SINAR2(-NBC:NBC)
 !
-!
-      AFCALC = 0.
-!
-!.. Firstly if we are centric then calculate only cosine terms
-!
+      AFCALC = 0.0
+! Firstly if we are centric then calculate only cosine terms
       IF (CENTRC) THEN
         IF (LOG_HYDROGENS) THEN
           DO N = 1, NATOM
             SUM = 0.
 ! SUM OVER SYMMETRY EQUIVALENTS:
             DO I = 1, NOPC
-!.. V is 2pi*(h*x+t)
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)     &
-     &            *RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
+! V is 2pi*(h*x+t)
+              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
               IV = V
               PV = V - FLOAT(IV)
               SUM = SUM + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
@@ -325,12 +315,10 @@
         ELSE
           DO NS = 1, NSATOM
             N = ISATOM(NS)
-            SUM = 0.
-!
+            SUM = 0.0
 ! SUM OVER SYMMETRY EQUIVALENTS:
             DO I = 1, NOPC
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)     &
-     &            *RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
+              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
               IV = V
               PV = V - FLOAT(IV)
               SUM = SUM + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
@@ -340,18 +328,16 @@
         ENDIF
         FFCALC_DEFAULT = AFCALC*AFCALC
       ELSE
-!.. Deal with the non-centric case
+! Deal with the non-centric case
         BFCALC = 0.
         IF (LOG_HYDROGENS) THEN
           DO N = 1, NATOM
-            SUMA = 0.
-            SUMB = 0.
-!
+            SUMA = 0.0
+            SUMB = 0.0
 ! SUM OVER SYMMETRY EQUIVALENTS:
             DO I = 1, NOPC
-!.. V is 2pi*(h*x+t)
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)     &
-     &            *RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
+! V is 2pi*(h*x+t)
+              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
               IV = V
               PV = V - FLOAT(IV)
               SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
@@ -363,13 +349,11 @@
         ELSE
           DO NS = 1, NSATOM
             N = ISATOM(NS)
-            SUMA = 0.
-            SUMB = 0.
-!
+            SUMA = 0.0
+            SUMB = 0.0
 ! SUM OVER SYMMETRY EQUIVALENTS:
             DO I = 1, NOPC
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)     &
-     &            *RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
+              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
               IV = V
               PV = V - FLOAT(IV)
               SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
@@ -387,11 +371,9 @@
 !
       SUBROUTINE CALCOSARX
       PARAMETER (NAC=256,NBC=100*NAC,FARCOS=256.)
-      COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC),               &
-     &                COSAR2(-NBC:NBC)
-      COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC),               &
-     &                SINAR2(-NBC:NBC)
-!
+      COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC), COSAR2(-NBC:NBC)
+      COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC), SINAR2(-NBC:NBC)
+
       TWOPI = 8.*ATAN(1.)
       AMUL = TWOPI/FARCOS
       DO I = -NBC, NBC
@@ -405,5 +387,5 @@
         SINAR1(I) = 0.5*(SIN(XP)-SIN(XM))
         SINAR2(I) = 0.5*(SIN(XP)+SIN(XM)-2.*SINAR0(I))
       ENDDO
-!
+
       END SUBROUTINE CALCOSARX

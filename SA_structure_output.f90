@@ -17,7 +17,6 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
-      INCLUDE 'IZMCheck.inc'
 
       CHARACTER*3     asym
       CHARACTER*5                          OriginalLabel
@@ -39,16 +38,25 @@
       INTEGER         nfrag
       COMMON /frgcom/ nfrag
 
-      REAL            tiso,                occ
-      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
-
       DOUBLE PRECISION blen,                alph,                bet,                f2cmat
       COMMON /zmcomr/  blen(maxatm,maxfrg), alph(maxatm,maxfrg), bet(maxatm,maxfrg), f2cmat(3,3)
+
+      REAL            tiso,                occ
+      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
 
       DOUBLE PRECISION inv(3,3)
 
       COMMON /posopt/ XATOPT(3,150)
 
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -57,6 +65,9 @@
       COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+
+      LOGICAL         gotzmfile
+      COMMON /zmlgot/ gotzmfile(maxfrg)
 
       PARAMETER (mpdbops=192)
       CHARACTER*20 cpdbops(mpdbops)
@@ -71,9 +82,7 @@
       COMMON /pdbcat/ f2cpdb(3,3)
       LOGICAL tSavePDB, tSaveCSSR, tSaveCCL
       INTEGER ipcount
-      INTEGER CheckedFragNo
-
-      ntem = NumberSGTable
+      LOGICAL, EXTERNAL :: SaveCSSR, SaveCCL
 
 !     ep added.  Following subroutine saves calculated and observed
 !     diffraction patterns in .pro file
@@ -81,8 +90,8 @@
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
       tSavePDB = SavePDB
-      tSaveCSSR = SaveCSSR
-      tSaveCCL = SaveCCL
+      tSaveCSSR = SaveCSSR()
+      tSaveCCL = SaveCCL()
 !
 !       Output a CSSR file to fort.64
 !       Output a PDB  file to fort.65
@@ -95,7 +104,7 @@
         OPEN (UNIT=64,FILE=cssr_file(1:cssr_flen),STATUS='unknown')
         WRITE (64,1000) (CellPar(ii),ii=1,3)
  1000   FORMAT (' REFERENCE STRUCTURE = 00000   A,B,C =',3F8.3)
-        WRITE (64,1010) (CellPar(ii),ii=4,6), SGNumStr(Ntem)(1:3)
+        WRITE (64,1010) (CellPar(ii),ii=4,6), SGNumStr(NumberSGTable)(1:3)
  1010   FORMAT ('   ALPHA,BETA,GAMMA =',3F8.3,'    SPGR = ',A3)
         WRITE (64,"(' ',I3,'   0  DASH solution')") natom
         IF (T .GT. 999.9) THEN
@@ -121,13 +130,13 @@
           WRITE (65,1041) SNGL(t), -SNGL(fopt), cpb, ntotmov
  1041     FORMAT ('REMARK T=',F6.2,', chi**2=',F7.2,' and profile chi**2=',F7.2,' after ',I8,' moves')
         ENDIF
-        WRITE (65,1050) (CellPar(ii),ii=1,6), SGHMaStr(NTem)
+        WRITE (65,1050) (CellPar(ii),ii=1,6), SGHMaStr(NumberSGTable)
  1050   FORMAT ('CRYST1',3F9.3,3F7.2,X,A12)
 ! JCC Add in V2 pdb records to store space group and symmetry
         WRITE (65,1380)
         WRITE (65,1381)
  1381   FORMAT ('REMARK 290 CRYSTALLOGRAPHIC SYMMETRY')
-        WRITE (65,1382) SGHMaStr(NTem)
+        WRITE (65,1382) SGHMaStr(NumberSGTable)
  1382   FORMAT ('REMARK 290 SYMMETRY OPERATORS FOR SPACE GROUP: ',A)
         WRITE (65,1380)
         WRITE (65,1383)
@@ -170,45 +179,40 @@
       iiact = 0
       itotal = 0
       ipcount = 0
-      CheckedFragNo = 0
-      DO j = 1, nfrag
-        itotal = iiact
-        DO WHILE (CheckedFragNo.LE.CheckSize)
-          CheckedFragNo = CheckedFragNo + 1
-          IF (IZMCheck(CheckedFragNo).EQ.1) EXIT   ! the loop
-        ENDDO
+      DO ifrg = 1, maxfrg
+        IF (gotzmfile(ifrg)) THEN
+          itotal = iiact
 ! Write out the translation/rotation information for each residue
-        IF (tSavePDB) THEN
-          WRITE (65,1039) j
- 1039     FORMAT ('REMARK Start of molecule number ',I6)
-          WRITE (65,1037) (SNGL(parvals(ij)),ij=ipcount+1,ipcount+3)
- 1037     FORMAT ('REMARK Translations: ',3F10.6)
-        ENDIF
-        IF (natoms(CheckedFragNo).GT.1) THEN
-! Normalise the Q-rotations before writing them out ...
-          qvals(1) = SNGL(parvals(ipcount+4))
-          qvals(2) = SNGL(parvals(ipcount+5))
-          qvals(3) = SNGL(parvals(ipcount+6))
-          qvals(4) = SNGL(parvals(ipcount+7))
-          qnrm = SQRT(qvals(1)**2 + qvals(2)**2 + qvals(3)**2 + qvals(4)**2)
-          qvals = qvals / qnrm
           IF (tSavePDB) THEN
-            WRITE (65,1038) (qvals(ij),ij=1,4)
- 1038       FORMAT ('REMARK Q-Rotations : ',4F10.6)
+            WRITE (65,1039) ifrg
+ 1039       FORMAT ('REMARK Start of molecule number ',I6)
+            WRITE (65,1037) (SNGL(parvals(ij)),ij=ipcount+1,ipcount+3)
+ 1037       FORMAT ('REMARK Translations: ',3F10.6)
           ENDIF
-          ipcount = ipcount + izmpar(CheckedFragNo)
-        ENDIF
-        DO i = 1, natoms(CheckedFragNo)
-! Was   ii = ii + 1
-          iiact = iiact + 1
-          ii = itotal + izmbid(i,CheckedFragNo)
-          iorig = izmbid(i,CheckedFragNo)
-!         The CSSR atom lines
-          IF (tSaveCSSR) THEN
-            WRITE (64,1110) iiact, OriginalLabel(iorig,CheckedFragNo)(1:4),           &
-     &                      (xatopt(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
- 1110       FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
+          IF (natoms(ifrg).GT.1) THEN
+! Normalise the Q-rotations before writing them out ...
+            qvals(1) = SNGL(parvals(ipcount+4))
+            qvals(2) = SNGL(parvals(ipcount+5))
+            qvals(3) = SNGL(parvals(ipcount+6))
+            qvals(4) = SNGL(parvals(ipcount+7))
+            qnrm = SQRT(qvals(1)**2 + qvals(2)**2 + qvals(3)**2 + qvals(4)**2)
+            qvals = qvals / qnrm
+            IF (tSavePDB) THEN
+              WRITE (65,1038) (qvals(ij),ij=1,4)
+ 1038         FORMAT ('REMARK Q-Rotations : ',4F10.6)
+            ENDIF
+            ipcount = ipcount + izmpar(ifrg)
           ENDIF
+          DO i = 1, natoms(ifrg)
+! Was     ii = ii + 1
+            iiact = iiact + 1
+            ii = itotal + izmbid(i,ifrg)
+            iorig = izmbid(i,ifrg)
+! The CSSR atom lines
+            IF (tSaveCSSR) THEN
+              WRITE (64,1110) iiact, OriginalLabel(iorig,ifrg)(1:4),(xatopt(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
+ 1110         FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
+            ENDIF
 !       The PDB atom lines
 !
 ! JCC Changed to use the PDB's orthogonalisation  definition
@@ -229,26 +233,29 @@
 !   xc=xc*cos(rnew) + zc*sin(rnew)
 !   zc=zc*cos(rnew) - xc*sin(rnew)
 !
-          xc = xatopt(1,ii)*SNGL(f2cpdb(1,1)) + xatopt(2,ii)*SNGL(f2cpdb(1,2)) + xatopt(3,ii)*SNGL(f2cpdb(1,3))
-          yc = xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)*SNGL(f2cpdb(2,3))
-          zc = xatopt(3,ii)*SNGL(f2cpdb(3,3))
+            xc = xatopt(1,ii)*SNGL(f2cpdb(1,1)) + xatopt(2,ii)*SNGL(f2cpdb(1,2)) + xatopt(3,ii)*SNGL(f2cpdb(1,3))
+            yc = xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)*SNGL(f2cpdb(2,3))
+            zc = xatopt(3,ii)*SNGL(f2cpdb(3,3))
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
-          IF (tSavePDB) THEN
-            IF (asym(iorig,CheckedFragNo)(2:2).EQ.' ') THEN
-              WRITE (65,1120) iiact, OriginalLabel(iorig,CheckedFragNo)(1:3), xc, yc, zc, asym(iorig,CheckedFragNo)(1:1)
- 1120         FORMAT ('HETATM',I5,'  ',A3,' NONE    1    ',3F8.3,'  1.00  0.00           ',A1,'  ')
-            ELSE
-              WRITE (65,1130) iiact, OriginalLabel(iorig,CheckedFragNo)(1:4), xc, yc, zc, asym(iorig,CheckedFragNo)(1:2)
- 1130         FORMAT ('HETATM',I5,' ',A4,' NONE    1    ',3F8.3,'  1.00  0.00          ',A2,'  ')
+            IF (tSavePDB) THEN
+              IF (asym(iorig,ifrg)(2:2).EQ.' ') THEN
+                WRITE (65,1120) iiact, OriginalLabel(iorig,ifrg)(1:3), xc, yc, zc, &
+                                occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:1)
+ 1120           FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
+              ELSE
+                WRITE (65,1130) iiact, OriginalLabel(iorig,ifrg)(1:4), xc, yc, zc, &
+                                occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:2)
+ 1130           FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+              ENDIF
             ENDIF
-          ENDIF
-!       The CCL atom lines
-          IF (tSaveCCL) THEN
-            WRITE (66,1033) asym(iorig,CheckedFragNo), (xatopt(k,ii),k=1,3)
- 1033       FORMAT ('A ',A3,' ',3F10.5,'  3.0  1.0')
-          ENDIF
-        ENDDO
+!         The CCL atom lines
+            IF (tSaveCCL) THEN
+              WRITE (66,1033) asym(iorig,ifrg), (xatopt(k,ii),k=1,3)
+ 1033         FORMAT ('A ',A3,' ',3F10.5,'  3.0  1.0')
+            ENDIF
+          ENDDO
+        ENDIF
       ENDDO
       IF (tSaveCSSR) CLOSE (64)
       IF (tSavePDB) THEN

@@ -76,8 +76,6 @@
                 CALL Profile_Plot(IPTYPE)
             END SELECT
           ENDIF
-        CASE DEFAULT
-          CALL DebugErrorMessage('Forgot to handle event in DealWithPlotOptionsWindow')
       END SELECT
       CALL PopActiveWindowID
 
@@ -103,9 +101,6 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCLOSE, IDCANCEL)
-
-
-
               CALL WDialogSelect(IDD_Configuration)
               CALL WDialogHide()
             CASE (IDBBROWSE)
@@ -117,20 +112,13 @@
               tFileName = ViewExe
               CALL WSelectFile(FILTER,IFLAGS,tFileName,'Select Viewer',IFTYPE)
 ! Did the user press cancel?
-              IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) THEN
-                CALL PopActiveWindowID
-                RETURN
+              IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOK) THEN
+                VIEWEXE = tFileName
+                CALL WDialogPutString(IDF_ViewExe,VIEWEXE)
               ENDIF
-! Note that up to this point, none of the global variables had changed. Baling out was no problem.
-              VIEWEXE = tFileName
-              CALL WDialogPutString(IDF_ViewExe,VIEWEXE)
-            CASE DEFAULT
-              CALL DebugErrorMessage('Forgot to handle something in DealWithConfiguration')
           END SELECT
         CASE (FieldChanged)
          ! Do nothing
-        CASE DEFAULT
-          CALL DebugErrorMessage('Forgot to handle event in DealWithConfiguration')
       END SELECT
       CALL PopActiveWindowID
 
@@ -168,8 +156,6 @@
               CALL WDialogHide()
             CASE (IDCANCEL)
               CALL WDialogHide()
-            CASE DEFAULT
-              CALL DebugErrorMessage('Forgot to handle something in DealWithStructuralInformation 1')
           END SELECT
           CALL Profile_Plot(IPTYPE)
         CASE (FieldChanged)
@@ -185,11 +171,7 @@
               CALL Download_SpaceGroup(IDD_Crystal_Symmetry)
               NumPawleyRef = 0
             CASE (IDD_Peak_Widths)
-            CASE DEFAULT
-              CALL DebugErrorMessage('Forgot to handle something in DealWithStructuralInformation 2')
           END SELECT
-        CASE DEFAULT
-          CALL DebugErrorMessage('Forgot to handle event in DealWithStructuralInformation')
       END SELECT
       CALL PopActiveWindowID
 
@@ -218,8 +200,6 @@
             CASE (IDF_Data_Download) ! The 'Apply' button
               CALL DownloadWavelength(IDD_Data_Properties)    
               CALL Generate_TicMarks
-            CASE DEFAULT
-              CALL DebugErrorMessage('Forgot to handle something in DealWithDiffractionSetupPane 1')
           END SELECT
           CALL Profile_Plot(IPTYPE)
         CASE (FieldChanged)
@@ -234,11 +214,7 @@
               CASE (IDF_wavelength1)
                 CALL DownloadWavelength(IDD_Data_Properties)
                 CALL Generate_TicMarks
-              CASE DEFAULT
-                CALL DebugErrorMessage('Forgot to handle something in DealWithDiffractionSetupPane 2')
             END SELECT
-        CASE DEFAULT
-          CALL DebugErrorMessage('Forgot to handle event in DealWithDiffractionSetupPane')
       END SELECT
       CALL PopActiveWindowID
 
@@ -274,12 +250,8 @@
                 CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
               ENDIF
               CALL WDialogShow(-1,-1,0,Modeless)
-            CASE DEFAULT
-              CALL DebugErrorMessage('Forgot to handle something in DealWithPeakPositionsPane 1')
           END SELECT
         CASE (FieldChanged)
-        CASE DEFAULT
-          CALL DebugErrorMessage('Forgot to handle event in DealWithPeakPositionsPane')
       END SELECT
       CALL PopActiveWindowID
 
@@ -334,8 +306,6 @@
               CALL Upload_ZeroPoint
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
               CALL Generate_TicMarks
-            CASE DEFAULT
-              CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 1')
           END SELECT
           CALL Profile_Plot(IPTYPE)
         CASE (FieldChanged)
@@ -395,11 +365,7 @@
             CASE (IDF_ZeroPoint)
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_ZeroPoint               
-!            CASE DEFAULT
-!              CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 2')
           END SELECT
-        CASE DEFAULT
-          CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
       END SELECT
       CALL PopActiveWindowID
 
@@ -436,8 +402,6 @@
               END IF
             CASE (IDF_RunDICVOL)
               CALL RunDICVOL
-            CASE DEFAULT
-!              CALL DebugErrorMessage('Forgot to handle something in DealWithIndexPreparation 1')
           END SELECT
           CALL Profile_Plot(IPTYPE)
         CASE (FieldChanged)
@@ -445,13 +409,7 @@
             CASE (IDF_Indexing_Lambda)
               CALL DownloadWavelength(IDD_Index_Preparation)
               CALL Generate_TicMarks   
-            CASE (IDD_Index_Preparation)
-!              CALL DebugErrorMessage('Something unexpected happened in DealWithIndexPreparation')
-            CASE DEFAULT
-!              CALL DebugErrorMessage('Forgot to handle FieldChanged in DealWithIndexPreparation')
           END SELECT
-        CASE DEFAULT
-!          CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
       END SELECT
       CALL PopActiveWindowID
 
@@ -503,6 +461,65 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithDVResults
+!
+!*****************************************************************************
+!
+      SUBROUTINE EstimateZeroPointError
+!
+! Experiment: can we estimate the zero point assuming that several
+! of the peak positions are the higher order of an other peak position?
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE DICVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER           NTPeak
+      REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              PkProb
+      INTEGER           IOrdTem
+      INTEGER           IHPk
+      COMMON /ALLPEAKS/ NTPeak,                                                  &
+                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        PkProb(MTPeak),                                          &
+                        IOrdTem(MTPeak),                                         &
+                        IHPk(3,MTPeak)
+
+      REAL    ZeroPointError(1:800) ! Enough for N=40 peaks [ (N**2 - N)/2 ]
+      REAL    TwoTheta2dSpacing ! Function
+      INTEGER I, Peak1, Peak2, IOrd1, IOrd2, Order1, Order2
+      REAL    dSpacing1, dSpacing2
+
+      IF (NTPeak .LT. 2) THEN
+        CALL DebugErrorMessage("Can't estimate zero point from less than 2 peaks.")
+        RETURN
+      ENDIF
+! Peaks are ordered: d-spacing(N) > d-spacing(N+1)
+      I = 0
+      OPEN(10,FILE='ZeroPoint.txt',ERR=999)
+      DO Peak1 = 1, NTPeak-1
+        IOrd1 = IOrdTem(Peak1)
+        DO Peak2 = Peak1+1, NTPeak
+          IOrd2 = IOrdTem(Peak2)
+          dSpacing1 = TwoTheta2dSpacing(AllPkPosVal(IOrd1))
+          dSpacing2 = TwoTheta2dSpacing(AllPkPosVal(IOrd2))
+          DO Order1 = 1, 9
+            DO Order2 = Order1+1, 10
+! Now calculate zeropoint
+
+            ENDDO
+          ENDDO
+        ENDDO
+      ENDDO
+      CLOSE(10)
+      RETURN
+  999 CALL ErrorMessage('Could not open zero point error file.')
+
+      END SUBROUTINE EstimateZeroPointError
 !
 !*****************************************************************************
 !
@@ -581,17 +598,17 @@
 ! Check if any crystal system checked at all
       IF (NumDoF .EQ. 0) THEN
         CALL ErrorMessage('Please check at least one crystal system.')
-        RETURN
+        GOTO 999
       ENDIF
 ! Check if the number of observed lines is consistent with the crystal systems
       IF (NTPeak .LT. NumDoF) THEN
         CALL ErrorMessage('The number of observed lines is less than the number of degrees of freedom.')
-        RETURN
+        GOTO 999
       ENDIF
 ! Warn the user if we have less observed lines than twice the number of degrees of freedom including the zero point
       IF ((2*(NumDoF+1)) .GT. NTPeak) THEN
         IF (.NOT. Confirm('The number of observed lines is less than twice the number of degrees of freedom,'//CHAR(13)//&
-        'do you wish to continue anyway?')) RETURN
+        'do you wish to continue anyway?')) GOTO 999
       ENDIF
       IF (DV_ScaleFactor .LT. 0.1) DV_ScaleFactor = 0.1
       IF (DV_ScaleFactor .GT. 5.0) DV_ScaleFactor = 5.0
@@ -599,7 +616,7 @@
       IF (Isystem(5) .EQ. 1) THEN
         IF ((Bemin .LT. 45.0) .OR. (Bemax .GT. 150.0)) THEN
           CALL ErrorMessage('The range of the angle beta does not make sense.')
-          RETURN
+          GOTO 999
         ELSE
 ! Correct maximum cell length for the angle beta
  ! If 90.0 is inside the range, then that's the maximum
@@ -619,7 +636,7 @@
 ! Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
       IF ((TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1)))*DV_ScaleFactor) .GT. MaxLen) THEN
         IF (.NOT. Confirm('WARNING: the maximum cell axis length is shorter than required for indexing the first peak.'//CHAR(13)// &
-        'Do you wish to continue anyway?')) RETURN
+        'Do you wish to continue anyway?')) GOTO 999
       ENDIF
       n = NTPeak
       wave2 = (Lambda / 2) * DV_ScaleFactor
@@ -644,7 +661,7 @@
       DO I = 1, NTPeak
         IOrd = IOrdTem(I)
         d(I) = AllPkPosVal(IOrd) - Rexpzp
-      END DO
+      ENDDO
       CALL WCursorShape(CurHourGlass)
       NumOfDICVOLSolutions = 0
       CALL DICVOL91(Isystem(1),Isystem(2),Isystem(3),Isystem(4),Isystem(5),Isystem(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
@@ -657,9 +674,9 @@
         CALL WDialogSelect(IDD_DV_Results)
         CALL WDialogHide()
         CALL ErrorMessage('No solutions were found.')
-        CALL PopActiveWindowID
-        RETURN
+        GOTO 999
       ENDIF
+      IF (DICVOL_Error .EQ. cDICVOL_TooManySolutions) CALL WarningMessage('More than 30 solutions found, please check your data.')
 ! Pop up a window showing the solutions, so that the user can choose one to be imported into DASH
       CALL WDialogSelect(IDD_DV_Results)
 ! Clear all fields in the grid
@@ -677,9 +694,9 @@
         CALL WGridPutCellReal  (IDF_DV_Summary_0, 9,I,DICVOLSolutions(I)%Volume,'(F9.2)')
         IF (DICVOLSolutions(I)%M .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,10,I,DICVOLSolutions(I)%M,'(F7.1)')
         IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,11,I,DICVOLSolutions(I)%F,'(F7.1)')
-      END DO
+      ENDDO
       CALL WDialogShow(-1,-1,0,Modeless)
-      CALL PopActiveWindowID
+  999 CALL PopActiveWindowID
 
       END SUBROUTINE RunDICVOL
 !

@@ -5,7 +5,6 @@
       SUBROUTINE create_fob()
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'IZMCheck.inc'
 
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
@@ -22,14 +21,25 @@
       CHARACTER*5                          OriginalLabel
       COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
 
+      INTEGER         nfrag
       COMMON /frgcom/ nfrag
 
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-
+      LOGICAL         gotzmfile
+      COMMON /zmlgot/ gotzmfile(maxfrg)
 
 ! JvdS should be the same thing
 !O      COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
@@ -42,30 +52,27 @@
       LOGICAL HYDNOT
       COMMON /HIDDAT/ HYDNOT(150), nsatom, isatom(150)
 
-      INTEGER jj
+      INTEGER ifrg, i
 
       item = 0
       NSATOM = 0
-      ifrg = 0
-      DO jj = 1, nfrag
-        DO WHILE (ifrg.LE.CheckSize)
-          ifrg = ifrg + 1
-          IF (IZMCheck(ifrg).EQ.1) EXIT     ! the loop since we have a fragment we are using
-        ENDDO
-        DO i = 1, natoms(ifrg)
-          item = item + 1
-          hydnot(item) = (asym(i,ifrg).NE.'H  ')
-          IF (hydnot(item)) THEN
-            nsatom = nsatom + 1
-            isatom(nsatom) = item
-          ENDIF
-          DO iref = 1, maxk
-            ssq = 0.25*dstar(iref)**2
-            atem = occ(i,ifrg)*ascfac(asym(i,ifrg),ssq)
-            btem = tiso(i,ifrg)*ssq
-            fob(item,iref) = atem*EXP(-btem)
+      DO ifrg = 1, maxfrg
+        IF (gotzmfile(ifrg)) THEN
+          DO i = 1, natoms(ifrg)
+            item = item + 1
+            hydnot(item) = (asym(i,ifrg).NE.'H  ')
+            IF (hydnot(item)) THEN
+              nsatom = nsatom + 1
+              isatom(nsatom) = item
+            ENDIF
+            DO iref = 1, maxk
+              ssq = 0.25*dstar(iref)**2
+              atem = occ(i,ifrg)*ascfac(asym(i,ifrg),ssq)
+              btem = tiso(i,ifrg)*ssq
+              fob(item,iref) = atem*EXP(-btem)
+            ENDDO
           ENDDO
-        ENDDO
+        ENDIF
       ENDDO
       natom = item
 
@@ -290,10 +297,12 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'IZMCheck.inc'
 
       INTEGER         nfrag
       COMMON /frgcom/ nfrag
+
+      LOGICAL         gotzmfile
+      COMMON /zmlgot/ gotzmfile(maxfrg)
 
       INTEGER         icomflg
       REAL                             AtomicWeighting
@@ -339,46 +348,42 @@
                    43,    52,    90,    22,    81,    69,    92,    23,    74,     0,   &
                    54,    39,    70,     0,    30,    40,     0,     0,     0/
 
-      INTEGER IFrag, jj, I, J
+      INTEGER ifrg, I, J
       REAL    TotalAtomicWeighting
       LOGICAL UseCrystallographicCentreOfMass
 
       UseCrystallographicCentreOfMass = .TRUE.
-      IFrag = 0
-      DO jj = 1, nfrag
-        DO WHILE (IFrag.LE.CheckSize)
-          IFrag = IFrag + 1
-          IF (IZMCheck(IFrag).EQ.1) EXIT     ! the loop since we have a fragment we are using
-        ENDDO
-        IF (icomflg(IFrag) .EQ. 0)  THEN
-          IF (UseCrystallographicCentreOfMass) THEN
-            DO I = 1, natoms(IFrag)
-              DO J = 1, 109
-                IF (asym(I,IFrag) .EQ. el(J)) THEN
-                  AtomicWeighting(I,IFrag) = FLOAT(atnr(J))**2
-                  EXIT
-                ENDIF
+      DO ifrg = 1, maxfrg
+        IF (gotzmfile(ifrg)) THEN
+          IF (icomflg(ifrg) .EQ. 0)  THEN
+            IF (UseCrystallographicCentreOfMass) THEN
+              DO I = 1, natoms(ifrg)
+                DO J = 1, 109
+                  IF (asym(I,ifrg) .EQ. el(J)) THEN
+                    AtomicWeighting(I,ifrg) = FLOAT(atnr(J))**2
+                    EXIT
+                  ENDIF
+                ENDDO
               ENDDO
-            ENDDO
+            ELSE
+              DO I = 1, natoms(ifrg)
+                AtomicWeighting(I,ifrg) = 1.0
+              ENDDO
+            ENDIF
           ELSE
-            TotalAtomicWeighting = 0.0
-            DO I = 1, natoms(IFrag)
-              AtomicWeighting(I,IFrag) = 1.0
+            DO I = 1, natoms(ifrg)
+              AtomicWeighting(I,ifrg) = 0.0
             ENDDO
+            AtomicWeighting(icomflg(ifrg),ifrg) = 1.0
           ENDIF
-        ELSE
-          DO I = 1, natoms(IFrag)
-            AtomicWeighting(I,IFrag) = 0.0
+          TotalAtomicWeighting = 0.0
+          DO I = 1, natoms(ifrg)
+            TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(I,ifrg) 
           ENDDO
-          AtomicWeighting(icomflg(IFrag),IFrag) = 1.0
+          DO I = 1, natoms(ifrg)
+            AtomicWeighting(I,ifrg) = AtomicWeighting(I,ifrg) / TotalAtomicWeighting 
+          ENDDO
         ENDIF
-        TotalAtomicWeighting = 0.0
-        DO I = 1, natoms(IFrag)
-          TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(I,IFrag) 
-        ENDDO
-        DO I = 1, natoms(IFrag)
-          AtomicWeighting(I,IFrag) = AtomicWeighting(I,IFrag) / TotalAtomicWeighting 
-        ENDDO
       ENDDO
 
       END SUBROUTINE Create_AtomicWeightings

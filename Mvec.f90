@@ -640,8 +640,6 @@
 !C 9C
 !H Modification of Harwell Fast Fourier Transform.
 !
-!%
-!      DIMENSION TR(%FFT2%),TI(%FFT2%)
       DIMENSION TR(1024), TI(1024)
       EXTERNAL FFTADD
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
