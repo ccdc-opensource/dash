@@ -1,13 +1,15 @@
+!
+!*****************************************************************************
+!
       SUBROUTINE FCN(N,THETA,H)
 
 !
       use winteracter
       use druid_header
 !
-     DOUBLE PRECISION THETA(*), H
+      DOUBLE PRECISION THETA(*), H
 
-      parameter (maxatm=100)
-      parameter (maxfrg=20)
+      INCLUDE 'PARAMS.INC'
       integer ioptb,iopta,ioptt,iz1,iz2,iz3
       common /zmcomi/ ntatm,natoms(maxfrg),&
       ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
@@ -21,7 +23,7 @@
       RETURN
       END
 !
-!
+!*****************************************************************************
 !
       SUBROUTINE FCN_PRT(N,THETA,H)
 
@@ -31,8 +33,9 @@
       use druid_header
 !
       DOUBLE PRECISION THETA(*), H
-      parameter (maxatm=100)
-      parameter (maxfrg=20)
+
+      INCLUDE 'PARAMS.INC'
+
       integer ioptb,iopta,ioptt,iz1,iz2,iz3
       common /zmcomi/ ntatm,natoms(maxfrg),&
       ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
@@ -44,4 +47,8 @@
       h=dble(snglh)
 
       RETURN
+
       END
+!
+!*****************************************************************************
+!

@@ -13,6 +13,7 @@
       INTEGER      ipos
       INTEGER      IFlags
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'IZMCheck.inc'
       INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'GLBVAR.INC'
@@ -54,29 +55,24 @@
       COMMON /shadl/ log_shad(mvar)
       COMMON /shadi/ kshad(mvar)
 
-      PARAMETER (maxatm=100)
-      PARAMETER (maxfrg=20)
-      DOUBLE PRECISION a, b, c, al, be, ga
-      DOUBLE PRECISION tiso, occ
+      REAL tiso, occ
+      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen, alph, bet, f2cmat
-      CHARACTER*3 asym
       INTEGER ioptb, iopta, ioptt, iz1, iz2, iz3
       COMMON /zmcomi/ ntatm, natoms(maxfrg), &
         ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
         iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
         bet(maxatm,maxfrg),f2cmat(3,3)
+      CHARACTER*3 asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
-      COMMON /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),&
-        al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),&
-        occ(maxatm,maxfrg)
       INTEGER nfrag,lfrag
       COMMON /frgcom/ nfrag,lfrag(maxfrg)
       CHARACTER*80 frag_file
       COMMON /frgcha/ frag_file(maxfrg)
       CHARACTER*36 czmpar
       COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
-        czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
+        czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
 
@@ -598,6 +594,7 @@
       INTEGER, INTENT (IN   ) :: CheckSize
       INTEGER, INTENT (IN   ) :: IZMCheck(CheckSize)
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
@@ -612,25 +609,20 @@
       LOGICAL gaussb
       DOUBLE PRECISION T0,rt,eps,target_value
 
-      PARAMETER (maxatm=100)
-      PARAMETER (maxfrg=20)
-      DOUBLE PRECISION a,b,c,al,be,ga
-      DOUBLE PRECISION tiso,occ
+      REAL tiso, occ
+      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen,alph,bet,f2cmat
 !>> JCC Handle via the PDB standard
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
-      CHARACTER*3 asym
       INTEGER ioptb,iopta,ioptt,iz1,iz2,iz3
       COMMON /zmcomi/ ntatm,natoms(maxfrg),&
         ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
         iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
         bet(maxatm,maxfrg),f2cmat(3,3)
+      CHARACTER*3 asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
-      COMMON /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),&
-        al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),&
-        occ(maxatm,maxfrg)
 
       COMMON /frgcom/ nfrag,lfrag(maxfrg)
       PARAMETER (mvar=100)
@@ -660,7 +652,7 @@
 
       CHARACTER*36 czmpar
       COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
-            czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
+            czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
 
@@ -774,31 +766,28 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      INCLUDE 'PARAMS.INC'
+
       INTEGER CheckSize
       INTEGER IDFZMFile(CheckSize), IDFZMPars(CheckSize)
       INTEGER IDFZMCheck(CheckSize), IDBZMBrowse(CheckSize)
       INTEGER IZMCheck(CheckSize)
-      PARAMETER (maxatm=100)
-      PARAMETER (maxfrg=20)
-      DOUBLE PRECISION a,b,c,al,be,ga
-      DOUBLE PRECISION tiso,occ
+      REAL tiso, occ
+      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen,alph,bet,f2cmat
-      CHARACTER*3 asym
       INTEGER ioptb,iopta,ioptt,iz1,iz2,iz3
       COMMON /zmcomi/ ntatm,natoms(maxfrg),&
         ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
         iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
         bet(maxatm,maxfrg),f2cmat(3,3)
+      CHARACTER*3 asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
-      COMMON /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),&
-        al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),&
-        occ(maxatm,maxfrg)
       INTEGER nfrag,lfrag
       COMMON /frgcom/ nfrag,lfrag(maxfrg)
       CHARACTER*36 czmpar
       COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
-        czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
+        czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
 
@@ -847,30 +836,27 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      INCLUDE 'PARAMS.INC'
+
       INTEGER CheckSize
       INTEGER IZMcheck(CheckSize)
       INTEGER IDFZMpars(CheckSize)
-      PARAMETER (maxatm=100)
-      PARAMETER (maxfrg=20)
-      DOUBLE PRECISION a, b, c, al, be, ga
-      DOUBLE PRECISION tiso, occ
+      REAL tiso, occ
+      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen, alph, bet, f2cmat
-      CHARACTER*3 asym
       INTEGER     ioptb, iopta, ioptt, iz1, iz2, iz3
       COMMON /zmcomi/ ntatm,natoms(maxfrg),&
         ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
         iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
         bet(maxatm,maxfrg),f2cmat(3,3)
+      CHARACTER*3 asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
-      COMMON /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),&
-        al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),&
-        occ(maxatm,maxfrg)
       INTEGER nfrag,lfrag
       COMMON /frgcom/ nfrag,lfrag(maxfrg)
       CHARACTER*36 czmpar
       COMMON /zmnpar/ izmtot,izmpar(maxfrg),&
-        czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
+        czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
       LOGICAL gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
       COMMON /POSNS/NATOM,XATO(3,150),KX(3,150),AMULT(150),&

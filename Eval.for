@@ -3,11 +3,11 @@ C
       SUBROUTINE MAKEFRAC(CHROM,NGENES)!,NATS,ICOM)
 C     -------------------------------------------
 C
-c      PARAMETER (MAXATM=100)
-      parameter (maxatm=100)
-      parameter (maxfrg=20)
-      double precision a,b,c,al,be,ga
-      double precision tiso,occ
+      INCLUDE 'PARAMS.INC'
+	include 'IZMcheck.inc'
+
+      REAL tiso, occ
+      common /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)           
       double precision blen,alph,bet,f2cmat
       character*3 asym
       integer ioptb,iopta,ioptt,iz1,iz2,iz3
@@ -19,13 +19,8 @@ c      PARAMETER (MAXATM=100)
      &alph(maxatm,maxfrg),bet(maxatm,maxfrg),
      &f2cmat(3,3)
       common /zmcomc/ asym(maxatm,maxfrg)
-      common /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),
-     &al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),
-     &occ(maxatm,maxfrg)           
       common /zmcomg/ icomflg(maxfrg)
-c
 
-	include 'IZMcheck.inc'
       parameter (mvar=100)
       logical log_shad
       common /shadl/ log_shad(mvar)
@@ -184,11 +179,10 @@ C
       SUBROUTINE MAKEFRAC_PRT(CHROM,NGENES,IWRUN)!,NATS,ICOM)
 C     -------------------------------------------
 C
-c      PARAMETER (MAXATM=100)
-      parameter (maxatm=100)
-      parameter (maxfrg=20)
-      double precision a,b,c,al,be,ga
-      double precision tiso,occ
+      INCLUDE 'PARAMS.INC'
+
+      REAL tiso, occ
+      common /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       double precision blen,alph,bet,f2cmat
       character*3 asym
       integer ioptb,iopta,ioptt,iz1,iz2,iz3
@@ -201,9 +195,6 @@ c      PARAMETER (MAXATM=100)
      &alph(maxatm,maxfrg),bet(maxatm,maxfrg),
      &f2cmat(3,3)
       common /zmcomc/ asym(maxatm,maxfrg)
-      common /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),
-     &al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),
-     &occ(maxatm,maxfrg)            
       common /zmcomg/ icomflg(maxfrg)
 c
       parameter (mvar=100)

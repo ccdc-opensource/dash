@@ -131,8 +131,25 @@
       INTEGER MTPeak
       PARAMETER ( MTPeak = 100 )
 
-! The Maximumn number of Child Windows allowed (determined by Winteracter)
+! The Maximum number of Child Windows allowed (determined by Winteracter)
 ! Used in common blocks SACHILDWINDOWS and CHISQDWINDOWSUSED
 
       INTEGER MaxNumChildWin
       PARAMETER ( MaxNumChildWin = 20 )
+
+! For use in common blocks ZMCOMI, ZMCOMR, ZMCOMC, ZMCOMO, FRGCOM, FRGCHA, ZMCOMG, ZMLGOT, ZMNPAR
+
+	  INTEGER maxfrg
+      PARAMETER ( maxfrg = 20 )
+
+! maxfrg = Maximum number of fragments = individual z-matrices
+
+      INTEGER MaxDOF
+	  PARAMETER ( MaxDOF = 30 )
+
+! MaxDOF = Maximum number of degrees of freedom per fragment (= per individual z-matrix)
+
+! For use in common blocks ZMCOMI, ZMCOMR, ZMCOMC, ZMCOMO, FRGCOM, FRGCHA, ZMCOMG, ZMLGOT, ZMNPAR
+
+      INTEGER maxatm
+      PARAMETER ( maxatm = 100 )
