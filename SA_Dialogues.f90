@@ -74,10 +74,8 @@
       IMPLICIT NONE      
 
       INTEGER       iFlags
-      INTEGER, EXTERNAL :: Read_One_Zm
       INTEGER       zmread
       INTEGER       iFrg, iSelection
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       CHARACTER(MaxPathLength) SDIFile, DirName, tFileName
       CHARACTER*80  FileName
       CHARACTER*150 FilterStr
@@ -86,6 +84,8 @@
       INTEGER       tNextzmNum
       INTEGER       tCounter
       CHARACTER*7   tExtension
+      INTEGER, EXTERNAL :: Read_One_Zm
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -126,7 +126,7 @@
             CASE (IDB_SA_Project_Import)
 ! JCC Import .. convert a mol/pdb/mol2 file into a Z-matrix
               CALL ImportZmatrix('')
-            CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4)
+            CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4, IDB_zmDelete5, IDB_zmDelete6)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
                 iFrg = 1
                 DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
@@ -134,7 +134,7 @@
                 ENDDO
                 gotzmfile(iFrg) = .FALSE.
               ENDIF ! Delete this Z-matrix
-            CASE (IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4)
+            CASE (IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4, IDB_zmBrowse5, IDB_zmBrowse6)
               iFrg = 1
               DO WHILE (IDBZMBrowse(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
@@ -207,14 +207,14 @@
                 GOTO 10
               ENDIF
 ! View individual Z-matrices in e.g. Mercury
-            CASE (IDB_zmView1, IDB_zmView2, IDB_zmView3, IDB_zmView4)
+            CASE (IDB_zmView1, IDB_zmView2, IDB_zmView3, IDB_zmView4, IDB_zmView5, IDB_zmView6)
               iFrg = 1
               DO WHILE (IDBZMView(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
               CALL ViewZmatrix(iFrg)
 ! Edit individual Z-matrices
-            CASE (IDB_zmEdit1, IDB_zmEdit2, IDB_zmEdit3, IDB_zmEdit4)
+            CASE (IDB_zmEdit1, IDB_zmEdit2, IDB_zmEdit3, IDB_zmEdit4, IDB_zmEdit5, IDB_zmEdit6)
               iFrg = 1
               DO WHILE (IDBzmEdit(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
@@ -320,9 +320,9 @@
                   CASE (1) ! All atoms
                     ThisOne = .TRUE.
                   CASE (2) ! All non-hydrogens
-                    ThisOne = (asym(izmbid(iAtomNr,iFrg),iFrg) .NE. 'H  ')
+                    ThisOne = (zmElementCSD(izmbid(iAtomNr,iFrg),iFrg) .NE. 2)
                   CASE (3) ! All hydrogens
-                    ThisOne = (asym(izmbid(iAtomNr,iFrg),iFrg) .EQ. 'H  ')
+                    ThisOne = (zmElementCSD(izmbid(iAtomNr,iFrg),iFrg) .EQ. 2)
                 END SELECT
                 IF (ThisOne) CALL WGridPutCellReal(IDF_AtomPropGrid,iColumn,iAtomNr,tReal,'(F5.3)')
               ENDDO
@@ -380,7 +380,10 @@
           IF (EventInfo%VALUE2 .EQ. IDF_AtomPropGrid) THEN
             CALL WGridPos(EventInfo%Y,iCol,iRow)
             IF (iCol .EQ. 2) THEN
-              CALL zmCopyDialog2Temp
+              IF (natoms(iFrg) .EQ. 1) THEN
+                CALL ErrorMessage('The last atom cannot be deleted.')
+              ELSE
+                CALL zmCopyDialog2Temp
 ! Add in a check to see if the atom to be deleted is used in defining rotations
 ! and ask the user for confirmation
 
@@ -390,74 +393,76 @@
 
 
 
-              zmAtomDeleted = .TRUE.
+                zmAtomDeleted = .TRUE.
 ! Delete the atom
-              iAtomNr = izmbid(iRow,iFrg)
+                iAtomNr = izmbid(iRow,iFrg)
 ! It is very likely that we will end up with one of the atoms having an 'orignal ID' that
 ! is greater than the current number of atoms. This would give boundary overflows.
 ! We can retain the original order (minus one atom) but that involves subtracting 1
 ! from atom IDs following the one we have deleted
-              DO i = 1, natoms(iFrg)
-                IF (izmoid(i,iFrg) .GT. izmoid(iAtomNr,iFrg)) izmoid(i,iFrg) = izmoid(i,iFrg) - 1
-              ENDDO
-! Remove any bonds this atom was involved in
-              IF (NumberOfBonds(iFrg) .GT. 0) THEN
-                iBondNr = 1
-                DO WHILE (iBondNr .LE. NumberOfBonds(iFrg))
-                  IF ((Bonds(1,iBondNr,iFrg) .EQ. iAtomNr) .OR. (Bonds(2,iBondNr,iFrg) .EQ. iAtomNr)) THEN
-                    DO iBondNr2 = iBondNr, NumberOfBonds(iFrg)-1
-                      BondType(iBondNr2,iFrg) = BondType(iBondNr2+1,iFrg)
-                      Bonds(1,iBondNr2,iFrg)  = Bonds(1,iBondNr2+1,iFrg)
-                      Bonds(2,iBondNr2,iFrg)  = Bonds(2,iBondNr2+1,iFrg)
-                    ENDDO
-                    NumberOfBonds(iFrg) = NumberOfBonds(iFrg) - 1
-                  ELSE
-                    CALL INC(iBondNr)
-                  ENDIF
+                DO i = 1, natoms(iFrg)
+                  IF (izmoid(i,iFrg) .GT. izmoid(iAtomNr,iFrg)) izmoid(i,iFrg) = izmoid(i,iFrg) - 1
                 ENDDO
+! Remove any bonds this atom was involved in
                 IF (NumberOfBonds(iFrg) .GT. 0) THEN
-                  DO iBondNr = 1, NumberOfBonds(iFrg)
-                    IF (Bonds(1,iBondNr,iFrg) .GT. iAtomNr) Bonds(1,iBondNr,iFrg) = Bonds(1,iBondNr,iFrg) - 1
-                    IF (Bonds(2,iBondNr,iFrg) .GT. iAtomNr) Bonds(2,iBondNr,iFrg) = Bonds(2,iBondNr,iFrg) - 1
+                  iBondNr = 1
+                  DO WHILE (iBondNr .LE. NumberOfBonds(iFrg))
+                    IF ((Bonds(1,iBondNr,iFrg) .EQ. iAtomNr) .OR. (Bonds(2,iBondNr,iFrg) .EQ. iAtomNr)) THEN
+                      DO iBondNr2 = iBondNr, NumberOfBonds(iFrg)-1
+                        BondType(iBondNr2,iFrg) = BondType(iBondNr2+1,iFrg)
+                        Bonds(1,iBondNr2,iFrg)  = Bonds(1,iBondNr2+1,iFrg)
+                        Bonds(2,iBondNr2,iFrg)  = Bonds(2,iBondNr2+1,iFrg)
+                      ENDDO
+                      NumberOfBonds(iFrg) = NumberOfBonds(iFrg) - 1
+                    ELSE
+                      CALL INC(iBondNr)
+                    ENDIF
+                  ENDDO
+                  IF (NumberOfBonds(iFrg) .GT. 0) THEN
+                    DO iBondNr = 1, NumberOfBonds(iFrg)
+                      IF (Bonds(1,iBondNr,iFrg) .GT. iAtomNr) Bonds(1,iBondNr,iFrg) = Bonds(1,iBondNr,iFrg) - 1
+                      IF (Bonds(2,iBondNr,iFrg) .GT. iAtomNr) Bonds(2,iBondNr,iFrg) = Bonds(2,iBondNr,iFrg) - 1
+                    ENDDO
+                  ENDIF
+                ENDIF
+! If not last atom in list, shuffle remaining
+                IF (iAtomNr .NE. NATOMS(iFrg)) THEN 
+                  DO I = iAtomNr, NATOMS(iFrg)-1
+                    asym(I,iFrg) = asym(I+1,iFrg)
+                    zmElementCSD(I,iFrg) = zmElementCSD(I+1,iFrg)
+                    tiso(I,iFrg) = tiso(I+1,iFrg)
+                    occ(I,iFrg)  = occ(I+1,iFrg)
+                    OriginalLabel(I,iFrg) = OriginalLabel(I+1,iFrg)
+                    izmoid(I,iFrg) = izmoid(I+1,iFrg)
                   ENDDO
                 ENDIF
-              ENDIF
+                natcry = NATOMS(iFrg)
 ! If not last atom in list, shuffle remaining
-              IF (iAtomNr .NE. NATOMS(iFrg)) THEN 
-                DO I = iAtomNr, NATOMS(iFrg)-1
-                  asym(I,iFrg) = asym(I+1,iFrg)
-                  tiso(I,iFrg) = tiso(I+1,iFrg)
-                  occ(I,iFrg)  = occ(I+1,iFrg)
-                  OriginalLabel(I,iFrg) = OriginalLabel(I+1,iFrg)
-                  izmoid(I,iFrg) = izmoid(I+1,iFrg)
+                IF (iAtomNr .NE. natcry) THEN 
+                  DO I = iAtomNr, natcry-1
+                    axyzo(I,1)   = axyzo(I+1,1)
+                    axyzo(I,2)   = axyzo(I+1,2)
+                    axyzo(I,3)   = axyzo(I+1,3)
+                  ENDDO
+                ENDIF
+                natcry = natcry - 1
+                nbocry = NumberOfBonds(iFrg)
+                DO iBondNr = 1, nbocry
+                  btype(iBondNr)  = BondType(iBondNr,iFrg)
+                  bond(iBondNr,1) = Bonds(1,iBondNr,iFrg)
+                  bond(iBondNr,2) = Bonds(2,iBondNr,iFrg)
                 ENDDO
-              ENDIF
-              natcry = NATOMS(iFrg)
-! If not last atom in list, shuffle remaining
-              IF (iAtomNr .NE. natcry) THEN 
-                DO I = iAtomNr, natcry-1
-                  axyzo(I,1)   = axyzo(I+1,1)
-                  axyzo(I,2)   = axyzo(I+1,2)
-                  axyzo(I,3)   = axyzo(I+1,3)
-                ENDDO
-              ENDIF
-              natcry = natcry - 1
-              nbocry = NumberOfBonds(iFrg)
-              DO iBondNr = 1, nbocry
-                btype(iBondNr)  = BondType(iBondNr,iFrg)
-                bond(iBondNr,1) = Bonds(1,iBondNr,iFrg)
-                bond(iBondNr,2) = Bonds(2,iBondNr,iFrg)
-              ENDDO
 ! If this was the pivot atom, use centre of mass
-              IF (icomflg(iFrg) .EQ. iAtomNr) icomflg(iFrg) = 0 
-              IF (natoms(iFrg) .NE. 0) THEN
-                CALL WGridSetCell(IDF_AtomPropGrid,1,1)
-                natoms(iFrg) = natoms(iFrg) - 1
+                IF (icomflg(iFrg) .EQ. iAtomNr) icomflg(iFrg) = 0 
+                IF (natoms(iFrg) .NE. 0) THEN
+                  CALL WGridSetCell(IDF_AtomPropGrid,1,1)
+                  natoms(iFrg) = natoms(iFrg) - 1
+                ENDIF
+                DO i = 1, natoms(iFrg)
+                  izmbid(izmoid(i,iFrg),iFrg) = i ! the back mapping
+                ENDDO
+                CALL zmCopyTemp2Dialog
               ENDIF
-              DO i = 1, natoms(iFrg)
-                izmbid(izmoid(i,iFrg),iFrg) = i ! the back mapping
-              ENDDO
-              CALL zmCopyTemp2Dialog
               CALL WGridPutCellCheckBox(IDF_AtomPropGrid,2,irow,Unchecked)
             ENDIF
           ENDIF
@@ -780,6 +785,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE ZMVAR
+      USE ATMVAR
 
       IMPLICIT NONE 
       
@@ -802,7 +808,7 @@
 ! atom labels
         CALL WGridPutCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr,iFrg))
 ! atom elements
-        CALL WGridPutCellString(IDF_AtomPropGrid,3,iRow,asym(iAtomNr,iFrg))
+        CALL WGridPutCellString(IDF_AtomPropGrid,3,iRow,ElementStr(zmElementCSD(iAtomNr,iFrg)))
 ! Biso
         CALL WGridPutCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr,iFrg),'(F5.3)')
 ! occupancies
@@ -995,7 +1001,7 @@
       SUBROUTINE zmRelabel(iFrg)
 
 ! This routine re-labels atoms in Z-matrix number iFrg
-! The new label consists of element + sequential number
+! The new labels consist of element + sequential number
 
       USE ZMVAR
 
@@ -1016,6 +1022,21 @@
       ENDDO
 
       END SUBROUTINE zmRelabel
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmRelabelAll
+
+! This routine re-labels atoms in all Z-matrices
+! The new labels consist of element + sequential number
+
+      USE ZMVAR
+
+      DO iFrg = 1, maxfrg
+        CALL zmRelabel(iFrg)
+      ENDDO
+
+      END SUBROUTINE zmRelabelAll
 !
 !*****************************************************************************
 !
@@ -1041,13 +1062,13 @@
         DO iAtomNr = 1, natoms(iFrg)-1
 ! Compare entry to next
 ! Never swap if same
-          IF ((asym(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. asym(izmbid(iAtomNr+1,iFrg),iFrg))) THEN
+          IF ((zmElementCSD(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. zmElementCSD(izmbid(iAtomNr+1,iFrg),iFrg))) THEN
             ShouldBeSwapped = .FALSE.
 ! Otherwise, never swap if first is Carbon or second is Hydrogen
-          ELSE IF ((asym(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. 'C  ') .OR. (asym(izmbid(iAtomNr+1,iFrg),iFrg) .EQ. 'H  ')) THEN
+          ELSE IF ((zmElementCSD(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. 1) .OR. (zmElementCSD(izmbid(iAtomNr+1,iFrg),iFrg) .EQ. 2)) THEN
             ShouldBeSwapped = .FALSE.
 ! Otherwise, always swap if second is Carbon or first is Hydrogen
-          ELSE IF ((asym(izmbid(iAtomNr+1,iFrg),iFrg) .EQ. 'C  ') .OR. (asym(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. 'H  ')) THEN
+          ELSE IF ((zmElementCSD(izmbid(iAtomNr+1,iFrg),iFrg) .EQ. 1) .OR. (zmElementCSD(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. 2)) THEN
             ShouldBeSwapped = .TRUE.
 ! Otherwise, swap if first > second
           ELSE
@@ -1169,7 +1190,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      USE ZMVAR
 
       IMPLICIT NONE      
 
@@ -1205,7 +1225,7 @@
               CALL WDialogFieldState(IDF_LABELa,tFieldState)
               CALL WDialogFieldState(IDF_LABELb,tFieldState)
               CALL WDialogFieldState(IDF_LABELc,tFieldState)
-          END SELECT ! EventInfo%Value1 Field Changed Options
+          END SELECT
       END SELECT
   999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
