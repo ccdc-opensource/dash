@@ -170,12 +170,72 @@
                 iFrg = iFrg + 1
               ENDDO
               CALL ViewZmatrix(iFrg)
+! View individual Z-matrices in e.g. Mercury
+            CASE (IDB_zmEdit1, IDB_zmEdit2, IDB_zmEdit3, IDB_zmEdit4)
+              iFrg = 1
+              DO WHILE (IDBzmEdit(iFrg) .NE. EventInfo%VALUE1)
+                iFrg = iFrg + 1
+              ENDDO
+              CALL WDialogSelect(IDD_zmEdit)
+              CALL WDialogShow(-1,-1,0,SemiModeLess)
+!              CALL ViewZmatrix(iFrg)
           END SELECT
       END SELECT
   999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowZmatrices
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithEditZMatrixWindow
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER tFieldState
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_zmEdit)
+      SELECT CASE (EventType)
+        CASE (PushButton)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+! Ungrey 'Load DASH Pawley file' button on toolbar
+              CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOn)
+              CALL WizardWindowShow(IDD_SAW_Page1)
+            CASE (IDNEXT)
+              CALL SA_Parameter_Set
+              CALL WizardWindowShow(IDD_SA_input2)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL WDialogHide()
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_RotationsGrid)
+            CASE (IDF_Use_PO)
+              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                tFieldState = Enabled
+              ELSE
+                tFieldState = Disabled
+              ENDIF
+              CALL WDialogFieldState(IDF_PO_a,tFieldState)
+              CALL WDialogFieldState(IDF_PO_b,tFieldState)
+              CALL WDialogFieldState(IDF_PO_c,tFieldState)
+              CALL WDialogFieldState(IDF_LABELa,tFieldState)
+              CALL WDialogFieldState(IDF_LABELb,tFieldState)
+              CALL WDialogFieldState(IDF_LABELc,tFieldState)
+          END SELECT ! EventInfo%Value1 Field Changed Options
+      END SELECT
+  999 CALL UpdateZmatrixSelection
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithEditZMatrixWindow
 !
 !*****************************************************************************
 !
@@ -197,6 +257,8 @@
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
+! Ungrey 'Load DASH Pawley file' button on toolbar
+              CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOn)
               CALL WizardWindowShow(IDD_SAW_Page1)
             CASE (IDNEXT)
               CALL SA_Parameter_Set
@@ -277,11 +339,7 @@
               IF (LimsChanged) THEN
                 IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
               ENDIF
-              IF (.NOT. LimsChanged) THEN
-! Ungrey 'Load DASH Pawley file' button on toolbar
-                CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOn)
-                CALL WizardWindowShow(IDD_SAW_Page1)
-              ENDIF
+              IF (.NOT. LimsChanged) CALL WizardWindowShow(IDD_SAW_Page2)
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL WDialogSelect(IDD_SA_input3)
