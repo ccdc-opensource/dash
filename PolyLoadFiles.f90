@@ -131,7 +131,6 @@
       CALL WDialogSelect(IDD_PW_Page5)
 ! Initialise truncation of start of powder pattern
       CALL WDialogPutReal(IDF_Min2Theta,XPMIN,'(F6.3)')
-      CALL WDialogRangeReal(IDF_Min2Theta,XPMIN,XPMAX)
 ! In principle, set resolution so as to truncate at DefaultMaxResolution.
 ! However, if truncation resolution not attainable with current data range / wavelength,
 ! adjust the setting of the maximum resolution to maximum possible.
@@ -141,7 +140,6 @@
         tMaxResolution = DefaultMaxResolution
       ENDIF
       CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
-      CALL WDialogRangeReal(IDF_MaxResolution,XPMIN,XPMAX)
       CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tMaxResolution))
       CALL PopActiveWindowID
 
