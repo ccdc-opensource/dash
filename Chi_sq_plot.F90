@@ -441,7 +441,7 @@
                 chi_y_min = MIN(YCUR(1),YCUR(2))
                 chi_y_max = MAX(YCUR(1),YCUR(2))
               ENDIF
-              CALL WindowClear()
+              CALL WindowClear
               Zoomed = .TRUE.
               CALL Plotting_Chi_sqd(ihandle)
               RETURN  
