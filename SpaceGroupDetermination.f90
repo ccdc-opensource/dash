@@ -123,7 +123,7 @@
      CALL SetChildWinAutoClose(IHANDLE)
 ! Deletes the Default parameter file.  Try to keep this hidden from user?  Means that they
 ! won't be able to change the parameters     
-     CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'ADVANCED.asc')
+!     CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'ADVANCED.asc')
 
      RETURN
 
@@ -135,5 +135,41 @@
      RETURN
      END SUBROUTINE SpaceGroupDeterminationCode
 
+!*********************************************************************************
+     SUBROUTINE SpaceGroupFileDialog 
+     
+     USE DRUID_HEADER
+     USE VARIABLES
+     USE WINTERACTER
+     
+     IMPLICIT NONE
 
-      
+     CHARACTER(MaxPathLength) :: CurrentDirectory
+ 
+     LOGICAL Exists
+
+     CALL WMessageBox(YesNo, QuestionIcon, CommonYes, &
+          'Would you like to remove files generated'//CHAR(13)// &
+          'during space group determination?', 'Confirm')
+
+     IF(WinfoDialog(ExitButtonCommon) .EQ. CommonYes) THEN
+       CALL IosDirName(CurrentDirectory)
+       CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'ADVANCED.asc')
+       CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'table.asc')
+       CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'parameter_input.asc')
+       INQUIRE(FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'peak_ignored.asc',EXIST=exists)
+       IF (exists) THEN
+         CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'peak_ignored.asc')
+       ENDIF
+       INQUIRE(FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'uncorrelated_peaks.asc',EXIST=exists)
+       IF (exists) THEN
+         CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'uncorrelated_peaks.asc')
+       ENDIF
+     ENDIF
+     IF (WinfoDialog(ExitButtonCommon) .EQ. CommonNo) THEN
+       RETURN
+     ENDIF
+
+     END SUBROUTINE SpaceGroupFileDialog
+
+       
