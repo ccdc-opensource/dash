@@ -65,8 +65,9 @@
       LOGICAL tSavePDB, tSaveCSSR, tSaveCCL
       INTEGER ipcount
       LOGICAL, EXTERNAL :: SaveCSSR, SaveCCL
-      INTEGER I, II, K, npdbops, iiact, iTotal, ifrg, IJ, iOrig
+      INTEGER I, J, II, K, npdbops, iiact, iTotal, ifrg, IJ, iOrig
       REAL xc, yc, zc
+      INTEGER TotNumBonds, NumOfAtomsSoFar
 
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
@@ -223,6 +224,18 @@
       ENDDO ! loop over Z-matrices
       IF (tSaveCSSR) CLOSE (64)
       IF (tSavePDB) THEN
+! Per Z-matrix, write out the connectivity.
+        TotNumBonds = 0
+        NumOfAtomsSoFar = 0
+        DO ifrg = 1, maxfrg
+          IF (gotzmfile(ifrg)) THEN
+            DO J = 1, NumberOfBonds(ifrg)
+              WRITE(65,'(A6,I5,I5)') 'CONECT', izmoid(Bonds(1,J,ifrg),ifrg)+NumOfAtomsSoFar, izmoid(Bonds(2,J,ifrg),ifrg)+NumOfAtomsSoFar
+            ENDDO
+            NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
+            TotNumBonds = TotNumBonds + NumberOfBonds(ifrg)
+          ENDIF
+        ENDDO ! loop over Z-matrices
         WRITE (65,"('END')")
         CLOSE (65)
       ENDIF
