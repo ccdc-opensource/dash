@@ -37,7 +37,7 @@
 
       LOGICAL, EXTERNAL :: Get_AutoAlign
       INTEGER, EXTERNAL :: PrjSaveAs
-      INTEGER I, IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption, iDummy
+      INTEGER IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption, iDummy
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
@@ -45,18 +45,7 @@
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WDialogSelect(IDD_OutputSolutions)
-              CALL WDialogHide
-! Close all SA profile child windows that are still open
-              DO i = 1, MaxNumChildWin
-                IF (SAUsedChildWindows(i) .EQ. 1) THEN
-                  CALL WindowCloseChild(i)
-                  SAUsedChildWindows(i) = 0
-                  CALL UnRegisterChildWindow(i)
-                ENDIF
-              ENDDO
-! Close Chi-sqd plot 
-              CALL Close_Chisq_Plot
+              CALL CloseOutputSolutionsChildWindows
 ! Go back to the Pawley refinement or the initial Wizard
 ! If we got here from the main Wizard window (option four), return to that window.
 ! Return to SA input otherwise
@@ -73,19 +62,8 @@
                 CALL SelectMode(ID_Structure_Solution_Mode)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
-              CALL WDialogSelect(IDD_OutputSolutions)
-              CALL WDialogHide
+              CALL CloseOutputSolutionsChildWindows
               CALL EndWizardPastPawley
-! Close all SA profile child windows that are still open
-              DO i = 1, MaxNumChildWin
-                IF (SAUsedChildWindows(i) .EQ. 1) THEN
-                  CALL WindowCloseChild(i)
-                  SAUsedChildWindows(i) = 0
-                  CALL UnRegisterChildWindow(i)
-                ENDIF
-              ENDDO
-! Close Chi-sqd plot 
-              CALL Close_Chisq_Plot
               CALL PopActiveWindowID
               RETURN
             CASE (IDB_SaveSol)
@@ -97,6 +75,8 @@
               CALL WDialogShow(-1,-1,0,ModeLess)
               CALL WDialogPutString(IDF_DirAndBaseName,OutputFilesBaseName(1:OFBN_Len))
               CALL UpdateOutputSolutionsWIndow
+            CASE (IDB_Prog3)
+              CALL OpenChiSqPlotWindow
             CASE (IDB_Select)
               CALL WDialogGetInteger(IDF_Limit1,iLimit1)
               CALL WDialogGetInteger(IDF_Limit2,iLimit2)
@@ -150,19 +130,7 @@
       DO iRow = 1, NumOf_SA_Runs
         CALL WGridGetCellCheckBox(IDF_SA_summary,6,iRow,iStatus)
         IF (iStatus .EQ. 1) THEN
-! Close "Save Solutions" window which may be up
-          CALL WDialogSelect(IDD_OutputSolutions)
-          CALL WDialogHide
-! Close all SA profile child windows that are still open
-          DO i = 1, MaxNumChildWin
-            IF (SAUsedChildWindows(i) .EQ. 1) THEN
-              CALL WindowCloseChild(i)
-              SAUsedChildWindows(i) = 0
-              CALL UnRegisterChildWindow(i)
-            ENDIF
-          ENDDO
-! Close Chi-sqd plot 
-          CALL Close_Chisq_Plot
+          CALL CloseOutputSolutionsChildWindows
           CALL WDialogSelect(IDD_SAW_Page5)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,6,iRow,Unchecked)
 ! Fill SA Parameter Bounds Wizard Window with the values from this solution.
@@ -181,19 +149,7 @@
       DO iRow = 1, NumOf_SA_Runs
         CALL WGridGetCellCheckBox(IDF_SA_summary,7,iRow,iStatus)
         IF (iStatus .EQ. 1) THEN
-! Close "Save Solutions" window which may be up
-          CALL WDialogSelect(IDD_OutputSolutions)
-          CALL WDialogHide
-! Close all SA profile child windows that are still open
-          DO i = 1, MaxNumChildWin
-            IF (SAUsedChildWindows(i) .EQ. 1) THEN
-              CALL WindowCloseChild(i)
-              SAUsedChildWindows(i) = 0
-              CALL UnRegisterChildWindow(i)
-            ENDIF
-          ENDDO
-! Close Chi-sqd plot 
-          CALL Close_Chisq_Plot
+          CALL CloseOutputSolutionsChildWindows
           CALL WDialogSelect(IDD_SAW_Page5)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,7,iRow,Unchecked)
           CALL ShowWizardWindowRietveld(iSol2Run(iRow))
@@ -207,9 +163,47 @@
 !
 !*******************************************************************************
 !
+      SUBROUTINE CloseOutputSolutionsChildWindows
+! A helper routine to close all windows that should be closed when the output solutions window
+! is changed in any way, i.e.:
+! - all the powder pattern windows (profile child windows)
+! - the chi-sqrd progress window
+! - the Save solutions window
+
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC' 
+
+! Required to handle the profile graphs plotted in child windows
+      INTEGER                 SAUsedChildWindows
+      COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
+
+      INTEGER I
+
+      CALL PushActiveWindowID
+! Close "Save Solutions" window which may be up
+      CALL WDialogSelect(IDD_OutputSolutions)
+      CALL WDialogHide
+! Close all SA profile child windows that are still open
+      DO i = 1, MaxNumChildWin
+        IF (SAUsedChildWindows(i) .EQ. 1) THEN
+          CALL WindowCloseChild(i)
+          SAUsedChildWindows(i) = 0
+          CALL UnRegisterChildWindow(i)
+        ENDIF
+      ENDDO
+! Close Chi-sqd plot 
+      CALL Close_Chisq_Plot
+      CALL PopActiveWindowID
+
+      END SUBROUTINE CloseOutputSolutionsChildWindows
+!
+!*******************************************************************************
+!
       SUBROUTINE DealWithOutputSolutions
       
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE SOLVAR
@@ -317,7 +311,6 @@
 !
       SUBROUTINE UpdateOutputSolutionsWindow
       
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE SOLVAR
@@ -461,7 +454,6 @@
 !
       SUBROUTINE SaveSolutions
       
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE SOLVAR
@@ -1182,7 +1174,6 @@
 ! model via Mercury and the profile data in a graph window
 !!April2002 Added Zoom functionality.  Still needs a bit of tidying....
       
-      USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1232,7 +1223,6 @@
 !
 !  Enable button up and mouse movement events
 !
-      USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1336,7 +1326,6 @@
 !
 !  
 !
-      USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
