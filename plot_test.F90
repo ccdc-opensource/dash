@@ -6,7 +6,7 @@
 !   called from SASummary.f90
 !     This subroutine manipulates the data required to plot the observed  
 !   diffraction pattern with the calculated pattern and difference.  The
-!   data is read in from the .bin file and stored in COMMON BLOCK ProFilePLotStore
+!   data is read in from the .pro file and stored in COMMON BLOCK ProFilePLotStore
 !  ihandle is used to identify the column of the store_ arrays where the data
 !  for each child window (ihandle) is stored
 
