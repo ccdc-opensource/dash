@@ -72,26 +72,12 @@
         kzmpar(ii,ifrg) = 1
         xzmpar(ii,ifrg) = 0.5
       ENDDO
-!################################ T E S T I N G ##############################################
-
-   !     UseQuaternions(ifrg) = .FALSE.
-
-!###########################################################################################
       czmpar(4,ifrg) = 'Q1(frag )'
       czmpar(5,ifrg) = 'Q2(frag )'
       czmpar(6,ifrg) = 'Q3(frag )'
       czmpar(7,ifrg) = 'Q4(frag )'
-      IF (UseQuaternions(ifrg)) THEN
-        DO ii = 4, 7
-          kzmpar(ii,ifrg) = 2 ! Quaternion
-          xzmpar(ii,ifrg) = 0.5
-        ENDDO
-      ELSE
-        DO ii = 4, 7
-          kzmpar(ii,ifrg) = 6 ! single rotation axis
-          xzmpar(ii,ifrg) = SQRT(0.5)
-        ENDDO
-      ENDIF
+      kzmpar(ii,ifrg) = 2 ! Quaternion
+      xzmpar(ii,ifrg) = 0.5
       DO i = 1, 7
         WRITE (czmpar(i,ifrg)(8:8),880) ifrg
       ENDDO
