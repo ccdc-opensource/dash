@@ -19,6 +19,25 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION ValidCellAxisLength(TheValue)
+!
+! This function establishes if a REAL is a valid length for a unit cell axis
+!
+! INPUT   : TheValue = the alleged cell parameter
+!
+! RETURNS : .TRUE.  if 0.000001 < TheValue < 1000.0
+!           .FALSE. otherwise
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheValue
+
+      ValidCellAxisLength = ((TheValue .GT. 0.000001) .AND. (TheValue .LT. 1000.0))
+
+      END FUNCTION ValidCellAxisLength
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION FnUnitCellOK()
 !
 ! Checks if all cell parameters available and acceptable
@@ -35,11 +54,15 @@
 
       INTEGER I
       REAL    a,b,c,d2r,calp,cbet,cgam,arg,vcell
+      LOGICAL ValidCellAxisLength ! Function
       
-! Initialise to 'cell is not OK'
+! Initialise to 'unit cell is not OK'
       FnUnitCellOK = .FALSE.
 ! Check if the user has at least entered a value for every cell parameter
-      DO I = 1, 6
+      DO I = 1, 3
+        IF (.NOT. ValidCellAxisLength(CellPar(I))) RETURN
+      END DO
+      DO I = 4, 6
         IF (CellPar(I) .LT. 0.000001) RETURN
       END DO
 ! Check if the unit cell volume makes sense
