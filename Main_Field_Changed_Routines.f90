@@ -524,12 +524,12 @@
       CALL WDialogGetReal       (IDF_Indexing_ScaleFactor, DV_ScaleFactor)
 ! Number of degrees of freedom, we don't even count the zero point
       NumDoF = 0
-      IF (Isystem(1)) NumDof = MAX(NumDoF,1)
-      IF (Isystem(2)) NumDof = MAX(NumDoF,2)
-      IF (Isystem(3)) NumDof = MAX(NumDoF,2)
-      IF (Isystem(4)) NumDof = MAX(NumDoF,3)
-      IF (Isystem(5)) NumDof = MAX(NumDoF,4)
-      IF (Isystem(6)) NumDof = MAX(NumDoF,6)
+      IF (Isystem(1) .EQ. 1) NumDof = MAX(NumDoF,1)
+      IF (Isystem(2) .EQ. 1) NumDof = MAX(NumDoF,2)
+      IF (Isystem(3) .EQ. 1) NumDof = MAX(NumDoF,2)
+      IF (Isystem(4) .EQ. 1) NumDof = MAX(NumDoF,3)
+      IF (Isystem(5) .EQ. 1) NumDof = MAX(NumDoF,4)
+      IF (Isystem(6) .EQ. 1) NumDof = MAX(NumDoF,6)
 ! Check if any crystal system checked at all
       IF (NumDoF .EQ. 0) THEN
         CALL ErrorMessage('Please check at least one crystal system.')

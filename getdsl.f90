@@ -10,21 +10,36 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
-      CHARACTER*(*) FileName
+      CHARACTER*(*), INTENT (IN   ) :: FileName
+      INTEGER,       INTENT (IN   ) :: LenFn
+      INTEGER,       INTENT (  OUT) :: Ierr
+
       CHARACTER*128 line
       CHARACTER*3   KeyChar
-      INTEGER       LenFn, Idum, nl
+      INTEGER       Idum, nl
       REAL          Temp
       INTEGER       Itemp
 
-      COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),PkFnEsd(MPkDes,Max_NPFR), &
-        PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &
-        PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-        PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),PkPosAv(MAX_NPFR)
+      REAL              PkFnVal,                      PkFnEsd,                      &
+                        PkFnCal,                                                    &
+                        PkFnVarVal,                   PkFnVarEsd,                   &
+                        PkAreaVal,                    PkAreaEsd,                    &
+                        PkPosVal,                     PkPosEsd,                     &
+                        PkPosAv
+
+      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+                        PkFnCal(MPkDes,Max_NPFR),                                   &
+                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+                        PkPosAv(MAX_NPFR)
+      INTEGER I
 
       Ierr = 0
 !     Open the file
