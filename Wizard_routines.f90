@@ -36,6 +36,7 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
+      IF (CurrentWizardWindow .EQ. 0) RETURN
 ! Things go all wrong if some intelligent part of DASH decides that the current Wizard window should be
 ! hidden while the main DASH window has been minimised. Therefore, just enter an infinite loop...
       CALL WindowSelect(0)
@@ -44,7 +45,6 @@
         CALL WindowSelect(0)
         CALL IOsWait(50) ! wait half a sec
       ENDDO
-      IF (CurrentWizardWindow .EQ. 0) RETURN
       CALL WDialogSelect(CurrentWizardWindow)
       IF (WInfoDialog(6) .GT. 0) THEN
         IXPos_IDD_Wizard = WInfoDialog(6)
