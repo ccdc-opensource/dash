@@ -11,7 +11,7 @@
     USE druid_header
 !
 !   The common blocks below contain the info required for .pro file
-      PARAMETER (MOBS=15000)
+	INCLUDE 'PARAMS.INC'
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
       YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),&
