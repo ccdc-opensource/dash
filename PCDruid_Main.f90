@@ -16,7 +16,7 @@
 !C>> External binaries
 		  CHARACTER(LEN=255)            :: VIEWEXE     = 'C:\Program Files\DASH\mercury.exe'
 		  CHARACTER(LEN=255)            :: CONVEXE     = 'C:\Program Files\DASH\zmconv.exe'
-		  CHARACTER(LEN=20)             :: VIEWARG     = '-client'
+		  CHARACTER(LEN=20)             :: VIEWARG     = ''
     	  LOGICAL ViewOn, ConvOn, ViewAct, AutoUpdate
 		  COMMON / EXTPRG / ViewOn, ConvOn,  ViewAct,  AutoUpdate, ViewExe, ConvExe, ViewArg
 		  COMMON / EXTDIR / INSTDIR
