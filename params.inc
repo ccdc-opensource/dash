@@ -76,13 +76,23 @@
 ! during the Pawley refinement. It is used implicitly in at least one other constant as well,
 ! so just changing 400 to 500 won't work.
 
+      INTEGER     MaxNumRef
+      PARAMETER ( MaxNumRef = MaxBVar-50 )
+
+      INTEGER     MaxVVar
+      PARAMETER ( MaxVVar = MaxBVar + 100 )
+
+      INTEGER     MaxConstraints
+      PARAMETER ( MaxConstraints = MaxBVar-100 )
+
+      INTEGER     MaxF2VA ! "Family 2 variables"
+      PARAMETER ( MaxF2VA = MaxBVar )
+
 ! For use in Quick_Pawley
 
       INTEGER     QPFDIM
-      PARAMETER ( QPFDIM = (20000 + (MaxBVar * (MaxBVar+3)) / 2) )
+      PARAMETER ( QPFDIM = ((MaxBVar*(MaxBVar+1)) / 2) )
 ! This is the number of elements in the least squares refinement matrix.
-! The extra 20000 looks a bit stupid, but it was there in the original code so I left it in.
-! Should not be necessary at all.
 
       INTEGER     MVAR
       PARAMETER ( MVAR = 100 )
