@@ -209,7 +209,8 @@
 ! ######### @@ JvdS 21 July 2003 ####################
 ! Where does the 1.0/1.2 come from? What's wrong with 1.0 ?
 !O      ZXDELT = (1.0 / 1.2)*(ZARGI(NPT2)-ZARGI(NPT2-1))
-      ZXDELT = ZARGI(NPT2)-ZARGI(NPT2-1)
+!O      ZXDELT = ZARGI(NPT2)-ZARGI(NPT2-1)
+      ZXDELT = (ZARGI(NPTS)-ZARGI(1)) / (NPTS-1)
       ZXDEL(KNOW) = ZXDELT
       KOBZ(1) = ISPMIN
       ZOBSMAX = ZOBS(ISPMIN)
