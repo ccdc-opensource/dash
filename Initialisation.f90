@@ -534,12 +534,12 @@
       INTEGER    RecNr
       INTEGER*4    ISEED
       INTEGER    tFileHandle
-      LOGICAL, EXTERNAL :: AutoLocalMinimisation, SaveCSSR, SaveCCL, &
-                           ColourFlexibleTorsions, ConnectPointsObs, &
+      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, SaveCSSR, SaveCCL, &
+                           Get_ColourFlexibleTorsions, ConnectPointsObs, &
                            PlotErrorBars, PlotBackground,            &
                            PlotPeakFitDifferenceProfile,             &
                            WDialogGetCheckBoxLogical,                &
-                           Get_UseHydrogens
+                           Get_UseHydrogens, Get_SavePRO
       REAL, EXTERNAL :: WavelengthOf
       INTEGER*4 tInteger
 
@@ -658,7 +658,7 @@
 ! Save use hydrogens YES / NO
       CALL FileWriteLogical(tFileHandle,RecNr,Get_UseHydrogens())
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,ColourFlexibleTorsions())
+      CALL FileWriteLogical(tFileHandle,RecNr,Get_ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
       CALL FileWriteLogical(tFileHandle,RecNr,SavePDB)    ! 1. .pdb  ?
       CALL FileWriteLogical(tFileHandle,RecNr,SaveCSSR()) ! 2. .cssr ?
@@ -666,9 +666,9 @@
       CALL FileWriteLogical(tFileHandle,RecNr,.FALSE.)    ! 4. .res  ? (not possible yet)
       CALL FileWriteLogical(tFileHandle,RecNr,.FALSE.)    ! 5. .mol2 ? (not possible yet)
 ! Save YES / NO if .pro file is to be written out when a best solution is found
-      CALL FileWriteLogical(tFileHandle,RecNr,.TRUE.)
+      CALL FileWriteLogical(tFileHandle,RecNr,Get_SavePRO())
 ! Auto local minimisation at the end of every run in multirun YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,AutoLocalMinimisation())
+      CALL FileWriteLogical(tFileHandle,RecNr,Get_AutoLocalMinimisation())
 ! Save the damping factor for the local minimisation
       CALL FileWriteReal(tFileHandle,RecNr,SA_SimplexDampingFactor)
 ! Save the seeds for the random number generator
@@ -850,7 +850,8 @@
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 4. .res  ? (not possible yet)
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 5. .mol2 ? (not possible yet)
 ! Read YES / NO if .pro file is to be written out when a best solution is found
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical) ! not used yet
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL Set_SavePRO(tLogical)
 ! Auto local minimisation at the end of every run in multirun YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,tLogical)
