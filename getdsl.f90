@@ -163,7 +163,7 @@
       INCLUDE 'GLBVAR.INC'
 
       CHARACTER*(*) FileName
-      INTEGER       LenFn, Idum, nl
+      INTEGER       LenFn, Idum
 
       COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),PkFnEsd(MPkDes,Max_NPFR), &
         PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &

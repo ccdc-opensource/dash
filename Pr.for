@@ -5566,7 +5566,6 @@ CD
 CD If used with an old-style L REFI card, expects a signed packed integer.
 CO Prints out what it has read. NB No longer sets LOGICAL TIC.
 C
-      LOGICAL OLD
       CHARACTER *4 SWORDS(5),WORD
       CHARACTER *27 SORCWD(5),TYPEWD(6)
       COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),

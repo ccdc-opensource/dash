@@ -11,8 +11,7 @@ C..             and redo the tic marks when we load in the data.)
 C..   Check the lattice constants
 C..   Check the wavelength
 C..   Check the space group
-      LOGICAL           :: SKIP    = .FALSE.
-      INTEGER           :: I,IDNUMBER
+      INTEGER           :: I
       INCLUDE 'statlog.inc' 
 C
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,

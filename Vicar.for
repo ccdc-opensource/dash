@@ -103,8 +103,8 @@ C     Constants
 C     Local
       real*8 ang_1,ang_2
       real*8 sin_1,cos_1,sin_2,cos_2
-      real*8 cosine,one_over_sine,sine2,norm,eps,sinarg
-      real*8 u1(3),u2(3),u3(3),u4(3),a,b,c, rad
+      real*8 cosine,one_over_sine,norm,eps,sinarg
+      real*8 u1(3),u2(3),u3(3),u4(3), rad
 c
 c     convert the angle values from degrees to radians;
 c     then find their sine and cosine values

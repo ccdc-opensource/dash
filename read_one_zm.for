@@ -3,7 +3,6 @@ C>>
       integer function read_one_zm(ifrg)
 c      real*8 x(maxatm),y(maxatm),z(maxatm)
       character*120 line
-      logical file_present
 c
       parameter (maxatm=100)
       parameter (maxfrg=20)

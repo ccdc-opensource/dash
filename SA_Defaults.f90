@@ -35,7 +35,6 @@
 
       IMPLICIT NONE
 
-!O      character*75 filehead ! Maximum permissible length.
       CHARACTER*(*), INTENT (IN   ) :: FileHead 
 
       CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
@@ -45,9 +44,8 @@
 
       LOGICAL outfilset
       COMMON /outfileset/ outfilset
-!      INTEGER i
 
-      INTEGER KLEN, POS
+      INTEGER POS
 
 ! The first line causes array bounds to exceed
 !O      i = len_trim(filehead) + 1

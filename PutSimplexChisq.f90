@@ -2,7 +2,6 @@
 !
       USE WINTERACTER
       USE DRUID_HEADER
-      type (win_font) chifont
 !
       character*7 chistr
 !

@@ -375,7 +375,7 @@
       XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
       LOGICAL PlotErrorBars ! Function
-      REAL YDIF(MOBS),YCTEM(MOBS)
+      REAL YDIF(MOBS)
 !
        call IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
