@@ -5483,7 +5483,8 @@
       CHARACTER*5 TIM
       CHARACTER*10 DAT
       CHARACTER*6 MAIN
-      COMMON /PRCHISQ/ CHISQ, RWPOBS, RWPEXP
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
       SAVE SMYOB, SWYOBS
 !
       GOTO (1,2,3,4,5,6,100,100,100,100,11,12,13), IRFAC
@@ -5605,9 +5606,9 @@
  2014 FORMAT (/' N-P+C =',F8.0)
       RWPOBS = 100.*SQRT(SUMWD/SWYOBS)
       RWPEXP = 100.*SQRT(FREE/SWYOBS)
-      CHISQ = SUMWD/FREE
-!      WRITE (ITO,2004) CHISQ,NOBS,LVARB
-      WRITE (LPT,2004) CHISQ, NOBS, LVARB
+      PAWLEYCHISQ = SUMWD/FREE
+!      WRITE (ITO,2004) PAWLEYCHISQ,NOBS,LVARB
+      WRITE (LPT,2004) PAWLEYCHISQ, NOBS, LVARB
  2004 FORMAT (' Chi squared =',F10.4,' for',I6,' observations',' and',  &
      &        I4,' basic variables')
       WRITE (LPT,2019) SMYD, SMYO, SMYOB, SMYC, SMWYOS, SWYOBS, SUMWD
@@ -6345,9 +6346,7 @@
       CALL INPLPR(PCXX,PFXX)
 !
 ! MUST HAVE L PKFN CARDS:
-      IF (ILREAD(9).EQ.0) CALL ERRMES(2,1,                              &
-     &                               'L PKFN cards giving peak function'&
-     &                               )
+      IF (ILREAD(9).EQ.0) CALL ERRMES(2,1,'L PKFN cards giving peak function')
 !
 ! NOW FOR THIS PHASE:
 ! CLEAR CONSTRAINT COUNTS FOR GEOMETRY AND PAWLEY:
