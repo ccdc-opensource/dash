@@ -7,9 +7,7 @@
       USE ZMVAR
 
       IMPLICIT NONE
-!
-!       Called when a new minimum is found
-!
+
       DOUBLE PRECISION t, fopt
       REAL cpb
       DOUBLE PRECISION parvals(*) ! The current torsion parameters (can't be called X here)
@@ -344,7 +342,7 @@
  1070 FORMAT ('SCALE2    ',3F10.5,'      0.00000')
       WRITE (65,1080) inv(3,1), inv(3,2), inv(3,3)
  1080 FORMAT ('SCALE3    ',3F10.5,'      0.00000')
-! Per z-matrix, determine the connectivity. This has to be done only once.
+! Per Z-matrix, determine the connectivity. This has to be done only once.
       TotNumBonds = 0
       NumOfAtomsSoFar = 0
       DO ifrg = 1, maxfrg
@@ -356,7 +354,7 @@
           NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
           TotNumBonds = TotNumBonds + NumberOfBonds(ifrg)
         ENDIF
-      ENDDO ! loop over z-matrices
+      ENDDO ! loop over Z-matrices
 ! Get atom label option from dialogue. Two options: 
 ! 1. "Element symbol + solution number"
 ! 2. "Orignal atom labels"
