@@ -88,9 +88,6 @@
       REAL            XPG1, XPG2, YPG1, YPG2
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
 
-      INTEGER ISB
-      CHARACTER*(80) STATBARSTR(4:7)
-
       CALL IGrSelect(1,0)
       CALL IGrArea(0.0,0.0,1.0,1.0)
       CALL IGrUnits(0.0,0.0,1.0,1.0)
@@ -102,18 +99,6 @@
 ! Draw axes and add scales
       CALL IPgArea(XPG1,YPG1,XPG2,YPG2) ! In IGrUnits
       CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
-      CALL IRealToString(xpgmin,statbarstr(4)(1:),'(F10.3)')
-      CALL IRealToString(xpgmax,statbarstr(5)(1:),'(F10.3)')
-      IF ((ypgmax-ypgmin) .LE. 100.0) THEN      
-        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(F10.3)')
-        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(F10.3)')
-      ELSE
-        CALL IRealToString(ypgmin,statbarstr(6)(1:),'(F10.1)')
-        CALL IRealToString(ypgmax,statbarstr(7)(1:),'(F10.1)')
-      END IF
-      DO ISB = 4, 7
-        CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-      END DO
       CALL IPgClipRectangle('P')
       CALL IPgBorder
 
@@ -492,8 +477,8 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
                         PF_FWHM(MAX_NPFR)
 
-!F      INTEGER        CurrHiLiPFR
-!F      COMMON /HLPFR/ CurrHiLiPFR
+      INTEGER        CurrHiLiPFR
+      COMMON /HLPFR/ CurrHiLiPFR
 
       CHARACTER*1 ChrPkNum
       CHARACTER*2 ChrPkNum2
@@ -603,8 +588,8 @@
         ENDIF
       ENDDO
       CALL IGrFillPattern(Outline)
-!F      CurrHiLiPFR = 0
-!F      CALL HighLightPFR
+      CurrHiLiPFR = 0
+      CALL HighLightPFR
 
       ENDSUBROUTINE Plot_PeakFit_Info
 !

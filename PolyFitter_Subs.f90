@@ -25,11 +25,8 @@
       REAL            XPG1, XPG2, YPG1, YPG2
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
 
-      CHARACTER*(80) STATBARSTR(4:7)
-
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-      INTEGER ISB
-      REAL XMINT, XMAXT, YMINT, YMAXT, xgcurold, ygcurold
+      REAL xgcurold, ygcurold
 
       CALL WindowSelect(0)
       CALL WMessageEnable(MouseMove, Enabled)
@@ -61,24 +58,6 @@
           CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
           CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
           CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
-          xmint = MIN(xcur(1),xcur(2))
-          xmaxt = MAX(xcur(1),xcur(2))
-          ymint = MIN(ycur(1),ycur(2))
-          ymaxt = MAX(ycur(1),ycur(2))
-          IF (.NOT. (xmint.EQ.xmaxt .OR. ymint.EQ.ymaxt)) THEN
-            CALL IRealToString(xmint,statbarstr(4)(1:),'(F10.3)')
-            CALL IRealToString(xmaxt,statbarstr(5)(1:),'(F10.3)')
-            IF (ymaxt-ymint .LE. 100.0) THEN
-              CALL IRealToString(ymint,statbarstr(6)(1:),'(F10.3)')
-              CALL IRealToString(ymaxt,statbarstr(7)(1:),'(F10.3)')
-            ELSE
-              CALL IRealToString(ymint,statbarstr(6)(1:),'(F10.1)')
-              CALL IRealToString(ymaxt,statbarstr(7)(1:),'(F10.1)')
-            ENDIF
-            DO ISB = 4, 7
-              CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-            ENDDO
-          ENDIF
           SELECT CASE (EventType)
             CASE (MouseMove)
               xgcur(2) = EventInfo%GX
@@ -97,7 +76,7 @@
             CASE (MouseButUp)
               xgcur(2) = EventInfo%GX
               ygcur(2) = EventInfo%GY
-              CALL WMessageEnable(MouseMove, Disabled)
+!              CALL WMessageEnable(MouseMove, Disabled)
               CALL WMessageEnable(MouseButUp, Disabled)
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
                 CALL IGrColourN(KolNumRectSelect)
@@ -230,7 +209,7 @@
           ypgdif = ypgmax - ypgmin
           ypgmin = MAX(ypmin,ypgmin-0.25*ypgdif)
           ypgmax = ypgmin + ypgdif
-          CALL Get_IPMaxMin() 
+          CALL Get_IPMaxMin
           CALL Profile_Plot
         CASE (KeyCursorUp)
 ! We're going to move the graph up if we can
@@ -318,89 +297,164 @@
       nPoints = 1 + iStop - iStart
 
       END SUBROUTINE Get_IPMaxMin
-!F!
-!F!*****************************************************************************
-!F!
-!F      SUBROUTINE HighLightPFR
-!F
-!F      USE WINTERACTER
-!F      USE DRUID_HEADER
-!F      USE VARIABLES
-!F
-!F      IMPLICIT NONE
-!F
-!F      INCLUDE 'PARAMS.INC'
-!F      INCLUDE 'Poly_Colours.inc'
-!F
-!F      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-!F                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-!F                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-!F                       XGGMIN,    XGGMAX
-!F      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-!F                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-!F                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-!F                       XGGMIN,    XGGMAX
-!F
-!F      REAL              XPF_Range
-!F      LOGICAL                                       RangeFitYN
-!F      INTEGER           IPF_Lo,                     IPF_Hi
-!F      INTEGER           NumPeakFitRange,            CurrentRange
-!F      INTEGER           IPF_Range
-!F      INTEGER           NumInPFR
-!F      REAL              XPF_Pos,                    YPF_Pos
-!F      INTEGER           IPF_RPt
-!F      REAL              XPeakFit,                   YPeakFit
-!F      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-!F                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-!F                        NumPeakFitRange,            CurrentRange,                &
-!F                        IPF_Range(MAX_NPFR),                                     &
-!F                        NumInPFR(MAX_NPFR),                                      & 
-!F                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-!F                        IPF_RPt(MAX_NPFR),                                       &
-!F                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
-!F
-!F      INTEGER        CurrHiLiPFR
-!F      COMMON /HLPFR/ CurrHiLiPFR
-!F
-!F      REAL xCur, yCur
-!F      REAL gxleft, gybot, gxright, gytop
-!F
-!F      CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur,yCur)
-!F! Get current PFR
-!F      CALL DetermineCurrentPeakFitRange(xCur)
-!F! Check if current range equal current highlighted
-!F      IF (CurrentRange .NE. CurrHiLiPFR) THEN
-!F        CALL IGrPlotMode('EOR')
-!F        CALL IGrColourN(KolNumPGWindow)
-!F !O       CALL IGrFillPattern(Hatched,Medium,DiagUp)
-!F        CALL IGrFillPattern(Outline,Medium,DiagUp)
-!F! Unhighlight current highlighted
-!F        IF (CurrHiLiPFR .NE. 0) THEN
-!F          CALL IPgUnitsToGrUnits(XPF_Range(1,CurrHiLiPFR),ypgmin,gxleft,gybot)
-!F          CALL IPgUnitsToGrUnits(XPF_Range(2,CurrHiLiPFR),ypgmax,gxright,gytop)
-!F          gxleft  = MAX(gxleft,xggmin)
-!F          gxleft  = MIN(gxleft,xggmax)
-!F          gxright = MIN(gxright,xggmax)
-!F          gxright = MAX(gxright,xggmin)
-!F          CALL IGrRectangle(gxleft,gybot,gxright,gytop) 
-!F        ENDIF
-!F! Highlight current PFR
-!F        IF (CurrentRange .NE. 0) THEN
-!F          CALL IPgUnitsToGrUnits(XPF_Range(1,CurrentRange),ypgmin,gxleft,gybot)
-!F          CALL IPgUnitsToGrUnits(XPF_Range(2,CurrentRange),ypgmax,gxright,gytop)
-!F          gxleft  = MAX(gxleft,xggmin)
-!F          gxleft  = MIN(gxleft,xggmax)
-!F          gxright = MIN(gxright,xggmax)
-!F          gxright = MAX(gxright,xggmin)
-!F          CALL IGrRectangle(gxleft,gybot,gxright,gytop) 
-!F        ENDIF
-!F        CALL IGrFillPattern(Outline,Medium,DiagUp)
-!F        CALL IGrPlotMode('Normal')
-!F        CALL IGrColourN(InfoGrScreen(PrevColReq))
-!F        CurrHiLiPFR = CurrentRange
-!F      ENDIF
-!F
-!F      END SUBROUTINE HighLightPFR
+!
+!*****************************************************************************
+!
+      SUBROUTINE HighLightPFR
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'Poly_Colours.inc'
+
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
+
+      INTEGER        CurrHiLiPFR
+      COMMON /HLPFR/ CurrHiLiPFR
+
+      REAL xCur, yCur
+      REAL gxleft, gybot, gxright, gytop
+      REAL XGGMIN, XGGMAX, YGGMIN, YGGMAX
+
+      IF (PastPawley .OR. (NumPeakFitRange .EQ. 0)) RETURN
+      CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur,yCur)
+      CALL IPgUnitsToGrUnits(xpgmin,ypgmin,xggmin,yggmin)
+      CALL IPgUnitsToGrUnits(xpgmax,ypgmax,xggmax,yggmax)
+! Get current PFR
+      CALL DetermineCurrentPeakFitRange(xCur, yCur)
+! Check if current range equal current highlighted
+      IF (CurrentRange .NE. CurrHiLiPFR) THEN
+        CALL IGrPlotMode('EOR')
+        CALL IGrColourN(KolNumPGWindow)
+        CALL IGrFillPattern(Outline,Medium,DiagUp)
+! Unhighlight current highlighted
+        IF (CurrHiLiPFR .NE. 0) THEN
+          CALL IPgUnitsToGrUnits(XPF_Range(1,CurrHiLiPFR),ypgmin,gxleft,gybot)
+          CALL IPgUnitsToGrUnits(XPF_Range(2,CurrHiLiPFR),ypgmax,gxright,gytop)
+          gxleft  = MAX(gxleft,xggmin)
+          gxleft  = MIN(gxleft,xggmax)
+          gxright = MIN(gxright,xggmax)
+          gxright = MAX(gxright,xggmin)
+          CALL IGrRectangle(gxleft,gybot,gxright,gytop) 
+        ENDIF
+! Highlight current PFR
+        IF (CurrentRange .NE. 0) THEN
+          CALL IPgUnitsToGrUnits(XPF_Range(1,CurrentRange),ypgmin,gxleft,gybot)
+          CALL IPgUnitsToGrUnits(XPF_Range(2,CurrentRange),ypgmax,gxright,gytop)
+          gxleft  = MAX(gxleft,xggmin)
+          gxleft  = MIN(gxleft,xggmax)
+          gxright = MIN(gxright,xggmax)
+          gxright = MAX(gxright,xggmin)
+          CALL IGrRectangle(gxleft,gybot,gxright,gytop) 
+        ENDIF
+        CALL IGrFillPattern(Outline,Medium,DiagUp)
+        CALL IGrPlotMode('Normal')
+        CALL IGrColourN(InfoGrScreen(PrevColReq))
+        CurrHiLiPFR = CurrentRange
+      ENDIF
+
+      END SUBROUTINE HighLightPFR
+!
+!*****************************************************************************
+!
+      SUBROUTINE DisplayHKL
+!
+! Called whenever the mouse is moved. Display h,k,l if over a tick mark.
+
+      USE WINTERACTER
+      USE VARIABLES
+      USE REFVAR
+
+      IMPLICIT NONE
+
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+
+      REAL xCur, yCur, diff
+      INTEGER II, ClosestRef
+      CHARACTER*(12) hklString
+
+      IF (NumOfRef .EQ. 0) RETURN
+      CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur,yCur)
+! xCur and yCur are now the current mouse coordinates in Pg units
+      diff = ABS(RefArgK(1) - xCur)
+      ClosestRef = 1
+      DO II = 2, NumOfRef
+        IF (RefArgK(II) .GE. XPGMIN .AND. RefArgK(II) .LE. XPGMAX) THEN
+          IF (ABS(RefArgK(II) - xCur) .LT. diff) THEN
+            diff = ABS(RefArgK(II) - xCur)
+            ClosestRef = II
+          ENDIF
+        ENDIF
+      ENDDO
+      WRITE(hklString,'(I3,",",I3,",",I3)') iHKL(1,ClosestRef), iHKL(2,ClosestRef), iHKL(3,ClosestRef)
+      CALL WindowOutStatusBar(8,hklString)
+
+      END SUBROUTINE DisplayHKL
+!
+!*****************************************************************************
+!
+      SUBROUTINE UpdateMousePosition
+
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+
+      REAL xCur, yCur
+      CHARACTER*(12) tString
+
+      IF (NoData) RETURN
+      CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur,yCur)
+      CALL IRealToString(xCur,tString,'(F10.3)')
+      CALL WindowOutStatusBar(6,tString)
+      IF (ypgmax-ypgmin .LE. 100.0) THEN
+        CALL IRealToString(yCur,tString,'(F10.3)')
+      ELSE
+        CALL IRealToString(yCur,tString,'(F10.1)')
+      ENDIF
+      CALL WindowOutStatusBar(7,tString)
+
+      END SUBROUTINE UpdateMousePosition
 !
 !*****************************************************************************
 !
@@ -459,10 +513,9 @@
       REAL xgcurold
       SAVE xgcurold
 
-      INTEGER iSB, ii, iPFRange, iPFL1, iPFL2
+      INTEGER ii, iPFRange, iPFL1, iPFL2
       REAL    XPFR1, XPFR2
       REAL    GXMIN, GYMIN, GXMAX, GYMAX
-      CHARACTER*(80) STATBARSTR(2:3)
 
 ! Get ready to put up the big cursor
       CALL WMessageEnable(MouseMove, Enabled)
@@ -505,17 +558,8 @@
             xgcurold = xgcur(2)
             CALL IGrPlotMode('Normal')
             CALL IGrColourN(InfoGrScreen(PrevColReq))
-            CALL IRealToString(xcur(2),statbarstr(2)(1:),'(F10.3)')
-            IF (ypgmax-ypgmin .LE. 100.0) THEN
-              CALL IRealToString(ycur(2),statbarstr(3)(1:),'(F10.3)')
-            ELSE
-              CALL IRealToString(ycur(2),statbarstr(3)(1:),'(F10.1)')
-            ENDIF
-            DO ISB = 2, 3
-              CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-            ENDDO 
           CASE (MouseButUp)
-            CALL WMessageEnable(MouseMove, Disabled)
+!            CALL WMessageEnable(MouseMove, Disabled)
             CALL WMessageEnable(MouseButUp, Disabled)
 ! MouseButUp action for selecting the peak fitting region
 ! Remove old cross-hair
@@ -567,10 +611,6 @@
               IPF_Range(NumPeakFitRange) = 1 + IPF_Hi(NumPeakFitRange) - IPF_Lo(NumPeakFitRange)
               NumInPFR(NumPeakFitRange) = 0
 ! Now we have the range in terms of the profile point index
-              DO ISB = 2, 3
-                statbarstr(isb) = '          '
-                CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-              ENDDO                
               CALL IGrColourN(KolNumPanelDark)
               CALL IGrFillPattern(Hatched,Medium,DiagUp)
               CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
@@ -609,8 +649,6 @@
 
       INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
       COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
-
-      REAL XCUR(2), YCUR(2)
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -652,22 +690,23 @@
       INTEGER II, IP, NTPEAK, iNewNumber, iOldNumber, iPeakNr, iPoint
       REAL    ATEM, ANEW
       LOGICAL ReplotNecessary, RecalculationNecessary
+      REAL    xCur(2), yCur(2)
 
       ReplotNecessary        = .FALSE.
       RecalculationNecessary = .FALSE.
-      xcur(1) = XCurFirst
-      CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
+      xCur(1) = XCurFirst
+      CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur(2),yCur(2))
+      CALL DetermineCurrentPeakFitRange(XCur(2), yCur(2))
       SELECT CASE (EventInfo%VALUE1)
         CASE (KeyDeleteUnder)
 ! Delete the nearest peak fitting range but ask first ...
           IF (NumPeakFitRange .EQ. 0) THEN
-            CALL ErrorMessage('No peak fitting ranges to delete!')
+            CALL InfoMessage('No peak fitting ranges to delete.')
           ELSE
 ! Check if in a peak range - if not tell the user...
-            CALL DetermineCurrentPeakFitRange(XCur(2))
             IF (CurrentRange .EQ. 0) THEN
 ! Tell the user to place the cursor in the range to be fitted.
-              CALL ErrorMessage('Place the cursor in a peak fitting range.')
+              CALL InfoMessage('Place the cursor in a peak fitting range.')
             ELSE
               IF (Confirm('Do you really want to'//CHAR(13)//' delete this peak fitting range?')) THEN
                 ReplotNecessary        = .TRUE.
@@ -737,7 +776,6 @@
 ! KeyNumber=1-9: locating peak positions...
 ! Insert: add another peak
 ! Are we in a peak range?
-          CALL DetermineCurrentPeakFitRange(XCur(2))
           IF (CurrentRange .NE. 0) THEN
             IF (EventInfo%VALUE1 .EQ. KeyInsert) THEN
               NTPeak = NumInPFR(CurrentRange) + 1
@@ -768,7 +806,6 @@
         CASE (48,KeyReturn)
 ! KeyNumber=0 or KeyReturn: get ready to fit peaks ...
 ! Check if in a peak range - if not tell the user...
-          CALL DetermineCurrentPeakFitRange(XCur(2))
           IF (CurrentRange .EQ. 0) THEN
 ! Tell the user to place the cursor in the range to be fitted.
             CALL ErrorMessage('Place the cursor in a peak fitting range.')
@@ -798,7 +835,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE DetermineCurrentPeakFitRange(TheMouseCursorPosition)
+      SUBROUTINE DetermineCurrentPeakFitRange(xCur, yCur)
 !
 ! This routine determines which peak fit range the mouse cursor is currently in
 ! and returns the number in the global variable CurrentRange.
@@ -810,9 +847,16 @@
 !
       IMPLICIT NONE
 
-      REAL, INTENT (IN   ) :: TheMouseCursorPosition
+      REAL, INTENT (IN   ) :: xCur, yCur ! Mouse cursor position in PgUnits
 
       INCLUDE 'PARAMS.INC'
+
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -837,9 +881,10 @@
       INTEGER I
 
       CurrentRange = 0
+      IF ((yCur .LT. YPGMIN) .OR. (yCur .GT. YPGMAX)) RETURN
       IF (NumPeakFitRange .EQ. 0) RETURN
       DO I = 1, NumPeakFitRange
-        IF (TheMouseCursorPosition.GE.XPF_Range(1,I) .AND. TheMouseCursorPosition.LE.XPF_Range(2,I)) THEN
+        IF ((xCur .GE. XPF_Range(1,I)) .AND. (xCur .LE. XPF_Range(2,I))) THEN
           CurrentRange = I
         ENDIF
       ENDDO
