@@ -97,7 +97,7 @@
 ! JCC Import .. convert a mol/pdb/mol2 file into a z-matrix
               CALL ImportZmatrix
             CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
-              IF (Confirm('Do you want to clear this z-matrix?')) THEN
+              IF (Confirm('Do you want to clear this Z-matrix?')) THEN
                 ifrg = 1
                 DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
                   ifrg = ifrg + 1

@@ -461,20 +461,20 @@
 
       IMPLICIT NONE
 
-      INTEGER            I, IFlags, ISEL, Ilen, Istart, Istat, Nzm
+      INTEGER            I, IFlags, ISEL, Ilen, Istart, Istat
       INTEGER            POS
       CHARACTER(LEN=4)   :: EXT4
       CHARACTER(LEN=255) :: FilterStr, F
       CHARACTER(LEN=512) :: Zmfiles
       CHARACTER(LEN=5)   :: fmt     
-      CHARACTER(LEN=512) :: Info = 'You can import molecules from mol2, mol or pdb files into DASH.'//CHAR(13)//&
+      CHARACTER(LEN=512) :: Info = 'You can import molecules from res, cssr, mol2, mol or pdb files into DASH.'//CHAR(13)//&
                                    'When you click on OK, you will be prompted for a file in one'//CHAR(13)//&
-                                   'of these formats. DASH will create separate z-matrix files for'//CHAR(13)//&
+                                   'of these formats. DASH will create separate Z-matrix files for'//CHAR(13)//&
                                    'each chemical residue present in the first entry in the file.'//CHAR(13)//&
                                    'In multiple entry files the first entry will be read only.'
       INTEGER, EXTERNAL :: Res2Mol2, CSSR2Mol2
 
-      CALL WMessageBox(OKCancel, InformationIcon, CommonOK, Info, "Create Z-matrix")
+      CALL InfoMessage(Info)
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
       IFlags = LoadDialog + DirChange + AppendExt
       FilterStr = "All files (*.*)|*.*|"//&
@@ -542,18 +542,16 @@
       ELSE ! All Ok: Need to read in the file names
         Ilen = 1
         DO WHILE (Ilen .LT. 512)
-          Nzm = Nzm + 1
+!          Nzm = Nzm + 1
           READ (145,'(A)',ERR=20,END=20) F
           ZmFiles(Ilen:512) = CHAR(13)//F(1:LEN_TRIM(F))
           Ilen = LEN_TRIM(ZmFiles) + 1
         ENDDO
  20     CONTINUE
-        CALL WMessageBox(OKOnly, InformationICon, CommonOk, &
-                         "Generated the following zmatrices successfully:"//CHAR(13)//&
+        CALL InfoMessage("Generated the following Z-matrices successfully:"//CHAR(13)//&
                          ZmFiles(1:Ilen)//CHAR(13)//CHAR(13)//&
-                         "You can load them by clicking on the zmatrix browse buttons"//CHAR(13)//&
-                         "in the SA setup window",&
-                         "Generation Successful")
+                         "You can load them by clicking on the Z-matrix browse buttons"//CHAR(13)//&
+                         "in the Molecular Z-Matrices window.")
         CLOSE(145)
       ENDIF
 
