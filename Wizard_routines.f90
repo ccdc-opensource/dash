@@ -1216,8 +1216,10 @@
       INTEGER IOption
       LOGICAL, EXTERNAL :: Confirm
 
+
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page1)
+      SpaceGroupDetermination = .FALSE. 
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -1261,6 +1263,14 @@
               CALL CheckUnitCellConsistency
             CASE (IDB_Delabc)
               CALL Clear_UnitCell_WithConfirmation
+! Space Group Program Interface
+            CASE (IDF_SGDet) 
+               NumberSGTable = LPosSG(LatBrav) ! Most general space group of crystal system chosen
+               CALL SetSpaceGroupMenu 
+               CALL Generate_TicMarks
+               CALL Download_SpaceGroup(IDD_PW_Page1) 
+               SpaceGroupDetermination = .TRUE.
+               CALL WizardWindowShow(IDD_PW_Page10)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)

@@ -39,8 +39,8 @@
       CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
       CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
 !!ep added
-      CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed,Disabled)
-      CALL WDialogFieldState(IDBACK, Disabled)
+!!      CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed,Disabled)
+      CALL WDialogFieldState(IDBACK, Enabled)
 ! If the background has been subtracted after the pattern was read in, then the
 ! order of the background polynomial defaults to 2, otherwise to 10.
       IF (.NOT. BACKREF) THEN
@@ -147,6 +147,7 @@
       INTEGER Ilen, IER
       CHARACTER(MaxPathLength) SDIFile
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER Inum
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
@@ -154,6 +155,7 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL, IDCLOSE)
+              SpaceGroupDetermination = .FALSE.
               CALL EndWizardCommon
             CASE (IDF_PawRef_Refine)
               CALL WritePawleyRefinementFile
@@ -210,8 +212,7 @@
               CALL WDialogFieldState(IDB_PawRef_Reject,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
-!! ep added
-             CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed, Disabled)
+
             CASE (IDB_PawRef_Accept)
 ! update the profile and stay with the Pawley refinement
               IPTYPE = 2
@@ -250,11 +251,10 @@
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
               CALL WDialogSelect(IDD_Pawley_Status)
               IF (LastValuesSet) CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
-!!ep added
-              CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed, Enabled)
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
+              CALL WDialogFieldState(IDBACK, Enabled)
               CALL SetModeMenuState(0,0)
 ! JCC Only change the setting if this is the second Pawley fit
               IF (NumPawleyRef .EQ. 1) THEN
@@ -268,6 +268,23 @@
                 CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Checked)
                 CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,5)
               ENDIF
+! If entered window by going through "Space Group>" route then do not have the option
+! to save sdi file.  Can only perform Pawley Refinement then go back to cell parameters
+! window
+                IF(SpaceGroupDetermination) THEN 
+                CALL WDialogGetInteger(IDF_Pawley_Refinement_Number,Inum)
+                  IF (Inum .LE. 1) THEN
+                    CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
+                  ELSE
+! Have hit "Refine" at least twice so are now able to call Space Group Determination program
+                   IF (Inum .gt. 1) THEN
+                     CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd
+                     CALL WDialogFieldState(IDBACK, Enabled)
+                     CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+                     CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
+                   END IF
+                  END IF
+                END IF
             CASE (IDB_PawRef_Reject)
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
 ! JCC Reset the R-values if possible
@@ -282,8 +299,7 @@
                 CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
                 CALL retrieve_polybackup
                 CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
-!ep added
-                CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed, Enabled)
+                CALL WDialogFieldState(IDBACK, Enabled)
               ENDIF
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
@@ -303,10 +319,6 @@
               CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
               NoData = .FALSE.
               CALL ShowWizardWindowZmatrices
-!ep added
-            CASE (IDF_Paw_Ref_SgDet_Proceed)
-              CALL SpaceGroupDetermination(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd
-              CALL WDialogFieldState(IDBACK, Enabled)
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_PW_Page1)
           END SELECT

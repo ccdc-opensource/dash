@@ -1189,6 +1189,8 @@
       CALL WDialogSelect(IDD_PW_Page1)
 ! Enable/disable the wizard next button
       CALL WDialogFieldStateLogical(IDNEXT,FnUnitCellOK())
+!!Enable/disable the space group determination button
+      CALL WDialogFieldStateLogical (IDF_SGDet, FnUnitCellOK())
       CALL Generate_TicMarks
       CALL PopActiveWindowID
 
