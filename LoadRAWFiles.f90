@@ -35,7 +35,7 @@
       INTEGER tNumOfRanges
       CHARACTER*80 TitleOfRange(250) ! 8 = maximum number of ranges in a STOE file
       CHARACTER*20, EXTERNAL :: Integer2String
-      REAL    t2ThetaStep(250), t2ThetaEnd(250)
+      REAL    t2ThetaStep(250)
       INTEGER iHighlightList(250)
       LOGICAL LoadRange(250), AtLeastOneSelected
       REAL    Smallest2ThetaStep
