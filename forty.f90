@@ -221,6 +221,10 @@
       DO ICYC = NCYC1, LASTCY
  !D     DO ICYC = 1, 1
 ! *** Winteracter calls ***
+        CALL WDialogSelect(IDD_ViewPawley)
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPTS)
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MAXK)
+        CALL WDialogSelect(IDD_Pawley_Status)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_Number,ICYC)
         CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,LASTCY)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPTS)
@@ -293,9 +297,9 @@
           IF (npt30*(ipt/npt30).EQ.ipt) THEN
             CALL WDialogPutProgressBar(IDF_Pawley_Progress_Bar,ipt,Absolute)
           ENDIF
-          YBACK = 0.
-          YPEAK = 0.
-          YCALC = 0.
+          YBACK = 0.0
+          YPEAK = 0.0
+          YCALC = 0.0
           NOBSNOW = IPT
           KMAX = KREFT(NOBSNOW) ! Number of peaks contributing to this data point
           ARGI = ZARGI(NOBSNOW)
@@ -406,6 +410,9 @@
 ! OUTPUT NEW CRYSTAL DATA FOR PENULTIMATE CYCLE:
         IF (DONE) CALL NWINPR(PCXX,PFXX,MAGROU)
 ! *** Winteracter calls ***
+        CALL WDialogSelect(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
+        CALL WDialogSelect(IDD_Pawley_Status)
         CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
         CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RWPOBS,'(F12.2)')
         CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RWPEXP,'(F12.2)')
