@@ -248,10 +248,8 @@
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
       LOGICAL         InSA
       COMMON /SADATA/ InSA
@@ -274,11 +272,11 @@
       INTEGER                                           nPeaksFound
       COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
 
-      LOGICAL         UseRene, UseESD
-      INTEGER                          nwidth
-      REAL                                     width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                       InPeak
-      COMMON / RENE / UseRene, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      LOGICAL         UseRene, UseRelease, UseESD
+      INTEGER                                     nwidth
+      REAL                                                width, minstep, rwidth, SqrtCorrObs 
+      LOGICAL                                                                                   InPeak
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
 
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
@@ -300,7 +298,7 @@
       UseESD = .TRUE.
       CALL WDialogPutCheckBoxLogical(IDC_UseESD, UseESD)
       DO I = 1, MVAR
-        ModalFlag(I) = 1
+        ModalFlag(I) = 0 ! 0 = not a torsion angle
       ENDDO
       ShowAgain = .TRUE.
       Counter   = 0

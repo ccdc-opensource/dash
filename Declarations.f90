@@ -294,10 +294,10 @@
 
 ! Note that the variable names in this COMMON block are not consistent.
 
-      REAL             XOPT,       C,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
-! MVAR = 100 (the variable formerly also known as NMAX, almost subtly different from MPAR)
+! MVAR = 100
 ! XOPT = values of the parameters of the best SA solution so far
 
       INTEGER         KKOR
@@ -341,10 +341,8 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
       INTEGER         NStPar
       COMMON /pextra/ NStPar

@@ -20,13 +20,11 @@
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
                               chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
 ! Variables used to specify Child Window position
-      INTEGER Ix, Iy
+      INTEGER                 Ix, Iy
       COMMON /WindowPosition/ Ix, Iy
       DATA Ix /10/, Iy /450/
 
@@ -37,15 +35,15 @@
         RETURN
       ENDIF
       CALL WindowOpenChild(ChiHandle,SysMenuOn+MinButton+OwnedByRoot, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
-      CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
+      CALL RegisterChildWindow(Chihandle, DealWithChiSqdPlot)
       Zoomed = .FALSE.
       chi_x_min = FLOAT(nmpert)/100000.0
       chi_y_min = 0.0
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Action1)
-      CALL WDialogFieldState(IDB_Prog3,Disabled)
+      CALL WDialogFieldState(IDB_Prog3, Disabled)
       CALL WDialogSelect(IDD_SAW_Page5)
-      CALL WDialogFieldState(IDB_Prog3,Disabled)
+      CALL WDialogFieldState(IDB_Prog3, Disabled)
       CALL PopActiveWindowID
       CALL plotting_Chi_sqd
 
@@ -102,7 +100,6 @@
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
 
-
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
@@ -117,19 +114,17 @@
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
-      REAL             XOPT,       C,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
-      LOGICAL         UseRene, UseESD
-      INTEGER                          nwidth
-      REAL                                     width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                       InPeak
-      COMMON / RENE / UseRene, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      LOGICAL         UseRene, UseRelease, UseESD
+      INTEGER                                     nwidth
+      REAL                                                 width, minstep, rwidth, SqrtCorrObs 
+      LOGICAL                                                                                   InPeak
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
 
       REAL Curr_CHI
 
@@ -183,10 +178,8 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
       INTEGER                    ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiHandle
@@ -340,10 +333,8 @@
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
                               chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
       SELECT CASE (EventType)
 ! will close the profile plot window
@@ -526,10 +517,8 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
       LOGICAL, EXTERNAL :: Get_OutputChi2vsMoves
       INTEGER hFile, I, J
