@@ -276,7 +276,6 @@
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
-              CALL Pawley_Limits_Save()
 ! Emulate loading .SDI file for next window
               CALL WDialogSelect(IDD_SAW_Page1)
 ! If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
@@ -295,7 +294,6 @@
 ! ########################################################
 
 !.. Reload the Pawley profile ...
-              CALL Pawley_Limits_Restore()
               CALL Load_Pawley_Pro
 
 ! ########################################################
@@ -677,132 +675,6 @@
       CALL Profile_Plot(IPTYPE)
 
       END SUBROUTINE Load_Pawley_PRO
-!
-!*****************************************************************************
-!
-      SUBROUTINE PAWLEY_LIMITS_SAVE
-
-      INCLUDE 'PARAMS.INC'
-
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-      COMMON /PAWPROFRAN/ XPPMIN,XPPMAX,YPPMIN,YPPMAX,                  &
-     &XPPGMIN,XPPGMAX,                                                  &
-     &YPPGMIN,YPPGMAX,XPPGMINOLD,XPPGMAXOLD,YPPGMINOLD,YPPGMAXOLD
-      COMMON /PAWPROFIPM/ IPPMIN,IPPMAX,IPPMINOLD,IPPMAXOLD
-      COMMON /PAWPROFMOR/ NPPFR 
-    
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
-
-      NPPFR=NumPeakFitRange
-      NumPeakFitRange=0
-      XPPMIN=XPMIN
-      XPPMAX=XPMAX
-      YPPMIN=YPMIN
-      YPPMAX=YPMAX
-      XPPGMIN=XPGMIN
-      XPPGMAX=XPGMAX
-      YPPGMIN=YPGMIN
-      YPPGMAX=YPGMAX
-
-      XPPGMINOLD=XPGMINOLD
-      XPPGMAXOLD=XPGMAXOLD
-      YPPGMINOLD=YPGMINOLD
-      YPPGMAXOLD=YPGMAXOLD
-      IPPMIN=IPMIN
-      IPPMAX=IPMAX
-      IPPMINOLD=IPMINOLD
-      IPPMAXOLD=IPMAXOLD
-
-      END SUBROUTINE PAWLEY_LIMITS_SAVE
-!
-!*****************************************************************************
-!
-      SUBROUTINE PAWLEY_LIMITS_RESTORE
-
-      INCLUDE 'PARAMS.INC'
-
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-      COMMON /PAWPROFRAN/ XPPMIN,XPPMAX,YPPMIN,YPPMAX,                  &
-     &XPPGMIN,XPPGMAX,                                                  &
-     &YPPGMIN,YPPGMAX,XPPGMINOLD,XPPGMAXOLD,YPPGMINOLD,YPPGMAXOLD
-      COMMON /PAWPROFIPM/ IPPMIN,IPPMAX,IPPMINOLD,IPPMAXOLD
-      COMMON /PAWPROFMOR/ NPPFR 
-   
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
-
-      NumPeakFitRange=NPPFR
-
-      XPMIN=XPPMIN
-      XPMAX=XPPMAX
-      YPMIN=YPPMIN
-      YPMAX=YPPMAX
-      XPGMIN=XPPGMIN
-      XPGMAX=XPPGMAX
-      YPGMIN=YPPGMIN
-      YPGMAX=YPPGMAX
-
-      XPGMINOLD=XPPGMINOLD
-      XPGMAXOLD=XPPGMAXOLD
-      YPGMINOLD=YPPGMINOLD
-      YPGMAXOLD=YPPGMAXOLD
-      IPMIN=IPPMIN
-      IPMAX=IPPMAX
-      IPMINOLD=IPPMINOLD
-      IPMAXOLD=IPPMAXOLD
-
-      END SUBROUTINE PAWLEY_LIMITS_RESTORE
 !
 !*****************************************************************************
 !
