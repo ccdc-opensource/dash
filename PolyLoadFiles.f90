@@ -39,7 +39,7 @@
 !               'DASH powder diffraction files (*.xye)|*.xye|'//&
 !               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
       FILTER = 'All files (*.*)|*.*|'//&
-               'All powder diffraction files|*.cpi;*.mdi;*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye;*.x01|'//&
+               'All powder diffraction files|*.cpi;*.mdi;*.pod;*.raw;*.rd;*.sd;*.txt;*.udf;*.uxd;*.xye;*.x01|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
@@ -186,6 +186,7 @@
       INTEGER, EXTERNAL :: Load_raw_File
       INTEGER, EXTERNAL :: Load_pod_File
       INTEGER, EXTERNAL :: Load_rd_File
+      INTEGER, EXTERNAL :: Load_sci_File ! Scintag. The extension is txt, but that is bound to generate clashes.
       INTEGER, EXTERNAL :: Load_udf_File
       INTEGER, EXTERNAL :: Load_uxd_File
       INTEGER, EXTERNAL :: Load_xye_File
@@ -217,7 +218,7 @@
       SELECT CASE (EXT4)
         CASE ('cpi ')
           ISTAT = Load_cpi_File(TheFileName,ESDsFilled)
-        CASE ('dat ', 'txt ')
+        CASE ('dat ')
           ISTAT = Load_dat_File(TheFileName,ESDsFilled)
         CASE ('mdi ')
           ISTAT = Load_mdi_File(TheFileName,ESDsFilled)
@@ -227,6 +228,8 @@
           ISTAT = Load_raw_File(TheFileName,ESDsFilled)
         CASE ('rd  ','sd  ')
           ISTAT =  Load_rd_File(TheFileName,ESDsFilled)
+        CASE ('txt ')
+          ISTAT = Load_sci_File(TheFileName,ESDsFilled)
         CASE ('udf ')
           ISTAT = Load_udf_File(TheFileName,ESDsFilled)
         CASE ('uxd ')
@@ -1118,6 +1121,323 @@
 !
 !*****************************************************************************
 !
+      INTEGER FUNCTION Load_sci_File(TheFileName,ESDsFilled)
+!
+! This function tries to load a *.txt file (Scintag ASCII powder pattern format).
+!
+! Note that this function should only be called from DiffractionFileLoad
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+!
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data)
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      LOGICAL,       INTENT (  OUT) :: ESDsFilled
+! Comment on ESDsFilled for this file format:
+!
+! This is not a very well documented format, and the file never contains the
+! number of seconds counted for. It does sometimes contain a column with the number
+! of seconds counted for at that data point, but it is unclear if this is supposed to be
+! constant throughout the file (in which case the column is superfluous).
+! Therefore, all counts are always transformed to "counts per second".
+! (This should be in the documentation!)
+! As a result, the ESD must always be either read in or calculated per line.
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
+      CHARACTER*255 Cline, tString, tSubString
+      INTEGER       I, NumOfBins, hFile, tLen
+      LOGICAL       ReadWarning
+      INTEGER, EXTERNAL :: GetNumOfColumns, StrFind
+      REAL, EXTERNAL :: WavelengthOf
+      REAL          Lambda1
+      REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
+      LOGICAL       IsCPS, ContainsESDs, ContainsAngles, Contains2ThetaInfo, CountsLineFound
+      INTEGER       iCase
+      REAL          cps
+
+!C An example:
+!
+!Filename:
+!	E:\CSR\CSR 64 Limonite Montmorillonite Synthetix materials\montmorillonite.raw
+!
+!File ID:
+!	Uni Aless
+!
+!File Created:
+!	February 06, 2002 - 05:31 AM
+!
+!Comment:
+!	45 kV, 40 mA
+!
+!Scan Type: Normal
+!Start Angle: 1.9 deg.
+!Stop Angle: 69.94 deg.
+!Num Points: 2269
+!Step Size: 0.03 deg.
+!Datafile Res: 2000 
+!Scan Rate: 0.200000
+!Scan Mode: Continuous
+!Wavelength: 1.540562
+!
+!Diffractometer Optics:
+!		Detector:
+!			 Type: Fixed Slits
+!		Tube: 
+!			 Type: Fixed Slits
+!
+!
+!Axis[0]
+!	 Selected   : no 
+!	 Iterative  : no 
+!	 Start Angle: 0.000000 
+!	 Stop Angle : 0.000000 
+!	 Step Size  : 0.000000 
+!	 Oscillating: no 
+!
+!Axis[1]
+!	 Selected   : no 
+!	 Iterative  : no 
+!	 Start Angle: 0.000000 
+!	 Stop Angle : 0.000000 
+!	 Step Size  : 0.000000 
+!	 Oscillating: no 
+!
+!<SNIP>
+!
+!Axis[9]
+!	 Selected   : no 
+!	 Iterative  : no 
+!	 Start Angle: 0.000000 
+!	 Stop Angle : 0.000000 
+!	 Step Size  : 0.000000 
+!	 Oscillating: no 
+!
+!
+!
+!
+!    Deg.        Counts        Time           ESD
+!
+!Range 0
+!   1.900         52908        9000       230.017
+!   1.930         51444        9000       226.813
+!   1.960         50374        9000       224.442
+!
+!<SNIP>
+!
+!  69.880          1366        9000        36.959
+!  69.910          1485        9000        38.536
+!  69.940          1440        9000        37.947
+!
+!C
+!C Or:
+!C
+!
+!    Deg.           CPS         ESD
+!
+!Range 0
+!   1.900       5878.67        25.557
+!   1.930       5716.00        25.201
+!   1.960       5597.11        24.938
+!
+!<SNIP>
+!
+!  69.880        151.78         4.107
+!  69.910        165.00         4.282
+!  69.940        160.00         4.216
+!
+
+! Initialise to failure
+      Load_sci_File = 0
+      TwoThetaStart = -1.0
+      TwoThetaEnd   = -1.0
+      TwoThetaStep  = -1.0
+      Lambda1       = WavelengthOf('Cu')
+      NumOfBins     = -1
+      ReadWarning   = .FALSE.
+      CountsLineFound = .FALSE.
+      iCase = 0
+      cps = 1.0
+      hFile = 10
+      OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
+    9 READ(hFile,FMT='(A)',ERR=999,END=999) tString
+      CALL StrUpperCase(tString)
+      IF (tString(1:11) .EQ. 'WAVELENGTH:') THEN
+! Extract wavelength
+        CALL StrClean(tString,tLen)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        READ (tSubString,*,ERR=999) Lambda1
+      ENDIF
+      IF (tString(1:12) .EQ. 'START ANGLE:') THEN
+! Extract starting 2 theta angle
+        CALL StrClean(tString,tLen)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        READ (tSubString,*,ERR=999) TwoThetaStart
+      ENDIF
+      IF (tString(1:11) .EQ. 'STOP ANGLE:') THEN
+! Extract ending 2 theta angle
+        CALL StrClean(tString,tLen)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        READ (tSubString,*,ERR=999) TwoThetaEnd
+      ENDIF
+      IF (tString(1:11) .EQ. 'NUM POINTS:') THEN
+! Extract number of data points
+        CALL StrClean(tString,tLen)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        READ (tSubString,*,ERR=999) NumOfBins
+      ENDIF
+      IF (tString(1:10) .EQ. 'STEP SIZE:') THEN
+! Extract 2 theta angle step size
+        CALL StrClean(tString,tLen)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        READ (tSubString,*,ERR=999) TwoThetaStep
+      ENDIF
+! Detect start of data
+      IF (tString(1:5) .EQ. 'RANGE') GOTO 11
+      CALL StrClean(tString,tLen)
+      IF ((StrFind(tString,tLen,'CPS',3)    .NE. 0) .OR.  &
+          (StrFind(tString,tLen,'COUNTS',6) .NE. 0)) THEN
+        IsCPS = (StrFind(tString,tLen,'CPS',3) .NE. 0)
+        CountsLineFound = .TRUE.
+        ContainsAngles = (StrFind(tString,tLen,'DEG.',4) .NE. 0)
+        ContainsESDs = (StrFind(tString,tLen,'ESD',3) .NE. 0)
+        IF (IsCPS .AND. (.NOT. ContainsESDs)) THEN
+          CALL ErrorMessage('This file does not contain enough information'//CHAR(13)// &
+                            'to estimate the standard deviations.'//CHAR(13)//CHAR(13)// &
+                            'Please re-generate this file, either:'//CHAR(13)// &
+                            'with "Includes" | "ESD" ticked, and/or'//CHAR(13)// &
+                            'with "Units" set to "Counts" rather than "CPS"')
+          RETURN
+        ENDIF
+        IF (ContainsAngles) iCase = iCase + 1
+        IF (.NOT. IsCPS)    iCase = iCase + 2
+        IF (ContainsESDs)   iCase = iCase + 4
+      ENDIF
+      GOTO 9
+   11 CONTINUE
+! Determine where to get the 2 theta info from: from the header or from the count data
+      IF (.NOT. CountsLineFound) THEN
+! Problem: we don't know what to read.
+        CALL ErrorMessage('No header info for columns.')
+        RETURN
+      ENDIF
+      Contains2ThetaInfo = (TwoThetaStart .GT. 0.0 .AND.   &
+                            TwoThetaStep  .GT. 0.0 .AND.   &
+                            TwoThetaEnd   .GT. 0.0)
+      IF ((.NOT. ContainsAngles) .AND. (.NOT. Contains2ThetaInfo)) THEN
+        CALL ErrorMessage('No 2 theta information.')
+        RETURN
+      ENDIF
+! Check consistency # of points vs. 2 theta info
+      IF ((NumOfBins .GT. 0) .AND. Contains2ThetaInfo) THEN
+        IF (NumOfBins .NE. 1+NINT((TwoThetaEnd-TwoThetaStart)/TwoThetaStep)) THEN
+          CALL ErrorMessage('2 theta information and number of data points not consistent.')
+          RETURN
+        ENDIF
+      ENDIF
+! Fill the 2theta values first
+      CurrTwoTheta = TwoThetaStart
+      DO I = 1, NumOfBins
+        XOBS(I) = CurrTwoTheta
+        CurrTwoTheta = CurrTwoTheta + TwoThetaStep
+      ENDDO
+      I = 1
+   10 READ(UNIT=hFile,FMT='(A)',ERR=999,END=100) Cline
+      SELECT CASE (iCase)
+        CASE (2) ! Counts, time
+          READ(Cline,*,ERR=999,END=100) YOBS(I), cps
+        CASE (3) ! Angle, Counts, time
+          READ(Cline,*,ERR=999,END=100) XOBS(I), YOBS(I), cps
+        CASE (4) ! CPS, ESD
+          READ(Cline,*,ERR=999,END=100) YOBS(I), EOBS(I)
+        CASE (5) ! Angle, CPS, ESD
+          READ(Cline,*,ERR=999,END=100) XOBS(I), YOBS(I), EOBS(I)
+        CASE (6) ! Counts, time, ESD
+          READ(Cline,*,ERR=999,END=100) YOBS(I), cps, EOBS(I)
+        CASE (7) ! Angle, Counts, time, ESD
+          READ(Cline,*,ERR=999,END=100) XOBS(I), YOBS(I), cps, EOBS(I)
+        CASE DEFAULT
+          CALL ErrorMessage('Programming error in Load_sci_File()')
+          RETURN
+      END SELECT
+      IF (cps .LT. 1) GOTO 10
+      IF (.NOT. IsCPS) THEN
+        cps = cps / 1000.0
+        IF (.NOT. ContainsESDs) EOBS(I) = SQRT(YOBS(I))
+        YOBS(I) = YOBS(I) / cps
+        EOBS(I) = EOBS(I) / cps
+      ENDIF
+! Skip negative 2-theta data and negative intensities
+      IF (XOBS(I) .LE. 0.0) GOTO 10
+      IF (YOBS(I) .LT. 0.0) GOTO 10
+      IF (I .GT. 1) THEN
+        IF (ABS(XOBS(I) - XOBS(I-1)) .LT. 0.0000001) THEN
+          IF (.NOT. ReadWarning) THEN
+            ReadWarning = .TRUE.
+            CALL WarningMessage("The data file contains multiple observations for the same 2-theta."//CHAR(13)// &
+                                "Only one observation will be used.")
+          ENDIF
+          GOTO 10
+        ENDIF
+      ENDIF
+      I = I + 1
+! JCC Only read in a maximum of MOBS points
+      IF (I .GT. MOBS) THEN
+        CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+        GOTO 100
+      ENDIF
+      GOTO 10
+ 100  NOBS = I - 1
+      IF (NumOfBins .NE. -1) THEN
+        IF (NOBS .LT. NumOfBins) CALL WarningMessage('File contained less data points than expected.'//CHAR(13)// &
+                                                     'Will continue with points actually read only.')
+        IF (NOBS .GT. NumOfBins) THEN
+          CALL WarningMessage('File contained more data points than expected.'//CHAR(13)// &
+                              'Excess points will be ignored.')
+          NOBS = NumOfBins
+        ENDIF
+      ENDIF
+      ESDsFilled = .TRUE.
+! JvdS Added check for number of observations = 0
+      IF (NOBS .EQ. 0) THEN
+        CALL ErrorMessage("The file contains no valid data.")
+        GOTO 999
+      ENDIF
+! This is definitely laboratory data
+      JRadOption = 1
+      CALL Upload_Source
+      CALL Set_Wavelength(Lambda1)
+      Load_sci_File = 1
+ 999  CLOSE(hFile)
+
+      END FUNCTION Load_sci_File
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION Load_udf_File(TheFileName,ESDsFilled)
 !
 ! This function tries to load a *.udf file (ASCII format from Philips machines).
@@ -1743,7 +2063,7 @@
 !
       INTEGER FUNCTION Load_x01_File(TheFileName,ESDsFilled)
 !
-! This function tries to load a *.xnn [nn = 01, 02 etc] file (Bede ASCII powder pattern format).
+! This function tries to load a *.x01 file (Bede ASCII powder pattern format).
 !
 ! Note that this function should only be called from DiffractionFileLoad
 !
@@ -1855,7 +2175,7 @@
         CALL GetSubString(tString,' ',tSubString)
         CALL GetSubString(tString,' ',tSubString)
         CALL GetSubString(tString,' ',tSubString)
-        READ (tSubString,*) NumOfBins
+        READ (tSubString,*,ERR=999) NumOfBins
         NumOfBins = NumOfBins + 1 ! Don't ask me why
         CALL GetSubString(tString,' ',tSubString)
         CALL GetSubString(tString,' ',tSubString)
