@@ -55,10 +55,15 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
-      INTEGER    mpdbops
-      PARAMETER (mpdbops=192)
-      CHARACTER*20 cpdbops(mpdbops)
-      COMMON /pdbops/ npdbops, cpdbops
+      INTEGER     mpdbops
+      PARAMETER ( mpdbops = 192 )
+
+      INTEGER         npdbops
+      CHARACTER*20             cpdbops
+      COMMON /pdbops/ npdbops, cpdbops(mpdbops)
+
+      INTEGER              iMyExit, num_new_min
+      COMMON / CMN000001 / iMyExit, num_new_min
 
       REAL qvals(4), qnrm
 ! Use standard PDB orthogonalisation
@@ -68,7 +73,7 @@
       INTEGER ipcount
       LOGICAL, EXTERNAL :: SaveCSSR, SaveCCL
       INTEGER hFileCSSR, hFilePDB, hFileCCL, hFileCIF
-      INTEGER I, J, II, K, npdbops, iiact, iTotal, iFrg, iFrgCopy, IJ, iOrig
+      INTEGER I, J, II, K, iiact, iTotal, iFrg, iFrgCopy, IJ, iOrig
       REAL xc, yc, zc
       INTEGER TotNumBonds, NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen, iRadSelection
       CHARACTER(MaxPathLength) tFileName
@@ -82,12 +87,20 @@
       ELSE
         WRITE (TemperatureStr,"('T=',F6.2)") SNGL(T)
       ENDIF
+! When iMyExit = 5, we are going to view the structure. Just write out .pdb
+      IF (iMyExit .EQ. 5) THEN
+        tSavePDB  = .TRUE.
+        tSaveCSSR = .FALSE.
+        tSaveCCL  = .FALSE.
+        tSaveCIF  = .FALSE.
+      ELSE
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
-      tSavePDB = SavePDB
-      tSaveCSSR = SaveCSSR()
-      tSaveCCL = SaveCCL()
-      tSaveCIF = .FALSE.
+        tSavePDB  = SavePDB
+        tSaveCSSR = SaveCSSR()
+        tSaveCCL  = SaveCCL()
+        tSaveCIF  = .FALSE.
+      ENDIF
 !
 !       Output a CSSR file to fort.64
 !       Output a PDB  file to fort.65
