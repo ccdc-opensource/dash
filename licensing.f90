@@ -17,7 +17,7 @@
       DO WHILE (valid_license .LE. 0) 
         valid_license = Read_License_Valid()
         IF      (valid_license .EQ. -7) THEN
-          MessageStr = "Demo license not valid."
+          MessageStr = "Demo licence not valid."
         ELSE IF (valid_license .LE. -2) THEN
           MessageStr = "DASH problem: could not find or open the licence file"//CHAR(13)//&
             InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"License.dat."
@@ -108,7 +108,7 @@
                   ENDIF
                 ENDIF
               CASE (ID_Licence_Request)
-                CALL Write_License_Request_Form()
+                CALL Write_License_Request_Form
                 CALL WExit
             END SELECT
           CASE (CloseRequest)
