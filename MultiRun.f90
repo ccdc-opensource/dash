@@ -23,7 +23,6 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Input3)
-      SA_Run_Number = 0
       CALL WDialogGetInteger(IDF_SA_MaxRepeats,MaxRuns)
       CALL WDialogGetReal(IDF_MaxMoves1,MaxMoves1)
       IF (MaxMoves1 .LT.   0.001) MaxMoves1 =   0.001
