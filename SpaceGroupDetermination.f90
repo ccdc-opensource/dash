@@ -1,6 +1,5 @@
       
       SUBROUTINE SpaceGroupDeterminationCode(LatBrav, PawleyChiSqd)
-      USE DRUID_HEADER
       USE VARIABLES
       USE WINTERACTER
       
@@ -138,7 +137,6 @@
 !*********************************************************************************
      SUBROUTINE SpaceGroupFileDialog 
      
-     USE DRUID_HEADER
      USE VARIABLES
      USE WINTERACTER
      

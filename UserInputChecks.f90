@@ -135,7 +135,6 @@
       SUBROUTINE CheckUnitCellConsistency
 
       USE WINTERACTER
-      USE DRUID_HEADER
 
       IMPLICIT NONE
 

@@ -1169,7 +1169,6 @@
 !!April2002 Added Zoom functionality.  Still needs a bit of tidying....
       
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
