@@ -669,12 +669,12 @@
                 DO i = 1, natoms(iFrg)
                   iiact = iiact + 1
                   iAtom = iAtom + 1
-                  xc = XAtmCoords(1,OrderedAtm(iAtom),iSol) * f2cpdb(1,1) + &
-                       XAtmCoords(2,OrderedAtm(iAtom),iSol) * f2cpdb(1,2) + &
-                       XAtmCoords(3,OrderedAtm(iAtom),iSol) * f2cpdb(1,3)
-                  yc = XAtmCoords(2,OrderedAtm(iAtom),iSol) * f2cpdb(2,2) + &
-                       XAtmCoords(3,OrderedAtm(iAtom),iSol) * f2cpdb(2,3)
-                  zc = XAtmCoords(3,OrderedAtm(iAtom),iSol) * f2cpdb(3,3)
+                  xc = XAtmCoords(1,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(1,1) + &
+                       XAtmCoords(2,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(1,2) + &
+                       XAtmCoords(3,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(1,3)
+                  yc = XAtmCoords(2,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(2,2) + &
+                       XAtmCoords(3,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(2,3)
+                  zc = XAtmCoords(3,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(3,3)
 ! Note that elements are right-justified
                   IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
                     IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
