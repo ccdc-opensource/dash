@@ -338,18 +338,20 @@
       KK = 0
       DO iR = 1, MFCSTO
         READ(hFile,'(Q,A)',END=100,ERR=999) NLIN, LINE
-!.. No cross correlation ...
+!C SHELX .hkl files are terminated by a line containing h = k = l = 0
+        READ(LINE(1:NLIN),*,END=999,ERR=999) (jHKL(I,iR),I=1,3)
+        IF ((jHKL(1,iR) .EQ. 0) .AND. &
+            (jHKL(2,iR) .EQ. 0) .AND. &
+            (jHKL(3,iR) .EQ. 0)) GOTO 100
+!C No cross correlation ...
         READ(LINE(1:NLIN),*,END=999,ERR=999) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
-!.. F2 and sig(F2)
+!C F2 and sig(F2)
         WTJ(iR) = 1.0 / WTJ(iR)
         KK = iR
       ENDDO
   100 NumOfRef = KK
-!O      WRITE(76,*) ' Number of reflections ',NumOfRef
-!
-!.. We've got the lattice constants, symmetry etc. already.
-!
-!.. Let's order the reflections in increasing 2 theta and fill the array ArgKK
+!C We've got the lattice constants, symmetry etc. already.
+!C Let's order the reflections in increasing 2 theta and fill the array ArgKK
       CALL OrderReflections
 
       DO iR = 1, NumOfRef
@@ -364,11 +366,7 @@
         WTIJ(iR) = WTI(iR) * WTI(iR)
       ENDDO
       CLOSE(hFile)
-!O      WRITE(76,*) ' Number of reflections ', NumOfRef
-!O      DO iR = 1, NumOfRef
-!O        WRITE(76,*) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR)
-!O      ENDDO
-!.. Now synthesise a simple diffraction pattern at 1 Angstrom
+!C Now synthesise a simple diffraction pattern at 1 Angstrom
       NBIN = 5000
       ARGIMIN = RefArgK(1)-1.0
       ARGIMAX = RefArgK(NumOfRef)+1.0
@@ -376,8 +374,6 @@
       SIGMA = 3.0 * ARGISTP
       ADSIG = 0.39894/SIGMA
       ISIG5 = 15
-!O      WRITE(76,*) ' min/max argkk ',argkk(1),argkk(NumOfRef)
-!O      WRITE(76,*) ' 2 theta range ',ARGIMIN,ARGIMAX,ARGISTP,SIGMA,ISIG5
       DO I = 1, NBIN
         KXIMIN(I) = 0
       ENDDO
@@ -385,7 +381,6 @@
         IArgKK = 1 + (RefArgK(K)-ARGIMIN)/ARGISTP
         IXKMIN(K) = IArgKK - ISIG5
         IXKMAX(K) = IArgKK + ISIG5
-!O        WRITE(76,*) K, ArgKK(K), IArgKK, IXKMIN(K), IXKMAX(K)
         DO I = IXKMIN(K), IXKMAX(K)
           IF (KXIMIN(I) .EQ. 0) KXIMIN(I) = K
           KXIMAX(I) = K
@@ -399,7 +394,7 @@
         YBBIN(I) = 0.0
         EBIN(I)  = 0.0
         IF (KXIMIN(I) .EQ. 0) THEN
-!.. No peaks at this point
+!C No peaks at this point
           EBIN(I) = 1.0
           WTSA(I) = 1.0
           KREFT(I) = 0
@@ -419,7 +414,6 @@
           WTSA(I) = 1.0 / EBIN(I)**2
         ENDIF
       ENDDO
-
 !C Write out a fake .pik file
       OPEN(UNIT=hFile,FILE='polyp.pik',STATUS='UNKNOWN',ERR=999)
       DO I = 1, NBIN
@@ -431,21 +425,12 @@
       ENDDO
       CLOSE(hFile)
 !C Write out a fake .hcv file
-!        READ(LINE(1:NLIN),*,END=999,ERR=999) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
       OPEN(UNIT=hFile,FILE='polyp.hcv',STATUS='UNKNOWN',ERR=999)
       DO iR = 1, NumOfRef
         WRITE(hFile,*) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), iR
       ENDDO
       CLOSE(hFile)
-!C Write out a fake .hkl file
-! For powders, this is used for space group determination only
-!        READ(LINE(1:NLIN),*,END=999,ERR=999) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
-  !O    OPEN(UNIT=hFile,FILE='polyp.hcv',STATUS='UNKNOWN',ERR=999)
-  !O    DO iR = 1, NumOfRef
-  !O      WRITE(hFile,*) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), iR
-  !O    ENDDO
-  !O    CLOSE(hFile)
-
+!C No need to write out a fake .hkl file: the .hkl file is used for space group determination only.
       CALL Clear_BackGround
       NoData = .FALSE.
       CALL Set_Wavelength(1.0)
