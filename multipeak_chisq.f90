@@ -47,8 +47,7 @@
 
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
-      INTEGER                                                                ICODEZ
-      REAL                                                                                 KOBZ
+      INTEGER                                                                ICODEZ,       KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       REAL            ZCAL
@@ -72,10 +71,34 @@
       LOGICAL         LERANL
       COMMON /PKCOM3/ LERANL
 
+!F      REAL              XPF_Range
+!F      LOGICAL                                       RangeFitYN
+!F      INTEGER           IPF_Lo,                     IPF_Hi
+!F      INTEGER           NumPeakFitRange,            CurrentRange
+!F      INTEGER           IPF_Range
+!F      INTEGER           NumInPFR
+!F      REAL              XPF_Pos,                    YPF_Pos
+!F      INTEGER           IPF_RPt
+!F      REAL              XPeakFit,                   YPeakFit
+!F      REAL              PF_FWHM
+!F      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+!F                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+!F                        NumPeakFitRange,            CurrentRange,                &
+!F                        IPF_Range(MAX_NPFR),                                     &
+!F                        NumInPFR(MAX_NPFR),                                      & 
+!F                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+!F                        IPF_RPt(MAX_NPFR),                                       &
+!F                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+!F                        PF_FWHM(MAX_NPFR)
+
       INTEGER I, II, III, JJ, JARGI, KK, IV, NPEAK2, IARGI
       REAL    DTARG, CCHI, TARGI, YBACK, POFF, CHIADD, PTEM
       REAL    C3FN(3)
 
+!F      IPF_RPt(1) = 0
+!F      DO II = 1, NumPeakFitRange
+!F        IPF_RPt(II+1) = IPF_RPt(II) + IPF_Range(II)
+!F      ENDDO
 ! Profile refinement stage:
 ! Single peak-fitting code
       DO I = 1, NPEAK
@@ -122,8 +145,16 @@
           ZCAL(II) = ZCAL(II) + AREA(JJ)*YNORM
         ENDDO
         CHIADD = (ZOBS(II)-ZCAL(II))/ZDOBS(II)
+!F        YPeakFit(IPF_RPt(CurrentRange) + II) = ZCAL(II)
         CCHI = CCHI + CHIADD*CHIADD
       ENDDO  !  II LOOP
+!F      DO I = 1, NPTS
+!F        II = IPF_RPt(CurrentRange) + I
+!F        XPeakFit(II) = ZARGI(I)
+!F        YPeakFit(II) = ZCAL(I)
+!F      ENDDO
+!F      RangeFitYN(CurrentRange) = .TRUE.
+!F      CALL Plot_PeakFit_Info
 ! Penalise against any negative peak widths
       IF (.NOT.LERANL) THEN
         DO IV = 1, NPKGEN(1,1)
@@ -182,8 +213,7 @@
 
       INTEGER         NPTS
       REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
-      INTEGER                                                                ICODEZ
-      REAL                                                                                 KOBZ
+      INTEGER                                                                ICODEZ,       KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       REAL            ZXDELT
@@ -238,9 +268,13 @@
 !C 19B
 !H
 !
-      INCLUDE 'PARAMS.INC'
+      IMPLICIT NONE
 
-      COMPLEX CFFT, CFF
+      INTEGER, INTENT (IN   ) :: MNS
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'REFLNS.INC'
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
@@ -271,19 +305,22 @@
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
                       NBASF4(MPRPKF,2,9), L4END(9)
 
+      REAL              PKCONV
       COMMON /WWPRSAVZ/ PKCONV(2048,9)
 
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
 
-      INCLUDE 'REFLNS.INC'
-
-      DIMENSION CFFT(8), FR(2048,8), FI(2048,8), FRT(2048), FIT(2048)
-
       LOGICAL         LERANL
       COMMON /PKCOM3/ LERANL
 
       LOGICAL NEAR90
+      REAL SIG, GAM, HPS, HMS, DENTEM, C2TEM, CTEM, GTEM, CLTEM, TANRA, DENASY, BET1, BET2, BETM, BETP2
+      REAL BETP, BETM2, BETPI, BETPK, ARG, AFII, SII, VAL, SVAL, ARGP1, ARGM1, FRCP, FRSP, FRCM, FRSM
+      REAL SINP, SINM, COSP, COSM, XTEM
+      INTEGER MN2, MN2M1, MN2P1, I, II, J, INV
+      REAL  FR(2048,8), FI(2048,8), FRT(2048), FIT(2048)
+      COMPLEX CFFT(8), CFF
 
       IF (LERANL) THEN
         SIG = ABS(PKFNVA(1))
@@ -297,18 +334,18 @@
         HMS = PKFNVA(4)
       ENDIF
       DENTEM = (FLOAT(MNS)*ZXDEL(KNOW))
-      C2TEM = PI/DENTEM
-      CTEM = 2.*C2TEM
-      GTEM = CTEM*SIG
-      CLTEM = C2TEM*GAM
+      C2TEM  = PI / DENTEM
+      CTEM   = 2.0 * C2TEM
+      GTEM   = CTEM * SIG   ! Gaussian
+      CLTEM  = C2TEM * GAM  ! Lorentzian
 ! TO DEAL WITH (A) 90 DEGREES AND (B) ABOVE ALL WE WILL DO IS
 ! (A) SET FR(I,3)=1 AND ALL ELSE TO ZERO AND
 ! (B) SWITCH THE SIGN OF THE IMAGINARY COMPONENTS
-      NEAR90 = (ABS(ARGK-90.).LT.2.0)
+      NEAR90 = (ABS(ARGK-90.0).LT.2.0)
       IF (.NOT. NEAR90) THEN
         TANRA = ABS(TAN(RAD*ARGK))
         DENASY = 0.5*(HPS-HMS)*(HPS+HMS)
-! BET1 AND NETPI CHANGE SIGN AT 90 DEGREES
+! BET1 AND BETPI CHANGE SIGN AT 90 DEGREES
 ! BET2, BETP, BETM, BETP2 AND BETM2 DO NOT
         BET1 = 0.5*RAD*DENTEM*TANRA
         BET2 = SQRT(BET1)
@@ -326,16 +363,17 @@
 ! GAUSSIAN
         ARG = GTEM*FLOAT(II)
         FR(I,1) = EXP(-0.5*ARG*ARG)
-        FI(I,1) = 0.
+        FI(I,1) = 0.0
 ! LORENTZIAN
         AFII = ABS(FLOAT(II))
-        ARG = MAX(0.,CLTEM*AFII)
+!F        ARG = CLTEM*AFII
+        ARG = MAX(0.0,CLTEM*AFII)
         FR(I,2) = EXP(-ARG)
-        FI(I,2) = 0.
+        FI(I,2) = 0.0
 ! ASYMMETRY FUNCTION FOR UMBRELLA EFFECT
         IF (II.EQ.0 .OR. NEAR90) THEN
-          FR(I,3) = 1.
-          FI(I,3) = 0.
+          FR(I,3) = 1.0
+          FI(I,3) = 0.0
         ELSE
           SII = SQRT(AFII)
           VAL = FLOAT(II)
@@ -355,9 +393,9 @@
           COSM = COS(BETM2*VAL)
 ! BET1 AND BETPI CHANGE SIGN AT 90 DEGREES
 ! BET2, BETP, BETM, BETP2 AND BETM2 DO NOT
-          FR(I,3) = ((HPS*FRCP-HMS*FRCM)-BETPK*(SINP-SINM))/DENASY
+          FR(I,3) =  ((HPS*FRCP-HMS*FRCM)-BETPK*(SINP-SINM))/DENASY
           FI(I,3) = -((HPS*FRSP-HMS*FRSM)+BETPK*(COSP-COSM))/DENASY
-          IF (ARGK.GT.90.) THEN
+          IF (ARGK .GT. 90.0) THEN
             FI(I,3) = -FI(I,3)
           ENDIF
         ENDIF
