@@ -1,12 +1,14 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE WriteSAParametersToFile
+      SUBROUTINE WriteSAParametersToFile(TheFileName)
 
       USE WINTERACTER
       USE DRUID_HEADER
       
       IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
 
@@ -33,7 +35,7 @@
 
       CALL PushActiveWindowID
       tFileHandle = 10
-      OPEN(tFileHandle,FILE='SA_PARAMS.TXT',ERR=999)
+      OPEN(tFileHandle,FILE=TheFileName,ERR=999)
       WRITE(tFileHandle,'("  Parameters for simulated annealing in DASH")',ERR=999)
       CALL WDialogSelect(IDD_SA_input2)
       kk = 0
@@ -41,7 +43,7 @@
         IF (gotzmfile(ifrg)) THEN
 ! Write the name of the file
           ilen = LEN_TRIM(frag_file(ifrg))
-          WRITE(tFileHandle,*,ERR=999) '  Z-matrix '//frag_file(ifrg)(1:ilen)
+          WRITE(tFileHandle,'(A)',ERR=999) '  Z-matrix '//frag_file(ifrg)(1:ilen)
           DO ii = 1, izmpar(ifrg)
             kk = kk + 1
             ilen = LEN_TRIM(czmpar(ii,ifrg))
@@ -133,8 +135,7 @@
       COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
 
       INTEGER I
-      CHARACTER*17 temp_file
-      DATA temp_file /'Temp_Zmatrix.mol2'/
+      CHARACTER*85 temp_file
       CHARACTER*2  AtmElement(1:MAXATM_2)
 
       REAL*8 CART(MAXATM,3)
@@ -145,6 +146,7 @@
       INTEGER atom
       INTEGER Element
       INTEGER NumOfFlexTorsions
+      INTEGER tLength
 
       natcry = NATOMS(ifrg)
       CALL MAKEXYZ(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),      &
@@ -159,15 +161,13 @@
         atomlabel(I) = OriginalLabel(I,ifrg)
       ENDDO
       CALL AssignCSDElement(AtmElement)
+! Calculate bonds and assign bond types.
+      CALL SAMABO
 ! Q & D to display flexible torsion angles in different colors by forcing different
-! element type. SAMABO, which calcualtes the bond types, uses aelem, which are the original
-! elements.
-! WriteMol2 uses aelem_2, which we fill with an element reflecting the state of the torsion angle.
-! Slightly dirty, the routines are now no longer standalone.
-      aelem_2 = aelem
+! element types.
       IF (ColourFlexibleTorsions() .AND. (natcry.GE.4)) THEN
         DO I = 1, natcry
-          aelem_2(I) = 1     ! Carbon        Grey
+          aelem(I) = 1       ! Carbon        Grey
         ENDDO
         NumOfFlexTorsions = 0
         DO atom = 4, natcry
@@ -191,15 +191,18 @@
               CASE (8)
                 Element = 66 ! Phosphorus
             END SELECT
-            aelem_2(atom) = Element
-            aelem_2(IZ1(atom,ifrg)) = Element
-            aelem_2(IZ2(atom,ifrg)) = Element
-            aelem_2(IZ3(atom,ifrg)) = Element
+            aelem(atom) = Element
+            aelem(IZ1(atom,ifrg)) = Element
+            aelem(IZ2(atom,ifrg)) = Element
+            aelem(IZ3(atom,ifrg)) = Element
           ENDIF
         ENDDO
       ENDIF
+      tLength = LEN_TRIM(frag_file(ifrg))
+      temp_file = frag_file(ifrg)(1:tLength-8)//'_temp.mol2'
 ! Show the mol2 file
       IF (WriteMol2(temp_file) .EQ. 1) CALL ViewStructure(temp_file)
+      CALL IOSDeleteFile(temp_file)
 ! Show the z-matrix file in an editor window
       CALL WindowOpenChild(IHANDLE)
       CALL WEditFile(frag_file(ifrg),Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
@@ -214,7 +217,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-! JCC Add in checking: only use z-matrices that the user has selected!
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
@@ -298,7 +300,7 @@
                 ELSE 
                   lb(kk) = x(kk) - 180.0
                   ub(kk) = x(kk) + 180.0
-                END IF              
+                ENDIF              
                 vm(kk) = 10.0
               CASE (4) !.. angle
                 lb(kk) = x(kk) - 10.0
@@ -564,7 +566,7 @@
           READ (145,'(A)',ERR=20,END=20) F
           ZmFiles(Ilen:512) = CHAR(13)//F(1:LEN_TRIM(F))
           Ilen = LEN_TRIM(ZmFiles) + 1
-        END DO
+        ENDDO
  20     CONTINUE
         CALL WMessageBox(OKOnly, InformationICon, CommonOk, &
                          "Generated the following zmatrices successfully:"//CHAR(13)//&
@@ -573,7 +575,7 @@
                          "in the SA setup window",&
                          "Generation Successful")
         CLOSE(145)
-      END IF
+      ENDIF
 
       END SUBROUTINE ImportZmatrix
 !
