@@ -32,7 +32,7 @@
       INTEGER I, J, NumCol
       INTEGER GetNumOfColumns ! Function
       CHARACTER*1 ChrLowerCase, ChrUpperCase ! Functions
-      INTEGER item, II, izm, IKK, nlin, natof
+      INTEGER II, izm, IKK, nlin, natof
       INTEGER AsymLen, IDlen
       CHARACTER*3 tIDstr
       REAL*8 CART(1:3,1:MAXATM)
@@ -56,10 +56,9 @@
 ! IAT = 0        : use centre of mass
 ! IAT = non-zero : use atom nr. IAT   (necessary if atom on special position).
 !  59   0
-      READ (19,*,ERR=999,IOSTAT=ErrorStatus) natof, item
+      READ (19,*,ERR=999,IOSTAT=ErrorStatus) natof, icomflg(iFrg)
       natoms(iFrg) = natof
-      icomflg(iFrg) = item
-      izmpar(ifrg) = 7 ! always reserve 4 parameters for rotations, whether quaternion or single axis
+      izmpar(iFrg) = 7 ! always reserve 4 parameters for rotations, whether quaternion or single axis
       czmpar(1,iFrg) = ' x(frag )'
       czmpar(2,iFrg) = ' y(frag )'
       czmpar(3,iFrg) = ' z(frag )'
@@ -109,11 +108,11 @@
      &        ioptt(i,iFrg), iz1(i,iFrg), iz2(i,iFrg), iz3(i,iFrg),   &
      &        tiso(i,iFrg), occ(i,iFrg)
 ! Adjust torsion angle to be between -180.0 and +180.0
-        DO WHILE (bet(i,ifrg) .LT. -180.0)
-          bet(i,ifrg) = bet(i,ifrg) + 360.0
+        DO WHILE (bet(i,iFrg) .LT. -180.0)
+          bet(i,iFrg) = bet(i,iFrg) + 360.0
         ENDDO
-        DO WHILE (bet(i,ifrg) .GT.  180.0)
-          bet(i,ifrg) = bet(i,ifrg) - 360.0
+        DO WHILE (bet(i,iFrg) .GT.  180.0)
+          bet(i,iFrg) = bet(i,iFrg) - 360.0
         ENDDO
 ! Remove what we have just read from the string
         DO J = 1, 11
@@ -123,7 +122,7 @@
 ! How many columns do we have left?
         NumCol = GetNumOfColumns(Line)
         IF (NumCol .EQ. 0) THEN
-          izmoid(i,ifrg) = i
+          izmoid(i,iFrg) = i
         ELSE
           READ (line(1:nlin),*,IOSTAT=ErrorStatus) izmoid(i,iFrg)
         ENDIF
@@ -203,7 +202,7 @@
         axyzo(I,1) = SNGL(CART(1,I))
         axyzo(I,2) = SNGL(CART(2,I))
         axyzo(I,3) = SNGL(CART(3,I))
-        AtmElement(I)(1:2) = asym(I,ifrg)(1:2)
+        AtmElement(I)(1:2) = asym(I,iFrg)(1:2)
       ENDDO
       CALL AssignCSDElement(AtmElement)
 ! Calculate bonds and assign bond types.
