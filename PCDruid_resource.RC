@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 28/Sep/2001 10:00:11
+// Modified : 28/Sep/2001 15:33:38
 //
 ///////////////////////////////////////////////////
 //
@@ -489,6 +489,8 @@
 #define IDF_eps                          1172
 #define IDF_LABEL16                      1207
 #define IDF_Indexing_ScaleFactor         1208
+#define IDD_DV_Results                    133
+#define IDF_DV_Summary                   1244
 
 ///////////////////////////////////////////////////
 //
@@ -2353,6 +2355,31 @@ BEGIN
 " 1100     0.10000E-002      20.000      \n"
 "[Trackbars] \n"
 "[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_DV_Results DIALOG 0, 0,  470,  161
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Solutions from DICVOL"
+BEGIN
+    CONTROL "",IDF_DV_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   19,   44,  433,   79
+    CONTROL "DICVOL completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  137,   12,  200,   12
+    CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  217,  136,   40,   14
+    CONTROL "Import one into DASH by pressing 'Import' or press Cancel.",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  147,   25,  180,   13
+END
+
+IDD_DV_Results RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+" 1244    11     30   146 \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
