@@ -103,6 +103,7 @@
 ! results from simulated annealing run.  Handles messages from the window.
 ! Grid includes a "view" button which allows the user to view the molecular
 ! model via Mercury and the profile data in a graph window
+!!April2002 Added Zoom functionality.  Still needs a bit of tidying....
       
       USE WINTERACTER
       USE DRUID_HEADER
@@ -115,19 +116,180 @@
 ! Required to handle the profile graphs plotted in child windows
       INTEGER  SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
+      INTEGER Ihandle
+!      LOGICAL MseBtnPressed, OldEventWaiting
+! The routines that act on the mousebutton presses are non-reentrant
+! and the one should not be called when the other is active, so we must keep a flag if we are dealing
+! with a mouse button press. 
+!      COMMON /Events/ MseBtnPressed, OldEventWaiting
+
 
       SELECT CASE (EventType)
-! Will close the profile plot window
+
         CASE (CloseRequest)
           CALL WindowCloseChild(EventInfo%win)
           SAUsedChildWindows(EventInfo%win) = 0
           CALL UnRegisterChildWindow(EventInfo%win)
-! Exposing or resizing of profile plot windows - will replot
+
         CASE (expose, resize)
           CALL plot_pro_file(EventInfo%win)
+
+        CASE (MouseButDown)
+!!           IF (MseBtnPressed) GOTO 10
+           IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
+!!              MseBtnPressed = .TRUE.
+              CALL plot_pro_file(EventInfo%win)
+              Ihandle = EventInfo%win
+              CALL PlotZoom(Ihandle)
+!!              MseBtnPressed = .FALSE.
+           ENDIF
+!!10         CONTINUE
+
+        CASE (KeyDown) ! home key resets the plot to original axes
+           IF (EventInfo%VALUE1 .eq. KeyHome) THEN 
+             CALL ResetProfPlotAxes(EventInfo%win)
+             CALL WindowClear()
+             CALL plot_pro_file(EventInfo%win)
+           ENDIF
       END SELECT
 
       END SUBROUTINE DealWithProfilePlot
 !
 !*******************************************************************************
 !
+      SUBROUTINE PlotZoom(Ihandle)
+!
+!  Enable button up and mouse movement events
+!
+      USE WINTERACTER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Poly_Colours.inc'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
+      INTEGER ISB
+      REAL xgcurold, ygcurold
+
+      REAL, DIMENSION (20):: Ymin
+      REAL, DIMENSION (20):: Ymax
+      REAL, DIMENSION (20):: Xmax
+      REAL, DIMENSION (20):: Xmin
+      COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
+
+      INTEGER Ihandle
+      CALL WindowSelect(Ihandle)
+      CALL WMessageEnable(MouseMove, Enabled)
+      CALL WMessageEnable(MouseButUp, Enabled)
+! JCC Set the scale correctly. 
+      CALL IGrUnits(0.0, 0.0, 1.0, 1.0)
+      CALL IPgArea(0.1,0.1,0.9,0.9)
+      CALL IPgUnits(xmin(ihandle),ymin(ihandle),xmax(ihandle),ymax(ihandle))
+      xgcur(1) = EventInfo%GX
+      ygcur(1) = EventInfo%GY
+      CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
+      xgcurold = xgcur(1)
+      ygcurold = ygcur(1)
+
+!!      CALL IGrFillPattern(0,1,1)
+!!      CALL IGrPlotMode('EOR')
+!!      CALL IGrColourN(KolNumRectSelect)
+!!      ! Draw new 
+!!      CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+!!      CALL IGrPlotMode('Normal')
+!!      CALL IGrColourN(InfoGrScreen(PrevColReq))
+      DO WHILE (.TRUE.)
+!Can't use PeekEvent since the following events aren't handled for ChildWindows
+         CALL WMessagePeek(EventType, EventInfo)
+         IF (EventType .ne. (-1)) THEN
+           IF (EventInfo%WIN .GT. 0) THEN
+           CALL WindowSelect(Ihandle)
+           CALL IGrUnits(0.0,0.0,1.0,1.0)
+           CALL IPgArea(0.1,0.1,0.9,0.9)
+           CALL IPgUnits(xmin(ihandle),ymin(ihandle),xmax(ihandle),ymax(ihandle))
+           CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
+
+          SELECT CASE (EventType)
+            CASE (MouseMove)
+              xgcur(2) = EventInfo%GX
+              ygcur(2) = EventInfo%GY
+              CALL IGrPlotMode('EOR')
+              CALL IGrColourN(KolNumRectSelect)
+              CALL IGrFillPattern(0,1,1)
+              ! Remove old
+              CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+              ! Draw new
+              CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
+              xgcurold = xgcur(2)
+              ygcurold = ygcur(2)
+              CALL IGrPlotMode('Normal')
+              CALL IGrColourN(InfoGrScreen(PrevColReq))
+            CASE (MouseButUp)
+              xgcur(2) = EventInfo%GX
+              ygcur(2) = EventInfo%GY
+              CALL WMessageEnable(MouseMove, Disabled)
+              CALL WMessageEnable(MouseButUp, Disabled)
+              IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
+                CALL IGrColourN(KolNumRectSelect)
+                CALL IGrPlotMode('EOR')
+                CALL IGrFillPattern(0,1,1)
+                ! Remove old
+                CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+                CALL IGrPlotMode('Normal')
+                CALL IGrColourN(InfoGrScreen(PrevColReq))
+                IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(xmax(ihandle)-Xmin(ihandle))) RETURN
+                IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(YMAX(ihandle)-YMIN(ihandle))) RETURN
+                XMin(ihandle) = MIN(XCUR(1),XCUR(2))
+                XMax(ihandle) = MAX(XCUR(1),XCUR(2))  
+                YMin(ihandle) = MIN(YCUR(1),YCUR(2))
+                YMax(ihandle) = MAX(YCUR(1),YCUR(2))
+              ENDIF
+              CALL WindowClear()
+              CALL Plot_pro_file(ihandle)
+              RETURN  
+          END SELECT
+        ENDIF
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE PlotZoom
+!************************************************************************************************
+
+      SUBROUTINE ResetProfPLotAxes(Ihandle)
+!
+!  
+!
+      USE WINTERACTER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+
+
+      INTEGER Ihandle
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      REAL, DIMENSION (20):: Ymin
+      REAL, DIMENSION (20):: Ymax
+      REAL, DIMENSION (20):: Xmax
+      REAL, DIMENSION (20):: Xmin
+      COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
+
+      YMin(ihandle) = MINVAL(YOBIN(1:NBIN))
+      YMax(ihandle) = MAXVAL(YOBIN(1:NBIN))
+      Xmin(ihandle) = XBIN(1)
+      Xmax(ihandle) = XBIN(NBIN)
+
+      END SUBROUTINE ResetProfPlotAxes

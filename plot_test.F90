@@ -146,6 +146,14 @@
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      REAL, DIMENSION (20):: Ymin
+      REAL, DIMENSION (20):: Ymax
+      REAL, DIMENSION (20):: Xmax
+      REAL, DIMENSION (20):: Xmin
+      COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
+
+      INTEGER iz
+
 
       REAL                XAtmCoords
       COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:MaxAtm_4,1:MaxRun)
@@ -163,9 +171,8 @@
                       KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
+
       REAL yadd
-      REAL Ymin
-      REAL Ymax
       EXTERNAL DealWithProfilePlot
       INTEGER I, II, iHandle
       REAL rDummy
@@ -180,7 +187,7 @@
       CALL RegisterChildWindow(iHandle,DealWithProfilePlot)
       SAUsedChildWindows(iHandle) = 1
       CALL WindowSelect(iHandle)
-! Calculate store_ycalc(I,ihandle)
+      CALL WindowClear()
 
 ! Fill Xato
       DO I = 1, NATOM
@@ -192,19 +199,20 @@
 ! @@      CALL VALCHI(rDummy,1000) ! Preferrred orientation part if appropriate
       CALL VALCHI(rDummy,0)    ! Structural part
       CALL VALCHIPRO(rDummy)
+
       DO I = 1, NBIN
         store_ycalc(I,iHandle) = YCBIN(I)
       ENDDO
-!
-! calculate the offset for the difference plot
-!
-      YMin = MINVAL(YOBIN(1:NBIN))
-      YMax = MAXVAL(YOBIN(1:NBIN))
-      YADD = 0.5 * (YMax+YMin)
-      DO II = 1, NBIN
-        store_diff(II,ihandle) = YADD + YOBIN(II) - store_ycalc(II,ihandle)
-      ENDDO
+
+!   Initialise the x and y max min values for the plot
+
+      YMin(ihandle) = MINVAL(YOBIN(1:NBIN))
+      YMax(ihandle) = MAXVAL(YOBIN(1:NBIN))
+      Xmin(ihandle) = XBIN(1)
+      Xmax(ihandle) = XBIN(NBIN)
+
 ! call subroutine which plots data
+
       CALL plot_pro_file(ihandle)
 
       END SUBROUTINE organise_sa_result_data
@@ -232,19 +240,25 @@
       REAL                      store_ycalc,                      store_diff
       COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
 
-      REAL Ymax, Ymin
-      REAL Xmax, Xmin
+      REAL, DIMENSION (20):: Ymin
+      REAL, DIMENSION (20):: Ymax
+      REAL, DIMENSION (20):: Xmax
+      REAL, DIMENSION (20):: Xmin
+      COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
 
-      YMin = MINVAL(YOBIN(1:NBIN))
-      YMax = MAXVAL(YOBIN(1:NBIN))
-      Xmin = XBIN(1)
-      Xmax = XBIN(NBIN)
-
+!
+!  Calculate offset for difference plot.  Position will move as zoom in on profile plot.
+!
+      YADD = 0.5 * (YMax(ihandle)+YMin(ihandle))
+      DO II = 1, NBIN
+        store_diff(II,ihandle) = YADD + YOBIN(II) - store_ycalc(II,ihandle)
+      ENDDO
       CALL WindowSelect(ihandle)
+!
 !  Start of all the plotting calls
-
+!
       CALL IGrArea(0.0, 0.0, 1.0, 1.0)
-      CALL IGrUnits(0.0, 0.0, 100.0, 100.0)           
+      CALL IGrUnits(0.0, 0.0, 1.0, 1.0)           
 !
 !  Start new presentation graphics plot
 !
@@ -264,8 +278,8 @@
 !
 !  Set units for plot
 !
-      CALL IPgUnits(      xmin,    ymin, &
-                          xmax,    ymax)
+      CALL IPgUnits(      xmin(ihandle),    ymin(ihandle), &
+                          xmax(ihandle),    ymax(ihandle))
 !
 !  Set presentation graphics area
 !
