@@ -487,6 +487,8 @@
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDCANCEL)
                 CALL DoExit
+              CASE (IDB_Here)
+                Info%Valid = -5
               CASE (IDOK)
                 CALL WDialogGetRadioButton(IDF_IDoNotAgree,iOption)
                 SELECT CASE (iOption)
@@ -497,9 +499,9 @@
                   CASE (3)
                     Info%Valid = -5
                 END SELECT
-                CALL WDialogHide
-                RETURN
             END SELECT
+            CALL WDialogHide
+            RETURN
         END SELECT
       ENDDO
 

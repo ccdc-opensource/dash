@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 21/Jun/2002 12:22:47
+// Modified : 25/Jun/2002 11:31:04
 //
 ///////////////////////////////////////////////////
 //
@@ -634,6 +634,7 @@
 #define IDF_Directory                    1416
 #define IDF_BaseName                     1417
 #define IDF_RADIO6                       1407
+#define IDB_Here                         1387
 
 ///////////////////////////////////////////////////
 //
@@ -1933,7 +1934,7 @@ END
 IDD_License_Dialog DIALOG 0, 0,  269,  147
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "Aquiring a licence"
+CAPTION "Acquiring a licence"
 BEGIN
     CONTROL "You need to enter a valid licence for DASH to run on this machine. To do this, either enter your licence key in the box provided or create a licence request form and e-mail it to support@ccdc.cam.ac.uk",IDF_License_Info,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   16,  238,   28
     CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   38,  120,   38,   14
@@ -2528,17 +2529,19 @@ BEGIN
 ,0
 END
 
-IDD_LicenceAgreement DIALOG 0, 0,  298,  258
+IDD_LicenceAgreement DIALOG 0, 0,  298,  281
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Licence Agreement"
 BEGIN
-    CONTROL "",IDF_Agreement,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE | ES_READONLY,   18,   37,  262,  144
-    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  129,  236,   40,   14
-    CONTROL "I do NOT agree",IDF_IDoNotAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   62,  188,  100,   14
-    CONTROL "I have read the full text above and I Agree",IDF_IAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   62,  202,  175,   14
-    CONTROL "I want to enter an other licence key",IDF_RADIO6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   62,  216,  175,   14
-    CONTROL "In order to read the entire text, please use the scroll bar on the right-hand side.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   19,   16,  260,   12
+    CONTROL "",IDF_Agreement,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE | ES_READONLY,   18,   61,  262,  144
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  129,  260,   40,   14
+    CONTROL "I do NOT agree",IDF_IDoNotAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   62,  212,  100,   14
+    CONTROL "I have read the full text above and I Agree",IDF_IAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   62,  226,  175,   14
+    CONTROL "I want to enter another licence key",IDF_RADIO6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   62,  240,  175,   14
+    CONTROL "In order to read the entire text, please use the scroll bar on the right-hand side.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   19,   42,  260,   12
+    CONTROL "If you have purchased a copy of DASH,",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   22,   16,  150,    8
+    CONTROL "Click here",IDB_Here,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  176,   13,   46,   14
 END
 
 IDD_LicenceAgreement RCDATA
