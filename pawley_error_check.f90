@@ -29,7 +29,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PawleyWarning()
+      SUBROUTINE PawleyWarning
 
       USE WINTERACTER
       USE DRUID_HEADER
