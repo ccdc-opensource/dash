@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 12/Feb/2002 15:18:01
+// Modified : 19/Feb/2002 09:51:10
 //
 ///////////////////////////////////////////////////
 //
@@ -568,6 +568,12 @@
 #define IDD_TabSAsetup                    167
 #define IDD_TabSAOutput                   169
 #define IDD_TabPlotOptions                168
+#define ID_Delabc                       40019
+#define IDB_Delabc                       1410
+#define IDD_DICVOLRunning                 171
+#define IDBSTOP                          1411
+#define IDF_LABEL13                      1227
+#define IDF_LABEL14                      1228
 
 ///////////////////////////////////////////////////
 //
@@ -584,9 +590,9 @@ BEGIN
     CONTROL "Observed &Profile...",IDF_ObservedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   76,   66,   14
     CONTROL "Calculated Profile...",IDF_CalculatedData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   76,   66,   14
     CONTROL "&Difference Profile...",IDF_DifferenceData_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   76,   66,   14
-    CONTROL "&Axes Colour...",IDF_Axes_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   92,   66,   14
-    CONTROL "&Tick Mark Colour...",IDF_TickMark_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   92,   66,   14
-    CONTROL "&Peak Fitting Colour...",IDF_PeakFitting_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   92,   66,   14
+    CONTROL "&Axes...",IDF_Axes_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   92,   66,   14
+    CONTROL "&Tick Marks...",IDF_TickMark_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   92,   66,   14
+    CONTROL "&Peak Fitting...",IDF_PeakFitting_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   92,   66,   14
     CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  104,  119,   40,   14
     CONTROL "Colours",IDF_Colour_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   12,   64,  228,   48
     CONTROL "Symbol size",IDF_SymbolSize_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   58,   22,   62,   12
@@ -666,6 +672,7 @@ BEGIN
     CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  228,   40,   40,   14
     CONTROL "0.0000",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  228,   15,   40,   14
     CONTROL "Zero-point",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  224,    6,   48,   28
+    CONTROL "",IDB_Delabc,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  253,   76,   16,   16
 END
 
 IDD_Crystal_Symmetry RCDATA
@@ -975,6 +982,19 @@ BEGIN
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
 END
 
+IDD_Width_Equations RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
@@ -1182,7 +1202,7 @@ BEGIN
 END
 
 IDD_Polyfitter_Wizard_01 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard"
 BEGIN
@@ -1217,7 +1237,7 @@ BEGIN
 END
 
 IDD_PW_Page1 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Unit Cell Parameters"
 BEGIN
@@ -1246,6 +1266,7 @@ BEGIN
     CONTROL "",IDF_Space_Group_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  212,   46,   80,   50
     CONTROL "0.0000",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  313,   43,   40,   14
     CONTROL "Zero-point",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  309,   34,   48,   28
+    CONTROL "",IDB_Delabc,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  339,  106,   16,   16
 END
 
 IDD_PW_Page1 RCDATA
@@ -1276,7 +1297,7 @@ BEGIN
 END
 
 IDD_PW_Page2 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Basic Diffraction Information"
 BEGIN
@@ -1331,7 +1352,7 @@ BEGIN
 END
 
 IDD_PW_Page3 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Powder Diffraction File"
 BEGIN
@@ -1648,7 +1669,7 @@ BEGIN
 END
 
 IDD_SA_input2 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Parameter Bounds"
 BEGIN
@@ -1988,16 +2009,16 @@ BEGIN
 ,0
 END
 
-IDD_Pawley_ErrorLog DIALOG 0, 0,  223,   99
+IDD_Pawley_ErrorLog DIALOG 0, 0,  238,   99
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Errors detected during Pawley fit"
 BEGIN
-    CONTROL "The extracted intensities are ill conditioned due to a high degree of overlap in the data set and so could be unreliable in certain ranges.",IDF_Pawley_ErrorLog_Intro,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    8,    8,  208,   20
-    CONTROL "Full details of the problems are recorded in the fit list file, polyp.lis.",IDF_Pawley_ErrorLog_Intro2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,    8,   28,  208,   12
-    CONTROL "You may be able to fix the problem by decreasing the data range in 2-theta or by increasing the overlap criterion.",IDF_Pawley_ErrorLog_intro3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,    8,   40,  208,   20
-    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   28,   68,   40,   14
-    CONTROL "&View fit list file",ID_Edit_PawleyLog,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  136,   68,   50,   14
+    CONTROL "The extracted intensities are ill conditioned due to a high degree of overlap in the data set and so could be unreliable in certain ranges.",IDF_Pawley_ErrorLog_Intro,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    8,    8,  218,   20
+    CONTROL "Full details of the problems are recorded in the fit list file, polyp.lis.",IDF_Pawley_ErrorLog_Intro2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,    8,   28,  218,   12
+    CONTROL "You may be able to fix the problem by decreasing the data range in 2-theta or by increasing the overlap criterion.",IDF_Pawley_ErrorLog_intro3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,    8,   40,  218,   20
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   52,   70,   40,   14
+    CONTROL "&View fit list file",ID_Edit_PawleyLog,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  136,   70,   50,   14
 END
 
 IDD_Pawley_ErrorLog RCDATA
@@ -2014,7 +2035,7 @@ BEGIN
 END
 
 IDD_SAW_Page1_old DIALOG 0, 0,  400,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Molecular Z-Matrices"
 BEGIN
@@ -2083,7 +2104,7 @@ BEGIN
 END
 
 IDD_SA_Multi_completed_ep DIALOG 0, 0,  470,  184
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Results from Simulated Annealing"
 BEGIN
@@ -2157,7 +2178,7 @@ BEGIN
 END
 
 IDD_PW_Page5 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Profile Range"
 BEGIN
@@ -2200,7 +2221,7 @@ BEGIN
 END
 
 IDD_PW_Page4 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Diffraction Setup"
 BEGIN
@@ -2249,7 +2270,7 @@ BEGIN
 END
 
 IDD_PW_Page6 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Background Subtraction"
 BEGIN
@@ -2480,7 +2501,7 @@ BEGIN
 END
 
 IDD_PW_Page7 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Indexing Step 1: Peak Picking"
 BEGIN
@@ -2511,7 +2532,7 @@ BEGIN
 END
 
 IDD_PW_Page8 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Indexing Step 2: DICVOL"
 BEGIN
@@ -2583,7 +2604,7 @@ BEGIN
 END
 
 IDD_PW_Page9 DIALOG 0, 0,  475,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Results from DICVOL"
 BEGIN
@@ -2673,7 +2694,7 @@ BEGIN
 END
 
 IDD_PW_Page10 DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Pawley Refinement Step 1: Peak Picking"
 BEGIN
@@ -2729,7 +2750,7 @@ BEGIN
 END
 
 IDD_SAW_Page2 DIALOG 0, 0,  400,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Additional SA Parameters"
 BEGIN
@@ -2887,7 +2908,7 @@ BEGIN
 END
 
 IDD_SAW_Page1 DIALOG 0, 0,  400,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Molecular Z-Matrices"
 BEGIN
@@ -3375,6 +3396,42 @@ BEGIN
 ,0
 END
 
+IDD_DICVOLRunning DIALOG 0, 0,  183,  134
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DICVOL Running..."
+BEGIN
+    CONTROL "Crystal systems to be searched:",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   22,   11,  140,    8
+    CONTROL "Cubic",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   40,   27,   50,   10
+    CONTROL "Hexagonal",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   37,   50,   10
+    CONTROL "Tetragonal",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   47,   50,   10
+    CONTROL "Trigonal",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | SS_LEFT,   40,   57,   50,   10
+    CONTROL "Orthorhombic",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   67,   50,   10
+    CONTROL "Monoclinic",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   77,   50,   10
+    CONTROL "Triclinic",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   87,   50,   10
+    CONTROL "STOP",IDBSTOP,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   72,  108,   40,   14
+    CONTROL "v",IDF_LABEL9,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   27,   50,   10
+    CONTROL "v",IDF_LABEL10,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   37,   50,   10
+    CONTROL "v",IDF_LABEL11,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   47,   50,   10
+    CONTROL "v",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,   90,   57,   50,   10
+    CONTROL "v",IDF_LABEL13,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   67,   50,   10
+    CONTROL "ooo",IDF_LABEL14,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   77,   50,   10
+    CONTROL "",IDF_LABEL15,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   87,   50,   10
+END
+
+IDD_DICVOLRunning RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
 ///////////////////////////////////////////////////
 //
 // Menus
@@ -3466,6 +3523,7 @@ IDB_zmDelete2                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 IDB_zmDelete3                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 IDB_zmDelete4                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 IDB_ZmatrixDelete5              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
+IDB_Delabc                      BITMAP DISCARDABLE "res\\Del_abc.bmp"
 
 ///////////////////////////////////////////////////
 //
@@ -3495,6 +3553,7 @@ BEGIN
     ID_Up                           "Move up"
     ID_Down                         "Move down"
     ID_ClearPeakFitRanges           "Delete peak fit ranges"
+    ID_Delabc                       "Clear cell parameters"
 END
 
 ///////////////////////////////////////////////////
@@ -3511,7 +3570,8 @@ BEGIN
    ID_Pawley_Refinement_Mode,
    ID_Structure_Solution_Mode,0,
    ID_Start_Wizard,0,
-   ID_ClearPeakFitRanges,0,
+   ID_ClearPeakFitRanges,
+   ID_Delabc,0,
    ID_Left,
    ID_Right,
    ID_Up,

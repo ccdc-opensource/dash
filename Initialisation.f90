@@ -82,6 +82,7 @@
       CALL WDialogLoad(IDD_PW_Page5)
       CALL WDialogLoad(IDD_PW_Page6)
       CALL WDialogLoad(IDD_PW_Page7)
+      CALL WDialogLoad(IDD_DICVOLRunning)
       CALL WDialogLoad(IDD_PW_Page8)
       CALL WDialogLoad(IDD_PW_Page9)
       CALL WDialogLoad(IDD_PW_Page10)
