@@ -274,8 +274,11 @@
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Data_Download) ! The 'Apply' button
+              CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+              CALL Upload_Zero_Point
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
               CALL SetCrystalSystem(GetCrystalSystemFromUnitCell())
+              CALL Generate_TicMarks
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 1')
           END SELECT
