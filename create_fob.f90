@@ -290,9 +290,10 @@
           RETURN
         ENDIF
       ENDDO
+      CALL WarningMessage('Unknown element for calculation of atomic scattering factors.')
 ! default is a dummy.
-      ascfac = a1(1)*EXP(-b1(1)*ss) + a2(1)*EXP(-b2(1)*ss) + a3(1)      &
-     &         *EXP(-b3(1)*ss) + a4(1)*EXP(-b4(1)*ss) + cv(1)
+      ascfac = a1(99)*EXP(-b1(99)*ss) + a2(99)*EXP(-b2(99)*ss) + a3(99)      &
+     &         *EXP(-b3(99)*ss) + a4(99)*EXP(-b4(99)*ss) + cv(99)
 
       END FUNCTION ASCFAC
 !
