@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 12/Mar/2002 10:34:35
+// Modified : 14/Mar/2002 13:00:20
 //
 ///////////////////////////////////////////////////
 //
@@ -621,6 +621,9 @@
 #define ID_Save                         40027
 #define ID_New                          40024
 #define ID_Open                         40026
+#define IDF_SGdetGROUP                   1457
+#define IDF_Paw_Ref_SGDet_Proceed        1461
+#define IDF_SGDet_LABEL                  1462
 
 ///////////////////////////////////////////////////
 //
@@ -1415,7 +1418,7 @@ BEGIN
 ,0
 END
 
-IDD_Pawley_Status DIALOG 0, 0,  400,  185
+IDD_Pawley_Status DIALOG 0, 0,  400,  244
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Pawley Refinement Step 2"
@@ -1464,6 +1467,9 @@ BEGIN
     CONTROL "Step size damping factor",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  267,   76,   80,    8
     CONTROL "1.0",IDF_FudgeFactor,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  350,   73,   30,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "Space Group Determination",IDF_SGdetGROUP,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,  188,  298,   40
+    CONTROL "Proceed",IDF_Paw_Ref_SGDet_Proceed,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  204,   40,   14
+    CONTROL "The Pawley refinement must have been performed in the most general extinction group of the crystal system under consideration.",IDF_SGDet_LABEL,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  154,  204,  222,   16
 END
 
 IDD_Pawley_Status RCDATA

@@ -38,6 +38,8 @@
       CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
       CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
       CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+!!ep added
+      CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed,Disabled)
 ! If the background has been subtracted after the pattern was read in, then the
 ! order of the background polynomial defaults to 2, otherwise to 10.
       IF (.NOT. BACKREF) THEN
@@ -207,6 +209,8 @@
               CALL WDialogFieldState(IDB_PawRef_Reject,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+!! ep added
+             CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed, Disabled)
             CASE (IDB_PawRef_Accept)
 ! update the profile and stay with the Pawley refinement
               IPTYPE = 2
@@ -245,6 +249,8 @@
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
               CALL WDialogSelect(IDD_Pawley_Status)
               IF (LastValuesSet) CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
+!!ep added
+              CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed, Enabled)
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
@@ -275,6 +281,8 @@
                 CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
                 CALL retrieve_polybackup
                 CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
+!ep added
+                CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed, Enabled)
               ENDIF
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
@@ -295,6 +303,9 @@
               CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
               NoData = .FALSE.
               CALL ShowWizardWindowZmatrices
+!ep added
+            CASE (IDF_Paw_Ref_SgDet_Proceed)
+              CALL SpaceGroupDetermination(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
