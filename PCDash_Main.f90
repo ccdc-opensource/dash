@@ -135,6 +135,8 @@
           IPTYPE = -IPTYPE
           CALL Profile_Plot
           IPTYPE = -IPTYPE
+        CASE (ID_SaveXYE)
+          CALL SaveXYE
         CASE (ID_FILE_EXIT)
           CALL WExit
         CASE (ID_Plot_Options)
@@ -256,11 +258,54 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE SaveXYE
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      CHARACTER(MaxPathLength) :: tFileName
+      CHARACTER(LEN=45) :: FILTER
+      INTEGER iFlags, hFile, I
+      LOGICAL, EXTERNAL :: FnWavelengthOK
+      
+      iFlags = SaveDialog + AppendExt + PromptOn
+      FILTER = 'Powder diffraction files (*.xye)|*.xye|'
+      tFileName = ''
+      CALL WSelectFile(FILTER,iFlags,tFileName,'Save powder diffraction file')
+      IF ((WInfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
+        hFile = 10
+        OPEN(UNIT=hFile,FILE=tFileName,ERR=999)
+        IF (FnWavelengthOK()) WRITE(hFile,'(F9.5)',ERR=999) ALambda
+        DO I = 1, NBIN
+          WRITE(hFile,'(F6.3,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
+        ENDDO
+      ENDIF
+      CLOSE(hFile)
+      RETURN
+  999 CALL ErrorMessage('Error writing .xye file.')
+      CLOSE(hFile)
+
+      END SUBROUTINE SaveXYE
+!
+!*****************************************************************************
+!
       SUBROUTINE LaunchHelp
 
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+
+      IMPLICIT NONE
 
       CALL WHelpFile(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))// &
        'Documentation'//DIRSPACER//'Manual'//DIRSPACER//'DASH User Guide.chm')
@@ -366,6 +411,8 @@
       CALL IOSDeleteFile('MakeZmatrix.log')
       CALL IOSDeleteFile('SA_PARAMS.TXT')
       CALL IOSDeleteFile('Overlap_Temp.pdb')
+      CALL IOSDeleteFile('Rebuild_temp.zmatrix')
+      CALL IOSDeleteFile('Rebuild_temp.mol2')
 
       END SUBROUTINE DeleteTempFiles
 !
