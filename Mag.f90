@@ -1,14 +1,6 @@
-!*==CENTRO.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
-!
-!
-!
-!
-!
-!
-! LEVEL 1      SUBROUTINE CENTRO(CVEC,SVEC,RMAT,PSIFAC,PSIFCC,PSI,PCEN)
       SUBROUTINE CENTRO(CVEC,SVEC,RMAT,PSIFAC,PSIFCC,PSI,PCEN)
 !
 ! *** CENTRO updated by PJB 27 May 92 ***
@@ -36,10 +28,9 @@
       COMPLEX CVEC(3), SVEC(3), TVEC(3), TVEC1(3), TVEC2(3)
       COMPLEX PSIFAC, PSIFCC, VEC1(3), VEC2(3)
       DIMENSION RMAT(3,3)
-!
+
       DIF = .FALSE.
       GOTO 1
-!
       ENTRY CENDIF(CVEC,SVEC,VEC1,VEC2,RMAT,PSIFAC,PSIFCC,PSI,PCEN)
       DIF = .TRUE.
 ! COMPLEX CONJUGATE FOR CENTROSYMETRIC STRUCTURE FACTOR
@@ -65,16 +56,9 @@
       ENDIF
       RETURN
       END SUBROUTINE CENTRO
-!*==FMCALC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-!
-!
-! LEVEL 6      SUBROUTINE FMCALC(H,FMCMOD,FMCSQR)
       SUBROUTINE FMCALC(H,FMCMOD,FMCSQR)
 !
 ! *** FMCALC corrected by JBF/PJB 13-Jan-1995 ***
@@ -143,18 +127,15 @@
       LOGICAL FERO, FERA, HELI, AMOD, ANTI, MODUL
       COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
      &                KOM22
-!
+
 ! CLEAR ALL ANSWERS IN CASE ABSENT:
-!
 ! CLEAR MODULUS AND SQUARE:
       FMCMOD = 0.
       FMCSQR = 0.
       SSQRD = STHL*STHL
-!
 ! OUT IF ABSENT:
       IF (MAGABS(H,IK)) GOTO 100
       TAU = -FLOAT(IK)
-!
 !  CYCLE OVER DOMAINS
       ND = 0
       ICHIR = 1
@@ -185,11 +166,9 @@
           CALL CGMZER(FMC,1,3)
 ! FIRST SCATTERING FACTOR:
           IFF = 0
-!
 ! CYCLE OVER MAGNETIC ATOMS:
           DO IM = 1, NMAG
             IR = JMAGAT(IM)
-!
 ! IS THERE A PHASE FACTOR ASSOCIATED WITH THE CENTRE OF SYMMETRY FOR THIS ATOM
             IF (CENPSI) THEN
 ! IS THE ATOM ON THE CENTRE
@@ -197,7 +176,6 @@
               IF (.NOT.PSICEN) NIPC = NPHI(IM)/2
               DOCENT = (CENTRC .AND. (.NOT.PSICEN))
             ENDIF
-!
 ! JUMP IF FORM/SCATTERING FACTOR THE SAME AS BEFORE
             IF (NMFORM(IM).EQ.IFF) GOTO 2
 ! IF NOT, GET IT
@@ -218,8 +196,7 @@
 ! SKIP IF IROP DOESNT GENERATE A DISTINCT SUB-LATTICE
                 IF (MODUL .AND. LPHI(IPTAB(IROP,IM),IM).NE.IROP) GOTO 3
                 CALL ROTSYM(H,RH,IROP,-1)
-                IF (IDOMOP.NE.1 .AND. MSTAB(IDOMOP).LT.0)               &
-     &              CALL GMREV(RH,RH,3,1)
+                IF (IDOMOP.NE.1 .AND. MSTAB(IDOMOP).LT.0) CALL GMREV(RH,RH,3,1)
                 F1 = TWOPI*(SCALPR(X(1,IR),RH)+SCALPR(TRANS(1,IROP),H))
 !  ANISOTROPIC T F (=1. IF NOT THERE) NEEDED SEPARATELY FOR LSQ:
                 ERS = ANITF(RH,IR)
@@ -252,8 +229,7 @@
 !          TEST=TAU*(RADIAN(PHIH(NIPC+IP,IM))-TPTAB(IP,IM))
                     PSIFCC = CEXP(CMPLX(0.,TEST))
                   ENDIF
-                  CALL CENTRO(TVEC,TVEC,OTRSYM(1,1,25),PSIFAC,PSIFCC,   &
-     &                        PSI,PSICEN)
+                  CALL CENTRO(TVEC,TVEC,OTRSYM(1,1,25),PSIFAC,PSIFCC,PSI,PSICEN)
                 ELSE
 ! IF CENTRIC THEN ATOM WAS ON THE CENTRE
                   IF (CENTRC) CALL CMRSCA(TVEC,TVEC,2.0,3,1)
@@ -265,7 +241,6 @@
                 NFAC = NFAC + 1
 ! END OF INNERMOST CYCLE OVER SYMMETRY
     3         ENDDO
-!
               FAC = AMULT(IR)*EXP(-TF(IR)*SSQRD)
 ! COMPENSATE FOR NOT USING ALL SYMMETRY ELEMENTS
               FACTOR = FLOAT(NOPC)/FLOAT(NFAC)
@@ -284,14 +259,10 @@
               CALL CGMSCA(SUM1,TVEC,TERM,3,1)
               CALL CGMADD(FMC,TVEC,FMC,1,3)
             ENDDO
-!
-!
           ENDDO
 ! END OF CYCLE OVER ATOMIC POSITIONS
-!
 !  COMPENSATE FOR MULTIPLICITY OF THE STAR
           CALL CMRSCA(FMC,FMC,FKSTAR,3,1)
-!
 ! NOW THE CYCLE FOR THE DOMAIN AVERAGE
    18     IF (IDOMOP.EQ.1 .OR. FERO) CALL MAGDOM(H,HD,IDOMOP,SKIP)
           CALL RCMPRD(HD,FMC,P,3,3,1)
@@ -305,19 +276,15 @@
           ENDIF
    15   ENDDO
       ENDDO
-!
 ! NOW THE DOMAIN AVERAGE
       FMCSQR = FMCSQR/FLOAT(ND)
       FMCMOD = SQRT(FMCSQR)
-!
   100 RETURN
+
       END SUBROUTINE FMCALC
-!*==GENMAG.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE GENMAG(H,NOMORE,MUL,SMAX,NFLAG)
       SUBROUTINE GENMAG(H,NOMORE,MUL,SMAX,NFLAG)
 !
 ! *** GENMAG updated by JCM 6 May 92 ***
@@ -379,12 +346,9 @@
       CALL GMEQ(HT,H,3,1)
   100 RETURN
       END SUBROUTINE GENMAG
-!!*==MAGABS.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      LOGICAL FUNCTION MAGABS(H,IK)
       LOGICAL FUNCTION MAGABS(H,IK)
 !
 ! *** MAGABS modified by PJB Jan 91 ***
@@ -427,12 +391,9 @@
       MAGABS = M
       RETURN
       END FUNCTION MAGABS
-!*==MAGCNC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE MAGCNC
       SUBROUTINE MAGCNC
 !
 ! *** MAGCNC uodated by PJB 17-Jan-95 ***
@@ -469,13 +430,9 @@
       ENDDO
       RETURN
       END SUBROUTINE MAGCNC
-!*==MAGCON.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 4      SUBROUTINE MAGCON(IATO,LMFIX,FIRST)
       SUBROUTINE MAGCON(IATO,LMFIX,FIRST)
 !
 ! *** MAGCON corrected by PJB 4 30-Nov-1994 ***
@@ -530,7 +487,6 @@
       COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
      &                KOM22
 !
-!
       IAT = JMAGAT(IATO)
 !  CHECK THAT STRUCTURE AND SYMMETRY ARE COMPATIBLE WITH THE
 !  PROPAGATION VECTOR
@@ -542,7 +498,6 @@
           RETURN
         ENDIF
       ENDDO
-!
       CANG1 = ANGM(1,IATO)
       CANG2 = ANGM(2,IATO)
       DO J = 1, 3
@@ -553,7 +508,6 @@
 !  JUMP IF NOT SPECIAL
       NONE = N.EQ.1
       IF (NONE) GOTO 17
-!
       IF (N.LT.0 .AND. MSTAB(1).LT.0) THEN
 ! CENTRE OF SYMMETRY PRESENT: IF NOT AT ORIGIN WHAT
 ! LATTICE VECTOR IS INVOLVED
@@ -580,7 +534,6 @@
           ENDIF
         ENDIF
       ENDIF
-!
 !  LOOK TO SEE WHICH ELEMENTS OF THE ATOM SUB-GROUP ARE
 !  IN THE MAGNETIC SYMMETRY GROUP
       DO K = 2, NOPC
@@ -598,8 +551,7 @@
           PH = SCALPR(PROP,RX)
 !  CHECK THE THE PHASE SHIFT IS n*PI
           IF (ABS(FLOAT(NINT(2.*PH))-2.*PH).GT..001) THEN
-            CALL ERRIN2(K,-1,'Operator',                                &
-     &                  'is not consistent with a moment on'//          &
+            CALL ERRIN2(K,-1,'Operator','is not consistent with a moment on'//          &
      &                  ATNAME(IATO)//'for this propagation vector')
 !  IF AN ODD MULTIPLE OF PI REVERSE THE MATRIX
             IF (ABS(FLOAT(NINT(PH))-PH).GT..3) CALL GMREV(RMAT,RMAT,3,3)
@@ -607,7 +559,6 @@
         ENDIF
         CALL RELSM3(RMAT,NFIX,FIX)
     3 ENDDO
-!
 !  NOW CONVERT XYZ CONSTRAINTS TO SPHERICAL POLAR ONES
 !  COUNT FIXED PARS
       NFIXED = 0
@@ -620,15 +571,12 @@
           IF (NFIX(I).LT.9999) NREL = NREL + 1
         ENDIF
       ENDDO
-!
       GOTO (10,11,12,13), NFIXED + 1
-!
 ! ALL FIXED
    13 DO I = 1, 3
         LMFIX(I) = .TRUE.
       ENDDO
       GOTO 17
-!
 !  TWO FIXED - FIND WHICH
    12 IF (NFIX(1).EQ.0 .AND. NFIX(2).EQ.0) THEN
         CANG1 = 0.
@@ -640,33 +588,27 @@
       IF (NFIX(2).EQ.0) CANG2 = 0.
       LMFIX(2) = .TRUE.
       GOTO 10
-!
 !  ONE FIXED
    11 IF (NFIX(3).NE.0) GOTO 7
       CANG1 = 90.
       LMFIX(1) = .TRUE.
-!
 !  NOW RELATIONSHIPS
    10 GOTO (8,8,15,16), NREL + 1
 ! NONE
     8 NONE = NFIXED.EQ.0
       GOTO 17
-!
 !  ALL THREE RELATED - FIX BOTH ANGLES
    16 CANG2 = ATAN2(FIX(1),FIX(2))
       CANG1 = DEGREE(ATAN2(FIX(1)*COS(CANG2),FIX(3)))
       LMFIX(1) = .TRUE.
       GOTO 14
-!
 !  IF TWO PARS RELATED THEY SHOULD BE 1 AND 2 IF THE THIRD IS FREE
    15 IF (NFIX(3).NE.9999 .AND. NFIXED.NE.1) THEN
         WRITE (LPT,3000) NFIX
         CALL BMBOUT
         RETURN
       ENDIF
-!
       GOTO (20,17,21,20), NFIX(1) + 1
-!
    21 CANG2 = ATAN2(FIX(1),FIX(2))
    14 LMFIX(2) = .TRUE.
       CANG2 = DEGREE(CANG2)
@@ -721,13 +663,9 @@
      &        3I5/' I thought this couldn''t happen! PJB')
  2002 FORMAT (1X,A4,' =',F9.2)
       END SUBROUTINE MAGCON
-!*==MAGDOM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 3      SUBROUTINE MAGDOM(H,HK,IOP,SKIP)
       SUBROUTINE MAGDOM(H,HK,IOP,SKIP)
 !
 ! *** MAGDOM by PJB Apr 87 ***
@@ -782,12 +720,9 @@
 !
   100 RETURN
       END SUBROUTINE MAGDOM
-!*==MAGSYM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE MAGSYM(MODE)
       SUBROUTINE MAGSYM(MODE)
 !
 ! *** MAGSYM updated by PJB 31-May-1994 ***
@@ -823,7 +758,10 @@
      &                MTYP, NDOM, FERO, FERA, HELI, AMOD, ANTI, MODUL, KOM20
       LOGICAL FERO, FERA, HELI, AMOD, ANTI, MODUL
       COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3), KOM22
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       IF (MODE.EQ.1) GOTO 20
 !  INITIALISE
       CALL JGMZER(MTSYM,1,NOPC)
@@ -833,8 +771,7 @@
       ENTRY MELIN(IOP,VAL)
       IO = IABS(IOP)
       IF (ABS(VAL).LT..0001) THEN
-        CALL ERRIN2(IOP,1,'Zero value for magnetic symmetry operator',  &
-     &              ' ')
+        CALL ERRIN2(IOP,1,'Zero value for magnetic symmetry operator',' ')
         GOTO 100
       ENDIF
 !  RECORD WHETHER THE OPERATOR INVOLVED INVERSION
@@ -934,7 +871,10 @@
           ENDIF
         ELSE
           IX = MULTAB(NO,INVERS(IOPP))
-          IF (MSTAB(IX).EQ.0) CALL ERRMES(-1,0,'Logical error in MAGSYM - bad tables')
+          IF (MSTAB(IX).EQ.0) THEN
+            CALL ERRMES(-1,0,'Logical error in MAGSYM - bad tables')
+            IF (IBMBER .NE. 0) RETURN
+          ENDIF
           CALL GMPRD(OTRSYM(1,1,IX),OTRSYM(1,1,IOPP),OTRSYM(1,1,NO),3,3,3)
         ENDIF
         IF (MSTAB(NO).LT.0) CALL GMREV(OTRSYM(1,1,NO),OTRSYM(1,1,NO),3,3)
@@ -952,12 +892,9 @@
       ENDIF
   100 RETURN
       END SUBROUTINE MAGSYM
-!*==MF5ADD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE MF5ADD(ISPC,IG,IS,N)
       SUBROUTINE MF5ADD(ISPC,IG,IS,N)
 !
 ! *** MF5ADD by JCM 13 Jun 88 ***
@@ -994,13 +931,9 @@
       IS = ISPC - MPTAB(I) + 1
   100 RETURN
       END SUBROUTINE MF5ADD
-!*==PROPAG.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 1      SUBROUTINE PROPAG(MODE,INOUT)
       SUBROUTINE PROPAG(MODE,INOUT)
 !
 ! 17B
@@ -1049,7 +982,6 @@
         INOUT = -1
       ENDIF
       GOTO 100
-!
 ! SET SYMMETRY CONSTRAINTS
    20 IPOFF = INOUT
 ! CLEAR OUT ALL FIX/RELA INFO
@@ -1065,10 +997,8 @@
         ITAB(I) = IABS(NORD(I))
         JGEN(1) = JGEN(1) + 1
    21 ENDDO
-!
 ! Find generators of subgroup
       CALL GENELM(ITAB,JGEN)
-!
 ! JUMP IF NOT SPECIAL:
       IF (JGEN(1).EQ.1) GOTO 26
 ! JUMP IF NOT ON A CENTRE OF SYMMETRY:
@@ -1084,7 +1014,6 @@
         CALL GMEQ(SYM(1,1,K),RMAT,3,3)
         IF (JGEN(I).LT.0) CALL GMREV(RMAT,RMAT,3,3)
         CALL RELSM3(RMAT,NFIX3,FIX3)
-!
 ! IS THERE A SECOND GENERATOR OF THE SUB-GROUP WHICH MAKES THIS ATOM SPECIAL?
         IF (JGEN(3).EQ.0) GOTO 26
       ENDDO
@@ -1120,14 +1049,9 @@
       ENDIF
   100 RETURN
       END SUBROUTINE PROPAG
-!*==PROPER.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-! LEVEL 5      SUBROUTINE PROPER(AKVEC)
       SUBROUTINE PROPER(AKVEC)
 !
 ! *** PROPER updated by PJB 14-Dec-1994 ***
@@ -1228,12 +1152,9 @@
       IF (KSTARS) CALL GMEQ(AKSTAR,BKSTAR,3,NKC)
 
       END SUBROUTINE PROPER
-!*==PSICON.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE PSICON(MGAT,IPSFIX)
       SUBROUTINE PSICON(MGAT,IPSFIX)
 !
 ! *** PSICON corrected by PJB/JBF 13-Jan-1995 ***
@@ -1366,8 +1287,7 @@
         IF (NO.NE.0) THEN
           DO J = 1, I - 1
             IF (NO.EQ.LTPHI(J)) THEN
-              CALL ERRIN2(NO,-1,                                        &
-     &                'Phase given for sublattice generated by operator',' is redundant')
+              CALL ERRIN2(NO,-1,'Phase given for sublattice generated by operator',' is redundant')
               GOTO 10
             ENDIF
           ENDDO
@@ -1380,12 +1300,9 @@
    10 ENDDO
 
       END SUBROUTINE PSICON
-!*==SETFCM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 12      SUBROUTINE SETFCM(MAGSET)
       SUBROUTINE SETFCM(MAGSET)
 !
 ! *** SETFCM by PJB 31-May-1994 ***
@@ -1422,9 +1339,13 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-!
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       CALL INPUTN(LPT)
       CALL SYMOP
+      IF (IBMBER .NE. 0) RETURN
       CALL OPSYM(1)
       CALL RECIP
       CALL ATOPOS
@@ -1438,12 +1359,9 @@
       IF (IERR.NE.0) CALL ERRMES(1,0,'in SETFCM')
 
       END SUBROUTINE SETFCM
-!*==SPHELI.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 8      SUBROUTINE SPHELI(IM,MODE)
       SUBROUTINE SPHELI(IM,MODE)
 !
 ! *** SPHELI updated by PJB 30-May-95 ***
@@ -1513,12 +1431,9 @@
       ENDIF
   100 RETURN
       END SUBROUTINE SPHELI
-!*==SPHPOL.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE SPHPOL(ANG1,ANG2,SD,MODE)
       SUBROUTINE SPHPOL(ANG1,ANG2,SD,MODE)
 !
 ! *** SPHPOL by PJB 24 Jan 89 ***
