@@ -1,4 +1,4 @@
-! Winteracter module created : 03/Nov/2003 18:33:53
+! Winteracter module created : 06/Nov/2003 17:28:56
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -174,7 +174,7 @@
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_ChiSq_Label2   =  1318
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_ChiSq          =  1276
           INTEGER, PARAMETER :: IDF_Pawley_Status_Group         =  1278
-          INTEGER, PARAMETER :: IDD_SA_Action2                  =   126
+          INTEGER, PARAMETER :: IDB_Resume                      =  1498
           INTEGER, PARAMETER :: IDF_CPL_GRID                    =  1401
           INTEGER, PARAMETER :: IDF_LABEL1                      =  1402
           INTEGER, PARAMETER :: IDF_LABEL2                      =  1404
@@ -212,7 +212,6 @@
           INTEGER, PARAMETER :: IDF_LABEL7                      =  1463
           INTEGER, PARAMETER :: IDF_StopSA                      =  1195
           INTEGER, PARAMETER :: IDF_Pause_Annealing             =  1495
-          INTEGER, PARAMETER :: IDF_Status_tab                  =  1498
           INTEGER, PARAMETER :: IDD_Parameter_Status            =   136
           INTEGER, PARAMETER :: IDD_Anneal_Status               =   138
           INTEGER, PARAMETER :: IDD_Profile_Status              =   139
@@ -709,4 +708,5 @@
           INTEGER, PARAMETER :: IDF_MinStep                     =  1300
           INTEGER, PARAMETER :: IDF_Width                       =  1303
           INTEGER, PARAMETER :: IDC_UseESD                      =  1380
+          INTEGER, PARAMETER :: IDC_UseRelease                  =  1536
       END MODULE Druid_Header
