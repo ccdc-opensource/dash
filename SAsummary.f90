@@ -75,9 +75,9 @@
       END SELECT
 !ep allows you to view pdb file of SA Solutions, each clicked
 !   check box in fresh mercury window
-      DO irow = 1, MaxRuns
+      DO irow = 1, SA_Run_Number
         CALL WGridGetCellCheckBox(IDF_SA_summary,2,irow,istatus)
-        IF (istatus.eq.1) THEN
+        IF (istatus.EQ.1) THEN
 ! calls subroutine which opens Mercury window with .pdb file
           CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)
           CALL ViewStructure(Grid_Buffer)
