@@ -106,6 +106,8 @@
       CLOSE(InputFile)
 ! Given the element, assign the CSD element (fill aelem(1:MAXATM))
       CALL AssignCSDElement(AtmElement)
+! JvdS Q & D hack to allow colouring of flexible torsions in other routines
+      aelem_2 = aelem
       Res2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-3)//'mol2')
       RETURN
   998 CALL ErrorMessage('Error opening input file.')
@@ -224,6 +226,8 @@
       ENDDO
 ! Given the element, assign the CSD element (fill aelem(1:MAXATM))
       CALL AssignCSDElement(AtmElement)
+! JvdS Q & D hack to allow colouring of flexible torsions in other routines
+      aelem_2 = aelem
       CSSR2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-4)//'mol2')
       RETURN
   990 CALL ErrorMessage('Error while reading input file.')
@@ -301,7 +305,8 @@
       CALL SAMABO
       DO I = 1, natcry
         sybatom(I) = '    '
-        SELECT CASE (aelem(I))
+! SAMABO uses aelem, aelem_2 is there to emulate colouring based on flexibility of torsion angles
+        SELECT CASE (aelem_2(I))
           CASE (1, 56, 64) ! C, N, O
             SELECT CASE (hybr(I))
               CASE (1)
@@ -315,21 +320,20 @@
               CASE DEFAULT
                 HybridisationStr = '0 '
             END SELECT
-            sybatom(I) = ElementStr(aelem(I))(1:1)//'.'//HybridisationStr
+            sybatom(I) = ElementStr(aelem_2(I))(1:1)//'.'//HybridisationStr
           CASE DEFAULT
-            sybatom(I)(1:1) = ChrUpperCase(ElementStr(aelem(I))(1:1))
-            sybatom(I)(2:2) = ChrLowerCase(ElementStr(aelem(I))(2:2))
+            sybatom(I)(1:1) = ChrUpperCase(ElementStr(aelem_2(I))(1:1))
+            sybatom(I)(2:2) = ChrLowerCase(ElementStr(aelem_2(I))(2:2))
         END SELECT
       ENDDO
       Ilen = LEN_TRIM(TheFileName)
       OutputFile = 3
       OPEN(UNIT=OutputFile,file=TheFileName(1:Ilen),form='formatted',err=997)
       WRITE(OutputFile,"('@<TRIPOS>MOLECULE')",ERR=996)
-      WRITE(OutputFile,'(A)',ERR=996) 'Temporary file'
+      WRITE(OutputFile,'(A)',ERR=996) 'Temporary file created by DASH'
       WRITE(OutputFile,"(2(I5,1X),'    1     0     0')",ERR=996) natcry, nbocry
       WRITE(OutputFile,"('SMALL')",ERR=996)
       WRITE(OutputFile,"('NO_CHARGES')",ERR=996)
-      WRITE(OutputFile,*,ERR=996) 'Temporary file created by DASH'
       WRITE(OutputFile,"('@<TRIPOS>ATOM')",ERR=996)
       DO I = 1, natcry
         WRITE(OutputFile,270,ERR=996) I,atomlabel(I),(axyzo(I,j),j=1,3),sybatom(I)

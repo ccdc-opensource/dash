@@ -19,6 +19,7 @@
 
       INTEGER, DIMENSION(MAXATM_2) :: aelem
 ! aelem = element type as used by CSD
+      INTEGER, DIMENSION(MAXATM_2) :: aelem_2
 
 !U! Elements (plus other CSD 'element' definitions What's 'ZZ'??)
 !U      DATA el  /'C ','H ','AC','AG','AL','AM','AR','AS','AT','AU','B ', &
