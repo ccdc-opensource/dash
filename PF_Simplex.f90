@@ -2,7 +2,6 @@
 !*****************************************************************************
 !
       SUBROUTINE SIMOPT(X,DX,COVAR,N,CHIFUN)
-!     --------------------------------------
 !!
 ! Purpose
 !     A SIMPLEX-based routine which optimises the values of the N
@@ -26,14 +25,16 @@
 !
 !-----------------------------------------------------------------------
 !
+      INCLUDE 'PARAMS.INC'
+
       REAL X(N), DX(N), COVAR(N,N)
       INTEGER N
       EXTERNAL CHIFUN
 
-      INTEGER    MAXITR
-      PARAMETER (MAXITR=100)
-      INTEGER     MVAR,        MMPAR
-      PARAMETER ( MVAR = 100 , MMPAR = MVAR * MVAR )
+      INTEGER     MAXITR
+      PARAMETER ( MAXITR = 100)
+      INTEGER     MMPAR
+      PARAMETER ( MMPAR = MVAR * MVAR )
       REAL HESS(MMPAR), DELTA(MVAR), C0, C1(2,MVAR), C2(MMPAR)
       REAL V((MVAR+1)*MAXITR), EX(3*MVAR), C(MVAR+1)
       INTEGER IR(MVAR+1), INDX(MVAR)
