@@ -1,4 +1,4 @@
-! Winteracter module created : 22/Jan/2002 16:57:35
+! Winteracter module created : 23/Jan/2002 16:51:14
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -491,4 +491,34 @@
           INTEGER, PARAMETER :: IDF_LABELc                      =  1294
           INTEGER, PARAMETER :: IDD_Parameter_Status_2          =   156
           INTEGER, PARAMETER :: IDD_DIALOG004                   =   158
+          INTEGER, PARAMETER :: IDD_SAW_Page1a                  =   159
+          INTEGER, PARAMETER :: IDF_zmNumOf1                    =  1298
+          INTEGER, PARAMETER :: IDF_zmNumOf2                    =  1299
+          INTEGER, PARAMETER :: IDF_zmNumOf3                    =  1300
+          INTEGER, PARAMETER :: IDF_zmNumOf4                    =  1303
+          INTEGER, PARAMETER :: IDF_LABEL10                     =  1465
+          INTEGER, PARAMETER :: IDB_zmEdit1                     =  1305
+          INTEGER, PARAMETER :: IDB_zmEdit2                     =  1306
+          INTEGER, PARAMETER :: IDB_zmEdit3                     =  1309
+          INTEGER, PARAMETER :: IDB_zmEdit4                     =  1310
+          INTEGER, PARAMETER :: IDB_zmView1                     =  1304
+          INTEGER, PARAMETER :: IDB_zmView2                     =  1319
+          INTEGER, PARAMETER :: IDB_zmView3                     =  1324
+          INTEGER, PARAMETER :: IDB_zmView4                     =  1327
+          INTEGER, PARAMETER :: IDB_zmBrowse1                   =  1330
+          INTEGER, PARAMETER :: IDB_zmBrowse2                   =  1339
+          INTEGER, PARAMETER :: IDB_zmBrowse3                   =  1347
+          INTEGER, PARAMETER :: IDB_zmBrowse4                   =  1356
+          INTEGER, PARAMETER :: IDB_zmDelete1                   =  1365
+          INTEGER, PARAMETER :: IDB_zmDelete2                   =  1366
+          INTEGER, PARAMETER :: IDB_zmDelete3                   =  1367
+          INTEGER, PARAMETER :: IDB_zmDelete4                   =  1368
+          INTEGER, PARAMETER :: IDD_zmEdit                      =   160
+          INTEGER, PARAMETER :: IDB_View                        =  1375
+          INTEGER, PARAMETER :: IDB_SaveAs                      =  1379
+          INTEGER, PARAMETER :: IDD_TEMPLATE014                 =   161
+          INTEGER, PARAMETER :: IDF_AtomPropGrid                =  1381
+          INTEGER, PARAMETER :: IDF_BUTTON5                     =  1382
+          INTEGER, PARAMETER :: IDF_BUTTON6                     =  1384
+          INTEGER, PARAMETER :: IDB_Relabel                     =  1385
       END MODULE Druid_Header
