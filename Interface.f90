@@ -338,9 +338,9 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_input4)
@@ -369,9 +369,9 @@
 
       LOGICAL, INTENT (IN   ) :: TheValue
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_input4)
@@ -395,9 +395,9 @@
 
       LOGICAL, INTENT (IN   ) :: TheValue
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_input4)
@@ -406,6 +406,47 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_UseCrystallographicCoM
+!
+!*****************************************************************************
+!
+      SUBROUTINE Set_AutoAlign(TheValue)
+
+! When .TRUE., the molecules of each solution in a multi run are set to a default position/orientation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: TheValue
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input4)
+      CALL WDialogPutCheckBoxLogical(IDF_Align, TheValue)
+      LAlign = TheValue
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_AutoAlign
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION Get_AutoAlign
+
+! When .TRUE., the molecules of each solution in a multi run are set to a default position/orientation
+
+      IMPLICIT NONE
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
+
+      Get_AutoAlign = LAlign
+
+      END FUNCTION Get_AutoAlign
 !
 !*****************************************************************************
 !
@@ -423,9 +464,9 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
@@ -450,46 +491,6 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_HydrogenTreatment
-!
-!*****************************************************************************
-!
-      LOGICAL FUNCTION Get_AutoAlign
-
-! When .TRUE., the molecules of each solution in a multi run are set to a default position/orientation
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      Get_AutoAlign = WDialogGetCheckBoxLogical(IDF_Align)
-      CALL PopActiveWindowID
-
-      END FUNCTION Get_AutoAlign
-!
-!*****************************************************************************
-!
-      SUBROUTINE Set_AutoAlign(TheValue)
-
-! When .TRUE., the molecules of each solution in a multi run are set to a default position/orientation
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      LOGICAL, INTENT (IN   ) :: TheValue
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      CALL WDialogPutCheckBoxLogical(IDF_Align, TheValue)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Set_AutoAlign
 !
 !*****************************************************************************
 !

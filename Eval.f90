@@ -30,9 +30,9 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       REAL TRAN(1:3), ROTA(1:3,1:3)
       REAL QUATER(0:3), QQSUM, QDEN

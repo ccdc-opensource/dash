@@ -1067,9 +1067,9 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       INTEGER KATOM, i, KI
       INTEGER iFrg

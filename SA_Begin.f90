@@ -33,9 +33,9 @@
       LOGICAL         InSA
       COMMON /SADATA/ InSA
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput, DateToday, DateDaysElapsed, &
                            TimeNowSeconds

@@ -547,9 +547,9 @@
 
       IMPLICIT NONE    
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       INTEGER, EXTERNAL :: WriteMol2, WDialogGetRadioButtonInt
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
@@ -1551,9 +1551,9 @@
       REAL                                                       iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       LOGICAL, EXTERNAL :: NearlyEqual
@@ -1597,8 +1597,9 @@
               RandomInitVal = WDialogGetCheckBoxLogical(IDF_RandomInitVal)
               DO I = 1, NVAR
                 CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X_init(I))
-                ! Have LB and UB been filled yet???????? ############ TODO ##############
-          !      CALL ParseRawInput(I)
+                CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, I, LB(I))
+                CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, I, UB(I))
+                CALL ParseRawInput(I)
               ENDDO
               CALL ShowWithWizardWindowSASettings
             CASE (IDCANCEL, IDCLOSE)
@@ -1881,10 +1882,6 @@
 
       IMPLICIT NONE      
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
-
       INTEGER, EXTERNAL :: BatchFileSaveAs
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER tInteger, iDummy
@@ -1902,12 +1899,7 @@
               CALL WizardWindowShow(IDD_SA_input3_2)
             CASE (IDB_Solve)
 ! We've finished the SA input
-              CALL WDialogGetRadioButton(IDR_HydrogensIgnore, HydrogenTreatment)
-              UseCCoM = WDialogGetCheckBoxLogical(IDF_CrystallographicCoM)
-              AutoMinimise = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
-              UseHAutoMin = WDialogGetCheckBoxLogical(IDF_UseHydrogensAuto)
-
-              ! Align ??? = WDialogGetCheckBoxLogical(IDF_Align)
+              CALL DownLoadSAOPT
               CALL WizardWindowHide
               CALL BeginSA
             CASE (IDCANCEL, IDCLOSE)

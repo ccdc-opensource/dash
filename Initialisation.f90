@@ -274,9 +274,9 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
@@ -376,7 +376,7 @@
       CALL Set_AutoLocalMinimisation(.TRUE.)
       CALL Set_UseHydrogensDuringAutoLocalMinimise(.TRUE.)
       CALL Set_UseCrystallographicCoM(.TRUE.)
-      ! ########## Auto Align ################
+      CALL Set_AutoAlign(.TRUE.)
       Call Set_HydrogenTreatment(2) ! Absorb
       CALL WDialogSelect(IDD_SA_Modal_input2)
       RandomInitVal = .TRUE.
@@ -552,9 +552,9 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, SaveCCL, SaveCIF, SaveRES,  &
                            Get_ColourFlexibleTorsions, ConnectPointsObs,  &

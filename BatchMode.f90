@@ -17,9 +17,9 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       REAL            T0, RT
       COMMON /saparl/ T0, RT
@@ -125,11 +125,16 @@
             CALL INextReal(line, rTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             ChiMult = rTem
-          CASE ('USECCOM') ! Auto local minimise
+          CASE ('USECCOM') ! Use crystallographic centre of mass
             I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
             UseCCoM = (tString(1:iLen) .EQ. "TRUE")
+          CASE ('AUTOALIGN') ! Auto align
+            I = InfoError(1) ! reset the errors
+            CALL INextString(line, tString)
+            IF (InfoError(1) .NE. 0) GOTO 999
+            LAlign = (tString(1:iLen) .EQ. "TRUE")
           CASE ('HYDROGEN') ! Hydrogen treatment
             I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
@@ -145,7 +150,7 @@
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
             UseHAutoMin = (tString(1:iLen) .EQ. "TRUE")
-          CASE ('RANDOMISE') 
+          CASE ('RANDOMISE') ! Randomise initial SA-parameter values
             I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
@@ -203,7 +208,6 @@
   100 CONTINUE 
       CLOSE(hFile)
       CALL BeginSA
-
       ! Exit DASH, but before doing so, save output to a file.
       ! it is probably best to save the output to a file that is specified in
       ! the .duff file, because that makes it easier for the user to later relate
@@ -215,6 +219,33 @@
       CALL DoExit
 
       END SUBROUTINE BatchMode
+!
+!*****************************************************************************
+!
+      SUBROUTINE DownLoadSAOPT
+      ! Fills COMMON block /SAOPT/ with values from GUI.
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE   
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input4)
+      CALL WDialogGetRadioButton(IDR_HydrogensIgnore, HydrogenTreatment)
+      UseCCoM = WDialogGetCheckBoxLogical(IDF_CrystallographicCoM)
+      AutoMinimise = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
+      UseHAutoMin = WDialogGetCheckBoxLogical(IDF_UseHydrogensAuto)
+      LAlign = WDialogGetCheckBoxLogical(IDF_Align)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DownLoadSAOPT
 !
 !*****************************************************************************
 !
@@ -278,9 +309,9 @@
       REAL            T0, RT
       COMMON /saparl/ T0, RT
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       REAL            X_init,       x_unique,       lb,       ub
       COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
@@ -291,9 +322,7 @@
 
       INTEGER iHandle, i, iFrg
 
-      ! TODO ##################
-      ! Problem here: we haven't fetched the values from the current dialogue yet: everything
-      ! in COMMON block SAOPT is wrong.
+      CALL DownLoadSAOPT
       iHandle = 10
       OPEN(UNIT=iHandle, FILE=FileName, ERR=999)
       WRITE(iHandle,'(A)',ERR=999) '# This is a generated file.'
@@ -350,8 +379,7 @@
         WRITE(iHandle,'(A)',ERR=999) 'MINIMISEHYDR FALSE'
       ENDIF
       WRITE(iHandle,'(A)',ERR=999) '# Auto align'
-      ! TODO ##################
-      IF ( RandomInitVal ) THEN
+      IF ( LAlign ) THEN
         WRITE(iHandle,'(A)',ERR=999) 'AUTOALIGN TRUE'
       ELSE
         WRITE(iHandle,'(A)',ERR=999) 'AUTOALIGN FALSE'

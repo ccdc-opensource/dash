@@ -41,7 +41,7 @@
       INTEGER tNumHydrogens, tNumNonHydrogens, tAtomNumber
       REAL ssq
 
-! JvdS Order all atoms such that the Hydrogen atoms are always at
+! Order all atoms such that the Hydrogen atoms are always at
 ! the end of the atom list. That way, if we don't want to use hydrogens
 ! we can simply subtract the number of hydrogens from the number of atoms and
 ! everything works
