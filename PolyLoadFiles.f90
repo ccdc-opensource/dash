@@ -333,7 +333,7 @@
       USE VARIABLES
       USE DRUID_HEADER
 
-!      IMPLICIT NONE
+      IMPLICIT NONE
 
       CHARACTER(LEN=MaxPathLength), INTENT (INOUT) :: TheFileName
 
@@ -342,28 +342,48 @@
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
 
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
+
+      REAL              XPF_Range
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
@@ -377,8 +397,9 @@
       INTEGER          I, J, JJ
       INTEGER          POS
       LOGICAL          ESDsFilled
+      INTEGER          INTEGRATED_GUESS, MAX_INTENSITY_INDEX, IST
+      REAL             XADD, YOADD, VADD
 
-      BACKREF = .TRUE.
 ! Initialise to failure
       DiffractionFileLoad = 0
       KLEN = LEN_TRIM(TheFileName)
@@ -437,7 +458,7 @@
       ENDIF
       DataSetChange = DataSetChange + 1
       NumPawleyRef = 0
-!      NTic=0
+      BackRef = .TRUE.
       CurrentRange = 0
       NumPeakFitRange = 0
       DO I = 1, MAX_NPFR
@@ -1647,8 +1668,16 @@
       CALL Upload_Source
 ! Try to set the wavelength
 ! If the wavelength was not present in the file, try to interpret the anode material
-      IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf(Anode)
-      CALL UpdateWavelength(Lambda1)
+      IF (Lambda1 .LT. 0.00001) THEN
+        IF (Anode .EQ. 'Xx') THEN
+          CALL ErrorMessage('This file does not specify the wavelength,'//CHAR(13)// &
+                            'please update the file to contain the _WL1, _RANGE_WL or _ANODE keyword.')
+        ELSE
+          CALL UpdateWavelength(WavelengthOf(Anode))
+        ENDIF
+      ELSE
+        CALL UpdateWavelength(Lambda1)
+      ENDIF
       Load_uxd_File = 1
       RETURN
  999  CONTINUE
@@ -1716,7 +1745,6 @@
            CALL ErrorMessage('First line contains only one column, but not a valid wavelength.')
            GOTO 999
         ENDIF
-        CALL UpdateWavelength(Lambda1)
 ! JvdS Q & D hack enabling the cell parameters to be stored on the second line of the .xye file.
 ! ####################
         READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
@@ -1800,7 +1828,7 @@
           ENDIF
         ENDIF
       ENDIF
-!C>> Modified to handle files without esds - used to read in YOBS as the esd
+! Modified to handle files without esds - used to read in YOBS as the esd
  10   READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
       READ(Cline,*, IOSTAT = IS) XOBS(I),YOBS(I),EOBS(I)
       IF (IS .NE. 0) THEN
@@ -1828,7 +1856,7 @@
         END IF
       END IF
       I = I + 1
-!>> JCC Only read in a maximum of MOBS points
+! JCC Only read in a maximum of MOBS points
       IF (I .GT. MOBS) THEN
         CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
         GOTO 100
@@ -1843,15 +1871,20 @@
         RETURN
       ENDIF
 ! If wavelength not present in file, initialise to Cu
-      IF (Lambda1 .LT. 0.00001) Lambda1 = WavelengthOf('Cu')
+      IF (Lambda1 .LT. 0.00001) THEN
+        CALL UpdateWavelength(WavelengthOf('Cu'))
+        JRadOption = 1
+      ELSE
 ! Initialise source material to synchrotron
-      JRadOption = 2
+        JRadOption = 2
 ! Now add in a test: if wavelength close to known anode material,
 ! set source to laboratory. Otherwise, source is synchrotron.
-      DO I = 2, 6
-        IF (ABS(ALambda - FnWavelengthOfMenuOption(I)) .LT. 0.0003) JRadOption = 1
-      END DO
+        DO I = 2, 6
+          IF (ABS(Lambda1 - FnWavelengthOfMenuOption(I)) .LT. 0.0003) JRadOption = 1
+        END DO
+      ENDIF
       CALL Upload_Source
+      CALL UpdateWavelength(Lambda1)
       Load_xye_File = 1
       RETURN
  999  CONTINUE
@@ -1861,10 +1894,10 @@
 !
 !*****************************************************************************
 !
-!>> JCC  Routine to truncate data to a particular data range
-!>> In practice, this varies the NOBS value so the data is not lost, just
-!>> Hidden. The routine should not be called with RMaxTTheta greater
-!>> than the maximum value read in
+! JCC  Routine to truncate data to a particular data range
+! In practice, this varies the NOBS value so the data is not lost, just
+! Hidden. The routine should not be called with RMaxTTheta greater
+! than the maximum value read in
       SUBROUTINE TruncateData(RMaxTTheta)
 
       USE VARIABLES
