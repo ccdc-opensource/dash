@@ -199,7 +199,6 @@
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL WDialogSelect(IDD_SA_input3)
-              T0 = 0.0
               RPOS = T0
               CALL WDialogPutReal(IDF_SA_T0,RPOS,'(F7.2)')
               IPOS = 1000 - NINT(RPOS)
@@ -226,12 +225,12 @@
               ELSE
                 tFieldState = Enabled
               ENDIF
-                CALL WDialogFieldState(IDF_SA_ChiTest_Label,tFieldState)
-                CALL WDialogFieldState(IDF_SA_ChiTest,tFieldState)
-                CALL WDialogFieldState(IDF_SA_MaxMoves_Label,tFieldState)
-                CALL WDialogFieldState(IDF_MaxMoves1,tFieldState)
-                CALL WDialogFieldState(IDF_LABEL21,tFieldState)
-                CALL WDialogFieldState(IDF_MaxMoves2,tFieldState)
+              CALL WDialogFieldState(IDF_SA_ChiTest_Label,tFieldState)
+              CALL WDialogFieldState(IDF_SA_ChiTest,tFieldState)
+              CALL WDialogFieldState(IDF_SA_MaxMoves_Label,tFieldState)
+              CALL WDialogFieldState(IDF_MaxMoves1,tFieldState)
+              CALL WDialogFieldState(IDF_LABEL21,tFieldState)
+              CALL WDialogFieldState(IDF_MaxMoves2,tFieldState)
               CALL WizardWindowShow(IDD_SA_input3)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
@@ -374,7 +373,7 @@
               CALL WDialogSelect(IDD_SA_input3)
               CALL WDialogGetReal(IDF_SA_T0,RPOS)
               T0 = RPOS
-              IPOS=1000 - NINT(RPOS)
+              IPOS = 1000 - NINT(RPOS)
               CALL WDialogPutTrackbar(IDF_SA_T0_trackbar,IPOS)
             CASE (IDF_SA_Tredrate_trackbar)
               IF (EventInfo%VALUE2 .EQ. IDF_SA_Tredrate_trackbar) THEN
