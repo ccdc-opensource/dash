@@ -1,19 +1,22 @@
-C>> JCC Include declarations here for REFLNS
-C>> rather than hard-coded ... you know it makes sense
+!C>> JCC Include declarations here for REFLNS
+!C>> rather than hard-coded ... you know it makes sense
 
-	  INTEGER REFDIM
-	  PARAMETER (REFDIM = 10000)
-	  INTEGER ISMAG(REFDIM)
-	  INTEGER KMIN,KMAX,KMOD,KNOW
-	  INTEGER MAXKK(9),KOM23
-C>> JCC GGCALC dimension increased to 500
-	  REAL REFH(3,REFDIM),AMUL(REFDIM),AICALC(REFDIM),AIOBS(REFDIM),
+      INTEGER REFDIM
+      PARAMETER (REFDIM = 10000)
+     
+!C>> JCC GGCALC dimension increased to 500
+      REAL REFH(3,REFDIM),AMUL(REFDIM),AICALC(REFDIM),AIOBS(REFDIM),    &
      &     ESDOBS(REFDIM),SOMEGA(REFDIM),GGCALC(500),DSTAR(REFDIM)
-	  REAL DKDDS
-	  INTEGER MAXK
+      INTEGER KMIN,KMAX,KMOD,KNOW
+      INTEGER ISMAG(REFDIM)
+      REAL DKDDS
+      INTEGER MAXKK(9),KOM23
+      INTEGER MAXK
 
-      COMMON /REFLNS/REFH,AMUL,AICALC,
-     & AIOBS,ESDOBS,SOMEGA,GGCALC,
-     & MAXKK,KMIN,KMAX,KMOD,KNOW,DSTAR,ISMAG,
+      COMMON /REFLNS/REFH,AMUL,AICALC,                                  &
+     & AIOBS,ESDOBS,SOMEGA,GGCALC,                                      &
+     & MAXKK,KMIN,KMAX,KMOD,KNOW,DSTAR,ISMAG,                           &
      & DKDDS,KOM23
+
       EQUIVALENCE (MAXK,MAXKK(1))
+
