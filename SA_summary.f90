@@ -25,7 +25,7 @@
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
-      CHARACTER*255 Grid_Buffer
+      CHARACTER*MaxPathLength Grid_Buffer
       INTEGER RangeOption
 
       CALL PushActiveWindowID
@@ -45,7 +45,6 @@
               ENDDO
 ! Close Chi-sqd plot 
               CALL Close_Chisq_Plot
-              CALL WizardWindowShow(IDD_SA_input3)
               CALL PopActiveWindowID
               RETURN
             CASE (IDF_InvertSelection)
