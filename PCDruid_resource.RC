@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 07/Feb/2003 09:15:25
+// Modified : 31/Mar/2003 14:53:59
 //
 ///////////////////////////////////////////////////
 //
@@ -662,6 +662,14 @@
 #define IDF_BimodalReset                 1503
 #define IDF_BimodalIcon                  1504
 #define IDF_TriModalIcon                 1505
+#define IDD_Rietveld2                     188
+#define IDD_DIALOG007                     189
+#define IDD_TEMPLATE022                   191
+#define IDD_TEMPLATE023                   192
+#define IDF_CHECK1                       1507
+#define IDD_TEMPLATE024                   193
+#define IDF_CHECK2                       1508
+#define IDF_REAL2                        1509
 
 ///////////////////////////////////////////////////
 //
@@ -3551,7 +3559,7 @@ BEGIN
 ,0
 END
 
-IDD_SAW_Page5 DIALOG 0, 0,  400,  197
+IDD_SAW_Page5 DIALOG 0, 0,  424,  197
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Analyse Solutions"
@@ -3571,7 +3579,7 @@ BEGIN
     CONTROL "1",IDF_Limit1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  164,  176,   34,   14
     CONTROL "1",IDF_Limit2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  228,  176,   34,   14
     CONTROL "&Invert Selection",IDF_InvertSelection,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  283,  176,   60,   14
-    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   92,   10,  276,   80
+    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   92,   10,  316,   80
     CONTROL "Select",IDB_Select,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   88,  176,   40,   14
     CONTROL "solutions",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  128,  179,   36,    8
     CONTROL "Save...",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  233,  150,   40,   14
@@ -3591,7 +3599,7 @@ BEGIN
 " 1220               1              99 \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1136     6     99   176 \n"
+" 1136     7     99   176 \n"
 "   20 \n"
 "[Colours] \n"
 "[Lengths] \n"
@@ -3608,6 +3616,7 @@ BEGIN
     CONTROL "Profile Chi-sqd",ISS4,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   54,   14
     CONTROL "Intensity Chi-sqd",ISS5,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   60,   14
     CONTROL "Restart",ISS6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   36,   14
+    CONTROL "Rietveld",ISS7,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   40,   14
 END
 
 IDD_TEMPLATE021 RCDATA
@@ -3616,6 +3625,7 @@ BEGIN
 " 1066 0 \n"
 " 1067 0 \n"
 " 1070 0 \n"
+" 1093 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -3941,6 +3951,139 @@ BEGIN
 "[Checks] \n"
 " 1491 1 \n"
 " 1492 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_Rietveld2 DIALOG 0, 0,  534,  210
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Rigid-Body Rietveld Refinement"
+BEGIN
+    CONTROL "",IDF_RR_ZmatrixGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   10,   28,  133,  129
+    CONTROL "",IDF_RR_TorsionGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  154,   28,  133,  129
+    CONTROL "",IDF_RR_AngleGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  298,   28,  115,  129
+    CONTROL "",IDF_RR_BondGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  424,   28,   98,  129
+    CONTROL "Torsions",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  154,   12,  133,    8
+    CONTROL "Angles",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  298,   12,  115,    8
+    CONTROL "Bonds",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  424,   12,   98,    8
+    CONTROL "Translations and orientations",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   10,   12,  133,    8
+    CONTROL "Refine",IDB_Refine,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  206,  188,   40,   14
+    CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  257,  188,   40,   14
+    CONTROL "Global isotropic temperature factor",IDF_CHECK1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   26,  164,  126,   14
+    CONTROL "Preferred orientation",IDF_CHECK2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   26,  188,   82,   14
+    CONTROL "0.0",IDF_REAL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  156,  168,   40,   14
+    CONTROL "0.0",IDF_REAL2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  122,  188,   40,   14
+    CONTROL "View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  326,  188,   40,   14
+END
+
+IDD_Rietveld2 RCDATA
+BEGIN
+"[Checks] \n"
+" 1507 0 \n"
+" 1508 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+" 1397     2    100   189 \n"
+"   80 \n"
+" 1440     2    100   191 \n"
+"   80 \n"
+" 1438     2    100   192 \n"
+"   60 \n"
+" 1441     2    100   193 \n"
+"   40 \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_DIALOG007 DIALOG 0, 0, 1000,   16
+STYLE DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Value",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
+    CONTROL "F",ISS2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
+END
+
+IDD_DIALOG007 RCDATA
+BEGIN
+"[Checks] \n"
+" 1066 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_TEMPLATE022 DIALOG 0, 0, 1000,   16
+STYLE DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Value",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
+    CONTROL "F",ISS3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
+END
+
+IDD_TEMPLATE022 RCDATA
+BEGIN
+"[Checks] \n"
+" 1067 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_TEMPLATE023 DIALOG 0, 0, 1000,   16
+STYLE DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Value",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
+    CONTROL "F",ISS3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
+END
+
+IDD_TEMPLATE023 RCDATA
+BEGIN
+"[Checks] \n"
+" 1067 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_TEMPLATE024 DIALOG 0, 0, 1000,   16
+STYLE DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Value",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
+    CONTROL "F",ISS3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    0,    0,   10,   14
+END
+
+IDD_TEMPLATE024 RCDATA
+BEGIN
+"[Checks] \n"
+" 1067 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"

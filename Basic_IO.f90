@@ -397,7 +397,7 @@
         CASE (IDD_Summary)
           CALL DealWithSaSummary
           GOTO 10
-        CASE (IDD_Rietveld)
+        CASE (IDD_Rietveld2)
           CALL DealWithWindowRietveld
           GOTO 10
       END SELECT
