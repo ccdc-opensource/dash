@@ -253,12 +253,4 @@ C>> JCC Added in return status for failed reading and failed opening
  999  Read_One_Zm = ErrorStatus
 	return
 
-      end
-
-
-	subroutine Write_Solution_Information
-
-	
-
-
-	end subroutine Write_Solution_Information
+      end function read_one_zm
