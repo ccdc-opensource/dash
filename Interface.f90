@@ -184,9 +184,9 @@
         CALL ErrorMessage('Wavelength invalid, will be set to Cu')
         CALL Set_Wavelength(WavelengthOf('Cu'))
       ENDIF
-      IF (TheTwoTheta .LT. 0.01) THEN
+      IF (TheTwoTheta .LT. 0.0) THEN
         TwoTheta2dSpacing = 1000000.0
-        CALL DebugErrorMessage('TheTwoTheta .LT. 0.1 in TwoTheta2dSpacing')
+        CALL DebugErrorMessage('TheTwoTheta .LT. 0.0 in TwoTheta2dSpacing')
       ELSE
         TwoTheta2dSpacing = ALambda / (2*SIN(Degrees2Radians(TheTwoTheta/2)))
       ENDIF
