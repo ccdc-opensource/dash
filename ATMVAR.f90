@@ -117,6 +117,9 @@
                      'Xe',      'Y ',      'Yb',      'Zn',      'Zr',     &
                      'Du' /
 
+!C Coefficients for analytical approximation of atomic scattering factors
+!C See e.g. International Tables for Crystallography (1992), Volume C,
+!C Mathematical, Physical and Chemical Tables, Ed. A.J.C. Wilson, pp. 500-502.
       REAL A1(MaxElm), B1(MaxElm), A2(MaxElm), B2(MaxElm)
       REAL A3(MaxElm), B3(MaxElm), A4(MaxElm), B4(MaxElm)
       REAL CV(MaxElm)
