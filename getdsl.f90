@@ -448,7 +448,7 @@
       GETTIC = 1
 ! JCC - add in an error trap for bad file opening
       OPEN(11,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-      I=1
+      I = 1
  10   READ(11,*,ERR=100,END=100) (IH(II,I),II=1,3), ARGK(I), DSTAR(I)
       I = I + 1
       IF (I .GT. MTIC) GOTO 100
