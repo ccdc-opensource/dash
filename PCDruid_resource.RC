@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 30/Sep/2001 18:58:25
+// Modified : 04/Oct/2001 14:35:27
 //
 ///////////////////////////////////////////////////
 //
@@ -495,6 +495,7 @@
 #define ISS9                             1233
 #define ISS10                            1241
 #define ISS11                            1242
+#define IDF_PrintSA                      1244
 
 ///////////////////////////////////////////////////
 //
@@ -1743,7 +1744,7 @@ FONT    8, "MS Sans Serif"
 CAPTION "DASH - Simulated Annealing Protocol"
 BEGIN
     CONTROL "< Back",IDB_SA3_back,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   20,  204,   40,   14
-    CONTROL "Solve >",IDB_SA3_finish,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  144,  204,   40,   14
+    CONTROL "Solve >",IDB_SA3_finish,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  163,  204,   40,   14
     CONTROL "0.0",IDF_SA_T0,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,   18,  108,   28,   14
     CONTROL "100",IDF_SA_T0_trackbar,"MSCTLS_TRACKBAR32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TBS_AUTOTICKS | TBS_VERT | TBS_TOP | TBS_ENABLESELRANGE,   24,   12,   20,   96
     CONTROL "1000",IDF_SA_T0_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    8,   16,   16,    8
@@ -1769,7 +1770,7 @@ BEGIN
     CONTROL "Random",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  178,   16,   28,    8
     CONTROL "seeds",IDF_LABEL13,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  180,   24,   24,    8
     CONTROL "each T",IDF_LABEL14,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  180,   96,   24,    8
-    CONTROL "Cancel",IDF_SA3_cancel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   82,  204,   40,   14
+    CONTROL "Cancel",IDF_SA3_cancel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   68,  204,   40,   14
     CONTROL "314",IDF_SA_RandomSeed1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  176,   35,   40,   14
     CONTROL "265",IDF_SA_RandomSeed3,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  176,   67,   40,   14
     CONTROL "159",IDF_SA_RandomSeed2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  176,   51,   40,   14
@@ -1780,6 +1781,7 @@ BEGIN
     CONTROL "Profile chi-squared multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   22,  184,  112,   12
     CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  138,  184,   54,   12
     CONTROL "Termination Criteria. Please note that only multiple runs use these criteria. A single run will run until the user stops it.",IDF_SA_Input3_termhead,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   22,  128,  190,   16
+    CONTROL "Print",IDF_PrintSA,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  115,  204,   40,   14
 END
 
 IDD_SA_input3 RCDATA

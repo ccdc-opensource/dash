@@ -1,4 +1,4 @@
-! Winteracter module created : 30/Sep/2001 18:58:25
+! Winteracter module created : 04/Oct/2001 14:35:27
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -482,4 +482,5 @@
           INTEGER, PARAMETER :: ISS9                            =  1233
           INTEGER, PARAMETER :: ISS10                           =  1241
           INTEGER, PARAMETER :: ISS11                           =  1242
+          INTEGER, PARAMETER :: IDF_PrintSA                     =  1244
       END MODULE Druid_Header
