@@ -26,10 +26,9 @@
       COMMON /posopt/ XATOPT(3,MaxAtm_3)
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER         NATOM
       REAL                   X
@@ -341,9 +340,9 @@
                                   occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:2)
  1130             FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
                 ENDIF
-                pdbAtmCoords(1,iorig,iFrgCopy,iFrg,SA_Run_Number) = xc
-                pdbAtmCoords(2,iorig,iFrgCopy,iFrg,SA_Run_Number) = yc
-                pdbAtmCoords(3,iorig,iFrgCopy,iFrg,SA_Run_Number) = zc
+                pdbAtmCoords(1,iorig,iFrgCopy,iFrg,Curr_SA_Run) = xc
+                pdbAtmCoords(2,iorig,iFrgCopy,iFrg,Curr_SA_Run) = yc
+                pdbAtmCoords(3,iorig,iFrgCopy,iFrg,Curr_SA_Run) = zc
               ENDIF
 ! The CCL atom lines
               IF (tSaveCCL) THEN
@@ -446,10 +445,9 @@
       COMMON /pdbops/ npdbops, cpdbops
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 ! SA_Run_Number now holds the number of the last completed multirun
 
 ! Use standard PDB orthogonalisation
@@ -565,7 +563,7 @@
       iiact = 0
       TickedRunNr = 0
       NumOfOverlaidStructures = 0
-      DO GridRowNr = 1, SA_Run_Number
+      DO GridRowNr = 1, NumOf_SA_Runs
         IF (RangeOption .EQ. 1) THEN ! "Show Solutions p through q"
           UseThisSolution = ((GridRowNr .GE. Limit1) .AND. (GridRowNr .LE. Limit2))
         ELSE ! "Show Selected"
