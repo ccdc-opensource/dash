@@ -146,23 +146,19 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GetEvent
-!
-! Fetches the last event from Winteracter and places it in two global variables
-! called EventType and EventInfo (both in VARIABLES)
-!
+      LOGICAL FUNCTION DealWithEvent
+
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
 
-      LOGICAL MseBtnPressed
+      LOGICAL MseBtnPressed, OldEventWaiting
 ! The routines that act on the mousebutton presses are non-reentrant
 ! and the one should not be called when the other is active, so we must keep a flag if we are dealing
 ! with a mouse button press. 
-      DATA MseBtnPressed / .FALSE. /
-      COMMON /JvdS1/ MseBtnPressed
+      COMMON /Events/ MseBtnPressed, OldEventWaiting
 
 ! For child windows that are an editor, the only event DASH has to handle itself
 ! (all other events for editor child windows are handled automatically by Winteracter)
@@ -179,7 +175,6 @@
       POINTER (p, Handler)
 ! 'p' is now a code pointer to the subroutine 'Handler'
 
-  10  CALL WMessage(EventType,EventInfo)
       SELECT CASE (EventInfo%WIN)
         CASE (0) ! Main window
           SELECT CASE (EventType)
@@ -201,10 +196,11 @@
               ELSE IF(EventInfo%VALUE1 .EQ. RightButton) THEN
 ! Get to work on the cross-hair movement--fitting this time
                 IF (MseBtnPressed) GOTO 10
+                IF (PastPawley) GOTO 10
                 MseBtnPressed = .TRUE.
                 CALL Move_CrossHair_Fit
                 MseBtnPressed = .FALSE.
-              END IF
+              ENDIF
               GOTO 10
             CASE (KeyDown)
               CALL Check_KeyDown
@@ -242,6 +238,9 @@
         CASE (IDD_Index_Preparation)
           CALL DealWithIndexPreparation
           GOTO 10
+        CASE (IDD_DV_Results)
+          CALL DealWithDVResults
+          GOTO 10
         CASE (IDD_Crystal_Symmetry)
           CALL DealWithCrystalSymmetryPane
           GOTO 10
@@ -278,13 +277,55 @@
         CASE (IDD_PW_Page2)
           CALL DealWithWizardWindowDiffractionSetup2
           GOTO 10
-        CASE (IDD_DV_Results)
-          CALL DealWithDVResults
-          GOTO 10
         CASE (IDD_Pawley_Status)
           CALL DealWithPawleyFitWindow
           GOTO 10
+        CASE (IDD_SAW_Page1)
+          CALL DealWithWizardWindowZmatrices
+          GOTO 10
+        CASE (IDD_SA_input2)
+          CALL DealWithWizardWindowParameterBounds
+          GOTO 10
+        CASE (IDD_SA_input3)
+          CALL DealWithWizardWindowSASettings
+          GOTO 10
       END SELECT
+      DealWithEvent = .FALSE.
+      RETURN
+! If we are here, we could deal with this event.
+   10 DealWithEvent = .TRUE.
+
+      END FUNCTION DealWithEvent
+!
+!*****************************************************************************
+!
+      SUBROUTINE GetEvent
+!
+! Fetches the last event from Winteracter and places it in two global variables
+! called EventType and EventInfo (both in VARIABLES)
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      LOGICAL MseBtnPressed, OldEventWaiting
+      COMMON /Events/ MseBtnPressed, OldEventWaiting
+
+      LOGICAL, EXTERNAL :: DealWithEvent
+
+! Wait for a message
+  10  IF (OldEventWaiting) THEN
+        OldEventWaiting = .FALSE.
+      ELSE
+        CALL WMessage(EventType,EventInfo)
+      ENDIF
+! Try to process it. If we processed it, just wait for the next message
+      IF (DealWithEvent()) GOTO 10
+! If we couldn't process it ourselves, exit the routine and let the calling routine handle it
+! The way things have been programmed now, that shouldn't happen very often.
+      OldEventWaiting = .FALSE.
 
       END SUBROUTINE GetEvent
 !
@@ -302,137 +343,51 @@
 
       IMPLICIT NONE
 
-      LOGICAL MseBtnPressed
-! The routines that act on the mousebutton presses are non-reentrant
-! and the one should not be called when the other is active, so we must keep a flag if we are dealing
-! with a mouse button press. 
-      COMMON /JvdS1/ MseBtnPressed
+      LOGICAL MseBtnPressed, OldEventWaiting
+      COMMON /Events/ MseBtnPressed, OldEventWaiting
 
-! For child windows that are an editor, the only event DASH has to handle itself
-! (all other events for editor child windows are handled automatically by Winteracter)
-! is the CloseRequest. By 'registering' a child window with GetEvent, by setting the
-! ChildWinAutoClose variable for that child window to true, GetEvent will take care of that.
-      LOGICAL           ChildWinAutoClose
-      COMMON /ChWinAC/  ChildWinAutoClose(1:20)
+      LOGICAL, EXTERNAL :: DealWithEvent
 
-      INTEGER*4         ChildWinHandler
-      LOGICAL                                  ChildWinHandlerSet
-      COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
-
-      EXTERNAL Handler
-
-      POINTER (p, Handler)
-
-  10  CALL WMessagePeek(EventType,EventInfo)
-      IF (EventType .NE. NoMessage) THEN
-        SELECT CASE (EventInfo%WIN)
-          CASE (0) ! Main window
-            SELECT CASE (EventType)
-              CASE (Expose,Resize)
-                CALL Redraw()
-                GOTO 10
-              CASE (MenuSelect)
-                CALL ProcessMenu
-                GOTO 10
-              CASE (CloseRequest)
-                CALL WExit
-                GOTO 10
-              CASE (MouseButDown)
-                IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
-                  IF (MseBtnPressed) GOTO 10
-                  MseBtnPressed = .TRUE.
-                  CALL Plot_Alter
-                  MseBtnPressed = .FALSE.
-                ELSE IF(EventInfo%VALUE1 .EQ. RightButton) THEN
-! Get to work on the cross-hair movement - fitting this time
-                  IF (MseBtnPressed) GOTO 10
-                  MseBtnPressed = .TRUE.
-                  CALL Move_CrossHair_Fit
-                  MseBtnPressed = .FALSE.
-                END IF
-                GOTO 10
-              CASE (KeyDown)
-                CALL Check_KeyDown
-                CALL Check_KeyDown_PeakFit_Inner
-                GOTO 10
-            END SELECT
-          CASE (1:20) ! One of the Child Windows
-            IF (EventType.EQ.CloseRequest .AND. ChildWinAutoClose(EventInfo%WIN)) THEN
-              CALL PushActiveWindowID
-              CALL WindowCloseChild(EventInfo%WIN)
-              ChildWinAutoClose(EventInfo%WIN) = .FALSE.
-              CALL PopActiveWindowID
-              GOTO 10
-            ENDIF
-            IF (ChildWinHandlerSet(EventInfo%WIN)) THEN
-              p = ChildWinHandler(EventInfo%WIN)
-              CALL Handler
-              GOTO 10
-            ENDIF
-          CASE (IDD_Plot_Option_Dialog)
-            CALL DealWithPlotOptionsWindow
-            GOTO 10
-          CASE (IDD_Configuration)
-            CALL DealWithConfiguration
-            GOTO 10
-          CASE (IDD_Structural_Information)
-            CALL DealWithStructuralInformation
-            GOTO 10
-          CASE (IDD_Data_Properties)
-            CALL DealWithDiffractionSetupPane
-            GOTO 10
-          CASE (IDD_Peak_Positions)
-            CALL DealWithPeakPositionsPane
-            GOTO 10
-          CASE (IDD_Index_Preparation)
-            CALL DealWithIndexPreparation
-            GOTO 10
-          CASE (IDD_Crystal_Symmetry)
-            CALL DealWithCrystalSymmetryPane
-            GOTO 10
-          CASE (IDD_Peak_Widths)
-            ! Do nothing
-            GOTO 10
-          CASE (IDD_Polyfitter_Wizard_01)
-            CALL DealWithMainWizardWindow
-            GOTO 10
-          CASE (IDD_PW_Page3)
-            CALL DealWithWizardWindowDiffractionFileInput
-            GOTO 10
-          CASE (IDD_PW_Page4)
-            CALL DealWithWizardWindowDiffractionSetup
-            GOTO 10
-          CASE (IDD_PW_Page5)
-            CALL DealWithWizardWindowProfileRange
-            GOTO 10
-          CASE (IDD_PW_Page6)
-            CALL DealWithWizardWindowBackground
-            GOTO 10
-          CASE (IDD_PW_Page7)
-            CALL DealWithWizardWindowIndexing1
-            GOTO 10
-          CASE (IDD_PW_Page8)
-            CALL DealWithWizardWindowIndexing2
-            GOTO 10
-          CASE (IDD_PW_Page9)
-            CALL DealWithWizardWindowDICVOLResults
-            GOTO 10
-          CASE (IDD_PW_Page1)
-            CALL DealWithWizardWindowUnitCellParameters
-            GOTO 10
-          CASE (IDD_PW_Page2)
-            CALL DealWithWizardWindowDiffractionSetup2
-            GOTO 10
-          CASE (IDD_DV_Results)
-            CALL DealWithDVResults
-            GOTO 10
-          CASE (IDD_Pawley_Status)
-            CALL DealWithPawleyFitWindow
-            GOTO 10
-        END SELECT
+  10  IF (OldEventWaiting) THEN
+        OldEventWaiting = .FALSE.
+      ELSE
+        CALL WMessagePeek(EventType,EventInfo)
+        IF (EventType .EQ. NoMessage) RETURN
       ENDIF
+! Try to process it. If we processed it, just wait for the next message
+      IF (DealWithEvent()) GOTO 10
+! If we couldn't process it ourselves, exit the routine and let the calling routine handle it
+! The way things have been programmed now, that shouldn't happen very often.
+      OldEventWaiting = .FALSE.
 
       END SUBROUTINE PeekEvent
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION IsEventWaiting
+!
+! Reports if events are waiting to be handled. If not, program execution resumes.
+! It tries to emulate _not_ removing the events from the queu by
+! setting a flag, 'OldEventWaiting', which is used by GetEvent, PeekEvent and IsEventWaiting.
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      LOGICAL MseBtnPressed, OldEventWaiting
+      COMMON /Events/ MseBtnPressed, OldEventWaiting
+
+      IF (OldEventWaiting) THEN
+        IsEventWaiting = .TRUE.
+      ELSE
+        CALL WMessagePeek(EventType,EventInfo)
+        OldEventWaiting = (EventType .NE. NoMessage)
+        IsEventWaiting = OldEventWaiting
+      ENDIF
+
+      END FUNCTION IsEventWaiting
 !
 !*****************************************************************************
 !
