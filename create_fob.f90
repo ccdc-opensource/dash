@@ -174,7 +174,7 @@
 ! i.e. the centre of scattering power, is used for rotations.
 ! The scattering power of an atom is the square of the number of its electrons,
 ! which is taken to be Z, its atomic number, i.e. we are neglecting ions.
-! Ideally, we would want hydrogens to have weight 0.0 when not taken into account.
+! Hydrogens have a negligible effect and are included even if not included during the SA.
 
       USE ZMVAR
 
@@ -201,7 +201,7 @@
 ! i.e. the centre of scattering power, is used for rotations.
 ! The scattering power of an atom is the square of the number of its electrons,
 ! which is taken to be Z, its atomic number, i.e. we are neglecting ions.
-! Ideally, we would want hydrogens to have weight 0.0 when not taken into account.
+! Hydrogens have a negligible effect and are included even if not included during the SA.
 
       USE ZMVAR
       USE ATMVAR
