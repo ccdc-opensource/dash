@@ -5252,8 +5252,26 @@
       CHARACTER*6 MAIN
       COMMON /WHEN  / TIM(2), MAIN
 
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+
+      REAL            CummChiSqd
+      COMMON /CMN007/ CummChiSqd(MOBS)
+
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       SAVE SMYOB, SWYOBS
       CHARACTER*20 Integer2String
@@ -5357,6 +5375,9 @@
       RWPOBS = 100.*SQRT(SUMWD/SWYOBS)
       RWPEXP = 100.*SQRT(FREE/SWYOBS)
       PAWLEYCHISQ = SUMWD/FREE
+      DO ii = 1, NPTS
+        CummChiSqd(ii) = CummChiSqd(ii) / SUMWD * ypmax
+      ENDDO
       WRITE (LPT,2004) PAWLEYCHISQ, NOBS, LVARB
  2004 FORMAT (' Chi squared =',F10.4,' for',I6,' observations',' and',  &
      &        I4,' basic variables')
