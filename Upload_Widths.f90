@@ -290,7 +290,7 @@
       INTEGER I, NumFittedPFR
 
       NumFittedPFR = 0 ! The number of Peak Fit Ranges that have actually been fitted
-! Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
+! Loop over all hatched areas.
       IF (NumPeakFitRange .GT. 0) THEN
         DO I = 1, NumPeakFitRange
           IF (RangeFitYN(I)) THEN
@@ -365,7 +365,7 @@
       INTEGER I, NumFittedPFR
 
       NumFittedPFR = 0 ! The number of Peak Fit Ranges that have actually been fitted
-! Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
+! Loop over all hatched areas.
       DO I = 1, NumPeakFitRange
         IF (RangeFitYN(I)) THEN
           CALL INC(NumFittedPFR)
