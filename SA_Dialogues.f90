@@ -1365,6 +1365,7 @@
 
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       INTEGER tFieldState
+      INTEGER h, k, l
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page2)
@@ -1376,6 +1377,15 @@
               CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOn)
               CALL WizardWindowShow(IDD_SAW_Page1)
             CASE (IDNEXT)
+              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                CALL WDialogGetInteger(IDF_PO_a, h)
+                CALL WDialogGetInteger(IDF_PO_b, k)
+                CALL WDialogGetInteger(IDF_PO_c, l)
+                IF ((h .EQ. 0) .AND. (k .EQ. 0) .AND. (l .EQ. 0)) THEN
+                  CALL ErrorMessage("h, k and l cannot all be zero.")
+                  RETURN
+                ENDIF
+              ENDIF
               CALL SA_Parameter_Set
               CALL ShowWizardWindowParameterBounds
             CASE (IDCANCEL, IDCLOSE)
