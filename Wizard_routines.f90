@@ -272,6 +272,7 @@
               CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDNEXT)
+              CALL WizardApplyDiffractionFileInput
               CALL WizardWindowHide
               CALL WDialogSelect(IDD_PW_Page4)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
@@ -422,6 +423,7 @@
               CALL WDialogSelect(IDD_PW_Page4)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDNEXT)
+              CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
               CALL WizardWindowHide
               CALL WDialogSelect(IDD_PW_Page6)
@@ -523,6 +525,8 @@
               CALL WDialogSelect(IDD_PW_Page5)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDNEXT)
+              CALL WizardApplyDiffractionFileInput
+              CALL WizardApplyProfileRange
               CALL WizardApplyBackground
               CALL WizardWindowHide
               CALL WDialogSelect(IDD_PW_Page7)
@@ -902,6 +906,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Space_Group_Menu)
               CALL Download_SpaceGroup(IDD_PW_Page1)
+              CALL Generate_TicMarks
               NumPawleyRef = 0
             CASE (IDF_Crystal_System_Menu)
               CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)

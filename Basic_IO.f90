@@ -9,7 +9,7 @@
 !
       USE WINTERACTER
       
-      CHARACTER*(*), INTENT(IN   ) :: TheMessage
+      CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Error")
 
@@ -26,7 +26,7 @@
 !
       USE WINTERACTER
       
-      CHARACTER*(*), INTENT(IN   ) :: TheMessage
+      CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
       !RETURN
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Debug Error")
@@ -43,7 +43,7 @@
 !
       USE WINTERACTER
       
-      CHARACTER*(*), INTENT(IN   ) :: TheMessage
+      CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Warning")
 
@@ -53,13 +53,13 @@
 !
       SUBROUTINE InfoMessage(TheMessage)
 !
-! Displays a warning message
+! Displays an info message
 !
 ! INPUT   : TheMessage = The message to be displayed
 !
       USE WINTERACTER
       
-      CHARACTER*(*), INTENT(IN   ) :: TheMessage
+      CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Info")
 
@@ -80,7 +80,7 @@
 !
       USE WINTERACTER
       
-      CHARACTER*(*), INTENT(IN) :: TheQuestion
+      CHARACTER*(*), INTENT (IN   ) :: TheQuestion
 
       CALL WMessageBox(YesNo,QuestionIcon,CommonOK,TheQuestion(1:LEN_TRIM(TheQuestion)),'Confirm')
       Confirm = (WInfoDialog(ExitButtonCommon) .EQ. CommonYes)
@@ -467,7 +467,7 @@
 
 ! Check if stack empty
       IF (WinStackPtr .EQ. 25) THEN
-        CALL ErrorMessage('Serious programming bug: WinStack empty.')
+        CALL DebugErrorMessage('Serious programming bug: WinStack empty.')
         RETURN
       ENDIF
 ! If not, Inc(StackPtr)
