@@ -12,7 +12,7 @@
       
       REAL DV_ScaleFactor
 ! To scale all the data, so that large unit cells can be treated as though they were small.
-! implementation: all d-spacings are multiplied by this factor before being fed to DICVOL,
+! implementation: the wavelength is multiplied by this factor before being fed to DICVOL,
 ! all a, b, and c output by DICVOL are divided by it. 
 
       REAL coeff
