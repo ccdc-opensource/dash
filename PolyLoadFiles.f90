@@ -135,7 +135,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (IN) :: TheString
+      CHARACTER*(*), INTENT (IN   ) :: TheString
 
       INTEGER POS
       INTEGER tNumOfColumns
@@ -172,19 +172,15 @@
 !
 ! JvdS 18 July 2001
 !
-! OUTPUT  : NoData set to .FALSE. if data read in
-!
       USE WINTERACTER
       USE VARIABLES
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-!O      LOGICAL, INTENT (IN OUT) :: NoData
-
       CHARACTER(LEN=512) :: FILTER
-      INTEGER       ::   IFLAGS
-      INTEGER            IFTYPE    ! Needed for Winteracter routine
+      INTEGER               IFLAGS
+      INTEGER               IFTYPE    ! Needed for Winteracter routine
       CHARACTER(LEN=MaxPathLength) tFileName ! Temporary filename
 
       IFLAGS = LoadDialog + DirChange + PromptOn
@@ -245,18 +241,16 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! OUTPUT  : NoData set to .FALSE. if data read in
-!
       USE WINTERACTER
       USE VARIABLES
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=MaxPathLength), INTENT (IN OUT) :: TheFileName
+      CHARACTER(LEN=MaxPathLength), INTENT (INOUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC' ! Contains alambda, the wavelength
+      INCLUDE 'GLBVAR.INC'
 
       INTEGER NBIN, LBIN
       REAL    XBIN, YOBIN, YCBIN, YBBIN, EBIN
@@ -339,8 +333,6 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! OUTPUT  : NoData set to .FALSE. if data read in
-!
 ! RETURNS : 1 for success
 !           0 for error (could be file not found/file in use/no valid data)
 !
@@ -350,7 +342,7 @@
 
 !      IMPLICIT NONE
 
-      CHARACTER(LEN=MaxPathLength), INTENT (IN OUT) :: TheFileName
+      CHARACTER(LEN=MaxPathLength), INTENT (INOUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
 
@@ -373,7 +365,6 @@
         IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
       INCLUDE 'lattice.inc'
 
       INTEGER          KLEN
@@ -527,8 +518,7 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! OUTPUT  : NoData set to .FALSE. if data read in
-!         : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
 ! RETURNS : 1 for success
 !           0 for error (could be file not found/file in use/no valid data)
@@ -539,8 +529,8 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=MaxPathLength), INTENT (IN)  :: TheFileName
-      LOGICAL,                      INTENT (OUT) :: ESDsFilled
+      CHARACTER(LEN=MaxPathLength), INTENT (IN   ) :: TheFileName
+      LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -548,8 +538,6 @@
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-
-      INCLUDE 'statlog.inc'
 
       INTEGER     I, Shift, FLEN ! Length of TheFileName
       REAL*8      TwoThetaStart, TwoThetaStep, CurrTwoTheta
@@ -814,8 +802,7 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! OUTPUT  : NoData set to .FALSE. if data read in
-!         : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
 ! RETURNS : 1 for success
 !           0 for error (could be file not found/file in use/no valid data)
@@ -826,16 +813,14 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=MaxPathLength), INTENT (IN)  :: TheFileName
-      LOGICAL,                      INTENT (OUT) :: ESDsFilled
+      CHARACTER(LEN=MaxPathLength), INTENT (IN   ) :: TheFileName
+      LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
 
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-
-      INCLUDE 'statlog.inc'
 
       INTEGER      I, NumOfBins, FLEN ! Length of TheFileName
       REAL         Lambda1
@@ -1047,8 +1032,7 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! OUTPUT  : NoData set to .FALSE. if data read in
-!         : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
 ! RETURNS : 1 for success
 !           0 for error (could be file not found/file in use/no valid data)
@@ -1067,8 +1051,6 @@
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-
-      INCLUDE 'statlog.inc'
 
       CHARACTER*255 Cline ! String containing last line read from file
       INTEGER       J, NumOfBins, CurrLineNr, FLEN ! Length of TheFileName
@@ -1223,8 +1205,7 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! OUTPUT  : NoData set to .FALSE. if data read in
-!         : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
 ! RETURNS : 1 for success
 !           0 for error (could be file not found/file in use/no valid data)
@@ -1243,8 +1224,6 @@
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-
-      INCLUDE 'statlog.inc'
 
       CHARACTER*511 Cline ! String containing last line read from file
       INTEGER       J, MaxNumOfBins, FLEN ! Length of TheFileName
@@ -1508,8 +1487,7 @@
 !
 ! INPUT   : TheFileName = the file name
 !
-! OUTPUT  : NoData set to .FALSE. if data read in
-!         : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
 !
 ! RETURNS : 1 for success
 !           0 for error (could be file not found/file in use/no valid data)
@@ -1520,8 +1498,8 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=MaxPathLength), INTENT (IN)  :: TheFileName
-      LOGICAL,                      INTENT (OUT) :: ESDsFilled
+      CHARACTER(LEN=MaxPathLength), INTENT (IN   ) :: TheFileName
+      LOGICAL,                      INTENT (  OUT) :: ESDsFilled
 
       INCLUDE 'PARAMS.INC'
 

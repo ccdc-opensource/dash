@@ -747,8 +747,7 @@
       TicExists = .FALSE.
 ! JvdS isn't gotdslfile initialised?
  10   line = ' '
-      READ(11,1100,END=100) line
- 1100 FORMAT(a)
+      READ(11,'(A)',END=100) line
       nl = LEN_TRIM(line)
       CALL ILowerCase(line(:nl))
       CALL INextString(line,keychar)
@@ -844,7 +843,6 @@
 
       IMPLICIT NONE
 
-!O      LOGICAL NoData
       INTEGER klen
 
       INCLUDE 'GLBVAR.INC'
@@ -878,7 +876,7 @@
         END IF
 !C>> JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
 !C>> I moved it, since i wanted to check that all the data read in ok before calling it
-        IF (TicExists  .AND. PikExists .AND. HcvExists ) THEN
+        IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
 !C>> JCC before, this just didnt plot anything, even though in theory we should be able
 !C>> to observe the full profile. Firstly have to synchronize the common blocks though
           CALL Synchronize_Data()
