@@ -2919,8 +2919,9 @@
       CHARACTER*4 WDTF04(NW)
       LOGICAL TESTOV
       DIMENSION C3FN(3), C3DN(3), IWTF04(3,NW)
+      INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
+      LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
-      LOGICAL SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))

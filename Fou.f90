@@ -30,9 +30,9 @@
       CHARACTER*4 MWORD, MTBL1(8), MTBL2(4), MNEW(20)
       CHARACTER*80 MCARD(20), NEWNCD
       CHARACTER*10 FILNOM
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
-      LOGICAL SDREAD
+      INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
+      LOGICAL                                                                             SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
