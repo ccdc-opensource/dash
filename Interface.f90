@@ -342,6 +342,8 @@
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,8,I,PkProb(IOrd),'(F8.3)')
         END DO
       ELSE
+! JvdS This should never be necessary: CALL WDialogClearField(IDD_Peak_Positions_Grid)
+! should have taken care of all this
         CALL WDialogFieldState(ID_Index_Output,Disabled)
         DO I = 1, 8
           CALL WGridClearCell(IDF_Peak_Positions_Grid,I,1)
