@@ -166,16 +166,12 @@
       INCLUDE 'statlog.inc'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
-! Not too pretty, but safe
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
       INTEGER                BackupNOBS
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
-
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -264,7 +260,6 @@
         DO I = NOBS+1, MOBS
           XOBS(I) = 0.0
           YOBS(I) = 0.0
-          YBAK(I) = 0.0
           EOBS(I) = 0.0
         ENDDO
       ENDIF
@@ -301,9 +296,9 @@
         BackupYOBS(I) = YOBS(I)
         BackupEOBS(I) = EOBS(I)
       ENDDO
-! JvdS Assume no knowledge on background
+! Assume no knowledge on background
       CALL Clear_BackGround
-      LBIN = 1
+      CALL Clear_Bins
       CALL Rebin_Profile
       IPTYPE = 1
       NoData = .FALSE.
@@ -342,8 +337,8 @@
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       CHARACTER*255 Cline ! String containing last line read from file
       INTEGER       I, J, NumOfBins, FLEN ! Length of TheFileName
@@ -481,8 +476,8 @@
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
 !&SRS
 ! SRSRUN = Sum of 9129                                                           
@@ -607,8 +602,8 @@
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       INTEGER      I, NumOfBins, FLEN ! Length of TheFileName
       REAL         Lambda1
@@ -848,8 +843,8 @@
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       CHARACTER*255 Cline ! String containing last line read from file
       CHARACTER*255 tSubString
@@ -1051,8 +1046,8 @@
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       CHARACTER*511 Cline ! String containing last line read from file
       INTEGER       J, MaxNumOfBins, FLEN ! Length of TheFileName
@@ -1343,8 +1338,8 @@
       INCLUDE 'lattice.inc'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       CHARACTER*255 Cline
       INTEGER       I, IS, FLEN ! Length of TheFileName
@@ -1475,8 +1470,8 @@
       INCLUDE 'lattice.inc'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       CHARACTER*255 Cline, tString, tSubString
       INTEGER       I, NumOfBins, hFile, tLen
@@ -1643,8 +1638,8 @@
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       INTEGER                BackupNOBS
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
@@ -1674,7 +1669,6 @@
         XOBS(I) = BackupXOBS(I+Shift)
         YOBS(I) = BackupYOBS(I+Shift)
         EOBS(I) = BackupEOBS(I+Shift)
-        YBAK(I) = 0.0
       ENDDO
       NOBS = NOBS - Shift
       CALL Rebin_Profile
@@ -1709,8 +1703,8 @@
  
       XPMIN = XBIN(1)
       XPMAX = XBIN(NBIN)
-      YPMIN = XBIN(1)
-      YPMAX = XBIN(1)
+      YPMIN = YOBIN(1)
+      YPMAX = YOBIN(1)
       DO I = 2, NBIN
         YPMIN = MIN(YOBIN(I),YPMIN)
         YPMAX = MAX(YOBIN(I),YPMAX)
@@ -1733,9 +1727,9 @@
 !
       SUBROUTINE ProfileRead_TruncationWarning(filename, Npoints)
 
-      USE VARIABLES
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       CHARACTER*(*) filename
       CHARACTER*7   cmobs
@@ -1759,8 +1753,8 @@
       INCLUDE 'PARAMS.INC'
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
@@ -1769,26 +1763,24 @@
       INCLUDE 'statlog.inc'
 
       INTEGER I, J, JJ, IST
-      REAL XADD, YOADD, YBADD, VADD
+      REAL XADD, YOADD, VADD
 
       NBIN = (NOBS/LBIN)
       DO I = 1, NBIN
         IST = (I-1) * LBIN
         XADD  = 0.0
         YOADD = 0.0
-        YBADD = 0.0
         VADD  = 0.0
         DO J = 1, LBIN
           JJ = J + IST
           XADD  = XADD  + XOBS(JJ)
           YOADD = YOADD + YOBS(JJ)
-          YBADD = YBADD + YBAK(JJ)
           VADD  = VADD  + EOBS(JJ)**2
         ENDDO
         XBIN(I)  =  XADD/FLOAT(LBIN)
         YOBIN(I) = YOADD/FLOAT(LBIN)
         YCBIN(I) = 0.0
-        YBBIN(I) = YBADD/FLOAT(LBIN)
+        YBBIN(I) = 0.0
         EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
       ENDDO
       DataSetChange = DataSetChange + 1

@@ -28,15 +28,14 @@
 ! displayed, moved, closed and then displayed again.
 
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
 ! MOBS  = (=15000) Maximum number of observations, i.e. data points in powder pattern
 ! NOBS  = Number of data points in powder pattern
 ! XOBS  = 2 theta
 ! YOBS  = observed number of counts ('intensity') for the corresponding 2 theta value
 !        (this should have been a 'struct'/'record', but that didn't exist yet in FORTRAN when this was programmed)
-! YBAK  = background number of counts ('intensity') for the corresponding 2 theta value
 ! EOBS  = estimated standard deviation of the observed number of counts ('intensity')
 !         for the corresponding 2 theta value
 !

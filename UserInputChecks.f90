@@ -50,7 +50,6 @@
                        XGGMIN,    XGGMAX
       
       FnPatternOK = .FALSE.
-      IF (NoData) RETURN
       IF (NBIN .LT. 15) RETURN
       IF ((XPMAX-XPMIN) .LT. 1.0) RETURN
       FnPatternOK = .TRUE.
