@@ -1,9 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SA_OUTPUT(T,CHIMIN,CHIAV,CHIESD,&
-      dxvav,xvsig,flav,N,NUP,NDOWN,NREJ,&
-      ntotmov)
+      SUBROUTINE SA_OUTPUT(T,CHIMIN,CHIAV,CHIESD,dxvav,xvsig,flav,N,NUP,NDOWN,ntotmov)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -11,13 +9,13 @@
       IMPLICIT NONE
 
       REAL T, CHIMIN, CHIAV, CHIESD
-      INTEGER N, NUP, NDOWN, NREJ, ntotmov
+      INTEGER N, NUP, NDOWN, ntotmov
       REAL dxvav(*),xvsig(*),flav(*)
 
       INCLUDE 'PARAMS.INC'
 
-      REAL XOPT,       C,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       INTEGER         Curr_SA_Iteration
       COMMON /ITRINF/ Curr_SA_Iteration
@@ -32,15 +30,14 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       REAL ctem, tempvl
+      REAL bchpro, bchmin, bpwval, avchi1, avchi2, avchi3, avchi4
       REAL tenow1, tenow2, ruler, rulex1, rulex2
       REAL, PARAMETER :: rminh = 0.01
       REAL, PARAMETER :: rmaxh = 0.99
@@ -66,9 +63,6 @@
       avchi3 = ALOG10(MAX(1.0, chiav-0.1*chiesd))
       ctem = MAX(1.0, chiav+0.1*chiesd)
       avchi4 = ALOG10(MIN(10000.0, ctem))
-      nd1 = ndown
-      nd3 = ntotmov
-      nd4 = nup
       CALL IGrFillPattern(Solid)
 ! Temperature
       CALL IGrSelect(3,IDF_T_picture)
@@ -112,7 +106,7 @@
       CALL IGrUnits(0.0,0.0,ruler,1.0)
       CALL IGrColourN(63)  ! Yellow
       rulex1 = 0.0
-      rulex2 = FLOAT(nd3)
+      rulex2 = FLOAT(ntotmov)
       CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
       CALL IGrColourN(159) ! Blue
       rulex1 = rulex2
@@ -128,11 +122,11 @@
       ELSE
         CALL IGrColourN(95) ! Lightgreen
         rulex1 = 0.0
-        rulex2 = FLOAT(nd1)
+        rulex2 = FLOAT(ndown)
         CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
         CALL IGrColourN(159) ! Blue
         rulex1 = rulex2
-        rulex2 = rulex2 + FLOAT(nd4)
+        rulex2 = rulex2 + FLOAT(nup)
         CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
         CALL IGrColourN(31) ! Red
         rulex1 = rulex2
