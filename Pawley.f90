@@ -372,12 +372,7 @@
                 CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
               ENDIF
             CASE (IDB_PawRef_Save)
-!!              IF (SpaceGroupDetermination) THEN
-!!                CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd                
-!!                CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
-!!              ELSE
-                IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve, Enabled)
-!!              ENDIF
+              IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve, Enabled)
             CASE (IDF_PawRef_Solve)
               IF (SpaceGroupDetermination) THEN
                 CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd                
@@ -386,7 +381,7 @@
 ! Emulate loading .SDI file for next window
                 Ilen = LEN_TRIM(DashPikFile)
                 SDIFile = DashPikFile(1:Ilen-3)//'sdi'
-                CALL SetSAFileName(SDIFile)
+                CALL ScrUpdateFileNameSDIFile(SDIFile)
 ! Read in the HCV, PIK and TIC files from POLYP
                 CALL GETHCV(DashHcvFile, IER)
                 CALL GETPIK(DashPikFile, IER)
@@ -629,9 +624,9 @@
       MATSZ = QPFDIM
       NINIT = 1
       ALSQ = 0.0
-! JCC trap the return status
-      Quick_Pawley_Fit = FORTY(xxx,ALSQ,MATSZ,PCCN01,PFCN03,DUMMY,CALPR,fname)
-! JCC Trap for an error on file opening
+! Trap the return status
+      Quick_Pawley_Fit = FORTY(xxx, ALSQ, MATSZ, PCCN01, PFCN03, DUMMY, CALPR, fname)
+! Trap for an error on file opening
       IF (ICRYDA .NE. -1) CALL CLOFIL(ICRYDA)
       IF (IO10 .NE. -1)   CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
@@ -841,7 +836,7 @@
       WRITE(iFile,'(A)',ERR=999) " DSL ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
       WRITE(iFile,8140,ERR=999) (CellPar(I),I=1,6)
  8140 FORMAT(' Cell ',3F10.5,3F10.4)
-      WRITE(iFile,8150,ERR=999) NumberSGTable,SGNumStr(NumberSGTable),SGHMaStr(NumberSGTable)
+      WRITE(iFile,8150,ERR=999) NumberSGTable, SGNumStr(NumberSGTable), SGHMaStr(NumberSGTable)
  8150 FORMAT(' SpaceGroup ',I4,4X,A12,A12)
       WRITE(iFile,8160,ERR=999) PAWLEYCHISQ
  8160 FORMAT(' PawleyChiSq ',F10.2)
@@ -882,17 +877,17 @@
       WRITE(iFile,*,ERR=999)'! Radiation wavelength and data type'
       WRITE(iFile,'(A3,1X,F10.5,I2)',ERR=999) 'rad', ALambda, JRadOption
       WRITE(iFile,*,ERR=999)'! Sigma shape parameters: format sigma1 dummy sigma2 dummy'
-      WRITE(iFile,100,ERR=999) 'sig',PeakShapeSigma(1),0.02,PeakShapeSigma(2),0.02
+      WRITE(iFile,100,ERR=999) 'sig',PeakShapeSigma(1), 0.02, PeakShapeSigma(2), 0.02
       WRITE(iFile,*,ERR=999)'! Gamma shape parameters: format gamma1 dummy gamma2 dummy'
-      WRITE(iFile,100,ERR=999) 'gam',PeakShapeGamma(1),0.02,PeakShapeGamma(2),0.02
+      WRITE(iFile,100,ERR=999) 'gam',PeakShapeGamma(1), 0.02, PeakShapeGamma(2), 0.02
       WRITE(iFile,*,ERR=999)'! Asymmetry parameters: format HPSL dummy HMSL dummy'
-      WRITE(iFile,100,ERR=999) 'asy',PeakShapeHPSL,0.02,PeakShapeHMSL,0.02
+      WRITE(iFile,100,ERR=999) 'asy', PeakShapeHPSL, 0.02, PeakShapeHMSL, 0.02
       WRITE(iFile,*,ERR=999)'! Calculated zero point'
-      WRITE(iFile,110,ERR=999) 'zer',ZeroPoint
+      WRITE(iFile,110,ERR=999) 'zer', ZeroPoint
       WRITE(iFile,*,ERR=999)'! Pawley-fit SLIM parameter setting'
-      WRITE(iFile,110,ERR=999) 'sli',SlimValue
+      WRITE(iFile,110,ERR=999) 'sli', SlimValue
       WRITE(iFile,*,ERR=999)'! Pawley-fit Scale factor setting'
-      WRITE(iFile,110,ERR=999) 'sca',ScalFac
+      WRITE(iFile,110,ERR=999) 'sca', ScalFac
   100 FORMAT(A3,1X,4(F10.4,1X))
   110 FORMAT(A3,1X,F10.4)
       CLOSE(iFile)
@@ -913,22 +908,22 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: CreateSDIFile
       CHARACTER(MaxPathLength) :: SDIFileName
       CHARACTER(LEN=45) :: FILTER
       INTEGER IFLAGS
-
-      INTEGER, EXTERNAL :: CreateSDIFile
       
 ! Save the project
       SaveProject = .FALSE.
       IFLAGS = SaveDialog + AppendExt + PromptOn
       FILTER = 'Diffraction information files (*.sdi)|*.sdi|'
       SDIFileName = ' '
-      CALL WSelectFile(FILTER,IFLAGS,SDIFileName,'Save diffraction information for structure solution')
+      CALL WSelectFile(FILTER, IFLAGS, SDIFileName, 'Save diffraction information for structure solution')
       IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(SDIFileName) .NE. 0)) THEN
         IF (CreateSDIFile(SDIFileName) .EQ. 0) THEN
-          CALL SetSAFileName(SDIFileName)
+          CALL ScrUpdateFileNameSDIFile(SDIFileName)
           CALL sa_SetOutputFiles(SDIFileName)
+!C Update the file name in the status bar
           SaveProject = .TRUE.
         ENDIF
       ENDIF
