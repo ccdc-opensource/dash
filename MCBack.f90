@@ -218,23 +218,11 @@
           YOBS(IOBS) = YOBS(IOBS) - YBBIN(I)
           YPMIN = MIN(YOBS(IOBS),YPMIN)
           YPMAX = MAX(YOBS(IOBS),YPMAX)
-        END DO
+        ENDDO
         YOBIN(I) = YOBIN(I) - YBBIN(I)
-        YBBIN(I) = 0.0
-      END DO
-      XPGMIN = XPMIN
-      XPGMAX = XPMAX                       
-      YPGMIN = YPMIN
-      YPGMAX = YPMAX
-      CALL UPLOAD_RANGE()
-      XPGMINOLD = XPMIN
-      XPGMAXOLD = XPMAX
-      YPGMINOLD = YPMIN
-      YPGMAXOLD = YPMAX
-      IPMIN = 1
-      IPMAX = NBIN
-      IPMINOLD = IPMIN
-      IPMAXOLD = IPMAX
+      ENDDO
+      CALL Init_BackGround
+      CALL GetProfileLimits
       BACKREF = .FALSE.
 
       END SUBROUTINE SubtractBackground
@@ -247,16 +235,9 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
+      IMPLICIT NONE
 
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-
-      INTEGER I, IBpass
+      INTEGER  IBpass
       LOGICAL QUIT
 
 ! Remember current dialogue window
@@ -287,9 +268,7 @@
               QUIT = .TRUE.
             CASE (IDCANCEL)
 ! If user Cancels, assume no knowledge on background
-              DO I = 1, NBIN
-                YBBIN(I) = 0.0
-              END DO
+              CALL Init_BackGround
               QUIT = .TRUE.
           END SELECT
         END IF

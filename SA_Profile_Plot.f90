@@ -20,9 +20,6 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
-!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
-!U     YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
@@ -80,7 +77,6 @@
       REAL YOSUM, YCSUM, RESCL
       INTEGER I, II
 
-!U      NOBS = NOBSA
       NBIN = NOBSA
       YOSUM = 0.0
       YCSUM = 0.0
@@ -97,14 +93,8 @@
         XBIN(I)  = XOBSA(I)
         YOBIN(I) = YOBSA(I)
         YCBIN(I) = YCALBEST(I)
-        YBBIN(I) = 0.0
         EBIN(I)  = EsdA(I)
-!U        XOBS(I)=XOBSA(I)
-!U        YOBS(I)=YOBSA(I)
-!U        YCAL(I)=YCALBEST(I)
-!U        YBAK(I)=0.0
-!U        EOBS(I)=EsdA(I)
-      END DO
+      ENDDO
       IF (num_sa_profile_plot .EQ. 1) CALL GetProfileLimits
       IPTYPE = 2
       CALL Profile_Plot
