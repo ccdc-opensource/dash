@@ -443,9 +443,6 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER    MVAR
-      PARAMETER (MVAR = 100)
-
       INTEGER         MAXK
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)

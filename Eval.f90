@@ -11,6 +11,8 @@
 
       REAL*8 CHROM(*)
 
+      INCLUDE 'PARAMS.INC'
+
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
@@ -28,8 +30,6 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
       DATA ZERO / 0.0D0 /
 
-      INTEGER    MVAR
-      PARAMETER (MVAR = 100)
       REAL*8 CKK1, CKK2, CKK3
       REAL*8 TRAN(1:3), ROTA(1:3,1:3), CART(1:3,1:MAXATM)
       REAL*8 QUATER(4), QQSUM, QDEN
