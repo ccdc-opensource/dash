@@ -172,18 +172,22 @@
 !
       SUBROUTINE FillSymmetry
 
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+
 ! Covers the eventuality of the default space group option.
 ! We need to determine the number of symmetry operators etc.
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
+
+      INTEGER         NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+      COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      CHARACTER*6 xxx
-      CHARACTER*10 fname
-
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
 
       INTEGER     msymmin
       PARAMETER ( msymmin = 10 )
@@ -195,23 +199,35 @@
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
+      CHARACTER*10 filnam_root
+      COMMON /commun/ filnam_root
+
+
+      CHARACTER*6 PNAME
+      INTEGER hFile, iSym
+      INTEGER, EXTERNAL :: GetCrystalSystem
+
    10 IBMBER = 0
-      OPEN(42,file='polys.ccl',status='unknown')
-      WRITE(42,4210) 
+      hFile = 42
+      OPEN(hFile,file='polys.ccl',status='unknown',ERR=999)
+      WRITE(hFile,4210,ERR=999) 
  4210 FORMAT('N Determining the space group ')
       IF (NumberSGTable .GE. 1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin .GT. 0) THEN
-          DO isym = 1, nsymmin
-            WRITE(42,4235) symline(isym)
- 4235       FORMAT('S ',a)
+          DO iSym = 1, nsymmin
+            WRITE(hFile,4235,ERR=999) symline(iSym)
+ 4235       FORMAT('S ',A)
           ENDDO
         ENDIF
       ENDIF
-      CLOSE(42)
-      fname='polys'
-      xxx='SPGMAK'
-      CALL FORSYM(xxx,fname)
+      CLOSE(hFile)
+      filnam_root = 'polys'
+      PNAME = 'SPGMAK'
+      NINIT = 1
+      CALL PREFIN(PNAME)
+      CALL SYMOP
+      IF (IBMBER .EQ. 0) CALL OPSYM(1)
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
@@ -223,6 +239,9 @@
         CALL ErrorMessage('Error while determining space group: space group reset.')
         GOTO 10
       ENDIF
+      RETURN
+  999 CALL ErrorMessage('Error writing temporary file for space group decoding.')
+      CLOSE(hFile)
 
       END SUBROUTINE FillSymmetry
 !
