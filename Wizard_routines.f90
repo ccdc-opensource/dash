@@ -1288,8 +1288,7 @@
       CHARACTER(LEN=MaxPathLength) CTEMP
       REAL    Temp
       INTEGER ISTAT
-      INTEGER DiffractionFileBrowse ! Function
-      INTEGER DiffractionFileOpen ! Function
+      INTEGER, EXTERNAL :: DiffractionFileBrowse, DiffractionFileOpen
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page2)

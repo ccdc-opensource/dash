@@ -411,7 +411,7 @@
       ENDDO
       kk = 0
       TotNumZMatrices = 0
-! JCC Run through all possible fragments
+! Run through all possible fragments
       DO iFrg = 1, maxfrg
 ! Only include those that are now checked
         IF (gotzmfile(iFrg)) THEN
