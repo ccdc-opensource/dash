@@ -30,7 +30,7 @@
       IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)
 !U      Character(Len=48) ChPtGp
 
-!>JCC 
+!>JCC
       Integer ICurSel
 
       NTPeak=0
@@ -80,7 +80,7 @@
         End Do
         If (NTPeak.eq.1) Then
           SigmDif=0.01
-!	     write(76,*) ' SigmDif= ',SigmDif,NTPeak
+!          write(76,*) ' SigmDif= ',SigmDif,NTPeak
         Else
           PfTDMin=PkTicDif(1)
           PfTDMax=PkTicDif(1)
@@ -89,7 +89,7 @@
             PfTDMax=Max(PfTDMax,PkTicDif(II))
           End Do
           SigmDif= 0.2886751345948*Abs(PfTDMax-PfTDMin)
-!	     write(76,*) ' SigmDif= ',SigmDif,NTPeak
+!          write(76,*) ' SigmDif= ',SigmDif,NTPeak
         End If
         Do I=1,NTPeak
           IOrd=IOrdTem(I)
@@ -110,19 +110,19 @@
             ProbTot=ProbTot+ProbAdd
           End Do
           PkProb(IOrd)=ProbTop/ProbTot
-!	     write(76,*) ' Prob= ',I,Iord,PkProb(IOrd),ProbTop,ProbTot
+!          write(76,*) ' Prob= ',I,Iord,PkProb(IOrd),ProbTop,ProbTot
         End Do
       End If
 !
 ! Write out all the peak positions in an ordered list ...
       ICurSel = WinfoDialog(CurrentDialog)
-	  CALL WDialogSelect(IDD_Peak_Positions)
-	  CALL WDialogClearField(IDD_Peak_Positions_Grid)
-	  CALL WDialogSelect(IDD_Peak_Positions)
-	  CALL WGridRows(IDF_Peak_Positions_Grid,NTPeak)
+        CALL WDialogSelect(IDD_Peak_Positions)
+        CALL WDialogClearField(IDD_Peak_Positions_Grid)
+        CALL WDialogSelect(IDD_Peak_Positions)
+        CALL WGridRows(IDF_Peak_Positions_Grid,NTPeak)
 
-	  IF (NTPeak .GT. 0) THEN
-	    CALL WDialogFieldState(ID_Index_Output,Enabled)
+        IF (NTPeak .GT. 0) THEN
+          CALL WDialogFieldState(ID_Index_Output,Enabled)
         DO I=1,NTPeak
           IOrd=IOrdTem(i)
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,1,i,AllPkPosVal(IOrd),'(F12.4)')
@@ -134,24 +134,24 @@
           CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,6,i,IHPk(2,I))
           CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,7,i,IHPk(3,I))
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,8,i,PkProb(IOrd),'(F8.3)')
-!	    write(76,*) ' PutCell ',I,(IHPk(jjj,I),jjj=1,3),AllPkPosVal(IOrd),AllPkPosEsd(IOrd)
+!         write(76,*) ' PutCell ',I,(IHPk(jjj,I),jjj=1,3),AllPkPosVal(IOrd),AllPkPosEsd(IOrd)
         END DO
-	  ELSE
-	    CALL WDialogFieldState(ID_Index_Output,Disabled)
-	    DO I = 1,8
+        ELSE
+          CALL WDialogFieldState(ID_Index_Output,Disabled)
+          DO I = 1,8
           CALL WGridClearCell(IDF_Peak_Positions_Grid,i,1)
-		END DO
-	  END IF
+            END DO
+        END IF
 
 
-!  
+!
 ! Now do a refinement ...
 ! JvdS Following two lines didn't do anything
 !U      CALL WDialogSelect(IDD_Crystal_Symmetry)
 !U      Call WDialogGetMenu(IDF_Crystal_System_Menu,IPtGp,ChPtGp)
       Call RefineLattice()
-	  IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
+        IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
 !
-!       
+!
 !
       endsubroutine Upload_Positions
