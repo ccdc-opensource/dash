@@ -287,7 +287,6 @@
       tRecLattice = SNGL(c2fmat)
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL CREATE_FOB()
-      kk = 0
       CALL WDialogSelect(IDD_SAW_Page2)
 ! Per Z-matrix, determine whether to use quaternions or a single axis
       DO ifrg = 1, maxfrg
@@ -324,18 +323,18 @@
             ENDDO
 ! Calculate the orientation of the axis
 ! Note: Alpha_m and Beta_m in radians
-            Beta_m  = ACOS(zmSingleRotationAxis(3,ifrg))
-            IF (ABS(zmSingleRotationAxis(3,ifrg)) .GT. 0.99998) THEN
+            Beta_m  = ACOS(zmSingleRotationAxis(3,iFrg))
+            IF (ABS(zmSingleRotationAxis(3,iFrg)) .GT. 0.99998) THEN
 ! The axis coincides with the z-axis, so alpha becomes undefined: set alpha to 0.0
               Alpha_m = 0.0
 ! It turns out that we can get problems with rounding errors here
-            ELSE IF ((-zmSingleRotationAxis(2,ifrg)/SIN(Beta_m)) .GT.  0.99999) THEN
+            ELSE IF ((-zmSingleRotationAxis(2,iFrg)/SIN(Beta_m)) .GT.  0.99999) THEN
               Alpha_m = 0.0
-            ELSE IF ((-zmSingleRotationAxis(2,ifrg)/SIN(Beta_m)) .LT. -0.99999) THEN
+            ELSE IF ((-zmSingleRotationAxis(2,iFrg)/SIN(Beta_m)) .LT. -0.99999) THEN
               Alpha_m = PI
             ELSE
-              Alpha_m = ACOS(-zmSingleRotationAxis(2,ifrg)/SIN(Beta_m))
-              IF ((ASIN((zmSingleRotationAxis(1,ifrg)))/SIN(Beta_m)) .LT. 0.0) Alpha_m = TWOPI - Alpha_m
+              Alpha_m = ACOS(-zmSingleRotationAxis(2,iFrg)/SIN(Beta_m))
+              IF ((ASIN((zmSingleRotationAxis(1,iFrg)))/SIN(Beta_m)) .LT. 0.0) Alpha_m = TWOPI - Alpha_m
             ENDIF
 ! It's an axis, so Gamma_m can be set to 0.0
             q0m = COS(0.5*Beta_m) * COS(0.5*Alpha_m)
@@ -356,37 +355,43 @@
 ! q0a and q3a are the parameters that are varied during the SA and cannot be multiplied in until 
 ! the actual evaluation of chi-squared. The other factors depend on the orientation of the axis
 ! only, which is known:
-            zmSingleRotationQs(0,ifrg) = DBLE(1.0)
-            zmSingleRotationQs(1,ifrg) = DBLE(2.0 * (q1m*q3m + q0m*q2m))
-            zmSingleRotationQs(2,ifrg) = DBLE(2.0 * (q2m*q3m - q0m*q1m))
-            zmSingleRotationQs(3,ifrg) = DBLE((q0m**2) - (q1m**2) - (q2m**2) + (q3m**2))
+            zmSingleRotationQs(0,iFrg) = DBLE(1.0)
+            zmSingleRotationQs(1,iFrg) = DBLE(2.0 * (q1m*q3m + q0m*q2m))
+            zmSingleRotationQs(2,iFrg) = DBLE(2.0 * (q2m*q3m - q0m*q1m))
+            zmSingleRotationQs(3,iFrg) = DBLE((q0m**2) - (q1m**2) - (q2m**2) + (q3m**2))
           ENDIF
         ENDIF
       ENDDO
       tk = 0
+      kk = 0
+      TotNumZMatrices = 0
 ! JCC Run through all possible fragments
-      DO ifrg = 1, maxfrg
+      DO iFrg = 1, maxfrg
 ! Only include those that are now checked
-        IF (gotzmfile(ifrg)) THEN
+        IF (gotzmfile(iFrg)) THEN
 
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO ii = 1, izmpar(ifrg)
+            TotNumZMatrices = TotNumZMatrices + 1
+            DO ii = 1, izmpar(iFrg)
               kk = kk + 1
-              x(kk) = xzmpar(ii,ifrg)
-              parlabel(kk) = czmpar(ii,ifrg)
-              SELECT CASE (kzmpar(ii,ifrg))
+              zm2Par(ii,iFrgCopy,iFrg) = kk
+              Par2iFrg(kk)     = iFrg
+              Par2iFrgCopy(kk) = iFrgCopy
+              x(kk) = xzmpar(ii,iFrg)
+              parlabel(kk) = czmpar(ii,iFrg)
+              SELECT CASE (kzmpar(ii,iFrg))
                 CASE (1) ! position
                   kzmpar2(kk) = 1
                   lb(kk) = 0.0
                   ub(kk) = 1.0
                 CASE (2,6) ! quaternion
-                  IF (UseQuaternions(ifrg)) THEN
-                    kzmpar(ii,ifrg) = 2 ! quaternion instead of single axis 
+                  IF (UseQuaternions(iFrg)) THEN
+                    kzmpar(ii,iFrg) = 2 ! quaternion instead of single axis 
                     kzmpar2(kk) = 2
                     lb(kk) = -1.0
                     ub(kk) =  1.0
                   ELSE
-                    kzmpar(ii,ifrg) = 6 ! single axis instead of quaternion 
+                    kzmpar(ii,iFrg) = 6 ! single axis instead of quaternion 
                     kzmpar2(kk) = 6
 ! At the moment a Z-matrix containing more than one atom is read in, four
 ! parameters are reserved for 'rotations'. When the rotation is restricted to
@@ -443,6 +448,7 @@
         PrefPars(2) = FLOAT(iK)
         PrefPars(3) = FLOAT(iL)
         kk = kk + 1
+        Par2iFrg(kk) = 0
         kzmpar2(kk) = 7 ! preferred orientation
         x(kk) = 1.0 ! no preferred orientation
         parlabel(kk) = 'Preferred Orientation'

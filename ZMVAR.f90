@@ -34,6 +34,18 @@
 
 ! Maximum number of bonds. Must be equal to MAXBND in SAMVAR
 
+      INTEGER Par2iFrg(1:100)
+
+! Per SA parameter, to which Z-matrix does it belong. 0 = non-structural, e.g. preferred orientation
+
+      INTEGER Par2iFrgCopy(1:100)
+
+! Per SA parameter, to which copy of the Z-matrix does it belong.
+
+      INTEGER zm2Par(1:MaxDOF,1:maxcopies,1:maxfrg)
+
+! Mapping of parameters per dergee of freedom per copy per Z-matrix
+
 ! The following variables are there to allow the dialogue fields in the
 ! window dealing with Z-matrices to be handled by DO...ENDDO loops.
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
@@ -58,6 +70,10 @@
       INTEGER         nfrag
 
 ! nfrag = number of fragments
+
+      INTEGER         TotNumZMatrices
+
+! Total number of Z-matrices, including number of copies
 
       CHARACTER*255   frag_file(0:maxfrg)
 
