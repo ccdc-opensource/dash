@@ -25,7 +25,6 @@
 ! iopta  = optimise valence angle 1=YES, 0=NO.
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
 
-
       REAL RR_tran(1:3,1:RR_maxfrg,1:RR_maxcopies)
       REAL RR_rot(1:4,1:RR_maxfrg,1:RR_maxcopies)
       REAL RR_blen(1:RR_maxatm,1:RR_maxfrg,1:RR_maxcopies)
@@ -36,6 +35,8 @@
 ! blen   = bond length     (wrt iz1)
 ! alph   = valence angle   (wrt iz1 & iz2)
 ! bet    = torsion angle   (wrt iz1, iz2 & iz3)
+
+      REAL RR_AtmCoords(1:3, 1:150)
 
       END MODULE RRVAR
 !
