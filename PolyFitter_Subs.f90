@@ -137,7 +137,6 @@
       USE VARIABLES
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
@@ -509,7 +508,6 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Poly_Colours.inc'
 
       INTEGER          NBIN, LBIN

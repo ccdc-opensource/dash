@@ -105,7 +105,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
       CHARACTER(LEN=128) lintem
@@ -505,7 +504,6 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
       INCLUDE 'Poly_Colours.inc'
 
@@ -701,7 +699,6 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
       INCLUDE 'Poly_Colours.inc'
 

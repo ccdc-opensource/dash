@@ -162,7 +162,6 @@
       LOGICAL, INTENT (IN   ) :: UseMc
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
       INTEGER          NBIN, LBIN

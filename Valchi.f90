@@ -15,7 +15,7 @@
       INTEGER, INTENT (IN   ) :: CurrentParameter
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
 
       INTEGER         KKOR
       REAL                  WTIJ

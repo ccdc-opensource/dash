@@ -153,7 +153,6 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN

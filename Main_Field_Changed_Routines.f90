@@ -371,7 +371,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'LATTICE.INC'
 
       INTEGER, EXTERNAL :: SGNrMenu2Table
@@ -724,7 +723,6 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
       INTEGER           NTPeak

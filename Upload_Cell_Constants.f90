@@ -9,8 +9,7 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       REAL ChiGetLattice
       EXTERNAL ChiGetLattice

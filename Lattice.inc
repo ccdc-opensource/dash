@@ -60,3 +60,9 @@
 !      Space Group (IT tables)    : SGHMaStr(IPosSg)
 !      Space Group Hall symbol    : SGHalStr(IPosSg)
 !      Space Group explicit symbol: SGShmStr(IPosSg)
+
+      INTEGER          NumberSGTable
+      COMMON /NSGTCMN/ NumberSGTable
+
+! NumberSGTable stores the number of the Space Group from the space group table.
+! Each setting has its own number, so there are 530 entries in total.
