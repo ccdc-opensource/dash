@@ -129,36 +129,59 @@
 ! Ideally, we would want hydrogens to have weight 0.0 when not taken into account.
 
       USE ZMVAR
-      USE ATMVAR
 
       IMPLICIT NONE
 
-      INTEGER iFrg, I, J
-      REAL    TotalAtomicWeighting
+      INTEGER iFrg
 
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           IF (icomflg(iFrg) .EQ. 0)  THEN
-            DO I = 1, natoms(iFrg)
-              DO J = 1, MaxElm
-                IF (asym(I,iFrg)(1:2) .EQ. ElementStr(J)(1:2)) THEN
-                  AtomicWeighting(I,iFrg) = FLOAT(atnr(J))**2
-                  EXIT
-                ENDIF
-              ENDDO
-            ENDDO
-            TotalAtomicWeighting = 0.0
-            DO I = 1, natoms(iFrg)
-              TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(I,iFrg) 
-            ENDDO
-            DO I = 1, natoms(iFrg)
-              AtomicWeighting(I,iFrg) = AtomicWeighting(I,iFrg) / TotalAtomicWeighting 
-            ENDDO
+            CALL zmCreate_AtomicWeightings(iFrg)
           ENDIF
         ENDIF
       ENDDO
 
       END SUBROUTINE Create_AtomicWeightings
+!
+!*****************************************************************************
+!
+      SUBROUTINE zmCreate_AtomicWeightings(iFrg)
+! This routine sets the weights for the atoms used when calculating the centre of mass
+! of a Z-matrix.
+! The weights are set such that the 'crystallographic' centre of mass,
+! i.e. the centre of scattering power, is used for rotations.
+! The scattering power of an atom is the square of the number of its electrons,
+! which is taken to be Z, its atomic number, i.e. we are neglecting ions.
+! Ideally, we would want hydrogens to have weight 0.0 when not taken into account.
+
+      USE ZMVAR
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iFrg
+
+      INTEGER I, J
+      REAL    TotalAtomicWeighting
+
+      DO I = 1, natoms(iFrg)
+        DO J = 1, MaxElm
+          IF (asym(I,iFrg)(1:2) .EQ. ElementStr(J)(1:2)) THEN
+            AtomicWeighting(I,iFrg) = FLOAT(atnr(J))**2
+            EXIT
+          ENDIF
+        ENDDO
+      ENDDO
+      TotalAtomicWeighting = 0.0
+      DO I = 1, natoms(iFrg)
+        TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(I,iFrg) 
+      ENDDO
+      DO I = 1, natoms(iFrg)
+        AtomicWeighting(I,iFrg) = AtomicWeighting(I,iFrg) / TotalAtomicWeighting 
+      ENDDO
+
+      END SUBROUTINE zmCreate_AtomicWeightings
 !
 !*****************************************************************************
 !
