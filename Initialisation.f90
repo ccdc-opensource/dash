@@ -392,6 +392,7 @@
       CALL WDialogPutString(IDF_ViewExe,ViewExe)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,.TRUE.)
+      SA_SimplexDampingFactor = 0.1
       CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,.FALSE.)
       CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,.FALSE.)
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -453,7 +454,7 @@
       KolPeakPos        = Win_RGB(50,50,200)
       KolBack           = Win_RGB(164,211,105)
 
-      CALL ReadConfigurationFile
+   !   CALL ReadConfigurationFile
 
       CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
                                         KolPGWindow%IGreen,&
@@ -512,7 +513,14 @@
 !*****************************************************************************
 !
       SUBROUTINE WriteConfigurationFile
-
+!
+! Writes out a binary configuration file. Note that some of the options that are
+! saved aren't actually optional in DASH at the moment. But adding them as options
+! to the executable isn't too difficult, whereas adding them to the configuration file
+! means that the configuration files would not be compatible.
+! This can be partially solved by adding new variables at the end only and by programming it such
+! that DASH ignores the remainder of the configuration file. That's what it does at the moment.
+!
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -664,8 +672,14 @@
       CALL FileWriteLogical(tFileHandle,RecNr,SavePDB)    ! 1. .pdb  ?
       CALL FileWriteLogical(tFileHandle,RecNr,SaveCSSR()) ! 2. .cssr ?
       CALL FileWriteLogical(tFileHandle,RecNr,SaveCCL())  ! 3. .ccl  ?
+      CALL FileWriteLogical(tFileHandle,RecNr,.FALSE.)    ! 4. .res  ? (not possible yet)
+      CALL FileWriteLogical(tFileHandle,RecNr,.FALSE.)    ! 5. .mol2 ? (not possible yet)
+! Save YES / NO if .pro file is to be written out when a best solution is found
+      CALL FileWriteLogical(tFileHandle,RecNr,.TRUE.)
 ! Auto local minimisation at the end of every run in multirun YES / NO
       CALL FileWriteLogical(tFileHandle,RecNr,AutoLocalMinimisation())
+! Save the damping factor for the local minimisation
+      CALL FileWriteReal(tFileHandle,RecNr,SA_SimplexDampingFactor)
 ! Save the seeds for the random number generator
       CALL WDialogSelect(IDD_SA_input3)
       CALL WDialogGetInteger(IDF_SA_RandomSeed1,ISEED)
@@ -830,20 +844,26 @@
 ! and the viewer arguments
       CALL FileReadString(tFileHandle,RecNr,ViewArg)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
-! Save use hydrogens YES / NO
+! Read use hydrogens YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,LOG_HYDROGENS)
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
-! Save YES / NO which molecular file formats are to be written out when a best solution is found
+! Read YES / NO which molecular file formats are to be written out when a best solution is found
       CALL FileReadLogical(tFileHandle,RecNr,SavePDB)    ! 1. .pdb  ?
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 2. .cssr ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,tLogical)
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 3. .ccl  ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,tLogical)
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 4. .res  ? (not possible yet)
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 5. .mol2 ? (not possible yet)
+! Read YES / NO if .pro file is to be written out when a best solution is found
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical) ! not used yet
 ! Auto local minimisation at the end of every run in multirun YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,tLogical)
+! Read the damping factor for the local minimisation
+      CALL FileReadReal(tFileHandle,RecNr,SA_SimplexDampingFactor)
 ! Read the seeds for the random number generator
       CALL WDialogSelect(IDD_SA_input3)
       CALL FileReadInteger(tFileHandle,RecNr,tInteger)
