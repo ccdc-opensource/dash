@@ -175,7 +175,9 @@
       DATA LimsChanged / .FALSE. /
       SAVE LimsChanged
       LOGICAL Confirm ! Function
-      REAL T0, RT, xtem
+      REAL xtem
+      DOUBLE PRECISION T0, rt
+      COMMON /saparl/  T0, rt
       INTEGER JPOS, NMOVES, IFCOl, IFRow, ICHK
       REAL         rpos
       INTEGER      ipos
