@@ -12,7 +12,21 @@
 ! Declare window-type and message variables
 !
 
+! JvdS 
+!
+! #######################################################################
+!
+! H E L P
+!
+! The following line generates Heisenbugs
+!
+
       CHARACTER*255 SDIFile
+
+!
+! #######################################################################
+!
+
       CHARACTER*80 pikfile,ticfile,hcvfile
       REAL         rpos
       INTEGER      ipos
@@ -34,7 +48,6 @@
 !
       INTEGER  MAXEVL, IPRINT
 !
-!O      LOGICAL :: NODATA = .FALSE.
       DOUBLE PRECISION cen,sig
       LOGICAL       gaussb
       DOUBLE PRECISION T0,rt,eps,target_value
@@ -705,13 +718,20 @@
 
       USE VARIABLES
 
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
+      REAL    PAWLEYCHISQ,RWPOBS,RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
       INCLUDE 'statlog.inc'
 !
-      CHARACTER(LEN = 255)            ::  SDIFile, dslfile
-      CHARACTER(LEN = MaxPathLength) :: line,subline
+!O      CHARACTER(LEN = 255)            ::  SDIFile, dslfile
+      CHARACTER*(*), INTENT (IN   ) ::  SDIFile
+      CHARACTER(LEN = 80)           ::   dslfile
+      CHARACTER(LEN = MaxPathLength) :: line, subline
 
+      INTEGER nl
       CHARACTER*12 KeyChar
 
 !C>> JCC Declaration
@@ -727,6 +747,10 @@
       iticer = 1
       ipiker = 0
       idsl = 0
+      IF (LEN_TRIM(SDIFile) .GT. 80) THEN
+        CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in OPENHCVPIKTIC')
+
+      ENDIF
 ! Now open all the appropriate PIK, TIC and HCV files
       OPEN(11,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
       CALL sa_SetOutputFiles(SDIFile)
@@ -746,26 +770,32 @@
 !C>> JCC Cant use this, since file paths can have spaces in under windows
 !          call INextString(line,pikfile)
           CALL ILocateString(line,isst,ised)
-          WRITE(DashPikFile,*) line(isst:nl)
+!O          WRITE(DashPikFile,*) line(isst:nl)
+          DashPikFile(1:80) = line(isst:isst+79)
           PikExists = .TRUE.
         CASE ('tic')
 !C>> JCC Cant use this, since file paths can have spaces in under windows
 !         call INextString(line,ticfile)
           CALL ILocateString(line,isst,ised)
-          WRITE(DashTicFile,*) line(isst:nl)
+! JvdS I get strange results here when I use the debugger.
+! DashTicFile is 255 characters long. But not always.
+!O          WRITE(DashTicFile,*) line(isst:nl)
+          DashTicFile(1:80) = line(isst:isst+79)
           TicExists = .TRUE.
         CASE ('hcv')
 !C>> JCC Cant use this, since file paths can have spaces in under windows
 !          call INextString(line,hcvfile)
           CALL ILocateString(line,isst,ised)
-          WRITE(DashHcvFile,*) line(isst:nl)
+!O          WRITE(DashHcvFile,*) line(isst:nl)
+          DashHcvFile(1:80) = line(isst:isst+79)
           HcvExists = .TRUE.
 !C>> JCC Additional file: 'dsl'. The selection file.
 !C>> This lists the peak selection data, shape parameters and experimental 
 !C>> data such as wavelength.
         CASE ('dsl')
           CALL ILocateString(line,isst,ised)
-          WRITE(dslfile,*) line(isst:nl)
+!O          WRITE(dslfile,*) line(isst:nl)
+          dslfile(1:80) = line(isst:isst+79)
           gotdslfile = .TRUE.
         CASE ('cel')
           DO I = 1, 6
@@ -790,16 +820,16 @@
           LatBrav = GetCrystalSystem_2(IActSGNum,NumberSGTable)
           CALL SetCrystalSystem(LatBrav)
 ! Last but not least set the space group
-          CALL Update_Space_Group(-1,LatBrav,NumberSGTable)
+          CALL SetSpaceGroupMenu
           NumPawleyRef = 0
           CALL FillSymmetry()
         CASE ('paw')
           CALL INextReal(line,PawleyChiSq)
         CASE ('raw')
           CALL ILocateString(line,isst,ised)
-          WRITE(DashRawFile,*) line(isst:nl)
-! @ JvdS shouldn't the next line have been: RawExists = .TRUE. ?
-          HcvExists = .TRUE.      
+!O          WRITE(DashRawFile,*) line(isst:nl)
+          DashRawFile(1:80) = line(isst:isst+79)
+          RawExists = .TRUE.      
       END SELECT
       GOTO 10 
  100  CONTINUE

@@ -1,64 +1,88 @@
-    subroutine sa_Defaults()
-!ep appended
-    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file, pro_file
-    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file, pro_file
-    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen, pro_flen
-	logical outfilset
-	common /outfileset/ outfilset
-	data outfilset/ .FALSE. /
+      subroutine sa_Defaults()
+
+      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
+      COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
+      INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+
+      logical outfilset
+      common /outfileset/ outfilset
+      data outfilset/ .FALSE. /
 !
     logsa_file='Druid.lsa'
-	logsa_flen=len_trim(logsa_file)
-	IF ( .NOT. outfilset ) THEN
-	    cssr_file='SA_best.cssr'
-		pdb_file='SA_best.pdb'
-		ccl_file='SA_best.ccl'
-		log_file='SA_best.log'
+      logsa_flen=len_trim(logsa_file)
+      IF ( .NOT. outfilset ) THEN
+          cssr_file='SA_best.cssr'
+            pdb_file='SA_best.pdb'
+            ccl_file='SA_best.ccl'
+            log_file='SA_best.log'
 ! ep appended
         pro_file='SA_best.pro'
 !
-		cssr_flen=len_trim(cssr_file)
-		pdb_flen=len_trim(pdb_file)
-		ccl_flen=len_trim(ccl_file)
-		log_flen=len_trim(ccl_file)
+            cssr_flen=len_trim(cssr_file)
+            pdb_flen=len_trim(pdb_file)
+            ccl_flen=len_trim(ccl_file)
+            log_flen=len_trim(ccl_file)
 ! ep appended
         pro_flen=len_trim(pro_file)
-	END IF
+      END IF
 !
     end
 
 !C>> JCC New subroutine to set the output file names
 
-	subroutine sa_SetOutputFiles(filehead)
-!
-	character*75 filehead ! Maximum permissible length.
-! ep appended
-    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file, pro_file
-    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file, pro_file
-    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen, pro_flen
-!
-	logical outfilset
-	common /outfileset/ outfilset
-	integer i
+      SUBROUTINE sa_SetOutputFiles(FileHead)
 
-	i = len_trim(filehead) + 1
-!C>> By default, set the output files to <sdifile head>.cssr etc
-!C Next code allows us to pass in a full filename (strips out the extension if present)
-	 do while (i .GT. 0 .AND. filehead(i:i) .NE. '.')
-		i = i - 1
-	 end do
-	 if (i .EQ. 0) i = len_trim(filehead) + 1
-	 i = i - 1
-!ep appended
-    cssr_file= filehead(1:i)//'.cssr'
-    pdb_file=  filehead(1:i)//'.pdb'
-    ccl_file=  filehead(1:i)//'.ccl'
-    log_file=  filehead(1:i)//'.log'
-	pro_file=  filehead(1:i)//'.pro'	
-    cssr_flen=len_trim(cssr_file)
-    pdb_flen=len_trim(pdb_file)
-    ccl_flen=len_trim(ccl_file)
-	log_flen=len_trim(log_file)
-	pro_flen=len_trim(pro_file)
-	outfilset = .TRUE.
-	end subroutine sa_SetOutputFiles
+      IMPLICIT NONE
+
+!O      character*75 filehead ! Maximum permissible length.
+      CHARACTER*(*), INTENT (IN   ) :: FileHead 
+
+      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
+      COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
+      INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+
+      LOGICAL outfilset
+      COMMON /outfileset/ outfilset
+!      INTEGER i
+
+      INTEGER KLEN, POS
+
+! The first line causes array bounds to exceed
+!O      i = len_trim(filehead) + 1
+!O!C>> By default, set the output files to <sdifile head>.cssr etc
+!O!C Next code allows us to pass in a full filename (strips out the extension if present)
+!O       do while (i .GT. 0 .AND. filehead(i:i) .NE. '.')
+!O            i = i - 1
+!O       end do
+!O       if (i .EQ. 0) i = len_trim(filehead) + 1
+!O       i = i - 1
+
+! Find the last occurrence of '.'
+      POS = LEN_TRIM(FileHead)
+      DO WHILE ((POS .GT. 0) .AND. (FileHead(POS:POS) .NE. '.'))
+        POS = POS - 1
+      END DO
+! If no '.' present, pretend there is one after the filename
+      IF (POS .EQ. 0) POS = LEN_TRIM(FileHead) + 1
+! Now point to the position just before the '.'
+      POS = POS - 1
+! We will append '.cssr', which is five characters, and after that the total length shouldn't exceed 80
+      IF (POS .GT. 75) THEN
+        CALL DebugErrorMessage('File name too long in sa_SetOutputFiles')
+        POS = 75
+      ENDIF
+      cssr_file = FileHead(1:POS)//'.cssr'
+      pdb_file  = FileHead(1:POS)//'.pdb'
+      ccl_file  = FileHead(1:POS)//'.ccl'
+      log_file  = FileHead(1:POS)//'.log'
+      pro_file  = FileHead(1:POS)//'.pro'    
+      cssr_flen = LEN_TRIM(cssr_file)
+      pdb_flen  = LEN_TRIM(pdb_file)
+      ccl_flen  = LEN_TRIM(ccl_file)
+      log_flen  = LEN_TRIM(log_file)
+      pro_flen  = LEN_TRIM(pro_file)
+      outfilset = .TRUE.
+
+      END SUBROUTINE sa_SetOutputFiles
