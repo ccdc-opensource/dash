@@ -25,8 +25,6 @@
       REAL          RULB
       COMMON /RULB/ RULB(Mvar)
 
-      REAL*4 XSIM(MVAR), DXSIM(MVAR)
-
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
 
@@ -64,13 +62,14 @@
 
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, Confirm, UseHydrogensDuringAuto
       INTEGER, EXTERNAL :: Get_HydrogenTreatment
+      REAL, EXTERNAL :: SA_FCN
       CHARACTER*80 chistr
       INTEGER I, II, III, N
-      REAL, EXTERNAL :: SA_FCN
       LOGICAL tAccept, tLOG_HYDROGENS
       REAL    FTEM
-      REAL DFTEM
+      REAL    DFTEM
       LOGICAL DesorbHydrogens
+      REAL    XSIM(MVAR), DXSIM(MVAR)
 
       IF (Auto .AND. (.NOT. Get_AutoLocalMinimisation())) RETURN
       CALL WCursorShape(CurHourGlass)

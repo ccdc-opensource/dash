@@ -47,7 +47,6 @@
       CHARACTER*50 tString
       INTEGER*4    SERIAL
       CHARACTER*4  NAME(MAXATM_2)
-      REAL         tX, tY, tZ
       LOGICAL      IsFractional
       REAL         tCellPar(1:6)
 
@@ -90,18 +89,15 @@
 ! needs orthogonal co-ordinates => convert
       IF (IsFractional) THEN
         DO I = 1, natcry
-          tX = Coordinates(1,I) * tLattice(1,1) + Coordinates(2,I) * tLattice(1,2) + Coordinates(3,I) * tLattice(1,3)
-          tY = Coordinates(1,I) * tLattice(2,1) + Coordinates(2,I) * tLattice(2,2) + Coordinates(3,I) * tLattice(2,3)
-          tZ = Coordinates(1,I) * tLattice(3,1) + Coordinates(2,I) * tLattice(3,2) + Coordinates(3,I) * tLattice(3,3)
-          axyzo(I,1) = tX
-          axyzo(I,2) = tY
-          axyzo(I,3) = tZ
+          axyzo(1,I) = Coordinates(1,I) * tLattice(1,1) + Coordinates(2,I) * tLattice(1,2) + Coordinates(3,I) * tLattice(1,3)
+          axyzo(2,I) = Coordinates(1,I) * tLattice(2,1) + Coordinates(2,I) * tLattice(2,2) + Coordinates(3,I) * tLattice(2,3)
+          axyzo(3,I) = Coordinates(1,I) * tLattice(3,1) + Coordinates(2,I) * tLattice(3,2) + Coordinates(3,I) * tLattice(3,3)
         ENDDO
       ELSE
         DO I = 1, natcry
-          axyzo(I,1) = Coordinates(1,I)
-          axyzo(I,2) = Coordinates(2,I)
-          axyzo(I,3) = Coordinates(3,I)
+          axyzo(1,I) = Coordinates(1,I)
+          axyzo(2,I) = Coordinates(2,I)
+          axyzo(3,I) = Coordinates(3,I)
         ENDDO
       ENDIF
 ! The variable NAME now holds 'Cl6 ' etc. for every atom. 
@@ -183,8 +179,7 @@
       INTEGER      ii, I, J, Ilen, OutputFile
       LOGICAL      tIncludeUnitCell
       REAL         tLattice(1:3,1:3), tRecLattice(1:3,1:3), tLattice_2(1:3,1:3)
-      REAL         tX, tY, tZ
-      REAL         NEWaxyzo(1:MAXATM_2,1:3)
+      REAL         NEWaxyzo(1:3, 1:MAXATM_2)
 
 !    The CSD bond types are:  1 = single  2= double  3=triple  4=quadruple
 !                             5 = aromatic      6 = polymeric single
@@ -254,23 +249,20 @@
         CALL LatticeCellParameters2Lattice_2(CellPar(1), CellPar(2), CellPar(3), &
                                              CellPar(4), CellPar(5), CellPar(6), tLattice_2)
 ! tLattice_2 now holds the matrix for fractional to a-along-x orthogonal
-        CALL GMPRD(tLattice_2,tRecLattice,tLattice,3,3,3)
+        CALL MultiplyMatrices(tLattice_2,tRecLattice,tLattice,3,3,3)
 ! tLattice now holds the matrix for c-along-z orthogonal to a-along-x orthogonal
 ! axyzo now holds the orthogonal co-ordinates if c is along z  
         DO I = 1, natcry
-          tX = axyzo(I,1) * tLattice(1,1) + axyzo(I,2) * tLattice(1,2) + axyzo(I,3) * tLattice(1,3)
-          tY = axyzo(I,1) * tLattice(2,1) + axyzo(I,2) * tLattice(2,2) + axyzo(I,3) * tLattice(2,3)
-          tZ = axyzo(I,1) * tLattice(3,1) + axyzo(I,2) * tLattice(3,2) + axyzo(I,3) * tLattice(3,3)
-          NEWaxyzo(I,1) = tX
-          NEWaxyzo(I,2) = tY
-          NEWaxyzo(I,3) = tZ
+          NEWaxyzo(1,I) = axyzo(1,I) * tLattice(1,1) + axyzo(2,I) * tLattice(1,2) + axyzo(3,I) * tLattice(1,3)
+          NEWaxyzo(2,I) = axyzo(1,I) * tLattice(2,1) + axyzo(2,I) * tLattice(2,2) + axyzo(3,I) * tLattice(2,3)
+          NEWaxyzo(3,I) = axyzo(1,I) * tLattice(3,1) + axyzo(2,I) * tLattice(3,2) + axyzo(3,I) * tLattice(3,3)
         ENDDO
 ! NEWaxyzo now holds the orthogonal co-ordinates if a is along x
       ELSE
         DO I = 1, natcry
-          NEWaxyzo(I,1) = axyzo(I,1)
-          NEWaxyzo(I,2) = axyzo(I,2)
-          NEWaxyzo(I,3) = axyzo(I,3)
+          NEWaxyzo(1,I) = axyzo(1,I)
+          NEWaxyzo(2,I) = axyzo(2,I)
+          NEWaxyzo(3,I) = axyzo(3,I)
         ENDDO
       ENDIF
       DO I = 1, natcry

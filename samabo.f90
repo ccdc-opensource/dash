@@ -1055,7 +1055,7 @@
 !Function:  Get angle for i-j-k in atom list coords XO.
 !Version:  21.10.94     Sam Motherwell
 !Arguments:
-! IAT,JAT,KAT  define atom number for torsion anngle i-j-k
+! IAT,JAT,KAT  define atom numbers for angle i-j-k
 ! AVAL   returned angle in degrees
       USE SAMVAR
 
@@ -1068,11 +1068,10 @@
       INTEGER :: K
       REAL, DIMENSION(3) :: X1, X2, X3
 
-      Aval = 0.0
       DO K = 1, 3
-        X1(K) = Axyzo(Iat,K)
-        X2(K) = Axyzo(Jat,K)
-        X3(K) = Axyzo(Kat,K)
+        X1(K) = Axyzo(K,Iat)
+        X2(K) = Axyzo(K,Jat)
+        X3(K) = Axyzo(K,Kat)
       ENDDO
       CALL SAMANG(X1,X2,X3,Aval)
 
@@ -1136,7 +1135,7 @@
 !Function:  Get torsion angle for i-j-k-l in atom list coords XO.
 !Version:  19.8.94     Sam Motherwell
 !Arguments:
-! IAT,JAT,KAT,LAT  define atom number for torsion angle i-j-k-l
+! IAT,JAT,KAT,LAT  define atom numbers for torsion angle i-j-k-l
 ! AVAL   returned angle in degrees
 
       USE SAMVAR
@@ -1150,10 +1149,10 @@
       REAL, DIMENSION(3) :: X1, X2, X3, X4
 
       DO K = 1, 3
-        X1(K) = Axyzo(Iat,K)
-        X2(K) = Axyzo(Jat,K)
-        X3(K) = Axyzo(Kat,K)
-        X4(K) = Axyzo(Lat,K)
+        X1(K) = Axyzo(K,Iat)
+        X2(K) = Axyzo(K,Jat)
+        X3(K) = Axyzo(K,Kat)
+        X4(K) = Axyzo(K,Lat)
       ENDDO
       CALL SAMTOR(X1,X2,X3,X4,Aval)
 
@@ -1210,7 +1209,7 @@
       REAL U(3), V(3), DU, DV, COSA
       REAL RTOL
       PARAMETER (RTOL=0.000001)
-      REAL Radians2Degrees ! Function
+      REAL, EXTERNAL :: Radians2Degrees
 
       CALL SAMVEC(X2,X1,U,DU)
       CALL SAMVEC(X2,X3,V,DV)
@@ -2048,10 +2047,10 @@
 
       USE SAMVAR
 
-! Function: Calculate the distance IAT - JAT  give orthor coords XO
+! Function: Calculate the distance IAT - JAT  given orthor coords AXYZO
 ! Version:  23.5.94                  SAM MOTHERWELL 20.10.93
 ! Notes:
-! 1. Iat , Jat are atom numbers in the list of atoms with coords XO
+! 1. Iat, Jat are atom numbers in the list of atoms with coords AXYZO
 !   The distance is returned as DVAL
 
       IMPLICIT NONE
@@ -2060,9 +2059,9 @@
       REAL,    INTENT (  OUT) :: DVAL
       REAL DXO,DYO,DZO
 
-      DXO = AXYZO(IAT,1) - AXYZO(JAT,1)
-      DYO = AXYZO(IAT,2) - AXYZO(JAT,2)
-      DZO = AXYZO(IAT,3) - AXYZO(JAT,3)
+      DXO = AXYZO(1,IAT) - AXYZO(1,JAT)
+      DYO = AXYZO(2,IAT) - AXYZO(2,JAT)
+      DZO = AXYZO(3,IAT) - AXYZO(3,JAT)
       DVAL = SQRT(DXO**2 + DYO**2 + DZO**2)
 
       END SUBROUTINE PLUDIJ

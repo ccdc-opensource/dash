@@ -16,7 +16,7 @@
       CHARACTER*5 atomlabel(1:MAXATM_2)
 ! atomlabel = Original atom labels
 
-      REAL    axyzo(1:MAXATM_2,1:3)
+      REAL    axyzo(1:3, 1:MAXATM_2)
 ! axyzo = atomic xyz co-ordinates, orthogonal
 
       INTEGER aelem(1:MAXATM_2)
@@ -47,7 +47,7 @@
 !U              0,   0/
 
       INTEGER, DIMENSION(MAXBND)   :: btype
-      INTEGER, DIMENSION(MAXBND,2) :: bond
+      INTEGER, DIMENSION(MAXBND, 2) :: bond
 ! btype  = bond type
 ! bond   = list of bonds Iat, Jat   
 
