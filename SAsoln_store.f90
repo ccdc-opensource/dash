@@ -21,10 +21,10 @@
       YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD,& 
       XGGMIN,XGGMAX,YGGMIN,YGGMAX
 
-      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
+      CHARACTER*80       logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
       COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
-      INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
-      COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      INTEGER            cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      COMMON /outfillen/ cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
 
     open(unit=61,file=pro_file(1:pro_flen),status='unknown')
     do 10 i = 1,nobs

@@ -43,7 +43,6 @@
       COMMON /saparl/ T0,rt,eps,target_value
       INTEGER  NS, NT, IER, ISEED1, ISEED2
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-      COMMON /shadl/ log_shad(mvar)
       COMMON /shadi/ kshad(mvar)
 
       REAL tiso, occ
@@ -629,7 +628,6 @@
       INTEGER  NS, NT, ISEED1, ISEED2
       INTEGER  MAXEVL, IPRINT
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-      COMMON /shadl/ log_shad(mvar)
       COMMON /shadi/ kshad(mvar)
 
       CHARACTER*36 parlabel(mvar)
