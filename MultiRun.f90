@@ -35,7 +35,7 @@
       MaxMoves = NINT(tMaxMoves)
       CALL WDialogGetReal(IDF_SA_ChiTest,   ChiMult)
       RESTART = ((MaxRuns .GT. 1) .AND. (ChiMult .GT. 0.0))
-      CALL WDialogSelect(IDD_SA_Multi_completed_ep)
+      CALL WDialogSelect(IDD_SAW_Page5)
       CALL WDialogClearField(IDF_SA_Summary)
       CALL PopActiveWindowID
 
@@ -57,8 +57,13 @@
 
       REAL,          INTENT (IN   ) :: IntensityChiSquared
 
+      INCLUDE 'PARAMS.INC'
+
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
@@ -70,16 +75,37 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
+      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_4)
+          
+      REAL            BestValuesDoF
+      COMMON /SOLCOM/ BestValuesDoF(1:mvar,1:MaxRun)
+
+      REAL                XAtmCoords
+      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:MaxAtm_4,1:MaxRun)
+
       REAL Grid_ProfileChi, Grid_IntensityChi
       INTEGER Grid_Overlay
       CHARACTER*MaxPathLength Grid_Buffer
-      INTEGER I
-      CHARACTER*(MaxPathLength) PdbFileName
+      INTEGER I, J, iAtom
+      REAL Curr_BestValuesDoF(1:mvar), Curr_XAtmCoords(1:3,1:MaxAtm_4)
+      CHARACTER*2 RowLabelStr
 
-      PdbFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pdb'
+      DO J = 1, nvar
+        Curr_BestValuesDoF(J) = BestValuesDoF(J,Curr_SA_Run)
+      ENDDO
+      DO iAtom = 1, TotNumOfAtoms
+        Curr_XAtmCoords(1,iAtom) = XAtmCoords(1,iAtom,Curr_SA_Run)
+        Curr_XAtmCoords(2,iAtom) = XAtmCoords(2,iAtom,Curr_SA_Run)
+        Curr_XAtmCoords(3,iAtom) = XAtmCoords(3,iAtom,Curr_SA_Run)
+      ENDDO
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Multi_completed_ep)
+      CALL WDialogSelect(IDD_SAW_Page5)
       CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
+      DO I = 1, NumOf_SA_Runs
+        WRITE(RowLabelStr,'(I2)') I
+        CALL WGridLabelRow(IDF_SA_summary,I,RowLabelStr)
+      ENDDO
       DO I = NumOf_SA_Runs-1, 1, -1
         CALL WGridGetCellReal(IDF_SA_Summary,4,I,Grid_ProfileChi)
         IF (Grid_ProfileChi .GT. CHIPROBEST) THEN
@@ -90,14 +116,30 @@
           CALL WGridPutCellCheckBox(IDF_SA_Summary,3,I+1,Grid_Overlay)
           CALL WGridPutCellReal    (IDF_SA_Summary,4,I+1,Grid_ProfileChi,'(F7.2)')
           CALL WGridPutCellReal    (IDF_SA_Summary,5,I+1,Grid_IntensityChi,'(F7.2)')
+          DO J = 1, nvar
+            BestValuesDoF(J,I+1) = BestValuesDoF(J,I)
+          ENDDO
+          DO iAtom = 1, TotNumOfAtoms
+            XAtmCoords(1,iAtom,I+1) = XAtmCoords(1,iAtom,I)
+            XAtmCoords(2,iAtom,I+1) = XAtmCoords(2,iAtom,I)
+            XAtmCoords(3,iAtom,I+1) = XAtmCoords(3,iAtom,I)
+          ENDDO
         ELSE
           EXIT
         ENDIF
       ENDDO
-      CALL WGridPutCellString(IDF_SA_Summary,1,I+1,PdbFileName(1:LEN_TRIM(PdbFileName)))
+      CALL WGridPutCellString(IDF_SA_Summary,1,I+1,SA_RunNumberStr)
       CALL WGridPutCellCheckBox(IDF_SA_summary,3,I+1,Checked)
       CALL WGridPutCellReal(IDF_SA_Summary,4,  I+1,CHIPROBEST,'(F7.2)')
       CALL WGridPutCellReal(IDF_SA_Summary,5,  I+1,IntensityChiSquared,'(F7.2)')
+      DO J = 1, nvar
+        BestValuesDoF(J,I+1) = Curr_BestValuesDoF(J)
+      ENDDO
+      DO iAtom = 1, TotNumOfAtoms
+        XAtmCoords(1,iAtom,I+1) = Curr_XAtmCoords(1,iAtom)
+        XAtmCoords(2,iAtom,I+1) = Curr_XAtmCoords(2,iAtom)
+        XAtmCoords(3,iAtom,I+1) = Curr_XAtmCoords(3,iAtom)
+      ENDDO
       CALL PopActiveWindowID
 
       END SUBROUTINE Log_SARun_Entry
@@ -126,7 +168,7 @@
       REAL Grid_ProfileChi, Grid_IntensityChi
       CHARACTER(MaxPathLength) Grid_Buffer
 
-      CALL WDialogSelect(IDD_SA_Multi_completed_ep)
+      CALL WDialogSelect(IDD_SAW_Page5)
       OPEN(UNIT=101, FILE=OutputFilesBaseName(1:OFBN_Len)//'.log', status = 'unknown',ERR=999)
       WRITE(101,*,ERR=999) 'File name, Profile Chi Squared, Intensity Chi Squared'
       DO I = 1, NumOf_SA_Runs

@@ -26,13 +26,14 @@
       INTEGER                                                            MaxIterationSoFar
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
 
+      LOGICAL         InSA
+      COMMON /SADATA/ InSA
+
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput
       LOGICAL, EXTERNAL :: Get_UseHydrogens
       REAL    T1
       REAL    SA_Duration ! The time the SA took, in seconds
       CHARACTER*10 SA_DurationStr
-      INTEGER I, RangeOption
-      CHARACTER*2 RowLabelStr
 
       IF (CheckOverwriteSaOutput() .EQ. 0) THEN
         CALL WizardWindowShow(IDD_SA_input3)
@@ -49,8 +50,8 @@
 !O      CALL WDialogSelect(IDD_Parameter_Status_2)
 !O      CALL WDialogShow(-1,-1,0,Modeless)
       T1 = SECNDS(0.0)
-      CALL PDB_SymmRecords()
-      CALL Init_MultiRun()
+      CALL PDB_SymmRecords
+      CALL Init_MultiRun
 ! Grey out "start next" button if not multirun
       CALL WDialogFieldStateLogical(IDF_StartNext,RESTART)
       IPTYPE = 2
@@ -58,11 +59,12 @@
       Chi_sqd = 0.0
       MaxIterationSoFar = 0
       CALL WDialogFieldState(IDB_Summary,Disabled)
+      InSA = .TRUE.
       CALL SimulatedAnnealing
+      InSA = .FALSE.
       SA_Duration = SECNDS(T1)
       WRITE(SA_DurationStr,'(F10.1)') SA_Duration
       CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
-      CALL WizardWindowShow(IDD_SA_input3)
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       CALL OutputChi2vsMoves
@@ -76,22 +78,7 @@
 !O      DO WHILE (WinfoWindow(WindowState) .EQ. WinMinimised)
 !O        CALL IOsWait(50) ! wait half a sec
 !O      ENDDO
-!ep SASummary presents a grid summarising results of the Simulated
-!   Annealing runs.  
-      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
-      DO I = 1, NumOf_SA_Runs
-        WRITE(RowLabelStr,'(I2)') I
-        CALL WGridLabelRow(IDF_SA_summary,I,RowLabelStr)
-      ENDDO
-      CALL WDialogGetRadioButton(IDF_ShowRange,RangeOption)
-      IF (RangeOption .EQ. 1) THEN ! "Show Selected"
-        CALL WDialogFieldState(IDF_Limit1,Enabled)
-        CALL WDialogFieldState(IDF_Limit2,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDF_Limit1,Disabled)
-        CALL WDialogFieldState(IDF_Limit2,Disabled)
-      ENDIF
-      CALL WDialogShow(-1,-1,0,Modeless)
+      CALL WizardWindowShow(IDD_SAW_Page5)
 
       END SUBROUTINE BeginSA
 !
@@ -172,7 +159,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE FillSymmetry()
+      SUBROUTINE FillSymmetry
 
 ! Covers the eventuality of the default space group option.
 ! We need to determine the number of symmetry operators etc.

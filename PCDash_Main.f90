@@ -153,6 +153,8 @@
           CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)
           CALL ShowWizardWindowZmatrices
+        CASE (IDB_AnalyseSolutions)
+          CALL WizardWindowShow(IDD_SAW_Page5)
         CASE (ID_FitPeaks)
 ! Check if we have any peak fit ranges at all
           IF (NumPeakFitRange .EQ. 0) THEN

@@ -379,7 +379,7 @@
         CASE (IDD_SA_Action1)
           CALL DealWithSAStatusWindow
           GOTO 10
-        CASE (IDD_SA_Multi_Completed_ep)
+        CASE (IDD_SAW_Page5)
           CALL DealWithSaSummary
           GOTO 10
         CASE (IDD_Rietveld)

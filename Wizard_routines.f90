@@ -46,7 +46,7 @@
         IXPos_IDD_Wizard = WInfoDialog(6)
         IYPos_IDD_Wizard = WInfoDialog(7)
       ENDIF
-      CALL WDialogHide()
+      CALL WDialogHide
       CurrentWizardWindow = 0
 
       END SUBROUTINE WizardWindowHide
@@ -117,8 +117,8 @@
 ! The wizard windows can only be closed by DASH, and when it closes the
 ! windows that need this code, it updates all these variables automatically?
       CALL Upload_CrystalSystem
-      CALL Upload_Cell_Constants()
-      CALL Upload_Range()
+      CALL Upload_Cell_Constants
+      CALL Upload_Range
       CALL Generate_TicMarks
 
       END SUBROUTINE EndWizard
@@ -237,8 +237,7 @@
                 CASE (3) ! Simulated annealing structure solution
                   CALL ShowWizardWindowZmatrices
                 CASE (4) ! Analyse solutions
-                  CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
-                  CALL WDialogShow(-1,-1,0,Modeless)
+                  CALL WizardWindowShow(IDD_SAW_Page5)
               END SELECT
           END SELECT
       END SELECT
@@ -1218,7 +1217,6 @@
 
       INTEGER IOption
       LOGICAL, EXTERNAL :: Confirm
-
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page1)
