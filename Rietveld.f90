@@ -193,6 +193,7 @@
           RR_XATO_Orig(J,I) = XATO(J,I)
         ENDDO
       ENDDO
+      CALL MakRHm
       CALL RR_VALCHI(ChiSqd)
       CALL VALCHIPRO(ChiProSqd)
       CALL WDialogPutReal(IDR_INTCHI, ChiSqd, "(F9.2)")
@@ -1707,8 +1708,9 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: XtalFileOpen, XtalFileBrowse 
       CHARACTER(MaxPathLength) SDIFile, XtalFile
-      INTEGER Curr_SA_Run
+      INTEGER Curr_SA_Run, iStat
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page6)
@@ -1733,13 +1735,12 @@
               CALL WDialogGetString(IDF_SDI_File_Name, SDIFile)
               CALL SDIFileOpen(SDIFile)
             CASE (IDB_xtal_file_Browse)
-              CALL XtalFileBrowse
+              iStat = XtalFileBrowse()
+              CALL WDialogFieldStateLogical(IDNEXT, (iStat .EQ. 0))
             CASE (IDB_xtal_file_Open)
               CALL WDialogGetString(IDF_Xtal_File_Name, XtalFile)
-              CALL XtalFileOpen(XtalFile)
-          END SELECT
-        CASE (FieldChanged)
-          SELECT CASE (EventInfo%VALUE1)
+              iStat = XtalFileOpen(XtalFile)
+              CALL WDialogFieldStateLogical(IDNEXT, (iStat .EQ. 0))
           END SELECT
       END SELECT
       CALL PopActiveWindowID

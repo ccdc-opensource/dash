@@ -2,18 +2,23 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE XtalFileBrowse
+      INTEGER FUNCTION XtalFileBrowse
 !
 ! This routine lets the user browse a directory for a crystal structure file.
 ! If a valid file has been selected, it will be opened automatically.
 ! Effectively, this routine is just a wrap around a file_open routine
 ! such that it lets the user visually select a file first.
 !
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data/...)
+!           2 if user pressed cancel
+! 
       USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: XtalFileOpen
       CHARACTER(LEN=160) FILTER
       INTEGER           IFLAGS, IFTYPE 
       CHARACTER(LEN=MaxPathLength) tFileName
@@ -26,23 +31,29 @@
       IFTYPE = 2
       CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open crystal structure file',IFTYPE)
 ! Did the user press cancel?
-      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
+      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) THEN
+        XtalFileBrowse = 2
+        RETURN
+      ENDIF
 ! Note that up to this point, none of the global variables had changed. Baling out was no problem.
 ! Try to open the file. This can be removed, of course, and relocated to places in the code where
 ! the current subroutine is called.
 ! Actually, that is how it works in practice under Windows (try 'Start' -> 'Run...' -> 'Browse...'
 ! it will not actually open the file, just select it).
-      CALL XtalFileOpen(tFileName)
+      XtalFileBrowse = XtalFileOpen(tFileName)
 
-      END SUBROUTINE XtalFileBrowse
+      END FUNCTION XtalFileBrowse
 !
 !*****************************************************************************
 !
-      SUBROUTINE XtalFileOpen(TheFileName)
+      INTEGER FUNCTION XtalFileOpen(TheFileName)
 !
 ! This routine tries to open a file containing a crystal structure.
 !
 ! INPUT   : TheFileName = the file name
+!
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data/...)
 !
       USE WINTERACTER
       USE VARIABLES
@@ -51,6 +62,7 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
+      INTEGER, EXTERNAL :: XtalFileLoad
       LOGICAL FExists
       INTEGER KLEN
 
@@ -59,16 +71,20 @@
       INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
       IF (.NOT. FExists) THEN
         CALL ErrorMessage("The file "//TheFileName(1:KLEN)//" does not exist!")
+        XtalFileOpen = 1
         RETURN
       ENDIF
-      CALL XtalFileLoad(TheFileName) 
+      XtalFileOpen = XtalFileLoad(TheFileName) 
       
-      END SUBROUTINE XtalFileOpen
+      END FUNCTION XtalFileOpen
 !
 !*****************************************************************************
 !
-      SUBROUTINE XtalFileLoad(TheFileName)
-
+      INTEGER FUNCTION XtalFileLoad(TheFileName)
+!
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data/...)
+!
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -99,6 +115,7 @@
       REAL unit_cell_parameters(1:6)
       LOGICAL OK
 
+      XtalFileLoad = 1 ! Initialise to error
       tFileName = TheFileName
       iLen = LEN_TRIM(tFileName)
 ! Find the last occurence of '.' in tFileName
@@ -171,7 +188,7 @@
       READ(iHandle, '(A)', END=100, ERR=999) line
       nl = LEN_TRIM(line)
       CALL ILowerCase(line(1:nl))
-      CALL INextString(line,keychar)
+      CALL INextString(line, KeyChar)
       SELECT CASE (KeyChar(1:3))
         CASE ('cel')                                ! Cell parameters
           DO I = 1, 6
@@ -197,26 +214,28 @@
           IF (Read_One_ZM(iFrg) .NE. 0) THEN ! successful read
             CALL ErrorMessage("Error while reading Z-matrix file "//frag_file(iFrg)(1:LEN_TRIM(frag_file(iFrg))))
             iFrg = iFrg - 1 
+            RETURN
           ENDIF ! If the read on the Z-matrix was ok
         CASE ('cen')                                ! "Centre of mass"
           IF (.NOT. Get_UseCrystallographicCoM()) THEN
             IF (iFrg .NE. 0) THEN
-              CALL INextString(line,keychar)
-              CALL INextString(line,keychar)
-              CALL INextReal(line,RR_tran(1,iFrg))
-              CALL INextReal(line,RR_tran(2,iFrg))
-              CALL INextReal(line,RR_tran(3,iFrg))
+            ! @@ This will go wrong if the filename contains a space
+              CALL INextString(line, KeyChar)
+              CALL INextString(line, KeyChar)
+              CALL INextReal(line, RR_tran(1,iFrg))
+              CALL INextReal(line, RR_tran(2,iFrg))
+              CALL INextReal(line, RR_tran(3,iFrg))
             ENDIF
           ENDIF
         CASE ('cry')                                ! "Crystallographic centre of mass"
           IF (Get_UseCrystallographicCoM()) THEN
             IF (iFrg .NE. 0) THEN
-              CALL INextString(line,keychar)
-              CALL INextString(line,keychar)
-              CALL INextString(line,keychar)
-              CALL INextReal(line,RR_tran(1,iFrg))
-              CALL INextReal(line,RR_tran(2,iFrg))
-              CALL INextReal(line,RR_tran(3,iFrg))
+              CALL INextString(line, keychar)
+              CALL INextString(line, keychar)
+              CALL INextString(line ,keychar)
+              CALL INextReal(line, RR_tran(1,iFrg))
+              CALL INextReal(line, RR_tran(2,iFrg))
+              CALL INextReal(line, RR_tran(3,iFrg))
             ENDIF
           ENDIF
         CASE ('qua')                                ! "Quaternion"
@@ -263,16 +282,14 @@
           ENDIF
         ENDDO
       ENDDO
-      CALL UpdateZmatrixSelection ! Needed? Useful? I think yes, because it allows starting SA with this structure.
+      CALL UpdateZmatrixSelection
       CALL SA_Parameter_Set
-      CALL Create_AtomicWeightings(Get_HydrogenTreatment())
-      CALL FillSymmetry_2
-      CALL GET_LOGREF
+      XtalFileLoad = 0
       RETURN
  999  CALL ErrorMessage('Error reading crystal structure file.')
       CLOSE(iHandle) 
 
-      END SUBROUTINE XtalFileLoad
+      END FUNCTION XtalFileLoad
 !
 !*****************************************************************************
 !
