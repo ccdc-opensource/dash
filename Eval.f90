@@ -21,7 +21,9 @@
      &                iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg), alph(maxatm,maxfrg),         &
      &                bet(maxatm,maxfrg), f2cmat(3,3)
-      COMMON /zmcomg/ icomflg(maxfrg)
+      INTEGER         icomflg
+      REAL                             AtomicWeighting
+      COMMON /zmcomg/ icomflg(maxfrg), AtomicWeighting(maxatm,maxfrg)
 !
       PARAMETER (mvar=100)
       REAL*8 CHROM(*)
@@ -100,21 +102,21 @@
      &               IZ1(1,IFRG),IZ2(1,IFRG),IZ3(1,IFRG),CART(1,1),     &
      &               CART(1,2),CART(1,3))
 ! Determine origin for rotations
-        ICFRG = ICOMFLG(IFRG)
+        ICFRG = ICOMFLG(IFrg)
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
         IF (ICFRG.EQ.0) THEN
           XC = ZERO
           YC = ZERO
           ZC = ZERO
           DO I = 1, NATS
-            XC = XC + CART(I,1)
-            YC = YC + CART(I,2)
-            ZC = ZC + CART(I,3)
+            XC = XC + AtomicWeighting(I,IFrg)*CART(I,1)
+            YC = YC + AtomicWeighting(I,IFrg)*CART(I,2)
+            ZC = ZC + AtomicWeighting(I,IFrg)*CART(I,3)
           ENDDO
-          XNORM = ONE/DFLOAT(NATS)
-          XC = XC*XNORM
-          YC = YC*XNORM
-          ZC = ZC*XNORM
+    !U      XNORM = ONE/DFLOAT(NATS)
+    !U      XC = XC*XNORM
+    !U      YC = YC*XNORM
+    !U      ZC = ZC*XNORM
 ! Otherwise, use atom number ICFRG
         ELSE
           XC = CART(ICFRG,1)
