@@ -1,104 +1,26 @@
       SUBROUTINE Main_Field_Changed_Routines(IDNumber,JDNumber)
-!
+
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
-!C>> Not used here 
-!      LOGICAL :: NODATA
-      LOGICAL :: SKIP    = .FALSE.
-      LOGICAL :: GOTCELL(6), GOTALLCELL, BackFrom2
-!C>> JCC Does nothing so removed      LOGICAL :: GOTWVLN
-      INTEGER :: I, ITYPE, IDNUMBER, IPW_Option
-      INCLUDE 'statlog.inc'
-!
-      PARAMETER (MOBS=15000)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-!
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
-!
-!C>> JCC: lattice definitions now in an include file
-      INCLUDE 'Lattice.inc'
+      IMPLICIT NONE
+
+      INTEGER  IDNUMBER, JDNumber
+
+      INCLUDE 'GLBVAR.INC' ! Contains JRadOption
 
 !C>> JCC A few useful declarations
-      CHARACTER(LEN=20) :: Dummy
-      INTEGER IRadSelection, IDummy
-!
-!      INTEGER :: KPosSG,Isp,ISGShow(530)
-!
+      INTEGER IRadSelection
+
       SELECT CASE (IDNumber)
-        CASE (IDF_wavelength1,IDD_Data_Properties)
-!C>> JCC Moved to a subroutine
+        CASE (IDD_Data_Properties)
+          CALL DebugErrorMessage('fksdhfrwiugf')
           CALL DownloadWavelength(IDD_Data_Properties)
-!C>> JCC Check the cell before trying to regenerate tickmarks with the new wavelength
-          CALL PolyFitter_Wizard_Check_Status()
-          IF (CellOk) CALL Generate_TicMarks
+          CALL Generate_TicMarks
         CASE (IDF_Indexing_Lambda,IDD_Index_Preparation)
           CALL DownloadWavelength(IDD_Index_Preparation)
-          call PolyFitter_Wizard_Check_Status()
-          IF (CellOk) CALL Generate_TicMarks   
-        CASE (IDD_Crystal_Symmetry) ! Deal with the changing pane from symmetry
-!C>> JCC Moved this to a subroutine.
-          CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
-          CALL UpdateCell(IDD_Crystal_Symmetry)
-          CALL Update_Space_Group(IDD_Crystal_Symmetry, IDummy, IDummy)
-!C>> JCC Check the cell before trying to generate tickmarks
-          CALL PolyFitter_Wizard_Check_Status()
-          IF (CellOk) CALL Generate_TicMarks             
-        CASE (IDF_Space_Group_Menu)  
-!C>> JCC Moved this to a subroutine.
-          CALL Update_Space_Group(IDD_Crystal_Symmetry, IDummy, IDummy)
-!C>> JCC Check the cell before trying to generate tickmarks
-          CALL PolyFitter_Wizard_Check_Status()
-          IF (CellOk) CALL Generate_TicMarks
-        CASE (IDF_Crystal_System_Menu)
-          CALL WDialogSelect(IDD_Crystal_Symmetry)
-          CALL Set_Space_Group(IDD_Crystal_Symmetry)
-!C>> JCC If the system is reset then regenerate the tic marks
-          CALL PolyFitter_Wizard_Check_Status()
-          IF (CellOk) CALL Generate_TicMarks
-        CASE (IDF_a_latt)
-          CALL WDialogSelect(IDD_Crystal_Symmetry)
-          CALL WDialogGetReal(IDF_a_latt,CellPar(1))
-          GOTCELL(1) = .TRUE.
-          CALL UpdateCell(IDD_Crystal_Symmetry)
-        CASE (IDF_b_latt)
-          CALL WDialogSelect(IDD_Crystal_Symmetry)
-          CALL WDialogGetReal(IDF_b_latt,CellPar(2))
-          GOTCELL(2) = .TRUE.
-          call UpdateCell(IDD_Crystal_Symmetry)
-        CASE (IDF_c_latt)
-          CALL WDialogSelect(IDD_Crystal_Symmetry)
-          CALL WDialogGetReal(IDF_c_latt,CellPar(3))
-          GOTCELL(3) = .TRUE.
-          call UpdateCell(IDD_Crystal_Symmetry)
-        CASE (IDF_alp_latt)
-          CALL WDialogSelect(IDD_Crystal_Symmetry)
-          CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
-          GOTCELL(4) = .TRUE.
-          call UpdateCell(IDD_Crystal_Symmetry)
-        CASE (IDF_bet_latt)
-          CALL WDialogSelect(IDD_Crystal_Symmetry)
-          CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
-          GOTCELL(5) = .TRUE.
-          call UpdateCell(IDD_Crystal_Symmetry)
-        CASE (IDF_gam_latt)
-          CALL WDialogSelect(IDD_Crystal_Symmetry)
-          CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
-          GOTCELL(6) = .TRUE.
-          CALL UpdateCell(IDD_Crystal_Symmetry)               
-        CASE (IDF_LabX_Source,IDF_SynX_Source,IDF_CWN_Source,IDF_TOF_source)
-          CALL WDialogSelect(IDD_Data_Properties)
-!          CALL Get_Main_IRadOption()
-          CALL Set_Main_IRadOption()
-          CALL PolyFitter_Wizard_Check_Status()
-          IF (CellOk) CALL Generate_TicMarks           
-!C>> JCC Handle a few other events 
-        CASE (IDF_Wavelength_Menu) ! Wavelength menu selection
-          CALL WDialogSelect(IDD_Data_Properties)
-          CALL Set_Main_IRadOption()  
-          CALL PolyFitter_Wizard_Check_Status()
-          IF (CellOk) CALL Generate_TicMarks           
+          CALL Generate_TicMarks   
       END SELECT
       SELECT CASE (JDNumber)
 !         CASE (IDF_binning)
@@ -110,11 +32,303 @@
 !           CALL Profile_Plot(IPTYPE)
 !C>> JCC Added
         CASE (IDF_Wavelength_Menu) ! tab has changed from the wavelength
-          CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection,Dummy)
+          CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
           CALL SetWavelengthToSelection(IRadSelection)                
       END SELECT
 
       END SUBROUTINE Main_Field_Changed_Routines
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithPlotOptionsWindow
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Poly_Colours.inc'
+                
+      TYPE(WIN_RGB) :: SelectedColour
+
+      IF (EventInfo%WIN .NE. IDD_Plot_Option_Dialog) THEN
+        CALL DebugErrorMessage('WinID wrong in DealWithPlotOptionsWindow')
+        RETURN
+      ENDIF
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      SELECT CASE (EventType)
+!        CASE (MouseButDown)
+        CASE (PushButton) ! one of the buttons was pushed
+! Which button was pressed is now in EventInfo%VALUE1
+! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDOK,IDCANCEL)
+              CALL WDialogHide()
+            CASE (IDF_ObservedData_Colour)
+              SelectedColour = KolObs
+              CALL WSelectColour(SelectedColour)
+              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+                CALL IGrPaletteRGB(KolNumObs,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+            CASE (IDF_CalculatedData_Colour)
+              SelectedColour = KolCal
+              CALL WSelectColour(SelectedColour)
+              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+                CALL IGrPaletteRGB(KolNumCal,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+            CASE (IDF_DifferenceData_Colour)
+              SelectedColour = KolDif
+              CALL WSelectColour(SelectedColour)
+              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+                CALL IGrPaletteRGB(KolNumDif,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+            CASE (IDF_Axes_Colour)
+              SelectedColour = KolMain
+              CALL WSelectColour(SelectedColour)
+              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+                CALL IGrPaletteRGB(KolNumMain,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+            CASE (IDF_TickMark_Colour)
+              SelectedColour = KolCTic
+              CALL WSelectColour(SelectedColour)
+              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+                CALL IGrPaletteRGB(KolNumCTic,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+            CASE (IDF_PeakFitting_Colour)
+              SelectedColour = KolMTic
+              CALL WSelectColour(SelectedColour)
+              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+                CALL IGrPaletteRGB(KolNumMTic,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+          END SELECT
+          CALL Profile_Plot(IPTYPE)
+!        CASE (KeyDown)
+!        CASE (MenuSelect)
+        CASE (FieldChanged)
+          IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDF_ErrorBar_Check)
+                CALL Profile_Plot(IPTYPE)
+              CASE (IDF_Background_Check)
+                CALL Profile_Plot(IPTYPE)
+            END SELECT
+          ENDIF
+!        CASE (TabChanged)
+!        CASE (Expose,Resize)
+!        CASE (CloseRequest)
+        CASE DEFAULT
+          CALL DebugErrorMessage('Forgot to handle event in DealWithPlotOptionsWindow')
+      END SELECT
+      CALL PopActiveWindowID
+      RETURN
+
+      END SUBROUTINE DealWithPlotOptionsWindow
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithStructuralInformation
+! This is the window containing the four tabs from the 'View' menu
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER IDummy
+
+      IF (EventInfo%WIN .NE. IDD_Structural_Information) THEN
+        CALL DebugErrorMessage('WinID wrong in DealWithStructuralInformation')
+        RETURN
+      ENDIF
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Structural_Information)
+      SELECT CASE (EventType)
+!        CASE (MouseButDown)
+        CASE (PushButton) ! one of the buttons was pushed
+! Which button was pressed is now in EventInfo%VALUE1
+! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_Dismiss_StrInf) ! The 'OK' button
+              CALL Check_Crystal_Symmetry()
+              CALL DownloadWavelength(IDD_Data_Properties)
+              CALL WDialogSelect(IDD_Structural_Information)
+              CALL WDialogHide()
+            CASE (IDCANCEL)
+              CALL WDialogHide()
+            CASE DEFAULT
+              CALL DebugErrorMessage('Forgot to handle something in DealWithStructuralInformation 1')
+          END SELECT
+          CALL Profile_Plot(IPTYPE)
+!        CASE (KeyDown)
+!        CASE (MenuSelect)
+        CASE (FieldChanged)
+! Do nothing
+        CASE (TabChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDD_Data_Properties)
+              CALL DownloadWavelength(IDD_Data_Properties)
+              CALL Generate_TicMarks
+            CASE (IDD_Peak_Positions)
+            CASE (IDD_Crystal_Symmetry)
+              CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
+              CALL UpdateCell(IDD_Crystal_Symmetry)
+              CALL Update_Space_Group(IDD_Crystal_Symmetry, IDummy, IDummy)
+              CALL Generate_TicMarks             
+            CASE (IDD_Peak_Widths)
+            CASE DEFAULT
+              CALL DebugErrorMessage('Forgot to handle something in DealWithStructuralInformation 2')
+          END SELECT
+!        CASE (Expose,Resize)
+!        CASE (CloseRequest)
+        CASE DEFAULT
+          CALL DebugErrorMessage('Forgot to handle event in DealWithStructuralInformation')
+      END SELECT
+      CALL PopActiveWindowID
+      RETURN
+
+      END SUBROUTINE DealWithStructuralInformation
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithDiffractionSetupPane
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+                
+      INTEGER IRadSelection
+
+      IF (EventInfo%WIN .NE. IDD_Data_Properties) THEN
+        CALL DebugErrorMessage('WinID wrong in DealWithDiffractionSetupPane')
+        RETURN
+      ENDIF
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Data_Properties)
+      SELECT CASE (EventType)
+!        CASE (MouseButDown)
+        CASE (PushButton) ! one of the buttons was pushed
+! Which button was pressed is now in EventInfo%VALUE1
+! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_Data_Download) ! The 'Apply' button
+! @ Does the following do what it is supposed to do
+! Download the data from the structural information pages
+              CALL Check_Crystal_Symmetry()
+              CALL DownloadWavelength(IDD_Data_Properties)    
+! JvdS @ Why isn't there a CALL Generate_TicMarks here?
+            CASE DEFAULT
+              CALL DebugErrorMessage('Forgot to handle something in DealWithDiffractionSetupPane 1')
+          END SELECT
+          CALL Profile_Plot(IPTYPE)
+!        CASE (KeyDown)
+!        CASE (MenuSelect)
+        CASE (FieldChanged)
+            SELECT CASE (EventInfo%VALUE1)
+              CASE (IDF_LabX_Source,IDF_SynX_Source,IDF_CWN_Source,IDF_TOF_source)
+                CALL WDialogGetRadioButton(IDF_LabX_Source,JRadOption)
+                CALL SetSourceDataState(JRadOption)
+                CALL Generate_TicMarks 
+              CASE (IDF_Wavelength_Menu) ! Wavelength menu selection
+                CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
+                CALL SetWavelengthToSelection(IRadSelection)
+              CASE (IDF_wavelength1)
+                CALL DownloadWavelength(IDD_Data_Properties)
+                CALL Generate_TicMarks
+              CASE DEFAULT
+                CALL DebugErrorMessage('Forgot to handle something in DealWithDiffractionSetupPane 2')
+            END SELECT
+!        CASE (TabChanged)
+!        CASE (Expose,Resize)
+!        CASE (CloseRequest)
+        CASE DEFAULT
+          CALL DebugErrorMessage('Forgot to handle event in DealWithDiffractionSetupPane')
+      END SELECT
+      CALL PopActiveWindowID
+      RETURN
+
+      END SUBROUTINE DealWithDiffractionSetupPane
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithCrystalSymmetryPane
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'LATTICE.INC'
+
+      INTEGER IDummy
+
+      IF (EventInfo%WIN .NE. IDD_Crystal_Symmetry) THEN
+        CALL DebugErrorMessage('WinID wrong in DealWithCrystalSymmetryPane')
+        RETURN
+      ENDIF
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      SELECT CASE (EventType)
+!        CASE (MouseButDown)
+        CASE (PushButton) ! one of the buttons was pushed
+! Which button was pressed is now in EventInfo%VALUE1
+! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_Data_Download)
+              CALL Check_Crystal_Symmetry()
+! JvdS @ Following line is very weird: we're in a completely different window
+              CALL DownloadWavelength(IDD_Data_Properties)        
+            CASE DEFAULT
+              CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 1')
+          END SELECT
+          CALL Profile_Plot(IPTYPE)
+!        CASE (KeyDown)
+!        CASE (MenuSelect)
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_a_latt)
+              CALL WDialogGetReal(IDF_a_latt,CellPar(1))
+              CALL UpdateCell(IDD_Crystal_Symmetry)
+            CASE (IDF_b_latt)
+              CALL WDialogGetReal(IDF_b_latt,CellPar(2))
+              CALL UpdateCell(IDD_Crystal_Symmetry)
+            CASE (IDF_c_latt)
+              CALL WDialogGetReal(IDF_c_latt,CellPar(3))
+              CALL UpdateCell(IDD_Crystal_Symmetry)
+            CASE (IDF_alp_latt)
+              CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
+              CALL UpdateCell(IDD_Crystal_Symmetry)
+            CASE (IDF_bet_latt)
+              CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
+              CALL UpdateCell(IDD_Crystal_Symmetry)
+            CASE (IDF_gam_latt)
+              CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
+              CALL UpdateCell(IDD_Crystal_Symmetry)               
+            CASE (IDF_Crystal_System_Menu)
+              CALL Set_Space_Group(IDD_Crystal_Symmetry)
+!C>> JCC If the system is reset then regenerate the tic marks
+              CALL Generate_TicMarks
+            CASE (IDF_Space_Group_Menu)  
+              CALL Update_Space_Group(IDD_Crystal_Symmetry, IDummy, IDummy)
+              CALL Generate_TicMarks
+            CASE DEFAULT
+              CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 2')
+          END SELECT
+!        CASE (TabChanged)
+!        CASE (Expose,Resize)
+!        CASE (CloseRequest)
+        CASE DEFAULT
+          CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
+      END SELECT
+      CALL PopActiveWindowID
+      RETURN
+
+      END SUBROUTINE DealWithCrystalSymmetryPane
 !
 !*****************************************************************************
 !
@@ -124,27 +338,22 @@
       USE DRUID_HEADER
 
       INCLUDE 'statlog.inc'
-      INTEGER ICurSel
+      LOGICAL FnUnitCellOK ! Function
 
-! JvdS The current dialogue window is saved here. Where is it restored?
-      IcurSel = WInfoDialog(CurrentDialog)
+      CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page1)
-! PolyFitter_Wizard_Check_Status() sets CellOK
-      CALL PolyFitter_Wizard_Check_Status()
-! CellOK is a global variable in statlog.inc
-      IF (CellOK) THEN
+      IF (FnUnitCellOK()) THEN
 ! Enable the wizard next button
-! JvdS Was:      CALL WDialogFieldState(IDF_PW1_Next,Enabled)
         CALL WDialogFieldState(IDNEXT,Enabled)
         CALL Upload_Cell_Constants()
         CALL Check_Crystal_Symmetry()
         CALL Set_Space_Group(IUploadFrom)
-        CALL Generate_TicMarks
       ELSE
 ! Disable the wizard next button
-! JvdS Was:      CALL WDialogFieldState(IDF_PW1_Next,Disabled)
         CALL WDialogFieldState(IDNEXT,Disabled)
       END IF
+      CALL Generate_TicMarks
+      CALL PopActiveWindowID
 
       END SUBROUTINE UpdateCell
 !
@@ -161,9 +370,9 @@
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
       INTEGER IUploadFrom
-      INTEGER ICurSg,ICurSel
+      INTEGER ICurSg
 
-      ICurSel = WInfoDialog(CurrentDialog)
+      CALL PushActiveWindowID
       IF (IUpLoadFrom .EQ. IDD_Crystal_Symmetry) THEN
         CALL WDialogSelect(IDD_Crystal_Symmetry)
         CALL WDialogGetMenu(IDF_Crystal_System_Menu,IOption)
@@ -176,8 +385,6 @@
 !        Call WDialogGetMenu(IDF_PW_Space_Group_Menu,ICurSg)
       END IF
 !      Call WDialogPutMenu(IDF_PW_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
-! No value given
-      IF (Ioption .EQ. -999) IOption = 1
 11    NumBrSG = LPosSG(IOption+1) - LPosSG(IOption)
 !      IActSg = ICurSG + LPosSG(IOption)
 ! Only update if the current setting is not of the correct lattice type
@@ -185,7 +392,7 @@
           (IPosSg .GE. LPosSg(IOption) .AND. IPosSg .LT. LPosSg(IOption) + NumBrSg) ) THEN
 ! Selection of same lattice so retain current space group
 !C>> Reset to whatever was previously selected
-        IF (ICurSel .NE. 0) CALL WDialogSelect(ICurSel)
+        CALL PopActiveWindowID
         RETURN
       END IF
       ISPosSG = 1
@@ -197,33 +404,38 @@
       IPosSG = LPosSG(IOption)
       NumberSGTable = IPosSG
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
+!O      CALL WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu,IOption)
       CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
+! JvdS @ Next line should be obsolete
+!U      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
 !C>> JCC Set in the wizard too
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutMenu(IDF_PW_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
+!O      CALL WDialogPutMenu(IDF_PW_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
+      CALL WDialogPutOption(IDF_PW_Crystal_System_Menu,IOption)
       CALL WDialogPutMenu(IDF_PW_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-      CALL WDialogPutOption(IDF_PW_Space_Group_Menu,ISPosSG)
-!C>> Reset to whatever was previously selected
-      IF (ICurSel .NE. 0) CALL WDialogSelect(ICurSel)
+! JvdS @ Next line should be obsolete
+!U      CALL WDialogPutOption(IDF_PW_Space_Group_Menu,ISPosSG)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Set_Space_Group
 !
 !*****************************************************************************
 !
 !C>> Sets the space group selected
-      SUBROUTINE Update_Space_Group(IUploadFrom, ILat, ISgnum)
+      SUBROUTINE Update_Space_Group(IUploadFrom, TheLatticeSystem, ISgnum)
 
       USE WINTERACTER
       USE DRUID_HEADER
 
+      INTEGER TheLatticeSystem
+
       INCLUDE 'statlog.inc'
       INCLUDE 'Lattice.inc'
       INTEGER IUploadFrom
-      INTEGER ICurSel
 
-      ICurSel = WInfoDialog(CurrentDialog)
+
+      CALL PushActiveWindowID
       IF (IUploadFrom .EQ. IDD_Crystal_Symmetry) THEN
         CALL WDialogSelect(IDD_Crystal_Symmetry)
         CALL WDialogGetMenu(IDF_Crystal_System_Menu,IOption)
@@ -233,7 +445,7 @@
         CALL WDialogGetMenu(IDF_PW_Crystal_System_Menu,IOption)
         CALL WDialogGetMenu(IDF_PW_Space_Group_Menu,ISPosSG)
       ELSE
-        IOption = ILat
+        IOption = TheLatticeSystem
         ISPosSG = ISgnum - LPosSG(IOption) + 1
       END IF
 !.. Trap 0 for unknown and make it P 1
@@ -246,49 +458,23 @@
       IPosSG = LPosSG(IOption) + ISPosSg - 1
       NumberSGTable = IPosSG
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu,IOption)
       CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
 ! Set in the wizard too
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutMenu(IDF_PW_Crystal_System_Menu,CS_Options,NCS_Options,IOption)
+      CALL WDialogPutOption(IDF_PW_Crystal_System_Menu,IOption)
       CALL WDialogPutMenu(IDF_PW_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-      CALL WDialogPutOption(IDF_PW_Space_Group_Menu,ISPosSG)
 ! Finally set the number of pawley refinements to zero
       NumPawleyRef = 0
-      IF (ICurSel .NE. 0) CALL WDialogSelect(ICurSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Update_Space_Group
 !
 !*****************************************************************************
 !
-!      subroutine Check_Main_Crystal_Symmetry()
-!
-!
-!C>> JCC This is redundant now
-!      use Winteracter
-!      use Druid_Header
-!
-!      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
-! Set the values
-!      Call WDialogSelect(IDD_Crystal_Symmetry)
-!      Call WDialogGetReal(IDF_a_latt,CellPar(1))
-!      Call WDialogGetReal(IDF_b_latt,CellPar(2))      
-!      Call WDialogGetReal(IDF_c_latt,CellPar(3))      
-!      Call WDialogGetReal(IDF_alp_latt,CellPar(4))      
-!      Call WDialogGetReal(IDF_bet_latt,CellPar(5))      
-!      Call WDialogGetReal(IDF_gam_latt,CellPar(6))
-
-!C>> Just a dummy call
-!       Call Check_Crystal_Symmetry
-!
-!      end subroutine Check_Main_Crystal_Symmetry
-!
-!*****************************************************************************
-!
 !C>> JCC Added this in as a single function
       SUBROUTINE  Check_Lattice_Type
-
+! Although called 'Check_Lattice_Type, it sets the lattice type really
       USE WINTERACTER
       USE DRUID_HEADER
 
@@ -304,13 +490,12 @@
       DATA LastCellPar / 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 /
       SAVE LastCellPar
       INTEGER I
+      LOGICAL FnUnitCellOK ! Function
       REAL, PARAMETER :: SmallVal = 1.0E-6
 !C>> JCC Added this: initialise to one
       DATA LatBrav / 1 / ! The default setting
-!
-      DO I = 1 ,6
-        IF (CellPar(I) .LE. 0.0) RETURN
-      END DO
+! Check if cell parameters are available and make sense
+      IF (.NOT. FnUnitCellOK()) RETURN
 ! C>> JCC run check on last Cell
       IF (   ABS( CellPar(1) - LastCellPar(1) ) .LE. SmallVal  &
        .AND. ABS( CellPar(2) - LastCellPar(2) ) .LE. SmallVal  &   
@@ -333,10 +518,8 @@
            .AND. ABS(CellPar(5)-CellPar(4)) .LE. SmallVal
 !
 ! Unk=1, Tri=2,Mon_a=3,Mon_b=4,Mon_c=5,Ort=6,Tet=7,Tri=8,Rho=9,Hex=10,Cub=11
+! JvdS @ Note that this routine can never return Tri=8
 
-!C>> JCC The next code has changed a bit: The LatBrav indices are now set to
-!C>> the correct values, and some code for handling equal axes lengths but
-!C>> non-equal angles has been added
       IF (ABC_Same .AND. Ang_Same) THEN
         IF (Alp_90) THEN
           LatBrav = 11 ! Cubic
@@ -374,128 +557,6 @@
 
       END SUBROUTINE Check_Lattice_Type
 !
-!
-!      subroutine Get_Main_IRadOption()
-!
-!      USE WINTERACTER
-!      USE DRUID_HEADER
-!
-!         CALL WDialogGetRadioButton(IDF_LabX_Source,IRadOption)
-!          SELECT CASE (IRadOption)
-!            CASE(1)
-! Lab X-ray
-!              CALL WDialogFieldState(IDF_CW_group,Enabled)
-!              CALL WDialogFieldState(IDF_radiation_label,Enabled)
-!              CALL WDialogFieldState(IDF_single_wavelength,Enabled)
-!              CALL WDialogFieldState(IDF_wavelength1,Enabled)
-!              CALL WDialogGetRadioButton(IDF_single_wavelength,INWOption)
-!              CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
-!              CALL WDialogFieldState(IDF_two_wavelength,Enabled)
-!C>>              If (INWOption.eq.1) then
-!C>>                CALL WDialogFieldState(IDF_wavelength2,Disabled)
-!C>>              Else
-!C>>                CALL WDialogFieldState(IDF_wavelength2,Enabled)
-!C>>              End If
-!              CALL WDialogFieldState(IDF_TOF_group,Disabled)
-!              CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
-!              CALL WDialogFieldState(IDF_flight_path,Disabled)
-!              CALL WDialogFieldState(IDF_2theta_label,Disabled)
-!              CALL WDialogFieldState(IDF_2theta0,Disabled)
-!            CASE(2,3)
-! Synchrotron X-ray & CW neutron
-!              CALL WDialogFieldState(IDF_CW_group,Enabled)
-!              CALL WDialogFieldState(IDF_radiation_label,Disabled)
-!              CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-!              CALL WDialogFieldState(IDF_single_wavelength,Enabled)
-!              CALL WDialogFieldState(IDF_two_wavelength,Disabled)
-!              CALL WDialogFieldState(IDF_wavelength1,Enabled)
-!>>              CALL WDialogFieldState(IDF_wavelength2,Disabled)
-!              CALL WDialogFieldState(IDF_TOF_group,Disabled)
-!              CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
-!              CALL WDialogFieldState(IDF_flight_path,Disabled)
-!              CALL WDialogFieldState(IDF_2theta_label,Disabled)
-!              CALL WDialogFieldState(IDF_2theta0,Disabled)
-!            CASE(4)
-! TOF neutron
-!              CALL WDialogFieldState(IDF_CW_group,Disabled)
-!              CALL WDialogFieldState(IDF_radiation_label,Disabled)
-!              CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-!              CALL WDialogFieldState(IDF_single_wavelength,Disabled)
-!              CALL WDialogFieldState(IDF_two_wavelength,Disabled)
-!              CALL WDialogFieldState(IDF_wavelength1,Disabled)
-!>>              CALL WDialogFieldState(IDF_wavelength2,Disabled)
-!              CALL WDialogFieldState(IDF_TOF_group,Enabled)
-!              CALL WDialogFieldState(IDF_Flight_Path_Label,Enabled)
-!              CALL WDialogFieldState(IDF_flight_path,Enabled)
-!              CALL WDialogFieldState(IDF_2theta_label,Enabled)
-!              CALL WDialogFieldState(IDF_2theta0,Enabled)
-!          END SELECT
-!      end subroutine Get_Main_IRadOption
-!
-!*****************************************************************************
-!
-      SUBROUTINE Set_Main_IRadOption()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER IRadOption
-
-      CALL WDialogGetRadioButton(IDF_LabX_Source,IRadOption)
-      CALL SetSourceDataState(IRadOption)
-!          SELECT CASE (IRadOption)
-!            CASE(1)
-! Lab X-ray
-!              CALL WDialogFieldState(IDF_CW_group,Enabled)
-!              CALL WDialogFieldState(IDF_radiation_label,Enabled)
-!              CALL WDialogFieldState(IDF_single_wavelength,Enabled)
-!              CALL WDialogFieldState(IDF_wavelength1,Enabled)
-!              CALL WDialogGetRadioButton(IDF_single_wavelength,INWOption)
-!              CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
-!              CALL WDialogFieldState(IDF_two_wavelength,Enabled)
-!>>              If (INWOption.eq.1) then
-!>>                CALL WDialogFieldState(IDF_wavelength2,Disabled)
-!>>              Else
-!>>                CALL WDialogFieldState(IDF_wavelength2,Enabled)
-!>>              End If
-!              CALL WDialogFieldState(IDF_TOF_group,Disabled)
-!              CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
-!              CALL WDialogFieldState(IDF_flight_path,Disabled)
-!              CALL WDialogFieldState(IDF_2theta_label,Disabled)
-!              CALL WDialogFieldState(IDF_2theta0,Disabled)
-!            CASE(2,3)
-! Synchrotron X-ray & CW neutron
-!              CALL WDialogFieldState(IDF_CW_group,Enabled)
-!              CALL WDialogFieldState(IDF_radiation_label,Disabled)
-!              CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-!              CALL WDialogFieldState(IDF_single_wavelength,Enabled)
-!              CALL WDialogFieldState(IDF_two_wavelength,Disabled)
-!              CALL WDialogFieldState(IDF_wavelength1,Enabled)
-!>>              CALL WDialogFieldState(IDF_wavelength2,Disabled)
-!              CALL WDialogFieldState(IDF_TOF_group,Disabled)
-!              CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
-!              CALL WDialogFieldState(IDF_flight_path,Disabled)
-!              CALL WDialogFieldState(IDF_2theta_label,Disabled)
-!              CALL WDialogFieldState(IDF_2theta0,Disabled)
-!            CASE(4)
-! TOF neutron
-!              CALL WDialogFieldState(IDF_CW_group,Disabled)
-!              CALL WDialogFieldState(IDF_radiation_label,Disabled)
-!              CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-!              CALL WDialogFieldState(IDF_single_wavelength,Disabled)
-!              CALL WDialogFieldState(IDF_two_wavelength,Disabled)
-!              CALL WDialogFieldState(IDF_wavelength1,Disabled)
-!>>JCC              CALL WDialogFieldState(IDF_wavelength2,Disabled)
-!              CALL WDialogFieldState(IDF_TOF_group,Enabled)
-!              CALL WDialogFieldState(IDF_Flight_Path_Label,Enabled)
-!              CALL WDialogFieldState(IDF_flight_path,Enabled)
-!              CALL WDialogFieldState(IDF_2theta_label,Enabled)
-!              CALL WDialogFieldState(IDF_2theta0,Enabled)
-!          END SELECT
-      END SUBROUTINE Set_Main_IRadOption
-!
 !*****************************************************************************
 !
 !C>> Sequence of subroutines that handle the downloading of each field in turn
@@ -504,13 +565,13 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-      REAL Temp
+      INTEGER, INTENT (IN   ) :: From
+
       INCLUDE 'statlog.inc'
       INCLUDE 'Lattice.inc'
-      INTEGER ICurrentSel
-      INTEGER From
+      REAL Temp
 
-      ICurrentSel = WinfoDialog(CurrentDialog)
+      CALL PushActiveWindowID
       IF (From .EQ. IDD_Data_Properties) THEN
         CALL WDialogSelect(IDD_Data_Properties)
         CALL WDialogGetReal(IDF_wavelength1,Temp)
@@ -518,8 +579,9 @@
         CALL WDialogSelect(IDD_Index_Preparation)
         CALL WDialogGetReal(IDF_Indexing_Lambda,Temp)
       END IF
+! JvdS @ and what about IDF_PW_wavelength1?
       CALL UpdateWavelength(Temp)
-      IF (ICurrentSel .NE. 0) CALL WDialogSelect(ICurrentSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE DownLoadWavelength
 !
@@ -527,40 +589,118 @@
 !
       SUBROUTINE SetWavelengthToSelection(Iselection)
 
-      INCLUDE 'Lattice.inc'
+      IMPLICIT NONE
 
-      IF ((Iselection .GT. 1) .AND. (Iselection .LE. (NRad_Types + 1))) THEN
-        CALL UpdateWavelength(RadWaveLengths(Iselection - 1))
-      ENDIF
+      INTEGER, INTENT (IN   ) :: Iselection
+
+      REAL FnWavelengthOfMenuOption ! Function
+
+! Winteracter menu:
+!     1 = <...>
+!     2 = Cu      <==  DEFAULT
+!     3 = Mo
+!     4 = Co
+!     5 = Cr
+!     6 = Fe
+
+      IF ((Iselection .GE. 2) .AND. (Iselection .LE. 6)) CALL UpdateWavelength(FnWavelengthOfMenuOption(Iselection))
+      RETURN
 
       END SUBROUTINE SetWavelengthToSelection
 !
 !*****************************************************************************
 !
+      REAL FUNCTION FnWavelengthOfMenuOption(TheOption)
+!
+! This function returns the wavelength that goes with the anode material as selected
+! from the Winteracter menus:
+
+! Winteracter menu:
+!     1 = <...>
+!     2 = Cu      <==  DEFAULT
+!     3 = Mo
+!     4 = Co
+!     5 = Cr
+!     6 = Fe
+!
+! JvdS 5 Aug 2001
+!
+! INPUT   : TheOption = the number of the selected option, e.g. 'Cu' = 2
+!
+! RETURNS : The wavelength of the anode material of that menu option in Angstrom
+!           ErrorMessage if TheOption not in range (should never happen)
+!
+! NOTE don't call this function with TheOption 1, because that will initialise the wavelength to 0.0
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheOption
+
+      REAL WavelengthOf ! Function
+
+      SELECT CASE (TheOption)
+        CASE (2)
+          FnWavelengthOfMenuOption = WavelengthOf('Cu')
+        CASE (3)
+          FnWavelengthOfMenuOption = WavelengthOf('Mo')
+        CASE (4)
+          FnWavelengthOfMenuOption = WavelengthOf('Co')
+        CASE (5)
+          FnWavelengthOfMenuOption = WavelengthOf('Cr')
+        CASE (6)
+          FnWavelengthOfMenuOption = WavelengthOf('Fe')
+        CASE DEFAULT
+          CALL DebugErrorMessage('Programming error in FnWavelengthOfMenuOption')
+          FnWavelengthOfMenuOption = 0.0
+      END SELECT
+      RETURN
+
+      END FUNCTION FnWavelengthOfMenuOption
+!
+!*****************************************************************************
+!
       SUBROUTINE UpdateWavelength(TheWaveLength)
+! Should be renamed to 'SetWavelength'
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      REAL    TheWaveLength
-      INTEGER ICurrentSel
-      INCLUDE 'statlog.inc'
-      INCLUDE 'Lattice.inc'
+      REAL, INTENT (IN   ) :: TheWaveLength
+
+      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+
+      INTEGER I, IRadSelection
+      REAL    FnWavelengthOfMenuOption ! Function
 
       IF ((TheWaveLength .GT. 0.1) .AND. (TheWaveLength .LT. 20.0)) THEN
-        alambda = TheWaveLength
-        WVLNOK = .TRUE.
+        ALambda = TheWaveLength
       ENDIF
-      ICurrentSel = WinfoDialog(CurrentDialog)
+      CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogPutReal(IDF_wavelength1,alambda,'(f10.5)')
+      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(f10.5)')
       CALL WDialogSelect(IDD_PW_Page2)
-      CALL WDialogPutReal(IDF_PW_wavelength1,alambda,'(f10.5)')
+      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(f10.5)')
       CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogPutReal(IDF_Indexing_Lambda,alambda,'(f10.5)')
-      CALL WDialogSelect(ICurrentSel)
+      CALL WDialogPutReal(IDF_Indexing_Lambda,ALambda,'(f10.5)')
+! Now add in a test: if lab data, and wavelength close to known material,
+! set anode material in Winteracter menus. Otherwise, anode is unknown.
+      IF (JRadOption .EQ. 1) THEN ! X-ray lab data
+! Initialise anode material to unknown
+        IRadSelection = 1 ! <...> in the Winteracter menu
+        DO I = 2, 6
+          IF (ABS(ALambda - FnWavelengthOfMenuOption(I)) .LT. 0.0003) IRadSelection = I
+        END DO
+        CALL WDialogSelect(IDD_Data_Properties)
+        CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
+        CALL WDialogSelect(IDD_PW_Page2)
+        CALL WDialogPutOption(IDF_PW_Wavelength_Menu,IRadSelection)
+      ENDIF
+      CALL PopActiveWindowID
 
       END SUBROUTINE UpdateWavelength
 !
@@ -630,7 +770,7 @@
               GOTO 1
           END SELECT
         END DO
-1       CONTINUE
+   1    CONTINUE
       ELSE IF (ISpaceGroup .LE. OrthLim) THEN
         LatticeNumber = 6
       ELSE IF (ISpaceGroup .LE. TetrLim) THEN
@@ -648,10 +788,15 @@
               GOTO 2
           END SELECT
         END DO
-2       CONTINUE
+   2    CONTINUE
       ELSE IF (ISpaceGroup .LE. HexaLim) THEN
         LatticeNumber = 10
       ENDIF
+! JvdS @ How can this function ever assign 11 ( = Cubic) to a 
+! 'kristalstelsel'? (The variable LatBrav, probably short for 'Lattice Bravais'
+! is used throughout DASH, but there are 14 Bravais lattices, so that's not
+! what's kept in the variable).
+
       RETURN
 
       END FUNCTION LatticeNumber
@@ -663,15 +808,16 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-      CHARACTER*(*) filename
-      INTEGER       ICurSel
+      IMPLICIT NONE
 
-      ICurSel = WInfoDialog(CurrentDialog)
+      CHARACTER*(*) filename
+
+      CALL PushActiveWindowID
 ! JvdS Started to add SA to Wizard
 !      CALL WDialogSelect(IDD_SA_input1)
       CALL WDialogSelect(IDD_SAW_Page1)
       CALL WDialogPutString(IDF_SA_Project_Name,filename)
-      IF (ICurSel .NE. 0) CALL WDialogSelect(ICurSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE SetSAFileName
 !
@@ -682,7 +828,9 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-      INTEGER, INTENT (IN) :: State
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: State
 
       IF (State .EQ. 1) THEN
         CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOn)
@@ -708,11 +856,11 @@
 !>> Is SolutionOn is zero then the solving state is left as is
 
       USE WINTERACTER
-      USE druid_header
+      USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN) :: PeakOn, PawleyOn, SolutionOn
+      INTEGER, INTENT (IN   ) :: PeakOn, PawleyOn, SolutionOn
 
       IF (PeakOn .GT. 0) THEN
         CALL WMenuSetState(ID_Peak_Fitting_Mode,ItemEnabled,WintOn)
@@ -735,28 +883,29 @@
 !
 !*****************************************************************************
 !
-!>> JCC Subroutine for controlling the selection of the mode menu and tool buttons in DASH
-      SUBROUTINE SelectModeMenuState(Selection)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN) :: Selection
-
-      CALL WMenuSetState(ID_Peak_Fitting_Mode,      ItemChecked,WintOff)
-      CALL WMenuSetState(ID_Pawley_Refinement_Mode, ItemChecked,WintOff)
-      CALL WMenuSetState(ID_Structure_Solution_Mode,ItemChecked,WintOff)
-      IF      (Selection .EQ. ID_Peak_Fitting_Mode)       THEN
-        CALL WMenuSetState(ID_Peak_Fitting_Mode,      ItemChecked,WintOn)
-      ELSE IF (Selection .EQ. ID_Pawley_Refinement_Mode)  THEN 
-        CALL WMenuSetState(ID_Pawley_Refinement_Mode, ItemChecked,WintOn)
-      ELSE IF (Selection .EQ. ID_Structure_Solution_Mode) THEN 
-        CALL WMenuSetState(ID_Structure_Solution_Mode,ItemChecked,WintOn)
-      END IF
-      RETURN
-
-      END SUBROUTINE SelectModeMenuState
-
-
+!U!>> JCC Subroutine for controlling the selection of the mode menu and tool buttons in DASH
+!U      SUBROUTINE SelectModeMenuState(Selection)
+!U
+!U      USE WINTERACTER
+!U      USE DRUID_HEADER
+!U
+!U      IMPLICIT NONE
+!U
+!U      INTEGER, INTENT (IN   ) :: Selection
+!U
+!U      CALL WMenuSetState(ID_Peak_Fitting_Mode,      ItemChecked,WintOff)
+!U      CALL WMenuSetState(ID_Pawley_Refinement_Mode, ItemChecked,WintOff)
+!U      CALL WMenuSetState(ID_Structure_Solution_Mode,ItemChecked,WintOff)
+!U      IF      (Selection .EQ. ID_Peak_Fitting_Mode)       THEN
+!U        CALL WMenuSetState(ID_Peak_Fitting_Mode,      ItemChecked,WintOn)
+!U      ELSE IF (Selection .EQ. ID_Pawley_Refinement_Mode)  THEN 
+!U        CALL WMenuSetState(ID_Pawley_Refinement_Mode, ItemChecked,WintOn)
+!U      ELSE IF (Selection .EQ. ID_Structure_Solution_Mode) THEN 
+!U        CALL WMenuSetState(ID_Structure_Solution_Mode,ItemChecked,WintOn)
+!U      END IF
+!U      RETURN
+!U
+!U      END SUBROUTINE SelectModeMenuState
+!
+!*****************************************************************************
+!

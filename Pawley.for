@@ -1,18 +1,16 @@
       subroutine Quick_Pawley
 c
       USE WINTERACTER
-      USE druid_header
+      USE DRUID_HEADER
+	USE VARIABLES
 !
 !   Type declarations
 !
-      TYPE(WIN_MESSAGE) :: MESSAGE
-c
       INCLUDE 'DialogPosCmn.inc'
 	INCLUDE 'params.inc'
 c
       character*80 profile
       logical nodata,PawleyOptionChosen 
-      COMMON /PLTYPE/ IPTYPE
 c
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),
@@ -23,11 +21,12 @@ c
      &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, 
      &XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      REAL :: CELLPAR,ZEROPOINT,ALAMBDA
+	INCLUDE 'GLBVAR.INC' ! Contains ALambda
 C>> JCC Declarations
 	INTEGER ieocc
 	INTEGER Quick_Pawley_Fit
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
+      REAL :: CELLPAR,ZEROPOINT
+      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
 C
 C.. CCSL common blocks included - take care!
       COMMON /CELPAR/CELL(3,3,2),V(2),ORTH(3,3,2),CPARS(6,2),KCPARS(6),
@@ -65,10 +64,8 @@ c
 
       ItemX=IXPos_IDD_Pawley_Status
       ItemY=IYPos_IDD_Pawley_Status
-C>> JCC       CALL WDialogLoad(IDD_Pawley_Status)
       CALL WDialogSelect(IDD_Pawley_Status)
       CALL WDialogShow(ITemX,ItemY,0,Modeless)
-!      write(76,*) ' IDD_Pawley_Status ',IDD_Pawley_Status
 c
       CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
       CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
@@ -148,7 +145,6 @@ C	    END IF
 ! with this?
 	  endif
 
-!	  write(76,*) ' Finished Quick_Pawley_Fit'
 	
         ipt=0
         CALL WDialogPutProgressBar(IDF_Pawley_Progress_Bar,ipt,Absolute)
@@ -164,19 +160,18 @@ C	    END IF
 c
         PawleyOptionChosen=.false.
         DO WHILE(.NOT.PawleyOptionChosen)
-            CALL WMessage(ITYPE,MESSAGE)
-!	write(76,*) ' Pawley loop ',itype,Message%Value1,Message%Value2
-            SELECT CASE (ITYPE)
+            CALL GetEvent
+            SELECT CASE (EventType)
               CASE (Expose,Resize)
 				CALL Redraw()
 ! 
               CASE (MouseButDown)
-                    CALL Plot_Alter(MESSAGE%GX,MESSAGE%GY)
+                    CALL Plot_Alter
               CASE (KeyDown)
-                    CALL Check_KeyDown(MESSAGE)
+                    CALL Check_KeyDown
 !
               CASE (PushButton)
-                IDNumber=Message%Value1
+                IDNumber=EventInfo%Value1
                 SELECT CASE (IDNumber)
                   CASE(IDB_PawRef_Reject)
                     PawleyOptionChosen=.true.
@@ -211,7 +206,6 @@ C.. upload the cell constants and zeropoint from the Pawley refinement
                       CELLPAR(JJ)=DEGREE(ARCCOS(CELL(II,2,1)))
                     END DO
                     ZEROPOINT=ZEROSP(1,1,1)
-C>> JCC         Call WDialogLoad(IDD_Peak_Positions)
         Call WDialogSelect(IDD_Peak_Positions)
         Call WDialogPutReal(IDF_a_refine,CellPar(1),'(F10.5)')
         Call WDialogPutReal(IDF_b_refine,CellPar(2),'(F10.5)')      
@@ -254,7 +248,6 @@ C		CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
 	END IF
 	CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
       CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
-!      write(76,*) ' Now able to solve '
 	CALL SetModeMenuState(0,0,1)
 
       goto 555
@@ -278,18 +271,16 @@ C..   Check the lattice constants
 C..   Check the wavelength
 C..   Check the space group
 !
-      use Winteracter
-      use druid_header
+      USE WINTERACTER
+      USE DRUID_HEADER
+	USE VARIABLES
 !
 !
 !   Type declarations
 !
-      TYPE(WIN_MESSAGE) :: MESSAGE
-!
       LOGICAL :: NODATA
       LOGICAL           :: SKIP    = .FALSE.
-      LOGICAL :: GOTCELL(6),GOTALLCELL, BackFrom2
-      INTEGER           :: I,ITYPE,IDNUMBER,IPW_Option
+      INTEGER           :: I,IDNUMBER,IPW_Option
      
       INCLUDE 'statlog.inc'
       INCLUDE 'DialogPosCmn.inc'
@@ -325,17 +316,19 @@ c
      & BACKGD(100,5),KBCKGD(100,5),NBK,LBKD(20),ZBAKIN
       LOGICAL ZBAKIN
 !
-      COMMON /PLTYPE/ IPTYPE
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 !
       COMMON /PAWREFCMN/ XRANMIN,XRANMAX,NPawBack
 !
 	CHARACTER*4 ChRadOption(4)
 	DATA CHRADOPTION /'LABX','SYNX','SYNX','TOFN'/
-	COMMON /RadOption/ JRadOption
+
+	INCLUDE 'GLBVAR.INC' ! Contains JRadOption
 
 	INTEGER SaveProject
-
+	LOGICAL FnUnitCellOK ! Function
+	LOGICAL FnWaveLengthOK ! Function
+	REAL    WavelengthOf ! Function
 
 	IF (.NOT. BACKREF) THEN
 		NPawBack = 2
@@ -415,8 +408,6 @@ c
         CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
 cccc gone        CALL WDialogPutCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
         CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
-
-
       End If
 	IF (.NOT. BACKREF) THEN
 	    CALL WDialogFieldState(IDF_IDF_PawRef_NBack,Disabled)
@@ -426,20 +417,19 @@ C
       SkipPawleyRef=.false.
 	CALL delete_polybackup
       DO WHILE(.NOT.SkipPawleyRef)
-        CALL WMessage(ITYPE,MESSAGE)
-!	write(76,*) ' Pawley loop ',itype,Message%Value1,Message%Value2
-        SELECT CASE (ITYPE)
+        CALL GetEvent
+
+        SELECT CASE (EventType)
           CASE (Expose,Resize)
             CALL Redraw()
 !
               CASE (MouseButDown)
-                    CALL Plot_Alter(MESSAGE%GX,MESSAGE%GY)
+                    CALL Plot_Alter
               CASE (KeyDown)
-                  CALL Check_KeyDown(MESSAGE)
+                  CALL Check_KeyDown
 !
           CASE (PushButton)
-            IDNumber=Message%Value1
-!	write(76,*) ' IDNumber in Pawley loop is ',IDNUMBER
+            IDNumber=EventInfo%Value1
             SELECT CASE (IDNumber)
               CASE(IDF_PawRef_Refine)
                 Goto 888
@@ -489,7 +479,6 @@ C.. If no wavelength then assume Cu Ka1 wvln=1.54051
 C..
 C.. Write out the data file ...
 C.. We should check if there are data to write out!
-!      write(76,*) ' In QP ',Nbin,NumInternalDSC,DataSetChange
       IF (nbin .GT. 0) THEN
 C.. Allow a maximum of 300 reflections
         IF (ntic .EQ. 0) RETURN
@@ -511,7 +500,6 @@ C.. Allow a maximum of 300 reflections
 
 
         IF (NumInternalDSC .NE. DataSetChange) THEN
-!          write(76,*) ' Writing polyf.dat',NumInternalDSC,DataSetChange
           OPEN(41,file='polyp.dat',status='unknown')
           DO i=1,nbin
             IF (xbin(i) .GT. xranmax) GOTO 4110
@@ -524,7 +512,7 @@ C.. Allow a maximum of 300 reflections
       ELSE
         RETURN
       END IF
-      IF (.NOT. CELLOK) RETURN
+      IF (.NOT. FnUnitCellOK()) RETURN
 C 
       OPEN(42,file='polyp.ccl',status='unknown')
       WRITE(42,4210) 
@@ -536,7 +524,6 @@ C
      &'1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
       if (IPosSG.ge.1) then
         call DecodeSGSymbol(SGShmStr(IPosSg))
-!        write(76,*) nsymmin,' symmetry operators'
         if (nsymmin.gt.0) then
           do isym=1,nsymmin
             write(42,4235) symline(isym)
@@ -553,20 +540,12 @@ C
       IRtyp=2-Item
       write(42,4245) IRTYP,xranmin,xranmax
  4245 format('L RTYP  'i3,2f10.3,'  0.001')
-      if (WVLNOK) then
-        write(42,4250) ALambda
-      else
-        ALambda=1.54051
-        write(42,4250) ALambda
-      end if
- 4250 format('L WVLN ',f10.5)
-      if (zeropoint.gt.-1.0.and.zeropoint.lt.1.0) then
-        write(42,4260) zeropoint
-      else
-        zeropoint=0.0
-        write(42,4260) zeropoint
-      end if
- 4260 format('L ZERO ',f10.5)
+      IF (.NOT. FnWaveLengthOK()) ALambda = WavelengthOf('Cu')
+	WRITE(42,4250) ALambda
+ 4250 FORMAT('L WVLN ',f10.5)
+      IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint.GT.1.0)) ZeroPoint=0.0
+	WRITE(42,4260) ZeroPoint
+ 4260 FORMAT('L ZERO ',f10.5)
 C>> JCC Was
 C      write(42,4270) SLIMVALUE
 C 4270 format('L SCAL   0.01000'/
@@ -690,7 +669,6 @@ C
       xxx='CN11LS'
       MATSZ=QPFDIM
       NINIT=1
-!      write(76,*) ' In Quick_Pawley_Fit '
 C>> JCC trap the return status
 	call make_polybackup ! make a backup of the polyp files
       Quick_Pawley_Fit = FORTY(xxx,ALSQ,MATSZ,PCCN01,
@@ -740,8 +718,7 @@ C
       COMMON /YSTORE/ ZCAL(MPPTS),ZBAK(MPPTS)
       COMMON /ZSTOR1/ ZXDELT,IIMIN,IIMAX,XDIFT,XMINT
 !
-      COMMON /PLTYPE/ IPTYPE
-!
+      INCLUDE 'GLBVAR.INC'
 
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),
      &itypot(mobstic),iordot(mobstic),
@@ -778,33 +755,13 @@ c
       integer function New_Pawley_Refinement()
 c
       USE WINTERACTER
-      USE druid_header
-c
+      USE DRUID_HEADER
 
-	include 'params.inc'
-      character*80 profile
-      logical nodata,PawleyOptionChosen 
-C>> JCC added in error check declarations
-	integer ieocc
-      COMMON /PLTYPE/ IPTYPE
-c
-
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),
-     &YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),
-     &YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,
-     &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, 
-     &XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      INCLUDE 'statlog.inc'
       INCLUDE 'DialogPosCmn.inc'
 c
-C>> JCC       CALL WDialogLoad(IDD_Pawley_Status)
       CALL WDialogSelect(IDD_Pawley_Status)
       CALL WDialogShow(IXPos_IDD_Pawley_Status,
      &IYPos_IDD_Pawley_Status,0,Modeless)
-!      write(76,*) ' IDD_Pawley_Status (go with CCN) ',IDD_Pawley_Status
 c
       call Quick_Pawley_ReRefine() 
       New_Pawley_Refinement = Quick_Pawley_Fit()
@@ -832,18 +789,16 @@ C..   Check the lattice constants
 C..   Check the wavelength
 C..   Check the space group
 !
-      use Winteracter
-      use druid_header
+      USE WINTERACTER
+      USE DRUID_HEADER
+	USE VARIABLES
 !
 !
 !   Type declarations
 !
-      TYPE(WIN_MESSAGE) :: MESSAGE
-!
       LOGICAL :: NODATA
       LOGICAL           :: SKIP    = .FALSE.
-      LOGICAL :: GOTCELL(6),GOTALLCELL, BackFrom2
-      INTEGER           :: I,ITYPE,IDNUMBER,IPW_Option
+      INTEGER           :: I,IDNUMBER,IPW_Option
       INCLUDE 'statlog.inc'
 	INCLUDE 'params.inc'
 C>> JCC Cell/lattice declarations now in an include file
@@ -875,8 +830,6 @@ c
      &XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 !
-      COMMON /PLTYPE/ IPTYPE
-
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
       COMMON /PAWREFCMN/ XRANMIN,XRANMAX,NPawBack
 
@@ -934,28 +887,26 @@ c
 C
       SkipPawleyRef=.false.
       DO WHILE(.NOT.SkipPawleyRef)
-        CALL WMessage(ITYPE,MESSAGE)
-!	write(76,*) ' Pawley loop ',itype,Message%Value1,Message%Value2
-        SELECT CASE (ITYPE)
+        CALL GetEvent
+        SELECT CASE (EventType)
           CASE (Expose,Resize)
             CALL Redraw()
 !
               CASE (MouseButDown)
-                    CALL Plot_Alter(MESSAGE%GX,MESSAGE%GY)
+                    CALL Plot_Alter
               CASE (KeyDown)
-                  CALL Check_KeyDown(MESSAGE)
+                  CALL Check_KeyDown
 !
           CASE (PushButton)
-            IDNumber=Message%Value1
-!	write(76,*) ' IDNumber in Pawley ReRefine loop is ',IDNUMBER
-            SELECT CASE (IDNumber)
+            IDNumber=EventInfo%Value1
+            SELECT CASE (EventInfo%Value1)
               CASE(IDF_PawRef_Refine)
                 Goto 888
               CASE(IDB_PawRef_Skip)
                 SkipPawleyRef=.true.
             END SELECT
 c          CASE(FieldChanged)
-c            IDNumber=Message%Value1
+c            IDNumber=EventInfo%Value1
 c            SELECT CASE (IDNumber)
 c              CASE (IDF_IDF_PawRef_NBack)
 c                CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
@@ -981,7 +932,6 @@ c            END SELECT
       Call WDialogGetCheckBox(IDF_PawRef_RefWid_Check,IWid_Check)
       If (IWid_Check.eq.Checked) then
        CALL WDialogGetRadioButton(IDF_PawRef_RefWid_Radio1,IWid_Option)
-!       write(76,*) ' IWid_Option ',IWid_Option
       End If
       CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
       CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
@@ -992,7 +942,6 @@ C.. We should only proceed with this if we have good cell constants
 C.. If no wavelength then assume Cu Ka1 wvln=1.54051
 C..
 C
-!      write(76,*) 'About to open  polyp.ccl and polyp.ccn'
       open(42,file='polyp.ccl',status='unknown')
       open(43,file='polyp.ccn',status='old')
       FirstVaryLine=.true.
@@ -1025,10 +974,8 @@ C..
       If (Item.eq.1) write(42,4330)
  4330 format('L VARY ZERO 1 ')
       Call WDialogGetCheckBox(IDF_PawRef_RefWid_Check,IWid_Check)
-!      write(76,*) ' IWid_Check = ',IWid_Check,Checked
       If (IWid_Check.eq.Checked) then
        CALL WDialogGetRadioButton(IDF_PawRef_RefWid_Radio1,IWid_Option)
-!      write(76,*) ' IWid_Check:IWid_Option = ',IWid_Option
        SELECT CASE (IWid_Option)
          CASE(1)
           write(42,4410)
@@ -1323,7 +1270,7 @@ C>> Make a backup copy of the polyp.pik file to recover in event of an error
 	use winteracter
 	use druid_header
 	use variables
-      character(len=255) :: SDIFileName
+      character(len=80) :: SDIFileName
 	character(len=255) :: Currentdir
 	character(len=45) :: FILTER
 	integer IFLAGS
