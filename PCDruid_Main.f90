@@ -150,7 +150,6 @@
 ! Initialise space group information
       CALL PolyFitterInitialise()
       CALL InitialiseVariables
-      CALL Default_Crystal_Symmetry
       CALL Check_License()
 ! JvdS Now we can remove the licence dialogue from memory:
       CALL WDialogSelect(IDD_License_Dialog)
@@ -193,8 +192,6 @@
           CALL Main_Field_Changed_Routines(EventInfo%Value1,EventInfo%Value2)
         CASE (Expose,Resize)
           CALL Redraw()
-!        CASE (CloseRequest)
-!          CALL WExit
       END SELECT
 
       END SUBROUTINE process_mainwindow_message
