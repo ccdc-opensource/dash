@@ -67,13 +67,7 @@
         CASE (FieldChanged)
           IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
             SELECT CASE (EventInfo%VALUE1)
-              CASE (IDF_ErrorBar_Check)
-                CALL Profile_Plot
-              CASE (IDF_Background_Check)
-                CALL Profile_Plot
-              CASE (IDF_ConnectObsPoints)
-                CALL Profile_Plot
-              CASE (IDF_PlotPeakFitDif)
+              CASE (IDF_ErrorBar_Check, IDF_Background_Check, IDF_ConnectObsPoints, IDF_PlotPeakFitDif, IDF_ShowCumChiSqd)
                 CALL Profile_Plot
             END SELECT
           ENDIF
@@ -95,6 +89,7 @@
       INTEGER IFLAGS, IFTYPE
       CHARACTER*MaxPathLength tFileName
       CHARACTER*75  FILTER
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
@@ -117,6 +112,17 @@
                 CALL WDialogPutString(IDF_ViewExe,VIEWEXE)
               ENDIF
           END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_UseHydrogens,IDF_AutoLocalOptimise)
+              IF (WDialogGetCheckBoxLogical(IDF_UseHydrogens)) THEN
+! If hydrogens are used during SA, force use of hydrogens during autominimise
+                CALL WDialogPutCheckBoxLogical(IDF_UseHydrogensAuto,.TRUE.)
+                CALL WDialogFieldState(IDF_UseHydrogensAuto,Disabled)
+              ELSE
+                CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto,WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
+              ENDIF
+          END SELECT
       END SELECT
       CALL PopActiveWindowID
 
@@ -133,7 +139,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Structural_Information)
@@ -142,7 +148,7 @@
           CASE (PushButton) ! one of the buttons was pushed
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDOK, IDCANCEL)
-                CALL WDialogHide()
+                CALL WDialogHide
             END SELECT
         END SELECT
       ELSE
@@ -158,9 +164,9 @@
                 CALL Generate_TicMarks
                 CALL WDialogSelect(IDD_Structural_Information)
                 CALL CheckUnitCellConsistency
-                CALL WDialogHide()
+                CALL WDialogHide
               CASE (IDCANCEL)
-                CALL WDialogHide()
+                CALL WDialogHide
             END SELECT
             CALL Profile_Plot
           CASE (FieldChanged)
