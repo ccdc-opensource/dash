@@ -129,7 +129,7 @@
         CALL WDialogPutReal(IDF_Sigma2,PkFnVarVal(2,1),'(F10.4)')
         DO I = 1, NumFittedPFR
           iord = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_Sigma_Grid,4,I,PkFnCal(1,iord),'(F12.5)')
+          CALL WGridPutCellReal(IDF_Sigma_Grid,4,I,PkFnCal(1,iord),'(F12.4)')
         ENDDO
       ENDIF
 ! Write out gammas
@@ -157,7 +157,7 @@
         CALL WDialogPutReal(IDF_Gamma2,PkFnVarVal(2,2),'(F10.4)')
         DO I = 1, NumFittedPFR
           iord = IOrdTem(i)
-          CALL WGridPutCellReal(IDF_Gamma_Grid,4,I,PkFnCal(2,iord),'(F12.5)')
+          CALL WGridPutCellReal(IDF_Gamma_Grid,4,I,PkFnCal(2,iord),'(F12.4)')
         ENDDO
       ENDIF
 ! Write out HPSL
@@ -170,7 +170,7 @@
       ENDDO
       IF (NumFittedPFR .GE. 2) THEN
 ! Let's fit HPSL
-        IPtPS =3 
+        IPtPS = 3 
         CALL Fit_Constant(FitPar,FitEsd,1,IPtPS)
         IF (IBMBER .NE. 0) THEN
           IBMBER = 0
@@ -183,7 +183,7 @@
         CALL WDialogPutReal(IDF_HPSL1,PkFnVarVal(1,3),'(F10.4)')
         DO I = 1, NumFittedPFR
           iord = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_HPSL_Grid,4,i,PkFnCal(3,iord),'(F12.5)')
+          CALL WGridPutCellReal(IDF_HPSL_Grid,4,i,PkFnCal(3,iord),'(F12.4)')
         ENDDO
       ENDIF
 ! Write out HMSL
@@ -209,7 +209,7 @@
         CALL WDialogPutReal(IDF_HMSL1,PkFnVarVal(1,4),'(F10.4)')
         DO I = 1, NumFittedPFR
           iord = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_HMSL_Grid,4,I,PkFnCal(4,iord),'(F12.5)')
+          CALL WGridPutCellReal(IDF_HMSL_Grid,4,I,PkFnCal(4,iord),'(F12.4)')
         ENDDO
       ENDIF
 ! Warn if HPSL is less than HMSL
@@ -281,6 +281,7 @@
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )
+
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
       COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
@@ -383,9 +384,10 @@
 
       INCLUDE 'PARAMS.INC'
 
+      REAL X(MVAR), DX(MVAR)
+
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
-      REAL X(MVAR), DX(MVAR)
   
       REAL COV(MMPAR)
 
@@ -395,6 +397,7 @@
       REAL Chisq_Sigma
       EXTERNAL Chisq_Sigma
       INTEGER I, II
+      REAL    rDummy
 
 ! Observations
       CALL FillFUNVAL_COMMON(1)
@@ -409,6 +412,8 @@
         II = I + (I-1)*N
         DX(I) = SQRT(AMAX1(0.,COV(II)))
       ENDDO
+! The following line is needed only to fill the ZVAL values given the final optimised parameters.
+      rDummy = Chisq_Sigma(N,X)
       CALL FillPkFnCal(1)
 
       END SUBROUTINE Fit_Sigma
@@ -434,6 +439,7 @@
       COMMON /CCSLER/ IBMBER
 
       INTEGER I, II
+      REAL    rDummy
 
 ! Observations
       CALL FillFUNVAL_COMMON(2)
@@ -448,6 +454,8 @@
         II = I + (I-1) * N
         DX(I) = SQRT(AMAX1(0.,COV(II)))
       ENDDO
+! The following line is needed only to fill the ZVAL values given the final optimised parameters.
+      rDummy = Chisq_Gamma(N,X)
       CALL FillPkFnCal(2)
 
       END SUBROUTINE Fit_Gamma
@@ -474,6 +482,7 @@
       COMMON / CCSLER / IBMBER 
 
       INTEGER I, II
+      REAL    rDummy
 
 ! Observations
       CALL FillFUNVAL_COMMON(IPtPS)
@@ -488,6 +497,8 @@
         II = I + (I-1) * N
         DX(I) = SQRT(AMAX1(0.,COV(II)))
       ENDDO
+! The following line is needed only to fill the ZVAL values given the final optimised parameters.
+      rDummy = Chisq_Constant(N,X)
       CALL FillPkFnCal(IPtPS)
 
       END SUBROUTINE Fit_Constant
@@ -505,6 +516,7 @@
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )
+
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
       COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
@@ -518,8 +530,8 @@
         secth = 1.0 / COSD(halfxi)
         tanth = TAND(halfxi)
         ZVAL(I) = SQRT(MAX(0.0,(P(1)*secth)**2+(P(2)*tanth)**2))
-        CTEM = (ZVAL(I)-YVAL(I))/EVAL(I)
-        Chisq_Sigma = Chisq_Sigma + CTEM*CTEM
+        CTEM = (ZVAL(I)-YVAL(I)) / EVAL(I)
+        Chisq_Sigma = Chisq_Sigma + CTEM * CTEM
       ENDDO
 
       END FUNCTION Chisq_Sigma
@@ -537,6 +549,7 @@
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )
+
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
       COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
@@ -569,6 +582,7 @@
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )
+
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
       COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
