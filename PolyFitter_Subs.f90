@@ -35,7 +35,7 @@
       IPMINOLD = IPMIN
       IPMAXOLD = IPMAX
       IMOV = 0
-      DO
+      DO WHILE (.TRUE.)
         CALL GetEvent
         IF (EventInfo%WIN .EQ. 0) THEN
           CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
@@ -403,7 +403,7 @@
 
       COMMON /CURVAL/ XCurFirst
 
-      DO
+      DO WHILE (.TRUE.)
         CALL GetEvent
         IF (EventInfo%WIN .EQ. 0) THEN ! Message from main window
           SELECT CASE (EventType)
@@ -500,7 +500,7 @@
 ! Expose,Resize, MouseMove, MouseButUp and a very limited number of
 ! KeyDown options at this first stage
       IMOV = 0
-      DO
+      DO WHILE (.TRUE.)
         CALL GetEvent
           xgcur(2) = EventInfo%GX
           ygcur(2) = EventInfo%GY
