@@ -33,17 +33,35 @@
 ! MaxSPGR is the maximum number of space groups including all different settings.
 ! These are loaded from a file at the beginning.
 
-! Following lines : local variables in include
-      INTEGER :: NumBrSg, ISPosSG, ISG, JSG
-      CHARACTER(LEN=24) :: SGHMaBrStr(MaxSPGR)
+!O      INTEGER           :: LPosSG
+!O      CHARACTER(LEN=12) :: SGNumStr
+!O      CHARACTER(LEN=12) :: SGHMaStr
+!O!U      CHARACTER(LEN=18) :: SGHalStr
+!O      CHARACTER(LEN=24) :: SGShmStr
+!O! These are broken into three to make this include fortran and f90 compatible
+!O      COMMON /SGStrCmn1/ LPosSG(12), SGNumStr(MaxSPGR)
+!O!U      COMMON /SGStrCmn2/ SGHMaStr(MaxSPGR), SGHalStr(MaxSPGR)
+!O!U      COMMON /SGStrCmn3/ SGShmStr(MaxSPGR)
+!O      COMMON /SGStrCmn2/ SGHMaStr(MaxSPGR), SGShmStr(MaxSPGR)
 
       INTEGER           :: LPosSG
       CHARACTER(LEN=12) :: SGNumStr
       CHARACTER(LEN=12) :: SGHMaStr
-!U      CHARACTER(LEN=18) :: SGHalStr
       CHARACTER(LEN=24) :: SGShmStr
-! These are broken into three to make this include fortran and f90 compatible
-      COMMON /SGStrCmn1/ LPosSG(12), SGNumStr(MaxSPGR)
-!U      COMMON /SGStrCmn2/ SGHMaStr(MaxSPGR), SGHalStr(MaxSPGR)
-!U      COMMON /SGStrCmn3/ SGShmStr(MaxSPGR)
-      COMMON /SGStrCmn2/ SGHMaStr(MaxSPGR), SGShmStr(MaxSPGR)
+      COMMON /SGStrCmn/ LPosSG(12), SGNumStr(MaxSPGR),                  &
+     &                  SGHMaStr(MaxSPGR), SGShmStr(MaxSPGR)
+
+! LPosSG contains the offset per crystal system in the space group list
+! E.g., the monoclinic-a (crystal system nr. 2) space groups start at entry 3 and
+! end at entry 37
+!      LPosSG( 1) =   1
+!      LPosSG( 2) =   3
+!      LPosSG( 3) =  38 
+!      LPosSG( 4) =  73
+!      LPosSG( 5) = 108
+!      LPosSG( 6) = 349
+!      LPosSG( 7) = 430
+!      LPosSG( 8) = 455
+!      LPosSG( 9) = 462
+!      LPosSG(10) = 489
+!      LPosSG(11) = MaxSPGR+1
