@@ -81,10 +81,12 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'LATTICE.INC'
+
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
       INTEGER, EXTERNAL :: Read_One_Zm, Get_HydrogenTreatment
-      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
+      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM, FnUnitCellOK, nearly_equal
       INTEGER, EXTERNAL :: CSSR2Mol2
       INTEGER iHandle
       CHARACTER(MaxPathLength) :: line
@@ -97,6 +99,8 @@
       INTEGER iFrg
       INTEGER KK, I, ExtLen
       INTEGER iLen, iPos
+      REAL unit_cell_parameters(1:6)
+      LOGICAL OK
 
       tFileName = TheFileName
       iLen = LEN_TRIM(tFileName)
@@ -160,24 +164,31 @@
       globFile = tFileName(1:iLen-ExtLen)//"glob"
 !C Load .glob file
       iHandle = 10
-      OPEN(iHandle,FILE=globFile(1:LEN_TRIM(globFile)),STATUS='OLD',ERR=999)
+      OPEN(iHandle, FILE=globFile(1:LEN_TRIM(globFile)), STATUS='OLD', ERR=999)
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page6)
       CALL WDialogPutString(IDF_Xtal_File_Name, TheFileName)
       CALL PopActiveWindowID
       iFrg = 0
  10   line = ''
-      READ(iHandle,'(A)',END=100,ERR=999) line
+      READ(iHandle, '(A)', END=100, ERR=999) line
       nl = LEN_TRIM(line)
       CALL ILowerCase(line(1:nl))
       CALL INextString(line,keychar)
       SELECT CASE (KeyChar(1:3))
         CASE ('cel')                                ! Cell parameters
-     ! Ignore
-     !     DO I = 1, 6
-     !       CALL INextReal(line,CellPar(i))
-     !     ENDDO
-     !     CALL Upload_Cell_Constants
+          DO I = 1, 6
+            CALL INextReal(line, unit_cell_parameters(i))
+          ENDDO
+          ! Check if we have unit cell parameters available
+          IF (FnUnitCellOK()) THEN
+            OK = .TRUE.
+            DO I = 1, 6
+              IF (.NOT. nearly_equal(CellPar(i), unit_cell_parameters(i), 0.5)) OK = .FALSE.
+            ENDDO
+            IF (.NOT. OK) CALL WarningMessage("Unit-cell parameters from .sdi file and from crystal structure are inconsistent."//  &
+              CHAR(13)//CHAR(10)//"The chi-squared values will be nonsensical.")
+          ENDIF
         CASE ('spa')
      ! Ignore
         CASE ('sym')
