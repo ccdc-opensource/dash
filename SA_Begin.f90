@@ -59,11 +59,11 @@
       CALL Init_MultiRun
 ! Grey out "start next" button if not multirun
       CALL WDialogFieldStateLogical(IDF_StartNext,RESTART)
+      CALL WDialogFieldState(IDB_Summary,Disabled)
       IPTYPE = 2
 ! Clear Chi-sqd array between starting sets of SA Runs
       Chi_sqd = 0.0
       MaxIterationSoFar = 0
-      CALL WDialogFieldState(IDB_Summary,Disabled)
       InSA = .TRUE.
       CALL MakRHm
       CALL SimulatedAnnealing
