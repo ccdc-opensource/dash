@@ -125,7 +125,7 @@
         IF (CellPar(I) .LT. 0.001) RETURN
       ENDDO
 ! Check if the unit cell volume makes sense
-      IF (UnitCellVolume(CellPar(1),CellPar(2),CellPar(3),CellPar(4),CellPar(5),CellPar(6)) .LT. 10.0) RETURN
+      IF (UnitCellVolume(CellPar(1), CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6)) .LT. 10.0) RETURN
       FnUnitCellOK = .TRUE.
 
       END FUNCTION FnUnitCellOK
@@ -157,16 +157,16 @@
 !           10 = Cubic
 
       IF (.NOT. FnUnitCellOK()) RETURN
-      AB_Same  = NearlyEqual(CellPar(2),CellPar(1))
-      BC_Same  = NearlyEqual(CellPar(3),CellPar(2))
-      AC_Same  = NearlyEqual(CellPar(3),CellPar(1))
+      AB_Same  = NearlyEqual(CellPar(2), CellPar(1))
+      BC_Same  = NearlyEqual(CellPar(3), CellPar(2))
+      AC_Same  = NearlyEqual(CellPar(3), CellPar(1))
       ABC_Same = (AB_Same .AND. BC_Same) 
-      Alp_90   = NearlyEqual(CellPar(4), 90.0)
-      Bet_90   = NearlyEqual(CellPar(5), 90.0)
-      Gam_90   = NearlyEqual(CellPar(6), 90.0)
-      Gam_120  = NearlyEqual(CellPar(6),120.0)
-      Ang_Same = NearlyEqual(CellPar(6),CellPar(5)) .AND. &
-                 NearlyEqual(CellPar(5),CellPar(4))
+      Alp_90   = NearlyEqual(CellPar(4),  90.0)
+      Bet_90   = NearlyEqual(CellPar(5),  90.0)
+      Gam_90   = NearlyEqual(CellPar(6),  90.0)
+      Gam_120  = NearlyEqual(CellPar(6), 120.0)
+      Ang_Same = NearlyEqual(CellPar(6), CellPar(5)) .AND. &
+                 NearlyEqual(CellPar(5), CellPar(4))
       IF (ABC_Same .AND. Ang_Same) THEN
         IF (Alp_90) THEN
           tLatBrav = 10 ! Cubic
