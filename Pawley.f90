@@ -776,6 +776,9 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
       INTEGER, EXTERNAL :: WRTDSL
       INTEGER LSDI, iDot, I, L1, L4, iDummy, iFile
       CHARACTER*(MaxPathLength) DirName, FileName
@@ -851,7 +854,7 @@
  8150 FORMAT(' SpaceGroup ',I4,4X,A12,A12)
       WRITE(iFile,8160,ERR=999) PAWLEYCHISQ
  8160 FORMAT(' PawleyChiSq ',F10.2)
-      WRITE(iFile,*,ERR=999) "Single Crystal"
+      IF (Is_SX) WRITE(iFile,*,ERR=999) "Single Crystal"
       CLOSE(iFile)
       CreateSDIFile = 0
       RETURN
