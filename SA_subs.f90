@@ -501,10 +501,10 @@
           ELSEIF (RATIO.LT.0.4) THEN
             VM(I) = VM(I)/(1.0+C(I)*((0.4-RATIO)/0.4))
           ENDIF
-          IF (VM(I).GT.RULB(I)) THEN
+          IF (VM(I) .GT. RULB(I)) THEN
             VM(I) = RULB(I)
           ENDIF
-          IF (VM(I).LT.0.01*RULB(I)) THEN
+          IF (VM(I) .LT. 0.01*RULB(I)) THEN
             VM(I) = 0.01*RULB(I)
           ENDIF
         ENDDO
