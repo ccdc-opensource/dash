@@ -90,7 +90,7 @@
       ELSE
         WRITE (TemperatureStr,"('T=',F6.2)") SNGL(T)
       ENDIF
-      WRITE (DASHRemarkStr,100,ERR=999) TemperatureStr, -SNGL(FOPT), CHIPROBEST, ntotmov
+      WRITE (DASHRemarkStr,100,ERR=999) TemperatureStr, SNGL(FOPT), CHIPROBEST, ntotmov
   100 FORMAT (A8,', chi**2=',F7.2,' and profile chi**2=',F7.2,' after ',I8,' moves')
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
