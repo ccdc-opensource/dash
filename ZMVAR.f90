@@ -110,7 +110,6 @@
       INTEGER          zmSingleRotAxAtm(0:maxfrg)
       REAL             zmSingleRotAxFrac(1:3,0:maxfrg)
       INTEGER          zmSingleRotAxAtms(1:3,0:maxfrg)
-
       DOUBLE PRECISION zmSingleRotationQs(0:3,0:maxfrg)
 
 ! icomflg         = Centre of mass flag.
@@ -125,7 +124,6 @@
 ! zmSingleRotAxAtms : the three atoms defining a plane thenormal of which is the direction of rotation
 !                     These numbers are enterd by the users according to their numbering scheme,
 !                     but stored in the DASH numbering
-! zmSingleRotationAxis = If UseQuaternions = .FALSE., this is the axis that is used
 ! zmSingleRotationQs   = Factors in the quaternion-expression of the rotation about a single axis
 !                        which are due to the orientation of the single axis
     
