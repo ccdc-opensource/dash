@@ -1,4 +1,4 @@
-! Winteracter module created : 03/Nov/2001 18:00:55
+! Winteracter module created : 04/Nov/2001 16:53:04
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -489,4 +489,19 @@
           INTEGER, PARAMETER :: IDF_ColourByElement             =  1200
           INTEGER, PARAMETER :: IDF_GROUP3                      =  1202
           INTEGER, PARAMETER :: IDF_ColourBySolution            =  1216
+          INTEGER, PARAMETER :: IDB_ZMatrixEdit1                =  1234
+          INTEGER, PARAMETER :: IDB_ZMatrixEdit2                =  1235
+          INTEGER, PARAMETER :: IDB_ZMatrixEdit3                =  1236
+          INTEGER, PARAMETER :: IDB_ZMatrixEdit4                =  1237
+          INTEGER, PARAMETER :: IDB_ZMatrixEdit5                =  1238
+          INTEGER, PARAMETER :: IDD_EditZMatrix                 =   155
+          INTEGER, PARAMETER :: IDBZMatrixView                  =  1240
+          INTEGER, PARAMETER :: IDSAVEAS                        =  1243
+          INTEGER, PARAMETER :: IDD_TEMPLATE013                 =   156
+          INTEGER, PARAMETER :: IDF_ZMatrixGrid                 =  1251
+          INTEGER, PARAMETER :: IDF_Occupancy                   =  1294
+          INTEGER, PARAMETER :: IDB_AddDummy                    =  1298
+          INTEGER, PARAMETER :: IDB_SetAllOcc                   =  1300
+          INTEGER, PARAMETER :: IDF_RADIO2                      =  1303
+          INTEGER, PARAMETER :: IDF_INTEGER1                    =  1304
       END MODULE Druid_Header
