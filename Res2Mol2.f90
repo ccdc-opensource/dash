@@ -135,7 +135,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION WriteMol2(TheFileName,IncludeUnitCell,iFrg)
+      INTEGER FUNCTION WriteMol2(TheFileName, IncludeUnitCell, iFrg)
 !
 ! Takes number of atoms    from natcry    in SAMVAR
 ! Takes atomic coordinates from axyzo     in SAMVAR  (orthogonal)
