@@ -11,8 +11,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL              AIOBS,         AICALC
-      COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
+      REAL              BICALC,         XICALC
+      COMMON /SAREFLN2/ BICALC(MSAREF), XICALC(MSAREF)
 
       INTEGER          NFITA, IFITA
       REAL                                 WTSA
@@ -30,9 +30,7 @@
       INTEGER II, I, K, KK
 
 ! JvdS VALCHIPRO, which calculates the profile chi-squared, is always
-! called after VALCHI. VALCHI already fills AICALC in COMMON /SAREFLNS/ (the COMMON block needs
-! to be specified here: they are kept in COMMON /REFLNS/ in Reflns.inc as well)). 
-  !    INCLUDE 'AllFFCalc.inc'
+! called after VALCHI. VALCHI already fills BICALC in COMMON /SAREFLN2/
       SUM1 = 0.0
       SUM2 = 0.0
       DO II = 1, NFITA
@@ -40,7 +38,7 @@
         YCALC = 0.0
         DO K = 1, KREFT(I)
           KK = KNIPT(K,I)
-          YCALC = YCALC + AICALC(KK) * PIKVAL(K,I)
+          YCALC = YCALC + BICALC(KK) * PIKVAL(K,I)
         ENDDO
         YCBIN(I) = YCALC
         SUM1 = SUM1 + YCALC

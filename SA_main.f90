@@ -230,6 +230,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE PO_VAR
       USE ZMVAR
 
       IMPLICIT NONE
@@ -258,6 +259,9 @@
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+
+      INTEGER         NStPar
+      COMMON /pextra/ NStPar
 
       DOUBLE PRECISION T0,rt
       COMMON /saparl/ T0,rt
@@ -421,29 +425,23 @@
 !JCC End of check on selection
         ENDIF
       ENDDO
-      UsePreferredOrientation = WDialogGetCheckBoxLogical(IDF_Use_PO)
+      NStPar = kk
+      PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
 ! Set up preferred orientation. This can't be the first parameter: it must be appended to the rest.
-      IF (UsePreferredOrientation) THEN
+      IF (PrefParExists) THEN
         CALL WDialogGetInteger(IDF_PO_a,iH)
         CALL WDialogGetInteger(IDF_PO_b,iK)
         CALL WDialogGetInteger(IDF_PO_c,iL)
-        PO_Axis(1) = FLOAT(iH)
-        PO_Axis(2) = FLOAT(iK)
-        PO_Axis(3) = FLOAT(iL)
-        tX = PO_Axis(1) * tRecLattice(1,1) + PO_Axis(2) * tRecLattice(1,2) + PO_Axis(3) * tRecLattice(1,3)
-        tY = PO_Axis(1) * tRecLattice(2,1) + PO_Axis(2) * tRecLattice(2,2) + PO_Axis(3) * tRecLattice(2,3)
-        tZ = PO_Axis(1) * tRecLattice(3,1) + PO_Axis(2) * tRecLattice(3,2) + PO_Axis(3) * tRecLattice(3,3)
-        PO_Axis(1) = tX 
-        PO_Axis(2) = tY 
-        PO_Axis(3) = tZ 
-        Length = SQRT(DOT_PRODUCT(PO_Axis,PO_Axis))
-        PO_Axis = PO_Axis / Length
+        PrefPars(1) = FLOAT(iH)
+        PrefPars(2) = FLOAT(iK)
+        PrefPars(3) = FLOAT(iL)
         kk = kk + 1
         kzmpar2(kk) = 7 ! preferred orientation
         x(kk) = 1.0 ! no preferred orientation
-        parlabel(kk) = 'PO'
+        parlabel(kk) = 'Preferred Orientation'
         lb(kk) =  0.0
         ub(kk) =  1.0
+        iPrfPar = kk
       ENDIF
       nvar = kk
 ! Now fill the grid
