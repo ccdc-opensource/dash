@@ -385,15 +385,20 @@
         CALL WGridGetCellCheckBox(IDF_SA_summary,3,GridRowNr,istatus)
         IF (istatus .EQ. 1) THEN
 ! The solutions have been ordered wrt chi**2. We must parse the original run nr from the
-! number of the .pdb file
-          CALL WGridGetCellString(IDF_SA_Summary,1,GridRowNr,tString)
-          ilen = LEN_TRIM(tString)
-          RunStr = tString(ilen-5:ilen-4)
-          IF (RunStr(1:1) .EQ. '0') THEN
-            RunStr(1:1) = RunStr(2:2)
-            RunStr(2:2) = ' '
+! number of the .pdb file. Unless we didn't do a multirun of course.
+          IF (MaxRuns .EQ. 1) THEN
+            RunStr = '1 '
+            RunNr  = 1
+          ELSE
+            CALL WGridGetCellString(IDF_SA_Summary,1,GridRowNr,tString)
+            ilen = LEN_TRIM(tString)
+            RunStr = tString(ilen-5:ilen-4)
+            IF (RunStr(1:1) .EQ. '0') THEN
+              RunStr(1:1) = RunStr(2:2)
+              RunStr(2:2) = ' '
+            ENDIF
+            READ(RunStr,'(I2)') RunNr
           ENDIF
-          READ(RunStr,'(I2)') RunNr
           TickedRunNr = TickedRunNr + 1 ! Number of ticked runs, counter used for choosing the colour
           IF (TickedRunNr .EQ. 11) TickedRunNr = 1 ! Re-use colours.
 ! Note that elements are right-justified
