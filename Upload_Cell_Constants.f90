@@ -202,7 +202,7 @@
       CALL IGrPlotMode(' ') 
       CALL Generate_TicMarks()
       IF (NVal .LE. NDD+2) RETURN
-!.. Now attempt a quick Pawley refinement
+! Now attempt a quick Pawley refinement
       CALL ShowPawleyFitWindow
 
       END SUBROUTINE RefineLattice
@@ -281,8 +281,7 @@
         ZI = tthc + zp
         CTem = (ZI - YVal(I)) / EVal(I)
         ChiGetLattice = ChiGetLattice + CTem * CTem
-      END DO
-      RETURN
+      ENDDO
 
       END FUNCTION ChiGetLattice
 !

@@ -120,7 +120,7 @@
       INTEGER IEOCC
       INTEGER, EXTERNAL :: PREFIN
 ! JCC This is for testing for mathematical errors in the CCSL that used to STOP the program
-      INTEGER IBMBER
+      INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
       IBMBER = 0
