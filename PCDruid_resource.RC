@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 10/Sep/2001 21:00:50
+// Modified : 11/Sep/2001 17:29:45
 //
 ///////////////////////////////////////////////////
 //
@@ -1889,7 +1889,7 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAM
 FONT    8, "MS Sans Serif"
 CAPTION "DASH - Simulated Annealing"
 BEGIN
-    CONTROL "",IDF_parameter_grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS | GS_WRAP,   10,   20,  272,  104,WS_EX_DLGMODALFRAME
+    CONTROL "",IDF_parameter_grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS | GS_WRAP,   10,   20,  273,  104,WS_EX_DLGMODALFRAME
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   10,  128,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  110,  128,   40,   14
     CONTROL "Simulated annealing parameter setup",IDF_SA2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   10,    8,  132,    8
@@ -1904,7 +1904,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1480     5     40   141 \n"
+" 1480     5     60   141 \n"
 "  100 \n"
 "[Colours] \n"
 "[Lengths] \n"
