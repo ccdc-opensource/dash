@@ -106,7 +106,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK) ! The 'OK' button
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
-              CALL Upload_Cell_Constants
+              CALL UpdateCell
               CALL WDialogSelect(IDD_Crystal_Symmetry)
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_Zero_Point               
@@ -273,6 +273,7 @@
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_Zero_Point
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
+              CALL UpdateCell
               CALL Generate_TicMarks
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 1')
