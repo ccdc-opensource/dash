@@ -15,10 +15,9 @@
 
 ! The number of the SA parameter corresponding to the extent of preferred orientation
 
-      REAL PrefPars(1:4)
+      REAL PrefPars(1:3)
 
 ! PrefPars(1:3) = Orientation (to be replaced by something called 'PO_Direction(1:3)
-! PrefPars(4)   = Extent of preferred orientation
 
       REAL PrefCsqa(48,10000) ! 10000 = MFCSTO
 
