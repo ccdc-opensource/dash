@@ -64,27 +64,27 @@
       END DO
       IWIDTHS(8)= 1500 
 ! Split status bar into more than one part
-      CALL WindowStatusBarParts(8,IWIDTHS)
+      CALL WindowStatusBarParts(8, IWIDTHS)
     !  CALL IDebugLevel(DbgMsgBox)
       CALL WMessageEnable(PushButton, Enabled)
       CALL WMessageEnable(FieldChanged, Enabled)
-      CALL CheckLicence
 ! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues
 ! Initialise space group information
       CALL PolyFitterInitialise
       CALL InitialiseVariables
+      CALL CheckLicence
       CALL WMessageEnable(TabChanged, Enabled)
       CALL WMessageEnable(MouseMove, Enabled)
 ! Main message loop
       IF (NARGS() .GT. 1) THEN
         CALL GetArg(1,ArgString) 
 ! Parse directory and go there
-        CALL SplitPath(ArgString,tDirName,tFileName)
+        CALL SplitPath(ArgString, tDirName, tFileName)
         CALL IOsDirChange(tDirName)
 ! Parse directory and go there
         ExtLen = 7
-        CALL FileGetExtension(ArgString,StrFileExtension,ExtLen)
+        CALL FileGetExtension(ArgString, StrFileExtension, ExtLen)
         CALL StrUpperCase(StrFileExtension)
         SELECT CASE (StrFileExtension)
           CASE ('DASH   ')
@@ -96,7 +96,7 @@
             IF (iDummy .EQ. 0) THEN ! successful read
               nFrag = 1
             ELSE 
-              CALL FileErrorPopup(frag_file(iFrg),iDummy)
+              CALL FileErrorPopup(frag_file(iFrg), iDummy)
             ENDIF ! If the read on the Z-matrix was ok
             CALL UpdateZmatrixSelection
             CALL WizardWindowShow(IDD_SAW_Page1)
