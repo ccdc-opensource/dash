@@ -393,15 +393,16 @@
       DATA CHRADOPTION /'LABX','SYNX','SYNX','TOFN'/
       INTEGER I
       LOGICAL, EXTERNAL :: FnUnitCellOK, FnWaveLengthOK, FnPatternOK
-      REAL, EXTERNAL :: WavelengthOf
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      REAL,    EXTERNAL :: WavelengthOf
       INTEGER NTCycles
       INTEGER JNB, NBLIN, INB, ITEM, ISYM, IRTYP
       INTEGER N1, N2, K1, KNB
       INTEGER tFileHandle
       LOGICAL UsePrevious, FirstVaryLine
       INTEGER nl
+      REAL    tReal
       CHARACTER*255 Line
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
 ! Are these checks in place here? If one of them fails, we shouldn't have been here in the first place.
 !
@@ -461,6 +462,9 @@
                 IRtyp = 2 - Item
                 WRITE(42,4245) IRTYP, xranmin, xranmax
  4245           FORMAT('L RTYP  'I3,2F10.3,'  0.001')
+              CASE ('SLIM')
+                CALL WDialogGetReal(IDF_Slim_Parameter,tReal)
+                WRITE(42,'(A7,F5.2)') 'L SLIM ', tReal
               CASE ('VARY')
                 IF (FirstVaryLine) THEN
                   WRITE(42,'(A)') 'L VARY ONLY ALL INTS'
