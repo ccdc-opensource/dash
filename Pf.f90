@@ -398,7 +398,7 @@
 !
 !
       INCLUDE 'PARAMS.INC'
-!
+
       REAL            ALAMBD
       INTEGER                      NLAMB
       COMMON /DGEOM / ALAMBD(5,5), NLAMB
