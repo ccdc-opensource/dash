@@ -13,7 +13,6 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
@@ -25,7 +24,6 @@
       CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
       CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
       CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
@@ -58,6 +56,7 @@
       NTCycles = 3
       CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
       CALL IOsDeleteFile('polyp.niw')
+      CALL WizardWindowShow(IDD_Pawley_Status)
       CALL PopActiveWindowID
 
       END SUBROUTINE ShowPawleyFitWindow
@@ -74,7 +73,6 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
@@ -305,7 +303,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
-      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'Lattice.inc'
 
       CHARACTER(LEN=80) :: BackStr
