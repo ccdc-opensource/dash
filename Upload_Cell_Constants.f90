@@ -24,27 +24,29 @@
 
       INCLUDE 'Lattice.inc'
 
+      LOGICAL ValidCellAxisLength ! Function
 
 ! JvdS @ I did this. Needs cleaning up
 
       CALL PushActiveWindowID
 ! Update all the cell constants ...
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      IF (CellPar(1) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_a_latt)
-      ELSE
+      IF (ValidCellAxisLength(CellPar(1))) THEN
         CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
-      ENDIF
-      IF (CellPar(2) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_b_latt)
       ELSE
+        CALL WDialogClearField(IDF_a_latt)
+      ENDIF
+      IF (ValidCellAxisLength(CellPar(2))) THEN
         CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')
-      ENDIF
-      IF (CellPar(3) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_c_latt)
       ELSE
-        CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')
+        CALL WDialogClearField(IDF_b_latt)
       ENDIF
+      IF (ValidCellAxisLength(CellPar(3))) THEN
+        CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')
+      ELSE
+        CALL WDialogClearField(IDF_c_latt)
+      ENDIF
+
       IF (CellPar(4) .LT. 0.00001) THEN
         CALL WDialogClearField(IDF_alp_latt)
       ELSE
@@ -62,21 +64,22 @@
       ENDIF
 !C>> And in the wizard too
       CALL WDialogSelect(IDD_PW_Page1)
-      IF (CellPar(1) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_a_latt)
-      ELSE
+      IF (ValidCellAxisLength(CellPar(1))) THEN
         CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
-      ENDIF
-      IF (CellPar(2) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_b_latt)
       ELSE
+        CALL WDialogClearField(IDF_a_latt)
+      ENDIF
+      IF (ValidCellAxisLength(CellPar(2))) THEN
         CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')
-      ENDIF
-      IF (CellPar(3) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_c_latt)
       ELSE
-        CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')
+        CALL WDialogClearField(IDF_b_latt)
       ENDIF
+      IF (ValidCellAxisLength(CellPar(3))) THEN
+        CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')
+      ELSE
+        CALL WDialogClearField(IDF_c_latt)
+      ENDIF
+
       IF (CellPar(4) .LT. 0.00001) THEN
         CALL WDialogClearField(IDF_alp_latt)
       ELSE
@@ -141,7 +144,6 @@
 
       REAL a,b,c,alpha,beta,gamma   
 
-      IF ((IDownFrom .NE. IDD_Crystal_Symmetry) .AND. (IDownFrom .NE. IDD_PW_Page1)) RETURN
       CALL PushActiveWindowID
 ! Get all the cell constants from the selected area
       CALL WDialogSelect(IDownFrom)
@@ -160,57 +162,6 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE Download_Cell_Constants
-!
-!*****************************************************************************
-!
-      SUBROUTINE Check_Crystal_Symmetry()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      INCLUDE 'Lattice.inc'
-
-      INTEGER tNewCrystalSystem
-      INTEGER GetCrystalSystemFromUnitCell ! Function
-      LOGICAL FnUnitCellOK ! Function
-
-      CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
-! GetCrystalSystem() determines the crystal system from the unit cell parameters
-      IF (.NOT. FnUnitCellOK()) RETURN
-      tNewCrystalSystem = GetCrystalSystemFromUnitCell()
-      IF (tNewCrystalSystem .NE. LatBrav) CALL SetCrystalSystem(tNewCrystalSystem)
-
-      END SUBROUTINE Check_Crystal_Symmetry
-!
-!*****************************************************************************
-!
-      SUBROUTINE SetCrystalSystem(TheCrystalSystem)
-! This routine sets the menus in the main window and in the wizard to a new
-! crystal system. No checks on consistency are performed.
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: TheCrystalSystem
-
-      INCLUDE 'Lattice.inc'
-
-      IF ((TheCrystalSystem .GE. 1) .AND. (TheCrystalSystem .LE. 11)) THEN
-        LatBrav = TheCrystalSystem
-      ELSE
-        CALL DebugErrorMessage('Crystal Sytem out of range in SetCrystalSystem()')
-        LatBrav = 1
-      END IF
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
-      CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE SetCrystalSystem
 !
 !*****************************************************************************
 !
@@ -267,15 +218,15 @@
       END DO
 !C>> JCC Updated to the correct values ...!
       SELECT CASE (LatBrav)
-        CASE (2)        ! Triclinic
+        CASE (1)        ! Triclinic
           NDD = 7
-        CASE (3,4,5)    ! Monoclinic (a/b/c-axis)
+        CASE (2,3,4)    ! Monoclinic (a/b/c-axis)
           NDD = 5
-        CASE (6)        ! Orthorhombic
+        CASE (5)        ! Orthorhombic
           NDD = 4
-        CASE (7,8,9,10) ! Tetragonal/Trigonal/Rhombohedral/Hexagonal
+        CASE (6,7,8,9)  ! Tetragonal/Trigonal/Rhombohedral/Hexagonal
           NDD = 3
-        CASE (11)       ! Cubic
+        CASE (10)       ! Cubic
           NDD = 2
       END SELECT
       IF (NDD .EQ. 0) RETURN
@@ -320,8 +271,7 @@
         IASS(6) = IASS(6) + (IHLR(2,I) * IHLR(3,I))**2
       END DO
       XDD(2)=GREC(1,1)
-!C>> JCC LatBrav is now 1 for unknown so we have to account for this here
-      IF ((LatBrav .EQ. 1) .OR. (LatBrav .EQ. 2)) THEN
+      IF (LatBrav .EQ. 1) THEN
 ! Triclinic
         XDD(3) = GREC(2,2) 
         XDD(4) = GREC(3,3)
@@ -333,56 +283,56 @@
           NOCREF = NOCREF .OR. (IASS(I) .EQ. 0)
         END DO
 !C>> JCC And here
-      ELSE IF (LatBrav .EQ. 3) THEN
+      ELSE IF (LatBrav .EQ. 2) THEN
 ! Monoclinic (a-axis)
         XDD(3)=GREC(2,2) 
         XDD(4)=GREC(3,3)
         XDD(5)=GREC(2,3)
         NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(6).EQ.0)
 !C>> JCC And here
-      Else If (LatBrav.eq.4) Then
+      Else If (LatBrav.eq.3) Then
 ! Monoclinic (b-axis)
         XDD(3)=GREC(2,2) 
         XDD(4)=GREC(3,3)
         XDD(5)=GREC(1,3)
         NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(5).EQ.0)
 !C>> JCC And here
-      Else If (LatBrav.eq.5) Then
+      Else If (LatBrav.eq.4) Then
 ! Monoclinic (c-axis)
         XDD(3)=GREC(2,2) 
         XDD(4)=GREC(3,3)
         XDD(5)=GREC(1,2)
         NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(4).EQ.0)
 !C>> JCC And here
-      Else If (LatBrav.eq.6) Then
+      Else If (LatBrav.eq.5) Then
 ! Orthorhombic
         XDD(3)=GREC(2,2) 
         XDD(4)=GREC(3,3)
         NOCREF=(IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0)
 !C>> JCC And here
-      Else If (LatBrav.eq.7) Then
+      Else If (LatBrav.eq.6) Then
 ! Tetragonal
         XDD(3)=GREC(3,3)
         NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
 !C>> JCC And here
-      Else If (LatBrav.eq.8) Then
+      Else If (LatBrav.eq.7) Then
 ! Trigonal
         XDD(3)=GREC(3,3)
         NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
 !C>> JCC And here
-      Else If (LatBrav.eq.9) Then
+      Else If (LatBrav.eq.8) Then
 ! Rhombohedral
         XDD(2)=GREC(1,1)
         XDD(3)=GREC(1,2)
         NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0).AND.(IASS(3).EQ.0)) & 
                .OR. ((IASS(4).EQ.0).AND.(IASS(5).EQ.0).AND.(IASS(6).EQ.0))
 !C>> JCC And here
-      Else If (LatBrav.eq.10) Then
+      Else If (LatBrav.eq.9) Then
 ! Hexagonal
         XDD(3)=GREC(3,3)
         NOCREF=((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
 !C>> JCC And here
-      Else If (LatBrav.eq.11) Then
+      Else If (LatBrav.eq.10) Then
 ! Cubic
       End If
       IF (NoCRef) RETURN
@@ -402,12 +352,11 @@
       XDD(9) = 0.5 * XDD(2)
       XDD(10) = 0.0
       DO I = 1 ,3
-!C>> JCC Account for LatBrav now being 1-11, but 2 as triclinic
-        GREC(I,I)=XDD(KELPT(I, MAX(LatBrav - 1,1) ))
+        GREC(I,I)=XDD(KELPT(I, LatBrav ))
       END DO
-      GREC(1,2)=XDD(KELPT(4, MAX(LatBrav - 1,1) ))
-      GREC(1,3)=XDD(KELPT(5, MAX(LatBrav - 1,1) ))     
-      GREC(2,3)=XDD(KELPT(6, MAX(LatBrav - 1,1) ))
+      GREC(1,2)=XDD(KELPT(4, LatBrav ))
+      GREC(1,3)=XDD(KELPT(5, LatBrav ))     
+      GREC(2,3)=XDD(KELPT(6, LatBrav ))
       GREC(2,1)=GREC(1,2)    
       GREC(3,1)=GREC(1,3)         
       GREC(3,2)=GREC(2,3)
@@ -450,50 +399,50 @@
       p5=0.
       p6=0.
 !C>> JCC Changed to correct settings of LatBrav
-      If (LatBrav.eq.2 .OR. LatBrav.eq.1) Then
-! Triclinic or Unknown
+      If (LatBrav.eq.1) Then
+! Triclinic
         p1=p(2)
         p2=p(3)
         p3=p(4)
         p4=p(5)
         p5=p(6)
         p6=p(7)
-      Else If (LatBrav.eq.3) Then
+      Else If (LatBrav.eq.2) Then
 ! Monoclinic - a axis unique
         p1=p(2)
         p2=p(3)
         p3=p(4)
         p6=p(5)
-      Else If (LatBrav.eq.4) Then
+      Else If (LatBrav.eq.3) Then
 ! Monoclinic - b axis unique
         p1=p(2)
         p2=p(3)
         p3=p(4)
         p5=p(5)
-      Else If (LatBrav.eq.5) Then
+      Else If (LatBrav.eq.4) Then
 ! Monoclinic - c axis unique
         p1=p(2)
         p2=p(3)
         p3=p(4)
         p4=p(5)
-      Else If (LatBrav.eq.6) Then
+      Else If (LatBrav.eq.5) Then
 ! Orthorhombic
         p1=p(2)
         p2=p(3)
         p3=p(4)
-      Else If (LatBrav.eq.7) Then
+      Else If (LatBrav.eq.6) Then
 ! Tetragonal
         p1=p(2)
         p2=p(2)
         p3=p(3)
-      Else If (LatBrav.eq.8) Then
+      Else If (LatBrav.eq.7) Then
 ! Trigonal
         p1=p(2)
         p2=p(2)
         p3=p(3)
 !>> JCC Wrong parameter extracted        p6=0.5*p(2)
         p4=0.5*p(2)
-      Else If (LatBrav.eq.9) Then
+      Else If (LatBrav.eq.8) Then
 ! Rhombohedral
         p1=p(2)
         p2=p(2)
@@ -501,14 +450,14 @@
         p4=p(3)
         p5=p(3)
         p6=p(3)
-      Else If (LatBrav.eq.10) Then
+      Else If (LatBrav.eq.9) Then
 ! Hexagonal
         p1=p(2)
         p2=p(2)
         p3=p(3)
         p4=0.5*p(2)
 !>> JCC Wrong parameter extracted        p6=0.5*p(2)
-      Else If (LatBrav.eq.11) Then
+      Else If (LatBrav.eq.10) Then
 ! Cubic
         p1=p(2)
         p2=p(2)
