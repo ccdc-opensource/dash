@@ -353,6 +353,40 @@
 !
 !*****************************************************************************
 !
+      CHARACTER*20 FUNCTION Real2String(TheReal, TheFormat)
+!
+! Converts an INTEGER to a left-justified CHARACTER*20
+!
+      IMPLICIT NONE
+
+      INTEGER,       INTENT (IN   ) :: TheReal
+      CHARACTER*(*), INTENT (IN   ) :: TheFormat
+
+      CHARACTER*20 tString
+      INTEGER POS, J
+
+      WRITE(tString,"("//TheFormat//")") TheReal
+! Skip spaces at start
+      POS = 1
+      DO WHILE (tString(POS:POS) .EQ. ' ')
+        POS = POS + 1
+      ENDDO
+      IF (POS .NE. 1) THEN
+        POS = POS - 1
+        DO J = 1, 20-POS
+          tString(J:J) = tString(J+POS:J+POS)
+        ENDDO
+! Pad rest of the old string with spaces
+        DO J = 20-POS+1, 20
+          tString(J:J) = ' '
+        ENDDO
+      ENDIF
+      Real2String = tString
+
+      END FUNCTION Real2String
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION StrFind(TheString, TheLen, TheSubString, TheSubLen)
 !
 ! Searches TheString for TheSubString
