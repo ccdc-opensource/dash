@@ -6,9 +6,9 @@
       REAL Coef4
       PARAMETER ( Coef4 = 1.E-04 )
       REAL pirad
-      PARAMETER ( pirad = 3.14159265358979323846 / 180.0 )
+      PARAMETER ( pirad = 0.3141592653589793115997963469E+01 / 180.0 )
       REAL pideg
-      PARAMETER ( pideg = 180.0 / 3.14159265358979323846 )
+      PARAMETER ( pideg = 180.0 / 0.3141592653589793115997963469E+01 )
       REAL dth, pas, pas16, pas2, pas32, pas4, pas64, pas8, rap, v, vinf,    &
      &        vsup, wave2
       REAL, DIMENSION(50) :: d, epsil, epsq, q, th
