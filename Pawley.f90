@@ -257,15 +257,15 @@
                   ENDIF
                   CALL PopActiveWindowID
                   RETURN
-                CASE (-1)
-                  NumPawleyRef = NumPawleyRef - 1
-! Return to data viewing
-                  CALL EndWizard
-! This handles cases where the number of reflections is exceeded
-                  CALL ErrorMessage("Sorry, can only Pawley refine a maximum of 350 reflections."//CHAR(13)// &
-                                    "You must truncate your data set.")
-                  CALL PopActiveWindowID
-                  RETURN
+!O                CASE (-1)
+!O                  NumPawleyRef = NumPawleyRef - 1
+!O! Return to data viewing
+!O                  CALL EndWizard
+!O! This handles cases where the number of reflections is exceeded
+!O                  CALL ErrorMessage("Sorry, can only Pawley refine a maximum of 350 reflections."//CHAR(13)// &
+!O                                    "You must truncate your data set.")
+!O                  CALL PopActiveWindowID
+!O                  RETURN
                 CASE DEFAULT
                   IF (PawleyErrorLog(2) .GT. 0) CALL PawleyWarning ! Check the log messages and reset
               END SELECT
@@ -275,7 +275,7 @@
               CALL WDialogFieldState(IDB_PawRef_Save,   Disabled)
               CALL WDialogFieldState(IDF_PawRef_Solve,  Disabled)
             CASE (IDB_PawRef_Accept)
-! update the profile and stay with the Pawley refinement
+! Update the profile and stay with the Pawley refinement
               IPTYPE = 2
 ! The new peak shape parameters are now in 
 !        PKFNSP(L,I,JPHASE,JSOURC)
@@ -620,8 +620,6 @@
       LOGICAL                                MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
 
-      REAL ALSQ(QPFDIM)
-
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
@@ -629,10 +627,11 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
 
+      INTEGER, EXTERNAL :: FORTY
       INTEGER MATSZ
       CHARACTER*6 xxx
       CHARACTER*10 fname
-      INTEGER, EXTERNAL :: FORTY
+      REAL ALSQ(QPFDIM)
 
       fname = 'polyp'
       xxx = 'CN11LS'
@@ -846,12 +845,13 @@
       WRITE(iFile,'(A)',ERR=999) " RAW ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
       CALL SplitPath(DashDslFile, DirName, FileName)
       WRITE(iFile,'(A)',ERR=999) " DSL ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
-      WRITE(81,8140,ERR=999) (CellPar(I),I=1,6)
+      WRITE(iFile,8140,ERR=999) (CellPar(I),I=1,6)
  8140 FORMAT(' Cell ',3F10.5,3F10.4)
-      WRITE(81,8150,ERR=999) NumberSGTable,SGNumStr(NumberSGTable),SGHMaStr(NumberSGTable)
+      WRITE(iFile,8150,ERR=999) NumberSGTable,SGNumStr(NumberSGTable),SGHMaStr(NumberSGTable)
  8150 FORMAT(' SpaceGroup ',I4,4X,A12,A12)
-      WRITE(81,8160,ERR=999) PAWLEYCHISQ
+      WRITE(iFile,8160,ERR=999) PAWLEYCHISQ
  8160 FORMAT(' PawleyChiSq ',F10.2)
+      WRITE(iFile,*,ERR=999) "Single Crystal"
       CLOSE(iFile)
       CreateSDIFile = 0
       RETURN
