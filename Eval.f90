@@ -2,24 +2,7 @@
 !
       SUBROUTINE MAKEFRAC(CHROM)
 
-      INCLUDE 'PARAMS.INC'
-
-      DOUBLE PRECISION blen, alph, bet, f2cmat
-      INTEGER ioptb, iopta, ioptt, iz1, iz2, iz3
-      COMMON /frgcom/ nfrag
-
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
-
-      COMMON /zmcomi/ ntatm, natoms(maxfrg), ioptb(maxatm,maxfrg),      &
-     &                iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),       &
-     &                iz1(maxatm,maxfrg), iz2(maxatm,maxfrg),           &
-     &                iz3(maxatm,maxfrg)
-      COMMON /zmcomr/ blen(maxatm,maxfrg), alph(maxatm,maxfrg),         &
-     &                bet(maxatm,maxfrg), f2cmat(3,3)
-      INTEGER         icomflg
-      REAL                             AtomicWeighting
-      COMMON /zmcomg/ icomflg(maxfrg), AtomicWeighting(maxatm,maxfrg)
+      USE ZMVAR
 
       PARAMETER (mvar=100)
       REAL*8 CHROM(*)
