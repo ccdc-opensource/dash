@@ -34,11 +34,11 @@
       INTEGER maxatom, maxbond, maxelm
       PARAMETER (maxatom=100, maxbond=100, maxelm=108)
 
-      CHARACTER*2  AtmElement(maxatom)
-      CHARACTER*4  sybatom(maxatom)
+      CHARACTER*2  AtmElement(1:maxatom)
+      CHARACTER*4  sybatom(1:maxatom)
       CHARACTER*80 mol2file, title
-      INTEGER      i,j,natom,nbond, bat(maxbond,2)
-      REAL         Coordinates(3,maxatom), bndr(maxatom)
+      INTEGER      i,j,natom,nbond, bat(1:maxbond,1:2)
+      REAL         Coordinates(1:3,1:maxatom), bndr(1:maxatom)
       INTEGER      InputFile
       INTEGER      OutputFile
       REAL         a, b, c, alpha, beta, gamma
@@ -48,9 +48,9 @@
       REAL         tX, tY, tZ
       CHARACTER*255 tString
       REAL         DummyReal
-      CHARACTER*4  DummyChar4
       INTEGER      DummyInteger
       CHARACTER*1  ChrLowerCase ! Function
+      CHARACTER*4  Labels(1:maxatom)
 
 ! Initialise to 'failure'
       Res2Mol2 = 0
@@ -69,9 +69,10 @@
       CALL StrUpperCase(tString)
       SELECT CASE (tString(1:4))
         CASE ('CELL')
-          READ(tString,*,ERR=990,END=990) DummyChar4, DummyReal, a, b, c, alpha, beta, gamma
+          READ(tString(5:),*,ERR=990,END=990) DummyReal, a, b, c, alpha, beta, gamma
           CALL LatticeCellParameters2Lattice(a, b, c, alpha, beta, gamma, tLattice)
-!        CASE ('TITL', 'ZERR', 'LATT', 'SYMM', 'SFAC', 'DISP', 'UNIT')
+        CASE ('TITL', 'ZERR', 'LATT', 'SYMM', 'SFAC', 'DISP', 'UNIT')
+          ! do nothing
         CASE ('HKLF', 'END ') ! We have finished, process the data we have read
           GOTO 100
         CASE DEFAULT ! If it's none of the above, it is probably an atom
@@ -86,7 +87,7 @@
           natom = natom + 1
           AtmElement(natom)(1:2) = tString(1:2)
           IF (.NOT. ChrIsLetter(tString(2:2))) AtmElement(natom)(2:2) = ' '
-          READ(tString,*,ERR=990) DummyChar4, DummyInteger, Coordinates(1,natom), Coordinates(2,natom), Coordinates(3,natom)
+          READ(tString,*,ERR=990) Labels(natom), DummyInteger, Coordinates(1,natom), Coordinates(2,natom), Coordinates(3,natom)
       END SELECT
 ! Read next line
       GOTO 10
@@ -124,11 +125,11 @@
       title = 'Temporary file created by DASH'
       WRITE(OutputFile,"(A80)") title
       WRITE(OutputFile,"('@<TRIPOS>ATOM')")
-      DO i = 1, natom
-        AtmElement(i)(2:2) = ChrLowerCase(AtmElement(i)(2:2))
-        WRITE(OutputFile,270) i,AtmElement(i),(Coordinates(j,i),j=1,3),sybatom(i)
+      DO I = 1, natom
+        Labels(I)(2:2) = ChrLowerCase(Labels(I)(2:2))
+        WRITE(OutputFile,270) I,Labels(I),(Coordinates(j,I),j=1,3),sybatom(I)
+  270 FORMAT(I3,1X,A4,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
       ENDDO
-  270 FORMAT(I3,1X,A2,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
       WRITE(OutputFile,"('@<TRIPOS>BOND')")
       DO i = 1, nbond
         WRITE(OutputFile,'(4(I3,1X))') i,bat(i,1),bat(i,2),1
