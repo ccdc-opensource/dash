@@ -256,10 +256,6 @@
       CHARACTER*20                                           symline
       COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
 
-      INTEGER         MAXK
-      REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
-
       INTEGER         NLGREF
       LOGICAL                 LOGREF
       COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
@@ -306,7 +302,7 @@
       ENDDO
       RefLen = VCTMOD(1.0,PrfDir,2)
       PrfDir = PrfDir / RefLen
-      DO iR = 1, MAXK
+      DO iR = 1, NumOfRef
         DO ii = 1, 3
           H(ii) = SNGL(iHKL(ii,iR))
         ENDDO
@@ -320,7 +316,7 @@
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
 
-      END  SUBROUTINE PO_Init
+      END SUBROUTINE PO_Init
 !
 !*****************************************************************************
 !

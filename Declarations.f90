@@ -268,9 +268,8 @@
 ! NFITA = number of bins that have a contribution from a reflection
 ! IFITA = a mapping of those bins to YOBIN(MOBS) 
 ! WTSA  = weights
-      INTEGER         MAXK
-      REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
+      REAL            FOB
+      COMMON /FCSTOR/ FOB(MaxAtm_3,MFCSTO)
 
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)

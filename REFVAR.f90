@@ -9,15 +9,10 @@
 
       INTEGER     MaxRef
       PARAMETER ( MaxRef = 10000 )
-
-      INTEGER     NumOfRef
-
 ! MaxRef = maximum number of reflections.
 
-!O      INTEGER         MAXK
-!O      REAL                  FOB(MaxAtm_3,MFCSTO)
-!O
-!O! MAXK = maximum number of reflections used during SA
+      INTEGER     NumOfRef
+! NumOfRef = maximum number of reflections used during SA
 
       INTEGER iHKL(1:3,MaxRef)
 ! iHKL = h, k and l for each reflection.
