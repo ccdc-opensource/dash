@@ -51,6 +51,22 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE InfoMessage(TheMessage)
+!
+! Displays a warning message
+!
+! INPUT   : TheMessage = The message to be displayed
+!
+      USE WINTERACTER
+      
+      CHARACTER*(*), INTENT(IN   ) :: TheMessage
+
+      CALL WMessageBox(OkOnly,InformationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Info")
+
+      END SUBROUTINE InfoMessage
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION Confirm(TheQuestion)      
 !
 ! Asks the user to confirm before execution of next action.
