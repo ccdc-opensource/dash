@@ -404,6 +404,9 @@
         CASE (IDD_SX_Page1)
           CALL DealWithWizardWindowSingleCrystalData1
           GOTO 10
+        CASE (IDD_SX_Page1a)
+          CALL DealWithWizardWindowSingleCrystalData1a
+          GOTO 10
         CASE (IDD_SX_Page2)
           CALL DealWithWizardWindowSingleCrystalData2
           GOTO 10
