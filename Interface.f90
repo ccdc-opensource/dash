@@ -1,5 +1,12 @@
-! This file contains routines that form the layer between DASH and Winteracter and
+! This file contains routines that form the layer between DASH and Winteracter to
 ! mutually exchange variables.
+!
+! Ideally, this file should one day be such that only this file and 'Basic_IO.f90'
+! have to be replaced when a new interface is programmed.
+!
+! One of the requirements for this to be possible is that every variable held in
+! a Winteracter dialogue is either also a variable in DASH or is retrieved on the fly
+! by means of a function (cf. AutoLocalMinimisation()).
 !
 ! Download_XXXXX = retrieves variable(s) XXXXX from a Winteracter dialogue and stores it in
 !                  the corresponding global variable(s) in DASH
@@ -11,7 +18,59 @@
 !
 !*****************************************************************************
 !
-! This file contains routines to read powder diffraction files.
+        SUBROUTINE WDialogPutCheckBoxLogical(TheFieldIdentifier, TheLogical)
+!
+! This subroutine provides a wrapper around the Winteracter WDialogPutCheckBox routine,
+! which takes an integer as an argument to define the state of a check box.
+! As a checkbox is the front-end equivalent of a variable of type LOGICAL,
+! it is more natural to have a routine that takes a logical as an argument
+! to define the state of a check box.
+! This is that routine.
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheFieldIdentifier
+      LOGICAL, INTENT (IN   ) :: TheLogical
+
+      IF (TheLogical) THEN
+        CALL WDialogPutCheckBox(TheFieldIdentifier,Checked)
+      ELSE
+        CALL WDialogPutCheckBox(TheFieldIdentifier,UnChecked)
+      ENDIF
+
+      END SUBROUTINE WDialogPutCheckBoxLogical
+!
+!*****************************************************************************
+!
+        SUBROUTINE WDialogGetCheckBoxLogical(TheFieldIdentifier, TheLogical)
+!
+! This subroutine provides a wrapper around the Winteracter WDialogGetCheckBox routine,
+! which takes the state of a check box and stores it in an integer.
+! As a checkbox is the front-end equivalent of a variable of type LOGICAL,
+! it is more natural to have a routine that takes a logical as an argument
+! to be defined by the state of a check box.
+! This is that routine.
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheFieldIdentifier
+      LOGICAL, INTENT (  OUT) :: TheLogical
+
+      INTEGER I
+
+      CALL WDialogGetCheckBox(TheFieldIdentifier,I)
+      TheLogical = (I .EQ. Checked)
+
+      END SUBROUTINE WDialogGetCheckBoxLogical
+!
+!*****************************************************************************
+!
 
       SUBROUTINE ScrUpdateFileName
 !
@@ -21,8 +80,8 @@
 ! JvdS 17 July 2001
 !
       USE WINTERACTER
-      USE VARIABLES
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -189,6 +248,48 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION ColourFlexibleTorsions
+
+! When .TRUE., flexible torsions are coloured when viewing a z-matrix
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER I
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogGetCheckBox(IDF_ColFlexTors,I)
+      CALL PopActiveWindowID
+      ColourFlexibleTorsions = (I .EQ. 1)
+
+      END FUNCTION ColourFlexibleTorsions
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION ConnectPointsObs
+
+! .TRUE. = when drawing the observed profile, the data points are joined by lines
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER I
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      CALL WDialogGetCheckBox(IDF_ConnectObsPoints,I)
+      CALL PopActiveWindowID
+      ConnectPointsObs = (I .EQ. 1)
+
+      END FUNCTION ConnectPointsObs
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION SaveCSSR
 
 ! When .TRUE., each run in a multi run ends with a local minimisation
@@ -244,6 +345,8 @@
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL WDialogSelect(IDD_Index_Preparation)
+      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+      CALL WDialogSelect(IDD_PW_Page8)
       CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL PopActiveWindowID
 
