@@ -14,10 +14,10 @@
      8:a3     I m 1 1       1    2 s    t
      9:a1     B b 1 1       1    2 s    t
      9:a2     C n 1 1       1    2 s    t
-     9:a3     I c 1 1       1    2 s    t
-     9:-a1    C c 1 1       0
-     9:-a2    B n 1 1       0
-     9:-a3    I b 1 1       0
+     9:a3     I c 1 1       1    2 s    t   
+     9:-a1    C c 1 1       1    2 s    t   
+     9:-a2    B n 1 1       1    2 s    t   
+     9:-a3    I b 1 1       1    2 s    t
     10:a      P 2/m 1 1     0    3 hx   hy   hz   
     11:a      P 21/m 1 1    0    3 hx   hy   hz
     12:a1     B 2/m 1 1     0    2 hx   hy
@@ -29,12 +29,12 @@
     14:a1     P 21/b 1 1    0    3 hx   hy   hz
     14:a2     P 21/n 1 1    0    3 hx   hy   hz
     14:a3     P 21/c 1 1    0    3 hx   hy   hz
-    15:a1     B 2/b 1 1     0    2 hx   hy
-    15:a2     C 2/n 1 1     0    2 hx   hz
-    15:a3     I 2/c 1 1     0    2 hx   hy
-    15:-a1    C 2/c 1 1     
-    15:-a2    B 2/n 1 1     
-    15:-a3    I 2/b 1 1     
+    15:a1     B 2/b 1 1     0    2 hx   hy   ?
+    15:a2     C 2/n 1 1     0    2 hx   hz   ?
+    15:a3     I 2/c 1 1     0    2 hx   hy   ?
+    15:-a1    C 2/c 1 1     0    2 hx   hy   ?
+    15:-a2    B 2/n 1 1     0    2 hx   hz   ?
+    15:-a3    I 2/b 1 1     0    2 hx   hy   ?
      3:b      P 1 2 1       1    3 s    hx   hz
      4:b      P 1 21 1      1    3 s    hx   hz
      5:b1     C 1 2 1       1    2 s    hz
@@ -49,10 +49,10 @@
      8:b3     I 1 m 1       1    2 r    t
      9:b1     C 1 c 1       1    2 r    t
      9:b2     A 1 n 1       1    2 r    t
-     9:b3     I 1 a 1       1    2 r    t
-     9:-b1    A 1 a 1       0
-     9:-b2    C 1 n 1       0
-     9:-b3    I 1 c 1       0
+     9:b3     I 1 a 1       1    2 r    t    
+     9:-b1    A 1 a 1       1    2 r    t    
+     9:-b2    C 1 n 1       1    2 r    t    
+     9:-b3    I 1 c 1       1    2 r    t    
     10:b      P 1 2/m 1     0    3 hx   hy   hz
     11:b      P 1 21/m 1    0    3 hx   hy   hz
     12:b1     C 1 2/m 1     0    2 hx   hz
@@ -67,9 +67,9 @@
     15:b1     C 1 2/c 1     0    2 hx   hz
     15:b2     A 1 2/n 1     0    2 hx   hy
     15:b3     I 1 2/a 1     0    2 hx   hy
-    15:-b1    A 1 2/a 1     
-    15:-b2    C 1 2/n 1     
-    15:-b3    I 1 2/c 1     
+    15:-b1    A 1 2/a 1     0    2 hx   hy   ?
+    15:-b2    C 1 2/n 1     0    2 hx   hz   ?
+    15:-b3    I 1 2/c 1     0    2 hx   hy   ?
      3:c      P 1 1 2       1    3 t    hx   hy
      4:c      P 1 1 21      1    3 t    hx   hy
      5:c1     A 1 1 2       1    2 t    hx
@@ -85,9 +85,9 @@
      9:c1     A 1 1 a       1    2 r    s
      9:c2     B 1 1 n       1    2 r    s
      9:c3     I 1 1 b       1    2 r    s
-     9:-c1    B 1 1 b       0
-     9:-c2    A 1 1 n       0
-     9:-c3    I 1 1 a       0
+     9:-c1    B 1 1 b       1    2 r    s   
+     9:-c2    A 1 1 n       1    2 r    s
+     9:-c3    I 1 1 a       1    2 r    s  
     10:c      P 1 1 2/m     0    3 hx   hy   hz
     11:c      P 1 1 21/m    0    3 hx   hy   hz
     12:c1     A 1 1 2/m     0    2 hx   hy
@@ -100,11 +100,11 @@
     14:c2     P 1 1 21/n    0    3 hx   hy   hz
     14:c3     P 1 1 21/b    0    3 hx   hy   hz
     15:c1     A 1 1 2/a     0    2 hx   hy
-    15:c2     B 1 1 2/n     0    2 hx   hy
+    15:c2     B 1 1 2/n     0    2 hx   hy    
     15:c3     I 1 1 2/b     0    2 hx   hy
-    15:-c1    B 1 1 2/b     
-    15:-c2    A 1 1 2/n     
-    15:-c3    I 1 1 2/a     
+    15:-c1    B 1 1 2/b     0    2 hx   hy    ?
+    15:-c2    A 1 1 2/n     0    2 hx   hy    ?
+    15:-c3    I 1 1 2/a     0    2 hx   hy    ?
     16        P 2 2 2       1    3 hx   hy   hz
     17        P 2 2 21      1    3 hx   hy   hz
     17:cab    P 21 2 2      1    3 hx   hy   hz
@@ -114,244 +114,244 @@
     18:bca    P 21 2 21     1    3 hx   hy   hz
     19        P 21 21 21    1    3 hx   hy   hz
     20        C 2 2 21      1    2 hx   hz
-    20:cab    A 21 2 2      1    2 hx   hy  ?
-    20:bca    B 2 21 2      1    2 hx   hy  ?
+    20:cab    A 21 2 2      1    2 hx   hy  
+    20:bca    B 2 21 2      1    2 hy   hz  
     21        C 2 2 2       1    2 hx   hz
-    21:cab    A 2 2 2       1    2 hx   hy  ?
-    21:bca    B 2 2 2       1    2 hx   hy  ?
+    21:cab    A 2 2 2       1    2 hx   hy  
+    21:bca    B 2 2 2       1    2 hy   hz  
     22        F 2 2 2       1    1 qqq
     23        I 2 2 2       1    2 hx   hy
     24        I 21 21 21    1    2 hx   hy
     25        P m m 2       1    3 t    hx   hy
-    25:cab    P 2 m m       1    3 r    hy   hz  ?
-    25:bca    P m 2 m       1    3 s    hx   hz  ?
+    25:cab    P 2 m m       1    3 r    hy   hz  
+    25:bca    P m 2 m       1    3 s    hx   hz  
     26        P m c 21      1    3 t    hx   hy
-    26:ba-c   P c m 21      
-    26:cab    P 21 m a      
-    26:-cba   P 21 a m      
-    26:bca    P b 21 m      
-    26:a-cb   P m 21 b      
+    26:ba-c   P c m 21      1    3 t    hx   hy 
+    26:cab    P 21 m a      1    3 r    hy   hz
+    26:-cba   P 21 a m      1    3 r    hy   hz
+    26:bca    P b 21 m      1    3 s    hx   hz
+    26:a-cb   P m 21 b      1    3 s    hx   hz
     27        P c c 2       1    3 t    hx   hy
-    27:cab    P 2 a a       
-    27:bca    P b 2 b       
+    27:cab    P 2 a a       1    3 r    hy   hz
+    27:bca    P b 2 b       1    3 s    hx   hz
     28        P m a 2       1    3 t    hx   hy
-    28:ba-c   P b m 2       
-    28:cab    P 2 m b       
-    28:-cba   P 2 c m       
-    28:bca    P c 2 m       
-    28:a-cb   P m 2 a       
+    28:ba-c   P b m 2       1    3 t    hx   hy      
+    28:cab    P 2 m b       1    3 r    hy   hz
+    28:-cba   P 2 c m       1    3 r    hy   hz
+    28:bca    P c 2 m       1    3 s    hx   hz
+    28:a-cb   P m 2 a       1    3 s    hx   hz
     29        P c a 21      1    3 t    hx   hy   
-    29:ba-c   P b c 21      
-    29:cab    P 21 a b      
-    29:-cba   P 21 c a      
-    29:bca    P c 21 b      
-    29:a-cb   P b 21 a      
+    29:ba-c   P b c 21      1    3 t    hx   hy
+    29:cab    P 21 a b      1    3 r    hy   hz
+    29:-cba   P 21 c a      1    3 r    hy   hz
+    29:bca    P c 21 b      1    3 s    hx   hz
+    29:a-cb   P b 21 a      1    3 s    hx   hz
     30        P n c 2       1    3 t    hx   hy
-    30:ba-c   P c n 2       
-    30:cab    P 2 n a       
-    30:-cba   P 2 a n       
-    30:bca    P b 2 n       
-    30:a-cb   P n 2 b       
+    30:ba-c   P c n 2       1    3 t    hx   hy
+    30:cab    P 2 n a       1    3 r    hy   hz
+    30:-cba   P 2 a n       1    3 r    hy   hz
+    30:bca    P b 2 n       1    3 s    hx   hz
+    30:a-cb   P n 2 b       1    3 s    hx   hz
     31        P m n 21      1    3 t    hx   hy
-    31:ba-c   P n m 21      
-    31:cab    P 21 m n      
-    31:-cba   P 21 n m      
-    31:bca    P n 21 m      
-    31:a-cb   P m 21 n      
+    31:ba-c   P n m 21      1    3 t    hx   hy
+    31:cab    P 21 m n      1    3 r    hy   hz
+    31:-cba   P 21 n m      1    3 r    hy   hz
+    31:bca    P n 21 m      1    3 s    hx   hz
+    31:a-cb   P m 21 n      1    3 s    hx   hz
     32        P b a 2       1    3 t    hx   hy
-    32:cab    P 2 c b       
-    32:bca    P c 2 a       
+    32:cab    P 2 c b       1    3 r    hy   hz
+    32:bca    P c 2 a       1    3 s    hx   hz
     33        P n a 21      1    3 t    hx   hy
-    33:ba-c   P b n 21      
-    33:cab    P 21 n b      
-    33:-cba   P 21 c n      
-    33:bca    P c 21 n      
-    33:a-cb   P n 21 a      
+    33:ba-c   P b n 21      1    3 t    hx   hy
+    33:cab    P 21 n b      1    3 r    hy   hz
+    33:-cba   P 21 c n      1    3 r    hy   hz
+    33:bca    P c 21 n      1    3 s    hx   hz
+    33:a-cb   P n 21 a      1    3 s    hx   hz
     34        P n n 2       1    3 t    hx   hy
-    34:cab    P 2 n n       
-    34:bca    P n 2 n       
+    34:cab    P 2 n n       1    3 r    hy   hz
+    34:bca    P n 2 n       1    3 s    hx   hz
     35        C m m 2       1    2 t    hx
-    35:cab    A 2 m m       
-    35:bca    B m 2 m       
+    35:cab    A 2 m m       1    2 r    hy
+    35:bca    B m 2 m       1    2 s    hz
     36        C m c 21      1    2 t    hx
-    36:ba-c   C c m 21      
-    36:cab    A 21 m a      
-    36:-cba   A 21 a m      
-    36:bca    B b 21 m      
-    36:a-cb   B m 21 b      
+    36:ba-c   C c m 21      1    2 t    hy
+    36:cab    A 21 m a      1    2 r    hy   
+    36:-cba   A 21 a m      1    2 r    hz   
+    36:bca    B b 21 m      1    2 s    hz
+    36:a-cb   B m 21 b      1    2 s    hx
     37        C c c 2       1    2 t    hx
-    37:cab    A 2 a a       
-    37:bca    B b 2 b       
+    37:cab    A 2 a a       1    2 r    hy
+    37:bca    B b 2 b       1    2 s    hz
     38        A m m 2       1    2 t    hx
-    38:ba-c   B m m 2       
-    38:cab    B 2 m m       
-    38:-cba   C 2 m m       
-    38:bca    C m 2 m       
-    38:a-cb   A m 2 m       
+    38:ba-c   B m m 2       1    2 t    hy
+    38:cab    B 2 m m       1    2 r    hy
+    38:-cba   C 2 m m       1    2 r    hz
+    38:bca    C m 2 m       1    2 s    hz
+    38:a-cb   A m 2 m       1    2 s    hx
     39        A b m 2       1    2 t    hx
-    39:ba-c   B m a 2       
-    39:cab    B 2 c m       
-    39:-cba   C 2 m b       
-    39:bca    C m 2 a       
-    39:a-cb   A c 2 m       
+    39:ba-c   B m a 2       1    2 t    hy
+    39:cab    B 2 c m       1    2 r    hy
+    39:-cba   C 2 m b       1    2 r    hz
+    39:bca    C m 2 a       1    2 s    hz
+    39:a-cb   A c 2 m       1    2 s    hx
     40        A m a 2       1    2 t    hx
-    40:ba-c   B b m 2       
-    40:cab    B 2 m b       
-    40:-cba   C 2 c m       
-    40:bca    C c 2 m       
-    40:a-cb   A m 2 a       
+    40:ba-c   B b m 2       1    2 t    hy
+    40:cab    B 2 m b       1    2 r    hy
+    40:-cba   C 2 c m       1    2 r    hz
+    40:bca    C c 2 m       1    2 s    hz
+    40:a-cb   A m 2 a       1    2 s    hx
     41        A b a 2       1    2 t    hx    
-    41:ba-c   B b a 2       
-    41:cab    B 2 c b       
-    41:-cba   C 2 c b       
-    41:bca    C c 2 a       
-    41:a-cb   A c 2 a       
+    41:ba-c   B b a 2       1    2 t    hy
+    41:cab    B 2 c b       1    2 r    hy
+    41:-cba   C 2 c b       1    2 r    hz
+    41:bca    C c 2 a       1    2 s    hz
+    41:a-cb   A c 2 a       1    2 s    hx
     42        F m m 2       1    1 t
-    42:cab    F 2 m m       
-    42:bca    F m 2 m       
-    43        F d d 2       0    1 t ???inversion
-    43:cab    F 2 d d       
-    43:bca    F d 2 d       
+    42:cab    F 2 m m       1    1 r
+    42:bca    F m 2 m       1    1 s
+    43        F d d 2       0    1 t    inversion at (1/8, 1/8, 1/8) not allowed for
+    43:cab    F 2 d d       0    1 r
+    43:bca    F d 2 d       0    1 s
     44        I m m 2       1    2 t    hx
-    44:cab    I 2 m m       
-    44:bca    I m 2 m       
+    44:cab    I 2 m m       1    2 r    hy
+    44:bca    I m 2 m       1    2 s    hz
     45        I b a 2       1    2 t    hx
-    45:cab    I 2 c b       
-    45:bca    I c 2 a       
+    45:cab    I 2 c b       1    2 r    hy
+    45:bca    I c 2 a       1    2 s    hz
     46        I m a 2       1    2 t    hx
-    46:ba-c   I b m 2       
-    46:cab    I 2 m b       
-    46:-cba   I 2 c m       
-    46:bca    I c 2 m       
-    46:a-cb   I m 2 a       
+    46:ba-c   I b m 2       1    2 t    hy
+    46:cab    I 2 m b       1    2 r    hy
+    46:-cba   I 2 c m       1    2 r    hz
+    46:bca    I c 2 m       1    2 s    hz
+    46:a-cb   I m 2 a       1    2 s    hx
     47        P m m m       0    3 hx   hy   hz
     48:1      P n n n:1     0    3 hx   hy   hz
     48:2      P n n n:2     0    3 hx   hy   hz
     49        P c c m       0    3 hx   hy   hz
-    49:cab    P m a a       
-    49:bca    P b m b       
+    49:cab    P m a a       0    3 hx   hy   hz
+    49:bca    P b m b       0    3 hx   hy   hz
     50:1      P b a n:1     0    3 hx   hy   hz
     50:2      P b a n:2     0    3 hx   hy   hz
-    50:1cab   P n c b:1     
-    50:2cab   P n c b:2     
-    50:1bca   P c n a:1     
-    50:2bca   P c n a:2     
+    50:1cab   P n c b:1     0    3 hx   hy   hz
+    50:2cab   P n c b:2     0    3 hx   hy   hz
+    50:1bca   P c n a:1     0    3 hx   hy   hz
+    50:2bca   P c n a:2     0    3 hx   hy   hz
     51        P m m a       0    3 hx   hy   hz
-    51:ba-c   P m m b       
-    51:cab    P b m m       
-    51:-cba   P c m m       
-    51:bca    P m c m       
-    51:a-cb   P m a m       
+    51:ba-c   P m m b       0    3 hx   hy   hz
+    51:cab    P b m m       0    3 hx   hy   hz
+    51:-cba   P c m m       0    3 hx   hy   hz
+    51:bca    P m c m       0    3 hx   hy   hz
+    51:a-cb   P m a m       0    3 hx   hy   hz
     52        P n n a       0    3 hx   hy   hz
-    52:ba-c   P n n b       
-    52:cab    P b n n       
-    52:-cba   P c n n       
-    52:bca    P n c n       
-    52:a-cb   P n a n       
+    52:ba-c   P n n b       0    3 hx   hy   hz
+    52:cab    P b n n       0    3 hx   hy   hz
+    52:-cba   P c n n       0    3 hx   hy   hz
+    52:bca    P n c n       0    3 hx   hy   hz
+    52:a-cb   P n a n       0    3 hx   hy   hz
     53        P m n a       0    3 hx   hy   hz
-    53:ba-c   P n m b       
-    53:cab    P b m n       
-    53:-cba   P c n m       
-    53:bca    P n c m       
-    53:a-cb   P m a n       
+    53:ba-c   P n m b       0    3 hx   hy   hz
+    53:cab    P b m n       0    3 hx   hy   hz
+    53:-cba   P c n m       0    3 hx   hy   hz
+    53:bca    P n c m       0    3 hx   hy   hz
+    53:a-cb   P m a n       0    3 hx   hy   hz
     54        P c c a       0    3 hx   hy   hz
-    54:ba-c   P c c b       
-    54:cab    P b a a       
-    54:-cba   P c a a       
-    54:bca    P b c b       
-    54:a-cb   P b a b       
+    54:ba-c   P c c b       0    3 hx   hy   hz
+    54:cab    P b a a       0    3 hx   hy   hz
+    54:-cba   P c a a       0    3 hx   hy   hz
+    54:bca    P b c b       0    3 hx   hy   hz
+    54:a-cb   P b a b       0    3 hx   hy   hz
     55        P b a m       0    3 hx   hy   hz
-    55:cab    P m c b       
-    55:bca    P c m a       
+    55:cab    P m c b       0    3 hx   hy   hz
+    55:bca    P c m a       0    3 hx   hy   hz
     56        P c c n       0    3 hx   hy   hz
-    56:cab    P n a a       
-    56:bca    P b n b       
+    56:cab    P n a a       0    3 hx   hy   hz
+    56:bca    P b n b       0    3 hx   hy   hz
     57        P b c m       0    3 hx   hy   hz
-    57:ba-c   P c a m       
-    57:cab    P m c a       
-    57:-cba   P m a b       
-    57:bca    P b m a       
-    57:a-cb   P c m b       
+    57:ba-c   P c a m       0    3 hx   hy   hz
+    57:cab    P m c a       0    3 hx   hy   hz
+    57:-cba   P m a b       0    3 hx   hy   hz
+    57:bca    P b m a       0    3 hx   hy   hz
+    57:a-cb   P c m b       0    3 hx   hy   hz
     58        P n n m       0    3 hx   hy   hz
-    58:cab    P m n n       
-    58:bca    P n m n       
+    58:cab    P m n n       0    3 hx   hy   hz
+    58:bca    P n m n       0    3 hx   hy   hz
     59:1      P m m n:1     0    3 hx   hy   hz
     59:2      P m m n:2     0    3 hx   hy   hz
-    59:1cab   P n m m:1     
-    59:2cab   P n m m:2     
-    59:1bca   P m n m:1     
-    59:2bca   P m n m:2     
+    59:1cab   P n m m:1     0    3 hx   hy   hz
+    59:2cab   P n m m:2     0    3 hx   hy   hz
+    59:1bca   P m n m:1     0    3 hx   hy   hz
+    59:2bca   P m n m:2     0    3 hx   hy   hz
     60        P b c n       0    3 hx   hy   hz
-    60:ba-c   P c a n       
-    60:cab    P n c a       
-    60:-cba   P n a b       
-    60:bca    P b n a       
-    60:a-cb   P c n b       
+    60:ba-c   P c a n       0    3 hx   hy   hz
+    60:cab    P n c a       0    3 hx   hy   hz
+    60:-cba   P n a b       0    3 hx   hy   hz
+    60:bca    P b n a       0    3 hx   hy   hz
+    60:a-cb   P c n b       0    3 hx   hy   hz
     61        P b c a       0    3 hx   hy   hz
-    61:ba-c   P c a b       
+    61:ba-c   P c a b       0    3 hx   hy   hz
     62        P n m a       0    3 hx   hy   hz
-    62:ba-c   P m n b       
-    62:cab    P b n m       
-    62:-cba   P c m n       
-    62:bca    P m c n       
-    62:a-cb   P n a m       
+    62:ba-c   P m n b       0    3 hx   hy   hz
+    62:cab    P b n m       0    3 hx   hy   hz
+    62:-cba   P c m n       0    3 hx   hy   hz
+    62:bca    P m c n       0    3 hx   hy   hz
+    62:a-cb   P n a m       0    3 hx   hy   hz
     63        C m c m       0    2 hx   hz
-    63:ba-c   C c m m       
-    63:cab    A m m a       
-    63:-cba   A m a m       
-    63:bca    B b m m       
-    63:a-cb   B m m b       
+    63:ba-c   C c m m       0    2 hy   hz
+    63:cab    A m m a       0    2 hx   hy
+    63:-cba   A m a m       0    2 hx   hz
+    63:bca    B b m m       0    2 hy   hz
+    63:a-cb   B m m b       0    2 hx   hy
     64        C m c a       0    2 hx   hz
-    64:ba-c   C c m b       
-    64:cab    A b m a       
-    64:-cba   A c a m       
-    64:bca    B b c m       
-    64:a-cb   B m a b       
-    65        C m m m       0    2 hx   hz
-    65:cab    A m m m       
-    65:bca    B m m m       
+    64:ba-c   C c m b       0    2 hy   hz
+    64:cab    A b m a       0    2 hx   hy
+    64:-cba   A c a m       0    2 hx   hz
+    64:bca    B b c m       0    2 hy   hz
+    64:a-cb   B m a b       0    2 hx   hz
+    65        C m m m       0    2 hx   hy
+    65:cab    A m m m       0    2 hy   hz
+    65:bca    B m m m       0    2 hy   hz
     66        C c c m       0    2 hx   hz
-    66:cab    A m a a       
-    66:bca    B b m b       
+    66:cab    A m a a       0    2 hx   hy
+    66:bca    B b m b       0    2 hy   hz
     67        C m m a       0    2 hx   hz
-    67:ba-c   C m m b       
-    67:cab    A b m m       
-    67:-cba   A c m m       
-    67:bca    B m c m       
-    67:a-cb   B m a m       
+    67:ba-c   C m m b       0    2 hy   hz
+    67:cab    A b m m       0    2 hx   hy
+    67:-cba   A c m m       0    2 hx   hz
+    67:bca    B m c m       0    2 hy   hz
+    67:a-cb   B m a m       0    2 hx   hy
     68:1      C c c a:1     0    2 hx   hz
-    68:2      C c c a:2     0  ?
-    68:1ba-c  C c c b:1     
-    68:2ba-c  C c c b:2     
-    68:1cab   A b a a:1     
-    68:2cab   A b a a:2     
-    68:1-cba  A c a a:1     
-    68:2-cba  A c a a:2     
-    68:1bca   B b c b:1     
-    68:2bca   B b c b:2     
-    68:1a-cb  B b a b:1     
-    68:2a-cb  B b a b:2     
+    68:2      C c c a:2     0    2 hx   hz
+    68:1ba-c  C c c b:1     0    2 hy   hz
+    68:2ba-c  C c c b:2     0    2 hy   hz
+    68:1cab   A b a a:1     0    2 hx   hy
+    68:2cab   A b a a:2     0    2 hx   hy
+    68:1-cba  A c a a:1     0    2 hx   hz
+    68:2-cba  A c a a:2     0    2 hx   hz
+    68:1bca   B b c b:1     0    2 hy   hz
+    68:2bca   B b c b:2     0    2 hy   hz
+    68:1a-cb  B b a b:1     0    2 hx   hy
+    68:2a-cb  B b a b:2     0    2 hx   hy
     69        F m m m       0    1 hx
     70:1      F d d d:1     0    1 hx
     70:2      F d d d:2     0    1 hx
     71        I m m m       0    2 hx   hy
     72        I b a m       0    2 hx   hy
-    72:cab    I m c b       
-    72:bca    I c m a       
+    72:cab    I m c b       0    2 hy   hz
+    72:bca    I c m a       0    2 hx   hz
     73        I b c a       0    2 hx   hy
-    73:ba-c   I c a b       
+    73:ba-c   I c a b       0    2 hx   hy
     74        I m m a       0    2 hx   hy
-    74:ba-c   I m m b       
-    74:cab    I b m m       
-    74:-cba   I c m m       
-    74:bca    I m c m       
-    74:a-cb   I m a m       
+    74:ba-c   I m m b       0    2 hx   hy
+    74:cab    I b m m       0    2 hy   hz
+    74:-cba   I c m m       0    2 hy   hz
+    74:bca    I m c m       0    2 hx   hz
+    74:a-cb   I m a m       0    2 hx   hz
     75        P 4           1    2 t    hxhy
     76        P 41          0    2 t    hxhy
     77        P 42          1    2 t    hxhy
     78        P 43          0    2 t    hxhy
     79        I 4           1    1 t
-    80        I 41          0    1 t   ???   inversion
+    80        I 41          0    1 t    inversion at (1/4,0,0) not allowed for
     81        P -4          1    2 hxhy hz
     82        I -4          1    1 hxqz 
     83        P 4/m         0    2 hxhy hz
@@ -372,7 +372,7 @@
     95        P 43 2 2      0    2 hxhy hz
     96        P 43 21 2     0    2 hxhy hz
     97        I 4 2 2       1    1 hz
-    98        I 41 2 2      0    1 hz     ???inversion
+    98        I 41 2 2      0    1 hz   inversion at (1/4,0,1/8) not allowed for
     99        P 4 m m       1    2 t    hxhy
    100        P 4 b m       1    2 t    hxhy
    101        P 42 c m      1    2 t    hxhy
@@ -383,8 +383,8 @@
    106        P 42 b c      1    2 t    hxhy
    107        I 4 m m       1    1 t
    108        I 4 c m       1    1 t
-   109        I 41 m d      0    1 t    ???Inversion
-   110        I 41 c d      0    1 t    ???Inversion
+   109        I 41 m d      0    1 t    inversion at (1/4,0,0) not allowed for
+   110        I 41 c d      0    1 t    inversion at (1/4,0,0) not allowed for
    111        P -4 2 m      1    2 hxhy hz
    112        P -4 2 c      1    2 hxhy hz
    113        P -4 21 m     1    2 hxhy hz
@@ -396,7 +396,7 @@
    119        I -4 m 2      1    1 hxqz
    120        I -4 c 2      1    1 hxqz
    121        I -4 2 m      1    1 hz
-   122        I -4 2 d      0    1 hz   ??? Inversion
+   122        I -4 2 d      0    1 hz   inversion at (1/4,0,1/8) not allowed for
    123        P 4/m m m     0    2 hxhy hz
    124        P 4/m c c     0    2 hxhy hz
    125:1      P 4/n b m:1   0    2 hxhy hz
@@ -452,11 +452,11 @@
    165        P -3 c 1      0    1 hz
    166:H      R -3 m:H      0    1 hz
    167:H      R -3 c:H      0    1 hz
-   146:R      R 3:R         1    0     ?
+   146:R      R 3:R         1    1 r    r,r,r in International tables?
    148:R      R -3:R        0    1 hhh
    155:R      R 32:R        1    1 hhh
-   160:R      R 3 m:R       1    0     ?
-   161:R      R 3 c:R       1    0     ?
+   160:R      R 3 m:R       1    1 r    r,r,r in International tables?
+   161:R      R 3 c:R       1    1 r    r,r,r in International tables?
    166:R      R -3 m:R      0    1 hhh
    167:R      R -3 c:R      0    1 hhh
    168        P 6           1    1 t
@@ -465,7 +465,7 @@
    171        P 62          0    1 t
    172        P 64          0    1 t
    173        P 63          1    1 t
-   174        P -6          1    2txty hz
+   174        P -6          1    2 txty hz
    175        P 6/m         0    1 hz
    176        P 63/m        0    1 hz
    177        P 6 2 2       1    1 hz
@@ -503,7 +503,7 @@
    207        P 4 3 2       1    1 hhh
    208        P 42 3 2      1    1 hhh
    209        F 4 3 2       1    1 hhh
-   210        F 41 3 2      0    1 hhh   ???inversion
+   210        F 41 3 2      0    1 hhh  inversion at (1/8, 1/8, 1/8) not allowed for
    211        I 4 3 2       1    0
    212        P 43 3 2      0    1 hhh
    213        P 41 3 2      0    1 hhh
