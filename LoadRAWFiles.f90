@@ -68,11 +68,6 @@
             CALL PushActiveWindowID
             CALL WDialogLoad(IDD_DataRangeSTOE)
             CALL WDialogSelect(IDD_DataRangeSTOE)
-! For debugging
-  !          TitleOfRange(1) = 'Test entry nr. 1'
-  !          TitleOfRange(2) = 'Test entry nr. 2'
-  !          TitleOfRange(3) = 'Test entry nr. 3'
-  !          tNumOfRanges = 3
             CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,1)
             CALL WDialogShow(-1,-1,IDOK,Modal)
             CALL WDialogGetMenu(IDF_DataRangeMenu,irange)
@@ -854,6 +849,10 @@
 ! 2. Measure different ranges at different resolutions / counting times
 ! I don't think the former will be used for solving structures.
           READ(UNIT=10,REC=4,ERR=999) NumOfDataRanges
+          IF (NumOfDataRanges .GT. 1) THEN
+            CALL InfoMessage('This file contains more than one datarange: only the first will be read.')
+            NumOfDataRanges = 1
+          ENDIF
 ! The complete file header is 712 bytes, so start reading at record (712 DIV 4) + RecNumber
           Offset = 178
 ! @ Now there should be a loop over the number of data ranges
