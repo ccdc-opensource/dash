@@ -571,6 +571,7 @@
       DO I = 1, nvar
         X(I) = XOPT(I)
       ENDDO
+      F = FOPT
 !O      CALL PO_PRECFC
 !O      CALL FCN(XOPT,F,0)
 !O      FOPT = F
