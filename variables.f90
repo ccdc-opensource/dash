@@ -20,9 +20,6 @@
       INTEGER MaxPathLength
       PARAMETER (MaxPathLength = 255)
 
-      LOGICAL               :: PLOTT
-      DATA PLOTT / .FALSE. / ! Graphic plotted?
-
       CHARACTER(MaxPathLength) ::  FNAME
       DATA FNAME / ' ' /     ! Current filename
 
@@ -46,10 +43,7 @@
       CHARACTER(20)            ::  VIEWARG
       DATA VIEWARG / '' /
       
-      LOGICAL ViewOn
       LOGICAL ConvOn       ! Set if external Z-matrix conversion program available
-      LOGICAL ViewAct
-      LOGICAL AutoUpdate
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER*80  DashTicFile
