@@ -708,10 +708,10 @@
 
       INTEGER iLen, iPos
       CHARACTER*4 ExtensionStr
-      INTEGER, EXTERNAL :: CSSR2Mol2
       CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
       CHARACTER(5) fmt
       INTEGER iStat, iStart, I
+      INTEGER, EXTERNAL :: CSSR2Mol2
 
       TheNumOfZmatrices = 0
       tInputFile = TheInputFile

@@ -112,29 +112,27 @@
       COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
       CHARACTER(LEN = MaxPathLength) :: line
-
       INTEGER nl
       CHARACTER*12 KeyChar
-
       INTEGER i
-      INTEGER ihcver,ipiker,iloger,idsler, isst, ised
+      INTEGER ihcver,ipiker,iloger,idsler
       INTEGER, EXTERNAL :: GetCrystalSystem, GETTIC
       LOGICAL, EXTERNAL :: FnPatternOK, FnWavelengthOK
       REAL, EXTERNAL :: TwoTheta2dSpacing
-      INTEGER tFileHandle
+      INTEGER iHandle
       LOGICAL TicExists
       LOGICAL HcvExists
       LOGICAL PikExists
       LOGICAL DslExists
 
-! JCC Set to success in all cases
+! Set to success in all cases
       ihcver = 0
       iloger = 0
       ipiker = 0
       idsler = 0
 ! Now open all the appropriate PIK and HCV files
-      tFileHandle = 10
-      OPEN(tFileHandle,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
+      iHandle = 10
+      OPEN(iHandle,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
       CALL sa_SetOutputFiles(SDIFile)
       TicExists = .FALSE.
       HcvExists = .FALSE.
@@ -142,32 +140,26 @@
       DslExists = .FALSE.
       CALL Clear_PeakFitRanges
  10   line = ' '
-      READ(tFileHandle,'(A)',END=100,ERR=999) line
+      READ(iHandle,'(A)',END=100,ERR=999) line
       nl = LEN_TRIM(line)
       CALL ILowerCase(line(:nl))
       CALL INextString(line,keychar)
       SELECT CASE (KeyChar(1:3))
         CASE ('tic')
-          CALL ILocateString(line,isst,ised)
-          DashTicFile = line(isst:)
+          DashTicFile = line(ILocateChar(line):)
           TicExists = .TRUE.
         CASE ('hcv')
-          CALL ILocateString(line,isst,ised)
-          DashHcvFile = line(isst:)
+          DashHcvFile = line(ILocateChar(line):)
           HcvExists = .TRUE.
         CASE ('hkl')
-          CALL ILocateString(line,isst,ised)
-          DashHklFile = line(isst:)
+          DashHklFile = line(ILocateChar(line):)
         CASE ('pik')
-          CALL ILocateString(line,isst,ised)
-          DashPikFile = line(isst:)
+          DashPikFile = line(ILocateChar(line):)
           PikExists = .TRUE.
         CASE ('raw')
-          CALL ILocateString(line,isst,ised)
-          DashRawFile = line(isst:)
+          DashRawFile = line(ILocateChar(line):)
         CASE ('dsl')
-          CALL ILocateString(line,isst,ised)
-          DashDslFile = line(isst:)
+          DashDslFile = line(ILocateChar(line):)
           DslExists = .TRUE.
         CASE ('cel') ! Cell parameters
           DO I = 1, 6
@@ -183,7 +175,7 @@
           CALL INextReal(line,PAWLEYCHISQ)
       END SELECT
       GOTO 10 
- 100  CLOSE(tFileHandle)
+ 100  CLOSE(iHandle)
       IF (DslExists) THEN
         CALL GETDSL(DashDslFile,idsler)
         DslExists = (idsler .EQ. 0)
@@ -231,7 +223,7 @@
       ENDIF
       RETURN
  999  CALL ErrorMessage('Error reading .sdi file.')
-      CLOSE(tFileHandle) 
+      CLOSE(iHandle) 
 
       END SUBROUTINE SDIFileLoad
 !

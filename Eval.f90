@@ -35,9 +35,9 @@
       REAL*8 QUATER(0:3), QQSUM, QDEN
       REAL*8 XC, YC, ZC, ZERO
       INTEGER KK, KATOM, iFrg, iFrgCopy, NATS, KK1, KK2, KK3, JQ, JQS, I, ICFRG, KI
-      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
       REAL*8 Duonion(0:1)
       DOUBLE PRECISION tX, tY, tZ, tQ(0:3)
+      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
 
       KK = 0
       KATOM = 0
