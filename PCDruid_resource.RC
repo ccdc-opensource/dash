@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 26/Feb/2001 10:30:50
+// Modified : 26/Feb/2001 11:20:04
 //
 ///////////////////////////////////////////////////
 //
@@ -1963,7 +1963,7 @@ BEGIN
     CONTROL "159",IDF_SA_RandomSeed2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  176,   51,   40,   14
     CONTROL "1",IDF_SA_MaxRepeats,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  138,  152,   56,   12
     CONTROL "Maximum number of SA runs",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   22,  152,  112,   12
-    CONTROL "10000000",IDF_SA_MaxMoves,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  138,  168,   56,   12
+    CONTROL "10000000",IDF_SA_MaxMoves,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  138,  168,   56,   12
     CONTROL "Maximum number of moves per run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   22,  168,  112,   12
     CONTROL "Profile chi-squared multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   22,  184,  112,   12
     CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  138,  184,   54,   12
@@ -2455,59 +2455,59 @@ END
 //
 // Bitmaps
 //
-IDF_Width_Equations             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\WidthEquations.bmp"
-IDF_PW_Logo1                    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
-IDF_PW_Logo2                    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
-IDF_PW_Logo3                    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
-IDF_WelcomeWizard               BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\WizardWelcome.bmp"
-IDF_PW_Logo4                    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
-IDF_Pawley_Status_Pic           BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\EmbossedProfile.bmp"
-IDF_Profile_Zoom_Button         BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\zoom.bmp"
-IDF_Profile_FullRange_Button    BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\fullrange.bmp"
-IDF_PawRefOptionsPicture        BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PawRefOptions.bmp"
-ID_TOOLBAR1                     BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\toolbar1.bmp"
-ID_BITMAP1                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\WidthEquations.bmp"
-ID_BITMAP2                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
-ID_BITMAP3                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
-ID_BITMAP4                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
-ID_BITMAP5                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\WizardWelcome.bmp"
-ID_BITMAP6                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
-ID_BITMAP7                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardSmall.bmp"
-ID_BITMAP8                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\zoom.bmp"
-ID_BITMAP9                      BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\fullrange.bmp"
-ID_BITMAP10                     BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PawRefOptions.bmp"
-IDF_StrInf_Picture              BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
-IDB_ZMatrix_Browse1             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
-IDB_ZMatrix_Browse2             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
-IDB_ZMatrix_Browse3             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
-IDB_ZMatrix_Browse4             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
-IDB_ZMatrix_Browse5             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\OpenFile.bmp"
-IDF_SA1_picture                 BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
-IDF_SA2_picture                 BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
-IDF_SA3_picture                 BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
-IDF_T_picture                   BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\temperature1.bmp"
-IDF_avchisq_picture             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\temperature1.bmp"
-IDF_minchisq_picture            BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\temperature1.bmp"
-IDF_prochisq_picture            BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\temperature1.bmp"
-IDF_SA_Stop_Button              BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\stop.bmp"
-IDF_SA_Pause_Button             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\pause.bmp"
-IDF_SA_Play_Button              BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\play.bmp"
-IDF_SA_Simplex_Button           BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\fast_forward.BMP"
-IDF_Pause_Annealing             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\pause.bmp"
-IDF_SA_Reanneal_Button          BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\back.bmp"
-IDF_SA_Eject_Button             BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\eject.BMP"
-IDF_SA_NewAnneal_Button         BITMAP DISCARDABLE "G:\\DASH_TEST\\dash\\res\\previous_track.BMP"
+IDF_Width_Equations             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\WidthEquations.bmp"
+IDF_PW_Logo1                    BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+IDF_PW_Logo2                    BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+IDF_PW_Logo3                    BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+IDF_WelcomeWizard               BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\WizardWelcome.bmp"
+IDF_PW_Logo4                    BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+IDF_Pawley_Status_Pic           BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\EmbossedProfile.bmp"
+IDF_Profile_Zoom_Button         BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\zoom.bmp"
+IDF_Profile_FullRange_Button    BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\fullrange.bmp"
+IDF_PawRefOptionsPicture        BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PawRefOptions.bmp"
+ID_TOOLBAR1                     BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\toolbar1.bmp"
+ID_BITMAP1                      BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\WidthEquations.bmp"
+ID_BITMAP2                      BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+ID_BITMAP3                      BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+ID_BITMAP4                      BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+ID_BITMAP5                      BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\WizardWelcome.bmp"
+ID_BITMAP6                      BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizard.bmp"
+ID_BITMAP7                      BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizardSmall.bmp"
+ID_BITMAP8                      BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\zoom.bmp"
+ID_BITMAP9                      BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\fullrange.bmp"
+ID_BITMAP10                     BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PawRefOptions.bmp"
+IDF_StrInf_Picture              BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
+IDB_ZMatrix_Browse1             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDB_ZMatrix_Browse2             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDB_ZMatrix_Browse3             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDB_ZMatrix_Browse4             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDB_ZMatrix_Browse5             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\OpenFile.bmp"
+IDF_SA1_picture                 BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
+IDF_SA2_picture                 BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
+IDF_SA3_picture                 BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\PolyFitterWizardFull.bmp"
+IDF_T_picture                   BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\temperature1.bmp"
+IDF_avchisq_picture             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\temperature1.bmp"
+IDF_minchisq_picture            BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\temperature1.bmp"
+IDF_prochisq_picture            BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\temperature1.bmp"
+IDF_SA_Stop_Button              BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\stop.bmp"
+IDF_SA_Pause_Button             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\pause.bmp"
+IDF_SA_Play_Button              BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\play.bmp"
+IDF_SA_Simplex_Button           BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\fast_forward.BMP"
+IDF_Pause_Annealing             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\pause.bmp"
+IDF_SA_Reanneal_Button          BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\back.bmp"
+IDF_SA_Eject_Button             BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\eject.BMP"
+IDF_SA_NewAnneal_Button         BITMAP DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\previous_track.BMP"
 
 ///////////////////////////////////////////////////
 //
 // Icons
 //
-icon1                           ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Druid.ico"
-ID_ICON1                        ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Druid.ico"
-ID_ICON2                        ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Druid.ico"
-ID_ICON3                        ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Druid.ico"
-IDF_Done_icon                   ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\Done.ico"
-ID_Wizard_Icon                  ICON   DISCARDABLE "G:\\DASH_TEST\\dash\\res\\wizard.ico"
+icon1                           ICON   DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\Druid.ico"
+ID_ICON1                        ICON   DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\Druid.ico"
+ID_ICON2                        ICON   DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\Druid.ico"
+ID_ICON3                        ICON   DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\Druid.ico"
+IDF_Done_icon                   ICON   DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\Done.ico"
+ID_Wizard_Icon                  ICON   DISCARDABLE "D:\\Jason\\DASH_TEST\\dash\\res\\wizard.ico"
 
 ///////////////////////////////////////////////////
 //
