@@ -293,10 +293,11 @@
         PkProb(MTPeak), IOrdTem(MTPeak), IHPk(3,MTPeak)
 
       INTEGER IFTYPE
-      INTEGER            :: IFLAGS,KLEN
+      INTEGER IFLAGS, KLEN
       CHARACTER(LEN=75) :: FILTER
-      REAL Rvpar(2), Rcpar(3), Lambda, Rdens, Rmolwt, Rfom, Rexpzp, Reps
+      REAL    Rvpar(2), Rcpar(5), Lambda, Rdens, Rmolwt, Rfom, Rexpzp, Reps
       INTEGER Isystem(6), UseErr, I, Iord
+      REAL    Epsilon
 
 ! Get a file name
 
@@ -313,12 +314,14 @@
       CALL WDialogGetReal(IDF_Indexing_Lambda, Lambda)
       CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
       CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
-      CALL WDialogGetReal(IDF_Indexing_MaxLen, Rcpar(1))
+      CALL WDialogGetReal(IDF_Indexing_Maxa, Rcpar(1))
+      CALL WDialogGetReal(IDF_Indexing_Maxb, Rcpar(2))
+      CALL WDialogGetReal(IDF_Indexing_Maxc, Rcpar(3))
 ! JvdS @ add in very quick check: is the d-spacing belonging to the first peak greater
 ! than the maximum cell length requested? If so, tell user he is a moron.
 !     Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
-      CALL WDialogGetReal(IDF_Indexing_MinAng, Rcpar(2))
-      CALL WDialogGetReal(IDF_Indexing_MaxAng, Rcpar(3))
+      CALL WDialogGetReal(IDF_Indexing_MinAng, Rcpar(4))
+      CALL WDialogGetReal(IDF_Indexing_MaxAng, Rcpar(5))
       CALL WDialogGetReal(IDF_Indexing_Density, Rdens)
       CALL WDialogGetReal(IDF_Indexing_MolWt,   Rmolwt)
       CALL WDialogGetReal(IDF_Indexing_Fom,     Rfom)
@@ -329,20 +332,21 @@
       CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      Isystem(4))
       CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, Isystem(5))
       CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  Isystem(6))
-      CALL WDialogGetCheckBox(IDF_Indexing_UseErrors,  UseErr)
+      CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
+      CALL WDialogGetReal(IDF_eps,Epsilon)
 ! Write it out 
       OPEN(UNIT=117,FILE=FNAME(1:KLEN),STATUS='UNKNOWN',ERR=99)
       WRITE(117,*,ERR=100) 'DICVOL input file created by DASH'
       WRITE(117,'(8(I3,1X))',ERR=100)  NTPeak, 2, (Isystem(i),i=1,6)
-      WRITE(117,'(7(F8.2,1X))',ERR=100)  Rcpar(1),Rcpar(1),Rcpar(1),Rvpar(1),Rvpar(2),Rcpar(2),Rcpar(3)
+      WRITE(117,'(7(F8.2,1X))',ERR=100)  Rcpar(1),Rcpar(2),Rcpar(3),Rvpar(1),Rvpar(2),Rcpar(4),Rcpar(5)
       WRITE(117,'(F10.6,1X,3(F8.4,1X))',ERR=100)  Lambda, Rmolwt, Rdens, Rdens/50.0
-      IF (UseErr .EQ. 1) THEN
+      IF (UseErr .EQ. 2) THEN
         Reps = 1.0
       ELSE
-        Reps = 0.0
+        Reps = Epsilon
       END IF
-      WRITE(117,'(F3.1,1X,F6.2,1X,F9.6)',ERR=100) Reps, Rfom, Rexpzp
-      IF (UseErr .EQ. 1) THEN
+      WRITE(117,'(F5.3,1X,F6.2,1X,F9.6)',ERR=100) Reps, Rfom, Rexpzp
+      IF (UseErr .EQ. 2) THEN
         DO I = 1, NTPeak
           IOrd = IOrdTem(i)
           WRITE(117,'(F12.4,1X,F12.4)',ERR=100) AllPkPosVal(IOrd), AllPkPosEsd(IOrd)*10.0
