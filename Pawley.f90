@@ -138,7 +138,7 @@
 ! Local variables logging errors in the pawley fit
       INTEGER IDUMMY, ipt
       INTEGER PawleyErrorLog  
-      INTEGER, EXTERNAL :: Quick_Pawley_Fit
+      INTEGER, EXTERNAL :: Quick_Pawley_Fit, GETTIC
       REAL, EXTERNAL :: DEGREE
       INTEGER ieocc, II, JJ
       LOGICAL LastValuesSet
@@ -314,9 +314,10 @@
               Ilen = LEN_TRIM(DashPikFile)
               SDIFile = DashPikFile(1:Ilen-3)//'sdi'
               CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
-              CALL GET_LOGREF(DashTicFile,IER)
-              CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),IER)
-              CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
+              iDummy = GETTIC(DashTicFile)
+              CALL GET_LOGREF
+              CALL GETHCV(DashHcvFile,IER)
+              CALL GETPIK(DashPikFile,IER)
               NoData = .FALSE.
               CALL ShowWizardWindowZmatrices
             CASE (IDBACK)
