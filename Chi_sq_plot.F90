@@ -125,7 +125,7 @@
 ! First Run so set DynamicMaxX to zero.  IF "stop" pressed in SA run Window want to reset
 ! DynamicMAxX
       IF((Run_number.EQ.1).AND.(It_count.EQ.2)) THEN
-        DDynamicMaxX = 0.0
+        DynamicMaxX = 0.0
       END IF
 
 ! calculate array of x values for graph
