@@ -1,4 +1,4 @@
-! Winteracter module created : 02/Nov/2001 18:31:01
+! Winteracter module created : 03/Nov/2001 18:00:55
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -36,7 +36,6 @@
           INTEGER, PARAMETER :: ID_Polyfitter_Tips              = 40033
           INTEGER, PARAMETER :: ID_Druid_Mode_Menu              = 40022
           INTEGER, PARAMETER :: ID_Peak_Fitting_Mode            = 40023
-          INTEGER, PARAMETER :: ID_Default_Mode                 = 40028
           INTEGER, PARAMETER :: ID_Structure_Solution_Mode      = 40010
           INTEGER, PARAMETER :: ID_Pawley_Refinement_Mode       = 40040
           INTEGER, PARAMETER :: ID_Options                      = 40048
@@ -480,4 +479,14 @@
           INTEGER, PARAMETER :: IDF_PlotPeakFitDif              =  1133
           INTEGER, PARAMETER :: ID_ClearPeakFitRanges           = 40018
           INTEGER, PARAMETER :: IDB_ShowOverlap                 =  1137
+          INTEGER, PARAMETER :: IDB_ZmatrixDelete1              =  1145
+          INTEGER, PARAMETER :: IDB_ZmatrixDelete2              =  1146
+          INTEGER, PARAMETER :: IDB_ZmatrixDelete3              =  1147
+          INTEGER, PARAMETER :: IDB_ZmatrixDelete4              =  1148
+          INTEGER, PARAMETER :: IDB_ZmatrixDelete5              =  1149
+          INTEGER, PARAMETER :: IDF_UseOriginal                 =  1164
+          INTEGER, PARAMETER :: IDF_UseSolutionNr               =  1178
+          INTEGER, PARAMETER :: IDF_ColourByElement             =  1200
+          INTEGER, PARAMETER :: IDF_GROUP3                      =  1202
+          INTEGER, PARAMETER :: IDF_ColourBySolution            =  1216
       END MODULE Druid_Header
