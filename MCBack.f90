@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE BackMCBruckner(nbruckwin)
+      SUBROUTINE BackMCBruckner(nbruckwin,mbruckiter,UseMC,UseSpline)
 
       USE WINTERACTER
 
@@ -12,7 +12,8 @@
       REAL     XBIN, YOBIN, YCBIN, YBBIN, EBIN
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
 
-        INTEGER,                  INTENT(IN   ) :: nbruckwin
+      INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
+      LOGICAL, INTENT (IN   ) :: UseMc, UseSpline
 
       INTEGER MAXSSPL
       PARAMETER (MAXSSPL=5000)
@@ -24,7 +25,7 @@
       INTEGER, DIMENSION(MOBS)            :: jft
       REAL                                tRandomNumber
       INTEGER I, II, IIII, I1, I2, KK, jf1, jf0, jfp1, jfn, n0, ndiv
-      INTEGER mbruckiter, iter, IILO, IIHI, nsep, ninsep, ngood
+      INTEGER iter, IILO, IIHI, nsep, ninsep, ngood
       INTEGER knotem, npartem
       INTRINSIC MOD
       REAL rat, stem
@@ -36,7 +37,6 @@
 !  and raise background to correct value using a Monte Carlo sampling procedure)
 !
       CALL WCursorShape(CurHourGlass)
-      mbruckiter = 20
       DO I = -nbruckwin, 0
         ys(I) = yobin(1)
       END DO
@@ -48,6 +48,11 @@
         ys(ii) = yobin(NBIN)
       END DO
       IIII = 0
+
+!U      DO I = 1, NBIN
+!U        ybbin(I) = 0.0
+!U      END DO
+
       DO iter = 1, mbruckiter
 ! Loop over data points
         DO I = 1, NBIN
@@ -60,58 +65,67 @@
           END DO
           ybbin(I) = (ybbin(I)-ys(I))/FLOAT(2 * nbruckwin)
         END DO
-        DO I = 1, NBIN
+! Use a Monte Carlo algorithm to find the correct height of the background
+        IF (UseMC) THEN
+          DO I = 1, NBIN
 ! rat = ratio?
-          rat = (ybbin(I)-ys(I))/ebin(I)
-          stem = 1.0 / (1.0 + EXP(MIN(20.0,-rat)))  
-          CALL RANDOM_NUMBER(tRandomNumber)
-          IF (tRandomNumber .LT. stem) ybbin(I) = ys(I)
-          ys(I) = ybbin(I)
-        END DO
+            rat = (ybbin(I)-ys(I))/ebin(I)
+            stem = 1.0 / (1.0 + EXP(MIN(20.0,-rat)))  
+            CALL RANDOM_NUMBER(tRandomNumber)
+            IF (tRandomNumber .LT. stem) ybbin(I) = ys(I)
+            ys(I) = ybbin(I)
+          END DO
+        ELSE
+          DO I = 1, NBIN
+            ys(I) = ybbin(I)
+          END DO
+        ENDIF
       END DO
 !.. Now we should do some spline smoothing to remove the noise 
-      nsep    =  5
-      ninsep  = 10
-      ngood   =  0
-      knotem  =  0  
-      npartem =  0
-      DO i = 1, NBIN
-        IF (ybbin(i) .EQ. yobin(i)) THEN
-          es(i) = 1.E6 * ebin(i)
-        ELSE
-          es(i) = ebin(i)
-          IF (MOD(ngood,nsep) .EQ. 0) THEN
-            IF (MOD(knotem,ninsep) .EQ. 0) THEN
-              npartem = npartem + 1
-              ipartem(npartem) = knotem + 1
+      IF (UseSpline) THEN
+        nsep    =  5
+        ninsep  = 10
+        ngood   =  0
+        knotem  =  0  
+        npartem =  0
+        DO i = 1, NBIN
+          IF (ybbin(i) .EQ. yobin(i)) THEN
+            es(i) = 1.E6 * ebin(i)
+          ELSE
+            es(i) = ebin(i)
+            IF (MOD(ngood,nsep) .EQ. 0) THEN
+              IF (MOD(knotem,ninsep) .EQ. 0) THEN
+                npartem = npartem + 1
+                ipartem(npartem) = knotem + 1
+              END IF
+              knotem = knotem + 1
+              ikt(knotem) = i
+              xkt(knotem) = xbin(i)
             END IF
-            knotem = knotem + 1
-            ikt(knotem) = i
-            xkt(knotem) = xbin(i)
+            ngood = ngood + 1
           END IF
-          ngood = ngood + 1
-        END IF
-      END DO
-      ikt(knotem) = NBIN
-      ipartem(npartem) = knotem
-      jft(1) = 1
-      jft(NBIN) = knotem - 1
-      DO kk = 1, knotem-1
-        i1 = ikt(kk)
-        i2 = ikt(kk+1) - 1
-        DO i = i1, i2
-          jft(i) = kk
         END DO
-      END DO
-      DO i = 1, npartem-1
-        jf1 = ipartem(i)
-        jf0 = jf1-1
-        jfp1 = ipartem(i+1)
-        jfn = 1 + jfp1 - ipartem(i)
-        n0 = ikt(jf1)
-        ndiv = 1 + ikt(jfp1) - n0
-        CALL SplineSmooth(xbin(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,ybbin(n0))
-      END DO
+        ikt(knotem) = NBIN
+        ipartem(npartem) = knotem
+        jft(1) = 1
+        jft(NBIN) = knotem - 1
+        DO kk = 1, knotem-1
+          i1 = ikt(kk)
+          i2 = ikt(kk+1) - 1
+          DO i = i1, i2
+            jft(i) = kk
+          END DO
+        END DO
+        DO i = 1, npartem-1
+          jf1 = ipartem(i)
+          jf0 = jf1-1
+          jfp1 = ipartem(i+1)
+          jfn = 1 + jfp1 - ipartem(i)
+          n0 = ikt(jf1)
+          ndiv = 1 + ikt(jfp1) - n0
+          CALL SplineSmooth(xbin(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,ybbin(n0))
+        END DO
+      ENDIF
       CALL WCursorShape(CurArrow)
 
       END SUBROUTINE BackMCBruckner
