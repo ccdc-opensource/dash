@@ -225,6 +225,90 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION Get_UseHydrogens
+
+! When .TRUE., each run in a multi run ends with a local minimisation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      Get_UseHydrogens = WDialogGetCheckBoxLogical(IDF_UseHydrogens)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_UseHydrogens
+!
+!*****************************************************************************
+!
+      SUBROUTINE Set_UseHydrogens(TheValue)
+
+! When .TRUE., each run in a multi run ends with a local minimisation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: TheValue
+
+      LOGICAL           LOG_HYDROGENS
+      COMMON /HYDROGEN/ LOG_HYDROGENS
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogPutCheckBoxLogical(IDF_UseHydrogens,TheValue)
+      LOG_HYDROGENS = TheValue
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_UseHydrogens
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION Get_AutoLocalMinimisation
+
+! When .TRUE., each run in a multi run ends with a local minimisation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      Get_AutoLocalMinimisation = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_AutoLocalMinimisation
+!
+!*****************************************************************************
+!
+      SUBROUTINE Set_AutoLocalMinimisation(TheValue)
+
+! When .TRUE., each run in a multi run ends with a local minimisation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: TheValue
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,TheValue)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_AutoLocalMinimisation
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION AutoLocalMinimisation
 
 ! When .TRUE., each run in a multi run ends with a local minimisation
@@ -1293,23 +1377,20 @@
 !*****************************************************************************
 !
 ! JCC Subroutine for controlling the configuration of the menus and tool buttons in DASH
-      SUBROUTINE SetModeMenuState(PeakOn,PawleyOn,SolutionOn)
+      SUBROUTINE SetModeMenuState(PeakOn,PawleyOn)
 ! If PeakOn is positive then peak fitting will be enabled
 ! If PawleyOn is positive then Pawley fitting will be enabled
-! Is SolutionOn is positive solving will be enabled
 ! If PeakOn is negative then peak fitting will be disabled
 ! If PawleyOn is negative then Pawley fitting will be disabled
-! Is SolutionOn is negative solving will be disabled
 ! If PeakOn is zero then the peak fitting state is left as is
 ! If PawleyOn is zero then the Pawley fitting state is left as is
-! Is SolutionOn is zero then the solving state is left as is
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: PeakOn, PawleyOn, SolutionOn
+      INTEGER, INTENT (IN   ) :: PeakOn, PawleyOn
 
       IF (PeakOn .GT. 0) THEN
         CALL WMenuSetState(ID_Peak_Fitting_Mode,ItemEnabled,WintOn)
@@ -1320,11 +1401,6 @@
         CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOn)
       ELSE IF (PawleyOn .LT. 0) THEN
         CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOff)
-      ENDIF
-      IF (SolutionOn .GT. 0) THEN
-        CALL WMenuSetState(ID_Structure_Solution_Mode,ItemEnabled,WintOn)
-      ELSE IF (SolutionOn .LT. 0) THEN
-        CALL WMenuSetState(ID_Structure_Solution_Mode,ItemEnabled,WintOff)
       ENDIF
 
       END SUBROUTINE SetModeMenuState
