@@ -283,6 +283,10 @@
 ! The initialisations should be split up into 'one off initialisations' (at the start up
 ! of DASH only) and 'whenever a new project file is opened'
       CALL WDialogSelect(IDD_SA_input3_2)
+      NS = 20
+      CALL WDialogPutInteger(IDF_SA_NS, NS)
+      NT = 25
+      CALL WDialogPutInteger(IDF_SA_NT, NT)
       DO I = 1, MVAR
         ModalFlag(I) = 0 ! 0 = not a torsion angle
       ENDDO
