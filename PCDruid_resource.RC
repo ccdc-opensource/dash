@@ -2889,11 +2889,11 @@ IDB_ZMatrix_Browse2             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse3             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse4             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse5             BITMAP DISCARDABLE "res\\OpenFile.bmp"
-IDB_ZmatrixDelete1              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
-IDB_ZmatrixDelete2              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
-IDB_ZmatrixDelete3              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
-IDB_ZmatrixDelete4              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
-IDB_ZmatrixDelete5              BITMAP DISCARDABLE "D:\\cvsDASH\\dash\\res\\DeleteFile.bmp"
+IDB_ZmatrixDelete1              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
+IDB_ZmatrixDelete2              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
+IDB_ZmatrixDelete3              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
+IDB_ZmatrixDelete4              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
+IDB_ZmatrixDelete5              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 
 ///////////////////////////////////////////////////
 //
