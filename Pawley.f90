@@ -59,13 +59,9 @@
       DATA RLastValues / 0.0,0.0,0.0 /
       DATA ILastValues / 0,0/
       SAVE RLastValues,ILastValues
-      CHARACTER(LEN=80) :: SDIFile
 ! Local variables logging errors in the pawley fit
       INTEGER PawleyEigError
       INTEGER PawleyErrorLog  
-      INTEGER KLEN
-      INTEGER ihcver,iticer,ipiker,iloger,idsler
-      INTEGER GETTIC ! Function
 
       ItemX=IXPos_IDD_Pawley_Status
       ItemY=IYPos_IDD_Pawley_Status
@@ -75,12 +71,6 @@
       CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
  555  CALL WDialogClearField(IDF_Pawley_Cycle_Number)
       CALL WDialogClearField(IDF_Pawley_Refinement_Number)
-! JCC Leave this information in place always
-!      CALL WDialogClearField(IDF_Pawley_Cycle_Rwp)
-!      CALL WDialogClearField(IDF_Pawley_Cycle_RwpExp)
-!      CALL WDialogClearField(IDF_Pawley_Cycle_ChiSq)
-!      CALL WDialogClearField(IDF_Pawley_Cycle_NumPts)
-!      CALL WDialogClearField(IDF_Pawley_Cycle_NumRefs)
       PawleyEigError = PawleyErrorLog(2) ! Reset the log messages
 
       CALL Quick_Pawley_Preparation 
@@ -96,10 +86,10 @@
 ! An error occurred, so pop up a box to say so and then
 ! skip this refinement
           CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk,           &
-     &        "The refinement was unsuccessful!"//CHAR(13)//            &
-     &            "Possible causes could be too many peak parameters"   &
-     &         //CHAR(13)//"or bad data at high angles.",               &
-     &        "Ill-conditioned refinement")
+             "The refinement was unsuccessful!"//CHAR(13)//            &
+                 "Possible causes could be too many peak parameters"   &
+              //CHAR(13)//"or bad data at high angles.",               &
+             "Ill-conditioned refinement")
 
 ! Reset the R-values if possible
           IF (LastValuesSet) THEN
@@ -120,10 +110,10 @@
             CALL WDialogHide()
 !>> This handles cases where the number of reflections is exceeded
             CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk,         &
-     &                     "Sorry, can only Pawley refine a maximum"//  &
-     &                     "of 400 reflections."//CHAR(13)//            &
-     &                     "You must truncate your data set"//CHAR(13), &
-     &                             "Refinement not possible")
+                          "Sorry, can only Pawley refine a maximum"//  &
+                          "of 400 reflections."//CHAR(13)//            &
+                          "You must truncate your data set"//CHAR(13), &
+                                  "Refinement not possible")
 !         IF (winfoDialog(4) .EQ. 1) THEN
 !                 CALL TruncateData(20.0)
 !         END IF
@@ -170,8 +160,6 @@
                 END IF
                 GOTO 555
                 CASE (IDB_PawRef_Accept)
-!T! This should be logically equivalent to saving the .sdi file
-!T! and retrieving it.
 !.. update the profile and stay with the Pawley refinement
 !.. upload the cell constants and zeropoint from the Pawley refinement
                   DO II=1,3
@@ -182,59 +170,8 @@
                   CALL Upload_Cell_Constants()
                   ZEROPOINT = ZEROSP(1,1,1)
                   CALL Upload_Zero_Point() 
-
-
-!T!.. Save the project
-!T                  SDIFile = 'TempFile.sdi'
-!T                  CALL CreateSDIFile(SDIFile)
-      
                   CALL Generate_TicMarks()
                   CALL Load_Pawley_Pro
-
-!T        DashDslFile = 'TempFile.dsl'
-!T        CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
-!T        DslExists = (idsler .EQ. 0)
-!T        IF (.NOT. DslExists) CALL DebugErrorMessage('Could not read DSL')
-!T
-!T!                  GOTO 5
-!T
-!T!C>> JCC Set to success in all cases
-!T      ihcver = 0
-!T      iloger = 0
-!T      iticer = 1
-!T      ipiker = 0
-!T! Now open all the appropriate PIK, TIC and HCV files
-!T
-!T        DashTicFile = 'TempFile.tic'
-!T        DashHcvFile = 'TempFile.hcv'
-!T        DashPikFile = 'TempFile.pik'
-!T        klen = LEN_TRIM(DashTicFile)
-!T        iticer = GETTIC(klen,DashTicFile)
-!T        IF (iticer .EQ. 0) TicExists = .FALSE.
-!T        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
-!T        HcvExists = (ihcver .EQ. 0)
-!T        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
-!T        PikExists = (ipiker .EQ. 0)
-!T!U      NOBS=NPTS
-!T!U      NBIN=NPTS
-!T!U      DO I=1,NBIN
-!T!U        XBIN(I)=ZARGI(I)
-!T!U        YOBIN(I)=ZOBS(I)
-!T!U        YCBIN(I)=ZCAL(I)
-!T!U        YBBIN(I)=ZBAK(I)
-!T!U        EBIN(I)=ZDOBS(I)
-!T!U        XOBS(I)=ZARGI(I)
-!T!U        YOBS(I)=ZOBS(I)
-!T!U        YCAL(I)=ZCAL(I)
-!T!U        YBAK(I)=ZBAK(I)
-!T!U        EOBS(I)=ZDOBS(I)
-!T!U      END DO
-!T        CALL Synchronize_Data()
-!T      IPTYPE=2
-!T      CALL Profile_Plot(IPTYPE)
-!T
-!T 5    CONTINUE
-
 !>> JCC Save the settings
                   CALL WDialogSelect(IDD_Pawley_Status)
                   CALL WDialogGetReal(IDF_Pawley_Cycle_Rwp,RLastValues(1)) 
@@ -464,9 +401,9 @@
  4210 FORMAT('N Polyfitter file for quick Pawley refinement')
       WRITE(42,4220) (CellPar(I),I=1,6)
  4220 FORMAT('C ',3F10.5,3F10.3)
-      write(42,4230) 
- 4230 format('F C 2 2.31 20.8439 1.02 10.2075 ',                        &
-     &'1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
+      WRITE(42,4230) 
+ 4230 FORMAT('F C 2 2.31 20.8439 1.02 10.2075 ',                        &
+      '1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
       IF (NumberSGTable.ge.1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin .GT. 0) THEN
@@ -478,9 +415,9 @@
       END IF
       WRITE(42,4240) NTCycles, ChRadOption(JRadOption)
  4240 FORMAT('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0'/              &
-     &'L REFI PAWL'/                                                    &
-     &'L SORC ', A4/                                                    &
-     &'L WGHT 3')
+      'L REFI PAWL'/                                                    &
+      'L SORC ', A4/                                                    &
+      'L WGHT 3')
       CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
       IRtyp = 2-Item
       WRITE(42,4245) IRTYP,xranmin,xranmax
@@ -491,19 +428,10 @@
       IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
       WRITE(42,4260) ZeroPoint
  4260 FORMAT('L ZERO ',F10.5)
-!>> JCC Was
-!      write(42,4270) SLIMVALUE
-! 4270 format('L SCAL   0.01000'/
-!     &'L SLIM 0.5'/
-!     &'L REFK 10.0'/
-!     &'L PKCN TYPE 1'/
-!     &'L PKFN TYPE 3'/
-!     &'L PKFN LIMS 0.005')
-!>> Now
       CALL WDialogGetReal(IDF_Slim_Parameter,SLIMVALUE)
       WRITE(42,4270) SCALFAC,SLIMVALUE
- 4270 FORMAT('L SCAL   ',f7.5,/                                         &
-     &'L SLIM ',f5.2,' '/                                               &
+ 4270 FORMAT('L SCAL   ',F7.5,/                                         &
+     &'L SLIM ',F5.2,' '/                                               &
      &'L REFK 10.0'/                                                    &
      &'L PKCN TYPE 1'/                                                  &
      &'L PKFN TYPE 3'/                                                  &
@@ -515,10 +443,10 @@
       WRITE(42,4273) PkFnVarVal(1,3)
       WRITE(42,4274) PkFnVarVal(1,4)
 
- 4271 FORMAT('L PKFN SIGM ',2f8.4)
- 4272 FORMAT('L PKFN GAMM ',2f8.4)
- 4273 FORMAT('L PKFN HPSL ',f8.4)
- 4274 FORMAT('L PKFN HMSL ',f8.4)
+ 4271 FORMAT('L PKFN SIGM ',2F8.4)
+ 4272 FORMAT('L PKFN GAMM ',2F8.4)
+ 4273 FORMAT('L PKFN HPSL ',F8.4)
+ 4274 FORMAT('L PKFN HMSL ',F8.4)
 !>>
 !>> JCC Error! NumPawleyRef hasalready been incremented ...
 ! Was      If (NumPawleyRef.eq.0) then
@@ -575,7 +503,7 @@
  4440 FORMAT('L VARY GAMM 2')
       CLOSE(42)    
 
-      END
+      END SUBROUTINE Quick_Pawley_Preparation
 !
 !*****************************************************************************
 !

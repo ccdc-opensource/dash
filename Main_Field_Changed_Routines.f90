@@ -80,7 +80,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithPlotOptionsWindow')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithPlotOptionsWindow
 !
@@ -142,7 +141,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithStructuralInformation')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithStructuralInformation
 !
@@ -192,7 +190,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithDiffractionSetupPane')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithDiffractionSetupPane
 !
@@ -225,7 +222,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithPeakPositionsPane')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithPeakPositionsPane
 !
@@ -346,7 +342,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithCrystalSymmetryPane
 !
@@ -400,7 +395,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithIndexPreparation
 !
@@ -693,8 +687,11 @@
 !     5 = Cr
 !     6 = Fe
 
-      IF ((Iselection .GE. 2) .AND. (Iselection .LE. 6)) CALL UpdateWavelength(FnWavelengthOfMenuOption(Iselection))
-      RETURN
+      IF ((Iselection .GE. 2) .AND. (Iselection .LE. 6)) THEN
+        CALL UpdateWavelength(FnWavelengthOfMenuOption(Iselection))
+      ELSE
+        CALL DebugErrorMessage('Non-existing item addressed in anode material menu')
+      ENDIF
 
       END SUBROUTINE SetWavelengthToSelection
 !
@@ -744,13 +741,12 @@
           CALL DebugErrorMessage('Programming error in FnWavelengthOfMenuOption')
           FnWavelengthOfMenuOption = 0.0
       END SELECT
-      RETURN
 
       END FUNCTION FnWavelengthOfMenuOption
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION GetCrystalSystem_2(IDashSg)
+      INTEGER FUNCTION GetCrystalSystem(IDashSg)
 !
 ! This function determines the crystal system given one of the 530 space groups in DASH
 
@@ -764,15 +760,14 @@
 
       DO I = 2, 11
         IF (IDashSg .LT. LPosSG(I)) THEN
-          GetCrystalSystem_2 = I - 1
+          GetCrystalSystem = I - 1
           RETURN
         ENDIF
       ENDDO
       CALL DebugErrorMessage('Space group out of range.')
-      GetCrystalSystem_2 = 1 ! Triclininc
-      RETURN
+      GetCrystalSystem = 1 ! Triclininc
 
-      END FUNCTION GetCrystalSystem_2
+      END FUNCTION GetCrystalSystem
 !
 !*****************************************************************************
 !
@@ -810,7 +805,6 @@
       ELSE
         CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOff)
       END IF
-      RETURN
 
       END SUBROUTINE SetWizardState
 !
@@ -850,7 +844,6 @@
       ELSE IF (SolutionOn .LT. 0) THEN
         CALL WMenuSetState(ID_Structure_Solution_Mode,ItemEnabled,WintOff)
       END IF
-      RETURN
 
       END SUBROUTINE SetModeMenuState
 !

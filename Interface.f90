@@ -153,10 +153,15 @@
       INTEGER I, IRadSelection
       REAL    FnWavelengthOfMenuOption ! Function
 
-      IF ((TheWaveLength .GT. 0.1) .AND. (TheWaveLength .LT. 20.0)) THEN
-        ALambda = TheWaveLength
+      IF ((TheWaveLength .LT. 0.01) .OR. (TheWaveLength .GT. 20.0)) THEN
+        CALL ErrorMessage('Invalid wavelength')
+        RETURN
       ENDIF
+      IF (TheWaveLength .EQ. ALambda) RETURN
+      ALambda = TheWaveLength
       CALL PushActiveWindowID
+! This is the right place to update the maximum resolution (even if it's not necessary)
+
       CALL WDialogSelect(IDD_Data_Properties)
       CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_PW_Page2)
@@ -208,7 +213,7 @@
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
 
-      COMMON /PROFTIC/ NTic,IH(3,MTic),ArgK(MTic),DStar(MTic)
+      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
         PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
