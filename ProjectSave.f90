@@ -66,8 +66,6 @@
 ! Effectively, this routine is just a wrapper around the PrjFileOpen routine
 ! such that it lets the user visually select a file first.
 !
-      USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
       USE PRJVAR
 
@@ -142,7 +140,6 @@
 !
 ! This subroutine saves the project file.
 !
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE PRJVAR
@@ -190,8 +187,6 @@
       COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
       INTEGER, EXTERNAL :: GetCrystalSystem
-      LOGICAL, EXTERNAL :: FnPatternOK, FnWavelengthOK
-      REAL, EXTERNAL :: TwoTheta2dSpacing
       INTEGER I, j, RW
       CHARACTER*(255) tString 
 
@@ -226,11 +221,8 @@
         LatBrav = GetCrystalSystem(NumberSGTable)
         CALL Upload_CrystalSystem
       ENDIF
-
       CALL PrjErrTrace
-
 ! Read / Write Pawley refinement related stuff
-
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PAWLEYCHISQ)
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeSigma(1))
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeSigma(2))
@@ -238,13 +230,10 @@
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeGamma(2))
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeHPSL)
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeHMSL)
-
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,SlimValue)
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ScalFac)
 ! RAW .\Example.xye ! @@@@ include ??
-
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NBIN)
-
 ! Read / Write the .pik file
 !            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
 !        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
@@ -303,6 +292,7 @@
         NoData = .FALSE.
         CALL GetProfileLimits
         CALL Get_IPMaxMin 
+        CALL Update_TruncationLimits
         IPTYPE = 1
 ! Calculate tick marks
         PastPawley = .FALSE.
@@ -310,18 +300,12 @@
         PastPawley = .TRUE.
         CALL Profile_Plot
       ENDIF
-
       CALL PrjErrTrace
-
       CALL PrjReadWriteIntensities
-
       CALL PrjErrTrace
-
 ! Read / Write the Z-matrices
       CALL PrjReadWriteZmatrices
-
       CALL PrjErrTrace
-
 ! Read / Write Preferred Orientation
       CALL PrjReadWritePO
       IF (RW .EQ. cRead) THEN
@@ -329,16 +313,12 @@
         CALL GET_LOGREF
         CALL MakRHm
       ENDIF
-
       CALL PrjErrTrace
-
 ! Update ranges and fixed yes/no per parameter
       IF (RW .EQ. cRead) CALL SA_Parameter_Set
 ! Read / Write solutions
       CALL PrjReadWriteSolutions
-
       CALL PrjErrTrace
-
       IF (RW .EQ. cRead) THEN
         CALL WDialogSelect(IDD_ViewPawley)
         CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
@@ -351,10 +331,6 @@
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
         CALL WDialogSelect(IDD_PW_Page8)
         CALL WDialogFieldState(IDB_PrevRes,Disabled)
-        IF (FnPatternOK() .AND. FnWavelengthOK()) THEN
-          CALL WDialogSelect(IDD_ViewPawley)
-          CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(RefArgK(NumOfRef)))
-        ENDIF
         BackRef = .FALSE.
         CALL SetModeMenuState(0,1)
 ! Change global variable FNAME
@@ -362,7 +338,6 @@
 ! Update this throughout the program (Wizard + status bar)
         CALL ScrUpdateFileName
       ENDIF
-
       CLOSE(hPrjFile)
       CALL PopActiveWindowID
       RETURN
@@ -378,7 +353,6 @@
 !
 ! Read or writes information on solutions to / from binary project file.
 !
-      USE WINTERACTER
       USE DRUID_HEADER
       USE PRJVAR
       USE SOLVAR
@@ -587,9 +561,9 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
       INTEGER iFrg, RW, iAtomNr
       REAL    tReal
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
 ! The following variables are there to allow the dialogue fields in the
 ! window dealing with Z-matrices to be handled by DO...ENDDO loops.
