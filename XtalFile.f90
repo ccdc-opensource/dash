@@ -94,7 +94,7 @@
       INTEGER nl, iStat, iStart
       CHARACTER(20) KeyChar
       CHARACTER(5) fmt
-      INTEGER iFrg, iFrgCopy
+      INTEGER iFrg
       INTEGER KK, I, ExtLen
       INTEGER iLen, iPos
 
@@ -188,7 +188,6 @@
         CASE ('z-m')                                ! Z-matrix file
           iFrg = iFrg + 1
           ! Following lines do not take copies of Z-matrices into account
-          zmNumberOfCopies(iFrg) = 1
           IF (iFrg .GT. maxfrg) GOTO 100
           frag_file(iFrg) = line(ILocateChar(line):)
           IF (Read_One_ZM(iFrg) .EQ. 0) THEN ! successful read
@@ -202,9 +201,9 @@
             IF (iFrg .NE. 0) THEN
               CALL INextString(line,keychar)
               CALL INextString(line,keychar)
-              CALL INextReal(line,RR_tran(1,iFrg,1))
-              CALL INextReal(line,RR_tran(2,iFrg,1))
-              CALL INextReal(line,RR_tran(3,iFrg,1))
+              CALL INextReal(line,RR_tran(1,iFrg))
+              CALL INextReal(line,RR_tran(2,iFrg))
+              CALL INextReal(line,RR_tran(3,iFrg))
             ENDIF
           ENDIF
         CASE ('cry')                                ! "Crystallographic centre of mass"
@@ -213,17 +212,17 @@
               CALL INextString(line,keychar)
               CALL INextString(line,keychar)
               CALL INextString(line,keychar)
-              CALL INextReal(line,RR_tran(1,iFrg,1))
-              CALL INextReal(line,RR_tran(2,iFrg,1))
-              CALL INextReal(line,RR_tran(3,iFrg,1))
+              CALL INextReal(line,RR_tran(1,iFrg))
+              CALL INextReal(line,RR_tran(2,iFrg))
+              CALL INextReal(line,RR_tran(3,iFrg))
             ENDIF
           ENDIF
         CASE ('qua')                                ! "Quaternion"
           IF (iFrg .NE. 0) THEN
-            CALL INextReal(line,RR_rot(1,iFrg,1))
-            CALL INextReal(line,RR_rot(2,iFrg,1))
-            CALL INextReal(line,RR_rot(3,iFrg,1))
-            CALL INextReal(line,RR_rot(4,iFrg,1))
+            CALL INextReal(line, RR_rot(1,iFrg))
+            CALL INextReal(line, RR_rot(2,iFrg))
+            CALL INextReal(line, RR_rot(3,iFrg))
+            CALL INextReal(line, RR_rot(4,iFrg))
           ENDIF
       END SELECT
       GOTO 10 
@@ -233,35 +232,33 @@
       KK = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            ! Translations
-            BestValuesDoF(KK+1,1) = RR_tran(1,iFrg,iFrgCopy)
-            BestValuesDoF(KK+2,1) = RR_tran(2,iFrg,iFrgCopy)
-            BestValuesDoF(KK+3,1) = RR_tran(3,iFrg,iFrgCopy)
-            KK = KK +3
-            ! Rotations
-            IF (natoms(iFrg) .GT. 1) THEN
-              BestValuesDoF(KK+1,1) = RR_rot(1,iFrg,iFrgCopy)
-              BestValuesDoF(KK+2,1) = RR_rot(2,iFrg,iFrgCopy)
-              BestValuesDoF(KK+3,1) = RR_rot(3,iFrg,iFrgCopy)
-              BestValuesDoF(KK+4,1) = RR_rot(4,iFrg,iFrgCopy)
-              KK = KK +4
+          ! Translations
+          BestValuesDoF(KK+1,1) = RR_tran(1,iFrg)
+          BestValuesDoF(KK+2,1) = RR_tran(2,iFrg)
+          BestValuesDoF(KK+3,1) = RR_tran(3,iFrg)
+          KK = KK +3
+          ! Rotations
+          IF (natoms(iFrg) .GT. 1) THEN
+            BestValuesDoF(KK+1,1) = RR_rot(1,iFrg)
+            BestValuesDoF(KK+2,1) = RR_rot(2,iFrg)
+            BestValuesDoF(KK+3,1) = RR_rot(3,iFrg)
+            BestValuesDoF(KK+4,1) = RR_rot(4,iFrg)
+            KK = KK +4
+          ENDIF
+          ! Torsions
+          DO I = 1, natoms(iFrg)
+            IF (IOPTB(I,iFrg) .EQ. 1) THEN
+              KK = KK + 1
+              BestValuesDoF(KK,1) = BLEN(I,iFrg)
             ENDIF
-            ! Torsions
-            DO I = 1, natoms(iFrg)
-              IF (IOPTB(I,iFrg) .EQ. 1) THEN
-                KK = KK + 1
-                BestValuesDoF(KK,1) = BLEN(I,iFrg) ! No copies taken into account!!!!
-              ENDIF
-              IF (IOPTA(I,iFrg) .EQ. 1) THEN
-                KK = KK + 1
-                BestValuesDoF(KK,1) = ALPH(I,iFrg) ! No copies taken into account!!!!
-              ENDIF
-              IF (IOPTT(I,iFrg) .EQ. 1) THEN
-                KK = KK + 1
-                BestValuesDoF(KK,1) = BET(I,iFrg) ! No copies taken into account!!!!
-              ENDIF
-            ENDDO
+            IF (IOPTA(I,iFrg) .EQ. 1) THEN
+              KK = KK + 1
+              BestValuesDoF(KK,1) = ALPH(I,iFrg)
+            ENDIF
+            IF (IOPTT(I,iFrg) .EQ. 1) THEN
+              KK = KK + 1
+              BestValuesDoF(KK,1) = BET(I,iFrg)
+            ENDIF
           ENDDO
         ENDIF
       ENDDO

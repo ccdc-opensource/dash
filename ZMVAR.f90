@@ -12,16 +12,13 @@
 ! f2cmat = 3x3 matrix for conversion from fractional to Cartesian  coordinates 
 ! c2fmat = 3x3 matrix for conversion from Cartesian  to fractional coordinates 
 
-      INTEGER maxatm
+      INTEGER     maxatm
       PARAMETER ( maxatm = 150 )
 
-      INTEGER maxcopies
-      PARAMETER ( maxcopies = 8 )
-
-      INTEGER maxfrg
+      INTEGER     maxfrg
       PARAMETER ( maxfrg = 32 )
 
-      INTEGER maxfrginterface
+      INTEGER     maxfrginterface
       PARAMETER ( maxfrginterface = 6 )
 
 ! maxfrg = Maximum number of fragments = individual Z-matrices.
@@ -32,51 +29,28 @@
 ! In variables declared as (0:maxfrg), position 0 is reserved for a temporary copy
 ! used when editing a Z-matrix.
 
-      INTEGER MaxDOF
+      INTEGER     MaxDOF
       PARAMETER ( MaxDOF = 50 )
+! MaxDOF = Maximum number of degrees of freedom per fragment (= per individual Z-matrix)
 
       INTEGER     MVAR_2
       PARAMETER ( MVAR_2 = 100 )
 
-! MaxDOF = Maximum number of degrees of freedom per fragment (= per individual Z-matrix)
-
-      INTEGER maxbnd_2
+      INTEGER     maxbnd_2
       PARAMETER ( maxbnd_2 = 1500 )
-
 ! Maximum number of bonds. Must be equal to MAXBND in SAMVAR
 
       INTEGER Par2iFrg(1:MVAR_2)
-
 ! Per SA parameter, to which Z-matrix does it belong. 0 = non-structural, e.g. preferred orientation
 
-      INTEGER Par2iFrgCopy(1:MVAR_2)
-
-! Per SA parameter, to which copy of the Z-matrix does it belong.
-
-      INTEGER zm2Par(1:MaxDOF, 1:maxcopies, 1:maxfrg)
-
-! Mapping of parameters per degree of freedom per copy per Z-matrix
+      INTEGER zm2Par(1:MaxDOF, 1:maxfrg)
+! Mapping of parameters per degree of freedom per Z-matrix
 
       INTEGER          nfrag
-
 ! nfrag = number of fragments
 
-      INTEGER          TotNumZMatrices
-
-! Total number of Z-matrices, including number of copies
-
       CHARACTER*255    frag_file(0:maxfrg)
-
 ! frag_file = name of the .zmatrix file containing fragment number iFrag
-
-      INTEGER          zmNumberOfCopies(0:maxfrg)
-
-! zmNumberOfCopies  =  number of copies of this Z-matrix used during the SA.
-!                      This way, it is easy e.g. to solve salts or solve structures in P1
-!                      Each copy is identical (including occupancies / single axis) except for:
-!                      1. its translation x, y, z
-!                      2. its quaternions
-!                      3. its torsion angles/valence angles/bond lengths
 
       LOGICAL          gotzmfile(0:maxfrg)
 
@@ -99,15 +73,15 @@
 ! 1 = to atom
 ! 2 = fractional co-ordinates
 ! 3 = normal to plane
-      INTEGER  zmSingleRotAxAtm(0:maxfrg)
+
+      INTEGER  zmSingleRotAxAtm(1:2, 0:maxfrg)
       REAL     zmSingleRotAxFrac(1:3, 0:maxfrg)
       INTEGER  zmSingleRotAxAtms(1:3, 0:maxfrg)
       REAL     zmSingleRotationQs(0:3, 0:maxfrg)
-
-! zmSingleRotAxAtm
-! zmSingleRotAxFrac
-! zmSingleRotAxAtms : the three atoms defining a plane the normal of which is the direction of rotation
-!                     These numbers are enterd by the users according to their numbering scheme,
+! zmSingleRotAxAtm  : Line through two atoms
+! zmSingleRotAxFrac : Fractional co-ordinates
+! zmSingleRotAxAtms : Three atoms defining a plane the normal of which is the direction of rotation
+!                     These numbers are entered by the users according to their numbering scheme,
 !                     but stored in the DASH numbering
 ! zmSingleRotationQs   = Factors in the quaternion-expression of the rotation about a single axis
 !                        which are due to the orientation of the single axis
@@ -145,11 +119,8 @@
       REAL blen(1:maxatm, 0:maxfrg), alph(1:maxatm, 0:maxfrg), bet(1:maxatm, 0:maxfrg)
 
 ! blen   = bond length     (wrt iz1)
-! No copies taken into account!!!!
 ! alph   = valence angle   (wrt iz1 & iz2)
-! No copies taken into account!!!!
 ! bet    = torsion angle   (wrt iz1, iz2 & iz3)
-! No copies taken into account!!!!
 
       CHARACTER*3     asym(1:maxatm, 0:maxfrg)
       INTEGER         zmElementCSD(1:maxatm, 0:maxfrg)
