@@ -308,7 +308,6 @@
         izmoid(0,I) = 0
         izmbid(0,I) = 0
       ENDDO
-      CALL Clear_ExclRegions
       CALL Clear_SA
       UseQuaternions = .TRUE.
 ! Initialise arrays to do with administration of open child windows

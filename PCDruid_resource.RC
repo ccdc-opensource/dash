@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 15/Jul/2003 09:38:29
+// Modified : 15/Jul/2003 10:59:22
 //
 ///////////////////////////////////////////////////
 //
@@ -503,9 +503,6 @@
 #define IDF_FileName                     1393
 #define IDF_BisoOccValue                 1394
 #define IDF_LABEL3                       1395
-#define IDD_ExclRegions                   163
-#define IDD_TEMPLATE015                   164
-#define IDF_ExclRegionsGrid              1396
 #define IDB_ReOrder                      1400
 #define IDBSAVE                          1403
 #define IDB_Rotations                    1405
@@ -617,7 +614,6 @@
 #define IDF_Beta                         1249
 #define IDF_Gamma                        1250
 #define IDD_ViewPawley                    127
-#define IDB_ClearAll                     1406
 #define IDM_ViewPawley                  40030
 #define IDF_CHECK7                       1248
 #define IDF_ShowCumChiSqd                1408
@@ -2962,52 +2958,6 @@ BEGIN
 "[Lengths] \n"
 " 1021     5 \n"
 " 1066     2 \n"
-,0
-END
-
-IDD_ExclRegions DIALOG 0, 0,  152,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
-FONT    8, "MS Sans Serif"
-CAPTION "Excluded Regions"
-BEGIN
-    CONTROL "",IDF_ExclRegionsGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   21,   10,  110,  116
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   90,  143,   40,   14
-    CONTROL "Clear &All",IDB_ClearAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   22,  143,   40,   14
-END
-
-IDD_ExclRegions RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-" 1396     2     10   164 \n"
-"   20 \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_TEMPLATE015 DIALOG 0, 0, 1000,   16
-STYLE DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Start",ISS1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE,    0,    0,   40,   14
-    CONTROL "End",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE,    0,    0,   40,   14
-END
-
-IDD_TEMPLATE015 RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
 ,0
 END
 
