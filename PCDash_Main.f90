@@ -198,7 +198,7 @@
 
       LOGICAL, EXTERNAL :: Confirm
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      INTEGER, EXTERNAL :: DiffractionFileBrowse, PrjSave, PrjSaveAs
+      INTEGER, EXTERNAL :: DiffractionFileBrowse
       REAL xpgdif, ypgdif
       INTEGER ISTAT, tInt1, tInt2
       INTEGER tCurrentRange
