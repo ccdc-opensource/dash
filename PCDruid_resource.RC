@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 22/Apr/2004 10:32:09
+// Modified : 22/Apr/2004 11:24:03
 //
 ///////////////////////////////////////////////////
 //
@@ -1300,18 +1300,18 @@ FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard"
 BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "This wizard leads you through the DASH options ranging from viewing diffraction data to full molecular structure solution using simulated annealing.",IDF_PW01_Text1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  132,   28,  182,   24
+    CONTROL "This wizard leads you through the DASH options ranging from viewing diffraction data to full molecular structure solution using simulated annealing.",IDF_PW01_Text1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  132,   26,  182,   24
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "",IDF_WelcomeWizard,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,  114,    7,  220,   16
+    CONTROL "",IDF_WelcomeWizard,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,  114,    5,  220,   16
     CONTROL "<&Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
-    CONTROL "DASH options",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  130,   53,  186,   94
+    CONTROL "DASH options",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  130,   52,  186,   94
     CONTROL "&View data / determine peak positions",IDF_PW_Option1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,   62,  132,   14
-    CONTROL "Preparation for &Pawley refinement",IDF_PW_Option2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,   76,  132,   14
-    CONTROL "Preparation of s&ingle crystal data",IDF_PW_Option3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,   90,  132,   14
-    CONTROL "&Simulated annealing structure solution",IDF_PW_Option4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,  104,  132,   14
-    CONTROL "&Analyse solutions",IDF_PW_Option5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,  118,  132,   14
-    CONTROL "&Rietveld refinement",IDF_PW_Option6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,  132,  132,   14
+    CONTROL "Preparation for &Pawley refinement",IDF_PW_Option2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,   75,  132,   14
+    CONTROL "Preparation of s&ingle crystal data",IDF_PW_Option3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,   88,  132,   14
+    CONTROL "&Simulated annealing structure solution",IDF_PW_Option4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,  102,  132,   14
+    CONTROL "&Analyse solutions",IDF_PW_Option5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,  115,  132,   14
+    CONTROL "&Rietveld refinement",IDF_PW_Option6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,  128,  132,   14
 END
 
 IDD_Polyfitter_Wizard_01 RCDATA
