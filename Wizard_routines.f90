@@ -72,6 +72,11 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) &
+        RETURN
 ! Hide any visible Wizard window
       CALL WizardWindowHide
       CALL WDialogSelect(TheDialogID)
