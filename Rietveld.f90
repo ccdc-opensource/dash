@@ -1026,6 +1026,7 @@
       USE VARIABLES
       USE ZMVAR
       USE RRVAR
+      USE SAMVAR
 
       IMPLICIT NONE
 
@@ -1048,8 +1049,8 @@
       LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
       INTEGER KATOM, i, KI
       INTEGER iFrg
-      REAL CKK1, CKK2, CKK3, TRAN(1:3)
-      REAL QQSUM, QDEN, QUATER(0:3), tQ(0:3), ROTA(1:3,1:3), CART(1:3,1:MAXATM), Duonion(0:1)
+      REAL TRAN(1:3)
+      REAL QQSUM, QDEN, QUATER(0:3), tQ(0:3), ROTA(1:3,1:3), Duonion(0:1)
       INTEGER JQ, ICFRG
       REAL XC, YC, ZC
 
@@ -1060,12 +1061,7 @@
         RR_tran(1,iFrg) = RR_tran(1,iFrg) - INT(RR_tran(1,iFrg))
         RR_tran(2,iFrg) = RR_tran(2,iFrg) - INT(RR_tran(2,iFrg))
         RR_tran(3,iFrg) = RR_tran(3,iFrg) - INT(RR_tran(3,iFrg))
-        CKK1 = RR_tran(1,iFrg)
-        CKK2 = RR_tran(2,iFrg)
-        CKK3 = RR_tran(3,iFrg)
-        TRAN(1) = CKK1*F2CMAT(1,1) + CKK2*F2CMAT(1,2) + CKK3*F2CMAT(1,3)
-        TRAN(2) = CKK1*F2CMAT(2,1) + CKK2*F2CMAT(2,2) + CKK3*F2CMAT(2,3)
-        TRAN(3) = CKK1*F2CMAT(3,1) + CKK2*F2CMAT(3,2) + CKK3*F2CMAT(3,3)
+        CALL PremultiplyVectorByMatrix(f2cmat, RR_tran(1,iFrg), TRAN)
 ! If more than one atom then proceed
         IF (natoms(iFrg) .GT. 1) THEN
 ! If we have at least two atoms, there are two options:
@@ -1082,7 +1078,7 @@
               QUATER(JQ) = QDEN * RR_rot(JQ+1,iFrg)
             ENDDO
 ! QUATER now holds the normalised quaternions
-            CALL ROTMAK(QUATER,ROTA)
+            CALL Quaternion2Matrix(QUATER, ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the quaternions
           ELSE
 ! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
@@ -1098,20 +1094,13 @@
 ! QUATER now holds the normalised quaternion corresponding to the single rotation axis
 ! Now premultiply with the original molecular orientation (JvdS I don't understand why
 ! they must be premultiplied: I would say they should be postmultiplied)
-            tQ(0) =   QUATER(0)*zmInitialQs(0,iFrg) - QUATER(1)*zmInitialQs(1,iFrg) &
-                    - QUATER(2)*zmInitialQs(2,iFrg) - QUATER(3)*zmInitialQs(3,iFrg)
-            tQ(1) =   QUATER(0)*zmInitialQs(1,iFrg) + QUATER(1)*zmInitialQs(0,iFrg) &
-                    - QUATER(2)*zmInitialQs(3,iFrg) + QUATER(3)*zmInitialQs(2,iFrg)
-            tQ(2) =   QUATER(0)*zmInitialQs(2,iFrg) + QUATER(1)*zmInitialQs(3,iFrg) &
-                    + QUATER(2)*zmInitialQs(0,iFrg) - QUATER(3)*zmInitialQs(1,iFrg)
-            tQ(3) =   QUATER(0)*zmInitialQs(3,iFrg) - QUATER(1)*zmInitialQs(2,iFrg) &
-                    + QUATER(2)*zmInitialQs(1,iFrg) + QUATER(3)*zmInitialQs(0,iFrg)
-            CALL ROTMAK(tQ,ROTA)
+            CALL QuaternionMultiply(zmInitialQs(0,iFrg), QUATER, tQ)  
+            CALL Quaternion2Matrix(tQ, ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the single rotation axis
           ENDIF
         ENDIF
         CALL makexyz(natoms(iFrg),RR_blen(1,iFrg),RR_alph(1,iFrg),RR_bet(1,iFrg),        &
-                     IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+                     IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),axyzo)
 ! Determine origin for rotations
         ICFRG = ICOMFLG(iFrg)
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
@@ -1121,15 +1110,15 @@
           ZC = 0.0
           IF (Get_UseCrystallographicCoM()) THEN
             DO I = 1, natoms(iFrg)
-              XC = XC + AtomicWeighting(I,iFrg)*CART(1,I)
-              YC = YC + AtomicWeighting(I,iFrg)*CART(2,I)
-              ZC = ZC + AtomicWeighting(I,iFrg)*CART(3,I)
+              XC = XC + AtomicWeighting(I,iFrg)*axyzo(1,I)
+              YC = YC + AtomicWeighting(I,iFrg)*axyzo(2,I)
+              ZC = ZC + AtomicWeighting(I,iFrg)*axyzo(3,I)
             ENDDO
           ELSE
             DO I = 1, natoms(iFrg)
-              XC = XC + CART(1,I)
-              YC = YC + CART(2,I)
-              ZC = ZC + CART(3,I)
+              XC = XC + axyzo(1,I)
+              YC = YC + axyzo(2,I)
+              ZC = ZC + axyzo(3,I)
             ENDDO
             XC = XC/FLOAT(natoms(iFrg))
             YC = YC/FLOAT(natoms(iFrg))
@@ -1137,27 +1126,25 @@
           ENDIF
 ! Otherwise, use atom number ICFRG
         ELSE
-          XC = CART(1,ICFRG)
-          YC = CART(2,ICFRG)
-          ZC = CART(3,ICFRG)
+          XC = axyzo(1,ICFRG)
+          YC = axyzo(2,ICFRG)
+          ZC = axyzo(3,ICFRG)
         ENDIF
 ! Subtract the origin from all atom positions
         DO I = 1, natoms(iFrg)
-          CART(1,I) = CART(1,I) - XC
-          CART(2,I) = CART(2,I) - YC
-          CART(3,I) = CART(3,I) - ZC
+          axyzo(1,I) = axyzo(1,I) - XC
+          axyzo(2,I) = axyzo(2,I) - YC
+          axyzo(3,I) = axyzo(3,I) - ZC
         ENDDO
 ! Apply rotation and translation to the atoms of this Z-matrix
-        CALL DO_ATOM_POS(TRAN,ROTA,CART,natoms(iFrg))
+        CALL DO_ATOM_POS(TRAN, ROTA, axyzo, natoms(iFrg))
 ! When we are here, we have the actual co-ordinates of all the atoms in this Z-matrix
 ! in Cartesian (orthogonal) co-ordinates. We need fractional co-ordinates: convert.
         DO I = 1, natoms(iFrg)
           KI = KATOM + I
 ! Note that we must reorder the atoms such that the hydrogens are appended after the 
 ! non-hydrogens.
-          XATO(1,OrderedAtm(KI)) = CART(1,I)*c2fmat(1,1) + CART(2,I)*c2fmat(1,2) + CART(3,I)*c2fmat(1,3)
-          XATO(2,OrderedAtm(KI)) = CART(1,I)*c2fmat(2,1) + CART(2,I)*c2fmat(2,2) + CART(3,I)*c2fmat(2,3)
-          XATO(3,OrderedAtm(KI)) = CART(1,I)*c2fmat(3,1) + CART(2,I)*c2fmat(3,2) + CART(3,I)*c2fmat(3,3)
+          CALL PremultiplyVectorByMatrix(c2fmat, axyzo(1,I), XATO(1,OrderedAtm(KI)))
         ENDDO
         KATOM = KATOM + natoms(iFrg)
       ENDDO
@@ -1205,7 +1192,7 @@
       CHARACTER*2 SolStr
       INTEGER AtomLabelOption, AtomColourOption
       INTEGER I, iFrg, J, iiact, BondNr
-      REAL    xc, yc, zc
+      REAL    x_pdb(1:3)
       INTEGER iAtom
       INTEGER hFilePDB
 
@@ -1233,33 +1220,28 @@
       SolStr = "_O"
 ! Note that elements are right-justified
       IF (AtomColourOption .EQ. 1) THEN ! Colour by solution
-        ColourStr = 'Co'  ! Cobalt        Blue
+        ColourStr = ' S'  ! Sulphur        Yellow
       ENDIF
       iAtom = 0
       DO iFrg = 1, nFrag
         DO i = 1, natoms(iFrg)
           iiact = iiact + 1
           iAtom = iAtom + 1
-          xc = RR_XATO_Orig(1,OrderedAtm(iAtom)) * f2cpdb(1,1) + &
-               RR_XATO_Orig(2,OrderedAtm(iAtom)) * f2cpdb(1,2) + &
-               RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(1,3)
-          yc = RR_XATO_Orig(2,OrderedAtm(iAtom)) * f2cpdb(2,2) + &
-               RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(2,3)
-          zc = RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(3,3)
+          CALL PremultiplyVectorByMatrix(f2cpdb, RR_XATO_Orig(1,OrderedAtm(iAtom)), x_pdb)
 ! Note that elements are right-justified
           IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
-            IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
-              ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
+            IF (ElSym(i,iFrg)(2:2) .EQ. ' ') THEN
+              ColourStr(1:2) = ' '//ElSym(i,iFrg)(1:1)
             ELSE
-              ColourStr(1:2) = asym(i,iFrg)(1:2)
+              ColourStr = ElSym(i,iFrg)
             ENDIF
           ENDIF
           IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
-            LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
+            LabelStr = ElSym(i,iFrg)(1:LEN_TRIM(ElSym(i,iFrg)))//SolStr
           ELSE  ! Orignal atom labels
             LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
           ENDIF
-          WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
+          WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), x_pdb(1), x_pdb(2), x_pdb(3), occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
  1120     FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
         ENDDO ! loop over atoms
       ENDDO ! loop over Z-matrices
@@ -1274,26 +1256,21 @@
         DO i = 1, natoms(iFrg)
           iiact = iiact + 1
           iAtom = iAtom + 1
-          xc = Xato(1,OrderedAtm(iAtom)) * f2cpdb(1,1) + &
-               Xato(2,OrderedAtm(iAtom)) * f2cpdb(1,2) + &
-               Xato(3,OrderedAtm(iAtom)) * f2cpdb(1,3)
-          yc = Xato(2,OrderedAtm(iAtom)) * f2cpdb(2,2) + &
-               Xato(3,OrderedAtm(iAtom)) * f2cpdb(2,3)
-          zc = Xato(3,OrderedAtm(iAtom)) * f2cpdb(3,3)
+          CALL PremultiplyVectorByMatrix(f2cpdb, Xato(1,OrderedAtm(iAtom)), x_pdb)
 ! Note that elements are right-justified
           IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
-            IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
-              ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
+            IF (ElSym(i,iFrg)(2:2) .EQ. ' ') THEN
+              ColourStr(1:2) = ' '//ElSym(i,iFrg)(1:1)
             ELSE
-              ColourStr(1:2) = asym(i,iFrg)(1:2)
+              ColourStr = ElSym(i,iFrg)
             ENDIF
           ENDIF
           IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
-            LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
+            LabelStr = ElSym(i,iFrg)(1:LEN_TRIM(ElSym(i,iFrg)))//SolStr
           ELSE  ! Orignal atom labels
             LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
           ENDIF
-          WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
+          WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), x_pdb(1), x_pdb(2), x_pdb(3), occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
         ENDDO ! loop over atoms
       ENDDO ! loop over Z-matrices
 ! Per Z-matrix, determine the connectivity. This has to be done only once.
@@ -1385,7 +1362,7 @@
       INTEGER tLen1, tLen2, NumOfAtmPerElm(1:MaxElm), iScat, K1, tElement
       CHARACTER(MaxPathLength) :: tFileName
       CHARACTER(LEN=255) :: FILTER
-      REAL    xc, yc, zc
+      REAL    x_pdb(1:3)
       CHARACTER*80 tString, tString1, tString2
       CHARACTER*2  LATT
 
@@ -1418,21 +1395,16 @@
                 iOrig = izmbid(i,iFrg)
                 ii = OrderedAtm(itotal + iOrig)
 ! The PDB atom lines
-                xc = Xato(1,ii) * f2cpdb(1,1) + &
-                     Xato(2,ii) * f2cpdb(1,2) + &
-                     Xato(3,ii) * f2cpdb(1,3)
-                yc = Xato(2,ii) * f2cpdb(2,2) + &
-                     Xato(3,ii) * f2cpdb(2,3)
-                zc = Xato(3,ii) * f2cpdb(3,3)
+                CALL PremultiplyVectorByMatrix(f2cpdb, Xato(1,ii), x_pdb)
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
-                IF (asym(iOrig,iFrg)(2:2).EQ.' ') THEN
-                  WRITE (hFile,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), xc, yc, zc, &
-                                  occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:1)
+                IF (ElSym(iOrig,iFrg)(2:2).EQ.' ') THEN
+                  WRITE (hFile,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), x_pdb(1), x_pdb(2), x_pdb(3), &
+                                  occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg), ElSym(iOrig,iFrg)(1:1)
  1120             FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
                 ELSE
-                  WRITE (hFile,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), xc, yc, zc, &
-                                  occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:2)
+                  WRITE (hFile,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), x_pdb(1), x_pdb(2), x_pdb(3), &
+                                  occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg), ElSym(iOrig,iFrg)(1:2)
  1130             FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
                 ENDIF
               ENDDO ! loop over atoms
@@ -1495,8 +1467,8 @@
                 iiact = iiact + 1
                 iOrig = izmbid(i,iFrg)
                 ii = OrderedAtm(itotal + iOrig)
-                WRITE (hFile,1033,ERR=999) asym(iOrig,iFrg), (Xato(k,ii),k=1,3), RR_ITF*tiso(iOrig,iFrg), occ(iOrig,iFrg) 
- 1033           FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
+                WRITE (hFile,1033,ERR=999) ElSym(iOrig,iFrg), (Xato(k,ii),k=1,3), RR_ITF*tiso(iOrig,iFrg), occ(iOrig,iFrg) 
+ 1033           FORMAT ('A ',A2,'  ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
               ENDDO ! loop over atoms
             ENDDO ! loop over Z-matrices
           CASE (4) ! cif

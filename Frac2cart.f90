@@ -1,33 +1,9 @@
-!O!
-!O!*****************************************************************************
-!O!
-!O      SUBROUTINE FRAC2CART(MATRIX,A,B,C,ALFA,BETA,GAMA)
-!O
-!O      REAL MATRIX(3,3), A, B, C, ALFA, BETA, GAMA
-!O      REAL RADEG, CA, CB, CG, SA, ASA, TERM
-!O      DATA RADEG /1.7453292519943296E-2 /
-!O
-!O      CA = COS(ALFA*RADEG)
-!O      CB = COS(BETA*RADEG)
-!O      CG = COS(GAMA*RADEG)
-!O      SA = SIN(ALFA*RADEG)
-!O      ASA = A/SA
-!O      TERM = SQRT(ABS(1.0E0-CA**2-CB**2-CG**2+2.0*CA*CB*CG)+SMALL)
-!O      MATRIX(1,1) = ASA*TERM
-!O      MATRIX(2,1) = 0.0
-!O      MATRIX(3,1) = 0.0
-!O      MATRIX(1,2) = -ASA*(CA*CB-CG)
-!O      MATRIX(2,2) = B*SA
-!O      MATRIX(3,2) = 0.0
-!O      MATRIX(1,3) = A*CB
-!O      MATRIX(2,3) = B*CA
-!O      MATRIX(3,3) = C
-!O
-!O      END SUBROUTINE FRAC2CART
 !
 !*****************************************************************************
 !
       SUBROUTINE FRAC2PDB(MATRIX,A,B,C,ALFA,BETA,GAMA)
+
+! Same as LatticeCellParameters2Lattice_2()
 
       REAL MATRIX(3,3)
       REAL A, B, C, ALFA, BETA, GAMA

@@ -149,6 +149,7 @@
       USE VARIABLES
       USE PO_VAR
       USE ZMVAR
+      USE SAMVAR
 
       IMPLICIT NONE
 
@@ -180,20 +181,15 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_HydrogenTreatment
       CHARACTER*36 parlabel(mvar)
       INTEGER I, II, kk, iFrg, iH, iK, iL
-      REAL    tLattice(1:3,1:3)
-      REAL    Beta_m, Alpha_m, q0m, q1m, q2m, q3m
-      REAL    Length
-      INTEGER iAxis
-      REAL    CART(1:3,1:MAXATM)
       REAL    Point1(1:3), Point2(1:3), Point3(1:3) 
       REAL    zmSingleRotationAxis(1:3)
+      REAL    Q(0:3)
 
       CALL PushActiveWindowID
 ! Calculate the unit cell axes in terms of the orthogonal lattice from
 ! the unit cell parameters
       CALL LatticeCellParameters2Lattice(CellPar(1), CellPar(2), CellPar(3), &
-                                         CellPar(4), CellPar(5), CellPar(6), tLattice)
-      f2cmat = tLattice
+                                         CellPar(4), CellPar(5), CellPar(6), f2cmat)
 ! Calculate the reciprocal lattice
       CALL InverseMatrix(f2cmat, c2fmat, 3)
       CALL frac2pdb(f2cpdb, CellPar(1), CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6))
@@ -207,61 +203,25 @@
           SELECT CASE (zmSingleRotAxDef(iFrg))
             CASE (1) ! two atom numbers
 ! We need the Cartesian co-ordinates of these two atoms
-              CALL makexyz(natoms(iFrg), BLEN(1,iFrg), ALPH(1,iFrg), BET(1,iFrg), IZ1(1,iFrg), IZ2(1,iFrg), IZ3(1,iFrg), CART)
-              zmSingleRotationAxis(1) = CART(1,zmSingleRotAxAtm(2,iFrg)) - CART(1,zmSingleRotAxAtm(1,iFrg))
-              zmSingleRotationAxis(2) = CART(2,zmSingleRotAxAtm(2,iFrg)) - CART(1,zmSingleRotAxAtm(1,iFrg))
-              zmSingleRotationAxis(3) = CART(3,zmSingleRotAxAtm(2,iFrg)) - CART(1,zmSingleRotAxAtm(1,iFrg))
+              CALL makexyz(natoms(iFrg), BLEN(1,iFrg), ALPH(1,iFrg), BET(1,iFrg), IZ1(1,iFrg), IZ2(1,iFrg), IZ3(1,iFrg), axyzo)
+              zmSingleRotationAxis(1) = axyzo(1,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
+              zmSingleRotationAxis(2) = axyzo(2,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
+              zmSingleRotationAxis(3) = axyzo(3,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
             CASE (2) ! Fractional
-! The variable zmSingleRotationAxis holds the fractional co-ordinates,
+! The variable zmSingleRotAxFrac holds the fractional co-ordinates,
 ! we need orthogonal co-ordinates => convert
-              zmSingleRotationAxis(1) = zmSingleRotAxFrac(1,iFrg)*tLattice(1,1) +     &
-                                        zmSingleRotAxFrac(2,iFrg)*tLattice(1,2) +     &
-                                        zmSingleRotAxFrac(3,iFrg)*tLattice(1,3)
-              zmSingleRotationAxis(2) = zmSingleRotAxFrac(1,iFrg)*tLattice(2,1) +     &
-                                        zmSingleRotAxFrac(2,iFrg)*tLattice(2,2) +     &
-                                        zmSingleRotAxFrac(3,iFrg)*tLattice(2,3)
-              zmSingleRotationAxis(3) = zmSingleRotAxFrac(1,iFrg)*tLattice(3,1) +     &
-                                        zmSingleRotAxFrac(2,iFrg)*tLattice(3,2) +     &
-                                        zmSingleRotAxFrac(3,iFrg)*tLattice(3,3)
+              CALL PremultiplyVectorByMatrix(f2cmat, zmSingleRotAxFrac(1,iFrg), zmSingleRotationAxis)
             CASE (3) ! Normal to plane defined by three atoms
 ! We need the Cartesian co-ordinates of these atoms
-              CALL makexyz(natoms(iFrg),BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
-              Point1 = CART(:,zmSingleRotAxAtms(1,iFrg))
-              Point2 = CART(:,zmSingleRotAxAtms(2,iFrg))
-              Point3 = CART(:,zmSingleRotAxAtms(3,iFrg))
+              CALL makexyz(natoms(iFrg), BLEN(1,iFrg), ALPH(1,iFrg), BET(1,iFrg), IZ1(1,iFrg), IZ2(1,iFrg), IZ3(1,iFrg), axyzo)
+              Point1 = axyzo(:,zmSingleRotAxPlnAtm(1,iFrg))
+              Point2 = axyzo(:,zmSingleRotAxPlnAtm(2,iFrg))
+              Point3 = axyzo(:,zmSingleRotAxPlnAtm(3,iFrg))
               Point1 = Point1 - Point2
               Point3 = Point3 - Point2
               CALL VectorCrossProduct(Point1, Point3, zmSingleRotationAxis(1))
           END SELECT
-! Normalise the axis
-          Length = SQRT(zmSingleRotationAxis(1)**2 + &
-                        zmSingleRotationAxis(2)**2 + &
-                        zmSingleRotationAxis(3)**2     )
-          DO iAxis = 1, 3
-            zmSingleRotationAxis(iAxis) = zmSingleRotationAxis(iAxis) / Length
-            IF (zmSingleRotationAxis(iAxis) .GT.  0.99999) zmSingleRotationAxis(iAxis) =  0.99999
-            IF (zmSingleRotationAxis(iAxis) .LT. -0.99999) zmSingleRotationAxis(iAxis) = -0.99999
-          ENDDO
-! Calculate the orientation of the axis
-! Note: Alpha_m and Beta_m in radians
-          Beta_m  = ACOS(zmSingleRotationAxis(3))
-          IF (ABS(zmSingleRotationAxis(3)) .GT. 0.99998) THEN
-! The axis coincides with the z-axis, so alpha becomes undefined: set alpha to 0.0
-            Alpha_m = 0.0
-! It turns out that we can get problems with rounding errors here
-          ELSE IF ((-zmSingleRotationAxis(2)/SIN(Beta_m)) .GT.  0.99999) THEN
-            Alpha_m = 0.0
-          ELSE IF ((-zmSingleRotationAxis(2)/SIN(Beta_m)) .LT. -0.99999) THEN
-            Alpha_m = PI
-          ELSE
-            Alpha_m = ACOS(-zmSingleRotationAxis(2)/SIN(Beta_m))
-            IF ((ASIN((zmSingleRotationAxis(1)))/SIN(Beta_m)) .LT. 0.0) Alpha_m = TWOPI - Alpha_m
-          ENDIF
-! It's an axis, so Gamma_m can be set to 0.0
-          q0m = COS(0.5*Beta_m) * COS(0.5*Alpha_m)
-          q1m = SIN(0.5*Beta_m) * COS(0.5*Alpha_m)
-          q2m = SIN(0.5*Beta_m) * SIN(0.5*Alpha_m)
-          q3m = COS(0.5*Beta_m) * SIN(0.5*Alpha_m)
+          CALL Vector2Quaternion(zmSingleRotationAxis, Q)
 ! Now we know the quaternions which, when applied, would give the direction of the axis of rotation.
 ! In order for this axis to be aligned with the z-axis, we must apply the inverse of this rotation.
 ! Hence we want:
@@ -277,9 +237,9 @@
 ! the actual evaluation of chi-squared. The other factors depend on the orientation of the axis
 ! only, which is known:
           zmSingleRotationQs(0,iFrg) = 1.0
-          zmSingleRotationQs(1,iFrg) = 2.0 * (q1m*q3m + q0m*q2m)
-          zmSingleRotationQs(2,iFrg) = 2.0 * (q2m*q3m - q0m*q1m)
-          zmSingleRotationQs(3,iFrg) = (q0m**2) - (q1m**2) - (q2m**2) + (q3m**2)
+          zmSingleRotationQs(1,iFrg) = 2.0 * (Q(1)*Q(3) + Q(0)*Q(2))
+          zmSingleRotationQs(2,iFrg) = 2.0 * (Q(2)*Q(3) - Q(0)*Q(1))
+          zmSingleRotationQs(3,iFrg) = (Q(0)**2) - (Q(1)**2) - (Q(2)**2) + (Q(3)**2)
         ENDIF
       ENDDO
       kk = 0

@@ -704,7 +704,7 @@
       INTEGER ipcount, iScat, tElement, k1
       INTEGER hFileCSSR, hFilePDB, hFileCCL, hFileCIF, hFileRES, hFilePRO
       INTEGER I, J, II, K, iiact, iTotal, iFrg, IJ, iOrig
-      REAL    xc, yc, zc
+      REAL    x_pdb(1:3)
       INTEGER TotNumBonds, NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen, iRadSelection
       INTEGER                   tLen1, tLen2
       CHARACTER*80              tString, tString1, tString2
@@ -1019,28 +1019,23 @@
           ENDIF
           IF (tSavePDB) THEN
 ! The PDB atom lines
-            xc = XAtmCoords(1,ii,tRunNr) * f2cpdb(1,1) + &
-                 XAtmCoords(2,ii,tRunNr) * f2cpdb(1,2) + &
-                 XAtmCoords(3,ii,tRunNr) * f2cpdb(1,3)
-            yc = XAtmCoords(2,ii,tRunNr) * f2cpdb(2,2) + &
-                 XAtmCoords(3,ii,tRunNr) * f2cpdb(2,3)
-            zc = XAtmCoords(3,ii,tRunNr) * f2cpdb(3,3)
+            CALL PremultiplyVectorByMatrix(f2cpdb, XAtmCoords(1,ii,tRunNr), x_pdb)
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
-            IF (asym(iOrig,iFrg)(2:2).EQ.' ') THEN
-              WRITE (hFilePDB,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), xc, yc, zc, &
-                              occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:1)
+            IF (ElSym(iOrig,iFrg)(2:2).EQ.' ') THEN
+              WRITE (hFilePDB,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), x_pdb(1), x_pdb(2), x_pdb(3), &
+                              occ(iOrig,iFrg), tiso(iOrig,iFrg), ElSym(iOrig,iFrg)(1:1)
  1120         FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
             ELSE
-              WRITE (hFilePDB,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), xc, yc, zc, &
-                              occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:2)
+              WRITE (hFilePDB,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), x_pdb(1), x_pdb(2), x_pdb(3), &
+                              occ(iOrig,iFrg), tiso(iOrig,iFrg), ElSym(iOrig,iFrg)(1:2)
  1130         FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
             ENDIF
           ENDIF
 ! The CCL atom lines
           IF (tSaveCCL) THEN
-            WRITE (hFileCCL,1033,ERR=999) asym(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), tiso(iOrig,iFrg), occ(iOrig,iFrg) 
- 1033       FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
+            WRITE (hFileCCL,1033,ERR=999) ElSym(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), tiso(iOrig,iFrg), occ(iOrig,iFrg) 
+ 1033       FORMAT ('A ',A2,'  ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
           ENDIF
 ! The CIF atom lines
 !C # 9. ATOMIC COORDINATES AND DISPLACEMENT PARAMETERS

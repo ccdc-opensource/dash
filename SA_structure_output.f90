@@ -74,7 +74,7 @@
       INTEGER ipcount, iScat, tElement, k1
       INTEGER hFileCSSR, hFilePDB, hFileCCL, hFileCIF, hFileRES
       INTEGER I, J, II, K, iiact, iTotal, iFrg, IJ, iOrig
-      REAL    xc, yc, zc
+      REAL    x_pdb(1:3)
       INTEGER NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen, iRadSelection
       INTEGER tLen1, tLen2
       CHARACTER(MaxPathLength) tFileName
@@ -381,28 +381,23 @@
           ENDIF
           IF (tSavePDB) THEN
 ! The PDB atom lines
-            xc = XAtmCoords(1,ii,Curr_SA_Run) * f2cpdb(1,1) + &
-                 XAtmCoords(2,ii,Curr_SA_Run) * f2cpdb(1,2) + &
-                 XAtmCoords(3,ii,Curr_SA_Run) * f2cpdb(1,3)
-            yc = XAtmCoords(2,ii,Curr_SA_Run) * f2cpdb(2,2) + &
-                 XAtmCoords(3,ii,Curr_SA_Run) * f2cpdb(2,3)
-            zc = XAtmCoords(3,ii,Curr_SA_Run) * f2cpdb(3,3)
+          CALL PremultiplyVectorByMatrix(f2cpdb, XAtmCoords(1,ii,Curr_SA_Run), x_pdb)
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
-            IF (asym(iOrig,iFrg)(2:2).EQ.' ') THEN
-              WRITE (hFilePDB,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), xc, yc, zc, &
-                              occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:1)
+            IF (ElSym(iOrig,iFrg)(2:2).EQ.' ') THEN
+              WRITE (hFilePDB,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), x_pdb(1), x_pdb(2), x_pdb(3), &
+                              occ(iOrig,iFrg), tiso(iOrig,iFrg), ElSym(iOrig,iFrg)(1:1)
  1120         FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
             ELSE
-              WRITE (hFilePDB,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), xc, yc, zc, &
-                              occ(iOrig,iFrg), tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:2)
+              WRITE (hFilePDB,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), x_pdb(1), x_pdb(2), x_pdb(3), &
+                              occ(iOrig,iFrg), tiso(iOrig,iFrg), ElSym(iOrig,iFrg)(1:2)
  1130         FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
             ENDIF
           ENDIF
 ! The CCL atom lines
           IF (tSaveCCL) THEN
-            WRITE (hFileCCL,1033,ERR=999) asym(iOrig,iFrg), (XAtmCoords(k,ii,Curr_SA_Run),k=1,3), tiso(iOrig,iFrg), occ(iOrig,iFrg) 
- 1033       FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
+            WRITE (hFileCCL,1033,ERR=999) ElSym(iOrig,iFrg), (XAtmCoords(k,ii,Curr_SA_Run),k=1,3), tiso(iOrig,iFrg), occ(iOrig,iFrg) 
+ 1033       FORMAT ('A ',A2,'  ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
           ENDIF
 ! The CIF atom lines
 !C # 9. ATOMIC COORDINATES AND DISPLACEMENT PARAMETERS
@@ -504,7 +499,7 @@
       INTEGER, EXTERNAL :: WritePDBCommon
       INTEGER TotNumBonds, NumOfAtomsSoFar
       INTEGER I, iFrg, J, iAtom
-      REAL    xc, yc, zc
+      REAL    x_pdb(1:3)
       INTEGER hFilePDB
       CHARACTER(2) RunStr
 
@@ -520,20 +515,15 @@
       DO iFrg = 1, nFrag
         DO i = 1, natoms(iFrg)
           iAtom = iAtom + 1
-          xc = XAtmCoords(1,OrderedAtm(iAtom),TheRunNr) * f2cpdb(1,1) + &
-               XAtmCoords(2,OrderedAtm(iAtom),TheRunNr) * f2cpdb(1,2) + &
-               XAtmCoords(3,OrderedAtm(iAtom),TheRunNr) * f2cpdb(1,3)
-          yc = XAtmCoords(2,OrderedAtm(iAtom),TheRunNr) * f2cpdb(2,2) + &
-               XAtmCoords(3,OrderedAtm(iAtom),TheRunNr) * f2cpdb(2,3)
-          zc = XAtmCoords(3,OrderedAtm(iAtom),TheRunNr) * f2cpdb(3,3)
+          CALL PremultiplyVectorByMatrix(f2cpdb, XAtmCoords(1,OrderedAtm(iAtom),TheRunNr), x_pdb)
 ! Note that elements are right-justified
-          IF (asym(i,iFrg)(2:2).EQ.' ') THEN
-            WRITE (hFilePDB,1120,ERR=999) iAtom, OriginalLabel(i,iFrg)(1:3), xc, yc, zc, &
-                                          occ(i,iFrg), tiso(i,iFrg), asym(i,iFrg)(1:1)
+          IF (ElSym(i,iFrg)(2:2).EQ.' ') THEN
+            WRITE (hFilePDB,1120,ERR=999) iAtom, OriginalLabel(i,iFrg)(1:3), x_pdb(1), x_pdb(2), x_pdb(3), &
+                                          occ(i,iFrg), tiso(i,iFrg), ElSym(i,iFrg)(1:1)
  1120       FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
           ELSE
-            WRITE (hFilePDB,1130,ERR=999) iAtom, OriginalLabel(i,iFrg)(1:4), xc, yc, zc, &
-                                          occ(i,iFrg), tiso(i,iFrg), asym(i,iFrg)(1:2)
+            WRITE (hFilePDB,1130,ERR=999) iAtom, OriginalLabel(i,iFrg)(1:4), x_pdb(1), x_pdb(2), x_pdb(3), &
+                                          occ(i,iFrg), tiso(i,iFrg), ElSym(i,iFrg)(1:2)
  1130       FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
           ENDIF
         ENDDO ! loop over atoms
@@ -608,7 +598,7 @@
       CHARACTER*2 SolStr
       INTEGER AtomLabelOption, AtomColourOption
       INTEGER I, iFrg, J, iiact, ISTATUS, BondNr, ilen
-      REAL    xc, yc, zc
+      REAL    x_pdb(1:3)
       INTEGER iAtom
       INTEGER hFilePDB
       INTEGER tNumOf_SA_Runs
@@ -687,26 +677,21 @@
             DO i = 1, natoms(iFrg)
               iiact = iiact + 1
               iAtom = iAtom + 1
-              xc = XAtmCoords(1,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(1,1) + &
-                   XAtmCoords(2,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(1,2) + &
-                   XAtmCoords(3,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(1,3)
-              yc = XAtmCoords(2,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(2,2) + &
-                   XAtmCoords(3,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(2,3)
-              zc = XAtmCoords(3,OrderedAtm(iAtom),iSol2Run(iSol)) * f2cpdb(3,3)
+              CALL PremultiplyVectorByMatrix(f2cpdb, XAtmCoords(1,OrderedAtm(iAtom),iSol2Run(iSol)), x_pdb)
 ! Note that elements are right-justified
               IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
-                IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
-                  ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
+                IF (ElSym(i,iFrg)(2:2) .EQ. ' ') THEN
+                  ColourStr(1:2) = ' '//ElSym(i,iFrg)(1:1)
                 ELSE
-                  ColourStr(1:2) = asym(i,iFrg)(1:2)
+                  ColourStr = ElSym(i,iFrg)
                 ENDIF
               ENDIF
               IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
-                LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
+                LabelStr = ElSym(i,iFrg)(1:LEN_TRIM(ElSym(i,iFrg)))//SolStr
               ELSE  ! Orignal atom labels
                 LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
               ENDIF
-              WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
+              WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), x_pdb(1), x_pdb(2), x_pdb(3), occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
  1120         FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
             ENDDO ! loop over atoms
           ENDDO ! loop over Z-matrices
@@ -773,7 +758,7 @@
 
 ! Initialise to failure
       WritePDBCommon = 1
-      CALL InverseMatrix(f2cpdb,inv,3)
+      CALL InverseMatrix(f2cpdb, inv, 3)
 ! Add in a Header record
 ! In the space group table file, rhombohedral and hexagonal axes for trigonal space groups
 ! are flagged with ":R" and ":H" respectively. According to the pdb specification:
