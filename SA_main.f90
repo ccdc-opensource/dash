@@ -29,17 +29,7 @@
 
       INTEGER  MAXEVL, IPRINT
 
-      DOUBLE PRECISION cen,sig
-      LOGICAL       gaussb
-      DOUBLE PRECISION T0,rt,eps,target_value
       PARAMETER (mvar=100)
-      COMMON /gaubou/ cen(mvar),sig(mvar)
-      COMMON /gaulog/ gaussb(mvar)
-      CHARACTER*80  torfile
-      LOGICAL ltorfil
-      COMMON /torfcm/ torfile(mvar)
-      COMMON /torlog/ ltorfil(mvar)
-      COMMON /jitter/ rjittr
       DOUBLE PRECISION x,lb,ub,vm,xpreset
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
 
@@ -49,6 +39,7 @@
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
+      DOUBLE PRECISION T0,rt,eps,target_value
       COMMON /saparl/ T0,rt,eps,target_value
       INTEGER  NS, NT, IER, ISEED1, ISEED2
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
@@ -603,12 +594,6 @@
       DOUBLE PRECISION XOPT,CSH,FSTAR,XP,FOPT
       COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
 
-      INTEGER  NS, NT, ISEED1, ISEED2
-      INTEGER  MAXEVL, IPRINT
-
-      DOUBLE PRECISION cen,sig
-      LOGICAL gaussb
-      DOUBLE PRECISION T0,rt,eps,target_value
 
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
@@ -627,13 +612,6 @@
 
       COMMON /frgcom/ nfrag,lfrag(maxfrg)
       PARAMETER (mvar=100)
-      COMMON /gaubou/ cen(mvar),sig(mvar)
-      COMMON /gaulog/ gaussb(mvar)
-      CHARACTER*80  torfile
-      LOGICAL ltorfil
-      COMMON /torfcm/ torfile(mvar)
-      COMMON /torlog/ ltorfil(mvar)
-      COMMON /jitter/ rjittr
       DOUBLE PRECISION x,lb,ub,vm,xpreset
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
 
@@ -644,7 +622,10 @@
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
+      DOUBLE PRECISION T0,rt,eps,target_value
       COMMON /saparl/ T0,rt,eps,target_value
+      INTEGER  NS, NT, ISEED1, ISEED2
+      INTEGER  MAXEVL, IPRINT
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
       COMMON /shadl/ log_shad(mvar)
       COMMON /shadi/ kshad(mvar)

@@ -1,19 +1,20 @@
-     subroutine SA_OUTPUT(kopt,T,CHIMIN,CHIAV,CHIESD,&
-     xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,LNOBDS,NNEW,&
+!
+!*****************************************************************************
+!
+     SUBROUTINE SA_OUTPUT(kopt,T,CHIMIN,CHIAV,CHIESD,&
+     xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,&
      nmpert,ntotmov,iteration)
-!
-!
+
       USE WINTERACTER
       USE DRUID_HEADER
 
-      COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
-!
+
       REAL*8 xopt(*),dxvav(*),xvsig(*),flav(*),lb(*),ub(*),vm(*)
-!
-      PARAMETER (maxiter=10000)
-      COMMON /pltstore/ xiter(maxiter),tstore(maxiter),&
-      foptstore(maxiter),fpavstore(maxiter)
+
+      INCLUDE 'PARAMS.INC'
+
       COMMON /PLTSTO2/ CHIPROBEST(MAXITER)
+      COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
 
       REAL temin,temax, bchmin, bpwval, bchpro, tempvl
       REAL avchi1, avchi2, avchi3, avchi4
@@ -29,7 +30,7 @@
       CALL WDialogPutReal(IDF_curr_temp,T,'(f8.2)')
       CALL WDialogPutReal(IDF_min_chisq,chimin,'(f8.2)')
       CALL WDialogPutReal(IDF_profile_chisq2,CHIPROBEST(iteration),'(f8.2)')
-!
+
 !.. best chi-squared scale ...
         bchmin=alog10(max(1.,chimin))
         temin=0.0
@@ -56,59 +57,61 @@
         temin=0.0
         temax=4.0
         avchi3=alog10(max(1.,chiav-0.1*chiesd))
-        ctem=max(1.,chiav+0.1*chiesd)
+        ctem=MAX(1.0,chiav+0.1*chiesd)
         avchi4=alog10(min(10000.,ctem))
         nd1 = ndown
         nd2 = nmpert
         nd3 = ntotmov
         nd4 = nup
-      end if
+      END IF
       CALL Sa_Output_Gr
       CALL WDialogSelect(IDD_Parameter_Status)
-      do i=1,n
-        CALL WGridPutCellReal(IDF_CPL_grid,1,i,sngl(xopt(i)),'(f12.5)')
-      end do
-      if (kopt.eq.1) then
-        do i=1,n
-          CALL WGridPutCellReal(IDF_CPL_grid,2,i,sngl(flav(i)),'(f12.5)')
-          CALL WGridPutCellReal(IDF_CPL_grid,3,i,sngl(vm(i)),'(f12.5)')
-          CALL WGridPutCellReal(IDF_CPL_grid,4,i,sngl(dxvav(i)),'(f12.5)')
-          CALL WGridPutCellReal(IDF_CPL_grid,5,i,sngl(xvsig(i)),'(f12.5)')
-          CALL WGridPutCellReal(IDF_CPL_grid,6,i,sngl(lb(i)),'(f12.5)')
-          CALL WGridPutCellReal(IDF_CPL_grid,7,i,sngl(ub(i)),'(f12.5)')
-        end do
-      end if
+      DO I = 1, n
+        CALL WGridPutCellReal(IDF_CPL_grid,1,I,SNGL(xopt(i)),'(F12.5)')
+      END DO
+      IF (kopt .EQ. 1) THEN
+        DO I = 1, n
+          CALL WGridPutCellReal(IDF_CPL_grid,2,I,SNGL(flav(i)),'(F12.5)')
+          CALL WGridPutCellReal(IDF_CPL_grid,3,I,SNGL(vm(i)),'(F12.5)')
+          CALL WGridPutCellReal(IDF_CPL_grid,4,I,SNGL(dxvav(i)),'(F12.5)')
+          CALL WGridPutCellReal(IDF_CPL_grid,5,I,SNGL(xvsig(i)),'(F12.5)')
+          CALL WGridPutCellReal(IDF_CPL_grid,6,I,SNGL(lb(i)),'(F12.5)')
+          CALL WGridPutCellReal(IDF_CPL_grid,7,I,SNGL(ub(i)),'(F12.5)')
+        END DO
+      END IF
 
-      END
+      END SUBROUTINE SA_OUTPUT
+!
+!*****************************************************************************
+!
+      SUBROUTINE sa_output_gr()
 
-
-
-      subroutine sa_output_gr()
       USE WINTERACTER
       USE DRUID_HEADER
-        USE VARIABLES
-        IMPLICIT NONE
+      USE VARIABLES
 
-        REAL temin,temax, bchmin, bpwval, bchpro, tempvl
-        REAL avchi1, avchi2, avchi3, avchi4
-        INTEGER nd1, nd2, nd3, nd4
-        COMMON / sagdat / temin, temax, bchmin, bpwval, bchpro, &
+      IMPLICIT NONE
+
+      REAL temin,temax, bchmin, bpwval, bchpro, tempvl
+      REAL avchi1, avchi2, avchi3, avchi4
+      INTEGER nd1, nd2, nd3, nd4
+      COMMON / sagdat / temin, temax, bchmin, bpwval, bchpro, &
                 tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
                 nd2, nd3, nd4
-      character*255 temperfile
-        REAL tenow1, tenow2, ruler, rulex1, rulex2
-        integer iemax, ilt
+      CHARACTER*255 temperfile
+      REAL tenow1, tenow2, ruler, rulex1, rulex2
+      INTEGER iemax, ilt
   
       REAL, PARAMETER ::  rminh = 0.01
-        REAL, PARAMETER ::  rmaxh = 0.99
+      REAL, PARAMETER ::  rmaxh = 0.99
 
 
-      temperfile= INSTDIR(1:len_trim(INSTDIR))//DIRSPACER//'Images'//DIRSPACER//'temperature1.bmp'
-        ilt = len_trim(temperfile)
+      temperfile= INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Images'//DIRSPACER//'temperature1.bmp'
+      ilt = LEN_TRIM(temperfile)
 
 
-        CALL IGrSelect(3,IDF_minchisq_picture)
-        CALL IGrFillPattern(Solid)
+      CALL IGrSelect(3,IDF_minchisq_picture)
+      CALL IGrFillPattern(Solid)
       CALL IGrUnits(temin,0.0,temax,1.0)
       CALL IGrLoadImage(temperfile(1:ilt))
 
@@ -127,7 +130,7 @@
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
       CALL IGrColourN(95)
 
-        tenow1=bchpro-0.03
+      tenow1=bchpro-0.03
       tenow2=bchpro+0.03
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
 
@@ -169,7 +172,7 @@
       CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
 ! total moves
       CALL IGrSelect(3,IDF_SATotalMoves_picture)
-      iemax=1+alog10(max(1.,float(nd3)))
+      iemax=1+alog10(MAX(1.,FLOAT(nd3)))
       ruler=10.**iemax
       CALL IGrUnits(0.0,0.0,ruler,1.0)
       CALL IGrColourN(52)
@@ -182,8 +185,11 @@
       CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
 
       CALL IGrSelect(1,0)
-        CALL IGrUnits(0.,0.,1.,1.)
-        CALL IGrArea(0.,0.,1.,1.)
+      CALL IGrUnits(0.,0.,1.,1.)
+      CALL IGrArea(0.,0.,1.,1.)
+      RETURN
+
+      END SUBROUTINE sa_output_gr
 !
-        return
-        end subroutine sa_output_gr
+!*****************************************************************************
+!

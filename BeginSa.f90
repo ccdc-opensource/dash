@@ -12,9 +12,9 @@
 
       PARAMETER (mvar=100)
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
-!C>> Function defn
-      INTEGER CheckOverwriteSaOutput
-      INTEGER test
+
+      INTEGER CheckOverwriteSaOutput ! Function
+      INTEGER test                   ! Function
 
       test = CheckOverwriteSaOutput()
       IF (test .EQ. 0) THEN
@@ -22,13 +22,8 @@
         RETURN
       END IF
       CALL WDialogSelect(IDD_SA_Action1)
-!
-!      Call WDialogFieldState(IDF_Pause_Annealing,Disabled)
-!      Call WDialogFieldState(IDF_SA_Stop_Button,Disabled)
-!      Call WDialogFieldState(IDF_Viewer,Disabled)
       CALL WDialogFieldState(IDF_Pause_Annealing,Enabled)
-!      Call WDialogFieldState(IDF_SA_Stop_Button,Enabled)
-!C>> JCC Added check on viewer
+! Check on viewer
       IF (ViewOn) THEN
         CALL WDialogFieldState(IDF_Viewer,Enabled)
       ELSE
@@ -40,14 +35,14 @@
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       DoSaRedraw = .FALSE.
-!>> JCC Automatic end so pop up a message to say what happened
+! Automatic end so pop up a message to say what happened
 !       Call WDialogSelect(IDD_SA_Completed)
       Ierrflag = InfoError(1)
       CALL WindowSelect(0)
       Ierrflag = InfoError(1)
-!>> Wait for the user to raise the window. Under NT the "WindowRaise call" 
-!>> Does not seem to work annoyingly, so once complete, wait for the user to
-!>> raise the window
+! Wait for the user to raise the window. Under NT the "WindowRaise call" 
+! Does not seem to work annoyingly, so once complete, wait for the user to
+! raise the window
       DO WHILE (WinfoWindow(WindowState) .EQ. 0)
         CALL IOsWait(50) ! wait half a sec
       END DO

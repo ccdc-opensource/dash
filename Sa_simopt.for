@@ -8,12 +8,10 @@ C
 C
       DO I=1,NVAR
         DBLEP(I)=DBLE(PSTORE(I))
-c	write(6,*) i,pstore(i)
       END DO
       DO II=1,N
         I=IP(II)
         DBLEP(I)=DBLE(P(II))
-c	write(6,*) ii,i,p(ii)
       END DO
       CALL FCN(NPAR,DBLEP,CHIANS)
       SACCHI=SNGL(CHIANS)
@@ -64,7 +62,6 @@ c      WRITE(*,*)
 c      WRITE(*,100) CHIMIN
 c 100  FORMAT('  New chi-squared = ',F12.4)
       ZERO=0.0
-!      WRITE(63,*) ZERO,CHIMIN,ZERO,ZERO
       ITER=0
    1  ITER=ITER+1
       IF (ITER.GT.MAXITR) GOTO 999
@@ -82,7 +79,6 @@ c 991    FORMAT(I5,3X,F12.5)
 c 	END DO
 C
 c
-c	write(6,*) (v(ii),ii=1,n)
       CALL SAVCOPY(EX,V,N)
       CHI=SACCHI(N,V)
 c      WRITE(*,100) CHI
