@@ -61,8 +61,7 @@
       MAXXKK = MFCSPE
       MAXK = 0
       DO IR = 1, MAXXKK
-        READ (31,*,ERR=998,END=200) (IREFH(I,IR),I=1,3), ARGK(IR),      &
-     &                              DSTAR(IR)
+        READ (31,*,ERR=998,END=200) (IREFH(I,IR),I=1,3), ARGK(IR),DSTAR(IR)
         MAXK = MAXK + 1
         IHMIN = MIN(IREFH(1,IR),IHMIN)
         IKMIN = MIN(IREFH(2,IR),IKMIN)
@@ -375,11 +374,10 @@
         IKMINLT0 = IKMIN.LT.0
       END SELECT
 !
-      CLOSE (31)
 !
       GOTO 999
   998 ier = 1
-      CLOSE (31)
-  999 RETURN
+  999 CLOSE (31)
+      RETURN
 !
       END SUBROUTINE GET_LOGREF

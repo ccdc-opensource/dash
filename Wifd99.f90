@@ -478,40 +478,6 @@
       ENDDO
       IF (A(N,N).EQ.0.0) A(N,N) = TINY
       END SUBROUTINE XXLUDCMP
-!*==XXVCOPY.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!U      SUBROUTINE PIKCAL
-!UC
-!UC.. Calculates the values of p(i,k) and dp(i,k)/dpsf(q)
-!UC>> JCC Moved to an include file
-!U	INCLUDE 'REFLNS.INC'
-!UC.. Note only 3 phases specifically hardwired here
-!U      PARAMETER (MPPTS=15000,MKPTS=150000)
-!U      COMMON /ZSTORE/ NPTS,ZARGI(MPPTS),ZOBS(MPPTS),ZDOBS(MPPTS),
-!U     &ZWT(MPPTS),ICODEZ(MPPTS),KOBZ(MPPTS)
-!UC
-!UC
-!UC
-!U      RETURN
-!U      END
-      SUBROUTINE XXVCOPY(X,Y,N)
-!     -----------------------
-!
-      REAL X(*), Y(*)
-!
-      DO I = 1, N
-        Y(I) = X(I)
-      ENDDO
-      END SUBROUTINE XXVCOPY
-!*==XXVRFILL.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE XXVRFILL(X,A,N)
-!     ------------------------
-!
-      REAL X(*)
-!
-      DO I = 1, N
-        X(I) = A
-      ENDDO
-      END SUBROUTINE XXVRFILL
 !*==XDELPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
       SUBROUTINE XDELPR
 !
@@ -560,6 +526,7 @@
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
      &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
      &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+      LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
@@ -578,7 +545,6 @@
           ENDIF
         ENDDO
         PFNVAR(I,JPHASE,JSOURC) = NUMPFP(I,JPHASE,JSOURC).NE.0
-!        WRITE(76,*) ' Peak descriptor ',I,NUMPFP(I,JPHASE,JSOURC)
       ENDDO
 !
       END SUBROUTINE QNUMPP
