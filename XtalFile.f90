@@ -159,6 +159,9 @@
       globFile = tFileName(1:iLen-ExtLen)//"glob"
       iHandle = 10
       OPEN(iHandle,FILE=globFile(1:LEN_TRIM(globFile)),STATUS='OLD',ERR=999)
+      DO iFrg = 1, maxfrg
+        gotzmfile(iFrg) = .FALSE.
+      ENDDO
       iFrg = 0
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page6)
