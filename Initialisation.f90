@@ -91,7 +91,8 @@
       CALL WDialogLoad(IDD_Summary)
       CALL WDialogLoad(IDD_SAW_Page5)
       CALL WDialogLoad(IDD_Parameter_Status_2)
-      CALL WDialogLoad(IDD_Rietveld)
+      CALL WDialogLoad(IDD_OutputSolutions)
+!      CALL WDialogLoad(IDD_Rietveld)
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
