@@ -1,55 +1,7 @@
 !
 !*****************************************************************************
 !
-! Initialise the multirun settings
-!
-!*****************************************************************************
-!
-      SUBROUTINE Init_MultiRun
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                           ChiMult
-      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
-
-      REAL    MaxMoves1, tMaxMoves
-      INTEGER MaxMoves2
-
-      !C All a bit dodgy: these are the only few variables that are read directly from the
-      !C interface, and therefore need special treatment when in batch mode.
-
-      LOGICAL         in_batch
-      COMMON /BATEXE/ in_batch
-
-      IF ( in_batch ) &
-        RETURN
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Input3_2)
-      CALL WDialogGetInteger(IDF_SA_MaxRepeats, MaxRuns)
-      CALL WDialogGetReal(IDF_MaxMoves1, MaxMoves1)
-      IF (MaxMoves1 .LT.   0.001) MaxMoves1 =   0.001
-      IF (MaxMoves1 .GT. 100.0  ) MaxMoves1 = 100.0
-      CALL WDialogGetInteger(IDF_MaxMoves2, MaxMoves2)
-      IF (MaxMoves2 .LT. 1) MaxMoves2 = 1
-      IF (MaxMoves2 .GT. 8) MaxMoves2 = 8
-      tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
-      IF (tMaxMoves .LT. 10.0) tMaxMoves = 10.0
-      IF (tMaxMoves .GT.  2.0E9) tMaxMoves = 2.0E9
-      MaxMoves = NINT(tMaxMoves)
-      CALL WDialogGetReal(IDF_SA_ChiTest, ChiMult)
-      CALL WDialogSelect(IDD_SAW_Page5)
-      CALL WDialogClearField(IDF_SA_Summary)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Init_MultiRun
-!
-!*****************************************************************************
-!
-! Add a multi-run pdb file to the list of solutions in the GUI
+! Add a multi-run result to the list of solutions in the GUI
 !
 !*****************************************************************************
 !
