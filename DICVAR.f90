@@ -2,6 +2,19 @@
       MODULE DICVAR
       IMPLICIT NONE
       INTEGER DICVOL_Error
+
+      INTEGER cDICVOL_ErrorOnWrite
+      PARAMETER (cDICVOL_ErrorOnWrite = 1)
+      INTEGER cDICVOL_TooManySolutions
+      PARAMETER (cDICVOL_TooManySolutions = 2)
+      INTEGER cDIVCOLExpErrTooLarge
+      PARAMETER (cDIVCOLExpErrTooLarge = 3)
+      
+      REAL DV_ScaleFactor
+! To scale all the data, so that large unit cells can be treated as though they were small.
+! implementation: all d-spacings are multiplied by this factor before being fed to DICVOL,
+! all a, b, and c output by DICVOL are divided by it. 
+
       REAL coeff
       PARAMETER ( coeff = 1.E+08 )
       REAL Coef4
