@@ -409,14 +409,7 @@
       CALL WCursorShape(CurHourGlass)
       CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'zmconv.exe'// &
         ' '//fmt(1:LEN_TRIM(fmt))//' "'//tFileName(iStart:iLen)//'" cell_only',3)
-        CALL WCursorShape(CurCrossHair)
-! Check return status
-      OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = iStat)
-      CLOSE(145)
-      IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (iStat .NE. 0)) THEN
-        CALL ErrorMessage("Sorry, could not read unit-cell parameters.")
-        RETURN
-      ENDIF
+      CALL WCursorShape(CurCrossHair)
 !C Replace extension by .glob
       ExtLen = 5 ! Maximum length of a valid extension
       CALL FileGetExtension(TheFileName, ExtensionStr, ExtLen)
