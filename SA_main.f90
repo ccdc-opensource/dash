@@ -79,7 +79,7 @@
       WRITE(tFileHandle,'("  Random seed 1 = ",I5)',ERR=999) I
       CALL WDialogGetInteger(IDF_SA_RandomSeed2,I)
       WRITE(tFileHandle,'("  Random seed 2 = ",I5)',ERR=999) I
-      CALL WDialogGetReal(IDF_SA_T0,R)
+      CALL WDialogGetReal(IDF_SA_T0, R)
       IF (R .EQ. 0.0) THEN
         WRITE(tFileHandle,'("  Initial temperature = to be estimated by DASH")',ERR=999)
       ELSE
