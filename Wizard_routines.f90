@@ -209,8 +209,8 @@
 
       IMPLICIT NONE
 
-      INTEGER :: IPW_Option
-      CHARACTER*MaxPathLength tString
+      INTEGER IPW_Option
+      LOGICAL, EXTERNAL :: FnPatternOK
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
@@ -225,14 +225,14 @@
               SELECT CASE (IPW_Option)
                 CASE (1) ! View data / determine peaks positions
                   CALL WDialogSelect(IDD_PW_Page3)
-                  CALL WDialogGetString(IDF_PWa_DataFileName_String,tString)
-! If no filename provided => grey out 'Next >' button
-                  CALL WDialogFieldStateLogical(IDNEXT,LEN_TRIM(tString) .NE. 0)
+! If no data => grey out 'Next >' button
+                  CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
+                  CALL WDialogFieldStateLogical(IDB_Bin,FnPatternOK())
                   CALL WizardWindowShow(IDD_PW_Page3)
                 CASE (2) ! Preparation for Pawley refinement
                   CALL WDialogSelect(IDD_PW_Page2)
 ! If we have loaded a powder pattern, the Next > button should be enabled
-                  CALL WDialogFieldStateLogical(IDNEXT,.NOT. NoData)
+                  CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
                   CALL WizardWindowShow(IDD_PW_Page2)
                 CASE (3) ! Simulated annealing structure solution
                   CALL ShowWizardWindowZmatrices
@@ -256,13 +256,17 @@
       INCLUDE 'PARAMS.INC'
    
       INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
       
 ! Not too pretty, but safe
       INTEGER                BackupNOBS
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       INTEGER I
 
@@ -272,9 +276,19 @@
         YOBS(I) = BackupYOBS(I)
         EOBS(I) = BackupEOBS(I)
       ENDDO
-! JvdS Assume no knowledge on background
-      CALL Clear_BackGround
-      CALL Rebin_Profile
+! All DASH FUNCTIONs and SUBROUTINEs use the re-binned profile, so emulate
+! binning with a bin width of 1
+      NBIN = NOBS
+      LBIN = 1
+      DO I = 1, NBIN
+        XBIN(I)  = XOBS(I)
+        YOBIN(I) = YOBS(I)
+        YCBIN(I) = 0.0
+        YBBIN(I) = 0.0
+        EBIN(I)  = EOBS(I)
+      ENDDO
+      CALL GetProfileLimits
+      CALL Get_IPMaxMin 
 
       END SUBROUTINE WizardApplyDiffractionFileInput
 !
@@ -290,13 +304,10 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-
       CHARACTER(MaxPathLength) CTEMP
       INTEGER ISTAT
       INTEGER, EXTERNAL :: DiffractionFileBrowse, DiffractionFileOpen
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page3)
@@ -305,33 +316,63 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
-            CASE (IDNEXT)
+            CASE (IDNEXT, IDB_Bin)
               CALL WizardApplyDiffractionFileInput
               CALL Profile_Plot
-              CALL WizardWindowShow(IDD_PW_Page4)
+! If the user is re-binning this profile, make sure we pass the binning
+              CALL WDialogSelect(IDD_PW_Page3a)
+              IF ((EventInfo%VALUE1 .EQ. IDB_Bin) .OR. WDialogGetCheckBoxLogical(IDF_BinData)) THEN
+                CALL WizardWindowShow(IDD_PW_Page3a)
+              ELSE
+                CALL WizardWindowShow(IDD_PW_Page4)
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
-            CASE (IDB_Bin)
-              CALL WizardApplyDiffractionFileInput
-              CALL Profile_Plot
-              CALL WizardWindowShow(IDD_PW_Page3a)
             CASE (ID_PWa_DF_Open)
               CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
               ISTAT = DiffractionFileOpen(CTEMP)
-              CALL WDialogFieldStateLogical(IDNEXT,ISTAT .EQ. 1)
+! If no data => grey out 'Next >' button
+              CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
+              CALL WDialogFieldStateLogical(IDB_Bin,FnPatternOK())
             CASE (IDBBROWSE)
               ISTAT = DiffractionFileBrowse()
-! Don't change if the user pressed 'Cancel' (ISTAT = 2)
-              IF      (ISTAT .EQ. 1) THEN
-                CALL WDialogFieldState(IDNEXT,Enabled)
-              ELSE IF (ISTAT .EQ. 0) THEN
-                CALL WDialogFieldState(IDNEXT,Disabled)
-              ENDIF
+! If no data => grey out 'Next >' button
+              CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
+              CALL WDialogFieldStateLogical(IDB_Bin,FnPatternOK())
           END SELECT
       END SELECT
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowDiffractionFileInput
+!
+!*****************************************************************************
+!
+      SUBROUTINE WizardApplyRebin
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page3a)
+      IF (WDialogGetCheckBoxLogical(IDF_BinData)) THEN
+        CALL WDialogGetInteger(IDF_LBIN,LBIN)
+      ELSE
+        LBIN = 1
+      ENDIF
+      CALL PopActiveWindowID
+      CALL Rebin_Profile
+
+      END SUBROUTINE WizardApplyRebin
 !
 !*****************************************************************************
 !
@@ -357,27 +398,17 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
+              CALL WizardApplyDiffractionFileInput
+              CALL Profile_Plot 
               CALL WizardWindowShow(IDD_PW_Page3)
             CASE (IDNEXT)
-! Get value from window
-              IF (WDialogGetCheckBoxLogical(IDF_BinData)) THEN
-                CALL WDialogGetInteger(IDF_LBIN,LBIN)
-              ELSE
-                LBIN = 1
-              ENDIF
-              CALL Rebin_Profile
+              CALL WizardApplyRebin
               CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDAPPLY)
-! Get value from window
-              IF (WDialogGetCheckBoxLogical(IDF_BinData)) THEN
-                CALL WDialogGetInteger(IDF_LBIN,LBIN)
-              ELSE
-                LBIN = 1
-              ENDIF
-              CALL Rebin_Profile
+              CALL WizardApplyRebin
               CALL Profile_Plot
           END SELECT
         CASE (FieldChanged)
@@ -414,6 +445,7 @@
       INTEGER IRadSelection
       REAL, EXTERNAL :: TwoTheta2dSpacing
       LOGICAL, EXTERNAL :: FnWavelengthOK
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page4)
@@ -421,7 +453,13 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowShow(IDD_PW_Page3)
+! If the user is re-binning this profile, make sure we pass the binning
+              CALL WDialogSelect(IDD_PW_Page3a)
+              IF (WDialogGetCheckBoxLogical(IDF_BinData)) THEN
+                CALL WizardWindowShow(IDD_PW_Page3a)
+              ELSE
+                CALL WizardWindowShow(IDD_PW_Page3)
+              ENDIF
             CASE (IDNEXT)
               IF (.NOT. FnWavelengthOK()) THEN
                 CALL ErrorMessage('Invalid wavelength.')
