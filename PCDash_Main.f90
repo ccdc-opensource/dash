@@ -26,14 +26,14 @@
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
 ! but these mappings are.
 
-      INTEGER        IDFZMNumber,           IDFZMFile,                &
-                     IDBZMDelete,           IDBZMBrowse,              &
-                     IDBZMView,             IDBZMEdit,                &
+      INTEGER        IDFZMNumber,                    IDFZMFile,                &
+                     IDBZMDelete,                    IDBZMBrowse,              &
+                     IDBZMView,                      IDBZMEdit,                &
                      IDFZMpars
-      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),      &
-                     IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
-                     IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg)
+      COMMON /IDFZM/ IDFZMNumber(1:maxfrginterface), IDFZMFile(1:maxfrginterface),      &
+                     IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
+                     IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
+                     IDFZMpars(1:maxfrginterface)
       DATA IDFzmNumber / IDF_zmNumOf1,  IDF_zmNumOf2,  IDF_zmNumOf3,  IDF_zmNumOf4,  IDF_zmNumOf5,  IDF_zmNumOf6  /
       DATA IDFZMFile   / IDF_zmFile1,   IDF_zmFile2,   IDF_zmFile3,   IDF_zmFile4,   IDF_zmFile5,   IDF_zmFile6   /
       DATA IDBZMDelete / IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4, IDB_zmDelete5, IDB_zmDelete6 /
@@ -79,7 +79,6 @@
 ! Main message loop
       IF (NARGS() .GT. 1) THEN
         CALL GetArg(1,ArgString) 
-        CALL DebugErrorMessage(ArgString)
 ! Parse directory and go there
         CALL SplitPath(ArgString,tDirName,tFileName)
         CALL IOsDirChange(tDirName)
@@ -96,9 +95,6 @@
             iDummy = Read_One_ZM(iFrg)
             IF (iDummy .EQ. 0) THEN ! successful read
               gotzmfile(iFrg) = .TRUE.
-! Initialise 'Number of' field to 1
-              CALL WDialogSelect(IDD_SAW_Page1)
-              CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
 ! JCC traps for Z-matrix reading
             ELSE 
               gotzmfile(iFrg) = .FALSE. 
@@ -110,7 +106,7 @@
             CALL SDIFileOpen(ArgString)
             CALL WizardWindowShow(IDD_SAW_Page1)
           CASE ('PDB    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'CSSR   ')
-              CALL WDialogSelect(IDD_SAW_Page1)
+            CALL WDialogSelect(IDD_SAW_Page1)
             iFrg = 1
             CALL zmConvert(ArgString,tNumZMatrices,tZmatrices)
             IF (tNumZMatrices .EQ. 0) GOTO 999
@@ -120,8 +116,6 @@
             iDummy = Read_One_ZM(iFrg)
             IF (iDummy .EQ. 0) THEN ! successful read
               gotzmfile(iFrg) = .TRUE.
-! Initialise 'Number of' field to 1
-              CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
 ! Find next free slot ("iFrg")
               tCounter = 1
               DO WHILE ((gotzmfile(iFrg)) .AND. (tCounter .LT. maxfrg))
@@ -370,7 +364,6 @@
       SUBROUTINE SaveXYE
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -411,7 +404,6 @@
       SUBROUTINE LaunchHelp
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -428,7 +420,6 @@
 !   This subroutine processes About selection
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -470,9 +461,6 @@
 !
       SUBROUTINE DoExit
 
-      USE WINTERACTER
-      USE VARIABLES
-
       IMPLICIT NONE
 
       INTEGER ISTAT
@@ -491,7 +479,6 @@
       SUBROUTINE DeleteTempFiles
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE DICVAR
 
 ! Remove redundant files 

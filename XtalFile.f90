@@ -10,7 +10,6 @@
 ! such that it lets the user visually select a file first.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -46,7 +45,6 @@
 ! INPUT   : TheFileName = the file name
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
