@@ -37,6 +37,7 @@
       INTEGER ISB
       REAL XMINT, XMAXT, YMINT, YMAXT, xgcurold, ygcurold
 
+      CALL WindowSelect(0)
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
 ! JCC Set the scale correctly. 
