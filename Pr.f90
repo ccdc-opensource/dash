@@ -204,6 +204,8 @@
 !O Puts this printing in lines for everything except family 2 parameters,
 !O    and in clumps per atom for family 2
 !
+      INCLUDE "PARAMS.INC"
+      
       EXTERNAL PCXX, PFXX, MAGSHF
       LOGICAL SHFCEL, HEAD, NPROP
       DIMENSION DPROP(3)
@@ -211,14 +213,28 @@
       COMMON /ATBLOC/ NAME, IPNAME(12)
       CHARACTER*4 NAME, IPNAME
       COMMON /ATBLOK/ IBUFF, PNEW(12), PESD(12), PSHIFT(12), POLD(12), PSESD(12)
-      COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /DERVAR/ DERIVV(500), LVARV
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
+      REAL            DERIVV
+      INTEGER                          LVARV
+      COMMON /DERVAR/ DERIVV(MaxVVar), LVARV
+
       INTEGER         NINIT, NBATCH, NSYSTM
       LOGICAL                                MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      COMMON /MATDAT/ MATPNT(401), BLSQ(400)
+
+      INTEGER MM(MaxBVar)
+      INTEGER         MATPNT
+      REAL                               BLSQ
+      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
+      EQUIVALENCE (MM(1),MATPNT(2))
+
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
 
@@ -228,14 +244,18 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
+
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP, NSKTOT, KOM24
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
      &                ISYM(500), ILAT(500), CELLTR(3,500), XSLAK(3,500),&
@@ -245,6 +265,7 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
+
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
@@ -572,7 +593,9 @@
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
-      COMMON /DERVAR/ DERIVV(500), LVARV
+      REAL            DERIVV
+      INTEGER                          LVARV
+      COMMON /DERVAR/ DERIVV(MaxVVar), LVARV
 
       INTEGER         NINIT, NBATCH, NSYSTM
       LOGICAL                                MULFAS, MULSOU, MULONE
@@ -602,7 +625,8 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
 
       REAL            ARGK, PKCNSP
       INTEGER                              KPCNSP
@@ -801,27 +825,39 @@
 
       INCLUDE 'PARAMS.INC'
 
-      DIMENSION DERIVA(500), CDERS(6), DERIV4(5)
+      DIMENSION DERIVA(MaxVVar), CDERS(6), DERIV4(5)
+
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
+
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
+
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /DERVAR/ DERIVV(500), LVARV
+
+      REAL            DERIVV
+      INTEGER                          LVARV
+      COMMON /DERVAR/ DERIVV(MaxVVar), LVARV
+
       REAL            ALAMBD
       INTEGER                      NLAMB
       COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
-      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(300), DERIVT(300)
-      COMPLEX FC, DERIVT
+
+      COMPLEX         FC
+      REAL                FCMOD, COSAL, SINAL, FCDERS
+      COMPLEX                                                   DERIVT
+      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(MaxF2VA), DERIVT(MaxF2VA)
+
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
@@ -838,7 +874,8 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
 
       INTEGER         NATOM
       REAL                   X
@@ -1304,10 +1341,10 @@
 !O Writes the original matrix to a file whose name is requested interactively,
 !O and whose default extension is .IHM.
 !
-      DIMENSION ALSQ(MATSZ)
-      DIMENSION A(400,400), D(400), E(400)
-
       INCLUDE 'PARAMS.INC'
+      
+      DIMENSION ALSQ(MATSZ)
+      DIMENSION A(MaxBVar,MaxBVar), D(MaxBVar), E(MaxBVar)
 
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
@@ -1384,9 +1421,9 @@
         NAMFIL = '.EIG'
         MAT = NOPFIL(1112)
 ! HOUSEHOLDER:
-        CALL TRED2(A,N,400,D,E,.TRUE.)
+        CALL TRED2(A,N,MaxBVar,D,E,.TRUE.)
 ! QL:
-        CALL TQLI(D,E,N,400,A,.TRUE.)
+        CALL TQLI(D,E,N,MaxBVar,A,.TRUE.)
 ! PRINT EIGENVALUES:
         CALL MESS(LPT,2,'Eigenvalues of normal LSQ matrix relating to INTS:')
         DO I = 1, N
@@ -1413,10 +1450,12 @@
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
+
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
       COMMON /EXCREG/ NEXCL(5), EXCLUD(40,5)
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
 
@@ -1462,19 +1501,28 @@
 !H Multiple entry routine to deal with all aspects of extinction corrections
 !H  for profile refinement
 !
+      INCLUDE 'PARAMS.INC'
+      
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
+
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
+
       REAL            ALAMBD
       INTEGER                      NLAMB
       COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
-      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(300), DERIVT(300)
-      COMPLEX FC, DERIVT
+
+      COMPLEX         FC
+      REAL                FCMOD, COSAL, SINAL, FCDERS
+      COMPLEX                                                   DERIVT
+      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(MaxF2VA), DERIVT(MaxF2VA)
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
+
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       COMMON /PREXTN/ NEXTYP, EXTPR, KEXTPR, EXTCO, DEREXQ, DXDFQ
@@ -1483,6 +1531,7 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
+
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
 
@@ -1499,7 +1548,7 @@
       WRITE (LPT,2005) EXTPR
  2005 FORMAT (/' Extinction correction parameter =',F10.4,' microns ')
       IF (EXTPR.EQ.0.) GOTO 10
-      GOTO 100
+      RETURN
 ! FORM EXTINCTION CORRECTION WHICH WILL BE P3 IN CALxx, AND DERIVATIVE:
     2 IF (EXTPR.EQ.0.) GOTO 10
 ! ONLY FOR TOF AT PRESENT:
@@ -1512,14 +1561,14 @@
       DEREXQ = -EXTCO*UTEM*UEXT
       DXDFQ = -EXTCO*UALP*UEXT
       EXTCO = SQRT(EXTCO)
-      GOTO 100
+      RETURN
 ! APPLY SHIFT IN COEFFICIENT:
     3 CALL ADJUST(EXTPR)
-      GOTO 100
+      RETURN
 ! WRITE OUT NEW 'L EXTN' CARD FOR TOF:
     4 WRITE (NEWIN,2001) NEXTYP, EXTPR
  2001 FORMAT ('L EXTN',2X,I2,1X,F10.4)
-      GOTO 100
+      RETURN
 ! DEAL WITH ABSENCE OF 'L EXTN' CARD:
     5 CALL MESS(LPT,1,'No L EXTN card - assuming no extinction correction')
       NEXTYP = 0
@@ -1527,18 +1576,17 @@
    10 EXTCO = 1.0
       DEREXQ = 0.
       DXDFQ = 0.
-      GOTO 100
+      RETURN
 ! FIX EXT COR IF NO CARD GIVEN:
     6 IF (NEXTYP.EQ.0) CALL ADDFX5(1,1,8,1,1,4)
-      GOTO 100
+      RETURN
       ENTRY EXCPR8(NV)
 ! RECORD THAT THE EXTN CORRECTION PARAMETER IS VARIABLE NUMBER NV:
       KEXTPR = NV
-      GOTO 100
+      RETURN
       ENTRY EXCPR9
 ! RECORD THAT THE EXTN CORRECTION PARAMETER IS FIXED:
       KEXTPR = 0
-  100 RETURN
 
       END SUBROUTINE EXCRPR
 !
@@ -1593,7 +1641,9 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
@@ -1964,7 +2014,11 @@
 
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
 
+
+      REAL            DERIVB
+      INTEGER                          LVARB
       COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
@@ -1995,7 +2049,9 @@
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
                       NBASF4(MPRPKF,2,9), L4END(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
@@ -3234,18 +3290,7 @@
           ELSE
             FCSQ = 0.
           ENDIF
-! AND MAGNETIC Q*Q IF NECESSARY
-          IF (MAGNET) THEN
-            CALL FMCALC(rHKL(1,KNOW),FMCMOD,FMCSQR)
-            IF (TIC) THEN
-              CALL ERRCHK(2,KTIC,ITMREF,0,'intensity contributions')
-              IF (IBMBER .NE. 0) RETURN
-              AICALC(KTIC) = ARGK
-              AIOBS(KTIC) = -FAC*FMCSQR*FLOAT(MUL)
-            ENDIF
-          ELSE
-            FMCSQR = 0.0
-          ENDIF
+          FMCSQR = 0.0
           ANT(KNOW) = FAC*FLOAT(MUL)*(FCSQ+FMCSQR)
 ! NOW THE PRINTING IF REQUIRED
           IF (TIC .OR. (IPRNT(2).GT.0)) THEN
@@ -3409,7 +3454,9 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
@@ -4127,7 +4174,11 @@
 
       LOGICAL PRNCYC
       DIMENSION ALSQ(MATSZ)
-      COMMON /DERVAR/ DERIVV(500), LVARV
+
+      REAL            DERIVV
+      INTEGER                          LVARV
+      COMMON /DERVAR/ DERIVV(MaxVVar), LVARV
+
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       INTEGER         LPT, LUNI
@@ -4145,8 +4196,10 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
+
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP, NSKTOT, KOM24
 
 ! OUT IF SIMULATION CYCLE:
@@ -5191,22 +5244,34 @@
       COMPLEX FCALC
       LOGICAL PRNCYC, TESTOV, LATABS
       DIMENSION IH(3)
+
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
-      COMMON /DERBAS/ DERIVB(400), LVARB
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(300), DERIVT(300)
-      COMPLEX FC, DERIVT
+
+      COMPLEX         FC
+      REAL                FCMOD, COSAL, SINAL, FCDERS
+      COMPLEX                                                   DERIVT
+      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(MaxF2VA), DERIVT(MaxF2VA)
+
       INTEGER         NINIT, NBATCH, NSYSTM
       LOGICAL                                MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
       COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5),    &
      &                KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
       LOGICAL ZBAKIN
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
+
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
@@ -5483,19 +5548,8 @@
           FC = FCALC(rHKL(1,K))
           FNSQ = FC*CONJG(FC)
         ENDIF
-        IF (MAG) THEN
-          CALL FMCALC(rHKL(1,K),FMCMOD,FMCSQR)
-          IF (.NOT.FIXED) THEN
-            WRITE (LPT,2042) (rHKL(I,K),I=1,3), ARGK, AIOBS(K), AICALC(K), AIDIFF, ESDOB, FNSQ, FMCSQR
- 2042       FORMAT (1X,3F8.3,F12.2,4F14.4,2F10.3)
-          ELSE
-            WRITE (LPT,2043) IH, ARGK, AIOBS(K), AICALC(K), AIDIFF, ESDOB, FNSQ, FMCSQR
- 2043       FORMAT (1X,3I5,F12.2,4F14.4,2F10.3)
-          ENDIF
-        ELSE
-          WRITE (LPT,2006) IH, ARGK, AIOBS(K), AICALC(K), AIDIFF, ESDOB, FNSQ
- 2006     FORMAT (1X,3I5,F12.2,4F14.4,F10.3)
-        ENDIF
+        WRITE (LPT,2006) IH, ARGK, AIOBS(K), AICALC(K), AIDIFF, ESDOB, FNSQ
+ 2006   FORMAT (1X,3I5,F12.2,4F14.4,F10.3)
         IF (PRECYC) THEN
           F4PAR(1,K) = AIOBS(K)
           F4PESD(1,K) = ESDOB
@@ -6173,16 +6227,23 @@
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
+
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
+
       REAL            ALAMBD
       INTEGER                      NLAMB
       COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
-      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(300), DERIVT(300)
-      COMPLEX FC, DERIVT
+
+      COMPLEX         FC
+      REAL                FCMOD, COSAL, SINAL, FCDERS
+      COMPLEX                                                   DERIVT
+      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(MaxF2VA), DERIVT(MaxF2VA)
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
+
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
 
@@ -6287,11 +6348,20 @@
 !N need the distinction, a function name MAGxxx is used as an argument.  But
 !N this is called from VARMAK, and at present it is easier done this way.
 !
-      COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /DERVAR/ DERIVV(500), LVARV
+      INCLUDE 'PARAMS.INC'
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
+      REAL            DERIVV
+      INTEGER                          LVARV
+      COMMON /DERVAR/ DERIVV(MaxVVar), LVARV
+
       INTEGER         NINIT, NBATCH, NSYSTM
       LOGICAL                                MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
 
@@ -6301,7 +6371,9 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
