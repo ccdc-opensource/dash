@@ -154,8 +154,8 @@
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
 
-      INTEGER MVAR
-      PARAMETER (mvar=100)
+      INTEGER    MVAR
+      PARAMETER (MVAR = 100)
       DOUBLE PRECISION x,lb,ub,vm,xpreset
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
 

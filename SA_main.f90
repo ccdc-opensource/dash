@@ -236,17 +236,15 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
-      INTEGER NMAX
-      PARAMETER (NMAX = 100)
-      DOUBLE PRECISION XOPT,CSH,XP,FOPT
-      COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),XP(NMAX),FOPT
+      INTEGER    MVAR
+      PARAMETER (MVAR = 100)
+      DOUBLE PRECISION XOPT,       C,       XP,       FOPT
+      COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
 
 ! JCC Handle via the PDB standard
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
 
-      INTEGER mvar
-      PARAMETER (mvar=100)
       DOUBLE PRECISION x,lb,ub,vm,xpreset
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
       COMMON /presetr/ xpreset(mvar)

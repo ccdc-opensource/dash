@@ -37,8 +37,8 @@
       CHARACTER*20 cpdbops(mpdbops)
       COMMON /pdbops/ npdbops, cpdbops
 !Required to check if x,y, or z have been fixed or bounds changed from defaults
-      INTEGER MVAR
-      PARAMETER (mvar=100)
+      INTEGER    MVAR
+      PARAMETER (MVAR = 100)
 !!can't call first common block member x
       DOUBLE PRECISION xx,lb,ub,vm
       COMMON /values/ xx(mvar),lb(mvar),ub(mvar),vm(mvar)
