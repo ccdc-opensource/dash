@@ -136,16 +136,10 @@
       REAL              XOPT,       C,       FOPT
       COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
-      LOGICAL         UseRene, UseRelease, UseESD
-      INTEGER                                     nwidth
-      REAL                                                 width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                                   InPeak
-      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
-
       REAL Curr_CHI
 
       Curr_Iter = TheIter
-      IF (Is_SX .OR. UseRene) THEN
+      IF (Is_SX) THEN
         Curr_CHI = FOPT
       ELSE
         Curr_CHI = CHIPROBEST
