@@ -1,30 +1,26 @@
-      subroutine create_fob()
-	include 'params.inc'
-c
-      parameter (maxatm=100)
-      parameter (maxfrg=20)
-      double precision a,b,c,al,be,ga
-      double precision tiso,occ
-      double precision blen,alph,bet,f2cmat
-      character*3 asym
-      integer ioptb,iopta,ioptt,iz1,iz2,iz3
+!
+!*****************************************************************************
+!
+      SUBROUTINE create_fob()
 
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'IZMCheck.inc'
 
-	include 'IZMCheck.inc'
+      REAL tiso, occ
+      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
+      DOUBLE PRECISION blen,alph,bet,f2cmat
+      CHARACTER*3 asym
+      INTEGER ioptb,iopta,ioptt,iz1,iz2,iz3
 
-      common /zmcomi/ ntatm,natoms(maxfrg),
+      COMMON /zmcomi/ ntatm,natoms(maxfrg),
      &ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),
      &iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
-      common /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),
+      COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),
      &bet(maxatm,maxfrg),f2cmat(3,3)
-      common /zmcomc/ asym(maxatm,maxfrg)
-      common /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),
-     &al(maxfrg),be(maxfrg),ga(maxfrg),tiso(maxatm,maxfrg),
-     &occ(maxatm,maxfrg)
-c
-      common /frgcom/ nfrag,lfrag(maxfrg)
-c
-C
+      COMMON /zmcomc/ asym(maxatm,maxfrg)
+
+      COMMON /frgcom/ nfrag,lfrag(maxfrg)
+
       COMMON /FCSTOR/MAXK,FOB(150,MFCSTO)
       COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),
      & TF(150),KTF(150),SITE(150),KSITE(150),
@@ -32,53 +28,47 @@ C
       COMMON /FCSPC2/ ARGK(MFCSP2),DSTAR(MFCSP2)
       LOGICAL HYDNOT
       COMMON /HIDDAT/ HYDNOT(150),nsatom,isatom(150)
-      logical log_hydrogens
-      common /hydrogen/ log_hydrogens  
 
-	integer jj
-c
-c
-c
-      item=0
-      NSATOM=0
-	ifrg = 0
-      do jj=1,nfrag
-	  do while ( ifrg .LE. CheckSize )
-		ifrg = ifrg + 1
-	    if ( IZMCheck(ifrg) .EQ. 1 ) EXIT ! the loop since we have a fragment we are using
-	  end do
+      INTEGER jj
 
-        do i=1,natoms(ifrg)
-          item=item+1
-          hydnot(item)=(asym(i,ifrg).ne.'H  ')
-          if (hydnot(item)) then
+      item = 0
+      NSATOM = 0
+      ifrg = 0
+      DO jj = 1, nfrag
+        DO WHILE ( ifrg .LE. CheckSize )
+          ifrg = ifrg + 1
+          IF ( IZMCheck(ifrg) .EQ. 1 ) EXIT ! the loop since we have a fragment we are using
+        END DO
+        DO i = 1, natoms(ifrg)
+          item = item + 1
+          hydnot(item)=(asym(i,ifrg).NE.'H  ')
+          IF (hydnot(item)) THEN
              nsatom=nsatom+1
              isatom(nsatom)=item
-          end if
-          do iref=1,maxk
+          END IF
+          DO iref = 1, maxk
             ssq=0.25*dstar(iref)**2
-            atem=sngl(occ(i,ifrg))*ascfac(asym(i,ifrg),ssq)
-            btem=sngl(tiso(i,ifrg))*ssq
-            fob(item,iref)=atem*exp(-btem)
-          end do
-        end do
-      end do
-c
+            atem=occ(i,ifrg)*ascfac(asym(i,ifrg),ssq)
+            btem=tiso(i,ifrg)*ssq
+            fob(item,iref)=atem*EXP(-btem)
+          END DO
+        END DO
+      END DO
       natom=item
-c
-      end
-c
-c
-c
-      function ascfac(asym,ss)
-c
-c
-      parameter (melem=99)
-      character*3 asym,symba(melem)
-      real a1(melem),b1(melem),a2(melem),b2(melem)
-      real a3(melem),b3(melem),a4(melem),b4(melem)
-      real cv(melem)
-c
+
+      END SUBROUTINE create_fob
+!
+!*****************************************************************************
+!
+      FUNCTION ascfac(asym,ss)
+! Atomic SCattering FACtors
+
+      PARAMETER (melem=99)
+      CHARACTER*3 asym,symba(melem)
+      REAL a1(melem),b1(melem),a2(melem),b2(melem)
+      REAL a3(melem),b3(melem),a4(melem),b4(melem)
+      REAL cv(melem)
+
       DATA SYMBA/ 'Du', 'H  ','He ','Li ','Be ','B  ','C  ','N  ','O  ',
      &'F  ','Ne ','Na ','Mg ','Al ','Si ','P  ','S  ','Cl ','Ar ',
      &'K  ','Ca ','Sc ','Ti ','V  ','Cr ','Mn ','Fe ','Co ','Ni ',
@@ -89,7 +79,7 @@ c
      &'Tm ','Yb ','Lu ','Hf ','Ta ','W  ','Re ','Os ','Ir ','Pt ',
      &'Au ','Hg ','Tl ','Pb ','Bi ','Po ','At ','Rn ','Fr ','Ra ',
      &'Ac ','Th ','Pa ','U  ','Np ','Pu ','Am ','Cm ','Bk ','Cf '/
-C
+
       DATA A1/0.0000, 
      &   0.48992,   0.87340,   1.12820,   1.59190,   2.05450,   2.31000,
      &  12.21260,   3.04850,   3.53920,   3.95530,   4.76260,   5.42040,
@@ -108,7 +98,7 @@ C
      &  35.31630,  35.56310,  35.92990,  35.76300,  35.65970,  35.56450,
      &  35.88470,  36.02280,  36.18740,  36.52540,  36.67060,  36.64880,
      &  36.78810,  36.91850/
-C
+
       DATA B1/1.0000, 
      &  20.65930,   9.10370,   3.95460,  43.64270,  23.21850,  20.84390,
      &   0.00570,  13.27710,  10.28250,   8.40420,   3.28500,   2.82750,
@@ -127,7 +117,7 @@ C
      &   0.68587,   0.66310,   0.64645,   0.61634,   0.58909,   0.56336,
      &   0.54775,   0.52930,   0.51193,   0.49938,   0.48363,   0.46515,
      &   0.45102,   0.43753/
-C
+
       DATA A2/0.0000, 
      &   0.26200,   0.63090,   0.75080,   1.12780,   1.33260,   1.02000,
      &   3.13220,   2.28680,   2.64120,   3.11250,   3.17360,   2.17350,
@@ -146,7 +136,7 @@ C
      &  19.02110,  21.28160,  23.05470,  22.90640,  23.10320,  23.42190,
      &  23.29480,  23.41280,  23.59640,  23.80830,  24.09920,  24.40960,
      &  24.77360,  25.19950/
-C 
+ 
       DATA B2/1.0000,
      &   7.74039,   3.35680,   1.05240,   1.86230,   1.02100,  10.20750,
      &   9.89330,   5.70110,   4.29440,   3.42620,   8.84220,  79.26110,
@@ -165,7 +155,7 @@ C
      &   3.97458,   4.06910,   4.17619,   3.87135,   3.65155,   3.46204,
      &   3.41519,   3.32530,   3.25396,   3.26371,   3.20647,   3.08997,
      &   3.04619,   3.00775/
-C 
+ 
       DATA A3/0.0000,
      &   0.19677,   0.31120,   0.61750,   0.53910,   1.09790,   1.58860,
      &   2.01250,   1.54630,   1.51700,   1.45460,   1.26740,   1.22690,
@@ -184,7 +174,7 @@ C
      &   9.49887,   8.00370,  12.14390,  12.47390,  12.59770,  12.74730,
      &  14.18910,  14.94910,  15.64020,  16.77070,  17.34150,  17.39900,
      &  17.89190,  18.33170/
-C 
+ 
       DATA B3/1.0000,
      &  49.55190,  22.92760,  85.39050,  103.4830,  60.34980,   0.56870,
      &  28.99750,   0.32390,   0.26150,   0.23060,   0.31360,   0.38080,
@@ -203,7 +193,7 @@ C
      &  11.38240,  14.04220,  23.10520,  19.98870,  18.59900,  17.83090,
      &  16.92350,  16.09270,  15.36220,  14.94550,  14.31360,  13.43460,
      &  12.89460,  12.40440/
-C
+
       DATA A4/0.0000,
      &   0.04988,   0.17800,   0.46530,   0.70290,   0.10680,   0.86500,
      &   1.16630,   0.86700,   1.02430,   1.12510,   1.11280,   2.30730,
@@ -222,7 +212,7 @@ C
      &   7.42518,   7.44330,   2.11253,   3.21097,   4.08655,   4.80703,
      &   4.17287,   4.18800,   4.18550,   3.47947,   3.49331,   4.21665,
      &   4.23284,   4.24391/
-C
+
       DATA B4/1.0000,
      &   2.20159,   0.98210, 168.26100,   0.54200,   0.14030,  51.65120,
      &   0.58260,  32.90890,  26.14760,  21.71840, 129.42400,   7.19370,
@@ -241,7 +231,7 @@ C
      &  45.47150,  44.24730, 150.64500, 142.32500, 117.02000,  99.17220,
      & 105.25100, 100.61300,  97.49080, 105.98000, 102.27300,  88.48340,
      &  86.00300,  83.78810/
-C
+
       DATA CV/0.0000,
      &   0.00131,   0.00640,   0.03770,   0.03850,  -0.19320,   0.21560,
      & -11.52900,   0.25080,   0.27760,   0.35150,   0.67600,   0.85840,
@@ -260,24 +250,26 @@ C
      &  13.71080,  13.69050,  13.72470,  13.62110,  13.52660,  13.43140,
      &  13.42870,  13.39660,  13.35730,  13.38120,  13.35920,  13.28870,
      &  13.27540,  13.26740/
-c
-	 do i=1,melem
-       if (asym.eq.symba(i)) then
-         ascfac=a1(i)*exp(-b1(i)*ss)+a2(i)*exp(-b2(i)*ss)
-     &     +a3(i)*exp(-b3(i)*ss)+a4(i)*exp(-b4(i)*ss)
-     &     +cv(i)
-         goto 999
-       end if
-	 end do
-c
-c>> jcc: default is a dummy.
 
-	ascfac=a1(1)*exp(-b1(1)*ss)+a2(1)*exp(-b2(1)*ss)
-     &     +a3(1)*exp(-b3(1)*ss)+a4(1)*exp(-b4(1)*ss)
-     &     +cv(1)
+      DO I = 1, melem
+        IF (asym .EQ. symba(I)) THEN
+          ascfac = a1(I)*EXP(-b1(I)*ss)
+     &            +a2(I)*EXP(-b2(I)*ss)
+     &            +a3(I)*EXP(-b3(I)*ss)
+     &            +a4(I)*EXP(-b4(I)*ss)
+     &            +cv(I)
+          GOTO 999
+        END IF
+      END DO
+c default is a dummy.
+      ascfac = a1(1)*EXP(-b1(1)*ss)
+     &        +a2(1)*EXP(-b2(1)*ss)
+     &        +a3(1)*EXP(-b3(1)*ss)
+     &        +a4(1)*EXP(-b4(1)*ss)
+     &        +cv(1)
+ 999  RETURN
 
-	
- 999  return
-
-
-	end
+      END
+!
+!*****************************************************************************
+!

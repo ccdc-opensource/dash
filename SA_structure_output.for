@@ -12,13 +12,12 @@
       DOUBLE PRECISION parvals(*) ! The current torsion parameters (cant be called X here)
       INTEGER ntotmov
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
       INCLUDE 'IZMCheck.inc'
-
-      parameter (maxatm=100)
-      parameter (maxfrg=20)
+      
       character*3 asym
       common /zmcomc/ asym(maxatm,maxfrg)
       common /zmcomi/ ntatm,natoms(maxfrg),
@@ -27,15 +26,14 @@
 
       CHARACTER*36 czmpar
       COMMON /zmnpar/ izmtot,izmpar(maxfrg),
-     &   czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
+     & czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
 
       INTEGER ipcount
       INTEGER CheckedFragNo
 
       COMMON /frgcom/ nfrag,lfrag(maxfrg)
-      DOUBLE PRECISION a,b,c,al,be,ga,chrg
-      COMMON /zmcomo/ a(maxfrg),b(maxfrg),c(maxfrg),
-     &  al(maxfrg),be(maxfrg),ga(maxfrg),chrg(maxatm,maxfrg)
+      REAL tiso, occ
+      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen,alph,bet,f2cmat
       COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),
      &  bet(maxatm,maxfrg),f2cmat(3,3)
