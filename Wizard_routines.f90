@@ -202,6 +202,8 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'Lattice.inc'
+
       LOGICAL, EXTERNAL :: FnPatternOK
       INTEGER IPW_Option
 
@@ -219,20 +221,26 @@
                 CASE (1) ! View data / determine peaks positions
                   CALL WDialogSelect(IDD_PW_Page3)
 ! If no data => grey out 'Next >' button
-                  CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
-                  CALL WDialogFieldStateLogical(IDB_Bin,FnPatternOK())
+                  CALL WDialogFieldStateLogical(IDNEXT, FnPatternOK())
+                  CALL WDialogFieldStateLogical(IDB_Bin, FnPatternOK())
                   CALL WizardWindowShow(IDD_PW_Page3)
                 CASE (2) ! Preparation for Pawley refinement
                   CALL WDialogSelect(IDD_PW_Page2)
 ! If we have loaded a powder pattern, the Next > button should be enabled
-                  CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
+                  CALL WDialogFieldStateLogical(IDNEXT, FnPatternOK())
                   CALL WizardWindowShow(IDD_PW_Page2)
-                CASE (3) ! Simulated annealing structure solution
+                CASE (3) ! Single crystal
+                  CALL WDialogSelect(IDD_SX_Page1)
+                  ZeroPoint = 0.0
+                  CALL Upload_ZeroPoint               
+                  CALL Generate_TicMarks
+                  CALL WizardWindowShow(IDD_SX_Page1)
+                CASE (4) ! Simulated annealing structure solution
                   CALL ShowWizardWindowZmatrices
-                CASE (4) ! Analyse solutions
+                CASE (5) ! Analyse solutions
                   CALL WizardWindowShow(IDD_SAW_Page5)
                   CALL SelectMode(IDB_AnalyseSolutions)
-                CASE (5) ! Rietveld refinement
+                CASE (6) ! Rietveld refinement
                   CALL WizardWindowShow(IDD_SAW_Page6)
        !           CALL SelectMode(IDB_AnalyseSolutions)
               END SELECT

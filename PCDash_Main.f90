@@ -508,6 +508,8 @@
       CALL IOsDeleteFile('polyp.tbk')
       CALL IOsDeleteFile('polyp.hbk')
       CALL IOsDeleteFile('polyp.hbl')
+      CALL IOsDeleteFile('polyo.ccl')
+      CALL IOsDeleteFile('polyo.lis')
       CALL IOsDeleteFile('SA_best.pdb')
       CALL IOsDeleteFile(DV_FileName)
       CALL IOSDeleteFile('MakeZmatrix.log')

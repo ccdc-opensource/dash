@@ -1,4 +1,4 @@
-! Winteracter module created : 09/Aug/2003 15:18:22
+! Winteracter module created : 09/Sep/2003 16:06:08
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -718,4 +718,7 @@
           INTEGER, PARAMETER :: IDF_MENU1                       =  1546
           INTEGER, PARAMETER :: IDB_Restart                     =  1547
           INTEGER, PARAMETER :: IDC_AbsorbH                     =  1548
+          INTEGER, PARAMETER :: IDF_PW_Option6                  =  1549
+          INTEGER, PARAMETER :: IDD_SX_Page1                    =   120
+          INTEGER, PARAMETER :: IDD_SX_Page2                    =   141
       END MODULE Druid_Header
