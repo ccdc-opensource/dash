@@ -312,7 +312,7 @@
               CALL CheckUnitCellConsistency
               CALL Profile_Plot
             CASE (IDB_Delabc)
-              IF (Confirm('Do you wish to clear all cell parameters?')) CALL Clear_UnitCell
+              CALL Clear_UnitCell_WithConfirmation
           END SELECT
         CASE (FieldChanged)
 ! Due to the way Winteracter works, a FieldChanged is generated for 'REAL' input boxes
@@ -659,7 +659,6 @@
       REAL    Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
       INTEGER Isystem(6), UseErr, I, Iord
       INTEGER IHANDLE
-      REAL    Epsti
       REAL    Epsilon
       REAL    MaxLen
       LOGICAL Confirm ! Function
@@ -758,13 +757,13 @@
           ELSE 
             epsil(I) = AllPkPosEsd(IOrd) * 10.0
           ENDIF
-          Epsti = epsil(I) + 0.015
-          IF (Epsti .GT. epst) epst = Epsti
+          IF (((epsil(I) + 0.015) * DV_ScaleFactor) .GT. epst) epst = ((epsil(I) + 0.015) * DV_ScaleFactor)
+          epsil(I) = epsil(I) * DV_ScaleFactor
         ENDDO
       ELSE
-        epst = Epsilon + 0.015
+        epst = (Epsilon + 0.015) * DV_ScaleFactor
         DO I = 1, n
-          epsil(I) = Epsilon
+          epsil(I) = Epsilon * DV_ScaleFactor
         ENDDO
       ENDIF
       DO I = 1, NTPeak
@@ -773,7 +772,8 @@
       ENDDO
       CALL WCursorShape(CurHourGlass)
       NumOfDICVOLSolutions = 0
-      CALL DICVOL91(Isystem(1),Isystem(2),Isystem(3),Isystem(4),Isystem(5),Isystem(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
+      CALL DICVOL91(Isystem(1) .EQ. 1,Isystem(2) .EQ. 1,Isystem(3) .EQ. 1, &
+                    Isystem(4) .EQ. 1,Isystem(5) .EQ. 1,Isystem(6) .EQ. 1,Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
       CALL WCursorShape(CurCrossHair)
 ! Pop up a window showing the DICVOL output file in a text editor
       CALL WindowOpenChild(IHANDLE)
