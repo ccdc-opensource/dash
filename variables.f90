@@ -44,12 +44,10 @@
 
 ! New license information structure    
       TYPE License_Info
-        INTEGER   Day
-        INTEGER   Month
-        INTEGER   Year
-        INTEGER   DateCode
+        INTEGER   ExpiryDate
+        INTEGER   DaysLeft
         INTEGER   SerialNumber
-        INTEGER   LicenseType
+        INTEGER   LicenceType
         INTEGER   Valid
       END TYPE
       INTEGER NodeKey,DemoKey,SiteKey
