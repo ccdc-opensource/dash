@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SA_structure_output(T,fopt,cpb,parvals,ntotmov,RunNr)
+      SUBROUTINE SA_structure_output(T,fopt,cpb,parvals,ntotmov)
 
       USE VARIABLES
       USE ZMVAR
@@ -13,16 +13,25 @@
       DOUBLE PRECISION t, fopt
       REAL cpb
       DOUBLE PRECISION parvals(*) ! The current torsion parameters (can't be called X here)
-      INTEGER ntotmov, RunNr
+      INTEGER ntotmov
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
+      INTEGER    MVAR
+      PARAMETER (MVAR = 100)
+
       DOUBLE PRECISION inv(3,3)
 
       REAL            XATOPT
       COMMON /posopt/ XATOPT(3,150)
+
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       INTEGER         NATOM
       REAL                   X
@@ -221,9 +230,9 @@
                                 occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:2)
  1130           FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
               ENDIF
-              pdbAtmCoords(1,iorig,ifrg,RunNr) = xc
-              pdbAtmCoords(2,iorig,ifrg,RunNr) = yc
-              pdbAtmCoords(3,iorig,ifrg,RunNr) = zc
+              pdbAtmCoords(1,iorig,ifrg,SA_Run_Number) = xc
+              pdbAtmCoords(2,iorig,ifrg,SA_Run_Number) = yc
+              pdbAtmCoords(3,iorig,ifrg,SA_Run_Number) = zc
             ENDIF
 !         The CCL atom lines
             IF (tSaveCCL) THEN
@@ -736,6 +745,8 @@
 !
       SUBROUTINE AddSingleSolution(ProfileChi,IntensityChi)
 
+      IMPLICIT NONE
+
       REAL ProfileChi, IntensityChi
 
       CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
@@ -744,13 +755,6 @@
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
-      LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
-
-      SA_Run_Number = 1
       CALL Log_SARun_Entry(pdb_file,ProfileChi,IntensityChi)
 
       END SUBROUTINE ADDSINGLESOLUTION
@@ -777,7 +781,6 @@
 
       CHARACTER*85 new_fname
 
-      SA_Run_Number = SA_Run_Number + 1
       CALL AppendNumToFileName(SA_Run_Number,cssr_file,new_fname)
       CALL IOsDeleteFile(new_fname)
       CALL IOsRenameFile(cssr_file(1:LEN_TRIM(cssr_file)),new_fname)

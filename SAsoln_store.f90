@@ -41,7 +41,7 @@
       LOGICAL, EXTERNAL :: Get_SavePRO
       INTEGER    tFileHandle
 
-      PRO_saved(SA_Run_Number+1) = .FALSE.
+      PRO_saved(SA_Run_Number) = .FALSE.
       IF (.NOT. Get_SavePRO()) RETURN
       tFileHandle = 61
       OPEN(UNIT=tFileHandle,FILE=pro_file(1:pro_flen),status='unknown',ERR=999)
@@ -51,7 +51,7 @@
       ENDDO
 ! to overwrite:
       CLOSE(tFileHandle)
-      PRO_saved(SA_Run_Number+1) = .TRUE.
+      PRO_saved(SA_Run_Number) = .TRUE.
       RETURN
   999 CALL ErrorMessage('Error while writing .pro file.')
       CLOSE(tFileHandle)
