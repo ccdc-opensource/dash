@@ -72,6 +72,7 @@
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       CALL OutputChi2vsMoves
+      CALL SetModeMenuState(0,0,1)
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Enabled)
 !O      Ierrflag = InfoError(1)
@@ -87,6 +88,7 @@
       IF (iMyExit .EQ. 5) THEN
         CALL WizardWindowShow(IDD_SA_input2)
       ELSE
+        CALL SelectMode(IDB_AnalyseSolutions)
         CALL WDialogSelect(IDD_SAW_Page5)
         CALL WDialogPutInteger(IDF_Limit1,1)
         CALL WDialogPutInteger(IDF_Limit2,NumOf_SA_Runs)
@@ -275,7 +277,7 @@
       COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
 
       INTEGER           iHMUL
-      COMMON /SAREFLN3/ iHMUL(MFCSTO)
+      COMMON /SAREFLN3/ iHMUL(MaxRef)
 
       INTEGER         NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
