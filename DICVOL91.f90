@@ -295,6 +295,7 @@
 !
 !     Reading of the data
       iw = 117
+      DICVOL_Error = 0 ! Success
       OPEN(iw,FILE='DICVOL.OUT',ERR=1900)
 99001 FORMAT (A)
       IF ( amax.EQ.0.0 ) amax = 20.0
@@ -885,8 +886,9 @@
 !      WRITE (iw,99038)
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS'/2X,37('*'))
       GOTO 2000
- 1900 CALL ErrorMessage('Error accessing input / output file')
+ 1900 CALL ErrorMessage('Error accessing output file')
       CLOSE (IW)
+      DICVOL_Error = 1
       RETURN
  2000 WRITE (iw,99019)
 99019 FORMAT (/14X,'DICVOL91 : USEFUL REFERENCES'/14X,'--------'/16X,                                              &
