@@ -54,7 +54,6 @@
 
       REAL RR_Params(1:RR_MVAR)
       REAL RR_InitSteps(1:RR_MVAR) ! Initial step sizes for Simplex
-      INTEGER RR_var2PO
       INTEGER RR_var2ITF
 
       INTEGER RR_nvar, RR_npar
