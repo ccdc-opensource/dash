@@ -6714,23 +6714,22 @@
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 
 ! IF P1 OR P BAR1, NO ABSENCES:
-      IF (NOPC.EQ.1) GOTO 101
+      IF (NOPC .EQ. 1) GOTO 101
       ISPABS = .TRUE.
       DO IC = 1, NCENT
         DO I = 1, NOPC
           CALL ROTSYM(H,EH,I,-1)
-          IF (IC.EQ.2) CALL GMREV(EH,EH,1,3)
+          IF (IC .EQ. 2) CALL GMREV(EH,EH,1,3)
           DO J = 1, 3
             IF (ABS(H(J)-EH(J)).GT.10.E-4) GOTO 1
           ENDDO
 ! REFLECTION TRANSFORMS INTO ITSELF - CHECK TRANSLATION
           A = SCALPR(TRANS(1,I),H)
-          IF (ABS(AMOD((ABS(A)+0.01),1.)).GT.0.1) GOTO 100
+          IF (ABS(AMOD((ABS(A)+0.01),1.0)).GT.0.1) RETURN
     1   ENDDO
       ENDDO
 ! PRESENT:
   101 ISPABS = .FALSE.
-  100 RETURN
 
       END FUNCTION ISPABS
 !
@@ -8559,6 +8558,7 @@
   101 NOPFIL = LUN
       IOTAB(IU) = MODE
   100 MESSAG = ' '
+
       END FUNCTION NOPFIL
 !
 !*****************************************************************************

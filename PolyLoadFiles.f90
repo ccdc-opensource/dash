@@ -31,7 +31,7 @@
       CHARACTER(LEN=MaxPathLength) tFileName
 
       IFLAGS = LoadDialog + DirChange + PromptOn
-! It seems that Winteracter cannot cope with strings of this length
+! It seems that Winteracter cannot cope with strings of this length (> 255 bytes)
 !      FILTER = 'All files (*.*)|*.*|'//&
 !               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
 !               'Bruker powder diffraction files (*.raw, *.uxd)|*.raw;*.uxd|'//&
@@ -92,11 +92,8 @@
         CALL ErrorMessage("The file "//TheFileName(1:KLEN)//" does not exist!")
         RETURN
       ENDIF
-! This is the point of no return: the selected file will be new file, valid data or not
-! Change global variable FNAME
-      FNAME = TheFileName
 ! Update this throughout the program (Wizard + status bar)
-      CALL ScrUpdateFileName
+      FNAME = TheFileName
       ISTAT = DiffractionFileLoad(TheFileName)
       DiffractionFileOpen = ISTAT
       IF (ISTAT .NE. 0) RETURN
@@ -188,27 +185,27 @@
       NoWavelengthInXYE = .FALSE.
       SELECT CASE (EXT4)
         CASE ('cpi ')
-          ISTAT = Load_cpi_File(TheFileName,ESDsFilled)
+          ISTAT = Load_cpi_File(TheFileName, ESDsFilled)
         CASE ('dat ')
-          ISTAT = Load_dat_File(TheFileName,ESDsFilled)
+          ISTAT = Load_dat_File(TheFileName, ESDsFilled)
         CASE ('mdi ')
-          ISTAT = Load_mdi_File(TheFileName,ESDsFilled)
+          ISTAT = Load_mdi_File(TheFileName, ESDsFilled)
         CASE ('pod ')
-          ISTAT = Load_pod_File(TheFileName,ESDsFilled)
+          ISTAT = Load_pod_File(TheFileName, ESDsFilled)
         CASE ('raw ')
-          ISTAT = Load_raw_File(TheFileName,ESDsFilled)
+          ISTAT = Load_raw_File(TheFileName, ESDsFilled)
         CASE ('rd  ','sd  ')
-          ISTAT =  Load_rd_File(TheFileName,ESDsFilled)
+          ISTAT =  Load_rd_File(TheFileName, ESDsFilled)
         CASE ('txt ')
-          ISTAT = Load_sci_File(TheFileName,ESDsFilled)
+          ISTAT = Load_sci_File(TheFileName, ESDsFilled)
         CASE ('udf ')
-          ISTAT = Load_udf_File(TheFileName,ESDsFilled)
+          ISTAT = Load_udf_File(TheFileName, ESDsFilled)
         CASE ('uxd ')
-          ISTAT = Load_uxd_File(TheFileName,ESDsFilled)
+          ISTAT = Load_uxd_File(TheFileName, ESDsFilled)
         CASE ('xye ')
-          ISTAT = Load_xye_File(TheFileName,ESDsFilled)
+          ISTAT = Load_xye_File(TheFileName, ESDsFilled)
         CASE ('x01 ')
-          ISTAT = Load_x01_File(TheFileName,ESDsFilled)
+          ISTAT = Load_x01_File(TheFileName, ESDsFilled)
         CASE DEFAULT
           ISTAT = 1
       END SELECT
@@ -241,7 +238,7 @@
       CALL Clear_UnitCell
 ! Ungrey 'Remove background' button on toolbar if Wizard is not up
 !O      IF (CurrentWizardWindow .EQ. 0) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
-      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
+      CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOn)
       tYPMIN = YOBS(1)
       tYPMAX = YOBS(1)
       DO I = 1, NOBS
@@ -257,7 +254,7 @@
       ENDDO
       IF (INTEGRATED_GUESS .GT. 250000.0) THEN
         ScalFac = 0.01 * INTEGRATED_GUESS/250000.0
-      ELSE IF (tYPMAX .GT. 100000) THEN
+      ELSE IF (tYPMAX .GT. 100000.0) THEN
         ScalFac = 0.01 * tYPMAX/100000.0
       ENDIF
       BackupXOBS = 0.0
@@ -277,7 +274,6 @@
       IPTYPE = 1
       NoData = .FALSE.
       CALL Clear_PeakFitRanges
-!      CALL Profile_Plot
       CALL sa_SetOutputFiles(TheFileName)
       CALL ScrUpdateFileName
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
@@ -285,7 +281,6 @@
       CALL WDialogSelect(IDD_PW_Page8)
       CALL WDialogFieldState(IDB_PrevRes,Disabled)
       CALL PopActiveWindowID
-!      CALL FourierPattern(1,1000)
 
       END FUNCTION DiffractionFileLoad
 !
