@@ -12,7 +12,7 @@
 
       INTEGER :: IFlags, Ilen, Idashlen
       CHARACTER(LEN=MaxPathLength) :: Dirname, DashDir, InstDirLc, DashDirLc, DirNameLc
-      LOGICAL Confirm ! Function
+      LOGICAL, EXTERNAL ::  Confirm
 
       Idashlen = GETENVQQ("DASH_DIR",DashDir)
       InstDirLc = InstDir
@@ -181,12 +181,22 @@
       USE WINTERACTER
       USE VARIABLES
       USE DFLIB ! Windows environment variable handling: for GETENVQQ
+      USE KERNEL32
+
+      IMPLICIT NONE
 
       INTEGER       lval
       CHARACTER*255 DashDir
       CHARACTER*255 line
       CHARACTER*255 tDir, tFile
+      CHARACTER*MaxPathLength tString
+      INTEGER*4 tProcess, tSize
 
+      tSize = MaxPathLength
+      tProcess = 0 ! this program
+      CALL GetModuleFileName(tProcess,tString,LOC(tSize))
+! tString should now contain the full path to PCDash.exe irrespective of the way
+! DASH has been invoked.
       ViewOn     = .FALSE.
       ViewAct    = .FALSE.
       ConvOn     = .FALSE.
