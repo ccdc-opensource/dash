@@ -1293,7 +1293,7 @@
               CASE (MouseButUp)
                 xgcur(2) = EventInfo%GX
                 ygcur(2) = EventInfo%GY
-                CALL WMessageEnable(MouseMove, Disabled)
+!                CALL WMessageEnable(MouseMove, Disabled)
                 CALL WMessageEnable(MouseButUp, Disabled)
                 IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
                   CALL IGrColourN(KolNumRectSelect)

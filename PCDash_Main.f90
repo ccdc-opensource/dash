@@ -79,6 +79,7 @@
       CALL InitialiseVariables
       CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(TabChanged, Enabled)
+      CALL WMessageEnable(MouseMove, Enabled)
       CALL CheckLicence
 ! Main message loop
       IF (NARGS() .GT. 1) THEN
@@ -99,7 +100,7 @@
             iDummy = Read_One_ZM(iFrg)
             IF (iDummy .EQ. 0) THEN ! successful read
               gotzmfile(iFrg) = .TRUE.
-! JCC traps for Z-matrix reading
+! Traps for Z-matrix reading
             ELSE 
               gotzmfile(iFrg) = .FALSE. 
               CALL FileErrorPopup(frag_file(iFrg),iDummy)
@@ -157,7 +158,6 @@
 ! Comment this next line out to remove the wizard
         CALL StartWizard
       ENDIF
-!      CALL ShowWindowRietveld
       DO WHILE (.TRUE.)
         CALL GetEvent
       ENDDO
@@ -219,7 +219,6 @@
 
 !   Branch depending on chosen menu item
 
-      CALL WindowOutStatusBar(8,' ')
       SELECT CASE (EventInfo%VALUE1)
         CASE (IDB_Open)
           CALL PrjFileBrowse

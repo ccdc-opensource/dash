@@ -1651,7 +1651,6 @@
       INTEGER, INTENT (IN   ) :: TheMode
 
       INCLUDE 'GLBVAR.INC'
-      CHARACTER*(80) STATBARSTR2
 
       CALL PushActiveWindowID
       IF (WMenuGetState(TheMode,ItemEnabled) .EQ. Disabled) THEN
@@ -1659,19 +1658,10 @@
         CALL WMenuSetState(TheMode,ItemEnabled,Enabled)
       ENDIF
 ! Update the status bar
-      SELECT CASE (TheMode)
-        CASE (ID_Peak_Fitting_Mode)
-          STATBARSTR2 = 'Peak fitting mode'
-        CASE (ID_Pawley_Refinement_Mode)
-          STATBARSTR2 = 'Pawley refinement mode'
-        CASE (ID_Structure_Solution_Mode)
-          STATBARSTR2 = 'Structure solution mode'
-          CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-          CALL WDialogPutRadioButton(IDF_PW_Option3)
-        CASE (IDB_AnalyseSolutions)
-          STATBARSTR2 = 'Analyse solutions mode'
-      END SELECT
-      CALL WindowOutStatusBar(8,STATBARSTR2)
+      IF (TheMode .EQ. ID_Structure_Solution_Mode) THEN
+        CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+        CALL WDialogPutRadioButton(IDF_PW_Option3)
+      ENDIF
 ! Update the menu + the toolbar
       CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
       IDCurrent_Cursor_mode = TheMode
