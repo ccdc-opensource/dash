@@ -13,7 +13,6 @@
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen, alph, bet, f2cmat
-      CHARACTER*3 asym
       INTEGER ioptb, iopta, ioptt, iz1, iz2, iz3
       COMMON /frgcom/ nfrag
       COMMON /zmcomi/ ntatm, natoms(maxfrg), ioptb(maxatm,maxfrg),      &
@@ -22,7 +21,6 @@
      &                iz3(maxatm,maxfrg)
       COMMON /zmcomr/ blen(maxatm,maxfrg), alph(maxatm,maxfrg),         &
      &                bet(maxatm,maxfrg), f2cmat(3,3)
-      COMMON /zmcomc/ asym(maxatm,maxfrg)
       COMMON /zmcomg/ icomflg(maxfrg)
 !
       PARAMETER (mvar=100)
@@ -34,7 +32,6 @@
 !
 !      COMMON  /ZMCOMI/ NATOMS,IOPTT(MAXATM),IZ1(MAXATM),IZ2(MAXATM),IZ3(MAXATM)
 !      COMMON  /ZMCOMR/ BLEN(MAXATM),ALPH(MAXATM),BET(MAXATM),F2CMAT(3,3)
-!      COMMON  /ZMCOMC/ ASYM(MAXATM)
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
