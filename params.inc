@@ -153,3 +153,11 @@
 
       INTEGER maxatm
       PARAMETER ( maxatm = 100 )
+
+! For use in common block PLTSTO2
+
+	  INTEGER  maxiter
+      PARAMETER ( maxiter = 10000 )
+
+! maxiter = maximum number of simulated annealing iterations (per individual run when multi run).
+
