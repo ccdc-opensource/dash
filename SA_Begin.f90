@@ -204,9 +204,6 @@
       CHARACTER*20                                           symline
       COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
 
-      INTEGER           iHMUL
-      COMMON /SAREFLN3/ iHMUL(MaxRef)
-
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
