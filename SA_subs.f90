@@ -896,15 +896,9 @@
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
 
-      LOGICAL         UseRene, UseRelease, UseESD
-      INTEGER                                     nwidth
-      REAL                                                width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                                   InPeak
-      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
-
       REAL Best_CHI
 
-      IF (Is_SX .OR. UseRene) THEN
+      IF (Is_SX) THEN
         Best_CHI = FOPT
       ELSE
         Best_CHI = CHIPROBEST
