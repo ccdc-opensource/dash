@@ -1,3 +1,149 @@
+! @ The validity of tLattice is never checked !!!
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION Res2Mol2(TheFileName)
+!
+! This subroutine tries to read a SHELX .res file and tries to convert it to a Sybyl .mol2 file.
+! The .mol2 file stuff was taken from 'cad2mol2.f' by Jos Lommerse.
+! Bonds are calculated from the distances between 2 atoms.
+!
+! Free format.
+!
+! RETURNS : 0 for failure
+!           1 for success
+!
+!TITLBA09_2                                  
+!CELL   0.0000   4.0207   4.5938  21.0298  90.7123  69.6944  80.3612
+!LATT  1
+!O1    0    0.19295   -0.33996    0.06295    1.00000    0.02476
+!O2    0   -0.17961   -0.00616    0.13265    1.00000    0.02000
+!C3    0   -0.10381   -0.30317    0.43567    1.00000    0.08073
+!H4    0   -0.29456   -0.41679    0.45015    1.00000    0.10000
+!H5    0    0.14042   -0.43747    0.42625    1.00000    0.10000
+!AG19  0   -0.28653    0.22594    0.03911    1.00000    0.04943
+!H20   0   -0.13171   -0.14728    0.47266    1.00000    0.10000
+!END 
+!
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*MaxPathLength, INTENT (IN   ) :: TheFileName
+
+      INTEGER maxatom, maxbond, maxelm
+      PARAMETER (maxatom=100, maxbond=100, maxelm=108)
+
+      CHARACTER*2  AtmElement(maxatom)
+      CHARACTER*4  sybatom(maxatom)
+      CHARACTER*80 mol2file, title
+      INTEGER      i,j,natom,nbond, bat(maxbond,2)
+      REAL         Coordinates(3,maxatom), bndr(maxatom)
+      INTEGER      InputFile
+      INTEGER      OutputFile
+      REAL         a, b, c, alpha, beta, gamma
+      REAL         tLattice(1:3,1:3)
+      INTEGER      Ilen
+      LOGICAL      ChrIsLetter ! Function
+      REAL         tX, tY, tZ
+      CHARACTER*255 tString
+      REAL         DummyReal
+      CHARACTER*4  DummyChar4
+      INTEGER      DummyInteger
+      CHARACTER*1  ChrLowerCase ! Function
+
+! Initialise to 'failure'
+      Res2Mol2 = 0
+      natom = 0
+      InputFile = 10
+      OPEN(UNIT=InputFile,file=TheFileName,form='formatted',status='old',err=998)
+! Initialise cell parameters to invalid values
+      a = 0.0
+      b = 0.0
+      c = 0.0
+      alpha = 0.0
+      beta  = 0.0
+      gamma = 0.0
+   10 READ(InputFile,'(A)',ERR=990,END=100) tString
+      IF (LEN_TRIM(tString) .LT. 3) GOTO 10
+      CALL StrUpperCase(tString)
+      SELECT CASE (tString(1:4))
+        CASE ('CELL')
+          READ(tString,*) DummyChar4, DummyReal, a, b, c, alpha, beta, gamma
+          CALL LatticeCellParameters2Lattice(a, b, c, alpha, beta, gamma, tLattice)
+!        CASE ('TITL', 'ZERR', 'LATT', 'SYMM', 'SFAC', 'DISP', 'UNIT')
+        CASE ('HKLF', 'END ') ! We have finished, process the data we have read
+          GOTO 100
+        CASE DEFAULT ! If it's none of the above, it is probably an atom
+! Check if first character is a letter. If not, skip this line and read the next.
+          IF (.NOT. ChrIsLetter(tString(1:1))) GOTO 10
+! If the third character is still a letter, it couldn't have been an element.
+! Skip this line and read the next. (Note that 'C X', where C an element and X any letter, 
+! should not be possible.)
+          IF (ChrIsLetter(tString(3:3))) GOTO 10
+! Now we are up to the point where we can assume that the first one or two characters,
+! but not the third, form an element.
+          natom = natom + 1
+          AtmElement(natom)(1:2) = tString(1:2)
+          IF (.NOT. ChrIsLetter(tString(2:2))) AtmElement(natom)(2:2) = ' '
+          READ(tString,*,ERR=990) DummyChar4, DummyInteger, Coordinates(1,natom), Coordinates(2,natom), Coordinates(3,natom)
+      END SELECT
+! Read next line
+      GOTO 10
+  100 CONTINUE
+      IF (natom .EQ. 0) THEN
+        CALL ErrorMessage('No Atoms found.')
+        RETURN
+      ENDIF
+! The variable Coordinates holds the atomic fractional co-ordinates, the mol2 file
+! needs orthogonal co-ordinates => convert
+      DO I = 1, natom
+        tX = Coordinates(1,I) * tLattice(1,1) + Coordinates(2,I) * tLattice(1,2) + Coordinates(3,I) * tLattice(1,3)
+        tY = Coordinates(1,I) * tLattice(2,1) + Coordinates(2,I) * tLattice(2,2) + Coordinates(3,I) * tLattice(2,3)
+        tZ = Coordinates(1,I) * tLattice(3,1) + Coordinates(2,I) * tLattice(3,2) + Coordinates(3,I) * tLattice(3,3)
+        Coordinates(1,I) = tX
+        Coordinates(2,I) = tY
+        Coordinates(3,I) = tZ
+      ENDDO
+      CLOSE(InputFile)
+! Given the element, assign the bond radius
+      CALL ass_type(natom,AtmElement,bndr)
+! Make the bonds using a simple distance criterion
+      CALL make_bond(natom,Coordinates,bndr,nbond,bat)
+      CALL sybylatom(natom,AtmElement,sybatom,nbond,bat)
+      Ilen = LEN_TRIM(TheFileName)
+! Replace 'cssr' by 'mol2'
+      mol2file = TheFileName(1:Ilen-3)//'mol2'
+      OutputFile = 3
+      OPEN(UNIT=OutputFile,file=mol2file,form='formatted',err=997)
+      WRITE(OutputFile,"('@<TRIPOS>MOLECULE')")
+      WRITE(OutputFile,'(A)') 'Temporary file'
+      WRITE(OutputFile,"(2(I5,1X),'    1     0     0')") natom, nbond
+      WRITE(OutputFile,"('SMALL')")
+      WRITE(OutputFile,"('NO_CHARGES')")
+      title = 'Temporary file created by DASH'
+      WRITE(OutputFile,"(A80)") title
+      WRITE(OutputFile,"('@<TRIPOS>ATOM')")
+      DO i = 1, natom
+        AtmElement(i)(2:2) = ChrLowerCase(AtmElement(i)(2:2))
+        WRITE(OutputFile,270) i,AtmElement(i),(Coordinates(j,i),j=1,3),sybatom(i)
+      ENDDO
+  270 FORMAT(I3,1X,A2,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
+      WRITE(OutputFile,"('@<TRIPOS>BOND')")
+      DO i = 1, nbond
+        WRITE(OutputFile,'(4(I3,1X))') i,bat(i,1),bat(i,2),1
+      ENDDO
+      CLOSE(OutputFile)
+      Res2Mol2 = 1
+      RETURN
+  990 CALL ErrorMessage('Error while reading input file.')
+      RETURN
+  997 CALL ErrorMessage('Error opening mol2file.')
+      RETURN 
+  998 CALL ErrorMessage('Error opening input file.')
+      RETURN
+
+      END FUNCTION Res2Mol2
 !
 !*****************************************************************************
 !
@@ -6,7 +152,11 @@
 ! This subroutine tries to read a .cssr file and tries to convert it to a Sybyl .mol2 file.
 ! The .mol2 file stuff was taken from 'cad2mol2.f' by Jos Lommerse.
 ! Bonds are calculated from the distances between 2 atoms.
-! The .cssr format is fixed.
+!
+! RETURNS : 0 for failure
+!           1 for success
+!
+! A .cssr file is fixed format.
 !
 !                                         3.988   3.988   9.769
 !                       90.000  90.000  60.000    SPGR =  1 P 1         OPT = 1
@@ -32,7 +182,7 @@
       CHARACTER*4  sybatom(maxatom)
       CHARACTER*80 mol2file, title
       INTEGER      i,j,natom,nbond, bat(maxbond,2)
-      REAL         x(maxatom,3), bndr(maxatom)
+      REAL         Coordinates(3,maxatom), bndr(maxatom)
       INTEGER      InputFile
       INTEGER      OutputFile
       REAL         a, b, c, alpha, beta, gamma
@@ -41,18 +191,16 @@
       CHARACTER*50 tString
       INTEGER*4    SERIAL
       CHARACTER*4  NAME(maxatom)
-      INTEGER      I1, I2
+      INTEGER      I1, I2, Ilen
       LOGICAL      ChrIsLetter ! Function
       REAL         tX, tY, tZ
+      CHARACTER*1  ChrLowerCase
 
 ! Initialise to 'failure'
       CSSR2Mol2 = 0
       natom = 0
       InputFile = 10
       OPEN(UNIT=InputFile,file=TheFileName,form='formatted',status='old',err=998)
-      mol2file = 'Temp.mol2'
-      OutputFile = 3
-      OPEN(UNIT=OutputFile,file=mol2file,form='formatted',err=997)
 ! Initialise cell parameters to invalid values
 ! If no valid values are read, then the atomic co-ordinates must be orthogonal
       a = 0.0
@@ -87,17 +235,17 @@
    30 CONTINUE
       DO I = 1, natom
         READ(InputFile,'(I4,1X,A4,2X,F9.5,1X,F9.5,1X,F9.5)',ERR=990,END=999) SERIAL, NAME(I), &
-                                                            X(I,1), X(I,2), X(I,3)
+                                                            Coordinates(1,I), Coordinates(2,I), Coordinates(3,I)
       ENDDO
 ! The variable X holds the atomic fractional co-ordinates, the mol2 file
 ! needs orthogonal co-ordinates => convert
       DO I = 1, natom
-        tX = X(I,1) * tLattice(1,1) + X(I,2) * tLattice(1,2) + X(I,3) * tLattice(1,3)
-        tY = X(I,1) * tLattice(2,1) + X(I,2) * tLattice(2,2) + X(I,3) * tLattice(2,3)
-        tZ = X(I,1) * tLattice(3,1) + X(I,2) * tLattice(3,2) + X(I,3) * tLattice(3,3)
-        X(I,1) = tX
-        X(I,2) = tY
-        X(I,3) = tZ
+        tX = Coordinates(1,I) * tLattice(1,1) + Coordinates(2,I) * tLattice(1,2) + Coordinates(3,I) * tLattice(1,3)
+        tY = Coordinates(1,I) * tLattice(2,1) + Coordinates(2,I) * tLattice(2,2) + Coordinates(3,I) * tLattice(2,3)
+        tZ = Coordinates(1,I) * tLattice(3,1) + Coordinates(2,I) * tLattice(3,2) + Coordinates(3,I) * tLattice(3,3)
+        Coordinates(1,I) = tX
+        Coordinates(2,I) = tY
+        Coordinates(3,I) = tZ
       ENDDO
 ! The variable NAME now holds 'Cl6 ' etc. for every atom. 
 ! We must extract the element from that
@@ -113,36 +261,43 @@
             AtmElement(I)(I2:I2) = NAME(I)(I1:I1)
             I2 = I2 + 1
           ENDIF
+          CALL StrUpperCase(AtmElement(I))
         ENDDO
       ENDDO
       CLOSE(InputFile)
 ! Given the element, assign the bond radius
       CALL ass_type(natom,AtmElement,bndr)
 ! Make the bonds using a simple distance criterion
-      CALL make_bond(natom,x,bndr,nbond,bat)
+      CALL make_bond(natom,Coordinates,bndr,nbond,bat)
       CALL sybylatom(natom,AtmElement,sybatom,nbond,bat)
+      Ilen = LEN_TRIM(TheFileName)
+! Replace 'cssr' by 'mol2'
+      mol2file = TheFileName(1:Ilen-4)//'mol2'
+      OutputFile = 3
+      OPEN(UNIT=OutputFile,file=mol2file,form='formatted',err=997)
       WRITE(OutputFile,"('@<TRIPOS>MOLECULE')")
       WRITE(OutputFile,'(A)') 'Temporary file'
-      WRITE(OutputFile,"(2(I5,X),'    1     0     0')") natom, nbond
+      WRITE(OutputFile,"(2(I5,1X),'    1     0     0')") natom, nbond
       WRITE(OutputFile,"('SMALL')")
       WRITE(OutputFile,"('NO_CHARGES')")
       title = 'Temporary file created by DASH'
       WRITE(OutputFile,"(A80)") title
       WRITE(OutputFile,"('@<TRIPOS>ATOM')")
       DO i = 1, natom
-        WRITE(OutputFile,270) i,AtmElement(i),(x(i,j),j=1,3),sybatom(i)
+        AtmElement(i)(2:2) = ChrLowerCase(AtmElement(i)(2:2))
+        WRITE(OutputFile,270) i,AtmElement(i),(Coordinates(j,i),j=1,3),sybatom(i)
       ENDDO
   270 FORMAT(I3,1X,A2,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
       WRITE(OutputFile,"('@<TRIPOS>BOND')")
       DO i = 1, nbond
-        WRITE(OutputFile,'(4(I3,X))') i,bat(i,1),bat(i,2),1
+        WRITE(OutputFile,'(4(I3,1X))') i,bat(i,1),bat(i,2),1
       ENDDO
       CLOSE(OutputFile)
       CSSR2Mol2 = 1
       RETURN
   990 CALL ErrorMessage('Error while reading input file.')
       RETURN
-  997 CALL ErrorMessage('Error opening mol2file')
+  997 CALL ErrorMessage('Error opening mol2file.')
       RETURN 
   998 CALL ErrorMessage('Error opening input file.')
       RETURN
@@ -155,48 +310,38 @@
 !
       SUBROUTINE sybylatom(natom,AtmElement,sybatom,nbond,bat)
 
-      PARAMETER(maxatom=100,maxbond=100)
+      IMPLICIT NONE
 
-!O      CHARACTER*1  number, getal
-      CHARACTER*1  getal
+      INTEGER maxatom, maxbond, maxelm
+      PARAMETER (maxatom=100, maxbond=100, maxelm=108)
+
+      INTEGER      natom
       CHARACTER*2  AtmElement(maxatom)
       CHARACTER*4  sybatom(maxatom)
-      INTEGER      i, j, neighbour, bat(maxbond,2)
+      INTEGER      nbond
+      INTEGER      bat(maxbond,2)
+
+      CHARACTER*1  getal
+      INTEGER      i, j, NumOfNeighbours
+      CHARACTER*1  ChrLowerCase, ChrUpperCase ! Function
 
       DO i = 1, natom
+        sybatom(i) = '    '
         SELECT CASE (AtmElement(i)(1:2))
-          CASE ('O ')
-            neighbour = 0
+          CASE ('C ', 'N ', 'O ')
+            NumOfNeighbours = 0
             DO j = 1, nbond
               IF ((bat(j,1).EQ.i) .OR. (bat(j,2).EQ.i)) THEN
-              neighbour = neighbour + 1
+              NumOfNeighbours = NumOfNeighbours + 1
               ENDIF
             ENDDO
-            WRITE(getal,'(I1)') neighbour+1
-!            READ(number,'(A1)') getal
-            sybatom(i)=AtmElement(i)(1:1)//'.'//getal
-          CASE ('N ')
-            neighbour = 0
-            DO j = 1, nbond
-              IF ((bat(j,1).EQ.i) .OR. (bat(j,2).EQ.i)) THEN
-                neighbour = neighbour + 1
-              ENDIF
-            ENDDO
-            WRITE(getal,'(I1)') neighbour
-!            READ(number,'(A1)') getal
-            sybatom(i)=AtmElement(i)(1:1)//'.'//getal
-          CASE ('C ')
-            neighbour = 0
-            DO j = 1, nbond
-              IF ((bat(j,1).EQ.i) .OR. (bat(j,2).EQ.i)) THEN
-                neighbour = neighbour + 1
-              ENDIF
-            ENDDO
-            WRITE(getal,'(I1)') neighbour-1
-!            READ(number,'(A1)') getal
+            IF (AtmElement(i)(1:1) .EQ. 'C') NumOfNeighbours = NumOfNeighbours - 1
+            IF (AtmElement(i)(1:1) .EQ. 'O') NumOfNeighbours = NumOfNeighbours + 1
+            WRITE(getal,'(I1)') NumOfNeighbours
             sybatom(i)=AtmElement(i)(1:1)//'.'//getal
           CASE DEFAULT
-            sybatom(i)=AtmElement(i)
+            sybatom(i)(1:1)=ChrUpperCase(AtmElement(i)(1:1))
+            sybatom(i)(2:2)=ChrLowerCase(AtmElement(i)(2:2))
         END SELECT
       ENDDO
       RETURN
@@ -207,7 +352,8 @@
 !
       SUBROUTINE ass_type(natom,AtmElement,bndr)
 
-      PARAMETER(maxatom=100,maxelm=108)
+      INTEGER maxatom, maxbond, maxelm
+      PARAMETER (maxatom=100, maxbond=100, maxelm=108)
 
       INTEGER     natom
       CHARACTER*2 AtmElement(maxatom)
@@ -216,17 +362,17 @@
       REAL         rsd(maxelm)
       CHARACTER*2  el(maxelm)
 
-! Elements (plus other CSD 'element' definitions What's 'Zz'??)
-      DATA el  /'C ','H ','Ac','Ag','Al','Am','Ar','As','At','Au','B ', &
-           'Ba','Be','Bi','Bk','Br','Ca','Cd','Ce','Cf','Cl','Cm','Co', &
-           'Cr','Cs','Cu','D ','Dy','Er','Es','Eu','F ','Fe','Fm','Fr', &
-           'Ga','Gd','Ge','He','Hf','Hg','Ho','I ','In','Ir','K ','Kr', &
-           'La','Li','Lu','Lw','Md','Mg','Mn','Mo','N ','Na','Nb','Nd', &
-           'Ne','Ni','No','Np','O ','Os','P ','Pa','Pb','Pd','Pm','Po', &
-           'Pr','Pt','Pu','Ra','Rb','Re','Rh','Rn','Ru','S ','Sb','Sc', &
-           'Se','Si','Sm','Sn','Sr','Ta','Tb','Tc','Te','Th','Ti','Tl', &
-           'Tm','U ','V ','W ','X ','Xe','Y ','Yb','Z ','Zn','Zr','Zz', &
-           'Me'/
+! Elements (plus other CSD 'element' definitions What's 'ZZ'??)
+      DATA el  /'C ','H ','AC','AG','AL','AM','AR','AS','AT','AU','B ', &
+           'BA','BE','BI','BK','BR','CA','CD','CE','CF','CL','CM','CO', &
+           'CR','CS','CU','D ','DY','ER','ES','EU','F ','FE','FM','FR', &
+           'GA','GD','GE','HE','HF','HG','HO','I ','IN','IR','K ','KR', &
+           'LA','LI','LU','LW','MD','MG','MN','MO','N ','NA','NB','ND', &
+           'NE','NI','NO','NP','O ','OS','P ','PA','PB','PD','PM','PO', &
+           'PR','PT','PU','RA','RB','RE','RH','RN','RU','S ','SB','SC', &
+           'SE','SI','SM','SN','SR','TA','TB','TC','TE','TH','TI','TL', &
+           'TM','U ','V ','W ','X ','XE','Y ','YB','Z ','ZN','ZR','ZZ', &
+           'ME'/
 
 !U! Elements (plus other CSD 'element' definitions What's 'Zz'??)
 !U      DATA atnr/   6,   1,  89,  47,  13,  95,  18,  33,  85,  79,   5, &
@@ -265,8 +411,8 @@
           ENDIF
         ENDDO
         IF (.NOT. FOUND) THEN
-          CALL DebugErrorMessage('Atomnumber not found')
-          RETURN
+          CALL DebugErrorMessage('Element '//AtmElement(I)(1:2)//' not found')
+          bndr(I) = 1.0
         ENDIF
       ENDDO
       RETURN
@@ -275,15 +421,15 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE make_bond(natom,x,bndr,nbond,bat)
+      SUBROUTINE make_bond(natom,Coordinates,bndr,nbond,bat)
 
       IMPLICIT NONE
 
-      INTEGER maxatom, maxbond
-      PARAMETER (maxatom=100,maxbond=100)
+      INTEGER maxatom, maxbond, maxelm
+      PARAMETER (maxatom=100, maxbond=100, maxelm=108)
 
       INTEGER natom
-      REAL    x(1:maxatom,1:3), bndr(1:maxatom)
+      REAL    Coordinates(1:3,1:maxatom), bndr(1:maxatom)
       INTEGER nbond, bat(1:maxbond,1:2) 
 
       INTEGER I, J, K
@@ -296,7 +442,7 @@
         DO J = I+1, natom
           dist = 0.0
           DO K = 1, 3
-            dist = dist + (x(I,K)-x(J,K))**2
+            dist = dist + (Coordinates(K,I)-Coordinates(K,J))**2
           ENDDO
           dist = SQRT(dist)
           IF (dist .LT. (bndr(I)+bndr(J)+tol)) THEN

@@ -843,10 +843,10 @@
 !C>> JCC - need to factor in the sign of the wee beasty, otherwise the front end gets in a paddy!
 !              lb(kk)=0.0
 !              ub(kk)=360.0
-                IF      (x(kk) .LT. 0. .AND. x(kk) .GT. -180.0) THEN
+                IF      (x(kk) .LT. 0.0 .AND. x(kk) .GT. -180.0) THEN
                   lb(kk) =  -180.0
                   ub(kk) =   180.0
-                ELSE IF (x(kk) .GT. 0. .AND. x(kk) .LT.  360.0) THEN
+                ELSE IF (x(kk) .GT. 0.0 .AND. x(kk) .LT.  360.0) THEN
                   lb(kk) =   0.0
                   ub(kk) = 360.0
                 ELSE 
@@ -1064,18 +1064,18 @@
                                    'of these formats. DASH will create separate z-matrix files for'//CHAR(13)//&
                                    'each chemical residue present in the first entry in the file.'//CHAR(13)//&
                                    'In multiple entry files the first entry will be read only.'
-      INTEGER CSSR2Mol2 ! Function
+      INTEGER Res2Mol2, CSSR2Mol2 ! Function
 
       CALL WMessageBox(OKCancel, InformationIcon, CommonOK, Info, "Create Z-matrix")
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
       IFlags = LoadDialog + DirChange + AppendExt
       FilterStr = "All files (*.*)|*.*|"//&
-                  "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl|"//&
+                  "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"//&
                   "Protein DataBank files (*.pdb)|*.pdb|"//&
                   "Mol2 files (*.mol2, *.ml2)|*.mol2;*.ml2|"//&
                   "mdl mol files|*.mol;*.mdl|"//&
-                  "cssr files|*.cssr|"
-
+                  "SHELX files (*.res)|*.res|"//&
+                  "cssr files (*.cssr)|*.cssr|"
       ISEL = 2
       FNAME = ' '
       CALL WSelectFile(FilterStr, IFLAGS, FNAME,"Select a file for conversion",ISEL)
@@ -1096,13 +1096,22 @@
         CASE ('cssr')
           ISTAT = CSSR2Mol2(FNAME)
           IF (ISTAT .NE. 1) RETURN
-          FNAME = 'Temp.mol2'
+! Replace 'cssr' by 'mol2'
+          FNAME = FNAME(1:Ilen-4)//'mol2'
+          Ilen = LEN_TRIM(FNAME)
+          fmt = '-mol2'
+        CASE ('res ')
+          ISTAT = Res2Mol2(FNAME)
+          IF (ISTAT .NE. 1) RETURN
+! Replace 'res' by 'mol2'
+          FNAME = FNAME(1:Ilen-3)//'mol2'
+          Ilen = LEN_TRIM(FNAME)
           fmt = '-mol2'
         CASE ('pdb ')
           fmt = '-pdb'
         CASE ('mol2','ml2 ')
           fmt = '-mol2'
-        CASE ('mol ','mdl ','sdi ')
+        CASE ('mol ','mdl ')
           fmt = '-mol'
       END SELECT
 ! Run silently, 
