@@ -4,8 +4,9 @@
       SUBROUTINE BatchMode(ArgString)
 
       USE WINTERACTER
-      USE ZMVAR
       USE DRUID_HEADER
+      USE ZMVAR
+      USE PRJVAR
 
       IMPLICIT NONE
 
@@ -46,14 +47,18 @@
         nl = LEN_TRIM(line)
         IF ( nl .EQ. 0 ) GOTO 10 ! Blank line
         IF ( line(1:1) .EQ. "#" ) GOTO 10 ! It's a comment
-        CALL IUpperCase(line(:nl))
         CALL INextString(line, keyword)
+        CALL IUpperCase(keyword)
         SELECT CASE(keyword(1:LEN_TRIM(keyword)))
           CASE ('SDI') ! The .sdi file, containing wavelength, pattern, space group etc. etc.
             I = InfoError(1) ! reset the errors
             IF (InfoError(1) .NE. 0) GOTO 999
             ! Problem here: should be function, we don't have a way of telling if this call succeeded
             CALL SDIFileLoad(line(:nl))
+          CASE ('OUT') ! The output file, must have extension .dash
+            I = InfoError(1) ! reset the errors
+            IF (InfoError(1) .NE. 0) GOTO 999
+            PrjFileName = line(:nl)
           CASE ('T0') ! T0, the starting temperature for the SA
             I = InfoError(1) ! reset the errors
             CALL INextReal(line, rTem)
@@ -192,9 +197,11 @@
       ! it is probably best to save the output to a file that is specified in
       ! the .duff file, because that makes it easier for the user to later relate
       ! the output back to the input.
+      CALL PrjReadWrite(PrjFileName, cWrite)
       CALL DoExit
   999 CONTINUE
       CLOSE(hFile)
+      CALL DoExit
 
       END SUBROUTINE BatchMode
 !
