@@ -13,7 +13,7 @@
 !  USE module containing routine definitions and symbolic names.
 !
       use druid_header
-	USE WINTERACTER
+      USE WINTERACTER
 !
 !      IMPLICIT NONE
 !
@@ -23,40 +23,40 @@
       INTEGER,PARAMETER :: NSETS   =     1
       INTEGER,PARAMETER :: NVALUES = 10000
       INTEGER           :: ISET
-	  integer           :: ntotmov
-	  integer           :: iteration
-	  real              :: cpb
-	  integer           :: it_count
+        integer           :: ntotmov
+        integer           :: iteration
+        real              :: cpb
+        integer           :: it_count
         integer           :: ihandle
-	  real           :: x_max
-	  real           :: x_min
-	  real           :: y_max
+        real           :: x_max
+        real           :: x_min
+        real           :: y_max
        real, dimension(10000) :: num_moves
-	 real, dimension(10000)    :: chi_sqd
+       real, dimension(10000)    :: chi_sqd
        INTEGER ChiSqdChildWindows
        COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin)
 !
 !
 !
       it_count = iteration
-	  num_moves(it_count) = ntotmov
-	  chi_sqd(it_count) = cpb
+        num_moves(it_count) = ntotmov
+        chi_sqd(it_count) = cpb
       x_min=num_moves(1)
       x_max=num_moves(it_count)
-	  y_max=chi_sqd(1)+50
+        y_max=chi_sqd(1)+50
 !  First two interations performed both have iteration number=1.  The graph requires
 ! two points to plot a straight line and so the plot of chi-sqd vs.moves only
 ! starts when i_count =2, ie iteration number 2
       if (it_count.eq.2)then
-	  call WindowOpenChild(ihandle, x=10, y=450, width=400, height=300, title='Chi-sqd vs. Moves')
-	  ChiSqdChildWindows(ihandle) = 1 
+        call WindowOpenChild(ihandle, x=10, y=450, width=400, height=300, title='Chi-sqd vs. Moves')
+        ChiSqdChildWindows(ihandle) = 1 
         call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
-	  endif    
-	  if (it_count.gt.2) then
-	  call WindowSelect(ihandle)
-	  call WindowClear()
-	  call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
-	  end if
+        endif    
+        if (it_count.gt.2) then
+        call WindowSelect(ihandle)
+        call WindowClear()
+        call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
+        end if
 
       end subroutine Chi_sq_plot
 
@@ -64,19 +64,19 @@
       Subroutine plotting_Chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
       
       use druid_header
-	USE WINTERACTER
-      	  
-	INCLUDE 'poly_colours.inc'  
-	  
-	INTEGER,PARAMETER :: NSETS   =     1
+      USE WINTERACTER
+              
+      INCLUDE 'poly_colours.inc'  
+        
+      INTEGER,PARAMETER :: NSETS   =     1
       INTEGER,PARAMETER :: NVALUES = 10000
       INTEGER           :: ISET
-	INTEGER, INTENT(IN)        :: it_count
-	REAL, INTENT(IN)           :: x_max
-	REAL,INTENT(IN)           :: x_min
-	REAL,INTENT(IN)           :: y_max
+      INTEGER, INTENT(IN)        :: it_count
+      REAL, INTENT(IN)           :: x_max
+      REAL,INTENT(IN)           :: x_min
+      REAL,INTENT(IN)           :: y_max
       real, dimension(10000), INTENT(IN) :: num_moves
-	real, dimension(10000), INTENT(IN) :: chi_sqd
+      real, dimension(10000), INTENT(IN) :: chi_sqd
 
 !
 !  Start new presentation graphics plot
