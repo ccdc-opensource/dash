@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 31/Mar/2002 18:11:04
+// Modified : 03/Apr/2002 13:09:22
 //
 ///////////////////////////////////////////////////
 //
@@ -636,6 +636,7 @@
 #define IDF_MultPFdiff                   1476
 #define IDF_REAL1                        1477
 #define IDF_CHECK11                      1481
+#define IDB_PO                           1482
 
 ///////////////////////////////////////////////////
 //
@@ -2981,8 +2982,8 @@ BEGIN
     CONTROL "",IDF_ZM_pars2,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  361,   88,   16,   14
     CONTROL "",IDF_ZM_pars3,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  361,  104,   16,   14
     CONTROL "",IDF_ZM_pars4,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  361,  120,   16,   14
-    CONTROL "",IDF_ZM_allpars,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  362,  150,   16,   14
-    CONTROL "# of degrees of freedom =",IDF_ZM_allpars_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  273,  153,   86,    8
+    CONTROL "",IDF_ZM_allpars,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  361,   55,   16,   14
+    CONTROL "# of degrees of freedom =",IDF_ZM_allpars_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  266,   56,   86,    8
     CONTROL "&Open",IDB_SA_Project_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  299,   21,   40,   14
     CONTROL "&Import...",IDB_SA_Project_Import,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  226,  150,   38,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
@@ -3012,6 +3013,7 @@ BEGIN
     CONTROL "X",IDF_LABEL10,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  126,  122,    9,    8
     CONTROL "SDI file",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   87,    9,  300,   34
     CONTROL "Molecular Z-matrices",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   87,   48,  300,   94
+    CONTROL "Pref. Orient. >",IDB_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  325,  150,   50,   14
 END
 
 IDD_SAW_Page1 RCDATA

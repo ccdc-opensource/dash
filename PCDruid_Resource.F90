@@ -1,4 +1,4 @@
-! Winteracter module created : 31/Mar/2002 18:11:04
+! Winteracter module created : 03/Apr/2002 13:09:22
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -623,4 +623,5 @@
           INTEGER, PARAMETER :: IDF_MultPFdiff                  =  1476
           INTEGER, PARAMETER :: IDF_REAL1                       =  1477
           INTEGER, PARAMETER :: IDF_CHECK11                     =  1481
+          INTEGER, PARAMETER :: IDB_PO                          =  1482
       END MODULE Druid_Header
