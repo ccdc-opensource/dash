@@ -373,7 +373,7 @@
           MogulText = 'Bimodal around 0 degrees'
           ModalFlag(IFRow) = 2
           LB(IFRow) = -20.00
-          UB(IFRow) =  20.00
+          UB(IFRow) =   0.00
           Assigned = .TRUE.
         ENDIF
      
