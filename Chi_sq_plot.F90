@@ -440,7 +440,6 @@
       REAL xgcurold, ygcurold
 
       CALL WindowSelect(ChiHandle)
-      CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
 ! Set the scale correctly. 
       CALL IGrUnits(0.0, 0.0, 1.0, 1.0)
@@ -479,7 +478,6 @@
             CASE (MouseButUp)
               xgcur(2) = EventInfo%GX
               ygcur(2) = EventInfo%GY
-!              CALL WMessageEnable(MouseMove, Disabled)
               CALL WMessageEnable(MouseButUp, Disabled)
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
                 CALL IGrColourN(KolNumRectSelect)
