@@ -275,8 +275,6 @@
       ENDIF
       STATBARSTR(1) = FNAME
       CALL WindowOutStatusBar(1,STATBARSTR(1))
-! Enable all menu functions
-      CALL SetModeMenuState(1,1,1)
 !  update the file name of the project in the SA pop up
       CALL SetSAFileName(TheFileName(1:LEN_TRIM(TheFileName)))
       
@@ -386,18 +384,21 @@
       ENDIF
       IF (PikExists) THEN
         CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
+! Now:
+! None of the arrays in PROFOBS has been filled: the arrays in CHISTOP were filled instead.
+! YCAL has been reset to 0.0
         PikExists = (ipiker .EQ. 0)
       ENDIF
       CALL Init_PeakFitRanges
 ! JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
 ! I moved it, since i wanted to check that all the data read in ok before calling it
-      IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
+      IF (PikExists) THEN
 ! JCC before, this just didnt plot anything, even though in theory we should be able
 ! to observe the full profile. Firstly have to synchronize the common blocks though
         CALL Synchronize_Data()
-        IPTYPE = 2
         NoData = .FALSE.
       ENDIF
+      IPTYPE = 1
       CALL Profile_Plot(IPTYPE) 
 ! enable the buttons,
       IF (.NOT. NoData) THEN
