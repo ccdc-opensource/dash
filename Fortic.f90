@@ -17,81 +17,15 @@
 !A        settings for this are CALPRM for magnetic, CALPR for non-magnetic.
 !
 !
+      IMPLICIT NONE
+
       INCLUDE 'params.inc'
 
-      LOGICAL DFLTPR
-      EXTERNAL DFLTPR, PCXX, PFXX, MAGROU, CALROU, VARSPR
+      EXTERNAL PCXX, PFXX, MAGROU, CALROU
       CHARACTER*6 PNAME
-      DIMENSION ALSQ(MATSZ)
-      COMMON /DERVAR/ DERIVV(500), LVARV
-      COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5),    &
-     &                KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
-      LOGICAL ZBAKIN
-      INTEGER         LPT, LUNI
-      COMMON /IOUNIT/ LPT, LUNI
-      COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
-      COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
-     &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
-     &                YMAX, CSQTOT
-      EQUIVALENCE (IWGHT,IWGH(1))
-      COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
-     &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
-     &                WTSLAK(1000), WEELEV, KOM16
-      LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
-      COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
-     &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
-     &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
-      DIMENSION NGENS(6), NSPC(6)
-      EQUIVALENCE (NGENS(1),NGENPS(1,1))
-      EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
-      COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
-     &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
-     &                MAG, MPL, FIXED, DONE, CONV
-      LOGICAL SIMUL, MAG, MPL, FIXED, DONE
-      EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
-      INCLUDE 'REFLNS.INC'
-      COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
-     &                NSKTOT, KOM24
-      COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
-     &                ISYM(500), ILAT(500), CELLTR(3,500), XSLAK(3,500),&
-     &                COSIN(3,3), IABASE(500), NST1, SLONLY, TOSTAR(6,6)&
-     &                , BCALC(500), DERCEL(6,500), DERPOS(3,500,2),     &
-     &                ITYPSK(500), INVBON(10,500), NINVB(500),          &
-     &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
-     &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
-      LOGICAL SLONLY
-      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+      INTEGER MATSZ
+      REAL ALSQ(MATSZ)
 
-      COMMON /IPKCMN/ IPK, PIK(MIPK)
-
-      COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
-     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS), JOCCR(MPTS)
-
-! Note only 3 phases specifically hardwired here
-      COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
-     &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-
-      COMMON /SCRACH/ MESSAG, NAMFIL
-      CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
-      EQUIVALENCE (ICARD,MESSAG)
       CHARACTER*10 filnmr
       COMMON /commun/ filnam_root
       CHARACTER*10 filnam_root
@@ -136,8 +70,6 @@
       COMMON /commun/ filnam_root
 
       filnam_root = filnmr
-! JvdS I added NINIT = 1, otherwise INITIL, called by PREFIN, doesn't assign a filename to unit LPT
-! causing a file fort.12 to appear every time a .sdi file is opened (except the first time).
       NINIT = 1
       CALL PREFIN(PNAME)
       CALL SYMOP
@@ -147,7 +79,6 @@
 !
 !*****************************************************************************
 !
-
       SUBROUTINE MAKRHM
 ! Makes a number of matrices to speed up the default calculation
 
