@@ -298,3 +298,54 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE GetDateStr(TheDate)
+!
+! Returns date, e.g. '7 March 2001'
+! TheDate must have a minimum length of 17
+!
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (  OUT) :: TheDate
+
+      CHARACTER*8  tDate
+      CHARACTER*9  MonthStr
+
+      CALL DATE_AND_TIME(tDate) ! '20010215' for 15 Feb 2001
+      TheDate = ''
+      IF (tDate(7:7) .EQ. '0') THEN 
+        TheDate(1:1) = tDate(8:8)       ! DateStr = '7'
+      ELSE
+        TheDate(1:2) = tDate(7:8)       ! DateStr = '12'
+      ENDIF
+      SELECT CASE (tDate(5:6))
+        CASE ('01')
+          MonthStr = 'January'
+        CASE ('02')
+          MonthStr = 'February'
+        CASE ('03')
+          MonthStr = 'March'
+        CASE ('04')
+          MonthStr = 'April'
+        CASE ('05')
+          MonthStr = 'May'
+        CASE ('06')
+          MonthStr = 'June'
+        CASE ('07')
+          MonthStr = 'July'
+        CASE ('08')
+          MonthStr = 'August'
+        CASE ('09')
+          MonthStr = 'September'
+        CASE ('10')
+          MonthStr = 'October'
+        CASE ('11')
+          MonthStr = 'November'
+        CASE ('12')
+          MonthStr = 'December'
+      END SELECT
+      TheDate = TheDate(1:LEN_TRIM(TheDate))//' '//MonthStr(1:LEN_TRIM(MonthStr))//' '//tDate(1:4)
+
+      END SUBROUTINE GetDateStr
+!
+!*****************************************************************************
+!
