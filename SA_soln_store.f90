@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-    SUBROUTINE SA_soln_store()
+    SUBROUTINE SA_soln_store
     
 !ep July 2001
 !   This subroutine is called by SA_Structure_Output.for.  It writes out
