@@ -30,14 +30,18 @@
       INTEGER          IPMIN, IPMAX
       COMMON /PROFIPM/ IPMIN, IPMAX
 
+      REAL            XPG1, XPG2, YPG1, YPG2
+      COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
+
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
       INTEGER ISB
       REAL XMINT, XMAXT, YMINT, YMAXT, xgcurold, ygcurold
 
-
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
 ! JCC Set the scale correctly. 
+      CALL IGrUnits(0.0,0.0,1.0,1.0)
+      CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
       CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
       xgcur(1) = EventInfo%GX
       ygcur(1) = EventInfo%GY
@@ -55,6 +59,9 @@
       DO WHILE (.TRUE.)
         CALL GetEvent
         IF (EventInfo%WIN .EQ. 0) THEN
+          CALL IGrUnits(0.0,0.0,1.0,1.0)
+          CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
+          CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
           CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
           xmint = MIN(xcur(1),xcur(2))
           xmaxt = MAX(xcur(1),xcur(2))
@@ -99,10 +106,10 @@
                 CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
                 IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(XPGMAX-XPGMIN)) RETURN
                 IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(YPGMAX-YPGMIN)) RETURN
-                XPGMIN=MIN(XCUR(1),XCUR(2))
-                XPGMAX=MAX(XCUR(1),XCUR(2))  
-                YPGMIN=MIN(YCUR(1),YCUR(2))
-                YPGMAX=MAX(YCUR(1),YCUR(2))
+                XPGMIN = MIN(XCUR(1),XCUR(2))
+                XPGMAX = MAX(XCUR(1),XCUR(2))  
+                YPGMIN = MIN(YCUR(1),YCUR(2))
+                YPGMAX = MAX(YCUR(1),YCUR(2))
               ENDIF
               CALL IGrColourN(InfoGrScreen(PrevColReq))
               CALL Get_IPMaxMin()
