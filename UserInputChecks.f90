@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION FnWavelengthOK()
+      LOGICAL FUNCTION FnWavelengthOK
 !
 ! Checks if wavelength available and acceptable
 !
@@ -10,12 +10,72 @@
 ! RETURNS : .TRUE.  if the value of 'ALambda' can be used
 !           .FALSE. if the value of 'ALambda' is ridiculous
 !
+      IMPLICIT NONE
+      
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
       INCLUDE 'lattice.inc' ! Contains wavelength
 
       FnWavelengthOK = ((ALambda .GT. 0.1) .AND. (ALambda .LT. 20.0))
 
       END FUNCTION FnWavelengthOK
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION FnPatternOK
+!
+! Checks if diffraction pattern available and acceptable
+!
+! RETURNS : .TRUE.  if - we have data at all
+!                      - we have more than 15 points (that's the minimum needed for fitting a single peak)
+!                      - we have more than 1 degree 2 theta
+!           .FALSE. otherwise
+!
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+      
+      FnPatternOK = .FALSE.
+      IF (NoData) RETURN
+      IF (NBIN .LT. 15) RETURN
+      IF ((XPMAX-XPMIN) .LT. 1.0) RETURN
+      FnPatternOK = .TRUE.
+
+      END FUNCTION FnPatternOK
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION FnPeakShapeOK
+!
+! Checks if sigma1, sigma2, gamma1, gamma2, HPSL and HMSL are available and acceptable
+!
+! RETURNS : .TRUE.  if more than three peak fit ranges have been fitted (fitting three peaks
+!                   in a single range will not do)
+!           .FALSE. otherwise
+!
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      
+! JvdS @@ as no information on 'having been fitted' is ever stored, there's not
+! enough information available to make this function work.
+      FnPeakShapeOK = .TRUE.
+
+      END FUNCTION FnPeakShapeOK
 !
 !*****************************************************************************
 !
@@ -63,7 +123,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION FnUnitCellOK()
+      LOGICAL FUNCTION FnUnitCellOK
 !
 ! Checks if all cell parameters available and acceptable
 !
