@@ -34,6 +34,8 @@
 !
       USE WINTERACTER
       
+      IMPLICIT NONE
+
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Error")
@@ -50,10 +52,13 @@
 !
       USE WINTERACTER
       
+      IMPLICIT NONE
+
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
       LOGICAL            ShowAgain
-      COMMON  / DBGMSG / ShowAgain
+      INTEGER                       Counter
+      COMMON  / DBGMSG / ShowAgain, Counter
 
       LOGICAL, EXTERNAL :: Confirm
 
@@ -67,6 +72,40 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DebugShow(TheMessage)
+!
+! Displays a debug message in the lower window bar that should be ignored in the release version of DASH.
+!
+! INPUT   : TheMessage = The message to be displayed
+!
+      USE WINTERACTER
+      
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheMessage
+
+      LOGICAL            ShowAgain
+      INTEGER                       Counter
+      COMMON  / DBGMSG / ShowAgain, Counter
+
+      CHARACTER*(20), EXTERNAL :: Integer2String
+      CHARACTER*(255) tMessage
+      INTEGER         tLen
+
+!DEC$ IF DEFINED (ONTBUG)
+      Counter = Counter + 1
+! Update the status bar at the bottom of the screen.
+      tMessage = TheMessage
+      tLen = LEN_TRIM(tMessage)
+      tMessage = tMessage(1:tLen)//" "//Integer2String(Counter)
+      tLen = LEN_TRIM(tMessage)
+      CALL WindowOutStatusBar(1,tMessage(1:tLen))
+!DEC$ ENDIF
+
+      END SUBROUTINE DebugShow
+!
+!*****************************************************************************
+!
       SUBROUTINE WarningMessage(TheMessage)
 !
 ! Displays a warning message
@@ -75,6 +114,8 @@
 !
       USE WINTERACTER
       
+      IMPLICIT NONE
+
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Warning")
@@ -91,6 +132,8 @@
 !
       USE WINTERACTER
       
+      IMPLICIT NONE
+
       CHARACTER*(*), INTENT (IN   ) :: TheMessage
 
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Info")
@@ -112,6 +155,8 @@
 !
       USE WINTERACTER
       
+      IMPLICIT NONE
+
       CHARACTER*(*), INTENT (IN   ) :: TheQuestion
 
       CALL WMessageBox(YesNo,QuestionIcon,CommonOK,TheQuestion(1:LEN_TRIM(TheQuestion)),'Confirm')
@@ -421,12 +466,11 @@
 ! called EventType and EventInfo (both in VARIABLES)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
 
-      LOGICAL MseBtnPressed, OldEventWaiting
+      LOGICAL         MseBtnPressed, OldEventWaiting
       COMMON /Events/ MseBtnPressed, OldEventWaiting
 
       LOGICAL, EXTERNAL :: DealWithEvent
@@ -454,7 +498,6 @@
 ! called EventType and EventInfo (both in VARIABLES)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -487,7 +530,6 @@
 ! setting a flag, 'OldEventWaiting', which is used by GetEvent, PeekEvent and IsEventWaiting.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
