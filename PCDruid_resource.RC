@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 15/May/2002 11:02:00
+// Modified : 16/May/2002 16:43:47
 //
 ///////////////////////////////////////////////////
 //
@@ -628,6 +628,7 @@
 #define IDM_ViewPawley                  40030
 #define IDF_PO_G1                        1407
 #define IDF_CHECK7                       1248
+#define IDF_ShowCumChiSqd                1408
 
 ///////////////////////////////////////////////////
 //
@@ -653,7 +654,8 @@ BEGIN
     CONTROL "Character size",IDF_CharacterSize_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   58,    6,   62,   12
     CONTROL "Show &background",IDF_background_check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   19,   80,   14
     CONTROL "Connect data &points",IDF_ConnectObsPoints,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   33,   90,   14
-    CONTROL "Plot peak &fit difference",IDF_PlotPeakFitDif,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   47,   90,   14
+    CONTROL "Show peak &fit difference",IDF_PlotPeakFitDif,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   47,   90,   14
+    CONTROL "Show cumulative chi-sqd",IDF_ShowCumChiSqd,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   47,   94,   14
 END
 
 IDD_Plot_Option_Dialog RCDATA
@@ -663,6 +665,7 @@ BEGIN
 " 1364 1 \n"
 " 1132 0 \n"
 " 1133 0 \n"
+" 1408 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -1723,11 +1726,11 @@ BEGIN
     CONTROL "314",IDF_SA_RandomSeed1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  332,  110,   43,   14
     CONTROL "159",IDF_SA_RandomSeed2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  332,  126,   43,   14
     CONTROL "10",IDF_SA_MaxRepeats,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  343,   43,   32,   14
-    CONTROL "Number of SA runs (<100)",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  251,   45,   86,   10
+    CONTROL "Number of SA runs",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  251,   45,   86,   10
     CONTROL "Max. number of moves / run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  245,   84,   52,   20
     CONTROL "Profile chi-sqd multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,  253,   64,   84,   10
     CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  343,   62,   32,   14
-    CONTROL "Termination Criteria. Please note that only multiple runs use these criteria. A single run will run until the user stops it.",IDF_SA_Input3_termhead,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  250,   12,  125,   26
+    CONTROL "Termination criteria for multiple runs. A single run will run until the user stops it.",IDF_SA_Input3_termhead,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  250,   12,  125,   18
     CONTROL "&Print...",IDF_PrintSA,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  236,  150,   40,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  305,   87,   30,   12
@@ -2239,10 +2242,11 @@ BEGIN
     CONTROL "Output .&pro",IDF_OutputPRO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   92,   54,   14
     CONTROL "Output chi-s&quared vs. moves",IDF_OutputChi2vsMoves,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  134,  110,   14
     CONTROL "Use crystallo&graphic centre of mass",IDF_CrystallographicCoM,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,   80,  130,   14
-    CONTROL "Auto &align",IDF_Align,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  108,   46,   14
+    CONTROL "Auto &align",IDF_Align,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  122,   46,   14
     CONTROL "Output .c&if",IDF_OutputCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  106,   54,   14
     CONTROL "Output .&res",IDF_OutputRES,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  120,   54,   14
     CONTROL "Output .pd&b",IDF_OutputPDB,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   50,   54,   14
+    CONTROL "Use &Hydrogens",IDF_UseHydrogensAuto,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  108,   66,   14
 END
 
 IDD_Configuration RCDATA
@@ -2260,6 +2264,7 @@ BEGIN
 " 1462 0 \n"
 " 1461 0 \n"
 " 1457 0 \n"
+" 1474 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
