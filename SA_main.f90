@@ -25,13 +25,14 @@
       INTEGER MaxMoves2
       CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*20 MaxMovesStr
+      INTEGER, EXTERNAL :: DateToday
 
       WriteSAParametersToFile = 1 ! Error
       CALL PushActiveWindowID
       tFileHandle = 10
       OPEN(tFileHandle,FILE=TheFileName,ERR=999)
       WRITE(tFileHandle,'("  Parameters for simulated annealing in DASH")',ERR=999)
-      CALL GetDateStr(DateStr)
+      CALL Date2String(DateToday(),DateStr)
       WRITE(tFileHandle,'(A)',ERR=999) "  Date = "//DateStr(1:LEN_TRIM(DateStr))
       CALL WDialogSelect(IDD_SAW_Page1)
       CALL WDialogGetString(IDF_SA_Project_Name,tSDIFile)
