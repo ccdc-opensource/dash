@@ -6,7 +6,6 @@ C
 	double precision t,fopt
 	real cpb
 	double precision parvals(*) ! The current torsion parameters (cant be called X here)
-        character*10 fname
 	integer ntotmov
         parameter (maxatm=100)
         parameter (maxfrg=20)
@@ -365,7 +364,7 @@ C
       parameter (msymmin=10)
       character*20 symline
 	common /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
-	character*50 stem,stout,stoutt
+	character*50 stout
 
 	parameter (mpdbops=192)
 	character*20 cpdbops(mpdbops)
@@ -447,7 +446,7 @@ C Expand the symmetry generators into a list of symm ops by cross-multiplication
 	end
 
 	logical function PDB_CmpMat(a,b)
-	real a(4,4),b(4,4), val1,val2
+	real a(4,4),b(4,4)
 	PDB_CmpMat = .false.
 
 	do i = 1,4
@@ -481,80 +480,6 @@ C Expand the symmetry generators into a list of symm ops by cross-multiplication
 	return 
 	end subroutine PDB_PosTrans
 
-
-
-	subroutine sa_dash_solution_report(T,CHIMIN,CHIAV,CHIESD,
-     & xopt,dxvav,xvsig,flav,lb,ub,vm,n,iteration)
-!
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-      COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
-!
-	real*8 xopt(*),dxvav(*),xvsig(*),flav(*),lb(*),ub(*),vm(*)
-!
-!
-      parameter (maxiter=10000)
-      common /pltstore/ xiter(maxiter),tstore(maxiter),
-     &        foptstore(maxiter),fpavstore(maxiter)
-
-	parameter (maxfrg=20)
-      character*36 czmpar
-      common /zmnpar/ izmtot,izmpar(maxfrg),
-     &      czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
-      logical gotzmfile
-      common /zmlgot/ gotzmfile(maxfrg)
-
-      COMMON /PLTSTO2/ CHIPROBEST(MAXITER)
-
-	INTEGER ipnum
-
-      OPEN(UNIT=101,FILE='test.sum',STATUS='UNKNOWN',ERR=99)
-
-	WRITE(101,'(a)')'# Dash summary file for current best solution'
-
-      WRITE(101,'(a, f8.2)')
-     & '# Best profile chi-squared:   ', CHIPROBEST(iteration)
-	WRITE(101,'(a, f8.2)')
-     & '# Best intensity chi-squared: ', chimin
-
-      WRITE(101,'(a, f8.2)')
-     & '# Current temperature:        ', T
-!
-	WRITE(101,'(a)')
-     & '# Summary of new parameter values follows'
-
-	
-
-
-
-	write(101,'(a)')'# Translations'
-	write(101,'(3a,12a,12a,12a)')
-     &  '#  ','Value','Lower bound','Upper bound'
-	write(101,'(a,3f12.5)')'X: ',
-     &                       sngl(xopt(1)), sngl(lb(1))  ,sngl(ub(1))
-	write(101,'(a,3f12.5)')'Y: ',
-     &                       sngl(xopt(2)), sngl(lb(2))  ,sngl(ub(2))
-	write(101,'(a,3f12.5)')'Z: ',
-     &                       sngl(xopt(3)), sngl(lb(3))  ,sngl(ub(3))
-
-	write(101,'(a)')'# Q-rotations'
-	write(101,'(3a,12a,12a,12a)')
-     &  '#  ','Value','Lower bound','Upper bound'
-	do i = 4,7
-	write(101,'(a,i1,1x,3f12.5)')'Q',i,
-     &                       sngl(xopt(i)), sngl(lb(i))  ,sngl(ub(i))
-	end do
-
-	write(101,'(a)')
-	
-
-	
-
-
-	close(101)
- 99   return
-	end
 
       Subroutine AddSingleSolution(ProfileChi,IntensityChi)
 
@@ -624,7 +549,7 @@ C ep appended
 	Subroutine AppendNumToFileName(Num,infilename,outfilename)
 	character*(*) infilename, outfilename
 	integer iinlen,icount
-      character*3 NumStr,l
+      character*3 NumStr
 	iinlen = len_trim(infilename)
 	ipos = 0
 	iout = 1
