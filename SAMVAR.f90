@@ -1,18 +1,17 @@
 !*==I_PREPROCESS.f90  created by SPAG 6.11Dc at 13:53 on  5 Oct 2001
       MODULE SAMVAR
+
       IMPLICIT NONE
-!
-! COMMON /PLUTRM/
-!
-      INTEGER :: stdoutterm
-!
+
 ! PARAMETER definitions
-!
-      INTEGER, PARAMETER :: MAXATM = 150
 
-      REAL ATCHG(1:MAXATM)
+      INTEGER, PARAMETER :: MAXATM_2 = 100
 
+      REAL ATCHG(1:MAXATM_2)
 ! ATCHG = formal charge
+
+      CHARACTER*5 atomlabel(1:MAXATM_2)
+! Original atom labels
 
 !
 ! PARAMETER definitions
@@ -21,9 +20,8 @@
 !
 ! COMMON /MVADAT/
 !
-      INTEGER :: tatom
-      INTEGER, DIMENSION(MAXATM) :: aelem
-      REAL, DIMENSION(MAXATM,3) :: axyzo
+      INTEGER, DIMENSION(MAXATM_2) :: aelem
+      REAL, DIMENSION(MAXATM_2,3) :: axyzo
 ! axyzo atomic yxyz co-ordinates, orthogonal
 
 !--    AELEM    element type as used by Jos
@@ -54,32 +52,27 @@
 
 !--    NHYC     number of terminal H 
 !--    NCAC     number of connections other than terminal H 
-!--    ATRESN   residue number 
-!--    NATCRY   number of atoms
-!--    NBOCRY   number of bonds 
 
-
-!
 ! COMMON /MVBDAT/
 !
-      INTEGER :: tbond
       INTEGER, DIMENSION(MAXBND) :: btype
       INTEGER, DIMENSION(MAXBND,2) :: bond
 !      BTYPE    nbt          
 !--    BOND     list of bonds Iat, Jat   
 !
-! COMMON /PLUTLI/
-!
-      INTEGER :: idebug
-!
 ! COMMON /PLUTQY/
 !
       INTEGER :: natcry, nbocry
-!--  NBOCRY  number of bonds in list
-      INTEGER, DIMENSION(MAXATM) :: ncac, nhyc
+! natcry = number of atoms in list
+! nbocry = number of bonds in list
+
+      INTEGER, DIMENSION(MAXATM_2) :: ncac, nhyc
+! ncac = number of connections excluding hydrogens
+! nhyc = number of connections to hydrogens
 !
 ! COMMON /PLUTW1/
 !
-      INTEGER, DIMENSION(MAXATM) :: hybr
+      INTEGER, DIMENSION(MAXATM_2) :: hybr
 !-- HYBR      estimate of hybridisation 1 = sp1 2=sp2 3=sp3  >100 = metal
+
       END MODULE SAMVAR
