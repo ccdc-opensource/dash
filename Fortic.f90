@@ -133,17 +133,18 @@
 
       filnam_root = filnmr
 ! JvdS I added NINIT = 1, otherwise INITIL, called by PREFIN, doesn't assign a filename to unit LPT
-! causing a file fort.12 to appear every time a .sdi file is opened (execpt the first time).
+! causing a file fort.12 to appear every time a .sdi file is opened (except the first time).
       NINIT = 1
       CALL PREFIN(PNAME)
       CALL SYMOP
       CALL OPSYM(1)
 
       END SUBROUTINE FORSYM
-!*==MAKRHM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE MAKRHM
-!.. Makes a number of matrices to speed up the default calculation
+! Makes a number of matrices to speed up the default calculation
 
       DIMENSION H(3)
       INCLUDE 'SGinc\FFCALCTOP.INC'

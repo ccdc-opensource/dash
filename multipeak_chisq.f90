@@ -53,7 +53,8 @@
 !
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
+      REAL            ZCAL !,        ZBAK
+      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XDIFT, XMINT
       COMMON /ZSTOR2/ MN, MN2
 !
@@ -90,9 +91,8 @@
       CCHI = 0.
       DO II = IIMIN, IIMAX
         TARGI = ZARGI(II)
-        YBACK = P(1) + P(2)*(TARGI-XMINT)
-                                     !/XDIFT
-        ZBAK(II) = YBACK
+        YBACK = P(1) + P(2)*(TARGI-XMINT) !/XDIFT
+  !      ZBAK(II) = YBACK
         ZCAL(II) = YBACK
         DO JJ = 1, NPEAK
           ARGK = ZARGK(JJ)

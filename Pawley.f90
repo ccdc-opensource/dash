@@ -41,8 +41,10 @@
 ! order of the background polynomial defaults to 2, otherwise to 10.
       IF (.NOT. BACKREF) THEN
         CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,2)
+        CALL WDialogRangeInteger(IDF_IDF_PawRef_NBack,2,6)
       ELSE
         CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,10)
+        CALL WDialogRangeInteger(IDF_IDF_PawRef_NBack,2,10)
       ENDIF
       CALL WDialogClearField(IDF_Pawley_Cycle_Number)
       CALL WDialogClearField(IDF_Pawley_Refinement_Number)
@@ -123,8 +125,8 @@
       REAL                                                                                      KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
 
-      REAL            ZCAL,        ZBAK
-      COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
+      REAL            ZCAL !,        ZBAK
+      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
 
       REAL            ZXDELT
       INTEGER                 IIMIN, IIMAX
@@ -558,7 +560,7 @@
         IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
         WRITE(tFileHandle,4260) ZeroPoint
  4260   FORMAT('L ZERO ',F10.5)
-!        WRITE(tFileHandle,"('L EXCL ',F7.3,1X,F7.3)") 0.5, 43.0
+ !       WRITE(tFileHandle,"('L EXCL ',F7.3,1X,F7.3)") 16.6, 17.0
         CALL WDialogGetReal(IDF_Slim_Parameter,SLIMVALUE)
         WRITE(tFileHandle,4270) SCALFAC, SLIMVALUE
  4270   FORMAT('L SCAL   ',F7.5,/                                         &
@@ -662,18 +664,18 @@
       REAL                                                                                      KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
 
-      REAL            ZCAL,        ZBAK
-      COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
+      REAL            ZCAL !,        ZBAK
+      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
 
       INTEGER I
 
       NBIN = NPTS
       DO I = 1, NBIN
-        XBIN(I)  = ZARGI(I)
-        YOBIN(I) = ZOBS(I)
+  !      XBIN(I)  = ZARGI(I)
+  !      YOBIN(I) = ZOBS(I)
         YCBIN(I) = ZCAL(I)
-        YBBIN(I) = ZBAK(I)
-        EBIN(I)  = ZDOBS(I)
+  !      YBBIN(I) = ZBAK(I)
+  !      EBIN(I)  = ZDOBS(I)
       ENDDO
       IPTYPE = 2
       CALL Profile_Plot
@@ -888,7 +890,6 @@
       CALL WSelectFile(FILTER,IFLAGS,SDIFileName,'Save diffraction information for structure solution')
       IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (SDIFileName .NE. ' ')) THEN
         CALL CreateSDIFile(SDIFileName)
-        CALL Set_saFileNames(SDIFileName(1:LEN_TRIM(SDIFileName) - 4))
         CALL sa_SetOutputFiles(SDIFileName)
         SaveProject = .TRUE.
       ENDIF

@@ -8537,8 +8537,7 @@
 !* PROVISION FOR PHASE AND SOURCE CHANGES:
           CALL PARNAM(IPNAM1(1),IPNAM1(2),1,I)
           CALL PARNAM(IPNAM2(1),IPNAM2(2),1,J)
-          WRITE (LPT,2005) IPNAM1(1), IPNAM1(2), IPNAM2(1), IPNAM2(2),  &
-     &                     ICOR
+          WRITE (LPT,2005) IPNAM1(1), IPNAM1(2), IPNAM2(1), IPNAM2(2), ICOR
  2005     FORMAT (' ',2(1X,A4),' - ',2(1X,A4),'    ',I4)
     3   ENDDO
       ENDDO

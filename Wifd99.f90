@@ -1,10 +1,11 @@
-!*==BLKINT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE BLKINT(IC,ICORL,NHKL,IB,NB,NHSMAX,NCORL)
-!     ---------------------------------------------------
 !
+!*****************************************************************************
+!
+      SUBROUTINE BLKINT(IC,ICORL,NHKL,IB,NB,NHSMAX,NCORL)
+
       INTEGER IC(*), ICORL(15,*), IB(*)
       LOGICAL ISOLAT
-!
+
       ICUT = 15
     1 ICUT = ICUT + 5
       IB(1) = 1
@@ -30,17 +31,19 @@
         IF (J.GE.NHKL) GOTO 3
       ENDDO
     3 NB = K
+
       END SUBROUTINE BLKINT
-!*==CHECKP.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE CHECKP(W,H,N,JREF,POSDEF)
-!     ------------------------------------
 !
+!*****************************************************************************
+!
+      SUBROUTINE CHECKP(W,H,N,JREF,POSDEF)
+
       REAL W(N,N), H(N,N), D(50), E(50)
       LOGICAL POSDEF
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
       INTEGER Idummy
       INTEGER PawleyErrorLog
-!
+
       POSDEF = .TRUE.
       CALL VCOPY(H,W,N*N)
       CALL TRED2(W,N,N,D,E,.TRUE.)
@@ -68,13 +71,14 @@
         H(I,I) = H(I,I) + DMIN
       ENDDO
       END SUBROUTINE CHECKP
-!*==CLUMPS.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE CLUMPS(IC,N,NC,NCTOT,MLTP,ALPHA)
-!     -------------------------------------------
 !
+!*****************************************************************************
+!
+      SUBROUTINE CLUMPS(IC,N,NC,NCTOT,MLTP,ALPHA)
+
       REAL ALPHA(*)
       INTEGER IC(*), NC(*), MLTP(*)
-!
+
       J = 1
       DO JJ = 1, N
         NCJJ = 1
@@ -97,13 +101,14 @@
       ENDDO
     2 NCTOT = JJ
       END SUBROUTINE CLUMPS
-!*==COVAR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE COVAR(SIGY,ICORL,NCORL,NC,N,CY)
-!     ------------------------------------------
 !
+!*****************************************************************************
+!
+      SUBROUTINE COVAR(SIGY,ICORL,NCORL,NC,N,CY)
+
       REAL SIGY(*), CY(N,N)
       INTEGER ICORL(15,*), NC(*)
-!
+
       CALL VRFILL(CY,0.0,N*N)
       JJ = 1
       DO J = 1, N
@@ -119,14 +124,16 @@
         ENDDO
     1   JJ = JJ + NC(J)
       ENDDO
+
       END SUBROUTINE COVAR
-!*==DCLUMP.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE DCLUMP(HY,NY,IC,H,N,ALPHA)
-!     -------------------------------------
 !
+!*****************************************************************************
+!
+      SUBROUTINE DCLUMP(HY,NY,IC,H,N,ALPHA)
+
       REAL HY(NY,NY), H(N,N), ALPHA(*)
       INTEGER IC(*)
-!
+
       CALL VRFILL(H,0.0,N*N)
       IC0 = IC(1) - 1
       DO J = 1, N
@@ -138,38 +145,50 @@
         ENDDO
       ENDDO
       CALL VCOPY(H,HY,N*N)
+
       END SUBROUTINE DCLUMP
-!*==HBLOCK.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
+!*****************************************************************************
 !
       SUBROUTINE HBLOCK(IC,SIGY,ICORL,CY,HY,N,NCORL,JREF,POSDEF,MLTP)
-!     ---------------------------------------------------------------
-!
+
       INTEGER N, NCORL, JREF
       REAL SIGY(*), CY(N,N), HY(N,N), ALPHA(50)
       INTEGER IC(*), ICORL(15,*), MLTP(*), NC(50)
       LOGICAL POSDEF
-!
+
       CALL CLUMPS(IC,N,NC,NCTOT,MLTP,ALPHA)
       CALL COVAR(SIGY,ICORL,NCORL,NC,NCTOT,CY)
       CALL XXINVERT(CY,HY,NCTOT,2.0)
       CALL DCLUMP(HY,NCTOT,IC,CY,N,ALPHA)
       CALL CHECKP(CY,HY,N,JREF,POSDEF)
+
       END SUBROUTINE HBLOCK
-!*==HCVOUT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE HCVOUT(HKL,IC,X,HX,N,NCORL,POSDEF)
-!     ---------------------------------------------
 !
+!*****************************************************************************
+!
+      SUBROUTINE HCVOUT(HKL,IC,X,HX,N,NCORL,POSDEF)
+
       REAL X(*), HX(N,N), HKL(3,*)
       INTEGER IC(*), ICOR(15)
       LOGICAL POSDEF
-!
+
       PARAMETER (IREFSM=2000)
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
       COMMON /CORHES/ IHCOV(30,10000)
       COMMON /COUNTE/ KOUNT
-!
+
+! JvdS While playing around with excluded regions, it struck me that the output from this routine was corrupt.
+! the IHCOV written out are often FFFFFFFFh, leading to problems with formatting leading to problems in the SA.
+! ICOR(15) is a local variable here, not EQUIVALENCED as far as I can tell, and it
+! is assigned values, but never used.
+! In GetHCV, where the file that is written out here is read in, ICOR is read in instead of IHCOV
+! Combining the above, I think that ICOR should be written out.
+! Also note the number of zeros present in the .pik and .hcv file: they are not necessary, as the
+! routines that read those files check the number of columns to be read.
+! Also note that the dimension of the number of correlations in the COMMON blocks is different:
+! ICOR thinks it should be 15, IHCOV thinks it should be 30, and ICOR in GetHCV thinks it should be 20.
+
       DO J = 1, N
         SIGXX = HX(J,J)
         IF (SIGXX.LE.1.0E-20) THEN
@@ -190,12 +209,15 @@
           II = II + 1
         ENDDO
         KOUNT = KOUNT + 1
-        WRITE (LCV,100) (NINT(HKL(I,J)),I=1,3), X(J), SIGX, IC(J),      &
-     &                  (IHCOV(K,KOUNT),K=1,NCORL)
+!O        WRITE (LCV,100) (NINT(HKL(I,J)),I=1,3), X(J), SIGX, IC(J), (IHCOV(K,KOUNT),K=1,NCORL)
+        WRITE (LCV,100) (NINT(HKL(I,J)),I=1,3), X(J), SIGX, IC(J), (ICOR(K),K=1,NCORL)
   100   FORMAT (3I5,1X,F12.3,1X,F12.4,1X,I5,15I4)
       ENDDO
+
       END SUBROUTINE HCVOUT
-!*==HESCOR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE HESCOR(ALSQ,MATSZ)
 !
 ! *** HESCOR from HKLOUT ***
@@ -208,13 +230,12 @@
       DIMENSION ALSQ(MATSZ)
       DIMENSION IH(3), ADIAG(400), ICOV(30)
       CHARACTER*80 FMT2
-!
-!
+
       INCLUDE 'PARAMS.INC'
-!
+
       PARAMETER (IREFSM=2000)
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
-!
+
       COMMON /DERBAS/ DERIVB(400), LVARB
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -245,7 +266,7 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
+
       INCLUDE 'REFLNS.INC'
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
@@ -254,7 +275,7 @@
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
       COMMON /CORHES/ IHCOV(30,10000)
-!
+
 ! OUT IF LIST NOT WANTED:
       IF (SIMUL) GOTO 100
       IF (IABS(MODERR(JSOURC)).NE.2 .AND. RIET) GOTO 100
@@ -272,8 +293,7 @@
             IF (FIXED) THEN
               WRITE (LKH,FMT2) IH, F4PAR(1,I), F4PESD(1,I)
             ELSE
-              WRITE (LKH,FMT2) (REFH(J,I),J=1,3), F4PAR(1,I),           &
-     &                         F4PESD(1,I)
+              WRITE (LKH,FMT2) (REFH(J,I),J=1,3), F4PAR(1,I), F4PESD(1,I)
             ENDIF
           ENDIF
           IF (IPRNT(5).GT.0) THEN
@@ -291,15 +311,13 @@
               I1 = I1 - 1
               GOTO 90
             ENDIF
-!
 ! IF FIRST INTS, RECORD OFFSET FOR PRINTING CLUMP NUMBER:
             IF (I.EQ.1) KBASE = K - 1
 ! NOW FIND THE NEXT IPRNT(5) BASICS AFTER K:
             L1 = K + IPRNT(5)
             IF (L1.GT.L4END(JPHASE)) L1 = L4END(JPHASE)
             DO L = K + 1, L1
-              ICOV(L-K) = NINT(100.*ELEMAT(ALSQ,MATSZ,K,L)/(ADIAG(K)*   &
-     &                    ADIAG(L)))
+              ICOV(L-K) = NINT(100.*ELEMAT(ALSQ,MATSZ,K,L)/(ADIAG(K)*ADIAG(L)))
             ENDDO
    89       DO L = 1, IPRNT(5)
               IHCOV(L,I) = ICOV(L)
@@ -308,13 +326,15 @@
         ENDIF
       ENDDO
   100 RETURN
+
       END SUBROUTINE HESCOR
-!*==HKL2HCV.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE HKL2HCV(NCORL)
-!     ------------------------------------------------------------
-!
-!
+
       INCLUDE 'PARAMS.INC'
+
       INTEGER IB(2001)
       REAL HESSY(50,50), COVARY(50,50)
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
@@ -322,21 +342,18 @@
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       PARAMETER (IREFSM=2000)
       REAL SIGI(IREFSM), FSQV(IREFSM)
       INTEGER MLTP(IREFSM)
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
       LOGICAL POSDEF
-!>> Declare NJ
       INTEGER NJ
       DATA NHSMAX/50/
       COMMON /COUNTE/ KOUNT
       COMMON /CORHES/ IHCOV(30,10000)
-!
+
       KOUNT = 0
-!
       NHKL = MAXKK(JPHASE)
       DO J = NHKL, 2, -1
         IF (ICLUMP(J).EQ.ICLUMP(J-1)) THEN
@@ -346,7 +363,6 @@
           ENDDO
         ENDIF
       ENDDO
-!
       DO J = 1, NHKL
         MLTP(J) = AMUL(J)
         SIGI(J) = F4PESD(1,J)
@@ -355,25 +371,23 @@
           ICORL(K,J) = NINT(0.99*FLOAT(ICORL(K,J)))
         ENDDO
       ENDDO
-!
       CALL BLKINT(ICLUMP,ICORL,NHKL,IB,NB,NHSMAX,NCORL)
-!
       DO I = 1, NB
         J = IB(I)
         NJ = IB(I+1) - J
-        CALL HBLOCK(ICLUMP(J),SIGI(J),ICORL(1,J),COVARY,HESSY,NJ,NCORL, &
-     &              J,POSDEF,MLTP(J))
+        CALL HBLOCK(ICLUMP(J),SIGI(J),ICORL(1,J),COVARY,HESSY,NJ,NCORL,J,POSDEF,MLTP(J))
         CALL HCVOUT(REFH(1,J),ICLUMP(J),FSQV(J),HESSY,NJ,NCORL,POSDEF)
       ENDDO
-!
+
       END SUBROUTINE HKL2HCV
-!*==XXINVERT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE XXINVERT(A,B,N,X)
-!     --------------------------
 !
+!*****************************************************************************
+!
+      SUBROUTINE XXINVERT(A,B,N,X)
+
       REAL A(N,N), B(N,N)
       INTEGER INDEX(100)
-!
+
       CALL VRFILL(B,0.0,N*N)
       DO J = 1, N
         B(J,J) = X
@@ -383,12 +397,13 @@
         CALL XXLUBKSB(A,N,N,INDEX,B(1,J))
       ENDDO
       END SUBROUTINE XXINVERT
-!*==XXLUBKSB.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE XXLUBKSB(A,N,NP,INDX,B)
-!     --------------------------------
-!
+
       DIMENSION A(NP,NP), INDX(N), B(N)
-!
+
       II = 0
       DO I = 1, N
         LL = INDX(I)
@@ -413,13 +428,14 @@
         B(I) = SUM/A(I,I)
       ENDDO
       END SUBROUTINE XXLUBKSB
-!*==XXLUDCMP.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE XXLUDCMP(A,N,NP,INDX,D)
-!     --------------------------------
 !
+!*****************************************************************************
+!
+      SUBROUTINE XXLUDCMP(A,N,NP,INDX,D)
+
       PARAMETER (NMAX=100,TINY=1.0E-20)
       DIMENSION A(NP,NP), INDX(N), VV(NMAX)
-!
+
       D = 1.0
       DO I = 1, N
         AAMAX = 0.0
@@ -476,25 +492,23 @@
       ENDDO
       IF (A(N,N).EQ.0.0) A(N,N) = TINY
       END SUBROUTINE XXLUDCMP
-!*==XDELPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE XDELPR
-!
 !.. Calculates the value of XPKDEL for each reflection
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
-!
       INCLUDE 'params.inc'
 !.. Note only 3 phases specifically hardwired here
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
       REAL XIDEL(MPPTS)
-!
+
       DO I = 1, NPTS - 1
         XIDEL(I) = 0.5*(ZARGI(I+1)-ZARGI(I))
       ENDDO
       XIDEL(NPTS) = XIDEL(NPTS-1)
-!
       IOBS = 1
       DO IR = 1, MAXK
         ZXDEL(IR) = XIDEL(NPTS)
@@ -508,17 +522,15 @@
         ENDDO
    30   CONTINUE
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE XDELPR
-!*==QNUMPP.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
+!*****************************************************************************
 !
       SUBROUTINE QNUMPP
-!
-!
+
       INCLUDE 'PARAMS.INC'
+
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -534,7 +546,6 @@
 ! FOR NOW, IMPOSE PHASE 1, SOURCE 1 WHICH WE HOPE STAY THERE:
       JPHASE = 1
       JSOURC = 1
-!
       DO I = 1, NPKGEN(JPHASE,JSOURC)
         NUMPFP(I,JPHASE,JSOURC) = 0
         DO J = 1, NPKFSP(I,JPHASE,JSOURC)
@@ -544,5 +555,8 @@
         ENDDO
         PFNVAR(I,JPHASE,JSOURC) = NUMPFP(I,JPHASE,JSOURC).NE.0
       ENDDO
-!
+
       END SUBROUTINE QNUMPP
+!
+!*****************************************************************************
+!

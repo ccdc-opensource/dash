@@ -442,12 +442,6 @@
               CALL WizardWindowShow(IDD_PW_Page6)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
-            CASE (IDB_ConvertT2R) ! Convert max. 2 theta to max. resolution
-              CALL WDialogGetReal(IDF_Max2Theta,tReal)
-              CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tReal))
-            CASE (IDB_ConvertR2T) ! Convert max. resolution to max. 2 theta
-              CALL WDialogGetReal(IDF_MaxResolution,tReal)
-              CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
               CALL Profile_Plot
@@ -470,8 +464,6 @@
               ENDIF
               CALL WDialogFieldState(IDF_Max2Theta,tFieldState)
               CALL WDialogFieldState(IDF_MaxResolution,tFieldState)
-              CALL WDialogFieldState(IDB_ConvertT2R,tFieldState)
-              CALL WDialogFieldState(IDB_ConvertR2T,tFieldState)
             CASE (IDF_Max2Theta)
 ! When entering a maximum value for 2 theta, update maximum value for the resolution
               CALL WDialogGetReal(IDF_Max2Theta,tReal)
@@ -503,8 +495,7 @@
       CALL WDialogSelect(IDD_PW_Page6)
       CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
       CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-      CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
-                                          WDialogGetCheckBoxLogical(IDF_UseSplineYN))
+      CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
       CALL PopActiveWindowID
 
       END SUBROUTINE WizardApplyBackground
@@ -546,8 +537,7 @@
               CALL WizardApplyProfileRange
               CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
               CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-              CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
-                                                   WDialogGetCheckBoxLogical(IDF_UseSplineYN))
+              CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
 ! Force display of background
               CALL WDialogSelect(IDD_Plot_Option_Dialog)
               CALL WDialogPutCheckBoxLogical(IDF_background_check,.TRUE.)

@@ -301,7 +301,8 @@
 
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
+      REAL            ZCAL !,        ZBAK
+      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XDIFT, XMINT
       COMMON /ZSTOR2/ MN, MN2
       COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
@@ -449,7 +450,8 @@
 
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
+      REAL            ZCAL !,        ZBAK
+      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
 
       COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),                       &
      &                  PkFnEsd(MPkDes,Max_NPFR),                       &

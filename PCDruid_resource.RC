@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 23/Nov/2001 18:24:18
+// Modified : 24/Nov/2001 15:09:35
 //
 ///////////////////////////////////////////////////
 //
@@ -408,7 +408,6 @@
 #define IDF_NumOfIterations              1211
 #define IDF_WindowWidth                  1212
 #define IDF_UseMCYN                      1213
-#define IDF_UseSplineYN                  1215
 #define ID_Remove_Background            40003
 #define IDF_LABEL9                       1226
 #define IDAPPLY                          1227
@@ -426,8 +425,7 @@
 #define IDF_sup2_4                       1089
 #define IDF_Gamma_label2                 1081
 #define IDF_gamm1_label2                 1072
-#define IDB_ConvertT2R                   1098
-#define IDB_ConvertR2T                   1099
+#define IDB_Convert                      1098
 #define IDD_XYE                           130
 #define IDF_RunDICVOL                    1101
 #define IDF_Indexing_CellRange2          1338
@@ -2147,8 +2145,7 @@ BEGIN
     CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  242,  150,   40,   14
     CONTROL "Start",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  108,   45,  240,   29
     CONTROL "End",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  108,   87,  240,   46
-    CONTROL "Conve&rt >",IDB_ConvertT2R,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  296,   97,   40,   14
-    CONTROL "< Conver&t",IDB_ConvertR2T,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  296,  114,   40,   14
+    CONTROL "Conve&rt",IDB_Convert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  296,  105,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
 END
 
@@ -2232,7 +2229,6 @@ BEGIN
     CONTROL "Window",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  144,   65,   40,    8
     CONTROL "100",IDF_WindowWidth,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  188,   63,   32,   14
     CONTROL "Use &Monte Carlo for background correction",IDF_UseMCYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  112,   88,  150,   14
-    CONTROL "Use &spline smoothing",IDF_UseSplineYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  112,  104,   90,   14
     CONTROL "&Preview",IDF_Preview,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  247,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  306,  150,   40,   14
@@ -2242,7 +2238,6 @@ IDD_PW_Page6 RCDATA
 BEGIN
 "[Checks] \n"
 " 1213 1 \n"
-" 1215 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"

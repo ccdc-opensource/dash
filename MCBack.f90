@@ -150,7 +150,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SubtractBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
+      SUBROUTINE SubtractBackground(nbruckwin,mbruckiter,UseMC)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -159,7 +159,7 @@
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
-      LOGICAL, INTENT (IN   ) :: UseMc, UseSpline
+      LOGICAL, INTENT (IN   ) :: UseMc
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -182,31 +182,10 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
-
       INTEGER IOBS, I, J
 
 ! Calculate the background
-      CALL CalculateBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
+      CALL CalculateBackground(nbruckwin,mbruckiter,UseMC)
 ! Subtract the background
       IOBS = 0
       YPMIN = YOBS(1) - YBBIN(1)
@@ -245,11 +224,11 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Background_Apply)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-              CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
+              CALL CalculateBackground(IBpass,20,.TRUE.)
               CALL Profile_Plot
             CASE (IDF_Background_Accept)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-              CALL SubtractBackground(IBpass,20,.TRUE.,.TRUE.)
+              CALL SubtractBackground(IBpass,20,.TRUE.)
               CALL WDialogHide()
               CALL Profile_Plot
             CASE (IDCANCEL)
@@ -264,14 +243,14 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CalculateBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
+      SUBROUTINE CalculateBackground(nbruckwin,mbruckiter,UseMC)
 
       USE WINTERACTER
 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
-      LOGICAL, INTENT (IN   ) :: UseMc, UseSpline
+      LOGICAL, INTENT (IN   ) :: UseMc
 
       INCLUDE 'PARAMS.INC'
 
@@ -302,14 +281,14 @@
       CALL WCursorShape(CurHourGlass)
       DO I = -nbruckwin, 0
         ys(I) = yobin(1)
-      END DO
+      ENDDO
       DO I = 1, NBIN
         ys(I) = yobin(I)
-      END DO
+      ENDDO
       DO I = 1, nbruckwin
         ii = NBIN + I
         ys(ii) = yobin(NBIN)
-      END DO
+      ENDDO
       DO iter = 1, mbruckiter
 ! Loop over data points
         DO I = 1, NBIN
@@ -319,9 +298,9 @@
 ! Loop over window around current data point
           DO II = iilo, iihi
             ybbin(I) = ybbin(I) + ys(II)
-          END DO
+          ENDDO
           ybbin(I) = (ybbin(I)-ys(I))/FLOAT(2 * nbruckwin)
-        END DO
+        ENDDO
         IF (UseMC) THEN
           DO I = 1, NBIN
 ! Use a Monte Carlo algorithm to find the correct height of the background
@@ -331,37 +310,37 @@
             CALL RANDOM_NUMBER(tRandomNumber)
             IF (tRandomNumber .LT. stem) ybbin(I) = ys(I)
             ys(I) = ybbin(I)
-          END DO
+          ENDDO
         ELSE
           DO I = 1, NBIN
             ys(I) = MIN(ybbin(I),ys(I))
-          END DO
+          ENDDO
         ENDIF
-      END DO
-!.. Now we should do some spline smoothing to remove the noise 
-      IF (UseSpline) THEN
+      ENDDO
+! Now we should do some spline smoothing to remove the noise 
+      IF (UseMc) THEN
         nsep    =  5
         ninsep  = 10
         ngood   =  0
         knotem  =  0  
         npartem =  0
         DO i = 1, NBIN
-          IF (ybbin(i) .EQ. yobin(i)) THEN
-            es(i) = 1.E6 * ebin(i)
+          IF (YBBIN(i) .EQ. YOBIN(i)) THEN
+            es(i) = 1.E6 * EBIN(i)
           ELSE
-            es(i) = ebin(i)
+            es(i) = EBIN(i)
             IF (MOD(ngood,nsep) .EQ. 0) THEN
               IF (MOD(knotem,ninsep) .EQ. 0) THEN
                 npartem = npartem + 1
                 ipartem(npartem) = knotem + 1
-              END IF
+              ENDIF
               knotem = knotem + 1
               ikt(knotem) = i
               xkt(knotem) = xbin(i)
-            END IF
+            ENDIF
             ngood = ngood + 1
-          END IF
-        END DO
+          ENDIF
+        ENDDO
         ikt(knotem) = NBIN
         ipartem(npartem) = knotem
         jft(1) = 1
@@ -371,8 +350,8 @@
           i2 = ikt(kk+1) - 1
           DO i = i1, i2
             jft(i) = kk
-          END DO
-        END DO
+          ENDDO
+        ENDDO
         DO i = 1, npartem-1
           jf1 = ipartem(i)
           jf0 = jf1-1
@@ -380,8 +359,8 @@
           jfn = 1 + jfp1 - ipartem(i)
           n0 = ikt(jf1)
           ndiv = 1 + ikt(jfp1) - n0
-          CALL SplineSmooth(xbin(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,ybbin(n0))
-        END DO
+          CALL SplineSmooth(XBIN(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,YBBIN(n0))
+        ENDDO
       ENDIF
       CALL WCursorShape(CurCrossHair)
 
@@ -410,7 +389,7 @@
 
       DO J = 1, nkn-1
         xdel(J) = DBLE(xkk(J+1)-xkk(J))
-      END DO
+      ENDDO
       CALL SplVal(xdel,u,nkn)
       nd1 = ndat-1
       nk1 = nkn-1
@@ -429,26 +408,26 @@
         d(i) = ab*(1.0 + b(i))*xdd
         DO j = 1, nkn
           deri(j) = 0.0
-        END DO
+        ENDDO
         deri(j0) = a(i)
         deri(j1) = b(i)
         DO j = 1, nkn
           deri(j) = deri(j)+c(i)*u(j0,j)+d(i)*u(j1,j)
-        END DO
+        ENDDO
         DO j = 1, nkn
           bvec(j) = bvec(j)+w*DBLE(y(i))*deri(j)
           DO k = 1, nkn
             hess(j,k) = hess(j,k)+w*deri(j)*deri(k)
-          END DO
-        END DO
-      END DO
+          ENDDO
+        ENDDO
+      ENDDO
       CALL DGMINV(hess,covar,nkn)
       DO I = 1, nkn
         ans(i) = 0.0
         DO j = 1, nkn
           ans(i) = ans(i) + covar(i,j) * bvec(j)
-        END DO
-      END DO
+        ENDDO
+      ENDDO
       DO I = 1, ndat
         j0 = jfs(i) - jf0
         j1 = j0 + 1
@@ -457,15 +436,12 @@
         DO k = 1, nkn
           qj  = qj  + u(j0,k)*ans(k)
           qj1 = qj1 + u(j1,k)*ans(k)
-        END DO
-! JvdS Was:
-!O        smo(i) = SNGL(a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1)
-! This caused an underflow error
+        ENDDO
         TempResult = a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1
         IF (ABS(TempResult) .LT. 0.000001) TempResult = 0.0
         smo(i) = SNGL(TempResult)
-      END DO
-!
+      ENDDO
+
       END SUBROUTINE SplineSmooth
 !
 !*****************************************************************************
@@ -486,8 +462,6 @@
       A(1,1) = 1.0
       A(m,m) = 1.0
       DO I = 2, m-1
-!        Im1 = I - 1
-!        Ip1 = I + 1
         A(I,I-1) = xdel(I-1) / 6.0
         A(I,I+1) = xdel(I  ) / 6.0
         A(I,I  ) = 2.0 * (A(I,I-1)+A(I,I+1))
@@ -504,7 +478,6 @@
 !
 !*****************************************************************************
 !
-! LEVEL 3      SUBROUTINE DGMINV(A,B,N)
       SUBROUTINE DGMINV(A,B,N)
 !
 ! *** GMINV by JCM from SID 11 Oct 88 ***
@@ -583,7 +556,6 @@
         IG(K) = KF
         D = -D
   190 CONTINUE
-      RETURN
 
       END SUBROUTINE DGMINV
 !

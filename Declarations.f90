@@ -57,11 +57,10 @@
       REAL                                                                                      KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
 
-      REAL            ZCAL,        ZBAK
-      COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
+      REAL            ZCAL !,        ZBAK
+      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
 
-! Seem to hold output of calculations.
-
+! Hold output from Pawley refinement and multi-peak fitter.
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &

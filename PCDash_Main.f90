@@ -117,7 +117,7 @@
           CALL WDialogSelect(IDD_Background_Fit)
 ! Initialise the background
           CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-          CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
+          CALL CalculateBackground(IBpass,20,.TRUE.)
           CALL Profile_Plot
           CALL WDialogShow(-1,-1,0,SemiModeless)
           CALL PopActiveWindowID

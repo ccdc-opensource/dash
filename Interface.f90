@@ -1481,11 +1481,10 @@
           STATBARSTR(8)='Structure solution mode'
       END SELECT
       CALL WindowOutStatusBar(8,STATBARSTR(8))
-! Update the menu
+! Update the menu + the toolbar
       CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
       IDCurrent_Cursor_mode = TheMode
       CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-! Update the toolbar
       
       END SUBROUTINE SelectMode
 !
