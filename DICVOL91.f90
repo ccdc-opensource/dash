@@ -359,7 +359,7 @@
           IF ( n.EQ.0 ) THEN
             WRITE (iw,*) ' EXPERIMENTAL ERROR TOO LARGE !'
             DICVOL_Error = cDIVCOLExpErrTooLarge
-            GOTO 2000
+            GOTO 999
           ENDIF
           GOTO 300
         ENDIF
@@ -630,7 +630,7 @@
  500  CONTINUE
 !      WRITE (iw,99029)
 !99029 FORMAT (/2X,'END OF SEARCH FOR MONOCLINIC SOLUTIONS'/2X,38('*'))
- 600  IF ( Jtr.EQ.0 ) GOTO 2000
+ 600  IF ( Jtr.EQ.0 ) GOTO 999
 !      WRITE (iw,99033)
 !99033 FORMAT (//3X,'SEARCH OF TRICLINIC SOLUTION(S)'/3X,31('*')/)
 !      WRITE (iw,99037)
@@ -699,7 +699,7 @@
  1000 CONTINUE
 !      WRITE (iw,99038)
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS'/2X,37('*'))
-      GOTO 2000
+      GOTO 999
  1100 CONTINUE
 !      WRITE (iw,99025)
 !99025 FORMAT (/2X,'END OF SEARCH FOR CUBIC SOLUTION(S)'/2X,35('*'))
@@ -849,7 +849,7 @@
  1400 CONTINUE
 !      WRITE (iw,99029)
 !99029 FORMAT (/2X,'END OF SEARCH FOR MONOCLINIC SOLUTIONS'/2X,38('*'))
- 1500 IF ( Jtr.EQ.0 ) GOTO 2000
+ 1500 IF ( Jtr.EQ.0 ) GOTO 999
 !      WRITE (iw,99033)
 !99033 FORMAT (//3X,'SEARCH OF TRICLINIC SOLUTION(S)'/3X,31('*')/)
 !      WRITE (iw,99037)
@@ -899,20 +899,11 @@
  1800 CONTINUE
 !      WRITE (iw,99038)
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS'/2X,37('*'))
-      GOTO 2000
+      GOTO 999
  1900 CALL ErrorMessage('Error opening output file')
       CLOSE (IW)
       DICVOL_Error = cDICVOL_ErrorOnWrite
       RETURN
- 2000 WRITE (iw,"(/14X,'DICVOL : Useful References'/14X,'------'/16X,                     &
-     &            '1 D. Louër & M. Louër      (1972). J. Appl. Cryst.  5, 271-275.'/16X,  &
-     &            '2 A. Boultif & D. Louër    (1991). J. Appl. Cryst. 24, 987-993.'/16X,  &
-     &            '3 D. Louër & R. Vargas     (1982). J. Appl. Cryst. 15, 542-545.'/16X,  &
-     &            '4 P.M. de Wolff            (1968). J. Appl. Cryst.  5, 108-113.'/16X,  &
-     &            '5 G.S. Smith & R.L. Snyder (1979). J. Appl. Cryst. 12,  60- 65.')")
-!99019 FORMAT (/14X,'DICVOL91 : USEFUL REFERENCES'/14X,'--------'/16X,             &
-!     &        '* LOUER, D. & LOUER, M. (1972). J. APPL. CRYST. 5, 271-275.'/16X,  &
-!     &        '* BOULTIF, A. & LOUER, D. (1991). J. APPL. CRYST. 24, 987-993.')
 !99020 FORMAT (8X,'CUBIC SYSTEM')
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
 !99022 FORMAT (8X,'TETRAGONAL SYSTEM')
@@ -935,6 +926,12 @@
      &        F8.3)
 !99037 FORMAT (8X,'TRICLINIC SYSTEM')
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS')
-  999 CLOSE(IW)
+  999 WRITE (iw,"(/14X,'DICVOL : Useful References'/14X,'------'/16X,                     &
+     &            '1 D. Louër & M. Louër      (1972). J. Appl. Cryst.  5, 271-275.'/16X,  &
+     &            '2 A. Boultif & D. Louër    (1991). J. Appl. Cryst. 24, 987-993.'/16X,  &
+     &            '3 D. Louër & R. Vargas     (1982). J. Appl. Cryst. 15, 542-545.'/16X,  &
+     &            '4 P.M. de Wolff            (1968). J. Appl. Cryst.  5, 108-113.'/16X,  &
+     &            '5 G.S. Smith & R.L. Snyder (1979). J. Appl. Cryst. 12,  60- 65.')")
+      CLOSE(IW)
 
       END SUBROUTINE DICVOL91
