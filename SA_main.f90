@@ -213,14 +213,10 @@
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
               IPTYPE = 2
               RETURN
-            CASE (IDCANCEL)
+            CASE (IDCANCEL, IDCLOSE)
               CALL WDialogSelect(IDD_SAW_Page1)
-! Window will be removed, save current position
-              IXPos_IDD_Wizard = WInfoDialog(6)
-              IYPos_IDD_Wizard = WInfoDialog(7)
-              CALL WDialogHide()
+              CALL EndWizardCommon
               IPTYPE = 2
-              CALL SetWizardState(1)
               RETURN
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
@@ -317,16 +313,13 @@
 ! Interact with the main window and look at the Pawley refinement...
           CASE (PushButton)
             SELECT CASE (EventInfo%VALUE1)
-              CASE (IDF_SA2_cancel)
-! Go back to the Pawley refinement or the initial wizard
-                IXPos_IDD_Wizard = WInfoDialog(6)
-                IYPos_IDD_Wizard = WInfoDialog(7)
-                CALL WDialogHide()
+              CASE (IDCANCEL, IDCLOSE)
+                CALL EndWizardCommon
                 IPTYPE = 2
                 RETURN
               CASE (IDBACK)
 ! Go back to the 1st window
-!>> JCC Check if the limits have changed and warn about it 
+! JCC Check if the limits have changed and warn about it 
                 IF (LimsChanged) THEN
                   IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
                 END IF
@@ -348,7 +341,7 @@
               CASE (IDF_parameter_grid)
                 CALL WGridPos(EventInfo%X,IFCol,IFRow)
                 SELECT CASE (IFCol)
-                CASE(1)
+                CASE (1)
 !.. parameter
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,5,IFRow,ICHK)
                   IF (ICHK .EQ. Checked) THEN
@@ -358,7 +351,7 @@
                     X(IFRow)=DBLE(MIN(SNGL(ub(IFRow)),xtem))
                     CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,sngl(x(IFRow)),'(F12.5)')
                   END IF
-                CASE(2)
+                CASE (2)
 !.. lower bound
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,5,IFRow,ICHK)
                   IF (ICHK .EQ. Checked) THEN
@@ -372,7 +365,7 @@
                     X(IFRow) = DBLE(xtem)
                     CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,SNGL(x(IFRow)),'(F12.5)')
                   END IF
-                CASE(3)
+                CASE (3)
 !.. upper bound
 ! JCC Check the bounding - only update if parameter is set to vary
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,5,IFRow,ICHK)
@@ -387,7 +380,7 @@
                     X(IFRow) = DBLE(xtem)
                     CALL WGridPutCellReal(IDF_parameter_grid,1,IFRow,SNGL(x(IFRow)),'(F12.5)')
                   END IF
-                CASE(4, 5)
+                CASE (4, 5)
 !.. fix or vary
                   CALL WGridGetCellCheckBox(IDF_parameter_grid,IFCol,IFRow,ICHK)
                   IF ( (IFCol .EQ. 4 .AND. ICHK .EQ. Checked) .OR. &
@@ -436,7 +429,7 @@
                 END SELECT ! IFCol
             END SELECT ! EventInfo%Value1 Field Changed Options
         END SELECT  ! ITYPE
-      END DO
+      ENDDO
 !.. We are now on window number 3
  777  CALL WDialogSelect(IDD_SA_input3)
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
@@ -468,15 +461,11 @@
 !.. Interact with the main window and look at the Pawley refinement...
           CASE (PushButton)
             SELECT CASE (EventInfo%VALUE1)
-              CASE (IDF_SA3_cancel,IDCANCEL)
-! Go back to the Pawley refinement or the initial wizard
+              CASE (IDCANCEL, IDCLOSE)
+                CALL EndWizardCommon
                 IPTYPE = 2
-! Window is going to be removed: save current position
-                IXPos_IDD_Wizard = WInfoDialog(6)
-                IYPos_IDD_Wizard = WInfoDialog(7)
-                CALL WDialogHide()
                 RETURN
-              CASE (IDB_SA3_back)
+              CASE (IDBACK)
 ! Go back to the 2nd window
 ! Window is going to be removed: save current position
                 IXPos_IDD_Wizard = WInfoDialog(6)
@@ -573,7 +562,7 @@
                 CALL WDialogGetInteger(IDF_SA_RandomSeed3,ISeed3)
             END SELECT
         END SELECT
-      END DO ! End of Message loop
+      ENDDO ! End of Message loop
 !... We've finished the three SA input pages
  888  CONTINUE
       CALL MakRHm()
