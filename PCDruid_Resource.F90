@@ -1,4 +1,4 @@
-! Winteracter module created : 16/Sep/2001 15:07:16
+! Winteracter module created : 19/Sep/2001 13:34:59
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -460,4 +460,9 @@
           INTEGER, PARAMETER :: ID_Up                           = 40013
           INTEGER, PARAMETER :: IDF_GROUP5                      =  1008
           INTEGER, PARAMETER :: IDF_FudgeFactor                 =  1095
+          INTEGER, PARAMETER :: IDF_GROUP1                      =  1096
+          INTEGER, PARAMETER :: IDF_GROUP2                      =  1097
+          INTEGER, PARAMETER :: IDF_sup2_4                      =  1089
+          INTEGER, PARAMETER :: IDF_Gamma_label2                =  1081
+          INTEGER, PARAMETER :: IDF_gamm1_label2                =  1072
       END MODULE Druid_Header
