@@ -488,6 +488,13 @@
               CALL Dialog2RRVAR
               CALL RR_MAKEFRAC
               CALL RR_Compare
+            CASE (IDB_Relabel)
+              ! Update memory
+              CALL zmRelabelAll
+              ! Update current dialogue window
+              CALL Set_Show_torsion
+              CALL Set_Show_angle
+              CALL Set_Show_bond
             CASE (IDB_Clear1)
               iValues = 0
               CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid,2,iValues,100)
