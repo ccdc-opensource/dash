@@ -1,12 +1,11 @@
-      SUBROUTINE Plot_Alter(xgtem,ygtem)
+      SUBROUTINE Plot_Alter
 !
 !  Enable button up and mouse movement events
 !
       USE WINTERACTER
+      USE VARIABLES
 
       TYPE(WIN_STYLE)    WINDOW
-!      TYPE(WIN_MESSAGE)  MESSAGE
-      TYPE(WIN_MESSAGE)  ZMESSAGE
 !
       CHARACTER (LEN=20) XCURST,YCURST
       INCLUDE 'PARAMS.INC'
@@ -17,21 +16,18 @@
         XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 !
-!
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
-!
+
+      INCLUDE 'GLBVAR.INC'
+
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
       CALL WCursorShape(CurCrossHair)
 ! JCC Set the scale correctly. 
       CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
-      xgcur(1) = xgtem  !  MESSAGE%GX
-      ygcur(1) = ygtem  !  MESSAGE%GY
-      CALL IPgUnitsFromGrUnits(xgtem,ygtem,xcur(1),ycur(1))
+      xgcur(1) = EventInfo%GX
+      ygcur(1) = EventInfo%GY
+      CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
       XPGMINOLD = XPGMIN
       XPGMAXOLD = XPGMAX
       YPGMINOLD = YPGMIN
@@ -40,9 +36,9 @@
       IPMAXOLD = IPMAX
       IMOV = 0
       DO
-        CALL WMessage(IZTYPE,ZMESSAGE)
-        IF (ZMESSAGE%WIN .EQ. 0) THEN
-          CALL IPgUnitsFromGrUnits(zmessage%GX,zmessage%GY,xcur(2),ycur(2))
+        CALL GetEvent
+        IF (EventInfo%WIN .EQ. 0) THEN
+          CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
           xmint = MIN(xcur(1),xcur(2))
           xmaxt = MAX(xcur(1),xcur(2))
           ymint = MIN(ycur(1),ycur(2))
@@ -66,13 +62,13 @@
               CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
             END DO
           END IF
-          SELECT CASE (IZTYPE)
+          SELECT CASE (EventType)
             CASE (Expose,Resize)
               CALL Redraw()
               IMOV = 0        
             CASE (MouseMove)
-              xgcur(2) = ZMESSAGE%GX
-              ygcur(2) = ZMESSAGE%GY
+              xgcur(2) = EventInfo%GX
+              ygcur(2) = EventInfo%GY
               IMOV = IMOV + 1
               CALL IGrPlotMode('EOR')
               CALL IGrColourN(KolNumRectSelect)
@@ -92,13 +88,13 @@
               CALL IGrPlotMode(' ')
               CALL IGrColourN(InfoGrScreen(PrevColReq))
             CASE (MouseButUp)
-              xgcur(2) = ZMESSAGE%GX
-              ygcur(2) = ZMESSAGE%GY
+              xgcur(2) = EventInfo%GX
+              ygcur(2) = EventInfo%GY
               CALL IGrPlotMode(' ')
               CALL IGrColourN(KolNumRectSelect)
               CALL WMessageEnable(MouseMove, Disabled)
               CALL WMessageEnable(MouseButUp, Disabled)
-              IF (ZMESSAGE%VALUE1 .EQ. LeftButton) THEN
+              IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
                 CALL IGrFillPattern(0,1,1)
                 CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
                 IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(XPGMAX-XPGMIN)) EXIT
@@ -126,10 +122,11 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Check_KeyDown(Message)
+      SUBROUTINE Check_KeyDown
 
       USE WINTERACTER
-      TYPE(WIN_MESSAGE) :: MESSAGE
+      USE VARIABLES
+!      TYPE(WIN_MESSAGE) :: MESSAGE
 
       INCLUDE 'PARAMS.INC'
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
@@ -138,15 +135,15 @@
         YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
         XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
+
+      INCLUDE 'GLBVAR.INC'
 
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
 
 ! acts on various KeyDown options
-      KeyNumber = MESSAGE%VALUE1
+      KeyNumber = EventInfo%VALUE1
       if (KeyNumber .NE. KeyBackSpace) then
         XPGMINOLD=XPGMIN
         XPGMAXOLD=XPGMAX
@@ -157,13 +154,13 @@
       end if
 !
       SELECT CASE (KeyNumber)
-           CASE(KeyPageLeft)
+         CASE(KeyPageLeft)
            xpgdif=xpgmax-xpgmin
            xpgmin=max(xpmin,xpgmin-0.02*xpgdif)
            xpgmax=xpgmin+xpgdif
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)
-           CASE(KeyPageRight)
+         CASE(KeyPageRight)
 ! We're going to move the graph to the right if we can
            xpgdif=xpgmax-xpgmin
            xpgmax=min(xpmax,xpgmax+0.02*xpgdif)
@@ -275,30 +272,24 @@
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)        
       END SELECT
-!
+
       END SUBROUTINE Check_KeyDown
 !
 !*****************************************************************************
 !
-      SUBROUTINE Check_PushButton(MESSAGE)
+      SUBROUTINE Check_PushButton
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
-      TYPE(WIN_MESSAGE) :: MESSAGE
-      TYPE(WIN_RGB) :: SelectedColour
-      LOGICAL Quit,NoData
-      LOGICAL Run_Wizard
+      IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
+      INCLUDE 'Poly_Colours.inc'
+      INCLUDE 'GLBVAR.INC'
 
       REAL Temp
-      INCLUDE 'Poly_Colours.inc'
-!
+
 !!! When a dialog push button is pressed, the unique identifier
 !!! of that button is returned in VALUE%VALUE1. 
 !!! This will correspond to the identifier defined in the 
@@ -306,104 +297,40 @@
 !!! identifier of the currently selected field in the corresponding 
 !!! dialog when the button was pressed.
 ! This subroutine acts on various PushButton options
-!
-      IDNumber = MESSAGE%VALUE1
-      SELECT CASE (IDNumber)
+
+      SELECT CASE (EventInfo%VALUE1)
         CASE (IDCANCEL)
-          IF (MESSAGE%WIN .NE. 0) THEN
-            CALL WDialogSelect(MESSAGE%WIN)
+          IF (EventInfo%WIN .NE. 0) THEN
+            CALL WDialogSelect(EventInfo%WIN)
             CALL WDialogHide()
-          ELSE
-            CALL WExit
           END IF
         CASE (IDF_Dismiss_StrInf)
-          CALL Check_Crystal_Symmetry()
-          CALL DownloadWavelength(IDD_Data_Properties)
-          CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogHide()
-        CASE (IDF_dismiss_plot_options)
-          CALL WDialogSelect(IDD_Plot_Option_Dialog)
-          CALL WDialogHide()
+          CALL DebugErrorMessage('dkfhsd')
         CASE (IDF_Data_Download)
 ! Download the data from the structural information pages
           CALL Check_Crystal_Symmetry()
           CALL DownloadWavelength(IDD_Data_Properties)        
-        CASE(IDF_Axes_Colour)
-          SelectedColour = KolMain
-          CALL WSelectColour(SelectedColour)
-          IF (WinfoDialog(4).EQ.1) &    ! Set colour if user clicked OK 
-          CALL IGrPaletteRGB(KolNumMain,SelectedColour%IRed,&
-                             SelectedColour%IGreen,SelectedColour%IBlue)
-        CASE(IDF_DifferenceData_Colour)
-          SelectedColour = KolDif
-          CALL WSelectColour(SelectedColour)
-          IF (WinfoDialog(4).EQ.1) &    ! Set colour if user clicked OK 
-          CALL IGrPaletteRGB(KolNumDif,SelectedColour%IRed,&
-                             SelectedColour%IGreen,SelectedColour%IBlue)
-        CASE(IDF_ObservedData_Colour)
-          SelectedColour = KolObs
-          CALL WSelectColour(SelectedColour)
-          IF (WinfoDialog(4).EQ.1) &    ! Set colour if user clicked OK 
-          CALL IGrPaletteRGB(KolNumObs,SelectedColour%IRed,&
-                             SelectedColour%IGreen,SelectedColour%IBlue)
-        CASE(IDF_PeakFitting_Colour)
-          SelectedColour = KolMTic
-          CALL WSelectColour(SelectedColour)
-          IF (WinfoDialog(4).EQ.1) &    ! Set colour if user clicked OK 
-          CALL IGrPaletteRGB(KolNumMTic,SelectedColour%IRed,&
-                             SelectedColour%IGreen,SelectedColour%IBlue)
-        CASE(IDF_TickMark_Colour)
-          SelectedColour = KolCTic
-          CALL WSelectColour(SelectedColour)
-          IF (WinfoDialog(4).EQ.1) &    ! Set colour if user clicked OK 
-          CALL IGrPaletteRGB(KolNumCTic,SelectedColour%IRed,&
-                             SelectedColour%IGreen,SelectedColour%IBlue)
-        CASE(IDF_CalculatedData_Colour)
-          SelectedColour = KolCal
-          CALL WSelectColour(SelectedColour)
-          IF (WinfoDialog(4).EQ.1) &    ! Set colour if user clicked OK 
-          CALL IGrPaletteRGB(KolNumCal,SelectedColour%IRed,&
-                             SelectedColour%IGreen,SelectedColour%IBlue)
         CASE(ID_Index_Output)
-          CALL IndexOutput_Window
-        CASE(ID_Indexing_Create)
-              CALL WDialogSelect(IDD_Index_Preparation)
-              CALL WDialogGetReal(IDF_Indexing_Lambda,  Temp)
-              IF (Temp .LT. 0.00001) THEN
-                CALL WMessageBox(OkOnly, InformationIcon, CommonOk, &
-                    "The radiation wavelength has not been entered!",&
-                    "Bad wavelength")
-              ELSE                 
-                CALL Create_DicvolIndexFile()
-                CALL WDialogSelect(IDD_Index_Preparation)
-                CALL WDialogHide()
-              END IF
-        CASE(ID_Indexing_Cancel)
+! Set the wavelength
+          CALL DownLoadWavelength(IDD_Data_Properties)
           CALL WDialogSelect(IDD_Index_Preparation)
-          CALL WDialogHide()
+          CALL WDialogShow(-1,-1,0,Modeless)
+        CASE(ID_Indexing_Create)
+          CALL WDialogSelect(IDD_Index_Preparation)
+          CALL WDialogGetReal(IDF_Indexing_Lambda,Temp)
+          IF (Temp .LT. 0.00001) THEN
+            CALL ErrorMessage("The radiation wavelength has not been entered!")
+          ELSE                 
+            CALL Create_DicvolIndexFile()
+            CALL WDialogSelect(IDD_Index_Preparation)
+            CALL WDialogHide()
+          END IF
       END SELECT
 ! Now replot
 ! No new x-y limits so we don't call Get_IPMaxMin() 
       CALL Profile_Plot(IPTYPE)
 !
       END SUBROUTINE Check_PushButton
-!
-!*****************************************************************************
-!
-      SUBROUTINE IndexOutput_Window()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      TYPE(WIN_MESSAGE)  MESSAGE
-        
-! Set the wavelength
-      CALL DownLoadWavelength(IDD_Data_Properties)
-      CALL WDialogSelect(IDD_Index_Preparation)
-! JvdS @ A new window is selected, but isn't dealt with
-      CALL WDialogShow(-1,-1,0,Modeless)
-
-      END SUBROUTINE IndexOutput_Window
 !
 !*****************************************************************************
 !
@@ -424,10 +351,10 @@
 
 ! Get a file name
 
-! Extract the informationfrom the dialog
+! Extract the information from the dialog
       Icursel = WInfoDialog(CurrentDialog)
       IFLAGS = SaveDialog  + PromptOn + AppendExt
-      FILTER = 'Dicvol files (*.dat)|*.dat|All files |*.*|'
+      FILTER = 'DICVOL files (*.dat)|*.dat|All files |*.*|'
       FNAME=' '
       CALL WSelectFile(FILTER,IFLAGS,FNAME,'Enter DICVOL file name')
       klen = LEN_TRIM(FNAME)
@@ -477,17 +404,11 @@
       IF (ICurSel .NE. 0) CALL WDialogSelect(Icursel)
       RETURN
  99   CONTINUE
-      CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                       "Sorry, could not open the file"//CHAR(13) &
-                       //FNAME(1:klen), &
-                       "DICVOL open failure")
+      CALL ErrorMessage("Sorry, could not open the file"//CHAR(13)//FNAME(1:KLEN))
       IF (ICurSel .NE. 0) CALL WDialogSelect(Icursel)
       RETURN
  100  CONTINUE
-      CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                       "Sorry, could not write to the file"//CHAR(13) &
-                       //FNAME(1:klen), &
-                       "DICVOL write failure")
+      CALL ErrorMessage("Sorry, could not write to the file"//CHAR(13)//FNAME(1:KLEN))
       IF (ICurSel .NE. 0) CALL WDialogSelect(Icursel)
       RETURN
 
@@ -495,204 +416,198 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PeakFind_Manual(IDVal_Current)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      TYPE(WIN_STYLE)    WINDOW
-      TYPE(WIN_MESSAGE)  MESSAGE
-      TYPE(WIN_MESSAGE)  ZMESSAGE
-      LOGICAL FinishMenuMode
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
-      INTEGER IDCurrent_Cursor_Mode
-      COMMON /CURSOR_MODE/ IDCurrent_Cursor_Mode
-
-      DO
-        CALL WMessage(ITYPE,MESSAGE)
-        SELECT CASE (ITYPE)
-          CASE (MouseButDown)
-            IF      (MESSAGE%VALUE1 .EQ. LeftButton) THEN
-              CALL Plot_Alter(MESSAGE%GX,MESSAGE%GY)
-            ELSE IF (MESSAGE%VALUE1 .EQ. RightButton) THEN
-! Get to work on the cross-hair movement
-              CALL MOVE_CROSSHAIR(MESSAGE%GX,MESSAGE%GY)
-            END IF
-          CASE (MenuSelect)
-            IDVal_Current=Message%Value1               
-            IF (FinishMenuMode(IDVal_Current,ID_CrossHair_Cursor_Mode)) THEN
-              CALL WMessageEnable(MouseMove, Disabled)
-              CALL WMessageEnable(MouseButUp, Disabled)
-              STATBARSTR(8)='Standard cursor'
-              CALL WindowOutStatusBar(8,STATBARSTR(8))
-              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-              IDCurrent_Cursor_mode=ID_Default_Cursor_Mode
-              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-              RETURN
-            END IF
-          CASE (KeyDown)                
-            IF (MESSAGE%VALUE1 .EQ. KeyEscape) THEN
-              CALL WMessageEnable(MouseMove, Disabled)
-              CALL WMessageEnable(MouseButUp, Disabled)
-              STATBARSTR(8)='Standard cursor'
-              CALL WindowOutStatusBar(8,STATBARSTR(8))
-              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-              IDCurrent_Cursor_mode=ID_Default_Cursor_Mode
-              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-              RETURN
-            ELSE
-              CALL Check_KeyDown(MESSAGE)
-            END IF
-          CASE (Expose,Resize)
-            CALL Redraw()
-        END SELECT
-      END DO
-!
-      END SUBROUTINE PeakFind_Manual
-!
-!*****************************************************************************
-!
-      SUBROUTINE MOVE_CROSSHAIR(xgtem,ygtem)
-!
-      USE WINTERACTER
-
-      TYPE(WIN_STYLE)    WINDOW
-      TYPE(WIN_MESSAGE)  MESSAGE
-      TYPE(WIN_MESSAGE)  ZMESSAGE
-
-      INCLUDE 'PARAMS.INC'
-
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-!
-      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
-      LOGICAL HVLINE_THERE
-
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
-      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
-      CHARACTER*100 HKLSTR
-      CHARACTER*4   CHRFORM
-      REAL     ARGKPLT(10),DSPLT(10)
-      INTEGER IHPLT(3,10)
-      INCLUDE 'Poly_Colours.inc'
-      REAL    CHAR_SIZE,MARKER_SIZE
-      LOGICAL ERROR_BAR
-      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE 
-!
-! Get ready to put up the big cursor
-      HVLINE_THERE=.FALSE.
-      CALL WMessageEnable(MouseMove, Enabled)
-      CALL WMessageEnable(MouseButUp, Enabled)
-      CALL WCursorShape(CurCrossHair)
-      CALL IPgUnitsToGrUnits(xpgmin,ypgmin,gxmin,gymin)
-      CALL IPgUnitsToGrUnits(xpgmax,ypgmax,gxmax,gymax)
-      gxav=0.5*(gxmax+gxmin)
-      gyav=0.5*(gymax+gymin)
-      gxwd=0.001*(gxmax-gxmin)
-      gywd=0.001*(gymax-gymin)
-      xgcur(1)=xgtem
-      ygcur(1)=ygtem
-      CALL IPgUnitsFromGrUnits(xgtem,ygtem,xcur(1),ycur(1))
-      CALL WMessageEnable(MouseMove, Enabled)
-      CALL WMessageEnable(MouseButUp, Enabled)
-      IMOV = 0
-      DO
-        CALL WMessage(IZTYPE,ZMESSAGE)
-          xgcur(2)=zmessage%GX
-          ygcur(2)=zmessage%GY
-          CALL IPgUnitsFromGrUnits(zmessage%GX,zmessage%GY,&
-                                   xcur(2),ycur(2))
-          SELECT CASE (IZTYPE)
-            CASE (Expose,Resize)
-              CALL Redraw()
-            CASE (KeyDown)
-              KeyNumber=ZMessage%Value1
-              CALL Check_KeyDown_PeakFind_Inner(KeyNumber,xcur(2),ycur(2))
-            CASE (MouseButDown)
-              IMOV = 0
-            CASE (MouseMove)
-! Set up the cross-hairs for peak finding
-                  imov=imov+1
-                  if (imov.eq.1) then
-! Draw cross-hair
-                    CALL IGrColourN(KolNumLargeCrossHair)
-                    gxt0=xgcur(2)
-                    gxt1=xgcur(2)-gxwd
-                    gxt2=xgcur(2)+gxwd
-                    gyt0=ygcur(2)
-                    gyt1=ygcur(2)-gywd
-                    gyt2=ygcur(2)+gywd
-                    CALL IGrMoveTo(gxt1,gyt0)
-                    CALL IGrLineTo(gxt2,gyt0)
-                    CALL IGrMoveTo(gxt0,gyt1)
-                    CALL IGrLineTo(gxt0,gyt2)
-                  else
-! Remove old cross-hair
-                    if (imov.eq.2) then
-                      call profile_plot(IPTYPE)
-                      CALL IGrPlotMode('EOR')
-                    else
-                      CALL IGrMoveTo(gxmin,ygcurold)
-                      CALL IGrLineTo(gxmax,ygcurold)
-                      CALL IGrMoveTo(xgcurold,gymin)
-                      CALL IGrLineTo(xgcurold,gymax)
-!                     CALL IGrPlotMode('EOR')
-                    endif
-! Paint new cross-hair
-                    CALL IGrColourN(KolNumLargeCrossHair)
-!                    CALL IGrColourN(224)
-                    CALL IGrMoveTo(gxmin,ygcur(2))
-                    CALL IGrLineTo(gxmax,ygcur(2))
-                    CALL IGrMoveTo(xgcur(2),gymin)
-                    CALL IGrLineTo(xgcur(2),gymax)
-                  end if
-                  xgcurold=xgcur(2)
-                  ygcurold=ygcur(2)
-                if (xpgmax-xpgmin.le.200.) then
-                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.3)')
-                else
-                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.1)')
-                end if
-                if (ypgmax-ypgmin.le.100.) then
-                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.3)')
-                else
-                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.1)')
-                end if
-                DO ISB=2,3
-                  CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-                END DO 
-            CASE (MouseButUp)
-! MouseButUp action for peak finding
-! Remove old cross-hair
-                CALL IGrMoveTo(gxmin,ygcurold)
-                CALL IGrLineTo(gxmax,ygcurold)
-                CALL IGrMoveTo(xgcurold,gymin)
-                CALL IGrLineTo(xgcurold,gymax)
-                CALL IGrPlotMode(' ')
-                DO ISB=2,3
-                 statbarstr(isb)='          '
-                 CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-                END DO                
-               CALL Profile_Plot(IPTYPE)
-               RETURN 
-            END SELECT
-          END DO 
-!
-      END SUBROUTINE MOVE_CROSSHAIR
-!
+!U      SUBROUTINE PeakFind_Manual(IDVal_Current)
+!U
+!U      USE WINTERACTER
+!U      USE DRUID_HEADER
+!U      USE VARIABLES
+!U
+!U      TYPE(WIN_STYLE)    WINDOW
+!U      LOGICAL FinishMenuMode
+!U
+!U      INCLUDE 'GLBVAR.INC'
+!U
+!U      DO
+!U        CALL WMessage(EventType,EventInfo)
+!U        SELECT CASE (EventType)
+!U          CASE (MouseButDown)
+!U            IF      (EventInfo%VALUE1 .EQ. LeftButton) THEN
+!U              CALL Plot_Alter(EventInfo%GX,EventInfo%GY)
+!U            ELSE IF (EventInfo%VALUE1 .EQ. RightButton) THEN
+!U! Get to work on the cross-hair movement
+!U              CALL MOVE_CROSSHAIR(EventInfo%GX,EventInfo%GY)
+!U            END IF
+!U          CASE (MenuSelect)
+!U            IDVal_Current=EventInfo%Value1               
+!U            IF (FinishMenuMode(IDVal_Current,ID_CrossHair_Cursor_Mode)) THEN
+!U              CALL WMessageEnable(MouseMove, Disabled)
+!U              CALL WMessageEnable(MouseButUp, Disabled)
+!U              STATBARSTR(8)='Standard cursor'
+!U              CALL WindowOutStatusBar(8,STATBARSTR(8))
+!U              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
+!U              IDCurrent_Cursor_mode=ID_Default_Mode
+!U              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+!U              RETURN
+!U            END IF
+!U          CASE (KeyDown)                
+!U            IF (EventInfo%VALUE1 .EQ. KeyEscape) THEN
+!U              CALL WMessageEnable(MouseMove, Disabled)
+!U              CALL WMessageEnable(MouseButUp, Disabled)
+!U              STATBARSTR(8)='Standard cursor'
+!U              CALL WindowOutStatusBar(8,STATBARSTR(8))
+!U              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
+!U              IDCurrent_Cursor_mode=ID_Default_Mode
+!U              CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+!U              RETURN
+!U            ELSE
+!U              CALL Check_KeyDown(EventInfo)
+!U            END IF
+!U          CASE (Expose,Resize)
+!U            CALL Redraw()
+!U        END SELECT
+!U      END DO
+!U
+!U      END SUBROUTINE PeakFind_Manual
+!U!
+!U!*****************************************************************************
+!U!
+!U      SUBROUTINE MOVE_CROSSHAIR(xgtem,ygtem)
+!U!
+!U      USE WINTERACTER
+!U
+!U      TYPE(WIN_STYLE)    WINDOW
+!U      TYPE(WIN_MESSAGE)  ZMESSAGE
+!U
+!U      INCLUDE 'PARAMS.INC'
+!U
+!U      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+!U
+!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+!U      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+!U      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+!U        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+!U        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+!U      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+!U!
+!U      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
+!U
+!U      INCLUDE 'GLBVAR.INC'
+!U
+!U      LOGICAL HVLINE_THERE
+!U
+!U      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
+!U        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+!U      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
+!U      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
+!U      CHARACTER*100 HKLSTR
+!U      CHARACTER*4   CHRFORM
+!U      REAL     ARGKPLT(10),DSPLT(10)
+!U      INTEGER IHPLT(3,10)
+!U      INCLUDE 'Poly_Colours.inc'
+!U      REAL    CHAR_SIZE,MARKER_SIZE
+!U      LOGICAL ERROR_BAR
+!U      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE 
+!U!
+!U! Get ready to put up the big cursor
+!U      HVLINE_THERE=.FALSE.
+!U      CALL WMessageEnable(MouseMove, Enabled)
+!U      CALL WMessageEnable(MouseButUp, Enabled)
+!U      CALL WCursorShape(CurCrossHair)
+!U      CALL IPgUnitsToGrUnits(xpgmin,ypgmin,gxmin,gymin)
+!U      CALL IPgUnitsToGrUnits(xpgmax,ypgmax,gxmax,gymax)
+!U      gxav=0.5*(gxmax+gxmin)
+!U      gyav=0.5*(gymax+gymin)
+!U      gxwd=0.001*(gxmax-gxmin)
+!U      gywd=0.001*(gymax-gymin)
+!U      xgcur(1)=xgtem
+!U      ygcur(1)=ygtem
+!U      CALL IPgUnitsFromGrUnits(xgtem,ygtem,xcur(1),ycur(1))
+!U      CALL WMessageEnable(MouseMove, Enabled)
+!U      CALL WMessageEnable(MouseButUp, Enabled)
+!U      IMOV = 0
+!U      DO
+!U        CALL WMessage(IZTYPE,ZMESSAGE)
+!U          xgcur(2)=zmessage%GX
+!U          ygcur(2)=zmessage%GY
+!U          CALL IPgUnitsFromGrUnits(zmessage%GX,zmessage%GY,xcur(2),ycur(2))
+!U          SELECT CASE (IZTYPE)
+!U            CASE (Expose,Resize)
+!U              CALL Redraw()
+!U            CASE (KeyDown)
+!U              KeyNumber=ZMessage%Value1
+!U              CALL Check_KeyDown_PeakFind_Inner(KeyNumber,xcur(2),ycur(2))
+!U            CASE (MouseButDown)
+!U              IMOV = 0
+!U            CASE (MouseMove)
+!U! Set up the cross-hairs for peak finding
+!U                  imov=imov+1
+!U                  if (imov.eq.1) then
+!U! Draw cross-hair
+!U                    CALL IGrColourN(KolNumLargeCrossHair)
+!U                    gxt0=xgcur(2)
+!U                    gxt1=xgcur(2)-gxwd
+!U                    gxt2=xgcur(2)+gxwd
+!U                    gyt0=ygcur(2)
+!U                    gyt1=ygcur(2)-gywd
+!U                    gyt2=ygcur(2)+gywd
+!U                    CALL IGrMoveTo(gxt1,gyt0)
+!U                    CALL IGrLineTo(gxt2,gyt0)
+!U                    CALL IGrMoveTo(gxt0,gyt1)
+!U                    CALL IGrLineTo(gxt0,gyt2)
+!U                  else
+!U! Remove old cross-hair
+!U                    if (imov.eq.2) then
+!U                      call profile_plot(IPTYPE)
+!U                      CALL IGrPlotMode('EOR')
+!U                    else
+!U                      CALL IGrMoveTo(gxmin,ygcurold)
+!U                      CALL IGrLineTo(gxmax,ygcurold)
+!U                      CALL IGrMoveTo(xgcurold,gymin)
+!U                      CALL IGrLineTo(xgcurold,gymax)
+!U!                     CALL IGrPlotMode('EOR')
+!U                    endif
+!U! Paint new cross-hair
+!U                    CALL IGrColourN(KolNumLargeCrossHair)
+!U!                    CALL IGrColourN(224)
+!U                    CALL IGrMoveTo(gxmin,ygcur(2))
+!U                    CALL IGrLineTo(gxmax,ygcur(2))
+!U                    CALL IGrMoveTo(xgcur(2),gymin)
+!U                    CALL IGrLineTo(xgcur(2),gymax)
+!U                  end if
+!U                  xgcurold=xgcur(2)
+!U                  ygcurold=ygcur(2)
+!U                if (xpgmax-xpgmin.le.200.) then
+!U                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.3)')
+!U                else
+!U                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(f10.1)')
+!U                end if
+!U                if (ypgmax-ypgmin.le.100.) then
+!U                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.3)')
+!U                else
+!U                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(f10.1)')
+!U                end if
+!U                DO ISB=2,3
+!U                  CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
+!U                END DO 
+!U            CASE (MouseButUp)
+!U! MouseButUp action for peak finding
+!U! Remove old cross-hair
+!U                CALL IGrMoveTo(gxmin,ygcurold)
+!U                CALL IGrLineTo(gxmax,ygcurold)
+!U                CALL IGrMoveTo(xgcurold,gymin)
+!U                CALL IGrLineTo(xgcurold,gymax)
+!U                CALL IGrPlotMode(' ')
+!U                DO ISB=2,3
+!U                 statbarstr(isb)='          '
+!U                 CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
+!U                END DO                
+!U               CALL Profile_Plot(IPTYPE)
+!U               RETURN 
+!U            END SELECT
+!U          END DO 
+!U!
+!U      END SUBROUTINE MOVE_CROSSHAIR
+!U!
 !*****************************************************************************
 !
       SUBROUTINE Fit_PeakTop(xtem)
@@ -709,8 +624,9 @@
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 !
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
+
+      INCLUDE 'GLBVAR.INC'
+
       LOGICAL HVLINE_THERE
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
@@ -782,11 +698,9 @@
       INCLUDE 'PARAMS.INC'
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      INTEGER IPTYPE,JPTYPE
-      COMMON /PLTYPE/ IPTYPE
+
       INCLUDE 'statlog.inc'
 !
-      JPTYPE=ABS(IPTYPE)
       NBIN=(NOBS/LBIN)
       DO I=1,NBIN
         IST=(I-1)*LBIN
@@ -813,73 +727,6 @@
       CALL Get_IPMaxMin() 
 !
       END SUBROUTINE Rebin_Profile
-!
-!*****************************************************************************
-!
-      SUBROUTINE Check_WhichDialog(IDFOldNumber,IDFNewNumber)
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-!
-      INCLUDE 'PARAMS.INC'
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-!
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
-!
-     CALL WDialogGetRadioButton(IDF_LabX_Source,IRadiationType)
-!      CALL WDialogPutRadioButton(IDF_SynX_Source)
-!
-      SELECT CASE (IDFOldNumber)
-! Gets the contents of changeable fields just after they've been exitted.
-! Obtain all the dialog terms here
-        CASE(IDF_a_latt)
-           CALL WDialogGetReal(IDF_a_latt,alatt)
-           CALL WDialogGetReal(IDF_b_latt,blatt)
-!           write(76,*) 'IDF_a_latt',alatt,blatt
-        CASE(IDF_b_latt)
-           CALL WDialogGetReal(IDF_a_latt,alatt)
-           CALL WDialogGetReal(IDF_b_latt,blatt)
-!           write(76,*) 'IDF_b_latt',alatt,blatt
-        CASE(IDF_c_latt)
-           CALL WDialogGetReal(IDF_c_latt,clatt)
-        CASE(IDF_alp_latt)
-           CALL WDialogGetReal(IDF_alp_latt,alplatt)
-        CASE(IDF_bet_latt)
-           CALL WDialogGetReal(IDF_bet_latt,betlatt)
-        CASE(IDF_gam_latt)
-           CALL WDialogGetReal(IDF_gam_latt,gamlatt)
-!        CASE(IDF_binning)
-! Change the binning
-!           CALL WDialogSelect(IDD_Plot_Option_Dialog)
-!           CALL WDialogGetInteger(IDF_Binning,LBin)
-!           CALL Rebin_Profile()
-! Now replot
-!           CALL Profile_Plot(IPTYPE)
-      END SELECT
-      SELECT CASE (IDFNewNumber)
-!         CASE(IDF_binning)
-! Change the binning
-!           CALL WDialogSelect(IDD_Plot_Option_Dialog)
-!           CALL WDialogGetInteger(IDF_Binning,LBin)
-!           CALL Rebin_Profile()
-! Now replot
-!           CALL Profile_Plot(IPTYPE)
-! CW neutron
-         CASE(IDF_CWN_Source)
-           CALL WDialogSelect(IDD_Data_Properties)
-     CALL WDialogGetRadioButton(IDF_LabX_Source,IRadiationType)
-!      CALL WDialogPutRadioButton(IDF_SynX_Source)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
-            CALL WDialogFieldState(IDF_TOF_group,Disabled)
-            CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
-            CALL WDialogFieldState(IDF_2theta_Label,Disabled)
-            CALL WDialogFieldState(IDF_Flight_Path,Disabled)
-            CALL WDialogFieldState(IDF_2theta0,Disabled)
-      END SELECT
-
-!
-      END SUBROUTINE Check_WhichDialog
 !
 !*****************************************************************************
 !
@@ -916,26 +763,22 @@
 !
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
-      TYPE(WIN_STYLE)    WINDOW
-      TYPE(WIN_MESSAGE)  MESSAGE
-      TYPE(WIN_MESSAGE)  ZMESSAGE
       LOGICAL FinishMenuMode
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
-      INTEGER IDCurrent_Cursor_Mode
-      COMMON /CURSOR_MODE/ IDCurrent_Cursor_Mode
+
+      INCLUDE 'GLBVAR.INC'
 
       DO
-        CALL WMessage(ITYPE,MESSAGE)
-        IF (MESSAGE%WIN .NE. 0) THEN ! Message from a dialog
-          SELECT CASE (ITYPE)
+        CALL GetEvent
+        IF (EventInfo%WIN .NE. 0) THEN ! Message from a dialogue
+          SELECT CASE (EventType)
             CASE (PushButton)
-              CALL Check_PushButton(Message)
+              CALL Check_PushButton
             CASE (FieldChanged)
-              CALL Main_Field_Changed_Routines(Message%Value1,Message%Value2)
+              CALL Main_Field_Changed_Routines(EventInfo%Value1,EventInfo%Value2)
             CASE (TabChanged)
-              CALL Main_Field_Changed_Routines(Message%Value1,Message%Value2)
+              CALL Main_Field_Changed_Routines(EventInfo%Value1,EventInfo%Value2)
             CASE (Expose,Resize)
               CALL Redraw()
             CASE (CloseRequest)
@@ -943,44 +786,42 @@
               CALL WDialogHide()
           END SELECT
         ELSE
-          SELECT CASE (ITYPE)
+          SELECT CASE (EventType)
             CASE (MouseButDown)
-              IF (MESSAGE%VALUE1 .EQ. LeftButton) THEN
-                CALL Plot_Alter(MESSAGE%GX,MESSAGE%GY)
-              ELSE IF(MESSAGE%VALUE1 .EQ. RightButton) THEN
+              IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
+                CALL Plot_Alter
+              ELSE IF(EventInfo%VALUE1 .EQ. RightButton) THEN
 ! Get to work on the cross-hair movement - fitting this time
-                CALL Move_CrossHair_Fit(MESSAGE%GX,MESSAGE%GY)
+                CALL Move_CrossHair_Fit
               END IF
             CASE (MenuSelect)
-              IDVal_Current=Message%Value1
+              IDVal_Current=EventInfo%Value1
               IF (FinishMenuMode(IDVal_Current,ID_Peak_Fitting_Cursor_Mode)) THEN
                 CALL WMessageEnable(MouseMove, Disabled)
                 CALL WMessageEnable(MouseButUp, Disabled)
                 STATBARSTR(8)='Standard cursor'
                 CALL WindowOutStatusBar(8,STATBARSTR(8))
                 CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-                IDCurrent_Cursor_mode=ID_Default_Cursor_Mode
+                IDCurrent_Cursor_mode=ID_Default_Mode
                 CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
                 RETURN
               END IF
             CASE (KeyDown)                
-              IF (MESSAGE%VALUE1.EQ.KeyEscape) THEN
+              IF (EventInfo%VALUE1.EQ.KeyEscape) THEN
                 CALL WMessageEnable(MouseMove, Disabled)
                 CALL WMessageEnable(MouseButUp, Disabled)
                 STATBARSTR(8)='Standard cursor'
                 CALL WindowOutStatusBar(8,STATBARSTR(8))
                 CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-                IDCurrent_Cursor_mode=ID_Default_Cursor_Mode
+                IDCurrent_Cursor_mode=ID_Default_Mode
                 CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
                 RETURN
               ELSE
-                CALL Check_KeyDown(MESSAGE)
-                CALL Check_KeyDown_PeakFit(MESSAGE)
+                CALL Check_KeyDown
+                CALL Check_KeyDown_PeakFit
               END IF
             CASE (Expose,Resize)
               CALL Redraw()
-            CASE (CloseRequest)
-              CALL WExit
           END SELECT 
         END IF
       END DO
@@ -989,13 +830,12 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Move_CrossHair_Fit(xgtem,ygtem)
+      SUBROUTINE Move_CrossHair_Fit
 
       USE WINTERACTER
+      USE VARIABLES
 
       TYPE(WIN_STYLE)    WINDOW
-      TYPE(WIN_MESSAGE)  MESSAGE
-      TYPE(WIN_MESSAGE)  ZMESSAGE
 
       INCLUDE 'PARAMS.INC'
 
@@ -1009,16 +849,15 @@
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
+
+      INCLUDE 'GLBVAR.INC'
+
       LOGICAL HVLINE_THERE
 
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
       INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
       CHARACTER*100 HKLSTR
       CHARACTER*4   CHRFORM
       REAL ARGKPLT(10),DSPLT(10)
@@ -1050,9 +889,10 @@
       gyav=0.5*(gymax+gymin)
       gxwd=0.001*(gxmax-gxmin)
       gywd=0.001*(gymax-gymin)
-      xgcur(1)=xgtem
-      ygcur(1)=ygtem
-      CALL IPgUnitsFromGrUnits(xgtem,ygtem,xcur(1),ycur(1))
+
+      xgcur(1) = EventInfo%GX
+      ygcur(1) = EventInfo%GY
+      CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
       xcurfirst=xcur(1)
       ycurfirst=ycur(1)
       CALL WMessageEnable(MouseMove, Enabled)
@@ -1064,16 +904,15 @@
 ! KeyDown options at this first stage
       IMOV = 0
       DO
-        CALL WMessage(IZTYPE,ZMESSAGE)
-          xgcur(2)=zmessage%GX
-          ygcur(2)=zmessage%GY
-          CALL IPgUnitsFromGrUnits(zmessage%GX,zmessage%GY,&
-                                   xcur(2),ycur(2))
-          SELECT CASE (IZTYPE)
+        CALL GetEvent
+          xgcur(2) = EventInfo%GX
+          ygcur(2) = EventInfo%GY
+          CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
+          SELECT CASE (EventType)
             CASE (Expose,Resize)
               CALL Redraw()
             CASE (KeyDown)
-              KeyNumber=ZMessage%Value1
+              KeyNumber = EventInfo%Value1
               CALL Check_KeyDown_PeakFit_Inner(KeyNumber,xcur(1),xcur(2))
             CASE (MouseButDown)
               imov=0
@@ -1170,36 +1009,36 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Check_KeyDown_PeakFind(MESSAGE)
-
-      USE WINTERACTER
-
-      TYPE(WIN_MESSAGE) :: MESSAGE
-      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-
-! acts on various KeyDown options that are specific for peakfitting
-      KeyNumber = MESSAGE%VALUE1
-      xgcur(2) = MESSAGE%GX
-      ygcur(2) = MESSAGE%GY
-      CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
-      CALL Check_KeyDown_PeakFind_Inner(KeyNumber,xcur(2),ycur(2))
-
-      END SUBROUTINE Check_KeyDown_PeakFind
+!U      SUBROUTINE Check_KeyDown_PeakFind(MESSAGE)
+!U
+!U      USE WINTERACTER
+!U
+!U      TYPE(WIN_MESSAGE) :: MESSAGE
+!U      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
+!U
+!U! acts on various KeyDown options that are specific for peakfitting
+!U      KeyNumber = MESSAGE%VALUE1
+!U      xgcur(2) = MESSAGE%GX
+!U      ygcur(2) = MESSAGE%GY
+!U      CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
+!U      CALL Check_KeyDown_PeakFind_Inner(KeyNumber,xcur(2),ycur(2))
+!U
+!U      END SUBROUTINE Check_KeyDown_PeakFind
 !
 !*****************************************************************************
 !
-      SUBROUTINE Check_KeyDown_PeakFit(MESSAGE)
+      SUBROUTINE Check_KeyDown_PeakFit
 
       USE WINTERACTER
+      USE VARIABLES
 
-      TYPE(WIN_MESSAGE) :: MESSAGE
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
       COMMON /CURVAL/ XCurFirst,YCurFirst
 
 ! acts on various KeyDown options that are specific for peakfitting
-      KeyNumber=Message%Value1
-      xgcur(2)=Message%GX
-      ygcur(2)=Message%GY
+      KeyNumber=EventInfo%Value1
+      xgcur(2)=EventInfo%GX
+      ygcur(2)=EventInfo%GY
       CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
       CALL Check_KeyDown_PeakFit_Inner(KeyNumber,XCurFirst,xcur(2))
 
@@ -1207,192 +1046,186 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Check_KeyDown_PeakFind_Inner(KeyNumber,xval,yval)
-
-      USE WINTERACTER
-
-      TYPE(WIN_MESSAGE) :: MESSAGE
-
-      INCLUDE 'PARAMS.INC'
-
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
-
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
-
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
-      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
-      CHARACTER*100 HKLSTR
-      CHARACTER*4   CHRFORM
-      REAL ARGKPLT(10),DSPLT(10)
-      INTEGER IHPLT(3,10)
-      INCLUDE 'Poly_Colours.inc'
-      REAL CHAR_SIZE,MARKER_SIZE
-      LOGICAL ERROR_BAR
-      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
-
-      xcur(2)=xval
-      ycur(2)=yval
-      IF (KeyNumber.eq.KeyReturn) THEN
-        numobstic=numobstic+1
-! Simple cursor location
-        itypot(numobstic)=0
-        xobstic(numobstic)=xcur(2)
-        axdif=abs(xobs(nobs)-xobs(1))
-        do ii=1,nobs
-          atem=abs(xcur(2)-xobs(ii))
-          if (atem.le.axdif) then
-            axdif=atem
-            yobstic(numobstic)=yobs(ii)
-          end if
-        end do
-                call Upload_Positions()
-                CALL IGrPlotMode(' ')
-                call Profile_Plot(IPTYPE)
-                CALL IGrPlotMode('EOR')
-              ELSE IF (KeyNumber.eq.KeyInsert) THEN
-                numobstic=numobstic+1
-                itypot(numobstic)=1
-! Fit to the top of the peak
-                call fit_peaktop(xcur(2))
-                CALL IGrPlotMode(' ')
-                call Profile_Plot(IPTYPE)
-                CALL IGrPlotMode('EOR')
-              ELSE IF (KeyNumber.eq.KeyDeleteUnder) THEN
-! Delete the nearest peak but ask first ...
-                IF (NUMOBSTIC.EQ.0) THEN
-                 CALL WMessageBox(OKOnly,ExclamationIcon,CommonOK, &
-                 'No tickmarks to delete!', &
-                 'Delete tickmark confirmation')
-                ELSE
-                 CALL WMessageBox(YesNo,QuestionIcon,CommonYes, &
-                 'Do you really want to'//CHAR(13)//' delete this tickmark?', &
-                 'Delete tickmark confirmation')
-                 IF (WInfoDialog(4).EQ.CommonYes) THEN
-! Delete the closest tickmark ...
-                  ATEM=ABS(XOBSTIC(1)-XCUR(2))
-                  LTEM=1
-                  DO II=1,NUMOBSTIC
-                    AATEM=ABS(XOBSTIC(II)-XCUR(2))
-                    IF (AATEM.LT.ATEM) THEN
-                      LTEM=II
-                      ATEM=AATEM
-                    END IF
-                  END DO
-                  KK=0
-                  DO II=1,NUMOBSTIC
-                    IF (II.NE.LTEM) THEN
-                      KK=KK+1
-                      XXTEM(KK)=XOBSTIC(II)
-                      YYTEM(KK)=YOBSTIC(II)
-                      ITTEM(KK)=ITYPOT(II)
-                      IOTEM(KK)=IORDOT(II)
-                      DO JJ=1,9
-                        UUTEM(JJ,KK)=UOBSTIC(JJ,II)
-                        ZZTEM(JJ,KK)=ZOBSTIC(JJ,II)
-                      END DO
-                    END IF
-                  END DO
-                  NUMOBSTIC=NUMOBSTIC-1
-                  DO II=1,NUMOBSTIC
-                      KK=II
-                      XOBSTIC(II)=XXTEM(KK)
-                      YOBSTIC(II)=YYTEM(KK)
-                      ITYPOT(II)=ITTEM(KK)
-                      IORDOT(II)=IOTEM(KK)
-                      DO JJ=1,9
-                        UOBSTIC(JJ,II)=UUTEM(JJ,KK)
-                        ZOBSTIC(JJ,II)=ZZTEM(JJ,KK)
-                      END DO
-                  END DO                                  
-                 END IF
-                 CALL Upload_Positions()
-                         CALL Upload_Widths()
-                END IF
-              ELSE IF (KeyNumber.eq.77 .or. KeyNumber.eq.109) THEN
-! KeyNumber=M/m
-! Find the Miller index of the nearest Bragg peak ...
-                IF (NTIC.GT.0) THEN
-                  ATEM=ABS(ARGK(1)-XCUR(2))
-                  DO II=1,NTIC
-                    AATEM=ABS(ARGK(II)-XCUR(2))
-                    ATEM=MIN(ATEM,AATEM)
-                  END DO
-                  NNP=0
-                  DO II=1,NTIC
-                    AATEM=ABS(ARGK(II)-XCUR(2))
-                    IF (AATEM.EQ.ATEM) THEN
-                      NNP=NNP+1
-                      DO I3=1,3
-                       IHPLT(I3,NNP)=IH(I3,II)
-                      END DO
-                      ARGKPLT(NNP)=ARGK(II)
-                      DSPLT(NNP)=1./DSTAR(II)
-                    END IF
-                  END DO
-                  hklstr=' '
-                  CHRFORM='(I1)'
-                  ILOC=0
-                  DO IPP=1,NNP
-                    ILOC=ILOC+1
-                    HKLSTR(ILOC:ILOC)='('
-                    DO I3=1,3
-                      IF (IHPLT(I3,IPP).LE.-10.) THEN
-                        ISF=3
-                      ELSE IF (IHPLT(I3,IPP).LT.0.AND.IHPLT(I3,IPP).GT.-10.) THEN
-                        ISF=2
-                      ELSE IF (IHPLT(I3,IPP).GE.0.AND.IHPLT(I3,IPP).LT.10.) THEN
-                        ISF=1
-                      ELSE
-                        ISF=2
-                      END IF
-                      CALL IntegerToString(ISF,CHRFORM(3:3),'(I1)')
-                      CALL IntegerToString(IHPLT(I3,IPP),&
-                         HKLSTR(ILOC+1:ILOC+ISF),CHRFORM)
-                      ILOC=ILOC+ISF+1
-                      HKLSTR(ILOC:ILOC)=' '
-                    END DO
-                    HKLSTR(ILOC:ILOC)=')'
-                  END DO
-                  CALL WindowOutStatusBar(2,HKLSTR)
-                  CALL IGrCharJustify('L')
-                  CALL IGrColourN(KolNumCTic)
-                  CHSTEM=0.75*Char_Size
-                  CALL IGrCharSize(chstem,chstem)
-                  CALL IGrCharRotate(90.)
-                  xtem=xcur(2)-0.02*(xpgmax-xpgmin)
-                  ytem=ycur(2)+0.01*(ypgmax-ypgmin)
-                  CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-                  CALL IGrCharOut(xgtem,ygtem,HKLSTR(:LEN_TRIM(HKLSTR)))
-                  CALL IGrCharRotate(0.)
-                  hklstr=' '
-          IF (argkplt(nnp).ge.200.) THEN
-            CALL IRealToString(ARGKPLT(NNP),&
-            HKLSTR(1:),'(F10.2)')
-          ELSE
-            CALL IRealToString(ARGKPLT(NNP),&
-            HKLSTR(1:),'(F10.4)')
-          END IF
-          CALL WindowOutStatusBar(3,HKLSTR)
-        END IF
-      ELSE
-        CALL IGrPlotMode(' ')
-        RETURN
-      ENDIF
-
-      END SUBROUTINE Check_KeyDown_PeakFind_Inner
-!
+!U      SUBROUTINE Check_KeyDown_PeakFind_Inner(KeyNumber,xval,yval)
+!U
+!U      USE WINTERACTER
+!U
+!U      INCLUDE 'PARAMS.INC'
+!U
+!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+!U      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+!U      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+!U        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+!U        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+!U      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+!U
+!U      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
+!U        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+!U      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
+!U      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
+!U
+!U      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+!U
+!U      INCLUDE 'GLBVAR.INC'
+!U
+!U      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
+!U      CHARACTER*100 HKLSTR
+!U      CHARACTER*4   CHRFORM
+!U      REAL ARGKPLT(10),DSPLT(10)
+!U      INTEGER IHPLT(3,10)
+!U      INCLUDE 'Poly_Colours.inc'
+!U      REAL CHAR_SIZE,MARKER_SIZE
+!U      LOGICAL ERROR_BAR
+!U      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
+!U
+!U      LOGICAL Confirm ! Function
+!U
+!U      xcur(2)=xval
+!U      ycur(2)=yval
+!U      IF (KeyNumber.eq.KeyReturn) THEN
+!U        numobstic=numobstic+1
+!U! Simple cursor location
+!U        itypot(numobstic)=0
+!U        xobstic(numobstic)=xcur(2)
+!U        axdif=abs(xobs(nobs)-xobs(1))
+!U        do ii=1,nobs
+!U          atem=abs(xcur(2)-xobs(ii))
+!U          if (atem.le.axdif) then
+!U            axdif=atem
+!U            yobstic(numobstic)=yobs(ii)
+!U          end if
+!U        end do
+!U                call Upload_Positions()
+!U                CALL IGrPlotMode(' ')
+!U                call Profile_Plot(IPTYPE)
+!U                CALL IGrPlotMode('EOR')
+!U              ELSE IF (KeyNumber.eq.KeyInsert) THEN
+!U                numobstic=numobstic+1
+!U                itypot(numobstic)=1
+!U! Fit to the top of the peak
+!U                call fit_peaktop(xcur(2))
+!U                CALL IGrPlotMode(' ')
+!U                call Profile_Plot(IPTYPE)
+!U                CALL IGrPlotMode('EOR')
+!U              ELSE IF (KeyNumber.eq.KeyDeleteUnder) THEN
+!U! Delete the nearest peak but ask first ...
+!U                IF (NUMOBSTIC.EQ.0) THEN
+!U                 CALL ErrorMessage('No tickmarks to delete!')
+!U                ELSE
+!U                 IF (Confirm('Do you really want to'//CHAR(13)//' delete this tickmark?')) THEN
+!U! Delete the closest tickmark ...
+!U                  ATEM=ABS(XOBSTIC(1)-XCUR(2))
+!U                  LTEM=1
+!U                  DO II=1,NUMOBSTIC
+!U                    AATEM=ABS(XOBSTIC(II)-XCUR(2))
+!U                    IF (AATEM.LT.ATEM) THEN
+!U                      LTEM=II
+!U                      ATEM=AATEM
+!U                    END IF
+!U                  END DO
+!U                  KK=0
+!U                  DO II=1,NUMOBSTIC
+!U                    IF (II.NE.LTEM) THEN
+!U                      KK=KK+1
+!U                      XXTEM(KK)=XOBSTIC(II)
+!U                      YYTEM(KK)=YOBSTIC(II)
+!U                      ITTEM(KK)=ITYPOT(II)
+!U                      IOTEM(KK)=IORDOT(II)
+!U                      DO JJ=1,9
+!U                        UUTEM(JJ,KK)=UOBSTIC(JJ,II)
+!U                        ZZTEM(JJ,KK)=ZOBSTIC(JJ,II)
+!U                      END DO
+!U                    END IF
+!U                  END DO
+!U                  NUMOBSTIC=NUMOBSTIC-1
+!U                  DO II=1,NUMOBSTIC
+!U                      KK=II
+!U                      XOBSTIC(II)=XXTEM(KK)
+!U                      YOBSTIC(II)=YYTEM(KK)
+!U                      ITYPOT(II)=ITTEM(KK)
+!U                      IORDOT(II)=IOTEM(KK)
+!U                      DO JJ=1,9
+!U                        UOBSTIC(JJ,II)=UUTEM(JJ,KK)
+!U                        ZOBSTIC(JJ,II)=ZZTEM(JJ,KK)
+!U                      END DO
+!U                  END DO                                  
+!U                 END IF
+!U                 CALL Upload_Positions()
+!U                         CALL Upload_Widths()
+!U                END IF
+!U              ELSE IF (KeyNumber.eq.77 .or. KeyNumber.eq.109) THEN
+!U! KeyNumber=M/m
+!U! Find the Miller index of the nearest Bragg peak ...
+!U                IF (NTIC.GT.0) THEN
+!U                  ATEM=ABS(ARGK(1)-XCUR(2))
+!U                  DO II=1,NTIC
+!U                    AATEM=ABS(ARGK(II)-XCUR(2))
+!U                    ATEM=MIN(ATEM,AATEM)
+!U                  END DO
+!U                  NNP=0
+!U                  DO II=1,NTIC
+!U                    AATEM=ABS(ARGK(II)-XCUR(2))
+!U                    IF (AATEM.EQ.ATEM) THEN
+!U                      NNP=NNP+1
+!U                      DO I3=1,3
+!U                       IHPLT(I3,NNP)=IH(I3,II)
+!U                      END DO
+!U                      ARGKPLT(NNP)=ARGK(II)
+!U                      DSPLT(NNP)=1./DSTAR(II)
+!U                    END IF
+!U                  END DO
+!U                  hklstr=' '
+!U                  CHRFORM='(I1)'
+!U                  ILOC=0
+!U                  DO IPP=1,NNP
+!U                    ILOC=ILOC+1
+!U                    HKLSTR(ILOC:ILOC)='('
+!U                    DO I3=1,3
+!U                      IF (IHPLT(I3,IPP).LE.-10.) THEN
+!U                        ISF=3
+!U                      ELSE IF (IHPLT(I3,IPP).LT.0.AND.IHPLT(I3,IPP).GT.-10.) THEN
+!U                        ISF=2
+!U                      ELSE IF (IHPLT(I3,IPP).GE.0.AND.IHPLT(I3,IPP).LT.10.) THEN
+!U                        ISF=1
+!U                      ELSE
+!U                        ISF=2
+!U                      END IF
+!U                      CALL IntegerToString(ISF,CHRFORM(3:3),'(I1)')
+!U                      CALL IntegerToString(IHPLT(I3,IPP),&
+!U                         HKLSTR(ILOC+1:ILOC+ISF),CHRFORM)
+!U                      ILOC=ILOC+ISF+1
+!U                      HKLSTR(ILOC:ILOC)=' '
+!U                    END DO
+!U                    HKLSTR(ILOC:ILOC)=')'
+!U                  END DO
+!U                  CALL WindowOutStatusBar(2,HKLSTR)
+!U                  CALL IGrCharJustify('L')
+!U                  CALL IGrColourN(KolNumCTic)
+!U                  CHSTEM=0.75*Char_Size
+!U                  CALL IGrCharSize(chstem,chstem)
+!U                  CALL IGrCharRotate(90.)
+!U                  xtem=xcur(2)-0.02*(xpgmax-xpgmin)
+!U                  ytem=ycur(2)+0.01*(ypgmax-ypgmin)
+!U                  CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+!U                  CALL IGrCharOut(xgtem,ygtem,HKLSTR(:LEN_TRIM(HKLSTR)))
+!U                  CALL IGrCharRotate(0.)
+!U                  hklstr=' '
+!U          IF (argkplt(nnp).ge.200.) THEN
+!U            CALL IRealToString(ARGKPLT(NNP),&
+!U            HKLSTR(1:),'(F10.2)')
+!U          ELSE
+!U            CALL IRealToString(ARGKPLT(NNP),&
+!U            HKLSTR(1:),'(F10.4)')
+!U          END IF
+!U          CALL WindowOutStatusBar(3,HKLSTR)
+!U        END IF
+!U      ELSE
+!U        CALL IGrPlotMode(' ')
+!U        RETURN
+!U      ENDIF
+!U
+!U      END SUBROUTINE Check_KeyDown_PeakFind_Inner
+!U!
 !*****************************************************************************
 !
       SUBROUTINE Check_KeyDown_PeakFit_Inner(KeyNumber,xcur1,xcur2)
@@ -1401,8 +1234,6 @@
       USE DRUID_HEADER
 
       TYPE(WIN_STYLE)    WINDOW
-      TYPE(WIN_MESSAGE)  MESSAGE
-      TYPE(WIN_MESSAGE)  ZMESSAGE
 
       INCLUDE 'PARAMS.INC'
 
@@ -1416,16 +1247,15 @@
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
+
+      INCLUDE 'GLBVAR.INC'
+
       LOGICAL HVLINE_THERE
 
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
       INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
       CHARACTER*100 HKLSTR
       CHARACTER*4   CHRFORM
       REAL ARGKPLT(10),DSPLT(10)
@@ -1458,26 +1288,24 @@
       INTEGER NPeaksFitted, ICurSel
       LOGICAL Check_TicMark_Data
 
-      xcur(1)=xcur1
-      xcur(2)=xcur2
-      IF (KeyNumber.eq.KeyDeleteUnder) THEN
+      xcur(1) = xcur1
+      xcur(2) = xcur2
+      IF (KeyNumber .EQ. KeyDeleteUnder) THEN
 ! Delete the nearest peak fitting range but ask first ...
-                IF (NumPeakFitRange.eq.0) THEN
-                 CALL WMessageBox(OKOnly,ExclamationIcon,CommonOK, &
-                 'No peak fitting ranges to delete!', &
-                 'Delete peak fitting confirmation')
+                IF (NumPeakFitRange .EQ. 0) THEN
+                 CALL ErrorMessage('No peak fitting ranges to delete!')
                 ELSE
                  CALL WMessageBox(YesNo,QuestionIcon,CommonYes, &
                  'Do you really want to'//CHAR(13)//' delete this peak fitting range?', &
                  'Delete peak fitting confirmation')
                  IF (WInfoDialog(4).EQ.CommonYes) THEN
 ! Delete the closest peak fitting range ...
-                  DO II=1,NumPeakFitRange
+                  DO II = 1, NumPeakFitRange
                     IF (XCUR(2).GE.XPF_Range(1,II) .AND. &
                         XCUR(2).LE.XPF_Range(2,II) ) THEN
 ! The cursor is sitting inside the peak range - remove the range
 ! and shuffle all the regions that are already there.
-                      LTEM=II
+                      LTEM = II
                     END IF
                   END DO
                   KK=0
@@ -1568,7 +1396,6 @@
 !                CALL IGrPlotMode('EOR')
                         CALL Upload_Widths
                         CALL Upload_Positions
-!  write(76,*) ' NumPeakFitRange (out) is ',NumPeakFitRange
               ELSE IF (KeyNumber.ge.49 .and. KeyNumber.le.57) THEN
 ! KeyNumber=1-9: locating peak positions...
 ! Are we in a peak range?
@@ -1629,11 +1456,9 @@
                       InRange=II
                     END IF
                   END DO
-                  IF (InRange.eq.0) THEN
+                  IF (InRange .EQ. 0) THEN
 ! Tell the user to place the cursor in the range to be fitted.
-                    CALL WMessageBox(OKOnly,ExclamationIcon,CommonOK, &
-                    'Place the cursor in a peak fitting range', &
-                    'Peak fitting confirmation')
+                    CALL ErrorMessage('Place the cursor in a peak fitting range.')
                   ELSE
 ! We're ready to fit the Bragg peaks
                     CurrentRange=InRange
@@ -1673,72 +1498,70 @@
           DO II=1,NumPeakFitRange
                   NPeaksFitted = NPeaksFitted + NumInPFR(II)
           END DO
-
             IF ( NPeaksFitted .GE. 3 ) THEN
                   CALL SetModeMenuState(1,1,0)
             ELSE
                   CALL SetModeMenuState(1,0,0)
             END IF
-
-
        ELSE
             CALL SetModeMenuState(1,-1,0)
        END IF
 
-     RETURN
-     END SUBROUTINE Check_KeyDown_PeakFit_Inner
+      RETURN
+      END SUBROUTINE Check_KeyDown_PeakFit_Inner
 !
+!*****************************************************************************
 !
-!
-      Logical Function FinishMenuMode(IDV_Menu_Now,IDV_Current_Menu_Option)
-!
-      USE Winteracter
-      USE druid_header
+      LOGICAL FUNCTION FinishMenuMode(IDV_Menu_Now,IDV_Current_Menu_Option)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
 !C>> JCC Was 17
       INTEGER, PARAMETER :: Num_Menu_Options = 27
 !C>> JCC Dimension changed to Param value
-      Integer, Save :: IDV_Menu_Option(Num_Menu_Options)
-      Integer IDV_Menu_Now, IDV_Current_Menu_Option
+      INTEGER, SAVE :: IDV_Menu_Option(Num_Menu_Options)
+      INTEGER IDV_Menu_Now, IDV_Current_Menu_Option
 
-      IDV_Menu_Option(1)  = ID_Default_Cursor_Mode 
-      IDV_Menu_Option(2)  = ID_CrossHair_Cursor_Mode 
-      IDV_Menu_Option(3)  = ID_Peak_Fitting_Cursor_Mode 
-      IDV_Menu_Option(4)  = ID_get_lattice_constants 
-      IDV_Menu_Option(5)  = ID_get_peak_widths 
-      IDV_Menu_Option(6)  = ID_import_pro_file 
-      IDV_Menu_Option(7)  = ID_import_tic_file 
-      IDV_Menu_Option(8)  = ID_get_peak_intensities 
-      IDV_Menu_Option(9)  = ID_import_uxd_file 
-      IDV_Menu_Option(10) = ID_import_CCL  
-      IDV_Menu_Option(11) = ID_import_ICSD
-      IDV_Menu_Option(12) = ID_import_CIF 
-      IDV_Menu_Option(13) = ID_export_CIF 
-      IDV_Menu_Option(14) = ID_export_CCL 
+! JvdS Lines labelled W generated a compiler warning that the variables used had not been initialised.
+
+      IDV_Menu_Option( 1) = ID_Default_Mode 
+!W      IDV_Menu_Option( 2) = ID_CrossHair_Cursor_Mode 
+!W      IDV_Menu_Option( 3) = ID_Peak_Fitting_Cursor_Mode 
+      IDV_Menu_Option( 4) = ID_get_lattice_constants 
+      IDV_Menu_Option( 5) = ID_get_peak_widths 
+      IDV_Menu_Option( 6) = ID_import_pro_file 
+!W      IDV_Menu_Option( 7) = ID_import_tic_file 
+      IDV_Menu_Option( 8) = ID_get_peak_intensities 
+!W      IDV_Menu_Option( 9) = ID_import_uxd_file 
+!W      IDV_Menu_Option(10) = ID_import_CCL  
+!W      IDV_Menu_Option(11) = ID_import_ICSD
+!W      IDV_Menu_Option(12) = ID_import_CIF 
+!W      IDV_Menu_Option(13) = ID_export_CIF 
+!W      IDV_Menu_Option(14) = ID_export_CCL 
       IDV_Menu_Option(15) = ID_help_about_Polyfitter 
       IDV_Menu_Option(16) = ID_PolyFitter_Help 
       IDV_Menu_Option(17) = ID_Polyfitter_Tips 
 !C>> JCC Has to have these too 
-        IDV_Menu_Option(18) = ID_Default_Mode 
-        IDV_Menu_Option(19) = ID_import_xye_file 
-        IDV_Menu_Option(20) = ID_file_exit 
-        IDV_Menu_Option(21) = ID_file_print 
-        IDV_Menu_Option(22) = ID_Pawley_Refinement_Mode 
-        IDV_Menu_Option(23) = ID_get_data_properties 
+      IDV_Menu_Option(18) = ID_Default_Mode 
+      IDV_Menu_Option(19) = ID_import_xye_file 
+      IDV_Menu_Option(20) = ID_file_exit 
+      IDV_Menu_Option(21) = ID_file_print 
+      IDV_Menu_Option(22) = ID_Pawley_Refinement_Mode 
+      IDV_Menu_Option(23) = ID_get_data_properties 
       IDV_Menu_Option(24) = ID_get_crystal_symmetry 
-        IDV_Menu_Option(25) = ID_get_peak_positions
-        IDV_Menu_Option(26) = ID_Structure_Solution_mode
-        IDV_Menu_Option(26) = ID_Start_Wizard
-     If (IDV_Menu_Now.EQ.IDV_Current_Menu_Option) Then
-       FinishMenuMode=.FALSE.
-     ELSE
-       DO I = 1, Num_Menu_Options
-         If (IDV_Menu_Now.EQ.IDV_Menu_Option(i)) Then
-           FinishMenuMode=.TRUE.
-           GOTO 100
-         END IF
-       END DO     
-     END IF
+      IDV_Menu_Option(25) = ID_get_peak_positions
+      IDV_Menu_Option(26) = ID_Structure_Solution_mode
+      IDV_Menu_Option(26) = ID_Start_Wizard
+      IF (IDV_Menu_Now.EQ.IDV_Current_Menu_Option) Then
+        FinishMenuMode=.FALSE.
+      ELSE
+        DO I = 1, Num_Menu_Options
+          IF (IDV_Menu_Now .EQ. IDV_Menu_Option(I)) THEN
+            FinishMenuMode = .TRUE.
+            GOTO 100
+          END IF
+        END DO     
+      END IF
+ 100  RETURN
 
- 100 RETURN
-
-     END FUNCTION  FinishMenuMode
+      END FUNCTION  FinishMenuMode
