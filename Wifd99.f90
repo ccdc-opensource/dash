@@ -199,7 +199,8 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -589,7 +590,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
