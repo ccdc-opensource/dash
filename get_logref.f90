@@ -216,11 +216,32 @@
             LOGREF(3,IR) = (HPL.NE.HPLm) .AND. (K_.EQ.K_m) ! h+l = 2n+1, k = 2n
             LOGREF(4,IR) = (HPL.NE.HPLm) .AND. (K_.NE.K_m) ! h+l = 2n+1, k = 2n+1
           ENDDO
-        CASE (365)                             ! I 41/a (origin choice 2)
+        CASE (362)                             ! P42/n (origin choice 2: inversion at origin)
           NLGREF = 8
           DO IR = 1, NumOfRef
             H_ = iHKL(1,IR)
             K_ = iHKL(2,IR)
+            L_ = iHKL(3,IR)
+            HPK = H_ + K_
+            HPL = H_ + L_
+            KPL = K_ + L_
+            HPKm = 2*(HPK/2)
+            HPLm = 2*(HPL/2)
+            KPLm = 2*(KPL/2)
+            LOGREF(1,IR) = (HPK.EQ.HPKm) .AND. (HPL.EQ.HPLm) .AND. (KPL.EQ.KPLm) ! h+k = 2n,   h+l = 2n,   k+l = 2n
+            LOGREF(2,IR) = (HPK.EQ.HPKm) .AND. (HPL.EQ.HPLm) .AND. (KPL.NE.KPLm) ! h+k = 2n,   h+l = 2n,   k+l = 2n+1
+            LOGREF(3,IR) = (HPK.EQ.HPKm) .AND. (HPL.NE.HPLm) .AND. (KPL.EQ.KPLm) ! h+k = 2n,   h+l = 2n+1, k+l = 2n
+            LOGREF(4,IR) = (HPK.EQ.HPKm) .AND. (HPL.NE.HPLm) .AND. (KPL.NE.KPLm) ! h+k = 2n,   h+l = 2n+1, k+l = 2n+1
+            LOGREF(5,IR) = (HPK.NE.HPKm) .AND. (HPL.EQ.HPLm) .AND. (KPL.EQ.KPLm) ! h+k = 2n+1, h+l = 2n,   k+l = 2n
+            LOGREF(6,IR) = (HPK.NE.HPKm) .AND. (HPL.EQ.HPLm) .AND. (KPL.NE.KPLm) ! h+k = 2n+1, h+l = 2n,   k+l = 2n+1
+            LOGREF(7,IR) = (HPK.NE.HPKm) .AND. (HPL.NE.HPLm) .AND. (KPL.EQ.KPLm) ! h+k = 2n+1, h+l = 2n+1, k+l = 2n
+            LOGREF(8,IR) = (HPK.NE.HPKm) .AND. (HPL.NE.HPLm) .AND. (KPL.NE.KPLm) ! h+k = 2n+1, h+l = 2n+1, k+l = 2n+1
+          ENDDO
+        CASE (365)                             ! I 41/a (origin choice 2)
+          NLGREF = 8
+          DO iR = 1, NumOfRef
+            H_ = iHKL(1,iR)
+            K_ = iHKL(2,iR)
             H_m = 2*(H_/2)
             K_m = 2*(K_/2)
             HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
@@ -267,7 +288,7 @@
       END SELECT
       SELECT CASE (NumberSGTable)
 ! adjustments for presence of kx and hy terms
-        CASE (356, 365, 369, 391)
+        CASE (356, 362, 365, 369, 391)
           JHMIN = MIN(IHMIN,IKMIN)
           JHMAX = MAX(IHMAX,IKMAX)
           IHMIN = JHMIN

@@ -48,8 +48,8 @@
                         FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061, FFCALC_064, FFCALC_065
       REAL, EXTERNAL :: FFCALC_066, FFCALC_067, FFCALC_069, FFCALC_112, FFCALC_115, FFCALC_116, &
                         FFCALC_143, FFCALC_164, FFCALC_176, FFCALC_212, FFCALC_266, FFCALC_269
-      REAL, EXTERNAL :: FFCALC_284, FFCALC_290, FFCALC_292, FFCALC_298, FFCALC_304, FFCALC_356, &
-                        FFCALC_365, FFCALC_369, FFCALC_430, FFCALC_431, FFCALC_432, FFCALC_433
+      REAL, EXTERNAL :: FFCALC_284, FFCALC_290, FFCALC_292, FFCALC_298, FFCALC_304, FFCALC_356, FFCALC_362, &
+                        FFCALC_365, FFCALC_369, FFCALC_391, FFCALC_430, FFCALC_431, FFCALC_432, FFCALC_433
       REAL, EXTERNAL :: FFCALC_434, FFCALC_435, FFCALC_449, FFCALC_451, FFCALC_462, FFCALC_468, &
                         FFCALC_469, FFCALC_471, FFCALC_481, FFCALC_483, FFCALC_485, FFCALC_DEFAULT
       REAL    SUM1, SUM2, RESCL, DELI, DELJ, CHIADD
@@ -186,6 +186,10 @@
           DO IR = 1, NumOfRef
             AICALC(IR) = FFCALC_356(IR)
           ENDDO
+        CASE (362)           ! P 42/n (origin choice 2)
+          DO IR = 1, NumOfRef
+            AICALC(IR) = FFCALC_362(IR)
+          ENDDO
         CASE (365)           ! I 41/a (origin choice 2)
           DO IR = 1, NumOfRef
             AICALC(IR) = FFCALC_365(IR)
@@ -193,6 +197,10 @@
         CASE (369)           ! P 41 21 2
           DO IR = 1, NumOfRef
             AICALC(IR) = FFCALC_369(IR)
+          ENDDO
+        CASE (391)           ! P -4 21 c
+          DO IR = 1, NumOfRef
+            AICALC(IR) = FFCALC_391(IR)
           ENDDO
   ! Obscure from here on in !
         CASE (430)           ! P3
