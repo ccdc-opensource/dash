@@ -172,8 +172,13 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       INTEGER iSol, hFile
 
+      IF ( in_batch ) &
+        RETURN
       IF (OFBN_Len .EQ. 0) THEN
         CALL DebugErrorMessage("OFBN_Len .EQ. 0 when saving .log file.")
       ELSE
