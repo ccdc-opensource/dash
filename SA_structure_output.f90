@@ -83,15 +83,14 @@
 !       The CSSR file first
       IF (tSaveCSSR) THEN
         OPEN (UNIT=64,FILE=cssr_file(1:cssr_flen),STATUS='unknown')
+        WRITE (64,1000) (CellPar(ii),ii=1,3)
+ 1000   FORMAT (' REFERENCE STRUCTURE = 00000   A,B,C =',3F8.3)
+        WRITE (64,1010) (CellPar(ii),ii=4,6), SGNumStr(Ntem)(1:3)
+ 1010   FORMAT ('   ALPHA,BETA,GAMMA =',3F8.3,'    SPGR = ',A3)
         WRITE (64,"(' ',I3,'   0  DASH solution')") natom
         WRITE (64,1030) SNGL(t), -SNGL(fopt), cpb, ntotmov
  1030   FORMAT (' T=',F6.2,', chi**2=',F7.2,' and profile chi**2=',F7.2,&
      &          ' after ',I8,' moves')
-        WRITE (64,1000) (CellPar(ii),ii=1,3)
-!
- 1000   FORMAT (' REFERENCE STRUCTURE = 00000   A,B,C =',3F8.3)
-        WRITE (64,1010) (CellPar(ii),ii=4,6), SGNumStr(Ntem)(1:3)
- 1010   FORMAT ('   ALPHA,BETA,GAMMA =',3F8.3,'    SPGR = ',A3)
       ENDIF
 !
 !       Now the PDB...
@@ -193,10 +192,9 @@
 !
 !         The CSSR atom lines
           IF (tSaveCSSR) THEN
-            WRITE (64,1110) iiact, asym(iorig,CheckedFragNo),           &
-     &                      (xatopt(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0,  &
-     &                      0, 0.0
- 1110       FORMAT (I4,1X,A3,3X,3(F9.5,1X),8I4,1X,F7.3)
+            WRITE (64,1110) iiact, OriginalLabel(iorig,CheckedFragNo)(1:4),           &
+     &                      (xatopt(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
+ 1110       FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
           ENDIF
 !       The PDB atom lines
 !
@@ -218,30 +216,21 @@
 !   xc=xc*cos(rnew) + zc*sin(rnew)
 !   zc=zc*cos(rnew) - xc*sin(rnew)
 !
-          xc = xatopt(1,ii)*SNGL(f2cpdb(1,1)) + xatopt(2,ii)            &
-     &         *SNGL(f2cpdb(1,2)) + xatopt(3,ii)*SNGL(f2cpdb(1,3))
-          yc = xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)            &
-     &         *SNGL(f2cpdb(2,3))
+          xc = xatopt(1,ii)*SNGL(f2cpdb(1,1)) + xatopt(2,ii)*SNGL(f2cpdb(1,2)) + xatopt(3,ii)*SNGL(f2cpdb(1,3))
+          yc = xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)*SNGL(f2cpdb(2,3))
           zc = xatopt(3,ii)*SNGL(f2cpdb(3,3))
-!
-! Was
-!          if (asym(i,j)(2:2).eq.' ') then
-!            write(65,1120) ii,asym(i,j),xc,yc,zc
-!          else
-!            write(65,1130) ii,asym(i,j),xc,yc,zc
-!          endif
-! Now
+! Note that element are right-justified
+! (important for distinction between Calcium "Ca   " and alpha carbon " Ca  ".
+!HETATM   23  S15 NONE    1       5.565   4.481   6.518  1.00  0.00
+!HETATM   24  S16 NONE    1       0.201   4.300   5.816  1.00  0.00
+!HETATM   25 Cl17 NONE    1       5.887   3.389   3.431  1.00  0.00
           IF (tSavePDB) THEN
             IF (asym(iorig,CheckedFragNo)(2:2).EQ.' ') THEN
-              WRITE (65,1120) iiact, asym(iorig,CheckedFragNo), xc, yc, &
-     &                        zc
- 1120         FORMAT ('HETATM',I5,'  ',A3,' NONE    1    ',3F8.3,       &
-     &                '  1.00  0.00')
+              WRITE (65,1120) iiact, OriginalLabel(iorig,CheckedFragNo)(1:4), xc, yc, zc
+ 1120         FORMAT ('HETATM',I5,'  ',A4,'NONE    1    ',3F8.3,'  1.00  0.00')
             ELSE
-              WRITE (65,1130) iiact, asym(iorig,CheckedFragNo), xc, yc, &
-     &                        zc
- 1130         FORMAT ('HETATM',I5,' ',A3,'  NONE    1    ',3F8.3,       &
-     &                '  1.00  0.00')
+              WRITE (65,1130) iiact, OriginalLabel(iorig,CheckedFragNo)(1:5), xc, yc, zc
+ 1130         FORMAT ('HETATM',I5,' ',A5,'NONE    1    ',3F8.3,'  1.00  0.00')
             ENDIF
           ENDIF
 !       The CCL atom lines
