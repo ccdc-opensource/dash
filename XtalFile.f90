@@ -284,6 +284,7 @@
       ENDDO
       CALL UpdateZmatrixSelection
       CALL SA_Parameter_Set
+      CALL Clear_SA
       XtalFileLoad = 0
       RETURN
  999  CALL ErrorMessage('Error reading crystal structure file.')
@@ -370,7 +371,6 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-!      LOGICAL, EXTERNAL :: FnUnitCellOK
       INTEGER, EXTERNAL :: CSSR2Mol2, proposed_crystal_system
       INTEGER iHandle
       CHARACTER(MaxPathLength) :: line
@@ -416,7 +416,7 @@
         CASE ('mol ','mdl ')
           fmt = '-mol'
       END SELECT
-! Run silently, 
+! Run silently 
       CALL IOSDeleteFile('MakeZmatrix.log')
       iStat = InfoError(1) ! Clear any errors 
       iStart = 1
@@ -445,7 +445,7 @@
       CALL ILowerCase(line(1:nl))
       CALL INextString(line,keychar)
       SELECT CASE (KeyChar(1:3))
-        CASE ('cel')                                ! Cell parameters
+        CASE ('cel') ! Cell parameters
           DO I = 1, 6
             CALL INextReal(line, CellPar(i))
           ENDDO
@@ -453,10 +453,10 @@
           CALL Upload_CrystalSystem
           ! Upload_CrystalSystem() calls UpdateCell()
           ! UpdateCell() calls GenerateTickMarks()
-        CASE ('spa')
-     ! Ignore
-        CASE ('sym')
-     ! Ignore
+        CASE ('spa') ! Space group
+          ! Ignore
+        CASE ('sym') ! Symmetry operators
+          ! Ignore
       END SELECT
       GOTO 10 
  100  CLOSE(iHandle)
