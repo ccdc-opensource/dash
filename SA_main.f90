@@ -146,7 +146,7 @@
       INTEGER, INTENT (IN   ) :: ifrg
 
       INTEGER I
-      CHARACTER*85 temp_file
+      CHARACTER(MaxPathLength) temp_file
       CHARACTER*2  AtmElement(1:MAXATM_2)
       REAL*8 CART(1:3,1:MAXATM)
       INTEGER IHANDLE

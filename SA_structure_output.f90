@@ -294,7 +294,7 @@
       LOGICAL, EXTERNAL :: ChrIsLetter
       INTEGER AtomLabelOption, AtomColourOption, RangeOption
       INTEGER GridRowNr
-      CHARACTER*100 tString
+      CHARACTER(MaxPathLength) tString
       INTEGER II, I, ifrg, J, iiact, ISTATUS, BondNr, ilen
       REAL xc, yc, zc
       LOGICAL UseThisSolution

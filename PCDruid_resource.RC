@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 28/Jan/2002 12:35:34
+// Modified : 28/Jan/2002 13:22:41
 //
 ///////////////////////////////////////////////////
 //
@@ -2091,6 +2091,7 @@ BEGIN
 "[Grids] \n"
 "[Colours] \n"
 "[Lengths] \n"
+" 1021   255 \n"
 ,0
 END
 
