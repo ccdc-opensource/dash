@@ -1,288 +1,2840 @@
-!*==FFCALC_001.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_001(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_001.f90'
+
+! Structure factor calculations for space group P1
+! Loop is performed over the atoms in the asymmetric unit
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          C3F = COSQS(IL,3,N)*FOB(N,IR)
+          S3F = SINQS(IL,3,N)*FOB(N,IR)
+          XCC = COSQS(IK,2,N)*C3F
+          XSC = SINQS(IK,2,N)*C3F
+          XCS = COSQS(IK,2,N)*S3F
+          XSS = SINQS(IK,2,N)*S3F
+          CCC = COSQS(IH,1,N)*XCC
+          CSS = COSQS(IH,1,N)*XSS
+          SCS = SINQS(IH,1,N)*XCS
+          SSC = SINQS(IH,1,N)*XSC
+          SCC = SINQS(IH,1,N)*XCC
+          CSC = COSQS(IH,1,N)*XSC
+          CCS = COSQS(IH,1,N)*XCS
+          SSS = SINQS(IH,1,N)*XSS
+          AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
+          BFCAL = BFCAL + SCC + CSC + CCS - SSS
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          C3F = COSQS(IL,3,N)*FOB(N,IR)
+          S3F = SINQS(IL,3,N)*FOB(N,IR)
+          XCC = COSQS(IK,2,N)*C3F
+          XSC = SINQS(IK,2,N)*C3F
+          XCS = COSQS(IK,2,N)*S3F
+          XSS = SINQS(IK,2,N)*S3F
+          CCC = COSQS(IH,1,N)*XCC
+          CSS = COSQS(IH,1,N)*XSS
+          SCS = SINQS(IH,1,N)*XCS
+          SSC = SINQS(IH,1,N)*XSC
+          SCC = SINQS(IH,1,N)*XCC
+          CSC = COSQS(IH,1,N)*XSC
+          CCS = COSQS(IH,1,N)*XCS
+          SSS = SINQS(IH,1,N)*XSS
+          AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
+          BFCAL = BFCAL + SCC + CSC + CCS - SSS
+        ENDDO
+      ENDIF
+      FFCALC_001 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_001
-!*==FFCALC_002.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_002(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_002.f90'
+
+! Structure factor calculations for space group P-1
+! Loop is performed over the atoms in the asymmetric unit
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          C3F = COSQS(IL,3,N)*FOB(N,IR)
+          S3F = SINQS(IL,3,N)*FOB(N,IR)
+          CCC = COSQS(IH,1,N)*COSQS(IK,2,N)*C3F
+          CSS = COSQS(IH,1,N)*SINQS(IK,2,N)*S3F
+          SCS = SINQS(IH,1,N)*COSQS(IK,2,N)*S3F
+          SSC = SINQS(IH,1,N)*SINQS(IK,2,N)*C3F
+          AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          C3F = COSQS(IL,3,N)*FOB(N,IR)
+          S3F = SINQS(IL,3,N)*FOB(N,IR)
+          CCC = COSQS(IH,1,N)*COSQS(IK,2,N)*C3F
+          CSS = COSQS(IH,1,N)*SINQS(IK,2,N)*S3F
+          SCS = SINQS(IH,1,N)*COSQS(IK,2,N)*S3F
+          SSC = SINQS(IH,1,N)*SINQS(IK,2,N)*C3F
+          AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
+        ENDDO
+      ENDIF
+      FFCALC_002 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_002
-!*==FFCALC_039.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_039(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_039.f90'
+
+! Structure factor calculations for space group P 1 21 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N) &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N) &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N) &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_039 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_039
-!*==FFCALC_040.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_040(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_040.f90'
+
+! Structure factor calculations for space group C 1 2 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_040 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_040
-!*==FFCALC_044.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_044(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_044.f90'
+
+! Structure factor calculations for space group P 1 c 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_044 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_044
-!*==FFCALC_050.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_050(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_050.f90'
+
+! Structure factor calculations for space group C 1 c 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_050 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_050
-!*==FFCALC_052.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_052(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_052.f90'
+
+! Structure factor calculations for space group I 1 a 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_052 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_052
-!*==FFCALC_057.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_057(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_057.f90'
+
+! Structure factor calculations for space group P1 21/m 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_057 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_057
-!*==FFCALC_058.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_058(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_058.f90'
+
+! Structure factor calculations for space group C 1 2/m 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)    &
+     &            *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)    &
+     &            *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_058 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_058
-!*==FFCALC_061.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_061(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_061.f90'
+
+! Structure factor calculations for space group P 1 2/c 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_061 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_061
-!*==FFCALC_064.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_064(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_064.f90'
+
+! Structure factor calculations for space group P 1 21/c 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_064 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_064
-!*==FFCALC_065.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_065(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_065.f90'
+
+! Structure factor calculations for space group P 1 21/n 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_065 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_065
-!*==FFCALC_066.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_066(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_066.f90'
+
+! Structure factor calculations for space group P 1 21/a 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_066 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_066
-!*==FFCALC_067.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_067(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_067.f90'
+
+! Structure factor calculations for space group c 1 2/c 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_067 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_067
-!*==FFCALC_069.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_069(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_069.f90'
+
+! Structure factor calculations for space group I 1 2/a 1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_069 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_069
-!*==FFCALC_112.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_112(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_112.f90'
+
+! Structure factor calculations for space group P 21 21 2
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_112 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_112
-!*==FFCALC_115.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_115(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_115.f90'
+
+! Structure factor calculations for space group P 21 21 21
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_115 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_115
-!*==FFCALC_116.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_116(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_116.f90'
+
+! Structure factor calculations for space group C 2 2 21
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+                    *FOB(N,IR)
+            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+                    *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_116 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_116
-!*==FFCALC_143.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_143(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_143.f90'
+
+! Structure factor calculations for space group P c a 21
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_143 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_143
-!*==FFCALC_164.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_164(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_164.f90'
+
+! Structure factor calculations for space group P n a 21
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_164 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_164
-!*==FFCALC_176.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_176(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_176.f90'
+
+! Structure factor calculations for space group C m c 21
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_176 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_176
-!*==FFCALC_212.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_212(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_212.f90'
+
+! Structure factor calculations for space group F d d 2
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+!
+! Note the use here of a prefactor of '2' for logrefs of 1 and 3
+! to take into account the double weighting of these SF expression
+! as seen in Vol B
+!
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)&
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)&
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+     &              -COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+     &              +COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+     &              +SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)&
+     &              *FOB(N,IR)
+            BFCAL = BFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)&
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+     &              +COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+     &              +SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+     &              -COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)&
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)&
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+     &              -COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+     &              +COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+     &              +SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)&
+     &              *FOB(N,IR)
+            BFCAL = BFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)&
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+     &              +COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+     &              +SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+     &              *FOB(N,IR)
+            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+     &              -COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_212 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_212
-!*==FFCALC_266.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_266(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_266.f90'
+
+! Structure factor calculations for space group P c c n
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_266 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_266
-!*==FFCALC_269.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_269(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_269.f90'
+
+! Structure factor calculations for space group P b c m
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_269 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_269
-!*==FFCALC_284.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_284(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_284.f90'
+
+! Structure factor calculations for space group P b c n
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_284 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_284
-!*==FFCALC_290.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_290(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_290.f90'
+
+! Structure factor calculations for space group P b c a
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_290 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_290
-!*==FFCALC_292.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_292(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_292.f90'
+
+! Structure factor calculations for space group P n m a
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(2,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(3,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSEIF (LOGREF(4,IR)) THEN
+          DO NS = 1, NATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_292 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_292
-!*==FFCALC_298.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_298(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_298.f90'
+
+! Structure factor calculations for space group C m c m
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_298 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_298
-!*==FFCALC_304.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_304(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_304.f90'
+
+! Structure factor calculations for space group C m c a
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        IF (LOGREF(1,IR)) THEN
+          DO N = 1, NATOM
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO N = 1, NATOM
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ELSE
+        IF (LOGREF(1,IR)) THEN
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ELSE
+          DO NS = 1, NSATOM
+            N = ISATOM(NS)
+            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
+     &              *FOB(N,IR)
+          ENDDO
+        ENDIF
+      ENDIF
+      FFCALC_304 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_304
-!*==FFCALC_356.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_356(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_356.f90'
+
+! Structure factor calculations for space group I-4
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      DO N = 1, NATOM
+        term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)             &
+     &          *COSQS(IK,1,N)
+        term2 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)             &
+     &          *SINQS(IK,1,N)
+        term3 = COSQS(IL,3,N)
+        term4 = (term1-term2)*term3
+        AFCAL = AFCAL + term4*fob(n,ir)
+        term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)             &
+     &          *COSQS(IK,1,N)
+        term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)             &
+     &          *SINQS(IK,1,N)
+        term3 = SINQS(IL,3,N)
+        term4 = (term1-term2)*term3
+        BFCAL = BFCAL + term4*fob(n,ir)
+      ENDDO
+      FFCALC_356 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_356
-!*==FFCALC_365.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_365(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_365.f90'
+
+! Structure factor calculations for space group I 41/a (origin choice 2)
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term3 = COSQS(IL,3,N)
+          term4 = (term1-term2)*term3
+          AFCAL = AFCAL + term4*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = COSQS(IH,2,N)*COSQS(IK,1,N) + SINQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term4 = COSQS(IL,3,N)
+          term5 = term1*term2 - term3*term4
+          AFCAL = AFCAL - term5*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = SINQS(IH,2,N)*COSQS(IK,1,N) - COSQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term4 = SINQS(IL,3,N)
+          term5 = term1*term2 - term3*term4
+          AFCAL = AFCAL + term5*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term3 = SINQS(IL,3,N)
+          term4 = (term1+term2)*term3
+          AFCAL = AFCAL - term4*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(5,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term3 = COSQS(IL,3,N)
+          term4 = (term1-term2)*term3
+          AFCAL = AFCAL + term4*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(6,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = COSQS(IH,2,N)*COSQS(IK,1,N) + SINQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term4 = COSQS(IL,3,N)
+          term5 = term1*term2 + term3*term4
+          AFCAL = AFCAL - term5*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(7,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = SINQS(IH,2,N)*COSQS(IK,1,N) - COSQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term4 = SINQS(IL,3,N)
+          term5 = term1*term2 + term3*term4
+          AFCAL = AFCAL + term5*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(8,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term3 = SINQS(IL,3,N)
+          term4 = (term1+term2)*term3
+          AFCAL = AFCAL - term4*fob(n,ir)
+        ENDDO
+      ENDIF
+      FFCALC_365 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_365
-!*==FFCALC_369.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_369(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_369.f90'
+
+! Structure factor calculations for space group P 41 21 2
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      IL = IREFH(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term2 = COSQS(IL,3,N)
+          term3 = 2.*term1*term2
+          AFCAL = AFCAL + term3*fob(n,ir)
+          term1 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term2 = SINQS(IL,3,N)
+          term3 = 2.*term1*term2
+          BFCAL = BFCAL - term3*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term2 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term3 = COSQS(IL,3,N)
+          term4 = (term1-term2)*term3
+          term5 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term6 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term7 = SINQS(IL,3,N)
+          term8 = (term5+term6)*term7
+          AFCAL = AFCAL + (term4-term8)*fob(n,ir)
+          term4 = (term1+term2)*term3
+          term8 = (term5-term6)*term7
+          BFCAL = BFCAL + (term4+term8)*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term2 = COSQS(IL,3,N)
+          term3 = 2.*term1*term2
+          AFCAL = AFCAL - term3*fob(n,ir)
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term2 = SINQS(IL,3,N)
+          term3 = 2.*term1*term2
+          BFCAL = BFCAL + term3*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term2 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term3 = COSQS(IL,3,N)
+          term4 = (term1-term2)*term3
+          term5 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)           &
+     &            *SINQS(IK,1,N)
+          term6 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)           &
+     &            *COSQS(IK,1,N)
+          term7 = SINQS(IL,3,N)
+          term8 = (term5+term6)*term7
+          AFCAL = AFCAL - (term4+term8)*fob(n,ir)
+          term4 = (term1+term2)*term3
+          term8 = (term5-term6)*term7
+          BFCAL = BFCAL + (term4-term8)*fob(n,ir)
+        ENDDO
+      ENDIF
+      FFCALC_369 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_369
-!*==FFCALC_430.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_430(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_430.f90'
+
+! SUM OVER ATOMS IN ASYMMETRIC UNIT:
+!.. For P3
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_430 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_430
-!*==FFCALC_431.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_431(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_431.f90'
+
+! SUM OVER ATOMS IN ASYMMETRIC UNIT:
+!.. For P31
+      AFCAL = 0.
+      BFCAL = 0.
+!      CFCAL=0.
+!      DFCAL=0.
+      RH = 6.283185307179*FLOAT(IREFH(1,IR))
+      RK = 6.283185307179*FLOAT(IREFH(2,IR))
+      RI = -(RH+RK)
+      RL = 6.283185307179*FLOAT(IREFH(3,IR))
+      VL = RL/3.
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          XV = X(1,N)
+          YV = X(2,N)
+          RLZV = RL*X(3,N)
+          ARG1 = RH*XV + RK*YV + RLZV
+          ARG2 = RK*XV + RI*YV + RLZV + VL
+          ARG3 = RI*XV + RH*YV + RLZV - VL
+          AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+          BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+!         ARG2=RK*XV+RI*YV+RLZV-VL
+!         ARG3=RI*XV+RH*YV+RLZV+VL
+!         CFCAL=CFCAL+(COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+!         DFCAL=DFCAL+(SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          XV = X(1,N)
+          YV = X(2,N)
+          RLZV = RL*X(3,N)
+          ARG1 = RH*XV + RK*YV + RLZV
+          ARG2 = RK*XV + RI*YV + RLZV + VL
+          ARG3 = RI*XV + RH*YV + RLZV - VL
+          AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+          BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+!         ARG2=RK*XV+RI*YV+RLZV-VL
+!         ARG3=RI*XV+RH*YV+RLZV+VL
+!         CFCAL=CFCAL+(COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+!         DFCAL=DFCAL+(SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+        ENDDO
+      ENDIF
+!      RAT=0.0
+!      FF1=AFCAL*AFCAL+BFCAL*BFCAL
+!      FF2=CFCAL*CFCAL+DFCAL*DFCAL
+!      FFCALC_431=RAT*FF1+(1.-RAT)*FF2
+      FFCALC_431 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_431
-!*==FFCALC_432.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_432(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_432.f90'
+
+! SUM OVER ATOMS IN ASYMMETRIC UNIT:
+!.. For P32
+      AFCAL = 0.
+      BFCAL = 0.
+      RH = 6.283185307179*FLOAT(IREFH(1,IR))
+      RK = 6.283185307179*FLOAT(IREFH(2,IR))
+      RI = -(RH+RK)
+      RL = 6.283185307179*FLOAT(IREFH(3,IR))
+      VL = RL/3.
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          XV = X(1,N)
+          YV = X(2,N)
+          RLZV = RL*X(3,N)
+          ARG1 = RH*XV + RK*YV + RLZV
+          ARG2 = RK*XV + RI*YV + RLZV - VL
+          ARG3 = RI*XV + RH*YV + RLZV + VL
+          AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+          BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          XV = X(1,N)
+          YV = X(2,N)
+          RLZV = RL*X(3,N)
+          ARG1 = RH*XV + RK*YV + RLZV
+          ARG2 = RK*XV + RI*YV + RLZV - VL
+          ARG3 = RI*XV + RH*YV + RLZV + VL
+          AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+          BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_432 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_432
-!*==FFCALC_433.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_433(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_433.f90'
+
+! Structure factor calculations for space group R3 hexagonal axes
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_433 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_433
-!*==FFCALC_434.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_434(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_434.f90'
+
+! SUM OVER ATOMS IN ASYMMETRIC UNIT:
+!.. For P-3
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_434 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_434
-!*==FFCALC_435.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_435(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_435.f90'
+
+! Structure factor calculations for space group R-3 hexagonal axes
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_435 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_435
-!*==FFCALC_449.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_449(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_449.f90'
+
+!	 Structure factor calculations for space group P-31m
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+!
+!
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI = SHKI1 + SHKI2 + SHKI3
+!
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          SKHI = SKHI1 + SKHI2 + SKHI3
+          RPHCC = CHKI + CKHI
+          RPHSS = SHKI + SKHI
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ-RPHSS*SLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          SKHI = SKHI1 + SKHI2 + SKHI3
+          RPHCC = CHKI + CKHI
+          RPHSS = SHKI + SKHI
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ-RPHSS*SLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_449 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_449
-!*==FFCALC_451.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_451(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_451.f90'
+
+!	 Structure factor calculations for space group P-3m1
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+!
+!
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          SKHI = SKHI1 + SKHI2 + SKHI3
+          RPHCC = CHKI + CKHI
+          RMHSS = SHKI - SKHI
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ-RMHSS*SLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          SKHI = SKHI1 + SKHI2 + SKHI3
+          RPHCC = CHKI + CKHI
+          RMHSS = SHKI - SKHI
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ-RMHSS*SLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_451 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_451
-!*==FFCALC_462.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_462(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_462.f90'
+
+!	 Structure factor calculations for space group P6
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (CHKI*SLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (CHKI*SLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_462 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_462
-!*==FFCALC_468.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_468(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_468.f90'
+
+!	 Structure factor calculations for space group P-6
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (SHKI*CLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (SHKI*CLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_468 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_468
-!*==FFCALC_469.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_469(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_469.f90'
+
+!	 Structure factor calculations for space group P6/m
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_469 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_469
-!*==FFCALC_471.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_471(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_471.f90'
+
+!	 Structure factor calculations for space group P622
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+!
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          RPHCC = CHKI + CKHI
+          RMHCC = CHKI - CKHI
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (RMHCC*SLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          RPHCC = CHKI + CKHI
+          RMHCC = CHKI - CKHI
+          CLZ = COSQS(IL,3,N)
+          SLZ = SINQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (RMHCC*SLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_471 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_471
-!*==FFCALC_481.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_481(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_481.f90'
+
+!	 Structure factor calculations for space group P-6m2
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+!
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          SKHI = SKHI1 + SKHI2 + SKHI3
+          RPHCC = CHKI + CKHI
+          RMHSS = SHKI - SKHI
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (RMHSS*CLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          SKHI = SKHI1 + SKHI2 + SKHI3
+          RPHCC = CHKI + CKHI
+          RMHSS = SHKI - SKHI
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (RMHSS*CLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_481 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_481
-!*==FFCALC_483.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_483(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_483.f90'
+
+      AFCAL = 0.
+      BFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          SKHI = SKHI1 + SKHI2 + SKHI3
+          RPHCC = CHKI + CKHI
+          RPHSS = SHKI + SKHI
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (RPHSS*CLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          SHKI = SHKI1 + SHKI2 + SHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          SKHI = SKHI1 + SKHI2 + SKHI3
+          RPHCC = CHKI + CKHI
+          RPHSS = SHKI + SKHI
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+          BFCAL = BFCAL + (RPHSS*CLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_483 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_483
-!*==FFCALC_485.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_485(IR)
+
       INCLUDE 'SGinc\FFCALCTOP.inc'
-      INCLUDE 'SGinc\FFCALC_485.f90'
-      END FUNCTION FFCALC_485
-!*==FFCALC_DEFAULT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+
+!	 Structure factor calculations for space group P6/mmm
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
 !
+      AFCAL = 0.
+      IH = IREFH(1,IR)
+      IK = IREFH(2,IR)
+      II = -(IH+IK)
+      IL = IREFH(3,IR)
+      IF (LOG_HYDROGENS) THEN
+        DO N = 1, NATOM
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          RPHCC = CHKI + CKHI
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO NS = 1, NSATOM
+          N = ISATOM(NS)
+          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(IK,2,N)
+          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(II,2,N)
+          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IH,2,N)
+          CHKI = CHKI1 + CHKI2 + CHKI3
+          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
+     &            *SINQS(IH,2,N)
+          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
+     &            *SINQS(II,2,N)
+          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
+     &            *SINQS(IK,2,N)
+          CKHI = CKHI1 + CKHI2 + CKHI3
+          RPHCC = CHKI + CKHI
+          CLZ = COSQS(IL,3,N)
+          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_485 = AFCAL*AFCAL
+
+      END FUNCTION FFCALC_485
+!
+!*****************************************************************************
 !
       FUNCTION FFCALC_DEFAULT(IR)
 
@@ -367,7 +2919,8 @@
       ENDIF
 
       END FUNCTION FFCALC_DEFAULT
-!*==CALCOSARX.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE CALCOSARX
 
@@ -390,3 +2943,6 @@
       ENDDO
 
       END SUBROUTINE CALCOSARX
+!
+!*****************************************************************************
+!
