@@ -5670,6 +5670,7 @@
       CHARACTER*17 DateStr
       CHARACTER*9  MonthStr
       INTEGER, EXTERNAL :: DateToday
+      INTEGER tLen
 !
 ! FOR THE CONVENIENCE OF THOSE WHO FIND THE ABOVE STATEMENT EYE-CROSSING,
 ! THE ELEMENTS OF THE ARRAY ISMBOL WILL BE:
@@ -5804,7 +5805,7 @@
  2000 FORMAT (/20X,A23//8X,' Cambridge Crystallography Subroutine Library     Mark 4.12')
 ! OBTAIN DATE AND TIME:
       CALL DATE_AND_TIME(tDate)
-      CALL Date2String(DateToday(),DateStr)
+      CALL Date2String(DateToday(),DateStr,tLen)
       SELECT CASE (tDate(5:6))
         CASE ('01')
           MonthStr = 'JAN'
@@ -5832,7 +5833,7 @@
           MonthStr = 'DEC'
       END SELECT
       CALL TIME(TIM(1))
-      WRITE (LPT,2001) TIM(1), DateStr(1:LEN_TRIM(DateStr))
+      WRITE (LPT,2001) TIM(1), DateStr(1:tLen)
  2001 FORMAT (/20X,'Job run at ',A5,' on ',A)
   100 RETURN
 
