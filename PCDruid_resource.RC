@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 03/Apr/2002 13:09:22
+// Modified : 04/Apr/2002 13:53:05
 //
 ///////////////////////////////////////////////////
 //
@@ -1264,7 +1264,7 @@ BEGIN
     CONTROL "&View data / determine peak positions",IDF_PW_Option1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,   81,  132,   14
     CONTROL "Preparation for &Pawley refinement",IDF_PW_Option2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,   95,  132,   14
     CONTROL "&Simulated annealing structure solution",IDF_PW_Option3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,  109,  132,   14
-    CONTROL "Constrained Rietveld refinement",IDF_PW_Option4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,  123,  132,   14
+    CONTROL "Analyse solutions",IDF_PW_Option4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  158,  123,  132,   14
     CONTROL "",IDF_WelcomeWizard,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,  114,   14,  220,   16
     CONTROL "<&Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
 END

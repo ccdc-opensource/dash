@@ -236,6 +236,9 @@
                   CALL WizardWindowShow(IDD_PW_Page2)
                 CASE (3) ! Simulated annealing structure solution
                   CALL ShowWizardWindowZmatrices
+                CASE (4) ! Analyse solutions
+                  CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
+                  CALL WDialogShow(-1,-1,0,Modeless)
               END SELECT
           END SELECT
       END SELECT
