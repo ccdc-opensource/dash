@@ -153,21 +153,22 @@
       CALL Set_Show_torsion
       CALL RRVAR2Dialog
       IF (PrefParExists) THEN
-        CALL WDialogFieldState(IDC_PO,Enabled)
-        CALL WDialogFieldState(IDR_PO,Enabled)
+        CALL WDialogFieldState(IDC_PO, Enabled)
+        CALL WDialogFieldState(IDR_PO, Enabled)
         tFieldState = Enabled
       ELSE
-        CALL WDialogFieldState(IDC_PO,Disabled)
-        CALL WDialogFieldState(IDR_PO,Disabled)
+        CALL WDialogFieldState(IDC_PO, Disabled)
+        CALL WDialogFieldState(IDR_PO, Disabled)
         tFieldState = Disabled
       ENDIF
       CALL WDialogSelect(IDD_RR_PO_Dialog)
-      CALL WDialogFieldState(IDF_PO_a,tFieldState)
-      CALL WDialogFieldState(IDF_PO_b,tFieldState)
-      CALL WDialogFieldState(IDF_PO_c,tFieldState)
-      CALL WDialogFieldState(IDF_LABELa,tFieldState)
-      CALL WDialogFieldState(IDF_LABELb,tFieldState)
-      CALL WDialogFieldState(IDF_LABELc,tFieldState)
+      CALL WDialogPutCheckBoxLogical(IDF_Use_PO, PrefParExists)
+      CALL WDialogFieldState(IDF_PO_a, tFieldState)
+      CALL WDialogFieldState(IDF_PO_b, tFieldState)
+      CALL WDialogFieldState(IDF_PO_c, tFieldState)
+      CALL WDialogFieldState(IDF_LABELa, tFieldState)
+      CALL WDialogFieldState(IDF_LABELb, tFieldState)
+      CALL WDialogFieldState(IDF_LABELc, tFieldState)
       CALL WDialogSelect(IDD_Rietveld2)
       ! Initialise PO
       IF (PrefParExists) CALL PO_PRECFC(RR_PO)
@@ -581,7 +582,7 @@
                 PrefPars(2) = FLOAT(iK)
                 PrefPars(3) = FLOAT(iL)
                 CALL WDialogSelect(IDD_Rietveld2)
-                CALL WDialogGetReal(IDR_PO,RR_PO)
+                CALL WDialogGetReal(IDR_PO, RR_PO)
                 CALL FillSymmetry_2
                 CALL PO_PRECFC(RR_PO)
               ENDIF
