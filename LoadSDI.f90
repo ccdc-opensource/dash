@@ -227,6 +227,7 @@
       CALL WDialogFieldState(IDB_PrevRes, Disabled)
       DefaultMaxResolution = 0.1 ! Force using maximum attainable
       CALL Update_TruncationLimits
+      CALL GET_LOGREF
       RETURN
  999  CALL ErrorMessage('Error reading .sdi file.')
       CLOSE(iHandle) 
