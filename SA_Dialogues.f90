@@ -16,6 +16,7 @@
            
       INCLUDE 'DialogPosCmn.inc'
 
+      CALL SelectMode(ID_Structure_Solution_Mode)
       CALL WDialogSelect(IDD_SAW_Page1)
 ! @ Enable or disable the "Next" button
       CALL WDialogFieldState(IDNEXT,Enabled)
