@@ -650,7 +650,7 @@
                                    'of these formats. DASH will create separate Z-matrix files for'//CHAR(13)//&
                                    'each chemical residue present in the first entry in the file.'//CHAR(13)//&
                                    'In multiple entry files the first entry will be read only.'
-      INTEGER, EXTERNAL :: Res2Mol2, CSSR2Mol2
+      INTEGER, EXTERNAL :: CSSR2Mol2
       CHARACTER(MaxPathLength) tFileName
       INTEGER tNumZMatrices
       CHARACTER(80) tZmatrices
@@ -709,7 +709,7 @@
 
       INTEGER iLen, iPos
       CHARACTER*4 ExtensionStr
-      INTEGER, EXTERNAL :: Res2Mol2, CSSR2Mol2
+      INTEGER, EXTERNAL :: CSSR2Mol2
       CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
       CHARACTER(5) fmt
       INTEGER iStat, iStart, I
@@ -741,11 +741,7 @@
           iLen = LEN_TRIM(tInputFile)
           fmt = '-mol2'
         CASE ('res ')
-          IF (Res2Mol2(tInputFile) .NE. 1) RETURN
-! Replace 'res' by 'mol2'
-          tInputFile = tInputFile(1:iLen-3)//'mol2'
-          iLen = LEN_TRIM(tInputFile)
-          fmt = '-mol2'
+          fmt = '-res'
         CASE ('pdb ')
           fmt = '-pdb'
         CASE ('mol2','ml2 ')
