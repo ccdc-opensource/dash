@@ -545,15 +545,15 @@
 ! Quick check if values have been read at all.
       IF (TwoThetaStart .LT. 0.000001) THEN
         CALL ErrorMessage('2 theta starting value not found.')
-        RETURN
+        GOTO 999
       ENDIF
       IF (TwoThetaEnd   .LT. 0.000001) THEN
         CALL ErrorMessage('2 theta end value not found.')
-        RETURN
+        GOTO 999
       ENDIF
       IF (TwoThetaStep  .LT. 0.000001) THEN
         CALL ErrorMessage('2 theta step size not found.')
-        RETURN
+        GOTO 999
       ENDIF
 ! Note that NINT correctly rounds to the nearest whole number
       NumOfBins = 1 + NINT((TwoThetaEnd - TwoThetaStart) / TwoThetaStep)
@@ -567,7 +567,7 @@
       IF (NumOfBins .EQ. 0) THEN
 ! The user should be warned here
         CALL ErrorMessage("The file does not contain enough data points.")
-        RETURN
+        GOTO 999
       ENDIF
 ! Fill the 2theta values first
       CurrTwoTheta = TwoThetaStart
@@ -597,7 +597,7 @@
       IF (NOBS .EQ. 0) THEN
 ! The user should be warned here
         CALL ErrorMessage("The file does not contain enough data points.")
-        RETURN
+        GOTO 999
       ENDIF
       ESDsFilled = .FALSE.
 ! This is probably synchrotron data
@@ -606,6 +606,7 @@
       RETURN
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
+      CLOSE(10)
       RETURN
 
       END FUNCTION Load_dat_File
@@ -676,14 +677,14 @@
       READ(UNIT=10,REC=1,ERR=999) C4
       IF (C4(1:3) .NE. 'RAW') THEN
         CALL ErrorMessage("Not a valid Bruker .raw file.")
-        RETURN
+        GOTO 999
       ENDIF
       SELECT CASE (C4(4:4))
         CASE (' ')
 ! Warn the user
           CALL ErrorMessage("This version of the .raw format is no longer supported."//&
                            CHAR(13)//"Please convert to a newer version and try again.")
-          RETURN
+          GOTO 999
         CASE ('1')
 ! A version 3 file, the most recent and most complicated format
 !? 'current file status'. 1 = done, 2 = active, 3 = aborted, 4 = interrupted
@@ -710,7 +711,7 @@
             IF (I4 .NE. 304) THEN
 ! The user should be warned here
               CALL ErrorMessage("Length of Range Header Structure must be 304.")
-              RETURN
+              GOTO 999
             ENDIF
 ! Number of 'data records'
             READ(UNIT=10,REC=Offset+2,ERR=999) NumOfBins
@@ -723,7 +724,7 @@
 ! Check that we will not read less than 1 data point
             IF (NumOfBins .EQ. 0) THEN
               CALL ErrorMessage("The file contains no valid data.")
-              RETURN
+              GOTO 999
             ENDIF
 ! Starting angle for 2 theta drive in degrees
             READ(UNIT=10,REC=Offset+5,ERR=999) RecReal(1)
@@ -751,7 +752,7 @@
             ELSE
               IF (ABS(Lambda1-ALambda) .LE. 0.0001) THEN
                 CALL ErrorMessage('More than one wavelength used, reading aborted.')
-                RETURN
+                GOTO 999
               ENDIF
             ENDIF
 ! Data record length. Must be 4.
@@ -759,7 +760,7 @@
             IF (I4 .NE. 4) THEN
 ! The user should be warned here
               CALL ErrorMessage("Record length must be 4.")
-              RETURN
+              GOTO 999
             ENDIF
 ! Length of supplementary header (bytes)
             READ(UNIT=10,REC=Offset+65,ERR=999) I4
@@ -767,7 +768,7 @@
             IF (MOD(I4,4) .NE. 0) THEN
 ! The user should be warned here
               CALL ErrorMessage("Length of Supplementary Header is not a multiple of 4.")
-              RETURN
+              GOTO 999
             ENDIF
 ! Skip all supplementary headers of the current data range
             Offset = Offset + I4 / 4
@@ -827,7 +828,7 @@
             IF (NumOfBins .EQ. 0) THEN
 ! The user should be warned here
               CALL ErrorMessage("The file contains no valid data.")
-              RETURN
+              GOTO 999
             ENDIF
 ! The step size. A REAL*4 in this format
             READ(UNIT=10,REC=Offset+4,ERR=999) R4
@@ -877,7 +878,7 @@
 ! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
         CASE DEFAULT
           CALL ErrorMessage('Unrecognised *.raw format.')
-          RETURN
+          GOTO 999
       END SELECT
       CLOSE(10)
       NOBS = NumOfBins
@@ -888,6 +889,7 @@
       RETURN
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
+      CLOSE(10)
       RETURN
 
       END FUNCTION Load_raw_File
@@ -961,18 +963,18 @@
       Version = C4(1:2)
       IF ((Version .NE. 'V5') .AND. (Version .NE. 'D3') .AND. (Version .NE. 'V3')) THEN
         CALL ErrorMessage("Not a valid Philips .rd/.sd file.")
-        RETURN
+        GOTO 999
       ENDIF
       SELECT CASE (C4(3:4))
         CASE ('DI')
           CALL ErrorMessage("This file contains peak positions, not a powder pattern.")
-          RETURN
+          GOTO 999
         CASE ('BK')
           CALL ErrorMessage("This file contains a background, not a powder pattern.")
-          RETURN
+          GOTO 999
         CASE ('2D')
           CALL ErrorMessage("This file contains a second derivative, not a powder pattern.")
-          RETURN
+          GOTO 999
       END SELECT
 ! Anode material
       READ(UNIT=10,REC=22,ERR=999) I4
@@ -1056,9 +1058,18 @@
 ! The number of counts per 2theta should commence from here.
 ! Calculate how many bins we expect.
 ! Quick check if values have been read at all.
-      IF (TwoThetaStart .LT. 0.000001) RETURN
-      IF (TwoThetaEnd   .LT. 0.000001) RETURN
-      IF (TwoThetaStep  .LT. 0.000001) RETURN
+      IF (TwoThetaStart .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta starting value not found.')
+        GOTO 999
+      ENDIF
+      IF (TwoThetaEnd   .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta end value not found.')
+        GOTO 999
+      ENDIF
+      IF (TwoThetaStep  .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta step size not found.')
+        GOTO 999
+      ENDIF
 ! If the scan was continuous (rather than step), the average 2 theta of a data point is actually
 ! step/2 higher than indicated in the file. The number of data points is decreased by one.
 ! This is the way this is stored when a .rd is converted to a .udf
@@ -1078,7 +1089,7 @@
       IF (NumOfBins .EQ. 0) THEN
 ! The user should be warned here
         CALL ErrorMessage("The file contains no valid data.")
-        RETURN
+        GOTO 999
       ENDIF
       IF (Version .EQ. 'V5') THEN
         Offset = 202
@@ -1118,6 +1129,7 @@
       RETURN
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
+      CLOSE(10)
       RETURN
 
       END FUNCTION Load_rd_File
@@ -1256,15 +1268,15 @@
 ! Quick check if values have been read at all.
       IF (TwoThetaStart .LT. 0.000001) THEN
         CALL ErrorMessage('2 theta starting value not found.')
-        RETURN
+        GOTO 999
       ENDIF
       IF (TwoThetaEnd   .LT. 0.000001) THEN
         CALL ErrorMessage('2 theta end value not found.')
-        RETURN
+        GOTO 999
       ENDIF
       IF (TwoThetaStep  .LT. 0.000001) THEN
         CALL ErrorMessage('2 theta step size not found.')
-        RETURN
+        GOTO 999
       ENDIF
 ! Note that NINT correctly rounds to the nearest whole number
       NumOfBins = 1 + NINT((TwoThetaEnd - TwoThetaStart) / TwoThetaStep)
@@ -1278,7 +1290,7 @@
       IF (NumOfBins .EQ. 0) THEN
 ! The user should be warned here
         CALL ErrorMessage("The file does not contain enough data points.")
-        RETURN
+        GOTO 999
       ENDIF
 ! Fill the 2theta values first
       CurrTwoTheta = TwoThetaStart
@@ -1304,7 +1316,7 @@
       IF (NOBS .EQ. 0) THEN
 ! The user should be warned here
         CALL ErrorMessage("The file does not contain enough data points.")
-        RETURN
+        GOTO 999
       ENDIF
       ESDsFilled = .FALSE.
 ! This is definitely laboratory data
@@ -1317,6 +1329,7 @@
       RETURN
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
+      CLOSE(10)
       RETURN
 
       END FUNCTION Load_udf_File
@@ -1687,7 +1700,7 @@
         READ(Cline,*,ERR=999,END=999) Lambda1
         IF ((Lambda1 .LT. 0.0001) .OR. (Lambda1 .GT. 20.0)) THEN
            CALL ErrorMessage('First line contains only one column, but not a valid wavelength.')
-           RETURN
+           GOTO 999
         ENDIF
         CALL UpdateWavelength(Lambda1)
       ELSE
@@ -1752,6 +1765,7 @@
       Load_xye_File = 1
       RETURN
  999  CONTINUE
+      CLOSE(10)
       RETURN
 
       END FUNCTION Load_xye_File
