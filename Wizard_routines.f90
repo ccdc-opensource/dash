@@ -12,11 +12,9 @@
       INTEGER                                   CurrentWizardWindow
       COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
 
-      CALL SetWizardState(-1)
       CALL SetModeMenuState(1,0)
       CALL SelectMode(ID_Peak_Fitting_Mode)
       CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
-      InWizard = .TRUE.
 
       END SUBROUTINE StartWizard
 !
@@ -67,6 +65,8 @@
       CurrentWizardWindow = TheDialogID
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       InWizardWindow = .TRUE.
+      CALL SetWizardState(-1)
+      InWizard = .TRUE.
 
       END SUBROUTINE WizardWindowShow
 !

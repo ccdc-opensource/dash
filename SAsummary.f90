@@ -13,7 +13,6 @@
       USE VARIABLES
 
       INCLUDE 'PARAMS.INC' 
-      INCLUDE 'DialogPosCmn.inc'
 
 !ep    need the common block to identify the number rows in the grid          
       LOGICAL         RESTART
@@ -42,8 +41,7 @@
               ENDDO
 ! Close Chi-sqd plot 
               CALL Close_Chisq_Plot
-              CALL WDialogSelect(IDD_SA_input3)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+              CALL WizardWindowShow(IDD_SA_input3)
               CALL PopActiveWindowID
               RETURN
             CASE (IDB_ShowOverlap)
