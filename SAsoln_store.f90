@@ -59,8 +59,6 @@
       OPEN(UNIT=tFileHandle,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
       DO I = 1, NBIN
-        CALL FileWriteReal(tFileHandle,RecNr,XBIN (I))
-        CALL FileWriteReal(tFileHandle,RecNr,YOBIN(I))
         CALL FileWriteReal(tFileHandle,RecNr,YCBIN(I))
       ENDDO
       PRO_saved(SA_Run_Number+1) = .TRUE.

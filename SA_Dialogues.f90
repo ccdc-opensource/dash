@@ -82,6 +82,8 @@
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
+! Grey out 'Load DASH Pawley file' button on toolbar
+              CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOff)
               CALL SA_Parameter_Set
               CALL WizardWindowShow(IDD_SA_input2)
             CASE (IDCANCEL, IDCLOSE)
