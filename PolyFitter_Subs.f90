@@ -403,11 +403,18 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
+      REAL            XPG1, XPG2, YPG1, YPG2
+      COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
+
       REAL xCur, yCur, diff
       INTEGER II, ClosestRef
       CHARACTER*(12) hklString
 
       IF (NumOfRef .EQ. 0) RETURN
+! Set the scale correctly. 
+      CALL IGrUnits(0.0,0.0,1.0,1.0)
+      CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
+      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
       CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur,yCur)
 ! xCur and yCur are now the current mouse coordinates in Pg units
       diff = ABS(RefArgK(1) - xCur)
@@ -440,10 +447,17 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
+      REAL            XPG1, XPG2, YPG1, YPG2
+      COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
+
       REAL xCur, yCur
       CHARACTER*(12) tString
 
       IF (NoData) RETURN
+! Set the scale correctly. 
+      CALL IGrUnits(0.0,0.0,1.0,1.0)
+      CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
+      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
       CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur,yCur)
       CALL IRealToString(xCur,tString,'(F10.3)')
       CALL WindowOutStatusBar(6,tString)
