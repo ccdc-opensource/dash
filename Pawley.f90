@@ -19,7 +19,7 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
            
-      INTEGER PawleyErrorLog ! Function
+      INTEGER, EXTERNAL :: PawleyErrorLog
       INTEGER IDUMMY
       INTEGER NTCycles
 
@@ -138,12 +138,12 @@
 ! Local variables logging errors in the pawley fit
       INTEGER IDUMMY, ipt
       INTEGER PawleyErrorLog  
-      INTEGER Quick_Pawley_Fit ! Function
+      INTEGER, EXTERNAL :: Quick_Pawley_Fit
       REAL    DEGREE ! Function
       INTEGER ieocc, II, JJ
       LOGICAL LastValuesSet
       SAVE    LastValuesSet
-      LOGICAL SaveProject ! Function
+      LOGICAL, EXTERNAL :: SaveProject
       INTEGER Ilen, IER
       CHARACTER(MaxPathLength) SDIFile
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
@@ -174,7 +174,7 @@
                     CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3),'(F12.2)')
                     CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
                     CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
-                    CALL retrieve_polybackup()
+                    CALL retrieve_polybackup
                   ENDIF
 ! JCC Need to back-copy the arrays here 
 ! Also decrement the number of Pawley refinements since it failed
@@ -229,10 +229,10 @@
 ! L = 4 : 'HMSL', I = 1
 ! JPHASE = 1, JSOURC = 1
 
-              CALL Upload_Cell_Constants()
+              CALL Upload_Cell_Constants
               ZeroPoint = ZEROSP(1,1,1)
-              CALL Upload_ZeroPoint() 
-              CALL Generate_TicMarks()
+              CALL Upload_ZeroPoint 
+              CALL Generate_TicMarks
 ! The CCSL code has written out a new input file for the next Pawley refinement--polyp.ccn
 ! As the user has accepted the fit, we can use this file to generate our new input file.
 ! To flag this to the subroutine, we create the file 'polyp.niw'
@@ -294,11 +294,10 @@
             CASE (IDF_PawRef_Solve)
 ! Emulate loading .SDI file for next window
               CALL WDialogSelect(IDD_SAW_Page1)
-! If FromPawleyFit read in the HCV, PIK and TIC files from POLYP
+! Read in the HCV, PIK and TIC files from POLYP
               Ilen = LEN_TRIM(DashPikFile)
               SDIFile = DashPikFile(1:Ilen-3)//'sdi'
               CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
-! JvdS GET_LOGREF and GETTIC do the same thing.
               CALL GET_LOGREF(DashTicFile,IER)
               CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),IER)
               CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
@@ -378,8 +377,6 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
       
-      REAL XRANMIN, XRANMAX
-      SAVE XRANMIN, XRANMAX
       INTEGER NPawBack
       INTEGER NPawBack_OLD
       SAVE    NPawBack_OLD ! To test if number of background parameters has changed
@@ -401,33 +398,16 @@
 ! Are these checks in place here? If one of them fails, we shouldn't have been here in the first place.
 !
 ! We should only proceed with this if we have good cell constants 
-! If no wavelength then assume Cu Ka1 wvln=1.54051
 !
 ! Write out the data file ...
 ! We should check if there are data to write out!
       IF (.NOT. FnPatternOK()) RETURN
       IF (.NOT. FnUnitCellOK()) RETURN
       IF (NumOfRef .EQ. 0) RETURN
-! Allow a maximum of 300 reflections
-! JvdS Why?
-      IF (NumOfRef .GT. 300) THEN
-        xranmax = MIN(xpmax,RefArgK(300))
-      ELSE
-        xranmax = xpmax
-      ENDIF
-      xranmin = xpmin
-! JCC Original code - seems to cause the reflection loss bug
-!        xranmax=xbin(nbin)
-
-! Substituting with this line seems to fix this bug? Is this a reasonable fix?
-! JvdS @@ Doesn't this undo all of the above range checking?
-! JvdS if there >300 reflections / tic marks, all of them will be included this way?
-      xranmax = xpmax
       IF (NumInternalDSC .NE. DataSetChange) THEN
         tFileHandle = 41
         OPEN(tFileHandle,file='polyp.dat',status='unknown')
         DO I = 1, NBIN
-          IF (XBIN(I) .GT. xranmax) GOTO 4110
           WRITE(tFileHandle,'(F10.4,F12.2,F12.2)') XBIN(I), YOBIN(I), EBIN(I)
         ENDDO
  4110   CLOSE(tFileHandle)
@@ -454,7 +434,7 @@
               CASE('RTYP')
                 CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
                 IRtyp = 2 - Item
-                WRITE(42,4245) IRTYP, xranmin, xranmax
+                WRITE(42,4245) IRTYP, xpmin, xpmax
  4245           FORMAT('L RTYP  'I3,2F10.3,'  0.001')
               CASE ('SLIM')
                 CALL WDialogGetReal(IDF_Slim_Parameter,tReal)
@@ -543,7 +523,7 @@
         'L WGHT 3')
         CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
         IRtyp = 2 - Item
-        WRITE(tFileHandle,4246) IRTYP, xranmin, xranmax
+        WRITE(tFileHandle,4246) IRTYP, xpmin, xpmax
  4246   FORMAT('L RTYP  'I3,2F10.3,'  0.001')
         IF (.NOT. FnWaveLengthOK()) ALambda = WavelengthOf('Cu')
         WRITE(tFileHandle,4250) ALambda
@@ -606,19 +586,27 @@
 
       USE WINTERACTER
 
+      IMPLICIT NONE
+
 ! DIMENSION OF ALSQ BELOW, AND SETTING OF MATSZ, TO BE ALTERED TO BE SOMETHING
 ! A LITTLE LARGER THAN N*(N+3)/2 WHERE THERE WILL BE N BASIC VARIABLES
 
       INCLUDE 'PARAMS.INC'
       
       EXTERNAL PCCN01,PFCN03,DUMMY,CALPR
-      COMMON /GLOBAL/NINIT,NBATCH,NSYSTM,MULFAS,MULSOU,MULONE
-      DIMENSION ALSQ(QPFDIM)
+
+      INTEGER         NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+      COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
+      REAL ALSQ(QPFDIM)
+
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
+
       INTEGER MATSZ
       CHARACTER*6 xxx
       CHARACTER*10 fname
@@ -690,6 +678,7 @@
         CALL IOsCopyFile('polyp.hkl', 'polyp.hbl')
         IF (InfoError(1) .NE. 0) copyhkl = .FALSE.
       ENDIF
+      IF (.NOT. (copypik .AND. copytic .AND. copyhcv .AND. copyhkl)) CALL DebugErrorMessage('Error backing up Pawley')
       YCBINP = YCBIN
       YBBINP = YBBIN
 
@@ -769,18 +758,19 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
+      CHARACTER(MaxPathLength)  InputFilesBaseName
+      INTEGER                                       IFBN_Len
+      COMMON /ibasnam/          InputFilesBaseName, IFBN_Len
+
       INTEGER LSDI, iDot, I, L1, L4, iDummy
       INTEGER, EXTERNAL :: WRTDSL
+
 ! Initialise to error
       CreateSDIFile = 1
       LSDI = LEN_TRIM(SDIFileName)
       IF (LSDI .GT. MaxPathLength) THEN
         CALL DebugErrorMessage('SDIFileName too long in CreateSDIFile')
         LSDI = MaxPathLength
-      ENDIF
-      IF (LSDI .EQ. 0) THEN
-        CALL ErrorMessage('Filename not provided.'//CHAR(13)//'Try again!')
-        RETURN
       ENDIF
 ! First copy the .pik, .tic, .hcv and .khl files
 	DashPikFile = ' '
@@ -837,22 +827,22 @@
       ENDIF
       OPEN(81,file=SDIFileName(1:LSDI),status='unknown',ERR=999)
       WRITE(81,8110,ERR=999) DashTicFile(1:LEN_TRIM(DashTicFile))
-      WRITE(81,8120,ERR=999) DashHcvFile(1:LEN_TRIM(DashHcvFile))
-      WRITE(81,8121,ERR=999) DashHklFile(1:LEN_TRIM(DashHklFile))
-      WRITE(81,8130,ERR=999) DashPikFile(1:LEN_TRIM(DashPikFile))
-      WRITE(81,8136,ERR=999) DashRawFile(1:LEN_TRIM(DashRawFile))
-      WRITE(81,8135,ERR=999) DashDslFile(1:LEN_TRIM(DashDslFile))
-      WRITE(81,8140,ERR=999) (CellPar(I),I=1,6)
-      WRITE(81,8150,ERR=999) NumberSGTable,SGNumStr(NumberSGTable),SGHMaStr(NumberSGTable)
-      WRITE(81,8160,ERR=999) PAWLEYCHISQ
  8110 FORMAT(' TIC ',A)
+      WRITE(81,8120,ERR=999) DashHcvFile(1:LEN_TRIM(DashHcvFile))
  8120 FORMAT(' HCV ',A)
+      WRITE(81,8121,ERR=999) DashHklFile(1:LEN_TRIM(DashHklFile))
  8121 FORMAT(' HKL ',A)
+      WRITE(81,8130,ERR=999) DashPikFile(1:LEN_TRIM(DashPikFile))
  8130 FORMAT(' PIK ',A)
- 8135 FORMAT(' DSL ',A)
+      WRITE(81,8136,ERR=999) DashRawFile(1:LEN_TRIM(DashRawFile))
  8136 FORMAT(' RAW ',A)
+      WRITE(81,8135,ERR=999) DashDslFile(1:LEN_TRIM(DashDslFile))
+ 8135 FORMAT(' DSL ',A)
+      WRITE(81,8140,ERR=999) (CellPar(I),I=1,6)
  8140 FORMAT(' Cell ',3F10.5,3F10.4)
+      WRITE(81,8150,ERR=999) NumberSGTable,SGNumStr(NumberSGTable),SGHMaStr(NumberSGTable)
  8150 FORMAT(' SpaceGroup ',I4,4X,A12,A12)
+      WRITE(81,8160,ERR=999) PAWLEYCHISQ
  8160 FORMAT(' PawleyChiSq ',F10.2)
       CLOSE(81)
       CreateSDIFile = 0
@@ -861,6 +851,63 @@
       CLOSE(81)
 
       END FUNCTION CreateSDIFile
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION WRTDSL(FileName,LenFn)
+! Routine for writing a 'DSL' file. This file contains
+! The additional data that is part of the Winteracter front end: Namely
+! radiation type/wavelength etc.
+!
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'Lattice.inc'
+      INCLUDE 'GLBVAR.INC'
+
+      CHARACTER*(*) FileName
+      INTEGER       LenFn, Idum
+
+      REAL              PkFnVal,                      PkFnEsd,                      &
+                        PkFnCal,                                                    &
+                        PkFnVarVal,                   PkFnVarEsd,                   &
+                        PkAreaVal,                    PkAreaEsd,                    &
+                        PkPosVal,                     PkPosEsd,                     &
+                        PkPosAv
+      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+                        PkFnCal(MPkDes,Max_NPFR),                                   &
+                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+                        PkPosAv(MAX_NPFR)
+
+! Initialise to error      
+      WRTDSL = 1
+      OPEN (UNIT = 77,FILE=FileName(1:LenFn),STATUS='UNKNOWN',ERR=999)
+      WRITE(77,*,ERR=999)'! Radiation wavelength and data type'
+      WRITE(77,'(A3,1X,F10.5,I2)',ERR=999) 'rad', ALambda, JRadOption
+      WRITE(77,*,ERR=999)'! Sigma shape parameters: format sigma1 esd sigma2 esd'
+      WRITE(77,100,ERR=999) 'sig',PkFnVarVal(1,1),PkFnVarEsd(1,1),PkFnVarVal(2,1),PkFnVarEsd(2,1)
+      WRITE(77,*,ERR=999)'! Gamma shape parameters: format gamma1 esd gamma2 esd'
+      WRITE(77,100,ERR=999) 'gam',PkFnVarVal(1,2),PkFnVarEsd(1,2),PkFnVarVal(2,2),PkFnVarEsd(2,2)
+      WRITE(77,*,ERR=999)'! Asymmetry parameters: format HPSL esd HMSL esd'
+      WRITE(77,100,ERR=999) 'asy',PkFnVarVal(1,3),PkFnVarEsd(1,3),PkFnVarVal(1,4),PkFnVarEsd(1,4)
+      WRITE(77,*,ERR=999)'! Calculated zero point'
+      WRITE(77,110,ERR=999) 'zer',ZeroPoint
+      WRITE(77,*,ERR=999)'! Pawley-fit SLIM parameter setting'
+      WRITE(77,110,ERR=999) 'sli',SLIMVALUE
+      WRITE(77,*,ERR=999)'! Pawley-fit Scale factor setting'
+      WRITE(77,110,ERR=999) 'sca',SCALFAC
+  100 FORMAT(A3,1X,4(F10.4,1X))
+  110 FORMAT(A3,1X,F10.4)
+      CLOSE(77)
+      WRTDSL = 0
+      RETURN
+! Error if we get here
+  999 CALL ErrorMessage('Error while writing .dsl file.')
+      CLOSE(77,IOSTAT=IDUM)
+
+      END FUNCTION WRTDSL
 !
 !*****************************************************************************
 !
@@ -884,7 +931,7 @@
       FILTER = 'Diffraction information files (*.sdi)|*.sdi|'
       SDIFileName = ' '
       CALL WSelectFile(FILTER,IFLAGS,SDIFileName,'Save diffraction information for structure solution')
-      IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (SDIFileName .NE. ' ')) THEN
+      IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(SDIFileName) .NE. 0)) THEN
         IF (CreateSDIFile(SDIFileName) .EQ. 0) THEN
           CALL sa_SetOutputFiles(SDIFileName)
           SaveProject = .TRUE.
