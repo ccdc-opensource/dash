@@ -1705,8 +1705,11 @@
 	    iStatus = 0
         CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 5, iRow, iStatus)
         IF (iStatus .EQ. Checked) THEN
-          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)  	      
-		  CALL WriteMogulMol2(iFRow) !Call Mogul
+          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)
+          CALL CheckMogulUse(UseMogul)
+          IF(UseMogul) THEN  	      
+		    CALL WriteMogulMol2(iFRow) !Call Mogul
+          ENDIF
           IF (kzmpar2(IFrow) .EQ. 3) THEN ! Modal Torsion Angle so show dialog
             CALL ShowBiModalDialog(IFRow, xtem)
           ELSE
@@ -1848,6 +1851,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE ZMVAR
+      USE VARIABLES
 
       IMPLICIT NONE      
 
@@ -1900,6 +1904,9 @@
       ENDDO
       CALL WDialogSelect(IDD_ModalDialog)
 !     Clear Fields
+      IF (.NOT. UseMogul) THEN
+        CALL WDialogClearField(IDF_MogulText)
+      ENDIF
       CALL WDialogClearField(IDF_ModalUpper)
       CALL WDialogClearField(IDF_ModalLower)
       CALL WDialogClearField(IDF_ReportLower1)

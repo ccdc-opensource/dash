@@ -1,3 +1,39 @@
+      SUBROUTINE CheckMogulUse(MogulUse)
+
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE WINTERACTER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: Confirm
+
+      INTEGER I
+      LOGICAL, INTENT (IN   ) :: MogulUse
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogGetString(IDF_MogulExe,MOGULEXE)
+      CALL PopActiveWindowID
+      I = LEN_TRIM(MOGULEXE)
+
+      IF (I .NE. 0) UseMogul = .TRUE. 
+      IF (UseMogul .EQ. .FALSE.) RETURN
+
+      IF (I .EQ. 0) THEN
+        IF (Confirm('Do you intend to use Mogul?')) THEN
+          UseMogul = .TRUE.        
+          RETURN
+        ELSE
+         UseMogul = .FALSE.
+         RETURN
+        ENDIF
+      ENDIF
+      
+      
+      END SUBROUTINE CheckMogulUse
+      
+!***********************************************************************      
       
       SUBROUTINE WriteMogulMol2(iFRow)
 
@@ -223,35 +259,19 @@
       CALL WDialogGetString(IDF_MogulExe,MOGULEXE)
       CALL PopActiveWindowID
       I = LEN_TRIM(MOGULEXE)
-
-      IF (I .NE. 0) UseMogul = .TRUE. 
-      IF (UseMogul .EQ. .FALSE.) RETURN
-
-      IF (I .EQ. 0) THEN
-        IF (Confirm('Do you intend to use Mogul?')) THEN
-          UseMogul = .TRUE.
-          CALL ErrorMessage("DASH could not launch Mogul. The path to the Mogul exe is not specified."//CHAR(13)//&
-                          "This can be changed in the Configuration... window"//CHAR(13)//&
-                          "under Options in the menu bar.")      
-        
-          RETURN
-        ELSE
-         UseMogul = .FALSE.
-         RETURN
-        ENDIF
-      ENDIF
       INQUIRE(FILE = MOGULEXE(1:I),EXIST=exists)
       IF (.NOT. exists) GOTO 999
       M = InfoError(1) ! Clear errors
       CALL IOSCommand(MOGULEXE(1:I)//' -ins '//'"'//Script_file(1:LEN_TRIM(Script_file))//'"', ProcBlocked)
       IF (InfoError(1) .NE. 0) GOTO 999
-      IF(kzmpar2(IFRow) .EQ. 3) THEN ! Modal Torsion so try and process
+      IF(kzmpar2(IFRow) .EQ. 3) THEN ! Modal Torsion so try to process
         CALL ProcessMogulOutput(MogulOutputFile, iFRow)
       ENDIF
       RETURN
-999   CALL ErrorMessage("DASH could not launch Mogul. The Mogul executable is currently configured"//CHAR(13)//&
-                        "to launch the program "//MOGULEXE(1:I)//CHAR(13)//&
-                        "This can be changed in the Configuration... window"//CHAR(13)//&
+999   CALL ErrorMessage("DASH could not launch Mogul."//CHAR(13)//&
+                        "The Mogul executable is currently configured to launch the program: "//CHAR(13)//&
+                        MOGULEXE(1:I)//CHAR(13)//&
+                        "This can be changed in the Configuration Window"//CHAR(13)//&
                         "under Options in the menu bar.")
 
 
@@ -316,6 +336,10 @@
           I = 1 
         ENDIF
       ENDDO
+      CLOSE(240)
+! Will not delete Mogul Output in this release as it may be useful for support problems
+! If DASH_Mogul comes about, may want to delete output file.
+!      CALL IosDeleteFile(MogulOutputFile) 
       
       TotalSum = 0
       DO I = 1,NumberOfBins
@@ -434,6 +458,7 @@
 
       CALL WDialogSelect(IDD_ModalDialog)
       CALL WDialogPutString(IDF_MogulText, MogulText)
+
 
       RETURN
 
