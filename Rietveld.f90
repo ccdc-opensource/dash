@@ -646,12 +646,19 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE RRVAR
+      USE PO_VAR
 
       IMPLICIT NONE
 
       REAL ChiSqd, ChiProSqd 
 
       CALL Dialog2RRVAR
+      ! Initialise PO
+      IF (PrefParExists) CALL PO_PRECFC(RR_PO)
+      ! Initialise ITF
+      CALL CreateFobITF
+      ! Initialise XATO(1:3,1:150)
+      CALL RR_MAKEFRAC
       CALL RRVAR2Params
       IF (RR_npar .EQ. 0) THEN
         CALL InfoMessage('No refinable parameters selected.')
@@ -682,7 +689,6 @@
 
       INTEGER i, iRow, iCol, iField, iFrg
 
-! Fill and display dialogue
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
       iRow = 1
