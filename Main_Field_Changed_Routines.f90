@@ -240,7 +240,6 @@
       CALL WDialogSelect(IDD_Peak_Positions)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (ID_Index_Output)
 ! Set the wavelength
@@ -255,7 +254,6 @@
               ENDIF
               CALL WDialogShow(-1,-1,0,Modeless)
           END SELECT
-        CASE (FieldChanged)
       END SELECT
       CALL PopActiveWindowID
 
