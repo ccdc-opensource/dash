@@ -3,9 +3,13 @@
 ! Doesn't treat Sohnke groups any differently from any other space group and
 ! therefore sometimes get "unaligned" solutions.  Not everything behaves well 
 ! all the time, for example Pca21 has caused problems.
-! NOV2001 added nasty fix which will help with cases like Pca21
-! TODO Trigonal and hexagonal space groups ignored since x-y type symmetry 
-!      operations are not decoded correctly
+! NOV2001 Added nasty fix which will help with cases like Pca21
+! JAN2002 Now use array rpdb for symmetry operations (instead of SOAxis, SOnumber etc.
+!         All symmetry operations decoded correctly (for example x-y)
+!         Added fix to align space groups with two infinite translation axes, Cc
+! TODO Trigonal and hexagonal space groups ignored.
+!      Symmetry ops in P32 correctly decoded but structures not aligned - inversion
+!       on z axis??
 !      Three equivalent axes (i.e. cubic groups) are not taken account of 
 !********************************************************************************
 	SUBROUTINE ALIGN()
@@ -19,9 +23,9 @@
 
 ! Required for XATOPT
       COMMON /posopt/ XATOPT(3,150)
-!expt!
+!
       PARAMETER (mpdbops=192)
-      COMMON /fullsymmops/ rpdb(4,4,mpdbops)
+      COMMON /fullsymmops/ rpdb(4,4,mpdbops)!Symmetry operations
 ! Required for NATOM
       INTEGER         NATOM
       REAL                   X
@@ -51,7 +55,7 @@
       PARAMETER (MaxNumAtom = 100)
 
 ! Local Variables
-      CHARACTER(len = 80) :: line
+      CHARACTER(len = 255) :: line
       INTEGER      nlin
       INTEGER      Inversion
       INTEGER      NumOfShifts
@@ -85,9 +89,9 @@
 
 !        
 !--------- Check to see if align algorithm should be applied-----------
-! For now, if the space group is trigonal or hexagonal does not attempt alignment.  Space
-! group decoding currently does not handle x-y type instructions       
-      IF ((NumberSGTable.GE.430).AND.(NumberSGTable.LE.488)) THEN
+! For now, if the space group is trigonal, hexagonal or cubic, does not attempt alignment.  
+     
+      IF (NumberSGTable.GE.430) THEN
         RETURN
       END IF       
 ! If number of zmatrices greater than 1, do not align
@@ -101,13 +105,15 @@
       ENDDO
 !--------- End of Checks ----------
 
-      OPEN(220,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'SGSymbandShift.txt',STATUS='OLD', ERR = 10)
+!      OPEN(220,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'SGSymbandShift.txt',STATUS='OLD', ERR = 10)
+      OPEN(220,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 10)
       DO j = 1,(NumberSGTable-1)
         READ (220, 50) nlin, line
 50      FORMAT(q,a)
       ENDDO
       READ(220,55) Inversion, NumOfShifts, ShiftString
-55    FORMAT(28x, I1, 4x, I1, x, A40)
+!55    FORMAT(28x, I1, 4x, I1, x, A40)
+55    FORMAT(75x, I1, 4x, I1, x, A20)
         DO j = 1,NumofShifts
           Shift(j) = ShiftString(((j*5)-4):(j*5))
         ENDDO 
@@ -272,9 +278,18 @@
            END DO
          END IF
 !--------------------------------------------------------------------------------------------
-! Have to perform space group operations on the CoMMatrix to make sure all origins generated:
+! Have to perform space group operations on each entry of CoMMatrix to make sure all origins generated:
 ! CoMSGMatrix: 3 dimensional matrix (i,k,j).  i describes number of CoM's generated
 ! from shifts, k is number of symmetry ops and j is x,y,or z
+!
+! rpdb description: rpdb(a,b,c) 
+! a = 1-4.  When a = 1 this describes the x component of the 
+! symmetry operation, a=2 is the y component of the symop etc.  Not sure what the
+! 4th column is for. (4,4,_) usually = 1 though.
+! b = 1-4.  Contains the symmetry operation.  (1,0,0,1/2) means x + 1/2, (1, -1, 0, 0) 
+! means x - y 
+! c 1-192.  This is the number of symmetry operations for the space group. First entry
+! is always x,y,z
 
    DO i = 1, icount
      DO k = 1, npdbops
@@ -330,13 +345,16 @@
        END DO
      END DO
 ! If have equivalent axes then apply abitrary criterion to see if x and y should be swapped
-     IF (equivAxes.eq.2) THEN
+    IF (equivAxes.eq.2) THEN
        IF (centre(1).gt.centre(2)) THEN
          DO i = 1,NATOM
            tempx = FinalMol(1,i)
            tempy = FinalMol(2,i)
            FinalMol(1,i) = tempy
-          FinalMol(2,i) = tempx
+           FinalMol(2,i) = tempx
+             IF (Inversion.ne.1) THEN
+               FinalMol(3,i) = (FinalMol(3,i)*(-1) + 1)
+             END IF
          END DO
        END IF
      END IF
@@ -395,8 +413,8 @@
      END DO
 
      RETURN
-10   CALL ErrorMessage('Could not open file'//CHAR(13)// 'SGSymbandShift.txt' &
-                        //CHAR(13)// 'It should be in the installation directory')
+10   CALL ErrorMessage('Sorry, could not find the file'//CHAR(13)// 'SpaceGroupSymbols.dat' &
+                        //CHAR(13)// 'in the installation directory')
            
      END SUBROUTINE Align
 
