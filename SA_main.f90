@@ -469,6 +469,14 @@
           CALL WDialogFieldState(IDBZMDelete(ifrg),Disabled)
         ENDIF
       ENDDO
+! JvdS @@ Following is wrong (we need a valid .sdi as well), but 
+! a. identical to release version
+! b. it's difficult to keep track of the validity of the .sdi file
+      IF (nfrag .NE. 0) THEN
+        CALL WDialogFieldState(IDNEXT,Enabled)
+      ELSE
+        CALL WDialogFieldState(IDNEXT,Disabled)
+      ENDIF
       natom = ntatm
       IF (izmtot .EQ. 0) THEN            
         CALL WDialogClearField(IDF_ZM_allpars)
