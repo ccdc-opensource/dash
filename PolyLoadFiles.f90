@@ -1268,9 +1268,9 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
-      INTEGER NOBS
-      REAL    XOBS, YOBS, YCAL, YBAK, EOBS
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
 
       CHARACTER*255 Cline
       INTEGER       I, IS, FLEN ! Length of TheFileName
@@ -1279,7 +1279,6 @@
       REAL          FnWavelengthOfMenuOption ! Function
       INTEGER       GetNumOfColumns ! Function
       REAL          Lambda1
-      REAL          Temp
       LOGICAL       OK
       INTEGER       IRadSelection
 
@@ -1325,8 +1324,7 @@
               SELECT CASE (EventInfo%VALUE1)
                 CASE (IDOK)
                   OK = .TRUE.
-                  CALL WDialogGetReal(IDF_wavelength,Temp)
-                  CALL Set_Wavelength(Temp) ! Wavelength now in ALambda
+                  CALL WDialogGetReal(IDF_wavelength1,Lambda1)
                   GOTO 11
                 CASE (IDCANCEL)
                   OK = .FALSE.
@@ -1336,9 +1334,9 @@
               SELECT CASE (EventInfo%VALUE1)
                 CASE (IDF_Wavelength_Menu) ! Wavelength menu selection
                   CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
-                  Temp = FnWavelengthOfMenuOption(IRadSelection)
-                  CALL WDialogPutReal(IDF_wavelength,Temp)
-                CASE (IDF_wavelength)
+                  Lambda1 = FnWavelengthOfMenuOption(IRadSelection)
+                  CALL WDialogPutReal(IDF_wavelength1,Lambda1)
+                CASE (IDF_wavelength1)
                   ! Do nothing 
               END SELECT
           END SELECT
@@ -1357,7 +1355,7 @@
   13    CONTINUE
         IF (OK) THEN
 ! This simply assumes that it was a valid .xye file
-          WRITE(64,'(F9.5)') ALambda
+          WRITE(64,'(F9.5)') Lambda1
 ! Read a line from the original file
   14      READ(UNIT=10,FMT='(A)',ERR=12,END=15) Cline
 ! Write the trimmed version to another file          
