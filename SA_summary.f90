@@ -49,21 +49,11 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL CloseOutputSolutionsChildWindows
-! Go back to the Pawley refinement or the initial Wizard
-! If we got here from the main Wizard window (option four), return to that window.
-! Return to SA input otherwise
+              CALL EndWizardPastPawley
               CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-              CALL WDialogGetRadioButton(IDF_PW_Option1,iOption)
-              IF (iOption .EQ. 4) THEN
-                CALL EndWizardPastPawley
-                CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-                CALL WDialogPutRadioButton(IDF_PW_Option4)
-                CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
-                CALL SelectMode(ID_Peak_Fitting_Mode)
-              ELSE
-                CALL WizardWindowShow(IDD_SA_input3_2)
-                CALL SelectMode(ID_Structure_Solution_Mode)
-              ENDIF
+              CALL WDialogPutRadioButton(IDF_PW_Option5)
+              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+              CALL SelectMode(ID_Peak_Fitting_Mode)
             CASE (IDCANCEL, IDCLOSE)
               CALL CloseOutputSolutionsChildWindows
               CALL EndWizardPastPawley
