@@ -833,6 +833,7 @@
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
 ! Read use hydrogens YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,LOG_HYDROGENS)
+      CALL WDialogPutCheckBoxLogical(IDF_UseHydrogens,LOG_HYDROGENS)
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
