@@ -1,4 +1,4 @@
-! Winteracter module created : 23/Nov/2001 18:24:18
+! Winteracter module created : 24/Nov/2001 15:09:35
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -395,7 +395,6 @@
           INTEGER, PARAMETER :: IDF_NumOfIterations             =  1211
           INTEGER, PARAMETER :: IDF_WindowWidth                 =  1212
           INTEGER, PARAMETER :: IDF_UseMCYN                     =  1213
-          INTEGER, PARAMETER :: IDF_UseSplineYN                 =  1215
           INTEGER, PARAMETER :: ID_Remove_Background            = 40003
           INTEGER, PARAMETER :: IDF_LABEL9                      =  1226
           INTEGER, PARAMETER :: IDAPPLY                         =  1227
@@ -413,8 +412,7 @@
           INTEGER, PARAMETER :: IDF_sup2_4                      =  1089
           INTEGER, PARAMETER :: IDF_Gamma_label2                =  1081
           INTEGER, PARAMETER :: IDF_gamm1_label2                =  1072
-          INTEGER, PARAMETER :: IDB_ConvertT2R                  =  1098
-          INTEGER, PARAMETER :: IDB_ConvertR2T                  =  1099
+          INTEGER, PARAMETER :: IDB_Convert                     =  1098
           INTEGER, PARAMETER :: IDD_XYE                         =   130
           INTEGER, PARAMETER :: IDF_RunDICVOL                   =  1101
           INTEGER, PARAMETER :: IDF_Indexing_CellRange2         =  1338

@@ -649,7 +649,7 @@
   ! Use Monte Carlo YES / NO
       CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
   ! Use spline smooth YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseSplineYN))
+      CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
 ! Save default wavelength
       CALL FileWriteReal(tFileHandle,RecNr,WavelengthOf('Cu'))
 ! Save default maximum resolution
@@ -845,7 +845,6 @@
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)      ! Use Monte Carlo YES / NO
       CALL WDialogPutCheckBoxLogical(IDF_UseMCYN,tLogical)
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)      ! Use spline smooth YES / NO
-      CALL WDialogPutCheckBoxLogical(IDF_UseSplineYN,tLogical)
 ! Read default wavelength
       CALL FileReadReal(tFileHandle,RecNr,tReal)
       CALL Set_Wavelength(tReal)

@@ -23,19 +23,6 @@
       LOGICAL                                  LOGREF
       COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
 
-      INTEGER         NATOM
-      REAL                   X
-      INTEGER                          KX
-      REAL                                        AMULT,      TF
-      INTEGER         KTF
-      REAL                      SITE
-      INTEGER                              KSITE,      ISGEN
-      REAL            SDX,        SDTF,      SDSITE
-      INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-
       REAL              AIOBS,         AICALC
       COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
 
@@ -43,12 +30,6 @@
       REAL                  WTIJ
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
-
-      LOGICAL         IHMINLT0, IKMINLT0, ILMINLT0
-      COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0
-
-      INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
-      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
 
       INTEGER KK, I, NPO, NLIN, NCOR, IR, II, JJ, IK, MINCOR, KL
 
@@ -74,8 +55,7 @@
       NCOR = NCOR - 1
       BACKSPACE (121)
       DO IR = 1, MSAREF
-        READ (121,*,END=100,ERR=998) (IREFH(I,IR),I=1,3), AIOBS(IR),    &
-     &                               WTI(IR), KL, (ICOR(I),I=1,NCOR)
+        READ (121,*,END=100,ERR=998) (IREFH(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (ICOR(I),I=1,NCOR)
         KK = IR
 !
 !.. Now work out which terms should be kept for the chi-squared calculation

@@ -66,7 +66,7 @@
         CALL WDialogGetInteger(IDF_WindowWidth,tInteger)
         CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
         CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
-        CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseSplineYN))
+        CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
         CALL FileWriteInteger(tFileHandle,RecNr,LBIN)
       ENDIF
       CALL FileWriteInteger(tFileHandle,RecNr,nfrag)

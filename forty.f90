@@ -1,4 +1,5 @@
-!*==FORTY.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       INTEGER FUNCTION FORTY(PNAME,ALSQ,MATSZ,PCXX,PFXX,MAGROU,CALROU,filnmr)
 !
@@ -22,17 +23,18 @@
 !
       USE WINTERACTER
       USE DRUID_HEADER
-
-!
 !
 !.. Interaction here with Winteracter !!!!!!
 !
       LOGICAL DFLTPR, PRNCYC
-      EXTERNAL DFLTPR, PCXX, PFXX, MAGROU, CALROU, RUNPAR, VARSPR,      &
-     &         PRNCYC
-!
+      EXTERNAL DFLTPR, PCXX, PFXX, MAGROU, CALROU, RUNPAR, VARSPR, PRNCYC
+
       INCLUDE 'params.inc'
-!
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       CHARACTER*6 PNAME
       DIMENSION ALSQ(MATSZ)
       COMMON /DERVAR/ DERIVV(500), LVARV
@@ -72,11 +74,8 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
-! JCC Moved to an include file
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       INCLUDE 'REFLNS.INC'
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
@@ -91,28 +90,21 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
       LOGICAL LOGIPK
       COMMON /IPKCMN/ LOGIPK, IPK, PIK(MIPK)
-!
-!
       COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
      &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS),    &
      &                JOCCR(MPTS)
-!
       COMMON /CMNNOW/ NOBSNOW
-!
 !.. Note only 3 phases specifically hardwired here
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-!
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
+      REAL            ZCAL !,        ZBAK
+      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XDIFT, XMINT
-!
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
-!
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -127,26 +119,21 @@
 !
 !----------------------
 !
-!
 ! JCC add error handling declarations
       INTEGER IEOCC
       INTEGER PREFIN
 ! JCC This is for testing for mathematical errors in the CCSL that used to STOP the program
       INTEGER IBMBER
       COMMON /CCSLER/ IBMBER
-!
+
       ICalled = 0
-!
 ! JCC Initialise return value to successful (=1) any other value is failure
       FORTY = 1
       IPK = 0
       filnam_root = filnmr
-!
       IEOCC = PREFIN(PNAME)
 ! Check the return status
       IF (IEOCC.NE.1) GOTO 900
-!
-!
 ! SET UP PRECISE PROBLEM, AND READ MOST L CARDS:
       CALL REFSET
 ! DISCOVER WHETHER SLACK CONSTRAINTS:
@@ -156,96 +143,70 @@
 ! THIS ROUTINE IS ONLY FOR ONE PHASE:
       CALL LOGPHA(1)
       CALL SETPR(PCXX,PFXX,MAGROU)
-!
 ! JCC Trap for any problems
       IF (IBMBER.GT.0) GOTO 950
-!
 ! COLLECT CONSTRAINTS IMPOSED BY SYMMETRY, AND THOSE REQUESTED, AND
 ! SET UP PARAMETERS AS VARIABLES (NOT YET AS BASIC VARIABLES)
       CALL PARSPR(MAGROU)
 ! JCC Trap for any problems
       IF (IBMBER.GT.0) GOTO 950
-!
-!
 ! MAKE LIST OF REFLECTION INDICES:
       CALL INRFPR(PCXX,PFXX)
-!
 ! READ OBS DATA AND SEND OUT TO TEMPORARY UNIT FOR REINPUT EACH CYCLE
       CALL INOBPR(ISCR,NFLIP,PCXX,PFXX)
-!
       CALL CHKMAXREF(PCXX)
-!
 ! CALCULATE THE STEP-SIZE FOR PEAK-SHAPE CALCULATION
       CALL XDELPR
-!
       CALL QNUMPP
-!
 ! Open the .PIK file
       MESSAG = 'peak contribution (.pik) file'
       NAMFIL = '.PIK'
       IPK = 80
       CALL OPNFIL(IPK,113)
       DONE = .FALSE.
-!
       DO ICYC = NCYC1, LASTCY
-!      WRITE (ITO,2000) ICYC
-! 2000   FORMAT (' >>> Starting cycle',I4)
-!
-!.. *** Winteracter calls ***
+! *** Winteracter calls ***
         CALL WDialogPutInteger(IDF_Pawley_Cycle_Number,ICYC)
         CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,LASTCY)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPts)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MaxK)
-!
-!>> JCC Add in check on number of reflections here, so that code doesnt bomb out in the Pawley attempt
+! JCC Add in check on number of reflections here, so that code doesn't bomb out in the Pawley attempt
         IF (MaxK.GT.400) GOTO 910
         IF (PRECYC .AND. ICYC.NE.NCYC1) THEN
           SIMUL = .FALSE.
           PRECYC = .FALSE.
         ENDIF
-!
 ! IF NEEDED, CAIL/SAPS/APES PROCESSING ON EACH CYCLE
 ! FOR NOW, IMPOSE PHASE 1, SOURCE 1 WHICH WE HOPE STAY THERE:
         JPHASE = 1
         JSOURC = 1
-!
-!.. CALCULATE PEAK & PEAK DERIVATIVE CONTRIBUTIONS
+! CALCULATE PEAK & PEAK DERIVATIVE CONTRIBUTIONS
         IF (AKNOTS.LE.0.) THEN
-          CALL PFXX(2)
-                     !PIKCAL
+          CALL PFXX(2) !PIKCAL
         ELSE
           CALL PFXX(3)
         ENDIF
-!
-!
-!>> JCC Trap for any problems
+! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
-!
         IF (.NOT.RIET) CALL FAM4PR(2,PCXX,PFXX)
         CALL VARMAK(DFLTPR,RUNPAR,VARSPR)
 !* this won't actually do - we want varspm if magnetic
 ! FOR NOW, IMPOSE PHASE 1, SOURCE 1 WHICH WE HOPE STAY THERE:
         JPHASE = 1
         JSOURC = 1
-!
 ! IF ANY SLACK CONSTRAINTS, SET UP:
         CALL GEOMCO(1)
-!>> JCC Trap for any problems
+! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
-!
         CALL LOGSET
-!
 ! INITIALISE R FACTOR SUMS:
         CALL RFACS(1)
         CALL RFACPR(1,PCXX)
-!
-!>> JCC Trap for any problems
+! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
-!
 ! SET UP POINTERS IN TRIANGULAR MATRIX AND CLEAR OUT LSQ MATRIX AND RHS
         CALL MATSET(ALSQ,MATSZ)
-!
-!>> JCC Trap for any problems
+! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 ! COUNT USED OBSERVATIONS :
         NOBS = 0
@@ -257,14 +218,14 @@
 !
 !
 ! NEW ENTRY TO ARRANGE INTERPOLATION FOR SPEED IF APPROPRIATE:
-!..      CALL PFXX(3)
+!      CALL PFXX(3)
 !
-!...  2   READ (ISCR,END=3) ARGI,OBS,DOBS,WT,ICODE,KMIN,KMAX
+!  2   READ (ISCR,END=3) ARGI,OBS,DOBS,WT,ICODE,KMIN,KMAX
 !
 ! CLEAR YCALC TO COLLECT QUANTITY COMPARABLE WITH OBS, AND DERIVV TO COLLECT
 ! THE CORRESPONDING DERIVATIVES OF YCALC WRT ALL VARIABLES:
 ! (DONE HERE IN CASE NO CONTRIBUTING REFLNS)
-!.. *** Winteracter call ***
+! *** Winteracter call ***
         CALL WDialogRangeProgressBar(IDF_Pawley_Progress_Bar,1,Npts)
         Npt30 = Npts/30
         DO IPT = 1, NPTS
@@ -275,7 +236,7 @@
           YPEAK = 0.
           YCALC = 0.
           NOBSNOW = IPT
-          KMAX = IOCCR(NOBSNOW)
+          KMAX = IOCCR(NOBSNOW) ! Number of peaks contributing to this data point
           ARGI = ZARGI(NOBSNOW)
           OBS = ZOBS(NOBSNOW)
           DOBS = ZDOBS(NOBSNOW)
@@ -285,76 +246,91 @@
 !
 ! DEAL WITH CASE YCALC=0 (EITHER BY BEING EXCLUDED OR BY HAVING NO CONTRIBUTING
 ! REFLECTIONS) - NB ICODE IS NON-ZERO FOR DO **NOT** USE:
+
+! JvdS I set ZBAKIN to .TRUE.
+! With the excluded regions code reinstated, this is necessary to 
+! ensure that we obtain the same results as with the release version.
+          ZBAKIN = .TRUE.
           IF (KMAX.EQ.0 .AND. .NOT.ZBAKIN) ICODE = -1
-          IF (ICODE.NE.0) THEN
-!          CALL RFACPR(5,PCXX)
-!          GO TO 2
-          ENDIF
+! When we are here
+!   ICODE = -1   : no contributing reflections
+!   ICODE =  0   : normal
+!   ICODE =  1   : excluded region (set in 'CONTRI' in Pr.f90)
+! JvdS This is where ICODE is tested. ICODE is used to signal that the point
+! is part of an excluded region. The code labelled !O is the old code, 
+! which did nothing.
+!O          IF (ICODE.NE.0) THEN
+!O!          CALL RFACPR(5,PCXX)
+!O!          GO TO 2 ! This used to jump to the point where the next input line was read
+!O          ENDIF
 !
 ! CALCULATE FUNCTION TO MATCH OBSERVED, AND ITS DERIVATIVES, AND DO SOME
 ! STATISTICS:
-          IF (KMAX.NE.0) CALL CALROU(PCXX,PFXX)
-          CALL BACKPR(2)
+! ICODE .NE. 0 means: no contribution, either excluded region or no peak
+          IF (KMAX.NE.0 .AND. (ICODE.EQ.0)) CALL CALROU(PCXX,PFXX) ! Fills YPEAK
+! ICODE = 1 means: excluded region
+          IF (ICODE .NE. 1) CALL BACKPR(2) ! Fills YBACK
           YCALC = YBACK + YPEAK
           ZCAL(NOBSNOW) = YCALC
-          ZBAK(NOBSNOW) = YBACK
-!
+          YBBIN(NOBSNOW) = YBACK
 ! MAKE DERIVATIVES WRT BASIC VARIABLES FROM THOSE WRT VARIABLES:
           CALL RELATE
-!
 ! DIFFERENCE:
           IF (SIMUL) OBS = YCALC
           DIFF = OBS - YCALC
 ! FROM WEIGHT GET SQRTWT AND WDIFF INTO COMM0N:
-          IF (NOBS.EQ.532) INOTH = 1
           CALL WGHTLS(3,ARGI)
-!
 ! ADD IN TO R FACTORS:
-          CALL RFACPR(2,PCXX)
-!
-!>> JCC Trap for any problems
+          IF (ICODE.EQ.0) THEN
+            CALL RFACPR(2,PCXX) ! YCALC .NE. 0.0
+          ELSE
+            CALL RFACPR(5,PCXX) ! YCALC .EQ. 0.0, i.e. excluded region or just no peaks
+          ENDIF
+! JCC Trap for any problems
           IF (IBMBER.GT.0) GOTO 950
 ! ADD DERIVATIVES IN TO LSQ MATRIX:
           CALL MATTOT(ALSQ,MATSZ)
           IF (DONE) THEN
-            NTEM = IOCCR(NOBSNOW)
+            IF (ICODE .EQ. 1) THEN
+              NTEM = 0                ! Excluded region
+            ELSE
+              NTEM = IOCCR(NOBSNOW)
+            ENDIF
             K1 = KIPT(NOBSNOW) + 1
             K2 = KIPT(NOBSNOW+1)
-            KD = 1 + K2 - K1
             WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
             IF (NTEM.GT.0) WRITE (IPK,*) (KNIPT(KK),PIK(KNIPT(KK)),KK=K1,K2)
           ENDIF
           NOBS = NOBS + 1
 ! NEXT OBSERVATION:
 !...      GO TO 2
-        ENDDO
-             ! IPT LOOP TO NPTS
-!
+   10     CONTINUE
+        ENDDO ! IPT LOOP TO NPTS
 ! HERE ON NO MORE PROFILE OBSERVATIONS - PRINT R FACTORS:
         CALL RFACPR(3,PCXX)
-!>> JCC Trap for any problems
+! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 ! SLACK CONSTRAINTS - FIRST PAWLEY-TYPE:
         CALL PAWLS(ALSQ,MATSZ,3)
-!>> JCC Trap for any problems
+! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 !* JOIN HERE IF ONLY SLACK:
 ! THEN GEOMETRICAL:
         CALL GEOMLS(ALSQ,MATSZ)
-!>> JCC Trap for any problems
+! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 ! COMBINED CHI SQUARED:
         CALL RFACS(6)
 ! IF CAIL, OUTPUT EIGENVALUES & EIGENVECTORS IF REQUIRED BY "I PREE"
         IF (DONE) CALL EIGEN(ALSQ,MATSZ)
         IF (DONE) CALL HESCOR(ALSQ,MATSZ)
-!>> JCC Trap for any problems
+! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 ! INVERT MATRIX:
         CALL MATINV(ALSQ,MATSZ)
 ! CALCULATE SHIFTS AND ESD'S:
         CALL MATSHF(ALSQ,MATSZ)
-!>> JCC Trap for any problems
+! JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 ! APPLY SHIFTS AND PRINT:
         CALL APSHPR(ALSQ,MATSZ,PCXX,PFXX,MAGROU)
@@ -375,11 +351,11 @@
       CALL CLOFIL(ISCR)
       IF (PRNCYC(4)) CALL CLOFIL(IOP2)
       CLOSE (IPK)
-!>> JCC Trap for any problems
+! JCC Trap for any problems
 	IF (IBMBER .GT. 0) CALL DebugErrorMessage('Error in FORTY after HKLOUT')
       IBMBER = 0   ! Ignore a problem that can occur in HKLOUT - Ken/Bill to check out please
       RETURN
-!>> JCC Added in error handling here
+! JCC Added in error handling here
   900 CONTINUE
       FORTY = 0
       IF (IPK.NE.0) CLOSE (ipk,IOSTAT=istat)
@@ -392,8 +368,8 @@
       IBMBER = 0
 
       END FUNCTION FORTY
-!*==PFCN03.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
       SUBROUTINE PFCN03(N)
 !
@@ -424,7 +400,7 @@
 !A to it.
 !
       INCLUDE 'params.inc'
-!
+
       PARAMETER (NW=4)
       CHARACTER*4 WDCN03(NW)
       LOGICAL TESTOV
@@ -440,10 +416,8 @@
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
      &                VALMUB
-!
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-!
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
@@ -471,46 +445,36 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVZ/ PKCONV(512,9)
       COMMON /PRKNOT/ ARGKNT(50), PKKNOT(512,9,50)
-!      COMMON /PRSAVF/PKLIST(512,9,200),ZXDEL(200),PKCONV(512,9),
-!     & ARGNOT(50),PKNOT(64,9,50),XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
 !.. Note only 3 phases specifically hardwired here
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-!
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-!
       REAL ZTEM(MPPTS), RTEM(3,MRFLNZ), TF4PAR(MF4PAR)
-!
       LOGICAL PFNVAR
       COMMON /PFNINF/ NUMPFP(8,9,5), PFNVAR(8,9,5)
-!
+
       REAL ARTEM(6)
       INTEGER KORD(MRFLNZ)
-!
+
       COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
-     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS),    &
-     &                JOCCR(MPTS)                            !,
-!
+     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS), JOCCR(MPTS)
       COMMON /CMN300/ ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK)&
      &                , KARGO(MAXPIK), KARGK(MAXPIK)
-!
+
       DATA WDCN03/'SIGM', 'GAMM', 'HPSL', 'HMSL'/
       DATA IWCN03/3, 3, 0, 3, 4, 0, 3, 5, 0, 3, 6, 0/
-!
+
       GOTO (10,1,2,3,100,5,6,7), N + 1
-!
 ! N=0: SET UP "DATA SOURCE CN/SR, PEAK TYPE 01"
    10 NPKGEN(JPHASE,JSOURC) = 4
       NGEN4(JPHASE,JSOURC) = 3
@@ -880,7 +844,7 @@
           CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
           DO I = 1, 3
             III = IARGI + I - 2
-! JCC @ Can get an array bound overflow error here so I've trapped for it temporarily.
+! JCC @@ Can get an array bound overflow error here so I've trapped for it temporarily.
 ! May want to check out why ...
 ! Added a hack ...
             IF (III.LE.512 .AND. III.GT.0) THEN
@@ -950,7 +914,6 @@
       STRKT = DELT.LT.2.0*STRTOL*ZXDEL(KNOW)
       SLACK = 0.
       GOTO 100
-!
     7 CALL FDCN03(1)
       F4PAR(2,KNOW) = PKFNVA(1)
       F4PAR(3,KNOW) = PKFNVA(2)
@@ -958,9 +921,8 @@
   100 RETURN
 
       END SUBROUTINE PFCN03
-!*==FCSUB3.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
+!*****************************************************************************
 !
       SUBROUTINE FCSUB3(MNS)
 !
@@ -969,7 +931,7 @@
 !C 19B
 !H
       INCLUDE 'PARAMS.INC'
-!
+
       LOGICAL NEAR90
       COMPLEX CFFT, DFFT, DDT, CFF
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
@@ -985,11 +947,8 @@
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
      &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
      &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVZ/ PKCONV(512,9)
-!      COMMON /PRSAVF/PKLIST(512,9,200),ZXDEL(200),PKCONV(512,9),
-!     & ARGNOT(50),PKNOT(64,9,50),XPDKNT(50)
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
@@ -999,7 +958,7 @@
      &          DR(512,8), DI(512,8), FRT(512), FIT(512)
       LOGICAL PFNVAR
       COMMON /PFNINF/ NUMPFP(8,9,5), PFNVAR(8,9,5)
-!
+
       SIG = PKFNVA(1)
       GAM = PKFNVA(2)
       HPS = PKFNVA(3)
@@ -1121,3 +1080,6 @@
       ENDDO
 
       END SUBROUTINE FCSUB3
+!
+!*****************************************************************************
+!
