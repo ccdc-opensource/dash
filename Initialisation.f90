@@ -364,7 +364,7 @@
       PastPawley = .FALSE.
       DefaultMaxResolution = 1.75
       LOG_HYDROGENS = .FALSE.
-      CALL UpdateWavelength(WaveLengthOf('Cu'))
+      CALL Set_Wavelength(WaveLengthOf('Cu'))
 ! Now initialise the maximum resolution in the dialogue window
       CALL WDialogSelect(IDD_PW_Page5)
       CALL WDialogPutReal(IDF_MaxResolution,DefaultMaxResolution)
@@ -818,7 +818,7 @@
       CALL WDialogPutCheckBoxLogical(IDF_UseSplineYN,tLogical)
 ! Read default wavelength
       CALL FileReadReal(tFileHandle,RecNr,tReal)
-      CALL UpdateWavelength(tReal)
+      CALL Set_Wavelength(tReal)
 ! Read default maximum resolution
       CALL FileReadReal(tFileHandle,RecNr,DefaultMaxResolution)
 ! Now initialise the maximum resolution in the dialogue window

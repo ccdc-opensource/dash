@@ -182,7 +182,7 @@
 
       IF (.NOT. FnWaveLengthOK()) THEN
         CALL ErrorMessage('Wavelength invalid, will be set to Cu')
-        CALL UpdateWavelength(WavelengthOf('Cu'))
+        CALL Set_Wavelength(WavelengthOf('Cu'))
       ENDIF
       IF (TheTwoTheta .LT. 0.01) THEN
         TwoTheta2dSpacing = 1000000.0
@@ -212,7 +212,7 @@
 
       IF (.NOT. FnWaveLengthOK()) THEN
         CALL ErrorMessage('Wavelength invalid, will be set to Cu')
-        CALL UpdateWavelength(WavelengthOf('Cu'))
+        CALL Set_Wavelength(WavelengthOf('Cu'))
       ENDIF
 ! Calculate minimum d-spacing for the given wavelength
       IF (ThedSpacing .LT. TwoTheta2dSpacing(89.9999)) THEN
@@ -399,6 +399,9 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
 
       INCLUDE 'Lattice.inc'
 
@@ -423,6 +426,7 @@
 !
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -467,13 +471,19 @@
         ENDDO
 ! Update their Enabled/Disabled state depending on whether they are constrained by the crystal system
         IF (WindowNr .NE. 3) THEN
-          DO I = 1, 6
-            IF (CellParConstrained(I)) THEN
+          IF (PastPawley) THEN ! Just make everything read only
+            DO I = 1, 6
               CALL WDialogFieldState(CellParID(I),DialogReadOnly)
-            ELSE
-              CALL WDialogFieldState(CellParID(I),Enabled)
-            ENDIF
-          ENDDO
+            ENDDO
+          ELSE
+            DO I = 1, 6
+              IF (CellParConstrained(I)) THEN
+                CALL WDialogFieldState(CellParID(I),DialogReadOnly)
+              ELSE
+                CALL WDialogFieldState(CellParID(I),Enabled)
+              ENDIF
+            ENDDO
+          ENDIF
         ENDIF
       ENDDO
       CALL CheckIfWeCanDoAPawleyRefinement
@@ -517,26 +527,19 @@
 
       INTEGER, INTENT (IN   ) :: From
 
-      INCLUDE 'statlog.inc'
-      INCLUDE 'Lattice.inc'
       REAL Temp
 
       CALL PushActiveWindowID
-      IF (From .EQ. IDD_Data_Properties) THEN
-        CALL WDialogSelect(IDD_Data_Properties)
-        CALL WDialogGetReal(IDF_wavelength1,Temp)
-      ELSE IF (From .EQ. IDD_Index_Preparation) THEN
-        CALL WDialogSelect(IDD_Index_Preparation)
-        CALL WDialogGetReal(IDF_Indexing_Lambda,Temp)
-      END IF
-      CALL UpdateWavelength(Temp)
+      CALL WDialogSelect(From)
+      CALL WDialogGetReal(IDF_wavelength1,Temp)
+      CALL Set_Wavelength(Temp)
       CALL PopActiveWindowID
 
       END SUBROUTINE DownLoadWavelength
 !
 !*****************************************************************************
 !
-      SUBROUTINE UpdateWavelength(TheWaveLength)
+      SUBROUTINE Set_Wavelength(TheWaveLength)
 ! Should be renamed to 'SetWavelength'/'UploadWavelength'
 
       USE WINTERACTER
@@ -546,6 +549,53 @@
       IMPLICIT NONE
 
       REAL, INTENT (IN   ) :: TheWaveLength
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL, EXTERNAL :: NearlyEqual
+
+      IF ((TheWaveLength .LT. 0.01) .OR. (TheWaveLength .GT. 20.0)) THEN
+        CALL ErrorMessage('Invalid wavelength')
+        RETURN
+      ENDIF
+      IF (NearlyEqual(TheWaveLength,ALambda)) RETURN
+      ALambda = TheWaveLength
+      CALL Upload_Wavelength
+
+      END SUBROUTINE Set_Wavelength
+!
+!*****************************************************************************
+!
+      SUBROUTINE Set_AnodeMaterial(IRadSelection)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: IRadSelection
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Data_Properties)
+      CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
+      CALL WDialogSelect(IDD_PW_Page2)
+      CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
+      CALL WDialogSelect(IDD_PW_Page4)
+      CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_AnodeMaterial
+!
+!*****************************************************************************
+!
+      SUBROUTINE Upload_Wavelength
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
 
@@ -563,12 +613,6 @@
       REAL    FnWavelengthOfMenuOption ! Function
       REAL    TwoTheta2dSpacing, dSpacing2TwoTheta ! Function
 
-      IF ((TheWaveLength .LT. 0.01) .OR. (TheWaveLength .GT. 20.0)) THEN
-        CALL ErrorMessage('Invalid wavelength')
-        RETURN
-      ENDIF
-      IF (TheWaveLength .EQ. ALambda) RETURN
-      ALambda = TheWaveLength
       CALL PushActiveWindowID
 ! This is the right place to update the maximum resolution (even if it's not necessary)
 ! In principle, set resolution so as to truncate after DefaultMaxResolution.
@@ -582,7 +626,6 @@
       ENDIF
       CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
       CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tMaxResolution))
-
       CALL WDialogSelect(IDD_Data_Properties)
       CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_PW_Page2)
@@ -590,7 +633,7 @@
       CALL WDialogSelect(IDD_PW_Page4)
       CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogPutReal(IDF_Indexing_Lambda,ALambda,'(F10.5)')
+      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
 ! Now add in a test: if lab data, and wavelength close to known material,
 ! set anode material in Winteracter menus. Otherwise, anode is unknown.
       IF (JRadOption .EQ. 1) THEN ! X-ray lab data
@@ -599,17 +642,12 @@
         DO I = 2, 6
           IF (ABS(ALambda - FnWavelengthOfMenuOption(I)) .LT. 0.0003) IRadSelection = I
         ENDDO
-        CALL WDialogSelect(IDD_Data_Properties)
-        CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
-        CALL WDialogSelect(IDD_PW_Page2)
-        CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
-        CALL WDialogSelect(IDD_PW_Page4)
-        CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
+        CALL Set_AnodeMaterial(IRadSelection)
       ENDIF
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL PopActiveWindowID
 
-      END SUBROUTINE UpdateWavelength
+      END SUBROUTINE Upload_Wavelength
 !
 !*****************************************************************************
 !
@@ -801,14 +839,21 @@
 
       USE WINTERACTER
       USE DRUID_HEADER 
+      USE VARIABLES
 
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC' ! Contains JRadOption
 
       INTEGER WindowNr
+      INTEGER NotDisabled
 
       CALL PushActiveWindowID
+      IF (PastPawley) THEN
+        NotDisabled = DialogReadOnly
+      ELSE
+        NotDisabled = Enabled
+      ENDIF
       DO WindowNr = 1, 3
         SELECT CASE (WindowNr)
           CASE (1) 
@@ -820,10 +865,10 @@
         END SELECT
         SELECT CASE (JRadOption)
           CASE (1) ! Lab X-ray
-            CALL WDialogFieldState(IDF_CW_group,Enabled)
-            CALL WDialogFieldState(IDF_radiation_label,Enabled)
-            CALL WDialogFieldState(IDF_wavelength1,Enabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
+            CALL WDialogFieldState(IDF_CW_group,NotDisabled)
+            CALL WDialogFieldState(IDF_radiation_label,NotDisabled)
+            CALL WDialogFieldState(IDF_wavelength1,NotDisabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu,NotDisabled)
             CALL WDialogFieldState(IDF_TOF_group,Disabled)
             CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
             CALL WDialogFieldState(IDF_flight_path,Disabled)
@@ -831,10 +876,10 @@
             CALL WDialogFieldState(IDF_2theta0,Disabled)
             CALL WDialogPutRadioButton(IDF_LabX_Source)
           CASE (2, 3) ! Synchrotron X-ray & CW neutron  
-            CALL WDialogFieldState(IDF_CW_group,Enabled)
+            CALL WDialogFieldState(IDF_CW_group,NotDisabled)
             CALL WDialogFieldState(IDF_radiation_label,Disabled)
             CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-            CALL WDialogFieldState(IDF_wavelength1,Enabled)
+            CALL WDialogFieldState(IDF_wavelength1,NotDisabled)
             CALL WDialogFieldState(IDF_TOF_group,Disabled)
             CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
             CALL WDialogFieldState(IDF_flight_path,Disabled)
@@ -850,11 +895,11 @@
             CALL WDialogFieldState(IDF_radiation_label,Disabled)
             CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
             CALL WDialogFieldState(IDF_wavelength1,Disabled)
-            CALL WDialogFieldState(IDF_TOF_group,Enabled)
-            CALL WDialogFieldState(IDF_Flight_Path_Label,Enabled)
-            CALL WDialogFieldState(IDF_flight_path,Enabled)
-            CALL WDialogFieldState(IDF_2theta_label,Enabled)
-            CALL WDialogFieldState(IDF_2theta0,Enabled)
+            CALL WDialogFieldState(IDF_TOF_group,NotDisabled)
+            CALL WDialogFieldState(IDF_Flight_Path_Label,NotDisabled)
+            CALL WDialogFieldState(IDF_flight_path,NotDisabled)
+            CALL WDialogFieldState(IDF_2theta_label,NotDisabled)
+            CALL WDialogFieldState(IDF_2theta0,NotDisabled)
             CALL WDialogPutRadioButton(IDF_TOF_source)
         END SELECT
       ENDDO
@@ -874,7 +919,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'statlog.inc'
       INCLUDE 'lattice.inc'
 
       LOGICAL FnUnitCellOK ! Function
@@ -971,12 +1015,12 @@
 !
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
 
 ! JvdS MaxSPGR is set to 530 in 'lattice.inc'
 ! Not necessary any more: with 'crystal system = unknown' eliminated,
@@ -1020,8 +1064,6 @@
       INTEGER, INTENT (IN   ) :: IUploadFrom
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
-      INCLUDE 'Lattice.inc'
 
       INTEGER SGNrMenu2Table ! Function
       INTEGER ISPosSG
@@ -1130,7 +1172,7 @@
 !     6 = Fe
 
       IF ((Iselection .GE. 2) .AND. (Iselection .LE. 6)) THEN
-        CALL UpdateWavelength(FnWavelengthOfMenuOption(Iselection))
+        CALL Set_Wavelength(FnWavelengthOfMenuOption(Iselection))
       ELSE
         CALL DebugErrorMessage('Non-existing item addressed in anode material menu')
       ENDIF

@@ -146,7 +146,6 @@
 
 !   Branch depending on chosen menu item
 
- 10   CALL WCursorShape(CurCrossHair)
       STATBARSTR(8)=' '
       CALL WindowOutStatusBar(8,STATBARSTR(8))
       SELECT CASE (EventInfo%VALUE1)
@@ -220,14 +219,14 @@
         CASE (ID_Down)
 ! We're going to move the graph down if we can
           ypgdif=ypgmax-ypgmin
-          ypgmin=max(ypmin,ypgmin-0.25*ypgdif)
+          ypgmin=MAX(ypmin,ypgmin-0.25*ypgdif)
           ypgmax=ypgmin+ypgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot(IPTYPE)
         CASE (ID_Up)
 ! We're going to move the graph up if we can
           ypgdif=ypgmax-ypgmin
-          ypgmax=min(ypmax,ypgmax+0.25*ypgdif)
+          ypgmax=MIN(ypmax,ypgmax+0.25*ypgdif)
           ypgmin=ypgmax-ypgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot(IPTYPE)

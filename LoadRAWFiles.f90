@@ -756,7 +756,7 @@
         k = k + nblk
       ENDDO
       Lambda1 = Header%Wavelen1
-      CALL UpdateWavelength(Lambda1)
+      CALL Set_Wavelength(Lambda1)
       NOBS = j
 ! Now fill XOBS
       CurrTwoTheta = RangeInfo%Begin(1)
@@ -907,7 +907,7 @@
 ! Check that the same wavelength has been used for all data ranges
             IF (CurrDataRange .EQ. 1) THEN
 ! Store this value as the experimental wavelength
-              CALL UpdateWavelength(Lambda1)
+              CALL Set_Wavelength(Lambda1)
             ELSE
               IF (ABS(Lambda1-ALambda) .LE. 0.0001) THEN
                 CALL ErrorMessage('More than one wavelength used, reading aborted.')
@@ -965,7 +965,7 @@
           I2(2) = I2(3)
 ! R4 now holds the wavelength
           Lambda1 = R4
-          CALL UpdateWavelength(Lambda1)
+          CALL Set_Wavelength(Lambda1)
 ! The complete file header is 256 bytes, so start reading at record (256 DIV 4) + RecNumber
           Offset = 64
 ! @ Now there should be a loop over the number of data ranges

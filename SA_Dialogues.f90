@@ -22,6 +22,31 @@
       CALL WDialogFieldState(IDNEXT,Enabled)
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       CALL SA_SetOutputFilenamesToDefaults()
+      PastPawley = .TRUE.
+! Grey out 'Delete all peak fit ranges' button on toolbar
+      CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
+! Grey out 'Remove Background' button on toolbar
+      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
+! Grey out 'Load diffraction pattern' button on toolbar
+      CALL WMenuSetState(ID_import_xye_file,ItemEnabled,WintOff)
+! Make unit cell etc. read only under 'View' 
+      CALL Upload_Cell_Constants
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL WDialogFieldState(IDF_Space_Group_Menu,DialogReadOnly)
+      CALL WDialogFieldState(IDF_Crystal_System_Menu,DialogReadOnly)
+      CALL WDialogFieldState(IDF_ZeroPoint,DialogReadOnly)
+      CALL WDialogFieldState(IDAPPLY,DialogReadOnly)
+      CALL WDialogSelect(IDD_Data_Properties)
+      CALL WDialogFieldState(IDAPPLY,DialogReadOnly)
+      CALL WDialogFieldState(IDF_wavelength1,DialogReadOnly)
+      CALL WDialogFieldState(IDF_Wavelength_Menu,DialogReadOnly)
+      CALL WDialogFieldState(IDF_LabX_Source,DialogReadOnly)
+      CALL WDialogFieldState(IDF_SynX_Source,DialogReadOnly)
+      CALL WDialogFieldState(IDF_CWN_Source,DialogReadOnly)
+      CALL WDialogFieldState(IDF_TOF_source,DialogReadOnly)
+      CALL WDialogSelect(IDD_Peak_Positions)
+      CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
+
 
       END SUBROUTINE ShowWizardWindowZmatrices
 !
@@ -57,18 +82,16 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the Pawley refinement or the initial wizard
-              CALL WizardWindowHide
-              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+              CALL EndWizardPastPawley
+              CALL SetWizardState(0)
+              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL WizardWindowHide
-              PastPawley = .TRUE.
               CALL SA_Parameter_Set
-              CALL WDialogSelect(IDD_SA_input2)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+              CALL WizardWindowShow(IDD_SA_input2)
             CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizardCommon
+              CALL EndWizardPastPawley
             CASE (IDB_SA_Project_Browse)
               CALL SDIFileBrowse
             CASE (IDB_SA_Project_Open)
@@ -178,9 +201,6 @@
 ! Interact with the main window and look at the Pawley refinement...
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizardCommon
-              RETURN
             CASE (IDBACK)
 ! Go back to the 1st window
 ! JCC Check if the limits have changed and warn about it 
@@ -189,8 +209,7 @@
               ENDIF
               IF (.NOT. LimsChanged) THEN
                 CALL WizardWindowHide
-                CALL WDialogSelect(IDD_SAW_Page1)
-                CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+                CALL WizardWindowShow(IDD_SAW_Page1)
               ENDIF
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
@@ -219,6 +238,8 @@
               NMoves = NT * NS * NVAR
               CALL WDialogPutInteger(IDF_SA_Moves,NMoves)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizardPastPawley
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -318,13 +339,19 @@
 ! Interact with the main window and look at the Pawley refinement...
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizardCommon
             CASE (IDBACK)
 ! Go back to the 2nd window
               CALL WizardWindowHide
-              CALL WDialogSelect(IDD_SA_input2)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+              CALL WizardWindowShow(IDD_SA_input2)
+            CASE (IDB_SA3_finish) ! 'Solve >' button
+! We've finished the SA input
+              CALL WizardWindowHide
+              CALL MakRHm()
+              CALL CalCosArx()
+              CALL Create_AtomicWeightings
+              CALL BeginSA
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizardPastPawley
             CASE (IDF_PrintSA)
               IF (WriteSAParametersToFile('SA_PARAMS.TXT') .EQ. 0) THEN
                 CALL WindowOpenChild(IHANDLE)
@@ -339,13 +366,6 @@
 ! two 'Print' outputs on screen. The possibility of editing the file is probably more useful.
                 CALL SetChildWinAutoClose(IHANDLE)
               ENDIF
-            CASE (IDB_SA3_finish) ! 'Solve >' button
-! We've finished the SA input
-              CALL WizardWindowHide
-              CALL MakRHm()
-              CALL CalCosArx()
-              CALL Create_AtomicWeightings
-              CALL BeginSA
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)

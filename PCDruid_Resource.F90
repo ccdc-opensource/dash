@@ -1,4 +1,4 @@
-! Winteracter module created : 06/Nov/2001 16:56:49
+! Winteracter module created : 07/Nov/2001 14:19:36
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -319,7 +319,6 @@
           INTEGER, PARAMETER :: IDF_TBarGroup1                  =  1190
           INTEGER, PARAMETER :: IDF_SA_move_type2               =  1196
           INTEGER, PARAMETER :: IDF_SA_move_type3               =  1197
-          INTEGER, PARAMETER :: IDF_Data_Download               =  1043
           INTEGER, PARAMETER :: ID_PWa_DF_Open                  =  1047
           INTEGER, PARAMETER :: ID_Index_Output                 =  1295
           INTEGER, PARAMETER :: IDD_Index_Preparation           =   153
@@ -333,7 +332,6 @@
           INTEGER, PARAMETER :: IDF_Indexing_tetra              =  1314
           INTEGER, PARAMETER :: IDF_Indexing_Hexa               =  1315
           INTEGER, PARAMETER :: IDF_Indexing_Cubic              =  1316
-          INTEGER, PARAMETER :: IDF_Indexing_Lambda             =  1324
           INTEGER, PARAMETER :: IDF_Indexing_Lamda_label        =  1325
           INTEGER, PARAMETER :: IDF_Indexing_Max                =  1326
           INTEGER, PARAMETER :: IDF_Indexing_MinVol             =  1003
