@@ -179,11 +179,14 @@
       COMMON / ModalTorsions/ ModalFlag(mvar)
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_HydrogenTreatment
+      REAL, EXTERNAL :: Degrees2Radians
       CHARACTER*36 parlabel(mvar)
       INTEGER I, II, kk, iFrg, iH, iK, iL
       REAL    Point1(1:3), Point2(1:3), Point3(1:3) 
-      REAL    zmSingleRotationAxis(1:3)
+      REAL    Axis(1:3)
       REAL    Q(0:3)
+      REAL    v1(1:3), v2(1:3)
+      REAL    Alpha, Beta, Gamma
 
       CALL PushActiveWindowID
 ! Calculate the unit cell axes in terms of the orthogonal lattice from
@@ -199,18 +202,18 @@
       DO iFrg = 1, nFrag
         CALL zmDoAdmin(iFrg)
         IF (.NOT. UseQuaternions(iFrg)) THEN
-! Initialise the parts of the quaternions of the single rotation axis that are due to the axis
+! Calculate the single axis
           SELECT CASE (zmSingleRotAxDef(iFrg))
             CASE (1) ! two atom numbers
 ! We need the Cartesian co-ordinates of these two atoms
               CALL makexyz(natoms(iFrg), BLEN(1,iFrg), ALPH(1,iFrg), BET(1,iFrg), IZ1(1,iFrg), IZ2(1,iFrg), IZ3(1,iFrg), axyzo)
-              zmSingleRotationAxis(1) = axyzo(1,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
-              zmSingleRotationAxis(2) = axyzo(2,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
-              zmSingleRotationAxis(3) = axyzo(3,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
+              Axis(1) = axyzo(1,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
+              Axis(2) = axyzo(2,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
+              Axis(3) = axyzo(3,zmSingleRotAxAtm(2,iFrg)) - axyzo(1,zmSingleRotAxAtm(1,iFrg))
             CASE (2) ! Fractional
 ! The variable zmSingleRotAxFrac holds the fractional co-ordinates,
 ! we need orthogonal co-ordinates => convert
-              CALL PremultiplyVectorByMatrix(f2cmat, zmSingleRotAxFrac(1,iFrg), zmSingleRotationAxis)
+              CALL PremultiplyVectorByMatrix(f2cmat, zmSingleRotAxFrac(1,iFrg), Axis)
             CASE (3) ! Normal to plane defined by three atoms
 ! We need the Cartesian co-ordinates of these atoms
               CALL makexyz(natoms(iFrg), BLEN(1,iFrg), ALPH(1,iFrg), BET(1,iFrg), IZ1(1,iFrg), IZ2(1,iFrg), IZ3(1,iFrg), axyzo)
@@ -219,9 +222,33 @@
               Point3 = axyzo(:,zmSingleRotAxPlnAtm(3,iFrg))
               Point1 = Point1 - Point2
               Point3 = Point3 - Point2
-              CALL VectorCrossProduct(Point1, Point3, zmSingleRotationAxis(1))
+              CALL VectorCrossProduct(Point1, Point3, Axis)
           END SELECT
-          CALL Vector2Quaternion(zmSingleRotationAxis, Q)
+! Calculate initial orientation
+          SELECT CASE (zmSingleRAIniOrDef(iFrg))
+            CASE (1) ! Define from axis (only possible when axis is defined from atoms, not from another axis)
+              v1(1) = Axis(1)
+              v1(2) = Axis(2)
+              v1(3) = Axis(3)
+              CALL PremultiplyVectorByMatrix(f2cmat, zmSingleRAIniOrFrac(1,iFrg), v2) ! frac -> cart
+      !        CALL Vector2Quaternion(v1, )
+      !        CALL Vector2Quaternion(v2, )
+
+            CASE (2) ! Defined as Euler angles => convert to Quaternions
+              Alpha = zmSingleRAIniOrEuler(1, iFrg)
+              Beta  = zmSingleRAIniOrEuler(2, iFrg)
+              Gamma = zmSingleRAIniOrEuler(3, iFrg)
+              zmInitialQs(0, iFrg) = COS(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha+Gamma))
+              zmInitialQs(1, iFrg) = SIN(0.5*Degrees2Radians(Beta)) * COS(0.5*Degrees2Radians(Alpha-Gamma))
+              zmInitialQs(2, iFrg) = SIN(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha-Gamma))
+              zmInitialQs(3, iFrg) = COS(0.5*Degrees2Radians(Beta)) * SIN(0.5*Degrees2Radians(Alpha+Gamma))
+            CASE (3) ! Defined as quaternions
+              zmInitialQs(0, iFrg) = zmSingleRAIniOrQuater(0,iFrg)
+              zmInitialQs(1, iFrg) = zmSingleRAIniOrQuater(1,iFrg)
+              zmInitialQs(2, iFrg) = zmSingleRAIniOrQuater(2,iFrg)
+              zmInitialQs(3, iFrg) = zmSingleRAIniOrQuater(3,iFrg)
+          END SELECT
+          CALL Vector2Quaternion(Axis, Q)
 ! Now we know the quaternions which, when applied, would give the direction of the axis of rotation.
 ! In order for this axis to be aligned with the z-axis, we must apply the inverse of this rotation.
 ! Hence we want:
