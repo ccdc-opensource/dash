@@ -5,8 +5,6 @@
 ! - filename (this is now done partially by 'FNAME', which is also used as a dummy)
 
 ! NoData is regularly set to .FALSE. but is it ever set to .TRUE.?
-! Length of SDIFile/SDIFileName inconsistent (especially suspect: Pawley.for around line 1326/1273
-! length was 255, is now 80)
 ! Many bugs when selecting space group
 
       MODULE VARIABLES
@@ -40,10 +38,6 @@
       COMMON / EXTDIR / INSTDIR
 
 !C>> File information; Names of files used by DASH For I/O
-!O      CHARACTER(LEN = MaxPathLength) :: DashRawFile
-!O      CHARACTER(LEN = MaxPathLength) :: DashHcvFile
-!O      CHARACTER(LEN = MaxPathLength) :: DashPikFile
-!O      CHARACTER(LEN = MaxPathLength) :: DashTicFile
       CHARACTER(LEN = 80) :: DashRawFile
       CHARACTER(LEN = 80) :: DashHcvFile
       CHARACTER(LEN = 80) :: DashPikFile
