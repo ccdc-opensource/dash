@@ -3,12 +3,12 @@
 !
 ! JvdS The following global variables seem to be needed:
 !
-! - start of profile (to indicate range)
-! - end  of profile
 ! - filename (this is now done partially by 'FNAME', which is also used as a dummy)
 
 ! NoData is regularly set to .FALSE. but is it ever set to .TRUE.?
-
+!
+! The declarations have now been rewritten in a format SPAG can understand
+!
       MODULE VARIABLES
 
       USE WINTERACTER
@@ -17,13 +17,13 @@
 !
       IMPLICIT NONE
 !
-      LOGICAL                       :: SAVEF
+      LOGICAL               :: SAVEF
       DATA SAVEF / .FALSE. / ! File needs saving
 
       INTEGER MaxPathLength
       PARAMETER (MaxPathLength = 255)
 
-      LOGICAL               ::    PLOTT
+      LOGICAL               :: PLOTT
       DATA PLOTT / .FALSE. / ! Graphic plotted?
 
       CHARACTER(MaxPathLength) ::  FNAME
@@ -35,7 +35,7 @@
 
       CHARACTER(21)            ::  SPACEGROUPS
       DATA SPACEGROUPS / 'SpaceGroupSymbols.dat' / ! Table name
-      CHARACTER               ::  DIRSPACER
+      CHARACTER                ::  DIRSPACER
       DATA DIRSPACER / '\' / ! Windows spacer
       CHARACTER(8)             ::  CONFIG
       DATA CONFIG / 'Dash.cfg' /
@@ -46,7 +46,7 @@
       CHARACTER(MaxPathLength) :: CONVEXE
       DATA CONVEXE / 'C:\Program Files\DASH\zmconv.exe' /
 
-      CHARACTER(20)           ::  VIEWARG
+      CHARACTER(20)            ::  VIEWARG
       DATA VIEWARG / '' /
       
       LOGICAL ViewOn
@@ -105,6 +105,13 @@
 
       LOGICAL AutoLocalMinimisation
 ! When set, each run in a multi run ends with a local minimisation
+
+      LOGICAL ConnectPointsObs
+! .TRUE. = when drawing the observed profile, the data points are joined by lines
+
+      REAL DefaultMaxResolution
+! The maximum resolution cut-off, in Angstrom, set as default when a new powder pattern is read in.
+
 
       END MODULE VARIABLES
 !
