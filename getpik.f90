@@ -13,9 +13,9 @@
 
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
 
-      INTEGER         NLGREF, IREFH
+      INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
+      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
 
       INTEGER         NATOM
       REAL                   X

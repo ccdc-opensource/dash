@@ -371,7 +371,7 @@
           CALL ILocateString(line,isst,ised)
           DashDslFile(1:80) = line(isst:isst+79)
           DslExists = .TRUE.
-        CASE ('cel')
+        CASE ('cel') ! Cell parameters
           DO I = 1, 6
             CALL INextReal(line,CellPar(i))
           ENDDO

@@ -19,9 +19,9 @@
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
 
-      INTEGER         NLGREF, IREFH
+      INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
+      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
 
       REAL              AIOBS,         AICALC
       COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
