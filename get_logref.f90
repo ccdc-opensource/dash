@@ -90,21 +90,28 @@
           DO IR = 1, NumOfRef
             K_ = iHKL(2,IR)
             K_m = 2*(K_/2)
-            LOGREF(1,IR) = K_.EQ.K_m ! k=2n
+            LOGREF(1,IR) = K_.EQ.K_m ! k = 2n
           ENDDO
         CASE (44,50,61,67,116,176,298)         ! P 1 c 1, C 1 c 1, P 1 2/c 1, C 1 21/c 1, C 2 2 21
           NLGREF = 1                           ! C m c 21, C m c m,
           DO IR = 1, NumOfRef
             L_ = iHKL(3,IR)
             L_m = 2*(L_/2)
-            LOGREF(1,IR) = (L_.EQ.L_m) ! l=2n
+            LOGREF(1,IR) = (L_.EQ.L_m) ! l = 2n
+          ENDDO
+        CASE (62)                              ! P 1 2/n 1
+          NLGREF = 1
+          DO IR = 1, NumOfRef
+            HPL = iHKL(1,IR) + iHKL(3,IR)
+            HPLm = 2*(HPL/2)
+            LOGREF(1,IR) = (HPL.EQ.HPLm) ! h+l = 2n
           ENDDO
         CASE (64,304)                          ! P 1 21/c 1, C m c a
           NLGREF = 1
           DO IR = 1, NumOfRef
             KPL = iHKL(2,IR) + iHKL(3,IR)
             KPLm = 2*(KPL/2)
-            LOGREF(1,IR) = KPL.EQ.KPLm ! k+l=2n
+            LOGREF(1,IR) = KPL.EQ.KPLm ! k+l = 2n
           ENDDO
         CASE (65)                              ! P 1 21/n 1
           NLGREF = 1
@@ -118,21 +125,21 @@
           DO IR = 1, NumOfRef
             HPK = iHKL(1,IR) + iHKL(2,IR)
             HPKm = 2*(HPK/2)
-            LOGREF(1,IR) = HPK.EQ.HPKm ! h+k=2n
+            LOGREF(1,IR) = HPK.EQ.HPKm ! h+k = 2n
           ENDDO
         CASE (52,69)                           ! I 1 a 1, I 1 2/a 1
           NLGREF = 1
           DO IR = 1, NumOfRef
             H_ = iHKL(1,IR)
             H_m = 2*(H_/2)
-            LOGREF(1,IR) = (H_.EQ.H_m) ! h=2n
+            LOGREF(1,IR) = (H_.EQ.H_m) ! h = 2n
           ENDDO
         CASE (112)                             ! P 21 21 2
           NLGREF = 1
           DO IR = 1, NumOfRef
             HPK = iHKL(1,IR) + iHKL(2,IR)
             HPKm = 2*(HPK/2)
-            LOGREF(1,IR) = (HPK.EQ.HPKm) ! h+k=2n
+            LOGREF(1,IR) = (HPK.EQ.HPKm) ! h+k = 2n
           ENDDO
         CASE (115,290)                         ! P21 21 21, P b c a
           NLGREF = 4
@@ -153,10 +160,10 @@
             L_ = iHKL(3,IR)
             H_m = 2*(H_/2)
             L_m = 2*(L_/2)
-            LOGREF(1,IR) = (H_.EQ.H_m) .AND. (L_.EQ.L_m) ! h = 2n  ,l = 2n
-            LOGREF(2,IR) = (H_.EQ.H_m) .AND. (L_.NE.L_m) ! h = 2n  ,l = 2n+1
-            LOGREF(3,IR) = (H_.NE.H_m) .AND. (L_.EQ.L_m) ! h = 2n+1,l = 2n
-            LOGREF(4,IR) = (H_.NE.H_m) .AND. (L_.NE.L_m) ! h = 2n+1,l = 2n+1
+            LOGREF(1,IR) = (H_.EQ.H_m) .AND. (L_.EQ.L_m) ! h = 2n  , l = 2n
+            LOGREF(2,IR) = (H_.EQ.H_m) .AND. (L_.NE.L_m) ! h = 2n  , l = 2n+1
+            LOGREF(3,IR) = (H_.NE.H_m) .AND. (L_.EQ.L_m) ! h = 2n+1, l = 2n
+            LOGREF(4,IR) = (H_.NE.H_m) .AND. (L_.NE.L_m) ! h = 2n+1, l = 2n+1
           ENDDO
         CASE (164,284)                         ! P n a 21, P b c n
           NLGREF = 4
@@ -165,10 +172,10 @@
             L_ = iHKL(3,IR)
             HPKm = 2*(HPK/2)
             L_m = 2*(L_/2)
-            LOGREF(1,IR) = (HPK.EQ.HPKm) .AND. (L_.EQ.L_m) ! h+k = 2n,  l = 2n
-            LOGREF(2,IR) = (HPK.EQ.HPKm) .AND. (L_.NE.L_m) ! h+k = 2n,  l = 2n+1
-            LOGREF(3,IR) = (HPK.NE.HPKm) .AND. (L_.EQ.L_m) ! h+k = 2n+1,l = 2n
-            LOGREF(4,IR) = (HPK.NE.HPKm) .AND. (L_.NE.L_m) ! h+k = 2n+1,l = 2n+1
+            LOGREF(1,IR) = (HPK.EQ.HPKm) .AND. (L_.EQ.L_m) ! h+k = 2n,   l = 2n
+            LOGREF(2,IR) = (HPK.EQ.HPKm) .AND. (L_.NE.L_m) ! h+k = 2n,   l = 2n+1
+            LOGREF(3,IR) = (HPK.NE.HPKm) .AND. (L_.EQ.L_m) ! h+k = 2n+1, l = 2n
+            LOGREF(4,IR) = (HPK.NE.HPKm) .AND. (L_.NE.L_m) ! h+k = 2n+1, l = 2n+1
           ENDDO
         CASE (212)                             ! F d d 2
           NLGREF = 4

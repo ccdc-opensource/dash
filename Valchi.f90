@@ -54,7 +54,7 @@
       COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
 
       REAL, EXTERNAL :: FFCALC_001, FFCALC_002, FFCALC_039, FFCALC_040, FFCALC_044, FFCALC_050, &
-                        FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061, FFCALC_064, FFCALC_065
+                        FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061, FFCALC_062, FFCALC_064, FFCALC_065
       REAL, EXTERNAL :: FFCALC_066, FFCALC_067, FFCALC_069, FFCALC_112, FFCALC_115, FFCALC_116, &
                         FFCALC_143, FFCALC_164, FFCALC_176, FFCALC_212, FFCALC_266, FFCALC_269
       REAL, EXTERNAL :: FFCALC_284, FFCALC_290, FFCALC_292, FFCALC_298, FFCALC_304, FFCALC_356, &
@@ -115,6 +115,10 @@
           CASE (61)            ! P 1 2/c 1
             DO IR = 1, NumOfRef
               AICALC(IR) = FFCALC_061(IR)   
+            ENDDO
+          CASE (62)            ! P 1 2/n 1
+            DO IR = 1, NumOfRef
+              AICALC(IR) = FFCALC_062(IR)   
             ENDDO
           CASE (64)            ! P 1 21/c 1
             DO IR = 1, NumOfRef
