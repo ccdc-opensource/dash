@@ -930,7 +930,7 @@
       INTEGER i, iFrg, iParam
       REAL Damping
 
-      Damping = 0.01
+      Damping = 0.1
       iParam = 1
       DO iFrg = 1, nFrag
         ! Translations
@@ -979,7 +979,7 @@
         DO i = 2, natoms(iFrg)
           IF (RR_ioptb(i,iFrg) .EQ. 1) THEN
             RR_Params(iParam) = RR_blen(i,iFrg)
-            RR_InitSteps(iParam) = 5.0 * Damping
+            RR_InitSteps(iParam) = 0.05 * Damping
             iParam = iParam + 1
           ENDIF
         ENDDO
@@ -997,7 +997,7 @@
         DO i = 4, natoms(iFrg)
           IF (RR_ioptt(i,iFrg) .EQ. 1) THEN
             RR_Params(iParam) = RR_bet(i,iFrg)
-            RR_InitSteps(iParam) = 0.05 * Damping
+            RR_InitSteps(iParam) = 5.0 * Damping
             iParam = iParam + 1
           ENDIF
         ENDDO
