@@ -74,7 +74,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt /winapp
-# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /check:bounds /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /traceback /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
+# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /check:bounds /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:0 /traceback /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
 # SUBTRACT F90 /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /MTd /W4 /Gm /GX /ZI /O2 /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
@@ -104,6 +104,7 @@ LINK32=link.exe
 SOURCE=.\Align.f90
 DEP_F90_ALIGN=\
 	".\Debug\ATMVAR.MOD"\
+	".\Debug\SOLVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -160,6 +161,7 @@ DEP_F90_CCSLM=\
 SOURCE=.\Chi_sq_plot.F90
 DEP_F90_CHI_S=\
 	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
 	".\params.inc"\
 	".\POLY_COLOURS.INC"\
 	".\Variables.mod"\
@@ -276,7 +278,6 @@ SOURCE=.\Fcn.f90
 SOURCE=.\Ffcalc.f90
 DEP_F90_FFCAL=\
 	".\Debug\REFVAR.MOD"\
-	".\params.inc"\
 	".\SGinc\ffcalctop.inc"\
 	
 # End Source File
@@ -286,7 +287,6 @@ SOURCE=.\Fortic.f90
 DEP_F90_FORTI=\
 	".\Debug\REFVAR.MOD"\
 	".\params.inc"\
-	".\SGinc\ffcalctop.inc"\
 	
 # End Source File
 # Begin Source File
@@ -335,6 +335,7 @@ SOURCE=.\Init_Routines.f90
 DEP_F90_INIT_=\
 	".\Debug\PO_VAR.mod"\
 	".\Debug\PRJVAR.MOD"\
+	".\Debug\SOLVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -415,6 +416,7 @@ SOURCE=.\Mag.f90
 SOURCE=.\Main_Field_Changed_Routines.f90
 DEP_F90_MAIN_=\
 	".\Debug\DICVAR.mod"\
+	".\Debug\SOLVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
@@ -463,6 +465,7 @@ DEP_F90_MULTIP=\
 
 SOURCE=.\MultiRun.f90
 DEP_F90_MULTIR=\
+	".\Debug\SOLVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\Variables.mod"\
@@ -531,6 +534,7 @@ DEP_F90_PF_SI=\
 
 SOURCE=.\plot_test.F90
 DEP_F90_PLOT_=\
+	".\Debug\SOLVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\POLY_COLOURS.INC"\
@@ -597,10 +601,10 @@ DEP_F90_PROFI=\
 
 SOURCE=.\ProjectSave.f90
 DEP_F90_PROJE=\
-	".\Debug\ATMVAR.MOD"\
 	".\Debug\PO_VAR.mod"\
 	".\Debug\PRJVAR.MOD"\
 	".\Debug\REFVAR.MOD"\
+	".\Debug\SOLVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -628,6 +632,8 @@ SOURCE=.\Res2Mol2.f90
 DEP_F90_RES2M=\
 	".\Debug\ATMVAR.MOD"\
 	".\Debug\SAMVAR.MOD"\
+	".\Debug\ZMVAR.MOD"\
+	".\Lattice.inc"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -676,6 +682,7 @@ DEP_F90_SA_DI=\
 	".\Debug\SAMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
 	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -718,6 +725,7 @@ DEP_F90_SA_SO=\
 SOURCE=.\SA_structure_output.f90
 DEP_F90_SA_ST=\
 	".\Debug\ATMVAR.MOD"\
+	".\Debug\SOLVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -731,6 +739,7 @@ DEP_F90_SA_ST=\
 
 SOURCE=.\SA_summary.f90
 DEP_F90_SA_SU=\
+	".\Debug\SOLVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
@@ -753,6 +762,10 @@ SOURCE=.\SAMVAR.f90
 # Begin Source File
 
 SOURCE=.\SGDecode.f90
+# End Source File
+# Begin Source File
+
+SOURCE=.\SOLVAR.f90
 # End Source File
 # Begin Source File
 
@@ -792,6 +805,7 @@ DEP_F90_TSA_S=\
 SOURCE=.\tSA_simplex.f90
 DEP_F90_TSA_SI=\
 	".\Debug\ATMVAR.MOD"\
+	".\Debug\SOLVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\Variables.mod"\
@@ -804,6 +818,7 @@ SOURCE=.\tSA_subs.f90
 DEP_F90_TSA_SU=\
 	".\Debug\ATMVAR.MOD"\
 	".\Debug\PO_VAR.mod"\
+	".\Debug\SOLVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\Lattice.inc"\
