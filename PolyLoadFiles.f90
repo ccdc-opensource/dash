@@ -1286,72 +1286,8 @@
       ELSE
 ! If we are here, the .xye file didn't contain the wavelength
         NoWavelengthInXYE = .TRUE.
-!U        CALL PushActiveWindowID
-!U        CALL WDialogLoad(IDD_XYE)
-!U        CALL WDialogSelect(IDD_XYE)
-!U        CALL WDialogShow(-1,-1,IDOK,SemiModeless)
-!U        OK = .FALSE.
-!U        DO WHILE (.TRUE.)
-!U          CALL GetEvent
-!U          SELECT CASE (EventType)
-!U            CASE (PushButton)
-!U              SELECT CASE (EventInfo%VALUE1)
-!U                CASE (IDOK)
-!U                  OK = .TRUE.
-!U                  CALL WDialogGetReal(IDF_wavelength1,Lambda1)
-!U                  GOTO 11
-!U                CASE (IDCANCEL)
-!U                  OK = .FALSE.
-!U                  GOTO 11
-!U              END SELECT
-!U            CASE (FieldChanged)
-!U              SELECT CASE (EventInfo%VALUE1)
-!U                CASE (IDF_Wavelength_Menu) ! Wavelength menu selection
-!U                  CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
-!U                  Lambda1 = FnWavelengthOfMenuOption(IRadSelection)
-!U                  CALL WDialogPutReal(IDF_wavelength1,Lambda1)
-!U                CASE (IDF_wavelength1)
-!U                  ! Do nothing 
-!U              END SELECT
-!U          END SELECT
-!U        ENDDO
-!U 11     CALL WDialogSelect(IDD_XYE)
-!U        CALL WDialogUnload
-!U        CALL PopActiveWindowID
-!U        CLOSE(10)
-!U        OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-!U        OPEN(UNIT=64,FILE='TempFile.xye',ERR=12)
-!U        GOTO 13
-!U  12    CONTINUE
-!U        CALL ErrorMessage('Error: no changes made.')
-!U        CLOSE(64)
-!U        OK = .FALSE.
-!U  13    CONTINUE
-!U        IF (OK) THEN
-!U! This simply assumes that it was a valid .xye file
-!U          WRITE(64,'(F9.5)') Lambda1
-!U! Read a line from the original file
-!U  14      READ(UNIT=10,FMT='(A)',ERR=12,END=15) Cline
-!U! Write the trimmed version to another file          
-!U          WRITE(64,'(A)') Cline(1:LEN_TRIM(Cline))
-!U          GOTO 14
-!U  15      CONTINUE ! EoF
-!U          CLOSE(64)
-!U          CLOSE(10)
-!U! Delete old .xye file
-!U          CALL IOsDeleteFile(TheFileName)
-!U! Move temp file to old .xye
-!U          CALL IOsRenameFile('TempFile.xye',TheFileName)
-!U          OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-!U          I = 1
-!U! Check if wavelength available on very first line
-!U          READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
-!U          IF (GetNumOfColumns(Cline) .NE. 1) THEN
-            CLOSE(10)
-            OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-!U            GOTO 12
-!U          ENDIF
-!U        ENDIF
+        CLOSE(10)
+        OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
       ENDIF
 ! Modified to handle files without esds - used to read in YOBS as the esd
  10   READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
