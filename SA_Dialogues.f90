@@ -1484,18 +1484,15 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER         nvar, ns, nt, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
-
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
-
-      REAL            T0, RT
-      COMMON /saparl/ T0, RT
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
       COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  
@@ -1504,8 +1501,8 @@
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       LOGICAL, EXTERNAL :: NearlyEqual
       REAL    xtem
-      INTEGER NMOVES, IFCOl, IFRow, ICHK
-      INTEGER tMaxRuns, I
+      INTEGER IFCOl, IFRow, ICHK
+      INTEGER I
       INTEGER iRow, iStatus
       INTEGER iFrg
       INTEGER kk, iOption, jFrg
@@ -1541,17 +1538,7 @@
               ENDIF
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
-              CALL WDialogSelect(IDD_SA_input3_2)
-              CALL WDialogPutReal(IDF_SA_T0, T0, '(F7.2)')
-              CALL WDialogPutReal(IDF_SA_Tredrate, RT, '(F6.3)')
-              NS = 20
-              CALL WDialogPutInteger(IDF_SA_NS, NS)
-              NT = 25
-              CALL WDialogPutInteger(IDF_SA_NT, NT)
-              NMoves = NT * NS * NVAR
-              CALL WDialogPutInteger(IDF_SA_Moves, NMoves)
-              CALL WDialogGetInteger(IDF_SA_MaxRepeats, tMaxRuns)
-              CALL WizardWindowShow(IDD_SA_input3_2)
+              CALL ShowWithWizardWindowSASettings
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_Relabel)
@@ -1687,6 +1674,39 @@
 !
 !*****************************************************************************
 !
+! This window needs some initialisation and can be called from more than one location
+! now that we can load old solutions.
+      SUBROUTINE ShowWithWizardWindowSASettings
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INTEGER NMoves
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input3_2)
+      CALL WDialogPutReal(IDF_SA_T0, T0, '(F7.2)')
+      CALL WDialogPutReal(IDF_SA_Tredrate, RT, '(F6.3)')
+      CALL WDialogPutInteger(IDF_SA_NS, NS)
+      CALL WDialogPutInteger(IDF_SA_NT, NT)
+      NMoves = NT * NS * NVAR
+      CALL WDialogPutInteger(IDF_SA_Moves, NMoves)
+      CALL WizardWindowShow(IDD_SA_input3_2)
+      CALL SelectMode(ID_Structure_Solution_Mode)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE ShowWithWizardWindowSASettings      
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardWindowSASettings
 
       USE WINTERACTER
@@ -1703,6 +1723,13 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      LOGICAL           Resume_SA
+      COMMON /RESUMESA/ Resume_SA
+
       INTEGER, EXTERNAL :: WriteSAParametersToFile
       INTEGER IHANDLE, KPOS
 
@@ -1715,11 +1742,18 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the 2nd window
-            CALL WizardWindowShow(IDD_SA_Modal_input2)
+              CALL WizardWindowShow(IDD_SA_Modal_input2)
             CASE (IDB_SA3_finish) ! 'Solve >' button
 ! We've finished the SA input
-              CALL WizardWindowHide
-              CALL BeginSA
+              ! It is possible to click "Resume SA" after having completed all runs and to
+              ! forget to specify more runs. That way, we will already have completed all runs.
+              CALL WDialogGetInteger(IDF_SA_MaxRepeats, MaxRuns)
+              IF (Resume_SA .AND. (NumOf_SA_Runs .GE. MaxRuns)) THEN
+                CALL InfoMessage("Number of requested runs already completed: please increase number of runs.")
+              ELSE
+                CALL WizardWindowHide
+                CALL BeginSA
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDF_PrintSA)

@@ -180,6 +180,9 @@
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
+      
+      LOGICAL           Resume_SA
+      COMMON /RESUMESA/ Resume_SA
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_HydrogenTreatment
       REAL, EXTERNAL :: Degrees2Radians
@@ -364,6 +367,7 @@
       ENDDO
 ! Tick "Randomise initial values"
       CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .TRUE.)
+      Resume_SA = .FALSE.
       CALL PopActiveWindowID
 
       END SUBROUTINE SA_Parameter_Set
