@@ -1,4 +1,4 @@
-! Winteracter module created : 01/Aug/2001 14:51:10
+! Winteracter module created : 08/Aug/2001 16:55:19
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -15,7 +15,6 @@
           INTEGER, PARAMETER :: IDD_Plot_Option_Dialog          =   103
           INTEGER, PARAMETER :: IDF_SymbolSize_Label            =  1002
           INTEGER, PARAMETER :: ID_get_peak_positions           = 40017
-          INTEGER, PARAMETER :: IDF_dismiss_plot_options        =  1003
           INTEGER, PARAMETER :: IDF_Axes_Colour                 =  1004
           INTEGER, PARAMETER :: IDF_GROUP4                      =  1005
           INTEGER, PARAMETER :: IDF_SlimLabel                   =  1006
@@ -179,16 +178,10 @@
           INTEGER, PARAMETER :: IDF_PW_Space_Group_Group        =  1219
           INTEGER, PARAMETER :: IDF_PW_a_latt_label             =  1220
           INTEGER, PARAMETER :: IDF_PW_alp_latt_label           =  1221
-          INTEGER, PARAMETER :: IDF_PW_a_latt                   =  1222
-          INTEGER, PARAMETER :: IDF_PW_alp_latt                 =  1223
           INTEGER, PARAMETER :: IDF_PW_b_latt_label             =  1224
           INTEGER, PARAMETER :: IDF_PW_bet_latt_label           =  1225
-          INTEGER, PARAMETER :: IDF_PW_b_latt                   =  1226
-          INTEGER, PARAMETER :: IDF_PW_bet_latt                 =  1227
           INTEGER, PARAMETER :: IDF_PW_c_latt_label             =  1228
           INTEGER, PARAMETER :: IDF_PW_gam_latt_label           =  1229
-          INTEGER, PARAMETER :: IDF_PW_c_latt                   =  1230
-          INTEGER, PARAMETER :: IDF_PW_gam_latt                 =  1231
           INTEGER, PARAMETER :: IDF_PW_Crystal_System_Menu      =  1232
           INTEGER, PARAMETER :: IDF_PW_Space_Group_Menu         =  1233
           INTEGER, PARAMETER :: IDF_PW_Source_Group             =  1234
@@ -493,7 +486,7 @@
           INTEGER, PARAMETER :: IDF_Indexing_Lambda             =  1324
           INTEGER, PARAMETER :: IDF_Indexing_Lamda_label        =  1325
           INTEGER, PARAMETER :: IDF_Indexing_Max                =  1326
-          INTEGER, PARAMETER :: IDF_Indexng_MinVol              =  1327
+          INTEGER, PARAMETER :: IDF_Indexing_MinVol             =  1003
           INTEGER, PARAMETER :: IDF_Indexing_MaxVol             =  1328
           INTEGER, PARAMETER :: IDF_Indexing_MinLen             =  1329
           INTEGER, PARAMETER :: IDF_Indexing_MaxLen             =  1330
@@ -504,7 +497,6 @@
           INTEGER, PARAMETER :: IDF_Indexing_CellRange          =  1335
           INTEGER, PARAMETER :: IDF_Indexing_CellAngle          =  1336
           INTEGER, PARAMETER :: ID_Indexing_Create              =  1337
-          INTEGER, PARAMETER :: ID_Indexing_Cancel              =  1338
           INTEGER, PARAMETER :: IDF_Indexing_chemgroup          =  1339
           INTEGER, PARAMETER :: IDF_Indexing_Misc               =  1340
           INTEGER, PARAMETER :: IDF_Indexing_Density_Label      =  1341
@@ -535,11 +527,6 @@
           INTEGER, PARAMETER :: IDF_Background_Accept           =  1362
           INTEGER, PARAMETER :: IDF_Background_Apply            =  1363
           INTEGER, PARAMETER :: IDF_background_check            =  1364
-          INTEGER, PARAMETER :: ID_Fit_data_request             =   156
-          INTEGER, PARAMETER :: IDF_Fit_Now                     =  1366
-          INTEGER, PARAMETER :: IDF_Fit_later                   =  1367
-          INTEGER, PARAMETER :: IDF_Fit_data_label              =  1365
-          INTEGER, PARAMETER :: IDF_Fit_data_label2             =  1368
           INTEGER, PARAMETER :: IDD_Pawley_ErrorLog             =   157
           INTEGER, PARAMETER :: IDF_Pawley_ErrorLog_Intro       =  1369
           INTEGER, PARAMETER :: IDF_Pawley_ErrorLog_Intro2      =  1370
