@@ -705,9 +705,6 @@
                        tXPGMIN,    tXPGMAX,    tYPGMIN,    tYPGMAX,      &
                        tXPGMINOLD, tXPGMAXOLD, tYPGMINOLD, tYPGMAXOLD
       INTEGER          tIPMIN, tIPMAX, tiStart, tiStop, tnPoints
-      REAL tYOBIN(1:MOBS)
-      INTEGER I, Window, J
-      REAL Iavg
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
