@@ -1,4 +1,4 @@
-! Winteracter module created : 20/Apr/2004 16:55:59
+! Winteracter module created : 20/Apr/2004 17:22:34
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -694,7 +694,6 @@
           INTEGER, PARAMETER :: IDF_IniOrEuler                  =  1157
           INTEGER, PARAMETER :: IDF_IniOrQuater                 =  1298
           INTEGER, PARAMETER :: IDF_AtomNr1                     =  1548
-          INTEGER, PARAMETER :: IDB_ViewRot                     =  1488
           INTEGER, PARAMETER :: IDF_a2                          =  1147
           INTEGER, PARAMETER :: IDF_b2                          =  1148
           INTEGER, PARAMETER :: IDF_c2                          =  1219

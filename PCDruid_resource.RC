@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 20/Apr/2004 16:55:59
+// Modified : 20/Apr/2004 17:22:34
 //
 ///////////////////////////////////////////////////
 //
@@ -707,7 +707,6 @@
 #define IDF_IniOrEuler                   1157
 #define IDF_IniOrQuater                  1298
 #define IDF_AtomNr1                      1548
-#define IDB_ViewRot                      1488
 #define IDF_a2                           1147
 #define IDF_b2                           1148
 #define IDF_c2                           1219
@@ -2724,7 +2723,6 @@ BEGIN
     CONTROL "0.0",IDF_Alpha,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   80,  202,   38,   14
     CONTROL "0.0",IDF_Beta,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  123,  202,   38,   14
     CONTROL "0.0",IDF_Gamma,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  166,  202,   38,   14
-    CONTROL "View2",IDB_ViewRot,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,  250,   40,   14
     CONTROL "0.0",IDF_a2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   97,  182,   30,   14
     CONTROL "0.0",IDF_b2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  133,  182,   30,   14
     CONTROL "1.0000",IDF_c2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  169,  182,   30,   14
