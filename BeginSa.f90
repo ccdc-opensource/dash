@@ -71,7 +71,6 @@
       DO WHILE (WinfoWindow(WindowState) .EQ. 0)
         CALL IOsWait(50) ! wait half a sec
       ENDDO
-      CALL WDialogSelect(IDD_SA_Action1)
       CALL WizardWindowHide
 !ep SASummary presents a grid summarising results of the Simulated
 !   Annealing runs.  

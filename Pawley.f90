@@ -274,7 +274,6 @@
             CASE (IDB_PawRef_Save)
               IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
             CASE (IDF_PawRef_Solve)
-              CALL WizardWindowHide
 ! Emulate loading .SDI file for next window
               CALL WDialogSelect(IDD_SAW_Page1)
 ! If FromPawleyFit read in the HCV, PIK and TIC files from POLYP

@@ -14,8 +14,6 @@
 
       IMPLICIT NONE 
            
-      INCLUDE 'DialogPosCmn.inc'
-
       CALL UpdateZmatrixSelection
       CALL WizardWindowShow(IDD_SAW_Page1)
 ! @@ Enable or disable the "Next" button
@@ -89,7 +87,7 @@
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL SA_Parameter_Set
-              CALL WizardWindowBackNext(IDD_SA_input2)
+              CALL WizardWindowShow(IDD_SA_input2)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_SA_Project_Browse)
@@ -160,8 +158,6 @@
 
       IMPLICIT NONE      
 
-      INCLUDE 'DialogPosCmn.inc'
-
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
 
@@ -190,7 +186,6 @@
 ! We are now on window number 2
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_input2)
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       SELECT CASE (EventType)
 ! Interact with the main window and look at the Pawley refinement...
         CASE (PushButton)
@@ -202,11 +197,10 @@
                 IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
               ENDIF
               IF (.NOT. LimsChanged) THEN
-                CALL WizardWindowBackNext(IDD_SAW_Page1)
+                CALL WizardWindowShow(IDD_SAW_Page1)
               ENDIF
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
-              CALL WizardWindowHide
               CALL WDialogSelect(IDD_SA_input3)
               T0 = 0.0
               RPOS = T0
@@ -230,7 +224,7 @@
               CALL WDialogPutTrackbar(IDF_SA_NT_trackbar,IPOS)
               NMoves = NT * NS * NVAR
               CALL WDialogPutInteger(IDF_SA_Moves,NMoves)
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+              CALL WizardWindowShow(IDD_SA_input3)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
           END SELECT
@@ -312,8 +306,6 @@
 
       IMPLICIT NONE      
 
-      INCLUDE 'DialogPosCmn.inc'
-      
       DOUBLE PRECISION T0, rt
       COMMON /saparl/  T0, rt
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
@@ -334,7 +326,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the 2nd window
-              CALL WizardWindowBackNext(IDD_SA_input2)
+              CALL WizardWindowShow(IDD_SA_input2)
             CASE (IDB_SA3_finish) ! 'Solve >' button
 ! We've finished the SA input
               CALL WizardWindowHide
