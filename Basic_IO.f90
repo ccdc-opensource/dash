@@ -553,7 +553,7 @@
 
 ! Check if stack empty
       IF (WinStackPtr .EQ. 25) THEN
-        CALL DebugErrorMessage('Serious programming bug: WinStack empty.')
+        CALL DebugErrorMessage('WinStack empty.')
         RETURN
       ENDIF
 ! If not, Inc(StackPtr)

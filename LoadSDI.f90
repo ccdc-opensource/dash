@@ -76,7 +76,7 @@
         RETURN
       ENDIF
 ! Disable Pawley refinement button if we are 'PastPawley'
-      IF (PastPawley) CALL SetModeMenuState(-1,-1)
+      IF (PastPawley) CALL SetModeMenuState(-1,-1,-1)
       STATBARSTR(1) = FNAME
       CALL WindowOutStatusBar(1,STATBARSTR(1))
 ! update the file name of the project in the SA pop up
@@ -88,17 +88,28 @@
 !
       SUBROUTINE SDIFileLoad(SDIFile)
 
+      USE WINTERACTER
+      USE DRUID_HEADER
       USE VARIABLES
+      USE REFVAR
 
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) ::  SDIFile
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
       CHARACTER(LEN = MaxPathLength) :: line
 
@@ -129,7 +140,7 @@
       DslExists = .FALSE.
       CALL Clear_PeakFitRanges
  10   line = ' '
-      READ(tFileHandle,'(A)',END=100) line
+      READ(tFileHandle,'(A)',END=100,ERR=999) line
       nl = LEN_TRIM(line)
       CALL ILowerCase(line(:nl))
       CALL INextString(line,keychar)
@@ -160,7 +171,7 @@
           DO I = 1, 6
             CALL INextReal(line,CellPar(i))
           ENDDO
-          CALL Upload_Cell_Constants()
+          CALL Upload_Cell_Constants
         CASE ('spa')
           CALL INextInteger(line,NumberSGTable)
 ! Set the crystal system
@@ -197,13 +208,25 @@
 ! enable the buttons,
       IF (.NOT. NoData) THEN
         IF (idsler .EQ. 0) THEN
-          CALL SetModeMenuState(0,1)
+          CALL SetModeMenuState(0,1,-1)
         ELSE
-          CALL SetModeMenuState(0,-1)
+          CALL SetModeMenuState(0,-1,-1)
         ENDIF
       ENDIF
+      CALL WDialogSelect(IDD_ViewPawley)
+      CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
+      CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
+      CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
+      CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
+      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NOBS)
+      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,NumOfRef)
+      CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
+      CALL Clear_SA
+      RETURN
+ 999  CALL ErrorMessage('Error reading .sdi file.')
+      CLOSE(tFileHandle) 
 
- 999  END SUBROUTINE SDIFileLoad
+      END SUBROUTINE SDIFileLoad
 !
 !*****************************************************************************
 !
@@ -266,9 +289,6 @@
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999                          
             PeakShapeSigma(2) = Temp
-            CALL WDialogSelect(IDD_ViewPawley)
-            CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
-            CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
           CASE ('gam') ! Gamma
 ! Gamma 1
             I = InfoError(1) ! reset the errors
@@ -281,9 +301,6 @@
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999                          
             PeakShapeGamma(2) = Temp
-            CALL WDialogSelect(IDD_ViewPawley)
-            CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
-            CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
           CASE ('asy') ! HMSL/HPSL asymmetry parameters
 
             CALL WDialogSelect(IDD_HPSL_info)
@@ -343,12 +360,11 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INTEGER iR, I, iLen, hFile
+      INTEGER iR, I, hFile
 
 ! Initialise to failure
       GETTIC = 1
       hFile = 31
-      iLen = LEN_TRIM(TheFileName)
       OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       NumOfRef = 0
       DO iR = 1, MaxRef
@@ -390,12 +406,12 @@
       INTEGER, EXTERNAL :: GetNumOfColumns
       INTEGER hFile
 
+      iErr = 1
       hFile = 121
       OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       KK = 0
       KKOR = 0
       MINCOR = 20
-      iErr = 1
       DO iR = 1, MFCSTO
         READ(hFile,2121,END=100,ERR=999) NLIN, LINE
    2121 FORMAT (Q,A)
@@ -469,10 +485,10 @@
       LOGICAL WrongValuesPresent
       INTEGER KTEM, hFile
 
-      WrongValuesPresent = .FALSE.
       iErr = 1
       hFile = 21
       OPEN (hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
+      WrongValuesPresent = .FALSE.
       NFITA = 0
       NOBS = 0
       DO I = 1, MOBS

@@ -32,7 +32,7 @@
       IF ((CurrentWizardWindow .EQ. IDD_PW_Page7) .OR.       &
           (CurrentWizardWindow .EQ. IDD_PW_Page8) .OR.       &
           (CurrentWizardWindow .EQ. IDD_PW_Page9)) RETURN
-      CALL SetModeMenuState(-1,1)
+      CALL SetModeMenuState(-1,1,0)
       CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
@@ -307,7 +307,6 @@
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
-              CALL SetModeMenuState(0,0)
 ! JCC Only change the setting if this is the second Pawley fit
               IF (NumPawleyRef .EQ. 1) THEN
                 CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
@@ -366,6 +365,8 @@
               CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
               CALL GETHCV(DashHcvFile,IER)
               CALL GETPIK(DashPikFile,IER)
+              CALL WDialogSelect(IDD_ExclRegions)
+              CALL WDialogHide
               CALL ShowWizardWindowZmatrices
             CASE (IDB_ExclRegions)
               CALL WDialogSelect(IDD_ExclRegions)
