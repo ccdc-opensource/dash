@@ -297,27 +297,32 @@
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
       VIEWARG = ''
-! In order to facilitate distributing an installed version of DASH on a CD together with
-! an installed version of Mercury: test if DASH was launched from the directory on the CD
-! and if Mercury is in the directory that we will burn onto the CD.
-! If it does, for now, assume that that is where we will get Mercury from: do not check the registry.
-! The reason for not checking the registry is, that that might come up with an old version of Mercury,
-! whereas we want to use the CD to show off the latest version.
-      MercuryExists = .FALSE.
-! First, check that the DASH installation directory is the directory we put on the CD.
-      IF (InstallationDirectory(3:LEN_TRIM(InstallationDirectory)) .EQ. '\CCDC\DASH 2.0\') THEN
-! Check if \CCDC\Mercury 1.1\Mercury.exe exists on this drive
-        VIEWEXE = InstallationDirectory(1:2)//'\CCDC\Mercury 1.1\Mercury.exe'
-        INQUIRE(FILE=VIEWEXE,EXIST=MercuryExists) 
-      ENDIF
-      IF (.NOT. MercuryExists) THEN
-        VIEWEXE = ''
-        CALL GetPathToMercuryFromRegistry
-      ENDIF
+
+!O! In order to facilitate distributing an installed version of DASH on a CD together with
+!O! an installed version of Mercury: test if DASH was launched from the directory on the CD
+!O! and if Mercury is in the directory that we will burn onto the CD.
+!O! If it does, for now, assume that that is where we will get Mercury from: do not check the registry.
+!O! The reason for not checking the registry is, that that might come up with an old version of Mercury,
+!O! whereas we want to use the CD to show off the latest version.
+!O      MercuryExists = .FALSE.
+!O! First, check that the DASH installation directory is the directory we put on the CD.
+!O      IF (InstallationDirectory(3:LEN_TRIM(InstallationDirectory)) .EQ. '\CCDC\DASH 2.0\') THEN
+!O! Check if \CCDC\Mercury 1.1\Mercury.exe exists on this drive
+!O        VIEWEXE = InstallationDirectory(1:2)//'\CCDC\Mercury 1.1\Mercury.exe'
+!O        INQUIRE(FILE=VIEWEXE,EXIST=MercuryExists) 
+!O      ENDIF
+!O      IF (.NOT. MercuryExists) THEN
+!O        VIEWEXE = ''
+!O        CALL GetPathToMercuryFromRegistry
+!O      ENDIF
+
+      VIEWEXE = ''
+      CALL GetPathToMercuryFromRegistry
       DO I = 0, maxfrg
         izmoid(0,I) = 0
         izmbid(0,I) = 0
       ENDDO
+      CALL Clear_ExclRegions
       CALL Clear_SA
       UseQuaternions = .TRUE.
 ! Initialise arrays to do with administration of open child windows
@@ -325,10 +330,10 @@
       ChildWinHandlerSet = .FALSE.
       InSA = .FALSE.
       DashRawFile = ' '
-      DashHcvFile = ' '
-      DashHklFile = ' '
-      DashPikFile = ' '
-      DashTicFile = ' '
+      DashHcvFile = 'polyp.hcv'
+      DashHklFile = 'polyp.hkl'
+      DashPikFile = 'polyp.pik'
+      DashTicFile = 'polyp.tic'
       UseConfigFile = .TRUE.
       IDCurrent_Cursor_Mode = ID_Peak_Fitting_Mode
       DataSetChange = 0
