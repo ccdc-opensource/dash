@@ -358,8 +358,10 @@
       INTEGER  pdbBond(1:MAXBND*maxfrg,1:2)
       INTEGER TotNumBonds, NumOfAtomsSoFar
       CHARACTER*4 LabelStr
+      CHARACTER*2 ColourStr
       CHARACTER*2 RunStr
       LOGICAL, EXTERNAL :: ChrIsLetter
+      INTEGER AtomLabelOption, AtomColourOption
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
@@ -431,34 +433,55 @@
           TotNumBonds = TotNumBonds + nbocry
         ENDIF
       ENDDO ! loop over z-matrices
+! Get atom label option from dialogue. Two options: 
+! 1. "Element symbol + solution number" (default)
+! 2. "Orignal atom labels"
+      CALL WDialogGetRadioButton(IDF_UseSolutionNr,AtomLabelOption)
+! Get atom colour option from dialogue. Two options: 
+! 1. "By solution number" (default)
+! 2. "By element"
+      CALL WDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
+! JvdS Oct 2001
+! Note that for the following code--which can colour an atom assigning a dummy element while retaining
+! the original atom label even if this contains the contradictory element symbol--relies
+! on the viewer reading .pdb files as specified on the .pdb file webpage. Sounds normal,
+! but it turns out that WebLabViewer doesn't do this. So, for this piece of code to work, we
+! really need Mercury.
+! That's not too much of a restriction, because WebLabViewer cannot cope with the overlaying atoms
+! anyway (it will recalculate bonds even when CONECT records are provided), so WebLabViewer
+! will always show a mess, irrespective of the exact contents of the .pdb file.
+! In short: works only with Mercury.
       iiact = 0
       TickedRunNr = 0
       DO RunNr = 1, SA_Run_Number
         CALL WGridGetCellCheckBox(IDF_SA_summary,3,RunNr,istatus)
         IF (istatus .EQ. 1) THEN
           TickedRunNr = TickedRunNr + 1
-          SELECT CASE(TickedRunNr)
-            CASE ( 1)
-              LabelStr = 'Co' ! Cobalt        Blue
-            CASE ( 2)
-              LabelStr = 'O'  ! Oxygen        Red
-            CASE ( 3)
-              LabelStr = 'S'  ! Sulphur       Yellow
-            CASE ( 4)
-              LabelStr = 'Cl' ! Chlorine      Green
-            CASE ( 5)
-              LabelStr = 'N'  ! Nitrogen      Light blue
-            CASE ( 6)
-              LabelStr = 'Br' ! Bromine       Brown
-            CASE ( 7)
-              LabelStr = 'I'  ! Iodine        Pink
-            CASE ( 8)
-              LabelStr = 'C'  ! Carbon        Grey
-            CASE ( 9)
-              LabelStr = 'H'  ! Hydrogen      White
-            CASE (10)
-              LabelStr = 'P'  ! Phosphorus
-          END SELECT
+! Note that elements are right-justified
+          IF (AtomColourOption .EQ. 1) THEN ! Colour by solution
+            SELECT CASE(TickedRunNr)
+              CASE ( 1)
+                ColourStr = 'Co' ! Cobalt        Blue
+              CASE ( 2)
+                ColourStr = ' O '  ! Oxygen        Red
+              CASE ( 3)
+                ColourStr = ' S '  ! Sulphur       Yellow
+              CASE ( 4)
+                ColourStr = 'Cl' ! Chlorine      Green
+              CASE ( 5)
+                ColourStr = ' N '  ! Nitrogen      Light blue
+              CASE ( 6)
+                ColourStr = 'Br' ! Bromine       Brown
+              CASE ( 7)
+                ColourStr = ' I '  ! Iodine        Pink
+              CASE ( 8)
+                ColourStr = ' C '  ! Carbon        Grey
+              CASE ( 9)
+                ColourStr = ' H '  ! Hydrogen      White
+              CASE (10)
+                ColourStr = ' P '  ! Phosphorus
+            END SELECT
+          ENDIF
           WRITE(RunStr,'(I2)') RunNr
           CALL StrClean(RunStr,ilen) ! Left justify
           LabelStr = LabelStr(1:LEN_TRIM(LabelStr))//RunStr
@@ -470,16 +493,20 @@
                 yc = pdbAtmCoords(2,i,ifrg,RunNr)
                 zc = pdbAtmCoords(3,i,ifrg,RunNr)
 ! Note that elements are right-justified
-! WebLab viewer even wants the elements in the atom names to be right justified.
-                IF (.NOT. ChrIsLetter(LabelStr(2:2))) THEN
-                  WRITE (65,1120) iiact, LabelStr(1:3), xc, yc, zc, &
-                                  occ(i,ifrg), tiso(i,ifrg), LabelStr(1:1)
- 1120             FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
-                ELSE
-                  WRITE (65,1130) iiact, LabelStr(1:4), xc, yc, zc, &
-                                  occ(i,ifrg), tiso(i,ifrg), LabelStr(1:2)
- 1130             FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+                IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
+                  IF (asym(i,ifrg)(2:2) .EQ. ' ') THEN
+                    ColourStr(1:2) = ' '//asym(i,ifrg)(1:1)
+                  ELSE
+                    ColourStr(1:2) = asym(i,ifrg)(1:2)
+                  ENDIF
                 ENDIF
+                IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
+                  LabelStr = asym(i,ifrg)(1:LEN_TRIM(asym(i,ifrg)))//RunStr
+                ELSE  ! Orignal atom labels
+                  LabelStr(1:4) = OriginalLabel(i,ifrg)(1:4)
+                ENDIF
+                WRITE (65,1120) iiact, LabelStr(1:4), xc, yc, zc, occ(i,ifrg), tiso(i,ifrg), ColourStr(1:2)
+ 1120           FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
               ENDDO ! loop over atoms
             ENDIF
           ENDDO ! loop over z-matrices
