@@ -1,10 +1,11 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_001(IR)
+      REAL FUNCTION FFCALC_001(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
+      REAL C3F, S3F, XCC, XSC, XCS, XSS, CCC, CSS, SCS, SSC, SCC, CSC, CCS, SSS
 ! Structure factor calculations for space group P1
 ! Loop is performed over the atoms in the asymmetric unit
       AFCAL = 0.
@@ -36,9 +37,11 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_002(IR)
+      REAL FUNCTION FFCALC_002(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      REAL C3F, S3F, CCC, CSS, SCS, SSC
 
 ! Structure factor calculations for space group P-1
 ! Loop is performed over the atoms in the asymmetric unit
@@ -61,7 +64,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_039(IR)
+      REAL FUNCTION FFCALC_039(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -94,7 +97,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_040(IR)
+      REAL FUNCTION FFCALC_040(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -118,7 +121,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_044(IR)
+      REAL FUNCTION FFCALC_044(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -151,7 +154,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_050(IR)
+      REAL FUNCTION FFCALC_050(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -184,7 +187,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_052(IR)
+      REAL FUNCTION FFCALC_052(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -217,7 +220,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_057(IR)
+      REAL FUNCTION FFCALC_057(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -245,7 +248,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_058(IR)
+      REAL FUNCTION FFCALC_058(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -266,7 +269,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_061(IR)
+      REAL FUNCTION FFCALC_061(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -294,7 +297,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_064(IR)
+      REAL FUNCTION FFCALC_064(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -322,7 +325,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_065(IR)
+      REAL FUNCTION FFCALC_065(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -350,7 +353,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_066(IR)
+      REAL FUNCTION FFCALC_066(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -379,7 +382,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_067(IR)
+      REAL FUNCTION FFCALC_067(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -407,7 +410,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_069(IR)
+      REAL FUNCTION FFCALC_069(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -435,7 +438,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_112(IR)
+      REAL FUNCTION FFCALC_112(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -464,7 +467,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_115(IR)
+      REAL FUNCTION FFCALC_115(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -503,7 +506,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_116(IR)
+      REAL FUNCTION FFCALC_116(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -532,7 +535,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_143(IR)
+      REAL FUNCTION FFCALC_143(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -571,7 +574,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_164(IR)
+      REAL FUNCTION FFCALC_164(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -610,7 +613,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_176(IR)
+      REAL FUNCTION FFCALC_176(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -639,7 +642,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_212(IR)
+      REAL FUNCTION FFCALC_212(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -699,7 +702,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_266(IR)
+      REAL FUNCTION FFCALC_266(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -733,7 +736,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_269(IR)
+      REAL FUNCTION FFCALC_269(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -767,7 +770,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_284(IR)
+      REAL FUNCTION FFCALC_284(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -801,7 +804,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_290(IR)
+      REAL FUNCTION FFCALC_290(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -835,7 +838,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_292(IR)
+      REAL FUNCTION FFCALC_292(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -869,7 +872,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_298(IR)
+      REAL FUNCTION FFCALC_298(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -895,7 +898,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_304(IR)
+      REAL FUNCTION FFCALC_304(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -921,7 +924,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_356(IR)
+      REAL FUNCTION FFCALC_356(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -951,7 +954,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_365(IR)
+      REAL FUNCTION FFCALC_365(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1037,7 +1040,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_369(IR)
+      REAL FUNCTION FFCALC_369(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1108,7 +1111,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_430(IR)
+      REAL FUNCTION FFCALC_430(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1140,7 +1143,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_431(IR)
+      REAL FUNCTION FFCALC_431(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1179,7 +1182,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_432(IR)
+      REAL FUNCTION FFCALC_432(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1208,7 +1211,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_433(IR)
+      REAL FUNCTION FFCALC_433(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1241,7 +1244,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_434(IR)
+      REAL FUNCTION FFCALC_434(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1271,7 +1274,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_435(IR)
+      REAL FUNCTION FFCALC_435(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1302,7 +1305,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_449(IR)
+      REAL FUNCTION FFCALC_449(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1345,7 +1348,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_451(IR)
+      REAL FUNCTION FFCALC_451(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1388,7 +1391,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_462(IR)
+      REAL FUNCTION FFCALC_462(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1417,7 +1420,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_468(IR)
+      REAL FUNCTION FFCALC_468(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1449,7 +1452,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_469(IR)
+      REAL FUNCTION FFCALC_469(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1475,7 +1478,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_471(IR)
+      REAL FUNCTION FFCALC_471(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1511,7 +1514,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_481(IR)
+      REAL FUNCTION FFCALC_481(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1554,7 +1557,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_483(IR)
+      REAL FUNCTION FFCALC_483(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1593,7 +1596,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_485(IR)
+      REAL FUNCTION FFCALC_485(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -1625,7 +1628,7 @@
 !
 !*****************************************************************************
 !
-      FUNCTION FFCALC_DEFAULT(IR)
+      REAL FUNCTION FFCALC_DEFAULT(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
