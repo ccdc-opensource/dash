@@ -156,10 +156,10 @@
       ! hence must be restored when the Rietveld window is closed.
       SA_PrefParExists = PrefParExists
       SA_PrefPars(1:3) = PrefPars(1:3)
-      CALL WDialogSelect(IDD_RR_PO_Dialog)
       IF (PrefParExists) THEN
         CALL WDialogFieldState(IDC_PO, Enabled)
         CALL WDialogFieldState(IDR_PO, Enabled)
+        CALL WDialogSelect(IDD_RR_PO_Dialog)
         CALL WDialogPutInteger(IDF_PO_a, NINT(PrefPars(1)))
         CALL WDialogPutInteger(IDF_PO_b, NINT(PrefPars(2)))
         CALL WDialogPutInteger(IDF_PO_c, NINT(PrefPars(3)))
@@ -167,6 +167,7 @@
       ELSE
         CALL WDialogFieldState(IDC_PO, Disabled)
         CALL WDialogFieldState(IDR_PO, Disabled)
+        CALL WDialogSelect(IDD_RR_PO_Dialog)
         CALL WDialogPutInteger(IDF_PO_a, 0)
         CALL WDialogPutInteger(IDF_PO_b, 0)
         CALL WDialogPutInteger(IDF_PO_c, 1)
