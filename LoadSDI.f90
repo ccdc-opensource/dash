@@ -95,6 +95,13 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
+      INCLUDE 'reflns.inc'
+
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
+      REAL WLGTH
+      EQUIVALENCE (WLGTH,ALAMBD(1,1))
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
@@ -207,6 +214,8 @@
       CALL WDialogPutReal(IDF_HMSL,   PeakShapeHMSL,     '(F10.4)')
       CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NOBS)
       CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,NumOfRef)
+      MAXK = NumOfRef
+      WLGTH = ALambda
       CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
       CALL Clear_SA
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
