@@ -589,7 +589,6 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
-      USE VARIABLES
       USE ZMVAR
       USE ATMVAR
       USE SOLVAR
@@ -649,7 +648,7 @@
       IF (WritePDBCommon(hFilePDB) .NE. 0) GOTO 999
 ! Get atom label option from dialogue. Two options: 
 ! 1. "Element + solution #"
-! 2. "Orignal atom labels"
+! 2. "Original atom labels"
       CALL WDialogGetRadioButton(IDF_UseSolutionNr,AtomLabelOption)
 ! Get atom colour option from dialogue. Two options: 
 ! 1. "By solution number"
