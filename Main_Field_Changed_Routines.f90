@@ -353,12 +353,31 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE DICVAR
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
+      INTEGER           NTPeak
+      REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              PkProb
+      INTEGER           IOrdTem
+      INTEGER           IHPk
+
+      COMMON /ALLPEAKS/ NTPeak,                                                  &
+                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        PkProb(MTPeak),                                          &
+                        IOrdTem(MTPeak),                                         &
+                        IHPk(3,MTPeak)
+
+      REAL Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
+      INTEGER Isystem(6), UseErr, I, Iord
       REAL    Temp
+      INTEGER tFileHandle
+      INTEGER IHANDLE
+      REAL    Epsti
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Index_Preparation)
@@ -378,6 +397,66 @@
                 CALL WDialogSelect(IDD_Index_Preparation)
                 CALL WDialogHide()
               END IF
+            CASE (IDF_RunDICVOL)
+              CALL WDialogGetReal(IDF_Indexing_Lambda, Lambda)
+              CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
+              CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
+              CALL WDialogGetReal(IDF_Indexing_MaxLen, amax)
+! JvdS @ add in very quick check: is the d-spacing belonging to the first peak greater
+! than the maximum cell length requested? If so, tell user he is a moron.
+!     Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
+              CALL WDialogGetReal(IDF_Indexing_MinAng, Bemin)
+              CALL WDialogGetReal(IDF_Indexing_MaxAng, Bemax)
+              CALL WDialogGetReal(IDF_Indexing_Density, Rdens)
+              CALL WDialogGetReal(IDF_Indexing_MolWt,   Rmolwt)
+              CALL WDialogGetReal(IDF_Indexing_Fom,     fom)
+              CALL WDialogGetReal(IDF_ZeroPoint,        Rexpzp)
+              CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      Isystem(1))
+              CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      Isystem(2))
+              CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       Isystem(3))
+              CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      Isystem(4))
+              CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, Isystem(5))
+              CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  Isystem(6))
+              CALL WDialogGetCheckBox(IDF_Indexing_UseErrors,  UseErr)
+! Write it out 
+              tFileHandle = 10
+              OPEN(UNIT=tFileHandle,FILE='DICVOL.IN',STATUS='UNKNOWN',ERR=100)
+              n = NTPeak
+              Bmax = amax
+              Cmax = amax
+              WRITE(tFileHandle,'(F10.6,1X,3(F8.4,1X))',ERR=100) Lambda, Rmolwt, Rdens, Rdens/50.0
+              IF (UseErr .EQ. 1) THEN
+                epst = 0.0
+                DO I = 1, n
+                  IOrd = IOrdTem(i)
+                  IF (AllPkPosEsd(IOrd) .LT. 0.001) THEN
+                    epsil(I) = 0.01
+                  ELSE 
+                    epsil(I) = AllPkPosEsd(IOrd)*10.0
+                  ENDIF
+                  Epsti = epsil(I) + 0.015
+                  IF (Epsti .GT. epst) epst = Epsti
+                ENDDO
+              ELSE
+                epst = 0.03 + 0.015
+                DO I = 1, n
+                  epsil(I) = 0.03
+                ENDDO
+              ENDIF
+              DO I = 1, NTPeak
+                IOrd = IOrdTem(i)
+                d(I) = AllPkPosVal(IOrd)-Rexpzp
+              END DO
+              CLOSE(tFileHandle)
+              GOTO 1
+ 100          CALL ErrorMessage("Sorry, could not access the file DICVOL.IN")
+              CLOSE(tFileHandle)
+              GOTO 999
+   1          CALL WCursorShape(CurHourGlass)
+              CALL DICVOL91(Isystem(1),Isystem(2),Isystem(3),Isystem(4),Isystem(5),Isystem(6),Rvpar(1),Rvpar(2))
+              CALL WCursorShape(CurCrossHair)
+              CALL WindowOpenChild(IHANDLE)
+              CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithIndexPreparation 1')
           END SELECT
@@ -395,7 +474,7 @@
         CASE DEFAULT
           CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
       END SELECT
-      CALL PopActiveWindowID
+  999 CALL PopActiveWindowID
 
       END SUBROUTINE DealWithIndexPreparation
 !
