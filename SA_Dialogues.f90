@@ -15,10 +15,22 @@
       IMPLICIT NONE 
 
       INCLUDE 'GLBVAR.INC'
+      INTEGER        IDFZMFile,                                                &
+                     IDBZMDelete,                    IDBZMBrowse,              &
+                     IDBZMView,                      IDBZMEdit,                &
+                     IDFZMpars,                      IDFZMLabel,               &
+                     first_zm_in_win
+      COMMON /IDFZM/ IDFZMFile(1:maxfrginterface),                                      &
+                     IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
+                     IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
+                     IDFZMpars(1:maxfrginterface),   IDFZMLabel(1:maxfrginterface),     &
+                     first_zm_in_win
 
 ! @@ Enable or disable the "Next" button, only partially taken care of in UpdateZmatrixSelection
       CALL UpdateZmatrixSelection
       CALL WizardWindowShow(IDD_SAW_Page1)
+      CALL WDialogFieldStateLogical(IDB_Up, first_zm_in_win .NE. 1)
+      CALL WDialogFieldStateLogical(IDB_Down, first_zm_in_win+maxfrginterface-1 .NE. maxfrg)
       PastPawley = .TRUE.
 ! Grey out 'Delete all peak fit ranges' button on toolbar
       CALL WMenuSetState(ID_ClearPeakFitRanges, ItemEnabled, WintOff)
@@ -83,11 +95,13 @@
       INTEGER        IDFZMFile,                                                &
                      IDBZMDelete,                    IDBZMBrowse,              &
                      IDBZMView,                      IDBZMEdit,                &
-                     IDFZMpars
+                     IDFZMpars,                      IDFZMLabel,               &
+                     first_zm_in_win
       COMMON /IDFZM/ IDFZMFile(1:maxfrginterface),                                      &
                      IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
                      IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
-                     IDFZMpars(1:maxfrginterface)
+                     IDFZMpars(1:maxfrginterface),   IDFZMLabel(1:maxfrginterface),     &
+                     first_zm_in_win
 
       INTEGER, EXTERNAL :: Read_One_Zm
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
@@ -221,6 +235,14 @@
                 iFrg = iFrg + 1
               ENDDO
               CALL ShowEditZMatrixWindow(iFrg)
+            CASE (IDB_Up)
+              first_zm_in_win = first_zm_in_win - 1
+              CALL WDialogFieldStateLogical(IDB_Up, first_zm_in_win .NE. 1)
+              CALL WDialogFieldStateLogical(IDB_Down, first_zm_in_win+maxfrginterface-1 .NE. maxfrg)
+            CASE (IDB_Down)
+              first_zm_in_win = first_zm_in_win + 1
+              CALL WDialogFieldStateLogical(IDB_Up, first_zm_in_win .NE. 1)
+              CALL WDialogFieldStateLogical(IDB_Down, first_zm_in_win+maxfrginterface-1 .NE. maxfrg)
           END SELECT
         CASE (FieldChanged)
       END SELECT
