@@ -544,7 +544,7 @@
                            WDialogGetCheckBoxLogical,                     &
                            Get_UseHydrogens, Get_SavePRO, Get_OutputChi2vsMoves, &
                            Get_AutoLocalMinimisation, Get_DivideByEsd
-      LOGICAL, EXTERNAL :: UseHydrogensDuringAuto, Get_ShowCumChiSqd
+      LOGICAL, EXTERNAL :: UseHydrogensDuringAuto, Get_ShowCumChiSqd, Get_AutoAlign
       REAL, EXTERNAL :: WavelengthOf
       INTEGER*4 tInteger
       REAL*4    tReal
@@ -713,6 +713,8 @@
       CALL FileWriteLogical(hFile,RecNr,Get_ShowCumChiSqd())
 ! Divide difference by ESDs      
       CALL FileWriteLogical(hFile,RecNr,Get_DivideByEsd())
+! Auto align      
+      CALL FileWriteLogical(hFile,RecNr,Get_AutoAlign())
   999 CLOSE(hFile)
 
       END SUBROUTINE WriteConfigurationFile
@@ -955,9 +957,17 @@
       CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
       CALL WDialogPutCheckBoxLogical(IDF_ShowCumChiSqd,tLogical)
-! Divide difference by ESDs      
+! Following is new in DASH 2.2
+! Divide difference by ESDs
       CALL FileReadLogical(hFile,RecNr,tLogical)
+      IF (GetBFIOError() .NE. 0) THEN
+        CLOSE(hFile)
+        RETURN
+      ENDIF
       CALL WDialogPutCheckBoxLogical(IDF_DivDiffByEsd,tLogical)
+! Auto align      
+      CALL FileReadLogical(hFile,RecNr,tLogical)
+      CALL Set_AutoAlign(tLogical)
       CLOSE(hFile)
       RETURN
   999 CALL DebugErrorMessage('Error while opening config file')
