@@ -72,7 +72,6 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
-! Start the message loop
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -94,7 +93,7 @@
               CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
               CALL SDIFileOpen(SDIFile)
             CASE (IDB_SA_Project_Import)
-! JCC Import .. convert a mol/pdb/mol2 file into a z-matrix
+! JCC Import .. convert a mol/pdb/mol2 file into a Z-matrix
               CALL ImportZmatrix
             CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
@@ -103,7 +102,7 @@
                   ifrg = ifrg + 1
                 ENDDO
                 gotzmfile(ifrg) = .FALSE.
-              ENDIF ! Delete this z-matrix
+              ENDIF ! Delete this Z-matrix
             CASE (IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
               ifrg = 1
               DO WHILE (IDBZMBrowse(ifrg) .NE. EventInfo%VALUE1)
@@ -121,12 +120,12 @@
               zmread = Read_One_ZM(ifrg)
               IF (zmread .EQ. 0) THEN ! successful read
                 gotzmfile(ifrg) = .TRUE.
-! JCC traps for zmatrix reading
+! JCC traps for Z-matrix reading
               ELSE 
                 gotzmfile(ifrg) = .FALSE. 
                 CALL FileErrorPopup(frag_file(ifrg),zmread)
-              ENDIF ! If the read on the zmatrix was ok
-! View individual z-matrices in e.g. Mercury
+              ENDIF ! If the read on the Z-matrix was ok
+! View individual Z-matrices in e.g. Mercury
             CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
               ifrg = 1
               DO WHILE (IDBZMView(ifrg) .NE. EventInfo%VALUE1)
@@ -139,6 +138,47 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowZmatrices
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowAdditionalSAParams
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER ifrg
+      LOGICAL, EXTERNAL :: Confirm
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SAW_Page2)
+      SELECT CASE (EventType)
+        CASE (PushButton)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_SAW_Page1)
+            CASE (IDNEXT)
+              CALL SA_Parameter_Set
+              CALL WizardWindowShow(IDD_SA_input2)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizardPastPawley
+          END SELECT
+
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_RotationsGrid)
+          END SELECT ! EventInfo%Value1 Field Changed Options
+
+
+
+      END SELECT
+  999 CALL UpdateZmatrixSelection
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowAdditionalSAParams
 !
 !*****************************************************************************
 !
