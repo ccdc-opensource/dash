@@ -424,7 +424,7 @@
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDCANCEL)
+            CASE (IDCLOSE)
               CALL WDialogHide()
 ! Unload the dialogue from memory
               CALL WDialogUnload
