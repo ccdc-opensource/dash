@@ -87,4 +87,5 @@
       INTEGER :: ly
       REAL :: vmax2, vmin2, vmoii, vr2
       REAL Bemin, Bemax
+
       END MODULE DICVAR

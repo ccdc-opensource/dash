@@ -7,7 +7,6 @@
 
       REAL snglh
 
-!O      CALL makefrac(theta)
       CALL makefrac_2(theta)
       CALL valchi(snglh)
       h = DBLE(snglh)
