@@ -33,10 +33,12 @@
       REAL         atem,                      btem
       COMMON /FOB/ atem(1:MaxAtm_3,1:MaxRef), btem(1:MaxAtm_3,1:MaxRef)
 
-      INTEGER iFrg, i, item, iRef, iFrgCopy
+      LOGICAL, EXTERNAL :: Get_AbsorbHydrogens
+      INTEGER, EXTERNAL :: NumOfBondedHydrogens, ElmNumber2CSD
+      REAL, EXTERNAL :: ascfac
+      INTEGER iFrg, iAtom, item, iRef, iFrgCopy, Element, AtomicNumber
       INTEGER tNumHydrogens, tNumNonHydrogens, tAtomNumber
       REAL ssq
-      REAL, EXTERNAL :: ascfac
 
 ! JvdS Order all atoms such that the Hydrogen atoms are always at
 ! the end of the atom list. That way, if we don't want to use hydrogens
@@ -51,9 +53,9 @@
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 1, natoms(iFrg)
+            DO iAtom = 1, natoms(iFrg)
               TotNumOfAtoms = TotNumOfAtoms + 1
-              IF (zmElementCSD(i,iFrg) .EQ. 2) THEN
+              IF (zmElementCSD(iAtom,iFrg) .EQ. 2) THEN
                 NumOfHydrogens = NumOfHydrogens + 1
               ELSE
                 NumOfNonHydrogens = NumOfNonHydrogens + 1
@@ -71,9 +73,9 @@
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 1, natoms(iFrg)
+            DO iAtom = 1, natoms(iFrg)
               tAtomNumber = tAtomNumber + 1
-              IF (zmElementCSD(i,iFrg) .EQ. 2) THEN
+              IF (zmElementCSD(iAtom,iFrg) .EQ. 2) THEN
                 tNumHydrogens = tNumHydrogens + 1
                 item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
               ELSE
@@ -81,10 +83,13 @@
                 item = tNumNonHydrogens
               ENDIF
               OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
+              AtomicNumber = atnr(zmElementCSD(iAtom,iFrg))
+              IF (Get_AbsorbHydrogens()) AtomicNumber = AtomicNumber + NumOfBondedHydrogens(iAtom, iFrg)
+              Element = ElmNumber2CSD(AtomicNumber)
               DO iRef = 1, NumOfRef
                 ssq = 0.25*DSTAR(iRef)**2
-                atem(item,iRef) = occ(i,iFrg) * AScFac(ssq,zmElementCSD(i,iFrg))
-                btem(item,iRef) = tiso(i,iFrg)*ssq
+                atem(item,iRef) = occ(iAtom,iFrg) * AScFac(ssq,Element)
+                btem(item,iRef) = tiso(iAtom,iFrg)*ssq
                 FOB(item,iRef) = atem(item,iRef)*EXP(-btem(item,iRef))
               ENDDO
             ENDDO
@@ -116,7 +121,7 @@
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
-      INTEGER item, tNumHydrogens, tNumNonHydrogens, iFrg, iFrgCopy, i, iRef
+      INTEGER item, tNumHydrogens, tNumNonHydrogens, iFrg, iFrgCopy, iAtom, iRef
 
       item = 0
       tNumHydrogens = 0
@@ -124,8 +129,8 @@
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 1, natoms(iFrg)
-              IF (zmElementCSD(i,iFrg) .EQ. 2) THEN
+            DO iAtom = 1, natoms(iFrg)
+              IF (zmElementCSD(iAtom,iFrg) .EQ. 2) THEN
                 tNumHydrogens = tNumHydrogens + 1
                 item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
               ELSE
@@ -210,21 +215,43 @@
 
       INTEGER, INTENT (IN   ) :: iFrg
 
-      INTEGER I
+      INTEGER iAtom
       REAL    TotalAtomicWeighting
 
-      DO I = 1, natoms(iFrg)
-        AtomicWeighting(I,iFrg) = FLOAT(atnr(zmElementCSD(i,iFrg)))**2
+      DO iAtom = 1, natoms(iFrg)
+        AtomicWeighting(iAtom,iFrg) = FLOAT(atnr(zmElementCSD(iAtom,iFrg)))**2
       ENDDO
       TotalAtomicWeighting = 0.0
-      DO I = 1, natoms(iFrg)
-        TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(I,iFrg) 
+      DO iAtom = 1, natoms(iFrg)
+        TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(iAtom,iFrg) 
       ENDDO
-      DO I = 1, natoms(iFrg)
-        AtomicWeighting(I,iFrg) = AtomicWeighting(I,iFrg) / TotalAtomicWeighting 
+      DO iAtom = 1, natoms(iFrg)
+        AtomicWeighting(iAtom,iFrg) = AtomicWeighting(iAtom,iFrg) / TotalAtomicWeighting 
       ENDDO
 
       END SUBROUTINE zmCreate_AtomicWeightings
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION NumOfBondedHydrogens(iAtom, iFrg)
+
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iAtom, iFrg
+
+      INTEGER iBond, tNumOfBondedHydrogens
+
+      tNumOfBondedHydrogens = 0
+      DO iBond = 1, NumberOfBonds(iFrg)
+        IF (((Bonds(1,iBond,iFrg) .EQ. iAtom) .AND. (zmElementCSD(Bonds(2,iBond,iFrg),iFrg) .EQ. 2)) .OR. &
+            ((Bonds(2,iBond,iFrg) .EQ. iAtom) .AND. (zmElementCSD(Bonds(1,iBond,iFrg),iFrg) .EQ. 2)))     &
+          tNumOfBondedHydrogens = tNumOfBondedHydrogens + 1
+      ENDDO
+      NumOfBondedHydrogens = tNumOfBondedHydrogens
+
+      END FUNCTION NumOfBondedHydrogens
 !
 !*****************************************************************************
 !
