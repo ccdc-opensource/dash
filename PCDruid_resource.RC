@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 12/Sep/2001 16:26:21
+// Modified : 12/Sep/2001 20:24:40
 //
 ///////////////////////////////////////////////////
 //
@@ -312,15 +312,12 @@
 #define IDD_Parameter_Status              136
 #define IDD_Anneal_Status                 138
 #define IDD_Profile_Status                139
-#define IDF_Status_Graph                 1500
 #define IDF_Profile_Plot                 1501
 #define IDF_ProfileType_Radio1           1408
 #define IDF_ProfileType_Radio2           1503
 #define IDF_Profile_Zoom_Button          1414
 #define IDF_Profile_FullRange_Button     1415
 #define IDF_SA1_cancel                   1178
-#define IDF_Anneal_LogY                  1497
-#define IDF_Anneal_LinY                  1499
 #define IDF_peakcont_label               1502
 #define IDF_pikfile_browse_button        1504
 #define IDF_reffile                      1505
@@ -1765,30 +1762,6 @@ IDD_DIALOG003 RCDATA
 BEGIN
 "[Checks] \n"
 " 1021 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_Anneal_Status DIALOG 0, 0,  290,  138
-STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "",IDF_Status_Graph,"STATIC",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | SS_ETCHEDFRAME | SS_NOTIFY | SS_CENTERIMAGE,    4,    4,  282,  112
-    CONTROL "log y-scale",IDF_Anneal_LogY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,    6,  120,   60,   14
-    CONTROL "linear y-scale",IDF_Anneal_LinY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  224,  120,   60,   14
-END
-
-IDD_Anneal_Status RCDATA
-BEGIN
-"[Checks] \n"
-" 1497 0 \n"
-" 1499 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
