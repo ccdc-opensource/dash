@@ -7,7 +7,7 @@
 
       IMPLICIT NONE
 
-      REAL f2cmat(1:3,1:3), c2fmat(1:3,1:3)
+      REAL f2cmat(1:3, 1:3), c2fmat(1:3, 1:3)
 
 ! f2cmat = 3x3 matrix for conversion from fractional to Cartesian  coordinates 
 ! c2fmat = 3x3 matrix for conversion from Cartesian  to fractional coordinates 
@@ -35,6 +35,9 @@
       INTEGER MaxDOF
       PARAMETER ( MaxDOF = 50 )
 
+      INTEGER     MVAR_2
+      PARAMETER ( MVAR_2 = 100 )
+
 ! MaxDOF = Maximum number of degrees of freedom per fragment (= per individual Z-matrix)
 
       INTEGER maxbnd_2
@@ -42,15 +45,15 @@
 
 ! Maximum number of bonds. Must be equal to MAXBND in SAMVAR
 
-      INTEGER Par2iFrg(1:100)
+      INTEGER Par2iFrg(1:MVAR_2)
 
 ! Per SA parameter, to which Z-matrix does it belong. 0 = non-structural, e.g. preferred orientation
 
-      INTEGER Par2iFrgCopy(1:100)
+      INTEGER Par2iFrgCopy(1:MVAR_2)
 
 ! Per SA parameter, to which copy of the Z-matrix does it belong.
 
-      INTEGER zm2Par(1:MaxDOF,1:maxcopies,1:maxfrg)
+      INTEGER zm2Par(1:MaxDOF, 1:maxcopies, 1:maxfrg)
 
 ! Mapping of parameters per degree of freedom per copy per Z-matrix
 
@@ -78,7 +81,7 @@
       LOGICAL          gotzmfile(0:maxfrg)
 
       INTEGER          icomflg(0:maxfrg)
-      REAL             AtomicWeighting(1:maxatm,0:maxfrg)
+      REAL             AtomicWeighting(1:maxatm, 0:maxfrg)
       LOGICAL          UseQuaternions(0:maxfrg)
 ! icomflg         = Centre of mass flag.
 !                   0 = use centre of mass of molecule as centre of rotation
@@ -97,9 +100,9 @@
 ! 2 = fractional co-ordinates
 ! 3 = normal to plane
       INTEGER  zmSingleRotAxAtm(0:maxfrg)
-      REAL     zmSingleRotAxFrac(1:3,0:maxfrg)
-      INTEGER  zmSingleRotAxAtms(1:3,0:maxfrg)
-      REAL     zmSingleRotationQs(0:3,0:maxfrg)
+      REAL     zmSingleRotAxFrac(1:3, 0:maxfrg)
+      INTEGER  zmSingleRotAxAtms(1:3, 0:maxfrg)
+      REAL     zmSingleRotationQs(0:3, 0:maxfrg)
 
 ! zmSingleRotAxAtm
 ! zmSingleRotAxFrac
@@ -110,10 +113,10 @@
 !                        which are due to the orientation of the single axis
     
       INTEGER         izmpar(0:maxfrg)
-      CHARACTER*36    czmpar(1:MaxDOF,0:maxfrg)
-      INTEGER         kzmpar(1:MaxDOF,0:maxfrg)
-      INTEGER         kzmpar2(1:100)
-      REAL            xzmpar(1:MaxDOF,0:maxfrg)
+      CHARACTER*36    czmpar(1:MaxDOF, 0:maxfrg)
+      INTEGER         kzmpar(1:MaxDOF, 0:maxfrg)
+      INTEGER         kzmpar2(1:MVAR_2)
+      REAL            xzmpar(1:MaxDOF, 0:maxfrg)
 
 ! izmpar = number of degrees of freedom ('parameters') per Z-matrix
 ! czmpar = Character string associated with this parameter value
@@ -130,8 +133,8 @@
 ! xzmpar = initial value of parameter
 
       INTEGER         natoms(0:maxfrg)
-      INTEGER         ioptb(1:maxatm,0:maxfrg), iopta(1:maxatm,0:maxfrg), ioptt(1:maxatm,0:maxfrg)
-      INTEGER         iz1(1:maxatm,0:maxfrg), iz2(1:maxatm,0:maxfrg), iz3(1:maxatm,0:maxfrg)
+      INTEGER         ioptb(1:maxatm, 0:maxfrg), iopta(1:maxatm, 0:maxfrg), ioptt(1:maxatm, 0:maxfrg)
+      INTEGER         iz1(1:maxatm, 0:maxfrg), iz2(1:maxatm, 0:maxfrg), iz3(1:maxatm, 0:maxfrg)
 
 ! natoms = number of atoms in this fragment (=Z-matrix)
 ! ioptb  = optimise bond length 1=YES, 0=NO.
@@ -139,7 +142,7 @@
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
 ! iz1, iz2, iz3 = atoms with respect to which the current atom is defined in the Z-matrix
 
-      REAL blen(1:maxatm,0:maxfrg), alph(1:maxatm,0:maxfrg), bet(1:maxatm,0:maxfrg)
+      REAL blen(1:maxatm, 0:maxfrg), alph(1:maxatm, 0:maxfrg), bet(1:maxatm, 0:maxfrg)
 
 ! blen   = bond length     (wrt iz1)
 ! No copies taken into account!!!!
@@ -148,9 +151,9 @@
 ! bet    = torsion angle   (wrt iz1, iz2 & iz3)
 ! No copies taken into account!!!!
 
-      CHARACTER*3     asym(1:maxatm,0:maxfrg)
-      INTEGER         zmElementCSD(1:maxatm,0:maxfrg)
-      CHARACTER*5     OriginalLabel(1:maxatm,0:maxfrg)
+      CHARACTER*3     asym(1:maxatm, 0:maxfrg)
+      INTEGER         zmElementCSD(1:maxatm, 0:maxfrg)
+      CHARACTER*5     OriginalLabel(1:maxatm, 0:maxfrg)
 
 ! asym = Atom SYMbol--e.g. 'H  ' for hydrogen, 'Ag ' for silver--of the current atom.
 ! zmElement = CSD element number. MaxElm = dummy.
@@ -159,19 +162,19 @@
 ! Note that we allow five characters, .pdb allows 4, .res and .cssr can't cope with the
 ! atom label being a real 'name', it must be the element + a number
 
-      REAL tiso(1:maxatm,0:maxfrg), occ(1:maxatm,0:maxfrg)
+      REAL tiso(1:maxatm, 0:maxfrg), occ(1:maxatm, 0:maxfrg)
 
 ! tiso = Isotropic temperature factor of the current atom
 ! occ  = Occupancy of the current atom
 
-      INTEGER izmoid(0:maxatm,0:maxfrg), izmbid(0:maxatm,0:maxfrg)
+      INTEGER izmoid(0:maxatm, 0:maxfrg), izmbid(0:maxatm, 0:maxfrg)
 
 ! The original atom ids to list in the labels and the back mapping
 ! Atom number 0 means 'not specified' and always maps onto itself
 
       INTEGER NumberOfBonds(0:maxfrg)
-      INTEGER BondType(1:maxbnd_2,0:maxfrg)
-      INTEGER Bonds(1:2,1:maxbnd_2,0:maxfrg)
+      INTEGER BondType(1:maxbnd_2, 0:maxfrg)
+      INTEGER Bonds(1:2, 1:maxbnd_2, 0:maxfrg)
 
 ! Bondtypes and bonds. Precalculated and stored for speed. 90,000 bytes
 !   BondType:
