@@ -44,6 +44,21 @@
 !         for the corresponding 2 theta value
 !
 
+      INTEGER         NPTS
+      REAL                  ZARGI,        ZOBS,        ZDOBS,        ZWT
+      INTEGER                                                                    ICODEZ
+      REAL                                                                                      KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
+
+
+
+
+      REAL            ZCAL,        ZBAK
+      COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
+
+! Seem to hold output of calculations.
+
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -77,7 +92,7 @@
 ! DSTAR = d*
 !
 ! Note: exactly the same information is held in two other common blocks.
-! Of these, I deleted the following one (merged it with this one):
+! Of these, I deleted the following one (merged it with /PROFTIC/):
 ! COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
 
       REAL              XPF_Range
