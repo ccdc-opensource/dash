@@ -290,7 +290,7 @@
       IF (PastPawley) CALL SetModeMenuState(-1,-1)
       STATBARSTR(1) = FNAME
       CALL WindowOutStatusBar(1,STATBARSTR(1))
-!  update the file name of the project in the SA pop up
+! update the file name of the project in the SA pop up
       CALL SetSAFileName(FNAME(1:KLEN))
       
       END SUBROUTINE SDIFileOpen
