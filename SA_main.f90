@@ -313,8 +313,7 @@
 ! Go back to the 1st window
 !>> JCC Check if the limits have changed and warn about it 
                 IF (LimsChanged) THEN
-                  IF (Confirm("Note: Going back will erase the edits made to the current parameters,'//&
-                  &' overwrite changes?")) LimsChanged = .FALSE.
+                  IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
                 END IF
                 IF (.NOT. LimsChanged) THEN
                   IXPos_IDD_SA_Input = WInfoDialog(6)
