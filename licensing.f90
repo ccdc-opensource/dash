@@ -310,7 +310,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Write_License_Request_Form()
+      SUBROUTINE Write_License_Request_Form
 
       USE WINTERACTER
       USE DRUID_HEADER
