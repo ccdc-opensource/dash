@@ -528,6 +528,7 @@
       REAL    COM(1:3), v(1:3), v1(1:3), v2(1:3)
       LOGICAL tUseSingleAxis
       REAL    Point1(1:3), Point2(1:3), Point3(1:3) 
+      REAL    Q1(0:3), Q2(0:3)
 
       iFrg = 0
       CALL PushActiveWindowID
@@ -600,9 +601,10 @@
                       CALL VectorCrossProduct(Point1, Point3, v1)
                   END SELECT
                   CALL PremultiplyVectorByMatrix(f2cmat, zmSingleRAIniOrFrac(1,iFrg), v2) ! frac -> cart
-          !        CALL Vector2Quaternion(v1, )
-          !        CALL Vector2Quaternion(v2, )
-
+                  CALL Vector2Quaternion(v1, Q1)
+                  CALL Vector2Quaternion(v2, Q2)
+                  CALL QuaternionInverse(Q1)
+                  CALL QuaternionMultiply(Q2, Q1, zmInitialQs(0, iFrg))
                 CASE (2) ! Defined as Euler angles => convert to Quaternions
                   Alpha = zmSingleRAIniOrEuler(1, iFrg)
                   Beta  = zmSingleRAIniOrEuler(2, iFrg)
