@@ -3,18 +3,33 @@
 !
       SUBROUTINE Init_StdOut()
 ! Selects the 'working directory' (which is changed every time the directory is changed
-! when e.g. a z-matrix is loaded, so this is not really '_the_' working directory).
+! when e.g. a Z-matrix is loaded, so this is not really '_the_' working directory).
 ! Checks if in that directory (but, as said, that directory changes all the time)
 ! temporary files can be created.
  
       USE WINTERACTER
       USE VARIABLES
+      USE KERNEL32
 
       IMPLICIT NONE
 
       INTEGER :: IFlags, ISTAT
       CHARACTER(LEN=MaxPathLength) :: Dirname
+      CHARACTER*MaxPathLength tString
+      CHARACTER*255 tFile
+      INTEGER*4 tProcess, tSize
 
+! Determine the directory where DASH.exe resides and store it in "InstallationDirectory"
+      tSize = MaxPathLength
+      tProcess = 0 ! this program
+      CALL GetModuleFileName(tProcess,tString,LOC(tSize))
+! tString should now contain the full path to DASH.exe irrespective of the way
+! DASH has been invoked.
+      CALL SplitPath(tString,InstallationDirectory,tFile)
+      IF (LEN_TRIM(InstallationDirectory) .EQ. 0) InstallationDirectory = '.'//DIRSPACER
+      CALL IOsDirChange(InstallationDirectory)
+      CALL IOsDirName(InstallationDirectory)
+      InstallationDirectory = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//DIRSPACER
       DO WHILE (.TRUE.)
         IFlags = DirChange + DirCreate
         Dirname = ' '
@@ -25,7 +40,6 @@
         ENDIF
 ! Open the file
         OPEN(UNIT = 6, FILE = 'dash.out', STATUS = 'UNKNOWN', ERR = 110)
-        CLOSE(UNIT=6,STATUS='DELETE',IOSTAT=ISTAT)
         RETURN
  110    CALL ErrorMessage("DASH problem: Could not open temporary files"//CHAR(13)// &
                           "in the directory "//DirName(1:LEN_TRIM(DirName))//CHAR(13)//&
@@ -90,7 +104,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      USE KERNEL32
 
       IMPLICIT NONE
 
@@ -104,9 +117,6 @@
                                 'Monoclinic-c', 'Orthorhombic', 'Tetragonal  ', &
                                 'Trigonal    ', 'Rhombohedral', 'Hexagonal   ', &
                                 'Cubic       '/
-      CHARACTER*MaxPathLength tString
-      CHARACTER*255 tFile
-      INTEGER*4 tProcess, tSize
 
       LPosSG( 1) =   1
       LPosSG( 2) =   3
@@ -119,14 +129,6 @@
       LPosSG( 9) = 462
       LPosSG(10) = 489
       LPosSG(11) = MaxSPGR+1
-! Determine the directory where DASH.exe resides and store it in "InstallationDirectory"
-      tSize = MaxPathLength
-      tProcess = 0 ! this program
-      CALL GetModuleFileName(tProcess,tString,LOC(tSize))
-! tString should now contain the full path to DASH.exe irrespective of the way
-! DASH has been invoked.
-      CALL SplitPath(tString,InstallationDirectory,tFile)
-      IF (LEN_TRIM(InstallationDirectory) .EQ. 0) InstallationDirectory = '.'//DIRSPACER
 ! Get the space group symbols ...
       OPEN(110,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 999)
       i = 0
