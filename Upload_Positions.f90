@@ -25,7 +25,6 @@
 
       COMMON /PROFTIC/ NTic,IH(3,MTic),ArgK(MTic),DStar(MTic)
 !
-      Parameter (MTPeak=100)
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
       PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
       IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)

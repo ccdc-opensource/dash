@@ -30,10 +30,10 @@
 !
       IMPLICIT NONE
 
-      INTEGER I
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
-      REAL    CELLPAR,ZEROPOINT
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
+      INCLUDE 'lattice.inc'
+
+      INTEGER I
       REAL    a,b,c,d2r,calp,cbet,cgam,arg,vcell
       
 ! Initialise to 'cell is not OK'

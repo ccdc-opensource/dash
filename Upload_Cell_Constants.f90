@@ -172,9 +172,11 @@
 
       INTEGER tNewCrystalSystem
       INTEGER GetCrystalSystemFromUnitCell ! Function
+      LOGICAL FnUnitCellOK ! Function
 
       CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
 ! GetCrystalSystem() determines the crystal system from the unit cell parameters
+      IF (.NOT. FnUnitCellOK()) RETURN
       tNewCrystalSystem = GetCrystalSystemFromUnitCell()
       IF (tNewCrystalSystem .NE. LatBrav) CALL SetCrystalSystem(tNewCrystalSystem)
 
@@ -217,6 +219,8 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      INCLUDE 'params.inc'
+
       REAL ChiGetLattice
       EXTERNAL ChiGetLattice
 
@@ -228,7 +232,6 @@
 
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
 
-      PARAMETER (MTPeak=100)
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
       PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
       IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)
