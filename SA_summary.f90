@@ -699,6 +699,11 @@
                       KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
+      REAL, EXTERNAL         :: UnitCellVolume
+      LOGICAL, EXTERNAL      :: Get_AutoLocalMinimisation, UseHydrogensDuringAuto
+      INTEGER, EXTERNAL      :: WritePDBCommon, Get_HydrogenTreatment
+      CHARACTER*1, EXTERNAL  :: ChrLowerCase
+      CHARACTER*20, EXTERNAL :: Integer2String
       REAL                     qvals(4), qnrm
       LOGICAL tSavePDB, tSaveCSSR, tSaveCCL, tSaveCIF, tSaveRES, tSavePRO
       INTEGER ipcount, iScat, tElement, k1
@@ -709,15 +714,10 @@
       INTEGER                   tLen1, tLen2
       CHARACTER*80              tString, tString1, tString2
       CHARACTER*2               LATT
-      CHARACTER*1, EXTERNAL  :: ChrLowerCase
-      REAL, EXTERNAL         :: UnitCellVolume
       INTEGER                   NumOfAtmPerElm(1:MaxElm)
-      CHARACTER*20, EXTERNAL :: Integer2String
-      INTEGER, EXTERNAL      :: WritePDBCommon
       CHARACTER*72              DASHRemarkStr
       REAL                      tIntChiSqd, tProChiSqd
       INTEGER                   tRunNr
-      LOGICAL, EXTERNAL :: Get_UseHydrogens, Get_AutoLocalMinimisation, UseHydrogensDuringAuto
       LOGICAL tLOG_HYDROGENS
 
       tRunNr = iSol2Run(TheSolutionNr)
@@ -1133,7 +1133,7 @@
         ENDIF
 ! VALCHI fills BICALC
         tLOG_HYDROGENS = LOG_HYDROGENS
-        IF (Get_UseHydrogens()) THEN
+        IF (Get_HydrogenTreatment() .EQ. 3) THEN
           LOG_HYDROGENS = .TRUE.
         ELSE
           LOG_HYDROGENS = (Get_AutoLocalMinimisation() .AND. UseHydrogensDuringAuto())

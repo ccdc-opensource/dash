@@ -1,13 +1,15 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE create_fob
+      SUBROUTINE create_fob(AbsorbHydrogens)
 
       USE ATMVAR
       USE ZMVAR
       USE REFVAR
 
       IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: AbsorbHydrogens
 
       INCLUDE 'PARAMS.INC'
 
@@ -33,7 +35,6 @@
       REAL         atem,                      btem
       COMMON /FOB/ atem(1:MaxAtm_3,1:MaxRef), btem(1:MaxAtm_3,1:MaxRef)
 
-      LOGICAL, EXTERNAL :: Get_AbsorbHydrogens
       INTEGER, EXTERNAL :: NumOfBondedHydrogens, ElmNumber2CSD
       REAL, EXTERNAL :: ascfac
       INTEGER iFrg, iAtom, item, iRef, iFrgCopy, Element, AtomicNumber
@@ -84,7 +85,7 @@
               ENDIF
               OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
               AtomicNumber = atnr(zmElementCSD(iAtom,iFrg))
-              IF (Get_AbsorbHydrogens()) AtomicNumber = AtomicNumber + NumOfBondedHydrogens(iAtom, iFrg)
+              IF (AbsorbHydrogens) AtomicNumber = AtomicNumber + NumOfBondedHydrogens(iAtom, iFrg)
               Element = ElmNumber2CSD(AtomicNumber)
               DO iRef = 1, NumOfRef
                 ssq = 0.25*DSTAR(iRef)**2

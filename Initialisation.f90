@@ -530,7 +530,7 @@
                            PlotErrorBars, PlotBackground,                 &
                            PlotPeakFitDifferenceProfile,                  &
                            WDialogGetCheckBoxLogical,                     &
-                           Get_UseHydrogens, Get_SavePRO, Get_OutputChi2vsMoves, &
+                           Get_HydrogenTreatment, Get_SavePRO, Get_OutputChi2vsMoves, &
                            Get_AutoLocalMinimisation, Get_DivideByEsd
       LOGICAL, EXTERNAL :: UseHydrogensDuringAuto, Get_ShowCumChiSqd, Get_AutoAlign
       REAL, EXTERNAL :: WavelengthOf
@@ -651,9 +651,9 @@
 ! and the viewer arguments
       CALL WDialogGetString(IDF_ViewArg,ViewArg)
       CALL FileWriteString(hFile,RecNr,ViewArg)
-! Save use hydrogens YES / NO
-      CALL FileWriteLogical(hFile,RecNr,Get_UseHydrogens())
-! Colour flexible torsions (in z-matrix viewer) YES / NO
+! Save hydrogen treatment 1 = ignore, 2 = absorb, 3 = explicit
+      CALL FileWriteLogical(hFile,RecNr, Get_HydrogenTreatment())
+! Colour flexible torsions (in Z-matrix viewer) YES / NO
       CALL FileWriteLogical(hFile,RecNr,Get_ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
       CALL FileWriteLogical(hFile,RecNr,SavePDB())  ! 1. .pdb  ?
@@ -696,13 +696,13 @@
       CALL FileWriteInteger(hFile,RecNr,tInteger)
 ! Following is new in DASH 2.1
 ! Use hydrogens for auto local minimise
-      CALL FileWriteLogical(hFile,RecNr,UseHydrogensDuringAuto())
+      CALL FileWriteLogical(hFile,RecNr, UseHydrogensDuringAuto())
 ! Plot cumulative chi-squared      
-      CALL FileWriteLogical(hFile,RecNr,Get_ShowCumChiSqd())
+      CALL FileWriteLogical(hFile,RecNr, Get_ShowCumChiSqd())
 ! Divide difference by ESDs      
-      CALL FileWriteLogical(hFile,RecNr,Get_DivideByEsd())
+      CALL FileWriteLogical(hFile,RecNr, Get_DivideByEsd())
 ! Auto align      
-      CALL FileWriteLogical(hFile,RecNr,Get_AutoAlign())
+      CALL FileWriteLogical(hFile,RecNr, Get_AutoAlign())
   999 CLOSE(hFile)
 
       END SUBROUTINE WriteConfigurationFile
@@ -727,17 +727,20 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
+      REAL, EXTERNAL :: WavelengthOf
+      REAL, EXTERNAL :: dSpacing2TwoTheta
+      INTEGER, EXTERNAL :: GetBFIOError
       CHARACTER*MaxPathLength tFileName
       INTEGER   RecNr, RW
       INTEGER   hFile
-      REAL, EXTERNAL :: WavelengthOf
       CHARACTER*MaxPathLength tString
+      CHARACTER*MaxPathLength MainVersionStr
+      CHARACTER*MaxPathLength SubVersionStr
       INTEGER*4 tInteger
       LOGICAL*4 tLogical
       REAL*4    tReal
-      REAL, EXTERNAL :: dSpacing2TwoTheta
-      INTEGER, EXTERNAL :: GetBFIOError
       LOGICAL   FExists
+      INTEGER   tLen, MainVersionLen, SubVersionLen
 
       RW = 1
       tFileName = 'D3.cfg'
@@ -748,7 +751,14 @@
       OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Read the header
-      CALL FileReadString(hFile,RecNr,tString)
+      CALL FileReadString(hFile,RecNr,tString) ! E.g. 'DASH 2.1.1 configuration file'
+      ! Extract the main version number
+      tLen = LEN_TRIM(tString)
+      tString = tString(6:tLen) ! Removes 'DASH '
+      CALL GetSubString(tString, '.', MainVersionStr)
+      MainVersionLen = LEN_TRIM(MainVersionStr)
+      CALL GetSubString(tString, '.', SubVersionStr)
+      SubVersionLen = LEN_TRIM(SubVersionStr)
       CALL FileReadLogical(hFile,RecNr,UseConfigFile)
       IF (.NOT. UseConfigFile) THEN
         CALL DebugErrorMessage('Config file not used.')
@@ -863,9 +873,20 @@
 ! and the viewer arguments
       CALL FileReadString(hFile,RecNr,ViewArg)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
-! Read use hydrogens YES / NO
-      CALL FileReadLogical(hFile,RecNr,LOG_HYDROGENS)
-      CALL Set_UseHydrogens(LOG_HYDROGENS)
+! Read hydrogen treatment. This was a LOGICAL for versions below DASH 2.2
+      IF ( (MainVersionStr .EQ. "1") .OR.    &
+          ((MainVersionStr .EQ. "2") .AND. ((SubVersionStr .EQ. "0") .OR. (SubVersionStr .EQ. "1") .OR. (SubVersionStr .EQ. "2"))) ) THEN
+        CALL FileReadLogical(hFile, RecNr, LOG_HYDROGENS)
+        IF (LOG_HYDROGENS) THEN
+          CALL Set_HydrogenTreatment(3) ! Explicit
+        ELSE
+          CALL Set_HydrogenTreatment(1) ! Ignore
+        ENDIF
+      ELSE
+        CALL FileReadInteger(hFile, RecNr, tInteger)
+        CALL Set_HydrogenTreatment(tInteger)
+        LOG_HYDROGENS = (tInteger .EQ. 3)
+      ENDIF
 ! Colour flexible torsions (in Z-matrix viewer) YES / NO
       CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)

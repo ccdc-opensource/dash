@@ -64,24 +64,32 @@
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, Confirm, UseHydrogensDuringAuto
+      INTEGER, EXTERNAL :: Get_HydrogenTreatment
       CHARACTER*80 chistr
       INTEGER I, II, III, N
       REAL, EXTERNAL :: SA_FCN
       LOGICAL tAccept, tLOG_HYDROGENS
       REAL    FTEM
       DOUBLE PRECISION DFTEM
+      LOGICAL DesorbHydrogens
 
       IF (Auto .AND. (.NOT. Get_AutoLocalMinimisation())) RETURN
       CALL WCursorShape(CurHourGlass)
       tLOG_HYDROGENS = LOG_HYDROGENS
+      DesorbHydrogens = .FALSE.
       IF (Auto .AND. UseHydrogensDuringAuto()) THEN
         LOG_HYDROGENS = .TRUE.
+!C If we have absorbed the hydrogens and want to use them now, we must do some re-administrating.
+        IF (Get_HydrogenTreatment() .EQ. 2) THEN
+          DesorbHydrogens = .TRUE.
+          CALL create_fob(.FALSE.)
+        ENDIF
       ENDIF
       N = NPAR
       DO II = 1, N
         I = IP(II)
         XSIM(II) = SNGL(XOPT(I))
-! DXSIM = initial step sizes.
+!C DXSIM = initial step sizes.
         DXSIM(II) = SA_SimplexDampingFactor*0.1*SNGL(RULB(I))
       ENDDO
       CALL SA_SIMOPT(XSIM,DXSIM,N,FTEM)
@@ -93,6 +101,7 @@
         tAccept = Confirm(CHISTR//CHAR(13)//'Press Yes to proceed with Simplex results.')
       ENDIF
       LOG_HYDROGENS = tLOG_HYDROGENS
+      IF (DesorbHydrogens) CALL create_fob(.TRUE.)
       IF (tAccept) THEN
         DO II = 1, N
           I = IP(II)

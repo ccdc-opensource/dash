@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 22/Sep/2003 16:07:30
+// Modified : 24/Sep/2003 16:30:01
 //
 ///////////////////////////////////////////////////
 //
@@ -723,7 +723,6 @@
 #define IDB_Up6                          1540
 #define IDF_MENU1                        1546
 #define IDB_Restart                      1547
-#define IDC_AbsorbH                      1548
 #define IDF_PW_Option6                   1549
 #define IDD_SX_Page1                      120
 #define IDD_SX_Page2                      141
@@ -731,6 +730,9 @@
 #define IDF_HPSL                         1479
 #define IDF_HMSL                         1480
 #define IDD_SX_Page1a                     132
+#define IDR_HydrogensAbsorb              1090
+#define IDR_HydrogensIgnore              1092
+#define IDR_HydrogensExplicit            1550
 
 ///////////////////////////////////////////////////
 //
@@ -2203,20 +2205,22 @@ BEGIN
     CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    9,   11,   27,    8
     CONTROL "Arguments for viewer",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,    9,   31,   68,    8
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  121,  158,   40,   14
-    CONTROL "Auto local &minimise",IDF_AutoLocalOptimise,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  108,   76,   14
+    CONTROL "Auto local &minimise",IDF_AutoLocalOptimise,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  130,   76,   14
     CONTROL "Output .c&ssr",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   64,   54,   14
     CONTROL "Output .cc&l",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   78,   54,   14
-    CONTROL "Use &hydrogens",IDF_UseHydrogens,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,   66,   62,   14
-    CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,   52,   84,   14
+    CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,   47,   84,   14
     CONTROL "Output .&pro",IDF_OutputPRO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  120,   54,   14
     CONTROL "Output chi-s&quared vs. moves",IDF_OutputChi2vsMoves,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  134,  110,   14
-    CONTROL "Use crystallo&graphic centre of mass",IDF_CrystallographicCoM,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,   94,  130,   14
-    CONTROL "Auto &align",IDF_Align,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  136,   46,   14
+    CONTROL "Use crystallo&graphic centre of mass",IDF_CrystallographicCoM,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  116,  130,   14
+    CONTROL "Auto &align",IDF_Align,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  158,   46,   14
     CONTROL "Output .c&if",IDF_OutputCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   92,   54,   14
     CONTROL "Output .&res",IDF_OutputRES,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  106,   54,   14
     CONTROL "Output .pd&b",IDF_OutputPDB,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   50,   54,   14
-    CONTROL "Use hydrogens",IDF_UseHydrogensAuto,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  122,   70,   14
-    CONTROL "Absorb hydrogens",IDC_AbsorbH,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,   80,   80,   14
+    CONTROL "Use hydrogens",IDF_UseHydrogensAuto,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  144,   70,   14
+    CONTROL "Ignore",IDR_HydrogensIgnore,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   17,   70,   44,   14
+    CONTROL "Absorb",IDR_HydrogensAbsorb,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   17,   83,   44,   14
+    CONTROL "Explicit",IDR_HydrogensExplicit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   17,   96,   44,   14
+    CONTROL "Hydrogens",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   11,   61,   58,   52
 END
 
 IDD_Configuration RCDATA
@@ -2225,7 +2229,6 @@ BEGIN
 " 1259 1 \n"
 " 1260 0 \n"
 " 1277 0 \n"
-" 1296 0 \n"
 " 1131 0 \n"
 " 1043 0 \n"
 " 1099 0 \n"
@@ -2235,7 +2238,9 @@ BEGIN
 " 1461 0 \n"
 " 1457 1 \n"
 " 1474 1 \n"
-" 1548 0 \n"
+" 1092 0 \n"
+" 1090 1 \n"
+" 1550 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -4162,16 +4167,16 @@ BEGIN
     CONTROL "T0",IDF_SA_T0_label1,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   98,   30,   28,   10
     CONTROL "Cool",IDF_SA_cool_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  130,   30,   28,   10
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "10",IDF_SA_MaxRepeats,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  323,   26,   32,   14
-    CONTROL "Number of SA runs",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  234,   28,   85,   10
-    CONTROL "Max. number of moves / run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  234,   69,   52,   20
-    CONTROL "Profile chi-sqd multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,  234,   47,   85,   10
-    CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  323,   45,   32,   14
+    CONTROL "10",IDF_SA_MaxRepeats,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  323,   25,   32,   14
+    CONTROL "Number of SA runs",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  234,   27,   85,   10
+    CONTROL "Max. number of moves / run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  234,   50,   52,   20
+    CONTROL "Profile chi-sqd multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,  234,   75,   85,   10
+    CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  323,   73,   32,   14
     CONTROL "&Print...",IDF_PrintSA,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  236,  150,   40,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  294,   72,   30,   12
-    CONTROL "x  10",IDF_LABEL21,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  325,   73,   18,    8
-    CONTROL "7",IDF_MaxMoves2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE,  346,   66,   22,   12
+    CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  294,   53,   30,   12
+    CONTROL "x  10",IDF_LABEL21,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  325,   54,   18,    8
+    CONTROL "7",IDF_MaxMoves2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE,  346,   47,   22,   12
     CONTROL "1",IDF_NumDoFPerMove,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  184,   66,   30,   14
     CONTROL "# of DoF changed / move",IDF_LABEL20,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   92,   68,   90,    8
     CONTROL "&More >",IDB_More,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  314,  150,   40,   14
