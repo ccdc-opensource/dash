@@ -34,7 +34,7 @@
       REAL*8 RADEG, CA, CB, CG, SG, VOLU, ZERO
       DATA RADEG, ZERO/1.7453292519943296D-2, 0.0D0/
 ! This routine will create the conversion matrix for fractional to orthogonal
-! coordinates as defined in the PDB manual
+! coordinates as defined in the PDB manual (i.e. a along X)
       CA = DCOS(ALFA*RADEG)
       CB = DCOS(BETA*RADEG)
       CG = DCOS(GAMA*RADEG)
