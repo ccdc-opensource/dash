@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 07/Sep/2001 15:18:42
+// Modified : 09/Sep/2001 18:54:54
 //
 ///////////////////////////////////////////////////
 //
@@ -151,13 +151,6 @@
 #define IDF_HPSL1                        1092
 #define ISS7                             1093
 #define ISS8                             1094
-#define IDF_a_refine                     1095
-#define IDF_zeropt_refine                1096
-#define IDF_c_refine                     1097
-#define IDF_alp_refine                   1098
-#define IDF_bet_refine                   1099
-#define IDF_gam_refine                   1100
-#define IDF_b_refine                     1101
 #define IDF_a_refine_label               1102
 #define IDF_b_refine_label               1103
 #define IDF_c_refine_label               1104
@@ -764,13 +757,13 @@ STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Peak_Positions_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,    8,    4,  262,   66
-    CONTROL "",IDF_a_refine,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    6,   92,   30,   12
-    CONTROL "",IDF_zeropt_refine,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  178,   92,   36,   12
-    CONTROL "",IDF_c_refine,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   72,   92,   28,   12
-    CONTROL "",IDF_alp_refine,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  104,   92,   22,   12
-    CONTROL "",IDF_bet_refine,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  128,   92,   22,   12
-    CONTROL "",IDF_gam_refine,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  152,   92,   22,   12
-    CONTROL "",IDF_b_refine,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   38,   92,   32,   12
+    CONTROL "",IDF_a_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,    6,   92,   30,   12
+    CONTROL "",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  178,   92,   36,   12
+    CONTROL "",IDF_c_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   72,   92,   28,   12
+    CONTROL "",IDF_alp_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  104,   92,   22,   12
+    CONTROL "",IDF_bet_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  128,   92,   22,   12
+    CONTROL "",IDF_gam_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  152,   92,   22,   12
+    CONTROL "",IDF_b_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   38,   92,   32,   12
     CONTROL "a",IDF_a_refine_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    6,   80,   30,    8
     CONTROL "b",IDF_b_refine_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   40,   80,   30,    8
     CONTROL "c",IDF_c_refine_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   72,   80,   28,    8

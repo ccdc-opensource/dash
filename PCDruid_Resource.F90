@@ -1,4 +1,4 @@
-! Winteracter module created : 07/Sep/2001 15:18:42
+! Winteracter module created : 09/Sep/2001 18:54:54
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -138,13 +138,6 @@
           INTEGER, PARAMETER :: IDF_HPSL1                       =  1092
           INTEGER, PARAMETER :: ISS7                            =  1093
           INTEGER, PARAMETER :: ISS8                            =  1094
-          INTEGER, PARAMETER :: IDF_a_refine                    =  1095
-          INTEGER, PARAMETER :: IDF_zeropt_refine               =  1096
-          INTEGER, PARAMETER :: IDF_c_refine                    =  1097
-          INTEGER, PARAMETER :: IDF_alp_refine                  =  1098
-          INTEGER, PARAMETER :: IDF_bet_refine                  =  1099
-          INTEGER, PARAMETER :: IDF_gam_refine                  =  1100
-          INTEGER, PARAMETER :: IDF_b_refine                    =  1101
           INTEGER, PARAMETER :: IDF_a_refine_label              =  1102
           INTEGER, PARAMETER :: IDF_b_refine_label              =  1103
           INTEGER, PARAMETER :: IDF_c_refine_label              =  1104

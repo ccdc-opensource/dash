@@ -211,7 +211,7 @@
         CASE (PushButton) ! one of the buttons was pushed
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
-            CASE(ID_Index_Output)
+            CASE (ID_Index_Output)
 ! Set the wavelength
               CALL DownLoadWavelength(IDD_Data_Properties)
               CALL WDialogSelect(IDD_Index_Preparation)
@@ -426,6 +426,26 @@
       INTEGER GetCrystalSystemFromUnitCell ! Function
 
       CALL PushActiveWindowID
+! Update values of constrained cell parameters to match the parameters they're constrained to
+      SELECT CASE (LatBrav)
+        CASE ( 1) ! Triclinic
+        CASE ( 2) ! Monoclinic a
+        CASE ( 3) ! Monoclinic b
+        CASE ( 4) ! Monoclinic c
+        CASE ( 5) ! Orthorhombic
+        CASE ( 6) ! Tetragonal
+          CellPar(2) = CellPar(1)
+        CASE ( 7, 9) ! Trigonal / Hexagonal
+          CellPar(2) = CellPar(1)
+        CASE ( 8) ! Rhombohedral
+          CellPar(2) = CellPar(1)
+          CellPar(3) = CellPar(1)
+          CellPar(5) = CellPar(4)
+          CellPar(6) = CellPar(4)
+        CASE (10) ! Cubic
+          CellPar(2) = CellPar(1)
+          CellPar(3) = CellPar(1)
+      END SELECT
 ! Update all windows so that they show the contents of the global variables.
 ! This is in the cell parameters tab, in the wizard, and in the peak positions tab.
       CALL Upload_Cell_Constants()
@@ -622,51 +642,82 @@
 
       INCLUDE 'Lattice.inc'
 
+      INTEGER I
+
       IF ((TheCrystalSystem .GE. 1) .AND. (TheCrystalSystem .LE. 10)) THEN
         LatBrav = TheCrystalSystem
       ELSE
         CALL DebugErrorMessage('Crystal Sytem out of range in UserSetCrystalSystem()')
         LatBrav = 1
       END IF
+      DO I = 1, 6
+        CellParConstrained(I) = .FALSE.
+      ENDDO
+      CALL PushActiveWindowID
       SELECT CASE (LatBrav)
         CASE ( 1) ! Triclinic
         CASE ( 2) ! Monoclinic a
           CellPar(5) =  90.0
           CellPar(6) =  90.0
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
         CASE ( 3) ! Monoclinic b
           CellPar(4) =  90.0
           CellPar(6) =  90.0
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(6) = .TRUE.
         CASE ( 4) ! Monoclinic c
           CellPar(4) =  90.0
           CellPar(5) =  90.0
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(5) = .TRUE.
         CASE ( 5) ! Orthorhombic
           CellPar(4) =  90.0
           CellPar(5) =  90.0
           CellPar(6) =  90.0
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
         CASE ( 6) ! Tetragonal
           CellPar(2) = CellPar(1)
           CellPar(4) =  90.0
           CellPar(5) =  90.0
           CellPar(6) =  90.0
+          CellParConstrained(2) = .TRUE.
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
         CASE ( 7, 9) ! Trigonal / Hexagonal
           CellPar(2) = CellPar(1)
           CellPar(4) =  90.0
           CellPar(5) =  90.0
           CellPar(6) = 120.0
+          CellParConstrained(2) = .TRUE.
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
         CASE ( 8) ! Rhombohedral
           CellPar(2) = CellPar(1)
           CellPar(3) = CellPar(1)
           CellPar(5) = CellPar(4)
           CellPar(6) = CellPar(4)
+          CellParConstrained(2) = .TRUE.
+          CellParConstrained(3) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
         CASE (10) ! Cubic
           CellPar(2) = CellPar(1)
           CellPar(3) = CellPar(1)
           CellPar(4) =  90.0
           CellPar(5) =  90.0
           CellPar(6) =  90.0
+          CellParConstrained(2) = .TRUE.
+          CellParConstrained(3) = .TRUE.
+          CellParConstrained(4) = .TRUE.
+          CellParConstrained(5) = .TRUE.
+          CellParConstrained(6) = .TRUE.
       END SELECT
       CALL Upload_Cell_Constants
-      CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
       CALL WDialogSelect(IDD_PW_Page1)
@@ -704,6 +755,8 @@
       LOGICAL FnUnitCellOK ! Function
       LOGICAL NearlyEqual ! Function
 
+      GetCrystalSystemFromUnitCell = LatBrav
+      RETURN
 ! Check if cell parameters are available and make sense, otherwise set crystal system to unknown
       IF (.NOT. FnUnitCellOK()) THEN
         GetCrystalSystemFromUnitCell = 1 ! Triclinic
@@ -880,13 +933,13 @@
       ENDIF
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(f10.5)')
+      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_PW_Page2)
-      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(f10.5)')
+      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_PW_Page4)
-      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(f10.5)')
+      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(F10.5)')
       CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogPutReal(IDF_Indexing_Lambda,ALambda,'(f10.5)')
+      CALL WDialogPutReal(IDF_Indexing_Lambda,ALambda,'(F10.5)')
 ! Now add in a test: if lab data, and wavelength close to known material,
 ! set anode material in Winteracter menus. Otherwise, anode is unknown.
       IF (JRadOption .EQ. 1) THEN ! X-ray lab data

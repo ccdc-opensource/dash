@@ -10,7 +10,7 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Peak_Positions)
-      CALL WDialogPutReal(IDF_zeropt_refine,ZeroPoint,'(F10.4)')
+      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL PopActiveWindowID
@@ -24,113 +24,58 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      IMPLICIT NONE
+
       INCLUDE 'Lattice.inc'
 
       LOGICAL ValidCellAxisLength ! Function
+      INTEGER WindowNr
+      INTEGER CellParID(6)
+      INTEGER I
 
-! JvdS @ I did this. Needs cleaning up
-
+      CellParID(1) = IDF_a_latt
+      CellParID(2) = IDF_b_latt
+      CellParID(3) = IDF_c_latt
+      CellParID(4) = IDF_alp_latt
+      CellParID(5) = IDF_bet_latt
+      CellParID(6) = IDF_gam_latt
       CALL PushActiveWindowID
-! Update all the cell constants ...
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-      IF (ValidCellAxisLength(CellPar(1))) THEN
-        CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
-      ELSE
-        CALL WDialogClearField(IDF_a_latt)
-      ENDIF
-      IF (ValidCellAxisLength(CellPar(2))) THEN
-        CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')
-      ELSE
-        CALL WDialogClearField(IDF_b_latt)
-      ENDIF
-      IF (ValidCellAxisLength(CellPar(3))) THEN
-        CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')
-      ELSE
-        CALL WDialogClearField(IDF_c_latt)
-      ENDIF
-
-      IF (CellPar(4) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_alp_latt)
-      ELSE
-        CALL WDialogPutReal(IDF_alp_latt,CellPar(4),'(F10.3)')
-      ENDIF
-      IF (CellPar(5) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_bet_latt)
-      ELSE
-        CALL WDialogPutReal(IDF_bet_latt,CellPar(5),'(F10.3)')
-      ENDIF
-      IF (CellPar(6) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_gam_latt)
-      ELSE
-        CALL WDialogPutReal(IDF_gam_latt,CellPar(6),'(F10.3)')
-      ENDIF
-!C>> And in the wizard too
-      CALL WDialogSelect(IDD_PW_Page1)
-      IF (ValidCellAxisLength(CellPar(1))) THEN
-        CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
-      ELSE
-        CALL WDialogClearField(IDF_a_latt)
-      ENDIF
-      IF (ValidCellAxisLength(CellPar(2))) THEN
-        CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')
-      ELSE
-        CALL WDialogClearField(IDF_b_latt)
-      ENDIF
-      IF (ValidCellAxisLength(CellPar(3))) THEN
-        CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')
-      ELSE
-        CALL WDialogClearField(IDF_c_latt)
-      ENDIF
-
-      IF (CellPar(4) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_alp_latt)
-      ELSE
-        CALL WDialogPutReal(IDF_alp_latt,CellPar(4),'(F10.3)')
-      ENDIF
-      IF (CellPar(5) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_bet_latt)
-      ELSE
-        CALL WDialogPutReal(IDF_bet_latt,CellPar(5),'(F10.3)')
-      ENDIF
-      IF (CellPar(6) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_gam_latt)
-      ELSE
-        CALL WDialogPutReal(IDF_gam_latt,CellPar(6),'(F10.3)')
-      ENDIF
-!C>> And in the peak positions box
-      CALL WDialogSelect(IDD_Peak_Positions)
-
-      IF (ValidCellAxisLength(CellPar(1))) THEN
-        CALL WDialogPutReal(IDF_a_refine,CellPar(1),'(F10.5)')
-      ELSE
-        CALL WDialogClearField(IDF_a_refine)
-      ENDIF
-      IF (ValidCellAxisLength(CellPar(2))) THEN
-        CALL WDialogPutReal(IDF_b_refine,CellPar(2),'(F10.5)')
-      ELSE
-        CALL WDialogClearField(IDF_b_refine)
-      ENDIF
-      IF (ValidCellAxisLength(CellPar(3))) THEN
-        CALL WDialogPutReal(IDF_c_refine,CellPar(3),'(F10.5)')
-      ELSE
-        CALL WDialogClearField(IDF_c_refine)
-      ENDIF
-
-      IF (CellPar(4) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_alp_refine)
-      ELSE
-        CALL WDialogPutReal(IDF_alp_refine,CellPar(4),'(F10.3)')
-      ENDIF
-      IF (CellPar(5) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_bet_refine)
-      ELSE
-        CALL WDialogPutReal(IDF_bet_refine,CellPar(5),'(F10.3)')
-      ENDIF
-      IF (CellPar(6) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_gam_refine)
-      ELSE
-        CALL WDialogPutReal(IDF_gam_refine,CellPar(6),'(F10.3)')
-      ENDIF
+      DO WindowNr = 1, 3
+        SELECT CASE (WindowNr)
+          CASE (1) 
+            CALL WDialogSelect(IDD_Crystal_Symmetry)
+          CASE (2) 
+            CALL WDialogSelect(IDD_PW_Page1)
+          CASE (3) 
+            CALL WDialogSelect(IDD_Peak_Positions)
+        END SELECT
+! Update all the unit cell lengths ...
+        DO I = 1, 3
+          IF (ValidCellAxisLength(CellPar(I))) THEN
+            CALL WDialogPutReal(CellParID(I),CellPar(I),'(F10.5)')
+          ELSE
+            CALL WDialogClearField(CellParID(I))
+          ENDIF
+          IF (CellParConstrained(I)) THEN
+            CALL WDialogFieldState(CellParID(I),Disabled)
+          ELSE
+            CALL WDialogFieldState(CellParID(I),Enabled)
+          ENDIF
+        ENDDO
+! ... and the unit cell angles
+        DO I = 4, 6
+          IF (CellPar(I) .LT. 0.00001) THEN
+            CALL WDialogClearField(CellParID(I))
+          ELSE
+            CALL WDialogPutReal(CellParID(I),CellPar(I),'(F10.3)')
+          ENDIF
+          IF (CellParConstrained(I)) THEN
+            CALL WDialogFieldState(CellParID(I),Disabled)
+          ELSE
+            CALL WDialogFieldState(CellParID(I),Enabled)
+          ENDIF
+        ENDDO
+      ENDDO
       CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Cell_Constants
@@ -198,10 +143,10 @@
       DATA KELPT /2,3,4,5,6,7, 2,3,4,5,10,10, 2,3,4,10,5,10, 2,3,4,10,10,5, &
       2,3,4,10,10,10, 2,2,3,10,10,10, 2,2,3,9,10,10, &
       2,2,2,3,3,3, 2,2,3,9,10,10, 2,2,2,10,10,10/ 
-!>> JCC Check the wavelength: if the user has not set it, then
-!>> we should not be here!
       LOGICAL FnWaveLengthOK ! Function
 
+!>> JCC Check the wavelength: if the user has not set it, then
+!>> we should not be here!
       IF (.NOT. FnWaveLengthOK()) RETURN
       NVal = 0
       DO I = 1, NTPeak
@@ -248,9 +193,7 @@
       CALL InverseMatrix(GREAL,GREC,3)
       XDD(1) = ZeroPoint
       DXDD(1) = 0.01*ABS(ZeroPoint)+0.001
-      DO I = 1, 6
-        IASS(I) = 0
-      END DO
+      IASS = 0
       DO I = 1, NVal
         DO II = 1, 3
           IASS(II) = IASS(II) + IHLR(II,I)**2
@@ -308,8 +251,8 @@
       END SELECT
       IF (NoCRef) RETURN
       IF (NVal .LE. NDD) RETURN
-      DDMAX=0.
-      DO I=2,NDD
+      DDMAX = 0.0
+      DO I = 2, NDD
         DDMAX = MAX(DDMAX,1.e-4*ABS(XDD(I)))
       END DO
       DO I = 2, NDD
@@ -319,7 +262,7 @@
       CALL SIMOPT(XDD,DXDD,COVDD,NDD,ChiGetLattice)
       XDD(9) = 0.5 * XDD(2)
       XDD(10) = 0.0
-      DO I = 1 ,3
+      DO I = 1, 3
         GREC(I,I) = XDD(KELPT(I, LatBrav))
       END DO
       GREC(1,2) = XDD(KELPT(4, LatBrav))
