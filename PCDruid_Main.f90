@@ -1016,6 +1016,11 @@
 	  SUBROUTINE DoExit()
       USE WINTERACTER
       USE VARIABLES
+	  INTEGER ISTAT
+
+	  CLOSE(UNIT=12,STATUS='DELETE',IOSTAT=ISTAT)
+	  CLOSE(UNIT=6,STATUS='DELETE',IOSTAT=ISTAT)
+	  CALL DeleteTempFiles
 	  CALL WindowClose()
       STOP
 	  END SUBROUTINE DoExit
@@ -1856,3 +1861,27 @@
 		CALL SetWizardState(WizardOn)
    endif
    end subroutine ToggleMenus
+
+
+   	subroutine DeleteTempFiles
+	USE WINTERACTER
+	USE DRUID_HEADER
+
+! Remove redundant files 
+	CALL IOsDeleteFile('polyf.tic')
+	CALL IOsDeleteFile('polyf.ccl')
+	CALL IOsDeleteFile('polyf.lis')
+	CALL IOsDeleteFile('polyf.hkl')
+
+	CALL IOsDeleteFile('polyp.tic')
+	CALL IOsDeleteFile('polyp.hkl')
+	CALL IOsDeleteFile('polyp.ccl')
+	CALL IOsDeleteFile('polyp.ccn')
+	CALL IOsDeleteFile('polyp.pik')
+	CALL IOsDeleteFile('polyp.hcv')
+	CALL IOsDeleteFile('polyp.dat')
+
+    CALL IOsDeleteFile('polys.ccl')
+    CALL IOsDeleteFile('polys.lis')
+
+	end subroutine DeleteTempFiles
