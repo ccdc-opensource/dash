@@ -274,15 +274,15 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SA_STRUCTURE_OUTPUT_OVERLAP(LastRunNr)
+      SUBROUTINE SA_STRUCTURE_OUTPUT_OVERLAP
 
+      USE WINTERACTER
+      USE DRUID_HEADER
       USE VARIABLES
       USE SAMVAR
 !
 !       Called at the end of the SA
 !
-      INTEGER LastRunNr
-
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
@@ -344,10 +344,15 @@
 ! The original atom ids to list in the labels and the back mapping
       COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
 
+      LOGICAL RESTART
+      INTEGER SA_Run_Number, I
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+! SA_Run_Number now holds the number of the last completed multirun
+
 ! Use standard PDB orthogonalisation
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
-      INTEGER RunNr
+      INTEGER RunNr, TickedRunNr
       REAL*8 CART(MAXATM,3)
       CHARACTER*2  AtmElement(1:MAXATM_2)
       INTEGER  pdbBond(1:MAXBND*maxfrg,1:2)
@@ -356,9 +361,9 @@
       CHARACTER*2 RunStr
       LOGICAL, EXTERNAL :: ChrIsLetter
 
-!       Write the file headers first
-!
-! Now the PDB...
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
+! Write the file headers first
       OPEN (UNIT=65,FILE='Test_Overlap.pdb',STATUS='unknown',ERR=999)
 ! JCC included again
       CALL sagminv(f2cpdb,inv,3)
@@ -427,65 +432,77 @@
         ENDIF
       ENDDO ! loop over z-matrices
       iiact = 0
-      DO RunNr = 1, LastRunNr
-        SELECT CASE(RunNr)
-          CASE ( 1)
-            LabelStr = 'Co' ! Cobalt        Blue
-          CASE ( 2)
-            LabelStr = 'O'  ! Oxygen        Red
-          CASE ( 3)
-            LabelStr = 'S'  ! Sulphur       Yellow
-          CASE ( 4)
-            LabelStr = 'Cl' ! Chlorine      Green
-          CASE ( 5)
-            LabelStr = 'N'  ! Nitrogen      Light blue
-          CASE ( 6)
-            LabelStr = 'Br' ! Bromine       Brown
-          CASE ( 7)
-            LabelStr = 'I'  ! Iodine        Pink
-          CASE ( 8)
-            LabelStr = 'C'  ! Carbon        Grey
-          CASE ( 9)
-            LabelStr = 'H'  ! Hydrogen      White
-          CASE (10)
-            LabelStr = 'P'  ! Phosphorus
-        END SELECT
-        WRITE(RunStr,'(I2)') RunNr
-        CALL StrClean(RunStr,ilen) ! Left justify
-        LabelStr = LabelStr(1:LEN_TRIM(LabelStr))//RunStr
-        DO ifrg = 1, maxfrg
-          IF (gotzmfile(ifrg)) THEN
-            DO i = 1, natoms(ifrg)
-              iiact = iiact + 1
-              xc = pdbAtmCoords(1,i,ifrg,RunNr)        ! We could replace (ii) by (orig,ifrg) and get rid of ii and itotal
-              yc = pdbAtmCoords(2,i,ifrg,RunNr)
-              zc = pdbAtmCoords(3,i,ifrg,RunNr)
+      TickedRunNr = 0
+      DO RunNr = 1, SA_Run_Number
+        CALL WGridGetCellCheckBox(IDF_SA_summary,3,RunNr,istatus)
+        IF (istatus .EQ. 1) THEN
+          TickedRunNr = TickedRunNr + 1
+          SELECT CASE(TickedRunNr)
+            CASE ( 1)
+              LabelStr = 'Co' ! Cobalt        Blue
+            CASE ( 2)
+              LabelStr = 'O'  ! Oxygen        Red
+            CASE ( 3)
+              LabelStr = 'S'  ! Sulphur       Yellow
+            CASE ( 4)
+              LabelStr = 'Cl' ! Chlorine      Green
+            CASE ( 5)
+              LabelStr = 'N'  ! Nitrogen      Light blue
+            CASE ( 6)
+              LabelStr = 'Br' ! Bromine       Brown
+            CASE ( 7)
+              LabelStr = 'I'  ! Iodine        Pink
+            CASE ( 8)
+              LabelStr = 'C'  ! Carbon        Grey
+            CASE ( 9)
+              LabelStr = 'H'  ! Hydrogen      White
+            CASE (10)
+              LabelStr = 'P'  ! Phosphorus
+          END SELECT
+          WRITE(RunStr,'(I2)') RunNr
+          CALL StrClean(RunStr,ilen) ! Left justify
+          LabelStr = LabelStr(1:LEN_TRIM(LabelStr))//RunStr
+          DO ifrg = 1, maxfrg
+            IF (gotzmfile(ifrg)) THEN
+              DO i = 1, natoms(ifrg)
+                iiact = iiact + 1
+                xc = pdbAtmCoords(1,i,ifrg,RunNr)        ! We could replace (ii) by (orig,ifrg) and get rid of ii and itotal
+                yc = pdbAtmCoords(2,i,ifrg,RunNr)
+                zc = pdbAtmCoords(3,i,ifrg,RunNr)
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
-              IF (.NOT. ChrIsLetter(LabelStr(2:2))) THEN
-                WRITE (65,1120) iiact, LabelStr(1:3), xc, yc, zc, &
-                                occ(i,ifrg), tiso(i,ifrg), LabelStr(1:1)
- 1120           FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
-              ELSE
-                WRITE (65,1130) iiact, LabelStr(1:4), xc, yc, zc, &
-                                occ(i,ifrg), tiso(i,ifrg), LabelStr(1:2)
- 1130           FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
-              ENDIF
-            ENDDO ! loop over atoms
-          ENDIF
-        ENDDO ! loop over z-matrices
+                IF (.NOT. ChrIsLetter(LabelStr(2:2))) THEN
+                  WRITE (65,1120) iiact, LabelStr(1:3), xc, yc, zc, &
+                                  occ(i,ifrg), tiso(i,ifrg), LabelStr(1:1)
+ 1120             FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
+                ELSE
+                  WRITE (65,1130) iiact, LabelStr(1:4), xc, yc, zc, &
+                                  occ(i,ifrg), tiso(i,ifrg), LabelStr(1:2)
+ 1130             FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+                ENDIF
+              ENDDO ! loop over atoms
+            ENDIF
+          ENDDO ! loop over z-matrices
+        ENDIF ! Was this solution ticked to be displayed?
       ENDDO ! loop over runs
-      DO RunNr = 1, LastRunNr
-        DO BondNr = 1, TotNumBonds
-          WRITE(65,'(A6,I5,I5)') 'CONECT', (pdbBond(BondNr,1)+NATOM*(RunNr-1)), (pdbBond(BondNr,2)+NATOM*(RunNr-1))
-        ENDDO
+      TickedRunNr = 0
+      DO RunNr = 1, SA_Run_Number
+        CALL WGridGetCellCheckBox(IDF_SA_summary,3,RunNr,istatus)
+        IF (istatus .EQ. 1) THEN
+          TickedRunNr = TickedRunNr + 1
+          DO BondNr = 1, TotNumBonds
+            WRITE(65,'(A6,I5,I5)') 'CONECT', (pdbBond(BondNr,1)+NATOM*(TickedRunNr-1)), (pdbBond(BondNr,2)+NATOM*(TickedRunNr-1))
+          ENDDO
+        ENDIF
       ENDDO ! loop over runs
       WRITE (65,"('END')")
       CLOSE (65)
       CALL ViewStructure('Test_Overlap.pdb')
+      CALL PopActiveWindowID
       RETURN
  1380 FORMAT ('REMARK 290 ')
   999 CALL ErrorMessage('Could not open temporary file.')
+      CALL PopActiveWindowID
 
       END SUBROUTINE SA_STRUCTURE_OUTPUT_OVERLAP
 !*==SAGMINV.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001

@@ -54,6 +54,7 @@
               CALL WDialogHide()
               EXIT
             END IF
+            IF (EventInfo%VALUE1 .EQ. IDB_ShowOverlap) CALL SA_STRUCTURE_OUTPUT_OVERLAP
         END SELECT
 !ep allows you to view pdb file of SA Solutions, each clicked
 !   check box in fresh mercury window
