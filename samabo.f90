@@ -894,11 +894,10 @@
 
       IMPLICIT NONE
 
-      INTEGER :: Npib
-      INTENT (INOUT) Npib
+      INTEGER, INTENT (INOUT) :: Npib
 
-      INTEGER :: I, Iat, Ipibon, Jat, Mettot
-      LOGICAL ISMET ! Function
+      LOGICAL, EXTERNAL :: ISMET
+      INTEGER I, Iat, Ipibon, Jat, Mettot
 
 ! HYBR      estimate of hybridiation 1 = sp1 2=sp2 3=sp3  >100 = metal
       

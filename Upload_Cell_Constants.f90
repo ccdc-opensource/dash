@@ -11,9 +11,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
 
-      REAL ChiGetLattice
-      EXTERNAL ChiGetLattice
-
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
       REAL XDD(MVAR),DXDD(MVAR),COVDD(MMPAR)
@@ -56,12 +53,13 @@
       ! 4 = c
       ! etc.
 
-      LOGICAL FnWaveLengthOK, FnUnitCellOK ! Function
-      INTEGER I, II, iOrd, NDD
-      REAL    DDMAX
-
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
+
+      LOGICAL, EXTERNAL :: FnWaveLengthOK, FnUnitCellOK
+      REAL, EXTERNAL :: ChiGetLattice
+      INTEGER I, II, iOrd, NDD
+      REAL    DDMAX
 
 ! JCC Check the wavelength: if the user has not set it, then
 ! we should not be here!
