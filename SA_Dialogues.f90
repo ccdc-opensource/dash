@@ -716,6 +716,7 @@
           Bonds(2,iBondNr,iFrg2)  = Bonds(2,iBondNr,iFrg1)
         ENDDO
       ENDIF
+      CALL zmDoAdmin(iFrg2)
 
       END SUBROUTINE zmCopy
 !
@@ -773,7 +774,6 @@
       zmAtomDeleted = .FALSE.
       zmRebuild = 0
   999 CALL zmRotCopyDialog2Temp
-      CALL zmDoAdmin(iFrg)
       frag_file(iFrg) = tOldFileName
 
       END FUNCTION zmRebuild
@@ -985,6 +985,7 @@
       CALL WDialogGetInteger(IDF_RotAxPlnAtm3,tInteger)
       zmSingleRotAxAtms(3,iFrg) = izmbid(tInteger,iFrg)
       CALL WDialogGetRadioButton(IDF_RotAxAtom,zmSingleRotAxDef(iFrg))
+      CALL zmDoAdmin(iFrg)
       CALL PopActiveWindowID
 
       END SUBROUTINE zmRotCopyDialog2Temp
