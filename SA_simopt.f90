@@ -19,8 +19,8 @@
       REAL              XOPT,       C,       FOPT
       COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       REAL          RULB
       COMMON /RULB/ RULB(Mvar)
@@ -109,7 +109,7 @@
         DO II = 1, N
           I = IP(II)
           XOPT(I) = XSIM(II)
-          X(I) = XSIM(II)
+          x_unique(I) = XSIM(II)
         ENDDO
         FOPT = FTEM
         DO II = 1, NATOM
@@ -134,8 +134,8 @@
   !U      ENDDO
       ELSE
         IF (PrefParExists) THEN
-          CALL PO_PRECFC(X(iPrfPar))
-          CALL FCN(X,DFTEM,0)
+          CALL PO_PRECFC(x_unique(iPrfPar))
+          CALL FCN(x_unique,DFTEM,0)
         ENDIF
       ENDIF
       CALL WCursorShape(CurCrossHair)
@@ -155,8 +155,8 @@
       REAL P(MVAR)
       INTEGER N
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       REAL              XOPT,       C,       FOPT
       COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT

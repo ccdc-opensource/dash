@@ -17,8 +17,8 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       INTEGER         KKOR
       REAL                  WTIJ
@@ -285,7 +285,7 @@
 ! If we are here, the parameter that has been changed didn't affect the fractional co-ordinates.
 ! In the current set-up, that means that it must have been the preferred orientation.
 ! So: recalculate the preferred orientation correction factors.
-        CALL PO_PRECFC(x(iPrfPar))
+        CALL PO_PRECFC(x_unique(iPrfPar))
       ENDIF
 ! AICALC(1:NumOfRef) now contains the structural part of the calculated intensities
 ! XICALC(1:NumOfRef) now contains the preferred orientation part of the calculated intensities
@@ -336,7 +336,7 @@
       INCLUDE 'PARAMS.INC'
 
       INTEGER         NATOM
-      REAL                   X
+      REAL                   Xato
       INTEGER                          KX
       REAL                                        AMULT,      TF
       INTEGER         KTF
@@ -344,7 +344,7 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
@@ -382,12 +382,12 @@
         NATOM = NumOfNonHydrogens
       ENDIF
       DO N = 1, NATOM
-        C1N = COS(TWOPI*X(1,N))
-        C2N = COS(TWOPI*X(2,N))
-        C3N = COS(TWOPI*X(3,N))
-        S1N = SIN(TWOPI*X(1,N))
-        S2N = SIN(TWOPI*X(2,N))
-        S3N = SIN(TWOPI*X(3,N))
+        C1N = COS(TWOPI*Xato(1,N))
+        C2N = COS(TWOPI*Xato(2,N))
+        C3N = COS(TWOPI*Xato(3,N))
+        S1N = SIN(TWOPI*Xato(1,N))
+        S2N = SIN(TWOPI*Xato(2,N))
+        S3N = SIN(TWOPI*Xato(3,N))
         COSQS(0,1,N) = 1.0
         COSQS(0,2,N) = 1.0
         COSQS(0,3,N) = 1.0

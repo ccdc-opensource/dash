@@ -61,10 +61,8 @@
 
 !Required to check if x,y, or z have been fixed or bounds changed from defaults
 
-!Can't call first common block member x
-
-      REAL             xx,       lb,       ub,       vm
-      COMMON /values/  xx(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       INTEGER MaxNumAtom !in an include somewhere??
       PARAMETER (MaxNumAtom = 150)

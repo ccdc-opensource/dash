@@ -680,8 +680,8 @@
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
-      REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
       INTEGER     mpdbops
       PARAMETER ( mpdbops = 192 )
