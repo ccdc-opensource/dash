@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Init_PeakFitRanges
+      SUBROUTINE Clear_PeakFitRanges
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -57,11 +57,11 @@
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL CheckIfWeCanIndex
 
-      END SUBROUTINE Init_PeakFitRanges
+      END SUBROUTINE Clear_PeakFitRanges
 !
 !*****************************************************************************
 !
-      SUBROUTINE Init_BackGround
+      SUBROUTINE Clear_BackGround
 
       IMPLICIT NONE
 
@@ -84,7 +84,41 @@
         YBBIN(I) = 0.0
       ENDDO
 
-      END SUBROUTINE Init_BackGround
+      END SUBROUTINE Clear_BackGround
+!
+!*****************************************************************************
+!
+      SUBROUTINE Clear_UnitCell
+
+      IMPLICIT NONE
+
+      INCLUDE 'lattice.inc'
+
+      INTEGER I
+
+      ZeroPoint = 0.0
+      CALL Upload_ZeroPoint
+      LatBrav = 1 ! Triclinic
+      DO I = 1, 6
+        CellPar(I) = -999.0
+      ENDDO
+      CALL Upload_CrystalSystem
+
+      END SUBROUTINE Clear_UnitCell
+!
+!*****************************************************************************
+!
+      SUBROUTINE Clear_Zmatrices
+
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+! Blow away the z-matrices
+      gotzmfile = .FALSE.
+      CALL UpdateZmatrixSelection
+
+      END SUBROUTINE Clear_Zmatrices
 !
 !*****************************************************************************
 !

@@ -1,4 +1,4 @@
-! Winteracter module created : 26/Nov/2001 12:01:07
+! Winteracter module created : 01/Dec/2001 14:02:04
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -212,7 +212,6 @@
           INTEGER, PARAMETER :: IDF_SA_TRR_label                =  1155
           INTEGER, PARAMETER :: IDF_LABEL12                     =  1467
           INTEGER, PARAMETER :: IDF_LABEL5                      =  1459
-          INTEGER, PARAMETER :: IDF_LABEL13                     =  1468
           INTEGER, PARAMETER :: IDF_SA_TRR_label2               =  1156
           INTEGER, PARAMETER :: IDF_LABEL11                     =  1466
           INTEGER, PARAMETER :: IDF_SA_cool_label               =  1162
@@ -315,8 +314,6 @@
           INTEGER, PARAMETER :: IDD_Index_Preparation           =   153
           INTEGER, PARAMETER :: IDF_Indexing_Systems            =  1307
           INTEGER, PARAMETER :: IDF_Indexing_Cell               =  1308
-          INTEGER, PARAMETER :: IDF_Indexing_Info               =  1309
-          INTEGER, PARAMETER :: IDF_Indexing_Label              =  1310
           INTEGER, PARAMETER :: IDF_Indexing_triclinic          =  1311
           INTEGER, PARAMETER :: IDF_Indexing_Monoclinic         =  1312
           INTEGER, PARAMETER :: IDF_Indexing_Ortho              =  1313
@@ -481,4 +478,5 @@
           INTEGER, PARAMETER :: IDF_Limit2                      =  1220
           INTEGER, PARAMETER :: IDF_InvertSelection             =  1221
           INTEGER, PARAMETER :: IDF_OutputChi2vsMoves           =  1099
+          INTEGER, PARAMETER :: IDF_SubtractBackground          =  1100
       END MODULE Druid_Header

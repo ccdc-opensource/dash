@@ -166,16 +166,16 @@
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
           BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ELSE
         DO N = 1, NATOM
           AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
           BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ENDIF
       FFCALC_050 = AFCAL*AFCAL + BFCAL*BFCAL
@@ -199,16 +199,16 @@
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
           BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ELSE
         DO N = 1, NATOM
           AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
           BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ENDIF
       FFCALC_052 = AFCAL*AFCAL + BFCAL*BFCAL
@@ -231,12 +231,12 @@
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ELSE
         DO N = 1, NATOM
           AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ENDIF
       FFCALC_057 = AFCAL*AFCAL
@@ -258,7 +258,7 @@
       IL = IREFH(3,IR)
       DO N = 1, NATOM
         AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)    &
-   &            *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+                *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
       ENDDO
       FFCALC_058 = AFCAL*AFCAL
 
@@ -280,12 +280,12 @@
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ELSE
         DO N = 1, NATOM
           AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ENDIF
       FFCALC_061 = AFCAL*AFCAL
@@ -308,12 +308,12 @@
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ELSE
         DO N = 1, NATOM
           AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
         ENDDO
       ENDIF
       FFCALC_064 = AFCAL*AFCAL
@@ -664,15 +664,15 @@
       ELSEIF (LOGREF(2,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
-   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
-   &              -COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
-   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
-   &              *FOB(N,IR)
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+                  -COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+                  *FOB(N,IR)
           BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
-   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
-   &              +COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
-   &              +SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
-   &              *FOB(N,IR)
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+                  +COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+                  +SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+                  *FOB(N,IR)
         ENDDO
       ELSEIF (LOGREF(3,IR)) THEN
         DO N = 1, NATOM
@@ -682,15 +682,15 @@
       ELSEIF (LOGREF(4,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
-   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
-   &              +COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
-   &              +SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
-   &              *FOB(N,IR)
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+                  +COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+                  +SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+                  *FOB(N,IR)
           BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
-   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
-   &              -COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
-   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
-   &              *FOB(N,IR)
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+                  -COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+                  *FOB(N,IR)
         ENDDO
       ENDIF
       FFCALC_212 = AFCAL*AFCAL + BFCAL*BFCAL

@@ -30,7 +30,7 @@
       MAIN_WINDOW%WIDTH  = 0.8   * WInfoScreen(1)
       MAIN_WINDOW%HEIGHT = 0.375 * WInfoScreen(2)
       MAIN_WINDOW%X      = 0.1   * WInfoScreen(1)
-      MAIN_WINDOW%Y      = 0.06  * FLOAT(WInfoScreen(2)) + 262.0
+      MAIN_WINDOW%Y      = 0.01  * FLOAT(WInfoScreen(2)) + 365.0
 ! Set druid_header menu id and window title
       MAIN_WINDOW%MENUID = IDR_MENU1
       MAIN_WINDOW%TITLE  = "DASH"
@@ -144,7 +144,7 @@
         CASE (ID_Structure_Solution_Mode)
           CALL ShowWizardWindowZmatrices
         CASE (ID_ClearPeakFitRanges)
-          IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Init_PeakFitRanges
+          IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Clear_PeakFitRanges
         CASE (ID_get_crystal_symmetry)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
@@ -266,29 +266,12 @@
 !   This subroutine redraws the window
 !
       USE WINTERACTER
-      USE VARIABLES
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
-
 !   Update window
-!
-!      ICurPlotMode = InfoGrScreen(PlotModeReq)
       CALL IGrPlotMode('N')
-      IF (PLOTT) CALL Profile_Plot
-      IF (DoSaRedraw) CALL sa_output_gr()
-
-!       SELECT CASE (ICurPlotMode)
-!           CASE (PlotNormal)
-!                 CALL IGrPlotMode('N')
-!           CASE (PlotOr)
-!                 CALL IGrPlotMode('O')
-!           CASE (PlotAnd)
-!                 CALL IGrPlotMode('A')
-!           CASE (PlotEor)
-!                 CALL IGrPlotMode('E')
-!       END SELECT                        
+      CALL Profile_Plot
 
       END SUBROUTINE Redraw
 !

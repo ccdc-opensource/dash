@@ -37,7 +37,7 @@
         WRITE(Exp,'(I2)') valid_license
         CALL InfoMessage("Your DASH license will expire in "//Exp//" days.")
       ENDIF
-! JvdS Now we can remove the licence dialogue from memory:
+! Now we can remove the licence dialogue from memory:
       CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogUnload
 
@@ -130,6 +130,39 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE decipher(v,w,k)
+
+      INTEGER, INTENT (in   ) ::  v(2)
+      INTEGER, INTENT (  out) ::  w(2)
+      INTEGER, INTENT (in   ) ::  k(4)
+
+      INTEGER y,  z
+      INTEGER a, b, c, d
+      INTEGER n 
+      INTEGER sum
+      INTEGER :: delta = 16#9E3779B9
+
+      sum = 16#C6EF3720
+      n = 32
+      y = v(1)
+      z = v(2)
+      a = k(1)
+      b = k(2)
+      c = k(3)
+      d = k(4)
+      DO WHILE (n .GT. 0)
+        n = n - 1
+        z = z - (ISHFT(y,4)) - IEOR(c,y) - IEOR(sum,ISHFT(y,-5)) - d
+        y = y - (ISHFT(z,4)) - IEOR(a,z) - IEOR(sum,ISHFT(z,-5)) - b
+        sum = sum - delta
+      ENDDO
+      w(1) = y
+      w(2) = z
+
+      END SUBROUTINE decipher
+!
+!*****************************************************************************
+!
       SUBROUTINE Decode_License(LString,Info)
 
       USE VARIABLES
@@ -149,20 +182,18 @@
       k(4) = 1453
       Info%Valid = 1
 ! JvdS Next lines very dirty: v is INTEGER*4, but their XOR is INTEGER*2. Not possible.
-      READ(Lstring,'(2z8,z4)',err = 99) v(1), v(2), checksum
+      READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
       cs = IEOR(v(1),v(2))
       IF (tCheckSum .NE. checksum) GOTO 99
 ! Check the checksum
       CALL decipher(v,w,k)
-      Info%SerialNumber =  w(1)
-      Info%LicenseType = w(2)/100000000
-      Info%DateCode = w(2) - Info%LicenseType*100000000
-      Info%Year     = Info%DateCode/10000
-      Info%Month    = (Info%DateCode - Info%Year*10000)/100
-      Info%Day      = (Info%DateCode - Info%Year*10000 - Info%Month*100)
-      IF (Info%LicenseType .EQ. SiteKey) THEN
-        Info%SerialNumber = Info%SerialNumber - 145789123 ! demangle into a site number
-      END IF 
+      Info%SerialNumber = w(1)
+      Info%LicenseType  = w(2)/100000000
+      Info%DateCode     = w(2) - Info%LicenseType*100000000
+      Info%Year         = Info%DateCode/10000
+      Info%Month        = (Info%DateCode - Info%Year*10000)/100
+      Info%Day          = (Info%DateCode - Info%Year*10000 - Info%Month*100)
+      IF (Info%LicenseType .EQ. SiteKey) Info%SerialNumber = Info%SerialNumber - 145789123 ! demangle into a site number
       RETURN 
  99   CONTINUE
       Info%Valid = -1
@@ -171,7 +202,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER Function Read_License_Valid()
+      INTEGER FUNCTION Read_License_Valid()
 
       USE VARIABLES  
 
@@ -262,13 +293,11 @@
       WRITE(iun,'(A)',ERR=99)         "# License File for DASH"
       WRITE(iun,'(A)',ERR=99)         "#"
       WRITE(iun,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' license '
-
       IF      (Info%LicenseType .EQ. NodeKey) THEN
         WRITE(iun,'(A,z8)',ERR=99) '# Your DASH Serial ID for this machine is ',Info%SerialNumber
       ELSE IF (Info%LicenseType .EQ. SiteKey) THEN
         WRITE(iun,'(A,z8)',ERR=99) '# Your DASH Site ID is ',Info%SerialNumber
       ENDIF
-
       IF (Info%Year .EQ. 9999) THEN
         WRITE(iun,'(A)',ERR=99)'# The license is non-expiring'
       ELSE
@@ -349,62 +378,26 @@
 !
 !*****************************************************************************
 !
-subroutine decipher(v,w,k)
+      INTEGER FUNCTION Get_DashSerialNumber( lpszDriveName )
 
+      USE DFWIN
 
-integer, intent(in)     ::  v(2)
-integer, intent(out)    ::  w(2)
-integer, intent(in)     ::  k(4)
+      CHARACTER*(*)   lpszDriveName
+      CHARACTER*100   lpszSystemName
+      INTEGER(4)      lpszSerialNumber
+      INTEGER(4)      nSystemNameSize 
+      INTEGER         Mangler
+      PARAMETER (Mangler = 149355525)
 
-integer y,  z
-integer a, b, c, d
-integer :: n 
-integer :: sum
-integer :: delta = 16#9E3779B9
+      LOGICAL(4)      bRC
+      INTEGER*4       ret
+      CHARACTER*50    Volume
 
-sum = 16#C6EF3720
-n = 32
-
-y = v(1)
-z = v(2)
-
-a = k(1)
-b = k(2)
-c = k(3)
-d = k(4)
-
-do while ( n .gt. 0)
-      n = n - 1
-      z = z - (ishft(y,4)) - ieor(c,y) - ieor(sum,ishft(y,-5)) - d
-      y = y - (ishft(z,4)) - ieor(a,z) - ieor(sum,ishft(z,-5)) - b
-      sum = sum - delta
-end do
-w(1) = y
-w(2) = z
-return
-end subroutine decipher
-!
-!*****************************************************************************
-!
-     integer function Get_DashSerialNumber( lpszDriveName )
-     use dfwin
-     character*(*)   lpszDriveName
-     character*100   lpszSystemName
-     integer(4)      lpszSerialNumber
-       integer(4)      nSystemNameSize 
-       integer         Mangler
-       parameter (Mangler = 149355525)
-
-     logical(4)      bRC
-     integer*4       ret
-     character*50    Volume
-       nSystemNameSize     = 100
+      nSystemNameSize   = 100
 !     lpszSystemName      = lpszSystemName
-     lpszSerialNumber    = 1
-
-
-     ret = lstrcpy(lpszSystemName, "                               "C)
-     bRC = GetVolumeInformation(                                       &
+      lpszSerialNumber    = 1
+      ret = lstrcpy(lpszSystemName, "                               "C)
+      bRC = GetVolumeInformation(                                       &
                            lpszdrivename,                              &
                            Volume,                                     &
                            50,                                         &
@@ -413,10 +406,9 @@ end subroutine decipher
                            NULL,                                       &
                            lpszSystemName,                             &
                            nSystemNameSize)
+      Get_DashSerialNumber = IEOR(lpszSerialNumber,Mangler)
 
-      Get_DashSerialNumber  = IEOR(lpszSerialNumber,Mangler)
-    return
-      end
+      END FUNCTION Get_DashSerialNumber
 !
 !*****************************************************************************
 !

@@ -411,7 +411,7 @@
           CALL ScrUpdateFileName
         ENDIF
       ENDIF
-      CALL Init_PeakFitRanges
+      CALL Clear_PeakFitRanges
       IPTYPE = 1
       CALL Profile_Plot
 ! enable the buttons,

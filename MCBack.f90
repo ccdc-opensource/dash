@@ -199,7 +199,7 @@
         ENDDO
         YOBIN(I) = YOBIN(I) - YBBIN(I)
       ENDDO
-      CALL Init_BackGround
+      CALL Clear_BackGround
       CALL GetProfileLimits
       BACKREF = .FALSE.
 
@@ -233,7 +233,7 @@
               CALL Profile_Plot
             CASE (IDCANCEL)
 ! If user Cancels, assume no knowledge on background
-              CALL Init_BackGround
+              CALL Clear_BackGround
               CALL WDialogHide()
           END SELECT
       END SELECT
@@ -280,40 +280,40 @@
 !
       CALL WCursorShape(CurHourGlass)
       DO I = -nbruckwin, 0
-        ys(I) = yobin(1)
+        ys(I) = YOBIN(1)
       ENDDO
       DO I = 1, NBIN
-        ys(I) = yobin(I)
+        ys(I) = YOBIN(I)
       ENDDO
       DO I = 1, nbruckwin
         ii = NBIN + I
-        ys(ii) = yobin(NBIN)
+        ys(ii) = YOBIN(NBIN)
       ENDDO
       DO iter = 1, mbruckiter
 ! Loop over data points
         DO I = 1, NBIN
           iilo = I - nbruckwin
           iihi = I + nbruckwin
-          ybbin(I) = 0.0
+          YBBIN(I) = 0.0
 ! Loop over window around current data point
           DO II = iilo, iihi
-            ybbin(I) = ybbin(I) + ys(II)
+            YBBIN(I) = YBBIN(I) + ys(II)
           ENDDO
-          ybbin(I) = (ybbin(I)-ys(I))/FLOAT(2 * nbruckwin)
+          YBBIN(I) = (YBBIN(I)-ys(I))/FLOAT(2 * nbruckwin)
         ENDDO
         IF (UseMC) THEN
           DO I = 1, NBIN
 ! Use a Monte Carlo algorithm to find the correct height of the background
 ! rat = ratio?
-            rat = (ybbin(I)-ys(I))/ebin(I)
+            rat = (YBBIN(I)-ys(I))/EBIN(I)
             stem = 1.0 / (1.0 + EXP(MIN(20.0,-rat)))  
             CALL RANDOM_NUMBER(tRandomNumber)
-            IF (tRandomNumber .LT. stem) ybbin(I) = ys(I)
-            ys(I) = ybbin(I)
+            IF (tRandomNumber .LT. stem) YBBIN(I) = ys(I)
+            ys(I) = YBBIN(I)
           ENDDO
         ELSE
           DO I = 1, NBIN
-            ys(I) = MIN(ybbin(I),ys(I))
+            ys(I) = MIN(YBBIN(I),ys(I))
           ENDDO
         ENDIF
       ENDDO
@@ -336,7 +336,7 @@
               ENDIF
               knotem = knotem + 1
               ikt(knotem) = i
-              xkt(knotem) = xbin(i)
+              xkt(knotem) = XBIN(i)
             ENDIF
             ngood = ngood + 1
           ENDIF

@@ -156,67 +156,67 @@
       ENDIF
       SELECT CASE (EventInfo%VALUE1)
         CASE (KeyPageLeft)
-          xpgdif=xpgmax-xpgmin
-          xpgmin=MAX(xpmin,xpgmin-0.02*xpgdif)
-          xpgmax=xpgmin+xpgdif
+          xpgdif = xpgmax - xpgmin
+          xpgmin = MAX(xpmin,xpgmin-0.02*xpgdif)
+          xpgmax = xpgmin + xpgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (KeyPageRight)
 ! We're going to move the graph to the right if we can
-          xpgdif=xpgmax-xpgmin
-          xpgmax=MIN(xpmax,xpgmax+0.02*xpgdif)
-          xpgmin=xpgmax-xpgdif
+          xpgdif = xpgmax - xpgmin
+          xpgmax = MIN(xpmax,xpgmax+0.02*xpgdif)
+          xpgmin = xpgmax - xpgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (KeyCursorLeft)
 ! We're going to move the graph to the left if we can
-          xpgdif=xpgmax-xpgmin
-          xpgmin=MAX(xpmin,xpgmin-0.25*xpgdif)
-          xpgmax=xpgmin+xpgdif
+          xpgdif = xpgmax - xpgmin
+          xpgmin = MAX(xpmin,xpgmin-0.25*xpgdif)
+          xpgmax = xpgmin + xpgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (KeyCursorRight)
 ! We're going to move the graph to the right if we can
-          xpgdif=xpgmax-xpgmin
-          xpgmax=MIN(xpmax,xpgmax+0.25*xpgdif)
-          xpgmin=xpgmax-xpgdif
+          xpgdif = xpgmax - xpgmin
+          xpgmax = MIN(xpmax,xpgmax+0.25*xpgdif)
+          xpgmin = xpgmax - xpgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (KeyLeftExtreme)
 ! We're going to move the graph as far left as we can
-          xpgdif=xpgmax-xpgmin
-          xpgmin=xpmin
-          xpgmax=xpgmin+xpgdif
+          xpgdif = xpgmax - xpgmin
+          xpgmin = xpmin
+          xpgmax = xpgmin + xpgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (KeyRightExtreme)
 ! We're going to move the graph as far right as we can
-          xpgdif=xpgmax-xpgmin
-          xpgmax=xpmax
-          xpgmin=xpgmax-xpgdif
+          xpgdif = xpgmax - xpgmin
+          xpgmax = xpmax
+          xpgmin = xpgmax - xpgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot      
         CASE (KeyPageDown)
 ! We're going to expand the xscale by sqrt(2) if we can
-          xpgdif=xpgmax-xpgmin
-          xpgav=0.5*(xpgmax+xpgmin)
-          xtem=MIN(0.5*(xpmax-xpmin),0.7071*xpgdif)
-          xpgmin=xpgav-xtem
-          xpgmax=xpgav+xtem
+          xpgdif = xpgmax - xpgmin
+          xpgav = 0.5*(xpgmax+xpgmin)
+          xtem = MIN(0.5*(xpmax-xpmin),0.7071*xpgdif)
+          xpgmin = xpgav - xtem
+          xpgmax = xpgav + xtem
           IF (xpgmin.LT.xpmin) THEN
-            xpgmin=xpmin
-            xpgmax=xpgmin+2.*xtem
+            xpgmin = xpmin
+            xpgmax = xpgmin + 2.0 * xtem
           ELSE IF (xpgmax.GT.xpmax) THEN
-            xpgmax=xpmax
-            xpgmin=xpgmax-2.*xtem
+            xpgmax = xpmax
+            xpgmin = xpgmax - 2.0 * xtem
           ENDIF
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (KeyPageUp)
 ! We're going to contract the xscale by sqrt(2)
-          xpgdif=xpgmax-xpgmin
-          xpgav=0.5*(xpgmax+xpgmin)
-          xtem=0.3536*xpgdif
+          xpgdif = xpgmax - xpgmin
+          xpgav = 0.5 * (xpgmax+xpgmin)
+          xtem = 0.3536 * xpgdif
           xpgmin = xpgav - xtem
           xpgmax = xpgav + xtem
           CALL Get_IPMaxMin() 
@@ -238,38 +238,38 @@
         CASE (KeyUpExtreme)
 ! We're going to scale to min/max y over the current range
           ii = ypgmin
-          ypgmin=ypgmax
-          ypgmax=ii
-          DO ii=1,NBIN
+          ypgmin = ypgmax
+          ypgmax = ii
+          DO ii = 1, NBIN
             IF(XBIN(ii).GE.xpgmin .AND. XBIN(ii).LE.xpgmax) THEN
-              ypgmin=MIN(yobin(ii),ypgmin)
-              ypgmax=MAX(yobin(ii),ypgmax)
+              ypgmin = MIN(YOBIN(ii),ypgmin)
+              ypgmax = MAX(YOBIN(ii),ypgmax)
             ENDIF
           ENDDO
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (KeyBackspace)
 ! Undo last zoom action
-          xpgmint=xpgmin
-          xpgmaxt=xpgmax
-          ypgmint=ypgmin
-          ypgmaxt=ypgmax
-          xpgmin=xpgminold
-          xpgmax=xpgmaxold
-          ypgmin=ypgminold
-          ypgmax=ypgmaxold
-          xpgminold=xpgmint
-          xpgmaxold=xpgmaxt
-          ypgminold=ypgmint
-          ypgmaxold=ypgmaxt
+          xpgmint = xpgmin
+          xpgmaxt = xpgmax
+          ypgmint = ypgmin
+          ypgmaxt = ypgmax
+          xpgmin = xpgminold
+          xpgmax = xpgmaxold
+          ypgmin = ypgminold
+          ypgmax = ypgmaxold
+          xpgminold = xpgmint
+          xpgmaxold = xpgmaxt
+          ypgminold = ypgmint
+          ypgmaxold = ypgmaxt
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (KeyHome)
 ! Back to full profile range
-          xpgmin=xpmin
-          xpgmax=xpmax
-          ypgmin=ypmin
-          ypgmax=ypmax
+          xpgmin = xpmin
+          xpgmax = xpmax
+          ypgmin = ypmin
+          ypgmax = ypmax
           CALL Get_IPMaxMin() 
           CALL Profile_Plot     
       END SELECT
@@ -335,6 +335,7 @@
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -343,6 +344,7 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
+
       INTEGER          IPMIN, IPMAX
       COMMON /PROFIPM/ IPMIN, IPMAX
 
@@ -470,7 +472,7 @@
               IPF_Range(NumPeakFitRange) = 1 + IPF_Hi(NumPeakFitRange) - IPF_Lo(NumPeakFitRange)
 ! Now we have the range in terms of the profile point index
               DO ISB = 2, 3
-                statbarstr(isb)='          '
+                statbarstr(isb) = '          '
                 CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
               ENDDO                
 !O              CALL Profile_Plot
@@ -580,25 +582,24 @@
                 IILOTEM(KK)= IPF_Lo(II)
                 IIHITEM(KK)= IPF_Hi(II)
                 IIRANGT(KK)= IPF_Range(II)
-                NNTEM(KK)=   NumInPFR(II)
-                PkPosAvTem(KK)=PkPosAv(II)
+                NNTEM(KK) = NumInPFR(II)
+                PkPosAvTem(KK) = PkPosAv(II)
                 DO IP = 1, MPkDes
-                  PkFnValTem(IP,KK)=PkFnVal(IP,II)
-                  PkFnEsdTem(IP,KK)=PkFnEsd(IP,II)
+                  PkFnValTem(IP,KK) = PkFnVal(IP,II)
+                  PkFnEsdTem(IP,KK) = PkFnEsd(IP,II)
                 ENDDO
                 DO IP = 1, NumInPFR(II)
-                  XPF_PTEM(IP,KK)=XPF_Pos(IP,II)
-                  YPF_PTEM(IP,KK)=YPF_Pos(IP,II)
-                  PkPosValTem(IP,KK)=PkPosVal(IP,II)
-                  PkPosEsdTem(IP,KK)=PkPosEsd(IP,II)
-                  PkAreaValTem(IP,KK)=PkAreaVal(IP,II)
-                  PkAreaEsdTem(IP,KK)=PkAreaEsd(IP,II)
+                  XPF_PTEM(IP,KK) = XPF_Pos(IP,II)
+                  YPF_PTEM(IP,KK) = YPF_Pos(IP,II)
+                  PkPosValTem(IP,KK) = PkPosVal(IP,II)
+                  PkPosEsdTem(IP,KK) = PkPosEsd(IP,II)
+                  PkAreaValTem(IP,KK) = PkAreaVal(IP,II)
+                  PkAreaEsdTem(IP,KK) = PkAreaEsd(IP,II)
                 ENDDO
-!                      IPF_RPtTem(KK)=KR
-                DO IC=1,IPF_Range(II)
-                  KR=KR+1
-                  XPkFitTem(KR)=XPeakFit(IPF_RPt(II)+IC)
-                  YPkFitTem(KR)=YPeakFit(IPF_RPt(II)+IC)
+                DO IC = 1, IPF_Range(II)
+                  KR = KR + 1
+                  XPkFitTem(KR) = XPeakFit(IPF_RPt(II)+IC)
+                  YPkFitTem(KR) = YPeakFit(IPF_RPt(II)+IC)
                 ENDDO
               ENDIF
             ENDDO
@@ -613,13 +614,13 @@
               CALL WDialogFieldState(IDF_ClearPeakFitRanges,Disabled)
               CALL PopActiveWindowID
             ELSE
-              DO II=1,NumPeakFitRange
-                KK=II
-                XPF_Range(1,II)=XXFTEM(1,KK)
-                XPF_Range(2,II)=XXFTEM(2,KK)
-                IPF_Lo(II)=IILOTEM(KK)
-                IPF_Hi(II)=IIHITEM(KK)
-                IPF_Range(II)=IIRANGT(KK)
+              DO II = 1, NumPeakFitRange
+                KK = II
+                XPF_Range(1,II) = XXFTEM(1,KK)
+                XPF_Range(2,II) = XXFTEM(2,KK)
+                IPF_Lo(II) = IILOTEM(KK)
+                IPF_Hi(II) = IIHITEM(KK)
+                IPF_Range(II) = IIRANGT(KK)
                 NumInPFR(II) = NNTEM(KK)
                 PkPosAv(II) = PkPosAvTem(II)
                 DO IP = 1, MPkDes
@@ -659,7 +660,6 @@
         ENDIF ! NumPeakFitRange.eq.0
         CALL IGrPlotMode(' ')
         CALL Profile_Plot
-!                CALL IGrPlotMode('EOR')
         CALL Upload_Positions
         CALL Upload_Widths
       ELSE IF (EventInfo%VALUE1.GE.49 .AND. EventInfo%VALUE1.LE.57) THEN
@@ -668,9 +668,9 @@
         IF (NumPeakFitRange.GT.0) THEN
           InRange = 0
           DO II = 1, NumPeakFitRange
-            IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II) ) THEN
+            IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II)) THEN
 ! The cursor is sitting inside a peak range - go for it!
-              InRange=II
+              InRange = II
             ENDIF
           ENDDO
           IF (InRange .NE. 0) THEN
@@ -678,27 +678,27 @@
             NTem = NumInPFR(InRange) + 1
             IF (NTPeak .GT. NTem) THEN
 ! We've gone for too big a number - ignore
-            ELSE IF(NTPeak.EQ.NTem) THEN
+            ELSE IF (NTPeak.EQ.NTem) THEN
 ! Here's the next peak
               NumInPFR(InRange) = NTem
               XPF_Pos(NTem,InRange) = XCur(2)
               ATem = ABS(XCur(2)-XBin(IPF_Lo(InRange)))
               DO IP = IPF_Lo(InRange), IPF_Hi(InRange)
-                ANew = ABS(XCur(2)-XBin(IP))
+                ANew = ABS(XCur(2)-XBIN(IP))
                 IF (ANew.LE.ATem) THEN
                   ATem = ANew
-                  YPF_Pos(NTem,InRange)=YOBin(IP)
+                  YPF_Pos(NTem,InRange) = YOBIN(IP)
                 ENDIF
               ENDDO
             ELSE
 ! Reposition an existing peak
               XPF_Pos(NTPeak,InRange) = XCur(2)
-              ATem = ABS(XCur(2) - XBin(IPF_Lo(InRange)))
+              ATem = ABS(XCur(2) - XBIN(IPF_Lo(InRange)))
               DO IP = IPF_Lo(InRange), IPF_Hi(InRange)
-                ANew = ABS(XCur(2) - XBin(IP))
+                ANew = ABS(XCur(2) - XBIN(IP))
                 IF (ANew.LE.ATem) THEN
                   ATem = ANew
-                  YPF_Pos(NTPeak,InRange) = YOBin(IP)
+                  YPF_Pos(NTPeak,InRange) = YOBIN(IP)
                 ENDIF
               ENDDO
             ENDIF ! NTPeak.eq.NTem
