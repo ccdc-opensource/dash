@@ -70,15 +70,15 @@
 
 !  SOSign, SOnumber and SOAxis are matrices which contain the symmetry operators 
 !  generated for the space group
-       REAL SONumber
-       DIMENSION SONumber(50,3)
-       CHARACTER*1 SOSign
-       DIMENSION SOSign(50,3)
-       INTEGER SOAxis
-       DIMENSION SOAxis(50,3)
-       COMMON/symops/SOSign, SONumber, SOAxis
+      REAL SONumber
+      DIMENSION SONumber(50,3)
+      CHARACTER*1 SOSign
+      DIMENSION SOSign(50,3)
+      INTEGER SOAxis
+      DIMENSION SOAxis(50,3)
+      COMMON/symops/SOSign, SONumber, SOAxis
        
-       EXTERNAL ErrorMessage
+      EXTERNAL ErrorMessage
    
 
       OPEN(220,file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'SGSymbandShift.txt',status='old', err = 10)
@@ -112,7 +112,7 @@
 ! Determine in there are two equivalent axes i.e. is space group tetragonal,
 ! trigonal or hexagonal?  Cubic groups and hence three equivalent axes are not handled yet
 
-      IF ((NumberSGTable.ge.349).and.(NumberSGTable.le.488))THEN
+      IF ((NumberSGTable.ge.349).and.(NumberSGTable.le.488)) THEN
        EquivAxes = 2
       END IF
 

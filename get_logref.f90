@@ -3,25 +3,33 @@
 !*****************************************************************************
 !
       SUBROUTINE GET_LOGREF(FILE,lenfil,ier)
-!
-      CHARACTER*(*), INTENT(IN   ) :: FILE
-!
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: FILE
+      INTEGER,       INTENT (IN   ) :: lenfil
+      INTEGER,       INTENT (  OUT) :: ier
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
-!
+
+      INTEGER         MAXK
+      REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
-      LOGICAL LOGREF
+
+      INTEGER         NLGREF, IREFH
+      LOGICAL                                  LOGREF
       COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
-!
+
 
 ! JvdS should be the same thing
 !O      COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
-      INTEGER NTIC
-      INTEGER IH
-      REAL    ARGK
-      REAL    DSTAR
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       INTEGER         NATOM
       REAL                   X
@@ -35,18 +43,18 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-!
+
+      INTEGER         KKOR
+      REAL                  WTIJ
+      INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
-!
-      LOGICAL IHMINLT0, IKMINLT0, ILMINLT0
+
+      LOGICAL         IHMINLT0, IKMINLT0, ILMINLT0
       COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0
-      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN,  &
-     &                IIMAX
-!
-      COMMON /CHISTOP/ NOBS, NFIT, IFIT(MCHSTP), CHIOBS, WT(MCHSTP),    &
-     &                 XOBS(MCHSTP), YOBS(MCHSTP), YCAL(MCHSTP),        &
-     &                 ESD(MCHSTP)
-!
+
+      INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
+      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
+
 !     These declarations are needed for the get_logref.inc
 !     file to work correctly
 !     The following integers represent h,k,l,h+k,h+l,k+l and h+k+l
@@ -54,7 +62,9 @@
 !     The following integers represent the previous integers, divided by 2
 !     and then multiplied by 2
       INTEGER H_m, K_m, L_m, HPKm, HPLm, KPLm, HPKPLm
-!
+
+      INTEGER IR, I, JHMAX, JHMIN, MAXXKK, Item, IREMAIN, LL, LLM
+
       IHMIN = 9999
       IKMIN = 9999
       ILMIN = 9999
@@ -65,9 +75,6 @@
       IIMAX = -9999
       ier = 0
       OPEN (31,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998)
-!
-!**
-!      MAXXKK=100000
       MAXXKK = MFCSPE
       MAXK = 0
       DO IR = 1, MAXXKK
@@ -301,22 +308,14 @@
           K_m = 2*(K_/2)
           HPKPL = IREFH(1,IR) + IREFH(2,IR) + IREFH(3,IR)
           IREMAIN = MOD(HPKPL,4)
-          LOGREF(1,IR) = (H_.EQ.H_m) .AND. (K_.EQ.K_m) .AND.            &
-     &                   (IREMAIN.EQ.0)
-          LOGREF(2,IR) = (H_.EQ.H_m) .AND. (K_.NE.K_m) .AND.            &
-     &                   (IREMAIN.EQ.0)
-          LOGREF(3,IR) = (H_.NE.H_m) .AND. (K_.EQ.K_m) .AND.            &
-     &                   (IREMAIN.EQ.0)
-          LOGREF(4,IR) = (H_.NE.H_m) .AND. (K_.NE.K_m) .AND.            &
-     &                   (IREMAIN.EQ.0)
-          LOGREF(5,IR) = (H_.EQ.H_m) .AND. (K_.EQ.K_m) .AND.            &
-     &                   (IREMAIN.EQ.2)
-          LOGREF(6,IR) = (H_.EQ.H_m) .AND. (K_.NE.K_m) .AND.            &
-     &                   (IREMAIN.EQ.2)
-          LOGREF(7,IR) = (H_.NE.H_m) .AND. (K_.EQ.K_m) .AND.            &
-     &                   (IREMAIN.EQ.2)
-          LOGREF(8,IR) = (H_.NE.H_m) .AND. (K_.NE.K_m) .AND.            &
-     &                   (IREMAIN.EQ.2)
+          LOGREF(1,IR) = (H_.EQ.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.0)
+          LOGREF(2,IR) = (H_.EQ.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.0)
+          LOGREF(3,IR) = (H_.NE.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.0)
+          LOGREF(4,IR) = (H_.NE.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.0)
+          LOGREF(5,IR) = (H_.EQ.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.2)
+          LOGREF(6,IR) = (H_.EQ.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.2)
+          LOGREF(7,IR) = (H_.NE.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.2)
+          LOGREF(8,IR) = (H_.NE.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.2)
           IF (H_.EQ.2 .AND. K_.EQ.2 .AND. IREMAIN.EQ.2) THEN
           ENDIF
         ENDDO
@@ -343,7 +342,6 @@
         ENDDO
       CASE DEFAULT
       END SELECT
-!
       SELECT CASE (NumberSGTable)    ! adjustments for presence of 'i' index
       CASE (430,431,432,433,434,435,449,451,462,468)
         JHMIN = MIN(IIMIN,IHMIN,IKMIN)
@@ -371,7 +369,6 @@
         IKMINLT0 = IKMIN.LT.0
       CASE DEFAULT
       END SELECT
-!
       SELECT CASE (NumberSGTable)    ! adjustments for presence of kx and hy terms
       CASE (356,365,369)
         jhmin = MIN(ihmin,ikmin)
@@ -383,11 +380,8 @@
         IHMINLT0 = IHMIN.LT.0
         IKMINLT0 = IKMIN.LT.0
       END SELECT
-!
-!
       GOTO 999
   998 ier = 1
   999 CLOSE (31)
-      RETURN
-!
+
       END SUBROUTINE GET_LOGREF

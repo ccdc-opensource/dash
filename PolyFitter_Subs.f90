@@ -721,43 +721,43 @@
                 IPF_Lo(II)=IILOTEM(KK)
                 IPF_Hi(II)=IIHITEM(KK)
                 IPF_Range(II)=IIRANGT(KK)
-                NumInPFR(II)=NNTEM(KK)
-                PkPosAv(II)=PkPosAvTem(II)
-                DO IP=1,MPkDes
-                  PkFnVal(IP,II)=PkFnValTem(IP,II)
-                  PkFnEsd(IP,II)=PkFnEsdTem(IP,II)
+                NumInPFR(II) = NNTEM(KK)
+                PkPosAv(II) = PkPosAvTem(II)
+                DO IP = 1, MPkDes
+                  PkFnVal(IP,II) = PkFnValTem(IP,II)
+                  PkFnEsd(IP,II) = PkFnEsdTem(IP,II)
                 ENDDO
-                DO IP=1,NumInPFR(II)
-                  XPF_Pos(IP,II)=XPF_PTEM(IP,II)
-                  YPF_Pos(IP,II)=YPF_PTEM(IP,II)
-                  PkPosVal(IP,II)=PkPosValTem(IP,II)
-                  PkPosEsd(IP,II)=PkPosEsdTem(IP,II)
-                  PkAreaVal(IP,II)=PkAreaValTem(IP,II)
-                  PkAreaEsd(IP,II)=PkAreaEsdTem(IP,II)
+                DO IP = 1, NumInPFR(II)
+                  XPF_Pos(IP,II) = XPF_PTEM(IP,II)
+                  YPF_Pos(IP,II) = YPF_PTEM(IP,II)
+                  PkPosVal(IP,II) = PkPosValTem(IP,II)
+                  PkPosEsd(IP,II) = PkPosEsdTem(IP,II)
+                  PkAreaVal(IP,II) = PkAreaValTem(IP,II)
+                  PkAreaEsd(IP,II) = PkAreaEsdTem(IP,II)
                 ENDDO
-                IPF_RPt(II)=KR
-                DO IC=1,IPF_Range(II)
-                  KR=KR+1
-                  XPeakFit(KR)=XPkFitTem(KR)
-                  YPeakFit(KR)=YPkFitTem(KR)
+                IPF_RPt(II) = KR
+                DO IC = 1, IPF_Range(II)
+                  KR = KR + 1
+                  XPeakFit(KR) = XPkFitTem(KR)
+                  YPeakFit(KR) = YPkFitTem(KR)
                 ENDDO
               ENDDO
             ENDIF
-            II=NumPeakFitRange+1
-            NumInPFR(II)=0
-            IPF_RPt(II)=KR
+            II = NumPeakFitRange + 1
+            NumInPFR(II) = 0
+            IPF_RPt(II) = KR
 ! JCC Next line to zero the deleted range value completely
-            IPF_RPt(II+1)=0 
-            XPF_Range(1,II)=-9999.0 
-            XPF_Range(2,II)=-9999.0
-            DO IC=1,IPF_Range(II)
-              KR=KR+1
-              XPeakFit(KR)=-9999.0
-              YPeakFit(KR)=0.0
+            IPF_RPt(II+1) = 0 
+            XPF_Range(1,II) = -9999.0 
+            XPF_Range(2,II) = -9999.0
+            DO IC = 1, IPF_Range(II)
+              KR = KR + 1
+              XPeakFit(KR) = -9999.0
+              YPeakFit(KR) = 0.0
             ENDDO
-            IPF_Range(II)=0                            
+            IPF_Range(II) = 0                            
           ENDIF ! WInfoDialog(4).EQ.CommonYes
-        ENDIF  ! NumPeakFitRange.eq.0
+        ENDIF ! NumPeakFitRange.eq.0
         CALL IGrPlotMode(' ')
         CALL Profile_Plot
 !                CALL IGrPlotMode('EOR')
@@ -766,7 +766,7 @@
       ELSE IF (EventInfo%VALUE1.GE.49 .AND. EventInfo%VALUE1.LE.57) THEN
 ! KeyNumber=1-9: locating peak positions...
 ! Are we in a peak range?
-        IF (NumPeakFitRange.gt.0) then
+        IF (NumPeakFitRange.GT.0) then
           InRange=0
           DO II=1,NumPeakFitRange
             IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II) ) THEN
@@ -774,20 +774,20 @@
               InRange=II
             ENDIF
           ENDDO
-          IF (InRange.ne.0) THEN
-            NTPeak=EventInfo%VALUE1-48
-            NTem=NumInPFR(InRange)+1
-            IF (NTPeak .gt. NTem) THEN
+          IF (InRange .NE. 0) THEN
+            NTPeak = EventInfo%VALUE1 - 48
+            NTem = NumInPFR(InRange) + 1
+            IF (NTPeak .GT. NTem) THEN
 ! We've gone for too big a number - ignore
-            ELSE IF(NTPeak.eq.NTem) THEN
+            ELSE IF(NTPeak.EQ.NTem) THEN
 ! Here's the next peak
               NumInPFR(InRange)=NTem
               XPF_Pos(NTem,InRange)=XCur(2)
-              ATem=ABS(XCur(2)-XBin(IPF_Lo(InRange)))
-              DO IP=IPF_Lo(InRange),IPF_Hi(InRange)
-                ANew=ABS(XCur(2)-XBin(IP))
-                IF (ANew.le.ATem) THEN
-                  ATem=ANew
+              ATem = ABS(XCur(2)-XBin(IPF_Lo(InRange)))
+              DO IP = IPF_Lo(InRange), IPF_Hi(InRange)
+                ANew = ABS(XCur(2)-XBin(IP))
+                IF (ANew.LE.ATem) THEN
+                  ATem = ANew
                   YPF_Pos(NTem,InRange)=YOBin(IP)
                 ENDIF
               ENDDO
@@ -813,8 +813,8 @@
 ! KeyNumber=0 or KeyReturn: get ready to fit peaks ...
 ! Check if in a peak range - if not tell the user...
         IF (NumPeakFitRange.GT.0) then
-          InRange=0
-          DO II=1,NumPeakFitRange
+          InRange = 0
+          DO II = 1, NumPeakFitRange
             IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II) ) THEN
 ! The cursor is sitting inside a peak range - go for it!
               InRange=II
@@ -825,7 +825,7 @@
             CALL ErrorMessage('Place the cursor in a peak fitting range.')
           ELSE
 ! We're ready to fit the Bragg peaks
-            CurrentRange=InRange
+            CurrentRange = InRange
 ! One or more peaks to be fitted - initial positions determined by user
 ! If NumInPFR(InRange).eq.0 we're going to search & fit a single peak
             CALL WCursorShape(CurHourGlass)

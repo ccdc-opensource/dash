@@ -1,24 +1,28 @@
-!*==GETHCV.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!
-!*****************************************************************************
-!
 !
 !*****************************************************************************
 !
       SUBROUTINE GETHCV(FILENAM,lenfil,ier)
-!
-      CHARACTER*(*), INTENT(IN) :: FILENAM
-!
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: FILENAM
+      INTEGER,       INTENT (IN   ) :: lenfil
+      INTEGER,       INTENT (  OUT) :: ier
+
       INCLUDE 'PARAMS.INC'
-!
+
       CHARACTER*150 LINE
       INTEGER ICOR(20), NKKOR(MCHIHS)
       REAL WTI(MFCSTO)
-!
+
+      INTEGER         MAXK
+      REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
-      LOGICAL LOGREF
+
+      INTEGER         NLGREF, IREFH
+      LOGICAL                                  LOGREF
       COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
-!
+
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -31,19 +35,23 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-!
+
+      REAL              AIOBS,         AICALC
       COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
+
+      INTEGER         KKOR
+      REAL                  WTIJ
+      INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
-!
-      LOGICAL IHMINLT0, IKMINLT0, ILMINLT0
+
+      LOGICAL         IHMINLT0, IKMINLT0, ILMINLT0
       COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0
-      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN,  &
-     &                IIMAX
-!
-      COMMON /CHISTOP/ NOBS, NFIT, IFIT(MCHSTP), CHIOBS, WT(MCHSTP),    &
-     &                 XOBS(MCHSTP), YOBS(MCHSTP), YCAL(MCHSTP),        &
-     &                 ESD(MCHSTP)
-!
+
+      INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
+      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
+
+      INTEGER KK, I, NPO, NLIN, NCOR, IR, II, JJ, IK, MINCOR, KL
+
       OPEN (121,FILE=FILENAM(:Lenfil),STATUS='OLD',ERR=998)
       KK = 0
       KKOR = 0
@@ -90,7 +98,7 @@
         II = IKKOR(IK)
         JJ = JKKOR(IK)
         IF (II.EQ.JJ) THEN
-          WTIJ(IK) = WTI(II)*WTI(JJ)
+          WTIJ(IK) = WTI(II) * WTI(JJ)
         ELSE
           WTIJ(IK) = 0.02*WTI(II)*WTI(JJ)*FLOAT(NKKOR(IK))
         ENDIF
@@ -98,6 +106,8 @@
       GOTO 999
   998 ier = 1
   999 CLOSE (121)
-      RETURN
-!
+
       END SUBROUTINE GETHCV
+!
+!*****************************************************************************
+!

@@ -5,10 +5,20 @@
 
       INCLUDE 'PARAMS.INC'
 
+      INTEGER         MAXK
+      REAL                  FOB
+      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+
+      INTEGER         NLGREF, IREFH
+      LOGICAL                                  LOGREF
       COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
 
+      INTEGER         KKOR
+      REAL                  WTIJ
+      INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
-      COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+
+      REAL              AIOBS,         AICALC
       COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
 
       INTEGER         NATOM
@@ -61,7 +71,6 @@
 !
 !
       INCLUDE 'PARAMS.INC'
-!
 
       INTEGER         NATOM
       REAL                   X
@@ -82,8 +91,7 @@
       COMMON /CSQSTO/ COSQS(-20:20,3,150), SINQS(-20:20,3,150)
       LOGICAL IHMINLT0, IKMINLT0, ILMINLT0
       COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0
-      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN,  &
-     &                IIMAX
+      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
       DATA TWOPI/6.2831853071796/
 !
 !     cosqs(a,1,c) holds hx terms
