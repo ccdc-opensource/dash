@@ -488,27 +488,26 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
 
-
       REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
       COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
       LOGICAL, EXTERNAL :: Get_OutputChi2vsMoves
-      INTEGER tFileHandle, I, J
+      INTEGER hFile, I, J
       CHARACTER(MaxPathLength) tFileName
 
       IF (.NOT. Get_OutputChi2vsMoves()) RETURN
-      tFileHandle = 10
+      hFile = 10
       tFileName = OutputFilesBaseName(1:OFBN_Len)//'.chi'
-      OPEN(UNIT=tFileHandle,FILE=tFileName(1:OFBN_Len+4),ERR=999)
+      OPEN(UNIT=hFile,FILE=tFileName(1:OFBN_Len+4),ERR=999)
       DO I = 1, MaxIterationSoFar
-        WRITE(tFileHandle,'(I10,1X,99(F9.2,1X))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
+        WRITE(hFile,'(I10,1X,99(F9.2,1X))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
       ENDDO
-      CLOSE(tFileHandle)
+      CLOSE(hFile)
       RETURN
   999 CALL ErrorMessage('Could not access profile chi-squared versus moves file.')
-      CLOSE(tFileHandle)
+      CLOSE(hFile)
 
       END SUBROUTINE OutputChi2vsMoves
 !
