@@ -42,8 +42,8 @@
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       REAL            DERIVV
-      INTEGER                      LVARV
-      COMMON /DERVAR/ DERIVV(500), LVARV
+      INTEGER                          LVARV
+      COMMON /DERVAR/ DERIVV(MaxVVar), LVARV
 
       INTEGER         IBACK, NBACK
       REAL                             ARGBAK,        BACKGD
@@ -237,12 +237,12 @@
         CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,LASTCY)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPTS)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MAXK)
-! JCC Add in check on number of reflections here, so that code doesn't bomb out in the Pawley attempt
-        IF (MAXK.GT.350) THEN
-          FORTY = -1
-          IF (IPK.NE.0) CLOSE (IPK)
-          RETURN
-        ENDIF
+!O! JCC Add in check on number of reflections here, so that code doesn't bomb out in the Pawley attempt
+!O        IF (MAXK.GT.350) THEN
+!O          FORTY = -1
+!O          IF (IPK.NE.0) CLOSE (IPK)
+!O          RETURN
+!O        ENDIF
         IF (PRECYC .AND. ICYC.NE.NCYC1) THEN
           SIMUL = .FALSE.
           PRECYC = .FALSE.
@@ -487,27 +487,34 @@
       CHARACTER*4 WDCN03(NW)
       LOGICAL TESTOV
       DIMENSION C3FN(3), C3DN(3), IWCN03(3,NW)
+
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
+
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
+
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+
+      LOGICAL STRKT
       COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
-      LOGICAL STRKT
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -572,13 +579,8 @@
       INTEGER                                                                ICODEZ,       KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
-      REAL ZTEM(MOBS), RTEM(3,MFCSTO), TF4PAR(MF4PAR)
-
       LOGICAL         PFNVAR
       COMMON /PFNINF/ PFNVAR(8,9,5)
-
-      REAL ARTEM(6)
-      INTEGER KORD(MFCSTO)
 
       INTEGER         KIPT,       KNIPT
       REAL                                       ZNORM,         DZNDKQ
@@ -590,8 +592,10 @@
       INTEGER         KREFT
       COMMON /FPINF2/ KREFT(MOBS)
 
+      REAL ZTEM(MOBS), RTEM(3,MFCSTO), TF4PAR(MF4PAR)
+      REAL ARTEM(6)
+      INTEGER KORD(MFCSTO)
       DIMENSION ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK), KARGO(MAXPIK), KARGK(MAXPIK)
-
       DATA WDCN03/'SIGM', 'GAMM', 'HPSL', 'HMSL'/
       DATA IWCN03/3, 3, 0, 3, 4, 0, 3, 5, 0, 3, 6, 0/
       CHARACTER*20 Integer2String
