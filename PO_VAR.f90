@@ -5,6 +5,8 @@
 !
       MODULE PO_VAR
 
+      IMPLICIT NONE
+
       LOGICAL PrefParExists
 
 ! Determines if preferred orientation correction is to be included or not
