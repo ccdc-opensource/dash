@@ -1,4 +1,4 @@
-! Winteracter module created : 25/Apr/2002 17:22:07
+! Winteracter module created : 26/Apr/2002 14:23:29
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -150,7 +150,6 @@
           INTEGER, PARAMETER :: IDF_PW_Option1                  =  1199
           INTEGER, PARAMETER :: IDF_PW_Logo1                    =  1204
           INTEGER, PARAMETER :: IDB_SA_Project_Import           =  1214
-          INTEGER, PARAMETER :: IDF_PW_radiation_label          =  1245
           INTEGER, PARAMETER :: IDF_PW_Flight_Path_Label        =  1248
           INTEGER, PARAMETER :: IDD_PW_Page3                    =   124
           INTEGER, PARAMETER :: IDF_PWa_Data_Group              =  1261
@@ -233,7 +232,6 @@
           INTEGER, PARAMETER :: IDD_Profile_Status              =   139
           INTEGER, PARAMETER :: IDF_Viewer                      =  1514
           INTEGER, PARAMETER :: IDD_DIALOG001                   =   132
-          INTEGER, PARAMETER :: IDD_DIALOG003                   =   137
           INTEGER, PARAMETER :: IDF_PawRef_Refine               =  1301
           INTEGER, PARAMETER :: IDF_IDF_PawRef_NBack            =  1291
           INTEGER, PARAMETER :: IDF_PawRef_Solve                =  1283
@@ -390,7 +388,6 @@
           INTEGER, PARAMETER :: IDF_Gamma_label2                =  1081
           INTEGER, PARAMETER :: IDF_gamm1_label2                =  1072
           INTEGER, PARAMETER :: IDB_Convert                     =  1098
-          INTEGER, PARAMETER :: IDD_XYE                         =   130
           INTEGER, PARAMETER :: IDF_RunDICVOL                   =  1101
           INTEGER, PARAMETER :: IDF_Indexing_CellRange2         =  1338
           INTEGER, PARAMETER :: IDF_Indexing_MinLen2            =  1348
