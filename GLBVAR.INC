@@ -48,3 +48,9 @@
       COMMON /CURSOR_MODE/ IDCurrent_Cursor_Mode
 
 ! IDCurrent_Cursor_Mode stores ?
+
+      LOGICAL DoSaRedraw
+      COMMON /SARDRW/ DoSaRedraw
+
+! Indicates whether the Simulated Annealing window should be redrawn
+

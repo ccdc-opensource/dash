@@ -3,13 +3,11 @@
       USE WINTERACTER
       USE DRUID_HEADER
 !>> JCC 
-	  USE VARIABLES
+      USE VARIABLES
 
-	  LOGICAL DoSaRedraw
-	  COMMON /SARDRW/ DoSaRedraw
-
+      INCLUDE 'GLBVAR.INC'
 !
-! Declare window-type and message variables
+! Declare window-type
 !
   TYPE(WIN_STYLE)    WINDOW
 !
