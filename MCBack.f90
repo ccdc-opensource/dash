@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SubtractBackground(nbruckwin,mbruckiter,UseMC)
+      SUBROUTINE SubtractBackground(nbruckwin, mbruckiter, UseMC)
 
       IMPLICIT NONE
 
@@ -25,7 +25,7 @@
       INTEGER I
 
 ! Calculate the background
-      CALL CalculateBackground(nbruckwin,mbruckiter,UseMC)
+      CALL CalculateBackground(nbruckwin, mbruckiter, UseMC)
 ! Subtract the background
       DO I = 1, NBIN
         YOBIN(I) = YOBIN(I) - YBBIN(I)
@@ -60,9 +60,9 @@
               CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
               CALL Profile_Plot
             CASE (IDOK)
-              CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
-              CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-              CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+              CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
+              CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
+              CALL SubtractBackground(tInt1, tInt2, WDialogGetCheckBoxLogical(IDF_UseMCYN))
               CALL WDialogHide
               CALL Profile_Plot
             CASE (IDCANCEL)
@@ -77,7 +77,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CalculateBackground(nbruckwin,mbruckiter,UseMC)
+      SUBROUTINE CalculateBackground(nbruckwin, mbruckiter, UseMC)
 
       USE WINTERACTER
 
@@ -96,9 +96,9 @@
       PARAMETER ( MAXSSPL = 5000 )
 
       REAL    xkt(MAXSSPL)
-      INTEGER ikt(MAXSSPL),ipartem(MAXSSPL)
+      INTEGER ikt(MAXSSPL), ipartem(MAXSSPL)
       REAL    es(MOBS)
-      REAL    ys(1-200:MOBS+200), tYBBIN(1:MOBS)
+      REAL    ys(1-200:MOBS+200)
       INTEGER jft(MOBS)
       REAL    tRandomNumber
       INTEGER I, II, I1, I2, KK, jf1, jf0, jfp1, jfn, n0, ndiv
@@ -106,9 +106,6 @@
       INTEGER knotem, npartem
       INTRINSIC MOD
       REAL    rat, stem
-      REAL AvgBeg
-      INTEGER Nbeg, Window, J, iLower, iUpper
-      REAL Iavg, Imin ! Average and minimum Intensity, as mentioned in Brueckner's paper
 !
 !  This subroutine determines the background using a smoothing
 !  procedure published by Sergio Brueckner in J. Appl. Cryst. (2000) 33, 977-979
@@ -116,22 +113,8 @@
 !  and raise background to correct value using a Monte Carlo sampling procedure
 !
       CALL WCursorShape(CurHourGlass)
-      Iavg = 0.0
-      Imin = YOBIN(1)
-      DO I = 1, NBIN
-        Iavg = Iavg + YOBIN(I)
-        Imin = MIN(Imin, YOBIN(I))
-      ENDDO
-      Iavg = Iavg / FLOAT(NBIN)
-      !C Calculate the average of the first Nbeg points
-      AvgBeg = 0.0
-      Nbeg = 1
-      DO I = 1, Nbeg
-        AvgBeg = AvgBeg + YOBIN(I)
-      ENDDO
-      AvgBeg = AvgBeg / Nbeg
       DO I = 1-nbruckwin, 0
-        ys(I) = AvgBeg
+        ys(I) = YOBIN(1)
       ENDDO
       DO I = 1, NBIN
         ys(I) = YOBIN(I)
@@ -139,22 +122,6 @@
       DO I = NBIN+1, NBIN+nbruckwin
         ys(I) = YOBIN(NBIN)
       ENDDO
-
-  !    Window = 7
-  !    DO I = 1, NBIN
-  !      Iavg = 0.0  
-  !      iLower = MAX(1-nbruckwin, I-Window)
-  !      iUpper = MIN(NBIN+nbruckwin,I+Window)
-  !      DO J = iLower, iUpper
-  !        Iavg = Iavg + YOBIN(J)
-  !      ENDDO
-  !      ys(I) = Iavg / (1+iUpper-iLower)
-  !    ENDDO
-
-
-  !    DO I = 1-nbruckwin, NBIN+nbruckwin
-  !      ys(I) = MIN(ys(I), 3.0*Iavg-2.0*Imin)
-  !    ENDDO
       DO iter = 1, mbruckiter
 ! Loop over data points
         DO I = 1, NBIN
@@ -172,34 +139,19 @@
 ! Use a Monte Carlo algorithm to find the correct height of the background
 ! rat = ratio?
             rat = (YBBIN(I)-ys(I))/EBIN(I)
-       !C     rat = (YBBIN(I)-YOBIN(I))/EBIN(I) ! This is what is used in the original paper.
             stem = 1.0 / (1.0 + EXP(MIN(20.0,-rat)))  
             CALL RANDOM_NUMBER(tRandomNumber)
             IF (tRandomNumber .LT. stem) YBBIN(I) = ys(I)
-       !C     IF (tRandomNumber .LT. stem) YBBIN(I) = YOBIN(I) ! This is what is used in the original paper.
             ys(I) = YBBIN(I)
           ENDDO
         ELSE
           DO I = 1, NBIN
             ys(I) = MIN(YBBIN(I),ys(I))
-       !C     ys(I) = MIN(YBBIN(I), YOBIN(I)) ! This is what is used in the original paper.
           ENDDO
         ENDIF
       ENDDO
 ! Now we should do some spline smoothing to remove the noise
       IF (UseMc) THEN
-  !      Window = 35
-  !      DO I = 1, NBIN
-  !        Iavg = 0.0  
-  !        iLower = MAX(1, I-Window)
-  !        iUpper = MIN(NBIN,I+Window)
-  !        DO J = iLower, iUpper
-  !          Iavg = Iavg + YBBIN(J)
-  !        ENDDO
-  !        tYBBIN(I) = Iavg / (1+iUpper-iLower)
-  !      ENDDO
-  !      YBBIN = tYBBIN
-  !      GOTO 10
         nsep    =  5
         ninsep  = 10
         ngood   =  0
@@ -242,7 +194,6 @@
           ndiv = 1 + ikt(jfp1) - n0
           CALL SplineSmooth(XBIN(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,YBBIN(n0))
         ENDDO
- !  10   CONTINUE
       ENDIF
       CALL WCursorShape(CurCrossHair)
 
@@ -256,24 +207,24 @@
 
       INTEGER nkn
       INTEGER NDAT
-      REAL    x(NDAT),y(NDAT),e(NDAT)
+      REAL    x(NDAT), y(NDAT), e(NDAT)
       INTEGER jfs(NDAT)
       REAL    xkk(nkn)
       REAL    smo(NDAT)
-      REAL  xdel(nkn),u(nkn,nkn)
-      REAL  bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
-      REAL  xdd
-      REAL  a(NDAT),b(NDAT),c(NDAT),d(NDAT)
-      REAL  deri(nkn),ans(nkn)
-      REAL  w, ab
-      REAL  qj, qj1
-      REAL  TempResult
+      REAL    xdel(nkn), u(nkn,nkn)
+      REAL    bvec(nkn), hess(nkn,nkn), covar(nkn,nkn)
+      REAL    xdd
+      REAL    a(NDAT),b(NDAT),c(NDAT),d(NDAT)
+      REAL    deri(nkn), ans(nkn)
+      REAL    w, ab
+      REAL    qj, qj1
+      REAL    TempResult
       INTEGER J, ND1, NK1, I, J0, J1, JF0, K
 
       DO J = 1, nkn-1
         xdel(J) = xkk(J+1)-xkk(J)
       ENDDO
-      CALL SplVal(xdel,u,nkn)
+      CALL SplVal(xdel, u, nkn)
       nd1 = ndat-1
       nk1 = nkn-1
       bvec = 0.0
@@ -339,7 +290,7 @@
       REAL,    INTENT (IN   ) :: xdel(m)
       REAL,    INTENT (  OUT) :: u(m,m)
 
-      REAL  A(m,m),b(m,m),c(m,m)
+      REAL  A(m,m), b(m,m), c(m,m)
       INTEGER I
 
 ! Initialise all entries of A, b and c to 0.0
