@@ -140,11 +140,11 @@
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (ID_PWa_DF_Open)
               CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
-              CALL Diffraction_File_Open(CTEMP)
+              CALL DiffractionFileOpen(CTEMP)
 !@ Should test for success here
               CALL WDialogFieldState(IDNEXT,Enabled)
             CASE (ID_PWa_DF_Browse)
-              CALL Diffraction_File_Browse
+              CALL DiffractionFileBrowse
 !@ Should test for success here
               CALL WDialogFieldState(IDNEXT,Enabled)
             CASE DEFAULT
@@ -543,9 +543,9 @@
               CALL EndWizard
             CASE (ID_PW_DF_Open)
               CALL WDialogGetString(IDF_PW_DataFileName_String,CTEMP)
-              CALL Diffraction_File_Open(CTEMP)
+              CALL DiffractionFileOpen(CTEMP)
             CASE (ID_PW_DF_Browse)
-              CALL Diffraction_File_Browse
+              CALL DiffractionFileBrowse
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowDiffractionSetup 1')
           END SELECT
