@@ -1,18 +1,15 @@
-!*==VALCHI.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE VALCHI(CHIVAL)
-!
+
       INCLUDE 'PARAMS.INC'
-!
+
       COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
-!
+
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
       COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
-!
-      DOUBLE PRECISION PRJADD
-      DOUBLE PRECISION PRJMAT0, PRJMAT1, PRJMAT2
-      COMMON /PRJMAT/ PRJMAT0, PRJMAT1(MPRJMT), PRJMAT2(MPRJMT)
-!
 
       INTEGER         NATOM
       REAL                   X
@@ -44,7 +41,6 @@
       ENDDO
       RESCL = 0.5*SUM1/SUM2
       CHIVAL = 0.
-      PRJMAT0 = PRJMAT0 + 1
       DO IK = 1, KKOR
         II = IKKOR(IK)
         JJ = JKKOR(IK)
@@ -52,16 +48,12 @@
         DELJ = AIOBS(JJ) - RESCL*AICALC(JJ)
         CHIADD = DELI*WTIJ(IK)*DELJ
         CHIVAL = CHIVAL + CHIADD
-        PRJADD = DBLE(CHIADD)
-        PRJMAT1(IK) = PRJMAT1(IK) + PRJADD
-        PRJMAT2(IK) = PRJMAT2(IK) + PRJADD*PRJADD
       ENDDO
       CHIVAL = CHIVAL/FLOAT(MAXK-2)
 
       END SUBROUTINE VALCHI
-!*==PRECFC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
+!*****************************************************************************
 !
       SUBROUTINE PRECFC
 !
@@ -108,7 +100,6 @@
         COSQS(0,1,N) = 1.
         COSQS(0,2,N) = 1.
         COSQS(0,3,N) = 1.
-!
         SINQS(0,1,N) = 0.
         SINQS(0,2,N) = 0.
         SINQS(0,3,N) = 0.
@@ -152,8 +143,9 @@
             SINQS(IL,3,N) = -SINQS(-IL,3,N)
           ENDDO
         ENDIF
-!
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE PRECFC
+!
+!*****************************************************************************
+!
