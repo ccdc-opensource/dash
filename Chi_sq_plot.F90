@@ -1,8 +1,8 @@
       SUBROUTINE Chi_sq_plot(ntotmov, iteration, cpb)
 !
 !
-!  ep added subroutine.  Called from SimulatedAnnealing subroutine (sa_subs.for
-!  ln 554).  This subroutine stores and manipulates data for a Profile Chi-sqd
+!  ep added subroutine.  Called from SimulatedAnnealing subroutine (sa_subs.for).
+!    This subroutine stores and manipulates data for a Profile Chi-sqd
 !  vs. number of moves plot.  Actual plotting is done by Subroutine Plotting_chi_sqd.
 !
 !
@@ -13,12 +13,13 @@
 !  USE module containing routine definitions and symbolic names.
 !
       use druid_header
-	  USE WINTERACTER
+	USE WINTERACTER
 !
 !      IMPLICIT NONE
 !
 !  Definitions and array declarations.
 !
+      INCLUDE 'params.inc'
       INTEGER,PARAMETER :: NSETS   =     1
       INTEGER,PARAMETER :: NVALUES = 10000
       INTEGER           :: ISET
@@ -26,11 +27,14 @@
 	  integer           :: iteration
 	  real              :: cpb
 	  integer           :: it_count
+        integer           :: ihandle
 	  real           :: x_max
 	  real           :: x_min
 	  real           :: y_max
-      real, dimension(10000) :: num_moves
-	  real, dimension(10000)    :: chi_sqd
+       real, dimension(10000) :: num_moves
+	 real, dimension(10000)    :: chi_sqd
+       INTEGER ChiSqdChildWindows
+       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin)
 !
 !
 !
@@ -44,11 +48,12 @@
 ! two points to plot a straight line and so the plot of chi-sqd vs.moves only
 ! starts when i_count =2, ie iteration number 2
       if (it_count.eq.2)then
-	  call WindowOpenChild(ihand, x=10, y=450, width=400, height=300, title='Chi-sqd vs. Moves')
-	  call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
+	  call WindowOpenChild(ihandle, x=10, y=450, width=400, height=300, title='Chi-sqd vs. Moves')
+	  ChiSqdChildWindows(ihandle) = 1 
+        call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
 	  endif    
 	  if (it_count.gt.2) then
-	  call WindowSelect(ihand)
+	  call WindowSelect(ihandle)
 	  call WindowClear()
 	  call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
 	  end if
@@ -59,18 +64,19 @@
       Subroutine plotting_Chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
       
       use druid_header
-	  USE WINTERACTER	  
+	USE WINTERACTER
+      	  
+	INCLUDE 'poly_colours.inc'  
 	  
-	  
-	  INTEGER,PARAMETER :: NSETS   =     1
+	INTEGER,PARAMETER :: NSETS   =     1
       INTEGER,PARAMETER :: NVALUES = 10000
       INTEGER           :: ISET
-	  integer        :: it_count
-	  real           :: x_max
-	  real           :: x_min
-	  real           :: y_max
-      real, dimension(10000) :: num_moves
-	  real, dimension(10000) :: chi_sqd
+	INTEGER, INTENT(IN)        :: it_count
+	REAL, INTENT(IN)           :: x_max
+	REAL,INTENT(IN)           :: x_min
+	REAL,INTENT(IN)           :: y_max
+      real, dimension(10000), INTENT(IN) :: num_moves
+	real, dimension(10000), INTENT(IN) :: chi_sqd
 
 !
 !  Start new presentation graphics plot
@@ -83,7 +89,7 @@
 !
 !  Set style for each data set
 !
-      CALL IPgStyle(  1,  0,  0,  0,      32,      64)
+      CALL IPgStyle(  1,  0,  0,  0,      KolNumObs)
 !
 !  Set marker number for data sets not using default marker
 !
@@ -96,7 +102,7 @@
 !
 !  Set presentation graphics area
 !
-      CALL IPgArea(0.100,0.200,0.900,0.800)
+      CALL IPgArea(0.150,0.200,0.900,0.800)
 !
 !  Draw main title
 !
@@ -104,7 +110,7 @@
       CALL IGrCharFont(       1)
       CALL IGrCharSpacing('F')
       CALL IGrCharSize( 1.3, 1.3)
-      CALL IGrColourN(     223)
+      CALL IGrColourN( KolNumMain)
       CALL IPgTitle('Profile Chi-squared vs. Number of Moves','C')
 !
 !  Label bottom X axis
@@ -115,11 +121,11 @@
 !  Label left Y axis
 !
       CALL IPgYLabelPos(  0.80)
-      CALL IPgYLabelLeft('Profile Chi-squared','CV')
+      CALL IPgYLabelLeft('Profile Chi-squared','C9')
 !
 !  Draw axes
 !
-      CALL IGrColourN(     223)
+      CALL IGrColourN(KolNumMain)
       CALL IPgAxes()
 !
 !  Adjust tick position for X Axes
