@@ -234,8 +234,7 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
@@ -766,16 +765,7 @@
           READ (145,'(A)',ERR=20,END=20) TheZmatrices(TheNumOfZmatrices+1)
           IF (LEN_TRIM(TheZmatrices(TheNumOfZmatrices+1)) .NE. 0) CALL INC(TheNumOfZmatrices)
         ENDDO
- 20     CONTINUE
-!O        IF (LEN_TRIM(F) .EQ. 0) THEN
-!O          CALL ErrorMessage("Sorry, could not create Z-matrices.")
-!O        ELSE
-!O          CALL InfoMessage("Generated the following Z-matrices successfully:"//CHAR(13)//&
-!O                           ZmFiles(1:Ilen)//CHAR(13)//CHAR(13)//&
-!O                           "You can load them by clicking on the Z-matrix browse buttons"//CHAR(13)//&
-!O                           "in the Molecular Z-Matrices window.")
-!O        ENDIF
-        CLOSE(145)
+ 20     CLOSE(145)
       ENDIF
 
       END SUBROUTINE zmConvert
