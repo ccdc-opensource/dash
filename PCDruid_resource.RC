@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 21/Apr/2003 17:42:16
+// Modified : 29/Apr/2003 09:55:04
 //
 ///////////////////////////////////////////////////
 //
@@ -1103,19 +1103,6 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
-END
-
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
@@ -3931,7 +3918,7 @@ BEGIN
     CONTROL "Lower",ISS2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,    0,    0,   48,   14
     CONTROL "Upper",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,    0,    0,   48,   14
     CONTROL "F",ISS1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT,    0,    0,   14,   14
-    CONTROL "Modal?",ISS5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT | BS_PUSHLIKE,    0,    0,   30,   14
+    CONTROL "Modal",ISS5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT | BS_PUSHLIKE,    0,    0,   30,   14
 END
 
 IDD_DIALOG003 RCDATA
@@ -3956,7 +3943,7 @@ CAPTION "Modal Torsion Angle Ranges"
 BEGIN
     CONTROL "Bimodal",IDF_BimodalRadio,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  140,   10,   40,   14
     CONTROL "Trimodal",IDF_TriModalRadio,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  207,   10,   40,   14
-    CONTROL "",IDF_TorsionName,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,    7,   40,   76,   14
+    CONTROL "",IDF_TorsionName,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,    7,   44,   85,   14
     CONTROL "0.0",IDF_Initial,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   29,   66,   40,   14
     CONTROL "Initial",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    9,   69,   18,    8
     CONTROL "Torsion Angle",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    8,   31,   44,    8
@@ -3973,7 +3960,7 @@ BEGIN
     CONTROL "Sampling Ranges",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  102,   44,  302,   44
     CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  302,   96,   40,   14
     CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  342,   96,   40,   14
-    CONTROL "Reset",IDF_BimodalReset,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  262,   96,   40,   14
+    CONTROL "Non Modal",IDF_BimodalReset,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  262,   96,   40,   14
     CONTROL "",IDF_BimodalIcon,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_ICON | SS_NOTIFY | SS_CENTERIMAGE,  118,    7,   18,   20
     CONTROL "",IDF_TriModalIcon,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_ICON | SS_NOTIFY | SS_CENTERIMAGE,  187,    7,   18,   20
 END
