@@ -520,7 +520,7 @@
       CALL IOSDeleteFile('SA_PARAMS.TXT')
       CALL IOSDeleteFile('Overlap_Temp.pdb')
       CALL IOSDeleteFile('Rebuild_temp*.zmatrix')
-      CALL IOSDeleteFile('Rebuild_temp.glob')
+      CALL IOSDeleteFile('*.glob')
       CALL IOSDeleteFile('Rebuild_temp.mol2')
 
       END SUBROUTINE DeleteTempFiles
