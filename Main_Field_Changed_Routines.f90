@@ -56,11 +56,11 @@
                 KolCTic = SelectedColour
               ENDIF
             CASE (IDF_PeakFitting_Colour)
-              SelectedColour = KolMTic
+              SelectedColour = KolPeakFit
               CALL WSelectColour(SelectedColour)
               IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
-                CALL IGrPaletteRGB(KolNumMTic,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
-                KolMTic = SelectedColour
+                CALL IGrPaletteRGB(KolNumPeakFit,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                KolPeakFit = SelectedColour
               ENDIF
           END SELECT
           CALL Profile_Plot
@@ -293,9 +293,9 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'LATTICE.INC'
 
-      INTEGER SGNrMenu2Table ! Function
+      INTEGER, EXTERNAL :: SGNrMenu2Table
       REAL    tReal
-      LOGICAL ValidCellAxisLength, NearlyEqual ! Functions
+      LOGICAL, EXTERNAL :: Confirm, ValidCellAxisLength, NearlyEqual
       INTEGER ISPosSG
 
       IF (PastPawley) RETURN
@@ -310,8 +310,10 @@
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
               CALL Generate_TicMarks
               CALL CheckUnitCellConsistency
+              CALL Profile_Plot
+            CASE (IDB_Delabc)
+              IF (Confirm('Do you wish to clear all cell parameters?')) CALL Clear_UnitCell
           END SELECT
-          CALL Profile_Plot
         CASE (FieldChanged)
 ! Due to the way Winteracter works, a FieldChanged is generated for 'REAL' input boxes
 ! only when that was the previous field to have the input focus. It doesn't necessarily mean
