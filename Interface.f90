@@ -773,15 +773,15 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Peak_Positions)
-      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+      CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+      CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
       CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+      CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+      CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
       CALL WDialogSelect(IDD_PW_Page8)
-      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+      CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
       CALL PopActiveWindowID
 
       END SUBROUTINE Upload_ZeroPoint
@@ -800,7 +800,9 @@
 
       INCLUDE 'Lattice.inc'
 
-      LOGICAL, EXTERNAL :: ValidCellAxisLength
+      LOGICAL, EXTERNAL :: ValidCellAxisLength, FnUnitCellOK
+      REAL, EXTERNAL :: UnitCellVolume
+      REAL V
       INTEGER WindowNr
       INTEGER CellParID(6)
       INTEGER I
@@ -826,7 +828,7 @@
 ! Update all the unit cell lengths ...
         DO I = 1, 3
           IF (ValidCellAxisLength(CellPar(I))) THEN
-            CALL WDialogPutReal(CellParID(I),CellPar(I),'(F10.5)')
+            CALL WDialogPutReal(CellParID(I), CellPar(I), '(F10.5)')
           ELSE
             CALL WDialogClearField(CellParID(I))
           ENDIF
@@ -836,22 +838,30 @@
           IF (CellPar(I) .LT. 0.00001) THEN
             CALL WDialogClearField(CellParID(I))
           ELSE
-            CALL WDialogPutReal(CellParID(I),CellPar(I),'(F10.3)')
+            CALL WDialogPutReal(CellParID(I), CellPar(I), '(F10.3)')
           ENDIF
         ENDDO
 ! Update their Enabled/Disabled state depending on whether they are constrained by the crystal system
         IF (WindowNr .NE. 4) THEN
           IF (PastPawley) THEN ! Just make everything read only
             DO I = 1, 6
-              CALL WDialogFieldState(CellParID(I),DialogReadOnly)
+              CALL WDialogFieldState(CellParID(I), DialogReadOnly)
             ENDDO
           ELSE
             DO I = 1, 6
-              CALL WDialogFieldStateLogical(CellParID(I),.NOT. CellParConstrained(I))
+              CALL WDialogFieldStateLogical(CellParID(I), .NOT. CellParConstrained(I))
             ENDDO
           ENDIF
         ENDIF
       ENDDO
+! Update volume in View dialogue
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      IF (FnUnitCellOK()) THEN
+        V = UnitCellVolume(CellPar(1), CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6))
+        CALL WDialogPutReal(IDF_UCVol, V, '(F10.3)')
+      ELSE
+        CALL WDialogClearField(IDF_UCVol)
+      ENDIF
       CALL Upload_Positions
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL PopActiveWindowID
@@ -872,12 +882,12 @@
       CALL PushActiveWindowID
 ! Get all the cell constants from the selected area
       CALL WDialogSelect(IDownFrom)
-      CALL WDialogGetReal(IDF_a_latt,CellPar(1))
-      CALL WDialogGetReal(IDF_b_latt,CellPar(2))      
-      CALL WDialogGetReal(IDF_c_latt,CellPar(3))      
-      CALL WDialogGetReal(IDF_alp_latt,CellPar(4))      
-      CALL WDialogGetReal(IDF_bet_latt,CellPar(5))      
-      CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
+      CALL WDialogGetReal(IDF_a_latt, CellPar(1))
+      CALL WDialogGetReal(IDF_b_latt, CellPar(2))      
+      CALL WDialogGetReal(IDF_c_latt, CellPar(3))      
+      CALL WDialogGetReal(IDF_alp_latt, CellPar(4))      
+      CALL WDialogGetReal(IDF_bet_latt, CellPar(5))      
+      CALL WDialogGetReal(IDF_gam_latt, CellPar(6))
       CALL UpdateCell
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL PopActiveWindowID
@@ -965,11 +975,11 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
+      CALL WDialogPutOption(IDF_Wavelength_Menu, IRadSelection)
       CALL WDialogSelect(IDD_PW_Page2)
-      CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
+      CALL WDialogPutOption(IDF_Wavelength_Menu, IRadSelection)
       CALL WDialogSelect(IDD_PW_Page4)
-      CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
+      CALL WDialogPutOption(IDF_Wavelength_Menu, IRadSelection)
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_AnodeMaterial
@@ -995,13 +1005,13 @@
 ! adjust the setting of the maximum resolution to maximum possible.
       CALL Update_TruncationLimits
       CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
+      CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
       CALL WDialogSelect(IDD_PW_Page2)
-      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
+      CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
       CALL WDialogSelect(IDD_PW_Page4)
-      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
+      CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
       CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
+      CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
 ! Now add in a test: if lab data, and wavelength close to known material,
 ! set anode material in Winteracter menus. Otherwise, anode is unknown.
       IF (JRadOption .EQ. 1) THEN ! X-ray lab data
@@ -1172,15 +1182,15 @@
       CALL WDialogFieldState(ID_Index_Output,Enabled)
       DO I = 1, NTPeak
         iOrd = IOrdTem(I)
-        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,1,I,AllPkPosVal(iOrd),'(F12.4)')
-        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,2,I,AllPkPosEsd(iOrd),'(F12.4)')
-        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,3,I,PkArgK(I),'(F12.4)')
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 1, I, AllPkPosVal(iOrd), '(F12.4)')
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 2, I, AllPkPosEsd(iOrd), '(F12.4)')
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 3, I, PkArgK(I), '(F12.4)')
         DifTem = AllPkPosVal(iOrd) - PkArgK(I)
-        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,4,I,DifTem,'(F12.4)')
-        CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,5,I,IHPk(1,I))
-        CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,6,I,IHPk(2,I))
-        CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,7,I,IHPk(3,I))
-        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,8,I,PkProb(iOrd),'(F8.3)')
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 4, I, DifTem, '(F12.4)')
+        CALL WGridPutCellInteger(IDF_Peak_Positions_Grid, 5, I, IHPk(1,I))
+        CALL WGridPutCellInteger(IDF_Peak_Positions_Grid, 6, I, IHPk(2,I))
+        CALL WGridPutCellInteger(IDF_Peak_Positions_Grid, 7, I, IHPk(3,I))
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 8, I, PkProb(iOrd), '(F8.3)')
       ENDDO
       CALL PopActiveWindowID
 
@@ -1221,41 +1231,41 @@
         END SELECT
         SELECT CASE (JRadOption)
           CASE (1) ! Lab X-ray
-            CALL WDialogFieldState(IDF_CW_group,NotDisabled)
-            CALL WDialogFieldState(IDF_radiation_label,NotDisabled)
-            CALL WDialogFieldState(IDF_wavelength1,NotDisabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,NotDisabled)
-            CALL WDialogFieldState(IDF_TOF_group,Disabled)
-            CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
-            CALL WDialogFieldState(IDF_flight_path,Disabled)
-            CALL WDialogFieldState(IDF_2theta_label,Disabled)
-            CALL WDialogFieldState(IDF_2theta0,Disabled)
+            CALL WDialogFieldState(IDF_CW_group, NotDisabled)
+            CALL WDialogFieldState(IDF_radiation_label, NotDisabled)
+            CALL WDialogFieldState(IDF_wavelength1, NotDisabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu, NotDisabled)
+            CALL WDialogFieldState(IDF_TOF_group, Disabled)
+            CALL WDialogFieldState(IDF_Flight_Path_Label, Disabled)
+            CALL WDialogFieldState(IDF_flight_path, Disabled)
+            CALL WDialogFieldState(IDF_2theta_label, Disabled)
+            CALL WDialogFieldState(IDF_2theta0, Disabled)
             CALL WDialogPutRadioButton(IDF_LabX_Source)
           CASE (2, 3) ! Synchrotron X-ray & CW neutron  
-            CALL WDialogFieldState(IDF_CW_group,NotDisabled)
-            CALL WDialogFieldState(IDF_radiation_label,Disabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-            CALL WDialogFieldState(IDF_wavelength1,NotDisabled)
-            CALL WDialogFieldState(IDF_TOF_group,Disabled)
-            CALL WDialogFieldState(IDF_Flight_Path_Label,Disabled)
-            CALL WDialogFieldState(IDF_flight_path,Disabled)
-            CALL WDialogFieldState(IDF_2theta_label,Disabled)
-            CALL WDialogFieldState(IDF_2theta0,Disabled)
+            CALL WDialogFieldState(IDF_CW_group, NotDisabled)
+            CALL WDialogFieldState(IDF_radiation_label, Disabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu, Disabled)
+            CALL WDialogFieldState(IDF_wavelength1, NotDisabled)
+            CALL WDialogFieldState(IDF_TOF_group, Disabled)
+            CALL WDialogFieldState(IDF_Flight_Path_Label, Disabled)
+            CALL WDialogFieldState(IDF_flight_path, Disabled)
+            CALL WDialogFieldState(IDF_2theta_label, Disabled)
+            CALL WDialogFieldState(IDF_2theta0, Disabled)
             IF (JRadOption .EQ. 2) THEN
               CALL WDialogPutRadioButton(IDF_SynX_Source)
             ELSE
               CALL WDialogPutRadioButton(IDF_CWN_Source)
             ENDIF
           CASE (4) ! TOF neutron
-            CALL WDialogFieldState(IDF_CW_group,Disabled)
-            CALL WDialogFieldState(IDF_radiation_label,Disabled)
-            CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
-            CALL WDialogFieldState(IDF_wavelength1,Disabled)
-            CALL WDialogFieldState(IDF_TOF_group,NotDisabled)
-            CALL WDialogFieldState(IDF_Flight_Path_Label,NotDisabled)
-            CALL WDialogFieldState(IDF_flight_path,NotDisabled)
-            CALL WDialogFieldState(IDF_2theta_label,NotDisabled)
-            CALL WDialogFieldState(IDF_2theta0,NotDisabled)
+            CALL WDialogFieldState(IDF_CW_group, Disabled)
+            CALL WDialogFieldState(IDF_radiation_label, Disabled)
+            CALL WDialogFieldState(IDF_Wavelength_Menu, Disabled)
+            CALL WDialogFieldState(IDF_wavelength1, Disabled)
+            CALL WDialogFieldState(IDF_TOF_group, NotDisabled)
+            CALL WDialogFieldState(IDF_Flight_Path_Label, NotDisabled)
+            CALL WDialogFieldState(IDF_flight_path, NotDisabled)
+            CALL WDialogFieldState(IDF_2theta_label, NotDisabled)
+            CALL WDialogFieldState(IDF_2theta0, NotDisabled)
             CALL WDialogPutRadioButton(IDF_TOF_source)
         END SELECT
       ENDDO
@@ -1305,12 +1315,12 @@
       CALL Upload_Cell_Constants
       CALL WDialogSelect(IDD_PW_Page1)
 ! Enable/disable the wizard next button
-      CALL WDialogFieldStateLogical(IDNEXT,FnUnitCellOK())
+      CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
 !!Enable/disable the space group determination button
       CALL WDialogFieldStateLogical(IDF_SGDet, FnUnitCellOK())
 ! Enable/disable the single xtal wizard next button
       CALL WDialogSelect(IDD_SX_Page1)
-      CALL WDialogFieldStateLogical(IDNEXT,FnUnitCellOK())
+      CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
       CALL Generate_TicMarks
       CALL PopActiveWindowID
 
@@ -1400,11 +1410,11 @@
         ISPosSG = NumberSGTable - LPosSG(LatBrav) + 1
       ENDIF
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+      CALL WDialogPutMenu(IDF_Space_Group_Menu, SGHMaBrStr, NumBrSG, ISPosSG)
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+      CALL WDialogPutMenu(IDF_Space_Group_Menu, SGHMaBrStr, NumBrSG, ISPosSG)
       CALL WDialogSelect(IDD_SX_Page1)
-      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+      CALL WDialogPutMenu(IDF_Space_Group_Menu, SGHMaBrStr, NumBrSG, ISPosSG)
       CALL PopActiveWindowID
 
       END SUBROUTINE SetSpaceGroupMenu
@@ -1427,14 +1437,14 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IUploadFrom)
-      CALL WDialogGetMenu(IDF_Space_Group_Menu,ISPosSG)
+      CALL WDialogGetMenu(IDF_Space_Group_Menu, ISPosSG)
       NumberSGTable = SGNrMenu2Table(ISPosSG)
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
+      CALL WDialogPutOption(IDF_Space_Group_Menu, ISPosSG)
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
+      CALL WDialogPutOption(IDF_Space_Group_Menu, ISPosSG)
       CALL WDialogSelect(IDD_SX_Page1)
-      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
+      CALL WDialogPutOption(IDF_Space_Group_Menu, ISPosSG)
       CALL PopActiveWindowID
 
       END SUBROUTINE Download_SpaceGroup
@@ -1504,11 +1514,11 @@
       END SELECT
       CALL UpdateCell
       CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu, LatBrav)
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu, LatBrav)
       CALL WDialogSelect(IDD_SX_Page1)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu, LatBrav)
       CALL SetSpaceGroupMenu
       CALL PopActiveWindowID
 
@@ -1637,19 +1647,19 @@
       COMMON /SADATA/ InSA
 
       IF (PeakOn .GT. 0) THEN
-        CALL WMenuSetState(ID_Peak_Fitting_Mode,ItemEnabled,WintOn)
+        CALL WMenuSetState(ID_Peak_Fitting_Mode, ItemEnabled, WintOn)
       ELSE IF (PeakOn .LT. 0) THEN
-        CALL WMenuSetState(ID_Peak_Fitting_Mode,ItemEnabled,WintOff)
+        CALL WMenuSetState(ID_Peak_Fitting_Mode, ItemEnabled, WintOff)
       ENDIF
       IF (PawleyOn .GT. 0) THEN
-        CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOn)
+        CALL WMenuSetState(ID_Pawley_Refinement_Mode, ItemEnabled, WintOn)
       ELSE IF (PawleyOn .LT. 0) THEN
-        CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOff)
+        CALL WMenuSetState(ID_Pawley_Refinement_Mode, ItemEnabled, WintOff)
       ENDIF
       IF ((NumOf_SA_Runs .EQ. 0) .OR. InSA) THEN
-        CALL WMenuSetState(IDB_AnalyseSolutions,ItemEnabled,WintOff)
+        CALL WMenuSetState(IDB_AnalyseSolutions, ItemEnabled, WintOff)
       ELSE
-        CALL WMenuSetState(IDB_AnalyseSolutions,ItemEnabled,WintOn)
+        CALL WMenuSetState(IDB_AnalyseSolutions, ItemEnabled, WintOn)
       ENDIF
 
       END SUBROUTINE SetModeMenuState
@@ -1682,9 +1692,9 @@
         CALL WDialogPutRadioButton(IDF_PW_Option3)
       ENDIF
 ! Update the menu + the toolbar
-      CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
+      CALL WMenuSetState(IDCurrent_Cursor_mode, ItemChecked, WintOff)
       IDCurrent_Cursor_mode = TheMode
-      CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+      CALL WMenuSetState(IDCurrent_Cursor_mode, ItemChecked, WintOn)
       CALL PopActiveWindowID
       
       END SUBROUTINE SelectMode

@@ -1,4 +1,4 @@
-! Winteracter module created : 24/Nov/2003 12:40:35
+! Winteracter module created : 24/Nov/2003 15:12:25
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -709,4 +709,5 @@
           INTEGER, PARAMETER :: IDF_Width                       =  1303
           INTEGER, PARAMETER :: IDC_UseESD                      =  1380
           INTEGER, PARAMETER :: IDC_UseRelease                  =  1536
+          INTEGER, PARAMETER :: IDF_UCVol                       =  1540
       END MODULE Druid_Header
