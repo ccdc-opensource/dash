@@ -87,8 +87,8 @@
 
       REAL, INTENT (IN   ) ::  The_a, The_b, The_c, TheAlpha, TheBeta, TheGamma
 
-      REAL    calp, cbet, cgam, arg
       REAL, EXTERNAL :: Degrees2Radians
+      REAL    calp, cbet, cgam, arg
       
       calp = COS(Degrees2Radians(TheAlpha))
       cbet = COS(Degrees2Radians(TheBeta))
@@ -111,12 +111,11 @@
 !
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC' ! Contains ALambda
       INCLUDE 'lattice.inc'
 
-      INTEGER I
       LOGICAL, EXTERNAL :: ValidCellAxisLength
       REAL,    EXTERNAL :: UnitCellVolume
+      INTEGER I
       
 ! Initialise to 'unit cell is not OK'
       FnUnitCellOK = .FALSE.
@@ -144,10 +143,10 @@
 
       INCLUDE 'Lattice.inc'
 
-      LOGICAL ABC_Same, AB_Same, AC_Same, BC_Same, Ang_Same, Alp_90, Bet_90, Gam_90, Gam_120
-      INTEGER tLatBrav
       LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm
       LOGICAL, EXTERNAL :: NearlyEqual
+      LOGICAL ABC_Same, AB_Same, AC_Same, BC_Same, Ang_Same, Alp_90, Bet_90, Gam_90, Gam_120
+      INTEGER tLatBrav
 
 !            1 = Triclinic
 !            2 = Monoclinic-a
