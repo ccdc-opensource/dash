@@ -61,7 +61,7 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
-      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, Confirm, UseHydrogensDuringAuto
+      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, Confirm, Get_UseHydrogensDuringAuto
       INTEGER, EXTERNAL :: Get_HydrogenTreatment
       REAL, EXTERNAL :: SA_FCN
       CHARACTER*80 chistr
@@ -76,7 +76,7 @@
       CALL WCursorShape(CurHourGlass)
       tLOG_HYDROGENS = LOG_HYDROGENS
       DesorbHydrogens = .FALSE.
-      IF (Auto .AND. UseHydrogensDuringAuto()) THEN
+      IF (Auto .AND. Get_UseHydrogensDuringAuto()) THEN
         LOG_HYDROGENS = .TRUE.
 !C If we have absorbed the hydrogens and want to use them now, we must do some re-administrating.
         IF (Get_HydrogenTreatment() .EQ. 2) THEN

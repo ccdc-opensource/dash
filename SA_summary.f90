@@ -710,7 +710,7 @@
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
       REAL, EXTERNAL         :: UnitCellVolume
-      LOGICAL, EXTERNAL      :: Get_AutoLocalMinimisation, UseHydrogensDuringAuto
+      LOGICAL, EXTERNAL      :: Get_AutoLocalMinimisation, Get_UseHydrogensDuringAuto
       INTEGER, EXTERNAL      :: WritePDBCommon, Get_HydrogenTreatment
       CHARACTER*1, EXTERNAL  :: ChrLowerCase
       CHARACTER*20, EXTERNAL :: Integer2String
@@ -1129,7 +1129,7 @@
         IF (Get_HydrogenTreatment() .EQ. 3) THEN
           LOG_HYDROGENS = .TRUE.
         ELSE
-          LOG_HYDROGENS = (Get_AutoLocalMinimisation() .AND. UseHydrogensDuringAuto())
+          LOG_HYDROGENS = (Get_AutoLocalMinimisation() .AND. Get_UseHydrogensDuringAuto())
         ENDIF
         CALL VALCHI(tIntChiSqd,0)    ! Structural part
         LOG_HYDROGENS = tLOG_HYDROGENS
