@@ -392,7 +392,7 @@
 !
 ! EXPECTS ALAMBD(ILAMB,KSOURC) TO BE SET IN /DGEOM.
 !
-! IF IOPT=1, JUST CALCULATES THE VALUES OF THE PEAK DESCRIPTORS.  IF IOPT=2,
+! IF IOPT=1, JUST CALCULATES THE VALUES OF THE PEAK DESCRIPTORS. IF IOPT=2,
 ! CALCULATES ALSO THEIR DERIVATIVES WRT THE REFINABLE PARAMETERS.
 !
 ! (LATER IT SHOULD USE THE FACT THAT IF LOGICAL REFUSE IS TRUE ON ENTRY, VALUES
@@ -523,7 +523,7 @@
 !
 ! EXPECTS ALAMBD(ILAMB,KSOURC) TO BE SET IN /DGEOM.
 !
-! IF IOPT=1, JUST CALCULATES THE VALUES OF THE PEAK DESCRIPTORS.  IF IOPT=2,
+! IF IOPT=1, JUST CALCULATES THE VALUES OF THE PEAK DESCRIPTORS. IF IOPT=2,
 ! CALCULATES ALSO THEIR DERIVATIVES WRT THE REFINABLE PARAMETERS.
 !
 ! (LATER IT SHOULD USE THE FACT THAT IF LOGICAL REFUSE IS TRUE ON ENTRY, VALUES
@@ -743,13 +743,13 @@
       SWITCH = EXP(-PKFNSP(1,1,JPHASE,JSOURC)/WSQ)
       PKFNVA(1) = SWITCH
 !.. TAUF & TAUS
-      PKFNVA(2) = PKFNSP(2,1,JPHASE,JSOURC) + PKFNSP(2,2,JPHASE,JSOURC) *WLGTH
-      PKFNVA(3) = PKFNSP(3,1,JPHASE,JSOURC) + PKFNSP(3,2,JPHASE,JSOURC)   *WLGTH
+      PKFNVA(2) = PKFNSP(2,1,JPHASE,JSOURC) + PKFNSP(2,2,JPHASE,JSOURC)*WLGTH
+      PKFNVA(3) = PKFNSP(3,1,JPHASE,JSOURC) + PKFNSP(3,2,JPHASE,JSOURC)*WLGTH
 !.. C49: PKFNVA(4) IS SIGMA NOT SIGMA SQUARED
       SIGMA = SQRT(PKFNSP(4,1,JPHASE,JSOURC)                            &
-     &        +(PKFNSP(4,2,JPHASE,JSOURC)+PKFNSP(4,3,JPHASE,JSOURC)*WSQ) *WSQ)
+              +(PKFNSP(4,2,JPHASE,JSOURC)+PKFNSP(4,3,JPHASE,JSOURC)*WSQ) *WSQ)
       GAMMA = PKFNSP(5,1,JPHASE,JSOURC)                                 &
-     &        + (PKFNSP(5,2,JPHASE,JSOURC)+PKFNSP(5,3,JPHASE,JSOURC)    *WLGTH)*WLGTH
+              + (PKFNSP(5,2,JPHASE,JSOURC)+PKFNSP(5,3,JPHASE,JSOURC)*WLGTH)*WLGTH
       PKFNVA(4) = SIGMA
       PKFNVA(5) = GAMMA
       PKFNVA(6) = PKFNSP(6,1,JPHASE,JSOURC)
@@ -3677,8 +3677,8 @@
 !H anisotropic strain and particle size effects
 !A On entry N=1,2,5,6 or 7:
 !A N=1: Set up program for data source TOF, peak function 08
-!A N=2: form peak function in YNORM, and its derivatives wrt paramet ers
-!A N=5: Sets LOGICAL REFUSE to determine if reflection makes a sign ificant
+!A N=2: form peak function in YNORM, and its derivatives wrt parameters
+!A N=5: Sets LOGICAL REFUSE to determine if reflection makes a significant
 !A      contribution to the profile at ARGI
 !A N=6: CAILS entry to determine whether near reflections should be related
 !A      by a strict or slack relationship.
@@ -3942,10 +3942,10 @@
 !H and Voigt double exponential peak function
 !A On entry N=1,2,3,5,6 or 7:
 !A N=1: Set up program for data source TOF, peak function 02:
-!A N=2: form peak function in YNORM, and its derivatives wrt paramet ers
+!A N=2: form peak function in YNORM, and its derivatives wrt parameters
 !A N=3: form peak function for reference positions for future interpolation
 !A      if appropriate.
-!A N=5: Sets LOGICAL REFUSE to determine if reflection makes a sign ificant
+!A N=5: Sets LOGICAL REFUSE to determine if reflection makes a significant
 !A      contribution to the profile at ARGI
 !A N=6: CAILS entry to determine whether near reflections should be related
 !A      by a strict or slack relationship.
