@@ -15,11 +15,9 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
-      ! COMMON block for settings when in batch mode that are usually done via the GUI
-
       LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
       INTEGER                                                            HydrogenTreatment
-      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
 
       REAL            T0, RT
       COMMON /saparl/ T0, RT
@@ -132,7 +130,7 @@
             I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
-            HydrogenTreatment = iTem
+            CALL Set_HydrogenTreatment(iTem)
           CASE ('AUTOMIN') ! Auto local minimise
             I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
@@ -207,11 +205,11 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CreateBatchFile
+      SUBROUTINE WriteBatchFile
 
       IMPLICIT NONE
 
-      END SUBROUTINE CreateBatchFile
+      END SUBROUTINE WriteBatchFile
 !
 !*****************************************************************************
 !

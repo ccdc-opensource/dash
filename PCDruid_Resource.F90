@@ -1,4 +1,4 @@
-! Winteracter module created : 05/Oct/2004 10:47:57
+! Winteracter module created : 25/Oct/2004 11:51:56
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -246,7 +246,7 @@
           INTEGER, PARAMETER :: IDF_ZM_pars4                    =  1127
           INTEGER, PARAMETER :: IDF_ZM_allpars_label            =  1135
           INTEGER, PARAMETER :: IDF_SA2_label                   =  1141
-          INTEGER, PARAMETER :: IDB_SA3_finish                  =  1144
+          INTEGER, PARAMETER :: IDB_Solve                       =  1144
           INTEGER, PARAMETER :: IDF_SA_RandomSeed1              =  1163
           INTEGER, PARAMETER :: IDF_SA_Moves                    =  1158
           INTEGER, PARAMETER :: IDF_SA_NT_label                 =  1160
@@ -649,4 +649,6 @@
           INTEGER, PARAMETER :: IDB_Down                        =  1150
           INTEGER, PARAMETER :: IDB_DeleteLastRun               =  1303
           INTEGER, PARAMETER :: IDB_BatchFile                   =  1155
+          INTEGER, PARAMETER :: IDD_SA_input4                   =   126
+          INTEGER, PARAMETER :: IDC_OuputDASH                   =  1248
       END MODULE Druid_Header

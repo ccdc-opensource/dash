@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 05/Oct/2004 10:47:57
+// Modified : 25/Oct/2004 11:51:56
 //
 ///////////////////////////////////////////////////
 //
@@ -259,7 +259,7 @@
 #define IDF_ZM_pars4                     1127
 #define IDF_ZM_allpars_label             1135
 #define IDF_SA2_label                    1141
-#define IDB_SA3_finish                   1144
+#define IDB_Solve                        1144
 #define IDF_SA_RandomSeed1               1163
 #define IDF_SA_Moves                     1158
 #define IDF_SA_NT_label                  1160
@@ -662,6 +662,8 @@
 #define IDB_Down                         1150
 #define IDB_DeleteLastRun                1303
 #define IDB_BatchFile                    1155
+#define IDD_SA_input4                     126
+#define IDC_OuputDASH                    1248
 
 ///////////////////////////////////////////////////
 //
@@ -1076,6 +1078,19 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
+END
+
+IDD_Width_Equations RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  112
@@ -2009,7 +2024,7 @@ BEGIN
 ,0
 END
 
-IDD_Configuration DIALOG 0, 0,  281,  198
+IDD_Configuration DIALOG 0, 0,  281,  103
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Configuration"
@@ -2019,23 +2034,8 @@ BEGIN
     CONTROL "B&rowse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  228,    9,   40,   14
     CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    9,   11,   27,    8
     CONTROL "Arguments for viewer",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,    6,   31,   74,    8
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  121,  178,   40,   14
-    CONTROL "Auto local &minimise",IDF_AutoLocalOptimise,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  150,   76,   14
-    CONTROL "Output .c&ssr",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   83,   54,   14
-    CONTROL "Output .cc&l",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   96,   54,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  120,   82,   40,   14
     CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,   66,   84,   14
-    CONTROL "Output .&pro",IDF_OutputPRO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  136,   54,   14
-    CONTROL "Output chi-s&quared vs. moves",IDF_OutputChi2vsMoves,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  150,  110,   14
-    CONTROL "Use crystallo&graphic centre of mass",IDF_CrystallographicCoM,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  135,  130,   14
-    CONTROL "Auto &align",IDF_Align,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   10,  178,   46,   14
-    CONTROL "Output .c&if",IDF_OutputCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  110,   54,   14
-    CONTROL "Output .&res",IDF_OutputRES,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  123,   54,   14
-    CONTROL "Output .pd&b",IDF_OutputPDB,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   70,   54,   14
-    CONTROL "Use hydrogens",IDF_UseHydrogensAuto,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  163,   70,   14
-    CONTROL "Ignore",IDR_HydrogensIgnore,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   17,   89,   44,   14
-    CONTROL "Absorb",IDR_HydrogensAbsorb,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   17,  102,   44,   14
-    CONTROL "Explicit",IDR_HydrogensExplicit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   17,  115,   44,   14
-    CONTROL "Hydrogens",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   11,   80,   58,   52
     CONTROL "",IDF_MogulExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   39,   44,  180,   14
     CONTROL "Mogul",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    7,   47,   26,    8
     CONTROL "B&rowse...",IDBBROWSE2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  228,   44,   40,   14
@@ -2044,21 +2044,7 @@ END
 IDD_Configuration RCDATA
 BEGIN
 "[Checks] \n"
-" 1259 1 \n"
-" 1260 0 \n"
-" 1277 0 \n"
 " 1131 0 \n"
-" 1043 0 \n"
-" 1099 0 \n"
-" 1215 1 \n"
-" 1224 1 \n"
-" 1462 0 \n"
-" 1461 0 \n"
-" 1457 1 \n"
-" 1474 1 \n"
-" 1092 1 \n"
-" 1090 0 \n"
-" 1550 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -3435,7 +3421,7 @@ FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Simulated Annealing Protocol"
 BEGIN
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
-    CONTROL "&Solve >",IDB_SA3_finish,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "0.0",IDF_SA_T0,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,   98,   50,   28,   14
     CONTROL "0.02",IDF_SA_Tredrate,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  130,   50,   28,   14
     CONTROL "N1",IDF_SA_NS_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  162,   38,   24,   10
@@ -3462,7 +3448,6 @@ BEGIN
     CONTROL "Random seeds",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  139,  105,   30,   18
     CONTROL "314",IDF_SA_RandomSeed1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  171,   99,   43,   14
     CONTROL "159",IDF_SA_RandomSeed2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  171,  115,   43,   14
-    CONTROL "Create batch file...",IDB_BatchFile,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  294,  150,   80,   14
 END
 
 IDD_SA_input3_2 RCDATA
@@ -3667,6 +3652,64 @@ BEGIN
 "[Tabs] \n"
 "[Ranges] \n"
 " 1205     0.10000E-003      1000.0      \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_SA_input4 DIALOG 0, 0,  385,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Simulated Annealing Options"
+BEGIN
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Solve >",IDB_Solve,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "Create batch file...",IDB_BatchFile,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  294,  150,   80,   14
+    CONTROL "Auto local &minimise",IDF_AutoLocalOptimise,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   94,   73,   76,   14
+    CONTROL ".c&ssr file",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  191,   75,   54,   14
+    CONTROL ".cc&l file",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  248,   62,   54,   14
+    CONTROL ".&pro file",IDF_OutputPRO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  305,   75,   54,   14
+    CONTROL "Output chi-s&quared vs. moves at end",IDF_OutputChi2vsMoves,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  191,   96,  160,   14
+    CONTROL "Use crystallo&graphic centre of mass",IDF_CrystallographicCoM,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   94,  126,  130,   14
+    CONTROL "Auto &align",IDF_Align,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   94,  106,   46,   14
+    CONTROL ".c&if file",IDF_OutputCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  248,   75,   54,   14
+    CONTROL ".&res file",IDF_OutputRES,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  305,   62,   54,   14
+    CONTROL ".pd&b file",IDF_OutputPDB,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  191,   62,   54,   14
+    CONTROL "Use hydrogens",IDF_UseHydrogensAuto,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  102,   86,   70,   14
+    CONTROL "Ignore",IDR_HydrogensIgnore,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   99,   23,   44,   14
+    CONTROL "Absorb",IDR_HydrogensAbsorb,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   99,   36,   44,   14
+    CONTROL "Explicit",IDR_HydrogensExplicit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   99,   49,   44,   14
+    CONTROL "Hydrogens",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   93,   14,   58,   52
+    CONTROL "Output",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  184,   14,  188,  102
+    CONTROL "Write out .dash file at end (recommended)",IDC_OuputDASH,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  191,   30,  170,   14
+    CONTROL "For every run, write out: (not recommended)",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  191,   50,  160,    8
+END
+
+IDD_SA_input4 RCDATA
+BEGIN
+"[Checks] \n"
+" 1259 1 \n"
+" 1260 0 \n"
+" 1277 0 \n"
+" 1043 0 \n"
+" 1099 0 \n"
+" 1215 1 \n"
+" 1224 1 \n"
+" 1462 0 \n"
+" 1461 0 \n"
+" 1457 0 \n"
+" 1474 1 \n"
+" 1092 0 \n"
+" 1090 1 \n"
+" 1550 0 \n"
+" 1248 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"

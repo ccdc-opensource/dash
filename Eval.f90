@@ -30,7 +30,10 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
       REAL TRAN(1:3), ROTA(1:3,1:3)
       REAL QUATER(0:3), QQSUM, QDEN
       REAL XC, YC, ZC
@@ -115,7 +118,7 @@
           XC = 0.0
           YC = 0.0
           ZC = 0.0
-          IF (Get_UseCrystallographicCoM()) THEN
+          IF (UseCCoM) THEN
             DO I = 1, NATS
               XC = XC + AtomicWeighting(I,iFrg)*axyzo(1,I)
               YC = YC + AtomicWeighting(I,iFrg)*axyzo(2,I)

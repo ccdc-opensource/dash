@@ -184,7 +184,11 @@
       LOGICAL           Resume_SA
       COMMON /RESUMESA/ Resume_SA
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_HydrogenTreatment
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: Degrees2Radians
       CHARACTER*36 parlabel(mvar)
       INTEGER I, II, kk, iFrg, iH, iK, iL
@@ -203,8 +207,8 @@
 ! Calculate the reciprocal lattice
       CALL InverseMatrix(f2cmat, c2fmat, 3)
       CALL frac2pdb(f2cpdb, CellPar(1), CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6))
-      CALL CREATE_FOB(Get_HydrogenTreatment() .EQ. 2)
-      CALL Create_AtomicWeightings(Get_HydrogenTreatment())
+      CALL CREATE_FOB(HydrogenTreatment .EQ. 2)
+      CALL Create_AtomicWeightings(HydrogenTreatment)
 ! Per Z-matrix, determine whether to use quaternions or a single axis
       DO iFrg = 1, nFrag
         CALL zmDoAdmin(iFrg)

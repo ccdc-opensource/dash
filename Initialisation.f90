@@ -104,6 +104,7 @@
       CALL WDialogLoad(IDD_SA_Modal_input2)
       CALL WDialogLoad(IDD_ModalDialog)
       CALL WDialogLoad(IDD_SA_input3_2)
+      CALL WDialogLoad(IDD_SA_input4)
       CALL WDialogLoad(IDD_SA_Action1)
       CALL WDialogLoad(IDD_Summary)
       CALL WDialogLoad(IDD_SAW_Page5)
@@ -216,9 +217,6 @@
       INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
       COMMON /DialoguePosCmn/ IXPos_IDD_Wizard, IYPos_IDD_Wizard
 
-      LOGICAL           LOG_HYDROGENS
-      COMMON /HYDROGEN/ LOG_HYDROGENS
-
       REAL            XPG1, XPG2, YPG1, YPG2
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
 
@@ -276,6 +274,10 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
@@ -295,6 +297,10 @@
       CALL WDialogPutInteger(IDF_SA_NS, NS)
       NT = 25
       CALL WDialogPutInteger(IDF_SA_NT, NT)
+      ISeed1 = 315
+      ISeed2 = 159
+      CALL WDialogPutInteger(IDF_SA_RandomSeed1, ISeed1)
+      CALL WDialogPutInteger(IDF_SA_RandomSeed2, ISeed2)
       DO I = 1, MVAR
         ModalFlag(I) = 0 ! 0 = not a torsion angle
       ENDDO
@@ -352,7 +358,6 @@
       ZeroPoint = 0.0
       PastPawley = .FALSE.
       NoWavelengthInXYE = .FALSE.
-      LOG_HYDROGENS = .FALSE.
       T0 = 0.0
       RT = 0.02
       ChiMult = 5.0 ! Dodgy: this must agree with the default specified in the resource file...
@@ -362,18 +367,20 @@
 ! Now initialise the maximum resolution in the dialogue window
       DefaultMaxResolution = DASHDefaultMaxResolution
       CALL Update_TruncationLimits
-      CALL WDialogSelect(IDD_SA_input3_2)
-      ISeed1 = 315
-      ISeed2 = 159
-      CALL WDialogPutInteger(IDF_SA_RandomSeed1, ISeed1)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed2, ISeed2)
       CALL WDialogSelect(IDD_Index_Preparation)
       CALL WDialogPutReal(IDF_eps, 0.03, '(F5.3)')
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogPutString(IDF_ViewExe, ViewExe)
       CALL WDialogPutString(IDF_ViewArg, ViewArg)
       CALL WDialogPutString(IDF_MogulExe, MogulExe)
-      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, .TRUE.)
+      CALL Set_AutoLocalMinimisation(.TRUE.)
+      CALL Set_UseHydrogensDuringAutoLocalMinimise(.TRUE.)
+      CALL Set_UseCrystallographicCoM(.TRUE.)
+      ! ########## Auto Align ################
+      Call Set_HydrogenTreatment(2) ! Absorb
+      CALL WDialogSelect(IDD_SA_Modal_input2)
+      RandomInitVal = .TRUE.
+      CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, RandomInitVal)
       SA_SimplexDampingFactor = 0.1
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
       CALL WDialogSelect(IDD_PW_Page8)
@@ -545,14 +552,18 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
       LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, SaveCCL, SaveCIF, SaveRES,  &
                            Get_ColourFlexibleTorsions, ConnectPointsObs,  &
                            PlotErrorBars, PlotBackground,                 &
                            PlotPeakFitDifferenceProfile,                  &
                            WDialogGetCheckBoxLogical,                     &
-                           Get_HydrogenTreatment, Get_SavePRO, Get_OutputChi2vsMoves, &
-                           Get_AutoLocalMinimisation, Get_DivideByEsd
-      LOGICAL, EXTERNAL :: Get_UseHydrogensDuringAuto, Get_ShowCumChiSqd, Get_AutoAlign
+                           Get_SavePRO, Get_OutputChi2vsMoves, &
+                           Get_DivideByEsd
+      LOGICAL, EXTERNAL :: Get_ShowCumChiSqd, Get_AutoAlign
       REAL, EXTERNAL :: WavelengthOf
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
@@ -680,9 +691,9 @@
       CALL WDialogGetString(IDF_ViewArg, ViewArg)
       CALL FileWriteString(hFile, RecNr, ViewArg)
 ! Save hydrogen treatment 1 = ignore, 2 = absorb, 3 = explicit
-      CALL FileWriteLogical(hFile,RecNr, Get_HydrogenTreatment())
+      CALL FileWriteLogical(hFile, RecNr, HydrogenTreatment)
 ! Colour flexible torsions (in Z-matrix viewer) YES / NO
-      CALL FileWriteLogical(hFile,RecNr,Get_ColourFlexibleTorsions())
+      CALL FileWriteLogical(hFile, RecNr, Get_ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
       CALL FileWriteLogical(hFile, RecNr, SavePDB())  ! 1. .pdb  ?
       CALL FileWriteLogical(hFile, RecNr, SaveCSSR()) ! 2. .cssr ?
@@ -691,12 +702,12 @@
       CALL FileWriteLogical(hFile, RecNr, SaveRES())  ! 5. .res  ?
 ! Save YES / NO if .pro file is to be written out when a best solution is found
       CALL FileWriteLogical(hFile, RecNr, Get_SavePRO())
-! Auto local minimisation at the end of every run in multirun YES / NO
-      CALL FileWriteLogical(hFile, RecNr, Get_AutoLocalMinimisation())
+! Auto local minimisation at the end of every run YES / NO
+      CALL FileWriteLogical(hFile, RecNr, AutoMinimise)
 ! Save output profile chi**2 versus moves plot YES / NO
       CALL FileWriteLogical(hFile, RecNr, Get_OutputChi2vsMoves())
 ! Save the damping factor for the local minimisation
-      CALL FileWriteReal(hFile,RecNr,SA_SimplexDampingFactor)
+      CALL FileWriteReal(hFile, RecNr, SA_SimplexDampingFactor)
 ! Save the seeds for the random number generator
       CALL WDialogSelect(IDD_SA_input3_2)
       CALL WDialogGetInteger(IDF_SA_RandomSeed1, tInteger)
@@ -724,7 +735,7 @@
       CALL FileWriteInteger(hFile, RecNr, tInteger)
 ! Following is new in DASH 2.1
 ! Use hydrogens for auto local minimise
-      CALL FileWriteLogical(hFile, RecNr, Get_UseHydrogensDuringAuto())
+      CALL FileWriteLogical(hFile, RecNr, UseHAutoMin)
 ! Plot cumulative chi-squared      
       CALL FileWriteLogical(hFile, RecNr, Get_ShowCumChiSqd())
 ! Following is new in DASH 2.2
@@ -766,9 +777,6 @@
 
       INTEGER     BFIOErrorCode
       COMMON /IO/ BFIOErrorCode
-
-      LOGICAL           LOG_HYDROGENS
-      COMMON /HYDROGEN/ LOG_HYDROGENS
 
       REAL, EXTERNAL :: WavelengthOf
       REAL, EXTERNAL :: dSpacing2TwoTheta
@@ -917,8 +925,8 @@
 ! Read hydrogen treatment. This was a LOGICAL for versions below DASH 2.2
       IF ( (MainVersionStr .EQ. "1") .OR.    &
           ((MainVersionStr .EQ. "2") .AND. ((SubVersionStr .EQ. "0") .OR. (SubVersionStr .EQ. "1") .OR. (SubVersionStr .EQ. "2"))) ) THEN
-        CALL FileReadLogical(hFile, RecNr, LOG_HYDROGENS)
-        IF (LOG_HYDROGENS) THEN
+        CALL FileReadLogical(hFile, RecNr, tLogical)
+        IF ( tLogical ) THEN
           CALL Set_HydrogenTreatment(3) ! Explicit
         ELSE
           CALL Set_HydrogenTreatment(1) ! Ignore
@@ -926,7 +934,6 @@
       ELSE
         CALL FileReadInteger(hFile, RecNr, tInteger)
         CALL Set_HydrogenTreatment(tInteger)
-        LOG_HYDROGENS = (tInteger .EQ. 3)
       ENDIF
 ! Colour flexible torsions (in Z-matrix viewer) YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
@@ -942,18 +949,11 @@
       CALL WDialogPutCheckBoxLogical(IDF_OutputCIF, tLogical)
       CALL FileReadLogical(hFile, RecNr, tLogical)   ! 5. .res  ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputRES, tLogical)
-! Read YES / NO if .pro file is to be written out when a best solution is found
-      CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL Set_SavePRO(tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)   ! 6. .pro  ?
+      CALL WDialogPutCheckBoxLogical(IDF_OutputPRO, tLogical)
 ! Auto local minimisation at the end of every run in multirun YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, tLogical)
-      IF (LOG_HYDROGENS) THEN
-! If hydrogens are used during SA, force use of hydrogens during autominimise
-        CALL WDialogFieldState(IDF_UseHydrogensAuto, Disabled)
-      ELSE
-        CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto, tLogical)
-      ENDIF
 ! Read output profile chi**2 versus moves plot YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_OutputChi2vsMoves, tLogical)
@@ -996,13 +996,12 @@
       END SELECT
 ! Following is new in DASH 2.1
 ! Use hydrogens for auto local minimise
-      CALL FileReadLogical(hFile,RecNr,tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
       IF (GetBFIOError() .NE. 0) THEN
         CLOSE(hFile)
         RETURN
       ENDIF
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutCheckBoxLogical(IDF_UseHydrogensAuto, tLogical)
+      CALL Set_UseHydrogensDuringAutoLocalMinimise(tLogical)
 ! Plot cumulative chi-squared 
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogSelect(IDD_Plot_Option_Dialog)

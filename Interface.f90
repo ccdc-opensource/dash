@@ -264,65 +264,6 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Get_HydrogenTreatment
-! 1 = ignore
-! 2 = absorb
-! 3 = explicit
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      LOGICAL         in_batch
-      COMMON /BATEXE/ in_batch
-
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
-
-      INTEGER iState
-
-      IF ( in_batch ) THEN
-        Get_HydrogenTreatment = HydrogenTreatment
-      ELSE
-        CALL PushActiveWindowID
-        CALL WDialogSelect(IDD_Configuration)
-        CALL WDialogGetRadioButton(IDR_HydrogensIgnore, iState)
-        Get_HydrogenTreatment = iState
-        CALL PopActiveWindowID
-      ENDIF
-
-      END FUNCTION Get_HydrogenTreatment
-!
-!*****************************************************************************
-!
-      SUBROUTINE Set_HydrogenTreatment(iState)
-! 1 = ignore
-! 2 = absorb
-! 3 = explicit
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: iState
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      SELECT CASE (iState)
-        CASE (1)
-          CALL WDialogPutRadioButton(IDR_HydrogensIgnore)
-        CASE (2)
-          CALL WDialogPutRadioButton(IDR_HydrogensAbsorb)
-        CASE (3)
-          CALL WDialogPutRadioButton(IDR_HydrogensExplicit)
-      END SELECT
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Set_HydrogenTreatment
-!
-!*****************************************************************************
-!
       LOGICAL FUNCTION Get_ShowCumChiSqd
 
 ! When .TRUE., the cumulative chi-sqd is plotted
@@ -363,67 +304,82 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_UseHydrogensDuringAuto
+      LOGICAL FUNCTION Get_OutputChi2vsMoves
 
-! When .TRUE., hydrogen atoms are included in the structure factor calculations during the
-! local minimisation at the end of each run.
+! When .TRUE., the profile chi**2 versus moves graph is written out to a file
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
-
-      LOGICAL         in_batch
-      COMMON /BATEXE/ in_batch
-
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
-      IF ( in_batch ) THEN
-        Get_UseHydrogensDuringAuto = UseHAutoMin
-      ELSE
-        CALL PushActiveWindowID
-        CALL WDialogSelect(IDD_Configuration)
-        Get_UseHydrogensDuringAuto = WDialogGetCheckBoxLogical(IDF_UseHydrogensAuto)
-        CALL PopActiveWindowID
-      ENDIF
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input4)
+      Get_OutputChi2vsMoves = WDialogGetCheckBoxLogical(IDF_OutputChi2vsMoves)
+      CALL PopActiveWindowID
 
-      END FUNCTION Get_UseHydrogensDuringAuto
+      END FUNCTION Get_OutputChi2vsMoves
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_UseCrystallographicCoM
+      SUBROUTINE Set_AutoLocalMinimisation(TheValue)
 
-! When .TRUE., when calculating the centre of rotation of a Z-matrix,
-! each atom is weighted by the square of its number of electrons
+! When .TRUE., each run in a multi run ends with a local minimisation
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
+      LOGICAL, INTENT (IN   ) :: TheValue
+
+      LOGICAL           LOG_HYDROGENS
+      COMMON /HYDROGEN/ LOG_HYDROGENS
+
       LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
       INTEGER                                                            HydrogenTreatment
-      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
 
-      LOGICAL         in_batch
-      COMMON /BATEXE/ in_batch
-
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-
-      IF ( in_batch ) THEN
-        Get_UseCrystallographicCoM = UseCCoM
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input4)
+      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, TheValue)
+      AutoMinimise = TheValue
+      IF ( AutoMinimise ) THEN
+! If hydrogens are used during SA, force use of hydrogens during autominimise
+        CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto, .NOT. LOG_HYDROGENS)
       ELSE
-        CALL PushActiveWindowID
-        CALL WDialogSelect(IDD_Configuration)
-        Get_UseCrystallographicCoM = WDialogGetCheckBoxLogical(IDF_CrystallographicCoM)
-        CALL PopActiveWindowID
+        CALL WDialogFieldState(IDF_UseHydrogensAuto, Disabled)
       ENDIF
+      CALL PopActiveWindowID
 
-      END FUNCTION Get_UseCrystallographicCoM
+      END SUBROUTINE Set_AutoLocalMinimisation
+!
+!*****************************************************************************
+!
+      SUBROUTINE Set_UseHydrogensDuringAutoLocalMinimise(TheValue)
+
+! When .TRUE., hydrogens are treated explicitly during auto local minimise
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: TheValue
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input4)
+      CALL WDialogPutCheckBoxLogical(IDF_UseHydrogensAuto, TheValue)
+      UseHAutoMin = TheValue
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_UseHydrogensDuringAutoLocalMinimise
 !
 !*****************************************************************************
 !
@@ -439,114 +395,61 @@
 
       LOGICAL, INTENT (IN   ) :: TheValue
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutCheckBoxLogical(IDF_CrystallographicCoM,TheValue)
+      CALL WDialogSelect(IDD_SA_input4)
+      CALL WDialogPutCheckBoxLogical(IDF_CrystallographicCoM, TheValue)
+      UseCCoM = TheValue
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_UseCrystallographicCoM
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_OutputChi2vsMoves
-
-! When .TRUE., the profile chi**2 versus moves graph is written out to a file
-
+      SUBROUTINE Set_HydrogenTreatment(iState)
+! 1 = ignore
+! 2 = absorb
+! 3 = explicit
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iState
+
+      LOGICAL           LOG_HYDROGENS
+      COMMON /HYDROGEN/ LOG_HYDROGENS
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      Get_OutputChi2vsMoves = WDialogGetCheckBoxLogical(IDF_OutputChi2vsMoves)
+      HydrogenTreatment = iState
+      CALL WDialogSelect(IDD_SA_input4)
+      SELECT CASE (HydrogenTreatment)
+        CASE (1)
+          CALL WDialogPutRadioButton(IDR_HydrogensIgnore)
+        CASE (2)
+          CALL WDialogPutRadioButton(IDR_HydrogensAbsorb)
+        CASE (3)
+          CALL WDialogPutRadioButton(IDR_HydrogensExplicit)
+      END SELECT
+      LOG_HYDROGENS = (HydrogenTreatment .EQ. 3)
+      IF ( LOG_HYDROGENS ) THEN
+! If hydrogens are used during SA, force use of hydrogens during autominimise
+        CALL WDialogFieldState(IDF_UseHydrogensAuto, Disabled)
+      ELSE
+        CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto, WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
+      ENDIF
       CALL PopActiveWindowID
 
-      END FUNCTION Get_OutputChi2vsMoves
-!
-!*****************************************************************************
-!
-      LOGICAL FUNCTION Get_AutoLocalMinimisation
-
-! When .TRUE., each run in a multi run ends with a local minimisation
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
-
-      LOGICAL         in_batch
-      COMMON /BATEXE/ in_batch
-
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-
-      IF ( in_batch ) THEN
-        Get_AutoLocalMinimisation = AutoMinimise
-      ELSE
-        CALL PushActiveWindowID
-        CALL WDialogSelect(IDD_Configuration)
-        Get_AutoLocalMinimisation = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
-        CALL PopActiveWindowID
-      ENDIF
-
-      END FUNCTION Get_AutoLocalMinimisation
-!
-!*****************************************************************************
-!
-      LOGICAL FUNCTION Get_RandomInitVal
-
-! When .TRUE., SA parameters are set to random values.
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
-      INTEGER                                                            HydrogenTreatment
-      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
-
-      LOGICAL         in_batch
-      COMMON /BATEXE/ in_batch
-
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-
-      IF ( in_batch ) THEN
-        Get_RandomInitVal = AutoMinimise
-      ELSE
-        CALL PushActiveWindowID
-        CALL WDialogSelect(IDD_SA_Modal_input2)
-        Get_RandomInitVal = WDialogGetCheckBoxLogical(IDF_RandomInitVal)
-        CALL PopActiveWindowID
-      ENDIF
-
-      END FUNCTION Get_RandomInitVal
-!
-!*****************************************************************************
-!
-      SUBROUTINE Set_AutoLocalMinimisation(TheValue)
-
-! When .TRUE., each run in a multi run ends with a local minimisation
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      LOGICAL, INTENT (IN   ) :: TheValue
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,TheValue)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Set_AutoLocalMinimisation
+      END SUBROUTINE Set_HydrogenTreatment
 !
 !*****************************************************************************
 !
@@ -562,7 +465,7 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogSelect(IDD_SA_input4)
       Get_AutoAlign = WDialogGetCheckBoxLogical(IDF_Align)
       CALL PopActiveWindowID
 
@@ -582,11 +485,31 @@
       LOGICAL, INTENT (IN   ) :: TheValue
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutCheckBoxLogical(IDF_Align,TheValue)
+      CALL WDialogSelect(IDD_SA_input4)
+      CALL WDialogPutCheckBoxLogical(IDF_Align, TheValue)
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_AutoAlign
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION SavePDB
+
+! When .TRUE., a file in .pdb format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input4)
+      SavePDB = WDialogGetCheckBoxLogical(IDF_OutputPDB)
+      CALL PopActiveWindowID
+
+      END FUNCTION SavePDB
 !
 !*****************************************************************************
 !
@@ -602,31 +525,11 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogSelect(IDD_SA_input4)
       Get_SavePRO = WDialogGetCheckBoxLogical(IDF_OutputPRO)
       CALL PopActiveWindowID
 
       END FUNCTION Get_SavePRO
-!
-!*****************************************************************************
-!
-      SUBROUTINE Set_SavePRO(TheValue)
-
-! When .TRUE., a file containing the calculated profile is saved for each SA run
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      LOGICAL, INTENT (IN   ) :: TheValue
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutCheckBoxLogical(IDF_OutputPRO,TheValue)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Set_SavePRO
 !
 !*****************************************************************************
 !
@@ -736,26 +639,6 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION SavePDB
-
-! When .TRUE., a file in .pdb format is written out for each SA solution
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      SavePDB = WDialogGetCheckBoxLogical(IDF_OutputPDB)
-      CALL PopActiveWindowID
-
-      END FUNCTION SavePDB
-!
-!*****************************************************************************
-!
       LOGICAL FUNCTION SaveCSSR
 
 ! When .TRUE., a file in .cssr format is written out for each SA solution
@@ -768,7 +651,7 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogSelect(IDD_SA_input4)
       SaveCSSR = WDialogGetCheckBoxLogical(IDF_OutputCSSR)
       CALL PopActiveWindowID
 
@@ -788,7 +671,7 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogSelect(IDD_SA_input4)
       SaveCCL = WDialogGetCheckBoxLogical(IDF_OutputCCL)
       CALL PopActiveWindowID
 
@@ -808,7 +691,7 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogSelect(IDD_SA_input4)
       SaveCIF = WDialogGetCheckBoxLogical(IDF_OutputCIF)
       CALL PopActiveWindowID
 
@@ -828,7 +711,7 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogSelect(IDD_SA_input4)
       SaveRES = WDialogGetCheckBoxLogical(IDF_OutputRES)
       CALL PopActiveWindowID
 
@@ -1147,11 +1030,13 @@
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              AllPkAreaVal
       REAL              PkProb
       INTEGER           IOrdTem
       INTEGER           IHPk
       COMMON /ALLPEAKS/ NTPeak,                                                  &
                         AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        AllPkAreaVal(MTPeak),                                    &
                         PkProb(MTPeak),                                          &
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
@@ -1168,7 +1053,7 @@
       CALL WDialogClearField(IDF_Peak_Positions_Grid)
       NTPeak = 0
 ! Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
-! Store all peaks thus found in one flat array: AllPkPosVal
+! Store all peak positions thus found in one flat array: AllPkPosVal
       IF (NumPeakFitRange .GT. 0) THEN
         DO J = 1, NumPeakFitRange
           IF (RangeFitYN(J)) THEN
@@ -1176,6 +1061,7 @@
               CALL INC(NTPeak)
               AllPkPosVal(NTPeak) = PkPosVal(I,J)
               AllPkPosEsd(NTPeak) = PkPosEsd(I,J)
+              AllPkAreaVal(NTPeak) = PkAreaVal(I,J)
             ENDDO
           ENDIF
         ENDDO
@@ -1261,6 +1147,9 @@
         CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 2, I, AllPkPosEsd(iOrd), '(F12.4)')
         CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 3, I, PkArgK(I), '(F12.4)')
         DifTem = AllPkPosVal(iOrd) - PkArgK(I)
+
+      !  DifTem = AllPkAreaVal(iOrd)
+
         CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 4, I, DifTem, '(F12.4)')
         CALL WGridPutCellInteger(IDF_Peak_Positions_Grid, 5, I, IHPk(1,I))
         CALL WGridPutCellInteger(IDF_Peak_Positions_Grid, 6, I, IHPk(2,I))
