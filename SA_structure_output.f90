@@ -1,54 +1,5 @@
 !*==SA_STRUCTURE_OUTPUT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!***<error analysis>****************************************************
-!
-!      SUBROUTINE CHINIT(V,N,DELTA,C0,C1,C2)
-!     -------------------------------------
-!
-!      REAL     V(*),DELTA(*),C0,C1(2,*),C2(N,*)
-!      EXTERNAL SACCHI
-!
-!      CALL VRFILL(C2,0.0,N*N)
-!      C0=SACCHI(N,V)
-!      CDELTA=C0/2000.0
-!      IF (CDELTA.LT.0.5) CDELTA=0.5
-!      DO 10 I=1,N
-!  10    CALL SADLINIT(V,I,C1(1,I),C1(2,I),C0,CDELTA,DELTA(I))
-!      DO 30 J=1,N
-!        V(J)=V(J)+DELTA(J)
-!        DO 20 I=J+1,N
-!          V(I)=V(I)+DELTA(I)
-!          C2(I,J)=SACCHI(N,V)
-!          C2(J,I)=C2(I,J)
-!          V(I)=V(I)-DELTA(I)
-!  20    CONTINUE
-!        V(J)=V(J)-DELTA(J)
-!  30  CONTINUE
-!      END
-!
-!      SUBROUTINE SADLINIT(X,J,CMINUS,CPLUS,C0,CDELTA,DELTA)
-!     ----------------------------------------------------
-!
-!      REAL X(*)
-!      DATA FRAC,SMALL,XLARGE /1.0E-6,1.0E-20,1.0E20/
-!C
-!      X0=X(J)
-!      D=FRAC*ABS(X0)+SMALL
-!      DO 10 I=1,100
-!        D=D+D
-!        X(J)=X0-D
-!        CMINUS=SACCHI(N,X)
-!        X(J)=X0+D
-!        CPLUS=SACCHI(N,X)
-!        IF (X(J).GT.XLARGE) GOTO 1
-!        IF (ABS(CMINUS-C0).GT.CDELTA) GOTO 1
-!        IF (ABS(CPLUS-C0).GT.CDELTA) GOTO 1
-!  10  CONTINUE
-!   1  DELTA=D
-!      X(J)=X0
-!      END
-!
-!
 !*****************************************************************************
 !
       SUBROUTINE SA_structure_output(t,fopt,cpb,parvals,ntotmov)
@@ -94,14 +45,10 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-      CHARACTER*80 logsa_file, cssr_file, pdb_file, ccl_file, log_file, &
-     &             pro_file
-      COMMON /outfilnam/ logsa_file, cssr_file, pdb_file, ccl_file,     &
-     &                   log_file, pro_file
-      INTEGER logsa_flen, cssr_flen, pdb_flen, ccl_flen, log_flen,      &
-     &        pro_flen
-      COMMON /outfillen/ logsa_flen, cssr_flen, pdb_flen, ccl_flen,     &
-     &                   log_flen, pro_flen
+      CHARACTER*80       logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/ logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 !
       PARAMETER (mpdbops=192)
       CHARACTER*20 cpdbops(mpdbops)
@@ -556,19 +503,14 @@
 !
       REAL ProfileChi, IntensityChi
 !
-      CHARACTER*80 logsa_file, cssr_file, pdb_file, ccl_file, log_file, &
-     &             pro_file
-      COMMON /outfilnam/ logsa_file, cssr_file, pdb_file, ccl_file,     &
-     &                   log_file, pro_file
-      INTEGER logsa_flen, cssr_flen, pdb_flen, ccl_flen, log_flen,      &
-     &        pro_flen
-      COMMON /outfillen/ logsa_flen, cssr_flen, pdb_flen, ccl_flen,     &
-     &                   log_flen, pro_flen
+      CHARACTER*80       logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/ logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 !
       LOGICAL RESTART
       INTEGER SA_Run_Number
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves,        &
-     &                MaxMoves, ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
 !
       SA_Run_Number = 1
       CALL Log_SARun_Entry(pdb_file,ProfileChi,IntensityChi)
@@ -585,16 +527,11 @@
 !
       LOGICAL RESTART
       INTEGER SA_Run_Number
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves,        &
-     &                MaxMoves, ChiMult
-      CHARACTER*80 logsa_file, cssr_file, pdb_file, ccl_file, log_file, &
-     &             pro_file
-      COMMON /outfilnam/ logsa_file, cssr_file, pdb_file, ccl_file,     &
-     &                   log_file, pro_file
-      INTEGER logsa_flen, cssr_flen, pdb_flen, ccl_flen, log_flen,      &
-     &        pro_flen
-      COMMON /outfillen/ logsa_flen, cssr_flen, pdb_flen, ccl_flen,     &
-     &                   log_flen, pro_flen
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+      CHARACTER*80       logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/ logsa_file, cssr_file, pdb_file, ccl_file, log_file, pro_file
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 !
       CHARACTER*85 new_fname
 !

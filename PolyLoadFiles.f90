@@ -1692,6 +1692,7 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
 
       INTEGER NOBS
       REAL    XOBS, YOBS, YCAL, YBAK, EOBS
@@ -1721,6 +1722,13 @@
            GOTO 999
         ENDIF
         CALL UpdateWavelength(Lambda1)
+
+        READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
+        IF (GetNumOfColumns(Cline) .EQ. 6) THEN
+          READ(Cline,*,ERR=999,END=999) CellPar(1), CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6)
+          CALL Upload_Cell_Constants
+        ENDIF
+
       ELSE
         READ(Cline,*, IOSTAT = IS) XOBS(I),YOBS(I),EOBS(I)
         IF (IS .NE. 0) THEN
@@ -2087,6 +2095,7 @@
       CHARACTER*(*), INTENT (INOUT) :: TheFileName
 
       INCLUDE 'GLBVAR.INC'
+      INCLUDE 'statlog.inc'
 
       LOGICAL FExists
       INTEGER KLEN
@@ -2111,6 +2120,9 @@
       CALL WindowOutStatusBar(1,STATBARSTR(1))
 ! Enable all menu functions
       CALL SetModeMenuState(1,1,1)
+!C>>  update the file name of the project in the SA pop up
+      CALL SetSAFileName(TheFileName(1:LEN_TRIM(TheFileName)))
+      NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
       RETURN
       
       END SUBROUTINE SDIFileOpen
@@ -2236,7 +2248,6 @@
 !C>> JCC before, this just didnt plot anything, even though in theory we should be able
 !C>> to observe the full profile. Firstly have to synchronize the common blocks though
         CALL Synchronize_Data()
-        NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
         Iptype = 2
         CALL Profile_Plot(IPTYPE) 
         NoData = .FALSE.
@@ -2249,8 +2260,6 @@
           CALL SetModeMenuState(1,-1,1)
         END IF
       END IF
-!C>>  update the file name of the project in the SA pop up
-      CALL SetSAFileName(SDIFile(1:LEN_TRIM(SDIFile)))
 !
  999  END SUBROUTINE SDIFileLoad
 !
@@ -2262,7 +2271,17 @@
       INTEGER,       INTENT (IN   ) :: FLEN
 
       INCLUDE 'PARAMS.INC'
+
+      INTEGER NTIC
+      INTEGER IH
+      REAL    ARGK
+      REAL    DSTAR
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+! MTIC  = 10000
+! NTIC  = number of tick marks
+! IH    = h, k and l
+! ARGK  = 2 theta value
+! DSTAR = d*
       INTEGER I, II
 
 !>> JCC - set return status

@@ -44,28 +44,23 @@
       IER = 0
       READ (121,2121,END=998,ERR=998) NLIN, LINE
  2121 FORMAT (Q,A)
-!
       DO I = NLIN, 1, -1
         IF (LINE(I:I).EQ.'.') THEN
           NPO = I
           GOTO 11
         ENDIF
       ENDDO
-!
    11 NCOR = 0
       DO I = NPO + 1, NLIN
         IF ((LINE(I-1:I-1).EQ.' ') .AND. (LINE(I:I).NE.' ')) THEN
           NCOR = NCOR + 1
         ENDIF
       ENDDO
-!
       NCOR = NCOR - 1
       BACKSPACE (121)
-!
       DO IR = 1, MREF
         READ (121,*,END=100,ERR=998) (IREFH(I,IR),I=1,3), AIOBS(IR),    &
      &                               WTI(IR), KL, (ICOR(I),I=1,NCOR)
-!
         KK = IR
 !
 !.. Now work out which terms should be kept for the chi-squared calculation

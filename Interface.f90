@@ -23,7 +23,9 @@
 !*****************************************************************************
 !
       SUBROUTINE Upload_Cell_Constants()
-
+!
+! Puts the global variables CellPar(1:6) in the Winteracter menus
+!
       USE WINTERACTER
       USE DRUID_HEADER
 

@@ -29,10 +29,7 @@
 
       Ierr = 0
 !     Open the file
-      OPEN (UNIT = 77, &
-           FILE=FileName(1:LenFn), &
-           STATUS='OLD', &
-           ERR=999)
+      OPEN (UNIT = 77, FILE=FileName(1:LenFn), STATUS='OLD', ERR=999)
 ! Loop over all records
       DO WHILE ( .TRUE. )
  10     READ(77,'(a)',END=100,ERR=999) line
@@ -44,12 +41,6 @@
             I = InfoError(1) ! reset the errors
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999
-! Postpone updating the wavelength until we know the type of radiation used.
-! If laboratory data, we can try to assign a material to the anode based on the wavelength
- !O           DO I = 1, NRad_Types
- !O             IF (ABS(Alambda - RadWaveLengths(I)) .LT. 0.0001) CALL SetWavelengthToSelection(I + 1)
-! Set the wizard/main to read as this selection
- !O           END DO
             CALL INextInteger(line,itemp)
             IF (InfoError(1) .EQ. 0) THEN
               CALL SetSourceDataState(itemp)
