@@ -48,7 +48,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Log_SARun_Entry(PdbFileName, ProfileChiSquared, IntensityChiSquared)
+      SUBROUTINE Log_SARun_Entry(IntensityChiSquared)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -56,8 +56,10 @@
 
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (IN   ) :: PdbFileName
-      REAL,          INTENT (IN   ) :: ProfileChiSquared, IntensityChiSquared
+      REAL,          INTENT (IN   ) :: IntensityChiSquared
+
+      REAL             CHIPROBEST
+      COMMON /PLTSTO2/ CHIPROBEST
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
@@ -65,16 +67,23 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
+      CHARACTER(MaxPathLength) OutputFilesBaseName
+      INTEGER                                       OFBN_Len
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
+
       REAL Grid_ProfileChi, Grid_IntensityChi
       CHARACTER*MaxPathLength Grid_Buffer
       INTEGER I
+      CHARACTER*(MaxPathLength) PdbFileName
 
+      PdbFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pdb'
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
       CALL WGridRows(IDF_SA_Summary, SA_Run_Number)
       DO I = SA_Run_Number - 1,1,-1
         CALL WGridGetCellReal(IDF_SA_Summary,4,I,Grid_ProfileChi)
-        IF (Grid_ProfileChi .GT. ProfileChiSquared) THEN
+        IF (Grid_ProfileChi .GT. CHIPROBEST) THEN
           CALL WGridGetCellString(IDF_SA_Summary,1,I,Grid_Buffer)
           CALL WGridGetCellReal(IDF_SA_Summary,5,I,Grid_IntensityChi)
           CALL WGridPutCellReal(IDF_SA_Summary,4,I+1,Grid_ProfileChi,'(F7.2)')
@@ -85,7 +94,7 @@
         ENDIF
       ENDDO
       CALL WGridPutCellString(IDF_SA_Summary,1,I+1,PdbFileName(1:LEN_TRIM(PdbFileName)))
-      CALL WGridPutCellReal(IDF_SA_Summary,4,  I+1,ProfileChiSquared,'(F7.2)')
+      CALL WGridPutCellReal(IDF_SA_Summary,4,  I+1,CHIPROBEST,'(F7.2)')
       CALL WGridPutCellReal(IDF_SA_Summary,5,  I+1,IntensityChiSquared,'(F7.2)')
       CALL PopActiveWindowID
 
