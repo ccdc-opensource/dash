@@ -113,11 +113,6 @@ SOURCE=.\Basic_Strings.f90
 # Begin Source File
 
 SOURCE=.\Basic_Vectors.f90
-DEP_F90_BASIC_=\
-	".\DRUID_HEADER.mod"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
 # End Source File
 # Begin Source File
 
@@ -329,6 +324,18 @@ DEP_F90_INITI=\
 	".\POLY_COLOURS.INC"\
 	".\statlog.inc"\
 	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\Interface.f90
+DEP_F90_INTER=\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
+	".\params.inc"\
+	".\statlog.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -657,17 +664,8 @@ DEP_F90_UPLOA=\
 # End Source File
 # Begin Source File
 
-SOURCE=.\Upload_Positions.f90
-DEP_F90_UPLOAD=\
-	".\DRUID_HEADER.mod"\
-	".\params.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
 SOURCE=.\Upload_Widths.f90
-DEP_F90_UPLOAD_=\
+DEP_F90_UPLOAD=\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
