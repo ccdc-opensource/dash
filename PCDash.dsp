@@ -258,53 +258,6 @@ SOURCE=.\Fcn.f90
 SOURCE=.\Ffcalc.f90
 DEP_F90_FFCAL=\
 	".\params.inc"\
-	".\SGinc\ffcalc_001.inc"\
-	".\SGinc\ffcalc_002.inc"\
-	".\SGinc\ffcalc_039.inc"\
-	".\SGinc\ffcalc_040.inc"\
-	".\SGinc\ffcalc_044.inc"\
-	".\SGinc\ffcalc_050.inc"\
-	".\SGinc\ffcalc_052.inc"\
-	".\SGinc\ffcalc_057.inc"\
-	".\SGinc\ffcalc_058.inc"\
-	".\SGinc\ffcalc_061.inc"\
-	".\SGinc\ffcalc_064.inc"\
-	".\SGinc\ffcalc_065.inc"\
-	".\SGinc\ffcalc_066.inc"\
-	".\SGinc\ffcalc_067.inc"\
-	".\SGinc\ffcalc_069.inc"\
-	".\SGinc\ffcalc_112.inc"\
-	".\SGinc\ffcalc_115.inc"\
-	".\SGinc\ffcalc_116.inc"\
-	".\SGinc\ffcalc_143.inc"\
-	".\SGinc\ffcalc_164.inc"\
-	".\SGinc\ffcalc_176.inc"\
-	".\SGinc\ffcalc_212.inc"\
-	".\SGinc\ffcalc_266.inc"\
-	".\SGinc\ffcalc_269.inc"\
-	".\SGinc\ffcalc_284.inc"\
-	".\SGinc\ffcalc_290.inc"\
-	".\SGinc\ffcalc_292.inc"\
-	".\SGinc\ffcalc_298.inc"\
-	".\SGinc\ffcalc_304.inc"\
-	".\SGinc\ffcalc_356.inc"\
-	".\SGinc\ffcalc_365.inc"\
-	".\SGinc\ffcalc_369.inc"\
-	".\SGinc\ffcalc_430.inc"\
-	".\SGinc\ffcalc_431.inc"\
-	".\SGinc\ffcalc_432.inc"\
-	".\SGinc\ffcalc_433.inc"\
-	".\SGinc\ffcalc_434.inc"\
-	".\SGinc\ffcalc_435.inc"\
-	".\SGinc\ffcalc_449.inc"\
-	".\SGinc\ffcalc_451.inc"\
-	".\SGinc\ffcalc_462.inc"\
-	".\SGinc\ffcalc_468.inc"\
-	".\SGinc\ffcalc_469.inc"\
-	".\SGinc\ffcalc_471.inc"\
-	".\SGinc\ffcalc_481.inc"\
-	".\SGinc\ffcalc_483.inc"\
-	".\SGinc\ffcalc_485.inc"\
 	".\SGinc\ffcalctop.inc"\
 	
 # End Source File
@@ -595,6 +548,13 @@ DEP_F90_PROFI=\
 	".\POLY_COLOURS.INC"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\ProjectSave.f90
+DEP_F90_PROJE=\
+	".\Variables.mod"\
 	
 # End Source File
 # Begin Source File
@@ -936,194 +896,6 @@ SOURCE=.\res\WizardWelcome.bmp
 # Begin Group "SGinc"
 
 # PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_001.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_002.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_039.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_040.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_044.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_050.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_052.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_057.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_058.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_061.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_064.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_065.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_066.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_067.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_069.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_112.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_115.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_116.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_143.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_164.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_176.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_212.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_266.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_269.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_284.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_290.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_292.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_298.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_304.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_356.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_365.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_369.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_430.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_431.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_432.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_433.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_434.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_435.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_449.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_451.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_462.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_468.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_469.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_471.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_481.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_483.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\SGinc\ffcalc_485.inc
-# End Source File
 # Begin Source File
 
 SOURCE=.\SGinc\ffcalctop.inc
