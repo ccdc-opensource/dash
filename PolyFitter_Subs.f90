@@ -425,7 +425,7 @@
         ENDIF
       ENDDO
       WRITE(hklString,'(I3,",",I3,",",I3)') iHKL(1,ClosestRef), iHKL(2,ClosestRef), iHKL(3,ClosestRef)
-      CALL WindowOutStatusBar(8,hklString)
+      CALL WindowOutStatusBar(5, hklString)
 
       END SUBROUTINE DisplayHKL
 !
@@ -457,13 +457,13 @@
       CALL IPgUnits(XPGMIN, YPGMIN, XPGMAX, YPGMAX)
       CALL IPgUnitsFromGrUnits(EventInfo%GX, EventInfo%GY, xCur, yCur)
       CALL IRealToString(xCur, tString, '(F10.3)')
-      CALL WindowOutStatusBar(6, tString)
+      CALL WindowOutStatusBar(3, tString)
       IF (YPGMAX-YPGMIN .LE. 100.0) THEN
         CALL IRealToString(yCur,tString, '(F10.3)')
       ELSE
         CALL IRealToString(yCur, tString, '(F10.1)')
       ENDIF
-      CALL WindowOutStatusBar(7, tString)
+      CALL WindowOutStatusBar(4, tString)
 
       END SUBROUTINE UpdateMousePosition
 !
