@@ -74,6 +74,9 @@
   200 CONTINUE
       CLOSE (21)
       CALL Init_BackGround
+! During the SA, only profile points that have peak contributions are calculated (there is no background
+! any more at this stage). Therefore, YCBIN must be initialised to zero's
+      YCBIN = 0.0
       NoData = .FALSE.
       CALL GetProfileLimits
       RETURN
