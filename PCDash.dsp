@@ -57,7 +57,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 version.lib kernel32.lib /nologo /subsystem:windows /machine:I386
-# ADD LINK32 winter.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"D:\Program Files\DASH\DASH.exe" /libpath:"c:\wint\lib.vf"
+# ADD LINK32 winter.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"D:\cvsDASH\dash\Debug\DASH.exe" /libpath:"c:\wint\lib.vf"
 # SUBTRACT LINK32 /profile
 
 !ELSEIF  "$(CFG)" == "PCDash - Win32 Debug"
@@ -74,8 +74,8 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt /winapp
-# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
-# SUBTRACT F90 /check:bounds /check:format /check:output_conversion /check:overflow /check:underflow /traceback /warn:declarations
+# ADD F90 /assume:buffered_io /assume:noaccuracy_sensitive /browser /check:bounds /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:5 /traceback /warn:argument_checking /warn:nofileopt /warn:truncated_source /warn:unused /fast
+# SUBTRACT F90 /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /MTd /W4 /Gm /GX /ZI /O2 /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -87,7 +87,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 version.lib kernel32.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 winter.lib winmm.lib version.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /out:"Debug/ADASH.exe" /pdbtype:sept /libpath:"c:\wint\lib.vf"
+# ADD LINK32 winter.lib winmm.lib version.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /out:"Debug/BDASH.exe" /pdbtype:sept /libpath:"c:\wint\lib.vf"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -103,12 +103,19 @@ LINK32=link.exe
 
 SOURCE=.\Align.f90
 DEP_F90_ALIGN=\
-	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\Variables.mod"\
 	
+NODEP_F90_ALIGN=\
+	".\Debug\ATMVAR.MOD"\
+	".\Debug\ZMVAR.MOD"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\ATMVAR.f90
 # End Source File
 # Begin Source File
 
@@ -163,6 +170,7 @@ DEP_F90_CHI_S=\
 
 SOURCE=.\create_fob.f90
 DEP_F90_CREAT=\
+	".\Debug\ATMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\params.inc"\
 	
@@ -171,7 +179,9 @@ DEP_F90_CREAT=\
 
 SOURCE=.\Declarations.f90
 DEP_F90_DECLA=\
+	".\Debug\ATMVAR.MOD"\
 	".\params.inc"\
+	".\Variables.mod"\
 	
 # End Source File
 # Begin Source File
@@ -253,6 +263,7 @@ DEP_F90_ERROR=\
 
 SOURCE=.\Eval.f90
 DEP_F90_EVAL_=\
+	".\Debug\ATMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\Variables.mod"\
 	
@@ -274,7 +285,6 @@ DEP_F90_FFCAL=\
 SOURCE=.\Fortic.f90
 DEP_F90_FORTI=\
 	".\params.inc"\
-	".\Reflns.inc"\
 	".\SGinc\ffcalctop.inc"\
 	
 # End Source File
@@ -310,6 +320,7 @@ DEP_F90_GENER=\
 
 SOURCE=.\get_logref.f90
 DEP_F90_GET_L=\
+	".\Debug\ATMVAR.MOD"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
 	
@@ -330,6 +341,7 @@ DEP_F90_GETDS=\
 
 SOURCE=.\gethcv.f90
 DEP_F90_GETHC=\
+	".\Debug\ATMVAR.MOD"\
 	".\params.inc"\
 	
 # End Source File
@@ -337,6 +349,7 @@ DEP_F90_GETHC=\
 
 SOURCE=.\getpik.f90
 DEP_F90_GETPI=\
+	".\Debug\ATMVAR.MOD"\
 	".\params.inc"\
 	".\Variables.mod"\
 	
@@ -456,6 +469,7 @@ DEP_F90_MULTIP=\
 SOURCE=.\MultiRun.f90
 DEP_F90_MULTIR=\
 	".\DRUID_HEADER.mod"\
+	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -490,6 +504,7 @@ SOURCE=.\PCDash_Main.f90
 DEP_F90_PCDAS=\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
+	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -517,6 +532,7 @@ DEP_F90_PLOT_=\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\POLY_COLOURS.INC"\
+	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -592,14 +608,32 @@ DEP_F90_READ_=\
 
 SOURCE=.\Res2Mol2.f90
 DEP_F90_RES2M=\
+	".\Debug\ATMVAR.MOD"\
 	".\Debug\SAMVAR.MOD"\
 	".\Variables.mod"\
 	
 # End Source File
 # Begin Source File
 
+SOURCE=.\Rietveld.f90
+DEP_F90_RIETV=\
+	".\Debug\RRVAR.MOD"\
+	".\Debug\ZMVAR.MOD"\
+	".\DRUID_HEADER.mod"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\RRVAR.f90
+# End Source File
+# Begin Source File
+
 SOURCE=.\SA_Begin.f90
 DEP_F90_SA_BE=\
+	".\Debug\ATMVAR.MOD"\
+	".\Debug\PO_VAR.mod"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
@@ -611,11 +645,16 @@ DEP_F90_SA_BE=\
 # Begin Source File
 
 SOURCE=.\SA_Defaults.f90
+DEP_F90_SA_DE=\
+	".\Variables.mod"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\SA_Dialogues.f90
 DEP_F90_SA_DI=\
+	".\Debug\PO_VAR.mod"\
+	".\Debug\SAMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\Variables.mod"\
@@ -626,6 +665,7 @@ DEP_F90_SA_DI=\
 
 SOURCE=.\SA_main.f90
 DEP_F90_SA_MA=\
+	".\Debug\PO_VAR.mod"\
 	".\Debug\SAMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
@@ -656,6 +696,7 @@ DEP_F90_SA_SO=\
 
 SOURCE=.\SA_structure_output.f90
 DEP_F90_SA_ST=\
+	".\Debug\ATMVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -716,6 +757,7 @@ SOURCE=.\tSA_simopt.f90
 
 SOURCE=.\tSA_simplex.f90
 DEP_F90_TSA_S=\
+	".\Debug\ATMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\Variables.mod"\
@@ -726,6 +768,8 @@ DEP_F90_TSA_S=\
 
 SOURCE=.\tSA_subs.f90
 DEP_F90_TSA_SU=\
+	".\Debug\ATMVAR.MOD"\
+	".\Debug\PO_VAR.mod"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\Lattice.inc"\
@@ -783,6 +827,8 @@ SOURCE=.\Utilities.f90
 
 SOURCE=.\Valchi.f90
 DEP_F90_VALCH=\
+	".\Debug\ATMVAR.MOD"\
+	".\Debug\PO_VAR.mod"\
 	".\Debug\ZMVAR.MOD"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
