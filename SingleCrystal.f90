@@ -253,7 +253,7 @@
       ENDIF
 ! Disable Pawley refinement button
       CALL SetModeMenuState(-1,-1)
-      CALL WindowOutStatusBar(1,FNAME)
+      CALL WindowOutStatusBar(1, FNAME)
 
       ! @@ ??
 ! Update the file name
