@@ -317,22 +317,24 @@
               CALL PopActiveWindowID
               RETURN
             CASE (IDB_Select)
-              CALL WDialogGetInteger(IDF_Limit1,iLimit1)
-              CALL WDialogGetInteger(IDF_Limit2,iLimit2)
+              CALL WDialogGetInteger(IDF_Limit1, iLimit1)
+              CALL WDialogGetInteger(IDF_Limit2, iLimit2)
               IF (iLimit1 .GT. iLimit2) THEN
                 tInteger = iLimit2
                 iLimit2  = iLimit1
                 iLimit1  = tInteger
               ENDIF
-              IF (iLimit2 .GT. NumOf_SA_Runs) iLimit2 = NumOf_SA_Runs
-              IF (iLimit1 .LT.             1) iLimit1 =             1
-              DO iRow = 1, NumOf_SA_Runs
+              IF (iLimit2 .GT. NumOf_SA_Runs+1) iLimit2 = NumOf_SA_Runs+1
+              IF (iLimit1 .LT.               1) iLimit1 =               1
+              DO iRow = 1, NumOf_SA_Runs+1
                 IF ((iRow .GE. iLimit1) .AND. (iRow .LE. iLimit2)) THEN
                   CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Checked)
                 ELSE
                   CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
                 ENDIF
               ENDDO
+              CALL WDialogPutInteger(IDF_Limit1, iLimit1)
+              CALL WDialogPutInteger(IDF_Limit2, iLimit2)
             CASE (IDF_InvertSelection)
               DO iRow = 1, NumOf_SA_Runs
                 CALL WGridGetCellCheckBox(IDF_SA_summary,3,iRow,istatus)
