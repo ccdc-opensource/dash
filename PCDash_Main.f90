@@ -42,7 +42,7 @@
       CALL InitialiseVariables
       CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(TabChanged, Enabled)
-      CALL Check_Licence
+      CALL CheckLicence
 ! Grey out al buttons to do with project file.
       CALL WMenuSetState(IDB_New,ItemEnabled,WintOff)
       CALL WMenuSetState(IDB_Open,ItemEnabled,WintOff)
@@ -110,7 +110,7 @@
       REAL xpgdif, ypgdif
       INTEGER ISTAT, IBpass
       INTEGER, EXTERNAL :: DiffractionFileBrowse, PrjSave, PrjSaveAs
-      INTEGER iDummy
+      INTEGER iDummy, tCurrentRange
 
 !   Branch depending on chosen menu item
 
@@ -167,8 +167,9 @@
           CALL WizardWindowShow(IDD_SAW_Page5)
         CASE (ID_FitPeaks)
           CALL WCursorShape(CurHourGlass)
-          DO CurrentRange = 1, NumPeakFitRange
-            IF (.NOT. RangeFitYN(CurrentRange)) THEN
+          DO tCurrentRange = 1, NumPeakFitRange
+            IF (.NOT. RangeFitYN(tCurrentRange)) THEN
+              CurrentRange = tCurrentRange
               CALL MultiPeak_Fitter
               CALL Profile_Plot
             ENDIF
