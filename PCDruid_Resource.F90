@@ -1,4 +1,4 @@
-! Winteracter module created : 14/Nov/2001 16:38:12
+! Winteracter module created : 15/Nov/2001 09:49:47
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -150,15 +150,6 @@
           INTEGER, PARAMETER :: IDF_PW_Option1                  =  1199
           INTEGER, PARAMETER :: IDF_PW_Logo1                    =  1204
           INTEGER, PARAMETER :: IDB_SA_Project_Import           =  1214
-          INTEGER, PARAMETER :: IDF_PW_lattice_constant_group   =  1217
-          INTEGER, PARAMETER :: IDF_PW_Crystal_system_group     =  1218
-          INTEGER, PARAMETER :: IDF_PW_Space_Group_Group        =  1219
-          INTEGER, PARAMETER :: IDF_PW_a_latt_label             =  1220
-          INTEGER, PARAMETER :: IDF_PW_alp_latt_label           =  1221
-          INTEGER, PARAMETER :: IDF_PW_b_latt_label             =  1224
-          INTEGER, PARAMETER :: IDF_PW_bet_latt_label           =  1225
-          INTEGER, PARAMETER :: IDF_PW_c_latt_label             =  1228
-          INTEGER, PARAMETER :: IDF_PW_gam_latt_label           =  1229
           INTEGER, PARAMETER :: IDF_PW_radiation_label          =  1245
           INTEGER, PARAMETER :: IDF_PW_Flight_Path_Label        =  1248
           INTEGER, PARAMETER :: IDD_PW_Page3                    =   124
