@@ -314,6 +314,9 @@
       INCLUDE 'Poly_Colours.inc'
       INCLUDE 'DialogPosCmn.inc'
 
+      LOGICAL           LOG_HYDROGENS
+      COMMON /HYDROGEN/ LOG_HYDROGENS
+
       INTEGER          NTIC
       INTEGER                IH
       REAL                               ARGK
@@ -371,7 +374,8 @@
       NumInternalDSC = -1
       ZeroPoint = 0.0
       PastPawley = .FALSE.
-      DefaultMaxResolution = 2.0
+      DefaultMaxResolution = 1.75
+      LOG_HYDROGENS = .FALSE.
       CALL UpdateWavelength(WaveLengthOf('Cu'))
 ! Now initialise the maximum resolution in the dialogue window
       CALL WDialogSelect(IDD_PW_Page5)
@@ -405,6 +409,7 @@
       IYPos_IDD_Wizard = 0.06 * XBSHeight
       NTIC = 0
       LBIN = 1
+      CALL Init_PeakFitRanges
       MARKER_SIZE = 0.35
       CHAR_SIZE = 1.0
       XPG1 = 0.12
@@ -523,16 +528,21 @@
       INTEGER     BFIOErrorCode
       COMMON /IO/ BFIOErrorCode
 
+      LOGICAL           LOG_HYDROGENS
+      COMMON /HYDROGEN/ LOG_HYDROGENS
+
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
       INTEGER    RecNr
-      INTEGER    ISEED
+      INTEGER*4    ISEED
       INTEGER    tFileHandle
       LOGICAL, EXTERNAL :: AutoLocalMinimisation, SaveCSSR, SaveCCL, &
                            ColourFlexibleTorsions, ConnectPointsObs, &
                            PlotErrorBars, PlotBackground,            &
-                           PlotPeakFitDifferenceProfile
+                           PlotPeakFitDifferenceProfile,             &
+                           WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: WavelengthOf
+      INTEGER*4 tInteger
 
       tFileName = 'D3.cfg'
       tFileHandle = 10
@@ -541,7 +551,6 @@
       RecNr = 1
 ! Write a header
       CALL FileWriteString(tFileHandle,RecNr,'DASH configuration file')
-      UseConfigFile = .TRUE.
       CALL FileWriteLogical(tFileHandle,RecNr,UseConfigFile)
       IF (.NOT. UseConfigFile) GOTO 999
 ! Save all colour definitions
@@ -625,14 +634,21 @@
       DefaultWorkingDir = 'D:\cvsDASH\dash\Debug'
       CALL FileWriteString(tFileHandle,RecNr,DefaultWorkingDir)
 ! Save defaults for background subtraction
-      CALL FileWriteInteger(tFileHandle,RecNr, 20)    ! Number of iterations
-      CALL FileWriteInteger(tFileHandle,RecNr,100)    ! Window
-      CALL FileWriteLogical(tFileHandle,RecNr,.TRUE.) ! Use Monte Carlo YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,.TRUE.) ! Use spline smooth YES / NO
+      CALL WDialogSelect(IDD_PW_Page6)
+  ! Number of iterations
+      CALL WDialogGetInteger(IDF_NumOfIterations,tInteger)
+      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+  ! Window
+      CALL WDialogGetInteger(IDF_WindowWidth,tInteger)
+      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+  ! Use Monte Carlo YES / NO
+      CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+  ! Use spline smooth YES / NO
+      CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseSplineYN))
 ! Save default wavelength
       CALL FileWriteReal(tFileHandle,RecNr,WavelengthOf('Cu'))
 ! Save default maximum resolution
-      CALL FileWriteReal(tFileHandle,RecNr,2.0)
+      CALL FileWriteReal(tFileHandle,RecNr,1.75)
 ! Save the viewer
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogGetString(IDF_ViewExe,ViewExe)
@@ -641,7 +657,7 @@
       CALL WDialogGetString(IDF_ViewArg,ViewArg)
       CALL FileWriteString(tFileHandle,RecNr,ViewArg)
 ! Save use hydrogens YES / NO
-
+      CALL FileWriteLogical(tFileHandle,RecNr,LOG_HYDROGENS)
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileWriteLogical(tFileHandle,RecNr,ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
@@ -681,6 +697,9 @@
 
       INTEGER     BFIOErrorCode
       COMMON /IO/ BFIOErrorCode
+
+      LOGICAL           LOG_HYDROGENS
+      COMMON /HYDROGEN/ LOG_HYDROGENS
 
       CHARACTER*MaxPathLength tFileName
       INTEGER    RecNr
@@ -812,7 +831,7 @@
       CALL FileReadString(tFileHandle,RecNr,ViewArg)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
 ! Save use hydrogens YES / NO
-
+      CALL FileReadLogical(tFileHandle,RecNr,LOG_HYDROGENS)
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
