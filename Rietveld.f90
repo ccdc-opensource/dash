@@ -747,7 +747,6 @@
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             ! Translations
             CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(1,iFrg,iFrgCopy), "(F7.5)")
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg,iFrgCopy))
             CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg,iFrgCopy))
             iRow = iRow + 1
             CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(2,iFrg,iFrgCopy), "(F7.5)")
