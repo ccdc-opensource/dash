@@ -3,6 +3,7 @@
 !
       SUBROUTINE SA_structure_output(T,parvals,ntotmov)
 
+      USE DRUID_HEADER
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR

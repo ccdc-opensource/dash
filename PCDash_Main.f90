@@ -21,6 +21,27 @@
       INTEGER       tNextzmNum
       INTEGER       tCounter
 
+! The following variables are there to allow the dialogue fields in the
+! window dealing with Z-matrices to be handled by DO...ENDDO loops.
+! The field identifiers assigned by Winteracter are not necessarily consecutive, 
+! but these mappings are.
+
+      INTEGER        IDFZMNumber,           IDFZMFile,                &
+                     IDBZMDelete,           IDBZMBrowse,              &
+                     IDBZMView,             IDBZMEdit,                &
+                     IDFZMpars
+      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),      &
+                     IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
+                     IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
+                     IDFZMpars(1:maxfrg)
+      DATA IDFzmNumber / IDF_zmNumOf1,  IDF_zmNumOf2,  IDF_zmNumOf3,  IDF_zmNumOf4,  IDF_zmNumOf5,  IDF_zmNumOf6  /
+      DATA IDFZMFile   / IDF_zmFile1,   IDF_zmFile2,   IDF_zmFile3,   IDF_zmFile4,   IDF_zmFile5,   IDF_zmFile6   /
+      DATA IDBZMDelete / IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4, IDB_zmDelete5, IDB_zmDelete6 /
+      DATA IDBZMBrowse / IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4, IDB_zmBrowse5, IDB_zmBrowse6 /
+      DATA IDBZMView   / IDB_zmView1,   IDB_zmView2,   IDB_zmView3,   IDB_zmView4,   IDB_zmView5,   IDB_zmView6   /
+      DATA IDBzmEdit   / IDB_zmEdit1,   IDB_zmEdit2,   IDB_zmEdit3,   IDB_zmEdit4,   IDB_zmEdit5,   IDB_zmEdit6   /
+      DATA IDFZMpars   / IDF_ZM_pars1,  IDF_ZM_pars2,  IDF_ZM_pars3,  IDF_ZM_pars4,  IDF_ZM_pars5,  IDF_ZM_pars6  /
+
 ! Initialise Winteracter
       CALL WInitialise(' ')
       CALL GetInstallationDirectory

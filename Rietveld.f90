@@ -224,6 +224,7 @@
 !
       SUBROUTINE Set_Show_bond
 
+      USE DRUID_HEADER
       USE RRVAR
       USE ZMVAR
 
@@ -294,6 +295,7 @@
 !
       SUBROUTINE Set_Show_angle
 
+      USE DRUID_HEADER
       USE RRVAR
       USE ZMVAR
 
@@ -366,6 +368,7 @@
 !
       SUBROUTINE Set_Show_torsion
 
+      USE DRUID_HEADER
       USE RRVAR
       USE ZMVAR
 
@@ -1538,6 +1541,7 @@
       SUBROUTINE RR_SaveAs
 ! Pop up file window, user must select file name + file type (through extension).
 
+      USE DRUID_HEADER
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR

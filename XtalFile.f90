@@ -77,6 +77,7 @@
 !C variables for copies!. This has not been a problem yet, but this will become a problem!
 
       USE WINTERACTER
+      USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
       USE RRVAR

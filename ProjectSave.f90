@@ -682,6 +682,7 @@
 !
 ! Reads or writes information on peak fit ranges to / from binary project file.
 !
+      USE DRUID_HEADER
       USE PRJVAR
       USE ZMVAR
 
@@ -690,6 +691,20 @@
       INTEGER iFrg, RW, iAtomNr
       REAL    tReal
       INTEGER, EXTERNAL :: ElmSymbol2CSD
+
+! The following variables are there to allow the dialogue fields in the
+! window dealing with Z-matrices to be handled by DO...ENDDO loops.
+! The field identifiers assigned by Winteracter are not necessarily consecutive, 
+! but these mappings are.
+
+      INTEGER        IDFZMNumber,           IDFZMFile,                &
+                     IDBZMDelete,           IDBZMBrowse,              &
+                     IDBZMView,             IDBZMEdit,                &
+                     IDFZMpars
+      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),      &
+                     IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
+                     IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
+                     IDFZMpars(1:maxfrg)
 
 ! Read or Write?
       RW = iPrjReadOrWrite
