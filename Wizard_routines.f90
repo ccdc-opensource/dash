@@ -365,6 +365,12 @@
               CALL WDialogHide()
               CALL WDialogSelect(IDD_PW_Page6)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDB_ConvertT2R) ! Convert max. 2 theta to max. resolution
+              CALL WDialogGetReal(IDF_Max2Theta,tReal)
+              CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tReal))
+            CASE (IDB_ConvertR2T) ! Convert max. resolution to max. 2 theta
+              CALL WDialogGetReal(IDF_MaxResolution,tReal)
+              CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
             CASE DEFAULT
