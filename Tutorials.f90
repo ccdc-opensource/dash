@@ -6,25 +6,30 @@
       USE DRUID_HEADER
       USE VARIABLES
 
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: Tutorial_ID
+
       CHARACTER*255 DirString, FileDir
       CHARACTER*255 Files(100)
       CHARACTER*255 CurDir
-      INTEGER       Tutorial_ID
       INTEGER       NFiles
+      INTEGER       I
 
       NFiles = 100
       CALL IOsDirName(CurDir)
-      IF       (Tutorial_ID .EQ. ID_Tutorial_1) THEN
-        DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial1"
-      ELSE IF  (Tutorial_ID .EQ. ID_Tutorial_2) THEN
-        DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial2"
-      ELSE IF  (Tutorial_ID .EQ. ID_Tutorial_3) THEN
-        DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial3"
-      ELSE IF  (Tutorial_ID .EQ. ID_Tutorial_4) THEN
-        DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial4"
-      ELSE IF  (Tutorial_ID .EQ. ID_Tutorial_5) THEN
-        DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial5"
-      END IF
+      SELECT CASE (Tutorial_ID)
+        CASE (ID_Tutorial_1)
+          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial1"
+        CASE (ID_Tutorial_2)
+          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial2"
+        CASE (ID_Tutorial_3)
+          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial3"
+        CASE (ID_Tutorial_4)
+          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial4"
+        CASE (ID_Tutorial_5)
+          DirString = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial5"
+      END SELECT
       FileDir = DirString(1:LEN_TRIM(DirString))//DIRSPACER//"data files"
       CALL IOsDirList(FileDir(1:LEN_TRIM(FileDir)),"",Files,Nfiles)
       CALL IOsDirChange(FileDir(1:LEN_TRIM(FileDir)))
