@@ -87,6 +87,28 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION ChrIsDigit(TheChar)
+
+      IMPLICIT NONE
+
+      CHARACTER*1, INTENT (IN   ) :: TheChar
+
+      CHARACTER*10 DigitSet
+      PARAMETER (DigitSet = '0123456789')
+      INTEGER POS
+
+      ChrIsDigit = .FALSE.
+      DO POS = 1, 10
+        IF (TheChar .EQ. DigitSet(POS:POS)) THEN
+          ChrIsDigit = .TRUE.
+          RETURN
+        ENDIF
+      ENDDO
+
+      END FUNCTION ChrIsDigit
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION GetNumOfColumns(TheString)
 !
 ! This function determines the number of columns in a string
@@ -328,6 +350,36 @@
       Integer2String = tString
 
       END FUNCTION Integer2String
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION StrFind(TheString, TheLen, TheSubString, TheSubLen)
+!
+! Searches TheString for TheSubString
+!
+! RETURNS : position of TheSubString in TheString. 0 means 'not found' 
+!
+! Explicit lengths are needed to allow searching for spaces
+!
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheString
+      INTEGER,       INTENT (IN   ) :: TheLen
+      CHARACTER*(*), INTENT (IN   ) :: TheSubString
+      INTEGER,       INTENT (IN   ) :: TheSubLen
+
+      CHARACTER*20 tString
+      INTEGER POS, J
+
+      DO POS = 0, TheLen-TheSubLen
+        IF (TheString(POS+1:POS+TheSubLen) .EQ. TheSubString(1:TheSubLen)) THEN
+          StrFind = POS + 1
+          RETURN
+        ENDIF
+      ENDDO
+      StrFind = 0
+
+      END FUNCTION StrFind
 !
 !*****************************************************************************
 !
