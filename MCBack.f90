@@ -113,6 +113,7 @@
             CASE (IDF_Background_Accept)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
               CALL SubtractBackground(IBpass,20,.TRUE.,.TRUE.)
+              QUIT = .TRUE.
             CASE (IDCANCEL)
 ! If user Cancels, assume no knowledge on background
               DO I = 1, NBIN
