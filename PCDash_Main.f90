@@ -129,6 +129,8 @@
           CALL ShowWizardWindowZmatrices
         CASE (ID_ClearPeakFitRanges)
           IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Clear_PeakFitRanges
+        CASE (ID_Delabc)
+          IF (Confirm('Do you wish to clear all cell parameters?')) CALL Clear_UnitCell
         CASE (ID_get_crystal_symmetry)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
@@ -155,38 +157,38 @@
           CALL PopActiveWindowID
         CASE (ID_Left)
 ! We're going to move the graph to the left if we can
-          xpgdif=xpgmax-xpgmin
-          xpgmin=MAX(xpmin,xpgmin-0.25*xpgdif)
-          xpgmax=xpgmin+xpgdif
+          xpgdif = xpgmax - xpgmin
+          xpgmin = MAX(xpmin,xpgmin-0.25*xpgdif)
+          xpgmax = xpgmin + xpgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (ID_Right)
 ! We're going to move the graph to the right if we can
-          xpgdif=xpgmax-xpgmin
-          xpgmax=MIN(xpmax,xpgmax+0.25*xpgdif)
-          xpgmin=xpgmax-xpgdif
+          xpgdif = xpgmax - xpgmin
+          xpgmax = MIN(xpmax,xpgmax+0.25*xpgdif)
+          xpgmin = xpgmax - xpgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (ID_Down)
 ! We're going to move the graph down if we can
-          ypgdif=ypgmax-ypgmin
-          ypgmin=MAX(ypmin,ypgmin-0.25*ypgdif)
-          ypgmax=ypgmin+ypgdif
+          ypgdif = ypgmax - ypgmin
+          ypgmin = MAX(ypmin,ypgmin-0.25*ypgdif)
+          ypgmax = ypgmin + ypgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (ID_Up)
 ! We're going to move the graph up if we can
-          ypgdif=ypgmax-ypgmin
-          ypgmax=MIN(ypmax,ypgmax+0.25*ypgdif)
-          ypgmin=ypgmax-ypgdif
+          ypgdif = ypgmax - ypgmin
+          ypgmax = MIN(ypmax,ypgmax+0.25*ypgdif)
+          ypgmin = ypgmax - ypgdif
           CALL Get_IPMaxMin() 
           CALL Profile_Plot
         CASE (ID_Home)
 ! Back to full profile range
-          xpgmin=xpmin
-          xpgmax=xpmax
-          ypgmin=ypmin
-          ypgmax=ypmax
+          xpgmin = xpmin
+          xpgmax = xpmax
+          ypgmin = ypmin
+          ypgmax = ypmax
           CALL Get_IPMaxMin() 
           CALL Profile_Plot 
         CASE (ID_PolyFitter_Help)
@@ -240,26 +242,10 @@
                CHAR(13)//&
                ProgramVersion//CHAR(13)//&
                CHAR(13)//&
-               'Copyright February 2002'
+               'Copyright Juni 2002'
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
 
       END SUBROUTINE About
-!
-!*****************************************************************************
-!
-      SUBROUTINE Redraw()
-!
-!   This subroutine redraws the window
-!
-      USE WINTERACTER
-
-      IMPLICIT NONE
-
-!   Update window
-      CALL IGrPlotMode('N')
-      CALL Profile_Plot
-
-      END SUBROUTINE Redraw
 !
 !*****************************************************************************
 !
