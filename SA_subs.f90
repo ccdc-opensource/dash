@@ -184,11 +184,11 @@
 ! Set initial values.
       iMyExit = 0
       Curr_SA_Run = Curr_SA_Run + 1
-      WRITE (SA_RunNumberStr,'(I3.3)') Curr_SA_Run
+      WRITE (SA_RunNumberStr, '(I3.3)') Curr_SA_Run
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Action1)
-      WRITE(CNruns,'(I3)') Curr_SA_Run
-      WRITE(CMruns,'(I3)') MaxRuns
+      WRITE(CNruns, '(I3)') Curr_SA_Run
+      WRITE(CMruns, '(I3)') MaxRuns
       CNruns = ADJUSTL(CNruns)
       CMruns = ADJUSTL(CMruns)
       CALL WDialogPutString(IDD_SA_RunLabel,'Simulated annealing run number '//CNRuns(1:LEN_TRIM(CNruns))// &
