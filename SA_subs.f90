@@ -168,7 +168,7 @@
 ! ####################################
     1 CONTINUE ! The start point for multiple runs.
 ! Set initial values.
-      imyexit = 0
+      iMyExit = 0
       Curr_SA_Run = Curr_SA_Run + 1
       WRITE (SA_RunNumberStr,'(I3.3)') Curr_SA_Run
       CALL PushActiveWindowID
@@ -415,6 +415,15 @@
           NumTrialsPar(I) = 0
         ENDDO
         CALL PeekEvent
+        DO WHILE (iMyExit .EQ. 6) ! Pause
+          CALL GetEvent
+          IF (EventInfo%WIN .EQ. IDD_Pause) THEN
+            CALL WDialogSelect(IDD_Pause)
+            CALL WDialogUnload
+            CALL WDialogSelect(IDD_SA_Action1)
+            iMyExit = 0
+          ENDIF
+        ENDDO
         IF (iMyExit .NE. 0) GOTO 999 ! Exit all loops and jump straight to the end
       ENDDO ! Loop over moves per iteration (NT)
       Last_NDOWN = NDOWN

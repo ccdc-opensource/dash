@@ -28,11 +28,15 @@
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Viewer) ! 'View'
-! calls subroutine which opens Mercury window with .pdb file
+! Calls subroutine which opens Mercury window with .pdb file
               CALL SA_STRUCTURE_OUTPUT_PDB(Curr_SA_Run)
               CALL ViewStructure('SA_best.pdb')
             CASE (IDF_Pause_Annealing) ! 'Pause'
-              CALL WMessageBox(OKOnly,ExclamationIcon,CommonOK,'Press OK to continue','Pause')
+!O              CALL WMessageBox(OKOnly,ExclamationIcon,CommonOK,'Press OK to continue','Pause')
+              iMyExit = 6
+              CALL WDialogLoad(IDD_Pause)
+              CALL WDialogSelect(IDD_Pause)
+              CALL WDialogShow(-1,-1,IDOK,Modeless)
             CASE (IDB_Prog3)
               CALL OpenChiSqPlotWindow
               CALL plotting_Chi_sqd(ChiHandle)
