@@ -345,7 +345,6 @@
 
       CHARACTER*150 LINE
       INTEGER ICOR(20), NKKOR(MCHIHS)
-      REAL WTI(MFCSTO)
 
       INTEGER         MAXK
       REAL                  FOB
@@ -361,30 +360,18 @@
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
       INTEGER KK, I, NPO, NLIN, NCOR, IR, II, JJ, IK, MINCOR, KL
+      INTEGER, EXTERNAL :: GetNumOfColumns
 
       OPEN (121,FILE=FILENAM(:Lenfil),STATUS='OLD',ERR=998)
       KK = 0
       KKOR = 0
       MINCOR = 20
       IER = 0
-      READ (121,2121,END=998,ERR=998) NLIN, LINE
- 2121 FORMAT (Q,A)
-      DO I = NLIN, 1, -1
-        IF (LINE(I:I).EQ.'.') THEN
-          NPO = I
-          GOTO 11
-        ENDIF
-      ENDDO
-   11 NCOR = 0
-      DO I = NPO + 1, NLIN
-        IF ((LINE(I-1:I-1).EQ.' ') .AND. (LINE(I:I).NE.' ')) THEN
-          NCOR = NCOR + 1
-        ENDIF
-      ENDDO
-      NCOR = NCOR - 1
-      BACKSPACE (121)
       DO IR = 1, MFCSTO
-        READ (121,*,END=100,ERR=998) (iHKL(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (ICOR(I),I=1,NCOR)
+        READ (121,2121,END=100,ERR=998) NLIN, LINE
+   2121 FORMAT (Q,A)
+        NCOR = GetNumOfColumns(LINE) - 6
+        READ (LINE(1:NLIN),*,END=998,ERR=998) (iHKL(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (ICOR(I),I=1,NCOR)
         KK = IR
 !
 !.. Now work out which terms should be kept for the chi-squared calculation
