@@ -376,6 +376,12 @@
           NEWaxyzo(I,3) = tZ
         ENDDO
 ! NEWaxyzo now holds the orthogonal co-ordinates if a is along x
+      ELSE
+        DO I = 1, natcry
+          NEWaxyzo(I,1) = axyzo(I,1)
+          NEWaxyzo(I,2) = axyzo(I,2)
+          NEWaxyzo(I,3) = axyzo(I,3)
+        ENDDO
       ENDIF
       DO I = 1, natcry
         WRITE(OutputFile,270,ERR=999) I,atomlabel(izmbid(I,iFrg)),(NEWaxyzo(izmbid(I,iFrg),j),j=1,3),sybatom(izmbid(I,iFrg))
