@@ -334,20 +334,24 @@
 
       CALL PrjErrTrace
 
-      CALL WDialogSelect(IDD_ViewPawley)
-      CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
-      CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
-      CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
-      CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
-      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NBIN)
-      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,NumOfRef)
-      CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
-! Grey out the "Previous Results >" button in the DICVOL Wizard window
-      CALL WDialogSelect(IDD_PW_Page8)
-      CALL WDialogFieldState(IDB_PrevRes,Disabled)
-      IF (FnPatternOK() .AND. FnWavelengthOK()) THEN
+      IF (RW .EQ. cRead) THEN
         CALL WDialogSelect(IDD_ViewPawley)
-        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(RefArgK(NumOfRef)))
+        CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
+        CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
+        CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
+        CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NBIN)
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,NumOfRef)
+        CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
+! Grey out the "Previous Results >" button in the DICVOL Wizard window
+        CALL WDialogSelect(IDD_PW_Page8)
+        CALL WDialogFieldState(IDB_PrevRes,Disabled)
+        IF (FnPatternOK() .AND. FnWavelengthOK()) THEN
+          CALL WDialogSelect(IDD_ViewPawley)
+          CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(RefArgK(NumOfRef)))
+        ENDIF
+        BACKREF = .FALSE.
+        CALL SetModeMenuState(0,1,1)
       ENDIF
 
       CLOSE(hPrjFile)
