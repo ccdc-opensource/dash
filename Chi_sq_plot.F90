@@ -118,11 +118,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'poly_colours.inc'
 
-!!<<<<<<< Chi_sq_plot.F90
-!!      REAL, DIMENSION(MaxIter+1) :: Xarray
-
-!!=======
-!!>>>>>>> 1.28
       REAL                    chi_sqd
       INTEGER                                           it_count
       REAL                                                        chi_y_max
@@ -135,15 +130,18 @@
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                                    ChiMult
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
-
+! Required for Pawley Chi Sq value
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+!
       REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
       COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
       INTEGER J, ISET
-!!      REAL   x_max
       REAL   Xarray(MaxIter+1)
+      REAL, DIMENSION (2) :: EndPoint, XEndPoint
 
       CALL WindowSelect(ChiHandle)
       CALL WindowClear()
@@ -153,6 +151,10 @@
       DO j = 1, MaxIterationSoFar
         Xarray(j) = (FLOAT(j * nmpert) / 100000)
       ENDDO
+! Y Values for endpoint line
+      DO j = 1,2
+        EndPoint(j) = PAWLEYCHISQ * ChiMult
+      END DO
 
       IF (.NOT. Zoomed) THEN
         chi_x_max = (MaxIterationSoFar * FLOAT(nmpert))/100000
@@ -246,12 +248,26 @@
         DO ISET = 1, NumOf_SA_Runs
           CALL IPgXYPairs(Xarray, Chi_sqd(1,ISET))
         ENDDO
+! Plot line which indicates endpoint
+        XEndPoint(1) = XArray(1)
+        XEndPOint(2) = XArray(MaxIterationSoFar) 
+        CALL IPgNewPlot(PgPolyLine,1,2,0,1)               
+        CALL IPgStyle(  1,  0,  0,  0,  KolNumDif)
+        CALL IPgXYPairs(XEndPoint, EndPoint)
       ENDIF
 ! Plot Chi-sqd values iteration by iteration
       CALL IPgNewPlot(PgPolyLine,1,it_count,0,1)
       CALL IPgStyle(  1,  0,  0,  0,  KolNumCal)
       CALL IPgXYPairs(Xarray, chi_sqd(1,Curr_SA_Run))
-
+!     Plot line which indicates endpoint iteration by iteration
+!     since this is the first run
+      IF (NumOf_SA_Runs .EQ. 0) THEN
+        XEndPoint(1) = XArray(1)
+        XEndPoint(2) = XArray(it_count) 
+        CALL IPgNewPlot(PgPolyLine,1,2,0,1)               
+        CALL IPgStyle(  1,  0,  0,  0,  KolNumDif)
+        CALL IPgXYPairs(XEndPoint, EndPoint)
+      END IF
       END SUBROUTINE plotting_chi_sqd
 !
 !*****************************************************************************
