@@ -1,4 +1,4 @@
-! Winteracter module created : 26/Oct/2001 18:52:01
+! Winteracter module created : 01/Nov/2001 17:40:10
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -478,4 +478,5 @@
           INTEGER, PARAMETER :: IDF_ColFlexTors                 =  1131
           INTEGER, PARAMETER :: IDF_ConnectObsPoints            =  1132
           INTEGER, PARAMETER :: IDF_PlotPeakFitDif              =  1133
+          INTEGER, PARAMETER :: ID_ClearPeakFitRanges           = 40018
       END MODULE Druid_Header

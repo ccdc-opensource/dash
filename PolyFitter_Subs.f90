@@ -87,7 +87,7 @@
                 CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
                 xgcurold = xgcur(2)
                 ygcurold = ygcur(2)
-              END IF 
+              ENDIF 
               CALL IGrPlotMode(' ')
               CALL IGrColourN(InfoGrScreen(PrevColReq))
             CASE (MouseButUp)
@@ -155,7 +155,6 @@
         IPMINOLD  = IPMIN
         IPMAXOLD  = IPMAX
       END IF
-!
       SELECT CASE (EventInfo%VALUE1)
          CASE (KeyPageLeft)
            xpgdif=xpgmax-xpgmin
@@ -340,19 +339,19 @@
         Reps = 1.0
       ELSE
         Reps = Epsilon
-      END IF
+      ENDIF
       WRITE(117,'(F5.3,1X,F6.2,1X,F9.6)',ERR=100) Reps, Rfom, Rexpzp
       IF (UseErr .EQ. 2) THEN
         DO I = 1, NTPeak
           IOrd = IOrdTem(i)
           WRITE(117,'(F12.4,1X,F12.4)',ERR=100) AllPkPosVal(IOrd), AllPkPosEsd(IOrd)*10.0
-        END DO
+        ENDDO
       ELSE
         DO I = 1, NTPeak
           IOrd = IOrdTem(i)
           WRITE(117,'(F12.4)',ERR=100) AllPkPosVal(IOrd)
-        END DO
-      END IF        
+        ENDDO
+      ENDIF        
       CLOSE(117)
       CALL PopActiveWindowID
       RETURN
@@ -391,14 +390,14 @@
         IF (XBIN(I) .GT. XPGMIN) THEN
           IPMIN = I
           GOTO 110
-        END IF
-      END DO
+        ENDIF
+      ENDDO
   110 DO I = NBIN, 1, -1
         IF (XBIN(I) .LT. XPGMAX) THEN
           IPMAX = I
           GOTO 112
-        END IF
-      END DO
+        ENDIF
+      ENDDO
   112 CONTINUE
 
       END SUBROUTINE Get_IPMaxMin
@@ -408,15 +407,24 @@
       SUBROUTINE Move_CrossHair_Fit
 
       USE WINTERACTER
+      USE DRUID_HEADER
       USE VARIABLES
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Poly_Colours.inc'
-      INCLUDE 'PARAMS.INC'
 
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+! @@ Jvds Why do we need PROFOBS here? Wasn't PROFBIN supposed to have been implemented?
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
@@ -435,11 +443,23 @@
 
       COMMON /CURVAL/ XCurFirst
 
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-      NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-      XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-      IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
  
       INTEGER IMOV
       SAVE IMOV
@@ -450,7 +470,6 @@
 ! Get ready to put up the big cursor
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
-!      CALL WCursorShape(CurCrossHair)
       CALL IPgUnitsToGrUnits(xpgmin,ypgmin,gxmin,gymin)
       CALL IPgUnitsToGrUnits(xpgmax,ypgmax,gxmax,gymax)
       xgcur(1) = EventInfo%GX
@@ -541,6 +560,8 @@
              CALL IGrPlotMode(' ')
            ELSE
               NumPeakFitRange = NumPeakFitRange + 1
+! Ungrey 'Delete all peak fit ranges' button on toolbar
+              CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
               XPF_Range(1,NumPeakFitRange) = XPFR1
               XPF_Range(2,NumPeakFitRange) = XPFR2
               IPF_Lo(NumPeakFitRange) = IPFL1
@@ -556,7 +577,7 @@
             ENDIF
             RETURN 
         END SELECT
-      END DO 
+      ENDDO 
 
       END SUBROUTINE MOVE_CROSSHAIR_FIT
 !
@@ -591,11 +612,24 @@
 
       REAL XCUR(2), YCUR(2), XGCUR(2), YGCUR(2)
 
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
       REAL XPF_PTEM(MAX_NPPR,MAX_NPFR),YPF_PTEM(MAX_NPPR,MAX_NPFR)
       REAL XXFTEM(2,MAX_NPFR),XPkFitTem(MAX_FITPT),YPkFitTem(MAX_FITPT)
       INTEGER IILOTEM(MAX_NPFR),IIHITEM(MAX_NPFR),IIRANGT(MAX_NPFR),NNTEM(MAX_NPFR)
@@ -630,8 +664,8 @@
 ! The cursor is sitting inside the peak range - remove the range
 ! and shuffle all the regions that are already there.
                  LTEM = II
-              END IF
-            END DO
+              ENDIF
+            ENDDO
             KK = 0
             KR = 0
             DO II = 1, NumPeakFitRange
@@ -647,7 +681,7 @@
                 DO IP = 1, MPkDes
                   PkFnValTem(IP,KK)=PkFnVal(IP,II)
                   PkFnEsdTem(IP,KK)=PkFnEsd(IP,II)
-                END DO
+                ENDDO
                 DO IP = 1, NumInPFR(II)
                   XPF_PTEM(IP,KK)=XPF_Pos(IP,II)
                   YPF_PTEM(IP,KK)=YPF_Pos(IP,II)
@@ -655,18 +689,21 @@
                   PkPosEsdTem(IP,KK)=PkPosEsd(IP,II)
                   PkAreaValTem(IP,KK)=PkAreaVal(IP,II)
                   PkAreaEsdTem(IP,KK)=PkAreaEsd(IP,II)
-                END DO
+                ENDDO
 !                      IPF_RPtTem(KK)=KR
                 DO IC=1,IPF_Range(II)
                   KR=KR+1
                   XPkFitTem(KR)=XPeakFit(IPF_RPt(II)+IC)
                   YPkFitTem(KR)=YPeakFit(IPF_RPt(II)+IC)
-                END DO
-              END IF
-            END DO
+                ENDDO
+              ENDIF
+            ENDDO
             KR=0
-            NumPeakFitRange=NumPeakFitRange-1
-            IF (NumPeakFitRange.GT.0) THEN
+            NumPeakFitRange = NumPeakFitRange - 1
+            IF (NumPeakFitRange.EQ.0) THEN
+! Grey out 'Delete all peak fit ranges' button on toolbar
+              CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
+            ELSE
               DO II=1,NumPeakFitRange
                 KK=II
                 XPF_Range(1,II)=XXFTEM(1,KK)
@@ -679,7 +716,7 @@
                 DO IP=1,MPkDes
                   PkFnVal(IP,II)=PkFnValTem(IP,II)
                   PkFnEsd(IP,II)=PkFnEsdTem(IP,II)
-                END DO
+                ENDDO
                 DO IP=1,NumInPFR(II)
                   XPF_Pos(IP,II)=XPF_PTEM(IP,II)
                   YPF_Pos(IP,II)=YPF_PTEM(IP,II)
@@ -687,15 +724,15 @@
                   PkPosEsd(IP,II)=PkPosEsdTem(IP,II)
                   PkAreaVal(IP,II)=PkAreaValTem(IP,II)
                   PkAreaEsd(IP,II)=PkAreaEsdTem(IP,II)
-                END DO
+                ENDDO
                 IPF_RPt(II)=KR
                 DO IC=1,IPF_Range(II)
                   KR=KR+1
                   XPeakFit(KR)=XPkFitTem(KR)
                   YPeakFit(KR)=YPkFitTem(KR)
-                END DO
-              END DO
-            END IF
+                ENDDO
+              ENDDO
+            ENDIF
             II=NumPeakFitRange+1
             NumInPFR(II)=0
             IPF_RPt(II)=KR
@@ -707,15 +744,15 @@
               KR=KR+1
               XPeakFit(KR)=-9999.0
               YPeakFit(KR)=0.0
-            END DO
+            ENDDO
             IPF_Range(II)=0                            
-          END IF ! WInfoDialog(4).EQ.CommonYes
-        END IF  ! NumPeakFitRange.eq.0
+          ENDIF ! WInfoDialog(4).EQ.CommonYes
+        ENDIF  ! NumPeakFitRange.eq.0
         CALL IGrPlotMode(' ')
         CALL Profile_Plot(IPTYPE)
 !                CALL IGrPlotMode('EOR')
-        CALL Upload_Widths
         CALL Upload_Positions
+        CALL Upload_Widths
       ELSE IF (EventInfo%VALUE1.GE.49 .AND. EventInfo%VALUE1.LE.57) THEN
 ! KeyNumber=1-9: locating peak positions...
 ! Are we in a peak range?
@@ -725,8 +762,8 @@
             IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II) ) THEN
 ! The cursor is sitting inside a peak range - go for it!
               InRange=II
-            END IF
-          END DO
+            ENDIF
+          ENDDO
           IF (InRange.ne.0) THEN
             NTPeak=EventInfo%VALUE1-48
             NTem=NumInPFR(InRange)+1
@@ -742,8 +779,8 @@
                 IF (ANew.le.ATem) THEN
                   ATem=ANew
                   YPF_Pos(NTem,InRange)=YOBin(IP)
-                END IF
-              END DO
+                ENDIF
+              ENDDO
             ELSE
 ! Reposition an existing peak
               XPF_Pos(NTPeak,InRange)=XCur(2)
@@ -753,11 +790,11 @@
                 IF (ANew.le.ATem) THEN
                   ATem=ANew
                   YPF_Pos(NTPeak,InRange)=YOBin(IP)
-                END IF
-              END DO
-            END IF ! NTPeak.eq.NTem
-          END IF ! InRange.ne.0
-        END IF ! NumPeakFitRange.gt.0
+                ENDIF
+              ENDDO
+            ENDIF ! NTPeak.eq.NTem
+          ENDIF ! InRange.ne.0
+        ENDIF ! NumPeakFitRange.gt.0
 ! We've got ourselves a new initial peak position
         CALL IGrPlotMode(' ')
         CALL Profile_Plot(IPTYPE)
@@ -771,8 +808,8 @@
             IF (XCur(2).GE.XPF_Range(1,II) .AND. XCur(2).LE.XPF_Range(2,II) ) THEN
 ! The cursor is sitting inside a peak range - go for it!
               InRange=II
-            END IF
-          END DO
+            ENDIF
+          ENDDO
           IF (InRange .EQ. 0) THEN
 ! Tell the user to place the cursor in the range to be fitted.
             CALL ErrorMessage('Place the cursor in a peak fitting range.')
@@ -784,8 +821,8 @@
             CALL WCursorShape(CurHourGlass)
             CALL MultiPeak_Fitter()
             CALL WCursorShape(CurCrossHair)
-          END IF ! InRange.eq.0
-        END IF ! NumPeakFitRange.gt.0                
+          ENDIF ! InRange.eq.0
+        ENDIF ! NumPeakFitRange.gt.0                
         CALL IGrPlotMode(' ')
         CALL Profile_Plot(IPTYPE)
       ELSE
@@ -804,6 +841,7 @@
       INCLUDE 'PARAMS.INC'
 
       REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
       INTEGER           IPF_Lo,                     IPF_Hi
       INTEGER           NumPeakFitRange,            CurrentRange
       INTEGER           IPF_Range
@@ -811,8 +849,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
-
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
                         IPF_Range(MAX_NPFR),                                     &
@@ -829,15 +866,15 @@
         NPeaksFitted = 0
         DO I = 1, NumPeakFitRange
           NPeaksFitted = NPeaksFitted + NumInPFR(I)
-        END DO
+        ENDDO
         IF ( NPeaksFitted .GE. 3 ) THEN
           CALL SetModeMenuState(1,1,0)
         ELSE
           CALL SetModeMenuState(1,0,0)
-        END IF
+        ENDIF
       ELSE
         CALL SetModeMenuState(1,-1,0)
-      END IF
+      ENDIF
 
       END SUBROUTINE CheckIfWeCanDoAPawleyRefinement
 !
