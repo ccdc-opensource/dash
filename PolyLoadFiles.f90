@@ -292,7 +292,8 @@
       ENDIF
       DataSetChange = DataSetChange + 1
       BackRef = .TRUE.
-      CALL Init_PeakFitRanges
+      CALL Clear_UnitCell
+      CALL Clear_PeakFitRanges
 ! Ungrey 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
       XPMIN = XOBS(1)
@@ -326,7 +327,7 @@
       LBIN = 1
       CALL Rebin_Profile
 ! JvdS Assume no knowledge on background
-      CALL Init_BackGround
+      CALL Clear_BackGround
       CALL GetProfileLimits
       IPTYPE = 1
       CALL Profile_Plot
