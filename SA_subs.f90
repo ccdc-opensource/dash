@@ -33,8 +33,9 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      INTEGER                 ModalFlag
-      COMMON / ModalTorsions/ ModalFlag(mvar)
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
 
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds
@@ -215,6 +216,10 @@
       NTOTMOV = 0
       DO I = 1, nvar
         XOPT(I) = X(I)
+   !     DO I = 1, nvar
+          NACP(I) = 0
+          NumTrialsPar(I) = 0
+    !    ENDDO
         C(I) = 2.0
       ENDDO
 ! Evaluate the function with input X and return value as F.
@@ -282,10 +287,6 @@
 !   Starting point for multiple moves
 ! ##########################################
       DO M = 1, NT
-        DO I = 1, nvar
-          NACP(I) = 0
-          NumTrialsPar(I) = 0
-        ENDDO
 ! MRAN RANGE IS 0 -> IM=7875
         MRAN = MOD(MRAN*IA+IC,IM)
         IARR = MRAN + 1
@@ -431,10 +432,6 @@
               CALL FCN(XP,FP,0)
             ENDIF
             PrevParsInclPO = CurrParsInclPO
-            FPSUM0 = FPSUM0 + 1.0
-            FPSUM1 = FPSUM1 + FP
-            FPSUM2 = FPSUM2 + FP*FP
-            A0SUM(H) = A0SUM(H) + 1.0
             XDSS(H) = XDSS(H) + (FP-F)**2
             PrevRejected = .FALSE.
             IF (FP .LE. F) THEN
@@ -479,6 +476,11 @@
                 PrevRejected = .TRUE.
               ENDIF
             ENDIF
+
+            FPSUM1 = FPSUM1 + F
+            FPSUM2 = FPSUM2 + F*F
+            A0SUM(H) = A0SUM(H) + 1.0
+
             X0SUM(H) = X0SUM(H) + 1.0
             XSUM(H) = XSUM(H) + X(H)
             XXSUM(H) = XXSUM(H) + X(H)**2
@@ -514,6 +516,7 @@
         ENDDO
         IF (iMyExit .NE. 0) GOTO 999 ! Exit all loops and jump straight to the end
       ENDDO ! Loop over moves per iteration (NT)
+      FPSUM0 = FPSUM0 + FLOAT(NS*NT*NPAR)
       Last_NDOWN = NDOWN
       Last_NUP   = NUP
 ! Calculate the average energy and deviation
@@ -522,14 +525,14 @@
       DO I = 1, nvar
         IF (X0SUM(I) .GT. 0.0) THEN
           DXVAV(I) = 1.0 !XSUM(I)/X0SUM(I)
-          XVSIG(I) = 1.0 !SQRT(MAX(DP0,(XXSUM(I)/X0SUM(I))-(DXVAV(I)*DXVAV(I))))
-          FLAV(I) = 1.0 !SQRT(MAX(DP0,XDSS(I)/A0SUM(I)))
+          XVSIG(I) = 1.0 !SQRT(MAX(0.0,(XXSUM(I)/X0SUM(I))-(DXVAV(I)*DXVAV(I))))
+          FLAV(I) = 1.0 !SQRT(MAX(0.0,XDSS(I)/A0SUM(I)))
         ENDIF
       ENDDO
       ntotmov = ntotmov + nmpert
       IF (num_new_min .NE. num_old_min) CALL Profile_Plot ! plot the profile
       num_old_min = num_new_min
-      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
+      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,FLAV,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
 ! If we have asked for an initial temperature to be calculated then do so
       IF (MAKET0) THEN
 ! Start temperature increased by 50% as asked for
@@ -857,8 +860,9 @@
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
 
-      INTEGER                ModalFlag
-      COMMON /ModalTorsions/ ModalFlag(mvar)
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
 
       REAL TempUpper, TempLower
       INTEGER I
