@@ -67,7 +67,6 @@
             DO JQ = 0, 3
               JQS = 1 + JQ + KK
               QUATER(JQ) = QDEN * CHROM(JQS)
-              CHROM(JQS) = QDEN * CHROM(JQS)
             ENDDO
 ! QUATER now holds the normalised quaternions
             CALL Quaternion2Matrix(QUATER, ROTA)
