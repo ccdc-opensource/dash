@@ -223,6 +223,7 @@
 
       CALL IGrColourN(KolNumMain)
       CALL IGrCharSize(1.,1.)
+      CALL IPgXScalePos(  0.38)
       CALL IPgXScale('TN')
       CALL IPgXScaleTop('T')
       CALL IGrColourN(KolNumMain)
