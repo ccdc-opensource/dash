@@ -1,13 +1,15 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE check_licence
+      SUBROUTINE CheckLicence
 
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
-      INTEGER valid_license
+      IMPLICIT NONE
+
+      INTEGER tValidLicence
       INTEGER, EXTERNAL :: Read_License_Valid
       CHARACTER*2 Exp
       CHARACTER*200 MessageStr
@@ -15,31 +17,34 @@
 
       CALL WDialogLoad(IDD_LicenceAgreement)
       CALL WDialogLoad(IDD_License_Dialog)
-      valid_license = 0
-      DO WHILE (valid_license .LE. 0) 
-        valid_license = Read_License_Valid()
-        IF      (valid_license .EQ. -7) THEN
-          MessageStr = "Demo licence not valid."
-        ELSE IF (valid_license .LE. -2) THEN
-          MessageStr = "DASH problem: could not find or open the licence file"//CHAR(13)//&
-            InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"License.dat."
-        ELSE IF (valid_license .EQ. -1) THEN
-          MessageStr = "DASH problem: Your DASH licence is invalid for this machine."
-        ELSE IF (valid_license .EQ.  0) THEN
-          MessageStr = "DASH problem: Your DASH licence has expired."
-        ENDIF
-        IF (valid_license .LE. 0) THEN
+      tValidLicence = 0
+      DO WHILE (tValidLicence .LE. 0) 
+        tValidLicence = Read_License_Valid()
+        SELECT CASE (tValidLicence)
+          CASE (-7)
+            MessageStr = "DASH problem: Demo licence not valid."
+          CASE (-3)
+            MessageStr = "DASH problem: Licence key not valid."
+          CASE (-2)
+            MessageStr = "DASH problem: Could not find or open the licence file"//CHAR(13)//&
+              InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"License.dat."
+          CASE (-1)
+            MessageStr = "DASH problem: Your DASH licence is invalid for this machine."
+          CASE (0)
+            MessageStr = "DASH problem: Your DASH licence has expired."
+        END SELECT
+        IF (tValidLicence .LE. 0) THEN
           MessageStr = MessageStr(1:LEN_TRIM(MessageStr))//CHAR(13)//&
                        "Would you like to enter a new licence?"
           IF (Confirm(MessageStr)) THEN
-            CALL LicensePopup
+            CALL LicencePopup
           ELSE
             CALL DoExit
           ENDIF
         ENDIF
       ENDDO
-      IF (valid_license .LE. 7) THEN
-        WRITE(Exp,'(I2)') valid_license
+      IF (tValidLicence .LE. 7) THEN
+        WRITE(Exp,'(I2)') tValidLicence
         CALL InfoMessage("Your DASH licence will expire in "//Exp//" days.")
       ENDIF
       CALL WDialogSelect(IDD_LicenceAgreement)
@@ -47,11 +52,11 @@
       CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogUnload
 
-      END SUBROUTINE check_licence
+      END SUBROUTINE CheckLicence
 !
 !*****************************************************************************
 !
-      SUBROUTINE LicensePopup
+      SUBROUTINE LicencePopup
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -85,7 +90,7 @@
                 CALL DoExit
               CASE (IDOK)
                 CALL WDialogGetString(IDF_License_String, CLString)
-                CALL Decode_License(CLString,Info)
+                CALL DecodeLicence(CLString,Info)
                 IF (Info%Valid .LT. 0 ) THEN
                   CALL ErrorMessage("Sorry, the licence key is invalid--please check your input.")
                 ELSE IF (WDialogGetCheckBoxLogical(IDF_License_Site) .AND. (Info%LicenseType .NE. SiteKey)) THEN
@@ -100,7 +105,7 @@
                     IF (Info%SerialNumber .NE. ICode) Valid = -99
                   ENDIF
                   IF (Valid .GT. 0) THEN
-                    CALL Write_License_File(CLString)
+                    CALL WriteLicenceFile(CLString)
                     INLOOP = .FALSE.
                   ELSE IF (Valid .EQ. 0) THEN
                     CALL ErrorMessage("Sorry, the licence key has expired.")
@@ -129,7 +134,7 @@
    99 CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogHide
 
-      END SUBROUTINE LicensePopup
+      END SUBROUTINE LicencePopup
 !
 !*****************************************************************************
 !
@@ -165,7 +170,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Decode_License(LString,Info)
+      SUBROUTINE DecodeLicence(LString,Info)
 
       USE VARIABLES
 
@@ -182,6 +187,7 @@
 ! JvdS Next lines very dirty: v is INTEGER*4, but their XOR is INTEGER*2. Not possible.
       READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
       cs = IEOR(v(1),v(2))
+      cs = IEOR(cs,16#1504)
 ! Check the checksum
       IF (tCheckSum .NE. checksum) GOTO 99
       CALL decipher(v,w)
@@ -193,15 +199,19 @@
       Info%Day          = (Info%DateCode - Info%Year*10000 - Info%Month*100)
       IF (Info%LicenseType .EQ. SiteKey) Info%SerialNumber = Info%SerialNumber - 145789123 ! demangle into a site number
       RETURN 
- 99   CONTINUE
+ 99   CONTINUE ! CALL ErrorMessage('Invalid licence key.')
       Info%Valid = -1
 
-      END SUBROUTINE Decode_License
+      END SUBROUTINE DecodeLicence
 !
 !*****************************************************************************
 !
       INTEGER FUNCTION Read_License_Valid()
-
+!
+! RETURNS  -2 : Error opening / reading file
+!          -3 : Licence key invalid (checksum error)
+!          -7 : User disagreed with evaluation licence
+!
       USE VARIABLES  
 
       CHARACTER*80 line, CLString
@@ -212,26 +222,24 @@
 
       Read_License_Valid = -2
       OPEN(UNIT=117,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='OLD',ERR=99)
-      DO WHILE (Read_License_Valid .LE. 0)
-        READ(117,'(A)',ERR=99,END=99) line
-        IF (line(1:1) .NE. '#') THEN
-          CALL INextString(line,clstring)
-          CALL Decode_License(CLString,Info)
-          IF (Info%Valid) THEN
-            tRead_License_Valid = License_Valid(Info)
-            IF (tRead_License_Valid .GT. 0) THEN
-              IF (Info%LicenseType .EQ. DemoKey) THEN
-                ttRead_License_Valid = ShowLicenceAgreement(Info)
-                IF (ttRead_License_Valid .EQ. -7) tRead_License_Valid = -7
-              ENDIF
-            ENDIF
-            Read_License_Valid = tRead_License_Valid
+   10 READ(117,'(A)',ERR=99,END=99) line
+      IF (line(1:1) .EQ. '#') GOTO 10
+      CALL INextString(line,clstring)
+      CALL DecodeLicence(CLString,Info)
+      IF (Info%Valid .EQ. 1) THEN
+        tRead_License_Valid = License_Valid(Info)
+        IF (tRead_License_Valid .GT. 0) THEN
+          IF (Info%LicenseType .EQ. DemoKey) THEN
+            ttRead_License_Valid = ShowLicenceAgreement(Info)
+            IF (ttRead_License_Valid .EQ. -7) tRead_License_Valid = -7
           ENDIF
         ENDIF
-      ENDDO
+        Read_License_Valid = tRead_License_Valid
+      ELSE ! Invalid checksum
+        Read_License_Valid = -3
+      ENDIF
 ! Have a decodable key ...
- 99   CONTINUE
-      CLOSE(117,iostat=dummy)
+ 99   CLOSE(117,iostat=dummy)
 
       END FUNCTION Read_License_Valid
 !
@@ -261,7 +269,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Write_License_File(LString)
+      SUBROUTINE WriteLicenceFile(LString)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -277,7 +285,7 @@
                     'September', 'October', 'November', 'December' /
       TYPE (License_Info) Info
 
-      CALL Decode_License(LString,Info)
+      CALL DecodeLicence(LString,Info)
       IF (Info%Valid .LE. 0) GOTO 99
       SELECT CASE ( Info%LicenseType ) 
         CASE (DemoKey)
@@ -290,7 +298,7 @@
           GOTO 99
       END SELECT
       OPEN(UNIT=IUN,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='UNKNOWN',ERR=99)
-      WRITE(iun,'(A)',ERR=99)     "# Licence File for DASH"
+      WRITE(iun,'(A)',ERR=99)     "# Licence File for "//ProgramVersion
       WRITE(iun,'(A)',ERR=99)     "#"
       WRITE(iun,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' licence '
       IF      (Info%LicenseType .EQ. NodeKey) THEN
@@ -309,7 +317,7 @@
    99 CONTINUE
       CLOSE(iun)
 
-      END SUBROUTINE Write_License_File
+      END SUBROUTINE WriteLicenceFile
 !
 !*****************************************************************************
 !
