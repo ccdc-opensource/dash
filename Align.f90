@@ -28,8 +28,7 @@
 !      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'  ! NumberSGTable
-      INCLUDE 'lattice.inc' ! Cellpar and space group strings
+      INCLUDE 'lattice.inc' ! Cellpar, space group strings and NumberSGTable
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves

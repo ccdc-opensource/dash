@@ -12,7 +12,6 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
@@ -828,7 +827,6 @@
 
       CHARACTER*(*), INTENT (IN   ) :: SDIFileName
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP

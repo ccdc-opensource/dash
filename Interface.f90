@@ -1286,7 +1286,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
 ! JvdS MaxSPGR is set to 530 in 'lattice.inc'
@@ -1330,7 +1329,7 @@
 
       INTEGER, INTENT (IN   ) :: IUploadFrom
 
-      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
 
       INTEGER, EXTERNAL :: SGNrMenu2Table
       INTEGER ISPosSG

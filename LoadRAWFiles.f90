@@ -299,7 +299,6 @@
       INTEGER,       INTENT (IN   ) :: irange
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS

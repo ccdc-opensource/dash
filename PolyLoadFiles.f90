@@ -81,7 +81,6 @@
       CHARACTER*(*), INTENT (INOUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -1641,7 +1640,6 @@
       REAL, INTENT (INOUT) :: TheMax2Theta
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS
