@@ -32,7 +32,7 @@
       LOGICAL DFLTPR, PRNCYC
       EXTERNAL DFLTPR, PCXX, PFXX, MAGROU, CALROU, RUNPAR, VARSPR, PRNCYC
 
-      INCLUDE 'params.inc'
+      INCLUDE 'PARAMS.INC'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
@@ -108,8 +108,15 @@
 
       COMMON /IPKCMN/ IPK, PIK(MIPK)
 
-      COMMON /CMN299/ KIPT(MOBS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
-     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MOBS), JOCCR(MOBS)
+      INTEGER         KIPT,       KNIPT
+      REAL                                       ZNORM,         DZNDKQ
+      REAL            DZNDVQ
+      INTEGER                           JOCCR
+      COMMON /CMN299/ KIPT(MOBS), KNIPT(MAXPIK), ZNORM(MAXPIK), DZNDKQ(MAXPIK), &
+                      DZNDVQ(9,MAXPIK), JOCCR(MOBS)
+
+      INTEGER         KREFT
+      COMMON /FPINF2/ KREFT(MOBS)
 
       COMMON /CMNNOW/ NOBSNOW
 
@@ -271,7 +278,7 @@
           YPEAK = 0.
           YCALC = 0.
           NOBSNOW = IPT
-          KMAX = IOCCR(NOBSNOW) ! Number of peaks contributing to this data point
+          KMAX = KREFT(NOBSNOW) ! Number of peaks contributing to this data point
           ARGI = ZARGI(NOBSNOW)
           OBS = ZOBS(NOBSNOW)
           DOBS = ZDOBS(NOBSNOW)
@@ -325,7 +332,7 @@
             IF (ICODE .EQ. 1) THEN
               NTEM = 0                ! Excluded region
             ELSE
-              NTEM = IOCCR(NOBSNOW)
+              NTEM = KREFT(NOBSNOW)
             ENDIF
             K1 = KIPT(NOBSNOW) + 1
             K2 = KIPT(NOBSNOW+1)
@@ -522,10 +529,16 @@
       REAL ARTEM(6)
       INTEGER KORD(MFCSTO)
 
-      COMMON /CMN299/ KIPT(MOBS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
-     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MOBS), JOCCR(MOBS)
+      INTEGER         KIPT,       KNIPT
+      REAL                                       ZNORM,         DZNDKQ
+      REAL            DZNDVQ
+      INTEGER                           JOCCR
+      COMMON /CMN299/ KIPT(MOBS), KNIPT(MAXPIK), ZNORM(MAXPIK), DZNDKQ(MAXPIK), &
+                      DZNDVQ(9,MAXPIK), JOCCR(MOBS)
 
-! O      COMMON /CMN300/ ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK), KARGO(MAXPIK), KARGK(MAXPIK)
+      INTEGER         KREFT
+      COMMON /FPINF2/ KREFT(MOBS)
+
       DIMENSION ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK), KARGO(MAXPIK), KARGK(MAXPIK)
 
       DATA WDCN03/'SIGM', 'GAMM', 'HPSL', 'HMSL'/
@@ -563,7 +576,7 @@
       CALL SORT_REAL(ZARGK,KORD,MAXK)
 ! Set the number of peaks at each point to zero
       DO II = 1, NPTS
-        IOCCR(II) = 0
+        KREFT(II) = 0
       ENDDO
       DO IR = 1, MAXK
         IRT = KORD(IR)
@@ -650,8 +663,8 @@
           KOUNT = KOUNT + 1
           KARGO(KOUNT) = II
           KARGK(KOUNT) = KNOW
-          IOCCR(II) = IOCCR(II) + 1
-          IF (IOCCR(II).EQ.1) JOCCR(II) = KOUNT
+          KREFT(II) = KREFT(II) + 1
+          IF (KREFT(II).EQ.1) JOCCR(II) = KOUNT
           TARGI = ZARGI(II)
           TARGK = ZARGK(KNOW)
           DTARG = TARGI - TARGK
@@ -698,8 +711,8 @@
       KKT = 0
       KIPT(1) = 0
       DO II = 1, NPTS
-        KIPT(II+1) = KIPT(II) + IOCCR(II)
-        IF (IOCCR(II).NE.0) THEN
+        KIPT(II+1) = KIPT(II) + KREFT(II)
+        IF (KREFT(II).NE.0) THEN
           KK = 0
           DO JJ = JOCCR(II), KOUNT
             IF (KARGO(JJ).EQ.II) THEN
@@ -711,7 +724,7 @@
               DO NPKD = 1, NPKGEN(JPHASE,JSOURC)
                 DZNDVQ(NPKD,KKT) = DZNDVQT(NPKD,JJ)
               ENDDO
-              IF (KK.EQ.IOCCR(II)) GOTO 680
+              IF (KK.EQ.KREFT(II)) GOTO 680
             ENDIF
           ENDDO
         ENDIF
@@ -756,7 +769,7 @@
 ! REFH and ZARGK have now been sorted.
 ! Set the number of contributing peaks at each data point to zero
       DO II = 1, NPTS
-        IOCCR(II) = 0
+        KREFT(II) = 0
       ENDDO
       IOBS = 1
       DO IR = 1, MAXK
@@ -883,8 +896,8 @@
           KOUNT = KOUNT + 1 ! IF (KOUNT .GT. MAXPIK) CALL DebugErrorMessage('KOUNT .GT. MAXPIK')
           KARGO(KOUNT) = II
           KARGK(KOUNT) = KNOW
-          IOCCR(II) = IOCCR(II) + 1
-          IF (IOCCR(II).EQ.1) JOCCR(II) = KOUNT
+          KREFT(II) = KREFT(II) + 1
+          IF (KREFT(II).EQ.1) JOCCR(II) = KOUNT
           TARGI = ZARGI(II)
           TARGK = ZARGK(KNOW)
           DTARG = TARGI - TARGK
@@ -940,8 +953,8 @@
       KKT = 0
       KIPT(1) = 0
       DO II = 1, NPTS
-        KIPT(II+1) = KIPT(II) + IOCCR(II)
-        IF (IOCCR(II).NE.0) THEN
+        KIPT(II+1) = KIPT(II) + KREFT(II)
+        IF (KREFT(II).NE.0) THEN
           KK = 0
           DO JJ = JOCCR(II), KOUNT
             IF (KARGO(JJ).EQ.II) THEN
@@ -953,7 +966,7 @@
               DO NPKD = 1, NPKGEN(JPHASE,JSOURC)
                 DZNDVQ(NPKD,KKT) = DZNDVQT(NPKD,JJ)
               ENDDO
-              IF (KK.EQ.IOCCR(II)) GOTO 3680
+              IF (KK.EQ.KREFT(II)) GOTO 3680
             ENDIF
           ENDDO
         ENDIF

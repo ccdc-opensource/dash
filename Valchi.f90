@@ -7,6 +7,7 @@
       USE ZMVAR
       USE PO_VAR
       USE VARIABLES
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -29,8 +30,6 @@
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
-      REAL              AIOBS,         AICALC
-      COMMON /SAREFLNS/ AIOBS(MFCSTO), AICALC(MFCSTO)
       REAL              BICALC,         XICALC
       COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 

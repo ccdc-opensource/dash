@@ -8,7 +8,7 @@
       IMPLICIT NONE
 
       INTEGER     MaxRef
-      PARAMETER ( MaxRef = 10000)
+      PARAMETER ( MaxRef = 10000 )
 
       INTEGER     NumOfRef
 
@@ -36,8 +36,9 @@
 !O      LOGICAL                 LOGREF
 !O      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
 !O
-!O      REAL              AIOBS,         AICALC
-!O      COMMON /SAREFLNS/ AIOBS(MaxRef), AICALC(MaxRef)
+      REAL    AIOBS(MaxRef), AICALC(MaxRef)
+! AIOBS = observed intensity, per reflection
+! AICALC = part of the calculated intensity due to structural parameters (atoms)
 
 !O! JCC GGCALC dimension increased to 500
 !O      REAL            rHKL,           AMUL

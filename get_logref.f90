@@ -22,24 +22,6 @@
       LOGICAL                 LOGREF
       COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
 
-      INTEGER         NATOM
-      REAL                   X
-      INTEGER                          KX
-      REAL                                        AMULT,      TF
-      INTEGER         KTF
-      REAL                      SITE
-      INTEGER                              KSITE,      ISGEN
-      REAL            SDX,        SDTF,      SDSITE
-      INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-
-      INTEGER         KKOR
-      REAL                  WTIJ
-      INTEGER                             IKKOR,         JKKOR
-      COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
-
       LOGICAL         IHMINLT0, IKMINLT0, ILMINLT0
       COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0
 
@@ -53,7 +35,6 @@
 !     The following integers represent the previous integers, divided by 2
 !     and then multiplied by 2
       INTEGER H_m, K_m, L_m, HPKm, HPLm, KPLm, HPKPLm
-
       INTEGER IR, JHMAX, JHMIN, Item, IREMAIN, LL, LLM
       INTEGER, EXTERNAL :: GETTIC
 
@@ -68,7 +49,7 @@
       IKMAX = -9999
       ILMAX = -9999
       IIMAX = -9999
-      DO iR = 1, MAXK
+      DO iR = 1, NumOfRef
         IHMIN = MIN(iHKL(1,IR),IHMIN)
         IKMIN = MIN(iHKL(2,IR),IKMIN)
         ILMIN = MIN(iHKL(3,IR),ILMIN)
@@ -120,56 +101,56 @@
           NLGREF = 0
         CASE (39,57)                           ! P 1 21 1, P 1 21/m 1
           NLGREF = 1
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             K_ = iHKL(2,IR)
             K_m = 2*(K_/2)
             LOGREF(1,IR) = K_.EQ.K_m ! k=2n
           ENDDO
         CASE (44,50,61,67,116,176,298)         ! P 1 c 1, C 1 c 1, P 1 2/c 1, C 1 21/c 1, C 2 2 21
           NLGREF = 1                          ! C m c 21, C m c m,
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             L_ = iHKL(3,IR)
             L_m = 2*(L_/2)
             LOGREF(1,IR) = (L_.EQ.L_m) ! l=2n
           ENDDO
         CASE (64,304)                          ! P 1 21/c 1, C m c a
           NLGREF = 1
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             KPL = iHKL(2,IR) + iHKL(3,IR)
             KPLm = 2*(KPL/2)
             LOGREF(1,IR) = KPL.EQ.KPLm ! k+l=2n
           ENDDO
         CASE (65)                              ! P 1 21/n 1
           NLGREF = 1
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
             HPKPLm = 2*(HPKPL/2)
             LOGREF(1,IR) = HPKPL.EQ.HPKPLm ! h+k+l=2n
           ENDDO
         CASE (66)                              ! P 1 21/a 1
           NLGREF = 1
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             HPK = iHKL(1,IR) + iHKL(2,IR)
             HPKm = 2*(HPK/2)
             LOGREF(1,IR) = HPK.EQ.HPKm ! h+k=2n
           ENDDO
         CASE (52,69)                           ! I 1 a 1, I 1 2/a 1
           NLGREF = 1
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             H_ = iHKL(1,IR)
             H_m = 2*(H_/2)
             LOGREF(1,IR) = (H_.EQ.H_m) ! h=2n
           ENDDO
         CASE (112)                             ! P 21 21 2
           NLGREF = 1
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             HPK = iHKL(1,IR) + iHKL(2,IR)
             HPKm = 2*(HPK/2)
             LOGREF(1,IR) = (HPK.EQ.HPKm) ! h+k=2n
           ENDDO
         CASE (115,290)                         ! P21 21 21, P b c a
           NLGREF = 4
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             HPK = iHKL(1,IR) + iHKL(2,IR)
             KPL = iHKL(2,IR) + iHKL(3,IR)
             HPKm = 2*(HPK/2)
@@ -181,7 +162,7 @@
           ENDDO
         CASE (143)                             ! P c a 21
           NLGREF = 4
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             H_ = iHKL(1,IR)
             L_ = iHKL(3,IR)
             H_m = 2*(H_/2)
@@ -193,7 +174,7 @@
           ENDDO
         CASE (164,284)                         ! P n a 21, P b c n
           NLGREF = 4
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             HPK = iHKL(1,IR) + iHKL(2,IR)
             L_ = iHKL(3,IR)
             HPKm = 2*(HPK/2)
@@ -205,7 +186,7 @@
           ENDDO
         CASE (212)                             ! F d d 2
           NLGREF = 4
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
             IREMAIN = MOD(HPKPL,4)
             LOGREF(1,IR) = (IREMAIN.EQ.0) !h+k+l=4n
@@ -215,7 +196,7 @@
           ENDDO
         CASE (266)                             ! P c c n
           NLGREF = 4
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             HPK = iHKL(1,IR) + iHKL(2,IR)
             HPL = iHKL(1,IR) + iHKL(3,IR)
             HPKm = 2*(HPK/2)
@@ -227,7 +208,7 @@
           ENDDO
         CASE (269)                             ! P b c m
           NLGREF = 4
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             K_ = iHKL(2,IR)
             L_ = iHKL(3,IR)
             K_m = 2*(K_/2)
@@ -239,7 +220,7 @@
           ENDDO
         CASE (292)                             ! P n m a
           NLGREF = 4
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             HPL = iHKL(1,IR) + iHKL(3,IR)
             K_ = iHKL(2,IR)
             HPLm = 2*(HPL/2)
@@ -251,7 +232,7 @@
           ENDDO
         CASE (365)                             ! I 41/a (origin choice 2)
           NLGREF = 8
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             H_ = iHKL(1,IR)
             K_ = iHKL(2,IR)
             H_m = 2*(H_/2)
@@ -271,7 +252,7 @@
           ENDDO
         CASE (369)                             ! P 41 21 2
           NLGREF = 4
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             H_ = iHKL(1,IR)
             K_ = iHKL(2,IR)
             L_ = iHKL(3,IR)
@@ -283,7 +264,7 @@
           ENDDO
         CASE (431,432)                         ! P31, P32
           NLGREF = 3
-          DO IR = 1, MAXK
+          DO IR = 1, NumOfRef
             LL = MOD(iHKL(3,IR)+300,3)
             LLM = 3*(LL/3)
             LOGREF(1,IR) = (LL.EQ.0)

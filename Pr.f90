@@ -864,8 +864,15 @@
       COMMON /TTHMNC/ TTHMON(5), KTHMON(5), C2TMON(5), S4TMON(5),       &
      &                OPCMON(5), ALPCOR, DLPCOR
 
-      COMMON /CMN299/ KIPT(MOBS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
-     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MOBS), JOCCR(MOBS)
+      INTEGER         KIPT,       KNIPT
+      REAL                                       ZNORM,         DZNDKQ
+      REAL            DZNDVQ
+      INTEGER                           JOCCR
+      COMMON /CMN299/ KIPT(MOBS), KNIPT(MAXPIK), ZNORM(MAXPIK), DZNDKQ(MAXPIK), &
+                      DZNDVQ(9,MAXPIK), JOCCR(MOBS)
+
+      INTEGER         KREFT
+      COMMON /FPINF2/ KREFT(MOBS)
 
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
@@ -5305,8 +5312,8 @@
         IF (SOMEGA(K).EQ.0.) GOTO 22
         FCA = 0.
         IF (AICALC(K).GT.0.) FCA = SQRT(AICALC(K))
-        FOB = 0.
-        IF (AIOBS(K).GT.0.) FOB = SQRT(AIOBS(K))
+        FOBS = 0.
+        IF (AIOBS(K).GT.0.) FOBS = SQRT(AIOBS(K))
 !  IS THIS A PROBLEM JBF 5-1-95
         FC = (0.0,0.0)
         IF (.NOT.LATABS(rHKL(1,K))) THEN
@@ -5318,11 +5325,11 @@
         A = REAL(FC)
         B = AIMAG(FC)
         FCMOD = SQRT(A*A+B*B)
-        IF (.NOT.TESTOV(FOB,FCA)) FOB = FCMOD*E*FOB/FCA
+        IF (.NOT.TESTOV(FOBS,FCA)) FOBS = FCMOD*E*FOBS/FCA
         IF (CENTRC) THEN
-          WRITE (IOP1,2030) IH, A, FOB
+          WRITE (IOP1,2030) IH, A, FOBS
         ELSE
-          WRITE (IOP1,2030) IH, FC, FOB
+          WRITE (IOP1,2030) IH, FC, FOBS
         ENDIF
    22 ENDDO
 ! READY FOR REINPUT BY FOURIER:

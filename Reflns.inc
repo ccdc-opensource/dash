@@ -3,9 +3,6 @@
 
 ! JCC GGCALC dimension increased to 500
 
-      REAL              AIOBS,         AICALC
-      COMMON /SAREFLNS/ AIOBS(MFCSTO), AICALC(MFCSTO)
-
       REAL            rHKL,           AMUL
       REAL            ESDOBS,         SOMEGA,       GGCALC
       INTEGER         MAXKK, KMIN, KMAX, KMOD, KNOW
