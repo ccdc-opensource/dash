@@ -3,7 +3,7 @@
 !
       SUBROUTINE ShowWizardWindowZmatrices
 !
-! The wizard window containing the z-matrices needs a lot of initialisation and
+! The wizard window containing the Z-matrices needs a lot of initialisation and
 ! can be called from more than one point in DASH, so here is a special routine
 ! to open that window.
 !
@@ -701,10 +701,8 @@
           ELSE IF ((asym(izmbid(iAtomNr+1,iFrg),iFrg) .EQ. 'C  ') .OR. (asym(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. 'H  ')) THEN
             ShouldBeSwapped = .TRUE.
 ! Otherwise, swap if first > second
-          ELSE IF ((asym(izmbid(iAtomNr  ,iFrg),iFrg) .GT. asym(izmbid(iAtomNr+1,iFrg),iFrg))) THEN
-            ShouldBeSwapped = .TRUE.
           ELSE
-            ShouldBeSwapped = .FALSE.
+            ShouldBeSwapped = ((asym(izmbid(iAtomNr  ,iFrg),iFrg) .GT. asym(izmbid(iAtomNr+1,iFrg),iFrg)))
           ENDIF
           IF (ShouldBeSwapped) THEN
             iTem                   = izmbid(iAtomNr  ,iFrg)
