@@ -1,4 +1,4 @@
-! Winteracter module created : 24/Sep/2001 16:15:08
+! Winteracter module created : 25/Sep/2001 16:11:20
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -369,7 +369,7 @@
           INTEGER, PARAMETER :: IDF_Indexing_MinVol             =  1003
           INTEGER, PARAMETER :: IDF_Indexing_MaxVol             =  1328
           INTEGER, PARAMETER :: IDF_Indexing_MinLen             =  1329
-          INTEGER, PARAMETER :: IDF_Indexing_MaxLen             =  1330
+          INTEGER, PARAMETER :: IDF_Indexing_Maxc               =  1194
           INTEGER, PARAMETER :: IDF_Indexing_MinAng             =  1331
           INTEGER, PARAMETER :: IDF_Indexing_MaxAng             =  1332
           INTEGER, PARAMETER :: IDF_Indexing_Min                =  1333
@@ -385,7 +385,7 @@
           INTEGER, PARAMETER :: IDF_Indexing_MolWt              =  1344
           INTEGER, PARAMETER :: IDF_Indexing_Fom_Label          =  1345
           INTEGER, PARAMETER :: IDF_Indexing_Fom                =  1346
-          INTEGER, PARAMETER :: IDF_Indexing_UseErrors          =  1347
+          INTEGER, PARAMETER :: IDF_Indexing_Maxa               =  1173
           INTEGER, PARAMETER :: IDF_Indexing_zpt                =  1349
           INTEGER, PARAMETER :: IDF_Indexing_exp                =  1350
           INTEGER, PARAMETER :: IDD_License_Dialog              =   154
@@ -449,9 +449,6 @@
           INTEGER, PARAMETER :: IDAPPLY                         =  1227
           INTEGER, PARAMETER :: IDF_Preview                     =  1230
           INTEGER, PARAMETER :: IDF_ZeroPoint                   =  1231
-          INTEGER, PARAMETER :: IDD_AddWavelengthToXYE          =   146
-          INTEGER, PARAMETER :: IDF_REAL3                       =  1232
-          INTEGER, PARAMETER :: IDF_LABEL3                      =  1233
           INTEGER, PARAMETER :: ID_Home                         = 40009
           INTEGER, PARAMETER :: ID_Right                        = 40012
           INTEGER, PARAMETER :: ID_Down                         = 40015
@@ -469,4 +466,13 @@
           INTEGER, PARAMETER :: IDD_XYE                         =   130
           INTEGER, PARAMETER :: IDF_wavelength                  =  1100
           INTEGER, PARAMETER :: IDF_RunDICVOL                   =  1101
+          INTEGER, PARAMETER :: IDF_Indexing_CellRange2         =  1338
+          INTEGER, PARAMETER :: IDF_Indexing_MinLen2            =  1348
+          INTEGER, PARAMETER :: IDF_Indexing_Maxb               =  1174
+          INTEGER, PARAMETER :: IDF_Indexing_CellRange3         =  1352
+          INTEGER, PARAMETER :: IDF_Indexing_MinLen3            =  1353
+          INTEGER, PARAMETER :: IDF_LABEL15                     =  1138
+          INTEGER, PARAMETER :: IDF_RADIO1                      =  1140
+          INTEGER, PARAMETER :: IDF_Indexing_UseErrors          =  1142
+          INTEGER, PARAMETER :: IDF_eps                         =  1172
       END MODULE Druid_Header

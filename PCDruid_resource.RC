@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 24/Sep/2001 16:15:08
+// Modified : 25/Sep/2001 16:11:20
 //
 ///////////////////////////////////////////////////
 //
@@ -382,7 +382,7 @@
 #define IDF_Indexing_MinVol              1003
 #define IDF_Indexing_MaxVol              1328
 #define IDF_Indexing_MinLen              1329
-#define IDF_Indexing_MaxLen              1330
+#define IDF_Indexing_Maxc                1194
 #define IDF_Indexing_MinAng              1331
 #define IDF_Indexing_MaxAng              1332
 #define IDF_Indexing_Min                 1333
@@ -398,7 +398,7 @@
 #define IDF_Indexing_MolWt               1344
 #define IDF_Indexing_Fom_Label           1345
 #define IDF_Indexing_Fom                 1346
-#define IDF_Indexing_UseErrors           1347
+#define IDF_Indexing_Maxa                1173
 #define IDF_Indexing_zpt                 1349
 #define IDF_Indexing_exp                 1350
 #define IDD_License_Dialog                154
@@ -462,9 +462,6 @@
 #define IDAPPLY                          1227
 #define IDF_Preview                      1230
 #define IDF_ZeroPoint                    1231
-#define IDD_AddWavelengthToXYE            146
-#define IDF_REAL3                        1232
-#define IDF_LABEL3                       1233
 #define ID_Home                         40009
 #define ID_Right                        40012
 #define ID_Down                         40015
@@ -482,6 +479,15 @@
 #define IDD_XYE                           130
 #define IDF_wavelength                   1100
 #define IDF_RunDICVOL                    1101
+#define IDF_Indexing_CellRange2          1338
+#define IDF_Indexing_MinLen2             1348
+#define IDF_Indexing_Maxb                1174
+#define IDF_Indexing_CellRange3          1352
+#define IDF_Indexing_MinLen3             1353
+#define IDF_LABEL15                      1138
+#define IDF_RADIO1                       1140
+#define IDF_Indexing_UseErrors           1142
+#define IDF_eps                          1172
 
 ///////////////////////////////////////////////////
 //
@@ -1865,49 +1871,59 @@ BEGIN
 ,0
 END
 
-IDD_Index_Preparation DIALOG 0, 0,  337,  230
+IDD_Index_Preparation DIALOG 0, 0,  339,  230
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Create indexing files"
 BEGIN
-    CONTROL "Information",IDF_Indexing_Info,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   10,    4,  312,   36
-    CONTROL "Systems to search",IDF_Indexing_Systems,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  196,   44,  126,   52
-    CONTROL "Cell Settings",IDF_Indexing_Cell,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   10,   44,  172,   96
+    CONTROL "Information",IDF_Indexing_Info,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,    4,  322,   36
+    CONTROL "Crystal systems to search",IDF_Indexing_Systems,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,    8,  146,  140,   52
+    CONTROL "Unit cell limits",IDF_Indexing_Cell,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,    8,   44,  140,   96
     CONTROL "This interface allows the user to produce simple DICVOL format output files. Values left as zero will  be treated as defaults. The user should edit the resultant file to set more complex settings.",IDF_Indexing_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   16,   16,  298,   16
-    CONTROL "Triclinic",IDF_Indexing_triclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  206,   60,   54,    8
-    CONTROL "Monoclinic",IDF_Indexing_Monoclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  206,   72,   54,    8
-    CONTROL "Orthorhombic",IDF_Indexing_Ortho,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  206,   84,   54,    8
-    CONTROL "Tetragonal",IDF_Indexing_tetra,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  266,   60,   52,    8
-    CONTROL "Hexagonal",IDF_Indexing_Hexa,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  266,   72,   52,    8
-    CONTROL "Cubic",IDF_Indexing_Cubic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  266,   84,   52,    8
-    CONTROL "0.0",IDF_Indexing_Lambda,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  282,  108,   36,   12
-    CONTROL "Wavelength (Å)",IDF_Indexing_Lamda_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  202,  112,   64,    8
-    CONTROL "Volume (cubic Å)",IDF_Indexing_Vol,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   14,   88,   56,    8
-    CONTROL "Cell length (Å)",IDF_Indexing_CellRange,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   14,  104,   56,    8
-    CONTROL "Cell Angle (deg.)",IDF_Indexing_CellAngle,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   14,  120,   56,    8
-    CONTROL "Minimum",IDF_Indexing_Min,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   80,   72,   40,    8
-    CONTROL "Maximum",IDF_Indexing_Max,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  132,   72,   40,    8
-    CONTROL "0.0",IDF_Indexing_MinVol,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   80,   84,   40,   14
-    CONTROL "3000.0",IDF_Indexing_MaxVol,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,   84,   40,   14
-    CONTROL "0.0",IDF_Indexing_MinLen,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   80,  100,   40,   14
-    CONTROL "30.0",IDF_Indexing_MaxLen,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  100,   40,   14
-    CONTROL "90.0",IDF_Indexing_MinAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   80,  116,   40,   14
-    CONTROL "125.0",IDF_Indexing_MaxAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  116,   40,   14
+    CONTROL "Triclinic",IDF_Indexing_triclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  159,   54,    8
+    CONTROL "Monoclinic",IDF_Indexing_Monoclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  171,   54,    8
+    CONTROL "Orthorhombic",IDF_Indexing_Ortho,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  183,   54,    8
+    CONTROL "Tetragonal",IDF_Indexing_tetra,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   78,  159,   52,    8
+    CONTROL "Hexagonal",IDF_Indexing_Hexa,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   78,  171,   52,    8
+    CONTROL "Cubic",IDF_Indexing_Cubic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   78,  183,   52,    8
+    CONTROL "1.5406",IDF_Indexing_Lambda,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  244,   99,   36,   12
+    CONTROL "Wavelength / Å",IDF_Indexing_Lamda_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  164,  103,   64,    8
+    CONTROL "Volume / Å",IDF_Indexing_Vol,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   18,   66,   45,    8
+    CONTROL "c / Å",IDF_Indexing_CellRange,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,  108,   45,    8
+    CONTROL "ß /",IDF_Indexing_CellAngle,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,  121,   45,    8
+    CONTROL "Minimum",IDF_Indexing_Min,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   65,   45,   30,    8
+    CONTROL "Maximum",IDF_Indexing_Max,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  106,   45,   32,    8
+    CONTROL "0.0",IDF_Indexing_MinVol,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   65,   62,   30,   14
+    CONTROL "3000.0",IDF_Indexing_MaxVol,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,   62,   35,   14
+    CONTROL "0.0",IDF_Indexing_MinLen,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   65,  104,   30,   14
+    CONTROL "30.0",IDF_Indexing_Maxc,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,  104,   35,   14
+    CONTROL "90.0",IDF_Indexing_MinAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   65,  118,   30,   14
+    CONTROL "125.0",IDF_Indexing_MaxAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,  118,   35,   14
     CONTROL "Save DICVOL File ...",ID_Indexing_Create,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  123,  208,   82,   14
     CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  227,  208,   40,   14
-    CONTROL "Chemistry (Optional)",IDF_Indexing_chemgroup,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  148,  172,   48
-    CONTROL "Other Settings (optional)",IDF_Indexing_Misc,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  196,  148,  126,   48
-    CONTROL "Measured density of compound",IDF_Indexing_Density_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,  164,  114,    8
-    CONTROL "Molecular weight of formula unit (a.m.u.)",IDF_Indexing_MolWt_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   12,  180,  116,    8
-    CONTROL "0.0",IDF_Indexing_Density,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  160,   40,   12
-    CONTROL "0.0",IDF_Indexing_MolWt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  176,   40,   12
-    CONTROL "Minimum figure-of-merit",IDF_Indexing_Fom_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  200,  164,   74,    8
-    CONTROL "0.0",IDF_Indexing_Fom,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  290,  160,   28,   12
-    CONTROL "Use errors from DASH",IDF_Indexing_UseErrors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  200,  180,  118,    8
-    CONTROL "Experimental zero-point",IDF_Indexing_zpt,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  202,  128,   76,    8
-    CONTROL "0.0",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  282,  124,   36,   12
-    CONTROL "Experimental Details",IDF_Indexing_exp,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  196,  100,  126,   40
+    CONTROL "Chemistry (Optional)",IDF_Indexing_chemgroup,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  158,   44,  172,   40
+    CONTROL "Other Settings (optional)",IDF_Indexing_Misc,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  158,  169,  172,   28
+    CONTROL "Measured density of compound",IDF_Indexing_Density_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  162,   57,  114,    8
+    CONTROL "Molecular weight of formula unit (a.m.u.)",IDF_Indexing_MolWt_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  162,   71,  116,    8
+    CONTROL "0.0",IDF_Indexing_Density,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  282,   53,   40,   12
+    CONTROL "0.0",IDF_Indexing_MolWt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  282,   68,   40,   12
+    CONTROL "Minimum figure-of-merit",IDF_Indexing_Fom_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  167,  183,   74,    8
+    CONTROL "5.0000",IDF_Indexing_Fom,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  252,  180,   28,   12
+    CONTROL "Experimental zero-point",IDF_Indexing_zpt,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  164,  118,   76,    8
+    CONTROL "0.0",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  244,  114,   36,   12
+    CONTROL "Experimental Details",IDF_Indexing_exp,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  158,   90,  172,   72
     CONTROL "Run DICVOL",IDF_RunDICVOL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   40,  208,   60,   14
+    CONTROL "3",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   52,   62,    4,    8
+    CONTROL "a / Å",IDF_Indexing_CellRange2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,   80,   45,    8
+    CONTROL "0.0",IDF_Indexing_MinLen2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   65,   76,   30,   14
+    CONTROL "30.0",IDF_Indexing_Maxa,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,   76,   35,   14
+    CONTROL "b / Å",IDF_Indexing_CellRange3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,   94,   45,    8
+    CONTROL "0.0",IDF_Indexing_MinLen3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   65,   90,   30,   14
+    CONTROL "30.0",IDF_Indexing_Maxb,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,   90,   35,   14
+    CONTROL "o",IDF_LABEL15,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   28,  118,    4,    8
+    CONTROL "Use fixed error",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  165,  130,   71,   14
+    CONTROL "Use errors from DASH",IDF_Indexing_UseErrors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  165,  144,   82,   14
+    CONTROL "0.30000E-01",IDF_eps,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  244,  130,   36,   13
 END
 
 IDD_Index_Preparation RCDATA
@@ -1919,17 +1935,25 @@ BEGIN
 " 1314 1 \n"
 " 1315 1 \n"
 " 1316 1 \n"
-" 1347 0 \n"
+" 1140 1 \n"
+" 1142 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
-" 1324      0.0000          0.34028E+039 \n"
+" 1324     0.10000E-003      20.000      \n"
 " 1003      0.0000          0.34028E+039 \n"
 " 1328      0.0000          0.34028E+039 \n"
 " 1329      0.0000          0.34028E+039 \n"
-" 1330      0.0000          0.34028E+039 \n"
+" 1194      0.0000          0.34028E+039 \n"
 " 1331      0.0000          0.34028E+039 \n"
 " 1332      0.0000          0.34028E+039 \n"
+" 1346      1.0000           10000.      \n"
+" 1231     -1.0000           1.0000      \n"
+" 1348      0.0000          0.34028E+039 \n"
+" 1173      0.0000          0.34028E+039 \n"
+" 1353      0.0000          0.34028E+039 \n"
+" 1174      0.0000          0.34028E+039 \n"
+" 1172      0.0000           1.0000      \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
@@ -2287,30 +2311,6 @@ BEGIN
 "[Ranges] \n"
 " 1211               1             100 \n"
 " 1212               1             500 \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_AddWavelengthToXYE DIALOG 0, 0,  205,   88
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
-FONT    8, "MS Sans Serif"
-CAPTION "Add Wavelength to .xye"
-BEGIN
-    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   64,   40,   14
-    CONTROL "0.0",IDF_REAL3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  130,   48,   40,   14
-    CONTROL "Experimental wavelength (Angstrom)",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    8,   50,  116,    8
-    CONTROL "Please enter the experimental wavelength with which this powder diffraction pattern was recorded. This wavelength will then be written to the first line of the .xye file and read in whenever this file is opened.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   14,    8,  178,   36
-END
-
-IDD_AddWavelengthToXYE RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
