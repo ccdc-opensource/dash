@@ -1,143 +1,3 @@
-!//////////////////////////////////////////////////////////////////////////
-! Routines for reading and writing a 'DSL' file. This file contains
-! The additional data that is part of the Winteracter front end: Namely
-! A list of the peak positions, the shape/asymmetry parameters, 
-! radiation type/wavelength etc.
-!
-!//////////////////////////////////////////////////////////////////////////
-      SUBROUTINE GETDSL(FileName,LenFn,Ierr)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-
-      CHARACTER*(*), INTENT (IN   ) :: FileName
-      INTEGER,       INTENT (IN   ) :: LenFn
-      INTEGER,       INTENT (  OUT) :: Ierr
-
-      CHARACTER*128 line
-      CHARACTER*3   KeyChar
-      INTEGER       Idum, nl
-      REAL          Temp
-      INTEGER       Itemp
-      INTEGER I, hFile
-
-      Ierr = 0
-! Open the file
-      hFile = 77
-      OPEN (UNIT=hFile, FILE=FileName(1:LenFn), STATUS='OLD', ERR=999)
-! Loop over all records
-      DO WHILE ( .TRUE. )
- 10     READ(hFile,'(A)',END=100,ERR=999) line
-        nl = LEN_TRIM(line)
-        CALL ILowerCase(line(:nl))
-        CALL INextString(line,keychar)
-        SELECT CASE(KeyChar(1:LEN_TRIM(keychar)))
-          CASE ('rad')
-            I = InfoError(1) ! reset the errors
-! Read the wavelength
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999
-            CALL INextInteger(line,itemp)
-            IF (InfoError(1) .EQ. 0) THEN
-              JRadOption = itemp
-            ELSE
-! default = X-ray lab data
-              JRadOption = 1
-            END IF
-            CALL Upload_Source
-! Now we know all there is to know about the wavelength and source: update it
-            CALL Set_Wavelength(Temp)
-          CASE ('zer')
-! Zero point
-            I = InfoError(1) ! reset the errors
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999
-            ZeroPoint = Temp
-            CALL Upload_ZeroPoint
-          CASE ('sli')
-! Pawley SLIM parameter
-            I = InfoError(1) ! reset the errors
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999                          
-            SlimValue = Temp 
-            CALL WDialogSelect(IDD_Pawley_Status)
-            CALL WDialogPutReal(IDF_Slim_Parameter,Temp,'(F7.3)')
-          CASE ('sca')
-            I = InfoError(1) ! reset the errors
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999                          
-            ScalFac = Temp        
-        END SELECT
-      END DO       
- 100  CONTINUE
-      BACKREF = .FALSE.
-      CLOSE(77)
-      RETURN
-! Error if we get here
-  999 Ierr = 1
-      CLOSE(77,IOSTAT=IDUM)
-
-      END SUBROUTINE GETDSL
-!
-!*****************************************************************************
-!
-      INTEGER FUNCTION WRTDSL(FileName,LenFn)
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'GLBVAR.INC'
-
-      CHARACTER*(*) FileName
-      INTEGER       LenFn, Idum
-
-      REAL              PkFnVal,                      PkFnEsd,                      &
-                        PkFnCal,                                                    &
-                        PkFnVarVal,                   PkFnVarEsd,                   &
-                        PkAreaVal,                    PkAreaEsd,                    &
-                        PkPosVal,                     PkPosEsd,                     &
-                        PkPosAv
-      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
-                        PkFnCal(MPkDes,Max_NPFR),                                   &
-                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
-                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
-                        PkPosAv(MAX_NPFR)
-
-! Initialise to error      
-      WRTDSL = 1
-      OPEN (UNIT = 77,FILE=FileName(1:LenFn),STATUS='UNKNOWN',ERR=999)
-      WRITE(77,*,ERR=999)'! Radiation wavelength and data type'
-      WRITE(77,'(A3,1X,F10.5,I2)',ERR=999) 'rad', ALambda, JRadOption
-      WRITE(77,*,ERR=999)'! Sigma shape parameters: format sigma1 esd sigma2 esd'
-      WRITE(77,100,ERR=999) 'sig',PkFnVarVal(1,1),PkFnVarEsd(1,1),PkFnVarVal(2,1),PkFnVarEsd(2,1)
-      WRITE(77,*,ERR=999)'! Gamma shape parameters: format gamma1 esd gamma2 esd'
-      WRITE(77,100,ERR=999) 'gam',PkFnVarVal(1,2),PkFnVarEsd(1,2),PkFnVarVal(2,2),PkFnVarEsd(2,2)
-      WRITE(77,*,ERR=999)'! Asymmetry parameters: format HPSL esd HMSL esd'
-      WRITE(77,100,ERR=999) 'asy',PkFnVarVal(1,3),PkFnVarEsd(1,3),PkFnVarVal(1,4),PkFnVarEsd(1,4)
-      WRITE(77,*,ERR=999)'! Calculated zero point'
-      WRITE(77,110,ERR=999) 'zer',ZeroPoint
-      WRITE(77,*,ERR=999)'! Pawley-fit SLIM parameter setting'
-      WRITE(77,110,ERR=999) 'sli',SLIMVALUE
-      WRITE(77,*,ERR=999)'! Pawley-fit Scale factor setting'
-      WRITE(77,110,ERR=999) 'sca',SCALFAC
-  100 FORMAT(A3,1X,4(F10.4,1X))
-  110 FORMAT(A3,1X,F10.4)
-      CLOSE(77)
-      WRTDSL = 0
-      RETURN
-! Error if we get here
-  999 CALL ErrorMessage('Error while writing .dsl file.')
-      CLOSE(77,IOSTAT=IDUM)
-
-      END FUNCTION WRTDSL
 !
 !*****************************************************************************
 !
@@ -308,7 +168,7 @@
 ! Set the crystal system
           LatBrav = GetCrystalSystem(NumberSGTable)
           CALL Upload_CrystalSystem
-          CALL FillSymmetry()
+          CALL FillSymmetry
         CASE ('paw')
           CALL INextReal(line,PAWLEYCHISQ)
       END SELECT
@@ -351,6 +211,91 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE GETDSL(FileName,LenFn,Ierr)
+! Routines for reading a 'DSL' file. This file contains
+! The additional data that is part of the Winteracter front end: Namely
+! radiation type/wavelength etc.
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+
+      CHARACTER*(*), INTENT (IN   ) :: FileName
+      INTEGER,       INTENT (IN   ) :: LenFn
+      INTEGER,       INTENT (  OUT) :: Ierr
+
+      CHARACTER*128 line
+      CHARACTER*3   KeyChar
+      INTEGER       Idum, nl
+      REAL          Temp
+      INTEGER       Itemp
+      INTEGER I, hFile
+
+      Ierr = 0
+! Open the file
+      hFile = 77
+      OPEN (UNIT=hFile, FILE=FileName(1:LenFn), STATUS='OLD', ERR=999)
+! Loop over all records
+      DO WHILE ( .TRUE. )
+ 10     READ(hFile,'(A)',END=100,ERR=999) line
+        nl = LEN_TRIM(line)
+        CALL ILowerCase(line(:nl))
+        CALL INextString(line,keychar)
+        SELECT CASE(KeyChar(1:LEN_TRIM(keychar)))
+          CASE ('rad')
+            I = InfoError(1) ! reset the errors
+! Read the wavelength
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999
+            CALL INextInteger(line,itemp)
+            IF (InfoError(1) .EQ. 0) THEN
+              JRadOption = itemp
+            ELSE
+! default = X-ray lab data
+              JRadOption = 1
+            END IF
+            CALL Upload_Source
+! Now we know all there is to know about the wavelength and source: update it
+            CALL Set_Wavelength(Temp)
+          CASE ('zer')
+! Zero point
+            I = InfoError(1) ! reset the errors
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999
+            ZeroPoint = Temp
+            CALL Upload_ZeroPoint
+          CASE ('sli')
+! Pawley SLIM parameter
+            I = InfoError(1) ! reset the errors
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            SlimValue = Temp 
+            CALL WDialogSelect(IDD_Pawley_Status)
+            CALL WDialogPutReal(IDF_Slim_Parameter,Temp,'(F7.3)')
+          CASE ('sca')
+            I = InfoError(1) ! reset the errors
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            ScalFac = Temp        
+        END SELECT
+      END DO       
+ 100  CONTINUE
+      BACKREF = .FALSE.
+      CLOSE(77)
+      RETURN
+! Error if we get here
+  999 Ierr = 1
+      CLOSE(77,IOSTAT=IDUM)
+
+      END SUBROUTINE GETDSL
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION GETTIC(TheFileName)
 !
 ! Reads the tick mark file (h, k, l, 2theta and d* per reflection)
@@ -382,6 +327,169 @@
  999  RETURN
 
       END FUNCTION GETTIC
+!
+!*****************************************************************************
+!
+      SUBROUTINE GETHCV(FILENAM,lenfil,ier)
+
+      USE ATMVAR
+      USE REFVAR
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: FILENAM
+      INTEGER,       INTENT (IN   ) :: lenfil
+      INTEGER,       INTENT (  OUT) :: ier
+
+      INCLUDE 'PARAMS.INC'
+
+      CHARACTER*150 LINE
+      INTEGER ICOR(20), NKKOR(MCHIHS)
+      REAL WTI(MFCSTO)
+
+      INTEGER         MAXK
+      REAL                  FOB
+      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
+
+      INTEGER         NLGREF
+      LOGICAL                 LOGREF
+      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
+
+      INTEGER         KKOR
+      REAL                  WTIJ
+      INTEGER                             IKKOR,         JKKOR
+      COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
+
+      INTEGER KK, I, NPO, NLIN, NCOR, IR, II, JJ, IK, MINCOR, KL
+
+      OPEN (121,FILE=FILENAM(:Lenfil),STATUS='OLD',ERR=998)
+      KK = 0
+      KKOR = 0
+      MINCOR = 20
+      IER = 0
+      READ (121,2121,END=998,ERR=998) NLIN, LINE
+ 2121 FORMAT (Q,A)
+      DO I = NLIN, 1, -1
+        IF (LINE(I:I).EQ.'.') THEN
+          NPO = I
+          GOTO 11
+        ENDIF
+      ENDDO
+   11 NCOR = 0
+      DO I = NPO + 1, NLIN
+        IF ((LINE(I-1:I-1).EQ.' ') .AND. (LINE(I:I).NE.' ')) THEN
+          NCOR = NCOR + 1
+        ENDIF
+      ENDDO
+      NCOR = NCOR - 1
+      BACKSPACE (121)
+      DO IR = 1, MFCSTO
+        READ (121,*,END=100,ERR=998) (iHKL(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (ICOR(I),I=1,NCOR)
+        KK = IR
+!
+!.. Now work out which terms should be kept for the chi-squared calculation
+!
+        KKOR = KKOR + 1
+        IKKOR(KKOR) = IR
+        JKKOR(KKOR) = IR
+        NKKOR(KKOR) = 100
+        DO I = 1, NCOR
+          IF (ABS(ICOR(I)).GE.MINCOR) THEN
+            KKOR = KKOR + 1
+            IKKOR(KKOR) = IR
+            JKKOR(KKOR) = IR + I
+            NKKOR(KKOR) = ICOR(I)
+          ENDIF
+        ENDDO
+      ENDDO
+  100 MAXK = KK
+      DO IK = 1, KKOR
+        II = IKKOR(IK)
+        JJ = JKKOR(IK)
+        IF (II.EQ.JJ) THEN
+          WTIJ(IK) = WTI(II) * WTI(JJ)
+        ELSE
+          WTIJ(IK) = 0.02*WTI(II)*WTI(JJ)*FLOAT(NKKOR(IK))
+        ENDIF
+      ENDDO
+      GOTO 999
+  998 ier = 1
+  999 CLOSE (121)
+
+      END SUBROUTINE GETHCV
+!
+!*****************************************************************************
+!
+      SUBROUTINE GETPIK(FILE,lenfil,ier)
+
+      USE VARIABLES
+      
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: FILE
+      INTEGER,       INTENT (IN   ) :: lenfil
+      INTEGER,       INTENT (  OUT) :: ier
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NFITA, IFITA
+      REAL                                 WTSA
+      COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      INTEGER         KNIPT
+      REAL                            PIKVAL
+      COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
+
+      INTEGER         KREFT
+      COMMON /FPINF2/ KREFT(MOBS)
+
+      INTEGER I, J, K
+      INTEGER tKNIPT(1:500)
+      REAL tPIKVAL(1:500)
+      LOGICAL WrongValuesPresent
+      INTEGER KTEM
+
+      WrongValuesPresent = .FALSE.
+      ier = 0
+      OPEN (21,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998)
+      NFITA = 0
+      NBIN = 0
+      DO I = 1, MOBS
+        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
+! JvdS Rather a serious error here, I think. KTEM can be as much as 70.
+! Some of the reflections contribute 0.000000E+00 ???
+        IF (KTEM .GT. 50) WrongValuesPresent = .TRUE.
+        KREFT(I) = MIN(50,KTEM)
+        NBIN = NBIN + 1
+        WTSA(I) = 1.0/EBIN(I)**2
+        IF (KTEM.GT.0) THEN
+          READ (21,*,ERR=998) (tKNIPT(K),tPIKVAL(K),K=1,KTEM)
+          DO j = 1, MIN(50,KTEM)
+            KNIPT(j,I)  = tKNIPT(j)
+            PIKVAL(j,I) = tPIKVAL(j)
+          ENDDO
+          NFITA = NFITA + 1
+          IFITA(NFITA) = I
+        ENDIF
+      ENDDO
+  200 CONTINUE
+      CLOSE (21)
+      CALL Clear_BackGround
+! During the SA, only profile points that have peak contributions are calculated (there is no background
+! any more at this stage). Therefore, YCBIN must be initialised to zero's
+      YCBIN = 0.0
+      NoData = .FALSE.
+      CALL GetProfileLimits
+      IF (WrongValuesPresent) CALL DebugErrorMessage('>50 contributing reflections encountered at least once.')
+      RETURN
+  998 ier = 1
+      CLOSE (21)
+
+      END SUBROUTINE GETPIK
 !
 !*****************************************************************************
 !
