@@ -1,4 +1,4 @@
-! Winteracter module created : 02/Apr/2003 16:12:32
+! Winteracter module created : 02/Apr/2003 17:07:33
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -659,4 +659,6 @@
           INTEGER, PARAMETER :: IDR_ITF                         =  1507
           INTEGER, PARAMETER :: IDR_INTCHI                      =  1510
           INTEGER, PARAMETER :: IDR_PROCHI                      =  1511
+          INTEGER, PARAMETER :: IDB_Calculate                   =  1512
+          INTEGER, PARAMETER :: IDB_Compare                     =  1514
       END MODULE Druid_Header

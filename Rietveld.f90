@@ -198,6 +198,15 @@
       RR_ioptITF = 0
       RR_ioptPO = 0
       CALL RRVAR2Dialog
+      IF (PrefParExists) THEN
+        CALL WDialogFieldState(IDC_PO,Enabled)
+        CALL WDialogFieldState(IDR_PO,Enabled)
+      ELSE
+        CALL WDialogFieldState(IDC_PO,Disabled)
+        CALL WDialogFieldState(IDR_PO,Disabled)
+      ENDIF
+      ! Initialise PO
+      IF (PrefParExists) CALL PO_PRECFC(RR_Params(RR_var2PO))
       ! Initialise ITF
       CALL CreateFobITF
       ! Initialise XATO(1:3,1:150)
@@ -221,6 +230,7 @@
       USE VARIABLES
       USE RRVAR
       USE SOLVAR
+      USE PO_VAR
 
       IMPLICIT NONE      
 
@@ -238,6 +248,7 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
       INTEGER I, J
+      REAL ChiSqd, ChiProSqd 
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
@@ -246,6 +257,19 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_Refine)
               CALL RietveldRefinement
+            CASE (IDB_Calculate)
+              CALL Dialog2RRVAR
+              ! Initialise PO
+              IF (PrefParExists) CALL PO_PRECFC(RR_Params(RR_var2PO))
+              ! Initialise ITF
+              CALL CreateFobITF
+              ! Initialise XATO(1:3,1:150)
+              CALL RR_MAKEFRAC
+              CALL RR_VALCHI(ChiSqd)
+              CALL VALCHIPRO(ChiProSqd)
+              CALL Profile_Plot
+              CALL WDialogPutReal(IDR_INTCHI, ChiSqd, "(F9.2)")
+              CALL WDialogPutReal(IDR_PROCHI, ChiProSqd, "(F9.2)")
             CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide
             CASE (IDB_View)

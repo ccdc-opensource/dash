@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 02/Apr/2003 16:12:32
+// Modified : 02/Apr/2003 17:07:33
 //
 ///////////////////////////////////////////////////
 //
@@ -672,6 +672,8 @@
 #define IDR_ITF                          1507
 #define IDR_INTCHI                       1510
 #define IDR_PROCHI                       1511
+#define IDB_Calculate                    1512
+#define IDB_Compare                      1514
 
 ///////////////////////////////////////////////////
 //
@@ -4000,6 +4002,9 @@ BEGIN
     CONTROL "Profile chi-sqrd",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  384,  174,   80,    8
     CONTROL "0.0",IDR_INTCHI,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  466,  155,   40,   14
     CONTROL "0.0",IDR_PROCHI,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  466,  172,   40,   14
+    CONTROL "Calculate",IDB_Calculate,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  224,  152,   40,   14
+    CONTROL "Save...",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  275,  152,   40,   14
+    CONTROL "Compare",IDB_Compare,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  324,  152,   40,   14
 END
 
 IDD_Rietveld2 RCDATA
