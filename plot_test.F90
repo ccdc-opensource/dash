@@ -76,6 +76,8 @@
 !
 !   open the plotting window, ihandle is the window's unique identifier
 !     
+      Iz = Iz-4
+      filename = grid_buffer(1:Iz)//'.pro'
       CALL WindowOpenChild(iHandle, x=10, y=450, width=800, height=400, title=filename)
       IF (iHandle.EQ.-1) THEN
         CALL ErrorMessage("Exceeded maximum number of allowed windows.  Close a profile window.")
@@ -87,9 +89,7 @@
 !
 !   open the file
 !     
-      Iz = Iz-4
       tFileHandle = 10
-      filename = grid_buffer(1:Iz)//'.pro'
       OPEN(UNIT=tFileHandle,FILE=filename,status='unknown',ERR=999)
       DO I = 1, NBIN
         READ(tFileHandle,12,END=999,ERR=999) tReal1, tReal2, store_ycalc(I,ihandle), tReal3
