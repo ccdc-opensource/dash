@@ -37,6 +37,8 @@
 
       INTEGER I, IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption
 
+      LOGICAL, EXTERNAL :: Get_AutoAlign
+
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
       SELECT CASE (EventType)
@@ -146,37 +148,49 @@
       DO iRow = 1, NumOf_SA_Runs
         CALL WGridGetCellCheckBox(IDF_SA_summary,6,iRow,iStatus)
         IF (iStatus .EQ. 1) THEN
+          IF (Get_AutoAlign()) THEN
+            CALL WarningMessage('Simulated Annealing performed with Auto Align active.'//CHAR(13)// & 
+            'Cannot proceed with Restart.')
+            CALL WGridPutCellCheckBox(IDF_SA_Summary,6,iRow,Unchecked)         
+          ELSE
 ! Close "Save Solutions" window which may be up
-          CALL WDialogSelect(IDD_OutputSolutions)
-          CALL WDialogHide
-          CALL WDialogSelect(IDD_SAW_Page5)
-          CALL WGridPutCellCheckBox(IDF_SA_Summary,6,iRow,Unchecked)
+            CALL WDialogSelect(IDD_OutputSolutions)
+            CALL WDialogHide
+            CALL WDialogSelect(IDD_SAW_Page5)
+            CALL WGridPutCellCheckBox(IDF_SA_Summary,6,iRow,Unchecked)
 ! Fill SA Parameter Bounds Wizard Window with the values from this solution.
 !O         CALL WDialogSelect(IDD_SA_input2)
-          CALL WDialogSelect(IDD_SA_Modal_input2)
-          DO IV = 1, NVAR
-            CALL WGridPutCellReal(IDF_parameter_grid_modal,1,IV,BestValuesDoF(IV,iSol2Run(iRow)))
-          ENDDO
+            CALL WDialogSelect(IDD_SA_Modal_input2)
+            DO IV = 1, NVAR
+              CALL WGridPutCellReal(IDF_parameter_grid_modal,1,IV,BestValuesDoF(IV,iSol2Run(iRow)))
+            ENDDO
 ! Untick "Randomise initial values"
-          CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal,.FALSE.)
-          CALL ShowWizardWindowParameterBounds
-          CALL PopActiveWindowID
-          RETURN
+            CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal,.FALSE.)
+            CALL ShowWizardWindowParameterBounds
+            CALL PopActiveWindowID
+            RETURN
+          ENDIF
         ENDIF
       ENDDO
 ! Rietveld refinement
       DO iRow = 1, NumOf_SA_Runs
         CALL WGridGetCellCheckBox(IDF_SA_summary,7,iRow,iStatus)
         IF (iStatus .EQ. 1) THEN
+          IF (Get_AutoAlign()) THEN
+           CALL WarningMessage('Simulated Annealing performed with Auto Align active.'//CHAR(13)// & 
+           'Cannot proceed with Rietveld.')
+           CALL WGridPutCellCheckBox(IDF_SA_Summary,7,iRow,Unchecked)
+         ELSE
 ! Close "Save Solutions" window which may be up
-          CALL WDialogSelect(IDD_OutputSolutions)
-          CALL WDialogHide
-          CALL WDialogSelect(IDD_SAW_Page5)
-          CALL WGridPutCellCheckBox(IDF_SA_Summary,7,iRow,Unchecked)
-          CALL WDialogHide
-          CALL ShowWindowRietveld(iSol2Run(iRow))
-          CALL PopActiveWindowID
-          RETURN
+           CALL WDialogSelect(IDD_OutputSolutions)
+           CALL WDialogHide
+           CALL WDialogSelect(IDD_SAW_Page5)
+           CALL WGridPutCellCheckBox(IDF_SA_Summary,7,iRow,Unchecked)
+           CALL WDialogHide
+           CALL ShowWindowRietveld(iSol2Run(iRow))
+           CALL PopActiveWindowID
+           RETURN
+          ENDIF
         ENDIF
       ENDDO
       CALL PopActiveWindowID

@@ -1472,6 +1472,8 @@
       INTEGER ipos
       INTEGER, EXTERNAL :: WriteSAParametersToFile
       INTEGER tMaxRuns, tFieldState
+      LOGICAL, EXTERNAL :: Get_AutoAlign
+
 
 ! We are now on window number 3
       CALL PushActiveWindowID
@@ -1485,6 +1487,10 @@
 !!O              CALL WizardWindowShow(IDD_SA_input2)
               CALL WizardWindowShow(IDD_SA_Modal_input2)
             CASE (IDB_SA3_finish) ! 'Solve >' button
+              IF (Get_AutoAlign()) THEN
+                CALL WarningMessage('Auto Align is active. It will not be possible to Restart'//CHAR(13)// & 
+                'or Rietveld refine these solutions.')
+              ENDIF
 ! We've finished the SA input
               CALL WizardWindowHide
               CALL BeginSA
