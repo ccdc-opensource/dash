@@ -1624,7 +1624,7 @@
 !*****************************************************************************
 !
 ! Subroutine for controlling the configuration of the menus and tool buttons in DASH
-      SUBROUTINE SetModeMenuState(PeakOn,PawleyOn)
+      SUBROUTINE SetModeMenuState(PeakOn, PawleyOn)
 ! If PeakOn is positive then peak fitting will be enabled
 ! If PawleyOn is positive then Pawley fitting will be enabled
 ! If PeakOn is negative then peak fitting will be disabled
@@ -1639,10 +1639,6 @@
 
       INTEGER, INTENT (IN   ) :: PeakOn, PawleyOn
 
-      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                           ChiMult
-      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
-
       LOGICAL         InSA
       COMMON /SADATA/ InSA
 
@@ -1656,7 +1652,7 @@
       ELSE IF (PawleyOn .LT. 0) THEN
         CALL WMenuSetState(ID_Pawley_Refinement_Mode, ItemEnabled, WintOff)
       ENDIF
-      IF ((NumOf_SA_Runs .EQ. 0) .OR. InSA) THEN
+      IF (InSA) THEN
         CALL WMenuSetState(IDB_AnalyseSolutions, ItemEnabled, WintOff)
       ELSE
         CALL WMenuSetState(IDB_AnalyseSolutions, ItemEnabled, WintOn)
@@ -1684,7 +1680,7 @@
       CALL PushActiveWindowID
       IF (WMenuGetState(TheMode,ItemEnabled) .EQ. Disabled) THEN
         CALL DebugErrorMessage('Programming error: requested menu item is greyed out')
-        CALL WMenuSetState(TheMode,ItemEnabled,Enabled)
+        CALL WMenuSetState(TheMode, ItemEnabled, Enabled)
       ENDIF
 ! Update the status bar
       IF (TheMode .EQ. ID_Structure_Solution_Mode) THEN
