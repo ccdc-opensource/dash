@@ -86,16 +86,16 @@
         IF (Grid_ProfileChi .GT. ProfileChiSquared) THEN
           CALL WGridGetCellString(IDF_SA_Summary,1,I,Grid_Buffer)
           CALL WGridGetCellReal(IDF_SA_Summary,5,I,Grid_IntensityChi)
-          CALL WGridPutCellReal(IDF_SA_Summary,4,I+1,Grid_ProfileChi,'(f7.2)')
-          CALL WGridPutCellReal(IDF_SA_Summary,5,I+1,Grid_IntensityChi,'(f7.2)')
+          CALL WGridPutCellReal(IDF_SA_Summary,4,I+1,Grid_ProfileChi,'(F7.2)')
+          CALL WGridPutCellReal(IDF_SA_Summary,5,I+1,Grid_IntensityChi,'(F7.2)')
           CALL WGridPutCellString(IDF_SA_Summary,1,I+1,Grid_Buffer)   
         ELSE
           EXIT
         ENDIF
       ENDDO
       CALL WGridPutCellString(IDF_SA_Summary,1,I+1,PdbFileName(1:LEN_TRIM(PdbFileName)))
-      CALL WGridPutCellReal(IDF_SA_Summary,4,  I+1,ProfileChiSquared,'(f7.2)')
-      CALL WGridPutCellReal(IDF_SA_Summary,5,  I+1,IntensityChiSquared,'(f7.2)')
+      CALL WGridPutCellReal(IDF_SA_Summary,4,  I+1,ProfileChiSquared,'(F7.2)')
+      CALL WGridPutCellReal(IDF_SA_Summary,5,  I+1,IntensityChiSquared,'(F7.2)')
       CALL WDialogSelect(IDD_SA_Action1)
       WRITE(CNruns,'(I4)') SA_Run_Number + 1
       WRITE(CMruns,'(I4)') MaxRuns
@@ -137,16 +137,16 @@
       OPEN(unit=101, file=log_file(1:log_flen), status = 'unknown', err = 99)
       WRITE(101,*) 'File name,Profile Chi Squared,Intensity Chi Squared'
       DO I = 1, SA_Run_Number
-        CALL WGridGetCellReal(IDF_SA_Summary,3,I,Grid_ProfileChi)
+        CALL WGridGetCellReal(IDF_SA_Summary,4,I,Grid_ProfileChi)
         CALL WGridGetCellString(IDF_SA_Summary,1,I,Grid_Buffer)
-        CALL WGridGetCellReal(IDF_SA_Summary,4,I,Grid_IntensityChi)
+        CALL WGridGetCellReal(IDF_SA_Summary,5,I,Grid_IntensityChi)
         WRITE(101,10) Grid_Buffer(1:LEN_TRIM(Grid_Buffer)),Grid_ProfileChi,Grid_IntensityChi
-      END DO
+      ENDDO
  10   FORMAT(A,',',F10.4,',',F10.4)
       CLOSE (101)
  99   RETURN
  
-    END SUBROUTINE SaveMultiRun_LogData
+      END SUBROUTINE SaveMultiRun_LogData
 !
 !**********************************************************************
 !
