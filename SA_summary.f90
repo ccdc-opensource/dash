@@ -1,7 +1,7 @@
 !
 !*******************************************************************************
 !
-      SUBROUTINE DealWithSaSummary
+      SUBROUTINE DealWithAnalyseSolutionsWindow
 ! ep July 2001 
 ! Called from Begin_Sa subroutine.  Calls window which contains summary of
 ! results from simulated annealing run.  Handles messages from the window.
@@ -29,7 +29,7 @@
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
-      INTEGER RangeOption, I, iRow, iStatus
+      INTEGER I, iRow, iStatus, iLimit1, iLimit2, tInteger
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
@@ -56,6 +56,23 @@
               CALL Close_Chisq_Plot
               CALL PopActiveWindowID
               RETURN
+            CASE (IDB_Select)
+              CALL WDialogGetInteger(IDF_Limit1,iLimit1)
+              CALL WDialogGetInteger(IDF_Limit2,iLimit2)
+              IF (iLimit1 .GT. iLimit2) THEN
+                tInteger = iLimit2
+                iLimit2  = iLimit1
+                iLimit1  = tInteger
+              ENDIF
+              IF (iLimit2 .GT. NumOf_SA_Runs) iLimit2 = NumOf_SA_Runs
+              IF (iLimit1 .LT.             1) iLimit1 =             1
+              DO iRow = 1, NumOf_SA_Runs
+                IF ((iRow .GE. iLimit1) .AND. (iRow .LE. iLimit2)) THEN
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Checked)
+                ELSE
+                  CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iRow,Unchecked)
+                ENDIF
+              ENDDO
             CASE (IDF_InvertSelection)
               DO iRow = 1, NumOf_SA_Runs
                 CALL WGridGetCellCheckBox(IDF_SA_summary,3,iRow,istatus)
@@ -66,20 +83,9 @@
                 ENDIF
               ENDDO
             CASE (IDB_ShowOverlap)
-              CALL SA_STRUCTURE_OUTPUT_OVERLAP
+              CALL SA_STRUCTURE_OUTPUT_OVERLAP(IDD_SAW_Page5)
           END SELECT
         CASE (FieldChanged)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_ShowRange, IDF_ShowTicked)
-              CALL WDialogGetRadioButton(IDF_ShowRange,RangeOption)
-              IF (RangeOption .EQ. 1) THEN ! "Show Selected"
-                CALL WDialogFieldState(IDF_Limit1,Enabled)
-                CALL WDialogFieldState(IDF_Limit2,Enabled)
-              ELSE
-                CALL WDialogFieldState(IDF_Limit1,Disabled)
-                CALL WDialogFieldState(IDF_Limit2,Disabled)
-              ENDIF
-          END SELECT
       END SELECT
 !ep allows you to view pdb file of SA Solutions, each clicked
 !   check box in fresh mercury window
@@ -90,13 +96,13 @@
           CALL SA_STRUCTURE_OUTPUT_PDB(iRow)
           CALL ViewStructure('SA_best.pdb')
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
-          IF (.NOT. InSA) CALL organise_sa_result_data(iRow)
+          CALL organise_sa_result_data(iRow)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,2,iRow,Unchecked)
         ENDIF
       ENDDO
       CALL PopActiveWindowID
 
-      END SUBROUTINE DealWithSaSummary
+      END SUBROUTINE DealWithAnalyseSolutionsWindow
 !
 !*******************************************************************************
 !
@@ -178,7 +184,6 @@
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-      INTEGER ISB
       REAL xgcurold, ygcurold
 
       REAL, DIMENSION (20):: Ymin
