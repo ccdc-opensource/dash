@@ -194,9 +194,9 @@
       FILTER = 'All files (*.*)|*.*|'//&
                'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
-      tFileName = ' '
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
+      tFileName = ' '
       CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open Powder Diffraction File',IFTYPE)
 ! Did the user press cancel?
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) THEN
