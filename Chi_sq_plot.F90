@@ -39,6 +39,11 @@
 
       EXTERNAL DealWithChiSqdPlot
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) &
+        RETURN
       IF (ChiHandle .NE. -1) THEN
         CALL DebugErrorMessage('OpenChiSqPlotWindow() while ChiHandle .NE. -1')
         RETURN
