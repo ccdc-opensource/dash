@@ -84,9 +84,6 @@
       INTEGER ipcount
       LOGICAL, EXTERNAL :: SaveCSSR, SaveCCL
 
-!     ep added.  Following subroutine saves calculated and observed
-!     diffraction patterns in .pro file
-      CALL Sa_soln_store
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
       tSavePDB = SavePDB
