@@ -5,13 +5,14 @@
 
       USE VARIABLES
       USE ZMVAR
+      USE ATMVAR
 
       IMPLICIT NONE
 
       REAL*8 CHROM(*)
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
-      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
       INTEGER         NATOM
       REAL                   X
