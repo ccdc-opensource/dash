@@ -69,6 +69,7 @@
       INTEGER zmread
       INTEGER ifrg
       LOGICAL, EXTERNAL :: Confirm
+      CHARACTER*80 DirName, FileName
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -83,6 +84,38 @@
 ! Go to the next stage of the SA input
 ! Grey out 'Load DASH Pawley file' button on toolbar
               CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOff)
+! Initialise the 'Additional SA Parameters' dialogue
+              CALL WDialogSelect(IDD_SAW_Page2)
+! Set PO checkbox to 'Do not use preferred orientation'
+              CALL WDialogPutCheckBoxLogical(IDF_Use_PO,.FALSE.)
+              CALL WDialogFieldState(IDF_PO_a,Disabled)
+              CALL WDialogFieldState(IDF_PO_b,Disabled)
+              CALL WDialogFieldState(IDF_PO_c,Disabled)
+              CALL WDialogFieldState(IDF_LABELa,Disabled)
+              CALL WDialogFieldState(IDF_LABELb,Disabled)
+              CALL WDialogFieldState(IDF_LABELc,Disabled)
+              DO iFrg = 1, maxfrg
+                IF (gotzmfile(iFrg)) THEN
+! Its label
+                  CALL SplitPath(frag_file(iFrg),DirName,FileName)
+                  CALL WGridLabelRow(IDF_RotationsGrid,iFrg,FileName)
+! Initialise "None" | "Quaternions" | "Single axis" menu to quaternions
+                  CALL WGridPutCellOption(IDF_RotationsGrid,1,iFrg,2)
+! Ungrey all "a or alpha" fields
+                  CALL WGridStateCell(IDF_RotationsGrid,2,iFrg,Enabled)
+                  CALL WGridStateCell(IDF_RotationsGrid,3,iFrg,Enabled)
+                  CALL WGridStateCell(IDF_RotationsGrid,4,iFrg,Enabled)
+                ELSE
+! Its label
+                  CALL WGridLabelRow(IDF_RotationsGrid,iFrg,'')
+! Initialise "None" | "Quaternions" | "Single axis" menu to quaternions
+                  CALL WGridPutCellOption(IDF_RotationsGrid,1,iFrg,1)
+! Grey out all "a or alpha" fields
+                  CALL WGridStateCell(IDF_RotationsGrid,2,iFrg,DialogReadOnly)
+                  CALL WGridStateCell(IDF_RotationsGrid,3,iFrg,DialogReadOnly)
+                  CALL WGridStateCell(IDF_RotationsGrid,4,iFrg,DialogReadOnly)
+                ENDIF
+              ENDDO
               CALL SA_Parameter_Set
               CALL WizardWindowShow(IDD_SA_input2)
 !T              CALL WizardWindowShow(IDD_SAW_Page2)
@@ -151,8 +184,8 @@
 
       IMPLICIT NONE      
 
-      INTEGER ifrg
-      LOGICAL, EXTERNAL :: Confirm
+      INTEGER tFieldState
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page2)
@@ -167,14 +200,22 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
           END SELECT
-
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_RotationsGrid)
+            CASE (IDF_Use_PO)
+              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                tFieldState = Enabled
+              ELSE
+                tFieldState = Disabled
+              ENDIF
+              CALL WDialogFieldState(IDF_PO_a,tFieldState)
+              CALL WDialogFieldState(IDF_PO_b,tFieldState)
+              CALL WDialogFieldState(IDF_PO_c,tFieldState)
+              CALL WDialogFieldState(IDF_LABELa,tFieldState)
+              CALL WDialogFieldState(IDF_LABELb,tFieldState)
+              CALL WDialogFieldState(IDF_LABELc,tFieldState)
           END SELECT ! EventInfo%Value1 Field Changed Options
-
-
-
       END SELECT
   999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
