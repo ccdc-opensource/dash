@@ -32,8 +32,6 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-!O      INTEGER OldNBin
-
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
@@ -51,9 +49,7 @@
 ! MAKE LIST OF REFLECTION INDICES:
       CALL INRFPR(PCXX,PFXX)
 ! Check if we have too many reflections
-!O      OldNBin = NBIN
       CALL CHKMAXREF(PCXX)
-!O      NBIN = OldNBin
 ! OUTPUT H,K,L IF REQUIRED:
       CALL HKLOUT(PCXX,ALSQ,MATSZ)
 
