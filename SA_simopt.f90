@@ -106,7 +106,6 @@
         FOPT = DBLE(FTEM)
         CALL WDialogSelect(IDD_SA_Action1)
         CALL WDialogPutReal(IDF_min_chisq,SNGL(FOPT),'(F8.2)')
-        FOPT = -FOPT
         DO II = 1, NATOM
           DO III = 1, 3
             XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
