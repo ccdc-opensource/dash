@@ -15,11 +15,12 @@
       CHARACTER(MaxPathLength) ArgString, tDirName, tFileName
       CHARACTER(7) StrFileExtension ! maximum = 7 = .zmatrix
       INTEGER ExtLen, iFrg, iDummy
-      INTEGER, EXTERNAL :: Read_One_zm, DiffractionFileOpen
       INTEGER       tNumZMatrices
       CHARACTER(80) tZmatrices(10)
       INTEGER       tNextzmNum
       INTEGER       tCounter
+      INTEGER, EXTERNAL :: Read_One_zm, DiffractionFileOpen
+      LOGICAL, EXTERNAL :: FnPatternOK
 
 ! The following variables are there to allow the dialogue fields in the
 ! window dealing with Z-matrices to be handled by DO...ENDDO loops.
@@ -148,6 +149,9 @@
           CASE ('RAW    ', 'CPI    ', 'DAT    ', 'TXT    ', 'MDI    ', 'POD    ', &
                 'RD     ', 'SD     ', 'UDF    ', 'UXD    ', 'XYE    ', 'X01    ')
             iDummy = DiffractionFileOpen(ArgString)
+            CALL WDialogSelect(IDD_PW_Page3)
+            CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
+            CALL WDialogFieldStateLogical(IDB_Bin,FnPatternOK())
             CALL WizardWindowShow(IDD_PW_Page3)
           CASE DEFAULT
             CALL ErrorMessage('Unrecognised file format.')
