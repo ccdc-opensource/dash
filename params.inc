@@ -135,23 +135,6 @@
       INTEGER MaxNumChildWin
       PARAMETER ( MaxNumChildWin = 20 )
 
-! For use in common blocks ZMCOMI, ZMCOMR, ZMCOMC, ZMCOMO, FRGCOM, FRGCHA, ZMCOMG, ZMLGOT, ZMNPAR
-
-	  INTEGER maxfrg
-      PARAMETER ( maxfrg = 5 )
-
-! maxfrg = Maximum number of fragments = individual z-matrices
-
-      INTEGER MaxDOF
-	  PARAMETER ( MaxDOF = 30 )
-
-! MaxDOF = Maximum number of degrees of freedom per fragment (= per individual z-matrix)
-
-! For use in common blocks ZMCOMI, ZMCOMR, ZMCOMC, ZMCOMO, FRGCOM, FRGCHA, ZMCOMG, ZMLGOT, ZMNPAR
-
-      INTEGER maxatm
-      PARAMETER ( maxatm = 100 )
-
 ! For use in common block PLTSTO2
 
 	  INTEGER  maxiter

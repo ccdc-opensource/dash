@@ -153,6 +153,7 @@ DEP_F90_CHI_S=\
 
 SOURCE=.\create_fob.f90
 DEP_F90_CREAT=\
+	".\Debug\ZMVAR.MOD"\
 	".\params.inc"\
 	
 # End Source File
@@ -243,6 +244,7 @@ DEP_F90_ERROR=\
 
 SOURCE=.\Eval.f90
 DEP_F90_EVAL_=\
+	".\Debug\ZMVAR.MOD"\
 	".\params.inc"\
 	
 # End Source File
@@ -381,11 +383,18 @@ DEP_F90_GETPI=\
 # Begin Source File
 
 SOURCE=.\Init_Routines.f90
+DEP_F90_INIT_=\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\params.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\Initialisation.f90
 DEP_F90_INITI=\
+	".\Debug\ZMVAR.MOD"\
 	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -600,7 +609,7 @@ DEP_F90_PROFI=\
 
 SOURCE=.\read_one_zm.f90
 DEP_F90_READ_=\
-	".\params.inc"\
+	".\Debug\ZMVAR.MOD"\
 	
 # End Source File
 # Begin Source File
@@ -619,10 +628,9 @@ SOURCE=.\SA_Defaults.f90
 
 SOURCE=.\SA_Dialogues.f90
 DEP_F90_SA_DI=\
+	".\Debug\ZMVAR.MOD"\
 	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
-	".\params.inc"\
 	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -633,10 +641,10 @@ DEP_F90_SA_DI=\
 SOURCE=.\SA_main.f90
 DEP_F90_SA_MA=\
 	".\Debug\SAMVAR.MOD"\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
-	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -696,17 +704,24 @@ DEP_F90_SA_SI=\
 
 SOURCE=.\SA_structure_output.f90
 DEP_F90_SA_ST=\
+	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\statlog.inc"\
 	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+NODEP_F90_SA_ST=\
+	".\Debug\SAMVAR.MOD"\
+	".\Debug\ZMVAR.MOD"\
 	
 # End Source File
 # Begin Source File
 
 SOURCE=.\sa_subs.f90
 DEP_F90_SA_SU=\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\Variables.mod"\
@@ -841,6 +856,14 @@ DEP_F90_WIZAR=\
 	".\params.inc"\
 	".\statlog.inc"\
 	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\ZMVAR.f90
+DEP_F90_ZMVAR=\
+	".\DRUID_HEADER.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File

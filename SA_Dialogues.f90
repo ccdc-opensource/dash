@@ -10,19 +10,12 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR
 
       IMPLICIT NONE 
            
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'statlog.inc'
-
-      INTEGER        IDFZMFile,           IDBZMBrowse,                &
-                     IDFZMpars,           IDBZMView,                  &
-                     IDBZMDelete
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
-                     IDBZMDelete(1:maxfrg)
 
       CALL WDialogSelect(IDD_SAW_Page1)
 ! @ Enable or disable the "Next" button
@@ -39,30 +32,14 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR
 
       IMPLICIT NONE      
 
       CHARACTER*80 SDIFile
       INTEGER      IFlags
 
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'DialogPosCmn.inc'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
-
-      INTEGER        IDFZMFile,           IDBZMBrowse,                &
-                     IDFZMpars,           IDBZMView,                  &
-                     IDBZMDelete
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
-                     IDBZMDelete(1:maxfrg)
-
-      INTEGER         nfrag
-      COMMON /frgcom/ nfrag
-      CHARACTER*80    frag_file
-      COMMON /frgcha/ frag_file(maxfrg)
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
 
 ! JCC Added in declarations
 ! The implementation has changed - this is now a function
@@ -162,13 +139,10 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR
 
       IMPLICIT NONE      
 
-      REAL         rpos
-      INTEGER      ipos
-
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'DialogPosCmn.inc'
 
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
@@ -185,19 +159,14 @@
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
-      INTEGER        IDFZMFile,           IDBZMBrowse,                &
-                     IDFZMpars,           IDBZMView,                  &
-                     IDBZMDelete
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
-                     IDBZMDelete(1:maxfrg)
-
       LOGICAL LimsChanged
       DATA LimsChanged / .FALSE. /
       SAVE LimsChanged
       LOGICAL Confirm ! Function
       REAL T0, RT, xtem
       INTEGER JPOS, NMOVES, IFCOl, IFRow, ICHK
+      REAL         rpos
+      INTEGER      ipos
 
 ! We are now on window number 2
       CALL PushActiveWindowID
@@ -323,29 +292,19 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR
 
       IMPLICIT NONE      
 
-      REAL         rpos
-      INTEGER      ipos
-
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'DialogPosCmn.inc'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
-
-      INTEGER        IDFZMFile,           IDBZMBrowse,                &
-                     IDFZMpars,           IDBZMView,                  &
-                     IDBZMDelete
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
-                     IDBZMDelete(1:maxfrg)
       
       DOUBLE PRECISION T0, rt
       COMMON /saparl/  T0, rt
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
 
+      REAL         rpos
+      INTEGER      ipos
       INTEGER IHANDLE, JMyExit, JPOS, KPOS
       INTEGER, EXTERNAL :: WriteSAParametersToFile
 

@@ -4,25 +4,9 @@
 !
       SUBROUTINE create_fob()
 
+      USE ZMVAR
+
       INCLUDE 'PARAMS.INC'
-
-      REAL tiso, occ
-      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
-      DOUBLE PRECISION blen, alph, bet, f2cmat
-      INTEGER ioptb, iopta, ioptt, iz1, iz2, iz3
-
-      COMMON /zmcomi/ ntatm, natoms(maxfrg), ioptb(maxatm,maxfrg),      &
-     &                iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),       &
-     &                iz1(maxatm,maxfrg), iz2(maxatm,maxfrg),           &
-     &                iz3(maxatm,maxfrg)
-      COMMON /zmcomr/ blen(maxatm,maxfrg), alph(maxatm,maxfrg),         &
-     &                bet(maxatm,maxfrg), f2cmat(3,3)
-      CHARACTER*3     asym
-      CHARACTER*5                          OriginalLabel
-      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
-
-      INTEGER         nfrag
-      COMMON /frgcom/ nfrag
 
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
       INTEGER         NATOM
@@ -37,9 +21,6 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
 
 ! JvdS should be the same thing
 !O      COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
@@ -294,30 +275,9 @@
 ! are all set to 0.0, except for the atom at the origin which is assigned a weight 1.0
 ! Ideally, we would want hydrogens to have weight 0.0 when not taken into account.
 
+      USE ZMVAR
+
       IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-
-      INTEGER         nfrag
-      COMMON /frgcom/ nfrag
-
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
-
-      INTEGER         icomflg
-      REAL                             AtomicWeighting
-      COMMON /zmcomg/ icomflg(maxfrg), AtomicWeighting(maxatm,maxfrg)
-
-      INTEGER         ntatm, natoms
-      INTEGER         ioptb,                iopta,                ioptt
-      INTEGER         iz1,                  iz2,                  iz3
-      COMMON /zmcomi/ ntatm, natoms(maxfrg),                                             &
-     &                ioptb(maxatm,maxfrg), iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),  &
-     &                iz1(maxatm,maxfrg),   iz2(maxatm,maxfrg),   iz3(maxatm,maxfrg)
-
-      CHARACTER*3     asym
-      CHARACTER*5                          OriginalLabel
-      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
 
       CHARACTER*3 el(1:109)
       INTEGER     atnr(1:109)

@@ -6,6 +6,8 @@
 !
       INTEGER FUNCTION read_one_zm(ifrg)
 
+      USE ZMVAR
+
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: ifrg
@@ -23,46 +25,6 @@
 !  C      1.4929873  0  113.1748255  0 -179.7006193  1   55   52   49  3.0  1.0   38 C7 C8 C9 C1
 !  C      1.5029990  0  113.0372990  0  179.9092170  0   57   54   51  3.0  1.0   59 C5 C6 C7 C8
 !
-      INCLUDE 'PARAMS.INC'
-
-      REAL            tiso,                occ
-      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
-
-      INTEGER         ntatm, natoms
-      INTEGER         ioptb,                iopta,                ioptt
-      INTEGER         iz1,                  iz2,                  iz3
-      COMMON /zmcomi/ ntatm, natoms(maxfrg),                                             &
-     &                ioptb(maxatm,maxfrg), iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),  &
-     &                iz1(maxatm,maxfrg),   iz2(maxatm,maxfrg),   iz3(maxatm,maxfrg)
-
-      DOUBLE PRECISION blen,                alph,                bet,                f2cmat
-      COMMON /zmcomr/  blen(maxatm,maxfrg), alph(maxatm,maxfrg), bet(maxatm,maxfrg), f2cmat(3,3)
-
-      CHARACTER*3     asym
-      CHARACTER*5                          OriginalLabel
-      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
-! asym = Atom SYMbol, e.g. 'H  ' for hydrogen, 'Ag ' for silver.
-
-      CHARACTER*80    frag_file
-      COMMON /frgcha/ frag_file(maxfrg)
-
-      INTEGER         icomflg
-      REAL                             AtomicWeighting
-      COMMON /zmcomg/ icomflg(maxfrg), AtomicWeighting(maxatm,maxfrg)
-
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
-
-      INTEGER         izmpar
-      CHARACTER*36                    czmpar
-      INTEGER                                                kzmpar
-      REAL                                                                          xzmpar
-      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
-!
-! JCC the original atom ids to list in the labels and the back mapping
-      INTEGER         izmoid,                izmbid
-      COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
-
       CHARACTER*255 line
       CHARACTER*255 tSubString
       INTEGER ErrorStatus
@@ -160,7 +122,7 @@
           CALL GetSubString(Line,' ',tSubString) ! And that should be what we really want:
                                                  ! the original atom label
         ELSE
-! Fake original atom labels by adding original atom number to element, e.g. 'C4'
+! Emulate original atom labels by adding original atom number to element, e.g. 'C4'
           WRITE(tIDstr,'(I3)') izmoid(i,ifrg)
           CALL StrClean(tIDstr,IDlen)
           tSubString = Asym(i,ifrg)(1:AsymLen)//tIDstr

@@ -5,31 +5,18 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE ZMVAR
       
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INCLUDE 'PARAMS.INC'
-
-      CHARACTER*80    frag_file
-      COMMON /frgcha/ frag_file(maxfrg)
-
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
 
-      INTEGER         izmpar
-      CHARACTER*36                    czmpar
-      INTEGER                                                kzmpar
-      REAL                                                                          xzmpar
-      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
-      
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
- 
       INTEGER tFileHandle, I, kk, ifrg, ilen, II, Fixed
       REAL    R, x, lb, ub
       CHARACTER*80 tSDIFile
@@ -154,39 +141,18 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR
       USE SAMVAR
 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: ifrg
 
-      INCLUDE 'PARAMS.INC'
-
-      CHARACTER*80    frag_file
-      COMMON /frgcha/ frag_file(maxfrg)
-
-      INTEGER         nfrag
-      COMMON /frgcom/ nfrag
-
-      INTEGER ntatm, natoms, ioptb, iopta, ioptt, iz1, iz2, iz3
-      COMMON /zmcomi/ ntatm, natoms(maxfrg), ioptb(maxatm,maxfrg),      &
-     &                iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),       &
-     &                iz1(maxatm,maxfrg), iz2(maxatm,maxfrg),           &
-     &                iz3(maxatm,maxfrg)
-
-      DOUBLE PRECISION blen, alph, bet, f2cmat
-      COMMON /zmcomr/ blen(maxatm,maxfrg), alph(maxatm,maxfrg),         &
-     &                bet(maxatm,maxfrg), f2cmat(3,3)
-
-      CHARACTER*3     asym
-      CHARACTER*5                          OriginalLabel
-      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
-
       INTEGER I
       CHARACTER*85 temp_file
       CHARACTER*2  AtmElement(1:MAXATM_2)
 
-      REAL*8 CART(MAXATM,3)
+      REAL*8 CART(maxatm,3)
 
       INTEGER IHANDLE
       INTEGER, EXTERNAL :: WriteMol2
@@ -266,39 +232,32 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE ZMVAR
 
-      INCLUDE 'PARAMS.INC'
+      IMPLICIT NONE
+
+  !    INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
+      INTEGER NMAX
       PARAMETER (NMAX = 100)
       DOUBLE PRECISION XOPT,CSH,XP,FOPT
       COMMON /sacmn/ XOPT(NMAX),CSH(NMAX),XP(NMAX),FOPT
 
-      DOUBLE PRECISION blen,alph,bet,f2cmat
 ! JCC Handle via the PDB standard
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
 
-      INTEGER ioptb,iopta,ioptt,iz1,iz2,iz3
-      COMMON /zmcomi/ ntatm,natoms(maxfrg),&
-        ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&
-        iz1(maxatm,maxfrg),iz2(maxatm,maxfrg),iz3(maxatm,maxfrg)
-      COMMON /zmcomr/ blen(maxatm,maxfrg),alph(maxatm,maxfrg),&
-        bet(maxatm,maxfrg),f2cmat(3,3)
-      CHARACTER*3     asym
-      CHARACTER*5                          OriginalLabel
-      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
-
-      COMMON /frgcom/ nfrag
+      INTEGER mvar
       PARAMETER (mvar=100)
       DOUBLE PRECISION x,lb,ub,vm,xpreset
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
+      COMMON /presetr/ xpreset(mvar)
 
       DOUBLE PRECISION prevub, prevlb ! For saving the previous range
       COMMON /pvalues/ prevub(mvar), prevlb(mvar)
 
-      COMMON /presetr/ xpreset(mvar)
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
@@ -308,13 +267,8 @@
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
 
       CHARACTER*36 parlabel(mvar)
-
-      CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmpar(maxfrg),czmpar(MaxDOF,maxfrg),kzmpar(MaxDOF,maxfrg),xzmpar(MaxDOF,maxfrg)
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
-
       DOUBLE PRECISION dcel(6)
+      INTEGER I, II, KK, ifrg
 
       DO I = 1, 6
         dcel(I) = DBLE(CellPar(I))
@@ -417,12 +371,9 @@
 !
       SUBROUTINE ClearZmatrices
 
+      USE ZMVAR
+
       IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
 
 ! Blow away the z-matrices
       gotzmfile = .FALSE.
@@ -436,32 +387,9 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE ZMVAR
 
       IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-
-      CHARACTER*80    frag_file
-      COMMON /frgcha/ frag_file(maxfrg)
-
-      INTEGER         ntatm, natoms
-      INTEGER         ioptb,                iopta,                ioptt
-      INTEGER         iz1,                  iz2,                  iz3
-      COMMON /zmcomi/ ntatm, natoms(maxfrg),                                             &
-     &                ioptb(maxatm,maxfrg), iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),  &
-     &                iz1(maxatm,maxfrg),   iz2(maxatm,maxfrg),   iz3(maxatm,maxfrg)
-
-      INTEGER         nfrag
-      COMMON /frgcom/ nfrag
-
-      INTEGER         izmpar
-      CHARACTER*36                    czmpar
-      INTEGER                                                kzmpar
-      REAL                                                                          xzmpar
-      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
-
-      LOGICAL         gotzmfile
-      COMMON /zmlgot/ gotzmfile(maxfrg)
 
       INTEGER         NATOM
       REAL                   X
@@ -475,13 +403,6 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-
-      INTEGER        IDFZMFile,           IDBZMBrowse,                &
-                     IDFZMpars,           IDBZMView,                  &
-                     IDBZMDelete
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
-                     IDBZMDelete(1:maxfrg)
 
       INTEGER NumberOfDOF, izmtot, ifrg
 
@@ -504,6 +425,7 @@
           CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
 ! Enable 'View' button
           CALL WDialogFieldState(IDBZMView(ifrg),Enabled)
+   !       CALL WDialogFieldState(IDBZMEdit(ifrg),Enabled)
         ELSE
           izmpar(ifrg) = 0
           natoms(ifrg) = 0
@@ -511,6 +433,7 @@
           CALL WDialogClearField(IDFZMFile(ifrg))
 ! Disable 'View' button
           CALL WDialogFieldState(IDBZMView(ifrg),Disabled)
+   !       CALL WDialogFieldState(IDBZMEdit(ifrg),Disabled)
         ENDIF
       ENDDO
       natom = ntatm
