@@ -1718,7 +1718,7 @@
         !F    CASE (IDB_Configuration)
         !F      CALL PushActiveWindowID
         !F      CALL WDialogSelect(IDD_Configuration)
-        !F      CALL WDialogShow(-1,-1,0,Modeless)
+        !F      CALL WDialogShow(-1, -1, 0, Modeless)
         !F      CALL PopActiveWindowID
           END SELECT
         CASE (FieldChanged)
@@ -1855,7 +1855,7 @@
           CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))          
         ENDIF
       ENDIF
-      CALL WDialogShow(-1, -1, IDD_ModalDialog, SemiModeless)
+      CALL WDialogShow(-1, -1, 0, SemiModeless)
       RowNumber = IFRow
       iUB = UB(IFRow)
       iLB = LB(IFRow)
