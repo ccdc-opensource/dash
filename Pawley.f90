@@ -68,6 +68,7 @@
       CALL IOsDeleteFile('polyp.niw')
       CALL WizardWindowShow(IDD_Pawley_Status)
       CALL PopActiveWindowID
+      IPTYPE = 2
 
       END SUBROUTINE ShowPawleyFitWindow
 !
@@ -124,9 +125,6 @@
       INTEGER                                                                    ICODEZ
       REAL                                                                                      KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-
-      REAL            ZCAL !,        ZBAK
-      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
 
       REAL            ZXDELT
       INTEGER                 IIMIN, IIMAX
@@ -230,7 +228,6 @@
 ! As the user has accepted the fit, we can use this file to generate our new input file.
 ! To flag this to the subroutine, we create the file 'polyp.niw'
               CALL IOsCopyFile('polyp.ccn','polyp.niw')
-              CALL Load_Pawley_Pro
 ! JCC Save the settings
               CALL WDialogSelect(IDD_Pawley_Status)
               CALL WDialogGetReal(IDF_Pawley_Cycle_Rwp,RLastValues(1)) 
@@ -648,43 +645,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Load_Pawley_PRO
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-
-      INTEGER         NPTS
-      REAL                  ZARGI,        ZOBS,        ZDOBS,        ZWT
-      INTEGER                                                                    ICODEZ
-      REAL                                                                                      KOBZ
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-
-      REAL            ZCAL !,        ZBAK
-      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
-
-  !    INTEGER I
-
-      NBIN = NPTS
-  !    DO I = 1, NBIN
-  !      XBIN(I)  = ZARGI(I)
-  !      YOBIN(I) = ZOBS(I)
-  !      YCBIN(I) = ZCAL(I)
-  !      YBBIN(I) = ZBAK(I)
-  !      EBIN(I)  = ZDOBS(I)
-  !    ENDDO
-      IPTYPE = 2
-      CALL Profile_Plot
-
-      END SUBROUTINE Load_Pawley_PRO
-!
-!*****************************************************************************
-!
       SUBROUTINE make_polybackup
 
       USE WINTERACTER
@@ -763,8 +723,10 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CreateSDIFile(SDIFileName)
-
+      INTEGER FUNCTION CreateSDIFile(SDIFileName)
+!
+! Returns 1 for failure, 0 for success
+!
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -779,10 +741,10 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      INTEGER LSDI, iDot, I, L1, L4
-!
-!.. First copy the .pik .tic and .hcv files
-!
+      INTEGER LSDI, iDot, I, L1, L4, iDummy
+      INTEGER, EXTERNAL :: WRTDSL
+! Initialise to error
+      CreateSDIFile = 1
       LSDI = LEN_TRIM(SDIFileName)
       IF (LSDI .GT. 80) THEN
         CALL DebugErrorMessage('SDIFileName too long in CreateSDIFile')
@@ -792,6 +754,7 @@
         CALL ErrorMessage('Filename not provided.'//CHAR(13)//'Try again!')
         RETURN
       ENDIF
+! First copy the .pik, .tic, .hcv and .khl files
 	DashPikFile = ' '
       DashTicFile = ' '
       DashHcvFile = ' '
@@ -821,21 +784,39 @@
       DashHcvFile(L1:L4)='.hcv'
       DashHklFile(L1:L4)='.hkl'
       DashDslFile(L1:L4)='.dsl'
-      CALL WRTDSL(DashDslFile,L4) ! Ignore any errors
+      IF (WRTDSL(DashDslFile,L4) .NE. 0) RETURN
+! Clear errors
+      iDummy = InfoError(1)
       CALL IOSCopyFile('polyp.pik',DashPikFile)
+      IF (InfoError(1) .NE. 0) THEN
+        CALL ErrorMessage('Error while writing .pik file.')
+        RETURN
+      ENDIF
       CALL IOSCopyFile('polyp.tic',DashTicFile)
+      IF (InfoError(1) .NE. 0) THEN
+        CALL ErrorMessage('Error while writing .tic file.')
+        RETURN
+      ENDIF
       CALL IOSCopyFile('polyp.hcv',DashHcvFile)
+      IF (InfoError(1) .NE. 0) THEN
+        CALL ErrorMessage('Error while writing .hcv file.')
+        RETURN
+      ENDIF
       CALL IOSCopyFile('polyp.hkl',DashHklFile)
-      OPEN(81,file=SDIFileName(1:LSDI),status='unknown')
-      WRITE(81,8110) DashTicFile(1:LEN_TRIM(DashTicFile))
-      WRITE(81,8120) DashHcvFile(1:LEN_TRIM(DashHcvFile))
-      WRITE(81,8121) DashHklFile(1:LEN_TRIM(DashHklFile))
-      WRITE(81,8130) DashPikFile(1:LEN_TRIM(DashPikFile))
-      WRITE(81,8136) DashRawFile(1:LEN_TRIM(DashRawFile))
-      WRITE(81,8135) DashDslFile(1:LEN_TRIM(DashDslFile))
-      WRITE(81,8140) (CellPar(I),I=1,6)
-      WRITE(81,8150) NumberSGTable,SGNumStr(NumberSGTable),SGHMaStr(NumberSGTable)
-      WRITE(81,8160) PAWLEYCHISQ
+      IF (InfoError(1) .NE. 0) THEN
+        CALL ErrorMessage('Error while writing .hkl file.')
+        RETURN
+      ENDIF
+      OPEN(81,file=SDIFileName(1:LSDI),status='unknown',ERR=999)
+      WRITE(81,8110,ERR=999) DashTicFile(1:LEN_TRIM(DashTicFile))
+      WRITE(81,8120,ERR=999) DashHcvFile(1:LEN_TRIM(DashHcvFile))
+      WRITE(81,8121,ERR=999) DashHklFile(1:LEN_TRIM(DashHklFile))
+      WRITE(81,8130,ERR=999) DashPikFile(1:LEN_TRIM(DashPikFile))
+      WRITE(81,8136,ERR=999) DashRawFile(1:LEN_TRIM(DashRawFile))
+      WRITE(81,8135,ERR=999) DashDslFile(1:LEN_TRIM(DashDslFile))
+      WRITE(81,8140,ERR=999) (CellPar(I),I=1,6)
+      WRITE(81,8150,ERR=999) NumberSGTable,SGNumStr(NumberSGTable),SGHMaStr(NumberSGTable)
+      WRITE(81,8160,ERR=999) PAWLEYCHISQ
  8110 FORMAT(' TIC ',A)
  8120 FORMAT(' HCV ',A)
  8121 FORMAT(' HKL ',A)
@@ -846,8 +827,12 @@
  8150 FORMAT(' SpaceGroup ',I4,4X,A12,A12)
  8160 FORMAT(' PawleyChiSq ',F10.2)
       CLOSE(81)
+      CreateSDIFile = 0
+      RETURN
+  999 CALL ErrorMessage('Error while writing .sdi file.')
+      CLOSE(81)
 
-      END SUBROUTINE CreateSDIFile
+      END FUNCTION CreateSDIFile
 !
 !*****************************************************************************
 !
@@ -857,9 +842,13 @@
       USE DRUID_HEADER
       USE VARIABLES
 
+      IMPLICIT NONE
+
       CHARACTER(LEN=80) :: SDIFileName
       CHARACTER(LEN=45) :: FILTER
       INTEGER IFLAGS
+
+      INTEGER, EXTERNAL :: CreateSDIFile
       
 !.. Save the project
       SaveProject = .FALSE.
@@ -868,9 +857,10 @@
       SDIFileName = ' '
       CALL WSelectFile(FILTER,IFLAGS,SDIFileName,'Save diffraction information for structure solution')
       IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (SDIFileName .NE. ' ')) THEN
-        CALL CreateSDIFile(SDIFileName)
-        CALL sa_SetOutputFiles(SDIFileName)
-        SaveProject = .TRUE.
+        IF (CreateSDIFile(SDIFileName) .EQ. 0) THEN
+          CALL sa_SetOutputFiles(SDIFileName)
+          SaveProject = .TRUE.
+        ENDIF
       ENDIF
 
       END FUNCTION SaveProject
