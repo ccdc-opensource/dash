@@ -177,6 +177,7 @@ DEP_F90_ERROR=\
 SOURCE=.\Eval.for
 DEP_F90_EVAL_=\
 	".\IZMCheck.inc"\
+	".\params.inc"\
 	
 # End Source File
 # Begin Source File
@@ -184,6 +185,7 @@ DEP_F90_EVAL_=\
 SOURCE=.\Fcn.f90
 DEP_F90_FCN_F=\
 	".\DRUID_HEADER.mod"\
+	".\params.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -511,6 +513,9 @@ DEP_F90_PUTSI=\
 # Begin Source File
 
 SOURCE=.\read_one_zm.for
+DEP_F90_READ_=\
+	".\params.inc"\
+	
 # End Source File
 # Begin Source File
 
@@ -532,6 +537,7 @@ DEP_F90_SA_MA=\
 	".\GLBVAR.INC"\
 	".\IZMCheck.inc"\
 	".\Lattice.inc"\
+	".\params.inc"\
 	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -550,15 +556,8 @@ DEP_F90_SA_MO=\
 SOURCE=.\SA_output.f90
 DEP_F90_SA_OU=\
 	".\DRUID_HEADER.mod"\
+	".\params.inc"\
 	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\sa_plot.f90
-DEP_F90_SA_PL=\
-	".\DRUID_HEADER.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -603,6 +602,7 @@ DEP_F90_SA_ST=\
 	".\GLBVAR.INC"\
 	".\IZMCheck.inc"\
 	".\Lattice.inc"\
+	".\params.inc"\
 	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -614,10 +614,6 @@ SOURCE=.\SA_SUBS.FOR
 DEP_F90_SA_SU=\
 	".\params.inc"\
 	
-# End Source File
-# Begin Source File
-
-SOURCE=.\sa_upload.f90
 # End Source File
 # Begin Source File
 
@@ -741,10 +737,6 @@ SOURCE=.\AllFFCalc.inc
 # Begin Source File
 
 SOURCE=.\DialogPosCmn.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\GET_LOGREF.inc
 # End Source File
 # Begin Source File
 
