@@ -159,7 +159,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE WRTDSL(FileName,LenFn,Ierr)
+      SUBROUTINE WRTDSL(FileName,LenFn)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -176,10 +176,7 @@
         PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
         PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),PkPosAv(MAX_NPFR)
 
-      OPEN (UNIT = 77, &
-           FILE=FileName(1:LenFn), &
-           STATUS='UNKNOWN', &
-           ERR=999)
+      OPEN (UNIT = 77,FILE=FileName(1:LenFn),STATUS='UNKNOWN',ERR=999)
       WRITE(77,*)'! Radiation wavelength and data type'
       WRITE(77,'(A3,1X,F10.5,I2)') 'rad', ALambda, JRadOption
       WRITE(77,*)'! Sigma shape parameters: format sigma1 esd sigma2 esd'
@@ -199,8 +196,7 @@
       CLOSE(77)
       RETURN
 !C Error if we get here
-  999 Ierr = 1
-      CLOSE(77,IOSTAT=IDUM)
+  999 CLOSE(77,IOSTAT=IDUM)
 
       END SUBROUTINE WRTDSL
 !
