@@ -28,6 +28,7 @@
 !
       USE VARIABLES
       USE SAMVAR
+      USE ZMVAR
 
       IMPLICIT NONE
 
@@ -107,7 +108,11 @@
       ENDDO
       CLOSE(InputFile)
       CALL SAMABO
-      Res2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-3)//'mol2')
+      DO i = 1, natcry
+        izmbid(i,0) = i
+        izmoid(i,0) = i
+      ENDDO
+      Res2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-3)//'mol2',.FALSE.,0)
       RETURN
   998 CALL ErrorMessage('Error opening input file.')
       RETURN
@@ -143,6 +148,7 @@
 !
       USE VARIABLES
       USE SAMVAR
+      USE ZMVAR
 
       IMPLICIT NONE
 
@@ -160,7 +166,7 @@
       CHARACTER*4  NAME(MAXATM_2)
       LOGICAL, EXTERNAL :: ChrIsLetter
       REAL         tX, tY, tZ
-      INTEGER, EXTERNAL :: WriteMol2
+      INTEGER, EXTERNAL :: WriteMol2, ElmSymbol2CSD
 
 ! Initialise to 'failure'
       CSSR2Mol2 = 0
@@ -224,9 +230,15 @@
         CALL StrUpperCase(AtmElement(I))
       ENDDO
 ! Given the element, assign the CSD element (fill aelem(1:MAXATM))
-      CALL AssignCSDElement(AtmElement)
+      DO I = 1, natcry
+        aelem(I) = ElmSymbol2CSD(AtmElement(I))
+      ENDDO
       CALL SAMABO
-      CSSR2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-4)//'mol2')
+      DO i = 1, natcry
+        izmbid(i,0) = i
+        izmoid(i,0) = i
+      ENDDO
+      CSSR2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-4)//'mol2',.FALSE.,0)
       RETURN
   990 CALL ErrorMessage('Error while reading input file.')
       RETURN
@@ -239,7 +251,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION WriteMol2(TheFileName)
+      INTEGER FUNCTION WriteMol2(TheFileName,IncludeUnitCell,iFrg)
 !
 ! Takes number of atoms    from natcry    in SAMVAR
 ! Takes atomic coordinates from axyzo     in SAMVAR  (orthogonal)
@@ -247,23 +259,42 @@
 ! Takes atom labels        from atomlabel in SAMVAR
 ! Takes bonds              from bond      in SAMVAR
 ! Takes bond types         from btype     in SAMVAR
+! Takes unit cell from global variables in DASH
+! Sets space group to P1
 ! and writes out a .mol2 file
+! Takes the order of the atoms from izmbid(:,iFrg)
+!
+! mol2 files contain an unresolved ambiguity: atom co-ordinates are given wrt. the 
+! the orthogonal axes, but the unit cell is given as a, b, c, alpha, beta, gamma.
+! It is not specified how the unit cell is to be constructed wrt. the orthogonal axes
+! from the unit cell parameters.
+! Mercury turns out to chose: a along x. Everywhere else in DASH, we have used c along z
 !
 ! RETURNS 0 for failure
 !         1 for success
 
       USE SAMVAR
       USE ATMVAR
+      USE ZMVAR
 
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      LOGICAL,       INTENT (IN   ) :: IncludeUnitCell
+      INTEGER,       INTENT (IN   ) :: iFrg
+
+      INCLUDE 'Lattice.inc'
 
       CHARACTER*4 sybatom(1:MAXATM_2)
       CHARACTER*2 BondStr(0:9)
       CHARACTER*2 HybridisationStr
       CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
-      INTEGER I, J, Ilen, OutputFile
+      INTEGER      ii, I, J, Ilen, OutputFile
+      LOGICAL, EXTERNAL :: FnUnitCellOK
+      LOGICAL      tIncludeUnitCell
+      REAL         tLattice(1:3,1:3), tRecLattice(1:3,1:3), tLattice_2(1:3,1:3)
+      REAL         tX, tY, tZ
+      REAL         NEWaxyzo(1:MAXATM_2,1:3)
 
 !    The CSD bond types are:  1 = single  2= double  3=triple  4=quadruple
 !                             5 = aromatic      6 = polymeric single
@@ -279,6 +310,8 @@
 !     7       (delocalised double)    un
 !     9       (pi)                    un
 
+      tIncludeUnitCell = IncludeUnitCell
+      IF (.NOT. FnUnitCellOK()) tIncludeUnitCell = .FALSE.
       BondStr(0) = 'un'   ! unspecified
       BondStr(1) = ' 1'
       BondStr(2) = ' 2'
@@ -322,41 +355,52 @@
       WRITE(OutputFile,"('SMALL')",ERR=999)
       WRITE(OutputFile,"('NO_CHARGES')",ERR=999)
       WRITE(OutputFile,"('@<TRIPOS>ATOM')",ERR=999)
+      IF (tIncludeUnitCell) THEN
+        CALL LatticeCellParameters2Lattice(CellPar(1), CellPar(2), CellPar(3), &
+                                           CellPar(4), CellPar(5), CellPar(6), tLattice)
+! tLattice now holds the matrix for fractional to c-along-z orthogonal
+        CALL InverseMatrix(tLattice,tRecLattice,3)
+! tRecLattice now holds the matrix for c-along-z orthogonal to fractional
+        CALL LatticeCellParameters2Lattice_2(CellPar(1), CellPar(2), CellPar(3), &
+                                             CellPar(4), CellPar(5), CellPar(6), tLattice_2)
+! tLattice_2 now holds the matrix for fractional to a-along-x orthogonal
+        CALL GMPRD(tLattice_2,tRecLattice,tLattice,3,3,3)
+! tLattice now holds the matrix for c-along-z orthogonal to a-along-x orthogonal
+! axyzo now holds the orthogonal co-ordinates if c is along z  
+        DO I = 1, natcry
+          tX = axyzo(I,1) * tLattice(1,1) + axyzo(I,2) * tLattice(1,2) + axyzo(I,3) * tLattice(1,3)
+          tY = axyzo(I,1) * tLattice(2,1) + axyzo(I,2) * tLattice(2,2) + axyzo(I,3) * tLattice(2,3)
+          tZ = axyzo(I,1) * tLattice(3,1) + axyzo(I,2) * tLattice(3,2) + axyzo(I,3) * tLattice(3,3)
+          NEWaxyzo(I,1) = tX
+          NEWaxyzo(I,2) = tY
+          NEWaxyzo(I,3) = tZ
+        ENDDO
+! NEWaxyzo now holds the orthogonal co-ordinates if a is along x
+      ENDIF
       DO I = 1, natcry
-        WRITE(OutputFile,270,ERR=999) I,atomlabel(I),(axyzo(I,j),j=1,3),sybatom(I)
+        WRITE(OutputFile,270,ERR=999) I,atomlabel(izmbid(I,iFrg)),(NEWaxyzo(izmbid(I,iFrg),j),j=1,3),sybatom(izmbid(I,iFrg))
   270   FORMAT(I3,1X,A5,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
       ENDDO
       WRITE(OutputFile,"('@<TRIPOS>BOND')",ERR=999)
       DO i = 1, nbocry
-        WRITE(OutputFile,'(3(I3,1X),A2)',ERR=999) i,bond(i,1),bond(i,2),BondStr(btype(I))
+        WRITE(OutputFile,'(3(I3,1X),A2)',ERR=999) i,izmoid(bond(i,1),iFrg),izmoid(bond(i,2),iFrg),BondStr(btype(I))
       ENDDO
+! Write out unit cell. First six numbers: a, b, c, alpha, beta, gamma
+! Next two integers: space group followed by axis setting
+! For this purpose, we set the space group to P1
+!C@<TRIPOS>CRYSIN
+!C   11.3720   10.2720    7.3590  108.7500   71.0700   96.1600     2     1
+      IF (tIncludeUnitCell) THEN
+        WRITE(OutputFile,"('@<TRIPOS>CRYSIN')",ERR=999)
+        WRITE(OutputFile,'(6(F8.4,1X),"   1    1")',ERR=999) (CellPar(ii),ii=1,6)
+      ENDIF
       CLOSE(OutputFile)
       WriteMol2 = 1
       RETURN
   999 CALL ErrorMessage('Error writing mol2 file.')
       CLOSE(OutputFile)
-      RETURN
 
       END FUNCTION WriteMol2
-!
-!*****************************************************************************
-!
-      SUBROUTINE AssignCSDElement(AtmElement)
-
-      USE SAMVAR
-
-      CHARACTER*2 AtmElement(MAXATM_2)
-
-      INTEGER I
-      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
-
-! We know AtmElement, now get the CSD element number
-      DO I = 1, natcry
-        aelem(I) = ElmSymbol2CSD(AtmElement(I))
-      ENDDO
-
-      END SUBROUTINE AssignCSDElement
 !
 !*****************************************************************************
 !
