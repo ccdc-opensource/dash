@@ -16,12 +16,14 @@
       valid_license = 0
       DO WHILE (valid_license .LE. 0) 
         valid_license = Read_License_Valid()
-        IF (valid_license .LE. -2) THEN
+        IF      (valid_license .EQ. -7) THEN
+          MessageStr = "Demo license not valid."
+        ELSE IF (valid_license .LE. -2) THEN
           MessageStr = "DASH problem: could not find or open the license file"//CHAR(13)//&
             INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"License.dat."
         ELSE IF (valid_license .EQ. -1) THEN
           MessageStr = "DASH problem: Your DASH license is invalid for this machine."
-        ELSE IF (valid_license .EQ. 0) THEN
+        ELSE IF (valid_license .EQ.  0) THEN
           MessageStr = "DASH problem: Your DASH license has expired."
         ENDIF
         IF (valid_license .LE. 0) THEN
@@ -52,13 +54,14 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-      LOGICAL    :: INLOOP = .TRUE.
+      LOGICAL    :: INLOOP
       INTEGER     Valid, ICode
       CHARACTER*MaxPathLength ClString
       TYPE (License_Info) Info
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: DateToday
 
+      INLOOP = .TRUE.
       Info%Valid = 0
       CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogShow(-1,-1,0,SemiModeless)
@@ -200,8 +203,9 @@
 
       CHARACTER*80 line, CLString
       INTEGER      dummy
-
       TYPE(License_Info) Info
+      INTEGER, EXTERNAL :: ShowLicenceAgreement
+      INTEGER tRead_License_Valid, ttRead_License_Valid
 
       Read_License_Valid = -2
       OPEN(UNIT=117,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'License.dat',STATUS='OLD',ERR=99)
@@ -211,8 +215,14 @@
           CALL INextString(line,clstring)
           CALL Decode_License(CLString,Info)
           IF (Info%Valid) THEN
-            Read_License_Valid = License_Valid(Info)
-            IF (Info%LicenseType .EQ. DemoKey) CALL ShowLicenceAgreement
+            tRead_License_Valid = License_Valid(Info)
+            IF (tRead_License_Valid .GT. 0) THEN
+              IF (Info%LicenseType .EQ. DemoKey) THEN
+                ttRead_License_Valid = ShowLicenceAgreement()
+                IF (ttRead_License_Valid .EQ. -7) tRead_License_Valid = -7
+              ENDIF
+            ENDIF
+            Read_License_Valid = tRead_License_Valid
           ENDIF
         ENDIF
       ENDDO
@@ -396,7 +406,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ShowLicenceAgreement
+      INTEGER FUNCTION ShowLicenceAgreement
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -406,6 +416,7 @@
 
       CHARACTER*5000 kString
 
+      ShowLicenceAgreement = -7
       kString = 'Your licence agreement here.'
       CALL WDialogSelect(IDD_LicenceAgreement)
       CALL WDialogPutString(IDF_Agreement,kString)
@@ -416,15 +427,18 @@
           CASE (PushButton) ! one of the buttons was pushed
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDCANCEL, ID_Licensing_Exit)
-                CALL DoExit
+                ShowLicenceAgreement = -7
+                CALL WDialogHide
+                RETURN
               CASE (IDB_IAgree)
+                ShowLicenceAgreement = 0
                 CALL WDialogHide
                 RETURN
             END SELECT
         END SELECT
       ENDDO
 
-      END SUBROUTINE ShowLicenceAgreement
+      END FUNCTION ShowLicenceAgreement
 !
 !*****************************************************************************
 !
