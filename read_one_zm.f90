@@ -129,18 +129,6 @@
         Asym(i,ifrg)(2:2) = ChrLowerCase(Asym(i,ifrg)(2:2))
         Asym(i,ifrg)(3:3) = ChrLowerCase(Asym(i,ifrg)(3:3))
 ! First item--the element--has been read. Rest more tricky.
-!O! JCC Try to read with the original ID if possible, else just map one-to-one
-!O        READ (line(1:nlin),*,IOSTAT=ErrorStatus) blen(i,ifrg),          &
-!O     &        ioptb(i,ifrg), alph(i,ifrg), iopta(i,ifrg), bet(i,ifrg),  &
-!O     &        ioptt(i,ifrg), iz1(i,ifrg), iz2(i,ifrg), iz3(i,ifrg),     &
-!O     &        tiso(i,ifrg), occ(i,ifrg), izmoid(i,ifrg)
-!O        IF (ErrorStatus.NE.0) THEN
-!O          READ (line(1:nlin),*,ERR=999,IOSTAT=ErrorStatus) blen(i,ifrg),&
-!O     &          ioptb(i,ifrg), alph(i,ifrg), iopta(i,ifrg), bet(i,ifrg),&
-!O     &          ioptt(i,ifrg), iz1(i,ifrg), iz2(i,ifrg), iz3(i,ifrg),   &
-!O     &          tiso(i,ifrg), occ(i,ifrg)
-!O          izmoid(i,ifrg) = i
-!O        ENDIF
 ! First, convert tabs to spaces and remove redundant spaces
         CALL StrClean(line,nlin)
 ! First column--the element--has been read: remove it
@@ -167,7 +155,7 @@
         ELSE
           READ (line(1:nlin),*,IOSTAT=ErrorStatus) izmoid(i,ifrg)
         ENDIF
-        IF (NumCol .GT. 1) THEN
+        IF (NumCol .GE. 2) THEN
           CALL GetSubString(Line,' ',tSubString) ! That should be the original atom number
           CALL GetSubString(Line,' ',tSubString) ! And that should be what we really want:
                                                  ! the original atom label
@@ -234,8 +222,8 @@
   999 Read_One_Zm = ErrorStatus
       RETURN
  1900 FORMAT (Q,A)
-  880 FORMAT (i1)
-  580 FORMAT (i4)
+  880 FORMAT (I1)
+  580 FORMAT (I4)
 
       END FUNCTION READ_ONE_ZM
 !
