@@ -665,8 +665,6 @@
 ! Next peak
             IF (NTPeak .EQ. (NumInPFR(CurrentRange) + 1)) CALL INC(NumInPFR(CurrentRange))
             IF (NTPeak .LE. NumInPFR(CurrentRange)) THEN
-! Ungrey 'Fit Peaks' button on toolbar
-              CALL WMenuSetState(ID_FitPeaks,ItemEnabled,WintOn)
               ReplotNecessary        = .TRUE.
               IF (RangeFitYN(CurrentRange)) RecalculationNecessary = .TRUE.
 ! When we are here, we are either adding a peak or shifting an old one.
