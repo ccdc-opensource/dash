@@ -85,7 +85,7 @@
 ! Fill Preferred Orientation part
       IF (PrefParExists) THEN
         X(iPrfPar) = BestValuesDoF(iPrfPar,TheRunNr)
-        CALL VALCHI(rDummy,1000) ! Fill Preferrred orientation part
+        CALL PO_PRECFC
       ENDIF
 ! VALCHI fills BICALC
       CALL VALCHI(rDummy,0)    ! Structural part
