@@ -6555,42 +6555,35 @@
  2000 FORMAT (/20X,A23//8X,' Cambridge Crystallography Subroutine Library     Mark 4.12')
 ! OBTAIN DATE AND TIME:
       CALL DATE_AND_TIME(tDate)
-      DateStr = ''
-      IF (tDate(7:7) .EQ. '0') THEN 
-        DateStr(1:1) = tDate(8:8)       ! DateStr = '7'
-      ELSE
-        DateStr(1:2) = tDate(7:8)       ! DateStr = '12'
-      ENDIF
+      CALL GetDateStr(DateStr)
       SELECT CASE (tDate(5:6))
         CASE ('01')
-          MonthStr = 'January'
+          MonthStr = 'JAN'
         CASE ('02')
-          MonthStr = 'February'
+          MonthStr = 'FEB'
         CASE ('03')
-          MonthStr = 'March'
+          MonthStr = 'MAR'
         CASE ('04')
-          MonthStr = 'April'
+          MonthStr = 'APR'
         CASE ('05')
-          MonthStr = 'May'
+          MonthStr = 'MAY'
         CASE ('06')
-          MonthStr = 'June'
+          MonthStr = 'JUN'
         CASE ('07')
-          MonthStr = 'July'
+          MonthStr = 'JUL'
         CASE ('08')
-          MonthStr = 'August'
+          MonthStr = 'AUG'
         CASE ('09')
-          MonthStr = 'September'
+          MonthStr = 'SEP'
         CASE ('10')
-          MonthStr = 'October'
+          MonthStr = 'OCT'
         CASE ('11')
-          MonthStr = 'November'
+          MonthStr = 'NOV'
         CASE ('12')
-          MonthStr = 'December'
+          MonthStr = 'DEC'
       END SELECT
-      DateStr = DateStr(1:LEN_TRIM(DateStr))//' '//MonthStr(1:LEN_TRIM(MonthStr))//' '//tDate(1:4)
       DAT(1:3) = tDate(7:8)//'-'
       DAT(4:6) = MonthStr(1:3)
-      CALL StrUpperCase(DAT(4:6))
       DAT(7:10) = '-'//tDate(3:4)//' '
 !VMS
       CALL TIME(TIM(1))

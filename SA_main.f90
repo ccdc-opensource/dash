@@ -20,9 +20,7 @@
       INTEGER tFileHandle, I, kk, ifrg, ilen, II, Fixed
       REAL    R, x, lb, ub
       CHARACTER*80 tSDIFile
-      CHARACTER*8  tDate      ! '20010215' for 15 Feb 2001
       CHARACTER*17 DateStr
-      CHARACTER*9  MonthStr
       REAL    MaxMoves1, tMaxMoves
       INTEGER MaxMoves2
       CHARACTER*20, EXTERNAL :: Integer2String
@@ -33,40 +31,7 @@
       tFileHandle = 10
       OPEN(tFileHandle,FILE=TheFileName,ERR=999)
       WRITE(tFileHandle,'("  Parameters for simulated annealing in DASH")',ERR=999)
-      CALL DATE_AND_TIME(tDate)
-      DateStr = ''
-      IF (tDate(7:7) .EQ. '0') THEN 
-        DateStr(1:1) = tDate(8:8)       ! DateStr = '7'
-      ELSE
-        DateStr(1:2) = tDate(7:8)       ! DateStr = '12'
-      ENDIF
-      SELECT CASE (tDate(5:6))
-        CASE ('01')
-          MonthStr = 'January'
-        CASE ('02')
-          MonthStr = 'February'
-        CASE ('03')
-          MonthStr = 'March'
-        CASE ('04')
-          MonthStr = 'April'
-        CASE ('05')
-          MonthStr = 'May'
-        CASE ('06')
-          MonthStr = 'June'
-        CASE ('07')
-          MonthStr = 'July'
-        CASE ('08')
-          MonthStr = 'August'
-        CASE ('09')
-          MonthStr = 'September'
-        CASE ('10')
-          MonthStr = 'October'
-        CASE ('11')
-          MonthStr = 'November'
-        CASE ('12')
-          MonthStr = 'December'
-      END SELECT
-      DateStr = DateStr(1:LEN_TRIM(DateStr))//' '//MonthStr(1:LEN_TRIM(MonthStr))//' '//tDate(1:4)
+      CALL GetDateStr(DateStr)
       WRITE(tFileHandle,'(A)',ERR=999) "  Date = "//DateStr(1:LEN_TRIM(DateStr))
       CALL WDialogSelect(IDD_SAW_Page1)
       CALL WDialogGetString(IDF_SA_Project_Name,tSDIFile)
