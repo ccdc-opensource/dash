@@ -248,13 +248,21 @@
 !
       SUBROUTINE Clear_SA
 
+      USE WINTERACTER
+      USE DRUID_HEADER
+
       IMPLICIT NONE
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      CALL PushActiveWindowID
       NumOf_SA_Runs = 0
+      ! Now clear the solutions from the analyse solutions window
+      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL WDialogClearField(IDF_SA_Summary)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Clear_SA
 !
