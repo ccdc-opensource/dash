@@ -110,12 +110,12 @@
       REAL                          TOLR
       INTEGER                                  NFFT
       REAL                                           AKNOTS
-      INTEGER         NBASF4,             L4END,    L6ST, L6END
+      INTEGER         NBASF4,             L4END
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
                       DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
                       NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
-                      NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+                      NBASF4(MPRPKF,2,9), L4END(9)
 
       REAL            ZEROSP
       INTEGER                        KZROSP
