@@ -301,17 +301,12 @@
           ELSE
             EOBS(I) = SQRT(YOBS(I))
           ENDIF
-        END DO
+        ENDDO
       ENDIF
       DataSetChange = DataSetChange + 1
       NumPawleyRef = 0
       BackRef = .TRUE.
-      CurrentRange = 0
-      NumPeakFitRange = 0
-      DO I = 1, MAX_NPFR
-        NumInPFR(I) = 0
-        IPF_RPt(I) = 0
-      END DO
+      CALL Init_PeakFitRanges
       XPMIN = XOBS(1)
       XPMAX = XOBS(1)
       YPMIN = YOBS(1)
@@ -323,17 +318,17 @@
         IF (YPMAX .LT. YOBS(I)) THEN
           MAX_INTENSITY_INDEX = I
           YPMAX = YOBS(I)
-        END IF
-      END DO
+        ENDIF
+      ENDDO
       INTEGRATED_GUESS = 0
       DO I = MAX(1,MAX_INTENSITY_INDEX - 5), MIN(NOBS,MAX_INTENSITY_INDEX + 5)
         INTEGRATED_GUESS = INTEGRATED_GUESS + YOBS(I)
-      END DO
+      ENDDO
       IF (INTEGRATED_GUESS .GT. 250000) THEN
         SCALFAC = 0.01 * INTEGRATED_GUESS/250000
       ELSE IF (YPMAX .GT. 100000) THEN
         SCALFAC = 0.01 * YPMAX/100000
-      END IF
+      ENDIF
       OriginalNOBS = NOBS
       EndNOBS = OriginalNOBS
       NBIN = (NOBS/LBIN)
@@ -347,14 +342,14 @@
           XADD  = XADD+XOBS(JJ)
           YOADD = YOADD+YOBS(JJ)
           VADD  = VADD+EOBS(JJ)**2
-        END DO
+        ENDDO
         XBIN(I)  = XADD/FLOAT(LBIN)
         YOBIN(I) = YOADD/FLOAT(LBIN)
         YCBIN(I) = YOBIN(I)
         EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
 ! JvdS Assume no knowledge on background
         YBBIN(I) = 0.0
-      END DO
+      ENDDO
       XPGMIN = XPMIN
       XPGMAX = XPMAX
       YPGMIN = YPMIN
@@ -494,7 +489,7 @@
   100 CLOSE(10)
       NOBS = I
       IF (NOBS .LT. NumOfBins) CALL WarningMessage('File contained less data points than expected.'//CHAR(13)// &
-                                                 'Will continue with points actually read only.')
+                                                   'Will continue with points actually read only.')
       IF (NOBS .EQ. 0) THEN
 ! The user should be warned here
         CALL ErrorMessage("The file does not contain enough data points.")
@@ -1098,7 +1093,7 @@
                 POS = POS + 1
                 DO WHILE ((POS .LE. StrLen) .AND. (Cline(POS:POS) .EQ. ' '))
                   POS = POS + 1
-                END DO
+                ENDDO
 ! Now we are at the first non-space character after '_ANODE ='
 ! Check that we have at least four characters left in Cline
                 IF ((POS+3) .LE. StrLen ) THEN
