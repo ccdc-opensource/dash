@@ -297,8 +297,8 @@
         DO I = 1, NBIN
           WRITE(hFile,'(F6.3,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
         ENDDO
+        CLOSE(hFile)
       ENDIF
-      CLOSE(hFile)
       RETURN
   999 CALL ErrorMessage('Error writing .xye file.')
       CLOSE(hFile)
