@@ -136,11 +136,19 @@
 ! Read / Write space group
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumberSGTable)
 ! Calculate tick marks
-      IF (RW .EQ. cRead) CALL Generate_TicMarks 
+      IF (RW .EQ. cRead) THEN
+        PastPawley = .FALSE.
+        CALL Generate_TicMarks
+      ENDIF
+! Is this "PastPawley"? (has consequences for e.g. drawing of peak fit ranges)
+      PastPawley = ((CurrentWizardWindow .EQ. IDD_SAW_Page1) .OR.     &
+                    (CurrentWizardWindow .EQ. IDD_SAW_Page2) .OR.     &
+                    (CurrentWizardWindow .EQ. IDD_SA_input2) .OR.     &
+                    (CurrentWizardWindow .EQ. IDD_SA_input3))
 ! Read / Write Pawley refinement related stuff
 ! Read / Write the peak fit ranges
       CALL PrjReadWritePeakFitRanges
-! We _must_ read the Peak Fit Ranges after the data needed to generate the tickmarks (unit cell,
+! We _must_ read the Peak Fit Ranges after the data needed to generate the tick marks (unit cell,
 ! zero point, wavelength, space group, powder pattern) because it needs the tick marks
 ! to assign a reflection to each peak position.
 ! Read / Write the .pik file
@@ -319,6 +327,7 @@
           ENDDO
         ENDIF
       ENDDO
+      IF (RW .EQ. cRead) CALL UpdateZmatrixSelection
 
       END SUBROUTINE PrjReadWriteZmatrices
 !
