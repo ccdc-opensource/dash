@@ -134,6 +134,12 @@
         tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.ccl'
         INQUIRE(FILE=tFileName,EXIST=OutputExists) 
         IF (OutputExists) GOTO 10
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.cif'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.res'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
 ! ep added.  Pro_file contains the powder diffraction data and fit....
         tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.pro'
         INQUIRE(FILE=tFileName,EXIST=OutputExists) 
@@ -157,7 +163,7 @@
         iFlags = SaveDialog + NonExPath + DirChange + AppendExt
         filehead = ''
 ! ep appended
-        CALL WSelectFile('pdb files|*.pdb|ccl files|*.ccl|cssr files|*.cssr|pro files|*.pro|',&
+        CALL WSelectFile('Output files (*.pdb,*.cssr,*.ccl,*.cif,*.res,*.pro)|*.pdb;*.cssr;*.ccl;*.cif;*.res;*.pro|', &
                          iFlags,filehead,'Choose SA output file name')
         IF ((WinfoDialog(4) .NE. CommonOk) .OR. (LEN_TRIM(filehead) .EQ. 0)) THEN ! Cancel
           CheckOverwriteSaOutput = 0
