@@ -49,7 +49,7 @@
 
       INTEGER zm2Par(1:MaxDOF,1:maxcopies,1:maxfrg)
 
-! Mapping of parameters per dergee of freedom per copy per Z-matrix
+! Mapping of parameters per degree of freedom per copy per Z-matrix
 
 ! The following variables are there to allow the dialogue fields in the
 ! window dealing with Z-matrices to be handled by DO...ENDDO loops.
@@ -72,19 +72,19 @@
       DATA IDBzmEdit   / IDB_zmEdit1,   IDB_zmEdit2,   IDB_zmEdit3,   IDB_zmEdit4   /
       DATA IDFZMpars   / IDF_ZM_pars1,  IDF_ZM_pars2,  IDF_ZM_pars3,  IDF_ZM_pars4  /
 
-      INTEGER         nfrag
+      INTEGER          nfrag
 
 ! nfrag = number of fragments
 
-      INTEGER         TotNumZMatrices
+      INTEGER          TotNumZMatrices
 
 ! Total number of Z-matrices, including number of copies
 
-      CHARACTER*255   frag_file(0:maxfrg)
+      CHARACTER*255    frag_file(0:maxfrg)
 
-! frag_file = name of the .zmatrix file containing fragment number ifrag
+! frag_file = name of the .zmatrix file containing fragment number iFrag
 
-      INTEGER         zmNumberOfCopies(0:maxfrg)
+      INTEGER          zmNumberOfCopies(0:maxfrg)
 
 ! zmNumberOfCopies  =  number of copies of this Z-matrix used during the SA.
 !                      This way, it is easy e.g. to solve salts or solve structures in P1
@@ -93,7 +93,7 @@
 !                      2. its quaternions
 !                      3. its torsion angles
 
-      LOGICAL         gotzmfile(0:maxfrg)
+      LOGICAL          gotzmfile(0:maxfrg)
 
       INTEGER          icomflg(0:maxfrg)
       REAL             AtomicWeighting(1:maxatm,0:maxfrg)
@@ -101,6 +101,8 @@
 
 ! We want to have some variables that specify the orientation of the Z-matrix when 
 ! rotation is restricted to a single axis      
+      REAL             zmInitialQs(0:3,0:maxfrg)
+
       INTEGER          zmSingleRotAxDef(0:maxfrg)
 ! 1 = to atom
 ! 2 = fractional co-ordinates
