@@ -187,7 +187,7 @@
 ! JvdS Next lines very dirty: v is INTEGER*4, but their XOR is INTEGER*2. Not possible.
       READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
       cs = IEOR(v(1),v(2))
-      cs = IEOR(cs,16#1504)
+      cs = IEOR(cs,16#1234)
 ! Check the checksum
       IF (tCheckSum .NE. checksum) THEN
 ! If the checksum is invalid, then that's the end of our checks.
