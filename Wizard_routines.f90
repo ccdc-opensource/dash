@@ -183,11 +183,11 @@
 ! @@ ?
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
-!O      CALL WDialogSelect(IDD_ViewPawley)
-!O      CALL WDialogFieldState(IDF_Sigma1,Enabled)
-!O      CALL WDialogFieldState(IDF_Sigma2,Enabled)
-!O      CALL WDialogFieldState(IDF_Gamma1,Enabled)
-!O      CALL WDialogFieldState(IDF_Gamma2,Enabled)
+      CALL WDialogSelect(IDD_ViewPawley)
+      CALL WDialogFieldState(IDF_Sigma1,Enabled)
+      CALL WDialogFieldState(IDF_Sigma2,Enabled)
+      CALL WDialogFieldState(IDF_Gamma1,Enabled)
+      CALL WDialogFieldState(IDF_Gamma2,Enabled)
       IPTYPE = 1
       CALL Profile_Plot
 
