@@ -21,6 +21,7 @@
       PARAMETER ( MCHIHS = 40000 )
 
 ! For common block CHISTOP and CHIBEST
+! Although it looks like an independent parameter, must be equal to MOBS
 
       INTEGER MCHSTP
       PARAMETER ( MCHSTP = 15000 )
@@ -137,7 +138,7 @@
 ! For use in common blocks ZMCOMI, ZMCOMR, ZMCOMC, ZMCOMO, FRGCOM, FRGCHA, ZMCOMG, ZMLGOT, ZMNPAR
 
 	  INTEGER maxfrg
-      PARAMETER ( maxfrg = 20 )
+      PARAMETER ( maxfrg = 5 )
 
 ! maxfrg = Maximum number of fragments = individual z-matrices
 
