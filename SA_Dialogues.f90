@@ -1479,10 +1479,10 @@
       LOGICAL                                                   LimsChanged
       COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
 
-      INTEGER                ModalFlag,       RowNumber
-      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber
-      SAVE   /ModalTorsions/      
-      
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
+
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       LOGICAL, EXTERNAL :: NearlyEqual
       REAL    xtem
@@ -1892,8 +1892,7 @@
 
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  
-      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
-      SAVE   /ModalTorsions/
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
 
       LOGICAL, EXTERNAL :: OutOfBounds
       INTEGER ICol, NumColumns, ISET
@@ -2217,8 +2216,9 @@
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
-      INTEGER                ModalFlag,       RowNumber      
-      COMMON /ModalTorsions/ ModalFlag(mvar), RowNUmber
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
 
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds 
