@@ -30,10 +30,11 @@
       PARAMETER (MVAR = 100)
       REAL*8 CKK1, CKK2, CKK3
       REAL*8 TRAN(3), ROTA(3,3), CART(1:3,1:MAXATM)
-      REAL*8 QUATER(4), QQSUM, QDEN, QUATT(MVAR)
+      REAL*8 QUATER(4), QQSUM, QDEN
       REAL*8 XC, YC, ZC, ZERO, ONE, V1, V2, V3
       INTEGER KK, KATOM, ifrg, NATS, KK1, KK2, KK3, JQ, JQS, I, ICFRG, KI
       LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
+      REAL*8 Duonion(1:2)
 
       KK = 0
       KATOM = 0
@@ -56,23 +57,51 @@
           KK = KK + 3
 ! If more than one atom then proceed
           IF (NATS.GT.1) THEN
-            QQSUM = 0.
-            DO JQ = 1, 4
-              JQS = JQ + KK
-              QUATT(JQS) = CHROM(JQS)
-              QQSUM = QQSUM + QUATT(JQS)**2
-            ENDDO
+! If we have at least two atoms, there are two options:
+! 1. Rotate the whole molecule freely, using quaternions
+! 2. Specify the rotation axis (e.g. if molecule on mirror plane)
+            IF (UseQuaternions(ifrg)) THEN
+              QQSUM = 0.0
+              DO JQ = 1, 4
+                JQS = JQ + KK
+                QQSUM = QQSUM + CHROM(JQS)**2
+              ENDDO
 ! QQSUM now holds the sum of the squares of the quaternions
-            QDEN = 1./SQRT(QQSUM)
-            DO JQ = 1, 4
-              JQS = JQ + KK
-              QUATT(JQS) = QDEN*QUATT(JQS)
-              QUATER(JQ) = QUATT(JQS)
-            ENDDO
+              QDEN = 1.0 / SQRT(QQSUM)
+              DO JQ = 1, 4
+                JQS = JQ + KK
+                QUATER(JQ) = QDEN * CHROM(JQS)
+              ENDDO
 ! QUATER now holds the normalised quaternions
-            CALL ROTMAK(QUATER,ROTA)
+              CALL ROTMAK(QUATER,ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the quaternions
-            KK = KK + 4
+              KK = KK + 4
+            ELSE
+! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
+              Duonion(1) = CHROM(KK+1)
+              Duonion(2) = CHROM(KK+2)
+              QDEN = 1.0 / SQRT(Duonion(1)**2 + Duonion(2)**2)
+              Duonion(1) = Duonion(1) * QDEN 
+              Duonion(2) = Duonion(2) * QDEN 
+              QUATER(1) = Duonion(1) * zmSingleRotationQs(0,ifrg)
+              QUATER(2) = Duonion(2) * zmSingleRotationQs(1,ifrg)
+              QUATER(3) = Duonion(2) * zmSingleRotationQs(2,ifrg)
+              QUATER(4) = Duonion(2) * zmSingleRotationQs(3,ifrg)
+! Sum the squares of the components
+              QQSUM = 0.0
+              DO JQ = 1, 4
+                QQSUM = QQSUM + QUATER(JQ)**2
+              ENDDO
+              QDEN = 1.0 / SQRT(QQSUM)
+! Normalise the quaternion
+              DO JQ = 1, 4
+                QUATER(JQ) = QDEN * QUATER(JQ)
+              ENDDO
+! QUATER now holds the normalised quaternions
+              CALL ROTMAK(QUATER,ROTA)
+! ROTA now holds the 3x3 rotation matrix corresponding to the single rotation axis
+              KK = KK + 4 ! We always reserve 4 parameters for rotations, whether needed or not
+            ENDIF
           ENDIF
           DO I = 1, NATS
             IF (IOPTB(I,IFRG).EQ.1) THEN
@@ -150,22 +179,44 @@
 !
 ! Converts 4 quaternions to a 3x3 rotation matrix
 !
-      REAL*8 DC4(4), EL(4,4), ROTA(3,3)
+! JvdS, 14 Jan 2002.
+! Reprogrammed according to Molecular Modelling by Leach, page 384.
+! (Note the typos: q1 and q2 should probably read phi minus psi)
 
-      DO I = 1, 4
-        DO J = I, 4
+      IMPLICIT NONE
+
+!O      REAL*8 DC4(4), EL(4,4), ROTA(3,3)
+      REAL*8 DC4(0:3), EL(0:3,0:3), ROTA(1:3,1:3)
+      INTEGER I, J
+
+!O      DO I = 1, 4
+!O        DO J = I, 4
+!O          EL(I,J) = 2.0 * DC4(I) * DC4(J)
+!O        ENDDO
+!O      ENDDO
+!O      ROTA(1,1) = 1.0 - (EL(2,2) + EL(3,3))
+!O      ROTA(2,2) = 1.0 - (EL(1,1) + EL(3,3))
+!O      ROTA(3,3) = 1.0 - (EL(1,1) + EL(2,2))
+!O      ROTA(1,2) = EL(1,2) - EL(3,4)
+!O      ROTA(1,3) = EL(1,3) + EL(2,4)
+!O      ROTA(2,3) = EL(2,3) - EL(1,4)
+!O      ROTA(2,1) = EL(1,2) + EL(3,4)
+!O      ROTA(3,1) = EL(1,3) - EL(2,4)
+!O      ROTA(3,2) = EL(2,3) + EL(1,4)
+      DO I = 0, 3
+        DO J = I, 3
           EL(I,J) = 2.0 * DC4(I) * DC4(J)
         ENDDO
       ENDDO
-      ROTA(1,1) = 1.0 - (EL(2,2) + EL(3,3))
-      ROTA(2,2) = 1.0 - (EL(1,1) + EL(3,3))
-      ROTA(3,3) = 1.0 - (EL(1,1) + EL(2,2))
-      ROTA(1,2) = EL(1,2) - EL(3,4)
-      ROTA(1,3) = EL(1,3) + EL(2,4)
-      ROTA(2,3) = EL(2,3) - EL(1,4)
-      ROTA(2,1) = EL(1,2) + EL(3,4)
-      ROTA(3,1) = EL(1,3) - EL(2,4)
-      ROTA(3,2) = EL(2,3) + EL(1,4)
+      ROTA(1,1) = 0.5 * (EL(0,0) + EL(1,1) - EL(2,2) - EL(3,3))
+      ROTA(2,2) = 0.5 * (EL(0,0) - EL(1,1) + EL(2,2) - EL(3,3))
+      ROTA(3,3) = 0.5 * (EL(0,0) - EL(1,1) - EL(2,2) + EL(3,3))
+      ROTA(1,2) = EL(1,2) + EL(0,3)
+      ROTA(1,3) = EL(1,3) - EL(0,2)
+      ROTA(2,1) = EL(1,2) - EL(0,3)
+      ROTA(2,3) = EL(2,3) + EL(0,1)
+      ROTA(3,1) = EL(1,3) + EL(0,2)
+      ROTA(3,2) = EL(2,3) - EL(0,1)
 
       END SUBROUTINE ROTMAK
 !
