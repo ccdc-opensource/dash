@@ -18,10 +18,13 @@
 
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
-           
+
+      INTEGER         PR_NumBack
+      REAL                        PR_BackGround
+      COMMON /PRBACK/ PR_NumBack, PR_BackGround(1:10)
+
       INTEGER, EXTERNAL :: PawleyErrorLog
       INTEGER IDUMMY
-      INTEGER NTCycles
 
 ! JvdS This window popping up automatically makes it impossible to 
 ! play around with indexing. Therefore: when in one of the indexing windows, ignore
@@ -40,16 +43,18 @@
       CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
 !!ep added
 !!      CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed,Disabled)
-      CALL WDialogFieldState(IDBACK, Enabled)
 ! If the background has been subtracted after the pattern was read in, then the
 ! order of the background polynomial defaults to 2, otherwise to 10.
       IF (.NOT. BACKREF) THEN
-        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,2)
+        PR_NumBack = 2
+        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,PR_NumBack)
         CALL WDialogRangeInteger(IDF_IDF_PawRef_NBack,2,6)
       ELSE
-        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,10)
+        PR_NumBack = 10
+        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,PR_NumBack)
         CALL WDialogRangeInteger(IDF_IDF_PawRef_NBack,2,10)
       ENDIF
+      PR_BackGround = 0.0
       CALL WDialogClearField(IDF_Pawley_Cycle_Number)
       CALL WDialogClearField(IDF_Pawley_Refinement_Number)
       IDUMMY = PawleyErrorLog(2) ! Reset the log messages
@@ -67,9 +72,7 @@
       CALL WDialogPutCheckBox(IDF_PawRef_RefSigm2_Check,Unchecked)
       CALL WDialogPutCheckBox(IDF_PawRef_RefGamm1_Check,Unchecked)
       CALL WDialogPutCheckBox(IDF_PawRef_RefGamm2_Check,Unchecked)
-      NTCycles = 3
-      CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
-      CALL IOsDeleteFile('polyp.niw')
+      CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,3)
       CALL WizardWindowShow(IDD_Pawley_Status)
       CALL PopActiveWindowID
 
@@ -96,11 +99,40 @@
       INTEGER                                                                                            KOM4
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2), KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
 
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END,    L6ST, L6END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+
       REAL            ZEROSP
       INTEGER                        KZROSP
       REAL                                          DKDZER
       INTEGER                                                  NZERSP
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6), NZERSP(9,5)
+
+      INTEGER         IBACK, NBACK
+      REAL                             ARGBAK,        BACKGD
+      INTEGER         KBCKGD,        NBK, LBKD
+      LOGICAL                                       ZBAKIN
+      COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5),    &
+                      KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
+
+      INTEGER         PR_NumBack
+      REAL                        PR_BackGround
+      COMMON /PRBACK/ PR_NumBack, PR_BackGround(1:10)
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
@@ -128,6 +160,9 @@
       INTEGER                                                                ICODEZ
       REAL                                                                                 KOBZ
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
+
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
 ! Save the boxes from Pawley fit to Pawley fit
       REAL RLastValues(3)
@@ -184,8 +219,6 @@
 ! Also decrement the number of Pawley refinements since it failed
                   NumPawleyRef = NumPawleyRef - 1
                   CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
-! We want to ignore the newly created .ccn and use the old .ccl, therefore, copy .ccl to .niw
-                  CALL IOSCopyFile('polyp.ccl','polyp.niw')
                   CALL WDialogClearField(IDF_Pawley_Cycle_Number)
                   IDUMMY = PawleyErrorLog(2) ! Reset the log messages
                   CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
@@ -221,12 +254,6 @@
             CASE (IDB_PawRef_Accept)
 ! update the profile and stay with the Pawley refinement
               IPTYPE = 2
-! upload the cell constants and zeropoint from the Pawley refinement
-              DO II = 1, 3
-                CELLPAR(II) = CELL(II,1,1)
-                JJ = II + 3
-                CELLPAR(JJ) = DEGREE(ACOS(CELL(II,2,1)))
-              ENDDO
 ! The new peak shape parameters are now in 
 !        PKFNSP(L,I,JPHASE,JSOURC)
 ! L = 1 : 'SIGM', I = 1, 2
@@ -234,15 +261,33 @@
 ! L = 3 : 'HPSL', I = 1
 ! L = 4 : 'HMSL', I = 1
 ! JPHASE = 1, JSOURC = 1
-
+              PeakShapeSigma(1) = PKFNSP(1,1,1,1)
+              PeakShapeSigma(2) = PKFNSP(1,2,1,1)
+              PeakShapeGamma(1) = PKFNSP(2,1,1,1)
+              PeakShapeGamma(2) = PKFNSP(2,2,1,1)
+              CALL WDialogSelect(IDD_ViewPawley)
+              CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
+              CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
+              CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
+              CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
+!C              PeakShapeHPSL 
+!C              PeakShapeHMSL
+! Store new background parameters
+              PR_NumBack = NBACK(1)
+              PR_BackGround = 0.0
+              DO II = 1, PR_NumBack
+                PR_BackGround(II) = BACKGD(II,1)
+              ENDDO
+! upload the cell constants and zeropoint from the Pawley refinement
+              DO II = 1, 3
+                CELLPAR(II) = CELL(II,1,1)
+                JJ = II + 3
+                CELLPAR(JJ) = DEGREE(ACOS(CELL(II,2,1)))
+              ENDDO
               CALL Upload_Cell_Constants
               ZeroPoint = ZEROSP(1,1,1)
               CALL Upload_ZeroPoint 
               CALL Generate_TicMarks
-! The CCSL code has written out a new input file for the next Pawley refinement--polyp.ccn
-! As the user has accepted the fit, we can use this file to generate our new input file.
-! To flag this to the subroutine, we create the file 'polyp.niw'
-              CALL IOsCopyFile('polyp.ccn','polyp.niw')
 ! JCC Save the settings
               CALL WDialogSelect(IDD_Pawley_Status)
               CALL WDialogGetReal(IDF_Pawley_Cycle_Rwp,RLastValues(1)) 
@@ -254,13 +299,14 @@
               CALL make_polybackup
 ! Disable the Solve button until the user does a Save
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+
               CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
+
               CALL WDialogSelect(IDD_Pawley_Status)
               IF (LastValuesSet) CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
-              CALL WDialogFieldState(IDBACK, Enabled)
               CALL SetModeMenuState(0,0)
 ! JCC Only change the setting if this is the second Pawley fit
               IF (NumPawleyRef .EQ. 1) THEN
@@ -285,7 +331,6 @@
 ! Have hit "Refine" at least twice so are now able to call Space Group Determination program
                    IF (Inum .gt. 1) THEN
                      CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd
-                     CALL WDialogFieldState(IDBACK, Enabled)
                      CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
                      CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
                    END IF
@@ -305,7 +350,6 @@
                 CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
                 CALL retrieve_polybackup
                 CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
-                CALL WDialogFieldState(IDBACK, Enabled)
               ENDIF
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
@@ -384,8 +428,6 @@
       INCLUDE 'statlog.inc'
       INCLUDE 'Lattice.inc'
 
-      CHARACTER(LEN=80) :: BackStr
-
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
                         PkFnVarVal,                   PkFnVarEsd,                   &
@@ -409,7 +451,14 @@
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-      
+
+      INTEGER         PR_NumBack
+      REAL                        PR_BackGround
+      COMMON /PRBACK/ PR_NumBack, PR_BackGround(1:10)
+
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -420,8 +469,6 @@
                        XGGMIN,    XGGMAX
       
       INTEGER NPawBack
-      INTEGER NPawBack_OLD
-      SAVE    NPawBack_OLD ! To test if number of background parameters has changed
       CHARACTER*4 ChRadOption(4)
       DATA CHRADOPTION /'LABX','SYNX','SYNX','TOFN'/
       INTEGER I
@@ -429,19 +476,16 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, NearlyEqual
       REAL,    EXTERNAL :: WavelengthOf
       INTEGER NTCycles
-      INTEGER JNB, NBLIN, INB, ITEM, ISYM, IRTYP
-      INTEGER N1, N2, K1, KNB
+      INTEGER ITEM, ISYM, IRTYP
       INTEGER tFileHandle, hFile
-      LOGICAL UsePrevious, FirstVaryLine
-      INTEGER nl, iRow, ii
+      INTEGER iRow, ii, J
       REAL    tReal
-      CHARACTER*255 Line
 ! Following variables are needed to sort out the excluded regions
       INTEGER iOrd(1:10)
       REAL    rStart(1:10), rEnd(1:10)
       REAL    trStart(1:10), trEnd(1:10)
       INTEGER NumUsed
-      LOGICAL Used(1:10), FirstExclRegionsLine
+      LOGICAL Used(1:10)
 
 ! Are these checks in place here? If one of them fails, we shouldn't have been here in the first place.
 !
@@ -458,7 +502,7 @@
         DO I = 1, NBIN
           WRITE(tFileHandle,'(F10.4,F12.2,F12.2)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
         ENDDO
- 4110   CLOSE(tFileHandle)
+        CLOSE(tFileHandle)
       ENDIF
       NumInternalDSC = DataSetChange
       NumPawleyRef = NumPawleyRef + 1
@@ -535,178 +579,77 @@
       CALL WDialogSelect(IDD_Pawley_Status)
       CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
       CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
-      INQUIRE(FILE = 'polyp.niw', exist=UsePrevious)
       hFile = 42
-      IF (UsePrevious) THEN
-        OPEN(hFile,file='polyp.ccl',status='unknown',ERR=999)
-        OPEN(43,file='polyp.niw',status='old',ERR=999)
-        FirstVaryLine = .TRUE.
-        FirstExclRegionsLine = .TRUE.
-   10   READ(43,5300,END=900,ERR=999) nl, line
- 5300   FORMAT(Q,A)
-        SELECT CASE (line(1:1))
-          CASE ('I')
-            WRITE(hFile,4240,ERR=999) NTCycles
- 4240       FORMAT('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0')
-          CASE ('L')
-            SELECT CASE (line(3:6))
-              CASE('RTYP')
-                CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
-                IRtyp = 2 - Item
-                WRITE(hFile,4245,ERR=999) IRTYP, xpmin, xpmax
- 4245           FORMAT('L RTYP  'I3,2F10.3,'  0.001')
-              CASE ('SLIM')
-                CALL WDialogGetReal(IDF_Slim_Parameter,tReal)
-                WRITE(hFile,'(A7,F5.2)',ERR=999) 'L SLIM ', tReal 
-              CASE ('EXCL')
-                IF (FirstExclRegionsLine) THEN
-                  DO iRow = 1, NumUsed
-                    WRITE(hFile,"('L EXCL ',F7.3,1X,F7.3)",ERR=999) rStart(iRow), rEnd(iRow)
-                  ENDDO
-                ENDIF
-                FirstExclRegionsLine = .FALSE.
-              CASE ('VARY')
-                IF (FirstVaryLine) THEN
-                  WRITE(hFile,'(A)',ERR=999) 'L VARY ONLY ALL INTS'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL BACK '
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL CELL '
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY ZERO 1 '
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 1'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 2'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 1'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 2'
-                ENDIF
-                FirstVaryLine = .FALSE.
-              CASE ('BACK')
-                CALL WDialogGetCheckBox(IDF_PawRef_RefBack_Check,Item)
-! If the background should not be varied, or the number of parameters hasn't changed,
-! just copy the old lines.
-                IF ((Item.EQ.0) .OR. (NPawBack.EQ.NPawBack_OLD)) THEN
-                  WRITE(hFile,'(A)',ERR=999) line(1:nl)              
-                ELSE
-! Otherwise, set all back ground parameters to zero
-! Read all old background lines
-                  nblin = 1 + (NPawBack_OLD-1)/5
-                  IF (nblin .GT. 1) THEN
-                    DO inb = 2, nblin ! we have already read the first line
-                      READ(43,5300,END=900,ERR=999) nl, line
-                    ENDDO
-                  ENDIF
-! Write all zeros for the new background
-                  nblin = 1 + (NPawBack-1)/5
-                  DO inb = 1, nblin
-                    n1 = 5*(inb-1)
-                    n2 = MIN(n1+5,NPawBack)-n1
-                    backstr = 'L BACK 2'
-                    knb = 7
-                    IF (inb.EQ.1) knb=9
-                    DO jnb = 1, n2
-                      k1 = knb + 12*(jnb-1)
-                      backstr(k1:k1+11) = '      0.000'
-                    ENDDO
-                    WRITE(hFile,'(A)',ERR=999) backstr
-                  ENDDO
-                  NPawBack_OLD = NPawBack
-                ENDIF
-              CASE DEFAULT
-                WRITE(hFile,'(A)',ERR=999) line(1:nl)              
-            END SELECT
-          CASE DEFAULT
-            WRITE(hFile,'(A)',ERR=999) line(1:nl)
-        END SELECT
-        GOTO 10
- 900    CLOSE(hFile)
-        CLOSE(43)
-        CALL IOsDeleteFile('polyp.niw')
-! The file we have just created will remain the new input file until either
-! a. the user starts the Pawley refinement from scratch (i.e. exits and re-opens the dialogue)
-! b. the user presses 'Accept' to accept the refined parameters
-        CALL IOsCopyFile('polyp.ccl', 'polyp.niw')
-      ELSE
-        CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOn)
-        OPEN(hFile,FILE='polyp.ccl',status='unknown',ERR=999)
-        WRITE(hFile,4210,ERR=999) 
+      OPEN(hFile,FILE='polyp.ccl',status='unknown',ERR=999)
+      WRITE(hFile,4210,ERR=999) 
  4210 FORMAT('N Polyfitter file for quick Pawley refinement')
-        WRITE(hFile,4220,ERR=999) (CellPar(I),I=1,6)
+      WRITE(hFile,4220,ERR=999) (CellPar(I),I=1,6)
  4220 FORMAT('C ',3F10.5,3F10.3)
-        WRITE(hFile,4230,ERR=999) 
+      WRITE(hFile,4230,ERR=999) 
  4230 FORMAT('F C 2 2.31 20.8439 1.02 10.2075 1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
-        IF (NumberSGTable .GE. 1) THEN
-          CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
-          IF (nsymmin .GT. 0) THEN
-            DO isym = 1, nsymmin
-              WRITE(hFile,4235,ERR=999) symline(isym)
- 4235         FORMAT('S ',A)
-            ENDDO
-          ENDIF
-        ENDIF
-        WRITE(hFile,4241,ERR=999) NTCycles, ChRadOption(JRadOption)
- 4241   FORMAT('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0'/              &
-        'L REFI PAWL'/                                                    &
-        'L SORC ', A4/                                                    &
-        'L WGHT 3')
-        CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
-        IRtyp = 2 - Item
-        WRITE(hFile,4246,ERR=999) IRTYP, xpmin, xpmax
- 4246   FORMAT('L RTYP  'I3,2F10.3,'  0.001')
-        IF (.NOT. FnWaveLengthOK()) ALambda = WavelengthOf('Cu')
-        WRITE(hFile,4250,ERR=999) ALambda
- 4250   FORMAT('L WVLN ',F10.5)
-        IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
-        WRITE(hFile,4260,ERR=999) ZeroPoint
- 4260   FORMAT('L ZERO ',F10.5)
-        DO iRow = 1, NumUsed
-          WRITE(hFile,"('L EXCL ',F7.3,1X,F7.3)",ERR=999) rStart(iRow), rEnd(iRow)
-        ENDDO
-        CALL WDialogGetReal(IDF_Slim_Parameter,SLIMVALUE)
-        WRITE(hFile,4270,ERR=999) SCALFAC, SLIMVALUE
- 4270   FORMAT('L SCAL   ',F7.5,/                                         &
-        'L SLIM ',F5.2,' '/                                               &
-        'L REFK 10.0'/                                                    &
-        'L PKCN TYPE 1'/                                                  &
-        'L PKFN TYPE 3'/                                                  &
-        'L PKFN LIMS 0.005')
-        WRITE(hFile,4271,ERR=999) PkFnVarVal(1,1), PkFnVarVal(2,1)
-        WRITE(hFile,4272,ERR=999) PkFnVarVal(1,2), PkFnVarVal(2,2)
-        WRITE(hFile,4273,ERR=999) PkFnVarVal(1,3)
-        WRITE(hFile,4274,ERR=999) PkFnVarVal(1,4)
- 4271   FORMAT('L PKFN SIGM ',2F8.4)
- 4272   FORMAT('L PKFN GAMM ',2F8.4)
- 4273   FORMAT('L PKFN HPSL ',F8.4)
- 4274   FORMAT('L PKFN HMSL ',F8.4)
-        IF (.NOT. BACKREF) THEN
-          NPawBack =  2
-        ELSE
-          NPawBack = 10
-        ENDIF
-        NPawBack_OLD = NPawBack
-        nblin = 1 + (NPawBack-1)/5
-        DO inb = 1, nblin
-          n1 = 5*(inb-1)
-          n2 = MIN(n1+5,NPawBack)-n1
-          backstr = 'L BACK 2'
-          knb = 7
-          IF (inb.EQ.1) knb=9
-          DO jnb = 1, n2
-            k1 = knb + 12*(jnb-1)
-            backstr(k1:k1+11) = '      0.000'
+      IF (NumberSGTable .GE. 1) THEN
+        CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
+        IF (nsymmin .GT. 0) THEN
+          DO isym = 1, nsymmin
+            WRITE(hFile,4235,ERR=999) symline(isym)
+ 4235       FORMAT('S ',A)
           ENDDO
-          WRITE(hFile,'(A)',ERR=999) backstr
-        ENDDO
-        WRITE(hFile,'(A)',ERR=999) 'L VARY ONLY ALL INTS'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL BACK'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL CELL'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ZERO 1 '
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 1'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 2'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 1'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 2'
-        CLOSE(hFile)
-      ENDIF   
+        ENDIF
+      ENDIF
+      WRITE(hFile,4241,ERR=999) NTCycles, ChRadOption(JRadOption)
+ 4241 FORMAT('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0'/              &
+      'L REFI PAWL'/                                                    &
+      'L SORC ', A4/                                                    &
+      'L WGHT 3')
+      CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
+      IRtyp = 2 - Item
+      WRITE(hFile,4246,ERR=999) IRTYP, xpmin, xpmax
+ 4246 FORMAT('L RTYP  'I3,2F10.3,'  0.001')
+      IF (.NOT. FnWaveLengthOK()) ALambda = WavelengthOf('Cu')
+      WRITE(hFile,4250,ERR=999) ALambda
+ 4250 FORMAT('L WVLN ',F10.5)
+      IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
+      WRITE(hFile,4260,ERR=999) ZeroPoint
+ 4260 FORMAT('L ZERO ',F10.5)
+      DO iRow = 1, NumUsed
+        WRITE(hFile,"('L EXCL ',F7.3,1X,F7.3)",ERR=999) rStart(iRow), rEnd(iRow)
+      ENDDO
+      CALL WDialogGetReal(IDF_Slim_Parameter,SLIMVALUE)
+      WRITE(hFile,4270,ERR=999) SCALFAC, SLIMVALUE
+ 4270 FORMAT('L SCAL   ',F7.5,/                                         &
+      'L SLIM ',F5.2,' '/                                               &
+      'L REFK 10.0')
+      WRITE(hFile,"('L PKCN TYPE 1')",ERR=999)
+      WRITE(hFile,"('L PKFN TYPE 3')",ERR=999)
+      WRITE(hFile,"('L PKFN LIMS 0.005')",ERR=999)
+      WRITE(hFile,4271,ERR=999) PeakShapeSigma(1), PeakShapeSigma(2)
+      WRITE(hFile,4272,ERR=999) PeakShapeGamma(1), PeakShapeGamma(2)
+      WRITE(hFile,4273,ERR=999) PeakShapeHPSL
+      WRITE(hFile,4274,ERR=999) PeakShapeHMSL
+ 4271 FORMAT('L PKFN SIGM ',2F8.4)
+ 4272 FORMAT('L PKFN GAMM ',2F8.4)
+ 4273 FORMAT('L PKFN HPSL ',F8.4)
+ 4274 FORMAT('L PKFN HMSL ',F8.4)
+      IF (NPawBack .LE. 5) THEN
+        WRITE(hFile,"('L BACK    2',4X,6(F10.5,1X))",ERR=999) (PR_BackGround(J),J=1,NPawBack)
+      ELSE
+        WRITE(hFile,"('L BACK    2',4X,6(F10.5,1X))",ERR=999) (PR_BackGround(J),J=1,5)
+        WRITE(hFile,"('L BACK ',7(F10.5,1X))",ERR=999) (PR_BackGround(J),J=6,NPawBack)
+      ENDIF
+      WRITE(hFile,'(A)',ERR=999) 'L VARY ONLY ALL INTS'
+      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL BACK'
+      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL CELL'
+      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ZERO 1 '
+      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 1'
+      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 2'
+      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 1'
+      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 2'
+      CLOSE(hFile)
       CALL PopActiveWindowID
       RETURN
   999 CALL ErrorMessage('Error writing temporary input file for Pawley refinement.')
       CLOSE(hFile)
+      CLOSE(tFileHandle)
       CALL PopActiveWindowID
 
       END SUBROUTINE WritePawleyRefinementFile
@@ -977,7 +920,7 @@
       CLOSE(81)
       CreateSDIFile = 0
       RETURN
-  999 CALL ErrorMessage('Error while writing .sdi file.')
+  999 CALL ErrorMessage('Error writing .sdi file.')
       CLOSE(81)
 
       END FUNCTION CreateSDIFile
@@ -1034,7 +977,7 @@
       WRTDSL = 0
       RETURN
 ! Error if we get here
-  999 CALL ErrorMessage('Error while writing .dsl file.')
+  999 CALL ErrorMessage('Error writing .dsl file.')
       CLOSE(77,IOSTAT=IDUM)
 
       END FUNCTION WRTDSL

@@ -41,9 +41,12 @@
                         PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
                         PkPosAv(MAX_NPFR)
 
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
+
       REAL    FitPar(MPkDes), FitEsd(MPkDes)
       INTEGER IOrdTem(MAX_NPFR)
-      INTEGER IOrd, IPtPS
+      INTEGER iOrd, IPtPS
       REAL    ptem3, ptem4
 
 ! This is for testing for mathematical errors
@@ -81,22 +84,33 @@
       CALL WDialogClearField(IDF_Sigma_Grid)
       CALL WDialogClearField(IDF_Sigma1)
       CALL WDialogClearField(IDF_sigma2)
+      PeakShapeSigma(1) = -999.0
+      PeakShapeSigma(2) = -999.0
 ! Clear gammas
       CALL WDialogSelect(IDD_Gamma_info)
       CALL WGridRows(IDF_Gamma_Grid,NumRows)
       CALL WDialogClearField(IDF_Gamma_Grid)
       CALL WDialogClearField(IDF_Gamma1)
       CALL WDialogClearField(IDF_Gamma2)
+      PeakShapeGamma(1) = -999.0
+      PeakShapeGamma(2) = -999.0
 ! Clear HPSL
       CALL WDialogSelect(IDD_HPSL_info)
       CALL WGridRows(IDF_HPSL_Grid,NumRows)
       CALL WDialogClearField(IDF_HPSL_Grid)
       CALL WDialogClearField(IDF_HPSL1)
+      PeakShapeHPSL = -999.0
 ! Clear HMSL
       CALL WDialogSelect(IDD_HMSL_info)
       CALL WGridRows(IDF_HMSL_Grid,NumRows)
       CALL WDialogClearField(IDF_HMSL_Grid)
       CALL WDialogClearField(IDF_HMSL1)
+      PeakShapeHMSL = -999.0
+      CALL WDialogSelect(IDD_ViewPawley)
+      CALL WDialogClearField(IDF_Sigma1)
+      CALL WDialogClearField(IDF_Sigma2)
+      CALL WDialogClearField(IDF_Gamma1)
+      CALL WDialogClearField(IDF_Gamma2)
       IF (NumFittedPFR .EQ. 0) THEN
         CALL PopActiveWindowID
         RETURN
@@ -107,10 +121,10 @@
       CALL WDialogSelect(IDD_Sigma_info)
 ! Only update those that have actually been fitted--we wouldn't have sensible values to show for the others anyway.
       DO I = 1, NumFittedPFR
-        iord = IOrdTem(I)
-        CALL WGridPutCellReal(IDF_Sigma_Grid,1,I,PkPosAv(iord),'(F12.3)')
-        CALL WGridPutCellReal(IDF_Sigma_Grid,2,I,PkFnVal(1,iord),'(F12.5)')
-        CALL WGridPutCellReal(IDF_Sigma_Grid,3,I,PkFnEsd(1,iord),'(F12.5)')
+        iOrd = IOrdTem(I)
+        CALL WGridPutCellReal(IDF_Sigma_Grid,1,I,PkPosAv(iOrd),'(F12.3)')
+        CALL WGridPutCellReal(IDF_Sigma_Grid,2,I,PkFnVal(1,iOrd),'(F12.5)')
+        CALL WGridPutCellReal(IDF_Sigma_Grid,3,I,PkFnEsd(1,iOrd),'(F12.5)')
       ENDDO
       IF (NumFittedPFR .GE. 3) THEN
 ! Let's fit Sigma
@@ -128,17 +142,22 @@
         CALL WDialogPutReal(IDF_Sigma1,PkFnVarVal(1,1),'(F10.4)')
         CALL WDialogPutReal(IDF_Sigma2,PkFnVarVal(2,1),'(F10.4)')
         DO I = 1, NumFittedPFR
-          iord = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_Sigma_Grid,4,I,PkFnCal(1,iord),'(F12.4)')
+          iOrd = IOrdTem(I)
+          CALL WGridPutCellReal(IDF_Sigma_Grid,4,I,PkFnCal(1,iOrd),'(F12.4)')
         ENDDO
+        PeakShapeSigma(1) = ABS(FitPar(1))
+        PeakShapeSigma(2) = ABS(FitPar(2))
+        CALL WDialogSelect(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
+        CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
       ENDIF
 ! Write out gammas
       CALL WDialogSelect(IDD_Gamma_info)
       DO I = 1, NumFittedPFR
-        iord = IOrdTem(I)
-        CALL WGridPutCellReal(IDF_Gamma_Grid,1,I,PkPosAv(iord),'(F12.3)')
-        CALL WGridPutCellReal(IDF_Gamma_Grid,2,I,PkFnVal(2,iord),'(F12.5)')
-        CALL WGridPutCellReal(IDF_Gamma_Grid,3,I,PkFnEsd(2,iord),'(F12.5)')
+        iOrd = IOrdTem(I)
+        CALL WGridPutCellReal(IDF_Gamma_Grid,1,I,PkPosAv(iOrd),'(F12.3)')
+        CALL WGridPutCellReal(IDF_Gamma_Grid,2,I,PkFnVal(2,iOrd),'(F12.5)')
+        CALL WGridPutCellReal(IDF_Gamma_Grid,3,I,PkFnEsd(2,iOrd),'(F12.5)')
       ENDDO
       IF (NumFittedPFR .GE. 3) THEN
 ! Let's fit Gamma
@@ -156,17 +175,22 @@
         CALL WDialogPutReal(IDF_Gamma1,PkFnVarVal(1,2),'(F10.4)')
         CALL WDialogPutReal(IDF_Gamma2,PkFnVarVal(2,2),'(F10.4)')
         DO I = 1, NumFittedPFR
-          iord = IOrdTem(i)
-          CALL WGridPutCellReal(IDF_Gamma_Grid,4,I,PkFnCal(2,iord),'(F12.4)')
+          iOrd = IOrdTem(i)
+          CALL WGridPutCellReal(IDF_Gamma_Grid,4,I,PkFnCal(2,iOrd),'(F12.4)')
         ENDDO
+        PeakShapeGamma(1) = ABS(FitPar(1))
+        PeakShapeGamma(2) = ABS(FitPar(2))
+        CALL WDialogSelect(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
+        CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
       ENDIF
 ! Write out HPSL
       CALL WDialogSelect(IDD_HPSL_info)
       DO I = 1, NumFittedPFR
-        iord = IOrdTem(I)
-        CALL WGridPutCellReal(IDF_HPSL_Grid,1,I,PkPosAv(iord),'(F12.3)')
-        CALL WGridPutCellReal(IDF_HPSL_Grid,2,I,PkFnVal(3,iord),'(F12.5)')
-        CALL WGridPutCellReal(IDF_HPSL_Grid,3,I,PkFnEsd(3,iord),'(F12.5)')
+        iOrd = IOrdTem(I)
+        CALL WGridPutCellReal(IDF_HPSL_Grid,1,I,PkPosAv(iOrd),'(F12.3)')
+        CALL WGridPutCellReal(IDF_HPSL_Grid,2,I,PkFnVal(3,iOrd),'(F12.5)')
+        CALL WGridPutCellReal(IDF_HPSL_Grid,3,I,PkFnEsd(3,iOrd),'(F12.5)')
       ENDDO
       IF (NumFittedPFR .GE. 2) THEN
 ! Let's fit HPSL
@@ -182,17 +206,18 @@
         PkFnVarEsd(1,3) = FitEsd(1)
         CALL WDialogPutReal(IDF_HPSL1,PkFnVarVal(1,3),'(F10.4)')
         DO I = 1, NumFittedPFR
-          iord = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_HPSL_Grid,4,i,PkFnCal(3,iord),'(F12.4)')
+          iOrd = IOrdTem(I)
+          CALL WGridPutCellReal(IDF_HPSL_Grid,4,i,PkFnCal(3,iOrd),'(F12.4)')
         ENDDO
+        PeakShapeHPSL = MAX(0.0002,FitPar(1))
       ENDIF
 ! Write out HMSL
       CALL WDialogSelect(IDD_HMSL_info)
       DO I = 1, NumFittedPFR
-        iord = IOrdTem(I)
-        CALL WGridPutCellReal(IDF_HMSL_Grid,1,i,PkPosAv(iord),'(F12.3)')
-        CALL WGridPutCellReal(IDF_HMSL_Grid,2,i,PkFnVal(4,iord),'(F12.5)')
-        CALL WGridPutCellReal(IDF_HMSL_Grid,3,i,PkFnEsd(4,iord),'(F12.5)')
+        iOrd = IOrdTem(I)
+        CALL WGridPutCellReal(IDF_HMSL_Grid,1,i,PkPosAv(iOrd),'(F12.3)')
+        CALL WGridPutCellReal(IDF_HMSL_Grid,2,i,PkFnVal(4,iOrd),'(F12.5)')
+        CALL WGridPutCellReal(IDF_HMSL_Grid,3,i,PkFnEsd(4,iOrd),'(F12.5)')
       ENDDO
 ! Let's fit HMSL
       IF (NumFittedPFR .GE. 2) THEN
@@ -208,9 +233,10 @@
         PkFnVarEsd(1,4) = FitEsd(1)
         CALL WDialogPutReal(IDF_HMSL1,PkFnVarVal(1,4),'(F10.4)')
         DO I = 1, NumFittedPFR
-          iord = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_HMSL_Grid,4,I,PkFnCal(4,iord),'(F12.4)')
+          iOrd = IOrdTem(I)
+          CALL WGridPutCellReal(IDF_HMSL_Grid,4,I,PkFnCal(4,iOrd),'(F12.4)')
         ENDDO
+        PeakShapeHMSL = MAX(0.0001,FitPar(1))
       ENDIF
 ! Warn if HPSL is less than HMSL
       IF (NumFittedPFR .GE. 2) THEN
