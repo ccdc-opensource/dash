@@ -86,6 +86,7 @@
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
       INTEGER NACC
+      INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
       INTEGER NACP(MVAR)
       LOGICAL MAKET0
       REAL FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
@@ -94,7 +95,6 @@
       INTEGER NUP, NDOWN, NREJ, H, I, J, M, II
       INTEGER MRAN, MRAN1, IARR, IAR1
       REAL T
-      INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
       REAL RANARR(30000), RANAR1(30000)
       REAL DXVAV(mvar), XVSIG(mvar), FLAV(mvar)
       REAL X0SUM(mvar), XSUM(mvar), XXSUM(mvar)
@@ -140,33 +140,6 @@
       IM = 7875
       IA = 211
       IC = 1663
-! vm is adjusted during the SA. So re-initialise every time the SA is started to
-! ensure that starting the SA more than once with the same parameters will give
-! identical results.
-      kk = 0
-      DO iFrg = 1, nFrag
-        DO ii = 1, izmpar(iFrg)
-          kk = kk + 1
-          SELECT CASE (kzmpar(ii,iFrg))
-            CASE (1) ! translation
-              vm(kk) = 0.1
-            CASE (2) ! quaternion
-              vm(kk) = 0.1
-            CASE (3) ! torsion
-              vm(kk) = 10.0
-            CASE (4) ! angle
-              vm(kk) = 1.0
-            CASE (5) ! bond
-              vm(kk) = 0.1*(ub(kk)-lb(kk))
-            CASE (6) ! single rotation axis
-              vm(kk) = 0.1
-          END SELECT
-        ENDDO
-      ENDDO
-      IF (PrefParExists) THEN
-        kk = kk + 1
-        vm(kk) = 0.01
-      ENDIF
       CALL FillRULB(nvar) !calcs upper and lower bounds for parameters
       NPAR = 0
       DO I = 1, nvar
@@ -203,8 +176,62 @@
       MAKET0 = (T0.LE.0.0)  ! T0 is estimated each run of a multirun
       IF (MAKET0) THEN
         T = 100000.0
+! vm is adjusted during the SA. So re-initialise every time the SA is started to
+! ensure that starting the SA more than once with the same parameters will give
+! identical results.
+        kk = 0
+        DO iFrg = 1, nFrag
+          DO ii = 1, izmpar(iFrg)
+            kk = kk + 1
+            SELECT CASE (kzmpar(ii,iFrg))
+              CASE (1) ! translation
+                vm(kk) = 1.0
+              CASE (2) ! quaternion
+                vm(kk) = 1.0
+              CASE (3) ! torsion
+                vm(kk) = 180.0
+              CASE (4) ! angle
+                vm(kk) = 1.0
+              CASE (5) ! bond
+                vm(kk) = 0.1*(ub(kk)-lb(kk))
+              CASE (6) ! single rotation axis
+                vm(kk) = 0.1
+            END SELECT
+          ENDDO
+        ENDDO
+        IF (PrefParExists) THEN
+          kk = kk + 1
+          vm(kk) = 0.1
+        ENDIF
       ELSE
         T = T0
+! vm is adjusted during the SA. So re-initialise every time the SA is started to
+! ensure that starting the SA more than once with the same parameters will give
+! identical results.
+        kk = 0
+        DO iFrg = 1, nFrag
+          DO ii = 1, izmpar(iFrg)
+            kk = kk + 1
+            SELECT CASE (kzmpar(ii,iFrg))
+              CASE (1) ! translation
+                vm(kk) = 0.1
+              CASE (2) ! quaternion
+                vm(kk) = 0.1
+              CASE (3) ! torsion
+                vm(kk) = 10.0
+              CASE (4) ! angle
+                vm(kk) = 1.0
+              CASE (5) ! bond
+                vm(kk) = 0.1*(ub(kk)-lb(kk))
+              CASE (6) ! single rotation axis
+                vm(kk) = 0.1
+            END SELECT
+          ENDDO
+        ENDDO
+        IF (PrefParExists) THEN
+          kk = kk + 1
+          vm(kk) = 0.01
+        ENDIF
       ENDIF
 ! Initialise the random number generator RANMAR.
 ! Increment the seeds for each SA run
@@ -216,10 +243,6 @@
       NTOTMOV = 0
       DO I = 1, nvar
         XOPT(I) = X(I)
-   !     DO I = 1, nvar
-          NACP(I) = 0
-          NumTrialsPar(I) = 0
-    !    ENDDO
         C(I) = 2.0
       ENDDO
 ! Evaluate the function with input X and return value as F.
@@ -292,6 +315,10 @@
         IARR = MRAN + 1
         MRAN1 = MOD(MRAN1*IA+IC,IM)
         IAR1 = MRAN1 + 1
+        DO I = 1, nvar
+          NACP(I) = 0
+          NumTrialsPar(I) = 0
+        ENDDO
         DO J = 1, NS
           DO IH = 1, NPAR
             DO I = 1, nvar
@@ -432,6 +459,14 @@
               CALL FCN(XP,FP,0)
             ENDIF
             PrevParsInclPO = CurrParsInclPO
+
+
+            FPSUM1 = FPSUM1 + FP
+            FPSUM2 = FPSUM2 + FP*FP
+            A0SUM(H) = A0SUM(H) + 1.0
+
+
+
             XDSS(H) = XDSS(H) + (FP-F)**2
             PrevRejected = .FALSE.
             IF (FP .LE. F) THEN
@@ -477,9 +512,9 @@
               ENDIF
             ENDIF
 
-            FPSUM1 = FPSUM1 + F
-            FPSUM2 = FPSUM2 + F*F
-            A0SUM(H) = A0SUM(H) + 1.0
+    !O        FPSUM1 = FPSUM1 + F
+    !O        FPSUM2 = FPSUM2 + F*F
+    !O        A0SUM(H) = A0SUM(H) + 1.0
 
             X0SUM(H) = X0SUM(H) + 1.0
             XSUM(H) = XSUM(H) + X(H)
@@ -543,6 +578,34 @@
         CALL MAKXIN(nvar)
         MAKET0 = .FALSE.
         CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
+        kk = 0
+        DO iFrg = 1, nFrag
+          DO ii = 1, izmpar(iFrg)
+            kk = kk + 1
+            SELECT CASE (kzmpar(ii,iFrg))
+              CASE (1) ! translation
+                vm(kk) = 0.1
+              CASE (2) ! quaternion
+                vm(kk) = 0.1
+              CASE (3) ! torsion
+                vm(kk) = 10.0
+              CASE (4) ! angle
+                vm(kk) = 1.0
+              CASE (5) ! bond
+                vm(kk) = 0.1*(ub(kk)-lb(kk))
+              CASE (6) ! single rotation axis
+                vm(kk) = 0.1
+            END SELECT
+          ENDDO
+        ENDDO
+        IF (PrefParExists) THEN
+          kk = kk + 1
+          vm(kk) = 0.01
+        ENDIF
+        DO I = 1, nvar
+          NACP(I) = 0
+          NumTrialsPar(I) = 0
+        ENDDO
         GOTO 100
       ENDIF
 ! If termination criteria are not met, prepare for another loop.
@@ -784,20 +847,23 @@
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
+      INTEGER         NPAR, IP
+      COMMON /SIMSTO/ NPAR, IP(MVAR)
+
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: RANMAR
-      INTEGER IV
+      INTEGER I, IV
 
 ! Get the "IDF_RandomInitVal" checkbox
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
-      IF (WDialogGetCheckBoxLogical(IDF_RandomInitVal)) THEN
-        DO IV = 1, N
-          X(IV) = LB(IV) + RULB(IV)*RANMAR()
+        DO I = 1, N
+          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X(I))
         ENDDO
-      ELSE
-        DO IV = 1, N
-          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IV, X(IV))
+      IF (WDialogGetCheckBoxLogical(IDF_RandomInitVal)) THEN
+        DO I = 1, NPAR
+          IV = IP(I)
+          X(IV) = LB(IV) + RULB(IV)*RANMAR()
         ENDDO
       ENDIF
       CALL PopActiveWindowID
@@ -830,9 +896,15 @@
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
 
+      LOGICAL         UseRene, UseESD
+      INTEGER                          nwidth
+      REAL                                     width, minstep, rwidth, SqrtCorrObs 
+      LOGICAL                                                                       InPeak
+      COMMON / RENE / UseRene, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+
       REAL Best_CHI
 
-      IF (Is_SX) THEN
+      IF (Is_SX .OR. UseRene) THEN
         Best_CHI = FOPT
       ELSE
         Best_CHI = CHIPROBEST
