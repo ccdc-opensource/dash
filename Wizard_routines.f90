@@ -164,7 +164,9 @@
       IF (.NOT. NoData) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
 ! Ungrey 'Load diffraction pattern' button on toolbar
       CALL WMenuSetState(ID_import_xye_file,ItemEnabled,WintOn)
-! Make unit cell etc. read only under 'View' 
+! Ungrey 'Load DASH Pawley file' button on toolbar
+      CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOn)
+! Make unit cell etc. under 'View' no longer read only 
       CALL Upload_Cell_Constants
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogFieldState(IDF_Space_Group_Menu,Enabled)
