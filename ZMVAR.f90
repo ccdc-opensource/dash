@@ -10,6 +10,11 @@
 
       IMPLICIT NONE
 
+      DOUBLE PRECISION f2cmat(1:3,1:3), c2fmat(1:3,1:3)
+
+! f2cmat = 3x3 matrix for conversion from fractional to Cartesian  coordinates 
+! c2fmat = 3x3 matrix for conversion from Cartesian  to fractional coordinates 
+
       INTEGER maxatm
       PARAMETER ( maxatm = 150 )
 
@@ -90,12 +95,20 @@
 
       LOGICAL         gotzmfile(0:maxfrg)
 
-! zmFileChanged Set to .TRUE.  when Z-matrix opened/deleted.
-!               Set to .FALSE. after SA parameter boundaries dialogue has been initialised
-
       INTEGER          icomflg(0:maxfrg)
       REAL             AtomicWeighting(1:maxatm,0:maxfrg)
       LOGICAL          UseQuaternions(0:maxfrg)
+
+! We want to have some variables that specify the orientation of the Z-matrix when 
+! rotation is restricted to a single axis      
+      INTEGER          zmSingleRotAxDef(0:maxfrg)
+! 1 = to atom
+! 2 = fractional co-ordinates
+! 3 = normal to plane
+      INTEGER          zmSingleRotAxAtm(0:maxfrg)
+      REAL             zmSingleRotAxFrac(1:3,0:maxfrg)
+      INTEGER          zmSingleRotAxAtms(1:3,0:maxfrg)
+
       REAL             zmSingleRotationAxis(1:3,0:maxfrg)
       DOUBLE PRECISION zmSingleRotationQs(0:3,0:maxfrg)
 
@@ -106,6 +119,11 @@
 !  if all weights = 1.0 : geometric centre of mass
 ! UseQuaternions    .TRUE.  : all rotations allowed, described by 4 quaternions
 !                   .FALSE. : only rotations about a single axis allowed (e.g. when on special position)
+! zmSingleRotAxAtm
+! zmSingleRotAxFrac
+! zmSingleRotAxAtms : the three atoms defining a plane thenormal of which is the direction of rotation
+!                     These numbers are enterd by the users according to their numbering scheme,
+!                     but stored in the DASH numbering
 ! zmSingleRotationAxis = If UseQuaternions = .FALSE., this is the axis that is used
 ! zmSingleRotationQs   = Factors in the quaternion-expression of the rotation about a single axis
 !                        which are due to the orientation of the single axis
@@ -148,11 +166,6 @@
 ! alph   = valence angle   (wrt iz1 & iz2)
 ! bet    = torsion angle   (wrt iz1, iz2 & iz3)
 
-      DOUBLE PRECISION f2cmat(1:3,1:3), c2fmat(1:3,1:3)
-
-! f2cmat = 3x3 matrix for conversion from fractional to Cartesian  coordinates 
-! c2fmat = 3x3 matrix for conversion from Cartesian  to fractional coordinates 
-
       CHARACTER*3     asym(1:maxatm,0:maxfrg)
       CHARACTER*5     OriginalLabel(1:maxatm,0:maxfrg)
 
@@ -167,9 +180,10 @@
 ! tiso = Isotropic temperature factor of the current atom
 ! occ  = Occupancy of the current atom
 
-      INTEGER izmoid(1:maxatm,0:maxfrg), izmbid(1:maxatm,0:maxfrg)
+      INTEGER izmoid(0:maxatm,0:maxfrg), izmbid(0:maxatm,0:maxfrg)
 
 ! The original atom ids to list in the labels and the back mapping
+! Atom number 0 means 'not specified' and always maps onto itself
 
       INTEGER NumberOfBonds(0:maxfrg)
       INTEGER BondType(1:maxbnd_2,0:maxfrg)
