@@ -48,6 +48,7 @@
 ! Go through the PolyFitter wizard
 ! Comment this next line out to remove the wizard
       CALL StartWizard()
+      CALL ShowWindowRietveld
       DO WHILE (.TRUE.)
         CALL GetEvent
       ENDDO
@@ -64,6 +65,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE PRJVAR
 
       IMPLICIT NONE
 
@@ -111,8 +113,12 @@
       STATBARSTR(8)=' '
       CALL WindowOutStatusBar(8,STATBARSTR(8))
       SELECT CASE (EventInfo%VALUE1)
-        CASE (ID_import_dpj_file)
-          CALL SDIFileBrowse
+        CASE (ID_New)
+          CALL Clear_Project
+        CASE (ID_Open)
+          CALL PrjReadWrite(cRead)
+        CASE (ID_Save)
+          CALL PrjReadWrite(cWrite)
         CASE (ID_import_xye_file)
           ISTAT = DiffractionFileBrowse()
         CASE (ID_Remove_Background)
