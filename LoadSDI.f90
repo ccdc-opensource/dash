@@ -181,7 +181,6 @@
       ENDIF
       IF (TicExists) THEN
         TicExists = (GETTIC(DashTicFile) .EQ. 0)
-        CALL GET_LOGREF
       ENDIF
       IF (HcvExists) THEN
         CALL GETHCV(DashHcvFile,ihcver)

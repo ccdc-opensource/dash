@@ -42,6 +42,7 @@
         CALL WizardWindowShow(IDD_SA_input3)
         RETURN
       ENDIF
+              CALL GET_LOGREF
 ! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
 ! changed while the SA is running).
       CALL WDialogSelect(IDD_Configuration)
