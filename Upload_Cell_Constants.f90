@@ -15,8 +15,8 @@
       REAL ChiGetLattice
       EXTERNAL ChiGetLattice
 
-      INTEGER    MPAR,   MMPAR
-      PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
+      INTEGER     MPAR,        MMPAR
+      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
       REAL XDD(MPAR),DXDD(MPAR),COVDD(MMPAR)
 
       INTEGER         NVAL
@@ -211,7 +211,8 @@
 !
       REAL FUNCTION ChiGetLattice(N,P)
 
-      PARAMETER (MPAR=50)
+      INTEGER     MPAR
+      PARAMETER ( MPAR = 100 )
       REAL P(MPAR)
 
       INCLUDE 'GLBVAR.INC' ! Contains ALambda

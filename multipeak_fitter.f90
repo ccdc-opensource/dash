@@ -4,7 +4,8 @@
       SUBROUTINE MULTIPEAK_FITTER()
 
       REAL, EXTERNAL :: MULTIPEAK_CHISQ
-      PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
+      INTEGER     MPAR,        MMPAR
+      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
       REAL X(MPAR), DX(MPAR), COV(MMPAR)
 
 ! Do all the initialisation
@@ -27,7 +28,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      PARAMETER (MPAR=50)
+      INTEGER     MPAR
+      PARAMETER ( MPAR = 100 )
       REAL V(MPAR), D(MPAR)
       PARAMETER (MPT=2000)
       COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
@@ -178,7 +180,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      PARAMETER (MPAR=50)
+      INTEGER     MPAR
+      PARAMETER ( MPAR = 100 )
       REAL V(MPAR), D(MPAR)
       PARAMETER (MPT=2000)
       COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
@@ -352,7 +355,8 @@
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
 
-      PARAMETER (MPAR=50)
+      INTEGER     MPAR
+      PARAMETER ( MPAR = 100 )
       REAL VARVAL(MPAR), VARESD(MPAR)
 !
 ! ... Set the ranges correctly
