@@ -1,6 +1,94 @@
 !
 !*****************************************************************************
 !
+! Originally in pr.for
+!
+C
+C
+C LEVEL 11       SUBROUTINE SETICN(PCXX)
+       SUBROUTINE SETICN(PCXX)
+C
+C *** SETTIC revised by JBF to deal with magnetism 2-Jun-95 ***
+C
+CH Prepare to write ASCII files by reading L cards and generating reflection
+      EXTERNAL PCXX,DUMMY
+      COMMON /BRAGG/STHMXX(5),STHL,SINTH,COSTH,SSQRD,TWSNTH(5),
+     & DSTAR2,TWOTHD(5),DIFANG(6)
+      EQUIVALENCE(STHLMX,STHMXX(1))
+      COMMON /DGEOM/IGEOM,UM(9),NLR,ANGLIN(3),ALAMBD(5,5),
+     & NLAMB,ILAMB
+      EQUIVALENCE (WLGTH,ALAMBD(1,1))
+      COMMON /IOUNIT/LPT,ITI,ITO,IPLO,LUNI,IOUT
+      COMMON /LREAD/ILREA(22,5),KOM18
+      DIMENSION ILREAD(22)
+      EQUIVALENCE (ILREAD(1),ILREA(1,1))
+      COMMON /PHASE/NPHASE,IPHASE,JPHASE,KPHASE,NPHUNI(9),
+     & SCALEP(9),KSCALP(9),PHMAG(9)
+      LOGICAL PHMAG
+      COMMON /PRPKCN/ARGK,PKCNSP(6,9,5),
+     & KPCNSP(6,9,5),DTDPCN(6),DTDWL,
+     & NPKCSP(9,5),ARGMIN(5),ARGMAX(5),
+     & ARGSTP(5),PCON
+      COMMON /PRZERO/ZEROSP(6,9,5),KZROSP(6,
+     & 9,5),DKDZER(6),NZERSP(9,5)
+      COMMON /REFIPR/RIET,CAIL,SAPS,APES,RAPS,TOF,CN,LX,SR,ED,PRECYC,TIC
+      LOGICAL RIET,CAIL,SAPS,APES,RAPS,TOF,CN,LX,SR,ED,PRECYC,TIC
+      COMMON /SOURCE/NSOURC,JSOURC,KSOURC,NDASOU(5),METHOD(
+     & 9),NPFSOU(9,5),NSOBS(5),SCALES(5),
+     & KSCALS(5),NPCSOU(9,5)
+C
+C READ RELEVANT L CARDS:
+      CALL INPLPR(PCXX,DUMMY)
+C
+C DEAL WITH THE CARDS WHICH ARE DIFFERENT ACCORDING TO TYPE OF DIFFRACTION:
+C
+C TF:
+C NEED L THE2 CARD GIVING 2 THETA DEGREES:
+      IF (TOF) THEN
+        IF (ILREAD(18) .EQ. 0)
+     &  CALL ERRMES(2,1,'L THE2 card giving counter angle')
+C FOR TF MUST HAVE L PKCN CARD:
+        IF (ILREAD(7) .EQ. 0)
+     &  CALL ERRMES(2,1,'L PKCN card giving peak centre')
+      ELSE
+C
+C CN AND/OR LX - NEED L WVLN CARD:
+        IF (ILREAD(13) .EQ. 0) THEN
+          IF (CN) THEN
+            ALAMBD(1,KSOURC)=1.900
+            NLAMB=1
+          ELSE IF (SR) THEN
+            ALAMBD(1,KSOURC)=0.850000
+            NLAMB=1
+          ELSE IF (LX) THEN
+            ALAMBD(1,KSOURC)=1.544390
+            ALAMBD(2,KSOURC)=1.540562
+            NLAMB=2
+          ENDIF
+          WRITE(LPT,2002) NLAMB,(ALAMBD(I,KSOURC),I=1,NLAMB)
+2002      FORMAT (' ',I3,' Wavelength(s): ',5(1X,F9.6))
+        ENDIF
+        PKCNSP(1,JPHASE,JSOURC)=96.0505
+        TWOTHD(JSOURC)=RADIAN(168.329)
+      ENDIF
+C
+**??NOT USED ELSEWHERE:
+C IF NO L ZERO CARD THEN ZEROPT=0:
+      IF (ILREAD(8) .EQ. 0) ZEROSP(1,JPHASE,JSOURC)=0.
+C
+      CALL PCXX(6)
+      WRITE (LPT,2018) STHLMX
+2018  FORMAT (/' Maximum sin theta for generation of indices is',F10.4)
+C
+C GENERATE REFLECTIONS:
+      CALL INRFPR(PCXX,DUMMY)
+C
+      RETURN
+      END
+C
+!
+!*****************************************************************************
+!
 ! Originally in PutSimplexChisq.f90
 !
       SUBROUTINE PutSimplexChisq(CCHI)
