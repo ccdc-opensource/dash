@@ -11,7 +11,7 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
-      CALL SetModeMenuState(1,0)
+      CALL SetModeMenuState(1,0,0)
       CALL SelectMode(ID_Peak_Fitting_Mode)
       CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
 
@@ -73,7 +73,7 @@
       CALL WDialogSelect(TheDialogID)
       CurrentWizardWindow = TheDialogID
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,IDNEXT,Modeless)
-      CALL SetWizardState(-1)
+      CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOff)
 
       END SUBROUTINE WizardWindowShow
 !
@@ -93,12 +93,12 @@
 
       CALL WizardWindowHide
       IF (WeCanDoAPawleyRefinement()) THEN
-        CALL SetModeMenuState(1,1)
+        CALL SetModeMenuState(1,1,0)
       ELSE
-        CALL SetModeMenuState(1,-1)
+        CALL SetModeMenuState(1,-1,0)
       ENDIF
       CALL SelectMode(ID_Peak_Fitting_Mode)
-      CALL SetWizardState(1)
+      CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOn)
 
       END SUBROUTINE EndWizardCommon
 !
@@ -1010,7 +1010,7 @@
               ENDDO
               CALL WCursorShape(CurHourGlass)
               NumOfDICVOLSolutions = 0
-              CALL WDialogSelect(IDD_DICVOLRunning)
+              CALL WDialogLoad(IDD_DICVOLRunning)
               IF (system(1)) THEN
                 CALL WDialogFieldState(IDF_LabCubic            ,DialogReadOnly)
                 CALL WDialogFieldState(IDF_LabProgCubic        ,DialogReadOnly)
@@ -1062,8 +1062,7 @@
               CALL WDialogShow(-1,-1,0,Modeless)
               CALL WCursorShape(CurHourGlass)
               CALL DICVOL91(system(1),system(2),system(3),system(4),system(5),system(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
-              CALL WDialogSelect(IDD_DICVOLRunning)
-              CALL WDialogHide
+              CALL WDialogUnload(IDD_DICVOLRunning)
               CALL WCursorShape(CurCrossHair)
 ! Pop up a window showing the DICVOL output file in a text editor
               CALL WindowOpenChild(IHANDLE)
