@@ -300,7 +300,7 @@
                CHAR(13)//&
                ProgramVersion//CHAR(13)//&
                CHAR(13)//&
-               'Copyright Juni 2002'
+               'Copyright June 2002'
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
 
       END SUBROUTINE About
