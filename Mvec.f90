@@ -625,13 +625,11 @@
       IF (N.EQ.-1) Y = Y - 1.0
       X = X - Y
   100 RETURN
+
       END SUBROUTINE FRACT
-!*==FT01A.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1    SUBROUTINE FT01A(IT,INV,TR,TI)
       SUBROUTINE FT01A(IT,INV,TR,TI)
 !
 ! *** FT01A updated by JCM FROM HARWELL ROUTINE 9 Sep 91 ***
@@ -641,22 +639,13 @@
 !H Modification of Harwell Fast Fourier Transform.
 !
       DIMENSION TR(1024), TI(1024)
-      EXTERNAL FFTADD
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /FFTDA / KJUMP, UR(15), UI(15)
-!
-      GOTO (1,2), KJUMP
-    1 UM = 0.5
-      DO I = 1, 15
-        UM = 0.5*UM
-        TH = TWOPI*UM
-        UR(I) = COS(TH)
-        UI(I) = SIN(TH)
-      ENDDO
-      KJUMP = 2
-!
-! SECOND AND SUBSEQUENT ENTRIES:
+
+      REAL            UR,     UI
+      COMMON /FFTDA / UR(15), UI(15)
+
     2 UM = 1.
       IF (INV.EQ.1) UM = -1.
       IO = 2
@@ -667,18 +656,16 @@
 ! ERROR EXIT - IT NOT A POWER OF 2, OR TOO BIG:
    99 INV = -1
       GOTO 100
-!
     4 IO = I
       II = IO
       I1 = IT/2
       I3 = 1
    10 K = 0
       I2 = I1 + I1
-   11 WR = 1.
-      WI = 0.
+   11 WR = 1.0
+      WI = 0.0
       KK = K
       JO = IO
-!
    12 IF (KK.EQ.0) GOTO 13
    14 JO = JO - 1
       KK1 = KK
@@ -688,10 +675,8 @@
       WI = WR*UI(JO) + WI*UR(JO)
       WR = WS
       GOTO 12
-!
    13 WI = WI*UM
       J = 0
-!
     9 L = J*I2 + K
       L1 = L + I1
       ZR = TR(L+1) + TR(L1+1)
@@ -712,7 +697,6 @@
       J = 1
       UM = 1.
       IF (INV.EQ.1) UM = 1./FLOAT(IT)
-!
     7 K = 0
       J1 = J
       DO I = 1, II
@@ -720,7 +704,6 @@
         K = 2*(K-J2) + J1
         J1 = J2
       ENDDO
-!
       IF (K.GE.J) THEN
         IF (K.EQ.J) THEN
           TR(J+1) = TR(J+1)*UM
@@ -742,12 +725,9 @@
       TI(IT) = TI(IT)*UM
   100 RETURN
       END SUBROUTINE FT01A
-!*==GMADD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GMADD(A,B,C,NI,NJ)
       SUBROUTINE GMADD(A,B,C,NI,NJ)
 !
 ! *** GMADD by JCM ***
@@ -767,12 +747,9 @@
       ENDDO
       RETURN
       END SUBROUTINE GMADD
-!*==GMEQ.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GMEQ(A,B,NI,NJ)
       SUBROUTINE GMEQ(A,B,NI,NJ)
 !
 ! *** GMEQ by PJB/JCM 28 Jun 83 ***
@@ -792,12 +769,9 @@
       ENDDO
       RETURN
       END SUBROUTINE GMEQ
-!*==GMINV.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE GMINV(A,B,N)
       SUBROUTINE GMINV(A,B,N)
 !
 ! *** GMINV by JCM from SID 11 Oct 88 ***
@@ -882,12 +856,9 @@
   190 ENDDO
       RETURN
       END SUBROUTINE GMINV
-!*==GMPRD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GMPRD(A,B,C,NI,NJ,NK)
       SUBROUTINE GMPRD(A,B,C,NI,NJ,NK)
 !
 ! *** GMPRD by JCM ***
@@ -916,12 +887,9 @@
       ENDDO
       RETURN
       END SUBROUTINE GMPRD
-!*==GMREV.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GMREV(A,B,NI,NJ)
       SUBROUTINE GMREV(A,B,NI,NJ)
 !
 ! *** GMREV by PJB/JCM 28 Jun 83 ***
@@ -941,12 +909,9 @@
       ENDDO
       RETURN
       END SUBROUTINE GMREV
-!*==GMSAME.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      LOGICAL FUNCTION GMSAME(A,B,N,TOLER)
       LOGICAL FUNCTION GMSAME(A,B,N,TOLER)
 !
 ! *** GMSAME by JCM 22 Oct 86 ***
@@ -973,12 +938,9 @@
       GMSAME = .TRUE.
   100 RETURN
       END FUNCTION GMSAME
-!*==GMSCA.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GMSCA(A,B,SCALE,NI,NJ)
       SUBROUTINE GMSCA(A,B,SCALE,NI,NJ)
 !
 ! *** GMSCA by JCM 22 Nov 84 ***
@@ -996,14 +958,11 @@
       DO I = 1, NIJ
         B(I) = SCALE*A(I)
       ENDDO
-      RETURN
+
       END SUBROUTINE GMSCA
-!*==GMSUB.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GMSUB(A,B,C,NI,NJ)
       SUBROUTINE GMSUB(A,B,C,NI,NJ)
 !
 ! *** GMSUB by PJB/JCM 28 Jun 83 ***
@@ -1019,14 +978,11 @@
       DO I = 1, NIJ
         C(I) = A(I) - B(I)
       ENDDO
-      RETURN
+
       END SUBROUTINE GMSUB
-!*==GMTRAN.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GMTRAN(A,B,JJ,II)
       SUBROUTINE GMTRAN(A,B,JJ,II)
 !
 ! *** GMTRAN by PJB ***
@@ -1038,20 +994,17 @@
 !A On exit  B is a real matrix of dimension (IIxJJ) which is the transpose of A
 !
       DIMENSION A(JJ,II), B(II,JJ)
-!
+
       DO J = 1, JJ
         DO I = 1, II
           B(I,J) = A(J,I)
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE GMTRAN
-!*==GMUNI.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GMUNI(A,NI)
       SUBROUTINE GMUNI(A,NI)
 !
 ! *** GMUNI by JCM 7 Jul 83 ***
@@ -1074,12 +1027,9 @@
       ENDDO
   100 RETURN
       END SUBROUTINE GMUNI
-!*==GMZER.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GMZER(A,NI,NJ)
       SUBROUTINE GMZER(A,NI,NJ)
 !
 ! *** GMZER by JCM 7 Jul 83 ***
@@ -1095,14 +1045,11 @@
       DO I = 1, NIJ
         A(I) = 0.
       ENDDO
-      RETURN
+
       END SUBROUTINE GMZER
-!*==JGMEQ.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE JGMEQ(JA,JB,NI,NJ)
       SUBROUTINE JGMEQ(JA,JB,NI,NJ)
 !
 ! *** JGMEQ by JCM  Jun 88 ***
@@ -1119,14 +1066,11 @@
           JB(I,J) = JA(I,J)
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE JGMEQ
-!*==JGMZER.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE JGMZER(JA,NI,NJ)
       SUBROUTINE JGMZER(JA,NI,NJ)
 !
 ! *** JGMZER by JCM Jun 88 ***
@@ -1144,12 +1088,9 @@
       ENDDO
       RETURN
       END SUBROUTINE JGMZER
-!*==RADIAN.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION RADIAN(X)
       FUNCTION RADIAN(X)
 !
 ! *** RADIAN by JCM ***
@@ -1169,12 +1110,9 @@
       RADIAN = RAD*X
 
       END FUNCTION RADIAN
-!*==RCMPRD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE RCMPRD(A,B,C,I,J,K)
       SUBROUTINE RCMPRD(A,B,C,I,J,K)
 !
 ! *** RCMPRD by PJB Jun 87 ***
@@ -1205,12 +1143,9 @@
       ENDDO
       RETURN
       END SUBROUTINE RCMPRD
-!*==RSCALP.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION RSCALP(A,B)
       FUNCTION RSCALP(A,B)
 !
 ! *** RSCALP by PJB Jun 87 ***
@@ -1229,12 +1164,9 @@
       RSCALP = REAL(P)
       RETURN
       END FUNCTION RSCALP
-!*==SCALPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      FUNCTION SCALPR(A,B)
       FUNCTION SCALPR(A,B)
 !
 ! *** SCALPR by JCM ***
@@ -1254,12 +1186,9 @@
       SCALPR = C(1)
       RETURN
       END FUNCTION SCALPR
-!*==SINCOS.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE SINCOS(SN,CS,L1)
       SUBROUTINE SINCOS(SN,CS,L1)
 !
 ! *** SINCOS updated by JCM 1 Jul 86 ***
@@ -1275,12 +1204,12 @@
 !N If ABS(SN)>1 the routine writes an error message and STOPS
 !
       CHARACTER*(*) L1
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
-!
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
+
       IF (ABS(SN)-10.E-5.GT.1.) THEN
         WRITE (LPT,3000) SN, L1
-        WRITE (ITO,3000) SN, L1
-!>> JCC        STOP
+ 3000   FORMAT (/' Sin or Cos value',E12.4,' greater than unity',' - called from ',A6)
         CALL BMBOUT
         RETURN
       ENDIF
@@ -1297,16 +1226,11 @@
 ! USUAL CASE:
         CS = SQRT(1.-SN*SN)
       ENDIF
-      RETURN
- 3000 FORMAT (/' Sin or Cos value',E12.4,' greater than unity',         &
-     &        ' - called from ',A6)
+
       END SUBROUTINE SINCOS
-!*==SPLINE.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE SPLINE(N,X,F,D)
       SUBROUTINE SPLINE(N,X,F,D)
 !
 ! *** SPLINE from HARWELL TB04A 21 May 85 ***
@@ -1322,7 +1246,8 @@
 !N For further details see the description of the Harwell Library
 !
       DIMENSION X(N), F(N), D(N)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SCRAT / A(2000)
 !
 ! F(I) ARE THE FUNCTION VALUES AT THE POINTS X(I) FOR I=1,N AND
@@ -1384,12 +1309,9 @@
       A(1) = 0.
   100 RETURN
       END SUBROUTINE SPLINE
-!*==SPLINT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION SPLINT(IX,N,U,S,D,X)
       FUNCTION SPLINT(IX,N,U,S,D,X)
 !
 ! *** SPLINT from HARWELL TG01B 21 May 85 ***
@@ -1474,12 +1396,9 @@
       SPLINT = 0.0
   100 RETURN
       END FUNCTION SPLINT
-!*==TB02A.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE TB02A(A,F,X,Y,N)
       SUBROUTINE TB02A(A,F,X,Y,N)
 !
 ! *** TB02A updated by JCM from HARWELL ***
@@ -1504,12 +1423,9 @@
       ENDDO
       RETURN
       END SUBROUTINE TB02A
-!*==TQLI.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE TQLI(D,E,N,NP,Z,BOTH)
       SUBROUTINE TQLI(D,E,N,NP,Z,BOTH)
 !
 ! *** TQLI by JCM from "NUMERICAL RECIPES"  Dec 89 ***
@@ -1551,7 +1467,7 @@
         ITER = 0
     1   DO M = L, N - 1
           DD = ABS(D(M)) + ABS(D(M+1))
-! @ JvdS Isn't the following test very odd? Isn't it effectively testing E(M) = 0.0 ?
+! @@ JvdS Isn't the following test very odd? Isn't it effectively testing E(M) = 0.0 ?
           IF (ABS(E(M))+DD.EQ.DD) GOTO 2
         ENDDO
 !
@@ -1568,7 +1484,7 @@
           DO I = M - 1, L, -1
             F = S*E(I)
             B = C*E(I)
-!>> @ JCC It seems that the next line causes numerous crashes in the Pawley refinement.
+!>> @@ JCC It seems that the next line causes numerous crashes in the Pawley refinement.
 !>> As such, Ive added in a check on the values of G and F to prevent it happening
 !>> This ought to be tested - why is it causing the crash: the input data must be corrupt
 !>> somehow.
@@ -1604,7 +1520,6 @@
                 Z(K,I) = C*Z(K,I) - S*F
               ENDDO
             ENDIF
-!
           ENDDO
           D(L) = D(L) - P
           E(L) = G
@@ -1614,12 +1529,9 @@
       ENDDO
   100 RETURN
       END SUBROUTINE TQLI
-!*==TRANSQ.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE TRANSQ(A,ND)
       SUBROUTINE TRANSQ(A,ND)
 !
 ! *** TRANSQ by JCM 12 Jul 83 ***
@@ -1641,12 +1553,9 @@
       ENDDO
       RETURN
       END SUBROUTINE TRANSQ
-!*==TRED2.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE TRED2(A,N,NP,D,E,BOTH)
       SUBROUTINE TRED2(A,N,NP,D,E,BOTH)
 !
 ! *** TRED2 by JCM from "NUMERICAL RECIPES" 4 Dec 89 ***
@@ -1698,7 +1607,6 @@
               DO K = 1, J
                 G = G + A(J,K)*A(I,K)
               ENDDO
-!
               IF (L.GT.J) THEN
                 DO K = J + 1, L
                   G = G + A(K,J)*A(I,K)
@@ -1722,7 +1630,6 @@
         ENDIF
         D(I) = H
       ENDDO
-!
     1 IF (BOTH) D(1) = 0.
       E(1) = 0.
       DO I = 1, N
@@ -1741,7 +1648,6 @@
           ENDIF
         ENDIF
         D(I) = A(I,I)
-!
         IF (BOTH) THEN
           A(I,I) = 1.
           IF (L.GE.1) THEN
@@ -1752,14 +1658,11 @@
           ENDIF
         ENDIF
       ENDDO
-      RETURN
+
       END SUBROUTINE TRED2
-!*==TRIAN1.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE TRIAN1(A,B,C,D,I)
       SUBROUTINE TRIAN1(A,B,C,D,I)
 !
 ! *** TRIAN1 by JCM 25 Jan 85 ***
@@ -1775,7 +1678,8 @@
 !D The angles are given and returned as their cosines.
 !O Writes an error message is a cosine found >1
 !
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       CS = B*C
       S = SQRT((1-B*B)*(1-C*C))
@@ -1791,8 +1695,6 @@
     4 X = D*S + CS
     5 IF (ABS(X)-1..LT.10.E-3) GOTO 8
    10 WRITE (LPT,3000) A, B, C, D, I, S, CS, X
-      WRITE (ITO,3000) A, B, C, D, I, S, CS, X
-!>> JCC      STOP
       CALL BMBOUT
       RETURN
 !
@@ -1805,12 +1707,9 @@
  3000 FORMAT (/' ERROR ** in spherical triangle - cosine greater',      &
      &        ' than 1.0'/' A,B,C,D=',4F10.4,'I=',I2,'S,CS,X=',3F10.4)
       END SUBROUTINE TRIAN1
-!*==UNIVEC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE UNIVEC(X,U)
       SUBROUTINE UNIVEC(X,U)
 !
 ! *** UNIVEC 1 May 84 by JCM ***
@@ -1839,12 +1738,9 @@
       ENDDO
   100 RETURN
       END SUBROUTINE UNIVEC
-!*==VECPRD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE VECPRD(VEC1,VEC2,PRD)
       SUBROUTINE VECPRD(VEC1,VEC2,PRD)
 !
 ! *** VECPRD by JCM ***
@@ -1863,5 +1759,8 @@
         J = K
         K = I
       ENDDO
-      RETURN
+
       END SUBROUTINE VECPRD
+!
+!*****************************************************************************
+!

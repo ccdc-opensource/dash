@@ -2,21 +2,20 @@
 !*****************************************************************************
 !
       SUBROUTINE MULTIPEAK_FITTER()
-      REAL MULTIPEAK_CHISQ
-      EXTERNAL MULTIPEAK_CHISQ
+
+      REAL, EXTERNAL :: MULTIPEAK_CHISQ
       PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
       REAL X(MPAR), DX(MPAR), COV(MMPAR)
-!
-!.. Do all the initialisation
+
+! Do all the initialisation
       CALL INITSP(N,X,DX)
-!.. Get variables
+! Get variables
       CALL GETVAR(N,X,DX)
-!.. Perform simplex
+! Perform simplex
       CALL SIMOPT(X,DX,COV,N,MULTIPEAK_CHISQ)
-!      CALL SUBPLXOPT(X,DX,COV,N,MULTIPEAK_CHISQ)
       DO I = 1, N
         II = I + (I-1)*N
-        DX(I) = SQRT(AMAX1(0.,COV(II)))
+        DX(I) = SQRT(AMAX1(0.0,COV(II)))
       ENDDO
       CALL OUTPUT_PRO(N,X,DX)
 
@@ -174,121 +173,8 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE WWFT01A(IT,INV,TR,TI)
-!
-! *** FT01A updated by JCM FROM HARWELL ROUTINE 9 Sep 91 ***
-!
-!X
-!C 9C
-!H Modification of Harwell Fast Fourier Transform.
-!
-      DIMENSION TR(1024), TI(1024)
-      EXTERNAL WWFFTADD
-      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /WWFFTDA/ KJUMP, UR(15), UI(15)
-
-      GOTO (1,2), KJUMP
-    1 UM = 0.5
-      DO I = 1, 15
-        UM = 0.5*UM
-        TH = TWOPI*UM
-        UR(I) = COS(TH)
-        UI(I) = SIN(TH)
-      ENDDO
-      KJUMP = 2
-! SECOND AND SUBSEQUENT ENTRIES:
-    2 UM = 1.
-      IF (INV.EQ.1) UM = -1.
-      IO = 2
-      DO I = 2, 16
-        IO = IO + IO
-        IF (IO-IT) 3, 4, 99
-    3 ENDDO
-! ERROR EXIT - IT NOT A POWER OF 2, OR TOO BIG:
-   99 INV = -1
-      GOTO 100
-    4 IO = I
-      II = IO
-      I1 = IT/2
-      I3 = 1
-   10 K = 0
-      I2 = I1 + I1
-   11 WR = 1.
-      WI = 0.
-      KK = K
-      JO = IO
-   12 IF (KK.EQ.0) GOTO 13
-   14 JO = JO - 1
-      KK1 = KK
-      KK = KK/2
-      IF (KK1.EQ.2*KK) GOTO 14
-      WS = WR*UR(JO) - WI*UI(JO)
-      WI = WR*UI(JO) + WI*UR(JO)
-      WR = WS
-      GOTO 12
-   13 WI = WI*UM
-      J = 0
-    9 L = J*I2 + K
-      L1 = L + I1
-      ZR = TR(L+1) + TR(L1+1)
-      ZI = TI(L+1) + TI(L1+1)
-      Z = WR*(TR(L+1)-TR(L1+1)) - WI*(TI(L+1)-TI(L1+1))
-      TI(L1+1) = WR*(TI(L+1)-TI(L1+1)) + WI*(TR(L+1)-TR(L1+1))
-      TR(L+1) = ZR
-      TR(L1+1) = Z
-      TI(L+1) = ZI
-      J = J + 1
-      IF (J.LT.I3) GOTO 9
-      K = K + 1
-      IF (K.LT.I1) GOTO 11
-      I3 = I3 + I3
-      IO = IO - 1
-      I1 = I1/2
-      IF (I1.GT.0) GOTO 10
-      J = 1
-      UM = 1.
-      IF (INV.EQ.1) UM = 1./FLOAT(IT)
-    7 K = 0
-      J1 = J
-      DO I = 1, II
-        J2 = J1/2
-        K = 2*(K-J2) + J1
-        J1 = J2
-      ENDDO
-      IF (K.GE.J) THEN
-        IF (K.EQ.J) THEN
-          TR(J+1) = TR(J+1)*UM
-          TI(J+1) = TI(J+1)*UM
-        ELSE
-          ZR = TR(J+1)
-          ZI = TI(J+1)
-          TR(J+1) = TR(K+1)*UM
-          TI(J+1) = TI(K+1)*UM
-          TR(K+1) = ZR*UM
-          TI(K+1) = ZI*UM
-        ENDIF
-      ENDIF
-      J = J + 1
-      IF (J.LT.IT-1) GOTO 7
-      TR(1) = TR(1)*UM
-      TI(1) = TI(1)*UM
-      TR(IT) = TR(IT)*UM
-      TI(IT) = TI(IT)*UM
-  100 RETURN
-      END SUBROUTINE WWFT01A
-!
-!*****************************************************************************
-!
-      BLOCKDATA WWFFTADD
-      COMMON /WWFFTDA/ KJUMP, UR(15), UI(15)
-      DATA KJUMP/1/
-      END BLOCKDATA WWFFTADD
-!
-!*****************************************************************************
-!
       SUBROUTINE INITSP(N,V,D)
-!.. Do all the initialisation
+! Do all the initialisation
 
       INCLUDE 'PARAMS.INC'
 
@@ -303,8 +189,8 @@
 
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      REAL            ZCAL !,        ZBAK
-      COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
+      REAL            ZCAL
+      COMMON /YSTORE/ ZCAL(MPPTS)
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XDIFT, XMINT
       COMMON /ZSTOR2/ MN, MN2
       COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &

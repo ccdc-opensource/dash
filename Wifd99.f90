@@ -40,7 +40,8 @@
 
       REAL W(N,N), H(N,N), D(50), E(50)
       LOGICAL POSDEF
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       INTEGER Idummy
       INTEGER PawleyErrorLog
 

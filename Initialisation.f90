@@ -352,12 +352,23 @@
       COMMON /sagdat/ bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nd2, nd3, nd4, bmIHANDLE
 
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+
+      REAL            UR,     UI
+      COMMON /FFTDA / UR(15), UI(15)
+
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
       PARAMETER (iWidth = 300, iHeight = 1)
       INTEGER tData(1:iWidth,1:iHeight)
       INTEGER I, J
       INTEGER iRed, iGreen, iBlue, iRGBvalue
+      REAL UM, TH
+
 
       PI     = 4.0*ATAN(1.0)
       RAD    = PI/180.0
@@ -368,8 +379,17 @@
       ALOG2  = ALOG(2.0)
       SQL2X8 = SQRT(8.0*ALOG2)
       VALMUB = 0.2695
+! Initialise some variables needed for Fast Fourier Transform
+      UM = 0.5
+      DO I = 1, 15
+        UM = 0.5*UM
+        TH = TWOPI*UM
+        UR(I) = COS(TH)
+        UI(I) = SIN(TH)
+      ENDDO
       ChildWinAutoClose = .FALSE.
       ChildWinHandlerSet = .FALSE.
+      SA_Run_Number = 0
       DashRawFile = ' '
       DashHcvFile = ' '
       DashHklFile = ' '
@@ -923,7 +943,7 @@
 ! Read use hydrogens YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,LOG_HYDROGENS)
       CALL Set_UseHydrogens(LOG_HYDROGENS)
-! Colour flexible torsions (in z-matrix viewer) YES / NO
+! Colour flexible torsions (in Z-matrix viewer) YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
 ! Read YES / NO which molecular file formats are to be written out when a best solution is found

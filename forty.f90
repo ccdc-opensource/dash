@@ -41,7 +41,8 @@
       COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5),    &
      &                KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
       LOGICAL ZBAKIN
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
@@ -417,7 +418,8 @@
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
@@ -472,6 +474,7 @@
 
       DATA WDCN03/'SIGM', 'GAMM', 'HPSL', 'HMSL'/
       DATA IWCN03/3, 3, 0, 3, 4, 0, 3, 5, 0, 3, 6, 0/
+      CHARACTER*20 Integer2String
 
       GOTO (10,1,2,3,100,5,6,7), N + 1
 ! N=0: SET UP "DATA SOURCE CN/SR, PEAK TYPE 01"
@@ -500,7 +503,7 @@
         CALL PCXX(5)
         ZARGK(IR) = ARGK
       ENDDO
-      CALL SORTX(ZARGK,KORD,MAXK)
+      CALL SORT_REAL(ZARGK,KORD,MAXK)
 ! Set the number of peaks at each point to zero
       DO II = 1, NPTS
         IOCCR(II) = 0
@@ -517,9 +520,6 @@
       ENDDO
       DO IR = 1, MAXK
         ZARGK(IR) = ZTEM(IR)
-        DO I = 1, 3
-          REFH(I,IR) = REFH(I,IR)
-        ENDDO
         IF (CAIL) THEN
           F4PAR(1,IR) = TF4PAR(IR)
         ENDIF
@@ -672,11 +672,12 @@
         CALL PCXX(5)
         ZARGK(IR) = ARGK
       ENDDO
-      CALL SORTX(ZARGK,KORD,MAXK)
+      CALL SORT_REAL(ZARGK,KORD,MAXK)
 ! Set the number of peaks at each point to zero
       DO II = 1, NPTS
         IOCCR(II) = 0
       ENDDO
+! Now store the sorted values sequentially
       DO IR = 1, MAXK
         IRT = KORD(IR)
         ZTEM(IR) = ZARGK(IRT)
@@ -687,6 +688,7 @@
           TF4PAR(IR) = F4PAR(1,IRT)
         ENDIF
       ENDDO
+! Now copy the sequential, sorted values back to their original COMMON blocks
       DO IR = 1, MAXK
         ZARGK(IR) = ZTEM(IR)
         DO I = 1, 3
@@ -696,10 +698,9 @@
           F4PAR(1,IR) = TF4PAR(IR)
         ENDIF
       ENDDO
+! REFH and ZARGK have now been sorted.
       IOBS = 1
-      DO IRT = 1, MAXK
-!        IR=KORD(IRT)
-        IR = IRT
+      DO IR = 1, MAXK
         DO I = IOBS, NPTS
           IF (ZARGI(I).GT.ZARGK(IR)) THEN
             KOBZ(IR) = I
@@ -854,6 +855,8 @@
                 NPKD1 = NPKD + 1
                 DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKCONV(III,NPKD1)
               ENDDO
+            ELSE
+         !     CALL DebugErrorMessage('(III.LE.512 .AND. III.GT.0) in forty.f90, III = '//Integer2String(II))
 ! JCC End of hack ...
             ENDIF
           ENDDO

@@ -103,6 +103,24 @@
 ! Of these, I deleted the following one (merged it with /PROFTIC/):
 ! COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
 
+
+!U      REAL REFH(3,REFDIM),AMUL(REFDIM),AICALC(REFDIM),AIOBS(REFDIM),    &
+!U     &     ESDOBS(REFDIM),SOMEGA(REFDIM),GGCALC(500),DSTAR(REFDIM)
+!U      INTEGER KMIN,KMAX,KMOD,KNOW
+!U      INTEGER ISMAG(REFDIM)
+!U      REAL DKDDS
+!U      INTEGER MAXKK(9),KOM23
+!U      INTEGER MAXK
+!U
+!U      COMMON /REFLNS/REFH,AMUL,AICALC,                                  &
+!U     & AIOBS,ESDOBS,SOMEGA,GGCALC,                                      &
+!U     & MAXKK,KMIN,KMAX,KMOD,KNOW,DSTAR,ISMAG,                           &
+!U     & DKDDS,KOM23
+!U
+!U      EQUIVALENCE (MAXK,MAXKK(1))
+
+! Note: this DSTAR is _NOT_ corrected for the zero point error.
+
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
       INTEGER           IPF_Lo,                     IPF_Hi

@@ -59,7 +59,8 @@
 !N The bonds N2 and N3 are held in INANG so that INANG( ,2) < INANG( ,3)
 !
       CHARACTER*4 NAME, MAKNAM
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
       CHARACTER*4 ATTNAM, BONNAM, ANGNAM, TORNAM
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
@@ -79,7 +80,6 @@
         IF (NMIN.EQ.INANG(I,2) .AND. NMAX.EQ.INANG(I,3)) THEN
           IF (NAME.NE.ANGNAM(I) .AND. NAME.NE.'    ') THEN
             WRITE (LPT,3000) NAME, ANGNAM(I)
-            WRITE (ITO,3000) NAME, ANGNAM(I)
             IE = 1
             GOTO 100
           ENDIF
@@ -87,10 +87,8 @@
           GOTO 100
         ENDIF
       ENDDO
-!
 ! NEW ANGLE - COUNT NUMBER OF BOND ANGLES:
       CALL ERRCHK(2,NUMANG,100,1,'angles for geometric constraints')
-!
 ! CHECK NAME OF ANGLE DOES NOT CLASH WITH ANY ATOM  OR BOND NAMES:
       L1 = 0
       IF (NTARNM.GT.0) L1 = NCFIND(NAME,ATTNAM,NTARNM)
@@ -100,7 +98,6 @@
         IE = 1
         GOTO 100
       ENDIF
-!
 ! ANGLE MAY HAVE BEEN GIVEN WITHOUT A NAME:
       ANGNAM(NUMANG) = NAME
       IF (NAME.EQ.'    ') ANGNAM(NUMANG) = MAKNAM('Ang',NUMANG)
@@ -111,12 +108,9 @@
   100 RETURN
  3000 FORMAT (/' ERROR ** ',A4,' and',A4,' refer to same angle')
       END SUBROUTINE ADDANG
-!*==ADDATM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE ADDATM(NAME,IA,XA,ISA,ILA,CELA,N)
       SUBROUTINE ADDATM(NAME,IA,XA,ISA,ILA,CELA,N)
 !
 ! *** ADDATM updated by JCM 9 Jun 91 ***
@@ -181,7 +175,6 @@
    19   ENDDO
         GOTO 17
       ENDIF
-!
 ! SEARCH FOR NAME IN THOSE FROM A CARDS:
       N1 = IATOM(NAME)
       IF (N1.LE.0) GOTO 1
@@ -192,10 +185,8 @@
         IF (XA(I).NE.X(I,N1)) GOTO 2
         IF (CELA(I).NE.0.) GOTO 2
       ENDDO
-!
 ! ATOM IDENTICAL - OK:
       GOTO 1
-!
     2 CALL ERRCH2(NAME,1,'L ATOM card name','same as one on A card')
       GOTO 100
 !
@@ -209,14 +200,11 @@
           IF (XA(I).NE.XSLAK(I,N)) GOTO 5
         ENDDO
         GOTO 100
-!
     5   CALL ERRCH2(NAME,1,'Name','occurs on 2 L ATOM cards')
         GOTO 100
       ENDIF
-!
    17 CALL ERRCHK(2,NTARNM,500,1,'names on L ATOM cards')
       N = NTARNM
-!
 ! IF NO NAME GIVEN, INVENT ONE:
       ATTNAM(N) = NAME
       IF (NAME.EQ.'    ') ATTNAM(N) = MAKNAM('SK0',N)
@@ -228,13 +216,11 @@
       ISYM(N) = ISA
       ILAT(N) = ILA
   100 RETURN
+
       END SUBROUTINE ADDATM
-!*==ADDBON.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE ADDBON(NAME,NA1,NA2,NA)
       SUBROUTINE ADDBON(NAME,NA1,NA2,NA)
 !
 ! *** ADDBON updated by JCM 21 Jul 91 ***
@@ -261,7 +247,8 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
       CHARACTER*4 ATTNAM, BONNAM, ANGNAM, TORNAM
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
@@ -280,7 +267,6 @@
         IF (NMIN.EQ.IATM(I,1) .AND. NMAX.EQ.IATM(I,2)) THEN
           IF (NAME.NE.BONNAM(I) .AND. NAME.NE.'    ') THEN
             WRITE (LPT,3000) NAME, BONNAM(I)
-            WRITE (ITO,3000) NAME, BONNAM(I)
             IERR = IERR + 1
             GOTO 100
           ENDIF
@@ -288,10 +274,8 @@
           GOTO 100
         ENDIF
       ENDDO
-!
 ! NEW BOND - COUNT NUMBER OF INVOLVED BONDS:
       CALL ERRCHK(2,NUMBON,500,1,'bonds for geometric constraints')
-!
 ! CHECK NAME OF BOND DOES NOT CLASH WITH ANY ATOM NAMES:
       L1 = 0
       IF (NTARNM.GT.0) L1 = NCFIND(NAME,ATTNAM,NTARNM)
@@ -299,7 +283,6 @@
         CALL ERRCH2(NAME,1,'Bond name','is also an atom name')
         GOTO 100
       ENDIF
-!
 ! BOND MAY BE GIVEN WITHOUT A NAME:
       BONNAM(NUMBON) = NAME
       IF (NAME.EQ.'    ') BONNAM(NUMBON) = MAKNAM('Bnd',NUMBON)
@@ -308,13 +291,11 @@
       IATM(NA,2) = NMAX
   100 RETURN
  3000 FORMAT (/' ERROR ** ',A4,' and',A4,' refer to same bond')
+
       END SUBROUTINE ADDBON
-!*==ADDCON.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE ADDCON(NPAR,KK1,AM,NSTAT)
       SUBROUTINE ADDCON(NPAR,KK1,AM,NSTAT)
 !
 ! *** ADDCON corrected by PJB 30-May-1995 ***
@@ -347,24 +328,20 @@
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
      &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
      &                KTPCON(200)
-!
+
 ! ADDING ENTRY:
       IADD = 1
       GOTO 1
-!
       ENTRY RELCON(NPAR,KK1,AM,NSTAT)
 ! ENTRY TO REPLACE AN EXISTING CONSTRAINT:
       IADD = 0
       GOTO 1
-!
       ENTRY SUBCON(NPAR,KK1,AM,NSTAT)
 ! SUBTRACTING ENTRY:
       IADD = -1
-!
 ! DISCOVER IF WIPING WHOLE SET:
     1 KWIPE = .NOT.(KWHOLE(KK1(1),KUN))
       IF (KWIPE) GOTO 5
-!
 ! PUT INTO STANDARD FORM OF ASCENDING KK WITH NEW AM(1)=1.:
       CALL GMEQ(KK1,KK2,1,NPAR)
       DO I = 1, NPAR
@@ -374,7 +351,6 @@
         KK2(N) = 2**(NBITS-1) - 1
       ENDDO
       AM2(1) = 1.
-!
 ! SCAN EXISTING CONSTRAINTS:
     5 DO I = 1, NUMCON
 ! LOOKING FOR MATCHES:
@@ -393,10 +369,8 @@
             IF (ABS(AM2(J)-AMCON(KPTCON(I)+J-1)).GT.0.00001) GOTO 3
           ENDIF
     4   ENDDO
-!
 ! WE HAVE IT ALREADY - WERE WE ADDING OR SUBTRACTING OR REPLACING?
         IF (IADD) 6, 7, 101
-!
 ! SUBTRACTING AN EXISTING:
     6   KSTCON(I) = 0
         GOTO 3
@@ -405,12 +379,9 @@
           AMCON(KPTCON(I)+J-1) = AM2(J)
         ENDDO
         GOTO 101
-!
     3 ENDDO
-!
 ! IF NOT FOUND, BUT SUBTRACTING, EXIT:
       IF (IADD.EQ.-1) GOTO 100
-!
 ! IT IS A REALLY NEW CONSTRAINT - ADD IT:
       CALL ERRCHK(2,NUMCON,200,0,'LSQ constraints')
       KPTCON(NUMCON+1) = KPTCON(NUMCON) + NPAR
@@ -420,28 +391,21 @@
       ENDDO
       KTPCON(NUMCON) = 1
       I = NUMCON
-!
 ! ADDING (OR REPLACING) AN EXISTING JOINS HERE:
   101 KSTCON(I) = NSTAT
-!
   100 RETURN
+
       END SUBROUTINE ADDCON
-!*==ADDPLN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUITNE ADDPLN(NIN,N)
       SUBROUTINE ADDPLN(NIN,N)
-!
+
       RETURN
       END SUBROUTINE ADDPLN
-!*==ADDTOR.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE ADDTOR(NAME,N1,N2,N3,N4,N5,N6,NT,IE)
       SUBROUTINE ADDTOR(NAME,N1,N2,N3,N4,N5,N6,NT,IE)
 !
 ! *** ADDTOR by JCM 16 Oct 90 ***
@@ -473,7 +437,8 @@
 !N
 !
       CHARACTER*4 NAME
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
       CHARACTER*4 ATTNAM, BONNAM, ANGNAM, TORNAM
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
@@ -484,17 +449,15 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
-!
+
       IE = 0
 ! IS TORSION ANGLE ALREADY GIVEN BETWEEN N1 AND N3 WITH N2 AS AXIS?
       NMIN = MIN(N1,N3)
       NMAX = MAX(N1,N3)
       DO I = 1, NUMTOR
-        IF (NMIN.EQ.INTOR(I,1) .AND. N2.EQ.INTOR(I,2) .AND.             &
-     &      NMAX.EQ.INTOR(I,3)) THEN
+        IF (NMIN.EQ.INTOR(I,1) .AND. N2.EQ.INTOR(I,2) .AND. NMAX.EQ.INTOR(I,3)) THEN
           IF (NAME.NE.TORNAM(I) .AND. NAME.NE.'    ') THEN
             WRITE (LPT,3000) NAME, TORNAM(I)
-            WRITE (ITO,3000) NAME, TORNAM(I)
             IE = 1
             GOTO 100
           ENDIF
@@ -502,11 +465,8 @@
           GOTO 100
         ENDIF
       ENDDO
-!
 ! NEW ANGLE - COUNT NUMBER OF TORSION ANGLES:
-      CALL ERRCHK(2,NUMTOR,100,1,                                       &
-     &            'torsion angles for geometric constraints')
-!
+      CALL ERRCHK(2,NUMTOR,100,1,'torsion angles for geometric constraints')
 ! CHECK NAME OF TORSION ANGLE DOES NOT CLASH WITH ANY OTHER NAMES:
       L1 = 0
       IF (NTARNM.GT.0) L1 = NCFIND(NAME,ATTNAM,NTARNM)
@@ -517,7 +477,6 @@
         IE = 1
         GOTO 100
       ENDIF
-!
 ! ANGLE MAY NOT BE NAMED:
       IF (NAME.EQ.'    ') THEN
         WRITE (TORNAM(NUMTOR),2000) NUMTOR
@@ -526,7 +485,6 @@
         TORNAM(NUMTOR) = NAME
       ENDIF
       NT = NUMTOR
-!
 ! N2 IS THE AXIS (FROM A2 TO A3):
       INTOR(NT,2) = N2
 !* N1 MUST JOIN A1 AND A2, AND N3 MUST JOIN A3 AND A4 - BUT I DON'T THINK
@@ -549,18 +507,15 @@
       ENDIF
   100 RETURN
  3000 FORMAT (/' ERROR ** ',A4,' and',A4,' refer to same torsion angle')
+
       END SUBROUTINE ADDTOR
-!*==ADJUST.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE ADJUST(PAR)
       SUBROUTINE ADJUST(PAR)
 
       USE WINTERACTER
       USE DRUID_HEADER
-!
 !
 ! *** ADJUST updated by JCM 11 Jan 88 ***
 !
@@ -583,7 +538,7 @@
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       REAL FudgeFactor
-!
+
       XOLD = PAR
 ! Jvds Assuming that the instabilities in the Pawley refinement are caused
 ! by the shift applied being too large, this would be the right place to adjust that.
@@ -594,7 +549,6 @@
       XNEW = XOLD + FudgeFactor*SHIFT
 ! EXIT IF NO FUDGES AT ALL:
       IF (NFUDGE.EQ.0) GOTO 101
-!
 !
 !* WE NEED EVENTUAL PROVISION FOR PARTICULAR PHASES & SOURCES:
 ! PACK FAMILY AND GENUS, NO PARTICULAR SPECIES:
@@ -624,29 +578,23 @@
         IF (ISPCC.EQ.IFDGPT(I)) GOTO 2
       ENDDO
       GOTO 101
-!
 ! THERE IS A FACTOR:
     2 GOTO (11,12,13,12), IFDTYP(I)
-!
 ! SIMPLE MULTIPLICATIVE FACTOR:
    11 XNEW = XOLD + FUDGE1(I)*SHIFT
       GOTO 101
-!
 ! LOWER LIMIT FROM "GE" (MAY BE COMBINED WITH UPPER LIMIT):
    12 IF (XNEW.LT.FUDGE1(I)) XNEW = FUDGE1(I)
       IF (IFDTYP(I).EQ.2) GOTO 101
-!
 ! UPPER LIMIT FROM "LE":
    13 IF (XNEW.GT.FUDGE2(I)) XNEW = FUDGE2(I)
       GOTO 101
-!
   101 PAR = XNEW
-      RETURN
+
       END SUBROUTINE ADJUST
-!*==ANGDIR.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-! LEVEL 4      SUBROUTINE ANGDIR(H,ANG)
       SUBROUTINE ANGDIR(H,ANG)
 !
 ! *** ANGDIR by PJB Sep 87 ***
@@ -660,27 +608,21 @@
 !N Only written for geometry types 6,7,8,11
 !
       DIMENSION DIR(3,2), V(3,2), H(3), ANG(4), T(3), XP(3), TT(3)
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, ILAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
 !
       GOTO (50,50,50,50,50,10,10,10,50,50,10), IGEOM
-!
 ! ERROR IN GEOMETRY TYPE:
-   50 CALL ERRIN2(IGEOM,0,'Geometry type',                              &
-     &     'not in ANGDIR; only 4circle 6,7,11 or general normal beam 8')
-!
+   50 CALL ERRIN2(IGEOM,0,'Geometry type','not in ANGDIR; only 4circle 6,7,11 or general normal beam 8')
    10 CALL GETDC(H,DIR)
       DO I = 1, 2
         CALL GMPRD(UM,DIR(1,I),V(1,I),3,3,1)
       ENDDO
 !  REVERSE INCIDENT BEAM
       CALL GMREV(V(1,1),V(1,1),1,3)
-!
       COSY = SCALPR(V(1,1),V(1,2))
       ANG(1) = -SIGN(ACOS(COSY),FLOAT(NLR))
       GOTO (50,50,50,50,50,20,20,11,50,50,20), IGEOM
-!
 !  GENERAL NORMAL BEAM CASE
    11 ANG(2) = ATAN2(V(1,1),V(2,1))
       X = V(3,2)
@@ -688,7 +630,6 @@
       CALL UNIVEC(V(1,2),D)
       ANG(3) = ATAN2(X,D)
       GOTO 100
-!
 !  FOUR-CIRCLE
 ! MAKE T THE VERTICAL DIRECTION IN THE DIFFRACTING POSITION
    20 CALL VECPRD(V(1,2),V(1,1),T)
@@ -716,15 +657,12 @@
 !  REVERSE ALL ANGLES IF NECESSARY
       CALL GMREV(ANG,ANG,1,4)
       GOTO 100
-!
   100 RETURN
+
       END SUBROUTINE ANGDIR
-!*==ANGLST.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE ANGLST(I1)
       SUBROUTINE ANGLST(I1)
 !
 ! *** ANGLST updated by JCM 11 Sep 92 ***
@@ -757,7 +695,8 @@
      &                BBMAX, SDMAX, ANG1, ANG2, BON2, SD1, SD2, BONOUT, &
      &                LSK, SLK
       LOGICAL SLK, BONOUT
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -780,7 +719,7 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
-!
+
       IF (NB.LE.1) GOTO 100
       IF (NB.EQ.2) CALL MESS(LPT,1,'Angle at atom '//ATNAME(I1)//' :')
       IF (NB.GT.2) CALL MESS(LPT,1,'Angles around atom '//ATNAME(I1)    &
@@ -794,11 +733,9 @@
           COSTH = SCLPRD(DXSAVE(1,I),DXSAVE(1,J),1)/(BSAVE(I)*BSAVE(J))
           CALL SINCOS(COSTH,SINTH,'ANGLST')
           ANG = DEGREE(ATAN2(SINTH,COSTH))
-!
 ! IF SLACK CONSTRAINTS BEING OUTPUT, ANG MAY BE NEEDED HERE:
           IF (.NOT.SLK) GOTO 42
           IF (ANG.GT.ANG1+SD1 .OR. ANG.LT.ANG1-SD1) GOTO 42
-!
 ! PICK UP BONDS SURROUNDING ANGLE & MAKE 3RD BOND OF TRIANGLE:
           NB1 = NBSAVE(I)
           NB2 = NBSAVE(J)
@@ -811,7 +748,6 @@
           WRITE (LPT,2002) ATNAME(N2SAVE(I)), ATNAME(I1), ATNAME(N2SAVE(J)), ANG
  2002     FORMAT (1X,A4,'-',A4,'-',A4,F9.2)
           GOTO 2
-!
 ! ONE OR BOTH ATOMS NEED FURTHER SPECIFICATION:
     3     DO K = 1, 3
             XD2(K) = X(K,I1)
@@ -838,12 +774,9 @@
     1 ENDDO
   100 RETURN
       END SUBROUTINE ANGLST
-!*==ANGRAD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      FUNCTION ANGRAD(A,B,IR)
       FUNCTION ANGRAD(A,B,IR)
 !
 ! *** ANGRAD by JCM 26 Sep 84 ***
@@ -862,19 +795,16 @@
 !D normals, and the required angle to be between planes.
 !
       DIMENSION A(3), B(3)
-!
+
       C = SCLPRD(A,B,IR)
       C = C/(VCTMOD(1.0,A,IR)*VCTMOD(1.0,B,IR))
       IF (IR.EQ.1) C = -C
       ANGRAD = ACOS(C)
-      RETURN
+
       END FUNCTION ANGRAD
-!*==ANITF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION ANITF(H,N)
       FUNCTION ANITF(H,N)
 !
 ! *** ANITF by JCM 19 Jul 83 ***
@@ -907,61 +837,11 @@
      &    + 2.*ATF(6,IA)*H(1)*H(2)
       ANITF = EXP(-A)
   100 RETURN
+
       END FUNCTION ANITF
-!*==ASK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-!
-!
-!
-!
-!
-!
-!
-! LEVEL 2      SUBROUTINE ASK(MESS)
-      SUBROUTINE ASK(MESS)
-!
-! *** ASK updated by PJB 17-Jun-1994 ***
-!
-!X
-!C 13C
-!H Writes a message on unit ITO and reads an interactive answer to /SCRACH/.
-!A On entry MESS is the message.
-!I On exit the answer typed to the terminal unit ITI is in ICARD, A80.
-!O Writes the message on unit ITO, using a FORMAT finishing $ if this is
-!O allowed by the FORTRAN system being used.
-!
-      CHARACTER*16 FORM
-      CHARACTER*(*) MESS
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
-      COMMON /SCRACH/ MESSAG, NAMFIL
-      CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
-      EQUIVALENCE (ICARD,MESSAG)
-      DATA FORM/'(1X,80A1,'' : ''$)'/
-!
-      L1 = LENGT(MESS)
-      IF (L1.EQ.0) L1 = 1
-! ANY SYSTEM WHICH WILL REALLY NOT TAKE $ SHOULD HAVE IT REMOVED:
-!3084      FORM(16:16)=' '
-      WRITE (FORM(5:6),2000) L1
- 2000 FORMAT (I2)
-      WRITE (ITO,FORM) (MESS(I:I),I=1,L1)
-!UNIX
-!           CALL FLUSH(ITO)
-      READ (ITI,1000) ICARD
- 1000 FORMAT (A80)
-      RETURN
-      END SUBROUTINE ASK
-!*==ASUNIT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
-!
-!
-!
-!
-! LEVEL 4      SUBROUTINE ASUNIT(H,HIN,N,M)
       SUBROUTINE ASUNIT(H,HIN,N,M)
 !
 ! *** ASUNIT by JCM 3 Jul 84 ***
@@ -1003,26 +883,21 @@
           IF (K.EQ.2) CALL GMREV(HIN,HIN,3,1)
           MM = MULBOX(HIN)
           IF (MM.NE.0) GOTO 101
-!
         ENDDO
       ENDDO
-!
 ! ERROR - REFLECTION NEVER TRANSFORMS INTO ASYMMETRIC UNIT:
       N = 0
       M = 0
       GOTO 100
-!
 ! FOUND: SET N TO POINT TO OPERATOR, -VE IF IN FRIEDEL SET:
   101 N = (3-2*K)*I
       M = MM
   100 RETURN
+
       END SUBROUTINE ASUNIT
-!*==ATOPOS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 10      SUBROUTINE ATOPOS
       SUBROUTINE ATOPOS
 !
 ! ***  ATOPOS by JCM 15 Jul 83 ***
@@ -1072,7 +947,8 @@
       COMMON /FONAM / FONA(20,9), FONAME(20)
       CHARACTER*4 FONAME, FONA
       COMMON /FORMD2/ NBKF(20,9), NMFNM(9)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
@@ -1092,21 +968,16 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
       COMMON /POSNS2/ NATO(9)
       COMMON /SCRAT / NTORD(24), Z(6)
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
-      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
-!
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   KOM26
+      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),  KOM22
+
 ! ARRANGE INPUT OF "S" CARDS IF NOT DONE
       IF (INREAD(19).GT.0) CALL SYMOP
-!
 ! SET "A CARDS READ":
       INREAD(1) = -IABS(INREAD(1))
-!
 ! INITIALISE NAME TABLES FOR ATOM AND SCATT NAMES:
       NUMANM = 0
       NUMFNM = 0
-!
 ! NUMBER OF A CARDS:
       NACARD = ICDNO(1)
       NATOM = 0
@@ -1114,13 +985,10 @@
         CALL MESS(LPT,1,'No atomic positions have been read from Crystal Data File')
         GOTO 100
       ENDIF
-!
       CALL MESS(LPT,1,'Atoms in the unit cell are')
       CALL MESS(LPT,0,' Mult Name       X         Y         Z        ITF      Site  Scat Fac Sub-Group')
-!
 !     NPOS=NUMBER OF GENERAL EQUIVALENT POSITIONS POSSIBLE
       NPOS = NLAT*NOP
-!
 ! READ A CARDS ONE BY ONE:
       ID = IABS(INREAD(1))
       DO IAC = 1, NACARD
@@ -1153,14 +1021,11 @@
           NBAKF(L) = N
           NMFNM(JPHASE) = L
         ENDIF
-!
 ! DEAL WITH POSSIBLE SPECIAL POSITION:
         M = 0
-!
 !  OPERATE WITH EACH SYMMETRY ELEMENT IN TURN:
         ISGEN(1,N) = 1
         MC = 0
-!
 !  TEST CENTRE OF SYMMETRY
         IF (CENTRC) THEN
           DO I = 1, 3
@@ -1168,39 +1033,31 @@
           ENDDO
           IF (LATVEC(Z)) MC = 1
         ENDIF
-!
 !  NOW EACH SYMMETRY OPERATOR
         NTORD(1) = 1
         DO NO = 2, NOPC
           NTORD(NO) = 0
           CALL ROTSYM(X(1,N),Z,NO,1)
-!
 !  ADD TRANSLATIONAL PART OF SYMMETRY ELEMENT:
           CALL GMADD(Z,TRANS(1,NO),Z,1,3)
           ISIG = 1
           CALL GMSUB(X(1,N),Z,Z(4),1,3)
           IF (LATVEC(Z(4))) GOTO 6
-!
 ! IF CENTROSYMMETRIC, TRY RELATED POSITION ALSO:
           IF (.NOT.CENTRC) GOTO 2
           ISIG = -1
           CALL GMADD(X(1,N),Z,Z(4),1,3)
           IF (.NOT.LATVEC(Z(4))) GOTO 2
-!
     6     NTORD(NO) = IABS(NORD(NO))
           IF (NTORD(NO).GT.10) NTORD(NO) = NTORD(NO) - 100
           NTORD(NO) = ISIG*(NTORD(NO))
-!
 !  COUNT FOR ORDER OF SUBGROUP
           ISGEN(1,N) = ISGEN(1,N) + 1
     2   ENDDO
-!
         M = NPOS/(ISGEN(1,N)*(1+MC))
         IF (MC.EQ.1) ISGEN(1,N) = -ISGEN(1,N)
-!
 !  GET GENERATORS OF SUBGROUP
         CALL GENELM(NTORD,ISGEN(1,N))
-!
         IF (ISGEN(1,N).GT.0) THEN
           IF (ISGEN(2,N).EQ.1 .AND. ISGEN(3,N).EQ.0) THEN
             WRITE (LPT,2003) M, ATNAME(N), (X(I,N),I=1,3), TF(N), SITE(N), FONAME(L)
@@ -1216,12 +1073,9 @@
   100 RETURN
  2003 FORMAT (1X,I4,2X,A4,1X,5F10.4,3X,A4,2I3)
       END SUBROUTINE ATOPOS
-!*==ATSPEC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE ATSPEC(N,K,CH)
       SUBROUTINE ATSPEC(N,K,CH)
 !
 ! *** ATSPEC updated by JCM 12 Nov 89 ***
@@ -1248,7 +1102,7 @@
       DIMENSION K(6), IDIG(5)
       COMMON /ATNMPK/ ATPACK(10,3)
       INTEGER ATPACK
-!
+
       CALL NPACK(N,K,6,2,ATPACK)
       CH = ' '
       IF (K(2).NE.1) THEN
@@ -1277,12 +1131,9 @@
       ENDIF
 
       END SUBROUTINE ATSPEC
-!*==AXIS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE AXIS(R,A)
       SUBROUTINE AXIS(R,A)
 !
 ! *** AXIS by PJB/JCM 28 Jun 83 ***
@@ -1294,19 +1145,16 @@
 !A On exit  A is a 1x3 vector holding its axis
 !
       DIMENSION R(3,3), S(3,3), A(3)
-!
+
 ! COPY R TO LOCAL S:
       CALL GMEQ(R,S,3,3)
-!
 ! SET D= + OR -1 AS DETERMINANT OF R (AN EIGENVALUE):
       D = 1.
       IF (DETER3(S).LT.0.) D = -1.
-!
 ! FORM R MINUS D*(UNIT MATRIX):
       DO I = 1, 3
         S(I,I) = S(I,I) - D
       ENDDO
-!
 ! I,J,K COUNT CYCLICALLY OVER 1,2,3:
       J = 2
       K = 3
@@ -1324,11 +1172,9 @@
   100 CALL FCTOR(A,N)
 
       END SUBROUTINE AXIS
-!*==BINDIG.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-! LEVEL 2      LOGICAL FUNCTION BINDIG(N,NBIN)
       LOGICAL FUNCTION BINDIG(N,NBIN)
 !
 ! *** BINDIG by JCM 13 Nov 91 ***
@@ -1351,13 +1197,9 @@
       ENDIF
 
       END FUNCTION BINDIG
-!*==BONCOS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 3      SUBROUTINE BONCOS(B1,B2,B3,ANGLE,COSTH,SINTH,DADB)
       SUBROUTINE BONCOS(B1,B2,B3,ANGLE,COSTH,SINTH,DADB)
 !
 ! *** BONCOS by JCM 18 Oct 90 ***
@@ -1378,7 +1220,6 @@
       CALL SINCOS(COSTH,SINTH,'BONCOS')
 ! ANGLE IN RADIANS:
       ANGLE = (ACOS(COSTH))
-
 ! DERIVATIVES OF COS THETA WRT B1, THEN B2, THEN B3
       DADB(1) = -B1/(B2*B3)
       DADB(2) = 1./B3 - COSTH/B2
@@ -1389,12 +1230,9 @@
       ENDDO
 
       END SUBROUTINE BONCOS
-!*==BONDA.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      FUNCTION BONDA(I1,I2,I3)
       FUNCTION BONDA(I1,I2,I3)
 !
 ! *** BONDA by JCM 1 Oct 86 ***
@@ -1436,12 +1274,9 @@
       BONDA = DEGREE(ATAN2(SINTH,COSTH))
 
       END FUNCTION BONDA
-!*==BONDER.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE BONDER(N)
       SUBROUTINE BONDER(N)
 !
 ! *** BONDER updated by JCM 22 Oct 90 ***
@@ -1520,12 +1355,9 @@
       ENDDO
 
       END SUBROUTINE BONDER
-!*==BONTRI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE BONTRI(N1,N2,N3,K,IE)
       SUBROUTINE BONTRI(N1,N2,N3,K,IE)
 !
 ! *** BONTRI by JCM 17 Oct 1990 ***
@@ -1541,7 +1373,8 @@
 !A         and N1 and N2 are possibly interchanged; the result is N1 < N2.
 !A         IE is an error indicator, set = 0 if OK, non-zero if error.
 !
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
       CHARACTER*4 ATTNAM, BONNAM, ANGNAM, TORNAM
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
@@ -1568,7 +1401,6 @@
       ENDDO
       IF (I1.EQ.0) THEN
         WRITE (LPT,3031) BONNAM(N1), BONNAM(N2)
-        WRITE (ITO,3031) BONNAM(N1), BONNAM(N2)
         IE = 1
         GOTO 100
       ENDIF
@@ -1577,14 +1409,11 @@
       CALL ADDBON('    ',IATM(N1,I1),IATM(N2,I2),N3)
   100 RETURN
  3031 FORMAT (/'  ERROR ** bonds ',A4,' and ',A4,' have no common atom')
+
       END SUBROUTINE BONTRI
-!*==CARDIN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 3      SUBROUTINE CARDIN(IDEN)
       SUBROUTINE CARDIN(IDEN)
 !
 ! *** CARDIN by JCM 2 Feb 88 ***
@@ -1630,13 +1459,11 @@
       GOTO 100
   101 NYZ = -1
   100 RETURN
+
       END SUBROUTINE CARDIN
-!*==CDFIN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE CDFIN(NUMCDF,ID,ENDIP)
       SUBROUTINE CDFIN(NUMCDF,ID,ENDIP)
 !
 ! *** CDFIN updated by JCM 21 Jan 92 ***
@@ -1669,7 +1496,7 @@
       CHARACTER*4 MWORD
       CHARACTER*1 ISS
       CHARACTER*10 FILNOM
-      LOGICAL GETM, ENDIP, ONCARD
+      LOGICAL GETM, ENDIP
 !
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
      &                ICDN(26,9), IERR, IO10, SDREAD
@@ -1682,7 +1509,8 @@
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       LOGICAL MULFAS, MULSOU, MULONE
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /PHAS0 / INRLP0, ICDLP0, INRLP1, ICDLP1, NCDF0
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
@@ -1761,20 +1589,13 @@
  2001   FORMAT (5X,I4,' card',A1,'  labelled ',A1)
     5 ENDDO
       NTOTAL(N1) = ID
-      IF (IOUT.EQ.0) THEN
-        IF (ONCARD('I','OUTP',A)) IOUT = NINT(A)
-        IF (IOUT.NE.0) WRITE (LPT,2000) IOUT
- 2000   FORMAT (/' Diagnostic output at number',I5,' required'/)
-      ENDIF
       RETURN
  1000 FORMAT (A80)
+
       END SUBROUTINE CDFIN
-!*==CDSCAN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE CDSCAN(CH,WORDS,LEN,K,LCD,NW)
       SUBROUTINE CDSCAN(CH,WORDS,LEN,K,LCD,NW)
 !
 ! *** CDSCAN updated by JCM 2 Feb 88 ***
@@ -1835,12 +1656,9 @@
   101 LCD = L
 
       END SUBROUTINE CDSCAN
-!*==CELDER.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE CELDER(H,DERS)
       SUBROUTINE CELDER(H,DERS)
 !
 ! *** CELDER updated by JCM  7 Sep 88 ***
@@ -1878,12 +1696,9 @@
       STHL = SQRT(SSQRD)
 
       END SUBROUTINE CELDER
-!*==CELMAT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE CELMAT(TOSTAR)
       SUBROUTINE CELMAT(TOSTAR)
 !
 ! *** CELMAT by JCM 17 Aug 89 ***
@@ -1946,14 +1761,11 @@
       TOSTAR(6,4) = -B*E - D*F
       TOSTAR(6,5) = -A*D - E*F
       TOSTAR(6,6) = -A*B - F*F
-      RETURN
+
       END SUBROUTINE CELMAT
-!*==CELNEW.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE CELNEW
       SUBROUTINE CELNEW
 !
 ! *** CELNEW updated by PJB 14-Dec-94 ***
@@ -1987,13 +1799,11 @@
       WRITE (NEWIN,2000) (CELL(I,1,1),I=1,3), (ANG(I),I=1,3)
  2000 FORMAT ('C ',3F10.5,3F10.3)
   100 RETURN
+
       END SUBROUTINE CELNEW
-!*==CELREL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 9      SUBROUTINE CELREL(IFAM,IGEN,ISPC)
       SUBROUTINE CELREL(IFAM,IGEN,ISPC)
 !
 ! *** CELREL updated by JCM 2 May 90 ***
@@ -2013,8 +1823,7 @@
 !
       DIMENSION NCOUNT(6)
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
 
 ! SET UP LIST OF 6 KK VALUES:
@@ -2026,12 +1835,9 @@
       NCELG = IGEN
       NCELS = ISPC
       END SUBROUTINE CELREL
-!*==CELSDP.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE CELSDP(ALSQ,MATSZ)
       SUBROUTINE CELSDP(ALSQ,MATSZ)
 !
 ! *** CELSDP by JCM 17 Aug 89 ***
@@ -2050,7 +1856,8 @@
       CHARACTER*5 AN(3)
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       DATA SI/'a', 'b', 'c'/
       DATA AN/'alpha', ' beta', 'gamma'/
 
@@ -2066,12 +1873,9 @@
       ENDDO
 
       END SUBROUTINE CELSDP
-!*==CELSHF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE CELSHF(N)
       SUBROUTINE CELSHF(N)
 !
 ! *** CELSHF updated by JCM 10 Feb 87 ***
@@ -2086,8 +1890,6 @@
 !
       CALL ADJUST(CPARS(N,2))
       GOTO 100
-!
-!
 ! TO SET ALL CELL PARAMETERS FIXED, OR VARY ONE:
       ENTRY CELVAR(N,NV)
       IF (N.EQ.0) THEN
@@ -2098,13 +1900,11 @@
         KCPARS(N) = NV
       ENDIF
   100 RETURN
+
       END SUBROUTINE CELSHF
-!*==CENTRE.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE CENTRE(LUNIT,N,TXT,NWIDE)
       SUBROUTINE CENTRE(LUNIT,N,TXT,NWIDE)
 !
 ! *** CENTRE by JCM 12 Sep 92 ***
@@ -2140,13 +1940,9 @@
  2001 FORMAT (1X,200A1)
 
       END SUBROUTINE CENTRE
-!*==CLOFIL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 1      SUBROUTINE CLOFIL(LUN)
       SUBROUTINE CLOFIL(LUN)
 !
 ! *** CLOFIL by PJB Jan 86 ***
@@ -2175,12 +1971,9 @@
       ENDDO
 
       END SUBROUTINE CLOFIL
-!*==CONATF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION CONATF(N,IA)
       FUNCTION CONATF(N,IA)
 !
 ! *** CONATF by JCM 16 Nov 84 ***
@@ -2210,7 +2003,6 @@
 !  TYPE 2 - AS IN HEWAT PROFILE REFINEMENT -  NO COSINES
     2 FAC = 4.
       GOTO 30
-!
 !  TYPE 3 U'S AS IN EXP-2*PI*PI(ETC)
     3 FAC = 1./(TWOPI*PI)
    30 GOTO (21,21,21,24,25,26), N
@@ -2222,7 +2014,6 @@
       GOTO 101
    26 C = FAC/(CELL(1,1,2)*CELL(2,1,2))
       GOTO 101
-!
 !  TYPE 4 - ONLY THE 2'S MISSING
     4 GOTO (41,41,41,42,42,42), N
    41 C = 1.0
@@ -2233,12 +2024,9 @@
   101 CONATF = C
 
       END FUNCTION CONATF
-!*==DEPRIN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE DEPRIN(IPRNT)
       SUBROUTINE DEPRIN(IPRNT)
 !
 ! *** DEPRIN by JCM 11 Feb 80 ***
@@ -2257,7 +2045,8 @@
 !D    'PRIN', 'PRFC', 'PRSK' etc, depending on the calling program
 !O Outputs suitable message
 !
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       IF (IPRNT.EQ.1) THEN
         CALL MESS(LPT,0,'first cycle')
@@ -2272,12 +2061,9 @@
       ENDIF
 
       END SUBROUTINE DEPRIN
-!*==DUMMY.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE DUMMY
       SUBROUTINE DUMMY(DUM)
 !
 ! *** DUMMY by JCM 21 Mar 89 ***
@@ -2290,12 +2076,9 @@
 !
       RETURN
       END SUBROUTINE DUMMY
-!*==ELEMAT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION ELEMAT(ALSQ,MATSZ,I,J)
       FUNCTION ELEMAT(ALSQ,MATSZ,I,J)
 !
 ! *** ELEMAT by JCM 16 Jul 87 ***
@@ -2313,18 +2096,15 @@
       DIMENSION ALSQ(MATSZ), MM(400)
       COMMON /MATDAT/ MATPNT(401), BLSQ(400)
       EQUIVALENCE (MM(1),MATPNT(2))
-!
+
       IND = MM(I) + J
       IF (J.LT.I) IND = MM(J) + I
       ELEMAT = ALSQ(IND)
 
       END FUNCTION ELEMAT
-!*==EQOP.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE EQOP(R,T,N,L)
       SUBROUTINE EQOP(R,T,N,L)
 !
 ! *** EQOP by JCM 28 Jun 83 ***
@@ -2354,7 +2134,7 @@
       DIMENSION R(3,3), T(3)
       COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48), VEC(3)
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
-!
+
       NN = N
       DO I = 1, NN
         DO J = 1, 3
@@ -2380,13 +2160,11 @@
       CALL GMEQ(R,TSYM(1,1,N),3,3)
       CALL GMEQ(T,TTRANS(1,N),1,3)
   100 RETURN
+
       END SUBROUTINE EQOP
-!*==EQPOS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE EQPOS(VEC1,VEC2,N1,N2,M)
       SUBROUTINE EQPOS(VEC1,VEC2,N1,N2,M)
 !
 ! *** EQPOS updated by JCM 13 Apr 86 ***
@@ -2409,7 +2187,8 @@
 !N M must be at least 1.
 !
       DIMENSION VEC1(3,M), VEC2(3)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       IF (N1.LT.1) GOTO 4
       DO I = 1, N1
@@ -2424,10 +2203,6 @@
     4 I = N1 + 1
       IF (I.LE.M) GOTO 5
       WRITE (LPT,3000) M, ((VEC1(J1,I1),J1=1,3),I1=1,M)
-      WRITE (ITO,3000) M, ((VEC1(J1,I1),J1=1,3),I1=1,M)
-!>> JCC
-!   Was      STOP
-!>> Handle through further function
       CALL BMBOUT
       RETURN
     5 CALL GMEQ(VEC2,VEC1(1,I),1,3)
@@ -2436,12 +2211,9 @@
       RETURN
  3000 FORMAT (/' ERROR ** more than',I3,' equivalent positions ','found in EQPOS - list so far is:'/(1X,3F12.4))
       END SUBROUTINE EQPOS
-!*==EQPPOS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE EQPPOS(VEC1,VEC2,N1,N2,M)
       SUBROUTINE EQPPOS(VEC1,VEC2,N1,N2,M)
 !
 ! *** EQPPOS corrected by PJB 31-May-1994 ***
@@ -2466,7 +2238,8 @@
 !
       DIMENSION VEC1(3,M), VEC2(3), TVEC(3)
       LOGICAL LATVEC
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       IF (N1.LT.1) GOTO 4
       DO I = 1, N1
@@ -2478,10 +2251,6 @@
     4 I = N1 + 1
       IF (I.GT.M) THEN
         WRITE (LPT,3000) M, ((VEC1(J1,I1),J1=1,3),I1=1,M)
-        WRITE (ITO,3000) M, ((VEC1(J1,I1),J1=1,3),I1=1,M)
-!>> JCC Handle through separate function
-! Was        STOP
-! Now
         CALL BMBOUT
         RETURN
       ENDIF
@@ -2490,13 +2259,11 @@
   101 N2 = I
       RETURN
  3000 FORMAT (/' ERROR ** more than',I3,' equivalent positions ','found in EQPOS - list so far is:'/(1X,3F12.4))
+
       END SUBROUTINE EQPPOS
-!*==EQRLV.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE EQRLV(VEC1,VEC2,N1,N2,M)
       SUBROUTINE EQRLV(VEC1,VEC2,N1,N2,M)
 !
 ! *** EQRLV by PJB Jun 88 ***
@@ -2523,7 +2290,8 @@
 !
       DIMENSION VEC1(3,1), VEC2(3), TVEC(3)
       LOGICAL LATABS
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 
       N = N1
       IF (N.LT.1) GOTO 4
@@ -2533,31 +2301,22 @@
 ! HAVE FOUND DUPLICATE - IGNORE & SET N2 TO POINT TO IT:
         GOTO 101
     1 ENDDO
-!
 ! HAVE NEW VECTOR:
     4 I = N + 1
       IF (M.EQ.0) GOTO 101
       IF (I.LE.M) GOTO 5
       WRITE (LPT,3000) M, ((VEC1(J,I),J=1,3),I=1,M)
-      WRITE (ITO,3000) M, ((VEC1(J,I),J=1,3),I=1,M)
-!>> JCC Handle through extra function
-! Was      STOP
-! Now
       CALL BMBOUT
       RETURN
-!
 ! TO STORE NEW VECTOR:
     5 CALL GMEQ(VEC2,VEC1(1,I),1,3)
   101 N2 = I
       RETURN
  3000 FORMAT (' ERROR ** more than',I3,'equivalent vectors ','formed - vectors so far are'/(1X,3E12.5))
       END SUBROUTINE EQRLV
-!*==EQVEC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE EQVEC(VEC1,VEC2,N1,N2,M)
       SUBROUTINE EQVEC(VEC1,VEC2,N1,N2,M)
 !
 ! *** EQVEC updated by JCM 22 Oct 86 ***
@@ -2584,7 +2343,8 @@
 !     The need for this was picked up by an array bounds check
       DIMENSION VEC1(3,*), VEC2(3)
       LOGICAL GMSAME
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 
       N = N1
       IF (N.LT.1) GOTO 4
@@ -2593,31 +2353,23 @@
 ! HAVE FOUND DUPLICATE - IGNORE & SET N2 TO POINT TO IT:
         GOTO 101
     1 ENDDO
-!
 ! HAVE NEW VECTOR:
     4 I = N + 1
       IF (M.EQ.0) GOTO 101
       IF (I.LE.M) GOTO 5
       WRITE (LPT,3000) M, ((VEC1(J,I),J=1,3),I=1,M)
-      WRITE (ITO,3000) M, ((VEC1(J,I),J=1,3),I=1,M)
-!>> JCC Handle through extra function
-! Was      STOP
-! Now
       CALL BMBOUT
       RETURN
-
 ! TO STORE NEW VECTOR:
     5 CALL GMEQ(VEC2,VEC1(1,I),1,3)
   101 N2 = I
       RETURN
  3000 FORMAT (' ERROR ** more than',I3,'equivalent vectors formed - vectors so far are'/(1X,3E12.5))
+
       END SUBROUTINE EQVEC
-!*==ERRATM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE ERRATM(NAME,NACT,MESS)
       SUBROUTINE ERRATM(NAME,NACT,MESS)
 !
 ! *** ERRATM by JCM 25 Sep 89 ***
@@ -2638,13 +2390,13 @@
 !
       CHARACTER*(*) MESS
       CHARACTER*4 NAME
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       LOGICAL SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -2652,27 +2404,18 @@
       L = LENGT(MESS)
       IF (NACT.GT.0) IERR = IERR + 1
       WRITE (LPT,3001) NAME, (MESS(I:I),I=1,L)
-      WRITE (ITO,3001) NAME, (MESS(I:I),I=1,L)
       IF (IABS(NACT).EQ.2) THEN
         WRITE (LPT,2001) ICARD
-        WRITE (ITO,2001) ICARD
       ENDIF
-
-!>> JCC Handle through extra function
-! Was    IF (NACT .EQ. 0)  STOP
-! Now
       IF (NACT.EQ.0) CALL BMBOUT
       RETURN
  3001 FORMAT (/' ERROR ** ',A4,' is not an atom name - on ',80A1)
  2001 FORMAT (' Card says:'/1X,A80)
 
       END SUBROUTINE ERRATM
-!*==ERRCH2.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE ERRCH2(WORD,NACT,MESS1,MESS2)
       SUBROUTINE ERRCH2(WORD,NACT,MESS1,MESS2)
 !
 ! *** ERRCH2 by JCM 25 Sep 89 ***
@@ -2697,18 +2440,19 @@
       CHARACTER*34 FORM
       CHARACTER*(*) MESS1, MESS2
       CHARACTER*(*) WORD
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       LOGICAL SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
       DATA FORM/'('' ERROR ** '',80A1,1X,A4 ,1X,80A1)'/
 
+      CALL DebugErrorMessage('ERRCH2 called')
       LW = LENGT(WORD)
       IF (LW.EQ.0) LW = 1
       WRITE (FORM(24:25),2000) LW
@@ -2718,27 +2462,18 @@
       L2 = LENGT(MESS2)
       IF (NACT.GT.0) IERR = IERR + 1
       WRITE (LPT,FORM) (MESS1(I:I),I=1,L1), WORD, (MESS2(I:I),I=1,L2)
-      WRITE (ITO,FORM) (MESS1(I:I),I=1,L1), WORD, (MESS2(I:I),I=1,L2)
       IF (IABS(NACT).EQ.2) THEN
         WRITE (LPT,2001) ICARD
-        WRITE (ITO,2001) ICARD
       ENDIF
-!>> JCC Handle through external function
-!>> Was
-!      IF (NACT .EQ. 0) STOP
-!>> Now
       IF (NACT.EQ.0) CALL BMBOUT
       RETURN
  2000 FORMAT (I2)
  2001 FORMAT (' Card says:'/1X,A80)
 
       END SUBROUTINE ERRCH2
-!*==ERRCHK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE ERRCHK(NTYP,NVALUE,NBOUND,NACT,MESS)
       SUBROUTINE ERRCHK(NTYP,NVALUE,NBOUND,NACT,MESS)
 !
 ! *** ERRCHK by JCM 4 Oct 88 ***
@@ -2769,34 +2504,26 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
-!
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
+
       IF (NTYP.NE.1) NVALUE = NVALUE + 1
       IF (NVALUE.LE.NBOUND) GOTO 100
       IF (NACT.GT.0) IERR = IERR + 1
       L = LENGT(MESS)
       IF (NTYP.EQ.1) THEN
         WRITE (LPT,3001) NVALUE, (MESS(I:I),I=1,L)
-        WRITE (ITO,3001) NVALUE, (MESS(I:I),I=1,L)
       ENDIF
       WRITE (LPT,3000) NBOUND, (MESS(I:I),I=1,L)
-      WRITE (ITO,3000) NBOUND, (MESS(I:I),I=1,L)
-!>> JCC Handle thru' external function
-!>> Was     IF (NACT .EQ. 0) STOP
-!>> Now
       IF (NACT.EQ.0) CALL BMBOUT
-!
   100 RETURN
  3001 FORMAT (/' ',I6,80A1)
  3000 FORMAT (/' ERROR ** there is an upper limit of',I6,' on number of ',80A1)
 
       END SUBROUTINE ERRCHK
-!*==ERRIN2.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE ERRIN2(INT,NACT,MESS1,MESS2)
       SUBROUTINE ERRIN2(INT,NACT,MESS1,MESS2)
 !
 ! *** ERRIN2 by JCM 25 Sep 89 ***
@@ -2823,7 +2550,8 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -2836,26 +2564,17 @@
       L2 = LENGT(MESS2)
       IF (NACT.GT.0) IERR = IERR + 1
       WRITE (LPT,FORM) (MESS1(I:I),I=1,L1), INT, (MESS2(I:I),I=1,L2)
-      WRITE (ITO,FORM) (MESS1(I:I),I=1,L1), INT, (MESS2(I:I),I=1,L2)
       IF (IABS(NACT).EQ.2) THEN
         WRITE (LPT,2001) ICARD
-        WRITE (ITO,2001) ICARD
       ENDIF
-!
-!>> JCC Handle thru' external function
-!>> Was     IF (NACT .EQ. 0) STOP
-!>> Now
       IF (NACT.EQ.0) CALL BMBOUT
       RETURN
  2001 FORMAT (' Card says:'/1X,A80)
  
       END SUBROUTINE ERRIN2
-!*==ERRMES.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE ERRMES(NTYP,NACT,MESS)
       SUBROUTINE ERRMES(NTYP,NACT,MESS)
 !
 ! *** ERRMES updated by JCM 10 Nov 89 ***
@@ -2882,16 +2601,13 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 
       L = LENGT(MESS)
       IF (NTYP.EQ.0) THEN
         IF (IERR.NE.0) THEN
           WRITE (LPT,3000) IERR, (MESS(I:I),I=1,L)
-          WRITE (ITO,3000) IERR, (MESS(I:I),I=1,L)
-!>> JCC Handle through extra function
-! Was      STOP
-! Now
           CALL BMBOUT
           RETURN
         ELSE
@@ -2901,21 +2617,13 @@
       IF (NACT.GT.0) IERR = IERR + 1
       IF (NTYP.EQ.1) THEN
         WRITE (LPT,3001) (MESS(I:I),I=1,L)
-        WRITE (ITO,3001) (MESS(I:I),I=1,L)
       ELSEIF (IABS(NTYP).EQ.2) THEN
         WRITE (LPT,3002) (MESS(I:I),I=1,L)
-        WRITE (ITO,3002) (MESS(I:I),I=1,L)
       ELSEIF (IABS(NTYP).EQ.3) THEN
         WRITE (LPT,3003) (MESS(I:I),I=1,L)
-        WRITE (ITO,3003) (MESS(I:I),I=1,L)
       ELSEIF (NTYP.EQ.-1) THEN
         WRITE (LPT,3004) (MESS(I:I),I=1,L)
-        WRITE (ITO,3004) (MESS(I:I),I=1,L)
       ENDIF
-!
-!>> JCC Handle thru' external function
-!>> Was     IF (NACT .EQ. 0) STOP
-!>> Now
       IF (NACT.EQ.0) CALL BMBOUT
   100 RETURN
  3000 FORMAT (///' *** ',I4,' fatal error(s) in input ',80A1)
@@ -2925,12 +2633,9 @@
  3004 FORMAT (/' PROGRAM ERROR ** ',80A1)
 
       END SUBROUTINE ERRMES
-!*==ERRRE2.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE ERRRE2(X,NACT,MESS1,MESS2)
       SUBROUTINE ERRRE2(X,NACT,MESS1,MESS2)
 !
 ! *** ERRRE2 by JCM 25 Sep 89 ***
@@ -2957,7 +2662,8 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -2970,25 +2676,17 @@
       L2 = LENGT(MESS2)
       IF (NACT.GT.0) IERR = IERR + 1
       WRITE (LPT,FORM) (MESS1(I:I),I=1,L1), X, (MESS2(I:I),I=1,L2)
-      WRITE (ITO,FORM) (MESS1(I:I),I=1,L1), X, (MESS2(I:I),I=1,L2)
       IF (IABS(NACT).EQ.2) THEN
         WRITE (LPT,2001) ICARD
-        WRITE (ITO,2001) ICARD
       ENDIF
-!>> JCC Handle thru' external function
-!>> Was     IF (NACT .EQ. 0) STOP
-!>> Now
       IF (NACT.EQ.0) CALL BMBOUT
       RETURN
  2001 FORMAT (' Card says:'/1X,A80)
 
       END SUBROUTINE ERRRE2
-!*==EXCLD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      LOGICAL FUNCTION EXCLD(A,B,M)
       LOGICAL FUNCTION EXCLD(A,B,M)
 !
 ! *** EXCLD by JCM 17 Jan 85 ***
@@ -3017,12 +2715,9 @@
   100 RETURN
 
       END FUNCTION EXCLD
-!*==UXEXPAND.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE UXEXPAND(IBUF,OBUF)
       SUBROUTINE UXEXPAND(IBUF,OBUF)
 !
 ! *** EXPAND new by PJB Mar-28-1994 ***
@@ -3067,13 +2762,11 @@
       ENDIF
       IF (I.LE.L) GOTO 1
   100 RETURN
+
       END SUBROUTINE UXEXPAND
-!*==EXTINC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE EXTINC(N,F)
       SUBROUTINE EXTINC(N,F)
 !
 ! *** EXTINC by JCM 23 Jan 85 ***
@@ -3118,25 +2811,20 @@
       LOGICAL LOREN, GAUSS
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
-!
+
       GOTO (1,2,2,4,5,6), N
-!
       ENTRY EXTIN1
-!
 ! READ E CARD:
     1 CALL INPUTE
       GOTO 100
-!
 ! CALCULATE EXTCOR - WITH DERIVATIVES IF N=3:
     2 IF (IEXTYP.EQ.0) GOTO 10
       A = 1.5*DOMR/CEXT(2)
       B = CEXT(1)*F*F/1.5
       C = 1.5*AMOSC
       H = 2.*AMOSC*AMOSC
-!
       IF (LOREN) D = 1./(1.+A/C)
       IF (GAUSS) D = 1./(SQRT(1.+A*A/H))
-!
       X = B*A*D
       X2 = 2.*X
       XX = X*X
@@ -3145,60 +2833,48 @@
       Y = SQRT(YY)
       EXTCOR = SQRT(Y)
       IF (N.EQ.2) GOTO 100
-!
 ! DERIVATIVES:
       IF (LOREN) FACTOR = 1./C
       IF (GAUSS) FACTOR = A*D/H
       FACTOR = FACTOR*A*D
-      DNUM = 2. + X2*(2.*CEXT(4)+CEXT(3)) + CEXT(4)                     &
-     &       *XX*(2.*CEXT(4)+CEXT(3))
+      DNUM = 2. + X2*(2.*CEXT(4)+CEXT(3)) + CEXT(4) *XX*(2.*CEXT(4)+CEXT(3))
       E = -YY*DNUM*X/(4.*C4*C4)
       DEXDRQ = E*(1.-FACTOR)/DOMR
       DEXDGQ = E*FACTOR/AMOSC
       DEXDFQ = E*2./F
       GOTO 100
-!
 ! ENTRY 2 OR 3 - NO EXTINCTION CORRECTION:
    10 EXTCOR = 1.
       DEXDRQ = 0.
       DEXDGQ = 0.
       DEXDFQ = 0.
       GOTO 100
-!
       ENTRY EXTIN3(NP)
       GOTO (4,5), NP
-!
 ! APPLY SHIFT TO DOMR:
     4 CALL ADJUST(DOMR)
       GOTO 100
-!
 ! APPLY SHIFT TO MOSC:
     5 CALL ADJUST(AMOSC)
       GOTO 100
-!
       ENTRY EXTIN4
-!
 ! NEW E CARD:
     6 WRITE (NEWIN,2000) IEXTYP, DOMR, AMOSC
  2000 FORMAT ('E',I5,2F10.4)
       GOTO 100
-!
       ENTRY EXTIN8(NP,NV)
       IF (NP.EQ.1) KDOMR = NV
       IF (NP.EQ.2) KMOSC = NV
       GOTO 100
-!
       ENTRY EXTIN9
       KDOMR = 0
       KMOSC = 0
   100 RETURN
+
       END SUBROUTINE EXTINC
-!*==F2NEW.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE F2NEW(L)
       SUBROUTINE F2NEW(L)
 !
 ! *** F2NEW updated by JCM 6 Feb 90 ***
@@ -3211,7 +2887,6 @@
 !A L = 1, 6 OR 20 for A, F OR T.
 !P The card should have been read to ICARD in /SCRACH/.
 !O Outputs to unit NEWIN  a new card, with altered parameters if necessary.
-!
 !
       CHARACTER*4 LABA, LABS, LABF
       DIMENSION A(6)
@@ -3255,17 +2930,13 @@
       IF (LBSLEN.GT.0) LABF = LABS
 ! MAY BE SD CARD:
       IF (SDREAD) THEN
-        WRITE (NEWIN,2020) LABA, (SDX(J,IR),J=1,3), SDTF(IR), LABF,     &
-     &                     SDSITE(IR)
+        WRITE (NEWIN,2020) LABA, (SDX(J,IR),J=1,3), SDTF(IR), LABF, SDSITE(IR)
  2020   FORMAT ('A SD ',A4,4F10.5,1X,A4,F10.5)
       ELSE
-        IF (SITE(IR).EQ.1.) WRITE (NEWIN,2000) LABA, (X(J,IR),J=1,3),   &
-     &                             TF(IR), LABF
-        IF (SITE(IR).NE.1.) WRITE (NEWIN,2000) LABA, (X(J,IR),J=1,3),   &
-     &                             TF(IR), LABF, SITE(IR)
+        IF (SITE(IR).EQ.1.) WRITE (NEWIN,2000) LABA, (X(J,IR),J=1,3), TF(IR), LABF
+        IF (SITE(IR).NE.1.) WRITE (NEWIN,2000) LABA, (X(J,IR),J=1,3), TF(IR), LABF, SITE(IR)
       ENDIF
       GOTO 100
-!
 ! 'F' CARD:
     2 CALL INPUTF(0,LABF,LBFLEN,NTYP,IPT,IER)
 ! REREAD CARD TO DISCOVER WHICH FACTOR AND TYPE:
@@ -3274,7 +2945,6 @@
       WRITE (NEWIN,2001) LABF, NTYP, CMULT(IR)
  2001 FORMAT ('F ',A4,I5,F10.5)
       GOTO 100
-!
 ! 'T' CARD:
     3 CALL INPUTT(0,LABA,LBALEN,NTYP,A,IER)
 ! REREAD CARD TO DISCOVER WHICH:
@@ -3286,20 +2956,16 @@
       WRITE (NEWIN,2002) LABA, IATYP(IAPT(IR)), A
  2002 FORMAT ('T ',A4,I5,6F10.5)
       GOTO 100
-!
 ! COPY OUT UNCHANGED CARD:
   101 WRITE (NEWIN,2003) (ICARD(I:I),I=1,LENGT(ICARD))
  2003 FORMAT (80A1)
-!
   100 RETURN
  2000 FORMAT ('A ',A4,4F10.5,1X,A4,F10.5)
+
       END SUBROUTINE F2NEW
-!*==F2PARS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      BLOCK DATA F2PARS
       BLOCKDATA F2PARS
 !
 ! *** F2PARS updated by PJB 23-Sept-93 ***
@@ -3320,12 +2986,9 @@
      &     1, 13, 1, 0, 0, 2, 0, 0, -1, 0, 0, -2, 0, 0, -3, 0, 0, -4, 0,&
      &     0, -5, 0, 0, -6, 0, 0/
       END BLOCKDATA F2PARS
-!*==F2RELA.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 9      SUBROUTINE F2RELA(IFAM,ISPVEC)
       SUBROUTINE F2RELA(IFAM,ISPVEC)
 !
 ! *** F2RELA updated by JCM 8 Sep 88 ***
@@ -3399,7 +3062,6 @@
           IF (K.GT.3) GOTO 2
           NFIX3(K) = 9999
     2   ENDDO
-!
 ! JUMP IF NOT SPECIAL:
         IF (ISGEN(1,IR).EQ.1) GOTO 6
 ! JUMP IF NOT SPECIAL BECAUSE OF A CENTRE OF SYMMETRY AT THE ORIGIN:
@@ -3413,8 +3075,6 @@
         CALL GMUNI(RMAT,3)
         CALL GMREV(RMAT,RMAT,3,3)
         CALL RELSM6(RMAT,NFIX6,FIX6)
-!
-!
 ! TAKE FIRST (OF POSSIBLE 2) SYMMETRY ELEMENTS MAKING THIS POSITION SPECIAL:
     4   DO I = 2, 3
           K = IABS(ISGEN(I,IR))
@@ -3423,7 +3083,6 @@
           CALL RELSM3(RMAT,NFIX3,FIX3)
 ! IF THERE IS AN ATF, FIND ITS RELATIONS ALSO:
           IF (IAPT(IR).NE.0) CALL RELSM6(RMAT,NFIX6,FIX6)
-!
 ! IS THERE A SECOND GENERATOR OF THE SUB-GROUP WHICH MAKES THIS ATOM SPECIAL?
           IF (ISGEN(3,IR).EQ.0) GOTO 6
         ENDDO
@@ -3438,7 +3097,6 @@
           ENDDO
           CALL FIXREL(6,NFIX6,FIX6,NCOUNT,5)
         ENDIF
-!
 ! NOW LINK SCATTERING FACTORS FOR THOSE ATOMS WITH SAME FACTOR:
         IS = NFORMF(IR)
         IT = NBAKF(IS)
@@ -3449,7 +3107,6 @@
           AM(2) = -1.
           CALL ADDCON(2,KK1,AM,5)
         ENDIF
-!
 ! AND FIX ALL NON-EXISTENT ATF COEFFS, CHECKING ANY WITH FIX/RELA INFO:
         IF (ICDNO(20).EQ.0) GOTO 3
         IF (IAPT(IR).EQ.0) THEN
@@ -3458,7 +3115,6 @@
           ENDDO
           GOTO 3
         ENDIF
-!
         DO I = 1, 6
           IF (NFIX6(I).EQ.9999) GOTO 9
           IF (NFIX6(I).EQ.0) THEN
@@ -3471,17 +3127,14 @@
 !     CHECK THAT COEFF I1 AND COEFF I2 HAVE CORRECT RELATIONSHIP
           I1 = I2
           GOTO 10
-!
     9   ENDDO
     3 ENDDO
   100 RETURN
+
       END SUBROUTINE F2RELA
-!*==F2SHFT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE F2SHFT
       SUBROUTINE F2SHFT
 !
 ! *** F2SHFT updated by JCM 10 Feb 87 ***
@@ -3513,12 +3166,10 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 !
       GOTO (1,1,1,4,4,4,4,4,4,10,11,12), ISPC
-!
 ! X, Y OR Z:
     1 CALL ADJUST(X(ISPC,IGEN))
       SDX(ISPC,IGEN) = ESD
       GOTO 100
-!
 ! B11, B22 ETC:
     4 IA = IAPT(IGEN)
       FAC = CONATF(ISPC-3,IA)
@@ -3528,28 +3179,22 @@
       CALL ADJUST(ATF(ISPC-3,IA))
       ATF(ISPC-3,IA) = ATF(ISPC-3,IA)/FAC
       GOTO 100
-!
 ! FORM/SCATTERING FACTOR:
    10 CALL ADJUST(CMULT(NFORMF(IGEN)))
       GOTO 100
-!
 ! SITE OCCUPATION FACTOR:
    11 CALL ADJUST(SITE(IGEN))
       SDSITE(IGEN) = ESD
       GOTO 100
-!
 ! ISOTROPIC TEMPERATURE FACTOR:
    12 CALL ADJUST(TF(IGEN))
       SDTF(IGEN) = ESD
-!
   100 RETURN
+
       END SUBROUTINE F2SHFT
-!*==F2VAR8.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE F2VAR8(NG,NS,NV)
       SUBROUTINE F2VAR8(NG,NS,NV)
 !
 ! *** F2VAR8 by JCM 17 Nov 90 ***
@@ -3571,28 +3216,21 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 !
       GOTO (1,1,1,4,4,4,4,4,4,10,11,12), NS
-!
 ! X, Y OR Z:
     1 KX(NS,NG) = NV
       GOTO 100
-!
 ! B11, B22 ETC:
     4 KATF(NS-3,IAPT(NG)) = NV
       GOTO 100
-!
 ! FORM/SCATTERING FACTOR:
    10 KCMULT(NG) = NV
       GOTO 100
-!
 ! SITE OCCUPATION FACTOR:
    11 KSITE(NG) = NV
       GOTO 100
-!
 ! ISOTROPIC TEMPERATURE FACTOR:
    12 KTF(NG) = NV
       GOTO 100
-!
-!
 ! TO CLEAR ALL FAMILY 2 VARIABLES TO BE FIXED:
       ENTRY F2VAR9
       DO IR = 1, NATOM
@@ -3606,15 +3244,12 @@
         KSITE(IR) = 0
         KTF(IR) = 0
       ENDDO
-!
   100 RETURN
+
       END SUBROUTINE F2VAR8
-!*==FACTGP.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE FACTGP(ISTAB,IFTAB,NFAC)
       SUBROUTINE FACTGP(ISTAB,IFTAB,NFAC)
 !
 ! *** FACTGP by PJB 13 Feb 90 ***
@@ -3659,7 +3294,6 @@
           IFTAB(I) = 0
         ENDIF
       ENDDO
-!
       NFAC = 1
       DO I = 2, NOPC
 ! POTENTIAL FACTOR ELEMENT:
@@ -3674,15 +3308,11 @@
     2 ENDDO
       IF (ISTAB(1).NE.0) NFAC = -NFAC
       IFTAB(1) = NFAC
-!
-      RETURN
+
       END SUBROUTINE FACTGP
-!*==FCALC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      COMPLEX FUNCTION FCALC(H)
       COMPLEX FUNCTION FCALC(H)
 !
 ! *** FCALC by JCM 19 Jul 83 ***
@@ -3728,17 +3358,13 @@
      &                KOM26
 !
       FCALC = CMPLX(0.,0.)
-!
 ! CALCULATE SINTHETA/LAMBDA:
       STHL = VCTMOD(0.5,H,2)
-!
 ! INITIALISE J, WHICH SAYS WHICH FORM FACTOR USED ON "PREVIOUS" ATOM:
       J = 0
-!
 ! SUM OVER ATOMS IN CELL:
       DO N = 1, NATOM
         SUM1 = CMPLX(0.,0.)
-!
 ! SUM OVER SYMMETRY EQUIVALENTS:
         DO I = 1, NOPC
           CALL ROTSYM(H,RH,I,-1)
@@ -3750,7 +3376,6 @@
         ENDDO
 ! IN CASE ANOM SCATT AND CENTROSYMMETRIC:
         IF (CENTRC) SUM1 = SUM1 + CONJG(SUM1)
-!
         SUM1 = SUM1*AMULT(N)*SITE(N)
         IF (NFORMF(N).EQ.J) GOTO 1
 ! CALCULATE A NEW FORM FACTOR:
@@ -3758,14 +3383,11 @@
         FO = FORMFA(STHL,J)
     1   FCALC = FCALC + SUM1*FO*EXP(-TF(N)*STHL*STHL)
       ENDDO
-      RETURN
+
       END FUNCTION FCALC
-!*==FCTOR.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FCTOR(H,N)
       SUBROUTINE FCTOR(H,N)
 !
 ! *** FCTOR by PJB/JCM 28 Jun 83 ***
@@ -3779,19 +3401,17 @@
 !A integral, and H has been divided through by N
 !
       DIMENSION H(3), AH(3)
-!
+
 ! USE ONLY MODULI:
       N = 0
       DO I = 1, 3
         AH(I) = ABS(H(I))
       ENDDO
-!
 ! NMAX= LARGEST:
       NMAX = MAX1(AH(1),AH(2),AH(3))
 ! FOR 0,0,0 EXIT WITH N=0
       IF (NMAX.EQ.0) GOTO 100
       FN = FLOAT(NMAX)
-!
 ! NOW SCAN EACH POSSIBLE HCF, DOWNWARDS:
       DO NN = 2, NMAX
         DO I = 1, 3
@@ -3808,13 +3428,11 @@
       FN = 1.
     5 N = NINT(FN)
   100 RETURN
+
       END SUBROUTINE FCTOR
-!*==FETSHF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FETSHF(N,SH,ES)
       SUBROUTINE FETSHF(N,SH,ES)
 !
 ! *** FETSHF updated by JCM 21 Mar 89 ***
@@ -3835,7 +3453,8 @@
 !D Updates ISHFT, AVSHFT and AMAXSH
 !
       LOGICAL TESTOV
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
@@ -3843,15 +3462,13 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-!
+
       GOTO (1,2,3), N
-!
 ! INITIALISE:
     1 AVSHFT = 0.
       ISHFT = 0
       AMAXSH = 0.
       GOTO 100
-!
 ! ADD IN TOTALS:
     2 SHESD = 0.
       IF (.NOT.TESTOV(SH,ES)) SHESD = ABS(SH/ES)
@@ -3859,19 +3476,15 @@
       AVSHFT = AVSHFT + SHESD
       AMAXSH = MAX(AMAXSH,SHESD)
       GOTO 100
-!
 ! PRINT AT CYCLE END:
     3 WRITE (LPT,2002) ICYC, AVSHFT/ISHFT, AMAXSH
- 2002 FORMAT (//' Average SHIFT/ESD for cycle ',I3,' =',                &
-     &        G14.5/' Maximum SHIFT/ESD = ',G14.5)
+ 2002 FORMAT (//' Average SHIFT/ESD for cycle ',I3,' =',G14.5/' Maximum SHIFT/ESD = ',G14.5)
   100 RETURN
+
       END SUBROUTINE FETSHF
-!*==FILNOM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      CHARACTER*10 FUNCTION FILNOM(LUN)
       CHARACTER*10 FUNCTION FILNOM(LUN)
 !
 ! *** FILNOM by PJB Jan 86 **
@@ -3887,7 +3500,7 @@
       COMMON /FINAME/ FILNAM(15)
       CHARACTER*10 FILNAM
       COMMON /LOONEY/ IOTAB(15), LUNTAB(15)
-!
+
       I = NFIND(LUN,LUNTAB,15)
       IF (I.EQ.0) THEN
         CALL ERRIN2(LUN,-1,'in FILNOM - unit','not in table LUNTAB')
@@ -3896,12 +3509,9 @@
       ENDIF
 
       END FUNCTION FILNOM
-!*==FILPRO.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FILPRO(DEFT,IU,LFIL)
       SUBROUTINE FILPRO(DEFT,IU,LFIL)
 !
 ! *** FILPRO updated by PJB for UNIX 28-Mar-1994 ***
@@ -3919,7 +3529,8 @@
       CHARACTER*10 FILNAM
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       LOGICAL MULFAS, MULSOU, MULONE
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -3982,12 +3593,10 @@
       FILNAM(IU) = NAMFIL(I+1:L)
       LFIL = L
       GOTO 100
-!
 ! THIS SECTION FOR VMS
    60 CALL JGMZER(MARK,1,4)
       L = LENG(NAMFIL,100)
       MARK(5) = L + 1
-!
 !  SEPARATE UP THE FILE-NAME
       JJ = 0
       DO I = 1, L
@@ -4004,11 +3613,9 @@
           GOTO 1
     2   ENDDO
     1 ENDDO
-!
 !  PROCESS EACH PART SEPARATELY
       DO IP = 1, 4
         GOTO (6,7,8,9), IP
-!
 !  EXTENSION
     6   M = MARK(IMTAB(IP))
         IF (M.NE.0) THEN
@@ -4018,24 +3625,20 @@
           IF (DEFT(1:1).NE.'.') DEFT(1:4) = '.DAT'
           GOTO 5
         ENDIF
-!
 !  DISC
     7   JP = IMTAB(IP)
         MM = MARK(JP)
         IF (MM.EQ.0) GOTO 5
         GOTO 12
-!
 !  NAME
     8   JP = IMTAB(1)
         GOTO 12
-!
 !  DIRECTORY PATH
     9   M = MARK(IMTAB(IP-1))
         MM = MARK(IMTAB(IP))
         IF (M.EQ.0) GOTO 5
         IF (M.GE.MM) GOTO 20
         GOTO 4
-!
 !  WRITE THE DIFFERENT PARTS TO DEFT
 !  SEARCH BACKWARDS FOR NEXT SEPARATOR
    12   DO I = JP - 1, 1, -1
@@ -4043,7 +3646,6 @@
           IF (M.GT.1) GOTO 10
         ENDDO
         M = 1
-!
 !  AND THEN FORWARDS IF NECESSARY
    10   IF (IP.EQ.2) GOTO 4
         DO I = JP, 5
@@ -4052,9 +3654,7 @@
         ENDDO
         MM = L
     4   DEFT(IPOS(IP):IPOS(IP+1)-1) = NAMFIL(M:MM)
-!
     5 ENDDO
-!
 !  CONDENSE AND WRITE BACK TO NAMFIL
       IP = 1
       DO JP = 1, 4
@@ -4065,34 +3665,26 @@
         IP = IP + L
         IF (I.EQ.1) MM = IP - 1
       ENDDO
-!
       FILNAM(IU) = NAMFIL(M:MM)
       LFIL = IP - 1
       GOTO 100
-!
 !  ERROR
-   20 CALL MESS(ITO,0,'Illegal file-name : '//NAMFIL)
-      CALL MESS(ITO,0,'Should be DISK:[DIRECTORY PATH]NAME.EXT')
+   20 CALL ErrorMessage('Illegal file-name : '//NAMFIL)
       LFIL = 0
       GOTO 100
-!
 ! IBM, FOR NOW:
    50 DO I = 1, 40
         IF (NAMFIL(I:I).EQ.'.') GOTO 52
       ENDDO
       I = 0
-!
    52 FILNAM(IU) = NAMFIL(I+1:I+10)
       LFIL = 40
-!
   100 RETURN
+
       END SUBROUTINE FILPRO
-!*==FINDCD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE FINDCD(CH,WORD,LEN,K,LCD)
       SUBROUTINE FINDCD(CH,WORD,LEN,K,LCD)
 !
 ! *** FINDCD updated by JCM 2 Feb 88 ***
@@ -4132,12 +3724,10 @@
 !
       L = -1
       I = LETTER(CH)
-!
 ! IF NO CH CARDS AT ALL, EXIT:
       IF (ICDNO(I).EQ.0) GOTO 101
       ID = K + 1
       IF (K.EQ.0) ID = IABS(INREAD(I))
-!
 ! READ NEXT CARD:
     1 IF (ID.GT.NTOTAL(JPHASE)) GOTO 102
       CALL CARDIN(ID)
@@ -4152,20 +3742,16 @@
         IF (ICARD(IST:IST).NE.' ') GOTO 87
       ENDDO
       GOTO 1
-!
    87 IF (ICARD(IST:IST+LEN-1).NE.WORD(1:LEN)) GOTO 1
 ! FOUND CARD:
       GOTO 101
   102 L = 0
   101 LCD = L
-      RETURN
+
       END SUBROUTINE FINDCD
-!*==FIXPAR.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE FIXPAR(NP,NFIX)
       SUBROUTINE FIXPAR(NP,NFIX)
 !
 ! *** FIXPAR by JCM 13 Jul 83 ***
@@ -4193,12 +3779,9 @@
 ! OUT IF PAR ALREADY FIXED, OR PAR UNREFERENCED SO FAR
       RETURN
       END SUBROUTINE FIXPAR
-!*==FIXREL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 8      SUBROUTINE FIXREL(N,NFIX,FIX,KKLIST,NSTAT)
       SUBROUTINE FIXREL(N,NFIX,FIX,KKLIST,NSTAT)
 !
 ! *** FIXREL by JCM 11 Jan 88 ***
@@ -4247,12 +3830,9 @@
       ENDDO
       RETURN
       END SUBROUTINE FIXREL
-!*==FIXUNI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE FIXUNI(A,NDO)
       SUBROUTINE FIXUNI(A,NDO)
 !
 ! *** FIXUNI updated by JCM 26 Sep 84 ***
@@ -4282,7 +3862,8 @@
 !D returning to SYMUNI.
 !
       DIMENSION A(3), PTEMP(3)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
@@ -4294,7 +3875,6 @@
       NSTAT(J) = 0
       NOPL = NOPL - 1
       GOTO 100
-!
 ! ADD PLANE A IF POSSIBLE;  IF NONE THERE ALREADY, SIMPLY ACCEPT:
     1 CALL FCTOR(A,N)
       IF (NOPL.GT.0) GOTO 2
@@ -4303,53 +3883,36 @@
       NNEW = 1
       CALL GMEQ(A,ASY(1,1),1,3)
       GOTO 10
-!
 ! SOMETHING THERE ALREADY - IF 4, TOO MANY:
     2 IF (NOPL.LT.4) GOTO 3
       WRITE (LPT,3000) A
-      WRITE (ITO,3000) A
-!>> JCC Handle the STOP through an extra function
-! Was
-!     STOP
-! Now
       CALL BMBOUT
       RETURN
-!
 ! CHECK WE DO NOT ALREADY HAVE A OR -A:
     3 DO I = 1, 4
         IF (NSTAT(I).EQ.0) GOTO 4
         CALL VECPRD(A,ASY(1,I),PTEMP)
         IF (VCTMOD(1.0,PTEMP,1).LT.0.0001) GOTO 100
     4 ENDDO
-!
 ! A IS NEW;  ADD IT, EVEN IF FOR NOW TO POSITION 4:
       DO NNEW = 1, 4
         IF (NSTAT(NNEW).EQ.0) GOTO 8
       ENDDO
 ! SHOULD NOT BE HERE - ALL 4 SLOTS IN ASY (AND HENCE NSTAT) SHOULD NOT BE FULL:
       WRITE (LPT,3001) NOPL
-      WRITE (ITO,3001) NOPL
-!>> JCC Handle the STOP through an extra function
-! Was
-!     STOP
-! Now
       CALL BMBOUT
       RETURN
-!
     8 NOPL = NOPL + 1
       NSTAT(NNEW) = NDO
       CALL GMEQ(A,ASY(1,NNEW),1,3)
-!
 ! NOW TEST NEW CONFIGURATION - IF 4 PLANES JOIN PART WHICH TAKES ONLY 3:
    10 IF (NOPL.GE.4) GOTO 11
       CALL TRYUNI(0)
       IF (NICE) 12, 100, 13
-!
 ! PLANE NOT TO BE USED - REMOVE:
    12 NOPL = NOPL - 1
       NSTAT(NNEW) = 0
       GOTO 100
-!
 ! PLANE OK BUT VOL TOO BIG (OR A HINGE):
    13 IF (NOPL.NE.3) GOTO 100
 ! IF ONLY 1 OR 2 PLANES, NOTHING MORE WE CAN DO; (4 PLANES NOT HERE)
@@ -4369,12 +3932,10 @@
         NSTAT(I) = 0
         CALL TRYUNI(0)
         IF (NICE) 5, 100, 15
-!
 ! IF NICE EVER BECOMES -1, OMIT NEW PLANE:
     5   NSTAT(I) = NSTATS
         NSTAT(NNEW) = 0
         GOTO 100
-!
 ! VOL IS STILL TOO LARGE:
    15   IF (VOL.GT.OLDVOL) GOTO 6
 ! KEEP SMALLEST FOUND VOL
@@ -4383,23 +3944,19 @@
         N1 = I
     6   NSTAT(I) = NSTATS
    14 ENDDO
-!
 ! STILL TOO BIG, BUT SHOULD HAVE SMALLEST VOL OF HINGE IN OLDVOL, AND THE PLANE
 ! WE OMITTED TO GET IT IN N1:
       NSTAT(N1) = 0
 ! TIDY UP AGAIN:
       CALL TRYUNI(0)
   100 RETURN
- 3000 FORMAT (/' *** PROGRAM ERROR - OFFERING PLANE',3F5.0,             &
-     &        ' TO FIXUNI, WITH 4 PLANES ALREADY')
+ 3000 FORMAT (/' *** PROGRAM ERROR - OFFERING PLANE',3F5.0,' TO FIXUNI, WITH 4 PLANES ALREADY')
  3001 FORMAT (/' *** PROGRAM ERROR IN FIXUNI - ASY FULL BUT NOPL=',I3)
+
       END SUBROUTINE FIXUNI
-!*==FIXVAR.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE FIXVAR(FX,IFAM,IGEN,ISPC,KP,KS,NSTAT)
       SUBROUTINE FIXVAR(FX,IFAM,IGEN,ISPC,KP,KS,NSTAT)
 !
 ! *** FIXVAR by JCM 9 Nov 90 ***
@@ -4432,7 +3989,8 @@
       LOGICAL FX, FIX, KWHOLE
       CHARACTER*4 FV(2), NAM1, NAM2
       DIMENSION K(5)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
      &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
@@ -4449,29 +4007,24 @@
       KK = KPAK(IFAM,IGEN,ISPC,KP,KS)
       FIX = FX
       GOTO 1
-!
 ! FIXING ENTRY WITH UNPACKED 5:
       ENTRY ADDFX5(IFAM,IGEN,ISPC,KP,KS,NSTAT)
       KK = KPAK(IFAM,IGEN,ISPC,KP,KS)
       FIX = .TRUE.
       GOTO 1
-!
 ! VARYING ENTRY WITH UNPACKED 5:
       ENTRY ADDVR5(IFAM,IGEN,ISPC,KP,KS,NSTAT)
       KK = KPAK(IFAM,IGEN,ISPC,KP,KS)
       FIX = .FALSE.
       GOTO 1
-!
 ! FIXING ENTRY WITH PACKED PARAMETER SPEC:
       ENTRY ADDFIX(KKK,NSTAT)
       FIX = .TRUE.
       GOTO 10
-!
 ! VARYING ENTRY WITH PACKED PARAMETER SPEC:
       ENTRY ADDVAR(KKK,NSTAT)
       FIX = .FALSE.
       GOTO 10
-!
 ! EITHER FIX OR VARY ENTRY, WITH PACKED KK:
       ENTRY FVKPAK(KKK,NSTAT,FX)
       FIX = FX
@@ -4487,13 +4040,10 @@
       IF (KSTFV(N).LT.0) I2 = 2
 ! CANNOT LOWER STATUS:
       IF (NSTAT.GE.IABS(KSTFV(N))) GOTO 3
-!
 ! THIS IS A SIMPLIFICATION COVERING EXISTING CASES:
       CALL PARNAM(NAM1,NAM2,3,KK)
-      CALL MESS(LPT,0,'Ignored request to '//FV(I1)//' parameter '//    &
-     &          NAM1//NAM2//' - fixed by symmetry')
+      CALL MESS(LPT,0,'Ignored request to '//FV(I1)//' parameter '//NAM1//NAM2//' - fixed by symmetry')
       GOTO 100
-!
 ! A NEW REQUEST - ACCEPT IT:
     2 CALL ERRCHK(2,NUMFV,200,0,'fix or vary requests')
       N = NUMFV
@@ -4505,19 +4055,15 @@
         KTYPFV(N) = NUMPAK
         CALL GMEQ(K,KUNPFV(1,NUMPAK),1,5)
       ENDIF
-!
 ! JOIN HERE TO UPDATE AN EXISTING ENTRY:
     3 KSTFV(N) = NSTAT
       IF (.NOT.FIX) KSTFV(N) = -NSTAT
       KTIME(N) = NTICK(NTIME)
   100 RETURN
       END SUBROUTINE FIXVAR
-!*==FLIP.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE FLIP(I,J)
       SUBROUTINE FLIP(I,J)
 !
 ! *** FLIP by JCM 4 Feb 88 ***
@@ -4531,14 +4077,11 @@
       K = I
       I = J
       J = K
-      RETURN
+
       END SUBROUTINE FLIP
-!*==FORMFA.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      COMPLEX FUNCTION FORMFA(AK,II)
       COMPLEX FUNCTION FORMFA(AK,II)
 !
 ! *** FORMFA updated by JCM 25 Jan 91 ***
@@ -4569,16 +4112,15 @@
       COMPLEX FDASH
       COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
      &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       I = II
       M = MODE(I)
       GOTO (1,2,3,2,100), M
-!
 !     NEUTRON NUCLEAR SCATTERING:
     1 G = 1.0
       GOTO 20
-!
 !     FORM FACTORS AS EXPONENTIAL SERIES:
     2 N = NT(I)
       G = F(N,I)
@@ -4589,16 +4131,10 @@
       ENDDO
       IF (M.EQ.4) G = G*AK*AK
       GOTO 20
-!
 !     FORM FACTORS GIVEN IN A TABLE:
     3 N = NT(I)
       IF ((AK.LE.S(N,I)) .AND. (AK.GE.S(1,I))) GOTO 14
       WRITE (LPT,3000) AK, I
-      WRITE (ITO,3000) AK, I
-!>> JCC Handle the STOP through an extra function
-! Was
-!     STOP
-! Now
       CALL BMBOUT
       RETURN
    14 IF (N.LT.5) THEN
@@ -4632,12 +4168,9 @@
  3000 FORMAT (/' ERROR **  sin theta/lamda =',F6.3,                     &
      &        ' outside range of table for form factor number',I3)
       END FUNCTION FORMFA
-!*==FUDGET.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE FUDGET(IPT,ITYP,F1,F2)
       SUBROUTINE FUDGET(IPT,ITYP,F1,F2)
 !
 ! *** FUDGET by JCM 10 Feb 87 ***
@@ -4686,12 +4219,9 @@
    43 IPT = IPKEEP
   100 RETURN
       END SUBROUTINE FUDGET
-!*==FUDGIN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE FUDGIN
       SUBROUTINE FUDGIN
 !
 ! *** FUDGIN updated by JCM 27 Apr 92 ***
@@ -4716,7 +4246,8 @@
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
       COMMON /FUDG  / NFUDGE, IFDGPT(20), FUDGE1(20), FUDGE2(20),       &
      &                IFDTYP(20)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
@@ -4726,7 +4257,7 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       IN = 0
 ! NEXT "L FUDG" CARD:
    31 CALL FINDCD('L','FUDG',4,IN,L)
@@ -4738,25 +4269,20 @@
 ! READ NEXT PARAMETER SPEC ON CARD:
     3 CALL PARRD(IPT,IPT,K,IFAM,IGEN,ISPC)
       IF (K) 1, 31, 2
-!
 ! K +VE - A PACKED PARAMETER SPEC:
     2 IER = IERR
       CALL ERRCHK(2,NFUDGE,20,0,'fudge factors')
       IF (IER.NE.IERR) GOTO 100
-!
 ! READ FUDGE FACTOR:
       IFDGPT(NFUDGE) = K
       CALL FUDGET(IPT,IFDTYP(NFUDGE),FUDGE1(NFUDGE),FUDGE2(NFUDGE))
       GOTO 3
-!
 ! K -VE - A WORD LIKE ALL(-100), ONLY (-99)
     1 I = -K - 98
       GOTO (11,12), I
-!
 ! 'ONLY' SHOULD BE A MISTAKE HERE:
    11 CALL ERRMES(1,1,'"ONLY" not allowed on L FUDG card')
       GOTO 3
-!
 ! 'ALL' SHOULD BE ACCOMPANIED BY EITHER +VE IFAM, MEANING THAT A (POSSIBLY
 !  PARTIAL) PARAMETER SPEC IS GIVEN, OR -VE IFAM, MEANING THAT A COMPOSITE
 ! WORD FOLLOWED THE 'ALL':
@@ -4765,27 +4291,22 @@
    12 IF (IFAM.LE.0) GOTO 5
       K = KPAK(IFAM,IGEN,ISPC,KPHASE,KSOURC)
       GOTO 2
-!
     5 GOTO (21,22,21,24,25,21), -IFAM
-!
 ! 'XYZB' - SET SPECIES 1-9 (ALL GENERA, FAMILY 2)
    25 L1 = 1
       GOTO 19
-!
 ! 'BIJ' - SET SPECIES 4-9 (ALL GENERA, FAMILY 2)
    22 L1 = 4
    19 L2 = 9
       N1 = 2
       N2 = 0
       GOTO 20
-!
 ! 'CELL' - SET SPECIES 2-7, FAMILY 1, GENUS 1:
    24 L1 = 2
       L2 = 7
       N1 = 1
       N2 = 1
       GOTO 20
-!
 ! 'XYZ' - SET SPECIES 1-3 (ALL GENERA, FAMILY 2) - ALSO XYZT WITH ADDED 12
 ! AND XYZS WITH ADDED 11
    21 L1 = 1
@@ -4820,15 +4341,12 @@
         IFDGPT(NFUDGE) = KPAK(2,0,11,KPHASE,1)
       ENDIF
       GOTO 3
-!
   100 RETURN
+
       END SUBROUTINE FUDGIN
-!*==GENELM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE GENELM(NSUB,ISGEN)
       SUBROUTINE GENELM(NSUB,ISGEN)
 !
 ! *** GENELM corrected by JCM 18 Sep 89 ***
@@ -4846,9 +4364,8 @@
       DIMENSION NSUB(24), ISGEN(3), ISIG(2)
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
-!
+      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3), KOM22
+
 !  JUMP OUT FOR P1 OR P-1:
       ISGEN(2) = 1
       ISGEN(3) = 0
@@ -4863,9 +4380,7 @@
           NSUB(N) = 0
         ENDDO
     1 ENDDO
-!
       NGEN = 1
-!
 ! COUNT DOWN THROUGH ORDERS OF POSSIBLE SYMMETRY ELEMENTS:
       DO NN = 1, 5
         IORD = 7 - NN
@@ -4877,7 +4392,6 @@
 !  OPERATOR OF ORDER IORD FOUND - MARK IT USED, KEEPING ITS SIGN:
           ISIG(NGEN) = ISIGN(1,NSUB(NNN))
           NSUB(NNN) = 0
-!
 ! IF NOT FIRST OF THIS ORDER, WE NEED A SECOND GENERATOR TO PRODUCE IT - JUMP:
           IF (.NOT.FIRST) GOTO 6
 ! THE FIRST OPERATOR OF THIS ORDER:
@@ -4897,24 +4411,18 @@
           GOTO 100
     5   ENDDO
     4 ENDDO
-!
 !  NO SECOND GENERATOR - RETURN
       GOTO 100
-!
 !  SET SECOND GENERATOR:
    10 ISGEN(3) = NNN*ISIG(2)
       GOTO 100
-!
     3 ISGEN(3) = M*ISIG(1)*ISIG(2)
-!
   100 RETURN
+
       END SUBROUTINE GENELM
-!*==GENMUL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE GENMUL(H,NOMORE,M)
       SUBROUTINE GENMUL(H,NOMORE,M)
 !
 ! *** GENMUL by JCM 18 Jun 85 ***
@@ -4951,13 +4459,12 @@
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /HKLGEN/ STEP(3,3), PT(3,3), VECEND(3,3), PRPT(3,3),       &
      &                NPRIM(2,2), NP, LFAC(2), MCOUNT(2), KOM5
-!
+
       NOMORE = .FALSE.
     4 DO L = 1, 3
         CALL GMADD(PT(1,L),STEP(1,L),H,1,3)
         IF (SCALPR(H,VECEND(1,L))-1.) 2, 2, 1
     1 ENDDO
-!
 ! NEXT 3D LATTICE IF NON-PRIMITIVE:
 ! SIMULATE 'DO MCOUNT(1)=1,LFAC(1)'
       MCOUNT(1) = MCOUNT(1) + 1
@@ -4966,22 +4473,18 @@
 ! SIMULATE 'DO MCOUNT(2)=1,LFAC(2)
       MCOUNT(2) = MCOUNT(2) + 1
       IF (MCOUNT(2).GT.LFAC(2)) GOTO 101
-!
 ! MAKE COEFFICIENTS OF STEP VECTORS FOR NEXT PRIMITIVE STEP:
     8 DO I = 1, 2
         C(I) = FLOAT(MOD((MCOUNT(1)-1)*NPRIM(I,1)*LFAC(2)+(MCOUNT(2)-1)*&
      &         NPRIM(I,2)*LFAC(1),NP))/FLOAT(NP)
       ENDDO
-!
       DO I = 1, 3
-        VEC(I) = C(1)*STEP(I,1) + C(2)*STEP(I,2) + FLOAT(MCOUNT(2)-1)   &
-     &           *STEP(I,3)/FLOAT(LFAC(2))
+        VEC(I) = C(1)*STEP(I,1) + C(2)*STEP(I,2) + FLOAT(MCOUNT(2)-1) *STEP(I,3)/FLOAT(LFAC(2))
       ENDDO
       DO L = 1, 3
         CALL GMADD(PRPT(1,L),VEC,PT(1,L),1,3)
       ENDDO
       GOTO 4
-!
 !  NEW VALUES ARE IN H; RESET PT
     2 DO J = 1, L
         CALL GMEQ(H,PT(1,J),1,3)
@@ -4993,17 +4496,14 @@
     6 IF (STHL-10.E-5) 4, 5, 5
     5 IF (LATABS(H)) GOTO 4
       GOTO 100
-!
 !  IF HERE HAVE NO MORE VALUES OF H,K,L TO OFFER
   101 NOMORE = .TRUE.
   100 RETURN
+
       END SUBROUTINE GENMUL
-!*==GEOMCO.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE GEOMCO(N)
       SUBROUTINE GEOMCO(N)
 !
 ! *** GEOMCO updated by JCM 24 Jan 90 ***
@@ -5030,7 +4530,8 @@
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
@@ -5054,19 +4555,15 @@
 !
 ! NOT IF NO SLACK CONSTRAINTS:
       IF (NSLAK(1).EQ.0) GOTO 100
-!
       GOTO (1,2,3), N
-!
 ! SETTING UP ENTRY:
     1 IPRNT(8) = 0
       IF (ONCARD('I','PRSK',A)) IPRNT(8) = NINT(A)
       CALL MESS(LPT,1,'Printing of bond "obs" and calc values wanted')
       CALL DEPRIN(IPRNT(8))
-!
 ! SET UP MATRIX TO CONVERT DERIVATIVES WRT A,B,C ETC TO DERIVATIVES
 ! WRT A*, B*, C* ETC:
       CALL CELMAT(TOSTAR)
-!
 ! SET UP THE MATRIX OF 1S AND COSINES FOR THESE DERIVATIVES:
       CALL GMUNI(COSIN,3)
       COSIN(1,2) = CELL(3,2,1)
@@ -5075,31 +4572,23 @@
       COSIN(3,1) = CELL(2,2,1)
       COSIN(2,3) = CELL(1,2,1)
       COSIN(3,2) = CELL(1,2,1)
-!
-      GOTO 100
-!
+      RETURN
 ! ENTRY FROM APSHSF AFTER ALL SHIFTS APPLIED TO POSITION COORDINATES:
     2 DO I = 1, NTARNM
         CALL XTRANS(IABASE(I),XSLAK(1,I),ISYM(I),ILAT(I),CELLTR(1,I))
       ENDDO
-      GOTO 100
-!
+      RETURN
 ! ENTRY FROM NWINSF ON FINDING L ATOM CARD - IDENTIFY ATOM:
     3 CALL RDWORD(NAME,LEN,7,IPT,80,0,IER)
       L = NCFIND(NAME,ATTNAM,NTARNM)
-      WRITE (NEWIN,2000) NAME, ATNAME(IABASE(L)), ISYM(L), ILAT(L),     &
-     &                   (CELLTR(I,L),I=1,3)
+      WRITE (NEWIN,2000) NAME, ATNAME(IABASE(L)), ISYM(L), ILAT(L), (CELLTR(I,L),I=1,3)
  2000 FORMAT ('L ATOM ',1X,A4,1X,A4,2I5,3F4.0)
-      GOTO 100
-!
   100 RETURN
+
       END SUBROUTINE GEOMCO
-!*==GEOMIN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      SUBROUTINE GEOMIN(N)
       SUBROUTINE GEOMIN(N)
 !
 ! *** GEOMIN updated by JCM 8 Mar 91 ***
@@ -5145,7 +4634,8 @@
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -5186,7 +4676,6 @@
         CALL MESS(LPT,1,'No geometric slack constraints')
         GOTO 100
       ENDIF
-!
 ! FOR NOW READ TYPE (WHETHER OR NOT TO EXPECT CONVENTIONAL LSQ OBSERVATIONS
 ! AS WELL AS SLACK CONSTRAINTS), AND EXTRA MULTIPLICATIVE WEIGHTING
 ! FACTOR IF TYPE 2 -  EVENTUALLY MAY BE MORE ON THIS CARD
@@ -5196,12 +4685,10 @@
 !   10=UNIT WEIGHTS (NOT NORMALLY SENSIBLE)
 !   20=WEIGHTS TO BE USED AS READ (IE READ 1/SIGMA SQRD)
 !   30=READ SIGMA, USE WEIGHT=1/SIGMA SQRD
-!
       NST1 = NSTYP/10
       SLONLY = NSTYP - NST1*10.EQ.1
       IF (SLONLY) THEN
-        CALL MESS(LPT,1,'Refinement using bond slack constraints '//    &
-     &            'only')
+        CALL MESS(LPT,1,'Refinement using bond slack constraints only')
         CALL MESS(LPT,0,'If irrelevant L cards (REFI, MODE, WGHT, '//   &
      &            'TFAC, SCAL) have been given they will be ignored')
         SLAKWT(1) = 1.
@@ -5211,34 +4698,27 @@
      &            'and conventional observations')
         GOTO 20
       ENDIF
-!
    98 CALL ERRIN2(NSTYP,2,'slack constraint type','not allowed')
       GOTO 100
-!
    20 CALL RDREAL(SLAKWT(1),IPT,IPT,80,IER)
       IF (SLAKWT(1).EQ.0.) SLAKWT(1) = 1.
       WRITE (LPT,2005) SLAKWT(1)
  2005 FORMAT (' Extra weighting factor = ',F12.4)
 ! HOLD IT AS SQRT, WHICH IS HOW IT IS NEEDED:
       SLAKWT(1) = SQRT(SLAKWT(1))
-!
    40 IF (NST1.LE.0 .OR. NST1.GT.3) GOTO 98
       GOTO (41,42,43), NST1
    41 CALL MESS(LPT,0,'Unit weights')
       GOTO 100
-!
    42 CALL MESS(LPT,0,'Weights used directly as read')
       GOTO 100
-!
    43 CALL MESS(LPT,0,'Read sigma, weight by 1/(sigma sqrd)')
       GOTO 100
-!
 ! READ L ATOM CARDS:
    92 K = 0
    81 CALL FINDCD('L','ATOM',4,K,L)
       K = L
       IF (L.LE.0) GOTO 51
-!
 ! READ TARGET ATOM NAME:
       CALL RDWORD(NAME,LEN,7,IPT,80,0,IER)
 ! READ ATOM SPECIFICATION;  FIND RELATED ATOM IN ASSY UNIT:
@@ -5246,23 +4726,18 @@
 ! ADD NAME AND ATOM SPEC TO LISTS:
       CALL ADDATM(NAME,IA,XS,IS,IL,CS,ITMP)
       GOTO 81
-!
 ! READ L BOND CARDS:
    51 K = 0
     2 CALL FINDCD('L','BOND',4,K,L)
       K = L
       IF (L.LE.0) GOTO 52
-!
 ! READ NAME OF BOND:
       CALL RDWORD(BNAME,LEN,7,IPT,80,0,IER)
-!
 ! READ ATOM NAMES AT 2 ENDS:
       CALL RDBOND(IPT,NEND,IE)
       IF (IE.NE.0) GOTO 2
-!
 ! ADD BOND TO LIST:
       CALL ADDBON(BNAME,NEND(1),NEND(2),NB)
-!
 ! READ REQUIRED "OBSERVED" BOND, AND ITS ESD:
       CALL RDREAL(BOBS(NSLAK(1)+1),IPT,IPT,80,IER)
       IF (IER.EQ.100) GOTO 2
@@ -5276,19 +4751,13 @@
       NINVB(NSLAK(1)) = 1
 ! AND WHICH ONE IT IS:
       INVBON(1,NSLAK(1)) = NB
-!
-      WRITE (LPT,2001) BONNAM(NB), ATTNAM(IATM(NB,1)),                  &
-     &                 ATTNAM(IATM(NB,2))
- 2001 FORMAT (/' BOND slack constraint ',A4,' between atoms ',1X,A4,    &
-     &        ' and ',A4,':')
+      WRITE (LPT,2001) BONNAM(NB), ATTNAM(IATM(NB,1)), ATTNAM(IATM(NB,2))
+ 2001 FORMAT (/' BOND slack constraint ',A4,' between atoms ',1X,A4,' and ',A4,':')
       WRITE (LPT,2002) (XSLAK(J,IATM(NB,1)),J=1,3),                     &
-     &                 (XSLAK(J,IATM(NB,2)),J=1,3), BOBS(NSLAK(1)),     &
-     &                 EOBS(NSLAK(1))
+     &                 (XSLAK(J,IATM(NB,2)),J=1,3), BOBS(NSLAK(1)), EOBS(NSLAK(1))
  2002 FORMAT (' Actual  coordinates are:',3F10.5,' and ',               &
-     &        3F10.5/'           "Observed" bond =',F10.4,' with esd ', &
-     &        F10.5)
+     &        3F10.5/'           "Observed" bond =',F10.4,' with esd ', F10.5)
       GOTO 2
-!
 ! READ L ANGL CARDS:
    52 IF (NUMBON.EQ.0) GOTO 100
       K = 0
@@ -5297,14 +4766,12 @@
       IF (L.LE.0) GOTO 53
 ! READ NAME OF ANGLE:
       CALL RDWORD(ANAME,LEN,7,IPT,80,0,IER)
-!
 ! READ 2 BOND NAMES TO DEFINE ANGLE, AND FIND THE THIRD SIDE OF TRIANGLE:
       CALL RDANGL(IPT,N1,N2,N3,NCOM,IE)
       IF (IE.NE.0) GOTO 6
 ! ADD ANGLE TO LIST:
       CALL ADDANG(ANAME,N1,N2,N3,NA,IE)
       IF (IE.NE.0) GOTO 6
-!
 ! RECORD CONSTRAINT - THE "OPPOSITE" SIDE COMES FIRST:
       CALL RDREAL(BOBS(NSLAK(1)+1),IPT,IPT,80,IER)
       IF (IER.EQ.100) GOTO 6
@@ -5320,13 +4787,11 @@
       INVBON(2,NSLAK(1)) = N2
       INVBON(3,NSLAK(1)) = N3
       WRITE (LPT,2021) ANAME, BONNAM(N2), BONNAM(N3)
- 2021 FORMAT (/' ANGL slack constraint ',A4,' between bonds ',1X,A4,    &
-     &        ' and ',A4,':')
+ 2021 FORMAT (/' ANGL slack constraint ',A4,' between bonds ',1X,A4,' and ',A4,':')
       WRITE (LPT,2022) ATTNAM(NCOM), BOBS(NSLAK(1)), EOBS(NSLAK(1))
  2022 FORMAT ('            At atom ',A4/'           "Observed" angle =',&
      &        F10.1,' with esd ',F10.2)
       GOTO 6
-!
 ! READ L EQUB CARDS:
    53 K = 0
    63 CALL FINDCD('L','EQUB',4,K,L)
@@ -5340,10 +4805,8 @@
       CALL RDWORD(BNAME,LEN,IPT,IPT,80,0,IER)
       N2 = NCFIND(BNAME,BONNAM,NUMBON)
       IF (N2.GT.0) GOTO 12
-!
    11 CALL ERRCH2(BNAME,2,' ','is not a bond name')
       GOTO 63
-!
 ! RECORD CONSTRAINT
    12 CALL ERRCHK(2,NSLAK(1),500,0,'geometric slack constraints')
 ! THE OBS IS ZERO HERE:
@@ -5358,10 +4821,8 @@
       INVBON(1,NSLAK(1)) = N1
       INVBON(2,NSLAK(1)) = N2
       WRITE (LPT,2031) BONNAM(N1), BONNAM(N2), EOBS(NSLAK(1))
- 2031 FORMAT (/' EQUB slack constraint - bond ',A4,' approx = bond ',A4,&
-     &        ' with esd ',F10.5)
+ 2031 FORMAT (/' EQUB slack constraint - bond ',A4,' approx = bond ',A4,' with esd ',F10.5)
       GOTO 63
-!
 ! READ L LINE CARDS:
    54 K = 0
    64 CALL FINDCD('L','LINE',4,K,L)
@@ -5370,7 +4831,6 @@
       IPT = 7
       CALL RDANGL(IPT,N1,N2,N3,NCOM,IE)
       IF (IE.NE.0) GOTO 64
-!
 ! RECORD CONSTRAINT:
       CALL ERRCHK(2,NSLAK(1),500,0,'geometric slack constraints')
       BOBS(NSLAK(1)) = 0.
@@ -5388,7 +4848,6 @@
  2041 FORMAT (/' LINE slack constraint - bonds ',A4,' and ',A4,         &
      &        'in an approximate straight line with esd ',F10.5)
       GOTO 64
-!
 ! READ L TORS CARDS:
    55 K = 0
    65 CALL FINDCD('L','TORS',4,K,L)
@@ -5396,7 +4855,6 @@
       IF (L.LE.0) GOTO 56
 ! READ NAME OF TORSION ANGLE:
       CALL RDWORD(ANAME,LEN,7,IPT,80,0,IER)
-!
 ! READ 3 BOND NAMES TO DEFINE ANGLE:
 ! READ FIRST BOND NAME:
       CALL RDWORD(BNAME,LEN,IPT,IPT,80,0,IER)
@@ -5410,14 +4868,11 @@
       CALL RDWORD(BNAME,LEN,IPT,IPT,80,0,IER)
       N3 = NCFIND(BNAME,BONNAM,NUMBON)
       IF (N3.GT.0) GOTO 23
-!
    22 CALL ERRCH2(BNAME,2,' ','is not a bond name')
       GOTO 65
-!
 ! ADD ANGLE TO LIST:
    23 CALL ADDTOR(ANAME,N1,N2,N3,N4,N5,N6,NT,IE)
       IF (IE.GT.0) GOTO 65
-!
 ! RECORD CONSTRAINT :
       CALL RDREAL(BOBS(NSLAK(1)+1),IPT,IPT,80,IER)
       IF (IER.EQ.100) GOTO 65
@@ -5436,19 +4891,16 @@
       INVBON(5,NSLAK(1)) = N5
       INVBON(6,NSLAK(1)) = N6
       WRITE (LPT,2051) ANAME, BONNAM(N1), BONNAM(N3)
- 2051 FORMAT (/' TORS slack constraint ',A4,' between bonds ',1X,A4,    &
-     &        ' and ',A4,':')
+ 2051 FORMAT (/' TORS slack constraint ',A4,' between bonds ',1X,A4, ' and ',A4,':')
       WRITE (LPT,2052) BONNAM(N2), BOBS(NSLAK(1)), EOBS(NSLAK(1))
  2052 FORMAT ('   with common axis ',A4/'           "Observed" angle =',&
      &        F10.1,' with esd ',F10.2)
       GOTO 65
-!
 ! READ L EQUA CARDS:
    56 K = 0
    66 CALL FINDCD('L','EQUA',4,K,L)
       K = L
       IF (L.LE.0) GOTO 57
-!
 ! READ FIRST ANGLE NAME:
       CALL RDWORD(ANAME,LEN,7,IPT,80,0,IER)
       K1 = NCFIND(ANAME,ANGNAM,NUMANG)
@@ -5457,10 +4909,8 @@
       CALL RDWORD(ANAME,LEN,IPT,IPT,80,0,IER)
       K2 = NCFIND(ANAME,ANGNAM,NUMANG)
       IF (K2.GT.0) GOTO 25
-!
    24 CALL ERRCH2(ANAME,2,' ','is not a bond angle name')
       GOTO 66
-!
 ! RECORD CONSTRAINT
    25 CALL ERRCHK(2,NSLAK(1),500,0,'geometric slack constraints')
 ! THE OBS IS ZERO HERE:
@@ -5482,13 +4932,11 @@
  2061 FORMAT (/' EQUA slack constraint - angle ',A4,' approx = angle ', &
      &        A4,' with esd ',F10.5)
       GOTO 66
-!
 ! READ L PLAN CARDS:
    57 K = 0
    67 CALL FINDCD('L','PLAN',4,K,L)
       K = L
       IF (L.LE.0) GOTO 100
-!
 ! DISCOVER HOW MANY ATOMS INVOLVED:
       N = 0
       IPT = 7
@@ -5502,19 +4950,15 @@
         GOTO 67
       ENDIF
       GOTO 31
-!
    32 CALL ADDPLN(NIN,N)
 !*      ITYPSK( ETC TO BE SET EITHER HERE OR IN ADDPLN
       GOTO 67
-!
   100 RETURN
+
       END SUBROUTINE GEOMIN
-!*==GEOMLS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE GEOMLS(ALSQ,MATSZ)
       SUBROUTINE GEOMLS(ALSQ,MATSZ)
 !
 ! *** GEOMLS updated by JCM 2 Oct 90 ***
@@ -5564,7 +5008,8 @@
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       COMMON /DERVAR/ DERIVV(500), LVARV
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
      &                YMAX, CSQTOT
@@ -5597,33 +5042,27 @@
      &     '   Obs       Calc   ', '    Diff      Esd     ',            &
      &     '    Atom1     Atom2', '    Bond1     Bond2', ' Bond sum ',  &
      &     '   Angle1     Angle2', ' Ang1 bonds   Ang2 bonds'/
-!
+
 ! OUT IF NO SLACK CONSTRAINTS:
       IF (NSLAK(1).EQ.0) GOTO 100
-!
 ! HEADING FOR OBS/CALC BOND PRINTING IF REQUESTED:
       PRIN = PRNCYC(8)
       IF (PRIN) CALL MESS(LPT,1,'  Slack Constraints:')
-!
 ! TYPE 1, GEOMETRICAL SLACK CONSTRAINTS - TYPE 3 IS PAWLEY-TYPE:
       ISLKTP = 1
 ! COUNT ALL INVOLVED BONDS:
       DO IB = 1, NUMBON
         CALL BONDER(IB)
       ENDDO
-!
 ! COUNT ALL GEOMETRICAL SLACK CONSTRAINTS:
       DO ISK = 1, NSLAK(1)
-!
 ! CLEAR WHOLE DERIVATIVE VECTOR - ONLY A FEW ITEMS WILL BE FILLED BY
 ! ANY PARTICULAR BOND:
         IF (LVARV.GT.0) CALL GMZER(DERIVV,1,LVARV)
-!
 ! SET UP POINTERS TO INVOLVED BONDS:
         DO I = 1, NINVB(ISK)
           NVB(I) = INVBON(I,ISK)
         ENDDO
-!
 ! WHICH TYPE IS THIS CONSTRAINT?
         GOTO (31,32,33,34,35,36,37), ITYPSK(ISK)
 !
@@ -5633,7 +5072,6 @@
    31   YCALC = BCALC(NVB(1))
         DERBON(1) = 1.
         GOTO 50
-!
 ! TYPE 2 - ANGLE BETWEEN 2 BONDS:
    32   B1 = BCALC(NVB(1))
         B2 = BCALC(NVB(2))
@@ -5641,20 +5079,17 @@
 ! YCALC = THETA RADIANS:
         CALL BONCOS(B1,B2,B3,YCALC,COSTH,SINTH,DERBON)
         GOTO 50
-!
 ! TYPE 3 - EQUAL BONDS:
    33   YCALC = BCALC(NVB(1)) - BCALC(NVB(2))
         DERBON(1) = 1.
         DERBON(2) = -1.
         GOTO 50
-!
 ! TYPE 4 - LINE:
    34   YCALC = BCALC(NVB(1)) - BCALC(NVB(2)) - BCALC(NVB(3))
         DERBON(1) = 1.
         DERBON(2) = -1.
         DERBON(3) = -1.
         GOTO 50
-!
 ! TYPE 5 - TORS:
    35   B1 = BCALC(NVB(1))
         B2 = BCALC(NVB(2))
@@ -5668,7 +5103,6 @@
         CALL BONCOS(B6,B2,B3,TEMP,COSTH3,SINTH3,DETH3)
         COTTH2 = COSTH2/SINTH2
         COTTH3 = COSTH3/SINTH3
-!
 ! THE EXPRESSION FOR COS PHI, THE TORSION ANGLE, IS NOW
 ! C=B/D + COT THETA2 * COT THETA3, WHERE THE NUMERATOR, B, AND DENOMINATOR,
 !                                  D, ARE GIVEN BY:
@@ -5677,13 +5111,11 @@
         C = B/D + COTTH2*COTTH3
         CALL SINCOS(C,S,'GEOMLS')
         YCALC = ACOS(C)
-!
 ! DERIVATIVES OF C WRT ALL 6 BONDS:
         CSEQ2 = 1./(SINTH2*SINTH2)
         CSEQ3 = 1./(SINTH3*SINTH3)
         X2 = B*COTTH2 + COTTH3*CSEQ2
         X3 = B*COTTH3 + COTTH2*CSEQ3
-!
         DERBON(1) = -B/B1 - DETH2(2)*X2
         DERBON(2) = -2.*B1/D - DETH2(3)*X2 - DETH3(2)*X3
         DERBON(3) = -B/B3 - DETH3(3)*X3
@@ -5695,7 +5127,6 @@
           DERBON(I) = -DERBON(I)/S
         ENDDO
         GOTO 50
-!
 ! TYPE 6 - EQUAL ANGLES:
    36   B1 = BCALC(NVB(1))
         B2 = BCALC(NVB(2))
@@ -5711,10 +5142,8 @@
         ENDDO
         GOTO 50
    37   CONTINUE
-!
 ! TYPE 7 - PLANE:
         GOTO 50
-!
 ! JOIN HERE WITH YCALC, AND DERBON= D(YCALC)/EACH INVOLVED BOND -
 ! MAKE DERIVATIVES OF YCALC WRT ANY RELEVANT VARIABLE:
    50   DO I = 1, 6
@@ -5728,7 +5157,6 @@
             DERIVV(L) = S
           ENDIF
         ENDDO
-!
 ! DERIVATIVES OF YCALC WRT THE POSITION COORDS OF THE 3 ATOMS:
 ! COUNT INVOLVED BONDS:
         DO IB = 1, NINVB(ISK)
@@ -5742,7 +5170,6 @@
             ENDDO
           ENDDO
         ENDDO
-!
         CALL RELATE
         OBS = BOBS(ISK)
 ! FOR ANGLES, USER TALKS IN DEGREES, PROGRAM WORKS IN RADIANS:
@@ -5755,10 +5182,8 @@
         GOTO (21,22,23), NST1
    21   SQRTWT = 1.
         GOTO 20
-!
    22   SQRTWT = SQRT(EOBS(ISK))
         GOTO 29
-!
    23   IF (TESTOV(1.,EOBS(ISK))) THEN
           SQRTWT = 0.
         ELSE
@@ -5777,27 +5202,22 @@
             F3 = ' '
           ENDIF
           GOTO (61,62,63,64,65,66,67), ITYPSK(ISK)
-!
    61     IF (HEAD) THEN
             FORMA = '('''//F1//F2//F3//F4//''')'
             WRITE (LPT,FORMA)
           ENDIF
           WRITE (LPT,2001) BONNAM(NVB(1)), OBS, YCALC, DIFF, EOBS(ISK), &
-     &                     ATTNAM(IATM(NVB(1),1)),                      &
-     &                     ATTNAM(IATM(NVB(1),2))
+     &                     ATTNAM(IATM(NVB(1),1)), ATTNAM(IATM(NVB(1),2))
  2001     FORMAT (1X,A4,F10.4,F10.4,F10.5,G12.4,6X,A4,6X,A4)
           GOTO 60
-!
    62     IF (HEAD) THEN
             FORMA = '('''//F1//F2//F3//F5//''')'
             WRITE (LPT,FORMA)
           ENDIF
           CALL ADDANG('    ',NVB(1),NVB(2),NVB(3),IA,IE)
           WRITE (LPT,2009) ANGNAM(IA), BOBS(ISK), DEGREE(YCALC),        &
-     &                     DEGREE(DIFF), EOBS(ISK), BONNAM(NVB(2)),     &
-     &                     BONNAM(NVB(3))
+     &                     DEGREE(DIFF), EOBS(ISK), BONNAM(NVB(2)), BONNAM(NVB(3))
           GOTO 60
-!
    63     IF (HEAD) THEN
             FORMA = '('''//F1//F5//F3//F5//''')'
             WRITE (LPT,FORMA)
@@ -5806,17 +5226,14 @@
      &                     , BONNAM(NVB(1)), BONNAM(NVB(2))
  2011     FORMAT (1X,'EQUB',F10.4,F10.4,F10.5,G12.4,6X,A4,6X,A4)
           GOTO 60
-!
    64     IF (HEAD) THEN
             FORMA = '('''//F1//F5//F3//F6//F5//''')'
             WRITE (LPT,FORMA)
           ENDIF
           WRITE (LPT,2002) ISK, BCALC(NVB(2)), BCALC(NVB(3)), DIFF,     &
-     &                     EOBS(ISK), BCALC(NVB(1)), BONNAM(NVB(2)),    &
-     &                     BONNAM(NVB(3))
+     &                     EOBS(ISK), BCALC(NVB(1)), BONNAM(NVB(2)), BONNAM(NVB(3))
  2002     FORMAT (1X,'LINE',3F10.4,F10.5,G12.4,6X,A4,6X,A4)
           GOTO 60
-!
    65     IF (HEAD) THEN
             FORMA = '('''//F1//F2//F3//F5//''')'
             WRITE (LPT,FORMA)
@@ -5824,10 +5241,8 @@
           CALL ADDTOR('    ',NVB(1),NVB(2),NVB(3),NVB(4),NVB(5),NVB(6), &
      &                IT,IE)
           WRITE (LPT,2009) TORNAM(IT), BOBS(ISK), DEGREE(YCALC),        &
-     &                     DEGREE(DIFF), EOBS(ISK), BONNAM(NVB(1)),     &
-     &                     BONNAM(NVB(3))
+     &                     DEGREE(DIFF), EOBS(ISK), BONNAM(NVB(1)), BONNAM(NVB(3))
           GOTO 60
-!
    66     IF (HEAD) THEN
             FORMA = '('''//F1//F7//F3//F8//''')'
             WRITE (LPT,FORMA)
@@ -5838,12 +5253,9 @@
  2003     FORMAT (1X,'EQUA',2F10.2,F10.3,G12.4,2(2X,A4,'^ ',A4,2X))
           GOTO 60
    67     CONTINUE
-!
           GOTO 60
-!
         ENDIF
    60   CALL MATTOT(ALSQ,MATSZ)
-!
 ! ADD IN BOND-TYPE SLACK CONSTRAINT STATISTICS:
         CALL RFACS(4)
       ENDDO
@@ -5851,13 +5263,11 @@
       CALL RFACS(5)
   100 RETURN
  2009 FORMAT (1X,A4,F10.2,F10.2,F10.3,G12.4,6X,A4,6X,A4)
+
       END SUBROUTINE GEOMLS
-!*==GETDC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE GETDC(H,DIREC)
       SUBROUTINE GETDC(H,DIREC)
 !
 ! *** updated by PJB 24-Apr-1995 ***
@@ -5946,8 +5356,7 @@
     4 DIFF = SINTH - SIN(DIFANG(1)/2)
       IF (ABS(DIFF).GT..01) THEN
         WRITE (MESSAG,1000) h, DIFF
- 1000   FORMAT ('Calculated and observed sintheta''s for',3F6.2,        &
-     &          'differ by',F8.4)
+ 1000   FORMAT ('Calculated and observed sintheta''s for',3F6.2,'differ by',F8.4)
         CALL ERRMES(1,-1,MESSAG)
       ENDIF
       A = ((DIFANG(1)/2)-DIFANG(2))*SGNROT
@@ -6136,7 +5545,8 @@
 !
       CHARACTER*4 INEED(6)
       LOGICAL ONCARD
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -6162,29 +5572,22 @@
 ! NCYC:
    11   NCYC = NINT(A)
         GOTO 18
-!
 ! CYC1:
    12   NCYC1 = NINT(A)
         GOTO 18
-!
 ! PRIN:
    13   IPRNT(1) = NINT(A)
         GOTO 18
-!
 ! MCOR:
    14   MAXCOR = NINT(A)
         GOTO 18
-!
 ! PRDM:
    15   IPRNT(7) = NINT(A)
         GOTO 18
-!
 ! CONV:
    16   CONV = A
         GOTO 18
-!
    18 ENDDO
-!
 ! ARRANGE LAST CYCLE NUMBER, AND WHETHER SIMPLY SIMUATION:
       SIMUL = .FALSE.
       LASTCY = NCYC1 + NCYC - 1
@@ -6213,18 +5616,11 @@
 !
       WRITE (LPT,2006) CONV
  2006 FORMAT (/' Cycles to stop if max(shift/esd) < ',F10.4)
-!
-      IF (IPRNT(7).NE.0) CALL MESS(LPT,1,'File for Deposited'//         &
-     &                 ' Material to be output on same cycle as new CDF')
+      IF (IPRNT(7).NE.0) CALL MESS(LPT,1,'File for Deposited Material to be output on same cycle as new CDF')
       END SUBROUTINE IICD1
-!*==INBOX.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-! LEVEL 1      SUBROUTINE INBOX(H,IN)
       SUBROUTINE INBOX(H,IN)
 !
 ! *** INBOX by PJB/JCM 3 Aug 83 ***
@@ -6265,14 +5661,9 @@
       IF (I.EQ.1) IN = IP
   100 RETURN
       END SUBROUTINE INBOX
-!*==INDFIX.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-! LEVEL 2      SUBROUTINE INDFIX(H,K)
       SUBROUTINE INDFIX(H,K)
 !
 ! *** INDFIX by JCM 20 Jul 83 ***
@@ -6290,12 +5681,9 @@
       ENDDO
       RETURN
       END SUBROUTINE INDFIX
-!*==INDFLO.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE INDFLO(H,K)
       SUBROUTINE INDFLO(H,K)
 !
 ! *** INDFLO by JCM 22 Nov 83 ***
@@ -6313,12 +5701,9 @@
       ENDDO
       RETURN
       END SUBROUTINE INDFLO
-!*==INITIL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE INITIL(PROGRM)
       SUBROUTINE INITIL(PROGRM)
 !
 ! *** INITIL updated by PJB for Unix 24-Oct-1994 ***
@@ -6365,7 +5750,8 @@
       CHARACTER*10 FILNAM
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       LOGICAL MULFAS, MULSOU, MULONE
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /LENINT/ NBITS
       COMMON /LOONEY/ IOTAB(15), LUNTAB(15)
       COMMON /MAPGT / ZGTVAL(20), ZCGT, IGT, IZGT, IDUMPG
@@ -6505,12 +5891,6 @@
 !
 !  SET RESERVED IOUNITS
 !
-! TELETYPE IN:
-      ITI = 5
-! TELETYPE OUT:
-      ITO = 6
-! PLOTTER, IF NEEDED EVER:
-      IPLO = 0
 ! LPT IS SPECIAL BECAUSE WE NEED TO WRITE TO IT HERE AND NOW, WITHOUT
 ! GIVING THE MAIN PROGRAM A CHANCE TO ALTER ITS VALUE.  OTHER UNITS WILL BE
 ! CLEARED HERE, BUT MAY BE SET LATER BY MAIN, BEFORE THEY ARE FIRST USED.
@@ -6520,23 +5900,14 @@
 ! FOR RVAX, IF BOTH LPT > 0 AND UNIT LPT OPEN, USE THAT VALUE OF
 ! LPT, AND DO NOT REOPEN IT.  OTHERWISE, USE LPT=12
       NAMFIL = '.LIS'
-!UNIX
       CALL UPONE(NAMFIL,3)
       IF (LPT.GT.0) THEN
-!VMS
         INQUIRE (LPT,OPENED=ISOPEN)
-!VMS
         IF (.NOT.ISOPEN) CALL OPNFIL(LPT,2143)
-!3084      CALL OPNFIL(LPT,3)
       ELSE
         LPT = 12
-!ILL      MESSAG=PROGRM
-!ILL      CALL OPNFIL(LPT,2132)
-!RAL
         CALL OPNFIL(LPT,2143)
-!3084      CALL OPNFIL(LPT,2243)
       ENDIF
-!
 ! CLEAR ALL OTHER NAMED UNITS, SO THAT IF THEY ARE SET BY MAIN OR
 ! BATCH WE WILL NOTICE THIS:
       ICRYDA = -9999
@@ -6597,16 +5968,9 @@
   100 RETURN
 
       END SUBROUTINE INITIL
-!*==INPUTA.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-!
-!
-! LEVEL 4      SUBROUTINE INPUTA(ID,LABA,LBALEN,LABS,LBSLEN,X,T,S,IER)
       SUBROUTINE INPUTA(ID,LABA,LBALEN,LABS,LBSLEN,X,T,S,IER)
 !
 ! *** INPUTA updated by JCM 26 Sep 89 ***
@@ -6706,12 +6070,9 @@
 !
   100 RETURN
       END SUBROUTINE INPUTA
-!*==INPUTC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE INPUTC(ID,CELL)
       SUBROUTINE INPUTC(ID,CELL)
 !
 ! *** INPUTC updated by JCM 26 Sep 89 ***
@@ -6755,12 +6116,9 @@
     1 ENDDO
   100 RETURN
       END SUBROUTINE INPUTC
-!*==INPUTE.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE INPUTE
       SUBROUTINE INPUTE
 !
 ! *** INPUTE updated by JCM 29 Aug 91 ***
@@ -6795,7 +6153,8 @@
      &                , DEXDFQ, DEXDRQ, DEXDGQ, LOREN, GAUSS
       LOGICAL LOREN, GAUSS
       COMMON /EXTRAE/ DOMRI(3), FOVLP, KDOMRI(3), KFOVLP
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       INREAD(5) = -IABS(INREAD(5))
       GOTO (1,2), ICDNO(5) + 1
@@ -6850,12 +6209,9 @@
 !
   100 RETURN
       END SUBROUTINE INPUTE
-!*==INPUTF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE INPUTF(ID,LABF,LBFLEN,NTYP,IPT,IER)
       SUBROUTINE INPUTF(ID,LABF,LBFLEN,NTYP,IPT,IER)
 !
 ! *** INPUTF by JCM 1 Mar 84 ***
@@ -6883,25 +6239,19 @@
       CALL RDWORD(LABF,LBFLEN,3,IPT,80,0,IE)
       IF (IE.NE.0) GOTO 8
       IF (LETTER(LABF(1:1)).NE.0) GOTO 1
-    8 CALL ERRCH2(ICARD(3:6),-2,' ',                                    &
-     &            'read from "F" card where label expected')
+    8 CALL ERRCH2(ICARD(3:6),-2,' ','read from "F" card where label expected')
       IER = IER + 1
-!
     1 IPKEEP = IPT
       CALL RDINTG(NTYP,IPT,IPT,80,IE)
       IF ((IE.NE.0) .AND. (IE.NE.100)) THEN
         IER = IER + 1
-        CALL ERRCH2(ICARD(IPKEEP:IPT-1),-2,'in form factor type',       &
-     &              'on "F" card')
+        CALL ERRCH2(ICARD(IPKEEP:IPT-1),-2,'in form factor type','on "F" card')
       ENDIF
-      RETURN
+
       END SUBROUTINE INPUTF
-!*==INPUTI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE INPUTI
       SUBROUTINE INPUTI
 !
 ! *** INPUTI updated by JCM 14 Jul 86 ***
@@ -6953,26 +6303,20 @@
         CALL CARDIN(ID)
         ID = ID + NYZ
         IPT = 2
-!
     3   IF (IIN.LE.20) GOTO 4
         CALL ERRMES(1,1,'more than 20 items on I cards')
         GOTO 100
-!
     4   CALL RDWORD(IIREAD(IIN+1),NTEMP,IPT,IPT,80,0,IER)
         IF (IER.EQ.100) GOTO 2
         IIN = IIN + 1
         CALL RDREAL(ACOEFF(IIN),IPT,IPT,80,IER)
         GOTO 3
     2 ENDDO
-!
   100 RETURN
       END SUBROUTINE INPUTI
-!*==INPUTN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE INPUTN(NOUT)
       SUBROUTINE INPUTN(NOUT)
 !
 ! *** INPUTN updated by JCM 6 Apr 89 ***
@@ -6993,13 +6337,13 @@
 !N The "N" is not held in ITITLE
 !
       CHARACTER*8 NOTTLE
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       LOGICAL SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NTITL / NTITLE, KOM14
       COMMON /TITLE / ITITLE
       CHARACTER*80 ITITLE
@@ -7007,27 +6351,23 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
       DATA NOTTLE/'UNTITLED'/
-!
 ! IF NOUT=-1, COPY TITLE FROM SCRACH:
       IF (NOUT.EQ.-1) THEN
         NTITLE = LENGT(ICARD)
         ITITLE(1:NTITLE) = ICARD(1:NTITLE)
         GOTO 101
       ENDIF
-!
 ! IF TITLE BEEN INPUT BY PREVIOUS CALL, JUST COPY OUT:
       IF (INREAD(14).LT.0) GOTO 101
 !
 ! SET "N CARD READ ONCE":
       INREAD(14) = -IABS(INREAD(14))
-!
 ! IF NO "N" CARD GO TO PUT IN "UNTITLED":
       IF (ICDNO(14).LT.1) THEN
         ITITLE = NOTTLE
         NTITLE = 8
         GOTO 100
       ENDIF
-!
 ! READ N CARD:
       CALL CARDIN(IABS(INREAD(14)))
 ! NTITLE GIVES NO. OF PRINTING CHARS IN TITLE:
@@ -7038,12 +6378,9 @@
   100 RETURN
  2000 FORMAT (1X,79A1)
       END SUBROUTINE INPUTN
-!*==INPUTS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE INPUTS(ID,R,T)
       SUBROUTINE INPUTS(ID,R,T)
 !
 ! *** INPUTS improved by JCM 30 Aug 92 ***
@@ -7085,7 +6422,8 @@
       COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10),         &
      &                ISMBOL(21)
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -7114,8 +6452,7 @@
     3     ENDDO
           IF (ICARD(L:L).EQ.'/') B = A*SIGN
           DO IXYZ = 24, 26
-            IF ((ICARD(L:L).EQ.LETUP(IXYZ)) .OR.                        &
-     &          (ICARD(L:L).EQ.LETLOW(IXYZ))) R(J,IXYZ-23) = SIGN
+            IF ((ICARD(L:L).EQ.LETUP(IXYZ)) .OR. (ICARD(L:L).EQ.LETLOW(IXYZ))) R(J,IXYZ-23) = SIGN
           ENDDO
           IF (ICARD(L:L).EQ.'+') SIGN = 1.
           IF (ICARD(L:L).EQ.'-') SIGN = -1.0
@@ -7134,18 +6471,14 @@
 ! IF ERRORS, REPORT & SET IERR
       IF (IER.EQ.0) GOTO 100
       WRITE (LPT,3000) R, T, ICARD
-      WRITE (ITO,3000) R, T, ICARD
       IERR = IERR + 1
   100 RETURN
  3000 FORMAT (/' ERROR ** on S card resulting in matrix',3(3F5.1/),     &
      &        ' and vector',3F5.1,' from card saying'/A80)
       END SUBROUTINE INPUTS
-!*==INPUTT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE INPUTT(ID,LABA,LBALEN,NTYP,A,IER)
       SUBROUTINE INPUTT(ID,LABA,LBALEN,NTYP,A,IER)
 !
 ! *** INPUTT by JCM 8 Feb 84 ***
@@ -7172,7 +6505,7 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!
+
       IER = 0
       IF (ID.NE.0) CALL CARDIN(ID)
 ! IPT MOVES ALONG CARD AS ITEMS TAKEN FROM IT:
@@ -7181,7 +6514,6 @@
         CALL ERRATM(ICARD(3:6),-2,'"T" card')
         GOTO 101
       ENDIF
-!
       IPKEEP = IPT
       CALL RDINTG(NTYP,IPT,IPT,80,IE)
       IF ((IE.NE.0) .AND. (IE.NE.100)) THEN
@@ -7196,16 +6528,12 @@
         ENDIF
       ENDDO
       GOTO 100
-!
   101 IER = IER + 1
   100 RETURN
       END SUBROUTINE INPUTT
-!*==INPUTU.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE INPUTU(HT)
       SUBROUTINE INPUTU(HT)
 !
 ! *** INPUTU by JCM 22 Nov 84 ***
@@ -7234,7 +6562,8 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       INREAD(21) = -IABS(INREAD(21))
       HT(1) = 13.
@@ -7269,12 +6598,9 @@
      &        'inside asymmetric unit')
   100 RETURN
       END SUBROUTINE INPUTU
-!*==INTCHR.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE INTCHR(IDIG,NDIG,ICHR,NCHR,MODE)
       SUBROUTINE INTCHR(IDIG,NDIG,ICHR,NCHR,MODE)
 !
 ! *** INTCHR updated by JCM 12 Nov 89 ***
@@ -7294,15 +6620,11 @@
       COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10),         &
      &                ISMBOL(21)
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       IF (NDIG.LE.NCHR) GOTO 1
       WRITE (LPT,3000) NDIG, NCHR
-      WRITE (ITO,3000) NDIG, NCHR
-!>> JCC Handle the STOP through an extra function
-! Was
-!     STOP
-! Now
       CALL BMBOUT
       RETURN
 !
@@ -7319,12 +6641,9 @@
       RETURN
  3000 FORMAT (/' ERROR ** in INTCHR -',I4,' digits into',I4,' chars')
       END SUBROUTINE INTCHR
-!*==INTDIG.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE INTDIG(N,IDIG,NDIG)
       SUBROUTINE INTDIG(N,IDIG,NDIG)
 !
 ! *** INTDIG by JCM 8 Jun 82 ***
@@ -7339,7 +6658,8 @@
 !O If the integer is too big, says so & exits with nothing stored
 !
       DIMENSION IDIG(5), ITENS(4)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       DATA ITENS/10, 100, 1000, 10000/
 !
       IN = IABS(N)
@@ -7359,12 +6679,9 @@
       NDIG = ND
   100 RETURN
       END SUBROUTINE INTDIG
-!*==INVENT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE INVENT(U,H,ANS)
       SUBROUTINE INVENT(U,H,ANS)
 !
 ! *** INVENT by PJB/JCM 8 Aug 83 ***
@@ -7375,7 +6692,8 @@
 !H plane but not parallel to the axis.
 !
       DIMENSION U(3), H(3), ANS(3), VEC(3,2), COMPA(3,2)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
 ! SET UP DEFAULT VALUES:
       CALL GMZER(VEC,3,2)
@@ -7434,11 +6752,6 @@
 !
 ! IF HERE, BOTH POTENTIAL ANSWERS HAVE PROVED PARALLEL TO H
       WRITE (LPT,3001) U, H, VEC
-      WRITE (ITO,3001) U, H, VEC
-!>> JCC Handle the STOP through an extra function
-! Was
-!     STOP
-! Now
       CALL BMBOUT
       RETURN
 !
@@ -7446,12 +6759,9 @@
  3001 FORMAT (/' ERROR ** IN INVENT - PLANE',3F10.2,' AND ',            &
      &        'EXCLUDED AXIS',3F10.4,' HAVE GIVEN VECTORS:'/2(3F10.4/))
       END SUBROUTINE INVENT
-!*==IPOPE.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION IPOPE(N)
       FUNCTION IPOPE(N)
 !
 !
@@ -7481,12 +6791,9 @@
       IPOPE = I
       RETURN
       END FUNCTION IPOPE
-!*==ISCAT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      FUNCTION ISCAT(FNAME)
       FUNCTION ISCAT(FNAME)
 !
 ! *** ISCAT updated by JCM 23 Sep 86 ***
@@ -7513,12 +6820,9 @@
       ENDIF
       RETURN
       END FUNCTION ISCAT
-!*==ISPABS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      LOGICAL FUNCTION ISPABS(H)
       LOGICAL FUNCTION ISPABS(H)
 !
 ! *** ISPABS corrected by WIFD Jan 87 ***
@@ -7557,12 +6861,9 @@
   101 ISPABS = .FALSE.
   100 RETURN
       END FUNCTION ISPABS
-!*==KPAK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      FUNCTION KPAK(IFAM,IGEN,ISPC,KP,KS)
       FUNCTION KPAK(IFAM,IGEN,ISPC,KP,KS)
 !
 ! *** KPAK for MK4 by JCM 7 Nov 90 ***
@@ -7597,12 +6898,9 @@
       CALL NPACK(KPAK,LPAK,N,1,KKPACK)
       RETURN
       END FUNCTION KPAK
-!*==KSAME.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 6      LOGICAL FUNCTION KSAME(KK1,KK2)
       LOGICAL FUNCTION KSAME(KK1,KK2)
 !
 ! *** KSAME updated for MK4 by JCM 10 Feb 90
@@ -7638,12 +6936,9 @@
   101 KSAME = .TRUE.
   100 RETURN
       END FUNCTION KSAME
-!*==KUNPAK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE KUNPAK(KK,IFAM,IGEN,ISPC,KP,KS)
       SUBROUTINE KUNPAK(KK,IFAM,IGEN,ISPC,KP,KS)
 !
 ! *** KUNPAK by JCM 8 Nov 90 ***
@@ -7679,12 +6974,9 @@
       IF (MULSOU) KS = LPAK(5)
       RETURN
       END SUBROUTINE KUNPAK
-!*==KWHOLE.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      LOGICAL FUNCTION KWHOLE(KK,K)
       LOGICAL FUNCTION KWHOLE(KK,K)
 !
 ! *** KWHOLE updated by JCM 4 Dec 91 ***
@@ -7719,12 +7011,9 @@
       IF (MULSOU .AND. K(5).EQ.0) KWHOLE = .FALSE.
       RETURN
       END FUNCTION KWHOLE
-!*==LATABS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      LOGICAL FUNCTION LATABS(H)
       LOGICAL FUNCTION LATABS(H)
 !
 ! *** LATABS updated by PJB Sep 87 ***
@@ -7759,13 +7048,9 @@
     2 LATABS = .FALSE.
   100 RETURN
       END FUNCTION LATABS
-!*==LATVEC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 1      LOGICAL FUNCTION LATVEC(X)
       LOGICAL FUNCTION LATVEC(X)
 !
 ! *** LATVEC by PJB 5 Nov 84 ***
@@ -7796,12 +7081,9 @@
       LATVEC = .FALSE.
   100 RETURN
       END FUNCTION LATVEC
-!*==LENG.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION LENG(NTEXT,L)
       FUNCTION LENG(NTEXT,L)
 !
 ! *** LENG by PJB 13 Apr 85 ***
@@ -7822,12 +7104,9 @@
   101 LENG = I
       RETURN
       END FUNCTION LENG
-!*==LENGT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION LENGT(CHAR)
       INTEGER FUNCTION LENGT(CHAR)
 !
 ! *** LENGT by JCM 13 Nov 87 ***
@@ -7849,12 +7128,9 @@
       LENGT = LEN_TRIM(CHAR)
 
       END FUNCTION LENGT
-!*==LETTER.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION LETTER(I)
       FUNCTION LETTER(I)
 !
 ! *** LETTER by JCM 7 Oct 83 ***
@@ -7879,12 +7155,9 @@
     2 LETTER = J
       RETURN
       END FUNCTION LETTER
-!*==LFCALC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE LFCALC(H)
       SUBROUTINE LFCALC(H)
 !
 ! *** LFCALC updated by JCM 22 Sep 87 ***
@@ -7938,8 +7211,7 @@
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 !
 ! CLEAR ANSWERS IN CASE ABSENT:
 !
@@ -7952,19 +7224,14 @@
 ! CLEAR DERIVATIVES:
       L2 = NVARF(2,JPHASE,1)
       IF (L2.GT.0) CALL GMZER(FCDERS,1,L2)
-!
 ! OUT IF ABSENT:
       IF (LATABS(H)) GOTO 100
-!
 ! SET FIRST SCATTERING FACTOR:
       IFF = 0
-!
 ! GET OFFSET TO REACH THESE VARIABLES:
       LO = LVFST1(2,JPHASE,1)
-!
 ! CLEAR DERIVATIVE VECTOR:
       IF (L2.GT.0) CALL CGMZER(DERIVT,1,L2)
-!
 ! CYCLE OVER INDEPENDENT ATOMS:
       DO IR = 1, NATOM
         SUM1 = CMPLX(0.,0.)
@@ -7972,7 +7239,6 @@
           IFF = NFORMF(IR)
           FORM = FORMFA(STHL,IFF)
         ENDIF
-!
 ! INNER LOOP OVER SYMMETRY EQUIVALENTS:
         DO IS = 1, NOPC
           CALL ROTSYM(H,RH,IS,-1)
@@ -7991,8 +7257,7 @@
 !
           DO I = 1, 3
             L = KX(I,IR)
-            IF (L.NE.0) DERIVT(L-LO) = RH(I)*CMPLX(-BRS,ARS)            &
-     &                                 + DERIVT(L-LO)
+            IF (L.NE.0) DERIVT(L-LO) = RH(I)*CMPLX(-BRS,ARS) + DERIVT(L-LO)
           ENDDO
 !
 ! IF ANY ATF (NOT A LOOP, FOR SPEED):
@@ -8016,32 +7281,27 @@
 !
 ! IF CENTROSYMMETRIC, COMPENSATE FOR USING ONLY HALF NUMBER OF OPERATORS:
         IF (CENTRC) SUM1 = SUM1 + CONJG(SUM1)
-!
         FAC = AMULT(IR)*EXP(-TF(IR)*SSQRD)
         HR = FAC*FORM*SITE(IR)
 ! HR IS PRODUCT OF ATOM DEPENDENT BUT SYMMETRY INDEPENDENT FACTORS
         FC = FC + HR*SUM1
-!
 !  NOW WE TIDY UP THE XYZ AND BIJ DERIVATIVES, ALLOWING FOR CENTRE:
         DO I = 1, 3
           L = KX(I,IR)
           IF (L.GT.0) THEN
             DERIVT(L-LO) = TWOPI*HR*DERIVT(L-LO)
-            IF (CENTRC) DERIVT(L-LO) = DERIVT(L-LO)                     &
-     &                                 + CONJG(DERIVT(L-LO))
+            IF (CENTRC) DERIVT(L-LO) = DERIVT(L-LO) + CONJG(DERIVT(L-LO))
           ENDIF
           IF (IA.NE.0) THEN
             L = KATF(I,IA)
             IF (L.GT.0) THEN
               DERIVT(L-LO) = -HR*DERIVT(L-LO)
-              IF (CENTRC) DERIVT(L-LO) = DERIVT(L-LO)                   &
-     &            + CONJG(DERIVT(L-LO))
+              IF (CENTRC) DERIVT(L-LO) = DERIVT(L-LO) + CONJG(DERIVT(L-LO))
             ENDIF
             L = KATF(I+3,IA)
             IF (L.GT.0) THEN
               DERIVT(L-LO) = -HR*2.*DERIVT(L-LO)
-              IF (CENTRC) DERIVT(L-LO) = DERIVT(L-LO)                   &
-     &            + CONJG(DERIVT(L-LO))
+              IF (CENTRC) DERIVT(L-LO) = DERIVT(L-LO) + CONJG(DERIVT(L-LO))
             ENDIF
           ENDIF
         ENDDO
@@ -8066,7 +7326,6 @@
         COSAL = A/FCMOD
         SINAL = B/FCMOD
       ENDIF
-!
       DO I = 1, L2
 ! NO SUMMING - THESE ARE THE ACTUAL DERIVATIVES NOT DIVIDED BY ANYTHING, AS
 ! THEY ARE SUBJECT TO THE CHAIN RULE NEXT, NOT LOGARITHMIC DIFFERENTIATION:
@@ -8074,12 +7333,9 @@
       ENDDO
   100 RETURN
       END SUBROUTINE LFCALC
-!*==LLTFAC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE LLTFAC(N)
       SUBROUTINE LLTFAC(N)
 !
 ! *** LLTFAC updated JCM 13 Jan 88 ***
@@ -8100,7 +7356,8 @@
 !A ENTRY LTFAC8(NV) sets KTFAC to indicate TFAC is variable number NV
 !A ENTRY LTFAC9 sets KTFAC to indicate TFAC fixed
 !
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       COMMON /OVER  / ITFAC, OTFAC(10), KOTFAC(10), NTFAC, JTFAC, KOM15
@@ -8109,6 +7366,12 @@
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
+     &                ICDN(26,9), IERR, IO10, SDREAD
+      LOGICAL SDREAD
+      DIMENSION INREAD(26), ICDNO(26)
+      EQUIVALENCE (INREAD(1),INREA(1,1))
+      EQUIVALENCE (ICDNO(1),ICDN(1,1))
 !
       GOTO (1,100,3,4,5,6), N
 !
@@ -8151,12 +7414,9 @@
       KTFAC = 0
   100 RETURN
       END SUBROUTINE LLTFAC
-!*==LMATCH.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      FUNCTION LMATCH(LABEL,NAMTAB,NUM,NBOUND)
       FUNCTION LMATCH(LABEL,NAMTAB,NUM,NBOUND)
 !
 ! *** LMATCH updated by JCM 23 Sep 86 ***
@@ -8175,7 +7435,8 @@
 !
       CHARACTER*4 LABEL, NAMTAB
       DIMENSION NAMTAB(NBOUND)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
 ! IF NO ENTRIES, NO MATCH:
       IF (NUM.EQ.0) GOTO 2
@@ -8185,11 +7446,6 @@
 ! NO MATCH - ADD NEW NAME TO TABLE:
     2 IF (NUM.LT.NBOUND) GOTO 3
       WRITE (LPT,3000) NBOUND, LABEL
-      WRITE (ITO,3000) NBOUND, LABEL
-!>> JCC Handle the STOP through an extra function
-! Was
-!     STOP
-! Now
       CALL BMBOUT
       RETURN
 !
@@ -8201,15 +7457,9 @@
  3000 FORMAT (/' ERROR ** IN LMATCH - TABLE WITH',I5,' ENTRIES',        &
      &        ' FULL - TRYING TO ADD ',A4)
       END FUNCTION LMATCH
-!*==MAKGRP.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-!
-! LEVEL 2       SUBROUTINE MAKGRP(IGSB,IOPS,MODE,PRODCT)
       SUBROUTINE MAKGRP(IGSB,IOPS,MODE,PRODCT)
 !
 ! *** MAKGRP modified by PJB 31-May-1994 ***
@@ -8316,12 +7566,9 @@
   101 IGSB(1) = ISIGN(NO,IGSB(1))
       RETURN
       END SUBROUTINE MAKGRP
-!*==MAKNAM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      CHARACTER *4 FUNCTION MAKNAM(CHAR,N)
       CHARACTER*4 FUNCTION MAKNAM(CHAR,N)
 !
 ! *** MAKNAM BY JCM 8 JUL 91 ***
@@ -8349,13 +7596,9 @@
       MAKNAM = NAME
       RETURN
       END FUNCTION MAKNAM
-!*==MATCEL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 4      SUBROUTINE MATCEL(ALSQ,MATSZ)
       SUBROUTINE MATCEL(ALSQ,MATSZ)
 !
 ! *** MATCEL updated by JCM 15 Nov 90 ***
@@ -8473,13 +7716,9 @@
 !
       RETURN
       END SUBROUTINE MATCEL
-!*==MATCOR.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-! LEVEL 7      SUBROUTINE MATCOR(ALSQ,MATSZ)
       SUBROUTINE MATCOR(ALSQ,MATSZ)
 !
 ! *** MATCOR updated by JCM 11 Aug 88 **
@@ -8494,7 +7733,8 @@
       CHARACTER*4 IPNAM1(2), IPNAM2(2), IUPPER(400), LOWER(400)
       DIMENSION ALSQ(MATSZ), MM(400), ICORR(400)
       COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /MATDAT/ MATPNT(401), BLSQ(400)
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
@@ -8572,12 +7812,9 @@
       IF (NV.LT.LVARB) GOTO 7
   100 RETURN
       END SUBROUTINE MATCOR
-!*==MATINV.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE MATINV(ALSQ,MATSZ)
       SUBROUTINE MATINV(ALSQ,MATSZ)
 !
 ! *** MATINV updated by JCM 2 Jun 89 ***
@@ -8598,7 +7835,8 @@
       LOGICAL TESTOV, OVER
       DIMENSION ALSQ(MATSZ)
       COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /MATDAT/ MATPNT(401), BLSQ(400)
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
@@ -8702,12 +7940,9 @@
   100 RETURN
  3000 FORMAT (/' WARNING in MATINV ** zero diagonal element for basic variable number',I5,2X,A4,1X,A4)
       END SUBROUTINE MATINV
-!*==MATSET.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE MATSET(ALSQ,MATSZ)
       SUBROUTINE MATSET(ALSQ,MATSZ)
 !
 ! *** MATSET updated by JCM 11 Aug 88 ***
@@ -8721,7 +7956,8 @@
 !
       DIMENSION ALSQ(MATSZ)
       COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /MATDAT/ MATPNT(401), BLSQ(400)
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
@@ -8730,7 +7966,7 @@
       EQUIVALENCE (MODER,MODERR(1))
 !
 !
-      IF (SIMUL) GOTO 100
+      IF (SIMUL) RETURN
 ! SET UP POINTERS:
       MATPNT(1) = 0
       DO I = 1, LVARB
@@ -8739,27 +7975,18 @@
       NMAT = (LVARB+1)*(LVARB+2)/2
       IF (MATSZ.LT.NMAT) THEN
         WRITE (LPT,3000) MATSZ, NMAT, LVARB
-        WRITE (ITO,3000) MATSZ, NMAT, LVARB
-!>> JCC Handle the STOP through an extra function
-! Was
-!     STOP
-! Now
+ 3000 FORMAT (/' ERROR ** MATSZ given as',I6,' and needs to be  at least',I6,' for',I5,' basic variables')
         CALL BMBOUT
         RETURN
       ENDIF
-!
 ! CLEAR MATRIX AND RHS:
       CALL GMZER(ALSQ,1,MATSZ)
       CALL GMZER(BLSQ,1,LVARB)
-  100 RETURN
- 3000 FORMAT (/' ERROR ** MATSZ given as',I6,' and needs to be  at least',I6,' for',I5,' basic variables')
+
       END SUBROUTINE MATSET
-!*==MATSHF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE MATSHF(ALSQ,MATSZ)
       SUBROUTINE MATSHF(ALSQ,MATSZ)
 !
 ! *** MATSHF updated by JCM 30 Sep 88 ***
@@ -8786,7 +8013,8 @@
       CHARACTER*4 BS, VR
       DIMENSION ALSQ(MATSZ), MM(400), SHIFTS(400)
       COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /MATDAT/ MATPNT(401), BLSQ(400)
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
@@ -8803,7 +8031,7 @@
      &                NSKTOT, KOM24
       EQUIVALENCE (MM(1),MATPNT(2))
 !
-      IF (SIMUL) GOTO 100
+      IF (SIMUL) RETURN
 ! SCALE FOR ESD'S:
       CHI2 = SUMWD/(NOBS-LVARB)
       CHITOT = CHI2
@@ -8814,12 +8042,6 @@
         IF (ALSQ(IR+I).LT.0.) THEN
           CALL PARNAM(BS,VR,1,I)
           WRITE (LPT,3000) I, BS, VR
-          WRITE (ITO,3000) I, BS, VR
-!
-!>> JCC Handle the STOP through an extra function
-! Was
-!     STOP
-! Now
           CALL BMBOUT
           RETURN
         ENDIF
@@ -8833,21 +8055,17 @@
           SHIFTS(I) = SHIFTS(I) + BLSQ(J)*ALSQ(MM(J)+I)
         ENDDO
     1 ENDDO
-!
 ! FOR NOW:
       DO I = 1, LVARB
         BLSQ(I) = SHIFTS(I)
       ENDDO
   100 RETURN
- 3000 FORMAT (/' ERROR ** ill-conditioning starts at basic variable',   &
-     &        ' number',I5,2X,A4,1X,A4)
+ 3000 FORMAT (/' ERROR ** ill-conditioning starts at basic variable',' number',I5,2X,A4,1X,A4)
+
       END SUBROUTINE MATSHF
-!*==MATTOT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE MATTOT(ALSQ,MATSZ)
       SUBROUTINE MATTOT(ALSQ,MATSZ)
 !
 ! *** MATTOT updated by JCM 17 Oct 89 ***
@@ -8877,7 +8095,7 @@
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
       EQUIVALENCE (MM(1),MATPNT(2))
-!
+
       IF (SIMUL) GOTO 100
       SQWDIF = SQRTWT*DIFF
       DO I = 1, LVARB
@@ -8893,12 +8111,9 @@
     1 ENDDO
   100 RETURN
       END SUBROUTINE MATTOT
-!*==MESS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE MESS(LUNIT,N,TXT)
       SUBROUTINE MESS(LUNIT,N,TXT)
 !
 ! *** MESS updated by JCM 12 Sep 92 ***
@@ -8926,14 +8141,11 @@
       ENDIF
       WRITE (LUNIT,2001) (TXT(I:I),I=1,LENGT(TXT))
  2001 FORMAT (1X,200A1)
-      RETURN
+
       END SUBROUTINE MESS
-!*==MINIM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION MINIM(LIST,N,M)
       FUNCTION MINIM(LIST,N,M)
 !
 ! *** MINIM by JCM 15 Jan 88 ***
@@ -8957,14 +8169,11 @@
     1 ENDDO
       MINIM = MIN
       M = IKEEP
-      RETURN
+
       END FUNCTION MINIM
-!*==MTPROD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE MTPROD(I,J,N)
       SUBROUTINE MTPROD(I,J,N)
 !
 ! *** MTPROD new by PJB Nov 90 ***
@@ -8978,19 +8187,15 @@
 !N name PRODCT.
 !
       COMMON /SYMMAG/ MTSYM(25), MSTAB(24), NMSYM, NFAC, OTRSYM(3,3,25),&
-     &                MTYP, NDOM, FERO, FERA, HELI, AMOD, ANTI, MODUL,  &
-     &                KOM20
+     &                MTYP, NDOM, FERO, FERA, HELI, AMOD, ANTI, MODUL, KOM20
       LOGICAL FERO, FERA, HELI, AMOD, ANTI, MODUL
-!
+
       MTSYM(N) = MTSYM(I)*MTSYM(J)
-      RETURN
+
       END SUBROUTINE MTPROD
-!*==MULBOX.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      FUNCTION MULBOX(H)
       FUNCTION MULBOX(H)
 !
 ! *** MULBOX updated by JCM 14 Jun 88 ***
@@ -9007,27 +8212,23 @@
       DIMENSION H(3)
       COMMON /FUNIT / NASYM, ASYM(3,3), EDGE(3,3), ANG(3), NMUL, KOM10
       COMMON /GUNIT / MARK(3,2), BSYM(3,3), IBOX, KOM11
-!
+
 !  DETECT 000
       MULT = 1
       IBOX = 999
       IF (ABS(H(1))+ABS(H(2))+ABS(H(3)).LT.10.E-5) GOTO 101
-!
 !  OTHERWISE START WITH MULT FOR GENERAL POSITION
       MULT = NMUL
 !  VALUE FOR GENERAL POINT
-!
       CALL INBOX(H,IBOX)
       IN = IBOX
       IF (IN) 102, 101, 3
-!
     3 IF (IN.GT.10) GOTO 4
 !  ON A PLANE
       M1 = MARK(IN,1) + 1
       GOTO (102,101,2,5,5), M1
     2 MULT = MULT/2
       GOTO 101
-!
 !  WE ONLY WANT HALF THE PLANE
     5 TEST = SCALPR(H,BSYM(1,IN))
       IF (TEST+.0001.LT.0.) GOTO 102
@@ -9039,7 +8240,6 @@
 !  BIT TO ACCEPT ONLY ONE HALF OF CENTRE LINE FOR P-1
     7 IF (SCALPR(H,BSYM(1,2)).LT.0.) GOTO 102
       GOTO 101
-!
 !  ON AN AXIS
     4 IN = IN - 10
       IF (MARK(IN,2).EQ.0) GOTO 102
@@ -9047,18 +8247,14 @@
       IF (MARK(IN,2).GT.0 .OR. NASYM.NE.2) GOTO 101
 !  WE ONLY WANT HALF THE AXIS
       IF (SCALPR(H,EDGE(1,IN)).GE.0.) GOTO 101
-!
 !  HERE IF NOT STRICTLY INSIDE
   102 MULT = 0
   101 MULBOX = MULT
-      RETURN
+
       END FUNCTION MULBOX
-!*==NCFIND.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION NCFIND(CH,CTABLE,NBOUND)
       FUNCTION NCFIND(CH,CTABLE,NBOUND)
 !
 ! *** NCFIND by JCM 15 Jul 86 ***
@@ -9072,20 +8268,17 @@
 !D to the position of CH in the table if it is there.
 !
       CHARACTER*(*) CH, CTABLE(NBOUND)
-!
+
       DO L = 1, NBOUND
         IF (CH.EQ.CTABLE(L)) GOTO 101
       ENDDO
       L = 0
   101 NCFIND = L
-      RETURN
+
       END FUNCTION NCFIND
-!*==NDIGIT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION NDIGIT(I)
       FUNCTION NDIGIT(I)
 !
 ! *** NDIGIT by JCM 11 Oct 83 ***
@@ -9098,24 +8291,20 @@
 !D value.
 !
       CHARACTER*1 I
-      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10),         &
-     &                ISMBOL(21)
+      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10), ISMBOL(21)
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
-!
+
       DO J = 1, 10
         IF (I.EQ.IDIGIT(J)) GOTO 2
       ENDDO
       J = -1
     2 NDIGIT = J
       IF (NDIGIT.EQ.10) NDIGIT = 0
-      RETURN
+
       END FUNCTION NDIGIT
-!*==NEWCD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE NEWCD
       SUBROUTINE NEWCD
 !
 ! *** NEWCD by JCM 10 Mar 86 ***
@@ -9138,12 +8327,9 @@
       CALL OPNFIL(NEWIN,113)
 
       END SUBROUTINE NEWCD
-!*==NEWLIN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE NEWLIN(LUNIT)
       SUBROUTINE NEWLIN(LUNIT)
 !
 ! *** NEWLIN by JCM 14 Sep 92 ***
@@ -9154,14 +8340,11 @@
 !
       WRITE (LUNIT,2000)
  2000 FORMAT (' ')
-      RETURN
+
       END SUBROUTINE NEWLIN
-!*==NFIND.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION NFIND(N,NTABLE,NBOUND)
       FUNCTION NFIND(N,NTABLE,NBOUND)
 !
 ! *** NFIND by JCM 17 Apr 84 ***
@@ -9181,16 +8364,12 @@
       ENDDO
       L = 0
   101 NFIND = L
-      RETURN
+
       END FUNCTION NFIND
-!*==NOPFIL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      FUNCTION NOPFIL(MODE)
       FUNCTION NOPFIL(MODE)
-!
 !
 ! *** NOPFIL updated by PJB 24-Oct-1994 ***
 !
@@ -9252,9 +8431,8 @@
 !D The array IOTAB marks the units available; IOTAB=0 for available
 !D units, IOTAB=MODE for units in use.
 !
-!
       DIMENSION LM(2)
-      LOGICAL SAYS, BRUCE
+      LOGICAL BRUCE
       CHARACTER*7 FILSTA(3)
       CHARACTER*10 FILACC(3)
       CHARACTER*12 FILFOR(2)
@@ -9265,7 +8443,8 @@
       CHARACTER*80 FMT
       COMMON /FINAME/ FILNAM(15)
       CHARACTER*10 FILNAM
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /LOONEY/ IOTAB(15), LUNTAB(15)
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
@@ -9285,6 +8464,8 @@
 !     in from FORTY via common block commun.
       COMMON /commun/ filnam_root
       CHARACTER*10 filnam_root
+      LOGICAL, EXTERNAL :: Confirm
+
 !  UNSCRAMBLE MODE
       M = MODE
       MODE5 = M/10000
@@ -9439,14 +8620,12 @@
    56 WRITE (FMT,601) LNAM
   601 FORMAT ('('' File '',A',I2,','' does not exist'')')
    62 WRITE (LPT,FMT) NAMFIL(1:LNAM)
-      WRITE (ITO,FMT) NAMFIL(1:LNAM)
    50 IF (MODE2.LT.2 .OR. MODE2.EQ.4) GOTO 6
 ! NO WAY TO OFFER USER ANOTHER TRY:
       NOPFIL = -1
       GOTO 100
 ! ERROR TYPE 2 - 'NEW' FILE EXISTS ALREADY:
-   53 CALL ASK('Existing file '//NAMFIL(1:LNAM)//' will be overwritten'//' OK? (Y/N) ')
-      IF (.NOT.SAYS('Y')) GOTO 50
+   53 IF (.NOT. Confirm('Existing file '//NAMFIL(1:LNAM)//' will be overwritten, OK?')) GOTO 50
 ! ALLOW TO TRY SAME FILE AGAIN WITH STATUS OLD
       IS = 1
       GOTO 30
@@ -9461,8 +8640,7 @@
 ! ERROR TYPE 0 - OTHERS
    55 WRITE (FMT,600) LNAM
   600 FORMAT ('('' *** ERROR opening file '',A',I2,','' IOSTAT='',I4)')
-   61 WRITE (ITO,FMT) NAMFIL, IOE
-      WRITE (LPT,FMT) NAMFIL, IOE
+   61 WRITE (LPT,FMT) NAMFIL, IOE
       GOTO 50
 ! SUCCESSFUL EXIT
   101 NOPFIL = LUN
@@ -9503,7 +8681,8 @@
 !
       DIMENSION LPACK(10,3)
       DIMENSION L(N)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /LENINT/ NBITS
 !
 !
@@ -9531,7 +8710,6 @@
 ! TEST LARGEST POSSIBLE PACKED NUMBER WILL FIT IN MACHINE INTEGER, LESS SIGN
       IF (AM.LT.2.**NBITS) GOTO 100
       WRITE (LPT,3002) AM, NBITS
-      WRITE (ITO,3002) AM, NBITS
       GOTO 100
 !
 ! MODE=1:  PACKING:
@@ -9541,9 +8719,7 @@
         IF (LPACK(I,1).LT.0) LP = IABS(L(I))
         IF (0.LE.LP .AND. LP.LE.IABS(LPACK(I,1))) GOTO 4
         WRITE (LPT,3003) L(I), LPACK(I,1)
-        WRITE (ITO,3003) L(I), LPACK(I,1)
         GOTO 100
-!
     4   NPK1 = NPK1*LPACK(I,3) + L(I) + LPACK(I,2)
       ENDDO
       NPK = NPK1
@@ -9864,7 +9040,8 @@
       CHARACTER*40 FILTEM
       COMMON /FINAME/ FILNAM(15)
       CHARACTER*10 FILNAM
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /LOONEY/ IOTAB(15), LUNTAB(15)
 !
       IF (L.EQ.-9999) THEN
@@ -9896,7 +9073,7 @@
       GOTO 4
 !
 ! L NOT IN TABLE - CHECK SUITABILITY:
-    3 IF (L.LT.0 .OR. L.EQ.ITI .OR. L.EQ.ITO) CALL ERRIN2(L,0,'cannot open unit','in OPNFIL')
+    3 IF (L.LT.0) CALL ERRIN2(L,0,'cannot open unit','in OPNFIL')
       LUNTAB(K) = L
     4 CONTINUE
 !VMS
@@ -9914,11 +9091,6 @@
     7 L1 = NOPFIL(M)
       IF (L1.EQ.L) GOTO 100
       WRITE (LPT,3001) L, L1
-      WRITE (ITO,3001) L, L1
-!>> JCC Handle the STOP through an extra function
-! Was
-!     STOP
-! Now
       CALL BMBOUT
       RETURN
 !
@@ -9956,7 +9128,8 @@
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
       COMMON /FRIED / FRIEDL, KOM8
       LOGICAL FRIEDL
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48),         &
@@ -10122,7 +9295,8 @@
 !
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       DO M = 1, 2
         DO I = 1, 3
@@ -10306,7 +9480,8 @@
       CHARACTER*4 ATNA, ATNAME
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       LOGICAL MULFAS, MULSOU, MULONE
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /MPODA / NMPAT, NMPOL, MPATAB(20), MPNMTB(150), NCLUMP,    &
      &                KCLUMP(100), MPTAB(21), POLAMP(200,6), KPOLMP(200)&
      &                , NCMAT, CONMAT(600,2)
@@ -10383,9 +9558,6 @@
 !
 ! IF 0, COMPLAIN.
    22 WRITE (LPT,3001) M, N, IFAM, IGEN, ISPC
-      WRITE (ITO,3001) M, N, IFAM, IGEN, ISPC
-!
-!
 ! IF +VE, NAME ALREADY PACKED IN MM FOR LOOK-UP IN PRIWRD:
    23 CALL PRIWRD(IFAM,IGEN,ISPC,IPNAM2,0)
 ! MAY NOT ALL BE PRESENT - TRY JUST SPECIES NAME IF NOT FOUND:
@@ -10658,12 +9830,9 @@
       CALL FIXUNI(PL3,3)
       RETURN
       END SUBROUTINE PLN3AD
-!*==POLUNI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE POLUNI
       SUBROUTINE POLUNI
 !
 ! *** POLUNI by PJB 8 Aug 83 ***
@@ -10680,14 +9849,14 @@
 !D faces and edges of the reciprocal cell asymmetric unit in order to
 !D deduce the multiplicites of reflections occurring on them.
 !
-      LOGICAL BINDIG
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /FRIED / FRIEDL, KOM8
       LOGICAL FRIEDL
       COMMON /FUNIT / NASYM, ASYM(3,3), EDGE(3,3), ANG(3), NMUL, KOM10
       COMMON /GUNIT / MARK(3,2), BSYM(3,3), IBOX, KOM11
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
@@ -10702,7 +9871,6 @@
           MARK(I,J) = 1
         ENDDO
       ENDDO
-!
 !  DEAL WITH P1 AND P-1
       IF ((NOP.EQ.1) .AND. .NOT.FRIEDL) GOTO 100
       IF (NOPC.GT.1) GOTO 14
@@ -10711,44 +9879,32 @@
       CALL VECPRD(ASYM(1,1),BSYM(1,1),BSYM(1,2))
       MARK(1,1) = 4
       GOTO 100
-!
 !  WORK OVER SYMMETRY ELEMENTS
    14 DO N = 2, NOPC
         IF (IABS(NORD(N)).GT.100) GOTO 1
         IORD = IABS(NORD(N))
         IF (MIRROR(N).EQ.0) GOTO 2
-!
 !  PROCEDURE IF MIRROR PLANE,EITHER END OF AXIS WILL DO
         DO IR = 1, 2
           CALL EQVEC(ASYM,AXI(1,N,1),NASYM,M,0)
           IF (M.GT.NASYM) GOTO 15
-!
 !  MARK PLANE AS MIRROR
           MARK(M,1) = 2
           GOTO 16
    15     CALL GMREV(AXI(1,N,1),AXI(1,N,1),3,1)
         ENDDO
-!
 !  JUMP IF NOT A DIAD AXIS
    16   IF (NORD(N).EQ.-2 .AND. .NOT.FRIEDL) GOTO 1
-!
 !  PROCEDURE FOR SYMMETRY AXES
     2   CALL INBOX(AXI(1,N,2),IN)
         IF (IN) 1, 3, 4
-!
 !  SYMMETRY AXIS INSIDE UNIT - ERROR\
     3   WRITE (LPT,3000) (AXI(I,N,1),I=1,3), N
-        WRITE (ITO,3000) (AXI(I,N,1),I=1,3), N
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
         CALL BMBOUT
         RETURN
-!
 !  AXIS IS ON UNIT
     4   IF (IN.GT.10) GOTO 5
         IF (IORD.GT.2) GOTO 3
-!
 !  HERE FOR DIAD AXIS ON A PLANE - NOT AT CORNER
         CALL VECPRD(ASYM(1,IN),AXI(1,N,2),BSYM(1,IN))
         MARK(IN,1) = 3
@@ -10766,7 +9922,6 @@
 !  CHECK MARK NOT ZERO ALREADY
    13   IF (MARK(L,2).NE.0) MARK(M,2) = 0
         GOTO 1
-!
 !  AXIS ON EDGE
     5   IN = IN - 10
         IF (NASYM.GT.2) GOTO 11
@@ -10793,9 +9948,7 @@
         MARK(M,2) = 0
         M = M1
    12   MARK(M,1) = 0
-!
     1 ENDDO
-!
 !  PUT IN EXTRA DIVISION IF A MIRROR PLANE GOES THROUGH AN EDGE
       IF (NASYM.LT.2) GOTO 100
 !  NO EDGES:
@@ -10807,21 +9960,13 @@
         J = K
         K = I
       ENDDO
-  100 IF (BINDIG(IOUT,16)) THEN
-        WRITE (LPT,4000) ((MARK(I,J),I=1,3),J=1,2), BSYM, EDGE
-        WRITE (ITO,4000) ((MARK(I,J),I=1,3),J=1,2), BSYM, EDGE
-      ENDIF
-      RETURN
- 3000 FORMAT (/' ERROR ** IN POLUNI - SYMMETRY AXIS ',3F5.1,            &
-     &        ' INSIDE UNIT - OPERATOR NUMBER',I4)
- 4000 FORMAT (/' MARK :',3I5,4X,3I5/' BSYM, EDGE :'/3(/3(1X,3F8.2/)))
+  100 RETURN
+ 3000 FORMAT (/' ERROR ** IN POLUNI - SYMMETRY AXIS ',3F5.1,' INSIDE UNIT - OPERATOR NUMBER',I4)
+
       END SUBROUTINE POLUNI
-!*==PRBLOK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE PRBLOK
       SUBROUTINE PRBLOK
 !
 ! *** PRBLOK Modified by PJB 9-Mar-1994 ***
@@ -10847,7 +9992,8 @@
       CHARACTER*4 NAME, IPNAME
       COMMON /ATBLOK/ IBUFF, PNEW(12), PESD(12), PSHIFT(12), POLD(12),  &
      &                PSESD(12)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       DATA LABEL/'   NEW', '   ESD', ' SHIFT', '   OLD'/
 !
@@ -10871,18 +10017,12 @@
  2006 FORMAT (' SH/SD',12F9.5)
       IBUFF = 0
   100 RETURN
+
       END SUBROUTINE PRBLOK
-!*==PREFIN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE PREFIN(PROGRM)
-!>> JCC Was
-!    SUBROUTINE PREFIN(PROGRM)
-!>> Now
       INTEGER FUNCTION PREFIN(PROGRM)
-!>> Need this to be able to return an error status.
 !
 ! *** PREFIN updated by JCM 28 Apr 92 ***
 !
@@ -10978,31 +10118,15 @@
 !>> JCC Initialise return value ( successful = 1, anything else is failure)
       PREFIN = 1
 !
-!
 ! INITIALISE WHOLE SYSTEM - DATE, TIME, CONSTANTS, I/O UNIT NUMBERS ETC:
 ! UNLESS THAT HAS ALREADY BEEN DONE ONCE IN THE JOB
       CALL INITIL(PROGRM)
-!
-      GOTO 9
-!
-! ENTRY TO READ A NEW CRYSTAL DATA SET FROM THE SAME FILE:
-!      ENTRY NEXPRE(ENDIP)
-!      CALL CLOFIL(IO10)
-!      GO TO 10
-!
-! ENTRY TO READ A NEW CRYSTAL DATA SET FROM A DIFFERENT FILE:
-!      ENTRY NEWPRE
-!      CALL CLOFIL(ICRYDA)
-!      CALL CLOFIL(IO10)
-! OPEN CRYSTAL DATA BY ASKING FOR NAME WHERE POSSIBLE:
+! OPEN CRYSTAL DATA
     9 ENDIP = .FALSE.
       MESSAG = 'Crystal data file'
-!ILL      NAMFIL='.CRY'
-!RAL
       NAMFIL = '.CCL'
       CALL OPNFIL(ICRYDA,111)
-!>> JCC
-!>>  Check the value of ICRYDA. An error may have occurred on opening the file
+! Check the value of ICRYDA. An error may have occurred on opening the file
       IF (ICRYDA.EQ.-1) THEN
         PREFIN = 0
         RETURN
@@ -11015,14 +10139,11 @@
       ID = 0
       CALL CDFIN(1,ID,ENDIP)
       NTOTL = NTOTAL(1)
-      RETURN
+
       END FUNCTION PREFIN
-!*==PRILIS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE PRILIS(AVAL,IPT1,IPT2)
       SUBROUTINE PRILIS(AVAL,IPT1,IPT2)
 !
 ! *** PRILIS updated by JCM 22 Aug 86 ***
@@ -11037,7 +10158,8 @@
 !O Writes out AVAL(IPT1 to IPT2), in format G12.5, 5 per line.
 !
       DIMENSION AVAL(IPT2), ATEMP(20)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       IN = 0
       DO I = IPT1, IPT2
@@ -11054,12 +10176,9 @@
       RETURN
  2000 FORMAT (4(1X,5G12.5/))
       END SUBROUTINE PRILIS
-!*==PRIPLN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE PRIPLN(A,IR)
       SUBROUTINE PRIPLN(A,IR)
 !
 ! *** PRIPLN updated by JCM 12 Nov 89 ***
@@ -11075,21 +10194,19 @@
 !
       CHARACTER*12 NEQN
       DIMENSION A(3)
-      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10),         &
-     &                ISMBOL(21)
+      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10), ISMBOL(21)
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
-!
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
+
       IPT = 0
       NEQN = ' '
       DO I = 1, 3
         IF (A(I)) 3, 2, 4
-!
 ! NEGATIVE TERM:
     3   IPT = IPT + 1
         NEQN(IPT:IPT) = '-'
         GOTO 5
-!
 ! POSITIVE TERM - OMIT EXPLICIT PLUS IF AT START:
     4   IF (IPT.EQ.0) GOTO 5
         IPT = IPT + 1
@@ -11111,7 +10228,6 @@
         ENDIF
         NEQN(IPT:IPT) = LETLOW(L)
     2 ENDDO
-!
 ! TIDY:
       IF (IPT.EQ.0) GOTO 100
       IF ((IPT.EQ.3) .AND. (NEQN(2:2).EQ.'-')) THEN
@@ -11127,12 +10243,9 @@
  2000 FORMAT (13X,A12)
   100 RETURN
       END SUBROUTINE PRIPLN
-!*==PRIVAR.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE PRIVAR
       SUBROUTINE PRIVAR
 !
 ! *** PRIVAR updated for MK4 by JCM Aug 89 ***
@@ -11155,7 +10268,8 @@
       COMMON /DERBAS/ DERIVB(400), LVARB
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       LOGICAL MULFAS, MULSOU, MULONE
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
@@ -11168,7 +10282,6 @@
         CALL MESS(LPT,1,'No variables')
         GOTO 100
       ENDIF
-!
       WRITE (LPT,2001) LVARB
  2001 FORMAT (/'    ',I5,' basic variable(s) :'/)
 ! NUMBER OF ITEMS PER LINE OF OUTPUT:
@@ -11180,10 +10293,8 @@
       IC = 0
       JPH = 0
       JSO = 0
-!
       DO IB = 1, LVARB
         K = LVRPR(LBSVR(IB))
-!
 ! SAVE PREVIOUS PHASE AND SOURCE:
         KPHASE = JPH
         KSOURC = JSO
@@ -11194,9 +10305,7 @@
           WRITE (LPT,2006) JPH
  2006     FORMAT (/' Phase',I3)
         ENDIF
-!
         IF (IFAM.NE.4) GOTO 5
-!
 ! FAMILY 4 - LONG VECTORS, INCONVENIENT TO PRINT:
 ! GET PRINTING NAME:
         NOLD = NAM2
@@ -11233,13 +10342,11 @@
         ISP1F4 = ISPC
         ISPNF4 = ISPC
         GOTO 4
-!
 ! SAME GENUS - IS IT NEXT SPECIES?
     8   IF (ISPNF4+1.EQ.ISPC) THEN
           ISPNF4 = ISPC
           GOTO 4
         ENDIF
-!
 ! PUT RANGE END INTO BUFFER:
         IF (ISP1F4.NE.ISPNF4) THEN
           IPR2(IC) = NOLD
@@ -11250,7 +10357,6 @@
           ENDIF
         ENDIF
         GOTO 14
-!
 ! NOT FAMILY 4:
     5   IF (ISP1F4.NE.ISPNF4) THEN
           ISPNF4 = ISP1F4
@@ -11269,14 +10375,12 @@
           IC = 0
         ENDIF
     4 ENDDO
-!
 ! MAY BE REMNANTS OF FAMILY 4 NOT IN BUFFER:
       IF (F4 .AND. (ISP1F4.NE.ISPNF4)) THEN
         IPR2(IC) = NAM2
         IJOIN(IC) = '-'
       ENDIF
       IF (IC.NE.0) WRITE (LPT,2002) (IPR1(J),IJOIN(J),IPR2(J),J=1,IC)
-!
 ! CONSTRAINT LIST:
       IF (JCONST.LE.0) GOTO 100
       WRITE (LPT,2003) JCONST
@@ -11292,11 +10396,9 @@
         KS = KSOURC
         IF (JR.GT.8) THEN
           WRITE (LPT,3000) NAM1, NAM2
-          WRITE (ITO,3000) NAM1, NAM2
           JNEXT = JROW + 7
           JR = 8
         ENDIF
-!
         F4 = .TRUE.
         F5 = .TRUE.
         DO M = 1, JR
@@ -11332,12 +10434,9 @@
  3000 FORMAT (/' ERROR ** redundant variable',2(A4),                    &
      &        'related to > 8 basics - cannot yet print')
       END SUBROUTINE PRIVAR
-!*==PRIWRD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE PRIWRD(IFAM,IGEN,ISPC,NAME,MODE)
       SUBROUTINE PRIWRD(IFAM,IGEN,ISPC,NAME,MODE)
 !
 ! *** PRIWRD updated for MK4 by JCM 8 May 90 ***
@@ -11394,12 +10493,9 @@
       ENDIF
       RETURN
       END SUBROUTINE PRIWRD
-!*==PRMTIV.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE PRMTIV
       SUBROUTINE PRMTIV
 !
 ! *** PRMTIV by JCM 11 Oct 84 ***
@@ -11412,15 +10508,14 @@
 !D Sets up coefficients NPRIM(2,2), MCOUNT(2), LFAC(2) in /HKLGEN/
 !D to make primitive stepping vectors from the existing steps.
 !
-      LOGICAL BINDIG
       DIMENSION VEC(3,2)
       COMMON /HKLGEN/ STEP(3,3), PT(3,3), VECEND(3,3), PRPT(3,3),       &
      &                NPRIM(2,2), NP, LFAC(2), MCOUNT(2), KOM5
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
 !
 !  CHECK WHETHER PRIMITIVE AND SET UP INTERVENING STEPS IF NOT:
-!
       DO I = 1, 2
         DO J = 1, 2
           NPRIM(I,J) = 0
@@ -11429,7 +10524,6 @@
         LFAC(I) = 1
       ENDDO
       IF (NP.EQ.1) GOTO 100
-!
 !  CHECK WHETHER BASE PLANE IS PRIMITIVE
       CALL VECPRD(STEP(1,1),STEP(1,2),VEC(1,1))
       CALL FCTOR(VEC(1,1),M)
@@ -11441,21 +10535,13 @@
         IF (J.EQ.M) GOTO 11
       ENDDO
       WRITE (LPT,3000) M, J, (VEC(I,1),I=1,3), STEP
-      WRITE (ITO,3000) M, J, (VEC(I,1),I=1,3), STEP
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
       CALL BMBOUT
       RETURN
-!
-!
    11 NPRIM(1,1) = N1 - 1
       NPRIM(2,1) = 1
       LFAC(1) = M
-!
 !  IS THIS ENOUGH?
-      IF (M.EQ.NP) GOTO 101
-!
+      IF (M.EQ.NP) GOTO 100
 !  INTERVENING LAYERS ON THIRD AXIS:
     1 L = NP/M
       CALL GMEQ(STEP(1,3),VEC(1,2),1,3)
@@ -11468,39 +10554,22 @@
         ENDDO
         CALL GMADD(VEC(1,2),STEP(1,2),VEC(1,2),1,3)
       ENDDO
-!
 !  ERROR IF WE GET HERE
       WRITE (LPT,3001) L, M, J, ((VEC(I,II),I=1,3),II=1,2), STEP
-      WRITE (ITO,3001) L, M, J, ((VEC(I,II),I=1,3),II=1,2), STEP
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
       CALL BMBOUT
       RETURN
-!
-!
     5 NPRIM(1,2) = N1 - 1
       NPRIM(2,2) = N2 - 1
       LFAC(2) = L
-  101 IF (BINDIG(IOUT,16)) THEN
-        WRITE (LPT,4000) M, L, NP, NPRIM, STEP
-        WRITE (ITO,4000) M, L, NP, NPRIM, STEP
-      ENDIF
   100 RETURN
  3000 FORMAT (/' ERROR ** IN PRMTIV FINDING BASE PLANE VECTOR - ',      &
      &        ' M,J=',2I4,' VEC1=',3F5.1,' STEP ARRAY IS'/1X,9F5.1)
  3001 FORMAT (/' ERROR ** in PRMTIV making second vector',' - L,M,J=',  &
-     &        3I4/' Vectors so far are:',6F5.1/' Step array',' is',     &
-     &        9F5.1)
- 4000 FORMAT (' M,L,NP,NPRIM,STEP:'/1X,3I5,4X,I4,4I3/9(1X,3F8.2/)       &
-     &        /3(1X,3F8.2/))
+     &        3I4/' Vectors so far are:',6F5.1/' Step array',' is',9F5.1)
       END SUBROUTINE PRMTIV
-!*==PRNCYC.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      LOGICAL FUNCTION PRNCYC(N)
       LOGICAL FUNCTION PRNCYC(N)
 !
 ! *** PRNCYC by JCM 17 Nov 84 ***
@@ -11710,7 +10779,8 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
 !
@@ -11739,7 +10809,6 @@
       CALL XROOT(IA,XACT,ISYMM,ILATT,CS)
       IF (ISYMM.NE.0) GOTO 2
       WRITE (LPT,3009) ATNAME(IA), XACT
-      WRITE (ITO,3009) ATNAME(IA), XACT
       GOTO 99
 !
 ! MAY BE SIMPLE LABEL FOR ATOM AS ON A CARD, OR PART SPEC:
@@ -11752,7 +10821,6 @@
 ! CHECK SYMMETRY OPERATOR NUMBER:
       IF (IABS(ISYMM).GT.NOPC) THEN
         WRITE (LPT,3003) ISYMM, NOPC
-        WRITE (ITO,3003) ISYMM, NOPC
         GOTO 99
       ENDIF
 !
@@ -11767,7 +10835,6 @@
 !
       IF (ILATT.GT.NLAT .OR. ILATT.LE.0) THEN
         WRITE (LPT,3005) ILATT, NLAT
-        WRITE (ITO,3005) ILATT, NLAT
         GOTO 99
       ENDIF
 !
@@ -11983,7 +11050,8 @@
       CHARACTER*4 NFV(2)
       LOGICAL FX
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
      &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
@@ -12050,10 +11118,6 @@
 ! 'ALL'
    12 IF (IFAM.EQ.0) THEN
         WRITE (LPT,3000) KK, IFAM, IGEN, ISPC
-        WRITE (ITO,3000) KK, IFAM, IGEN, ISPC
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
         CALL BMBOUT
         RETURN
       ENDIF
@@ -12246,7 +11310,8 @@
       CHARACTER*4 IWORD
       LOGICAL TESTOV
       DIMENSION A(NBOUND)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       IPT = IPT1
       IER = 0
@@ -12275,14 +11340,12 @@
 !
     7 IF (.NOT.TESTOV(Y,Z)) GOTO 6
       WRITE (LPT,3002) X, Y, Z
-      WRITE (ITO,3002) X, Y, Z
       IER = 3
       GOTO 100
 !
     6 NPT = NINT((Y-X+10.E-5)/Z) + 1
       IF (NPT.GE.1) GOTO 8
       WRITE (LPT,3003) X, Y, Z
-      WRITE (ITO,3003) X, Y, Z
       IER = 4
       GOTO 100
 !
@@ -12714,7 +11777,8 @@
       DIMENSION ANGLE(3,2)
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       NOUT = N
       MM = M
@@ -12810,7 +11874,7 @@
 !H Reads the lattice parameters and forms the reciprocal cell.
 !D The real cell parameters are read from the "C" card in the order
 !D a, b, c (in Angstroms) alpha, beta, gamma (in degrees).
-!D The reciprocal cell parameters,cell volume and othogonal transformations
+!D The reciprocal cell parameters,cell volume and orthogonal transformations
 !D are calculated.
 !D Cell edges and angles which are fixed by symmetry need not be given
 !D on the "C" card.  Redundant parameters at the right hand end of a card
@@ -12843,7 +11907,8 @@
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       DATA HEADNG/'Symmetry constraints on lattice parameters'/
       DATA LABEL/'  a', '  b', '  c', 'alpha', ' beta', 'gamma'/
 !
@@ -13159,7 +12224,8 @@
 !D eventually be used by routine VARMAK.
 !
       DIMENSION R(3,3), NFIX(3), FIX(3)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       DO K = 1, 3
 ! COUNTS 3 EQUATIONS
@@ -13178,10 +12244,6 @@
           GOTO 2
     3     IF (IZ.EQ.2) GOTO 4
           WRITE (LPT,3000) A1, A2, A
-          WRITE (ITO,3000) A1, A2, A
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
           CALL BMBOUT
           RETURN
 !
@@ -13219,7 +12281,8 @@
 !
       DIMENSION R(3,3), NFIX(6), FIX(6)
       DIMENSION LKUP(3,3)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       DATA LKUP/1, 6, 5, 6, 2, 4, 5, 4, 3/
 !
       DO K = 1, 3
@@ -13243,10 +12306,6 @@
               GOTO 2
     3         IF (IZ.EQ.2) GOTO 4
               WRITE (LPT,3000) A1, A2, A
-              WRITE (ITO,3000) A1, A2, A
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
               CALL BMBOUT
               RETURN
 !
@@ -13301,7 +12360,8 @@
 !
       LOGICAL TESTOV
       COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
      &                YMAX, CSQTOT
@@ -13356,7 +12416,6 @@
  2001 FORMAT (/' R1=Sum diffs/Sum obs =',G12.4/' R2=Sum squares diffs/Sum squares obs = ',G12.4)
       CHISQ = SUMWD/FLOAT(NOBS-LVARB)
       WRITE (LPT,2003) CHISQ, SUMWD
-      WRITE (ITO,2003) CHISQ, SUMWD
       WRITE (LPT,2033) NOBS, LVARB
  2033 FORMAT (' For',I6,' observations and',I4,' basic variables')
       IF (IWGHT.EQ.1) GOTO 100
@@ -13373,11 +12432,9 @@
 !
 ! PRINTING FOR SLACK CONSTRAINTS:
     5 WRITE (LPT,2010) ISLKTP
-      WRITE (ITO,2010) ISLKTP
 !* NEED DATA STATEMENT WITH DIFFERENT TYPES
       CSQTOT = SLKSWD(ISLKTP)/FLOAT(NSLAK(ISLKTP))
       WRITE (LPT,2011) CSQTOT, NSLAK(ISLKTP)
-      WRITE (ITO,2011) CSQTOT, NSLAK(ISLKTP)
       GOTO 100
 !
 ! PRINTING FOR SLACK CONSTRAINTS AND CONVENTIONAL OBS TOGETHER:
@@ -13393,7 +12450,6 @@
    36 ENDDO
       CSQTOT = CNUM/CDEN
       WRITE (LPT,2005) CSQTOT
-      WRITE (ITO,2005) CSQTOT
   100 RETURN
  2003 FORMAT (' Chi squared =',G12.3,' Sum weighted diffs sqrd =',G12.3)
  2010 FORMAT (/' For slack constraints type',I4)
@@ -13709,7 +12765,8 @@
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -13885,7 +12942,8 @@
       COMMON /FORGRP/ NATFOR(20,150), NAFPNT(20)
       COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
      &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -13970,7 +13028,6 @@
       NAMODE(LFAC) = IABS(NTYP)
       IF (NAMODE(LFAC).EQ.1) GOTO 3
       WRITE (LPT,3003) NTYP, LABF
-      WRITE (ITO,3003) NTYP, LABF
       IERR = IERR + 1
       GOTO 6
 ! RECORD MODE IN NAMODE, AND FOR NOW EXPECT ONLY 1 - THEN READ FDASH AND FDDASH
@@ -13999,7 +13056,6 @@
 ! SCATTERING FACTOR:
    13 IF (NTYP.LE.5) GOTO 7
       WRITE (LPT,3002) NTYP, LABF
-      WRITE (ITO,3002) NTYP, LABF
       IERR = IERR + 1
       GOTO 6
     7 IF (MODE(LFAC).EQ.0) GOTO 20
@@ -14080,7 +13136,6 @@
       IF (NT(LFAC).EQ.1) GOTO 36
       IF (S(NT(LFAC),LFAC).GT.S(NT(LFAC)-1,LFAC)) GOTO 36
       WRITE (LPT,3011) NT(LFAC), S(NT(LFAC),LFAC), S(NT(LFAC)-1,LFAC), LABF
-      WRITE (ITO,3011) NT(LFAC), S(NT(LFAC),LFAC), S(NT(LFAC)-1,LFAC), LABF
       GOTO 6
    33 F(NT(LFAC),LFAC) = XX
    36 IF (IPT.LT.80) GOTO 8
@@ -14124,7 +13179,6 @@
      &          'Table is:'/(1X,5(F10.2,F10.4)))
         IF (F(NT(LFAC),LFAC).NE.9999.) GOTO 40
         CALL MESS(LPT,1,'WARNING ** an odd number of numbers was read as the table of S and F')
-        CALL MESS(ITO,1,'WARNING ** an odd number of numbers was read as the table of S and F')
         GOTO 40
    46   N1 = NT(LFAC)
         WRITE (LPT,2002) FONAME(LFAC), M, N1, CMULT(LFAC), (F(I,LFAC),I=1,N1)
@@ -14192,14 +13246,15 @@
 !D S is put into COMMON /BRAGG/ here.
 !
       DIMENSION TEMP(3)
-      LOGICAL ONCARD, BINDIG
+      LOGICAL ONCARD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
      &                DSTAR2, TWOTHD(5), DIFANG(6)
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /FUNIT / NASYM, ASYM(3,3), EDGE(3,3), ANG(3), NMUL, KOM10
       COMMON /HKLGEN/ STEP(3,3), PT(3,3), VECEND(3,3), PRPT(3,3),       &
      &                NPRIM(2,2), NP, LFAC(2), MCOUNT(2), KOM5
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
 !
       STHLMX = S
       IF (S.NE.0.) GOTO 5
@@ -14273,23 +13328,13 @@
       CALL GMEQ(PRPT(1,3),PRPT(1,2),1,3)
 ! START POINT IN PT ALSO:
       CALL GMEQ(PRPT,PT,3,3)
-      IF (BINDIG(IOUT,16)) THEN
-        WRITE (LPT,4000) STEP, PT, VECEND
-        WRITE (ITO,4000) STEP, PT, VECEND
-      ENDIF
       CALL PRMTIV
   100 RETURN
- 4000 FORMAT (/' STEP,PT,VECEND :'/3(3(3F8.2/)/))
+
       END SUBROUTINE SETGEN
-!*==SHFESD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-!
-! LEVEL 1      SUBROUTINE SHFESD(J)
       SUBROUTINE SHFESD(J)
 !
 ! *** SHFESD by JCM 7 May 86 ***
@@ -14322,75 +13367,11 @@
         ESD = ESD + (AMOUNT(M)*DERIVB(JCMAT(M)))**2
       ENDDO
       ESD = SQRT(ESD)
-      RETURN
+
       END SUBROUTINE SHFESD
-!*==SORTX.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE SORTX(VAL,IP,N)
-      SUBROUTINE SORTX(VAL,IP,N)
-!
-! *** SORTX updated by JHM/JCM 22 Aug 86 ***
-!
-!X
-!C 16C
-!H Sorts pointers to a real array using Heapsort.
-!
-!A On entry VAL is an array of N real numbers.
-!A On exit IP is an array of N pointers to VAL in ascending order
-!
-!N Copyright John Matthewman 18 July 1983
-!N  HEAPSORT
-!N  (See Knuth 'Art of Computer Programming' Vol 3, Section 5.2.3)
-!
-!
-      DIMENSION VAL(N), IP(N)
-!
-! EXTRA PART (WHICH MAY BE REMOVED AGAIN) - SET UP POINTERS:
-      DO I = 1, N
-        IP(I) = I
-      ENDDO
-      IF (N.LT.2) RETURN
-!  INITIALISE
-      L = N/2 + 1
-      IR = N
-    1 L = L - 1
-      K = IP(L)
-    3 J = L
-      GOTO 4
-!
-!  SIFTING LOOP
-    5 IF (VAL(IP(J)).LT.VAL(IP(J+1))) J = J + 1
-    7 IP(I) = IP(J)
-    4 I = J
-      J = J + J
-      IF (J-IR) 5, 7, 8
-!
-!  FLOYDS MODIFICATION
-   10 IP(J) = IP(I)
-    8 J = I
-      I = I/2
-      IF (I) 6, 6, 9
-    9 IF (J.GT.L .AND. VAL(K).GT.VAL(IP(I))) GOTO 10
-    6 IP(J) = K
-!
-!  END OF A SIFT
-      IF (L.GT.1) GOTO 1
-      K = IP(IR)
-      IP(IR) = IP(1)
-      IR = IR - 1
-      IF (IR.GT.1) GOTO 3
-      IP(1) = K
-  100 RETURN
-      END SUBROUTINE SORTX
-!*==SPACE.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
-!
-!
-!
-!
-! LEVEL 1      SUBROUTINE SPACE(NT,NSCR,NGENS)
       SUBROUTINE SPACE(NT,NSCR,NGENS)
 !
 ! *** SPACE corrected by PJB  02-Nov-1994 ***
@@ -14411,9 +13392,8 @@
       CHARACTER*4 FIRST, MID, LAST
       CHARACTER*16 NT
       CHARACTER*12 IN
-      CHARACTER*12 SYSTEM(6)
-      CHARACTER*4 NTEX(21), AMTSA(3), AMGES(3,2)
-      CHARACTER*4 TX(6,3), TEXB(9)
+      CHARACTER*4 NTEX(21)
+      CHARACTER*4 TEXB(9)
       LOGICAL TRI, MONO, ORTHO, TETRA, HEXA, CUBIC, CENTRE
       LOGICAL AFACE, BFACE, CFACE, BODY, RHOMB, FACE, PRIM, SLASH, MINUS
       LOGICAL EMPTY(3), LETT1(3), OUTSID
@@ -14426,12 +13406,11 @@
       EQUIVALENCE (FIRST,IN(1:4))
       EQUIVALENCE (MID,IN(5:8))
       EQUIVALENCE (LAST,IN(9:12))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       DATA NDIGS/'0', '1', '2', '3', '4', '5', '6'/
       DATA LATLET/'A', 'B', 'C', 'I', 'R', 'F', 'P'/
       DATA SPALET/'A', 'B', 'C', 'M', 'N', 'D'/
-      DATA SYSTEM/'TRICLINIC', 'MONOCLINIC', 'ORTHORHOMBIC',            &
-     &     'TETRAGONAL', 'HEXAGONAL', 'CUBIC'/
       DATA MGES/1, 3*0, 1, 3*0, 1, -1, 3*0, -1, 3*0, 1, 0, 1, 0, 2* - 1,&
      &     3*0, 1, 0, 1, 0, -1, 4*0, 1, 0, 1, 3*0, 2*1, 2*0, 2*1, 0, -1,&
      &     4*0, 1, -1, 3*0, -1, 3*0, -1, 1, 3*0, 1, 3*0, -1, 0, -1, 0,  &
@@ -14507,8 +13486,7 @@
       ENDDO
       CALL ERRMES(1,0,'No space group symbol')
    10 NBR = NCFIND(NT(IS:IS),LATLET,7)
-      IF (NBR.EQ.0) CALL ERRCH2(NT(IS:IS),0,'lattice letter',           &
-     &                          'not recognised')
+      IF (NBR.EQ.0) CALL ERRCH2(NT(IS:IS),0,'lattice letter','not recognised')
       AFACE = (NBR.EQ.1)
       BFACE = (NBR.EQ.2)
       CFACE = (NBR.EQ.3)
@@ -14516,7 +13494,6 @@
       RHOMB = (NBR.EQ.5)
       FACE = (NBR.EQ.6)
       PRIM = (NBR.EQ.7)
-!
       OUTSID = .TRUE.
       DO I = IS + 1, 16
         IF (OUTSID .AND. NT(I:I).EQ.' ') GOTO 1
@@ -14547,12 +13524,10 @@
         JS = JS + 1
         IF (NT(I:I).EQ.'3' .OR. NT(I:I).EQ.'6') MSYS = 5
     1 ENDDO
-!
       DO J = 1, 3
         I = 4*J - 3
         EMPTY(J) = IN(I:I).EQ.'0'
         LETT1(J) = (NCFIND(IN(I:I),SPALET,6).GT.0)
-!      DIGIT1(J) =(NCFIND(IN(I:I),NDIGS(2),6) .GT. 0)
       ENDDO
       IF (EMPTY(1)) CALL ERRMES(1,0,'No space group symbols')
       DO I = 1, 6
@@ -14583,8 +13558,7 @@
 !
       IF (FIRDIG(4)) MSYS = 4
       IF (MID(1:1).EQ.'3') MSYS = 6
-      IF (MSYS.EQ.2 .AND. FIRST(1:1).GE.'2' .AND. MID(1:1).GE.'2')      &
-     &    MSYS = 3
+      IF (MSYS.EQ.2 .AND. FIRST(1:1).GE.'2' .AND. MID(1:1).GE.'2') MSYS = 3
       IF (FIRDIG(1) .AND. EMPTY(2)) MSYS = 1
       TRI = (MSYS.EQ.1)
       MONO = (MSYS.EQ.2)
@@ -14625,8 +13599,7 @@
         KL = 24*NSCRW1/NDIG1
         IF (MINUS) NET(1) = NDIG1 + 6
         IF (NDIG1.EQ.3) NG = 1
-        IF (NDIG1.GE.3 .AND. NDIG1.LE.6 .AND. NSCRW1.GT.0) MTSA(1,3)    &
-     &      = KL
+        IF (NDIG1.GE.3 .AND. NDIG1.LE.6 .AND. NSCRW1.GT.0) MTSA(1,3) = KL
         IF (EMPTY(2)) THEN
           NG = 1
           IF (SLASH) THEN
@@ -14654,8 +13627,7 @@
 !   DETECT 2-FOLD AXIS NOT FOLLOWED BY A LETTER:
 !
 !        IF (IN(L:L).EQ. '2' .AND. IN(M:M) .LT. 'A')THEN
-            IF (IN(L:L).EQ.'2' .AND. (NCFIND(IN(M:M),SPALET,6).EQ.0))   &
-     &          THEN
+            IF (IN(L:L).EQ.'2' .AND. (NCFIND(IN(M:M),SPALET,6).EQ.0)) THEN
               NG = NG + 1
               NET(NG) = 29 - 9*I
               IF (IN(L+1:L+1).EQ.'1') NES(NG) = I + 1
@@ -14679,9 +13651,7 @@
 !       3. TETRAGONAL-HEXAGONAL-CUBIC
 !
           ELSEIF (IN(M:M).GT.'1') THEN
-!
-            IF (I.NE.3 .OR. SLASH .OR.                                  &
-     &          (CUBIC.AND.(LETT1(1).OR.EMPTY(3)))) THEN
+            IF (I.NE.3 .OR. SLASH .OR. (CUBIC.AND.(LETT1(1).OR.EMPTY(3)))) THEN
               NG = NG + 1
               IF (NG.EQ.4) NG = 3
 !  FIRST CYCLE  :
@@ -14709,11 +13679,8 @@
                 IF (IN(M:M).EQ.'2') NET(NG) = 2
               ENDIF
               IF (FIR21) NES(2) = 6
-!          IF (MID2 .AND. LAST2 .AND. I.EQ.1 .AND. FIRST(2:2).GT.'0')
-              IF (MID2 .AND. LAST2 .AND. I.EQ.1 .AND. NSCRW1.GT.0)      &
-     &            MTSA(2,3) = 24 - MTSA(1,3)
+              IF (MID2 .AND. LAST2 .AND. I.EQ.1 .AND. NSCRW1.GT.0) MTSA(2,3) = 24 - MTSA(1,3)
               IF (.NOT.FIRDIG(3)) MTSA(1,3) = 0
-!          IF (NET(2) .EQ. 14 .AND. FIRST(2:2) .GT. '0') THEN
               IF (NET(2).EQ.14 .AND. NSCRW1.GT.0) THEN
                 MTSA(2,1) = 24 - KL
                 MTSA(2,2) = KL
@@ -14752,7 +13719,6 @@
           ENDDO
         ENDDO
       ENDDO
-!
       NSS = -1
       K = 0
   610 K = K + 1
@@ -14801,8 +13767,7 @@
 !  REMOVE LATTICE TRANSLATIONS -  FIRST I THEN F,A,B,C:
 !
           IF (BODY .AND. I.EQ.1) THEN
-            IF (MTS(NSS,1).GE.12 .AND. MTS(NSS,2).GE.12 .AND. MTS(NSS,3)&
-     &          .GE.12) THEN
+            IF (MTS(NSS,1).GE.12 .AND. MTS(NSS,2).GE.12 .AND. MTS(NSS,3).GE.12) THEN
               DO IJ = 1, 3
                 MTS(NSS,IJ) = MTS(NSS,IJ) - 12
               ENDDO
@@ -14830,7 +13795,6 @@
           MTSA(1,K) = MOD((MTS(NSS,K)/2)+24,24)
         ENDDO
       ENDIF
-!
 !   DETERMINE THE REF. NUMBER SHIFT VECTOR TO AN ORIGIN OF I.T..
       IIS = 1
       DO I = 1, 3
@@ -14849,7 +13813,6 @@
 ! GROUPS P (& I)21 21 21 (P N C 2 & A B M 2 ALSO HAVE MS=2):
             IF (LAST(2:2).EQ.'1') MS = 2
           ENDIF
-!
 ! GROUPS P (& A & I)B A 2, PN A 21, PN N 2 (THE NEXT 5 ORTHO WITH MS=8):
 !    (BUT NB THIS DOES TOO MANY WITH MIDA):
           IF ((MIDA.OR.(FIRN.AND.MIDN)) .AND. LAST2) THEN
@@ -14857,16 +13820,12 @@
 ! GROUPS PC A 21 AND P (& A & I) M A 2 (THE ONLY 4 GROUPS WITH MS=1):
             IF (FIRM .OR. FIRC) MS = 1
           ENDIF
-!
 ! GROUPS CM M A & CM C A (THE LAST 2 OF THE 8 ORTHOS WITH MS=8):
           IF (CFACE .AND. FIRM .AND. LASTA) MS = 8
-!
 ! GROUPS A B M 2 & P N C 2 (P&I 21 21 21 HAVE BEEN SET ALREADY):
           IF ((FIRN.OR.FIRB) .AND. (MIDC.OR.MIDM) .AND. LAST2) MS = 2
-!
 ! GROUPS I B C A AND I M M A (IA 3, F41 3 2 & I A 3 D ALSO HAVE MS=7):
           IF (BODY .AND. LASTA) MS = 7
-!
 ! GROUP F D D 2 (THE ONLY GROUP WITH MS=6):
           IF (MIDD .AND. LAST2) MS = 6
         ELSEIF (TETRA) THEN
@@ -14876,8 +13835,7 @@
           IF (.NOT.SLASH) THEN
 ! GROUP 80 : I41 (AND OTHERS WHICH GET RESET LATER)
             IF (BODY .AND. NSCRW1.EQ.1) MS = 9
-            IF ((MID2.AND.LAST2) .AND. (NSCRW1.EQ.1.OR.NSCRW1.EQ.3))    &
-     &          THEN
+            IF ((MID2.AND.LAST2) .AND. (NSCRW1.EQ.1.OR.NSCRW1.EQ.3)) THEN
 ! GROUPS 91,92 : P41 2 2, P43 2 2 (AND OTHERS WHICH GET RESET LATER):
               MS = 3
 ! GROUP 98 : I41 2 2 (96, P43 21 2 NEEDS MS=12 BUT IT IS NOT SET HERE):
@@ -14894,14 +13852,12 @@
                 IF (NSCRW1.EQ.I-1) MS = 8 + I
               ENDDO
             ENDIF
-!
             IF (LASTC) THEN
 ! GROUP 112 : P-4 2 C (AND 114 : P-4 21 C WHICH IS IMMEDIATELY RESET)
               IF (MID2) MS = 3
 ! GROUP 114 : P -4 21 C
               IF (MID21) MS = 11
             ENDIF
-!
 ! GROUP I-4 2 D (THE ONLY GROUP WITH MS=13) (& OTHERS WHICH ARE LATER RESET):
             IF (LASTD) MS = 13
 ! GROUP 116 : P-4 C 2 (AND 120 : I -4 C 2 WHICH IS LATER RESET)
@@ -14922,8 +13878,7 @@
 ! GROUPS P42/N & P42/N N M:
           IF (FIRST(4:4).EQ.'N' .AND. (EMPTY(2).OR.MIDN)) MS = 14
 ! GROUPS P4/M N C & P4/N N C:
-          IF (MIDN .AND. (FIRST(3:3).EQ.'M'.OR.FIRST(3:3).EQ.'N'))      &
-     &        MS = 14
+          IF (MIDN .AND. (FIRST(3:3).EQ.'M'.OR.FIRST(3:3).EQ.'N')) MS = 14
           IF (FIRST(4:4).EQ.'A') THEN
 ! GROUP 141 : I 41/A M D (THE ONLY GROUP WITH MS=17)
             IF (MIDM) MS = 17
@@ -14931,7 +13886,6 @@
             IF (MIDC) MS = 18
           ENDIF
         ELSE
-!
 ! ALL TYPES EXCEPT ORTHO AND TETRA:
 ! GROUPS P31 1 2, P31 2 1, P32 1 2, P32 1 2 (THE ONLY GROUPS GIVING MS=4 OR 5):
           IF (FIRDIG(3) .AND. .NOT.EMPTY(2)) THEN
@@ -14942,38 +13896,6 @@
           IF (FACE .AND. NSCRW1.EQ.1 .OR. BODY .AND. FIRA) MS = 7
         ENDIF
       ENDIF
-!
-!      IF (ONCARD('S','ORIG',A) THEN
-!      CALL RDNUMS( for 3 values off card)
-!      IIS=2
-!      ENDIF
-!** THIS WAS:
-!       SHIFT TO ANOTHER ORIGIN
-!
-!*        WRITE(ITO,2026)
-!*2026    FORMAT (' Type the shift vector:')
-!*        READ (ITI,1014) NV
-!*1014    FORMAT (A12)
-!*        JN=2
-!*        JM=0
-!*        DO 840 I=1,12
-!*        IF (JN.LT.14) IN(JN:JN)=NV(I:I)
-!*        IF (NV(I:I) .EQ. ' ') THEN
-!*          JM=JM+1
-!*          JN=4*JM+1
-!*        ENDIF
-!* 840    JN=JN+1
-!*        JP=0
-!*        DO 845 I=1,9,4
-!*        JP=JP+1
-!*        IO=I+1
-!*        LO=I+3
-!*        IF (IN(LO:LO).NE.'0') NSW(JP)=
-!*     1   (ICHAR(IN(IO:IO))-ICHAR('0'))*24/(ICHAR(IN(LO:LO))-ICHAR('0'))
-!* 845    CONTINUE
-!*      ENDIF
-!
-!
 !       APPLY THE SHIFT OF ORIGIN TO ALL OPERATIONS.
 !
 !* IIS IS ALWAYS 1 OR 2 NOW
@@ -14994,17 +13916,13 @@
           ENDDO
         ENDDO
       ENDIF
-!
 !       NORMALIZATION OF CENTRING TYPE.
-!
       DO I = 1, NG
         DO J = 1, 3
-!
           K = MOD(J,3) + 1
           KI = MOD(K,3) + 1
           IF (BODY .AND. J.EQ.1) THEN
-            IF (MTS(I,1).GE.12 .AND. MTS(I,2).GE.12 .AND. MTS(I,3)      &
-     &          .GE.12) THEN
+            IF (MTS(I,1).GE.12 .AND. MTS(I,2).GE.12 .AND. MTS(I,3).GE.12) THEN
               DO IJ = 1, 3
                 MTS(I,IJ) = MTS(I,IJ) - 12
               ENDDO
@@ -15021,57 +13939,11 @@
 !
 ! OUTPUT:
 !
-! DIAGNOSTIC CCSL OUTPUT :
-      IF (IOUT.EQ.16) THEN
-        WRITE (LPT,4000) SYSTEM(MSYS)
- 4000   FORMAT (/' Crystal family',29X,': ',A12)
-        IF (CENTRE) THEN
-          WRITE (LPT,4001) NT
- 4001     FORMAT (' Space group (centrosymmetric)',14X,':   ',A16)
-        ELSE
-          WRITE (LPT,4002) NT
- 4002     FORMAT (' Space group (noncentrosymmetric)',11X,': ',A16)
-        ENDIF
-        IF (IIS.EQ.1) THEN
-          DO I = 1, 3
-            AMTSA(I) = NTEX(NSW(I)+1)
-            IF (NSW(I).NE.0) AMTSA(I)(1:1) = ' '
-            IF (NSW(I).EQ.0) AMTSA(I) = '   0'
-          ENDDO
-          WRITE (LPT,4003) (AMTSA(I),I=1,3)
- 4003     FORMAT (' Shift vector (leads to the orig. of symb.):',3A4)
-        ENDIF
-!
-        WRITE (LPT,4004) NT, MS, NGENS, NES, NET
- 4004   FORMAT (1X,A16,'MS=',I4,' NGENS=',I2,' NES=',3I4,' NET=',3I4)
-        IR = -1
-        WRITE (LPT,4005)
- 4005   FORMAT (/' Symmetry-operations'/)
-  420   IR = IR + 2
-        IE = IR + 1
-        DO I = IR, IE
-          IU = I
-          IO = MOD(IU,2)
-          IF (IO.EQ.0) IO = 2
-          DO J = 1, 3
-            MO = MSS(I,J,1) + MSS(I,J,2)*3 + MSS(I,J,3)*4 + 5
-            TX(J,IO) = TEXB(MO)
-            AMGES(J,IO) = NTEX(MTS(I,J)+1)
-          ENDDO
-        ENDDO
-        IF (IE.LE.NG) WRITE (LPT,4006) IR, (TX(J,1),AMGES(J,1),J=1,3),  &
-     &                                 IE, (TX(J,2),AMGES(J,2),J=1,3)
-        IF (IE.GT.NG) WRITE (LPT,4006) IR, (TX(J,1),AMGES(J,1),J=1,3)
-        IF (IE.LT.NG) GOTO 420
-      ENDIF
-!
 ! OUTPUT S CARD GENERATORS TO SCRATCH FILE:
       DO I = 1, NGENS
-        WRITE (NSCR,5000) (TEXB(MSS(I,J,1)+MSS(I,J,2)*3+MSS(I,J,3)*4+5),&
-     &                    NTEX(MTS(I,J)+1),J=1,3)
+        WRITE (NSCR,5000) (TEXB(MSS(I,J,1)+MSS(I,J,2)*3+MSS(I,J,3)*4+5), NTEX(MTS(I,J)+1),J=1,3)
  5000   FORMAT ('S ',2(2A4,','),2A4)
       ENDDO
-!
 ! ADJUST NGENS IF FURTHER S CARDS ARE TO BE WRITTEN
 ! CENTROSYMMETRIC OPERATOR:
       IF (CENTRE) THEN
@@ -15079,7 +13951,6 @@
         WRITE (NSCR,5001)
  5001   FORMAT ('S -X, -Y, -Z')
       ENDIF
-!
 ! NON-PRIMITIVE LATTICES:
       IF (NBR.LT.7) NGENS = NGENS + 1
       IF (NBR.EQ.6) NGENS = NGENS + 2
@@ -15095,15 +13966,12 @@
  5006 FORMAT ('S 2/3+X, 2/3+Y, 1/3+Z'/'S 1/3+X, 2/3+Y, 2/3+Z')
       REWIND (NSCR)
       RETURN
- 4006 FORMAT (2X,I2,'.',1X,2(A4,A4,' ,'),A4,A4,4X,I2,'.',1X,            &
-     &        2(A4,A4,' ,'),A4,A4)
+ 4006 FORMAT (2X,I2,'.',1X,2(A4,A4,' ,'),A4,A4,4X,I2,'.',1X, 2(A4,A4,' ,'),A4,A4)
+
       END SUBROUTINE SPACE
-!*==SPGNAM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE SPGNAM(N,NAME)
       SUBROUTINE SPGNAM(N,NAME)
 !
 ! *** SPGNAM by JCM 30 Aug 92 ***
@@ -15170,7 +14038,7 @@
      &     'P-4 3 N', 'F-4 3 C', 'I-4 3 D', 'PM 3 M', 'PN 3 N',         &
      &     'PM 3 N', 'PN 3 M', 'FM 3 M', 'FM 3 C', 'FD 3 M', 'FD 3 C',  &
      &     'IM 3 M', 'IA 3 D'/
-!
+
       IF (N.GT.0) THEN
         NAME = SGSYMB(N)
       ELSE
@@ -15183,17 +14051,11 @@
           NAME = ICARD(I:I+15)
         ENDIF
       ENDIF
-      RETURN
+
       END SUBROUTINE SPGNAM
-!*==SUBSYM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-!
-! LEVEL 1      SUBROUTINE SUBSYM(ITAB)
       SUBROUTINE SUBSYM(ITAB)
 !
 ! *** SUBSYM corrected by PJB 24-Oct-94 ***
@@ -15213,19 +14075,16 @@
 !N The routine SYMBAK may be used to restore the stored symmetry.
 !
       DIMENSION ITAB(24), IGTAB(3), KTAB(24), MTAB(24), NTAB(24)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /OLDSYM/ OSYM(3,3,24), OTRANS(3,24), JNVERS(24), JNORD(24),&
-     &                MOLTAB(24,24), IOGEN(3), NOPONT(24), NOPO, NCENTO,&
-     &                NOPCO
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
-      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
-!
-      CALL MESS(LPT,1,                                                  &
-     &          'Full symmetry replaced by configurational symmetry')
+     &                MOLTAB(24,24), IOGEN(3), NOPONT(24), NOPO, NCENTO, NOPCO
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
+      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3), KOM22
+
+      CALL MESS(LPT,1, 'Full symmetry replaced by configurational symmetry')
 ! STORE NUMBERS
       NOPO = NOP
       NCENTO = NCENT
@@ -15237,9 +14096,7 @@
       CALL JGMEQ(NORD,JNORD,1,NOPC)
       CALL JGMEQ(MULTAB,MOLTAB,24,NOPC)
       CALL JGMEQ(IGEN,IOGEN,1,3)
-!
       CALL JGMEQ(ITAB,NTAB,1,NOPC)
-!
 !  IS THERE A CENTRE OF SYMMETRY
       NCENT = 1
       IF (ITAB(1).EQ.1) NCENT = 2
@@ -15286,7 +14143,6 @@
           ENDDO
     1   ENDDO
     8 ENDDO
-!
 ! RECONSTITUTE SYMMETRY, NOW ONLY FOR SUBGROUP:
       NOPC = IS
       DO I = 2, NOPC
@@ -15312,22 +14168,11 @@
       CALL JGMEQ(IGTAB(2),IGEN,2,1)
       NGEN = 1
       IF (IGEN(2).NE.0) NGEN = 2
-      IF (IOUT.GT.100) THEN
-        WRITE (LPT,4000) ((MULTAB(I,J),I=1,NOPC),J=1,NOPC)
- 4000   FORMAT (' Multiplication table for subgroup:'/8(1X,8I5/))
-        WRITE (LPT,4001) (NORD(I),I=1,NOPC)
- 4001   FORMAT ('   NORD: ',8I4)
-        WRITE (LPT,4002) (INVERS(I),I=1,NOPC)
- 4002   FORMAT (' INVERS: ',8I4)
-      ENDIF
-      RETURN
+
       END SUBROUTINE SUBSYM
-!*==SYMBAK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE SYMBAK
       SUBROUTINE SYMBAK
 !
 ! *** SYMBAK by PJB 1 May 92 ***
@@ -15336,17 +14181,15 @@
 !C 1B
 !H Restores the original symmetry operators after a call to SUBSYM.
 !
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /OLDSYM/ OSYM(3,3,24), OTRANS(3,24), JNVERS(24), JNORD(24),&
-     &                MOLTAB(24,24), IOGEN(3), NOPONT(24), NOPO, NCENTO,&
-     &                NOPCO
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
-      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
-!
+     &                MOLTAB(24,24), IOGEN(3), NOPONT(24), NOPO, NCENTO, NOPCO
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
+      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3), KOM22
+
       CALL MESS(LPT,1,'Restoring full symmetry')
 ! RESTORE NUMBERS
       NOP = NOPO
@@ -15360,14 +14203,11 @@
       CALL JGMEQ(JNORD,NORD,1,NOPC)
       CALL JGMEQ(MOLTAB,MULTAB,24,NOPC)
       CALL JGMEQ(IOGEN,IGEN,1,3)
-      RETURN
+
       END SUBROUTINE SYMBAK
-!*==SYMCEN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE SYMCEN(NC)
       SUBROUTINE SYMCEN(NC)
 !
 ! *** SYMCEN by JCM 11 Jul 83 ***
@@ -15392,14 +14232,15 @@
 !O Writes its findings on unit LPT.
 !
       CHARACTER*5 WORD(2)
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48), ITAB(24)&
      &                , JTAB(48), NNORD(48), D(3,3)
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
       DATA WORD/'Non-c', '    C'/
-!
+
       NCENT = 1
       NC = 0
       CALL GMZER(ORIGIN,1,3)
@@ -15410,7 +14251,6 @@
           ENDDO
         ENDDO
         IF (ABS(TTRANS(1,NO))+ABS(TTRANS(2,NO))+ABS(TTRANS(3,NO)).EQ.0.) GOTO 4
-!
 ! CENTRE OF SYMMETRY FOUND NOT AT ORIGIN:
         CALL GMEQ(TTRANS(1,NO),ORIGIN,1,3)
         CALL GMSCA(ORIGIN,ORIGIN,0.5,1,3)
@@ -15418,7 +14258,6 @@
         WRITE (LPT,2001) ORIGIN
  2001   FORMAT (/' Centre at:',3F10.4,' Fcs complex')
         GOTO 3
-!
 !  CENTRE OF SYMMETRY FOUND AT ORIGIN:
     4   NCENT = 2
         NC = NO
@@ -15429,16 +14268,11 @@
       NOPC = NOP/NCENT
       CENTRC = NCENT.EQ.2
       CALL ERRCHK(1,NOPC,24,0,'symmetry operators')
-      RETURN
+
       END SUBROUTINE SYMCEN
-!*==SYMFRI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-! LEVEL 6      SUBROUTINE SYMFRI
       SUBROUTINE SYMFRI
 !
 ! *** SYMFRI updated  by JCM 14 Jul 86 ***
@@ -15462,16 +14296,15 @@
       LOGICAL ONCARD
       COMMON /FRIED / FRIEDL, KOM8
       LOGICAL FRIEDL
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-!
+
       FRIEDL = .TRUE.
       IF (CENTRC) GOTO 100
-!
 ! IF NON-CENTROSYMMETRIC, LOOK FOR I FRIE CARD:
       IF (ONCARD('I','FRIE',A)) THEN
-!
 ! AND IF I FRIE CARD GIVEN, TAKE INSTRUCTION FROM IT:
         FRIEDL = (A.NE.0.)
         IF (FRIEDL) THEN
@@ -15479,17 +14312,14 @@
           GOTO 100
         ENDIF
       ENDIF
-!
       FRIEDL = .FALSE.
       CALL MESS(LPT,1,'Friedel''s law NOT assumed - hkl distinct from -h-k-l')
   100 RETURN
+
       END SUBROUTINE SYMFRI
-!*==SYMGEN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 8      SUBROUTINE SYMGEN
       SUBROUTINE SYMGEN
 !
 ! *** SYMGEN by PJB/JCM 8 Jul 83 ***
@@ -15524,16 +14354,15 @@
 !D into /SYMDA/ and /SYMTAB/, and sets up a table of pointers to
 !D invers elements, INVERS.
 !
-      LOGICAL FIRST, BINDIG
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      LOGICAL FIRST
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48), ITAB(24)&
      &                , JTAB(48), NNORD(48), D(3,3)
-      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
-!
-!
+      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3), KOM22
+
 ! FIRST LOOK FOR CENTRE OF SYMMETRY:
       CALL SYMCEN(NC)
 !
@@ -15541,14 +14370,12 @@
       DO N = 1, NOP
         NNORD(N) = 1
       ENDDO
-!
 ! DISCOVER ORDERS & FILL IT TABLE, REJECTING CENTROSYMMETRICALLY
 ! RELATED OPERATORS, AND REJECTING HIGHER POWERS OF THOSE OF ORDER
 ! 3, 4 OR 6:
       NGEN = 1
       IGEN(1) = 1
       IF (NOP.EQ.1) GOTO 18
-!
       DO NO = 2, NOP
         IF (NNORD(NO).EQ.0 .OR. NNORD(NO).GT.10) GOTO 1
 ! N WILL GIVE THE NUMBER OF THE LATEST GENERATED OPERATOR:
@@ -15558,13 +14385,11 @@
    16   N = MLTAB(NO,N)
 !  REJECT OPERATORS WHICH GENERATE A CENTRE:
         IF (N.EQ.NC) GOTO 1
-!
 ! IF UNIT OPERATOR (NUMBER 1) HAS BEEN GENERATED, WE NOW HAVE THE
 ! ORDER OF OPERATOR NUMBER "NO":
         IF (N.EQ.1) GOTO 15
         M = M + 1
         GOTO 16
-!
 ! FILL IT ORDERS VECTOR;  CANCEL C-RELATED IF THERE IS ONE:
    15   NNORD(NO) = M
         IF (CENTRC) NNORD(MLTAB(NC,NO)) = 0
@@ -15582,7 +14407,6 @@
           NNORD(N) = NNORD(N) + 100
         ENDDO
     1 ENDDO
-!
 ! PART 3:
 ! NOW FILL IN VECTORS ITAB AND JTAB TO GIVE THE CROSS-REFERENCES BETWEEN
 ! OLD AND NEW NUMBERINGS OF THE OPERATORS:
@@ -15595,11 +14419,9 @@
 ! THE IDENTITY OPERATOR.  IF NOP=2 WE HAVE P-1, AND (BECAUSE OF THE
 ! WAY WE ARE STORING OPERATORS) WANT 0 GENERATORS.
       IF (NOPC.EQ.1) GOTO 101
-!
 ! HERE AT LEAST MONOCLINIC; CLEAR REMAINING ITEMS IN VECTORS:
       IF (NOP.GT.1) CALL JGMZER(JTAB(2),1,NOP-1)
       IF (NOPC.GT.1) CALL JGMZER(ITAB(2),1,NOPC-1)
-!
 ! NOW COUNT DOWN THROUGH ORDERS OF POSSIBLE SYMMETRY ELEMENTS:
       DO NN = 1, 5
         IORD = 7 - NN
@@ -15617,20 +14439,13 @@
           FIRST = .FALSE.
           M = NNN
           GOTO 9
-!
 !  HERE IF NOT FIRST:
     4     DO M = 1, NOP
             IF (MLTAB(ITAB(IGEN(NGEN)),M).EQ.NNN) GOTO 31
           ENDDO
           WRITE (LPT,3000) NNN, NGEN
-          WRITE (ITO,3000) NNN, NGEN
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
           CALL BMBOUT
           RETURN
-!
-!
    31     IF (NNORD(M).EQ.0 .OR. NNORD(M).GT.10) GOTO 3
           IF (JTAB(M).NE.0) GOTO 3
 !  MAKE IT A GENERATOR
@@ -15658,36 +14473,18 @@
             ENDDO
           ENDDO
           IF (NUMOP.GT.NUM) GOTO 7
-!
     3   ENDDO
-!
     2 ENDDO
-!
-! SOME DIAGNOSTIC OUTPUT IN CASE OF TROUBLE:
-      IF (BINDIG(IOUT,16)) THEN
-        WRITE (LPT,4000) (NNORD(I),I=1,NOP)
-        WRITE (ITO,4000) (NNORD(I),I=1,NOP)
-        WRITE (LPT,4001) (JTAB(I),I=1,NOP)
-        WRITE (ITO,4001) (JTAB(I),I=1,NOP)
-        WRITE (LPT,4002) (ITAB(I),I=1,NOPC)
-        WRITE (ITO,4002) (ITAB(I),I=1,NOPC)
-      ENDIF
-!
 ! PART 4 - TIDY UP INFORMATION INTO PERMANENT SPACE:
   101 CALL SYMTID(NC)
       RETURN
  3000 FORMAT (' ERROR ** in SYMGEN - operator',I4,' not found',         &
      &        ' in table MLTAB;  no. of generators so far -',I4)
- 4000 FORMAT (/' NNORD:',(16I5))
- 4001 FORMAT (/' JTAB:',(16I5))
- 4002 FORMAT (/'ITAB:',(16I5))
+
       END SUBROUTINE SYMGEN
-!*==SYMOP.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 9      SUBROUTINE SYMOP
       SUBROUTINE SYMOP
 !
 ! *** SYMOP updated by JCM 30 Aug 92 ***
@@ -15721,26 +14518,22 @@
 !
       LOGICAL ONCARD, SGIVEN
       CHARACTER*16 SNAME
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       LOGICAL SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-      COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48), R(3,3), &
-     &                T(3)
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
-!
+      COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48), R(3,3), T(3)
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
+
 ! INPUT NUMBER OF S CARDS:
       NNSYM = ICDNO(19)
-!
 ! SET "S CARDS READ":
       INREAD(19) = -IABS(INREAD(19))
-!
 ! INITIALISE AS THOUGH P1:
       NLAT = 1
       NOP = 1
@@ -15750,10 +14543,8 @@
 ! ALAT HOLDS (UP TO 4) LATTICE TRANSLATION VECTORS
 ! TTRANS HOLDS (IN THIS FIRST STAGE) THE TRANSLATION VECTORS OF EACH OPERATOR
 ! TSYM HOLDS (IN THIS FIRST STAGE) THE ROTATION MATRICES OF EACH OPERATOR
-!
       IF (NNSYM.EQ.0) CALL MESS(LPT,1,'No cards starting S have been read - assuming space group P1')
       ID = IABS(INREAD(19))
-!
 ! FIRST, IS THERE AN S GRUP CARD
       SGIVEN = (ONCARD('S','GRUP',A))
       IF (SGIVEN) THEN
@@ -15763,7 +14554,6 @@
         NNSYM = NGENS
         ID = -NSPC
       ENDIF
-!
 ! READ AND INTERPRET S CARDS ONE BY ONE:
       DO NCARD = 1, NNSYM
         CALL INPUTS(ID,R,T)
@@ -15772,7 +14562,6 @@
 ! DISCOVER WHETHER R,T IS A NEW OPERATOR:
         CALL EQOP(R,T,NO,NLAT)
         IF (NO.LE.NOP) GOTO 4
-!
 ! IF HERE, NEW OPERATOR:
     5   NOP = NOP + 1
         DO N = 2, NOP
@@ -15799,14 +14588,12 @@
 ! OPERATORS - WE CANNOT ALTER NOP AT THE END OF A DO LOOP:
         IF (NO-NOP) 4, 4, 5
     4 ENDDO
-!
 ! HERE WHEN ALL CARDS READ:
       DO N = 1, NOP
         MLTAB(1,N) = N
         MLTAB(N,1) = N
       ENDDO
       IF (NLAT.LT.2) GOTO 102
-!
 !     FORM COMPLETE TRANSLATION GROUP
       DO N = 2, NOP
         M1 = NLAT
@@ -15827,19 +14614,14 @@
       I = I + 1
       J = I
       IF (I.LE.NLAT) GOTO 1
-!
 !  COMPLETE GROUP FORMED - NOW FIND GENERATORS
   102 IF (IERR.NE.0) CALL ERRMES(1,0,'on S cards')
-!
       CALL SYMGEN
-      RETURN
+
       END SUBROUTINE SYMOP
-!*==SYMREF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE SYMREF(HIN,HOUT,NREFS,PHASE)
       SUBROUTINE SYMREF(HIN,HOUT,NREFS,PHASE)
 !
 ! *** SYMREF corrected by PJB (davinda) 22-Apr-1994 ***
@@ -15862,10 +14644,8 @@
       DIMENSION HIN(3), HOUT(3,48), EH(3), PHASE(48), TR(3)
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
-      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
+      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3), KOM22
 !
       NREFS = 0
       DO J = 1, NCENT
@@ -15882,14 +14662,11 @@
           ENDIF
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE SYMREF
-!*==SYMTID.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE SYMTID(NC)
       SUBROUTINE SYMTID(NC)
 !
 ! *** SYMTID by JCM 11 Jul 83 ***
@@ -15916,7 +14693,6 @@
 !
 !O Writes to unit LPT a brief report of the generators.
 !
-      LOGICAL BINDIG
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
@@ -15926,90 +14702,62 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /SCRAT / TSYM(3,3,48), TTRANS(3,48), MLTAB(48,48), ITAB(24)&
      &                , JTAB(48), NNORD(48), D(3,3)
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
-      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
-     &                KOM22
-!
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
+      COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),  KOM22
+
       CALL MESS(LPT,1,'The group is generated by the')
       IF (NGEN.GT.0) WRITE (LPT,2001) NGEN, (IGEN(I),I=1,NGEN)
  2001 FORMAT ('+',31X,I3,' element(s) numbered:',3I3)
       IF (CENTRC .AND. NOP.GT.2) CALL MESS(LPT,0,'and the')
       IF (CENTRC) CALL MESS(LPT,0,'centre of symmetry.')
-!
 !  STORE DEFINITIVE SYMMETRY OPERATORS  IN NEW SEQUENCE;  ALSO ORDERS OF
 !  ELEMENTS :
       DO N1 = 1, NOPC
         CALL GMEQ(TSYM(1,1,ITAB(N1)),SYM(1,1,N1),3,3)
         CALL GMEQ(TTRANS(1,ITAB(N1)),TRANS(1,N1),1,3)
         NORD(N1) = NNORD(ITAB(N1))
-        IF ((NORD(N1).EQ.0) .AND. (NC.GT.0)) NORD(N1)                   &
-     &      = NNORD(MLTAB(ITAB(N1),NC))
+        IF ((NORD(N1).EQ.0) .AND. (NC.GT.0)) NORD(N1) = NNORD(MLTAB(ITAB(N1),NC))
 !  MAKE THE ORDERS OF INVERTING ELEMENTS NEGATIVE:
         IF (DETER3(SYM(1,1,N1)).LT.0.) NORD(N1) = -NORD(N1)
-!
 ! STORE MULTIPLICATION TABLE AND INVERSES:
         DO N2 = 1, NOPC
           MULTAB(N2,N1) = JTAB(MLTAB(ITAB(N2),ITAB(N1)))
           IF (MULTAB(N2,N1).EQ.1) INVERS(N1) = N2
         ENDDO
       ENDDO
-!
-! DIAGNOSTIC OUTPUT IN CASE OF TROUBLE:
-      IF (BINDIG(IOUT,16)) THEN
-        DO N1 = 1, NOPC
-          WRITE (LPT,4000) (MULTAB(N2,N1),N2=1,NOPC)
-          WRITE (ITO,4000) (MULTAB(N2,N1),N2=1,NOPC)
-        ENDDO
-        WRITE (LPT,4001) (INVERS(I),I=1,NOPC)
-        WRITE (ITO,4001) (INVERS(I),I=1,NOPC)
-        WRITE (LPT,4002) (NORD(I),I=1,NOPC)
-        WRITE (ITO,4002) (NORD(I),I=1,NOPC)
-      ENDIF
-!
-!
 ! SET UP CONSTRAINTS ON CELL PARAMETERS:
 ! CLEAR CHAIN INFORMATION FOR ALL CELL PARAMETERS
       IF (INREAD(3).LT.0) GOTO 101
       DO I = 1, 6
         IPTCEL(I) = 9999
       ENDDO
-!
 ! CYCLE OVER ALL SYMMETRY LOOKING FOR RELATIONS
       IF (NOPC.EQ.1) GOTO 7
       DO NO = 1, NGEN
         CALL RELSM6(SYM(1,1,IGEN(NO)),IPTCEL,AMCELL)
       ENDDO
-!
 ! PUT SUITABLE NUMBERS IN CPARS TO KEEP SCLPRD AND VCTMOD HAPPY EVEN IF RECIP
 ! NOT OBEYED BEFORE SYMUNI:
     7 DO I = 1, 2
         DO J = 1, 3
-          CPARS(J,I) = 1.
-          CPARS(J+3,I) = 0.
-          IF (IPTCEL(J+3).NE.0 .AND. IPTCEL(J+3).LT.4) CPARS(J+3,I)     &
-     &        = 0.5*FLOAT(2*I-3)
+          CPARS(J,I) = 1.0
+          CPARS(J+3,I) = 0.0
+          IF (IPTCEL(J+3).NE.0 .AND. IPTCEL(J+3).LT.4) CPARS(J+3,I) = 0.5*FLOAT(2*I-3)
         ENDDO
       ENDDO
-!
 ! READ I FRIE CARD IF RELEVANT, SETTING LOGICAL FRIEDL FOR "FRIEDEL TO HOLD":
   101 CALL SYMFRI
-      RETURN
- 4000 FORMAT (/' MULTAB:',(16I5))
- 4001 FORMAT (/' INVERS:',(16I5))
- 4002 FORMAT (/' NORD:',(16I5))
+
       END SUBROUTINE SYMTID
-!*==SYMUNI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 7      SUBROUTINE SYMUNI
       SUBROUTINE SYMUNI
 !
 ! *** SYMUNI updated by PJB 14 Jun 88 ***
@@ -16108,7 +14856,8 @@
       COMMON /FRIED / FRIEDL, KOM8
       LOGICAL FRIEDL
       COMMON /FUNIT / NASYM, ASYM(3,3), EDGE(3,3), ANG(3), NMUL, KOM10
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
@@ -16119,20 +14868,17 @@
       COMMON /SYMTAB/ MULTAB(24,24), INVERS(24), NORD(24), IGEN(3),     &
      &                KOM22
       DATA XAX, ZAX/1.0, 0., 0., 0., 0., 1./
-!
+
 ! READ IN POSSIBLE U CARD GIVING 3 TYPICAL INDICES REQUIRED BY USER TO
 ! BE WITHIN THE FINISHED ASYMMETRIC UNIT.  IF NO U CARD USE 13,11,10:
       CALL INPUTU(HT)
-!
 ! CLEAR SPACE FOR FIXUNI TO BUILD UP NOPL PLANES IN ASY WITH STATUS NSTAT:
       NOPL = 0
       CALL GMZER(ASY(1,1),3,4)
       CALL JGMZER(NSTAT,1,4)
-!
 ! NMUL=FRACTION OF UNIT INVOLVED AND MUST TAKE ACCOUNT OF FRIEDEL:
       NMUL = NOP
       IF (FRIEDL) NMUL = NOPC*2
-!
 ! JUMP IF POINT GROUP 1, NO PLANES AT ALL REQUIRED:
       IF (NMUL.EQ.1) GOTO 102
 ! JUMP IF NOT POINT GROUP -1:
@@ -16167,7 +14913,6 @@
         CALL GMEQ(SYM(1,1,INVERS(N)),D,3,3)
         CALL TRANSQ(D,3)
         CALL AXIS(D,AXI(1,N,2))
-!
 ! PICK OUT USEFUL AXES:
         LASTAX = N
         IF (NORD(N).EQ.2) NPP2 = N
@@ -16176,22 +14921,18 @@
         IF (I.EQ.2 .AND. NP2.EQ.0) NP2 = N
         IF (I.EQ.3 .AND. NP3.EQ.0) NP3 = N
         IF (I.EQ.4 .AND. NP4.EQ.0) NP4 = N
-!
 ! MARK MIRRORS:
         IF (NORD(N).EQ.-6 .OR. NORD(N).EQ.-2) GOTO 4
         IF (.NOT.FRIEDL) GOTO 3
         IF (NORD(N).EQ.3) GOTO 3
     4   MIRROR(N) = 1
     3 ENDDO
-!
 ! IF PRINCIPAL AXIS IS A "2" MOVE NP2 PAST IT:
       IF (NP2.EQ.2) NP2 = 3
-!
 ! JUMP IF NOT CUBIC:
       IF (N3.NE.4) GOTO 5
 ! JUMP IF NO "4" AXIS:
       IF (NP4.EQ.0) GOTO 6
-!
 ! PICK PLANE THROUGH 4 AND ANY 3:
       CALL VECPRD(AXI(1,NP4,2),AXI(1,NP3,2),PL1)
 ! AND INSIST ON KEEPING IT:
@@ -16215,10 +14956,8 @@
     8   CALL FIXUNI(PL1,-2)
         CALL FIXUNI(PL2,-3)
     7 ENDDO
-!
 !  SHOULD NOT GET HERE:
       GOTO 11
-!
 ! CUBIC WITH NO 4 AXIS - IS IT 23 OR 3M?:
     6 IF (NMUL.NE.12) GOTO 20
 ! 23 - UNIT MUST HAVE THREE 3 AXES AS EDGES, ANY ANY 3 SHOULD DO:
@@ -16233,7 +14972,6 @@
       IF (NORD(K).NE.3) GOTO 22
       CALL PLN3AD(I,J,K)
       IF (NICE) 11, 102, 11
-!
 ! M3 - WANT ONE 3 AXIS AND TWO 2S:
    20 DO J = NP2, LASTAX
 ! PICK OUT PAIRS OF 2 AXES TO PUT WITH 3:
@@ -16244,37 +14982,27 @@
           IF (NORD(K).NE.2) GOTO 39
           CALL PLN3AD(NP3,J,K)
           IF (NICE) 10, 102, 10
-!
 ! IF DO NOT MAKE GOOD CELL, TAKE ALL 3 OUT AGAIN:
    10     CALL FIXUNI(PL1,-1)
           CALL FIXUNI(PL2,-2)
           CALL FIXUNI(PL3,-3)
    39   ENDDO
     9 ENDDO
-!
 ! SHOULD HAVE MADE GOOD UNIT BY NOW:
    11 WRITE (LPT,3000) NP2, NP3, NP4
-      WRITE (ITO,3000) NP2, NP3, NP4
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
       CALL BMBOUT
       RETURN
-!
-!
 ! NEITHER TRICLINIC NOR CUBIC - TRY ALL MIRRORS:
     5 DO N = 2, LASTAX
         IF (MIRROR(N).EQ.0) GOTO 12
         CALL FIXUNI(AXI(1,N,1),1)
         IF (NICE) 12, 102, 12
    12 ENDDO
-!
 ! MIRRORS INADEQUATE - PICK OUT THOSE WITH ONLY 1 SYMMETRY ELEMENT (OTHER THAN
 ! THE UNIT, A CENTRE, OR THOSE GENERATED FROM THE ONE):
       IF (LASTAX.NE.2) GOTO 13
 ! THIS ASSUMES THAT SUCH AN AXIS IS ELEMENT 2 - SO LONG AS WE HAVE COME IN VIA
 ! SYMOP, SYMGEN IT WILL BE:
-!
 ! TAKE PLANE THROUGH AXIS AND X AXIS (OR Z AXIS):
    18 CALL VECPRD(AXI(1,2,2),XAX,PL1)
       IF (VCTMOD(1.0,PL1,1).LT.0.0001) CALL VECPRD(AXI(1,2,2),ZAX,PL1)
@@ -16287,10 +15015,8 @@
         CALL FIXUNI(PL2,1)
         IF (NICE) 14, 102, 14
    14 ENDDO
-!
 ! SHOULD BE ENOUGH:
       CALL ERRMES(-1,0,'in SYMUNI - single axis not enough')
-!
 ! HAVE PRINCIPAL AXES PLUS OTHERS - ARE THERE ANY 2'S?
    13 IF (NPP2.EQ.0) GOTO 16
 ! MAKE PLANES THROUGH PRINCIPAL AND A 2 AND OFFER IN TURN:
@@ -16300,35 +15026,25 @@
         CALL FIXUNI(PL1,1)
         IF (NICE) 17, 102, 17
    17 ENDDO
-!
 ! THIS CONTINUAL OFFERING DOES NOT REMOVE THE PLANES IT DOES NOT LIKE, AND
 ! MAY CAUSE TROUBLE.
-!
 ! SHOULD HAVE BEEN ENOUGH - IF NOT ONLY CASE  SHOULD BE CENTRE NOT AT ORIGIN:
       IF (.NOT.CENTRC) GOTO 18
-      CALL ERRMES(-1,0,                                                 &
-     &            'in SYMUNI - principal axis plus 2 axes not enough')
-!
+      CALL ERRMES(-1,0,'in SYMUNI - principal axis plus 2 axes not enough')
 ! WE SHOULD BE AT -3M HERE, WITH 2 MIRRORS, BUT UNIT TOO BIG.  HALVE IT:
    16 CALL FIXUNI(AXI(1,2,1),1)
       IF (NICE.NE.0) CALL ERRMES(-1,0,'reached end of SYMUNI')
-!
 ! SUCCESSFUL UNIT - TIDY IT AND TRANSFORM TO HOLD TYPICAL REFLECTION:
   102 CALL UNITID
-!
 ! FINAL UNIT - MARK EDGES FOR MULTIPLICITY:
       CALL POLUNI
-!
       RETURN
- 3000 FORMAT (/' *** PROGRAM ERROR in SYMUNI - all cubic axes scanned', &
-     &        ' - NP2, NP3, NP4=',3I3)
+ 3000 FORMAT (/' *** PROGRAM ERROR in SYMUNI - all cubic axes scanned',' - NP2, NP3, NP4=',3I3)
+
       END SUBROUTINE SYMUNI
-!*==TBLFND.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE TBLFND(NAME,IANS,IFAM,IGEN,ISPC,KP,KS)
       SUBROUTINE TBLFND(NAME,IANS,IFAM,IGEN,ISPC,KP,KS)
 !
 ! *** TBLFND updated by JCM 8 May 90 ***
@@ -16363,8 +15079,7 @@
       DIMENSION ITBSPC(2)
       COMMON /ATNAM / ATNAME(150), ATNA(150,9)
       CHARACTER*4 ATNA, ATNAME
-      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10),         &
-     &                ISMBOL(21)
+      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10), ISMBOL(21)
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
       COMMON /FONAM / FONA(20,9), FONAME(20)
       CHARACTER*4 FONAME, FONA
@@ -16391,14 +15106,13 @@
       CHARACTER*4 LSQWD
       DATA ITB/'ALL', 'ONLY'/
       DATA ITBSPC/ - 100, -99/
-!
+
 ! CLEAR ANSWERS:
       IFAM = 0
       IGEN = 0
       ISPC = 0
       KP = 0
       KS = 0
-!
 ! FIRST TRY TO FIND IN MAIN WORD TABLE WHICH WAS SET UP IN THE MAIN PROGRAM TO
 ! SPECIFY THE PROBLEM:
       L = NCFIND(NAME,LSQWD,IWDNUM)
@@ -16409,14 +15123,12 @@
         IF (IANS.GT.0) CALL KUNPAK(IANS,IFAM,IGEN,ISPC,KP,KS)
         GOTO 100
       ENDIF
-!
 ! NEXT TRY TBLFND'S OWN TABLE OF USEFUL WORDS APPLICABLE TO MOST LSQ:
       L = NCFIND(NAME,ITB,2)
       IF (L.GT.0) THEN
         IANS = ITBSPC(L)
         GOTO 100
       ENDIF
-!
 ! TRY DIGITS (SPECIES NAMES INVOLVED IN FAMILY 1, OR 3 ETC. ):
       N = 0
       DO J = 1, 4
@@ -16434,7 +15146,6 @@
     9 ISPC = N
 ! GO TO PACK INTO IANS
       GOTO 102
-!
 ! OTHER WORDS REFER TO FAMILY 2 OR MORE - CHECK THERE MAY BE SOME:
     5 IF (NFAM.LT.2) GOTO 101
       IF (MULFAS) THEN
@@ -16447,7 +15158,6 @@
         IFAM = 2
         GOTO 102
       ENDIF
-!
 ! MAY BE SCATTERING FACTOR NAME:
       IF (MULFAS) THEN
         ISC = NCFIND(NAME,FONA(1,KPHASE),NMFNM(KPHASE))
@@ -16462,17 +15172,14 @@
   102 IANS = KPAK(IFAM,IGEN,ISPC,KPHASE,0)
       KP = KPHASE
       GOTO 100
-!
 ! WORD CANNOT BE FOUND:
   101 IANS = 0
   100 RETURN
+
       END SUBROUTINE TBLFND
-!*==TESTOV.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      LOGICAL FUNCTION TESTOV(A,B)
       LOGICAL FUNCTION TESTOV(A,B)
 !
 ! *** TESTOV by JCM 22 Nov 83 ***
@@ -16487,14 +15194,9 @@
       TESTOV = ((A+B).EQ.A)
 
       END FUNCTION TESTOV
-!*==TRYUNI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-! LEVEL 4      SUBROUTINE TRYUNI(NCHK)
       SUBROUTINE TRYUNI(NCHK)
 !
 ! *** TRYUNI by JCM 25 Sep 84 ***
@@ -16555,29 +15257,26 @@
       COMMON /FRIED / FRIEDL, KOM8
       LOGICAL FRIEDL
       COMMON /FUNIT / NASYM, ASYM(3,3), EDGE(3,3), ANG(3), NMUL, KOM10
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
-!
+
       NASYM = NOPL
-      IF (NASYM.LE.0 .OR. NASYM.GE.4)                                   &
-     &     CALL ERRIN2(NASYM,0,'in PROGRAM using TRYUNI with NOPL=',' ')
-!
+      IF (NASYM.LE.0 .OR. NASYM.GE.4) CALL ERRIN2(NASYM,0,'in PROGRAM using TRYUNI with NOPL=',' ')
       I = 1
       DO J = 1, NASYM
     3   IF (NSTAT(I).NE.0) GOTO 4
         I = I + 1
         IF (I.LT.5) GOTO 3
         CALL ERRMES(-1,0,'TRYUNI not given enough planes')
-!
     4   CALL GMEQ(ASY(1,I),ASYM(1,J),1,3)
         NNSTAT(I) = NSTAT(J)
         I = I + 1
       ENDDO
-!
 ! SET UP PI/3 FOR DETECTION OF ANGLE, NICE INITIALISED TO 'TOO BIG', AND
 ! CLEAR INDICATOR THAT WE HAVE PI/3 OR 2PI/3 ANGLE:
       PIBY3 = PI/3.
@@ -16585,11 +15284,9 @@
       N3AX = 0
 ! BRANCH ON 1, 2 OR 3 PLANES:
    25 GOTO (7,8,9), NASYM
-!
 ! SINGLE PLANE - HALF SPACE:
     7 AMUL = 0.5
       GOTO 10
-!
 ! TWO PLANES - MAY FIRST NEED TO REVERSE ONE FOR SMALLER ANGLE:
     8 ANG(3) = ANGRAD(ASYM(1,1),ASYM(1,2),1)
       IF (ABS(ANG(3)-PIBY3).LT.0.0001) N3AX = 3
@@ -16609,7 +15306,6 @@
 ! TAKE OUT ANY COMMON FACTOR:
       CALL FCTOR(EDGE(1,3),N)
       GOTO 10
-!
 ! THREE PLANES - MAKE ANGLES SMALLER AS ABOVE, MAKE EDGES AND ANGLES:
     9 SUM = -PI
       NFLIP = 0
@@ -16631,24 +15327,20 @@
         ANG(J) = PI - ANG(J)
         NFLIP = NFLIP + 1
    13   SUM = SUM + ANG(J)
-!
 ! MAKE EDGE, POINTING SAME WAY AS OPPOSITE PLANE:
         CALL VECPRD(ASYM(1,J2),ASYM(1,J3),EDGE(1,J))
-        IF (SCALPR(EDGE(1,J),ASYM(1,J)).LT.0.)                          &
-     &      CALL GMREV(EDGE(1,J),EDGE(1,J),1,3)
+        IF (SCALPR(EDGE(1,J),ASYM(1,J)).LT.0.0) CALL GMREV(EDGE(1,J),EDGE(1,J),1,3)
         CALL FCTOR(EDGE(1,J),N)
         J2 = J3
         J3 = J
       ENDDO
       AMUL = SUM/FOURPI
-!
 ! DETECT HINGE - 3 PLANES, BUT WITH A COMMON EDGE:
       CALL EQVEC(EDGE(1,1),EDGE(1,3),2,M,0)
       IF (M.GE.3) GOTO 10
 ! MARK HINGE TO BE DEALT WITH OUTSIDE:
       VOL = 0.
       GOTO 100
-!
 ! JOIN - WE HAVE A UNIT WITH 1, 2 OR 3 PLANES (NOT HINGE), AND WHERE RELEVANT
 ! EDGES AND ANGLES HAVE BEEN STORED;  MUL=FRACTION OCCUPIED:
    10 VOL = AMUL*FLOAT(NMUL)
@@ -16660,7 +15352,6 @@
       IF (NICE.EQ.-1 .AND. N3AX.NE.0) GOTO 25
 ! THIS MAY LOOP, BUT THE SECOND TIME WE LOOK AT SUCH A UNIT IT SHOULD BE OK.
       IF (NCHK.EQ.0 .AND. NICE.NE.0) GOTO 100
-!
 ! IF VOLUME OK, OR IF ASKED TO CHECK ANYWAY, COUNT RELATIVES OF TYPICAL REFLN:
       MOP1 = 0
       IC = 1
@@ -16676,15 +15367,9 @@
 ! TEST RELATIVE FOR BEING IN GIVEN BOX - "ON" AS AN ANSWER IS AN ERROR:
           IF (IN.GT.0) THEN
             WRITE (LPT,3002) HT
-            WRITE (ITO,3002) HT
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
             CALL BMBOUT
             RETURN
-!
           ENDIF
-!
           IF (IN.GE.0) THEN
 ! MOP1=NUMBER OF RELATIVES INSIDE BOX:
 ! MOP2 WILL HOLD "WHICH OPERATOR PUTS HT INTO BOX", -VELY IF BY A CENTRE ALSO:
@@ -16693,18 +15378,15 @@
           ENDIF
         ENDDO
       ENDDO
-!
 ! MOP1=0 MEANS WRONG BOX:
       IF (MOP1.EQ.0) NICE = -1
   100 RETURN
  3002 FORMAT (/' *** ERROR - typical reflection',3F5.0,' not general')
+
       END SUBROUTINE TRYUNI
-!*==UNITID.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE UNITID
       SUBROUTINE UNITID
 !
 ! *** UNITID by JCM 26 Sep 84 ***
@@ -16730,18 +15412,18 @@
 !O to unit LPT.
 !
       COMMON /FUNIT / NASYM, ASYM(3,3), EDGE(3,3), ANG(3), NMUL, KOM10
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /SCRAT / AXI(3,24,2), MIRROR(24), D(3,3), PL1(3), PL2(3),  &
      &                PL3(3), HT(3), ASY(3,4), NSTAT(4), NOPL, NICE,    &
      &                VOL, MOP1, MOP2
-!
+
       MO = IABS(MOP2)
       IF (NASYM.LE.0) THEN
 ! SPECIAL FOR P1, NO FRIEDEL:
         CALL MESS(LPT,1,'No symmetrical equivalents')
         GOTO 100
       ENDIF
-!
       WRITE (LPT,2001) NASYM
  2001 FORMAT (/' Asymmetric unit has',I3,' plane(s):')
       DO I = 1, NASYM
@@ -16749,9 +15431,7 @@
         IF (MOP2.LT.0) CALL GMREV(PL1,PL1,1,3)
         CALL GMEQ(PL1,ASYM(1,I),1,3)
         CALL PRIPLN(ASYM(1,I),1)
-!
       ENDDO
-!
 ! REMAKE EDGES:
       IF (NASYM.LT.2) GOTO 100
       J2 = 2
@@ -16765,13 +15445,11 @@
         J3 = J
       ENDDO
   100 RETURN
+
       END SUBROUTINE UNITID
-!*==UPONE.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE UPONE(CH,ISYS)
       SUBROUTINE UPONE(CH,ISYS)
 !
 !C 13C
@@ -16784,8 +15462,7 @@
 !
 ! TO LOWER CASE FOR UNIX UPPER FOR VMS
       CHARACTER*(*) CH
-      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10),         &
-     &                ISMBOL(21)
+      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10), ISMBOL(21)
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
 !
       N = LENGT(CH)
@@ -16802,11 +15479,11 @@
           GOTO 1
     2   ENDDO
     1 ENDDO
-      RETURN
+
       END SUBROUTINE UPONE
-!*==UPPER.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
-! LEVEL 1      SUBROUTINE UPPER(C)
+!*****************************************************************************
+!
       SUBROUTINE UPPER(C)
 !
 ! *** UPPER by JCM 3 Aug 92 ***
@@ -16816,35 +15493,30 @@
 !H Replaces any lower case letters in C by upper case
 !
       CHARACTER*(*) C
-      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10),         &
-     &                ISMBOL(21)
+      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10), ISMBOL(21)
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
-!
+
       L = LENGT(C)
       DO I = 1, L
         M = LETTER(C(I:I))
         IF (M.GT.0) C(I:I) = LETUP(M)
       ENDDO
-      RETURN
+
       END SUBROUTINE UPPER
-!*==VARFMT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
-!
-!
+!*****************************************************************************
 !
       BLOCKDATA VARFMT
       COMMON /VARFOR/ RLINE1, RLINE2
       CHARACTER*24 RLINE2
       CHARACTER*16 RLINE1
-!
+
       DATA RLINE1, RLINE2/'(5X,3F5.0,I5,I5)', '(15X,2F10.5,10X,2F10.5)'/
+
       END BLOCKDATA VARFMT
-!*==VARMAK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 8       SUBROUTINE VARMAK(DEFALT,GETPAR,VARSXX)
       SUBROUTINE VARMAK(DEFALT,GETPAR,VARSXX)
 !
 ! *** VARMAK updated by JCM 14 Nov 90 ***
@@ -16901,7 +15573,8 @@
      &                NEXTJ
       COMMON /DERBAS/ DERIVB(400), LVARB
       COMMON /DERVAR/ DERIVV(500), LVARV
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
      &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
@@ -16924,16 +15597,14 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
 ! START COUNTS OF VARIABLES AND BASIC VARIABLES:
       LVARV = 0
       LVARB = 0
 ! NOT IF ONLY SIMULATION:
       IF (SIMUL) GOTO 100
-!
 ! COUNT FIXED PARAMETERS:
       LFIX = 0
-!
       DO I = 1, NPHASE
         DO J = 1, NFAM
           DO K = 1, NSOURC
@@ -16946,11 +15617,9 @@
           ENDDO
         ENDDO
       ENDDO
-!
 ! FIRST SCAN FIX & VARY LISTS AND FIX WHERE POSSIBLE:
 ! START A SCAN OF PARAMETERS:
       IFAM = 0
-!
 ! NEXT PARAMETER:
     2 CALL GETPAR(IFAM,IGEN,ISPC)
       IF (IFAM.EQ.-1) GOTO 3
@@ -16969,7 +15638,6 @@
         ENDIF
         FOUND = .TRUE.
     1 ENDDO
-!
 ! NO MENTION SO FAR IF FOUND STILL FALSE:
       IF (.NOT.FOUND) THEN
 ! FIRST SEE IF 'ONLY' OCCURRED ON 'FIX' CARD:
@@ -16983,7 +15651,6 @@
           FX = .NOT.(DEFALT(IFAM,IGEN,ISPC))
         ENDIF
       ENDIF
-!
 ! RECORD KK FOR "CERTAINLY FIXED" (OF WHICH THE OPPOSITE IS "PROBABLY VARIED")
       IF (FX) THEN
         CALL ERRCHK(2,LFIX,2000,0,'LSQ parameters in VARMAK')
@@ -16991,13 +15658,11 @@
       ENDIF
 ! NEXT PARAMETER
       GOTO 2
-!
 ! SECOND LIST ALL PARAMETERS OCCURRING IN CONSTRAINTS:
     3 NPAR = 0
       DO I = 1, NUMCON
 ! NOT IF CONSTRAINT DELETED:
         IF (KSTCON(I).EQ.0) GOTO 41
-!
 ! SCAN EVERY PARAMETER SPEC IN THIS CONSTRAINT:
         DO K = KPTCON(I), KPTCON(I+1) - 1
 ! NOT IF FIXED:
@@ -17026,8 +15691,6 @@
 !  45  KKCOL(L)=KKCON(K)
    42   ENDDO
    41 ENDDO
-!
-!
 ! FILL IN MATRIX OF COEFFICIENTS IN CONSTRAINTS:
 ! IN MATRIX A, FIRST SUBSCRIPT = PARAMETER, SECOND=CONSTRAINT
       CALL GMZER(A,500,200)
@@ -17042,11 +15705,9 @@
    53     A(NFIND(KKCON(K),KKCOL,NPAR),NCON) = AMCON(K)
    52   ENDDO
    51 ENDDO
-!
 ! THIS MATRIX MAY CONTAIN REDUNDANT OR INCONSISTENT CONSTRAINTS, OR
 ! SIMPLY CONSTRAINTS NOT IN THE BEST FORM FOR DESIGNATING REDUNDANT
 ! VARIABLES.  PERFORM GAUSSIAN ELIMINATION ON IT:
-!
       SMALL = 0.000001
       DO NP = 1, NCON
         DO J = NP, NPAR
@@ -17054,10 +15715,8 @@
             IF (ABS(A(J,I)).GT.SMALL) GOTO 63
           ENDDO
         ENDDO
-!
 ! NO MORE NON-ZERO COEFFICIENTS LEFT - OUT
         GOTO 64
-!
 ! PIVOT FOUND:
 ! SWOP COLUMNS J AND NP (EVEN IF THEY ARE THE SAME), AND SCALE:
    63   KTEMP = KKCOL(J)
@@ -17069,14 +15728,12 @@
           A(J,K) = A(NP,K)
           A(NP,K) = TEMP
         ENDDO
-!
 ! NOW SWOP ROWS I AND NP:
         DO K = 1, NPAR
           TEMP = A(K,I)
           A(K,I) = A(K,NP)
           A(K,NP) = TEMP/PIVOT
         ENDDO
-!
 ! NOW SCAN ALL CONSTRAINTS, OMITTING THE SECTION BETWEEN NP AND I
 ! WHICH WE ALREADY KNOW TO HAVE ZEROS, AND ELIMINATE:
         DO L = 1, NCON
@@ -17086,21 +15743,13 @@
             A(M,L) = A(M,L) - A(NP,L)*A(M,NP)
           ENDDO
    71   ENDDO
-!
       ENDDO
-!
    64 NCON = NP - 1
       IF (NPAR.LT.NCON) THEN
         WRITE (LPT,3010) NPAR, NCON
-        WRITE (ITO,3010) NPAR, NCON
-!>>JCC HAndle through extra function
-! Was      STOP
-! Now
         CALL BMBOUT
         RETURN
-!
       ENDIF
-!
 ! THIRD MARK THE FIRST NCON PARAMETERS FROM THE ELIMINATED
 ! MATRIX AS "NOT BASIC" (MAY BE FIXED OR REDUNDANT)
       DO I = 1, NCON
@@ -17109,21 +15758,16 @@
 ! A NON-ZERO IN THIS PANEL MEANS A CONSTRAINT, NOT A FIXING:
           IF (ABS(A(J,I)).GT.SMALL) GOTO 60
         ENDDO
-!
 ! HERE WE HAVE DISCOVERED THAT THE PARAMETER IS ACTUALLY FIXED:
         CALL ERRCHK(2,LFIX,2000,0,'LSQ parameters in VARMAK')
         KPRVR(LFIX) = KKCOL(I)
         KREDUN(I) = 0
         GOTO 68
-!
 ! HERE WE HAVE DISCOVERED THAT THE PARAMETER IS REDUNDANT:
    60   KREDUN(I) = KKCOL(I)
    68 ENDDO
-!
 ! FOURTH SCAN PARAMETERS AGAIN, DESIGNATING BASICS AND REDUNDANTS:
-!
       IFAM = 0
-!
 ! NEXT PARAMETER:
    21 CALL GETPAR(IFAM,IGEN,ISPC)
 ! GETPAR RETURNS IFAM -1 IF ALL FINISHED:
@@ -17155,7 +15799,6 @@
           GOTO 21
         ENDIF
       ENDIF
-!
 ! MAKE IT BASIC:
       CALL ERRCHK(2,LVARB,400,0,'basic variables in LSQ')
 ! RECORD CROSS POINTERS FOR VARIABLES AND BASIC VARIABLES:
@@ -17165,18 +15808,15 @@
       IF (LBFST1(IFAM,JPHASE,JSOURC).EQ.-1) THEN
         LBFST1(IFAM,JPHASE,JSOURC) = LVARB - 1
       ENDIF
-!
 ! ALL THE PARAMETERS INVOLVED IN THE RIGHT HAND SIDES OF CONSTRAINTS ARE
 ! BASIC - SEE IF THIS ONE IS THERE, AND RECORD WHICH VARIABLE IT IS IF SO:
       IF (NPAR.GT.0) THEN
         N = NFIND(KK,KKCOL,NPAR)
         IF (N.GT.0) KBVCOL(N) = LVARB
       ENDIF
-!
 ! RECORD BASIC VARIABLES/FAMILY/PHASE:
       NBARF(IFAM,JPHASE,1) = NBARF(IFAM,JPHASE,1) + 1
       GOTO 21
-!
 ! A BIT OF OVERKILL UNTIL I DECIDE ON A PERMANENT STRUCTURE:
    22 IV = LVARV
       IB = LVARB
@@ -17196,7 +15836,6 @@
           ENDDO
         ENDDO
       ENDDO
-!
 ! FINALLY ABSORB ALL CONSTRAINTS FOR USE THIS CYCLE:
       JCONST = 0
       NEXTJ = 1
@@ -17210,7 +15849,6 @@
         LRDVR(JCONST) = LV
         DO J = NCON + 1, NPAR
           IF (ABS(A(J,I)).LT.SMALL) GOTO 31
-!
 ! PUT CONSTRAINT INTO TABLE TO USE THIS CYCLE:
           JCMAT(NEXTJ) = KBVCOL(J)
           AMOUNT(NEXTJ) = -A(J,I)
@@ -17218,30 +15856,21 @@
           JROWPT(JCONST+1) = NEXTJ
    31   ENDDO
    30 ENDDO
-!
 ! FETTLE STARTS OF FAMILIES FOR THOSE WITH NO MEMBERS:
 !**???
 !
 ! PRINT OUT WHAT WE HAVE DONE:
       CALL PRIVAR
-!
 ! CALL APPLICATION-DEPENDENT ROUTINE TO FILL IN "WHICH VARIABLE IS THIS
 ! PARAMETER?" FOR ALL PARAMETERS:
       CALL VARSXX
-!
   100 RETURN
  3010 FORMAT (' ERROR ** ',I4,' parameters in ',I4,' constraints')
+
       END SUBROUTINE VARMAK
-!*==VCTMOD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-!
-!
-! LEVEL 1      FUNCTION VCTMOD(SCALE,H,IR)
       FUNCTION VCTMOD(SCALE,H,IR)
 !
 ! *** VCTMOD by JCM 26 Apr 84 ***
@@ -17261,7 +15890,7 @@
       DIMENSION H(3)
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-!
+
       VEC = 0.
       J = 2
       K = 3
@@ -17272,14 +15901,11 @@
       ENDDO
       VEC = SCALE*DSQRT(VEC)
       VCTMOD = SNGL(VEC)
-      RETURN
+
       END FUNCTION VCTMOD
-!*==VOCAB.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE VOCAB(WORD,MEAN,NW)
       SUBROUTINE VOCAB(WORD,MEAN,NW)
 !
 ! *** VOCAB by JCM 4 Aug 90 ***
@@ -17323,14 +15949,11 @@
         ENDIF
       ENDDO
       IWDNUM = IWDNUM + NW
-      RETURN
+
       END SUBROUTINE VOCAB
-!*==VOIGT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE VOIGT(X,SIGMA,GAMMA,YVAL,DERX,DERS,DERG)
       SUBROUTINE VOIGT(X,SIGMA,GAMMA,YVAL,DERX,DERS,DERG)
 !
 ! *** VOIGT by WIFD Jun 84 ***
@@ -17368,15 +15991,11 @@
       DERX = CTEM*DWRDX
       DERS = -ATEM*(SWR+DWRDX*XTEM+DWRDY*YTEM)/SIGMA
       DERG = 0.5*CTEM*DWRDY
-!
-      RETURN
+
       END SUBROUTINE VOIGT
-!*==WERF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE WERF(RS1,RS2,XX,YY)
       SUBROUTINE WERF(RS1,RS2,XX,YY)
 !
 ! *** WERF by WIFD 25 May 84 ***
@@ -17387,7 +16006,7 @@
       IMPLICIT DOUBLE PRECISION(A-H,O-Z)
       DOUBLE PRECISION LAMBDA
       LOGICAL B
-!
+
       X = DABS(XX)
       Y = DABS(YY)
       IF (Y.LT.4.29 .AND. X.LT.5.33) GOTO 1
@@ -17432,14 +16051,11 @@
       IF (Y.EQ.0.0) RS1 = DEXP(-X**2)
       RS2 = 1.12837916709551*RS2
       IF (XX.LT.0) RS2 = -RS2
-      RETURN
+
       END SUBROUTINE WERF
-!*==WGHTLS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE WGHTLS(N,ARG)
       SUBROUTINE WGHTLS(N,ARG)
 !
 ! *** WGHTLS updated by JCM 23 Mar 92 ***
@@ -17448,7 +16064,6 @@
 !C 6C
 !H Performs various operations to do with weights for LSQ, either for PR
 !H or simpler applications.
-!H applications.
 !A On entry N=1 means find an L WGHT card and read from it the type of
 !A              weighting to be used, with default = 1.  ARG is irrelevant.
 !A          N=2 means from ARG, IWGHT etc make a weight to go with this OBS
@@ -17457,7 +16072,8 @@
 !A              argument, or sometimes the observation.
 !
       LOGICAL ONCARD
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
      &                YMAX, CSQTOT
@@ -17465,9 +16081,8 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       GOTO (10,20,30), N
-!
 ! FIND AND INTERPRET AN L WGHT CARD, OR THE LACK OF IT:
    10 IF (.NOT.ONCARD('L','WGHT',W)) THEN
         CALL MESS(LPT,1,'No L WGHT card -')
@@ -17475,66 +16090,48 @@
       ELSE
         IWGH(KSOURC) = NINT(W)
         IF (IWGH(KSOURC).GT.3 .OR. IWGH(KSOURC).LE.0) THEN
-          CALL ERRIN2(IWGH(KSOURC),1,'weighting scheme',                &
-     &                ' not allowed -')
+          CALL ERRIN2(IWGH(KSOURC),1,'weighting scheme',' not allowed -')
           GOTO 101
         ENDIF
       ENDIF
-!
       GOTO (41,42,43), IWGH(KSOURC)
-!
 ! UNIT WEIGHTS:
    41 CALL MESS(LPT,1,'Unit weights')
       GOTO 100
-!
 ! WEIGHT TO BE USED AS READ:
    42 CALL MESS(LPT,1,'Weights to be used as read from reflection data')
       GOTO 100
-!
 ! SIGMA READ, WEIGHT IS 1/SIGMA SQUARED:
-   43 CALL MESS(LPT,1,'Sigma read from reflection data - weight '//     &
-     &          'is 1/sigma squared')
+   43 CALL MESS(LPT,1,'Sigma read from reflection data - weight is 1/sigma squared')
       GOTO 100
-!
 ! INITIAL VALUE FOR WT - USED TO BE SUBROUTINE WTINPR:
    20 GOTO (1,2,3), IWGH(JSOURC)
-!
 ! UNIT WEIGHTS:
-    1 WT = 1.
+    1 WT = 1.0
       GOTO 100
-!
 ! DOBS READ AND TO BE USED AS WEIGHT:
     2 WT = DOBS
       GOTO 100
-!
 ! SIGMA READ (INTO DOBS) - USE 1/SIGMA SQUARED:
     3 IF (DOBS.NE.0.) THEN
         WT = 1./(DOBS*DOBS)
       ELSE
         WRITE (LPT,3000) ARG, OBS
- 3000   FORMAT (/' WARNING ** zero weight found for point ',2(F10.3,2X),&
-     &          ' -- weight set to unity ')
+ 3000   FORMAT (/' WARNING ** zero weight found for point ',2(F10.3,2X),' -- weight set to unity ')
         WT = 1.0
       ENDIF
       GOTO 100
-!
    30 SQRTWT = SQRT(WT)
       WDIFF = SQRTWT*DIFF
       GOTO 100
-!
   101 IWGH(KSOURC) = 1
       CALL MESS(LPT,0,'assuming unit weights')
   100 RETURN
+
       END SUBROUTINE WGHTLS
-!*==XROOT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-!
-! LEVEL 3      SUBROUTINE XROOT(IA,XX,IS,IL,C)
       SUBROUTINE XROOT(IA,XX,IS,IL,C)
 !
 ! *** XROOT updated by JCM 18 Oct 87 ***
@@ -17568,8 +16165,7 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 !
 ! CYCLE OVER CENTRE
       DO IC = 1, NCENT
@@ -17583,7 +16179,6 @@
             CALL GMADD(X1,ALAT(1,IL),X2,1,3)
 ! DO NOT NOW PUT INTO CENTRAL CELL:
 !      CALL FRAC3(X2)
-!
 ! SCAN ALL 27 CELLS:
             DO NCELZ = 1, 5
               C(3) = FLOAT(NCELZ-3)
@@ -17592,7 +16187,6 @@
                 DO NCELX = 1, 5
                   C(1) = FLOAT(NCELX-3)
                   CALL GMADD(X2,C,X3,1,3)
-!
 ! X3 SHOULD EVENTUALLY MATCH OUR TARGET:
                   IF (GMSAME(XX,X3,3,0.0001)) GOTO 101
                 ENDDO
@@ -17604,14 +16198,11 @@
 ! IF HERE, WE HAVE NO MATCH:
       IS = 0
   101 IF (IC.EQ.2) IS = -IS
-      RETURN
+
       END SUBROUTINE XROOT
-!*==XTRANS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE XTRANS(IAT,XX,IS,IL,C)
       SUBROUTINE XTRANS(IAT,XX,IS,IL,C)
 !
 ! *** XTRANS corrected by JCM 18 Oct 87 ***
@@ -17638,8 +16229,7 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
+      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 !
 ! ROTATE BY SYMMETRY OPERATOR:
       CALL ROTSYM(X(1,IAT),XX(1),IABS(IS),1)
@@ -17653,14 +16243,10 @@
 !      CALL FRAC3(XX)
 ! CELL TRANSLATIONS:
       CALL GMADD(XX(1),C(1),XX(1),1,3)
-      RETURN
+
       END SUBROUTINE XTRANS
-!*==BMBOUT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
-!
-!
-!
-!>> JCC Added ion BMBOUT
+!*****************************************************************************
 !
       SUBROUTINE BMBOUT
 ! BMBOUT BoMBs OUT of the code. Essentially this replaces STOP in the code but
@@ -17675,5 +16261,8 @@
 !     STOP
 !
       IBMBER = 1 ! The alternative: track with a flag
-      RETURN
+
       END SUBROUTINE BMBOUT
+!
+!*****************************************************************************
+!

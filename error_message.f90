@@ -62,7 +62,7 @@
           ardif(II) = argk - arrt ! argk is a global variable
           arrt = argk
         ENDDO
-        CALL sortx(ardif,iorda,10)
+        CALL SORT_REAL(ardif,iorda,10)
         maxk = 349 + iorda(10)
 ! JvdS was:
 !O      aadd = ardif(10)

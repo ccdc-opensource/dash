@@ -10,13 +10,17 @@
 !A On entry VAL is an array of N real numbers.
 !A On exit IP is an array of N pointers to VAL in ascending order
 !
+!N Copyright John Matthewman 18 July 1983
+!N  HEAPSORT
+!N  (See Knuth 'Art of Computer Programming' Vol 3, Section 5.2.3)
+!
       DIMENSION VAL(N), IP(N)
 
 ! EXTRA PART (WHICH MAY BE REMOVED AGAIN) - SET UP POINTERS:
       DO I = 1, N
         IP(I) = I
       ENDDO
-      IF (N.LT.2) GOTO 100
+      IF (N.LT.2) RETURN
 !  INITIALISE
       L = N/2 + 1
       IR = N
@@ -44,7 +48,6 @@
       IR = IR - 1
       IF (IR.GT.1) GOTO 3
       IP(1) = K
-  100 RETURN
 
       END SUBROUTINE SORT_REAL
 !

@@ -2,6 +2,838 @@
 !*****************************************************************************
 !
 ! Originally in Pf.f90
+!
+!*****************************************************************************
+!
+      SUBROUTINE FDLX01(IOPT)
+!
+! *** FDLX01 updated by WIFD/JCM 7 Mar 89 ***
+!
+!X
+!C 19B
+!H Function descriptors for X-Ray data, with derivatives
+!A On entry IOPT=1 if only function descriptors are required
+!A               2 if both descriptors and derivatives are required
+!P Expects ARGK in /PRPKCN to hold 2thetaK degrees, and the peak
+!P function species values in PKFNSP in /PRPKFN to have been read by
+!P calls of PFCN0x
+!
+!D Used when LX, LAB X-Ray
+!D Simple Gaussian, Cagliotti width variation
+!D If SAPS and KNOW points to a reflection for which SIGS is
+!D being refined, uses value in F4PAR(2 instead of calculated value.
+!
+      INCLUDE 'PARAMS.INC'
+!
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
+     &                ILAMB
+      EQUIVALENCE (WLGTH,ALAMBD(1,1))
+      COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
+     &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
+     &                SCALEP(9), KSCALP(9), PHMAG(9)
+      LOGICAL PHMAG
+      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
+     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
+     &                ARGSTP(5), PCON
+!
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
+     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
+     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
+     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
+     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+!
+      LOGICAL REFUSE, CYC1, NOPKRF
+      COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
+     &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
+     &                MAG, MPL, FIXED, DONE, CONV
+      LOGICAL SIMUL, MAG, MPL, FIXED, DONE
+      EQUIVALENCE (MODER,MODERR(1))
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
+     &                PRECYC, TIC
+      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
+     &        TIC
+!>> JCC Moved to an include file
+      INCLUDE 'REFLNS.INC'
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
+     &                NPCSOU(9,5)
+!
+! For the moment, same variable names as TOF case...
+!
+! WE DO NOT WANT THE CALCULATION IF:
+!  A) SAPS, AND
+!  B) IT IS NOT THE SPECIAL INITIAL CYCLE, AND
+!  C) WE ARE REFINING THIS SIGMA:
+      TANTH = TAN(RAD*ARGK/2.)
+      PKFNVA(1) = (PKFNSP(1,1,JPHASE,JSOURC)*TANTH+PKFNSP(1,2,JPHASE,   &
+     &            JSOURC))*TANTH + PKFNSP(1,3,JPHASE,JSOURC)
+      IF (SAPS .OR. APES) THEN
+        IF (PRECYC) THEN
+          F4PAR(2,KNOW) = PKFNVA(1)
+        ELSE
+          IF (KF4PAR(2,KNOW).GT.0) PKFNVA(1) = F4PAR(2,KNOW)
+        ENDIF
+      ENDIF
+      IF (IOPT.EQ.1) GOTO 100
+      DERPFN(1,1) = TANTH*TANTH
+      DERPFN(1,2) = TANTH
+      DERPFN(1,3) = 1.
+  100 RETURN
+      END SUBROUTINE FDLX01
+!
+!*****************************************************************************
+!
+      SUBROUTINE FDLX02(IOPT)
+!
+! *** FDLX02 updated by WIFD/JCM 7 Mar 89 ***
+!
+!X
+!C 19B
+!H Function descriptors for X-Ray data type 2, with derivatives
+!A On entry IOPT=1 if only function descriptors are required
+!A               2 if both descriptors and derivatives are required
+!P Expects ARGK in /PRPKCN to hold 2thetaK degrees, and the peak
+!P function species values in PKFNSP in /PRPKFN to have been read by
+!P calls of PFCN0x
+!
+!D Used when LX, LAB X-Ray
+!D Simple Gaussian, Cagliotti width variation
+!D If SAPS and KNOW points to a reflection for which SIGS is
+!D being refined, uses value in F4PAR(2 instead of calculated value.
+!
+!
+      INCLUDE 'PARAMS.INC'
+!
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
+     &                ILAMB
+      EQUIVALENCE (WLGTH,ALAMBD(1,1))
+!
+      COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
+     &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
+!
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
+     &                SCALEP(9), KSCALP(9), PHMAG(9)
+      LOGICAL PHMAG
+      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
+     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
+     &                ARGSTP(5), PCON
+!
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
+     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
+     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
+     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
+     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+!
+      LOGICAL REFUSE, CYC1, NOPKRF
+      COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
+     &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
+     &                MAG, MPL, FIXED, DONE, CONV
+      LOGICAL SIMUL, MAG, MPL, FIXED, DONE
+      EQUIVALENCE (MODER,MODERR(1))
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
+     &                PRECYC, TIC
+      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
+     &        TIC
+!>> JCC Moved to an include file
+      INCLUDE 'REFLNS.INC'
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
+     &                NPCSOU(9,5)
+!
+! For the moment, same variable names as TOF case...
+!
+! WE DO NOT WANT THE CALCULATION IF:
+!  A) SAPS, AND
+!  B) IT IS NOT THE SPECIAL INITIAL CYCLE, AND
+!  C) WE ARE REFINING THIS PEAK VARIABLE:
+      TANTH = TAN(ARGK/2.)
+      PKFNVA(1) = (PKFNSP(1,1,JPHASE,JSOURC)*TANTH+PKFNSP(1,2,JPHASE,   &
+     &            JSOURC))*TANTH + PKFNSP(1,3,JPHASE,JSOURC)
+      SECTH = SQRT(1.+TANTH*TANTH)
+      PKFNVA(2) = PKFNSP(2,1,JPHASE,JSOURC)                             &
+     &            *TANTH + PKFNSP(2,2,JPHASE,JSOURC)*SECTH
+      IF (SAPS .OR. APES) THEN
+        IF (PRECYC) THEN
+          F4PAR(2,KNOW) = PKFNVA(1)
+          F4PAR(3,KNOW) = PKFNVA(2)
+        ELSE
+          IF (KF4PAR(2,KNOW).GT.0) PKFNVA(1) = F4PAR(2,KNOW)
+          IF (KF4PAR(3,KNOW).GT.0) PKFNVA(2) = F4PAR(3,KNOW)
+        ENDIF
+      ENDIF
+      IF (IOPT.EQ.1) GOTO 100
+!
+! DERIVATIVES OF PKFNVA ARRY WRT PKFNSP ARRAY:
+      DERPFN(1,1) = TANTH*TANTH
+      DERPFN(1,2) = TANTH
+      DERPFN(1,3) = 1.
+      DERPFN(2,1) = TANTH
+      DERPFN(2,2) = SECTH
+  100 RETURN
+      END SUBROUTINE FDLX02
+!
+!*****************************************************************************
+!
+! Originally in Pf.f90
+!
+!*****************************************************************************
+!
+      SUBROUTINE PFLX01(N)
+!
+! *** PFLX01 updated by JCM 27 May 89 ***
+!
+!H Multiple entry routine to do various calculations for X-ray data,
+!H Gaussian peak
+!
+!A On entry N=1,2,5,6, or 7
+!A N=1: Initialise program to do data source LX, peak function 01
+!A N=2 form peak function in YNORM, and its derivatives wrt paramet ers
+!A N=5: Sets LOGICAL REFUSE to determine if reflection makes a sign ificant
+!A      contribution to the profile at ARGI
+!A N=6: CAILS entry to determine whether near reflections should be related
+!A      by a strict or slack relationship.
+!A N=7: SAPS entry to obey FDXXXX to set up a value(s) for PKFNVA
+!
+!
+      INCLUDE 'PARAMS.INC'
+      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
+     &                ILAMB
+      EQUIVALENCE (WLGTH,ALAMBD(1,1))
+      COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
+     &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
+      COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
+     &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
+     &                WTSLAK(1000), WEELEV, KOM16
+      LOGICAL STRKT
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
+     &                SCALEP(9), KSCALP(9), PHMAG(9)
+      LOGICAL PHMAG
+      COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
+     &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
+     &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
+      DIMENSION NGENS(6), NSPC(6)
+      EQUIVALENCE (NGENS(1),NGENPS(1,1))
+      EQUIVALENCE (NSPC(1),NSPCPS(1,1))
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
+     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
+     &                ARGSTP(5), PCON
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
+     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
+     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
+     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
+     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+!
+      LOGICAL REFUSE, CYC1, NOPKRF
+      COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6),          &
+     &                NZERSP(9,5)
+      COMMON /PWORDS/ PWD(10,9,5)
+      CHARACTER*4 PWD
+!>> JCC Moved to an include file
+      INCLUDE 'REFLNS.INC'
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
+     &                NPCSOU(9,5)
+      COMMON /XRAYC / ARGK2
+      PARAMETER (NW=5)
+      CHARACTER*4 WDLX01(NW)
+      DIMENSION IWLX01(3,NW)
+      DATA WDLX01/'SIGM', 'U', 'V', 'W', 'TTHM'/
+      DATA IWLX01/3, 3, 0, 3, 3, 1, 3, 3, 2, 3, 3, 3, 6, 1, 2/
+!
+      GOTO (10,1,2,100,100,5,6,7), N + 1
+!
+! N=0: SET UP "DATA SOURCE LX, PEAK TYPE 01"
+   10 NPKGEN(JPHASE,JSOURC) = 1
+      NGEN4(JPHASE,JSOURC) = 2
+      LF3SP(3,JPHASE,JSOURC) = 3
+      LF6SP(1,JSOURC) = 2
+      DO I = 1, NPKGEN(JPHASE,JSOURC)
+        PWD(I,JPHASE,JSOURC) = WDLX01(I)
+      ENDDO
+      GOTO 100
+!
+! N=1: ADD PACKED VOCABULARY FOR THIS SOURCE, THIS PHASE, TO THE MAIN LIST:
+    1 CALL VOCAB(WDLX01,IWLX01,NW)
+      GOTO 100
+!
+! N=2: PROFILE REFINEMENT STAGE
+    2 CALL FDLX01(2)
+      DEL = ARGI - ARGK
+      SIGDSQ = 1./PKFNVA(1)
+      DELSQ = DEL*DEL
+      ARGTEM = DELSQ*SIGDSQ
+      DEL2 = ARGI - ARGK2
+      DELSQ2 = DEL2*DEL2
+      ARGTM2 = DELSQ2*SIGDSQ
+      EXPON = EXP(-0.5*ARGTEM)
+      EXPON2 = EXP(-0.5*ARGTM2)
+      ANORM = SQRT(SIGDSQ*0.159154943)
+      YNORM = ANORM*(EXPON+0.5*EXPON2)
+!
+! DYNDKQ IS THE DERIVATIVE OF YNORM WRT TK (ARGK), DIVIDED BY YNORM.  THE 6
+! LETTER NAME DOES NOT ALLOW US TO EXPRESS ALL THIS, BUT THE Q IS IMPORTANT
+! BECAUSE IT INDICATES 'QUOTIENT', IE THE DERIVATIVE IS DIVIDED BY THE FUNCTION
+! BUT BE CAREFUL FOR ZERO YNORM
+      IF (YNORM.EQ.0.) THEN
+        DYNDKQ = 0.
+        DYNDVQ(1) = 0.
+      ELSE
+! FIRST, (1/Y)(DY/D(ARGK))  K MEANS WRT ARGK
+! THIS COMES FROM (1/Y)*(DY/D(DEL))*(D(DEL)/(D(ARGK))
+! THUS, NO NEGATIVE SIGN
+        ATEM = 0.5*RADIAN(ARGK-ZEROSP(1,JPHASE,JSOURC))
+        RTEM = ALAMBD(2,JSOURC)/ALAMBD(1,JSOURC)
+        UTEM = RTEM*SIN(ATEM)
+        DX2DXK = RTEM*COS(ATEM)/SQRT(1.-UTEM*UTEM)
+        DYNDKQ = (ANORM*SIGDSQ*(DEL*EXPON+0.5*DEL2*EXPON2*DX2DXK))/YNORM
+! THEN, (1/Y)(DY/D(SIGMA-SQUARED))
+        BTEM = (ANORM*(ARGTEM*EXPON+0.5*ARGTM2*EXPON2))/YNORM
+        DYNDVQ(1) = 0.5*SIGDSQ*(BTEM-1.)
+      ENDIF
+      GOTO 100
+!
+! N=5: IS REFLECTION IN RANGE?
+!
+    5 CALL FDLX01(1)
+      DEL = ARGI - ARGK
+      DEL2 = ARGI - ARGK2
+      TEMSQ = TOLER(1,JPHASE,JSOURC)*PKFNVA(1)
+      IF (DEL.LE.0.) THEN
+        REFUSE = DEL*DEL.GT.TEMSQ
+      ELSE
+        IF (DEL2.LE.0.) THEN
+          REFUSE = .FALSE.
+        ELSE
+          REFUSE = DEL2*DEL2.GT.TEMSQ
+        ENDIF
+      ENDIF
+!
+      GOTO 100
+!
+! N=6 *** CAILS *** SETTING UP SLACK AND STRICT CONSTRAINTS
+!
+    6 CALL FDLX01(1)
+      DELT = ABS(AKLO-AKHI)
+      STRKT = DELT.LE.STRTOL*PKFNVA(1)
+      SLACK = 0.
+      IF (DELT.GE.SLKTOL*PKFNVA(1)) GOTO 100
+      SLACK = EXP(1.-(DELT/(SLKTOL*PKFNVA(1)))**2)
+      GOTO 100
+!
+    7 CALL FDLX01(1)
+      F4PAR(2,KNOW) = PKFNVA(1)
+      GOTO 100
+!
+  100 RETURN
+      END SUBROUTINE PFLX01
+!
+!*****************************************************************************
+!
+      SUBROUTINE PFLX02(N)
+!
+! *** PFLX02 updated by JCM 27 May 89 ***
+!
+!H Multiple entry routine for various calculations for X-Ray data,
+!H Voigt peak function
+!
+!A On entry N=1,2,5,6, or 7
+!A N=1: Set up program for data source LX, peak function 02
+!A N=2: form peak function in YNORM, and its derivatives wrt paramet ers
+!A N=5: Sets LOGICAL REFUSE to determine if reflection makes a sign ificant
+!A      contribution to the profile at ARGI
+!A N=6: CAILS entry to determine whether near reflections should be related
+!A      by a strict or slack relationship.
+!A N=7: SAPS entry to obey FDXXXX to set up a value(s) for PKFNVA
+!
+!
+      INCLUDE 'PARAMS.INC'
+      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
+     &                ILAMB
+      EQUIVALENCE (WLGTH,ALAMBD(1,1))
+      COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
+     &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
+      COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
+     &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
+     &                WTSLAK(1000), WEELEV, KOM16
+      LOGICAL STRKT
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
+     &                SCALEP(9), KSCALP(9), PHMAG(9)
+      LOGICAL PHMAG
+      COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
+     &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
+     &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
+      DIMENSION NGENS(6), NSPC(6)
+      EQUIVALENCE (NGENS(1),NGENPS(1,1))
+      EQUIVALENCE (NSPC(1),NSPCPS(1,1))
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
+     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
+     &                ARGSTP(5), PCON
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
+     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
+     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
+     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
+     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+      LOGICAL REFUSE, CYC1, NOPKRF
+      COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6),          &
+     &                NZERSP(9,5)
+      COMMON /PWORDS/ PWD(10,9,5)
+      CHARACTER*4 PWD
+!>> JCC Moved to an include file
+      INCLUDE 'REFLNS.INC'
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
+     &                NPCSOU(9,5)
+      COMMON /XRAYC / ARGK2
+      PARAMETER (NW=6)
+      CHARACTER*4 WDLX02(NW)
+      DIMENSION IWLX02(3,NW)
+      DATA WDLX02/'SIGM', 'GAMM', 'U', 'V', 'W', 'TTHM'/
+      DATA IWLX02/3, 3, 0, 3, 4, 0, 3, 3, 1, 3, 3, 2, 3, 3, 3, 6, 1, 2/
+!
+!
+      GOTO (10,1,2,100,100,5,6,7), N + 1
+!
+! N=0: SET UP "DATA SOURCE LX, PEAK TYPE 02"
+   10 NPKGEN(JPHASE,JSOURC) = 2
+      NGEN4(JPHASE,JSOURC) = 2
+      LF3SP(3,JPHASE,JSOURC) = 3
+      LF3SP(4,JPHASE,JSOURC) = -2
+      LF6SP(1,JSOURC) = 2
+      DO I = 1, NPKGEN(JPHASE,JSOURC)
+        PWD(I,JPHASE,JSOURC) = WDLX02(I)
+      ENDDO
+      GOTO 100
+!
+! N=1: ADD PACKED VOCABULARY FOR THIS SOURCE, THIS PHASE, TO THE MAIN LIST:
+    1 CALL VOCAB(WDLX02,IWLX02,NW)
+      GOTO 100
+!
+! N=2: PROFILE REFINEMENT STAGE
+    2 CALL FDLX02(2)
+      DEL1 = ARGI - ARGK
+      DEL2 = ARGI - ARGK2
+      SIGMA = SQRT(PKFNVA(1))
+      GAMMA = PKFNVA(2)
+      CALL VOIGT(DEL1,SIGMA,GAMMA,YVAL1,DERX1,DERS1,DERG1)
+      CALL VOIGT(DEL2,SIGMA,GAMMA,YVAL2,DERX2,DERS2,DERG2)
+      YNORM = YVAL1 + 0.5*YVAL2
+!
+! DYNDKQ IS THE DERIVATIVE OF YNORM WRT TK (ARGK), DIVIDED BY YNORM.  THE 6
+! LETTER NAME DOES NOT ALLOW US TO EXPRESS ALL THIS, BUT THE Q IS IMPORTANT
+! BECAUSE IT INDICATES 'QUOTIENT', IE THE DERIVATIVE IS DIVIDED BY THE FUNCTION
+! BUT BE CAREFUL FOR ZERO YNORM
+      IF (YNORM.EQ.0.) THEN
+        DYNDKQ = 0.
+        DYNDVQ(1) = 0.
+        DYNDVQ(2) = 0.
+      ELSE
+! FIRST, (1/Y)(DY/D(ARGK))  K MEANS WRT ARGK
+! THIS COMES FROM (1/Y)*(DY/D(DEL))*(D(DEL)/(D(ARGK))
+! THUS, NO NEGATIVE SIGN
+        ATEM = 0.5*RADIAN(ARGK-ZEROSP(1,JPHASE,JSOURC))
+        RTEM = ALAMBD(2,JSOURC)/ALAMBD(1,JSOURC)
+        UTEM = RTEM*SIN(ATEM)
+        DX2DXK = RTEM*COS(ATEM)/SQRT(1.-UTEM*UTEM)
+        DYNDKQ = -(DERX1+0.5*DX2DXK*DERX2)/YNORM
+! THEN, (1/Y)(DY/D(SIGMA-SQUARED))
+        DYNDVQ(1) = (DERS1+0.5*DERS2)/(2.*SIGMA*YNORM)
+        DYNDVQ(2) = (DERG1+0.5*DERG2)/YNORM
+      ENDIF
+      GOTO 100
+!
+! N=5: IS REFLECTION IN RANGE?
+!
+    5 CALL FDLX02(1)
+      DEL1 = ARGI - ARGK
+      DEL2 = ARGI - ARGK2
+      TEMSQ = TOLER(1,JPHASE,JSOURC)*PKFNVA(1)
+      TEMGA = (TOLER(2,JPHASE,JSOURC)*PKFNVA(2))**2
+      IF (DEL1.LE.0.) THEN
+        REFUSE = DEL1*DEL1.GT.(TEMSQ+TEMGA)
+      ELSE
+        IF (DEL2.LE.0.) THEN
+          REFUSE = .FALSE.
+        ELSE
+          REFUSE = DEL2*DEL2.GT.(TEMSQ+TEMGA)
+        ENDIF
+      ENDIF
+!
+      GOTO 100
+!
+!
+    6 CALL FDLX02(1)
+      DELT = ABS(AKLO-AKHI)
+      STRKT = DELT.LE.STRTOL*PKFNVA(1)
+      SLACK = 0.
+      IF (DELT.GE.SLKTOL*PKFNVA(1)) GOTO 100
+      SLACK = EXP(1.-(DELT/(SLKTOL*PKFNVA(1)))**2)
+      GOTO 100
+!
+    7 CALL FDLX02(1)
+      F4PAR(2,KNOW) = PKFNVA(1)
+      GOTO 100
+!
+  100 RETURN
+      END SUBROUTINE PFLX02
+!
+!*****************************************************************************
+!
+      SUBROUTINE PCLX01(N)
+!
+! *** PCLX01 updated by WIFD/JCM 28 Feb 88 ***
+!
+!H Multiple entry routine to deal with Peak centres for X-Ray:
+!A On entry N requests one of the following:
+!A N=1: (Not yet used) read L PKCN card
+!A N=2: calculate Peak Centre, ARGK, and its derivative wrt ZERO
+!A N=3: (Not yet used) apply shifts
+!A N=4: (Not yet used) write new card
+!A N=5: calculate Peak Centre, ARGK
+!A N=6: Calculate maximum sin theta/lambda from maximum 2theta
+!A N=7: (Not yet used) prepare to call PFXX(7)
+!
+      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
+     &                DSTAR2, TWOTHD(5), DIFANG(6)
+      EQUIVALENCE (STHLMX,STHMXX(1))
+      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
+     &                ILAMB
+      EQUIVALENCE (WLGTH,ALAMBD(1,1))
+      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
+     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
+     &                SCALEP(9), KSCALP(9), PHMAG(9)
+      LOGICAL PHMAG
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
+     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
+     &                ARGSTP(5), PCON
+      COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6),          &
+     &                NZERSP(9,5)
+      INCLUDE 'REFLNS.INC'
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
+     &                NPCSOU(9,5)
+      COMMON /XRAYC / ARGK2
+
+      GOTO (100,2,100,100,2,6,100), N
+! N=2 OR 5:
+! ARGK=ZERO+ARCSIN(......)
+    2 TEM1 = 0.5*ALAMBD(1,JSOURC)*DSTAR(KNOW)
+      TEM2 = 0.5*ALAMBD(2,JSOURC)*DSTAR(KNOW)
+! REMEMBER, 2THETA:
+      ARGK = ZEROSP(1,JPHASE,JSOURC) + 2.*DEGREE(ASIN(TEM1))
+      ARGK2 = ZEROSP(1,JPHASE,JSOURC) + 2.*DEGREE(ASIN(TEM2))
+      IF (N.EQ.5) GOTO 100
+! CHAIN RULE: D(ARGK)/D(D*)SQ = D(ARGK)/D(D*) * D(D*)/D(D*)SQ
+      DKDDS = DEGREE(0.5*WLGTH/(DSTAR(KNOW)*SQRT(1.-TEM1*TEM2)))
+      DKDZER(1) = 1.
+      GOTO 100
+! MAX SIN THETA/LAMBDA:
+    6 STHMXX(JSOURC) = SIN(RADIAN(ARGMAX(JSOURC)/2.))/WLGTH
+  100 RETURN
+
+      END SUBROUTINE PCLX01
+!
+!*****************************************************************************
+!
+      SUBROUTINE FDTF12(IOPT)
+!
+! *** FDTF12 by JBF 2 March 94 ***
+!
+!X
+!C 19B
+!H Forms Peak function descriptors & derivatives as for FDTF02 but with
+!H alternative SIGM and GAMM parameters for magnetic peaks data.
+!
+!A On entry IOPT indicates the opion required:
+!A If IOPT=1, just calculates the values of the peak descriptors.
+!A If IOPT=2, calculates also their derivatives wrt the refinable parameters.
+!A
+!P Expects ALAMBD(ILAMB,KSOURC) the wavelength, to be set in /DGEOM.
+!D Evaluates the peak function descriptors (PKFNVA) in terms of PKFNSP,
+!D the Peak Function Species, and the derivatives (DERPFN) of PKFNVA wrt PKFNSP.
+!
+! (LATER IT SHOULD USE THE FACT THAT IF LOGICAL REFUSE IS TRUE ON ENTRY, VALUES
+! OF THE PEAK DESCRIPTORS SHOULD HAVE BEEN SAVED IN COMMON /PRSAVE, AND MAY NOW
+! BE USED AGAIN.  I WILL INVESTIGATE THIS REMARK SOON - JUDY).
+!
+      INCLUDE 'PARAMS.INC'
+!
+      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
+     &                ILAMB
+      EQUIVALENCE (WLGTH,ALAMBD(1,1))
+      COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
+     &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
+     &                SCALEP(9), KSCALP(9), PHMAG(9)
+      LOGICAL PHMAG
+      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
+     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
+     &                ARGSTP(5), PCON
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
+     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
+     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
+     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
+     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+!
+      LOGICAL REFUSE, CYC1, NOPKRF
+      COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
+     &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
+     &                MAG, MPL, FIXED, DONE, CONV
+      LOGICAL SIMUL, MAG, MPL, FIXED, DONE
+      EQUIVALENCE (MODER,MODERR(1))
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
+     &                PRECYC, TIC
+      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
+     &        TIC
+!>> JCC Moved to an include file
+      INCLUDE 'REFLNS.INC'
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
+     &                NPCSOU(9,5)
+!
+!.. SWITCH
+      ATEM = PKFNSP(1,2,JPHASE,JSOURC) - 1./WLGTH
+      BTEM = PKFNSP(1,1,JPHASE,JSOURC)*ATEM
+      PKFNVA(1) = 0.5*ERFNC(BTEM)
+!.. TAUF & TAUS
+      PKFNVA(2) = PKFNSP(2,1,JPHASE,JSOURC) + PKFNSP(2,2,JPHASE,JSOURC) &
+     &            *WLGTH
+      PKFNVA(3) = PKFNSP(3,1,JPHASE,JSOURC) + PKFNSP(3,2,JPHASE,JSOURC) &
+     &            *WLGTH
+!.. C49: PKFNVA(4) IS SIGMA NOT SIGMA SQUARED
+      WSQ = WLGTH*WLGTH
+      SIGMA = SQRT(PKFNSP(4,1,JPHASE,JSOURC)                            &
+     &        +(PKFNSP(4,2,JPHASE,JSOURC)+PKFNSP(4,3,JPHASE,JSOURC)*WSQ)&
+     &        *WSQ)
+      SIGMM = SQRT(PKFNSP(6,1,JPHASE,JSOURC)                            &
+     &        +(PKFNSP(6,2,JPHASE,JSOURC)+PKFNSP(6,3,JPHASE,JSOURC)*WSQ)&
+     &        *WSQ)
+      GAMMA = PKFNSP(5,1,JPHASE,JSOURC)                                 &
+     &        + (PKFNSP(5,2,JPHASE,JSOURC)+PKFNSP(5,3,JPHASE,JSOURC)    &
+     &        *WLGTH)*WLGTH
+      GAMMM = PKFNSP(7,1,JPHASE,JSOURC)                                 &
+     &        + (PKFNSP(7,2,JPHASE,JSOURC)+PKFNSP(7,3,JPHASE,JSOURC)    &
+     &        *WLGTH)*WLGTH
+      PKFNVA(4) = SIGMA
+      PKFNVA(5) = GAMMA
+      PKFNVA(6) = SIGMM
+      PKFNVA(7) = GAMMM
+! USE ISMAG TO SWITCH BETWEEN SIGMA/SIGMM AND GAMMA/GAMMM
+      IF (ISMAG(KNOW).EQ.0) THEN
+        F4VAL(2,KNOW) = SIGMA
+        F4VAL(3,KNOW) = GAMMA
+      ELSE
+        F4VAL(2,KNOW) = SIGMM
+        F4VAL(3,KNOW) = GAMMM
+      ENDIF
+      IF (SAPS .OR. APES) THEN
+        IF (PRECYC) THEN
+          IF (ISMAG(KNOW).EQ.0) THEN
+            F4PAR(2,KNOW) = PKFNVA(4)
+            F4PAR(3,KNOW) = PKFNVA(5)
+          ELSE
+            F4PAR(2,KNOW) = PKFNVA(6)
+            F4PAR(3,KNOW) = PKFNVA(7)
+          ENDIF
+        ELSE
+          IF (KF4PAR(2,KNOW).GT.0) THEN
+            IF (ISMAG(KNOW).EQ.0) THEN
+              PKFNVA(4) = F4PAR(2,KNOW)
+            ELSE
+              PKFNVA(6) = F4PAR(2,KNOW)
+            ENDIF
+          ENDIF
+          IF (KF4PAR(3,KNOW).GT.0) THEN
+            IF (ISMAG(KNOW).EQ.0) THEN
+              PKFNVA(5) = F4PAR(3,KNOW)
+            ELSE
+              PKFNVA(7) = F4PAR(3,KNOW)
+            ENDIF
+          ENDIF
+        ENDIF
+      ENDIF
+!
+! IOPT=1 EXIT HERE AS ONLY PEAK DESCRIPTORS ARE WANTED (NOT DERIVATIVES)
+      IF (IOPT.EQ.1) GOTO 100
+      CTEM = -0.564189584*EXP(-BTEM*BTEM)
+      DERPFN(1,1) = ATEM*CTEM
+      DERPFN(1,2) = CTEM*PKFNSP(1,1,JPHASE,JSOURC)
+      DERPFN(2,1) = 1.
+      DERPFN(2,2) = WLGTH
+      DERPFN(3,1) = 1.
+      DERPFN(3,2) = WLGTH
+      D41 = 0.5/SIGMA
+      DERPFN(4,1) = D41
+      DERPFN(4,2) = WSQ*D41
+      DERPFN(4,3) = WSQ*WSQ*D41
+      DERPFN(5,1) = 1.
+      DERPFN(5,2) = WLGTH
+      DERPFN(5,3) = WSQ
+      D61 = 0.5/SIGMM
+      DERPFN(6,1) = D61
+      DERPFN(6,2) = WSQ*D61
+      DERPFN(6,3) = WSQ*WSQ*D61
+      DERPFN(7,1) = 1.
+      DERPFN(7,2) = WLGTH
+      DERPFN(7,3) = WSQ
+  100 RETURN
+      END SUBROUTINE FDTF12
+!
+!*****************************************************************************
+!
+      SUBROUTINE FTSB12(MNS)
+!
+! *** FTSB12 by JBF MAR 94 For N and M peaks with different SIGM and GAMM ***
+!
+      INCLUDE 'PARAMS.INC'
+!
+      COMPLEX CFFT, DFFT, DDT, CFE, CFT
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
+     &                SCALEP(9), KSCALP(9), PHMAG(9)
+      LOGICAL PHMAG
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
+     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
+     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
+     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
+     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+!
+      LOGICAL REFUSE, CYC1, NOPKRF
+      COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
+     &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
+! JCC Moved to an include file
+      INCLUDE 'REFLNS.INC'
+      COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
+     &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
+     &                FIE(256), FRT(256), FIT(256)
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
+     &                NPCSOU(9,5)
+!
+      SW = PKFNVA(1)
+      TAUF = PKFNVA(2)
+      TAUS = PKFNVA(3)
+!
+      IF (ISMAG(KNOW).EQ.0) THEN
+        SIG = PKFNVA(4)
+        GAM = PKFNVA(5)
+      ELSE
+        SIG = PKFNVA(6)
+        GAM = PKFNVA(7)
+      ENDIF
+      SW1 = 1. - SW
+!
+      C2TEM = PI/(FLOAT(MNS)*XPKDEL(KMOD))
+      CTEM = 2.*C2TEM
+      FTEMF = CTEM*TAUF
+      FTEMS = CTEM*TAUS
+      GTEM = CTEM*SIG
+      CLTEM = C2TEM*GAM
+!
+      MN2 = MNS/2
+      MN2M1 = MN2 - 1
+      MN2P1 = MN2 + 1
+      DO I = 1, MNS
+        II = MOD(I+MN2,MNS) - MN2P1
+!.. FAST EXPONENTIAL DECAY
+        ARG = FTEMF*FLOAT(II)
+        FR(I,2) = 1./(1.+ARG*ARG)
+        FI(I,2) = ARG*FR(I,2)
+        ATEMF = CTEM*FLOAT(II)*FR(I,2)**2
+        DR(I,2) = -2.*ARG*ATEMF
+        DI(I,2) = (1.-ARG*ARG)*ATEMF
+!.. SLOW EXPONENTIAL DECAY
+        ARG = FTEMS*FLOAT(II)
+        FR(I,3) = 1./(1.+ARG*ARG)
+        FI(I,3) = ARG*FR(I,3)
+        ATEMS = CTEM*FLOAT(II)*FR(I,3)**2
+        DR(I,3) = -2.*ARG*ATEMS
+        DI(I,3) = (1.-ARG*ARG)*ATEMS
+!.. GAUSSIAN
+        ARG = GTEM*FLOAT(II)
+        FR(I,4) = EXP(-0.5*ARG*ARG)
+        FI(I,4) = 0.
+        DR(I,4) = -ARG*ARG*FR(I,4)/SIG
+        DI(I,4) = 0.
+!.. LORENTZIAN
+        AFII = ABS(FLOAT(II))
+        ARG = CLTEM*AFII
+        FR(I,5) = EXP(-ARG)
+        FI(I,5) = 0.
+        DR(I,5) = -C2TEM*AFII*FR(I,5)
+        DI(I,5) = 0.
+      ENDDO
+!
+! NOW FORM PRODUCTS IN FOURIER SPACE
+      DO I = 1, MNS
+! LIMITS ARE SPECIFIC TO THIS VERSION WHERE EITHER 4&5 OR 6&7 ARE APPROPRIATE
+        DO J = 2, NPKGEN(JPHASE,JSOURC) - 2
+          CFFT(J) = CMPLX(FR(I,J),FI(I,J))
+          DFFT(J) = CMPLX(DR(I,J),DI(I,J))
+        ENDDO
+        CFE = CFFT(2)*CFFT(4)*CFFT(5)
+        CFT = CFFT(3)*CFFT(4)*CFFT(5)
+        DDT(2) = SW*DFFT(2)*CFFT(4)*CFFT(5)
+        DDT(3) = SW1*DFFT(3)*CFFT(4)*CFFT(5)
+        DDT(4) = (SW*CFFT(2)+SW1*CFFT(3))*DFFT(4)*CFFT(5)
+        DDT(5) = (SW*CFFT(2)+SW1*CFFT(3))*DFFT(5)*CFFT(4)
+! LIMITS ARE SPECIFIC TO THIS VERSION WHERE EITHER 4&5 OR 6&7 ARE APPROPRIATE
+        DO J = 2, NPKGEN(JPHASE,JSOURC) - 2
+          DR(I,J) = REAL(DDT(J))
+          DI(I,J) = AIMAG(DDT(J))
+        ENDDO
+        FRE(I) = REAL(CFE)
+        FIE(I) = AIMAG(CFE)
+        FRT(I) = REAL(CFT)
+        FIT(I) = AIMAG(CFT)
+      ENDDO
+!
+! DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
+      INV = 1
+      CALL FT01A(MNS,INV,FRE,FIE)
+      CALL FT01A(MNS,INV,FRT,FIT)
+!
+! LIMITS ARE SPECIFIC TO THIS VERSION WHERE EITHER 4&5 OR 6&7 ARE APPROPRIATE
+      DO J = 2, NPKGEN(JPHASE,JSOURC) - 2
+        CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
+      ENDDO
+! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
+      XTEM = 1./XPKDEL(KMOD)
+      DO I = 1, MNS
+        II = MOD(I+MN2M1,MNS) + 1
+        PKADD(II,1) = (SW*FRE(I)+SW1*FRT(I))*XTEM
+        PKADD(II,2) = (FRE(I)-FRT(I))*XTEM
+! STORE IN PKADD AS APPROPRIATE
+!      DO 7 J=2,NPKGEN(JPHASE,JSOURC)
+!      JJ=J+1
+!      PKADD(II,JJ)= DR(I,J)*XTEM
+!   7  CONTINUE
+        PKADD(II,3) = DR(I,2)*XTEM
+        PKADD(II,4) = DR(I,3)*XTEM
+        IF (ISMAG(KNOW).EQ.0) THEN
+          PKADD(II,5) = DR(I,4)*XTEM
+          PKADD(II,6) = DR(I,5)*XTEM
+          PKADD(II,7) = 0.0
+          PKADD(II,8) = 0.0
+        ELSE
+          PKADD(II,5) = 0.0
+          PKADD(II,6) = 0.0
+          PKADD(II,7) = DR(I,4)*XTEM
+          PKADD(II,8) = DR(I,5)*XTEM
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE FTSB12
       SUBROUTINE PFTF12(N)
 !
 ! *** PFTF12 by JBF March 94 ***
