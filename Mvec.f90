@@ -462,38 +462,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GMPRD(A,B,C,NI,NJ,NK)
-!
-! *** GMPRD by JCM ***
-!
-!X
-!C 12C
-!H Sets matrix C = matrix A times matrix B.
-!A On entry A is a real NIxNJ matrix
-!A          B is a real NJxNK matrix
-!A On exit  C is a real NIxNK matrix holding A times B
-!
-      DIMENSION A(1), B(1), C(1)
-
-      DO I = 1, NI
-        IK = I
-        JK = 1
-        DO K = 1, NK
-          IJ = I
-          C(IK) = 0.0
-          DO J = 1, NJ
-            C(IK) = C(IK) + A(IJ)*B(JK)
-            IJ = IJ + NI
-            JK = JK + 1
-          ENDDO
-          IK = IK + NI
-        ENDDO
-      ENDDO
-
-      END SUBROUTINE GMPRD
-!
-!*****************************************************************************
-!
       SUBROUTINE GMREV(A,B,NI,NJ)
 !
 ! *** GMREV by PJB/JCM 28 Jun 83 ***
@@ -796,7 +764,7 @@
 !
       DIMENSION A(3), B(3), C(1)
 
-      CALL GMPRD(A,B,C,1,3,1)
+      CALL MultiplyMatrices(A,B,C,1,3,1)
       SCALPR = C(1)
 
       END FUNCTION SCALPR
