@@ -1,4 +1,4 @@
-! Winteracter module created : 01/Feb/2002 13:55:18
+! Winteracter module created : 02/Feb/2002 17:58:57
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -518,8 +518,8 @@
           INTEGER, PARAMETER :: IDB_SaveAs                      =  1379
           INTEGER, PARAMETER :: IDD_TEMPLATE014                 =   161
           INTEGER, PARAMETER :: IDF_AtomPropGrid                =  1381
-          INTEGER, PARAMETER :: IDF_BUTTON5                     =  1382
-          INTEGER, PARAMETER :: IDF_BUTTON6                     =  1384
+          INTEGER, PARAMETER :: IDF_WhichAtomMenu               =  1382
+          INTEGER, PARAMETER :: IDF_UisoOccMenu                 =  1384
           INTEGER, PARAMETER :: IDB_Relabel                     =  1385
           INTEGER, PARAMETER :: IDF_IDoNotAgree                 =  1386
           INTEGER, PARAMETER :: IDD_DIALOG002                   =   162
@@ -528,4 +528,8 @@
           INTEGER, PARAMETER :: IDF_zmFile2                     =  1389
           INTEGER, PARAMETER :: IDF_zmFile3                     =  1390
           INTEGER, PARAMETER :: IDF_zmFile4                     =  1391
+          INTEGER, PARAMETER :: IDF_FileName                    =  1393
+          INTEGER, PARAMETER :: IDF_LABEL3                      =  1395
+          INTEGER, PARAMETER :: IDF_REAL1                       =  1396
+          INTEGER, PARAMETER :: IDF_BUTTON10                    =  1397
       END MODULE Druid_Header

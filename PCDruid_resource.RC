@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 01/Feb/2002 13:55:18
+// Modified : 02/Feb/2002 17:58:57
 //
 ///////////////////////////////////////////////////
 //
@@ -531,8 +531,8 @@
 #define IDB_SaveAs                       1379
 #define IDD_TEMPLATE014                   161
 #define IDF_AtomPropGrid                 1381
-#define IDF_BUTTON5                      1382
-#define IDF_BUTTON6                      1384
+#define IDF_WhichAtomMenu                1382
+#define IDF_UisoOccMenu                  1384
 #define IDB_Relabel                      1385
 #define IDF_IDoNotAgree                  1386
 #define IDD_DIALOG002                     162
@@ -541,6 +541,10 @@
 #define IDF_zmFile2                      1389
 #define IDF_zmFile3                      1390
 #define IDF_zmFile4                      1391
+#define IDF_FileName                     1393
+#define IDF_LABEL3                       1395
+#define IDF_REAL1                        1396
+#define IDF_BUTTON10                     1397
 
 ///////////////////////////////////////////////////
 //
@@ -946,6 +950,19 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
+END
+
+IDD_Width_Equations RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
@@ -2935,25 +2952,38 @@ BEGIN
 ,0
 END
 
-IDD_zmEdit DIALOG 0, 0,  361,  151
+IDD_zmEdit DIALOG 0, 0,  268,  325
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "Edit Z-Matrix"
+CAPTION "Edit Atomic Properties / Z-Matrix"
 BEGIN
-    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   84,  126,   40,   14
-    CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  131,  126,   40,   14
-    CONTROL "View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  239,  126,   40,   14
-    CONTROL "Save As...",IDB_SaveAs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  192,  126,   40,   14
-    CONTROL "",IDF_AtomPropGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   22,   13,  190,   91
-    CONTROL "Button",IDF_BUTTON5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  223,   35,   40,   14
-    CONTROL "Button",IDF_BUTTON6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  223,   60,   40,   14
-    CONTROL "Re-label",IDB_Relabel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   24,  126,   40,   14
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   78,  302,   40,   14
+    CONTROL "&Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  138,  302,   40,   14
+    CONTROL "&View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  198,  278,   40,   14
+    CONTROL "Save &As...",IDB_SaveAs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  148,  278,   40,   14
+    CONTROL "",IDF_AtomPropGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   39,   25,  190,  204
+    CONTROL "Re-&label",IDB_Relabel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   30,  278,   40,   14
+    CONTROL "Debug message",IDF_FileName,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,   34,    7,  200,   14
+    CONTROL "Uiso / Occpancies",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  238,  250,   32
+    CONTROL "",IDF_WhichAtomMenu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  112,  251,   80,   40
+    CONTROL "to",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  197,  253,   10,    8
+    CONTROL "0.0",IDF_REAL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  213,  250,   35,   14
+    CONTROL "of",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   98,  253,   10,    8
+    CONTROL "&Set",IDF_BUTTON10,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   15,  250,   30,   14
+    CONTROL "",IDF_UisoOccMenu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,   52,  251,   40,   40
 END
 
 IDD_zmEdit RCDATA
 BEGIN
 "[Checks] \n"
 "[Menus] \n"
+" 1382     3     2 \n"
+"All atoms \n"
+"All non-hydrogens \n"
+"All hydrogens \n"
+" 1384     2     1 \n"
+"Uiso \n"
+"Occ. \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
@@ -2971,8 +3001,8 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "Label",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
     CONTROL "Element",ISS2,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
-    CONTROL "Uiso",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
-    CONTROL "Occ.",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,   40,   14
+    CONTROL "Uiso",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   40,   14
+    CONTROL "Occ.",ISS4,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   40,   14
 END
 
 IDD_TEMPLATE014 RCDATA
@@ -2988,7 +3018,7 @@ BEGIN
 "[Colours] \n"
 "[Lengths] \n"
 " 1021     5 \n"
-" 1066     2 \n"
+" 1066     3 \n"
 ,0
 END
 
