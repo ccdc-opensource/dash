@@ -87,7 +87,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 version.lib kernel32.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 winter.lib winmm.lib version.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /out:"Debug/TDASH.exe" /pdbtype:sept /libpath:"c:\wint\lib.vf"
+# ADD LINK32 winter.lib winmm.lib version.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /out:"Debug/ADASH.exe" /pdbtype:sept /libpath:"c:\wint\lib.vf"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -103,10 +103,10 @@ LINK32=link.exe
 
 SOURCE=.\Align.f90
 DEP_F90_ALIGN=\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
-	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -163,8 +163,8 @@ DEP_F90_CHI_S=\
 
 SOURCE=.\create_fob.f90
 DEP_F90_CREAT=\
+	".\Debug\ZMVAR.MOD"\
 	".\params.inc"\
-	".\Release\ZMVAR.MOD"\
 	
 # End Source File
 # Begin Source File
@@ -190,43 +190,43 @@ SOURCE=.\DICVAR.f90
 
 SOURCE=.\DICVO2.f90
 DEP_F90_DICVO=\
-	".\Release\DICVAR.mod"\
+	".\Debug\DICVAR.mod"\
 	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DICVO3.f90
 DEP_F90_DICVO3=\
-	".\Release\DICVAR.mod"\
+	".\Debug\DICVAR.mod"\
 	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DICVO4.f90
 DEP_F90_DICVO4=\
-	".\Release\DICVAR.mod"\
+	".\Debug\DICVAR.mod"\
 	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DICVO5.f90
 DEP_F90_DICVO5=\
-	".\Release\DICVAR.mod"\
+	".\Debug\DICVAR.mod"\
 	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DICVO6.f90
 DEP_F90_DICVO6=\
-	".\Release\DICVAR.mod"\
+	".\Debug\DICVAR.mod"\
 	
 # End Source File
 # Begin Source File
 
 SOURCE=.\DICVO7.f90
 DEP_F90_DICVO7=\
+	".\Debug\DICVAR.mod"\
 	".\DRUID_HEADER.mod"\
-	".\Release\DICVAR.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -234,7 +234,7 @@ DEP_F90_DICVO7=\
 
 SOURCE=.\DICVOL91.f90
 DEP_F90_DICVOL=\
-	".\Release\DICVAR.mod"\
+	".\Debug\DICVAR.mod"\
 	
 # End Source File
 # Begin Source File
@@ -253,7 +253,7 @@ DEP_F90_ERROR=\
 
 SOURCE=.\Eval.f90
 DEP_F90_EVAL_=\
-	".\Release\ZMVAR.MOD"\
+	".\Debug\ZMVAR.MOD"\
 	
 # End Source File
 # Begin Source File
@@ -344,11 +344,11 @@ DEP_F90_GETPI=\
 
 SOURCE=.\Init_Routines.f90
 DEP_F90_INIT_=\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
-	".\Release\ZMVAR.MOD"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -356,12 +356,12 @@ DEP_F90_INIT_=\
 
 SOURCE=.\Initialisation.f90
 DEP_F90_INITI=\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\POLY_COLOURS.INC"\
-	".\Release\ZMVAR.MOD"\
 	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -407,12 +407,12 @@ SOURCE=.\Mag.f90
 
 SOURCE=.\Main_Field_Changed_Routines.f90
 DEP_F90_MAIN_=\
+	".\Debug\DICVAR.mod"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\POLY_COLOURS.INC"\
-	".\Release\DICVAR.mod"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -432,6 +432,9 @@ DEP_F90_MCBAC=\
 # Begin Source File
 
 SOURCE=.\MONKEY1.F90
+DEP_F90_MONKE=\
+	".\Variables.mod"\
+	
 # End Source File
 # Begin Source File
 
@@ -565,10 +568,10 @@ DEP_F90_PROFI=\
 
 SOURCE=.\ProjectSave.f90
 DEP_F90_PROJE=\
+	".\Debug\ZMVAR.MOD"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
-	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -576,15 +579,15 @@ DEP_F90_PROJE=\
 
 SOURCE=.\read_one_zm.f90
 DEP_F90_READ_=\
-	".\Release\SAMVAR.MOD"\
-	".\Release\ZMVAR.MOD"\
+	".\Debug\SAMVAR.MOD"\
+	".\Debug\ZMVAR.MOD"\
 	
 # End Source File
 # Begin Source File
 
 SOURCE=.\Res2Mol2.f90
 DEP_F90_RES2M=\
-	".\Release\SAMVAR.MOD"\
+	".\Debug\SAMVAR.MOD"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -595,6 +598,7 @@ DEP_F90_SA_BE=\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
+	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -607,8 +611,8 @@ SOURCE=.\SA_Defaults.f90
 
 SOURCE=.\SA_Dialogues.f90
 DEP_F90_SA_DI=\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
-	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -617,20 +621,12 @@ DEP_F90_SA_DI=\
 
 SOURCE=.\SA_main.f90
 DEP_F90_SA_MA=\
+	".\Debug\SAMVAR.MOD"\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
-	".\Release\SAMVAR.MOD"\
-	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\sa_move_status.f90
-DEP_F90_SA_MO=\
-	".\DRUID_HEADER.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -640,54 +636,36 @@ SOURCE=.\SA_output.f90
 DEP_F90_SA_OU=\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
-	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
 
-SOURCE=.\sa_refresh.f90
-DEP_F90_SA_RE=\
-	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\Sa_simopt.f90
-# End Source File
-# Begin Source File
-
-SOURCE=.\sa_simplex.f90
-DEP_F90_SA_SI=\
-	".\DRUID_HEADER.mod"\
+SOURCE=.\SA_soln_store.f90
+DEP_F90_SA_SO=\
 	".\params.inc"\
 	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
 
 SOURCE=.\SA_structure_output.f90
 DEP_F90_SA_ST=\
+	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
-	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
 
-SOURCE=.\sa_subs.f90
+SOURCE=.\SA_summary.f90
 DEP_F90_SA_SU=\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
-	".\Release\ZMVAR.MOD"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -696,7 +674,7 @@ DEP_F90_SA_SU=\
 
 SOURCE=.\samabo.f90
 DEP_F90_SAMAB=\
-	".\Release\SAMVAR.MOD"\
+	".\Debug\SAMVAR.MOD"\
 	
 # End Source File
 # Begin Source File
@@ -705,16 +683,34 @@ SOURCE=.\SAMVAR.f90
 # End Source File
 # Begin Source File
 
-SOURCE=.\SAsoln_store.f90
-DEP_F90_SASOL=\
-	".\params.inc"\
-	".\Variables.mod"\
+SOURCE=.\SGDecode.f90
+# End Source File
+# Begin Source File
+
+SOURCE=.\tSA_move_status.f90
+DEP_F90_TSA_M=\
+	".\DRUID_HEADER.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
 
-SOURCE=.\SAsummary.f90
-DEP_F90_SASUM=\
+SOURCE=.\tSA_refresh.f90
+DEP_F90_TSA_R=\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\tSA_simopt.f90
+# End Source File
+# Begin Source File
+
+SOURCE=.\tSA_simplex.f90
+DEP_F90_TSA_S=\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\Variables.mod"\
@@ -723,7 +719,14 @@ DEP_F90_SASUM=\
 # End Source File
 # Begin Source File
 
-SOURCE=.\SGDecode.f90
+SOURCE=.\tSA_subs.f90
+DEP_F90_TSA_SU=\
+	".\Debug\ZMVAR.MOD"\
+	".\DRUID_HEADER.mod"\
+	".\params.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
 # End Source File
 # Begin Source File
 
@@ -808,11 +811,11 @@ DEP_F90_WIFD9=\
 
 SOURCE=.\Wizard_routines.f90
 DEP_F90_WIZAR=\
+	".\Debug\DICVAR.mod"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
-	".\Release\DICVAR.mod"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
