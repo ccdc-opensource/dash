@@ -5,7 +5,7 @@
 !
 ! Displays an error message
 !
-! INPUT   : TheMessage : The message to be displayed
+! INPUT   : TheMessage = The message to be displayed
 !
       USE WINTERACTER
       
@@ -22,16 +22,32 @@
 ! Displays an error message that should be ignored in the release version of DASH.
 ! Before release, this subroutine should simply RETURN without doing anything.
 !
-! INPUT   : TheMessage : The message to be displayed
+! INPUT   : TheMessage = The message to be displayed
 !
       USE WINTERACTER
       
       CHARACTER*(*), INTENT(IN   ) :: TheMessage
 
-      RETURN
+      !RETURN
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Debug Error")
 
       END SUBROUTINE DebugErrorMessage
+!
+!*****************************************************************************
+!
+      SUBROUTINE WarningMessage(TheMessage)
+!
+! Displays a warning message
+!
+! INPUT   : TheMessage = The message to be displayed
+!
+      USE WINTERACTER
+      
+      CHARACTER*(*), INTENT(IN   ) :: TheMessage
+
+      CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Warning")
+
+      END SUBROUTINE WarningMessage
 !
 !*****************************************************************************
 !
@@ -41,7 +57,7 @@
 ! Please note that 'Cancel', meaning that the user panicked, equates to 'No',
 ! therefore, harmful actions should take place after explicit 'Yes' only.
 !
-! INPUT   : TheQuestion : The question to be confirmed
+! INPUT   : TheQuestion = The question to be confirmed
 !
 ! RETURNS : .TRUE.  if user pressed 'Yes'/'OK'
 !           .FALSE. if user pressed 'No'/'Abort'/'Cancel'
@@ -54,6 +70,26 @@
       Confirm = (WInfoDialog(ExitButtonCommon) .EQ. CommonYes)
 
       END FUNCTION Confirm
+!
+!*****************************************************************************
+!
+      SUBROUTINE SetChildWinAutoClose(TheIHANDLE)
+
+! For child windows that are an editor, the only event DASH has to handle itself
+! (all other events for editor child windows are handled automatically by Winteracter)
+! is the CloseRequest. By 'registering' a child window with GetEvent, by setting the
+! ChildWinAutoClose variable for that child window to true, GetEvent will take care of that.
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheIHANDLE
+
+      LOGICAL         ChildWinAutoClose
+      COMMON /ChWAC/  ChildWinAutoClose(1:20)
+
+      ChildWinAutoClose(TheIHANDLE) = .TRUE.
+
+      END SUBROUTINE SetChildWinAutoClose
 !
 !*****************************************************************************
 !
@@ -74,6 +110,13 @@
 ! with a mouse button press. 
       DATA MseBtnPressed / .FALSE. /
       COMMON /JvdS1/ MseBtnPressed
+
+! For child windows that are an editor, the only event DASH has to handle itself
+! (all other events for editor child windows are handled automatically by Winteracter)
+! is the CloseRequest. By 'registering' a child window with GetEvent, by setting the
+! ChildWinAutoClose variable for that child window to true, GetEvent will take care of that.
+      LOGICAL         ChildWinAutoClose
+      COMMON /ChWAC/  ChildWinAutoClose(1:20)
 
   10  CALL WMessage(EventType,EventInfo)
       SELECT CASE (EventInfo%WIN)
@@ -108,9 +151,10 @@
               GOTO 10
           END SELECT
         CASE (1:20)
-          IF (EventType .EQ. CloseRequest) THEN
+          IF ((EventType.EQ.CloseRequest) .AND. ChildWinAutoClose(EventInfo%WIN)) THEN
             CALL PushActiveWindowID
             CALL WindowCloseChild(EventInfo%WIN)
+            ChildWinAutoClose(EventInfo%WIN) = .FALSE.
             CALL PopActiveWindowID
             GOTO 10
           ENDIF
@@ -158,6 +202,9 @@
           GOTO 10
         CASE (IDD_DV_Results)
           CALL DealWithDVResults
+          GOTO 10
+        CASE (IDD_Pawley_Status)
+          CALL DealWithPawleyFitWindow
           GOTO 10
       END SELECT
 
@@ -267,6 +314,9 @@
             GOTO 10
           CASE (IDD_DV_Results)
             CALL DealWithDVResults
+            GOTO 10
+          CASE (IDD_Pawley_Status)
+            CALL DealWithPawleyFitWindow
             GOTO 10
         END SELECT
       ENDIF

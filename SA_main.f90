@@ -796,6 +796,7 @@
 ! Show the z-matrix file in an editor window
   999 CALL WindowOpenChild(IHANDLE)
       CALL WEditFile(frag_file(ifrg),Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+      CALL SetChildWinAutoClose(IHANDLE)
 
       END SUBROUTINE ViewZmatrix
 !
