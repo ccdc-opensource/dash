@@ -184,7 +184,7 @@
         CALL SelectMode(IDB_AnalyseSolutions)
         CALL WDialogSelect(IDD_SAW_Page5)
         CALL WDialogPutInteger(IDF_Limit1,1)
-        CALL WDialogPutInteger(IDF_Limit2,NumOf_SA_Runs)
+        CALL WDialogPutInteger(IDF_Limit2, NumOf_SA_Runs)
         CALL WizardWindowShow(IDD_SAW_Page5)
       ENDIF
 
