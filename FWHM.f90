@@ -81,10 +81,6 @@
       Y(5) = PKFUNC(X(5))
       ITER = 0
    10 ITER = ITER + 1
-      IF (ITER .EQ. MAXITER/2) THEN
-! This indicates that we have a problem
-
-      ENDIF
       IF (ITER .GT. MAXITER) GOTO 100 ! This happens now and then (due to rounding errors?), but is not a problem.
       X(2) = X(1) + 0.25*(X(5)-X(1))
       Y(2) = PKFUNC(X(2))
