@@ -1,8 +1,10 @@
       SUBROUTINE GETHCV(FILENAM,lenfil,ier)
+
+!O      character*80  filenam
+      CHARACTER*(*), INTENT (IN   ) :: FILENAM
 C
-	INCLUDE 'params.inc'
-	 CHARACTER*150 LINE
-      character*80  filenam
+      INCLUDE 'params.inc'
+       CHARACTER*150 LINE
       INTEGER ICOR(20),NKKOR(MCHIHS)
       REAL WTI(MFCSTO)
 C
@@ -27,16 +29,16 @@ c
 
       COMMON /FPINF/PIK(0:50,MFPINF),KMINST(MFPINF),KMAXST(MFPINF)
 C
-!	write(56,*) ' HCVfile is ',lenfil,'"',FILENAM(:Lenfil),'"'
+!     write(56,*) ' HCVfile is ',lenfil,'"',FILENAM(:Lenfil),'"'
       OPEN(121,FILE=FILENAM(:Lenfil),STATUS='OLD',err=998)
-!	write(56,*) ' HCVfile is ',lenfil,'"',FILENAM(:Lenfil),'"'
+!     write(56,*) ' HCVfile is ',lenfil,'"',FILENAM(:Lenfil),'"'
 C
 C
       KK=0
       MREF=MSAREF
       KKOR=0
       MINCOR=20
-	IER = 0
+      IER = 0
       READ(121,2121,END=998,ERR=998) NLIN,LINE
  2121 FORMAT(Q,A)
 C
@@ -96,11 +98,11 @@ C
         END IF
       END DO
 C
-!	 write(56,*) ' In gethcv ',maxk,kkor
+!      write(56,*) ' In gethcv ',maxk,kkor
 C
       GOTO 999
  998  ier=1
-!	 write(56,*) ' In gethcv ',maxk,kkor
+!      write(56,*) ' In gethcv ',maxk,kkor
  999  CLOSE(121)
       RETURN
       END

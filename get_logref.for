@@ -1,5 +1,7 @@
       SUBROUTINE GET_LOGREF(FILE,lenfil,ier)
 C
+!O      CHARACTER*80  file
+      CHARACTER*(*), INTENT (IN   ) :: FILE
       INCLUDE 'params.inc'
       COMMON /FCSTOR/MAXK,FOB(150,MFCSTO)
       LOGICAL LOGREF
@@ -36,7 +38,6 @@ c
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 c
-      CHARACTER*80  file
 C
       IHMIN=9999
       IKMIN=9999
@@ -122,7 +123,6 @@ C     of "does K_ equal K_m?" tests whether or not k is even.
  
 
       SELECT CASE (NumberSGTable)
-
         CASE (1,2,40,58,430,433,434,435,356,449,451,462,468)    ! P1,P-1,C 1 2 1,C 1 2/m 1,P3,P-3,R3(hex),R-3(hex),I-4,P-31m, P-3m1, P6, P-6
           NLGREF=0
         CASE (469,471,481,483,485)           ! P6/m, P622, P-6m2, P-62m, P6/mmm
@@ -303,7 +303,6 @@ C     of "does K_ equal K_m?" tests whether or not k is even.
       END SELECT
 
       SELECT CASE (NumberSGTable)    ! adjustments for presence of 'i' index
-
         CASE (430,431,432,433,434,435,449,451,462,468) 
           JHMIN=MIN(IIMIN,IHMIN,IKMIN)
           JHMAX=MAX(IIMAX,IHMAX,IKMAX)
