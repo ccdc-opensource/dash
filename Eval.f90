@@ -181,7 +181,31 @@
 !
 ! JvdS, 14 Jan 2002.
 ! Reprogrammed according to Molecular Modelling by Leach, page 384.
-! (Note the typos: q1 and q2 should probably read phi minus psi)
+! (Note the typos: q1 and q2 should read phi minus psi)
+
+! q0 = Cos(0.5*beta) * Cos(0.5(alpha+gamma))
+! q1 = Sin(0.5*beta) * Cos(0.5(alpha-gamma))
+! q2 = Sin(0.5*beta) * Sin(0.5(alpha-gamma))
+! q3 = Cos(0.5*beta) * Sin(0.5(alpha+gamma))
+!
+! 1. gamma about the z-axis
+! 2. beta  about the x-axis
+! 3. alpha about the z-axis
+!
+! Inverse of   1*q0 + i*q1 + j*q2 + k*q3   =   1*q0 - i*q1 - j*q2 - k*q3
+!
+! unity   q0 = 1
+!         q1 = 0
+!         q2 = 0
+!         q3 = 0
+!
+! Rotation about z-axis => beta = 0 => q1 = q2 = 0
+!
+! 1 * 1 =  1    i * 1 =  i    j * 1 =  j    k * 1 =  k
+! 1 * i =  i    i * i = -1    j * i = -k    k * i =  j
+! 1 * j =  j    i * j =  k    j * j = -1    k * j = -i
+! 1 * k =  k    i * k = -j    j * k =  i    k * k = -1
+!
 
       IMPLICIT NONE
 
