@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 15/Nov/2001 09:49:47
+// Modified : 15/Nov/2001 11:08:14
 //
 ///////////////////////////////////////////////////
 //
@@ -1173,6 +1173,19 @@ IDD_PW_Page1 RCDATA
 BEGIN
 "[Checks] \n"
 "[Menus] \n"
+" 1064    10     1 \n"
+"Triclinic \n"
+"Monoclinic (a-axis) \n"
+"Monoclinic (b-axis) \n"
+"Monoclinic (c-axis) \n"
+"Orthorhombic \n"
+"Tetragonal \n"
+"Trigonal \n"
+"Rhombohedral \n"
+"Hexagonal \n"
+"Cubic \n"
+" 1065     1     1 \n"
+"Debug message \n"
 "[Tabs] \n"
 "[Ranges] \n"
 " 1231     -1.0000           1.0000      \n"

@@ -317,6 +317,8 @@
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
+      LOGICAL          log_preset
+      COMMON /presetl/ log_preset
 
       INTEGER          NTIC
       INTEGER                IH
@@ -364,6 +366,7 @@
       PastPawley = .FALSE.
       DefaultMaxResolution = 1.75
       LOG_HYDROGENS = .FALSE.
+      log_preset = .FALSE.
       CALL Set_Wavelength(WaveLengthOf('Cu'))
 ! Now initialise the maximum resolution in the dialogue window
       CALL WDialogSelect(IDD_PW_Page5)
