@@ -216,7 +216,9 @@
 ! NMAX = mvar = 100
 ! XOPT = values of the parameters of the best SA solution so far
 
-      INTEGER         KKOR, WTIJ,         IKKOR,         JKKOR
+      INTEGER         KKOR
+      REAL                  WTIJ
+      INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
       INTEGER         MAXK
