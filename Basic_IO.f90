@@ -58,7 +58,7 @@
 
       LOGICAL, EXTERNAL :: Confirm
 
-      !RETURN
+      RETURN
       IF (ShowAgain) THEN
         ShowAgain = Confirm('Debug error : '//TheMessage(1:LEN_TRIM(TheMessage))//CHAR(13)//'More Debug Error messages?')
       ENDIF
