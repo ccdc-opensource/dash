@@ -80,9 +80,10 @@
                               chi_x_max, chi_x_min, chi_y_min, Zoomed
 
       INTEGER  J
+      LOGICAL ChiFix
 
 ! chi_sqd is initialised to all zeros in BeginSa()
-
+      ChiFix = .FALSE.
       it_count = iteration
       IF (iteration .GT. MaxIterationSoFar) MaxIterationSoFar = iteration
 ! Record chi-sqd value in array.  Chi-sqd values following it_count entry
@@ -93,12 +94,20 @@
       IF (iteration .GT. 1) THEN
         IF (CHIPROBEST .GT. chi_sqd(iteration-1, Curr_SA_Run)) THEN
           chi_sqd(iteration, Curr_SA_Run) = Chi_sqd(iteration-1, Curr_SA_Run)
-         END IF
+          ChiFix = .TRUE.
+        END IF
       END IF
 !! Fill rest of array with current Chi-sqd Value
-      DO J = iteration+1, MaxIter
-        Chi_sqd(J, Curr_SA_Run) = CHIPROBEST
-      ENDDO
+      IF (ChiFix .EQ. .TRUE.) THEN 
+        DO J = iteration+1, MaxIter
+          Chi_sqd(J, Curr_SA_Run) = Chi_sqd(iteration-1, Curr_SA_Run)
+          ChiFix = .FALSE.
+        ENDDO
+      ELSE
+        DO J = iteration+1, MaxIter
+          Chi_sqd(J, Curr_SA_Run) = CHIPROBEST
+        ENDDO
+      END IF
 
       IF ((ChiSqdChildWindows(ChiHandle).EQ.1).AND.(iteration.GE.2)) CALL plotting_chi_sqd(ChiHandle)
 
