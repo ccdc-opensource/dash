@@ -335,6 +335,8 @@
 				  CASE(ID_PWa_DF_Open)
 			          CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
 					  CALL XYEPRO_file_Read(CTEMP,NoData)
+!C>> JCC Need to reselect dialogue after the action
+					CALL WDialogSelect(IDD_PW_Page3)
                   CASE(ID_PWa_DF_Browse)
                     call XYEPRO_file_Open(NoData)
 !C>> JCC Need to reselect dialogue after the action
