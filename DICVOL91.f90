@@ -5,13 +5,13 @@
 !       ======================================================================
 !     ==========================================================================
 !
-!     DDDDDDD   IIII   CCCCCC   VV    VV   OOOOOO   LL         999999        11
-!     DD    DD   II   CC    CC  VV    VV  OO    OO  LL        99    99     1111
-!     DD    DD   II   CC        VV    VV  OO    OO  LL        99    99   111 11
-!     DD    DD   II   CC        VV    VV  OO    OO  LL         9999999       11
-!     DD    DD   II   CC         VV  VV   OO    OO  LL              99       11
-!     DD    DD   II   CC    CC    VVVV    OO    OO  LL    LL  99    99       11
-!     DDDDDDD   IIII   CCCCCC      VV      OOOOOO   LLLLLLLL   999999       1111
+!     DDDDDDD   IIII   CCCCCC   VV    VV   OOOOOO   LL         999999       11
+!     DD    DD   II   CC    CC  VV    VV  OO    OO  LL        99    99    1111
+!     DD    DD   II   CC        VV    VV  OO    OO  LL        99    99      11
+!     DD    DD   II   CC        VV    VV  OO    OO  LL         9999999      11
+!     DD    DD   II   CC         VV  VV   OO    OO  LL              99      11
+!     DD    DD   II   CC    CC    VVVV    OO    OO  LL    LL  99    99      11
+!     DDDDDDD   IIII   CCCCCC      VV      OOOOOO   LLLLLLLL   999999     111111
 !
 !     ==========================================================================
 !       ======================================================================
@@ -281,7 +281,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: Jc, Jt, Jh, Jo, Jm, Jtr
+      LOGICAL, INTENT (IN   ) :: Jc, Jt, Jh, Jo, Jm, Jtr
       REAL,    INTENT (INOUT) :: Volmin, Volmax
       REAL,    INTENT (IN   ) :: Poimol, Dens, Delden
 !
@@ -298,6 +298,7 @@
 !     Reading of the data
       iw = 117
       DICVOL_Error = 0 ! Success
+      DICVOL_NumOfSolutions = 0 ! Initialise number of solutions to 0 for all crystal systems
       OPEN(iw,FILE='DICVOL.OUT',ERR=1900)
 99001 FORMAT (A)
       IF ( amax.EQ.0.0 ) amax = 30.0
@@ -330,11 +331,11 @@
         dth = dth + epsil(I)
         epsil(I) = d(I)*epsil(I)*pirad*0.5/TAN(Angulo)
       ENDDO
-      Vn = .6/(1./n-.0052)*d(n)**3
+      Vn = 0.6/(1.0/n-.0052)*d(n)**3
  200  DO I = 1, n
         Pr = d(I)*d(I)
         q(I) = 1./Pr
-        epsq(I) = 2.*epsil(I)/(Pr*d(I))
+        epsq(I) = 2.0*epsil(I)/(Pr*d(I))
       ENDDO
       dth = dth/n
  300  Nr = NINT(d(1)/d(2))
@@ -370,7 +371,7 @@
         kq(I) = coeff*q(I)
         kepsq(I) = coeff*epsq(I)
       ENDDO
-      IF ( Jm.NE.0 ) THEN
+      IF ( Jm ) THEN
         IF ( Bemin.EQ.0.0 ) Bemin = 90.
         IF ( Bemax.EQ.0.0 ) Bemax = 125.
         WRITE (iw,99009) amax, Bmax, Volmin, Cmax, Bemin, Volmax, Bemax
@@ -380,7 +381,7 @@
      &          'C MAXIMUM    =',F8.2,' A',5X,'|',5X,'|',32X,'|'/4X,'|',4X,'BETA MINIMUM =',F8.2,' Deg.',2X,'|',5X,&
      &          '|',2X,'VOLUME MAXIMUM =',F8.2,' A**3 |'/4X,'|',4X,'BETA MAXIMUM =',F8.2,' Deg.',2X,'|',5X,'|',32X,&
      &          '|'/4X,'|',33X,'|',5X,'|',32X,'|'/4X,35('-'),5X,34('-')//)
-      ELSEIF ( (Jc+Jt+Jh+Jo).EQ.0 ) THEN
+      ELSEIF ( .NOT. (Jc .OR. Jt .OR. Jh .OR. Jo) ) THEN
         WRITE (iw,99010) Volmin, Volmax
 99010   FORMAT (//21X,42('*')//22X,9('-'),'---  VOLUME LIMITS  ---',8('-')/22X,'|',38X,'|'/22X,'|',38X,'|'/22X,'|',&
      &          3X,' VOLUME MINIMUM =',F8.2,' A**3',5X,'|'/22X,'|',38X,'|'/22X,'|',3X,' VOLUME MAXIMUM =',F8.2,    &
@@ -448,7 +449,7 @@
         rap = Poimol/Avog
         Vunitp = rap/(Dens-Delden)
         Vunitm = rap/(Dens+Delden)
-        IF ( Jc.EQ.0 ) GOTO 1200
+        IF ( .NOT. Jc ) GOTO 1200
 !        WRITE (iw,99030)
 !99030 FORMAT (/3X,'SEARCH OF CUBIC SOLUTION(S)'/3X,27('*')//)
 !        WRITE (iw,99020)
@@ -480,7 +481,7 @@
         Pasvol = 400.
         Nvol = (Volmaxc-Volmin)/Pasvol
         Nvol = Nvol + 1
-        IF ( Jc.NE.0 ) THEN
+        IF ( Jc ) THEN
 !          WRITE (iw,99030)
 !99030 FORMAT (/3X,'SEARCH OF CUBIC SOLUTION(S)'/3X,27('*')//)
           vinf = Volmin
@@ -503,7 +504,9 @@
           Vv = v
           Volmaxc = AMIN1(Volmaxc,v)
         ENDIF
-        IF ( Jt.NE.0 .OR. Jh.NE.0 .OR. Jo.NE.0 ) THEN
+! When we are here, cubic has finished
+        CALL DICVOL_FinishedCrystalSystem(cCubic)
+        IF ( Jt .OR. Jh .OR. Jo ) THEN
 !          WRITE (iw,99031)
 !99031 FORMAT (//3X,'SEARCH OF TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SOLUTION(S)'/3X,69('*')/)
           DO Kvol = 1, Nvol
@@ -514,7 +517,7 @@
 !            WRITE (iw,99028) vinf, vsup
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
-            IF ( Jt.NE.0 ) THEN
+            IF ( Jt ) THEN
 !              WRITE (iw,99022)
 !99022 FORMAT (8X,'TETRAGONAL SYSTEM')
               Ichoix = -1
@@ -526,7 +529,7 @@
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
               ENDIF
             ENDIF
-            IF ( Jh.NE.0 ) THEN
+            IF ( Jh ) THEN
               Vv = v
 !              WRITE (iw,99023)
 !99023 FORMAT (8X,'HEXAGONAL SYSTEM')
@@ -539,7 +542,7 @@
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
               ENDIF
             ENDIF
-            IF ( Jo.NE.0 ) THEN
+            IF ( Jo ) THEN
               Vv = v
 !              WRITE (iw,99024)
 !99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
@@ -557,7 +560,9 @@
           Vv = v
           Volmaxc = AMIN1(Volmaxc,v)
         ENDIF
-        IF ( Jm.EQ.0 ) GOTO 600
+! When we are here, Tetragonal, Hexagonal and Orthorhombic have finished
+        CALL DICVOL_FinishedCrystalSystem(cTetragonal+cHexagonal+cOrthorhombic)
+        IF ( .NOT. Jm ) GOTO 600
 !        WRITE (iw,99032)
 !99032 FORMAT (//3X,'SEARCH OF MONOCLINIC SOLUTION(S)'/3X,32('*')/)
 !        WRITE (iw,99027)
@@ -632,7 +637,10 @@
  500  CONTINUE
 !      WRITE (iw,99029)
 !99029 FORMAT (/2X,'END OF SEARCH FOR MONOCLINIC SOLUTIONS'/2X,38('*'))
- 600  IF ( Jtr.EQ.0 ) GOTO 999
+ 600  CONTINUE
+! When we are here, Monoclinic has finished
+      CALL DICVOL_FinishedCrystalSystem(cMonoclinic)
+      IF ( .NOT. Jtr ) GOTO 999
 !      WRITE (iw,99033)
 !99033 FORMAT (//3X,'SEARCH OF TRICLINIC SOLUTION(S)'/3X,31('*')/)
 !      WRITE (iw,99037)
@@ -707,7 +715,8 @@
 !99025 FORMAT (/2X,'END OF SEARCH FOR CUBIC SOLUTION(S)'/2X,35('*'))
       Vv = v
       Volmaxc = AMIN1(Volmaxc,v)
- 1200 IF ( Jt.NE.0 .OR. Jh.NE.0 .OR. Jo.NE.0 ) THEN
+ 1200 CALL DICVOL_FinishedCrystalSystem(cCubic)
+      IF ( Jt .OR. Jh .OR. Jo ) THEN
 !        WRITE (iw,99031)
 !99031 FORMAT (3X,'TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SYSTEM')
         DO kz = 1, 50
@@ -721,7 +730,7 @@
 !            WRITE (iw,99028) vinf, vsup
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
-            IF ( Jt.NE.0 ) THEN
+            IF ( Jt ) THEN
               Vv = v
 !              WRITE (iw,99022)
 !99022 FORMAT (8X,'TETRAGONAL SYSTEM')
@@ -734,7 +743,7 @@
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
               ENDIF
             ENDIF
-            IF ( Jh.NE.0 ) THEN
+            IF ( Jh ) THEN
               Vv = v
 !              WRITE (iw,99023)
 !99023 FORMAT (8X,'HEXAGONAL SYSTEM')
@@ -747,7 +756,7 @@
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
               ENDIF
             ENDIF
-            IF ( Jo.NE.0 ) THEN
+            IF ( Jo ) THEN
               Vv = v
 !              WRITE (iw,99024)
 !99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
@@ -767,7 +776,8 @@
 !        WRITE (iw,99026)
 !99026 FORMAT (//2X,'END OF SEARCH FOR TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SOLUTION(S)'/2X,77('*'))
       ENDIF
-      IF ( Jm.EQ.0 ) GOTO 1500
+      CALL DICVOL_FinishedCrystalSystem(cTetragonal+cHexagonal+cOrthorhombic)
+      IF ( .NOT. Jm ) GOTO 1500
 !      WRITE (iw,99032)
 !99032 FORMAT (//3X,'SEARCH OF MONOCLINIC SOLUTION(S)'/3X,32('*')/)
 !      WRITE (iw,99027)
@@ -843,7 +853,8 @@
  1400 CONTINUE
 !      WRITE (iw,99029)
 !99029 FORMAT (/2X,'END OF SEARCH FOR MONOCLINIC SOLUTIONS'/2X,38('*'))
- 1500 IF ( Jtr.EQ.0 ) GOTO 999
+ 1500 CALL DICVOL_FinishedCrystalSystem(cMonoclinic)
+      IF ( .NOT. Jtr ) GOTO 999
 !      WRITE (iw,99033)
 !99033 FORMAT (//3X,'SEARCH OF TRICLINIC SOLUTION(S)'/3X,31('*')/)
 !      WRITE (iw,99037)

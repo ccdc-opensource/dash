@@ -1,3 +1,6 @@
+!
+!*****************************************************************************
+!
 ! Variables for DICVOL
       MODULE DICVAR
 
@@ -5,15 +8,40 @@
 
       INTEGER DICVOL_Error
 
-      INTEGER cDICVOL_ErrorOnWrite
-      PARAMETER (cDICVOL_ErrorOnWrite = 1)
-      INTEGER cDICVOL_TooManySolutions
-      PARAMETER (cDICVOL_TooManySolutions = 2)
-      INTEGER cDIVCOLExpErrTooLarge
-      PARAMETER (cDIVCOLExpErrTooLarge = 3)
-      INTEGER cDICVOL_ErrorInterrupted
-      PARAMETER (cDICVOL_ErrorInterrupted = 4)
+      INTEGER     cDICVOL_ErrorOnWrite
+      PARAMETER ( cDICVOL_ErrorOnWrite     = 1 )
+      INTEGER     cDICVOL_TooManySolutions
+      PARAMETER ( cDICVOL_TooManySolutions = 2 )
+      INTEGER     cDIVCOLExpErrTooLarge
+      PARAMETER ( cDIVCOLExpErrTooLarge    = 3 )
+      INTEGER     cDICVOL_ErrorInterrupted
+      PARAMETER ( cDICVOL_ErrorInterrupted = 4 )
+
+      INTEGER     cCubic
+      PARAMETER ( cCubic        =   1 )
+      INTEGER     cHexagonal
+      PARAMETER ( cHexagonal    =   2 )
+      INTEGER     cTetragonal
+      PARAMETER ( cTetragonal   =   4 )
+      INTEGER     cTrigonal
+      PARAMETER ( cTrigonal     =   8 )
+      INTEGER     cRhombohedral
+      PARAMETER ( cRhombohedral =  16 )
+      INTEGER     cOrthorhombic
+      PARAMETER ( cOrthorhombic =  32 )
+      INTEGER     cMonoclinic
+      PARAMETER ( cMonoclinic   =  64 )
+      INTEGER     cTriclinic
+      PARAMETER ( cTriclinic    = 128 )
       
+      INTEGER DICVOL_NumOfSolutions(1:6) ! Number of solutions per crystal system
+! 1 = Cubic
+! 2 = Tetragonal
+! 3 = Hexagonal
+! 4 = Orthorhombic
+! 5 = Monoclinic
+! 6 = Triclinic
+
       REAL DV_ScaleFactor
 ! To scale all the data, so that large unit cells can be treated as though they were small.
 ! implementation: 
@@ -22,16 +50,15 @@
 ! 3. all a, b, and c output by DICVOL are divided by it. 
 ! 4. The volume is divided by DV_ScaleFactor**3
 
-      REAL coeff
+      REAL        coeff
       PARAMETER ( coeff = 1.E+08 )
-      REAL Coef4
+      REAL        Coef4
       PARAMETER ( Coef4 = 1.E-04 )
-      REAL pirad
+      REAL        pirad
       PARAMETER ( pirad = 0.3141592653589793115997963469E+01 / 180.0 )
-      REAL pideg
+      REAL        pideg
       PARAMETER ( pideg = 180.0 / 0.3141592653589793115997963469E+01 )
-      REAL dth, pas, pas16, pas2, pas32, pas4, pas64, pas8, rap, v, vinf,    &
-     &        vsup, wave2
+      REAL dth, pas, pas16, pas2, pas32, pas4, pas64, pas8, rap, v, vinf, vsup, wave2
       REAL, DIMENSION(50) :: d, epsil, epsq, q, th
       INTEGER :: kdens, kz, mh, mh2, mk, mk2, ml, ml2, n
       INTEGER, DIMENSION(50) :: kepsq, kq, kqt
@@ -91,3 +118,6 @@
       REAL Bemin, Bemax
 
       END MODULE DICVAR
+!
+!*****************************************************************************
+!

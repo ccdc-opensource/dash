@@ -145,6 +145,7 @@
           CALL TRIHKL1(kamoi5,kbmoi5,kcmoi5,kdmoi5,kemoi5,kfmoi5,kaplu5,kbplu5,kcplu5,kdplu5,keplu5,kfplu5,5)
           IF ( nt.EQ.-1 ) GOTO 1520
           ndich(5) = ndich(5) + 1
+      CALL PeekEvent
           DO I = 1, n - 1
             J = I + 1
             IF ( irj(I,5).EQ.1 .AND. irj(J,5).EQ.1 .AND. ih(I,1,5).EQ.ih(J,1,5) .AND. ik(I,1,5).EQ.ik(J,1,5) .AND. &
@@ -271,6 +272,7 @@
               CALL TRIHKL1(kamoi6,kbmoi6,kcmoi6,kdmoi6,kemoi6,kfmoi6,kaplu6,kbplu6,kcplu6,kdplu6,keplu6,kfplu6,6)
               IF ( nt.EQ.-1 ) GOTO 1325
               ndich(6) = ndich(6) + 1
+      CALL PeekEvent
               DO I = 1, n - 1
                 J = I + 1
                 IF ( irj(I,6).EQ.1 .AND. irj(J,6).EQ.1 .AND. ih(I,1,6).EQ.ih(J,1,6) .AND. ik(I,1,6).EQ.ik(J,1,6)   &
@@ -398,6 +400,7 @@
      &                         7)
                   IF ( nt.EQ.-1 ) GOTO 1278
                   ndich(7) = ndich(7) + 1
+      CALL PeekEvent
                   DO I = 1, n - 1
                     J = I + 1
                     IF ( irj(I,7).EQ.1 .AND. irj(J,7).EQ.1 .AND. ih(I,1,7).EQ.ih(J,1,7) .AND. ik(I,1,7)            &
@@ -479,6 +482,7 @@
      &                         8)
                   IF ( nt.NE.-1 ) THEN
                     ndich(8) = ndich(8) + 1
+      CALL PeekEvent
                     DO I = 1, n - 1
                       J = I + 1
                       IF ( irj(I,8).EQ.1 .AND. irj(J,8).EQ.1 .AND. ih(I,1,8).EQ.ih(J,1,8) .AND. ik(I,1,8)          &
