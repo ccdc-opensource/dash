@@ -832,6 +832,9 @@
 
       INCLUDE 'PARAMS.INC' 
 
+      INTEGER         nvar, NS, NT, iSeed1, iSeed2
+      COMMON /sapars/ nvar, NS, NT, iSeed1, iSeed2
+
       REAL          RULB
       COMMON /RULB/ RULB(Mvar)
 
@@ -847,7 +850,7 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
-      DO I = 1, NPAR
+      DO I = 1, NVAR
         CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X(I))
       ENDDO
       IF (WDialogGetCheckBoxLogical(IDF_RandomInitVal)) THEN
