@@ -2124,11 +2124,9 @@
       ENDDO
 
       END SUBROUTINE CheckTriModalBounds
-
 !
 !*****************************************************************************
 !
-
       SUBROUTINE CheckBimodalBounds(row,OneEightyScale)
 
 ! Determines whether it is appropriate to use a -180 to 0 and 0 to 180 degree 
@@ -2153,11 +2151,9 @@
       ENDIF
 
       END SUBROUTINE CheckBiModalBounds 
-      
 !
 !*****************************************************************************
 !
-
       LOGICAL FUNCTION CheckXInBounds(npar, XIn)
 
 ! This Subroutine determines if a trial torsion angle value is within
@@ -2252,3 +2248,6 @@
       END SELECT
 
       END FUNCTION CheckXInBounds
+!
+!*****************************************************************************
+!
