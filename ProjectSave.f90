@@ -413,7 +413,7 @@
           CALL FileRWReal(hPrjFile, iPrjRecNr, RW, ProfileChiSqd(I))
           CALL FileRWReal(hPrjFile, iPrjRecNr, RW, IntensityChiSqd(I))
           IF (iPrjReadOrWrite .EQ. cRead) THEN
-! Fill pdbAtmCoords
+! Fill XAtmCoords
             CALL makefrac(X)
 ! Fractional co-ordinates are now in Xato.
             DO ii = 1, NATOM
