@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 05/Sep/2001 16:14:12
+// Modified : 06/Sep/2001 12:18:31
 //
 ///////////////////////////////////////////////////
 //
@@ -2435,7 +2435,7 @@ BEGIN
     CONTROL "Truncate data to start at 2 theta =",IDF_TruncateStartYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  101,   45,  105,   14
     CONTROL "1.7500",IDF_Max2Theta,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  208,   77,   35,   14
     CONTROL "o",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  244,   75,   40,    8
-    CONTROL "3.0000",IDF_Min2Theta,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  213,   45,   30,   14
+    CONTROL "0.0000",IDF_Min2Theta,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  213,   45,   30,   14
     CONTROL "o",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  244,   43,   40,    8
     CONTROL "Please note that for maximal performance of the background subtraction algorithm, the diffraction pattern should not start or end at a Bragg peak.",IDF_LABEL9,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  101,    8,  178,   24
     CONTROL "Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  258,  128,   40,   14
@@ -2445,7 +2445,7 @@ IDD_PW_Page5 RCDATA
 BEGIN
 "[Checks] \n"
 " 1206 1 \n"
-" 1222 0 \n"
+" 1222 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
