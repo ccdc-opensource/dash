@@ -140,21 +140,64 @@
       REAL*8 CART(MAXATM,3)
 
       INTEGER IHANDLE
-      INTEGER WriteMol2 ! Function
+      INTEGER, EXTERNAL :: WriteMol2
+      LOGICAL, EXTERNAL :: ColourFlexibleTorsions
+      INTEGER atom
+      INTEGER Element
+      INTEGER NumOfFlexTorsions
 
-      natcry = NATOMS(IFRG)
-      CALL MAKEXYZ(natcry,BLEN(1,IFRG),ALPH(1,IFRG),BET(1,IFRG),      &
-     &             IZ1(1,IFRG),IZ2(1,IFRG),IZ3(1,IFRG),CART(1,1),     &
+      natcry = NATOMS(ifrg)
+      CALL MAKEXYZ(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),      &
+     &             IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART(1,1),     &
      &             CART(1,2),CART(1,3))
 ! Conversion of asym to aelem : very dirty, but works
       DO I = 1, natcry
         axyzo(I,1) = SNGL(CART(I,1))
         axyzo(I,2) = SNGL(CART(I,2))
         axyzo(I,3) = SNGL(CART(I,3))
-        AtmElement(I)(1:2) = asym(I,IFRG)(1:2)
-        atomlabel(I) = OriginalLabel(I,IFRG)
+        AtmElement(I)(1:2) = asym(I,ifrg)(1:2)
+        atomlabel(I) = OriginalLabel(I,ifrg)
       ENDDO
       CALL AssignCSDElement(AtmElement)
+! Q & D to display flexible torsion angles in different colors by forcing different
+! element type. SAMABO, which calcualtes the bond types, uses aelem, which are the original
+! elements.
+! WriteMol2 uses aelem_2, which we fill with an element reflecting the state of the torsion angle.
+! Slightly dirty, the routines are now no longer standalone.
+      aelem_2 = aelem
+      IF (ColourFlexibleTorsions() .AND. (natcry.GE.4)) THEN
+        DO I = 1, natcry
+          aelem_2(I) = 1     ! Carbon        Grey
+        ENDDO
+        NumOfFlexTorsions = 0
+        DO atom = 4, natcry
+          IF (ioptt(atom,ifrg) .EQ. 1) THEN
+            NumOfFlexTorsions = NumOfFlexTorsions + 1
+            SELECT CASE(NumOfFlexTorsions)
+              CASE (1)
+                Element = 23 ! Cobalt        Blue
+              CASE (2)
+                Element = 64 ! Oxygen        Red
+              CASE (3)
+                Element = 81 ! Sulphur       Yellow
+              CASE (4)
+                Element = 21 ! Chlorine      Green
+              CASE (5)
+                Element = 56 ! Nitrogen      Light blue
+              CASE (6)
+                Element = 16 ! Bromine       Brown
+              CASE (7)
+                Element = 43 ! Iodine        Pink
+              CASE (8)
+                Element = 66 ! Phosphorus
+            END SELECT
+            aelem_2(atom) = Element
+            aelem_2(IZ1(atom,ifrg)) = Element
+            aelem_2(IZ2(atom,ifrg)) = Element
+            aelem_2(IZ3(atom,ifrg)) = Element
+          ENDIF
+        ENDDO
+      ENDIF
 ! Show the mol2 file
       IF (WriteMol2(temp_file) .EQ. 1) CALL ViewStructure(temp_file)
 ! Show the z-matrix file in an editor window
