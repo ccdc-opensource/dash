@@ -193,7 +193,7 @@
       LOGICAL, EXTERNAL :: FnPatternOK, FnWavelengthOK
       REAL, EXTERNAL :: TwoTheta2dSpacing
       INTEGER I, j, RW
-      CHARACTER*(255) tString
+      CHARACTER*(255) tString 
 
       ErrCounter = 0
       CALL PushActiveWindowID
@@ -238,6 +238,11 @@
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeGamma(2))
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeHPSL)
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeHMSL)
+
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,SlimValue)
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ScalFac)
+! RAW .\Example.xye ! @@@@ include ??
+
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NBIN)
 
 ! Read / Write the .pik file
@@ -350,8 +355,12 @@
           CALL WDialogSelect(IDD_ViewPawley)
           CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(RefArgK(NumOfRef)))
         ENDIF
-        BACKREF = .FALSE.
-        CALL SetModeMenuState(0,1,1)
+        BackRef = .FALSE.
+        CALL SetModeMenuState(0,1)
+! Change global variable FNAME
+        FNAME = ThePrjFile
+! Update this throughout the program (Wizard + status bar)
+        CALL ScrUpdateFileName
       ENDIF
 
       CLOSE(hPrjFile)
