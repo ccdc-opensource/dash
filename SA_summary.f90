@@ -32,7 +32,10 @@
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
-      INTEGER I, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INTEGER I, IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
@@ -127,14 +130,33 @@
 !ep allows you to view pdb file of SA Solutions, each clicked
 !   check box in fresh mercury window
       DO iRow = 1, NumOf_SA_Runs
-        CALL WGridGetCellCheckBox(IDF_SA_summary,2,iRow,istatus)
-        IF (istatus .EQ. 1) THEN
+        CALL WGridGetCellCheckBox(IDF_SA_summary,2,iRow,iStatus)
+        IF (iStatus .EQ. 1) THEN
 ! calls subroutine which opens Mercury window with .pdb file
           CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow))
           CALL ViewStructure('SA_best.pdb')
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(iRow)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,2,iRow,Unchecked)
+          CALL PopActiveWindowID
+          RETURN
+        ENDIF
+      ENDDO
+! Allows you to restart a run
+      DO iRow = 1, NumOf_SA_Runs
+        CALL WGridGetCellCheckBox(IDF_SA_summary,6,iRow,iStatus)
+        IF (iStatus .EQ. 1) THEN
+          CALL WGridPutCellCheckBox(IDF_SA_Summary,6,iRow,Unchecked)
+! Fill SA Parameter Bounds Wizard Window with the values from this solution.
+          CALL WDialogSelect(IDD_SA_input2)
+          DO IV = 1, NVAR
+            CALL WGridPutCellReal(IDF_parameter_grid,1,IV,BestValuesDoF(IV,iSol2Run(iRow)))
+          ENDDO
+! Untick "Randomise initial values"
+          CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal,.FALSE.)
+          CALL ShowWizardWindowParameterBounds
+          CALL PopActiveWindowID
+          RETURN
         ENDIF
       ENDDO
       CALL PopActiveWindowID
@@ -1107,24 +1129,20 @@
 ! Required to handle the profile graphs plotted in child windows
       INTEGER  SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
-      INTEGER Ihandle
+      INTEGER iHandle
 !      LOGICAL MseBtnPressed, OldEventWaiting
 ! The routines that act on the mousebutton presses are non-reentrant
 ! and the one should not be called when the other is active, so we must keep a flag if we are dealing
 ! with a mouse button press. 
 !      COMMON /Events/ MseBtnPressed, OldEventWaiting
 
-
       SELECT CASE (EventType)
-
         CASE (CloseRequest)
           CALL WindowCloseChild(EventInfo%win)
           SAUsedChildWindows(EventInfo%win) = 0
           CALL UnRegisterChildWindow(EventInfo%win)
-
         CASE (expose, resize)
           CALL plot_pro_file(EventInfo%win)
-
         CASE (MouseButDown)
 !!           IF (MseBtnPressed) GOTO 10
            IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
@@ -1135,9 +1153,8 @@
 !!              MseBtnPressed = .FALSE.
            ENDIF
 !!10         CONTINUE
-
         CASE (KeyDown) ! home key resets the plot to original axes
-           IF (EventInfo%VALUE1 .eq. KeyHome) THEN 
+           IF (EventInfo%VALUE1 .EQ. KeyHome) THEN 
              CALL ResetProfPlotAxes(EventInfo%win)
              CALL WindowClear
              CALL plot_pro_file(EventInfo%win)
@@ -1148,7 +1165,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PlotZoom(Ihandle)
+      SUBROUTINE PlotZoom(iHandle)
 !
 !  Enable button up and mouse movement events
 !
@@ -1156,6 +1173,8 @@
       USE VARIABLES
 
       IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iHandle
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Poly_Colours.inc'
@@ -1173,14 +1192,13 @@
       REAL, DIMENSION (20):: Xmin
       COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
 
-      INTEGER Ihandle
       CALL WindowSelect(Ihandle)
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
 ! JCC Set the scale correctly. 
       CALL IGrUnits(0.0, 0.0, 1.0, 1.0)
       CALL IPgArea(0.1,0.1,0.9,0.9)
-      CALL IPgUnits(xmin(ihandle),ymin(ihandle),xmax(ihandle),ymax(ihandle))
+      CALL IPgUnits(xmin(iHandle),ymin(iHandle),xmax(iHandle),ymax(iHandle))
       xgcur(1) = EventInfo%GX
       ygcur(1) = EventInfo%GY
       CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
@@ -1197,14 +1215,13 @@
       DO WHILE (.TRUE.)
 !Can't use PeekEvent since the following events aren't handled for ChildWindows
          CALL WMessagePeek(EventType, EventInfo)
-         IF (EventType .ne. (-1)) THEN
+         IF (EventType .NE. (-1)) THEN
            IF (EventInfo%WIN .GT. 0) THEN
-           CALL WindowSelect(Ihandle)
+           CALL WindowSelect(iHandle)
            CALL IGrUnits(0.0,0.0,1.0,1.0)
            CALL IPgArea(0.1,0.1,0.9,0.9)
-           CALL IPgUnits(xmin(ihandle),ymin(ihandle),xmax(ihandle),ymax(ihandle))
+           CALL IPgUnits(xmin(iHandle),ymin(iHandle),xmax(iHandle),ymax(iHandle))
            CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
-
           SELECT CASE (EventType)
             CASE (MouseMove)
               xgcur(2) = EventInfo%GX
@@ -1233,15 +1250,15 @@
                 CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
                 CALL IGrPlotMode('Normal')
                 CALL IGrColourN(InfoGrScreen(PrevColReq))
-                IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(xmax(ihandle)-Xmin(ihandle))) RETURN
-                IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(YMAX(ihandle)-YMIN(ihandle))) RETURN
-                XMin(ihandle) = MIN(XCUR(1),XCUR(2))
-                XMax(ihandle) = MAX(XCUR(1),XCUR(2))  
-                YMin(ihandle) = MIN(YCUR(1),YCUR(2))
-                YMax(ihandle) = MAX(YCUR(1),YCUR(2))
+                IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(xmax(iHandle)-Xmin(iHandle))) RETURN
+                IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(YMAX(iHandle)-YMIN(iHandle))) RETURN
+                XMin(iHandle) = MIN(XCUR(1),XCUR(2))
+                XMax(iHandle) = MAX(XCUR(1),XCUR(2))  
+                YMin(iHandle) = MIN(YCUR(1),YCUR(2))
+                YMax(iHandle) = MAX(YCUR(1),YCUR(2))
               ENDIF
               CALL WindowClear()
-              CALL Plot_pro_file(ihandle)
+              CALL Plot_pro_file(iHandle)
               RETURN  
           END SELECT
         ENDIF
@@ -1252,7 +1269,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ResetProfPlotAxes(Ihandle)
+      SUBROUTINE ResetProfPlotAxes(iHandle)
 !
 !  
 !
@@ -1261,7 +1278,7 @@
 
       IMPLICIT NONE
 
-      INTEGER Ihandle
+      INTEGER, INTENT (IN   ) :: iHandle
 
       INCLUDE 'PARAMS.INC'
 
@@ -1275,10 +1292,10 @@
       REAL, DIMENSION (20):: Xmin
       COMMON /PROFPLOTAXES/ Ymin, Ymax, XMin, XMax
 
-      YMin(ihandle) = MINVAL(YOBIN(1:NBIN))
-      YMax(ihandle) = MAXVAL(YOBIN(1:NBIN))
-      Xmin(ihandle) = XBIN(1)
-      Xmax(ihandle) = XBIN(NBIN)
+      YMin(iHandle) = MINVAL(YOBIN(1:NBIN))
+      YMax(iHandle) = MAXVAL(YOBIN(1:NBIN))
+      Xmin(iHandle) = XBIN(1)
+      Xmax(iHandle) = XBIN(NBIN)
 
       END SUBROUTINE ResetProfPlotAxes
 !

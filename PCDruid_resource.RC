@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 01/Aug/2002 14:18:44
+// Modified : 18/Nov/2002 14:54:32
 //
 ///////////////////////////////////////////////////
 //
@@ -643,8 +643,6 @@
 #define IDB_PrevRes                      1490
 #define IDD_Pause                         135
 #define IDF_RandomInitVal                1361
-#define IDB_Restart                      1362
-#define IDF_Limit3                       1222
 
 ///////////////////////////////////////////////////
 //
@@ -3567,13 +3565,10 @@ BEGIN
     CONTROL "1",IDF_Limit1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  164,  176,   34,   14
     CONTROL "1",IDF_Limit2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  228,  176,   34,   14
     CONTROL "&Invert Selection",IDF_InvertSelection,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  283,  176,   60,   14
-    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   92,   10,  241,   80
+    CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   92,   10,  276,   80
     CONTROL "Select",IDB_Select,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   88,  176,   40,   14
     CONTROL "solutions",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  128,  179,   36,    8
     CONTROL "Save...",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  233,  150,   40,   14
-    CONTROL "Restart",IDB_Restart,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  290,  112,   40,   14
-    CONTROL "solution",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  330,  115,   32,    8
-    CONTROL "1",IDF_Limit3,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  362,  112,   35,   14
 END
 
 IDD_SAW_Page5 RCDATA
@@ -3588,10 +3583,9 @@ BEGIN
 "[Ranges] \n"
 " 1219               1              99 \n"
 " 1220               1              99 \n"
-" 1222               1              99 \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1136     5     99   176 \n"
+" 1136     6     99   176 \n"
 "   20 \n"
 "[Colours] \n"
 "[Lengths] \n"
@@ -3607,6 +3601,7 @@ BEGIN
     CONTROL "Overlay",ISS3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT,    0,    0,   34,   14
     CONTROL "Profile Chi-sqd",ISS4,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   54,   14
     CONTROL "Intensity Chi-sqd",ISS5,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   60,   14
+    CONTROL "Restart",ISS6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   36,   14
 END
 
 IDD_TEMPLATE021 RCDATA
@@ -3614,6 +3609,7 @@ BEGIN
 "[Checks] \n"
 " 1066 0 \n"
 " 1067 0 \n"
+" 1070 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
