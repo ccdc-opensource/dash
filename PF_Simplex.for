@@ -20,47 +20,47 @@ C
 C
 C***********************************************************************
 C
-      FUNCTION ROBCHI_CREF(DAT,SIG,FIT,NDAT)
-C     ---------------------------------
-C
-      PARAMETER (MPAR=50)
-      REAL ROBCHI_CREF,P(MPAR)
-      PARAMETER (MVAL=50)
-      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
-
-      REAL DAT(*),SIG(*),FIT(*)
-      DATA RT2,YJ0,YJ1 /0.7071067814,0.120782238,0.333333333/
-      DATA ERSMAL,ERFBIG,SMALL /0.03,3.0,1.0E-20/
-C
-      CHI=0.0
-      DO 10 I=1,NVAL
-C.. Include the d*^2 calculated function on the following line
-C        FITI= ...
-! JvdS The following line generated a compiler error (Warning: Variable FITI is used before its value has been defined).
-! JvdS I assume that FITI = FIT(I).
-! JvdS FIT(*) is one of the arguments to this routine and is not used anywhere else,
-! JvdS also, it is inside a loop over I.
-
-! JvdS Note that due to this typo, ***NONE*** of the arguments passed to this routine was used.
-
-! JvdS The good news is: this function isn't used anywhere anyway.
-
-!JvdS the line of code was:
-!        DIF=RT2*ABS(YVAL(I)-FITI)/EVAL(I)
-! JvdS and now it is:
-        DIF=RT2*ABS(YVAL(I)-FIT(I))/EVAL(I)
-        IF (DIF.LT.ERSMAL) THEN
-          CHI=CHI+YJ0-YJ1*DIF**2
-        ELSEIF (DIF.GT.ERFBIG) THEN
-          CHI=CHI-LOG(DIF)
-        ELSE
-          CHI=CHI-LOG(DIF)+LOG(ABS(1.0-ERFC_FUN(DIF))+SMALL)
-        ENDIF
-        IF (CHI.LE.-1.0E15) GOTO 1
-  10  CONTINUE
-   1  ROBCHI_CREF=-2.0*CHI
-      END
-C
+!U      FUNCTION ROBCHI_CREF(DAT,SIG,FIT,NDAT)
+!UC     ---------------------------------
+!UC
+!U      PARAMETER (MPAR=50)
+!U      REAL ROBCHI_CREF,P(MPAR)
+!U      PARAMETER (MVAL=50)
+!U      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
+!U
+!U      REAL DAT(*),SIG(*),FIT(*)
+!U      DATA RT2,YJ0,YJ1 /0.7071067814,0.120782238,0.333333333/
+!U      DATA ERSMAL,ERFBIG,SMALL /0.03,3.0,1.0E-20/
+!UC
+!U      CHI=0.0
+!U      DO 10 I=1,NVAL
+!UC.. Include the d*^2 calculated function on the following line
+!UC        FITI= ...
+!U! JvdS The following line generated a compiler error (Warning: Variable FITI is used before its value has been defined).
+!U! JvdS I assume that FITI = FIT(I).
+!U! JvdS FIT(*) is one of the arguments to this routine and is not used anywhere else,
+!U! JvdS also, it is inside a loop over I.
+!U
+!U! JvdS Note that due to this typo, ***NONE*** of the arguments passed to this routine was used.
+!U
+!U! JvdS The good news is: this function isn't used anywhere anyway.
+!U
+!U!JvdS the line of code was:
+!U!        DIF=RT2*ABS(YVAL(I)-FITI)/EVAL(I)
+!U! JvdS and now it is:
+!U        DIF=RT2*ABS(YVAL(I)-FIT(I))/EVAL(I)
+!U        IF (DIF.LT.ERSMAL) THEN
+!U          CHI=CHI+YJ0-YJ1*DIF**2
+!U        ELSEIF (DIF.GT.ERFBIG) THEN
+!U          CHI=CHI-LOG(DIF)
+!U        ELSE
+!U          CHI=CHI-LOG(DIF)+LOG(ABS(1.0-ERFC_FUN(DIF))+SMALL)
+!U        ENDIF
+!U        IF (CHI.LE.-1.0E15) GOTO 1
+!U  10  CONTINUE
+!U   1  ROBCHI_CREF=-2.0*CHI
+!U      END
+!UC
 C
       FUNCTION ERFC_FUN(X)
 C     ----------------
