@@ -38,7 +38,7 @@
       LOGICAL           Resume_SA
       COMMON /RESUMESA/ Resume_SA
 
-      LOGICAL, EXTERNAL :: Get_AutoAlign
+      LOGICAL, EXTERNAL :: Get_AutoAlign, Confirm
       INTEGER, EXTERNAL :: PrjSaveAs
       INTEGER IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iDummy
 
@@ -112,17 +112,17 @@
         CASE (FieldChanged)
           CALL UpdateOutputSolutionsWindow
       END SELECT
-!ep Allows you to view pdb file of SA Solutions, each clicked
-!   check box in fresh mercury window
+! Allows you to view pdb file of SA Solutions, each clicked
+! check box in fresh Mercury window
       DO iRow = 1, NumOf_SA_Runs
         CALL WGridGetCellCheckBox(IDF_SA_summary, 2, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
+          CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
 ! Calls subroutine which opens Mercury window with .pdb file
           CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow))
           CALL ViewStructure('SA_best.pdb')
 ! Calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(iRow)
-          CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
           CALL PopActiveWindowID
           RETURN
         ENDIF
@@ -131,28 +131,33 @@
       DO iRow = 1, NumOf_SA_Runs
         CALL WGridGetCellCheckBox(IDF_SA_summary, 6, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
-          CALL CloseOutputSolutionsChildWindows
-          CALL WDialogSelect(IDD_SAW_Page5)
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 6, iRow, Unchecked)
+          IF (Confirm("Restarting the simulated annealing will erase all current solutions."//CHAR(13)// &
+                      "In order to keep the current solutions and append new ones, choose 'Resume SA'."//CHAR(13)// &
+                      "Do you wish to continue and erase all current solutions?")) THEN
+            CALL CloseOutputSolutionsChildWindows
+            CALL WDialogSelect(IDD_SAW_Page5)
 ! Fill SA Parameter Bounds Wizard Window with the values from this solution.
-          CALL WDialogSelect(IDD_SA_Modal_input2)
-          DO IV = 1, NVAR
-            CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IV, BestValuesDoF(IV,iSol2Run(iRow)))
-          ENDDO
+            CALL WDialogSelect(IDD_SA_Modal_input2)
+            DO IV = 1, NVAR
+              CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IV, BestValuesDoF(IV,iSol2Run(iRow)))
+            ENDDO
 ! Untick "Randomise initial values"
-          CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .FALSE.)
-          CALL ShowWizardWindowParameterBounds
-          CALL PopActiveWindowID
-          RETURN
+            CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .FALSE.)
+            ! Change mode to structure solution
+            CALL SelectMode(ID_Structure_Solution_Mode)
+            CALL ShowWizardWindowParameterBounds
+            CALL PopActiveWindowID
+            RETURN
+          ENDIF
         ENDIF
       ENDDO
 ! Rietveld refinement
       DO iRow = 1, NumOf_SA_Runs
         CALL WGridGetCellCheckBox(IDF_SA_summary, 7, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
-          CALL CloseOutputSolutionsChildWindows
-          CALL WDialogSelect(IDD_SAW_Page5)
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 7, iRow, Unchecked)
+          CALL CloseOutputSolutionsChildWindows
           CALL ShowWizardWindowRietveld(iSol2Run(iRow))
           CALL PopActiveWindowID
           RETURN
