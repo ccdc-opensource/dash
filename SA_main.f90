@@ -33,15 +33,50 @@
       INTEGER tFileHandle, I, kk, ifrg, ilen, II, Fixed
       REAL    R, x, lb, ub
       CHARACTER*80 tSDIFile
-
+      CHARACTER*8  tDate      ! '20010215' for 15 Feb 2001
+      CHARACTER*17 DateStr
+      CHARACTER*9  MonthStr
 
       WriteSAParametersToFile = 1 ! Error
       CALL PushActiveWindowID
       tFileHandle = 10
       OPEN(tFileHandle,FILE=TheFileName,ERR=999)
       WRITE(tFileHandle,'("  Parameters for simulated annealing in DASH")',ERR=999)
-  !    WRITE(tFileHandle,'("  Date = ",A)',ERR=999)
-
+      CALL DATE_AND_TIME(tDate)
+      DateStr = ''
+      IF (tDate(7:7) .EQ. '0') THEN 
+        DateStr(1:1) = tDate(8:8)       ! DateStr = '7'
+      ELSE
+        DateStr(1:2) = tDate(7:8)       ! DateStr = '12'
+      ENDIF
+      SELECT CASE (tDate(5:6))
+        CASE ('01')
+          MonthStr = 'January'
+        CASE ('02')
+          MonthStr = 'February'
+        CASE ('03')
+          MonthStr = 'March'
+        CASE ('04')
+          MonthStr = 'April'
+        CASE ('05')
+          MonthStr = 'May'
+        CASE ('06')
+          MonthStr = 'June'
+        CASE ('07')
+          MonthStr = 'July'
+        CASE ('08')
+          MonthStr = 'August'
+        CASE ('09')
+          MonthStr = 'September'
+        CASE ('10')
+          MonthStr = 'October'
+        CASE ('11')
+          MonthStr = 'November'
+        CASE ('12')
+          MonthStr = 'December'
+      END SELECT
+      DateStr = DateStr(1:LEN_TRIM(DateStr))//' '//MonthStr(1:LEN_TRIM(MonthStr))//' '//tDate(1:4)
+      WRITE(tFileHandle,'(A)',ERR=999) "  Date = "//DateStr(1:LEN_TRIM(DateStr))
       CALL WDialogSelect(IDD_SAW_Page1)
       CALL WDialogGetString(IDF_SA_Project_Name,tSDIFile)
       WRITE(tFileHandle,'("  SDI file = ",A)',ERR=999) tSDIFile(1:LEN_TRIM(tSDIFile))
@@ -325,7 +360,7 @@
         ENDIF
       ENDDO
       nvar = kk
-!.. Now fill the grid
+! Now fill the grid
       CALL WDialogSelect(IDD_SA_input2)
       CALL WGridRows(IDF_parameter_grid,nvar)
       DO i = 1, nvar
@@ -383,7 +418,7 @@
       LOGICAL         gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
 
-! Blow away the selected z-matrices
+! Blow away the z-matrices
       gotzmfile = .FALSE.
       CALL UpdateZmatrixSelection
 
@@ -501,7 +536,7 @@
                                    'of these formats. DASH will create separate z-matrix files for'//CHAR(13)//&
                                    'each chemical residue present in the first entry in the file.'//CHAR(13)//&
                                    'In multiple entry files the first entry will be read only.'
-      INTEGER Res2Mol2, CSSR2Mol2 ! Function
+      INTEGER, EXTERNAL :: Res2Mol2, CSSR2Mol2
 
       CALL WMessageBox(OKCancel, InformationIcon, CommonOK, Info, "Create Z-matrix")
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
