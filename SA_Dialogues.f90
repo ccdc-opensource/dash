@@ -516,7 +516,7 @@
 
       IMPLICIT NONE    
 
-      INTEGER, EXTERNAL :: WriteMol2, Get_HydrogenTreatment
+      INTEGER, EXTERNAL :: WriteMol2, Get_HydrogenTreatment, WDialogGetRadioButtonInt
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
       REAL, EXTERNAL :: Degrees2Radians
       INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State
@@ -661,19 +661,21 @@
               CALL WDialogFieldStateLogical(IDF_RotAxFrac,   tUseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_RotAxPln,    tUseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_GROUP3,      tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_IniOrAxis,   tUseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_IniOrEuler,  tUseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_IniOrQuater, tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_IniOrAxis,   tUseSingleAxis)
               iOpt1State = Disabled
               iOpt2State = Disabled
               iOpt3State = Disabled
               IF (tUseSingleAxis) THEN
                 CALL WDialogGetRadioButton(IDF_RotAxAtom, iOption)
-                SELECT CASE (iOption)
+                SELECT CASE (WDialogGetRadioButtonInt(IDF_RotAxAtom))
                   CASE (1)
                     iOpt1State = Enabled
                   CASE (2)
                     iOpt2State = Enabled
+                    IF (WDialogGetRadioButtonInt(IDF_IniOrAxis) .EQ. 1) CALL WDialogPutRadioButton(IDF_IniOrQuater)
+                    CALL WDialogFieldStateLogical(IDF_IniOrAxis, .FALSE.)
                   CASE (3)
                     iOpt3State = Enabled
                 END SELECT
@@ -694,8 +696,7 @@
               iOpt2State = Disabled
               iOpt3State = Disabled
               IF (tUseSingleAxis) THEN
-                CALL WDialogGetRadioButton(IDF_IniOrAxis, iOption)
-                SELECT CASE (iOption)
+                SELECT CASE (WDialogGetRadioButtonInt(IDF_IniOrAxis))
                   CASE (1)
                     iOpt1State = Enabled
                   CASE (2)
