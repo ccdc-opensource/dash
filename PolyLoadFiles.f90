@@ -525,6 +525,7 @@
       CALL Profile_Plot(IPTYPE)
       NoData = .FALSE.
       CALL ScrUpdateFileName
+      PastPawley = .FALSE.
 !      CALL FourierPattern(1,1000)
 
       END FUNCTION DiffractionFileLoad
@@ -1223,7 +1224,7 @@
       POS = 1
       DO WHILE (Cline(POS:POS) .EQ. ' ')
         POS = POS + 1
-      END DO
+      ENDDO
       SELECT CASE (Cline(POS:POS))
         CASE ('_')
 ! It's a keyword. Read up to the next '=' or EOL, ignoring spaces and converting to uppercase
@@ -1236,7 +1237,7 @@
               KeyWordPos = KeyWordPos + 1
             ENDIF
             POS = POS + 1
-          END DO
+          ENDDO
           KeyWordLen = KeyWordPos - 1
           SELECT CASE (KeyWord(1:KeyWordLen))
             CASE ('_ACTUAL_I100','_D-I','_2THETA-I') ! It's a peak list, not a powder pattern
@@ -1459,8 +1460,8 @@
       IF (GetNumOfColumns(Cline) .EQ. 1) THEN
         READ(Cline,*,ERR=999,END=999) Lambda1
         IF ((Lambda1 .LT. 0.0001) .OR. (Lambda1 .GT. 20.0)) THEN
-           CALL ErrorMessage('First line contains only one column, but not a valid wavelength.')
-           GOTO 999
+          CALL ErrorMessage('First line contains only one column, but not a valid wavelength.')
+          GOTO 999
         ENDIF
 ! JvdS Q & D hack enabling the cell parameters to be stored on the second line of the .xye file.
 ! ####################
@@ -1568,16 +1569,16 @@
             CALL ErrorMessage("Warning: The data file contains multiple observations for the same "//&
                               "2-theta"//CHAR(13)//"Only the first observation"//&
                               "will be used")
-          END IF
+          ENDIF
           GOTO 10
-        END IF
-      END IF
+        ENDIF
+      ENDIF
       I = I + 1
 ! JCC Only read in a maximum of MOBS points
       IF (I .GT. MOBS) THEN
         CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
         GOTO 100
-      END IF
+      ENDIF
       GOTO 10
  100  NOBS = I - 1
       CLOSE(10)
@@ -1598,7 +1599,7 @@
 ! set source to laboratory. Otherwise, source is synchrotron.
         DO I = 2, 6
           IF (ABS(Lambda1 - FnWavelengthOfMenuOption(I)) .LT. 0.0003) JRadOption = 1
-        END DO
+        ENDDO
       ENDIF
       CALL Upload_Source
       CALL UpdateWavelength(Lambda1)
@@ -1651,7 +1652,7 @@
 
       DO I = 1, EndNOBS
         IF (XOBS(I) .GT. RMaxTTheta) EXIT
-      END DO
+      ENDDO
       IF (I .LE. 1) RETURN
       NOBS = I - 1
       NBIN=(NOBS/LBIN)
@@ -1669,13 +1670,13 @@
           YCADD=YCADD+YCAL(JJ)
           YBADD=YBADD+YBAK(JJ)
           VADD=VADD+EOBS(JJ)**2
-        END DO
+        ENDDO
         XBIN(I)=XADD/FLOAT(LBIN)
         YOBIN(I)=YOADD/FLOAT(LBIN)
         YCBIN(I)=YCADD/FLOAT(LBIN)
         YBBIN(I)=YBADD/FLOAT(LBIN)
         EBIN(I)=SQRT(VADD)/FLOAT(LBIN)
-      END DO
+      ENDDO
       XPMIN=XOBS(1)
       XPMAX=XOBS(1)
       YPMIN=YOBS(1)
@@ -1685,7 +1686,7 @@
         XPMAX=MAX(XOBS(I),XPMAX)
         YPMIN=MIN(YOBS(I),YPMIN)
         YPMAX=MAX(YOBS(I),YPMAX)
-      END DO
+      ENDDO
       XPGMIN=XPMIN
       XPGMAX=XPMAX
       YPGMIN=YPMIN
@@ -1769,7 +1770,7 @@
       ENDDO
       DO I = 1, NOBS
         IF (tXOBS(I) .GT. TheMin2Theta) EXIT
-      END DO
+      ENDDO
       Shift = I-1
       EndNOBS = OriginalNOBS - Shift
       DO I = 1, EndNOBS
@@ -1804,13 +1805,13 @@
           YCADD = YCADD + YCAL(JJ)
           YBADD = YBADD + YBAK(JJ)
           VADD  = VADD  + EOBS(JJ)**2
-        END DO
+        ENDDO
         XBIN(I)  =  XADD/FLOAT(LBIN)
         YOBIN(I) = YOADD/FLOAT(LBIN)
         YCBIN(I) = YCADD/FLOAT(LBIN)
         YBBIN(I) = YBADD/FLOAT(LBIN)
         EBIN(I)  = SQRT(VADD)/FLOAT(LBIN)
-      END DO
+      ENDDO
       XPMIN = XOBS(1)
       XPMAX = XOBS(1)
       YPMIN = YOBS(1)
@@ -1820,7 +1821,7 @@
         XPMAX = MAX(XOBS(I),XPMAX)
         YPMIN = MIN(YOBS(I),YPMIN)
         YPMAX = MAX(YOBS(I),YPMAX)
-      END DO
+      ENDDO
       XPGMIN = XPMIN
       XPGMAX = XPMAX
       YPGMIN = YPMIN
@@ -1929,7 +1930,7 @@
         CALL ErrorMessage("Could not read the project file "//FNAME(1:KLEN)//&
                           CHAR(13)//"successfully.")
         RETURN
-      END IF
+      ENDIF
       STATBARSTR(1) = FNAME
       CALL WindowOutStatusBar(1,STATBARSTR(1))
 ! Enable all menu functions
@@ -1950,11 +1951,29 @@
 
       CHARACTER*(*), INTENT (IN   ) ::  SDIFile
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
       INCLUDE 'statlog.inc'
+
+      REAL              XPF_Range
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
       CHARACTER(LEN = MaxPathLength) :: line
 
@@ -2048,6 +2067,12 @@
         CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
         PikExists = (ipiker .EQ. 0)
       ENDIF
+      CurrentRange = 0
+      NumPeakFitRange = 0
+      DO I = 1, MAX_NPFR
+        NumInPFR(I) = 0
+        IPF_RPt(I) = 0
+      ENDDO
 ! JCC Last thing - reload the profile. Previously this was done in Load_TIC_File but 
 ! I moved it, since i wanted to check that all the data read in ok before calling it
       IF (TicExists  .AND. PikExists .AND. HcvExists) THEN
@@ -2055,17 +2080,18 @@
 ! to observe the full profile. Firstly have to synchronize the common blocks though
         CALL Synchronize_Data()
         Iptype = 2
-        CALL Profile_Plot(IPTYPE) 
         NoData = .FALSE.
       ENDIF
+      CALL Profile_Plot(IPTYPE) 
 ! enable the buttons,
       IF (.NOT. NoData) THEN
         IF (idsler .EQ. 0) THEN
           CALL SetModeMenuState(1,1,1)
         ELSE
           CALL SetModeMenuState(1,-1,1)
-        END IF
-      END IF
+        ENDIF
+      ENDIF
+      PastPawley = .TRUE.
 
  999  END SUBROUTINE SDIFileLoad
 !
