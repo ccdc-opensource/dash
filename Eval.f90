@@ -3,6 +3,7 @@
 !
       SUBROUTINE MAKEFRAC(CHROM)
 
+      USE VARIABLES
       USE ZMVAR
 
       IMPLICIT NONE
@@ -24,17 +25,18 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-      DATA ZERO, ONE/0.0D0, 1.0D0/
+      DATA ZERO / 0.0D0 /
 
       INTEGER    MVAR
       PARAMETER (MVAR = 100)
       REAL*8 CKK1, CKK2, CKK3
-      REAL*8 TRAN(3), ROTA(3,3), CART(1:3,1:MAXATM)
+      REAL*8 TRAN(1:3), ROTA(1:3,1:3), CART(1:3,1:MAXATM)
       REAL*8 QUATER(4), QQSUM, QDEN
-      REAL*8 XC, YC, ZC, ZERO, ONE, V1, V2, V3
+      REAL*8 XC, YC, ZC, ZERO
       INTEGER KK, KATOM, ifrg, NATS, KK1, KK2, KK3, JQ, JQS, I, ICFRG, KI
       LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
       REAL*8 Duonion(1:2)
+      DOUBLE PRECISION tX, tY, tZ
 
       KK = 0
       KATOM = 0
@@ -51,9 +53,9 @@
           CKK1 = CHROM(KK1)
           CKK2 = CHROM(KK2)
           CKK3 = CHROM(KK3)
-          TRAN(1) = CKK1*F2CMAT(1,1)
-          TRAN(2) = CKK1*F2CMAT(1,2) + CKK2*F2CMAT(2,2)
-          TRAN(3) = CKK1*F2CMAT(1,3) + CKK2*F2CMAT(2,3) + CKK3*F2CMAT(3,3)
+          TRAN(1) = CKK1*F2CMAT(1,1) + CKK2*F2CMAT(1,2) + CKK3*F2CMAT(1,3)
+          TRAN(2) = CKK1*F2CMAT(2,1) + CKK2*F2CMAT(2,2) + CKK3*F2CMAT(2,3)
+          TRAN(3) = CKK1*F2CMAT(3,1) + CKK2*F2CMAT(3,2) + CKK3*F2CMAT(3,3)
           KK = KK + 3
 ! If more than one atom then proceed
           IF (NATS.GT.1) THEN
@@ -155,21 +157,22 @@
             CART(3,I) = CART(3,I) - ZC
           ENDDO
           CALL DO_ATOM_POS(TRAN,ROTA,CART,NATS)
-          V1 = ONE/F2CMAT(1,1)
-          V2 = ONE/F2CMAT(2,2)
-          V3 = ONE/F2CMAT(3,3)
           DO I = 1, NATS
-            CART(1,I) = CART(1,I)*V1
-            CART(2,I) = (CART(2,I)-CART(1,I)*F2CMAT(1,2))*V2
-            CART(3,I) = (CART(3,I)-CART(1,I)*F2CMAT(1,3)-CART(2,I)*F2CMAT(2,3))*V3
+            tX = CART(1,I)*c2fmat(1,1) + CART(2,I)*c2fmat(1,2) + CART(3,I)*c2fmat(1,3)
+            tY = CART(1,I)*c2fmat(2,1) + CART(2,I)*c2fmat(2,2) + CART(3,I)*c2fmat(2,3)
+            tZ = CART(1,I)*c2fmat(3,1) + CART(2,I)*c2fmat(3,2) + CART(3,I)*c2fmat(3,3)
             KI = KATOM + I
-            X(1,OrderedAtm(KI)) = SNGL(CART(1,I))
-            X(2,OrderedAtm(KI)) = SNGL(CART(2,I))
-            X(3,OrderedAtm(KI)) = SNGL(CART(3,I))
+            X(1,OrderedAtm(KI)) = SNGL(tX)
+            X(2,OrderedAtm(KI)) = SNGL(tY)
+            X(3,OrderedAtm(KI)) = SNGL(tZ)
           ENDDO
           KATOM = KATOM + NATS
         ENDIF
       ENDDO
+      IF (UsePreferredOrientation) THEN
+        kk = kk + 1
+        G1 = CHROM(KK)
+      ENDIF
 
       END SUBROUTINE MAKEFRAC
 !
