@@ -2,7 +2,9 @@
 C
 !O      character*80  file
       CHARACTER*(*), INTENT (IN   ) :: FILE
+
 	INCLUDE 'params.inc'
+
       COMMON /FCSTOR/MAXK,FOB(150,MFCSTO)
       LOGICAL LOGREF
       COMMON /FCSPEC/ NLGREF,IREFH(3,MFCSPE),LOGREF(8,MFCSPE)
@@ -25,14 +27,12 @@ c
       COMMON /FPINF1/ KREFT(MFPINF),KNIPT(50,MFPINF),PIKVAL(50,MFPINF)
       COMMON /FPINF2/ NTERMS
 c
-      common /sappcmn/ xpmin,xpmax,ypmin,ypmax
+      COMMON /sappcmn/ xpmin,xpmax,ypmin,ypmax
 c
-      common /sapgcmn/ xpgmin,xpgmax,ypgmin,ypgmax
+      COMMON /sapgcmn/ xpgmin,xpgmax,ypgmin,ypgmax
 c
 	ier = 0
-C
       OPEN(21,FILE=FILE(:Lenfil),STATUS='OLD',err=998, Iostat = Istat)
-C
       CHIOBS=0.
       NFIT=0
       xpmin= 1.e20
@@ -48,8 +48,8 @@ C
         KREFT(I)=KTEM
         NOBS=NOBS+1
 c..        ESD(I)=1./SQRT(WT(I))
-        wt(i)=1./esd(i)**2
-        YCAL(I)=0.
+        WT(I) = 1.0 / ESD(I)**2
+        YCAL(I) = 0.0
 c..        KTEM=KMAXST(I)-KMINST(I)
         IF (KTEM.GT.0) THEN
            NTERMS=NTERMS+KTEM
@@ -67,8 +67,6 @@ c..        KTEM=KMAXST(I)-KMINST(I)
       xpgmax=xpmax
       ypgmin=ypmin
       ypgmax=ypmax
-C      write(56,*) ' In GetPik ',nterms,xpmin,xpmax,ypmin,ypmax
-C**
       CLOSE(21)
       GOTO 999
  998  ier=1
