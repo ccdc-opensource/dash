@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 19/Feb/2002 09:51:10
+// Modified : 21/Feb/2002 17:49:57
 //
 ///////////////////////////////////////////////////
 //
@@ -572,8 +572,21 @@
 #define IDB_Delabc                       1410
 #define IDD_DICVOLRunning                 171
 #define IDBSTOP                          1411
-#define IDF_LABEL13                      1227
-#define IDF_LABEL14                      1228
+#define IDF_LabProgCubic                 1434
+#define IDF_LabProgTetragonal            1429
+#define IDF_LabCubic                     1412
+#define IDF_LabHexagonal                 1414
+#define IDF_LabTetragonal                1424
+#define IDF_LabOrthorhombic              1426
+#define IDF_LabMonoclinic                1427
+#define IDF_LabTriclinic                 1428
+#define IDF_LabProgHexagonal             1435
+#define IDF_LabProgOrthorhombic          1436
+#define IDF_LabProgMonoclinic            1437
+#define IDF_LabProgTriclinic             1433
+#define IDBPAUSE                         1425
+#define IDF_PicHourglass                 1430
+#define ID_FitPeaks                     40020
 
 ///////////////////////////////////////////////////
 //
@@ -980,19 +993,6 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
-END
-
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
@@ -2568,8 +2568,8 @@ BEGIN
     CONTROL "&Triclinic",IDF_Indexing_triclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  119,   54,    8
     CONTROL "&Monoclinic",IDF_Indexing_Monoclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,  107,   54,    8
     CONTROL "&Orthorhombic",IDF_Indexing_Ortho,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   95,   54,    8
-    CONTROL "T&etragonal",IDF_Indexing_tetra,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  102,  119,   52,    8
-    CONTROL "&Hexagonal",IDF_Indexing_Hexa,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  102,  107,   52,    8
+    CONTROL "T&etragonal",IDF_Indexing_tetra,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  102,  107,   52,    8
+    CONTROL "&Hexagonal",IDF_Indexing_Hexa,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  102,  119,   52,    8
     CONTROL "C&ubic",IDF_Indexing_Cubic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  102,   95,   52,    8
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
 END
@@ -3396,27 +3396,28 @@ BEGIN
 ,0
 END
 
-IDD_DICVOLRunning DIALOG 0, 0,  183,  134
+IDD_DICVOLRunning DIALOG 0, 0,  273,  138
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DICVOL Running..."
 BEGIN
-    CONTROL "Crystal systems to be searched:",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   22,   11,  140,    8
-    CONTROL "Cubic",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   40,   27,   50,   10
-    CONTROL "Hexagonal",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   37,   50,   10
-    CONTROL "Tetragonal",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   47,   50,   10
-    CONTROL "Trigonal",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | SS_LEFT,   40,   57,   50,   10
-    CONTROL "Orthorhombic",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   67,   50,   10
-    CONTROL "Monoclinic",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   77,   50,   10
-    CONTROL "Triclinic",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   40,   87,   50,   10
-    CONTROL "STOP",IDBSTOP,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   72,  108,   40,   14
-    CONTROL "v",IDF_LABEL9,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   27,   50,   10
-    CONTROL "v",IDF_LABEL10,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   37,   50,   10
-    CONTROL "v",IDF_LABEL11,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   47,   50,   10
-    CONTROL "v",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,   90,   57,   50,   10
-    CONTROL "v",IDF_LABEL13,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   67,   50,   10
-    CONTROL "ooo",IDF_LABEL14,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   77,   50,   10
-    CONTROL "",IDF_LABEL15,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,   87,   50,   10
+    CONTROL "Crystal system",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  121,   13,   58,    8
+    CONTROL "Stop",IDBSTOP,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  185,   95,   40,   14
+    CONTROL "Cubic",IDF_LabCubic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  121,   25,   50,   10
+    CONTROL "Tetragonal",IDF_LabTetragonal,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  121,   35,   50,   10
+    CONTROL "Hexagonal",IDF_LabHexagonal,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  121,   45,   50,   10
+    CONTROL "Orthorhombic",IDF_LabOrthorhombic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  121,   55,   50,   10
+    CONTROL "Monoclinic",IDF_LabMonoclinic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  121,   65,   50,   10
+    CONTROL "Triclinic",IDF_LabTriclinic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  121,   75,   50,   10
+    CONTROL "",IDF_LabProgCubic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   25,   50,   10
+    CONTROL "",IDF_LabProgTetragonal,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   35,   50,   10
+    CONTROL "",IDF_LabProgHexagonal,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   45,   50,   10
+    CONTROL "",IDF_LabProgOrthorhombic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   55,   50,   10
+    CONTROL "",IDF_LabProgMonoclinic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   65,   50,   10
+    CONTROL "",IDF_LabProgTriclinic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   75,   50,   10
+    CONTROL "Pause",IDBPAUSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  126,   95,   40,   14
+    CONTROL "# Solutions && status",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  180,   13,   72,    8
+    CONTROL "",IDF_PicHourglass,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   13,    8,   93,  117
 END
 
 IDD_DICVOLRunning RCDATA
@@ -3524,6 +3525,7 @@ IDB_zmDelete3                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 IDB_zmDelete4                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 IDB_ZmatrixDelete5              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 IDB_Delabc                      BITMAP DISCARDABLE "res\\Del_abc.bmp"
+IDF_PicHourglass                BITMAP DISCARDABLE "res\\Hourglass2.bmp"
 
 ///////////////////////////////////////////////////
 //
@@ -3554,6 +3556,7 @@ BEGIN
     ID_Down                         "Move down"
     ID_ClearPeakFitRanges           "Delete peak fit ranges"
     ID_Delabc                       "Clear cell parameters"
+    ID_FitPeaks                     "Fit peaks"
 END
 
 ///////////////////////////////////////////////////
@@ -3570,6 +3573,7 @@ BEGIN
    ID_Pawley_Refinement_Mode,
    ID_Structure_Solution_Mode,0,
    ID_Start_Wizard,0,
+   ID_FitPeaks,
    ID_ClearPeakFitRanges,
    ID_Delabc,0,
    ID_Left,
