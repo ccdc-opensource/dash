@@ -186,32 +186,6 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX
-      COMMON /PROFIPM/ IPMIN, IPMAX
-
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
-
-      REAL              XPF_Range
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
-
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
       INTEGER, EXTERNAL :: Load_dat_File
@@ -276,13 +250,9 @@
 ! Fill the E.S.D.s if that hasn't been taken care of yet
       IF (.NOT. ESDsFilled) THEN
         DO I = 1, NOBS
-          IF (YOBS(I) .LT. 0.000001) THEN
 ! Number of counts can be zero, especially at low theta due to a variable slit
-            EOBS(I) = 1
 ! @ quick fix, not necessarily correct for simulated data (quite accurate for real data)
-          ELSE
-            EOBS(I) = SQRT(YOBS(I))
-          ENDIF
+          EOBS(I) = SQRT(MAX(1.0,YOBS(I)))
         ENDDO
       ENDIF
 ! Reset points that have not been read to zero.
@@ -547,10 +517,57 @@
 !   70000.       0.       0.   19094.       0.    1185.   0.7856
 !SCAN ENDED
 
-! Current status, initialise to 'error'
-      Load_pod_File  = 0
+      INTEGER I, FLEN
+      CHARACTER*255 tString, tSubString
+      INTEGER hFile, tLen
+      REAL    TwoTheta, rDummy1, rDummy2, rDummy3, rDummy4, tSignal, tScale
 
-
+! Initialise to failure
+      Load_pod_File = 0
+      FLEN = LEN_TRIM(TheFileName)
+      I = 1
+      hFile = 10
+      OPEN(UNIT=hFile,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+! Skip start.
+      tSubString = ''
+      DO WHILE (tSubString .NE. 'TWOTHETA')
+        READ(hFile,FMT='(A)',ERR=999,END=999) tString
+        CALL StrClean(tString,tLen)
+        CALL GetSubString(tString,' ',tSubString)
+      ENDDO
+ 10   READ(hFile,FMT='(A)',ERR=999,END=100) tString
+      IF (tString .EQ. 'SCAN ENDED') GOTO 100
+      READ(tString,*,ERR=999) TwoTheta, rDummy1, rDummy2, rDummy3, rDummy4, tSignal, tScale
+      XOBS(I) = TwoTheta / 1000.0
+! CHAN3 has already been corrected for variation of incident beam intensity
+      YOBS(I) = tSignal
+! which has consequences for the calculation of the ESDs
+      EOBS(I) = SQRT(MAX(1.0,(tSignal/tScale)))*tScale
+! Skip negative 2-theta data and negative intensities
+      IF (XOBS(I) .LE. 0.0) GOTO 10
+      IF (YOBS(I) .LT. 0.0) GOTO 10
+      CALL INC(I)
+! Only read in a maximum of MOBS points
+      IF (I .GT. MOBS) THEN
+        CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+        GOTO 100
+      ENDIF
+      GOTO 10
+ 100  NOBS = I - 1
+      CLOSE(hFile)
+      ESDsFilled = .TRUE.
+! JvdS Added check for number of observations = 0
+      IF (NOBS .EQ. 0) THEN
+        CALL ErrorMessage("The file contains no valid data.")
+        RETURN
+      ENDIF
+! This is definitely synchrotron data
+      JRadOption = 2
+      CALL Upload_Source
+      Load_pod_File = 1
+      RETURN
+ 999  CONTINUE
+      CLOSE(hFile)
  
       END FUNCTION Load_pod_File
 !
@@ -1048,7 +1065,7 @@
       INTEGER       MaxNumOfColumns, NumOfColumns2Read
       INTEGER       GetNumOfColumns ! Function
       CHARACTER*1   ChrLowerCase, ChrUpperCase ! Functions
-      REAL          WavelengthOf ! Function
+      REAL, EXTERNAL :: WavelengthOf
       INTEGER       KeyWordPos, KeyWordLen, StrLen, I
 
 ! Current status, initialise to 'error'
@@ -1329,12 +1346,9 @@
       CHARACTER*255 Cline
       INTEGER       I, IS, FLEN ! Length of TheFileName
       LOGICAL       ReadWarning
-!      REAL          WavelengthOf ! Function
-      REAL          FnWavelengthOfMenuOption ! Function
-      INTEGER       GetNumOfColumns ! Function
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption
+      INTEGER, EXTERNAL :: GetNumOfColumns
       REAL          Lambda1
-!      LOGICAL       OK
-!      INTEGER       IRadSelection
 
 ! Initialise to failure
       Load_xye_File = 0
