@@ -265,3 +265,36 @@
 !
 !*****************************************************************************
 !
+      CHARACTER*10 FUNCTION Integer2String(TheInteger)
+!
+! Converts an INTEGER to a left-justified CHARACTER*10
+!
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheInteger
+
+      CHARACTER*10 tString
+      INTEGER POS, J
+
+      WRITE(tString,'(I10)') TheInteger
+! Skip spaces at start
+      POS = 1
+      DO WHILE (tString(POS:POS) .EQ. ' ')
+        POS = POS + 1
+      ENDDO
+      IF (POS .NE. 1) THEN
+        POS = POS - 1
+        DO J = 1, 10-POS
+          tString(J:J) = tString(J+POS:J+POS)
+        ENDDO
+! Pad rest of the old string with spaces
+        DO J = 10-POS+1, 10
+          tString(J:J) = ' '
+        ENDDO
+      ENDIF
+      Integer2String = tString
+
+      END FUNCTION Integer2String
+!
+!*****************************************************************************
+!
