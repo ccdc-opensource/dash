@@ -791,13 +791,24 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
-      INTEGER ii
+      INTEGER ii, tLen
       REAL    inv(3,3)
 
 ! Initialise to failure
       WritePDBCommon = 1
       CALL InverseMatrix(f2cpdb,inv,3)
 ! Add in a Header record
+
+! In the space group table file, rhombohedral and hexagonal axes for trigonal space groups
+! are flagged with ":R" and ":H" respectively. According to the pdb specification:
+! "For a rhombohedral space group in the hexagonal setting, the lattice type symbol used is H."
+! This also implies that if it is rhombohedral, the ":R" should simply be deleted
+! (Mercury doesn't expect it and it should not be present according to the specification).
+      tLen = LEN_TRIM(SGHMaStr(NumberSGTable))
+      IF (SGHMaStr(NumberSGTable)(tLen-1:tLen) .EQ. ":H") THEN
+        SGHMaStr(NumberSGTable)(1:1) = "H"
+      ENDIF
+      IF (SGHMaStr(NumberSGTable)(tLen-1:tLen-1) .EQ. ":") tLen = tLen - 2
       WRITE (hFilePDB,1050,ERR=999) (CellPar(ii),ii=1,6), SGHMaStr(NumberSGTable)
  1050 FORMAT ('CRYST1',3F9.3,3F7.2,X,A12)
 ! JCC Add in V2 pdb records to store space group and symmetry

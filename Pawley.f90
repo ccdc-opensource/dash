@@ -206,7 +206,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               IF (SpaceGroupDetermination) THEN 
-                CALL IosDirName(CurrentDirectory)
+                CALL IOsDirName(CurrentDirectory)
                 INQUIRE(FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'table.asc',EXIST=exists)
                 IF (exists) THEN
                   CALL SpaceGroupFileDialog
@@ -250,7 +250,7 @@
                   CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
                   IF (NumPawleyRef .GT. 0) THEN
                     CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
-                    CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
+                    CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
                   ENDIF
                   CALL PopActiveWindowID
                   RETURN
@@ -271,12 +271,6 @@
               CALL WDialogFieldState(IDB_PawRef_Reject,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
-! ep added
-              IF (SpaceGroupDetermination) THEN
-                CALL WDialogFieldState(IDF_PawRef_Solve, Disabled)
-              ELSE
-               CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
-              ENDIF
             CASE (IDB_PawRef_Accept)
 ! update the profile and stay with the Pawley refinement
               IPTYPE = 2
@@ -325,9 +319,6 @@
               CALL make_polybackup
 ! Disable the Solve button until the user does a Save
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
-
-              CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
-
               CALL WDialogSelect(IDD_Pawley_Status)
               IF (LastValuesSet) CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
@@ -363,8 +354,10 @@
                     END IF
                 END IF
             CASE (IDB_PawRef_Reject)
+! Disable the Solve button until the user does a Save 
+              CALL WDialogFieldState(IDF_PawRef_Solve,Disabled) 
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
-! JCC Reset the R-values if possible
+! Reset the R-values if possible
               IF (LastValuesSet) THEN
                 CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(F12.2)')
                 RWPOBS = RLastValues(1)
