@@ -430,7 +430,7 @@
 
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
-      REAL X(MVAR),DX(MVAR),COV(MMPAR)
+      REAL X(MVAR), DX(MVAR), COV(MMPAR)
 
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
@@ -470,7 +470,7 @@
 
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
-      REAL X(MVAR),DX(MVAR),COV(MMPAR)
+      REAL X(MVAR), DX(MVAR), COV(MMPAR)
 
       INTEGER IBMBER
       COMMON / CCSLER / IBMBER 
@@ -496,17 +496,23 @@
 !
 !*****************************************************************************
 !
-      FUNCTION Chisq_Sigma(N,P)
+      REAL FUNCTION Chisq_Sigma(N,P)
 
-      INTEGER     MVAR
-      PARAMETER ( MVAR = 100 )
-      REAL Chisq_Sigma, P(MVAR)
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER N
+      REAL P(MVAR)
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
       COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
+
+      INTEGER I
+      REAL    CTEM, halfxi, secth, tanth
 
       Chisq_Sigma = 0.0
       DO I = 1, NVAL
@@ -522,17 +528,23 @@
 !
 !*****************************************************************************
 !
-      FUNCTION Chisq_Gamma(N,P)
+      REAL FUNCTION Chisq_Gamma(N,P)
 
-      INTEGER     MVAR
-      PARAMETER ( MVAR = 100 )
-      REAL Chisq_Gamma, P(MVAR)
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER N
+      REAL P(MVAR)
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
       COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
+
+      INTEGER I
+      REAL    CTEM, halfxi, secth, tanth
 
       Chisq_Gamma = 0.0
       DO I = 1, NVAL
@@ -548,17 +560,23 @@
 !
 !*****************************************************************************
 !
-      FUNCTION Chisq_Constant(N,P)
+      REAL FUNCTION Chisq_Constant(N,P)
 
-      INTEGER     MVAR
-      PARAMETER ( MVAR = 100 )
-      REAL Chisq_Constant, P(MVAR)
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER N
+      REAL P(MVAR)
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
       COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
+
+      INTEGER I
+      REAL    CTEM
 
       Chisq_Constant = 0.0
       DO I = 1, NVAL
