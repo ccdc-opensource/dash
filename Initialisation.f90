@@ -505,7 +505,6 @@
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
       INTEGER    RecNr
-      INTEGER    tFileHandle
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, SaveCSSR, SaveCCL, &
                            Get_ColourFlexibleTorsions, ConnectPointsObs, &
                            PlotErrorBars, PlotBackground,            &
@@ -515,166 +514,168 @@
       REAL, EXTERNAL :: WavelengthOf
       INTEGER*4 tInteger
       REAL*4    tReal
+      INTEGER RW, hFile
 
+      RW = 0
       tFileName = 'D3.cfg'
-      tFileHandle = 10
+      hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=tFileHandle,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Write a header
-      CALL FileWriteString(tFileHandle,RecNr,ProgramVersion//' configuration file')
-      CALL FileWriteLogical(tFileHandle,RecNr,UseConfigFile)
+      CALL FileWriteString(hFile,RecNr,ProgramVersion//' configuration file')
+      CALL FileWriteLogical(hFile,RecNr,UseConfigFile)
       IF (.NOT. UseConfigFile) GOTO 999
 ! Save all colour definitions
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumPGWindow)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPGWindow%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPGWindow%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPGWindow%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumMain)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolMain%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolMain%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolMain%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumObs)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolObs%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolObs%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolObs%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumCal)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolCal%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolCal%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolCal%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumDif)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolDif%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolDif%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolDif%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumMTic)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolMTic%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolMTic%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolMTic%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumCTic)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolCTic%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolCTic%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolCTic%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumPanelVLite)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelVLite%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelVLite%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelVLite%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumPanelLite)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelLite%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelLite%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelLite%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumPanelDark)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelDark%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelDark%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelDark%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumPanelVDark)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelVDark%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelVDark%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelVDark%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumPanelOuter)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelOuter%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelOuter%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPanelOuter%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumRectSelect)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolRectSelect%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolRectSelect%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolRectSelect%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumLargeCrossHair)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolLargeCrossHair%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolLargeCrossHair%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolLargeCrossHair%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumPeakFit)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPeakFit%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPeakFit%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPeakFit%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumPeakPos)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPeakPos%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPeakPos%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolPeakPos%IBlue)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolNumBack)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolBack%IRed)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolBack%IGreen)
-      CALL FileWriteInteger(tFileHandle,RecNr,KolBack%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPGWindow)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPGWindow%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPGWindow%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPGWindow%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumMain)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMain%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMain%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMain%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumObs)
+      CALL FileRWInteger(hFile,RecNr,RW,KolObs%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolObs%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolObs%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumCal)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCal%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCal%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCal%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumDif)
+      CALL FileRWInteger(hFile,RecNr,RW,KolDif%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolDif%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolDif%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumMTic)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMTic%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMTic%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMTic%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumCTic)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCTic%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCTic%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCTic%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelVLite)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVLite%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVLite%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVLite%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelLite)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelLite%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelLite%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelLite%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelDark)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelDark%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelDark%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelDark%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelVDark)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVDark%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVDark%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVDark%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelOuter)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelOuter%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelOuter%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelOuter%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumRectSelect)
+      CALL FileRWInteger(hFile,RecNr,RW,KolRectSelect%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolRectSelect%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolRectSelect%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumLargeCrossHair)
+      CALL FileRWInteger(hFile,RecNr,RW,KolLargeCrossHair%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolLargeCrossHair%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolLargeCrossHair%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPeakFit)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakFit%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakFit%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakFit%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPeakPos)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakPos%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakPos%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakPos%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumBack)
+      CALL FileRWInteger(hFile,RecNr,RW,KolBack%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolBack%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolBack%IBlue)
 ! Show error bars YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,PlotErrorBars())
+      CALL FileWriteLogical(hFile,RecNr,PlotErrorBars())
 ! Show background YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,PlotBackground())
+      CALL FileWriteLogical(hFile,RecNr,PlotBackground())
 ! Connect data points with lines YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,ConnectPointsObs())
+      CALL FileWriteLogical(hFile,RecNr,ConnectPointsObs())
 ! Plot peak fit difference YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,PlotPeakFitDifferenceProfile())
+      CALL FileWriteLogical(hFile,RecNr,PlotPeakFitDifferenceProfile())
 ! Save the default working directory
       DefaultWorkingDir = 'D:\cvsDASH\dash\Debug'
-      CALL FileWriteString(tFileHandle,RecNr,DefaultWorkingDir)
+      CALL FileWriteString(hFile,RecNr,DefaultWorkingDir)
 ! Save defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
   ! Number of iterations
       CALL WDialogGetInteger(IDF_NumOfIterations,tInteger)
-      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL FileWriteInteger(hFile,RecNr,tInteger)
   ! Window
       CALL WDialogGetInteger(IDF_WindowWidth,tInteger)
-      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL FileWriteInteger(hFile,RecNr,tInteger)
   ! Use Monte Carlo YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+      CALL FileWriteLogical(hFile,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
   ! Use spline smooth YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+      CALL FileWriteLogical(hFile,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
 ! Save default wavelength
-      CALL FileWriteReal(tFileHandle,RecNr,WavelengthOf('Cu'))
+      CALL FileWriteReal(hFile,RecNr,WavelengthOf('Cu'))
 ! Save default maximum resolution
-      CALL FileWriteReal(tFileHandle,RecNr,1.75)
+      CALL FileWriteReal(hFile,RecNr,1.75)
 ! Save the viewer
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogGetString(IDF_ViewExe,ViewExe)
-      CALL FileWriteString(tFileHandle,RecNr,ViewExe)
+      CALL FileWriteString(hFile,RecNr,ViewExe)
 ! and the viewer arguments
       CALL WDialogGetString(IDF_ViewArg,ViewArg)
-      CALL FileWriteString(tFileHandle,RecNr,ViewArg)
+      CALL FileWriteString(hFile,RecNr,ViewArg)
 ! Save use hydrogens YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,Get_UseHydrogens())
+      CALL FileWriteLogical(hFile,RecNr,Get_UseHydrogens())
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,Get_ColourFlexibleTorsions())
+      CALL FileWriteLogical(hFile,RecNr,Get_ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
-      CALL FileWriteLogical(tFileHandle,RecNr,SavePDB)    ! 1. .pdb  ?
-      CALL FileWriteLogical(tFileHandle,RecNr,SaveCSSR()) ! 2. .cssr ?
-      CALL FileWriteLogical(tFileHandle,RecNr,SaveCCL())  ! 3. .ccl  ?
-      CALL FileWriteLogical(tFileHandle,RecNr,.FALSE.)    ! 4. .res  ? (not possible yet)
-      CALL FileWriteLogical(tFileHandle,RecNr,.FALSE.)    ! 5. .mol2 ? (not possible yet)
+      CALL FileWriteLogical(hFile,RecNr,SavePDB)    ! 1. .pdb  ?
+      CALL FileWriteLogical(hFile,RecNr,SaveCSSR()) ! 2. .cssr ?
+      CALL FileWriteLogical(hFile,RecNr,SaveCCL())  ! 3. .ccl  ?
+      CALL FileWriteLogical(hFile,RecNr,.FALSE.)    ! 4. .res  ? (not possible yet)
+      CALL FileWriteLogical(hFile,RecNr,.FALSE.)    ! 5. .mol2 ? (not possible yet)
 ! Save YES / NO if .pro file is to be written out when a best solution is found
-      CALL FileWriteLogical(tFileHandle,RecNr,Get_SavePRO())
+      CALL FileWriteLogical(hFile,RecNr,Get_SavePRO())
 ! Auto local minimisation at the end of every run in multirun YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,Get_AutoLocalMinimisation())
+      CALL FileWriteLogical(hFile,RecNr,Get_AutoLocalMinimisation())
 ! Save output profile chi**2 versus moves plot YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,Get_OutputChi2vsMoves())
+      CALL FileWriteLogical(hFile,RecNr,Get_OutputChi2vsMoves())
 ! Save the damping factor for the local minimisation
-      CALL FileWriteReal(tFileHandle,RecNr,SA_SimplexDampingFactor)
+      CALL FileWriteReal(hFile,RecNr,SA_SimplexDampingFactor)
 ! Save the seeds for the random number generator
       CALL WDialogSelect(IDD_SA_input3)
       CALL WDialogGetInteger(IDF_SA_RandomSeed1,tInteger)
-      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL FileWriteInteger(hFile,RecNr,tInteger)
       CALL WDialogGetInteger(IDF_SA_RandomSeed2,tInteger)
-      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL FileWriteInteger(hFile,RecNr,tInteger)
       CALL WDialogGetInteger(IDF_SA_MaxRepeats,tInteger)
-      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL FileWriteInteger(hFile,RecNr,tInteger)
       CALL WDialogGetReal(IDF_SA_ChiTest,tReal)
-      CALL FileWriteReal(tFileHandle,RecNr,tReal)
+      CALL FileWriteReal(hFile,RecNr,tReal)
       CALL WDialogGetReal(IDF_MaxMoves1,tReal)
-      CALL FileWriteReal(tFileHandle,RecNr,tReal)
+      CALL FileWriteReal(hFile,RecNr,tReal)
       CALL WDialogGetInteger(IDF_MaxMoves2,tInteger)
-      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL FileWriteInteger(hFile,RecNr,tInteger)
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
 ! Atom labels for SA solutions overlay. Two options: 
 ! 1. "Element symbol + solution number"
 ! 2. "Orignal atom labels"
       CALL WDialogGetRadioButton(IDF_UseSolutionNr,tInteger)
-      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL FileWriteInteger(hFile,RecNr,tInteger)
 ! Atom colours for SA solutions overlay. Two options: 
 ! 1. "By solution number"
 ! 2. "By element"
       CALL WDialogGetRadioButton(IDF_ColourBySolution,tInteger)
-      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL FileWriteInteger(hFile,RecNr,tInteger)
 
 
 
-  999 CLOSE(tFileHandle)
+  999 CLOSE(hFile)
 
       END SUBROUTINE WriteConfigurationFile
 !
@@ -700,8 +701,8 @@
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
       CHARACTER*MaxPathLength tFileName
-      INTEGER    RecNr
-      INTEGER    tFileHandle
+      INTEGER    RecNr, RW
+      INTEGER    hFile
       REAL, EXTERNAL :: WavelengthOf
       CHARACTER*MaxPathLength tString
       INTEGER*4 tInteger
@@ -710,173 +711,174 @@
       REAL, EXTERNAL :: dSpacing2TwoTheta
       LOGICAL FExists
 
+      RW = 1
       tFileName = 'D3.cfg'
       INQUIRE(FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,EXIST=FExists)
       IF (.NOT. FExists) RETURN
-      tFileHandle = 10
+      hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=tFileHandle,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Read the header
-      CALL FileReadString(tFileHandle,RecNr,tString)
-      CALL FileReadLogical(tFileHandle,RecNr,UseConfigFile)
+      CALL FileReadString(hFile,RecNr,tString)
+      CALL FileReadLogical(hFile,RecNr,UseConfigFile)
       IF (.NOT. UseConfigFile) THEN
         CALL DebugErrorMessage('Config file not used.')
         GOTO 999
       ENDIF
 ! Read all colour definitions
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumPGWindow)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPGWindow%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPGWindow%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPGWindow%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumMain)
-      CALL FileReadInteger(tFileHandle,RecNr,KolMain%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolMain%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolMain%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumObs)
-      CALL FileReadInteger(tFileHandle,RecNr,KolObs%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolObs%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolObs%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumCal)
-      CALL FileReadInteger(tFileHandle,RecNr,KolCal%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolCal%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolCal%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumDif)
-      CALL FileReadInteger(tFileHandle,RecNr,KolDif%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolDif%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolDif%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumMTic)
-      CALL FileReadInteger(tFileHandle,RecNr,KolMTic%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolMTic%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolMTic%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumCTic)
-      CALL FileReadInteger(tFileHandle,RecNr,KolCTic%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolCTic%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolCTic%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumPanelVLite)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelVLite%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelVLite%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelVLite%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumPanelLite)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelLite%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelLite%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelLite%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumPanelDark)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelDark%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelDark%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelDark%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumPanelVDark)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelVDark%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelVDark%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelVDark%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumPanelOuter)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelOuter%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelOuter%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPanelOuter%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumRectSelect)
-      CALL FileReadInteger(tFileHandle,RecNr,KolRectSelect%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolRectSelect%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolRectSelect%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumLargeCrossHair)
-      CALL FileReadInteger(tFileHandle,RecNr,KolLargeCrossHair%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolLargeCrossHair%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolLargeCrossHair%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumPeakFit)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPeakFit%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPeakFit%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPeakFit%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumPeakPos)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPeakPos%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPeakPos%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolPeakPos%IBlue)
-      CALL FileReadInteger(tFileHandle,RecNr,KolNumBack)
-      CALL FileReadInteger(tFileHandle,RecNr,KolBack%IRed)
-      CALL FileReadInteger(tFileHandle,RecNr,KolBack%IGreen)
-      CALL FileReadInteger(tFileHandle,RecNr,KolBack%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPGWindow)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPGWindow%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPGWindow%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPGWindow%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumMain)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMain%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMain%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMain%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumObs)
+      CALL FileRWInteger(hFile,RecNr,RW,KolObs%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolObs%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolObs%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumCal)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCal%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCal%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCal%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumDif)
+      CALL FileRWInteger(hFile,RecNr,RW,KolDif%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolDif%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolDif%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumMTic)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMTic%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMTic%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolMTic%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumCTic)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCTic%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCTic%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolCTic%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelVLite)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVLite%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVLite%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVLite%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelLite)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelLite%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelLite%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelLite%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelDark)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelDark%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelDark%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelDark%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelVDark)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVDark%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVDark%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelVDark%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPanelOuter)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelOuter%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelOuter%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPanelOuter%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumRectSelect)
+      CALL FileRWInteger(hFile,RecNr,RW,KolRectSelect%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolRectSelect%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolRectSelect%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumLargeCrossHair)
+      CALL FileRWInteger(hFile,RecNr,RW,KolLargeCrossHair%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolLargeCrossHair%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolLargeCrossHair%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPeakFit)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakFit%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakFit%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakFit%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumPeakPos)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakPos%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakPos%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolPeakPos%IBlue)
+      CALL FileRWInteger(hFile,RecNr,RW,KolNumBack)
+      CALL FileRWInteger(hFile,RecNr,RW,KolBack%IRed)
+      CALL FileRWInteger(hFile,RecNr,RW,KolBack%IGreen)
+      CALL FileRWInteger(hFile,RecNr,RW,KolBack%IBlue)
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
 ! Show error bars YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ErrorBar_Check,tLogical)
 ! Show background YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_background_check,tLogical)
 ! Connect data points with lines YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ConnectObsPoints,tLogical)
 ! Plot peak fit difference YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_PlotPeakFitDif,tLogical)
 ! Read the default working directory
-      CALL FileReadString(tFileHandle,RecNr,tString)
+      CALL FileReadString(hFile,RecNr,tString)
 ! Read defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)      ! Number of iterations
+      CALL FileReadInteger(hFile,RecNr,tInteger)      ! Number of iterations
       CALL WDialogPutInteger(IDF_NumOfIterations,tInteger)
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)      ! Window
+      CALL FileReadInteger(hFile,RecNr,tInteger)      ! Window
       CALL WDialogPutInteger(IDF_WindowWidth,tInteger)
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)      ! Use Monte Carlo YES / NO
+      CALL FileReadLogical(hFile,RecNr,tLogical)      ! Use Monte Carlo YES / NO
       CALL WDialogPutCheckBoxLogical(IDF_UseMCYN,tLogical)
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)      ! Use spline smooth YES / NO
+      CALL FileReadLogical(hFile,RecNr,tLogical)      ! Use spline smooth YES / NO
 ! Read default wavelength
-      CALL FileReadReal(tFileHandle,RecNr,tReal)
+      CALL FileReadReal(hFile,RecNr,tReal)
       CALL Set_Wavelength(tReal)
 ! Read default maximum resolution
-      CALL FileReadReal(tFileHandle,RecNr,DefaultMaxResolution)
+      CALL FileReadReal(hFile,RecNr,DefaultMaxResolution)
 ! Now initialise the maximum resolution in the dialogue window
       CALL WDialogSelect(IDD_PW_Page5)
       CALL WDialogPutReal(IDF_MaxResolution,DefaultMaxResolution)
       CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(DefaultMaxResolution))
 ! Read the viewer
       CALL WDialogSelect(IDD_Configuration)
-      CALL FileReadString(tFileHandle,RecNr,ViewExe)
+      CALL FileReadString(hFile,RecNr,ViewExe)
       CALL WDialogPutString(IDF_ViewExe,ViewExe)
 ! and the viewer arguments
-      CALL FileReadString(tFileHandle,RecNr,ViewArg)
+      CALL FileReadString(hFile,RecNr,ViewArg)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
 ! Read use hydrogens YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,LOG_HYDROGENS)
+      CALL FileReadLogical(hFile,RecNr,LOG_HYDROGENS)
       CALL Set_UseHydrogens(LOG_HYDROGENS)
 ! Colour flexible torsions (in Z-matrix viewer) YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
 ! Read YES / NO which molecular file formats are to be written out when a best solution is found
-      CALL FileReadLogical(tFileHandle,RecNr,SavePDB)    ! 1. .pdb  ?
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 2. .cssr ?
+      CALL FileReadLogical(hFile,RecNr,SavePDB)    ! 1. .pdb  ?
+      CALL FileReadLogical(hFile,RecNr,tLogical)   ! 2. .cssr ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,tLogical)
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 3. .ccl  ?
+      CALL FileReadLogical(hFile,RecNr,tLogical)   ! 3. .ccl  ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,tLogical)
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 4. .res  ? (not possible yet)
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 5. .mol2 ? (not possible yet)
+      CALL FileReadLogical(hFile,RecNr,tLogical)   ! 4. .res  ? (not possible yet)
+      CALL FileReadLogical(hFile,RecNr,tLogical)   ! 5. .mol2 ? (not possible yet)
 ! Read YES / NO if .pro file is to be written out when a best solution is found
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL Set_SavePRO(tLogical)
 ! Auto local minimisation at the end of every run in multirun YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,tLogical)
 ! Read output profile chi**2 versus moves plot YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL FileReadLogical(hFile,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_OutputChi2vsMoves,tLogical)
 ! Read the damping factor for the local minimisation
-      CALL FileReadReal(tFileHandle,RecNr,SA_SimplexDampingFactor)
+      CALL FileReadReal(hFile,RecNr,SA_SimplexDampingFactor)
 ! Read the seeds for the random number generator
       CALL WDialogSelect(IDD_SA_input3)
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL FileReadInteger(hFile,RecNr,tInteger)
       CALL WDialogPutInteger(IDF_SA_RandomSeed1,tInteger)
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL FileReadInteger(hFile,RecNr,tInteger)
       CALL WDialogPutInteger(IDF_SA_RandomSeed2,tInteger)
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL FileReadInteger(hFile,RecNr,tInteger)
       CALL WDialogPutInteger(IDF_SA_MaxRepeats,tInteger)
-      CALL FileReadReal(tFileHandle,RecNr,tReal)
+      CALL FileReadReal(hFile,RecNr,tReal)
       CALL WDialogPutReal(IDF_SA_ChiTest,tReal)
-      CALL FileReadReal(tFileHandle,RecNr,tReal)
+      CALL FileReadReal(hFile,RecNr,tReal)
       CALL WDialogPutReal(IDF_MaxMoves1,tReal)
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL FileReadInteger(hFile,RecNr,tInteger)
       CALL WDialogPutInteger(IDF_MaxMoves2,tInteger)
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
 ! Atom labels for SA solutions overlay. Two options: 
 ! 1. "Element symbol + solution number"
 ! 2. "Orignal atom labels"
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL FileReadInteger(hFile,RecNr,tInteger)
       SELECT CASE (tInteger)
         CASE (1)
           CALL WDialogPutRadioButton(IDF_UseSolutionNr)
@@ -886,7 +888,7 @@
 ! Atom colours for SA solutions overlay. Two options: 
 ! 1. "By solution number"
 ! 2. "By element"
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL FileReadInteger(hFile,RecNr,tInteger)
       SELECT CASE (tInteger)
         CASE (1)
           CALL WDialogPutRadioButton(IDF_ColourBySolution)
@@ -895,10 +897,10 @@
       END SELECT
 
 
-      CLOSE(tFileHandle)
+      CLOSE(hFile)
       RETURN
   999 CALL DebugErrorMessage('Error while opening config file')
-      CLOSE(tFileHandle)
+      CLOSE(hFile)
 
       END SUBROUTINE ReadConfigurationFile
 !
