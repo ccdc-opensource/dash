@@ -172,8 +172,7 @@
 !*****************************************************************************
 !
       SUBROUTINE SIMP0(V,D,C,IR,N,CHIFUN)
-!     ----------------------------
-!
+
       EXTERNAL CHIFUN
       REAL V(N,*), C(*), D(*)
       INTEGER IR(*)
@@ -184,13 +183,13 @@
         C(I) = CHIFUN(N,V(1,I))
       ENDDO
       CALL SSORT(C,IR,N)
+
       END SUBROUTINE SIMP0
 !
 !*****************************************************************************
 !
       SUBROUTINE SSORT(C,IR,N)
-!     ------------------------
-!
+
       REAL C(*)
       INTEGER IR(*)
 
@@ -206,13 +205,13 @@
    10   ENDDO
         IR(J) = J
    20 ENDDO
+
       END SUBROUTINE SSORT
 !
 !*****************************************************************************
 !
       SUBROUTINE XCENT(V,XC,IH,N)
-!     ---------------------------
-!
+
       REAL V(N,*), XC(*)
 
       XNORM = 1.0/FLOAT(N)
@@ -225,28 +224,28 @@
       DO I = 1, N
         XC(I) = XC(I)*XNORM
       ENDDO
+
       END SUBROUTINE XCENT
 !
 !*****************************************************************************
 !
       SUBROUTINE XZERO(XH,X0,XC,N,A)
-!     ------------------------------
-!
+
       REAL XH(*), X0(*), XC(*)
-!
+
       DO I = 1, N
         X0(I) = A*(XC(I)-XH(I)) + XC(I)
       ENDDO
+
       END SUBROUTINE XZERO
 !
 !*****************************************************************************
 !
       SUBROUTINE EXPAND(CL,X0,X00,XC,N,C0,G,CHIFUN)
-!     --------------------------------------
-!
+
       EXTERNAL CHIFUN
       REAL X0(*), X00(*), XC(*)
-!
+
       DO I = 1, N
         X00(I) = G*(X0(I)-XC(I)) + XC(I)
       ENDDO
@@ -255,6 +254,7 @@
         CALL VCOPY(X00,X0,N)
         C0 = C00
       ENDIF
+
       END SUBROUTINE EXPAND
 !
 !*****************************************************************************
@@ -264,7 +264,7 @@
 !
       EXTERNAL CHIFUN
       REAL X0(*), X00(*), XC(*), XH(*)
-!
+
       IF (C0.LT.CH) THEN
         DO I = 1, N
           X00(I) = B*(X0(I)-XC(I)) + XC(I)
@@ -275,13 +275,13 @@
         ENDDO
       ENDIF
       C00 = CHIFUN(N,X00)
+
       END SUBROUTINE CONTRACT
 !
 !*****************************************************************************
 !
       SUBROUTINE CONT2(K,V,C,N,IR,CHIFUN)
-!     ----------------------------
-!
+
       EXTERNAL CHIFUN
       REAL V(N,*), C(*)
       INTEGER IR(*)
@@ -294,13 +294,13 @@
         ENDDO
    20 ENDDO
       CALL SSORT(C,IR,N)
+
       END SUBROUTINE CONT2
 !
 !*****************************************************************************
 !
       SUBROUTINE CHINIT(V,N,DELTA,C0,C1,C2,CHIFUN)
-!     -------------------------------------
-!
+
       REAL V(*), DELTA(*), C0, C1(2,*), C2(N,*)
       EXTERNAL CHIFUN
 
@@ -321,13 +321,13 @@
         ENDDO
         V(J) = V(J) - DELTA(J)
       ENDDO
+
       END SUBROUTINE CHINIT
 !
 !*****************************************************************************
 !
       SUBROUTINE DLINIT(X,J,CMINUS,CPLUS,C0,CDELTA,DELTA,CHIFUN)
-!     ----------------------------------------------------
-!
+
       EXTERNAL CHIFUN
       REAL X(*)
       DATA FRAC, SMALL, XLARGE/1.0E-6, 1.0E-20, 1.0E20/
@@ -346,25 +346,25 @@
       ENDDO
     1 DELTA = D
       X(J) = X0
+
       END SUBROUTINE DLINIT
 !
 !*****************************************************************************
 !
       SUBROUTINE HSINT1(C0,C1,D,N,HS)
-!     -------------------------------
-!
+
       REAL C0, C1(2,*), D(*), HS(N,*)
-!
+
       DO I = 1, N
         HS(I,I) = (C1(2,I)-C0-C0+C1(1,I))/(D(I)*D(I))
       ENDDO
+
       END SUBROUTINE HSINT1
 !
 !*****************************************************************************
 !
       SUBROUTINE HSINT2(C0,C1,C2,D,N,HS)
-!     ----------------------------------
-!
+
       REAL C0, C1(2,*), C2(N,*), D(*), HS(N,*)
 
       DO J = 1, N
@@ -373,13 +373,13 @@
           HS(J,I) = HS(I,J)
         ENDDO
       ENDDO
+
       END SUBROUTINE HSINT2
 !
 !*****************************************************************************
 !
       SUBROUTINE INVERT(HESS,COVAR,N,INDX)
-!     ------------------------------------
-!
+
       REAL HESS(N,*), COVAR(N,*)
       INTEGER INDX(*)
 ! JCC This is for testing for mathematical errors used to PAUSE the program: The pause seemed to
@@ -397,6 +397,7 @@
       DO I = 1, N
         CALL LUBKSB(HESS,N,N,INDX,COVAR(1,I))
       ENDDO
+
       END SUBROUTINE INVERT
 !
 !*****************************************************************************
@@ -477,6 +478,7 @@
         ENDIF
       ENDDO
       IF (A(N,N).EQ.0.0) A(N,N) = TINY
+
       END SUBROUTINE LUDCMP
 !
 !*****************************************************************************
