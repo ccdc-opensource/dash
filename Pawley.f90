@@ -485,6 +485,7 @@
       INTEGER ITEM, ISYM, IRTYP
       INTEGER tFileHandle, hFile
       INTEGER J
+      REAL    tPeakShapeSigma(1:2), tPeakShapeGamma(1:2)
 
 ! Are these checks in place here? If one of them fails, we shouldn't have been here in the first place.
 !
@@ -549,6 +550,23 @@
       WRITE(hFile,"('L PKCN TYPE 1')",ERR=999)
       WRITE(hFile,"('L PKFN TYPE 3')",ERR=999)
       WRITE(hFile,"('L PKFN LIMS 0.005')",ERR=999)
+!C Try to get the peak shape parameters from the View Pawley dialogue. If this fails, use the
+!C values in memory.
+      CALL WDialogSelect(IDD_ViewPawley)
+      CALL WDialogGetReal(IDF_Sigma1, tPeakShapeSigma(1))
+      CALL WDialogGetReal(IDF_Sigma2, tPeakShapeSigma(2))
+      CALL WDialogGetReal(IDF_Gamma1, tPeakShapeGamma(1))
+      CALL WDialogGetReal(IDF_Gamma2, tPeakShapeGamma(2))
+      IF ((tPeakShapeSigma(1) .GT. -100.0)  .AND. (tPeakShapeSigma(1) .LT. 100.0) .AND.   &
+          (tPeakShapeSigma(2) .GT. -100.0)  .AND. (tPeakShapeSigma(2) .LT. 100.0) .AND.   &
+          (tPeakShapeGamma(1) .GT. -100.0)  .AND. (tPeakShapeGamma(1) .LT. 100.0) .AND.   &
+          (tPeakShapeGamma(2) .GT. -100.0)  .AND. (tPeakShapeGamma(2) .LT. 100.0)) THEN
+        PeakShapeSigma(1) = tPeakShapeSigma(1)
+        PeakShapeSigma(2) = tPeakShapeSigma(2)
+        PeakShapeGamma(1) = tPeakShapeGamma(1)
+        PeakShapeGamma(2) = tPeakShapeGamma(2)
+      ENDIF
+      CALL WDialogSelect(IDD_Pawley_Status)
       WRITE(hFile,4271,ERR=999) PeakShapeSigma(1), PeakShapeSigma(2)
       WRITE(hFile,4272,ERR=999) PeakShapeGamma(1), PeakShapeGamma(2)
       WRITE(hFile,4273,ERR=999) PeakShapeHPSL
