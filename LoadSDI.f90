@@ -346,10 +346,6 @@
       CHARACTER*150 LINE
       INTEGER NKKOR(MCHIHS)
 
-      INTEGER         MAXK
-      REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
-
       INTEGER         KKOR
       REAL                  WTIJ
       INTEGER                             IKKOR,         JKKOR
@@ -388,7 +384,7 @@
           ENDIF
         ENDDO
       ENDDO
-  100 MAXK = KK
+  100 NumOfRef = KK
       DO IK = 1, KKOR
         II = IKKOR(IK)
         JJ = JKKOR(IK)

@@ -11,9 +11,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER         MAXK
-      REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
+      REAL            FOB
+      COMMON /FCSTOR/ FOB(MaxAtm_3,MFCSTO)
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
@@ -82,7 +81,7 @@
               ENDIF
               OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
               tElemNumber = ElmSymbol2CSD(asym(i,iFrg)(1:2))
-              DO iRef = 1, MAXK
+              DO iRef = 1, NumOfRef
                 ssq = 0.25*DSTAR(iRef)**2
                 atem = occ(i,iFrg) * AScFac(ssq,tElemNumber)
                 btem = tiso(i,iFrg)*ssq

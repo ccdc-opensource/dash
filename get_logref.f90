@@ -14,10 +14,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
-      INTEGER         MAXK
-      REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
-
       INTEGER         NLGREF
       LOGICAL                 LOGREF
       COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
@@ -40,7 +36,6 @@
 
       ier = GETTIC(FILE)
       IF (ier .NE. 0) RETURN
-      MAXK = NumOfRef
       IHMIN = 9999
       IKMIN = 9999
       ILMIN = 9999
