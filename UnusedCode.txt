@@ -3957,7 +3957,6 @@ C
       CALL WDialogPutTrackbar(IDF_targetchisq_trackbar,nint(sngl(target_value)))
       CALL WDialogPutInteger(IDF_ISEED1,iseed1)
       CALL WDialogPutInteger(IDF_ISEED2,iseed2)
-! Jvds @ Where's number 3?
       CALL WDialogPutInteger(IDF_NT,NT)
       CALL WDialogPutInteger(IDF_NS,NS)
 !
@@ -5290,7 +5289,6 @@ C
 ! Now called: Diffraction Setup
  200 SKIP = .FALSE.
       CALL WDialogSelect(IDD_PW_Page2)
-! JvdS @ following line should not be necessary
       CALL SetSourceDataState(JRadOption)
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       DO WHILE(.NOT. SKIP)
@@ -5303,7 +5301,6 @@ C
             CALL process_mainwindow_message
             CYCLE
         END SELECT
-! JvdS @ Next line is in a weird place again
         CALL WDialogGetRadioButton(IDF_PW_LabX_Source,JRadOption)
         CALL SetSourceDataState(JRadOption)
         SELECT CASE (EventType)
