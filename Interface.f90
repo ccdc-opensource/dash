@@ -244,6 +244,47 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION Get_ShowCumChiSqd
+
+! When .TRUE., the cumulative chi-sqd is plotted
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      Get_ShowCumChiSqd = WDialogGetCheckBoxLogical(IDF_ShowCumChiSqd)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_ShowCumChiSqd
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION UseHydrogensDuringAuto
+
+! When .TRUE., hydrogen atoms are included in the structure factor calculations during the
+! local minimisation at the end of each run.
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      UseHydrogensDuringAuto = WDialogGetCheckBoxLogical(IDF_UseHydrogensAuto)
+      CALL PopActiveWindowID
+
+      END FUNCTION UseHydrogensDuringAuto
+!
+!*****************************************************************************
+!
       SUBROUTINE Set_UseHydrogens(TheValue)
 
 ! When .TRUE., hydrogen atoms are included in the structure factor calculations
