@@ -1,8 +1,8 @@
     subroutine sa_Defaults()
-!
-    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
-    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
-    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen
+!ep appended
+    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file, pro_file
+    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file, pro_file
+    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen, pro_flen
 	logical outfilset
 	common /outfileset/ outfilset
 	data outfilset/ .FALSE. /
@@ -14,11 +14,15 @@
 		pdb_file='SA_best.pdb'
 		ccl_file='SA_best.ccl'
 		log_file='SA_best.log'
+! ep appended
+        pro_file='SA_best.pro'
 !
 		cssr_flen=len_trim(cssr_file)
 		pdb_flen=len_trim(pdb_file)
 		ccl_flen=len_trim(ccl_file)
 		log_flen=len_trim(ccl_file)
+! ep appended
+        pro_flen=len_trim(pro_file)
 	END IF
 !
     end
@@ -28,9 +32,10 @@
 	subroutine sa_SetOutputFiles(filehead)
 !
 	character*75 filehead ! Maximum permissible length.
-    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
-    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
-    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen
+! ep appended
+    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file, pro_file
+    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file, pro_file
+    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen, pro_flen
 !
 	logical outfilset
 	common /outfileset/ outfilset
@@ -44,14 +49,16 @@
 	 end do
 	 if (i .EQ. 0) i = len_trim(filehead) + 1
 	 i = i - 1
-
+!ep appended
     cssr_file= filehead(1:i)//'.cssr'
     pdb_file=  filehead(1:i)//'.pdb'
     ccl_file=  filehead(1:i)//'.ccl'
-    log_file=  filehead(1:i)//'.log'	
+    log_file=  filehead(1:i)//'.log'
+	pro_file=  filehead(1:i)//'.pro'	
     cssr_flen=len_trim(cssr_file)
     pdb_flen=len_trim(pdb_file)
     ccl_flen=len_trim(ccl_file)
 	log_flen=len_trim(log_file)
+	pro_flen=len_trim(pro_file)
 	outfilset = .TRUE.
 	end subroutine sa_SetOutputFiles

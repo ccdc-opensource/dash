@@ -20,6 +20,7 @@ C
         common /zmnpar/ izmtot,izmpar(maxfrg),
      &   czmpar(30,maxfrg),kzmpar(30,maxfrg),xzmpar(30,maxfrg)
 
+
 	  integer ipcount
 	  include 'IZMCheck.inc'
 	  integer CheckedFragNo
@@ -37,11 +38,13 @@ C
       COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),
      & TF(150),KTF(150),SITE(150),KSITE(150),
      & ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
-        character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+C ep appended
+        character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &                     pro_file   
         common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
-     &                     log_file
+     &                     log_file, pro_file
         common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
-     &                     log_flen
+     &                     log_flen, pro_flen
 c
 C>> JCC Cell/Lattice declarations now in an include file
 
@@ -61,6 +64,10 @@ C>> JCC Use standard PDB orthogonalisation
       include 'statlog.inc'
 c
       ntem=NumberSGTable
+
+C	ep added.  Following subroutine saves calculated and observed
+C     diffraction patterns in .pro file
+	CALL Sa_soln_store
 c
 c       Output a CSSR file to fort.64
 C       Output a PDB  file to fort.65
@@ -555,9 +562,13 @@ C Expand the symmetry generators into a list of symm ops by cross-multiplication
       Subroutine AddSingleSolution(ProfileChi,IntensityChi)
 
 	REAL ProfileChi,IntensityChi
-      character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
-      common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
-      common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen
+C ep appended
+      character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &						pro_file
+      common /outfilnam/logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &						pro_file
+      common /outfillen/logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,
+     &						pro_flen
 	LOGICAL RESTART
 	INTEGER SA_Run_Number
 	COMMON /MULRUN/ RESTART, SA_Run_Number, 
@@ -577,10 +588,12 @@ C Expand the symmetry generators into a list of symm ops by cross-multiplication
 	INTEGER SA_Run_Number
 	COMMON /MULRUN/ RESTART, SA_Run_Number, 
      &                MaxRuns,  MinMoves, MaxMoves, ChiMult
-
-      character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
-      common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
-      common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen
+C ep appended
+      character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &    pro_file
+      common /outfilnam/logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &    pro_file
+      common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,pro_flen
 c
 	character*85 new_fname
 
@@ -593,6 +606,11 @@ c
 	CALL AppendNumToFileName(SA_Run_Number,ccl_file,new_fname)
 	CALL IOsDeleteFile(new_fname)
 	CALL IOsRenameFile( ccl_file(1:len_trim(ccl_file)),new_fname)
+
+C ep appended
+	CALL AppendNumToFileName(SA_Run_Number,pro_file,new_fname)
+	CALL IOsDeleteFile(new_fname)
+	CALL IOsRenameFile( pro_file(1:len_trim(pro_file)),new_fname)
 
 	CALL AppendNumToFileName(SA_Run_Number,pdb_file,new_fname)
 	CALL IOsDeleteFile(new_fname)

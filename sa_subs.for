@@ -105,11 +105,13 @@ c
       common /sappcmn/ xpmin,xpmax,ypmin,ypmax
       common /chibest/ ycalbest(MCHSTP)
 c
-        character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
+c ep appended
+        character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &					 pro_file	
         common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
-     &                     log_file
+     &                     log_file, pro_file
         common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
-     &                     log_flen
+     &                     log_flen, pro_flen
 C
       DOUBLE PRECISION PRJAV,PRJSD
       DOUBLE PRECISION PRJMAT0,PRJMAT1,PRJMAT2
@@ -548,6 +550,8 @@ c
        fpavstore(iteration)=-sngl(fpav)
 c.. corrint specific
        chiprobest(iteration)=cpb
+c ep added - following call to Chi_sq_plot routine.
+       call chi_sq_plot(ntotmov, iteration, cpb) 
 c
        if (num_new_min.ne.num_old_min) then
 
@@ -614,6 +618,9 @@ C.. We will use the energy fluctuation to reduce the temperature
       IF (RESTART) THEN
 		IF ( CheckTerm(NTOTMOV, CHIPROBEST(iteration) ) ) THEN
 			CALL AddMultiSolution(cpb,sngl(-fopt))
+C  ep added.  The following will close the Chi-sqd vs. no moves window.  At
+C  this point it will be the only child window open.
+	        call WindowCloseChild(1)
 			IF ( SA_Run_Number .LT. MaxRuns ) GOTO 1
 	    ELSE
 	        GO TO 100
