@@ -1593,8 +1593,6 @@
 !>> In practice, this varies the NOBS value so the data is not lost, just
 !>> Hidden. The routine should not be called with RMaxTTheta greater
 !>> than the maximum value read in
-! JvdS And how about discarding data from the beginning of the diffraction pattern
-! (when variable slits have been used, for example).
       SUBROUTINE TruncateData(RMaxTTheta)
 
       USE VARIABLES
@@ -1855,7 +1853,7 @@
 ! This is the point of no return: the selected file will be new file, valid data or not
 ! Change global variable FNAME
       FNAME = TheFileName
-      CALL OpenHCVPIKTIC(FNAME(1:KLEN)) 
+      CALL SDIFileLoad(FNAME(1:KLEN)) 
       IF (NoData) THEN
         CALL ErrorMessage("Could not read the project file "//FNAME(1:KLEN)//&
                           CHAR(13)//"successfully.")
@@ -1909,7 +1907,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_TIC_File(FLEN,TheFileName)
+      INTEGER FUNCTION GETTIC(FLEN,TheFileName)
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (IN   ) :: FLEN
@@ -1919,7 +1917,7 @@
       INTEGER I, II
 
 !>> JCC - set return status
-      Load_TIC_File = 1
+      GETTIC = 1
 !>> JCC - add in an error trap for bad file opening
       OPEN(11,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
       I=1
@@ -1929,10 +1927,10 @@
  100  NTIC=I-1
       CLOSE(11)
       RETURN
- 999  Load_TIC_File = 0
+ 999  GETTIC = 0
       RETURN
 
-      END FUNCTION Load_TIC_File
+      END FUNCTION GETTIC
 !
 !*****************************************************************************
 !

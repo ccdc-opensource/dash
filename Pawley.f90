@@ -1115,7 +1115,6 @@
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
 
-      CHARACTER*80 pikfile,ticfile,hcvfile,dslfile
       COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
       INTEGER Ieocc
 !
@@ -1130,10 +1129,10 @@
         CALL ErrorMessage('Filename not provided.'//CHAR(13)//'Try again!')
         RETURN
       ENDIF
-	pikfile = ' '
-      ticfile = ' '
-      hcvfile = ' '
-      dslfile = ' '
+	DashPikFile = ' '
+      DashTicFile = ' '
+      DashHcvFile = ' '
+      DashDslFile = ' '
       IDot = 0
       DO I = LSDI, 1, -1
         IF (SDIFileName(I:I) .EQ. '.') THEN
@@ -1141,10 +1140,10 @@
           GOTO 50
         END IF
       END DO
- 50   pikfile(1:LSDI) = SDIFileName(1:LSDI)
-      ticfile(1:LSDI) = SDIFileName(1:LSDI)
-      hcvfile(1:LSDI) = SDIFileName(1:LSDI)
-      dslfile(1:LSDI) = SDIFileName(1:LSDI)
+ 50   DashPikFile(1:LSDI) = SDIFileName(1:LSDI)
+      DashTicFile(1:LSDI) = SDIFileName(1:LSDI)
+      DashHcvFile(1:LSDI) = SDIFileName(1:LSDI)
+      DashDslFile(1:LSDI) = SDIFileName(1:LSDI)
       IF (IDot .EQ. 0) THEN
         L1 = LSDI + 1
         L4 = LSDI + 4
@@ -1152,20 +1151,20 @@
         L1 = LSDI - 3
         L4 = LSDI
       END IF
-      pikfile(L1:L4)='.pik'
-      ticfile(L1:L4)='.tic'
-      hcvfile(L1:L4)='.hcv'
-      dslfile(L1:L4)='.dsl'
-      CALL WRTDSL(dslfile,L4,Ieocc) ! Ignore any errors
-      CALL IOSCopyFile('polyp.pik',pikfile)
-      CALL IOSCopyFile('polyp.tic',ticfile)
-      CALL IOSCopyFile('polyp.hcv',hcvfile)
+      DashPikFile(L1:L4)='.pik'
+      DashTicFile(L1:L4)='.tic'
+      DashHcvFile(L1:L4)='.hcv'
+      DashDslFile(L1:L4)='.dsl'
+      CALL WRTDSL(DashDslFile,L4,Ieocc) ! Ignore any errors
+      CALL IOSCopyFile('polyp.pik',DashPikFile)
+      CALL IOSCopyFile('polyp.tic',DashTicFile)
+      CALL IOSCopyFile('polyp.hcv',DashHcvFile)
       OPEN(81,file=SDIFileName(1:LSDI),status='unknown')
-      WRITE(81,8110) ticfile(1:LEN_TRIM(ticfile))
-      WRITE(81,8120) hcvfile(1:LEN_TRIM(hcvfile))
-      WRITE(81,8130) pikfile(1:LEN_TRIM(pikfile))
+      WRITE(81,8110) DashTicFile(1:LEN_TRIM(DashTicFile))
+      WRITE(81,8120) DashHcvFile(1:LEN_TRIM(DashHcvFile))
+      WRITE(81,8130) DashPikFile(1:LEN_TRIM(DashPikFile))
       WRITE(81,8136) DashRawFile(1:LEN_TRIM(DashRawFile))
-      WRITE(81,8135) dslfile(1:LEN_TRIM(dslfile))
+      WRITE(81,8135) DashDslFile(1:LEN_TRIM(DashDslFile))
       WRITE(81,8140) (CellPar(I),I=1,6)
       WRITE(81,8150) NumberSGTable,SGNumStr(NumberSGTable),SGHMaStr(NumberSGTable)
       WRITE(81,8160) PawleyChiSq

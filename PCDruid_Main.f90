@@ -40,16 +40,17 @@
       COMMON / EXTDIR / INSTDIR
 
 ! File information; Names of files used by DASH For I/O
-      CHARACTER*80 :: DashRawFile
+      CHARACTER*80 :: DashTicFile
       CHARACTER*80 :: DashHcvFile
       CHARACTER*80 :: DashPikFile
-      CHARACTER*80 :: DashTicFile
+      CHARACTER*80 :: DashRawFile
       CHARACTER*80 :: DashDslFile
 
-      LOGICAL RawExists
+      LOGICAL TicExists
       LOGICAL HcvExists
       LOGICAL PikExists
-      LOGICAL TicExists
+      LOGICAL RawExists
+      LOGICAL DslExists
 
 ! New license information structure    
       TYPE License_Info
