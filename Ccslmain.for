@@ -565,6 +565,9 @@ C
 C
 C LEVEL 5      SUBROUTINE ADJUST(PAR)
       SUBROUTINE ADJUST(PAR)
+
+	USE WINTERACTER
+	USE DRUID_HEADER
 C
 C *** ADJUST updated by JCM 11 Jan 88 ***
 C
@@ -586,9 +589,16 @@ C
      & IFDTYP(20)
       COMMON /NEWOLD/SHIFT,XOLD,XNEW,ESD,IFAM,IGEN,ISPC,
      & NEWIN,KPACK,LKH,SHESD,ISHFT,AVSHFT,AMAXSH
+      REAL FudgeFactor
 C
       XOLD=PAR
-      XNEW=XOLD+SHIFT
+! Jvds Assuming that the instabilities in the Pawley refinement are caused
+! by the shift applied being too large, this would be the right place to adjust that.
+! Rather than setting FUDGE1 factors, how about just multiplying everything by a user set
+! damping factor.
+      CALL WDialogSelect(IDD_Pawley_Status)
+      CALL WDialogGetReal(IDF_FudgeFactor,FudgeFactor)
+      XNEW=XOLD+FudgeFactor*SHIFT
 C EXIT IF NO FUDGES AT ALL:
       IF (NFUDGE .EQ. 0) GO TO 101
 C
@@ -5581,7 +5591,7 @@ C
 CX
 CC 6A
 CH Interprets all L FUDG cards.
-CD Sets NFUDGE in /FUDG to be the number of fudge factors read.
+CD Sets NFUDGE in /FUDG/ to be the number of fudge factors read.
 CD Reads from the cards sets of <parameter specification> <fudge factor>
 CD The parameter specification may be any of those described under PARRD
 CD The fudge factor may be one of:
