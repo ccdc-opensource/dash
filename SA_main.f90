@@ -25,6 +25,8 @@
       CHARACTER*9  MonthStr
       REAL    MaxMoves1, tMaxMoves
       INTEGER MaxMoves2
+      CHARACTER*20, EXTERNAL :: Integer2String
+      CHARACTER*20 MaxMovesStr
 
       WriteSAParametersToFile = 1 ! Error
       CALL PushActiveWindowID
@@ -120,16 +122,33 @@
       ELSE
         WRITE(tFileHandle,'("  Number of runs = ",I5)',ERR=999) I
         CALL WDialogGetReal(IDF_MaxMoves1,MaxMoves1)
-        IF (MaxMoves1 .LT.    0.001) MaxMoves1 =    0.001
-        IF (MaxMoves1 .GT. 1000.0  ) MaxMoves1 = 1000.0
+        IF (MaxMoves1 .LT.   0.001) MaxMoves1 =   0.001
+        IF (MaxMoves1 .GT. 100.0  ) MaxMoves1 = 100.0
         CALL WDialogGetInteger(IDF_MaxMoves2,MaxMoves2)
-        IF (MaxMoves2 .LT.  1) MaxMoves2 =  1
-        IF (MaxMoves2 .GT. 10) MaxMoves2 = 10
+        IF (MaxMoves2 .LT. 1) MaxMoves2 = 1
+        IF (MaxMoves2 .GT. 8) MaxMoves2 = 8
         tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
         IF (tMaxMoves .LT. 10.0) tMaxMoves = 10.0
-        IF (tMaxMoves .GT. 10.0E12) tMaxMoves = 10.0E12
+        IF (tMaxMoves .GT.  2.0E9) tMaxMoves = 2.0E9
         I = NINT(tMaxMoves)
-        WRITE(tFileHandle,'("  Maximum number of moves per run = ",I10)',ERR=999) I
+        MaxMovesStr = Integer2String(I)
+        ilen = LEN_TRIM(MaxMovesStr)
+! 1000000000 ==> 1000000,000
+        IF (ilen .GT. 3) THEN
+          MaxMovesStr(ilen-1:ilen+1) = MaxMovesStr(ilen-2:ilen)
+          MaxMovesStr(ilen-2:ilen-2) = ','
+        ENDIF
+! 1000000,000 ==> 1000,000,000
+        IF (ilen .GT. 6) THEN
+          MaxMovesStr(ilen-4:ilen+2) = MaxMovesStr(ilen-5:ilen+1)
+          MaxMovesStr(ilen-5:ilen-5) = ','
+        ENDIF
+! 1000,000,000 ==> 1,000,000,000
+        IF (ilen .GT. 9) THEN
+          MaxMovesStr(ilen-7:ilen+3) = MaxMovesStr(ilen-8:ilen+2)
+          MaxMovesStr(ilen-8:ilen-8) = ','
+        ENDIF
+        WRITE(tFileHandle,'("  Maximum number of moves per run = ",A)',ERR=999) MaxMovesStr(1:LEN_TRIM(MaxMovesStr))
         CALL WDialogGetReal(IDF_SA_ChiTest,R)
         WRITE(tFileHandle,'("  A run will stop when the profile chi² is less than ",   &
                 F6.2," · ",F7.3," = ",F8.4)',ERR=999) R, PAWLEYCHISQ, R*PAWLEYCHISQ
@@ -439,6 +458,7 @@
           CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
 ! Enable 'View' button
           CALL WDialogFieldState(IDBZMView(ifrg),Enabled)
+          CALL WDialogFieldState(IDBZMDelete(ifrg),Enabled)
         ELSE
           izmpar(ifrg) = 0
           natoms(ifrg) = 0
@@ -446,6 +466,7 @@
           CALL WDialogClearField(IDFZMFile(ifrg))
 ! Disable 'View' button
           CALL WDialogFieldState(IDBZMView(ifrg),Disabled)
+          CALL WDialogFieldState(IDBZMDelete(ifrg),Disabled)
         ENDIF
       ENDDO
       natom = ntatm
