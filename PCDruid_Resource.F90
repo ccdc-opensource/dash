@@ -1,4 +1,4 @@
-! Winteracter module created : 30/Jan/2002 13:51:36
+! Winteracter module created : 30/Jan/2002 15:51:53
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -522,4 +522,6 @@
           INTEGER, PARAMETER :: IDF_BUTTON6                     =  1384
           INTEGER, PARAMETER :: IDB_Relabel                     =  1385
           INTEGER, PARAMETER :: IDF_IDoNotAgree                 =  1386
+          INTEGER, PARAMETER :: IDD_DIALOG002                   =   162
+          INTEGER, PARAMETER :: IDF_BUTTON8                     =  1387
       END MODULE Druid_Header

@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 30/Jan/2002 13:51:36
+// Modified : 30/Jan/2002 15:51:53
 //
 ///////////////////////////////////////////////////
 //
@@ -535,6 +535,8 @@
 #define IDF_BUTTON6                      1384
 #define IDB_Relabel                      1385
 #define IDF_IDoNotAgree                  1386
+#define IDD_DIALOG002                     162
+#define IDF_BUTTON8                      1387
 
 ///////////////////////////////////////////////////
 //
@@ -1293,6 +1295,7 @@ BEGIN
 "[Grids] \n"
 "[Colours] \n"
 "[Lengths] \n"
+" 1201   255 \n"
 ,0
 END
 
@@ -1310,6 +1313,20 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  167,   77,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+END
+
+IDD_PW_Page3 RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+" 1263   255 \n"
+,0
 END
 
 IDD_Pawley_Status DIALOG 0, 0,  400,  185
@@ -1888,7 +1905,7 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAM
 FONT    8, "MS Sans Serif"
 CAPTION "Aquiring a licence"
 BEGIN
-    CONTROL "You need to enter a valid licence for DASH to run on this machine. To do this, either enter your licence key in the box provided or create a licence request form and e-mail it to software@ccdc.cam.ac.uk",IDF_License_Info,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   16,  238,   28
+    CONTROL "You need to enter a valid licence for DASH to run on this machine. To do this, either enter your licence key in the box provided or create a licence request form and e-mail it to support@ccdc.cam.ac.uk",IDF_License_Info,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   16,  238,   28
     CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   38,  120,   38,   14
     CONTROL "Enter Licence Key:",IDF_License_Key,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   56,   94,    8
     CONTROL "",IDF_License_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,  120,   52,  132,   14
@@ -1950,6 +1967,19 @@ BEGIN
     CONTROL "You may be able to fix the problem by decreasing the data range in 2-theta or by increasing the overlap criterion.",IDF_Pawley_ErrorLog_intro3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,    8,   40,  204,   20
     CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   28,   68,   40,   14
     CONTROL "&View fit list file",ID_Edit_PawleyLog,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  136,   68,   50,   14
+END
+
+IDD_Pawley_ErrorLog RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
 END
 
 IDD_SAW_Page1 DIALOG 0, 0,  400,  170
@@ -2951,6 +2981,83 @@ BEGIN
 "[Lengths] \n"
 " 1021     5 \n"
 " 1066     2 \n"
+,0
+END
+
+IDD_DIALOG002 DIALOG 0, 0,  400,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Pawley Refinement Step 2"
+BEGIN
+    CONTROL "0",IDF_Pawley_Progress_Bar,"MSCTLS_PROGRESS32",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP,  104,  111,  278,   10,WS_EX_CLIENTEDGE
+    CONTROL "Cycle number",IDF_Pawley_Cycle_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,   97,   46,    8
+    CONTROL "",IDF_Pawley_Cycle_Number,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  156,   95,   16,   12
+    CONTROL "of",IDF_Pawley_Cycle_Label2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  178,   97,   12,    8
+    CONTROL "reflections",IDF_Pawley_Cycle_Refs_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  130,  129,   34,    8
+    CONTROL "",IDF_Pawley_Cycle_NumRefs,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  104,  127,   24,   12
+    CONTROL "points",IDF_Pawley_Cycle_Pts_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  193,  129,   20,    8
+    CONTROL "",IDF_Pawley_Cycle_NumPts,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  168,  127,   24,   12
+    CONTROL "chi",IDF_Pawley_Cycle_ChiSq_Label1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  335,  129,   12,    8
+    CONTROL "",IDF_Pawley_Cycle_ChiSq,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  354,  127,   28,   12
+    CONTROL "Refinement status",IDF_Pawley_Status_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,   84,  298,   60
+    CONTROL "Rwp",IDF_Pawley_Cycle_Rwp_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  224,  129,   15,    8
+    CONTROL "",IDF_Pawley_Cycle_Rwp,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  240,  127,   28,   12
+    CONTROL "R(exp)",IDF_Pawley_Cycle_RwpExp_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  275,  129,   22,    8
+    CONTROL "",IDF_Pawley_Cycle_RwpExp,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  298,  127,   28,   12
+    CONTROL "Refinement number",IDF_Pawley_RefNum_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  302,   97,   62,    8
+    CONTROL "",IDF_Pawley_Refinement_Number,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  366,   95,   16,   12
+    CONTROL "N(back)  =",IDF_PawRef_NBack_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  321,   17,   32,    8
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  143,  150,   40,   14
+    CONTROL "&Refine",IDF_PawRef_Refine,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "3",IDF_Pawley_Total_Cycles,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  196,   95,   25,   12
+    CONTROL "Re-use intensities",IDF_PawRef_UseInts_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   14,   80,   14
+    CONTROL "Intensities",IDF_PawRef_RefInts_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  104,   14,   52,   14
+    CONTROL "Background",IDF_PawRef_RefBack_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  254,   14,   60,   14
+    CONTROL "10",IDF_IDF_PawRef_NBack,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  355,   15,   30,   14
+    CONTROL "&Unit cell",IDF_PawRef_RefCell_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  104,   28,   52,   14
+    CONTROL "&Zeropoint",IDF_PawRef_RefZero_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  162,   28,   60,   14
+    CONTROL "Sigma(size)",IDF_PawRef_RefSigm1_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  104,   46,   54,   14
+    CONTROL "Sigma(strain)",IDF_PawRef_RefSigm2_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  104,   60,   54,   14
+    CONTROL "Gamma(size)",IDF_PawRef_RefGamm1_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  161,   46,   54,   14
+    CONTROL "Gamma(strain)",IDF_PawRef_RefGamm2_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  161,   60,   60,   14
+    CONTROL "Refined control",IDF_Pawley_Options_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,    7,  298,   72
+    CONTROL "&Solve >",IDF_PawRef_Solve,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  349,  150,   40,   14
+    CONTROL "2",IDF_Pawley_Cycle_ChiSq_Label2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  348,  126,    5,    8
+    CONTROL "Re&ject",IDB_PawRef_Reject,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  246,  150,   40,   14
+    CONTROL "&Accept",IDB_PawRef_Accept,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  203,  150,   40,   14
+    CONTROL "Sa&ve",IDB_PawRef_Save,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  306,  150,   40,   14
+    CONTROL "Overlap criterion",IDF_SlimLabel,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  301,   51,   52,    8
+    CONTROL "1.0",IDF_Slim_Parameter,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  355,   48,   30,   14
+    CONTROL "Step size damping factor",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  272,   35,   80,    8
+    CONTROL "1.0",IDF_FudgeFactor,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  355,   32,   30,   14
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "Excluded regions...",IDF_BUTTON8,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  226,   60,   70,   14
+END
+
+IDD_DIALOG002 RCDATA
+BEGIN
+"[Checks] \n"
+" 1288 0 \n"
+" 1286 1 \n"
+" 1289 1 \n"
+" 1292 0 \n"
+" 1293 0 \n"
+" 1320 0 \n"
+" 1321 0 \n"
+" 1322 0 \n"
+" 1323 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1266               0             100 \n"
+" 1269               2              25 \n"
+" 1291               2              20 \n"
+" 1007     0.25000           3.0000      \n"
+" 1095     0.10000E-001      5.0000      \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
 ,0
 END
 
