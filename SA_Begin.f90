@@ -180,8 +180,9 @@
 
 ! Covers the eventuality of the default space group option.
 ! We need to determine the number of symmetry operators etc.
-      LOGICAL SDREAD
-      COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),ICDN(26,9),IERR,IO10,SDREAD
+      INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
+      LOGICAL                                                                             SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       CHARACTER*6 xxx
