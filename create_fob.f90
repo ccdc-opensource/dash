@@ -140,7 +140,7 @@
         IF (gotzmfile(iFrg)) THEN
           IF (icomflg(iFrg) .EQ. 0)  THEN
             DO I = 1, natoms(iFrg)
-              DO J = 1, 109
+              DO J = 1, MaxElm
                 IF (asym(I,iFrg)(1:2) .EQ. ElementStr(J)(1:2)) THEN
                   AtomicWeighting(I,iFrg) = FLOAT(atnr(J))**2
                   EXIT
