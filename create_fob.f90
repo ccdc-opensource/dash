@@ -84,7 +84,11 @@
           DO iRef = 1, NumOfRef
             ssq = 0.25*DSTAR(iRef)**2
             atem(item,iRef) = occ(iAtom,iFrg) * AScFac(ssq,Element)
-            btem(item,iRef) = tiso(iAtom,iFrg)*ssq
+            IF (AbsorbHydrogens) THEN
+              btem(item,iRef) = tiso(iAtom,iFrg)*ssq * (1.0 + FLOAT(NumOfBondedHydrogens(iAtom, iFrg))/10.0)
+            ELSE
+              btem(item,iRef) = tiso(iAtom,iFrg)*ssq
+            ENDIF
             FOB(item,iRef) = atem(item,iRef)*EXP(-btem(item,iRef))
           ENDDO
         ENDDO
