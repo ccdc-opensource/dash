@@ -337,6 +337,8 @@
         CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
         CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
         CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
+        CALL WDialogPutReal(IDF_HPSL,   PeakShapeHPSL,     '(F10.4)')
+        CALL WDialogPutReal(IDF_HMSL,   PeakShapeHMSL,     '(F10.4)')
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts, NBIN)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs, NumOfRef)
         CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq, PAWLEYCHISQ, '(F12.3)')
