@@ -140,6 +140,8 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
+! These variables have to do with the peak fit ranges as selected by the user
+!
 ! MAX_NPFR (= 50) = MAXimum Number of Peak Fit Ranges
 ! MAX_NPPR (= MPeak = 10) = MAXimum Number of Peaks per Peak Fit Range
 ! XPF_Range(1,i)  = start of hatched area
@@ -173,6 +175,17 @@
                         PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
                         PkPosAv(MAX_NPFR)
 
+! These variables have to do with the peak shape parameters as calculated per peak fit range.
+! Note that one peak fit range can have more than one peak position.
+!
+
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
+
+! These variables have to do with the overall peak shape parameters as calculated from the
+! Pawley Refinement.
+!
+
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
       REAL              PkProb
@@ -184,6 +197,9 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
+! These variables have to do with the peak positions as calculated _per peak_ selected by the user.
+! Note that one peak fit range can have more than one peak position.
+!
 ! MTPeak        = (=100) maximum number of peak positions used for refinement of unit cell parameters
 ! NTPeak        = Total number of peaks
 ! AllPkPosVal   = position of the peak
