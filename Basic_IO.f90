@@ -161,6 +161,9 @@
         CASE (IDD_Plot_Option_Dialog)
           CALL DealWithPlotOptionsWindow
           GOTO 10
+        CASE (IDD_Configuration)
+          CALL DealWithConfiguration
+          GOTO 10
         CASE (IDD_Structural_Information)
           CALL DealWithStructuralInformation
           GOTO 10
@@ -272,6 +275,9 @@
             ENDIF
           CASE (IDD_Plot_Option_Dialog)
             CALL DealWithPlotOptionsWindow
+            GOTO 10
+          CASE (IDD_Configuration)
+            CALL DealWithConfiguration
             GOTO 10
           CASE (IDD_Structural_Information)
             CALL DealWithStructuralInformation

@@ -1,4 +1,4 @@
-! Winteracter module created : 10/Oct/2001 09:13:57
+! Winteracter module created : 14/Oct/2001 15:46:34
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -179,7 +179,6 @@
           INTEGER, PARAMETER :: IDF_PWa_Data_Group              =  1261
           INTEGER, PARAMETER :: IDF_PWa_Data_fFilename          =  1262
           INTEGER, PARAMETER :: IDF_PWa_DataFileName_String     =  1263
-          INTEGER, PARAMETER :: ID_PWa_DF_Browse                =  1264
           INTEGER, PARAMETER :: IDF_PW_Option2                  =  1252
           INTEGER, PARAMETER :: IDF_PW_Option3                  =  1253
           INTEGER, PARAMETER :: IDF_PW_Option4                  =  1254
@@ -488,4 +487,13 @@
           INTEGER, PARAMETER :: IDB_ZMatrixView3                =  1248
           INTEGER, PARAMETER :: IDB_ZMatrixView4                =  1249
           INTEGER, PARAMETER :: IDB_ZMatrixView5                =  1250
+          INTEGER, PARAMETER :: ID_Configuration                = 40016
+          INTEGER, PARAMETER :: IDD_Configuration               =   147
+          INTEGER, PARAMETER :: IDF_ViewArg                     =  1256
+          INTEGER, PARAMETER :: IDF_ViewExe                     =  1257
+          INTEGER, PARAMETER :: IDBBROWSE                       =  1258
+          INTEGER, PARAMETER :: IDF_AutoLocalOptimise           =  1259
+          INTEGER, PARAMETER :: IDF_OutputCSSR                  =  1260
+          INTEGER, PARAMETER :: IDF_OutputCCL                   =  1277
+          INTEGER, PARAMETER :: IDF_UseHydrogens                =  1296
       END MODULE Druid_Header

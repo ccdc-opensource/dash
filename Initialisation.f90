@@ -69,6 +69,7 @@
       CALL WDialogLoad(IDD_Structural_Information)
       CALL WDialogLoad(IDD_SA_Action1)
       CALL WDialogLoad(IDD_Plot_Option_Dialog)
+      CALL WDialogLoad(IDD_Configuration)
 !      CALL WDialogLoad(IDD_About_Polyfitter)
       CALL WDialogLoad(IDD_Pawley_Status)
       CALL WDialogLoad(IDD_Peak_Positions)
@@ -419,6 +420,8 @@
       USE DRUID_HEADER
       USE VARIABLES
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
@@ -432,22 +435,24 @@
       REAL                                           DSTAR
       COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
-      COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
+      REAL            XPG1, XPG2, YPG1, YPG2
+      COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
+      INTEGER         nvar, ns, nt, neps, maxevl, iprint, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, neps, maxevl, iprint, iseed1, iseed2
 
       LOGICAL         ChildWinAutoClose
       COMMON /ChWAC/  ChildWinAutoClose(1:20)
 
       REAL    WaveLengthOf ! Function
+      REAL    dSpacing2TwoTheta ! Function
+      INTEGER ISeed3
 
-      DO I = 1, 20
-        ChildWinAutoClose(I) = .FALSE.
-      ENDDO
+      ChildWinAutoClose = .FALSE.
       DashRawFile = ' '
       DashHcvFile = ' '
       DashPikFile = ' '
@@ -464,7 +469,7 @@
       ZeroPoint = 0.0
       DefaultMaxResolution = 2.0
       CALL UpdateWavelength(WaveLengthOf('Cu'))
-! Now initialise the maximum resolution
+! Now initialise the maximum resolution in the dialogue window
       CALL WDialogSelect(IDD_PW_Page5)
       CALL WDialogPutReal(IDF_MaxResolution,DefaultMaxResolution)
       CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(DefaultMaxResolution))
@@ -477,6 +482,25 @@
       CALL WDialogPutInteger(IDF_SA_RandomSeed3,ISeed3)
       CALL WDialogSelect(IDD_Index_Preparation)
       CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogPutString(IDF_ViewExe,ViewExe)
+      CALL WDialogPutString(IDF_ViewArg,ViewArg)
+      IF (AutoLocalMinimisation) THEN
+        CALL WDialogPutCheckBox(IDF_AutoLocalOptimise,1)
+      ELSE
+        CALL WDialogPutCheckBox(IDF_AutoLocalOptimise,0)
+      ENDIF
+      IF (SaveCSSR) THEN
+        CALL WDialogPutCheckBox(IDF_OutputCSSR,1)
+      ELSE
+        CALL WDialogPutCheckBox(IDF_OutputCSSR,0)
+      ENDIF
+      IF (SaveCCL) THEN
+        CALL WDialogPutCheckBox(IDF_OutputCCL,1)
+      ELSE
+        CALL WDialogPutCheckBox(IDF_OutputCCL,0)
+      ENDIF
+
       SLIMVALUE = 1.0
       SCALFAC   = 0.01
       BACKREF   = .TRUE.
@@ -589,8 +613,8 @@
 !
 !*****************************************************************************
 !
-!C>> Handle file opening. Exit with a message to say what is wrong if all attempts fail
-! JvdS What does it return? tFileHandle and 0 otherwise?
+! Handle file opening. Exit with a message to say what is wrong if all attempts fail
+! JvdS What does it return? FileHandle and 0 otherwise?
       INTEGER FUNCTION PolyFitter_OpenSpaceGroupSymbols
 
       USE WINTERACTER
@@ -602,19 +626,19 @@
       CHARACTER*255 DashDir, Command
 
       PolyFitter_OpenSpaceGroupSymbols = 0
-!   Try the default installation directory first
+! Try the default installation directory first
       OPEN(110,file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//SPACEGROUPS,status='old', err = 10)
       RETURN
  10   CONTINUE
-!   Fail so look in current working directory
+! Fail so look in current working directory
       OPEN(110,file=SPACEGROUPS,status='old', err = 20, iostat = errstat)
       dlen = GETCWD(INSTDIR)
       RETURN
  20   CONTINUE
-!   Failed to open in the current working directory: try getting the environment variable DASH_DIR
+! Failed to open in the current working directory: try getting the environment variable DASH_DIR
       lval = GETENVQQ("DASH_DIR",DashDir)
       IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
-!   Environment variable is set
+! Environment variable is set
         Open(110,file=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//SPACEGROUPS,status='old', err = 30)
         INSTDIR = DASHDIR
         RETURN

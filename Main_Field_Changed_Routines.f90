@@ -85,6 +85,59 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DealWithConfiguration
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER IFLAGS, IFTYPE
+      CHARACTER*MaxPathLength tFileName
+      CHARACTER*75  FILTER
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCLOSE, IDCANCEL)
+
+
+
+              CALL WDialogSelect(IDD_Configuration)
+              CALL WDialogHide()
+            CASE (IDBBROWSE)
+              IFLAGS = LoadDialog + PromptOn
+              FILTER = 'All files (*.*)|*.*|'//&
+                       'All executables (*.exe)|*.exe|'
+! IFTYPE specifies which of the file types in the list is the default
+              IFTYPE = 2
+              tFileName = ' '
+              CALL WSelectFile(FILTER,IFLAGS,tFileName,'Select Viewer',IFTYPE)
+! Did the user press cancel?
+              IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) THEN
+                CALL PopActiveWindowID
+                RETURN
+              ENDIF
+! Note that up to this point, none of the global variables had changed. Baling out was no problem.
+              VIEWEXE = tFileName
+              CALL WDialogPutString(IDF_ViewExe,VIEWEXE)
+            CASE DEFAULT
+              CALL DebugErrorMessage('Forgot to handle something in DealWithConfiguration')
+          END SELECT
+        CASE (FieldChanged)
+         ! Do nothing
+        CASE DEFAULT
+          CALL DebugErrorMessage('Forgot to handle event in DealWithConfiguration')
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithConfiguration
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithStructuralInformation
 ! This is the window containing the four tabs from the 'View' menu
 
