@@ -157,8 +157,7 @@
       INTEGER tLength, BondNr
 
       natcry = NATOMS(ifrg)
-      CALL MAKEXYZ_2(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),      &
-                     IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART)
+      CALL MAKEXYZ_2(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART)
 ! Conversion of asym to aelem : very dirty, but works
       DO I = 1, natcry
         axyzo(I,1) = SNGL(CART(1,I))
@@ -511,14 +510,15 @@
         IF (FNAME(I:I) .EQ. DIRSPACER) Istart = I + 1
       ENDDO
       CALL WCursorShape(CurHourGlass)
-      CALL IOSCommand(CONVEXE(1:LEN_TRIM(CONVEXE))//' '//fmt(1:LEN_TRIM(fmt))//' "'//FNAME(Istart:Ilen)//'"',3)
+      CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'zmconv.exe'// &
+        ' '//fmt(1:LEN_TRIM(fmt))//' "'//FNAME(Istart:Ilen)//'"',3)
       CALL WCursorShape(CurCrossHair)
 ! Check return status
       OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = ISTAT)
       IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (ISTAT .NE. 0)) THEN
 ! An error occurred: get the return status
 ! IECODE = InfoError(3)
-        CALL ErrorMessage("Sorry, could not create z-matrices")
+        CALL ErrorMessage("Sorry, could not create Z-matrices")
 ! Prompt with files created
       ELSE ! All Ok: Need to read in the file names
         Ilen = 1

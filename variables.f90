@@ -23,22 +23,13 @@
       CHARACTER(MaxPathLength) ::  FNAME
       DATA FNAME / ' ' /     ! Current filename
 
-! Added these in for portability reasons       
-      CHARACTER(MaxPathLength) ::  INSTDIR
-      DATA INSTDIR / 'C:\Program Files\DASH' / ! Default installation directory
+      CHARACTER(MaxPathLength) ::  InstallationDirectory
 
-      CHARACTER(21)            ::  SPACEGROUPS
-      DATA SPACEGROUPS / 'SpaceGroupSymbols.dat' / ! Table name
       CHARACTER                ::  DIRSPACER
       DATA DIRSPACER / '\' / ! Windows spacer
-      CHARACTER(8)             ::  CONFIG
-      DATA CONFIG / 'D3.cfg' /
 ! External binaries
       CHARACTER(MaxPathLength) :: VIEWEXE
       DATA VIEWEXE / 'C:\Program Files\CCDC\Mercury 1.0\mercury.exe' /
-
-      CHARACTER(MaxPathLength) :: CONVEXE
-      DATA CONVEXE / 'C:\Program Files\DASH\zmconv.exe' /
 
       CHARACTER(20)            ::  VIEWARG
       DATA VIEWARG / '' /
@@ -88,7 +79,7 @@
 ! If set to .FALSE., the rest of the configuration file will be skipped.
       
       LOGICAL SavePDB
-! Flags to decide which molecular model files are written out when a best solution is found
+! Flag to decide which molecular model files are written out when a best solution is found
 
       REAL SA_SimplexDampingFactor
 ! Damping factor for the local minimisation during / after a simulated annealing run
@@ -130,8 +121,8 @@
 ! The code used to calculate the tickmarks does so by emulating a Rietveld refinement.
 ! As a Rietveld Refinement needs scatterers, a single carbon atom is provided in the 
 ! CCSL input file. This is read by the CCSL code and sets the number of atoms to 1, overriding
-! all z-matrices.
-! Therefore, calculating the tickmarks destroys the z-matrices.
+! all Z-matrices.
+! Therefore, calculating the tickmarks destroys the Z-matrices.
 ! Due to the way Winteracter and DASH work, the tickmarks are re-calculated every time
 ! a user switches between tabs in the 'View' dialogue.
 ! The variable 'PastPawley' is there to indicate that the Pawley refinement has finished and that

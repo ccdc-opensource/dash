@@ -2,24 +2,20 @@
 !*****************************************************************************
 !
       SUBROUTINE Init_StdOut()
+! Selects the 'working directory' (which is changed every time the directory is changed
+! when e.g. a z-matrix is loaded, so this is not really '_the_' working directory).
+! Checks if in that directory (but, as said, that directory changes all the time)
+! temporary files can be created.
  
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
-      USE DFLIB
 
       IMPLICIT NONE
 
-      INTEGER :: IFlags, Ilen, Idashlen
-      CHARACTER(LEN=MaxPathLength) :: Dirname, DashDir, InstDirLc, DashDirLc, DirNameLc
-      LOGICAL, EXTERNAL ::  Confirm
+      INTEGER :: IFlags, ISTAT
+      CHARACTER(LEN=MaxPathLength) :: Dirname
 
-      Idashlen = GETENVQQ("DASH_DIR",DashDir)
-      InstDirLc = InstDir
-      DashDirLc = DashDir
-      CALL ILowerCase(DashDirLc)
-      CALL ILowerCase(InstDirLc)
-   10 DO WHILE (.TRUE.)
+      DO WHILE (.TRUE.)
         IFlags = DirChange + DirCreate
         Dirname = ' '
         CALL WSelectDir(IFlags,Dirname,"Select working directory for DASH...")
@@ -27,19 +23,12 @@
           CALL WindowClose()
           STOP
         ENDIF
-        DirNameLc = DirName
-        CALL ILowerCase(DirNameLc)
-        Ilen = LEN_TRIM(DirNameLc)
-        IF ( (DirNameLc(1:Ilen) .EQ. DashDirLc(1:LEN_TRIM(DashDirLc))) .OR.  &
-             (DirNameLc(1:Ilen) .EQ. InstDirLc(1:LEN_TRIM(InstDirLc))) ) THEN
-          IF (.NOT. Confirm("Are you sure you wish to start DASH in"//CHAR(13)//"the installation directory "//&
-            CHAR(13)//DirName(1:Ilen)//" ?")) GOTO 10
-        ENDIF
 ! Open the file
         OPEN(UNIT = 6, FILE = 'dash.out', STATUS = 'UNKNOWN', ERR = 110)
+        CLOSE(UNIT=6,STATUS='DELETE',IOSTAT=ISTAT)
         RETURN
  110    CALL ErrorMessage("DASH problem: Could not open temporary files"//CHAR(13)// &
-                          "in the directory "//DirName(4:Ilen)//CHAR(13)//&
+                          "in the directory "//DirName(1:LEN_TRIM(DirName))//CHAR(13)//&
                           "Please pick an alternative directory for your DASH run")
       ENDDO
 
@@ -99,8 +88,9 @@
       SUBROUTINE PolyFitterInitialise
 
       USE WINTERACTER
-      USE VARIABLES
       USE DRUID_HEADER
+      USE VARIABLES
+      USE KERNEL32
 
       IMPLICIT NONE
 
@@ -109,12 +99,14 @@
 
       CHARACTER(LEN=128) lintem
       INTEGER I, II, nl
-      INTEGER, EXTERNAL :: PolyFitter_OpenSpaceGroupSymbols
 !O      DATA LPosSG/1,1,3,38,73,108,349,430,455,462,489,531/
       DATA CrystalSystemString /'Triclinic   ', 'Monoclinic-a', 'Monoclinic-b', &
                                 'Monoclinic-c', 'Orthorhombic', 'Tetragonal  ', &
                                 'Trigonal    ', 'Rhombohedral', 'Hexagonal   ', &
                                 'Cubic       '/
+      CHARACTER*MaxPathLength tString
+      CHARACTER*255 tDir, tFile
+      INTEGER*4 tProcess, tSize
 
       LPosSG( 1) =   1
       LPosSG( 2) =   3
@@ -127,10 +119,16 @@
       LPosSG( 9) = 462
       LPosSG(10) = 489
       LPosSG(11) = MaxSPGR+1
-! JCC Init the viewing etc
-      CALL PolyFitter_EnableExternal
+! Determine the directory where DASH.exe resides and store it in "InstallationDirectory"
+      tSize = MaxPathLength
+      tProcess = 0 ! this program
+      CALL GetModuleFileName(tProcess,tString,LOC(tSize))
+! tString should now contain the full path to DASH.exe irrespective of the way
+! DASH has been invoked.
+      CALL SplitPath(tString,InstallationDirectory,tFile)
+      IF (LEN_TRIM(InstallationDirectory) .EQ. 0) InstallationDirectory = '.'//DIRSPACER
 ! Get the space group symbols ...
-      IF (PolyFitter_OpenSpaceGroupSymbols() .NE. 0) GOTO 999 ! fail gracefully!
+      OPEN(110,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 999)
       i = 0
  10   lintem=' '
       READ(110,1100,END=100) nl, lintem
@@ -158,7 +156,8 @@
       GOTO 10
  100  IF (I .NE. MaxSPGR) THEN
         CALL ErrorMessage('Number of space groups in space-group file has changed.')
-        GOTO 999
+        CALL WindowClose()
+        STOP
       ENDIF
       CLOSE(110)
 ! Initialise space group to P 1
@@ -169,122 +168,14 @@
       RETURN
  999  CONTINUE
 ! Failure, so exit gracefully
+      CALL ErrorMessage("Sorry, DASH is not installed correctly: could not find the file"//CHAR(13) &
+                          //'SpaceGroupSymbols.dat'//CHAR(13)// &
+                          "in the installation directory"//CHAR(13)//&
+                          InstallationDirectory(1:LEN_TRIM(InstallationDirectory)))              
       CALL WindowClose()
       STOP
 
       END SUBROUTINE PolyFitterInitialise
-!
-!*****************************************************************************
-! 
-      SUBROUTINE PolyFitter_EnableExternal()
-
-      USE WINTERACTER
-      USE VARIABLES
-      USE DFLIB ! Windows environment variable handling: for GETENVQQ
-      USE KERNEL32
-
-      IMPLICIT NONE
-
-      INTEGER       lval
-      CHARACTER*255 DashDir
-      CHARACTER*MaxPathLength line
-      CHARACTER*255 tDir, tFile
-      INTEGER*4 tProcess, tSize
-
-      ConvOn     = .FALSE.
-      lval = GETENVQQ("DASH_DIR",DashDir)
-      IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
-        OPEN(121, FILE=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 10)
-        INSTDIR = DashDir
-        GOTO 25
-      ENDIF
-   10 OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 20)
-      GOTO 25
-   20 tSize = MaxPathLength
-      tProcess = 0 ! this program
-      CALL GetModuleFileName(tProcess,line,LOC(tSize))
-! tString should now contain the full path to PCDash.exe irrespective of the way
-! DASH has been invoked.
-      CALL SplitPath(line,tDir,tFile)
-      IF (LEN_TRIM(tDir) .EQ. 0) tDir = '.'//DIRSPACER
-      OPEN(121,FILE=tDir(1:LEN_TRIM(tDir))//CONFIG, STATUS='OLD',ERR=30)
-! Remove '\' at end
-      tDir(LEN_TRIM(tDir):LEN_TRIM(tDir)) = ' '
-      INSTDIR = tDir
-! Read it
-   25 CONTINUE                  
-   30 CONTINUE
-      CLOSE(121)
-
-      END SUBROUTINE PolyFitter_EnableExternal
-!
-!*****************************************************************************
-!
-! Handle file opening. Exit with a message to say what is wrong if all attempts fail
-! JvdS What does it return? FileHandle and 0 otherwise?
-      INTEGER FUNCTION PolyFitter_OpenSpaceGroupSymbols
-
-      USE WINTERACTER
-      USE VARIABLES
-      USE DFLIB ! Windows environment variable handling: for GETENVQQ
-      USE DFPORT
-      USE KERNEL32
-
-      INTEGER       errstat, lval, dlen
-      CHARACTER*255 DashDir, Command
-      INTEGER*4 tProcess, tSize
-
-      PolyFitter_OpenSpaceGroupSymbols = 0
-! Try the default installation directory first
-      OPEN(110,file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//SPACEGROUPS,status='old', err = 10)
-      RETURN
- 10   CONTINUE
-! Fail so look in current working directory
-      OPEN(110,file=SPACEGROUPS,status='old', err = 20, iostat = errstat)
-      dlen = GETCWD(INSTDIR)
-      RETURN
- 20   CONTINUE
-! Failed to open in the current working directory: try getting the environment variable DASH_DIR
-      lval = GETENVQQ("DASH_DIR",DashDir)
-      IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
-! Environment variable is set
-        OPEN(110,file=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//SPACEGROUPS,status='old', err = 30)
-        INSTDIR = DASHDIR
-        RETURN
- 30     CONTINUE
-! If DASH_DIR is set, then use a different message
-        Call ErrorMessage("Sorry, DASH is not installed correctly: Could not find the file"//CHAR(13)//CHAR(13)  &
-                          //SPACEGROUPS//CHAR(13)//CHAR(13)// &
-                          "in the default installation directory "//CHAR(13)//CHAR(13)//&
-                          INSTDIR(1:LEN_TRIM(INSTDIR))//CHAR(13)//CHAR(13)//&
-                          "in your current working directory, or in the directory "//CHAR(13)//CHAR(13)&
-                          //DashDir(1:LEN_TRIM(DashDir)))              
-          PolyFitter_OpenSpaceGroupSymbols = errstat
-        RETURN
-      ENDIF
-! Try looking at the command path itself and deriving the path from that
-      tSize = MaxPathLength
-      tProcess = 0 ! this program
-      CALL GetModuleFileName(tProcess,Command,LOC(tSize))
-      dlen = LEN_TRIM(Command)
-      DO WHILE (Command(dlen:dlen) .NE. DIRSPACER)
-        dlen = dlen - 1
-      ENDDO
-! JvdS What happens if no DIRSPACER is present?
-      dlen = dlen - 1
-      OPEN(110,File=Command(1:dlen)//DIRSPACER//SPACEGROUPS,status='old', err = 40)
-      INSTDIR = Command(1:dlen)
-      RETURN
- 40   CONTINUE
-! If we get here, all attempts failed to open the file so fail gracefully
-      CALL ErrorMessage("Sorry, DASH is not installed correctly: Could not find the file"//CHAR(13)//CHAR(13) &
-                        //SPACEGROUPS//CHAR(13)//CHAR(13)// &
-                        "in the default installation directory "//CHAR(13)//CHAR(13)// &
-                        INSTDIR(1:LEN_TRIM(INSTDIR))//CHAR(13)//CHAR(13)// &
-                        "or in your current working directory")
-      PolyFitter_OpenSpaceGroupSymbols = errstat
-
-      END FUNCTION PolyFitter_OpenSpaceGroupSymbols
 !
 !*****************************************************************************
 !
@@ -368,7 +259,6 @@
       INTEGER I, J
       INTEGER iRed, iGreen, iBlue, iRGBvalue
       REAL UM, TH
-
 
       PI     = 4.0*ATAN(1.0)
       RAD    = PI/180.0
@@ -482,9 +372,6 @@
       KolBack           = Win_RGB(164,211,105)
 
       CALL ReadConfigurationFile
-      CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
-      INQUIRE(FILE=CONVEXE(1:LEN_TRIM(CONVEXE)),EXIST=ConvOn)
-
       CALL WDialogSelect(IDD_SAW_Page1)
       IF (ConvOn) THEN
         CALL WDialogFieldState(IDB_SA_Project_Import,Enabled)
@@ -546,7 +433,6 @@
 ! Initialise bitmap 'Temperature1.bmp'
 ! Rather than loading it from file, it is now calculated.
       CALL WBitMapCreate(bmIHANDLE,iWidth,iHeight)
-!U      OPEN(UNIT=10,FILE='Bitmap.txt')
       DO J = 1, iHeight
         DO I = 1, iWidth
 ! Red
@@ -578,10 +464,8 @@
           END SELECT
           iRGBvalue = (iBlue*256*256) + (iGreen*256) + iRed
           tData(I,J) = iRGBvalue
-!U          WRITE(10,'(I8,1X,I8,1X,I8)') iRed, iGreen, iBlue
         ENDDO    
       ENDDO              
-!U      CLOSE(10)
       CALL WBitMapGetData(bmIHANDLE,tData)
 
       END SUBROUTINE InitialiseVariables
@@ -626,7 +510,7 @@
       tFileName = 'D3.cfg'
       tFileHandle = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=tFileHandle,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=tFileHandle,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Write a header
       CALL FileWriteString(tFileHandle,RecNr,'DASH configuration file')
@@ -818,11 +702,11 @@
       LOGICAL FExists
       
       tFileName = 'D3.cfg'
-      INQUIRE(FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//tFileName,EXIST=FExists)
+      INQUIRE(FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,EXIST=FExists)
       IF (.NOT. FExists) RETURN
       tFileHandle = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=tFileHandle,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=tFileHandle,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Read the header
       CALL FileReadString(tFileHandle,RecNr,tString)
