@@ -3420,7 +3420,7 @@ C
             SELECT CASE (EventInfo%Value1)
               CASE(IDF_PawRef_Refine)
                 Goto 888
-              CASE(IDB_PawRef_Skip)
+              CASE(IDCLOSE)
                 SkipPawleyRef=.true.
             END SELECT
 !          CASE(FieldChanged)
