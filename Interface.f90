@@ -56,7 +56,7 @@
           ELSE
             CALL WDialogClearField(CellParID(I))
           ENDIF
-          IF (CellParConstrained(I)) THEN
+          IF (CellParConstrained(I) .OR. (WindowNr .EQ. 3)) THEN
             CALL WDialogFieldState(CellParID(I),Disabled)
           ELSE
             CALL WDialogFieldState(CellParID(I),Enabled)
@@ -69,7 +69,7 @@
           ELSE
             CALL WDialogPutReal(CellParID(I),CellPar(I),'(F10.3)')
           ENDIF
-          IF (CellParConstrained(I)) THEN
+          IF (CellParConstrained(I) .OR. (WindowNr .EQ. 3)) THEN
             CALL WDialogFieldState(CellParID(I),Disabled)
           ELSE
             CALL WDialogFieldState(CellParID(I),Enabled)
