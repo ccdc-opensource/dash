@@ -1,6 +1,10 @@
 !
 !*****************************************************************************
 !
+! This file contains routines to read powder diffraction files.
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION DiffractionFileBrowse
 !
 ! This routine lets the user browse a directory for a diffraction file.
