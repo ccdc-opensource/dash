@@ -1,4 +1,4 @@
-! Winteracter module created : 19/Feb/2002 09:51:10
+! Winteracter module created : 21/Feb/2002 17:49:57
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -559,6 +559,19 @@
           INTEGER, PARAMETER :: IDB_Delabc                      =  1410
           INTEGER, PARAMETER :: IDD_DICVOLRunning               =   171
           INTEGER, PARAMETER :: IDBSTOP                         =  1411
-          INTEGER, PARAMETER :: IDF_LABEL13                     =  1227
-          INTEGER, PARAMETER :: IDF_LABEL14                     =  1228
+          INTEGER, PARAMETER :: IDF_LabProgCubic                =  1434
+          INTEGER, PARAMETER :: IDF_LabProgTetragonal           =  1429
+          INTEGER, PARAMETER :: IDF_LabCubic                    =  1412
+          INTEGER, PARAMETER :: IDF_LabHexagonal                =  1414
+          INTEGER, PARAMETER :: IDF_LabTetragonal               =  1424
+          INTEGER, PARAMETER :: IDF_LabOrthorhombic             =  1426
+          INTEGER, PARAMETER :: IDF_LabMonoclinic               =  1427
+          INTEGER, PARAMETER :: IDF_LabTriclinic                =  1428
+          INTEGER, PARAMETER :: IDF_LabProgHexagonal            =  1435
+          INTEGER, PARAMETER :: IDF_LabProgOrthorhombic         =  1436
+          INTEGER, PARAMETER :: IDF_LabProgMonoclinic           =  1437
+          INTEGER, PARAMETER :: IDF_LabProgTriclinic            =  1433
+          INTEGER, PARAMETER :: IDBPAUSE                        =  1425
+          INTEGER, PARAMETER :: IDF_PicHourglass                =  1430
+          INTEGER, PARAMETER :: ID_FitPeaks                     = 40020
       END MODULE Druid_Header
