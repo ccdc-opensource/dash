@@ -1,4 +1,4 @@
-! Winteracter module created : 14/Jan/2002 13:06:35
+! Winteracter module created : 16/Jan/2002 18:22:03
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -485,4 +485,8 @@
           INTEGER, PARAMETER :: IDF_PO_c                        =  1237
           INTEGER, PARAMETER :: IDD_TEMPLATE012                 =   135
           INTEGER, PARAMETER :: IDF_RotationsGrid               =  1238
+          INTEGER, PARAMETER :: IDF_Use_PO                      =  1240
+          INTEGER, PARAMETER :: IDF_LABELa                      =  1243
+          INTEGER, PARAMETER :: IDF_LABELb                      =  1251
+          INTEGER, PARAMETER :: IDF_LABELc                      =  1294
       END MODULE Druid_Header
