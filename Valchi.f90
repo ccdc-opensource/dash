@@ -3,6 +3,9 @@
 !
       SUBROUTINE VALCHI(CHIVAL)
 
+      USE ZMVAR
+      USE VARIABLES
+
       IMPLICIT NONE
 
       REAL, INTENT (  OUT) :: CHIVAL
@@ -46,7 +49,7 @@
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
       
       REAL    SUM1, SUM2, RESCL, DELI, DELJ, CHIADD
-      INTEGER IR, IK, II, JJ
+      INTEGER iR, iK, II, JJ
       REAL, EXTERNAL :: FFCALC_001, FFCALC_002, FFCALC_039, FFCALC_040, FFCALC_044, FFCALC_050, &
                         FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061, FFCALC_064, FFCALC_065
       REAL, EXTERNAL :: FFCALC_066, FFCALC_067, FFCALC_069, FFCALC_112, FFCALC_115, FFCALC_116, &
@@ -55,6 +58,8 @@
                         FFCALC_365, FFCALC_369, FFCALC_430, FFCALC_431, FFCALC_432, FFCALC_433
       REAL, EXTERNAL :: FFCALC_434, FFCALC_435, FFCALC_449, FFCALC_451, FFCALC_462, FFCALC_468, &
                         FFCALC_469, FFCALC_471, FFCALC_481, FFCALC_483, FFCALC_485, FFCALC_DEFAULT
+      REAL Vector1(1:3), Vector2(1:3)
+      REAL tDotProduct
 
       CALL PRECFC
       SUM1 = 0.0
@@ -260,6 +265,26 @@
           ENDDO
       END SELECT
       NATOM = TotNumOfAtoms
+! March-Dollase correction for Preferred Orientation
+      IF (UsePreferredOrientation) THEN
+! All this should be done much more efficiently, of course. We could precalculate tDotProduct(1:MAXK)
+        DO iR = 1, MAXK
+! Calculate angle between PO axis and this reflection
+          Vector1(1) = FLOAT(IREFH(1,iR))
+          Vector1(2) = FLOAT(IREFH(2,iR))
+          Vector1(3) = FLOAT(IREFH(3,iR))
+! Convert Vector1 expressed in reciprocal co-ordinates to orthogonal co-ordinates.
+          Vector2(1) = Vector1(1) * c2fmat(1,1) + Vector1(2) * c2fmat(1,2) + Vector1(3) * c2fmat(1,3)
+          Vector2(2) = Vector1(1) * c2fmat(2,1) + Vector1(2) * c2fmat(2,2) + Vector1(3) * c2fmat(2,3)
+          Vector2(3) = Vector1(1) * c2fmat(3,1) + Vector1(2) * c2fmat(3,2) + Vector1(3) * c2fmat(3,3)
+! Vector2 now contains the orientation of this reflection in orthogonal co-ordinates
+          CALL VectorNormalise(Vector2)
+! PO_Axis has already been converted to orth. and normalised, and so is Vector2 now.
+          tDotProduct = DOT_PRODUCT(PO_Axis,Vector2)
+! G1 is the SA parameter and must have been set in MAKEFRAC()
+          AICALC(iR) = AICALC(iR) * (  (G1**2) * tDotProduct + (1-tDotProduct) / G1  )**(-3.0/2.0)
+        ENDDO
+      ENDIF
       DO IK = 1, KKOR
         II = IKKOR(IK)
         JJ = JKKOR(IK)
@@ -284,8 +309,7 @@
 !
       SUBROUTINE PRECFC
 !
-!... Pre-calculates sin and cosine terms for the structure factor calculation
-!
+! Pre-calculates sin and cosine terms for the structure factor calculation
 !
       INCLUDE 'PARAMS.INC'
 
@@ -345,12 +369,12 @@
         S1N = SIN(TWOPI*X(1,N))
         S2N = SIN(TWOPI*X(2,N))
         S3N = SIN(TWOPI*X(3,N))
-        COSQS(0,1,N) = 1.
-        COSQS(0,2,N) = 1.
-        COSQS(0,3,N) = 1.
-        SINQS(0,1,N) = 0.
-        SINQS(0,2,N) = 0.
-        SINQS(0,3,N) = 0.
+        COSQS(0,1,N) = 1.0
+        COSQS(0,2,N) = 1.0
+        COSQS(0,3,N) = 1.0
+        SINQS(0,1,N) = 0.0
+        SINQS(0,2,N) = 0.0
+        SINQS(0,3,N) = 0.0
 !.. IH
         DO IH = 1, IHMAX
           IH1 = IH - 1
@@ -359,7 +383,7 @@
         ENDDO
         IF (IHMINLT0) THEN
           DO IH = IHMIN, -1
-            COSQS(IH,1,N) = COSQS(-IH,1,N)
+            COSQS(IH,1,N) =  COSQS(-IH,1,N)
             SINQS(IH,1,N) = -SINQS(-IH,1,N)
           ENDDO
         ENDIF
@@ -371,7 +395,7 @@
         ENDDO
         IF (IKMINLT0) THEN
           DO IK = IKMIN, -1
-            COSQS(IK,2,N) = COSQS(-IK,2,N)
+            COSQS(IK,2,N) =  COSQS(-IK,2,N)
             SINQS(IK,2,N) = -SINQS(-IK,2,N)
           ENDDO
         ENDIF
@@ -383,7 +407,7 @@
         ENDDO
         IF (ILMINLT0) THEN
           DO IL = ILMIN, -1
-            COSQS(IL,3,N) = COSQS(-IL,3,N)
+            COSQS(IL,3,N) =  COSQS(-IL,3,N)
             SINQS(IL,3,N) = -SINQS(-IL,3,N)
           ENDDO
         ENDIF
