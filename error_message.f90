@@ -11,6 +11,7 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'REFLNS.INC'
+      INCLUDE 'statlog.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -53,6 +54,10 @@
       ENDDO
       argmax(1) = argk
       maxk = NumOfRef
+      NBIN = NPTS
+      DataSetChange = DataSetChange + 1
+      CALL GetProfileLimits
+      CALL Get_IPMaxMin 
 
       END SUBROUTINE CHKMAXREF
 !
