@@ -534,7 +534,7 @@
                 DO JJ = ipf1, ipf2
                    AveESD = AveESD + EBIN(IPF_Lo(i)+JJ-ipf1)
                 ENDDO
-                AveESD = AveESD / SNGL(1+ipf2-ipf1)
+                AveESD = AveESD / FLOAT(1+ipf2-ipf1)
                 DO JJ = ipf1, ipf2
                    Difference(JJ) = (((YOBIN(IPF_Lo(i)+JJ-ipf1) - YPeakFit(JJ)) * 2.50 * AveESD) / EBIN(IPF_Lo(i)+JJ-ipf1)) + 0.5*(YPGMAX+YPGMIN)
 !O                   Difference(JJ) = ((YOBIN(IPF_Lo(i)+JJ-ipf1) - YPeakFit(JJ))) + 0.5*(YPGMAX+YPGMIN)

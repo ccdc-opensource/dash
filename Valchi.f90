@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE VALCHI(CHIVAL,CurrentParameter)
+      SUBROUTINE VALCHI(CHIVAL, CurrentParameter)
 
       USE ATMVAR
       USE ZMVAR
@@ -17,8 +17,8 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
 
-      DOUBLE PRECISION xpar,       lb,       ub,       vm
-      COMMON /values/  xpar(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+      REAL             x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       INTEGER         KKOR
       REAL                  WTIJ
@@ -26,7 +26,7 @@
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
       INTEGER         NATOM
-      REAL                   X
+      REAL                   Xato
       INTEGER                          KX
       REAL                                        AMULT,      TF
       INTEGER         KTF
@@ -34,7 +34,7 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
@@ -268,7 +268,7 @@
 ! If we are here, the parameter that has been changed didn't affect the fractional co-ordinates.
 ! In the current set-up, that means that it must have been the preferred orientation.
 ! So: recalculate the preferred orientation correction factors.
-        CALL PO_PRECFC(SNGL(xpar(iPrfPar)))
+        CALL PO_PRECFC(x(iPrfPar))
       ENDIF
 ! AICALC(1:NumOfRef) now contains the structural part of the calculated intensities
 ! XICALC(1:NumOfRef) now contains the preferred orientation part of the calculated intensities

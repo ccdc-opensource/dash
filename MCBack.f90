@@ -221,18 +221,18 @@
       INTEGER jfs(NDAT)
       REAL    xkk(nkn)
       REAL    smo(NDAT)
-      REAL*8  xdel(nkn),u(nkn,nkn)
-      REAL*8  bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
-      REAL*8  xdd
-      REAL*8  a(NDAT),b(NDAT),c(NDAT),d(NDAT)
-      REAL*8  deri(nkn),ans(nkn)
-      REAL*8  w, ab
-      REAL*8  qj, qj1
-      REAL*8  TempResult
+      REAL  xdel(nkn),u(nkn,nkn)
+      REAL  bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
+      REAL  xdd
+      REAL  a(NDAT),b(NDAT),c(NDAT),d(NDAT)
+      REAL  deri(nkn),ans(nkn)
+      REAL  w, ab
+      REAL  qj, qj1
+      REAL  TempResult
       INTEGER J, ND1, NK1, I, J0, J1, JF0, K
 
       DO J = 1, nkn-1
-        xdel(J) = DBLE(xkk(J+1)-xkk(J))
+        xdel(J) = xkk(J+1)-xkk(J)
       ENDDO
       CALL SplVal(xdel,u,nkn)
       nd1 = ndat-1
@@ -242,8 +242,8 @@
       DO i = 1, ndat
         j0 = MIN(nkn-1,jfs(i)-jf0)
         j1 = j0 + 1
-        w = DBLE(e(i))**-2
-        b(i) = ( DBLE( x(i)-xkk(j0) ) )/xdel(j0)
+        w = e(i)**-2
+        b(i) = (x(i)-xkk(j0)) / xdel(j0)
         a(i) = 1.0-b(i)
         ab = -a(i)*b(i)/6.0
         xdd = xdel(j0)**2
@@ -258,7 +258,7 @@
           deri(j) = deri(j)+c(i)*u(j0,j)+d(i)*u(j1,j)
         ENDDO
         DO j = 1, nkn
-          bvec(j) = bvec(j)+w*DBLE(y(i))*deri(j)
+          bvec(j) = bvec(j)+w*y(i)*deri(j)
           DO k = 1, nkn
             hess(j,k) = hess(j,k)+w*deri(j)*deri(k)
           ENDDO
@@ -282,7 +282,7 @@
         ENDDO
         TempResult = a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1
         IF (ABS(TempResult) .LT. 0.000001) TempResult = 0.0
-        smo(i) = SNGL(TempResult)
+        smo(i) = TempResult
       ENDDO
 
       END SUBROUTINE SplineSmooth
@@ -294,10 +294,10 @@
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: m
-      REAL*8,  INTENT (IN   ) :: xdel(m)
-      REAL*8,  INTENT (  OUT) :: u(m,m)
+      REAL,    INTENT (IN   ) :: xdel(m)
+      REAL,    INTENT (  OUT) :: u(m,m)
 
-      REAL*8  A(m,m),b(m,m),c(m,m)
+      REAL  A(m,m),b(m,m),c(m,m)
       INTEGER I
 
 ! Initialise all entries of A, b and c to 0.0
@@ -313,7 +313,7 @@
         c(I,I-1) = 1.0 / xdel(I-1)
         c(I,I+1) = 1.0 / xdel(I)
         c(I,I)   = -(c(I,I-1)+c(I,I+1))
-      END DO
+      ENDDO
 ! Invert matrix A. Answer is in b
       CALL DGMINV(A,b,m)
 ! Multiply matrix b by matrix c. Result is in u
@@ -337,7 +337,7 @@
       IMPLICIT NONE
 
       INTEGER Dim1, Dim2, Dim3
-      REAL*8  A(Dim1,Dim2), B(Dim2,Dim3), C(Dim1,Dim3)
+      REAL    A(Dim1,Dim2), B(Dim2,Dim3), C(Dim1,Dim3)
       INTEGER I, J, K
 
       DO I = 1, Dim1

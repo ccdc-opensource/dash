@@ -7,7 +7,7 @@
 
       IMPLICIT NONE
 
-      DOUBLE PRECISION f2cmat(1:3,1:3), c2fmat(1:3,1:3)
+      REAL f2cmat(1:3,1:3), c2fmat(1:3,1:3)
 
 ! f2cmat = 3x3 matrix for conversion from fractional to Cartesian  coordinates 
 ! c2fmat = 3x3 matrix for conversion from Cartesian  to fractional coordinates 
@@ -91,16 +91,16 @@
 
 ! We want to have some variables that specify the orientation of the Z-matrix when 
 ! rotation is restricted to a single axis      
-      DOUBLE PRECISION zmInitialQs(0:3,0:maxfrg)
+      REAL     zmInitialQs(0:3,0:maxfrg)
 
-      INTEGER          zmSingleRotAxDef(0:maxfrg)
+      INTEGER  zmSingleRotAxDef(0:maxfrg)
 ! 1 = to atom
 ! 2 = fractional co-ordinates
 ! 3 = normal to plane
-      INTEGER          zmSingleRotAxAtm(0:maxfrg)
-      REAL             zmSingleRotAxFrac(1:3,0:maxfrg)
-      INTEGER          zmSingleRotAxAtms(1:3,0:maxfrg)
-      DOUBLE PRECISION zmSingleRotationQs(0:3,0:maxfrg)
+      INTEGER  zmSingleRotAxAtm(0:maxfrg)
+      REAL     zmSingleRotAxFrac(1:3,0:maxfrg)
+      INTEGER  zmSingleRotAxAtms(1:3,0:maxfrg)
+      REAL     zmSingleRotationQs(0:3,0:maxfrg)
 
 ! zmSingleRotAxAtm
 ! zmSingleRotAxFrac
@@ -140,7 +140,7 @@
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
 ! iz1, iz2, iz3 = atoms with respect to which the current atom is defined in the Z-matrix
 
-      DOUBLE PRECISION blen(1:maxatm,0:maxfrg), alph(1:maxatm,0:maxfrg), bet(1:maxatm,0:maxfrg)
+      REAL blen(1:maxatm,0:maxfrg), alph(1:maxatm,0:maxfrg), bet(1:maxatm,0:maxfrg)
 
 ! blen   = bond length     (wrt iz1)
 ! No copies taken into account!!!!

@@ -1153,7 +1153,7 @@
       REAL CKK1, CKK2, CKK3, TRAN(1:3)
       REAL QQSUM, QDEN, QUATER(0:3), tQ(0:3), ROTA(1:3,1:3), CART(1:3,1:MAXATM), Duonion(0:1)
       INTEGER JQ, ICFRG
-      REAL tX, tY, tZ, XC, YC, ZC
+      REAL XC, YC, ZC
       LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
 
       KATOM = 0
@@ -1168,9 +1168,9 @@
             CKK1 = RR_tran(1,iFrg,iFrgCopy)
             CKK2 = RR_tran(2,iFrg,iFrgCopy)
             CKK3 = RR_tran(3,iFrg,iFrgCopy)
-            TRAN(1) = CKK1*SNGL(F2CMAT(1,1)) + CKK2*SNGL(F2CMAT(1,2)) + CKK3*SNGL(F2CMAT(1,3))
-            TRAN(2) = CKK1*SNGL(F2CMAT(2,1)) + CKK2*SNGL(F2CMAT(2,2)) + CKK3*SNGL(F2CMAT(2,3))
-            TRAN(3) = CKK1*SNGL(F2CMAT(3,1)) + CKK2*SNGL(F2CMAT(3,2)) + CKK3*SNGL(F2CMAT(3,3))
+            TRAN(1) = CKK1*F2CMAT(1,1) + CKK2*F2CMAT(1,2) + CKK3*F2CMAT(1,3)
+            TRAN(2) = CKK1*F2CMAT(2,1) + CKK2*F2CMAT(2,2) + CKK3*F2CMAT(2,3)
+            TRAN(3) = CKK1*F2CMAT(3,1) + CKK2*F2CMAT(3,2) + CKK3*F2CMAT(3,3)
 ! If more than one atom then proceed
             IF (natoms(iFrg).GT.1) THEN
 ! If we have at least two atoms, there are two options:
@@ -1187,7 +1187,7 @@
                   QUATER(JQ) = QDEN * RR_rot(JQ+1,iFrg,iFrgCopy)
                 ENDDO
 ! QUATER now holds the normalised quaternions
-                CALL RR_ROTMAK(QUATER,ROTA)
+                CALL ROTMAK(QUATER,ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the quaternions
               ELSE
 ! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
@@ -1211,12 +1211,12 @@
                         + QUATER(2)*zmInitialQs(0,iFrg) - QUATER(3)*zmInitialQs(1,iFrg)
                 tQ(3) =   QUATER(0)*zmInitialQs(3,iFrg) - QUATER(1)*zmInitialQs(2,iFrg) &
                         + QUATER(2)*zmInitialQs(1,iFrg) + QUATER(3)*zmInitialQs(0,iFrg)
-                CALL RR_ROTMAK(tQ,ROTA)
+                CALL ROTMAK(tQ,ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the single rotation axis
               ENDIF
             ENDIF
-            CALL RR_MAKEXYZ(natoms(iFrg),RR_blen(1,iFrg,iFrgCopy),RR_alph(1,iFrg,iFrgCopy),RR_bet(1,iFrg,iFrgCopy),        &
-                           IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+            CALL makexyz(natoms(iFrg),RR_blen(1,iFrg,iFrgCopy),RR_alph(1,iFrg,iFrgCopy),RR_bet(1,iFrg,iFrgCopy),        &
+                         IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
 ! Determine origin for rotations
             ICFRG = ICOMFLG(iFrg)
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
@@ -1253,19 +1253,16 @@
               CART(3,I) = CART(3,I) - ZC
             ENDDO
 ! Apply rotation and translation to the atoms of this Z-matrix
-            CALL RR_DO_ATOM_POS(TRAN,ROTA,CART,natoms(iFrg))
+            CALL DO_ATOM_POS(TRAN,ROTA,CART,natoms(iFrg))
 ! When we are here, we have the actual co-ordinates of all the atoms in this Z-matrix
 ! in Cartesian (orthogonal) co-ordinates. We need fractional co-ordinates: convert.
             DO I = 1, natoms(iFrg)
-              tX = CART(1,I)*SNGL(c2fmat(1,1)) + CART(2,I)*SNGL(c2fmat(1,2)) + CART(3,I)*SNGL(c2fmat(1,3))
-              tY = CART(1,I)*SNGL(c2fmat(2,1)) + CART(2,I)*SNGL(c2fmat(2,2)) + CART(3,I)*SNGL(c2fmat(2,3))
-              tZ = CART(1,I)*SNGL(c2fmat(3,1)) + CART(2,I)*SNGL(c2fmat(3,2)) + CART(3,I)*SNGL(c2fmat(3,3))
               KI = KATOM + I
 ! Note that we must reorder the atoms such that the hydrogens are appended after the 
 ! non-hydrogens.
-              XATO(1,OrderedAtm(KI)) = tX
-              XATO(2,OrderedAtm(KI)) = tY
-              XATO(3,OrderedAtm(KI)) = tZ
+              XATO(1,OrderedAtm(KI)) = CART(1,I)*c2fmat(1,1) + CART(2,I)*c2fmat(1,2) + CART(3,I)*c2fmat(1,3)
+              XATO(2,OrderedAtm(KI)) = CART(1,I)*c2fmat(2,1) + CART(2,I)*c2fmat(2,2) + CART(3,I)*c2fmat(2,3)
+              XATO(3,OrderedAtm(KI)) = CART(1,I)*c2fmat(3,1) + CART(2,I)*c2fmat(3,2) + CART(3,I)*c2fmat(3,3)
             ENDDO
             KATOM = KATOM + natoms(iFrg)
           ENDDO
@@ -1273,60 +1270,6 @@
       ENDDO
 
       END SUBROUTINE RR_MAKEFRAC
-!
-!*****************************************************************************
-!
-      SUBROUTINE RR_ROTMAK(Q,ROTA)
-!
-! Converts 4 quaternions to a 3x3 rotation matrix
-!
-      IMPLICIT NONE
-
-      REAL, INTENT (IN   ) :: Q(0:3)
-      REAL, INTENT (  OUT) :: ROTA(1:3,1:3)
-
-      ROTA(1,1) = 1.0 - 2.0*(Q(2)**2) - 2.0*(Q(3)**2); 
-      ROTA(1,2) = 2.0*Q(1)*Q(2) - 2.0*Q(3)*Q(0);     
-      ROTA(1,3) = 2.0*Q(1)*Q(3) + 2.0*Q(2)*Q(0);
-      ROTA(2,1) = 2.0*Q(1)*Q(2) + 2.0*Q(3)*Q(0);     
-      ROTA(2,2) = 1.0 - 2.0*(Q(1)**2) - 2.0*(Q(3)**2); 
-      ROTA(2,3) = 2.0*Q(2)*Q(3) - 2.0*Q(1)*Q(0);
-      ROTA(3,1) = 2.0*Q(1)*Q(3) - 2.0*Q(2)*Q(0);     
-      ROTA(3,2) = 2.0*Q(2)*Q(3) + 2.0*Q(1)*Q(0);     
-      ROTA(3,3) = 1.0 - 2.0*(Q(1)**2) - 2.0*(Q(2)**2);
-
-      END SUBROUTINE RR_ROTMAK
-!
-!*****************************************************************************
-!
-      SUBROUTINE RR_DO_ATOM_POS(TRANS,ROTA,POS,NATOMS)
-
-      IMPLICIT NONE
-
-      REAL,  INTENT (IN   ) :: TRANS(3), ROTA(3,3)
-      REAL,  INTENT (  OUT) :: POS(3,*)
-      INTEGER, INTENT (IN   ) :: NATOMS
-
-      REAL POSIN(3)
-      INTEGER I, J
-      INTEGER K, L
-
-      DO J = 1, NATOMS
-        DO I = 1, 3
-          POSIN(I) = POS(I,J)
-        ENDDO
-        DO K = 1, 3
-          POS(K,J) = 0.0
-          DO L = 1, 3
-            POS(K,J) = POS(K,J) + ROTA(K,L)*POSIN(L)
-          ENDDO
-        ENDDO
-        DO I = 1, 3
-          POS(I,J) = POS(I,J) + TRANS(I)
-        ENDDO
-      ENDDO
-
-      END SUBROUTINE RR_DO_ATOM_POS
 !
 !*****************************************************************************
 !
@@ -1761,7 +1704,7 @@
             tLen = LEN_TRIM(tString)
             WRITE (hFile,'("_diffrn_radiation_type ",A)',ERR=999) tString(1:tLen)
             WRITE (hFile,'("_diffrn_radiation_wavelength",F10.5)',ERR=999) ALambda
-  !@@          WRITE (hFile,'("_refine_ls_goodness_of_fit_all ",F7.3)',ERR=999) SQRT(MAX(0.0,-SNGL(fopt)))
+  !@@          WRITE (hFile,'("_refine_ls_goodness_of_fit_all ",F7.3)',ERR=999) SQRT(MAX(0.0,FOPT))
             IF (PrefParExists) THEN
               WRITE (hFile,'("_pd_proc_ls_pref_orient_corr")',ERR=999)               
               WRITE (hFile,'(";")',ERR=999)

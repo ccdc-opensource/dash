@@ -12,8 +12,8 @@
 
       IMPLICIT NONE
 
-      DOUBLE PRECISION t
-      DOUBLE PRECISION parvals(*) ! The current torsion parameters
+      REAL T
+      REAL parvals(*) ! The current torsion parameters
       INTEGER ntotmov
 
       INCLUDE 'PARAMS.INC'
@@ -26,7 +26,7 @@
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
 
-      DOUBLE PRECISION XOPT,       C,       FOPT
+      REAL XOPT,       C,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
@@ -87,9 +87,9 @@
       IF (T .GT. 999.9) THEN
         TemperatureStr = 'T=******'
       ELSE
-        WRITE (TemperatureStr,"('T=',F6.2)") SNGL(T)
+        WRITE (TemperatureStr,"('T=',F6.2)") T
       ENDIF
-      WRITE (DASHRemarkStr,100,ERR=999) TemperatureStr, SNGL(FOPT), CHIPROBEST, ntotmov
+      WRITE (DASHRemarkStr,100,ERR=999) TemperatureStr, FOPT, CHIPROBEST, ntotmov
   100 FORMAT (A8,', chi**2=',F7.2,' and profile chi**2=',F7.2,' after ',I8,' moves')
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
@@ -228,7 +228,7 @@
         tLen = LEN_TRIM(tString)
         WRITE (hFileCIF,'("_diffrn_radiation_type ",A)',ERR=999) tString(1:tLen)
         WRITE (hFileCIF,'("_diffrn_radiation_wavelength",F10.5)',ERR=999) ALambda
-        WRITE (hFileCIF,'("_refine_ls_goodness_of_fit_all ",F7.3)',ERR=999) SQRT(MAX(0.0,-SNGL(fopt)))
+        WRITE (hFileCIF,'("_refine_ls_goodness_of_fit_all ",F7.3)',ERR=999) SQRT(MAX(0.0,FOPT))
         IF (PrefParExists) THEN
           WRITE (hFileCIF,'("_pd_proc_ls_pref_orient_corr")',ERR=999)               
           WRITE (hFileCIF,'(";")',ERR=999)
@@ -359,15 +359,15 @@
             IF (tSavePDB) THEN
               WRITE (hFilePDB,1039,ERR=999) iFrg
  1039         FORMAT ('REMARK Start of molecule number ',I6)
-              WRITE (hFilePDB,1037,ERR=999) (SNGL(parvals(ij)),ij=ipcount+1,ipcount+3)
+              WRITE (hFilePDB,1037,ERR=999) (parvals(ij),ij=ipcount+1,ipcount+3)
  1037         FORMAT ('REMARK Translations: ',3F10.6)
             ENDIF
             IF (natoms(iFrg) .GT. 1) THEN
 ! Normalise the Q-rotations before writing them out ...
-              qvals(1) = SNGL(parvals(ipcount+4))
-              qvals(2) = SNGL(parvals(ipcount+5))
-              qvals(3) = SNGL(parvals(ipcount+6))
-              qvals(4) = SNGL(parvals(ipcount+7))
+              qvals(1) = parvals(ipcount+4)
+              qvals(2) = parvals(ipcount+5)
+              qvals(3) = parvals(ipcount+6)
+              qvals(4) = parvals(ipcount+7)
               qnrm = SQRT(qvals(1)**2 + qvals(2)**2 + qvals(3)**2 + qvals(4)**2)
               qvals = qvals / qnrm
               IF (tSavePDB) THEN
