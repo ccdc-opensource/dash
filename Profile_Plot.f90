@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Profile_Plot(TheIPTYPE)
+      SUBROUTINE Profile_Plot
 !
 ! JvdS There is only one place in the DASH code where this function is NOT
 ! called with 'IPTYPE' as argument: and that's when it's called with '-IPTYPE'
@@ -11,10 +11,10 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-      INTEGER, INTENT (IN   ) :: TheIPTYPE
+      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'GLBVAR.INC'
 
       INTEGER          NTIC
       INTEGER                IH
@@ -43,7 +43,7 @@
       LOGICAL PlotBackground ! Function
 
 !   Setup hardcopy options
-      IF (TheIPTYPE .LT. 0) THEN
+      IF (IPTYPE .LT. 0) THEN
         CALL IGrInit('HP')
         CALL IGrHardCopyOptions(1,700)
         CALL IGrHardCopyOptions(2,375)
@@ -54,7 +54,7 @@
       CALL Plot_Custom_Axes()
       CALL IPgBorder()
 ! Observed profile
-      SELECT CASE (ABS(TheIPTYPE))
+      SELECT CASE (ABS(IPTYPE))
         CASE (1) 
           CALL Plot_Observed_Profile()
         CASE (2) 
@@ -67,7 +67,7 @@
       IF (NTIC .NE. 0) CALL Plot_Calculated_Tics()
       PLOTT = .TRUE.
 !   Switch off hardcopy
-      IF (TheIPTYPE .LT. 0) THEN
+      IF (IPTYPE .LT. 0) THEN
         CALL IGrHardCopy('S')
         CALL IGrInit('P')
       ENDIF
@@ -237,13 +237,13 @@
       CALL IPgUnitsToGrUnits(xpgmin,ypgmin,xggmin,yggmin)
       CALL IPgUnitsToGrUnits(xpgmax,ypgmax,xggmax,yggmax)
 ! Plot y=0 for tidiness
-      zero=0.0
+      zero = 0.0
       IF (ypgmin.lt.zero .and. ypgmax.gt.zero) THEN
         CALL IPgUnitsToGrUnits(xpgmin,zero,xggt,yggt)
         CALL IGrMoveTo(xggt,yggt)
         CALL IPgUnitsToGrUnits(xpgmax,zero,xggt,yggt)
         CALL IGrLineTo(xggt,yggt)
-      END IF
+      ENDIF
       CALL IGrCharSize(1.,1.2)
       CALL IPgYScaleLeft('TN')
       CALL IPgYScaleRight('T')
@@ -252,7 +252,7 @@
         CALL IPgXLabel('2 theta','C')
       ELSE
         CALL IPgXLabel('time-of-flight (microseconds)','C')
-      END IF
+      ENDIF
 
       ENDSUBROUTINE Plot_Custom_Axes
 !

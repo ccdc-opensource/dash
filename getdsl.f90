@@ -399,7 +399,7 @@
         NoData = .FALSE.
       ENDIF
       IPTYPE = 1
-      CALL Profile_Plot(IPTYPE) 
+      CALL Profile_Plot
 ! enable the buttons,
       IF (.NOT. NoData) THEN
         IF (idsler .EQ. 0) THEN

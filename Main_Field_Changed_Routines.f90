@@ -9,7 +9,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Poly_Colours.inc'
                 
       TYPE(WIN_RGB) :: SelectedColour
@@ -64,18 +63,18 @@
                 KolMTic = SelectedColour
               ENDIF
           END SELECT
-          CALL Profile_Plot(IPTYPE)
+          CALL Profile_Plot
         CASE (FieldChanged)
           IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDF_ErrorBar_Check)
-                CALL Profile_Plot(IPTYPE)
+                CALL Profile_Plot
               CASE (IDF_Background_Check)
-                CALL Profile_Plot(IPTYPE)
+                CALL Profile_Plot
               CASE (IDF_ConnectObsPoints)
-                CALL Profile_Plot(IPTYPE)
+                CALL Profile_Plot
               CASE (IDF_PlotPeakFitDif)
-                CALL Profile_Plot(IPTYPE)
+                CALL Profile_Plot
             END SELECT
           ENDIF
       END SELECT
@@ -103,7 +102,6 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCLOSE, IDCANCEL)
-              CALL WDialogSelect(IDD_Configuration)
               CALL WDialogHide()
             CASE (IDBBROWSE)
               IFLAGS = LoadDialog + PromptOn
@@ -119,8 +117,6 @@
                 CALL WDialogPutString(IDF_ViewExe,VIEWEXE)
               ENDIF
           END SELECT
-        CASE (FieldChanged)
-         ! Do nothing
       END SELECT
       CALL PopActiveWindowID
 
@@ -137,7 +133,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
       CALL PushActiveWindowID
@@ -166,7 +161,7 @@
               CASE (IDCANCEL)
                 CALL WDialogHide()
             END SELECT
-            CALL Profile_Plot(IPTYPE)
+            CALL Profile_Plot
           CASE (FieldChanged)
 ! Do nothing
           CASE (TabChanged)
@@ -210,7 +205,7 @@
               CALL DownloadWavelength(IDD_Data_Properties)    
               CALL Generate_TicMarks
           END SELECT
-          CALL Profile_Plot(IPTYPE)
+          CALL Profile_Plot
         CASE (FieldChanged)
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDF_LabX_Source,IDF_SynX_Source,IDF_CWN_Source,IDF_TOF_source)
@@ -314,7 +309,7 @@
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
               CALL Generate_TicMarks
           END SELECT
-          CALL Profile_Plot(IPTYPE)
+          CALL Profile_Plot
         CASE (FieldChanged)
 ! Due to the way Winteracter works, a FieldChanged is generated for 'REAL' input boxes
 ! only when that was the previous field to have the input focus. It doesn't necessarily mean
@@ -387,7 +382,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       REAL    Temp
 
       CALL PushActiveWindowID
@@ -409,7 +403,7 @@
             CASE (IDF_RunDICVOL)
               CALL RunDICVOL
           END SELECT
-          CALL Profile_Plot(IPTYPE)
+          CALL Profile_Plot
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_wavelength1)

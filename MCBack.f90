@@ -269,7 +269,7 @@
 ! Initialise the background
       CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
       CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
-      CALL Profile_Plot(IPTYPE)
+      CALL Profile_Plot
       CALL WDialogShow(-1,-1,0,Modeless)
       QUIT = .FALSE.
       DO WHILE(.NOT. QUIT)
@@ -280,7 +280,7 @@
             CASE (IDF_Background_Apply)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
               CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
-              CALL Profile_Plot(IPTYPE)
+              CALL Profile_Plot
             CASE (IDF_Background_Accept)
               CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
               CALL SubtractBackground(IBpass,20,.TRUE.,.TRUE.)
@@ -296,7 +296,7 @@
       END DO
       CALL WDialogSelect(IDD_Background_Fit)
       CALL WDialogHide()
-      CALL Profile_Plot(IPTYPE)
+      CALL Profile_Plot
       CALL PopActiveWindowID
 
       END SUBROUTINE Background_Fit

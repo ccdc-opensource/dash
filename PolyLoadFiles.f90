@@ -309,6 +309,8 @@
       DataSetChange = DataSetChange + 1
       BackRef = .TRUE.
       CALL Init_PeakFitRanges
+! Ungrey 'Remove background' button on toolbar
+      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
       XPMIN = XOBS(1)
       XPMAX = XOBS(1)
       YPMIN = YOBS(1)
@@ -346,7 +348,7 @@
       ENDDO
       CALL GetProfileLimits
       IPTYPE = 1
-      CALL Profile_Plot(IPTYPE)
+      CALL Profile_Plot
       NoData = .FALSE.
       CALL ScrUpdateFileName
 !      CALL FourierPattern(1,1000)
@@ -1475,7 +1477,7 @@
       NOBS = I - 1
       CALL Rebin_Profile
       CALL GetProfileLimits
-      CALL Profile_Plot(IPTYPE)
+      CALL Profile_Plot
 
       END SUBROUTINE TruncateData
 !
@@ -1564,7 +1566,7 @@
       NOBS = NOBS - Shift
       CALL Rebin_Profile
       CALL GetProfileLimits
-      CALL Profile_Plot(IPTYPE)
+      CALL Profile_Plot
 
       END SUBROUTINE TruncateDataStart
 !
