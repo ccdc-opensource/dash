@@ -10773,7 +10773,9 @@ C     & 'Crystallography Subroutine Library     Mark %MARK%.%VERS%')
      & 'Crystallography Subroutine Library     Mark 4.12')
 C OBTAIN DATE AND TIME:
 CVMS
-      CALL DATE(DAT)
+! JvdS Was:
+!      CALL DATE(DAT)
+      DAT = '03-AUG-01'
 CUNIX
       DAT(10:)=' '
 CVMS
@@ -15359,6 +15361,8 @@ C
 C
 C LEVEL 3      FUNCTION NOPFIL(MODE)
       FUNCTION NOPFIL(MODE)
+
+	USE WINTERACTER
 C
 C *** NOPFIL updated by PJB 24-Oct-1994 ***
 C
@@ -15602,7 +15606,7 @@ CVMS
 C MUST SPECIFY READONLY FOR READ FILES ON VAX TO AVOID PROTECTION FAILURES
 C WHEN READING FROM FOREIGN DIRECTORIES
 CVMS
-
+!	CALL ErrorMessage('NAMFIL = '//NAMFIL)
       OPEN (UNIT=LUN,FILE=NAMFIL,ACCESS=FILACC(IA),FORM=FILFOR(IF),
 CVMS
 
@@ -19396,7 +19400,7 @@ C
 C
 C
 C LEVEL 1      FUNCTION RANGE(X,A,B)
-      FUNCTION RANGE(X,A,B)
+      FUNCTION ARANGE(X,A,B)
 C
 C *** RANGE by JCM 23 Sep 87 ***
 C
@@ -19426,7 +19430,7 @@ C
       GO TO 2
 C
  101  IF (R .EQ. B) R=A
-      RANGE=R
+      ARANGE=R
       RETURN
       END
 C
@@ -21497,61 +21501,63 @@ C
 C
 C
 C
-C LEVEL 2      FUNCTION RGAUSS(SIGMA)
-      FUNCTION RGAUSS(SIGMA)
-C
-C *** RGAUSS by PJB 27-Sept-93 ***
-C
-CX
-CC 9C
-CH Returns a value random number with a gaussian distribution.
-CA On entry SIGMA gives the width if the dsitribution such that
-CA          p(x)=exp-(x/SIGMA)**2
-CA          if SIGMA=0 sets the seed for random number generation
-CN  Uses the subprogram NB01A from the Harwell library.
-C
-      COMMON /LENINT/NBITS
-      COMMON /SEEDIT/LSEED
-C
-      IF (SIGMA.EQ.0) THEN
-c        SEED=SECNDS(0.)
-        ISEED=2**(NBITS-1) -INT(SEED)
-        ISEED=2*ISEED-1
-        GO TO 100
-      ENDIF
-c      AR=RAN(ISEED)
-      ar=.756
-      R=ABS(2*AR-1.)
-      K=0
-      NUM=0
-      A=0.
-      XLIM=100.
-      B=XLIM
-      ERR=.0001
-      MAXIT=100
-    5 CALL NB01A(K,A,B,ERR,X,Y,MAXIT)
-      GO TO (1,2,3,4) K
-C
-    1 IF (X.GT.XLIM) THEN
-        Y=1.-R
-      ELSE
-        Y=1.-ERFNC(X)-R
-      ENDIF
-      GO TO 5
-C
-    2 RGAUSS=X
-      IF (AR.LT.0.5) RGAUSS=-X
-      RGAUSS=RGAUSS*SIGMA
-      GO TO 100
-C
-    3 CALL ERRMES(1,0,'Too many iterations in RGAUSS')
-      GO TO 100
-    4 CALL ERRMES(1,0,'from RGAUSS')
-      GO TO 100
-C
-C
-  100 RETURN
-      END
+! JvdS The following routine was never called and used an uninitialised variable
+! causing a compiler warning. Removing all exclamation marks restores the original routine.
+!C LEVEL 2      FUNCTION RGAUSS(SIGMA)
+!      FUNCTION RGAUSS(SIGMA)
+!C
+!C *** RGAUSS by PJB 27-Sept-93 ***
+!C
+!CX
+!CC 9C
+!CH Returns a value random number with a gaussian distribution.
+!CA On entry SIGMA gives the width if the dsitribution such that
+!CA          p(x)=exp-(x/SIGMA)**2
+!CA          if SIGMA=0 sets the seed for random number generation
+!CN  Uses the subprogram NB01A from the Harwell library.
+!C
+!      COMMON /LENINT/NBITS
+!      COMMON /SEEDIT/LSEED
+!C
+!      IF (SIGMA.EQ.0) THEN
+!c        SEED=SECNDS(0.)
+!        ISEED=2**(NBITS-1) -INT(SEED)
+!        ISEED=2*ISEED-1
+!        GO TO 100
+!      ENDIF
+!c      AR=RAN(ISEED)
+!      ar=.756
+!      R=ABS(2*AR-1.)
+!      K=0
+!      NUM=0
+!      A=0.
+!      XLIM=100.
+!      B=XLIM
+!      ERR=.0001
+!      MAXIT=100
+!    5 CALL NB01A(K,A,B,ERR,X,Y,MAXIT)
+!      GO TO (1,2,3,4) K
+!C
+!    1 IF (X.GT.XLIM) THEN
+!        Y=1.-R
+!      ELSE
+!        Y=1.-ERFNC(X)-R
+!      ENDIF
+!      GO TO 5
+!C
+!    2 RGAUSS=X
+!      IF (AR.LT.0.5) RGAUSS=-X
+!      RGAUSS=RGAUSS*SIGMA
+!      GO TO 100
+!C
+!    3 CALL ERRMES(1,0,'Too many iterations in RGAUSS')
+!      GO TO 100
+!    4 CALL ERRMES(1,0,'from RGAUSS')
+!      GO TO 100
+!C
+!C
+!  100 RETURN
+!      END
 C
 C
 C
