@@ -168,18 +168,15 @@
 !
 ! COLLECT CONSTRAINTS IMPOSED BY SYMMETRY, AND THOSE REQUESTED, AND
 ! SET UP PARAMETERS AS VARIABLES (NOT YET AS BASIC VARIABLES)
-!      write(76,*) ' About to enter PARSPR'
       CALL PARSPR(MAGROU)
 !>> JCC Trap for any problems
       IF (IBMBER.GT.0) GOTO 950
 !
 !
 ! MAKE LIST OF REFLECTION INDICES:
-!      write(76,*) ' About to enter INRFPR'
       CALL INRFPR(PCXX,PFXX)
 !
 ! READ OBS DATA AND SEND OUT TO TEMPORARY UNIT FOR REINPUT EACH CYCLE
-!      write(76,*) ' About to enter INOBPR'
       CALL INOBPR(ISCR,NFLIP,PCXX,PFXX)
 !
       CALL CHKMAXREF(PCXX)
@@ -278,7 +275,6 @@
 !.. *** Winteracter call ***
         CALL WDialogRangeProgressBar(IDF_Pawley_Progress_Bar,1,Npts)
         Npt30 = Npts/30
-!	write(76,*) ' About to cycle round ',npts,' obs'
         DO IPT = 1, NPTS
           IF (npt30*(ipt/npt30).EQ.ipt) THEN
             CALL WDialogPutProgressBar(IDF_Pawley_Progress_Bar,ipt,     &

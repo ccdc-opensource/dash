@@ -102,32 +102,26 @@
       CHARACTER*10 filnam_root
       filnam_root = filnmr
 !
-!      write(76,*) ' about to enter PREFIN '
       CALL PREFIN(PNAME)
 !
 ! SET UP PRECISE PROBLEM, AND READ MOST L CARDS:
       CALL REFSET
 ! THIS ROUTINE IS ONLY FOR ONE PHASE:
       CALL LOGPHA(1)
-!      write(76,*) ' about to enter SETPR '
       CALL SETPR(PCXX,PFXX,MAGROU)
 !
 ! COLLECT CONSTRAINTS IMPOSED BY SYMMETRY, AND THOSE REQUESTED, AND
 ! SET UP PARAMETERS AS VARIABLES (NOT YET AS BASIC VARIABLES)
-!      write(76,*) ' about to enter PARSPR '
       CALL PARSPR(MAGROU)
 !
 ! MAKE LIST OF REFLECTION INDICES:
-!     write(76,*) ' about to enter INRFPR '
       CALL INRFPR(PCXX,PFXX)
 !.. Check if we have too many reflections
       CALL CHKMAXREF(PCXX)
 !
 !
 ! OUTPUT H,K,L IF REQUIRED:
-!      write(76,*) ' about to enter HKLOUT '
       CALL HKLOUT(PCXX,ALSQ,MATSZ)
-!      write(76,*) ' just left HKLOUT '
       RETURN
       END SUBROUTINE FORTIC
 !*==FORSYM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
