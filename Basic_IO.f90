@@ -358,6 +358,9 @@
         CASE (IDD_Pawley_Status)
           CALL DealWithPawleyFitWindow
           GOTO 10
+        CASE (IDD_ExclRegions)
+          CALL DealWithExclRegionsWindow
+          GOTO 10
         CASE (IDD_SAW_Page1)
           CALL DealWithWizardWindowZmatrices
           GOTO 10
