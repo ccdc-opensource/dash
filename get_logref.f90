@@ -65,8 +65,7 @@
 !     LOGREF(1,IR)=K_.EQ.K_m ! k=2n
 !     means that if k is even for the IR'th reflection, then LOGREF
 !     for that reflection is set to true.  The following abbreviations
-!     are used for reflection indices (all defined as integer in the file
-!     get_logref.for
+!     are used for reflection indices (all defined as integer)
 !
 !     H_    = h
 !     K_    = k
@@ -94,7 +93,7 @@
             LOGREF(1,IR) = K_.EQ.K_m ! k=2n
           ENDDO
         CASE (44,50,61,67,116,176,298)         ! P 1 c 1, C 1 c 1, P 1 2/c 1, C 1 21/c 1, C 2 2 21
-          NLGREF = 1                          ! C m c 21, C m c m,
+          NLGREF = 1                           ! C m c 21, C m c m,
           DO IR = 1, NumOfRef
             L_ = iHKL(3,IR)
             L_m = 2*(L_/2)
