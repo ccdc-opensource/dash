@@ -12,7 +12,7 @@
       INTEGER :: IWIDTHS(10)
       INTEGER :: IWID
 
-!   Initialise Winteracter
+! Initialise Winteracter
       CALL WInitialise(' ')
 ! Try to redirect stdout - change working directory if unsuccessful
       CALL Init_StdOut()
@@ -209,7 +209,8 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-      CALL WHelpFile(INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Documentation'//DIRSPACER//'manual'//DIRSPACER//'dash.html')
+      CALL WHelpFile(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))// &
+       'Documentation'//DIRSPACER//'manual'//DIRSPACER//'dash.html')
 
       END SUBROUTINE LaunchHelp
 !
@@ -289,7 +290,6 @@
 
       CALL WriteConfigurationFile
       CLOSE(UNIT=12,STATUS='DELETE',IOSTAT=ISTAT)
-      CLOSE(UNIT=6,STATUS='DELETE',IOSTAT=ISTAT)
       CALL DeleteTempFiles
       CALL WindowClose
       STOP
