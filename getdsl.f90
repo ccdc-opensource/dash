@@ -123,9 +123,8 @@
             I = InfoError(1) ! reset the errors
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999
-            CALL WDialogSelect(IDD_Peak_Positions)                            
-            CALL WDialogPutReal(IDF_zeropt_refine,Temp,'(f10.4)')
             ZeroPoint = Temp
+            CALL Upload_Zero_Point
           CASE ('sli')
 ! Pawley SLIM parameter
             I = InfoError(1) ! reset the errors
