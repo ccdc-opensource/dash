@@ -1311,6 +1311,7 @@
         ENDIF
 ! Planar nitrogen with 3 connections and valence 4    C = N (R)2
 !                                                     C = NH2
+! JvdS What about                                     C = NH (R)
         IF ((AELEM(I).EQ.56 .AND. NCAC(I).EQ.3 .AND. HYBR(I).EQ.2) .OR.          &
             (AELEM(I).EQ.56 .AND. NCAC(I).EQ.1 .AND. NHYC(I).EQ.2) ) THEN 
           IAT=I
@@ -1764,7 +1765,7 @@
           ENDIF
 550   CONTINUE
 !
-! Final assignmemt of balancing charge to metal atom(s)
+! Final assignment of balancing charge to metal atom(s)
 !
 ! In cases with no metal  like  NR4(+)   Cl(-)   all OK 
 ! Cases like    ClO4(-)   and Cu      assign  (+1) to the Cu 
@@ -1924,13 +1925,13 @@
 !                  H   He  B   C   N   O   F   Ne  Si  P   S   Cl  Ar  As  Se  Br  Kr  Te  I   Xe  At  Rn  D
       DATA NONMET/  2, 39, 11,  1, 56, 64, 32, 60, 85, 66, 81, 21,  7,  8, 84, 16, 47, 92, 43,101,  9, 79, 27/
 
-      ISMET = .TRUE.
       DO J = 1, 23
         IF (IELEM.EQ.NONMET(J)) THEN 
           ISMET = .FALSE.
           RETURN
         ENDIF
       ENDDO
+      ISMET = .TRUE.
 
       END FUNCTION ISMET
 !
