@@ -96,6 +96,7 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
       CALL PushActiveWindowID
@@ -107,6 +108,9 @@
             CASE (IDOK) ! The 'OK' button
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
               CALL Upload_Cell_Constants
+              CALL WDialogSelect(IDD_Crystal_Symmetry)
+              CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+              CALL Upload_Zero_Point               
               CALL DownloadWavelength(IDD_Data_Properties)
               CALL Generate_TicMarks
               CALL WDialogSelect(IDD_Structural_Information)
