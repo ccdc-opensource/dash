@@ -222,7 +222,7 @@
       REAL xpgdif, ypgdif
       INTEGER ISTAT, tInt1, tInt2
       INTEGER, EXTERNAL :: DiffractionFileBrowse, PrjSave, PrjSaveAs
-      INTEGER iDummy, tCurrentRange
+      INTEGER tCurrentRange
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
 !   Branch depending on chosen menu item
@@ -232,10 +232,6 @@
       SELECT CASE (EventInfo%VALUE1)
         CASE (IDB_Open)
           CALL PrjFileBrowse
-        CASE (IDB_Save)
-          iDummy = PrjSave()
-        CASE (IDB_SaveAs)
-          iDummy = PrjSaveAs()
         CASE (ID_import_xye_file)
           ISTAT = DiffractionFileBrowse()
         CASE (ID_import_dpj_file)

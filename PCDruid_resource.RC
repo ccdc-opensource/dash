@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 22/Jul/2003 17:20:18
+// Modified : 23/Jul/2003 15:18:33
 //
 ///////////////////////////////////////////////////
 //
@@ -572,7 +572,6 @@
 #define IDF_RR_ZeroPoint                 1455
 #define IDB_Undo                         1456
 #define IDB_Open                        40024
-#define IDB_Save                        40026
 #define IDB_Edit                         1468
 #define IDB_Summary                      1469
 #define IDB_Bin                          1470
@@ -715,6 +714,8 @@
 #define IDD_FWHM_info                     163
 #define IDD_DIALOG011                     164
 #define IDF_FWHM_Grid                    1396
+#define IDB_SaveSol                      1406
+#define IDB_LoadSol                      1535
 
 ///////////////////////////////////////////////////
 //
@@ -766,13 +767,13 @@ BEGIN
 ,0
 END
 
-IDD_Structural_Information DIALOG 0, 0,  321,  178
+IDD_Structural_Information DIALOG 0, 0,  321,  187
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Structural Information"
 BEGIN
-    CONTROL "",IDF_Structural_Information_tab,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   14,    8,  285,  138
-    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  138,  152,   40,   14
+    CONTROL "",IDF_Structural_Information_tab,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   14,    8,  285,  152
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  138,  167,   40,   14
 END
 
 IDD_Structural_Information RCDATA
@@ -990,11 +991,11 @@ BEGIN
 ,0
 END
 
-IDD_Peak_Widths DIALOG 0, 0,  278,  122
+IDD_Peak_Widths DIALOG 0, 0,  278,  135
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_Widths_Tab,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   12,    2,  254,  118
+    CONTROL "",IDF_Widths_Tab,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   12,    2,  254,  130
 END
 
 IDD_Peak_Widths RCDATA
@@ -1045,7 +1046,7 @@ BEGIN
 ,0
 END
 
-IDD_Sigma_info DIALOG 0, 0,  240,  102
+IDD_Sigma_info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
@@ -1121,7 +1122,7 @@ BEGIN
 ,0
 END
 
-IDD_Width_Equations DIALOG 0, 0,  240,  102
+IDD_Width_Equations DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
@@ -1129,7 +1130,7 @@ BEGIN
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
 END
 
-IDD_Gamma_Info DIALOG 0, 0,  240,  102
+IDD_Gamma_Info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
@@ -1201,7 +1202,7 @@ BEGIN
 ,0
 END
 
-IDD_HPSL_info DIALOG 0, 0,  240,  102
+IDD_HPSL_info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
@@ -1268,7 +1269,7 @@ BEGIN
 ,0
 END
 
-IDD_HMSL_Info DIALOG 0, 0,  240,  102
+IDD_HMSL_Info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
@@ -3539,7 +3540,7 @@ BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "<&Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  283,  150,   60,   14
+    CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  291,  150,   60,   14
     CONTROL "E&lement + solution #",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  100,  106,   77,   14
     CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  100,  120,   77,   14
     CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  199,  106,   75,   14
@@ -3549,11 +3550,13 @@ BEGIN
     CONTROL "through",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  198,  178,   30,    8
     CONTROL "1",IDF_Limit1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  164,  176,   34,   14
     CONTROL "1",IDF_Limit2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  228,  176,   34,   14
-    CONTROL "&Invert Selection",IDF_InvertSelection,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  283,  176,   60,   14
+    CONTROL "&Invert Selection",IDF_InvertSelection,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  267,  176,   60,   14
     CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   92,   10,  315,   80
     CONTROL "Select",IDB_Select,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   88,  176,   40,   14
     CONTROL "solutions",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  128,  179,   36,    8
     CONTROL "Save...",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  233,  150,   40,   14
+    CONTROL "Save solutions...",IDB_SaveSol,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  288,  103,   65,   14
+    CONTROL "Load solutions...",IDB_LoadSol,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  288,  121,   65,   14
 END
 
 IDD_SAW_Page5 RCDATA
@@ -3615,12 +3618,12 @@ BEGIN
     CONTROL "",IDF_SA_Summary,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,   14,    8,  237,   80
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   37,  173,   40,   14
     CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  165,  173,   60,   14
-    CONTROL "E&lement + solution #",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   41,  130,   75,   14
-    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   41,  144,   75,   14
-    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  143,  130,   75,   14
-    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  143,  144,   75,   14
-    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   33,  120,   94,   43
-    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  135,  120,   94,   43
+    CONTROL "E&lement + solution #",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   41,  130,   77,   14
+    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   41,  144,   77,   14
+    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  145,  130,   75,   14
+    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  145,  144,   75,   14
+    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   33,  120,   96,   43
+    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  137,  120,   94,   43
     CONTROL "through",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  153,  100,   30,    8
     CONTROL "1",IDF_Limit1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  119,   98,   35,   14
     CONTROL "1",IDF_Limit2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  183,   98,   36,   14
@@ -4227,7 +4230,7 @@ BEGIN
 ,0
 END
 
-IDD_FWHM_info DIALOG 0, 0,  240,  102
+IDD_FWHM_info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
@@ -4422,10 +4425,8 @@ BEGIN
     ID_ClearPeakFitRanges           "Delete peak fit ranges"
     ID_Delabc                       "Clear cell parameters"
     ID_FitPeaks                     "Fit peaks"
-    IDB_Open                        "Open project"
-    IDB_Save                        "Save project"
-    IDB_SaveAs                      "Save As..."
     IDB_AnalyseSolutions            "Analyse Solutions"
+    IDB_Open                        "Load DASH solutions"
 END
 
 ///////////////////////////////////////////////////
@@ -4436,8 +4437,6 @@ ID_TOOLBAR1 RCDATA
 BEGIN
      16, 16,
    IDB_Open,
-   IDB_Save,
-   IDB_SaveAs,
    ID_import_xye_file,0,
    ID_Remove_Background,0,
    ID_Peak_Fitting_Mode,

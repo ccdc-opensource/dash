@@ -35,9 +35,9 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      INTEGER I, IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption
-
       LOGICAL, EXTERNAL :: Get_AutoAlign
+      INTEGER, EXTERNAL :: PrjSaveAs
+      INTEGER I, IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption, iDummy
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page5)
@@ -90,6 +90,10 @@
               CALL Close_Chisq_Plot
               CALL PopActiveWindowID
               RETURN
+            CASE (IDB_SaveSol)
+              iDummy = PrjSaveAs()
+            CASE (IDB_LoadSol)
+              CALL PrjFileBrowse
             CASE (IDBSAVE)
               CALL WDialogSelect(IDD_OutputSolutions)
               CALL WDialogShow(-1,-1,0,ModeLess)
