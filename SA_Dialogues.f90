@@ -344,9 +344,9 @@
               CALL WDialogSelect(IDD_SA_input2)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDF_PrintSA)
-              CALL WriteSAParametersToFile
+              CALL WriteSAParametersToFile('SA_PARAMS.TXT')
               CALL WindowOpenChild(IHANDLE)
-              CALL WEditFile('SA_PARAMS.TXT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+              CALL WEditFile('SA_PARAMS.TXT',Modeless,0,FileMustExist,4)
               CALL SetChildWinAutoClose(IHANDLE)
             CASE (IDB_SA3_finish) ! 'Solve >' button
 ! We've finished the SA input
