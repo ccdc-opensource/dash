@@ -81,6 +81,8 @@
 
       INTEGER     MaxVVar
       PARAMETER ( MaxVVar = MaxBVar + 100 )
+! MaxVVar = total number of variables (= parameters that are varied)
+! MaxBVar = total number of basic variables = variables that do not depend on other variables
 
       INTEGER     MaxConstraints
       PARAMETER ( MaxConstraints = MaxBVar-100 )
