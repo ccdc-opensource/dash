@@ -739,8 +739,11 @@
       LOGICAL*4 tLogical
       REAL*4    tReal
       REAL, EXTERNAL :: dSpacing2TwoTheta
-
+      LOGICAL FExists
+      
       tFileName = 'D3.cfg'
+      INQUIRE(FILE=tFileName,EXIST=FExists)
+      IF (.NOT. FExists) RETURN
       tFileHandle = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
       OPEN(UNIT=tFileHandle,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
