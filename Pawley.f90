@@ -25,12 +25,11 @@
       CALL WDialogSelect(IDD_Pawley_Status)
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
-  !    CALL WDialogFieldState(IDCLOSE,Enabled)
       CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
       CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
       CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
       CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
-! If background has been subtracted after the pattern was read in, then the
+! If the background has been subtracted after the pattern was read in, then the
 ! order of the background polynomial defaults to 2, otherwise to 10.
       IF (.NOT. BACKREF) THEN
         CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,2)
@@ -58,6 +57,7 @@
       CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
       CALL IOsDeleteFile('polyp.niw')
       CALL PopActiveWindowID
+      PastPawley = .FALSE.
 
       END SUBROUTINE ShowPawleyFitWindow
 !
@@ -198,7 +198,6 @@
                   IF (PawleyErrorLog(2) .GT. 0) CALL PawleyWarning ! Check the log messages and reset
               END SELECT
               CALL WDialogFieldState(IDF_PawRef_Refine,Disabled)
-       !       CALL WDialogFieldState(IDCLOSE,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Accept,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
@@ -239,7 +238,6 @@
                 CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
               END IF
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
-      !        CALL WDialogFieldState(IDCLOSE,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
               CALL SetModeMenuState(0,0,1)
@@ -257,7 +255,6 @@
       ENDIF
             CASE (IDB_PawRef_Reject)
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
-    !          CALL WDialogFieldState(IDCLOSE,Enabled)
 ! JCC Reset the R-values if possible
               IF (LastValuesSet) THEN
                 CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(F12.2)') 
@@ -271,26 +268,21 @@
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
             CASE (IDB_PawRef_Save)
-              IF (SaveProject()) THEN
-                CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
-     !           CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
-              END IF
+              IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
             CASE (IDF_PawRef_Solve)
               CALL Load_Pawley_Pro
-              IXPos_IDD_Pawley_Status = WInfoDialog(6)
-              IYPos_IDD_Pawley_Status = WInfoDialog(7)
+              IXPos_IDD_Wizard = WInfoDialog(6)
+              IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
-              IXPos_IDD_SA_Input = IXPos_IDD_Pawley_Status
-              IYPos_IDD_SA_Input = IYPos_IDD_Pawley_Status
               FromPawleyFit = .TRUE.
               CALL Pawley_Limits_Save()
+              PastPawley = .TRUE.
+         !     CALL ShowWizardWindowZmatrices
               CALL SA_Main()
 !.. Reload the Pawley profile ...
               CALL Pawley_Limits_Restore()
               CALL Load_Pawley_Pro
               SkipPawleyRef = .TRUE.
-              CALL PopActiveWindowID
-              RETURN
           END SELECT
         CASE (FieldChanged)
         CASE DEFAULT
@@ -850,6 +842,7 @@
         IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
         WRITE(tFileHandle,4260) ZeroPoint
  4260   FORMAT('L ZERO ',F10.5)
+!        WRITE(tFileHandle,"('L EXCL ',F7.3,1X,F7.3)") 0.5, 43.0
         CALL WDialogGetReal(IDF_Slim_Parameter,SLIMVALUE)
         WRITE(tFileHandle,4270) SCALFAC, SLIMVALUE
  4270   FORMAT('L SCAL   ',F7.5,/                                         &
@@ -913,7 +906,7 @@
 
 ! DIMENSION OF ALSQ BELOW, AND SETTING OF MATSZ, TO BE ALTERED TO BE SOMETHING
 ! A LITTLE LARGER THAN N*(N+3)/2 WHERE THERE WILL BE N BASIC VARIABLES
-!
+
       INCLUDE 'PARAMS.INC'
       
       EXTERNAL PCCN01,PFCN03,DUMMY,CALPR
@@ -1282,19 +1275,15 @@
       USE VARIABLES
 
       CHARACTER(LEN=80) :: SDIFileName
-!      CHARACTER(LEN=255) :: Currentdir
       CHARACTER(LEN=45) :: FILTER
       INTEGER IFLAGS
       
 !.. Save the project
       SaveProject = .FALSE.
-!      CALL IOsDirName(Currentdir)
       IFLAGS = SaveDialog + AppendExt + PromptOn
       FILTER = 'Diffraction information files (*.sdi)|*.sdi|'
       SDIFileName = ' '
       CALL WSelectFile(FILTER,IFLAGS,SDIFileName,'Save diffraction information for structure solution')
-!.. Go back to original directory
-!      CALL IOsDirChange(Currentdir)
       IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (SDIFileName .NE. ' ')) THEN
         CALL CreateSDIFile(SDIFileName)
         CALL Set_saFileNames(SDIFileName(1:LEN_TRIM(SDIFileName) - 4))

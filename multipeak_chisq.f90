@@ -69,7 +69,6 @@
 !.. Profile refinement stage:
 !.. Single peak-fitting code
 !
-!
       DO I = 1, NPEAK
         KK = 4 + 2*I
         AREA(I) = P(KK+1)
@@ -80,14 +79,12 @@
         IVV = IV + 2
         PKFNVA(IV) = P(IVV)
       ENDDO
-!
 !.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
 !.. THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
 !.. DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
       NPEAK2 = 1 + NPEAK/2
       ARGK = ZARGK(NPEAK2)
       CALL PF_FCSUB3(MN)
-!
 !.. FFT OVER
 !.. FIND THE PEAK MAXIMUM VALUE AND THEN WORK OUT THE PEAK LIMITS
       CCHI = 0.
@@ -100,7 +97,6 @@
         DO JJ = 1, NPEAK
           ARGK = ZARGK(JJ)
           DTARG = TARGI - ARGK
-!
 !... DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
           JARGI = NINT(DTARG/ZXDELT)
           IARGI = JARGI + MN2 + 1
@@ -110,14 +106,12 @@
           C3FN(1) = 0.5*POFF*(POFF-1.0)
           C3FN(2) = 1.0 - POFF**2
           C3FN(3) = 0.5*POFF*(POFF+1.0)
-!
           YNORM = 0.0
           DO I = 1, 3
             III = IARGI + I - 2
             PKTEM = PKCONV(III,1)
             YNORM = YNORM + C3FN(I)*PKTEM
           ENDDO
-!
           YCALC = AREA(JJ)*YNORM + YBACK
           ZCAL(II) = ZCAL(II) + YCALC
         ENDDO
@@ -132,8 +126,6 @@
           IF (PTEM.LT.0.0) CCHI = CCHI + PTEM*PTEM
         ENDDO
       ENDIF
-!
-!
       MULTIPEAK_CHISQ = CCHI
 !
       END FUNCTION MULTIPEAK_CHISQ
@@ -187,7 +179,7 @@
 !
       LOGICAL LERANL
       COMMON /PKCOM3/ LERANL
-!
+
       IF (LERANL) THEN
         SIG = ABS(PKFNVA(1))
         GAM = ABS(PKFNVA(2))
@@ -200,14 +192,11 @@
         HMS = PKFNVA(4)
       ENDIF
 !
-!
       DENTEM = (FLOAT(MNS)*ZXDEL(KNOW))
       C2TEM = PI/DENTEM
       CTEM = 2.*C2TEM
       GTEM = CTEM*SIG
       CLTEM = C2TEM*GAM
-!      WRITE(*,*) 'F',DENTEM,C2TEM,CTEM,GTEM,CLTEM,PI,ZXDEL(KNOW),ARGK
-!      WRITE(*,*) 'F',(PKFNVA(II),II=1,4)
 !.. TO DEAL WITH (A) 90 DEGREES AND (B) ABOVE ALL WE WILL DO IS
 !.. (A) SET FR(I,3)=1 AND ALL ELSE TO ZERO AND
 !.. (B) SWITCH THE SIGN OF THE IMAGINARY COMPONENTS
@@ -342,8 +331,7 @@
 !A On entry Z holds the argument
 !A On exit FRCOS, FRSIN hold ?
 !
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 !
       FZ = (1.+Z*0.926)/(2.+Z*(1.792+Z*3.104))
       GZ = 1./(2.+Z*(4.142+Z*(3.492+Z*6.670)))

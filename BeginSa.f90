@@ -23,7 +23,7 @@
       IF (test .EQ. 0) THEN
         imyexit = 3
         RETURN
-      END IF
+      ENDIF
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WDialogFieldState(IDF_Pause_Annealing,Enabled)
 ! Check on viewer
@@ -31,8 +31,8 @@
         CALL WDialogFieldState(IDF_Viewer,Enabled)
       ELSE
         CALL WDialogFieldState(IDF_Viewer,Disabled)
-      END IF
-      CALL WDialogShow(IXPos_IDD_SA_Input,IYPos_IDD_SA_Input,0,Modeless)
+      ENDIF
+      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       DoSaRedraw = .TRUE.
       T1 = SECNDS(0.0)
       CALL SimulatedAnnealing(imyexit)
@@ -50,7 +50,7 @@
 ! raise the window
       DO WHILE (WinfoWindow(WindowState) .EQ. 0)
         CALL IOsWait(50) ! wait half a sec
-      END DO
+      ENDDO
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WDialogHide()
       CALL ToggleMenus(0)
@@ -58,25 +58,6 @@
 !ep SASummary presents a grid summarising results of the Simulated
 !   Annealing runs.  
       CALL SaSummary()
-
-!ep      Call WDialogSelect(IDD_SA_Multi_Completed)
-!ep     CALL WDialogShow(-1,-1,0,Modeless)
-!ep     DO
-!ep               CALL WMessage(ITYPE, MESSAGE)
-!ep               IF (MESSAGE%WIN .EQ. 0) THEN
-!ep                     Quit = process_mainwindow_message(ITYPE, MESSAGE)
-!ep               ELSE
-!ep                   SELECT CASE (ITYPE)
-!ep                       CASE (PushButton)
-!jcc                          IF ( IDF_SA_Complete_Ok .EQ. MESSAGE%VALUE1) THEN
-!ep                           IF ( IDOK .EQ. MESSAGE%VALUE1) THEN
-!ep                                 CALL WDialogHide()
-!ep                                 EXIT
-!ep                           END IF
-!ep                   END SELECT
-!ep             END IF
-!ep     END DO
-
       CALL ToggleMenus(1)
       Ierrflag =  InfoError(1)
       DoSaRedraw = .FALSE.
@@ -85,7 +66,7 @@
 !
 !*****************************************************************************
 !
-!>> JCC Check the files before we trash them  
+! JCC Check the files before we trash them  
       INTEGER FUNCTION CheckOverwriteSaOutput()
 
       USE WINTERACTER
@@ -142,7 +123,7 @@
                     "Overwrite Output Files?")
         IF (WInfoDialog(4) .EQ. 1) THEN ! Yes - Overwrite
           RETURN 
-        ELSE IF (WinfoDialog(4) .EQ. 2) THEN ! No - so enter a new file name
+        ELSEIF (WinfoDialog(4) .EQ. 2) THEN ! No - so enter a new file name
           Iflags = SaveDialog + NonExPath + DirChange + AppendExt
           filehead = ' '
 !ep appended
@@ -158,7 +139,7 @@
         INQUIRE(FILE=ccl_file(1:ccl_flen),  EXIST=extccl)
         INQUIRE(FILE=pro_file(1:pro_flen),  EXIST=extpro)
 ! Read in a new file name
-      END DO
+      ENDDO
 
       END FUNCTION CheckOverwriteSaOutput
 !
@@ -189,9 +170,9 @@
           DO isym = 1, nsymmin
             WRITE(42,4235) symline(isym)
  4235       FORMAT('S ',a)
-          END DO
-        END IF
-      END IF
+          ENDDO
+        ENDIF
+      ENDIF
       CLOSE(42)
       fname='polys'
       xxx='SPGMAK'

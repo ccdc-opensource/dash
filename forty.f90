@@ -76,7 +76,7 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
@@ -128,25 +128,22 @@
 !----------------------
 !
 !
-!>> JCC add error handling declarations
+! JCC add error handling declarations
       INTEGER IEOCC
       INTEGER PREFIN
-!>> JCC This is for testing for mathematical errors in the CCSL that used to STOP the program
+! JCC This is for testing for mathematical errors in the CCSL that used to STOP the program
       INTEGER IBMBER
       COMMON /CCSLER/ IBMBER
 !
       ICalled = 0
 !
-!>> JCC Initialise return value to successful (=1) any other value is failure
+! JCC Initialise return value to successful (=1) any other value is failure
       FORTY = 1
       IPK = 0
       filnam_root = filnmr
 !
-!>> JCC Was
-!	CALL PREFIN(PNAME)
-!>> Now
       IEOCC = PREFIN(PNAME)
-!>> Check the return status
+! Check the return status
       IF (IEOCC.NE.1) GOTO 900
 !
 !
@@ -154,19 +151,19 @@
       CALL REFSET
 ! DISCOVER WHETHER SLACK CONSTRAINTS:
       CALL GEOMIN(0)
-!>> JCC Trap for any problems
+! JCC Trap for any problems
       IF (IBMBER.GT.0) GOTO 950
 ! THIS ROUTINE IS ONLY FOR ONE PHASE:
       CALL LOGPHA(1)
       CALL SETPR(PCXX,PFXX,MAGROU)
 !
-!>> JCC Trap for any problems
+! JCC Trap for any problems
       IF (IBMBER.GT.0) GOTO 950
 !
 ! COLLECT CONSTRAINTS IMPOSED BY SYMMETRY, AND THOSE REQUESTED, AND
 ! SET UP PARAMETERS AS VARIABLES (NOT YET AS BASIC VARIABLES)
       CALL PARSPR(MAGROU)
-!>> JCC Trap for any problems
+! JCC Trap for any problems
       IF (IBMBER.GT.0) GOTO 950
 !
 !
