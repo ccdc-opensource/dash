@@ -726,39 +726,6 @@
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
-            CASE (IDB_Divide)
-              DO I = 1, NBIN
-                YOBIN(I) = YOBIN(I) / EBIN(I)
-              ENDDO
-              CALL GetProfileLimits
-              CALL Get_IPMaxMin 
-              CALL Profile_Plot
-            CASE (IDB_Smooth)
-              CALL WDialogGetInteger(IDF_SmoothWindow, Window)
-              DO I = 1+Window, NBIN-Window
-                Iavg = 0.0
-                DO J = -Window, Window
-                  Iavg = Iavg + YOBIN(I+J)
-                ENDDO
-                tYOBIN(I) = Iavg / (2.0*Window+1.0)
-              ENDDO
-              NBIN = NBIN - 2*Window
-              BackupNOBS = NBIN
-              DO I = 1, NBIN
-                YOBIN(I) = tYOBIN(I+Window)
-                BackupYOBS(I) = tYOBIN(I+Window)
-              ENDDO
-              CALL GetProfileLimits
-              CALL Get_IPMaxMin 
-              CALL Profile_Plot
-            CASE (IDB_1st)  
-              NBIN = NBIN - 1
-              DO I = 1, NBIN
-                YOBIN(I) = YOBIN(I+1) - YOBIN(I)
-              ENDDO
-              CALL GetProfileLimits
-              CALL Get_IPMaxMin 
-              CALL Profile_Plot
             CASE (IDB_Preview)
               tXPMIN     = XPMIN
               tXPMAX     = XPMAX
