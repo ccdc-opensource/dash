@@ -104,7 +104,7 @@
 
       INTEGER IM, IA, IC
       INTEGER JRAN, num_old_min, NTOTMOV
-      INTEGER III, IH, KK, iFrg, iFrgCopy
+      INTEGER III, IH, KK, iFrg
       INTEGER Last_NUP, Last_NDOWN
       CHARACTER*3 CNruns,CMruns
       LOGICAL PrevRejected, CurrParsInclPO, PrevParsInclPO
@@ -149,24 +149,22 @@
       kk = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO ii = 1, izmpar(iFrg)
-              kk = kk + 1
-              SELECT CASE (kzmpar(ii,iFrg))
-                CASE (1) ! translation
-                  vm(kk) = 0.1
-                CASE (2) ! quaternion
-                  vm(kk) = 0.1
-                CASE (3) ! torsion
-                  vm(kk) = 10.0
-                CASE (4) ! angle
-                  vm(kk) = 1.0
-                CASE (5) ! bond
-                  vm(kk) = 0.1*(ub(kk)-lb(kk))
-                CASE (6) ! single rotation axis
-                  vm(kk) = 0.1
-              END SELECT
-            ENDDO
+          DO ii = 1, izmpar(iFrg)
+            kk = kk + 1
+            SELECT CASE (kzmpar(ii,iFrg))
+              CASE (1) ! translation
+                vm(kk) = 0.1
+              CASE (2) ! quaternion
+                vm(kk) = 0.1
+              CASE (3) ! torsion
+                vm(kk) = 10.0
+              CASE (4) ! angle
+                vm(kk) = 1.0
+              CASE (5) ! bond
+                vm(kk) = 0.1*(ub(kk)-lb(kk))
+              CASE (6) ! single rotation axis
+                vm(kk) = 0.1
+            END SELECT
           ENDDO
         ENDIF
       ENDDO
