@@ -1,4 +1,4 @@
-! Winteracter module created : 14/Oct/2003 18:11:37
+! Winteracter module created : 20/Oct/2003 18:36:50
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -709,4 +709,8 @@
           INTEGER, PARAMETER :: IDR_HydrogensAbsorb             =  1090
           INTEGER, PARAMETER :: IDR_HydrogensIgnore             =  1092
           INTEGER, PARAMETER :: IDR_HydrogensExplicit           =  1550
+          INTEGER, PARAMETER :: IDB_Divide                      =  1147
+          INTEGER, PARAMETER :: IDB_Smooth                      =  1148
+          INTEGER, PARAMETER :: IDF_SmoothWindow                =  1149
+          INTEGER, PARAMETER :: IDB_1st                         =  1150
       END MODULE Druid_Header

@@ -679,6 +679,8 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
@@ -689,12 +691,23 @@
       INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
       COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
 
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
+
+      INTEGER                BackupNOBS
+      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
+      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
+
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER tInt1, tInt2, tFieldState
       REAL             tXPMIN,     tXPMAX,     tYPMIN,     tYPMAX,       &
                        tXPGMIN,    tXPGMAX,    tYPGMIN,    tYPGMAX,      &
                        tXPGMINOLD, tXPGMAXOLD, tYPGMINOLD, tYPGMAXOLD
       INTEGER          tIPMIN, tIPMAX, tiStart, tiStop, tnPoints
+      REAL tYOBIN(1:MOBS)
+      INTEGER I, Window, J
+      REAL Iavg
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
@@ -713,6 +726,42 @@
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
+            CASE (IDB_Divide)
+              DO I = 1, NBIN
+                YOBIN(I) = YOBIN(I) / EBIN(I)
+              ENDDO
+      CALL GetProfileLimits
+      CALL Get_IPMaxMin 
+              CALL Profile_Plot
+            CASE (IDB_Smooth)
+              CALL WDialogGetInteger(IDF_SmoothWindow, Window)
+              DO I = 1+Window, NBIN-Window
+                Iavg = 0.0
+                DO J = -Window, Window
+                  Iavg = Iavg + YOBIN(I+J)
+                ENDDO
+                tYOBIN(I) = Iavg / (2.0*Window+1.0)
+              ENDDO
+              NBIN = NBIN - 2*Window
+              BackupNOBS = NBIN
+              DO I = 1, NBIN
+                YOBIN(I) = tYOBIN(I+Window)
+                BackupYOBS(I) = tYOBIN(I+Window)
+              ENDDO
+      CALL GetProfileLimits
+      CALL Get_IPMaxMin 
+              CALL Profile_Plot
+            CASE (IDB_1st)  
+              DO I = 2, NBIN
+                tYOBIN(I-1) = YOBIN(I) - YOBIN(I-1)
+              ENDDO
+              NBIN = NBIN - 1
+              DO I = 1, NBIN
+                YOBIN(I) = tYOBIN(I)
+              ENDDO
+      CALL GetProfileLimits
+      CALL Get_IPMaxMin 
+              CALL Profile_Plot
             CASE (IDB_Preview)
               tXPMIN     = XPMIN
               tXPMAX     = XPMAX
