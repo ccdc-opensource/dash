@@ -1,3 +1,112 @@
+!O!
+!O!*****************************************************************************
+!O!
+!O      SUBROUTINE organise_sa_result_data(irow)
+!O!ep July 2001
+!O!   called from SASummary.f90
+!O!     This subroutine manipulates the data required to plot the observed  
+!O!   diffraction pattern with the calculated pattern and difference.  The
+!O!   data is read in from the .pro file and stored in COMMON BLOCK ProFilePLotStore
+!O!  ihandle is used to identify the column of the store_ arrays where the data
+!O!  for each child window (ihandle) is stored
+!O
+!O      USE WINTERACTER
+!O      USE DRUID_HEADER
+!O      USE VARIABLES
+!O!
+!O!  Definitions and array declarations.
+!O!
+!O      IMPLICIT NONE
+!O
+!O      INTEGER, INTENT (IN   ) :: irow
+!O
+!O      INCLUDE 'PARAMS.INC'
+!O
+!O! Used to manage the child windows which display the profile plots
+!O      INTEGER                 SAUsedChildWindows
+!O      COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
+!O
+!O      REAL store_ycalc, store_diff
+!O! the number of columns in the store-arrays is set to the maximum number of 
+!O! child windows allowed
+!O      COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
+!O
+!O      LOGICAL          PRO_saved
+!O      COMMON /PROCOM/  PRO_saved(1:MaxRun)
+!O
+!O      INTEGER          NBIN, LBIN
+!O      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+!O      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+!O
+!O      INTEGER iz
+!O      REAL yadd
+!O      REAL Ymin
+!O      REAL Ymax
+!O      CHARACTER*MaxPathLength Grid_Buffer
+!O      CHARACTER*MaxPathLength filename
+!O      EXTERNAL DealWithProfilePlot
+!O      CHARACTER*2 RunStr
+!O      INTEGER I, II, RunNr, tFileHandle, iHandle
+!O      REAL tReal1, tReal2, tReal3
+!O!
+!O!   reading in the data from the saved .pro files
+!O!
+!O      CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)
+!O      Iz = LEN_TRIM(Grid_Buffer)
+!O! As it is now possible to switch saving .pro files on/off, even during SA,
+!O! we must now test if the .pro requested has been saved.
+!O! The solutions have been ordered wrt chi**2. We must parse the original run nr from the
+!O! number of the .pdb file.
+!O      RunStr = Grid_Buffer(Iz-5:Iz-4)
+!O      IF (RunStr(1:1) .EQ. '0') THEN
+!O        RunStr(1:1) = RunStr(2:2)
+!O        RunStr(2:2) = ' '
+!O      ENDIF
+!O      READ(RunStr,'(I2)') RunNr
+!O      IF (.NOT. PRO_saved(RunNr)) RETURN
+!O!
+!O!   open the plotting window, ihandle is the window's unique identifier
+!O!     
+!O      Iz = Iz-4
+!O      filename = grid_buffer(1:Iz)//'.pro'
+!O      CALL WindowOpenChild(iHandle, x=10, y=450, width=800, height=400, title=filename)
+!O      IF (iHandle.EQ.-1) THEN
+!O        CALL ErrorMessage("Exceeded maximum number of allowed windows.  Close a profile window.")
+!O        RETURN
+!O      ENDIF 
+!O      CALL RegisterChildWindow(iHandle,DealWithProfilePlot)
+!O      SAUsedChildWindows(iHandle) = 1
+!O      CALL WindowSelect(iHandle)
+!O!
+!O!   open the file
+!O!     
+!O      tFileHandle = 10
+!O      OPEN(UNIT=tFileHandle,FILE=filename,status='unknown',ERR=999)
+!O      DO I = 1, NBIN
+!O        READ(tFileHandle,12,END=999,ERR=999) tReal1, tReal2, store_ycalc(I,ihandle), tReal3
+!O12      FORMAT(F12.4,3(1X,F12.4))
+!O      ENDDO
+!O      CLOSE(tFileHandle)
+!O!
+!O!   calculate the offset for the difference plot
+!O!
+!O      YMin = MINVAL(YOBIN(1:NBIN))
+!O      YMax = MAXVAL(YOBIN(1:NBIN))
+!O      YADD = 0.5 * (YMax+YMin)
+!O      DO II = 1, NBIN
+!O        store_diff(II,ihandle) = YADD + YOBIN(II) - store_ycalc(II,ihandle)
+!O      ENDDO
+!O!   call subroutine which plots data
+!O      CALL plot_pro_file(ihandle)
+!O      RETURN
+!O999   CLOSE(tFileHandle)
+!O! Now close the child window that we had already opened.
+!O      CALL UnRegisterChildWindow(iHandle)
+!O      SAUsedChildWindows(iHandle) = 0
+!O      CALL WindowCloseChild(iHandle)
+!O      CALL ErrorMessage('Error while reading .pro file.')
+!O
+!O      END SUBROUTINE organise_sa_result_data
 !
 !*****************************************************************************
 !
@@ -38,38 +147,32 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      INTEGER iz
+      REAL                XAtmCoords
+      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:MaxAtm_4,1:MaxRun)
+
+      INTEGER         NATOM
+      REAL                   Xato
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
+                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
       REAL yadd
       REAL Ymin
       REAL Ymax
-      CHARACTER*MaxPathLength Grid_Buffer
-      CHARACTER*MaxPathLength filename
       EXTERNAL DealWithProfilePlot
-      CHARACTER*2 RunStr
-      INTEGER I, II, RunNr, tFileHandle, iHandle
-      REAL tReal1, tReal2, tReal3
-!
-!   reading in the data from the saved .bin files
-!
-      CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)
-      Iz = LEN_TRIM(Grid_Buffer)
-! As it is now possible to switch saving .pro files on/off, even during SA,
-! we must now test if the .pro requested has been saved.
-! The solutions have been ordered wrt chi**2. We must parse the original run nr from the
-! number of the .pdb file.
-      RunStr = Grid_Buffer(Iz-5:Iz-4)
-      IF (RunStr(1:1) .EQ. '0') THEN
-        RunStr(1:1) = RunStr(2:2)
-        RunStr(2:2) = ' '
-      ENDIF
-      READ(RunStr,'(I2)') RunNr
-      IF (.NOT. PRO_saved(RunNr)) RETURN
+      INTEGER I, II, iHandle
+      REAL rDummy
 !
 !   open the plotting window, ihandle is the window's unique identifier
 !     
-      Iz = Iz-4
-      filename = grid_buffer(1:Iz)//'.pro'
-      CALL WindowOpenChild(iHandle, x=10, y=450, width=800, height=400, title=filename)
+      CALL WindowOpenChild(iHandle, x=10, y=450, width=800, height=400, title='Profile')
       IF (iHandle.EQ.-1) THEN
         CALL ErrorMessage("Exceeded maximum number of allowed windows.  Close a profile window.")
         RETURN
@@ -77,18 +180,23 @@
       CALL RegisterChildWindow(iHandle,DealWithProfilePlot)
       SAUsedChildWindows(iHandle) = 1
       CALL WindowSelect(iHandle)
-!
-!   open the file
-!     
-      tFileHandle = 10
-      OPEN(UNIT=tFileHandle,FILE=filename,status='unknown',ERR=999)
-      DO I = 1, NBIN
-        READ(tFileHandle,12,END=999,ERR=999) tReal1, tReal2, store_ycalc(I,ihandle), tReal3
-12      FORMAT(F12.4,3(1X,F12.4))
+! Calculate store_ycalc(I,ihandle)
+
+! Fill Xato
+      DO I = 1, NATOM
+        Xato(1,I) = XAtmCoords(1,I,irow)
+        Xato(2,I) = XAtmCoords(2,I,irow)
+        Xato(3,I) = XAtmCoords(3,I,irow)
       ENDDO
-      CLOSE(tFileHandle)
+! Valchipro fills YCBIN
+! @@      CALL VALCHI(rDummy,1000) ! Preferrred orientation part if appropriate
+      CALL VALCHI(rDummy,0)    ! Structural part
+      CALL VALCHIPRO(rDummy)
+      DO I = 1, NBIN
+        store_ycalc(I,iHandle) = YCBIN(I)
+      ENDDO
 !
-!   calculate the offset for the difference plot
+! calculate the offset for the difference plot
 !
       YMin = MINVAL(YOBIN(1:NBIN))
       YMax = MAXVAL(YOBIN(1:NBIN))
@@ -96,15 +204,8 @@
       DO II = 1, NBIN
         store_diff(II,ihandle) = YADD + YOBIN(II) - store_ycalc(II,ihandle)
       ENDDO
-!   call subroutine which plots data
+! call subroutine which plots data
       CALL plot_pro_file(ihandle)
-      RETURN
-999   CLOSE(tFileHandle)
-! Now close the child window that we had already opened.
-      CALL UnRegisterChildWindow(iHandle)
-      SAUsedChildWindows(iHandle) = 0
-      CALL WindowCloseChild(iHandle)
-      CALL ErrorMessage('Error while reading .pro file.')
 
       END SUBROUTINE organise_sa_result_data
 !
