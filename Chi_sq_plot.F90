@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PrepareChiSqPlotData(iteration, cpb)
+      SUBROUTINE PrepareChiSqPlotData(iteration)
 !
 !
 !  ep added subroutine.  Called from SimulatedAnnealing subroutine (sa_subs.f90).
@@ -17,15 +17,17 @@
 !
       USE DRUID_HEADER
       USE WINTERACTER
-!
+
       IMPLICIT NONE
 !
 !  Definitions and array declarations.
 !
       INTEGER, INTENT (IN   ) :: iteration
-      REAL,    INTENT (IN   ) :: cpb
 
       INCLUDE 'PARAMS.INC'
+
+      REAL             CHIPROBEST
+      COMMON /PLTSTO2/ CHIPROBEST
 
       INTEGER                    ChiSqdChildWindows,                 ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
@@ -58,9 +60,9 @@
 
 ! Record chi-sqd value in array.  Chi-sqd values following it_count entry
 ! set to last Chi-sqd value entered.
-      chi_sqd(iteration, SA_Run_Number) = cpb
+      chi_sqd(iteration, SA_Run_Number) = CHIPROBEST
       DO J = iteration+1, MaxIter
-        Chi_sqd(J, SA_Run_Number) = cpb
+        Chi_sqd(J, SA_Run_Number) = CHIPROBEST
       ENDDO
 
 ! If first iteration...
