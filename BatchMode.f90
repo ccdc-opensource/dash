@@ -34,6 +34,10 @@
       REAL            X_init,       x_unique,       lb,       ub
       COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                                          iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
+
       CHARACTER*255 line, keyword, tString
       INTEGER iTem, hFile, nl, I, iLen, iFrg, iDummy
       REAL    rTem
@@ -181,10 +185,21 @@
                       IF ( InfoError(1) .NE. 0 ) GOTO 999
                     CASE ('FIXED') ! Fixed
                     CASE ('BIMODAL') ! Bimodal
+                      ModalFlag(i) = 2
+                      CALL INextReal(line, LB(i)) ! Lower bound
+                      IF ( InfoError(1) .NE. 0 ) GOTO 999
+                      CALL INextReal(line, UB(i)) ! Upper bound
+                      IF ( InfoError(1) .NE. 0 ) GOTO 999
                     CASE ('TRIMODAL') ! Trimodal
+                      ModalFlag(i) = 3
+                      CALL INextReal(line, LB(i)) ! Lower bound
+                      IF ( InfoError(1) .NE. 0 ) GOTO 999
+                      CALL INextReal(line, UB(i)) ! Upper bound
+                      IF ( InfoError(1) .NE. 0 ) GOTO 999
                     CASE DEFAULT
                       GOTO 999 ! Error
                   END SELECT
+           !       CALL ParseRawInput(I)
                 ENDIF
               ENDIF
             ENDDO
