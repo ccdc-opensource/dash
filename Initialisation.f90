@@ -171,7 +171,7 @@
       GOTO 10
  100  IF (I .NE. MaxSPGR) THEN
         CALL ErrorMessage('Number of space groups in space-group file has changed.')
-        CALL WindowClose()
+        CALL WindowClose
         STOP
       ENDIF
       CLOSE(110)
@@ -187,7 +187,7 @@
                           //'SpaceGroupSymbols.dat'//CHAR(13)// &
                           "in the installation directory"//CHAR(13)//&
                           InstallationDirectory(1:LEN_TRIM(InstallationDirectory)))              
-      CALL WindowClose()
+      CALL WindowClose
       STOP
 
       END SUBROUTINE PolyFitterInitialise
@@ -364,7 +364,7 @@
       KolObs            = Win_RGB(255,0,0)
       KolCal            = Win_RGB(0,0,255)
       KolDif            = Win_RGB(200,100,200)
-      KolMTic           = Win_RGB(191,0,0)
+      KolMTic           = Win_RGB(0,0,0)
       KolCTic           = Win_RGB(0,131,131)
       KolPanelVLite     = Win_RGB(245,245,245)
       KolPanelLite      = Win_RGB(235,235,235)
