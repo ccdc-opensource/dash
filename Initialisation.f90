@@ -708,17 +708,25 @@
       CALL FileWriteLogical(hFile, RecNr, UseHydrogensDuringAuto())
 ! Plot cumulative chi-squared      
       CALL FileWriteLogical(hFile, RecNr, Get_ShowCumChiSqd())
+! Following is new in DASH 2.2
 ! Divide difference by ESDs      
       CALL FileWriteLogical(hFile, RecNr, Get_DivideByEsd())
 ! Auto align      
       CALL FileWriteLogical(hFile, RecNr, Get_AutoAlign())
+! Following is new in DASH 3.0
 ! Save the mogul path
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogGetString(IDF_MogulExe, MogulExe)
       CALL FileWriteString(hFile, RecNr, MogulExe)
 ! Use Mogul
       CALL FileWriteLogical(hFile, RecNr, UseMogul)
-
+! Single crystal options
+      CALL WDialogSelect(IDD_SX_Page2)
+      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_RecalcESDs))
+      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_IgnLT))
+      CALL WDialogGetReal(IDF_CutOff, tReal)
+      CALL FileWriteReal(hFile, RecNr, tReal)
+      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_AvgFriedelPairs))
   999 CLOSE(hFile)
 
       END SUBROUTINE WriteConfigurationFile
@@ -991,12 +999,27 @@
 ! Auto align      
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL Set_AutoAlign(tLogical)
+! Following is new in DASH 3.0
 ! Read the Mogul path
       CALL FileReadString(hFile, RecNr, MogulExe)
+      IF (GetBFIOError() .NE. 0) THEN
+        CLOSE(hFile)
+        RETURN
+      ENDIF
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutString(IDF_MogulExe,MogulExe)
+      CALL WDialogPutString(IDF_MogulExe, MogulExe)
 ! Use Mogul
       CALL FileReadLogical(hFile, RecNr, UseMogul)
+! Single crystal options
+      CALL WDialogSelect(IDD_SX_Page2)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_RecalcESDs, tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_IgnLT, tLogical)
+      CALL FileReadReal(hFile, RecNr, tReal)
+      CALL WDialogPutReal(IDF_CutOff, tReal)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_AvgFriedelPairs, tLogical)
       CLOSE(hFile)
       RETURN
   999 CALL DebugErrorMessage('Error while opening config file')
