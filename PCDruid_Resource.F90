@@ -1,4 +1,4 @@
-! Winteracter module created : 22/Mar/2002 09:20:29
+! Winteracter module created : 31/Mar/2002 16:46:35
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -605,9 +605,8 @@
           INTEGER, PARAMETER :: IDF_RR_ExclRegions              =  1454
           INTEGER, PARAMETER :: IDF_RR_ZeroPoint                =  1455
           INTEGER, PARAMETER :: IDB_Undo                        =  1456
-          INTEGER, PARAMETER :: ID_Save                         = 40027
-          INTEGER, PARAMETER :: ID_New                          = 40024
-          INTEGER, PARAMETER :: ID_Open                         = 40026
+          INTEGER, PARAMETER :: IDB_Open                        = 40024
+          INTEGER, PARAMETER :: IDB_Save                        = 40026
           INTEGER, PARAMETER :: IDB_Edit                        =  1468
           INTEGER, PARAMETER :: IDB_Summary                     =  1469
           INTEGER, PARAMETER :: IDB_Bin                         =  1470
@@ -615,4 +614,5 @@
           INTEGER, PARAMETER :: IDF_BinData                     =  1471
           INTEGER, PARAMETER :: IDF_LBIN                        =  1472
           INTEGER, PARAMETER :: IDF_SGDet                       =  1473
+          INTEGER, PARAMETER :: IDB_New                         = 40028
       END MODULE Druid_Header
