@@ -21,54 +21,58 @@
 !
       INCLUDE 'params.inc'
       INTEGER,PARAMETER :: NSETS   =     1
-      INTEGER,PARAMETER :: NVALUES = 10000
         integer           :: ntotmov
         integer           :: iteration
         real              :: cpb
         integer           :: it_count
-        integer           :: ihandle
+        integer           :: ChiHandle
         real           :: x_max
         real           :: x_min
         real           :: y_max
        real, dimension(10000) :: num_moves
        real, dimension(10000)    :: chi_sqd
        INTEGER ChiSqdChildWindows
-       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin)
+       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
+! Variables used to specify Child Window position
+       INTEGER Ix, Iy
+       COMMON /WindowPosition/ Ix, Iy
+       DATA Ix /10/, Iy /450/
 !
 !
 !
-      it_count = iteration
+        it_count = iteration
         num_moves(it_count) = ntotmov
         chi_sqd(it_count) = cpb
-      x_min=num_moves(1)
-      x_max=num_moves(it_count)
+        x_min=num_moves(1)
+        x_max=num_moves(it_count)
         y_max=chi_sqd(1)+50
-!  First two interations performed both have iteration number=1.  The graph requires
+! First two interations performed both have iteration number=1.  The graph requires
 ! two points to plot a straight line and so the plot of chi-sqd vs.moves only
 ! starts when i_count =2, ie iteration number 2
-      if (it_count.eq.2)then
-        call WindowOpenChild(ihandle, x=10, y=450, width=400, height=300, title='Chi-sqd vs. Moves')
-        ChiSqdChildWindows(ihandle) = 1 
-        call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
+        if (it_count.eq.2)then
+          call WindowOpenChild(ChiHandle, x=Ix, y=Iy, width=400, height=300, title='Chi-sqd vs. Moves')
+          ChiSqdChildWindows(ChiHandle) = 1 
+          call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
         endif    
-        if (it_count.gt.2) then
-        call WindowSelect(ihandle)
-        call WindowClear()
-        call plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
-        end if
+! If ChildWindow is open then call plotting routine.
+!        if (it_count.gt.2) then
+        IF (ChiSqdChildWindows(ChiHandle).eq.1) THEN
+          CALL WindowSelect(ChiHandle)
+          CALL WindowClear()
+          CALL plotting_chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
+        END IF
 
-      end subroutine Chi_sq_plot
+        end subroutine Chi_sq_plot
 
 !***********************************************************************************************
-      Subroutine plotting_Chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
+      SUBROUTINE plotting_Chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
       
-      use druid_header
+      USE druid_header
       USE WINTERACTER
               
       INCLUDE 'poly_colours.inc'  
         
       INTEGER,PARAMETER :: NSETS   =     1
-      INTEGER,PARAMETER :: NVALUES = 10000
       INTEGER, INTENT(IN)        :: it_count
       REAL, INTENT(IN)           :: x_max
       REAL,INTENT(IN)           :: x_min
@@ -160,3 +164,25 @@
 !      END DO
       RETURN
       END SUBROUTINE plotting_chi_sqd
+!******************************************************************************************
+      
+      SUBROUTINE Close_Chisq_Plot
+      USE WINTERACTER
+      INCLUDE 'params.inc'
+      INTEGER ChiSqdChildWindows
+      COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin)
+      INTEGER Ix, Iy
+      COMMON /WindowPosition/ Ix, Iy
+
+      DO i = 1,MaxNumChildWin
+        IF (ChiSqdChildWindows(i) .EQ. 1) THEN
+! save position of window before close.  If more than one chisqd window open (not 
+! the case in this implementation) will save the position of the last window closed.
+          CALL WindowSelect(i)
+          Ix = WinfoWindow(WindowXpos)
+          Iy = WinfoWindow(WindowYpos)
+          CALL WindowCloseChild(i)
+          ChiSqdChildWindows(i) = 0
+        END IF
+      END DO
+      END SUBROUTINE Close_Chisq_Plot       			  
