@@ -1,6 +1,19 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE Clear_Project
+
+      IMPLICIT NONE
+
+      CALL Clear_PeakFitRanges
+      CALL Clear_UnitCell
+      CALL Clear_Zmatrices
+
+      END SUBROUTINE Clear_Project
+
+!
+!*****************************************************************************
+!
       SUBROUTINE Clear_PeakFitRanges
 
       USE WINTERACTER
