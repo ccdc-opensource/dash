@@ -77,41 +77,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SelectMode(TheMode)
-!
-! This subroutine selects "peak fitting" / "Pawley refinement" / "structure solution" mode,
-! ensuring that exactly one mode is active at all times and
-! updating the current mode in the menu and in the toolbar.
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-      
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: TheMode
-
-      INCLUDE 'GLBVAR.INC'
-
-! Update the status bar
-      SELECT CASE (TheMode)
-        CASE (ID_Peak_Fitting_Mode)
-          STATBARSTR(8)='Peak fitting mode'
-        CASE (ID_Pawley_Refinement_Mode)
-          STATBARSTR(8)='Pawley refinement mode'
-        CASE (ID_Structure_Solution_Mode)
-          STATBARSTR(8)='Structure solution mode'
-      END SELECT
-      CALL WindowOutStatusBar(8,STATBARSTR(8))
-! Update the menu
-      CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-      IDCurrent_Cursor_mode = TheMode
-      CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-! Update the toolbar
-      
-      END SUBROUTINE SelectMode
-!
-!*****************************************************************************
-!
       SUBROUTINE ProcessMenu
 !
 ! This subroutine processes the menu selections
@@ -173,7 +138,6 @@
         CASE (ID_Peak_Fitting_Mode)
           CALL SelectMode(ID_Peak_Fitting_Mode)
         CASE (ID_Pawley_Refinement_Mode)
-          CALL SelectMode(ID_Pawley_Refinement_Mode)
           CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)
           CALL ShowWizardWindowZmatrices
