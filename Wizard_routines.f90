@@ -32,10 +32,20 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
+! Things go all wrong if some intelligent part of DASH decides that the current Wizard window should be
+! hidden while the main DASH window has been minimised. Therefore, just enter an infinite loop...
+      CALL WindowSelect(0)
+      DO WHILE (WinfoWindow(WindowState) .EQ. WinMinimised)
+        CALL PeekEvent
+        CALL WindowSelect(0)
+        CALL IOsWait(50) ! wait half a sec
+      ENDDO
       IF (CurrentWizardWindow .EQ. 0) RETURN
       CALL WDialogSelect(CurrentWizardWindow)
-      IXPos_IDD_Wizard = WInfoDialog(6)
-      IYPos_IDD_Wizard = WInfoDialog(7)
+      IF (WInfoDialog(6) .GT. 0) THEN
+        IXPos_IDD_Wizard = WInfoDialog(6)
+        IYPos_IDD_Wizard = WInfoDialog(7)
+      ENDIF
       CALL WDialogHide()
       CurrentWizardWindow = 0
 
@@ -217,20 +227,12 @@
                   CALL WDialogSelect(IDD_PW_Page3)
                   CALL WDialogGetString(IDF_PWa_DataFileName_String,tString)
 ! If no filename provided => grey out 'Next >' button
-                  IF (LEN_TRIM(tString) .EQ. 0) THEN
-                    CALL WDialogFieldState(IDNEXT,Disabled)
-                  ELSE
-                    CALL WDialogFieldState(IDNEXT,Enabled)
-                  ENDIF
+                  CALL WDialogFieldStateLogical(IDNEXT,LEN_TRIM(tString) .NE. 0)
                   CALL WizardWindowShow(IDD_PW_Page3)
                 CASE (2) ! Preparation for Pawley refinement
                   CALL WDialogSelect(IDD_PW_Page2)
 ! If we have loaded a powder pattern, the Next > button should be enabled
-                  IF (NoData) THEN
-                    CALL WDialogFieldState(IDNEXT,Disabled)
-                  ELSE
-                    CALL WDialogFieldState(IDNEXT,Enabled)
-                  END IF
+                  CALL WDialogFieldStateLogical(IDNEXT,.NOT. NoData)
                   CALL WizardWindowShow(IDD_PW_Page2)
                 CASE (3) ! Simulated annealing structure solution
                   CALL ShowWizardWindowZmatrices
@@ -311,11 +313,7 @@
             CASE (ID_PWa_DF_Open)
               CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
               ISTAT = DiffractionFileOpen(CTEMP)
-              IF (ISTAT .EQ. 1) THEN
-                CALL WDialogFieldState(IDNEXT,Enabled)
-              ELSE
-                CALL WDialogFieldState(IDNEXT,Disabled)
-              ENDIF
+              CALL WDialogFieldStateLogical(IDNEXT,ISTAT .EQ. 1)
             CASE (IDBBROWSE)
               ISTAT = DiffractionFileBrowse()
 ! Don't change if the user pressed 'Cancel' (ISTAT = 2)
@@ -496,12 +494,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_TruncateStartYN)
 ! If set to 'TRUE', ungrey value field and vice versa
-              IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
-                tFieldState = Enabled
-              ELSE
-                tFieldState = Disabled
-              ENDIF
-              CALL WDialogFieldState(IDF_Min2Theta,tFieldState)
+              CALL WDialogFieldStateLogical(IDF_Min2Theta,WDialogGetCheckBoxLogical(IDF_TruncateStartYN))
             CASE (IDF_TruncateEndYN)
 ! If set to 'TRUE', ungrey value fields and vice versa
               IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
@@ -681,11 +674,7 @@
                 CASE (2) ! Enter known unit cell parameters
                   CALL WDialogSelect(IDD_PW_Page1)
 ! If the cell is OK, the Next> button should be enabled
-                  IF (FnUnitCellOK()) THEN
-                    CALL WDialogFieldState(IDNEXT,Enabled)
-                  ELSE
-                    CALL WDialogFieldState(IDNEXT,Disabled)
-                  END IF
+                  CALL WDialogFieldStateLogical(IDNEXT,FnUnitCellOK())
                   CALL WizardWindowShow(IDD_PW_Page1)
               END SELECT
             CASE (IDCANCEL, IDCLOSE)
@@ -716,11 +705,63 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBSTOP, IDCANCEL)
               DICVOL_Error = cDICVOL_ErrorInterrupted
+            CASE (IDBPause)
+              CALL WMessageBox(OKOnly,ExclamationIcon,CommonOK,'Press OK to continue','Pause')
           END SELECT
       END SELECT
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithDICVOLRunning
+!
+!*****************************************************************************
+!
+      SUBROUTINE DICVOL_FinishedCrystalSystem(TheCrystalSystem)
+!
+! Called when DICVOL has finished searching a crystal system. Updates the
+! "DICVOL Running..." dialogue.
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE DICVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheCrystalSystem 
+
+      CHARACTER*20 tString
+      CHARACTER*20, EXTERNAL :: Integer2String
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_DICVOLRunning)
+      IF (IAND(TheCrystalSystem,cCubic       ) .EQ. cCubic       ) THEN
+        tString = Integer2String(DICVOL_NumOfSolutions(1))
+        CALL WDialogPutString(IDF_LabProgCubic,tString(1:LEN_TRIM(tString)))
+      ENDIF
+      IF (IAND(TheCrystalSystem,cTetragonal  ) .EQ. cTetragonal  ) THEN
+        tString = Integer2String(DICVOL_NumOfSolutions(2))
+        CALL WDialogPutString(IDF_LabProgTetragonal,tString(1:LEN_TRIM(tString)))
+      ENDIF
+      IF (IAND(TheCrystalSystem,cHexagonal   ) .EQ. cHexagonal   ) THEN
+        tString = Integer2String(DICVOL_NumOfSolutions(3))
+        CALL WDialogPutString(IDF_LabProgHexagonal,tString(1:LEN_TRIM(tString)))
+      ENDIF
+      IF (IAND(TheCrystalSystem,cOrthorhombic) .EQ. cOrthorhombic) THEN
+        tString = Integer2String(DICVOL_NumOfSolutions(4))
+        CALL WDialogPutString(IDF_LabProgOrthorhombic,tString(1:LEN_TRIM(tString)))
+      ENDIF
+      IF (IAND(TheCrystalSystem,cMonoclinic  ) .EQ. cMonoclinic  ) THEN
+        tString = Integer2String(DICVOL_NumOfSolutions(5))
+        CALL WDialogPutString(IDF_LabProgMonoclinic,tString(1:LEN_TRIM(tString)))
+      ENDIF
+      IF (IAND(TheCrystalSystem,cTriclinic   ) .EQ. cTriclinic   ) THEN
+        tString = Integer2String(DICVOL_NumOfSolutions(6))
+        CALL WDialogPutString(IDF_LabProgTriclinic,tString(1:LEN_TRIM(tString)))
+      ENDIF
+      CALL PeekEvent
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DICVOL_FinishedCrystalSystem
 !
 !*****************************************************************************
 !
@@ -748,13 +789,13 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
-      REAL Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
-      INTEGER Isystem(6), I, Iord
+      REAL Rvpar(2), Rdens, Rmolwt, Rexpzp
+      LOGICAL system(6)
+      INTEGER I, Iord
       INTEGER IHANDLE
       REAL    Epsilon
       REAL    MaxLen
-      LOGICAL, EXTERNAL :: FnUnitCellOK
-      LOGICAL, EXTERNAL :: Confirm
+      LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm, WDialogGetCheckBoxLogical
       REAL,    EXTERNAL :: TwoTheta2dSpacing
       REAL    MaxSinBeta
       REAL    tBeta
@@ -773,7 +814,6 @@
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDNEXT)
 !              CALL EstimateZeroPointError
-              Lambda = ALambda
               CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
               CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
               CALL WDialogGetReal(IDF_Indexing_Maxa, amax)
@@ -781,31 +821,26 @@
               Cmax = amax
               CALL WDialogGetReal       (IDF_Indexing_MinAng,      Bemin)
               CALL WDialogGetReal       (IDF_Indexing_MaxAng,      Bemax)
-              IF (Bemin .GT. Bemax) THEN
-                tBeta = Bemin
-                Bemin = Bemax
-                Bemax = tBeta
-              ENDIF
               CALL WDialogGetReal       (IDF_Indexing_Density,     Rdens)
               CALL WDialogGetReal       (IDF_Indexing_MolWt,       Rmolwt)
               CALL WDialogGetReal       (IDF_ZeroPoint,            Rexpzp)
-              CALL WDialogGetCheckBox   (IDF_Indexing_Cubic,       Isystem(1))
-              CALL WDialogGetCheckBox   (IDF_Indexing_Tetra,       Isystem(2))
-              CALL WDialogGetCheckBox   (IDF_Indexing_Hexa,        Isystem(3))
-              CALL WDialogGetCheckBox   (IDF_Indexing_Ortho,       Isystem(4))
-              CALL WDialogGetCheckBox   (IDF_Indexing_Monoclinic,  Isystem(5))
-              CALL WDialogGetCheckBox   (IDF_Indexing_Triclinic,   Isystem(6))
+              system(1) = WDialogGetCheckBoxLogical(IDF_Indexing_Cubic)
+              system(2) = WDialogGetCheckBoxLogical(IDF_Indexing_Tetra)
+              system(3) = WDialogGetCheckBoxLogical(IDF_Indexing_Hexa)
+              system(4) = WDialogGetCheckBoxLogical(IDF_Indexing_Ortho)
+              system(5) = WDialogGetCheckBoxLogical(IDF_Indexing_Monoclinic)
+              system(6) = WDialogGetCheckBoxLogical(IDF_Indexing_Triclinic)
               CALL WDialogGetReal       (IDF_eps,                  Epsilon)
               CALL WDialogGetReal       (IDF_Indexing_Fom,         fom)
               CALL WDialogGetReal       (IDF_Indexing_ScaleFactor, DV_ScaleFactor)
 ! Number of degrees of freedom, we don't even count the zero point
               NumDoF = 0
-              IF (Isystem(1) .EQ. 1) NumDof = MAX(NumDoF,1)
-              IF (Isystem(2) .EQ. 1) NumDof = MAX(NumDoF,2)
-              IF (Isystem(3) .EQ. 1) NumDof = MAX(NumDoF,2)
-              IF (Isystem(4) .EQ. 1) NumDof = MAX(NumDoF,3)
-              IF (Isystem(5) .EQ. 1) NumDof = MAX(NumDoF,4)
-              IF (Isystem(6) .EQ. 1) NumDof = MAX(NumDoF,6)
+              IF (system(1)) NumDof = MAX(NumDoF,1)
+              IF (system(2)) NumDof = MAX(NumDoF,2)
+              IF (system(3)) NumDof = MAX(NumDoF,2)
+              IF (system(4)) NumDof = MAX(NumDoF,3)
+              IF (system(5)) NumDof = MAX(NumDoF,4)
+              IF (system(6)) NumDof = MAX(NumDoF,6)
 ! Check if any crystal system checked at all
               IF (NumDoF .EQ. 0) THEN
                 CALL ErrorMessage('Please check at least one crystal system.')
@@ -826,7 +861,12 @@
               IF (DV_ScaleFactor .LT. 0.1) DV_ScaleFactor = 0.1
               IF (DV_ScaleFactor .GT. 5.0) DV_ScaleFactor = 5.0
 ! Check if the maximum angle has a reasonable value. Only necessary when monoclinic is searched
-              IF (Isystem(5) .EQ. 1) THEN
+              IF (system(5)) THEN
+                IF (Bemin .GT. Bemax) THEN
+                  tBeta = Bemin
+                  Bemin = Bemax
+                  Bemax = tBeta
+                ENDIF
                 IF ((Bemin .LT. 45.0) .OR. (Bemax .GT. 150.0)) THEN
                   CALL ErrorMessage('The range of the angle beta does not make sense.')
                   GOTO 999
@@ -840,86 +880,136 @@
                   ENDIF
                 ENDIF
               ELSE
-              MaxSinBeta = 1.0 ! Beta = 90.0
-            ENDIF
+                MaxSinBeta = 1.0 ! Beta = 90.0
+              ENDIF
 ! Add in very quick check: is the d-spacing belonging to the first peak greater
 ! than the maximum cell length requested? If so, tell the user he/she is a moron.
-            MaxLen = MaxSinBeta*amax
+              MaxLen = MaxSinBeta*amax
 ! Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
-            IF ((TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1)))*DV_ScaleFactor) .GT. MaxLen) THEN
-              CALL ErrorMessage('The maximum cell axis length is shorter than required for indexing the first peak.')
-              GOTO 999
-            ENDIF
-            n = NTPeak
-            wave2 = (Lambda / 2) * DV_ScaleFactor
-            epst = Epsilon + 0.015
-            DO I = 1, n
-              epsil(I) = Epsilon * DV_ScaleFactor
-            ENDDO
-            DO I = 1, NTPeak
-              IOrd = IOrdTem(I)
-              d(I) = AllPkPosVal(IOrd) - Rexpzp
-            ENDDO
-            CALL WCursorShape(CurHourGlass)
-            NumOfDICVOLSolutions = 0
-            CALL WDialogSelect(IDD_DICVOLRunning)
-            CALL WDialogShow(-1,-1,0,SemiModeless)
-            CALL DICVOL91(Isystem(1),Isystem(2),Isystem(3),Isystem(4),Isystem(5),Isystem(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
-            CALL WDialogHide
-            CALL WCursorShape(CurCrossHair)
+              IF ((TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1)))*DV_ScaleFactor) .GT. MaxLen) THEN
+                CALL ErrorMessage('The maximum cell axis length is shorter than required for indexing the first peak.')
+                GOTO 999
+              ENDIF
+              n = NTPeak
+              wave2 = (ALambda / 2) * DV_ScaleFactor
+              epst = (Epsilon + 0.015) * DV_ScaleFactor
+              DO I = 1, n
+                epsil(I) = Epsilon * DV_ScaleFactor
+              ENDDO
+              DO I = 1, NTPeak
+                IOrd = IOrdTem(I)
+                d(I) = AllPkPosVal(IOrd) - Rexpzp
+              ENDDO
+              CALL WCursorShape(CurHourGlass)
+              NumOfDICVOLSolutions = 0
+              CALL WDialogSelect(IDD_DICVOLRunning)
+              IF (system(1)) THEN
+                CALL WDialogFieldState(IDF_LabCubic            ,DialogReadOnly)
+                CALL WDialogFieldState(IDF_LabProgCubic        ,DialogReadOnly)
+              ELSE
+                CALL WDialogFieldState(IDF_LabCubic            ,Disabled)
+                CALL WDialogFieldState(IDF_LabProgCubic        ,Disabled)
+              ENDIF
+              IF (system(2)) THEN
+                CALL WDialogFieldState(IDF_LabTetragonal       ,DialogReadOnly)
+                CALL WDialogFieldState(IDF_LabProgTetragonal   ,DialogReadOnly)
+              ELSE
+                CALL WDialogFieldState(IDF_LabTetragonal       ,Disabled)
+                CALL WDialogFieldState(IDF_LabProgTetragonal   ,Disabled)
+              ENDIF
+              IF (system(3)) THEN
+                CALL WDialogFieldState(IDF_LabHexagonal        ,DialogReadOnly)
+                CALL WDialogFieldState(IDF_LabProgHexagonal    ,DialogReadOnly)
+              ELSE
+                CALL WDialogFieldState(IDF_LabHexagonal        ,Disabled)
+                CALL WDialogFieldState(IDF_LabProgHexagonal    ,Disabled)
+              ENDIF
+              IF (system(4)) THEN
+                CALL WDialogFieldState(IDF_LabOrthorhombic     ,DialogReadOnly)
+                CALL WDialogFieldState(IDF_LabProgOrthorhombic ,DialogReadOnly)
+              ELSE
+                CALL WDialogFieldState(IDF_LabOrthorhombic     ,Disabled)
+                CALL WDialogFieldState(IDF_LabProgOrthorhombic ,Disabled)
+              ENDIF
+              IF (system(5)) THEN
+                CALL WDialogFieldState(IDF_LabMonoclinic       ,DialogReadOnly)
+                CALL WDialogFieldState(IDF_LabProgMonoclinic   ,DialogReadOnly)
+              ELSE
+                CALL WDialogFieldState(IDF_LabMonoclinic       ,Disabled)
+                CALL WDialogFieldState(IDF_LabProgMonoclinic   ,Disabled)
+              ENDIF
+              IF (system(6)) THEN
+                CALL WDialogFieldState(IDF_LabTriclinic        ,DialogReadOnly)
+                CALL WDialogFieldState(IDF_LabProgTriclinic    ,DialogReadOnly)
+              ELSE
+                CALL WDialogFieldState(IDF_LabTriclinic        ,Disabled)
+                CALL WDialogFieldState(IDF_LabProgTriclinic    ,Disabled)
+              ENDIF
+              CALL WDialogPutString(IDF_LabProgCubic,' ')
+              CALL WDialogPutString(IDF_LabProgTetragonal,' ')
+              CALL WDialogPutString(IDF_LabProgHexagonal,' ')
+              CALL WDialogPutString(IDF_LabProgOrthorhombic,' ')
+              CALL WDialogPutString(IDF_LabProgMonoclinic,' ')
+              CALL WDialogPutString(IDF_LabProgTriclinic,' ')
+              CALL WDialogShow(-1,-1,0,Modeless)
+              CALL WCursorShape(CurHourGlass)
+              CALL DICVOL91(system(1),system(2),system(3),system(4),system(5),system(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
+              CALL WDialogSelect(IDD_DICVOLRunning)
+              CALL WDialogHide
+              CALL WCursorShape(CurCrossHair)
 ! Pop up a window showing the DICVOL output file in a text editor
-            CALL WindowOpenChild(IHANDLE)
-            CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
+              CALL WindowOpenChild(IHANDLE)
+              CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
 ! If 'ViewOnly' is specified:
 ! 1. The file can be accessed while it is displayed.
-! 2. There is no 'Save as...' option the menu.
+! 2. There is no 'Save as...' option in the menu.
 ! If the output file is viewed without 'ViewOnly', the file cannot be accessed, which means that
 ! DICVOL returns with an error message which means that there are no solutions.
 ! Hence, this way, DICVOL can be run several times in succession and the results can be compared
 ! on screen. To save one of the output files (that all have the same name),
 ! the user must select all text and copy and paste it to an other editor window.
-            CALL SetChildWinAutoClose(IHANDLE)
-            IF (NumOfDICVOLSolutions .EQ. 0) THEN
-              CALL ErrorMessage('No solutions were found.')
-              GOTO 999
-            ENDIF  
-            IF (DICVOL_Error .EQ. cDICVOL_TooManySolutions) CALL WarningMessage('More than 30 solutions found, please check your data.')
+              CALL SetChildWinAutoClose(IHANDLE)
+              IF (NumOfDICVOLSolutions .EQ. 0) THEN
+                CALL ErrorMessage('No solutions were found.')
+                GOTO 999
+              ENDIF  
+              IF (DICVOL_Error .EQ. cDICVOL_TooManySolutions) CALL WarningMessage('More than 30 solutions found, please check your data.')
 ! If only a single solution, and no valid cell available, import that solution by default
-            IF ((NumOfDICVOLSolutions.EQ.1) .AND. (.NOT. FnUnitCellOK())) THEN
+              IF ((NumOfDICVOLSolutions.EQ.1) .AND. (.NOT. FnUnitCellOK())) THEN
 ! Import the unit cell parameters into DASH
-              CellPar(1) = DICVOLSolutions(1)%a
-              CellPar(2) = DICVOLSolutions(1)%b
-              CellPar(3) = DICVOLSolutions(1)%c
-              CellPar(4) = DICVOLSolutions(1)%alpha
-              CellPar(5) = DICVOLSolutions(1)%beta
-              CellPar(6) = DICVOLSolutions(1)%gamma
-              LatBrav = DICVOLSolutions(1)%CrystalSystem
-              CALL Upload_CrystalSystem
-              CALL UpdateCell()
-            ENDIF
+                CellPar(1) = DICVOLSolutions(1)%a
+                CellPar(2) = DICVOLSolutions(1)%b
+                CellPar(3) = DICVOLSolutions(1)%c
+                CellPar(4) = DICVOLSolutions(1)%alpha
+                CellPar(5) = DICVOLSolutions(1)%beta
+                CellPar(6) = DICVOLSolutions(1)%gamma
+                LatBrav = DICVOLSolutions(1)%CrystalSystem
+                CALL Upload_CrystalSystem
+                CALL UpdateCell()
+              ENDIF
 ! Pop up the next Wizard window showing the solutions, so that the user can choose one to be imported into DASH
-            CALL WDialogSelect(IDD_PW_Page9)
+              CALL WDialogSelect(IDD_PW_Page9)
 ! Clear all fields in the grid
-            CALL WDialogClearField(IDF_DV_Summary_0)
-            WRITE(nStr,'(I2)') n
-            CALL StrClean(nStr,ilen)
-            CALL WGridLabelColumn(IDF_DV_Summary_0,10,'M('//nStr(1:ilen)//')')
-            CALL WGridLabelColumn(IDF_DV_Summary_0,11,'F('//nStr(1:ilen)//')')
+              CALL WDialogClearField(IDF_DV_Summary_0)
+              WRITE(nStr,'(I2)') n
+              CALL StrClean(nStr,ilen)
+              CALL WGridLabelColumn(IDF_DV_Summary_0,10,'M('//nStr(1:ilen)//')')
+              CALL WGridLabelColumn(IDF_DV_Summary_0,11,'F('//nStr(1:ilen)//')')
 ! Set the number of rows in the grid to the number of solutions.
-            CALL WGridRows(IDF_DV_Summary_0,NumOfDICVOLSolutions)
-            DO I = 1, NumOfDICVOLSolutions
-              CALL WGridPutCellString(IDF_DV_Summary_0, 2,I,CrystalSystemString(DICVOLSolutions(I)%CrystalSystem))
-              CALL WGridPutCellReal  (IDF_DV_Summary_0, 3,I,DICVOLSolutions(I)%a,'(F8.4)')
-              CALL WGridPutCellReal  (IDF_DV_Summary_0, 4,I,DICVOLSolutions(I)%b,'(F8.4)')
-              CALL WGridPutCellReal  (IDF_DV_Summary_0, 5,I,DICVOLSolutions(I)%c,'(F8.4)')
-              CALL WGridPutCellReal  (IDF_DV_Summary_0, 6,I,DICVOLSolutions(I)%alpha,'(F7.3)')
-              CALL WGridPutCellReal  (IDF_DV_Summary_0, 7,I,DICVOLSolutions(I)%beta,'(F7.3)')
-              CALL WGridPutCellReal  (IDF_DV_Summary_0, 8,I,DICVOLSolutions(I)%gamma,'(F7.3)')
-              CALL WGridPutCellReal  (IDF_DV_Summary_0, 9,I,DICVOLSolutions(I)%Volume,'(F9.2)')
-              IF (DICVOLSolutions(I)%M .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,10,I,DICVOLSolutions(I)%M,'(F7.1)')
-              IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,11,I,DICVOLSolutions(I)%F,'(F7.1)')
-            ENDDO
-            CALL WizardWindowShow(IDD_PW_Page9)
+              CALL WGridRows(IDF_DV_Summary_0,NumOfDICVOLSolutions)
+              DO I = 1, NumOfDICVOLSolutions
+                CALL WGridPutCellString(IDF_DV_Summary_0, 2,I,CrystalSystemString(DICVOLSolutions(I)%CrystalSystem))
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 3,I,DICVOLSolutions(I)%a,'(F8.4)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 4,I,DICVOLSolutions(I)%b,'(F8.4)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 5,I,DICVOLSolutions(I)%c,'(F8.4)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 6,I,DICVOLSolutions(I)%alpha,'(F7.3)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 7,I,DICVOLSolutions(I)%beta,'(F7.3)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 8,I,DICVOLSolutions(I)%gamma,'(F7.3)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 9,I,DICVOLSolutions(I)%Volume,'(F9.2)')
+                IF (DICVOLSolutions(I)%M .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,10,I,DICVOLSolutions(I)%M,'(F7.1)')
+                IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,11,I,DICVOLSolutions(I)%F,'(F7.1)')
+              ENDDO
+              CALL WizardWindowShow(IDD_PW_Page9)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -1018,11 +1108,7 @@
             CASE (ID_PW_DF_Open)
               CALL WDialogGetString(IDF_PW_DataFileName_String,CTEMP)
               ISTAT = DiffractionFileOpen(CTEMP)
-              IF (ISTAT .EQ. 1) THEN
-                CALL WDialogFieldState(IDNEXT,Enabled)
-              ELSE
-                CALL WDialogFieldState(IDNEXT,Disabled)
-              ENDIF
+              CALL WDialogFieldStateLogical(IDNEXT,ISTAT .EQ. 1)
             CASE (IDBBROWSE)
               ISTAT = DiffractionFileBrowse()
 ! Don't change if the user pressed 'Cancel' (ISTAT = 2)
@@ -1112,7 +1198,7 @@
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
             CASE (IDB_Delabc)
-              IF (Confirm('Do you wish to clear all cell parameters?')) CALL Clear_UnitCell
+              CALL Clear_UnitCell_WithConfirmation
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
