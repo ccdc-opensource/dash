@@ -203,13 +203,11 @@
       INCLUDE 'PARAMS.INC' 
 
       REAL                    chi_sqd
-      INTEGER                                           it_count
-      REAL                                                        chi_y_max
-      INTEGER                                                            MaxIterationSoFar
-      REAL                    chi_x_max, chi_x_min, chi_y_min
-      LOGICAL                                      Zoomed
-      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, chi_y_max, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, Zoomed
+      INTEGER                                           Curr_Iter, MaxIterationSoFar
+      REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
+      LOGICAL                                                             Zoomed
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves

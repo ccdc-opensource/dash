@@ -3,7 +3,7 @@
 !
       SUBROUTINE SA_OUTPUT(T,CHIMIN,CHIAV,CHIESD,&
       xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,&
-      ntotmov,iteration)
+      ntotmov)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -11,10 +11,13 @@
       IMPLICIT NONE
 
       REAL T, CHIMIN, CHIAV, CHIESD
-      INTEGER n, NUP, NDOWN, NREJ, ntotmov, iteration
+      INTEGER n, NUP, NDOWN, NREJ, ntotmov
       REAL*8 xopt(*),dxvav(*),xvsig(*),flav(*),lb(*),ub(*),vm(*)
 
       INCLUDE 'PARAMS.INC'
+
+      INTEGER         Curr_SA_Iteration
+      COMMON /ITRINF/ Curr_SA_Iteration
 
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
@@ -118,7 +121,7 @@
       CALL IGrSelect(3,IDF_SA_move_distribution)
       ruler = FLOAT(nmpert)
       CALL IGrUnits(0.0,0.0,ruler,1.0)
-      IF (iteration .EQ. 1) THEN
+      IF (Curr_SA_Iteration .EQ. 1) THEN
         CALL IGrColourN(208) ! Black
         CALL IGrRectangle(0.0,rminh,ruler,rmaxh)
       ELSE

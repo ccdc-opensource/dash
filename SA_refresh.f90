@@ -14,8 +14,8 @@
       INTEGER              iMyExit, num_new_min
       COMMON / CMN000001 / iMyExit, num_new_min
 
-      INTEGER                    ChiSqdChildWindows,                 ChiHandle
-      COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
+ !O     INTEGER                    ChiSqdChildWindows,                 ChiHandle
+ !O     COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
@@ -38,7 +38,7 @@
               CALL WDialogShow(-1,-1,IDOK,Modeless)
             CASE (IDB_Prog3)
               CALL OpenChiSqPlotWindow
-              CALL plotting_Chi_sqd(ChiHandle)
+              CALL plotting_Chi_sqd
             CASE (IDF_StartNext) ! 'Start Next'
               iMyExit = 4
             CASE (IDF_StopSA, IDCANCEL) ! 'Stop'

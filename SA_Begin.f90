@@ -24,10 +24,11 @@
       COMMON / CMN000001 / iMyExit, num_new_min
 
       REAL                    chi_sqd
-      INTEGER                                           it_count
-      REAL                                                        y_max
-      INTEGER                                                            MaxIterationSoFar
-      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
+      INTEGER                                           Curr_Iter, MaxIterationSoFar
+      REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
+      LOGICAL                                                             Zoomed
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
 
       LOGICAL         InSA
       COMMON /SADATA/ InSA

@@ -92,14 +92,14 @@
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
 ! but these mappings are.
 
-      INTEGER        IDFZMNumber,           IDFZMFile,                &
-                     IDBZMDelete,           IDBZMBrowse,              &
-                     IDBZMView,             IDBZMEdit,                &
+      INTEGER        IDFZMNumber,                    IDFZMFile,                &
+                     IDBZMDelete,                    IDBZMBrowse,              &
+                     IDBZMView,                      IDBZMEdit,                &
                      IDFZMpars
-      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),      &
-                     IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
-                     IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg)
+      COMMON /IDFZM/ IDFZMNumber(1:maxfrginterface), IDFZMFile(1:maxfrginterface),      &
+                     IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
+                     IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
+                     IDFZMpars(1:maxfrginterface)
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -140,7 +140,7 @@
               CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
               CALL SDIFileOpen(SDIFile)
             CASE (IDB_SA_Project_Import)
-! JCC Import .. convert a mol/pdb/mol2 file into a Z-matrix
+! Import .. convert a mol/pdb/mol2 file into a Z-matrix
               CALL ImportZmatrix('')
             CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4, IDB_zmDelete5, IDB_zmDelete6)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
@@ -184,7 +184,7 @@
                   gotzmfile(iFrg) = .TRUE.
 ! Initialise 'Number of' field to 1
                   CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
-! JCC traps for Z-matrix reading
+! traps for Z-matrix reading
                 ELSE 
                   gotzmfile(iFrg) = .FALSE. 
                   CALL FileErrorPopup(frag_file(iFrg),zmread)
@@ -238,6 +238,15 @@
               ENDDO
               CALL ShowEditZMatrixWindow(iFrg)
           END SELECT
+        CASE (FieldChanged)
+          DO iFrg = 1, maxfrginterface
+            IF ((EventInfo%VALUE1 .EQ. IDFzmNumber(iFrg)) .OR. (EventInfo%VALUE2 .EQ. IDFzmNumber(iFrg))) THEN
+              ! Winteracter doesn't allow us to keep track of the "number of copies" input box
+              ! having been changed, and we need to have updated the internal variables before
+              ! calling UpdateZmatrixSelection(), so we will read out those boxes now.
+              CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+            ENDIF
+          ENDDO
       END SELECT
   999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
@@ -747,7 +756,6 @@
 ! RETURNS : 0 for success
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
       USE SAMVAR
@@ -1163,7 +1171,6 @@
 ! RETURNS : 0 for success
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
 
@@ -1735,8 +1742,6 @@
       CALL WDialogSelect(IDD_ModalDialog)
 
 !     Clear Fields
-      CALL WDialogClearField(IDF_TorsionName)
-      CALL WDialogClearField(IDF_Initial)
       CALL WDialogClearField(IDF_ModalUpper)
       CALL WDialogClearField(IDF_ModalLower)
       CALL WDialogClearField(IDF_ReportLower1)
@@ -1758,7 +1763,7 @@
           CALL WDialogPutReal(IDF_ModalLower,((-1)*OneEighty),'(F12.5)')
           CALL WDialogPutReal(IDF_ModalUpper,Zero,'(F12.5)')
           CALL WDialogPutReal(IDF_ReportLower1,Zero,'(F12.5)')
-          CALL WDialogPutReal(IDF_ReportUpper1,((-1)*OneEighty),'(F12.5)')
+          CALL WDialogPutReal(IDF_ReportUpper1,OneEighty,'(F12.5)')
         ENDIF
       ELSE
         CALL WDialogPutReal(IDF_ModalLower,SNGL(lb(IFRow)),'(F12.5)')
@@ -1828,12 +1833,12 @@
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
       SAVE   /ModalTorsions/
 
+      LOGICAL, EXTERNAL :: CheckXInBounds
       INTEGER ICol, NumColumns, ISET
       INTEGER Upper, Lower
       REAL    Zero, OneEighty, xtem, ttem
       DOUBLE PRECISION TempDouble
       REAL TempPrevub, TempPrevlb, TempPrevx
-      LOGICAL OutOfBounds
 
 ! Initialise variables          
       ICol = 0
@@ -1978,8 +1983,7 @@
               CALL WDialogGetDouble(IDF_ModalUpper, tempdouble)
               ub(RowNumber) = tempdouble
 !             Check that x is in bounds
-              CALL CheckXInBounds(RowNumber, X(RowNumber), OutOfBounds)
-              IF(OutofBounds) THEN
+              IF (CheckXInBounds(RowNumber, X(RowNumber))) THEN
                 CALL WarningMessage('Initial value does not fall within defined ranges')
                 IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOk) THEN
                   CALL PopActiveWindowID
@@ -2027,21 +2031,17 @@
 
       IMPLICIT NONE
       
-      REAL Angle
-      REAL TempAngle
+      REAL, INTENT (INOUT) :: Angle
 
-      IF ((Angle .GE. 0.00) .AND. (Angle .LE. 180.00)) RETURN
-
-      IF ((Angle .GT. 180.00) .AND. (Angle .LE. 360.00)) THEN
-        TempAngle = ((-1) * 180.00 + (Angle - 180.00))
-        Angle = TempAngle
+      IF ((Angle .GE. -180.0) .AND. (Angle .LE.  180.0)) RETURN
+      IF ((Angle .GT.  180.0) .AND. (Angle .LE.  360.0)) THEN
+        Angle = Angle - 360.0
+        RETURN
       ENDIF
-
-      IF ((Angle .LT. -180.00) .AND. (Angle .GE. -360.00)) THEN
-        Angle = 360.00 - Angle
+  !    CALL DebugErrorMessage("Modal torsion angle not in range I")
+      IF ((Angle .LT. -180.0) .AND. (Angle .GE. -360.0)) THEN
+        Angle = 360.0 - Angle    ! ? Is this correct?
       ENDIF
-      RETURN
-        
 
       END SUBROUTINE ThreeSixtyToOneEighty
 !
@@ -2051,22 +2051,16 @@
 
       IMPLICIT NONE
       
-      REAL Angle
-      REAL TempAngle
+      REAL, INTENT (INOUT) :: Angle
 
-      IF ((Angle .GE. 0.00) .AND. (Angle .LE. 180.00)) RETURN
-      IF ((Angle .GT. 180.00) .AND. (Angle .LE. 360.00)) RETURN
-
+      IF ((Angle .GE. 0.00) .AND. (Angle .LE.  360.00)) RETURN
       IF ((Angle .LT. 0.00) .AND. (Angle .GE. -180.00)) THEN
-        TempAngle = 360.00 + Angle
-        Angle = TempAngle
+        Angle = Angle + 360.0
+        RETURN
       ENDIF
-
-      RETURN
-        
+   !   CALL DebugErrorMessage("Modal torsion angle not in range II")
 
       END SUBROUTINE OneEightyToThreeSixty
-
 !
 !*****************************************************************************
 !
@@ -2100,7 +2094,6 @@
 !
 !*****************************************************************************
 !
-
       SUBROUTINE CheckTrimodalBounds(OneEightyScale)
 
 ! Determines whether it is appropriate to use a -180 to 0 and 0 to 180 degree 
@@ -2165,15 +2158,10 @@
 !*****************************************************************************
 !
 
-      SUBROUTINE CheckXInBounds(npar, XIn, OutofBounds)
+      LOGICAL FUNCTION CheckXInBounds(npar, XIn)
 
 ! This Subroutine determines if a trial torsion angle value is within
 ! modal torsion angle ranges defined.
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-      USE ZMVAR
 
       IMPLICIT NONE      
 
@@ -2184,7 +2172,6 @@
 
       INTEGER                ModalFlag,       RowNumber      
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNUmber
-      SAVE   /ModalTorsions/    
 
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds 
@@ -2192,14 +2179,12 @@
       INTEGER npar, I, Upper, Lower
 
       LOGICAL OneEightyScale
-      LOGICAL OutOfBounds
       REAL xtem, tempupper, templower, tempupper2, templower2
       DOUBLE PRECISION, INTENT (INOUT) :: XIn
 
       Upper = 1
       Lower = 2
-
-      OutOfBounds = .FALSE.
+      CheckXInBounds = .FALSE.
       SELECT  CASE(ModalFlag(npar))
         CASE (2) ! bimodal ranges
           IF (UB(npar) * LB(npar) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
@@ -2213,33 +2198,33 @@
             CALL OneEightyToThreeSixty(TempLower2)
             xtem = XIn                                                                                     
             IF ((xtem .LT. -180.00) .OR. (xtem .GT. 180.00)) THEN
-              OutOfBounds = .TRUE.
+              CheckXInBounds = .TRUE.
             ELSE
               CALL OneEightytoThreeSixty(xtem)
-              IF (((xtem .LT. MAX(TempLower, TempLower2)) .AND. (xtem .GT. MIN(TempLower, TempLower2))) &
-              .OR. ((xtem .LT. MAX(TempUpper, TempUpper2)) .AND. (xtem .GT. MIN(TempUpper, TempUpper2)))) THEN
-                OutOfBounds = .TRUE.                                       
+              IF (((xtem .LT. MAX(TempLower, TempLower2)) .AND. &
+                   (xtem .GT. MIN(TempLower, TempLower2))) .OR. &
+                  ((xtem .LT. MAX(TempUpper, TempUpper2)) .AND. &
+                   (xtem .GT. MIN(TempUpper, TempUpper2)))) THEN
+                CheckXInBounds = .TRUE.                                       
               ENDIF
             ENDIF
-
           ELSEIF (UB(npar) * LB(npar) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
               IF ((XIn .LT. -180.00) .OR. (XIn .GT. 180.00)) THEN
-                OutOfBounds = .TRUE.     
+                CheckXInBounds = .TRUE.     
               ELSE
                 IF ((XIn .LT. LB(npar)) .OR. (XIn .GT. UB(npar))) THEN
                   IF (((XIn .LT. (-1)*UB(npar)) .OR. (XIn .GT. (-1)*LB(npar)))) THEN !out of bounds            
-                    OutOfBounds = .TRUE.
+                    CheckXInBounds = .TRUE.
                   ENDIF
                 ENDIF
               ENDIF
           ENDIF
-
         CASE(3) !trimodal ranges
           xtem = XIn
           CALL DetermineTriModalBounds(SNGL(UB(npar)), Upper)
           CALL DetermineTriModalBounds(SNGL(LB(npar)), Lower)
           IF ((xtem .LT. -180.00) .OR. (xtem .GT.180.00)) THEN
-            OutOfBounds = .TRUE.
+            CheckXInBounds = .TRUE.
           ELSE                 
             CALL CheckTriModalBounds(OneEightyScale)
             IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
@@ -2249,7 +2234,6 @@
                 CALL OneEightyToThreeSixty(TempBounds(I,Lower))
               ENDDO
             ENDIF
-
 !           Determine if XP is in any of the three torsion angle ranges              
             TempUpper = MAX(Tempbounds(1,Upper), Tempbounds(1,Lower))!!UB(H)
             TempLower = MIN(Tempbounds(1,Lower), Tempbounds(1,Upper))!!LB(H)
@@ -2260,13 +2244,11 @@
                 TempUpper = MAX(Tempbounds(3,Upper), Tempbounds(3,Lower))
                 TempLower = MIN(Tempbounds(3,Upper), Tempbounds(3,Lower))
                 IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN        
-                  OutOfBounds = .TRUE.
+                  CheckXInBounds = .TRUE.
                 ENDIF
               ENDIF
             ENDIF
           ENDIF
       END SELECT
 
-      RETURN 
-
-      END SUBROUTINE CheckXInBounds
+      END FUNCTION CheckXInBounds
