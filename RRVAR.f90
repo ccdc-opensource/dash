@@ -12,7 +12,7 @@
       PARAMETER ( RR_maxatm = 150 )
 
       INTEGER RR_maxfrg
-      PARAMETER ( RR_maxfrg = 4 )
+      PARAMETER ( RR_maxfrg = 32 )
 
       INTEGER RR_maxcopies
       PARAMETER ( RR_maxcopies = 8 )
