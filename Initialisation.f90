@@ -16,10 +16,10 @@
 ! Determine the directory where DASH.exe resides and store it in "InstallationDirectory"
       tSize = MaxPathLength
       tProcess = 0 ! this program
-      CALL GetModuleFileName(tProcess,tString,LOC(tSize))
+      CALL GetModuleFileName(tProcess, tString, LOC(tSize))
 ! tString should now contain the full path to DASH.exe irrespective of the way
 ! DASH has been invoked.
-      CALL SplitPath(tString,InstallationDirectory,tFile)
+      CALL SplitPath(tString, InstallationDirectory, tFile)
       IF (LEN_TRIM(InstallationDirectory) .EQ. 0) InstallationDirectory = '.'//DIRSPACER
       CALL IOsDirChange(InstallationDirectory)
       CALL IOsDirName(InstallationDirectory)
@@ -357,10 +357,10 @@
       CALL WDialogPutInteger(IDF_SA_RandomSeed1, ISeed1)
       CALL WDialogPutInteger(IDF_SA_RandomSeed2, ISeed2)
       CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
+      CALL WDialogPutReal(IDF_eps, 0.03, '(F5.3)')
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutString(IDF_ViewExe,ViewExe)
-      CALL WDialogPutString(IDF_ViewArg,ViewArg)
+      CALL WDialogPutString(IDF_ViewExe, ViewExe)
+      CALL WDialogPutString(IDF_ViewArg, ViewArg)
       CALL WDialogPutString(IDF_MogulExe, MogulExe)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, .TRUE.)
       SA_SimplexDampingFactor = 0.1
@@ -471,7 +471,7 @@
                                        KolBack%IBlue)
 ! Initialise bitmap 'Temperature1.bmp'
 ! Rather than loading it from file, it is now calculated.
-      CALL WBitMapCreate(bmIHANDLE,iWidth,iHeight)
+      CALL WBitMapCreate(bmIHANDLE, iWidth, iHeight)
       DO J = 1, iHeight
         DO I = 1, iWidth
 ! Red
@@ -505,7 +505,7 @@
           tData(I,J) = iRGBvalue
         ENDDO    
       ENDDO              
-      CALL WBitMapGetData(bmIHANDLE,tData)
+      CALL WBitMapGetData(bmIHANDLE, tData)
 
       END SUBROUTINE InitialiseVariables
 !
@@ -775,7 +775,7 @@
       MainVersionLen = LEN_TRIM(MainVersionStr)
       CALL GetSubString(tString, '.', SubVersionStr)
       SubVersionLen = LEN_TRIM(SubVersionStr)
-      CALL FileReadLogical(hFile,RecNr,UseConfigFile)
+      CALL FileReadLogical(hFile, RecNr, UseConfigFile)
       IF (.NOT. UseConfigFile) THEN
         CALL DebugErrorMessage('Config file not used.')
         GOTO 999
@@ -851,42 +851,42 @@
       CALL FileRWInteger(hFile, RecNr, RW, KolBack%IBlue)
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
 ! Show error bars YES / NO
-      CALL FileReadLogical(hFile,RecNr,tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_ErrorBar_Check,tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_ErrorBar_Check, tLogical)
 ! Show background YES / NO
-      CALL FileReadLogical(hFile,RecNr,tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_background_check,tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_background_check, tLogical)
 ! Connect data points with lines YES / NO
-      CALL FileReadLogical(hFile,RecNr,tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_ConnectObsPoints,tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_ConnectObsPoints, tLogical)
 ! Plot peak fit difference YES / NO
-      CALL FileReadLogical(hFile,RecNr,tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_PlotPeakFitDif,tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_PlotPeakFitDif, tLogical)
 ! Read the default working directory
-      CALL FileReadString(hFile,RecNr,tString)
+      CALL FileReadString(hFile, RecNr, tString)
 ! Read defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
-      CALL FileReadInteger(hFile,RecNr,tInteger)      ! Number of iterations
-      CALL WDialogPutInteger(IDF_NumOfIterations,tInteger)
-      CALL FileReadInteger(hFile,RecNr,tInteger)      ! Window
-      CALL WDialogPutInteger(IDF_WindowWidth,tInteger)
-      CALL FileReadLogical(hFile,RecNr,tLogical)      ! Use Monte Carlo YES / NO
-      CALL WDialogPutCheckBoxLogical(IDF_UseMCYN,tLogical)
-      CALL FileReadLogical(hFile,RecNr,tLogical)      ! Use spline smooth YES / NO
+      CALL FileReadInteger(hFile, RecNr, tInteger)      ! Number of iterations
+      CALL WDialogPutInteger(IDF_NumOfIterations, tInteger)
+      CALL FileReadInteger(hFile, RecNr, tInteger)      ! Window
+      CALL WDialogPutInteger(IDF_WindowWidth, tInteger)
+      CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use Monte Carlo YES / NO
+      CALL WDialogPutCheckBoxLogical(IDF_UseMCYN, tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use spline smooth YES / NO
 ! Read default wavelength
-      CALL FileReadReal(hFile,RecNr,tReal)
+      CALL FileReadReal(hFile, RecNr, tReal)
       CALL Set_Wavelength(tReal)
 ! Read default maximum resolution
-      CALL FileReadReal(hFile,RecNr,DefaultMaxResolution)
+      CALL FileReadReal(hFile, RecNr, DefaultMaxResolution)
 ! Now initialise the maximum resolution in the dialogue window
       CALL Update_TruncationLimits
 ! Read the viewer
       CALL WDialogSelect(IDD_Configuration)
-      CALL FileReadString(hFile,RecNr,ViewExe)
-      CALL WDialogPutString(IDF_ViewExe,ViewExe)
+      CALL FileReadString(hFile, RecNr, ViewExe)
+      CALL WDialogPutString(IDF_ViewExe, ViewExe)
 ! and the viewer arguments
-      CALL FileReadString(hFile,RecNr,ViewArg)
-      CALL WDialogPutString(IDF_ViewArg,ViewArg)
+      CALL FileReadString(hFile, RecNr, ViewArg)
+      CALL WDialogPutString(IDF_ViewArg, ViewArg)
 ! Read hydrogen treatment. This was a LOGICAL for versions below DASH 2.2
       IF ( (MainVersionStr .EQ. "1") .OR.    &
           ((MainVersionStr .EQ. "2") .AND. ((SubVersionStr .EQ. "0") .OR. (SubVersionStr .EQ. "1") .OR. (SubVersionStr .EQ. "2"))) ) THEN
@@ -902,8 +902,8 @@
         LOG_HYDROGENS = (tInteger .EQ. 3)
       ENDIF
 ! Colour flexible torsions (in Z-matrix viewer) YES / NO
-      CALL FileReadLogical(hFile,RecNr,tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors, tLogical)
 ! Read YES / NO which molecular file formats are to be written out when a best solution is found
       CALL FileReadLogical(hFile, RecNr, tLogical)   ! 1. .pdb  ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputPDB, tLogical)
@@ -950,7 +950,7 @@
 ! Atom labels for SA solutions overlay. Two options: 
 ! 1. "Element symbol + solution number"
 ! 2. "Original atom labels"
-      CALL FileReadInteger(hFile,RecNr,tInteger)
+      CALL FileReadInteger(hFile, RecNr, tInteger)
       SELECT CASE (tInteger)
         CASE (1)
           CALL WDialogPutRadioButton(IDF_UseSolutionNr)
@@ -960,7 +960,7 @@
 ! Atom colours for SA solutions overlay. Two options: 
 ! 1. "By solution number"
 ! 2. "By element"
-      CALL FileReadInteger(hFile,RecNr,tInteger)
+      CALL FileReadInteger(hFile, RecNr, tInteger)
       SELECT CASE (tInteger)
         CASE (1)
           CALL WDialogPutRadioButton(IDF_ColourBySolution)
@@ -982,7 +982,7 @@
       CALL WDialogPutCheckBoxLogical(IDF_ShowCumChiSqd, tLogical)
 ! Following is new in DASH 2.2
 ! Divide difference by ESDs
-      CALL FileReadLogical(hFile,RecNr,tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
       IF (GetBFIOError() .NE. 0) THEN
         CLOSE(hFile)
         RETURN
@@ -992,12 +992,11 @@
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL Set_AutoAlign(tLogical)
 ! Read the Mogul path
+      CALL FileReadString(hFile, RecNr, MogulExe)
       CALL WDialogSelect(IDD_Configuration)
-      CALL FileReadString(hFile,RecNr,MogulExe)
       CALL WDialogPutString(IDF_MogulExe,MogulExe)
 ! Use Mogul
-      CALL FileReadLogical(hFile, RecNr, tLogical)
-      UseMogul = tLogical
+      CALL FileReadLogical(hFile, RecNr, UseMogul)
       CLOSE(hFile)
       RETURN
   999 CALL DebugErrorMessage('Error while opening config file')
