@@ -100,6 +100,7 @@
 ! Enable the appropriate menus:
       CALL SetModeMenuState(1,-1)
       DashRawFile = FNAME(1:LEN_TRIM(FNAME))
+      DefaultMaxResolution = DASHDefaultMaxResolution
       CALL Update_TruncationLimits
 
       END FUNCTION DiffractionFileOpen
@@ -279,7 +280,7 @@
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page8)
-      CALL WDialogFieldState(IDB_PrevRes,Disabled)
+      CALL WDialogFieldState(IDB_PrevRes, Disabled)
       CALL PopActiveWindowID
 
       END FUNCTION DiffractionFileLoad
