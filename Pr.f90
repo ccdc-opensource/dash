@@ -1874,7 +1874,7 @@
 
       DIMENSION ALSQ(MATSZ)
       DIMENSION IH(3), ADIAG(MaxBVar), ICOV(30)
-      CHARACTER*80 FMT1, FMT2
+      CHARACTER*80 FMT1, FMT2, FMT3
 
       PARAMETER (IREFSM=2000)
 
@@ -1935,7 +1935,7 @@
 
       DATA FMT1/'(3I5  ,F10.3,F10.4,I5,30I4)'/
       DATA FMT2/'(3I5  ,3(F10.3,F10.4))'/
-
+      DATA FMT3/'(3I5  ,F10.3,F10.4,I5,30I5)'/
 ! OUT IF LIST NOT WANTED:
       IF (SIMUL) GOTO 999
       IF (IABS(MODERR(JSOURC)).NE.2 .AND. RIET) GOTO 999
@@ -2022,7 +2022,9 @@
             ENDDO
 !  89      CIITEM=F4PESD(1,I)
    89       CIITEM = ADIAG(K)**2
-            WRITE (LKH,FMT1) IH, F4PAR(1,I), adiag(K), K - KBASE, (ICOV(L),L=1,IPRNT(5))
+! hkl file after pawley refinement writes here.  Using FMT3 so Space Group Determination
+! program can read correlations
+            WRITE (LKH,FMT3) IH, F4PAR(1,I), adiag(K), K - KBASE, (ICOV(L),L=1,IPRNT(5))
             ICLUMP(I) = K - KBASE
             DO L = 1, IPRNT(5)
               ICORL(L,I) = ICOV(L)
