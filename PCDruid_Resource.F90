@@ -1,4 +1,4 @@
-! Winteracter module created : 19/Jul/2002 16:47:13
+! Winteracter module created : 23/Jul/2002 09:29:29
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -631,4 +631,5 @@
           INTEGER, PARAMETER :: IDB_Configuration               =  1488
           INTEGER, PARAMETER :: IDB_Prog3                       =  1489
           INTEGER, PARAMETER :: IDB_PrevRes                     =  1490
+          INTEGER, PARAMETER :: IDD_Pause                       =   135
       END MODULE Druid_Header

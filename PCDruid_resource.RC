@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 19/Jul/2002 16:47:13
+// Modified : 23/Jul/2002 09:29:29
 //
 ///////////////////////////////////////////////////
 //
@@ -644,6 +644,7 @@
 #define IDB_Configuration                1488
 #define IDB_Prog3                        1489
 #define IDB_PrevRes                      1490
+#define IDD_Pause                         135
 
 ///////////////////////////////////////////////////
 //
@@ -1055,19 +1056,6 @@ BEGIN
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
 END
 
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
@@ -1319,7 +1307,7 @@ BEGIN
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "Enter crystal system, trial lattice constants (and space group if known).",IDF_PW_Page2_title,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  100,   17,  240,   12
-    CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  292,  150,   40,   14
+    CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  235,  150,   40,   14
     CONTROL "a",IDF_a_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  111,  105,   16,    8
     CONTROL "Lattice constants",IDF_lattice_constant_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   99,   89,  230,   48
     CONTROL "Crystal System",IDF_Crystal_system_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   99,   34,   96,   48
@@ -1340,7 +1328,7 @@ BEGIN
     CONTROL "0.0000",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  313,   43,   40,   14
     CONTROL "Zero-point",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  309,   34,   48,   28
     CONTROL "",IDB_Delabc,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  339,  106,   16,   16
-    CONTROL "Space Group >",IDF_SGDet,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  229,  150,   56,   14
+    CONTROL "Space Group >",IDF_SGDet,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  298,  150,   56,   14
 END
 
 IDD_PW_Page1 RCDATA
@@ -1439,7 +1427,7 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  167,   79,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "Rebin >",IDB_Bin,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  264,  150,   40,   14
+    CONTROL "Rebin >",IDB_Bin,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  314,  150,   40,   14
 END
 
 IDD_PW_Page3 RCDATA
@@ -2390,7 +2378,7 @@ BEGIN
     CONTROL "&Hexagonal",IDF_Indexing_Hexa,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  102,  119,   52,    8
     CONTROL "C&ubic",IDF_Indexing_Cubic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  102,   95,   52,    8
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "Previous Results >",IDB_PrevRes,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  284,  150,   70,   14
+    CONTROL "Previous Results >",IDB_PrevRes,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  290,  150,   70,   14
 END
 
 IDD_PW_Page8 RCDATA
@@ -2752,7 +2740,7 @@ BEGIN
     CONTROL "X",IDF_LABEL10,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  126,  122,    9,    8
     CONTROL "SDI file",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   87,    9,  300,   34
     CONTROL "Molecular Z-matrices",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   87,   48,  300,   94
-    CONTROL "Pref. Orient. >",IDB_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  325,  150,   50,   14
+    CONTROL "Pref. Orient. >",IDB_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  331,  150,   50,   14
 END
 
 IDD_SAW_Page1 RCDATA
@@ -3795,6 +3783,28 @@ BEGIN
 " 1264     2     0 \n"
 " \n"
 " \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_Pause DIALOG 0, 0,  104,   57
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "Pause"
+BEGIN
+    CONTROL "Press OK to continue",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    7,   14,   90,    8
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   32,   35,   40,   14
+END
+
+IDD_Pause RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
