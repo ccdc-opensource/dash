@@ -5,7 +5,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ShowWindowRietveld(Curr_SA_Run)
+      SUBROUTINE ShowWizardWindowRietveld(Curr_SA_Run)
 !
 ! The window containing the Rietveld Refinement needs a lot of initialisation,
 ! so here is a special routine to open that window.
@@ -195,9 +195,9 @@
       CALL WDialogPutReal(IDR_PROCHI, ChiProSqd, "(F9.2)")
       IPTYPE = 2
       CALL Profile_Plot
-      CALL WDialogShow(-1,-1,0,ModeLess)
+      CALL WizardWindowShow(IDD_Rietveld2)
 
-      END SUBROUTINE ShowWindowRietveld
+      END SUBROUTINE ShowWizardWindowRietveld
 !
 !*****************************************************************************
 !
@@ -467,7 +467,7 @@
               CALL WDialogPutReal(IDR_INTCHI, ChiSqd, "(F9.2)")
               CALL WDialogPutReal(IDR_PROCHI, ChiProSqd, "(F9.2)")
             CASE (IDCANCEL, IDCLOSE)
-              CALL WDialogHide
+              CALL EndWizardPastPawley
             CASE (IDB_SaveAs)
               CALL Dialog2RRVAR
               CALL RR_MAKEFRAC
@@ -1929,7 +1929,7 @@
             CASE (IDNEXT)
               Curr_SA_Run = 1
               CALL WDialogHide ! @@ Hide current window. Should probably be WizardWindowHide
-              CALL ShowWindowRietveld(Curr_SA_Run)
+              CALL ShowWizardWindowRietveld(Curr_SA_Run)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDB_SDI_file_Browse)
