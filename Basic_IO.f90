@@ -348,6 +348,9 @@
         CASE (IDD_SAW_Page1)
           CALL DealWithWizardWindowZmatrices
           GOTO 10
+        CASE (IDD_zmEdit)
+          CALL DealWithEditZMatrixWindow
+          GOTO 10
         CASE (IDD_SAW_Page2)
           CALL DealWithWizardWindowAdditionalSAParams
           GOTO 10
