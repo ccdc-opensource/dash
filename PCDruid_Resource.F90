@@ -1,4 +1,4 @@
-! Winteracter module created : 08/Dec/2003 15:37:24
+! Winteracter module created : 09/Jan/2004 10:20:31
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -712,4 +712,5 @@
           INTEGER, PARAMETER :: IDF_UCVol                       =  1540
           INTEGER, PARAMETER :: IDF_MogulExe                    =  1551
           INTEGER, PARAMETER :: IDBBROWSE2                      =  1552
+          INTEGER, PARAMETER :: IDF_MogulText                   =  1553
       END MODULE Druid_Header

@@ -36,7 +36,7 @@
 	  DATA UseMogul / .TRUE. /
 ! Set to false when Mogul not used for Modal Torsion Angle Ranges.
 ! Stops the user constantly being reminded that there isn't a path
-! to a Mogul exe specified Mogul
+! to a Mogul exe specified
 
 
       CHARACTER(8) :: ProgramVersion
