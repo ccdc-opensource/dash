@@ -199,7 +199,10 @@
       COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
-      INTEGER hFile, I, J, iFlags
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INTEGER hFile, I, J, iFlags, iSol
       CHARACTER(MaxPathLength) tFileName
       CHARACTER(100) FILTER
 
@@ -222,6 +225,28 @@
               CALL UpdateOutputSolutionsWIndow
             CASE (IDB_Output2)
               CALL SaveSolutions
+            CASE (IDB_SaveTBL)
+              iFlags = SaveDialog + AppendExt + PromptOn
+              FILTER = 'Parameter table (*.tbl)|*.tbl|'
+              CALL WDialogGetString(IDF_DirAndBaseName,tFileName)
+              tFileName = tFileName(1:LEN_TRIM(tFileName))//'.tbl'
+              CALL WSelectFile(FILTER,iFlags,tFileName,'Save parameters')
+! Problems here: 
+! - quaternions are not normalised
+! - torsion angles can be e.g. -238.8781
+! Must only write wanted solutions, not all.
+              IF ((WInfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
+                hFile = 10
+                OPEN(UNIT=hFile,FILE=tFileName,ERR=998)
+                DO iSol = 1, NumOf_SA_Runs
+                  WRITE(hFile,'(100(F9.4,1X))',ERR=998) (BestValuesDoF(J,iSol2Run(iSol)),J=1,nvar)
+                ENDDO
+                CLOSE(hFile)
+              ENDIF
+              CALL PopActiveWindowID
+              RETURN
+  998         CALL ErrorMessage('Error writing file.')
+              CLOSE(hFile)
             CASE (IDB_OutputChiSqd)
               iFlags = SaveDialog + AppendExt + PromptOn
               FILTER = 'Chi-sqrd vs. number of moves (*.chi)|*.chi|'
