@@ -610,7 +610,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -866,7 +867,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -1153,7 +1155,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -1319,7 +1322,8 @@
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -1970,7 +1974,8 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -2232,7 +2237,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -2718,7 +2724,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -2963,7 +2970,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -3405,7 +3413,8 @@
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -4286,7 +4295,8 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -5216,7 +5226,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -5691,7 +5702,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -5871,7 +5883,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -6064,7 +6077,8 @@
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -6167,7 +6181,8 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER

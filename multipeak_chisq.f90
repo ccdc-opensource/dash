@@ -27,7 +27,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
@@ -182,7 +183,8 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 
-      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
       REAL            DERPFN
       INTEGER                      NPKFSP
       REAL                                        TOLER
