@@ -315,6 +315,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+
       CHARACTER*40 fstr
       INTEGER      Iflags, Idummy, Sn
       INTEGER      Iun, IHan
@@ -329,7 +330,7 @@
       IF (Fname(1:1) .EQ. ' ') RETURN
       OPEN(unit = Iun, file = Fname(1:LEN_TRIM(Fname)),status = 'unknown',err=99)
       Sn = Get_DashSerialNumber("C:\\"C)
-      WRITE(Iun,'(A)',ERR=100) 'This file is provided to submit requests for DASH licences.'
+      WRITE(Iun,'(A)',ERR=100) 'This file is provided to submit requests for '//ProgramVersion//' licences.'
       WRITE(Iun,'(A)',ERR=100) 'A DASH evaluation licence will allow you to run DASH on any PC.'
       WRITE(Iun,'(A)',ERR=100) 'A site licence will allow you to install DASH on any PC on your own site.'
       WRITE(Iun,'(A)',ERR=100) 'Most licences, however, are node-locked. For this, we use a unique identifier.'
@@ -354,7 +355,7 @@
       CALL WMessageBox(YesNo,InformationIcon,CommonYes,&
         "A file "//Fname(1:LEN_TRIM(Fname))//" has been created."//CHAR(13)//&
         "You should edit this file and then send it to"//CHAR(13)//CHAR(13)//&
-        "software@ccdc.cam.ac.uk"//CHAR(13)//CHAR(13)//&
+        "support@ccdc.cam.ac.uk"//CHAR(13)//CHAR(13)//&
         "Would you like to edit this file now?","Edit licence request file")
       IF (WinfoDialog(4) .EQ. 1) THEN
         CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,'Edit licence request file'),IHan)
