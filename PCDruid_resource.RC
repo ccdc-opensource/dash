@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 30/Apr/2004 16:09:10
+// Modified : 01/May/2004 14:43:07
 //
 ///////////////////////////////////////////////////
 //
@@ -3359,25 +3359,23 @@ BEGIN
 ,0
 END
 
-IDD_SAW_Page6 DIALOG 0, 0,  400,  170
+IDD_SAW_Page6 DIALOG 0, 0,  375,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Rigid-Body Rietveld Refinement"
 BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "",IDF_SDI_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   94,   24,  200,   14
-    CONTROL "B&rowse...",IDB_SDI_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  343,   24,   36,   14
-    CONTROL "&Open",IDB_SDI_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  299,   24,   40,   14
+    CONTROL "",IDF_SDI_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   95,   26,  260,   14
+    CONTROL "B&rowse...",IDB_SDI_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  318,   44,   36,   14
+    CONTROL "&Open",IDB_SDI_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  274,   44,   40,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "<&Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "SDI file",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   87,   12,  300,   34
-    CONTROL "Crystal structure",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   87,   50,  300,   34
-    CONTROL "",IDF_Xtal_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   94,   62,  200,   14
-    CONTROL "B&rowse...",IDB_xtal_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  343,   62,   36,   14
-    CONTROL "O&pen",IDB_xtal_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  299,   62,   40,   14
-    CONTROL "Please note that these crystal structure files do not contain any information about restrictions on Z-matrices, and these have been reset to default values.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   93,   93,  288,   24
-    CONTROL "In order to retain this information, save/load solutions to/from a dash solutions file (file extension .dash), accessible from the ""Analyse Solutions"" window.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   93,  117,  288,   24
+    CONTROL "SDI file",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   89,   14,  275,   50
+    CONTROL "Crystal structure",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   89,   76,  275,   50
+    CONTROL "",IDF_Xtal_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   95,   88,  260,   14
+    CONTROL "B&rowse...",IDB_xtal_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  318,  106,   36,   14
+    CONTROL "O&pen",IDB_xtal_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  274,  106,   40,   14
     CONTROL "Start SA",IDB_Restart,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  288,  150,   40,   14
 END
 
