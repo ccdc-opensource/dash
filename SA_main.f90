@@ -256,12 +256,15 @@
 
       CHARACTER*36 parlabel(mvar)
       DOUBLE PRECISION dcel(6)
-      INTEGER I, II, kk, iFrg, iFrgCopy, tk, iOption, iH, iK, iL
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      REAL    tLattice(1:3,1:3), tRecLattice(1:3,1:3), tX, tY, tZ
+      INTEGER I, II, kk, iFrg, iFrgCopy, tk, iH, iK, iL
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
+      REAL    tLattice(1:3,1:3), tRecLattice(1:3,1:3)
       REAL    Beta_m, Alpha_m, q0m, q1m, q2m, q3m
       REAL    Length
-      INTEGER iAxis
+      INTEGER iAxis, iAtmNr
+      REAL*8  CART(1:3,1:MAXATM)
+      REAL    Origin(1:3)
+      REAL    Point1(1:3), Point2(1:3), Point3(1:3) 
 
       CALL PushActiveWindowID
 ! Calculate the unit cell axes in terms of the orthogonal lattice from
@@ -277,31 +280,67 @@
       tRecLattice = SNGL(c2fmat)
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL CREATE_FOB
-      CALL WDialogSelect(IDD_SAW_Page2)
+      CALL Create_AtomicWeightings
 ! Per Z-matrix, determine whether to use quaternions or a single axis
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          CALL WGridGetCellMenu(IDF_RotationsGrid,1,iFrg,iOption)
-          UseQuaternions(iFrg) = (iOption .NE. 3)
           IF (.NOT. UseQuaternions(iFrg)) THEN
-            CALL WGridGetCellReal(IDF_RotationsGrid,2,iFrg,zmSingleRotationAxis(1,iFrg))
-            CALL WGridGetCellReal(IDF_RotationsGrid,3,iFrg,zmSingleRotationAxis(2,iFrg))
-            CALL WGridGetCellReal(IDF_RotationsGrid,4,iFrg,zmSingleRotationAxis(3,iFrg))
 ! Initialise the parts of the quaternions of the single rotation axis that are due to the axis
+            SELECT CASE (zmSingleRotAxDef(iFrg))
+              CASE (1) ! to atom number
+! We need the Cartesian co-ordinates of this atom
+                CALL MAKEXYZ_2(natoms(iFrg),BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+! Now we need the co-ordinates of the origin of the rotations
+                IF (icomflg(iFrg) .EQ. 0) THEN ! C.O.M.
+                  Origin(1) = 0.0
+                  Origin(2) = 0.0
+                  Origin(3) = 0.0
+                  IF (Get_UseCrystallographicCoM()) THEN
+                    DO iAtmNr = 1, natoms(iFrg)
+                      Origin(1) = Origin(1) + AtomicWeighting(iAtmNr,iFrg) * SNGL(CART(1,iAtmNr))
+                      Origin(2) = Origin(2) + AtomicWeighting(iAtmNr,iFrg) * SNGL(CART(2,iAtmNr))
+                      Origin(3) = Origin(3) + AtomicWeighting(iAtmNr,iFrg) * SNGL(CART(3,iAtmNr))
+                    ENDDO
+                  ELSE
+                    DO iAtmNr = 1, natoms(iFrg)
+                      Origin(1) = Origin(1) + SNGL(CART(1,iAtmNr))
+                      Origin(2) = Origin(2) + SNGL(CART(2,iAtmNr))
+                      Origin(3) = Origin(3) + SNGL(CART(3,iAtmNr))
+                    ENDDO  
+                  ENDIF
+                  Origin(1) = Origin(1) / natoms(iFrg)
+                  Origin(2) = Origin(2) / natoms(iFrg)
+                  Origin(3) = Origin(3) / natoms(iFrg)
+                ELSE
+                  Origin(1) = SNGL(CART(1,icomflg(iFrg)))
+                  Origin(2) = SNGL(CART(2,icomflg(iFrg)))
+                  Origin(3) = SNGL(CART(3,icomflg(iFrg)))
+                ENDIF
+                zmSingleRotationAxis(1,iFrg) = SNGL(CART(1,zmSingleRotAxAtm(iFrg))) - Origin(1)
+                zmSingleRotationAxis(2,iFrg) = SNGL(CART(2,zmSingleRotAxAtm(iFrg))) - Origin(2)
+                zmSingleRotationAxis(3,iFrg) = SNGL(CART(3,zmSingleRotAxAtm(iFrg))) - Origin(3)
+              CASE (2) ! Fractional
 ! The variable zmSingleRotationAxis holds the fractional co-ordinates,
 ! we need orthogonal co-ordinates => convert
-            tX = zmSingleRotationAxis(1,iFrg)*tLattice(1,1) +     &
-                 zmSingleRotationAxis(2,iFrg)*tLattice(1,2) +     &
-                 zmSingleRotationAxis(3,iFrg)*tLattice(1,3)
-            tY = zmSingleRotationAxis(1,iFrg)*tLattice(2,1) +     &
-                 zmSingleRotationAxis(2,iFrg)*tLattice(2,2) +     &
-                 zmSingleRotationAxis(3,iFrg)*tLattice(2,3)
-            tZ = zmSingleRotationAxis(1,iFrg)*tLattice(3,1) +     &
-                 zmSingleRotationAxis(2,iFrg)*tLattice(3,2) +     &
-                 zmSingleRotationAxis(3,iFrg)*tLattice(3,3)
-            zmSingleRotationAxis(1,iFrg) = tX
-            zmSingleRotationAxis(2,iFrg) = tY
-            zmSingleRotationAxis(3,iFrg) = tZ
+                zmSingleRotationAxis(1,iFrg) = zmSingleRotAxFrac(1,iFrg)*tLattice(1,1) +     &
+                                               zmSingleRotAxFrac(2,iFrg)*tLattice(1,2) +     &
+                                               zmSingleRotAxFrac(3,iFrg)*tLattice(1,3)
+                zmSingleRotationAxis(2,iFrg) = zmSingleRotAxFrac(1,iFrg)*tLattice(2,1) +     &
+                                               zmSingleRotAxFrac(2,iFrg)*tLattice(2,2) +     &
+                                               zmSingleRotAxFrac(3,iFrg)*tLattice(2,3)
+                zmSingleRotationAxis(3,iFrg) = zmSingleRotAxFrac(1,iFrg)*tLattice(3,1) +     &
+                                               zmSingleRotAxFrac(2,iFrg)*tLattice(3,2) +     &
+                                               zmSingleRotAxFrac(3,iFrg)*tLattice(3,3)
+              CASE (3) ! Normal to plane defined by three atoms
+! We need the Cartesian co-ordinates of these atoms
+                CALL MAKEXYZ_2(natoms(iFrg),BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+                Point1 = SNGL(CART(:,zmSingleRotAxAtms(1,iFrg)))
+                Point2 = SNGL(CART(:,zmSingleRotAxAtms(2,iFrg)))
+                Point3 = SNGL(CART(:,zmSingleRotAxAtms(3,iFrg)))
+                Point1 = Point1 - Point2
+                Point3 = Point3 - Point2
+                CALL VectorCrossProduct(Point1,Point3,zmSingleRotationAxis(1,iFrg))
+            END SELECT
 ! Normalise the axis
             Length = SQRT(zmSingleRotationAxis(1,iFrg)**2 + &
                           zmSingleRotationAxis(2,iFrg)**2 + &
@@ -386,7 +425,7 @@
 ! parameters are reserved for 'rotations'. When the rotation is restricted to
 ! a single axis, only two of these parameters are necessary. By setting
 ! upper bound - lower bound to 0.000001, these parameters will be considered 'fixed'
-! and will not be picked during the SA, nor will they be optimised during the simpex minimisation.
+! and will not be picked during the SA, nor will they be optimised during the simplex minimisation.
                     tk = tk + 1
                     SELECT CASE (tk)
                       CASE (1,2) 
@@ -425,6 +464,7 @@
         ENDIF
       ENDDO
       NStPar = kk
+      CALL WDialogSelect(IDD_SAW_Page2)
       PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
 ! Set up preferred orientation. This can't be the first parameter: it must be appended to the rest.
       IF (PrefParExists) THEN
