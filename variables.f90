@@ -101,11 +101,8 @@
 ! This is the first item read from the configuration file (if present).
 ! If set to .FALSE., the rest of the configuration file will be skipped.
       
-      LOGICAL SavePDB, SaveCSSR, SaveCCL
+      LOGICAL SavePDB
 ! Flags to decide which molecular model files are written out when a best solution is found
-
-      LOGICAL AutoLocalMinimisation
-! When set, each run in a multi run ends with a local minimisation
 
       LOGICAL ConnectPointsObs
 ! .TRUE. = when drawing the observed profile, the data points are joined by lines
@@ -142,6 +139,19 @@
 
       INTEGER           :: NumOfDICVOLSolutions
       TYPE (T_UnitCell) :: DICVOLSolutions(MaxDICVOLSolutions)
+
+      LOGICAL PastPawley
+! The code used to calculate the tickmarks does so by emulating a Rietveld refinement.
+! As a Rietveld Refinement needs scatterers, a single carbon atom is provided in the 
+! CCSL input file. This is read by the CCSL code and sets the number of atoms to 1, overriding
+! all z-matrices.
+! Therefore, calculating the tickmarks destroys the z-matrices.
+! Due to the way Winteracter and DASH work, the tickmarks are re-calculated every time
+! a user switches between tabs in the 'View' dialogue.
+! The variable 'PastPawley' is there to indicate that the Pawley refinement has finished and that
+! no changes to any of the variables involved in calculating the tickmarks
+! (wavelength, zeropoint and unit cell parameters) is expected any more.
+! This variable is then tested before calculating the tickmarks.
 
       END MODULE VARIABLES
 !
