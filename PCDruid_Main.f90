@@ -5,8 +5,11 @@
 ! - filename (this is now done partially by 'FNAME', which is also used as a dummy)
 
 ! NoData is regularly set to .FALSE. but is it ever set to .TRUE.?
+! Length of SDIFile/SDIFileName inconsistent
 
       MODULE VARIABLES
+
+      USE WINTERACTER
 !
 !   Shared variables for any routine with 'USE VARIABLES'
 !
@@ -43,12 +46,10 @@
       LOGICAL HcvExists
       LOGICAL PikExists
       LOGICAL TicExists
-      INTEGER DataReadMode
 
 !C>> File names of data files
-      COMMON / FLINF1 /   DashRawFile, DashHcvFile, DashPikFile, DashTicFile
-      COMMON / FLINF2 /   RawExists,   HcvExists,   PikExists,   TicExists 
-      COMMON / FLINF3 /   DataReadMode
+!U      COMMON / FLINF1 /   DashRawFile, DashHcvFile, DashPikFile, DashTicFile
+!U      COMMON / FLINF2 /   RawExists,   HcvExists,   PikExists,   TicExists 
             
 !C>> License information
       INTEGER :: EXPIRY_DAY   =   31
@@ -71,6 +72,9 @@
       PARAMETER (DemoKey = 2)
       PARAMETER (SiteKey = 3)
 
+      INTEGER           :: EventType
+      TYPE(WIN_MESSAGE) :: EventInfo
+
       END MODULE VARIABLES
 !
 !*****************************************************************************
@@ -79,28 +83,24 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 !
 !   Type declarations
 !
       TYPE(WIN_STYLE)   :: MAIN_WINDOW
-      TYPE(WIN_MESSAGE) :: MESSAGE
 !
 !   Variable declarations
 !
-      LOGICAL           :: QUIT    = .FALSE.
       LOGICAL           :: NoData  = .TRUE.
       INTEGER           :: IWIDTHS(10)
-      INTEGER           :: ITYPE,IWID
-      INTEGER           :: L
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
+      INTEGER           :: IWID
+
+      INCLUDE 'GLBVAR.INC'
+
       INCLUDE 'STATLOG.INC'
       LOGICAL Run_Wizard
-      LOGICAL process_mainwindow_message
-
-      INTEGER ICurSel
 
       CALL WInitialise(' ')
       CALL Init_StdOut()
@@ -132,6 +132,8 @@
       CALL WindowOpen(MAIN_WINDOW,128)
 !   Load and display the toolbar
       CALL WMenuToolbar(ID_TOOLBAR1)
+! Disable the menu buttons
+      CALL SetModeMenuState(-1,-1,-1)
 !   Setup array of widths for status bar
       IWIDTHS(1) = 3800
       DO IWID = 2, 7
@@ -140,115 +142,81 @@
       IWIDTHS(8)= 1500 
 !   Split status bar into more than one part
       CALL WindowStatusBarParts(8,IWIDTHS)
-!   Disable certain menu options
-      CALL FieldUpdate()
-      CALL PP_DEFAULTS
-!   Main message loop
-!   Go through the PolyFitter wizard
       CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(PushButton  , Enabled)
-!      CALL WPlaySound('h11500so.wav',0)
+! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues()
-      CALL PolyFitter_Defaults()
+      CALL InitialiseVariables
+      CALL Default_Crystal_Symmetry
       CALL Check_License()
-!C>> JCC Disable the menu buttons
-      CALL SetModeMenuState(-1,-1,-1)
+! JvdS Now we can remove the licence dialogue from memory:
+      CALL WDialogSelect(IDD_License_Dialog)
+      CALL WDialogUnload
+      CALL WDialogSelect(0)
+!   Main message loop
+!   Go through the PolyFitter wizard
 !c>> Comment this next line out to remove the wizard
       NoData = Run_Wizard()
       CALL Generate_TicMarks()
-!C>> JCC Do we need this loop at all? It seems to hang the whole system?
-!      DO WHILE(NoData)
-!          CALL WMessage(ITYPE,MESSAGE)
-!          SELECT CASE (ITYPE)
-!              CASE (MenuSelect)
-!                  CALL ProcessDataMenu(MESSAGE%VALUE1,QUIT,NoData)
-!              CASE (CloseRequest)
-!                  CALL WExit(QUIT)
-!          END SELECT
-!          If (Quit) goto 100
-!
-!      END DO
-
-!
-!.. We no have data - load up all the dialogs
-!C>> JCC      CALL WDialogLoad(IDD_Structural_Information)
-!C>> JCC      CALL WDialogLoad(IDD_Plot_Option_Dialog)
-!
 !C JCC Enable tab changing
       CALL WMessageEnable(TabChanged, Enabled)
-      DO WHILE(.NOT. QUIT)
-        CALL WMessage(ITYPE,MESSAGE)
-        QUIT = process_mainwindow_message(ITYPE,MESSAGE)
+      DO WHILE(.TRUE.)
+        CALL GetEvent
+        CALL process_mainwindow_message
       END DO
-!   Close program
-  100 CALL WindowClose()
-      STOP
 
       END PROGRAM PCDruid_Main
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION process_mainwindow_message(ITYPE,MESSAGE)
+      SUBROUTINE process_mainwindow_message
 
       USE VARIABLES
       USE DRUID_HEADER
       USE WINTERACTER
 
-      INTEGER ITYPE
-      TYPE(WIN_MESSAGE) :: MESSAGE
-      LOGICAL QUIT
-
-      QUIT = .FALSE.
-      SELECT CASE (ITYPE)
+      SELECT CASE (EventType)
         CASE (MouseButDown)
-          CALL Plot_Alter(MESSAGE%GX,MESSAGE%GY)
+          CALL Plot_Alter
         CASE (PushButton)
-          CALL Check_PushButton(MESSAGE)
+          CALL Check_PushButton
         CASE (KeyDown)
-          CALL Check_KeyDown(MESSAGE)
+          CALL Check_KeyDown
         CASE (MenuSelect)
-          CALL ProcessMenu(MESSAGE%VALUE1,QUIT)
+          CALL ProcessMenu
         CASE (FieldChanged)
-          CALL Main_Field_Changed_Routines(Message%Value1,Message%Value2)
+          CALL Main_Field_Changed_Routines(EventInfo%Value1,EventInfo%Value2)
         CASE (TabChanged)
-          CALL Main_Field_Changed_Routines(Message%Value1,Message%Value2)
+          CALL Main_Field_Changed_Routines(EventInfo%Value1,EventInfo%Value2)
         CASE (Expose,Resize)
           CALL Redraw()
-        CASE (CloseRequest)
-          CALL WExit(QUIT)
+!        CASE (CloseRequest)
+!          CALL WExit
       END SELECT
-      process_mainwindow_message = QUIT
 
-      END FUNCTION process_mainwindow_message
+      END SUBROUTINE process_mainwindow_message
 !
 !*****************************************************************************
 !
-      SUBROUTINE ProcessMenu(IDENT,QUIT)
+      SUBROUTINE ProcessMenu
 !
 !   This subroutine processes the menu selections
 !
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 !
       IMPLICIT NONE
 !
-      INTEGER, INTENT (IN)     :: IDENT
-      LOGICAL, INTENT (IN OUT) :: QUIT
       LOGICAL NoData
-      INTEGER IPTYPE,JPTYPE
-      COMMON /PLTYPE/ IPTYPE
-      INTEGER IDCurrent_Cursor_Mode
-      COMMON /CURSOR_MODE/ IDCurrent_Cursor_Mode
-!
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
+
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
 !C>> JCC data to indicate whether we are coming out of peak-fitting mode
       LOGICAL FromPeakFit
       LOGICAL Run_Wizard ! Function
-      INTEGER IFlags
-      CHARACTER(LEN=255) FileName
+      LOGICAL Confirm ! Function
 
       FromPeakFit = .FALSE.
 !
@@ -257,15 +225,11 @@
  10   CALL WCursorShape(CurArrow)
       STATBARSTR(8)=' '
       CALL WindowOutStatusBar(8,STATBARSTR(8))
-      SELECT CASE (IDENT)
+      SELECT CASE (EventInfo%VALUE1)
         CASE (ID_import_xye_file)
           CALL Diffraction_File_Browse(NoData)
-!        CASE (ID_import_pro_file)
-!          CALL PRO_file_Open(NoData)
-!>> JCC Implement project reading now that this works via the SDI interface
         CASE (ID_import_dpj_file)
           CALL SDI_file_Open(NoData)
-!>> JCC Implement the structure solution button
         CASE (ID_Structure_Solution_Mode)
           CALL SA_Main()
 !        CASE (ID_FILE_SAVE)
@@ -273,20 +237,18 @@
 !        CASE (ID_FILE_SAVEAS)
 !          CALL Save(1)
         CASE (ID_FILE_PRINT)
-          JPTYPE=-IPTYPE
-          CALL Profile_Plot(JPTYPE)
+          CALL Profile_Plot(-IPTYPE)
         CASE (ID_FILE_EXIT)
-          CALL WExit(QUIT)
+          CALL WExit
 !        CASE (ID_EDIT_DIAG)
 !          CALL Edit()
 !        CASE (ID_PLOT)
 !          CALL Profile_Plot(IPTYPE)
         CASE (ID_Plot_Options)
-! JvdS The next line
-!          CALL Plot_Options(IPTYPE)
-! JvdS could be replaced by:
+          CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Plot_Option_Dialog)
           CALL WDialogShow(-1,-1,0,Modeless)
+          CALL PopActiveWindowID
         CASE (ID_Default_Mode)
           STATBARSTR(8)='Default visualisation mode'
           CALL WindowOutStatusBar(8,STATBARSTR(8))
@@ -308,23 +270,12 @@
           IDCurrent_Cursor_mode=ID_Peak_Fitting_Mode
           CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
           FromPeakFit = .TRUE.
-          CALL PeakFit(IDENT)
+          CALL PeakFit(EventInfo%VALUE1)
           GOTO 10
         CASE (ID_Pawley_Refinement_Mode)
           IF (NumPawleyRef .EQ. 0) THEN
-            CALL WMessageBox(YesNo,QuestionIcon,CommonOK,&
-            'Lattice constants may not have been refined'//CHAR(13)//&
-            'Do you wish to '// &
-            'continue?','Pawley Refinement')
-!   If answer 'No', return
-!
-!C>> JCC Seems this line sets the code in an infinite loop.
-! Was               IF (WInfoDialog(4).EQ.2) Goto 10
-! Now
-            IF (WInfoDialog(4).EQ.2) THEN
-! Just go home to mummy ...
-              RETURN
-            END IF
+            IF (.NOT. Confirm('Lattice constants may not have been refined'//CHAR(13)//&
+                              'Do you wish to continue?')) RETURN
           END IF
           CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
           IDCurrent_Cursor_mode=ID_Pawley_Refinement_Mode
@@ -342,48 +293,45 @@
             CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
             IDCurrent_Cursor_mode = ID_Peak_Fitting_Mode
             CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-            CALL PeakFit(IDENT)
+            CALL PeakFit(EventInfo%VALUE1)
             GOTO 10
           END IF
         CASE (ID_get_crystal_symmetry)
-!          STATBARSTR(8)='Lattice constant mode'
-!          CALL WindowOutStatusBar(8,STATBARSTR(8))
+          CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Crystal_Symmetry)
-          CALL WDialogSelect(IDD_Crystal_Symmetry)
-!C>> JCC  Dont do this, otherwise clicking OK makes the cell change its state          CALL Upload_Crystal_Symmetry()
-!C>> No longer needed since the dialogues are not destroyed 
+          CALL PopActiveWindowID
         CASE (ID_get_data_properties)
+          CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Data_Properties)
-          CALL WDialogSelect(IDD_Data_Properties)
-! JvdS commented out the following line.
-! It refers to a subroutine that uses an uninitialised variable to initialise
-! the X-ray source.
-!          CALL Upload_Data_Properties()
-          CALL Upload_Range()
+          CALL PopActiveWindowID
         CASE (ID_get_peak_positions)
+          CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Positions)
+          CALL PopActiveWindowID
         CASE (ID_get_peak_widths)
+          CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Widths)
+          CALL PopActiveWindowID
 !        CASE (ID_get_peak_intensities)
         CASE (ID_PolyFitter_Help)
           CALL LaunchHelp()
         CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5)
-          CALL LaunchTutorial(IDENT)
+          CALL LaunchTutorial(EventInfo%VALUE1)
         CASE (ID_help_about_Polyfitter)
           CALL About()
         CASE(ID_Start_Wizard)
           NoData = Run_Wizard()
           IF (.NOT. NoData) CALL Generate_TicMarks()
       END SELECT
-!
+
       RETURN
       END SUBROUTINE ProcessMenu
 !
@@ -414,51 +362,6 @@
       CALL WHelpFile(INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Documentation'//DIRSPACER//'manual'//DIRSPACER//'dash.html')
 
       END SUBROUTINE LaunchHelp
-!
-!*****************************************************************************
-!
-!      SUBROUTINE ProcessDataMenu(IDENT,QUIT,NoData)
-!
-!   This subroutine processes the menu selections for input data alone.
-!
-!      USE WINTERACTER
-!      USE DRUID_HEADER
-!
-!      IMPLICIT NONE
-!
-!      INTEGER, INTENT (IN)     :: IDENT
-!      LOGICAL, INTENT (IN OUT) :: QUIT
-!      LOGICAL, INTENT (IN OUT) :: NoData
-!      INTEGER IPTYPE, JPTYPE
-!      COMMON /PLTYPE/ IPTYPE
-!      INTEGER IDCurrent_Cursor_Mode
-!      COMMON /CURSOR_MODE/ IDCurrent_Cursor_Mode
-!
-!      CHARACTER(LEN=80) STATBARSTR
-!      COMMON /STATBAR/ STATBARSTR(10)
-!      INCLUDE 'statlog.inc'
-!
-!   Branch depending on chosen menu item
-!
-! 10   CALL WCursorShape(CurArrow)
-!      STATBARSTR(8)=' '
-!      CALL WindowOutStatusBar(8,STATBARSTR(8))
-!      SELECT CASE (IDENT)
-!        CASE (ID_import_xye_file)
-!          CALL Diffraction_File_Browse(NoData)
-!        CASE (ID_import_pro_file)
-!          CALL PRO_file_Open(NoData)
-!        CASE (ID_FILE_EXIT)
-!          CALL WExit(QUIT)
-!        CASE (ID_PolyFitter_Help)
-!          CALL LaunchHelp()
-!        CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5)
-!          CALL LaunchTutorial(IDENT)
-!        CASE (ID_Help_About)
-!          CALL About()
-!      END SELECT
-!
-!      END SUBROUTINE ProcessDataMenu
 !
 !*****************************************************************************
 !
@@ -510,83 +413,39 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CCL_file_Open()
-!
-!   This subroutine processes Open CCL file selection
-!
-      USE WINTERACTER
-      USE VARIABLES
-!
-      IMPLICIT NONE
-!
-      CHARACTER(LEN=256) :: FILTER
-      INTEGER            :: IFLAGS
-      CHARACTER(LEN=80) STATBARSTR
-      COMMON /STATBAR/ STATBARSTR(10)
-!
-!   Check if file needs saving
-      IF (SAVEF) THEN
-        CALL WMessageBox(YesNo,QuestionIcon,CommonOK,'Program contains an'//&
-          ' unsaved project.'//CHAR(13)//'Do you wish to '// &
-          'continue?','Open Project')
-!   If answer 'No', return
-        IF (WInfoDialog(4).EQ.2) RETURN
-      END IF
-!   If answer 'Yes'
-      SAVEF  = .FALSE.
-      CALL FieldUpdate()
-      IFLAGS = LoadDialog + DirChange + PromptOn
-      FILTER = 'CCL crystal data files (*.ccl)|*.ccl|'
-      FNAME=' '
-      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Open CCL file')
-!   Place your file load code here
-      CALL Load_CCL_File(LEN_TRIM(FNAME),FNAME)
-      STATBARSTR(1)=FNAME
-      CALL WindowOutStatusBar(1,STATBARSTR(1))
-      RETURN
-
-      END SUBROUTINE CCL_file_Open
-!
-!*****************************************************************************
-!
-!      SUBROUTINE PRO_file_Open(NoData)
-!
-!   This subroutine processes Open .PRO selection
-!
-!      USE WINTERACTER
-!      USE VARIABLES
-!
-!      IMPLICIT NONE
-!
-!      LOGICAL, INTENT (IN OUT) :: NoData
-!      CHARACTER(LEN=256) :: FILTER
-!      INTEGER            :: IFLAGS
-!      CHARACTER(LEN=80) STATBARSTR
-!      COMMON /STATBAR/ STATBARSTR(10)
-!
-!   Check if file needs saving
-!
-!      IF (SAVEF) THEN
-!        CALL WMessageBox(YesNo,QuestionIcon,CommonOK,'Program contains an'//&
-!          ' unsaved project.'//CHAR(13)//'Do you wish to '// &
-!          'continue?','Open Project')
-!   If answer 'No', return
-!        IF (WInfoDialog(4).EQ.2) RETURN
-!      END IF
-!   If answer 'Yes'
-!      SAVEF  = .FALSE.
-!      CALL FieldUpdate()
-!      IFLAGS = LoadDialog + DirChange + PromptOn
-!      FILTER = 'Refinement profile files (*.pro)|*.pro|'
-!      FNAME=' '
-!      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Open refinement profile file')
-!   Place your file load code here
-!      CALL Load_PRO_File(LEN_TRIM(FNAME),FNAME,NoData)
-!      STATBARSTR(1)=FNAME
-!      CALL WindowOutStatusBar(1,STATBARSTR(1))
-!      RETURN
-!
-!      END SUBROUTINE PRO_file_Open
+!U      SUBROUTINE CCL_file_Open()
+!U
+!U!   This subroutine processes Open CCL file selection
+!U
+!U      USE WINTERACTER
+!U      USE VARIABLES
+!U
+!U      IMPLICIT NONE
+!U
+!U      CHARACTER(LEN=256) :: FILTER
+!U      INTEGER            :: IFLAGS
+!U
+!U      INCLUDE 'GLBVAR.INC'
+!U
+!U      LOGICAL Confirm ! Function
+!U
+!U!   Check if file needs saving
+!U      IF (SAVEF) THEN
+!U        IF (.NOT. Confirm('Program contains an unsaved project.'//CHAR(13)//'Do you wish to continue?')) RETURN
+!U      END IF
+!U      SAVEF  = .FALSE.
+!U      CALL FieldUpdate()
+!U      IFLAGS = LoadDialog + DirChange + PromptOn
+!U      FILTER = 'CCL crystal data files (*.ccl)|*.ccl|'
+!U      FNAME=' '
+!U      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Open CCL file')
+!U!   Place your file load code here
+!U      CALL Load_CCL_File(LEN_TRIM(FNAME),FNAME)
+!U      STATBARSTR(1)=FNAME
+!U      CALL WindowOutStatusBar(1,STATBARSTR(1))
+!U      RETURN
+!U
+!U      END SUBROUTINE CCL_file_Open
 !
 !*****************************************************************************
 !
@@ -656,7 +515,6 @@
       IMPLICIT NONE
 
       CHARACTER(LEN=512)  :: CABOUT
-      INTEGER ICurSel
 !
 !   Set about message
 !
@@ -676,29 +534,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE FieldUpdate()
-!
-!   This routine enables/disables save options
-!
-      USE WINTERACTER
-      USE VARIABLES
-      USE DRUID_HEADER
-!
-      IMPLICIT NONE
-!
-!   Enable/disable save
-!
-!      IF (SAVEF) THEN
-!          CALL WMenuSetState(ID_FILE_SAVE,ItemEnabled,WintOn)
-!      ELSE
-!          CALL WMenuSetState(ID_FILE_SAVE,ItemEnabled,WintOff)
-!      END IF
-!
-      RETURN
-      END SUBROUTINE FieldUpdate
-!
-!*****************************************************************************
-!
       SUBROUTINE Redraw()
 !
 !   This subroutine redraws the window
@@ -707,8 +542,8 @@
       USE VARIABLES
 
       IMPLICIT NONE
-      INTEGER IPTYPE
-      COMMON /PLTYPE/ IPTYPE
+
+      INCLUDE 'GLBVAR.INC'
 
       LOGICAL DoSaRedraw
       COMMON /SARDRW/ DoSaRedraw
@@ -739,8 +574,7 @@
 !
 !*****************************************************************************
 !
-! JvdS  The variable QUIT is never defined and never used
-      SUBROUTINE WExit(QUIT)
+      SUBROUTINE WExit
 !
 !   This subroutine processes the close requests
 !
@@ -749,13 +583,9 @@
 
       IMPLICIT NONE
 
-      LOGICAL, INTENT (IN OUT) :: QUIT
+      LOGICAL Confirm ! Function
 
-      CALL WMessageBox(YesNo,StopIcon,CommonNo,&
-!        'Program contains an unsaved project.'//CHAR(13)//
-        'Do you want to exit DASH?','Ending DASH Session')
-      IF (WInfoDialog(4) .EQ. CommonYes) CALL DoExit
-
+      IF (Confirm('Do you want to exit DASH?')) CALL DoExit()
       RETURN
 
       END SUBROUTINE WExit
@@ -791,15 +621,12 @@
       INTEGER OpenFail, PolyFitter_OpenSpaceGroupSymbols
       DATA LPosSG/1,1,3,38,73,108,349,430,455,462,489,531/
 
-      LOGICAL SARDRW
-      COMMON /SARDRW/ DoSa
+      LOGICAL DoSaRedraw
+      COMMON /SARDRW/ DoSaRedraw
 
-      DoSa = .FALSE.
-
+      DoSaRedraw = .FALSE.
 !>> JCC Init the viewing etc
-
       CALL PolyFitter_EnableExternal
-!
 ! Get the space group symbols ...
 !C>> JCC This assumes that the file is in the current working directory
 !C>> I've written a more general function that will handle this better
@@ -910,11 +737,11 @@
       USE VARIABLES
       USE dflib ! Windows environment variable handling: for GETENVQQ
 
-      INTEGER       unit, errstat, lval
+      INTEGER       lval
       CHARACTER*255 DashDir
       CHARACTER*255 line
       CHARACTER*3   KeyChar
-      INTEGER       nl, is, ie, dlen
+      INTEGER       nl, dlen
 
       ViewOn     = .FALSE.
       ViewAct    = .FALSE.
@@ -971,13 +798,14 @@
 !C>> This way, the state can be memorised from session to session
       SUBROUTINE PolyFitter_UploadDialogues
       USE WINTERACTER
-      USE druid_header
+      USE DRUID_HEADER
 
-!      IMPLICIT NONE
+      IMPLICIT NONE
 
 !C>> SA bitmap
       INTEGER it, Ibmhandle
       COMMON / BMPHAN / Ibmhandle
+      REAL    WaveLengthOf ! Function
 
       CALL WDialogLoad(IDD_Structural_Information)
       CALL WDialogLoad(IDD_SA_Action1)
@@ -1005,11 +833,10 @@
       CALL WDialogLoad(IDD_PW_Page2)
       CALL WDialogLoad(IDD_PW_Page3)
       CALL WDialogLoad(IDD_SA_Completed)
-!	  CALL WDialogLoad(IDD_SA_Multi_Completed)
+! ep      CALL WDialogLoad(IDD_SA_Multi_Completed) 
       CALL WDialogLoad(IDD_SA_Multi_completed_ep)
       CALL WDialogLoad(IDD_License_Dialog)
       CALL WDialogLoad(ID_Background_Fit)
-!      CALL WDialogLoad(ID_Fit_data_request)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
 ! Upload sa bitmap into memory
       ibmhandle = 0
@@ -1017,6 +844,8 @@
       CALL IGrSelect(3,IDF_minchisq_picture)
       CALL WBitmapGet(ibmhandle,0)
       it = InfoError(1)
+! @ Initialise radiation to Cu Ka1. This is a strange place for doing this, should move.
+      CALL UpdateWavelength(WaveLengthOf('Cu'))
       RETURN
 
       END SUBROUTINE PolyFitter_UploadDialogues
@@ -1033,7 +862,6 @@
       IMPLICIT NONE
 
       INTEGER :: IFlags, I, IPASS, Ilen, Instlen, Idashlen
-      LOGICAL OpenFail
       CHARACTER(LEN=255) :: Dirname, DashDir, InstDirLc, DashDirLc, DirNameLc
 
       Idashlen = GETENVQQ("DASH_DIR",DashDir)
@@ -1055,15 +883,14 @@
         DirNameLc = DirName
         CALL ILowerCase(DirNameLc)
         Ilen = LEN_TRIM(DirNameLc)
-! JvdS Isn't the following line wrong? Shouldn't it be InstDirLc(1:LEN_TRIM(InstDirLc)) ?
+! JvdS @ Isn't the following line wrong? Shouldn't it be InstDirLc(1:LEN_TRIM(InstDirLc)) ?
         IF ( (DirNameLc(1:Ilen) .EQ. DashDirLc(1:LEN_TRIM(DashDirLc))) .OR.  &
              (DirNameLc(1:Ilen) .EQ. InstDirLc(1:LEN_TRIM(DashDirLc))) ) THEN
           CALL WMessageBox(YesNo,InformationIcon,CommonNo, &
             "Are you sure you wish to start Dash in"//CHAR(13)//"the installation directory "//&
             CHAR(13)//DirNameLc(1:Ilen)//" ?", &
             "File location")
-          I = WInfoDialog(4)
-          IF ( I .NE. CommonYes ) CYCLE LOOP_DIRECTORY_SELECT
+          IF (WInfoDialog(4) .NE. CommonYes) CYCLE LOOP_DIRECTORY_SELECT
         END IF
 ! Open the file
         OPEN(UNIT = 6, FILE = 'dash.out', STATUS = 'UNKNOWN', ERR = 110)
@@ -1074,23 +901,13 @@
           CHAR(13)//"in the directory "//DirName(4:Ilen)//CHAR(13)//&
           "Please pick an alternative directory for your DASH run",&
           "File-open failure")
-        I = WInfoDialog(4)
-        IF (I .NE. 1) THEN
-! JvdS Is 'IF (WInfoDialog(4) .NE. 1) THEN' possible? (Eliminating the intermediate variable I).
+        IF (WInfoDialog(4) .NE. CommonOK) THEN
           CALL WindowClose()
           STOP
         END IF
       END DO LOOP_DIRECTORY_SELECT
 
       END SUBROUTINE Init_StdOut
-!
-!*****************************************************************************
-!
-      SUBROUTINE PolyFitter_Defaults()
-
-      CALL Default_Crystal_Symmetry
-
-      END SUBROUTINE PolyFitter_Defaults
 !JvdS All of the following is licence stuff: should be in a separate file
 !
 !*****************************************************************************
@@ -1100,13 +917,9 @@
        USE DRUID_HEADER
        USE VARIABLES
 
-!      INTEGER TIMEDATA (8)
-!      CHARACTER (LEN = 12) DATEINFO (3)
-
-       INTEGER valid_license, ndays
+       INTEGER valid_license
        INTEGER Read_License_Valid
        CHARACTER*2 Exp
-       TYPE(License_Info) Info
 
 !      valid_license = 2
 !      CALL DATE_AND_TIME (DATEINFO (1), DATEINFO (2), DATEINFO (3), TIMEDATA)
@@ -1153,7 +966,7 @@
           IF (WinfoDialog(4) .EQ. 1) THEN
             CALL LicensePopup()
           ELSE
-            CALL WExit(.TRUE.)
+            CALL WExit
           END IF
         END IF
       END DO
@@ -1174,10 +987,9 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+
       LOGICAL           :: INLOOP = .TRUE.
-      LOGICAL           :: QUIT
-      TYPE(WIN_MESSAGE) :: MESSAGE
-      INTEGER Ident, MachId, get_DashSerialNumber, ISite, Valid, ICode
+      INTEGER       ISite, Valid, ICode
       CHARACTER*255 ClString
       TYPE (License_Info) Info
 
@@ -1195,31 +1007,24 @@
         CALL WDialogFieldState(IDF_License_SiteCodeLabel,Disabled)
       END IF
       DO WHILE(INLOOP)
-        CALL WMessage(ITYPE,MESSAGE)
-        SELECT CASE (ITYPE)
+        CALL GetEvent
+        SELECT CASE (EventType)
           CASE (PushButton)
-            Ident = MESSAGE%VALUE1
-            SELECT CASE(Ident)
+            SELECT CASE(EventInfo%VALUE1)
               CASE (ID_Licensing_Exit)
                 CALL DoExit()
               CASE (IDCANCEL)
-                CALL WExit(QUIT)
+                CALL WExit
               CASE (ID_Enter_License)
                 CALL WDialogGetString(IDF_License_String, CLString)
                 CALL Decode_License(CLString,Info)
                 IF (Info%Valid .LT. 0 ) THEN
-                  CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                    "Sorry, the license key is invalid - please check your input",&
-                    "Invalid key")
+                  CALL ErrorMessage("Sorry, the license key is invalid - please check your input.")
                 ELSE IF ((ISite .EQ. 1) .AND. (Info%LicenseType .NE. SiteKey)) THEN
-                  CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                     "Sorry, the license key is not a site license",&
-                     "Invalid key")
+                  CALL ErrorMessage("Sorry, the license key is not a site license.")
                 ELSE IF ((ISite .EQ. 0) .AND. (Info%LicenseType .EQ. SiteKey)) THEN
-                  CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                    "The license key is a site license:"//&
-                    " Please select the Site License check-box and enter your site code as well",&
-                    "Site key")                                             
+                  CALL ErrorMessage("The license key is a site license: Please select"//&
+                                    " the Site License check-box and enter your site code as well.")                                             
                 ELSE
                   Valid = License_Valid(Info)
                   IF (ISite .EQ. 1) THEN
@@ -1232,27 +1037,21 @@
                     CALL Write_License_File(CLString)
                     INLOOP = .FALSE.
                   ELSE IF (Valid .EQ. 0) THEN
-                    CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                      "Sorry, the license key has expired ",&
-                      "Expired key")                                                
+                    CALL ErrorMessage("Sorry, the license key has expired.")
                   ELSE IF (Valid .EQ. -1) THEN
-                    CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                       "Sorry, the license key is not valid for this machine ",&
-                        "Invalid key")
+                    CALL ErrorMessage("Sorry, the license key is not valid for this machine.")
                   ELSE IF (Valid .EQ. -99) THEN
-                    CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-                      "Sorry, the license key is not valid for this site ",&
-                      "Invalid site key")                                                                                           
+                    CALL ErrorMessage("Sorry, the license key is not valid for this site.") 
                   END IF
                 END IF
               CASE (ID_Licence_Request)
                 CALL Write_License_Request_Form()
-                CALL WExit(QUIT)
+                CALL WExit
             END SELECT
           CASE (Expose,Resize)
             CALL Redraw()
           CASE (CloseRequest)
-            CALL WExit(QUIT)
+            CALL WExit
           CASE (FieldChanged)
             CALL WDialogGetCheckBox(IDF_License_Site,ISite)
             IF (Isite .EQ. 1) THEN
@@ -1277,19 +1076,24 @@
 
       USE VARIABLES
 
+      IMPLICIT NONE
+
       CHARACTER*(*) LString
       TYPE (License_Info) Info
-      INTEGER v(2), w(2), k(4), i, lsum
-      INTEGER*2 checksum, cs
+      INTEGER v(2), w(2), k(4), cs
+      INTEGER*2 tCheckSum
+      EQUIVALENCE (tCheckSum,cs)
+      INTEGER*2 checksum
 
       k(1) = 2453
       k(2) = 1768
       k(3) = 4567
       k(4) = 1453
       Info%Valid = 1
+! JvdS Next lines very dirty: v is INTEGER*4, but their XOR is INTEGER*2. Not possible.
       READ(Lstring,'(2z8,z4)',err = 99) v(1), v(2), checksum
       cs = IEOR(v(1),v(2))
-      IF (cs .NE. checksum) GOTO 99
+      IF (tCheckSum .NE. checksum) GOTO 99
 ! Check the checksum
       CALL decipher(v,w,k)
       Info%SerialNumber =  w(1)
@@ -1315,16 +1119,14 @@
       USE VARIABLES  
 
       CHARACTER*80 line, CLString
-      CHARACTER*8  dt
-      INTEGER      today, snum, dummy
+      INTEGER      dummy
 
       TYPE(License_Info) Info
 
       Read_License_Valid = -2
       OPEN(UNIT=117,&
         file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'License.dat',&
-        STATUS='OLD',&
-        ERR=99 )
+        STATUS='OLD',ERR=99)
       DO WHILE (Read_License_Valid .LE. 0)
         READ(117,'(A)',err=99,END=99) line
         IF (line(1:1) .NE. '#') THEN
@@ -1348,7 +1150,6 @@
 
       USE VARIABLES
 
-      CHARACTER*80 line, clstring
       INTEGER      today, snum
       INTEGER      Get_DashSerialNumber
       CHARACTER*8  dt
@@ -1490,15 +1291,11 @@
       END IF
       RETURN
  99   CONTINUE
-      CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-        "Sorry, could not open the file "//CHAR(13)//fname(1:LEN_TRIM(Fname)),&
-        "Could not open file")
+      CALL ErrorMessage("Sorry, could not open the file "//CHAR(13)//fname(1:LEN_TRIM(Fname)))
       CLOSE(iun,iostat=idummy)
       RETURN            
  100  CONTINUE
-      CALL WMessageBox(OkOnly, ExclamationIcon, CommonOk, &
-        "Sorry, could not write to the file "//CHAR(13)//fname(1:LEN_TRIM(Fname)),&
-        "Could not open file")
+      CALL ErrorMessage("Sorry, could not write to the file "//CHAR(13)//fname(1:LEN_TRIM(Fname)))
       CLOSE(iun,iostat=idummy)      
 
       END SUBROUTINE Write_License_Request_Form
@@ -1512,7 +1309,6 @@
       CALL SetWizardState(-1)
       CALL PolyFitter_Wizard(NoData)
       IF (.NOT. NODATA) CALL SetModeMenuState(1,0,0)
-      CALL PolyFitter_Wizard_Check_Status()
       IF (.NOT. NODATA) CALL Upload_Wizard_Information()
       Run_Wizard = NoData
       CALL SetWizardState(1)
@@ -1561,11 +1357,11 @@
       ENDIF
       CALL WMenuSetState(ID_Import_dpj_file,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_Import_data,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_get_data_properties,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_get_peak_positions,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_get_crystal_symmetry,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_get_peak_widths,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_plot_options,ItemEnabled,OnOrOff)
+!      CALL WMenuSetState(ID_get_data_properties,ItemEnabled,OnOrOff)
+!      CALL WMenuSetState(ID_get_peak_positions,ItemEnabled,OnOrOff)
+!      CALL WMenuSetState(ID_get_crystal_symmetry,ItemEnabled,OnOrOff)
+!      CALL WMenuSetState(ID_get_peak_widths,ItemEnabled,OnOrOff)
+!      CALL WMenuSetState(ID_plot_options,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_PolyFitter_Help,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_Polyfitter_Tips,ItemEnabled,OnOrOff)
       CALL WMenuSetState(ID_help_about_Polyfitter,ItemEnabled,OnOrOff)
@@ -1578,11 +1374,6 @@
         PawleyOn   = WMenuGetState(ID_Pawley_Refinement_Mode,ItemEnabled)
         SolutionOn = WMenuGetState(ID_Structure_Solution_Mode,ItemEnabled)
         WizardOn   = WMenuGetState(ID_Start_Wizard,ItemEnabled)
-! JvdS The following line introduced a bug
-! Was:
-!        CALL SetModeMenuState(0,0,0)
-! The definition of SetModeMenuState is such that a 0 means "don't do anything"
-! Instead, the menus should be disabled:
         CALL SetModeMenuState(-1,-1,-1)
       ENDIF
       CALL SetWizardState(WizardOn)
