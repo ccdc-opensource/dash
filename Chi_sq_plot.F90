@@ -12,7 +12,7 @@
 !
 !  USE module containing routine definitions and symbolic names.
 !
-      use druid_header
+      USE DRUID_HEADER
       USE WINTERACTER
 !
 !      IMPLICIT NONE
@@ -38,8 +38,6 @@
        INTEGER Ix, Iy
        COMMON /WindowPosition/ Ix, Iy
        DATA Ix /10/, Iy /450/
-!
-!
 !
         it_count = iteration
         num_moves(it_count) = ntotmov
@@ -68,7 +66,7 @@
 !***********************************************************************************************
       SUBROUTINE plotting_Chi_sqd(num_moves, chi_sqd, x_min, x_max, it_count, y_max)
       
-      USE druid_header
+      USE DRUID_HEADER
       USE WINTERACTER
               
       INCLUDE 'poly_colours.inc'  
@@ -110,9 +108,9 @@
 !  Draw main title
 !
       CALL IGrCharSet('H')
-      CALL IGrCharFont(       1)
-      CALL IGrCharSpacing('F')
-      CALL IGrCharSize( 1.3, 1.3)
+      CALL IGrCharFont(3)
+      CALL IGrCharSpacing('P')
+      CALL IGrCharSize( 2.0, 1.5)
       CALL IGrColourN( KolNumMain)
       CALL IPgTitle('Profile Chi-squared vs. Number of Moves','C')
 !
@@ -163,7 +161,7 @@
 !          CALL IPgXYPairs(XVALUES(1,ISET),YVALUES(1,ISET))
            call IPgXYPairs(num_moves, chi_sqd)
 !      END DO
-      RETURN
+
       END SUBROUTINE plotting_chi_sqd
 !******************************************************************************************
       
@@ -188,6 +186,7 @@
           Iy = WinfoWindow(WindowYpos)
           CALL WindowCloseChild(i)
           ChiSqdChildWindows(i) = 0
-        END IF
-      END DO
+        ENDIF
+      ENDDO
+
       END SUBROUTINE Close_Chisq_Plot       			  
