@@ -16,6 +16,11 @@
       PARAMETER (MVAR = 100)
 ! Maximum number of 'parameters' / 'variables' (= degrees of freedom) in the SA
 
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
+
+! CurrentWizardWindow = Winteracter ID of current Wizard window
+
       INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
       COMMON /DialoguePosCmn/ IXPos_IDD_Wizard, IYPos_IDD_Wizard
 
@@ -148,7 +153,7 @@
 ! XPF_Range(1,i)  = start of hatched area
 ! XPF_Range(2,i)  = end   of hatched area
 ! RangeFitYN      = has this range been fitted Yes / No
-! @ RangeFitYN has not been implemented yet.
+! @@ RangeFitYN has not been implemented yet.
 ! IPF_Lo          = designates bin (so, pointer into XBIN) where the peak fit range starts.
 ! IPF_Hi          = designates bin (so, pointer into XBIN) where the peak fit range ends.
 ! NumPeakFitRange = Number of peak fit ranges (hatched areas on the screen)
@@ -230,6 +235,14 @@
 ! Note that the variable names in this COMMON block are not consistent.
 ! Note that '150' should be equal to MAXATM, which is 100
 
+      REAL              BICALC,         XICALC
+      COMMON /SAREFLN2/ BICALC(MSAREF), XICALC(MSAREF)
+! BICALC(1:MAXK) = the calculated intensities corrected for preferred orientation
+! XICALC(1:MAXK) = the preferred orientation part of the calculated intensities
+
+      INTEGER           iHMUL
+      COMMON /SAREFLN3/ iHMUL(MSAREF)
+
       REAL            XATOPT
       COMMON /posopt/ XATOPT(3,150)
 
@@ -238,7 +251,7 @@
       DOUBLE PRECISION XOPT,       C,       XP,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
 
-! MVAR = 100
+! MVAR = 100 (the variable formerly also known as NMAX)
 ! XOPT = values of the parameters of the best SA solution so far
 
       INTEGER         KKOR
@@ -261,13 +274,6 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      INTEGER         CurrentWizardWindow
-      COMMON /Wizard/ CurrentWizardWindow
-
-! InWizard            = when .TRUE., wizard is active
-! InWizardWindow      = when .TRUE., a wizard window is currently visible
-! CurrentWizardWindow = Winteracter ID of current Wizard window
-
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
@@ -276,6 +282,15 @@
       COMMON /sagdat/ bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
+      INTEGER         NStPar
+      COMMON /pextra/ NStPar
+
+! Yet another variable to hold the number of SA parameters
+! The full collection is now:
+!
+! nvar   = number of variables
+! npar   = number of parameters
+! NStPar = number of structural parameters (i.e. those changing the fractional co-ordinates)
 
       END SUBROUTINE FoolCompiler
 !
