@@ -1,4 +1,4 @@
-! Winteracter module created : 29/Jul/2003 15:58:03
+! Winteracter module created : 29/Jul/2003 16:50:05
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -717,4 +717,5 @@
           INTEGER, PARAMETER :: IDB_Up6                         =  1540
           INTEGER, PARAMETER :: IDF_MENU1                       =  1546
           INTEGER, PARAMETER :: IDB_Restart                     =  1547
+          INTEGER, PARAMETER :: IDC_AbsorbH                     =  1548
       END MODULE Druid_Header

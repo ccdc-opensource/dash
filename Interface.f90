@@ -92,7 +92,6 @@
 !
 !*****************************************************************************
 !
-
       SUBROUTINE ScrUpdateFileName
 !
 ! This routine updates all occurrences of the filename, both
@@ -215,6 +214,26 @@
       ENDIF
 
       END FUNCTION dSpacing2TwoTheta
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION Get_AbsorbHydrogens
+
+! When .TRUE., hydrogen atoms are included in the structure factor calculations
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      Get_AbsorbHydrogens = WDialogGetCheckBoxLogical(IDC_AbsorbH)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_AbsorbHydrogens
 !
 !*****************************************************************************
 !
