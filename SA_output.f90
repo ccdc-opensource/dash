@@ -94,6 +94,11 @@
       COMMON / sagdat / temin, temax, bchmin, bpwval, bchpro, &
                 tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
                 nd2, nd3, nd4
+      LOGICAL RESTART
+      INTEGER SA_Run_Number
+      INTEGER MaxRuns, MinMoves, MaxMoves
+      REAL    ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
       CHARACTER*255 temperfile
       REAL tenow1, tenow2, ruler, rulex1, rulex2
       INTEGER iemax, ilt
@@ -103,18 +108,37 @@
 
       temperfile = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Images'//DIRSPACER//'temperature1.bmp'
       ilt = LEN_TRIM(temperfile)
+! Temperature
+      CALL IGrSelect(3,IDF_T_picture)
+      CALL IGrUnits(temin,0.0,temax,1.0)
+      CALL IGrLoadImage(temperfile(1:ilt))
 
+
+      CALL IGrColourN(95) ! Lightgreen
+      tenow1=tempvl-0.03
+      tenow2=tempvl+0.03
+      CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
+! Minimum chi squared
       CALL IGrSelect(3,IDF_minchisq_picture)
       CALL IGrFillPattern(Solid)
       CALL IGrUnits(temin,0.0,temax,1.0)
       CALL IGrLoadImage(temperfile(1:ilt))
 
-      CALL IGrColourN(95)
+      CALL IGrColourN(95) ! Lightgreen
       tenow1=bchmin-0.03
       tenow2=bchmin+0.03
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
+!.. average chi-squared scale ...
+      CALL IGrSelect(3,IDF_avchisq_picture)
 
-
+      CALL IGrUnits(temin,0.0,temax,1.0)
+      CALL IGrLoadImage(temperfile(1:ilt))
+      CALL IGrColourN(95) ! Lightgreen
+      CALL IGrRectangle(avchi1,rminh,avchi2,rmaxh)
+      CALL IGrColourN(128)
+      CALL IGrRectangle(avchi3,rminh,avchi4,rmaxh)
+      CALL IGrColourN(95) ! Lightgreen
+! Profile chi squared
       CALL IGrSelect(3,IDF_prochisq_picture)
       CALL IGrUnits(temin,0.0,temax,1.0)
       CALL IGrLoadImage(temperfile(1:ilt))
@@ -122,60 +146,41 @@
       tenow1=bpwval-0.03
       tenow2=bpwval+0.03
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
-      CALL IGrColourN(95)
+      CALL IGrColourN(95) ! Lightgreen
 
       tenow1=bchpro-0.03
       tenow2=bchpro+0.03
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
 
-
-      CALL IGrSelect(3,IDF_T_picture)
-      CALL IGrUnits(temin,0.0,temax,1.0)
-      CALL IGrLoadImage(temperfile(1:ilt))
-
-
-      CALL IGrColourN(95)
-      tenow1=tempvl-0.03
-      tenow2=tempvl+0.03
-      CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
-!.. average chi-squared scale ...
-      CALL IGrSelect(3,IDF_avchisq_picture)
-
-      CALL IGrUnits(temin,0.0,temax,1.0)
-      CALL IGrLoadImage(temperfile(1:ilt))
-      CALL IGrColourN(95)
-      CALL IGrRectangle(avchi1,rminh,avchi2,rmaxh)
-      CALL IGrColourN(128)
-      CALL IGrRectangle(avchi3,rminh,avchi4,rmaxh)
-      CALL IGrColourN(95)
-
-      CALL IGrSelect(3,IDF_SA_move_distribution)
-      ruler=nd2
-      CALL IGrUnits(0.0,0.0,ruler,1.0)
-      CALL IGrColourN(95)
-      rulex1=0.0
-      rulex2=nd1
-      CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
-      CALL IGrColourN(159)
-      rulex1=rulex2
-      rulex2=rulex2+nd4
-      CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
-      CALL IGrColourN(31)
-      rulex1=rulex2
-      rulex2=nd2
-      CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
 ! total moves
       CALL IGrSelect(3,IDF_SATotalMoves_picture)
-      iemax=1+alog10(MAX(1.,FLOAT(nd3)))
-      ruler=10.**iemax
+!O      iemax=1+alog10(MAX(1.,FLOAT(nd3)))
+!O      ruler=10.**iemax
+      ruler = MaxMoves
       CALL IGrUnits(0.0,0.0,ruler,1.0)
-      CALL IGrColourN(52)
+      CALL IGrColourN(59)  ! Yellow
       rulex1=0.0
       rulex2=nd3
       CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
-      CALL IGrColourN(159)
+      CALL IGrColourN(159) ! Blue
       rulex1=rulex2
       rulex2=ruler
+      CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
+! Uphill, downhill, rejected
+      CALL IGrSelect(3,IDF_SA_move_distribution)
+      ruler=nd2
+      CALL IGrUnits(0.0,0.0,ruler,1.0)
+      CALL IGrColourN(95) ! Lightgreen
+      rulex1=0.0
+      rulex2=nd1
+      CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
+      CALL IGrColourN(159) ! Blue
+      rulex1=rulex2
+      rulex2=rulex2+nd4
+      CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
+      CALL IGrColourN(31) ! Red
+      rulex1=rulex2
+      rulex2=nd2
       CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
 
       CALL IGrSelect(1,0)
