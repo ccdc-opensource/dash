@@ -1,7 +1,9 @@
 !********************************************************************************
 ! Attempts to write out solutions from DASH such that they are superimposable.
+! This subroutine operates on the orthogonal co-ordinates, not on the centres of mass or quaternions.
+! The orthogonal co-ordinates used are XAtmCoords(1:3,1:NATOM,Curr_SA_Run)
 ! Doesn't treat Sohnke groups any differently from any other space group and
-! therefore sometimes get "unaligned" solutions.  Not everything behaves well 
+! therefore sometimes get "unaligned" solutions.  Not everything behaves well
 ! all the time, for example Pca21 has caused problems.
 ! NOV2001 Added nasty fix which will help with cases like Pca21
 ! JAN2002 Now use array rpdb for symmetry operations (instead of SOAxis, SOnumber etc.
@@ -10,16 +12,15 @@
 ! MAR2002 Trigonal and Hexagonal Groups handled better.  Further Generators (Section
 !         Int.Tables A) have been added and special cases where x and y axes are swapped
 !         without inverting z are taken care of.
-!         Three equivalent axes (i.e. cubic groups) are not taken account of explicitly 
+!         Three equivalent axes (i.e. cubic groups) are not taken account of explicitly
 !         but cubic groups (Pa3 at least) shown to align
 ! TODO R and H settings in some trigonal groups?
 !
 !*****************************************************************************
 !
 
-	SUBROUTINE ALIGN()
+      SUBROUTINE ALIGN()
 
-      USE DRUID_HEADER
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR            ! Number of zmatrices, nfrag
@@ -36,7 +37,7 @@
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 !
       PARAMETER (mpdbops=192)
-      COMMON /fullsymmops/ rpdb(4,4,mpdbops)!Symmetry operations
+      COMMON /fullsymmops/ rpdb(4,4,mpdbops) !Symmetry operations
 ! Required for NATOM
       INTEGER         NATOM
       REAL                   X
@@ -81,7 +82,7 @@
       INTEGER, DIMENSION(3)  :: FixedAxes
       INTEGER       NumOfTimesToApplyShift
       REAL          snum
-      REAL, DIMENSION (20,200,3) ::CoMSGMatrix     
+      REAL, DIMENSION (20,200,3) ::CoMSGMatrix
       INTEGER       icount
       INTEGER       INumOfShifts, IinfiniteAxes
       REAL, DIMENSION(3)     :: TempShiftMatrix
@@ -104,20 +105,15 @@
       INTEGER ActualOrigin
       INTEGER Odd
 
-      
       EXTERNAL ErrorMessage
 
-!        
+!
 !--------- Check to see if align algorithm should be applied-----------
 ! For now, if the space group is trigonal, hexagonal or cubic, does not attempt alignment.  
      
 !!      IF (NumberSGTable.GE.430) THEN
 !!        RETURN
 !!      END IF       
-! If number of Z-matrices greater than 1, do not align
-      IF (nfrag.GT.1) THEN
-        RETURN
-      END IF       
 ! If number of Z-matrices greater than 1, do not align
       IF (TotNumZMatrices.GT.1) RETURN
 
@@ -141,9 +137,9 @@
       READ(220,55) Inversion, NumOfShifts, ShiftString
 !55    FORMAT(28x, I1, 4x, I1, x, A40)
 55    FORMAT(75x, I1, 4x, I1, x, A20)
-        DO j = 1,NumofShifts
-          Shift(j) = ShiftString(((j*5)-4):(j*5))
-        ENDDO 
+      DO j = 1,NumofShifts
+        Shift(j) = ShiftString(((j*5)-4):(j*5))
+      ENDDO 
       CLOSE(220)
 
 ! Clear Sumx, sumy and sumz
@@ -159,7 +155,7 @@
 ! trigonal or hexagonal?  Cubic groups and hence three equivalent axes are 
 ! not handled yet
 
-      IF ((NumberSGTable.ge.349).and.(NumberSGTable.le.488)) THEN
+      IF ((NumberSGTable.GE.349).AND.(NumberSGTable.LE.488)) THEN
        EquivAxes = 2
       END IF
 
@@ -175,7 +171,7 @@
       CentreOfMass(3) = sumz / FLOAT(NATOM)
 
 ! If Space Group like P1 where only inversion allowed then set Centre of Mass to (1/2,1/2,1/2)
-      IF((Inversion.eq.1).and.(NumOfShifts.eq.0)) THEN
+      IF((Inversion.EQ.1).AND.(NumOfShifts.EQ.0)) THEN
         DO j = 1,3
           CentreOfMass(j) = 0.50
         END DO
@@ -194,18 +190,18 @@
 
       DO IZ = 1, NumberOfOrigins
         
-        DO j = 1,3
+        DO j = 1, 3
           CentreofMass(j) = Origin(IZ, j)
         END DO
      
 !       First entry into CoMMatrix is the original centre of mass
-        DO j = 1,3
+        DO j = 1, 3
           CoMMatrix(1,j) = CentreofMass(j)
         END DO
 
         icount = 1
 
-          DO k = 1,NumOfShifts
+          DO k = 1, NumOfShifts
             Transflag = 0
             CALL ShiftHandler(Shift(k), ShiftMatrix, CentreofMass, Transflag, InfiniteAxes)
               IF (Transflag.ne.1) THEN    
@@ -214,14 +210,14 @@
                 DO j = 1,NumOfTimesToApplyShift
                   iCount = iCount+1
                   CoMMAtrix(icount,1) = CentreOfMass(1) + j*ShiftMatrix(1)
-                  CoMMAtrix(icount,2) = CentreOfMass(2) + j*ShiftMatrix(2)                                      
-                  CoMMAtrix(icount,3) = CentreOfMass(3) + j*ShiftMatrix(3)             
+                  CoMMAtrix(icount,2) = CentreOfMass(2) + j*ShiftMatrix(2)
+                  CoMMAtrix(icount,3) = CentreOfMass(3) + j*ShiftMatrix(3)
                 END DO
               END IF
           END DO
 
 !       Check to see if user fixed infinite translation axes 
-        DO j = 1,3
+        DO j = 1, 3
           IF(InfiniteAxes(j) .EQ. 1) THEN
             CoMMatrix(1,j) = 0.5
           ELSEIF((InfiniteAxes(j) .EQ. 0).AND.(FixedAxes(j) .EQ. 1)) THEN 
@@ -246,15 +242,15 @@
 !Calculate number of genuine shifts         
          inumofshifts = NumofShifts - iinfiniteaxes
 !If only two shifts, apply them both and calculate centre of mass to put into CoMMatrix         
-         IF(inumofshifts.eq.2) THEN
-         DO k = 1,inumofshifts                        
+         IF(inumofshifts.EQ.2) THEN
+         DO k = 1, inumofshifts                        
            CALL ShiftHandler(Shift(iinfiniteaxes+k), ShiftMatrix, CentreofMass, Transflag, InfiniteAxes)
              DO j = 1,3
-               TempShiftMatrix(j) = Tempshiftmatrix(j)+shiftMatrix(j)
+               TempShiftMatrix(j) = Tempshiftmatrix(j) + shiftMatrix(j)
              END DO
          END DO
            icount = icount + 1
-           DO j = 1,3
+           DO j = 1, 3
              CoMMAtrix(icount,j) = CentreOfMass(j) + TempShiftMatrix(j)
            END DO
          END IF
@@ -262,59 +258,59 @@
 ! If there are 3 allowable shifts calculate all possible combinations
          IF(inumofshifts.eq.3) THEN
 ! Combination x + y
-           DO j = 1,3
+           DO j = 1, 3
              Tempshiftmatrix(j) = 0.0
            END DO
            DO k = 1,2
              CALL ShiftHandler(Shift(iinfiniteaxes+k), ShiftMatrix, CentreofMass, Transflag, InfiniteAxes)
-               DO j = 1,3
+               DO j = 1, 3
                Tempshiftmatrix(j) = tempshiftmatrix(j) + ShiftMatrix(j)
                END DO
            END DO
            icount = icount +1
-           DO j = 1,3
+           DO j = 1, 3
              CoMMAtrix(icount,j) = CentreOfMass(j) + TempShiftMatrix(j)
            END DO
 ! Combination x + z
-           DO j = 1,3
+           DO j = 1, 3
              Tempshiftmatrix(j) = 0.0
            END DO
            DO k = 1,3,2
              CALL ShiftHandler(Shift(iinfiniteaxes+k), ShiftMatrix, CentreofMass, Transflag, InfiniteAxes)
-               DO j = 1,3
+               DO j = 1, 3
                Tempshiftmatrix(j) = tempshiftmatrix(j) + ShiftMatrix(j)
                END DO
            END DO
            icount = icount +1
-           DO j = 1,3
+           DO j = 1, 3
              CoMMAtrix(icount,j) = CentreOfMass(j) + TempShiftMatrix(j)
            END DO
 ! Combination y + z
-           DO j = 1,3
+           DO j = 1, 3
              Tempshiftmatrix(j) = 0.0
            END DO
            DO k = 2,3
              CALL ShiftHandler(Shift(iinfiniteaxes+k), ShiftMatrix, CentreofMass, Transflag, InfiniteAxes)
-             DO j = 1,3
+             DO j = 1, 3
                Tempshiftmatrix(j) = tempshiftmatrix(j) + ShiftMatrix(j)
              END DO
            END DO
            icount = icount +1
-           DO j = 1,3
+           DO j = 1, 3
              CoMMAtrix(icount,j) = CentreOfMass(j) + TempShiftMatrix(j)
            END DO
 ! combination x+y+z
-           DO j = 1,3
+           DO j = 1, 3
              Tempshiftmatrix(j) = 0.0
            END DO
-           DO k = 1,3
+           DO k = 1, 3
              CALL ShiftHandler(Shift(iinfiniteaxes+k), ShiftMatrix, CentreofMass, Transflag, InfiniteAxes)
-             DO j = 1,3
+             DO j = 1, 3
                Tempshiftmatrix(j) = tempshiftmatrix(j) + ShiftMatrix(j)
              END DO
            END DO
            icount = icount +1
-           DO j = 1,3
+           DO j = 1, 3
              CoMMAtrix(icount,j) = CentreOfMass(j) + TempShiftMatrix(j)
            END DO
          END IF
@@ -339,7 +335,7 @@
      END IF
        DO i = 1, icount
          DO k = 1, npdbops
-           DO j = 1,3
+           DO j = 1, 3
              IF (infiniteaxes(j).NE.1) THEN
                CoMSGMatrix(i,k,j) = rpdb(j,4,k) + (rpdb(j,1,k)*CoMMatrix(i,1) + rpdb(j,2,k)*CoMMatrix(i,2) + rpdb(j,3,k)*CoMMatrix(i,3))
              ELSE 
@@ -357,7 +353,7 @@
           END IF           
          DO i = 1,icount 
            DO k = 1,npdbops
-             DO j=1,3
+             DO j=1, 3
                CoMSGMatrix((icount+i),k,j) = (-1)*CoMSGMatrix(i,k,j)
              END DO
            END DO
@@ -388,7 +384,6 @@
      END DO  ! End of loop through origins
 
 
-            
 
      bestorigin = MINLOC(obestdistance, MASK=obestdistance.gt.0) !Row of Origin containing correct origin
      ActualOrigin = INT(Origin(BestOrigin(1),4)) ! origin number referred to by CASE statements
@@ -451,7 +446,6 @@
           END IF
        END DO
      END IF
- 
 
 
 ! Case where there are two infinite translation axes and inversion centre.
@@ -495,32 +489,28 @@
 !The following three subroutines supply the details of the allowed shifts to align
 !
 !********************************************************************************************
-    SUBROUTINE ShiftHandler(Shift, ShiftMatrix, CentreofMass, Transflag, InfiniteAxes)
-    USE DRUID_HEADER
+      SUBROUTINE ShiftHandler(Shift, ShiftMatrix, CentreofMass, Transflag, InfiniteAxes)
 
+      CHARACTER*5 Shift
+      REAL, DIMENSION(3) :: ShiftMatrix
+      REAL, DIMENSION(3) :: CentreofMass
+      INTEGER, DIMENSION(3) :: InfiniteAxes
+      INTEGER Transflag
+      Shift = TRIM(Shift)
 
-    CHARACTER*5 Shift
-    REAL, DIMENSION(3) :: ShiftMatrix
-    REAL, DIMENSION(3) :: CentreofMass
-    INTEGER, DIMENSION(3) :: InfiniteAxes
-    INTEGER Transflag
-    Shift = TRIM(Shift)
+      Transflag = 0
+      IF ((Shift.eq.'r').or.(Shift.eq.'s').or.(Shift.eq.'t')) THEN
+        CALL ZeroInfiniteTransAxes(Shift, CentreOfMass, Transflag, InfiniteAxes)
+      ELSE
+        CALL GetShift(Shift, Shiftmatrix)
+      ENDIF
 
-    Transflag = 0
-    IF ((Shift.eq.'r').or.(Shift.eq.'s').or.(Shift.eq.'t')) THEN
-      CALL ZeroInfiniteTransAxes(Shift, CentreOfMass, Transflag, InfiniteAxes)
-    ELSE
-      CALL GetShift(Shift, Shiftmatrix)
-    END IF
-    RETURN
-    
-    END SUBROUTINE ShiftHandler
-
-
+      END SUBROUTINE ShiftHandler
+!
 !******************************************************************************
+!
     SUBROUTINE GetShift(Shift, ShiftMatrix)
 ! Returns an allowed shift for the Space Group
-    USE DRUID_HEADER
     
     CHARACTER*5 Shift
     REAL, DIMENSION(3) :: ShiftMatrix
@@ -561,14 +551,12 @@
         ShiftMatrix(3) = 0.5
 
     END SELECT
-    RETURN
 
     END SUBROUTINE GetShift
 !********************************************************************************************
     SUBROUTINE ZeroInfiniteTransAxes(Shift, CentreOfMass, Transflag, InfiniteAxes)
 ! An axis allows infinite translations so sets the centre of mass coordinate to 0.5 and
 ! records which axis infinite translations applicable to. 
-    USE DRUID_HEADER
 
     REAL, DIMENSION(3) :: CentreOfMass
     CHARACTER*5 Shift
@@ -588,7 +576,7 @@
           CentreOfMass(1) = 0.500
           InfiniteAxes(1) = 1
     END SELECT
-    
+
     Transflag = 1
     RETURN
     END SUBROUTINE ZeroInfiniteTransAxes
@@ -598,7 +586,6 @@
 !
 !*********************************************************************************************
     SUBROUTINE CoMCell(CoMSGMatrix, icount, npdbops)
-    USE DRUID_HEADER
 
     REAL, DIMENSION (20,200,3) ::CoMSGMatrix
     INTEGER icount
@@ -641,7 +628,6 @@
 !
 !********************************************************************************************
       SUBROUTINE MakeMol(XATOPT, isymopbest, ishiftbest, NATOM, Connarray, icount, inversion, Actualorigin)
-      USE DRUID_HEADER
 
       INTEGER     MaxNumAtom
       PARAMETER  (MaxNumAtom = 150)
@@ -785,13 +771,13 @@
     END SUBROUTINE SpecialOriginRequirements
 
 !********************************************************************************************    
-    
+
     SUBROUTINE ApplyOrigins(OriginIndex, OriginToApply, CentreofMass, Origin)
     REAL, DIMENSION (3,4) :: Origin
     REAL, DIMENSION (3) :: CentreofMass  
     INTEGER OriginIndex
     INTEGER OriginToApply
-       
+
        SELECT CASE (OriginToApply)
          CASE(1) ! -x, -y, z
            Origin(OriginIndex,1) = (-1) * CentreofMass(1)
@@ -814,17 +800,22 @@
            Origin(OriginIndex,3) = CentreofMass(3) - 0.25
            Origin(OriginIndex,4) = 4
        END SELECT
-    END SUBROUTINE   
-    
+    END SUBROUTINE
+!
 ! *******************************************************************************************
-    SUBROUTINE OddlybehavedAxisSwaps(NumberSGTable,Odd)
+!
+      SUBROUTINE OddlybehavedAxisSwaps(NumberSGTable,Odd)
+
       INTEGER Odd
-      INTEGER NumberSGTable           
-      
+      INTEGER NumberSGTable
+
       Odd = 0
       SELECT CASE (NumberSGTable)
         CASE(357:363, 469, 470, 494:500)
           Odd = 1
       END SELECT
-    END SUBROUTINE 
+
+      END SUBROUTINE
+!
 ! *********************************************************************************************
+!
