@@ -35,7 +35,7 @@
       COMMON /CCSLER/ IBMBER
 
 ! Do all the initialisation
-      CALL INITSP(N,X,DX)
+      CALL INITSP(N)
 ! Get variables
       CALL GETVAR(N,X,DX)
 ! Perform simplex
@@ -58,18 +58,28 @@
 !
       SUBROUTINE GETVAR(N,V,D)
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
-      REAL V(MVAR), D(MVAR)
-      PARAMETER (MPT=2000)
-      COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
+      INTEGER, INTENT (IN   ) :: N
+      REAL,    INTENT (  OUT) :: V(MVAR), D(MVAR)
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
-      PARAMETER (MPeak=10)
-      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
-      REAL YHITE(MPEAK)
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
+
+      INTEGER     MPeak
+      PARAMETER ( MPeak = 10 )
+
+      INTEGER         NPEAK
+      REAL                   AREA,        XPOS
+      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK)
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -102,71 +112,75 @@
                         PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
                         PkPosAv(MAX_NPFR)
 
-      YMAX = Y(1)
+      INTEGER I, IMAX, IP, KK, iPos
+      REAL YMAX, XMIN, XMAX, XDIF, XDELT, YMXB, YPMX, YPMX50, YBT, YPT, XHWHMU, GAMM
+      REAL SIGM, YPMX20, XTEM, HTEM, HPSL, HMSL, TOTAREA, YB, YHSUM, ATEM, ANEW
+      REAL YHITE(MPEAK)
+
+      YMAX = ZOBS(1)
       IMAX = 1
-      DO I = 1, NPT
-        IF (Y(I).GE.YMAX) THEN
-          YMAX = Y(I)
+      DO I = 1, NPTS
+        IF (ZOBS(I) .GE. YMAX) THEN
+          YMAX = ZOBS(I)
           IMAX = I
         ENDIF
       ENDDO
-      XMIN = X(1)
-      XMAX = X(NPT)
+      XMIN = ZARGI(1)
+      XMAX = ZARGI(NPTS)
       XDIF = XMAX - XMIN
-      XDELT = XDIF / (FLOAT(NPT)-1.0)
-      V(1) = Y(1)
-      V(2) = (Y(NPT)-Y(1))/XDIF
-      YMXB = V(1) + V(2)*(X(IMAX)-X(1))
+      XDELT = XDIF / (FLOAT(NPTS)-1.0)
+      V(1) = ZOBS(1)
+      V(2) = (ZOBS(NPTS)-ZOBS(1))/XDIF
+      YMXB = V(1) + V(2)*(ZARGI(IMAX)-ZARGI(1))
       YPMX = YMAX - YMXB
-      YPMX50 = 0.5*YPMX
+      YPMX50 = 0.5 * YPMX
 ! Estimate GAMM & SIGM
-      DO I = IMAX, NPT
-        YBT = V(1) + V(2)*(X(I)-X(1))
-        YPT = Y(I) - YBT
-        IF (YPT.LT.YPMX50) THEN
-          XHWHMU = X(I) - X(IMAX)
+      DO I = IMAX, NPTS
+        YBT = V(1) + V(2)*(ZARGI(I)-ZARGI(1))
+        YPT = ZOBS(I) - YBT
+        IF (YPT .LT. YPMX50) THEN
+          XHWHMU = ZARGI(I) - ZARGI(IMAX)
           GOTO 15
         ENDIF
       ENDDO
-   15 GAMM = 2.*XHWHMU
-      SIGM = 0.2*GAMM
+   15 GAMM = 2.0 * XHWHMU
+      SIGM = 0.2 * GAMM
 ! Now estimate HPSL & HMSL
       YPMX20 = 0.2*YPMX
       DO I = IMAX, 1, -1
-        YBT = V(1) + V(2)*(X(I)-X(1))
-        YPT = Y(I) - YBT
-        IF (YPT.LT.YPMX20) THEN
-          XTEM = X(IMAX) - X(I)
+        YBT = V(1) + V(2) * (ZARGI(I)-ZARGI(1))
+        YPT = ZOBS(I) - YBT
+        IF (YPT .LT. YPMX20) THEN
+          XTEM = ZARGI(IMAX) - ZARGI(I)
           GOTO 20
         ENDIF
       ENDDO
-   20 HTEM = 2.*ABS(XTEM-GAMM)
-      HPSL = MAX(0.001,SQRT(2.*RAD*HTEM*TAN(RAD*X(IMAX))))
-      HMSL = 0.5*HPSL
-      TOTAREA = 0.
-      DO I = 1, NPT
-        YB = V(1) + V(2)*(X(I)-X(1))
-        TOTAREA = TOTAREA + Y(I) - YB
+   20 HTEM = 2.0 * ABS(XTEM-GAMM)
+      HPSL = MAX(0.001,SQRT(2.0*RAD*HTEM*TAN(RAD*ZARGI(IMAX))))
+      HMSL = 0.5 * HPSL
+      TOTAREA = 0.0
+      DO I = 1, NPTS
+        YB = V(1) + V(2) * (ZARGI(I)-ZARGI(1))
+        TOTAREA = TOTAREA + ZOBS(I) - YB
       ENDDO
-!O      XDELT = X(IMAX) - X(IMAX-1)
-      TOTAREA = TOTAREA*XDELT
-      YHSUM = 0.
+      TOTAREA = TOTAREA * XDELT
+      YHSUM = 0.0
       DO IP = 1, NPEAK
-        ATEM = ABS(X(1)-XPOS(IP))
-        IPOS(IP) = 1
-        DO I = 1, NPT
-          ANEW = ABS(X(I)-XPOS(IP))
-          IF (ANEW.LT.ATEM) THEN
+        ATEM = ABS(ZARGI(1)-XPOS(IP))
+        iPos = 1
+        DO I = 2, NPTS
+          ANEW = ABS(ZARGI(I)-XPOS(IP))
+          IF (ANEW .LT. ATEM) THEN
             ATEM = ANEW
-            IPOS(IP) = I
+            iPos = I
           ENDIF
         ENDDO
-        YB = V(1) + V(2)*(XPOS(IP)-X(1))
-        YHITE(IP) = Y(IPOS(IP)) - YB
+        YB = V(1) + V(2) * (XPOS(IP)-ZARGI(1))
+        YHITE(IP) = ZOBS(iPos) - YB
         YHSUM = YHSUM + YHITE(IP)
       ENDDO
       DO IP = 1, NPEAK
-        AREA(IP) = TOTAREA*YHITE(IP)/YHSUM
+        AREA(IP) = TOTAREA * YHITE(IP) / YHSUM
       ENDDO
 !      IF (CurrentRange .EQ. 1) Then
       V(3) = SIGM
@@ -202,14 +216,14 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE INITSP(N,V,D)
+      SUBROUTINE INITSP(N)
 ! Do all the initialisation
 
-      INCLUDE 'PARAMS.INC'
+      IMPLICIT NONE
 
-      REAL V(MVAR), D(MVAR)
-      PARAMETER (MPT=2000)
-      COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
+      INTEGER, INTENT (  OUT) :: N
+
+      INCLUDE 'PARAMS.INC'
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -226,7 +240,12 @@
       REAL            ZCAL
       COMMON /YSTORE/ ZCAL(MOBS)
 
+      REAL            ZXDELT
+      INTEGER                 IIMIN, IIMAX
+      REAL                                  XMINT
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
+
+      INTEGER         MN, MN2
       COMMON /ZSTOR2/ MN, MN2
 
       REAL            ARGI, YNORM, PKFNSP,          KPFNSP
@@ -240,12 +259,12 @@
       REAL                          TOLR
       INTEGER                                  NFFT
       REAL                                           AKNOTS
-      INTEGER         NBASF4,             L4END,    L6ST, L6END
+      INTEGER         NBASF4,             L4END
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
                       DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
                       NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
-                      NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+                      NBASF4(MPRPKF,2,9), L4END(9)
 
       INCLUDE 'REFLNS.INC'
 
@@ -262,8 +281,12 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      PARAMETER (MPeak=10)
-      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
+      INTEGER     MPeak
+      PARAMETER ( MPeak = 10 )
+
+      INTEGER         NPEAK
+      REAL                   AREA,        XPOS
+      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK)
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -286,8 +309,9 @@
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-!.. speedup attempt
-      REAL ixres
+
+      INTEGER I, iTem, J, MNTEM, ISPMIN, ISPMAX, NPT2
+      REAL    YMAXTEM, ZOBSMAX
 
 ! If there are no peaks specified, assume there is one. Estimate its position by 
 ! by finding the 2 theta value with the highest number of counts
@@ -307,25 +331,20 @@
       NPeak = NumInPFR(CurrentRange)
       N = 6 + 2*NPeak
       DO I = 1, NPeak
-        XPos(I) = XPF_Pos(I,CurrentRange)
+        XPOS(I) = XPF_Pos(I,CurrentRange)
       ENDDO
-      Npt = IPF_Range(CurrentRange)
-      ITEM = IPF_Lo(CurrentRange) - 1
-      DO I = 1, NPT
-        J = ITEM + I
-        X(I) = XBIN(J)
-        Y(I) = YOBIN(J)
-        E(I) = EBIN(J)
+      NPTS = IPF_Range(CurrentRange)
+      iTem = IPF_Lo(CurrentRange) - 1
+      DO I = 1, NPTS
+        J = iTem + I
+        ZARGI(I) = XBIN(J)
+        ZOBS(I)  = YOBIN(J)
+        ZDOBS(I) = EBIN(J)
       ENDDO
-      IXRES = 1.2
-!      DXRES=1./FLOAT(IXRES)
-      DXRES = 1./IXRES
-      NPTS = NPT
+      MNTEM = NINT(2.0 * 1.2 * FLOAT(NPTS))
       MN = 1
-   10 MN = 2*MN
-      MNTEM = NINT(2.*IXRES*FLOAT(NPTS))
-!      MNTEM=2*IXRES*NPTS
-      IF (MN.LT.MNTEM) GOTO 10
+   10 MN = 2 * MN
+      IF (MN .LT. MNTEM) GOTO 10
       MN = MIN(2048,MN)
       MN2 = MN/2
       KNOW = 1
@@ -333,19 +352,14 @@
       JSOURC = 1
       NPKGEN(JPHASE,JSOURC) = 4
       ISPMIN = 1
-      ISPMAX = NPT
-      NPT2 = NPT/2
-      ZXDELT = DXRES*(X(NPT2)-X(NPT2-1))
+      ISPMAX = NPTS
+      NPT2 = NPTS/2
+      ZXDELT = (1.0 / 1.2)*(ZARGI(NPT2)-ZARGI(NPT2-1))
       ZXDEL(KNOW) = ZXDELT
-      DO I = 1, NPT
-        ZOBS(I) = Y(I)
-        ZDOBS(I) = E(I)
-        ZARGI(I) = X(I)
-      ENDDO
       KOBZ(1) = ISPMIN
       ZOBSMAX = ZOBS(ISPMIN)
       DO I = ISPMIN, ISPMAX
-        IF (ZOBS(I).GT.ZOBSMAX) THEN
+        IF (ZOBS(I) .GT. ZOBSMAX) THEN
           ZOBSMAX = ZOBS(I)
           KOBZ(1) = I
         ENDIF
@@ -364,7 +378,7 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL VARVAL(MVAR), VARESD(MVAR)
+      REAL, INTENT (INOUT) :: VARVAL(MVAR), VARESD(MVAR)
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -417,12 +431,12 @@
       REAL                          TOLR
       INTEGER                                  NFFT
       REAL                                           AKNOTS
-      INTEGER         NBASF4,             L4END,    L6ST, L6END
+      INTEGER         NBASF4,             L4END
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
                       DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
                       NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
-                      NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+                      NBASF4(MPRPKF,2,9), L4END(9)
 
       REAL    xranav, atem, anewt
       INTEGER I, II, IP, JP, iTem

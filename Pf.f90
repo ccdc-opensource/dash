@@ -75,13 +75,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -168,14 +180,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-!
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -273,14 +296,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-!
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -386,13 +420,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -510,13 +556,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
 
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -636,12 +694,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -757,12 +828,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -896,12 +980,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -1017,12 +1114,24 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       INCLUDE 'REFLNS.INC'
@@ -1142,12 +1251,24 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       INCLUDE 'REFLNS.INC'
@@ -1297,12 +1418,24 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       INCLUDE 'REFLNS.INC'
@@ -1433,12 +1566,24 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       INCLUDE 'REFLNS.INC'
@@ -1597,12 +1742,24 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       INCLUDE 'REFLNS.INC'
@@ -2052,12 +2209,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
       INCLUDE 'REFLNS.INC'
@@ -2185,12 +2355,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
@@ -2443,12 +2626,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
@@ -2690,12 +2886,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
@@ -2957,12 +3166,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
@@ -3202,12 +3424,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
@@ -3462,12 +3697,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
@@ -3715,13 +3963,25 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
 
-      LOGICAL REFUSE, CYC1, NOPKRF
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
