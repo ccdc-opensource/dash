@@ -210,7 +210,7 @@
       USE VARIABLES
 
       CALL WHelpFile(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))// &
-       'Documentation'//DIRSPACER//'manual'//DIRSPACER//'DASH User Guide.chm')
+       'Documentation'//DIRSPACER//'Manual'//DIRSPACER//'DASH User Guide.chm')
 
       END SUBROUTINE LaunchHelp
 !
