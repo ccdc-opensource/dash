@@ -231,6 +231,13 @@
             CASE (KeyDown)
               IF (MseBtnPressed) GOTO 10
               CALL Check_KeyDown
+! Peaks being fitted and refined automatically makes it impossible to 
+! play around with indexing. Therefore: when in one of the indexing windows, ignore
+! this routine.
+              IF ((CurrentWizardWindow .EQ. IDD_PW_Page3) .OR.     &
+                  (CurrentWizardWindow .EQ. IDD_PW_Page4) .OR.     &
+                  (CurrentWizardWindow .EQ. IDD_PW_Page5) .OR.     &
+                  (CurrentWizardWindow .EQ. IDD_PW_Page6)) GOTO 10
               CALL Check_KeyDown_PeakFit_Inner
               GOTO 10
           END SELECT
