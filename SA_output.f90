@@ -18,10 +18,10 @@
 
       REAL bchmin, bpwval, bchpro, tempvl
       REAL avchi1, avchi2, avchi3, avchi4
-      INTEGER nd1, nd2, nd3, nd4, IHANDLE
+      INTEGER nd1, nd2, nd3, nd4, bmIHANDLE
       COMMON / sagdat / bchmin, bpwval, bchpro, &
                 tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
-                nd2, nd3, nd4, IHANDLE
+                nd2, nd3, nd4, bmIHANDLE
 
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WDialogPutReal(IDF_curr_temp,T,'(F8.2)')
@@ -87,10 +87,10 @@
 
       REAL bchmin, bpwval, bchpro, tempvl
       REAL avchi1, avchi2, avchi3, avchi4
-      INTEGER nd1, nd2, nd3, nd4, IHANDLE
+      INTEGER nd1, nd2, nd3, nd4, bmIHANDLE
       COMMON / sagdat / bchmin, bpwval, bchpro, &
                 tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
-                nd2, nd3, nd4, IHANDLE
+                nd2, nd3, nd4, bmIHANDLE
       LOGICAL RESTART
       INTEGER SA_Run_Number
       INTEGER MaxRuns, MinMoves, MaxMoves
@@ -105,7 +105,7 @@
 ! Temperature
       CALL IGrSelect(3,IDF_T_picture)
       CALL IGrUnits(0.0,0.0,4.0,1.0)
-      CALL WBitmapPut(IHANDLE,0,0)
+      CALL WBitmapPut(bmIHANDLE,0,0)
       CALL IGrColourN(95) ! Lightgreen
       tenow1=tempvl-0.03
       tenow2=tempvl+0.03
@@ -113,7 +113,7 @@
 ! Minimum chi squared
       CALL IGrSelect(3,IDF_minchisq_picture)
       CALL IGrUnits(0.0,0.0,4.0,1.0)
-      CALL WBitmapPut(IHANDLE,0,0)
+      CALL WBitmapPut(bmIHANDLE,0,0)
       CALL IGrColourN(95) ! Lightgreen
       tenow1=bchmin-0.03
       tenow2=bchmin+0.03
@@ -121,7 +121,7 @@
 ! Average chi-squared
       CALL IGrSelect(3,IDF_avchisq_picture)
       CALL IGrUnits(0.0,0.0,4.0,1.0)
-      CALL WBitmapPut(IHANDLE,0,0)
+      CALL WBitmapPut(bmIHANDLE,0,0)
       CALL IGrColourN(95) ! Lightgreen
       CALL IGrRectangle(avchi1,rminh,avchi2,rmaxh)
       CALL IGrColourN(128)
@@ -129,7 +129,7 @@
 ! Profile chi squared
       CALL IGrSelect(3,IDF_prochisq_picture)
       CALL IGrUnits(0.0,0.0,4.0,1.0)
-      CALL WBitmapPut(IHANDLE,0,0)
+      CALL WBitmapPut(bmIHANDLE,0,0)
       CALL IGrColourN(63)
       tenow1=bpwval-0.03
       tenow2=bpwval+0.03
