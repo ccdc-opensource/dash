@@ -20,8 +20,7 @@
       DashDirLc = DashDir
       CALL ILowerCase(DashDirLc)
       CALL ILowerCase(InstDirLc)
-! JvdS @ Rewrite using GOTOs
-      LOOP_DIRECTORY_SELECT : DO WHILE (.TRUE.)
+   10 DO WHILE (.TRUE.)
         IFlags = DirChange + DirCreate
         Dirname = ' '
         CALL WSelectDir(IFlags,Dirname,"Select working directory for DASH...")
@@ -35,7 +34,7 @@
         IF ( (DirNameLc(1:Ilen) .EQ. DashDirLc(1:LEN_TRIM(DashDirLc))) .OR.  &
              (DirNameLc(1:Ilen) .EQ. InstDirLc(1:LEN_TRIM(InstDirLc))) ) THEN
           IF (.NOT. Confirm("Are you sure you wish to start Dash in"//CHAR(13)//"the installation directory "//&
-            CHAR(13)//DirNameLc(1:Ilen)//" ?")) CYCLE LOOP_DIRECTORY_SELECT
+            CHAR(13)//DirNameLc(1:Ilen)//" ?")) GOTO 10
         END IF
 ! Open the file
         OPEN(UNIT = 6, FILE = 'dash.out', STATUS = 'UNKNOWN', ERR = 110)
@@ -50,7 +49,7 @@
           CALL WindowClose()
           STOP
         END IF
-      END DO LOOP_DIRECTORY_SELECT
+      END DO
 
       END SUBROUTINE Init_StdOut
 !
