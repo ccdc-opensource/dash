@@ -38,7 +38,6 @@ C>> JCC the original atom ids to list in the labels and the back mapping
 C>> JCC Declaration
 	Integer ErrorStatus
 c
-c      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
 c       double precision dcel(6)
 c
 c      ntatm=0

@@ -241,10 +241,6 @@
             CALL Plot_Alter
           CASE (KeyDown)
             CALL Check_KeyDown
-!U          CASE (Expose, Resize)
-!U            IF (EventInfo%WIN .EQ. 0) THEN
-!U              CALL Redraw()
-!U            END IF
           CASE (PushButton)
             SELECT CASE (EventInfo%VALUE1)
 !C>> JCC Add in new 'clear' button
