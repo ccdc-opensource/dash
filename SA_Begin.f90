@@ -278,7 +278,8 @@
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
 
-      INTEGER         NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+      INTEGER         NINIT, NBATCH, NSYSTM
+      LOGICAL                                MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
 
       INTEGER         LPT, LUNI
