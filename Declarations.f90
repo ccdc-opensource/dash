@@ -63,10 +63,10 @@
 !
 
       INTEGER         NPTS
-      REAL                  ZARGI,        ZOBS,        ZDOBS,        ZWT
-      INTEGER                                                                    ICODEZ
-      REAL                                                                                      KOBZ
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
 ! NPTS is approximately NBIN.
 ! These variables hold the profile during peak fitting and Pawley refinement.
@@ -74,7 +74,7 @@
 ! As such, it should have been dimensioned KOBZ(REFDIM)
 
       REAL            ZCAL
-      COMMON /YSTORE/ ZCAL(MPPTS)
+      COMMON /YSTORE/ ZCAL(MOBS)
 
 ! Hold output from Pawley refinement and multi-peak fitter.
 
@@ -99,39 +99,30 @@
 ! IPMAX = bin number (so, pointer into XBIN) of the last bin visible on screen
 !         only useful when the user has zoomed in, otherwise IPMAX = NBIN
 
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
+      INTEGER         NLGREF
+      LOGICAL                 LOGREF
+      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
 
-! MTIC  = (=10000) maximum number of reflections. Although 350, 360 and 400 are mentioned as well.
-! NTIC  = number of tick marks
-! IH    = h, k and l
-! ARGK  = 2 theta value, corrected for zero point error
-! DSTAR = d*
-!
-! Note: exactly the same information is held in two other common blocks.
-! Of these, I deleted the following one (merged it with /PROFTIC/):
-! COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
+      REAL              AIOBS,         AICALC
+      COMMON /SAREFLNS/ AIOBS(MFCSTO), AICALC(MFCSTO)
 
-
-!U      REAL REFH(3,REFDIM),AMUL(REFDIM),AICALC(REFDIM),AIOBS(REFDIM),    &
-!U     &     ESDOBS(REFDIM),SOMEGA(REFDIM),GGCALC(500),DSTAR(REFDIM)
-!U      INTEGER KMIN,KMAX,KMOD,KNOW
-!U      INTEGER ISMAG(REFDIM)
-!U      REAL DKDDS
-!U      INTEGER MAXKK(9),KOM23
-!U      INTEGER MAXK
-!U
-!U      COMMON /REFLNS/REFH,AMUL,AICALC,                                  &
-!U     & AIOBS,ESDOBS,SOMEGA,GGCALC,                                      &
-!U     & MAXKK,KMIN,KMAX,KMOD,KNOW,DSTAR,ISMAG,                           &
-!U     & DKDDS,KOM23
-!U
-!U      EQUIVALENCE (MAXK,MAXKK(1))
-
-! Note: this DSTAR is _NOT_ corrected for the zero point error.
+!O! JCC GGCALC dimension increased to 500
+!O      REAL            REFH,           AMUL
+!O      REAL            ESDOBS,         SOMEGA,       GGCALC
+!O	  
+!O      INTEGER         MAXKK, KMIN, KMAX, KMOD, KNOW
+!O      INTEGER                                           ISMAG
+!O      REAL            DKDDS
+!O      INTEGER                KOM23
+!O
+!O      COMMON /REFLNS/ REFH(3,MFCSTO), AMUL(MFCSTO),                                   &
+!O	                  ESDOBS(MFCSTO), SOMEGA(MFCSTO), GGCALC(500),                    &
+!O                      MAXKK(9), KMIN, KMAX, KMOD, KNOW, ISMAG(MFCSTO), &
+!O                      DKDDS, KOM23
+!O
+!O      INTEGER         MAXK
+!O
+!O      EQUIVALENCE (MAXK,MAXKK(1))
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -167,7 +158,7 @@
 ! XPF_Pos         = 2 theta of the peak position, as entered by the user. This is NOT the fitted peak position.
 ! YPF_Pos         = Calculated number of counts of the peak position
 ! IPF_RPt         = pointer into XPeakFit/YPeakFit where the calculated points for this peak start
-! MAX_FITPT (= 10000) = MAXimum number of FIT PoinTs
+! MAX_FITPT (= 10,000) = MAXimum number of FIT PoinTs
 ! XPeakFit        = 2 theta of points of calculated peak (should all be equal to their corresponding XOBS/XBIN)
 ! YPeakFit        = y-values of points of calculated peaks
 
@@ -210,7 +201,7 @@
 ! Note that they use a mixture of variables from /PEAKFIT1/, /PEAKFIT2/ and /ALLPEAKS/ 
 ! Note that there is nothing temporary about IOrdTem
 ! It's probably better to get rid of IOrdTem and sort the list directly
-! If the right algorithm is chosen, that would speed up multiple sorts and reduce memory.
+! If the right algorithm is chosen, that would speed up multiple sorts and reduce memory consumption.
 
       INTEGER         IBACK, NBACK
       REAL                             ARGBAK,        BACKGD
@@ -231,19 +222,19 @@
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
 ! Note that the variable names in this COMMON block are not consistent.
 ! Note that '150' should be equal to MAXATM, which is 100
 
       REAL              BICALC,         XICALC
-      COMMON /SAREFLN2/ BICALC(MSAREF), XICALC(MSAREF)
+      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 ! BICALC(1:MAXK) = the calculated intensities corrected for preferred orientation
 ! XICALC(1:MAXK) = the preferred orientation part of the calculated intensities
 
       INTEGER           iHMUL
-      COMMON /SAREFLN3/ iHMUL(MSAREF)
+      COMMON /SAREFLN3/ iHMUL(MFCSTO)
 
       REAL            XATOPT
       COMMON /posopt/ XATOPT(3,MaxAtm_3)
@@ -260,6 +251,13 @@
       REAL                  WTIJ
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
+
+      INTEGER         KREFT,         KNIPT
+      REAL                                             PIKVAL
+      COMMON /FPINF1/ KREFT(MOBS), KNIPT(50,MOBS), PIKVAL(50,MOBS)
+!
+! Per bin, stores contributions per intensity.
+!
 
       INTEGER         MAXK
       REAL                  FOB

@@ -9,9 +9,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         C3F = COSQS(IL,3,N)*FOB(N,IR)
         S3F = SINQS(IL,3,N)*FOB(N,IR)
@@ -43,9 +43,9 @@
 ! Structure factor calculations for space group P-1
 ! Loop is performed over the atoms in the asymmetric unit
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         C3F = COSQS(IL,3,N)*FOB(N,IR)
         S3F = SINQS(IL,3,N)*FOB(N,IR)
@@ -70,9 +70,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N) &
@@ -103,9 +103,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
                 *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
@@ -127,9 +127,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -160,9 +160,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -193,9 +193,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -225,9 +225,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -253,9 +253,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)    &
                 *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
@@ -274,9 +274,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -302,9 +302,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -330,9 +330,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -359,9 +359,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
 
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -387,9 +387,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -415,9 +415,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
@@ -444,9 +444,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -473,9 +473,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -512,9 +512,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -541,9 +541,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -580,9 +580,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -619,9 +619,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -653,9 +653,9 @@
 !
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -707,9 +707,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -741,9 +741,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -775,9 +775,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -809,9 +809,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -843,9 +843,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -877,9 +877,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -903,9 +903,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
@@ -930,9 +930,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
         term2 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)*SINQS(IK,1,N)
@@ -959,9 +959,9 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
@@ -1046,9 +1046,9 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
-      IL = IREFH(3,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
           term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
@@ -1116,10 +1116,10 @@
 !.. For P3
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1150,10 +1150,10 @@
       BFCAL = 0.
 !      CFCAL=0.
 !      DFCAL=0.
-      RH = 6.283185307179*FLOAT(IREFH(1,IR))
-      RK = 6.283185307179*FLOAT(IREFH(2,IR))
+      RH = 6.283185307179*FLOAT(iHKL(1,IR))
+      RK = 6.283185307179*FLOAT(iHKL(2,IR))
       RI = -(RH+RK)
-      RL = 6.283185307179*FLOAT(IREFH(3,IR))
+      RL = 6.283185307179*FLOAT(iHKL(3,IR))
       VL = RL/3.
       DO N = 1, NATOM
         XV = X(1,N)
@@ -1187,10 +1187,10 @@
 !.. For P32
       AFCAL = 0.
       BFCAL = 0.
-      RH = 6.283185307179*FLOAT(IREFH(1,IR))
-      RK = 6.283185307179*FLOAT(IREFH(2,IR))
+      RH = 6.283185307179*FLOAT(iHKL(1,IR))
+      RK = 6.283185307179*FLOAT(iHKL(2,IR))
       RI = -(RH+RK)
-      RL = 6.283185307179*FLOAT(IREFH(3,IR))
+      RL = 6.283185307179*FLOAT(iHKL(3,IR))
       VL = RL/3.
       DO N = 1, NATOM
         XV = X(1,N)
@@ -1217,10 +1217,10 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1248,10 +1248,10 @@
 ! SUM OVER ATOMS IN ASYMMETRIC UNIT:
 !.. For P-3
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1279,10 +1279,10 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1312,10 +1312,10 @@
 !
 !
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1355,10 +1355,10 @@
 !
 !
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1397,10 +1397,10 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1426,10 +1426,10 @@
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1457,10 +1457,10 @@
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1485,10 +1485,10 @@
 !
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1521,10 +1521,10 @@
 !
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1560,10 +1560,10 @@
 
       AFCAL = 0.
       BFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
@@ -1602,10 +1602,10 @@
 ! See get_logref.inc for a description of the LOGREF conditions
 !
       AFCAL = 0.
-      IH = IREFH(1,IR)
-      IK = IREFH(2,IR)
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
       II = -(IH+IK)
-      IL = IREFH(3,IR)
+      IL = iHKL(3,IR)
       DO N = 1, NATOM
         CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
         CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)

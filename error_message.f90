@@ -18,10 +18,10 @@
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       INTEGER         NPTS
-      REAL                  ZARGI,        ZOBS,        ZDOBS,        ZWT
-      INTEGER                                                                    ICODEZ
-      REAL                                                                                      KOBZ
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS), ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       REAL            ARGK, PKCNSP
       INTEGER                              KPCNSP
@@ -54,8 +54,6 @@
         CALL PCXX(2) ! Changes argk
         arrt = argk
 ! Search for the maximum difference in 2 theta between two reflections between reflections 350 and 360
-! JvdS was:
-!O      DO II = 1, 1
         DO II = 1, 10
           know = 350 + II ! know is a global variable
           CALL PCXX(2)
@@ -64,8 +62,6 @@
         ENDDO
         CALL SORT_REAL(ardif,iorda,10)
         maxk = 349 + iorda(10)
-! JvdS was:
-!O      aadd = ardif(10)
         aadd = ardif(iorda(10))
       ENDIF
       know = maxk

@@ -12,12 +12,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
-
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
       INTEGER           IPF_Lo,                     IPF_Hi
@@ -36,7 +30,7 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
-      LOGICAL PlotBackground ! Function
+      LOGICAL, EXTERNAL :: PlotBackground
 
 !   Setup hardcopy options
       IF (IPTYPE .LT. 0) THEN
@@ -64,7 +58,7 @@
           IF (PlotBackground()) CALL Plot_Background()
         ENDIF
 !  Plot tic marks etc. if appropriate
-        IF (NTIC .NE. 0) CALL Plot_Calculated_Tics()
+        CALL Plot_Calculated_Tics()
 !   Switch off hardcopy
       ENDIF
       IF (IPTYPE .LT. 0) THEN
@@ -79,17 +73,12 @@
       SUBROUTINE Plot_Calculated_Tics
 
       USE WINTERACTER
+      USE REFVAR
 
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'POLY_COLOURS.INC'
-
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -103,15 +92,16 @@
       REAL    YPGDIF, YTIC1, YTIC2, xgtem, ygtem
       INTEGER II
 
+      IF (NumOfRef .EQ. 0) RETURN
       CALL IGrColourN(KolNumCTic)
       YPGDIF = (YPGMAX-YPGMIN)
       YTIC1 = YPGMIN + 0.94 * YPGDIF
       YTIC2 = YPGMIN + 0.97 * YPGDIF
-      DO II = 1, NTIC
-        IF (ARGK(II) .GE. XPGMIN .AND. ARGK(II) .LE. XPGMAX) THEN
-          CALL IPgUnitsToGrUnits(ARGK(II),ytic1,xgtem,ygtem)
+      DO II = 1, NumOfRef
+        IF (RefArgK(II) .GE. XPGMIN .AND. RefArgK(II) .LE. XPGMAX) THEN
+          CALL IPgUnitsToGrUnits(RefArgK(II),ytic1,xgtem,ygtem)
           CALL IGrMoveTo(xgtem,ygtem)
-          CALL IPgUnitsToGrUnits(ARGK(II),ytic2,xgtem,ygtem)
+          CALL IPgUnitsToGrUnits(RefArgK(II),ytic2,xgtem,ygtem)
           CALL IGrLineTo(xgtem,ygtem)
         ENDIF
       ENDDO
@@ -512,7 +502,7 @@
         ipf1 = IPF_RPt(i) + 1
         ipf2 = IPF_RPt(i+1)
 ! Now we do a quick check to see if the range has been set
-        IF (ipf2 .NE. 0) THEN
+        IF (RangeFitYN(i)) THEN
           IF (XPeakFit(ipf2) .GT. xpgmin .AND. XPeakFit(ipf1) .LT. xpgmax) THEN
 ! We can plot the calculated fit
             DO II = ipf1, ipf2

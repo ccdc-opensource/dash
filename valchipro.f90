@@ -12,7 +12,7 @@
       INCLUDE 'PARAMS.INC'
 
       REAL              BICALC,         XICALC
-      COMMON /SAREFLN2/ BICALC(MSAREF), XICALC(MSAREF)
+      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 
       INTEGER          NFITA, IFITA
       REAL                                 WTSA
@@ -24,7 +24,7 @@
 
       INTEGER         KREFT,         KNIPT
       REAL                                             PIKVAL
-      COMMON /FPINF1/ KREFT(MFPINF), KNIPT(50,MFPINF), PIKVAL(50,MFPINF)
+      COMMON /FPINF1/ KREFT(MOBS), KNIPT(50,MOBS), PIKVAL(50,MOBS)
 
       REAL SUM1, SUM2, YCALC, RESCL, CVP
       INTEGER II, I, K, KK

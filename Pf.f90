@@ -50,24 +50,31 @@
 !D being refined, uses value in F4PAR(2 instead of calculated value.
 !
       INCLUDE 'PARAMS.INC'
-!
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       REAL            ALAMBD
       INTEGER                      NLAMB
       COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
-!
+
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-!
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -80,16 +87,18 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
-!
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-!
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
 ! WE DO NOT WANT THE CALCULATION IF:
 !  A) SAPS, AND
 !  B) IT IS NOT THE SPECIAL INITIAL CYCLE, AND
@@ -134,6 +143,7 @@
 !
 !
       INCLUDE 'PARAMS.INC'
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       REAL            ALAMBD
@@ -143,14 +153,21 @@
 !
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-!
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 !
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
@@ -164,15 +181,17 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-!
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
 ! For the moment, same variable names as TOF case...
 !
 ! WE DO NOT WANT THE CALCULATION IF:
@@ -239,13 +258,21 @@
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 !
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
@@ -259,15 +286,17 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-!
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
 ! SWCH:
       ATEM = PKFNSP(1,2,JPHASE,JSOURC) - 1./WLGTH
       BTEM = PKFNSP(1,1,JPHASE,JSOURC)*ATEM
@@ -342,14 +371,21 @@
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-!
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -362,15 +398,17 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-!
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
 !.. SWITCH
       ATEM = PKFNSP(1,2,JPHASE,JSOURC) - 1./WLGTH
       BTEM = PKFNSP(1,1,JPHASE,JSOURC)*ATEM
@@ -424,6 +462,9 @@
 !*****************************************************************************
 !
       SUBROUTINE FDTF03(IOPT)
+
+      USE REFVAR
+
 !
 ! *** FDTF03 updated by WIFD/JCM 1 Jun 89 ***
 !
@@ -441,10 +482,10 @@
 !
 !
       INCLUDE 'PARAMS.INC'
-!
+
       DIMENSION CDUMP(10)
-      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
-     &                DSTAR2, TWOTHD(5), DIFANG(6)
+      REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
+      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
@@ -454,45 +495,54 @@
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-!
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
      &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
      &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
+
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-!
-!.. SWITCH
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
+! SWITCH
       ATEM = PKFNSP(1,2,JPHASE,JSOURC) - 1./WLGTH
       BTEM = PKFNSP(1,1,JPHASE,JSOURC)*ATEM
       PKFNVA(1) = 0.5*ERFNC(BTEM)
-!.. TAUF & TAUS
+! TAUF & TAUS
       PKFNVA(2) = PKFNSP(2,1,JPHASE,JSOURC) + PKFNSP(2,2,JPHASE,JSOURC) &
      &            *WLGTH
       PKFNVA(3) = PKFNSP(3,1,JPHASE,JSOURC) + PKFNSP(3,2,JPHASE,JSOURC) &
      &            *WLGTH
-!.. C49: PKFNVA(4) IS SIGMA NOT SIGMA SQUARED
+! C49: PKFNVA(4) IS SIGMA NOT SIGMA SQUARED
       WSQ = WLGTH*WLGTH
       SIGMA = SQRT(PKFNSP(4,1,JPHASE,JSOURC)                            &
      &        +(PKFNSP(4,2,JPHASE,JSOURC)+PKFNSP(4,3,JPHASE,JSOURC)*WSQ)&
@@ -500,9 +550,9 @@
       GAMMA = PKFNSP(5,1,JPHASE,JSOURC)                                 &
      &        + (PKFNSP(5,2,JPHASE,JSOURC)+PKFNSP(5,3,JPHASE,JSOURC)    &
      &        *WLGTH)*WLGTH
-!.. C AXIS QUADRATIC TERM
-      EL = REFH(3,KNOW)
-      CALL CELDER(REFH(1,KNOW),CDUMP)
+! C AXIS QUADRATIC TERM
+      EL = rHKL(3,KNOW)
+      CALL CELDER(rHKL(1,KNOW),CDUMP)
       D61 = ARGK*CPARS(3,2)*EL*EL/DSTAR2
       PKFNVA(4) = SIGMA
       PKFNVA(5) = GAMMA
@@ -571,14 +621,21 @@
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-!
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -590,15 +647,17 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-!
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
 !.. SWITCH
 !      ATEM= PKFNSP(1,2,JPHASE,JSOURC) - 1./WLGTH
 !      BTEM= PKFNSP(1,1,JPHASE,JSOURC)*ATEM
@@ -653,6 +712,8 @@
 !*****************************************************************************
 !
       SUBROUTINE FDTF05(IOPT)
+
+      USE REFVAR
 !
 ! *** FDTF05 updated by WIFD/JCM 7 Mar 89 ***
 !
@@ -669,7 +730,9 @@
 ! BE USED AGAIN.
 !
       INCLUDE 'PARAMS.INC'
-      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5), DIFANG(6)
+
+      REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
+      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
@@ -679,13 +742,21 @@
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -697,11 +768,16 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
 !.. SWITCH
       ATEM = PKFNSP(1,2,JPHASE,JSOURC) - 1./WLGTH
@@ -717,13 +793,13 @@
       PKFNVA(4) = SIGMA
       PKFNVA(5) = GAMMA
 !.. THIS IS SPECIFIC TO TETRAGONAL SYSTEMS!!!
-      R1 = REFH(1,KNOW)**2 + REFH(2,KNOW)**2
-      R2 = REFH(3,KNOW)**2
+      R1 = rHKL(1,KNOW)**2 + rHKL(2,KNOW)**2
+      R2 = rHKL(3,KNOW)**2
       AV = CELL(1,1,1)
       CV = CELL(3,1,1)
       V1 = SQRT(R1/AV**2+R2/CV**2)
       V2 = SQRT(R1/(AV+0.001*PKFNSP(7,1,JPHASE,JSOURC))**2+R2/(CV+0.001*PKFNSP(7,2,JPHASE,JSOURC))**2)
-      EFAC = (REFH(3,KNOW)/(CV*V1))**2
+      EFAC = (rHKL(3,KNOW)/(CV*V1))**2
       ESIGM = EFAC*SQRT  ((PKFNSP(6,1,JPHASE,JSOURC)+PKFNSP(6,2,JPHASE,JSOURC)*WSQ)*WSQ)
       PKFNVA(6) = ESIGM
       STTEM = 252.777*PKCNSP(1,JPHASE,JSOURC)*TWSNTH(JSOURC)
@@ -777,6 +853,8 @@
 !*****************************************************************************
 !
       SUBROUTINE FDTF08(IOPT)
+
+      USE REFVAR
 !
 ! *** FDTF08 (formerly 04) updated by WIFD May 89 ***
 !
@@ -803,13 +881,21 @@
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -821,14 +907,16 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
 !.. SWITCH
       ATEM = PKFNSP(1,2,JPHASE,JSOURC) - 1./WLGTH
@@ -847,12 +935,12 @@
       ARGST = 0.
       ARGPS = 0.
       DO I = 1, 3
-        CREFH(I) = CPARS(I,2)*REFH(I,KNOW)**2
+        CREFH(I) = CPARS(I,2)*rHKL(I,KNOW)**2
         I3 = I + 3
         IL = 9 - I3
         I1 = (8-I3)/2
         I2 = IL - I1
-        CREFH(I3) = 2.*CPARS(I3,2)*REFH(I1,KNOW)*REFH(I2,KNOW)
+        CREFH(I3) = 2.*CPARS(I3,2)*rHKL(I1,KNOW)*rHKL(I2,KNOW)
       ENDDO
       DO I = 1, 6
         ARGST = ARGST + PKFNSP(5,I,JPHASE,JSOURC)*CREFH(I)
@@ -922,9 +1010,13 @@
       COMPLEX CFFT, DFFT, DDT, CFE, CFT
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -937,8 +1029,13 @@
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256)
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
       SW = PKFNVA(1)
       TAUF = PKFNVA(2)
@@ -1038,9 +1135,13 @@
       COMPLEX CFFT, DFFT, DDT, CFE, CFT
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -1053,9 +1154,13 @@
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256)
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
       LOGICAL CANSMA
 
@@ -1185,9 +1290,13 @@
       COMPLEX CFFT, DFFT, DDT, CFE, CFT, CFED, CFEDI, DFED, CIARG, DPED
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -1197,8 +1306,14 @@
       COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       DIMENSION CFFT(8), DFFT(8), DDT(8), FR(256,8), FI(256,8),         &
      &          DR(256,8), DI(256,8), FRE(256), FIE(256), FRT(256), FIT(256)
 
@@ -1311,9 +1426,13 @@
       COMPLEX CFFT, DFFT, DDT, CFE, CFT, CTM1, CTM2, CFE2, CFT2, CF67
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -1327,8 +1446,13 @@
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256), FRE2(256), FIE2(256)&
      &                , FRT2(256), FIT2(256)
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
       SW = PKFNVA(1)
       TAUF = PKFNVA(2)
@@ -1462,12 +1586,17 @@
 ! *** FTSUB8 (formerly 4) by WIFD May 89 ***
 !
       INCLUDE 'PARAMS.INC'
+
       COMPLEX CFFT, DFFT, DDT, CFE, CFT
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -1480,8 +1609,13 @@
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256)
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
       SW = PKFNVA(1)
       TAUF = PKFNVA(2)
@@ -1583,6 +1717,8 @@
 !*****************************************************************************
 !
       SUBROUTINE PCCN01(N)
+
+      USE REFVAR
 !
 ! *** PCCN01 updated by JCM 28 Feb 88 ***
 !
@@ -1598,7 +1734,9 @@
 !P For entries 2,5, WLGTH must hold lambda, and DSTAR(KNOW) d*
 !
       INCLUDE 'PARAMS.INC'
-      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5), DIFANG(6)
+
+      REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
+      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -1613,15 +1751,29 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6), NZERSP(9,5)
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
       GOTO (100,2,100,100,2,6,100), N
 ! N=2OR 5:
@@ -1646,6 +1798,8 @@
 !*****************************************************************************
 !
       SUBROUTINE PCTF01(N)
+
+      USE REFVAR
 !
 ! *** PCTF01 updated by JCM 28 Feb 88 ***
 !
@@ -1663,7 +1817,10 @@
 !P Entries 2,5 and 7 require DSTAR(KNOW)=d*
 !P Entry 6 requires ARGK=minimum tof
 !
-      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5), DIFANG(6)
+      INCLUDE 'PARAMS.INC'
+      
+      REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
+      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
       REAL            ALAMBD
       INTEGER                      NLAMB
@@ -1673,17 +1830,30 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6), NZERSP(9,5)
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
-!
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       GOTO (1,2,3,4,2,6,2), N
 ! GIVEN AN 'L PKCN' CARD IN COMMON /SCRACH/, READ REST OF IT:
     1 CALL RDREAL(PKCNSP(1,JPHASE,KSOURC),7,IPT,80,IER)
@@ -1730,6 +1900,8 @@
 !*****************************************************************************
 !
       SUBROUTINE PCTF91(N)
+
+      USE REFVAR
 !
 ! *** PCTF91 updated by JCM 28 Feb 88 ***
 !
@@ -1748,8 +1920,10 @@
 !P Entries 2,5 and 7 require DSTAR(KNOW)=d*
 !P Entry 6 requires ARGK=minimum tof
 !
-      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
-     &                DSTAR2, TWOTHD(5), DIFANG(6)
+      INCLUDE 'PARAMS.INC'
+
+      REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
+      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
       REAL            ALAMBD
       INTEGER                      NLAMB
@@ -1759,19 +1933,31 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6),          &
      &                NZERSP(9,5)
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-!
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       GOTO (1,2,3,4,2,6,2,8), N
 ! GIVEN AN 'L PKCN' CARD IN COMMON /SCRACH/, READ REST OF IT:
     1 CALL RDREAL(PKCNSP(1,JPHASE,JSOURC),7,IPT,80,IER)
@@ -1839,24 +2025,33 @@
 !
 !
       INCLUDE 'PARAMS.INC'
+
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -1866,9 +2061,13 @@
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
       PARAMETER (NW=4)
       CHARACTER*4 WDCN01(NW)
@@ -1955,6 +2154,7 @@
 !
 !
       INCLUDE 'PARAMS.INC'
+
       COMPLEX CFFT, DFFT, DDT, CFE, CFT
       LOGICAL TESTOV
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -1965,18 +2165,26 @@
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -1988,8 +2196,14 @@
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       COMMON /SCRAT / CFFT(8), DFFT(8), DDT(8), CFE, CFT, FR(256,8),    &
      &                FI(256,8), DR(256,8), DI(256,8), FRE(256),        &
      &                FIE(256), FRT(256), FIT(256), C3FN(3), C3DN(3)
@@ -2198,6 +2412,7 @@
 !
 !
       INCLUDE 'PARAMS.INC'
+
       LOGICAL TESTOV
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -2208,18 +2423,26 @@
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -2230,11 +2453,15 @@
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       COMMON /SCRAT / C3FN(3), C3DN(3)
       PARAMETER (NW=5)
       CHARACTER*4 WDTF02(NW)
@@ -2443,18 +2670,26 @@
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -2466,9 +2701,14 @@
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       PARAMETER (NW=6)
       COMMON /SCRAT / C3FN(3), C3DN(3)
       CHARACTER*4 WDTF03(NW)
@@ -2674,6 +2914,7 @@
 !
 !
       INCLUDE 'PARAMS.INC'
+
       PARAMETER (NW=6)
       CHARACTER*4 WDTF04(NW)
       LOGICAL TESTOV
@@ -2695,18 +2936,26 @@
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -2718,9 +2967,14 @@
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       DATA WDTF04/'SWCH', 'TAUF', 'TAUS', 'SIGM', 'GAMM', 'POWR'/
       DATA IWTF04/3, 3, 0, 3, 4, 0, 3, 5, 0, 3, 6, 0, 3, 7, 0, 3, 8, 0/
 
@@ -2916,6 +3170,7 @@
 !
 !
       INCLUDE 'PARAMS.INC'
+
       LOGICAL TESTOV
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -2926,18 +3181,26 @@
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -2948,11 +3211,15 @@
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       COMMON /SCRAT / C3FN(3), C3DN(3)
       PARAMETER (NW=8)
       CHARACTER*4 WDTF05(NW)
@@ -3087,11 +3354,9 @@
       C3DN(1) = POFF - 0.5
       C3DN(2) = -2.*POFF
       C3DN(3) = POFF + 0.5
-!
       YNORM = 0.
       DYNDKQ = 0.
       CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
-!
       DO I = 1, 3
         II = IARGI + I - 2
         PKTEM = PKLIST(II,1,KMOD)
@@ -3166,6 +3431,7 @@
 !
 !
       INCLUDE 'PARAMS.INC'
+
       LOGICAL TESTOV
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -3175,18 +3441,26 @@
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -3197,11 +3471,15 @@
      &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       COMMON /SCRAT / C3FN(3), C3DN(3)
       PARAMETER (NW=6)
       CHARACTER*4 WDTF08(NW)
@@ -3406,6 +3684,7 @@
 !
 !
       INCLUDE 'PARAMS.INC'
+
       LOGICAL TESTOV
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -3415,18 +3694,26 @@
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -3439,8 +3726,14 @@
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       COMMON /SCRAT / C3FN(3), C3DN(3)
       PARAMETER (NW=5)
       CHARACTER*4 WDTF02(NW)

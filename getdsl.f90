@@ -20,33 +20,33 @@
       INTEGER,       INTENT (IN   ) :: LenFn
       INTEGER,       INTENT (  OUT) :: Ierr
 
+!O      REAL              PkFnVal,                      PkFnEsd,                      &
+!O                        PkFnCal,                                                    &
+!O                        PkFnVarVal,                   PkFnVarEsd,                   &
+!O                        PkAreaVal,                    PkAreaEsd,                    &
+!O                        PkPosVal,                     PkPosEsd,                     &
+!O                        PkPosAv
+!O      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+!O                        PkFnCal(MPkDes,Max_NPFR),                                   &
+!O                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+!O                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+!O                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+!O                        PkPosAv(MAX_NPFR)
+
       CHARACTER*128 line
       CHARACTER*3   KeyChar
       INTEGER       Idum, nl
       REAL          Temp
       INTEGER       Itemp
-
-      REAL              PkFnVal,                      PkFnEsd,                      &
-                        PkFnCal,                                                    &
-                        PkFnVarVal,                   PkFnVarEsd,                   &
-                        PkAreaVal,                    PkAreaEsd,                    &
-                        PkPosVal,                     PkPosEsd,                     &
-                        PkPosAv
-
-      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
-                        PkFnCal(MPkDes,Max_NPFR),                                   &
-                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
-                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
-                        PkPosAv(MAX_NPFR)
-      INTEGER I
+      INTEGER I, hFile
 
       Ierr = 0
-!     Open the file
-      OPEN (UNIT = 77, FILE=FileName(1:LenFn), STATUS='OLD', ERR=999)
+! Open the file
+      hFile = 77
+      OPEN (UNIT=hFile, FILE=FileName(1:LenFn), STATUS='OLD', ERR=999)
 ! Loop over all records
       DO WHILE ( .TRUE. )
- 10     READ(77,'(a)',END=100,ERR=999) line
+ 10     READ(hFile,'(A)',END=100,ERR=999) line
         nl = LEN_TRIM(line)
         CALL ILowerCase(line(:nl))
         CALL INextString(line,keychar)
@@ -66,64 +66,64 @@
             CALL Upload_Source
 ! Now we know all there is to know about the wavelength and source: update it
             CALL Set_Wavelength(Temp)
-          CASE ('sig') ! Sigma
-! Sigma 1
-            CALL WDialogSelect(IDD_Sigma_info)
-            I = InfoError(1) ! reset the errors
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999
-            CALL WDialogPutReal(IDF_Sigma1,Temp,'(f10.4)')
-            PkFnVarVal(1,1) = Temp
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999  
-            PkFnVarEsd(1,1) = Temp
-! Sigma 2
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999                          
-            CALL WDialogPutReal(IDF_Sigma2,Temp,'(f10.4)')
-            PkFnVarVal(2,1) = Temp
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999  
-            PkFnVarEsd(2,1) = Temp
-          CASE ('gam') ! Gamma
-! Gamma 1
-            CALL WDialogSelect(IDD_Gamma_info)
-            I = InfoError(1) ! reset the errors
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999                          
-            CALL WDialogPutReal(IDF_Gamma1,Temp,'(f10.4)')
-            PkFnVarVal(1,2) = Temp
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999  
-            PkFnVarEsd(1,2) = Temp
-! Gamma 2
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999                          
-            CALL WDialogPutReal(IDF_Gamma2,Temp,'(f10.4)')
-            PkFnVarVal(2,2) = Temp
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999  
-            PkFnVarEsd(2,2) = Temp
-          CASE ('asy') ! HMSL/HPSL Shape parameters
-! HPSL
-            CALL WDialogSelect(IDD_HPSL_info)
-            I = InfoError(1) ! reset the errors
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999                          
-            CALL WDialogPutReal(IDF_HPSL1,Temp,'(f10.4)')
-            PkFnVarVal(1,3) = MAX(0.0001,Temp)
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999  
-            PkFnVarEsd(1,3) = Temp
-! HMSL
-            CALL WDialogSelect(IDD_HMSL_info)
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999                          
-            CALL WDialogPutReal(IDF_HMSL1,Temp,'(f10.4)')
-            PkFnVarVal(1,4) = MAX(0.0001,Temp)
-            CALL INextReal(line,Temp)
-            IF (InfoError(1) .NE. 0) GOTO 999        
-            PkFnVarEsd(1,4)=Temp
+!O          CASE ('sig') ! Sigma
+!O! Sigma 1
+!O            CALL WDialogSelect(IDD_Sigma_info)
+!O            I = InfoError(1) ! reset the errors
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999
+!O            CALL WDialogPutReal(IDF_Sigma1,Temp,'(F10.4)')
+!O            PkFnVarVal(1,1) = Temp
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999  
+!O            PkFnVarEsd(1,1) = Temp
+!O! Sigma 2
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999                          
+!O            CALL WDialogPutReal(IDF_Sigma2,Temp,'(F10.4)')
+!O            PkFnVarVal(2,1) = Temp
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999  
+!O            PkFnVarEsd(2,1) = Temp
+!O          CASE ('gam') ! Gamma
+!O! Gamma 1
+!O            CALL WDialogSelect(IDD_Gamma_info)
+!O            I = InfoError(1) ! reset the errors
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999                          
+!O            CALL WDialogPutReal(IDF_Gamma1,Temp,'(F10.4)')
+!O            PkFnVarVal(1,2) = Temp
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999  
+!O            PkFnVarEsd(1,2) = Temp
+!O! Gamma 2
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999                          
+!O            CALL WDialogPutReal(IDF_Gamma2,Temp,'(F10.4)')
+!O            PkFnVarVal(2,2) = Temp
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999  
+!O            PkFnVarEsd(2,2) = Temp
+!O          CASE ('asy') ! HMSL/HPSL Shape parameters
+!O! HPSL
+!O            CALL WDialogSelect(IDD_HPSL_info)
+!O            I = InfoError(1) ! reset the errors
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999                          
+!O            CALL WDialogPutReal(IDF_HPSL1,Temp,'(F10.4)')
+!O            PkFnVarVal(1,3) = MAX(0.0001,Temp)
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999  
+!O            PkFnVarEsd(1,3) = Temp
+!O! HMSL
+!O            CALL WDialogSelect(IDD_HMSL_info)
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999                          
+!O            CALL WDialogPutReal(IDF_HMSL1,Temp,'(F10.4)')
+!O            PkFnVarVal(1,4) = MAX(0.0001,Temp)
+!O            CALL INextReal(line,Temp)
+!O            IF (InfoError(1) .NE. 0) GOTO 999        
+!O            PkFnVarEsd(1,4)=Temp
           CASE ('zer')
 ! Zero point
             I = InfoError(1) ! reset the errors
@@ -138,7 +138,7 @@
             IF (InfoError(1) .NE. 0) GOTO 999                          
             SlimValue = Temp 
             CALL WDialogSelect(IDD_Pawley_Status)
-            CALL WDialogPutReal(IDF_Slim_Parameter,Temp,'(f7.3)')
+            CALL WDialogPutReal(IDF_Slim_Parameter,Temp,'(F7.3)')
           CASE ('sca')
             I = InfoError(1) ! reset the errors
             CALL INextReal(line,Temp)
@@ -150,7 +150,7 @@
       BACKREF = .FALSE.
       CLOSE(77)
       RETURN
-!C Error if we get here
+! Error if we get here
   999 Ierr = 1
       CLOSE(77,IOSTAT=IDUM)
 
@@ -204,7 +204,7 @@
       CLOSE(77)
       WRTDSL = 0
       RETURN
-!C Error if we get here
+! Error if we get here
   999 CALL ErrorMessage('Error while writing .dsl file.')
       CLOSE(77,IOSTAT=IDUM)
 
@@ -241,7 +241,7 @@
 ! Note that up to this point, none of the global variables had changed. Baling out was no problem.
 ! Try to open the file. This can be removed, of course, and relocated to places in the code where
 ! the current subroutine is called.
-! Actually, that is how it works in practice under windows (try 'Start' -> 'Run...' -> 'Browse...'
+! Actually, that is how it works in practice under Windows (try 'Start' -> 'Run...' -> 'Browse...'
 ! it will not actually open the file, just select it).
       CALL SDIFileOpen(tFileName)
 
@@ -317,21 +317,19 @@
       CHARACTER*12 KeyChar
 
       INTEGER i, KLEN
-      INTEGER ihcver,iticer,ipiker,iloger,idsler, isst, ised
-      INTEGER GetCrystalSystem ! Function
-      INTEGER GETTIC ! Function
+      INTEGER ihcver,ipiker,iloger,idsler, isst, ised
+      INTEGER, EXTERNAL :: GetCrystalSystem
       INTEGER tFileHandle
 
 ! JCC Set to success in all cases
       ihcver = 0
       iloger = 0
-      iticer = 1
       ipiker = 0
       idsler = 0
       IF (LEN_TRIM(SDIFile) .GT. MaxPathLength) THEN
         CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in SDIFileLoad')
       ENDIF
-! Now open all the appropriate PIK, TIC and HCV files
+! Now open all the appropriate PIK and HCV files
       tFileHandle = 10
       OPEN(tFileHandle,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
       CALL sa_SetOutputFiles(SDIFile)
@@ -395,9 +393,6 @@
       klen = LEN_TRIM(DashTicFile)
       IF (TicExists) THEN
         CALL GET_LOGREF(DashTicFile,klen,iloger)
-! JvdS I think that GET_LOGREF already loaded the DashTicFile
-        iticer = GETTIC(klen,DashTicFile)
-        IF (iticer .EQ. 0) TicExists = .FALSE.
       ENDIF
       IF (HcvExists) THEN
         CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
@@ -429,18 +424,14 @@
 !
       INTEGER FUNCTION GETTIC(FLEN,TheFileName)
 
+      USE REFVAR
+
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (IN   ) :: FLEN
 
       INCLUDE 'PARAMS.INC'
-
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       INTEGER I, II
 
@@ -449,11 +440,11 @@
 ! JCC - add in an error trap for bad file opening
       OPEN(11,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
       I = 1
- 10   READ(11,*,ERR=100,END=100) (IH(II,I),II=1,3), ARGK(I), DSTAR(I)
+ 10   READ(11,*,ERR=100,END=100) (iHKL(II,I),II=1,3), RefArgK(I), DSTAR(I)
       I = I + 1
-      IF (I .GT. MTIC) GOTO 100
+      IF (I .GT. MFCSTO) GOTO 100
       GOTO 10
- 100  NTIC = I - 1
+ 100  NumOfRef = I - 1
       CLOSE(11)
       RETURN
  999  GETTIC = 0

@@ -20,9 +20,9 @@
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
 
-      INTEGER         NLGREF, iREFH
-      LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
+      INTEGER         NLGREF
+      LOGICAL                 LOGREF
+      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
 
       INTEGER         KKOR
       REAL                  WTIJ
@@ -30,9 +30,9 @@
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
       REAL              AIOBS,         AICALC
-      COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
+      COMMON /SAREFLNS/ AIOBS(MFCSTO), AICALC(MFCSTO)
       REAL              BICALC,         XICALC
-      COMMON /SAREFLN2/ BICALC(MSAREF), XICALC(MSAREF)
+      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 
       INTEGER         NATOM
       REAL                   X
@@ -348,9 +348,9 @@
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
-      INTEGER         NLGREF, iREFH
-      LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
+      INTEGER         NLGREF
+      LOGICAL                 LOGREF
+      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
 
       COMMON /CSQSTO/ COSQS(-20:20,3,150), SINQS(-20:20,3,150)
 
@@ -454,10 +454,10 @@
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       REAL              BICALC,         XICALC
-      COMMON /SAREFLN2/ BICALC(MSAREF), XICALC(MSAREF)
+      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 
       INTEGER           iHMUL
-      COMMON /SAREFLN3/ iHMUL(MSAREF)
+      COMMON /SAREFLN3/ iHMUL(MFCSTO)
 
       INTEGER iR, i
       REAL PrfPar, prfcor, csqa, ssqa

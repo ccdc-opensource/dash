@@ -3,33 +3,15 @@
 	  INTEGER     MFCSTO
       PARAMETER ( MFCSTO = 10000 )
 
-! For common block FCSPEC
-
-      INTEGER     MFCSPE
-      PARAMETER ( MFCSPE = MFCSTO )
-
-! For common block SAREFLNS
-
-      INTEGER     MSAREF
-      PARAMETER ( MSAREF = MFCSTO )
-
-! Maximum number of Simulated Annealing REFlections
-
 ! For common block CHISTO
 
       INTEGER     MCHIHS
       PARAMETER ( MCHIHS = 40000 )
 
-! For common block FPINF, FPINF1
-
-      INTEGER MFPINF
-! JvdS I increased this from 10000 to 15000, as that is the value it can get in GETPIK()
-      PARAMETER ( MFPINF = 15000 )
-
 ! For use in common block CMN299
 
-      INTEGER     MAXPIK,          MPTS
-      PARAMETER ( MAXPIK = 200000, MPTS = 15000 )
+      INTEGER     MAXPIK
+      PARAMETER ( MAXPIK = 200000 )
 
 ! For use in common block F4PARS
 
@@ -47,30 +29,10 @@
       INTEGER     MOBS
       PARAMETER ( MOBS = 15000 )
 
-! Note: The following parameters seem to be related to MOBS (i.e., should probably have the same value)
-! MPPTS
-! MPTS
-! MFPINF
-
-! For common block PROFTIC
-
-      INTEGER     MTIC
-      PARAMETER ( MTIC = MFCSTO )
-
 ! For common block PEAKFIT2
 
       INTEGER     MAX_NPFR,      MAX_NPPR,      MAX_FITPT,         MPkDes
       PARAMETER ( MAX_NPFR = 50, MAX_NPPR = 10, MAX_FITPT = 10000, MPkDes = 6 )
-
-! For use in common block ZSTORE
-
-      INTEGER     MPPTS
-      PARAMETER ( MPPTS = 15000 )
-
-! For use in common block REFLNZ and WWREFLNZ
-
-      INTEGER     MRFLNZ
-      PARAMETER ( MRFLNZ = MFCSTO )
 
 ! For use in common block IPKCMN
 
@@ -81,11 +43,6 @@
 
       INTEGER     ITMREF
       PARAMETER ( ITMREF = 10000 )
-
-! For use in common block WWREFLN (cf common block in REFLNS.INC)
-
-      INTEGER     WWREFDIM
-      PARAMETER ( WWREFDIM = MFCSTO )
 
 ! For use in common block ALLPEAKS
 
