@@ -1,3 +1,5 @@
+! This file contains routines that form the layer between DASH and Winteracter and
+! mutually exchange variables.
 !
 !*****************************************************************************
 !
@@ -13,8 +15,9 @@
       CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+      CALL WDialogSelect(IDD_Index_Preparation)
+      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL PopActiveWindowID
-
       END SUBROUTINE Upload_Zero_Point
 !
 !*****************************************************************************
