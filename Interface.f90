@@ -932,18 +932,21 @@
       REAL    tMaxResolution
       INTEGER I, IRadSelection
       REAL, EXTERNAL :: FnWavelengthOfMenuOption, TwoTheta2dSpacing, dSpacing2TwoTheta
+      LOGICAL, EXTERNAL :: FnPatternOK
 
       CALL PushActiveWindowID
 ! This is the right place to update the maximum resolution (even if it's not necessary)
 ! In principle, set resolution so as to truncate after DefaultMaxResolution.
 ! However, if truncation resolution not attainable with current data range / wavelength,
 ! adjust the setting of the maximum resolution to maximum possible.
-      CALL WDialogSelect(IDD_PW_Page5)
-      IF (NoData) THEN
-        tMaxResolution = DefaultMaxResolution
-      ELSE
+      IF (FnPatternOK()) THEN
         tMaxResolution = MAX(TwoTheta2dSpacing(XPMAX),DefaultMaxResolution)
+        CALL WDialogSelect(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
+      ELSE
+        tMaxResolution = DefaultMaxResolution
       ENDIF
+      CALL WDialogSelect(IDD_PW_Page5)
       CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
       CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tMaxResolution))
       CALL WDialogSelect(IDD_Data_Properties)
