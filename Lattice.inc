@@ -1,7 +1,7 @@
 
-      REAL SLIMVALUE, SCALFAC
-      LOGICAL BACKREF
-      COMMON /PWLYST/ SLIMVALUE, SCALFAC, BACKREF
+      REAL            SlimValue, ScalFac
+      LOGICAL                             BackRef
+      COMMON /PWLYST/ SlimValue, ScalFac, BackRef
 
       REAL :: CellPar, ZeroPoint
 	  LOGICAL CellParConstrained 

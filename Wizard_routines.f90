@@ -11,7 +11,7 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
-      CALL SetModeMenuState(1,0,0)
+      CALL SetModeMenuState(1,0)
       CALL SelectMode(ID_Peak_Fitting_Mode)
 !O! Grey out "Subtract Background" button in Toolbar
 !O      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
@@ -97,9 +97,9 @@
 
       CALL WizardWindowHide
       IF (WeCanDoAPawleyRefinement()) THEN
-        CALL SetModeMenuState(1,1,0)
+        CALL SetModeMenuState(1,1)
       ELSE
-        CALL SetModeMenuState(1,-1,0)
+        CALL SetModeMenuState(1,-1)
       ENDIF
       CALL SelectMode(ID_Peak_Fitting_Mode)
       CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOn)

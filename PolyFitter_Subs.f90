@@ -972,13 +972,13 @@
 
       CALL PushActiveWindowID
       IF (WeCanDoAPawleyRefinement()) THEN
-        CALL SetModeMenuState(0,1,0)
+        CALL SetModeMenuState(0,1)
         CALL WDialogSelect(IDD_PW_Page10)
         CALL WDialogFieldState(IDNEXT,Enabled)
         CALL WDialogSelect(IDD_Pawley_Status)
         CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
       ELSE
-        CALL SetModeMenuState(0,-1,0)
+        CALL SetModeMenuState(0,-1)
         CALL WDialogSelect(IDD_PW_Page10)
         CALL WDialogFieldState(IDNEXT,Disabled)
         CALL WDialogSelect(IDD_Pawley_Status)

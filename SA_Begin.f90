@@ -158,7 +158,7 @@
 !C After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       CALL OutputChi2vsMoves
-      CALL SetModeMenuState(0,0,1)
+      CALL SetModeMenuState(0,0)
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Enabled)
 !O      Ierrflag = InfoError(1)
