@@ -39,7 +39,7 @@
 !               'DASH powder diffraction files (*.xye)|*.xye|'//&
 !               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
       FILTER = 'All files (*.*)|*.*|'//&
-               'All powder diffraction files|*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
+               'All powder diffraction files|*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye;*.x*|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
@@ -195,12 +195,14 @@
       INTEGER, EXTERNAL :: Load_udf_File
       INTEGER, EXTERNAL :: Load_uxd_File
       INTEGER, EXTERNAL :: Load_xye_File
+      INTEGER, EXTERNAL :: Load_xnn_File
       INTEGER          ISTAT
       INTEGER          I
       INTEGER          POS
       LOGICAL          ESDsFilled
       REAL             INTEGRATED_GUESS
       INTEGER          MAX_INTENSITY_INDEX
+      LOGICAL, EXTERNAL :: ChrIsDigit
 
 ! Initialise to failure
       DiffractionFileLoad = 0
@@ -217,6 +219,11 @@
       EXT4 = '    '
       EXT4 = TheFileName(POS+1:KLEN)
       CALL ILowerCase(EXT4)
+! Bede files have sequence numbers in their extensions
+      IF (EXT4(1:1) .EQ. 'x') THEN
+        IF (ChrIsDigit(EXT4(2:2))) EXT4(2:2) = 'n' 
+        IF (ChrIsDigit(EXT4(3:3))) EXT4(3:3) = 'n' 
+      ENDIF
       ISTAT = 0
       ESDsFilled = .FALSE.
       NoWavelengthInXYE = .FALSE.
@@ -235,6 +242,8 @@
           ISTAT = Load_uxd_File(TheFileName,ESDsFilled)
         CASE ('xye ')
           ISTAT = Load_xye_File(TheFileName,ESDsFilled)
+        CASE ('xnn ')
+          ISTAT = Load_xnn_File(TheFileName,ESDsFilled)
       END SELECT
       DiffractionFileLoad = ISTAT
       IF (ISTAT .EQ. 0) THEN
@@ -1441,6 +1450,180 @@
       CLOSE(10)
 
       END FUNCTION Load_xye_File
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION Load_xnn_File(TheFileName,ESDsFilled)
+!
+! This function tries to load a *.xnn [nn = 01, 02 etc] file (Bede ASCII powder pattern format).
+!
+! Note that this function should only be called from DiffractionFileLoad
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+!
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data)
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      LOGICAL,       INTENT (  OUT) :: ESDsFilled
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+
+      CHARACTER*255 Cline, tString, tSubString
+      INTEGER       I, NumOfBins, hFile, tLen
+      LOGICAL       ReadWarning
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption
+      INTEGER, EXTERNAL :: GetNumOfColumns, StrFind
+      REAL          Lambda1
+      REAL          cps
+
+!DCC SCAN DATA:
+!File: d:\data temp\stephan\tablet_1_0aa1.x01
+!User: d1d1
+!Specimen: tablet_1    Crystal:     Reflection: 0 0 4
+!Wavelength: 1.54056 Å    Bragg angle: 34.5636 °    kV: 40.00    mA: 50.00
+! paracetamol tablet
+!Time: 15:15 Date : 1/30/2002
+!Scanning axis: 2Theta Scan direction: increasing
+!Scan range: 35.000000 deg
+!
+!Starting positions of motors: 
+!          2Theta     5.000050 deg
+!          Axis_1     0.000000 sec
+!          Axis_3     0.000000 sec
+!          Chi     0.000000 deg
+!          Det_Z     1.250000 mm
+!          Gonio_3     0.000000 deg
+!          Omega     0.000000 deg
+!          Optics_Rot     0.070000 deg
+!          Optics_Z     0.000000 mm
+!          Phi     0.000000 deg
+!          X     -3.000000 mm
+!          Y     -3.000000 mm
+!          Z     0.000000 mm
+!          Z1     4.600000 mm
+!          Z3     0.000000 mm
+!          ZCCC     4.720000 mm
+!          Omega_relative     6.944294 deg
+!Component axes and relative motions:
+!            *Omega      1.000000
+!          Omega-2Theta     0.000000 deg
+!Component axes and relative motions:
+!            *Omega      1.000000
+!            *2Theta     2.000000
+!          phi2theta     23.650000 deg
+!Component axes and relative motions:
+!            *Phi      1.000000
+!            *2Theta     2.000000
+!No. of points: 350     Counting time per point:    5.000000
+!Position   Count
+!     5.000050      36.600000
+!     5.100050      36.000000
+!     5.200050      35.200000
+!     5.300050      35.200000
+!     5.400050      33.000000
+! <SNIP>
+!     39.599950      149.200000
+!     39.699950      157.800000
+!     39.799950      155.400000
+!     39.899950      159.800000
+!     40.000000      180.600000
+
+! Initialise to failure
+      Load_xnn_File = 0
+      Lambda1       = 0.0
+      ReadWarning   = .FALSE.
+      hFile = 10
+      OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
+      I = 1
+    9 READ(hFile,FMT='(A)',ERR=999,END=999) tString
+      CALL StrClean(tString,tLen)
+      IF (StrFind(tString,tLen,'Wavelength:',11) .NE. 0) THEN
+! Extract wavelength
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        READ (tSubString,*) Lambda1
+      ENDIF
+      IF (StrFind(tString,tLen,'Counting time per point:',24) .NE. 0) THEN
+! Extract expected number of points and counting time per point
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        READ (tSubString,*) NumOfBins
+        NumOfBins = NumOfBins + 1 ! Don't ask me why
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        CALL GetSubString(tString,' ',tSubString)
+        READ (tSubString,*) cps
+      ENDIF
+! Detect start of data
+      IF (StrFind(tString,tLen,'Position Count',14) .NE. 0) GOTO 10
+      GOTO 9
+ 10   READ(UNIT=hFile,FMT='(A)',ERR=999,END=100) Cline
+      READ(Cline,*,ERR=999,END=100) XOBS(I), YOBS(I)
+! Skip negative 2-theta data and negative intensities
+      IF (XOBS(I) .LE. 0.0) GOTO 10
+      IF (YOBS(I) .LT. 0.0) GOTO 10
+      YOBS(I) = YOBS(I) * cps
+      IF (I .GT. 1) THEN
+        IF (ABS(XOBS(I) - XOBS(I-1)) .LT. 0.0000001) THEN
+          IF (.NOT. ReadWarning) THEN
+            ReadWarning = .TRUE.
+            CALL WarningMessage("The data file contains multiple observations for the same 2-theta."//CHAR(13)// &
+                                "Only the first observation will be used.")
+          ENDIF
+          GOTO 10
+        ENDIF
+      ENDIF
+      I = I + 1
+! JCC Only read in a maximum of MOBS points
+      IF (I .GT. MOBS) THEN
+        CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+        GOTO 100
+      ENDIF
+      GOTO 10
+ 100  NOBS = I - 1
+      CLOSE(hFile)
+      IF (NOBS .LT. NumOfBins) CALL WarningMessage('File contained less data points than expected.'//CHAR(13)// &
+                                                   'Will continue with points actually read only.')
+      IF (NOBS .GT. NumOfBins) THEN
+        CALL WarningMessage('File contained more data points than expected.'//CHAR(13)// &
+                            'Excess points will be ignored.')
+        NOBS = NumOfBins
+      ENDIF
+      ESDsFilled = .FALSE.
+! JvdS Added check for number of observations = 0
+      IF (NOBS .EQ. 0) THEN
+        CALL ErrorMessage("The file contains no valid data.")
+        RETURN
+      ENDIF
+! This is definitely laboratory data
+      JRadOption = 1
+      CALL Upload_Source
+      CALL Set_Wavelength(Lambda1)
+      Load_xnn_File = 1
+      RETURN
+ 999  CONTINUE
+      CLOSE(hFile)
+
+      END FUNCTION Load_xnn_File
 !
 !*****************************************************************************
 !
