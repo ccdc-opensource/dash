@@ -42,7 +42,8 @@
         CALL WizardWindowShow(IDD_SA_input3)
         RETURN
       ENDIF
-      CALL FillSymmetry
+      CALL Create_AtomicWeightings
+      CALL FillSymmetry_2
       CALL GET_LOGREF
 ! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
 ! changed while the SA is running).
@@ -175,11 +176,13 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE FillSymmetry
+      SUBROUTINE FillSymmetry_2
+
+      USE PO_VAR
+      USE REFVAR
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
 ! Covers the eventuality of the default space group option.
@@ -200,7 +203,10 @@
       REAL                        symmin
       CHARACTER*20                                           symline
       COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
- 
+
+      INTEGER           iHMUL
+      COMMON /SAREFLN3/ iHMUL(MaxRef)
+
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
@@ -210,12 +216,18 @@
       CHARACTER*6 PNAME
       INTEGER hFile, iSym
       INTEGER, EXTERNAL :: GetCrystalSystem
+      REAL phases(1:48), RefHT(1:3,1:48)
+      REAL PrfDir(1:3), H(1:3), RefLen
+      INTEGER i, ii, iR
+      REAL, EXTERNAL :: VCTMOD, SCLPRD
 
    10 IBMBER = 0
       hFile = 42
       OPEN(hFile,FILE='polys.ccl',status='unknown',ERR=999)
       WRITE(hFile,4210,ERR=999) 
  4210 FORMAT('N Determining the space group ')
+      WRITE(hFile,4220,ERR=999) (CellPar(i),i=1,6)
+ 4220 FORMAT('C ',3F9.5,3F9.3)
       IF (NumberSGTable .GE. 1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin .GT. 0) THEN
@@ -231,7 +243,10 @@
       NINIT = 1
       CALL PREFIN(PNAME)
       CALL SYMOP
-      IF (IBMBER .EQ. 0) CALL OPSYM(1)
+      IF (IBMBER .EQ. 0) THEN
+        CALL OPSYM(1)
+        CALL RECIP
+      ENDIF
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
@@ -243,101 +258,28 @@
         CALL ErrorMessage('Error while determining space group: space group reset.')
         GOTO 10
       ENDIF
-      RETURN
-  999 CALL ErrorMessage('Error writing temporary file for space group decoding.')
-      CLOSE(hFile)
-
-      END SUBROUTINE FillSymmetry
-!
-!*****************************************************************************
-!
-      SUBROUTINE PO_Init   
-
-      USE ATMVAR
-      USE PO_VAR
-      USE REFVAR
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-
-      INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
-      LOGICAL                                                                             SDREAD
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
-
-      INTEGER         LPT, LUNI
-      COMMON /IOUNIT/ LPT, LUNI
-
-      INTEGER     msymmin
-      PARAMETER ( msymmin = 10 )
-      INTEGER            nsymmin
-      REAL                        symmin
-      CHARACTER*20                                           symline
-      COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
-
-      INTEGER           iHMUL
-      COMMON /SAREFLN3/ iHMUL(MaxRef)
-
-      INTEGER         NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
-      COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
-
-      CHARACTER*10 filnam_root
-      COMMON /commun/ filnam_root
- 
-      CHARACTER*6  PNAME
-      REAL phases(1:48), RefHT(1:3,1:48)
-      REAL PrfDir(1:3), H(1:3), RefLen
-      INTEGER i, ii, iR, hFile, iSym
-      REAL, EXTERNAL :: VCTMOD, SCLPRD
-
-      IF (.NOT. PrefParExists) RETURN
-      hFile = 42
-      OPEN(hFile,FILE='polyx.ccl',status='unknown',ERR=999)
-      WRITE(hFile,4210,ERR=999) 
- 4210 FORMAT('N Handles preferred orientation')
-      WRITE(hFile,4220,ERR=999) (CellPar(i),i=1,6)
- 4220 FORMAT('C ',3F9.5,3F9.3)
-      IF (NumberSGTable .GE. 1) THEN
-        CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
-        IF (nsymmin .GT. 0) THEN
-          DO iSym = 1, nsymmin
-            WRITE(hFile,4235,ERR=999) symline(iSym)
- 4235       FORMAT('S ',A)
+      IF (PrefParExists) THEN
+        DO i = 1, 3
+          PrfDir(i) = PrefPars(i)
+        ENDDO
+        RefLen = VCTMOD(1.0,PrfDir,2)
+        PrfDir = PrfDir / RefLen
+        DO iR = 1, NumOfRef
+          DO ii = 1, 3
+            H(ii) = SNGL(iHKL(ii,iR))
           ENDDO
-        ENDIF
+          RefLen = VCTMOD(1.0,H,2) ! Calculate length of reciprocal-space vector
+          CALL SYMREF(H,RefHT,iHMUL(iR),phases)
+          DO ii = 1, iHMUL(iR)
+            PrefCsqa(ii,iR) = (SCLPRD(PrfDir,RefHT(1,ii),2)/RefLen)**2
+          ENDDO
+        ENDDO
       ENDIF
-      CLOSE(hFile)
-      PNAME = 'EXTMAK'
-      filnam_root = 'polyx'
-      NINIT = 1
-      CALL PREFIN(PNAME)
-      CALL SYMOP
-      CALL RECIP
-      DO i = 1, 3
-        PrfDir(i) = PrefPars(i)
-      ENDDO
-      RefLen = VCTMOD(1.0,PrfDir,2)
-      PrfDir = PrfDir / RefLen
-      DO iR = 1, NumOfRef
-        DO ii = 1, 3
-          H(ii) = SNGL(iHKL(ii,iR))
-        ENDDO
-        RefLen = VCTMOD(1.0,H,2) ! Calculate length of reciprocal-space vector
-        CALL SYMREF(H,RefHT,iHMUL(iR),phases)
-        DO ii = 1, iHMUL(iR)
-          PrefCsqa(ii,iR) = (SCLPRD(PrfDir,RefHT(1,ii),2)/RefLen)**2
-        ENDDO
-      ENDDO
-      CALL CLOFIL(ICRYDA)
-      CALL CLOFIL(IO10)
-      CALL CLOFIL(LPT)
       RETURN
   999 CALL ErrorMessage('Error writing temporary file for space group decoding.')
       CLOSE(hFile)
 
-      END SUBROUTINE PO_Init
+      END SUBROUTINE FillSymmetry_2
 !
 !*****************************************************************************
 !
