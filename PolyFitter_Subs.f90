@@ -909,11 +909,8 @@
       IDV_Menu_Option( 1) = ID_Default_Mode 
 !W      IDV_Menu_Option( 2) = ID_CrossHair_Cursor_Mode 
 !W      IDV_Menu_Option( 3) = ID_Peak_Fitting_Cursor_Mode 
-      IDV_Menu_Option( 4) = ID_get_lattice_constants 
       IDV_Menu_Option( 5) = ID_get_peak_widths 
-      IDV_Menu_Option( 6) = ID_import_pro_file 
 !W      IDV_Menu_Option( 7) = ID_import_tic_file 
-      IDV_Menu_Option( 8) = ID_get_peak_intensities 
 !W      IDV_Menu_Option( 9) = ID_import_uxd_file 
 !W      IDV_Menu_Option(10) = ID_import_CCL  
 !W      IDV_Menu_Option(11) = ID_import_ICSD

@@ -513,7 +513,6 @@
         OnOrOff = WintOff
       ENDIF
       CALL WMenuSetState(ID_Import_dpj_file,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_Import_data,ItemEnabled,OnOrOff)
 !      CALL WMenuSetState(ID_get_data_properties,ItemEnabled,OnOrOff)
 !      CALL WMenuSetState(ID_get_peak_positions,ItemEnabled,OnOrOff)
 !      CALL WMenuSetState(ID_get_crystal_symmetry,ItemEnabled,OnOrOff)

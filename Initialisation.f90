@@ -66,8 +66,7 @@
       IMPLICIT NONE
 
 !C>> SA bitmap
-      INTEGER it, Ibmhandle
-      COMMON / BMPHAN / Ibmhandle
+      INTEGER it
 
       CALL WDialogLoad(IDD_Structural_Information)
       CALL WDialogLoad(IDD_SA_Action1)
@@ -103,11 +102,6 @@
       CALL WDialogLoad(IDD_License_Dialog)
       CALL WDialogLoad(ID_Background_Fit)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
-! Upload sa bitmap into memory
-      ibmhandle = 0
-      CALL WDialogSelect(IDD_SA_Action1)
-      CALL IGrSelect(3,IDF_minchisq_picture)
-      CALL WBitmapGet(ibmhandle,0)
       it = InfoError(1)
       RETURN
 
