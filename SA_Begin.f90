@@ -6,6 +6,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR
 
       IMPLICIT NONE
 
@@ -32,6 +33,20 @@
       LOGICAL         InSA
       COMMON /SADATA/ InSA
 
+            INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput
       LOGICAL, EXTERNAL :: Get_UseHydrogens
       REAL    T1
@@ -42,7 +57,8 @@
         CALL WizardWindowShow(IDD_SA_input3)
         RETURN
       ENDIF
-              CALL GET_LOGREF
+      natom = ntatm
+      CALL GET_LOGREF
 ! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
 ! changed while the SA is running).
       CALL WDialogSelect(IDD_Configuration)
@@ -291,7 +307,7 @@
 
       IF (.NOT. PrefParExists) RETURN
       hFile = 42
-      OPEN(42,FILE='polyx.ccl',status='unknown',ERR=999)
+      OPEN(hFile,FILE='polyx.ccl',status='unknown',ERR=999)
       WRITE(hFile,4210,ERR=999) 
  4210 FORMAT('N Handles preferred orientation')
       WRITE(hFile,4220,ERR=999) (CellPar(i),i=1,6)

@@ -212,7 +212,11 @@
       tLength = LEN_TRIM(frag_file(iFrg))
       temp_file = frag_file(iFrg)(1:tLength-8)//'_temp.mol2'
 ! Show the mol2 file
-      IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) CALL ViewStructure(temp_file)
+      IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) THEN
+        CALL ViewStructure(temp_file)
+      ELSE
+        CALL DebugErrorMessage('Error writing temporary file.')
+      ENDIF
       CALL IOSDeleteFile(temp_file)
 
       END SUBROUTINE ViewZmatrix
@@ -542,22 +546,9 @@
 
       IMPLICIT NONE
 
-      INTEGER         NATOM
-      REAL                   X
-      INTEGER                          KX
-      REAL                                        AMULT,      TF
-      INTEGER         KTF
-      REAL                      SITE
-      INTEGER                              KSITE,      ISGEN
-      REAL            SDX,        SDTF,      SDSITE
-      INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-
       INTEGER NumberOfDOF, izmtot, iFrg, tInteger
       CHARACTER(MaxPathLength) DirName
-      CHARACTER*80  FileName
+      CHARACTER*80 FileName
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -608,7 +599,6 @@
 ! a. identical to release version
 ! b. it's difficult to keep track of the validity of the .sdi file
       CALL WDialogFieldStateLogical(IDNEXT,nfrag .NE. 0)
-      natom = ntatm
       IF (izmtot .EQ. 0) THEN            
         CALL WDialogClearField(IDF_ZM_allpars)
       ELSE
