@@ -7,14 +7,16 @@
 ! Grid includes a "view" button which allows the user to view the molecular
 ! model via Mercury and the profile data in a graph window
 	
-	  USE WINTERACTER
+	USE WINTERACTER
       USE DRUID_HEADER
-	  USE VARIABLES
+	USE VARIABLES
       TYPE(WIN_STYLE)    WINDOW
-	  
+	INCLUDE 'params.inc'  
 !ep	 need the common block to identify the number rows in the grid	  	
-	  COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
-	  
+	COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+!     required to handle the profile graphs plotted in child windows
+      INTEGER  SAUsedChildWindows
+      COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 	  
 	  CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
 	  CALL WDialogShow(-1,-1,0,Modeless)
@@ -27,16 +29,20 @@
 ! will close the profile plot window
 				  CASE (CloseRequest)
 				    CALL WindowCloseChild(EventInfo%win)
+                            SAUsedChildWindows(EventInfo%win) = 0
 ! exposing or resizing of profile plot windows - will replot
 				  CASE (expose, resize)
-				    CALL replot_pro_file(EventInfo%win)
+				    CALL plot_pro_file(EventInfo%win)
 ! Ok button of summary window pushed, dialog closed
 				  CASE (PushButton)
 					IF ( IDOK_ep .EQ. EventInfo%VALUE1) THEN
-! @ will close all child windows indiscriminantly - change!
-                                do i = 1, maxruns
-                                   call WindowCloseChild(i)
-                                End do
+! Closes all SA profile child windows which are still open when OK button clicked
+                                DO i = 1, MaxNumChildWin
+                                   IF (SAUsedChildWindows(i).eq.1) THEN
+                                     CALL WindowCloseChild(i)
+                                     SAUsedChildWindows(i) = 0
+                                   END IF
+                                END DO
 					CALL WDialogHide()
 					EXIT
 					END IF
@@ -55,7 +61,7 @@
 				    CALL WGridPutCellCheckBox(IDF_SA_Summary,2,irow,Unchecked)
 				    istatus = 0
 			    ENDIF
-            END DO		   
+                  END DO		   
 	  END DO
 
 	  END subroutine SaSummary
