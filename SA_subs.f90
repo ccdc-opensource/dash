@@ -10,6 +10,7 @@
       USE PO_VAR
       USE ZMVAR
       USE SOLVAR
+!O      USE REFVAR
 
       IMPLICIT NONE
 
@@ -112,6 +113,7 @@
       LOGICAL PrevRejected, CurrIsPO, PrevWasPO
       DOUBLE PRECISION tX147
 
+!O      NumOfRef = 10
       CALL OpenChiSqPlotWindow
       Curr_SA_Run = 0
       NumOf_SA_Runs = 0
@@ -167,6 +169,7 @@
 !   Starting point for multiple runs
 ! ####################################
     1 CONTINUE ! The start point for multiple runs.
+!O      kk = 0
 ! Set initial values.
       iMyExit = 0
       Curr_SA_Run = Curr_SA_Run + 1
@@ -229,13 +232,6 @@
       PrevRejected = .TRUE.
 ! plot the profile
       CALL Profile_Plot
-!  If the function is to be minimised, switch the sign of the function.
-!  Note that all intermediate and final output switches the sign back
-!  to eliminate any possible confusion for the user.
-! JvdS According to the compiler, this part was never initialised.
-! As it usually works, I assume MAXLOG is usually 0 probably meaning .FALSE.
-      MAXLOG = .FALSE.
-      IF (.NOT. MAXLOG) F = -F
       FOPT = F
       MRAN  = ISEED1 + Curr_SA_Run
       MRAN1 = ISEED2 + Curr_SA_Run
@@ -245,6 +241,7 @@
       Last_NUP   = nmpert / 2
       Last_NDOWN = nmpert / 2
   100 CONTINUE
+!O      kk = kk + 1
       NUP = 0
       NREJ = 0
       NDOWN = 0
@@ -259,7 +256,7 @@
       FPSUM1 = 0.0
       FPSUM2 = 0.0
 ! Update the SA status window
-      CALL SA_OUTPUT(SNGL(T),-SNGL(fopt),-SNGL(FPAV), SNGL(FPSD),xopt,dxvav,xvsig,flav,lb,ub,  &
+      CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),xopt,dxvav,xvsig,flav,lb,ub,  &
                      vm,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov,iteration)
       CALL sa_move_status(nmpert,0)
 ! ##########################################
@@ -336,7 +333,6 @@
             ENDIF
             PrevWasPO = CurrIsPO
 
-            FP = -FP
             FPSUM0 = FPSUM0 + 1.0
             FPSUM1 = FPSUM1 + FP
             FPSUM2 = FPSUM2 + FP*FP
@@ -344,7 +340,7 @@
             XDSS(H) = XDSS(H) + (FP-F)**2
             PrevRejected = .FALSE.
 ! Accept the new point if the function value increases.
-            IF (FP.GE.F) THEN
+            IF (FP.LE.F) THEN
               X(H) = XP(H)
               F = FP
               NACC = NACC + 1
@@ -354,7 +350,7 @@
               XXSUM(H) = XXSUM(H) + X(H)**2
               NUP = NUP + 1
 ! If greater than any other point, record as new optimum.
-              IF (FP.GT.FOPT) THEN
+              IF (FP.LT.FOPT) THEN
                 DO I = 1, nvar
                   XOPT(I) = XP(I)
                 ENDDO
@@ -367,13 +363,13 @@
                 CALL valchipro(CHIPROBEST)
                 FOPT = FP
 ! Update the SA status window
-                CALL SA_OUTPUT(SNGL(T),-SNGL(FOPT),-SNGL(FPAV),SNGL(FPSD),XOPT,dxvav,xvsig,flav,lb,ub,  &
+                CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),XOPT,dxvav,xvsig,flav,lb,ub,  &
                                vm,NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov,iteration)
               ENDIF
 ! If the point is lower, use the Metropolis criterion to decide on
 ! acceptance or rejection.
             ELSE
-              P = EXPREP((FP-F)/T)
+              P = EXPREP((F-FP)/T)
               PP = RANARR(IARR)
               IARR = IARR + 1
               IF (PP.LT.P) THEN
@@ -444,23 +440,33 @@
       iteration = iteration + 1
       IF (num_new_min .NE. num_old_min) CALL Profile_Plot ! plot the profile
       num_old_min = num_new_min
-      CALL SA_OUTPUT(SNGL(T),-SNGL(fopt),-SNGL(FPAV),SNGL(FPSD),xopt, &
+      CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),xopt, &
                      dxvav,xvsig,flav,lb,ub,vm,nvar,Last_NUP,Last_NDOWN,NREJ, &
                      ntotmov,iteration)
 ! If we have asked for an initial temperature to be calculated then do so
       IF (MAKET0) THEN
 ! Start temperature increased by 50% as asked for
         T = FPSD*1.5
+! Having done an SA cycle at T = 100000, the initial values are now randomised.
+! If the user had requested the values supplied to be used, reset them.
+        CALL MAKXIN(nvar)
         MAKET0 = .FALSE.
         GOTO 100
       ENDIF
 ! If termination criteria are not met, prepare for another loop.
 ! We will use the energy fluctuation to reduce the temperature
       T = T/(1.0+(RT*T)/(3.0*FPSD))
-      F = FOPT
+!O      IF (kk .GT. 0) THEN
+!O        NumOfRef = NumOfRef + 1
+!O        kk = 0
+!O      ENDIF
       DO I = 1, nvar
         X(I) = XOPT(I)
       ENDDO
+!O      CALL PO_PRECFC
+!O      CALL FCN(XOPT,F,0)
+!O      FOPT = F
+!O      CALL valchipro(CHIPROBEST)
   999 CONTINUE ! This is where we jump to if the user pressed 'Stop' during the SA
                ! The variable imyexit has been set to 3, 4 or 5  (3 = stop SA, 4 = start next run, 5 = Edit)
                ! If we didn't jump to this point, just passed it, imyexit is 0
@@ -590,11 +596,15 @@
 !
 !*****************************************************************************
 !
-      FUNCTION RANMAR
+      REAL FUNCTION RANMAR
+
+      IMPLICIT NONE
 
       REAL            U,     C, CD, CM
       INTEGER                           I97, J97
       COMMON /raset1/ U(97), C, CD, CM, I97, J97
+
+      REAL uni
 
       uni = U(I97) - U(J97)
       IF (uni.LT.0.0) uni = uni + 1.0
@@ -680,23 +690,38 @@
 !
       SUBROUTINE MAKXIN(N)
 
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
       DOUBLE PRECISION x, lb, ub, vm, xpreset
       COMMON /values/ x(mvar), lb(mvar), ub(mvar), vm(mvar)
-      COMMON /presetr/ xpreset(mvar)
-      LOGICAL log_preset
-      COMMON /presetl/ log_preset
 
-      IF (LOG_PRESET) THEN
-        DO IV = 1, N
-          X(IV) = XPRESET(IV)
-        ENDDO
-      ELSE
+      COMMON /presetr/ xpreset(mvar)
+
+      
+      INTEGER N, IV
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      REAL, EXTERNAL :: RANMAR
+      REAL    tReal
+
+! Get the "IDF_RandomInitVal" checkbox
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input2)
+      IF (WDialogGetCheckBoxLogical(IDF_RandomInitVal)) THEN
         DO IV = 1, N
           X(IV) = LB(IV) + (UB(IV)-LB(IV))*RANMAR()
         ENDDO
+      ELSE
+        DO IV = 1, N
+          CALL WGridGetCellReal(IDF_parameter_grid,1,IV,tReal)
+          X(IV) = DBLE(tReal)
+        ENDDO
       ENDIF
+      CALL PopActiveWindowID
 
       END SUBROUTINE MAKXIN
 !
