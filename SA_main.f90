@@ -150,7 +150,6 @@
       SUBROUTINE ViewZmatrix(iFrg)
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
       USE SAMVAR
@@ -564,39 +563,40 @@
                       KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      INTEGER NumberOfDOF, izmtot, iFrg, tInteger
-      CHARACTER(MaxPathLength) DirName
-      CHARACTER*80 FileName
-
 ! The following variables are there to allow the dialogue fields in the
 ! window dealing with Z-matrices to be handled by DO...ENDDO loops.
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
 ! but these mappings are.
 
-      INTEGER        IDFZMNumber,           IDFZMFile,                &
-                     IDBZMDelete,           IDBZMBrowse,              &
-                     IDBZMView,             IDBZMEdit,                &
+      INTEGER        IDFZMNumber,                    IDFZMFile,                &
+                     IDBZMDelete,                    IDBZMBrowse,              &
+                     IDBZMView,                      IDBZMEdit,                &
                      IDFZMpars
-      COMMON /IDFZM/ IDFZMNumber(1:maxfrg), IDFZMFile(1:maxfrg),      &
-                     IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
-                     IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
-                     IDFZMpars(1:maxfrg)
+      COMMON /IDFZM/ IDFZMNumber(1:maxfrginterface), IDFZMFile(1:maxfrginterface),      &
+                     IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
+                     IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
+                     IDFZMpars(1:maxfrginterface)
+
+      INTEGER NumberOfDOF, izmtot, iFrg
+      CHARACTER*(MaxPathLength) DirName
+      CHARACTER*(80) FileName
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
       nfrag  = 0
       izmtot = 0
       NATOM  = 0
-      DO iFrg = 1, maxfrg
+      DO iFrg = 1, maxfrginterface
         IF (gotzmfile(iFrg)) THEN
           nfrag = nfrag + 1
-          CALL WDialogGetInteger(IDFzmNumber(iFrg),tInteger)
-          NATOM = NATOM + tInteger * natoms(iFrg)
+          CALL WDialogPutInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+          NATOM = NATOM + zmNumberOfCopies(iFrg)*natoms(iFrg)
           IF (natoms(iFrg) .EQ. 1) THEN
             NumberOfDOF = 3 ! It's an atom
           ELSE
             NumberOfDOF = izmpar(iFrg) - 1 ! Count the quaternions as three, not four
           ENDIF
+          NumberOfDOF = NumberOfDOF * zmNumberOfCopies(iFrg)
           izmtot = izmtot + NumberOfDOF
 ! Enable 'Number of' field
           CALL WDialogFieldState(IDFzmNumber(iFrg),Enabled)
@@ -648,7 +648,6 @@
 ! If TheFileName is empty, user will be prompted for a file.
 ! 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -711,7 +710,6 @@
       SUBROUTINE zmConvert(TheInputFile,TheNumOfZmatrices,TheZmatrices)
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
