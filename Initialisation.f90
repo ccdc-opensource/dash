@@ -105,7 +105,7 @@
                                 'Trigonal    ', 'Rhombohedral', 'Hexagonal   ', &
                                 'Cubic       '/
       CHARACTER*MaxPathLength tString
-      CHARACTER*255 tDir, tFile
+      CHARACTER*255 tFile
       INTEGER*4 tProcess, tSize
 
       LPosSG( 1) =   1
@@ -277,6 +277,9 @@
         UR(I) = COS(TH)
         UI(I) = SIN(TH)
       ENDDO
+! Initialise path to viewer and argument for viewer. These will be overwritten if
+! the configuration file is found and used.
+      CALL GetPathToMercuryFromRegistry
       ChildWinAutoClose = .FALSE.
       ChildWinHandlerSet = .FALSE.
       SA_Run_Number = 0
@@ -373,12 +376,6 @@
 
       CALL ReadConfigurationFile
       CALL WDialogSelect(IDD_SAW_Page1)
-      IF (ConvOn) THEN
-        CALL WDialogFieldState(IDB_SA_Project_Import,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDB_SA_Project_Import,Disabled)
-      ENDIF
-
       CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
                                         KolPGWindow%IGreen,&
                                         KolPGWindow%IBlue)
@@ -700,7 +697,7 @@
       REAL*4    tReal
       REAL, EXTERNAL :: dSpacing2TwoTheta
       LOGICAL FExists
-      
+
       tFileName = 'D3.cfg'
       INQUIRE(FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,EXIST=FExists)
       IF (.NOT. FExists) RETURN
