@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE WriteSAParametersToFile(TheFileName)
+      INTEGER FUNCTION WriteSAParametersToFile(TheFileName)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -32,11 +32,19 @@
  
       INTEGER tFileHandle, I, kk, ifrg, ilen, II, Fixed
       REAL    R, x, lb, ub
+      CHARACTER*80 tSDIFile
 
+
+      WriteSAParametersToFile = 1 ! Error
       CALL PushActiveWindowID
       tFileHandle = 10
       OPEN(tFileHandle,FILE=TheFileName,ERR=999)
       WRITE(tFileHandle,'("  Parameters for simulated annealing in DASH")',ERR=999)
+  !    WRITE(tFileHandle,'("  Date = ",A)',ERR=999)
+
+      CALL WDialogSelect(IDD_SAW_Page1)
+      CALL WDialogGetString(IDF_SA_Project_Name,tSDIFile)
+      WRITE(tFileHandle,'("  SDI file = ",A)',ERR=999) tSDIFile(1:LEN_TRIM(tSDIFile))
       CALL WDialogSelect(IDD_SA_input2)
       kk = 0
       DO ifrg = 1, maxfrg
@@ -92,12 +100,13 @@
 
       CLOSE(tFileHandle)
       CALL PopActiveWindowID
+      WriteSAParametersToFile = 0 ! success
       RETURN
   999 CALL ErrorMessage('Could not access temporary file.')
       CLOSE(tFileHandle)
       CALL PopActiveWindowID
 
-      END SUBROUTINE WriteSAParametersToFile
+      END FUNCTION WriteSAParametersToFile
 !
 !*****************************************************************************
 !

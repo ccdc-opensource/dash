@@ -59,7 +59,7 @@
       COMMON /frgcha/ frag_file(maxfrg)
       LOGICAL         gotzmfile
       COMMON /zmlgot/ gotzmfile(maxfrg)
-!
+
 ! JCC Added in declarations
 ! The implementation has changed - this is now a function
       INTEGER Read_One_Zm
@@ -328,12 +328,13 @@
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
 
       INTEGER IHANDLE, JMyExit, JPOS, KPOS
+      INTEGER, EXTERNAL :: WriteSAParametersToFile
 
-!.. We are now on window number 3
+! We are now on window number 3
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_input3)
       SELECT CASE (EventType)
-!.. Interact with the main window and look at the Pawley refinement...
+! Interact with the main window and look at the Pawley refinement...
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL, IDCLOSE)
@@ -344,10 +345,19 @@
               CALL WDialogSelect(IDD_SA_input2)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDF_PrintSA)
-              CALL WriteSAParametersToFile('SA_PARAMS.TXT')
-              CALL WindowOpenChild(IHANDLE)
-              CALL WEditFile('SA_PARAMS.TXT',Modeless,0,FileMustExist,4)
-              CALL SetChildWinAutoClose(IHANDLE)
+              IF (WriteSAParametersToFile('SA_PARAMS.TXT') .EQ. 0) THEN
+                CALL WindowOpenChild(IHANDLE)
+                CALL WEditFile('SA_PARAMS.TXT',Modeless,0,FileMustExist,4)
+! Note that the implementation of this editor child window is different from those used for
+! the z-matrix and the DICVOL results. This editor window is not 'ViewOnly', which has three consequences:
+! 1. The file can be edited. The user can add a titel, for instance.
+! 2. The file can be saved using the 'Save as...' option from the menu.
+! 3. The file cannot be accessed by DASH while it is being viewed by the user. This
+!    means that the user can press the 'Print' button only once (or he must close the editor window).
+! This shouldn't be a problem as it is not too likely that someone wants to compare
+! two 'Print' outputs on screen. The possibility of editing the file is probably more useful.
+                CALL SetChildWinAutoClose(IHANDLE)
+              ENDIF
             CASE (IDB_SA3_finish) ! 'Solve >' button
 ! We've finished the SA input
               CALL WizardWindowHide
