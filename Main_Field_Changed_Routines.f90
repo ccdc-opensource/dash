@@ -422,7 +422,6 @@
       CALL WDialogSelect(IDD_Index_Preparation)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL)
               CALL WDialogHide()
@@ -477,7 +476,7 @@
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDCLOSE)
+            CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide()
               CALL PopActiveWindowID
               RETURN
@@ -500,7 +499,7 @@
           CALL PopActiveWindowID
           RETURN
         ENDIF
-      END DO               
+      ENDDO               
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithDVResults
