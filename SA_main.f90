@@ -146,7 +146,7 @@
       INTEGER I
       CHARACTER*85 temp_file
       CHARACTER*2  AtmElement(1:MAXATM_2)
-      REAL*8 CART(3,MAXATM)
+      REAL*8 CART(1:3,1:MAXATM)
       INTEGER IHANDLE
       INTEGER, EXTERNAL :: WriteMol2
       LOGICAL, EXTERNAL :: Get_ColourFlexibleTorsions

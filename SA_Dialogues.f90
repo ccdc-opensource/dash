@@ -94,7 +94,7 @@
               CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
               CALL SDIFileOpen(SDIFile)
             CASE (IDB_SA_Project_Import)
-! JCC Import .. convert a mol/pdb/mol2 file into a zmatrix
+! JCC Import .. convert a mol/pdb/mol2 file into a z-matrix
               CALL ImportZmatrix
             CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
               IF (Confirm('Do you want to clear this z-matrix?')) THEN
@@ -103,7 +103,6 @@
                   ifrg = ifrg + 1
                 ENDDO
                 gotzmfile(ifrg) = .FALSE.
-                frag_file(ifrg) = ' '
               ENDIF ! Delete this z-matrix
             CASE (IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
               ifrg = 1
@@ -112,14 +111,11 @@
               ENDDO
               IFlags = PromptOn + DirChange + AppendExt
               CALL WSelectFile('z-matrix files (*.zmatrix)|*.zmatrix|',IFlags,frag_file(ifrg),'Load z-matrix file')
-! JCC Need to check here to see if the user hit cancel
-! So I added a check here
 ! Did the user press cancel?
               IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) GOTO 999
 ! I don't think the following answer is allowed by Winteracter
               IF (LEN_TRIM(frag_file(ifrg)) .EQ. 0) THEN
                 gotzmfile(ifrg) = .FALSE.
-                frag_file(ifrg) = ' '
                 GOTO 999
               ENDIF
               zmread = Read_One_ZM(ifrg)
@@ -129,7 +125,6 @@
               ELSE 
                 gotzmfile(ifrg) = .FALSE. 
                 CALL FileErrorPopup(frag_file(ifrg),zmread)
-                frag_file(ifrg) = ' '
               ENDIF ! If the read on the zmatrix was ok
 ! View individual z-matrices in e.g. Mercury
             CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
@@ -197,11 +192,14 @@
                 IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
               ENDIF
               IF (.NOT. LimsChanged) THEN
+! Ungrey 'Load DASH Pawley file' button on toolbar
+                CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOn)
                 CALL WizardWindowShow(IDD_SAW_Page1)
               ENDIF
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL WDialogSelect(IDD_SA_input3)
+              T0 = 0.0
               RPOS = T0
               CALL WDialogPutReal(IDF_SA_T0,RPOS,'(F7.2)')
               IPOS = 1000 - NINT(RPOS)

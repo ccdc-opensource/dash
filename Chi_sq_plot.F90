@@ -1,3 +1,6 @@
+!
+!*****************************************************************************
+!
       SUBROUTINE PrepareChiSqPlotData(ntotmov, iteration, cpb)
 !
 !
@@ -88,7 +91,9 @@
       ENDIF
 
       END SUBROUTINE PrepareChiSqPlotData
-!***********************************************************************************************
+!
+!*****************************************************************************
+!
       SUBROUTINE plotting_Chi_sqd(ChiHandle)
       
       USE DRUID_HEADER
@@ -254,23 +259,19 @@
             END IF
         END IF
 
-
-
-       
-
       END SUBROUTINE plotting_chi_sqd
-!******************************************************************************************
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithChiSqdPlot
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       INCLUDE 'PARAMS.INC'
 
-
       INTEGER                    ChiSqdChildWindows,                 ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle      
-      
-      
+
       SELECT CASE (EventType)
 ! will close the profile plot window
         CASE (CloseRequest)
@@ -280,15 +281,17 @@
 ! exposing or resizing of profile plot windows 
         CASE (expose, resize)
           CALL PLotting_chi_sqd(EventInfo%win)
-        END SELECT       
-
+        END SELECT
 
       END SUBROUTINE DealWithChiSqdPlot
-!****************************************************************************************      
+!
+!*****************************************************************************
+!
       SUBROUTINE Close_Chisq_Plot
 
       USE WINTERACTER
       USE DRUID_HEADER
+
       INCLUDE 'PARAMS.INC'
 
       INTEGER ChiSqdChildWindows
@@ -311,3 +314,6 @@
       ENDDO
 
       END SUBROUTINE Close_Chisq_Plot                         
+!
+!*****************************************************************************
+!
