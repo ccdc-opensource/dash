@@ -13,6 +13,8 @@
       CHARACTER*200 MessageStr
       LOGICAL, EXTERNAL :: Confirm
 
+      CALL WDialogLoad(IDD_LicenceAgreement)
+      CALL WDialogLoad(IDD_License_Dialog)
       valid_license = 0
       DO WHILE (valid_license .LE. 0) 
         valid_license = Read_License_Valid()
@@ -40,7 +42,8 @@
         WRITE(Exp,'(I2)') valid_license
         CALL InfoMessage("Your DASH licence will expire in "//Exp//" days.")
       ENDIF
-! Now we can remove the licence dialogue from memory:
+      CALL WDialogSelect(IDD_LicenceAgreement)
+      CALL WDialogUnload
       CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogUnload
 
