@@ -742,7 +742,7 @@
       LOGICAL FExists
       
       tFileName = 'D3.cfg'
-      INQUIRE(FILE=tFileName,EXIST=FExists)
+      INQUIRE(FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//tFileName,EXIST=FExists)
       IF (.NOT. FExists) RETURN
       tFileHandle = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
