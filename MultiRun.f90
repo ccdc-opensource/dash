@@ -9,6 +9,8 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      IMPLICIT NONE
+
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
       INTEGER                                 MaxRuns, MaxMoves
@@ -16,12 +18,23 @@
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       CHARACTER*80 SA_Label
+      REAL    MaxMoves1, tMaxMoves
+      INTEGER MaxMoves2
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Input3)
       SA_Run_Number = 0
       CALL WDialogGetInteger(IDF_SA_MaxRepeats,MaxRuns)
-      CALL WDialogGetInteger(IDF_SA_MaxMoves,  MaxMoves)
+      CALL WDialogGetReal(IDF_MaxMoves1,MaxMoves1)
+      IF (MaxMoves1 .LT.    0.001) MaxMoves1 =    0.001
+      IF (MaxMoves1 .GT. 1000.0  ) MaxMoves1 = 1000.0
+      CALL WDialogGetInteger(IDF_MaxMoves2,MaxMoves2)
+      IF (MaxMoves2 .LT.  1) MaxMoves2 =  1
+      IF (MaxMoves2 .GT. 10) MaxMoves2 = 10
+      tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
+      IF (tMaxMoves .LT. 10.0) tMaxMoves = 10.0
+      IF (tMaxMoves .GT. 10.0E12) tMaxMoves = 10.0E12
+      MaxMoves = NINT(tMaxMoves)
       CALL WDialogGetReal(IDF_SA_ChiTest,   ChiMult)
       RESTART = ((MaxRuns .GT. 1) .AND. (ChiMult .GT. 0.0))
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)

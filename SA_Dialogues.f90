@@ -55,89 +55,77 @@
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
-          CASE (IDBACK)
+            CASE (IDBACK)
 ! Go back to the Pawley refinement or the initial wizard
-            CALL WizardWindowHide
-            CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-            CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-          CASE (IDNEXT)
+              CALL WizardWindowHide
+              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDNEXT)
 ! Go to the next stage of the SA input
-            CALL WizardWindowHide
-            PastPawley = .TRUE.
-            CALL SA_Parameter_Set
-            CALL WDialogSelect(IDD_SA_input2)
-            CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-          CASE (IDCANCEL, IDCLOSE)
-            CALL EndWizardCommon
-          CASE (IDB_SA_Project_Browse)
-            CALL SDIFileBrowse
-          CASE (IDB_SA_Project_Open)
-            CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
-            CALL SDIFileOpen(SDIFile)
-          CASE (IDB_SA_Project_Import)
+              CALL WizardWindowHide
+              PastPawley = .TRUE.
+              CALL SA_Parameter_Set
+              CALL WDialogSelect(IDD_SA_input2)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizardCommon
+            CASE (IDB_SA_Project_Browse)
+              CALL SDIFileBrowse
+            CASE (IDB_SA_Project_Open)
+              CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
+              CALL SDIFileOpen(SDIFile)
+            CASE (IDB_SA_Project_Import)
 ! JCC Import .. convert a mol/pdb/mol2 file into a zmatrix
-            CALL ImportZmatrix
-          CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
-            IF (Confirm('Do you want to clear this z-matrix?')) THEN
+              CALL ImportZmatrix
+            CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
+              IF (Confirm('Do you want to clear this z-matrix?')) THEN
+                ZmStateChanged = .TRUE.
+                ifrg = 1
+                DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
+                  ifrg = ifrg + 1
+                ENDDO
+                gotzmfile(ifrg) = .FALSE.
+                frag_file(ifrg) = ' '
+              ENDIF ! Delete this z-matrix
+            CASE (IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
               ZmStateChanged = .TRUE.
               ifrg = 1
-              DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
+              DO WHILE (IDBZMBrowse(ifrg) .NE. EventInfo%VALUE1)
                 ifrg = ifrg + 1
               ENDDO
-              gotzmfile(ifrg) = .FALSE.
-              frag_file(ifrg) = ' '
-            ENDIF ! Delete this z-matrix
-          CASE (IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
-            ZmStateChanged = .TRUE.
-            ifrg = 1
-            DO WHILE (IDBZMBrowse(ifrg) .NE. EventInfo%VALUE1)
-              ifrg = ifrg + 1
-            ENDDO
-            IFlags = PromptOn + DirChange + AppendExt
-            CALL WSelectFile('z-matrix files (*.zmatrix)|*.zmatrix|',IFlags,frag_file(ifrg),'Load z-matrix file')
+              IFlags = PromptOn + DirChange + AppendExt
+              CALL WSelectFile('z-matrix files (*.zmatrix)|*.zmatrix|',IFlags,frag_file(ifrg),'Load z-matrix file')
 ! JCC Need to check here to see if the user hit cancel
 ! So I added a check here
 ! Did the user press cancel?
-            IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) GOTO 999
+              IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) GOTO 999
 ! I don't think the following answer is allowed by Winteracter
-            IF (LEN_TRIM(frag_file(ifrg)) .EQ. 0) THEN
-              gotzmfile(ifrg) = .FALSE.
-              frag_file(ifrg) = ' '
-              GOTO 999
-            ENDIF
-            zmread = Read_One_ZM(ifrg)
-            IF (zmread .EQ. 0) THEN ! successful read
-              gotzmfile(ifrg) = .TRUE.
+              IF (LEN_TRIM(frag_file(ifrg)) .EQ. 0) THEN
+                gotzmfile(ifrg) = .FALSE.
+                frag_file(ifrg) = ' '
+                GOTO 999
+              ENDIF
+              zmread = Read_One_ZM(ifrg)
+              IF (zmread .EQ. 0) THEN ! successful read
+                gotzmfile(ifrg) = .TRUE.
 ! JCC traps for zmatrix reading
-            ELSE 
-              gotzmfile(ifrg) = .FALSE. 
-              CALL FileErrorPopup(frag_file(ifrg),zmread)
-              frag_file(ifrg) = ' '
-            ENDIF ! If the read on the zmatrix was ok
+              ELSE 
+                gotzmfile(ifrg) = .FALSE. 
+                CALL FileErrorPopup(frag_file(ifrg),zmread)
+                frag_file(ifrg) = ' '
+              ENDIF ! If the read on the zmatrix was ok
 ! View individual z-matrices in e.g. Mercury
-          CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
-            ifrg = 1
-            DO WHILE (IDBZMView(ifrg) .NE. EventInfo%VALUE1)
-              ifrg = ifrg + 1
-            ENDDO
-            IF (.NOT. gotzmfile(ifrg)) THEN
-              CALL ErrorMessage('File not found.')
-            ELSE
-              CALL ViewZmatrix(ifrg)
-            ENDIF
-! View individual z-matrices in e.g. Mercury
-          CASE (IDB_ZMatrixEdit1, IDB_ZMatrixEdit2, IDB_ZMatrixEdit3, IDB_ZMatrixEdit4, IDB_ZMatrixEdit5)
-            ifrg = 1
-            DO WHILE (IDBZMEdit(ifrg) .NE. EventInfo%VALUE1)
-              ifrg = ifrg + 1
-            ENDDO
-            IF (.NOT. gotzmfile(ifrg)) THEN
-              CALL ErrorMessage('File not found.')
-            ELSE
-              CALL WDialogSelect(IDD_EditZMatrix)
-              CALL WDialogShow(-1,-1,0,Modal)
-            ENDIF
-        END SELECT
+            CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
+              ifrg = 1
+              DO WHILE (IDBZMView(ifrg) .NE. EventInfo%VALUE1)
+                ifrg = ifrg + 1
+              ENDDO
+              IF (.NOT. gotzmfile(ifrg)) THEN
+                CALL ErrorMessage('File not found.')
+              ELSE
+                CALL ViewZmatrix(ifrg)
+              ENDIF
+          END SELECT
       END SELECT
   999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
@@ -324,6 +312,7 @@
       REAL         rpos
       INTEGER      ipos
       INTEGER, EXTERNAL :: WriteSAParametersToFile
+      INTEGER tMaxRuns, tFieldState
 
 ! We are now on window number 3
       CALL PushActiveWindowID
@@ -427,6 +416,19 @@
               CALL WDialogPutTrackbar(IDF_SA_NT_trackbar,IPOS)
               KPOS = NS * NT * NVAR
               CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
+            CASE (IDF_SA_MaxRepeats)
+              CALL WDialogGetInteger(IDF_SA_MaxRepeats,tMaxRuns)
+              IF (tMaxRuns .EQ. 1) THEN
+                tFieldState = Disabled
+              ELSE
+                tFieldState = Enabled
+              ENDIF
+                CALL WDialogFieldState(IDF_SA_ChiTest_Label,tFieldState)
+                CALL WDialogFieldState(IDF_SA_ChiTest,tFieldState)
+                CALL WDialogFieldState(IDF_SA_MaxMoves_Label,tFieldState)
+                CALL WDialogFieldState(IDF_MaxMoves1,tFieldState)
+                CALL WDialogFieldState(IDF_LABEL21,tFieldState)
+                CALL WDialogFieldState(IDF_MaxMoves2,tFieldState)
             CASE (IDF_SA_RandomSeed1) 
               CALL WDialogSelect(IDD_SA_input3)
               CALL WDialogGetInteger(IDF_SA_RandomSeed1,ISeed1)

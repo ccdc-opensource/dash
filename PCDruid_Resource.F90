@@ -1,4 +1,4 @@
-! Winteracter module created : 04/Nov/2001 16:53:04
+! Winteracter module created : 05/Nov/2001 21:05:11
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -141,7 +141,6 @@
           INTEGER, PARAMETER :: IDB_SA_Project_Open             =  1198
           INTEGER, PARAMETER :: IDD_PW_Page9                    =   151
           INTEGER, PARAMETER :: ID_PW_DF_Open                   =  1210
-          INTEGER, PARAMETER :: IDFINISH                        =  1048
           INTEGER, PARAMETER :: IDD_PW_Page1                    =   122
           INTEGER, PARAMETER :: IDD_PW_Page2                    =   123
           INTEGER, PARAMETER :: IDF_PW_Data_Group               =  1239
@@ -225,14 +224,13 @@
           INTEGER, PARAMETER :: IDF_LABEL13                     =  1468
           INTEGER, PARAMETER :: IDF_SA_TRR_label2               =  1156
           INTEGER, PARAMETER :: IDF_LABEL11                     =  1466
-          INTEGER, PARAMETER :: IDF_LABEL14                     =  1469
           INTEGER, PARAMETER :: IDF_SA_cool_label               =  1162
           INTEGER, PARAMETER :: IDF_SA_NS_label                 =  1159
           INTEGER, PARAMETER :: IDF_SA_TRR_label3               =  1157
           INTEGER, PARAMETER :: IDF_LABEL6                      =  1460
           INTEGER, PARAMETER :: IDF_SA_Repeat_Lab               =  1373
           INTEGER, PARAMETER :: IDF_SA_MaxRepeats               =  1374
-          INTEGER, PARAMETER :: IDF_SA_MaxMoves                 =  1375
+          INTEGER, PARAMETER :: IDF_MaxMoves1                   =  1139
           INTEGER, PARAMETER :: IDF_SA_MaxMoves_Label           =  1376
           INTEGER, PARAMETER :: IDF_npar_label                  =  1478
           INTEGER, PARAMETER :: IDF_npar                        =  1479
@@ -397,7 +395,6 @@
           INTEGER, PARAMETER :: IDD_SA_Multi_completed_ep       =   127
           INTEGER, PARAMETER :: IDD_TEMPLATE011                 =   128
           INTEGER, PARAMETER :: IDF_SA_Summary                  =  1136
-          INTEGER, PARAMETER :: IDOK_ep                         =  1139
           INTEGER, PARAMETER :: IDD_PW_Page5                    =   131
           INTEGER, PARAMETER :: IDF_MaxResolution               =  1205
           INTEGER, PARAMETER :: IDF_TruncateEndYN               =  1206
@@ -471,7 +468,6 @@
           INTEGER, PARAMETER :: IDD_PW_Page8                    =   150
           INTEGER, PARAMETER :: IDF_LABEL19                     =  1297
           INTEGER, PARAMETER :: IDD_DIALOG006                   =   152
-          INTEGER, PARAMETER :: IDD_PW_Page6a                   =   119
           INTEGER, PARAMETER :: IDF_RADIO3                      =  1129
           INTEGER, PARAMETER :: IDF_RADIO4                      =  1130
           INTEGER, PARAMETER :: IDF_ColFlexTors                 =  1131
@@ -489,19 +485,8 @@
           INTEGER, PARAMETER :: IDF_ColourByElement             =  1200
           INTEGER, PARAMETER :: IDF_GROUP3                      =  1202
           INTEGER, PARAMETER :: IDF_ColourBySolution            =  1216
-          INTEGER, PARAMETER :: IDB_ZMatrixEdit1                =  1234
-          INTEGER, PARAMETER :: IDB_ZMatrixEdit2                =  1235
-          INTEGER, PARAMETER :: IDB_ZMatrixEdit3                =  1236
-          INTEGER, PARAMETER :: IDB_ZMatrixEdit4                =  1237
-          INTEGER, PARAMETER :: IDB_ZMatrixEdit5                =  1238
-          INTEGER, PARAMETER :: IDD_EditZMatrix                 =   155
-          INTEGER, PARAMETER :: IDBZMatrixView                  =  1240
-          INTEGER, PARAMETER :: IDSAVEAS                        =  1243
-          INTEGER, PARAMETER :: IDD_TEMPLATE013                 =   156
-          INTEGER, PARAMETER :: IDF_ZMatrixGrid                 =  1251
-          INTEGER, PARAMETER :: IDF_Occupancy                   =  1294
-          INTEGER, PARAMETER :: IDB_AddDummy                    =  1298
-          INTEGER, PARAMETER :: IDB_SetAllOcc                   =  1300
-          INTEGER, PARAMETER :: IDF_RADIO2                      =  1303
-          INTEGER, PARAMETER :: IDF_INTEGER1                    =  1304
+          INTEGER, PARAMETER :: IDF_ClearPeakFitRanges          =  1048
+          INTEGER, PARAMETER :: IDF_LABEL21                     =  1234
+          INTEGER, PARAMETER :: IDF_MaxMoves2                   =  1235
+          INTEGER, PARAMETER :: IDD_PW_Page10                   =   119
       END MODULE Druid_Header

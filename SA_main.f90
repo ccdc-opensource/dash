@@ -23,6 +23,8 @@
       CHARACTER*8  tDate      ! '20010215' for 15 Feb 2001
       CHARACTER*17 DateStr
       CHARACTER*9  MonthStr
+      REAL    MaxMoves1, tMaxMoves
+      INTEGER MaxMoves2
 
       WriteSAParametersToFile = 1 ! Error
       CALL PushActiveWindowID
@@ -117,7 +119,16 @@
         WRITE(tFileHandle,'("  Single run, runs until user stops it")',ERR=999)
       ELSE
         WRITE(tFileHandle,'("  Number of runs = ",I5)',ERR=999) I
-        CALL WDialogGetInteger(IDF_SA_MaxMoves,I)
+        CALL WDialogGetReal(IDF_MaxMoves1,MaxMoves1)
+        IF (MaxMoves1 .LT.    0.001) MaxMoves1 =    0.001
+        IF (MaxMoves1 .GT. 1000.0  ) MaxMoves1 = 1000.0
+        CALL WDialogGetInteger(IDF_MaxMoves2,MaxMoves2)
+        IF (MaxMoves2 .LT.  1) MaxMoves2 =  1
+        IF (MaxMoves2 .GT. 10) MaxMoves2 = 10
+        tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
+        IF (tMaxMoves .LT. 10.0) tMaxMoves = 10.0
+        IF (tMaxMoves .GT. 10.0E12) tMaxMoves = 10.0E12
+        I = NINT(tMaxMoves)
         WRITE(tFileHandle,'("  Maximum number of moves per run = ",I10)',ERR=999) I
         CALL WDialogGetReal(IDF_SA_ChiTest,R)
         WRITE(tFileHandle,'("  A run will stop when the profile chi² is less than ",   &
@@ -427,7 +438,6 @@
           CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
 ! Enable 'View' button
           CALL WDialogFieldState(IDBZMView(ifrg),Enabled)
-          CALL WDialogFieldState(IDBZMEdit(ifrg),Enabled)
         ELSE
           izmpar(ifrg) = 0
           natoms(ifrg) = 0
@@ -435,7 +445,6 @@
           CALL WDialogClearField(IDFZMFile(ifrg))
 ! Disable 'View' button
           CALL WDialogFieldState(IDBZMView(ifrg),Disabled)
-          CALL WDialogFieldState(IDBZMEdit(ifrg),Disabled)
         ENDIF
       ENDDO
       natom = ntatm
