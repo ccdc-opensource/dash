@@ -3,8 +3,6 @@
 !
       SUBROUTINE Profile_Plot
 
-      USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -159,7 +157,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'POLY_COLOURS.INC'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
@@ -175,6 +172,7 @@
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
 
       INTEGER ISB
+      CHARACTER*(80) STATBARSTR(4:7)
 
       CALL IGrSelect(1,0)
       CALL IGrArea(0.0,0.0,1.0,1.0)
@@ -381,8 +379,8 @@
       REAL            CummChiSqd
       COMMON /CMN007/ CummChiSqd(MOBS)
 
-      REAL    YDIF(MOBS), YADD
       LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs, Get_ShowCumChiSqd, Get_DivideByEsd
+      REAL    YDIF(MOBS), YADD
       INTEGER I, II 
       REAL    sizmtem, xtem, ytem, xgtem, ygtem
       LOGICAL tGet_ShowCumChiSqd, tGet_DivideByEsd
@@ -428,9 +426,7 @@
       CALL IPgXYPairs(XBIN,YOBIN)
 ! Now draw the difference plofile
       CALL IPgXYPairs(XBIN,YDIF)
-!
 ! Do the error bars - we've precalculated the min & max pointers
-!
       CALL IGrColourN(KolNumObs)
       IF (PlotErrorBars()) THEN
         DO I = IPMIN, IPMAX

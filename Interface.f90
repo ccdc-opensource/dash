@@ -109,8 +109,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
-
 ! Note that FNAME is a global variable in VARIABLES
 
 ! Remember current dialogue window
@@ -121,8 +119,7 @@
       CALL WDialogPutString(IDF_PW_DataFileName_String,FNAME)
       CALL PopActiveWindowID
 ! Update the status bar at the bottom of the screen.
-      STATBARSTR(1) = FNAME
-      CALL WindowOutStatusBar(1,STATBARSTR(1))
+      CALL WindowOutStatusBar(1,FNAME)
 
       END SUBROUTINE ScrUpdateFileName
 !
@@ -1663,6 +1660,7 @@
       INTEGER, INTENT (IN   ) :: TheMode
 
       INCLUDE 'GLBVAR.INC'
+      CHARACTER*(80) STATBARSTR2
 
       CALL PushActiveWindowID
       IF (WMenuGetState(TheMode,ItemEnabled) .EQ. Disabled) THEN
@@ -1672,17 +1670,17 @@
 ! Update the status bar
       SELECT CASE (TheMode)
         CASE (ID_Peak_Fitting_Mode)
-          STATBARSTR(8)='Peak fitting mode'
+          STATBARSTR2 = 'Peak fitting mode'
         CASE (ID_Pawley_Refinement_Mode)
-          STATBARSTR(8)='Pawley refinement mode'
+          STATBARSTR2 = 'Pawley refinement mode'
         CASE (ID_Structure_Solution_Mode)
-          STATBARSTR(8)='Structure solution mode'
+          STATBARSTR2 = 'Structure solution mode'
           CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
           CALL WDialogPutRadioButton(IDF_PW_Option3)
         CASE (IDB_AnalyseSolutions)
-          STATBARSTR(8)='Analyse solutions mode'
+          STATBARSTR2 = 'Analyse solutions mode'
       END SELECT
-      CALL WindowOutStatusBar(8,STATBARSTR(8))
+      CALL WindowOutStatusBar(8,STATBARSTR2)
 ! Update the menu + the toolbar
       CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
       IDCurrent_Cursor_mode = TheMode
