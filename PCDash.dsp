@@ -87,7 +87,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 version.lib kernel32.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 winter.lib winmm.lib version.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /out:"Debug/BDASH.exe" /pdbtype:sept /libpath:"c:\wint\lib.vf"
+# ADD LINK32 winter.lib winmm.lib version.lib /nologo /subsystem:windows /incremental:no /debug /machine:I386 /out:"Debug/CDASH.exe" /pdbtype:sept /libpath:"c:\wint\lib.vf"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -333,6 +333,8 @@ DEP_F90_GET_L=\
 
 SOURCE=.\Init_Routines.f90
 DEP_F90_INIT_=\
+	".\Debug\PO_VAR.mod"\
+	".\Debug\PRJVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -462,6 +464,7 @@ DEP_F90_MULTIP=\
 SOURCE=.\MultiRun.f90
 DEP_F90_MULTIR=\
 	".\DRUID_HEADER.mod"\
+	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -594,6 +597,8 @@ DEP_F90_PROFI=\
 
 SOURCE=.\ProjectSave.f90
 DEP_F90_PROJE=\
+	".\Debug\ATMVAR.MOD"\
+	".\Debug\PO_VAR.mod"\
 	".\Debug\PRJVAR.MOD"\
 	".\Debug\REFVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
@@ -727,7 +732,9 @@ DEP_F90_SA_ST=\
 SOURCE=.\SA_summary.f90
 DEP_F90_SA_SU=\
 	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
 	".\params.inc"\
+	".\POLY_COLOURS.INC"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	

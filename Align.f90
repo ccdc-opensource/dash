@@ -21,16 +21,13 @@
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR            ! Number of zmatrices, nfrag
+      USE SOLVAR
 
 !      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'  ! NumberSGTable
       INCLUDE 'lattice.inc' ! Cellpar and space group strings
-
-! Required for XATOPT
-      REAL                XAtmCoords
-      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:maxatm,1:MaxRun)
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves

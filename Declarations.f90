@@ -235,11 +235,6 @@
       INTEGER           iHMUL
       COMMON /SAREFLN3/ iHMUL(MFCSTO)
 
-      REAL                XAtmCoords
-      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:MaxAtm_3,1:MaxRun)
-
-! Co-ordinates of the atoms of the asymmetric unit of the best SA solution so far per run.
-
       DOUBLE PRECISION XOPT,       C,       XP,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
 
