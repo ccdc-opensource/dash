@@ -14,10 +14,9 @@
 
       IMPLICIT NONE 
            
+! @@ Enable or disable the "Next" button, only partially taken care of in UpdateZmatrixSelection
       CALL UpdateZmatrixSelection
       CALL WizardWindowShow(IDD_SAW_Page1)
-! @@ Enable or disable the "Next" button
-   !   CALL WDialogFieldState(IDNEXT,Enabled)
       PastPawley = .TRUE.
 ! Grey out 'Delete all peak fit ranges' button on toolbar
       CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
@@ -47,7 +46,6 @@
       CALL SetModeMenuState(-1,-1)
       CALL SelectMode(ID_Structure_Solution_Mode)
       CALL Profile_Plot
-
 
       END SUBROUTINE ShowWizardWindowZmatrices
 !
@@ -170,16 +168,18 @@
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
+      DOUBLE PRECISION T0, rt
+      COMMON /saparl/  T0, rt
+
       LOGICAL LimsChanged
       DATA LimsChanged / .FALSE. /
       SAVE LimsChanged
-      LOGICAL Confirm ! Function
-      REAL xtem
-      DOUBLE PRECISION T0, rt
-      COMMON /saparl/  T0, rt
+
+      LOGICAL, EXTERNAL :: Confirm
+      REAL    xtem
       INTEGER JPOS, NMOVES, IFCOl, IFRow, ICHK
-      REAL         rpos
-      INTEGER      ipos, tMaxRuns, tFieldState
+      REAL    rpos
+      INTEGER ipos, tMaxRuns, tFieldState
 
 ! We are now on window number 2
       CALL PushActiveWindowID
@@ -316,12 +316,13 @@
 
       DOUBLE PRECISION T0, rt
       COMMON /saparl/  T0, rt
+
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
 
       INTEGER IHANDLE, JPOS, KPOS
-      REAL         rpos
-      INTEGER      ipos
+      REAL    rpos
+      INTEGER ipos
       INTEGER, EXTERNAL :: WriteSAParametersToFile
       INTEGER tMaxRuns, tFieldState
 

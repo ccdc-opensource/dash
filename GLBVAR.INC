@@ -1,7 +1,7 @@
 ! This file contains global variables.
 ! Yet another attempt to gather them.
 
-      INTEGER JRadOption
+      INTEGER            JRadOption
       COMMON /RadOption/ JRadOption
 
 ! JRadOption stores the type of radiation as entered by the user:
@@ -10,7 +10,7 @@
 ! 3 = Constant Wavelength Neutrons
 ! 4 = Time-of-Flight Neutrons
 
-      REAL ALambda
+      REAL            ALambda
       COMMON /ALABDA/ ALambda
 
 ! ALambda stores the wavelength in Angstrom
@@ -33,7 +33,7 @@
 !  STATBARSTR ( 9) =
 !  STATBARSTR (10) =
 
-      INTEGER IPTYPE
+      INTEGER         IPTYPE
       COMMON /PLTYPE/ IPTYPE
 
 ! IPTYPE indicates which profiles should be plotted:
@@ -44,27 +44,24 @@
 ! -1 = Observed              profile to printer (hardcopy)
 ! -2 = Observed + Calculated profile to printer (hardcopy)
 
-      INTEGER IDCurrent_Cursor_Mode
+      INTEGER              IDCurrent_Cursor_Mode
       COMMON /CURSOR_MODE/ IDCurrent_Cursor_Mode
 
-! IDCurrent_Cursor_Mode stores ?
+! IDCurrent_Cursor_Mode stores current mode: peak fitting, Pawley refinement or structure solution
 
-      LOGICAL DoSaRedraw
+      LOGICAL         DoSaRedraw
       COMMON /SARDRW/ DoSaRedraw
 
 ! Indicates whether the Simulated Annealing window should be redrawn
 
-      REAL CHAR_SIZE,MARKER_SIZE
-      COMMON /PROFDEF/CHAR_SIZE,MARKER_SIZE
+      REAL             CHAR_SIZE, MARKER_SIZE
+      COMMON /PROFDEF/ CHAR_SIZE, MARKER_SIZE
 
 ! Sizes of the characters and markers used in drawing the profiles in the main window
 
-      INTEGER NumberSGTable
+      INTEGER          NumberSGTable
       COMMON /NSGTCMN/ NumberSGTable
 
 ! NumberSGTable stores the number of the Space Group from the space group table.
 ! Each setting has its own number, so there are 530 entries in total.
-! This variable was originally in 'statlog.inc', all other space-group related variables
-! were and are in 'lattice.inc'.
-
 
