@@ -182,7 +182,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ROTMAK(DC4,ROTA)
+      SUBROUTINE ROTMAK(Q,ROTA)
 !
 ! Converts 4 quaternions to a 3x3 rotation matrix
 !
@@ -207,7 +207,7 @@
 !   (A0*B2 - A1*B3 + A2*B0 + A3*B1)*j +
 !   (A0*B3 + A1*B2 - A2*B1 + A3*B0)*k
 !
-! Inverse of   1*q0 + i*q1 + j*q2 + k*q3   =   1*q0 - i*q1 - j*q2 - k*q3
+! Inverse of   1*q0 + i*q1 + j*q2 + k*q3   =   1*q0 - i*q1 - j*q2 - k*q3 (only if normalised)
 !
 ! unity   q0 = 1
 !         q1 = 0
@@ -223,25 +223,18 @@
 !
       IMPLICIT NONE
 
-      REAL*8 DC4(0:3), ROTA(1:3,1:3)
+      REAL*8, INTENT (IN   ) :: Q(0:3)
+      REAL*8, INTENT (  OUT) :: ROTA(1:3,1:3)
 
-      REAL*8 EL(0:3,0:3)
-      INTEGER I, J
-
-      DO I = 0, 3
-        DO J = I, 3
-          EL(I,J) = 2.0 * DC4(I) * DC4(J)
-        ENDDO
-      ENDDO
-      ROTA(1,1) = 0.5 * (EL(0,0) + EL(1,1) - EL(2,2) - EL(3,3))
-      ROTA(2,2) = 0.5 * (EL(0,0) - EL(1,1) + EL(2,2) - EL(3,3))
-      ROTA(3,3) = 0.5 * (EL(0,0) - EL(1,1) - EL(2,2) + EL(3,3))
-      ROTA(1,2) = EL(1,2) + EL(0,3)
-      ROTA(1,3) = EL(1,3) - EL(0,2)
-      ROTA(2,1) = EL(1,2) - EL(0,3)
-      ROTA(2,3) = EL(2,3) + EL(0,1)
-      ROTA(3,1) = EL(1,3) + EL(0,2)
-      ROTA(3,2) = EL(2,3) - EL(0,1)
+      ROTA(1,1) = 1.0 - 2.0*(Q(2)**2) - 2.0*(Q(3)**2); 
+      ROTA(1,2) = 2.0*Q(1)*Q(2) - 2.0*Q(3)*Q(0);     
+      ROTA(1,3) = 2.0*Q(1)*Q(3) + 2.0*Q(2)*Q(0);
+      ROTA(2,1) = 2.0*Q(1)*Q(2) + 2.0*Q(3)*Q(0);     
+      ROTA(2,2) = 1.0 - 2.0*(Q(1)**2) - 2.0*(Q(3)**2); 
+      ROTA(2,3) = 2.0*Q(2)*Q(3) - 2.0*Q(1)*Q(0);
+      ROTA(3,1) = 2.0*Q(1)*Q(3) - 2.0*Q(2)*Q(0);     
+      ROTA(3,2) = 2.0*Q(2)*Q(3) + 2.0*Q(1)*Q(0);     
+      ROTA(3,3) = 1.0 - 2.0*(Q(1)**2) - 2.0*(Q(2)**2);
 
       END SUBROUTINE ROTMAK
 !
@@ -276,8 +269,8 @@
 
       IMPLICIT NONE
 
-      REAL*8,  INTENT (IN   ) :: XORTO(3), ROTA(3,3)
-      REAL*8,  INTENT (  OUT) :: XORTN(3)
+      REAL*8, INTENT (IN   ) :: XORTO(3), ROTA(3,3)
+      REAL*8, INTENT (  OUT) :: XORTN(3)
 
       INTEGER I, J
 
