@@ -70,7 +70,6 @@
 
       CALL WDialogLoad(IDD_Structural_Information)
       CALL WDialogLoad(IDD_SA_Action1)
-      CALL WDialogLoad(IDD_SA_Action2)
       CALL WDialogLoad(IDD_Plot_Option_Dialog)
 !      CALL WDialogLoad(IDD_About_Polyfitter)
       CALL WDialogLoad(IDD_Pawley_Status)
@@ -96,7 +95,6 @@
       CALL WDialogLoad(IDD_PW_Page4)
       CALL WDialogLoad(IDD_PW_Page5)
       CALL WDialogLoad(IDD_PW_Page6)
-      CALL WDialogLoad(IDD_SA_Completed)
 ! ep      CALL WDialogLoad(IDD_SA_Multi_Completed) 
       CALL WDialogLoad(IDD_SA_Multi_completed_ep)
       CALL WDialogLoad(IDD_License_Dialog)
