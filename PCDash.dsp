@@ -380,6 +380,10 @@ DEP_F90_GETPI=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\Init_Routines.f90
+# End Source File
+# Begin Source File
+
 SOURCE=.\Initialisation.f90
 DEP_F90_INITI=\
 	".\DialogPosCmn.inc"\
@@ -829,6 +833,7 @@ DEP_F90_WIFD9=\
 
 SOURCE=.\Wizard_routines.f90
 DEP_F90_WIZAR=\
+	".\Debug\DICVAR.MOD"\
 	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -837,9 +842,6 @@ DEP_F90_WIZAR=\
 	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-NODEP_F90_WIZAR=\
-	".\Debug\DICVAR.MOD"\
 	
 # End Source File
 # End Group
