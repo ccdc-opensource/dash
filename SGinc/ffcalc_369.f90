@@ -73,5 +73,4 @@
           BFCAL = BFCAL + (term4-term8)*fob(n,ir)
         ENDDO
       ENDIF
-!       write(76,*) ih,ik,il,AFCAL*AFCAL+BFCAL*BFCAL
       FFCALC_369 = AFCAL*AFCAL + BFCAL*BFCAL
