@@ -579,11 +579,7 @@
 ! JvdS @@ Following is wrong (we need a valid .sdi as well), but 
 ! a. identical to release version
 ! b. it's difficult to keep track of the validity of the .sdi file
-      IF (nfrag .NE. 0) THEN
-        CALL WDialogFieldState(IDNEXT,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDNEXT,Disabled)
-      ENDIF
+      CALL WDialogFieldStateLogical(IDNEXT,nfrag .NE. 0)
       natom = ntatm
       IF (izmtot .EQ. 0) THEN            
         CALL WDialogClearField(IDF_ZM_allpars)
@@ -678,9 +674,9 @@
       CALL WCursorShape(CurHourGlass)
       CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'zmconv.exe'// &
         ' '//fmt(1:LEN_TRIM(fmt))//' "'//FNAME(Istart:Ilen)//'"',3)
-      CALL WCursorShape(CurCrossHair)
 ! Check return status
       OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = ISTAT)
+      CALL WCursorShape(CurCrossHair)
       IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (ISTAT .NE. 0)) THEN
 ! An error occurred
         CALL ErrorMessage("Sorry, could not create Z-matrices.")
