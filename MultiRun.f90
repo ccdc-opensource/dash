@@ -158,7 +158,6 @@
       SUBROUTINE SaveMultiRun_LogData
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
       USE SOLVAR
 
@@ -176,7 +175,6 @@
 
       INTEGER iSol, hFile
 
-      CALL WDialogSelect(IDD_SAW_Page5)
       hFile = 101
       OPEN(UNIT=hFile, FILE=OutputFilesBaseName(1:OFBN_Len)//'.log', status = 'unknown',ERR=999)
       WRITE(hFile,*,ERR=999) 'Run number, Profile Chi Squared, Intensity Chi Squared'

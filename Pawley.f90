@@ -220,7 +220,7 @@
               CALL WizardWindowShow(IDD_PW_Page1)
             CASE (IDCANCEL, IDCLOSE)
               SpaceGroupDetermination = .FALSE.
-              CALL EndWizardCommon
+              CALL EndWizard
             CASE (IDF_PawRef_Refine)
               CALL WritePawleyRefinementFile
               ieocc = Quick_Pawley_Fit()
@@ -260,7 +260,7 @@
                 CASE (-1)
                   NumPawleyRef = NumPawleyRef - 1
 ! Return to data viewing
-                  CALL EndWizardCommon
+                  CALL EndWizard
 ! This handles cases where the number of reflections is exceeded
                   CALL ErrorMessage("Sorry, can only Pawley refine a maximum of 350 reflections."//CHAR(13)// &
                                     "You must truncate your data set.")
@@ -744,7 +744,6 @@
 ! Returns 1 for failure, 0 for success
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -904,7 +903,6 @@
       LOGICAL FUNCTION SaveProject
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE

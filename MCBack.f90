@@ -3,10 +3,6 @@
 !
       SUBROUTINE SubtractBackground(nbruckwin,mbruckiter,UseMC)
 
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
@@ -36,7 +32,7 @@
       ENDDO
       CALL Clear_BackGround
       CALL GetProfileLimits
-      BACKREF = .FALSE.
+      BackRef = .FALSE.
 
       END SUBROUTINE SubtractBackground
 !

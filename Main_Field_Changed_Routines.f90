@@ -291,9 +291,6 @@
       REAL                                                                    ChiMult
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      LOGICAL         InSA
-      COMMON /SADATA/ InSA
-
 !     required to handle the profile graphs plotted in child windows
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
