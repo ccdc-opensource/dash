@@ -12,46 +12,24 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          C3F = COSQS(IL,3,N)*FOB(N,IR)
-          S3F = SINQS(IL,3,N)*FOB(N,IR)
-          XCC = COSQS(IK,2,N)*C3F
-          XSC = SINQS(IK,2,N)*C3F
-          XCS = COSQS(IK,2,N)*S3F
-          XSS = SINQS(IK,2,N)*S3F
-          CCC = COSQS(IH,1,N)*XCC
-          CSS = COSQS(IH,1,N)*XSS
-          SCS = SINQS(IH,1,N)*XCS
-          SSC = SINQS(IH,1,N)*XSC
-          SCC = SINQS(IH,1,N)*XCC
-          CSC = COSQS(IH,1,N)*XSC
-          CCS = COSQS(IH,1,N)*XCS
-          SSS = SINQS(IH,1,N)*XSS
-          AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
-          BFCAL = BFCAL + SCC + CSC + CCS - SSS
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          C3F = COSQS(IL,3,N)*FOB(N,IR)
-          S3F = SINQS(IL,3,N)*FOB(N,IR)
-          XCC = COSQS(IK,2,N)*C3F
-          XSC = SINQS(IK,2,N)*C3F
-          XCS = COSQS(IK,2,N)*S3F
-          XSS = SINQS(IK,2,N)*S3F
-          CCC = COSQS(IH,1,N)*XCC
-          CSS = COSQS(IH,1,N)*XSS
-          SCS = SINQS(IH,1,N)*XCS
-          SSC = SINQS(IH,1,N)*XSC
-          SCC = SINQS(IH,1,N)*XCC
-          CSC = COSQS(IH,1,N)*XSC
-          CCS = COSQS(IH,1,N)*XCS
-          SSS = SINQS(IH,1,N)*XSS
-          AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
-          BFCAL = BFCAL + SCC + CSC + CCS - SSS
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        C3F = COSQS(IL,3,N)*FOB(N,IR)
+        S3F = SINQS(IL,3,N)*FOB(N,IR)
+        XCC = COSQS(IK,2,N)*C3F
+        XSC = SINQS(IK,2,N)*C3F
+        XCS = COSQS(IK,2,N)*S3F
+        XSS = SINQS(IK,2,N)*S3F
+        CCC = COSQS(IH,1,N)*XCC
+        CSS = COSQS(IH,1,N)*XSS
+        SCS = SINQS(IH,1,N)*XCS
+        SSC = SINQS(IH,1,N)*XSC
+        SCC = SINQS(IH,1,N)*XCC
+        CSC = COSQS(IH,1,N)*XSC
+        CCS = COSQS(IH,1,N)*XCS
+        SSS = SINQS(IH,1,N)*XSS
+        AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
+        BFCAL = BFCAL + SCC + CSC + CCS - SSS
+      ENDDO
       FFCALC_001 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_001
@@ -68,28 +46,15 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          C3F = COSQS(IL,3,N)*FOB(N,IR)
-          S3F = SINQS(IL,3,N)*FOB(N,IR)
-          CCC = COSQS(IH,1,N)*COSQS(IK,2,N)*C3F
-          CSS = COSQS(IH,1,N)*SINQS(IK,2,N)*S3F
-          SCS = SINQS(IH,1,N)*COSQS(IK,2,N)*S3F
-          SSC = SINQS(IH,1,N)*SINQS(IK,2,N)*C3F
-          AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          C3F = COSQS(IL,3,N)*FOB(N,IR)
-          S3F = SINQS(IL,3,N)*FOB(N,IR)
-          CCC = COSQS(IH,1,N)*COSQS(IK,2,N)*C3F
-          CSS = COSQS(IH,1,N)*SINQS(IK,2,N)*S3F
-          SCS = SINQS(IH,1,N)*COSQS(IK,2,N)*S3F
-          SSC = SINQS(IH,1,N)*SINQS(IK,2,N)*C3F
-          AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        C3F = COSQS(IL,3,N)*FOB(N,IR)
+        S3F = SINQS(IL,3,N)*FOB(N,IR)
+        CCC = COSQS(IH,1,N)*COSQS(IK,2,N)*C3F
+        CSS = COSQS(IH,1,N)*SINQS(IK,2,N)*S3F
+        SCS = SINQS(IH,1,N)*COSQS(IK,2,N)*S3F
+        SSC = SINQS(IH,1,N)*SINQS(IK,2,N)*C3F
+        AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
+      ENDDO
       FFCALC_002 = AFCAL*AFCAL
 
       END FUNCTION FFCALC_002
@@ -108,40 +73,20 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N) &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N) &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N) &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N) &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_039 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -161,22 +106,12 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
-                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
-                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
-                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
-                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
+                *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
+                *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+      ENDDO
       FFCALC_040 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_040
@@ -195,40 +130,20 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_044 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -248,40 +163,20 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_050 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -301,40 +196,20 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_052 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -353,32 +228,16 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_057 = AFCAL*AFCAL
 
@@ -397,18 +256,10 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)    &
-     &            *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)    &
-     &            *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)    &
+   &            *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+      ENDDO
       FFCALC_058 = AFCAL*AFCAL
 
       END FUNCTION FFCALC_058
@@ -426,32 +277,16 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_061 = AFCAL*AFCAL
 
@@ -470,32 +305,16 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-     &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+   &              *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_064 = AFCAL*AFCAL
 
@@ -514,32 +333,16 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_065 = AFCAL*AFCAL
 
@@ -554,36 +357,21 @@
 ! Structure factor calculations for space group P 1 21/a 1
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
+
       AFCAL = 0.
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_066 = AFCAL*AFCAL
 
@@ -602,32 +390,16 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_067 = AFCAL*AFCAL
 
@@ -646,32 +418,16 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
-                    *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_069 = AFCAL*AFCAL
 
@@ -691,40 +447,16 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_112 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -744,70 +476,26 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ENDIF
-      ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_115 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -827,40 +515,16 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-                    *FOB(N,IR)
-            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-                    *FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_116 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -880,70 +544,26 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
-      ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_143 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -963,70 +583,26 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
-      ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_164 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -1046,40 +622,16 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_176 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -1104,94 +656,42 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)&
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)&
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
-     &              -COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
-     &              +COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
-     &              +SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)&
-     &              *FOB(N,IR)
-            BFCAL = BFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)&
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
-     &              +COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
-     &              +SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
-     &              -COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
-      ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)&
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)&
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
-     &              -COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
-     &              +COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
-     &              +SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)&
-     &              *FOB(N,IR)
-            BFCAL = BFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)&
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
-     &              +COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
-     &              +SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
-     &              *FOB(N,IR)
-            BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
-     &              -COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
-     &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
+   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+   &              -COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+   &              *FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
+   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+   &              +COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+   &              +SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+   &              *FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
+   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+   &              +COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+   &              +SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+   &              *FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
+   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+   &              -COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+   &              -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+   &              *FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_212 = AFCAL*AFCAL + BFCAL*BFCAL
 
@@ -1210,54 +710,22 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
-      ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_266 = AFCAL*AFCAL
 
@@ -1276,54 +744,22 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
-      ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_269 = AFCAL*AFCAL
 
@@ -1342,54 +778,22 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
-      ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_284 = AFCAL*AFCAL
 
@@ -1408,54 +812,22 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
-      ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_290 = AFCAL*AFCAL
 
@@ -1474,54 +846,22 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
-      ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(2,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(3,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSEIF (LOGREF(4,IR)) THEN
-          DO NS = 1, NATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_292 = AFCAL*AFCAL
 
@@ -1540,32 +880,14 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_298 = AFCAL*AFCAL
 
@@ -1584,32 +906,14 @@
       IH = IREFH(1,IR)
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        IF (LOGREF(1,IR)) THEN
-          DO N = 1, NATOM
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO N = 1, NATOM
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ELSE
-        IF (LOGREF(1,IR)) THEN
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)   &
-     &              *FOB(N,IR)
-          ENDDO
-        ENDIF
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
       ENDIF
       FFCALC_304 = AFCAL*AFCAL
 
@@ -1630,17 +934,13 @@
       IK = IREFH(2,IR)
       IL = IREFH(3,IR)
       DO N = 1, NATOM
-        term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)             &
-     &          *COSQS(IK,1,N)
-        term2 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)             &
-     &          *SINQS(IK,1,N)
+        term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
+        term2 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)*SINQS(IK,1,N)
         term3 = COSQS(IL,3,N)
         term4 = (term1-term2)*term3
         AFCAL = AFCAL + term4*fob(n,ir)
-        term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)             &
-     &          *COSQS(IK,1,N)
-        term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)             &
-     &          *SINQS(IK,1,N)
+        term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)*COSQS(IK,1,N)
+        term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
         term3 = SINQS(IL,3,N)
         term4 = (term1-term2)*term3
         BFCAL = BFCAL + term4*fob(n,ir)
@@ -1664,84 +964,68 @@
       IL = IREFH(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
-          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
-          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)*SINQS(IK,1,N)
           term3 = COSQS(IL,3,N)
           term4 = (term1-term2)*term3
           AFCAL = AFCAL + term4*fob(n,ir)
         ENDDO
       ELSEIF (LOGREF(2,IR)) THEN
         DO N = 1, NATOM
-          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
           term2 = SINQS(IL,3,N)
-          term3 = COSQS(IH,2,N)*COSQS(IK,1,N) + SINQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term3 = COSQS(IH,2,N)*COSQS(IK,1,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
           term4 = COSQS(IL,3,N)
           term5 = term1*term2 - term3*term4
           AFCAL = AFCAL - term5*fob(n,ir)
         ENDDO
       ELSEIF (LOGREF(3,IR)) THEN
         DO N = 1, NATOM
-          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
           term2 = COSQS(IL,3,N)
-          term3 = SINQS(IH,2,N)*COSQS(IK,1,N) - COSQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term3 = SINQS(IH,2,N)*COSQS(IK,1,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
           term4 = SINQS(IL,3,N)
           term5 = term1*term2 - term3*term4
           AFCAL = AFCAL + term5*fob(n,ir)
         ENDDO
       ELSEIF (LOGREF(4,IR)) THEN
         DO N = 1, NATOM
-          term1 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
-          term2 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
+          term1 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)*COSQS(IK,1,N)
           term3 = SINQS(IL,3,N)
           term4 = (term1+term2)*term3
           AFCAL = AFCAL - term4*fob(n,ir)
         ENDDO
       ELSEIF (LOGREF(5,IR)) THEN
         DO N = 1, NATOM
-          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
-          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
           term3 = COSQS(IL,3,N)
           term4 = (term1-term2)*term3
           AFCAL = AFCAL + term4*fob(n,ir)
         ENDDO
       ELSEIF (LOGREF(6,IR)) THEN
         DO N = 1, NATOM
-          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
           term2 = SINQS(IL,3,N)
-          term3 = COSQS(IH,2,N)*COSQS(IK,1,N) + SINQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term3 = COSQS(IH,2,N)*COSQS(IK,1,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
           term4 = COSQS(IL,3,N)
           term5 = term1*term2 + term3*term4
           AFCAL = AFCAL - term5*fob(n,ir)
         ENDDO
       ELSEIF (LOGREF(7,IR)) THEN
         DO N = 1, NATOM
-          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
           term2 = COSQS(IL,3,N)
-          term3 = SINQS(IH,2,N)*COSQS(IK,1,N) - COSQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term3 = SINQS(IH,2,N)*COSQS(IK,1,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
           term4 = SINQS(IL,3,N)
           term5 = term1*term2 + term3*term4
           AFCAL = AFCAL + term5*fob(n,ir)
         ENDDO
       ELSEIF (LOGREF(8,IR)) THEN
         DO N = 1, NATOM
-          term1 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
-          term2 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
+          term1 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)*SINQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)*COSQS(IK,1,N)
           term3 = SINQS(IL,3,N)
           term4 = (term1+term2)*term3
           AFCAL = AFCAL - term4*fob(n,ir)
@@ -1767,29 +1051,23 @@
       IL = IREFH(3,IR)
       IF (LOGREF(1,IR)) THEN
         DO N = 1, NATOM
-          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
           term2 = COSQS(IL,3,N)
           term3 = 2.*term1*term2
           AFCAL = AFCAL + term3*fob(n,ir)
-          term1 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term1 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)*SINQS(IK,1,N)
           term2 = SINQS(IL,3,N)
           term3 = 2.*term1*term2
           BFCAL = BFCAL - term3*fob(n,ir)
         ENDDO
       ELSEIF (LOGREF(2,IR)) THEN
         DO N = 1, NATOM
-          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
-          term2 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)*SINQS(IK,1,N)
           term3 = COSQS(IL,3,N)
           term4 = (term1-term2)*term3
-          term5 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
-          term6 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
+          term5 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
+          term6 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)*COSQS(IK,1,N)
           term7 = SINQS(IL,3,N)
           term8 = (term5+term6)*term7
           AFCAL = AFCAL + (term4-term8)*fob(n,ir)
@@ -1799,29 +1077,23 @@
         ENDDO
       ELSEIF (LOGREF(3,IR)) THEN
         DO N = 1, NATOM
-          term1 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term1 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
           term2 = COSQS(IL,3,N)
           term3 = 2.*term1*term2
           AFCAL = AFCAL - term3*fob(n,ir)
-          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)*COSQS(IK,1,N)
           term2 = SINQS(IL,3,N)
           term3 = 2.*term1*term2
           BFCAL = BFCAL + term3*fob(n,ir)
         ENDDO
       ELSEIF (LOGREF(4,IR)) THEN
         DO N = 1, NATOM
-          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
-          term2 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)*SINQS(IK,1,N)
           term3 = COSQS(IL,3,N)
           term4 = (term1-term2)*term3
-          term5 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)           &
-     &            *SINQS(IK,1,N)
-          term6 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)           &
-     &            *COSQS(IK,1,N)
+          term5 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
+          term6 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)*COSQS(IK,1,N)
           term7 = SINQS(IL,3,N)
           term8 = (term5+term6)*term7
           AFCAL = AFCAL - (term4+term8)*fob(n,ir)
@@ -1848,50 +1120,20 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_430 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_430
@@ -1913,38 +1155,20 @@
       RI = -(RH+RK)
       RL = 6.283185307179*FLOAT(IREFH(3,IR))
       VL = RL/3.
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          XV = X(1,N)
-          YV = X(2,N)
-          RLZV = RL*X(3,N)
-          ARG1 = RH*XV + RK*YV + RLZV
-          ARG2 = RK*XV + RI*YV + RLZV + VL
-          ARG3 = RI*XV + RH*YV + RLZV - VL
-          AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
-          BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
-!         ARG2=RK*XV+RI*YV+RLZV-VL
-!         ARG3=RI*XV+RH*YV+RLZV+VL
-!         CFCAL=CFCAL+(COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
-!         DFCAL=DFCAL+(SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          XV = X(1,N)
-          YV = X(2,N)
-          RLZV = RL*X(3,N)
-          ARG1 = RH*XV + RK*YV + RLZV
-          ARG2 = RK*XV + RI*YV + RLZV + VL
-          ARG3 = RI*XV + RH*YV + RLZV - VL
-          AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
-          BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
-!         ARG2=RK*XV+RI*YV+RLZV-VL
-!         ARG3=RI*XV+RH*YV+RLZV+VL
-!         CFCAL=CFCAL+(COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
-!         DFCAL=DFCAL+(SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        XV = X(1,N)
+        YV = X(2,N)
+        RLZV = RL*X(3,N)
+        ARG1 = RH*XV + RK*YV + RLZV
+        ARG2 = RK*XV + RI*YV + RLZV + VL
+        ARG3 = RI*XV + RH*YV + RLZV - VL
+        AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+        BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+!        ARG2=RK*XV+RI*YV+RLZV-VL
+!        ARG3=RI*XV+RH*YV+RLZV+VL
+!        CFCAL=CFCAL+(COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+!        DFCAL=DFCAL+(SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+      ENDDO
 !      RAT=0.0
 !      FF1=AFCAL*AFCAL+BFCAL*BFCAL
 !      FF2=CFCAL*CFCAL+DFCAL*DFCAL
@@ -1968,30 +1192,16 @@
       RI = -(RH+RK)
       RL = 6.283185307179*FLOAT(IREFH(3,IR))
       VL = RL/3.
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          XV = X(1,N)
-          YV = X(2,N)
-          RLZV = RL*X(3,N)
-          ARG1 = RH*XV + RK*YV + RLZV
-          ARG2 = RK*XV + RI*YV + RLZV - VL
-          ARG3 = RI*XV + RH*YV + RLZV + VL
-          AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
-          BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          XV = X(1,N)
-          YV = X(2,N)
-          RLZV = RL*X(3,N)
-          ARG1 = RH*XV + RK*YV + RLZV
-          ARG2 = RK*XV + RI*YV + RLZV - VL
-          ARG3 = RI*XV + RH*YV + RLZV + VL
-          AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
-          BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        XV = X(1,N)
+        YV = X(2,N)
+        RLZV = RL*X(3,N)
+        ARG1 = RH*XV + RK*YV + RLZV
+        ARG2 = RK*XV + RI*YV + RLZV - VL
+        ARG3 = RI*XV + RH*YV + RLZV + VL
+        AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+        BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+      ENDDO
       FFCALC_432 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_432
@@ -2011,50 +1221,20 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_433 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_433
@@ -2072,48 +1252,19 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_434 = AFCAL*AFCAL
 
       END FUNCTION FFCALC_434
@@ -2132,48 +1283,19 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_435 = AFCAL*AFCAL
 
       END FUNCTION FFCALC_435
@@ -2194,81 +1316,29 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI = SHKI1 + SHKI2 + SHKI3
-!
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          SKHI = SKHI1 + SKHI2 + SKHI3
-          RPHCC = CHKI + CKHI
-          RPHSS = SHKI + SKHI
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ-RPHSS*SLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          SKHI = SKHI1 + SKHI2 + SKHI3
-          RPHCC = CHKI + CKHI
-          RPHSS = SHKI + SKHI
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ-RPHSS*SLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)*SINQS(IH,2,N)
+        SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)*SINQS(II,2,N)
+        SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        SKHI = SKHI1 + SKHI2 + SKHI3
+        RPHCC = CHKI + CKHI
+        RPHSS = SHKI + SKHI
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ-RPHSS*SLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_449 = AFCAL*AFCAL
 
       END FUNCTION FFCALC_449
@@ -2289,80 +1359,29 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          SKHI = SKHI1 + SKHI2 + SKHI3
-          RPHCC = CHKI + CKHI
-          RMHSS = SHKI - SKHI
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ-RMHSS*SLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          SKHI = SKHI1 + SKHI2 + SKHI3
-          RPHCC = CHKI + CKHI
-          RMHSS = SHKI - SKHI
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ-RMHSS*SLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)*SINQS(IH,2,N)
+        SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)*SINQS(II,2,N)
+        SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        SKHI = SKHI1 + SKHI2 + SKHI3
+        RPHCC = CHKI + CKHI
+        RMHSS = SHKI - SKHI
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ-RMHSS*SLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_451 = AFCAL*AFCAL
 
       END FUNCTION FFCALC_451
@@ -2382,36 +1401,16 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (CHKI*SLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (CHKI*SLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (CHKI*SLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_462 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_462
@@ -2431,48 +1430,19 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (SHKI*CLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (SHKI*CLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (SHKI*CLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_468 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_468
@@ -2491,32 +1461,14 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_469 = AFCAL*AFCAL
 
       END FUNCTION FFCALC_469
@@ -2537,54 +1489,22 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          RPHCC = CHKI + CKHI
-          RMHCC = CHKI - CKHI
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (RMHCC*SLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          RPHCC = CHKI + CKHI
-          RMHCC = CHKI - CKHI
-          CLZ = COSQS(IL,3,N)
-          SLZ = SINQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (RMHCC*SLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        RPHCC = CHKI + CKHI
+        RMHCC = CHKI - CKHI
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (RMHCC*SLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_471 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_471
@@ -2605,80 +1525,29 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          SKHI = SKHI1 + SKHI2 + SKHI3
-          RPHCC = CHKI + CKHI
-          RMHSS = SHKI - SKHI
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (RMHSS*CLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          SKHI = SKHI1 + SKHI2 + SKHI3
-          RPHCC = CHKI + CKHI
-          RMHSS = SHKI - SKHI
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (RMHSS*CLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)*SINQS(IH,2,N)
+        SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)*SINQS(II,2,N)
+        SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        SKHI = SKHI1 + SKHI2 + SKHI3
+        RPHCC = CHKI + CKHI
+        RMHSS = SHKI - SKHI
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (RMHSS*CLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_481 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_481
@@ -2695,80 +1564,29 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          SKHI = SKHI1 + SKHI2 + SKHI3
-          RPHCC = CHKI + CKHI
-          RPHSS = SHKI + SKHI
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (RPHSS*CLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          SHKI = SHKI1 + SHKI2 + SHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          SKHI = SKHI1 + SKHI2 + SKHI3
-          RPHCC = CHKI + CKHI
-          RPHSS = SHKI + SKHI
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
-          BFCAL = BFCAL + (RPHSS*CLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)*SINQS(IH,2,N)
+        SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)*SINQS(II,2,N)
+        SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        SKHI = SKHI1 + SKHI2 + SKHI3
+        RPHCC = CHKI + CKHI
+        RPHSS = SHKI + SKHI
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (RPHSS*CLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_483 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_483
@@ -2788,48 +1606,19 @@
       IK = IREFH(2,IR)
       II = -(IH+IK)
       IL = IREFH(3,IR)
-      IF (LOG_HYDROGENS) THEN
-        DO N = 1, NATOM
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          RPHCC = CHKI + CKHI
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
-        ENDDO
-      ELSE
-        DO NS = 1, NSATOM
-          N = ISATOM(NS)
-          CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(IK,2,N)
-          CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(II,2,N)
-          CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IH,2,N)
-          CHKI = CHKI1 + CHKI2 + CHKI3
-          CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)           &
-     &            *SINQS(IH,2,N)
-          CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)           &
-     &            *SINQS(II,2,N)
-          CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)           &
-     &            *SINQS(IK,2,N)
-          CKHI = CKHI1 + CKHI2 + CKHI3
-          RPHCC = CHKI + CKHI
-          CLZ = COSQS(IL,3,N)
-          AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
-        ENDDO
-      ENDIF
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        RPHCC = CHKI + CKHI
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+      ENDDO
       FFCALC_485 = AFCAL*AFCAL
 
       END FUNCTION FFCALC_485
@@ -2839,6 +1628,7 @@
       FUNCTION FFCALC_DEFAULT(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
@@ -2851,70 +1641,37 @@
       AFCALC = 0.0
 ! Firstly if we are centric then calculate only cosine terms
       IF (CENTRC) THEN
-        IF (LOG_HYDROGENS) THEN
-          DO N = 1, NATOM
-            SUM = 0.
+        DO N = 1, NATOM
+          SUM = 0.
 ! SUM OVER SYMMETRY EQUIVALENTS:
-            DO I = 1, NOPC
+          DO I = 1, NOPC
 ! V is 2pi*(h*x+t)
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
-              IV = V
-              PV = V - FLOAT(IV)
-              SUM = SUM + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
-            ENDDO
-            AFCALC = AFCALC + SUM*FOB(N,IR)
+            V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
+            IV = V
+            PV = V - FLOAT(IV)
+            SUM = SUM + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
           ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            SUM = 0.0
-! SUM OVER SYMMETRY EQUIVALENTS:
-            DO I = 1, NOPC
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
-              IV = V
-              PV = V - FLOAT(IV)
-              SUM = SUM + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
-            ENDDO
-            AFCALC = AFCALC + SUM*FOB(N,IR)
-          ENDDO
-        ENDIF
+          AFCALC = AFCALC + SUM*FOB(N,IR)
+        ENDDO
         FFCALC_DEFAULT = AFCALC*AFCALC
       ELSE
 ! Deal with the non-centric case
         BFCALC = 0.
-        IF (LOG_HYDROGENS) THEN
-          DO N = 1, NATOM
-            SUMA = 0.0
-            SUMB = 0.0
+        DO N = 1, NATOM
+          SUMA = 0.0
+          SUMB = 0.0
 ! SUM OVER SYMMETRY EQUIVALENTS:
-            DO I = 1, NOPC
+          DO I = 1, NOPC
 ! V is 2pi*(h*x+t)
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
-              IV = V
-              PV = V - FLOAT(IV)
-              SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
-              SUMB = SUMB + SINAR0(IV) + PV*(SINAR1(IV)+PV*SINAR2(IV))
-            ENDDO
-            AFCALC = AFCALC + SUMA*FOB(N,IR)
-            BFCALC = BFCALC + SUMB*FOB(N,IR)
+            V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
+            IV = V
+            PV = V - FLOAT(IV)
+            SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
+            SUMB = SUMB + SINAR0(IV) + PV*(SINAR1(IV)+PV*SINAR2(IV))
           ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            SUMA = 0.0
-            SUMB = 0.0
-! SUM OVER SYMMETRY EQUIVALENTS:
-            DO I = 1, NOPC
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
-              IV = V
-              PV = V - FLOAT(IV)
-              SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
-              SUMB = SUMB + SINAR0(IV) + PV*(SINAR1(IV)+PV*SINAR2(IV))
-            ENDDO
-            AFCALC = AFCALC + SUMA*FOB(N,IR)
-            BFCALC = BFCALC + SUMB*FOB(N,IR)
-          ENDDO
-        ENDIF
+          AFCALC = AFCALC + SUMA*FOB(N,IR)
+          BFCALC = BFCALC + SUMB*FOB(N,IR)
+        ENDDO
         FFCALC_DEFAULT = AFCALC*AFCALC + BFCALC*BFCALC
       ENDIF
 
@@ -2928,7 +1685,9 @@
       COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC), COSAR2(-NBC:NBC)
       COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC), SINAR2(-NBC:NBC)
 
-      TWOPI = 8.*ATAN(1.)
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+
       AMUL = TWOPI/FARCOS
       DO I = -NBC, NBC
         X = AMUL*FLOAT(I)

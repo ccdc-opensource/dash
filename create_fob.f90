@@ -6,9 +6,17 @@
 
       USE ZMVAR
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
+      INTEGER         MAXK
+      REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
+
+      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
+
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -24,28 +32,57 @@
 
 ! JvdS should be the same thing
 !O      COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
-      INTEGER NTIC
-      INTEGER IH
-      REAL    ARGK
-      REAL    DSTAR
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
-      LOGICAL HYDNOT
-      COMMON /HIDDAT/ HYDNOT(150), nsatom, isatom(150)
+      INTEGER ifrg, i, item, iref
+      INTEGER tNumHydrogens, tNumNonHydrogens, tAtomNumber
+      REAL ssq, atem, btem
+      REAL, EXTERNAL :: ascfac
 
-      INTEGER ifrg, i
+! JvdS Attempt to order all atoms such that the Hydrogen atoms are always at
+! the end of the atom list. That way, if we don't want to use hydrogens
+! we can simply subtract the number of hydrogens from the number of atoms and
+! everything works
 
-      item = 0
-      NSATOM = 0
+! Preliminary loop to determine number of atoms, number of hydrogen atoms,
+! and number of non-hydrogen atoms
+      TotNumOfAtoms = 0
+      NumOfHydrogens = 0
+      NumOfNonHydrogens = 0
       DO ifrg = 1, maxfrg
         IF (gotzmfile(ifrg)) THEN
           DO i = 1, natoms(ifrg)
-            item = item + 1
-            hydnot(item) = (asym(i,ifrg).NE.'H  ')
-            IF (hydnot(item)) THEN
-              nsatom = nsatom + 1
-              isatom(nsatom) = item
+            TotNumOfAtoms = TotNumOfAtoms + 1
+            IF (asym(i,ifrg).EQ.'H  ') THEN
+              NumOfHydrogens = NumOfHydrogens + 1
+            ELSE
+              NumOfNonHydrogens = NumOfNonHydrogens + 1
             ENDIF
+          ENDDO
+        ENDIF
+      ENDDO
+      natom = TotNumOfAtoms
+! The 'real' loop. Information for hydrogens is stored after all the non-hydrogen atoms      
+      item = 0
+      tNumHydrogens = 0
+      tNumNonHydrogens = 0
+      tAtomNumber = 0         ! To make life easier, we just use a mapping in MAKEFRAC
+      DO ifrg = 1, maxfrg
+        IF (gotzmfile(ifrg)) THEN
+          DO i = 1, natoms(ifrg)
+            tAtomNumber = tAtomNumber + 1
+            IF (asym(i,ifrg).EQ.'H  ') THEN
+              tNumHydrogens = tNumHydrogens + 1
+              item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
+            ELSE
+              tNumNonHydrogens = tNumNonHydrogens + 1
+              item = tNumNonHydrogens
+            ENDIF
+            OrderedAtm(tAtomNumber) = item
             DO iref = 1, maxk
               ssq = 0.25*dstar(iref)**2
               atem = occ(i,ifrg)*ascfac(asym(i,ifrg),ssq)
@@ -55,10 +92,8 @@
           ENDDO
         ENDIF
       ENDDO
-      natom = item
 
       END SUBROUTINE CREATE_FOB
-!*==ASCFAC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -120,7 +155,7 @@
      &     0.70100, 0.68587, 0.66310, 0.64645, 0.61634, 0.58909,        &
      &     0.56336, 0.54775, 0.52930, 0.51193, 0.49938, 0.48363,        &
      &     0.46515, 0.45102, 0.43753, 1.0000/
-!
+
       DATA A2/0.26200, 0.63090, 0.75080, 1.12780, 1.33260,      &
      &     1.02000, 3.13220, 2.28680, 2.64120, 3.11250, 3.17360,        &
      &     2.17350, 1.90020, 3.03530, 4.17910, 5.20340, 7.19640,        &
@@ -138,7 +173,7 @@
      &     15.47330, 19.02110, 21.28160, 23.05470, 22.90640, 23.10320,  &
      &     23.42190, 23.29480, 23.41280, 23.59640, 23.80830, 24.09920,  &
      &     24.40960, 24.77360, 25.19950, 0.0000/
-!
+
       DATA B2/7.74039, 3.35680, 1.05240, 1.86230, 1.02100,      &
      &     10.20750, 9.89330, 5.70110, 4.29440, 3.42620, 8.84220,       &
      &     79.26110, 0.74260, 32.33370, 27.15700, 22.21510, 1.16620,    &
@@ -156,7 +191,7 @@
      &     3.55078, 3.97458, 4.06910, 4.17619, 3.87135, 3.65155,        &
      &     3.46204, 3.41519, 3.32530, 3.25396, 3.26371, 3.20647,        &
      &     3.08997, 3.04619, 3.00775, 1.0000/
-!
+
       DATA A3/0.19677, 0.31120, 0.61750, 0.53910, 1.09790,      &
      &     1.58860, 2.01250, 1.54630, 1.51700, 1.45460, 1.26740,        &
      &     1.22690, 1.59360, 1.98910, 1.78000, 1.43790, 6.25560,        &
@@ -174,7 +209,7 @@
      &     13.11380, 9.49887, 8.00370, 12.14390, 12.47390, 12.59770,    &
      &     12.74730, 14.18910, 14.94910, 15.64020, 16.77070, 17.34150,  &
      &     17.39900, 17.89190, 18.33170, 0.0000/
-!
+
       DATA B3/49.55190, 22.92760, 85.39050, 103.4830, 60.34980, &
      &     0.56870, 28.99750, 0.32390, 0.26150, 0.23060, 0.31360,       &
      &     0.38080, 31.54720, 0.67850, 0.52600, 0.25360, 18.51940,      &
@@ -192,7 +227,7 @@
      &     9.55642, 11.38240, 14.04220, 23.10520, 19.98870, 18.59900,   &
      &     17.83090, 16.92350, 16.09270, 15.36220, 14.94550, 14.31360,  &
      &     13.43460, 12.89460, 12.40440, 1.0000/
-!
+
       DATA A4/0.04988, 0.17800, 0.46530, 0.70290, 0.10680,      &
      &     0.86500, 1.16630, 0.86700, 1.02430, 1.12510, 1.11280,        &
      &     2.30730, 1.96460, 1.54100, 1.49080, 1.58630, 1.64550,        &
@@ -210,7 +245,7 @@
      &     7.02588, 7.42518, 7.44330, 2.11253, 3.21097, 4.08655,        &
      &     4.80703, 4.17287, 4.18800, 4.18550, 3.47947, 3.49331,        &
      &     4.21665, 4.23284, 4.24391, 0.0000/
-!
+
       DATA B4/2.20159, 0.98210, 168.26100, 0.54200, 0.14030,    &
      &     51.65120, 0.58260, 32.90890, 26.14760, 21.71840, 129.42400,  &
      &     7.19370, 85.08860, 81.69370, 68.16450, 56.17200, 47.77840,   &
@@ -229,7 +264,7 @@
      &     47.00450, 45.47150, 44.24730, 150.64500, 142.32500,          &
      &     117.02000, 99.17220, 105.25100, 100.61300, 97.49080,         &
      &     105.98000, 102.27300, 88.48340, 86.00300, 83.78810, 1.0000/
-!
+
       DATA CV/0.00131, 0.00640, 0.03770, 0.03850, -0.19320,     &
      &     0.21560, -11.52900, 0.25080, 0.27760, 0.35150, 0.67600,      &
      &     0.85840, 1.11510, 1.14070, 1.11490, 0.86690, -9.55740,       &
@@ -247,7 +282,7 @@
      &     13.67700, 13.71080, 13.69050, 13.72470, 13.62110, 13.52660,  &
      &     13.43140, 13.42870, 13.39660, 13.35730, 13.38120, 13.35920,  &
      &     13.28870, 13.27540, 13.26740, 0.0000/
-!
+
       DO I = 1, melem
         IF (asym.EQ.symba(I)) THEN
           ascfac = a1(I)*EXP(-b1(I)*ss) + a2(I)*EXP(-b2(I)*ss) + a3(I)  &
@@ -258,7 +293,7 @@
 ! default is a dummy.
       ascfac = a1(1)*EXP(-b1(1)*ss) + a2(1)*EXP(-b2(1)*ss) + a3(1)      &
      &         *EXP(-b3(1)*ss) + a4(1)*EXP(-b4(1)*ss) + cv(1)
-!
+
       END FUNCTION ASCFAC
 !
 !*****************************************************************************
