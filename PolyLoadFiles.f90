@@ -209,7 +209,6 @@
 ! Actually, that is how it works in practice under windows (try 'Start' -> 'Run...' -> 'Browse...'
 ! it will not actually open the file, just select it).
       DiffractionFileBrowse = DiffractionFileOpen(tFileName)
-      RETURN
 
       END FUNCTION DiffractionFileBrowse
 !
@@ -237,15 +236,15 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
 
-      REAL XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
 
       LOGICAL    FExists
       INTEGER    KLEN
@@ -253,8 +252,8 @@
       INTEGER    ISTAT
       INTEGER    DiffractionFileLoad ! Function
       LOGICAL    Confirm ! Function
-      REAL       tMaxResolutionAttainable, tMaxResolution
-      REAL       TwoTheta2dSpacing ! Function
+      REAL       tMaxResolution
+      REAL       TwoTheta2dSpacing, dSpacing2TwoTheta ! Function
       LOGICAL    FnWavelengthOK ! Function
 
       DiffractionFileOpen = 0
@@ -299,20 +298,20 @@
         DashRawFile = FNAME(1:LEN_TRIM(FNAME))
       ENDIF
 ! Set minimum and maximum truncation values in Wizard in accordance with data read in
-      IF (.NOT. FnWavelengthOK()) RETURN
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
+! Initialise truncation of start of powder pattern
       CALL WDialogPutReal(IDF_Min2Theta,XPMIN,'(F6.3)')
-! If truncation resolution not attainable with current data range / wavelength, adjust the maximum resolution
-      tMaxResolutionAttainable = TwoTheta2dSpacing(XPMAX)
-      tMaxResolution = MAX(tMaxResolutionAttainable,DefaultMaxResolution)
-!T      CALL WDialogGetReal(IDF_MaxResolution,tReal)
-!T      IF (dSpacing2TwoTheta(tReal) .GT. XPMAX) THEN
-!T        CALL WDialogPutReal(IDF_Max2Theta,XPMAX)
-!T        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(XPMAX))
-!T      ELSE
-!T        CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
-!T      ENDIF
+! In principle, set resolution so as to truncate after DefaultMaxResolution.
+! However, if truncation resolution not attainable with current data range / wavelength,
+! adjust the setting of the maximum resolution to maximum possible.
+      IF (FnWavelengthOK()) THEN
+        tMaxResolution = MAX(TwoTheta2dSpacing(XPMAX),DefaultMaxResolution)
+      ELSE
+        tMaxResolution = DefaultMaxResolution
+      ENDIF
+      CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
+      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tMaxResolution))
       CALL PopActiveWindowID
 
       END FUNCTION DiffractionFileOpen
@@ -345,13 +344,16 @@
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
 
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
@@ -433,7 +435,6 @@
       ENDIF
       DataSetChange = DataSetChange + 1
       NumPawleyRef = 0
-      NumObsTic = 0
 !      NTic=0
       CurrentRange = 0
       NumPeakFitRange = 0
@@ -634,7 +635,6 @@
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
       CLOSE(10)
-      RETURN
 
       END FUNCTION Load_dat_File
 !
@@ -917,7 +917,6 @@
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
       CLOSE(10)
-      RETURN
 
       END FUNCTION Load_raw_File
 !
@@ -1157,7 +1156,6 @@
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
       CLOSE(10)
-      RETURN
 
       END FUNCTION Load_rd_File
 !
@@ -1357,7 +1355,6 @@
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
       CLOSE(10)
-      RETURN
 
       END FUNCTION Load_udf_File
 !
@@ -1644,7 +1641,6 @@
       RETURN
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
-      RETURN
 
       END FUNCTION Load_uxd_File
 !
@@ -1814,7 +1810,6 @@
       RETURN
  999  CONTINUE
       CLOSE(10)
-      RETURN
 
       END FUNCTION Load_xye_File
 !
@@ -1832,9 +1827,15 @@
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-      XGGMIN,XGGMAX,YGGMIN,YGGMAX
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
       INTEGER CurrentRange 
@@ -1842,9 +1843,6 @@
       NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
       XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
       IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-       itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
@@ -1924,9 +1922,15 @@
       REAL tXOBS(MOBS),tYOBS(MOBS),tYCAL(MOBS),tYBAK(MOBS),tEOBS(MOBS)
 
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-        XGGMIN,XGGMAX,YGGMIN,YGGMAX
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
       INTEGER CurrentRange 
@@ -1934,9 +1938,6 @@
         NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
           XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
       IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
  
@@ -2090,7 +2091,6 @@
 ! Actually, that is how it works in practice under windows (try 'Start' -> 'Run...' -> 'Browse...'
 ! it will not actually open the file, just select it).
       CALL SDIFileOpen(tFileName)
-      RETURN
 
       END SUBROUTINE SDIFileBrowse
 !
@@ -2139,7 +2139,6 @@
 !C>>  update the file name of the project in the SA pop up
       CALL SetSAFileName(TheFileName(1:LEN_TRIM(TheFileName)))
       NumPawleyRef = 0 ! We dont have the info for refinement so treat as if none has been done
-      RETURN
       
       END SUBROUTINE SDIFileOpen
 !
@@ -2314,7 +2313,6 @@
       CLOSE(11)
       RETURN
  999  GETTIC = 0
-      RETURN
 
       END FUNCTION GETTIC
 !
