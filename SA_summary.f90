@@ -12,6 +12,7 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE SOLVAR
+      USE PRJVAR
 
       IMPLICIT NONE
 
@@ -66,6 +67,7 @@
               CALL PopActiveWindowID
               RETURN
             CASE (IDB_SaveSol)
+              PrjFileName = OutputFilesBaseName(1:OFBN_Len)//'.dash'
               iDummy = PrjSaveAs()
             CASE (IDB_LoadSol)
               CALL PrjFileBrowse
