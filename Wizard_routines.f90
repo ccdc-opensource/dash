@@ -741,7 +741,15 @@
             CALL WCursorShape(CurCrossHair)
 ! Pop up a window showing the DICVOL output file in a text editor
             CALL WindowOpenChild(IHANDLE)
-            CALL WEditFile('DICVOL.OUT',Modeless,0,0,4)
+            CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
+! If 'ViewOnly' is specified:
+! 1. The file can be accessed while it is displayed.
+! 2. There is no 'Save as...' option the menu.
+! If the output file is viewed without 'ViewOnly', the file cannot be accessed, which means that
+! DICVOL returns with an error message which means that there are no solutions.
+! Hence, this way, DICVOL can be run several times in succession and the results can be compared
+! on screen. To save one of the output files (that all have the same name),
+! the user must select all text and copy and paste it to an other editor window.
             CALL SetChildWinAutoClose(IHANDLE)
             IF (NumOfDICVOLSolutions .EQ. 0) THEN
               CALL ErrorMessage('No solutions were found.')

@@ -496,7 +496,7 @@
         Vol = Dir(1)**2*Dir(2)
         IF ( Ktestwolff.EQ.0 ) THEN
           WRITE (iw,99002) Dir(1), Dir(2), Vol
-99002   FORMAT (//20X,'T E T R A G O N A L   S Y S T E M  '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,&
+99002     FORMAT (//20X,'T E T R A G O N A L   S Y S T E M  '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,&
      &          'VOLUME=',F9.2)
           CALL AddDICVOLSolution(6,Dir(1),Dir(1),Dir(2),90.0,90.0,90.0,Vol)
         ENDIF
@@ -506,7 +506,7 @@
         Vol = Dir(1)**2*Dir(2)*SQRT(3.)/2.
         IF ( Ktestwolff.EQ.0 ) THEN
           WRITE (iw,99004) Dir(1), Dir(2), Vol
-99004   FORMAT (//20X,'H E X A G O N A L    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,  &
+99004     FORMAT (//20X,'H E X A G O N A L    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,  &
      &          'VOLUME=',F9.2)
           CALL AddDICVOLSolution(9,Dir(1),Dir(1),Dir(2),90.0,90.0,120.0,Vol)
         ENDIF
@@ -516,7 +516,7 @@
         Vol = Dir(1)*Dir(2)*Dir(3)
         IF ( Ktestwolff.EQ.0 ) THEN
           WRITE (iw,99006) (Dir(I),I=1,3), Vol
-99006   FORMAT (//20X,'O R T H O R H O M B I C    S Y S T E M '//2X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'B=',    &
+99006     FORMAT (//20X,'O R T H O R H O M B I C    S Y S T E M '//2X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'B=',    &
      &          F9.5,2X,'C=',F9.5,3X,'VOLUME=',F8.2)
           CALL AddDICVOLSolution(5,Dir(1),Dir(2),Dir(3),90.0,90.0,90.0,Vol)
         ENDIF
@@ -526,7 +526,7 @@
         Vol = Dir(1)*Dir(2)*Dir(3)*SIN(Dir(4)*pirad)
         IF ( Ktestwolff.EQ.0 ) THEN
           WRITE (iw,99008) (Dir(I),I=1,4), Vol
-99008   FORMAT (//20X,'M O N O C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS :',1X,'A=',F7.4,' B=',F7.4,     &
+99008     FORMAT (//20X,'M O N O C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS :',1X,'A=',F7.4,' B=',F7.4,     &
      &          ' C=',F7.4,1X,'BETA=',F7.3,1X,'VOLUME=',F7.2)
           CALL AddDICVOLSolution(3,Dir(1),Dir(2),Dir(3),90.0,Dir(4),90.0,Vol)
         ENDIF
@@ -543,7 +543,7 @@
         Vol = Dir(1)*Dir(2)*Dir(3)*Svol
         IF ( Ktestwolff.EQ.0 ) THEN
           WRITE (iw,99010) (Dir(I),I=1,6), Vol
-99010   FORMAT (//20X,'T R I C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS AND THEIR STANDARD DEVIATIONS :'/1&
+99010     FORMAT (//20X,'T R I C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS AND THEIR STANDARD DEVIATIONS :'/1&
      &          X,'A=',F7.4,' B=',F7.4,' C=',F7.4,2X,'ALP=',F7.3,1X,'BET=',F7.3,' GAM=',F7.3,1X,'VOL=',F7.2)
           CALL AddDICVOLSolution(1,Dir(1),Dir(2),Dir(3),Dir(4),Dir(5),Dir(6),Vol)
         ENDIF
@@ -553,7 +553,7 @@
         Vol = Dir(1)**3
         IF ( Ktestwolff.EQ.0 ) THEN
           WRITE (iw,99012) Dir(1), Vol
-99012   FORMAT (//20X,' C U B I C    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,4X,'VOLUME=',F9.2)
+99012     FORMAT (//20X,' C U B I C    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,4X,'VOLUME=',F9.2)
           CALL AddDICVOLSolution(10,Dir(1),Dir(1),Dir(1),90.0,90.0,90.0,Vol)
         ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99013) Ecart(1)
@@ -565,8 +565,7 @@
 99014     FORMAT (/6X,'NUMBER OF MOLECULES IN THE UNIT CELL :  ',7X,'Z=',I3/)
         ENDIF
         WRITE (iw,99015)
-99015   FORMAT (/3X,'H',4X,'K',4X,'L',4X,'DOBS',5X,'DCAL',3X,'DOBS-DCAL',2X,'2TH.OBS',2X,      &
-     &          '2TH.CAL',1X,'DIF.2TH.'/)
+99015   FORMAT (/3X,'H',4X,'K',4X,'L',4X,'DOBS',5X,'DCAL',3X,'DOBS-DCAL',2X,'2TH.OBS',2X,'2TH.CAL',1X,'DIF.2TH.'/)
       ENDIF
       Dtheta = 0.
       Deltaq = 0.
@@ -684,10 +683,13 @@
       CALL AddDICVOL_F(Findex)
       WRITE (iw,99022) v, nini, fwolff, nini, Findex, Dtheta, nposs
 99022 FORMAT (2x,'=====>  CELL VOLUME = ',F7.1,' A**3     M(',I2,')=',F6.1,'  F(',I2,')=',F6.1,'(',F6.4,',',I3,')')
+
 99999 END SUBROUTINE AFFPAR
 !*==PASAJE.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
       SUBROUTINE PASAJE(Ind)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 !*** Start of declarations rewritten by SPAG
@@ -735,4 +737,5 @@
       CASE DEFAULT ! Tetragonal ?
         rec(2) = 1./par(2)
       END SELECT
+
       END SUBROUTINE PASAJE

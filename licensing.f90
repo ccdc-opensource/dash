@@ -263,11 +263,9 @@
       WRITE(iun,'(A)',ERR=99)         "#"
       WRITE(iun,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' license '
 
-! JvdS @ The following lines look weird: the second statement cannot be reached.
-! The second IF should probably read:  ELSE IF (Info%LicenseType .EQ. SiteKey) THEN
       IF      (Info%LicenseType .EQ. NodeKey) THEN
         WRITE(iun,'(A,z8)',ERR=99) '# Your DASH Serial ID for this machine is ',Info%SerialNumber
-      ELSE IF (Info%LicenseType .EQ. NodeKey) THEN
+      ELSE IF (Info%LicenseType .EQ. SiteKey) THEN
         WRITE(iun,'(A,z8)',ERR=99) '# Your DASH Site ID is ',Info%SerialNumber
       ENDIF
 
