@@ -171,5 +171,3 @@
      ENDIF
 
      END SUBROUTINE SpaceGroupFileDialog
-
-       
