@@ -1,4 +1,4 @@
-! Winteracter module created : 12/Dec/2001 18:28:53
+! Winteracter module created : 10/Jan/2002 12:23:09
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -199,7 +199,6 @@
           INTEGER, PARAMETER :: IDF_profchi2_label              =  1185
           INTEGER, PARAMETER :: IDD_input_parameters            =   140
           INTEGER, PARAMETER :: IDF_SA_Tredrate                 =  1179
-          INTEGER, PARAMETER :: IDD_zmatrix_files               =   134
           INTEGER, PARAMETER :: IDF_SA_T0_label1                =  1161
           INTEGER, PARAMETER :: IDF_SA_Tredrate_trackbar        =  1148
           INTEGER, PARAMETER :: IDF_SA_NS_trackbar              =  1149
@@ -225,8 +224,6 @@
           INTEGER, PARAMETER :: IDF_npar_label                  =  1478
           INTEGER, PARAMETER :: IDF_npar                        =  1479
           INTEGER, PARAMETER :: IDF_parameter_grid              =  1480
-          INTEGER, PARAMETER :: IDF_nfrag                       =  1488
-          INTEGER, PARAMETER :: IDF_zmatrixfile_grid            =  1489
           INTEGER, PARAMETER :: IDF_LABEL7                      =  1463
           INTEGER, PARAMETER :: IDF_StopSA                      =  1195
           INTEGER, PARAMETER :: IDF_Pause_Annealing             =  1495
@@ -236,7 +233,6 @@
           INTEGER, PARAMETER :: IDD_Profile_Status              =   139
           INTEGER, PARAMETER :: IDF_Viewer                      =  1514
           INTEGER, PARAMETER :: IDD_DIALOG001                   =   132
-          INTEGER, PARAMETER :: IDD_DIALOG002                   =   135
           INTEGER, PARAMETER :: IDD_DIALOG003                   =   137
           INTEGER, PARAMETER :: IDF_PawRef_Refine               =  1301
           INTEGER, PARAMETER :: IDF_IDF_PawRef_NBack            =  1291
