@@ -353,16 +353,14 @@
       NumInternalDSC = -1
       ZeroPoint = 0.0
       PastPawley = .FALSE.
-      DefaultMaxResolution = 1.75
       NoWavelengthInXYE = .FALSE.
       LOG_HYDROGENS = .FALSE.
       T0 = 0.0
       RT = 0.02
       CALL Set_Wavelength(WaveLengthOf('Cu'))
 ! Now initialise the maximum resolution in the dialogue window
-      CALL WDialogSelect(IDD_PW_Page5)
-      CALL WDialogPutReal(IDF_MaxResolution, DefaultMaxResolution)
-      CALL WDialogPutReal(IDF_Max2Theta, dSpacing2TwoTheta(DefaultMaxResolution))
+      DefaultMaxResolution = DASHDefaultMaxResolution
+      CALL Update_TruncationLimits
       CALL WDialogSelect(IDD_SA_input3_2)
       ISeed1 = 314
       ISeed2 = 159
@@ -664,7 +662,7 @@
 ! Save default wavelength
       CALL FileWriteReal(hFile, RecNr, WavelengthOf('Cu'))
 ! Save default maximum resolution
-      CALL FileWriteReal(hFile, RecNr, 1.75)
+      CALL FileWriteReal(hFile, RecNr, DASHDefaultMaxResolution)
 ! Save the viewer
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogGetString(IDF_ViewExe, ViewExe)
@@ -891,9 +889,7 @@
 ! Read default maximum resolution
       CALL FileReadReal(hFile,RecNr,DefaultMaxResolution)
 ! Now initialise the maximum resolution in the dialogue window
-      CALL WDialogSelect(IDD_PW_Page5)
-      CALL WDialogPutReal(IDF_MaxResolution,DefaultMaxResolution)
-      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(DefaultMaxResolution))
+      CALL Update_TruncationLimits
 ! Read the viewer
       CALL WDialogSelect(IDD_Configuration)
       CALL FileReadString(hFile,RecNr,ViewExe)

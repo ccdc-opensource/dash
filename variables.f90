@@ -78,8 +78,12 @@
       REAL SA_SimplexDampingFactor
 ! Damping factor for the local minimisation during / after a simulated annealing run
 
+      REAL        DASHDefaultMaxResolution
+      PARAMETER ( DASHDefaultMaxResolution = 1.75 )
       REAL DefaultMaxResolution
-! The maximum resolution cut-off, in Angstrom, set as default when a new powder pattern is read in.
+! The maximum resolution cut-off, in Angstrom, for this powder pattern.
+! This is equal to DASHDefaultMaxResolution for new patterns, and equal to whatever was used
+! for patterns from a .sdi file.
 
       LOGICAL PastPawley
 ! The code used to calculate the tickmarks does so by emulating a Rietveld refinement.

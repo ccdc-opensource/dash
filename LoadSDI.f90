@@ -225,6 +225,7 @@
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
       CALL WDialogSelect(IDD_PW_Page8)
       CALL WDialogFieldState(IDB_PrevRes, Disabled)
+      DefaultMaxResolution = 0.1 ! Force using maximum attainable
       CALL Update_TruncationLimits
       RETURN
  999  CALL ErrorMessage('Error reading .sdi file.')
