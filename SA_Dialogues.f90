@@ -2104,7 +2104,7 @@
               ENDIF
             ENDIF
 
-          ELSEIF (UB(npar) * LB(npar) .GT. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
+          ELSEIF (UB(npar) * LB(npar) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
               IF ((XIn .LT. -180.00) .OR. (XIn .GT. 180.00)) THEN
                 OutOfBounds = .TRUE.     
               ELSE
