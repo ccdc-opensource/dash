@@ -69,6 +69,7 @@
       INTEGER      Transflag
       REAL, DIMENSION(3)     :: ShiftMatrix
       INTEGER, DIMENSION(3)  :: Infiniteaxes
+      INTEGER, DIMENSION(3)  :: FixedAxes
       INTEGER       NumOfTimesToApplyShift
       REAL          snum
       REAL, DIMENSION (50,400,3) ::CoMSGMatrix     
@@ -104,10 +105,15 @@
         IF (gotzmfile(iFrg) .AND. (zmNumberOfCopies(iFrg).GT.1)) RETURN 
       ENDDO
 ! Check if any x,y,z coords have been fixed or upper and lower bounds changed from defaults.
-! If they have then do not align
-      DO j = 1,3
-        IF ((lb(j).NE.0.0000).OR.(ub(j).NE.1.000)) RETURN
-      ENDDO
+! If they have then alignment not carried out.  If user fixed an axis which is an infinite
+! axis, alignment will be applied
+        DO j = 1,3
+          IF ((ub(j).EQ.DBLE(0.5 + 1.0D-5)) .AND. (lb(j).EQ.DBLE(0.5 - 1.0D-5))) THEN
+            FixedAxes(j) = 1 !user fixed an axis but may be infinite axis
+          ELSEIF ((lb(j).NE.0.0000).OR.(ub(j).NE.1.000)) THEN
+            RETURN
+          END IF
+        END DO
 !--------- End of Checks ----------
 
 !      OPEN(220,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'SGSymbandShift.txt',STATUS='OLD', ERR = 10)
@@ -187,9 +193,13 @@
               END IF
           END DO
 
+
+
      DO j = 1,3
        IF(InfiniteAxes(j) .EQ. 1) THEN
         CoMMatrix(1,j) = 0.5
+       ELSEIF((InfiniteAxes(j) .EQ. 0).AND.(FixedAxes(j) .EQ. 1)) THEN 
+         RETURN !if user fixed an axis which is not an infinite axis then do not align
        END IF
      END DO
 
@@ -349,6 +359,7 @@
          FinalMol(j,i) = ConnArray(j,i) + centre(j)
        END DO
      END DO
+
 ! If have equivalent axes then apply abitrary criterion to see if x and y should be swapped
     IF (equivAxes.eq.2) THEN
        IF (centre(1).gt.centre(2)) THEN
@@ -357,8 +368,9 @@
            tempy = FinalMol(2,i)
            FinalMol(1,i) = tempy
            FinalMol(2,i) = tempx
-             IF (Inversion.ne.1) THEN
-               FinalMol(3,i) = (FinalMol(3,i)*(-1) + 1)
+             IF ((Inversion.ne.1).AND. ((NumberSgTable .LT. 357) .OR. (NumberSGTable .GT. 363))) THEN
+ !!              FinalMol(3,i) = (FinalMol(3,i)*(-1) + 1)
+                 FinalMol(3,i) = centre(3) - connarray(3,i)
              END IF
          END DO
        END IF
