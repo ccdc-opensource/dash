@@ -607,13 +607,8 @@ C.. We will use the energy fluctuation to reduce the temperature
 		IF ( CheckTerm(NTOTMOV, CHIPROBEST(iteration) ) ) THEN
 			CALL AddMultiSolution(cpb,sngl(-fopt))
 C  ep added.  Before the next SA run starts close the Chi-sqd vs. no moves window opened
-C in the subroutine Chi_sq_plot.  
-	                 DO i = 1,MaxNumChildWin
-                          IF (ChiSqdChildWindows(i).eq.1) THEN 
-                              CALL WindowCloseChild(i)
-	                        ChiSqdChildWindows(i) = 0
-	                    END IF
-                       END DO
+C in the subroutine Chi_sq_plot. 
+                  CALL Close_Chisq_Plot                
 			IF ( SA_Run_Number .LT. MaxRuns ) GOTO 1
 	    ELSE
 	        GO TO 100
