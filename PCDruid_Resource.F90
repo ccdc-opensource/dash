@@ -1,4 +1,4 @@
-! Winteracter module created : 22/Apr/2004 11:24:03
+! Winteracter module created : 23/Apr/2004 20:07:10
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -614,18 +614,6 @@
           INTEGER, PARAMETER :: IDB_SDI_file_Open               =  1515
           INTEGER, PARAMETER :: IDB_SDI_file_Browse             =  1523
           INTEGER, PARAMETER :: IDB_PO_Settings                 =  1534
-          INTEGER, PARAMETER :: IDF_zmFile5                     =  1392
-          INTEGER, PARAMETER :: IDB_zmBrowse5                   =  1357
-          INTEGER, PARAMETER :: IDF_ZM_pars5                    =  1128
-          INTEGER, PARAMETER :: IDB_zmView5                     =  1328
-          INTEGER, PARAMETER :: IDB_zmDelete5                   =  1369
-          INTEGER, PARAMETER :: IDB_zmEdit5                     =  1311
-          INTEGER, PARAMETER :: IDF_zmFile6                     =  1393
-          INTEGER, PARAMETER :: IDB_zmBrowse6                   =  1358
-          INTEGER, PARAMETER :: IDF_ZM_pars6                    =  1129
-          INTEGER, PARAMETER :: IDB_zmView6                     =  1329
-          INTEGER, PARAMETER :: IDB_zmDelete6                   =  1370
-          INTEGER, PARAMETER :: IDB_zmEdit6                     =  1312
           INTEGER, PARAMETER :: IDF_SDI_File_Name               =  1541
           INTEGER, PARAMETER :: IDD_RR_PO_Dialog                =   196
           INTEGER, PARAMETER :: IDF_STRING2                     =  1543
@@ -659,4 +647,6 @@
           INTEGER, PARAMETER :: IDF_MogulExe                    =  1551
           INTEGER, PARAMETER :: IDBBROWSE2                      =  1552
           INTEGER, PARAMETER :: IDF_MogulText                   =  1553
+          INTEGER, PARAMETER :: IDB_Up                          =  1149
+          INTEGER, PARAMETER :: IDB_Down                        =  1150
       END MODULE Druid_Header

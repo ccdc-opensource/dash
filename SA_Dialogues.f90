@@ -139,7 +139,7 @@
             CASE (IDB_SA_Project_Import)
 ! Import .. convert a mol/pdb/mol2 file into a Z-matrix
               CALL ImportZmatrix('')
-            CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4, IDB_zmDelete5, IDB_zmDelete6)
+            CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
                 DelFrg = 1
                 DO WHILE (IDBZMDelete(DelFrg) .NE. EventInfo%VALUE1)
@@ -150,7 +150,7 @@
                 ENDDO
                 nFrag = nFrag - 1
               ENDIF
-            CASE (IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4, IDB_zmBrowse5, IDB_zmBrowse6)
+            CASE (IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4)
               iFrg = 1
               DO WHILE (IDBZMBrowse(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
@@ -208,14 +208,14 @@
                 GOTO 10
               ENDIF
 ! View individual Z-matrices in e.g. Mercury
-            CASE (IDB_zmView1, IDB_zmView2, IDB_zmView3, IDB_zmView4, IDB_zmView5, IDB_zmView6)
+            CASE (IDB_zmView1, IDB_zmView2, IDB_zmView3, IDB_zmView4)
               iFrg = 1
               DO WHILE (IDBZMView(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
               CALL zmView(iFrg)
 ! Edit individual Z-matrices
-            CASE (IDB_zmEdit1, IDB_zmEdit2, IDB_zmEdit3, IDB_zmEdit4, IDB_zmEdit5, IDB_zmEdit6)
+            CASE (IDB_zmEdit1, IDB_zmEdit2, IDB_zmEdit3, IDB_zmEdit4)
               iFrg = 1
               DO WHILE (IDBzmEdit(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
@@ -1632,7 +1632,7 @@
                     prevx(IFRow) = xtem
                   ENDIF
                 CASE (3) ! upper bound
-! JCC Check the bounding - only update if parameter is set to vary
+! Check the bounding - only update if parameter is set to vary
                   CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
                     CALL WGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
@@ -1789,11 +1789,6 @@
 ! two 'Print' outputs on screen. The possibility of editing the file is probably more useful.
                 CALL SetChildWinAutoClose(IHANDLE)
               ENDIF
-        !F    CASE (IDB_Configuration)
-        !F      CALL PushActiveWindowID
-        !F      CALL WDialogSelect(IDD_Configuration)
-        !F      CALL WDialogShow(-1, -1, 0, Modeless)
-        !F      CALL PopActiveWindowID
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -1936,7 +1931,7 @@
       ix = X(IFRow)
       iRadio = ModalFlag(IFRow)
 
-      END SUBROUTINE
+      END SUBROUTINE ShowBimodalDialog
 !
 !*****************************************************************************
 !
