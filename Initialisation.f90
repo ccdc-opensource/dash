@@ -378,7 +378,7 @@
       KolPanelOuter     = Win_RGB(190,190,190)
       KolRectSelect     = Win_RGB(150,150,5)
       KolLargeCrossHair = Win_RGB(150,150,5)
-      KolPeakFit        = Win_RGB(20,20,240)
+      KolPeakFit        = Win_RGB(0,131,131)
       KolPeakPos        = Win_RGB(50,50,200)
       KolBack           = Win_RGB(164,211,105)
 
