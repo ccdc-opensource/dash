@@ -8,16 +8,16 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'params.inc'
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
       REAL ChiGetLattice
       EXTERNAL ChiGetLattice
 
-      INTEGER     MPAR,        MMPAR
-      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
-      REAL XDD(MPAR),DXDD(MPAR),COVDD(MMPAR)
+      INTEGER     MMPAR
+      PARAMETER ( MMPAR = MVAR * MVAR )
+      REAL XDD(MVAR),DXDD(MVAR),COVDD(MMPAR)
 
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL
@@ -218,9 +218,9 @@
 !
       REAL FUNCTION ChiGetLattice(N,P)
 
-      INTEGER     MPAR
-      PARAMETER ( MPAR = 100 )
-      REAL P(MPAR)
+      INTEGER     MVAR
+      PARAMETER ( MVAR = 100 )
+      REAL P(MVAR)
 
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
       INCLUDE 'lattice.inc'

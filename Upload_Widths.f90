@@ -383,11 +383,11 @@
 
       INTEGER, INTENT (IN   ) :: N
 
-      INTEGER     MPAR,        MMPAR
-      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
-      REAL X(MPAR), DX(MPAR)
-
       INCLUDE 'PARAMS.INC'
+
+      INTEGER     MMPAR
+      PARAMETER ( MMPAR = MVAR * MVAR )
+      REAL X(MVAR), DX(MVAR)
   
       REAL COV(MMPAR)
 
@@ -428,9 +428,9 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER     MPAR,        MMPAR
-      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
-      REAL X(MPAR),DX(MPAR),COV(MMPAR)
+      INTEGER     MMPAR
+      PARAMETER ( MMPAR = MVAR * MVAR )
+      REAL X(MVAR),DX(MVAR),COV(MMPAR)
 
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
@@ -468,9 +468,9 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER     MPAR,        MMPAR
-      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
-      REAL X(MPAR),DX(MPAR),COV(MMPAR)
+      INTEGER     MMPAR
+      PARAMETER ( MMPAR = MVAR * MVAR )
+      REAL X(MVAR),DX(MVAR),COV(MMPAR)
 
       INTEGER IBMBER
       COMMON / CCSLER / IBMBER 
@@ -498,9 +498,9 @@
 !
       FUNCTION Chisq_Sigma(N,P)
 
-      INTEGER     MPAR
-      PARAMETER ( MPAR = 100 )
-      REAL Chisq_Sigma, P(MPAR)
+      INTEGER     MVAR
+      PARAMETER ( MVAR = 100 )
+      REAL Chisq_Sigma, P(MVAR)
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )
@@ -524,9 +524,9 @@
 !
       FUNCTION Chisq_Gamma(N,P)
 
-      INTEGER     MPAR
-      PARAMETER ( MPAR = 100 )
-      REAL Chisq_Gamma, P(MPAR)
+      INTEGER     MVAR
+      PARAMETER ( MVAR = 100 )
+      REAL Chisq_Gamma, P(MVAR)
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )
@@ -550,9 +550,9 @@
 !
       FUNCTION Chisq_Constant(N,P)
 
-      INTEGER     MPAR
-      PARAMETER ( MPAR = 100 )
-      REAL Chisq_Constant, P(MPAR)
+      INTEGER     MVAR
+      PARAMETER ( MVAR = 100 )
+      REAL Chisq_Constant, P(MVAR)
 
       INTEGER     MVAL
       PARAMETER ( MVAL = 50 )

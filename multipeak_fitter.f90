@@ -26,9 +26,9 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
       REAL, EXTERNAL :: MULTIPEAK_CHISQ
-      INTEGER     MPAR,        MMPAR
-      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
-      REAL X(MPAR), DX(MPAR), COV(MMPAR)
+      INTEGER     MMPAR
+      PARAMETER ( MMPAR = MVAR * MVAR )
+      REAL X(MVAR), DX(MVAR), COV(MMPAR)
       INTEGER N, I, II
 
       INTEGER         IBMBER
@@ -60,9 +60,7 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER     MPAR
-      PARAMETER ( MPAR = 100 )
-      REAL V(MPAR), D(MPAR)
+      REAL V(MVAR), D(MVAR)
       PARAMETER (MPT=2000)
       COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
 
@@ -210,9 +208,7 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER     MPAR
-      PARAMETER ( MPAR = 100 )
-      REAL V(MPAR), D(MPAR)
+      REAL V(MVAR), D(MVAR)
       PARAMETER (MPT=2000)
       COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
 
@@ -355,11 +351,9 @@
 
       INTEGER NVAR
 
-      INTEGER     MPAR
-      PARAMETER ( MPAR = 100 )
-      REAL VARVAL(MPAR), VARESD(MPAR)
-
       INCLUDE 'PARAMS.INC'
+
+      REAL VARVAL(MVAR), VARESD(MVAR)
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
