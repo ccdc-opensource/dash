@@ -34,7 +34,7 @@
       IF ((CurrentWizardWindow .EQ. IDD_PW_Page7) .OR.       &
           (CurrentWizardWindow .EQ. IDD_PW_Page8) .OR.       &
           (CurrentWizardWindow .EQ. IDD_PW_Page9)) RETURN
-      CALL SetModeMenuState(-1,1,0)
+      CALL SetModeMenuState(-1,1)
       CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
@@ -62,6 +62,7 @@
         CALL WDialogRangeInteger(IDF_IDF_PawRef_NBack,2,10)
       ENDIF
       PR_BackGround = 0.0
+      CALL WDialogPutReal(IDF_Slim_Parameter,SLIMVALUE)
       CALL WDialogClearField(IDF_Pawley_Cycle_Number)
       CALL WDialogClearField(IDF_Pawley_Refinement_Number)
       IDUMMY = PawleyErrorLog(2) ! Reset the log messages
@@ -541,8 +542,8 @@
       IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
       WRITE(hFile,4260,ERR=999) ZeroPoint
  4260 FORMAT('L ZERO ',F10.5)
-      CALL WDialogGetReal(IDF_Slim_Parameter,SLIMVALUE)
-      WRITE(hFile,4270,ERR=999) SCALFAC, SLIMVALUE
+      CALL WDialogGetReal(IDF_Slim_Parameter,SlimValue)
+      WRITE(hFile,4270,ERR=999) ScalFac, SlimValue
  4270 FORMAT('L SCAL   ',F7.5,/                                         &
       'L SLIM ',F5.2,' '/                                               &
       'L REFK 10.0')
@@ -757,11 +758,13 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      INTEGER LSDI, iDot, I, L1, L4, iDummy
       INTEGER, EXTERNAL :: WRTDSL
+      INTEGER LSDI, iDot, I, L1, L4, iDummy, iFile
+      CHARACTER*(MaxPathLength) DirName, FileName
 
 ! Initialise to error
       CreateSDIFile = 1
+      iFile = 81
       LSDI = LEN_TRIM(SDIFileName)
       IF (LSDI .GT. MaxPathLength) THEN
         CALL DebugErrorMessage('SDIFileName too long in CreateSDIFile')
@@ -820,30 +823,31 @@
         CALL ErrorMessage('Error while writing .hkl file.')
         RETURN
       ENDIF
-      OPEN(81,file=SDIFileName(1:LSDI),status='unknown',ERR=999)
-      WRITE(81,8110,ERR=999) DashTicFile(1:LEN_TRIM(DashTicFile))
- 8110 FORMAT(' TIC ',A)
-      WRITE(81,8120,ERR=999) DashHcvFile(1:LEN_TRIM(DashHcvFile))
- 8120 FORMAT(' HCV ',A)
-      WRITE(81,8121,ERR=999) DashHklFile(1:LEN_TRIM(DashHklFile))
- 8121 FORMAT(' HKL ',A)
-      WRITE(81,8130,ERR=999) DashPikFile(1:LEN_TRIM(DashPikFile))
- 8130 FORMAT(' PIK ',A)
-      WRITE(81,8136,ERR=999) DashRawFile(1:LEN_TRIM(DashRawFile))
- 8136 FORMAT(' RAW ',A)
-      WRITE(81,8135,ERR=999) DashDslFile(1:LEN_TRIM(DashDslFile))
- 8135 FORMAT(' DSL ',A)
+      OPEN(iFile,file=SDIFileName(1:LSDI),status='unknown',ERR=999)
+! Write all file names with relative paths
+      CALL SplitPath(DashTicFile, DirName, FileName)
+      WRITE(iFile,'(A)',ERR=999) " TIC ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
+      CALL SplitPath(DashHcvFile, DirName, FileName)
+      WRITE(iFile,'(A)',ERR=999) " HCV ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
+      CALL SplitPath(DashHklFile, DirName, FileName)
+      WRITE(iFile,'(A)',ERR=999) " HKL ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
+      CALL SplitPath(DashPikFile, DirName, FileName)
+      WRITE(iFile,'(A)',ERR=999) " PIK ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
+      CALL SplitPath(DashRawFile, DirName, FileName)
+      WRITE(iFile,'(A)',ERR=999) " RAW ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
+      CALL SplitPath(DashDslFile, DirName, FileName)
+      WRITE(iFile,'(A)',ERR=999) " DSL ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
       WRITE(81,8140,ERR=999) (CellPar(I),I=1,6)
  8140 FORMAT(' Cell ',3F10.5,3F10.4)
       WRITE(81,8150,ERR=999) NumberSGTable,SGNumStr(NumberSGTable),SGHMaStr(NumberSGTable)
  8150 FORMAT(' SpaceGroup ',I4,4X,A12,A12)
       WRITE(81,8160,ERR=999) PAWLEYCHISQ
  8160 FORMAT(' PawleyChiSq ',F10.2)
-      CLOSE(81)
+      CLOSE(iFile)
       CreateSDIFile = 0
       RETURN
   999 CALL ErrorMessage('Error writing .sdi file.')
-      CLOSE(81)
+      CLOSE(iFile)
 
       END FUNCTION CreateSDIFile
 !
@@ -905,9 +909,9 @@
       WRITE(iFile,*,ERR=999)'! Calculated zero point'
       WRITE(iFile,110,ERR=999) 'zer',ZeroPoint
       WRITE(iFile,*,ERR=999)'! Pawley-fit SLIM parameter setting'
-      WRITE(iFile,110,ERR=999) 'sli',SLIMVALUE
+      WRITE(iFile,110,ERR=999) 'sli',SlimValue
       WRITE(iFile,*,ERR=999)'! Pawley-fit Scale factor setting'
-      WRITE(iFile,110,ERR=999) 'sca',SCALFAC
+      WRITE(iFile,110,ERR=999) 'sca',ScalFac
   100 FORMAT(A3,1X,4(F10.4,1X))
   110 FORMAT(A3,1X,F10.4)
       CLOSE(iFile)
