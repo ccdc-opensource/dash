@@ -87,7 +87,8 @@
 ! These global variables hold the last event reported by Winteracter
 
       LOGICAL NoData
-! .TRUE. when a powder diffraction pattern has been read in
+      DATA NoData / .TRUE. /
+! .FALSE. when a powder diffraction pattern has been read in
 
       INTEGER OriginalNOBS ! Original number of data points read in for the raw powder pattern
       INTEGER EndNOBS

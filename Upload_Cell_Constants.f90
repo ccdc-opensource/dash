@@ -30,11 +30,14 @@
       DATA KELPT /2,3,4,5,6,7, 2,3,4,5,10,10, 2,3,4,10,5,10, 2,3,4,10,10,5, &
       2,3,4,10,10,10, 2,2,3,10,10,10, 2,2,3,9,10,10, &
       2,2,2,3,3,3, 2,2,3,9,10,10, 2,2,2,10,10,10/ 
-      LOGICAL FnWaveLengthOK ! Function
+      LOGICAL FnWaveLengthOK, FnUnitCellOK ! Function
 
 !>> JCC Check the wavelength: if the user has not set it, then
 !>> we should not be here!
       IF (.NOT. FnWaveLengthOK()) RETURN
+!>> JvdS Check the unit cell parameters: if the user has not set them, then
+!>> we should not be here!
+      IF (.NOT. FnUnitCellOK()) RETURN
       NVal = 0
       DO I = 1, NTPeak
         IOrd = IOrdTem(I)
