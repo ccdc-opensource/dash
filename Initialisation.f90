@@ -447,6 +447,9 @@
       KolPeakFit        = Win_RGB(20,20,240)
       KolPeakPos        = Win_RGB(50,50,200)
       KolBack           = Win_RGB(164,211,105)
+
+      CALL ReadConfigurationFile
+
       CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
                                         KolPGWindow%IGreen,&
                                         KolPGWindow%IBlue)
@@ -498,7 +501,6 @@
       CALL IGrPaletteRGB(KolNumBack,   KolBack%IRed,&
                                        KolBack%IGreen,&
                                        KolBack%IBlue)
-      CALL ReadConfigurationFile
 
       END SUBROUTINE InitialiseVariables
 !
@@ -518,22 +520,28 @@
       INCLUDE 'lattice.inc'
       INCLUDE 'Poly_Colours.inc'
 
+      INTEGER     BFIOErrorCode
+      COMMON /IO/ BFIOErrorCode
+
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
       INTEGER    RecNr
       INTEGER    ISEED
       INTEGER    tFileHandle
       LOGICAL, EXTERNAL :: AutoLocalMinimisation, SaveCSSR, SaveCCL, &
-                           ColourFlexibleTorsions, ConnectPointsObs
+                           ColourFlexibleTorsions, ConnectPointsObs, &
+                           PlotErrorBars, PlotBackground,            &
+                           PlotPeakFitDifferenceProfile
       REAL, EXTERNAL :: WavelengthOf
 
       tFileName = 'D3.cfg'
       tFileHandle = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=tFileHandle,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=tFileHandle,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Write a header
       CALL FileWriteString(tFileHandle,RecNr,'DASH configuration file')
+      UseConfigFile = .TRUE.
       CALL FileWriteLogical(tFileHandle,RecNr,UseConfigFile)
       IF (.NOT. UseConfigFile) GOTO 999
 ! Save all colour definitions
@@ -605,6 +613,14 @@
       CALL FileWriteInteger(tFileHandle,RecNr,KolBack%IRed)
       CALL FileWriteInteger(tFileHandle,RecNr,KolBack%IGreen)
       CALL FileWriteInteger(tFileHandle,RecNr,KolBack%IBlue)
+! Show error bars YES / NO
+      CALL FileWriteLogical(tFileHandle,RecNr,PlotErrorBars())
+! Show background YES / NO
+      CALL FileWriteLogical(tFileHandle,RecNr,PlotBackground())
+! Connect data points with lines YES / NO
+      CALL FileWriteLogical(tFileHandle,RecNr,ConnectPointsObs())
+! Plot peak fit difference YES / NO
+      CALL FileWriteLogical(tFileHandle,RecNr,PlotPeakFitDifferenceProfile())
 ! Save the default working directory
       DefaultWorkingDir = 'D:\cvsDASH\dash\Debug'
       CALL FileWriteString(tFileHandle,RecNr,DefaultWorkingDir)
@@ -624,24 +640,22 @@
 ! and the viewer arguments
       CALL WDialogGetString(IDF_ViewArg,ViewArg)
       CALL FileWriteString(tFileHandle,RecNr,ViewArg)
+! Save use hydrogens YES / NO
+
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileWriteLogical(tFileHandle,RecNr,ColourFlexibleTorsions())
-! Connect data points with lines YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,ConnectPointsObs())
+! Save YES / NO which molecular file formats are to be written out when a best solution is found
+      CALL FileWriteLogical(tFileHandle,RecNr,SavePDB)    ! 1. .pdb  ?
+      CALL FileWriteLogical(tFileHandle,RecNr,SaveCSSR()) ! 2. .cssr ?
+      CALL FileWriteLogical(tFileHandle,RecNr,SaveCCL())  ! 3. .ccl  ?
+! Auto local minimisation at the end of every run in multirun YES / NO
+      CALL FileWriteLogical(tFileHandle,RecNr,AutoLocalMinimisation())
 ! Save the seeds for the random number generator
       CALL WDialogSelect(IDD_SA_input3)
       CALL WDialogGetInteger(IDF_SA_RandomSeed1,ISEED)
       CALL FileWriteInteger(tFileHandle,RecNr,ISEED)
       CALL WDialogGetInteger(IDF_SA_RandomSeed2,ISEED)
       CALL FileWriteInteger(tFileHandle,RecNr,ISEED)
-! Save use hydrogens YES / NO
-
-! Auto local minimisation at the end of every run in multirun YES / NO
-      CALL FileWriteLogical(tFileHandle,RecNr,AutoLocalMinimisation())
-! Save YES / NO which molecular file formats are to be written out when a best solution is found
-      CALL FileWriteLogical(tFileHandle,RecNr,SavePDB)    ! 1. .pdb  ?
-      CALL FileWriteLogical(tFileHandle,RecNr,SaveCSSR()) ! 2. .cssr ?
-      CALL FileWriteLogical(tFileHandle,RecNr,SaveCCL())  ! 3. .ccl  ?
 
 
 
@@ -665,10 +679,12 @@
       INCLUDE 'lattice.inc'
       INCLUDE 'Poly_Colours.inc'
 
+      INTEGER     BFIOErrorCode
+      COMMON /IO/ BFIOErrorCode
+
       CHARACTER*MaxPathLength tFileName
       INTEGER    RecNr
       INTEGER    tFileHandle
-      LOGICAL, EXTERNAL :: AutoLocalMinimisation, SaveCSSR, SaveCCL
       REAL, EXTERNAL :: WavelengthOf
       CHARACTER*MaxPathLength tString
       INTEGER*4 tInteger
@@ -679,7 +695,7 @@
       tFileName = 'D3.cfg'
       tFileHandle = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=tFileHandle,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=tFileHandle,FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Read the header
       CALL FileReadString(tFileHandle,RecNr,tString)
@@ -754,6 +770,19 @@
       CALL FileReadInteger(tFileHandle,RecNr,KolBack%IRed)
       CALL FileReadInteger(tFileHandle,RecNr,KolBack%IGreen)
       CALL FileReadInteger(tFileHandle,RecNr,KolBack%IBlue)
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+! Show error bars YES / NO
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_ErrorBar_Check,tLogical)
+! Show background YES / NO
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_background_check,tLogical)
+! Connect data points with lines YES / NO
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_ConnectObsPoints,tLogical)
+! Plot peak fit difference YES / NO
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_PlotPeakFitDif,tLogical)
 ! Read the default working directory
       CALL FileReadString(tFileHandle,RecNr,tString)
 ! Read defaults for background subtraction
@@ -782,30 +811,26 @@
 ! and the viewer arguments
       CALL FileReadString(tFileHandle,RecNr,ViewArg)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
+! Save use hydrogens YES / NO
+
 ! Colour flexible torsions (in z-matrix viewer) YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors,tLogical)
-! Connect data points with lines YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_ConnectObsPoints,tLogical)
-! Read the seeds for the random number generator
-      CALL WDialogSelect(IDD_SA_input3)
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed1,tInteger)
-      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed2,tInteger)
-! Save use hydrogens YES / NO
-
-      CALL WDialogSelect(IDD_Configuration)
-! Auto local minimisation at the end of every run in multirun YES / NO
-      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,tLogical)
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
       CALL FileReadLogical(tFileHandle,RecNr,SavePDB)    ! 1. .pdb  ?
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 2. .cssr ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,tLogical)
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)   ! 3. .ccl  ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,tLogical)
+! Auto local minimisation at the end of every run in multirun YES / NO
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,tLogical)
+! Read the seeds for the random number generator
+      CALL WDialogSelect(IDD_SA_input3)
+      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL WDialogPutInteger(IDF_SA_RandomSeed1,tInteger)
+      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL WDialogPutInteger(IDF_SA_RandomSeed2,tInteger)
 
 
 
