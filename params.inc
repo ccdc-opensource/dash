@@ -27,10 +27,6 @@
       PARAMETER ( MAX_NPFR = 50, MAX_NPPR = 10, MAX_FITPT = 10000, MPkDes = 6 )
 ! For common block PEAKFIT2
 
-      INTEGER     MIPK
-      PARAMETER ( MIPK = 500 )
-! For use in common block IPKCMN
-
       INTEGER     ITMREF
       PARAMETER ( ITMREF = 10000 )
 ! For use in common block SCRAT 
@@ -59,7 +55,7 @@
 ! Note the difference with MaxRuns: that's the number of runs requested by the user.
 
       INTEGER     MaxBVar
-      PARAMETER ( MaxBVar = 400 )
+      PARAMETER ( MaxBVar = 650 )
 ! Maximum number of basic variables. Not quite sure what a basic variable is,
 ! but it has to do the number of parameters that can be refined during the Pawley
 ! refinement, so this is the number that limits the number of reflections used 
@@ -89,6 +85,10 @@
       INTEGER     MVAR
       PARAMETER ( MVAR = 100 )
 ! Maximum number of 'parameters' / 'variables' (= degrees of freedom) in the SA
+
+      INTEGER     MIPK
+      PARAMETER ( MIPK = MaxBVar )
+! For use in common block IPKCMN
 
       INTEGER     MaxAtm_4
       PARAMETER	( MaxAtm_4 = 150)
