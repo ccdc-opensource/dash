@@ -37,8 +37,17 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
+      INTEGER                 ModalFlag
+      COMMON / ModalTorsions/ ModalFlag(mvar)
+      SAVE   /ModalTorsions/
+
+      REAL, DIMENSION (3,2) :: TempBounds
+      COMMON /TriModalBounds/  TempBounds
+
+      DOUBLE PRECISION RULB
+      COMMON /RULB/ RULB(Mvar)
+
       DOUBLE PRECISION RFIX
-      DOUBLE PRECISION RULB(mvar)
       DOUBLE PRECISION RANARR(30000), RANAR1(30000)
       DOUBLE PRECISION DXVAV(mvar), XVSIG(mvar), FLAV(mvar)
       DOUBLE PRECISION X0SUM(mvar), XSUM(mvar), XXSUM(mvar)
@@ -113,6 +122,16 @@
       LOGICAL PrevRejected, CurrIsPO, PrevWasPO
       DOUBLE PRECISION tX147
 
+      LOGICAL OneEightyScale
+      LOGICAL OutOfBounds
+      REAL xtem, tempupper, templower, tempupper2, templower2
+      INTEGER Upper, Lower
+      CHARACTER(MaxPathLength) :: CurrentDirectory
+
+      CALL IosDirName(CurrentDirectory)
+      Upper = 1
+      Lower = 2
+
 !O      NumOfRef = 10
       CALL OpenChiSqPlotWindow
       Curr_SA_Run = 0
@@ -170,6 +189,7 @@
 ! ####################################
     1 CONTINUE ! The start point for multiple runs.
 !O      kk = 0
+
 ! Set initial values.
       iMyExit = 0
       Curr_SA_Run = Curr_SA_Run + 1
@@ -197,6 +217,7 @@
       CALL RMARInit(ISEED1+Curr_SA_Run,ISEED2+Curr_SA_Run)
 ! Initialise all degrees of freedom either to a preset value or to
 ! a random value
+      CALL FillRULB(nvar)
       CALL MAKXIN(nvar)
       DO IV = 1, nvar
         C(IV) = 2.0
@@ -210,7 +231,6 @@
         XOPT(I) = X(I)
         NACP(I) = 0
         NumTrialsPar(I) = 0
-        RULB(I) = UB(I) - LB(I)
         IF (RULB(I).GT.RFIX) THEN
 ! NPAR is the number of parameters that are allowed to vary (i.e., not fixed)
 ! so in a way, NPAR is the number of parameters that are parameters.
@@ -235,6 +255,7 @@
       FOPT = F
       MRAN  = ISEED1 + Curr_SA_Run
       MRAN1 = ISEED2 + Curr_SA_Run
+
 ! ##########################################
 !   Starting point for multiple iterations
 ! ##########################################
@@ -280,6 +301,30 @@
             DX = RANAR1(IAR1) * VM(H)
             IAR1 = IAR1 + 1
             XP(H) = X(H) + DX
+!! If Modal ranges defined for torsions use random number to
+!  select from which range the value of XP will be derived.
+            IF (ModalFlag(H) .EQ. 2) THEN !Bimodal
+              IF (RANARR(IARR) .GT. 0.5) THEN
+                XP(H) = (-1) * XP(H)
+                IARR = IARR + 1
+              ENDIF
+            ELSEIF (ModalFlag(H) .EQ. 3) THEN !Trimodal
+              xtem = XP(H)
+              CALL OneEightyToThreeSixty(xtem)
+              IF ((RANARR(IARR) .GE. 0.33) .AND. (RANARR(IARR).LT. 0.66)) THEN
+                xtem = xtem + 120.00
+              ELSEIF ((RANARR(IARR) .GE. 0.66) .AND. (RANARR(IARR).LT. 1.00)) THEN
+                xtem = xtem + 240.00
+              ENDIF
+
+              IF (Xtem .GE. 360.00) THEN
+                Xtem = xtem - 360.00
+              END IF
+              CALL ThreeSixtyToOneEighty(xtem)
+              XP(H) = xtem
+              IARR = IARR + 1
+            ENDIF
+
 !O! If translation, adjust to be between 0.0 and 1.0
 !O            IF (kzmpar2(H) .EQ. 1) THEN
 !O              DO WHILE (XP(H) .LT. 0.0)
@@ -298,11 +343,121 @@
 !O                XP(H) = XP(H) - 360.0
 !O              ENDDO
 !O            ENDIF
+
 ! If XP is out of bounds, select a point in bounds for the trial.
-            IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
-              XP(H) = LB(H) + RULB(H) * RANARR(IARR)
-              IARR = IARR + 1
-            ENDIF
+            OutOfBounds = .FALSE.
+            SELECT  CASE(ModalFlag(H))
+              CASE (1) ! used for all parameters except modal torsion angles 
+                IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
+                  XP(H) = LB(H) + RULB(H) * RANARR(IARR)
+                  IARR = IARR + 1
+                ENDIF   
+              CASE (2) ! bimodal ranges
+                IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
+                  TempUpper = SNGL(UB(H))         ! so use 0-360 degree scale
+                  TempLower = SNGL(LB(H))
+                  TempLower2 = TempUpper - 180.00
+                  TempUpper2 = TempLower + 180.00
+                  CALL OneEightyToThreeSixty(TempUpper)
+                  CALL OneEightyToThreeSixty(TempLower)
+                  CALL OneEightyToThreeSixty(TempUpper2)
+                  CALL OneEightyToThreeSixty(TempLower2)
+                  xtem = XP(H)                                                                                      
+                  IF ((xtem .LT. -180.00) .OR. (xtem .GT. 180.00)) THEN
+                    OutOfBounds = .TRUE.
+                  ELSE
+                  CALL OneEightytoThreeSixty(xtem)
+                    IF (((xtem .LT. MAX(TempLower, TempLower2)) .AND. (xtem .GT. MIN(TempLower, TempLower2))) &
+                   .OR. ((xtem .LT. MAX(TempUpper, TempUpper2)) .AND. (xtem .GT. MIN(TempUpper, TempUpper2)))) THEN
+                      OutOfBounds = .TRUE.                                       
+                    ENDIF
+                  ENDIF
+                  IF (OutOfBounds) THEN !calculate new value in one of the two allowed ranges
+                    IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
+                      xtem = MAX(TempUpper, TempUpper2) + (RULB(H) * RANARR(IARR))
+                    ELSE
+                      xtem = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
+                    ENDIF
+                    IF (xtem .gt. 360.00) THEN
+                      xtem = xtem - 360.00
+                    ENDIF
+                    CALL ThreeSixtyToOneEighty(xtem)
+                    XP(H) = xtem
+                    IARR = IARR + 1 
+                  ENDIF
+                ELSEIF (UB(H) * LB(H) .GT. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
+                  IF ((XP(H) .LT. -180.00) .OR. (XP(H) .GT. 180.00)) THEN
+                    OutOfBounds = .TRUE.     
+                  ELSE
+                    IF ((XP(H) .LT. LB(H)) .OR. (XP(H) .GT. UB(H))) THEN
+                      IF (((XP(H) .LT. (-1)*UB(H)) .OR. (XP(H) .GT. (-1)*LB(H)))) THEN !out of bounds            
+                        OutOfBounds = .TRUE.
+                      ENDIF
+                    ENDIF
+                  ENDIF
+                  IF (OutOfBounds) THEN !calculate new value in one of the two defined ranges
+                    IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
+                      XP(H) = LB(H) + RULB(H) * RANARR(IARR)
+                      IARR = IARR + 1
+                    ELSE 
+                      XP(H) = (-1)*LB(H) - RULB(H) * RANARR(IARR)
+                      IARR = IARR + 1
+                    ENDIF 
+                  ENDIF
+                ENDIF
+
+              CASE(3) !trimodal ranges
+                xtem = XP(H)
+                CALL DetermineTriModalBounds(SNGL(UB(H)), Upper)
+                CALL DetermineTriModalBounds(SNGL(LB(H)), Lower)
+                IF ((xtem .LT. -180.00) .OR. (xtem .GT.180.00)) THEN
+                  OutOfBounds = .TRUE.
+                ELSE                 
+                  CALL CheckTriModalBounds(OneEightyScale)
+
+                  IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
+                    CALL OneEightytoThreeSixty(xtem)    ! so use 0-360 scale
+                    DO I = 1,3
+                     CALL OneEightyToThreeSixty(TempBounds(I,Upper))
+                     CALL OneEightyToThreeSixty(TempBounds(I,Lower))
+                    ENDDO
+                  ENDIF
+
+!             Determine if XP is in any of the three torsion angle ranges              
+                  TempUpper = Tempbounds(1,Upper)!!UB(H)
+                  TempLower = Tempbounds(1,Lower)!!LB(H)
+                  IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN
+                    TempUpper = TempBounds(2,Upper)
+                    TempLower = TempBounds(2,Lower)
+                    IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN
+                      TempUpper = TempBounds(3,Upper)
+                      TempLower = TempBounds(3,Lower)
+                      IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN        
+                        OutOfBounds = .TRUE.
+                      ENDIF
+                    ENDIF
+                  ENDIF
+                ENDIF
+                IF (OutOfBounds) THEN ! calculate new value in one of three allowed ranges
+                  xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
+                  IARR = IARR + 1
+                  IF ((RANARR(IARR) .GT. 0.33) .AND. (RANARR(IARR) .LE. 0.66)) THEN
+                    xtem = xtem - 120.00
+                    IARR = IARR + 1
+                  ELSEIF ((RANARR(IARR) .GT. 0.66) .AND. (RANARR(IARR) .LE. 1.00)) THEN
+                    xtem = xtem -240.00
+                    IARR = IARR + 1
+                    IF (xtem .LT. -180.00) THEN
+                      xtem = 360.00 + xtem
+                    ENDIF
+                  ENDIF
+                ENDIF
+                IF (OneEightyScale .EQ. .FALSE.) THEN ! Put XP back into OneEighty scale
+                  CALL ThreeSixtyToOneEighty(xtem)
+                ENDIF
+                XP(H) = xtem
+            END SELECT
+
             CurrIsPO = (kzmpar2(H) .EQ. 7)
             IF (PrefParExists) THEN
 ! Evaluate the function with the trial point XP and return as FP.
@@ -421,6 +576,7 @@
           ENDIF
         ENDDO
         IF (iMyExit .NE. 0) GOTO 999 ! Exit all loops and jump straight to the end
+
       ENDDO ! Loop over moves per iteration (NT)
       Last_NDOWN = NDOWN
       Last_NUP   = NUP
@@ -692,12 +848,15 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+   
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: N
+      INCLUDE 'PARAMS.INC' 
 
-      INCLUDE 'PARAMS.INC'
+      INTEGER, INTENT (IN   ) :: N
+      DOUBLE PRECISION RULB
+      COMMON /RULB/ RULB(Mvar)
 
       DOUBLE PRECISION x,       lb,       ub,       vm
       COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
@@ -709,14 +868,16 @@
 
 ! Get the "IDF_RandomInitVal" checkbox
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input2)
+!O      CALL WDialogSelect(IDD_SA_input2)
+      CALL WDialogSelect(IDD_SA_Modal_input2)
       IF (WDialogGetCheckBoxLogical(IDF_RandomInitVal)) THEN
         DO IV = 1, N
-          X(IV) = LB(IV) + (UB(IV)-LB(IV))*RANMAR()
+!ELNA          X(IV) = LB(IV) + (UB(IV)-LB(IV))*RANMAR()
+          X(IV) = LB(IV) + RULB(IV)*RANMAR()
         ENDDO
       ELSE
         DO IV = 1, N
-          CALL WGridGetCellReal(IDF_parameter_grid,1,IV,tReal)
+          CALL WGridGetCellReal(IDF_parameter_grid_modal,1,IV,tReal)
           X(IV) = DBLE(tReal)
         ENDDO
       ENDIF
@@ -744,6 +905,62 @@
       CheckTerm = ((Nmoves.GT.MaxMoves) .OR. (BestProChiSq.LT.(ChiMult*PAWLEYCHISQ)))
 
       END FUNCTION CheckTerm
+!
+!*****************************************************************************
+!
+      SUBROUTINE FillRULB(nvar)
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER, INTENT (INOUT) :: nvar
+
+      DOUBLE PRECISION RULB
+      COMMON /RULB/ RULB(mvar)  
+
+      DOUBLE PRECISION x,       lb,       ub,       vm
+      COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
+
+      INTEGER                 ModalFlag
+      COMMON / ModalTorsions/ ModalFlag(mvar)
+      SAVE   / ModalTorsions/
+
+      REAL TempUpper, TempLower
+      INTEGER I
+      LOGICAL ONeEightyScale
+
+
+      DO I = 1,nvar
+        RULB(I) = UB(I) - LB(I)
+          IF (ModalFlag(I) .EQ. 2) THEN
+            CALL CheckBiModalBounds(I, OneEightyScale)
+            IF (OneEightyScale .EQ. .FALSE.) THEN
+              tempUpper = SNGL(UB(I))
+              tempLower = SNGL(LB(I))
+              CALL OneEightyToThreeSixty(tempUpper)
+              CALL OneEightyToThreeSixty(tempLower)
+              RULB(I) = ABS(tempUpper - tempLower)
+            ENDIF
+           ENDIF
+           IF (ModalFlag(I) .EQ. 3) THEN
+            tempUpper = SNGL(UB(I))
+            CALL DetermineTriModalBounds(tempUpper, 1)
+            tempLower = SNGL(LB(I))
+            CALL DetermineTriModalBounds(tempLower, 2)
+              
+            CALL CheckTriModalBounds(OneEightyScale)
+
+            IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
+              tempUpper = SNGL(UB(I))
+              tempLower = SNGL(LB(I))
+              CALL OneEightyToThreeSixty(TempUpper)
+              CALL OneEightyToThreeSixty(TempLower)
+              RULB(I) = ABS(TempUpper - TempLower)
+            ENDIF
+           ENDIF
+        ENDDO
+      END SUBROUTINE FillRULB
 !
 !*****************************************************************************
 !

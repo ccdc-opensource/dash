@@ -376,7 +376,10 @@
         CASE (IDD_SAW_Page2)
           CALL DealWithWizardWindowAdditionalSAParams
           GOTO 10
-        CASE (IDD_SA_input2)
+!O        CASE (IDD_SA_input2)
+!O          CALL DealWithWizardWindowParameterBounds
+!O          GOTO 10
+        CASE (IDD_SA_Modal_input2)
           CALL DealWithWizardWindowParameterBounds
           GOTO 10
         CASE (IDD_SA_input3)

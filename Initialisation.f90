@@ -99,7 +99,9 @@
       CALL WDialogLoad(IDD_zmEdit)
       CALL WDialogLoad(IDD_zmEditRotations)
       CALL WDialogLoad(IDD_SAW_Page2)
-      CALL WDialogLoad(IDD_SA_input2)
+!O      CALL WDialogLoad(IDD_SA_input2)
+      CALL WDialogLoad(IDD_SA_Modal_input2)
+      CALL WDialogLoad(IDD_ModalDialog)
       CALL WDialogLoad(IDD_SA_input3)
       CALL WDialogLoad(IDD_SA_Action1)
       CALL WDialogLoad(IDD_Summary)
@@ -266,6 +268,14 @@
 
       LOGICAL            ShowAgain
       COMMON  / DBGMSG / ShowAgain
+
+!Elna
+      INTEGER                 ModalFlag
+      COMMON / ModalTorsions/ ModalFlag(100)
+
+      DO I = 1,MVar
+        ModalFlag = 1
+      ENDDO
 
 ! The initialisations should be split up into 'one off initialisations' (at the start up
 ! of DASH only) and 'whenever a new project file is opened'
