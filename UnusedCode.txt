@@ -1,6 +1,292 @@
 !
 !*****************************************************************************
 !
+! Originally in Pf.f90
+      SUBROUTINE PFTF12(N)
+!
+! *** PFTF12 by JBF March 94 ***
+!
+!H Multiple entry Time of Flight Peak Function (type 12) routine with FFT
+!H and Voigt double exponential peak function
+!A On entry N=0,1,2,5,6 or 7:
+!A On entry N=0 sets up DATA SOURCE TOF, PEAK TYPE 12
+!A Entry N=1 adds packed vocabulary for this source and phase to the main list
+!A and reads and interprets the L PKFN cards.  These cards have a second word:
+!A     SWCH
+!A     TAUF
+!A     TAUS
+!A     SIGM    For nuclear peaks
+!A     GAMM    For nuclear peaks
+!A     MSIG    SIGM for magnetic peaks
+!A     MGAM    GAMM for magnetic peaks
+!A followed by the width parameters involved in this particular peak
+!A descriptor.
+!A
+!A COMMON/REFLNS/ISMAG=0 are for nuclear peaks (SIGM); entries with ISMAG =1
+!A are for magnetic peaks and use SMIG parameters for SIGM. EXTEND VALUES OF
+!A THIS SEMAPHORE AT A LATER DATE!
+!A
+!A Entry N=2 forms the normalised peak function, and puts it in YNORM.  It also
+!A gives all necessary derivatives of YNORM with respect to anything that could
+!A be a parameter.
+!A
+!A Entry N=5 sets LOGICAL REFUSE to say whether or not reflection to be used,
+!A i.e. whether this reflection is near enough to this intensity to contribute
+!A to it.
+!A
+!A Entry N=6: CAILS entry to determine whether near reflections should be
+!A related by a strict or slack relationship.
+!A
+!A Entry N=7: SAPS entry to obey FDXXXX to set up a value(s) for PKFNVA
+!
+!
+      INCLUDE 'PARAMS.INC'
+      LOGICAL TESTOV
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
+     &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
+      COMMON /FFCONS/ C1D45, C20D45, C64D45, C1D3, C4D3
+      COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
+     &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
+     &                WTSLAK(1000), WEELEV, KOM16
+      LOGICAL STRKT
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
+     &                SCALEP(9), KSCALP(9), PHMAG(9)
+      LOGICAL PHMAG
+      COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
+     &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
+     &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
+      DIMENSION NGENS(6), NSPC(6)
+      EQUIVALENCE (NGENS(1),NGENPS(1,1))
+      EQUIVALENCE (NSPC(1),NSPCPS(1,1))
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
+     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
+     &                ARGSTP(5), PCON
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
+     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
+     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
+     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
+     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
+!
+      LOGICAL REFUSE, CYC1, NOPKRF
+      COMMON /PRSAVF/ PKLIST(256,9,200), XPKDEL(200), PKADD(256,9),     &
+     &                ARGNOT(50), PKNOT(64,9,50), XPDKNT(50)
+      COMMON /PWORDS/ PWD(10,9,5)
+      CHARACTER*4 PWD
+      INCLUDE 'REFLNS.INC'
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
+     &                NPCSOU(9,5)
+      COMMON /SCRAT / C3FN(3), C3DN(3)
+!
+      PARAMETER (NW=7)
+      CHARACTER*4 WDTF12(NW)
+      DIMENSION IWTF12(3,NW)
+      DATA WDTF12/'SWCH', 'TAUF', 'TAUS', 'SIGM', 'GAMM', 'MSIG',       &
+     &     'MGAM'/
+      DATA IWTF12/3, 3, 0, 3, 4, 0, 3, 5, 0, 3, 6, 0, 3, 7, 0, 3, 8, 0, &
+     &     3, 9, 0/
+!
+      GOTO (10,1,2,100,100,5,6,7), N + 1
+!
+! N=0: SET UP "DATA SOURCE TOF, PEAK TYPE 12 NUCLEAR & MAGNETIC"
+   10 NPKGEN(JPHASE,JSOURC) = 7
+      NGEN4(JPHASE,JSOURC) = 3
+      LF3SP(3,JPHASE,JSOURC) = -2
+      LF3SP(4,JPHASE,JSOURC) = -2
+      LF3SP(5,JPHASE,JSOURC) = -2
+      LF3SP(6,JPHASE,JSOURC) = -3
+      LF3SP(7,JPHASE,JSOURC) = -3
+      LF3SP(8,JPHASE,JSOURC) = -3
+      LF3SP(9,JPHASE,JSOURC) = -3
+      LF6SP(1,JSOURC) = 1
+      DO I = 1, NPKGEN(JPHASE,JSOURC)
+        PWD(I,JPHASE,JSOURC) = WDTF12(I)
+      ENDDO
+      C1D45 = 1./45.
+      C20D45 = 20./45.
+      C64D45 = 64./45.
+      C1D3 = 1./3.
+      C4D3 = 4./3.
+      GOTO 100
+!
+! N=1: ADD PACKED VOCABULARY FOR THIS SOURCE, THIS PHASE, TO THE MAIN LIST:
+    1 CALL VOCAB(WDTF12,IWTF12,NW)
+      GOTO 100
+!
+! PROFILE REFINEMENT STAGE:
+    2 CALL FDTF12(2)
+!.. FIRSTLY DECIDE WHETHER THE KTH PEAK IS ALREADY STORED IN THE
+!.. ARRAY PKLIST. AT THIS POINT REFUSE = (K .EQ. KPOINT(KMOD))
+!.. DETERMINED IN SUBROUTINE CALTF1 WHICH CALLS THIS ENTRY (IOPT=2)
+      IF (REFUSE) GOTO 26
+!
+!.. THE PEAK HAS NOT OCCURRED ALREADY - CALCULATE THE COMPLETE PEAK
+!.. SHAPE OF THE KTH PEAK BY FFT.
+!
+!.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
+!
+!.. FIRST DETERMINE FFT LIMITS FOR PEAK SHAPE
+      MN = 64
+      MN2 = MN/2
+! THIS WILL BE MADE MORE GENERAL IN FUTURE - AT MOMENT WILL DEAL WITH HELI
+! STRUCTURES
+      IF (ISMAG(KNOW).EQ.0) THEN
+        TEMSQ = (TOLER(4,JPHASE,JSOURC)*PKFNVA(4))**2
+        CAULIM = TOLER(5,JPHASE,JSOURC)*PKFNVA(5)
+      ELSE
+        TEMSQ = (TOLER(6,JPHASE,JSOURC)*PKFNVA(6))**2
+        CAULIM = TOLER(7,JPHASE,JSOURC)*PKFNVA(7)
+      ENDIF
+      AVTAU = TOLER(2,JPHASE,JSOURC)*PKFNVA(2) + PKFNVA(1)              &
+     &        *TOLER(3,JPHASE,JSOURC)*PKFNVA(3)
+      TEMSQ = TEMSQ + AVTAU*AVTAU
+      XPKDEL(KMOD) = (SQRT(TEMSQ)+CAULIM)/FLOAT(MN2)
+!
+!.. NOW SET UP FAST FOURIER TRANSFORM
+!.. THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
+!.. DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
+!
+!*      IEAGLE=NFFT
+!*      IF (IEAGLE .EQ. 0) IEAGLE=NINT(TOLER(1,JPHASE,JSOURC))
+      IEAGLE = NINT(TOLER(1,JPHASE,JSOURC))
+      IF (IEAGLE.EQ.3) THEN
+        MNS = MN
+        CALL FTSB12(MNS)
+        II = MNS/2 - MN2
+        DO I = 1, MN
+          II = II + 1
+          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
+            PKLIST(I,J,KMOD) = (C1D45)*PKADD(II,J)
+          ENDDO
+        ENDDO
+        MNS = 2*MN
+        CALL FTSB12(MNS)
+        II = MNS/2 - MN2
+        DO I = 1, MN
+          II = II + 1
+          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
+            PKLIST(I,J,KMOD) = PKLIST(I,J,KMOD) - (C20D45)*PKADD(II,J)
+          ENDDO
+        ENDDO
+        MNS = 4*MN
+        CALL FTSB12(MNS)
+        II = MNS/2 - MN2
+        DO I = 1, MN
+          II = II + 1
+          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
+            PKLIST(I,J,KMOD) = PKLIST(I,J,KMOD) + (C64D45)*PKADD(II,J)
+          ENDDO
+        ENDDO
+      ELSEIF (IEAGLE.EQ.2) THEN
+        MNS = MN
+        CALL FTSB12(MNS)
+        II = MNS/2 - MN2
+        DO I = 1, MN
+          II = II + 1
+          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
+            PKLIST(I,J,KMOD) = -(C1D3)*PKADD(II,J)
+          ENDDO
+        ENDDO
+        MNS = 2*MN
+        CALL FTSB12(MNS)
+        II = MNS/2 - MN2
+        DO I = 1, MN
+          II = II + 1
+          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
+            PKLIST(I,J,KMOD) = PKLIST(I,J,KMOD) + (C4D3)*PKADD(II,J)
+          ENDDO
+        ENDDO
+      ELSE
+        MNS = MN
+        CALL FTSB12(MNS)
+        II = MNS/2 - MN2
+        DO I = 1, MN
+          II = II + 1
+          DO J = 1, NPKGEN(JPHASE,JSOURC) + 1
+            PKLIST(I,J,KMOD) = PKADD(II,J)
+          ENDDO
+        ENDDO
+      ENDIF
+!.. FFT OVER
+!... DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
+   26 JARGI = NINT((ARGI-ARGK)/XPKDEL(KMOD))
+      IARGI = JARGI + MN2 + 1
+!.. WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
+      POFF = (ARGI-ARGK)/XPKDEL(KMOD) - FLOAT(JARGI)
+!.. WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
+      C3FN(1) = 0.5*POFF*(POFF-1.)
+      C3FN(2) = 1. - POFF**2
+      C3FN(3) = 0.5*POFF*(POFF+1.)
+      C3DN(1) = POFF - 0.5
+      C3DN(2) = -2.*POFF
+      C3DN(3) = POFF + 0.5
+      YNORM = 0.
+      DYNDKQ = 0.
+      CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
+      DO I = 1, 3
+        II = IARGI + I - 2
+        PKTEM = PKLIST(II,1,KMOD)
+        YNORM = YNORM + C3FN(I)*PKTEM
+        DYNDKQ = DYNDKQ - C3DN(I)*PKTEM
+        DO NPKD = 1, NPKGEN(JPHASE,JSOURC)
+          NPKD1 = NPKD + 1
+          DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKLIST(II,NPKD1,KMOD)
+        ENDDO
+      ENDDO
+!.. NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
+      IF (TESTOV(2.,YNORM)) THEN
+        DYNDKQ = 0.
+        CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
+      ELSE
+        DYNDKQ = DYNDKQ/(YNORM*XPKDEL(KMOD))
+        CALL GMSCA(DYNDVQ,DYNDVQ,1./YNORM,1,NPKGEN(JPHASE,JSOURC))
+      ENDIF
+      GOTO 100
+! PRE-PROFILE REFINEMENT STAGE
+    5 CALL FDTF12(1)
+      DEL = ARGI - ARGK
+! THIS WILL BE MADE MORE GENERAL IN FUTURE - AT MOMENT WILL DEAL WITH HELI
+! STRUCTURES
+      IF (ISMAG(KNOW).EQ.0) THEN
+        TEMSQ = (TOLER(4,JPHASE,JSOURC)*PKFNVA(4))**2
+        CAULIM = TOLER(5,JPHASE,JSOURC)*PKFNVA(5)
+      ELSE
+        TEMSQ = (TOLER(6,JPHASE,JSOURC)*PKFNVA(6))**2
+        CAULIM = TOLER(7,JPHASE,JSOURC)*PKFNVA(5)
+      ENDIF
+      IF (DEL) 510, 510, 520
+  520 AVTAU = PKFNVA(1)*TOLER(2,JPHASE,JSOURC)*PKFNVA(2)                &
+     &        + (1.-PKFNVA(1))*TOLER(3,JPHASE,JSOURC)*PKFNVA(3)
+      TEMSQ = TEMSQ + AVTAU*AVTAU
+  510 TEMLIM = CAULIM + SQRT(TEMSQ)
+      REFUSE = ABS(DEL).GT.TEMLIM
+      GOTO 100
+! N=6 *** CAILS *** SETTING UP SLACK AND STRICT CONSTRAINTS
+    6 CALL FDTF12(1)
+      DELT = ABS(AKLO-AKHI)
+      AVTAU = PKFNVA(1)*PKFNVA(2) + (1.-PKFNVA(1))*PKFNVA(3)
+! SQRT 8 LOG 2 AND LOG 2:
+      IF (ISMAG(KNOW).EQ.0) THEN
+        FWHME = SQL2X8*PKFNVA(4) + ALOG2*AVTAU
+      ELSE
+        FWHME = SQL2X8*PKFNVA(6) + ALOG2*AVTAU
+      ENDIF
+      STRKT = DELT.LT.STRTOL*FWHME
+      SLACK = 0.
+      IF (DELT.GE.SLKTOL*FWHME) GOTO 100
+      SLACK = EXP(1.-(DELT/(SLKTOL*FWHME))**2)
+      GOTO 100
+    7 CALL FDTF12(1)
+      F4PAR(2,KNOW) = PKFNVA(4)
+      GOTO 100
+  100 RETURN
+
+      END SUBROUTINE PFTF12
+!
+!*****************************************************************************
+!
 ! Originally in sa_subs.f90
 !*==RANXGI.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
