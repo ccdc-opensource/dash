@@ -322,6 +322,7 @@
 
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
+      INTEGER          Load_dat_File ! Function
       INTEGER          Load_raw_File ! Function
       INTEGER          Load_rd_File  ! Function
       INTEGER          Load_udf_File ! Function
@@ -352,6 +353,8 @@
       ISTAT = 0
       ESDsFilled = .FALSE.
       SELECT CASE (EXT4)
+        CASE ('dat ')
+          ISTAT = Load_dat_File(TheFileName,ESDsFilled)
         CASE ('raw ')
           ISTAT = Load_raw_File(TheFileName,ESDsFilled)
         CASE ('rd  ','sd  ')
@@ -473,6 +476,139 @@
       CALL ScrUpdateFileName
 
       END FUNCTION DiffractionFileLoad
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION Load_dat_File(TheFileName,ESDsFilled)
+!
+! This function tries to load a *.dat file (ASCII format used by Armel Le Bail).
+! The routine basically assumes that the file is OK.
+!
+! Note that this function should only be called from DiffractionFileLoad
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+!
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data)
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER(LEN=MaxPathLength), INTENT (IN   ) :: TheFileName
+      LOGICAL,                      INTENT (  OUT) :: ESDsFilled
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER NOBS
+      REAL    XOBS, YOBS, YCAL, YBAK, EOBS
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+
+      CHARACTER*255 Cline ! String containing last line read from file
+      INTEGER       I, J, NumOfBins, FLEN ! Length of TheFileName
+      REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
+      REAL          TempInput(8) ! Max. num. of columns is 8
+      INTEGER       NumOfColumns2Read
+      INTEGER       GetNumOfColumns ! Function
+
+! Current status, initialise to 'error'
+      Load_dat_File = 0
+      TwoThetaStart = 0.0
+      TwoThetaEnd   = 0.0
+      TwoThetaStep  = 0.0
+      FLEN = LEN_TRIM(TheFileName)
+      OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+! *.dat files look like this:
+!
+
+!    5.00   0.02   77.00
+!     1097      1133      1099      1076      1056      1056      1080      1101
+!     1089      1026      1050      1105      1078      1072      1076      1087
+!     1078      1013      1015      1066      1043      1048       996      1003
+! <SNIP>
+!      758       756       826       789       736       796       748       773
+!      785       786       736       762       718       757       771       738
+!      778
+!
+!12345678911234567892123456789312345678941234567895123456789612345678971234567898
+!
+
+
+! Read the header line
+    9 READ(10,*,ERR=999,END=999) TwoThetaStart, TwoThetaStep, TwoThetaEnd
+! The number of counts per 2theta should commence from here.
+! Calculate how many bins we expect.
+! Quick check if values have been read at all.
+      IF (TwoThetaStart .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta starting value not found.')
+        RETURN
+      ENDIF
+      IF (TwoThetaEnd   .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta end value not found.')
+        RETURN
+      ENDIF
+      IF (TwoThetaStep  .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta step size not found.')
+        RETURN
+      ENDIF
+! Note that NINT correctly rounds to the nearest whole number
+      NumOfBins = 1 + NINT((TwoThetaEnd - TwoThetaStart) / TwoThetaStep)
+! Check that we will not read more than MOBS data points
+      IF (NumOfBins .GT. MOBS) THEN
+! Warn the user
+        CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+        NumOfBins = MOBS
+      ENDIF
+! Check that we will not read less than 1 data point
+      IF (NumOfBins .EQ. 0) THEN
+! The user should be warned here
+        CALL ErrorMessage("The file does not contain enough data points.")
+        RETURN
+      ENDIF
+! Fill the 2theta values first
+      CurrTwoTheta = TwoThetaStart
+      DO I = 1, NumOfBins
+        XOBS(I) = CurrTwoTheta
+        CurrTwoTheta = CurrTwoTheta + TwoThetaStep
+      ENDDO
+      READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
+      I = 0
+! Next, we have to determine how many columns to read from the next line.
+! There are two conditions:
+! 1. the number of columns actually present in the string (GetNumOfColumns)
+! 2. the number of data point still to be read (NumOfBins - I)
+   11 NumOfColumns2Read = MIN(GetNumOfColumns(Cline),NumOfBins - I)
+      READ(Cline,*,ERR=999) TempInput(1:NumOfColumns2Read)
+! Next couple of lines rather clumsy, but safe.
+      DO J = 1, NumOfColumns2Read
+        YOBS(I+J) = TempInput(J)
+      ENDDO
+      I = I + NumOfColumns2Read
+      READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
+      GOTO 11
+  100 CLOSE(10)
+      NOBS = I
+      IF (NOBS .LT. NumOfBins) CALL ErrorMessage('File contained less data points than expected.'//CHAR(13)// &
+                                                 'Will continue with points actually read only.')
+      IF (NOBS .EQ. 0) THEN
+! The user should be warned here
+        CALL ErrorMessage("The file does not contain enough data points.")
+        RETURN
+      ENDIF
+      ESDsFilled = .FALSE.
+! This is probably synchrotron data
+      CALL SetSourceDataState(2)
+      Load_dat_File = 1
+      RETURN
+ 999  CONTINUE
+! Exit code is error by default, so we can simply return
+      RETURN
+
+      END FUNCTION Load_dat_File
 !
 !*****************************************************************************
 !
@@ -1409,7 +1545,7 @@
 ! and the number of data points is not a multiple of eight, DASH will crash while reading the last line.
                I = 1
 ! Replace all ',' by ' '.
-  11           DO POS = 1, StrLen
+   11          DO POS = 1, StrLen
                  IF (Cline(POS:POS) .EQ. ',') Cline(POS:POS) = ' '
                END DO
 ! Next, we have to determine how many columns to read from the next line.
@@ -1418,7 +1554,7 @@
 ! 2. the number of columns actually present in the string (GetNumOfColumns)
 ! 3. the number of data point still to be read (MaxNumOfBins - I)
                NumOfColumns2Read = MIN(MaxNumOfColumns, GetNumOfColumns(Cline))
-               NumOfColumns2Read = MIN(NumOfColumns2Read, MaxNumOfBins - I)
+               NumOfColumns2Read = MIN(NumOfColumns2Read, 1 + MaxNumOfBins - I)
                READ(Cline,*,ERR=999) TempInput(1:NumOfColumns2Read)
 ! Next couple of lines rather clumsy, but safe.
                DO J = 1, NumOfColumns2Read
