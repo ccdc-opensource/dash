@@ -422,8 +422,6 @@
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
@@ -469,7 +467,6 @@
       IXPos_IDD_Wizard = 0.1  * XBSWidth
       IYPos_IDD_Wizard = 0.06 * XBSHeight
       FromPawleyFit = .FALSE. 
-      NUMOBSTIC = 0
       NTIC = 0
       LBIN = 1
       MARKER_SIZE = 0.35
