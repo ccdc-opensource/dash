@@ -675,13 +675,10 @@
       CHARACTER*5                          OriginalLabel
       COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
 
-      INTEGER I,J,M
-      LOGICAL exists
+      INTEGER I
       CHARACTER*17 temp_file
       DATA temp_file /'Temp_Zmatrix.mol2'/
       CHARACTER*2  AtmElement(1:MAXATM_2)
-
-      CHARACTER*255 dirname, filename, curdir
 
       REAL*8 CART(MAXATM,3)
 
@@ -703,45 +700,8 @@
       CALL AssignCSDElement(AtmElement)
       I = WriteMol2(temp_file(1:LEN_TRIM(temp_file)))
       IF (I .EQ. 0) GOTO 999
-! Show the mol2 file 
-      I = LEN_TRIM(ViewExe)
-      J = LEN_TRIM(ViewArg)
-      INQUIRE(FILE = ViewExe(1:I), EXIST=exists)
-      IF (exists) THEN
-        CALL SplitPath(ViewExe,dirname, filename)
-        CALL IOsDirName(curdir)
-        CALL IOsDirChange(dirname)
-        M = InfoError(1)
-        IF (J .GT. 0) THEN
-          CALL IOSCommand( &
-             filename(1:LEN_TRIM(filename))//' '//ViewArg(1:J)//' '// &
-             '"'//curdir(1:LEN_TRIM(curdir))//DIRSPACER//temp_file(1:LEN_TRIM(temp_file))//'"',0)
-        ELSE
-          CALL IOSCommand( &
-               filename(1:LEN_TRIM(filename))//' '// &
-               '"'//curdir(1:LEN_TRIM(curdir))//DIRSPACER//temp_file(1:LEN_TRIM(temp_file))//'"',0)
-        END IF
-        CALL IOsDirChange(curdir)
-        M = InfoError(1)
-        IF (M .EQ. ErrOSCommand) THEN
-          CALL WMessageBox(OkOnly, InformationIcon, CommonOk, &
-                  "DASH could not launch your viewer. The viewer executable is currently configured"//&
-  CHAR(13)//"to launch the program "//ViewExe(1:I)//&
-  CHAR(13)//"To change the configuration you should edit the file "//&
-  CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Dash.cfg"//&
-  CHAR(13)//"and then restart DASH","Viewer incorrectly installed")
-        ELSE IF (M .EQ. 0) THEN
-          ViewAct = .TRUE.
-        END IF
-      ELSE
-        CALL WMessageBox(OkOnly, InformationIcon, CommonOk, &
-                  "DASH could not find your viewer. The viewer executable is currently configured"//&
-  CHAR(13)//"to launch the program "//ViewExe(1:I)//&
-  CHAR(13)//"To change the configuration you should edit the file "//&
-  CHAR(13)//INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//"Dash.cfg"//&
-  CHAR(13)//"and then restart DASH","No such viewer")
-      END IF
-
+! Show the mol2 file
+      CALL ViewStructure(temp_file(1:LEN_TRIM(temp_file)))
 ! Show the z-matrix file in an editor window
   999 CALL WindowOpenChild(IHANDLE)
       CALL WEditFile(frag_file(ifrg),Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
