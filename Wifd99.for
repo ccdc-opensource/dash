@@ -453,20 +453,20 @@ C
   19  CONTINUE
       IF (A(N,N).EQ.0.0) A(N,N)=TINY
       END
-      SUBROUTINE PIKCAL
-C
-C.. Calculates the values of p(i,k) and dp(i,k)/dpsf(q)
-C>> JCC Moved to an include file
-	INCLUDE 'REFLNS.INC'
-C.. Note only 3 phases specifically hardwired here
-      PARAMETER (MPPTS=15000,MKPTS=150000)
-      COMMON /ZSTORE/ NPTS,ZARGI(MPPTS),ZOBS(MPPTS),ZDOBS(MPPTS),
-     &ZWT(MPPTS),ICODEZ(MPPTS),KOBZ(MPPTS)
-C
-C
-C
-      RETURN
-      END
+!U      SUBROUTINE PIKCAL
+!UC
+!UC.. Calculates the values of p(i,k) and dp(i,k)/dpsf(q)
+!UC>> JCC Moved to an include file
+!U	INCLUDE 'REFLNS.INC'
+!UC.. Note only 3 phases specifically hardwired here
+!U      PARAMETER (MPPTS=15000,MKPTS=150000)
+!U      COMMON /ZSTORE/ NPTS,ZARGI(MPPTS),ZOBS(MPPTS),ZDOBS(MPPTS),
+!U     &ZWT(MPPTS),ICODEZ(MPPTS),KOBZ(MPPTS)
+!UC
+!UC
+!UC
+!U      RETURN
+!U      END
       SUBROUTINE XXVCOPY(X,Y,N)
 C     -----------------------
 C
