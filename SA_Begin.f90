@@ -113,10 +113,10 @@
 
       INCLUDE 'PARAMS.INC'
 
-      CHARACTER(MaxPathLength) OutputFilesBaseName
-      INTEGER                                       OFBN_Len
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
       CHARACTER(3)                                            SA_RunNumberStr
-      COMMON /basnam/          OutputFilesBaseName, OFBN_Len, SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
       INTEGER I, iFlags
       CHARACTER(MaxPathLength) filehead, tDirName, tFileName
