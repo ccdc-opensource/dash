@@ -204,6 +204,7 @@
               CALL WExit
               GOTO 10
             CASE (MouseButDown)
+              IF (NoData) GOTO 10
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
                 IF (MseBtnPressed) GOTO 10
                 MseBtnPressed = .TRUE.
