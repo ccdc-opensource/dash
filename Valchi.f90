@@ -58,7 +58,7 @@
       REAL, EXTERNAL :: FFCALC_066, FFCALC_067, FFCALC_069, FFCALC_112, FFCALC_115, FFCALC_116, &
                         FFCALC_143, FFCALC_164, FFCALC_176, FFCALC_212, FFCALC_266, FFCALC_269
       REAL, EXTERNAL :: FFCALC_284, FFCALC_290, FFCALC_292, FFCALC_298, FFCALC_304, FFCALC_356, &
-                        FFCALC_365, FFCALC_369, FFCALC_430, FFCALC_431, FFCALC_432, FFCALC_433
+                        FFCALC_365, FFCALC_369, FFCALC_391, FFCALC_430, FFCALC_431, FFCALC_432, FFCALC_433
       REAL, EXTERNAL :: FFCALC_434, FFCALC_435, FFCALC_449, FFCALC_451, FFCALC_462, FFCALC_468, &
                         FFCALC_469, FFCALC_471, FFCALC_481, FFCALC_483, FFCALC_485, FFCALC_DEFAULT
       REAL    SUM1, SUM2, RESCL, DELI, DELJ, CHIADD
@@ -202,6 +202,10 @@
           CASE (369)           ! P 41 21 2
             DO IR = 1, NumOfRef
               AICALC(IR) = FFCALC_369(IR)
+            ENDDO
+          CASE (391)           ! P -4 21 c
+            DO IR = 1, NumOfRef
+              AICALC(IR) = FFCALC_391(IR)
             ENDDO
   ! Obscure from here on in !
           CASE (430)           ! P3
@@ -367,9 +371,9 @@
       REAL    C1N, C2N, C3N, S1N, S2N, S3N
 
 !
-!     COSQS(a,1,c) holds hx terms
-!     COSQS(a,2,c) holds ky terms
-!     COSQS(a,3,c) holds lz terms
+!     COSQS(h,1,i) holds hx terms
+!     COSQS(k,2,i) holds ky terms
+!     COSQS(l,3,i) holds lz terms
 !
 ! The Xs (the co-ordinates) have been ordered in MAKEFRAC.
 ! NATOM must be set to the appropriate number.
