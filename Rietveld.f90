@@ -478,19 +478,19 @@
               NVALUES = 100
               CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
               CALL WGridGetCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
-              CALL WDialogPutInteger(IDI_Num1,NVALUES)
+              CALL WDialogPutInteger(IDI_Num1, NVALUES)
             CASE (IDB_Set2)
               iValues = 1
               NVALUES = 100
               CALL WGridPutCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
               CALL WGridGetCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
-              CALL WDialogPutInteger(IDI_Num2,NVALUES)
+              CALL WDialogPutInteger(IDI_Num2, NVALUES)
             CASE (IDB_Set3)
               iValues = 1
               NVALUES = 100
               CALL WGridPutCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
               CALL WGridGetCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
-              CALL WDialogPutInteger(IDI_Num3,NVALUES)
+              CALL WDialogPutInteger(IDI_Num3, NVALUES)
             CASE (IDB_Set4)
               iValues = 1
               NVALUES = 100
