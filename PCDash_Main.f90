@@ -62,13 +62,13 @@
 ! Disable the menu buttons
       CALL SetModeMenuState(1,-1)
 ! Setup array of widths for status bar
-      IWIDTHS(1) = 3800
-      DO IWID = 2, 7
+      IWIDTHS(1) = 6200
+      DO IWID = 2, 4
         IWIDTHS(IWID) = 800
       END DO
-      IWIDTHS(8)= 1500 
+      IWIDTHS(5)= 1500 
 ! Split status bar into more than one part
-      CALL WindowStatusBarParts(8, IWIDTHS)
+      CALL WindowStatusBarParts(5, IWIDTHS)
     !  CALL IDebugLevel(DbgMsgBox)
       CALL WMessageEnable(PushButton, Enabled)
       CALL WMessageEnable(FieldChanged, Enabled)
