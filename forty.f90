@@ -209,7 +209,7 @@
       CALL INRFPR(PCXX,PFXX)
 ! READ OBS DATA AND SEND OUT TO TEMPORARY UNIT FOR REINPUT EACH CYCLE
       CALL INOBPR(ISCR,NFLIP,PCXX,PFXX)
-      CALL CHKMAXREF(PCXX)
+      CALL CHKMAXREF
 ! CALCULATE THE STEP-SIZE FOR PEAK-SHAPE CALCULATION
       CALL XDELPR
       CALL QNUMPP
@@ -715,11 +715,11 @@
 ! WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
           POFF = DTARG/ZXDEL(KNOW) - FLOAT(JARGI)
 ! WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
-          C3FN(1) = 0.5*POFF*(POFF-1.)
-          C3FN(2) = 1. - POFF**2
-          C3FN(3) = 0.5*POFF*(POFF+1.)
+          C3FN(1) = 0.5*POFF*(POFF-1.0)
+          C3FN(2) = 1.0 - (POFF**2)
+          C3FN(3) = 0.5*POFF*(POFF+1.0)
           C3DN(1) = POFF - 0.5
-          C3DN(2) = -2.*POFF
+          C3DN(2) = -2.0*POFF
           C3DN(3) = POFF + 0.5
           YNORM = 0.
           DYNDKQ = 0.
@@ -807,7 +807,7 @@
           F4PAR(1,IR) = TF4PAR(IR)
         ENDIF
       ENDDO
-! REFH and ZARGK have now been sorted.
+! rHKL and ZARGK have now been sorted.
 ! Set the number of contributing peaks at each data point to zero
       DO II = 1, NPTS
         KREFT(II) = 0
@@ -877,9 +877,9 @@
         JK0 = MIN(JK0,KNOTS-1)
         POFF = (ARGK-ARGKNT(JK0))/TTINC
 ! Now calculate the weights of the interpolation. M = minus one, 0 = this point, P = plus one
-        C3FNM = 0.5*POFF*(POFF-1.)
-        C3FN0 = 1. - POFF**2
-        C3FNP = 0.5*POFF*(POFF+1.)
+        C3FNM = 0.5*POFF*(POFF-1.0)
+        C3FN0 = 1.0 - (POFF**2)
+        C3FNP = 0.5*POFF*(POFF+1.0)
         DO II = 1, MN
           PKCONV(II,1) = C3FNM*PKKNOT(II,1,JK0-1) + C3FN0*PKKNOT(II,1,JK0) + C3FNP*PKKNOT(II,1,JK0+1)
         ENDDO
@@ -948,11 +948,11 @@
 ! WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
           POFF = DTARG/ZXDEL(KNOW) - FLOAT(JARGI)
 ! WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
-          C3FN(1) = 0.5*POFF*(POFF-1.)
-          C3FN(2) = 1. - POFF**2
-          C3FN(3) = 0.5*POFF*(POFF+1.)
+          C3FN(1) = 0.5*POFF*(POFF-1.0)
+          C3FN(2) = 1.0 - (POFF**2)
+          C3FN(3) = 0.5*POFF*(POFF+1.0)
           C3DN(1) = POFF - 0.5
-          C3DN(2) = -2.*POFF
+          C3DN(2) = -2.0*POFF
           C3DN(3) = POFF + 0.5
           YNORM = 0.
           DYNDKQ = 0.
