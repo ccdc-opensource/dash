@@ -66,6 +66,7 @@
       REAL, EXTERNAL :: SA_FCN
       LOGICAL tAccept, tLOG_HYDROGENS
       REAL    FTEM
+      DOUBLE PRECISION tX147, DFTEM
 
       IF (Auto .AND. (.NOT. Get_AutoLocalMinimisation())) RETURN
       CALL WCursorShape(CurHourGlass)
@@ -75,8 +76,13 @@
       ENDIF
       N = NPAR
       IF (PrefParExists) THEN
+!O! Jvds 4 July 2002. Problem here: PO_PRECFC() uses X(MVAR), the current values, whereas we want to use 
+!O! XOPT(MVAR), the best values so far.
+!O! Quick fix...
+        tX147 = X(iPrfPar)
+        X(iPrfPar) = XOPT(iPrfPar)
         CALL PO_PRECFC
-        IF ((UB(iPrfPar) - LB(iPrfPar)) .GT. 1E-3) N = NPAR - 1
+        IF ((UB(iPrfPar) - LB(iPrfPar)) .GT. 1.0D-3) N = NPAR - 1
       ENDIF
       DO II = 1, N
         I = IP(II)
@@ -119,6 +125,12 @@
   !U          CALL WGridClearCell(IDF_CPL_grid,icol,i)
   !U        ENDDO
   !U      ENDDO
+      ELSE
+        IF (PrefParExists) THEN
+          X(iPrfPar) = tX147
+          CALL PO_PRECFC
+          CALL FCN(X,DFTEM,0)
+        ENDIF
       ENDIF
       CALL WCursorShape(CurCrossHair)
 
