@@ -571,7 +571,7 @@
         tLen2 = LEN_TRIM(tMessage)
         DO J = 1, NumOfFileTypes
           IF (ExistingFiles(J) .GT. 0) THEN
-            WRITE(tString,'(I2," files of type .",A4)') ExistingFiles(J), ExtStr(J)
+            WRITE(tString,'(I3," files of type .",A4)') ExistingFiles(J), ExtStr(J)
             tString = tString(1:LEN_TRIM(tString))//CHAR(13)//CHAR(10)
             tMessage = tMessage(1:tLen2)//tString
             tLen2 = LEN_TRIM(tMessage)
@@ -946,7 +946,7 @@
         ENDIF
         WRITE (hFileRES,1032,ERR=999) ALambda, (CellPar(ii),ii=1,6)
  1032   FORMAT ('CELL ',F7.5,1X,6(F8.4,1X))
-        WRITE (hFileRES,'("ZERR ",I2," 0.000 0.000 0.000 0.000 0.000 0.000")',ERR=999) npdbops
+        WRITE (hFileRES,'("ZERR ",I3," 0.000 0.000 0.000 0.000 0.000 0.000")',ERR=999) npdbops
         IF (SGShmStr(NumberSGTable)(3:3) .EQ. 'C') THEN
           LATT(1:1) = ' '
         ELSE

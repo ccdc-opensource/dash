@@ -1,5 +1,5 @@
 
-	  INTEGER     MFCSTO
+      INTEGER     MFCSTO
       PARAMETER ( MFCSTO = 10000 )
 ! For common block FCSTOR
 
@@ -35,8 +35,8 @@
       PARAMETER ( MTPeak = 100 )
 ! For use in common block ALLPEAKS
 
-      INTEGER     MaxPeaksFound
-      PARAMETER ( MaxPeaksFound = 50 )
+   !   INTEGER     MaxPeaksFound
+   !   PARAMETER ( MaxPeaksFound = 50 )
 ! The maximum number of peaks that the peak-finding algorithm will find
 
       INTEGER     MaxNumChildWin
@@ -44,21 +44,21 @@
 ! The Maximum number of Child Windows allowed (determined by Winteracter)
 ! Used in common blocks SACHILDWINDOWS and CHISQDWINDOWSUSED
 
-	  INTEGER     maxiter
+      INTEGER     maxiter
       PARAMETER ( maxiter = 10000 )
 ! maxiter = maximum number of simulated annealing iterations (per individual run when multi run).
 
       INTEGER     MaxRun
-	  PARAMETER ( MaxRun = 99 )
+      PARAMETER ( MaxRun = 999 )
 ! Maximum number of runs in a multirun.
-! Don't forget to update the Winteracter grids accordingly.
+! Don't forget to update the Winteracter grids and the maximum value of the spinner box accordingly.
 ! Note the difference with MaxRuns: that's the number of runs requested by the user.
 
       INTEGER     MaxBVar
       PARAMETER ( MaxBVar = 650 )
 ! Maximum number of basic variables. Not quite sure what a basic variable is,
 ! but it has to do the number of parameters that can be refined during the Pawley
-! refinement, so this is the number that limits the number of reflections used 
+! refinement, so this is the number that limits the number of reflections used
 ! during the Pawley refinement. It is used implicitly in at least one other constant as well,
 ! so just changing 400 to 500 won't work.
 

@@ -502,15 +502,15 @@
       INTEGER I, iFrg, J, iAtom
       REAL    x_pdb(1:3)
       INTEGER hFilePDB
-      CHARACTER(2) RunStr
+      CHARACTER(3) RunStr
 
       hFilePDB = 65
-      WRITE(RunStr, '(I2.2)') TheRunNr
+      WRITE(RunStr, '(I3.3)') TheRunNr
 ! Write the file headers first
       file_name = "DASH_tmp"//RunStr//".pdb"
       OPEN (UNIT=hFilePDB, FILE=file_name, STATUS='unknown', ERR=999)
 ! Add in a Header record
-      WRITE (hFilePDB, "('HEADER    CSD ENTRY RUNNUM',A2)", ERR=999) RunStr
+      WRITE (hFilePDB, "('HEADER    CSD ENTRY RUNNUM',A3)", ERR=999) RunStr
       IF (WritePDBCommon(hFilePDB) .NE. 0) GOTO 999
       iAtom = 0
       DO iFrg = 1, nFrag
@@ -597,7 +597,7 @@
       INTEGER TotNumBonds, NumOfAtomsSoFar
       CHARACTER*4 LabelStr
       CHARACTER*2 ColourStr
-      CHARACTER*2 SolStr
+      CHARACTER*3 SolStr
       INTEGER AtomLabelOption, AtomColourOption
       INTEGER I, iFrg, J, iiact, ISTATUS, BondNr, ilen
       REAL    x_pdb(1:3)
@@ -644,7 +644,7 @@
         IF (iSol .EQ. (NumOf_SA_Runs + 1)) THEN
           IF (Get_AutoAlign()) CALL Align
         ENDIF
-        WRITE(SolStr,'(I2)',ERR=999) iSol
+        WRITE(SolStr,'(I3)',ERR=999) iSol
         CALL StrClean(SolStr,ilen) ! Left justify
         CALL WGridGetCellCheckBox(IDF_SA_summary, 3, iSol, istatus)
         IF (istatus .EQ. 1) THEN
