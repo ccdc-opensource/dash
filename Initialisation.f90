@@ -326,7 +326,9 @@
 ! the configuration file is found and used.
       VIEWARG = ''
       VIEWEXE = ''
+      MOGULEXE = ' '
       CALL GetPathToMercuryFromRegistry
+      CALL GetPathToMogulFromRegistry
       DO I = 0, maxfrg
         izmoid(0,I) = 0
         izmbid(0,I) = 0
@@ -371,6 +373,7 @@
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogPutString(IDF_ViewExe,ViewExe)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
+      CALL WDialogPutString(IDF_MogulExe, MogulExe)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, .TRUE.)
       SA_SimplexDampingFactor = 0.1
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
