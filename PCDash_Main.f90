@@ -151,7 +151,7 @@
             iDummy = DiffractionFileOpen(ArgString)
             CALL WDialogSelect(IDD_PW_Page3)
             CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
-            CALL WDialogFieldStateLogical(IDB_Bin,FnPatternOK())
+            CALL WDialogFieldStateLogical(IDB_Bin, FnPatternOK())
             CALL WizardWindowShow(IDD_PW_Page3)
           CASE DEFAULT
             CALL ErrorMessage('Unrecognised file format.')
@@ -215,11 +215,11 @@
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
       LOGICAL, EXTERNAL :: Confirm
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER, EXTERNAL :: DiffractionFileBrowse, PrjSave, PrjSaveAs
       REAL xpgdif, ypgdif
       INTEGER ISTAT, tInt1, tInt2
-      INTEGER, EXTERNAL :: DiffractionFileBrowse, PrjSave, PrjSaveAs
       INTEGER tCurrentRange
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
 !   Branch depending on chosen menu item
 
@@ -236,9 +236,9 @@
 ! Initialise the background
           CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
           CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-          CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+          CALL CalculateBackground(tInt1, tInt2, WDialogGetCheckBoxLogical(IDF_UseMCYN))
           CALL Profile_Plot
-          CALL WDialogShow(-1,-1,0,Modeless)
+          CALL WDialogShow(-1, -1, 0, Modeless)
           CALL PopActiveWindowID
         CASE (ID_FILE_PRINT)
           IPTYPE = -IPTYPE
@@ -251,12 +251,12 @@
         CASE (ID_Plot_Options)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Plot_Option_Dialog)
-          CALL WDialogShow(-1,-1,0,Modeless)
+          CALL WDialogShow(-1, -1, 0, Modeless)
           CALL PopActiveWindowID
         CASE (ID_Configuration)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Configuration)
-          CALL WDialogShow(-1,-1,0,Modeless)
+          CALL WDialogShow(-1, -1, 0, Modeless)
           CALL PopActiveWindowID
         CASE (ID_Peak_Fitting_Mode)
           CALL SelectMode(ID_Peak_Fitting_Mode)
@@ -291,58 +291,58 @@
         CASE (ID_get_crystal_symmetry)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogShow(-1,-1,0,Modeless)
-          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Crystal_Symmetry)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Crystal_Symmetry)
           CALL PopActiveWindowID
         CASE (ID_get_data_properties)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogShow(-1,-1,0,Modeless)
-          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Data_Properties)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Data_Properties)
           CALL PopActiveWindowID
         CASE (ID_get_peak_positions)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogShow(-1,-1,0,Modeless)
-          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Positions)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Peak_Positions)
           CALL PopActiveWindowID
         CASE (ID_get_peak_widths)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogShow(-1,-1,0,Modeless)
-          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Widths)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Peak_Widths)
           CALL PopActiveWindowID
         CASE (IDM_ViewPawley)
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogShow(-1,-1,0,Modeless)
-          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_ViewPawley)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_ViewPawley)
           CALL PopActiveWindowID
         CASE (ID_Left)
 ! We're going to move the graph to the left if we can
           xpgdif = xpgmax - xpgmin
-          xpgmin = MAX(XPMIN,xpgmin-0.25*xpgdif)
+          xpgmin = MAX(XPMIN, xpgmin-0.25*xpgdif)
           xpgmax = xpgmin + xpgdif
           CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (ID_Right)
 ! We're going to move the graph to the right if we can
           xpgdif = xpgmax - xpgmin
-          xpgmax = MIN(XPMAX,xpgmax+0.25*xpgdif)
+          xpgmax = MIN(XPMAX, xpgmax+0.25*xpgdif)
           xpgmin = xpgmax - xpgdif
           CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (ID_Down)
 ! We're going to move the graph down if we can
           ypgdif = ypgmax - ypgmin
-          ypgmin = MAX(YPMIN,ypgmin-0.25*ypgdif)
+          ypgmin = MAX(YPMIN, ypgmin-0.25*ypgdif)
           ypgmax = ypgmin + ypgdif
           CALL Get_IPMaxMin 
           CALL Profile_Plot
         CASE (ID_Up)
 ! We're going to move the graph up if we can
           ypgdif = ypgmax - ypgmin
-          ypgmax = MIN(YPMAX,ypgmax+0.25*ypgdif)
+          ypgmax = MIN(YPMAX, ypgmax+0.25*ypgdif)
           ypgmin = ypgmax - ypgdif
           CALL Get_IPMaxMin
           CALL Profile_Plot

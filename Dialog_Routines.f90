@@ -47,8 +47,8 @@
       CALL IntegerToString(item2,chrfmt(inext:inext),'(I1)')
       inext = inext + 1
       chrfmt(inext:inext) = ')'
-      CALL WDialogPutReal(IDF_xmin,XPMIN,chrfmt(1:inext))
-      CALL WDialogPutReal(IDF_xmax,XPMAX,chrfmt(1:inext))
+      CALL WDialogPutReal(IDF_xmin, XPMIN, chrfmt(1:inext))
+      CALL WDialogPutReal(IDF_xmax, XPMAX, chrfmt(1:inext))
       atem1 = MAX(ABS(ypmin),ABS(ypmax))
       atem2 = 0.0001 * ABS(ypmax-ypmin)
       item1 = 0.5 + ALOG10(atem1)
