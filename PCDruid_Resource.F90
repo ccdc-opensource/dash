@@ -1,4 +1,4 @@
-! Winteracter module created : 23/Jul/2002 09:29:29
+! Winteracter module created : 24/Jul/2002 13:59:52
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -336,9 +336,6 @@
           INTEGER, PARAMETER :: ID_Start_Wizard                 = 40043
           INTEGER, PARAMETER :: IDD_Background_Fit              =   129
           INTEGER, PARAMETER :: IDF_background_text             =  1360
-          INTEGER, PARAMETER :: IDF_Background_Pass             =  1361
-          INTEGER, PARAMETER :: IDF_Background_Accept           =  1362
-          INTEGER, PARAMETER :: IDF_Background_Apply            =  1363
           INTEGER, PARAMETER :: IDF_background_check            =  1364
           INTEGER, PARAMETER :: IDD_Pawley_ErrorLog             =   157
           INTEGER, PARAMETER :: IDF_Pawley_ErrorLog_Intro       =  1369
@@ -372,7 +369,7 @@
           INTEGER, PARAMETER :: ID_Remove_Background            = 40003
           INTEGER, PARAMETER :: IDF_LABEL9                      =  1226
           INTEGER, PARAMETER :: IDAPPLY                         =  1227
-          INTEGER, PARAMETER :: IDF_Preview                     =  1230
+          INTEGER, PARAMETER :: IDB_Preview                     =  1230
           INTEGER, PARAMETER :: IDF_ZeroPoint                   =  1231
           INTEGER, PARAMETER :: ID_Home                         = 40009
           INTEGER, PARAMETER :: ID_Right                        = 40012

@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 23/Jul/2002 09:29:29
+// Modified : 24/Jul/2002 13:59:52
 //
 ///////////////////////////////////////////////////
 //
@@ -349,9 +349,6 @@
 #define ID_Start_Wizard                 40043
 #define IDD_Background_Fit                129
 #define IDF_background_text              1360
-#define IDF_Background_Pass              1361
-#define IDF_Background_Accept            1362
-#define IDF_Background_Apply             1363
 #define IDF_background_check             1364
 #define IDD_Pawley_ErrorLog               157
 #define IDF_Pawley_ErrorLog_Intro        1369
@@ -385,7 +382,7 @@
 #define ID_Remove_Background            40003
 #define IDF_LABEL9                       1226
 #define IDAPPLY                          1227
-#define IDF_Preview                      1230
+#define IDB_Preview                      1230
 #define IDF_ZeroPoint                    1231
 #define ID_Home                         40009
 #define ID_Right                        40012
@@ -1054,6 +1051,19 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
+END
+
+IDD_Width_Equations RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
@@ -1960,26 +1970,31 @@ BEGIN
 ,0
 END
 
-IDD_Background_Fit DIALOG 0, 0,  217,  103
+IDD_Background_Fit DIALOG 0, 0,  217,  122
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Background fitting using a Monte-Carlo low pass filter"
 BEGIN
-    CONTROL "Adjust the window size of the low-pass filter until a suitable background is obtained.",IDF_background_text,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   28,   16,  164,   24
-    CONTROL "100",IDF_Background_Pass,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  150,   48,   41,   12
-    CONTROL "Low-pass filter window size",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   28,   48,  102,    8
-    CONTROL "&Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  150,   76,   40,   14
-    CONTROL "&Accept",IDF_Background_Accept,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   90,   76,   40,   14
-    CONTROL "&Preview",IDF_Background_Apply,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   26,   76,   40,   14
+    CONTROL "Please adjust the number of iterations and the window size until a suitable background is obtained.",IDF_background_text,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   27,    7,  164,   20
+    CONTROL "&Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  114,  100,   40,   14
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   63,  100,   40,   14
+    CONTROL "&Preview",IDB_Preview,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  166,  100,   40,   14
+    CONTROL "20",IDF_NumOfIterations,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  118,   34,   32,   14
+    CONTROL "Number of iterations",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   44,   36,   70,    8
+    CONTROL "&Window",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   74,   55,   40,    8
+    CONTROL "100",IDF_WindowWidth,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  118,   53,   32,   14
+    CONTROL "Use &Monte Carlo for background correction",IDF_UseMCYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   42,   74,  150,   14
 END
 
 IDD_Background_Fit RCDATA
 BEGIN
 "[Checks] \n"
+" 1213 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
-" 1361               5             200 \n"
+" 1211               1             100 \n"
+" 1212               1             500 \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
@@ -2117,7 +2132,7 @@ BEGIN
     CONTROL "Window",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  160,   71,   40,    8
     CONTROL "100",IDF_WindowWidth,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  204,   69,   32,   14
     CONTROL "Use &Monte Carlo for background correction",IDF_UseMCYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  128,   91,  150,   14
-    CONTROL "&Preview",IDF_Preview,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  247,  150,   40,   14
+    CONTROL "&Preview",IDB_Preview,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  247,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  306,  150,   40,   14
     CONTROL "&Subtract background",IDF_SubtractBackground,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   98,   28,   80,   14
@@ -3163,7 +3178,7 @@ BEGIN
     CONTROL "",IDF_LabProgMonoclinic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   65,   50,   10
     CONTROL "",IDF_LabProgTriclinic,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,  180,   75,   50,   10
     CONTROL "Pause",IDBPAUSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  126,   95,   40,   14
-    CONTROL "# Solutions",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  180,   13,   72,    8
+    CONTROL "# of solutions",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  180,   13,   72,    8
     CONTROL "",IDF_PicHourglass,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   13,    8,   93,  117
 END
 

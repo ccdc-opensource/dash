@@ -173,6 +173,9 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
+
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
       INTEGER, EXTERNAL :: Load_cpi_File
@@ -191,7 +194,6 @@
       LOGICAL          ESDsFilled
       REAL             INTEGRATED_GUESS
       INTEGER          MAX_INTENSITY_INDEX
-      LOGICAL, EXTERNAL :: ChrIsDigit
       REAL             tYPMIN, tYPMAX
 
 ! Initialise to failure
@@ -237,12 +239,6 @@
       DiffractionFileLoad = ISTAT
       IF (ISTAT .EQ. 0) THEN
         CALL ErrorMessage('Could not load the file')
-! When we arrive here, the state of the program becomes a little bit undetermined.
-! This wasn't too bad in the old DASH code, as none of the variables was updated properly anyway,
-! but it starts to become a problem since some variables are now properly initialised and some aren't
-!        NoData = .TRUE.
-!        FNAME = ' '
-!        CALL ScrUpdateFileName
         RETURN
       ENDIF
       IF (ISTAT .EQ. 2) RETURN ! User pressed cancel somewhere
@@ -267,7 +263,8 @@
       DataSetChange = DataSetChange + 1
       BackRef = .TRUE.
       CALL Clear_UnitCell
-! Ungrey 'Remove background' button on toolbar
+! Ungrey 'Remove background' button on toolbar if Wizard is not up
+!O      IF (CurrentWizardWindow .EQ. 0) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
       tYPMIN = YOBS(1)
       tYPMAX = YOBS(1)

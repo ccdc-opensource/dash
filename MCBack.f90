@@ -205,20 +205,23 @@
 
       IMPLICIT NONE
 
-      INTEGER IBpass
+      INTEGER tInt1, tInt2
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Background_Fit)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Background_Apply)
-              CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-              CALL CalculateBackground(IBpass,20,.TRUE.)
+            CASE (IDB_Preview)
+              CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
+              CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
+              CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
               CALL Profile_Plot
-            CASE (IDF_Background_Accept)
-              CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-              CALL SubtractBackground(IBpass,20,.TRUE.)
+            CASE (IDOK)
+              CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
+              CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
+              CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
               CALL WDialogHide
               CALL Profile_Plot
             CASE (IDCANCEL)
