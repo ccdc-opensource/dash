@@ -9,8 +9,13 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
+
       INTEGER              iMyExit, num_new_min
       COMMON / CMN000001 / iMyExit, num_new_min
+
+      INTEGER                    ChiSqdChildWindows,                 ChiHandle
+      COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
@@ -28,6 +33,9 @@
               CALL ViewStructure('SA_best.pdb')
             CASE (IDF_Pause_Annealing) ! 'Pause'
               CALL WMessageBox(OKOnly,ExclamationIcon,CommonOK,'Press OK to continue','Pause')
+            CASE (IDB_Prog3)
+              CALL OpenChiSqPlotWindow
+              CALL plotting_Chi_sqd(ChiHandle)
             CASE (IDF_StartNext) ! 'Start Next'
               iMyExit = 4
             CASE (IDF_StopSA, IDCANCEL) ! 'Stop'
