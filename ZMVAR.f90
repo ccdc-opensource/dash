@@ -88,7 +88,7 @@
 !                      2. its quaternions
 !                      3. its torsion angles
 
-      LOGICAL         gotzmfile(1:maxfrg), zmFileChanged(1:maxfrg)
+      LOGICAL         gotzmfile(0:maxfrg)
 
 ! zmFileChanged Set to .TRUE.  when Z-matrix opened/deleted.
 !               Set to .FALSE. after SA parameter boundaries dialogue has been initialised
