@@ -14,7 +14,9 @@
 !N  HEAPSORT
 !N  (See Knuth 'Art of Computer Programming' Vol 3, Section 5.2.3)
 !
-      DIMENSION VAL(N), IP(N)
+      REAL,    INTENT (IN   ) :: VAL(N)
+      INTEGER, INTENT (  OUT) :: IP(N)
+      INTEGER, INTENT (IN   ) :: N
 
 ! EXTRA PART (WHICH MAY BE REMOVED AGAIN) - SET UP POINTERS:
       DO I = 1, N
