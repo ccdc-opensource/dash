@@ -622,6 +622,7 @@
             CASE (IDF_UseSingleAxis, IDF_RotAxAtom, IDF_RotAxFrac, IDF_RotAxPln)
               tUseSingleAxis = WDialogGetCheckBoxLogical(IDF_UseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_GROUP3,    tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_LABEL8,    tUseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_Alpha,     tUseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_Beta,      tUseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_Gamma,     tUseSingleAxis)
@@ -813,6 +814,9 @@
 ! occupancies
         CALL WGridPutCellReal(IDF_AtomPropGrid,5,iRow,occ(iAtomNr,iFrg),'(F5.3)')
       ENDDO
+! If only a single atom left, grey out "Rotations..." and "Re-order"
+      CALL WDialogFieldStateLogical(IDB_Rotations,natoms(iFrg) .GT. 1)
+      CALL WDialogFieldStateLogical(IDB_ReOrder,natoms(iFrg) .GT. 1)
       CALL PopActiveWindowID
 
       END SUBROUTINE zmCopyTemp2Dialog
