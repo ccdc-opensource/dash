@@ -24,11 +24,10 @@
 ! replace radian with rad=(1/radian)
       INTEGER i, k, i1, i2, i3
       REAL*8 bond, angle1, angle2, sign, rad
-!
-! cosmetic change to demo cvs
+
       IF (N.LT.1) RETURN
       rad = 1.0/radian
-!     First atom is placed at the origin
+! First atom is placed at the origin
       Cartesian(1,1) = 0.0D0
       Cartesian(2,1) = 0.0D0
       Cartesian(3,1) = 0.0D0

@@ -195,29 +195,10 @@
               WRITE (64,1110) iiact, OriginalLabel(iorig,ifrg)(1:4),(xatopt(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
  1110         FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
             ENDIF
-!       The PDB atom lines
-!
-! JCC Changed to use the PDB's orthogonalisation  definition
-! JCC Shouldnt make any difference the next change - I've made sure that the conversion
-! Uses single precision, but I think this is implicit anyway
-!          xc=  xatopt(1,ii)*SNGL(f2cmat(1,1))
-!
-!          yc= (xatopt(2,ii)*SNGL(f2cmat(2,2)))
-!     &      + (xatopt(1,ii)*SNGL(f2cmat(1,2)))
-!
-!          zc= (xatopt(3,ii)*SNGL(f2cmat(3,3)))
-!     &      + (xatopt(1,ii)*SNGL(f2cmat(1,3)))
-!     &      + (xatopt(2,ii)*SNGL(f2cmat(2,3)))
-!
-!     Now rotate cartesians about y
-!     rnew=(-1.0*(be(nfrag)-90.))*.0174533
-!   rnew=(-1.0*(cellpar(5)-90.))*.0174533
-!   xc=xc*cos(rnew) + zc*sin(rnew)
-!   zc=zc*cos(rnew) - xc*sin(rnew)
-!
+! The PDB atom lines
             xc = xatopt(1,ii)*SNGL(f2cpdb(1,1)) + xatopt(2,ii)*SNGL(f2cpdb(1,2)) + xatopt(3,ii)*SNGL(f2cpdb(1,3))
-            yc = xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)*SNGL(f2cpdb(2,3))
-            zc = xatopt(3,ii)*SNGL(f2cpdb(3,3))
+            yc =                                  xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)*SNGL(f2cpdb(2,3))
+            zc =                                                                   xatopt(3,ii)*SNGL(f2cpdb(3,3))
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
             IF (tSavePDB) THEN
@@ -268,7 +249,6 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
-      DOUBLE PRECISION inv(3,3)
 
       REAL            XATOPT
       COMMON /posopt/ XATOPT(3,150)
@@ -306,6 +286,7 @@
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
 
+      DOUBLE PRECISION inv(3,3)
       INTEGER RunNr, TickedRunNr, NumOfOverlaidStructures
       INTEGER  pdbBond(1:maxbnd_2*maxfrg,1:2)
       INTEGER TotNumBonds, NumOfAtomsSoFar
@@ -488,7 +469,7 @@
  1120           FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
               ENDDO ! loop over atoms
             ENDIF
-          ENDDO ! loop over z-matrices
+          ENDDO ! loop over Z-matrices
         ENDIF ! Was this solution ticked to be displayed?
       ENDDO ! loop over runs
       DO RunNr = 1, NumOfOverlaidStructures
