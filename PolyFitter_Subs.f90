@@ -553,82 +553,82 @@
 !U!
 !*****************************************************************************
 !
-      SUBROUTINE Fit_PeakTop(xtem)
-!
-      EXTERNAL CHIQUAD
-      REAL CHIQUAD
-!
-      INCLUDE 'PARAMS.INC'
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-      XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-!
-      INCLUDE 'GLBVAR.INC'
-
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-       itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-!
-      REAL VAR(3),DVAR(3),COVAR(3,3)
-      PARAMETER (MVAL=50)
-      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
-!
-      axdif=abs(xobs(nobs)-xobs(1))
-      klose=1
-      do ii=1,nobs
-        atem=abs(xtem-xobs(ii))
-        if (atem.le.axdif) then
-          axdif=atem
-          klose=ii
-        end if
-      end do
-!
-      nval=9
-      imin=klose-4
-      imax=klose+4
-      if (imin.lt.1) then
-        imin=1
-        imax=9
-      end if
-      if (imax.gt.nobs) then
-        imax=nobs
-        imin=nobs-8
-      end if
-!
-      xav=0.5*(xobs(imax)+xobs(imin)) 
-      xran=0.5*(xobs(imax)-xobs(imin))      
-      do i=1,9
-        ii=imin+i-1
-        xval(i)=(xobs(ii)-xav)/xran
-        yval(i)=yobs(ii)
-        eval(i)=eobs(ii)
-      end do
-!
-      nvar=3
-      var(1)=0.5*(yobs(imax)+yobs(imin))-yobs(imin+3)
-      var(2)=0.5*(yobs(imax)-yobs(imin))
-      var(3)=yobs(imin+3)
-      dvar(1)=0.1*var(1)
-      dvar(2)=0.1*var(2)
-      dvar(3)=0.1*var(3)
-!
-      call simopt(var,dvar,covar,nvar,chiquad)
-      xb=-0.5*var(2)/var(1)
-      yb=var(1)*xb*xb+var(2)*xb+var(3)
-      uran=xobs(imax)-xobs(imin)
-      xobstic(numobstic)=xav+xran*xb
-      yobstic(numobstic)=yb
-      do i=1,9
-        utt=xobs(imin)+0.125*float(i-1)*uran
-        uobstic(i,numobstic)=utt
-        ut=(utt-xav)/xran
-        zobstic(i,numobstic)=var(1)*ut*ut+var(2)*ut+var(3)
-      END DO
-
-      END SUBROUTINE fit_peaktop
-!
+!U      SUBROUTINE Fit_PeakTop(xtem)
+!U!
+!U      EXTERNAL CHIQUAD
+!U      REAL CHIQUAD
+!U!
+!U      INCLUDE 'PARAMS.INC'
+!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+!U      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+!U      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
+!U      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+!U      XGGMIN,XGGMAX,YGGMIN,YGGMAX
+!U      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+!U!
+!U      INCLUDE 'GLBVAR.INC'
+!U
+!U      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
+!U       itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+!U!
+!U      REAL VAR(3),DVAR(3),COVAR(3,3)
+!U      PARAMETER (MVAL=50)
+!U      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
+!U!
+!U      axdif=abs(xobs(nobs)-xobs(1))
+!U      klose=1
+!U      do ii=1,nobs
+!U        atem=abs(xtem-xobs(ii))
+!U        if (atem.le.axdif) then
+!U          axdif=atem
+!U          klose=ii
+!U        end if
+!U      end do
+!U!
+!U      nval=9
+!U      imin=klose-4
+!U      imax=klose+4
+!U      if (imin.lt.1) then
+!U        imin=1
+!U        imax=9
+!U      end if
+!U      if (imax.gt.nobs) then
+!U        imax=nobs
+!U        imin=nobs-8
+!U      end if
+!U!
+!U      xav=0.5*(xobs(imax)+xobs(imin)) 
+!U      xran=0.5*(xobs(imax)-xobs(imin))      
+!U      do i=1,9
+!U        ii=imin+i-1
+!U        xval(i)=(xobs(ii)-xav)/xran
+!U        yval(i)=yobs(ii)
+!U        eval(i)=eobs(ii)
+!U      end do
+!U!
+!U      nvar=3
+!U      var(1)=0.5*(yobs(imax)+yobs(imin))-yobs(imin+3)
+!U      var(2)=0.5*(yobs(imax)-yobs(imin))
+!U      var(3)=yobs(imin+3)
+!U      dvar(1)=0.1*var(1)
+!U      dvar(2)=0.1*var(2)
+!U      dvar(3)=0.1*var(3)
+!U!
+!U      call simopt(var,dvar,covar,nvar,chiquad)
+!U      xb=-0.5*var(2)/var(1)
+!U      yb=var(1)*xb*xb+var(2)*xb+var(3)
+!U      uran=xobs(imax)-xobs(imin)
+!U      xobstic(numobstic)=xav+xran*xb
+!U      yobstic(numobstic)=yb
+!U      do i=1,9
+!U        utt=xobs(imin)+0.125*float(i-1)*uran
+!U        uobstic(i,numobstic)=utt
+!U        ut=(utt-xav)/xran
+!U        zobstic(i,numobstic)=var(1)*ut*ut+var(2)*ut+var(3)
+!U      END DO
+!U
+!U      END SUBROUTINE fit_peaktop
+!U!
 !*****************************************************************************
 !
 !U      SUBROUTINE Rebin_Profile()
@@ -711,13 +711,7 @@
 
       DO
         CALL GetEvent
-        IF (EventInfo%WIN .NE. 0) THEN ! Message from a dialogue
-          SELECT CASE (EventType)
-            CASE (CloseRequest)
-              CALL WDialogSelect(IDD_Structural_Information)
-              CALL WDialogHide()
-          END SELECT
-        ELSE
+        IF (EventInfo%WIN .EQ. 0) THEN ! Message from main window
           SELECT CASE (EventType)
             CASE (MouseButDown)
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
@@ -790,9 +784,6 @@
       NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
       XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
       IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-      REAL XPF_PTEM(MAX_NPPR,MAX_NPFR),YPF_PTEM(MAX_NPPR,MAX_NPFR)
-      REAL XXFTEM(2,MAX_NPFR),YPkFitTem(MAX_FITPT)
-      INTEGER IILOTEM(MAX_NPFR),IIHITEM(MAX_NPFR),IIRANGT(MAX_NPFR),NNTEM(MAX_NPFR)
 !
 ! Get ready to put up the big cursor
       CALL WMessageEnable(MouseMove, Enabled)
@@ -1147,8 +1138,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-      TYPE(WIN_STYLE)    WINDOW
-
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
@@ -1160,19 +1149,12 @@
         XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
-      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
+      REAL XCUR(2)
 
       INCLUDE 'GLBVAR.INC'
 
-      LOGICAL HVLINE_THERE
-
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
-      INTEGER ITTEM(MOBSTIC)
-      CHARACTER*4   CHRFORM
-      REAL DSPLT(10)
-      INTEGER IHPLT(3,10)
       INCLUDE 'Poly_Colours.inc'
 
       INTEGER CurrentRange 
