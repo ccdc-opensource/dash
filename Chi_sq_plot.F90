@@ -87,23 +87,19 @@
       IF (iteration .GT. MaxIterationSoFar) MaxIterationSoFar = iteration
 ! Record chi-sqd value in array.  Chi-sqd values following it_count entry
 ! set to last Chi-sqd value entered.
+
+!! Ensure that profile chi-sqd value never increases....
       chi_sqd(iteration, Curr_SA_Run) = CHIPROBEST
+      IF (iteration .GT. 1) THEN
+        IF (CHIPROBEST .GT. chi_sqd(iteration-1, Curr_SA_Run)) THEN
+          chi_sqd(iteration, Curr_SA_Run) = Chi_sqd(iteration-1, Curr_SA_Run)
+         END IF
+      END IF
+!! Fill rest of array with current Chi-sqd Value
       DO J = iteration+1, MaxIter
         Chi_sqd(J, Curr_SA_Run) = CHIPROBEST
       ENDDO
-!!<<<<<<< Chi_sq_plot.F90
 
-! If this is the first SA run and 2 points for the line graph have been determined, open Child Window
-!!      IF ((Curr_SA_Run.EQ.1) .AND. (iteration.EQ.2)) THEN
-!!        CALL WindowOpenChild(ChiHandle,SysMenuOn+MinButton+AlwaysOnTop, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
-!!        ChiSqdChildWindows(ChiHandle) = 1
-!!        CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
-!!        Zoomed = .FALSE.
-!!      ENDIF
-!!=======
-! If first iteration, record y_max for graph
-!!      IF (iteration.EQ.1) y_max = chi_sqd(1, Curr_SA_Run)*1.25
-!!>>>>>>> 1.28
       IF ((ChiSqdChildWindows(ChiHandle).EQ.1).AND.(iteration.GE.2)) CALL plotting_chi_sqd(ChiHandle)
 
       END SUBROUTINE PrepareChiSqPlotData
@@ -155,12 +151,12 @@
 ! MaxIterationSoFar is initialised to zero in BeginSa
 ! calculate array of x values for graph
       DO j = 1, MaxIterationSoFar
-        Xarray(j) = FLOAT(j * nmpert)
+        Xarray(j) = (FLOAT(j * nmpert) / 100000)
       ENDDO
 
       IF (.NOT. Zoomed) THEN
-        chi_x_max = MaxIterationSoFar * FLOAT(nmpert)
-        chi_x_min = FLOAT(nmpert)
+        chi_x_max = (MaxIterationSoFar * FLOAT(nmpert))/100000
+        chi_x_min = FLOAT(nmpert)/100000
         chi_y_min = 0.0
         chi_y_max = chi_sqd(1, Curr_SA_Run)*1.25
       END IF
@@ -187,7 +183,7 @@
 !
 !  Set presentation graphics area
 !
-      CALL IPgArea(0.20,0.300,0.900,0.900)
+      CALL IPgArea(0.20,0.3,0.900,0.900)
 !
 !  Draw main title
 !
@@ -196,12 +192,12 @@
       CALL IGrCharSpacing('P')
       CALL IGrCharSize( 2.0, 1.5)
       CALL IGrColourN(KolNumMain)
-      CALL IPgTitle('Profile Chi-squared vs. Number of Moves','C')
+!!      CALL IPgTitle('Profile Chi-squared vs. Number of Moves','C')
 !
 !  Label bottom X axis
 !
       CALL IPgXLabelPos(  0.90)
-      CALL IPgXLabel('Number of Moves','C')
+      CALL IPgXLabel('Number of Moves / 100000','C')
 !
 !  Label left Y axis
 !
