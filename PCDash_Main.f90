@@ -158,19 +158,19 @@
             CALL ErrorMessage('No peak fitting ranges.')
           ELSE
 ! Find first range that has been swept but not fitted
-            CurrentRange = 0
+   10       CurrentRange = 0
             DO I = 1, NumPeakFitRange
               IF (.NOT. RangeFitYN(I)) THEN
                 CurrentRange = I
                 EXIT
               ENDIF
             ENDDO
-            IF (CurrentRange .EQ. 0) THEN
-              CALL InfoMessage('All peak fitting ranges have been fitted.')
-            ELSE
+            IF (CurrentRange .NE. 0) THEN
+!O              CALL InfoMessage('All peak fitting ranges have been fitted.')
+!O            ELSE
 ! We're ready to fit the Bragg peaks
 ! One or more peaks to be fitted - initial positions determined by user
-! If NumInPFR(InRange).eq.0 we're going to search & fit a single peak
+! If NumInPFR(InRange).EQ.0 we're going to search & fit a single peak
               CALL WCursorShape(CurHourGlass)
               CALL MultiPeak_Fitter()
               CALL WCursorShape(CurCrossHair)
@@ -178,6 +178,7 @@
 ! Disable Pawley refinement button and 'Next >' button in Wizard window
               CALL CheckIfWeCanDoAPawleyRefinement
               CALL CheckIfWeCanIndex
+              GOTO 10
             ENDIF
           ENDIF
         CASE (ID_ClearPeakFitRanges)
