@@ -16,11 +16,19 @@
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
+      LOGICAL         InWizard, InWizardWindow
+      INTEGER                                   CurrentWizardWindow
+      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+
       INTEGER PawleyErrorLog ! Function
       INTEGER IDUMMY
       INTEGER NTCycles
 
-  !    CALL SetModeMenuState(0,1,0)
+! JvdS This window popping up automatically makes it impossible to 
+! play around with indexing. Therefore: when in one of the indexing windows, ignore
+! this routine.
+      IF ((CurrentWizardWindow .EQ. IDD_PW_Page9) .OR. (CurrentWizardWindow .EQ. IDD_PW_Page8)) RETURN
+      CALL SetModeMenuState(-1,1)
       CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
@@ -147,13 +155,13 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL, IDCLOSE)
-              CALL SelectMode(ID_Peak_Fitting_Mode)
               CALL EndWizardCommon
             CASE (IDF_PawRef_Refine)
               CALL WritePawleyRefinementFile
               ieocc  = Quick_Pawley_Fit()
               ipt = 0
               CALL WDialogPutProgressBar(IDF_Pawley_Progress_Bar,ipt,Absolute)
+              CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
               SELECT CASE (ieocc)
                 CASE (0,-2)
 ! An error occurred, so pop up a box to say so and then skip this refinement
@@ -172,10 +180,10 @@
 ! JCC Need to back-copy the arrays here 
 ! Also decrement the number of Pawley refinements since it failed
                   NumPawleyRef = NumPawleyRef - 1
+                  CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
 ! We want to ignore the newly created .ccn and use the old .ccl, therefore, copy .ccl to .niw
                   CALL IOSCopyFile('polyp.ccl','polyp.niw')
                   CALL WDialogClearField(IDF_Pawley_Cycle_Number)
-                  CALL WDialogClearField(IDF_Pawley_Refinement_Number)
                   IDUMMY = PawleyErrorLog(2) ! Reset the log messages
                   CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
                   CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
@@ -189,8 +197,7 @@
                 CASE (-1)
                   NumPawleyRef = NumPawleyRef - 1
 ! Return to data viewing
-                  CALL SelectMode(ID_Peak_Fitting_Mode)
-                  CALL WDialogHide()
+                  CALL EndWizardCommon
 ! This handles cases where the number of reflections is exceeded
                   CALL ErrorMessage("Sorry, can only Pawley refine a maximum of 400 reflections."//CHAR(13)// &
                                     "You must truncate your data set.")
@@ -236,7 +243,6 @@
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
               CALL WDialogSelect(IDD_Pawley_Status)
               IF (LastValuesSet) THEN
-!              CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
                 CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
               ENDIF
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
@@ -269,6 +275,8 @@
               ENDIF
               CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
+              NumPawleyRef = NumPawleyRef - 1
+              CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
             CASE (IDB_PawRef_Save)
               IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
             CASE (IDF_PawRef_Solve)

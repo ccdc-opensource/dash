@@ -902,7 +902,7 @@
 
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
 ! Atom labels for SA solutions overlay. Two options: 
-! 1. "Element symbol + solution number" (default)
+! 1. "Element symbol + solution number"
 ! 2. "Orignal atom labels"
       CALL FileReadInteger(tFileHandle,RecNr,tInteger)
       SELECT CASE (tInteger)
@@ -912,7 +912,7 @@
           CALL WDialogPutRadioButton(IDF_UseOriginal)
       END SELECT
 ! Atom colours for SA solutions overlay. Two options: 
-! 1. "By solution number" (default)
+! 1. "By solution number"
 ! 2. "By element"
       CALL FileReadInteger(tFileHandle,RecNr,tInteger)
       SELECT CASE (tInteger)
