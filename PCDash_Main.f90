@@ -77,10 +77,10 @@
       CALL WMessageEnable(TabChanged, Enabled)
       CALL CheckLicence
 ! Grey out al buttons to do with project file.
-      CALL WMenuSetState(IDB_New,ItemEnabled,WintOff)
-      CALL WMenuSetState(IDB_Open,ItemEnabled,WintOff)
-      CALL WMenuSetState(IDB_Save,ItemEnabled,WintOff)
-      CALL WMenuSetState(IDB_SaveAs,ItemEnabled,WintOff)
+ !     CALL WMenuSetState(IDB_New,ItemEnabled,WintOff)
+ !     CALL WMenuSetState(IDB_Open,ItemEnabled,WintOff)
+ !     CALL WMenuSetState(IDB_Save,ItemEnabled,WintOff)
+ !     CALL WMenuSetState(IDB_SaveAs,ItemEnabled,WintOff)
 ! Main message loop
       IF (NARGS() .GT. 1) THEN
         CALL GetArg(1,ArgString) 
