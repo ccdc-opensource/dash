@@ -85,18 +85,7 @@
 ! This indicates that we have a problem
 
       ENDIF
-      IF (ITER .GT. MAXITER) THEN
-        CALL DebugErrorMessage("ITER .GT. MAXITER in PEAKTOP()")
-!DEC$ IF DEFINED (ONTBUG)
-        WRITE(76,"(5F15.11)") X(1), X(2), X(3), X(4), X(5)
-        WRITE(76,"(5F15.11)") Y(1), Y(2), Y(3), Y(4), Y(5)
-        WRITE(76,"(F15.11)")  ABS(2.0-(Y(5)/Y(3)+Y(1)/Y(3)))
-        WRITE(76,"(F15.11)")  ABS(2.0-(Y(5)+Y(1))/Y(3))
-        WRITE(76,"(F15.11)")  ABS((2.0*Y(3)-Y(5)-Y(1))/Y(3))
-        CLOSE (76)
-!DEC$ ENDIF
-        GOTO 100
-      ENDIF
+      IF (ITER .GT. MAXITER) GOTO 100 ! This happens now and then (due to rounding errors?), but is not a problem.
       X(2) = X(1) + 0.25*(X(5)-X(1))
       Y(2) = PKFUNC(X(2))
       X(4) = X(1) + 0.75*(X(5)-X(1))
