@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 13/May/2002 14:41:51
+// Modified : 14/May/2002 15:11:22
 //
 ///////////////////////////////////////////////////
 //
@@ -628,6 +628,7 @@
 #define IDB_ClearAll                     1406
 #define IDM_ViewPawley                  40030
 #define IDF_PO_G1                        1407
+#define IDF_CHECK7                       1248
 
 ///////////////////////////////////////////////////
 //
@@ -1035,6 +1036,19 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
+END
+
+IDD_Width_Equations RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
@@ -3124,12 +3138,13 @@ BEGIN
     CONTROL "&Tick Marks...",IDF_TickMark_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,   94,   60,   14
     CONTROL "&Peak Fitting...",IDF_PeakFitting_Colour,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  164,   94,   60,   14
     CONTROL "Colours",IDF_Colour_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   12,   66,  221,   49
-    CONTROL "Show &background",IDF_background_check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   41,   80,   14
+    CONTROL "Show &background",IDF_background_check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   33,   80,   14
     CONTROL "Connect data &points",IDF_ConnectObsPoints,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   19,   90,   14
     CONTROL "Plot peak &fit difference",IDF_PlotPeakFitDif,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,    7,    9,   90,   14
     CONTROL "Divide by ESDs",IDF_DivPFdiff,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   15,   23,   60,   14
     CONTROL "Multiply by",IDF_MultPFdiff,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   15,   37,   46,   14
     CONTROL "2.5000",IDF_REAL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   61,   38,   25,   14
+    CONTROL "Show cumulative chi-sqd",IDF_CHECK7,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  140,   47,   94,   14
 END
 
 IDD_TabPlotOptions RCDATA
@@ -3141,6 +3156,7 @@ BEGIN
 " 1133 0 \n"
 " 1475 1 \n"
 " 1476 1 \n"
+" 1248 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
