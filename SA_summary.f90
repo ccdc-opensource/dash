@@ -76,8 +76,6 @@
               CALL WDialogSelect(IDD_OutputSolutions)
               CALL WDialogHide
               CALL EndWizardPastPawley
-              CALL WDialogSelect(IDD_SA_Action1)
-              CALL WDialogFieldState(IDB_Summary,Enabled)
 ! Closes all SA profile child windows which are still open when OK button clicked
               DO i = 1, MaxNumChildWin
                 IF (SAUsedChildWindows(i).EQ.1) THEN
