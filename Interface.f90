@@ -34,9 +34,9 @@
       LOGICAL, INTENT (IN   ) :: TheLogical
 
       IF (TheLogical) THEN
-        CALL WDialogFieldState(TheFieldIdentifier,Enabled)
+        CALL WDialogFieldState(TheFieldIdentifier, Enabled)
       ELSE
-        CALL WDialogFieldState(TheFieldIdentifier,Disabled)
+        CALL WDialogFieldState(TheFieldIdentifier, Disabled)
       ENDIF
 
       END SUBROUTINE WDialogFieldStateLogical
@@ -60,9 +60,9 @@
       LOGICAL, INTENT (IN   ) :: TheLogical
 
       IF (TheLogical) THEN
-        CALL WDialogPutCheckBox(TheFieldIdentifier,Checked)
+        CALL WDialogPutCheckBox(TheFieldIdentifier, Checked)
       ELSE
-        CALL WDialogPutCheckBox(TheFieldIdentifier,UnChecked)
+        CALL WDialogPutCheckBox(TheFieldIdentifier, UnChecked)
       ENDIF
 
       END SUBROUTINE WDialogPutCheckBoxLogical
@@ -85,10 +85,32 @@
 
       INTEGER I
 
-      CALL WDialogGetCheckBox(TheFieldIdentifier,I)
+      CALL WDialogGetCheckBox(TheFieldIdentifier, I)
       WDialogGetCheckBoxLogical = (I .EQ. Checked)
 
       END FUNCTION WDialogGetCheckBoxLogical
+!
+!*****************************************************************************
+!
+        INTEGER FUNCTION WDialogGetRadioButtonInt(TheFieldIdentifier)
+!
+! This function provides a wrapper around the Winteracter WDialogGetRadioButton routine,
+! which takes the state of a set of radio buttons and stores it in an integer.
+! This function returns the integer instead of storing it, eliminating the temporary
+! variable in the calling code.
+!
+      USE WINTERACTER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheFieldIdentifier
+
+      INTEGER I
+
+      CALL WDialogGetRadioButton(TheFieldIdentifier, I)
+      WDialogGetRadioButtonInt = I
+
+      END FUNCTION WDialogGetRadioButtonInt
 !
 !*****************************************************************************
 !
@@ -110,9 +132,9 @@
 ! Remember current dialogue window
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page3)
-      CALL WDialogPutString(IDF_PWa_DataFileName_String,FNAME)
+      CALL WDialogPutString(IDF_PWa_DataFileName_String, FNAME)
       CALL WDialogSelect(IDD_PW_Page2)
-      CALL WDialogPutString(IDF_PW_DataFileName_String,FNAME)
+      CALL WDialogPutString(IDF_PW_DataFileName_String, FNAME)
       CALL PopActiveWindowID
 ! Update the status bar at the bottom of the screen.
       CALL WindowOutStatusBar(1,FNAME)
