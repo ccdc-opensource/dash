@@ -344,22 +344,21 @@
       INCLUDE 'PARAMS.INC'
 
       CHARACTER*150 LINE
-      INTEGER ICOR(20), NKKOR(MCHIHS)
+      INTEGER NKKOR(MCHIHS)
 
       INTEGER         MAXK
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
-
-      INTEGER         NLGREF
-      LOGICAL                 LOGREF
-      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
 
       INTEGER         KKOR
       REAL                  WTIJ
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
-      INTEGER KK, I, NPO, NLIN, NCOR, IR, II, JJ, IK, MINCOR, KL
+      INTEGER         IHCOV
+      COMMON /CORHES/ IHCOV(30,MaxRef)
+
+      INTEGER KK, I, NLIN, NCOR, IR, II, JJ, IK, MINCOR, KL
       INTEGER, EXTERNAL :: GetNumOfColumns
 
       OPEN (121,FILE=FILENAM(:Lenfil),STATUS='OLD',ERR=998)
@@ -367,25 +366,25 @@
       KKOR = 0
       MINCOR = 20
       IER = 0
-      DO IR = 1, MFCSTO
+      DO iR = 1, MFCSTO
         READ (121,2121,END=100,ERR=998) NLIN, LINE
    2121 FORMAT (Q,A)
         NCOR = GetNumOfColumns(LINE) - 6
-        READ (LINE(1:NLIN),*,END=998,ERR=998) (iHKL(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (ICOR(I),I=1,NCOR)
-        KK = IR
+        READ (LINE(1:NLIN),*,END=998,ERR=998) (iHKL(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (IHCOV(I,iR),I=1,NCOR)
+        KK = iR
 !
 !.. Now work out which terms should be kept for the chi-squared calculation
 !
         KKOR = KKOR + 1
-        IKKOR(KKOR) = IR
-        JKKOR(KKOR) = IR
+        IKKOR(KKOR) = iR
+        JKKOR(KKOR) = iR
         NKKOR(KKOR) = 100
         DO I = 1, NCOR
-          IF (ABS(ICOR(I)).GE.MINCOR) THEN
+          IF (ABS(IHCOV(I,iR)).GE.MINCOR) THEN
             KKOR = KKOR + 1
-            IKKOR(KKOR) = IR
-            JKKOR(KKOR) = IR + I
-            NKKOR(KKOR) = ICOR(I)
+            IKKOR(KKOR) = iR
+            JKKOR(KKOR) = iR + I
+            NKKOR(KKOR) = IHCOV(I,iR)
           ENDIF
         ENDDO
       ENDDO
