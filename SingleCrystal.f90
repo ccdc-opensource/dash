@@ -156,7 +156,7 @@
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_LabX_Source,IDF_SynX_Source)
+            CASE (IDF_LabX_Source, IDF_SynX_Source)
               CALL WDialogGetRadioButton(IDF_LabX_Source, JRadOption)
               CALL Upload_Source
               CALL Generate_TicMarks 
@@ -324,15 +324,25 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER ISIG5, IArgKK
       INTEGER KXIMIN(MOBS), KXIMAX(MOBS)
       INTEGER KK, I, NLIN, iR, J, K, hFile
       INTEGER KTEM, K1, K2
       REAL    ARGIMIN, ARGIMAX, ARGISTP, ARGT, FWHM, C0, Gaussian !, Lorentzian
       CHARACTER*150 LINE
+      LOGICAL RecalculateESDs
 
       HKLFFileLoad = 1
       hFile = 121
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SX_Page2)
+      RecalculateESDs = WDialogGetCheckBoxLogical(IDF_RecalcESDs)
+      CALL PopActiveWindowID
+      Is_SX = .TRUE.
       OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=998)
       KK = 0
       DO iR = 1, MFCSTO
@@ -349,8 +359,8 @@
 !C No cross correlation ...
         READ(LINE(1:NLIN),*,END=998,ERR=998) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
 !C F2 and sig(F2)
+        IF (RecalculateESDs) WTJ(iR) = MAX(SQRT(MAX(0.0, AJOBS(iR))), WTJ(iR))
         WTJ(iR) = 1.0 / WTJ(iR)
-   !F     WTJ(iR) = 1.0 / (MAX(SQRT(MAX(0.0,AJOBS(iR))),WTJ(iR)))
         KK = iR
       ENDDO
   100 NumOfRef = KK
@@ -429,7 +439,8 @@
 !C Write out a fake .hcv file
       OPEN(UNIT=hFile,FILE='polyp.hcv',STATUS='UNKNOWN',ERR=999)
       DO iR = 1, NumOfRef
-        WRITE(hFile,*) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), iR
+        WRITE(hFile,101) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), iR
+  101   FORMAT (3I5,1X,F12.3,1X,F12.4,1X,I5)
       ENDDO
       CLOSE(hFile)
       CALL Clear_BackGround
