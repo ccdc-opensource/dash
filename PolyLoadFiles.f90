@@ -331,14 +331,13 @@
       ELSE IF (YPMAX .GT. 100000) THEN
         SCALFAC = 0.01 * YPMAX/100000
       ENDIF
-      OriginalNOBS = NOBS
-      EndNOBS = OriginalNOBS
       BackupNOBS = NOBS
       DO I = 1, NOBS
         BackupXOBS(I) = XOBS(I)
         BackupYOBS(I) = YOBS(I)
         BackupEOBS(I) = EOBS(I)
       ENDDO
+      LBIN = 1
       CALL Rebin_Profile
 ! JvdS Assume no knowledge on background
       CALL Init_BackGround
@@ -1430,62 +1429,20 @@
 !
 !*****************************************************************************
 !
-! JCC  Routine to truncate data to a particular data range
-! In practice, this varies the NOBS value so the data is not lost, just
-! Hidden. The routine should not be called with RMaxTTheta greater
-! than the maximum value read in
-      SUBROUTINE TruncateData(RMaxTTheta)
-
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-
-      INTEGER          NOBS
-      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
-
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-
-      REAL RMaxTTheta
-      INTEGER I
-
-      DO I = 1, EndNOBS
-        IF (XOBS(I) .GT. RMaxTTheta) EXIT
-      ENDDO
-      IF (I .LE. 1) RETURN
-      NOBS = I - 1
-      CALL Rebin_Profile
-      CALL GetProfileLimits
-      CALL Profile_Plot
-
-      END SUBROUTINE TruncateData
+      SUBROUTINE TruncateData(TheMin2Theta,TheMax2Theta)
 !
-!*****************************************************************************
+! This subroutine truncates data both at the start and at the end.
+! Setting TheMin2Theta to 0.0 / TheMax2Theta to 90.0 effectively 
+! restores beginning or end to original state
 !
-      SUBROUTINE TruncateDataStart(TheMin2Theta)
-
+! Note: restores XOBS etc. from BackupXOBS etc., so can't be called _after_ background subtraction.
+!
       USE VARIABLES
 
       IMPLICIT NONE
 
       REAL, INTENT (IN   ) :: TheMin2Theta
+      REAL, INTENT (IN   ) :: TheMax2Theta
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -1494,77 +1451,34 @@
       REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
 
-      REAL tXOBS(MOBS),tYOBS(MOBS),tYCAL(MOBS),tYBAK(MOBS),tEOBS(MOBS)
+      INTEGER                BackupNOBS
+      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
+      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
- 
       INTEGER I, Shift
 
-! We might have been through this routine before: undo that (in case the user wants to 
-! truncate at a 2 theta value lower than currently visible) and store the result (i.e. the
-! original pattern) in tXOBS.
-
-! If EndNOBS <> OriginalNOBS, truncated data is stored after the original pattern
-      IF (EndNOBS .NE. OriginalNOBS) THEN
-        DO I = 1, OriginalNOBS-EndNOBS
-          tXOBS(I) = XOBS(I+EndNOBS)
-          tYOBS(I) = YOBS(I+EndNOBS)
-          tYCAL(I) = YCAL(I+EndNOBS)
-          tYBAK(I) = YBAK(I+EndNOBS)
-          tEOBS(I) = EOBS(I+EndNOBS)
-        ENDDO
-      ENDIF
-! The data that was truncated at the beginning is now part of NOBS again
-      NOBS = NOBS + OriginalNOBS - EndNOBS
-! Copy the rest of the pattern to tXOBS etc., including any parts truncated at the end.
-      DO I = 1, EndNOBS
-        tXOBS(I+OriginalNOBS-EndNOBS) = XOBS(I)
-        tYOBS(I+OriginalNOBS-EndNOBS) = YOBS(I)
-        tYCAL(I+OriginalNOBS-EndNOBS) = YCAL(I)
-        tYBAK(I+OriginalNOBS-EndNOBS) = YBAK(I)
-        tEOBS(I+OriginalNOBS-EndNOBS) = EOBS(I)
+! Find TheMax2Theta in BackupXOBS
+      DO I = BackupNOBS, 1, -1
+        IF (BackupXOBS(I) .LE. TheMax2Theta) EXIT
       ENDDO
+      NOBS = I
+! Find TheMin2Theta in BackupXOBS
       DO I = 1, NOBS
-        IF (tXOBS(I) .GT. TheMin2Theta) EXIT
+        IF (BackupXOBS(I) .GE. TheMin2Theta) EXIT
       ENDDO
-      Shift = I-1
-      EndNOBS = OriginalNOBS - Shift
-      DO I = 1, EndNOBS
-        XOBS(I) = tXOBS(I+Shift)
-        YOBS(I) = tYOBS(I+Shift)
-        YCAL(I) = tYCAL(I+Shift)
-        YBAK(I) = tYBAK(I+Shift)
-        EOBS(I) = tEOBS(I+Shift)
+      Shift = I - 1
+      DO I = 1, NOBS
+        XOBS(I) = BackupXOBS(I+Shift)
+        YOBS(I) = BackupYOBS(I+Shift)
+        EOBS(I) = BackupEOBS(I+Shift)
+        YBAK(I) = 0.0
       ENDDO
-      IF (Shift .NE. 0) THEN
-        DO I = 1, Shift
-          XOBS(EndNOBS+I) = tXOBS(I)
-          YOBS(EndNOBS+I) = tYOBS(I)
-          YCAL(EndNOBS+I) = tYCAL(I)
-          YBAK(EndNOBS+I) = tYBAK(I)
-          EOBS(EndNOBS+I) = tEOBS(I)
-        ENDDO
-      ENDIF
       NOBS = NOBS - Shift
       CALL Rebin_Profile
       CALL GetProfileLimits
       CALL Profile_Plot
 
-      END SUBROUTINE TruncateDataStart
+      END SUBROUTINE TruncateData
 !
 !*****************************************************************************
 !

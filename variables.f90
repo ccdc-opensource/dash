@@ -90,13 +90,6 @@
       DATA NoData / .TRUE. /
 ! .FALSE. when a powder diffraction pattern has been read in
 
-      INTEGER OriginalNOBS ! Original number of data points read in for the raw powder pattern
-      INTEGER EndNOBS
-! When truncating the powder pattern at the start, DASH stores the data points that were removed
-! _after_ the original pattern. EndNOBS points to the original end of the pattern.
-! OriginalNOBS is never changed, so the point between EndNOBS and Original NOBS are
-! data points that were reomved from the start of the pattern.
-
       LOGICAL UseConfigFile
 ! This is the first item read from the configuration file (if present).
 ! If set to .FALSE., the rest of the configuration file will be skipped.

@@ -186,6 +186,8 @@
 ! @@ ?
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
+      IPTYPE = 1
+      CALL Profile_Plot
 
       END SUBROUTINE EndWizardPastPawley
 !
@@ -270,8 +272,6 @@
       ENDDO
 ! JvdS Assume no knowledge on background
       CALL Init_BackGround
-      OriginalNOBS = NOBS
-      EndNOBS = OriginalNOBS
       CALL Rebin_Profile
       CALL GetProfileLimits
       CALL Profile_Plot
@@ -386,34 +386,25 @@
 
       IMPLICIT NONE
 
-      REAL    tReal
+      REAL    tMin, tMax
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-
-! Should be rewritten:
-! 1. Restore original whole pattern first (this is always available in BackupYOBS)
-!    (we could even move that part to the truncation routine itself: that's where this is done
-!    implicitly anyway)
-! 2. merge TruncateDataStart and TruncateData to give a single routine that truncates the data
-!    from both sides.
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
       IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
-        CALL WDialogGetReal(IDF_Min2Theta,tReal)
+        CALL WDialogGetReal(IDF_Min2Theta,tMin)
       ELSE
 ! If the user doesn't want to truncate the data, just restore the old values
-        tReal = 0.0
+        tMin = 0.0
       ENDIF
-      CALL TruncateDataStart(tReal)
       IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
-        CALL WDialogGetReal(IDF_Max2Theta,tReal)
+        CALL WDialogGetReal(IDF_Max2Theta,tMax)
       ELSE
 ! If the user doesn't want to truncate the data, just restore the old values
-        tReal = 90.0
+        tMax = 90.0
       ENDIF
-      CALL TruncateData(tReal)
+      CALL TruncateData(tMin,tMax)
       CALL PopActiveWindowID
-      CALL Profile_Plot
 
       END SUBROUTINE WizardApplyProfileRange
 !
