@@ -96,14 +96,7 @@
 ! IPMAX = bin number (so, pointer into XBIN) of the last bin visible on screen
 !         only useful when the user has zoomed in, otherwise IPMAX = NBIN
 
-      REAL              BICALC,         XICALC
-      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 
-! AIOBS = observed intensity, per reflection
-! AICALC = part of the calculated intensity due to structural parameters (atoms)
-! BICALC = AICALC * XICALC = calculated intensity
-! XICALC = part of the calculated intensity due to preferred orientation
- 
 !O! JCC GGCALC dimension increased to 500
 !O      REAL            REFH,           AMUL
 !O      REAL            ESDOBS,         SOMEGA,       GGCALC

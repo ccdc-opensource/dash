@@ -29,12 +29,13 @@
 
       INTEGER NLGREF
       LOGICAL LOGREF(8,MaxRef)
-
 ! Logicals indicating which reflections are absent.
 
-      REAL    AIOBS(MaxRef), AICALC(MaxRef)
+      REAL    AIOBS(MaxRef), AICALC(MaxRef), XICALC(MaxRef), BICALC(MaxRef)
 ! AIOBS = observed intensity, per reflection
 ! AICALC = part of the calculated intensity due to structural parameters (atoms)
+! XICALC = part of the calculated intensity due to preferred orientation
+! BICALC = AICALC * XICALC = calculated intensity
 
       REAL    WTI(MaxRef)
 ! Weight of the reflection

@@ -5,14 +5,13 @@
 !
 ! Must be called after VALCHI, because it needs the BICALC to have been set up.
 !
+      USE REFVAR
+      
       IMPLICIT NONE
 
       REAL, INTENT (  OUT) :: chivalpro
 
       INCLUDE 'PARAMS.INC'
-
-      REAL              BICALC,         XICALC
-      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 
       INTEGER          NFITA, IFITA
       REAL                                 WTSA
