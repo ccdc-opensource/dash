@@ -322,6 +322,9 @@
         CASE (IDD_PW_Page3)
           CALL DealWithWizardWindowDiffractionFileInput
           GOTO 10
+        CASE (IDD_PW_Page3a)
+          CALL DealWithWizardWindowRebin
+          GOTO 10
         CASE (IDD_PW_Page4)
           CALL DealWithWizardWindowDiffractionSetup
           GOTO 10

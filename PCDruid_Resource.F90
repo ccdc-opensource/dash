@@ -1,4 +1,4 @@
-! Winteracter module created : 15/Mar/2002 16:27:11
+! Winteracter module created : 17/Mar/2002 16:06:47
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -613,4 +613,8 @@
           INTEGER, PARAMETER :: IDF_SGDet_LABEL                 =  1462
           INTEGER, PARAMETER :: IDB_Edit                        =  1468
           INTEGER, PARAMETER :: IDB_Summary                     =  1469
+          INTEGER, PARAMETER :: IDB_Bin                         =  1470
+          INTEGER, PARAMETER :: IDD_PW_Page3a                   =   175
+          INTEGER, PARAMETER :: IDF_BinData                     =  1471
+          INTEGER, PARAMETER :: IDF_LBIN                        =  1472
       END MODULE Druid_Header

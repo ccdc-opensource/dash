@@ -273,7 +273,6 @@
 ! JvdS Assume no knowledge on background
       CALL Clear_BackGround
       CALL Rebin_Profile
-      CALL GetProfileLimits
 
       END SUBROUTINE WizardApplyDiffractionFileInput
 !
@@ -310,6 +309,10 @@
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
+            CASE (IDB_Bin)
+              CALL WizardApplyDiffractionFileInput
+              CALL Profile_Plot
+              CALL WizardWindowShow(IDD_PW_Page3a)
             CASE (ID_PWa_DF_Open)
               CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
               ISTAT = DiffractionFileOpen(CTEMP)
@@ -327,6 +330,64 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowDiffractionFileInput
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowRebin
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page3a)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_PW_Page3)
+            CASE (IDNEXT)
+! Get value from window
+              IF (WDialogGetCheckBoxLogical(IDF_BinData)) THEN
+                CALL WDialogGetInteger(IDF_LBIN,LBIN)
+              ELSE
+                LBIN = 1
+              ENDIF
+              CALL Rebin_Profile
+              CALL Profile_Plot
+              CALL WizardWindowShow(IDD_PW_Page4)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (IDAPPLY)
+! Get value from window
+              IF (WDialogGetCheckBoxLogical(IDF_BinData)) THEN
+                CALL WDialogGetInteger(IDF_LBIN,LBIN)
+              ELSE
+                LBIN = 1
+              ENDIF
+              CALL Rebin_Profile
+              CALL Profile_Plot
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_BinData)
+! If set to 'TRUE', ungrey value field and vice versa
+              CALL WDialogFieldStateLogical(IDF_LBIN,WDialogGetCheckBoxLogical(IDF_BinData))
+          END SELECT                
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowRebin
 !
 !*****************************************************************************
 !
