@@ -21,11 +21,11 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Input3_2)
-      CALL WDialogGetInteger(IDF_SA_MaxRepeats,MaxRuns)
-      CALL WDialogGetReal(IDF_MaxMoves1,MaxMoves1)
+      CALL WDialogGetInteger(IDF_SA_MaxRepeats, MaxRuns)
+      CALL WDialogGetReal(IDF_MaxMoves1, MaxMoves1)
       IF (MaxMoves1 .LT.   0.001) MaxMoves1 =   0.001
       IF (MaxMoves1 .GT. 100.0  ) MaxMoves1 = 100.0
-      CALL WDialogGetInteger(IDF_MaxMoves2,MaxMoves2)
+      CALL WDialogGetInteger(IDF_MaxMoves2, MaxMoves2)
       IF (MaxMoves2 .LT. 1) MaxMoves2 = 1
       IF (MaxMoves2 .GT. 8) MaxMoves2 = 8
       tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
@@ -77,9 +77,9 @@
       REAL Duonion(0:1)
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL WDialogSelect(IDD_Summary)
       DO iSol = 1, NumOf_SA_Runs-1
-        CALL WGridGetCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSol2Run(iSol)))
+        CALL WGridGetCellCheckBox(IDF_SA_Summary, 3, iSol, iSolTicked(iSol2Run(iSol)))
       ENDDO
 ! Add this solution to the list
       DO I = 1, nvar
@@ -138,7 +138,6 @@
       ENDDO
       IntensityChiSqd(Curr_SA_Run) = FOPT
       ProfileChiSqd(Curr_SA_Run) = CHIPROBEST
-      iSolTicked(Curr_SA_Run) = 1
 ! Now sort the list according to intensity chi sqd
       CALL SORT_REAL(IntensityChiSqd, iSol2Run, NumOf_SA_Runs)
       CALL Update_Solutions
