@@ -190,10 +190,10 @@
 ! Reprogrammed according to Molecular Modelling by Leach, page 384.
 ! (Note the typos: q1 and q2 should read phi minus psi)
 
-! q0 = Cos(0.5*beta) * Cos(0.5(alpha+gamma))
-! q1 = Sin(0.5*beta) * Cos(0.5(alpha-gamma))
-! q2 = Sin(0.5*beta) * Sin(0.5(alpha-gamma))
-! q3 = Cos(0.5*beta) * Sin(0.5(alpha+gamma))
+! q0 = Cos(0.5*beta) * Cos(0.5*(alpha+gamma))
+! q1 = Sin(0.5*beta) * Cos(0.5*(alpha-gamma))
+! q2 = Sin(0.5*beta) * Sin(0.5*(alpha-gamma))
+! q3 = Cos(0.5*beta) * Sin(0.5*(alpha+gamma))
 !
 ! 1. gamma about the z-axis
 ! 2. beta  about the x-axis
@@ -215,7 +215,9 @@
 !
       IMPLICIT NONE
 
-      REAL*8 DC4(0:3), EL(0:3,0:3), ROTA(1:3,1:3)
+      REAL*8 DC4(0:3), ROTA(1:3,1:3)
+
+      REAL*8 EL(0:3,0:3)
       INTEGER I, J
 
       DO I = 0, 3
@@ -272,7 +274,7 @@
       INTEGER I, J
 
       DO I = 1, 3
-        XORTN(I) = 0.
+        XORTN(I) = 0.0
         DO J = 1, 3
           XORTN(I) = XORTN(I) + ROTA(I,J)*XORTO(J)
         ENDDO

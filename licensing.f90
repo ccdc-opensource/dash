@@ -349,7 +349,7 @@
       WRITE(Iun,'(A)',ERR=100) '         '
       WRITE(Iun,'(A)',ERR=100) '         '
       WRITE(Iun,'(A)',ERR=100) '         '
-      WRITE(Iun,'(A)',ERR=100) 'You should send the completed contents of this file to software@ccdc.cam.ac.uk'
+      WRITE(Iun,'(A)',ERR=100) 'You should send the completed contents of this file to support@ccdc.cam.ac.uk'
       WRITE(Iun,*,ERR=100)
       CLOSE(iun,iostat=idummy)
       CALL WMessageBox(YesNo,InformationIcon,CommonYes,&

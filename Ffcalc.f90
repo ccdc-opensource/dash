@@ -1631,14 +1631,17 @@
       REAL FUNCTION FFCALC_DEFAULT(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
+
       LOGICAL CENTRC
+      COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
+
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 
       REAL            sctrh,            rhsto
-      COMMON /symsto/ sctrh(24,MFCSTO), rhsto(3,24,MFCSTO)
+      COMMON /symsto/ sctrh(24,MaxRef), rhsto(3,24,MaxRef)
 
       INTEGER     NAC,       NBC
       REAL                                  FARCOS
@@ -1708,7 +1711,7 @@
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
-      REAL AMUL, X, XP, XM
+      REAL    AMUL, X, XP, XM
       INTEGER I
 
       AMUL = TWOPI / FARCOS
