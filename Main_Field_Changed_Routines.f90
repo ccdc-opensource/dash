@@ -830,7 +830,7 @@
       DICVOLSolutions(NumOfDICVOLSolutions)%alpha = The_alpha
       DICVOLSolutions(NumOfDICVOLSolutions)%beta  = The_beta
       DICVOLSolutions(NumOfDICVOLSolutions)%gamma = The_gamma
-      DICVOLSolutions(NumOfDICVOLSolutions)%Volume = TheVolume
+      DICVOLSolutions(NumOfDICVOLSolutions)%Volume = TheVolume / (DV_ScaleFactor**3)
       DICVOLSolutions(NumOfDICVOLSolutions)%F = -1.0
       DICVOLSolutions(NumOfDICVOLSolutions)%M = -1.0
 ! F and M are calculated in a different part and added only subject to 
