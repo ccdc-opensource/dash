@@ -12,6 +12,7 @@
 !
 !   The common blocks below contain the info required for .pro file
 	INCLUDE 'PARAMS.INC'
+      REAL XOBS, YOBS, YCAL
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
       YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),&
@@ -27,8 +28,8 @@
 
     open(unit=61,file=pro_file(1:pro_flen),status='unknown')
     do 10 i = 1,nobs
-    write(61,12) xobs(i), yobs(i), ycal(i)
-12  format(3(f12.6))
+    write(61,12) char(9), xobs(i), char(9), yobs(i),char(9), ycal(i)
+12  format(3(a,f12.4))
 10  continue
 
 !   to overwrite:
