@@ -356,7 +356,6 @@
       CALL IOsDeleteFile('polyp.hkl')
       CALL IOsDeleteFile('polyp.ccl')
       CALL IOsDeleteFile('polyp.ccn')
-      CALL IOsDeleteFile('polyp.niw')
       CALL IOsDeleteFile('polyp.pik')
       CALL IOsDeleteFile('polyp.hcv')
       CALL IOsDeleteFile('polyp.dat')

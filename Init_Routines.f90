@@ -180,8 +180,6 @@
       CALL Upload_Positions
 !... and 'View'|'Peak Widths' tabs
       CALL Upload_Widths
-! Signal to Pawley refinement that we should start with a clean slate
-      CALL IOsDeleteFile('polyp.niw')
 ! Redraw
       CALL Profile_Plot
 ! Grey out 'Delete all peak fit ranges' button on toolbar
@@ -209,8 +207,13 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
+      INTEGER         PR_NumBack
+      REAL                        PR_BackGround
+      COMMON /PRBACK/ PR_NumBack, PR_BackGround(1:10)
+
       INTEGER I
 
+      PR_BackGround = 0.0
       DO I = 1, NBIN
         YBBIN(I) = 0.0
       ENDDO

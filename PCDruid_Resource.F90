@@ -1,4 +1,4 @@
-! Winteracter module created : 08/May/2002 11:31:25
+! Winteracter module created : 09/May/2002 15:29:14
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -117,7 +117,7 @@
           INTEGER, PARAMETER :: IDF_Sigma_label                 =  1081
           INTEGER, PARAMETER :: IDF_Sigma1                      =  1082
           INTEGER, PARAMETER :: IDF_sigma1_label                =  1083
-          INTEGER, PARAMETER :: IDF_sigma2                      =  1084
+          INTEGER, PARAMETER :: IDF_Sigma2                      =  1084
           INTEGER, PARAMETER :: IDF_sigma2_label                =  1085
           INTEGER, PARAMETER :: IDF_sup2_1                      =  1086
           INTEGER, PARAMETER :: IDF_sup2_2                      =  1087
