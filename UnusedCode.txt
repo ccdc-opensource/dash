@@ -1,8 +1,301 @@
 !
 !*****************************************************************************
 !
-! Originally in sa_subs.for
+! Originally in sa_plot.f90
+!
+     subroutine SA_PLOT(iter)
+!
+      use winteracter
+      use druid_header
+!
+      parameter (maxiter=10000)
+      common /pltstore/ xiter(maxiter),tstore(maxiter),&
+      foptstore(maxiter),fpavstore(maxiter)
+      COMMON /PLTSTO2/ CHIPROBEST(MAXITER)
 
+	  integer IcurSel
+!
+!
+!
+      if (iter.le.1) return
+      ICurSel = WInfoDialog(CurrentDialog)
+
+!
+      CALL WDialogSelect(IDD_Anneal_Status)
+      CALL IGrSelect(3, IDF_Status_Graph)
+      CALL IGrArea(0.0,0.0,1.0,1.0)
+      CALL IGrAreaClear
+      CALL IGrCharFont(1)
+!      CALL IGrCharSpacing('P')
+      CALL IGrColourN(175)
+!
+! Check on whether we want log or linear y axis
+      CALL WDialogGetRadioButton(IDF_Anneal_LogY,IRAD_AnnealLogLinY)
+      SELECT CASE (IRAD_AnnealLogLinY)
+          CASE (1)
+! Observed and calculated profiles
+            CALL IPgScaling('LIN','LOG')
+          CASE (2)
+! The difference profile
+            CALL IPgScaling('LIN','LIN')
+      END SELECT
+
+
+      CALL IPgNewGraph(4,iter,' ',' ','XY')
+!
+!  draw axes and add scales
+!
+
+
+      CALL IPgAxes
+      xgmin=1.
+      xgmax=float(iter)
+      CALL IRealMaxMin1(tstore,iter,tmin,tmax)
+      CALL IRealMaxMin1(foptstore,iter,fmin,fmax)
+      CALL IRealMaxMin1(fpavstore,iter,amin,amax)
+      CALL IRealMaxMin1(chiprobest,iter,cmin,cmax)
+      ygmin=0.9*min(tmin,fmin,amin,cmin)
+      ygmax=1.1*max(tmax,fmax,amax,cmax)
+      CALL IPgArea(.12,.12,.9,.95)
+      CALL IPgUnits(xgmin,ygmin,xgmax,ygmax)
+      CALL IGrCharSize(1.2,1.2)
+!      CALL IPgYUserScale(yticks,31)
+      CALL IPgBorder()
+      CALL IPgXScale('TN')
+      CALL IPgXScaleTop('T')
+      CALL IGrCharSize(1.2,1.2)
+      CALL IPgYScaleLeft('TN')
+      CALL IPgYScaleRight('T')
+!
+      CALL IGrCharSize(1.2,1.3)
+      CALL IPgXLabel('iteration number','C')
+      CALL IPgYLabelLeft('chi-squared & temperature','C9')
+      CALL IPgStyle(1,0,0,0,16,0)
+      CALL IPgStyle(2,0,0,0,112,0)
+      CALL IPgStyle(3,0,0,0,80,0)
+      CALL IPgStyle(4,0,0,0,192,0)
+      CALL IPgXYPairs(xiter,tstore)
+      CALL IPgXYPairs(xiter,foptstore)
+      CALL IPgXYPairs(xiter,fpavstore) 
+      CALL IPgXYPairs(xiter,chiprobest)
+!
+	  IF (ICurSel .NE. 0) CALL WDialogSelect(ICurSel)
+	  return
+      end
+!
+!*****************************************************************************
+!
+! Originally in sa_subs.for
+!
+C
+      SUBROUTINE RANSETGEN
+c
+      real x(1000),yd(1000),xv(1000)
+      common /rangenfun/npt,xs,y(1000)
+c
+      IM=29282
+      IA=1255
+      IC=6173
+      JRAN=1
+C
+      do i=1,1000
+        read(20,*,err=100) x(i),yd(i)
+        npt=i
+      end do
+c
+ 100  continue
+c
+      sumv=0.
+      xs=(x(2)-x(1))
+      xv(1)=0.
+      do i=1,npt
+        xv(i+1)=x(i)+xs
+        sumv=sumv+yd(i)
+      end do
+      y(1)=0.
+      sumt=0.
+      do i=1,npt
+        sumt=sumt+yd(i)
+        y(i+1)=sumt/sumv
+      end do
+c
+      end SUBROUTINE RANSETGEN
+c
+!
+!*****************************************************************************
+!
+      subroutine RANX2G(DRIN,DROUT)
+c
+      double precision drin,drout
+      common /x2gran/ xs,ygran(200)
+c
+      rin=sngl(drin)
+      rin=abs(rin)
+      jn=1
+        do j=199,1,-1
+          if (rin.gt.ygran(j)) then
+            jn=j
+            goto 10
+          end if
+        end do
+c.. rin is between yran(jn) and yran(jn+1) now iterate
+ 10     xl=xs*float(jn-1)
+        xsn=0.5*xs
+        xm=xl+xsn
+        xh=xm+xsn
+      yl=ygran(jn)
+      yh=ygran(jn+1)
+      ym=erf(xm)
+ 15   xlo=xl
+      xmo=xm
+      xho=xh
+      ylo=yl
+      ymo=ym
+      yho=yh
+      if (abs(yh-yl).lt.1e-5) goto 20
+      if (rin.ge.ym) then
+        xl=xmo
+        xh=xho
+        yl=ymo
+        yh=yho
+      else
+        xl=xlo
+        xh=xmo
+        yl=ylo
+        yh=ymo
+      end if
+      xm=0.5*(xh+xl)
+      ym=erf(xm)
+      goto 15
+ 20   rout=xm
+      if (drin.lt.0) rout=-rout
+      drout=dble(rout)
+c
+      return
+      end subroutine RANX2G
+
+      subroutine RANX2GEN(drin,drout)
+c
+      double precision drin,drout
+      common /rangenfun/npt,xs,y(1000)
+c
+      npt1=npt+1
+c
+c.. At this point we have the integral stored from 0 to 360 degrees
+c.. There are npt1 integral values.
+c
+      p5=0.5
+      rin=sngl(drin)
+c      do ir=1,40000
+c        jran=mod(jran*ia+ic,im)
+
+c        rin=float(jran)/float(im)
+c
+        do j=npt,1,-1
+          if (rin.gt.y(j)) then
+            jn=j
+            goto 10
+          end if
+        end do
+      xm=0.
+      goto 20  
+c.. rin is between y(jn) amd y(jn+1) now iterate
+ 10     xl=xs*float(jn-1)
+        xsn=0.5*xs
+        xm=xl+xsn
+        xh=xm+xsn
+      yl=y(jn)
+      yh=y(jn+1)
+      ym=yintpl(jn,p5)
+      p=p5
+      dp=0.5
+ 15   xlo=xl
+      xmo=xm
+      xho=xh
+      ylo=yl
+      ymo=ym
+      yho=yh
+      dp=0.5*dp
+      if (abs(yh-yl).lt.1e-5) goto 20
+      if (rin.ge.ym) then
+        xl=xmo
+        xh=xho
+        yl=ymo
+        yh=yho
+        p=p+dp
+      else
+        xl=xlo
+        xh=xmo
+        yl=ylo
+        yh=ymo
+        p=p-dp
+      end if
+      xm=0.5*(xh+xl)
+      ym=yintpl(jn,p)
+      goto 15
+ 20   drout=dble(xm)
+c
+      end subroutine RANX2GEN
+c
+
+
+c
+      function rantorget(x,i)
+c
+      double precision x
+      double precision RANTORSTO
+      common/rantst/ rantorsto(1001,20)
+c
+      ival=1.+1000.*x
+      if (ival.eq.1001) then
+        rantorget=rantorsto(1001,i)
+      else
+        del=1.+1000.*x-ival
+        rantorget=(1.-del)*rantorsto(ival,i)
+     &             +del*rantorsto(ival+1,i)
+      end if
+c
+      end function rantorget
+c
+c
+c
+c
+      function yintpl(jn,p)
+c
+      common /rangenfun/npt,xs,y(1000)
+      real yt(-2:2)
+      real vt(-2:2)
+c
+      do ii=-2,2
+        jt=1+mod(jn+ii+npt-1,npt)
+	  yt(ii)=y(jt)
+      end do
+c
+      pm2=p-2
+      pm1=p-1
+      pp1=p+1
+      pp2=p+2
+c
+      t2=pm1*pp1*p/24.
+      t1=-pm2*pp2*p/6.
+	yt0=yt(0)
+      vt(-2)=t2*pm2
+      vt(-1)=t1*pm1
+      vt(0)=pm2*pm1*pp1*pp2/4.
+      vt(1)=t1*pp1
+      vt(2)=t2*pp2
+	if (yt(-2).gt.yt0) yt(-2)=yt(-2)-1.
+	if (yt(-1).gt.yt0) yt(-1)=yt(-1)-1.
+	if (yt(1) .lt.yt0) yt(1)=yt(1)+1.
+	if (yt(2) .lt.yt0) yt(2)=yt(2)+1.
+      yintpl=0.
+      do i=-2,2
+        yintpl=yintpl+vt(i)*yt(i)
+      end do
+c
+      end function yintpl
+c
+c
       SUBROUTINE PRTVEC(VECTOR,NCOLS,NAME)
 C  This subroutine prints the double precision vector named VECTOR.
 C  Elements 1 thru NCOLS will be printed. NAME is a character variable
