@@ -87,3 +87,6 @@
       INTEGER     MVAR
       PARAMETER ( MVAR = 100 )
 ! Maximum number of 'parameters' / 'variables' (= degrees of freedom) in the SA
+
+      INTEGER     MaxAtm_4
+      PARAMETER	( MaxAtm_4 = 150)
