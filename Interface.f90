@@ -753,7 +753,7 @@
 
       INCLUDE 'Lattice.inc'
 
-      LOGICAL ValidCellAxisLength ! Function
+      LOGICAL, EXTERNAL :: ValidCellAxisLength
       INTEGER WindowNr
       INTEGER CellParID(6)
       INTEGER I
