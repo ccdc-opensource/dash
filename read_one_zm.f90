@@ -36,7 +36,7 @@
       INTEGER item, II, izm, IKK, nlin, natof
       INTEGER AsymLen, IDlen
       CHARACTER*3 tIDstr
-      REAL*8 CART(maxatm,3)
+      REAL*8 CART(3,MAXATM)
       CHARACTER*2  AtmElement(1:MAXATM_2)
       INTEGER BondNr
 
@@ -185,14 +185,13 @@
       ENDIF
 ! Now precalculate the bonds
       natcry = NATOMS(ifrg)
-      CALL MAKEXYZ(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),      &
-     &             IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART(1,1),     &
-     &             CART(1,2),CART(1,3))
+      CALL MAKEXYZ_2(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),      &
+                     IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART)
 ! Conversion of asym to aelem : very dirty, but works
       DO I = 1, natcry
-        axyzo(I,1) = SNGL(CART(I,1))
-        axyzo(I,2) = SNGL(CART(I,2))
-        axyzo(I,3) = SNGL(CART(I,3))
+        axyzo(I,1) = SNGL(CART(1,I))
+        axyzo(I,2) = SNGL(CART(2,I))
+        axyzo(I,3) = SNGL(CART(3,I))
         AtmElement(I)(1:2) = asym(I,ifrg)(1:2)
       ENDDO
       CALL AssignCSDElement(AtmElement)
