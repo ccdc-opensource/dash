@@ -1,4 +1,3 @@
-!*==FDCN01.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !CSL Mark 4 Update 54 4-July-95
 !

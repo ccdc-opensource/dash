@@ -299,29 +299,13 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_PawRef_RefSigm1_Check)
-              IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) THEN
-                CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Disabled)
-              ELSE
-                CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Enabled)
-              ENDIF
+              CALL WDialogFieldStateLogical(IDF_PawRef_RefSigm2_Check,.NOT. WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check))
             CASE (IDF_PawRef_RefSigm2_Check)
-              IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) THEN
-                CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Disabled)
-              ELSE
-                CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Enabled)
-              ENDIF
+              CALL WDialogFieldStateLogical(IDF_PawRef_RefSigm1_Check,.NOT. WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check))
             CASE (IDF_PawRef_RefGamm1_Check)
-              IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) THEN
-                CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Disabled)
-              ELSE
-                CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Enabled)
-              ENDIF
+              CALL WDialogFieldStateLogical(IDF_PawRef_RefGamm2_Check,.NOT. WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check))
             CASE (IDF_PawRef_RefGamm2_Check)
-              IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) THEN
-                CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Disabled)
-              ELSE
-                CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Enabled)
-              ENDIF
+              CALL WDialogFieldStateLogical(IDF_PawRef_RefGamm1_Check,.NOT. WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check))
           END SELECT
       END SELECT
       CALL PopActiveWindowID
