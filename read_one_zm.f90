@@ -1,8 +1,6 @@
 !
 !*****************************************************************************
 !
-! JCC Re-implemented as a function
-!
       INTEGER FUNCTION Read_One_Zm(iFrg)
 
       USE ZMVAR
