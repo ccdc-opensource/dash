@@ -6,11 +6,6 @@
       USE VARIABLES
 
       INCLUDE 'GLBVAR.INC'
-!
-! Declare window-type
-!
-  TYPE(WIN_STYLE)    WINDOW
-!
       INCLUDE 'DialogPosCmn.inc'
 !
       parameter (mvar=100)

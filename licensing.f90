@@ -406,8 +406,6 @@ integer :: n
 integer :: sum
 integer :: delta = 16#9E3779B9
 
-integer sz, sy
-
 sum = 16#C6EF3720
 n = 32
 

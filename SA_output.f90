@@ -107,14 +107,13 @@
 
 	  REAL temin,temax, bchmin, bpwval, bchpro, tempvl
 	  REAL avchi1, avchi2, avchi3, avchi4
-	  INTEGER ndown, nmpert, ntotmov
 	  INTEGER nd1, nd2, nd3, nd4
 	  COMMON / sagdat / temin, temax, bchmin, bpwval, bchpro, &
 	          tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
 	          nd2, nd3, nd4
       character*255 temperfile
 	  REAL tenow1, tenow2, ruler, rulex1, rulex2
-	  integer iemax, ippm, ilt
+	  integer iemax, ilt
   
       REAL, PARAMETER ::  rminh = 0.01
 	  REAL, PARAMETER ::  rmaxh = 0.99

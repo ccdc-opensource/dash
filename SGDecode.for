@@ -20,7 +20,7 @@ C	for A,B,C and I centering
       parameter (msymmin=10)
       character*20 symline
 	common /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
-	character*50 stem,stout,stoutt
+	character*50 stout
 !
 	nele=1
 	ns=24

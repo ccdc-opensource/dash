@@ -13,12 +13,6 @@
       INTEGER MAXEVL, IPRINT, NACC, NOBDS
       LOGICAL  MAXLOG,MAKET0
 !
-      character*132 line
-      character*80  sa_file
-      logical   log_inf_file,log_nvar,log_bounds,log_reduce
-      logical log_eps,log_ns,log_nt,log_neps,log_maxevl,log_iprint
-      logical log_iseed1,log_iseed2,log_T0,log_target_value
-      logical log_frag_file
       double precision cen,sig
       logical gaussb
       double precision T,T0,rt,eps,target_value
@@ -44,13 +38,10 @@
       common /shadi/ kshad(mvar)
 !
 !
-      REAL  RANMAR
-
       DOUBLE PRECISION RFIX
       DOUBLE PRECISION RULB(100)
       DOUBLE PRECISION RANARR(30000),RANAR1(30000)
       DOUBLE PRECISION RANAPM(30000),RANGAR(30000)
-      DOUBLE PRECISION RX(100)
       DOUBLE PRECISION XR(100),XRP(100)
       DOUBLE PRECISION DXVAV(100),XVSIG(100),FLAV(100)
       double precision X0SUM(100),XSUM(100),XXSUM(100)
@@ -63,7 +54,7 @@ C.. Really should reduce MVAR all round - to do!
 C  Type all internal variables.
       DOUBLE PRECISION FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
       DOUBLE PRECISION  F, FP, P, PP, RATIO ,DX
-      DOUBLE PRECISION RANIN, RANMUL, RXSUM, XK
+      DOUBLE PRECISION RANIN, XK
       INTEGER  NUP, NDOWN, NREJ, NNEW, LNOBDS, H, I, J, M
       INTEGER MRAN,MRAN1,IARR,IAR1
 
@@ -73,10 +64,6 @@ c
       double precision DP360,DP1,DP0
       double precision RANTORSTO
       common/rantst/ rantorsto(1001,20)
-c
-      REAL*4 XSIM(50),DXSIM(50),COVSIM(50,50)
-
-C  Type all functions.
 c
       COMMON /SIMSTO/ NP,IP(100),PSTORE(100)
       COMMON /POSNS/NATOM,XATO(3,150),KX(3,150),AMULT(150), 
@@ -107,7 +94,6 @@ c
       COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
      &log_flen,pro_flen
 C
-      DOUBLE PRECISION PRJAV,PRJSD
       DOUBLE PRECISION PRJMAT0,PRJMAT1,PRJMAT2
 
       COMMON /PRJMAT/PRJMAT0,PRJMAT1(MPRJMT),PRJMAT2(MPRJMT)
@@ -1142,7 +1128,6 @@ c
       subroutine RANX2GEN(drin,drout)
 c
       double precision drin,drout
-      real x(1000),yd(1000),xv(1000)
       common /rangenfun/npt,xs,y(1000)
 c
       npt1=npt+1
@@ -1156,7 +1141,6 @@ c      do ir=1,40000
 c        jran=mod(jran*ia+ic,im)
 
 c        rin=float(jran)/float(im)
-c	write(6,*) ir,rin
 c
         do j=npt,1,-1
           if (rin.gt.y(j)) then
@@ -1174,7 +1158,6 @@ c.. rin is between y(jn) amd y(jn+1) now iterate
       yl=y(jn)
       yh=y(jn+1)
       ym=yintpl(jn,p5)
-cc	write(6,*) jn,yl,ym,yh
       p=p5
       dp=0.5
  15   xlo=xl
@@ -1200,7 +1183,6 @@ cc	write(6,*) jn,yl,ym,yh
       end if
       xm=0.5*(xh+xl)
       ym=yintpl(jn,p)
-cc	write(6,*) p,yl,ym,yh
       goto 15
  20   drout=dble(xm)
 c

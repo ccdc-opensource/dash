@@ -10,7 +10,7 @@
 
       IMPLICIT NONE
 
-      INTEGER :: IFlags, I, Ilen, Instlen, Idashlen
+      INTEGER :: IFlags, Ilen, Instlen, Idashlen
       CHARACTER(LEN=MaxPathLength) :: Dirname, DashDir, InstDirLc, DashDirLc, DirNameLc
       LOGICAL Confirm ! Function
 
@@ -141,7 +141,7 @@
 !>> JCC Init the viewing etc
       CALL PolyFitter_EnableExternal
 ! Get the space group symbols ...
-      OpenFail = PolyFitter_OpenSpaceGroupSymbols(110)
+      OpenFail = PolyFitter_OpenSpaceGroupSymbols()
       IF (OpenFail .NE. 0) GOTO 999 ! fail gracefully!
       i=0
  10   lintem=' '
@@ -184,8 +184,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
 !
-      TYPE(WIN_STYLE)   :: MAIN_WINDOW
-
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
@@ -354,21 +352,19 @@
 !
 !C>> Handle file opening. Exit with a message to say what is wrong if all attempts fail
 ! JvdS What does it return? Filehandle and 0 otherwise?
-      INTEGER FUNCTION PolyFitter_OpenSpaceGroupSymbols(unit)
+      INTEGER FUNCTION PolyFitter_OpenSpaceGroupSymbols
 
       USE WINTERACTER
       USE VARIABLES
       USE dflib ! Windows environment variable handling: for GETENVQQ
       USE dfport
 
-      INTEGER       unit, errstat, lval, dlen
+      INTEGER       errstat, lval, dlen
       CHARACTER*255 DashDir, Command
 
       PolyFitter_OpenSpaceGroupSymbols = 0
 !   Try the default installation directory first
-      OPEN(110,file=INSTDIR(1:LEN_TRIM(INSTDIR))//&
-        DIRSPACER(1:LEN_TRIM(DIRSPACER))//&
-        SPACEGROUPS,status='old', err = 10)
+      OPEN(110,file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//SPACEGROUPS,status='old', err = 10)
       RETURN
  10   CONTINUE
 !   Fail so look in current working directory

@@ -5,9 +5,6 @@
       USE WINTERACTER
       USE VARIABLES
 
-      TYPE(WIN_STYLE)    WINDOW
-!
-      CHARACTER (LEN=20) XCURST,YCURST
       INCLUDE 'PARAMS.INC'
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
@@ -140,7 +137,6 @@
 
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
 
 ! acts on various KeyDown options
       KeyNumber = EventInfo%VALUE1
@@ -570,11 +566,8 @@
       XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 !
-      REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-
       INCLUDE 'GLBVAR.INC'
 
-      LOGICAL HVLINE_THERE
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
 !
@@ -772,8 +765,6 @@
       USE WINTERACTER
       USE VARIABLES
 
-      TYPE(WIN_STYLE)    WINDOW
-
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
@@ -789,16 +780,8 @@
 
       INCLUDE 'GLBVAR.INC'
 
-      LOGICAL HVLINE_THERE
-
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-      REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
-      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
-      CHARACTER*100 HKLSTR
-      CHARACTER*4   CHRFORM
-      REAL ARGKPLT(10),DSPLT(10)
-      INTEGER IHPLT(3,10)
       INCLUDE 'Poly_Colours.inc'
       COMMON /CURVAL/ XCurFirst,YCurFirst
 
@@ -810,7 +793,6 @@
       REAL XPF_PTEM(MAX_NPPR,MAX_NPFR),YPF_PTEM(MAX_NPPR,MAX_NPFR)
       REAL XXFTEM(2,MAX_NPFR),YPkFitTem(MAX_FITPT)
       INTEGER IILOTEM(MAX_NPFR),IIHITEM(MAX_NPFR),IIRANGT(MAX_NPFR),NNTEM(MAX_NPFR)
-      INTEGER IPF_RPtTem(MAX_NPFR) 
 !
 ! Get ready to put up the big cursor
       CALL WMessageEnable(MouseMove, Enabled)
@@ -843,8 +825,6 @@
           ygcur(2) = EventInfo%GY
           CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
           SELECT CASE (EventType)
-!U            CASE (Expose,Resize)
-!U              CALL Redraw()
             CASE (KeyDown)
               KeyNumber = EventInfo%Value1
               CALL Check_KeyDown_PeakFit_Inner(KeyNumber,xcur(1),xcur(2))
@@ -1189,10 +1169,9 @@
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
         itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       REAL XXTEM(MOBSTIC),YYTEM(MOBSTIC),UUTEM(20,MOBSTIC),ZZTEM(20,MOBSTIC)
-      INTEGER ITTEM(MOBSTIC),IOTEM(MOBSTIC)
-      CHARACTER*100 HKLSTR
+      INTEGER ITTEM(MOBSTIC)
       CHARACTER*4   CHRFORM
-      REAL ARGKPLT(10),DSPLT(10)
+      REAL DSPLT(10)
       INTEGER IHPLT(3,10)
       INCLUDE 'Poly_Colours.inc'
 
@@ -1204,7 +1183,6 @@
       REAL XPF_PTEM(MAX_NPPR,MAX_NPFR),YPF_PTEM(MAX_NPPR,MAX_NPFR)
       REAL XXFTEM(2,MAX_NPFR),XPkFitTem(MAX_FITPT),YPkFitTem(MAX_FITPT)
       INTEGER IILOTEM(MAX_NPFR),IIHITEM(MAX_NPFR),IIRANGT(MAX_NPFR),NNTEM(MAX_NPFR)
-      INTEGER IPF_RPtTem(MAX_NPFR)
 
       COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),PkFnEsd(MPkDes,Max_NPFR), &
         PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &
@@ -1216,7 +1194,7 @@
       PkAreaValTem(MAX_NPPR,MAX_NPFR),PkAreaEsdTem(MAX_NPPR,MAX_NPFR), &
       PkPosValTem(MAX_NPPR,MAX_NPFR),PkPosEsdTem(MAX_NPPR,MAX_NPFR),PkPosAvTem(MAX_NPFR)
 
-      INTEGER NPeaksFitted, ICurSel
+      INTEGER NPeaksFitted
       LOGICAL Check_TicMark_Data
 
       xcur(1) = xcur1

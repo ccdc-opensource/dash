@@ -1,8 +1,5 @@
       subroutine create_fob()
 	include 'params.inc'
-c      real*8 x(maxatm),y(maxatm),z(maxatm)
-      character*80 line
-      logical file_present
 c
       parameter (maxatm=100)
       parameter (maxfrg=20)
@@ -80,7 +77,7 @@ c
       character*3 asym,symba(melem)
       real a1(melem),b1(melem),a2(melem),b2(melem)
       real a3(melem),b3(melem),a4(melem),b4(melem)
-      real a5(melem),b5(melem),cv(melem)
+      real cv(melem)
 c
       DATA SYMBA/ 'Du', 'H  ','He ','Li ','Be ','B  ','C  ','N  ','O  ',
      &'F  ','Ne ','Na ','Mg ','Al ','Si ','P  ','S  ','Cl ','Ar ',

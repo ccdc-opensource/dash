@@ -10,7 +10,6 @@
 	USE WINTERACTER
       USE DRUID_HEADER
 	USE VARIABLES
-      TYPE(WIN_STYLE)    WINDOW
 	INCLUDE 'params.inc'  
 !ep	 need the common block to identify the number rows in the grid	  	
 	COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult

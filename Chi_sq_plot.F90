@@ -22,7 +22,6 @@
       INCLUDE 'params.inc'
       INTEGER,PARAMETER :: NSETS   =     1
       INTEGER,PARAMETER :: NVALUES = 10000
-      INTEGER           :: ISET
         integer           :: ntotmov
         integer           :: iteration
         real              :: cpb
@@ -70,7 +69,6 @@
         
       INTEGER,PARAMETER :: NSETS   =     1
       INTEGER,PARAMETER :: NVALUES = 10000
-      INTEGER           :: ISET
       INTEGER, INTENT(IN)        :: it_count
       REAL, INTENT(IN)           :: x_max
       REAL,INTENT(IN)           :: x_min

@@ -2,7 +2,6 @@
 !
       use winteracter
       use druid_header
-      character*80 linstr
 !
       parameter (maxiter=10000)
       common /pltstore/ xiter(maxiter),tstore(maxiter),&

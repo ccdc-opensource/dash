@@ -54,9 +54,8 @@ C-----------------------------------------------------------------------
 C
       PARAMETER (MAXITR=10)
       REAL     X(N),DX(N),COVAR(N,N)
-      REAL     HESS(2500),DELTA(50),C0,C1(2,50),C2(2500)
       REAL     V(2550),EX(150),C(51)
-      INTEGER  IR(51),INDX(50)
+      INTEGER  IR(51)
       EXTERNAL SACCHI
       DATA     NMAX /50/
 C
@@ -127,7 +126,7 @@ C     ------------------------------------
 C
       REAL    V(N,*),EX(N,*),C(*),D(*)
       INTEGER IR(*)
-      LOGICAL RESTART,SLOW
+      LOGICAL SLOW
       DATA    ALPHA,BETA,GAMA/1.0,0.5,2.0/
 C
       SLOW=.FALSE.
