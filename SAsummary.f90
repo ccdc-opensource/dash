@@ -36,7 +36,14 @@
             CALL plot_pro_file(EventInfo%win)
 ! Ok button of summary window pushed, dialog closed
           CASE (PushButton)
-            IF (IDOK_ep .EQ. EventInfo%VALUE1) THEN
+            IF (EventInfo%VALUE1 .EQ.IDCANCEL) THEN
+              IF (EventInfo%win .EQ. IDD_SA_Multi_Completed_ep) THEN
+                CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
+                CALL WDialogHide()
+                EXIT
+              ENDIF
+            ENDIF
+            IF (EventInfo%VALUE1 .EQ. IDOK_ep) THEN
 ! Closes all SA profile child windows which are still open when OK button clicked
               DO i = 1, MaxNumChildWin
                 IF (SAUsedChildWindows(i).eq.1) THEN
