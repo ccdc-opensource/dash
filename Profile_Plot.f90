@@ -474,6 +474,7 @@
 
       REAL Difference(1:MAX_FITPT)
       INTEGER JJ
+      LOGICAL, EXTERNAL :: PlotPeakFitDifferenceProfile
 
       iord_peak = 0
       DO i = 1, NumPeakFitRange
@@ -511,15 +512,20 @@
             ENDDO
 ! ix2 is now a pointer into XPeakFit, YPeakFit, pointing to the end of the range
  120        CONTINUE
-            DO JJ = ipf1, ipf2
-               Difference(JJ) = YOBIN(IPF_Lo(i)+JJ-ipf1) - YPeakFit(JJ) + (0.5*YPF_Pos(1,i))
-            ENDDO
-!O            CALL IPgNewPlot(PgPolyLine,1, (1+ix2-ix1) )
-            CALL IPgNewPlot(PgPolyLine,2, (1+ix2-ix1) )
-            CALL IPgStyle(1,0,0,0,KolNumMTic,0)
-            CALL IPgStyle(2,0,0,0,KolNumCal,0)
-            CALL IPgXYPairs(XPeakFit(ix1),YPeakFit(ix1))
-            CALL IPgXYPairs(XPeakFit(ix1),Difference(ix1))
+            IF (PlotPeakFitDifferenceProfile()) THEN
+              DO JJ = ipf1, ipf2
+                 Difference(JJ) = YOBIN(IPF_Lo(i)+JJ-ipf1) - YPeakFit(JJ) + 0.5*(YPGMAX+YPGMIN)
+              ENDDO
+              CALL IPgNewPlot(PgPolyLine,2, (1+ix2-ix1) )
+              CALL IPgStyle(1,0,0,0,KolNumMTic,0)
+              CALL IPgStyle(2,0,0,0,KolNumCal,0)
+              CALL IPgXYPairs(XPeakFit(ix1),YPeakFit(ix1))
+              CALL IPgXYPairs(XPeakFit(ix1),Difference(ix1))
+            ELSE
+              CALL IPgNewPlot(PgPolyLine,1, (1+ix2-ix1) )
+              CALL IPgStyle(1,0,0,0,KolNumMTic,0)
+              CALL IPgXYPairs(XPeakFit(ix1),YPeakFit(ix1))
+            ENDIF
           ENDIF
         ENDIF
         IPresColN = InfoGrScreen(ColourReq)

@@ -76,6 +76,8 @@
                 CALL Profile_Plot(IPTYPE)
               CASE (IDF_ConnectObsPoints)
                 CALL Profile_Plot(IPTYPE)
+              CASE (IDF_PlotPeakFitDif)
+                CALL Profile_Plot(IPTYPE)
             END SELECT
           ENDIF
       END SELECT
@@ -549,7 +551,7 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
-      REAL Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
+      REAL    Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
       INTEGER Isystem(6), UseErr, I, Iord
       INTEGER IHANDLE
       REAL    Epsti
