@@ -13,6 +13,15 @@
 
       INCLUDE 'PARAMS.INC'
 
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+
       INTEGER          NFITA, IFITA
       REAL                                 WTSA
       COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
@@ -33,6 +42,8 @@
 
       REAL    SUM1, SUM2, YCALC, RESCL, CVP, LastValue
       INTEGER II, I, K, KK
+    !  LOGICAL, EXTERNAL :: Get_ShowCumChiSqd
+      REAL    tScale
 
 ! JvdS VALCHIPRO, which calculates the profile chi-squared, is always
 ! called after VALCHI. VALCHI already fills BICALC in COMMON /SAREFLN2/
@@ -58,15 +69,18 @@
         CVP = CVP + WTSA(I) * (YOBIN(I) - YCBIN(I))**2
         CummChiSqd(I) = CVP
       ENDDO
+      CHIVALPRO = CVP/FLOAT(NFITA-2)
+      tScale = ypmax / CVP
       LastValue = 0.0
       DO i = 1, NBIN
         IF (CummChiSqd(i) .LT. 0.0) THEN
           CummChiSqd(i) = LastValue
         ELSE
+! Rescale cummulative profile chi-squared
+          CummChiSqd(i) = CummChiSqd(i) * tScale
           LastValue = CummChiSqd(i)
         ENDIF
       ENDDO
-      CHIVALPRO = CVP/FLOAT(NFITA-2)
 
       END SUBROUTINE VALCHIPRO
 !
