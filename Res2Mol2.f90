@@ -67,7 +67,7 @@
         CASE ('CELL')
           READ(tString(5:),*,ERR=990,END=990) DummyReal, a, b, c, alpha, beta, gamma
           CALL LatticeCellParameters2Lattice(a, b, c, alpha, beta, gamma, tLattice)
-        CASE ('TITL', 'ZERR', 'LATT', 'SYMM', 'SFAC', 'DISP', 'UNIT', 'L.S.')
+        CASE ('TITL', 'ZERR', 'LATT', 'SYMM', 'SFAC', 'DISP', 'UNIT', 'L.S.', 'REM ')
           ! do nothing
         CASE ('HKLF', 'END ') ! We have finished, process the data we have read
           GOTO 100
@@ -373,14 +373,15 @@
 
       tElem(1:1) = ChrUpperCase(TheElementSymbol(1:1))
       tElem(2:2) = ChrLowerCase(TheElementSymbol(2:2))
-      DO I = 1, maxelm
-        IF (tElem(1:2) .EQ. ElementStr(I)(1:2)) THEN
+      DO I = 1, MaxElm
+        IF (tElem .EQ. ElementStr(I)) THEN
           ElmSymbol2CSD = I
           RETURN
         ENDIF
       ENDDO
-      CALL DebugErrorMessage('Element '//TheElementSymbol(1:2)//' not found')
-      ElmSymbol2CSD = 109
+      CALL WarningMessage('Unknown element '//TheElementSymbol(1:2)//'.'//CHAR(13)//&
+                          'Element has been set to Dummy.')
+      ElmSymbol2CSD = MaxElm
 
       END FUNCTION ElmSymbol2CSD
 !
