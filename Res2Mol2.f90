@@ -237,6 +237,120 @@
 !
 !*****************************************************************************
 !
+      INTEGER FUNCTION WriteMol2(TheFileName)
+! Takes number of atoms    from natcry    in SAMVAR
+! Takes atomic coordinates from axyzo     in SAMVAR  (orthogonal)
+! Takes element types      from aelem     in SAMVAR  (CSD style)
+! Takes atom labels        from atomlabel in SAMVAR
+! Generate bonds & bond types and writes out a .mol2 file
+
+      USE SAMVAR
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+
+      CHARACTER*4 sybatom(1:MAXATM_2)
+      CHARACTER*2 BondStr(0:9)
+      CHARACTER*2 HybridisationStr
+      CHARACTER*1 ChrLowerCase, ChrUpperCase ! Functions
+      INTEGER I, J, Ilen, OutputFile
+
+      CHARACTER*3 ElementStr(1:109)
+
+      DATA        ElementStr                                                            &
+               /'C  ', 'H  ', 'Ac ', 'Ag ', 'Al ', 'Am ', 'Ar ', 'As ', 'At ', 'Au ',   &
+                'B  ', 'Ba ', 'Be ', 'Bi ', 'Bk ', 'Br ', 'Ca ', 'Cd ', 'Ce ', 'Cf ',   &
+                'Cl ', 'Cm ', 'Co ', 'Cr ', 'Cs ', 'Cu ', 'D  ', 'Dy ', 'Er ', 'Es ',   &
+                'Eu ', 'F  ', 'Fe ', 'Fm ', 'Fr ', 'Ga ', 'Gd ', 'Ge ', 'He ', 'Hf ',   &
+                'Hg ', 'Ho ', 'I  ', 'In ', 'Ir ', 'K  ', 'Kr ', 'La ', 'Li ', 'Lu ',   &
+                'Lw ', 'Md ', 'Mg ', 'Mn ', 'Mo ', 'N  ', 'Na ', 'Nb ', 'Nd ', 'Ne ',   &
+                'Ni ', 'No ', 'Np ', 'O  ', 'Os ', 'P  ', 'Pa ', 'Pb ', 'Pd ', 'Pm ',   &
+                'Po ', 'Pr ', 'Pt ', 'Pu ', 'Ra ', 'Rb ', 'Re ', 'Rh ', 'Rn ', 'Ru ',   &
+                'S  ', 'Sb ', 'Sc ', 'Se ', 'Si ', 'Sm ', 'Sn ', 'Sr ', 'Ta ', 'Tb ',   &
+                'Tc ', 'Te ', 'Th ', 'Ti ', 'Tl ', 'Tm ', 'U  ', 'V  ', 'W  ', 'X  ',   &
+                'Xe ', 'Y  ', 'Yb ', 'Z  ', 'Zn ', 'Zr ', 'Zz ', 'Me ', 'Du '/
+
+!    The CSD bond types are:  1 = single  2= double  3=triple  4=quadruple
+!                             5 = aromatic      6 = polymeric single
+!                             7 = delocalised   9 = pi-bond
+!
+!   Sam's                            mol2
+!     1       (single)                1
+!     2       (double)                2
+!     3       (triple)                3
+!     4       (quadruple)             un
+!     5       (aromatic)              ar
+!     6       (polymeric)             un
+!     7       (delocalised double)    un
+!     9       (pi)                    un
+
+      BondStr(0) = 'un'   ! unspecified
+      BondStr(1) = ' 1'
+      BondStr(2) = ' 2'
+      BondStr(3) = ' 3'
+      BondStr(4) = 'un'
+      BondStr(5) = 'ar'
+      BondStr(6) = 'un'
+      BondStr(7) = 'un'
+      BondStr(8) = 'un'
+      BondStr(9) = 'un'
+      
+! Initialise to failure
+      WriteMol2 = 0
+      CALL SAMABO
+      DO I = 1, natcry
+        sybatom(I) = '    '
+        SELECT CASE (aelem(I))
+          CASE (1, 56, 64) ! C, N, O
+            SELECT CASE (hybr(I))
+              CASE (1)
+                HybridisationStr = '1 '
+              CASE (2)
+                HybridisationStr = '2 '
+              CASE (3)
+                HybridisationStr = '3 '
+              CASE (4)
+                HybridisationStr = 'ar'
+              CASE DEFAULT
+                HybridisationStr = '0 '
+            END SELECT
+            sybatom(I) = ElementStr(aelem(I))(1:1)//'.'//HybridisationStr
+          CASE DEFAULT
+            sybatom(I)(1:1) = ChrUpperCase(ElementStr(aelem(I))(1:1))
+            sybatom(I)(2:2) = ChrLowerCase(ElementStr(aelem(I))(2:2))
+        END SELECT
+      ENDDO
+      Ilen = LEN_TRIM(TheFileName)
+      OutputFile = 3
+      OPEN(UNIT=OutputFile,file=TheFileName(1:Ilen),form='formatted',err=997)
+      WRITE(OutputFile,"('@<TRIPOS>MOLECULE')",ERR=996)
+      WRITE(OutputFile,'(A)',ERR=996) 'Temporary file'
+      WRITE(OutputFile,"(2(I5,1X),'    1     0     0')",ERR=996) natcry, nbocry
+      WRITE(OutputFile,"('SMALL')",ERR=996)
+      WRITE(OutputFile,"('NO_CHARGES')",ERR=996)
+      WRITE(OutputFile,*,ERR=996) 'Temporary file created by DASH'
+      WRITE(OutputFile,"('@<TRIPOS>ATOM')",ERR=996)
+      DO I = 1, natcry
+        WRITE(OutputFile,270,ERR=996) I,atomlabel(I),(axyzo(I,j),j=1,3),sybatom(I)
+  270 FORMAT(I3,1X,A5,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
+      ENDDO
+      WRITE(OutputFile,"('@<TRIPOS>BOND')",ERR=996)
+      DO i = 1, nbocry
+        WRITE(OutputFile,'(3(I3,1X),A2)',ERR=996) i,bond(i,1),bond(i,2),BondStr(btype(I))
+      ENDDO
+      CLOSE(OutputFile)
+      WriteMol2 = 1
+      RETURN
+  997 CALL ErrorMessage('Error opening mol2 file.')
+      RETURN 
+  996 CALL ErrorMessage('Error while writing mol2 file.')
+      RETURN
+
+      END FUNCTION WriteMol2
+!
+!*****************************************************************************
+!
       SUBROUTINE AssignCSDElement(AtmElement)
 
       USE SAMVAR
