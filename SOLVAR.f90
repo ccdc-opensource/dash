@@ -7,6 +7,10 @@
 
       IMPLICIT NONE
 
+      INTEGER iSolOrder(1:99)
+
+      INTEGER iSolTicked(1:99)
+
       REAL ProfileChiSqd(1:99) ! MaxRun
 
       REAL IntensityChiSqd(1:99) ! MaxRun
@@ -15,8 +19,6 @@
 
       REAL XAtmCoords(1:3,1:150,1:99) ! MaxAtm, MaxRun 
 ! Co-ordinates of the atoms of the asymmetric unit of the best SA solution so far per run.
-
-      INTEGER iSolOrder(1:99)
 
       END MODULE SOLVAR
 !
