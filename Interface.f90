@@ -806,6 +806,7 @@
           ENDIF
         ENDIF
       ENDDO
+      CALL Upload_Positions
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL PopActiveWindowID
 
@@ -1013,6 +1014,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -1020,7 +1022,8 @@
                         NumInPFR(MAX_NPFR),                                      & 
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
@@ -1157,8 +1160,6 @@
         CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,7,I,IHPk(3,I))
         CALL WGridPutCellReal(IDF_Peak_Positions_Grid,8,I,PkProb(iOrd),'(F8.3)')
       ENDDO
-! Now do a refinement ...
-      CALL RefineLattice
       CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Positions

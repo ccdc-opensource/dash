@@ -19,6 +19,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -26,7 +27,8 @@
                         NumInPFR(MAX_NPFR),                                      & 
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
@@ -106,6 +108,10 @@
       CALL WDialogClearField(IDF_HMSL_Grid)
       CALL WDialogClearField(IDF_HMSL1)
       PeakShapeHMSL = -999.0
+! Clear FWHM
+      CALL WDialogSelect(IDD_FWHM_info)
+      CALL WGridRows(IDF_FWHM_Grid,NumRows)
+      CALL WDialogClearField(IDF_FWHM_Grid)
       CALL WDialogSelect(IDD_ViewPawley)
       CALL WDialogClearField(IDF_Sigma1)
       CALL WDialogClearField(IDF_Sigma2)
@@ -238,6 +244,13 @@
         ENDDO
         PeakShapeHMSL = MAX(0.0001,FitPar(1))
       ENDIF
+! Write out FWHM
+      CALL WDialogSelect(IDD_FWHM_info)
+      DO I = 1, NumFittedPFR
+        iOrd = IOrdTem(I)
+        CALL WGridPutCellReal(IDF_FWHM_Grid,1,i,PkPosAv(iOrd),'(F12.3)')
+        CALL WGridPutCellReal(IDF_FWHM_Grid,2,i,PF_FWHM(iOrd),'(F12.5)')
+      ENDDO
 ! Warn if HPSL is less than HMSL
       IF (NumFittedPFR .GE. 2) THEN
         IF (PkFnVarVal(1,4) .GT. PkFnVarVal(1,3)) THEN
@@ -283,6 +296,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -290,7 +304,8 @@
                         NumInPFR(MAX_NPFR),                                      & 
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
@@ -359,6 +374,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -366,7 +382,8 @@
                         NumInPFR(MAX_NPFR),                                      & 
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &

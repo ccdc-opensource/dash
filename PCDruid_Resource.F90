@@ -1,4 +1,4 @@
-! Winteracter module created : 15/Jul/2003 10:59:22
+! Winteracter module created : 22/Jul/2003 11:29:16
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -720,4 +720,7 @@
           INTEGER, PARAMETER :: IDF_NumDoFPerMove               =  1351
           INTEGER, PARAMETER :: IDF_LABEL20                     =  1544
           INTEGER, PARAMETER :: IDB_More                        =  1545
+          INTEGER, PARAMETER :: IDD_FWHM_info                   =   163
+          INTEGER, PARAMETER :: IDD_DIALOG011                   =   164
+          INTEGER, PARAMETER :: IDF_FWHM_Grid                   =  1396
       END MODULE Druid_Header
