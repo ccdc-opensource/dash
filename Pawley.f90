@@ -863,44 +863,59 @@
       CHARACTER*(*) FileName
       INTEGER       LenFn, Idum
 
-      REAL              PkFnVal,                      PkFnEsd,                      &
-                        PkFnCal,                                                    &
-                        PkFnVarVal,                   PkFnVarEsd,                   &
-                        PkAreaVal,                    PkAreaEsd,                    &
-                        PkPosVal,                     PkPosEsd,                     &
-                        PkPosAv
-      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
-                        PkFnCal(MPkDes,Max_NPFR),                                   &
-                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
-                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
-                        PkPosAv(MAX_NPFR)
+!O      REAL              PkFnVal,                      PkFnEsd,                      &
+!O                        PkFnCal,                                                    &
+!O                        PkFnVarVal,                   PkFnVarEsd,                   &
+!O                        PkAreaVal,                    PkAreaEsd,                    &
+!O                        PkPosVal,                     PkPosEsd,                     &
+!O                        PkPosAv
+!O      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+!O                        PkFnCal(MPkDes,Max_NPFR),                                   &
+!O                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+!O                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+!O                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+!O                        PkPosAv(MAX_NPFR)
+
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
+
+      INTEGER iFile
 
 ! Initialise to error      
       WRTDSL = 1
-      OPEN (UNIT = 77,FILE=FileName(1:LenFn),STATUS='UNKNOWN',ERR=999)
-      WRITE(77,*,ERR=999)'! Radiation wavelength and data type'
-      WRITE(77,'(A3,1X,F10.5,I2)',ERR=999) 'rad', ALambda, JRadOption
-      WRITE(77,*,ERR=999)'! Sigma shape parameters: format sigma1 esd sigma2 esd'
-      WRITE(77,100,ERR=999) 'sig',PkFnVarVal(1,1),PkFnVarEsd(1,1),PkFnVarVal(2,1),PkFnVarEsd(2,1)
-      WRITE(77,*,ERR=999)'! Gamma shape parameters: format gamma1 esd gamma2 esd'
-      WRITE(77,100,ERR=999) 'gam',PkFnVarVal(1,2),PkFnVarEsd(1,2),PkFnVarVal(2,2),PkFnVarEsd(2,2)
-      WRITE(77,*,ERR=999)'! Asymmetry parameters: format HPSL esd HMSL esd'
-      WRITE(77,100,ERR=999) 'asy',PkFnVarVal(1,3),PkFnVarEsd(1,3),PkFnVarVal(1,4),PkFnVarEsd(1,4)
-      WRITE(77,*,ERR=999)'! Calculated zero point'
-      WRITE(77,110,ERR=999) 'zer',ZeroPoint
-      WRITE(77,*,ERR=999)'! Pawley-fit SLIM parameter setting'
-      WRITE(77,110,ERR=999) 'sli',SLIMVALUE
-      WRITE(77,*,ERR=999)'! Pawley-fit Scale factor setting'
-      WRITE(77,110,ERR=999) 'sca',SCALFAC
+      iFile = 77
+      OPEN (UNIT = iFile,FILE=FileName(1:LenFn),STATUS='UNKNOWN',ERR=999)
+      WRITE(iFile,*,ERR=999)'! Radiation wavelength and data type'
+      WRITE(iFile,'(A3,1X,F10.5,I2)',ERR=999) 'rad', ALambda, JRadOption
+
+!O      WRITE(iFile,*,ERR=999)'! Sigma shape parameters: format sigma1 esd sigma2 esd'
+!O      WRITE(iFile,100,ERR=999) 'sig',PkFnVarVal(1,1),PkFnVarEsd(1,1),PkFnVarVal(2,1),PkFnVarEsd(2,1)
+!O      WRITE(iFile,*,ERR=999)'! Gamma shape parameters: format gamma1 esd gamma2 esd'
+!O      WRITE(iFile,100,ERR=999) 'gam',PkFnVarVal(1,2),PkFnVarEsd(1,2),PkFnVarVal(2,2),PkFnVarEsd(2,2)
+!O      WRITE(iFile,*,ERR=999)'! Asymmetry parameters: format HPSL esd HMSL esd'
+!O      WRITE(iFile,100,ERR=999) 'asy',PkFnVarVal(1,3),PkFnVarEsd(1,3),PkFnVarVal(1,4),PkFnVarEsd(1,4)
+
+      WRITE(iFile,*,ERR=999)'! Sigma shape parameters: format sigma1 dummy sigma2 dummy'
+      WRITE(iFile,100,ERR=999) 'sig',PeakShapeSigma(1),0.02,PeakShapeSigma(2),0.02
+      WRITE(iFile,*,ERR=999)'! Gamma shape parameters: format gamma1 dummy gamma2 dummy'
+      WRITE(iFile,100,ERR=999) 'gam',PeakShapeGamma(1),0.02,PeakShapeGamma(2),0.02
+      WRITE(iFile,*,ERR=999)'! Asymmetry parameters: format HPSL dummy HMSL dummy'
+      WRITE(iFile,100,ERR=999) 'asy',PeakShapeHPSL,0.02,PeakShapeHMSL,0.02
+
+      WRITE(iFile,*,ERR=999)'! Calculated zero point'
+      WRITE(iFile,110,ERR=999) 'zer',ZeroPoint
+      WRITE(iFile,*,ERR=999)'! Pawley-fit SLIM parameter setting'
+      WRITE(iFile,110,ERR=999) 'sli',SLIMVALUE
+      WRITE(iFile,*,ERR=999)'! Pawley-fit Scale factor setting'
+      WRITE(iFile,110,ERR=999) 'sca',SCALFAC
   100 FORMAT(A3,1X,4(F10.4,1X))
   110 FORMAT(A3,1X,F10.4)
-      CLOSE(77)
+      CLOSE(iFile)
       WRTDSL = 0
       RETURN
 ! Error if we get here
   999 CALL ErrorMessage('Error writing .dsl file.')
-      CLOSE(77,IOSTAT=IDUM)
+      CLOSE(iFile,IOSTAT=IDUM)
 
       END FUNCTION WRTDSL
 !
