@@ -53,7 +53,7 @@
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 1, natoms(iFrg)
               TotNumOfAtoms = TotNumOfAtoms + 1
-              IF (asym(i,iFrg).EQ.'H  ') THEN
+              IF (zmElementCSD(i,iFrg) .EQ. 2) THEN
                 NumOfHydrogens = NumOfHydrogens + 1
               ELSE
                 NumOfNonHydrogens = NumOfNonHydrogens + 1
@@ -73,7 +73,7 @@
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 1, natoms(iFrg)
               tAtomNumber = tAtomNumber + 1
-              IF (asym(i,iFrg).EQ.'H  ') THEN
+              IF (zmElementCSD(i,iFrg) .EQ. 2) THEN
                 tNumHydrogens = tNumHydrogens + 1
                 item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
               ELSE
@@ -125,7 +125,7 @@
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 1, natoms(iFrg)
-              IF (asym(i,iFrg).EQ.'H  ') THEN
+              IF (zmElementCSD(i,iFrg) .EQ. 2) THEN
                 tNumHydrogens = tNumHydrogens + 1
                 item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
               ELSE
@@ -210,16 +210,11 @@
 
       INTEGER, INTENT (IN   ) :: iFrg
 
-      INTEGER I, J
+      INTEGER I
       REAL    TotalAtomicWeighting
 
       DO I = 1, natoms(iFrg)
-        DO J = 1, MaxElm
-          IF (asym(I,iFrg)(1:2) .EQ. ElementStr(J)(1:2)) THEN
-            AtomicWeighting(I,iFrg) = FLOAT(atnr(J))**2
-            EXIT
-          ENDIF
-        ENDDO
+        AtomicWeighting(I,iFrg) = FLOAT(atnr(zmElementCSD(i,iFrg)))**2
       ENDDO
       TotalAtomicWeighting = 0.0
       DO I = 1, natoms(iFrg)
