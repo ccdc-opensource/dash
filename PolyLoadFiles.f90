@@ -339,7 +339,7 @@
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       CHARACTER*255 tString ! String containing last line read from file
-      INTEGER       I, NumOfBins, FLEN ! Length of TheFileName
+      INTEGER       I, NumOfBins
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       INTEGER       hFile
       INTEGER, EXTERNAL :: GetNumOfColumns
@@ -355,8 +355,7 @@
       TwoThetaStart = 0.0
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
-      FLEN = LEN_TRIM(TheFileName)
-      OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+      OPEN(UNIT=10,FILE=TheFileName,STATUS='OLD',ERR=999)
 ! *.cpi files look like this:
 !
 !SIETRONICS XRD SCAN               ! File identification marker (copy exactly)
@@ -382,7 +381,7 @@
 
 ! Read the header line
       READ(hFile,FMT='(A)',ERR=999,END=999) tString
-      IF (tString .NE. 'SIETRONICS XRD SCAN') THEN
+      IF ((tString .NE. 'SIETRONICS XRD SCAN') .AND. (tString .NE. 'Calculated Values from PowderCell')) THEN
         CALL ErrorMessage('File identification marker missing.')
         GOTO 999
       ENDIF
@@ -494,7 +493,7 @@
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       CHARACTER*255 Cline ! String containing last line read from file
-      INTEGER       I, J, NumOfBins, FLEN ! Length of TheFileName
+      INTEGER       I, J, NumOfBins
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       REAL          TempInput(8) ! Max. num. of columns is 8
       INTEGER       NumOfColumns2Read, hFile
@@ -506,8 +505,7 @@
       TwoThetaStart = 0.0
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
-      FLEN = LEN_TRIM(TheFileName)
-      OPEN(UNIT=hFile,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
 ! *.dat files look like this:
 !
 
