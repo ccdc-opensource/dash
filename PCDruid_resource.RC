@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 12/Sep/2001 20:24:40
+// Modified : 13/Sep/2001 14:02:41
 //
 ///////////////////////////////////////////////////
 //
@@ -24,7 +24,6 @@
 #define ID_HELP                         40007
 #define ID_HELP_ABOUT                   40008
 #define ID_ViewMenu                     40011
-#define ID_Exit                         40112
 #define IDD_Plot_Option_Dialog            103
 #define IDF_SymbolSize_Label             1002
 #define ID_get_peak_positions           40017
@@ -43,19 +42,11 @@
 #define IDF_CharacterSize_Label          1016
 #define IDF_CharacterSize                1017
 #define ID_import_xye_file              40014
-#define ID_get_lattice_constants        40024
 #define ID_get_peak_widths              40025
-#define ID_import_data                  40026
-#define ID_import_pro_file              40027
 #define ID_import_dpj_file              40021
-#define ID_get_peak_intensities         40030
 #define ID_help_about_Polyfitter        40031
 #define ID_PolyFitter_Help              40032
 #define ID_Polyfitter_Tips              40033
-#define ID_Level1_Tips                  40034
-#define ID_Level2_Tips                  40035
-#define ID_Level3_Tips                  40036
-#define ID_Level0_Tips                  40037
 #define ID_Druid_Mode_Menu              40022
 #define ID_Peak_Fitting_Mode            40023
 #define ID_Default_Mode                 40028
@@ -159,13 +150,10 @@
 #define IDF_gam_refine_label             1107
 #define IDF_zeropt_label                 1108
 #define IDF_CellRefinement_Label         1109
-#define ID_import_ccl_file              40104
 #define IDD_Polyfitter_Wizard_01          121
 #define IDF_PW01_Text1                   1197
 #define IDB_SA_Project_Open              1198
 #define IDF_PW0_Skip                     1216
-#define IDF_PW_Logo2                     1207
-#define IDF_PW_Logo3                     1208
 #define ID_PW_DF_Open                    1210
 #define IDFINISH                         1048
 #define IDD_PW_Page1                      122
@@ -201,7 +189,6 @@
 #define IDF_PW_2theta_label              1250
 #define IDF_PW_2theta0                   1251
 #define IDD_PW_Page3                      124
-#define IDF_PW_Logo4                     1256
 #define IDF_PWa_Data_Group               1261
 #define IDF_PWa_Data_fFilename           1262
 #define IDF_PWa_DataFileName_String      1263
@@ -227,7 +214,6 @@
 #define IDF_Pawley_Cycle_NumPts          1274
 #define IDF_Pawley_Cycle_ChiSq_Label2    1318
 #define IDF_Pawley_Cycle_ChiSq           1276
-#define IDF_Pawley_Status_Pic            1277
 #define IDF_Pawley_Status_Group          1278
 #define IDD_SA_Action2                    126
 #define IDF_CPL_GRID                     1401
@@ -248,21 +234,11 @@
 #define IDF_av_chisq                     1431
 #define IDF_avchisq_label                1432
 #define IDF_profchi2_label               1185
-#define IDF_controlfile_label            1434
-#define IDF_inputfile_string             1435
-#define IDF_inputfile_browse             1436
-#define IDF_save_inputfile_button        1437
-#define IDF_saveas_inputfile_button      1440
-#define IDF_savefile_group               1444
 #define IDD_input_parameters              140
-#define IDF_inputfile_help_button        1441
-#define IDF_getinput_group               1442
-#define IDF_miscinput_group              1443
 #define IDF_space_group_label            1449
 #define IDF_SA_Tredrate                  1179
 #define IDD_space_group                   130
 #define IDF_spacegp_group                1450
-#define IDD_control_file                  129
 #define IDD_input_data                    133
 #define IDD_zmatrix_files                 134
 #define IDF_SA_T0_label1                 1161
@@ -315,8 +291,6 @@
 #define IDF_Profile_Plot                 1501
 #define IDF_ProfileType_Radio1           1408
 #define IDF_ProfileType_Radio2           1503
-#define IDF_Profile_Zoom_Button          1414
-#define IDF_Profile_FullRange_Button     1415
 #define IDF_SA1_cancel                   1178
 #define IDF_peakcont_label               1502
 #define IDF_pikfile_browse_button        1504
@@ -349,36 +323,7 @@
 #define IDF_PawRef_Line                  1299
 #define IDB_PawRef_Skip                  1300
 #define IDF_Pawley_Options_Group         1302
-#define IDF_PawRefOptionsPicture         1303
-#define IDR_MENU2                       30002
-#define ID_BITMAP1                      20002
-#define ID_BITMAP2                      20003
-#define ID_BITMAP3                      20004
-#define ID_BITMAP4                      20005
-#define ID_BITMAP5                      20006
-#define ID_BITMAP6                      20007
-#define ID_BITMAP7                      20008
-#define ID_BITMAP8                      20009
-#define ID_BITMAP9                      20010
-#define ID_BITMAP10                     20011
-#define ID_ICON2                        20012
-#define ID_ICON3                        20013
-#define ID_STRING001                    20014
-#define ID_STRING002                    20015
-#define ID_STRING003                    20016
-#define ID_STRING004                    20017
-#define ID_STRING005                    20018
-#define ID_STRING006                    20019
-#define ID_STRING007                    20020
-#define ID_STRING008                    20021
-#define ID_STRING009                    20022
-#define ID_STRING010                    20023
-#define ID_STRING011                    20024
-#define ID_STRING012                    20025
-#define ID_STRING013                    20026
-#define ID_STRING014                    20027
 #define IDF_Pawley_Cycle_ChiSq_Label1    1317
-#define IDF_StrInf_Picture               1318
 #define ID_get_crystal_symmetry         40041
 #define ID_get_data_properties          40042
 #define IDF_PawRef_RefSigm1_Check        1320
@@ -414,12 +359,9 @@
 #define IDF_ZM_allpars_label             1135
 #define IDD_SA_input2                     120
 #define IDB_SA1_next                     1137
-#define IDF_SA1_picture                  1138
 #define IDD_TEMPLATE009                   141
-#define IDF_SA2_picture                  1140
 #define IDF_SA2_label                    1141
 #define IDD_SA_input3                     142
-#define IDF_SA3_picture                  1142
 #define IDB_SA3_back                     1143
 #define IDB_SA3_finish                   1144
 #define IDF_SA_RandomSeed1               1163
@@ -436,9 +378,6 @@
 #define IDF_minchisq_picture             1169
 #define IDF_prochisq_picture             1170
 #define IDF_avchisq_picture              1171
-#define IDF_SA_Pause_Button              1172
-#define IDF_SA_Stop_Button               1173
-#define IDF_SA_Play_Button               1174
 #define IDF_SA_Reanneal_Button           1175
 #define IDF_SA_total_moves_label         1176
 #define IDF_SA_zero_move_label           1177
@@ -449,7 +388,6 @@
 #define IDF_TBarGroup3                   1192
 #define IDF_TBarGroup4                   1193
 #define IDF_TBarGroup1                   1190
-#define IDF_SA_Eject_Button              1194
 #define IDF_SA_move_type2                1196
 #define IDF_SA_move_type3                1197
 #define IDF_clear_zmatrix                1294
@@ -1439,22 +1377,6 @@ BEGIN
 "[Colours] \n"
 "[Lengths] \n"
 ,0
-END
-
-IDD_control_file DIALOG 0, 0,  280,   78
-STYLE WS_CHILD | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  154,   48,   40,   14
-    CONTROL "file",IDF_controlfile_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   20,   16,   20,    8
-    CONTROL "",IDF_inputfile_string,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   60,   14,  160,   14
-    CONTROL "Browse",IDF_inputfile_browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  230,   12,   40,   14
-    CONTROL "Save",IDF_save_inputfile_button,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,   48,   40,   14
-    CONTROL "Save as...",IDF_saveas_inputfile_button,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   86,   48,   40,   14
-    CONTROL "Help",IDF_inputfile_help_button,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  220,   48,   40,   14
-    CONTROL "Get control file",IDF_getinput_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    6,    4,  270,   28
-    CONTROL "",IDF_miscinput_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  140,   36,  134,   32
-    CONTROL "Save control file",IDF_savefile_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    6,   36,  128,   32
 END
 
 IDD_space_group DIALOG 0, 0,  249,  121
@@ -2583,7 +2505,7 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "DASH &Tutorials"
         BEGIN
-            MENUITEM "Tutorial 1:  Hydrochlorothiazide",         ID_Tutorial_1
+            MENUITEM "Tutorial 1: Hydrochlorothiazide",          ID_Tutorial_1
             MENUITEM "Tutorial 2: Chloropropamide",              ID_Tutorial_2
             MENUITEM "Tutorial 3: Cimetidine",                   ID_Tutorial_3
             MENUITEM "Tutorial 4: Decafluoroquaterphenyl",       ID_Tutorial_4
@@ -2605,84 +2527,11 @@ ID_Polyfitter_Tips,5,3,0
 0
 END
 
-IDR_MENU2 MENU
-BEGIN
-    POPUP "&File"
-    BEGIN
-        MENUITEM "Import project file",                      ID_import_dpj_file
-        MENUITEM SEPARATOR
-        POPUP "Import profile data"
-        BEGIN
-            MENUITEM ".xye format (ASCII)",                      ID_import_xye_file
-            MENUITEM ".pro format (ISIX)",                       ID_import_pro_file
-        END
-        MENUITEM SEPARATOR
-        MENUITEM "&Print",                                   ID_FILE_PRINT
-        MENUITEM SEPARATOR
-        MENUITEM "&Exit",                                    ID_FILE_EXIT
-    END
-    POPUP "&Mode"
-    BEGIN
-        MENUITEM "&Default\aAlt+M",                          ID_Default_Mode, CHECKED
-        MENUITEM SEPARATOR
-        MENUITEM "&Peak fitting\aAlt+P",                     ID_Peak_Fitting_Mode
-        MENUITEM "Pawley &refinement\aAlt+R",                ID_Pawley_Refinement_Mode
-        MENUITEM "Structure solution\aAlt+S",                ID_Structure_Solution_Mode
-    END
-    POPUP "&View"
-    BEGIN
-        MENUITEM "Peak positions",                           ID_get_peak_positions
-        MENUITEM "&Lattice constants",                       ID_get_lattice_constants
-        MENUITEM "Peak &widths",                             ID_get_peak_widths
-        MENUITEM SEPARATOR
-        MENUITEM "Peak &intensities",                        ID_get_peak_intensities
-    END
-    POPUP "&Options"
-    BEGIN
-        MENUITEM "Plot",                                     ID_plot_options
-    END
-    POPUP "&Help"
-    BEGIN
-        MENUITEM "DASH &Help\aCtrl-H",                       ID_PolyFitter_Help
-        MENUITEM SEPARATOR
-        POPUP "DASH &Tips"
-        BEGIN
-            MENUITEM "Beginner",                                 ID_Level1_Tips, CHECKED
-            MENUITEM "Normal",                                   ID_Level2_Tips
-            MENUITEM "Expert",                                   ID_Level3_Tips
-            MENUITEM "None",                                     ID_Level0_Tips
-        END
-        MENUITEM SEPARATOR
-        MENUITEM "About &DASH",                              ID_help_about_Polyfitter
-    END
-END
-
-IDR_MENU2 RCDATA
-BEGIN
-ID_FILE,1,0
-ID_import_data,1,3,0
-ID_Druid_Mode_Menu,2,0
-ID_ViewMenu,3,0
-ID_Options,4,0
-ID_HELP,5,0
-ID_Polyfitter_Tips,5,3,0
-0
-END
-
 ///////////////////////////////////////////////////
 //
 // Accelerators
 //
 IDR_MENU1 ACCELERATORS
-BEGIN
-  77        , ID_Default_Mode                ,NOINVERT,VIRTKEY,ALT
-  80        , ID_Peak_Fitting_Mode           ,NOINVERT,VIRTKEY,ALT
-  82        , ID_Pawley_Refinement_Mode      ,NOINVERT,VIRTKEY,ALT
-  83        , ID_Structure_Solution_Mode     ,NOINVERT,VIRTKEY,ALT
-  72        , ID_PolyFitter_Help             ,NOINVERT,VIRTKEY,CONTROL
-END
-
-IDR_MENU2 ACCELERATORS
 BEGIN
   77        , ID_Default_Mode                ,NOINVERT,VIRTKEY,ALT
   80        , ID_Peak_Fitting_Mode           ,NOINVERT,VIRTKEY,ALT
@@ -2697,46 +2546,17 @@ END
 //
 IDF_Width_Equations             BITMAP DISCARDABLE "res\\WidthEquations.bmp"
 IDF_PW_Logo1                    BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
-IDF_PW_Logo2                    BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
-IDF_PW_Logo3                    BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
 IDF_WelcomeWizard               BITMAP DISCARDABLE "res\\WizardWelcome.bmp"
-IDF_PW_Logo4                    BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
-IDF_Pawley_Status_Pic           BITMAP DISCARDABLE "res\\EmbossedProfile.bmp"
-IDF_Profile_Zoom_Button         BITMAP DISCARDABLE "res\\zoom.bmp"
-IDF_Profile_FullRange_Button    BITMAP DISCARDABLE "res\\fullrange.bmp"
-IDF_PawRefOptionsPicture        BITMAP DISCARDABLE "res\\PawRefOptions.bmp"
 ID_TOOLBAR1                     BITMAP DISCARDABLE "res\\toolbar1.bmp"
-ID_BITMAP1                      BITMAP DISCARDABLE "res\\WidthEquations.bmp"
-ID_BITMAP2                      BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
-ID_BITMAP3                      BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
-ID_BITMAP4                      BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
-ID_BITMAP5                      BITMAP DISCARDABLE "res\\WizardWelcome.bmp"
-ID_BITMAP6                      BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
-ID_BITMAP7                      BITMAP DISCARDABLE "res\\PolyFitterWizardSmall.bmp"
-ID_BITMAP8                      BITMAP DISCARDABLE "res\\zoom.bmp"
-ID_BITMAP9                      BITMAP DISCARDABLE "res\\fullrange.bmp"
-ID_BITMAP10                     BITMAP DISCARDABLE "res\\PawRefOptions.bmp"
-IDF_StrInf_Picture              BITMAP DISCARDABLE "res\\PolyFitterWizardFull.bmp"
 IDB_ZMatrix_Browse1             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse2             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse3             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse4             BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse5             BITMAP DISCARDABLE "res\\OpenFile.bmp"
-IDF_SA1_picture                 BITMAP DISCARDABLE "res\\PolyFitterWizardFull.bmp"
-IDF_SA2_picture                 BITMAP DISCARDABLE "res\\PolyFitterWizardFull.bmp"
-IDF_SA3_picture                 BITMAP DISCARDABLE "res\\PolyFitterWizardFull.bmp"
 IDF_T_picture                   BITMAP DISCARDABLE "res\\temperature1.bmp"
 IDF_avchisq_picture             BITMAP DISCARDABLE "res\\temperature1.bmp"
 IDF_minchisq_picture            BITMAP DISCARDABLE "res\\temperature1.bmp"
 IDF_prochisq_picture            BITMAP DISCARDABLE "res\\temperature1.bmp"
-IDF_SA_Stop_Button              BITMAP DISCARDABLE "res\\stop.bmp"
-IDF_SA_Pause_Button             BITMAP DISCARDABLE "res\\pause.bmp"
-IDF_SA_Play_Button              BITMAP DISCARDABLE "res\\play.bmp"
-IDF_SA_Simplex_Button           BITMAP DISCARDABLE "res\\fast_forward.BMP"
-IDF_Pause_Annealing             BITMAP DISCARDABLE "res\\pause.bmp"
-IDF_SA_Reanneal_Button          BITMAP DISCARDABLE "res\\back.bmp"
-IDF_SA_Eject_Button             BITMAP DISCARDABLE "res\\eject.BMP"
-IDF_SA_NewAnneal_Button         BITMAP DISCARDABLE "res\\previous_track.BMP"
 
 ///////////////////////////////////////////////////
 //
@@ -2744,9 +2564,6 @@ IDF_SA_NewAnneal_Button         BITMAP DISCARDABLE "res\\previous_track.BMP"
 //
 icon1                           ICON   DISCARDABLE "res\\Druid.ico"
 ID_ICON1                        ICON   DISCARDABLE "res\\Druid.ico"
-ID_ICON2                        ICON   DISCARDABLE "res\\Druid.ico"
-ID_ICON3                        ICON   DISCARDABLE "res\\Druid.ico"
-IDF_Done_icon                   ICON   DISCARDABLE "res\\Done.ico"
 ID_Wizard_Icon                  ICON   DISCARDABLE "res\\wizard.ico"
 
 ///////////////////////////////////////////////////
@@ -2756,24 +2573,8 @@ ID_Wizard_Icon                  ICON   DISCARDABLE "res\\wizard.ico"
 STRINGTABLE DISCARDABLE
 BEGIN
     ID_HELP_ABOUT                   "Help"
-    ID_Exit                         "Exit"
     ID_FILE_EXIT                    "Exit"
     ID_PolyFitter_Help              "Help"
-    ID_import_ccl_file              "Open CCL control file"
-    ID_STRING001                    "Save"
-    ID_STRING002                    "Help"
-    ID_STRING003                    "Exit"
-    ID_STRING004                    "Exit"
-    ID_STRING005                    "Open tickmark file"
-    ID_STRING006                    "Help"
-    ID_STRING007                    "Undo"
-    ID_STRING008                    "Default"
-    ID_STRING009                    "Crosshair mode"
-    ID_STRING010                    "Peak fitting cursor mode"
-    ID_STRING011                    "Open CCL control file"
-    ID_STRING012                    "Open XYE format powder diffraction file"
-    ID_STRING013                    "Open profile refinement data file"
-    ID_STRING014                    "Open CCL control file"
     ID_Default_Mode                 "Default Mode"
     ID_Peak_Fitting_Mode            "Peak fitting mode"
     ID_Structure_Solution_Mode      "Structure solution mode"
