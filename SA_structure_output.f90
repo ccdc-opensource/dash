@@ -239,7 +239,6 @@
         CLOSE (65)
       ENDIF
       IF (tSaveCCL) CLOSE (66)
-      CALL UpdateViewer()
       RETURN
  1380 FORMAT ('REMARK 290 ')
 
@@ -834,16 +833,6 @@
       ENDDO
 
       END SUBROUTINE APPENDNUMTOFILENAME
-!
-!*****************************************************************************
-!
-      SUBROUTINE UpdateViewer()
-
-      USE VARIABLES
-
-      IF (AutoUpdate .AND. ViewAct) CALL ViewBest
-
-      END SUBROUTINE UPDATEVIEWER
 !
 !*****************************************************************************
 !
