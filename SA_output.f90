@@ -95,11 +95,13 @@
       COMMON / sagdat / bchmin, bpwval, bchpro, &
                 tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
                 nd2, nd3, nd4, bmIHANDLE
-      LOGICAL RESTART
-      INTEGER SA_Run_Number
-      INTEGER MaxRuns, MinMoves, MaxMoves
-      REAL    ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+
       REAL tenow1, tenow2, ruler, rulex1, rulex2
   
       REAL, PARAMETER ::  rminh = 0.01

@@ -9,21 +9,21 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-      LOGICAL RESTART
-      INTEGER SA_Run_Number
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+
       CHARACTER*80 SA_Label
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Input3)
       SA_Run_Number = 0
-      MinMoves = 15000
       CALL WDialogGetInteger(IDF_SA_MaxRepeats,MaxRuns)
       CALL WDialogGetInteger(IDF_SA_MaxMoves,  MaxMoves)
       CALL WDialogGetReal(IDF_SA_ChiTest,   ChiMult)
       RESTART = ((MaxRuns .GT. 1) .AND. (ChiMult .GT. 0.0))
-!ep    CALL WDialogSelect(IDD_SA_Multi_Completed)
-!    CALL WDialogClearField(IDF_SA_Solution_Grid)
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
       CALL WDialogClearField(IDF_SA_Summary)
       CALL WDialogSelect(IDD_SA_Action1)
@@ -54,9 +54,11 @@
       REAL ProfileChiSquared
       REAL IntensityChiSquared
 
-      LOGICAL RESTART
-      INTEGER SA_Run_Number
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       REAL Grid_ProfileChi, Grid_IntensityChi
       CHARACTER*255 Grid_Buffer
@@ -101,28 +103,27 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      IMPLICIT NONE
+
       CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
       COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
-      LOGICAL RESTART
-      INTEGER SA_Run_Number, I
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
+      INTEGER I
       REAL Grid_ProfileChi, Grid_IntensityChi
       CHARACTER*255 Grid_Buffer
 
-!ep    CALL WDialogSelect(IDD_SA_Multi_Completed)
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
       OPEN(unit=101, file=log_file(1:log_flen), status = 'unknown', err = 99)
       WRITE(101,*) 'File name,Profile Chi Squared,Intensity Chi Squared'
       DO I = 1, SA_Run_Number
-!ep         CALL WGridGetCellReal(IDF_SA_Solution_Grid,3,I,Grid_ProfileChi)
-!           CALL WGridGetCellString(IDF_SA_Solution_Grid,1,I,Grid_Buffer)
-!           CALL WGridGetCellReal(IDF_SA_Solution_Grid,2,I,Grid_IntensityChi)
-!           WRITE(101,10) Grid_Buffer(1:len_trim(Grid_Buffer)),Grid_ProfileChi,Grid_IntensityChi
-
         CALL WGridGetCellReal(IDF_SA_Summary,3,I,Grid_ProfileChi)
         CALL WGridGetCellString(IDF_SA_Summary,1,I,Grid_Buffer)
         CALL WGridGetCellReal(IDF_SA_Summary,4,I,Grid_IntensityChi)
