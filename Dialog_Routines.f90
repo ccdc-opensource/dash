@@ -6,6 +6,8 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      IMPLICIT NONE
+
       CHARACTER*8 chrfmt
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
@@ -18,6 +20,8 @@
                        XGGMIN,    XGGMAX
 
       LOGICAL, EXTERNAL :: FnPatternOK
+      REAL atem1, atem2
+      INTEGER iTem, iTem1, iTem2, iNext
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Data_Properties)
