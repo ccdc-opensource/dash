@@ -189,6 +189,9 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
+              IF (SpaceGroupDetermination) THEN
+                CALL SpaceGroupFileDialog
+              ENDIF
               IPTYPE = 1
               CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page1)
