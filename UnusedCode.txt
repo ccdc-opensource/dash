@@ -1,8 +1,154 @@
 !
 !*****************************************************************************
 !
+! Originally in Plot_SA_Profile.f90
+!
+      subroutine Plot_SA_profile()
+!************
+!
+!
+      CALL IGrArea(0.0,0.0,1.0,1.0)
+      CALL IGrUnits(0.,0.,1.,1.)
+      CALL IGrAreaClear
+      CALL IGrCharFont(1)
+      CALL IGrColourN(159)
+      CALL IPgScaling('LIN','LIN')
+!
+!
+      CALL WDialogGetRadioButton(IDF_ProfileType_Radio1,IRAD_ProfileType)
+      SELECT CASE (IRAD_ProfileType)
+          CASE (1)
+! Observed and calculated profiles
+              CALL IPgNewGraph(3,nobs,' ',' ','XY')
+              yshift=0.5*(ypgmax-ypgmin)
+          CASE (2)
+! The difference profile
+              CALL IPgNewGraph(2,nobs,' ',' ','XY')
+              yshift=0.5*(ypmax-ypmin)
+      END SELECT
+!
+      DO I=1,NOBS
+        ydif(i)=yshift+yobs(i)-ycalbest(i)
+      END DO
+!
+!  draw axes and add scales
+!
+      CALL IPgAxes
+      CALL IPgArea(.12,.12,.9,.95)
+      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
+      CALL IPgClipRectangle('P')
+      CALL IPgBorder()
+      CALL IGrCharSize(1.,1.)
+      CALL IPgXScale('TN')
+      CALL IPgXScaleTop('T')
+      CALL IGrCharSize(1.,1.2)
+      CALL IPgYScaleLeft('TN')
+      CALL IPgYScaleRight('T')
+      CALL IGrCharSize(1.,1.2)
+      CALL IPgXLabel('2 theta','C')
+!
+      SELECT CASE (IRAD_ProfileType)
+          CASE (1)
+! Observed and calculated profiles
+            CALL IPgYLabelLeft('Counts','C9')
+            CALL IPgStyle(1,0,0,0,4,0)
+            CALL IPgStyle(2,0,3,0,0,31)
+            CALL IPgMarker( 2, 14)
+            CALL IPgStyle(3,0,0,0,159,0)
+            CALL IPgXYPairs(xobs,ydif)
+            CALL IGrCharSize(.3,.3)
+            CALL IPgXYPairs(xobs,yobs)
+            CALL IPgXYPairs(xobs,ycalbest)
+          CASE (2)
+! The difference profile
+            CALL IPgYLabelLeft('Difference profile','C9')
+            CALL IPgStyle(1,0,0,0,4,0)
+            CALL IPgStyle(2,0,0,0,159,0)
+            CALL IPgXYPairs(xobs,yobs)
+            CALL IPgXYPairs(xobs,ydif)
+      END SELECT
+      end subroutine Plot_SA_profile
+!
+!*****************************************************************************
+!
 ! Originally in pr.for
 !
+!*==WRINST.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!
+!
+!
+! LEVEL 2      SUBROUTINE WRINST(N)
+      SUBROUTINE WRINST(N)
+!
+! *** WRINST by JCM 13 Aug 91 ***
+!
+!H Set and write first 155 elements of IWORK, instument parameters etc,
+!H for TIC & PICTIC
+!A On entry N=no. of points to set in IWORK(55)
+!
+      INCLUDE 'params.inc'
+!
+      COMMON /FCCDAT/ DATFIL, INSTNM, LONGTI, RUNUSR, STTIME, WSHIST,   &
+     &                XCAPT, YCAPT, MCAPT
+      CHARACTER DATFIL*80, INSTNM*8, LONGTI*80, RUNUSR*20, STTIME*20,   &
+     &          WSHIST*200, XCAPT*40, YCAPT*40, MCAPT*40
+!
+      COMMON /FOCDAT/ NOTC, NCYMIN, NCYMAX, DELTA, LDFIL, FI, INSTCO,   &
+     &                INSTST, NXCODE, LNPDFN, AL1, AL2, NOSPEC, NPT,    &
+     &                NUMRUN, RUNDUR, TTHET, XMN, XMX, YMN, YMX, NYCODE,&
+     &                NEMODE, EFIXED, USERPR(30), TDATA(MFOCDA),        &
+     &                OBSDAT(MFOCDA), CALDAT(33000),      &
+     &                ERR(MFOCDA), STADAT(MFOCDA), YRANGE, IUNIT
+!
+      COMMON /WORKG / IWORK(256)
+      REAL RWORK(256)
+      CHARACTER*1024 CWORK
+! NON-STANDARD FORTRAN 77:
+!VMS
+      EQUIVALENCE (IWORK,CWORK)
+      EQUIVALENCE (IWORK,RWORK)
+!
+      IWORK(1) = NCYMIN
+      IWORK(2) = NCYMAX
+      RWORK(3) = DELTA
+      IWORK(4) = LDFIL
+      CWORK(17:96) = DATFIL
+      RWORK(25) = FI
+      IWORK(26) = INSTCO
+      CWORK(105:112) = INSTNM
+      IWORK(29) = INSTST
+      IWORK(30) = NXCODE
+      IWORK(31) = LNPDFN
+      RWORK(32) = AL1
+      RWORK(33) = AL2
+      CWORK(133:212) = LONGTI
+      IWORK(54) = 1
+! N SET AS INPUT ARGUMENT:
+      IWORK(55) = N
+      IWORK(56) = NUMRUN
+      CWORK(225:244) = RUNUSR
+      RWORK(62) = RUNDUR
+      CWORK(249:268) = STTIME
+      RWORK(68) = TTHET
+      CWORK(273:472) = WSHIST
+      RWORK(119) = XMN
+      RWORK(120) = XMX
+      RWORK(121) = YMN
+      RWORK(122) = YMX
+!* NOW RELYING ON CAPTS SET OUTSIDE
+      CWORK(489:528) = XCAPT
+      CWORK(529:568) = YCAPT
+      CWORK(569:608) = MCAPT
+      IWORK(153) = NYCODE
+      IWORK(154) = NEMODE
+      IWORK(155) = EFIXED
+!
+!      WRITE THIS DATA TO FILE
+!
+      CALL WRDATA(.FALSE.,IUNIT,IWORK,155)
+      RETURN
+      END SUBROUTINE WRINST
 C
 C
 C LEVEL 11       SUBROUTINE SETICN(PCXX)
@@ -17022,7 +17168,327 @@ C
       END
 C
 C
+!*==REJECT.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
+!
+!
+!
+!
+! LEVEL 1      SUBROUTINE REJECT(N,NEXT,LREJ,USE)
+      SUBROUTINE REJECT(N,NEXT,LREJ,USE)
+!
+! *** REJECT corrected by PJB 22-June-95 ***
+!
+!X
+!C 11C
+!H Decides for ARRNGE-type main programs whether the record number of
+!H a reflection occurs in a list of those to be rejected.
+!A On entry N is normally the number of the reflection to be tested.
+!A            but if negative indicates the setting up entry which
+!A            opens the rejection list and reads the first entry.
+!A          NEXT should initially be set to zero;  it should then be
+!A               preserved between entries.
+!A          LREJ is the number of the unit from which to read rejection
+!A               numbers.
+!
+!A On exit LOGICAL USE is TRUE if reflection number N is to be used.
+!
+!D Reads one integer at a time from unit LREJ.  Takes a -ve integer
+!D to imply "all the numbers between the previous number and this one".
+!
+!N N must be monotonic increasing.
+!
+      LOGICAL USE
+      COMMON /ARRDAT/ IFOR(6), INC, LINO, NREF, INLBUF, NBUF, IBUF,     &
+     &                INFBUF, INDLEN, NUMVAL, IPOS, ISTORE, ICHNGE, NEW,&
+     &                LPRINT, ICD, IS, NREF1, NREFL
+      LOGICAL INC, NEW, LPRINT
+      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      COMMON /SCRACH/ MESSAG, NAMFIL
+      CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
+      EQUIVALENCE (ICARD,MESSAG)
+      EQUIVALENCE (ICARD(1:1),MESSAG)
+!
+      IF (N.GE.0) GOTO 1
+!
+      MESSAG = 'File containing rejection list?'
+      NAMFIL = '.REJ'
+      LREJ = NOPFIL(111)
+   31 READ (LREJ,1000,END=30) ICARD
+      CALL RDINTG(NEXT,1,IPT,80,IER)
+      IF (IER.NE.0) GOTO 31
+      IF (NEXT.GE.0) GOTO 100
+      WRITE (LPT,2000) NEXT
+ 2000 FORMAT (/' No rejections - ',I6,' read')
+   30 NEXT = 99999999
+      GOTO 100
+!
+    1 IF (N.LT.NEXT) GOTO 101
+!
+      USE = .FALSE.
+      IF (N.LE.-NEXT) GOTO 100
+!
+! NEED NEXT NUMBER FROM LIST
+      LAST = NEXT
+      READ (LREJ,1000,END=2) ICARD
+      CALL RDINTG(NEXT,1,IPT,80,IER)
+      IF (IER.NE.0) GOTO 31
+!
+! CHECK CORRECT SEQUENCE
+      IF ((LAST.LT.0.AND.NEXT+LAST.GT.0) .OR. IABS(NEXT).GT.LAST)       &
+     &    GOTO 100
+      WRITE (LPT,3000) LAST, NEXT
+ 3000 FORMAT (/' ERROR ** in sequence of rejection list',2I10)
+!>>JCC HAndle through extra function
+! Was      STOP
+! Now
+      CALL BMBOUT
+      RETURN
+!
+!
+! AT END, SET NO MORE REJECTIONS
+    2 NEXT = 99999999
+      GOTO 100
+  101 USE = .TRUE.
+  100 RETURN
+ 1000 FORMAT (A80)
+      END SUBROUTINE REJECT
 
+!*==SETABS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
+!
+!
+!
+!
+!
+! LEVEL 12      SUBROUTINE SETABS
+      SUBROUTINE SETABS
+!
+! *** SETABS by JCM 4 Oct 85 ***
+!
+!X
+!C 2A
+!H Sets up data for the calculation of absorption (or related) integrals.
+!D Calls SETDC and SETG to set up the COMMON blocks /DGEOM/ and /GAUSS/
+!D Checks that all necessary quantities have been given and are acceptable.
+!D Checks that at least 3 plane faces have been given on G FACE cards.
+!D Checks that D L/R card has been given.
+!D If no G MODE card has been given, assumes mode 1, simple absorption
+!D correction.
+!D If no G PNTS card has been given assumes 5 x 5 x 5
+!D  If no G MU card has been given assumes that mu will be set by a
+!D main program
+!P RECIP must have read in the cell parameters.
+!I Causes D and "G" cards to be read from the copy of the Crystal Data
+!I File on unit IO10.
+!O Writes its findings to unit LPT.
+!
+      COMMON /ABSDAT/ AMU, MODEA
+      COMMON /CPLANE/ AA(15), BB(15), CC(15), DD(15), NP
+      COMMON /DREAD / IDREAD(8)
+      COMMON /GAUSS / XX(1000), YY(1000), ZZ(1000), WW(1000), NL, NM,   &
+     &                NN, NQ
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
+     &                ICDN(26,9), IERR, IO10, SDREAD
+      LOGICAL SDREAD
+      DIMENSION INREAD(26), ICDNO(26)
+      EQUIVALENCE (INREAD(1),INREA(1,1))
+      EQUIVALENCE (ICDNO(1),ICDN(1,1))
+      COMMON /GREAD / IGREAD(4)
+      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+!
+      CALL MESS(LPT,2,                                                  &
+     &          'Absorption Corrections using Gaussian integration')
+      IF (INREAD(4).GT.0) CALL SETDC
+      IF (INREAD(7).GT.0) CALL INPUTG
+!
+! NOW CHECK SPECIFIC ITEMS NEEDED FOR ABSORPTION TYPE INTEGRALS:
+      IF (NP.LE.2) THEN
+        CALL ERRMES(2,1,'equations of plane faces')
+        GOTO 100
+      ENDIF
+!
+      IF (IGREAD(2).LE.0) THEN
+        NL = 5
+        NM = 5
+        NN = 5
+        CALL MESS(LPT,1,'No G PNTS card read - assuming 5 x 5 x 5')
+      ENDIF
+!
+      IF (IGREAD(3).LE.0) CALL MESS(LPT,1,'No G MU card read - '//      &
+     &                       'assuming AMU put in place by MAIN program'&
+     &                       )
+!
+      IF (IGREAD(4).LE.0) THEN
+        MODEA = 1
+        CALL MESS(LPT,1,'No G MODE card read - assuming 1')
+      ENDIF
+!
+      IF (IDREAD(3).LE.0) THEN
+        CALL ERRMES(2,1,'D L/R card for abs cor')
+        GOTO 100
+      ENDIF
+!
+      CALL SETGAU
+  100 RETURN
+      END SUBROUTINE SETABS
+!*==SETGAU.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
+!
+!
+!
+!
+! LEVEL 5      SUBROUTINE SETGAU
+      SUBROUTINE SETGAU
+!
+! *** SETGAU BY JCM ***
+!
+!X
+!C 2A
+!H Sets up the COMMON /GAUSS/ for Gaussian integration (for use in
+!H absorption correction type integrals).
+!P NL,NM,NN in /GAUSS/ should be the required number of Gauss points
+!P        to scan the given crystal in the 3 directions x,y,z.
+!P INPUTG should have read all the "G" cards.
+!
+!D Sets up a 3D mesh of Gauss points and weights covering the given
+!D crystal whose faces are described in /CPLANE/.  In /GAUSS/
+!D the arrays XX, YY, ZZ hold the x,y and z coordinates of the points
+!D referred to the standard crystallographic axes, and the array WW
+!D holds the weights.
+!O Writes the crystal volume so found to unit LPT.
+!
+!N SETGAU may be called several times in one job, to enable comparison
+!N between integrations using different numbers of points.
+!
+      LOGICAL TESTOV
+      COMMON /CPLANE/ AA(15), BB(15), CC(15), DD(15), NP
+      COMMON /GAUSS / XX(1000), YY(1000), ZZ(1000), WW(1000), NL, NM,   &
+     &                NN, NQ
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
+     &                ICDN(26,9), IERR, IO10, SDREAD
+      LOGICAL SDREAD
+      DIMENSION INREAD(26), ICDNO(26)
+      EQUIVALENCE (INREAD(1),INREA(1,1))
+      EQUIVALENCE (ICDNO(1),ICDN(1,1))
+      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      COMMON /SCRAT / GPT(150), GWT(150)
+!
+!
+      IF (INREAD(7).GT.0) CALL INPUTG
+      NQ = NL*NM*NN
+!%
+!      CALL ERRCHK(1,NQ,%GPTS%,0,'Gauss points, product of all 3')
+      CALL ERRCHK(1,NQ,1000,0,'Gauss points, product of all 3')
+      U = 0.
+      V = 0.
+      DO IR = 1, NP
+        DO IS = 1, NP
+          D = BB(IR)*CC(IS) - CC(IR)*BB(IS)
+          DO IT = 1, NP
+            E = BB(IS)*CC(IT) - CC(IS)*BB(IT)
+            F = BB(IT)*CC(IR) - CC(IT)*BB(IR)
+            A = DD(IR)*E + DD(IS)*F + DD(IT)*D
+            B = AA(IR)*E + AA(IS)*F + AA(IT)*D
+            IF (TESTOV(A,B)) GOTO 11
+            X = A/B
+            A = (DD(IS)-AA(IS)*X)*CC(IT) - (DD(IT)-AA(IT)*X)*CC(IS)
+            IF (TESTOV(A,E)) GOTO 11
+            Y = A/E
+            A = DD(IT) - AA(IT)*X - BB(IT)*Y
+            IF (TESTOV(A,CC(IT))) GOTO 11
+            Z = A/CC(IT)
+            DO I = 1, NP
+              IF (AA(I)*X+BB(I)*Y+CC(I)*Z-DD(I).GT.0.0001) GOTO 11
+            ENDDO
+            IF (U.LT.X) U = X
+            IF (X.LT.V) V = X
+   11     ENDDO
+        ENDDO
+      ENDDO
+      U = U - V
+      IO = 1
+!
+! SET UP ENTIRE RANGES OF GAUSS POINTS AND WEIGHTS IN /SCRAT/:
+      ITEM1 = 1
+      ITEM2 = NL
+      CALL GAUSPT(NL,GPT(ITEM1),GWT(ITEM1))
+      DO IR = ITEM1, ITEM2
+        X = V + U*GPT(IR)
+        E = 6000.
+        D = -6000.
+        DO IS = 1, NP
+          DO IT = 1, NP
+            A = (DD(IS)-AA(IS)*X)*CC(IT) - (DD(IT)-AA(IT)*X)*CC(IS)
+            B = BB(IS)*CC(IT) - CC(IS)*BB(IT)
+            IF (TESTOV(A,B)) GOTO 17
+            Y = A/B
+            A = DD(IT) - AA(IT)*X - BB(IT)*Y
+            IF (TESTOV(A,CC(IT))) GOTO 17
+            Z = A/CC(IT)
+            DO IQ = 1, NP
+              IF (AA(IQ)*X+BB(IQ)*Y+CC(IQ)*Z-DD(IQ).GT.0.0001) GOTO 17
+            ENDDO
+            IF (D.LT.Y) D = Y
+            IF (Y.LT.E) E = Y
+   17     ENDDO
+        ENDDO
+        D = D - E
+!
+! SET UP GAUSS POINTS AND WEIGHTS FOR SECOND INTEGRATION DIRECTION (UNLESS SAME
+! AS FIRST):
+        ITEM3 = ITEM1
+        ITEM4 = ITEM2
+        IF (NM.EQ.NL) GOTO 1
+        ITEM3 = ITEM2 + 1
+        ITEM4 = ITEM3 + NM - 1
+        CALL GAUSPT(NM,GPT(ITEM3),GWT(ITEM3))
+    1   DO IS = ITEM3, ITEM4
+          Y = E + D*GPT(IS)
+          G = 6000.
+          F = -6000.
+          DO IT = 1, NP
+            A = DD(IT) - AA(IT)*X - BB(IT)*Y
+            IF (TESTOV(A,CC(IT))) GOTO 23
+            Z = A/CC(IT)
+            DO IQ = 1, NP
+              IF (AA(IQ)*X+BB(IQ)*Y+CC(IQ)*Z-DD(IQ).GE.0.0001) GOTO 23
+            ENDDO
+            IF (F.LT.Z) F = Z
+            IF (Z.LT.G) G = Z
+   23     ENDDO
+          F = F - G
+          ITEM5 = ITEM1
+          ITEM6 = ITEM2
+          IF (NN.EQ.NL) GOTO 2
+          ITEM5 = ITEM3
+          ITEM6 = ITEM4
+          IF (NN.EQ.NM) GOTO 2
+          ITEM5 = ITEM4 + 1
+          ITEM6 = ITEM5 + NN - 1
+          CALL GAUSPT(NN,GPT(ITEM5),GWT(ITEM5))
+    2     DO IT = ITEM5, ITEM6
+            Z = G + F*GPT(IT)
+            XX(IO) = X
+            YY(IO) = Y
+            ZZ(IO) = Z
+            WW(IO) = D*F*GWT(IR)*GWT(IS)*GWT(IT)
+            IO = IO + 1
+          ENDDO
+        ENDDO
+      ENDDO
+      V = 0.
+      DO IQ = 1, NQ
+        V = V + WW(IQ)
+      ENDDO
+      IF (TESTOV(1.,V)) CALL ERRMES(1,0,'- is origin strictly inside crystal?')
+!
+      VSTAR = 1/V
+      DO IQ = 1, NQ
+        WW(IQ) = VSTAR*WW(IQ)
+      ENDDO
+      V = V*U
+      WRITE (LPT,2000) V
+ 2000 FORMAT (/' Crystal volume ',F12.5)
+      RETURN
+      END SUBROUTINE SETGAU
 !
 !*****************************************************************************
 !
