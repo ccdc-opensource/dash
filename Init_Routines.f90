@@ -36,26 +36,38 @@
       CHARACTER*2 RowLabelStr
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page5)
-      CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
-      DO iSol = 1, NumOf_SA_Runs
-        WRITE(RowLabelStr,'(I2)') iSol
-        CALL WGridLabelRow(IDF_SA_summary,iSol,RowLabelStr)
-        CALL WGridPutCellInteger (IDF_SA_Summary,1,iSol,iSol2Run(iSol)) 
-        CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSol2Run(iSol)))
-        CALL WGridPutCellReal    (IDF_SA_Summary,4,iSol,ProfileChiSqd(iSol2Run(iSol)),'(F7.2)')
-        CALL WGridPutCellReal    (IDF_SA_Summary,5,iSol,IntensityChiSqd(iSol2Run(iSol)),'(F7.2)')
-      ENDDO
-      CALL WDialogSelect(IDD_Summary)
-      CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
-      DO iSol = 1, NumOf_SA_Runs
-        WRITE(RowLabelStr,'(I2)') iSol
-        CALL WGridLabelRow(IDF_SA_summary,iSol,RowLabelStr)
-        CALL WGridPutCellInteger (IDF_SA_Summary,1,iSol,iSol2Run(iSol)) 
-        CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSol2Run(iSol)))
-        CALL WGridPutCellReal    (IDF_SA_Summary,4,iSol,ProfileChiSqd(iSol2Run(iSol)),'(F7.2)')
-        CALL WGridPutCellReal    (IDF_SA_Summary,5,iSol,IntensityChiSqd(iSol2Run(iSol)),'(F7.2)')
-      ENDDO
+      IF (NumOf_SA_Runs .EQ. 0) THEN
+! Winteracter doesn't seem able to cope with setting the number of rows in a grid to zero,
+! so if no SA runs, the number of rows is set such that it fills the screen but doesn't allow
+! scrolling down.
+        CALL WDialogSelect(IDD_SAW_Page5)
+        CALL WGridRows(IDF_SA_Summary, 5)
+        CALL WDialogClearField(IDF_SA_Summary)
+        CALL WDialogSelect(IDD_Summary)
+        CALL WGridRows(IDF_SA_Summary, 5)
+        CALL WDialogClearField(IDF_SA_Summary)
+      ELSE
+        CALL WDialogSelect(IDD_SAW_Page5)
+        CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
+        DO iSol = 1, NumOf_SA_Runs
+          WRITE(RowLabelStr,'(I2)') iSol
+          CALL WGridLabelRow(IDF_SA_summary,iSol,RowLabelStr)
+          CALL WGridPutCellInteger (IDF_SA_Summary,1,iSol,iSol2Run(iSol)) 
+          CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSol2Run(iSol)))
+          CALL WGridPutCellReal    (IDF_SA_Summary,4,iSol,ProfileChiSqd(iSol2Run(iSol)),'(F7.2)')
+          CALL WGridPutCellReal    (IDF_SA_Summary,5,iSol,IntensityChiSqd(iSol2Run(iSol)),'(F7.2)')
+        ENDDO
+        CALL WDialogSelect(IDD_Summary)
+        CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
+        DO iSol = 1, NumOf_SA_Runs
+          WRITE(RowLabelStr,'(I2)') iSol
+          CALL WGridLabelRow(IDF_SA_summary,iSol,RowLabelStr)
+          CALL WGridPutCellInteger (IDF_SA_Summary,1,iSol,iSol2Run(iSol)) 
+          CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSol2Run(iSol)))
+          CALL WGridPutCellReal    (IDF_SA_Summary,4,iSol,ProfileChiSqd(iSol2Run(iSol)),'(F7.2)')
+          CALL WGridPutCellReal    (IDF_SA_Summary,5,iSol,IntensityChiSqd(iSol2Run(iSol)),'(F7.2)')
+        ENDDO
+      ENDIF
       CALL PopActiveWindowID
 
       END SUBROUTINE Update_Solutions
