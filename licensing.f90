@@ -34,9 +34,9 @@
         WRITE(Exp,'(I2)') Info%DaysLeft
         CALL InfoMessage("Your DASH licence will expire in "//Exp//" days.")
       ENDIF
-      CALL WDialogSelect(IDD_LicenceAgreement)
-      CALL WDialogUnload
       CALL WDialogSelect(IDD_License_Dialog)
+      CALL WDialogUnload
+      CALL WDialogSelect(IDD_LicenceAgreement)
       CALL WDialogUnload
 
       END SUBROUTINE CheckLicence
@@ -176,7 +176,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, EXTERNAL :: Get_DiskSerialNumber, DateToday
+      INTEGER, EXTERNAL :: Get_DiskSerialNumber, DateToday, DateDaysElapsed
       CHARACTER*(*) LString
       TYPE (License_Info) Info
       INTEGER v(2), w(2), cs
@@ -201,7 +201,7 @@
       Info%LicenceType  = w(2)/100000000
       Info%ExpiryDate   = w(2) - Info%LicenceType*100000000
       IF (Info%LicenceType .EQ. SiteKey) Info%SerialNumber = Info%SerialNumber - 145789123 ! demangle into a site number
-      Info%DaysLeft = MAX(0, Info%ExpiryDate - DateToday())
+      Info%DaysLeft = MAX(0, DateDaysElapsed(DateToday(), Info%ExpiryDate))
       IF (Info%DaysLeft .EQ. 0) THEN
 ! If the licence key has expired, then that's the end of our checks.
         Info%Valid = -3
@@ -423,7 +423,7 @@
       Info%Valid = -5
       NextLine = CHAR(13)//CHAR(10)//CHAR(13)//CHAR(10)
 ! Convert expiry date to a string
-      CALL Date2String(Info%ExpiryDate,tDateStr,tLen)
+      CALL Date2String(Info%ExpiryDate, tDateStr, tLen)
       kString = 'In order to run this evaluation version of DASH, you must first read and agree to the '// &
                 'terms of the following licence agreement:'//NextLine// &
                 'DASH (the "Program") is a copyright work belonging to CCDC Software Limited.  In '// &
@@ -481,7 +481,7 @@
                 ' to the foregoing terms and conditions you should select the "I DO NOT AGREE"'// &
                 ' option below. After making your selection, please click OK to proceed.'
       CALL WDialogSelect(IDD_LicenceAgreement)
-      CALL WDialogPutString(IDF_Agreement,kString)
+      CALL WDialogPutString(IDF_Agreement, kString)
       CALL WDialogShow(-1, -1, 0, SemiModeless)
       DO WHILE (.TRUE.)
         CALL GetEvent
