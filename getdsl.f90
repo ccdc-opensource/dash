@@ -180,7 +180,8 @@
      PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &
      PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
      PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),PkPosAv(MAX_NPFR)
-	 COMMON /RadOption/JRadOption
+
+       INCLUDE 'GLBVAR.INC' ! Contains JRadOption
 
 	 OPEN (UNIT = 77, &
            FILE=FileName(1:LenFn), &
