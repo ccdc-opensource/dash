@@ -1306,8 +1306,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER IOption
       LOGICAL, EXTERNAL :: Confirm
