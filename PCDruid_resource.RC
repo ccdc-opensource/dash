@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 23/Jul/2003 15:18:33
+// Modified : 24/Jul/2003 11:07:45
 //
 ///////////////////////////////////////////////////
 //
@@ -4124,7 +4124,8 @@ BEGIN
     CONTROL "",IDF_Xtal_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   94,   62,  200,   14
     CONTROL "B&rowse...",IDB_xtal_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  343,   62,   36,   14
     CONTROL "O&pen",IDB_xtal_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  299,   62,   40,   14
-    CONTROL "Problems with: icomflag, quaternion or single axis, copies of Z-matrices",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   93,  123,  288,   20
+    CONTROL "Please note that these crystal structure files do not contain any information about rotations or multiple copies of Z-matrices, and these have been reset to default values.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   93,   93,  288,   24
+    CONTROL "In order to retain this information, save/load solutions to/from a dash solutions file (file extension .dash), accessible from the ""Analyse Solutions"" window.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   93,  117,  288,   24
 END
 
 IDD_SAW_Page6 RCDATA
@@ -4136,7 +4137,6 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
-" 1458 255 000 000 000 000 000 \n"
 "[Lengths] \n"
 " 1541   255 \n"
 " 1542   255 \n"
