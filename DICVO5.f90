@@ -3,10 +3,10 @@
 !     | 	     T R I C L I N I C 3		 |
 !     ----------------------------------------------------
       SUBROUTINE TRICLINI3
+
       USE DICVAR
+
       IMPLICIT NONE
-!
-!*** Start of declarations rewritten by SPAG
 !
 ! Local variables
 !
