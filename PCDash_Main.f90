@@ -210,8 +210,7 @@
       USE VARIABLES
 
       CALL WHelpFile(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))// &
-       'Documentation'//DIRSPACER//'manual'//DIRSPACER//'DASH HTMLhelp.chm')
-!T      CALL WHelpFile('C:\Program Files\CCDC\Mercury 1.0\docs\Mercury.chm')
+       'Documentation'//DIRSPACER//'manual'//DIRSPACER//'DASH User Guide.chm')
 
       END SUBROUTINE LaunchHelp
 !
