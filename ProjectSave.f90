@@ -165,9 +165,6 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-      INTEGER         CurrentWizardWindow
-      COMMON /Wizard/ CurrentWizardWindow
-
       INTEGER         KREFT
       COMMON /FPINF2/ KREFT(MOBS)
 
@@ -185,7 +182,7 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      INTEGER I, j, tInteger, RW, tCurrentWizardWindow
+      INTEGER I, j, tInteger, RW
       LOGICAL tLogical
       REAL    tReal
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
@@ -202,12 +199,6 @@
 ! Read / Write the header
       tString = ProgramVersion//' project file'
       CALL FileRWString(hPrjFile,iPrjRecNr,RW,tString)
-! Read / Write Wizard Window
-      IF (RW .EQ. cWrite) THEN
-        CALL FileWriteInteger(hPrjFile,iPrjRecNr,CurrentWizardWindow)
-      ELSE
-        CALL FileReadInteger(hPrjFile,iPrjRecNr,tCurrentWizardWindow)
-      ENDIF
 ! Read / Write radiation source
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,JRadOption)
 ! Read / Write Wavelength
@@ -280,6 +271,7 @@
       ENDDO
 ! Read / Write zero-point
       CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ZeroPoint)
+      IF (RW .EQ. cRead) CALL Upload_ZeroPoint
 ! Read / Write space group
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumberSGTable)
 ! Calculate tick marks
@@ -288,64 +280,53 @@
         CALL Upload_CrystalSystem
         PastPawley = .FALSE.
         CALL Generate_TicMarks
+        PastPawley = .TRUE.
       ENDIF
-! Excluded regions
 
 ! Read / Write Pawley refinement related stuff
-! Read / Write the peak fit ranges
-      CALL PrjReadWritePeakFitRanges
 
       CALL PrjErrTrace
 
-! We _must_ read the Peak Fit Ranges after the data needed to generate the tick marks (unit cell,
-! zero point, wavelength, space group, powder pattern) because it needs the tick marks
-! to assign a reflection to each peak position.
 ! Read / Write the .pik file
 !            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
 !        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
-      IF (RW .EQ. cRead) THEN
-        CALL WizardWindowShow(tCurrentWizardWindow)
-      ENDIF
-      CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,PastPawley)
-      IF (PastPawley) THEN
-        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PAWLEYCHISQ)
+      IF (RW .EQ. cRead) CALL WizardWindowShow(IDD_SAW_Page5)
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PAWLEYCHISQ)
 ! If we are this way down the file, NBIN was determined by original pattern + truncation + LBIN.
 ! However, after we have done a Pawley fit, data points beyond the 350th reflection have been discarded,
 ! and NBIN has a new value.
-        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NBIN)
+! @@ I think things go wrong here.
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NBIN)
 ! Read / Write observed pattern minus the background fitted during the Pawley refinement.
 ! This is the observed pattern read in by GETPIK.
 
-        CALL PrjErrTrace
+      CALL PrjErrTrace
 
+      DO I = 1, NBIN
+        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,YOBIN(I))
+      ENDDO
+      IF (RW .EQ. cRead) THEN
         DO I = 1, NBIN
-          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,YOBIN(I))
-        ENDDO
-        IF (RW .EQ. cRead) THEN
-          DO I = 1, NBIN
-            WTSA(I) = 1.0 / EBIN(I)**2
-          ENDDO
-        ENDIF
-        NFITA = 0
-        DO I = 1, NBIN
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,KREFT(I))
-          IF (KREFT(I).GT.0) THEN
-            DO j = 1, KREFT(I)
-              CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,KNIPT(j,I))
-              CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PIKVAL(j,I))
-            ENDDO
-            NFITA = NFITA + 1
-            IFITA(NFITA) = I
-          ENDIF
+          WTSA(I) = 1.0 / EBIN(I)**2
         ENDDO
       ENDIF
+      NFITA = 0
+      DO I = 1, NBIN
+        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,KREFT(I))
+        IF (KREFT(I).GT.0) THEN
+          DO j = 1, KREFT(I)
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,KNIPT(j,I))
+            CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PIKVAL(j,I))
+          ENDDO
+          NFITA = NFITA + 1
+          IFITA(NFITA) = I
+        ENDIF
+      ENDDO
       IF (RW .EQ. cRead) CALL Profile_Plot
 
       CALL PrjErrTrace
 
-      IF (PastPawley) THEN
-        CALL PrjReadWriteIntensities
-      ENDIF
+      CALL PrjReadWriteIntensities
 
       CALL PrjErrTrace
 
@@ -370,8 +351,6 @@
       CALL PrjReadWriteSolutions
 
       CALL PrjErrTrace
-
-
 
       CLOSE(hPrjFile)
       CALL PopActiveWindowID
@@ -475,103 +454,6 @@
          CALL DebugErrorMessage('Prj read error at '//Integer2String(ErrCounter))
 
       END SUBROUTINE PrjErrTrace
-!
-!*****************************************************************************
-!
-      SUBROUTINE PrjReadWritePeakFitRanges
-!
-! Read or writes information on peak fit ranges to / from binary project file.
-!
-      USE PRJVAR
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
-
-      REAL              PkFnVal,                      PkFnEsd,                      &
-                        PkFnCal,                                                    &
-                        PkFnVarVal,                   PkFnVarEsd,                   &
-                        PkAreaVal,                    PkAreaEsd,                    &
-                        PkPosVal,                     PkPosEsd,                     &
-                        PkPosAv
-      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
-                        PkFnCal(MPkDes,Max_NPFR),                                   &
-                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
-                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
-                        PkPosAv(MAX_NPFR)
-
-      INTEGER iPFR, iPeak, iPkDes, iPoint, RW
-
-! Read or Write?
-      RW = iPrjReadOrWrite
-! If no Peak Fit Ranges, write 0 and exit   
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumPeakFitRange)
-      IF (NumPeakFitRange .NE. 0) THEN
-        DO iPFR = 1, NumPeakFitRange
-          CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,XPF_Range(1,iPFR))
-          CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,XPF_Range(2,iPFR))
-          CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,RangeFitYN(iPFR))
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,IPF_Lo(iPFR))
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,IPF_Hi(iPFR))
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumInPFR(iPFR))
-          DO iPeak = 1, NumInPFR(iPFR)
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,XPF_Pos(iPeak,iPFR))
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,YPF_Pos(iPeak,iPFR))
-          ENDDO
-          IF (RangeFitYN(iPFR)) THEN
-            DO iPkDes = 1, MPkDes
-              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkFnVal(iPkDes,iPFR))
-              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkFnEsd(iPkDes,iPFR))
-              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkFnCal(iPkDes,iPFR))
-            ENDDO
-            DO iPeak = 1, NumInPFR(iPFR)
-              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkAreaVal(iPeak,iPFR))
-              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkAreaEsd(iPeak,iPFR))
-              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkPosVal(iPeak,iPFR))
-              CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkPosEsd(iPeak,iPFR))
-            ENDDO
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,PkPosAv(iPFR))
-          ENDIF
-! Calculate IPF_Range (only necessary on read)
-          IPF_Range(iPFR) = 1 + IPF_Hi(iPFR) - IPF_Lo(iPFR)
-        ENDDO
-! Calculate IPF_RPt
-        IPF_RPt(1) = 0
-        DO iPFR = 1, NumPeakFitRange
-          IPF_RPt(iPFR+1) = IPF_RPt(iPFR) + IPF_Range(iPFR)
-        ENDDO
-        DO iPoint = 1, IPF_RPt(NumPeakFitRange+1)
-          CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,XPeakFit(iPoint))
-          CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,YPeakFit(iPoint))
-        ENDDO
-      ENDIF
-      IF (RW .EQ. cRead) THEN
-! Update 'View'|'Peak Positions'...
-        CALL Upload_Positions ! Calculates COMMON /ALLPEAKS/
-!... and 'View'|'Peak Widths' tabs
-        CALL Upload_Widths
-      ENDIF
-
-      END SUBROUTINE PrjReadWritePeakFitRanges
 !
 !*****************************************************************************
 !
