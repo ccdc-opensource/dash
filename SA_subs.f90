@@ -17,12 +17,8 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
 
-      REAL             XOPT,       C,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
-
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
@@ -30,8 +26,8 @@
       REAL            T0, RT
       COMMON /saparl/ T0, RT
 
-      INTEGER         nvar, ns, nt, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+      INTEGER         nvar, NS, NT, iSeed1, iSeed2
+      COMMON /sapars/ nvar, NS, NT, iSeed1, iSeed2
 
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  
@@ -74,25 +70,23 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
-      INTEGER              iMyExit, num_new_min
-      COMMON / CMN000001 / iMyExit, num_new_min
+      INTEGER              iMyExit 
+      LOGICAL                       NewOptimumFound, WasMinimised
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
 
       REAL, EXTERNAL :: EXPREP
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
-      INTEGER NACC
       INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
       INTEGER NACP(MVAR)
       LOGICAL MAKET0
       REAL FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
       REAL RATIO, DX, F, FP, P, PP
       REAL RANIN
-      INTEGER NUP, NDOWN, NREJ, H, I, J, M, II
+      INTEGER NUP, NDOWN, H, I, J, M, II
       INTEGER MRAN, MRAN1, IARR, IAR1
       REAL T
       REAL RANARR(30000), RANAR1(30000)
@@ -100,25 +94,20 @@
       REAL X0SUM(mvar), XSUM(mvar), XXSUM(mvar)
       REAL XDSS(mvar), A0SUM(mvar)
       INTEGER IM, IA, IC
-      INTEGER JRAN, num_old_min, NTOTMOV
+      INTEGER JRAN, NTOTMOV
       INTEGER III, IH, KK, iFrg
       INTEGER Last_NUP, Last_NDOWN
       CHARACTER*3 CNruns,CMruns
       LOGICAL PrevRejected, CurrParsInclPO, PrevParsInclPO
-      INTEGER TotNumTrials, TotNumRetrials
+      INTEGER TotNumTrials
       CHARACTER*2 RowLabelStr
       REAL XP(MVAR)
-      REAL xtem, tempupper, templower, tempupper2, templower2
-      REAL Sgn
-      LOGICAL Use_Sharpen
-      REAL ITFRange ! For blurring when using Sharpen
+      REAL xtem, tempupper, templower, tempupper2
       REAL Initial_T ! As calculated during intial run, not as set by the user.
-
-      Use_Sharpen = .FALSE.
-      ITFRange = 10.0 ! I.e. ITF runs from 50.0 -> 1.0
+      
+      WasMinimised = .FALSE.
       NumParPerTrial = 1
       TotNumTrials = 0
-      TotNumRetrials = 0
       Curr_SA_Run = 0
       NumOf_SA_Runs = 0
       DO I = 1, 99
@@ -134,7 +123,7 @@
       DO I = 1, 30000
         JRAN = MOD(JRAN*IA+IC,IM)
         RANARR(I) = FLOAT(JRAN)/FLOAT(IM) ! RANARR now between  0.0 and 1.0
-        RANIN = 2.0 * RANARR(I) - 1.0     ! RANIN  now between -0.1 and 1.0
+        RANIN = 2.0 * RANARR(I) - 1.0     ! RANIN  now between -1.0 and 1.0
         CALL RANX2E(RANIN,RANAR1(I))
       ENDDO
       IM = 7875
@@ -153,58 +142,6 @@
         ENDIF
       ENDDO
       nmpert = NT * NS * NPAR ! Number of Moves per Temperature
-      CALL OpenChiSqPlotWindow
-! ####################################
-!   Starting point for multiple runs
-! ####################################
-    1 CONTINUE ! The start point for multiple runs.
-! Set initial values.
-      iMyExit = 0
-      Curr_SA_Run = Curr_SA_Run + 1
-      WRITE (SA_RunNumberStr,'(I3.3)') Curr_SA_Run
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Action1)
-      WRITE(CNruns,'(I3)') Curr_SA_Run
-      WRITE(CMruns,'(I3)') MaxRuns
-      CNruns = ADJUSTL(CNruns)
-      CMruns = ADJUSTL(CMruns)
-      CALL WDialogPutString(IDD_SA_RunLabel,'Simulated annealing run number '//CNRuns(1:LEN_TRIM(CNruns))// &
-                                            ' of '//CMRuns(1:LEN_TRIM(CMRuns)))
-      CALL PopActiveWindowID
-      num_new_min = 0
-      num_old_min = -1
-      MAKET0 = (T0.LE.0.0)  ! T0 is estimated each run of a multirun
-      IF (MAKET0) THEN
-        T = 100000.0
-! vm is adjusted during the SA. So re-initialise every time the SA is started to
-! ensure that starting the SA more than once with the same parameters will give
-! identical results.
-        kk = 0
-        DO iFrg = 1, nFrag
-          DO ii = 1, izmpar(iFrg)
-            kk = kk + 1
-            SELECT CASE (kzmpar(ii,iFrg))
-              CASE (1) ! translation
-                vm(kk) = 1.0
-              CASE (2) ! quaternion
-                vm(kk) = 1.0
-              CASE (3) ! torsion
-                vm(kk) = 180.0
-              CASE (4) ! angle
-                vm(kk) = 1.0
-              CASE (5) ! bond
-                vm(kk) = 0.1*(ub(kk)-lb(kk))
-              CASE (6) ! single rotation axis
-                vm(kk) = 0.1
-            END SELECT
-          ENDDO
-        ENDDO
-        IF (PrefParExists) THEN
-          kk = kk + 1
-          vm(kk) = 0.1
-        ENDIF
-      ELSE
-        T = T0
 ! vm is adjusted during the SA. So re-initialise every time the SA is started to
 ! ensure that starting the SA more than once with the same parameters will give
 ! identical results.
@@ -232,15 +169,91 @@
           kk = kk + 1
           vm(kk) = 0.01
         ENDIF
+      CALL OpenChiSqPlotWindow
+! ####################################
+!   Starting point for multiple runs
+! ####################################
+    1 CONTINUE ! The start point for multiple runs.
+! Set initial values.
+      iMyExit = 0
+      Curr_SA_Run = Curr_SA_Run + 1
+      WRITE (SA_RunNumberStr,'(I3.3)') Curr_SA_Run
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_Action1)
+      WRITE(CNruns,'(I3)') Curr_SA_Run
+      WRITE(CMruns,'(I3)') MaxRuns
+      CNruns = ADJUSTL(CNruns)
+      CMruns = ADJUSTL(CMruns)
+      CALL WDialogPutString(IDD_SA_RunLabel,'Simulated annealing run number '//CNRuns(1:LEN_TRIM(CNruns))// &
+                                            ' of '//CMRuns(1:LEN_TRIM(CMRuns)))
+      CALL PopActiveWindowID
+      MAKET0 = (T0.LE.0.0)  ! T0 is estimated each run of a multirun
+      IF (MAKET0) THEN
+        T = 100000.0
+! vm is adjusted during the SA. So re-initialise every time the SA is started to
+! ensure that starting the SA more than once with the same parameters will give
+! identical results.
+    !O    kk = 0
+    !O    DO iFrg = 1, nFrag
+    !O      DO ii = 1, izmpar(iFrg)
+    !O        kk = kk + 1
+    !O        SELECT CASE (kzmpar(ii,iFrg))
+    !O          CASE (1) ! translation
+    !O            vm(kk) = 1.0
+    !O          CASE (2) ! quaternion
+    !O            vm(kk) = 1.0
+    !O          CASE (3) ! torsion
+    !O            vm(kk) = 180.0
+    !O          CASE (4) ! angle
+    !O            vm(kk) = 1.0
+    !O          CASE (5) ! bond
+    !O            vm(kk) = 0.1*(ub(kk)-lb(kk))
+    !O          CASE (6) ! single rotation axis
+    !O            vm(kk) = 0.1
+    !O        END SELECT
+    !O      ENDDO
+    !O    ENDDO
+    !O    IF (PrefParExists) THEN
+    !O      kk = kk + 1
+    !O      vm(kk) = 0.1
+    !O    ENDIF
+      ELSE
+        T = T0
+! vm is adjusted during the SA. So re-initialise every time the SA is started to
+! ensure that starting the SA more than once with the same parameters will give
+! identical results.
+  !O      kk = 0
+  !O      DO iFrg = 1, nFrag
+  !O        DO ii = 1, izmpar(iFrg)
+  !O          kk = kk + 1
+  !O          SELECT CASE (kzmpar(ii,iFrg))
+  !O            CASE (1) ! translation
+  !O              vm(kk) = 0.1
+  !O            CASE (2) ! quaternion
+  !O              vm(kk) = 0.1
+  !O            CASE (3) ! torsion
+  !O              vm(kk) = 10.0
+  !O            CASE (4) ! angle
+  !O              vm(kk) = 1.0
+  !O            CASE (5) ! bond
+  !O              vm(kk) = 0.1*(ub(kk)-lb(kk))
+  !O            CASE (6) ! single rotation axis
+  !O              vm(kk) = 0.1
+  !O          END SELECT
+  !O        ENDDO
+  !O      ENDDO
+  !O      IF (PrefParExists) THEN
+  !O        kk = kk + 1
+  !O        vm(kk) = 0.01
+  !O      ENDIF
       ENDIF
 ! Initialise the random number generator RANMAR.
 ! Increment the seeds for each SA run
-      CALL RMARInit(ISEED1+Curr_SA_Run,ISEED2+Curr_SA_Run)
+      CALL RMARInit(iSEED1+Curr_SA_Run, iSEED2+Curr_SA_Run)
 ! Initialise all degrees of freedom either to a preset value or to
 ! a random value
-      CALL MAKXIN(nvar)
-      NACC = 0
       NTOTMOV = 0
+      CALL MAKXIN
       DO I = 1, nvar
         XOPT(I) = X(I)
         C(I) = 2.0
@@ -254,16 +267,18 @@
         ENDDO
       ENDDO
       FOPT = F
+      NewOptimumFound = .FALSE.
 ! Evaluate the profile chi-squared as well
       CALL valchipro(CHIPROBEST)
+      CALL ChiSqPlot_UpdateIterAndChiProBest(1)
       CALL WDialogSelect(IDD_Summary)
       CALL WGridRows(IDF_SA_Summary, Curr_SA_Run)
       WRITE(RowLabelStr,'(I2)') Curr_SA_Run
       CALL WGridLabelRow(IDF_SA_summary, Curr_SA_Run, RowLabelStr)
-      CALL WGridPutCellInteger (IDF_SA_Summary,1,Curr_SA_Run, NumOf_SA_Runs+1) 
-      CALL WGridPutCellCheckBox(IDF_SA_Summary,3,Curr_SA_Run, 1)
-      CALL WGridPutCellReal    (IDF_SA_Summary,4,Curr_SA_Run, CHIPROBEST, '(F7.2)')
-      CALL WGridPutCellReal    (IDF_SA_Summary,5,Curr_SA_Run, FOPT, '(F7.2)')
+      CALL WGridPutCellInteger (IDF_SA_Summary, 1, Curr_SA_Run, NumOf_SA_Runs+1) 
+      CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, Curr_SA_Run, 1)
+      CALL WGridPutCellReal    (IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
+      CALL WGridPutCellReal    (IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
       CALL WDialogPutInteger(IDF_Limit1, 1)
       CALL WDialogPutInteger(IDF_Limit2, Curr_SA_Run)
       PrevRejected = .TRUE.
@@ -274,24 +289,17 @@
       Last_NUP   = nmpert / 2
       Last_NDOWN = nmpert / 2
       Curr_SA_Iteration = 0
-      CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
+      DO I = 1, nvar
+        NACP(I) = 0
+        NumTrialsPar(I) = 0
+      ENDDO
 ! ##########################################
 !   Starting point for multiple iterations
 ! ##########################################
   100 CONTINUE
       Curr_SA_Iteration = Curr_SA_Iteration + 1
-      IF (Use_Sharpen) THEN
-        IF (MAKET0) THEN
-          RR_ITF = 1.0 !ITFRange
-        ELSE
-          RR_ITF = MAX(1.0, (T/(100.0*Initial_T)) * (ITFRange-1.0) + 1.0)
-        ENDIF
-        CALL CreateFobITF
-        CALL FCN(X,F,0)
-        CALL FCN(XOPT,FOPT,0)
-      ENDIF
+
       NUP = 0
-      NREJ = 0
       NDOWN = 0
       DO II = 1, nvar
         X0SUM(II) = 0.0
@@ -304,7 +312,7 @@
       FPSUM1 = 0.0
       FPSUM2 = 0.0
 ! Update the SA status window
-      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
+      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,ntotmov)
       CALL sa_move_status(nmpert,0)
 ! ##########################################
 !   Starting point for multiple moves
@@ -315,10 +323,6 @@
         IARR = MRAN + 1
         MRAN1 = MOD(MRAN1*IA+IC,IM)
         IAR1 = MRAN1 + 1
-        DO I = 1, nvar
-          NACP(I) = 0
-          NumTrialsPar(I) = 0
-        ENDDO
         DO J = 1, NS
           DO IH = 1, NPAR
             DO I = 1, nvar
@@ -333,92 +337,78 @@
 ! Generate XP, the trial value of X. Note use of VM to choose XP.
               DX = RANAR1(IAR1) * VM(H)
               IAR1 = IAR1 + 1
-              XP(H) = X(H) + DX
+              XP(H) = XP(H) + DX
 ! If modal ranges defined for torsions use random number to
 ! select from which range the value of XP will be derived.
               IF (ModalFlag(H) .EQ. 2) THEN !Bimodal
                 IF (RANARR(IARR) .GT. 0.5) THEN
-                  IF (UB(H) * LB(H) .LT. 0.00) THEN
-                    XP(H) = XP(H) + 180.00
-                    CALL ThreeSixtyToOneEighty(XP(H))
+                  IF (UB(H) * LB(H) .LT. 0.0) THEN
+                    XP(H) = XP(H) + 180.0
                   ELSE
                     XP(H) = -XP(H)
                   ENDIF
                 ENDIF            
                 IARR = IARR + 1 
+                CALL ThreeSixtyToOneEighty(XP(H))
               ELSEIF (ModalFlag(H) .EQ. 3) THEN !Trimodal
                 xtem = XP(H)
                 CALL OneEightyToThreeSixty(xtem)
-                IF ((RANARR(IARR) .GE. 0.33) .AND. (RANARR(IARR).LT. 0.66)) THEN
+                IF ((RANARR(IARR) .GE. 0.333) .AND. (RANARR(IARR).LT. 0.667)) THEN
                   xtem = xtem + 120.00
-                ELSEIF ((RANARR(IARR) .GE. 0.66) .AND. (RANARR(IARR).LT. 1.00)) THEN
+                ELSEIF ((RANARR(IARR) .GE. 0.667) .AND. (RANARR(IARR).LT. 1.0)) THEN
                   xtem = xtem + 240.00
                 ENDIF
                 IARR = IARR + 1
                 IF (Xtem .GE. 360.00) THEN
-                  Xtem = xtem - 360.00
-                ENDIF
+                   Xtem = xtem - 360.00
+                endif
                 CALL ThreeSixtyToOneEighty(xtem)
                 XP(H) = xtem
               ENDIF
 ! If XP is out of bounds, select a point in bounds for the trial.
               SELECT CASE(ModalFlag(H))
-                CASE (1) ! used for all parameters except modal torsion angles 
-                  IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
-                    TotNumRetrials = TotNumRetrials + 1
-                    XP(H) = LB(H) + RULB(H) * RANARR(IARR)
-                    IARR = IARR + 1
-                  ENDIF   
+                CASE (0,1) ! used for all parameters except modal torsion angles
+                  IF (IsFullRangeTrans(H)) THEN
+! We don't actually have to do anything here: just skipping the out-of-bounds test suffices
+                    IF (XP(H) .LT. 0.0) XP(H) = XP(H) + 1.0
+                    IF (XP(H) .GT. 1.0) XP(H) = XP(H) - 1.0
+                  ELSE IF (IsFullRangeTorsion(H)) THEN
+! We don't actually have to do anything here: just skipping the out-of-bounds test suffices
+                    IF (XP(H) .LT. -180.0) XP(H) = XP(H) + 360.0
+                    IF (XP(H) .GT. +180.0) XP(H) = XP(H) - 360.0
+                  ELSE
+                    IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
+                      XP(H) = LB(H) + RULB(H) * RANARR(IARR)
+                      IARR = IARR + 1
+                    ENDIF
+                  ENDIF
                 CASE (2) ! bimodal ranges
 ! Complicated-looking calcs of inbounds torsion angles is to try and guarantee a good
 ! sampling of all user defined ranges.  
                   IF (OutOfBounds(H, XP(H))) THEN
-                    IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
-                      TempUpper = UB(H)         ! so use 0-360 degree scale
-                      TempLower = LB(H)
-                      TempLower2 = TempUpper - 180.00
-                      TempUpper2 = TempLower + 180.00
+                    IF (UB(H) * LB(H) .LT. 0.0) THEN ! Range such as -170 to 170 defined                                                  
+                      TempLower = LB(H)              ! so use 0 to 360 degree scale
+                      TempUpper = UB(H)
+                      TempUpper2 = TempLower + 180.0
                       CALL OneEightyToThreeSixty(TempUpper)
-                      CALL OneEightyToThreeSixty(TempLower)
                       CALL OneEightyToThreeSixty(TempUpper2)
-                      CALL OneEightyToThreeSixty(TempLower2)
-                      xtem = XP(H)
-                      CALL OneEightytoThreeSixty(xtem)
-                      Sgn = SIGN(1.0, XP(H))
                       IF (RANARR(IARR) .LT. 0.5) THEN 
                         IARR = IARR + 1               
-                        xtem = MAX(TempUpper, TempUpper2) + (RULB(H) * RANARR(IARR))
-                        IF (sgn .LT. 0.0) THEN
-                          xtem = xtem -180.00
-                        ENDIF
+                        XP(H) = MAX(TempUpper, TempUpper2) + (RULB(H) * RANARR(IARR))
                       ELSE
                         IARR = IARR + 1
-                        xtem = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
-                        IF (sgn .LT. 0.0) THEN
-                          xtem = xtem + 180.00
-                        ENDIF
+                        XP(H) = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
                       ENDIF
                       IARR = IARR + 1 
-                      IF (xtem .GT. 360.00) THEN
-                        xtem = xtem - 360.00
-                      ENDIF
-                      CALL ThreeSixtyToOneEighty(xtem)
-                      XP(H) = xtem
-                    ELSEIF (UB(H) * LB(H) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
-                      Sgn = SIGN(1.0, XP(H))
-                      IF (RANARR(IARR) .LT. 0.5) THEN
-                        IARR = IARR + 1
-                        XP(H) = LB(H) + (RULB(H) * RANARR(IARR))
-                        XP(H) = XP(H) * (-Sgn)
-                      ELSE
-                        IARR = IARR + 1 
-                        XP(H) = -LB(H) - (RULB(H) * RANARR(IARR))
-                        XP(H) = XP(H) * Sgn
-                      ENDIF 
+                    ELSEIF (UB(H) * LB(H) .GE. 0.0) THEN ! Range such as 30 to 90 degs or -30 to -90 defined
+                      XP(H) = LB(H) + (RULB(H) * RANARR(IARR))
                       IARR = IARR + 1
+                      IF (RANARR(IARR) .LT. 0.5) XP(H) = -XP(H)
+                      IARR = IARR + 1 
                     ENDIF
+                    CALL ThreeSixtyToOneEighty(XP(H))
                   ENDIF
-                CASE(3) !trimodal ranges
+                CASE (3) !trimodal ranges
                   IF (OutOfBounds(H, XP(H))) THEN ! calculate new value in one of three allowed ranges
                     xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
                     IARR = IARR + 1
@@ -452,7 +442,7 @@
                   CALL FCN(XP,FP,0)
                 ENDIF
               ELSE
-                CALL FCN(XP,FP,H) ! Becomes H(1)
+                CALL FCN(XP,FP,H)
               ENDIF
             ELSE
               IF ((CurrParsInclPO) .OR. (PrevParsInclPO .AND. PrevRejected)) CALL PO_PRECFC(XP(iPrfPar))
@@ -460,19 +450,15 @@
             ENDIF
             PrevParsInclPO = CurrParsInclPO
 
-
             FPSUM1 = FPSUM1 + FP
             FPSUM2 = FPSUM2 + FP*FP
             A0SUM(H) = A0SUM(H) + 1.0
-
-
 
             XDSS(H) = XDSS(H) + (FP-F)**2
             PrevRejected = .FALSE.
             IF (FP .LE. F) THEN
               X(H) = XP(H)
               F = FP
-              NACC = NACC + 1
               NACP(H) = NACP(H) + 1
               NUP = NUP + 1
 ! If lower than any other point, record as new optimum.
@@ -485,14 +471,14 @@
                     XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
                   ENDDO
                 ENDDO
-                num_new_min = num_new_min + 1
+                NewOptimumFound = .TRUE.
                 CALL valchipro(CHIPROBEST)
                 FOPT = FP
                 CALL WDialogSelect(IDD_Summary)
                 CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
                 CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
 ! Update the SA status window
-                CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov)
+                CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,NVAR,Last_NUP,Last_NDOWN,ntotmov)
               ENDIF
 ! If the point is greater, use the Metropolis criterion to decide on
 ! acceptance or rejection.
@@ -503,18 +489,16 @@
               IF (PP .LT. P) THEN
                 X(H) = XP(H)
                 F = FP
-                NACC = NACC + 1
                 NACP(H) = NACP(H) + 1
                 NDOWN = NDOWN + 1
               ELSE
-                NREJ = NREJ + 1
                 PrevRejected = .TRUE.
               ENDIF
             ENDIF
 
-    !O        FPSUM1 = FPSUM1 + F
-    !O        FPSUM2 = FPSUM2 + F*F
-    !O        A0SUM(H) = A0SUM(H) + 1.0
+      !O      FPSUM1 = FPSUM1 + F
+      !O      FPSUM2 = FPSUM2 + F*F
+      !O      A0SUM(H) = A0SUM(H) + 1.0
 
             X0SUM(H) = X0SUM(H) + 1.0
             XSUM(H) = XSUM(H) + X(H)
@@ -539,6 +523,10 @@
           ENDIF
         ENDDO
         CALL PeekEvent
+        IF (WasMinimised) THEN
+          F = FOPT          
+          WasMinimised = .FALSE.
+        ENDIF
         DO WHILE (iMyExit .EQ. 6) ! Pause
           CALL GetEvent
           IF (EventInfo%WIN .EQ. IDD_Pause) THEN
@@ -565,9 +553,9 @@
         ENDIF
       ENDDO
       ntotmov = ntotmov + nmpert
-      IF (num_new_min .NE. num_old_min) CALL Profile_Plot ! plot the profile
-      num_old_min = num_new_min
-      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,FLAV,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
+      IF (NewOptimumFound) CALL Profile_Plot ! plot the profile
+      NewOptimumFound = .FALSE.
+      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,FLAV,nvar,Last_NUP,Last_NDOWN,ntotmov)
 ! If we have asked for an initial temperature to be calculated then do so
       IF (MAKET0) THEN
 ! Start temperature increased by 50% as asked for
@@ -575,42 +563,43 @@
         Initial_T = T
 ! Having done an SA cycle at T = 100000, the initial values are now randomised.
 ! If the user had requested the values supplied to be used, reset them.
-        CALL MAKXIN(nvar)
+        CALL MAKXIN
         MAKET0 = .FALSE.
         CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
-        kk = 0
-        DO iFrg = 1, nFrag
-          DO ii = 1, izmpar(iFrg)
-            kk = kk + 1
-            SELECT CASE (kzmpar(ii,iFrg))
-              CASE (1) ! translation
-                vm(kk) = 0.1
-              CASE (2) ! quaternion
-                vm(kk) = 0.1
-              CASE (3) ! torsion
-                vm(kk) = 10.0
-              CASE (4) ! angle
-                vm(kk) = 1.0
-              CASE (5) ! bond
-                vm(kk) = 0.1*(ub(kk)-lb(kk))
-              CASE (6) ! single rotation axis
-                vm(kk) = 0.1
-            END SELECT
-          ENDDO
-        ENDDO
-        IF (PrefParExists) THEN
-          kk = kk + 1
-          vm(kk) = 0.01
-        ENDIF
-        DO I = 1, nvar
-          NACP(I) = 0
-          NumTrialsPar(I) = 0
-        ENDDO
+  !O      kk = 0
+  !O      DO iFrg = 1, nFrag
+  !O        DO ii = 1, izmpar(iFrg)
+  !O          kk = kk + 1
+  !O          SELECT CASE (kzmpar(ii,iFrg))
+  !O            CASE (1) ! translation
+  !O              vm(kk) = 0.1
+  !O            CASE (2) ! quaternion
+  !O              vm(kk) = 0.1
+  !O            CASE (3) ! torsion
+  !O              vm(kk) = 10.0
+  !O            CASE (4) ! angle
+  !O              vm(kk) = 1.0
+  !O            CASE (5) ! bond
+  !O              vm(kk) = 0.1*(ub(kk)-lb(kk))
+  !O            CASE (6) ! single rotation axis
+  !O              vm(kk) = 0.1
+  !O          END SELECT
+  !O        ENDDO
+  !O      ENDDO
+  !O      IF (PrefParExists) THEN
+  !O        kk = kk + 1
+  !O        vm(kk) = 0.01
+  !O      ENDIF
+  !O      DO I = 1, nvar
+  !O        NACP(I) = 0
+  !O        NumTrialsPar(I) = 0
+  !O      ENDDO
         GOTO 100
       ENDIF
 ! If termination criteria are not met, prepare for another loop.
 ! We will use the energy fluctuation to reduce the temperature
       T = T/(1.0+(RT*T)/(3.0*FPSD))
+   !   IF (MOD(Curr_SA_Iteration,5) .EQ. 0) CALL LocalMinimise(.TRUE.)
       DO I = 1, nvar
         X(I) = XOPT(I)
       ENDDO
@@ -752,6 +741,28 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE RANX2Init
+!
+! Fills yran with an integrated Maxwell distribution that will be used to bias the step size during the SA
+!
+      IMPLICIT NONE
+
+      REAL              xs, yran
+      COMMON / x2eran / xs, yran(200)
+
+      INTEGER I
+      REAL    xi
+
+      xs = 0.1
+      DO i = 1, 200
+        xi = xs*FLOAT(i-1)
+        yran(i) = 1.0 - (0.5*xi*xi+xi+1.0)*EXP(-xi)
+      ENDDO
+
+      END SUBROUTINE RANX2Init
+!
+!*****************************************************************************
+!
       SUBROUTINE RANX2E(DRIN, DROUT)
 
       IMPLICIT NONE
@@ -759,12 +770,13 @@
       REAL, INTENT (IN   ) :: drin
       REAL, INTENT (  OUT) :: drout
 
-      REAL            xs, yran
-      COMMON /x2eran/ xs, yran(200)
+      REAL              xs, yran
+      COMMON / x2eran / xs, yran(200)
 
       REAL rin, xl, xsn, xm, xh, yl, yh, ym, xlo, xmo, xho, ylo, ymo, yho, rout
       INTEGER jn, j
 
+! Use bisection to find the inverse distribution
       rin = ABS(drin)
       jn = 1
       DO j = 199, 1, -1
@@ -780,7 +792,7 @@
       xh = xm + xsn
       yl = yran(jn)
       yh = yran(jn+1)
-      ym = 1.0 - (0.5*xm*xm+xm+1.)*EXP(-xm)
+      ym = 1.0 - (0.5*xm*xm+xm+1.0)*EXP(-xm)
    15 xlo = xl
       xmo = xm
       xho = xh
@@ -800,37 +812,17 @@
         yh = ymo
       ENDIF
       xm = 0.5*(xh+xl)
-      ym = 1. - (0.5*xm*xm+xm+1.)*EXP(-xm)
+      ym = 1.0 - (0.5*xm*xm+xm+1.0)*EXP(-xm)
       GOTO 15
    20 rout = xm
-      IF (drin.LT.0.0) rout = -rout
+      IF (drin .LT. 0.0) rout = -rout
       drout = rout
 
       END SUBROUTINE RANX2E
 !
 !*****************************************************************************
 !
-      SUBROUTINE RANX2Init
-
-      IMPLICIT NONE
-
-      REAL            xs, yran
-      COMMON /x2eran/ xs, yran(200)
-
-      INTEGER I
-      REAL    xi
-
-      xs = 0.1
-      DO i = 1, 200
-        xi = xs*FLOAT(i-1)
-        yran(i) = 1. - (0.5*xi*xi+xi+1.)*EXP(-xi)
-      ENDDO
-
-      END SUBROUTINE RANX2Init
-!
-!*****************************************************************************
-!
-      SUBROUTINE MAKXIN(N)
+      SUBROUTINE MAKXIN
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -838,8 +830,6 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC' 
-
-      INTEGER, INTENT (IN   ) :: N
 
       REAL          RULB
       COMMON /RULB/ RULB(Mvar)
@@ -852,18 +842,18 @@
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: RANMAR
-      INTEGER I, IV
+      INTEGER I, II
 
 ! Get the "IDF_RandomInitVal" checkbox
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
-        DO I = 1, N
-          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X(I))
-        ENDDO
+      DO I = 1, NPAR
+        CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X(I))
+      ENDDO
       IF (WDialogGetCheckBoxLogical(IDF_RandomInitVal)) THEN
-        DO I = 1, NPAR
-          IV = IP(I)
-          X(IV) = LB(IV) + RULB(IV)*RANMAR()
+        DO II = 1, NPAR
+          I = IP(II)
+          X(I) = LB(I) + RULB(I)*RANMAR()
         ENDDO
       ENDIF
       CALL PopActiveWindowID
@@ -890,17 +880,17 @@
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
 
-      REAL             XOPT,       C,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
 
-      LOGICAL         UseRene, UseESD
-      INTEGER                          nwidth
-      REAL                                     width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                       InPeak
-      COMMON / RENE / UseRene, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      LOGICAL         UseRene, UseRelease, UseESD
+      INTEGER                                     nwidth
+      REAL                                                width, minstep, rwidth, SqrtCorrObs 
+      LOGICAL                                                                                   InPeak
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
 
       REAL Best_CHI
 
@@ -930,7 +920,7 @@
       COMMON /RULB/ RULB(Mvar)
 
       REAL             x,       lb,       ub,       vm
-      COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  
@@ -943,6 +933,7 @@
       DO I = 1, nvar
         RULB(I) = UB(I) - LB(I)
         IF (ModalFlag(I) .EQ. 2) THEN
+        ! JvdS I think error here if e.g. LB = -5.0, UB = 95.0
           CALL CheckBiModalBounds(I, OneEightyScale)
           IF (.NOT. OneEightyScale) THEN
             tempUpper = UB(I)
