@@ -2,7 +2,7 @@
 !*****************************************************************************
 !
       SUBROUTINE SA_OUTPUT(T,CHIMIN,CHIAV,CHIESD,&
-      xopt,dxvav,xvsig,flav,N,NUP,NDOWN,NREJ,&
+      dxvav,xvsig,flav,N,NUP,NDOWN,NREJ,&
       ntotmov)
 
       USE WINTERACTER
@@ -12,9 +12,12 @@
 
       REAL T, CHIMIN, CHIAV, CHIESD
       INTEGER N, NUP, NDOWN, NREJ, ntotmov
-      REAL*8 xopt(*),dxvav(*),xvsig(*),flav(*)
+      REAL dxvav(*),xvsig(*),flav(*)
 
       INCLUDE 'PARAMS.INC'
+
+      REAL XOPT,       C,       FOPT
+      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       INTEGER         Curr_SA_Iteration
       COMMON /ITRINF/ Curr_SA_Iteration
@@ -34,7 +37,7 @@
       COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
-      DOUBLE PRECISION x,       lb,       ub,       vm
+      REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       REAL ctem, tempvl
@@ -44,9 +47,9 @@
       INTEGER I
 
       CALL WDialogSelect(IDD_SA_Action1)
-      CALL WDialogPutReal(IDF_curr_temp,T,'(F8.2)')
-      CALL WDialogPutReal(IDF_min_chisq,chimin,'(F8.2)')
-      CALL WDialogPutReal(IDF_profile_chisq2,CHIPROBEST,'(F8.2)')
+      CALL WDialogPutReal(IDF_curr_temp, T, '(F8.2)')
+      CALL WDialogPutReal(IDF_min_chisq, chimin, '(F8.2)')
+      CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
 ! best chi-squared scale
       bchmin = ALOG10(MAX(1.0,chimin))
 ! profile chi-squared scale
@@ -56,13 +59,13 @@
       CALL WDialogPutInteger(IDF_total_moves,ntotmov)
       CALL WDialogPutInteger(IDF_SA_total_moves_label,nmpert)
 ! Temperature scale
-      tempvl = ALOG10(MAX(1.0,t))
-      avchi1 = ALOG10(MAX(1.0,chiav-chiesd))
-      ctem = MAX(1.0,chiav+chiesd)
-      avchi2 = ALOG10(MIN(10000.0,ctem))
-      avchi3 = ALOG10(MAX(1.0,chiav-0.1*chiesd))
-      ctem = MAX(1.0,chiav+0.1*chiesd)
-      avchi4 = ALOG10(MIN(10000.0,ctem))
+      tempvl = ALOG10(MAX(1.0, T))
+      avchi1 = ALOG10(MAX(1.0, chiav-chiesd))
+      ctem = MAX(1.0, chiav+chiesd)
+      avchi2 = ALOG10(MIN(10000.0, ctem))
+      avchi3 = ALOG10(MAX(1.0, chiav-0.1*chiesd))
+      ctem = MAX(1.0, chiav+0.1*chiesd)
+      avchi4 = ALOG10(MIN(10000.0, ctem))
       nd1 = ndown
       nd3 = ntotmov
       nd4 = nup
@@ -143,15 +146,15 @@
 ! nor is it displayed.
 !U      CALL WDialogSelect(IDD_Parameter_Status_2)
 !U      DO I = 1, N
-!U        CALL WGridPutCellReal(IDF_CPL_grid,1,I,SNGL(xopt(i)),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,1,I,xopt(i),'(F12.5)')
 !U      ENDDO
 !U      DO I = 1, N
-!U        CALL WGridPutCellReal(IDF_CPL_grid,2,I,SNGL(flav(i)),'(F12.5)')
-!U        CALL WGridPutCellReal(IDF_CPL_grid,3,I,SNGL(vm(i)),'(F12.5)')
-!U        CALL WGridPutCellReal(IDF_CPL_grid,4,I,SNGL(dxvav(i)),'(F12.5)')
-!U        CALL WGridPutCellReal(IDF_CPL_grid,5,I,SNGL(xvsig(i)),'(F12.5)')
-!U        CALL WGridPutCellReal(IDF_CPL_grid,6,I,SNGL(lb(i)),'(F12.5)')
-!U        CALL WGridPutCellReal(IDF_CPL_grid,7,I,SNGL(ub(i)),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,2,I,flav(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,3,I,vm(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,4,I,dxvav(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,5,I,xvsig(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,6,I,lb(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,7,I,ub(i),'(F12.5)')
 !U      ENDDO
 
       END SUBROUTINE SA_OUTPUT

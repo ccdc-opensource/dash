@@ -229,8 +229,8 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      DOUBLE PRECISION T0, rt
-      COMMON /saparl/  T0, rt
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
 
       LOGICAL           ChildWinAutoClose
       COMMON /ChWinAC/  ChildWinAutoClose(1:20)

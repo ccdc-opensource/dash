@@ -9,7 +9,7 @@
 
       IMPLICIT NONE
 
-      REAL*8 CHROM(*)
+      REAL CHROM(*)
 
       INCLUDE 'PARAMS.INC'
 
@@ -28,15 +28,14 @@
       COMMON /POSNS / NATOM, XATO(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
-      DATA ZERO / 0.0D0 /
 
-      REAL*8 CKK1, CKK2, CKK3
-      REAL*8 TRAN(1:3), ROTA(1:3,1:3), CART(1:3,1:MAXATM)
-      REAL*8 QUATER(0:3), QQSUM, QDEN
-      REAL*8 XC, YC, ZC, ZERO
+      REAL CKK1, CKK2, CKK3
+      REAL TRAN(1:3), ROTA(1:3,1:3), CART(1:3,1:MAXATM)
+      REAL QUATER(0:3), QQSUM, QDEN
+      REAL XC, YC, ZC
       INTEGER KK, KATOM, iFrg, iFrgCopy, NATS, KK1, KK2, KK3, JQ, JQS, I, ICFRG, KI
-      REAL*8 Duonion(0:1)
-      DOUBLE PRECISION tX, tY, tZ, tQ(0:3)
+      REAL Duonion(0:1)
+      REAL tQ(0:3)
       LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
 
       KK = 0
@@ -121,15 +120,15 @@
                 BET(I,iFrg) = CHROM(KK)
               ENDIF
             ENDDO
-            CALL MAKEXYZ_2(NATS,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),        &
-                           IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+            CALL makexyz(NATS,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),        &
+                         IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
 ! Determine origin for rotations
             ICFRG = ICOMFLG(iFrg)
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
-            IF (ICFRG.EQ.0) THEN
-              XC = ZERO
-              YC = ZERO
-              ZC = ZERO
+            IF (ICFRG .EQ. 0) THEN
+              XC = 0.0
+              YC = 0.0
+              ZC = 0.0
               IF (Get_UseCrystallographicCoM()) THEN
                 DO I = 1, NATS
                   XC = XC + AtomicWeighting(I,iFrg)*CART(1,I)
@@ -142,9 +141,9 @@
                   YC = YC + CART(2,I)
                   ZC = ZC + CART(3,I)
                 ENDDO
-                XC = XC/DBLE(NATS)
-                YC = YC/DBLE(NATS)
-                ZC = ZC/DBLE(NATS)
+                XC = XC/FLOAT(NATS)
+                YC = YC/FLOAT(NATS)
+                ZC = ZC/FLOAT(NATS)
               ENDIF
 ! Otherwise, use atom number ICFRG
             ELSE
@@ -163,15 +162,12 @@
 ! When we are here, we have the actual co-ordinates of all the atoms in this Z-matrix
 ! in Cartesian (orthogonal) co-ordinates. We need fractional co-ordinates: convert.
             DO I = 1, NATS
-              tX = CART(1,I)*c2fmat(1,1) + CART(2,I)*c2fmat(1,2) + CART(3,I)*c2fmat(1,3)
-              tY = CART(1,I)*c2fmat(2,1) + CART(2,I)*c2fmat(2,2) + CART(3,I)*c2fmat(2,3)
-              tZ = CART(1,I)*c2fmat(3,1) + CART(2,I)*c2fmat(3,2) + CART(3,I)*c2fmat(3,3)
               KI = KATOM + I
 ! Note that we must reorder the atoms such that the hydrogens are appended after the 
 ! non-hydrogens.
-              XATO(1,OrderedAtm(KI)) = SNGL(tX)
-              XATO(2,OrderedAtm(KI)) = SNGL(tY)
-              XATO(3,OrderedAtm(KI)) = SNGL(tZ)
+              XATO(1,OrderedAtm(KI)) = CART(1,I)*c2fmat(1,1) + CART(2,I)*c2fmat(1,2) + CART(3,I)*c2fmat(1,3)
+              XATO(2,OrderedAtm(KI)) = CART(1,I)*c2fmat(2,1) + CART(2,I)*c2fmat(2,2) + CART(3,I)*c2fmat(2,3)
+              XATO(3,OrderedAtm(KI)) = CART(1,I)*c2fmat(3,1) + CART(2,I)*c2fmat(3,2) + CART(3,I)*c2fmat(3,3)
             ENDDO
             KATOM = KATOM + NATS
           ENDDO
@@ -223,8 +219,8 @@
 !
       IMPLICIT NONE
 
-      REAL*8, INTENT (IN   ) :: Q(0:3)
-      REAL*8, INTENT (  OUT) :: ROTA(1:3,1:3)
+      REAL, INTENT (IN   ) :: Q(0:3)
+      REAL, INTENT (  OUT) :: ROTA(1:3,1:3)
 
       ROTA(1,1) = 1.0 - 2.0*(Q(2)**2) - 2.0*(Q(3)**2); 
       ROTA(1,2) = 2.0*Q(1)*Q(2) - 2.0*Q(3)*Q(0);     
@@ -240,48 +236,34 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE DO_ATOM_POS(TRANS,ROTA,POS,NATOMS)
+      SUBROUTINE DO_ATOM_POS(TRANS, ROTA, POS, NATOMS)
 
       IMPLICIT NONE
 
-      REAL*8,  INTENT (IN   ) :: TRANS(3), ROTA(3,3)
-      REAL*8,  INTENT (  OUT) :: POS(3,*)
+      REAL,    INTENT (IN   ) :: TRANS(3), ROTA(3,3)
+      REAL,    INTENT (  OUT) :: POS(3,*)
       INTEGER, INTENT (IN   ) :: NATOMS
 
-      REAL*8 POSIN(3)
+      REAL POSIN(3)
       INTEGER I, J
+      INTEGER K, L
 
       DO J = 1, NATOMS
         DO I = 1, 3
           POSIN(I) = POS(I,J)
         ENDDO
-        CALL ROTCAR(POSIN,POS(1,J),ROTA)
+        DO K = 1, 3
+          POS(K,J) = 0.0
+          DO L = 1, 3
+            POS(K,J) = POS(K,J) + ROTA(K,L)*POSIN(L)
+          ENDDO
+        ENDDO
         DO I = 1, 3
           POS(I,J) = POS(I,J) + TRANS(I)
         ENDDO
       ENDDO
 
       END SUBROUTINE DO_ATOM_POS
-!
-!*****************************************************************************
-!
-      SUBROUTINE ROTCAR(XORTO,XORTN,ROTA)
-
-      IMPLICIT NONE
-
-      REAL*8, INTENT (IN   ) :: XORTO(3), ROTA(3,3)
-      REAL*8, INTENT (  OUT) :: XORTN(3)
-
-      INTEGER I, J
-
-      DO I = 1, 3
-        XORTN(I) = 0.0
-        DO J = 1, 3
-          XORTN(I) = XORTN(I) + ROTA(I,J)*XORTO(J)
-        ENDDO
-      ENDDO
-
-      END SUBROUTINE ROTCAR
 !
 !*****************************************************************************
 !

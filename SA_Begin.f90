@@ -353,7 +353,7 @@
         PrfDir = PrfDir / RefLen
         DO iR = 1, NumOfRef
           DO ii = 1, 3
-            H(ii) = SNGL(iHKL(ii,iR))
+            H(ii) = FLOAT(iHKL(ii,iR))
           ENDDO
           RefLen = VCTMOD(1.0,H,2) ! Calculate length of reciprocal-space vector
           CALL SYMREF(H,RefHT,iHMUL(iR),phases)

@@ -253,16 +253,16 @@
 
       INTEGER, INTENT (IN   ) :: iFrg
 
-      REAL*8  CART(1:3,1:MAXATM)
+      REAL  CART(1:3,1:MAXATM)
       INTEGER I, BondNr
 
       natcry = NATOMS(iFrg)
-      CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),      &
+      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),      &
                      IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
       DO I = 1, natcry
-        axyzo(I,1) = SNGL(CART(1,I))
-        axyzo(I,2) = SNGL(CART(2,I))
-        axyzo(I,3) = SNGL(CART(3,I))
+        axyzo(I,1) = CART(1,I)
+        axyzo(I,2) = CART(2,I)
+        axyzo(I,3) = CART(3,I)
         aelem(I) = zmElementCSD(I,iFrg)
       ENDDO
 ! Calculate bonds and assign bond types.

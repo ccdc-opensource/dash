@@ -3,22 +3,22 @@
 !O!
 !O      SUBROUTINE FRAC2CART(MATRIX,A,B,C,ALFA,BETA,GAMA)
 !O
-!O      REAL*8 MATRIX(3,3), A, B, C, ALFA, BETA, GAMA
-!O      REAL*8 RADEG, CA, CB, CG, SA, ASA, TERM, SMALL, ZERO
-!O      DATA RADEG, SMALL, ZERO/1.7453292519943296D-2, 1.0D-20, 0.0D0/
+!O      REAL MATRIX(3,3), A, B, C, ALFA, BETA, GAMA
+!O      REAL RADEG, CA, CB, CG, SA, ASA, TERM
+!O      DATA RADEG /1.7453292519943296E-2 /
 !O
-!O      CA = DCOS(ALFA*RADEG)
-!O      CB = DCOS(BETA*RADEG)
-!O      CG = DCOS(GAMA*RADEG)
-!O      SA = DSIN(ALFA*RADEG)
+!O      CA = COS(ALFA*RADEG)
+!O      CB = COS(BETA*RADEG)
+!O      CG = COS(GAMA*RADEG)
+!O      SA = SIN(ALFA*RADEG)
 !O      ASA = A/SA
-!O      TERM = DSQRT(ABS(1.0D0-CA**2-CB**2-CG**2+2.0D0*CA*CB*CG)+SMALL)
+!O      TERM = SQRT(ABS(1.0E0-CA**2-CB**2-CG**2+2.0*CA*CB*CG)+SMALL)
 !O      MATRIX(1,1) = ASA*TERM
-!O      MATRIX(2,1) = ZERO
-!O      MATRIX(3,1) = ZERO
+!O      MATRIX(2,1) = 0.0
+!O      MATRIX(3,1) = 0.0
 !O      MATRIX(1,2) = -ASA*(CA*CB-CG)
 !O      MATRIX(2,2) = B*SA
-!O      MATRIX(3,2) = ZERO
+!O      MATRIX(3,2) = 0.0
 !O      MATRIX(1,3) = A*CB
 !O      MATRIX(2,3) = B*CA
 !O      MATRIX(3,3) = C
@@ -30,25 +30,25 @@
       SUBROUTINE FRAC2PDB(MATRIX,A,B,C,ALFA,BETA,GAMA)
 
       REAL MATRIX(3,3)
-      REAL*8 A, B, C, ALFA, BETA, GAMA
-      REAL*8 RADEG, CA, CB, CG, SG, VOLU, ZERO
-      DATA RADEG, ZERO/1.7453292519943296D-2, 0.0D0/
+      REAL A, B, C, ALFA, BETA, GAMA
+      REAL RADEG, CA, CB, CG, SG, VOLU
+      DATA RADEG /1.7453292519943296E-2/
 ! This routine will create the conversion matrix for fractional to orthogonal
 ! coordinates as defined in the PDB manual (i.e. a along X)
-      CA = DCOS(ALFA*RADEG)
-      CB = DCOS(BETA*RADEG)
-      CG = DCOS(GAMA*RADEG)
-      SG = DSIN(GAMA*RADEG)
-      VOLU = A*B*C*SQRT(1-CA*CA-CB*CB-CG*CG+2*CA*CB*CG)
-      MATRIX(1,1) = SNGL(A)
-      MATRIX(2,1) = SNGL(ZERO)
-      MATRIX(3,1) = SNGL(ZERO)
-      MATRIX(1,2) = SNGL(B*CG)
-      MATRIX(2,2) = SNGL(B*SG)
-      MATRIX(3,2) = SNGL(ZERO)
-      MATRIX(1,3) = SNGL(C*CB)
-      MATRIX(2,3) = SNGL(C*(CA-CB*CG)/SG)
-      MATRIX(3,3) = SNGL(VOLU/(A*B*SG))
+      CA = COS(ALFA*RADEG)
+      CB = COS(BETA*RADEG)
+      CG = COS(GAMA*RADEG)
+      SG = SIN(GAMA*RADEG)
+      VOLU = A*B*C*SQRT(1.0-CA*CA-CB*CB-CG*CG+2.0*CA*CB*CG)
+      MATRIX(1,1) = A
+      MATRIX(2,1) = 0.0
+      MATRIX(3,1) = 0.0
+      MATRIX(1,2) = B*CG
+      MATRIX(2,2) = B*SG
+      MATRIX(3,2) = 0.0
+      MATRIX(1,3) = C*CB
+      MATRIX(2,3) = C*(CA-CB*CG)/SG
+      MATRIX(3,3) = VOLU/(A*B*SG)
 
       END SUBROUTINE FRAC2PDB
 !

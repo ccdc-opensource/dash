@@ -198,41 +198,41 @@
       iPrjRecNr = 1
 ! Read / Write the header
       tString = ProgramVersion//' project file'
-      CALL FileRWString(hPrjFile,iPrjRecNr,RW,tString)
+      CALL FileRWString(hPrjFile, iPrjRecNr, RW, tString)
 ! Read / Write radiation source
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,JRadOption)
+      CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, JRadOption)
 ! Read / Write Wavelength
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ALambda)
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, ALambda)
       IF (RW .EQ. cRead) THEN
         CALL Upload_Source
         CALL Upload_Wavelength
       ENDIF
 ! Read / Write unit cell
       DO I = 1, 6
-        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,CellPar(I))
+        CALL FileRWReal(hPrjFile, iPrjRecNr, RW, CellPar(I))
       ENDDO
 ! Read / Write zero-point
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ZeroPoint)
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, ZeroPoint)
       IF (RW .EQ. cRead) CALL Upload_ZeroPoint
 ! Read / Write space group
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumberSGTable)
+      CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumberSGTable)
       IF (RW .EQ. cRead) THEN
         LatBrav = GetCrystalSystem(NumberSGTable)
         CALL Upload_CrystalSystem
       ENDIF
       CALL PrjErrTrace
 ! Read / Write Pawley refinement related stuff
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PAWLEYCHISQ)
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeSigma(1))
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeSigma(2))
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeGamma(1))
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeGamma(2))
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeHPSL)
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeHMSL)
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,SlimValue)
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ScalFac)
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PAWLEYCHISQ)
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PeakShapeSigma(1))
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PeakShapeSigma(2))
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PeakShapeGamma(1))
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PeakShapeGamma(2))
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PeakShapeHPSL)
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PeakShapeHMSL)
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, SlimValue)
+      CALL FileRWReal(hPrjFile, iPrjRecNr, RW, ScalFac)
 ! RAW .\Example.xye ! @@@@ include ??
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NBIN)
+      CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NBIN)
 ! Read / Write the .pik file
 !            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
 !        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
@@ -241,15 +241,15 @@
 ! This is the observed pattern read in by GETPIK.
       CALL PrjErrTrace
       DO I = 1, NBIN
-        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,XBIN(I))
+        CALL FileRWReal(hPrjFile, iPrjRecNr, RW, XBIN(I))
       ENDDO
       CALL PrjErrTrace
       DO I = 1, NBIN
-        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,YOBIN(I))
+        CALL FileRWReal(hPrjFile, iPrjRecNr, RW, YOBIN(I))
       ENDDO
       CALL PrjErrTrace
       DO I = 1, NBIN
-        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,EBIN(I))
+        CALL FileRWReal(hPrjFile, iPrjRecNr, RW, EBIN(I))
       ENDDO
       IF (RW .EQ. cRead) THEN
         LBIN = 1
@@ -277,11 +277,11 @@
       ENDIF
       NFITA = 0
       DO I = 1, NBIN
-        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,KREFT(I))
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, KREFT(I))
         IF (KREFT(I).GT.0) THEN
           DO j = 1, KREFT(I)
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,KNIPT(j,I))
-            CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PIKVAL(j,I))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, KNIPT(j,I))
+            CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PIKVAL(j,I))
           ENDDO
           NFITA = NFITA + 1
           IFITA(NFITA) = I
@@ -390,22 +390,22 @@
 
       LOGICAL, EXTERNAL :: Get_AutoAlign
       INTEGER ii, I, J, RW
-      DOUBLE PRECISION X(MVAR)
+      REAL X(MVAR)
 
 ! Read or Write?
       RW = iPrjReadOrWrite
 ! Number of solutions
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumOf_SA_Runs)
+      CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumOf_SA_Runs)
 ! Read / Write solutions
       IF (NumOf_SA_Runs .NE. 0) THEN
         DO I = 1, NumOf_SA_Runs
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iSol2Run(I))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iSol2Run(I))
           DO J = 1, nvar
-            CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BestValuesDoF(J,I))
-            X(J) = DBLE(BestValuesDoF(J,I))
+            CALL FileRWReal(hPrjFile, iPrjRecNr, RW, BestValuesDoF(J,I))
+            X(J) = BestValuesDoF(J,I)
           ENDDO
-          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ProfileChiSqd(I))
-          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,IntensityChiSqd(I))
+          CALL FileRWReal(hPrjFile, iPrjRecNr, RW, ProfileChiSqd(I))
+          CALL FileRWReal(hPrjFile, iPrjRecNr, RW, IntensityChiSqd(I))
           IF (iPrjReadOrWrite .EQ. cRead) THEN
 ! Fill pdbAtmCoords
             CALL makefrac(X)
@@ -481,12 +481,12 @@
       RW = iPrjReadOrWrite
       KKOR = 0
       MINCOR = 20
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumOfRef)
+      CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumOfRef)
       DO iR = 1, NumOfRef
 ! Observed intensity
-        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,AIOBS(iR))
+        CALL FileRWReal(hPrjFile, iPrjRecNr, RW, AIOBS(iR))
 ! Weight of this intensity
-        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,WTI(iR))
+        CALL FileRWReal(hPrjFile, iPrjRecNr, RW, WTI(iR))
         IF (RW .EQ. cWrite) THEN
 ! Determine number of correlations to write out
           NCOR = 14
@@ -495,10 +495,10 @@
           ENDDO
         ENDIF
 ! Number of correlations
-        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NCOR)
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NCOR)
         IF (NCOR .GT. 0) THEN
           DO I = 1, NCOR
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,IHCOV(I,iR))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, IHCOV(I,iR))
           ENDDO
         ENDIF
 ! Now work out which terms should be kept for the chi-squared calculation
@@ -544,11 +544,11 @@
 
 ! Read or Write?
       RW = iPrjReadOrWrite
-      CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,PrefParExists)
+      CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, PrefParExists)
 ! Read/write preferred orientation parameters anyway, to enable the user
 ! to switch PO on and off without having to re-enter direction etc.
       DO i = 1, 3
-        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PrefPars(i))
+        CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PrefPars(i))
       ENDDO
 ! Update the appropriate Wizard window
       IF (iPrjReadOrWrite .EQ. cRead) CALL Update_PO
@@ -568,95 +568,83 @@
 
       INTEGER, EXTERNAL :: ElmSymbol2CSD
       INTEGER iFrg, RW, iAtomNr, BondNr
-      REAL    tReal
 
 ! Read or Write?
       RW = iPrjReadOrWrite
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,nfrag)
+      CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, nfrag)
       DO iFrg = 1, maxfrg
-        CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,gotzmfile(iFrg))
+        CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, gotzmfile(iFrg))
         IF (gotzmfile(iFrg)) THEN
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmNumberOfCopies(iFrg))
-          CALL FileRWString (hPrjFile,iPrjRecNr,RW,frag_file(iFrg))
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,izmpar(iFrg))
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,icomflg(iFrg))
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,natoms(iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmNumberOfCopies(iFrg))
+          CALL FileRWString (hPrjFile, iPrjRecNr, RW, frag_file(iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmpar(iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, icomflg(iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, natoms(iFrg))
           DO iAtomNr = 1, natoms(iFrg)
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,ioptb(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iopta(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,ioptt(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iz1(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iz2(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iz3(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, ioptb(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iopta(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, ioptt(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz1(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz2(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz3(iAtomNr,iFrg))
             IF (RW .EQ. cWrite) THEN
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(blen(iAtomNr,iFrg)))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(alph(iAtomNr,iFrg)))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(bet(iAtomNr,iFrg)))
+              CALL FileWriteReal(hPrjFile, iPrjRecNr, blen(iAtomNr,iFrg))
+              CALL FileWriteReal(hPrjFile, iPrjRecNr, alph(iAtomNr,iFrg))
+              CALL FileWriteReal(hPrjFile, iPrjRecNr, bet(iAtomNr,iFrg))
             ELSE
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              blen(iAtomNr,iFrg) = DBLE(tReal)
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              alph(iAtomNr,iFrg) = DBLE(tReal)
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              bet(iAtomNr,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile, iPrjRecNr, blen(iAtomNr,iFrg))
+              CALL FileReadReal(hPrjFile, iPrjRecNr, alph(iAtomNr,iFrg))
+              CALL FileReadReal(hPrjFile, iPrjRecNr, bet(iAtomNr,iFrg))
             ENDIF
-            CALL FileRWString (hPrjFile,iPrjRecNr,RW,asym(iAtomNr,iFrg))
+            CALL FileRWString (hPrjFile, iPrjRecNr, RW, asym(iAtomNr,iFrg))
             IF (RW .EQ. cRead) THEN
               zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
             ENDIF
-            CALL FileRWString (hPrjFile,iPrjRecNr,RW,OriginalLabel(iAtomNr,iFrg))
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,tiso(iAtomNr,iFrg))
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,occ(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,izmoid(iAtomNr,iFrg))
+            CALL FileRWString (hPrjFile, iPrjRecNr, RW, OriginalLabel(iAtomNr,iFrg))
+            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, tiso(iAtomNr,iFrg))
+            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, occ(iAtomNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmoid(iAtomNr,iFrg))
             izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the back mapping
-            CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,UseQuaternions(iFrg))
+            CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, UseQuaternions(iFrg))
             IF (RW .EQ. cWrite) THEN
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmInitialQs(0,iFrg)))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmInitialQs(1,iFrg)))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmInitialQs(2,iFrg)))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmInitialQs(3,iFrg)))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(0,iFrg))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(1,iFrg))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(2,iFrg))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(3,iFrg))
             ELSE
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              zmInitialQs(0,iFrg) = DBLE(tReal)
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              zmInitialQs(1,iFrg) = DBLE(tReal)
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              zmInitialQs(2,iFrg) = DBLE(tReal)
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              zmInitialQs(3,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(0,iFrg))
+              CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(1,iFrg))
+              CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(2,iFrg))
+              CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(3,iFrg))
             ENDIF
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxDef(iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtm(iFrg))
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotAxFrac(1,iFrg))
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotAxFrac(2,iFrg))
-            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotAxFrac(3,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtms(1,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtms(2,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtms(3,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxDef(iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(iFrg))
+            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(1,iFrg))
+            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(2,iFrg))
+            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(3,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(1,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(2,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(3,iFrg))
             IF (RW .EQ. cWrite) THEN
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(0,iFrg)))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(1,iFrg)))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(2,iFrg)))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(3,iFrg)))
+              CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(0,iFrg))
+              CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(1,iFrg))
+              CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(2,iFrg))
+              CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(3,iFrg))
             ELSE
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              zmSingleRotationQs(0,iFrg) = DBLE(tReal)
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              zmSingleRotationQs(1,iFrg) = DBLE(tReal)
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              zmSingleRotationQs(2,iFrg) = DBLE(tReal)
-              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-              zmSingleRotationQs(3,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(0,iFrg))
+              CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(1,iFrg))
+              CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(2,iFrg))
+              CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(3,iFrg))
             ENDIF
           ENDDO
           IF (RW .EQ. cRead) THEN
             CALL zmDoAdmin(iFrg)
           ENDIF
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumberOfBonds(iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumberOfBonds(iFrg))
           DO BondNr = 1, NumberOfBonds(iFrg)
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,BondType(BondNr,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,Bonds(1,BondNr,iFrg))
-            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,Bonds(2,BondNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, BondType(BondNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, Bonds(1,BondNr,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, Bonds(2,BondNr,iFrg))
           ENDDO
         ENDIF
       ENDDO

@@ -184,9 +184,9 @@
 ! On entry A is a square NxN real matrix
 ! On exit  B is its inverse
 !
-      IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT REAL (A-H,O-Z)
       INTEGER         II(500), IL(500), IG(500)
-      REAL*8          A(N,N), B(N,N)
+      REAL          A(N,N), B(N,N)
       INTEGER         I, J, IS, K
 
 ! Initialise b with values from a

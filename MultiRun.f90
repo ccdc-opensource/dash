@@ -32,7 +32,7 @@
       IF (tMaxMoves .LT. 10.0) tMaxMoves = 10.0
       IF (tMaxMoves .GT.  2.0E9) tMaxMoves = 2.0E9
       MaxMoves = NINT(tMaxMoves)
-      CALL WDialogGetReal(IDF_SA_ChiTest,   ChiMult)
+      CALL WDialogGetReal(IDF_SA_ChiTest, ChiMult)
       CALL WDialogSelect(IDD_SAW_Page5)
       CALL WDialogClearField(IDF_SA_Summary)
       CALL PopActiveWindowID
@@ -57,7 +57,7 @@
 
       INCLUDE 'PARAMS.INC'
 
-      DOUBLE PRECISION XOPT,       C,       FOPT
+      REAL XOPT,       C,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       REAL             CHIPROBEST
@@ -83,7 +83,7 @@
       ENDDO
 ! Add this solution to the list
       DO I = 1, nvar
-        BestValuesDoF(I,Curr_SA_Run) = SNGL(XOPT(I))
+        BestValuesDoF(I,Curr_SA_Run) = XOPT(I)
       ENDDO
       !C Normalise quaternions and translations
       KK = 0
@@ -140,7 +140,7 @@
           ENDDO
         ENDIF
       ENDDO
-      IntensityChiSqd(Curr_SA_Run) = SNGL(FOPT)
+      IntensityChiSqd(Curr_SA_Run) = FOPT
       ProfileChiSqd(Curr_SA_Run) = CHIPROBEST
       iSolTicked(Curr_SA_Run) = 1
 ! Now sort the list according to Profile chi sqd

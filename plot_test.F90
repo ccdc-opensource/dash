@@ -81,7 +81,7 @@
       ENDDO
 ! Fill Preferred Orientation part
       IF (PrefParExists) THEN
-        CALL PO_PRECFC(SNGL(BestValuesDoF(iPrfPar,TheRunNr)))
+        CALL PO_PRECFC(BestValuesDoF(iPrfPar,TheRunNr))
       ENDIF
 ! VALCHI fills BICALC
       CALL VALCHI(rDummy,0)    ! Structural part

@@ -16,44 +16,38 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
 
-      DOUBLE PRECISION XOPT,       C,       FOPT
+      REAL             XOPT,       C,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
-
-      DOUBLE PRECISION XP(MVAR)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-      DOUBLE PRECISION x,       lb,       ub,       vm
+      REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
-      DOUBLE PRECISION T0, rt
-      COMMON /saparl/  T0, rt
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       INTEGER                 ModalFlag
       COMMON / ModalTorsions/ ModalFlag(mvar)
-      SAVE   /ModalTorsions/
 
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds
 
-      DOUBLE PRECISION RULB
+      REAL          RULB
       COMMON /RULB/ RULB(Mvar)
 
-      DOUBLE PRECISION RFIX
-      DOUBLE PRECISION RANARR(30000), RANAR1(30000)
-      DOUBLE PRECISION DXVAV(mvar), XVSIG(mvar), FLAV(mvar)
-      DOUBLE PRECISION X0SUM(mvar), XSUM(mvar), XXSUM(mvar)
-      DOUBLE PRECISION XDSS(mvar), A0SUM(mvar)
+      REAL RANARR(30000), RANAR1(30000)
+      REAL DXVAV(mvar), XVSIG(mvar), FLAV(mvar)
+      REAL X0SUM(mvar), XSUM(mvar), XXSUM(mvar)
+      REAL XDSS(mvar), A0SUM(mvar)
 
 !  Type all functions.
-      DOUBLE PRECISION, EXTERNAL :: EXPREP
-
-      DOUBLE PRECISION DP0
+      REAL, EXTERNAL :: EXPREP
 
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
@@ -102,12 +96,13 @@
       INTEGER NACC
       INTEGER NACP(MVAR)
       LOGICAL MAKET0
-      DOUBLE PRECISION FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
-      DOUBLE PRECISION F, FP, P, PP, RATIO, DX
-      DOUBLE PRECISION RANIN
+      REAL FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
+      REAL RATIO, DX
+      REAL F, FP, P, PP
+      REAL RANIN
       INTEGER NUP, NDOWN, NREJ, H, I, J, M, II
       INTEGER MRAN, MRAN1, IARR, IAR1
-      DOUBLE PRECISION T
+      REAL T
       INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
 
       INTEGER IM, IA, IC
@@ -118,7 +113,7 @@
       LOGICAL PrevRejected, CurrParsInclPO, PrevParsInclPO
       INTEGER TotNumTrials, TotNumRetrials
       CHARACTER*2 RowLabelStr
-
+      REAL XP(MVAR)
       REAL xtem, tempupper, templower, tempupper2, templower2
       REAL Sgn
 
@@ -177,19 +172,17 @@
         kk = kk + 1
         vm(kk) = 0.01
       ENDIF
-      DP0 = 0.0
       CALL FillRULB(nvar) !calcs upper and lower bounds for parameters
       NPAR = 0
-      RFIX = 1E-3
       DO I = 1, nvar
-        IF (RULB(I).GT.RFIX) THEN
+        IF (RULB(I) .GT. 1.0E-3) THEN
 ! NPAR is the number of parameters that are allowed to vary (i.e., not fixed)
 ! so in a way, NPAR is the number of parameters that are parameters.
           NPAR = NPAR + 1
           IP(NPAR) = I
         ENDIF
       ENDDO
-      nmpert = nt * ns * NPAR ! Number of Moves per Temperature
+      nmpert = NT * NS * NPAR ! Number of Moves per Temperature
       CALL OpenChiSqPlotWindow
 ! ####################################
 !   Starting point for multiple runs
@@ -229,7 +222,7 @@
         C(I) = 2.0
       ENDDO
 ! Evaluate the function with input X and return value as F.
-      IF (PrefParExists) CALL PO_PRECFC(SNGL(X(iPrfPar)))
+      IF (PrefParExists) CALL PO_PRECFC(X(iPrfPar))
       CALL FCN(X,F,0)
       DO II = 1, NATOM
         DO III = 1, 3
@@ -239,8 +232,6 @@
       FOPT = F
 ! Evaluate the profile chi-squared as well
       CALL valchipro(CHIPROBEST)
-
-
       CALL WDialogSelect(IDD_Summary)
       CALL WGridRows(IDF_SA_Summary, Curr_SA_Run)
       WRITE(RowLabelStr,'(I2)') Curr_SA_Run
@@ -248,11 +239,9 @@
       CALL WGridPutCellInteger (IDF_SA_Summary,1,Curr_SA_Run,NumOf_SA_Runs+1) 
       CALL WGridPutCellCheckBox(IDF_SA_Summary,3,Curr_SA_Run,1)
       CALL WGridPutCellReal    (IDF_SA_Summary,4,Curr_SA_Run,CHIPROBEST,'(F7.2)')
-      CALL WGridPutCellReal    (IDF_SA_Summary,5,Curr_SA_Run,SNGL(FOPT),'(F7.2)')
+      CALL WGridPutCellReal    (IDF_SA_Summary,5,Curr_SA_Run,FOPT,'(F7.2)')
       CALL WDialogPutInteger(IDF_Limit1,1)
       CALL WDialogPutInteger(IDF_Limit2,Curr_SA_Run)
-
-
       PrevRejected = .TRUE.
 ! Plot the profile
       CALL Profile_Plot
@@ -281,7 +270,7 @@
       FPSUM1 = 0.0
       FPSUM2 = 0.0
 ! Update the SA status window
-      CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),xopt,dxvav,xvsig,flav,  &
+      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,  &
                      nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
       CALL sa_move_status(nmpert,0)
 ! ##########################################
@@ -335,7 +324,7 @@
                 IARR = IARR + 1
                 IF (Xtem .GE. 360.00) THEN
                   Xtem = xtem - 360.00
-                END IF
+                ENDIF
                 CALL ThreeSixtyToOneEighty(xtem)
                 XP(H) = xtem
               ENDIF
@@ -352,8 +341,8 @@
 ! sampling of all user defined ranges.  
                   IF (OutOfBounds(H, XP(H))) THEN
                     IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
-                      TempUpper = SNGL(UB(H))         ! so use 0-360 degree scale
-                      TempLower = SNGL(LB(H))
+                      TempUpper = UB(H)         ! so use 0-360 degree scale
+                      TempLower = LB(H)
                       TempLower2 = TempUpper - 180.00
                       TempUpper2 = TempLower + 180.00
                       CALL OneEightyToThreeSixty(TempUpper)
@@ -422,18 +411,18 @@
                   IF (CurrParsInclPO) THEN
                     CALL FCN(XP,FP,iPrfPar)
                   ELSE
-                    CALL PO_PRECFC(SNGL(XP(iPrfPar)))
+                    CALL PO_PRECFC(XP(iPrfPar))
                     CALL FCN(XP,FP,0)
                   ENDIF
                 ELSE
-                  IF (CurrParsInclPO) CALL PO_PRECFC(SNGL(XP(iPrfPar)))
+                  IF (CurrParsInclPO) CALL PO_PRECFC(XP(iPrfPar))
                   CALL FCN(XP,FP,0)
                 ENDIF
               ELSE
                 CALL FCN(XP,FP,H) ! Becomes H(1)
               ENDIF
             ELSE
-              IF ((CurrParsInclPO) .OR. (PrevParsInclPO .AND. PrevRejected)) CALL PO_PRECFC(SNGL(XP(iPrfPar)))
+              IF ((CurrParsInclPO) .OR. (PrevParsInclPO .AND. PrevRejected)) CALL PO_PRECFC(XP(iPrfPar))
               CALL FCN(XP,FP,0)
             ENDIF
             PrevParsInclPO = CurrParsInclPO
@@ -462,15 +451,11 @@
                 num_new_min = num_new_min + 1
                 CALL valchipro(CHIPROBEST)
                 FOPT = FP
-
-
                 CALL WDialogSelect(IDD_Summary)
-                CALL WGridPutCellReal(IDF_SA_Summary,4,Curr_SA_Run,CHIPROBEST,'(F7.2)')
-                CALL WGridPutCellReal(IDF_SA_Summary,5,Curr_SA_Run,SNGL(FOPT),'(F7.2)')
-
-
+                CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
+                CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
 ! Update the SA status window
-                CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),XOPT,dxvav,xvsig,flav,  &
+                CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,  &
                                NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov)
               ENDIF
 ! If the point is greater, use the Metropolis criterion to decide on
@@ -494,15 +479,15 @@
             XSUM(H) = XSUM(H) + X(H)
             XXSUM(H) = XXSUM(H) + X(H)**2
           ENDDO ! Loop over parameters
-          CALL sa_move_status(nmpert,m*NPAR*ns)
+          CALL sa_move_status(nmpert,m*NPAR*NS)
         ENDDO ! Loop over NS
 ! Adjust VM so that approximately half of all evaluations are accepted.
         DO II = 1, NPAR
           I = IP(II)
-          RATIO = DFLOAT(NACP(I))/DFLOAT(NumTrialsPar(I))
-          IF (RATIO.GT.0.6) THEN
+          RATIO = FLOAT(NACP(I))/FLOAT(NumTrialsPar(I))
+          IF (RATIO .GT. 0.6) THEN
             VM(I) = VM(I)*(1.0+C(I)*(RATIO-0.6)/0.4)
-          ELSEIF (RATIO.LT.0.4) THEN
+          ELSEIF (RATIO .LT. 0.4) THEN
             VM(I) = VM(I)/(1.0+C(I)*((0.4-RATIO)/0.4))
           ENDIF
           IF (VM(I) .GT. RULB(I)) THEN
@@ -529,7 +514,7 @@
       Last_NUP   = NUP
 ! Calculate the average energy and deviation
       FPAV = FPSUM1/FPSUM0
-      FPSD = SQRT(MAX(DP0,(FPSUM2/FPSUM0)-(FPAV**2)))
+      FPSD = SQRT(MAX(0.0,(FPSUM2/FPSUM0)-(FPAV**2)))
       DO I = 1, nvar
         IF (X0SUM(I) .GT. 0.0) THEN
           DXVAV(I) = 1.0 !XSUM(I)/X0SUM(I)
@@ -540,7 +525,7 @@
       ntotmov = ntotmov + nmpert
       IF (num_new_min .NE. num_old_min) CALL Profile_Plot ! plot the profile
       num_old_min = num_new_min
-      CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),xopt, &
+      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD, &
                      dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,NREJ, &
                      ntotmov)
 ! If we have asked for an initial temperature to be calculated then do so
@@ -594,17 +579,14 @@
 !
 !*****************************************************************************
 !
-      FUNCTION EXPREP(RDUM)
-!  This function replaces exp to avoid under- and overflows and is
-!  designed for IBM 370 type machines. It may be necessary to modify
-!  it for other machines. Note that the maximum and minimum values of
-!  EXPREP are such that they have no effect on the algorithm.
-!
-      DOUBLE PRECISION RDUM, EXPREP
+      REAL FUNCTION EXPREP(RDUM)
+! This function replaces exp to avoid under- and overflows
 
-      IF (RDUM.GT.174.) THEN
-        EXPREP = 3.69D+75
-      ELSEIF (RDUM.LT.-180.) THEN
+      REAL, INTENT (IN   ) :: RDUM
+
+      IF (RDUM .GT. 88.0) THEN
+        EXPREP = 1.6516363E+38
+      ELSEIF (RDUM .LT. -103.0) THEN
         EXPREP = 0.0
       ELSE
         EXPREP = EXP(RDUM)
@@ -701,16 +683,23 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE RANX2E(DRIN,DROUT)
+      SUBROUTINE RANX2E(DRIN, DROUT)
 
-      DOUBLE PRECISION drin, drout
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: drin
+      REAL, INTENT (  OUT) :: drout
+
+      REAL            xs, yran
       COMMON /x2eran/ xs, yran(200)
 
-      rin = SNGL(drin)
-      rin = ABS(rin)
+      REAL rin, xl, xsn, xm, xh, yl, yh, ym, xlo, xmo, xho, ylo, ymo, yho, rout
+      INTEGER jn, j
+
+      rin = ABS(drin)
       jn = 1
       DO j = 199, 1, -1
-        IF (rin.GT.yran(j)) THEN
+        IF (rin .GT. yran(j)) THEN
           jn = j
           GOTO 10
         ENDIF
@@ -722,15 +711,15 @@
       xh = xm + xsn
       yl = yran(jn)
       yh = yran(jn+1)
-      ym = 1. - (0.5*xm*xm+xm+1.)*EXP(-xm)
+      ym = 1.0 - (0.5*xm*xm+xm+1.)*EXP(-xm)
    15 xlo = xl
       xmo = xm
       xho = xh
       ylo = yl
       ymo = ym
       yho = yh
-      IF (ABS(yh-yl).LT.1E-3) GOTO 20
-      IF (rin.GE.ym) THEN
+      IF (ABS(yh-yl) .LT. 1.0E-3) GOTO 20
+      IF (rin .GE. ym) THEN
         xl = xmo
         xh = xho
         yl = ymo
@@ -746,7 +735,7 @@
       GOTO 15
    20 rout = xm
       IF (drin.LT.0.0) rout = -rout
-      drout = DBLE(rout)
+      drout = rout
 
       END SUBROUTINE RANX2E
 !
@@ -754,7 +743,13 @@
 !
       SUBROUTINE RANX2Init
 
+      IMPLICIT NONE
+
+      REAL            xs, yran
       COMMON /x2eran/ xs, yran(200)
+
+      INTEGER I
+      REAL    xi
 
       xs = 0.1
       DO i = 1, 200
@@ -771,23 +766,21 @@
       USE WINTERACTER
       USE DRUID_HEADER
    
-
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC' 
 
       INTEGER, INTENT (IN   ) :: N
 
-      DOUBLE PRECISION RULB
+      REAL          RULB
       COMMON /RULB/ RULB(Mvar)
 
-      DOUBLE PRECISION x,       lb,       ub,       vm
-      COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
+      REAL             x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       INTEGER IV
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: RANMAR
-      REAL    tReal
 
 ! Get the "IDF_RandomInitVal" checkbox
       CALL PushActiveWindowID
@@ -798,8 +791,7 @@
         ENDDO
       ELSE
         DO IV = 1, N
-          CALL WGridGetCellReal(IDF_parameter_grid_modal,1,IV,tReal)
-          X(IV) = DBLE(tReal)
+          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IV, X(IV))
         ENDDO
       ENDIF
       CALL PopActiveWindowID
@@ -839,10 +831,10 @@
 
       INTEGER, INTENT (INOUT) :: nvar
 
-      DOUBLE PRECISION RULB
-      COMMON /RULB/    RULB(mvar)  
+      REAL          RULB
+      COMMON /RULB/ RULB(Mvar)
 
-      DOUBLE PRECISION x,       lb,       ub,       vm
+      REAL             x,       lb,       ub,       vm
       COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
 
       INTEGER                ModalFlag
@@ -856,26 +848,26 @@
         RULB(I) = UB(I) - LB(I)
         IF (ModalFlag(I) .EQ. 2) THEN
           CALL CheckBiModalBounds(I, OneEightyScale)
-          IF (OneEightyScale .EQ. .FALSE.) THEN
-            tempUpper = SNGL(UB(I))
-            tempLower = SNGL(LB(I))
+          IF (.NOT. OneEightyScale) THEN
+            tempUpper = UB(I)
+            tempLower = LB(I)
             CALL OneEightyToThreeSixty(tempUpper)
             CALL OneEightyToThreeSixty(tempLower)
-            RULB(I) = DBLE(ABS(tempUpper - tempLower))
+            RULB(I) = ABS(tempUpper - tempLower)
           ENDIF
         ENDIF
         IF (ModalFlag(I) .EQ. 3) THEN
-          tempUpper = SNGL(UB(I))
+          tempUpper = UB(I)
           CALL DetermineTriModalBounds(tempUpper, 1)
-          tempLower = SNGL(LB(I))
+          tempLower = LB(I)
           CALL DetermineTriModalBounds(tempLower, 2)
           CALL CheckTriModalBounds(OneEightyScale)
-          IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
-            tempUpper = SNGL(UB(I))
-            tempLower = SNGL(LB(I))
+          IF (.NOT. OneEightyScale) THEN ! A range such as -170 to 170 has been defined
+            tempUpper = UB(I)
+            tempLower = LB(I)
             CALL OneEightyToThreeSixty(TempUpper)
             CALL OneEightyToThreeSixty(TempLower)
-            RULB(I) = DBLE(ABS(TempUpper - TempLower))
+            RULB(I) = ABS(TempUpper - TempLower)
           ENDIF
         ENDIF
       ENDDO

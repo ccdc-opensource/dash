@@ -289,7 +289,7 @@
       INTEGER, INTENT (IN   ) :: iFrg
 
       INTEGER I, BondNr
-      REAL*8 CART(1:3,1:MAXATM)
+      REAL CART(1:3,1:MAXATM)
 
       CALL WDialogSelect(IDD_zmEdit)
       CurrentlyEditedFrag = iFrg
@@ -300,11 +300,11 @@
 ! In order to be able to delete atoms from the Z-matrix at random, we need their
 ! Cartesian co-ordinates.
       natcry = natoms(iFrg)
-      CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
       DO I = 1, natcry
-        axyzo(I,1) = SNGL(CART(1,I))
-        axyzo(I,2) = SNGL(CART(2,I))
-        axyzo(I,3) = SNGL(CART(3,I))
+        axyzo(I,1) = CART(1,I)
+        axyzo(I,2) = CART(2,I)
+        axyzo(I,3) = CART(3,I)
         aelem(I) = zmElementCSD(I, iFrg)
         atomlabel(I) = OriginalLabel(I, iFrg)
       ENDDO
@@ -556,7 +556,6 @@
       CHARACTER(50) temp_file
       REAL    RotMat(1:3,1:3)
       REAL    COM(1:3), tX, tY, tZ
-      REAL*8  DQ(0:3), DRotMat(1:3,1:3)
       LOGICAL tUseSingleAxis
 
       iFrg = 0
@@ -612,7 +611,7 @@
                   ENDIF
 ! Otherwise, use atom number ICFRG
                 CASE (2) ! Use atom nr.
-                  CALL WDialogGetInteger(IDF_RotOrgAtomNr,iAtomNr)
+                  CALL WDialogGetInteger(IDF_RotOrgAtomNr, iAtomNr)
                   COM(1) = axyzo(izmbid(iAtomNr,iFrg),1)
                   COM(2) = axyzo(izmbid(iAtomNr,iFrg),2)
                   COM(3) = axyzo(izmbid(iAtomNr,iFrg),3)
@@ -627,9 +626,7 @@
               CALL WDialogGetReal(IDF_Q1,Q(1))
               CALL WDialogGetReal(IDF_Q2,Q(2))
               CALL WDialogGetReal(IDF_Q3,Q(3))
-              DQ = DBLE(Q)
-              CALL ROTMAK(DQ,DRotMat)
-              RotMat = SNGL(DRotMat)
+              CALL ROTMAK(Q, RotMat)
               DO I = 1, natcry
                 tX = axyzo(I,1) * RotMat(1,1) + axyzo(I,2) * RotMat(1,2) + axyzo(I,3) * RotMat(1,3)
                 tY = axyzo(I,1) * RotMat(2,1) + axyzo(I,2) * RotMat(2,2) + axyzo(I,3) * RotMat(2,3)
@@ -883,11 +880,11 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       iFrg = 0
-      CALL WDialogPutReal(IDF_Q0,SNGL(zmInitialQs(0,iFrg)))
-      CALL WDialogPutReal(IDF_Q1,SNGL(zmInitialQs(1,iFrg)))
-      CALL WDialogPutReal(IDF_Q2,SNGL(zmInitialQs(2,iFrg)))
-      CALL WDialogPutReal(IDF_Q3,SNGL(zmInitialQs(3,iFrg)))
-      CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr,icomflg(iFrg) .NE. 0)
+      CALL WDialogPutReal(IDF_Q0, zmInitialQs(0,iFrg))
+      CALL WDialogPutReal(IDF_Q1, zmInitialQs(1,iFrg))
+      CALL WDialogPutReal(IDF_Q2, zmInitialQs(2,iFrg))
+      CALL WDialogPutReal(IDF_Q3, zmInitialQs(3,iFrg))
+      CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr, icomflg(iFrg) .NE. 0)
       IF (icomflg(iFrg) .EQ. 0) THEN ! Use centre of mass
 ! Set radio button
         CALL WDialogPutRadioButton(IDF_RotOrgCOM)
@@ -1004,19 +1001,14 @@
       
       INTEGER iFrg, iOption, tInteger
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      REAL    tReal
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       iFrg = 0
-      CALL WDialogGetReal(IDF_Q0,tReal)
-      zmInitialQs(0,iFrg) = DBLE(tReal)
-      CALL WDialogGetReal(IDF_Q1,tReal)
-      zmInitialQs(1,iFrg) = DBLE(tReal)
-      CALL WDialogGetReal(IDF_Q2,tReal)
-      zmInitialQs(2,iFrg) = DBLE(tReal)
-      CALL WDialogGetReal(IDF_Q3,tReal)
-      zmInitialQs(3,iFrg) = DBLE(tReal)
+      CALL WDialogGetReal(IDF_Q0, zmInitialQs(0,iFrg))
+      CALL WDialogGetReal(IDF_Q1, zmInitialQs(1,iFrg))
+      CALL WDialogGetReal(IDF_Q2, zmInitialQs(2,iFrg))
+      CALL WDialogGetReal(IDF_Q3, zmInitialQs(3,iFrg))
       CALL WDialogGetRadioButton(IDF_RotOrgCOM,iOption)
       SELECT CASE (iOption)
         CASE (1) ! C.O.M.
@@ -1058,7 +1050,7 @@
 
       INTEGER I
       CHARACTER(MaxPathLength) temp_file
-      REAL*8 CART(1:3,1:MAXATM)
+      REAL CART(1:3,1:MAXATM)
       INTEGER, EXTERNAL :: WriteMol2
       LOGICAL, EXTERNAL :: Get_ColourFlexibleTorsions
       INTEGER atom
@@ -1067,11 +1059,11 @@
       INTEGER tLength, BondNr
 
       natcry = NATOMS(iFrg)
-      CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
       DO I = 1, natcry
-        axyzo(I,1) = SNGL(CART(1,I))
-        axyzo(I,2) = SNGL(CART(2,I))
-        axyzo(I,3) = SNGL(CART(3,I))
+        axyzo(I,1) = CART(1,I)
+        axyzo(I,2) = CART(2,I)
+        axyzo(I,3) = CART(3,I)
         aelem(I) = zmElementCSD(I,iFrg)
         atomlabel(I) = OriginalLabel(I,iFrg)
       ENDDO
@@ -1152,7 +1144,7 @@
         OriginalLabel(iAtomNr,iFrg) = asym(iAtomNr,iFrg)(1:LEN_TRIM(asym(iAtomNr,iFrg)))// &
                                       LastNumberSoFarStr(1:LEN_TRIM(LastNumberSoFarStr))
       ENDDO
-          CALL zmDoAdmin(iFrg)
+      CALL zmDoAdmin(iFrg)
 
       END SUBROUTINE zmRelabel
 !
@@ -1440,12 +1432,12 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      DOUBLE PRECISION x,lb,ub,vm
-      COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
+      REAL             x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
 
-      DOUBLE PRECISION T0, rt
-      COMMON /saparl/  T0, rt
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
@@ -1459,7 +1451,7 @@
       LOGICAL, EXTERNAL :: NearlyEqual
       REAL    xtem
       INTEGER NMOVES, IFCOl, IFRow, ICHK
-      REAL    rpos
+      REAL    RPOS
       INTEGER tMaxRuns, I
       INTEGER iRow, iStatus
       INTEGER iFrg, iFrgCopy
@@ -1498,9 +1490,9 @@
 ! Go to the next stage of the SA input
               CALL WDialogSelect(IDD_SA_input3_2)
               RPOS = T0
-              CALL WDialogPutReal(IDF_SA_T0,RPOS,'(F7.2)')
+              CALL WDialogPutReal(IDF_SA_T0, RPOS, '(F7.2)')
               RPOS = RT
-              CALL WDialogPutReal(IDF_SA_Tredrate,RPOS,'(F6.3)')
+              CALL WDialogPutReal(IDF_SA_Tredrate, RPOS, '(F6.3)')
               NS = 20
               CALL WDialogPutInteger(IDF_SA_NS, NS)
               NT = 25
@@ -1545,7 +1537,7 @@
               ENDDO
               ! Note that we do not update "Preferred orientation"
               DO i = 1, kk
-                CALL WGridLabelRow(IDF_parameter_grid_modal,i,parlabel(i))
+                CALL WGridLabelRow(IDF_parameter_grid_modal, i, parlabel(i))
               ENDDO
             CASE (IDB_View)
               CALL WDialogGetMenu(IDF_MENU1, iOption)
@@ -1575,77 +1567,77 @@
               CALL WGridPos(EventInfo%X,IFCol,IFRow)
               SELECT CASE (IFCol)
                 CASE (1) ! parameter
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,4,IFRow,ICHK)
+                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid_modal,IFCol,IFRow,xtem)
+                    CALL WGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
                     xtem = MAX(xtem,prevlb(IFRow))
                     xtem = MIN(xtem,prevub(IFRow))
                     IF (.NOT. NearlyEqual(xtem,prevx(IFRow))) THEN
                       LimsChanged = .TRUE.
-                      CALL WGridPutCellReal(IDF_parameter_grid_modal,1,IFRow,xtem,'(F12.5)')
+                      CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem, '(F12.5)')
                       prevx(IFRow) = xtem
                     ENDIF
                   ENDIF
                 CASE (2) ! lower bound
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,4,IFRow,ICHK)
+                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid_modal,IFCol,IFRow,xtem)
+                    CALL WGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
                     xtem = MIN(xtem,prevub(IFRow))
                     IF (.NOT. NearlyEqual(xtem,prevlb(IFRow))) THEN
                       LimsChanged = .TRUE.
-                      CALL WGridPutCellReal(IDF_parameter_grid_modal,2,IFRow,xtem,'(F12.5)')
+                      CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, IFRow, xtem, '(F12.5)')
                       prevlb(IFRow) = xtem
-                      lb(IFRow) = DBLE(xtem)
+                      lb(IFRow) = xtem
                     ENDIF
                     xtem = MAX(prevlb(IFRow),prevx(IFRow))
-                    CALL WGridPutCellReal(IDF_parameter_grid_modal,1,IFRow,xtem,'(F12.5)')
+                    CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem, '(F12.5)')
                     prevx(IFRow) = xtem
                   ENDIF
                 CASE (3) ! upper bound
 ! JCC Check the bounding - only update if parameter is set to vary
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,4,IFRow,ICHK)
+                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid_modal,IFCol,IFRow,xtem)
+                    CALL WGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
                     xtem = MAX(xtem,prevlb(IFRow))
                     IF (.NOT. NearlyEqual(xtem,prevub(IFRow))) THEN
                       LimsChanged = .TRUE.
-                      CALL WGridPutCellReal(IDF_parameter_grid_modal,3,IFRow,xtem,'(F12.5)')
+                      CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, IFRow, xtem, '(F12.5)')
                       prevub(IFRow) = xtem
-                      ub(IFRow) = DBLE(xtem)
+                      ub(IFRow) = xtem
                     ENDIF
                     xtem = MIN(prevub(IFRow),prevx(IFRow))
-                    CALL WGridPutCellReal(IDF_parameter_grid_modal,1,IFRow,xtem,'(F12.5)')
+                    CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem, '(F12.5)')
                     prevx(IFRow) = xtem
                   ENDIF
                 CASE (4) ! fix or vary
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,IFCol,IFRow,ICHK)
+                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, IFCol, IFRow, ICHK)
                   IF (ICHK .EQ. Checked) THEN
                     CALL WGridGetCellReal(IDF_parameter_grid_modal,1,IFRow,xtem)
-                    lb(IFRow) = DBLE(xtem-1.0D-5)
-                    ub(IFRow) = DBLE(xtem+1.0D-5)
-                    CALL WGridStateCell(IDF_parameter_grid_modal,1,IFRow,DialogReadOnly)
-                    CALL WGridStateCell(IDF_parameter_grid_modal,2,IFRow,DialogReadOnly)
-                    CALL WGridStateCell(IDF_parameter_grid_modal,3,IFRow,DialogReadOnly)
-                    CALL WGridStateCell(IDF_parameter_grid_modal,5,IFRow,Disabled)
+                    lb(IFRow) = xtem-1.0E-5
+                    ub(IFRow) = xtem+1.0E-5
+                    CALL WGridStateCell(IDF_parameter_grid_modal, 1, IFRow, DialogReadOnly)
+                    CALL WGridStateCell(IDF_parameter_grid_modal, 2, IFRow, DialogReadOnly)
+                    CALL WGridStateCell(IDF_parameter_grid_modal, 3, IFRow, DialogReadOnly)
+                    CALL WGridStateCell(IDF_parameter_grid_modal, 5, IFRow, Disabled)
                   ELSE
                     lb(IFRow) = prevlb(IFRow)
                     ub(IFRow) = prevub(IFRow)
-                    CALL WGridStateCell(IDF_parameter_grid_modal,1,IFRow,Enabled)
-                    CALL WGridStateCell(IDF_parameter_grid_modal,2,IFRow,Enabled)
-                    CALL WGridStateCell(IDF_parameter_grid_modal,3,IFRow,Enabled)
+                    CALL WGridStateCell(IDF_parameter_grid_modal, 1, IFRow, Enabled)
+                    CALL WGridStateCell(IDF_parameter_grid_modal, 2, IFRow, Enabled)
+                    CALL WGridStateCell(IDF_parameter_grid_modal, 3, IFRow, Enabled)
                     IF (kzmpar2(IFRow) .EQ. 3) THEN
-                      CALL WGridStateCell(IDF_parameter_grid_modal,5,IFRow,Enabled)
+                      CALL WGridStateCell(IDF_parameter_grid_modal, 5, IFRow, Enabled)
                     ENDIF
                   ENDIF
-                  CALL WGridPutCellReal(IDF_parameter_grid_modal,2,IFRow,SNGL(lb(IFRow)),'(F12.5)')
-                  CALL WGridPutCellReal(IDF_parameter_grid_modal,3,IFRow,SNGL(ub(IFRow)),'(F12.5)')
+                  CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, IFRow, lb(IFRow), '(F12.5)')
+                  CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, IFRow, ub(IFRow), '(F12.5)')
                   LimsChanged = .TRUE.
               END SELECT ! IFCol
           END SELECT ! EventInfo%Value1 Field Changed Options
       END SELECT  ! EventType
 ! Modal Torsion Angle Button
       DO iRow = 1, NVAR
-        CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,5,iRow,iStatus)
+        CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 5, iRow, iStatus)
         IF (iStatus .EQ. Checked) THEN
           CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)                 
           CALL ShowBiModalDialog(IFRow, xtem)
@@ -1667,16 +1659,14 @@
 
       IMPLICIT NONE      
 
-      DOUBLE PRECISION T0, rt
-      COMMON /saparl/  T0, rt
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       INTEGER IHANDLE, KPOS
       INTEGER, EXTERNAL :: WriteSAParametersToFile
-      LOGICAL, EXTERNAL :: Get_AutoAlign
-
 
 ! We are now on window number 3
       CALL PushActiveWindowID
@@ -1728,6 +1718,8 @@
               CALL WDialogGetInteger(IDF_SA_RandomSeed1, ISeed1)
             CASE (IDF_SA_RandomSeed2) 
               CALL WDialogGetInteger(IDF_SA_RandomSeed2, ISeed2)
+            CASE (IDF_SA_Tredrate)
+              CALL WDialogGetReal(IDF_SA_Tredrate, RT)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -1752,8 +1744,8 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      DOUBLE PRECISION x,lb,ub,vm
-      COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
+      REAL             x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
@@ -1814,31 +1806,31 @@
       IF (ModalFlag(IfRow) .EQ. 1) THEN ! Not been set before
         CALL WDialogPutRadioButton(IDF_BiModalRadio) 
         IF (XInitial .GE. 0.00) THEN
-          CALL WDialogPutReal(IDF_ModalLower,Zero,'(F12.5)')
-          CALL WDialogPutReal(IDF_ModalUpper,OneEighty,'(F12.5)')
-          CALL WDialogPutReal(IDF_ReportLower1,((-1)*OneEighty),'(F12.5)')
-          CALL WDialogPutReal(IDF_ReportUpper1,Zero,'(F12.5)')
+          CALL WDialogPutReal(IDF_ModalLower, Zero, '(F12.5)')
+          CALL WDialogPutReal(IDF_ModalUpper, OneEighty, '(F12.5)')
+          CALL WDialogPutReal(IDF_ReportLower1, -OneEighty, '(F12.5)')
+          CALL WDialogPutReal(IDF_ReportUpper1, Zero,'(F12.5)')
         ELSE
-          CALL WDialogPutReal(IDF_ModalLower,((-1)*OneEighty),'(F12.5)')
-          CALL WDialogPutReal(IDF_ModalUpper,Zero,'(F12.5)')
-          CALL WDialogPutReal(IDF_ReportLower1,Zero,'(F12.5)')
-          CALL WDialogPutReal(IDF_ReportUpper1,OneEighty,'(F12.5)')
+          CALL WDialogPutReal(IDF_ModalLower, -OneEighty, '(F12.5)')
+          CALL WDialogPutReal(IDF_ModalUpper, Zero, '(F12.5)')
+          CALL WDialogPutReal(IDF_ReportLower1, Zero, '(F12.5)')
+          CALL WDialogPutReal(IDF_ReportUpper1, OneEighty, '(F12.5)')
         ENDIF
       ELSE
-        CALL WDialogPutReal(IDF_ModalLower,SNGL(lb(IFRow)),'(F12.5)')
-        CALL WDialogPutReal(IDF_ModalUpper,SNGL(ub(IFRow)),'(F12.5)')
+        CALL WDialogPutReal(IDF_ModalLower, lb(IFRow), '(F12.5)')
+        CALL WDialogPutReal(IDF_ModalUpper, ub(IFRow), '(F12.5)')
         IF (ModalFlag(IFRow) .EQ. 2) THEN
           CALL WDialogPutRadioButton(IDF_BiModalRadio)
           IF ((UB(IFRow) * LB(IFRow)) .LT. 0.00) THEN
             CALL WDialogGetReal(IDF_ModalUpper, xtem)
-            CALL WDialogPutReal(IDF_ReportLower1, (xtem - 180.00))
+            CALL WDialogPutReal(IDF_ReportLower1, (xtem - 180.0))
             CALL WDialogGetReal(IDF_ModalLower, xtem)
-            CALL WDialogPutReal(IDF_ReportUpper1, (xtem + 180.00))
+            CALL WDialogPutReal(IDF_ReportUpper1, (xtem + 180.0))
           ELSE
             CALL WDialogGetReal(IDF_ModalUpper, xtem)
-            CALL WDialogPutReal(IDF_ReportLower1, (xtem * (-1)))
+            CALL WDialogPutReal(IDF_ReportLower1, -xtem)
             CALL WDialogGetReal(IDF_ModalLower, xtem)
-            CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
+            CALL WDialogPutReal(IDF_ReportUpper1, -xtem)
           ENDIF
         ELSEIF (ModalFlag(IFRow) .EQ. 3) THEN
           CALL WDialogPutRadioButton(IDF_TriModalRadio)          
@@ -1877,8 +1869,8 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      DOUBLE PRECISION x,lb,ub,vm
-      COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
+      REAL             x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
@@ -1896,7 +1888,6 @@
       INTEGER ICol, NumColumns, ISET
       INTEGER Upper, Lower
       REAL    Zero, OneEighty, xtem, ttem
-      DOUBLE PRECISION TempDouble
       REAL TempPrevub, TempPrevlb, TempPrevx
 
 ! Initialise variables          
@@ -1906,7 +1897,6 @@
       Lower = 2
       Zero = 0.0000
       OneEighty = 180.0000
-
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_ModalDialog)
       SELECT CASE (EventType) 
@@ -1930,7 +1920,6 @@
                 CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
               ENDIF
               ModalFlag(RowNumber) = 2
-
             CASE (IDF_TriModalRadio)
               CALL WDialogGetReal(IDF_ModalUpper, xtem)
               CALL DetermineTrimodalBounds(xtem, Upper)               
@@ -1941,19 +1930,18 @@
               CALL WDialogPutReal(IDF_ReportLower1, Tempbounds(2,Lower))
               CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))            
               ModalFlag(RowNumber) = 3 
-                          
             CASE (IDF_Initial)
               CALL WDialogGetReal(IDF_Initial, xtem)       
               TempPrevx = xtem
-              xtem = MAX(SNGL(lb(RowNumber)),xtem)
-              X(RowNumber)=DBLE(MIN(SNGL(ub(RowNumber)),xtem))
-              CALL WDialogPutReal(IDF_Initial, SNGL(x(RowNumber)), '(F12.5)')
+              xtem = MAX(lb(RowNumber),xtem)
+              X(RowNumber)=(MIN(ub(RowNumber),xtem))
+              CALL WDialogPutReal(IDF_Initial, x(RowNumber), '(F12.5)')
             CASE (IDF_ModalLower)
                CALL WDialogGetReal(IDF_ModalLower, xtem)
-               xtem = MIN(SNGL(ub(RowNumber)),xtem)
+               xtem = MIN(ub(RowNumber),xtem)
                TempPrevlb = LB(RowNumber)               
-               lb(RowNumber) = DBLE(xtem)
-               CALL WDialogPutReal(IDF_ModalLower,SNGL(lb(RowNumber)),'(F12.5)')
+               lb(RowNumber) = xtem
+               CALL WDialogPutReal(IDF_ModalLower,lb(RowNumber),'(F12.5)')
 ! How ranges are calculated depends on state of Modal RadioButton  
                CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
                  SELECT CASE (ISET) !bimodal radiobutton active
@@ -1988,14 +1976,13 @@
                      CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))
                      ModalFlag(RowNumber) = 3
                  END SELECT
-             
             CASE (IDF_ModalUpper)
 ! Check the bounding - only update if parameter is set to vary
               CALL WDialogGetReal(IDF_ModalUpper,xtem)
-              xtem = MAX(SNGL(lb(RowNumber)),xtem)
+              xtem = MAX(lb(RowNumber),xtem)
               TempPrevUb = UB(RowNumber)             
-              ub(RowNumber) = DBLE(xtem)
-              CALL WDialogPutReal(IDF_ModalUpper,SNGL(ub(RowNumber)),'(F12.5)')
+              ub(RowNumber) = xtem
+              CALL WDialogPutReal(IDF_ModalUpper, ub(RowNumber), '(F12.5)')
 !             How ranges are calculated depends on state of Modal RadioButton      
               CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
                  SELECT CASE (ISET) ! Bimodal Radiobutton active
@@ -2029,17 +2016,13 @@
                      CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))
                    END SELECT
             END SELECT
-
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK)
 !             Record parameters in appropriate arrays
-              CALL WDialogGetDouble(IDF_Initial, tempdouble)
-              X(RowNumber) = tempdouble
-              CALL WDialogGetDouble(IDF_ModalLower, tempdouble)
-              lb(RowNumber) = tempdouble                                                                               
-              CALL WDialogGetDouble(IDF_ModalUpper, tempdouble)
-              ub(RowNumber) = tempdouble
+              CALL WDialogGetReal(IDF_Initial, X(RowNumber))
+              CALL WDialogGetReal(IDF_ModalLower, lb(RowNumber))
+              CALL WDialogGetReal(IDF_ModalUpper, ub(RowNumber))
 !             Check that x is in bounds
               IF (OutOfBounds(RowNumber, X(RowNumber))) THEN
                 CALL WarningMessage('Initial value does not fall within defined ranges')
@@ -2072,12 +2055,11 @@
           prevub(RowNumber) = UB(RowNumber)
           prevlb(RowNumber) = LB(RowNumber)
           CALL WDialogSelect(IDD_SA_Modal_Input2)
-          CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, RowNumber, SNGL(X(RowNumber)))
-          CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, RowNumber, SNGL(LB(RowNumber)))
-          CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, RowNumber, SNGL(UB(RowNumber))) 
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, RowNumber, X(RowNumber))
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, RowNumber, LB(RowNumber))
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, RowNumber, UB(RowNumber)) 
           CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5, RowNumber, UnChecked)                          
       END SELECT
- 
       CALL PopActiveWindowID
           
       END SUBROUTINE DealWithBimodalDialog
@@ -2193,7 +2175,7 @@
 
       INCLUDE 'PARAMS.INC'
 
-      DOUBLE PRECISION x,       lb,       ub,       vm
+      REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       INTEGER row
@@ -2218,13 +2200,13 @@
 
       IMPLICIT NONE      
 
-      INTEGER,          INTENT (IN   ) :: npar
-      DOUBLE PRECISION, INTENT (INOUT) :: XIn
+      INTEGER, INTENT (IN   ) :: npar
+      REAL,    INTENT (INOUT) :: XIn
 
       INCLUDE 'PARAMS.INC'
 
-      DOUBLE PRECISION x,       lb,       ub,       vm
-      COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
+      REAL             x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       INTEGER                ModalFlag,       RowNumber      
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNUmber
@@ -2242,9 +2224,9 @@
       OutOfBounds = .FALSE.
       SELECT CASE(ModalFlag(npar))
         CASE (2) ! bimodal ranges
-          IF (UB(npar) * LB(npar) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
-            TempUpper = SNGL(UB(npar))         ! so use 0-360 degree scale
-            TempLower = SNGL(LB(npar))
+          IF (UB(npar) * LB(npar) .LT. 0.0) THEN ! range such as -170 to 170 defined                                                  
+            TempUpper = UB(npar)         ! so use 0-360 degree scale
+            TempLower = LB(npar)
             TempLower2 = TempUpper - 180.00
             TempUpper2 = TempLower + 180.00
             CALL OneEightyToThreeSixty(TempUpper)
@@ -2263,8 +2245,8 @@
                 OutOfBounds = .TRUE.                                       
               ENDIF
             ENDIF
-          ELSEIF (UB(npar) * LB(npar) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
-              IF ((XIn .LT. -180.00) .OR. (XIn .GT. 180.00)) THEN
+          ELSEIF (UB(npar) * LB(npar) .GE. 0.0) THEN ! range such as 30-90 degs or -30- -90 defined
+              IF ((XIn .LT. -180.0) .OR. (XIn .GT. 180.0)) THEN
                 OutOfBounds = .TRUE.     
               ELSE
                 IF ((XIn .LT. LB(npar)) .OR. (XIn .GT. UB(npar))) THEN
@@ -2274,17 +2256,17 @@
                 ENDIF
               ENDIF
           ENDIF
-        CASE(3) !trimodal ranges
+        CASE (3) !trimodal ranges
           xtem = XIn
-          CALL DetermineTriModalBounds(SNGL(UB(npar)), Upper)
-          CALL DetermineTriModalBounds(SNGL(LB(npar)), Lower)
-          IF ((xtem .LT. -180.00) .OR. (xtem .GT.180.00)) THEN
+          CALL DetermineTriModalBounds(UB(npar), Upper)
+          CALL DetermineTriModalBounds(LB(npar), Lower)
+          IF ((xtem .LT. -180.0) .OR. (xtem .GT.180.0)) THEN
             OutOfBounds = .TRUE.
           ELSE                 
             CALL CheckTriModalBounds(OneEightyScale)
-            IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
+            IF (.NOT. OneEightyScale) THEN ! A range such as -170 to 170 has been defined
               CALL OneEightytoThreeSixty(xtem)    ! so use 0-360 scale
-              DO I = 1,3
+              DO I = 1, 3
                 CALL OneEightyToThreeSixty(TempBounds(I,Upper))
                 CALL OneEightyToThreeSixty(TempBounds(I,Lower))
               ENDDO

@@ -16,14 +16,14 @@
 
       INCLUDE 'PARAMS.INC'
 
-      DOUBLE PRECISION XOPT,       C,       FOPT
+      REAL XOPT,       C,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
-      DOUBLE PRECISION x,       lb,       ub,       vm
+      REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
-      DOUBLE PRECISION RULB
-      COMMON /RULB/    RULB(Mvar)
+      REAL          RULB
+      COMMON /RULB/ RULB(Mvar)
 
       REAL*4 XSIM(MVAR), DXSIM(MVAR)
 
@@ -69,7 +69,7 @@
       REAL, EXTERNAL :: SA_FCN
       LOGICAL tAccept, tLOG_HYDROGENS
       REAL    FTEM
-      DOUBLE PRECISION DFTEM
+      REAL DFTEM
       LOGICAL DesorbHydrogens
 
       IF (Auto .AND. (.NOT. Get_AutoLocalMinimisation())) RETURN
@@ -87,9 +87,9 @@
       N = NPAR
       DO II = 1, N
         I = IP(II)
-        XSIM(II) = SNGL(XOPT(I))
+        XSIM(II) = XOPT(I)
 !C DXSIM = initial step sizes.
-        DXSIM(II) = SA_SimplexDampingFactor*0.1*SNGL(RULB(I))
+        DXSIM(II) = SA_SimplexDampingFactor*0.1*RULB(I)
       ENDDO
       CALL SA_SIMOPT(XSIM,DXSIM,N,FTEM)
       IF (Auto) THEN
@@ -104,10 +104,10 @@
       IF (tAccept) THEN
         DO II = 1, N
           I = IP(II)
-          XOPT(I) = DBLE(XSIM(II))
-          X(I) = DBLE(XSIM(II))
+          XOPT(I) = XSIM(II)
+          X(I) = XSIM(II)
         ENDDO
-        FOPT = DBLE(FTEM)
+        FOPT = FTEM
         DO II = 1, NATOM
           DO III = 1, 3
             XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
@@ -116,21 +116,21 @@
         CALL valchipro(CHIPROBEST)
         num_new_min = num_new_min + 1
         CALL WDialogSelect(IDD_SA_Action1)
-        CALL WDialogPutReal(IDF_min_chisq,SNGL(FOPT),'(F8.2)')
-        CALL WDialogPutReal(IDF_profile_chisq2,CHIPROBEST,'(F8.2)')
+        CALL WDialogPutReal(IDF_min_chisq, FOPT, '(F8.2)')
+        CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
         CALL WDialogSelect(IDD_Summary)
-        CALL WGridPutCellReal(IDF_SA_Summary,4,Curr_SA_Run,CHIPROBEST,'(F7.2)')
-        CALL WGridPutCellReal(IDF_SA_Summary,5,Curr_SA_Run,SNGL(FOPT),'(F7.2)')
+        CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
+        CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
   !U      CALL WDialogSelect(IDD_Parameter_Status)
   !U      DO i = 1, nvar
-  !U        CALL WGridPutCellReal(IDF_CPL_grid,1,i,SNGL(xopt(i)),'(F12.5)')
+  !U        CALL WGridPutCellReal(IDF_CPL_grid,1,i,xopt(i),'(F12.5)')
   !U        DO icol = 2, 7
   !U          CALL WGridClearCell(IDF_CPL_grid,icol,i)
   !U        ENDDO
   !U      ENDDO
       ELSE
         IF (PrefParExists) THEN
-          CALL PO_PRECFC(SNGL(X(iPrfPar)))
+          CALL PO_PRECFC(X(iPrfPar))
           CALL FCN(X,DFTEM,0)
         ENDIF
       ENDIF
@@ -151,10 +151,10 @@
       REAL P(MVAR)
       INTEGER N
 
-      DOUBLE PRECISION x,       lb,       ub,       vm
+      REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
-      DOUBLE PRECISION XOPT,       C,       FOPT
+      REAL             XOPT,       C,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       INTEGER         NPAR, IP
@@ -163,7 +163,8 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      DOUBLE PRECISION CHIANS, DBLEP(MVAR)
+      REAL DBLEP(MVAR)
+      REAL CHIANS
       INTEGER I, II
 
       DO I = 1, NVAR
@@ -171,13 +172,11 @@
       ENDDO
       DO II = 1, N
         I = IP(II)
-        DBLEP(I) = DBLE(P(II))
+        DBLEP(I) = P(II)
       ENDDO
-      IF (PrefParExists) THEN
-        CALL PO_PRECFC(SNGL(DBLEP(iPrfPar)))
-      ENDIF
-      CALL FCN(DBLEP,CHIANS,0)
-      SA_FCN = SNGL(CHIANS)
+      IF (PrefParExists) CALL PO_PRECFC(DBLEP(iPrfPar))
+      CALL FCN(DBLEP, CHIANS, 0)
+      SA_FCN = CHIANS
 
       END FUNCTION SA_FCN
 !
