@@ -239,7 +239,14 @@
 !
       SUBROUTINE DO_ATOM_POS(TRANS,ROTA,POS,NATOMS)
 
-      REAL*8 TRANS(3), ROTA(3,3), POSIN(3), POS(3,*)
+      IMPLICIT NONE
+
+      REAL*8,  INTENT (IN   ) :: TRANS(3), ROTA(3,3)
+      REAL*8,  INTENT (  OUT) :: POS(3,*)
+      INTEGER, INTENT (IN   ) :: NATOMS
+
+      REAL*8 POSIN(3)
+      INTEGER I, J
 
       DO J = 1, NATOMS
         DO I = 1, 3
@@ -257,7 +264,12 @@
 !
       SUBROUTINE ROTCAR(XORTO,XORTN,ROTA)
 
-      REAL*8 XORTO(3), XORTN(3), ROTA(3,3)
+      IMPLICIT NONE
+
+      REAL*8,  INTENT (IN   ) :: XORTO(3), ROTA(3,3)
+      REAL*8,  INTENT (  OUT) :: XORTN(3)
+
+      INTEGER I, J
 
       DO I = 1, 3
         XORTN(I) = 0.
