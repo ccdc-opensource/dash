@@ -71,7 +71,7 @@
  
 ! If this is the first SA run and 2 points for the line graph have been determined, open Child Window
       IF ((SA_Run_Number.EQ.1) .AND. (iteration.EQ.2)) THEN
-        CALL WindowOpenChild(ChiHandle, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
+        CALL WindowOpenChild(ChiHandle,SysMenuOn+MinButton+AlwaysOnTop, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
         ChiSqdChildWindows(ChiHandle) = 1
         CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
       ENDIF
@@ -266,8 +266,11 @@
 ! save position of window before close.  If more than one chisqd window open (not
 ! the case in this implementation) will save the position of the last window closed.
           CALL WindowSelect(I)
-          Ix = WinfoWindow(WindowXpos)
-          Iy = WinfoWindow(WindowYpos)
+! JvdS If the window has been minimised, this turns out to return negative values
+          IF (WinfoWindow(WindowXpos) .GE. 0) THEN
+            Ix = WinfoWindow(WindowXpos)
+            Iy = WinfoWindow(WindowYpos)
+          ENDIF
           CALL WindowCloseChild(I)
           CALL UnRegisterChildWindow(I)
           ChiSqdChildWindows(I) = 0
