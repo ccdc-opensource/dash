@@ -3631,6 +3631,7 @@
 !D Sets up the packing of IFAM, IGEN, ISPC, PHASE, SOURCE  into one integer
 !D Sets up the permanent fix, vary and constraint lists
 !
+      INCLUDE 'PARAMS.INC'
       EXTERNAL PFXX, PCXX
       EXTERNAL F2PARS
       EXTERNAL PRPARS
@@ -3645,8 +3646,8 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
-     &                KTPCON(200)
+     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KTPCON(MaxConstraints)
       COMMON /LSETDA/ MFAM, MGEN, MSPC, LASTST
       COMMON /LSQPAK/ KKPACK(10,3)
 
