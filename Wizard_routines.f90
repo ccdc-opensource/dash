@@ -153,8 +153,7 @@
 !U                CALL WDialogHide()
 !U!C>>                          CALL WDialogSelect(IDD_PW_Page1)
 !U                GOTO 200
-!U! JvdS I think that 'IDF_PW1_Skip' should have been something like 'CommonClose'
-!U              CASE(IDF_PW1_Skip,IDCANCEL)
+!U              CASE(IDCLOSE,IDCANCEL)
 !U                SKIP = .TRUE.
 !U                CALL WDialogSelect(IDD_PW_Page1)
 !U                CALL WDialogHide()
@@ -163,7 +162,7 @@
 !U            END SELECT
 !U          CASE (FieldChanged)
 !U            SELECT CASE (EventInfo%VALUE1)
-!U              CASE (IDF_PW_Space_Group_Menu)
+!U              CASE (IDF_Space_Group_Menu)
 !U                CALL Update_Space_Group(IDD_PW_Page1, IDummy, IDummy)
 !U                NumPawleyRef = 0
 !U              CASE (IDF_Crystal_System_Menu)
@@ -219,8 +218,8 @@
 !U                CALL WDialogGetReal(IDF_PW_wavelength1,Temp)
 !U                CALL UpdateWavelength(Temp)
 !U!C>> JCC Add in function  
-!U              CASE (IDF_PW_Wavelength_Menu)
-!U                CALL WDialogGetMenu(IDF_PW_Wavelength_Menu,IRadSelection)
+!U              CASE (IDF_Wavelength_Menu)
+!U                CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
 !U                CALL SetWavelengthToSelection(IRadSelection)
 !U            END SELECT
 !U          CASE (PushButton)
@@ -286,7 +285,7 @@
 !U!C>>                    SKIP = .TRUE.
 !U                CALL WDialogHide()
 !U! JvdS It's kind of dirty that 'Cancel' and 'Finish' amount to the same thing.
-!U              CASE(IDF_PW3_Finish,IDCANCEL)
+!U              CASE(IDFINISH,IDCANCEL)
 !U                SKIP = .TRUE.
 !U                CALL WDialogHide()
 !U                CALL ToggleMenus(1)
@@ -387,7 +386,7 @@
         CASE (PushButton) ! one of the buttons was pushed
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_PW3_Finish, IDCANCEL) ! The 'Close' button
+            CASE (IDFINISH, IDCANCEL)
               CALL EndWizard
             CASE (IDBACK)
               IXPos_IDD_Wizard = WInfoDialog(6)
@@ -447,14 +446,14 @@
               CALL WDialogHide()
               CALL WDialogSelect(IDD_PW_Page2)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-            CASE (IDF_PW1_Skip, IDCANCEL) ! The 'Close' button
+            CASE (IDCLOSE, IDCANCEL)
               CALL EndWizard
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowUnitCellParameters 1')
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_PW_Space_Group_Menu)
+            CASE (IDF_Space_Group_Menu)
               CALL Update_Space_Group(IDD_PW_Page1, IDummy, IDummy)
               NumPawleyRef = 0
             CASE (IDF_Crystal_System_Menu)
@@ -540,8 +539,8 @@
               CALL WDialogGetReal(IDF_PW_wavelength1,Temp)
               CALL UpdateWavelength(Temp)
               CALL Generate_TicMarks 
-            CASE (IDF_PW_Wavelength_Menu)
-              CALL WDialogGetMenu(IDF_PW_Wavelength_Menu,IRadSelection)
+            CASE (IDF_Wavelength_Menu)
+              CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
               CALL SetWavelengthToSelection(IRadSelection)
               CALL Generate_TicMarks 
           END SELECT                
@@ -605,7 +604,7 @@
           CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
           CALL WDialogFieldState(IDF_PW_radiation_label,Enabled)
           CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
-          CALL WDialogFieldState(IDF_PW_Wavelength_Menu,Enabled)
+          CALL WDialogFieldState(IDF_Wavelength_Menu,Enabled)
           CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
           CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
           CALL WDialogFieldState(IDF_PW_flight_path,Disabled)
@@ -627,7 +626,7 @@
           CALL WDialogSelect(IDD_PW_Page2)
           CALL WDialogFieldState(IDF_PW_CW_group,Enabled)
           CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-          CALL WDialogFieldState(IDF_PW_Wavelength_Menu,Disabled)
+          CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
           CALL WDialogFieldState(IDF_PW_wavelength1,Enabled)
           CALL WDialogFieldState(IDF_PW_TOF_group,Disabled)
           CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Disabled)
@@ -658,7 +657,7 @@
           CALL WDialogSelect(IDD_PW_Page2)
           CALL WDialogFieldState(IDF_PW_CW_group,Disabled)
           CALL WDialogFieldState(IDF_PW_radiation_label,Disabled)
-          CALL WDialogFieldState(IDF_PW_Wavelength_Menu,Disabled)
+          CALL WDialogFieldState(IDF_Wavelength_Menu,Disabled)
           CALL WDialogFieldState(IDF_PW_wavelength1,Disabled)
           CALL WDialogFieldState(IDF_PW_TOF_group,Enabled)
           CALL WDialogFieldState(IDF_PW_Flight_Path_Label,Enabled)

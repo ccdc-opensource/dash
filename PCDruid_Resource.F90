@@ -1,4 +1,4 @@
-! Winteracter module created : 10/Aug/2001 16:05:41
+! Winteracter module created : 13/Aug/2001 17:14:58
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -161,7 +161,6 @@
           INTEGER, PARAMETER :: IDF_PW_Logo2                    =  1207
           INTEGER, PARAMETER :: IDF_PW_Logo3                    =  1208
           INTEGER, PARAMETER :: ID_PW_DF_Open                   =  1210
-          INTEGER, PARAMETER :: IDF_PW1_Skip                    =  1211
           INTEGER, PARAMETER :: IDFINISH                        =  1048
           INTEGER, PARAMETER :: IDD_PW_Page1                    =   122
           INTEGER, PARAMETER :: IDD_PW_Page2                    =   123
@@ -182,7 +181,6 @@
           INTEGER, PARAMETER :: IDF_PW_bet_latt_label           =  1225
           INTEGER, PARAMETER :: IDF_PW_c_latt_label             =  1228
           INTEGER, PARAMETER :: IDF_PW_gam_latt_label           =  1229
-          INTEGER, PARAMETER :: IDF_PW_Space_Group_Menu         =  1233
           INTEGER, PARAMETER :: IDF_PW_Source_Group             =  1234
           INTEGER, PARAMETER :: IDF_PW_LabX_Source              =  1235
           INTEGER, PARAMETER :: IDF_PW_SynX_Source              =  1236
@@ -191,7 +189,6 @@
           INTEGER, PARAMETER :: IDF_PW_CW_group                 =  1240
           INTEGER, PARAMETER :: IDF_PW_wavelength1              =  1243
           INTEGER, PARAMETER :: IDF_PW_radiation_label          =  1245
-          INTEGER, PARAMETER :: IDF_PW_Wavelength_Menu          =  1246
           INTEGER, PARAMETER :: IDF_PW_TOF_group                =  1247
           INTEGER, PARAMETER :: IDF_PW_Flight_Path_Label        =  1248
           INTEGER, PARAMETER :: IDF_PW_flight_path              =  1249
@@ -199,7 +196,6 @@
           INTEGER, PARAMETER :: IDF_PW_2theta0                  =  1251
           INTEGER, PARAMETER :: IDD_PW_Page3                    =   124
           INTEGER, PARAMETER :: IDF_PW_Logo4                    =  1256
-          INTEGER, PARAMETER :: IDF_PW3_Finish                  =  1259
           INTEGER, PARAMETER :: IDF_PWa_Data_Group              =  1261
           INTEGER, PARAMETER :: IDF_PWa_Data_fFilename          =  1262
           INTEGER, PARAMETER :: IDF_PWa_DataFileName_String     =  1263

@@ -424,7 +424,7 @@
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,1)
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutMenu(IDF_PW_Space_Group_Menu,SGHMaBrStr,NumBrSG,1)
+      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,1)
       CALL PopActiveWindowID
 
       END SUBROUTINE SetSpaceGroupMenu
@@ -457,7 +457,7 @@
       ELSE IF (IUploadFrom .EQ. IDD_PW_Page1) THEN
         CALL WDialogSelect(IDD_PW_Page1)
         CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
-        CALL WDialogGetMenu(IDF_PW_Space_Group_Menu,ISPosSG)
+        CALL WDialogGetMenu(IDF_Space_Group_Menu,ISPosSG)
       ELSE
         LatBrav = TheCrystalSystem
         ISPosSG = ISgnum - LPosSG(LatBrav) + 1
@@ -469,7 +469,7 @@
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutOption(IDF_PW_Space_Group_Menu,ISPosSG)
+      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
       CALL SetCrystalSystem(LatBrav)
       CALL PopActiveWindowID
 
@@ -698,7 +698,7 @@
         CALL WDialogSelect(IDD_Data_Properties)
         CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
         CALL WDialogSelect(IDD_PW_Page2)
-        CALL WDialogPutOption(IDF_PW_Wavelength_Menu,IRadSelection)
+        CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
       ENDIF
       CALL PopActiveWindowID
 

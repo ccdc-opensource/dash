@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 10/Aug/2001 16:05:41
+// Modified : 13/Aug/2001 17:14:58
 //
 ///////////////////////////////////////////////////
 //
@@ -174,7 +174,6 @@
 #define IDF_PW_Logo2                     1207
 #define IDF_PW_Logo3                     1208
 #define ID_PW_DF_Open                    1210
-#define IDF_PW1_Skip                     1211
 #define IDFINISH                         1048
 #define IDD_PW_Page1                      122
 #define IDD_PW_Page2                      123
@@ -195,7 +194,6 @@
 #define IDF_PW_bet_latt_label            1225
 #define IDF_PW_c_latt_label              1228
 #define IDF_PW_gam_latt_label            1229
-#define IDF_PW_Space_Group_Menu          1233
 #define IDF_PW_Source_Group              1234
 #define IDF_PW_LabX_Source               1235
 #define IDF_PW_SynX_Source               1236
@@ -204,7 +202,6 @@
 #define IDF_PW_CW_group                  1240
 #define IDF_PW_wavelength1               1243
 #define IDF_PW_radiation_label           1245
-#define IDF_PW_Wavelength_Menu           1246
 #define IDF_PW_TOF_group                 1247
 #define IDF_PW_Flight_Path_Label         1248
 #define IDF_PW_flight_path               1249
@@ -212,7 +209,6 @@
 #define IDF_PW_2theta0                   1251
 #define IDD_PW_Page3                      124
 #define IDF_PW_Logo4                     1256
-#define IDF_PW3_Finish                   1259
 #define IDF_PWa_Data_Group               1261
 #define IDF_PWa_Data_fFilename           1262
 #define IDF_PWa_DataFileName_String      1263
@@ -1182,7 +1178,7 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  128,   40,   14
     CONTROL "&Close",IDF_PW0_Skip,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  206,  128,   40,   14
     CONTROL "DASH options",IDF_PW_Option_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  126,   52,  144,   72
-    CONTROL "View data / determine peaks positions",IDF_PW_Option1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  134,   64,  132,   14
+    CONTROL "View data / determine peak positions",IDF_PW_Option1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  134,   64,  132,   14
     CONTROL "Preparation for Pawley refinement",IDF_PW_Option2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  134,   78,  132,   14
     CONTROL "Simulated annealing structure solution",IDF_PW_Option3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  134,   92,  132,   14
     CONTROL "Constrained Rietveld refinement",IDF_PW_Option4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  134,  106,  132,   14
@@ -1221,10 +1217,10 @@ BEGIN
     CONTROL "",IDF_bet_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  220,   56,   40,   14
     CONTROL "",IDF_gam_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  296,   56,   40,   14
     CONTROL "",IDF_Crystal_System_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  122,   92,   80,   48
-    CONTROL "",IDF_PW_Space_Group_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  248,   92,   80,   50
+    CONTROL "",IDF_Space_Group_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  248,   92,   80,   50
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  128,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  128,   40,   14
-    CONTROL "&Close",IDF_PW1_Skip,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  207,  128,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  207,  128,   40,   14
     CONTROL "Alpha",IDF_PW_alp_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  114,   57,   24,    8
     CONTROL "Beta",IDF_PW_bet_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  192,   57,   24,    8
     CONTROL "b",IDF_PW_b_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  200,   44,   16,    8
@@ -1274,7 +1270,7 @@ BEGIN
     CONTROL "Diffraction data (.xye)",IDF_PW_Data_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  186,    4,  194,   48
     CONTROL "Wavelength for angle dispersive  X-ray data in Å",IDF_PW_CW_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  188,   56,  192,   48
     CONTROL "Radiation",IDF_PW_radiation_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  196,   78,   34,    8
-    CONTROL "",IDF_PW_Wavelength_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  236,   76,   60,   64
+    CONTROL "",IDF_Wavelength_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  236,   76,   60,   64
     CONTROL "",IDF_PW_wavelength1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  302,   74,   40,   14
     CONTROL "Time-of-flight neutron",IDF_PW_TOF_group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | BS_GROUPBOX | BS_TEXT | BS_LEFT,  188,  108,  192,   30
     CONTROL "flight path (m.)",IDF_PW_Flight_Path_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,  198,  120,   48,    8
@@ -1299,7 +1295,7 @@ BEGIN
 " 1237 0 \n"
 " 1238 0 \n"
 "[Menus] \n"
-" 1246     6     2 \n"
+" 1045     6     2 \n"
 "<...> \n"
 "Cu Ka1 \n"
 "Mo Ka1 \n"
@@ -1327,7 +1323,7 @@ BEGIN
     CONTROL "&Browse...",ID_PWa_DF_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  208,   56,   40,   14
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  128,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  128,   40,   14
-    CONTROL "&Finish",IDF_PW3_Finish,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  205,  128,   40,   14
+    CONTROL "&Finish",IDFINISH,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  205,  128,   40,   14
     CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  158,   56,   40,   14
 END
 
@@ -2242,7 +2238,7 @@ FONT    8, "MS Sans Serif"
 CAPTION "Errors detected during Pawley fit"
 BEGIN
     CONTROL "The extracted intensities are ill conditioned due to a high degree of overlap in the data set and so could be unreliable in certain ranges",IDF_Pawley_ErrorLog_Intro,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    8,    8,  204,   20
-    CONTROL "Full details of the problems is recorded in the fit list file, polyp.lis",IDF_Pawley_ErrorLog_Intro2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,    8,   28,  204,   12
+    CONTROL "Full details of the problems are recorded in the fit list file, polyp.lis",IDF_Pawley_ErrorLog_Intro2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,    8,   28,  204,   12
     CONTROL "You may be able to fix the problem by decreasing the data range in 2-theta or by increasing the overlap criterion",IDF_Pawley_ErrorLog_intro3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,    8,   40,  204,   20
     CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   28,   68,   40,   14
     CONTROL "View fit list file",ID_Edit_PawleyLog,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  136,   68,   50,   14
