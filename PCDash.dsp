@@ -72,9 +72,10 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt /winapp
-# ADD F90 /browser /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /nologo /traceback /warn:argument_checking /warn:nofileopt
+# ADD F90 /browser /check:power /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /nologo /traceback /warn:argument_checking /warn:nofileopt /warn:unused
+# SUBTRACT F90 /check:bounds /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations /warn:truncated_source
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /W4 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "_DEBUG"
@@ -98,10 +99,36 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
 # Begin Source File
 
-SOURCE=.\Abcalc.for
-DEP_F90_ABCAL=\
-	".\FFCALC.INC"\
-	".\params.inc"\
+SOURCE=.\Basic_IO.f90
+DEP_F90_BASIC=\
+	".\DRUID_HEADER.mod"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\Basic_Strings.f90
+# End Source File
+# Begin Source File
+
+SOURCE=.\Basic_Vectors.f90
+DEP_F90_BASIC_=\
+	".\DRUID_HEADER.mod"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\BeginSa.f90
+DEP_F90_BEGIN=\
+	".\DialogPosCmn.inc"\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -109,6 +136,17 @@ DEP_F90_ABCAL=\
 SOURCE=.\Ccslmain.for
 DEP_F90_CCSLM=\
 	".\Reflns.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\Chi_sq_plot.F90
+DEP_F90_CHI_S=\
+	".\DRUID_HEADER.mod"\
+	".\params.inc"\
+	".\POLY_COLOURS.INC"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -121,13 +159,37 @@ DEP_F90_CREAT=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\Dialog_Routines.f90
+DEP_F90_DIALO=\
+	".\DRUID_HEADER.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\DoAtomPositions.for
+# End Source File
+# Begin Source File
+
+SOURCE=.\error_message.f90
+DEP_F90_ERROR=\
+	".\Reflns.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\Eval.for
 DEP_F90_EVAL_=\
 	".\IZMCheck.inc"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\Fcn.f90
+DEP_F90_FCN_F=\
+	".\DRUID_HEADER.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -216,6 +278,7 @@ SOURCE=.\Frac2cart.for
 
 SOURCE=.\Generate_TicMarks.for
 DEP_F90_GENER=\
+	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\statlog.inc"\
 	
@@ -224,7 +287,7 @@ DEP_F90_GENER=\
 
 SOURCE=.\get_logref.for
 DEP_F90_GET_L=\
-	".\GET_LOGREF.inc"\
+	".\GLBVAR.INC"\
 	".\params.inc"\
 	".\statlog.inc"\
 	
@@ -234,6 +297,7 @@ DEP_F90_GET_L=\
 SOURCE=.\getdsl.f90
 DEP_F90_GETDS=\
 	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -255,13 +319,47 @@ DEP_F90_GETPI=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\Initialisation.f90
+DEP_F90_INITI=\
+	".\DialogPosCmn.inc"\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
+	".\params.inc"\
+	".\POLY_COLOURS.INC"\
+	".\statlog.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\Mag.for
+# End Source File
+# Begin Source File
+
+SOURCE=.\Main_Field_Changed_Routines.f90
+DEP_F90_MAIN_=\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
+	".\POLY_COLOURS.INC"\
+	".\statlog.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
 # End Source File
 # Begin Source File
 
 SOURCE=.\MCBack.f90
 DEP_F90_MCBAC=\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
 	".\params.inc"\
+	".\statlog.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -292,10 +390,11 @@ SOURCE=.\Mvec.for
 # End Source File
 # Begin Source File
 
-SOURCE=.\Pawley.for
+SOURCE=.\Pawley.f90
 DEP_F90_PAWLE=\
 	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\statlog.inc"\
@@ -315,7 +414,9 @@ DEP_F90_PAWLEY=\
 
 SOURCE=.\PCDruid_Main.f90
 DEP_F90_PCDRU=\
+	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\statlog.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -339,6 +440,41 @@ SOURCE=.\PF_Simplex.for
 # End Source File
 # Begin Source File
 
+SOURCE=.\plot_test.F90
+DEP_F90_PLOT_=\
+	".\DRUID_HEADER.mod"\
+	".\params.inc"\
+	".\POLY_COLOURS.INC"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\PolyFitter_Subs.f90
+DEP_F90_POLYF=\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\params.inc"\
+	".\POLY_COLOURS.INC"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\PolyLoadFiles.f90
+DEP_F90_POLYL=\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
+	".\params.inc"\
+	".\statlog.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\Pr.for
 DEP_F90_PR_FO=\
 	".\params.inc"\
@@ -347,11 +483,98 @@ DEP_F90_PR_FO=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\Profile_Plot.f90
+DEP_F90_PROFI=\
+	".\GLBVAR.INC"\
+	".\params.inc"\
+	".\POLY_COLOURS.INC"\
+	".\statlog.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\PutSimplexChisq.f90
+DEP_F90_PUTSI=\
+	".\DRUID_HEADER.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\read_one_zm.for
 # End Source File
 # Begin Source File
 
-SOURCE=.\SA_INPUT.FOR
+SOURCE=.\Res2Mol2.f90
+DEP_F90_RES2M=\
+	".\Variables.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\SA_Defaults.f90
+# End Source File
+# Begin Source File
+
+SOURCE=.\SA_main.f90
+DEP_F90_SA_MA=\
+	".\DialogPosCmn.inc"\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\IZMCheck.inc"\
+	".\Lattice.inc"\
+	".\statlog.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\sa_move_status.f90
+DEP_F90_SA_MO=\
+	".\DRUID_HEADER.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\SA_output.f90
+DEP_F90_SA_OU=\
+	".\DRUID_HEADER.mod"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\sa_plot.f90
+DEP_F90_SA_PL=\
+	".\DRUID_HEADER.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\SA_Profile_Plot.f90
+DEP_F90_SA_PR=\
+	".\GLBVAR.INC"\
+	".\params.inc"\
+	".\statlog.inc"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\sa_refresh.f90
+DEP_F90_SA_RE=\
+	".\DialogPosCmn.inc"\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\params.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
 # End Source File
 # Begin Source File
 
@@ -359,9 +582,18 @@ SOURCE=.\Sa_simopt.for
 # End Source File
 # Begin Source File
 
+SOURCE=.\sa_simplex.f90
+DEP_F90_SA_SI=\
+	".\DRUID_HEADER.mod"\
+	".\params.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\SA_structure_output.for
 DEP_F90_SA_ST=\
-	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
 	".\IZMCheck.inc"\
 	".\Lattice.inc"\
 	".\statlog.inc"\
@@ -378,22 +610,29 @@ DEP_F90_SA_SU=\
 # End Source File
 # Begin Source File
 
-SOURCE=.\SGDecode.for
+SOURCE=.\sa_upload.f90
 # End Source File
 # Begin Source File
 
-SOURCE=.\SplineFit.f90
-DEP_F90_SPLIN=\
+SOURCE=.\SAsoln_store.f90
+DEP_F90_SASOL=\
 	".\DRUID_HEADER.mod"\
 	".\params.inc"\
-	".\POLY_COLOURS.INC"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\SAsummary.f90
+DEP_F90_SASUM=\
+	".\DRUID_HEADER.mod"\
+	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
 
-SOURCE=.\subplxopt.for
+SOURCE=.\SGDecode.for
 # End Source File
 # Begin Source File
 
@@ -409,9 +648,37 @@ DEP_F90_TUTOR=\
 SOURCE=.\Upload_Cell_Constants.f90
 DEP_F90_UPLOA=\
 	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
 	".\Lattice.inc"\
+	".\params.inc"\
 	".\statlog.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\Upload_Positions.f90
+DEP_F90_UPLOAD=\
+	".\DRUID_HEADER.mod"\
+	".\params.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\Upload_Widths.f90
+DEP_F90_UPLOAD_=\
+	".\DRUID_HEADER.mod"\
+	".\params.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\UserInputChecks.f90
+DEP_F90_USERI=\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
 	
 # End Source File
 # Begin Source File
@@ -423,8 +690,21 @@ SOURCE=.\Utilities.for
 SOURCE=.\Valchi.for
 DEP_F90_VALCH=\
 	".\AllFFCalc.inc"\
+	".\GLBVAR.INC"\
 	".\params.inc"\
 	".\statlog.inc"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\valchipro.f90
+DEP_F90_VALCHI=\
+	".\AllFFCalc.inc"\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\params.inc"\
+	".\statlog.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -443,10 +723,12 @@ DEP_F90_WIFD9=\
 
 SOURCE=.\Wizard_routines.f90
 DEP_F90_WIZAR=\
-	".\DialogPosCmnf90.inc"\
+	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\statlog.inc"\
+	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -464,15 +746,19 @@ SOURCE=.\DialogPosCmn.inc
 # End Source File
 # Begin Source File
 
-SOURCE=.\fcdata.inc
-# End Source File
-# Begin Source File
-
 SOURCE=.\GET_LOGREF.inc
 # End Source File
 # Begin Source File
 
+SOURCE=.\GLBVAR.INC
+# End Source File
+# Begin Source File
+
 SOURCE=.\IZMCheck.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\Lattice.inc
 # End Source File
 # Begin Source File
 
@@ -485,6 +771,10 @@ SOURCE=.\POLY_COLOURS.INC
 # Begin Source File
 
 SOURCE=.\posns.inc
+# End Source File
+# Begin Source File
+
+SOURCE=.\Reflns.inc
 # End Source File
 # Begin Source File
 
@@ -585,253 +875,6 @@ SOURCE=.\res\WizardWelcome.bmp
 # Begin Source File
 
 SOURCE=.\res\ZOOM.BMP
-# End Source File
-# End Group
-# Begin Group "Interface"
-
-# PROP Default_Filter "f90"
-# Begin Group "Simulated Annealing"
-
-# PROP Default_Filter "f90"
-# Begin Source File
-
-SOURCE=.\BeginSa.f90
-DEP_F90_BEGIN=\
-	".\DialogPosCmnf90.inc"\
-	".\DRUID_HEADER.mod"\
-	".\Lattice.inc"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\PutSimplexChisq.f90
-DEP_F90_PUTSI=\
-	".\DRUID_HEADER.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\SA_Defaults.f90
-# End Source File
-# Begin Source File
-
-SOURCE=.\SA_main.f90
-DEP_F90_SA_MA=\
-	".\DialogPosCmnf90.inc"\
-	".\DRUID_HEADER.mod"\
-	".\IZMCheck.inc"\
-	".\Lattice.inc"\
-	".\statlog.inc"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\sa_move_status.f90
-DEP_F90_SA_MO=\
-	".\DRUID_HEADER.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\SA_output.f90
-DEP_F90_SA_OU=\
-	".\DRUID_HEADER.mod"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\SA_PLOT.F90
-DEP_F90_SA_PL=\
-	".\DRUID_HEADER.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\SA_Profile_Plot.f90
-DEP_F90_SA_PR=\
-	".\params.inc"\
-	".\statlog.inc"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\sa_refresh.f90
-DEP_F90_SA_RE=\
-	".\DialogPosCmnf90.inc"\
-	".\DRUID_HEADER.mod"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\sa_simplex.f90
-DEP_F90_SA_SI=\
-	".\DRUID_HEADER.mod"\
-	".\params.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\sa_upload.f90
-DEP_F90_SA_UP=\
-	".\DRUID_HEADER.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# End Group
-# Begin Source File
-
-SOURCE=.\Dialog_Routines.f90
-DEP_F90_DIALO=\
-	".\DRUID_HEADER.mod"\
-	".\Lattice.inc"\
-	".\statlog.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\error_message.f90
-DEP_F90_ERROR=\
-	".\reflns.inc90"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\Fcn.f90
-DEP_F90_FCN_F=\
-	".\DRUID_HEADER.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\inf_upload.f90
-DEP_F90_INF_U=\
-	".\DRUID_HEADER.mod"\
-	".\params.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\Main_Field_Changed_Routines.f90
-DEP_F90_MAIN_=\
-	".\DRUID_HEADER.mod"\
-	".\Lattice.inc"\
-	".\statlog.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\PolyFitter_Defaults.f90
-DEP_F90_POLYF=\
-	".\DialogPosCmnf90.inc"\
-	".\DRUID_HEADER.mod"\
-	".\Lattice.inc"\
-	".\params.inc"\
-	".\POLY_COLOURS.INC"\
-	".\statlog.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\PolyFitter_Subs.f90
-DEP_F90_POLYFI=\
-	".\DRUID_HEADER.mod"\
-	".\params.inc"\
-	".\POLY_COLOURS.INC"\
-	".\statlog.inc"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\PolyLoadFiles.f90
-DEP_F90_POLYL=\
-	".\DRUID_HEADER.mod"\
-	".\Lattice.inc"\
-	".\params.inc"\
-	".\statlog.inc"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\Profile_Plot.f90
-DEP_F90_PROFI=\
-	".\DRUID_HEADER.mod"\
-	".\params.inc"\
-	".\POLY_COLOURS.INC"\
-	".\statlog.inc"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\Upload_Positions.f90
-DEP_F90_UPLOAD=\
-	".\DRUID_HEADER.mod"\
-	".\params.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\Upload_Widths.f90
-DEP_F90_UPLOAD_=\
-	".\DRUID_HEADER.mod"\
-	".\params.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\valchipro.f90
-DEP_F90_VALCHI=\
-	".\AllFFCalc.inc"\
-	".\DRUID_HEADER.mod"\
-	".\params.inc"\
-	".\statlog.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\zm_upload.f90
-DEP_F90_ZM_UP=\
-	".\DRUID_HEADER.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# End Group
-# Begin Group "Interface Includes"
-
-# PROP Default_Filter "inc"
-# Begin Source File
-
-SOURCE=.\DialogPosCmnf90.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\reflns.inc90
 # End Source File
 # End Group
 # Begin Group "SGinc"
@@ -1030,24 +1073,17 @@ SOURCE=.\SGinc\ffcalc_485.inc
 SOURCE=.\SGinc\ffcalctop.inc
 # End Source File
 # End Group
-# Begin Group "Common Blocks"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\Lattice.inc
-# End Source File
-# Begin Source File
-
-SOURCE=.\Reflns.inc
-# End Source File
-# End Group
 # Begin Group "Licensing"
 
 # PROP Default_Filter ""
 # Begin Source File
 
 SOURCE=.\licensing.f90
+DEP_F90_LICEN=\
+	".\DRUID_HEADER.mod"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
 # End Source File
 # End Group
 # Begin Source File
@@ -1057,6 +1093,10 @@ SOURCE=.\Buglist.txt
 # Begin Source File
 
 SOURCE=.\Interface.txt
+# End Source File
+# Begin Source File
+
+SOURCE=.\UnusedCode.txt
 # End Source File
 # End Target
 # End Project
