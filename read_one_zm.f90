@@ -195,7 +195,7 @@
           IF (izmpar(iFrg) .EQ. MaxDOF) THEN
             ioptt(i,iFrg) = 0
           ELSE
-            izmpar(iFrg) = izmpar(ifrg) + 1
+            izmpar(iFrg) = izmpar(iFrg) + 1
             izm = izmpar(iFrg)
             kzmpar(izm,iFrg) = 3
             czmpar(izm,iFrg) = '('//OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
