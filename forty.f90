@@ -390,7 +390,7 @@
   950 FORTY = -2
       IF (IPK.NE.0) CLOSE (ipk,IOSTAT=istat)
       IBMBER = 0
-      RETURN
+
       END FUNCTION FORTY
 !*==PFCN03.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -523,16 +523,13 @@
         PWD(I,JPHASE,JSOURC) = WDCN03(I)
       ENDDO
       GOTO 100
-!
 ! N=1: ADD PACKED VOCABULARY FOR THIS SOURCE, THIS PHASE, TO THE MAIN LIST:
     1 CALL VOCAB(WDCN03,IWCN03,NW)
       GOTO 100
-!
 ! PROFILE REFINEMENT STAGE:
-!
     2 MN = 512
       MN2 = MN/2
-!.. Peak positions may have changed - check and re-sort if necessary
+! Peak positions may have changed - check and re-sort if necessary
       DO IR = 1, MAXK
         KNOW = IR
         CALL CELDER(REFH(1,KNOW),ARTEM)
@@ -541,12 +538,10 @@
         ZARGK(IR) = ARGK
       ENDDO
       CALL SORTX(ZARGK,KORD,MAXK)
-!
-!.. Set the number of peaks at each point to zero
+! Set the number of peaks at each point to zero
       DO II = 1, NPTS
         IOCCR(II) = 0
       ENDDO
-!
       DO IR = 1, MAXK
         IRT = KORD(IR)
         ZTEM(IR) = ZARGK(IRT)
@@ -557,7 +552,6 @@
           TF4PAR(IR) = F4PAR(1,IRT)
         ENDIF
       ENDDO
-!
       DO IR = 1, MAXK
         ZARGK(IR) = ZTEM(IR)
         DO I = 1, 3
@@ -567,7 +561,6 @@
           F4PAR(1,IR) = TF4PAR(IR)
         ENDIF
       ENDDO
-!
       IOBS = 1
       DO IRT = 1, MAXK
 !        IR=KORD(IRT)
@@ -580,19 +573,17 @@
         ENDDO
    30   CONTINUE
       ENDDO
-!
 !      IPOINT(1)=0
       KOUNT = 0
       DO KNOW = 1, MAXK
         ARGK = ZARGK(KNOW)
         CALL FDCN03(2)
-!.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
-!.. THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
-!.. DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
+! FFT CALCULATION STAGE IN PROFILE REFINEMENT
+! THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
+! DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
         CALL FCSUB3(MN)
-!
-!.. FFT OVER
-!.. FIND THE PEAK MAXIMUM VALUE AND THEN WORK OUT THE PEAK LIMITS
+! FFT OVER
+! FIND THE PEAK MAXIMUM VALUE AND THEN WORK OUT THE PEAK LIMITS
         PKMAX = PKCONV(1,1)
         IPMAX = 1
         DO I = 1, MN
@@ -601,7 +592,6 @@
             IPMAX = I
           ENDIF
         ENDDO
-!..
         PKCRIT = TOLR(1,JSOURC)
         PKCT = PKCRIT*PKMAX
         IMINT = 1
@@ -618,7 +608,6 @@
             GOTO 1520
           ENDIF
         ENDDO
-!
  1520   ARIMIN = ARGK + ZXDEL(KNOW)*FLOAT(IMINT-IPMAX)
         ARIMAX = ARGK + ZXDEL(KNOW)*FLOAT(IMAXT-IPMAX)
         IIMAX = NPTS
@@ -635,7 +624,6 @@
             GOTO 44
           ENDIF
         ENDDO
-!
    44   DO II = IIMIN, IIMAX
           KOUNT = KOUNT + 1
           KARGO(KOUNT) = II
@@ -645,24 +633,21 @@
           TARGI = ZARGI(II)
           TARGK = ZARGK(KNOW)
           DTARG = TARGI - TARGK
-!
-!... DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
+! DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
           JARGI = NINT((DTARG)/ZXDEL(KNOW))
           IARGI = JARGI + MN2 + 1
-!.. WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
+! WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
           POFF = DTARG/ZXDEL(KNOW) - FLOAT(JARGI)
-!.. WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
+! WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
           C3FN(1) = 0.5*POFF*(POFF-1.)
           C3FN(2) = 1. - POFF**2
           C3FN(3) = 0.5*POFF*(POFF+1.)
           C3DN(1) = POFF - 0.5
           C3DN(2) = -2.*POFF
           C3DN(3) = POFF + 0.5
-!
           YNORM = 0.
           DYNDKQ = 0.
           CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
-!
           DO I = 1, 3
             III = IARGI + I - 2
             PKTEM = PKCONV(III,1)
@@ -673,8 +658,7 @@
               DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKCONV(III,NPKD1)
             ENDDO
           ENDDO
-!
-!.. NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
+! NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
           IF (TESTOV(2.,YNORM)) THEN
             DYNDKQ = 0.
             CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
@@ -689,7 +673,6 @@
           ENDDO
         ENDDO  !  II LOOP
       ENDDO  ! KNOW LOOP
-!
       KKT = 0
       KIPT(1) = 0
       DO II = 1, NPTS
@@ -712,14 +695,13 @@
         ENDIF
   680   CONTINUE
       ENDDO
-!
       GOTO 100
 !
 ! PROFILE REFINEMENT STAGE with KNOTS:
 !
     3 MN = 512
       MN2 = MN/2
-!.. Peak positions may have changed - check and re-sort if necessary
+! Peak positions may have changed - check and re-sort if necessary
       DO IR = 1, MAXK
         KNOW = IR
         CALL CELDER(REFH(1,KNOW),ARTEM)
@@ -728,12 +710,10 @@
         ZARGK(IR) = ARGK
       ENDDO
       CALL SORTX(ZARGK,KORD,MAXK)
-!
-!.. Set the number of peaks at each point to zero
+! Set the number of peaks at each point to zero
       DO II = 1, NPTS
         IOCCR(II) = 0
       ENDDO
-!
       DO IR = 1, MAXK
         IRT = KORD(IR)
         ZTEM(IR) = ZARGK(IRT)
@@ -744,7 +724,6 @@
           TF4PAR(IR) = F4PAR(1,IRT)
         ENDIF
       ENDDO
-!
       DO IR = 1, MAXK
         ZARGK(IR) = ZTEM(IR)
         DO I = 1, 3
@@ -754,7 +733,6 @@
           F4PAR(1,IR) = TF4PAR(IR)
         ENDIF
       ENDDO
-!
       IOBS = 1
       DO IRT = 1, MAXK
 !        IR=KORD(IRT)
@@ -767,10 +745,8 @@
         ENDDO
  3030   CONTINUE
       ENDDO
-!
-!.. Now do the knots
+! Now do the knots
       KOUNT = 0
-!      WRITE(76,*) ' There are ',AKNOTS,' knots'
       IF (AKNOTS.LE.1.) THEN
         KNOTS = AKNOTS*MAXK
       ELSE
@@ -786,18 +762,15 @@
         ARGK = TTMIN + FLOAT(KNOW-1)*TTINC
         ARGKNT(KNOW) = ARGK
         CALL FDCN03(2)
-!.. FFT CALCULATION STAGE IN PROFILE REFINEMENT
-!.. THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
-!.. DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
+! FFT CALCULATION STAGE IN PROFILE REFINEMENT
+! THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
+! DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
         CALL FCSUB3(MN)
         MN21 = MN2 - 1
-!	write(44,*) argk,know,mn
         DO II = 1, MN
           PKKNOT(II,1,KNOW) = PKCONV(II,1)
           XDIFT = ZXDEL(1)*(II-MN21)
-!	    write(44,*) XDIFT,PKCONV(II,1)
         ENDDO
-!	WRITE(44,*) '*'
         DO JJ = 1, NPKGEN(JPHASE,JSOURC)
           IF (PFNVAR(JJ,JPHASE,JSOURC)) THEN
             JJ1 = JJ + 1
@@ -807,16 +780,13 @@
           ENDIF
         ENDDO
       ENDDO
-!	Close(44)
-!
-!
       KOUNT = 0
       JKNOT = 1
       DO KNOW = 1, MAXK
         ARGK = ZARGK(KNOW)
-!.. Do interpolation ... and come out with PKCONV
-!.. The first peak is at the first knot
-!.. and the last peak at the last knot.
+! Do interpolation ... and come out with PKCONV
+! The first peak is at the first knot
+! and the last peak at the last knot.
         JK = 1
         DO IK = JKNOT, KNOTS
           IF (ARGK.LT.ARGKNT(IK)) THEN
@@ -833,21 +803,17 @@
         C3FN0 = 1. - POFF**2
         C3FNP = 0.5*POFF*(POFF+1.)
         DO II = 1, MN
-          PKCONV(II,1) = C3FNM*PKKNOT(II,1,JK0-1)                       &
-     &                   + C3FN0*PKKNOT(II,1,JK0)                       &
-     &                   + C3FNP*PKKNOT(II,1,JK0+1)
+          PKCONV(II,1) = C3FNM*PKKNOT(II,1,JK0-1) + C3FN0*PKKNOT(II,1,JK0) + C3FNP*PKKNOT(II,1,JK0+1)
         ENDDO
         DO JJ = 1, NPKGEN(JPHASE,JSOURC)
           IF (PFNVAR(JJ,JPHASE,JSOURC)) THEN
             JJ1 = JJ + 1
             DO II = 1, MN
-              PKCONV(II,JJ1) = C3FNM*PKKNOT(II,JJ1,JK0-1)               &
-     &                         + C3FN0*PKKNOT(II,JJ1,JK0)               &
-     &                         + C3FNP*PKKNOT(II,JJ1,JK0+1)
+              PKCONV(II,JJ1) = C3FNM*PKKNOT(II,JJ1,JK0-1) + C3FN0*PKKNOT(II,JJ1,JK0) + C3FNP*PKKNOT(II,JJ1,JK0+1)
             ENDDO
           ENDIF
         ENDDO
-!.. FIND THE PEAK MAXIMUM VALUE AND THEN WORK OUT THE PEAK LIMITS
+! FIND THE PEAK MAXIMUM VALUE AND THEN WORK OUT THE PEAK LIMITS
         PKMAX = PKCONV(1,1)
         IPMAX = 1
         DO I = 1, MN
@@ -856,7 +822,6 @@
             IPMAX = I
           ENDIF
         ENDDO
-!..
         PKCRIT = TOLR(1,JSOURC)
         PKCT = PKCRIT*PKMAX
         IMINT = 1
@@ -873,7 +838,6 @@
             GOTO 3520
           ENDIF
         ENDDO
-!
  3520   ARIMIN = ARGK + ZXDEL(KNOW)*FLOAT(IMINT-IPMAX)
         ARIMAX = ARGK + ZXDEL(KNOW)*FLOAT(IMAXT-IPMAX)
         IIMAX = NPTS
@@ -890,7 +854,6 @@
             GOTO 3544
           ENDIF
         ENDDO
-!
  3544   DO II = IIMIN, IIMAX
           KOUNT = KOUNT + 1
           KARGO(KOUNT) = II
@@ -900,29 +863,26 @@
           TARGI = ZARGI(II)
           TARGK = ZARGK(KNOW)
           DTARG = TARGI - TARGK
-!
-!... DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
+! DO THE INTERPOLATIONS FOR YNORM AND DERIVATIVES FROM PKLIST
           JARGI = NINT((DTARG)/ZXDEL(KNOW))
           IARGI = JARGI + MN2 + 1
-!.. WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
+! WORK OUT ARGI OFFSET FROM "X(JARGI)" FOR INTERPOLATION
           POFF = DTARG/ZXDEL(KNOW) - FLOAT(JARGI)
-!.. WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
+! WORK OUT INTERPOLATION COEFFICIENTS FOR FUNCTIONS AND ARGK DERIVATIVE
           C3FN(1) = 0.5*POFF*(POFF-1.)
           C3FN(2) = 1. - POFF**2
           C3FN(3) = 0.5*POFF*(POFF+1.)
           C3DN(1) = POFF - 0.5
           C3DN(2) = -2.*POFF
           C3DN(3) = POFF + 0.5
-!
           YNORM = 0.
           DYNDKQ = 0.
           CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
-!
           DO I = 1, 3
             III = IARGI + I - 2
-!>> JCC Can get an array bound overflow error here so I've trapped for it temporarily.
-!>> May want to check out why ...
-!>> Added a hack ...
+! JCC @ Can get an array bound overflow error here so I've trapped for it temporarily.
+! May want to check out why ...
+! Added a hack ...
             IF (III.LE.512 .AND. III.GT.0) THEN
               PKTEM = PKCONV(III,1)
               YNORM = YNORM + C3FN(I)*PKTEM
@@ -931,11 +891,10 @@
                 NPKD1 = NPKD + 1
                 DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKCONV(III,NPKD1)
               ENDDO
-!>> JCC End of hack ...
+! JCC End of hack ...
             ENDIF
           ENDDO
-!
-!.. NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
+! NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
           IF (TESTOV(2.,YNORM)) THEN
             DYNDKQ = 0.
             CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
@@ -950,7 +909,6 @@
           ENDDO
         ENDDO  !  II LOOP
       ENDDO  ! KNOW LOOP
-!
       KKT = 0
       KIPT(1) = 0
       DO II = 1, NPTS
@@ -973,25 +931,20 @@
         ENDIF
  3680   CONTINUE
       ENDDO
-!
       GOTO 100
-!
 ! PRE-PROFILE REFINEMENT STAGE
     5 CALL FDCN03(1)
       DEL = ARGI - ARGK
       SIGLIM = TOLER(1,JPHASE,JSOURC)*PKFNVA(1)
       CAULIM = TOLER(2,JPHASE,JSOURC)*PKFNVA(2)
       ASYLIM = 0.5*DEG*TOLER(3,JPHASE,JSOURC)*PKFNVA(3)**2/TAN(RAD*ARGK)
-!
       TEMLIM = ASYLIM
       IF (DEL) 510, 510, 520
   510 TEMLIM = ASYLIM
   520 TEMLIM = TEMLIM + 0.5*(SIGLIM+CAULIM)
       REFUSE = ABS(DEL).GT.TEMLIM
       GOTO 100
-!
 ! N=6 *** CAILS *** SETTING UP SLACK AND STRICT CONSTRAINTS
-!
     6 CALL FDCN03(1)
       DELT = ABS(AKLO-AKHI)
       STRKT = DELT.LT.2.0*STRTOL*ZXDEL(KNOW)
@@ -1003,6 +956,7 @@
       F4PAR(3,KNOW) = PKFNVA(2)
       GOTO 100
   100 RETURN
+
       END SUBROUTINE PFCN03
 !*==FCSUB3.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -1037,7 +991,6 @@
 !      COMMON /PRSAVF/PKLIST(512,9,200),ZXDEL(200),PKCONV(512,9),
 !     & ARGNOT(50),PKNOT(64,9,50),XPDKNT(50)
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-!>> JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -1051,21 +1004,20 @@
       GAM = PKFNVA(2)
       HPS = PKFNVA(3)
       HMS = PKFNVA(4)
-!
       DENTEM = (FLOAT(MNS)*ZXDEL(KNOW))
       C2TEM = PI/DENTEM
       CTEM = 2.*C2TEM
       GTEM = CTEM*SIG
       CLTEM = C2TEM*GAM
-!.. TO DEAL WITH (A) 90 DEGREES AND (B) ABOVE ALL WE WILL DO IS
-!.. (A) SET FR(I,3)=1 AND ALL ELSE TO ZERO AND
-!.. (B) SWITCH THE SIGN OF THE IMAGINARY COMPONENTS
+! TO DEAL WITH (A) 90 DEGREES AND (B) ABOVE ALL WE WILL DO IS
+! (A) SET FR(I,3)=1 AND ALL ELSE TO ZERO AND
+! (B) SWITCH THE SIGN OF THE IMAGINARY COMPONENTS
       NEAR90 = (ABS(ARGK-90.).LT.2.0)
       IF (.NOT.NEAR90) THEN
         TANRA = ABS(TAN(RAD*ARGK))
         DENASY = 0.5*(HPS-HMS)*(HPS+HMS)
-!.. BET1 AND NETPI CHANGE SIGN AT 90 DEGREES
-!.. BET2, BETP, BETM, BETP2 AND BETM2 DO NOT
+! BET1 AND NETPI CHANGE SIGN AT 90 DEGREES
+! BET2, BETP, BETM, BETP2 AND BETM2 DO NOT
         BET1 = 0.5*RAD*DENTEM*TANRA
         BET2 = SQRT(BET1)
         BETP = HPS/BET2
@@ -1074,19 +1026,18 @@
         BETM2 = PIBY2*BETM*BETM
         BETPI = BET1/PI
       ENDIF
-!
       MN2 = MNS/2
       MN2M1 = MN2 - 1
       MN2P1 = MN2 + 1
       DO I = 1, MNS
         II = MOD(I+MN2,MNS) - MN2P1
-!.. GAUSSIAN
+! GAUSSIAN
         ARG = GTEM*FLOAT(II)
         FR(I,1) = EXP(-0.5*ARG*ARG)
         FI(I,1) = 0.
         DR(I,1) = -ARG*ARG*FR(I,1)/SIG
         DI(I,1) = 0.
-!.. LORENTZIAN
+! LORENTZIAN
         AFII = ABS(FLOAT(II))
         ARG = CLTEM*AFII
         FR(I,2) = EXP(-ARG)
@@ -1119,9 +1070,8 @@
           SINM = SIN(BETM2*VAL)
           COSP = COS(BETP2*VAL)
           COSM = COS(BETM2*VAL)
-!.. BET1 AND BETPI CHANGE SIGN AT 90 DEGREES
-!.. BET2, BETP, BETM, BETP2 AND BETM2 DO NOT
-!
+! BET1 AND BETPI CHANGE SIGN AT 90 DEGREES
+! BET2, BETP, BETM, BETP2 AND BETM2 DO NOT
           FR(I,3) = ((HPS*FRCP-HMS*FRCM)-BETPK*(SINP-SINM))/DENASY
           FI(I,3) = -((HPS*FRSP-HMS*FRSM)+BETPK*(COSP-COSM))/DENASY
           DR(I,3) = (FRCP-HPS*FR(I,3))/DENASY
@@ -1135,8 +1085,7 @@
           ENDIF
         ENDIF
       ENDDO
-!
-!.. NOW FORM PRODUCTS IN FOURIER SPACE
+! NOW FORM PRODUCTS IN FOURIER SPACE
       DO I = 1, MNS
         DO J = 1, NPKGEN(JPHASE,JSOURC)
           IF (J.NE.4) CFFT(J) = CMPLX(FR(I,J),FI(I,J))
@@ -1154,15 +1103,13 @@
         FRT(I) = REAL(CFF)
         FIT(I) = AIMAG(CFF)
       ENDDO
-!
-!.. DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
+! DO INVERSE TRANSFORMS OF FUNCTION AND DERIVATIVES
       INV = 1
       CALL FT01A(MNS,INV,FRT,FIT)
-!
       DO J = 1, NPKGEN(JPHASE,JSOURC)
         IF (PFNVAR(J,JPHASE,JSOURC)) CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
       ENDDO
-!.. WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
+! WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
       XTEM = 1./ZXDEL(KNOW)
       DO I = 1, MNS
         II = MOD(I+MN2M1,MNS) + 1
@@ -1172,6 +1119,5 @@
           PKCONV(II,JJ) = DR(I,J)*XTEM
         ENDDO
       ENDDO
-!
-      RETURN
+
       END SUBROUTINE FCSUB3
