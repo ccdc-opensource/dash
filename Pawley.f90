@@ -82,6 +82,7 @@
       CALL WDialogPutCheckBox(IDF_PawRef_RefGamm2_Check,Unchecked)
       CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,3)
       CALL WizardWindowShow(IDD_Pawley_Status)
+      CALL CHKMAXREF
       CALL PopActiveWindowID
 
       END SUBROUTINE ShowPawleyFitWindow
@@ -759,6 +760,7 @@
       INTEGER, EXTERNAL :: WRTDSL
       INTEGER LSDI, iDot, I, L1, L4, iDummy, iFile
       CHARACTER*(MaxPathLength) DirName, FileName
+      LOGICAL NoHKL
 
 ! Initialise to error
       CreateSDIFile = 1
@@ -816,10 +818,11 @@
         CALL ErrorMessage('Error while writing .hcv file.')
         RETURN
       ENDIF
+      NoHKL = .FALSE.
       CALL IOSCopyFile('polyp.hkl',DashHklFile)
       IF (InfoError(1) .NE. 0) THEN
-        CALL ErrorMessage('Error while writing .hkl file.')
-        RETURN
+        CALL DebugErrorMessage('Error while writing .hkl file.')
+        NoHKL = .TRUE.
       ENDIF
       OPEN(iFile,file=SDIFileName(1:LSDI),status='unknown',ERR=999)
 ! Write all file names with relative paths
@@ -827,8 +830,10 @@
       WRITE(iFile,'(A)',ERR=999) " TIC ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
       CALL SplitPath(DashHcvFile, DirName, FileName)
       WRITE(iFile,'(A)',ERR=999) " HCV ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
-      CALL SplitPath(DashHklFile, DirName, FileName)
-      WRITE(iFile,'(A)',ERR=999) " HKL ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
+      IF (.NOT. NoHKL) THEN
+        CALL SplitPath(DashHklFile, DirName, FileName)
+        WRITE(iFile,'(A)',ERR=999) " HKL ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
+      ENDIF
       CALL SplitPath(DashPikFile, DirName, FileName)
       WRITE(iFile,'(A)',ERR=999) " PIK ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
       CALL SplitPath(DashRawFile, DirName, FileName)
