@@ -25,10 +25,9 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
@@ -106,11 +105,7 @@
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
 ! Total moves
       CALL IGrSelect(3,IDF_SATotalMoves_picture)
-      IF (RESTART) THEN
-        ruler = FLOAT(MaxMoves)
-      ELSE
-        ruler = MaxIter * nmpert
-      ENDIF
+      ruler = FLOAT(MaxMoves)
       CALL IGrUnits(0.0,0.0,ruler,1.0)
       CALL IGrColourN(63)  ! Yellow
       rulex1 = 0.0

@@ -15,10 +15,9 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER              iMyExit, num_new_min
       COMMON / CMN000001 / iMyExit, num_new_min
@@ -44,7 +43,7 @@
       CHARACTER*20 tIntStr
 
       IF (CheckOverwriteSaOutput() .EQ. 0) THEN
-        CALL WizardWindowShow(IDD_SA_input3)
+        CALL WizardWindowShow(IDD_SA_input3_2)
         RETURN
       ENDIF
       OneDay = 24 * 60 * 60
@@ -72,8 +71,6 @@
       StartDate = DateToday()
       StartTime = TimeNowSeconds()
       CALL Init_MultiRun
-! Grey out "start next" button if not multirun
-      CALL WDialogFieldStateLogical(IDF_StartNext,RESTART)
       CALL WDialogFieldState(IDB_Summary,Enabled)
       IPTYPE = 2
 !C Clear Chi-sqd array between starting sets of SA Runs

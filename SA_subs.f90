@@ -82,10 +82,9 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
@@ -568,46 +567,27 @@
       CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
 !  Check termination criteria.
 !  Terminate SA if appropriate.
-      IF (RESTART) THEN
-        IF (CheckTerm(NTOTMOV,CHIPROBEST) .OR. (iMyExit .NE. 0)) THEN
+      IF (CheckTerm(NTOTMOV, CHIPROBEST) .OR. (iMyExit .NE. 0)) THEN
 ! End of a run in a multi-run. This is the place for a final local minimisation
-          NumOf_SA_Runs = Curr_SA_Run
+        NumOf_SA_Runs = Curr_SA_Run
 ! Get AutoLocalMinimisation from the Configuration Window
-          IF ((iMyExit .NE. 5) .AND. Get_AutoLocalMinimisation()) THEN
-            CALL LocalMinimise(.TRUE.)
-            CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
-          ENDIF
-          CALL ChiSqPlot_EndOfSARun
-! ep  Saves calculated and observed diffraction patterns in .pro file 
-          CALL Sa_soln_store
-! Align structure.  Will get to this point whether autominimise enabled or not.
-          IF (Get_AutoAlign()) CALL Align
-! Store optimum crystal structure        
-          CALL Log_SARun_Entry
-          CALL SA_STRUCTURE_OUTPUT(T,XOPT,ntotmov)
-          IF ((Curr_SA_Run.LT.MaxRuns) .AND. (iMyExit .NE. 3) .AND. (iMyExit .NE. 5)) THEN
-            GOTO 1 ! Next run
-          ENDIF
-        ELSE
-          GOTO 100 ! Next iteration
-        ENDIF
-      ELSEIF ((Curr_SA_Iteration.LT.MaxIter) .AND. (T.GT.0.0) .AND. (iMyExit .EQ. 0)) THEN
-        GOTO 100 ! Next iteration
-      ELSE
-        NumOf_SA_Runs = Curr_SA_Run ! = 1
-        ! Current chi squared plot should be redrawn in red
-        CALL plotting_Chi_sqd
-        IF (Get_AutoLocalMinimisation()) THEN
+        IF ((iMyExit .NE. 5) .AND. Get_AutoLocalMinimisation()) THEN
           CALL LocalMinimise(.TRUE.)
-! ep  Plots Chi sqd vs. num of moves plot
-!          CALL PrepareChiSqPlotData
+          CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
         ENDIF
+        CALL ChiSqPlot_EndOfSARun
 ! ep  Saves calculated and observed diffraction patterns in .pro file 
         CALL Sa_soln_store
 ! Align structure.  Will get to this point whether autominimise enabled or not.
         IF (Get_AutoAlign()) CALL Align
+! Store optimum crystal structure        
         CALL Log_SARun_Entry
-        CALL SA_STRUCTURE_OUTPUT(T,XOPT,ntotmov)
+        CALL SA_STRUCTURE_OUTPUT(T, XOPT, ntotmov)
+        IF ((Curr_SA_Run .LT. MaxRuns) .AND. (iMyExit .NE. 3) .AND. (iMyExit .NE. 5)) THEN
+          GOTO 1 ! Next run
+        ENDIF
+      ELSE
+        GOTO 100 ! Next iteration
       ENDIF
 
       END SUBROUTINE SimulatedAnnealing
@@ -835,10 +815,9 @@
       INTEGER, INTENT (IN   ) :: Nmoves
       REAL,    INTENT (IN   ) :: BestProChiSq
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP

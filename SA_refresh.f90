@@ -14,10 +14,9 @@
       INTEGER              iMyExit, num_new_min
       COMMON / CMN000001 / iMyExit, num_new_min
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Action1)
