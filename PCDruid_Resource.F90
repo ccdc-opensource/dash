@@ -1,4 +1,4 @@
-! Winteracter module created : 28/Sep/2004 16:56:09
+! Winteracter module created : 05/Oct/2004 10:47:57
 !
       MODULE Druid_Header
           IMPLICIT NONE

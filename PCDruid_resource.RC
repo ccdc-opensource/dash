@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 28/Sep/2004 16:56:09
+// Modified : 05/Oct/2004 10:47:57
 //
 ///////////////////////////////////////////////////
 //
@@ -1326,7 +1326,7 @@ END
 IDD_PW_Page1 DIALOG 0, 0,  375,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "DASH Wizard : Unit Cell Parameters"
+CAPTION "DASH Wizard : Unit-Cell Parameters"
 BEGIN
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
@@ -2105,11 +2105,11 @@ BEGIN
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "The next step is indexing the pattern.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   17,  238,   10
-    CONTROL "Alternatively, if the unit cell parameters are already known, they can be entered directly.",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   67,  238,   20
+    CONTROL "Alternatively, if the unit-cell parameters are already known, they can be entered directly.",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   67,  238,   20
     CONTROL "Select the first 20 peaks in the diffraction pattern using the mouse, then press 'Next >' to index the pattern with DICVOL.",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   34,  238,   20
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "&Index pattern",IDF_RADIO3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  121,   93,  130,   14
-    CONTROL "&Enter known unit cell parameters",IDF_RADIO4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  121,  113,  128,   14
+    CONTROL "&Enter known unit-cell parameters",IDF_RADIO4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  121,  113,  128,   14
 END
 
 IDD_PW_Page7 RCDATA
@@ -3557,7 +3557,7 @@ END
 IDD_SX_Page1 DIALOG 0, 0,  375,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "DASH Wizard : Single Crystal Step 1: Unit Cell Parameters"
+CAPTION "DASH Wizard : Single Crystal Step 1: Unit-Cell Parameters"
 BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  100,  150,   40,   14
