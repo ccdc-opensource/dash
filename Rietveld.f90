@@ -123,7 +123,9 @@
       ENDDO
       RR_ITF = 1.0
       IF (PrefParExists) THEN
+        KK = KK + 1
         RR_PO = BestValuesDoF(KK,Curr_SA_Run)
+        RR_var2PO = KK
       ELSE
         RR_PO = 1.0
       ENDIF
@@ -186,7 +188,7 @@
         CALL WDialogFieldState(IDR_PO,Disabled)
       ENDIF
       ! Initialise PO
-      IF (PrefParExists) CALL PO_PRECFC(RR_Params(RR_var2PO))
+      IF (PrefParExists) CALL PO_PRECFC(RR_PO)
       ! Initialise ITF
       CALL CreateFobITF
       ! Initialise XATO(1:3,1:150)
@@ -1030,11 +1032,13 @@
         ENDIF
       ENDDO
       IF (RR_ioptITF .EQ. 1) THEN
+        RR_var2ITF = iParam
         RR_Params(iParam) = RR_ITF
         RR_InitSteps(iParam) = 0.1 * Damping
         iParam = iParam + 1
       ENDIF
       IF (RR_ioptPO .EQ. 1) THEN
+        RR_var2PO = iParam
         RR_Params(iParam) =  RR_PO
         RR_InitSteps(iParam) = 0.1 * Damping
         iParam = iParam + 1
