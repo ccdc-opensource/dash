@@ -331,36 +331,6 @@ DEP_F90_GET_L=\
 # End Source File
 # Begin Source File
 
-SOURCE=.\getdsl.f90
-DEP_F90_GETDS=\
-	".\Debug\REFVAR.MOD"\
-	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
-	".\Lattice.inc"\
-	".\params.inc"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\gethcv.f90
-DEP_F90_GETHC=\
-	".\Debug\ATMVAR.MOD"\
-	".\Debug\REFVAR.MOD"\
-	".\params.inc"\
-	
-# End Source File
-# Begin Source File
-
-SOURCE=.\getpik.f90
-DEP_F90_GETPI=\
-	".\params.inc"\
-	".\Variables.mod"\
-	
-# End Source File
-# Begin Source File
-
 SOURCE=.\Init_Routines.f90
 DEP_F90_INIT_=\
 	".\Debug\ZMVAR.MOD"\
@@ -415,6 +385,20 @@ SOURCE=.\LoadRAWFiles.f90
 DEP_F90_LOADR=\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
+	".\params.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\LoadSDI.f90
+DEP_F90_LOADS=\
+	".\Debug\ATMVAR.MOD"\
+	".\Debug\REFVAR.MOD"\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
 	".\params.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -611,6 +595,7 @@ DEP_F90_PROFI=\
 SOURCE=.\ProjectSave.f90
 DEP_F90_PROJE=\
 	".\Debug\PRJVAR.MOD"\
+	".\Debug\REFVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -871,6 +856,7 @@ SOURCE=.\Valchi.f90
 DEP_F90_VALCH=\
 	".\Debug\ATMVAR.MOD"\
 	".\Debug\PO_VAR.mod"\
+	".\Debug\REFVAR.MOD"\
 	".\Debug\ZMVAR.MOD"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
