@@ -792,7 +792,7 @@
       IF (RecalculationNecessary) THEN
         CALL Upload_Positions
 ! Now do a refinement ...
-      CALL RefineLattice
+        CALL RefineLattice
         CALL Upload_Widths
       ENDIF
       IF (ReplotNecessary) CALL Profile_Plot

@@ -101,7 +101,8 @@
       INTEGER              iMyExit, num_new_min
       COMMON / CMN000001 / iMyExit, num_new_min
 
-!  Type all internal variables.
+      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
+      LOGICAL, EXTERNAL :: CheckTerm
       INTEGER NACC
       LOGICAL MAKET0
       DOUBLE PRECISION FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
@@ -110,11 +111,9 @@
       INTEGER NUP, NDOWN, NREJ, H, I, J, M, II, IV
       INTEGER MRAN, MRAN1, IARR, IAR1
       DOUBLE PRECISION T
-      LOGICAL, EXTERNAL :: CheckTerm
       INTEGER NumTrialsPar(MVAR)
 
       INTEGER IM, IA, IC
-      LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
       INTEGER JRAN, num_old_min, NTOTMOV
       INTEGER III, IH, KK, iFrg, iFrgCopy
       INTEGER Last_NUP, Last_NDOWN
@@ -124,7 +123,6 @@
       LOGICAL OutOfBounds
       REAL xtem, tempupper, templower, tempupper2, templower2
       REAL Sgn
-
 
 !O      NumOfRef = 10
       CALL OpenChiSqPlotWindow
