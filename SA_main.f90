@@ -432,15 +432,18 @@
       INTEGER        IDFZMFile,                                                &
                      IDBZMDelete,                    IDBZMBrowse,              &
                      IDBZMView,                      IDBZMEdit,                &
-                     IDFZMpars
+                     IDFZMpars,                      IDFZMLabel,               &
+                     first_zm_in_win
       COMMON /IDFZM/ IDFZMFile(1:maxfrginterface),                                      &
                      IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
                      IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
-                     IDFZMpars(1:maxfrginterface)
+                     IDFZMpars(1:maxfrginterface),   IDFZMLabel(1:maxfrginterface),     &
+                     first_zm_in_win
 
       INTEGER NumberOfDOF, izmtot, iFrg
       CHARACTER*(MaxPathLength) DirName
       CHARACTER*(80) FileName
+      CHARACTER*(3)  FrgStr
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -454,27 +457,37 @@
           NumberOfDOF = izmpar(iFrg) - 1 ! Count the quaternions as three, not four
         ENDIF
         izmtot = izmtot + NumberOfDOF
+        IF ((iFrg-first_zm_in_win+1 .GE. 1) .AND. &
+            (iFrg-first_zm_in_win+1 .LE. maxfrginterface)) THEN
+          WRITE(FrgStr, '(I3)') iFrg
+          CALL WDialogPutString(IDFZMLabel(iFrg-first_zm_in_win+1), FrgStr)
 ! Due to lack of space: display the name of file only, without its full path
-        CALL SplitPath(frag_file(iFrg),DirName, FileName)
-        CALL WDialogPutString(IDFZMFile(iFrg), FileName)
+          CALL SplitPath(frag_file(iFrg), DirName, FileName)
+          CALL WDialogPutString(IDFZMFile(iFrg-first_zm_in_win+1), FileName)
 ! Enable 'Delete' button
-        CALL WDialogFieldState(IDBZMDelete(iFrg), Enabled)
+          CALL WDialogFieldState(IDBZMDelete(iFrg-first_zm_in_win+1), Enabled)
 ! Enable 'View' button
-        CALL WDialogFieldState(IDBZMView(iFrg), Enabled)
+          CALL WDialogFieldState(IDBZMView(iFrg-first_zm_in_win+1), Enabled)
 ! Enable 'Edit...' button
-        CALL WDialogFieldState(IDBzmEdit(iFrg), Enabled)
-        CALL WDialogPutInteger(IDFZMpars(iFrg), NumberOfDOF)
+          CALL WDialogFieldState(IDBzmEdit(iFrg-first_zm_in_win+1), Enabled)
+          CALL WDialogPutInteger(IDFZMpars(iFrg-first_zm_in_win+1), NumberOfDOF)
+        ENDIF
       ENDDO
 ! Clear remainder
-      DO iFrg = nFrag+1, maxfrginterface
-        CALL WDialogClearField(IDFZMFile(iFrg))
+      DO iFrg = nFrag+1, maxfrg
+        IF ((iFrg-first_zm_in_win+1 .GE. 1) .AND. &
+            (iFrg-first_zm_in_win+1 .LE. maxfrginterface)) THEN
+          WRITE(FrgStr, '(I3)') iFrg
+          CALL WDialogPutString(IDFZMLabel(iFrg-first_zm_in_win+1), FrgStr)
+          CALL WDialogClearField(IDFZMFile(iFrg-first_zm_in_win+1))
 ! Disable 'View' button
-        CALL WDialogFieldState(IDBZMView(iFrg), Disabled)
+          CALL WDialogFieldState(IDBZMView(iFrg-first_zm_in_win+1), Disabled)
 ! Disable 'Delete' button
-        CALL WDialogFieldState(IDBZMDelete(iFrg), Disabled)
+          CALL WDialogFieldState(IDBZMDelete(iFrg-first_zm_in_win+1), Disabled)
 ! Disable 'Edit...' button
-        CALL WDialogFieldState(IDBzmEdit(iFrg), Disabled)
-        CALL WDialogClearField(IDFZMpars(iFrg))
+          CALL WDialogFieldState(IDBzmEdit(iFrg-first_zm_in_win+1), Disabled)
+          CALL WDialogClearField(IDFZMpars(iFrg-first_zm_in_win+1))
+        ENDIF
       ENDDO
 ! JvdS @@ Following is wrong (we need a valid .sdi as well), but 
 ! a. identical to release version
@@ -484,7 +497,7 @@
       IF (izmtot .EQ. 0) THEN            
         CALL WDialogClearField(IDF_ZM_allpars)
       ELSE
-        CALL WDialogPutInteger(IDF_ZM_allpars,izmtot)
+        CALL WDialogPutInteger(IDF_ZM_allpars, izmtot)
       ENDIF
       CALL PopActiveWindowID
 
