@@ -107,6 +107,7 @@
       CALL IGrColourN(95) ! Lightgreen
       tenow1=tempvl-0.03
       tenow2=tempvl+0.03
+      CALL IGrFillPattern(Solid)
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
 ! Minimum chi squared
       CALL IGrSelect(3,IDF_minchisq_picture)
