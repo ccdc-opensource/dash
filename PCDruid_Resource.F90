@@ -1,4 +1,4 @@
-! Winteracter module created : 04/Apr/2003 11:04:51
+! Winteracter module created : 07/Apr/2003 10:21:09
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -662,4 +662,23 @@
           INTEGER, PARAMETER :: IDB_Calculate                   =  1512
           INTEGER, PARAMETER :: IDF_DivDiffByEsd                =  1513
           INTEGER, PARAMETER :: IDB_Compare                     =  1514
+          INTEGER, PARAMETER :: IDC_DontUse1                    =  1515
+          INTEGER, PARAMETER :: IDI_Num1                        =  1516
+          INTEGER, PARAMETER :: IDC_HideH2                      =  1517
+          INTEGER, PARAMETER :: IDB_Clear1                      =  1518
+          INTEGER, PARAMETER :: IDC_DontUse2                    =  1519
+          INTEGER, PARAMETER :: IDI_Num2                        =  1520
+          INTEGER, PARAMETER :: IDB_Clear2                      =  1521
+          INTEGER, PARAMETER :: IDC_HideH3                      =  1522
+          INTEGER, PARAMETER :: IDC_DontUse3                    =  1523
+          INTEGER, PARAMETER :: IDI_Num3                        =  1524
+          INTEGER, PARAMETER :: IDB_Clear3                      =  1525
+          INTEGER, PARAMETER :: IDC_HideH4                      =  1526
+          INTEGER, PARAMETER :: IDC_DontUse4                    =  1527
+          INTEGER, PARAMETER :: IDI_Num4                        =  1528
+          INTEGER, PARAMETER :: IDB_Clear4                      =  1529
+          INTEGER, PARAMETER :: IDB_Set1                        =  1530
+          INTEGER, PARAMETER :: IDB_Set2                        =  1531
+          INTEGER, PARAMETER :: IDB_Set3                        =  1532
+          INTEGER, PARAMETER :: IDB_Set4                        =  1533
       END MODULE Druid_Header

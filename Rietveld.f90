@@ -1,3 +1,8 @@
+! Available:
+! Dialog2RRVAR() and RRVAR2Dialog()
+! Params2RRVAR() and RRVAR2Params()
+!
+! It would probably be nice to exclude parameters that determine e.g. that a phenyl ring is flat.
 !
 !*****************************************************************************
 !
@@ -128,6 +133,10 @@
       RR_ioptt = 0
       RR_ioptITF = 0
       RR_ioptPO = 0
+      ! Fill RR_Show_bond etc.
+      CALL Set_Show_bond
+      CALL Set_Show_angle
+      CALL Set_Show_torsion
 ! Fill and display dialogue
       CALL WDialogSelect(IDD_Rietveld2)
 ! First set labels and number of rows
@@ -161,54 +170,9 @@
         ENDIF
       ENDDO
       CALL WGridRows(iField, iRow-1)
-      iRow = 1
-      iCol = 1
-      iField = IDF_RR_BondGrid
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 2, natoms(iFrg)
-              CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))// &
-                ':'//OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg))))
-              iRow = iRow + 1
-            ENDDO
-          ENDDO
-        ENDIF
-      ENDDO
-      CALL WGridRows(iField, iRow-1)
-      iRow = 1
-      iCol = 1
-      iField = IDF_RR_AngleGrid
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 3, natoms(iFrg)
-              CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
-                                  OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
-                                  OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg))))
-              iRow = iRow + 1
-            ENDDO
-          ENDDO
-        ENDIF
-      ENDDO
-      CALL WGridRows(iField, iRow-1)
-      iRow = 1
-      iCol = 1
-      iField = IDF_RR_TorsionGrid
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 4, natoms(iFrg)
-              CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
-                                    OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
-                                    OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg)))//':'// &
-                                    OriginalLabel(iz3(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz3(i,iFrg),iFrg))))
-              iRow = iRow + 1
-            ENDDO
-          ENDDO
-        ENDIF
-      ENDDO
-      CALL WGridRows(iField, iRow-1)
+      CALL Set_Show_bond
+      CALL Set_Show_angle
+      CALL Set_Show_torsion
       RR_ioptITF = 0
       RR_ioptPO = 0
       CALL RRVAR2Dialog
@@ -243,6 +207,171 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE Set_Show_bond
+
+      USE RRVAR
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER iFrg, i, iFrgCopy
+      INTEGER iRow, iCol, iField
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL tDontUse4
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Rietveld2)
+      IF (WDialogGetCheckBoxLogical(IDC_HideH4)) THEN
+        DO iFrg = 1, maxfrg
+          IF (gotzmfile(iFrg)) THEN
+            DO I = 2, natoms(iFrg)
+              RR_Show_bond(I,iFrg) = (zmElementCSD(I,iFrg) .NE. 2) .AND. &
+                                     (zmElementCSD(iz1(I,iFrg),iFrg) .NE. 2)
+            ENDDO
+          ENDIF
+        ENDDO
+      ELSE
+        RR_Show_bond = .TRUE.
+      ENDIF
+      ! Now update the dialogue
+      tDontUse4 = WDialogGetCheckBoxLogical(IDC_DontUse4)
+      iRow = 1
+      iCol = 1
+      iField = IDF_RR_BondGrid
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 2, natoms(iFrg)
+              IF (RR_Show_bond(i, iFrg)) THEN
+                CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))// &
+                  ':'//OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg))))
+                CALL WGridPutCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy), "(F7.5)")
+                IF ( .NOT. tDontUse4) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg,iFrgCopy))
+                iRow = iRow + 1
+              ENDIF
+            ENDDO
+          ENDDO
+        ENDIF
+      ENDDO
+      CALL WGridRows(iField, iRow-1)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_Show_bond
+!
+!*****************************************************************************
+!
+      SUBROUTINE Set_Show_angle
+
+      USE RRVAR
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER iFrg, i, iFrgCopy
+      INTEGER iRow, iCol, iField
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL tDontUse3
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Rietveld2)
+      IF (WDialogGetCheckBoxLogical(IDC_HideH3)) THEN
+        DO iFrg = 1, maxfrg
+          IF (gotzmfile(iFrg)) THEN
+            DO I = 3, natoms(iFrg)
+              RR_Show_angle(I,iFrg) = (zmElementCSD(I,iFrg) .NE. 2) .AND. &
+                                      (zmElementCSD(iz1(I,iFrg),iFrg) .NE. 2) .AND. &
+                                      (zmElementCSD(iz2(I,iFrg),iFrg) .NE. 2)
+            ENDDO
+          ENDIF
+        ENDDO
+      ELSE
+        RR_Show_angle = .TRUE.
+      ENDIF
+      ! Now update the dialogue
+      tDontUse3 = WDialogGetCheckBoxLogical(IDC_DontUse3)
+      iRow = 1
+      iCol = 1
+      iField = IDF_RR_AngleGrid
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 3, natoms(iFrg)
+              IF (RR_Show_angle(i, iFrg)) THEN
+                CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
+                                    OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
+                                    OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg))))
+                CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
+                IF ( .NOT. tDontUse3) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg,iFrgCopy))
+                iRow = iRow + 1
+              ENDIF
+            ENDDO
+          ENDDO
+        ENDIF
+      ENDDO
+      CALL WGridRows(iField, iRow-1)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_Show_angle
+!
+!*****************************************************************************
+!
+      SUBROUTINE Set_Show_torsion
+
+      USE RRVAR
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER iFrg, i, iFrgCopy
+      INTEGER iRow, iCol, iField
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL tDontUse2
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Rietveld2)
+      IF (WDialogGetCheckBoxLogical(IDC_HideH2)) THEN
+        DO iFrg = 1, maxfrg
+          IF (gotzmfile(iFrg)) THEN
+            DO I = 4, natoms(iFrg)
+              RR_Show_torsion(I,iFrg) = (zmElementCSD(I,iFrg) .NE. 2) .AND. &
+                                        (zmElementCSD(iz1(I,iFrg),iFrg) .NE. 2) .AND. &
+                                        (zmElementCSD(iz2(I,iFrg),iFrg) .NE. 2) .AND. &
+                                        (zmElementCSD(iz3(I,iFrg),iFrg) .NE. 2)
+            ENDDO
+          ENDIF
+        ENDDO
+      ELSE
+        RR_Show_torsion = .TRUE.
+      ENDIF
+      ! Now update the dialogue
+      tDontUse2 = WDialogGetCheckBoxLogical(IDC_DontUse2)
+      iRow = 1
+      iCol = 1
+      iField = IDF_RR_TorsionGrid
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 4, natoms(iFrg)
+              IF (RR_Show_torsion(i, iFrg)) THEN
+                CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
+                                      OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
+                                      OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg)))//':'// &
+                                      OriginalLabel(iz3(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz3(i,iFrg),iFrg))))
+                CALL WGridPutCellReal(iField, iCol, iRow, RR_bet(i,iFrg,iFrgCopy), "(F10.5)")
+                IF ( .NOT. tDontUse2) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg,iFrgCopy))
+                iRow = iRow + 1
+              ENDIF
+            ENDDO
+          ENDDO
+        ENDIF
+      ENDDO
+      CALL WGridRows(iField, iRow-1)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_Show_torsion
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWindowRietveld
 
       USE WINTERACTER
@@ -269,6 +398,7 @@
 
       INTEGER I, J
       REAL ChiSqd, ChiProSqd 
+      INTEGER iValues(1:100)
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
@@ -308,8 +438,40 @@
               CALL Dialog2RRVAR
               CALL RR_MAKEFRAC
               CALL RR_Compare
+            CASE (IDB_Clear1)
+              iValues = 0
+              CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid,2,iValues,100)
+            CASE (IDB_Clear2)
+              iValues = 0
+              CALL WGridPutCheckBox(IDF_RR_TorsionGrid,2,iValues,100)
+            CASE (IDB_Clear3)
+              iValues = 0
+              CALL WGridPutCheckBox(IDF_RR_AngleGrid,2,iValues,100)
+            CASE (IDB_Clear4)
+              iValues = 0
+              CALL WGridPutCheckBox(IDF_RR_BondGrid,2,iValues,100)
+            CASE (IDB_Set1)
+              iValues = 1
+              CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid,2,iValues,100)
+            CASE (IDB_Set2)
+              iValues = 1
+              CALL WGridPutCheckBox(IDF_RR_TorsionGrid,2,iValues,100)
+            CASE (IDB_Set3)
+              iValues = 1
+              CALL WGridPutCheckBox(IDF_RR_AngleGrid,2,iValues,100)
+            CASE (IDB_Set4)
+              iValues = 1
+              CALL WGridPutCheckBox(IDF_RR_BondGrid,2,iValues,100)
           END SELECT
         CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDC_HideH2)
+              CALL Set_Show_torsion
+            CASE (IDC_HideH3)
+              CALL Set_Show_angle
+            CASE (IDC_HideH4)
+              CALL Set_Show_bond
+          END SELECT
       END SELECT
       CALL PopActiveWindowID
 
@@ -357,10 +519,16 @@
       IMPLICIT NONE
 
       INTEGER i, iRow, iCol, iField, iFrg, iFrgCopy
+      LOGICAL tDontUse1, tDontUse2, tDontUse3, tDontUse4
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
 ! Fill and display dialogue
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
+      tDontUse1 = WDialogGetCheckBoxLogical(IDC_DontUse1)
+      tDontUse2 = WDialogGetCheckBoxLogical(IDC_DontUse2)
+      tDontUse3 = WDialogGetCheckBoxLogical(IDC_DontUse3)
+      tDontUse4 = WDialogGetCheckBoxLogical(IDC_DontUse4)
       iRow = 1
       iCol = 1
       iField = IDF_RR_ZmatrixGrid
@@ -369,28 +537,56 @@
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             ! Translations
             CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(1,iFrg,iFrgCopy))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg,iFrgCopy))
+            IF (tDontUse1) THEN
+              RR_iopttran(1,iFrg,iFrgCopy) = .FALSE.
+            ELSE
+              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg,iFrgCopy))
+            ENDIF
             iRow = iRow + 1
             CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(2,iFrg,iFrgCopy))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg,iFrgCopy))
+            IF (tDontUse1) THEN
+              RR_iopttran(2,iFrg,iFrgCopy) = .FALSE.
+            ELSE
+              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg,iFrgCopy))
+            ENDIF
             iRow = iRow + 1
             CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(3,iFrg,iFrgCopy))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg,iFrgCopy))
+            IF (tDontUse1) THEN
+              RR_iopttran(3,iFrg,iFrgCopy) = .FALSE.
+            ELSE
+              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg,iFrgCopy))
+            ENDIF
             iRow = iRow + 1
             ! Rotations
             IF (natoms(iFrg) .NE. 1) THEN
               CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(1,iFrg,iFrgCopy))
-              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg,iFrgCopy))
+              IF (tDontUse1) THEN
+                RR_ioptrot(1,iFrg,iFrgCopy) = .FALSE.
+              ELSE
+                CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg,iFrgCopy))
+              ENDIF
               iRow = iRow + 1
               CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(2,iFrg,iFrgCopy))
-              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg,iFrgCopy))
+              IF (tDontUse1) THEN
+                RR_ioptrot(2,iFrg,iFrgCopy) = .FALSE.
+              ELSE
+                CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg,iFrgCopy))
+              ENDIF
               iRow = iRow + 1
               IF (UseQuaternions(iFrg)) THEN
                 CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(3,iFrg,iFrgCopy))
-                CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg,iFrgCopy))
+                IF (tDontUse1) THEN
+                  RR_ioptrot(3,iFrg,iFrgCopy) = .FALSE.
+                ELSE
+                  CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg,iFrgCopy))
+                ENDIF
                 iRow = iRow + 1
                 CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(4,iFrg,iFrgCopy))
-                CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg,iFrgCopy))
+                IF (tDontUse1) THEN
+                  RR_ioptrot(4,iFrg,iFrgCopy) = .FALSE.
+                ELSE
+                  CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg,iFrgCopy))
+                ENDIF
                 iRow = iRow + 1
               ENDIF
             ENDIF
@@ -404,9 +600,15 @@
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 2, natoms(iFrg)
-              CALL WGridGetCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy))
-              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg,iFrgCopy))
-              iRow = iRow + 1
+              IF (RR_Show_bond(i, iFrg)) THEN
+                CALL WGridGetCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy))
+                IF (tDontUse4) THEN
+                  RR_ioptb(i,iFrg,iFrgCopy) = .FALSE.
+                ELSE
+                  CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg,iFrgCopy))
+                ENDIF
+                iRow = iRow + 1
+              ENDIF
             ENDDO
           ENDDO
         ENDIF
@@ -418,9 +620,15 @@
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 3, natoms(iFrg)
-              CALL WGridGetCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy))
-              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg,iFrgCopy))
-              iRow = iRow + 1
+              IF (RR_Show_angle(i, iFrg)) THEN
+                CALL WGridGetCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy))
+                IF (tDontUse3) THEN
+                  RR_iopta(i,iFrg,iFrgCopy) = .FALSE.
+                ELSE
+                  CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg,iFrgCopy))
+                ENDIF
+                iRow = iRow + 1
+              ENDIF
             ENDDO
           ENDDO
         ENDIF
@@ -432,9 +640,15 @@
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 4, natoms(iFrg)
-              CALL WGridGetCellReal(iField, iCol, iRow, RR_bet(i,iFrg,iFrgCopy))
-              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg,iFrgCopy))
-              iRow = iRow + 1
+              IF (RR_Show_torsion(i, iFrg)) THEN
+                CALL WGridGetCellReal(iField, iCol, iRow, RR_bet(i,iFrg,iFrgCopy))
+                IF (tDontUse2) THEN
+                  RR_ioptt(i,iFrg,iFrgCopy) = .FALSE.
+                ELSE
+                  CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg,iFrgCopy))
+                ENDIF
+                iRow = iRow + 1
+              ENDIF
             ENDDO
           ENDDO
         ENDIF
@@ -459,10 +673,16 @@
       IMPLICIT NONE
 
       INTEGER i, iRow, iCol, iField, iFrg, iFrgCopy
+      LOGICAL tDontUse1, tDontUse2, tDontUse3, tDontUse4
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
 ! Fill and display dialogue
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
+      tDontUse1 = WDialogGetCheckBoxLogical(IDC_DontUse1)
+      tDontUse2 = WDialogGetCheckBoxLogical(IDC_DontUse2)
+      tDontUse3 = WDialogGetCheckBoxLogical(IDC_DontUse3)
+      tDontUse4 = WDialogGetCheckBoxLogical(IDC_DontUse4)
       iRow = 1
       iCol = 1
       iField = IDF_RR_ZmatrixGrid
@@ -471,28 +691,29 @@
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             ! Translations
             CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(1,iFrg,iFrgCopy), "(F7.5)")
+            IF ( .NOT. tDontUse1) CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg,iFrgCopy))
             CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg,iFrgCopy))
             iRow = iRow + 1
             CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(2,iFrg,iFrgCopy), "(F7.5)")
-            CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg,iFrgCopy))
+            IF ( .NOT. tDontUse1) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg,iFrgCopy))
             iRow = iRow + 1
             CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(3,iFrg,iFrgCopy), "(F7.5)")
-            CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg,iFrgCopy))
+            IF ( .NOT. tDontUse1) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg,iFrgCopy))
             iRow = iRow + 1
             ! Rotations
             IF (natoms(iFrg) .NE. 1) THEN
               CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(1,iFrg,iFrgCopy), "(F8.5)")
-              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg,iFrgCopy))
+              IF ( .NOT. tDontUse1) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg,iFrgCopy))
               iRow = iRow + 1
               CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(2,iFrg,iFrgCopy), "(F8.5)")
-              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg,iFrgCopy))
+              IF ( .NOT. tDontUse1) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg,iFrgCopy))
               iRow = iRow + 1
               IF (UseQuaternions(iFrg)) THEN
                 CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(3,iFrg,iFrgCopy), "(F8.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg,iFrgCopy))
+                IF ( .NOT. tDontUse1) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg,iFrgCopy))
                 iRow = iRow + 1
                 CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(4,iFrg,iFrgCopy), "(F8.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg,iFrgCopy))
+                IF ( .NOT. tDontUse1) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg,iFrgCopy))
                 iRow = iRow + 1
               ENDIF
             ENDIF
@@ -506,9 +727,11 @@
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 2, natoms(iFrg)
-              CALL WGridPutCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy), "(F7.5)")
-              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg,iFrgCopy))
-              iRow = iRow + 1
+              IF (RR_Show_bond(i, iFrg)) THEN
+                CALL WGridPutCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy), "(F7.5)")
+                IF ( .NOT. tDontUse4) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg,iFrgCopy))
+                iRow = iRow + 1
+              ENDIF
             ENDDO
           ENDDO
         ENDIF
@@ -520,9 +743,11 @@
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 3, natoms(iFrg)
-              CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
-              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg,iFrgCopy))
-              iRow = iRow + 1
+              IF (RR_Show_angle(i, iFrg)) THEN
+                CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
+                IF ( .NOT. tDontUse3) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg,iFrgCopy))
+                iRow = iRow + 1
+              ENDIF
             ENDDO
           ENDDO
         ENDIF
@@ -534,9 +759,11 @@
         IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             DO i = 4, natoms(iFrg)
-              CALL WGridPutCellReal(iField, iCol, iRow, RR_bet(i,iFrg,iFrgCopy), "(F10.5)")
-              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg,iFrgCopy))
-              iRow = iRow + 1
+              IF (RR_Show_torsion(i, iFrg)) THEN
+                CALL WGridPutCellReal(iField, iCol, iRow, RR_bet(i,iFrg,iFrgCopy), "(F10.5)")
+                IF ( .NOT. tDontUse2) CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg,iFrgCopy))
+                iRow = iRow + 1
+              ENDIF
             ENDDO
           ENDDO
         ENDIF
@@ -1214,6 +1441,7 @@
       CHARACTER*1, EXTERNAL :: ChrLowerCase
       INTEGER, EXTERNAL :: WritePDBCommon
       REAL, EXTERNAL :: UnitCellVolume
+      LOGICAL, EXTERNAL :: Get_DivideByEsd
 
       iFlags = SaveDialog + AppendExt + PromptOn
       FILTER = 'pdb (*.pdb)|*.pdb|'// &
@@ -1532,11 +1760,18 @@
             WRITE (hFile,"('END ')",ERR=999)
           CASE (6) ! pro
 !            WRITE(hFile,'(2(A,F7.2))',ERR=999) "Intensity chi-sqrd = ", tIntChiSqd, ", profile chi-sqrd = ", tProChiSqd
-            WRITE(hFile,'(A)',ERR=999) "      2theta"//CHAR(9)//"        Yobs"//CHAR(9)//"   ESD(Yobs)"//CHAR(9)//"       Ycalc"//CHAR(9)//"(Yobs - Ycalc) / ESD(Yobs)"
-            DO I = 1, NBIN
-              WRITE(hFile,12,ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), EBIN(I), CHAR(9), YCBIN(I), CHAR(9), (YOBIN(I)-YCBIN(I))/EBIN(I)
-   12         FORMAT(F12.4,4(A,F12.4))
-            ENDDO
+            IF (Get_DivideByEsd()) THEN
+              WRITE(hFile,'(A)',ERR=999) "      2theta"//CHAR(9)//"        Yobs"//CHAR(9)//"   ESD(Yobs)"//CHAR(9)//"       Ycalc"//CHAR(9)//"(Yobs - Ycalc) * <ESD> / ESD(Yobs)"
+              DO I = 1, NBIN
+                WRITE(hFile,12,ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), EBIN(I), CHAR(9), YCBIN(I), CHAR(9), (YOBIN(I)-YCBIN(I))*AVGESD/EBIN(I)
+              ENDDO
+            ELSE
+              WRITE(hFile,'(A)',ERR=999) "      2theta"//CHAR(9)//"        Yobs"//CHAR(9)//"   ESD(Yobs)"//CHAR(9)//"       Ycalc"//CHAR(9)//"Yobs - Ycalc"
+              DO I = 1, NBIN
+                WRITE(hFile,12,ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), EBIN(I), CHAR(9), YCBIN(I), CHAR(9), (YOBIN(I)-YCBIN(I))
+              ENDDO
+            ENDIF
+   12       FORMAT(F12.4,4(A,F12.4))
         END SELECT
         CLOSE(hFile)
       ENDIF
