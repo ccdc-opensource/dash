@@ -103,12 +103,13 @@
 
 ! Logicals indicating which reflections are absent.
 
-      REAL              AIOBS,         AICALC
-      COMMON /SAREFLNS/ AIOBS(MFCSTO), AICALC(MFCSTO)
+      REAL              BICALC,         XICALC
+      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 
 ! AIOBS = observed intensity, per reflection
 ! AICALC = part of the calculated intensity due to structural parameters (atoms)
-!
+! BICALC = AICALC * XICALC = calculated intensity
+! XICALC = part of the calculated intensity due to preferred orientation
  
 !O! JCC GGCALC dimension increased to 500
 !O      REAL            REFH,           AMUL
@@ -230,12 +231,6 @@
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
 ! Note that the variable names in this COMMON block are not consistent.
-! Note that '150' should be equal to MAXATM, which is 100
-
-      REAL              BICALC,         XICALC
-      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
-! BICALC(1:MAXK) = the calculated intensities corrected for preferred orientation
-! XICALC(1:MAXK) = the preferred orientation part of the calculated intensities
 
       INTEGER           iHMUL
       COMMON /SAREFLN3/ iHMUL(MFCSTO)
@@ -248,7 +243,7 @@
       DOUBLE PRECISION XOPT,       C,       XP,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
 
-! MVAR = 100 (the variable formerly also known as NMAX)
+! MVAR = 100 (the variable formerly also known as NMAX, almost subtly different from MPAR)
 ! XOPT = values of the parameters of the best SA solution so far
 
       INTEGER         KKOR
@@ -256,13 +251,23 @@
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
-      INTEGER         KREFT,         KNIPT
-      REAL                                             PIKVAL
-      COMMON /FPINF1/ KREFT(MOBS), KNIPT(50,MOBS), PIKVAL(50,MOBS)
-!
-! Per bin, stores contributions per intensity.
-!
+      INTEGER         KREFT
+      COMMON /FPINF2/ KREFT(MOBS)
+! KREFT = number of reflections contributing to this bin.
 
+      INTEGER         KNIPT
+      REAL                            PIKVAL
+      COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
+!
+! Per bin, stores contributions per reflection.
+!
+      INTEGER          NFITA, IFITA
+      REAL                                 WTSA
+      COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
+! NFITA & IFITA : for speed up of calculation of profile chi-squared only
+! NFITA = number of bins that have a contribution from a reflection
+! IFITA = a mapping of those bins to YOBIN(MOBS) 
+! WTSA  = weights
       INTEGER         MAXK
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
