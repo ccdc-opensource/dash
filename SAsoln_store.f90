@@ -22,11 +22,11 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file
 
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
@@ -43,7 +43,7 @@
       INTEGER    tFileHandle
       INTEGER    RecNr
 
-      PRO_saved(SA_Run_Number) = .FALSE.
+      PRO_saved(SA_Run_Number+1) = .FALSE.
       IF (.NOT. Get_SavePRO()) RETURN
       OPEN(UNIT=61,FILE=pro_file(1:pro_flen),status='unknown')
       DO I = 1, NBIN
@@ -63,7 +63,7 @@
         CALL FileWriteReal(tFileHandle,RecNr,YOBIN(I))
         CALL FileWriteReal(tFileHandle,RecNr,YCBIN(I))
       ENDDO
-      PRO_saved(SA_Run_Number) = .TRUE.
+      PRO_saved(SA_Run_Number+1) = .TRUE.
       CLOSE(tFileHandle)
       RETURN
   999 CALL DebugErrorMessage("Couldn't open binary file.")
