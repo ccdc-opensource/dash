@@ -709,8 +709,7 @@
       INTEGER tInt1, tInt2, tFieldState
       REAL             tXPMIN,     tXPMAX,     tYPMIN,     tYPMAX,       &
                        tXPGMIN,    tXPGMAX,    tYPGMIN,    tYPGMAX,      &
-                       tXPGMINOLD, tXPGMAXOLD, tYPGMINOLD, tYPGMAXOLD,   &
-                       tXGGMIN,    tXGGMAX
+                       tXPGMINOLD, tXPGMAXOLD, tYPGMINOLD, tYPGMAXOLD
       INTEGER          tIPMIN, tIPMAX, tiStart, tiStop, tnPoints
 
       CALL PushActiveWindowID
