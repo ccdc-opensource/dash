@@ -176,7 +176,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, EXTERNAL :: Get_DashSerialNumber, DateToday
+      INTEGER, EXTERNAL :: Get_DiskSerialNumber, DateToday
       CHARACTER*(*) LString
       TYPE (License_Info) Info
       INTEGER v(2), w(2), cs
@@ -211,7 +211,7 @@
 ! For node-locked licences check the serial id. Site-Wide licences just encode a serial id for our reference
 ! so if we catch any non-authorized users using the key, we know where it came from. Perhaps we may want to make
 ! the user key in this site code on installation for checking purposes.
-        IF (Info%SerialNumber .NE. Get_DashSerialNumber("C:\\"C)) Info%Valid = -4
+        IF (Info%SerialNumber .NE. Get_DiskSerialNumber("C:\\"C)) Info%Valid = -4
       ENDIF
       RETURN
    99 Info%Valid = -2
@@ -306,25 +306,26 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: Get_DiskSerialNumber
       CHARACTER*40 fstr
-      INTEGER      Iflags, Idummy, Sn
+      INTEGER      Iflags, iDummy, Sn
       INTEGER      Iun, IHan
       PARAMETER (Iun = 117)
-      INTEGER      Get_DashSerialNumber
+      CHARACTER*255 fname_2
 
       IFlags = SaveDialog + DirChange + AppendExt
       fstr = 'Text files|*.txt|All files|*.*|'
-      fname = ' '
+      fname_2 = ' '
       Idummy = 1
-      CALL WSelectFile(fstr,IFlags,Fname,"Please enter a filename",Idummy)
-      IF (Fname(1:1) .EQ. ' ') RETURN
-      OPEN(unit = Iun, file = Fname(1:LEN_TRIM(Fname)),status = 'unknown',err=99)
-      Sn = Get_DashSerialNumber("C:\\"C)
+      CALL WSelectFile(fstr, iFlags, fname_2, "Please enter a filename", iDummy)
+      IF (fname_2(1:1) .EQ. ' ') RETURN
+      OPEN(UNIT = Iun, FILE=fname_2(1:LEN_TRIM(fname_2)), STATUS='unknown', ERR=99)
+      Sn = Get_DiskSerialNumber("C:\\"C)
       WRITE(Iun,'(A)',ERR=100) 'This file is provided to submit requests for '//ProgramVersion//' licences.'
       WRITE(Iun,'(A)',ERR=100) 'A DASH evaluation licence will allow you to run DASH on any PC.'
       WRITE(Iun,'(A)',ERR=100) 'A site licence will allow you to install DASH on any PC on your own site.'
       WRITE(Iun,'(A)',ERR=100) 'Most licences, however, are node-locked. For this, we use a unique identifier.'
-      WRITE(Iun,'(A,Z8)',ERR=100)'For this PC, this is ',Sn
+      WRITE(Iun,'(A,Z8)',ERR=100)'For this PC, this is ', Sn
       WRITE(Iun,*,ERR=100)
       WRITE(Iun,'(A)',ERR=100) 'Please complete as applicable:'
       WRITE(Iun,*)
@@ -343,28 +344,28 @@
       WRITE(Iun,*,ERR=100)
       CLOSE(iun,iostat=idummy)
       CALL WMessageBox(YesNo,InformationIcon,CommonYes,&
-        "A file "//Fname(1:LEN_TRIM(Fname))//" has been created."//CHAR(13)//&
+        "A file "//fname_2(1:LEN_TRIM(fname_2))//" has been created."//CHAR(13)//&
         "You should edit this file and then send it to"//CHAR(13)//CHAR(13)//&
         "admin@ccdc.cam.ac.uk"//CHAR(13)//CHAR(13)//&
         "Would you like to edit this file now?","Edit licence request file")
       IF (WinfoDialog(4) .EQ. 1) THEN
         CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,'Edit licence request file'),IHan)
-        CALL WEditFile(Fname(1:LEN_TRIM(Fname)), Modal, 0, 0, SystemFixed)
+        CALL WEditFile(fname_2(1:LEN_TRIM(fname_2)), Modal, 0, 0, SystemFixed)
       ENDIF
       RETURN
    99 CONTINUE
-      CALL ErrorMessage("Sorry, could not open the file "//CHAR(13)//fname(1:LEN_TRIM(Fname)))
+      CALL ErrorMessage("Sorry, could not open the file "//CHAR(13)//fname_2(1:LEN_TRIM(fname_2)))
       CLOSE(iun,iostat=idummy)
       RETURN            
   100 CONTINUE
-      CALL ErrorMessage("Sorry, could not write to the file "//CHAR(13)//fname(1:LEN_TRIM(Fname)))
+      CALL ErrorMessage("Sorry, could not write to the file "//CHAR(13)//fname_2(1:LEN_TRIM(fname_2)))
       CLOSE(iun,iostat=idummy)      
 
       END SUBROUTINE WriteLicenceRequestForm
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Get_DashSerialNumber( lpszDriveName )
+      INTEGER FUNCTION Get_DiskSerialNumber( lpszDriveName )
 
       USE DFWIN
 
@@ -393,9 +394,9 @@
                            NULL,                             &
                            lpszSystemName,                   &
                            nSystemNameSize)
-      Get_DashSerialNumber = IEOR(lpszSerialNumber,Mangler)
+      Get_DiskSerialNumber = IEOR(lpszSerialNumber,Mangler)
 
-      END FUNCTION Get_DashSerialNumber
+      END FUNCTION Get_DiskSerialNumber
 !
 !*****************************************************************************
 !
