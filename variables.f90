@@ -27,14 +27,9 @@
 
       CHARACTER                ::  DIRSPACER
       DATA DIRSPACER / '\' / ! Windows spacer
-! External binaries
-      CHARACTER(MaxPathLength) :: VIEWEXE
-      DATA VIEWEXE / 'C:\Program Files\CCDC\Mercury 1.0\mercury.exe' /
 
-      CHARACTER(20)            ::  VIEWARG
-      DATA VIEWARG / '' /
-      
-      LOGICAL ConvOn       ! Set if external Z-matrix conversion program available
+      CHARACTER(MaxPathLength) :: VIEWEXE
+      CHARACTER(20)            :: VIEWARG
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER*80  DashTicFile
