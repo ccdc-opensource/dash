@@ -516,7 +516,7 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      INTEGER NumberOfDOF, izmtot, iFrg
+      INTEGER NumberOfDOF, izmtot, iFrg, tInteger
       CHARACTER(MaxPathLength) DirName
       CHARACTER*80  FileName
 
@@ -528,7 +528,8 @@
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           nfrag = nfrag + 1
-          ntatm = ntatm + natoms(iFrg)
+          CALL WDialogGetInteger(IDFzmNumber(iFrg),tInteger)
+          ntatm = ntatm + tInteger * natoms(iFrg)
           IF (natoms(iFrg) .EQ. 1) THEN
             NumberOfDOF = 3 ! It's an atom
           ELSE
