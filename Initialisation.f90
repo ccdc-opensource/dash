@@ -324,7 +324,6 @@
       InSA = .FALSE.
       DashRawFile = ' '
       DashHcvFile = 'polyp.hcv'
-      DashHklFile = 'polyp.hkl'
       DashPikFile = 'polyp.pik'
       DashTicFile = 'polyp.tic'
       UseConfigFile = .TRUE.
