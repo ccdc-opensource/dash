@@ -27,7 +27,7 @@
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Viewer) ! 'View'
+            CASE (IDB_View) ! 'View'
 ! Calls subroutine which opens Mercury window with .pdb file
               CALL SA_STRUCTURE_OUTPUT_PDB(Curr_SA_Run)
               CALL ViewStructure('SA_best.pdb')
