@@ -43,7 +43,8 @@
 ! For common block FPINF, FPINF1
 
       INTEGER MFPINF
-      PARAMETER ( MFPINF = 10000 )
+! JvdS I increased this from 10000 to 15000, as that is the value it can get in GETPIK()
+      PARAMETER ( MFPINF = 15000 )
 
 ! For use in common block CMN299
 
@@ -75,6 +76,11 @@
 
       INTEGER MOBS
       PARAMETER ( MOBS = 15000 )
+
+! Note: The following paramters seem to be related to MOBS (i.e., should probably have the same value)
+! MCHSTP
+! MPPTS
+! MFPINF
 
 ! For common block PROFTIC
 
