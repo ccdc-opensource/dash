@@ -1,283 +1,240 @@
 
-  subroutine BackFit(Mode, FilterWidth)
-   INCLUDE 'PARAMS.INC'
+      SUBROUTINE BackFit(FilterWidth)
+      INCLUDE 'PARAMS.INC'
 
-! Temporary local copies 
-   REAL,    DIMENSION(MOBS)		:: ybbin_backup
-   SAVE ybbin_backup
+      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
 
-   COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-   COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-   COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-   YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-   XGGMIN,XGGMAX,YGGMIN,YGGMAX
-   COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      INTEGER FilterWidth
 
+! Calculate values in common array
+      CALL BackMCBruckner(XBIN,YOBIN,EBIN,NBIN,FilterWidth,YBBIN)
 
-   INTEGER Mode,FilterWidth
-   INTEGER I
-
-   IF (Mode .EQ. 0) THEN
-    ! make back up
-     DO I = 1, NBIN
-	  ybbin_backup(I) = ybbin(I)
-	 END DO
-
-   ELSE IF (Mode .EQ. 1) THEN ! Calculate values in common array
-
-	CALL BackMCBruckner(xbin,yobin,ebin,nbin,FilterWidth,ybbin)	
-
-   ELSE IF (Mode .EQ. 2) THEN
-    ! recover backup
-     DO I = 1, NBIN
-	  ybbin(I) = ybbin_backup(I)
-	 END DO
-	 
-   END IF
-
-  end subroutine BackFit
+      END SUBROUTINE BackFit
 !
+!*****************************************************************************
 !
-  subroutine BackMCBruckner(xbin,yobin,ebin,ndat,nbruckwin,ybbin)
+      SUBROUTINE BackMCBruckner(xbin,yobin,ebin,ndat,nbruckwin,ybbin)
 !
-!
-   INCLUDE 'PARAMS.INC'
+      INCLUDE 'PARAMS.INC'
 
-	PARAMETER (MAXSSPL=5000)
-	PARAMETER (MXRAN=10000)
+      PARAMETER (MAXSSPL=5000)
+      PARAMETER (MXRAN=10000)
 !
-	REAL,    DIMENSION(MAXSSPL)		        :: xkt
-	INTEGER, DIMENSION(MAXSSPL)		        :: ikt
-	INTEGER, DIMENSION(MAXSSPL)		        :: ipartem
+      REAL,    DIMENSION(MAXSSPL)                 :: xkt
+      INTEGER, DIMENSION(MAXSSPL)                 :: ikt
+      INTEGER, DIMENSION(MAXSSPL)                 :: ipartem
 !
-	REAL,    DIMENSION(MOBS), INTENT(IN)	:: xbin,yobin,ebin
-	REAL,    DIMENSION(MOBS)		:: ybbin
-	REAL,    DIMENSION(MOBS)		:: yst,es
-	REAL,    DIMENSION(-200:MOBS+200)	:: ys
-	INTEGER, DIMENSION(MOBS)		:: jft
+      REAL,    DIMENSION(MOBS), INTENT(IN)      :: xbin,yobin,ebin
+      REAL,    DIMENSION(MOBS)            :: ybbin
+! JvdS New, local copies of ybbin etc. are created here, but that's not necessary
+      REAL,    DIMENSION(MOBS)            :: yst,es
+      REAL,    DIMENSION(-200:MOBS+200)   :: ys
+      INTEGER, DIMENSION(MOBS)            :: jft
 !
-	INTEGER					:: IRAN
-	REAL, DIMENSION(MXRAN)			:: RANVAL
+      INTEGER                             :: IRAN
+      REAL, DIMENSION(MXRAN)              :: RANVAL
 !
 !  This subroutine determines the background using a smoothing
 !  procedure published by Sergio Bruckner in J. Appl. Cryst. (2000) 33, 977-979
 !  Modified by WIFD to smooth residual noise using SplineSmooth 
 !  and raise background to correct value using a Monte Carlo sampling procedure)
 !
-	mbruckiter=20
-	iran=1
-      call Random_Number(RanVal)
-!
-	do i=-nbruckwin,0
-	  ii=ndat+i
-	  ys(i)=yobin(1)
-	end do
-	do i=1,ndat
-	  ys(i)=yobin(i)
-	end do
-	do i=1,nbruckwin
-	  ii=ndat+i
-	  ys(ii)=yobin(ndat)
-	end do
-!
-    item= 2*nbruckwin
-	do iter=1,mbruckiter
-	 do i=1,ndat
-	  iilo=i-nbruckwin
-	  iihi=i+nbruckwin
-	  ybbin(i)=0.
-	  do ii=iilo,iihi
-	    ybbin(i)=ybbin(i)+ys(ii)
-	  end do
-	  ybbin(i)= (ybbin(i)-ys(i))/float(item)
-	 end do
-!
-	 do i=1,ndat
-	  rat=(ybbin(i)-ys(i))/ebin(i)
-	  stem=1./(1.+exp(min(20.,-rat)))  
-	  iran=1+mod(iran+1,mxran)
-	  if (ranval(iran).lt.stem) then
-		ybbin(i)=ys(i)
-	  end if
-	  ys(i)=ybbin(i)
-	 end do
-!
-	end do
-!	return
+      mbruckiter = 20
+      iran = 1
+      CALL Random_Number(RanVal)
+      DO i = -nbruckwin, 0
+        ii = ndat + i
+        ys(i) = yobin(1)
+      END DO
+      DO i = 1, ndat
+        ys(i) = yobin(i)
+      END DO
+      DO i = 1, nbruckwin
+        ii = ndat + i
+        ys(ii) = yobin(ndat)
+      END DO
+      item = 2 * nbruckwin
+      DO iter = 1, mbruckiter
+        DO i = 1, ndat
+          iilo = i - nbruckwin
+          iihi = i + nbruckwin
+          ybbin(i) = 0.0
+          DO ii = iilo, iihi
+            ybbin(i) = ybbin(i) + ys(ii)
+          END DO
+          ybbin(i) = (ybbin(i)-ys(i))/FLOAT(item)
+        END DO
+        DO i = 1, ndat
+          rat = (ybbin(i)-ys(i))/ebin(i)
+          stem=1./(1.+EXP(MIN(20.,-rat)))  
+          iran=1+MOD(iran+1,mxran)
+          IF (ranval(iran) .LT. stem) THEN
+            ybbin(i)=ys(i)
+          END IF
+          ys(i)=ybbin(i)
+        END DO
+      END DO
 !
 !.. Now we should do some spline smoothing to remove the noise 
 !   
-	nsep=5
-	ninsep=10
-	ngood=0
-	knotem=0
-	npartem=0
-	do i=1,ndat
-	  if (ybbin(i).eq.yobin(i)) then
- 	    es(i)=1.e6*ebin(i)
-	  else
-	    es(i)=ebin(i)
-	    if (ngood.eq.nsep*(ngood/nsep)) then
-	      if (knotem.eq.ninsep*(knotem/ninsep)) then
-	        npartem=npartem+1
-	        ipartem(npartem)=knotem+1
-	      end if
-	      knotem=knotem+1
-	      ikt(knotem)=i
-	      xkt(knotem)=xbin(i)
-	    end if
-	    ngood=ngood+1
-	  end if
-	end do
-	ikt(knotem)=ndat
-	ipartem(npartem)=knotem
-
+      nsep    =  5
+      ninsep  = 10
+      ngood   =  0
+      knotem  =  0
+      npartem =  0
+      DO i = 1, ndat
+        IF (ybbin(i) .EQ. yobin(i)) THEN
+          es(i)=1.e6*ebin(i)
+        ELSE
+          es(i) = ebin(i)
+          IF (ngood.eq.nsep*(ngood/nsep)) THEN
+            IF (knotem.eq.ninsep*(knotem/ninsep)) THEN
+              npartem = npartem + 1
+              ipartem(npartem) = knotem + 1
+            END IF
+            knotem = knotem + 1
+            ikt(knotem) = i
+            xkt(knotem) = xbin(i)
+          END IF
+          ngood = ngood + 1
+        END IF
+      END DO
+      ikt(knotem) = ndat
+      ipartem(npartem) = knotem
+      jft(1) = 1
+      jft(ndat) = knotem - 1
+      DO kk=1,knotem-1
+        i1=ikt(kk)
+        i2=ikt(kk+1)-1
+        DO i=i1,i2
+          jft(i)=kk
+        END DO
+      END DO
+      DO i = 1, npartem - 1
+        jf1 = ipartem(i)
+        jf0 = jf1-1
+        jfp1 = ipartem(i+1)
+        jfn = 1 + jfp1 - ipartem(i)
+        n0 = ikt(jf1)
+        ndiv = 1 + ikt(jfp1) - n0
+        CALL SplineSmooth(xbin(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,ybbin(n0))
+      END DO
 !
-	jft(1)=1
-	jft(ndat)=knotem-1
-	do kk=1,knotem-1
-	  i1=ikt(kk)
-	  i2=ikt(kk+1)-1
-	  do i=i1,i2
-	    jft(i)=kk
-	  end do
-	end do
+      END SUBROUTINE BackMCBruckner
 !
-	do i=1,npartem-1
-	  jf1=ipartem(i)
-	  jf0=jf1-1
-	  jfp1=ipartem(i+1)
-	  jfn=1+jfp1-ipartem(i)
-	  n0=ikt(jf1)
-	  ndiv=1+ikt(jfp1)-n0
-	  call SplineSmooth(xbin(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,ybbin(n0))
-	end do
+!*****************************************************************************
 !
+      SUBROUTINE SplineSmooth(x,y,e,ndat,jf0,jfs,xkk,nkn,smo)
 !
-  end subroutine BackMCBruckner
+      REAL xkk(nkn)
+      REAL x(ndat),y(ndat),e(ndat)
+      INTEGER jfs(ndat)
 !
+      REAL*8 xdel(nkn),u(nkn,nkn)
+      REAL*8 bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
 !
-	subroutine SplineSmooth(x,y,e,ndat,jf0,jfs,xkk,nkn,smo)
+      REAL*8 xdd
+      REAL*8 a(ndat),b(ndat),c(ndat),d(ndat)
 !
-	real xkk(nkn)
-	real x(ndat),y(ndat),e(ndat)
-	integer jfs(ndat)
+      REAL*8 deri(nkn),ans(nkn)
+      REAL   smo(ndat)
+      REAL*8 w
+      REAL*8 qj, qj1
 !
-	real*8 xdel(nkn),u(nkn,nkn)
-	real*8 bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
+      DO j=1,nkn-1
+        xdel(j)=DBLE(xkk(j+1)-xkk(j))
+      END DO
+      CALL SplVal(xdel,u,nkn)
+      nd1=ndat-1
+      nk1=nkn-1
+      DO j=1,nkn
+        bvec(j)=0. 
+        DO k=1,nkn
+          hess(j,k)=0. 
+        END DO
+      END DO
+      DO i=1,ndat
+        j0=MIN(nkn-1,jfs(i)-jf0)
+        j1=j0+1
+        w= DBLE(e(i))**-2
+!       b(i)=(dble(x(i))-xkk(j0))/xdel(j0)
+        b(i)= ( DBLE( x(i)-xkk(j0) ) )/xdel(j0)
+        a(i)=1.-b(i)
+        ab=-a(i)*b(i)/6.
+        xdd=xdel(j0)**2
+        c(i)=ab*(1.+a(i))*xdd
+        d(i)=ab*(1.+b(i))*xdd
+        DO j=1,nkn
+          deri(j)=0.
+        END DO
+        deri(j0)=a(i)
+        deri(j1)=b(i)
+        DO j=1,nkn
+          deri(j)=deri(j)+c(i)*u(j0,j)+d(i)*u(j1,j)
+        END DO
+        do j=1,nkn
+          bvec(j)=bvec(j)+w*dble(y(i))*deri(j)
+          do k=1,nkn
+            hess(j,k)=hess(j,k)+w*deri(j)*deri(k)
+          end do
+        end do
+      end do
+      call DGMINV(hess,covar,nkn)
+      do i=1,nkn
+        ans(i)=0.
+        do j=1,nkn
+          ans(i)=ans(i)+covar(i,j)*bvec(j)
+        end do
+      end do
+      do i=1,ndat
+        j0=jfs(i)-jf0
+        j1=j0+1
+        qj=0.
+        qj1=0.
+        do k=1,nkn
+          qj=qj+u(j0,k)*ans(k)
+          qj1=qj1+u(j1,k)*ans(k)
+        end do
+        smo(i)=sngl(a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1)
+      END DO
 !
-	real*8 xdd
-	real*8 a(ndat),b(ndat),c(ndat),d(ndat)
+      END SUBROUTINE SplineSmooth
 !
-	real*8 deri(nkn),ans(nkn)
-	real   smo(ndat)
-	real*8 w
-	real*8 qj, qj1
+!*****************************************************************************
 !
-	do j=1,nkn-1
-	  xdel(j)=dble(xkk(j+1)-xkk(j))
-	end do
+      SUBROUTINE SplVal(XDEL,U,M)
 !
-	call SplVal(xdel,u,nkn)
+      REAL*8 xdel(m)
+      REAL*8 u(m,m)
+      REAL*8 a(m,m),b(m,m),c(m,m)
 !
-	nd1=ndat-1
-	nk1=nkn-1
+      do j=1,m
+        do i=1,m
+          a(i,j)=0.
+          b(i,j)=0.
+          c(i,j)=0.
+        end do
+      end do
+      a(1,1)=1.
+      a(m,m)=1.
+      DO i=2,m-1
+        im1=i-1
+        ip1=i+1
+        a(i,im1)=xdel(im1)/6.0
+        a(i,ip1)=xdel(i)/6.0
+        a(i,i)=2.*(a(i,im1)+a(i,ip1))
+        c(i,im1)=1./xdel(im1)
+        c(i,ip1)=1./xdel(i)
+        c(i,i)=-(c(i,im1)+c(i,ip1))
+      end do
 !
-	do j=1,nkn
-	  bvec(j)=0. 
-	  do k=1,nkn
-	    hess(j,k)=0. 
-	  end do
-	end do
+      call DGMINV(a,b,m)
+      call DGMPRD(b,c,u,m,m,m)
 !
+      end subroutine SplVal
 !
-	do i=1,ndat
-	  j0=min(nkn-1,jfs(i)-jf0)
-	  j1=j0+1
-	  w= dble(e(i))**-2
-!	  b(i)=(dble(x(i))-xkk(j0))/xdel(j0)
-	  b(i)= ( dble( x(i)-xkk(j0) ) )/xdel(j0)
-	  a(i)=1.-b(i)
-	  ab=-a(i)*b(i)/6.
-	  xdd=xdel(j0)**2
-	  c(i)=ab*(1.+a(i))*xdd
-	  d(i)=ab*(1.+b(i))*xdd
-	  do j=1,nkn
-	    deri(j)=0.
-	  end do
-	  deri(j0)=a(i)
-	  deri(j1)=b(i)
-	  do j=1,nkn
-	    deri(j)=deri(j)+c(i)*u(j0,j)+d(i)*u(j1,j)
-	  end do
-	  do j=1,nkn
-	    bvec(j)=bvec(j)+w*dble(y(i))*deri(j)
-	    do k=1,nkn
-	      hess(j,k)=hess(j,k)+w*deri(j)*deri(k)
-	    end do
-	  end do
-	end do
-!
-	call DGMINV(hess,covar,nkn)
-!
-	do i=1,nkn
-	  ans(i)=0.
-	  do j=1,nkn
-	    ans(i)=ans(i)+covar(i,j)*bvec(j)
-	  end do
-	end do
-!
-!
-	do i=1,ndat
-	  j0=jfs(i)-jf0
-	  j1=j0+1
-	  qj=0.
-	  qj1=0.
-	  do k=1,nkn
-	    qj=qj+u(j0,k)*ans(k)
-	    qj1=qj1+u(j1,k)*ans(k)
-	  end do
-	  smo(i)=sngl(a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1)
-! 
-	end do
-!
-	end subroutine SplineSmooth
-!
-!
-!
-	subroutine SplVal(XDEL,U,M)
-!
-	real*8 xdel(m)
-	real*8 u(m,m)
-	real*8 a(m,m),b(m,m),c(m,m)
-!
-	do j=1,m
-	  do i=1,m
-	    a(i,j)=0.
-	    b(i,j)=0.
-	    c(i,j)=0.
-	  end do
-	end do
-!
-	a(1,1)=1.
-	a(m,m)=1.
-!
-	do i=2,m-1
-	  im1=i-1
-	  ip1=i+1
-	  a(i,im1)=xdel(im1)/6.
-	  a(i,ip1)=xdel(i)/6.
-	  a(i,i)=2.*(a(i,im1)+a(i,ip1))
-	  c(i,im1)=1./xdel(im1)
-	  c(i,ip1)=1./xdel(i)
-	  c(i,i)=-(c(i,im1)+c(i,ip1))
-	end do
-!
-	call DGMINV(a,b,m)
-	call DGMPRD(b,c,u,m,m,m)
-!
-	end
-!
+!*****************************************************************************
 !
 ! LEVEL 3      SUBROUTINE DGMINV(A,B,N)
       SUBROUTINE DGMINV(A,B,N)
@@ -291,9 +248,9 @@
 !A On exit  B is its inverse
 !D Based on SID
 !
-	IMPLICIT REAL*8 (A-H,O-Z)
-      INTEGER		II(500),IL(500),IG(500)
-	REAL*8		A(N,N),B(N,N)
+      IMPLICIT REAL*8 (A-H,O-Z)
+      INTEGER           II(500),IL(500),IG(500)
+      REAL*8            A(N,N),B(N,N)
 !
       CALL DGMEQ(A,B,N,N)
       D=1.
@@ -327,16 +284,16 @@
    80 CONTINUE
 !
       DO 140 J=1,N
-      IF (J .EQ. K) GO TO 140
-      W=B(KF,J)
-      IF (W .EQ. 0.) GO TO 140
-      DO 130 I=1,N
-      IF (I .EQ. KF) THEN
-      B(I,J)=W/P
-      ELSE
-      B(I,J)=B(I,J)+W*B(I,K)
-      ENDIF
-  130 CONTINUE
+        IF (J .EQ. K) GO TO 140
+        W=B(KF,J)
+        IF (W .EQ. 0.) GO TO 140
+        DO 130 I=1,N
+          IF (I .EQ. KF) THEN
+            B(I,J)=W/P
+          ELSE
+            B(I,J)=B(I,J)+W*B(I,K)
+          ENDIF
+  130   CONTINUE
   140 CONTINUE
 !
   150 CONTINUE
@@ -377,12 +334,14 @@
 !N NI and NJ must be at least 1
 !
       REAL*8 A(NI,NJ),B(NI,NJ)
+
       DO 1 I=1,NI
-      DO 1 J=1,NJ
+        DO 1 J=1,NJ
     1 B(I,J)=A(I,J)
       RETURN
       END
 !
+!*****************************************************************************
 !
 ! LEVEL 1      SUBROUTINE DGMPRD(A,B,C,NI,NJ,NK)
       SUBROUTINE DGMPRD(A,B,C,NI,NJ,NK)
@@ -396,18 +355,18 @@
 !A          B is a real NJxNK matrix
 !A On exit  C is a real NIxNK matrix holding A times B
 !
-	IMPLICIT REAL*8 (A-H,O-Z)
+      IMPLICIT REAL*8 (A-H,O-Z)
       REAL*8 A(*),B(*),C(*)
-      DO 2 I = 1,NI
+      DO 2 I = 1, NI
       IK = I
       JK = 1
-      DO 2 K = 1,NK
-      IJ = I
-      C(IK) = 0.
-      DO 1 J = 1,NJ
-      C(IK) = C(IK) + A(IJ)*B(JK)
-      IJ = IJ + NI
-    1 JK = JK + 1
+      DO 2 K = 1, NK
+        IJ = I
+        C(IK) = 0.
+        DO 1 J = 1,NJ
+          C(IK) = C(IK) + A(IJ)*B(JK)
+          IJ = IJ + NI
+    1   JK = JK + 1
     2 IK = IK + NI
       RETURN
       END
