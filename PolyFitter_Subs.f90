@@ -153,48 +153,48 @@
       end if
 !
       SELECT CASE (KeyNumber)
-         CASE(KeyPageLeft)
+         CASE (KeyPageLeft)
            xpgdif=xpgmax-xpgmin
            xpgmin=max(xpmin,xpgmin-0.02*xpgdif)
            xpgmax=xpgmin+xpgdif
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)
-         CASE(KeyPageRight)
+         CASE (KeyPageRight)
 ! We're going to move the graph to the right if we can
            xpgdif=xpgmax-xpgmin
            xpgmax=min(xpmax,xpgmax+0.02*xpgdif)
            xpgmin=xpgmax-xpgdif
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)
-         CASE(KeyCursorLeft)
+         CASE (KeyCursorLeft)
 ! We're going to move the graph to the left if we can
            xpgdif=xpgmax-xpgmin
            xpgmin=max(xpmin,xpgmin-0.25*xpgdif)
            xpgmax=xpgmin+xpgdif
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)
-         CASE(KeyCursorRight)
+         CASE (KeyCursorRight)
 ! We're going to move the graph to the right if we can
            xpgdif=xpgmax-xpgmin
            xpgmax=min(xpmax,xpgmax+0.25*xpgdif)
            xpgmin=xpgmax-xpgdif
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)
-         CASE(KeyLeftExtreme)
+         CASE (KeyLeftExtreme)
 ! We're going to move the graph as far left as we can
            xpgdif=xpgmax-xpgmin
            xpgmin=xpmin
            xpgmax=xpgmin+xpgdif
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)
-         CASE(KeyRightExtreme)
+         CASE (KeyRightExtreme)
 ! We're going to move the graph as far right as we can
            xpgdif=xpgmax-xpgmin
            xpgmax=xpmax
            xpgmin=xpgmax-xpgdif
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)            
-         CASE(KeyPageDown)
+         CASE (KeyPageDown)
 ! We're going to expand the xscale by sqrt(2) if we can
            xpgdif=xpgmax-xpgmin
            xpgav=0.5*(xpgmax+xpgmin)
@@ -210,7 +210,7 @@
            end if
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)
-         CASE(KeyPageUp)
+         CASE (KeyPageUp)
 ! We're going to contract the xscale by sqrt(2)
            xpgdif=xpgmax-xpgmin
            xpgav=0.5*(xpgmax+xpgmin)
@@ -219,14 +219,14 @@
            xpgmax=xpgav+xtem
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)
-         CASE(KeyCursorDown)
+         CASE (KeyCursorDown)
 ! We're going to move the graph down if we can
            ypgdif=ypgmax-ypgmin
            ypgmin=max(ypmin,ypgmin-0.25*ypgdif)
            ypgmax=ypgmin+ypgdif
            CALL Get_IPMaxMin() 
            CALL Profile_Plot(IPTYPE)
-         CASE(KeyCursorUp)
+         CASE (KeyCursorUp)
 ! We're going to move the graph up if we can
            ypgdif=ypgmax-ypgmin
            ypgmax=min(ypmax,ypgmax+0.25*ypgdif)

@@ -230,7 +230,7 @@
       INTEGER    KLEN
 ! Note that FNAME is a global variable
       INTEGER    ISTAT
-      INTEGER    Diffraction_File_Load ! Function
+      INTEGER    DiffractionFileLoad ! Function
       LOGICAL    Confirm ! Function
 
       KLEN = LEN_TRIM(TheFileName)
@@ -254,7 +254,7 @@
       FNAME = TheFileName
 ! Update this throughout the program (Wizard + status bar)
       CALL ScrUpdateFileName
-      ISTAT = Diffraction_File_Load(TheFileName)
+      ISTAT = DiffractionFileLoad(TheFileName)
       IF (ISTAT .EQ. 0) RETURN
 ! Enable the appropriate menus:
       CALL SetModeMenuState(1,-1,-1)
@@ -278,7 +278,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Diffraction_File_Load(TheFileName)
+      INTEGER FUNCTION DiffractionFileLoad(TheFileName)
 !
 ! This routine tries to load a diffraction file.
 !
@@ -335,7 +335,7 @@
       REAL             dSpacing2TwoTheta ! Function
 
       BACKREF = .TRUE.
-      Diffraction_File_Load = 0
+      DiffractionFileLoad = 0
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
 ! Find the last occurence of '.' in TheFileName
@@ -363,7 +363,7 @@
         CASE ('xye ')
           ISTAT = Load_xye_File(TheFileName,ESDsFilled)
       END SELECT
-      Diffraction_File_Load = ISTAT
+      DiffractionFileLoad = ISTAT
       IF (ISTAT .EQ. 0) THEN
         CALL ErrorMessage('Could not load the file')
 ! When we arrive here, the state of the program becomes a little bit undetermined.
@@ -459,7 +459,7 @@
 ! Set minimum and maximum truncation values in Wizard in accordance with data read in
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
-      CALL WDialogPutReal(IDF_Min2Theta,XPMIN)
+      CALL WDialogPutReal(IDF_Min2Theta,XPMIN,'(F6.3)')
 ! If truncation resolution not attainable with current data range / wavelength, adjust the maximum resolution
       CALL WDialogGetReal(IDF_MaxResolution,tReal)
       IF (dSpacing2TwoTheta(tReal) .GT. XPMAX) THEN
@@ -472,7 +472,7 @@
       NoData = .FALSE.
       CALL ScrUpdateFileName
 
-      END FUNCTION Diffraction_File_Load
+      END FUNCTION DiffractionFileLoad
 !
 !*****************************************************************************
 !
@@ -481,7 +481,7 @@
 ! This function tries to load a *.raw file (binary format from Bruker machines).
 ! The routine basically assumes that the file is OK.
 !
-! Note that this function should only be called from Diffraction_File_Load
+! Note that this function should only be called from DiffractionFileLoad
 !
 ! JvdS 23 July 2001
 !
@@ -765,7 +765,7 @@
 ! We do not have permission to write .rd/.sd files: only to read them.
 ! The routine basically assumes that the file is OK.
 !
-! Note that this function should only be called from Diffraction_File_Load
+! Note that this function should only be called from DiffractionFileLoad
 !
 ! JvdS 25 July 2001
 !
@@ -995,7 +995,7 @@
 ! We do not have permission to write .udf files: only to read them.
 ! The routine basically assumes that the file is OK.
 !
-! Note that this function should only be called from Diffraction_File_Load
+! Note that this function should only be called from DiffractionFileLoad
 !
 ! JvdS 25 July 2001
 !
@@ -1196,7 +1196,7 @@
 ! Some variables can have defaults set in the Windows registry: I think it's beyond the scope
 ! of DASH to find those.
 !
-! Note that this function should only be called from Diffraction_File_Load
+! Note that this function should only be called from DiffractionFileLoad
 !
 ! JvdS 25 July 2001
 !
@@ -1474,11 +1474,40 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE AddWavelengthToXYE
+!
+! Old xye files don't contain the wavelength. If such an old xye file is detected,
+! this routine is called to give the user the opportunity to add the wavelength
+! to the xye file.
+!
+! JvdS Sep 2001
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      LOGICAL Confirm ! Function
+
+      IF (Confirm('This is an old .xye file, which does not contain the experimental wavelength.'//CHAR(13)//&
+          'Would you like to add the wavelength now?')) THEN
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_AddWavelengthToXYE)
+      CALL WDialogShow(-1,-1,0,Modeless)
+      CALL PopActiveWindowID
+
+      ENDIF
+
+      END SUBROUTINE AddWavelengthToXYE
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION Load_xye_File(TheFileName,ESDsFilled)
 !
 ! This function tries to load a *.xye file (standard DASH ASCII powder pattern format).
 !
-! Note that this function should only be called from Diffraction_File_Load
+! Note that this function should only be called from DiffractionFileLoad
 !
 ! JCC
 !
@@ -1520,6 +1549,10 @@
       READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
       IF (GetNumOfColumns(Cline) .EQ. 1) THEN
         READ(Cline,*,ERR=999,END=999) Lambda1
+        IF ((Lambda1 .LT. 0.0001) .OR. (Lambda1 .GT. 20.0)) THEN
+           CALL ErrorMessage('First line contains only one column, but not a valid wavelength.')
+           RETURN
+        ENDIF
         CALL UpdateWavelength(Lambda1)
       ELSE
         READ(Cline,*, IOSTAT = IS) XOBS(I),YOBS(I),EOBS(I)
