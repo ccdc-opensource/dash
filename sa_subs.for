@@ -3,6 +3,8 @@
 !
       SUBROUTINE SimulatedAnnealing(imyexit)
 
+      USE VARIABLES
+
       EXTERNAL FCN
 
       INCLUDE 'PARAMS.INC'
@@ -300,23 +302,28 @@ C  acceptance or rejection.
             movenow=m*np*ns
             CALL sa_move_status(1,nmpert,movenow)
             CALL sa_refresh(imyexit,iteration,num_new_min,cpb)
-            IF (imyexit.GT.0.AND.imyexit.LE.3) THEN
+            IF ((imyexit .GT. 0) .AND. (imyexit .LE. 3)) THEN
               IF ( RESTART ) THEN
-                    Call AddMultiSolution(cpb,-sngl(fopt))
-                  ELSE
-                        Call AddSingleSolution(cpb,-sngl(fopt))
+                IF (AutoLocalMinimisation) THEN
+                  CALL AutoLocalMinimise(iteration,num_new_min,cpb)
+                  CALL SA_PROFILE_PLOT(num_sa_profile_plot)
+                  CALL SA_STRUCTURE_OUTPUT(t,fopt,cpb,x,ntotmov)
+                ENDIF
+                CALL AddMultiSolution(cpb,-SNGL(fopt))
+              ELSE
+                CALL AddSingleSolution(cpb,-SNGL(fopt))
               ENDIF
-                  goto 998 ! terminate and close the log file.
-            end if
+              GOTO 998 ! terminate and close the log file.
+            END IF
 300      CONTINUE
 C  Adjust VM so that approximately half of all evaluations are accepted.
          DO 310, II = 1, NP
             I=IP(II)
-            RATIO = DFLOAT(NACP(I)) /DFLOAT(NS)
-            IF (RATIO .GT. .6) THEN
-               VM(I) = VM(I)*(1. + C(I)*(RATIO - .6)/.4)
-            ELSE IF (RATIO .LT. .4) THEN
-               VM(I) = VM(I)/(1. + C(I)*((.4 - RATIO)/.4))
+            RATIO = DFLOAT(NACP(I)) / DFLOAT(NS)
+            IF (RATIO .GT. 0.6) THEN
+               VM(I) = VM(I)*(1.0 + C(I)*(RATIO - 0.6)/0.4)
+            ELSE IF (RATIO .LT. 0.4) THEN
+               VM(I) = VM(I)/(1.0 + C(I)*((0.4 - RATIO)/0.4))
             END IF
             IF (VM(I) .GT. RULB(I)) THEN
                VM(I) = RULB(I)
@@ -348,21 +355,20 @@ C    number of moves in a child window
 c.. corrint specific
       chiprobest(iteration)=cpb
       IF (num_new_min .NE. num_old_min) THEN
-C.. output the structure coordinates in different formats
-        CALL SA_STRUCTURE_OUTPUT(t,fopt,cpb,x,ntotmov)
 c.. plot the profile
         CALL SA_PROFILE_PLOT(num_sa_profile_plot)
+C.. output the structure coordinates in different formats
+        CALL SA_STRUCTURE_OUTPUT(t,fopt,cpb,x,ntotmov)
       END IF
       num_old_min = num_new_min
       CALL SA_OUTPUT(1,SNGL(T),-SNGL(fopt),-SNGL(FPAV),SNGL(FPSD),
      &   xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,
      &   nmpert,ntotmov,iteration)
 c
-C.. If we have asked for an initial temperature to be calculated then
-C.. do so
+C  If we have asked for an initial temperature to be calculated then do so
       IF (ITERATION.EQ.2) THEN
         IF (MAKET0) THEN
-C.. JCC Start temperature increased by 50% as asked for
+C Start temperature increased by 50% as asked for
           T0=FPSD*1.5
           T=T0
           ITERATION=1
@@ -392,7 +398,15 @@ C  Check termination criteria.
 c
 C  Terminate SA if appropriate.
       IF (RESTART) THEN
-        IF ( CheckTerm(NTOTMOV, CHIPROBEST(iteration) ) ) THEN
+        IF ( CheckTerm(NTOTMOV,CHIPROBEST(iteration)) ) THEN
+! End of a run in a multi-run. This is the place for a final local minimisation
+          IF (AutoLocalMinimisation) THEN
+            CALL AutoLocalMinimise(iteration,num_new_min,cpb)
+! Follow routine is called only to synchrnize the common blocks
+            CALL SA_PROFILE_PLOT(num_sa_profile_plot)
+! Optimum crystal structure has changed => store again
+            CALL SA_STRUCTURE_OUTPUT(t,fopt,cpb,x,ntotmov)
+          ENDIF
           CALL AddMultiSolution(cpb,SNGL(-fopt))
 C  ep added.  Before the next SA run starts close the Chi-sqd vs. no moves window opened
 C in the subroutine Chi_sq_plot. 
