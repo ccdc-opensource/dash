@@ -21,7 +21,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Date2String(TheDate,TheDateString)
+      SUBROUTINE Date2String(TheDate,TheDateString, TheLength)
 !
 ! INPUT  TheDate as an integer, e.g. '20010215' for 15 Feb 2001
 ! OUTPUT date, e.g. '7 March 2001'
@@ -31,6 +31,7 @@
 
       INTEGER,       INTENT (IN   ) :: TheDate
       CHARACTER*(*), INTENT (  OUT) :: TheDateString
+      INTEGER,       INTENT (  OUT) :: TheLength
 
       CHARACTER*9  MonthStr(1:12)
       DATA MonthStr / 'January', 'February', 'March',     'April',   'May',      'June',             &
@@ -52,6 +53,7 @@
       WRITE (C4,'(I4)') Year
       TheDateString = C2(1:2)//' '//MonthStr(Month)//' '//C4(1:4)
       CALL StrClean(TheDateString,iLen)
+      TheLength = iLen
 
       END SUBROUTINE Date2String
 !
