@@ -87,6 +87,7 @@
       CALL WDialogLoad(IDD_PW_Page10)
       CALL WDialogLoad(IDD_SAW_Page1)
       CALL WDialogLoad(IDD_zmEdit)
+      CALL WDialogLoad(IDD_zmEditRotations)
       CALL WDialogLoad(IDD_SAW_Page2)
       CALL WDialogLoad(IDD_SA_input2)
       CALL WDialogLoad(IDD_SA_input3)
