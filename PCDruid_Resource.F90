@@ -1,4 +1,4 @@
-! Winteracter module created : 11/Apr/2002 15:35:43
+! Winteracter module created : 12/Apr/2002 10:46:34
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -604,4 +604,6 @@
           INTEGER, PARAMETER :: IDD_Summary                     =   177
           INTEGER, PARAMETER :: IDD_DIALOG009                   =   178
           INTEGER, PARAMETER :: IDB_Select                      =  1112
+          INTEGER, PARAMETER :: IDF_LABEL13                     =  1114
+          INTEGER, PARAMETER :: ID_SaveXYE                      = 40027
       END MODULE Druid_Header
