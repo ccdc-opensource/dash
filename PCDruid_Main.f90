@@ -46,6 +46,7 @@
       CALL WindowOpen(MAIN_WINDOW,128)
 ! Load and display the toolbar
       CALL WMenuToolbar(ID_TOOLBAR1)
+      CALL WCursorShape(CurCrossHair)
 ! Disable the menu buttons
       CALL SetModeMenuState(1,-1,-1)
 ! Setup array of widths for status bar
@@ -148,7 +149,7 @@
 !
 !   Branch depending on chosen menu item
 !
- 10   CALL WCursorShape(CurArrow)
+ 10   CALL WCursorShape(CurCrossHair)
       STATBARSTR(8)=' '
       CALL WindowOutStatusBar(8,STATBARSTR(8))
       SELECT CASE (EventInfo%VALUE1)

@@ -250,7 +250,7 @@
           CALL SplineSmooth(xbin(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,ybbin(n0))
         END DO
       ENDIF
-      CALL WCursorShape(CurArrow)
+      CALL WCursorShape(CurCrossHair)
 
       END SUBROUTINE CalculateBackground
 !
