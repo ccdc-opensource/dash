@@ -1123,6 +1123,9 @@
                 CALL WEditFile(DV_FileName,Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
                 CALL SetChildWinAutoClose(iHandle)
                 CALL ErrorMessage('No solutions were found.')
+! Grey out the "Previous Results >" button in the DICVOL Wizard window
+                CALL WDialogSelect(IDD_PW_Page8)
+                CALL WDialogFieldState(IDB_PrevRes,Disabled)
                 GOTO 999
               ENDIF  
               IF (DICVOL_Error .EQ. cDICVOL_TooManySolutions) CALL WarningMessage('More than 30 solutions found, please check your data.')
