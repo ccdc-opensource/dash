@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 20/Sep/2001 11:32:19
+// Modified : 21/Sep/2001 12:02:50
 //
 ///////////////////////////////////////////////////
 //
@@ -1892,7 +1892,7 @@ BEGIN
     CONTROL "30.0",IDF_Indexing_MaxLen,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  100,   40,   14
     CONTROL "90.0",IDF_Indexing_MinAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   80,  116,   40,   14
     CONTROL "125.0",IDF_Indexing_MaxAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  116,   40,   14
-    CONTROL "Create DICVOL File ...",ID_Indexing_Create,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   96,  208,   82,   14
+    CONTROL "Save DICVOL File ...",ID_Indexing_Create,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   96,  208,   82,   14
     CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  198,  208,   40,   14
     CONTROL "Chemistry (Optional)",IDF_Indexing_chemgroup,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  148,  172,   48
     CONTROL "Other Settings (optional)",IDF_Indexing_Misc,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  196,  148,  126,   48
