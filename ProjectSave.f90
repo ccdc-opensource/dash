@@ -185,6 +185,9 @@
       REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
       COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
       INTEGER, EXTERNAL :: GetCrystalSystem
       INTEGER I, j, RW
       CHARACTER*(255) tString 
@@ -223,6 +226,7 @@
       CALL PrjErrTrace
 ! Read / Write Pawley refinement related stuff
       CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PAWLEYCHISQ)
+      CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, Is_SX)
       CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PeakShapeSigma(1))
       CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PeakShapeSigma(2))
       CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PeakShapeGamma(1))
