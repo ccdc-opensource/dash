@@ -253,12 +253,6 @@
       COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
                       nd1, nmpert, nd3, nd4, bmIHANDLE
 
-      LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
-
       REAL            UR,     UI
       COMMON /FFTDA / UR(15), UI(15)
 
@@ -300,7 +294,6 @@
 ! Initialise arrays to do with administration of open child windows
       ChildWinAutoClose = .FALSE.
       ChildWinHandlerSet = .FALSE.
-      SA_Run_Number = 0
       DashRawFile = ' '
       DashHcvFile = ' '
       DashHklFile = ' '

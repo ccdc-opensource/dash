@@ -39,10 +39,9 @@
       DATA Ix /10/, Iy /450/
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       REAL                    chi_sqd
       INTEGER                                           it_count
@@ -60,19 +59,19 @@
 
 ! Record chi-sqd value in array.  Chi-sqd values following it_count entry
 ! set to last Chi-sqd value entered.
-      chi_sqd(iteration, SA_Run_Number) = CHIPROBEST
+      chi_sqd(iteration, Curr_SA_Run) = CHIPROBEST
       DO J = iteration+1, MaxIter
-        Chi_sqd(J, SA_Run_Number) = CHIPROBEST
+        Chi_sqd(J, Curr_SA_Run) = CHIPROBEST
       ENDDO
 
 ! If first iteration...
       IF (iteration.EQ.1) THEN
 ! ...record y_max for graph
-        y_max = chi_sqd(1, SA_Run_Number)*1.25
+        y_max = chi_sqd(1, Curr_SA_Run)*1.25
       ENDIF
  
 ! If this is the first SA run and 2 points for the line graph have been determined, open Child Window
-      IF ((SA_Run_Number.EQ.1) .AND. (iteration.EQ.2)) THEN
+      IF ((Curr_SA_Run.EQ.1) .AND. (iteration.EQ.2)) THEN
         CALL WindowOpenChild(ChiHandle,SysMenuOn+MinButton+AlwaysOnTop, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
         ChiSqdChildWindows(ChiHandle) = 1
         CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
@@ -105,10 +104,9 @@
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
@@ -200,20 +198,20 @@
 !
 !  Draw graph.
 !
-      IF (SA_Run_Number .GT. 1) THEN
+      IF (NumOf_SA_Runs .GT. 0) THEN
 ! Plot Chi-sqd values to maximum number of moves for completed SA runs
-        CALL IPgNewPlot(PgPolyLine,(SA_Run_Number-1),MaxIterationSoFar,0,1)
-        DO j = 1, SA_Run_Number-1
+        CALL IPgNewPlot(PgPolyLine,NumOf_SA_Runs,MaxIterationSoFar,0,1)
+        DO j = 1, NumOf_SA_Runs
           CALL IPgStyle(  j,  0,  0,  0,  KolNumObs)
         ENDDO
-        DO ISET = 1, SA_Run_Number-1
+        DO ISET = 1, NumOf_SA_Runs
           CALL IPgXYPairs(Xarray, Chi_sqd(1,ISET))
         ENDDO
       ENDIF
 ! Plot Chi-sqd values iteration by iteration
       CALL IPgNewPlot(PgPolyLine,1,it_count,0,1)
       CALL IPgStyle(  1,  0,  0,  0,  KolNumCal)
-      CALL IPgXYPairs(Xarray, chi_sqd(1,SA_Run_Number))
+      CALL IPgXYPairs(Xarray, chi_sqd(1,Curr_SA_Run))
 
       END SUBROUTINE plotting_chi_sqd
 !
@@ -298,10 +296,9 @@
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       CHARACTER(MaxPathLength) OutputFilesBaseName
       INTEGER                                       OFBN_Len
@@ -323,7 +320,7 @@
       tFileName = OutputFilesBaseName(1:OFBN_Len)//'.chi'
       OPEN(UNIT=tFileHandle,FILE=tFileName(1:OFBN_Len+4),ERR=999)
       DO I = 1, MaxIterationSoFar
-        WRITE(tFileHandle,'(I10,1X,99(F9.2,1X))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,SA_Run_Number) ! SA_Run_Number = last completed SA run
+        WRITE(tFileHandle,'(I10,1X,99(F9.2,1X))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
       ENDDO
       CLOSE(tFileHandle)
       RETURN

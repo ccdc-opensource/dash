@@ -278,10 +278,14 @@
 ! IP is their mapping
 
       LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+! RESTART = logical indicating whether multirun or not
+! Curr_SA_Run = The number of the current SA run
+! NumOf_SA_Runs = number of completed SA runs
+! MaxRuns = maximum number of runs requested by the user. (Note difference with MaxRun)
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
