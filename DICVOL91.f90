@@ -287,7 +287,7 @@
 !
       REAL, INTRINSIC :: AMAX1, AMIN1
       REAL :: Amaxi, Angulo, Avog, Bmaxi, Cmaxi,   &
-     &        Di, Difvol, Dos, Dosinv, Epsili, Epsqi, Pasvol, Pasvol1,       &
+     &        Di, Difvol, Epsili, Epsqi, Pasvol, Pasvol1,       &
      &        Petiamaxi, Peticmax, Peticmaxi, Pr, Q11, Qi, Thi, Vmax, Vmin, Vmoi, &
      &        Vn, Voinf, Volmaxc, Vosup, Vplu, Vsupm, Vunitm, Vunitp, Vv, Wave, X, Zb, Zz
       INTEGER :: I, Ichoix, Jfl, Klv, Kvol, Kz1, Kz2, Kzt, Na, Nac, Nb, Nc, Nr, Nvol
@@ -298,11 +298,12 @@
       DICVOL_Error = 0 ! Success
       OPEN(iw,FILE='DICVOL.OUT',ERR=1900)
 99001 FORMAT (A)
-      IF ( amax.EQ.0.0 ) amax = 20.0
-      IF ( Bmax.EQ.0.0 ) Bmax = 20.0
-      IF ( Cmax.EQ.0.0 ) Cmax = 20.0
-      IF ( Volmax.EQ.0.0 ) Volmax = 1500.0
-      Wave = wave2 * 2
+      IF ( amax.EQ.0.0 ) amax = 30.0
+      IF ( Bmax.EQ.0.0 ) Bmax = 30.0
+      IF ( Cmax.EQ.0.0 ) Cmax = 30.0
+      IF ( Volmax.EQ.0.0 ) Volmax = 3000.0
+! wave2 has been set to wavelength / 2
+      Wave = wave2 * 2.0
       pas = 0.4
       IF ( fom .EQ. 0.0 ) fom = 5.0
 !     preparation and writing out of the data
@@ -313,19 +314,19 @@
       nini = n
       WRITE (iw,99003)
 99003 FORMAT (/36X,'INPUT DATA')
-      dth = 0.
+      dth = 0.0
       WRITE (iw,99005)
 99005 FORMAT (12X,'EXPERIMENTAL',35X,'EXPERIMENTAL'/14X,'2-THETA',42X,'ERROR'/)
       WRITE (iw,99034) (d(I),epsil(I),I=1,n)
 99034 FORMAT (11X,F10.3,36X,F10.3)
-      Dos = 1.0
-      Dosinv = 0.5
+! Convert the 2 theta values to d-spacings
       DO I = 1, n
-        th(I) = Dos*d(I)
-        Angulo = pirad*Dosinv*d(I)
+        th(I) = d(I)
+        Angulo = pirad*0.5*d(I)
         d(I) = wave2/SIN(Angulo)
-        dth = dth + Dos*epsil(I)
-        epsil(I) = d(I)*epsil(I)*pirad*Dosinv/TAN(Angulo)
+        d(I) = d(I)
+        dth = dth + epsil(I)
+        epsil(I) = d(I)*epsil(I)*pirad*0.5/TAN(Angulo)
       ENDDO
       Vn = .6/(1./n-.0052)*d(n)**3
  200  DO I = 1, n
