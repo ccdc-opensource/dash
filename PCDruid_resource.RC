@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 21/Mar/2001 12:51:02
+// Modified : 04/Apr/2001 16:04:56
 //
 ///////////////////////////////////////////////////
 //
@@ -581,6 +581,7 @@
 #define ID_Tutorial_2                   40039
 #define ID_Tutorial_3                   40044
 #define ID_Tutorial_4                   40045
+#define ID_Tutorial_5                   40002
 
 ///////////////////////////////////////////////////
 //
@@ -2348,6 +2349,7 @@ BEGIN
             MENUITEM "Tutorial 2: Chloropropamide",              ID_Tutorial_2
             MENUITEM "Tutorial 3: Cimetidine",                   ID_Tutorial_3
             MENUITEM "Tutorial 4: Decafluoroquaterphenyl",       ID_Tutorial_4
+            MENUITEM "Tutorial 5: Uridine",                      ID_Tutorial_5
         END
         MENUITEM SEPARATOR
         MENUITEM "About &DASH",                              ID_help_about_Polyfitter

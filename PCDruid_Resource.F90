@@ -1,4 +1,4 @@
-! Winteracter module created : 21/Mar/2001 12:51:02
+! Winteracter module created : 04/Apr/2001 16:04:56
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -568,4 +568,5 @@
           INTEGER, PARAMETER :: ID_Tutorial_2                   = 40039
           INTEGER, PARAMETER :: ID_Tutorial_3                   = 40044
           INTEGER, PARAMETER :: ID_Tutorial_4                   = 40045
+          INTEGER, PARAMETER :: ID_Tutorial_5                   = 40002
       END MODULE Druid_Header

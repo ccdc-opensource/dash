@@ -20,6 +20,8 @@
 		DirString = INSTDIR(1:len_trim(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial3"
  	ELSE IF  (Tutorial_ID .EQ. ID_Tutorial_4) THEN
 		DirString = INSTDIR(1:len_trim(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial4"
+ 	ELSE IF  (Tutorial_ID .EQ. ID_Tutorial_5) THEN
+		DirString = INSTDIR(1:len_trim(INSTDIR))//DIRSPACER//"Documentation"//DIRSPACER//"tutorial5"
 	END IF
 	FileDir = DirString(1:len_trim(DirString))//DIRSPACER//"data files"
 
