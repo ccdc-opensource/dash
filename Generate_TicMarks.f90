@@ -26,12 +26,15 @@
       INCLUDE 'Lattice.inc'
       INCLUDE 'GLBVAR.INC'
 !
-      REAL XPMIN, XPMAX, YPMIN, YPMAX, XPGMIN, XPGMAX, YPGMIN, YPGMAX,  &
-     &     XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD, XGGMIN, XGGMAX,  &
-     &     YGGMIN, YGGMAX
-      COMMON /PROFRAN/ XPMIN, XPMAX, YPMIN, YPMAX, XPGMIN, XPGMAX,      &
-     &                 YPGMIN, YPGMAX, XPGMINOLD, XPGMAXOLD, YPGMINOLD, &
-     &                 YPGMAXOLD, XGGMIN, XGGMAX, YGGMIN, YGGMAX
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
 !
       INTEGER msymmin
       PARAMETER (msymmin=10)
@@ -139,9 +142,15 @@
 !
       LOGICAL FUNCTION Check_TicMark_Data
 !
-      COMMON /PROFRAN/ XPMIN, XPMAX, YPMIN, YPMAX, XPGMIN, XPGMAX,      &
-     &                 YPGMIN, YPGMAX, XPGMINOLD, XPGMAXOLD, YPGMINOLD, &
-     &                 YPGMAXOLD, XGGMIN, XGGMAX, YGGMIN, YGGMAX
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
 !
       LOGICAL FnUnitCellOK ! Function
       LOGICAL FnWaveLengthOK ! Function
