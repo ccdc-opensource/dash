@@ -1,4 +1,4 @@
-! Winteracter module created : 22/Jul/2003 11:29:16
+! Winteracter module created : 22/Jul/2003 17:20:18
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -260,8 +260,6 @@
           INTEGER, PARAMETER :: IDF_ZM_pars3                    =  1126
           INTEGER, PARAMETER :: IDF_ZM_pars4                    =  1127
           INTEGER, PARAMETER :: IDF_ZM_allpars_label            =  1135
-          INTEGER, PARAMETER :: IDD_SA_input2                   =   120
-          INTEGER, PARAMETER :: IDD_TEMPLATE009                 =   141
           INTEGER, PARAMETER :: IDF_SA2_label                   =  1141
           INTEGER, PARAMETER :: IDD_SA_input3                   =   142
           INTEGER, PARAMETER :: IDB_SA3_finish                  =  1144
@@ -680,25 +678,6 @@
           INTEGER, PARAMETER :: IDB_SDI_file_Open               =  1515
           INTEGER, PARAMETER :: IDB_SDI_file_Browse             =  1523
           INTEGER, PARAMETER :: IDB_PO_Settings                 =  1534
-          INTEGER, PARAMETER :: IDD_RR_PO_Settings              =   195
-          INTEGER, PARAMETER :: IDF_RADIO2                      =  1535
-          INTEGER, PARAMETER :: IDF_RADIO5                      =  1536
-          INTEGER, PARAMETER :: IDF_PO_a2                       =  1230
-          INTEGER, PARAMETER :: IDF_PO_b2                       =  1238
-          INTEGER, PARAMETER :: IDF_PO_c2                       =  1239
-          INTEGER, PARAMETER :: IDF_PO_a3                       =  1231
-          INTEGER, PARAMETER :: IDF_PO_b3                       =  1240
-          INTEGER, PARAMETER :: IDF_PO_c3                       =  1241
-          INTEGER, PARAMETER :: IDF_PO_a4                       =  1232
-          INTEGER, PARAMETER :: IDF_PO_b4                       =  1242
-          INTEGER, PARAMETER :: IDF_PO_c4                       =  1244
-          INTEGER, PARAMETER :: IDF_PO_a5                       =  1233
-          INTEGER, PARAMETER :: IDF_PO_b5                       =  1245
-          INTEGER, PARAMETER :: IDF_PO_c5                       =  1246
-          INTEGER, PARAMETER :: IDF_REAL2                       =  1537
-          INTEGER, PARAMETER :: IDF_REAL3                       =  1538
-          INTEGER, PARAMETER :: IDF_REAL4                       =  1539
-          INTEGER, PARAMETER :: IDF_REAL5                       =  1540
           INTEGER, PARAMETER :: IDF_zmFile5                     =  1392
           INTEGER, PARAMETER :: IDB_zmBrowse5                   =  1357
           INTEGER, PARAMETER :: IDF_ZM_pars5                    =  1128
