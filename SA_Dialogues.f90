@@ -22,6 +22,8 @@
       PastPawley = .TRUE.
 ! Grey out 'Delete all peak fit ranges' button on toolbar
       CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
+! Grey out 'Fit peaks' button on toolbar
+      CALL WMenuSetState(ID_FitPeaks,ItemEnabled,WintOff)
 ! Grey out 'Clear cell parameters' button on toolbar
       CALL WMenuSetState(ID_Delabc,ItemEnabled,WintOff)
 ! Grey out 'Remove Background' button on toolbar
@@ -46,6 +48,11 @@
       CALL WDialogFieldState(IDF_TOF_source,DialogReadOnly)
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
+      CALL WDialogSelect(IDD_ViewPawley)
+      CALL WDialogFieldState(IDF_Sigma1,DialogReadOnly)
+      CALL WDialogFieldState(IDF_Sigma2,DialogReadOnly)
+      CALL WDialogFieldState(IDF_Gamma1,DialogReadOnly)
+      CALL WDialogFieldState(IDF_Gamma2,DialogReadOnly)
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
       CALL SetModeMenuState(-1,-1)
@@ -291,7 +298,6 @@
       INTEGER, EXTERNAL :: zmSave, zmSaveAs, WriteMol2, zmRebuild
       INTEGER tLength, I, iBondNr2
       CHARACTER(MaxPathLength) temp_file
-      CHARACTER(MaxPathLength) tOldFileName
       INTEGER, EXTERNAL :: ElmSymbol2CSD
 
       CALL PushActiveWindowID
@@ -336,16 +342,14 @@
               CALL zmReOrder(iFrg)
               CALL zmCopyTemp2Dialog
             CASE (IDOK)
-              CALL zmCopyDialog2Temp
 ! If an atom has been deleted, rebuild the Z-matrix.
-              tOldFileName = frag_file(CurrentlyEditedFrag)
               IF (zmRebuild() .EQ. 1) THEN
                 CALL ErrorMessage('Could not rebuild the Z-matrix')
               ELSE
                 CALL WDialogHide
               ENDIF
-              frag_file(CurrentlyEditedFrag) = tOldFileName
               CALL zmCopy(0,CurrentlyEditedFrag)
+              CALL UpdateZmatrixSelection
             CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide
             CASE (IDBSAVE)
@@ -716,11 +720,13 @@
 
       IMPLICIT NONE      
 
-      INTEGER iFrg, zmRead
+      INTEGER iFrg
       INTEGER, EXTERNAL :: Read_One_ZM, WriteMol2
-      INTEGER tNumZMatrices
+      INTEGER tNumZMatrices, iAtomNr
       CHARACTER(80) tZmatrices
       DIMENSION tZmatrices(10)
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
+      CHARACTER(MaxPathLength) tOldFileName
 
 ! Initialise to failure
       zmRebuild = 1
@@ -731,20 +737,25 @@
         zmRebuild = 0
         RETURN
       ENDIF
-      IF (WriteMol2('temp.mol2',.FALSE.,iFrg) .NE. 1) RETURN ! Writing mol2 file failed
-      CALL zmConvert('temp.mol2',tNumZMatrices,tZmatrices)
+      tOldFileName = frag_file(iFrg)
+      DO iAtomNr = 1, natcry
+        atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
+        aelem(iAtomNr) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+      ENDDO
+      IF (WriteMol2('Rebuild_temp.mol2',.FALSE.,iFrg) .NE. 1) GOTO 700 ! Writing mol2 file failed
+      CALL zmConvert('Rebuild_temp.mol2',tNumZMatrices,tZmatrices)
 ! Check that we still have 1 Z-matrix
-      IF (tNumZMatrices .EQ. 0) RETURN ! Conversion failed
+      IF (tNumZMatrices .EQ. 0) GOTO 700 ! Conversion failed
       IF (tNumZMatrices .GT. 1) THEN
         CALL WarningMessage('More than 1 Z-matrix generated.'//&
                             'Only the first will be retained.')
-        CALL IOsCopyFile('temp_1.zmatrix','temp.zmatrix')
+        CALL IOsCopyFile('Rebuild_temp_1.zmatrix','Rebuild_temp.zmatrix')
       ENDIF
-      frag_file(iFrg) = 'temp.zmatrix'
-      zmRead = Read_One_ZM(iFrg)
-      IF (zmRead .NE. 0) RETURN ! reading failed
+      frag_file(iFrg) = 'Rebuild_temp.zmatrix'
+      IF (Read_One_ZM(iFrg) .NE. 0) GOTO 700 ! reading failed
       zmAtomDeleted = .FALSE.
       zmRebuild = 0
+  700 frag_file(iFrg) = tOldFileName
 
       END FUNCTION zmRebuild
 !
