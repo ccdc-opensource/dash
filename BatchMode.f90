@@ -4,7 +4,6 @@
       SUBROUTINE BatchMode(ArgString)
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE ZMVAR
       USE PRJVAR
 
@@ -105,7 +104,6 @@
               MaxMoves1 =   0.001
             IF (MaxMoves1 .GT. 100.0  ) &
               MaxMoves1 = 100.0
-            CALL WDialogGetInteger(IDF_MaxMoves2, MaxMoves2)
             IF (MaxMoves2 .LT. 1) &
               MaxMoves2 = 1
             IF (MaxMoves2 .GT. 8) &
@@ -210,6 +208,110 @@
       IMPLICIT NONE
 
       END SUBROUTINE WriteBatchFile
+!
+!*****************************************************************************
+!
+      SUBROUTINE MergeDASHFiles(DirName, OutputFileName)
+
+! Note: at the end of the day, we will have to be able to read everything into DASH. DASH is
+! limited to 99 (= MaxRun) solutions, so this routine will also always be limited to 99 solutions at a time.
+
+      USE WINTERACTER
+      USE PRJVAR
+      USE SOLVAR
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: DirName
+      CHARACTER*(*), INTENT (IN   ) :: OutputFileName
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      CHARACTER*255    dash_files(1:MaxRun), tDirName, FileName, tExtension
+      REAL All_BestValuesDoF(1:100,1:MaxRun)  ! mvar, MaxRun
+      REAL All_ProfileChiSqd(1:MaxRun)
+      REAL All_IntensityChiSqd(1:MaxRun)
+      INTEGER tot_nruns, number_of_dash_files, I, iRun, iDoF, iLen
+      INTEGER nvar_expected, ExtLength
+
+      in_batch = .TRUE.
+      number_of_dash_files = MaxRun
+      CALL IOsDirInfo(DirName, "*.dash", dash_files, number_of_dash_files)
+      tDirName = DirName
+      iLen = LEN_TRIM(tDirName)
+      IF ( tDirName(iLen:iLen) .NE. "\" ) THEN
+        tDirName = tDirName(1:iLen)//"\"
+        iLen = iLen + 1
+      ENDIF
+      tot_nruns = 0
+      DO I = 1, number_of_dash_files ! Loop over .dash files
+        CALL PrjFileLoad(tDirName(1:iLen)//dash_files(I))
+        !C Check that the number of variables is consistent in all .dash files
+        IF ( I .EQ. 1 ) THEN
+          nvar_expected = nvar
+        ELSE
+          IF ( nvar .NE. nvar_expected ) STOP
+        ENDIF
+        !C BestValuesDoF(1:100, 1:nruns) now contains the variables for this .dash file:
+        !C store in All_BestValuesDoF
+        DO iRun = 1, NumOf_SA_Runs
+          tot_nruns = tot_nruns + 1
+          IF ( tot_nruns .GT. MaxRun ) &
+            tot_nruns = MaxRun
+          All_ProfileChiSqd(tot_nruns)   = ProfileChiSqd(iRun)
+          All_IntensityChiSqd(tot_nruns) = IntensityChiSqd(iRun)
+          DO iDoF = 1, nvar
+            All_BestValuesDoF(iDoF, tot_nruns) = BestValuesDoF(iDoF, iRun)
+          ENDDO
+        ENDDO
+      ENDDO
+      NumOf_SA_Runs = tot_nruns
+      DO iRun = 1, NumOf_SA_Runs
+        ProfileChiSqd(iRun)   = All_ProfileChiSqd(iRun)
+        IntensityChiSqd(iRun) = All_IntensityChiSqd(iRun)
+        DO iDoF = 1, nvar
+          BestValuesDoF(iDoF, iRun) = All_BestValuesDoF(iDoF, iRun)
+        ENDDO
+      ENDDO
+      CALL SORT_REAL(IntensityChiSqd, iSol2Run, NumOf_SA_Runs)
+      !C Fabricate output file name from input files.
+      iLen = LEN_TRIM(OutputFileName)
+      IF ( iLen .GT. 0 ) THEN
+        FileName = OutputFileName
+        IF ( iLen .GT. 5 ) THEN ! Strip possible .dash extension
+          tExtension = FileName(iLen-4:iLen)
+          CALL StrUpperCase(tExtension)
+          IF ( tExtension .EQ. ".DASH" ) &
+            iLen = iLen - 5
+        ENDIF
+      ELSE
+        ExtLength = 4
+        CALL SplitPath2(dash_files(1), tDirName, FileName, tExtension, ExtLength)
+        iLen = LEN_TRIM(FileName)
+        !C Try to convert "Example1.dash" or "Example01.dash" to "Example.dash"
+        IF ( IntValueOfChar(FileName(iLen:iLen)) .GE. 0 ) THEN
+          iLen = iLen - 1
+          IF ( IntValueOfChar(FileName(iLen:iLen)) .GE. 0 ) &
+            iLen = iLen - 1
+        ELSE
+          FileName = "output"
+          iLen = LEN_TRIM(FileName)
+        ENDIF
+      ENDIF
+      CALL PrjReadWrite(FileName(1:iLen)//".dash", cWrite)
+
+      END SUBROUTINE MergeDASHFiles
 !
 !*****************************************************************************
 !

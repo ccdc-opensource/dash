@@ -49,12 +49,24 @@
 
       in_batch = .FALSE.
       IF (NARGS() .GT. 1) THEN
-        CALL GetArg(1, ArgString) 
-        ExtLen = 7
-        CALL FileGetExtension(ArgString, StrFileExtension, ExtLen)
-        CALL StrUpperCase(StrFileExtension)
-        IF (StrFileExtension .EQ. 'DUFF   ') &
+        CALL GetArg(1, ArgString)
+        CALL StrUpperCase(ArgString)
+        IF ( ArgString .EQ. "MERGE" ) THEN
+          IF ( NARGS() .EQ. 2 ) STOP
           in_batch = .TRUE.
+          CALL GetArg(2, tDirName)
+          tFileName = ""
+          IF ( NARGS() .GT. 3 ) &
+            CALL GetArg(3, tFileName)
+          CALL MergeDASHFiles(tDirName, tFileName);
+          STOP
+        ELSE
+          ExtLen = 7
+          CALL FileGetExtension(ArgString, StrFileExtension, ExtLen)
+          CALL StrUpperCase(StrFileExtension)
+          IF (StrFileExtension .EQ. 'DUFF   ') &
+            in_batch = .TRUE.
+        ENDIF
       ENDIF
       first_zm_in_win = 1
 ! Initialise Winteracter
@@ -78,7 +90,7 @@
         IWIDTHS(1) = 6200
         DO IWID = 2, 4
           IWIDTHS(IWID) = 800
-        END DO
+        ENDDO
         IWIDTHS(5)= 1500 
 ! Split status bar into more than one part
         CALL WindowStatusBarParts(5, IWIDTHS)
