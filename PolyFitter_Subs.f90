@@ -564,8 +564,11 @@
 
       LOGICAL, EXTERNAL :: Confirm
       INTEGER II, IP, NTPEAK, iNewNumber, iOldNumber, iPeakNr, iPoint
-      REAL ATEM, ANEW
+      REAL    ATEM, ANEW
+      LOGICAL ReplotNecessary, RecalculationNecessary
 
+      ReplotNecessary        = .FALSE.
+      RecalculationNecessary = .FALSE.
       xcur(1) = XCurFirst
       xgcur(2) = EventInfo%GX
       ygcur(2) = EventInfo%GY
@@ -583,6 +586,8 @@
               CALL ErrorMessage('Place the cursor in a peak fitting range.')
             ELSE
               IF (Confirm('Do you really want to'//CHAR(13)//' delete this peak fitting range?')) THEN
+                ReplotNecessary        = .TRUE.
+                RecalculationNecessary = .TRUE.
 ! The cursor is sitting inside the peak range - remove the range
 ! If there is only a single range, simply set number of ranges to 0
                 IF (NumPeakFitRange .EQ. 1) THEN
@@ -641,23 +646,28 @@
                     IPF_RPt(II+1) = IPF_RPt(II) + IPF_Range(II)
                   ENDDO
                 ENDIF ! Re-shuffling necessary
-                CALL Upload_Positions
-                CALL Upload_Widths
-                CALL Profile_Plot
               ENDIF ! Confirm that this PFR must be deleted
             ENDIF ! Cursor in a PFR?
           ENDIF ! NumPeakFitRange.EQ.0
-        CASE (49:57)
+        CASE (49:57,KeyInsert)
 ! KeyNumber=1-9: locating peak positions...
+! Insert: add another peak
 ! Are we in a peak range?
           CALL DetermineCurrentPeakFitRange(XCur(2))
           IF (CurrentRange .NE. 0) THEN
-            NTPeak = EventInfo%VALUE1 - 48
+            IF (EventInfo%VALUE1 .EQ. KeyInsert) THEN
+              NTPeak = NumInPFR(CurrentRange) + 1
+            ELSE
+              NTPeak = EventInfo%VALUE1 - 48
+            ENDIF
 ! Three cases : 1. existing peak, 2. next peak, 3. too big.
 ! Next peak
             IF (NTPeak .EQ. (NumInPFR(CurrentRange) + 1)) CALL INC(NumInPFR(CurrentRange))
             IF (NTPeak .LE. NumInPFR(CurrentRange)) THEN
-! When we are here, we are either adding a peak or shifting an old one. Either way, mark the hatched area as 'not fitted'
+              ReplotNecessary        = .TRUE.
+              IF (RangeFitYN(CurrentRange)) RecalculationNecessary = .TRUE.
+! When we are here, we are either adding a peak or shifting an old one.
+! Either way, mark the hatched area as 'not fitted'
               RangeFitYN(CurrentRange) = .FALSE.
               XPF_Pos(NTPeak,CurrentRange) = XCur(2)
               ATem = ABS(XCur(2)-XBIN(IPF_Lo(CurrentRange)))
@@ -668,30 +678,9 @@
                   YPF_Pos(NTPeak,CurrentRange) = YOBIN(IP)
                 ENDIF
               ENDDO
-              CALL Profile_Plot
             ENDIF
           ENDIF
 ! We've got ourselves a new initial peak position
-        CASE (KeyInsert)
-! Insert next peak
-! Are we in a peak range?
-          CALL DetermineCurrentPeakFitRange(XCur(2))
-          IF (CurrentRange .NE. 0) THEN
-            NTPeak = NumInPFR(CurrentRange) + 1
-            CALL INC(NumInPFR(CurrentRange))
-! Add a peak, mark the hatched area as 'not fitted'
-            RangeFitYN(CurrentRange) = .FALSE.
-            XPF_Pos(NTPeak,CurrentRange) = XCur(2)
-            ATem = ABS(XCur(2)-XBIN(IPF_Lo(CurrentRange)))
-            DO IP = IPF_Lo(CurrentRange), IPF_Hi(CurrentRange)
-              ANew = ABS(XCur(2)-XBIN(IP))
-              IF (ANew.LE.ATem) THEN
-                ATem = ANew
-                YPF_Pos(NTPeak,CurrentRange) = YOBIN(IP)
-              ENDIF
-            ENDDO
-            CALL Profile_Plot
-          ENDIF
         CASE (48,KeyReturn)
 ! KeyNumber=0 or KeyReturn: get ready to fit peaks ...
 ! Check if in a peak range - if not tell the user...
@@ -706,9 +695,15 @@
             CALL WCursorShape(CurHourGlass)
             CALL MultiPeak_Fitter
             CALL WCursorShape(CurCrossHair)
-            CALL Profile_Plot
+            ReplotNecessary        = .TRUE.
+            RecalculationNecessary = .TRUE.
           ENDIF
       END SELECT
+      IF (RecalculationNecessary) THEN
+        CALL Upload_Positions
+        CALL Upload_Widths
+      ENDIF
+      IF (ReplotNecessary) CALL Profile_Plot
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL CheckIfWeCanIndex
 
