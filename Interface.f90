@@ -27,7 +27,6 @@
 ! This is that routine.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
 
       IMPLICIT NONE
 
@@ -54,7 +53,6 @@
 ! This is that routine.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
 
       IMPLICIT NONE
 
@@ -80,7 +78,6 @@
 ! This is that routine.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
 
       IMPLICIT NONE
 
@@ -1506,9 +1503,6 @@
 !
 ! NOTE don't call this function with TheOption 1, because that will initialise the wavelength to 0.0
 !
-      USE WINTERACTER
-      USE DRUID_HEADER
-
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: TheOption

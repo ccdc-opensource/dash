@@ -16,7 +16,6 @@
 !
       USE DICVAR
       USE WINTERACTER
-      USE DRUID_HEADER
 
       IMPLICIT NONE
 !

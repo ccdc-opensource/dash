@@ -252,7 +252,6 @@
       SUBROUTINE WriteLicenceFile(LString)
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -303,7 +302,6 @@
       SUBROUTINE WriteLicenceRequestForm
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE

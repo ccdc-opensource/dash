@@ -164,7 +164,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -412,7 +411,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -732,7 +730,6 @@
 !           TitleOfRange = some sort of identifier for that range
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -910,7 +907,6 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
