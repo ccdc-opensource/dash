@@ -114,7 +114,7 @@
               ENDIF
               CALL IGrColourN(InfoGrScreen(PrevColReq))
               CALL Get_IPMaxMin()
-              CALL Profile_Plot(IPTYPE)
+              CALL Profile_Plot
               RETURN  
           END SELECT
         ENDIF
@@ -161,42 +161,42 @@
            xpgmin=MAX(xpmin,xpgmin-0.02*xpgdif)
            xpgmax=xpgmin+xpgdif
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyPageRight)
 ! We're going to move the graph to the right if we can
            xpgdif=xpgmax-xpgmin
            xpgmax=MIN(xpmax,xpgmax+0.02*xpgdif)
            xpgmin=xpgmax-xpgdif
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyCursorLeft)
 ! We're going to move the graph to the left if we can
            xpgdif=xpgmax-xpgmin
            xpgmin=MAX(xpmin,xpgmin-0.25*xpgdif)
            xpgmax=xpgmin+xpgdif
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyCursorRight)
 ! We're going to move the graph to the right if we can
            xpgdif=xpgmax-xpgmin
            xpgmax=MIN(xpmax,xpgmax+0.25*xpgdif)
            xpgmin=xpgmax-xpgdif
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyLeftExtreme)
 ! We're going to move the graph as far left as we can
            xpgdif=xpgmax-xpgmin
            xpgmin=xpmin
            xpgmax=xpgmin+xpgdif
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyRightExtreme)
 ! We're going to move the graph as far right as we can
            xpgdif=xpgmax-xpgmin
            xpgmax=xpmax
            xpgmin=xpgmax-xpgdif
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)            
+           CALL Profile_Plot      
          CASE (KeyPageDown)
 ! We're going to expand the xscale by sqrt(2) if we can
            xpgdif=xpgmax-xpgmin
@@ -212,7 +212,7 @@
              xpgmin=xpgmax-2.*xtem
            END IF
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyPageUp)
 ! We're going to contract the xscale by sqrt(2)
            xpgdif=xpgmax-xpgmin
@@ -221,21 +221,21 @@
            xpgmin=xpgav-xtem
            xpgmax=xpgav+xtem
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyCursorDown)
 ! We're going to move the graph down if we can
            ypgdif=ypgmax-ypgmin
            ypgmin=MAX(ypmin,ypgmin-0.25*ypgdif)
            ypgmax=ypgmin+ypgdif
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyCursorUp)
 ! We're going to move the graph up if we can
            ypgdif=ypgmax-ypgmin
            ypgmax=MIN(ypmax,ypgmax+0.25*ypgdif)
            ypgmin=ypgmax-ypgdif
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyUpExtreme)
 ! We're going to scale to min/max y over the current range
            ii = ypgmin
@@ -248,7 +248,7 @@
              END IF
            END DO
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyBackspace)
 ! Undo last zoom action
            xpgmint=xpgmin
@@ -264,7 +264,7 @@
            ypgminold=ypgmint
            ypgmaxold=ypgmaxt
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)
+           CALL Profile_Plot
          CASE (KeyHome)
 ! Back to full profile range
            xpgmin=xpmin
@@ -272,7 +272,7 @@
            ypgmin=ypmin
            ypgmax=ypmax
            CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)        
+           CALL Profile_Plot     
       END SELECT
 
       END SUBROUTINE Check_KeyDown
@@ -507,7 +507,7 @@
                   ELSE
 ! Remove old cross-hair
                     IF (imov.EQ.2) THEN
-                      CALL profile_plot(IPTYPE)
+                      CALL profile_plot
                       CALL IGrPlotMode('EOR')
                     ELSE
                       CALL IGrFillPattern(Hatched,Medium,DiagUp)
@@ -578,7 +578,7 @@
                 statbarstr(isb)='          '
                 CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
               ENDDO                
-              CALL Profile_Plot(IPTYPE)
+              CALL Profile_Plot
             ENDIF
             RETURN 
         END SELECT
@@ -759,7 +759,7 @@
           ENDIF ! WInfoDialog(4).EQ.CommonYes
         ENDIF  ! NumPeakFitRange.eq.0
         CALL IGrPlotMode(' ')
-        CALL Profile_Plot(IPTYPE)
+        CALL Profile_Plot
 !                CALL IGrPlotMode('EOR')
         CALL Upload_Positions
         CALL Upload_Widths
@@ -807,7 +807,7 @@
         ENDIF ! NumPeakFitRange.gt.0
 ! We've got ourselves a new initial peak position
         CALL IGrPlotMode(' ')
-        CALL Profile_Plot(IPTYPE)
+        CALL Profile_Plot
         CALL IGrPlotMode('EOR')
       ELSE IF (EventInfo%VALUE1.EQ.48 .or. EventInfo%VALUE1.EQ.KeyReturn) THEN
 ! KeyNumber=0 or KeyReturn: get ready to fit peaks ...
@@ -834,7 +834,7 @@
           ENDIF ! InRange.eq.0
         ENDIF ! NumPeakFitRange.gt.0                
         CALL IGrPlotMode(' ')
-        CALL Profile_Plot(IPTYPE)
+        CALL Profile_Plot
       ELSE
         CALL IGrPlotMode(' ')
       ENDIF
