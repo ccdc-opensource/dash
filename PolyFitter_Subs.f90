@@ -63,9 +63,10 @@
             END DO
           END IF
           SELECT CASE (EventType)
-            CASE (Expose,Resize)
-              CALL Redraw()
-              IMOV = 0        
+!U            CASE (Expose,Resize)
+!U              CALL Redraw()
+!U! JvdS @ The following line is now never dealt with
+!U              IMOV = 0        
             CASE (MouseMove)
               xgcur(2) = EventInfo%GX
               ygcur(2) = EventInfo%GY
@@ -126,7 +127,6 @@
 
       USE WINTERACTER
       USE VARIABLES
-!      TYPE(WIN_MESSAGE) :: MESSAGE
 
       INCLUDE 'PARAMS.INC'
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
@@ -277,84 +277,37 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Check_PushButton
-
+      SUBROUTINE Create_DicvolIndexFile
+     
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
-      IMPLICIT NONE
+      INCLUDE 'params.inc'
 
-      INCLUDE 'Poly_Colours.inc'
-      INCLUDE 'GLBVAR.INC'
-
-      REAL Temp
-
-!!! When a dialog push button is pressed, the unique identifier
-!!! of that button is returned in VALUE%VALUE1. 
-!!! This will correspond to the identifier defined in the 
-!!! program's resource file. VALUE%VALUE2 will be set to the 
-!!! identifier of the currently selected field in the corresponding 
-!!! dialog when the button was pressed.
-! This subroutine acts on various PushButton options
-
-      SELECT CASE (EventInfo%VALUE1)
-        CASE (IDCANCEL)
-          IF (EventInfo%WIN .NE. 0) THEN
-            CALL WDialogSelect(EventInfo%WIN)
-            CALL WDialogHide()
-          END IF
-        CASE(ID_Index_Output)
-! Set the wavelength
-          CALL DownLoadWavelength(IDD_Data_Properties)
-          CALL WDialogSelect(IDD_Index_Preparation)
-          CALL WDialogShow(-1,-1,0,Modeless)
-        CASE(ID_Indexing_Create)
-          CALL WDialogSelect(IDD_Index_Preparation)
-          CALL WDialogGetReal(IDF_Indexing_Lambda,Temp)
-          IF (Temp .LT. 0.00001) THEN
-            CALL ErrorMessage("The radiation wavelength has not been entered!")
-          ELSE                 
-            CALL Create_DicvolIndexFile()
-            CALL WDialogSelect(IDD_Index_Preparation)
-            CALL WDialogHide()
-          END IF
-      END SELECT
-! Now replot
-! No new x-y limits so we don't call Get_IPMaxMin() 
-      CALL Profile_Plot(IPTYPE)
-!
-      END SUBROUTINE Check_PushButton
-!
-!*****************************************************************************
-!
-      SUBROUTINE Create_DicvolIndexFile
-!     
-      USE WINTERACTER
-      USE druid_header
-      USE VARIABLES
-
-      INTEGER            :: IFLAGS,KLEN
-      CHARACTER(LEN=256) :: FILTER
-      REAL Rvpar(2), Rcpar(3), Lambda, Rdens, Rmolwt, Rfom, Rexpzp, Reps
-      INTEGER Isystem(6), UseErr, I, Iord
-      PARAMETER (MTPeak=100)
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
       PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
       IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)
 
+      INTEGER IFTYPE
+      INTEGER            :: IFLAGS,KLEN
+      CHARACTER(LEN=75) :: FILTER
+      REAL Rvpar(2), Rcpar(3), Lambda, Rdens, Rmolwt, Rfom, Rexpzp, Reps
+      INTEGER Isystem(6), UseErr, I, Iord
+
 ! Get a file name
 
 ! Extract the information from the dialog
-      Icursel = WInfoDialog(CurrentDialog)
+      CALL PushActiveWindowID
       IFLAGS = SaveDialog  + PromptOn + AppendExt
-      FILTER = 'DICVOL files (*.dat)|*.dat|All files |*.*|'
+      FILTER = 'All files (*.*)|*.*|DICVOL files (*.dat)|*.dat|'
       FNAME=' '
-      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Enter DICVOL file name')
-      klen = LEN_TRIM(FNAME)
-      IF (klen .EQ. 0) RETURN
+      IFTYPE = 2
+      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Enter DICVOL file name',IFTYPE)
+      KLEN = LEN_TRIM(FNAME)
+      IF (KLEN .EQ. 0) RETURN
       CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogGetReal(IDF_Indexing_Lambda,  Lambda)
+      CALL WDialogGetReal(IDF_Indexing_Lambda, Lambda)
       CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
       CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
       CALL WDialogGetReal(IDF_Indexing_MaxLen, Rcpar(1))
@@ -372,38 +325,38 @@
       CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  Isystem(6))
       CALL WDialogGetCheckBox(IDF_Indexing_UseErrors,  UseErr)
 ! Write it out 
-      OPEN(FILE=FNAME(1:klen), UNIT=117, STATUS='UNKNOWN',ERR=99)
-      WRITE(117,*,ERR=100) 'Dicvol input file created by DASH'
-      WRITE(117,'(8(I3,1x))',ERR=100)  NTPeak, 2, (Isystem(i),i=1,6)
-      WRITE(117,'(7(f8.2,1x))',ERR=100)  Rcpar(1),Rcpar(1),Rcpar(1),Rvpar(1),Rvpar(2),Rcpar(2),Rcpar(3)
-      WRITE(117,'(f10.6,1x,3(f8.4,1x))',ERR=100)  Lambda, Rmolwt, Rdens, Rdens/50.0
+      OPEN(UNIT=117,FILE=FNAME(1:KLEN),STATUS='UNKNOWN',ERR=99)
+      WRITE(117,*,ERR=100) 'DICVOL input file created by DASH'
+      WRITE(117,'(8(I3,1X))',ERR=100)  NTPeak, 2, (Isystem(i),i=1,6)
+      WRITE(117,'(7(F8.2,1X))',ERR=100)  Rcpar(1),Rcpar(1),Rcpar(1),Rvpar(1),Rvpar(2),Rcpar(2),Rcpar(3)
+      WRITE(117,'(F10.6,1X,3(F8.4,1X))',ERR=100)  Lambda, Rmolwt, Rdens, Rdens/50.0
       IF (UseErr .EQ. 1) THEN
         Reps = 1.0
       ELSE
         Reps = 0.0
       END IF
-      WRITE(117,'(f3.1,1x,f6.2,1x,f9.6)',ERR=100) Reps, Rfom, Rexpzp
+      WRITE(117,'(F3.1,1X,F6.2,1X,F9.6)',ERR=100) Reps, Rfom, Rexpzp
       IF (UseErr .EQ. 1) THEN
         DO I = 1, NTPeak
           IOrd = IOrdTem(i)
-          WRITE(117,'(f12.4,1x,f12.4)',ERR=100) AllPkPosVal(IOrd), AllPkPosEsd(IOrd)*10.0
+          WRITE(117,'(F12.4,1X,F12.4)',ERR=100) AllPkPosVal(IOrd), AllPkPosEsd(IOrd)*10.0
         END DO
       ELSE
         DO I = 1, NTPeak
           IOrd = IOrdTem(i)
-          WRITE(117,'(f12.4)',ERR=100) AllPkPosVal(IOrd)
+          WRITE(117,'(F12.4)',ERR=100) AllPkPosVal(IOrd)
         END DO
       END IF        
       CLOSE(117)
-      IF (ICurSel .NE. 0) CALL WDialogSelect(Icursel)
+      CALL PopActiveWindowID
       RETURN
  99   CONTINUE
       CALL ErrorMessage("Sorry, could not open the file"//CHAR(13)//FNAME(1:KLEN))
-      IF (ICurSel .NE. 0) CALL WDialogSelect(Icursel)
+      CALL PopActiveWindowID
       RETURN
  100  CONTINUE
       CALL ErrorMessage("Sorry, could not write to the file"//CHAR(13)//FNAME(1:KLEN))
-      IF (ICurSel .NE. 0) CALL WDialogSelect(Icursel)
+      CALL PopActiveWindowID
       RETURN
 
       END SUBROUTINE Create_DicvolIndexFile
@@ -685,42 +638,42 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Rebin_Profile()
-!
-! Rebins the profile
-!
-      INCLUDE 'PARAMS.INC'
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-
-      INCLUDE 'statlog.inc'
-!
-      NBIN=(NOBS/LBIN)
-      DO I=1,NBIN
-        IST=(I-1)*LBIN
-        XADD=0.
-        YOADD=0.
-        YCADD=0.
-        YBADD=0.
-        VADD=0.
-        DO J=1,LBIN
-          JJ=J+IST
-          XADD=XADD+XOBS(JJ)
-          YOADD=YOADD+YOBS(JJ)
-          YCADD=YCADD+YCAL(JJ)
-          YBADD=YBADD+YBAK(JJ)
-          VADD=VADD+EOBS(JJ)**2
-        END DO
-        XBIN(I)=XADD/FLOAT(LBIN)
-        YOBIN(I)=YOADD/FLOAT(LBIN)
-        YCBIN(I)=YCADD/FLOAT(LBIN)
-        YBBIN(I)=YBADD/FLOAT(LBIN)
-        EBIN(I)=SQRT(VADD)/FLOAT(LBIN)
-      END DO
-      DataSetChange=DataSetChange+1
-      CALL Get_IPMaxMin() 
-!
-      END SUBROUTINE Rebin_Profile
+!U      SUBROUTINE Rebin_Profile()
+!U!
+!U! Rebins the profile
+!U!
+!U      INCLUDE 'PARAMS.INC'
+!U      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+!U      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+!U
+!U      INCLUDE 'statlog.inc'
+!U!
+!U      NBIN=(NOBS/LBIN)
+!U      DO I=1,NBIN
+!U        IST=(I-1)*LBIN
+!U        XADD=0.
+!U        YOADD=0.
+!U        YCADD=0.
+!U        YBADD=0.
+!U        VADD=0.
+!U        DO J=1,LBIN
+!U          JJ=J+IST
+!U          XADD=XADD+XOBS(JJ)
+!U          YOADD=YOADD+YOBS(JJ)
+!U          YCADD=YCADD+YCAL(JJ)
+!U          YBADD=YBADD+YBAK(JJ)
+!U          VADD=VADD+EOBS(JJ)**2
+!U        END DO
+!U        XBIN(I)=XADD/FLOAT(LBIN)
+!U        YOBIN(I)=YOADD/FLOAT(LBIN)
+!U        YCBIN(I)=YCADD/FLOAT(LBIN)
+!U        YBBIN(I)=YBADD/FLOAT(LBIN)
+!U        EBIN(I)=SQRT(VADD)/FLOAT(LBIN)
+!U      END DO
+!U      DataSetChange=DataSetChange+1
+!U      CALL Get_IPMaxMin() 
+!U!
+!U      END SUBROUTINE Rebin_Profile
 !
 !*****************************************************************************
 !
@@ -767,14 +720,6 @@
         CALL GetEvent
         IF (EventInfo%WIN .NE. 0) THEN ! Message from a dialogue
           SELECT CASE (EventType)
-            CASE (PushButton)
-              CALL Check_PushButton
-            CASE (FieldChanged)
-              CALL Main_Field_Changed_Routines(EventInfo%Value1,EventInfo%Value2)
-            CASE (TabChanged)
-              CALL Main_Field_Changed_Routines(EventInfo%Value1,EventInfo%Value2)
-            CASE (Expose,Resize)
-              CALL Redraw()
             CASE (CloseRequest)
               CALL WDialogSelect(IDD_Structural_Information)
               CALL WDialogHide()
@@ -814,8 +759,6 @@
                 CALL Check_KeyDown
                 CALL Check_KeyDown_PeakFit
               END IF
-            CASE (Expose,Resize)
-              CALL Redraw()
           END SELECT 
         END IF
       END DO
@@ -900,8 +843,8 @@
           ygcur(2) = EventInfo%GY
           CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
           SELECT CASE (EventType)
-            CASE (Expose,Resize)
-              CALL Redraw()
+!U            CASE (Expose,Resize)
+!U              CALL Redraw()
             CASE (KeyDown)
               KeyNumber = EventInfo%Value1
               CALL Check_KeyDown_PeakFit_Inner(KeyNumber,xcur(1),xcur(2))
