@@ -130,9 +130,7 @@
 
       INTEGER, EXTERNAL :: HKLFFileBrowse, HKLFFileOpen
       LOGICAL, EXTERNAL :: SaveProject
-      INTEGER IRadSelection
       CHARACTER(LEN=MaxPathLength) CTEMP
-      REAL    Temp
       INTEGER iErr
 
       CALL PushActiveWindowID
@@ -454,7 +452,7 @@
         ENDIF
       ENDDO
 !C Write out a fake .pik file
-      OPEN(UNIT=hFile,FILE='polyp.pik',STATUS='UNKNOWN',ERR=999)
+      OPEN(UNIT=hFile, FILE='polyp.pik', STATUS='UNKNOWN', ERR=999)
       DO I = 1, NBIN
         KTEM = KREFT(I)
         WRITE(hFile,*) XBIN(I), YOBIN(I), EBIN(I), KTEM
@@ -464,7 +462,7 @@
       ENDDO
       CLOSE(hFile)
 !C Write out a fake .hcv file
-      OPEN(UNIT=hFile,FILE='polyp.hcv',STATUS='UNKNOWN',ERR=999)
+      OPEN(UNIT=hFile, FILE='polyp.hcv', STATUS='UNKNOWN', ERR=999)
       DO iR = 1, NumOfRef
         WRITE(hFile,101) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), iR
   101   FORMAT (3I5,1X,F12.3,1X,F12.4,1X,I5)
