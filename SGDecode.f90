@@ -181,19 +181,9 @@
       DATA strtran/'   ', '   ', '1/6', '1/4', '1/3', '   ', '1/2',     &
      &     '   ', '2/3', '3/4', '5/6', '   '/
       INTEGER kk
-! ep added
-      REAL SymOpNumber
-      DIMENSION SymOpNumber(1,3)
-      CHARACTER*1 SymOpSign
-      DIMENSION SymOpSign(1,3)
-      INTEGER SymOPAxis
-      DIMENSION SymOPAxis(1,3) 
-      COMMON /DecodeSymOps/ SymOpNumber, SymOpSign, SymOPAxis
 !
       lstout = 0
-      DO i = 1,3
-        SymOpNumber(1,i) = 1.0
-      ENDDO
+
       DO i = 1, 3
 !
         ipt = 0
@@ -201,40 +191,18 @@
         item = 1 + nint(12.*symtem(i,4))
         jpt = ipt + lentran(item)
         stem(ipt+1:jpt) = strtran(item)
-        SELECT CASE (stem(ipt+1:jpt))
-          CASE('1/2')
-            SymOpNumber(1,i) = 0.5
-          CASE('1/4')
-            SymOpNumber(1,i) = 0.25
-          CASE('1/3')
-            SymOpNumber(1,i) = 1.0/3.0
-          CASE('2/3')
-            SymOpNumber(1,i) = 2.0/3.0
-          CASE('1/6')
-            SymOpNumber(1,i) = 1.0/6.0
-          CASE('3/4')
-            SymOpNumber(1,i) = 0.75
-          CASE('5/6')
-            SymOpNumber(1,i) = 5.0/6.0
-         END SELECT
         ipt = jpt
         kk = nint(symtem(i,1))
         IF (kk.EQ.-1) THEN
           stem(ipt+1:ipt+2) = '-x'
           ipt = ipt + 2
-          SymOPSign (1,i) = '-'
-          SymOPAxis (1,i) = 1
         ELSEIF (kk.EQ.1) THEN
           IF (ipt.EQ.0) THEN
             stem(ipt+1:ipt+1) = 'x'
             ipt = ipt + 1
-            SymOPSign (1,i) = '*'
-            SymOPAxis (1,i) = 1
           ELSE
             stem(ipt+1:ipt+2) = '+x'
             ipt = ipt + 2
-            SymOpSign(1,i) = '+'
-            SymOPAxis (1,i) = 1
           ENDIF
         ENDIF
 !
@@ -243,19 +211,13 @@
         IF (kk.EQ.-1) THEN
           stem(ipt+1:ipt+2) = '-y'
           ipt = ipt + 2
-          SymOPSign (1,i) = '-'
-          SymOPAxis (1,i) = 2
         ELSEIF (kk.EQ.1) THEN
           IF (ipt.EQ.0) THEN
             stem(ipt+1:ipt+1) = 'y'
             ipt = ipt + 1
-            SymOPSign (1,i) = '*'
-            SymOPAxis (1,i) = 2
           ELSE
             stem(ipt+1:ipt+2) = '+y'
             ipt = ipt + 2
-            SymOPSign (1,i) = '+'
-            SymOPAxis (1,i) = 2
           ENDIF
         ENDIF
 !
@@ -263,19 +225,13 @@
         IF (kk.EQ.-1) THEN
           stem(ipt+1:ipt+2) = '-z'
           ipt = ipt + 2
-          SymOPSign (1,i) = '-'
-          SymOPAxis (1,i) = 3
         ELSEIF (kk.EQ.1) THEN
           IF (ipt.EQ.0) THEN
             stem(ipt+1:ipt+1) = 'z'
             ipt = ipt + 1
-            SymOPSign (1,i) = '*'
-            SymOPAxis (1,i) = 3
           ELSE
             stem(ipt+1:ipt+2) = '+z'
             ipt = ipt + 2
-            SymOPSign (1,i) = '+'
-            SymOPAxis (1,i) = 3
           ENDIF
         ENDIF
         stoutt(lstout+1:lstout+ipt) = stem(1:ipt)
