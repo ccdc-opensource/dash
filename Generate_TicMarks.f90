@@ -39,18 +39,21 @@
       REAL                                           DSTAR
       COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
-      INTEGER msymmin
-      PARAMETER (msymmin=10)
-      INTEGER nsymmin
-      REAL symmin
-      CHARACTER*20 symline
-      COMMON /symgencmn/ nsymmin, symmin(4,4,msymmin), symline(msymmin)
+      INTEGER     msymmin
+      PARAMETER ( msymmin = 10 )
+      INTEGER            nsymmin
+      REAL                        symmin
+      CHARACTER*20                                           symline
+      COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 
       CHARACTER(MaxPathLength) TemTicFile
-      LOGICAL Check_TicMark_Data
+      LOGICAL, EXTERNAL :: Check_TicMark_Data
       INTEGER I, isym, LenFil
       INTEGER TicRead
-      INTEGER GETTIC   ! Function
+      INTEGER, EXTERNAL :: GETTIC
 !
 !  Space group number          : SGNumStr(IPosSg)
 !  Space Group (IT tables)     : SGHMaStr(IPosSg)
@@ -68,6 +71,7 @@
         RETURN
       ENDIF
       IF (PastPawley) RETURN
+   10 IBMBER = 0
       OPEN (42,FILE='polyf.ccl',STATUS='unknown')
       WRITE (42,4210)
  4210 FORMAT ('N Polyfitter file')
@@ -94,13 +98,21 @@
  4260 FORMAT ('L ZERO ',F10.5)
       WRITE (42,4270)
  4270 FORMAT ('L SCAL   0.10000'/'L SLIM 2.0'/'L PKCN TYPE 1'/          &
-     &        'L PKFN TYPE 3'/'L PKFN LIMS 0.005'/                      &
-     &        'L PKFN SIGM    0.0051    0.0001'/                        &
-     &        'L PKFN GAMM    0.0009    0.2703'/'L PKFN HPSL    0.0250'/&
-     &        'L PKFN HMSL    0.0008'/'L BACK 2 0.0 0.0 0.0 0.0 0.0'/   &
-     &        'L VARY ONLY ALL INTS'/'L VARY ALL BACK ')
+              'L PKFN TYPE 3'/'L PKFN LIMS 0.005'/                      &
+              'L PKFN SIGM    0.0051    0.0001'/                        &
+              'L PKFN GAMM    0.0009    0.2703'/'L PKFN HPSL    0.0250'/&
+              'L PKFN HMSL    0.0008'/'L BACK 2 0.0 0.0 0.0 0.0 0.0'/   &
+              'L VARY ONLY ALL INTS'/'L VARY ALL BACK ')
       CLOSE (42)
       CALL Generate_TicMarks_CCSLcode
+      IF (IBMBER .NE. 0) THEN
+        NumberSGTable = 1 ! P1
+        CALL ErrorMessage('Error while calculating tick marks: space group reset to P1.')
+! Set the crystal system
+        LatBrav = 1
+        CALL Upload_CrystalSystem
+        GOTO 10
+      ENDIF
       TemTicFile = 'polyf.tic'
       lenfil = 9
       TicRead = GETTIC(9,TemTicFile)
@@ -114,6 +126,8 @@
 ! DIMENSION OF ALSQ BELOW, AND SETTING OF MATSZ, TO BE ALTERED TO BE SOMETHING
 ! A LITTLE LARGER THAN N*(N+3)/2 WHERE THERE WILL BE N BASIC VARIABLES
 !
+      INCLUDE 'Lattice.inc'
+      
       EXTERNAL PCCN01, PFCN03, DUMMY, CALPR
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       LOGICAL MULFAS, MULSOU, MULONE
