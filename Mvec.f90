@@ -1,9 +1,6 @@
-!*==ALNINT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION ALNINT(A,B,X,N)
       FUNCTION ALNINT(A,B,X,N)
 !
 ! *** ALNINT by JCM 21 May 85 ***
@@ -22,20 +19,17 @@
 !A ALINT on exit will hold the function value for argument X
 !
       DIMENSION A(N), B(N)
-!
+
       DO I = 2, N
         IF (A(I).GT.X) GOTO 2
       ENDDO
       I = N
     2 ALNINT = (B(I-1)*(A(I)-X)-B(I)*(A(I-1)-X))/(A(I)-A(I-1))
-      RETURN
+
       END FUNCTION ALNINT
-!*==C1MSCA.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE C1MSCA(A,B,SCALE,NI,NJ)
       SUBROUTINE C1MSCA(A,B,SCALE,NI,NJ)
 !
 ! *** C1MSCA by PJB Apr 87 ***
@@ -50,19 +44,17 @@
 !N Does nothing if NI or NJ is zero
 !
       COMPLEX B(1), SCALE
+
       DIMENSION A(1)
       NIJ = NI*NJ
       DO I = 1, NIJ
         B(I) = SCALE*A(I)
       ENDDO
-      RETURN
+
       END SUBROUTINE C1MSCA
-!*==CGAMMA.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE CGAMMA(R,X,E,G)
       SUBROUTINE CGAMMA(R,X,E,G)
 !
 ! *** CGAMMA/CGAMMS updated by PJB/JBF Dec 89 ***
@@ -80,14 +72,12 @@
 !
       DOUBLE PRECISION Y, Z, A
       LOGICAL SIMS, SI
-!
+
       DIMENSION G(2)
       SIMS = .FALSE.
       GOTO 1
-!
       ENTRY CGAMMS(R,X,E,G,RMS)
       SIMS = .TRUE.
-!
     1 Y = DBLE(R)
       Y = (Y-1.)/((Y*E+1.)*X)
       SI = DABS(Y).GE..005
@@ -98,7 +88,6 @@
           G(1) = SIGN(1.,SNGL(Y))
           G(2) = G(1)
         ELSE
-!
           A = Y*Y - 1.
           IF (SIMS) A = A + RMS
           Z = DSQRT(A)
@@ -106,7 +95,6 @@
           G(2) = Y - Z
         ENDIF
       ELSE
-!
         IF (Y.LT.0.) THEN
           G(2) = 0.0
           G(1) = 0.5*Y
@@ -117,14 +105,11 @@
           IF (G(2).GT..00001) G(1) = 1/G(2)
         ENDIF
       ENDIF
-      RETURN
+
       END SUBROUTINE CGAMMA
-!*==CGMADD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE CGMADD(A,B,C,NI,NJ)
       SUBROUTINE CGMADD(A,B,C,NI,NJ)
 !
 ! *** CGMADD by JCM 20 Nov 87 ***
@@ -136,19 +121,17 @@
 !A On exit C is set to the sum of A and B
 !
       COMPLEX A(NI,NJ), B(NI,NJ), C(NI,NJ)
+
       DO I = 1, NI
         DO J = 1, NJ
           C(I,J) = A(I,J) + B(I,J)
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE CGMADD
-!*==CGMEQ.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE CGMEQ(A,B,N,M)
       SUBROUTINE CGMEQ(A,B,N,M)
 !
 ! *** CGMEQ by JCM ***
@@ -160,18 +143,16 @@
 !A On exit B, a COMPLEX matrix of the same total size, has been set equal to A
 !N Would not give error even if N or M were zero.
       COMPLEX A(1), B(1)
+
       NE = N*M
       DO I = 1, NE
         B(I) = A(I)
       ENDDO
-      RETURN
+
       END SUBROUTINE CGMEQ
-!*==CGMSCA.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE CGMSCA(A,B,SCALE,NI,NJ)
       SUBROUTINE CGMSCA(A,B,SCALE,NI,NJ)
 !
 ! *** CGMSCA by PJB Apr 87 ***
@@ -186,18 +167,16 @@
 !N Note the existence of CMRSCA which works with a REAL scale
 !
       COMPLEX A(1), B(1), SCALE
+
       NIJ = NI*NJ
       DO I = 1, NIJ
         B(I) = SCALE*A(I)
       ENDDO
-      RETURN
+
       END SUBROUTINE CGMSCA
-!*==CGMZER.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE CGMZER(A,NI,NJ)
       SUBROUTINE CGMZER(A,NI,NJ)
 !
 ! *** CGMZER by JCM 23 Oct 87 ***
@@ -209,18 +188,16 @@
 !A On exit A is cleared to COMPLEX zero
 !
       COMPLEX A(1)
+
       NIJ = NI*NJ
       DO I = 1, NIJ
         A(I) = CMPLX(0.,0.)
       ENDDO
-      RETURN
+
       END SUBROUTINE CGMZER
-!*==CMCONJ.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE CMCONJ(A,B,I,J)
       SUBROUTINE CMCONJ(A,B,I,J)
 !
 ! *** CMCONJ by PJB Nov 89 ***
@@ -232,19 +209,17 @@
 !A On exit the I by J complex matrix B contains conjugate complex of A
 !
       COMPLEX A(I,J), B(I,J)
+
       DO II = 1, I
         DO JJ = 1, J
           B(II,JJ) = CONJG(A(II,JJ))
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE CMCONJ
-!*==CMRSCA.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE CMRSCA(A,B,SCALE,NI,NJ)
       SUBROUTINE CMRSCA(A,B,SCALE,NI,NJ)
 !
 ! *** CMRSCA by JCM 23 Aug 88 ***
@@ -259,18 +234,16 @@
 !N Note also the existence of CGMSCA which works entirely in COMPLEX.
 !
       COMPLEX A(1), B(1)
+
       NIJ = NI*NJ
       DO I = 1, NIJ
         B(I) = SCALE*A(I)
       ENDDO
-      RETURN
+
       END SUBROUTINE CMRSCA
-!*==DEGREE.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION DEGREE(X)
       FUNCTION DEGREE(X)
 !
 ! *** DEGREE by JCM ***
@@ -286,16 +259,13 @@
 !N /CONSTA/ and multiply X by DEG.
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-!
+
       DEGREE = DEG*X
-      RETURN
+
       END FUNCTION DEGREE
-!*==DETER3.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION DETER3(A)
       FUNCTION DETER3(A)
 !
 ! *** DETER3 by JCM 28 Jun 83 ***
@@ -307,7 +277,8 @@
 !A On exit DETER3 holds its determinant.
 !
       DIMENSION A(3,3)
-      D = 0.
+
+      D = 0.0
       J = 2
       K = 3
       DO I = 1, 3
@@ -316,14 +287,11 @@
         K = I
       ENDDO
       DETER3 = D
-      RETURN
+
       END FUNCTION DETER3
-!*==ERFNC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION ERFNC(X)
       FUNCTION ERFNC(X)
 !
 ! *** ERFNC by WIFD 22 Aug 85 ***
@@ -339,28 +307,23 @@
       DATA A4, A5, A6/0.0001520143, 0.0002765672, 0.0000430638/
 !  THESE COEFFICIENTS WERE TAKEN FROM ABRAMOVITZ AND STEGUN P.299
 !  AND GIVE ERFNC ACCURATE TO 3E-07 FOR BOTH +VE AND -VE X.
-!
+
       Z = ABS(X)
       ZZ = Z*Z
       ZZZ = Z*Z*Z
-      E = 1.0 + A1*Z + A2*ZZ + A3*ZZZ + A4*ZZ*ZZ + A5*ZZ*ZZZ +          &
-     &    A6*ZZZ*ZZZ
+      E = 1.0 + A1*Z + A2*ZZ + A3*ZZZ + A4*ZZ*ZZ + A5*ZZ*ZZZ + A6*ZZZ*ZZZ
       IF (E.LT.10.0) GOTO 1
       E = 0.0
       GOTO 2
     1 E = 1.0/E**16
       IF (E.LE.0.0) E = 0.0
     2 IF (X.LT.0.0) E = 2.0 - E
-!
       ERFNC = E
-      RETURN
+
       END FUNCTION ERFNC
-!*==FF01A.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE FF01A(VJS,VYS,XS,N)
       SUBROUTINE FF01A(VJS,VYS,XS,N)
 !
 ! *** FF01A from HARWELL LIBRARY modified by JCM 17 Jan 85 ***
@@ -403,10 +366,8 @@
      &     .30061451D-12, -.320674742D-11, .4220121905D-10,             &
      &     -.72719159369D-9, .1797245724797D-7, -.74144984110606D-6,    &
      &     .683851994261165D-4, -.3111170921067402D-1/
-!
-!VMS
       DATA XLG/1.7D+38/
-!3084      XLG=(1.0D0 - 16.0D0**(-14)) * 16.0D0**(+63)
+
       X = DBLE(XS)
       Y = DABS(X)
       Z = Y*.125D0
@@ -432,28 +393,23 @@
       N1 = 19
       N2 = 37
       GOTO 3
-!
     2 VJ0 = 1D0
       VY0 = -XLG
       GOTO 101
-!
    11 VY0 = .6366197723675813D0*DLOG(Y)*VJ0 + FX
       VYS = SNGL(VY0)
       GOTO 100
-!
     1 Z = 1D0/Z
       X2 = 4D0*Z*Z - 2D0
       JUMP = 3
       N1 = 38
       N2 = 55
       GOTO 3
-!
    12 X1 = FX
       JUMP = 4
       N1 = 56
       N2 = 73
       GOTO 3
-!
    13 X2 = DCOS(Y-.7853981633974483D0)
       X3 = DSIN(Y-.7853981633974483D0)
       X4 = .7978845608028654D0/DSQRT(Y)
@@ -464,12 +420,9 @@
       VYS = SNGL(VY0)
   100 RETURN
       END SUBROUTINE FF01A
-!*==FF02A.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE FF02A(VJS,VYS,S,N)
       SUBROUTINE FF02A(VJS,VYS,S,N)
 !
 ! *** FF02A from HARWELL LIBRARY modified by JCM 17 Jan 85 ***
@@ -509,10 +462,8 @@
      &     -.32643157D-12, .351521879D-11, -.4686363688D-10,            &
      &     .82291933277D-9, -.2095978138408D-7, .91386152579555D-6,     &
      &     -.9627723549157079D-4, .9355557413907065D-1/
-!
-!VMS
       DATA XLG/1.7D+38/
-!3084      XLG=(1.0D0 - 16.0D0**(-14)) * 16.0D0**(+63)
+
       X = DBLE(S)
       Y = DABS(X)
       Z = Y*.125D0
@@ -531,7 +482,6 @@
       ENDDO
       FX = (Q3-Q1)*.5D0
       GOTO (10,11,12,13), JUMP
-!
    10 VJ1 = FX*Z
       VJS = SNGL(VJ1)
       IF (N.LE.0) GOTO 100
@@ -542,24 +492,20 @@
     2 VJ1 = 0D0
       VY1 = -XLG
       GOTO 101
-!
    11 VY1 = .6366197723675813D0*(DLOG(Y)*VJ1-1D0/Y) + FX*Z
       VYS = SNGL(VY1)
       GOTO 100
-!
     1 Z = 1D0/Z
       X2 = 4D0*Z*Z - 2D0
       JUMP = 3
       N1 = 37
       N2 = 54
       GOTO 3
-!
    12 X1 = FX
       JUMP = 4
       N1 = 55
       N2 = 72
       GOTO 3
-!
    13 X2 = DCOS(Y-2.356194490192345D0)
       X3 = DSIN(Y-2.356194490192345D0)
       X4 = .7978845608028654D0/DSQRT(Y)
@@ -570,12 +516,9 @@
       VYS = SNGL(VY1)
   100 RETURN
       END SUBROUTINE FF02A
-!*==FRAC3.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE FRAC3(VEC)
       SUBROUTINE FRAC3(VEC)
 !
 ! *** FRAC3 by JCM 11 Nov 83 ***
@@ -587,18 +530,15 @@
 !A On exit the elements of VEC have each been put into the range 0 =< X < 1
 !
       DIMENSION VEC(3)
-!
+
       DO I = 1, 3
         CALL FRACT(VEC(I),A,J)
       ENDDO
-      RETURN
+
       END SUBROUTINE FRAC3
-!*==FRACT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE FRACT(X,Y,N)
       SUBROUTINE FRACT(X,Y,N)
 !
 ! *** FRACT by JCM ***
@@ -617,14 +557,12 @@
       N = 1
       IF (X.GE.1.) GOTO 1
       N = 0
-      IF (X.GE.0.) GOTO 100
+      IF (X.GE.0.) RETURN
 ! OUT IN USUAL CASE OF X ALREADY BEING +VE FRACTION
-!
       N = -1
     1 Y = AINT(X)
       IF (N.EQ.-1) Y = Y - 1.0
       X = X - Y
-  100 RETURN
 
       END SUBROUTINE FRACT
 !
@@ -656,7 +594,7 @@
 ! ERROR EXIT - IF NOT A POWER OF 2, OR TOO BIG:
    99 INV = -1
       CALL DebugErrorMessage('NOT A POWER OF 2, OR TOO BIG in FT01A')
-      GOTO 100
+      RETURN
     4 IO = I
       II = IO
       I1 = IT/2
@@ -741,12 +679,13 @@
 !N NI and NJ must be at least 1
 !
       DIMENSION A(NI,NJ), B(NI,NJ), C(NI,NJ)
+
       DO I = 1, NI
         DO J = 1, NJ
           C(I,J) = A(I,J) + B(I,J)
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE GMADD
 !
 !*****************************************************************************
@@ -768,7 +707,7 @@
           B(I,J) = A(I,J)
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE GMEQ
 !
 !*****************************************************************************
@@ -810,7 +749,10 @@
         II(K) = KF
         IL(KF) = KF
         D = D*P
-        IF (D.EQ.0.) CALL ERRMES(1,0,'Zero determinant')
+        IF (D.EQ.0.0) THEN
+          CALL ERRMES(1,0,'Zero determinant')
+          IF (IBMBER .NE. 0) RETURN
+        ENDIF
         DO I = 1, N
           IF (I.EQ.KF) THEN
             B(I,K) = 1./P
@@ -1219,6 +1161,7 @@
         WRITE (LPT,3000) SN, L1
  3000   FORMAT (/' Sin or Cos value',E12.4,' greater than unity',' - called from ',A6)
         CALL BMBOUT
+        CALL DebugErrorMessage('Error in SINCOS() in Mvec')
         RETURN
       ENDIF
 !
@@ -1230,7 +1173,6 @@
         SN = SIGN(1.0,SN)
         CS = 0.
       ELSE
-!
 ! USUAL CASE:
         CS = SQRT(1.-SN*SN)
       ENDIF
@@ -1268,9 +1210,7 @@
  3000   FORMAT (/'  ERROR ** in SPLINE - X',I3,' out of order')
         A(1) = 1.
         GOTO 100
-!
     5 ENDDO
-!
       DO I = 1, N
         J = 2
         IF (I-1) 6, 10, 6
@@ -1349,11 +1289,9 @@
 !     IS 2**IEPS*MAX(\U(1)\,\U(N)\).
       DIMENSION U(N), S(N), D(N)
       DATA IFLG, IEPS/0, -19/
-!
 !       TEST WETHER POINT IN RANGE.
       IF (X.LT.U(1)) GOTO 3
       IF (X.GT.U(N)) GOTO 4
-!
 !       JUMP IF KNOT INTERVAL REQUIRES RANDOM SEARCH.
       IF (IX.LT.0 .OR. IFLG.EQ.0) GOTO 12
 !       JUMP IF KNOT INTERVAL SAME AS LAST TIME.
@@ -1362,7 +1300,6 @@
     1 J = J + 1
    11 IF (X.GT.U(J+1)) GOTO 1
       GOTO 7
-!
 !       ESTIMATE KNOT INTERVAL BY ASSUMING EQUALLY SPACED KNOTS.
    12 J = ABS(X-U(1))/(U(N)-U(1))*(N-1) + 1
 !       ENSURE CASE X=U(N) GIVES J=N-1.
@@ -1373,7 +1310,6 @@
       IF (X.GE.U(J)) GOTO 11
     2 J = J - 1
       IF (X.LT.U(J)) GOTO 2
-!
 !       CALCULATE SPLINE PARAMETERS FOR JTH INTERVAL.
     7 H = U(J+1) - U(J)
       Q1 = H*D(J)
@@ -1381,12 +1317,10 @@
       SS = S(J+1) - S(J)
       B = 3.0*SS - 2.0*Q1 - Q2
       A = Q1 + Q2 - 2.0*SS
-!
 !       CALCULATE SPLINE VALUE.
     8 Z = (X-U(J))/H
       SPLINT = ((A*Z+B)*Z+Q1)*Z + S(J)
       GOTO 100
-!
 !       TEST IF X WITHIN ROUNDING ERROR OF U(1).
     3 IF (X.LE.U(1)-2.0**IEPS*AMAX1(ABS(U(1)),ABS(U(N)))) GOTO 101
       J = 1
@@ -1395,7 +1329,6 @@
     4 IF (X.GE.U(N)+2.0**IEPS*AMAX1(ABS(U(1)),ABS(U(N)))) GOTO 101
       J = N - 1
       GOTO 7
-!
 ! POINTS OUTSIDE RANGE:
   101 IFLG = 0
       SPLINT = 0.0
@@ -1417,6 +1350,7 @@
 !A On exit  Y holds the interpolated function value
 !
       DIMENSION A(N), F(N)
+
       Y = 0.0
       DO L = 1, N
         PL = 1.0
@@ -1426,7 +1360,7 @@
     3   ENDDO
         Y = Y + PL*F(L)
       ENDDO
-      RETURN
+
       END SUBROUTINE TB02A
 !
 !*****************************************************************************
@@ -1457,15 +1391,14 @@
 !
       LOGICAL BOTH
       DIMENSION D(NP), E(NP), Z(NP,NP)
-!
+
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
-      IF (N.LE.1) GOTO 100
+      IF (N.LE.1) RETURN
       DO I = 2, N
         E(I-1) = E(I)
       ENDDO
-!
       E(N) = 0.
       DO L = 1, N
         ITER = 0
@@ -1474,10 +1407,12 @@
 ! @@ JvdS Isn't the following test very odd? Isn't it effectively testing E(M) = 0.0 ?
           IF (ABS(E(M))+DD.EQ.DD) GOTO 2
         ENDDO
-!
         M = N
     2   IF (M.NE.L) THEN
-          IF (ITER.EQ.30) CALL ERRMES(1,0,'too many iterations IN TQLI')
+          IF (ITER.EQ.30) THEN
+            CALL ERRMES(1,0,'too many iterations IN TQLI')
+            IF (IBMBER .NE. 0) RETURN
+          ENDIF
           ITER = ITER + 1
           G = (D(L+1)-D(L))/(2.*E(L))
           R = SQRT(G**2+1.)
@@ -1488,11 +1423,10 @@
           DO I = M - 1, L, -1
             F = S*E(I)
             B = C*E(I)
-!>> @@ JCC It seems that the next line causes numerous crashes in the Pawley refinement.
-!>> As such, Ive added in a check on the values of G and F to prevent it happening
-!>> This ought to be tested - why is it causing the crash: the input data must be corrupt
-!>> somehow.
-!
+! @@ JCC It seems that the next line causes numerous crashes in the Pawley refinement.
+! As such, I've added in a check on the values of G and F to prevent it happening
+! This ought to be tested - why is it causing the crash: the input data must be corrupt
+! somehow.
             IF (ABS(F).GT.0.0 .OR. ABS(G).GT.0.0) THEN
               IF (ABS(F).GE.ABS(G)) THEN
                 C = G/F
@@ -1510,6 +1444,7 @@
             ELSE
 !>> Ok: An error has occurred in the passed data
               CALL BMBOUT
+              CALL DebugErrorMessage('F or G equal 0 in TQLI() in Mvec.')
               RETURN
             ENDIF
             G = D(I+1) - P
@@ -1531,7 +1466,7 @@
           GOTO 1
         ENDIF
       ENDDO
-  100 RETURN
+
       END SUBROUTINE TQLI
 !
 !*****************************************************************************
@@ -1547,7 +1482,7 @@
 !A On exit  A has been replaced by its transpose
 !
       DIMENSION A(ND,ND)
-!
+
       DO I = 1, ND - 1
         DO J = I + 1, ND
           B = A(I,J)
@@ -1555,7 +1490,7 @@
           A(J,I) = B
         ENDDO
       ENDDO
-      RETURN
+
       END SUBROUTINE TRANSQ
 !
 !*****************************************************************************
@@ -1582,7 +1517,7 @@
 !
       LOGICAL BOTH
       DIMENSION A(NP,NP), D(NP), E(NP)
-!
+
       IF (N.LE.1) GOTO 1
       DO I = N, 2, -1
         L = I - 1
