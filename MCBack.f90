@@ -94,7 +94,7 @@
 ! window cannot be made modal because it needs to draw the calculated background 
 ! to the main screen. And the user should be able to zoom in on parts of the graph
 ! to decide whether or not to accept the background.
-      CALL WDialogSelect(ID_Background_Fit)
+      CALL WDialogSelect(IDD_Background_Fit)
 ! Initialise the background
       CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
       CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
@@ -123,7 +123,7 @@
           END SELECT
         END IF
       END DO
-      CALL WDialogSelect(ID_Background_Fit)
+      CALL WDialogSelect(IDD_Background_Fit)
       CALL WDialogHide()
       CALL Profile_Plot(IPTYPE)
       CALL ToggleMenus(1)
