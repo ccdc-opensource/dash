@@ -16,6 +16,7 @@ C
      &TF(150),KTF(150),SITE(150),KSITE(150),
      &ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
 C
+      INCLUDE 'GLBVAR.INC'
       include 'statlog.inc'
 C
       LOGICAL USEREF
