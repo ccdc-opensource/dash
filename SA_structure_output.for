@@ -219,11 +219,13 @@
 	  ENDIF
         END DO
       END DO
-      WRITE(65,"('END')")
-	IF (SaveCSSR) THEN
+      IF (SaveCSSR) THEN
         CLOSE(64)
 	ENDIF
-      CLOSE(65)
+      IF (SavePDB) THEN
+        WRITE(65,"('END')")
+        CLOSE(65)
+      ENDIF
       IF (SaveCCL) THEN
         CLOSE(66)
 	ENDIF
