@@ -239,7 +239,7 @@
       IMPLICIT NONE
 
 ! Blow away the Z-matrices
-      gotzmfile = .FALSE.
+      nFrag = 0
       CALL UpdateZmatrixSelection
 
       END SUBROUTINE Clear_Zmatrices

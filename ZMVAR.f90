@@ -52,7 +52,6 @@
       CHARACTER*255    frag_file(0:maxfrg)
 ! frag_file = name of the .zmatrix file containing fragment number iFrag
 
-      LOGICAL          gotzmfile(0:maxfrg)
 
       INTEGER          icomflg(0:maxfrg)
       REAL             AtomicWeighting(1:maxatm, 0:maxfrg)

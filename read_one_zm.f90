@@ -117,7 +117,6 @@
         izmbid(izmoid(i,iFrg),iFrg) = i   ! the backward mapping from atoms in the Z-matrix
       ENDDO
       CLOSE (19)
-      gotzmfile(iFrg) = .TRUE.
 ! Initialise all the stuff that isn't present in a .zmatrix file
       UseQuaternions(iFrg) = .TRUE.
       zmInitialQs(0,iFrg) = 1.0

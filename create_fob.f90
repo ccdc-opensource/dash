@@ -51,17 +51,15 @@
       TotNumOfAtoms = 0
       NumOfHydrogens = 0
       NumOfNonHydrogens = 0
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          DO iAtom = 1, natoms(iFrg)
-            TotNumOfAtoms = TotNumOfAtoms + 1
-            IF (zmElementCSD(iAtom,iFrg) .EQ. 2) THEN
-              NumOfHydrogens = NumOfHydrogens + 1
-            ELSE
-              NumOfNonHydrogens = NumOfNonHydrogens + 1
-            ENDIF
-          ENDDO
-        ENDIF
+      DO iFrg = 1, nFrag
+        DO iAtom = 1, natoms(iFrg)
+          TotNumOfAtoms = TotNumOfAtoms + 1
+          IF (zmElementCSD(iAtom,iFrg) .EQ. 2) THEN
+            NumOfHydrogens = NumOfHydrogens + 1
+          ELSE
+            NumOfNonHydrogens = NumOfNonHydrogens + 1
+          ENDIF
+        ENDDO
       ENDDO
       natom = TotNumOfAtoms
 ! The 'real' loop. Information for hydrogens is stored after all the non-hydrogen atoms      
@@ -69,29 +67,27 @@
       tNumHydrogens = 0
       tNumNonHydrogens = 0
       tAtomNumber = 0         ! To make life easier, we just use a mapping in MAKEFRAC
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          DO iAtom = 1, natoms(iFrg)
-            tAtomNumber = tAtomNumber + 1
-            IF (zmElementCSD(iAtom,iFrg) .EQ. 2) THEN
-              tNumHydrogens = tNumHydrogens + 1
-              item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
-            ELSE
-              tNumNonHydrogens = tNumNonHydrogens + 1
-              item = tNumNonHydrogens
-            ENDIF
-            OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
-            AtomicNumber = atnr(zmElementCSD(iAtom,iFrg))
-            IF (AbsorbHydrogens) AtomicNumber = AtomicNumber + NumOfBondedHydrogens(iAtom, iFrg)
-            Element = ElmNumber2CSD(AtomicNumber)
-            DO iRef = 1, NumOfRef
-              ssq = 0.25*DSTAR(iRef)**2
-              atem(item,iRef) = occ(iAtom,iFrg) * AScFac(ssq,Element)
-              btem(item,iRef) = tiso(iAtom,iFrg)*ssq
-              FOB(item,iRef) = atem(item,iRef)*EXP(-btem(item,iRef))
-            ENDDO
+      DO iFrg = 1, nFrag
+        DO iAtom = 1, natoms(iFrg)
+          tAtomNumber = tAtomNumber + 1
+          IF (zmElementCSD(iAtom,iFrg) .EQ. 2) THEN
+            tNumHydrogens = tNumHydrogens + 1
+            item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
+          ELSE
+            tNumNonHydrogens = tNumNonHydrogens + 1
+            item = tNumNonHydrogens
+          ENDIF
+          OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
+          AtomicNumber = atnr(zmElementCSD(iAtom,iFrg))
+          IF (AbsorbHydrogens) AtomicNumber = AtomicNumber + NumOfBondedHydrogens(iAtom, iFrg)
+          Element = ElmNumber2CSD(AtomicNumber)
+          DO iRef = 1, NumOfRef
+            ssq = 0.25*DSTAR(iRef)**2
+            atem(item,iRef) = occ(iAtom,iFrg) * AScFac(ssq,Element)
+            btem(item,iRef) = tiso(iAtom,iFrg)*ssq
+            FOB(item,iRef) = atem(item,iRef)*EXP(-btem(item,iRef))
           ENDDO
-        ENDIF
+        ENDDO
       ENDDO
 
       END SUBROUTINE CREATE_FOB
@@ -123,21 +119,19 @@
       item = 0
       tNumHydrogens = 0
       tNumNonHydrogens = 0
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          DO iAtom = 1, natoms(iFrg)
-            IF (zmElementCSD(iAtom,iFrg) .EQ. 2) THEN
-              tNumHydrogens = tNumHydrogens + 1
-              item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
-            ELSE
-              tNumNonHydrogens = tNumNonHydrogens + 1
-              item = tNumNonHydrogens
-            ENDIF
-            DO iRef = 1, NumOfRef
-              FOB(item,iRef) = atem(item,iRef)*EXP(-RR_ITF*btem(item,iRef))
-            ENDDO
+      DO iFrg = 1, nFrag
+        DO iAtom = 1, natoms(iFrg)
+          IF (zmElementCSD(iAtom,iFrg) .EQ. 2) THEN
+            tNumHydrogens = tNumHydrogens + 1
+            item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
+          ELSE
+            tNumNonHydrogens = tNumNonHydrogens + 1
+            item = tNumNonHydrogens
+          ENDIF
+          DO iRef = 1, NumOfRef
+            FOB(item,iRef) = atem(item,iRef)*EXP(-RR_ITF*btem(item,iRef))
           ENDDO
-        ENDIF
+        ENDDO
       ENDDO
 
       END SUBROUTINE CreateFobITF
@@ -184,11 +178,9 @@
 
       INTEGER iFrg
 
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          IF (icomflg(iFrg) .EQ. 0)  THEN
-            CALL zmCreate_AtomicWeightings(iFrg, HydrogenTreatment)
-          ENDIF
+      DO iFrg = 1, nFrag
+        IF (icomflg(iFrg) .EQ. 0)  THEN
+          CALL zmCreate_AtomicWeightings(iFrg, HydrogenTreatment)
         ENDIF
       ENDDO
 

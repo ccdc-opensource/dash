@@ -161,14 +161,11 @@
 !C Load .glob file
       iHandle = 10
       OPEN(iHandle,FILE=globFile(1:LEN_TRIM(globFile)),STATUS='OLD',ERR=999)
-      DO iFrg = 1, maxfrg
-        gotzmfile(iFrg) = .FALSE.
-      ENDDO
-      iFrg = 0
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page6)
-      CALL WDialogPutString(IDF_Xtal_File_Name,TheFileName)
+      CALL WDialogPutString(IDF_Xtal_File_Name, TheFileName)
       CALL PopActiveWindowID
+      iFrg = 0
  10   line = ''
       READ(iHandle,'(A)',END=100,ERR=999) line
       nl = LEN_TRIM(line)
@@ -187,14 +184,11 @@
      ! Ignore
         CASE ('z-m')                                ! Z-matrix file
           iFrg = iFrg + 1
-          ! Following lines do not take copies of Z-matrices into account
           IF (iFrg .GT. maxfrg) GOTO 100
           frag_file(iFrg) = line(ILocateChar(line):)
-          IF (Read_One_ZM(iFrg) .EQ. 0) THEN ! successful read
-            gotzmfile(iFrg) = .TRUE.
-          ELSE 
-            gotzmfile(iFrg) = .FALSE. 
+          IF (Read_One_ZM(iFrg) .NE. 0) THEN ! successful read
             CALL ErrorMessage("Error while reading Z-matrix file "//frag_file(iFrg)(1:LEN_TRIM(frag_file(iFrg))))
+            iFrg = iFrg - 1 
           ENDIF ! If the read on the Z-matrix was ok
         CASE ('cen')                                ! "Centre of mass"
           IF (.NOT. Get_UseCrystallographicCoM()) THEN
@@ -227,41 +221,41 @@
       END SELECT
       GOTO 10 
  100  CLOSE(iHandle)
+      nFrag = iFrg
       !C Basically a Q&D hack: fill BestValuesDoF(:,1) because we already have a routine that can 
       !C translate BestValuesDoF into a fully functional Rietveld refinement window.
       KK = 0
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          ! Translations
-          BestValuesDoF(KK+1,1) = RR_tran(1,iFrg)
-          BestValuesDoF(KK+2,1) = RR_tran(2,iFrg)
-          BestValuesDoF(KK+3,1) = RR_tran(3,iFrg)
-          KK = KK +3
-          ! Rotations
-          IF (natoms(iFrg) .GT. 1) THEN
-            BestValuesDoF(KK+1,1) = RR_rot(1,iFrg)
-            BestValuesDoF(KK+2,1) = RR_rot(2,iFrg)
-            BestValuesDoF(KK+3,1) = RR_rot(3,iFrg)
-            BestValuesDoF(KK+4,1) = RR_rot(4,iFrg)
-            KK = KK +4
-          ENDIF
-          ! Torsions
-          DO I = 1, natoms(iFrg)
-            IF (IOPTB(I,iFrg) .EQ. 1) THEN
-              KK = KK + 1
-              BestValuesDoF(KK,1) = BLEN(I,iFrg)
-            ENDIF
-            IF (IOPTA(I,iFrg) .EQ. 1) THEN
-              KK = KK + 1
-              BestValuesDoF(KK,1) = ALPH(I,iFrg)
-            ENDIF
-            IF (IOPTT(I,iFrg) .EQ. 1) THEN
-              KK = KK + 1
-              BestValuesDoF(KK,1) = BET(I,iFrg)
-            ENDIF
-          ENDDO
+      DO iFrg = 1, nFrag
+        ! Translations
+        BestValuesDoF(KK+1,1) = RR_tran(1,iFrg)
+        BestValuesDoF(KK+2,1) = RR_tran(2,iFrg)
+        BestValuesDoF(KK+3,1) = RR_tran(3,iFrg)
+        KK = KK +3
+        ! Rotations
+        IF (natoms(iFrg) .GT. 1) THEN
+          BestValuesDoF(KK+1,1) = RR_rot(1,iFrg)
+          BestValuesDoF(KK+2,1) = RR_rot(2,iFrg)
+          BestValuesDoF(KK+3,1) = RR_rot(3,iFrg)
+          BestValuesDoF(KK+4,1) = RR_rot(4,iFrg)
+          KK = KK +4
         ENDIF
+        ! Torsions
+        DO I = 1, natoms(iFrg)
+          IF (IOPTB(I,iFrg) .EQ. 1) THEN
+            KK = KK + 1
+            BestValuesDoF(KK,1) = BLEN(I,iFrg)
+          ENDIF
+          IF (IOPTA(I,iFrg) .EQ. 1) THEN
+            KK = KK + 1
+            BestValuesDoF(KK,1) = ALPH(I,iFrg)
+          ENDIF
+          IF (IOPTT(I,iFrg) .EQ. 1) THEN
+            KK = KK + 1
+            BestValuesDoF(KK,1) = BET(I,iFrg)
+          ENDIF
+        ENDDO
       ENDDO
+      CALL UpdateZmatrixSelection ! Needed? Useful?
       CALL SA_Parameter_Set
       CALL Create_AtomicWeightings(Get_HydrogenTreatment())
       CALL FillSymmetry_2

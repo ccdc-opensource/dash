@@ -576,81 +576,78 @@
 ! Read or Write?
       RW = iPrjReadOrWrite
       CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, nfrag)
-      DO iFrg = 1, maxfrg
-        CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, gotzmfile(iFrg))
-        IF (gotzmfile(iFrg)) THEN
-          CALL FileRWString (hPrjFile, iPrjRecNr, RW, frag_file(iFrg))
-          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmpar(iFrg))
-          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, icomflg(iFrg))
-          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, natoms(iFrg))
-          DO iAtomNr = 1, natoms(iFrg)
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, ioptb(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iopta(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, ioptt(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz1(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz2(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz3(iAtomNr,iFrg))
-            IF (RW .EQ. cWrite) THEN
-              CALL FileWriteReal(hPrjFile, iPrjRecNr, blen(iAtomNr,iFrg))
-              CALL FileWriteReal(hPrjFile, iPrjRecNr, alph(iAtomNr,iFrg))
-              CALL FileWriteReal(hPrjFile, iPrjRecNr, bet(iAtomNr,iFrg))
-            ELSE
-              CALL FileReadReal(hPrjFile, iPrjRecNr, blen(iAtomNr,iFrg))
-              CALL FileReadReal(hPrjFile, iPrjRecNr, alph(iAtomNr,iFrg))
-              CALL FileReadReal(hPrjFile, iPrjRecNr, bet(iAtomNr,iFrg))
-            ENDIF
-            CALL FileRWString (hPrjFile, iPrjRecNr, RW, asym(iAtomNr,iFrg))
-            IF (RW .EQ. cRead) THEN
-              zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
-            ENDIF
-            CALL FileRWString (hPrjFile, iPrjRecNr, RW, OriginalLabel(iAtomNr,iFrg))
-            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, tiso(iAtomNr,iFrg))
-            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, occ(iAtomNr,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmoid(iAtomNr,iFrg))
-            izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the back mapping
-            CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, UseQuaternions(iFrg))
-            IF (RW .EQ. cWrite) THEN
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(0,iFrg))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(1,iFrg))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(2,iFrg))
-              CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(3,iFrg))
-            ELSE
-              CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(0,iFrg))
-              CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(1,iFrg))
-              CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(2,iFrg))
-              CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(3,iFrg))
-            ENDIF
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxDef(iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(1,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(2,iFrg))
-            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(1,iFrg))
-            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(2,iFrg))
-            CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(3,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(1,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(2,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(3,iFrg))
-            IF (RW .EQ. cWrite) THEN
-              CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(0,iFrg))
-              CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(1,iFrg))
-              CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(2,iFrg))
-              CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(3,iFrg))
-            ELSE
-              CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(0,iFrg))
-              CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(1,iFrg))
-              CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(2,iFrg))
-              CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(3,iFrg))
-            ENDIF
-          ENDDO
-          IF (RW .EQ. cRead) THEN
-            CALL zmDoAdmin(iFrg)
+      DO iFrg = 1, nFrag
+        CALL FileRWString (hPrjFile, iPrjRecNr, RW, frag_file(iFrg))
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmpar(iFrg))
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, icomflg(iFrg))
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, natoms(iFrg))
+        DO iAtomNr = 1, natoms(iFrg)
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, ioptb(iAtomNr,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iopta(iAtomNr,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, ioptt(iAtomNr,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz1(iAtomNr,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz2(iAtomNr,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz3(iAtomNr,iFrg))
+          IF (RW .EQ. cWrite) THEN
+            CALL FileWriteReal(hPrjFile, iPrjRecNr, blen(iAtomNr,iFrg))
+            CALL FileWriteReal(hPrjFile, iPrjRecNr, alph(iAtomNr,iFrg))
+            CALL FileWriteReal(hPrjFile, iPrjRecNr, bet(iAtomNr,iFrg))
+          ELSE
+            CALL FileReadReal(hPrjFile, iPrjRecNr, blen(iAtomNr,iFrg))
+            CALL FileReadReal(hPrjFile, iPrjRecNr, alph(iAtomNr,iFrg))
+            CALL FileReadReal(hPrjFile, iPrjRecNr, bet(iAtomNr,iFrg))
           ENDIF
-          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumberOfBonds(iFrg))
-          DO BondNr = 1, NumberOfBonds(iFrg)
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, BondType(BondNr,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, Bonds(1,BondNr,iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, Bonds(2,BondNr,iFrg))
-          ENDDO
+          CALL FileRWString (hPrjFile, iPrjRecNr, RW, asym(iAtomNr,iFrg))
+          IF (RW .EQ. cRead) THEN
+            zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+          ENDIF
+          CALL FileRWString (hPrjFile, iPrjRecNr, RW, OriginalLabel(iAtomNr,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, tiso(iAtomNr,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, occ(iAtomNr,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmoid(iAtomNr,iFrg))
+          izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the back mapping
+          CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, UseQuaternions(iFrg))
+          IF (RW .EQ. cWrite) THEN
+            CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(0,iFrg))
+            CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(1,iFrg))
+            CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(2,iFrg))
+            CALL FileWriteReal(hPrjFile,iPrjRecNr,zmInitialQs(3,iFrg))
+          ELSE
+            CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(0,iFrg))
+            CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(1,iFrg))
+            CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(2,iFrg))
+            CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(3,iFrg))
+          ENDIF
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxDef(iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(1,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(2,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(1,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(2,iFrg))
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(3,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(1,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(2,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(3,iFrg))
+          IF (RW .EQ. cWrite) THEN
+            CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(0,iFrg))
+            CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(1,iFrg))
+            CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(2,iFrg))
+            CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(3,iFrg))
+          ELSE
+            CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(0,iFrg))
+            CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(1,iFrg))
+            CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(2,iFrg))
+            CALL FileReadReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(3,iFrg))
+          ENDIF
+        ENDDO
+        IF (RW .EQ. cRead) THEN
+          CALL zmDoAdmin(iFrg)
         ENDIF
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumberOfBonds(iFrg))
+        DO BondNr = 1, NumberOfBonds(iFrg)
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, BondType(BondNr,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, Bonds(1,BondNr,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, Bonds(2,BondNr,iFrg))
+        ENDDO
       ENDDO
       IF (RW .EQ. cRead) THEN 
         CALL UpdateZmatrixSelection

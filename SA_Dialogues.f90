@@ -75,20 +75,6 @@
 
       IMPLICIT NONE      
 
-      INTEGER, EXTERNAL :: Read_One_Zm
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
-      INTEGER        iFlags
-      INTEGER        zmread
-      INTEGER        iFrg, iSelection
-      CHARACTER(MaxPathLength) SDIFile, DirName, tFileName
-      CHARACTER*(80) FileName
-      CHARACTER*250  FilterStr
-      INTEGER        tNumZMatrices, tLen
-      CHARACTER*(80) tZmatrices(10)
-      INTEGER        tNextzmNum
-      INTEGER        tCounter
-      CHARACTER*(7)  tExtension
-
 ! The following variables are there to allow the dialogue fields in the
 ! window dealing with Z-matrices to be handled by DO...ENDDO loops.
 ! The field identifiers assigned by Winteracter are not necessarily consecutive, 
@@ -102,6 +88,20 @@
                      IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
                      IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
                      IDFZMpars(1:maxfrginterface)
+
+
+      INTEGER, EXTERNAL :: Read_One_Zm
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      INTEGER        iFlags
+      INTEGER        zmread
+      INTEGER        iFrg, iSelection, DelFrg
+      CHARACTER(MaxPathLength) SDIFile, DirName, tFileName
+      CHARACTER*(80) FileName
+      CHARACTER*250  FilterStr
+      INTEGER        tNumZMatrices, tLen
+      CHARACTER*(80) tZmatrices(10)
+      INTEGER        tNextzmNum
+      CHARACTER*(7)  tExtension
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -138,17 +138,21 @@
               CALL ImportZmatrix('')
             CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4, IDB_zmDelete5, IDB_zmDelete6)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
-                iFrg = 1
-                DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
-                  iFrg = iFrg + 1
+                DelFrg = 1
+                DO WHILE (IDBZMDelete(DelFrg) .NE. EventInfo%VALUE1)
+                  DelFrg = DelFrg + 1
                 ENDDO
-                gotzmfile(iFrg) = .FALSE.
-              ENDIF ! Delete this Z-matrix
+                DO iFrg = DelFrg+1, nFrag
+                  CALL zmCopy(iFrg, iFrg-1)
+                ENDDO
+                nFrag = nFrag - 1
+              ENDIF
             CASE (IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4, IDB_zmBrowse5, IDB_zmBrowse6)
               iFrg = 1
               DO WHILE (IDBZMBrowse(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
+              IF (iFrg .GT. nFrag) iFrg = nFrag + 1
               iFlags = LoadDialog + PromptOn + DirChange + AppendExt
               FilterStr = "All files (*.*)|*.*|"//&
                           "Z-matrix and molecular model files|*.zmatrix;*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"//&
@@ -158,11 +162,6 @@
               CALL WSelectFile(FilterStr, iFlags, tFileName, 'Load Z-matrix file', iSelection)
 ! Did the user press cancel?
               IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) GOTO 999
-! I don't think the following answer is allowed by Winteracter
-              IF (LEN_TRIM(tFileName) .EQ. 0) THEN
-                gotzmfile(iFrg) = .FALSE.
-                GOTO 999
-              ENDIF
               CALL SplitPath(tFileName, DirName, FileName)
 ! Determine the extension. If Z-matrix, load it
               tLen = LEN_TRIM(FileName)
@@ -175,10 +174,8 @@
                 frag_file(iFrg) = tFileName
                 zmread = Read_One_ZM(iFrg)
                 IF (zmread .EQ. 0) THEN ! successful read
-                  gotzmfile(iFrg) = .TRUE.
-! traps for Z-matrix reading
+                  IF (iFrg .GT. nFrag) nFrag = nFrag + 1
                 ELSE 
-                  gotzmfile(iFrg) = .FALSE. 
                   CALL FileErrorPopup(frag_file(iFrg), zmread)
                 ENDIF ! If the read on the Z-matrix was ok
               ELSE
@@ -189,27 +186,21 @@
                 frag_file(iFrg) = DirName(1:LEN_TRIM(DirName))//tZmatrices(tNextzmNum)
                 zmread = Read_One_ZM(iFrg)
                 IF (zmread .EQ. 0) THEN ! successful read
-                  gotzmfile(iFrg) = .TRUE.
-! Find next free slot ("iFrg")
-                  tCounter = 1
-                  DO WHILE ((gotzmfile(iFrg)) .AND. (tCounter .LT. maxfrg))
-                    CALL INC(tCounter)
-                    CALL INC(iFrg)
-                    IF (iFrg .GT. maxfrg) iFrg = 1
-                  ENDDO
+                  IF (iFrg .GT. nFrag) THEN ! iFrg could have been lower for the _first_ Z-matrix
+                    nFrag = nFrag + 1
+                    IF (nFrag .EQ. maxfrg) THEN
+! More Z-matrices to read?
+                      IF (tNextzmNum .LT. tNumZMatrices) CALL InfoMessage('File contained more Z-matrices than available slots.')
+                      GOTO 999
+                    ENDIF
+                  ENDIF
+                  iFrg = nFrag + 1
                 ELSE
-                  gotzmfile(iFrg) = .FALSE.
                   CALL FileErrorPopup(frag_file(iFrg), zmread)
 ! Slot still free, so iFrg still OK.
                 ENDIF
-! More Z-matrices to read?
-                CALL INC(tNextzmNum)
+                tNextzmNum = tNextzmNum + 1
                 IF (tNextzmNum .GT. tNumZMatrices) GOTO 999
-! If no free slot found, exit
-                IF (gotzmfile(iFrg)) THEN
-                  CALL InfoMessage('File contained more Z-matrices than available slots.')
-                  GOTO 999
-                ENDIF
 ! Read next Z-matrix.
                 GOTO 10
               ENDIF
@@ -230,7 +221,8 @@
           END SELECT
         CASE (FieldChanged)
       END SELECT
-  999 CALL UpdateZmatrixSelection
+  999 CONTINUE
+      CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowZmatrices
@@ -680,7 +672,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE zmCopy(iFrg1,iFrg2)
+      SUBROUTINE zmCopy(iFrg1, iFrg2)
 
 ! Copies Z-matrix 1 to Z-matrix 2
 
@@ -1140,8 +1132,8 @@
 
       INTEGER iFrg
 
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) CALL zmRelabel(iFrg)
+      DO iFrg = 1, nFrag
+        CALL zmRelabel(iFrg)
       ENDDO
 
       END SUBROUTINE zmRelabelAll
@@ -1325,12 +1317,12 @@
               ELSE
                 tFieldState = Disabled
               ENDIF
-              CALL WDialogFieldState(IDF_PO_a,tFieldState)
-              CALL WDialogFieldState(IDF_PO_b,tFieldState)
-              CALL WDialogFieldState(IDF_PO_c,tFieldState)
-              CALL WDialogFieldState(IDF_LABELa,tFieldState)
-              CALL WDialogFieldState(IDF_LABELb,tFieldState)
-              CALL WDialogFieldState(IDF_LABELc,tFieldState)
+              CALL WDialogFieldState(IDF_PO_a, tFieldState)
+              CALL WDialogFieldState(IDF_PO_b, tFieldState)
+              CALL WDialogFieldState(IDF_PO_c, tFieldState)
+              CALL WDialogFieldState(IDF_LABELa, tFieldState)
+              CALL WDialogFieldState(IDF_LABELb, tFieldState)
+              CALL WDialogFieldState(IDF_LABELc, tFieldState)
           END SELECT
       END SELECT
   999 CALL UpdateZmatrixSelection
@@ -1376,13 +1368,10 @@
       ENDDO
       LimsChanged = .FALSE.
       KK = 0
-      DO iFrg = 1, maxfrg
-        ! Only include those that are now checked
-        IF (gotzmfile(iFrg)) THEN
-          KK = KK + 1
-          tStr = Integer2String(iFrg)
-          MenuOptions(KK) = tStr(1:3)
-        ENDIF
+      DO iFrg = 1, nFrag
+        KK = KK + 1
+        tStr = Integer2String(iFrg)
+        MenuOptions(KK) = tStr(1:3)
       ENDDO
       MenuOptions(KK+1) = "All"
       CALL WDialogPutMenu(IDF_MENU1, MenuOptions, nfrag+1, 1)
@@ -1483,12 +1472,9 @@
               ELSE
                 KK = 0
                 jFrg = -1
-                DO iFrg = 1, maxfrg
-                  ! Only include those that are now checked
-                  IF (gotzmfile(iFrg)) THEN
-                    KK = KK + 1
-                    IF (KK .EQ. iOption) jFrg = iFrg 
-                  ENDIF
+                DO iFrg = 1, nFrag
+                  KK = KK + 1
+                  IF (KK .EQ. iOption) jFrg = iFrg 
                 ENDDO
                 IF (jFrg .EQ. -1) CALL DebugErrorMessage("jFrg .EQ. -1")
                 CALL zmRelabel(jFrg)
@@ -1496,14 +1482,11 @@
               ! Update current Wizard window
               ! Run through all possible fragments
               kk = 0
-              DO iFrg = 1, maxfrg
-                ! Only include those that are now checked
-                IF (gotzmfile(iFrg)) THEN
-                  DO i = 1, izmpar(iFrg)
-                    kk = kk + 1
-                    parlabel(kk) = czmpar(i,iFrg)
-                  ENDDO
-                ENDIF
+              DO iFrg = 1, nFrag
+                DO i = 1, izmpar(iFrg)
+                  kk = kk + 1
+                  parlabel(kk) = czmpar(i,iFrg)
+                ENDDO
               ENDDO
               ! Note that we do not update "Preferred orientation"
               DO i = 1, kk
@@ -1512,23 +1495,12 @@
             CASE (IDB_View)
               CALL WDialogGetMenu(IDF_MENU1, iOption)
               ! Update memory
-              IF (iOption .EQ. nfrag+1) THEN ! "All"
-                DO iFrg = 1, maxfrg
-                  ! Only include those that are now checked
-                  IF (gotzmfile(iFrg)) CALL zmView(iFrg)
+              IF (iOption .EQ. nFrag+1) THEN ! "All"
+                DO iFrg = 1, nFrag
+                  CALL zmView(iFrg)
                 ENDDO
               ELSE
-                KK = 0
-                jFrg = -1
-                DO iFrg = 1, maxfrg
-                  ! Only include those that are now checked
-                  IF (gotzmfile(iFrg)) THEN
-                    KK = KK + 1
-                    IF (KK .EQ. iOption) jFrg = iFrg 
-                  ENDIF
-                ENDDO
-                IF (jFrg .EQ. -1) CALL DebugErrorMessage("jFrg .EQ. -1")
-                CALL zmView(jFrg)
+                CALL zmView(iOption)
               ENDIF
           END SELECT
         CASE (FieldChanged)

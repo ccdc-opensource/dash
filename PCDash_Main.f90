@@ -20,7 +20,6 @@
       INTEGER       tNumZMatrices
       CHARACTER(80) tZmatrices(10)
       INTEGER       tNextzmNum
-      INTEGER       tCounter
 
 ! The following variables are there to allow the dialogue fields in the
 ! window dealing with Z-matrices to be handled by DO...ENDDO loops.
@@ -95,10 +94,8 @@
             frag_file(iFrg) = ArgString
             iDummy = Read_One_ZM(iFrg)
             IF (iDummy .EQ. 0) THEN ! successful read
-              gotzmfile(iFrg) = .TRUE.
-! Traps for Z-matrix reading
+              nFrag = 1
             ELSE 
-              gotzmfile(iFrg) = .FALSE. 
               CALL FileErrorPopup(frag_file(iFrg),iDummy)
             ENDIF ! If the read on the Z-matrix was ok
             CALL UpdateZmatrixSelection
@@ -109,36 +106,26 @@
           CASE ('PDB    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'CSSR   ', 'CIF    ')
             CALL WDialogSelect(IDD_SAW_Page1)
             iFrg = 1
-            CALL zmConvert(ArgString,tNumZMatrices,tZmatrices)
+            CALL zmConvert(ArgString, tNumZMatrices, tZmatrices)
             IF (tNumZMatrices .EQ. 0) GOTO 999
             tNextzmNum  = 1
    10       CONTINUE
             frag_file(iFrg) = tDirName(1:LEN_TRIM(tDirName))//tZmatrices(tNextzmNum)
             iDummy = Read_One_ZM(iFrg)
             IF (iDummy .EQ. 0) THEN ! successful read
-              gotzmfile(iFrg) = .TRUE.
-! Find next free slot ("iFrg")
-              tCounter = 1
-              DO WHILE ((gotzmfile(iFrg)) .AND. (tCounter .LT. maxfrg))
-                CALL INC(tCounter)
-                CALL INC(iFrg)
-                IF (iFrg .GT. maxfrg) iFrg = 1
-              ENDDO
+              iFrg = iFrg + 1
+              IF (iFrg .EQ. maxfrg+1) THEN
+! If no free slot found, exit
+                CALL InfoMessage('File contained more Z-matrices than available slots.')
+                GOTO 999
+              ENDIF
             ELSE
-              gotzmfile(iFrg) = .FALSE.
-              CALL FileErrorPopup(frag_file(iFrg),iDummy)
+              CALL FileErrorPopup(frag_file(iFrg), iDummy)
 ! Slot still free, so iFrg still OK.
             ENDIF
 ! More Z-matrices to read?
-            CALL INC(tNextzmNum)
-            IF (tNextzmNum .GT. tNumZMatrices) GOTO 999
-! If no free slot found, exit
-            IF (gotzmfile(iFrg)) THEN
-              CALL InfoMessage('File contained more Z-matrices than available slots.')
-              GOTO 999
-            ENDIF
-! Read next Z-matrix.
-            GOTO 10
+            tNextzmNum = tNextzmNum + 1
+            IF (tNextzmNum .LE. tNumZMatrices) GOTO 10
   999       CALL UpdateZmatrixSelection
             CALL WizardWindowShow(IDD_SAW_Page1)
           CASE ('RAW    ', 'CPI    ', 'DAT    ', 'TXT    ', 'MDI    ', 'POD    ', &
