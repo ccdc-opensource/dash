@@ -110,7 +110,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE organise_sa_result_data(irow)
+      SUBROUTINE organise_sa_result_data(TheRunNr)
 !ep July 2001
 !   called from SASummary.f90
 !     This subroutine manipulates the data required to plot the observed  
@@ -128,7 +128,7 @@
 !
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: irow
+      INTEGER, INTENT (IN   ) :: TheRunNr
 
       INCLUDE 'PARAMS.INC'
 
@@ -181,13 +181,13 @@
       CALL RegisterChildWindow(iHandle,DealWithProfilePlot)
       SAUsedChildWindows(iHandle) = 1
       CALL WindowSelect(iHandle)
-      CALL WindowClear()
+      CALL WindowClear
 
 ! Fill Xato
       DO I = 1, NATOM
-        Xato(1,I) = XAtmCoords(1,I,irow)
-        Xato(2,I) = XAtmCoords(2,I,irow)
-        Xato(3,I) = XAtmCoords(3,I,irow)
+        Xato(1,I) = XAtmCoords(1,I,TheRunNr)
+        Xato(2,I) = XAtmCoords(2,I,TheRunNr)
+        Xato(3,I) = XAtmCoords(3,I,TheRunNr)
       ENDDO
 ! VALCHI fills BICALC
 ! @@      CALL VALCHI(rDummy,1000) ! Preferrred orientation part if appropriate
