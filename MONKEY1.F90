@@ -45,7 +45,7 @@
                              0,           &
                              KEY_EXECUTE, &
                              LOC(hKey))
-      IF (retCode .NE. 0) GOTO 20
+      IF (retCode .NE. ERROR_SUCCESS) GOTO 20
 ! ADD A QUERY AND ALLOCATE A BUFFER FOR BDATA.
       retCode = RegQueryInfoKey(hKey,                 &  ! Key handle returned from RegOpenKeyEx.
                                 ClassName,            &  ! Buffer for class name.
@@ -59,7 +59,7 @@
                                 LOC(dwcMaxValueData), &  ! Longest Value data.
                                 LOC(dwcSecDesc),      &  ! Security descriptor.
                                 ftLastWriteTime)         ! Last write time.
-      IF (retCode .NE. 0) GOTO 20
+      IF (retCode .NE. ERROR_SUCCESS) GOTO 20
       cbData = dwcMaxValueData
 ! ENUMERATE THE KEY.
       dwLBIndex = 0 ! I'm guessing here
