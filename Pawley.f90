@@ -270,11 +270,11 @@
                 CASE DEFAULT
                   IF (PawleyErrorLog(2) .GT. 0) CALL PawleyWarning ! Check the log messages and reset
               END SELECT
-              CALL WDialogFieldState(IDF_PawRef_Refine,Disabled)
-              CALL WDialogFieldState(IDB_PawRef_Accept,Enabled)
-              CALL WDialogFieldState(IDB_PawRef_Reject,Enabled)
-              CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
-              CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+              CALL WDialogFieldState(IDF_PawRef_Refine, Disabled)
+              CALL WDialogFieldState(IDB_PawRef_Accept, Enabled)
+              CALL WDialogFieldState(IDB_PawRef_Reject, Enabled)
+              CALL WDialogFieldState(IDB_PawRef_Save,   Disabled)
+              CALL WDialogFieldState(IDF_PawRef_Solve,  Disabled)
             CASE (IDB_PawRef_Accept)
 ! update the profile and stay with the Pawley refinement
               IPTYPE = 2
@@ -290,12 +290,12 @@
               PeakShapeGamma(1) = PKFNSP(2,1,1,1)
               PeakShapeGamma(2) = PKFNSP(2,2,1,1)
               CALL WDialogSelect(IDD_ViewPawley)
-              CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
-              CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
-              CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
-              CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
-!C              PeakShapeHPSL 
-!C              PeakShapeHMSL
+              CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
+              CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
+              CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
+              CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
+              CALL WDialogPutReal(IDF_HPSL,   PeakShapeHPSL,     '(F10.4)')
+              CALL WDialogPutReal(IDF_HMSL,   PeakShapeHMSL,     '(F10.4)')
 ! Store new background parameters
               PR_NumBack = NBACK(1)
               PR_BackGround = 0.0
@@ -314,70 +314,70 @@
               CALL Generate_TicMarks
 ! JCC Save the settings
               CALL WDialogSelect(IDD_Pawley_Status)
-              CALL WDialogGetReal(IDF_Pawley_Cycle_Rwp,RLastValues(1)) 
-              CALL WDialogGetReal(IDF_Pawley_Cycle_ChiSq,RLastValues(2))
-              CALL WDialogGetReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3))
-              CALL WDialogGetInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
-              CALL WDialogGetInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
+              CALL WDialogGetReal(IDF_Pawley_Cycle_Rwp, RLastValues(1)) 
+              CALL WDialogGetReal(IDF_Pawley_Cycle_ChiSq, RLastValues(2))
+              CALL WDialogGetReal(IDF_Pawley_Cycle_RwpExp, RLastValues(3))
+              CALL WDialogGetInteger(IDF_Pawley_Cycle_NumPts, ILastValues(1))
+              CALL WDialogGetInteger(IDF_Pawley_Cycle_NumRefs, ILastValues(2))
               LastValuesSet = .TRUE.
               CALL make_polybackup
 ! Disable the Solve button until the user does a Save
-              CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+              CALL WDialogFieldState(IDF_PawRef_Solve, Disabled)
               CALL WDialogSelect(IDD_Pawley_Status)
-              IF (LastValuesSet) CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
-              CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
-              CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
-              CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
+              IF (LastValuesSet) CALL WDialogFieldState(IDB_PawRef_Save, Enabled)
+              CALL WDialogFieldState(IDF_PawRef_Refine, Enabled)
+              CALL WDialogFieldState(IDB_PawRef_Accept, Disabled)
+              CALL WDialogFieldState(IDB_PawRef_Reject, Disabled)
 ! JCC Only change the setting if this is the second Pawley fit
               IF (NumPawleyRef .EQ. 1) THEN
-                CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
-                CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Enabled)
-                CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Enabled)
-                CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Enabled)
-                CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Enabled)
-                CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Checked)
-                CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Checked)
-                CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Checked)
+                CALL WDialogFieldState(IDF_PawRef_UseInts_Check, Enabled)
+                CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check, Enabled)
+                CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check, Enabled)
+                CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check, Enabled)
+                CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check, Enabled)
+                CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check, Checked)
+                CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check, Checked)
+                CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check, Checked)
                 CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,5)
               ENDIF
 ! If entered window by going through "Space Group>" route then do not have the option
 ! to save sdi file.  Can only perform Pawley Refinement then go back to cell parameters
 ! window
                 IF(SpaceGroupDetermination) THEN 
-                  CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
-                  CALL WDialogGetInteger(IDF_Pawley_Refinement_Number,Inum)
+                  CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
+                  CALL WDialogGetInteger(IDF_Pawley_Refinement_Number, Inum)
                     IF (Inum .LE. 1) THEN
                       CALL WDialogFieldState(IDF_PawRef_Solve, Disabled)
                     ELSE
 ! Have hit "Refine" at least twice so are now able to call Space Group Determination program
                       IF (Inum .gt. 1) THEN
 !!ep                     CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd
-                       CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
+                       CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
                        CALL WDialogFieldState(IDF_PawRef_Solve, Enabled)
                       END IF
                     END IF
                 END IF
             CASE (IDB_PawRef_Reject)
 ! Disable the Solve button until the user does a Save 
-              CALL WDialogFieldState(IDF_PawRef_Solve,Disabled) 
-              CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
+              CALL WDialogFieldState(IDF_PawRef_Solve, Disabled) 
+              CALL WDialogFieldState(IDF_PawRef_Refine, Enabled)
 ! Reset the R-values if possible
               IF (LastValuesSet) THEN
-                CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(F12.2)')
+                CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp, RLastValues(1),'(F12.2)')
                 RWPOBS = RLastValues(1)
-                CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,RLastValues(2),'(F12.3)')
+                CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq, RLastValues(2),'(F12.3)')
                 PAWLEYCHISQ = RLastValues(2)
-                CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3),'(F12.2)')
+                CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp, RLastValues(3),'(F12.2)')
                 RWPEXP = RLastValues(3)
-                CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
-                CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
+                CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts, ILastValues(1))
+                CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs, ILastValues(2))
                 CALL retrieve_polybackup
-                CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
+                CALL WDialogFieldState(IDB_PawRef_Save, Enabled)
               ENDIF
-              CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
-              CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
+              CALL WDialogFieldState(IDB_PawRef_Accept, Disabled)
+              CALL WDialogFieldState(IDB_PawRef_Reject, Disabled)
               NumPawleyRef = NumPawleyRef - 1
-              CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
+              CALL WDialogPutInteger(IDF_Pawley_Refinement_Number, NumPawleyRef)
               IF (SpaceGroupDetermination) THEN
                 CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
               ENDIF
@@ -386,21 +386,21 @@
 !!                CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd                
 !!                CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
 !!              ELSE
-                IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
+                IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve, Enabled)
 !!              ENDIF
             CASE (IDF_PawRef_Solve)
               IF (SpaceGroupDetermination) THEN
                 CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd                
-                CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
+                CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
               ELSE
 ! Emulate loading .SDI file for next window
                 CALL WDialogSelect(IDD_SAW_Page1)
 ! Read in the HCV, PIK and TIC files from POLYP
                 Ilen = LEN_TRIM(DashPikFile)
                 SDIFile = DashPikFile(1:Ilen-3)//'sdi'
-                CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
-                CALL GETHCV(DashHcvFile,IER)
-                CALL GETPIK(DashPikFile,IER)
+                CALL WDialogPutString(IDF_SA_Project_Name, SDIFile)
+                CALL GETHCV(DashHcvFile, IER)
+                CALL GETPIK(DashPikFile, IER)
                 CALL ShowWizardWindowZmatrices
               ENDIF
           END SELECT
@@ -438,13 +438,11 @@
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
-                        PkFnVarVal,                   PkFnVarEsd,                   &
                         PkAreaVal,                    PkAreaEsd,                    &
                         PkPosVal,                     PkPosEsd,                     &
                         PkPosAv
       COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
                         PkFnCal(MPkDes,Max_NPFR),                                   &
-                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
                         PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
                         PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
                         PkPosAv(MAX_NPFR)
@@ -485,7 +483,7 @@
       INTEGER ITEM, ISYM, IRTYP
       INTEGER tFileHandle, hFile
       INTEGER J
-      REAL    tPeakShapeSigma(1:2), tPeakShapeGamma(1:2)
+      REAL    tPeakShapeSigma(1:2), tPeakShapeGamma(1:2), tPeakShapeHPSL, tPeakShapeHMSL
 
 ! Are these checks in place here? If one of them fails, we shouldn't have been here in the first place.
 !
@@ -557,14 +555,20 @@
       CALL WDialogGetReal(IDF_Sigma2, tPeakShapeSigma(2))
       CALL WDialogGetReal(IDF_Gamma1, tPeakShapeGamma(1))
       CALL WDialogGetReal(IDF_Gamma2, tPeakShapeGamma(2))
+      CALL WDialogGetReal(IDF_HPSL, tPeakShapeHPSL)
+      CALL WDialogGetReal(IDF_HMSL, tPeakShapeHMSL)
       IF ((tPeakShapeSigma(1) .GT. -100.0)  .AND. (tPeakShapeSigma(1) .LT. 100.0) .AND.   &
           (tPeakShapeSigma(2) .GT. -100.0)  .AND. (tPeakShapeSigma(2) .LT. 100.0) .AND.   &
           (tPeakShapeGamma(1) .GT. -100.0)  .AND. (tPeakShapeGamma(1) .LT. 100.0) .AND.   &
-          (tPeakShapeGamma(2) .GT. -100.0)  .AND. (tPeakShapeGamma(2) .LT. 100.0)) THEN
+          (tPeakShapeGamma(2) .GT. -100.0)  .AND. (tPeakShapeGamma(2) .LT. 100.0) .AND.   &
+          (tPeakShapeHPSL     .GT. -100.0)  .AND. (tPeakShapeHPSL     .LT. 100.0) .AND.   &
+          (tPeakShapeHMSL     .GT. -100.0)  .AND. (tPeakShapeHMSL     .LT. 100.0)) THEN
         PeakShapeSigma(1) = tPeakShapeSigma(1)
         PeakShapeSigma(2) = tPeakShapeSigma(2)
         PeakShapeGamma(1) = tPeakShapeGamma(1)
         PeakShapeGamma(2) = tPeakShapeGamma(2)
+        PeakShapeHPSL     = tPeakShapeHPSL
+        PeakShapeHMSL     = tPeakShapeHMSL
       ENDIF
       CALL WDialogSelect(IDD_Pawley_Status)
       WRITE(hFile,4271,ERR=999) PeakShapeSigma(1), PeakShapeSigma(2)
