@@ -52,13 +52,13 @@
           DO ii = 1, izmpar(ifrg)
             kk = kk + 1
             ilen = LEN_TRIM(czmpar(ii,iFrg))
-            CALL WGridGetCellReal    (IDF_parameter_grid,1,kk,x)
-            CALL WGridGetCellCheckBox(IDF_parameter_grid,4,kk,Fixed)
+            CALL WGridGetCellReal    (IDF_parameter_grid_modal,1,kk,x)
+            CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,4,kk,Fixed)
             IF (Fixed .EQ. 1) THEN
               WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,A5)",ERR=999) czmpar(ii,iFrg),x,'Fixed'
             ELSE
-              CALL WGridGetCellReal(IDF_parameter_grid,2,kk,lb)
-              CALL WGridGetCellReal(IDF_parameter_grid,3,kk,ub)
+              CALL WGridGetCellReal(IDF_parameter_grid_modal,2,kk,lb)
+              CALL WGridGetCellReal(IDF_parameter_grid_modal,3,kk,ub)
               WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,F12.5,1X,F12.5)",ERR=999) czmpar(ii,iFrg),x,lb,ub
             ENDIF
           ENDDO
@@ -69,9 +69,9 @@
         WRITE(tFileHandle,'("  March-Dollase preferred orientation correction will be applied.")',ERR=999)
         WRITE(tFileHandle,'("  Orientation: a* = ",F6.3,", b* = ",F6.3,", c* = ",F6.3)',ERR=999) (PrefPars(ii),ii=1,3)
         kk = kk + 1
-        CALL WGridGetCellReal(IDF_parameter_grid,2,kk,lb)
-        CALL WGridGetCellReal(IDF_parameter_grid,3,kk,ub)
-        CALL WGridGetCellReal(IDF_parameter_grid,1,kk,x)
+        CALL WGridGetCellReal(IDF_parameter_grid_modal,2,kk,lb)
+        CALL WGridGetCellReal(IDF_parameter_grid_modal,3,kk,ub)
+        CALL WGridGetCellReal(IDF_parameter_grid_modal,1,kk,x)
         tString36 = 'Preferred Orientation'
         WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,F12.5,1X,F12.5)",ERR=999) tString36,x,lb,ub
       ENDIF
