@@ -167,7 +167,7 @@
 !
 !  Set presentation graphics area
 !
-      CALL IPgArea(0.150,0.200,0.900,0.800)
+      CALL IPgArea(0.20,0.300,0.900,0.900)
 !
 !  Draw main title
 !
@@ -180,7 +180,7 @@
 !
 !  Label bottom X axis
 !
-      CALL IPgXLabelPos(  0.70)
+      CALL IPgXLabelPos(  0.90)
       CALL IPgXLabel('Number of Moves','C')
 !
 !  Label left Y axis
@@ -202,8 +202,8 @@
       CALL IPgXTickLength(  1.00)
       CALL IPgDecimalPlaces(      -1)
       CALL IPgXUserScale((/0.0/),0)
-      CALL IPgXScaleAngle(  0.00,  0.00)
-      CALL IPgXScalePos(  0.38)
+      CALL IPgXScaleAngle(  0.00,  -90.00)
+      CALL IPgXScalePos(  0.1)
       CALL IPgXScale('NT')
 !
 !  Adjust tick position for Y Axes
