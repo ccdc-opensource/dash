@@ -11,7 +11,7 @@
 !
       INTEGER  NACP(NMAX), NS, NT, NFCNEV, IER, ISEED1, ISEED2
       INTEGER MAXEVL, IPRINT, NACC, NOBDS
-      LOGICAL  MAXLOG,QUIT,MAKET0
+      LOGICAL  MAXLOG,MAKET0
 !
       character*132 line
       character*80  sa_file
@@ -49,8 +49,6 @@
 !
 !
       REAL  RANMAR
-      integer ihandle
-      common /winwifd/ ihandle(20)
 
       DOUBLE PRECISION RFIX
       DOUBLE PRECISION RULB(100)
@@ -574,9 +572,8 @@ C..
 C..
 C  Check termination criteria.
 c
-         QUIT = .FALSE.
 C  Terminate SA if appropriate.
-         IF (QUIT) THEN
+         IF (.FALSE.) THEN
             DO 420, I = 1, N
                X(I) = XOPT(I)
   420       CONTINUE
@@ -725,189 +722,189 @@ c     *30081'
       return
       END
 
-      SUBROUTINE PRT1
-C  This subroutine prints intermediate output, as does PRT2 through
-C  PRT10. Note that if SA is minimizing the function, the sign of the
-C  function value and the directions (up/down) are reversed in all
-C  output to correspond with the actual function optimization. This
-C  correction is because SA was written to maximize functions and
-C  it minimizes by maximizing the negative a function.
-
-C      WRITE(*,'(  THE STARTING VALUE (X) IS OUTSIDE THE BOUNDS ',
-C     1          /,'  (LB AND UB). EXECUTION TERMINATED WITHOUT ANY'
-C     2          /,'   OPTIMIZATION. RESPECIFY X, UB OR LB SO THAT  '
-C     3          /,'   LB(I) .LT. X(I) .LT. UB(I), I = 1, N. )')
-
-      RETURN
-      END
-
-      SUBROUTINE PRT2(MAXLOG,N,X,F)
-
-      DOUBLE PRECISION  X(*), F
-      INTEGER  N
-      LOGICAL  MAXLOG
-
-C      CALL PRTVEC(X,N,'INITIAL X')
-      IF (MAXLOG) THEN
-	   WRITE(*,*)
-         WRITE(*,1010) SNGL(F)
-      ELSE
-         WRITE(*,*)
-         WRITE(*,1010) -SNGL(F)
-      END IF
- 1010 FORMAT('  Initial chi-squared value: ', F15.5) 
-
-      RETURN
-      END
-
-      SUBROUTINE PRT3(MAXLOG,N,XP,X,FP,F)
-
-      DOUBLE PRECISION  XP(*), X(*), FP, F
-      INTEGER  N
-      LOGICAL  MAXLOG
-
-      CALL PRTVEC(X,N,'CURRENT X')
-      IF (MAXLOG) THEN
-         WRITE(*,1010) F
-      ELSE
-         WRITE(*,1010) -F
-      END IF
- 1010 FORMAT('  CURRENT F: ', G25.18) 
-      CALL PRTVEC(XP,N,'TRIAL X')
-      WRITE(*,*) ' POINT REJECTED SINCE OUT OF BOUNDS '
-
-      RETURN
-      END
-
-      SUBROUTINE PRT4(MAXLOG,N,XP,X,FP,F)
-
-      DOUBLE PRECISION  XP(*), X(*), FP, F
-      INTEGER  N
-      LOGICAL  MAXLOG
-
-      CALL PRTVEC(X,N,'CURRENT X')
-      IF (MAXLOG) THEN
-         WRITE(*,1010) F
-         CALL PRTVEC(XP,N,'TRIAL X')
-         WRITE(*,1020) FP
-      ELSE
-         WRITE(*,1010) -F
-         CALL PRTVEC(XP,N,'TRIAL X')
-         WRITE(*,1020) -FP
-      END IF
- 1010 FORMAT('   CURRENT F: ', G25.18) 
- 1020 FORMAT('  RESULTING F: ', G25.18) 
-
-      RETURN
-      END
-
-      SUBROUTINE PRT5
-
-C      WRITE(*,'(,''  TOO MANY FUNCTION EVALUATIONS; CONSIDER ''
-C     1          /,''  INCREASING MAXEVL OR EPS, OR DECREASING ''
-C     2          /,''  NT OR RT. THESE RESULTS ARE LIKELY TO BE ''
-C     3          /,''  POOR.'',/)')
-
-      RETURN
-      END
-
-      SUBROUTINE PRT6(MAXLOG)
-
-      LOGICAL  MAXLOG
-
-      IF (MAXLOG) THEN
-         WRITE(*,*) '  THOUGH LOWER, POINT ACCEPTED '
-      ELSE
-         WRITE(*,*) '  THOUGH HIGHER, POINT ACCEPTED '
-      END IF
-
-      RETURN
-      END
-
-      SUBROUTINE PRT7(MAXLOG)
-
-      LOGICAL  MAXLOG
-
-      IF (MAXLOG) THEN
-         WRITE(*,*) '  LOWER POINT REJECTED '
-      ELSE
-         WRITE(*,*) '  HIGHER POINT REJECTED '
-      END IF
-
-      RETURN
-      END
-
-      SUBROUTINE PRT8(N,VM,XOPT,X)
-
-      DOUBLE PRECISION  VM(*), XOPT(*), X(*)
-      INTEGER  N
-
-      WRITE(*,*) 
-     &' INTERMEDIATE RESULTS AFTER STEP LENGTH ADJUSTMENT'
-      CALL PRTVEC(VM,N,'NEW STEP LENGTH (VM)')
-      CALL PRTVEC(XOPT,N,'CURRENT OPTIMAL X')
-      CALL PRTVEC(X,N,'CURRENT X')
-
-      RETURN
-      END
-
-      SUBROUTINE PRT9(MAXLOG,N,T,XOPT,VM,
-     &FOPT,FPAV,FPSD,NUP,NDOWN,NREJ,LNOBDS,NNEW)
-
-      DOUBLE PRECISION  XOPT(*), VM(*), T, FOPT, FTEM, FPAV, FPSD
-      INTEGER  N, NUP, NDOWN, NREJ, LNOBDS, NNEW, TOTMOV
-      LOGICAL  MAXLOG
-      COMMON /ITRINF/ iteration
-
-      TOTMOV = NUP + NDOWN + NREJ
-      WRITE(*,*)
-      WRITE(*,*) 
-     &' Intermediate results before next temperature reduction'
-      WRITE(*,1010) SNGL(T)
- 1010 FORMAT   ('  Current temperature:        ',F10.3)
-      IF (MAXLOG) THEN
-         WRITE(*,1020) SNGL(FOPT),SNGL(FPAV),
-     &SNGL(FPSD),TOTMOV,NUP,NDOWN,NREJ,LNOBDS,NNEW
- 1020    FORMAT('  Maximum cost function so far:  ',F10.3,' <<<<'/,
-     &          '  Average for this temperature:  ',F10.3,/,
-     &          '   +/- standard deviation     :  ',F10.3,/,
-     &          '     Total moves:                  ',i8,/, 
-     &          '        uphill:                    ',i8,/, 
-     &          '        accepted downhill:         ',i8,/, 
-     &          '        rejected downhill:         ',i8,/, 
-     &          '     Out of bounds trials:         ',i8,/, 
-     &          '     New maxima this temperature:  ',i8) 
-      ELSE
-         WRITE(*,1030) -SNGL(FOPT),-SNGL(FPAV),
-     &SNGL(FPSD),TOTMOV,NUP,NDOWN,NREJ,LNOBDS,NNEW
- 1030    FORMAT('  Minimum chi-squared so far:    ',F10.3,' <<<<'/, 
-     &          '  Average for this temperature:  ',F10.3,/,
-     &          '   +/- standard deviation     :  ',F10.3,/,
-     &          '     Total moves:                ',I10,/, 
-     &          '        downhill:                ',I10,/, 
-     &          '        accepted uphill:         ',I10,/, 
-     &          '        rejected uphill:         ',I10,/, 
-     &          '     Out of bounds trials:       ',I10,/, 
-     &          '     New minima this temperature:',I10) 
-      END IF
-c      iteration=iteration+1
-c      write(60,*) iteration,-fopt,t
-c      write(61,*) t,(sngl(xopt(i)),i=1,n)
-C      CALL PRTVEC(XOPT,N,'CURRENT OPTIMAL X')
-C      CALL PRTVEC(VM,N,'STEP LENGTH (VM)')
-
-C
-      CALL FCN_PRT(N,XOPT,FTEM)
-C
-      RETURN
-      END
-
-      SUBROUTINE PRT10
-
-      WRITE(*,*) '  SA ACHIEVED TERMINATION CRITERIA. IER = 0.'
-
-      RETURN
-      END
+!U      SUBROUTINE PRT1
+!UC  This subroutine prints intermediate output, as does PRT2 through
+!UC  PRT10. Note that if SA is minimizing the function, the sign of the
+!UC  function value and the directions (up/down) are reversed in all
+!UC  output to correspond with the actual function optimization. This
+!UC  correction is because SA was written to maximize functions and
+!UC  it minimizes by maximizing the negative a function.
+!U
+!UC      WRITE(*,'(  THE STARTING VALUE (X) IS OUTSIDE THE BOUNDS ',
+!UC     1          /,'  (LB AND UB). EXECUTION TERMINATED WITHOUT ANY'
+!UC     2          /,'   OPTIMIZATION. RESPECIFY X, UB OR LB SO THAT  '
+!UC     3          /,'   LB(I) .LT. X(I) .LT. UB(I), I = 1, N. )')
+!U
+!U      RETURN
+!U      END
+!U
+!U      SUBROUTINE PRT2(MAXLOG,N,X,F)
+!U
+!U      DOUBLE PRECISION  X(*), F
+!U      INTEGER  N
+!U      LOGICAL  MAXLOG
+!U
+!UC      CALL PRTVEC(X,N,'INITIAL X')
+!U      IF (MAXLOG) THEN
+!U	   WRITE(*,*)
+!U         WRITE(*,1010) SNGL(F)
+!U      ELSE
+!U         WRITE(*,*)
+!U         WRITE(*,1010) -SNGL(F)
+!U      END IF
+!U 1010 FORMAT('  Initial chi-squared value: ', F15.5) 
+!U
+!U      RETURN
+!U      END
+!U
+!U      SUBROUTINE PRT3(MAXLOG,N,XP,X,FP,F)
+!U
+!U      DOUBLE PRECISION  XP(*), X(*), FP, F
+!U      INTEGER  N
+!U      LOGICAL  MAXLOG
+!U
+!U      CALL PRTVEC(X,N,'CURRENT X')
+!U      IF (MAXLOG) THEN
+!U         WRITE(*,1010) F
+!U      ELSE
+!U         WRITE(*,1010) -F
+!U      END IF
+!U 1010 FORMAT('  CURRENT F: ', G25.18) 
+!U      CALL PRTVEC(XP,N,'TRIAL X')
+!U      WRITE(*,*) ' POINT REJECTED SINCE OUT OF BOUNDS '
+!U
+!U      RETURN
+!U      END
+!U
+!U      SUBROUTINE PRT4(MAXLOG,N,XP,X,FP,F)
+!U
+!U      DOUBLE PRECISION  XP(*), X(*), FP, F
+!U      INTEGER  N
+!U      LOGICAL  MAXLOG
+!U
+!U      CALL PRTVEC(X,N,'CURRENT X')
+!U      IF (MAXLOG) THEN
+!U         WRITE(*,1010) F
+!U         CALL PRTVEC(XP,N,'TRIAL X')
+!U         WRITE(*,1020) FP
+!U      ELSE
+!U         WRITE(*,1010) -F
+!U         CALL PRTVEC(XP,N,'TRIAL X')
+!U         WRITE(*,1020) -FP
+!U      END IF
+!U 1010 FORMAT('   CURRENT F: ', G25.18) 
+!U 1020 FORMAT('  RESULTING F: ', G25.18) 
+!U
+!U      RETURN
+!U      END
+!U
+!U      SUBROUTINE PRT5
+!U
+!UC      WRITE(*,'(,''  TOO MANY FUNCTION EVALUATIONS; CONSIDER ''
+!UC     1          /,''  INCREASING MAXEVL OR EPS, OR DECREASING ''
+!UC     2          /,''  NT OR RT. THESE RESULTS ARE LIKELY TO BE ''
+!UC     3          /,''  POOR.'',/)')
+!U
+!U      RETURN
+!U      END
+!U
+!U      SUBROUTINE PRT6(MAXLOG)
+!U
+!U      LOGICAL  MAXLOG
+!U
+!U      IF (MAXLOG) THEN
+!U         WRITE(*,*) '  THOUGH LOWER, POINT ACCEPTED '
+!U      ELSE
+!U         WRITE(*,*) '  THOUGH HIGHER, POINT ACCEPTED '
+!U      END IF
+!U
+!U      RETURN
+!U      END
+!U
+!U      SUBROUTINE PRT7(MAXLOG)
+!U
+!U      LOGICAL  MAXLOG
+!U
+!U      IF (MAXLOG) THEN
+!U         WRITE(*,*) '  LOWER POINT REJECTED '
+!U      ELSE
+!U         WRITE(*,*) '  HIGHER POINT REJECTED '
+!U      END IF
+!U
+!U      RETURN
+!U      END
+!U
+!U      SUBROUTINE PRT8(N,VM,XOPT,X)
+!U
+!U      DOUBLE PRECISION  VM(*), XOPT(*), X(*)
+!U      INTEGER  N
+!U
+!U      WRITE(*,*) 
+!U     &' INTERMEDIATE RESULTS AFTER STEP LENGTH ADJUSTMENT'
+!U      CALL PRTVEC(VM,N,'NEW STEP LENGTH (VM)')
+!U      CALL PRTVEC(XOPT,N,'CURRENT OPTIMAL X')
+!U      CALL PRTVEC(X,N,'CURRENT X')
+!U
+!U      RETURN
+!U      END
+!U
+!U      SUBROUTINE PRT9(MAXLOG,N,T,XOPT,VM,
+!U     &FOPT,FPAV,FPSD,NUP,NDOWN,NREJ,LNOBDS,NNEW)
+!U
+!U      DOUBLE PRECISION  XOPT(*), VM(*), T, FOPT, FTEM, FPAV, FPSD
+!U      INTEGER  N, NUP, NDOWN, NREJ, LNOBDS, NNEW, TOTMOV
+!U      LOGICAL  MAXLOG
+!U      COMMON /ITRINF/ iteration
+!U
+!U      TOTMOV = NUP + NDOWN + NREJ
+!U      WRITE(*,*)
+!U      WRITE(*,*) 
+!U     &' Intermediate results before next temperature reduction'
+!U      WRITE(*,1010) SNGL(T)
+!U 1010 FORMAT   ('  Current temperature:        ',F10.3)
+!U      IF (MAXLOG) THEN
+!U         WRITE(*,1020) SNGL(FOPT),SNGL(FPAV),
+!U     &SNGL(FPSD),TOTMOV,NUP,NDOWN,NREJ,LNOBDS,NNEW
+!U 1020    FORMAT('  Maximum cost function so far:  ',F10.3,' <<<<'/,
+!U     &          '  Average for this temperature:  ',F10.3,/,
+!U     &          '   +/- standard deviation     :  ',F10.3,/,
+!U     &          '     Total moves:                  ',i8,/, 
+!U     &          '        uphill:                    ',i8,/, 
+!U     &          '        accepted downhill:         ',i8,/, 
+!U     &          '        rejected downhill:         ',i8,/, 
+!U     &          '     Out of bounds trials:         ',i8,/, 
+!U     &          '     New maxima this temperature:  ',i8) 
+!U      ELSE
+!U         WRITE(*,1030) -SNGL(FOPT),-SNGL(FPAV),
+!U     &SNGL(FPSD),TOTMOV,NUP,NDOWN,NREJ,LNOBDS,NNEW
+!U 1030    FORMAT('  Minimum chi-squared so far:    ',F10.3,' <<<<'/, 
+!U     &          '  Average for this temperature:  ',F10.3,/,
+!U     &          '   +/- standard deviation     :  ',F10.3,/,
+!U     &          '     Total moves:                ',I10,/, 
+!U     &          '        downhill:                ',I10,/, 
+!U     &          '        accepted uphill:         ',I10,/, 
+!U     &          '        rejected uphill:         ',I10,/, 
+!U     &          '     Out of bounds trials:       ',I10,/, 
+!U     &          '     New minima this temperature:',I10) 
+!U      END IF
+!Uc      iteration=iteration+1
+!Uc      write(60,*) iteration,-fopt,t
+!Uc      write(61,*) t,(sngl(xopt(i)),i=1,n)
+!UC      CALL PRTVEC(XOPT,N,'CURRENT OPTIMAL X')
+!UC      CALL PRTVEC(VM,N,'STEP LENGTH (VM)')
+!U
+!UC
+!U      CALL FCN_PRT(N,XOPT,FTEM)
+!UC
+!U      RETURN
+!U      END
+!U
+!U      SUBROUTINE PRT10
+!U
+!U      WRITE(*,*) '  SA ACHIEVED TERMINATION CRITERIA. IER = 0.'
+!U
+!U      RETURN
+!U      END
 
       SUBROUTINE PRTVEC(VECTOR,NCOLS,NAME)
 C  This subroutine prints the double precision vector named VECTOR.
