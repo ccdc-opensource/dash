@@ -73,25 +73,49 @@
       SELECT CASE (EventInfo%WIN)
         CASE (0) ! Main window
           SELECT CASE (EventType)
-!            CASE (Expose,Resize)
-!              CALL Redraw()
-!              GOTO 10
+            CASE (Expose,Resize)
+              CALL Redraw()
+              GOTO 10
+            CASE (MenuSelect)
+              CALL ProcessMenu
+              GOTO 10
             CASE (CloseRequest)
               CALL WExit
               GOTO 10
           END SELECT
-        CASE (IDD_Plot_Option_Dialog)
-          CALL DealWithPlotOptionsWindow
-          GOTO 10
-        CASE (IDD_Structural_Information)
-          CALL DealWithStructuralInformation
-          GOTO 10
-        CASE (IDD_Data_Properties)
-          CALL DealWithDiffractionSetupPane
-          GOTO 10
-        CASE (IDD_Crystal_Symmetry)
-          CALL DealWithCrystalSymmetryPane
-          GOTO 10
+          CASE (IDD_Plot_Option_Dialog)
+            CALL DealWithPlotOptionsWindow
+            GOTO 10
+          CASE (IDD_Structural_Information)
+            CALL DealWithStructuralInformation
+            GOTO 10
+          CASE (IDD_Data_Properties)
+            CALL DealWithDiffractionSetupPane
+            GOTO 10
+          CASE (IDD_Peak_Positions)
+            CALL DealWithPeakPositionsPane
+            GOTO 10
+          CASE (IDD_Index_Preparation)
+            CALL DealWithIndexPreparation
+            GOTO 10
+          CASE (IDD_Crystal_Symmetry)
+            CALL DealWithCrystalSymmetryPane
+            GOTO 10
+          CASE (IDD_Peak_Widths)
+            ! Do nothing
+            GOTO 10
+          CASE (IDD_Polyfitter_Wizard_01)
+            CALL DealWithMainWizardWindow
+            GOTO 10
+          CASE (IDD_PW_Page3)
+            CALL DealWithWizardWindowDiffractionFileInput
+            GOTO 10
+          CASE (IDD_PW_Page1)
+            CALL DealWithWizardWindowUnitCellParameters
+            GOTO 10
+          CASE (IDD_PW_Page2)
+            CALL DealWithWizardWindowDiffractionSetup
+            GOTO 10
       END SELECT
 
       END SUBROUTINE GetEvent
@@ -115,9 +139,12 @@
         SELECT CASE (EventInfo%WIN)
           CASE (0) ! Main window
             SELECT CASE (EventType)
-!              CASE (Expose,Resize)
-!                CALL Redraw()
-!                GOTO 10
+              CASE (Expose,Resize)
+                CALL Redraw()
+                GOTO 10
+              CASE (MenuSelect)
+                CALL ProcessMenu
+                GOTO 10
               CASE (CloseRequest)
                 CALL WExit
                 GOTO 10
@@ -131,8 +158,29 @@
           CASE (IDD_Data_Properties)
             CALL DealWithDiffractionSetupPane
             GOTO 10
+          CASE (IDD_Peak_Positions)
+            CALL DealWithPeakPositionsPane
+            GOTO 10
+          CASE (IDD_Index_Preparation)
+            CALL DealWithIndexPreparation
+            GOTO 10
           CASE (IDD_Crystal_Symmetry)
             CALL DealWithCrystalSymmetryPane
+            GOTO 10
+          CASE (IDD_Peak_Widths)
+            ! Do nothing
+            GOTO 10
+          CASE (IDD_Polyfitter_Wizard_01)
+            CALL DealWithMainWizardWindow
+            GOTO 10
+          CASE (IDD_PW_Page3)
+            CALL DealWithWizardWindowDiffractionFileInput
+            GOTO 10
+          CASE (IDD_PW_Page1)
+            CALL DealWithWizardWindowUnitCellParameters
+            GOTO 10
+          CASE (IDD_PW_Page2)
+            CALL DealWithWizardWindowDiffractionSetup
             GOTO 10
         END SELECT
       ENDIF

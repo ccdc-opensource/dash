@@ -1,38 +1,3 @@
-      SUBROUTINE Main_Field_Changed_Routines(IDNumber,JDNumber)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      INTEGER  IDNUMBER, JDNumber
-
-      INCLUDE 'GLBVAR.INC' ! Contains JRadOption
-
-!C>> JCC A few useful declarations
-      INTEGER IRadSelection
-
-      SELECT CASE (IDNumber)
-        CASE (IDF_Indexing_Lambda,IDD_Index_Preparation)
-          CALL DownloadWavelength(IDD_Index_Preparation)
-          CALL Generate_TicMarks   
-      END SELECT
-      SELECT CASE (JDNumber)
-!         CASE (IDF_binning)
-! Change the binning
-!           CALL WDialogSelect(IDD_Plot_Option_Dialog)
-!           CALL WDialogGetInteger(IDF_Binning,LBin)
-!           CALL Rebin_Profile()
-! Now replot
-!           CALL Profile_Plot(IPTYPE)
-!C>> JCC Added
-        CASE (IDF_Wavelength_Menu) ! tab has changed from the wavelength
-          CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
-          CALL SetWavelengthToSelection(IRadSelection)                
-      END SELECT
-
-      END SUBROUTINE Main_Field_Changed_Routines
 !
 !*****************************************************************************
 !
@@ -49,14 +14,9 @@
                 
       TYPE(WIN_RGB) :: SelectedColour
 
-      IF (EventInfo%WIN .NE. IDD_Plot_Option_Dialog) THEN
-        CALL DebugErrorMessage('WinID wrong in DealWithPlotOptionsWindow')
-        RETURN
-      ENDIF
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
       SELECT CASE (EventType)
-!        CASE (MouseButDown)
         CASE (PushButton) ! one of the buttons was pushed
 ! Which button was pressed is now in EventInfo%VALUE1
 ! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
@@ -95,8 +55,6 @@
                 CALL IGrPaletteRGB(KolNumMTic,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
           END SELECT
           CALL Profile_Plot(IPTYPE)
-!        CASE (KeyDown)
-!        CASE (MenuSelect)
         CASE (FieldChanged)
           IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
             SELECT CASE (EventInfo%VALUE1)
@@ -106,9 +64,6 @@
                 CALL Profile_Plot(IPTYPE)
             END SELECT
           ENDIF
-!        CASE (TabChanged)
-!        CASE (Expose,Resize)
-!        CASE (CloseRequest)
         CASE DEFAULT
           CALL DebugErrorMessage('Forgot to handle event in DealWithPlotOptionsWindow')
       END SELECT
@@ -133,14 +88,9 @@
 
       INTEGER IDummy
 
-      IF (EventInfo%WIN .NE. IDD_Structural_Information) THEN
-        CALL DebugErrorMessage('WinID wrong in DealWithStructuralInformation')
-        RETURN
-      ENDIF
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Structural_Information)
       SELECT CASE (EventType)
-!        CASE (MouseButDown)
         CASE (PushButton) ! one of the buttons was pushed
 ! Which button was pressed is now in EventInfo%VALUE1
 ! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
@@ -156,8 +106,6 @@
               CALL DebugErrorMessage('Forgot to handle something in DealWithStructuralInformation 1')
           END SELECT
           CALL Profile_Plot(IPTYPE)
-!        CASE (KeyDown)
-!        CASE (MenuSelect)
         CASE (FieldChanged)
 ! Do nothing
         CASE (TabChanged)
@@ -176,8 +124,6 @@
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithStructuralInformation 2')
           END SELECT
-!        CASE (Expose,Resize)
-!        CASE (CloseRequest)
         CASE DEFAULT
           CALL DebugErrorMessage('Forgot to handle event in DealWithStructuralInformation')
       END SELECT
@@ -200,14 +146,9 @@
                 
       INTEGER IRadSelection
 
-      IF (EventInfo%WIN .NE. IDD_Data_Properties) THEN
-        CALL DebugErrorMessage('WinID wrong in DealWithDiffractionSetupPane')
-        RETURN
-      ENDIF
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Data_Properties)
       SELECT CASE (EventType)
-!        CASE (MouseButDown)
         CASE (PushButton) ! one of the buttons was pushed
 ! Which button was pressed is now in EventInfo%VALUE1
 ! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
@@ -219,8 +160,6 @@
               CALL DebugErrorMessage('Forgot to handle something in DealWithDiffractionSetupPane 1')
           END SELECT
           CALL Profile_Plot(IPTYPE)
-!        CASE (KeyDown)
-!        CASE (MenuSelect)
         CASE (FieldChanged)
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDF_LabX_Source,IDF_SynX_Source,IDF_CWN_Source,IDF_TOF_source)
@@ -236,9 +175,6 @@
               CASE DEFAULT
                 CALL DebugErrorMessage('Forgot to handle something in DealWithDiffractionSetupPane 2')
             END SELECT
-!        CASE (TabChanged)
-!        CASE (Expose,Resize)
-!        CASE (CloseRequest)
         CASE DEFAULT
           CALL DebugErrorMessage('Forgot to handle event in DealWithDiffractionSetupPane')
       END SELECT
@@ -246,6 +182,39 @@
       RETURN
 
       END SUBROUTINE DealWithDiffractionSetupPane
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithPeakPositionsPane
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Peak_Positions)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+! Which button was pressed is now in EventInfo%VALUE1
+          SELECT CASE (EventInfo%VALUE1)
+            CASE(ID_Index_Output)
+! Set the wavelength
+              CALL DownLoadWavelength(IDD_Data_Properties)
+              CALL WDialogSelect(IDD_Index_Preparation)
+              CALL WDialogShow(-1,-1,0,Modeless)
+            CASE DEFAULT
+              CALL DebugErrorMessage('Forgot to handle something in DealWithPeakPositionsPane 1')
+          END SELECT
+        CASE (FieldChanged)
+        CASE DEFAULT
+          CALL DebugErrorMessage('Forgot to handle event in DealWithPeakPositionsPane')
+      END SELECT
+      CALL PopActiveWindowID
+      RETURN
+
+      END SUBROUTINE DealWithPeakPositionsPane
 !
 !*****************************************************************************
 !
@@ -263,14 +232,9 @@
 
       INTEGER IDummy
 
-      IF (EventInfo%WIN .NE. IDD_Crystal_Symmetry) THEN
-        CALL DebugErrorMessage('WinID wrong in DealWithCrystalSymmetryPane')
-        RETURN
-      ENDIF
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       SELECT CASE (EventType)
-!        CASE (MouseButDown)
         CASE (PushButton) ! one of the buttons was pushed
 ! Which button was pressed is now in EventInfo%VALUE1
 ! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
@@ -281,8 +245,6 @@
               CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 1')
           END SELECT
           CALL Profile_Plot(IPTYPE)
-!        CASE (KeyDown)
-!        CASE (MenuSelect)
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_a_latt)
@@ -315,9 +277,6 @@
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 2')
           END SELECT
-!        CASE (TabChanged)
-!        CASE (Expose,Resize)
-!        CASE (CloseRequest)
         CASE DEFAULT
           CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
       END SELECT
@@ -328,27 +287,85 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DealWithIndexPreparation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+
+      REAL    Temp
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Index_Preparation)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+! Which button was pressed is now in EventInfo%VALUE1
+! Note that the checkboxes are handled by Winteracter: there's no source code for them in DASH
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCANCEL)
+              CALL WDialogHide()
+            CASE (ID_Indexing_Create)
+              CALL WDialogGetReal(IDF_Indexing_Lambda,Temp)
+              IF (Temp .LT. 0.00001) THEN
+                CALL ErrorMessage("The radiation wavelength has not been entered!")
+              ELSE                 
+                CALL Create_DicvolIndexFile()
+                CALL WDialogSelect(IDD_Index_Preparation)
+                CALL WDialogHide()
+              END IF
+            CASE DEFAULT
+              CALL DebugErrorMessage('Forgot to handle something in DealWithIndexPreparation 1')
+          END SELECT
+          CALL Profile_Plot(IPTYPE)
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_Indexing_Lambda)
+              CALL DownloadWavelength(IDD_Index_Preparation)
+              CALL Generate_TicMarks   
+            CASE (IDD_Index_Preparation)
+              CALL DebugErrorMessage('Something unexpected happened in DealWithIndexPreparation')
+            CASE DEFAULT
+              CALL DebugErrorMessage('Forgot to handle FieldChanged in DealWithIndexPreparation')
+          END SELECT
+        CASE DEFAULT
+          CALL DebugErrorMessage('Forgot to handle event in DealWithCrystalSymmetryPane')
+      END SELECT
+      CALL PopActiveWindowID
+      RETURN
+
+      END SUBROUTINE DealWithIndexPreparation
+!
+!*****************************************************************************
+!
       SUBROUTINE UpdateCell(IUploadFrom)
 
       USE WINTERACTER
       USE DRUID_HEADER
 
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: IUploadFrom
+
       INCLUDE 'statlog.inc'
+      INCLUDE 'lattice.inc'
+
       LOGICAL FnUnitCellOK ! Function
       INTEGER GetCrystalSystemFromUnitCell ! Function
 
       CALL PushActiveWindowID
       CALL Upload_Cell_Constants()
-      CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogSelect(IUploadFrom)
       IF (FnUnitCellOK()) THEN
 ! Enable the wizard next button
         CALL WDialogFieldState(IDNEXT,Enabled)
-!O        CALL Check_Crystal_Symmetry()
         CALL SetCrystalSystem(GetCrystalSystemFromUnitCell())
         CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
         CALL SetCrystalSystem(LatBrav)
         CALL SetSpaceGroupMenu(LatBrav)
-        CALL Generate_TicMarks
       ELSE
 ! Disable the wizard next button
         CALL WDialogFieldState(IDNEXT,Disabled)
@@ -563,7 +580,6 @@
         CALL WDialogSelect(IDD_Index_Preparation)
         CALL WDialogGetReal(IDF_Indexing_Lambda,Temp)
       END IF
-! JvdS @ and what about IDF_PW_wavelength1?
       CALL UpdateWavelength(Temp)
       CALL PopActiveWindowID
 

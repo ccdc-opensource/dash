@@ -49,14 +49,6 @@
       LOGICAL PikExists
       LOGICAL TicExists
 
-! JvdS @ These are needed at startup only: should be made local
-!C>> License information
-      INTEGER :: EXPIRY_DAY   =   31
-      INTEGER :: EXPIRY_MONTH =   12
-      INTEGER :: EXPIRY_YEAR  = 2000
-      CHARACTER(LEN=18) :: EXPIRY_STRING = '31st December 2000'
-
-! JvdS @ These are needed at startup only: should be made local
 !C>> New license information structure    
       TYPE License_Info
         INTEGER          :: Day
@@ -76,6 +68,9 @@
       TYPE(WIN_MESSAGE) :: EventInfo
 ! These global variables hold the last event reported by Winteracter
 
+      LOGICAL NoData
+! .TRUE. when a powder diffraction pattern has been read in
+
       END MODULE VARIABLES
 !
 !*****************************************************************************
@@ -94,15 +89,16 @@
 !
 !   Variable declarations
 !
-      LOGICAL           :: NoData  = .TRUE.
+!O      LOGICAL           :: NoData  = .TRUE.
       INTEGER           :: IWIDTHS(10)
       INTEGER           :: IWID
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
-
+      INCLUDE 'DialogPosCmnf90.inc'
       INCLUDE 'STATLOG.INC'
-      LOGICAL Run_Wizard
+
+!O      LOGICAL Run_Wizard
 
       CALL WInitialise(' ')
       CALL Init_StdOut()
@@ -143,7 +139,6 @@
       IWIDTHS(8)= 1500 
 !   Split status bar into more than one part
       CALL WindowStatusBarParts(8,IWIDTHS)
-      CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(PushButton  , Enabled)
 ! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues()
@@ -151,17 +146,12 @@
       CALL PolyFitterInitialise()
       CALL InitialiseVariables
       CALL Check_License()
-! JvdS Now we can remove the licence dialogue from memory:
-      CALL WDialogSelect(IDD_License_Dialog)
-      CALL WDialogUnload
-      CALL WDialogSelect(0)
+      CALL WMessageEnable(FieldChanged, Enabled)
+      CALL WMessageEnable(TabChanged, Enabled)
 !   Main message loop
 !   Go through the PolyFitter wizard
 !c>> Comment this next line out to remove the wizard
-      NoData = Run_Wizard()
-      CALL Generate_TicMarks()
-!C JCC Enable tab changing
-      CALL WMessageEnable(TabChanged, Enabled)
+      CALL StartWizard()
       DO WHILE(.TRUE.)
         CALL GetEvent
         CALL process_mainwindow_message
@@ -180,18 +170,8 @@
       SELECT CASE (EventType)
         CASE (MouseButDown)
           CALL Plot_Alter
-        CASE (PushButton)
-          CALL Check_PushButton
         CASE (KeyDown)
           CALL Check_KeyDown
-        CASE (MenuSelect)
-          CALL ProcessMenu
-        CASE (FieldChanged)
-          CALL Main_Field_Changed_Routines(EventInfo%Value1,EventInfo%Value2)
-        CASE (TabChanged)
-          CALL Main_Field_Changed_Routines(EventInfo%Value1,EventInfo%Value2)
-        CASE (Expose,Resize)
-          CALL Redraw()
       END SELECT
 
       END SUBROUTINE process_mainwindow_message
@@ -205,17 +185,14 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-!
+
       IMPLICIT NONE
-!
-      LOGICAL NoData
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
 !C>> JCC data to indicate whether we are coming out of peak-fitting mode
       LOGICAL FromPeakFit
-      LOGICAL Run_Wizard ! Function
       LOGICAL Confirm ! Function
 
       FromPeakFit = .FALSE.
@@ -227,9 +204,9 @@
       CALL WindowOutStatusBar(8,STATBARSTR(8))
       SELECT CASE (EventInfo%VALUE1)
         CASE (ID_import_xye_file)
-          CALL Diffraction_File_Browse(NoData)
+          CALL Diffraction_File_Browse
         CASE (ID_import_dpj_file)
-          CALL SDI_file_Open(NoData)
+          CALL SDI_file_Browse
         CASE (ID_Structure_Solution_Mode)
           CALL SA_Main()
 !        CASE (ID_FILE_SAVE)
@@ -328,11 +305,10 @@
         CASE (ID_help_about_Polyfitter)
           CALL About()
         CASE(ID_Start_Wizard)
-          NoData = Run_Wizard()
-          IF (.NOT. NoData) CALL Generate_TicMarks()
+          CALL StartWizard()
       END SELECT
-
       RETURN
+
       END SUBROUTINE ProcessMenu
 !
 !*****************************************************************************
@@ -605,18 +581,19 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Run_Wizard
-
-      LOGICAL NoData
-
-      CALL SetWizardState(-1)
-      CALL PolyFitter_Wizard(NoData)
-      IF (.NOT. NODATA) CALL SetModeMenuState(1,0,0)
-      IF (.NOT. NODATA) CALL Upload_Wizard_Information()
-      Run_Wizard = NoData
-      CALL SetWizardState(1)
-
-      END FUNCTION Run_Wizard
+!U      SUBROUTINE Run_Wizard
+!U
+!U      USE VARIABLES
+!U
+!U      CALL SetWizardState(-1)
+!U      CALL ToggleMenus(0)
+!U      CALL PolyFitter_Wizard
+!U      CALL ToggleMenus(1)
+!U      IF (.NOT. NoData) CALL SetModeMenuState(1,0,0)
+!U      IF (.NOT. NoData) CALL Upload_Wizard_Information()
+!U      CALL SetWizardState(1)
+!U
+!U      END SUBROUTINE Run_Wizard
 !
 !*****************************************************************************
 !
@@ -653,6 +630,9 @@
       INTEGER OnOrOff
 
 ! WintOn and WintOff are Winteracter constants
+
+      RETURN
+
       IF (OnOff .EQ. 1) THEN
         OnOrOff = WintOn
       ELSE
@@ -672,20 +652,22 @@
 !      CALL WMenuSetState(ID_import_pro_file,ItemEnabled,OnOrOff)
       IF (OnOff .EQ. 1) THEN
         CALL SetModeMenuState(PeakOn,PawleyOn,SolutionOn)
+!O        CALL SetWizardState(WizardOn)
       ELSE
         PeakOn     = WMenuGetState(ID_Peak_Fitting_Mode,ItemEnabled)
         PawleyOn   = WMenuGetState(ID_Pawley_Refinement_Mode,ItemEnabled)
         SolutionOn = WMenuGetState(ID_Structure_Solution_Mode,ItemEnabled)
-        WizardOn   = WMenuGetState(ID_Start_Wizard,ItemEnabled)
+!O        WizardOn   = WMenuGetState(ID_Start_Wizard,ItemEnabled)
         CALL SetModeMenuState(-1,-1,-1)
+!O        CALL SetWizardState(-1)
       ENDIF
-      CALL SetWizardState(WizardOn)
 
       END SUBROUTINE ToggleMenus
 !
 !*****************************************************************************
 !
       SUBROUTINE DeleteTempFiles
+
       USE WINTERACTER
       USE DRUID_HEADER
 
