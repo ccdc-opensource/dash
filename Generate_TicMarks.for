@@ -59,7 +59,8 @@ C
  4220 format ('C ',3f10.5,3f10.3)
       write(42,4230) 
  4230 format('F C 2 2.31 20.8439 1.02 10.2075 ',
-     &'1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
+     &'1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0')
+	IPosSG = NumberSGTable
       if (IPosSG.ge.1) then
         call DecodeSGSymbol(SGShmStr(IPosSg))
         if (nsymmin.gt.0) then
