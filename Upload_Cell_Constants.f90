@@ -34,6 +34,9 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
+
       INTEGER IASS(6)
       LOGICAL NOCREF
       REAL    GReal(3,3), GRec(3,3)
@@ -51,6 +54,12 @@
 ! JvdS Check the unit cell parameters: if the user has not set them, then
 ! we should not be here!
       IF (.NOT. FnUnitCellOK()) RETURN
+! The unit cell parameters being refined automatically makes it impossible to 
+! play around with indexing. Therefore: when in one of the indexing windows, ignore
+! this routine.
+      IF ((CurrentWizardWindow .EQ. IDD_PW_Page7) .OR.       &
+          (CurrentWizardWindow .EQ. IDD_PW_Page8) .OR.       &
+          (CurrentWizardWindow .EQ. IDD_PW_Page9)) RETURN
       NVal = 0
       DO I = 1, NTPeak
         IOrd = IOrdTem(I) ! IOrd is now a pointer into AllPkPosVal, sorted

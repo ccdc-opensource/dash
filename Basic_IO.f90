@@ -170,6 +170,9 @@
 
       IMPLICIT NONE
 
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
+
       LOGICAL MseBtnPressed, OldEventWaiting
 ! The routines that act on the mousebutton presses are non-reentrant
 ! and the one should not be called when the other is active, so we must keep a flag if we are dealing
@@ -205,15 +208,21 @@
               GOTO 10
             CASE (MouseButDown)
               IF (NoData) GOTO 10
+              IF (MseBtnPressed) GOTO 10
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
-                IF (MseBtnPressed) GOTO 10
                 MseBtnPressed = .TRUE.
                 CALL Plot_Alter
                 MseBtnPressed = .FALSE.
               ELSE IF(EventInfo%VALUE1 .EQ. RightButton) THEN
 ! Get to work on the cross-hair movement--fitting this time
-                IF (MseBtnPressed) GOTO 10
                 IF (PastPawley) GOTO 10
+! Peaks being fitted and refined automatically makes it impossible to 
+! play around with indexing. Therefore: when in one of the indexing windows, ignore
+! this routine.
+                IF ((CurrentWizardWindow .EQ. IDD_PW_Page3) .OR.     &
+                    (CurrentWizardWindow .EQ. IDD_PW_Page4) .OR.     &
+                    (CurrentWizardWindow .EQ. IDD_PW_Page5) .OR.     &
+                    (CurrentWizardWindow .EQ. IDD_PW_Page6)) GOTO 10
                 MseBtnPressed = .TRUE.
                 CALL Move_CrossHair_Fit
                 MseBtnPressed = .FALSE.
