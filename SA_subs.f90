@@ -77,8 +77,8 @@
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
 
-      INTEGER         iteration
-      COMMON /ITRINF/ iteration
+      INTEGER         Curr_SA_Iteration
+      COMMON /ITRINF/ Curr_SA_Iteration
 
       INTEGER                  OFBN_Len
       CHARACTER(MaxPathLength)           OutputFilesBaseName
@@ -102,7 +102,8 @@
       COMMON / CMN000001 / iMyExit, num_new_min
 
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
-      LOGICAL, EXTERNAL :: CheckTerm
+      LOGICAL, EXTERNAL :: CheckTerm, CheckXInBounds
+     ! CHARACTER*(20) :: Integer2String
       INTEGER NACC
       LOGICAL MAKET0
       DOUBLE PRECISION FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
@@ -119,13 +120,13 @@
       INTEGER Last_NUP, Last_NDOWN
       CHARACTER*3 CNruns,CMruns
       LOGICAL PrevRejected, CurrIsPO, PrevWasPO
+      INTEGER TotNumTrials, TotNumRetrials
 
-      LOGICAL OutOfBounds
       REAL xtem, tempupper, templower, tempupper2, templower2
       REAL Sgn
 
-!O      NumOfRef = 10
-      CALL OpenChiSqPlotWindow
+      TotNumTrials = 0
+      TotNumRetrials = 0
       Curr_SA_Run = 0
       NumOf_SA_Runs = 0
 ! Set up a random number generator store
@@ -176,12 +177,23 @@
         vm(kk) = 0.01
       ENDIF
       DP0 = 0.0
+      CALL FillRULB(nvar) !calcs upper and lower bounds for parameters
+      NPAR = 0
+      RFIX = 1E-3
+      DO I = 1, nvar
+        IF (RULB(I).GT.RFIX) THEN
+! NPAR is the number of parameters that are allowed to vary (i.e., not fixed)
+! so in a way, NPAR is the number of parameters that are parameters.
+          NPAR = NPAR + 1
+          IP(NPAR) = I
+        ENDIF
+      ENDDO
+      nmpert = nt * ns * NPAR ! Number of Moves per Temperature
+      CALL OpenChiSqPlotWindow
 ! ####################################
 !   Starting point for multiple runs
 ! ####################################
     1 CONTINUE ! The start point for multiple runs.
-!O      kk = 0
-
 ! Set initial values.
       iMyExit = 0
       Curr_SA_Run = Curr_SA_Run + 1
@@ -209,28 +221,17 @@
       CALL RMARInit(ISEED1+Curr_SA_Run,ISEED2+Curr_SA_Run)
 ! Initialise all degrees of freedom either to a preset value or to
 ! a random value
-      CALL FillRULB(nvar) !calcs upper and lower bounds for parameters
       CALL MAKXIN(nvar)
       DO IV = 1, nvar
         C(IV) = 2.0
       ENDDO
-      ITERATION = 1
       NACC = 0
       NTOTMOV = 0
-      NPAR = 0
-      RFIX = 1E-3
       DO I = 1, nvar
         XOPT(I) = X(I)
         NACP(I) = 0
         NumTrialsPar(I) = 0
-        IF (RULB(I).GT.RFIX) THEN
-! NPAR is the number of parameters that are allowed to vary (i.e., not fixed)
-! so in a way, NPAR is the number of parameters that are parameters.
-          NPAR = NPAR + 1
-          IP(NPAR) = I
-        ENDIF
       ENDDO
-      nmpert = nt * ns * NPAR ! Number of Moves per Temperature
 ! Evaluate the function with input X and return value as F.
       IF (PrefParExists) CALL PO_PRECFC(SNGL(X(iPrfPar)))
       CALL FCN(X,F,0)
@@ -247,14 +248,15 @@
       FOPT = F
       MRAN  = ISEED1 + Curr_SA_Run
       MRAN1 = ISEED2 + Curr_SA_Run
-
+      Last_NUP   = nmpert / 2
+      Last_NDOWN = nmpert / 2
+      Curr_SA_Iteration = 0
+      CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
 ! ##########################################
 !   Starting point for multiple iterations
 ! ##########################################
-      Last_NUP   = nmpert / 2
-      Last_NDOWN = nmpert / 2
   100 CONTINUE
-!O      kk = kk + 1
+      Curr_SA_Iteration = Curr_SA_Iteration + 1
       NUP = 0
       NREJ = 0
       NDOWN = 0
@@ -270,12 +272,11 @@
       FPSUM2 = 0.0
 ! Update the SA status window
       CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),xopt,dxvav,xvsig,flav,lb,ub,  &
-                     vm,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov,iteration)
+                     vm,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
       CALL sa_move_status(nmpert,0)
 ! ##########################################
 !   Starting point for multiple moves
 ! ##########################################
-
       DO M = 1, NT
 ! MRAN RANGE IS 0 -> IM=7875
         MRAN = MOD(MRAN*IA+IC,IM)
@@ -287,6 +288,7 @@
             H = IP(1+INT(RANARR(IARR)*NPAR))
             IARR = IARR + 1
             NumTrialsPar(H) = NumTrialsPar(H) + 1
+            TotNumTrials = TotNumTrials + 1
 ! Generate XP, the trial value of X. Note use of VM to choose XP.
             DO I = 1, nvar
               XP(I) = X(I)
@@ -304,8 +306,8 @@
                 ELSE
                   XP(H) = (-1) * (XP(H))
                 ENDIF
-                IARR = IARR + 1 
-               ENDIF            
+              ENDIF            
+              IARR = IARR + 1 
             ELSEIF (ModalFlag(H) .EQ. 3) THEN !Trimodal
               xtem = XP(H)
               CALL OneEightyToThreeSixty(xtem)
@@ -342,18 +344,17 @@
 !O            ENDIF
 
 ! If XP is out of bounds, select a point in bounds for the trial.
-            OutOfBounds = .FALSE.
-            SELECT  CASE(ModalFlag(H))
+            SELECT CASE(ModalFlag(H))
               CASE (1) ! used for all parameters except modal torsion angles 
                 IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
+                  TotNumRetrials = TotNumRetrials + 1
                   XP(H) = LB(H) + RULB(H) * RANARR(IARR)
                   IARR = IARR + 1
                 ENDIF   
               CASE (2) ! bimodal ranges
 ! Complicated-looking calcs of inbounds torsion angles is to try and guarantee a good
 ! sampling of all user defined ranges.  
-                CALL CheckXInBounds(H, XP(H), OutOfBounds)
-                IF (OutOfBounds) THEN
+                IF (CheckXInBounds(H, XP(H))) THEN
                   IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
                     TempUpper = SNGL(UB(H))         ! so use 0-360 degree scale
                     TempLower = SNGL(LB(H))
@@ -401,8 +402,7 @@
                 ENDIF
 
               CASE(3) !trimodal ranges
-                CALL CheckXinBounds(H, XP(H), OutOfBounds)
-                IF (OutOfBounds) THEN ! calculate new value in one of three allowed ranges
+                IF (CheckXinBounds(H, XP(H))) THEN ! calculate new value in one of three allowed ranges
                   xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
                   IARR = IARR + 1
                   IF ((RANARR(IARR) .GT. 0.33) .AND. (RANARR(IARR) .LE. 0.66)) THEN
@@ -413,9 +413,9 @@
                       xtem = 360.00 + xtem
                     ENDIF
                   ENDIF
+                  IARR = IARR + 1
                 ENDIF
                 XP(H) = xtem
-                IARR = IARR + 1
             END SELECT
 
             CurrIsPO = (kzmpar2(H) .EQ. 7)
@@ -476,7 +476,7 @@
                 FOPT = FP
 ! Update the SA status window
                 CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),XOPT,dxvav,xvsig,flav,lb,ub,  &
-                               vm,NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov,iteration)
+                               vm,NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov)
               ENDIF
 ! If the point is greater, use the Metropolis criterion to decide on
 ! acceptance or rejection.
@@ -550,14 +550,11 @@
         ENDIF
       ENDDO
       ntotmov = ntotmov + nmpert
-! ep  Plots Chi sqd vs. num of moves plot
-      CALL PrepareChiSqPlotData(iteration)
-      iteration = iteration + 1
       IF (num_new_min .NE. num_old_min) CALL Profile_Plot ! plot the profile
       num_old_min = num_new_min
       CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),xopt, &
                      dxvav,xvsig,flav,lb,ub,vm,nvar,Last_NUP,Last_NDOWN,NREJ, &
-                     ntotmov,iteration)
+                     ntotmov)
 ! If we have asked for an initial temperature to be calculated then do so
       IF (MAKET0) THEN
 ! Start temperature increased by 50% as asked for
@@ -566,15 +563,12 @@
 ! If the user had requested the values supplied to be used, reset them.
         CALL MAKXIN(nvar)
         MAKET0 = .FALSE.
+        CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
         GOTO 100
       ENDIF
 ! If termination criteria are not met, prepare for another loop.
 ! We will use the energy fluctuation to reduce the temperature
       T = T/(1.0+(RT*T)/(3.0*FPSD))
-!O      IF (kk .GT. 0) THEN
-!O        NumOfRef = NumOfRef + 1
-!O        kk = 0
-!O      ENDIF
       DO I = 1, nvar
         X(I) = XOPT(I)
       ENDDO
@@ -586,18 +580,19 @@
   999 CONTINUE ! This is where we jump to if the user pressed 'Stop' during the SA
                ! The variable imyexit has been set to 3, 4 or 5  (3 = stop SA, 4 = start next run, 5 = Edit)
                ! If we didn't jump to this point, just passed it, imyexit is 0
+      CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
 !  Check termination criteria.
 !  Terminate SA if appropriate.
       IF (RESTART) THEN
         IF (CheckTerm(NTOTMOV,CHIPROBEST) .OR. (iMyExit .NE. 0)) THEN
 ! End of a run in a multi-run. This is the place for a final local minimisation
-! Get AutoLocalMinimisation from the Configuration Window
           NumOf_SA_Runs = Curr_SA_Run
+! Get AutoLocalMinimisation from the Configuration Window
           IF (Get_AutoLocalMinimisation()) THEN
             CALL LocalMinimise(.TRUE.)
-! ep  Plots Chi sqd vs. num of moves plot
-            CALL PrepareChiSqPlotData(MAX(1,iteration-1))
+            CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
           ENDIF
+          CALL ChiSqPlot_EndOfSARun
 ! ep  Saves calculated and observed diffraction patterns in .pro file 
           CALL Sa_soln_store
 ! Align structure.  Will get to this point whether autominimise enabled or not.
@@ -611,14 +606,16 @@
         ELSE
           GOTO 100 ! Next iteration
         ENDIF
-      ELSEIF ((iteration.LT.MaxIter) .AND. (T.GT.0.0) .AND. (iMyExit .EQ. 0)) THEN
+      ELSEIF ((Curr_SA_Iteration.LT.MaxIter) .AND. (T.GT.0.0) .AND. (iMyExit .EQ. 0)) THEN
         GOTO 100 ! Next iteration
       ELSE
         NumOf_SA_Runs = Curr_SA_Run ! = 1
+        ! Current chi squared plot should be redrawn in red
+        CALL plotting_Chi_sqd
         IF (Get_AutoLocalMinimisation()) THEN
           CALL LocalMinimise(.TRUE.)
 ! ep  Plots Chi sqd vs. num of moves plot
-          CALL PrepareChiSqPlotData(MAX(1,iteration-1))
+!          CALL PrepareChiSqPlotData
         ENDIF
 ! ep  Saves calculated and observed diffraction patterns in .pro file 
         CALL Sa_soln_store

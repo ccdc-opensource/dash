@@ -263,6 +263,9 @@
       INTEGER                ModalFlag
       COMMON /ModalTorsions/ ModalFlag(100)
 
+      INTEGER                    ChiHandle
+      COMMON /ChiSqdWindowsUsed/ ChiHandle
+
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
       PARAMETER (iWidth = 300, iHeight = 1)
@@ -279,6 +282,7 @@
       ShowAgain = .TRUE.
       Counter   = 0
       CALL Clear_Zmatrices
+      ChiHandle = -1
       PI     = 4.0*ATAN(1.0)
       RAD    = PI/180.0
       DEG    = 180.0/PI
