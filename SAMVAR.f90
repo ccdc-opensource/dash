@@ -16,10 +16,10 @@
       CHARACTER*5 atomlabel(1:MAXATM_2)
 ! atomlabel = Original atom labels
 
-      REAL, DIMENSION(MAXATM_2,3) :: axyzo
+      REAL    axyzo(1:MAXATM_2,1:3)
 ! axyzo = atomic xyz co-ordinates, orthogonal
 
-      INTEGER, DIMENSION(MAXATM_2) :: aelem
+      INTEGER aelem(1:MAXATM_2)
 ! aelem = element type as used by CSD
 
 !U! Elements (plus other CSD 'element' definitions What's 'ZZ'??)

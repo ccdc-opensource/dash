@@ -1942,16 +1942,16 @@
 ! OUT IF LIST NOT WANTED:
       IF (SIMUL) GOTO 999
       IF (IABS(MODERR(JSOURC)).NE.2 .AND. RIET) GOTO 999
-      MESSAG = 'HKL listing'
+!O      MESSAG = 'HKL listing'
       NAMFIL = '.HKL'
       CALL OPNFIL(LKH,113)
       IF (CAIL) THEN
-        MESSAG = 'HCV listing'
+!O        MESSAG = 'HCV listing'
         NAMFIL = '.HCV'
         LCV = 72
         CALL OPNFIL(LCV,113)
       ENDIF
-      MESSAG = 'reflection positions file'
+!O      MESSAG = 'reflection positions file'
       NAMFIL = '.TIC'
       ITK = 73
       CALL OPNFIL(ITK,113)
@@ -2024,7 +2024,7 @@
               ICOV(L-K) = NINT(100.*ELEMAT(ALSQ,MATSZ,K,L)/(ADIAG(K)*ADIAG(L)))
             ENDDO
 !  89      CIITEM=F4PESD(1,I)
-   89       CIITEM = ADIAG(K)**2
+   89       CONTINUE
 ! hkl file after pawley refinement writes here.  Using FMT3 so Space Group Determination
 ! program can read correlations
             WRITE (LKH,FMT3) IH, F4PAR(1,I), adiag(K), K - KBASE, (ICOV(L),L=1,IPRNT(5))

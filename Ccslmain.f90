@@ -7522,7 +7522,6 @@
       ASMALL = CELL(1,1,1)
       BSMALL = CELL(2,1,1)
       CSMALL = CELL(3,1,1)
-!
       CALL GMZER(BGTOSM,6,6)
       BGTOSM(1,1) = 2.*ASMALL
       BGTOSM(2,2) = 2.*BSMALL
@@ -7537,13 +7536,12 @@
       BGTOSM(3,5) = CPARS(5,1)/CSMALL
       BGTOSM(1,6) = CPARS(6,1)/ASMALL
       BGTOSM(2,6) = CPARS(6,1)/BSMALL
-      CALL GMINV(BGTOSM,SMTOBG,6)
+      CALL InverseMatrix(BGTOSM,SMTOBG,6)
       CALL GMTRAN(SMTOBG,SMBGTR,6,6)
 ! CELLSD(I,J)=SMTOBG(I,K)*CELESD(K,L,1)*SMBGTR(L,J)
       CALL GMPRD(CELESD,SMBGTR,CELTMP,6,6,6)
       CALL GMPRD(SMTOBG,CELTMP,CELLSD,6,6,6)
-!
-      RETURN
+
       END SUBROUTINE MATCEL
 !
 !*****************************************************************************
@@ -9052,24 +9050,25 @@
 !
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
 
       DO M = 1, 2
         DO I = 1, 3
           DO J = 1, 3
-            ORTH(I,J,M) = 0.
+            ORTH(I,J,M) = 0.0
           ENDDO
         ENDDO
         N = 3 - M
         J = 5 - 2*M
         K = 2*M - 1
-        ORTH(J,J,M) = CELL(J,1,M)
-        ORTH(2,J,M) = CELL(K,2,M)*CELL(2,1,M)
-        ORTH(2,2,M) = CELL(K,3,M)*CELL(2,1,M)
-        ORTH(K,J,M) = CELL(2,2,M)*CELL(K,1,M)
-        ORTH(K,2,M) = -CELL(2,3,M)*CELL(J,2,N)*CELL(K,1,M)
-        ORTH(K,K,M) = CELL(2,3,M)*CELL(J,3,N)*CELL(K,1,M)
+        ORTH(J,J,M) =  CELL(J,1,M)
+        ORTH(2,J,M) =  CELL(K,2,M) * CELL(2,1,M)
+        ORTH(2,2,M) =  CELL(K,3,M) * CELL(2,1,M)
+        ORTH(K,J,M) =  CELL(2,2,M) * CELL(K,1,M)
+        ORTH(K,2,M) = -CELL(2,3,M) * CELL(J,2,N) * CELL(K,1,M)
+        ORTH(K,K,M) =  CELL(2,3,M) * CELL(J,3,N) * CELL(K,1,M)
       ENDDO
       IF (IOP.EQ.2) WRITE (LPT,2000) ORTH
  2000 FORMAT (/' Matrices for transformation of vectors to',            &
@@ -9102,12 +9101,13 @@
 !N The matrices used in the conversions are those printed out by RECIP
 !
       DIMENSION H(3), OH(3)
+
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-!
+
       IF (IR.GT.0) CALL GMPRD(H,ORTH(1,1,IR),OH,1,3,3)
       IF (IR.LT.0) CALL GMPRD(ORTH(1,1,3+IR),H,OH,3,3,1)
-      RETURN
+
       END SUBROUTINE ORTHO
 !
 !*****************************************************************************
@@ -9185,7 +9185,7 @@
 !A          If N is even M=N/2; if odd M=(N-1)/2
 !
       LOGICAL EVEN
-!
+
       M1 = N/2
       M2 = (N-1)/2
       EVEN = (M1.NE.M2)
@@ -9725,18 +9725,17 @@
 !
       CHARACTER*80 FBUF
       CHARACTER*6 LABEL(4)
-!
+
       COMMON /ATBLOC/ NAME, IPNAME(12)
       CHARACTER*4 NAME, IPNAME
       COMMON /ATBLOK/ IBUFF, PNEW(12), PESD(12), PSHIFT(12), POLD(12),  &
      &                PSESD(12)
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-!
+
       DATA LABEL/'   NEW', '   ESD', ' SHIFT', '   OLD'/
-!
+
       IF (IBUFF.EQ.0) GOTO 100
-!
       WRITE (LPT,2001) NAME, (IPNAME(II),II=1,IBUFF)
  2001 FORMAT (/2X,A4,12(3X,A4,2X))
       FBUF(1:4) = '(A6,'
@@ -9853,7 +9852,7 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
 !
-!>> JCC Initialise return value ( successful = 1, anything else is failure)
+! JCC Initialise return value ( successful = 1, anything else is failure)
       PREFIN = 1
 !
 ! INITIALISE WHOLE SYSTEM - DATE, TIME, CONSTANTS, I/O UNIT NUMBERS ETC:
@@ -9898,7 +9897,7 @@
       DIMENSION AVAL(IPT2), ATEMP(20)
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-!
+
       IN = 0
       DO I = IPT1, IPT2
         IN = IN + 1
@@ -9908,7 +9907,6 @@
         ENDIF
         ATEMP(IN) = AVAL(I)
       ENDDO
-!
 ! WRITE ANY SINGLE VALUES GATHERED INTO ATEMP:
       IF (IN.GT.0) WRITE (LPT,2000) (ATEMP(I),I=1,IN)
       RETURN
@@ -10256,10 +10254,10 @@
       DIMENSION VEC(3,2)
       COMMON /HKLGEN/ STEP(3,3), PT(3,3), VECEND(3,3), PRPT(3,3),       &
      &                NPRIM(2,2), NP, LFAC(2), MCOUNT(2), KOM5
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-!
-!
+
 !  CHECK WHETHER PRIMITIVE AND SET UP INTERVENING STEPS IF NOT:
       DO I = 1, 2
         DO J = 1, 2
@@ -10380,7 +10378,7 @@
       IP = IPRNT(N)
 ! IP=0 MEANS NO PRINTING:
       PRNCYC = .FALSE.
-      IF (IP.GT.0) THEN
+      IF (IP .GT. 0) THEN
         FIRST = (ICYC.EQ.NCYC1)
 ! DONE IS SET IF REFINEMENT HAS CONVERGED ACCORDING TO I CONV CARD:
         LAST = (ICYC.EQ.LASTCY) .OR. DONE
@@ -10525,7 +10523,7 @@
       IPKEEP = IPT
       ILATT = 1
       DO I = 1, 3
-        CS(I) = 0.
+        CS(I) = 0.0
       ENDDO
       CALL RDINTG(ISYMM,IPT,IPT,80,IER)
 ! MAY HAVE READ INTEGER, NOTHING OR DECIMAL NUMBER FOR X COORD:
@@ -10550,7 +10548,6 @@
         WRITE (LPT,3003) ISYMM, NOPC
         GOTO 99
       ENDIF
-!
       IF (ISYMM.LT.0 .AND. .NOT.CENTRC) THEN
         CALL ERRMES(1,-1,'-ve symmetry operator in non-centric group')
         GOTO 99
@@ -10571,7 +10568,6 @@
 ! MAKE ACTUAL COORDS FOR BOTH POSITIONS:
     2 CALL XTRANS(IA,XACT,ISYMM,ILATT,CS)
       GOTO 100
-!
    99 IERR = IERR + 1
   100 RETURN
  3009 FORMAT (/' ERROR ** ',A4,' WILL NOT TRANSFORM INTO ',3F10.4)
@@ -11135,9 +11131,9 @@
 
       IPT = IPT1
       IER = 0
-      XX = 0.
+      XX = 0.0
       ISIG = 0
-      SIG = 1.
+      SIG = 1.0
 ! ISIG SAYS WHETHER ANYTHING SIGNIFICANT YET READ, SIG HOLDS SIGN
       IPSH = 0
 ! IPSH SAYS WHETHER POINT OR SLASH READ
@@ -11224,7 +11220,7 @@
   101 X = SNGL(XX)*SIG
       IPT2 = IPT
       IF ((ISIG.EQ.0) .AND. (IER.EQ.0) .AND. (IC.NE.',')) IER = 100
-      RETURN
+
       END SUBROUTINE RDREAL
 !
 !*****************************************************************************
@@ -11255,7 +11251,7 @@
 !N two parameters.
 !
       DIMENSION AM(10), KK1(10)
-!
+
 ! SET NO TYPE 2 CONSTRAINTS:
 !
 ! READ ALL 'L RELA' CARDS:
@@ -11777,8 +11773,7 @@
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
 
-      IF (SIMUL) GOTO 100
-      IF (LVARV.LE.0) GOTO 100
+      IF (SIMUL .OR. (LVARV.LE.0)) RETURN
       DO I = 1, LVARB
         DERIVB(I) = DERIVV(LBSVR(I))
       ENDDO
@@ -11791,7 +11786,7 @@
           DERIVB(I) = DERIVB(I) + AMOUNT(K)*DERIVV(LRDVR(J))
         ENDDO
       ENDDO
-  100 RETURN
+
       END SUBROUTINE RELATE
 !
 !*****************************************************************************
@@ -12252,51 +12247,12 @@
 !D if they are letters.
 !
       CHARACTER*1 INCHAR, WANT
-!
+
       L = LETTER(INCHAR)
       M = LETTER(WANT)
       SAID = (L.EQ.M .AND. L.NE.0) 
 
       END FUNCTION SAID
-!
-!*****************************************************************************
-!
-      LOGICAL FUNCTION SAYS(WANT)
-!
-! *** SAYS by PJB 1-Oct-93 ***
-!
-!X
-!C 11C
-!H Decides whether the string WANT matches a string of the same length,just
-!H read into /SCRACH/ ignoring any distinction between upper and lower case.
-!A On entry WANT is the string to test
-!D Sets SAYS .TRUE. if WANT matches the string at the start of ICARD,
-!D ignoring the case of letters.
-!
-      CHARACTER*(*) WANT
-      COMMON /SCRACH/ MESSAG, NAMFIL
-      CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
-      EQUIVALENCE (ICARD,MESSAG)
-!
-      SAYS = .FALSE.
-      L = LEN(WANT)
-      DO I = 1, L
-        N1 = LETTER(WANT(I:I))
-        IF (N1.EQ.0) THEN
-! NOT A LETTER NEED AN EXACT MATCH
-          IF (ICARD(I:I).EQ.WANT(I:I)) GOTO 1
-          GOTO 100
-        ELSE
-! FOR LETTERS EITHER UPPER OR LOWER CASE WILL DO
-          N2 = LETTER(ICARD(I:I))
-          IF (N1.EQ.N2) GOTO 1
-          GOTO 100
-        ENDIF
-    1 ENDDO
-! ALL CHARACTERS MATCH
-      SAYS = .TRUE.
-  100 RETURN
-      END FUNCTION SAYS
 !
 !*****************************************************************************
 !

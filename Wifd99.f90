@@ -311,13 +311,21 @@
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
       INCLUDE 'REFLNS.INC'
+
       PARAMETER (IREFSM=2000)
+
       REAL SIGI(IREFSM), FSQV(IREFSM)
+
       INTEGER MLTP(IREFSM)
+
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
+
       LOGICAL POSDEF
+
       INTEGER NJ
+
       DATA NHSMAX/50/
+
       COMMON /COUNTE/ KOUNT
 
       INTEGER         IHCOV
@@ -368,6 +376,7 @@
 
       INTEGER     IREFSM
       PARAMETER ( IREFSM = 2000 )
+
       INTEGER         LCV, ICORL,            ICLUMP
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
 
@@ -469,7 +478,7 @@
         DO J = 1, N
           IF (ABS(A(I,J)).GT.AAMAX) AAMAX = ABS(A(I,J))
         ENDDO
-        IF (AAMAX.EQ.0.0) CALL DebugErrorMessage(' Singular matrix!')
+        IF (AAMAX.EQ.0.0) CALL DebugErrorMessage('Singular matrix!')
         VV(I) = 1.0/AAMAX
       ENDDO
       DO J = 1, N

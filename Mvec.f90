@@ -462,93 +462,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GMINV(A,B,N)
-!
-! *** GMINV by JCM from SID 11 Oct 88 ***
-!
-!X
-!C 12C
-!H Inverts matrix A into matrix B.
-!A On entry A is a square NxN real matrix
-!A On exit  B is its inverse
-!D Based on SID
-!
-      INTEGER         IBMBER
-      COMMON /CCSLER/ IBMBER
-
-      DIMENSION II(100), IL(100), IG(100), A(N,N), B(N,N)
-
-      CALL GMEQ(A,B,N,N)
-      D = 1.
-      IS = N - 1
-      DO K = 1, N
-        IL(K) = 0
-        IG(K) = K
-      ENDDO
-      DO K = 1, N
-        R = 0.
-        DO I = 1, N
-          IF (IL(I).NE.0) GOTO 40
-          W = B(I,K)
-          X = ABS(W)
-          IF (R.GT.X) GOTO 40
-          R = X
-          P = W
-          KF = I
-   40   ENDDO
-        II(K) = KF
-        IL(KF) = KF
-        D = D*P
-        IF (D.EQ.0.0) THEN
-          CALL ERRMES(1,0,'Zero determinant')
-          IF (IBMBER .NE. 0) RETURN
-        ENDIF
-        DO I = 1, N
-          IF (I.EQ.KF) THEN
-            B(I,K) = 1./P
-          ELSE
-            B(I,K) = -B(I,K)/P
-          ENDIF
-        ENDDO
-        DO J = 1, N
-          IF (J.EQ.K) GOTO 140
-          W = B(KF,J)
-          IF (W.EQ.0.) GOTO 140
-          DO I = 1, N
-            IF (I.EQ.KF) THEN
-              B(I,J) = W/P
-            ELSE
-              B(I,J) = B(I,J) + W*B(I,K)
-            ENDIF
-          ENDDO
-  140   ENDDO
-      ENDDO
-      DO K = 1, IS
-        KF = II(K)
-        KL = IL(KF)
-        KG = IG(K)
-        IF (KF.EQ.KG) GOTO 190
-        DO I = 1, N
-          R = B(I,KF)
-          B(I,KF) = B(I,KG)
-          B(I,KG) = R
-        ENDDO
-        DO J = 1, N
-          R = B(K,J)
-          B(K,J) = B(KL,J)
-          B(KL,J) = R
-        ENDDO
-        IL(KF) = K
-        IL(KG) = KL
-        IG(KL) = IG(K)
-        IG(K) = KF
-        D = -D
-  190 ENDDO
-
-      END SUBROUTINE GMINV
-!
-!*****************************************************************************
-!
       SUBROUTINE GMPRD(A,B,C,NI,NJ,NK)
 !
 ! *** GMPRD by JCM ***
@@ -561,12 +474,13 @@
 !A On exit  C is a real NIxNK matrix holding A times B
 !
       DIMENSION A(1), B(1), C(1)
+
       DO I = 1, NI
         IK = I
         JK = 1
         DO K = 1, NK
           IJ = I
-          C(IK) = 0.
+          C(IK) = 0.0
           DO J = 1, NJ
             C(IK) = C(IK) + A(IJ)*B(JK)
             IJ = IJ + NI
