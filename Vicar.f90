@@ -85,12 +85,9 @@
       REAL*8 bond, angle1, angle2
       INTEGER i, i1, i2, i3
 !     Constants
-      REAL*8 radian, pi, sqrtpi, twosix, logten
+      REAL*8 radian, pi
       PARAMETER (radian=57.29577951308232088D0)
       PARAMETER (pi=3.141592653589793238D0)
-      PARAMETER (sqrtpi=1.772453850905516027D0)
-      PARAMETER (twosix=1.122462048309372981D0)
-      PARAMETER (logten=2.302585092994045684D0)
       REAL*8 small
       PARAMETER (small=1.D-8)
 !     Local
@@ -114,34 +111,26 @@
       u1(2) = y(i2) - y(i3)
       u1(3) = z(i2) - z(i3)
       norm = 1.0/sqrt(u1(1)*u1(1)+u1(2)*u1(2)+u1(3)*u1(3))
-      u1(1) = u1(1)*norm
-      u1(2) = u1(2)*norm
-      u1(3) = u1(3)*norm
+      u1 = u1 * norm
       u2(1) = x(i1) - x(i2)
       u2(2) = y(i1) - y(i2)
       u2(3) = z(i1) - z(i2)
       norm = 1.0/sqrt(u2(1)*u2(1)+u2(2)*u2(2)+u2(3)*u2(3))
-      u2(1) = u2(1)*norm
-      u2(2) = u2(2)*norm
-      u2(3) = u2(3)*norm
+      u2 = u2 * norm
       u3(1) = u1(2)*u2(3) - u1(3)*u2(2)
       u3(2) = u1(3)*u2(1) - u1(1)*u2(3)
       u3(3) = u1(1)*u2(2) - u1(2)*u2(1)
+! Dot product of u1 and u2. As |u1| = |u2| = 1, this is the cosine of the angle between u1 and u2
       cosine = u1(1)*u2(1) + u1(2)*u2(2) + u1(3)*u2(3)
+! Now there follows a test if the cosine of an angle > 1.0
+! I have to brush up on my mathematics here: I would never have added this test.
       IF (abs(cosine).LT.1.0D0) THEN
         one_over_sine = 1.0/sqrt(1.0D0-cosine**2)
       ELSE
-!         write (*,10)  i
-!   10    format (' XYZATM - Undefined Dihed Angle at Atom',i6)
         sinarg = dmax1(small,cosine**2-1.0D0)
-!	 write (*,*) ' cosine is ',cosine,sinarg
         one_over_sine = 1.0/sqrt(sinarg)
-!	 write (*,*) ' cosine is ',cosine,sinarg
-!         sine = 1.0/sqrt(cosine**2 - 1.0d0)
       ENDIF
-      u3(1) = u3(1)*one_over_sine
-      u3(2) = u3(2)*one_over_sine
-      u3(3) = u3(3)*one_over_sine
+      u3 = u3 * one_over_sine
       u4(1) = u3(2)*u2(3) - u3(3)*u2(2)
       u4(2) = u3(3)*u2(1) - u3(1)*u2(3)
       u4(3) = u3(1)*u2(2) - u3(2)*u2(1)
