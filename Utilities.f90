@@ -20,6 +20,25 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION nearly_equal(value1, value2, tolerance)
+!
+! This function compares two REALs and determines if they are equal within tolerance
+!
+! INPUT   : value1 and value2 = the values to be compared
+!
+! RETURNS : .TRUE.  if value1 and value2 differ by less than tolerance
+!           .FALSE. otherwise
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: value1, value2, tolerance
+
+      nearly_equal = (ABS(value1 - value2) .LT. tolerance)
+
+      END FUNCTION nearly_equal
+!
+!*****************************************************************************
+!
       REAL FUNCTION Radians2Degrees(TheAngle)     
 
       IMPLICIT NONE
