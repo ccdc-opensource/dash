@@ -1,65 +1,55 @@
-! For common block FCSTOR
 
 	  INTEGER     MFCSTO
       PARAMETER ( MFCSTO = 10000 )
-
-! For common block CHISTO
+! For common block FCSTOR
 
       INTEGER     MCHIHS
       PARAMETER ( MCHIHS = 40000 )
-
-! For use in common block CMN299
+! For common block CHISTO
 
       INTEGER     MAXPIK
       PARAMETER ( MAXPIK = 200000 )
-
-! For use in common block F4PARS
+! For use in common block CMN299
 
       INTEGER     MF4PAR
       PARAMETER ( MF4PAR = 10000 )
-
-! For use in common block PRPKFN
+! For use in common block F4PARS
 
       INTEGER     MPRPKF
       PARAMETER ( MPRPKF = 10000 )
-
-! GUI Parameters
-! For common block PROFOBS and PROFBIN
+! For use in common block PRPKFN
 
       INTEGER     MOBS
       PARAMETER ( MOBS = 15000 )
-
-! For common block PEAKFIT2
+! For common block PROFOBS and PROFBIN
 
       INTEGER     MAX_NPFR,      MAX_NPPR,      MAX_FITPT,         MPkDes
       PARAMETER ( MAX_NPFR = 50, MAX_NPPR = 10, MAX_FITPT = 10000, MPkDes = 6 )
-
-! For use in common block IPKCMN
+! For common block PEAKFIT2
 
       INTEGER     MIPK
       PARAMETER ( MIPK = 500 )
-
-! For use in common block SCRAT 
+! For use in common block IPKCMN
 
       INTEGER     ITMREF
       PARAMETER ( ITMREF = 10000 )
-
-! For use in common block ALLPEAKS
+! For use in common block SCRAT 
 
       INTEGER     MTPeak
       PARAMETER ( MTPeak = 100 )
+! For use in common block ALLPEAKS
 
-! The Maximum number of Child Windows allowed (determined by Winteracter)
-! Used in common blocks SACHILDWINDOWS and CHISQDWINDOWSUSED
+      INTEGER     MaxPeaksFound
+      PARAMETER ( MaxPeaksFound = 50 )
+! The maximum number of peaks that the peak-finding algorithm will find
 
       INTEGER     MaxNumChildWin
       PARAMETER ( MaxNumChildWin = 20 )
-
-! For use in common block PLTSTO2
+! The Maximum number of Child Windows allowed (determined by Winteracter)
+! Used in common blocks SACHILDWINDOWS and CHISQDWINDOWSUSED
 
 	  INTEGER     maxiter
       PARAMETER ( maxiter = 10000 )
-
 ! maxiter = maximum number of simulated annealing iterations (per individual run when multi run).
 
       INTEGER     MaxRun
