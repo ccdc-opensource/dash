@@ -32,11 +32,11 @@
 
       INTEGER    MAXITR
       PARAMETER (MAXITR=100)
-      INTEGER     MPAR,        MMPAR
-      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
-      REAL HESS(MMPAR), DELTA(MPAR), C0, C1(2,MPAR), C2(MMPAR)
-      REAL V((MPAR+1)*MAXITR), EX(3*MPAR), C(MPAR+1)
-      INTEGER IR(MPAR+1), INDX(MPAR)
+      INTEGER     MVAR,        MMPAR
+      PARAMETER ( MVAR = 100 , MMPAR = MVAR * MVAR )
+      REAL HESS(MMPAR), DELTA(MVAR), C0, C1(2,MVAR), C2(MMPAR)
+      REAL V((MVAR+1)*MAXITR), EX(3*MVAR), C(MVAR+1)
+      INTEGER IR(MVAR+1), INDX(MVAR)
 
       LOGICAL LERANL
       COMMON /PKCOM3/ LERANL
@@ -414,8 +414,8 @@
 !
       SUBROUTINE LUDCMP(A,N,NP,INDX,D)
 
-      INTEGER    MVAR
-      PARAMETER (MVAR = 100)
+      INCLUDE 'PARAMS.INC'
+
       PARAMETER (TINY=1.0E-20)
       DIMENSION A(NP,NP), INDX(N), VV(MVAR)
 ! JCC This is for testing for mathematical errors used to PAUSE the program: The pause seemed to
