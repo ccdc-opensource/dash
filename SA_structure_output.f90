@@ -29,10 +29,9 @@
       DOUBLE PRECISION XOPT,       C,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
@@ -122,7 +121,7 @@
         ELSE
           WRITE (hFileCSSR,"(' ',I3,'   0 DASH solution')",ERR=999) natom
         ENDIF
-        WRITE (hFileCSSR,'(A)',ERR=999) '     1 '//DASHRemarkStr(11:61) 
+        WRITE (hFileCSSR,'(A)',ERR=999) '     1 '//DASHRemarkStr(11:51) 
       ENDIF
 ! PDB ...
       IF (tSavePDB) THEN
@@ -612,11 +611,10 @@
                       KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      LOGICAL         RESTART
-      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
-      REAL                                                                    ChiMult
-      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
-! NumOf_SA_Runs holds the number of completed multiruns
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+! NumOf_SA_Runs holds the number of completed SA runs
 
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
