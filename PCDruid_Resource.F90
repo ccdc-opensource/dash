@@ -1,4 +1,4 @@
-! Winteracter module created : 01/May/2004 14:43:07
+! Winteracter module created : 26/Sep/2004 18:46:00
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -647,4 +647,5 @@
           INTEGER, PARAMETER :: IDF_MogulText                   =  1553
           INTEGER, PARAMETER :: IDB_Up                          =  1149
           INTEGER, PARAMETER :: IDB_Down                        =  1150
+          INTEGER, PARAMETER :: IDB_DeleteLastRun               =  1303
       END MODULE Druid_Header

@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 01/May/2004 14:43:07
+// Modified : 26/Sep/2004 18:46:00
 //
 ///////////////////////////////////////////////////
 //
@@ -660,6 +660,7 @@
 #define IDF_MogulText                    1553
 #define IDB_Up                           1149
 #define IDB_Down                         1150
+#define IDB_DeleteLastRun                1303
 
 ///////////////////////////////////////////////////
 //
@@ -996,7 +997,7 @@ IDD_Sigma_info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_Sigma_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  217,   78
+    CONTROL "",IDF_Sigma_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  221,   78
     CONTROL "2",IDF_sup2_1,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   31,    4,    6,    8
     CONTROL "Sigma",IDF_Sigma_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    9,    7,   21,    8
     CONTROL "",IDF_Sigma1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   50,    4,   40,   14
@@ -1019,7 +1020,7 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1074     4     20   111 \n"
-"   16 \n"
+"   20 \n"
 "1 \n"
 "2 \n"
 "3 \n"
@@ -1080,7 +1081,7 @@ IDD_Gamma_Info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_Gamma_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  217,   78
+    CONTROL "",IDF_Gamma_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  221,   78
     CONTROL "",IDF_Gamma1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   50,    4,   40,   14
     CONTROL "",IDF_Gamma2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  149,    4,   40,   14
     CONTROL "sec(theta)",IDF_gamm1_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   92,    7,   32,    8
@@ -1099,7 +1100,7 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1075     4     20   117 \n"
-"   16 \n"
+"   20 \n"
 "1 \n"
 "2 \n"
 "3 \n"
@@ -1152,7 +1153,7 @@ IDD_HPSL_info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_HPSL_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  217,   78
+    CONTROL "",IDF_HPSL_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  221,   78
     CONTROL "HPSL =",IDF_HPSL_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   68,    7,   30,    8
     CONTROL "",IDF_HPSL,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  100,    4,   40,   14
 END
@@ -1166,7 +1167,7 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1019     4     20   116 \n"
-"   16 \n"
+"   20 \n"
 "1 \n"
 "2 \n"
 "3 \n"
@@ -1219,7 +1220,7 @@ IDD_HMSL_Info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_HMSL_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  217,   78
+    CONTROL "",IDF_HMSL_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  221,   78
     CONTROL "HMSL =",IDF_HMSL_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   68,    7,   30,    8
     CONTROL "",IDF_HMSL,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  100,    4,   40,   14
 END
@@ -1233,7 +1234,7 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1076     4     20   118 \n"
-"   16 \n"
+"   20 \n"
 "1 \n"
 "2 \n"
 "3 \n"
@@ -2676,10 +2677,10 @@ BEGIN
 " 1134 0 \n"
 " 1123 0 \n"
 " 1115 0 \n"
-" 1116 1 \n"
-" 1117 0 \n"
-" 1156 0 \n"
-" 1157 1 \n"
+" 1116 0 \n"
+" 1117 1 \n"
+" 1156 1 \n"
+" 1157 0 \n"
 " 1298 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
@@ -2794,6 +2795,7 @@ BEGIN
     CONTROL "Load solutions...",IDB_LoadSol,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  284,  122,   65,   14
     CONTROL "",IDB_Prog3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,   68,  175,   18,   15
     CONTROL "Resume SA",IDB_Resume,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  282,  150,   52,   14
+    CONTROL "Delete last run",IDB_DeleteLastRun,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  342,  150,   60,   14
 END
 
 IDD_SAW_Page5 RCDATA
@@ -3489,7 +3491,7 @@ IDD_FWHM_info DIALOG 0, 0,  240,  112
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_FWHM_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  217,   78
+    CONTROL "",IDF_FWHM_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS | GS_READONLY,   10,   20,  221,   78
     CONTROL "Normalised Full Width at Half Maximum and Integral Breadth",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   10,    7,  220,    8
 END
 
@@ -3502,7 +3504,7 @@ BEGIN
 "[Trackbars] \n"
 "[Grids] \n"
 " 1396     3     20   164 \n"
-"   16 \n"
+"   20 \n"
 "1 \n"
 "2 \n"
 "3 \n"

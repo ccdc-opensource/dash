@@ -69,7 +69,7 @@
               CALL WDialogSelect(IDD_OutputSolutions)
               CALL WDialogShow(-1, -1, 0, ModeLess)
               CALL WDialogPutString(IDF_DirAndBaseName, OutputFilesBaseName(1:OFBN_Len))
-              CALL UpdateOutputSolutionsWIndow
+              CALL UpdateOutputSolutionsWindow
             CASE (IDB_Prog3)
               CALL OpenChiSqPlotWindow
             CASE (IDB_Select)
@@ -109,6 +109,15 @@
               CALL ShowWizardWindowParameterBounds
               CALL PopActiveWindowID
               RETURN
+            CASE (IDB_DeleteLastRun)
+              IF (NumOf_SA_Runs .NE. 0) THEN
+                CALL Delete_SA_run(NumOf_SA_Runs)
+                Curr_SA_Run = Curr_SA_Run - 1 ! That's the variable that is used when SA is resumed
+                NumOf_SA_Runs = NumOf_SA_Runs - 1
+                CALL Update_Solutions
+                CALL UpdateOutputSolutionsWindow
+                CALL plotting_Chi_sqd
+              ENDIF
           END SELECT
         CASE (FieldChanged)
           CALL UpdateOutputSolutionsWindow
