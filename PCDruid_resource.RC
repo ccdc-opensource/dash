@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 22/Apr/2004 10:11:01
+// Modified : 22/Apr/2004 10:25:49
 //
 ///////////////////////////////////////////////////
 //
@@ -643,7 +643,6 @@
 #define IDD_RR_PO_Dialog                  196
 #define IDF_STRING2                      1543
 #define IDD_SA_input3_2                   197
-#define IDB_More                         1545
 #define IDD_FWHM_info                     163
 #define IDD_DIALOG011                     164
 #define IDF_FWHM_Grid                    1396
@@ -3474,7 +3473,6 @@ BEGIN
     CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  294,   65,   30,   12
     CONTROL "x  10",IDF_LABEL21,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  325,   66,   18,    8
     CONTROL "7",IDF_MaxMoves2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE,  346,   59,   22,   12
-    CONTROL "&More >",IDB_More,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  314,  150,   40,   14
     CONTROL "Termination criteria",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  231,   24,  145,   82
     CONTROL "Simulated Annealing",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   90,   24,  132,   54
     CONTROL "Moves each T",IDF_LABEL11,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  100,   97,   26,   18
