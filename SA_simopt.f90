@@ -100,8 +100,6 @@
           X(I) = DBLE(XSIM(II))
         ENDDO
         FOPT = DBLE(FTEM)
-        CALL WDialogSelect(IDD_SA_Action1)
-        CALL WDialogPutReal(IDF_min_chisq,SNGL(FOPT),'(F8.2)')
         DO II = 1, NATOM
           DO III = 1, 3
             XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
@@ -110,7 +108,11 @@
         CALL valchipro(CHIPROBEST)
         num_new_min = num_new_min + 1
         CALL WDialogSelect(IDD_SA_Action1)
+        CALL WDialogPutReal(IDF_min_chisq,SNGL(FOPT),'(F8.2)')
         CALL WDialogPutReal(IDF_profile_chisq2,CHIPROBEST,'(F8.2)')
+        CALL WDialogSelect(IDD_Summary)
+        CALL WGridPutCellReal(IDF_SA_Summary,4,Curr_SA_Run,CHIPROBEST,'(F7.2)')
+        CALL WGridPutCellReal(IDF_SA_Summary,5,Curr_SA_Run,SNGL(FOPT),'(F7.2)')
   !U      CALL WDialogSelect(IDD_Parameter_Status)
   !U      DO i = 1, nvar
   !U        CALL WGridPutCellReal(IDF_CPL_grid,1,i,SNGL(xopt(i)),'(F12.5)')

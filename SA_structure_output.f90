@@ -621,6 +621,7 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
+      INTEGER, EXTERNAL :: WritePDBCommon
       INTEGER iSol, TickedRunNr, NumOfOverlaidStructures
       INTEGER pdbBond(1:maxbnd_2*maxcopies*maxfrg,1:2)
       INTEGER TotNumBonds, NumOfAtomsSoFar
@@ -632,10 +633,15 @@
       REAL    xc, yc, zc
       INTEGER iAtom
       INTEGER hFilePDB
-      INTEGER, EXTERNAL :: WritePDBCommon
+      INTEGER tNumOf_SA_Runs
 
       CALL PushActiveWindowID
       CALL WDialogSelect(DialogueID)
+      tNumOf_SA_Runs = NumOf_SA_Runs
+      ! If DialogueID .EQ. IDD_Summary, then we could add 1 to the NumOfSARuns, because
+      ! there is currently a run in progress which also stores its intermediate optima
+      ! in XAtmCoords.
+      IF (DialogueID .EQ. IDD_Summary) tNumOf_SA_Runs = tNumOf_SA_Runs + 1
       hFilePDB = 65
 ! Write the file headers first
       OPEN (UNIT=hFilePDB,FILE='Overlap_Temp.pdb',STATUS='unknown',ERR=999)
@@ -664,7 +670,8 @@
       iiact = 0
       TickedRunNr = 0
       NumOfOverlaidStructures = 0
-      DO iSol = 1, NumOf_SA_Runs
+      DO iSol = 1, tNumOf_SA_Runs
+        IF (iSol .EQ. (NumOf_SA_Runs + 1)) CALL Align
         WRITE(SolStr,'(I2)',ERR=999) iSol
         CALL StrClean(SolStr,ilen) ! Left justify
         CALL WGridGetCellCheckBox(IDF_SA_summary,3,iSol,istatus)

@@ -31,8 +31,6 @@
       DOUBLE PRECISION T0, rt
       COMMON /saparl/  T0, rt
 
-      INTEGER NACP(MVAR)
-
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
@@ -101,8 +99,9 @@
       COMMON / CMN000001 / iMyExit, num_new_min
 
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
-      LOGICAL, EXTERNAL :: CheckTerm, CheckXInBounds
+      LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
       INTEGER NACC
+      INTEGER NACP(MVAR)
       LOGICAL MAKET0
       DOUBLE PRECISION FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
       DOUBLE PRECISION F, FP, P, PP, RATIO, DX
@@ -110,23 +109,28 @@
       INTEGER NUP, NDOWN, NREJ, H, I, J, M, II
       INTEGER MRAN, MRAN1, IARR, IAR1
       DOUBLE PRECISION T
-      INTEGER NumTrialsPar(MVAR)
+      INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
 
       INTEGER IM, IA, IC
       INTEGER JRAN, num_old_min, NTOTMOV
       INTEGER III, IH, KK, iFrg, iFrgCopy
       INTEGER Last_NUP, Last_NDOWN
       CHARACTER*3 CNruns,CMruns
-      LOGICAL PrevRejected, CurrIsPO, PrevWasPO
+      LOGICAL PrevRejected, CurrParsInclPO, PrevParsInclPO
       INTEGER TotNumTrials, TotNumRetrials
+      CHARACTER*2 RowLabelStr
 
       REAL xtem, tempupper, templower, tempupper2, templower2
       REAL Sgn
 
+      NumParPerTrial = 1
       TotNumTrials = 0
       TotNumRetrials = 0
       Curr_SA_Run = 0
       NumOf_SA_Runs = 0
+      DO I = 1, 99
+        iSol2Run(I) = I
+      ENDDO
 ! Set up a random number generator store
 ! Use a quick and dirty one from NR
       CALL RANX2Init
@@ -199,7 +203,6 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Action1)
       WRITE(CNruns,'(I3)') Curr_SA_Run
-      IF (Curr_SA_Run .EQ. 2) CALL WDialogFieldState(IDB_Summary,Enabled)
       WRITE(CMruns,'(I3)') MaxRuns
       CNruns = ADJUSTL(CNruns)
       CMruns = ADJUSTL(CMruns)
@@ -234,12 +237,26 @@
           XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
         ENDDO
       ENDDO
+      FOPT = F
 ! Evaluate the profile chi-squared as well
       CALL valchipro(CHIPROBEST)
+
+
+      CALL WDialogSelect(IDD_Summary)
+      CALL WGridRows(IDF_SA_Summary, Curr_SA_Run)
+      WRITE(RowLabelStr,'(I2)') Curr_SA_Run
+      CALL WGridLabelRow(IDF_SA_summary,Curr_SA_Run,RowLabelStr)
+      CALL WGridPutCellInteger (IDF_SA_Summary,1,Curr_SA_Run,NumOf_SA_Runs+1) 
+      CALL WGridPutCellCheckBox(IDF_SA_Summary,3,Curr_SA_Run,1)
+      CALL WGridPutCellReal    (IDF_SA_Summary,4,Curr_SA_Run,CHIPROBEST,'(F7.2)')
+      CALL WGridPutCellReal    (IDF_SA_Summary,5,Curr_SA_Run,SNGL(FOPT),'(F7.2)')
+      CALL WDialogPutInteger(IDF_Limit1,1)
+      CALL WDialogPutInteger(IDF_Limit2,Curr_SA_Run)
+
+
       PrevRejected = .TRUE.
 ! Plot the profile
       CALL Profile_Plot
-      FOPT = F
       MRAN  = ISEED1 + Curr_SA_Run
       MRAN1 = ISEED2 + Curr_SA_Run
       Last_NUP   = nmpert / 2
@@ -265,8 +282,8 @@
       FPSUM1 = 0.0
       FPSUM2 = 0.0
 ! Update the SA status window
-      CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),xopt,dxvav,xvsig,flav,lb,ub,  &
-                     vm,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
+      CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),xopt,dxvav,xvsig,flav,  &
+                     nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
       CALL sa_move_status(nmpert,0)
 ! ##########################################
 !   Starting point for multiple moves
@@ -283,163 +300,144 @@
         IAR1 = MRAN1 + 1
         DO J = 1, NS
           DO IH = 1, NPAR
-            H = IP(1+INT(RANARR(IARR)*NPAR))
-            IARR = IARR + 1
-            NumTrialsPar(H) = NumTrialsPar(H) + 1
-            TotNumTrials = TotNumTrials + 1
-! Generate XP, the trial value of X. Note use of VM to choose XP.
             DO I = 1, nvar
               XP(I) = X(I)
             ENDDO
-            DX = RANAR1(IAR1) * VM(H)
-            IAR1 = IAR1 + 1
-            XP(H) = X(H) + DX
+            CurrParsInclPO = .FALSE.
+            DO iParNum = 1, NumParPerTrial
+              H = IP(1+INT(RANARR(IARR)*NPAR))
+              IARR = IARR + 1
+              NumTrialsPar(H) = NumTrialsPar(H) + 1
+              TotNumTrials = TotNumTrials + 1
+! Generate XP, the trial value of X. Note use of VM to choose XP.
+              DX = RANAR1(IAR1) * VM(H)
+              IAR1 = IAR1 + 1
+              XP(H) = X(H) + DX
 ! If modal ranges defined for torsions use random number to
 ! select from which range the value of XP will be derived.
-            IF (ModalFlag(H) .EQ. 2) THEN !Bimodal
-              IF (RANARR(IARR) .GT. 0.5) THEN
-                IF (UB(H) * LB(H) .LT. 0.00) THEN
-                  XP(H) = XP(H) + 180.00
-                  CALL ThreeSixtyToOneEighty(XP(H))
-                ELSE
-                  XP(H) = -XP(H)
+              IF (ModalFlag(H) .EQ. 2) THEN !Bimodal
+                IF (RANARR(IARR) .GT. 0.5) THEN
+                  IF (UB(H) * LB(H) .LT. 0.00) THEN
+                    XP(H) = XP(H) + 180.00
+                    CALL ThreeSixtyToOneEighty(XP(H))
+                  ELSE
+                    XP(H) = -XP(H)
+                  ENDIF
+                ENDIF            
+                IARR = IARR + 1 
+              ELSEIF (ModalFlag(H) .EQ. 3) THEN !Trimodal
+                xtem = XP(H)
+                CALL OneEightyToThreeSixty(xtem)
+                IF ((RANARR(IARR) .GE. 0.33) .AND. (RANARR(IARR).LT. 0.66)) THEN
+                  xtem = xtem + 120.00
+                ELSEIF ((RANARR(IARR) .GE. 0.66) .AND. (RANARR(IARR).LT. 1.00)) THEN
+                  xtem = xtem + 240.00
                 ENDIF
-              ENDIF            
-              IARR = IARR + 1 
-            ELSEIF (ModalFlag(H) .EQ. 3) THEN !Trimodal
-              xtem = XP(H)
-              CALL OneEightyToThreeSixty(xtem)
-              IF ((RANARR(IARR) .GE. 0.33) .AND. (RANARR(IARR).LT. 0.66)) THEN
-                xtem = xtem + 120.00
-              ELSEIF ((RANARR(IARR) .GE. 0.66) .AND. (RANARR(IARR).LT. 1.00)) THEN
-                xtem = xtem + 240.00
+                IARR = IARR + 1
+                IF (Xtem .GE. 360.00) THEN
+                  Xtem = xtem - 360.00
+                END IF
+                CALL ThreeSixtyToOneEighty(xtem)
+                XP(H) = xtem
               ENDIF
-              IARR = IARR + 1
-              IF (Xtem .GE. 360.00) THEN
-                Xtem = xtem - 360.00
-              END IF
-              CALL ThreeSixtyToOneEighty(xtem)
-              XP(H) = xtem
-            ENDIF
-
-!O! If translation, adjust to be between 0.0 and 1.0
-!O            IF (kzmpar2(H) .EQ. 1) THEN
-!O              DO WHILE (XP(H) .LT. 0.0)
-!O                XP(H) = XP(H) + 1.0
-!O              ENDDO
-!O              DO WHILE (XP(H) .GT. 1.0)
-!O                XP(H) = XP(H) - 1.0
-!O              ENDDO
-!O            ENDIF
-!O! If torsion angle, adjust to be between -180.0 and +180.0
-!O            IF (kzmpar2(H) .EQ. 3) THEN
-!O              DO WHILE (XP(H) .LT. -180.0)
-!O                XP(H) = XP(H) + 360.0
-!O              ENDDO
-!O              DO WHILE (XP(H) .GT.  180.0)
-!O                XP(H) = XP(H) - 360.0
-!O              ENDDO
-!O            ENDIF
-
 ! If XP is out of bounds, select a point in bounds for the trial.
-            SELECT CASE(ModalFlag(H))
-              CASE (1) ! used for all parameters except modal torsion angles 
-                IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
-                  TotNumRetrials = TotNumRetrials + 1
-                  XP(H) = LB(H) + RULB(H) * RANARR(IARR)
-                  IARR = IARR + 1
-                ENDIF   
-              CASE (2) ! bimodal ranges
+              SELECT CASE(ModalFlag(H))
+                CASE (1) ! used for all parameters except modal torsion angles 
+                  IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
+                    TotNumRetrials = TotNumRetrials + 1
+                    XP(H) = LB(H) + RULB(H) * RANARR(IARR)
+                    IARR = IARR + 1
+                  ENDIF   
+                CASE (2) ! bimodal ranges
 ! Complicated-looking calcs of inbounds torsion angles is to try and guarantee a good
 ! sampling of all user defined ranges.  
-                IF (CheckXInBounds(H, XP(H))) THEN
-                  IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
-                    TempUpper = SNGL(UB(H))         ! so use 0-360 degree scale
-                    TempLower = SNGL(LB(H))
-                    TempLower2 = TempUpper - 180.00
-                    TempUpper2 = TempLower + 180.00
-                    CALL OneEightyToThreeSixty(TempUpper)
-                    CALL OneEightyToThreeSixty(TempLower)
-                    CALL OneEightyToThreeSixty(TempUpper2)
-                    CALL OneEightyToThreeSixty(TempLower2)
-                    xtem = XP(H)
-                    CALL OneEightytoThreeSixty(xtem)
-                    Sgn = SIGN(1.0, XP(H))
-                    IF (RANARR(IARR) .LT. 0.5) THEN 
-                      IARR = IARR + 1               
-                      xtem = MAX(TempUpper, TempUpper2) + (RULB(H) * RANARR(IARR))
-                      IF (sgn .LT. 0.0) THEN
-                        xtem = xtem -180.00
+                  IF (OutOfBounds(H, XP(H))) THEN
+                    IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
+                      TempUpper = SNGL(UB(H))         ! so use 0-360 degree scale
+                      TempLower = SNGL(LB(H))
+                      TempLower2 = TempUpper - 180.00
+                      TempUpper2 = TempLower + 180.00
+                      CALL OneEightyToThreeSixty(TempUpper)
+                      CALL OneEightyToThreeSixty(TempLower)
+                      CALL OneEightyToThreeSixty(TempUpper2)
+                      CALL OneEightyToThreeSixty(TempLower2)
+                      xtem = XP(H)
+                      CALL OneEightytoThreeSixty(xtem)
+                      Sgn = SIGN(1.0, XP(H))
+                      IF (RANARR(IARR) .LT. 0.5) THEN 
+                        IARR = IARR + 1               
+                        xtem = MAX(TempUpper, TempUpper2) + (RULB(H) * RANARR(IARR))
+                        IF (sgn .LT. 0.0) THEN
+                          xtem = xtem -180.00
+                        ENDIF
+                      ELSE
+                        IARR = IARR + 1
+                        xtem = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
+                        IF (sgn .LT. 0.0) THEN
+                          xtem = xtem + 180.00
+                        ENDIF
                       ENDIF
-                    ELSE
-                      IARR = IARR + 1
-                      xtem = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
-                      IF (sgn .LT. 0.0) THEN
-                        xtem = xtem + 180.00
-                      ENDIF
-                    ENDIF
-                    IARR = IARR + 1 
-                    IF (xtem .GT. 360.00) THEN
-                      xtem = xtem - 360.00
-                    ENDIF
-                    CALL ThreeSixtyToOneEighty(xtem)
-                    XP(H) = xtem
-                  ELSEIF (UB(H) * LB(H) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
-                    Sgn = SIGN(1.0, XP(H))
-                    IF (RANARR(IARR) .LT. 0.5) THEN
-                      IARR = IARR + 1
-                      XP(H) = LB(H) + (RULB(H) * RANARR(IARR))
-                      XP(H) = XP(H) * (-Sgn)
-                    ELSE
                       IARR = IARR + 1 
-                      XP(H) = -LB(H) - (RULB(H) * RANARR(IARR))
-                      XP(H) = XP(H) * Sgn
-                    ENDIF 
+                      IF (xtem .GT. 360.00) THEN
+                        xtem = xtem - 360.00
+                      ENDIF
+                      CALL ThreeSixtyToOneEighty(xtem)
+                      XP(H) = xtem
+                    ELSEIF (UB(H) * LB(H) .GE. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
+                      Sgn = SIGN(1.0, XP(H))
+                      IF (RANARR(IARR) .LT. 0.5) THEN
+                        IARR = IARR + 1
+                        XP(H) = LB(H) + (RULB(H) * RANARR(IARR))
+                        XP(H) = XP(H) * (-Sgn)
+                      ELSE
+                        IARR = IARR + 1 
+                        XP(H) = -LB(H) - (RULB(H) * RANARR(IARR))
+                        XP(H) = XP(H) * Sgn
+                      ENDIF 
+                      IARR = IARR + 1
+                    ENDIF
+                  ENDIF
+                CASE(3) !trimodal ranges
+                  IF (OutOfBounds(H, XP(H))) THEN ! calculate new value in one of three allowed ranges
+                    xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
+                    IARR = IARR + 1
+                    IF ((RANARR(IARR) .GT. 0.33) .AND. (RANARR(IARR) .LE. 0.66)) THEN
+                      xtem = xtem - 120.00
+                    ELSEIF ((RANARR(IARR) .GT. 0.66) .AND. (RANARR(IARR) .LE. 1.00)) THEN
+                      xtem = xtem -240.00
+                      IF (xtem .LT. -180.00) THEN
+                        xtem = 360.00 + xtem
+                      ENDIF
+                    ENDIF
                     IARR = IARR + 1
                   ENDIF
-                ENDIF
-              CASE(3) !trimodal ranges
-                IF (CheckXinBounds(H, XP(H))) THEN ! calculate new value in one of three allowed ranges
-                  xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
-                  IARR = IARR + 1
-                  IF ((RANARR(IARR) .GT. 0.33) .AND. (RANARR(IARR) .LE. 0.66)) THEN
-                    xtem = xtem - 120.00
-                  ELSEIF ((RANARR(IARR) .GT. 0.66) .AND. (RANARR(IARR) .LE. 1.00)) THEN
-                    xtem = xtem -240.00
-                    IF (xtem .LT. -180.00) THEN
-                      xtem = 360.00 + xtem
-                    ENDIF
-                  ENDIF
-                  IARR = IARR + 1
-                ENDIF
-                XP(H) = xtem
-            END SELECT
-            CurrIsPO = (kzmpar2(H) .EQ. 7)
-            IF (PrefParExists) THEN
+                  XP(H) = xtem
+              END SELECT
+              IF (kzmpar2(H) .EQ. 7) CurrParsInclPO = .TRUE.
+            ENDDO
+
 ! Evaluate the function with the trial point XP and return as FP.
+            IF (NumParPerTrial .EQ. 1) THEN
               IF (PrevRejected) THEN
-                IF (PrevWasPO) THEN
-                  IF (CurrIsPO) THEN
+                IF (PrevParsInclPO) THEN
+                  IF (CurrParsInclPO) THEN
                     CALL FCN(XP,FP,iPrfPar)
                   ELSE
                     CALL PO_PRECFC(SNGL(XP(iPrfPar)))
                     CALL FCN(XP,FP,0)
                   ENDIF
                 ELSE
-                  IF (CurrIsPO) THEN
-                    CALL PO_PRECFC(SNGL(XP(iPrfPar)))
-                    CALL FCN(XP,FP,0)
-                  ELSE
-                    CALL FCN(XP,FP,0)
-                  ENDIF
+                  IF (CurrParsInclPO) CALL PO_PRECFC(SNGL(XP(iPrfPar)))
+                  CALL FCN(XP,FP,0)
                 ENDIF
               ELSE
-                CALL FCN(XP,FP,H)
+                CALL FCN(XP,FP,H) ! Becomes H(1)
               ENDIF
             ELSE
+              IF ((CurrParsInclPO) .OR. (PrevParsInclPO .AND. PrevRejected)) CALL PO_PRECFC(SNGL(XP(iPrfPar)))
               CALL FCN(XP,FP,0)
             ENDIF
-            PrevWasPO = CurrIsPO
+            PrevParsInclPO = CurrParsInclPO
             FPSUM0 = FPSUM0 + 1.0
             FPSUM1 = FPSUM1 + FP
             FPSUM2 = FPSUM2 + FP*FP
@@ -465,9 +463,16 @@
                 num_new_min = num_new_min + 1
                 CALL valchipro(CHIPROBEST)
                 FOPT = FP
+
+
+                CALL WDialogSelect(IDD_Summary)
+                CALL WGridPutCellReal(IDF_SA_Summary,4,Curr_SA_Run,CHIPROBEST,'(F7.2)')
+                CALL WGridPutCellReal(IDF_SA_Summary,5,Curr_SA_Run,SNGL(FOPT),'(F7.2)')
+
+
 ! Update the SA status window
-                CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),XOPT,dxvav,xvsig,flav,lb,ub,  &
-                               vm,NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov)
+                CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),XOPT,dxvav,xvsig,flav,  &
+                               NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov)
               ENDIF
 ! If the point is greater, use the Metropolis criterion to decide on
 ! acceptance or rejection.
@@ -536,7 +541,7 @@
       IF (num_new_min .NE. num_old_min) CALL Profile_Plot ! plot the profile
       num_old_min = num_new_min
       CALL SA_OUTPUT(SNGL(T),SNGL(FOPT),SNGL(FPAV),SNGL(FPSD),xopt, &
-                     dxvav,xvsig,flav,lb,ub,vm,nvar,Last_NUP,Last_NDOWN,NREJ, &
+                     dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,NREJ, &
                      ntotmov)
 ! If we have asked for an initial temperature to be calculated then do so
       IF (MAKET0) THEN
