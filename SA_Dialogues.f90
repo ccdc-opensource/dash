@@ -697,6 +697,7 @@
         alph(iAtomNr,iFrg2)          = alph(iAtomNr,iFrg1)
         bet(iAtomNr,iFrg2)           = bet(iAtomNr,iFrg1)
         asym(iAtomNr,iFrg2)          = asym(iAtomNr,iFrg1)
+        zmElementCSD(iAtomNr,iFrg2)  = zmElementCSD(iAtomNr,iFrg1)
         OriginalLabel(iAtomNr,iFrg2) = OriginalLabel(iAtomNr,iFrg1)
         tiso(iAtomNr,iFrg2)          = tiso(iAtomNr,iFrg1)
         occ(iAtomNr,iFrg2)           = occ(iAtomNr,iFrg1)
@@ -912,6 +913,7 @@
       IMPLICIT NONE
 
       INTEGER iFrg, iRow, iAtomNr
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEdit)
@@ -927,6 +929,7 @@
         CALL WGridGetCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr,iFrg))
 ! atom elements
         CALL WGridGetCellString(IDF_AtomPropGrid,3,iRow,asym(iAtomNr,iFrg))
+        zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
 ! Biso
         CALL WGridGetCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr,iFrg))
 ! occupancies
