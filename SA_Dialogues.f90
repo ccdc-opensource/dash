@@ -77,6 +77,16 @@
           CASE (IDB_SA_Project_Import)
 ! JCC Import .. convert a mol/pdb/mol2 file into a zmatrix
             CALL ImportZmatrix
+          CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
+            IF (Confirm('Do you want to clear this z-matrix?')) THEN
+              ZmStateChanged = .TRUE.
+              ifrg = 1
+              DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
+                ifrg = ifrg + 1
+              ENDDO
+              gotzmfile(ifrg) = .FALSE.
+              frag_file(ifrg) = ' '
+            ENDIF ! Delete this z-matrix
           CASE (IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
             ZmStateChanged = .TRUE.
             ifrg = 1
@@ -104,16 +114,6 @@
               CALL FileErrorPopup(frag_file(ifrg),zmread)
               frag_file(ifrg) = ' '
             ENDIF ! If the read on the zmatrix was ok
-          CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
-            IF (Confirm('Do you want to clear this z-matrix?')) THEN
-              ZmStateChanged = .TRUE.
-              ifrg = 1
-              DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
-                ifrg = ifrg + 1
-              ENDDO
-              gotzmfile(ifrg) = .FALSE.
-              frag_file(ifrg) = ' '
-            ENDIF ! Delete this z-matrix
 ! View individual z-matrices in e.g. Mercury
           CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
             ifrg = 1
@@ -124,6 +124,18 @@
               CALL ErrorMessage('File not found.')
             ELSE
               CALL ViewZmatrix(ifrg)
+            ENDIF
+! View individual z-matrices in e.g. Mercury
+          CASE (IDB_ZMatrixEdit1, IDB_ZMatrixEdit2, IDB_ZMatrixEdit3, IDB_ZMatrixEdit4, IDB_ZMatrixEdit5)
+            ifrg = 1
+            DO WHILE (IDBZMEdit(ifrg) .NE. EventInfo%VALUE1)
+              ifrg = ifrg + 1
+            ENDDO
+            IF (.NOT. gotzmfile(ifrg)) THEN
+              CALL ErrorMessage('File not found.')
+            ELSE
+              CALL WDialogSelect(IDD_EditZMatrix)
+              CALL WDialogShow(-1,-1,0,Modal)
             ENDIF
         END SELECT
       END SELECT
