@@ -389,7 +389,7 @@
       CALL WDialogPutString(IDF_ViewExe,ViewExe)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,.TRUE.)
-      SA_SimplexDampingFactor = 0.25
+      SA_SimplexDampingFactor = 0.1
       CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,.FALSE.)
       CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,.FALSE.)
       CALL WDialogSelect(IDD_SAW_Page1)
