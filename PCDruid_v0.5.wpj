@@ -1,0 +1,75 @@
+Compiler_Options -c -winapp -check:noflawed_pentium -include:\wint\lib.dvf
+ 
+Compiler_Type    2
+ 
+Executable       \wint\MyPrograms\PCDruid_v0.5\PCDash.exe
+ 
+ 
+Linker_Options   -subsystem:windows
+ 
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\PCDruid_resource.RC 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\PCDruid_Resource.F90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\BeginSa.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Ccslmain.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\create_fob.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Dialog_Routines.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\DoAtomPositions.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\error_message.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Eval.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Fcn.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Ffcalc.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Fortic.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\forty.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Fou.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Frac2cart.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Generate_TicMarks.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\get_logref.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\gethcv.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\getpik.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\inf_upload.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Mag.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Main_Field_Changed_Routines.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\multipeak_chisq.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\multipeak_fitter.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Mvec.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Pawley.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\PCDruid_Main.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Pf.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\PF_Simplex.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\PolyFitter_Defaults.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\PolyFitter_Subs.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\PolyLoadFiles.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Pr.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Profile_Plot.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\PutSimplexChisq.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\SA_Defaults.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\read_one_zm.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\sa_input.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\SA_main.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\sa_move_status.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\SA_output.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\sa_plot.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\SA_Profile_Plot.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\sa_refresh.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Sa_simopt.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\sa_simplex.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\SA_structure_output.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\sa_subs.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\sa_upload.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\SGDecode.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\subplxopt.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Upload_Cell_Constants.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Upload_Positions.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Upload_Widths.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Utilities.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Valchi.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\valchipro.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Vicar.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Wifd99.for 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\Wizard_routines.f90 1 1 0
+Project_File     D:\WINT\MyPrograms\PCDruid_v0.5\zm_upload.f90 1 1 0
+ 
+RC_Options       /i\wint\include
+ 
+Mod_Options      -c
+ 
