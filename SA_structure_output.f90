@@ -67,7 +67,7 @@
       LOGICAL, EXTERNAL :: SaveCSSR, SaveCCL
       INTEGER I, J, II, K, npdbops, iiact, iTotal, iFrg, iFrgCopy, IJ, iOrig
       REAL xc, yc, zc
-      INTEGER TotNumBonds, NumOfAtomsSoFar
+      INTEGER TotNumBonds, NumOfAtomsSoFar, iBond1, iBond2, iTem
 
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
@@ -230,13 +230,24 @@
         TotNumBonds = 0
         NumOfAtomsSoFar = 0
         DO ifrg = 1, maxfrg
-          IF (gotzmfile(ifrg)) THEN
+          IF (gotzmfile(iFrg)) THEN
             DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-              DO J = 1, NumberOfBonds(ifrg)
-                WRITE(65,'(A6,I5,I5)') 'CONECT', izmoid(Bonds(1,J,ifrg),ifrg)+NumOfAtomsSoFar, izmoid(Bonds(2,J,ifrg),ifrg)+NumOfAtomsSoFar
-              ENDDO
-              NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
-              TotNumBonds = TotNumBonds + NumberOfBonds(ifrg)
+              IF (NumberOfBonds(iFrg) .GT. 0) THEN
+                DO J = 1, NumberOfBonds(iFrg)
+! Due to the backmapping, it is possible that the original number of the first atom is greater than the
+! original number of the second atom. Mercury can't read pdb files where this is the case.
+                  iBond1 = izmoid(Bonds(1,J,iFrg),iFrg)+NumOfAtomsSoFar
+                  iBond2 = izmoid(Bonds(2,J,iFrg),iFrg)+NumOfAtomsSoFar
+                  IF (iBond1 .GT. iBond2) THEN
+                    iTem   = iBond1
+                    iBond1 = iBond2
+                    iBond2 = iTem
+                  ENDIF
+                  WRITE(65,'(A6,I5,I5)') 'CONECT', iBond1, iBond2
+                ENDDO
+              ENDIF
+              NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
+              TotNumBonds = TotNumBonds + NumberOfBonds(iFrg)
             ENDDO
           ENDIF
         ENDDO ! loop over Z-matrices
@@ -363,14 +374,16 @@
       TotNumBonds = 0
       NumOfAtomsSoFar = 0
       DO ifrg = 1, maxfrg
-        IF (gotzmfile(ifrg)) THEN
+        IF (gotzmfile(iFrg)) THEN
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO J = 1, NumberOfBonds(ifrg)
-              pdbBond(J+TotNumBonds,1) = Bonds(1,J,ifrg) + NumOfAtomsSoFar
-              pdbBond(J+TotNumBonds,2) = Bonds(2,J,ifrg) + NumOfAtomsSoFar
-            ENDDO
-            NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
-            TotNumBonds = TotNumBonds + NumberOfBonds(ifrg)
+            IF (NumberOfBonds(iFrg) .GT. 0) THEN
+              DO J = 1, NumberOfBonds(iFrg)
+                pdbBond(J+TotNumBonds,1) = Bonds(1,J,iFrg) + NumOfAtomsSoFar
+                pdbBond(J+TotNumBonds,2) = Bonds(2,J,iFrg) + NumOfAtomsSoFar
+              ENDDO
+            ENDIF
+            NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
+            TotNumBonds = TotNumBonds + NumberOfBonds(iFrg)
           ENDDO
         ENDIF
       ENDDO ! loop over Z-matrices
@@ -463,28 +476,28 @@
           CALL StrClean(RunStr,ilen) ! Left justify
           LabelStr = LabelStr(1:LEN_TRIM(LabelStr))//RunStr
           DO ifrg = 1, maxfrg
-            IF (gotzmfile(ifrg)) THEN
+            IF (gotzmfile(iFrg)) THEN
 
               DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-                DO i = 1, natoms(ifrg)
+                DO i = 1, natoms(iFrg)
                   iiact = iiact + 1
-                  xc = pdbAtmCoords(1,i,iFrgCopy,ifrg,RunNr)
-                  yc = pdbAtmCoords(2,i,iFrgCopy,ifrg,RunNr)
-                  zc = pdbAtmCoords(3,i,iFrgCopy,ifrg,RunNr)
+                  xc = pdbAtmCoords(1,i,iFrgCopy,iFrg,RunNr)
+                  yc = pdbAtmCoords(2,i,iFrgCopy,iFrg,RunNr)
+                  zc = pdbAtmCoords(3,i,iFrgCopy,iFrg,RunNr)
 ! Note that elements are right-justified
                   IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
-                    IF (asym(i,ifrg)(2:2) .EQ. ' ') THEN
-                      ColourStr(1:2) = ' '//asym(i,ifrg)(1:1)
+                    IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
+                      ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
                     ELSE
-                      ColourStr(1:2) = asym(i,ifrg)(1:2)
+                      ColourStr(1:2) = asym(i,iFrg)(1:2)
                     ENDIF
                   ENDIF
                   IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
-                    LabelStr = asym(i,ifrg)(1:LEN_TRIM(asym(i,ifrg)))//RunStr
+                    LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//RunStr
                   ELSE  ! Orignal atom labels
                     LabelStr(1:4) = OriginalLabel(i,ifrg)(1:4)
                   ENDIF
-                  WRITE (65,1120) iiact, LabelStr(1:4), xc, yc, zc, occ(i,ifrg), tiso(i,ifrg), ColourStr(1:2)
+                  WRITE (65,1120) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
  1120             FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
                 ENDDO ! loop over atoms
               ENDDO
