@@ -151,7 +151,9 @@
         DXDD(I) = DDMAX
       END DO
 !.. Perform simplex
+      CALL WCursorShape(CurHourGlass)
       CALL SIMOPT(XDD,DXDD,COVDD,NDD,ChiGetLattice)
+      CALL WCursorShape(CurCrossHair)
       XDD(9) = 0.5 * XDD(2)
       XDD(10) = 0.0
       DO I = 1, 3
