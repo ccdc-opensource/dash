@@ -78,9 +78,10 @@
       INTEGER         izmpar(1:maxfrg)
       CHARACTER*36    czmpar(1:MaxDOF,1:maxfrg)
       INTEGER         kzmpar(1:MaxDOF,1:maxfrg)
+      INTEGER         kzmpar2(1:100)
       REAL            xzmpar(1:MaxDOF,1:maxfrg)
 
-! izmpar = number of degrees of freedom ('parameters')
+! izmpar = number of degrees of freedom ('parameters') per Z-matrix
 ! czmpar = Character string associated with this parameter value
 ! kzmpar = type of parameter
 !          1 = translation (3 D.O.F.)
@@ -89,6 +90,9 @@
 !          4 = valence angle
 !          5 = bond length
 !          6 = rotation about a single axis (also 4 D.O.F., could be made 1 or 2)
+! kzmpar2 = as kzmpar, but per parameter rather than per Z-matrix per parameter.
+!           This way, e.g. preferred orientation (which doesn't belong to a Z-matrix)
+!           can be dealt with.
 ! xzmpar = initial value of parameter
 
       INTEGER         ntatm
@@ -103,12 +107,14 @@
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
 ! iz1, iz2, iz3 = atoms with respect to which the current atom is defined in the z-matrix
 
-      DOUBLE PRECISION blen(1:maxatm,1:maxfrg), alph(1:maxatm,1:maxfrg), bet(1:maxatm,1:maxfrg), f2cmat(3,3)
+      DOUBLE PRECISION blen(1:maxatm,1:maxfrg), alph(1:maxatm,1:maxfrg), bet(1:maxatm,1:maxfrg)
+      DOUBLE PRECISION f2cmat(1:3,1:3), c2fmat(1:3,1:3)
 
 ! blen   = bond length     (wrt iz1)
 ! alph   = valence angle   (wrt iz1 & iz2)
 ! bet    = torsion angle   (wrt iz1, iz2 & iz3)
-! f2cmat = 3x3 matrix for conversion from fractional to Cartesian coordinates 
+! f2cmat = 3x3 matrix for conversion from fractional to Cartesian  coordinates 
+! c2fmat = 3x3 matrix for conversion from Cartesian  to fractional coordinates 
 
       CHARACTER*3     asym(1:maxatm,1:maxfrg)
       CHARACTER*5     OriginalLabel(1:maxatm,1:maxfrg)
