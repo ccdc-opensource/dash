@@ -99,6 +99,10 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
 # Begin Source File
 
+SOURCE=.\Basic_Files.f90
+# End Source File
+# Begin Source File
+
 SOURCE=.\Basic_IO.f90
 DEP_F90_BASIC=\
 	".\DRUID_HEADER.mod"\
