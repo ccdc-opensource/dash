@@ -6401,6 +6401,7 @@
       CHARACTER*8  tDate      ! '20010215' for 15 Feb 2001
       CHARACTER*17 DateStr
       CHARACTER*9  MonthStr
+      INTEGER, EXTERNAL :: DateToday
 !
 ! FOR THE CONVENIENCE OF THOSE WHO FIND THE ABOVE STATEMENT EYE-CROSSING,
 ! THE ELEMENTS OF THE ARRAY ISMBOL WILL BE:
@@ -6555,7 +6556,7 @@
  2000 FORMAT (/20X,A23//8X,' Cambridge Crystallography Subroutine Library     Mark 4.12')
 ! OBTAIN DATE AND TIME:
       CALL DATE_AND_TIME(tDate)
-      CALL GetDateStr(DateStr)
+      CALL Date2String(DateToday(),DateStr)
       SELECT CASE (tDate(5:6))
         CASE ('01')
           MonthStr = 'JAN'
