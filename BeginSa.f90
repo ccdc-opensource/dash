@@ -84,24 +84,27 @@
 
 	  CALL ToggleMenus(0)
 
+!ep SASummary presents a grid summarising results of the Simulated
+!   Annealing runs.  
+	  CALL SaSummary()
 
-      Call WDialogSelect(IDD_SA_Multi_Completed)
-	  CALL WDialogShow(-1,-1,0,Modeless)
-	  DO
-			CALL WMessage(ITYPE, MESSAGE)
-			IF (MESSAGE%WIN .EQ. 0) THEN
-				Quit = process_mainwindow_message(ITYPE, MESSAGE)
-			ELSE
-			    SELECT CASE (ITYPE)
-				  CASE (PushButton)
-!					IF ( IDF_SA_Complete_Ok .EQ. MESSAGE%VALUE1) THEN
-					IF ( IDOK .EQ. MESSAGE%VALUE1) THEN
-						CALL WDialogHide()
-						EXIT
-					END IF
-			    END SELECT
-		    END IF
-	  END DO
+!ep      Call WDialogSelect(IDD_SA_Multi_Completed)
+!ep	  CALL WDialogShow(-1,-1,0,Modeless)
+!ep	  DO
+!ep			CALL WMessage(ITYPE, MESSAGE)
+!ep			IF (MESSAGE%WIN .EQ. 0) THEN
+!ep				Quit = process_mainwindow_message(ITYPE, MESSAGE)
+!ep			ELSE
+!ep			    SELECT CASE (ITYPE)
+!ep				  CASE (PushButton)
+!jcc					IF ( IDF_SA_Complete_Ok .EQ. MESSAGE%VALUE1) THEN
+!ep					IF ( IDOK .EQ. MESSAGE%VALUE1) THEN
+!ep						CALL WDialogHide()
+!ep						EXIT
+!ep					END IF
+!ep			    END SELECT
+!ep		    END IF
+!ep	  END DO
 	  CALL ToggleMenus(1)
 
 	  Ierrflag =  InfoError(1)
@@ -115,12 +118,14 @@
 	USE WINTERACTER
 	USE DRUID_HEADER
 	character*85 new_fname
-    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file
-    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file
-    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen
+!ep appended
+    character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
+    common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file, pro_file
+    common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen, pro_flen
 	integer Iflags,Idummy
 	character*80 filehead
-	logical extcssr,extpdb,extccl
+!ep added extpro
+	logical extcssr,extpdb,extccl, extpro
 !
 	INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
 	IF (.NOT.extcssr) THEN
@@ -146,9 +151,18 @@
 		IF (extccl) EXIT
 	  END DO
 	END IF
+!	ep added.  Pro_file contains the powder diffraction data and fit....
+	INQUIRE(FILE=pro_file(1:pro_flen),  EXIST=extpro)
+	IF (.NOT.extpro) THEN
+	  DO I = 1,100
+	    CALL AppendNumToFileName(I,pro_file,new_fname)
+		INQUIRE(FILE=new_fname(1:len_trim(new_fname)),EXIST=extpro) 
+		IF (extpro) EXIT
+	  END DO
+	END IF
 
 	CheckOverwriteSaOutput = 1
-	DO WHILE (extcssr .OR. extpdb .OR. extccl)
+	DO WHILE (extcssr .OR. extpdb .OR. extccl .OR. extpro)
 
 			  CALL WMessageBox(YesNoCancel, QuestionIcon, CommonYes, &
 			  "Do you wish to overwrite existing files? "//CHAR(13) &
@@ -161,7 +175,8 @@
 			Iflags = SaveDialog+NonExPath+DirChange+AppendExt
 			Idummy = 1
 			filehead = ' '
-			CALL WSelectFile('ccl files|*.ccl|cssr files|*.cssr|pdb files|*.pdb|',&
+!ep appended
+			CALL WSelectFile('ccl files|*.ccl|cssr files|*.cssr|pdb files|*.pdb|pro files|*.pro|',&
 						     Iflags, &
 							 filehead,&
 							 'Choose SA output file name',&
@@ -177,6 +192,7 @@
 		INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
 		INQUIRE(FILE=pdb_file(1:pdb_flen),  EXIST=extpdb)
 		INQUIRE(FILE=ccl_file(1:ccl_flen),  EXIST=extccl)
+		INQUIRE(FILE=pro_file(1:pro_flen),  EXIST=extpro)
 
 ! Read in a new file name
 
