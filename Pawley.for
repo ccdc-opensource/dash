@@ -448,6 +448,7 @@ C
               CASE(IDB_PawRef_Save)
 			  IF ( SaveProject() .EQ. 1) THEN
 	              CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
+				  CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
 	          END IF
               CASE(IDF_PawRef_Solve)
                 call Load_Pawley_Pro
@@ -1320,14 +1321,15 @@ C>> Make a backup copy of the polyp.pik file to recover in event of an error
 	use winteracter
 	use druid_header
 	use variables
-      character(len=80) :: SDIFileName
+      character(len=255) :: SDIFileName
+	character(len=255) :: Currentdir
 	character(len=45) :: FILTER
 	integer IFLAGS
 	
 c.. Save the project
 	SaveProject = 0
-
-      IFLAGS = SaveDialog + DirChange + AppendExt + PromptOn
+c      CALL IOsDirName(Currentdir)
+      IFLAGS = SaveDialog + AppendExt + PromptOn
       FILTER = 'Diffraction information files (*.sdi)|*.sdi|'
 	DO I = 1,len_trim(SDIFileName)
 	      SDIFileName(I:I)=' '
@@ -1336,6 +1338,8 @@ c.. Save the project
       CALL WSelectFile(FILTER,IFLAGS,SDIFileName,
      &'Save diffraction information for structure solution')
 
+c.. Go back to original directory
+c      CALL IOsDirChange(Currentdir)
 	IF (WinfoDialog(4) .EQ. CommonOk .AND. 
      &    SDIFileName .NE. ' ') THEN
 		Call CreateSDIFile(SDIFileName)
