@@ -1108,21 +1108,14 @@
               CALL WDialogShow(-1,-1,0,Modeless)
               CALL WCursorShape(CurHourGlass)
               CALL DICVOL91(system(1),system(2),system(3),system(4),system(5),system(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
-              CALL WDialogUnload(IDD_DICVOLRunning)
+              CALL WDialogSelect(IDD_DICVOLRunning)
+              CALL WDialogUnload
               CALL WCursorShape(CurCrossHair)
-! Pop up a window showing the DICVOL output file in a text editor
-              CALL WindowOpenChild(iHandle)
-              CALL WEditFile(DV_FileName,Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
-! If 'ViewOnly' is specified:
-! 1. The file can be accessed while it is displayed.
-! 2. There is no 'Save as...' option in the menu.
-! If the output file is viewed without 'ViewOnly', the file cannot be accessed, which means that
-! DICVOL returns with an error message which means that there are no solutions.
-! Hence, this way, DICVOL can be run several times in succession and the results can be compared
-! on screen. To save one of the output files (that all have the same name),
-! the user must select all text and copy and paste it to an other editor window.
-              CALL SetChildWinAutoClose(iHandle)
               IF (NumOfDICVOLSolutions .EQ. 0) THEN
+! Pop up a window showing the DICVOL output file in a text editor
+                CALL WindowOpenChild(iHandle)
+                CALL WEditFile(DV_FileName,Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
+                CALL SetChildWinAutoClose(iHandle)
                 CALL ErrorMessage('No solutions were found.')
                 GOTO 999
               ENDIF  
@@ -1145,9 +1138,9 @@
 ! Clear all fields in the grid
               CALL WDialogClearField(IDF_DV_Summary_0)
               WRITE(nStr,'(I2)') n
-              CALL StrClean(nStr,ilen)
-              CALL WGridLabelColumn(IDF_DV_Summary_0,10,'M('//nStr(1:ilen)//')')
-              CALL WGridLabelColumn(IDF_DV_Summary_0,11,'F('//nStr(1:ilen)//')')
+              CALL StrClean(nStr,iLen)
+              CALL WGridLabelColumn(IDF_DV_Summary_0,10,'M('//nStr(1:iLen)//')')
+              CALL WGridLabelColumn(IDF_DV_Summary_0,11,'F('//nStr(1:iLen)//')')
 ! Set the number of rows in the grid to the number of solutions.
               CALL WGridRows(IDF_DV_Summary_0,NumOfDICVOLSolutions)
               DO I = 1, NumOfDICVOLSolutions
