@@ -38,7 +38,6 @@
       CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WizardWindowShow(IDD_SA_Action1)
-      DoSaRedraw = .TRUE.
       T1 = SECNDS(0.0)
       CALL PDB_SymmRecords()
       CALL Init_MultiRun()
@@ -58,7 +57,6 @@
       CALL OutputChi2vsMoves
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Enabled)
-      DoSaRedraw = .FALSE.
       Ierrflag = InfoError(1)
       CALL WindowSelect(0)
       Ierrflag = InfoError(1)
@@ -88,7 +86,6 @@
       ENDIF
       CALL WDialogShow(-1,-1,0,Modeless)
       Ierrflag =  InfoError(1)
-      DoSaRedraw = .FALSE.
 
       END SUBROUTINE BeginSa
 !
