@@ -53,20 +53,33 @@
 
       INTEGER I
 
+      INTEGER tKNIPT(1:500)
+      REAL tPIKVAL(1:500)
+      LOGICAL WrongValuesPresent
+
+      
+      WrongValuesPresent = .FALSE.
       ier = 0
       OPEN (21,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998,IOSTAT=Istat)
       NFITA = 0
       NBIN = 0
       ittem = 0
       DO I = 1, MOBS
-        READ (21,*,END=200) XBIN(I), YOBIN(I), EBIN(I), KTEM
-        KREFT(I) = KTEM
+        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
+! JvdS Rather a serious error here, I think. KTEM can be as much as 70.
+! Some of the reflections contribute 0.000000E+00 ???
+        IF (KTEM .GT. 50) WrongValuesPresent = .TRUE.
+        KREFT(I) = MIN(50,KTEM)
         NBIN = NBIN + 1
 !..        ESDA(I)=1./SQRT(WTSA(I))
         WTSA(I) = 1.0/EBIN(I)**2
 !..        KTEM=KMAXST(I)-KMINST(I)
         IF (KTEM.GT.0) THEN
-          READ (21,*,ERR=998) (KNIPT(K,I),PIKVAL(K,I),K=1,KTEM)
+          READ (21,*,ERR=998) (tKNIPT(K),tPIKVAL(K),K=1,KTEM)
+          DO j = 1, MIN(50,KTEM)
+            KNIPT(j,I)  = tKNIPT(j)
+            PIKVAL(j,I) = tPIKVAL(j)
+          ENDDO
           NFITA = NFITA + 1
           IFITA(NFITA) = I
         ENDIF
@@ -79,6 +92,7 @@
       YCBIN = 0.0
       NoData = .FALSE.
       CALL GetProfileLimits
+      IF (WrongValuesPresent) CALL DebugErrorMessage('>50 contributing reflections encountered at least once.')
       RETURN
   998 ier = 1
       CLOSE (21,IOSTAT=ISTAT)
