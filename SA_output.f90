@@ -101,7 +101,7 @@
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
       CHARACTER*255 temperfile
       REAL tenow1, tenow2, ruler, rulex1, rulex2
-      INTEGER iemax, ilt
+      INTEGER ilt
   
       REAL, PARAMETER ::  rminh = 0.01
       REAL, PARAMETER ::  rmaxh = 0.99
@@ -112,8 +112,6 @@
       CALL IGrSelect(3,IDF_T_picture)
       CALL IGrUnits(temin,0.0,temax,1.0)
       CALL IGrLoadImage(temperfile(1:ilt))
-
-
       CALL IGrColourN(95) ! Lightgreen
       tenow1=tempvl-0.03
       tenow2=tempvl+0.03
@@ -123,21 +121,18 @@
       CALL IGrFillPattern(Solid)
       CALL IGrUnits(temin,0.0,temax,1.0)
       CALL IGrLoadImage(temperfile(1:ilt))
-
       CALL IGrColourN(95) ! Lightgreen
       tenow1=bchmin-0.03
       tenow2=bchmin+0.03
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
-!.. average chi-squared scale ...
+! Average chi-squared
       CALL IGrSelect(3,IDF_avchisq_picture)
-
       CALL IGrUnits(temin,0.0,temax,1.0)
       CALL IGrLoadImage(temperfile(1:ilt))
       CALL IGrColourN(95) ! Lightgreen
       CALL IGrRectangle(avchi1,rminh,avchi2,rmaxh)
       CALL IGrColourN(128)
       CALL IGrRectangle(avchi3,rminh,avchi4,rmaxh)
-      CALL IGrColourN(95) ! Lightgreen
 ! Profile chi squared
       CALL IGrSelect(3,IDF_prochisq_picture)
       CALL IGrUnits(temin,0.0,temax,1.0)
@@ -147,15 +142,11 @@
       tenow2=bpwval+0.03
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
       CALL IGrColourN(95) ! Lightgreen
-
       tenow1=bchpro-0.03
       tenow2=bchpro+0.03
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
-
-! total moves
+! Total moves
       CALL IGrSelect(3,IDF_SATotalMoves_picture)
-!O      iemax=1+alog10(MAX(1.,FLOAT(nd3)))
-!O      ruler=10.**iemax
       ruler = MaxMoves
       CALL IGrUnits(0.0,0.0,ruler,1.0)
       CALL IGrColourN(59)  ! Yellow
@@ -182,10 +173,9 @@
       rulex1=rulex2
       rulex2=nd2
       CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
-
       CALL IGrSelect(1,0)
-      CALL IGrUnits(0.,0.,1.,1.)
-      CALL IGrArea(0.,0.,1.,1.)
+      CALL IGrUnits(0.0,0.0,1.0,1.0)
+      CALL IGrArea(0.0,0.0,1.0,1.0)
       RETURN
 
       END SUBROUTINE sa_output_gr
