@@ -119,6 +119,7 @@
       CLOSE (19)
       gotzmfile(iFrg) = .TRUE.
 ! Initialise all the stuff that isn't present in a .zmatrix file
+      zmNumberOfCopies(iFrg) = 1
       UseQuaternions(iFrg) = .TRUE.
       zmInitialQs(0,iFrg) = 1.0
       zmInitialQs(1,iFrg) = 0.0
