@@ -154,12 +154,14 @@
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_PW_Page1)
             CASE (IDCANCEL, IDCLOSE)
               SpaceGroupDetermination = .FALSE.
               CALL EndWizardCommon
             CASE (IDF_PawRef_Refine)
               CALL WritePawleyRefinementFile
-              ieocc  = Quick_Pawley_Fit()
+              ieocc = Quick_Pawley_Fit()
               ipt = 0
               CALL WDialogPutProgressBar(IDF_Pawley_Progress_Bar,ipt,Absolute)
               CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
@@ -212,6 +214,9 @@
               CALL WDialogFieldState(IDB_PawRef_Reject,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+              
+              
+              CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
 
             CASE (IDB_PawRef_Accept)
 ! update the profile and stay with the Pawley refinement
@@ -249,6 +254,7 @@
               CALL make_polybackup
 ! Disable the Solve button until the user does a Save
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+              CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
               CALL WDialogSelect(IDD_Pawley_Status)
               IF (LastValuesSet) CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
@@ -314,14 +320,12 @@
               Ilen = LEN_TRIM(DashPikFile)
               SDIFile = DashPikFile(1:Ilen-3)//'sdi'
               CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
-              iDummy = GETTIC(DashTicFile)
-              CALL GET_LOGREF
               CALL GETHCV(DashHcvFile,IER)
               CALL GETPIK(DashPikFile,IER)
-              NoData = .FALSE.
               CALL ShowWizardWindowZmatrices
-            CASE (IDBACK)
-              CALL WizardWindowShow(IDD_PW_Page1)
+            CASE (IDB_ExclRegions)
+              CALL WDialogSelect(IDD_ExclRegions)
+              CALL WDialogShow(-1,-1,0,Modeless)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -338,6 +342,31 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithPawleyFitWindow
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithExclRegionsWindow
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_ExclRegions)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDB_ClearAll)
+              CALL Clear_ExclRegions
+            CASE (IDCANCEL, IDCLOSE)
+              CALL WDialogHide
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithExclRegionsWindow
 !
 !*****************************************************************************
 !
@@ -397,16 +426,22 @@
       DATA CHRADOPTION /'LABX','SYNX','SYNX','TOFN'/
       INTEGER I
       LOGICAL, EXTERNAL :: FnUnitCellOK, FnWaveLengthOK, FnPatternOK
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, NearlyEqual
       REAL,    EXTERNAL :: WavelengthOf
       INTEGER NTCycles
       INTEGER JNB, NBLIN, INB, ITEM, ISYM, IRTYP
       INTEGER N1, N2, K1, KNB
-      INTEGER tFileHandle
+      INTEGER tFileHandle, hFile
       LOGICAL UsePrevious, FirstVaryLine
-      INTEGER nl
+      INTEGER nl, iRow, ii
       REAL    tReal
       CHARACTER*255 Line
+! Following variables are needed to sort out the excluded regions
+      INTEGER iOrd(1:10)
+      REAL    rStart(1:10), rEnd(1:10)
+      REAL    trStart(1:10), trEnd(1:10)
+      INTEGER NumUsed
+      LOGICAL Used(1:10), FirstExclRegionsLine
 
 ! Are these checks in place here? If one of them fails, we shouldn't have been here in the first place.
 !
@@ -419,49 +454,127 @@
       IF (NumOfRef .EQ. 0) RETURN
       IF (NumInternalDSC .NE. DataSetChange) THEN
         tFileHandle = 41
-        OPEN(tFileHandle,file='polyp.dat',status='unknown')
+        OPEN(tFileHandle,file='polyp.dat',status='unknown',ERR=999)
         DO I = 1, NBIN
-          WRITE(tFileHandle,'(F10.4,F12.2,F12.2)') XBIN(I), YOBIN(I), EBIN(I)
+          WRITE(tFileHandle,'(F10.4,F12.2,F12.2)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
         ENDDO
  4110   CLOSE(tFileHandle)
       ENDIF
       NumInternalDSC = DataSetChange
       NumPawleyRef = NumPawleyRef + 1
       CALL PushActiveWindowID
+! Get Excluded regions from dialogue
+      CALL WDialogSelect(IDD_ExclRegions)
+      Used = .TRUE.
+      NumUsed = 0
+      DO iRow = 1, 10
+        CALL WGridGetCellReal(IDF_ExclRegionsGrid,1,iRow,rStart(iRow))
+        CALL WGridGetCellReal(IDF_ExclRegionsGrid,2,iRow,rEnd(iRow))
+! If either invalid, mark as unused
+        IF ((rStart(iRow) .LT. 0.0) .OR. (rEnd(iRow) .LT. 0.0)) Used(iRow) = .FALSE.
+! make Start < End
+        IF (rStart(iRow) .GT. rEnd(iRow)) THEN
+          tReal = rStart(iRow)
+          rStart(iRow) = rEnd(iRow)
+          rEnd(iRow) = tReal
+        ENDIF
+! Check Start not lower than start of data
+        IF (rStart(iRow) .LT. XBIN(1)   ) rStart(iRow) = XBIN(1)
+! Check End not greater than end of data
+        IF (rEnd(iRow)   .GT. XBIN(NBIN)) rEnd(iRow)   = XBIN(NBIN)
+! Check Start and End not same
+        IF ( NearlyEqual(rStart(iRow),rEnd(iRow))) Used(iRow) = .FALSE.
+! If not used, set Start to 200.0, that way they will end up at the end of the list
+        IF (Used(iRow)) THEN
+          NumUsed = NumUsed + 1
+        ELSE
+          rStart(iRow) = 200.0
+        ENDIF
+      ENDDO
+! Now sort
+      CALL SORT_REAL(rStart,iOrd,10)
+      DO iRow = 1, 10
+        trStart(iRow) = rStart(iOrd(iRow))
+        trEnd(iRow)   = rEnd(iOrd(iRow))
+      ENDDO
+      DO iRow = 1, 10
+        rStart(iRow) = trStart(iRow)
+        rEnd(iRow)   = trEnd(iRow)
+      ENDDO
+      Used = .TRUE.
+      IF (NumUsed .LT. 10) THEN
+        DO iRow = NumUsed+1, 10
+          Used(iRow) = .FALSE.
+        ENDDO
+      ENDIF
+! now check for overlap
+      iRow = 1
+   20 IF ((iRow+1) .LE. NumUsed) THEN
+        IF (rStart(iRow+1) .LE. (rEnd(iRow)+0.0001)) THEN
+          rEnd(iRow) = MAX(rEnd(iRow),rEnd(iRow+1))
+! Shift remaining by -1
+          IF ((iRow+1) .NE. NumUsed) THEN
+            DO ii = iRow+1, NumUsed-1
+              rStart(ii) = rStart(ii+1)
+              rEnd(ii)   = rEnd(ii+1)
+            ENDDO
+          ENDIF
+          NumUsed = NumUsed - 1
+        ELSE
+          iRow = iRow + 1
+        ENDIF
+        GOTO 20
+      ENDIF
+! End of Excluded Regions processing, NumUsed, rStart and rEnd have now been filled
+! Now update this to the user:
+      CALL WDialogClearField(IDF_ExclRegionsGrid)
+      DO iRow = 1, NumUsed
+        CALL WGridPutCellReal(IDF_ExclRegionsGrid,1,iRow,rStart(iRow))
+        CALL WGridPutCellReal(IDF_ExclRegionsGrid,2,iRow,rEnd(iRow))
+      ENDDO
       CALL WDialogSelect(IDD_Pawley_Status)
       CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
       CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
       INQUIRE(FILE = 'polyp.niw', exist=UsePrevious)
+      hFile = 42
       IF (UsePrevious) THEN
-        OPEN(42,file='polyp.ccl',status='unknown')
-        OPEN(43,file='polyp.niw',status='old')
+        OPEN(hFile,file='polyp.ccl',status='unknown',ERR=999)
+        OPEN(43,file='polyp.niw',status='old',ERR=999)
         FirstVaryLine = .TRUE.
-   10   READ(43,5300,END=900) nl, line
+        FirstExclRegionsLine = .TRUE.
+   10   READ(43,5300,END=900,ERR=999) nl, line
  5300   FORMAT(Q,A)
         SELECT CASE (line(1:1))
           CASE ('I')
-            WRITE(42,4240) NTCycles
+            WRITE(hFile,4240,ERR=999) NTCycles
  4240       FORMAT('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0')
           CASE ('L')
             SELECT CASE (line(3:6))
               CASE('RTYP')
                 CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
                 IRtyp = 2 - Item
-                WRITE(42,4245) IRTYP, xpmin, xpmax
+                WRITE(hFile,4245,ERR=999) IRTYP, xpmin, xpmax
  4245           FORMAT('L RTYP  'I3,2F10.3,'  0.001')
               CASE ('SLIM')
                 CALL WDialogGetReal(IDF_Slim_Parameter,tReal)
-                WRITE(42,'(A7,F5.2)') 'L SLIM ', tReal
+                WRITE(hFile,'(A7,F5.2)',ERR=999) 'L SLIM ', tReal 
+              CASE ('EXCL')
+                IF (FirstExclRegionsLine) THEN
+                  DO iRow = 1, NumUsed
+                    WRITE(hFile,"('L EXCL ',F7.3,1X,F7.3)",ERR=999) rStart(iRow), rEnd(iRow)
+                  ENDDO
+                ENDIF
+                FirstExclRegionsLine = .FALSE.
               CASE ('VARY')
                 IF (FirstVaryLine) THEN
-                  WRITE(42,'(A)') 'L VARY ONLY ALL INTS'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check)) WRITE(42,'(A)') 'L VARY ALL BACK '
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check)) WRITE(42,'(A)') 'L VARY ALL CELL '
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check)) WRITE(42,'(A)') 'L VARY ZERO 1 '
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(42,'(A)') 'L VARY SIGM 1'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(42,'(A)') 'L VARY SIGM 2'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(42,'(A)') 'L VARY GAMM 1'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(42,'(A)') 'L VARY GAMM 2'
+                  WRITE(hFile,'(A)',ERR=999) 'L VARY ONLY ALL INTS'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check)) WRITE(42,'(A)',ERR=999) 'L VARY ALL BACK '
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check)) WRITE(42,'(A)',ERR=999) 'L VARY ALL CELL '
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check)) WRITE(42,'(A)',ERR=999) 'L VARY ZERO 1 '
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(42,'(A)',ERR=999) 'L VARY SIGM 1'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(42,'(A)',ERR=999) 'L VARY SIGM 2'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(42,'(A)',ERR=999) 'L VARY GAMM 1'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(42,'(A)',ERR=999) 'L VARY GAMM 2'
                 ENDIF
                 FirstVaryLine = .FALSE.
               CASE ('BACK')
@@ -469,14 +582,14 @@
 ! If the background should not be varied, or the number of parameters hasn't changed,
 ! just copy the old lines.
                 IF ((Item.EQ.0) .OR. (NPawBack.EQ.NPawBack_OLD)) THEN
-                  WRITE(42,'(A)') line(1:nl)              
+                  WRITE(hFile,'(A)',ERR=999) line(1:nl)              
                 ELSE
 ! Otherwise, set all back ground parameters to zero
 ! Read all old background lines
                   nblin = 1 + (NPawBack_OLD-1)/5
                   IF (nblin .GT. 1) THEN
                     DO inb = 2, nblin ! we have already read the first line
-                      READ(43,5300,END=900) nl, line
+                      READ(43,5300,END=900,ERR=999) nl, line
                     ENDDO
                   ENDIF
 ! Write all zeros for the new background
@@ -491,72 +604,72 @@
                       k1 = knb + 12*(jnb-1)
                       backstr(k1:k1+11) = '      0.000'
                     ENDDO
-                    WRITE(42,'(A)') backstr
+                    WRITE(hFile,'(A)',ERR=999) backstr
                   ENDDO
                   NPawBack_OLD = NPawBack
                 ENDIF
               CASE DEFAULT
-                WRITE(42,'(A)') line(1:nl)              
+                WRITE(hFile,'(A)',ERR=999) line(1:nl)              
             END SELECT
           CASE DEFAULT
-            WRITE(42,'(A)') line(1:nl)
+            WRITE(hFile,'(A)',ERR=999) line(1:nl)
         END SELECT
         GOTO 10
- 900    CLOSE(42)
+ 900    CLOSE(hFile)
         CLOSE(43)
         CALL IOsDeleteFile('polyp.niw')
 ! The file we have just created will remain the new input file until either
 ! a. the user starts the Pawley refinement from scratch (i.e. exits and re-opens the dialogue)
 ! b. the user presses 'Accept' to accept the refined parameters
         CALL IOsCopyFile('polyp.ccl', 'polyp.niw')
-        CALL PopActiveWindowID
       ELSE
         CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOn)
-        tFileHandle = 41
-        OPEN(tFileHandle,FILE='polyp.ccl',status='unknown')
-        WRITE(tFileHandle,4210) 
+        OPEN(hFile,FILE='polyp.ccl',status='unknown',ERR=999)
+        WRITE(hFile,4210,ERR=999) 
  4210 FORMAT('N Polyfitter file for quick Pawley refinement')
-        WRITE(tFileHandle,4220) (CellPar(I),I=1,6)
+        WRITE(hFile,4220,ERR=999) (CellPar(I),I=1,6)
  4220 FORMAT('C ',3F10.5,3F10.3)
-        WRITE(tFileHandle,4230) 
+        WRITE(hFile,4230,ERR=999) 
  4230 FORMAT('F C 2 2.31 20.8439 1.02 10.2075 1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
         IF (NumberSGTable .GE. 1) THEN
           CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
           IF (nsymmin .GT. 0) THEN
             DO isym = 1, nsymmin
-              WRITE(tFileHandle,4235) symline(isym)
- 4235         FORMAT('S ',a)
+              WRITE(hFile,4235,ERR=999) symline(isym)
+ 4235         FORMAT('S ',A)
             ENDDO
           ENDIF
         ENDIF
-        WRITE(tFileHandle,4241) NTCycles, ChRadOption(JRadOption)
+        WRITE(hFile,4241,ERR=999) NTCycles, ChRadOption(JRadOption)
  4241   FORMAT('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0'/              &
         'L REFI PAWL'/                                                    &
         'L SORC ', A4/                                                    &
         'L WGHT 3')
         CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
         IRtyp = 2 - Item
-        WRITE(tFileHandle,4246) IRTYP, xpmin, xpmax
+        WRITE(hFile,4246,ERR=999) IRTYP, xpmin, xpmax
  4246   FORMAT('L RTYP  'I3,2F10.3,'  0.001')
         IF (.NOT. FnWaveLengthOK()) ALambda = WavelengthOf('Cu')
-        WRITE(tFileHandle,4250) ALambda
+        WRITE(hFile,4250,ERR=999) ALambda
  4250   FORMAT('L WVLN ',F10.5)
         IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
-        WRITE(tFileHandle,4260) ZeroPoint
+        WRITE(hFile,4260,ERR=999) ZeroPoint
  4260   FORMAT('L ZERO ',F10.5)
- !       WRITE(tFileHandle,"('L EXCL ',F7.3,1X,F7.3)") 16.6, 17.0
+        DO iRow = 1, NumUsed
+          WRITE(hFile,"('L EXCL ',F7.3,1X,F7.3)",ERR=999) rStart(iRow), rEnd(iRow)
+        ENDDO
         CALL WDialogGetReal(IDF_Slim_Parameter,SLIMVALUE)
-        WRITE(tFileHandle,4270) SCALFAC, SLIMVALUE
+        WRITE(hFile,4270,ERR=999) SCALFAC, SLIMVALUE
  4270   FORMAT('L SCAL   ',F7.5,/                                         &
         'L SLIM ',F5.2,' '/                                               &
         'L REFK 10.0'/                                                    &
         'L PKCN TYPE 1'/                                                  &
         'L PKFN TYPE 3'/                                                  &
         'L PKFN LIMS 0.005')
-        WRITE(tFileHandle,4271) PkFnVarVal(1,1), PkFnVarVal(2,1)
-        WRITE(tFileHandle,4272) PkFnVarVal(1,2), PkFnVarVal(2,2)
-        WRITE(tFileHandle,4273) PkFnVarVal(1,3)
-        WRITE(tFileHandle,4274) PkFnVarVal(1,4)
+        WRITE(hFile,4271,ERR=999) PkFnVarVal(1,1), PkFnVarVal(2,1)
+        WRITE(hFile,4272,ERR=999) PkFnVarVal(1,2), PkFnVarVal(2,2)
+        WRITE(hFile,4273,ERR=999) PkFnVarVal(1,3)
+        WRITE(hFile,4274,ERR=999) PkFnVarVal(1,4)
  4271   FORMAT('L PKFN SIGM ',2F8.4)
  4272   FORMAT('L PKFN GAMM ',2F8.4)
  4273   FORMAT('L PKFN HPSL ',F8.4)
@@ -578,18 +691,23 @@
             k1 = knb + 12*(jnb-1)
             backstr(k1:k1+11) = '      0.000'
           ENDDO
-          WRITE(tFileHandle,'(A)') backstr
+          WRITE(hFile,'(A)',ERR=999) backstr
         ENDDO
-        WRITE(tFileHandle,'(A)') 'L VARY ONLY ALL INTS'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(tFileHandle,'(A)') 'L VARY ALL BACK'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check )) WRITE(tFileHandle,'(A)') 'L VARY ALL CELL'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check )) WRITE(tFileHandle,'(A)') 'L VARY ZERO 1 '
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(tFileHandle,'(A)') 'L VARY SIGM 1'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(tFileHandle,'(A)') 'L VARY SIGM 2'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(tFileHandle,'(A)') 'L VARY GAMM 1'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(tFileHandle,'(A)') 'L VARY GAMM 2'
-        CLOSE(tFileHandle)
+        WRITE(hFile,'(A)',ERR=999) 'L VARY ONLY ALL INTS'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY ALL BACK'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check )) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY ALL CELL'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check )) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY ZERO 1 '
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY SIGM 1'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY SIGM 2'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY GAMM 1'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY GAMM 2'
+        CLOSE(hFile)
       ENDIF   
+      CALL PopActiveWindowID
+      RETURN
+  999 CALL ErrorMessage('Error writing temporary input file for Pawley refinement.')
+      CLOSE(hFile)
+      CALL PopActiveWindowID
 
       END SUBROUTINE WritePawleyRefinementFile
 !
