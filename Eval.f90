@@ -67,6 +67,7 @@
             DO JQ = 0, 3
               JQS = 1 + JQ + KK
               QUATER(JQ) = QDEN * CHROM(JQS)
+              CHROM(JQS) = QDEN * CHROM(JQS)
             ENDDO
 ! QUATER now holds the normalised quaternions
             CALL Quaternion2Matrix(QUATER, ROTA)
@@ -74,11 +75,11 @@
             KK = KK + 4
           ELSE
 ! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
+            QDEN = 1.0 / SQRT(CHROM(KK+1)**2 + CHROM(KK+2)**2)
+            CHROM(KK+1) = CHROM(KK+1) * QDEN 
+            CHROM(KK+2) = CHROM(KK+2) * QDEN 
             Duonion(0) = CHROM(KK+1)
             Duonion(1) = CHROM(KK+2)
-            QDEN = 1.0 / SQRT(Duonion(0)**2 + Duonion(1)**2)
-            Duonion(0) = Duonion(0) * QDEN 
-            Duonion(1) = Duonion(1) * QDEN 
             QUATER(0) = Duonion(0) * zmSingleRotationQs(0,iFrg)
             QUATER(1) = Duonion(1) * zmSingleRotationQs(1,iFrg)
             QUATER(2) = Duonion(1) * zmSingleRotationQs(2,iFrg)
