@@ -596,7 +596,7 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      SavePDB = .TRUE. ! WDialogGetCheckBoxLogical(IDF_OutputPDB)
+      SavePDB = WDialogGetCheckBoxLogical(IDF_OutputPDB)
       CALL PopActiveWindowID
 
       END FUNCTION SavePDB
@@ -656,7 +656,7 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      SaveCIF = .FALSE. ! WDialogGetCheckBoxLogical(IDF_OutputCIF)
+      SaveCIF = WDialogGetCheckBoxLogical(IDF_OutputCIF)
       CALL PopActiveWindowID
 
       END FUNCTION SaveCIF
@@ -676,14 +676,14 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      SaveRES = .FALSE. ! WDialogGetCheckBoxLogical(IDF_OutputRES)
+      SaveRES = WDialogGetCheckBoxLogical(IDF_OutputRES)
       CALL PopActiveWindowID
 
       END FUNCTION SaveRES
 !
 !*****************************************************************************
 !
-      SUBROUTINE Upload_ZeroPoint()
+      SUBROUTINE Upload_ZeroPoint
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -710,7 +710,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Upload_Cell_Constants()
+      SUBROUTINE Upload_Cell_Constants
 !
 ! Puts the global variables CellPar(1:6) into the Winteracter menus
 !
@@ -960,7 +960,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Upload_Positions()
+      SUBROUTINE Upload_Positions
 
       USE WINTERACTER
       USE DRUID_HEADER 
@@ -1124,7 +1124,7 @@
         CALL WGridPutCellReal(IDF_Peak_Positions_Grid,8,I,PkProb(iOrd),'(F8.3)')
       ENDDO
 ! Now do a refinement ...
-      CALL RefineLattice()
+      CALL RefineLattice
       CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Positions
@@ -1220,7 +1220,7 @@
 
       INCLUDE 'lattice.inc'
 
-      LOGICAL FnUnitCellOK ! Function
+      LOGICAL, EXTERNAL :: FnUnitCellOK
 
       CALL PushActiveWindowID
 ! Update values of constrained cell parameters to match the parameters they're constrained to
@@ -1245,7 +1245,7 @@
       END SELECT
 ! Update all windows so that they show the contents of the global variables.
 ! This is in the cell parameters tab, in the wizard, and in the peak positions tab.
-      CALL Upload_Cell_Constants()
+      CALL Upload_Cell_Constants
       CALL WDialogSelect(IDD_PW_Page1)
 ! Enable/disable the wizard next button
       CALL WDialogFieldStateLogical(IDNEXT,FnUnitCellOK())
@@ -1361,7 +1361,7 @@
 
       INCLUDE 'GLBVAR.INC'
 
-      INTEGER SGNrMenu2Table ! Function
+      INTEGER, EXTERNAL :: SGNrMenu2Table
       INTEGER ISPosSG
 
       CALL PushActiveWindowID
@@ -1457,7 +1457,7 @@
 
       INTEGER, INTENT (IN   ) :: Iselection
 
-      REAL FnWavelengthOfMenuOption ! Function
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption
 
 ! Winteracter menu:
 !     1 = <...>
@@ -1504,7 +1504,7 @@
 
       INTEGER, INTENT (IN   ) :: TheOption
 
-      REAL WavelengthOf ! Function
+      REAL, EXTERNAL :: WavelengthOf
 
       SELECT CASE (TheOption)
         CASE (2)
