@@ -114,8 +114,9 @@
 
       IMPLICIT NONE
 
-! Blow away the z-matrices
+! Blow away the Z-matrices
       gotzmfile = .FALSE.
+      zmNumberOfCopies = 0
       CALL UpdateZmatrixSelection
 
       END SUBROUTINE Clear_Zmatrices

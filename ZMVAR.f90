@@ -17,7 +17,7 @@
       PARAMETER ( maxcopies = 8 )
 
       INTEGER maxfrg
-      PARAMETER ( maxfrg = 5 )
+      PARAMETER ( maxfrg = 4 )
 
 ! maxfrg = Maximum number of fragments = individual Z-matrices
 ! At the moment the maximum number of fragments is limited by the interface
@@ -45,13 +45,13 @@
                      IDBZMDelete(1:maxfrg), IDBZMBrowse(1:maxfrg),    &
                      IDBZMView(1:maxfrg),   IDBZMEdit(1:maxfrg),      &
                      IDFZMpars(1:maxfrg)
-!F      DATA IDFzmNumber / IDF_zmNumOf1,   IDF_zmNumOf2,   IDF_zmNumOf3,   IDF_zmNumOf4,   IDF_zmNumOf5   /
-      DATA IDFZMFile   / IDF_ZMatrix_file1,   IDF_ZMatrix_file2,   IDF_ZMatrix_file3,   IDF_ZMatrix_file4,   IDF_ZMatrix_file5   /
-      DATA IDBZMDelete / IDB_ZmatrixDelete1,  IDB_ZmatrixDelete2,  IDB_ZmatrixDelete3,  IDB_ZmatrixDelete4,  IDB_ZmatrixDelete5  /
-      DATA IDBZMBrowse / IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5 /
-      DATA IDBZMView   / IDB_ZMatrixView1,    IDB_ZMatrixView2,    IDB_ZMatrixView3,    IDB_ZMatrixView4,    IDB_ZMatrixView5    /
-!F      DATA IDBzmEdit   / IDB_zmEdit1,    IDB_zmEdit2,    IDB_zmEdit3,    IDB_zmEdit4,    IDB_zmEdit5    /
-      DATA IDFZMpars   / IDF_ZM_pars1,        IDF_ZM_pars2,        IDF_ZM_pars3,        IDF_ZM_pars4,        IDF_ZM_pars5        /
+      DATA IDFzmNumber / IDF_zmNumOf1,  IDF_zmNumOf2,  IDF_zmNumOf3,  IDF_zmNumOf4  /
+      DATA IDFZMFile   / IDF_zmFile1,   IDF_zmFile2,   IDF_zmFile3,   IDF_zmFile4   /
+      DATA IDBZMDelete / IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4 /
+      DATA IDBZMBrowse / IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4 /
+      DATA IDBZMView   / IDB_zmView1,   IDB_zmView2,   IDB_zmView3,   IDB_zmView4   /
+      DATA IDBzmEdit   / IDB_zmEdit1,   IDB_zmEdit2,   IDB_zmEdit3,   IDB_zmEdit4   /
+      DATA IDFZMpars   / IDF_ZM_pars1,  IDF_ZM_pars2,  IDF_ZM_pars3,  IDF_ZM_pars4  /
 
       INTEGER         nfrag
 
@@ -124,8 +124,8 @@
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
 ! iz1, iz2, iz3 = atoms with respect to which the current atom is defined in the Z-matrix
 
+!O      DOUBLE PRECISION blen(1:maxatm,1:maxfrg), alph(1:maxatm,1:maxfrg), bet(1:maxatm,1:maxfrg)
       DOUBLE PRECISION blen(1:maxatm,1:maxfrg), alph(1:maxatm,1:maxfrg), bet(1:maxatm,1:maxfrg)
-!F      DOUBLE PRECISION blen(1:maxatm,1:maxfrg), alph(1:maxatm,1:maxfrg), bet(1:maxatm,1:maxcopies,1:maxfrg)
 
 ! blen   = bond length     (wrt iz1)
 ! alph   = valence angle   (wrt iz1 & iz2)

@@ -63,8 +63,6 @@
       CHARACTER(LEN=MaxPathLength) SDIFile
       INTEGER      IFlags
 
-! JCC Added in declarations
-! The implementation has changed - this is now a function
       INTEGER, EXTERNAL :: Read_One_Zm
       INTEGER zmread
       INTEGER ifrg
@@ -97,129 +95,11 @@
               CALL WDialogFieldState(IDF_LABELc,Disabled)
               DO iFrg = 1, maxfrg
                 IF (gotzmfile(iFrg)) THEN
-! Its label
-                  CALL SplitPath(frag_file(iFrg),DirName,FileName)
-                  CALL WGridLabelRow(IDF_RotationsGrid,iFrg,FileName)
-! Initialise "None" | "Quaternions" | "Single axis" menu to quaternions
-                  CALL WGridPutCellOption(IDF_RotationsGrid,1,iFrg,2)
-! Ungrey all "a or alpha" fields
-                  CALL WGridStateCell(IDF_RotationsGrid,2,iFrg,Enabled)
-                  CALL WGridStateCell(IDF_RotationsGrid,3,iFrg,Enabled)
-                  CALL WGridStateCell(IDF_RotationsGrid,4,iFrg,Enabled)
-                ELSE
-! Its label
-                  CALL WGridLabelRow(IDF_RotationsGrid,iFrg,'')
-! Initialise "None" | "Quaternions" | "Single axis" menu to none
-                  CALL WGridPutCellOption(IDF_RotationsGrid,1,iFrg,1)
-! Grey out all "a or alpha" fields
-                  CALL WGridStateCell(IDF_RotationsGrid,2,iFrg,DialogReadOnly)
-                  CALL WGridStateCell(IDF_RotationsGrid,3,iFrg,DialogReadOnly)
-                  CALL WGridStateCell(IDF_RotationsGrid,4,iFrg,DialogReadOnly)
-                ENDIF
-              ENDDO
-              CALL SA_Parameter_Set
-              CALL WizardWindowShow(IDD_SA_input2)
-!F              CALL WizardWindowShow(IDD_SAW_Page2)
-            CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizardPastPawley
-            CASE (IDB_SA_Project_Browse)
-              CALL SDIFileBrowse
-            CASE (IDB_SA_Project_Open)
-              CALL WDialogGetString(IDF_SA_Project_Name,SDIFile)
-              CALL SDIFileOpen(SDIFile)
-            CASE (IDB_SA_Project_Import)
-! JCC Import .. convert a mol/pdb/mol2 file into a Z-matrix
-              CALL ImportZmatrix
-            CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
-              IF (Confirm('Do you want to clear this Z-matrix?')) THEN
-                ifrg = 1
-                DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
-                  ifrg = ifrg + 1
-                ENDDO
-                gotzmfile(ifrg) = .FALSE.
-              ENDIF ! Delete this Z-matrix
-            CASE (IDB_ZMatrix_Browse1, IDB_ZMatrix_Browse2, IDB_ZMatrix_Browse3, IDB_ZMatrix_Browse4, IDB_ZMatrix_Browse5)
-              ifrg = 1
-              DO WHILE (IDBZMBrowse(ifrg) .NE. EventInfo%VALUE1)
-                ifrg = ifrg + 1
-              ENDDO
-              IFlags = PromptOn + DirChange + AppendExt
-              CALL WSelectFile('Z-matrix files (*.zmatrix)|*.zmatrix|',IFlags,frag_file(ifrg),'Load Z-matrix file')
-! Did the user press cancel?
-              IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) GOTO 999
-! I don't think the following answer is allowed by Winteracter
-              IF (LEN_TRIM(frag_file(ifrg)) .EQ. 0) THEN
-                gotzmfile(ifrg) = .FALSE.
-                GOTO 999
-              ENDIF
-              zmread = Read_One_ZM(ifrg)
-              IF (zmread .EQ. 0) THEN ! successful read
-                gotzmfile(ifrg) = .TRUE.
-! JCC traps for Z-matrix reading
-              ELSE 
-                gotzmfile(ifrg) = .FALSE. 
-                CALL FileErrorPopup(frag_file(ifrg),zmread)
-              ENDIF ! If the read on the Z-matrix was ok
-! View individual Z-matrices in e.g. Mercury
-            CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
-              ifrg = 1
-              DO WHILE (IDBZMView(ifrg) .NE. EventInfo%VALUE1)
-                ifrg = ifrg + 1
-              ENDDO
-              CALL ViewZmatrix(ifrg)
-          END SELECT
-      END SELECT
-  999 CALL UpdateZmatrixSelection
-      CALL PopActiveWindowID
-
-      END SUBROUTINE DealWithWizardWindowZmatrices
-!
-!*****************************************************************************
-!
-      SUBROUTINE DealWithWizardWindowZmatrices_2
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-      USE ZMVAR
-
-      IMPLICIT NONE      
-
-      CHARACTER(LEN=MaxPathLength) SDIFile
-      INTEGER      IFlags
-
-      INTEGER, EXTERNAL :: Read_One_Zm
-      INTEGER zmread
-      INTEGER ifrg
-      LOGICAL, EXTERNAL :: Confirm
-      CHARACTER(LEN=MaxPathLength) DirName
-      CHARACTER*80 FileName
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page1)
-      SELECT CASE (EventType)
-        CASE (PushButton)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDBACK)
-! Go back to the Pawley refinement or the initial wizard
-              CALL EndWizardPastPawley
-              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
-            CASE (IDNEXT)
-! Go to the next stage of the SA input
-! Grey out 'Load DASH Pawley file' button on toolbar
-              CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOff)
-! Initialise the 'Additional SA Parameters' dialogue
-              CALL WDialogSelect(IDD_SAW_Page2)
-! Set PO checkbox to 'Do not use preferred orientation'
-              CALL WDialogPutCheckBoxLogical(IDF_Use_PO,.FALSE.)
-              CALL WDialogFieldState(IDF_PO_a,Disabled)
-              CALL WDialogFieldState(IDF_PO_b,Disabled)
-              CALL WDialogFieldState(IDF_PO_c,Disabled)
-              CALL WDialogFieldState(IDF_LABELa,Disabled)
-              CALL WDialogFieldState(IDF_LABELb,Disabled)
-              CALL WDialogFieldState(IDF_LABELc,Disabled)
-              DO iFrg = 1, maxfrg
-                IF (gotzmfile(iFrg)) THEN
+! Get the number of copies to use. If zero, set gotzmfile to .FALSE.
+                  CALL WDialogSelect(IDD_SAW_Page1)
+                  CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
+                  IF (zmNumberOfCopies(iFrg) .EQ. 0) gotzmfile(iFrg) = .FALSE.
+                  CALL WDialogSelect(IDD_SAW_Page2)
 ! Its label
                   CALL SplitPath(frag_file(iFrg),DirName,FileName)
                   CALL WGridLabelRow(IDF_RotationsGrid,iFrg,FileName)
@@ -253,47 +133,49 @@
               CALL ImportZmatrix
             CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
-                ifrg = 1
+                iFrg = 1
                 DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
-                  ifrg = ifrg + 1
+                  iFrg = iFrg + 1
                 ENDDO
-                gotzmfile(ifrg) = .FALSE.
+                gotzmfile(iFrg) = .FALSE.
               ENDIF ! Delete this Z-matrix
             CASE (IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4)
-              ifrg = 1
-              DO WHILE (IDBZMBrowse(ifrg) .NE. EventInfo%VALUE1)
-                ifrg = ifrg + 1
+              iFrg = 1
+              DO WHILE (IDBZMBrowse(iFrg) .NE. EventInfo%VALUE1)
+                iFrg = iFrg + 1
               ENDDO
               IFlags = PromptOn + DirChange + AppendExt
-              CALL WSelectFile('Z-matrix files (*.zmatrix)|*.zmatrix|',IFlags,frag_file(ifrg),'Load Z-matrix file')
+              CALL WSelectFile('Z-matrix files (*.zmatrix)|*.zmatrix|',IFlags,frag_file(iFrg),'Load Z-matrix file')
 ! Did the user press cancel?
               IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) GOTO 999
 ! I don't think the following answer is allowed by Winteracter
-              IF (LEN_TRIM(frag_file(ifrg)) .EQ. 0) THEN
-                gotzmfile(ifrg) = .FALSE.
+              IF (LEN_TRIM(frag_file(iFrg)) .EQ. 0) THEN
+                gotzmfile(iFrg) = .FALSE.
                 GOTO 999
               ENDIF
-              zmread = Read_One_ZM(ifrg)
+              zmread = Read_One_ZM(iFrg)
               IF (zmread .EQ. 0) THEN ! successful read
-                gotzmfile(ifrg) = .TRUE.
+                gotzmfile(iFrg) = .TRUE.
+! Initialise 'Number of' field to 1
+                CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
 ! JCC traps for Z-matrix reading
               ELSE 
-                gotzmfile(ifrg) = .FALSE. 
-                CALL FileErrorPopup(frag_file(ifrg),zmread)
+                gotzmfile(iFrg) = .FALSE. 
+                CALL FileErrorPopup(frag_file(iFrg),zmread)
               ENDIF ! If the read on the Z-matrix was ok
 ! View individual Z-matrices in e.g. Mercury
             CASE (IDB_zmView1, IDB_zmView2, IDB_zmView3, IDB_zmView4)
-              ifrg = 1
-              DO WHILE (IDBZMView(ifrg) .NE. EventInfo%VALUE1)
-                ifrg = ifrg + 1
+              iFrg = 1
+              DO WHILE (IDBZMView(iFrg) .NE. EventInfo%VALUE1)
+                iFrg = iFrg + 1
               ENDDO
-              CALL ViewZmatrix(ifrg)
+              CALL ViewZmatrix(iFrg)
           END SELECT
       END SELECT
   999 CALL UpdateZmatrixSelection
       CALL PopActiveWindowID
 
-      END SUBROUTINE DealWithWizardWindowZmatrices_2
+      END SUBROUTINE DealWithWizardWindowZmatrices
 !
 !*****************************************************************************
 !

@@ -18,7 +18,7 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      INTEGER tFileHandle, I, kk, ifrg, ilen, II, Fixed
+      INTEGER tFileHandle, I, kk, iFrg, ilen, II, Fixed
       REAL    R, x, lb, ub
       CHARACTER(MaxPathLength) tSDIFile
       CHARACTER*17 DateStr
@@ -43,21 +43,22 @@
       CALL WDialogSelect(IDD_SA_input2)
       kk = 0
       DO ifrg = 1, maxfrg
-        IF (gotzmfile(ifrg)) THEN
+        IF (gotzmfile(iFrg)) THEN
 ! Write the name of the file
-          ilen = LEN_TRIM(frag_file(ifrg))
-          WRITE(tFileHandle,'(A)',ERR=999) '  Z-matrix '//frag_file(ifrg)(1:ilen)
+          ilen = LEN_TRIM(frag_file(iFrg))
+          WRITE(tFileHandle,'(A)',ERR=999) '  Z-matrix '//frag_file(iFrg)(1:ilen)
+          WRITE(tFileHandle,'(A,I2)',ERR=999) ' Number of copies : ',  zmNumberOfCopies(iFrg)
           DO ii = 1, izmpar(ifrg)
             kk = kk + 1
-            ilen = LEN_TRIM(czmpar(ii,ifrg))
+            ilen = LEN_TRIM(czmpar(ii,iFrg))
             CALL WGridGetCellReal    (IDF_parameter_grid,1,kk,x)
             CALL WGridGetCellCheckBox(IDF_parameter_grid,4,kk,Fixed)
             IF (Fixed .EQ. 1) THEN
-              WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,A5)",ERR=999) czmpar(ii,ifrg),x,'Fixed'
+              WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,A5)",ERR=999) czmpar(ii,iFrg),x,'Fixed'
             ELSE
               CALL WGridGetCellReal(IDF_parameter_grid,2,kk,lb)
               CALL WGridGetCellReal(IDF_parameter_grid,3,kk,ub)
-              WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,F12.5,1X,F12.5)",ERR=999) czmpar(ii,ifrg),x,lb,ub
+              WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,F12.5,1X,F12.5)",ERR=999) czmpar(ii,iFrg),x,lb,ub
             ENDIF
           ENDDO
         ENDIF
@@ -270,7 +271,7 @@
 
       CHARACTER*36 parlabel(mvar)
       DOUBLE PRECISION dcel(6)
-      INTEGER I, II, kk, ifrg, tk, iOption, iH, iK, iL
+      INTEGER I, II, kk, iFrg, iFrgCopy, tk, iOption, iH, iK, iL
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL tLattice(1:3,1:3), tRecLattice(1:3,1:3), tX, tY, tZ
       REAL    Beta_m, Alpha_m, q0m, q1m, q2m, q3m
@@ -295,30 +296,36 @@
       CALL WDialogSelect(IDD_SAW_Page2)
 ! Per Z-matrix, determine whether to use quaternions or a single axis
       DO ifrg = 1, maxfrg
-        IF (gotzmfile(ifrg)) THEN
-          CALL WGridGetCellMenu(IDF_RotationsGrid,1,ifrg,iOption)
-          UseQuaternions(ifrg) = (iOption .NE. 3)
+        IF (gotzmfile(iFrg)) THEN
+          CALL WGridGetCellMenu(IDF_RotationsGrid,1,iFrg,iOption)
+          UseQuaternions(iFrg) = (iOption .NE. 3)
           IF (.NOT. UseQuaternions(ifrg)) THEN
-            CALL WGridGetCellReal(IDF_RotationsGrid,2,ifrg,zmSingleRotationAxis(1,ifrg))
-            CALL WGridGetCellReal(IDF_RotationsGrid,3,ifrg,zmSingleRotationAxis(2,ifrg))
-            CALL WGridGetCellReal(IDF_RotationsGrid,4,ifrg,zmSingleRotationAxis(3,ifrg))
+            CALL WGridGetCellReal(IDF_RotationsGrid,2,ifrg,zmSingleRotationAxis(1,iFrg))
+            CALL WGridGetCellReal(IDF_RotationsGrid,3,ifrg,zmSingleRotationAxis(2,iFrg))
+            CALL WGridGetCellReal(IDF_RotationsGrid,4,ifrg,zmSingleRotationAxis(3,iFrg))
 ! Initialise the parts of the quaternions of the single rotation axis that are due to the axis
 ! The variable zmSingleRotationAxis holds the fractional co-ordinates,
 ! we need orthogonal co-ordinates => convert
-            tX = zmSingleRotationAxis(1,ifrg)*tLattice(1,1) + zmSingleRotationAxis(2,ifrg)*tLattice(1,2) + zmSingleRotationAxis(3,ifrg)*tLattice(1,3)
-            tY = zmSingleRotationAxis(1,ifrg)*tLattice(2,1) + zmSingleRotationAxis(2,ifrg)*tLattice(2,2) + zmSingleRotationAxis(3,ifrg)*tLattice(2,3)
-            tZ = zmSingleRotationAxis(1,ifrg)*tLattice(3,1) + zmSingleRotationAxis(2,ifrg)*tLattice(3,2) + zmSingleRotationAxis(3,ifrg)*tLattice(3,3)
-            zmSingleRotationAxis(1,ifrg) = tX
-            zmSingleRotationAxis(2,ifrg) = tY
-            zmSingleRotationAxis(3,ifrg) = tZ
+            tX = zmSingleRotationAxis(1,iFrg)*tLattice(1,1) +     &
+                 zmSingleRotationAxis(2,iFrg)*tLattice(1,2) +     &
+                 zmSingleRotationAxis(3,iFrg)*tLattice(1,3)
+            tY = zmSingleRotationAxis(1,iFrg)*tLattice(2,1) +     &
+                 zmSingleRotationAxis(2,iFrg)*tLattice(2,2) +     &
+                 zmSingleRotationAxis(3,iFrg)*tLattice(2,3)
+            tZ = zmSingleRotationAxis(1,iFrg)*tLattice(3,1) +     &
+                 zmSingleRotationAxis(2,iFrg)*tLattice(3,2) +     &
+                 zmSingleRotationAxis(3,iFrg)*tLattice(3,3)
+            zmSingleRotationAxis(1,iFrg) = tX
+            zmSingleRotationAxis(2,iFrg) = tY
+            zmSingleRotationAxis(3,iFrg) = tZ
 ! Normalise the axis
-            Length = SQRT(zmSingleRotationAxis(1,ifrg)**2 + &
-                          zmSingleRotationAxis(2,ifrg)**2 + &
-                          zmSingleRotationAxis(3,ifrg)**2     )
+            Length = SQRT(zmSingleRotationAxis(1,iFrg)**2 + &
+                          zmSingleRotationAxis(2,iFrg)**2 + &
+                          zmSingleRotationAxis(3,iFrg)**2     )
             DO iAxis = 1, 3
-              zmSingleRotationAxis(iAxis,ifrg) = zmSingleRotationAxis(iAxis,ifrg) / Length
-              IF (zmSingleRotationAxis(iAxis,ifrg) .GT.  0.99999) zmSingleRotationAxis(iAxis,ifrg) =  0.99999
-              IF (zmSingleRotationAxis(iAxis,ifrg) .LT. -0.99999) zmSingleRotationAxis(iAxis,ifrg) = -0.99999
+              zmSingleRotationAxis(iAxis,iFrg) = zmSingleRotationAxis(iAxis,iFrg) / Length
+              IF (zmSingleRotationAxis(iAxis,iFrg) .GT.  0.99999) zmSingleRotationAxis(iAxis,iFrg) =  0.99999
+              IF (zmSingleRotationAxis(iAxis,iFrg) .LT. -0.99999) zmSingleRotationAxis(iAxis,iFrg) = -0.99999
             ENDDO
 ! Calculate the orientation of the axis
 ! Note: Alpha_m and Beta_m in radians
@@ -366,62 +373,67 @@
       DO ifrg = 1, maxfrg
 ! Only include those that are now checked
         IF (gotzmfile(ifrg)) THEN
-          DO ii = 1, izmpar(ifrg)
-            kk = kk + 1
-            x(kk) = xzmpar(ii,ifrg)
-            parlabel(kk) = czmpar(ii,ifrg)
-            SELECT CASE (kzmpar(ii,ifrg))
-              CASE (1) ! position
-                kzmpar2(kk) = 1
-                lb(kk) = 0.0
-                ub(kk) = 1.0
-              CASE (2,6) ! quaternion
-                IF (UseQuaternions(ifrg)) THEN
-                  kzmpar(ii,ifrg) = 2 ! quaternion instead of single axis 
-                  kzmpar2(kk) = 2
-                  lb(kk) = -1.0
-                  ub(kk) =  1.0
-                ELSE
-                  kzmpar(ii,ifrg) = 6 ! single axis instead of quaternion 
-                  kzmpar2(kk) = 6
+
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO ii = 1, izmpar(ifrg)
+              kk = kk + 1
+              x(kk) = xzmpar(ii,ifrg)
+              parlabel(kk) = czmpar(ii,ifrg)
+              SELECT CASE (kzmpar(ii,ifrg))
+                CASE (1) ! position
+                  kzmpar2(kk) = 1
+                  lb(kk) = 0.0
+                  ub(kk) = 1.0
+                CASE (2,6) ! quaternion
+                  IF (UseQuaternions(ifrg)) THEN
+                    kzmpar(ii,ifrg) = 2 ! quaternion instead of single axis 
+                    kzmpar2(kk) = 2
+                    lb(kk) = -1.0
+                    ub(kk) =  1.0
+                  ELSE
+                    kzmpar(ii,ifrg) = 6 ! single axis instead of quaternion 
+                    kzmpar2(kk) = 6
 ! At the moment a Z-matrix containing more than one atom is read in, four
 ! parameters are reserved for 'rotations'. When the rotation is restricted to
 ! a single axis, only two of these parameters are necessary. By setting
 ! upper bound - lower bound to 0.000001, these parameters will be considered 'fixed'
 ! and will not be picked during the SA, nor will they be optimised during the simpex minimisation.
-                  tk = tk + 1
-                  SELECT CASE (tk)
-                    CASE (1,2) 
-                      lb(kk) = -1.0
-                      ub(kk) =  1.0
-                    CASE (3,4) 
-                      lb(kk) =  0.0
-                      ub(kk) =  0.000001
-                  END SELECT
-                  IF (tk .EQ. 4) tk = 0
-                ENDIF
-              CASE (3) ! torsion
-                kzmpar2(kk) = 3
-                IF      ((x(kk) .GT. -180.0) .AND. (x(kk) .LT. 180.0)) THEN
-                  lb(kk) =  -180.0
-                  ub(kk) =   180.0
-                ELSE IF (x(kk) .GT. 0.0 .AND. x(kk) .LT.  360.0) THEN
-                  lb(kk) =   0.0
-                  ub(kk) = 360.0
-                ELSE 
-                  lb(kk) = x(kk) - 180.0
-                  ub(kk) = x(kk) + 180.0
-                ENDIF              
-              CASE (4) ! angle
-                kzmpar2(kk) = 4
-                lb(kk) = x(kk) - 10.0
-                ub(kk) = x(kk) + 10.0
-              CASE (5) ! bond
-                kzmpar2(kk) = 5
-                lb(kk) = 0.9*x(kk)
-                ub(kk) = x(kk)/0.9
-            END SELECT
+                    tk = tk + 1
+                    SELECT CASE (tk)
+                      CASE (1,2) 
+                        lb(kk) = -1.0
+                        ub(kk) =  1.0
+                      CASE (3,4) 
+                        lb(kk) =  0.0
+                        ub(kk) =  0.000001
+                    END SELECT
+                    IF (tk .EQ. 4) tk = 0
+                  ENDIF
+                CASE (3) ! torsion
+                  kzmpar2(kk) = 3
+                  IF      ((x(kk) .GT. -180.0) .AND. (x(kk) .LT. 180.0)) THEN
+                    lb(kk) =  -180.0
+                    ub(kk) =   180.0
+                  ELSE IF (x(kk) .GT. 0.0 .AND. x(kk) .LT.  360.0) THEN
+                    lb(kk) =   0.0
+                    ub(kk) = 360.0
+                  ELSE 
+                    lb(kk) = x(kk) - 180.0
+                    ub(kk) = x(kk) + 180.0
+                  ENDIF              
+                CASE (4) ! angle
+                  kzmpar2(kk) = 4
+                  lb(kk) = x(kk) - 10.0
+                  ub(kk) = x(kk) + 10.0
+                CASE (5) ! bond
+                  kzmpar2(kk) = 5
+                  lb(kk) = 0.9*x(kk)
+                  ub(kk) = x(kk)/0.9
+              END SELECT
+            ENDDO
           ENDDO
+
+
 !JCC End of check on selection
         ENDIF
       ENDDO
@@ -497,6 +509,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
       USE ZMVAR
 
       IMPLICIT NONE
@@ -514,8 +527,8 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
-      INTEGER NumberOfDOF, izmtot, ifrg
-      CHARACTER*255 DirName
+      INTEGER NumberOfDOF, izmtot, iFrg
+      CHARACTER(MaxPathLength) DirName
       CHARACTER*80  FileName
 
       CALL PushActiveWindowID
@@ -523,29 +536,43 @@
       nfrag  = 0
       izmtot = 0
       ntatm  = 0
-      DO ifrg = 1, maxfrg
-        IF (gotzmfile(ifrg)) THEN
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
           nfrag = nfrag + 1
-          ntatm = ntatm + natoms(ifrg)
-          IF (natoms(ifrg) .EQ. 1) THEN
+          ntatm = ntatm + natoms(iFrg)
+          IF (natoms(iFrg) .EQ. 1) THEN
             NumberOfDOF = 3 ! It's an atom
           ELSE
-            NumberOfDOF = izmpar(ifrg) - 1 ! Count the quaternions as three, not four
+            NumberOfDOF = izmpar(iFrg) - 1 ! Count the quaternions as three, not four
           ENDIF
           izmtot = izmtot + NumberOfDOF
-          CALL WDialogPutInteger(IDFZMpars(ifrg),NumberOfDOF)
-          CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
+! Enable 'Number of' field
+          CALL WDialogFieldState(IDFzmNumber(ifrg),Enabled)
+! Due to lack of space: display the name of file only, without its full path
+          CALL SplitPath(frag_file(iFrg),DirName,FileName)
+          CALL WDialogPutString(IDFZMFile(iFrg),FileName)
+! Enable 'Delete' button
+          CALL WDialogFieldState(IDBZMDelete(iFrg),Enabled)
 ! Enable 'View' button
-          CALL WDialogFieldState(IDBZMView(ifrg),Enabled)
-          CALL WDialogFieldState(IDBZMDelete(ifrg),Enabled)
+          CALL WDialogFieldState(IDBZMView(iFrg),Enabled)
+! Enable 'Edit...' button
+          CALL WDialogFieldState(IDBzmEdit(iFrg),Enabled)
+          CALL WDialogPutInteger(IDFZMpars(iFrg),NumberOfDOF)
         ELSE
-          izmpar(ifrg) = 0
-          natoms(ifrg) = 0
-          CALL WDialogClearField(IDFZMpars(ifrg))
-          CALL WDialogClearField(IDFZMFile(ifrg))
+          izmpar(iFrg) = 0
+          natoms(iFrg) = 0
+! Initialise 'Number of' field to 0
+          CALL WDialogPutInteger(IDFzmNumber(iFrg),0)
+! Disable 'Number of' field
+          CALL WDialogFieldState(IDFzmNumber(iFrg),Disabled)
+          CALL WDialogClearField(IDFZMFile(iFrg))
 ! Disable 'View' button
-          CALL WDialogFieldState(IDBZMView(ifrg),Disabled)
-          CALL WDialogFieldState(IDBZMDelete(ifrg),Disabled)
+          CALL WDialogFieldState(IDBZMView(iFrg),Disabled)
+! Disable 'Delete' button
+          CALL WDialogFieldState(IDBZMDelete(iFrg),Disabled)
+! Disable 'Edit...' button
+          CALL WDialogFieldState(IDBzmEdit(iFrg),Disabled)
+          CALL WDialogClearField(IDFZMpars(iFrg))
         ENDIF
       ENDDO
 ! JvdS @@ Following is wrong (we need a valid .sdi as well), but 
@@ -563,66 +590,6 @@
         CALL WDialogPutInteger(IDF_ZM_allpars,izmtot)
       ENDIF
       CALL PopActiveWindowID
-
-!O      CALL PushActiveWindowID
-!O      CALL WDialogSelect(IDD_SAW_Page1a)
-!O      nfrag  = 0
-!O      izmtot = 0
-!O      ntatm  = 0
-!O      DO ifrg = 1, maxfrg
-!O        IF (gotzmfile(ifrg)) THEN
-!O          nfrag = nfrag + 1
-!O          ntatm = ntatm + natoms(ifrg)
-!O          IF (natoms(ifrg) .EQ. 1) THEN
-!O            NumberOfDOF = 3 ! It's an atom
-!O          ELSE
-!O            NumberOfDOF = izmpar(ifrg) - 1 ! Count the quaternions as three, not four
-!O          ENDIF
-!O          izmtot = izmtot + NumberOfDOF
-!O          CALL WDialogPutInteger(IDFZMpars(ifrg),NumberOfDOF)
-!O! Due to lack of space: display the name of file only, without its full path
-!O          CALL SplitPath(frag_file(iFrg),DirName,FileName)
-!O          CALL WDialogPutString(IDFZMFile(ifrg),FileName)
-!O! Enable 'View' button
-!O          CALL WDialogFieldState(IDBZMView(ifrg),Enabled)
-!O! Enable 'Delete' button
-!O          CALL WDialogFieldState(IDBZMDelete(ifrg),Enabled)
-!O! Enable 'Edit...' button
-!O          CALL WDialogFieldState(IDBzmEdit(ifrg),Enabled)
-!O! Enable 'Number of' field
-!O          CALL WDialogFieldState(IDBZMView(ifrg),Enabled)
-!O        ELSE
-!O          izmpar(ifrg) = 0
-!O          natoms(ifrg) = 0
-!O          CALL WDialogClearField(IDFZMpars(ifrg))
-!O          CALL WDialogClearField(IDFZMFile(ifrg))
-!O! Disable 'View' button
-!O          CALL WDialogFieldState(IDBZMView(ifrg),Disabled)
-!O! Disable 'Delete' button
-!O          CALL WDialogFieldState(IDBZMDelete(ifrg),Disabled)
-!O! Disable 'Edit...' button
-!O          CALL WDialogFieldState(IDBzmEdit(ifrg),Disabled)
-!O! Initialise 'Number of' field to 0
-!O          CALL WDialogPutInteger(IDFzmNumber(ifrg),0)
-!O! Disable 'Number of' field
-!O          CALL WDialogFieldState(IDFzmNumber(ifrg),Disabled)
-!O        ENDIF
-!O      ENDDO
-!O! JvdS @@ Following is wrong (we need a valid .sdi as well), but 
-!O! a. identical to release version
-!O! b. it's difficult to keep track of the validity of the .sdi file
-!O      IF (nfrag .NE. 0) THEN
-!O        CALL WDialogFieldState(IDNEXT,Enabled)
-!O      ELSE
-!O        CALL WDialogFieldState(IDNEXT,Disabled)
-!O      ENDIF
-!O      natom = ntatm
-!O      IF (izmtot .EQ. 0) THEN            
-!O        CALL WDialogClearField(IDF_ZM_allpars)
-!O      ELSE
-!O        CALL WDialogPutInteger(IDF_ZM_allpars,izmtot)
-!O      ENDIF
-!O      CALL PopActiveWindowID
 
       END SUBROUTINE UpdateZmatrixSelection
 !

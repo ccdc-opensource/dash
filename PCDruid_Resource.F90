@@ -1,4 +1,4 @@
-! Winteracter module created : 30/Jan/2002 15:51:53
+! Winteracter module created : 01/Feb/2002 13:55:18
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -370,7 +370,7 @@
           INTEGER, PARAMETER :: ID_Tutorial_3                   = 40044
           INTEGER, PARAMETER :: ID_Tutorial_4                   = 40045
           INTEGER, PARAMETER :: ID_Tutorial_5                   = 40002
-          INTEGER, PARAMETER :: IDD_SAW_Page1                   =   102
+          INTEGER, PARAMETER :: IDD_SAW_Page1_old               =   102
           INTEGER, PARAMETER :: IDBACK                          =  1001
           INTEGER, PARAMETER :: IDNEXT                          =  1040
           INTEGER, PARAMETER :: IDD_SA_Multi_completed_ep       =   127
@@ -491,7 +491,7 @@
           INTEGER, PARAMETER :: IDF_LABELc                      =  1294
           INTEGER, PARAMETER :: IDD_Parameter_Status_2          =   156
           INTEGER, PARAMETER :: IDD_DIALOG004                   =   158
-          INTEGER, PARAMETER :: IDD_SAW_Page1a                  =   159
+          INTEGER, PARAMETER :: IDD_SAW_Page1                   =   159
           INTEGER, PARAMETER :: IDF_zmNumOf1                    =  1298
           INTEGER, PARAMETER :: IDF_zmNumOf2                    =  1299
           INTEGER, PARAMETER :: IDF_zmNumOf3                    =  1300
@@ -524,4 +524,8 @@
           INTEGER, PARAMETER :: IDF_IDoNotAgree                 =  1386
           INTEGER, PARAMETER :: IDD_DIALOG002                   =   162
           INTEGER, PARAMETER :: IDF_BUTTON8                     =  1387
+          INTEGER, PARAMETER :: IDF_zmFile1                     =  1388
+          INTEGER, PARAMETER :: IDF_zmFile2                     =  1389
+          INTEGER, PARAMETER :: IDF_zmFile3                     =  1390
+          INTEGER, PARAMETER :: IDF_zmFile4                     =  1391
       END MODULE Druid_Header
