@@ -363,8 +363,11 @@
 !
       SUBROUTINE SplineSmooth(x,y,e,NDAT,jf0,jfs,xkk,nkn,smo)
 
-      REAL    x(NDAT),y(NDAT),e(NDAT)
+      IMPLICIT NONE
+
+      INTEGER nkn
       INTEGER NDAT
+      REAL    x(NDAT),y(NDAT),e(NDAT)
       INTEGER jfs(NDAT)
       REAL    xkk(nkn)
       REAL    smo(NDAT)
@@ -373,9 +376,10 @@
       REAL*8  xdd
       REAL*8  a(NDAT),b(NDAT),c(NDAT),d(NDAT)
       REAL*8  deri(nkn),ans(nkn)
-      REAL*8  w
+      REAL*8  w, ab
       REAL*8  qj, qj1
       REAL*8  TempResult
+      INTEGER J, ND1, NK1, I, J0, J1, JF0, K
 
       DO J = 1, nkn-1
         xdel(J) = DBLE(xkk(J+1)-xkk(J))
@@ -419,7 +423,7 @@
         ENDDO
       ENDDO
       DO I = 1, ndat
-        j0 = jfs(i) - jf0
+        j0 = MIN(nkn-1,jfs(i)-jf0)
         j1 = j0 + 1
         qj  = 0.0
         qj1 = 0.0
@@ -436,11 +440,11 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SplVal(XDEL,U,M)
+      SUBROUTINE SplVal(XDEL,U,m)
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: M
+      INTEGER, INTENT (IN   ) :: m
       REAL*8  xdel(m)
       REAL*8,  INTENT (  OUT) :: u(m,m)
 
