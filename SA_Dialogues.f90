@@ -159,6 +159,7 @@
                 DO WHILE (IDBZMDelete(DelFrg) .NE. EventInfo%VALUE1)
                   DelFrg = DelFrg + 1
                 ENDDO
+                DelFrg = DelFrg + first_zm_in_win - 1
                 DO iFrg = DelFrg+1, nFrag
                   CALL zmCopy(iFrg, iFrg-1)
                 ENDDO
@@ -169,6 +170,7 @@
               DO WHILE (IDBZMBrowse(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
+              iFrg = iFrg + first_zm_in_win - 1
               IF (iFrg .GT. nFrag) iFrg = nFrag + 1
               iFlags = LoadDialog + PromptOn + DirChange + AppendExt
               FilterStr = "All files (*.*)|*.*|"//&
@@ -227,6 +229,7 @@
               DO WHILE (IDBZMView(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
+              iFrg = iFrg + first_zm_in_win - 1
               CALL zmView(iFrg)
 ! Edit individual Z-matrices
             CASE (IDB_zmEdit1, IDB_zmEdit2, IDB_zmEdit3, IDB_zmEdit4)
@@ -234,6 +237,7 @@
               DO WHILE (IDBzmEdit(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
+              iFrg = iFrg + first_zm_in_win - 1
               CALL ShowEditZMatrixWindow(iFrg)
             CASE (IDB_Up)
               first_zm_in_win = first_zm_in_win - 1
@@ -244,7 +248,6 @@
               CALL WDialogFieldStateLogical(IDB_Up, first_zm_in_win .NE. 1)
               CALL WDialogFieldStateLogical(IDB_Down, first_zm_in_win+maxfrginterface-1 .NE. maxfrg)
           END SELECT
-        CASE (FieldChanged)
       END SELECT
   999 CONTINUE
       CALL UpdateZmatrixSelection
