@@ -2018,7 +2018,7 @@
           CALL Upload_Cell_Constants()
         CASE ('spa')
           CALL INextInteger(line,NumberSGTable)
-! Set the lattice numbers
+! Set the crystal system
           LatBrav = GetCrystalSystem(NumberSGTable)
           CALL Upload_CrystalSystem
           NumPawleyRef = 0
@@ -2058,7 +2058,7 @@
         CALL Profile_Plot(IPTYPE) 
         NoData = .FALSE.
       ENDIF
-!  enable the buttons,
+! enable the buttons,
       IF (.NOT. NoData) THEN
         IF (idsler .EQ. 0) THEN
           CALL SetModeMenuState(1,1,1)

@@ -6,25 +6,19 @@
 ! PARAMETER definitions
 
       INTEGER, PARAMETER :: MAXATM_2 = 100
+      INTEGER, PARAMETER :: MAXBND   = 1500
 
-      REAL ATCHG(1:MAXATM_2)
-! ATCHG = formal charge
+      REAL atchg(1:MAXATM_2)
+! atchg = formal charge
 
       CHARACTER*5 atomlabel(1:MAXATM_2)
-! Original atom labels
+! atomlabel = Original atom labels
 
-!
-! PARAMETER definitions
-!
-      INTEGER, PARAMETER :: MAXBND = 1500
-!
-! COMMON /MVADAT/
-!
-      INTEGER, DIMENSION(MAXATM_2) :: aelem
       REAL, DIMENSION(MAXATM_2,3) :: axyzo
-! axyzo atomic yxyz co-ordinates, orthogonal
+! axyzo = atomic xyz co-ordinates, orthogonal
 
-!--    AELEM    element type as used by Jos
+      INTEGER, DIMENSION(MAXATM_2) :: aelem
+! aelem = element type as used by CSD
 
 !U! Elements (plus other CSD 'element' definitions What's 'ZZ'??)
 !U      DATA el  /'C ','H ','AC','AG','AL','AM','AR','AS','AT','AU','B ', &
@@ -50,18 +44,11 @@
 !U             69,  92,  23,  74,   0,  54,  39,  70,   0,  30,  40,   0, &
 !U              0/
 
-!--    NHYC     number of terminal H 
-!--    NCAC     number of connections other than terminal H 
-
-! COMMON /MVBDAT/
-!
-      INTEGER, DIMENSION(MAXBND) :: btype
+      INTEGER, DIMENSION(MAXBND)   :: btype
       INTEGER, DIMENSION(MAXBND,2) :: bond
-!      BTYPE    nbt          
-!--    BOND     list of bonds Iat, Jat   
-!
-! COMMON /PLUTQY/
-!
+! btype  = bond type
+! bond   = list of bonds Iat, Jat   
+
       INTEGER :: natcry, nbocry
 ! natcry = number of atoms in list
 ! nbocry = number of bonds in list
@@ -69,10 +56,8 @@
       INTEGER, DIMENSION(MAXATM_2) :: ncac, nhyc
 ! ncac = number of connections excluding hydrogens
 ! nhyc = number of connections to hydrogens
-!
-! COMMON /PLUTW1/
-!
+
       INTEGER, DIMENSION(MAXATM_2) :: hybr
-!-- HYBR      estimate of hybridisation 1 = sp1 2=sp2 3=sp3  >100 = metal
+! hybr      estimate of hybridisation 1 = sp1 2=sp2 3=sp3 4 = aromatic  >100 = metal
 
       END MODULE SAMVAR

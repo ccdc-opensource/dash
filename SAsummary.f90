@@ -86,19 +86,13 @@
       INTEGER, INTENT (IN  ) :: irow
 
       CHARACTER*255 Grid_Buffer
-      CHARACTER(20) OldViewArg
 
+      CALL PushActiveWindowID
 !     Get grid_buffer which contains the name of the correct pdb file
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
       CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)
-! JvdS @ next few lines effectively remove the arguments for the viewer.
-! A viewer like Rasmol, which needs this argument, will no longer work.
-! For Mercury, the effect is that a fresh viewer is launched,
-! allowing the user to view more than one structure at a time.
-      OldViewArg = ViewArg
-      ViewArg = ''
       CALL ViewStructure(Grid_Buffer(1:LEN_TRIM(Grid_Buffer)))
-      ViewArg = OldViewArg
+      CALL PopActiveWindowID
 
       END  SUBROUTINE Viewpdb
 !
