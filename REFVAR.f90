@@ -11,7 +11,7 @@
       PARAMETER ( MaxRef = 10000 )
 ! MaxRef = maximum number of reflections.
 
-      INTEGER     NumOfRef
+      INTEGER NumOfRef
 ! NumOfRef = maximum number of reflections used during SA
 
       INTEGER iHKL(1:3,MaxRef)
@@ -27,15 +27,16 @@
 ! Of these, I deleted the following one (merged it with /PROFTIC/):
 ! COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
 
-!O      INTEGER         NLGREF
-!O      LOGICAL                 LOGREF
-!O      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
-!O
+      INTEGER NLGREF
+      LOGICAL LOGREF(8,MaxRef)
+
+! Logicals indicating which reflections are absent.
+
       REAL    AIOBS(MaxRef), AICALC(MaxRef)
 ! AIOBS = observed intensity, per reflection
 ! AICALC = part of the calculated intensity due to structural parameters (atoms)
 
-      REAL WTI(MaxRef)
+      REAL    WTI(MaxRef)
 ! Weight of the reflection
 
 !O! JCC GGCALC dimension increased to 500

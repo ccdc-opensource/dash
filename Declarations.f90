@@ -96,12 +96,6 @@
 ! IPMAX = bin number (so, pointer into XBIN) of the last bin visible on screen
 !         only useful when the user has zoomed in, otherwise IPMAX = NBIN
 
-      INTEGER         NLGREF
-      LOGICAL                 LOGREF
-      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
-
-! Logicals indicating which reflections are absent.
-
       REAL              BICALC,         XICALC
       COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 
