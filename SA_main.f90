@@ -151,16 +151,14 @@
       INTEGER I
       CHARACTER*85 temp_file
       CHARACTER*2  AtmElement(1:MAXATM_2)
-
       REAL*8 CART(maxatm,3)
-
       INTEGER IHANDLE
       INTEGER, EXTERNAL :: WriteMol2
       LOGICAL, EXTERNAL :: ColourFlexibleTorsions
       INTEGER atom
       INTEGER Element
       INTEGER NumOfFlexTorsions
-      INTEGER tLength
+      INTEGER tLength, BondNr
 
       natcry = NATOMS(ifrg)
       CALL MAKEXYZ(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),      &
@@ -175,8 +173,12 @@
         atomlabel(I) = OriginalLabel(I,ifrg)
       ENDDO
       CALL AssignCSDElement(AtmElement)
-! Calculate bonds and assign bond types.
-      CALL SAMABO
+      nbocry = NumberOfBonds(ifrg)
+      DO BondNr = 1, nbocry
+        btype(BondNr)  = BondType(BondNr,ifrg)
+        bond(BondNr,1) = Bonds(1,BondNr,ifrg)
+        bond(BondNr,2) = Bonds(2,BondNr,ifrg)
+      ENDDO
 ! Q & D to display flexible torsion angles in different colors by forcing different
 ! element types.
       IF (ColourFlexibleTorsions() .AND. (natcry.GE.4)) THEN
@@ -425,7 +427,7 @@
           CALL WDialogPutString(IDFZMFile(ifrg),frag_file(ifrg))
 ! Enable 'View' button
           CALL WDialogFieldState(IDBZMView(ifrg),Enabled)
-   !       CALL WDialogFieldState(IDBZMEdit(ifrg),Enabled)
+          CALL WDialogFieldState(IDBZMEdit(ifrg),Enabled)
         ELSE
           izmpar(ifrg) = 0
           natoms(ifrg) = 0
@@ -433,7 +435,7 @@
           CALL WDialogClearField(IDFZMFile(ifrg))
 ! Disable 'View' button
           CALL WDialogFieldState(IDBZMView(ifrg),Disabled)
-   !       CALL WDialogFieldState(IDBZMEdit(ifrg),Disabled)
+          CALL WDialogFieldState(IDBZMEdit(ifrg),Disabled)
         ENDIF
       ENDDO
       natom = ntatm
