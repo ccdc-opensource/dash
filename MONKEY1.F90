@@ -282,7 +282,8 @@
       cbData = dwcMaxValueData
 
 ! ENUMERATE THE KEY.
-      dwLBIndex = J - 1 
+      dwLBIndex = J - 1
+      cbValueName = MAX_VALUE_NAME 
       retCode = RegEnumValue (hKey,             & ! Key handle returned from RegOpenKeyEx.
                               dwLBIndex,        & ! Value index, taken from listbox.
                               ValueName,        & ! Name of value.
@@ -404,6 +405,7 @@
 
 ! ENUMERATE THE KEY.
       dwLBIndex = J - 1 
+      cbValueName = MAX_VALUE_NAME
       retCode = RegEnumValue (hKey,             & ! Key handle returned from RegOpenKeyEx.
                               dwLBIndex,        & ! Value index, taken from listbox.
                               ValueName,        & ! Name of value.
