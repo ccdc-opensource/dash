@@ -378,7 +378,7 @@
         WRITE(iHandle,'(A,3(X,I3))',ERR=999) '#PO_DIR', (PO_Direction(i),i=1,3)
       ENDIF
       DO iFrg = 1, nfrag
-        WRITE(iHandle,'(A)',ERR=999) frag_file(iFrg)(1:LEN_TRIM(frag_file(iFrg)))
+        WRITE(iHandle,'(A)',ERR=999) "ZMATRIX "//frag_file(iFrg)(1:LEN_TRIM(frag_file(iFrg)))
       ENDDO
 !C Need limits for all parameters. Since these are by index, we need to write all of them out
       WRITE(iHandle,'(A,X,I3)',ERR=999) 'LIMITS', nvar
