@@ -554,13 +554,13 @@
     Transflag = 0
     SELECT CASE (Shift)
       CASE ('t')
-          CentreOfMass(3) = 0.500
+          CentreOfMass(3) = 0.5
           InfiniteAxes(3) = 1
       CASE ('s')
-          CentreOfMass(2) = 0.500
+          CentreOfMass(2) = 0.5
           InfiniteAxes(2) = 1        
       CASE ('r')
-          CentreOfMass(1) = 0.500
+          CentreOfMass(1) = 0.5
           InfiniteAxes(1) = 1
     END SELECT
     Transflag = 1
