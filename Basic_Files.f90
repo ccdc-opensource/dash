@@ -235,4 +235,34 @@
       END SUBROUTINE FileReadLogical
 !
 !*****************************************************************************
+!
+      SUBROUTINE SplitPath(PathName,DirName,FileName)
+!
+! This routine splits a full filename into the name of the file and its path.
+! If a path was present, it will still have its '\' at the end.
+
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: PathName
+      CHARACTER*(*), INTENT (  OUT) :: DirName, FileName
+
+      INTEGER I
+
+      I = LEN_TRIM(PathName)
+      DO WHILE ((I .GT. 0) .AND. (PathName(I:I) .NE. DIRSPACER))
+        I = I - 1
+      ENDDO
+      IF (I .EQ. 0) THEN
+        DirName  = ''
+        FileName = PathName
+      ELSE
+        DirName  = PathName(1:I)
+        FileName = PathName(I+1:LEN_TRIM(PathName))
+      ENDIF
+
+      END SUBROUTINE SplitPath
+!
+!*****************************************************************************
 ! 
