@@ -230,6 +230,10 @@
 ! InWizardWindow      = when .TRUE., a wizard window is currently visible
 ! CurrentWizardWindow = Winteracter ID of current Wizard window
 
+      LOGICAL           LOG_HYDROGENS
+      COMMON /HYDROGEN/ LOG_HYDROGENS
+
+
       END SUBROUTINE FoolCompiler
 !
 !*****************************************************************************
