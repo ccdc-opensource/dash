@@ -12,7 +12,6 @@
       CHARACTER*(*), INTENT(IN   ) :: TheMessage
 
       CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Error")
-      RETURN
 
       END SUBROUTINE ErrorMessage
 !
@@ -29,8 +28,8 @@
       
       CHARACTER*(*), INTENT(IN   ) :: TheMessage
 
-      CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Debug Error")
       RETURN
+      CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Debug Error")
 
       END SUBROUTINE DebugErrorMessage
 !
@@ -53,7 +52,6 @@
 
       CALL WMessageBox(YesNo,QuestionIcon,CommonOK,TheQuestion(1:LEN_TRIM(TheQuestion)),'Confirm')
       Confirm = (WInfoDialog(ExitButtonCommon) .EQ. CommonYes)
-      RETURN
 
       END FUNCTION Confirm
 !
@@ -97,7 +95,7 @@
                 CALL Plot_Alter
                 MseBtnPressed = .FALSE.
               ELSE IF(EventInfo%VALUE1 .EQ. RightButton) THEN
-! Get to work on the cross-hair movement - fitting this time
+! Get to work on the cross-hair movement--fitting this time
                 IF (MseBtnPressed) GOTO 10
                 MseBtnPressed = .TRUE.
                 CALL Move_CrossHair_Fit
@@ -109,48 +107,55 @@
               CALL Check_KeyDown_PeakFit_Inner
               GOTO 10
           END SELECT
-          CASE (IDD_Plot_Option_Dialog)
-            CALL DealWithPlotOptionsWindow
+        CASE (1:20)
+          IF (EventType .EQ. CloseRequest) THEN
+            CALL PushActiveWindowID
+            CALL WindowCloseChild(EventInfo%WIN)
+            CALL PopActiveWindowID
             GOTO 10
-          CASE (IDD_Structural_Information)
-            CALL DealWithStructuralInformation
-            GOTO 10
-          CASE (IDD_Data_Properties)
-            CALL DealWithDiffractionSetupPane
-            GOTO 10
-          CASE (IDD_Peak_Positions)
-            CALL DealWithPeakPositionsPane
-            GOTO 10
-          CASE (IDD_Index_Preparation)
-            CALL DealWithIndexPreparation
-            GOTO 10
-          CASE (IDD_Crystal_Symmetry)
-            CALL DealWithCrystalSymmetryPane
-            GOTO 10
-          CASE (IDD_Peak_Widths)
-            ! Do nothing
-            GOTO 10
-          CASE (IDD_Polyfitter_Wizard_01)
-            CALL DealWithMainWizardWindow
-            GOTO 10
-          CASE (IDD_PW_Page3)
-            CALL DealWithWizardWindowDiffractionFileInput
-            GOTO 10
-          CASE (IDD_PW_Page4)
-            CALL DealWithWizardWindowDiffractionSetup
-            GOTO 10
-          CASE (IDD_PW_Page5)
-            CALL DealWithWizardWindowProfileRange
-            GOTO 10
-          CASE (IDD_PW_Page6)
-            CALL DealWithWizardWindowBackground
-            GOTO 10
-          CASE (IDD_PW_Page1)
-            CALL DealWithWizardWindowUnitCellParameters
-            GOTO 10
-          CASE (IDD_PW_Page2)
-            CALL DealWithWizardWindowDiffractionSetup2
-            GOTO 10
+          ENDIF
+        CASE (IDD_Plot_Option_Dialog)
+          CALL DealWithPlotOptionsWindow
+          GOTO 10
+        CASE (IDD_Structural_Information)
+          CALL DealWithStructuralInformation
+          GOTO 10
+        CASE (IDD_Data_Properties)
+          CALL DealWithDiffractionSetupPane
+          GOTO 10
+        CASE (IDD_Peak_Positions)
+          CALL DealWithPeakPositionsPane
+          GOTO 10
+        CASE (IDD_Index_Preparation)
+          CALL DealWithIndexPreparation
+          GOTO 10
+        CASE (IDD_Crystal_Symmetry)
+          CALL DealWithCrystalSymmetryPane
+          GOTO 10
+        CASE (IDD_Peak_Widths)
+          ! Do nothing
+          GOTO 10
+        CASE (IDD_Polyfitter_Wizard_01)
+          CALL DealWithMainWizardWindow
+          GOTO 10
+        CASE (IDD_PW_Page3)
+          CALL DealWithWizardWindowDiffractionFileInput
+          GOTO 10
+        CASE (IDD_PW_Page4)
+          CALL DealWithWizardWindowDiffractionSetup
+          GOTO 10
+        CASE (IDD_PW_Page5)
+          CALL DealWithWizardWindowProfileRange
+          GOTO 10
+        CASE (IDD_PW_Page6)
+          CALL DealWithWizardWindowBackground
+          GOTO 10
+        CASE (IDD_PW_Page1)
+          CALL DealWithWizardWindowUnitCellParameters
+          GOTO 10
+        CASE (IDD_PW_Page2)
+          CALL DealWithWizardWindowDiffractionSetup2
+          GOTO 10
       END SELECT
 
       END SUBROUTINE GetEvent
@@ -208,6 +213,13 @@
                 CALL Check_KeyDown_PeakFit_Inner
                 GOTO 10
             END SELECT
+          CASE (1:20)
+            IF (EventType .EQ. CloseRequest) THEN
+              CALL PushActiveWindowID
+              CALL WindowCloseChild(EventInfo%WIN)
+              CALL PopActiveWindowID
+              GOTO 10
+            ENDIF
           CASE (IDD_Plot_Option_Dialog)
             CALL DealWithPlotOptionsWindow
             GOTO 10
@@ -285,7 +297,6 @@
       WinStack(WinStackPtr) = WInfoDialog(CurrentDialog)
 ! Dec(StackPtr)
       WinStackPtr = WinStackPtr - 1
-      RETURN
 
       END SUBROUTINE PushActiveWindowID
 !
@@ -323,7 +334,6 @@
 ! Restore current window ID
 !O      IF (WinStack(WinStackPtr) .NE. 0) CALL WDialogSelect(WinStack(WinStackPtr))
       CALL WDialogSelect(WinStack(WinStackPtr))
-      RETURN
 
       END SUBROUTINE PopActiveWindowID
 !
