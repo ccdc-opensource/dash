@@ -355,6 +355,53 @@
       END SUBROUTINE SplitPath
 !
 !*****************************************************************************
+!
+      SUBROUTINE SplitPath2(PathName,DirName,FileName, Extension, ExtLength)
+!
+! This routine splits a full filename into the name of the file, its extension and its path.
+! If a path was present, it will still have its '\' at the end.
+
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: PathName
+      CHARACTER*(*), INTENT (  OUT) :: DirName, FileName
+      CHARACTER*(*), INTENT (  OUT) :: Extension
+      INTEGER,       INTENT (INOUT) :: ExtLength      ! The length of the extension.
+
+      INTEGER I, iLen, iPos
+
+      I = LEN_TRIM(PathName)
+      DO WHILE ((I .GT. 0) .AND. (PathName(I:I) .NE. DIRSPACER))
+        I = I - 1
+      ENDDO
+      IF (I .EQ. 0) THEN
+        DirName  = ''
+        FileName = PathName
+      ELSE
+        DirName  = PathName(1:I)
+        FileName = PathName(I+1:LEN_TRIM(PathName))
+        iLen = LEN_TRIM(FileName)
+! Find the last occurence of '.' in FileName
+        iPos = iLen - 1 ! Last character of FileName is not tested
+! The longest extension possible is ExtLength
+        DO WHILE ((iPos .NE. 0) .AND. (FileName(iPos:iPos) .NE. DIRSPACER) .AND. (FileName(iPos:iPos) .NE. '.') .AND. (iPos .NE. (iLen-ExtLength-1)))
+          iPos = iPos - 1
+        ENDDO
+! If we haven't found a '.' by now, we cannot deal with the extension anyway
+        Extension = ''
+        IF (FileName(iPos:iPos) .NE. '.') THEN
+          ExtLength = 0
+        ELSE
+          Extension = FileName(iPos+1:iLen)
+          ExtLength = LEN_TRIM(Extension)
+        ENDIF
+      ENDIF
+
+      END SUBROUTINE SplitPath2
+!
+!*****************************************************************************
 ! 
       SUBROUTINE FileGetExtension(TheFile, TheExtension, TheLength)
 !
@@ -371,8 +418,8 @@
       INTEGER iLen, iPos
 
       iLen = LEN_TRIM(TheFile)
-! Find the last occurence of '.' in tInputFile
-      iPos = iLen - 1 ! Last character of tInputFile is not tested
+! Find the last occurence of '.' in TheFile
+      iPos = iLen - 1 ! Last character of TheFile is not tested
 ! The longest extension possible is TheLength
       DO WHILE ((iPos .NE. 0) .AND. (TheFile(iPos:iPos) .NE. DIRSPACER) .AND. (TheFile(iPos:iPos) .NE. '.') .AND. (iPos .NE. (iLen-TheLength-1)))
         iPos = iPos - 1
