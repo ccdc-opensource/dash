@@ -21,6 +21,7 @@
       INTEGER IDUMMY
       INTEGER NTCycles
 
+  !    CALL SetModeMenuState(0,1,0)
       CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
@@ -273,7 +274,6 @@
             CASE (IDB_PawRef_Save)
               IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
             CASE (IDF_PawRef_Solve)
-              CALL Load_Pawley_Pro
               CALL WizardWindowHide
 ! Emulate loading .SDI file for next window
               CALL WDialogSelect(IDD_SAW_Page1)
@@ -287,16 +287,6 @@
               CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
               NoData = .FALSE.
               CALL ShowWizardWindowZmatrices
-
-! JvdS @@ Should be relocated
-
-! ########################################################
-
-!.. Reload the Pawley profile ...
-              CALL Load_Pawley_Pro
-
-! ########################################################
-
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -341,10 +331,6 @@
       CHARACTER*20                                     symline
       COMMON /symgencmn/ nsymmin, symmin(4,4,msymmin), symline(msymmin)
 
-      INTEGER          NOBS
-      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
-      
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
@@ -634,10 +620,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
-      INTEGER          NOBS
-      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
-
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
@@ -653,7 +635,6 @@
 
       INTEGER I
 
-      NOBS = NPTS
       NBIN = NPTS
       DO I = 1, NBIN
         XBIN(I)  = ZARGI(I)
@@ -661,11 +642,6 @@
         YCBIN(I) = ZCAL(I)
         YBBIN(I) = ZBAK(I)
         EBIN(I)  = ZDOBS(I)
-        XOBS(I)  = ZARGI(I)
-        YOBS(I)  = ZOBS(I)
-        YCAL(I)  = ZCAL(I)
-        YBAK(I)  = ZBAK(I)
-        EOBS(I)  = ZDOBS(I)
       ENDDO
       IPTYPE = 2
       CALL Profile_Plot
