@@ -494,6 +494,7 @@
                 CALL WriteSAParametersToFile
                 CALL WindowOpenChild(IHANDLE)
                 CALL WEditFile('SA_PARAMS.TXT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+                CALL SetChildWinAutoClose(IHANDLE)
               CASE (IDB_SA3_finish)
 ! We've finished the SA input
 ! Window is going to be removed: save current position
@@ -608,12 +609,10 @@
       
       IMPLICIT NONE
 
-
       INCLUDE 'PARAMS.INC'
 
       CHARACTER*80    frag_file
       COMMON /frgcha/ frag_file(maxfrg)
-
 
       INTEGER tFileHandle, I
       REAL    R
