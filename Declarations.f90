@@ -157,6 +157,12 @@
 ! It's probably better to get rid of IOrdTem and sort the list directly
 ! If the right algorithm is chosen, that would speed up multiple sorts and reduce memory.
 
+      CHARACTER*3 asym
+      COMMON /zmcomc/ asym(maxatm,maxfrg)
+! asym = Atom SYMbol, e.g. 'H  ' for hydrogen, 'Ag ' for silver.
+!
+
+
       END SUBROUTINE FoolCompiler
 !
 !*****************************************************************************
