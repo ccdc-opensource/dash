@@ -309,7 +309,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION AutoLocalMinimisation
+      LOGICAL FUNCTION Get_SavePRO
 
 ! When .TRUE., each run in a multi run ends with a local minimisation
 
@@ -322,14 +322,34 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      AutoLocalMinimisation = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
+      Get_SavePRO = WDialogGetCheckBoxLogical(IDF_OutputPRO)
       CALL PopActiveWindowID
 
-      END FUNCTION AutoLocalMinimisation
+      END FUNCTION Get_SavePRO
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION ColourFlexibleTorsions
+      SUBROUTINE Set_SavePRO(TheValue)
+
+! When .TRUE., each run in a multi run ends with a local minimisation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: TheValue
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogPutCheckBoxLogical(IDF_OutputPRO,TheValue)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_SavePRO
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION Get_ColourFlexibleTorsions
 
 ! When .TRUE., flexible torsions are coloured when viewing a z-matrix
 
@@ -342,10 +362,10 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      ColourFlexibleTorsions = WDialogGetCheckBoxLogical(IDF_ColFlexTors)
+      Get_ColourFlexibleTorsions = WDialogGetCheckBoxLogical(IDF_ColFlexTors)
       CALL PopActiveWindowID
 
-      END FUNCTION ColourFlexibleTorsions
+      END FUNCTION Get_ColourFlexibleTorsions
 !
 !*****************************************************************************
 !
