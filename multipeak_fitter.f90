@@ -69,6 +69,164 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE INITSP(N)
+! Do all the initialisation
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (  OUT) :: N
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL            ZARGK,         ZXDEL
+      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
+
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ,       KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
+
+      REAL            ZCAL
+      COMMON /YSTORE/ ZCAL(MOBS)
+
+      REAL            ZXDELT
+      INTEGER                 IIMIN, IIMAX
+      REAL                                  XMINT
+      COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
+
+      INTEGER         MN, MN2
+      COMMON /ZSTOR2/ MN, MN2
+
+      REAL            ARGI, YNORM, PKFNSP
+      INTEGER                                       KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9)
+
+      INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
+      INTEGER     MPeak
+      PARAMETER ( MPeak = 10 )
+
+      INTEGER         NPEAK
+      REAL                   AREA,        XPOS       , P2
+      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), P2(MVAR)
+
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
+
+      INTEGER I, iTem, J, MNTEM, ISPMIN, ISPMAX, NPT2
+      REAL    YMAXTEM, ZOBSMAX
+
+! If there are no peaks specified, assume there is one. Estimate its position by 
+! by finding the 2 theta value with the highest number of counts
+      IF (NumInPFR(CurrentRange) .EQ. 0) THEN
+        NumInPFR(CurrentRange) = 1
+        YMaxTem = YOBIN(IPF_Lo(CurrentRange))
+        XPF_Pos(1,CurrentRange) = XBIN(IPF_Lo(CurrentRange))
+        YPF_Pos(1,CurrentRange) = YOBIN(IPF_Lo(CurrentRange))
+        DO I = IPF_Lo(CurrentRange), IPF_Hi(CurrentRange)
+          IF (YOBIN(I) .GT. YMaxTem) THEN
+            XPF_Pos(1,CurrentRange) = XBIN(I)
+            YPF_Pos(1,CurrentRange) = YOBIN(I)
+            YMaxTem = YOBIN(I)
+          ENDIF
+        ENDDO
+      ENDIF
+      NPeak = NumInPFR(CurrentRange)
+      N = 6 + 2*NPeak
+      DO I = 1, NPeak
+        XPOS(I) = XPF_Pos(I,CurrentRange)
+      ENDDO
+      NPTS = IPF_Range(CurrentRange)
+      iTem = IPF_Lo(CurrentRange) - 1
+      DO I = 1, NPTS
+        J = iTem + I
+        ZARGI(I) = XBIN(J)
+        ZOBS(I)  = YOBIN(J)
+        ZDOBS(I) = EBIN(J)
+      ENDDO
+      MNTEM = NINT(2.0 * 1.2 * FLOAT(NPTS))
+      MN = 1
+   10 MN = 2 * MN
+      IF (MN .LT. MNTEM) GOTO 10
+      MN = MIN(2048,MN)
+      MN2 = MN/2
+      KNOW = 1
+      JPHASE = 1
+      JSOURC = 1
+      NPKGEN(JPHASE,JSOURC) = 4
+      ISPMIN = 1
+      ISPMAX = NPTS
+      NPT2 = NPTS/2
+! ######### @@ JvdS 21 July 2003 ####################
+! Where does the 1.0/1.2 come from? What's wrong with 1.0 ?
+!O      ZXDELT = (1.0 / 1.2)*(ZARGI(NPT2)-ZARGI(NPT2-1))
+      ZXDELT = ZARGI(NPT2)-ZARGI(NPT2-1)
+      ZXDEL(KNOW) = ZXDELT
+      KOBZ(1) = ISPMIN
+      ZOBSMAX = ZOBS(ISPMIN)
+      DO I = ISPMIN, ISPMAX
+        IF (ZOBS(I) .GT. ZOBSMAX) THEN
+          ZOBSMAX = ZOBS(I)
+          KOBZ(1) = I
+        ENDIF
+      ENDDO
+      IIMIN = 1
+      IIMAX = NPTS
+      XMINT = ZARGI(IIMIN)
+
+      END SUBROUTINE INITSP
+!
+!*****************************************************************************
+!
       SUBROUTINE GETVAR(N,V,D)
 
       IMPLICIT NONE
@@ -225,164 +383,6 @@
       ENDDO
 
       END SUBROUTINE GETVAR
-!
-!*****************************************************************************
-!
-      SUBROUTINE INITSP(N)
-! Do all the initialisation
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT (  OUT) :: N
-
-      INCLUDE 'PARAMS.INC'
-
-      REAL            ZARGK,         ZXDEL
-      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
-
-      INTEGER         NPTS
-      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
-      INTEGER                                                                ICODEZ,       KOBZ
-      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
-
-      REAL            ZCAL
-      COMMON /YSTORE/ ZCAL(MOBS)
-
-      REAL            ZXDELT
-      INTEGER                 IIMIN, IIMAX
-      REAL                                  XMINT
-      COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
-
-      INTEGER         MN, MN2
-      COMMON /ZSTOR2/ MN, MN2
-
-      REAL            ARGI, YNORM, PKFNSP
-      INTEGER                                       KPFNSP
-      REAL            DERPFN
-      INTEGER                      NPKFSP
-      REAL                                        TOLER
-      INTEGER         NPKGEN
-      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
-      LOGICAL                                                    REFUSE
-      LOGICAL         CYC1, NOPKRF
-      REAL                          TOLR
-      INTEGER                                  NFFT
-      REAL                                           AKNOTS
-      INTEGER         NBASF4,             L4END
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
-                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
-                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
-                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
-                      NBASF4(MPRPKF,2,9), L4END(9)
-
-      INCLUDE 'REFLNS.INC'
-
-      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
-      INTEGER         NPFSOU
-      REAL                         SCALES
-      INTEGER                                 KSCALS,    NPCSOU
-      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
-
-      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
-      REAL                                                       SCALEP
-      INTEGER                                                               KSCALP
-      LOGICAL                                                                          PHMAG
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
-
-      INTEGER     MPeak
-      PARAMETER ( MPeak = 10 )
-
-      INTEGER         NPEAK
-      REAL                   AREA,        XPOS       , P2
-      COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), P2(MVAR)
-
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      REAL              PF_FWHM
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
-                        PF_FWHM(MAX_NPFR)
-
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
-
-      INTEGER I, iTem, J, MNTEM, ISPMIN, ISPMAX, NPT2
-      REAL    YMAXTEM, ZOBSMAX
-
-! If there are no peaks specified, assume there is one. Estimate its position by 
-! by finding the 2 theta value with the highest number of counts
-      IF (NumInPFR(CurrentRange) .EQ. 0) THEN
-        NumInPFR(CurrentRange) = 1
-        YMaxTem = YOBIN(IPF_Lo(CurrentRange))
-        XPF_Pos(1,CurrentRange) = XBIN(IPF_Lo(CurrentRange))
-        YPF_Pos(1,CurrentRange) = YOBIN(IPF_Lo(CurrentRange))
-        DO I = IPF_Lo(CurrentRange), IPF_Hi(CurrentRange)
-          IF (YOBIN(I) .GT. YMaxTem) THEN
-            XPF_Pos(1,CurrentRange) = XBIN(I)
-            YPF_Pos(1,CurrentRange) = YOBIN(I)
-            YMaxTem = YOBIN(I)
-          ENDIF
-        ENDDO
-      ENDIF
-      NPeak = NumInPFR(CurrentRange)
-      N = 6 + 2*NPeak
-      DO I = 1, NPeak
-        XPOS(I) = XPF_Pos(I,CurrentRange)
-      ENDDO
-      NPTS = IPF_Range(CurrentRange)
-      iTem = IPF_Lo(CurrentRange) - 1
-      DO I = 1, NPTS
-        J = iTem + I
-        ZARGI(I) = XBIN(J)
-        ZOBS(I)  = YOBIN(J)
-        ZDOBS(I) = EBIN(J)
-      ENDDO
-      MNTEM = NINT(2.0 * 1.2 * FLOAT(NPTS))
-      MN = 1
-   10 MN = 2 * MN
-      IF (MN .LT. MNTEM) GOTO 10
-      MN = MIN(2048,MN)
-      MN2 = MN/2
-      KNOW = 1
-      JPHASE = 1
-      JSOURC = 1
-      NPKGEN(JPHASE,JSOURC) = 4
-      ISPMIN = 1
-      ISPMAX = NPTS
-      NPT2 = NPTS/2
-! ######### @@ JvdS 21 July 2003 ####################
-! Where does the 1.0/1.2 come from? What's wrong with 1.0 ?
-!O      ZXDELT = (1.0 / 1.2)*(ZARGI(NPT2)-ZARGI(NPT2-1))
-      ZXDELT = ZARGI(NPT2)-ZARGI(NPT2-1)
-      ZXDEL(KNOW) = ZXDELT
-      KOBZ(1) = ISPMIN
-      ZOBSMAX = ZOBS(ISPMIN)
-      DO I = ISPMIN, ISPMAX
-        IF (ZOBS(I) .GT. ZOBSMAX) THEN
-          ZOBSMAX = ZOBS(I)
-          KOBZ(1) = I
-        ENDIF
-      ENDDO
-      IIMIN = 1
-      IIMAX = NPTS
-      XMINT = ZARGI(IIMIN)
-
-      END SUBROUTINE INITSP
 !
 !*****************************************************************************
 !
