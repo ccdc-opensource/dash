@@ -483,7 +483,7 @@
         x(kk) = 1.0 ! no preferred orientation
         parlabel(kk) = 'Preferred Orientation'
         lb(kk) =  0.5
-        ub(kk) =  1.5
+        ub(kk) =  2.0
         iPrfPar = kk
       ENDIF
       nvar = kk
