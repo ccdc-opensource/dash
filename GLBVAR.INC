@@ -49,11 +49,6 @@
 
 ! IDCurrent_Cursor_Mode stores current mode: peak fitting, Pawley refinement or structure solution
 
-      LOGICAL         DoSaRedraw
-      COMMON /SARDRW/ DoSaRedraw
-
-! Indicates whether the Simulated Annealing window should be redrawn
-
       REAL             CHAR_SIZE, MARKER_SIZE
       COMMON /PROFDEF/ CHAR_SIZE, MARKER_SIZE
 
