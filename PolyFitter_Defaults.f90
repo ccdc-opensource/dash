@@ -1,8 +1,8 @@
 !
-      SUBROUTINE PP_DEFAULTS
+      SUBROUTINE InitialiseVariables
 !
       USE WINTERACTER
-      USE druid_header
+      USE DRUID_HEADER
 !
       TYPE(WIN_STYLE)   :: MAIN_WINDOW
 !
@@ -19,36 +19,25 @@
       REAL CHAR_SIZE,MARKER_SIZE
       LOGICAL ERROR_BAR
       COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
-      INTEGER IDCurrent_Cursor_Mode
-      COMMON /CURSOR_MODE/ IDCurrent_Cursor_Mode 
+
       INCLUDE 'statlog.inc'
-
-	  INCLUDE 'lattice.inc'
-!      REAL :: CELLPAR,ZEROPOINT,ALAMBDA
-!      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA 
-
-
+      INCLUDE 'lattice.inc'
+      INCLUDE 'GLBVAR.INC' ! Contains JRadOption
       INCLUDE 'Poly_Colours.inc'
       INCLUDE 'DialogPosCmnf90.inc'
 !
       IDCurrent_Cursor_Mode=ID_Default_Mode
-!      call WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOn)
-!      call WMenuSetState(ID_Structure_Solution_Mode,ItemEnabled,WintOff)
-!
-	  call SetModeMenuState(-1,-1,-1)
-      CELLOK=.FALSE.
-      WVLNOK=.FALSE.
-      SPGPOK=.FALSE.
       DataSetChange=0
       NumInternalDSC=-1
       ZEROPOINT=0.0
 !>>JCC Added
-	  SLIMVALUE=1.0
-	  SCALFAC  = 0.01
-	  BACKREF =.TRUE.
+      SLIMVALUE=1.0
+      SCALFAC  = 0.01
+      BACKREF =.TRUE.
 !
-      IRadOption=2
-      INWOption=1
+      JRadOption = 1 ! Initialise to X-ray lab data
+! JvdS @ I think that the Bravais lattice type is initialised to unknown,
+! all unit cell parameters to unknown and now the space group that goes with it is P21/c?
 ! Default on P21/c
       NumberSGTable=64
 !
@@ -84,13 +73,13 @@
       KolNumPanelVLite=227
       KolNumPanelLite=228
       KolNumPanelDark=229
-      KolNumPanelVDark=230
-      KolNumPanelOuter=231
-      KolNumRectSelect=232
-      KolNumLargeCrossHair=233
+      KolNumPanelVDark = 230
+      KolNumPanelOuter = 231
+      KolNumRectSelect = 232
+      KolNumLargeCrossHair = 233
       KolNumPeakFit=234
       KolNumPeakPos=235
-	  KolNumBack=236
+      KolNumBack=236
 !
       KolDefPGWindow=Win_RGB(253,253,248)
       KolDefMain=Win_RGB(20,20,150)
@@ -113,7 +102,7 @@
       KolDefLargeCrossHair=Win_RGB(150,150,5)
       KolDefPeakFit=Win_RGB(20,20,240)
       KolDefPeakPos=Win_RGB(50,50,200)
-	  KolDefBack=Win_RGB(164,211,105)
+      KolDefBack=Win_RGB(164,211,105)
 !
       KolPGWindow=KolDefPGWindow
       KolMain=KolDefMain
@@ -131,7 +120,7 @@
       KolLargeCrossHair=KolDefLargeCrossHair
       KolPeakFit=KolDefPeakFit
       KolPeakPos=KolDefPeakPos
-	  KolBack=KolDefBack
+      KolBack=KolDefBack
 !
       CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
                                         KolPGWindow%IGreen,&
@@ -181,9 +170,8 @@
       CALL IGrPaletteRGB(KolNumPeakPos,KolPeakPos%IRed,&
                                        KolPeakPos%IGreen,&
                                        KolPeakPos%IBlue)
-	  CALL IGrPaletteRGB(KolNumBack,   KolBack%IRed,&
+      CALL IGrPaletteRGB(KolNumBack,   KolBack%IRed,&
                                        KolBack%IGreen,&
                                        KolBack%IBlue)
 !
-!
-      END SUBROUTINE PP_DEFAULTS
+      END SUBROUTINE InitialiseVariables

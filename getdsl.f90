@@ -11,6 +11,7 @@
        USE DRUID_HEADER
 
        INCLUDE 'Lattice.inc'
+       INCLUDE 'GLBVAR.INC' ! Contains ALambda
 
        CHARACTER*(*) FileName
        CHARACTER*128 line
@@ -43,17 +44,22 @@
             I = InfoError(1) ! reset the errors
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999
-            CALL UpdateWavelength(Temp)
-            DO I = 1, NRad_Types
-              IF (ABS(Alambda - RadWaveLengths(I)) .LT. 0.0001) CALL SetWavelengthToSelection(I + 1)
+! Postpone updating the wavelength until we know the type of radiation used.
+! If laboratory data, we can try to assign a material to the anode based on the wavelength
+ !O           DO I = 1, NRad_Types
+ !O             IF (ABS(Alambda - RadWaveLengths(I)) .LT. 0.0001) CALL SetWavelengthToSelection(I + 1)
 ! Set the wizard/main to read as this selection
-            END DO
+ !O           END DO
             CALL INextInteger(line,itemp)
             IF (InfoError(1) .EQ. 0) THEN
               CALL SetSourceDataState(itemp)
             ELSE
-              CALL SetSourceDataState(2)
+! default = X-ray lab data
+              CALL SetSourceDataState(1)
             END IF
+! Now we know all there is to know about the wavelength and source: update it
+            CALL UpdateWavelength(Temp)
+
           CASE ('sig') ! Sigma
 ! Sigma 1
             CALL WDialogSelect(IDD_Sigma_info)
@@ -153,6 +159,7 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
+      INCLUDE 'GLBVAR.INC' ! Contains ALambda
 
       CHARACTER*(*) FileName
       INTEGER       LenFn, Idum, nl
@@ -162,14 +169,12 @@
         PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
         PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),PkPosAv(MAX_NPFR)
 
-      INCLUDE 'GLBVAR.INC' ! Contains JRadOption
-
       OPEN (UNIT = 77, &
            FILE=FileName(1:LenFn), &
            STATUS='UNKNOWN', &
            ERR=999)
       WRITE(77,*)'! Radiation wavelength and data type'
-      WRITE(77,'(A3,1X,F10.5,I2)') 'rad', Alambda, JRadOption
+      WRITE(77,'(A3,1X,F10.5,I2)') 'rad', ALambda, JRadOption
       WRITE(77,*)'! Sigma shape parameters: format sigma1 esd sigma2 esd'
       WRITE(77,100) 'sig',PkFnVarVal(1,1),PkFnVarEsd(1,1),PkFnVarVal(2,1),PkFnVarEsd(2,1)
       WRITE(77,*)'! Gamma shape parameters: format gamma1 esd gamma2 esd'
@@ -190,7 +195,7 @@
   999 Ierr = 1
       CLOSE(77,IOSTAT=IDUM)
 
-      END  SUBROUTINE WRTDSL
+      END SUBROUTINE WRTDSL
 !
 !*****************************************************************************
 !
