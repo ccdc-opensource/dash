@@ -118,7 +118,6 @@
       INTEGER         NINIT, NBATCH, NSYSTM
       LOGICAL                                MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
-      DIMENSION ALSQ(100000)
 
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
@@ -130,10 +129,11 @@
       INTEGER matsz
       CHARACTER*6 xxx
       CHARACTER*10 fname
+      REAL ALSQ(1)
 
       fname = 'polyf'
       xxx = 'CN11LS'
-      MATSZ = 100000
+      MATSZ = 0 ! There should not be any basic variables
       NINIT = 1
       CALL FORTIC(xxx,ALSQ,MATSZ,PCCN01,PFCN03,DUMMY,fname)
       CALL CLOFIL(ICRYDA)
