@@ -417,7 +417,7 @@
 !
       SUBROUTINE About
 !
-!   This subroutine processes About selection
+!   This subroutine shows the About... dialogue
 !
       USE WINTERACTER
       USE VARIABLES
@@ -425,9 +425,8 @@
       IMPLICIT NONE
 
       CHARACTER(LEN=512) :: CABOUT
-!
-!   Set about message
-!
+      INTEGER tLen
+
       CABOUT = 'DASH: A structure solution package for X-ray powder '//CHAR(13)//&
                'diffraction, developed and distributed in collaboration'//CHAR(13)//&
                'between the ISIS Facility of the Rutherford Appleton'//CHAR(13)//&
@@ -436,9 +435,14 @@
                'terms and conditions of a valid software licence, obtainable'//CHAR(13)//&
                'from the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
                CHAR(13)//&
-               ProgramVersion//CHAR(13)//&
-               CHAR(13)//&
-               'Copyright July 2003'
+               ProgramVersion
+      tLen = LEN_TRIM(CABOUT)
+!DEC$ IF DEFINED (ONTBUG)
+      CABOUT = CABOUT(1:tLen)//' (Debug version)'
+      tLen = LEN_TRIM(CABOUT)
+!DEC$ ENDIF
+      CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
+               'Copyright March 2004'
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
 
       END SUBROUTINE About
