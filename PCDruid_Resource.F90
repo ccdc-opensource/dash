@@ -1,4 +1,4 @@
-! Winteracter module created : 07/Feb/2003 09:15:25
+! Winteracter module created : 31/Mar/2003 14:53:59
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -649,4 +649,12 @@
           INTEGER, PARAMETER :: IDF_BimodalReset                =  1503
           INTEGER, PARAMETER :: IDF_BimodalIcon                 =  1504
           INTEGER, PARAMETER :: IDF_TriModalIcon                =  1505
+          INTEGER, PARAMETER :: IDD_Rietveld2                   =   188
+          INTEGER, PARAMETER :: IDD_DIALOG007                   =   189
+          INTEGER, PARAMETER :: IDD_TEMPLATE022                 =   191
+          INTEGER, PARAMETER :: IDD_TEMPLATE023                 =   192
+          INTEGER, PARAMETER :: IDF_CHECK1                      =  1507
+          INTEGER, PARAMETER :: IDD_TEMPLATE024                 =   193
+          INTEGER, PARAMETER :: IDF_CHECK2                      =  1508
+          INTEGER, PARAMETER :: IDF_REAL2                       =  1509
       END MODULE Druid_Header

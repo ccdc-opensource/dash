@@ -164,6 +164,21 @@
           RETURN
         ENDIF
       ENDDO
+! Rietveld refinement
+      DO iRow = 1, NumOf_SA_Runs
+        CALL WGridGetCellCheckBox(IDF_SA_summary,7,iRow,iStatus)
+        IF (iStatus .EQ. 1) THEN
+! Close "Save Solutions" window which may be up
+          CALL WDialogSelect(IDD_OutputSolutions)
+          CALL WDialogHide
+          CALL WDialogSelect(IDD_SAW_Page5)
+          CALL WGridPutCellCheckBox(IDF_SA_Summary,7,iRow,Unchecked)
+          CALL WDialogHide
+          CALL ShowWindowRietveld(iSol2Run(iRow))
+          CALL PopActiveWindowID
+          RETURN
+        ENDIF
+      ENDDO
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithAnalyseSolutionsWindow
