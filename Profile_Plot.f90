@@ -13,8 +13,8 @@
 
       INTEGER, INTENT (IN   ) :: TheIPTYPE
 
-      INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'POLY_COLOURS.INC'
 
       INTEGER          NTIC
       INTEGER                IH
@@ -52,6 +52,7 @@
       CALL Plot_Initialise()
       CALL Plot_Panel()
       CALL Plot_Custom_Axes()
+      CALL IPgBorder()
 ! Observed profile
       SELECT CASE (ABS(TheIPTYPE))
         CASE (1) 
@@ -64,7 +65,6 @@
       IF (PlotBackground()) CALL Plot_Background()
 !  Plot tic marks etc. if appropriate
       IF (NTIC .NE. 0) CALL Plot_Calculated_Tics()
-      CALL IPgBorder()
       PLOTT = .TRUE.
 !   Switch off hardcopy
       IF (TheIPTYPE .LT. 0) THEN
@@ -82,8 +82,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'POLY_COLOURS.INC'
 
       INTEGER          NTIC
       INTEGER                IH
@@ -95,7 +95,6 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -128,7 +127,7 @@
 
       INCLUDE 'POLY_COLOURS.INC'
 
-      COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
+      COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
 
       CALL IGrPaletteRGB(100,253,253,245)
       CALL IGrPaletteRGB(101,250,250,235)
@@ -165,19 +164,21 @@
 
       USE WINTERACTER
 
-      INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'GLBVAR.INC'
+      INCLUDE 'POLY_COLOURS.INC'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
 
       CALL IGrSelect(1,0)
@@ -220,12 +221,13 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
 
       CALL IGrColourN(KolNumMain)
       CALL IGrCharSize(1.,1.)
@@ -260,28 +262,18 @@
 
       USE WINTERACTER
 
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'POLY_COLOURS.INC'
-      INCLUDE 'PARAMS.INC'
+      IMPLICIT NONE
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'POLY_COLOURS.INC'
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
       CALL IPgNewPlot(PgPolyLine,1,NBIN)
       CALL IPgStyle(1,0,0,0,KolNumBack,0)
-      CALL IPgXYPairs(xbin,ybbin)
+      CALL IPgXYPairs(XBIN,YBBIN)
 
       END SUBROUTINE Plot_Background
 !
@@ -291,26 +283,31 @@
 
       USE WINTERACTER
 
-      INCLUDE 'POLY_COLOURS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'PARAMS.INC'
+      IMPLICIT NONE
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'POLY_COLOURS.INC'
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
 
       LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
+      INTEGER I
+      REAL sizmtem, xtem, ytem, xgtem, ygtem
 
       CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
@@ -360,29 +357,33 @@
       SUBROUTINE Plot_ObsCalc_Profile()
 
       USE WINTERACTER
-      USE VARIABLES
 
-      INCLUDE 'POLY_COLOURS.INC'
-      INCLUDE 'GLBVAR.INC'
+      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'POLY_COLOURS.INC'
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
-      REAL YDIF(MOBS)
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+
+      REAL YDIF(MOBS), YADD
       LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
+      INTEGER I, II 
+      REAL sizmtem, xtem, ytem, xgtem, ygtem
 
       CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
@@ -390,8 +391,7 @@
       YADD = 0.5*(YPGMAX+YPGMIN)
       DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
         YDIF(II) = YADD + YOBIN(II) - YCBIN(II)
-      END DO
-
+      ENDDO
       CALL IPgNewPlot(PgPolyLine,3,NBIN)
       CALL IPgStyle(1,0,0,0,KolNumDif,0)
 ! Q & D hack
@@ -426,8 +426,8 @@
           ytem = MAX(ytem,ypgmin)
           CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
           CALL IGrLineTo(xgtem,ygtem)
-        END DO
-      END IF
+        ENDDO
+      ENDIF
       CALL IPgXYPairs(XBIN,YCBIN)
       CALL IGrCharSize(1.0,1.0)
       CALL IGrColourN(KolNumMain)
@@ -445,8 +445,8 @@
       USE WINTERACTER
 
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'GLBVAR.INC'
+      INCLUDE 'POLY_COLOURS.INC'
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       
@@ -463,7 +463,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
 
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -587,115 +588,35 @@
 !*****************************************************************************
 !
 ! JCC Subroutine that cross-references the two sets of common
-! blocks so that the profile ones contain the data thats been
-! read in. Basically hacked out of SA_Profile_Plot.
+! blocks so that the profile ones contain the data that's been
+! read in.
       SUBROUTINE Synchronize_Data
 
-      USE WINTERACTER
-
-      INCLUDE 'POLY_COLOURS.INC'
       INCLUDE 'PARAMS.INC'
-      INCLUDE 'statlog.inc'
-
-      INTEGER          NOBS
-      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+      INTEGER          NOBSA, NFITA, IFITA
+      REAL                                          CHIOBSA, WTSA
+      REAL             XOBSA,         YOBSA,         YCALA,         ESDA
+      COMMON /CHISTOP/ NOBSA, NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP),    &
+                       XOBSA(MCHSTP), YOBSA(MCHSTP), YCALA(MCHSTP), ESDA(MCHSTP)
 
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      INTEGER I
 
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+! This routine doesn't seem to be aware of the difference between NOBS and NBIN
+! Treat as though we are reading XBIN etc. (this routine is called after the Pawley stage)
 
-      COMMON /ZSTORE/ NPTS,ZARGI(MPPTS),ZOBS(MPPTS),ZDOBS(MPPTS),&
-        ZWT(MPPTS),ICODEZ(MPPTS),KOBZ(MPPTS)
-
-      COMMON /YSTORE/ ZCAL(MPPTS),ZBAK(MPPTS)
-
-      COMMON /ZSTOR1/ ZXDELT,IIMIN,IIMAX,XDIFT,XMINT
-
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-
-      COMMON /CHISTOP/ NOBSA,NFITA,IFITA(MCHSTP),CHIOBSA,&
-        WTSA(MCHSTP),XOBSA(MCHSTP),YOBSA(MCHSTP),YCALA(MCHSTP),ESDA(MCHSTP)
-
-      COMMON /chibest/ ycalbest(MCHSTP)
-
-      NOBS = NOBSA
       NBIN = NOBSA
-      YOSUM = 0.0
-      YCSUM = 0.0
-      DO II = 1, NFITA
-        I = IFITA(II)
-        YOSUM = YOSUM + YOBSA(I)
-        YCSUM = YCSUM + YCALbest(I)
-      ENDDO
-      RESCL = YOSUM / YCSUM
-      DO I = 1, NOBS
-        YCALbest(I) = RESCL * YCALbest(I)
-      ENDDO
       DO I = 1, NBIN
         XBIN(I)  = XOBSA(I)
         YOBIN(I) = YOBSA(I)
-        YCBIN(I) = YCALBEST(I)
         YBBIN(I) = 0.0
-        EBIN(I)  = EsdA(I)
-        XOBS(I)  = XOBSA(I)
-        YOBS(I)  = YOBSA(I)
-        YCAL(I)  = YCALBEST(I)
-        YBAK(I)  = 0.0
-        EOBS(I)  = EsdA(I)
-      END DO
-      XPMIN = XOBSA(1)
-      XPMAX = XOBSA(1)
-      YPMIN = YOBSA(1)
-      YPMAX = YOBSA(1)
-      DO I = 1, NOBS
-        XPMIN = MIN(XOBSA(I),XPMIN)
-        XPMAX = MAX(XOBSA(I),XPMAX)
-        YPMIN = MIN(YOBSA(I),YPMIN)
-        YPMAX = MAX(YOBSA(I),YPMAX)
-      END DO
-      XPGMIN = XPMIN
-      XPGMAX = XPMAX
-      YPGMIN = YPMIN
-      YPGMAX = YPMAX
-      CALL UPLOAD_RANGE()
-      XPGMINOLD = XPMIN
-      XPGMAXOLD = XPMAX
-      YPGMINOLD = YPMIN
-      YPGMAXOLD = YPMAX
-      IPMIN = 1
-      IPMAX = NBIN
-      IPMINOLD = IPMIN
-      IPMAXOLD = IPMAX
+        EBIN(I)  = ESDA(I)
+      ENDDO
+      CALL GetProfileLimits
 
       END SUBROUTINE Synchronize_Data
 !
