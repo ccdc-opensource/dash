@@ -64,7 +64,7 @@
       INTEGER :: iiaa, iibb, iicc, iiee, iiff, jjaa, jjbb, jjcc, jjdd, jjee, jjff, kamoi4,        &
      &           kaplu4, kbmoi4, kbplu4, kcmax, kcmin, kcmoi4, kcplu4, kemoi4, keplu4,    &
      &           kfmoi4, kfplu4, kt, ktp, md12, md34, md56, md7, md89
-      INTEGER :: ir, iw
+      INTEGER :: iw
       INTEGER :: ly
       REAL :: vmax2, vmin2, vmoii, vr2
       REAL Bemin, Bemax
