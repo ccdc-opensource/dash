@@ -35,9 +35,9 @@
       INTEGER tNumOfRanges
       CHARACTER*80 TitleOfRange(250) ! 8 = maximum number of ranges in a STOE file
       CHARACTER*20, EXTERNAL :: Integer2String
-      REAL    t2ThetaStart(250), t2ThetaStep(250), t2ThetaEnd(250)
+      REAL    t2ThetaStep(250), t2ThetaEnd(250)
       INTEGER iHighlightList(250)
-      LOGICAL LoadRange(250)
+      LOGICAL LoadRange(250), AtLeastOneSelected
       REAL    Smallest2ThetaStep
       INTEGER I, hFile
 
@@ -75,6 +75,10 @@
             CALL WDialogSelect(IDD_DataRangeSTOE)
             CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,1)
             CALL WDialogShow(-1,-1,IDOK,Modal)
+            IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
+              Load_raw_File = 2
+              RETURN
+            ENDIF
             CALL WDialogGetMenu(IDF_DataRangeMenu,iRange)
 ! irange is the data range to be read.
             CALL WDialogUnload(IDD_DataRangeSTOE)
@@ -86,7 +90,7 @@
         CASE (' ','1','2')
 ! Bruker files can contain multiple data ranges.
 ! Scan the file, get the number of data ranges and their titles.
-          CALL GetDataRangesBruker(TheFileName,tNumOfRanges,t2ThetaStart,t2ThetaStep,t2ThetaEnd)
+          CALL GetDataRangesBruker(TheFileName,tNumOfRanges,TitleOfRange,t2ThetaStep)
           IF (tNumOfRanges .EQ. 0) THEN
             CALL ErrorMessage('File contains no data.')
             RETURN
@@ -98,18 +102,27 @@
             CALL WDialogLoad(IDD_DataRangeBruker)
             CALL WDialogSelect(IDD_DataRangeBruker)
             DO CurrRange = 1, tNumOfRanges 
-              TitleOfRange(CurrRange) = "Range "//Integer2String(CurrRange)
               iHighlightList(CurrRange) = 1
             ENDDO
             CALL WDialogPutMenu(IDF_DataRangeMenu,TitleOfRange,tNumOfRanges,iHighlightList)
             CALL WDialogShow(-1,-1,IDOK,Modal)
+            IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
+              Load_raw_File = 2
+              RETURN
+            ENDIF
             CALL WDialogGetMenu(IDF_DataRangeMenu,iHighlightList)
 ! The array iHighlightList now contains '1' for every data range to be read, '0' otherwise.
             CALL WDialogUnload(IDD_DataRangeBruker)
             CALL PopActiveWindowID
+            AtLeastOneSelected = .FALSE.
             DO I = 1, tNumOfRanges
               LoadRange(I) = (iHighlightList(I) .EQ. 1)
+              IF (LoadRange(I)) AtLeastOneSelected = .TRUE.
             ENDDO
+            IF (.NOT. AtLeastOneSelected) THEN
+              CALL ErrorMessage('Please select at least one range.')
+              RETURN
+            ENDIF
           ENDIF
           Smallest2ThetaStep = 90.0
           DO I = 1, tNumOfRanges
@@ -125,15 +138,14 @@
       CALL Upload_Source
       Load_raw_File = 1
       RETURN
- 999  CONTINUE
 ! Exit code is error by default, so we can simply return
-      CLOSE(hFile)
+ 999  CLOSE(hFile)
 
       END FUNCTION Load_raw_File
 !
 !*****************************************************************************
 !
-      SUBROUTINE GetDataRangesBruker(TheFileName, TheNumOfRanges, The2ThetaStart, The2ThetaStep, The2ThetaEnd)
+      SUBROUTINE GetDataRangesBruker(TheFileName, TheNumOfRanges, TitleOfRange, The2ThetaStep)
 !
 ! This function tries to build a list of 'dataranges' present in a *.raw file (binary format from Bruker machines).
 ! The routine basically assumes that the file is OK.
@@ -156,7 +168,8 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (  OUT) :: TheNumOfRanges
-      REAL,       INTENT (  OUT) :: The2ThetaStart(*), The2ThetaStep(*), The2ThetaEnd(*)
+      CHARACTER*80,  INTENT (  OUT) :: TitleOfRange(*)
+      REAL,          INTENT (  OUT) :: The2ThetaStep(*)
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -167,7 +180,7 @@
 
       INTEGER     I, Shift, hFile
       REAL*8      TwoThetaStart, TwoThetaStep
-      REAL        Lambda1
+      REAL        Lambda1, t2ThetaStart, t2ThetaEnd
       INTEGER*4   I4, NumOfBins
       INTEGER*4   I4_2
       REAL*4      R4
@@ -182,6 +195,8 @@
       INTEGER*4   NumOfDataRanges  ! 1 data range = 1 powder pattern
       INTEGER*4   Offset, CurrDataRange
       INTEGER*2   SizeOfHeader
+      CHARACTER*80 tString
+      REAL StepTime
 
       TwoThetaStart = 0.0
       TwoThetaStep  = 0.0
@@ -230,7 +245,7 @@
             READ(hFile,REC=Offset+6,ERR=999) RecReal(2)
 ! Due to the EQUIVALENCE statement, R8 now holds the starting angle in degrees
             TwoThetaStart = R8
-            The2ThetaStart(CurrDataRange) = SNGL(TwoThetaStart)
+            t2ThetaStart = SNGL(TwoThetaStart)
 ! Read scan mode: 0 = step, 1 = continuous
             READ(hFile,REC=Offset+43,ERR=999) I4
 ! Step size in degrees
@@ -238,9 +253,10 @@
             READ(hFile,REC=Offset+46,ERR=999) RecReal(2)
 ! Due to the EQUIVALENCE statement, R8 now holds the step size in degrees
             TwoThetaStep = R8
-            IF (TwoThetaStep .LT. 0.000001) RETURN
+            IF (TwoThetaStep .LT. 0.000001) GOTO 999
+            READ(hFile,REC=Offset+49,ERR=999) StepTime
             The2ThetaStep(CurrDataRange) = SNGL(TwoThetaStep)
-            The2ThetaEnd(CurrDataRange) = SNGL(TwoThetaStart) + SNGL(TwoThetaStep) * NumOfBins
+            t2ThetaEnd = t2ThetaStart + SNGL(TwoThetaStep) * NumOfBins
 ! Next REAL*8 contains primary wavelength (Angstroms) for this data range
 ! Assuming a monochromated beam, this is the wavelength we would want
             READ(hFile,REC=Offset+61,ERR=999) RecReal(1)
@@ -272,6 +288,9 @@
               CALL ErrorMessage("Length of Supplementary Header is not a multiple of 4.")
               GOTO 999
             ENDIF
+            WRITE(tString,'(I3,1X,A1,2(F8.3,1X,A1),F9.6,1X,A1,F7.2)') CurrDataRange, CHAR(9), t2ThetaStart, &
+              CHAR(9), t2ThetaEnd, CHAR(9), The2ThetaStep(CurrDataRange), CHAR(9), StepTime
+            TitleOfRange(CurrDataRange) = tString
 ! Skip all supplementary headers of the current data range
             Offset = Offset + I4 / 4
 ! Skip the header of the current data range
@@ -326,7 +345,7 @@
 ! @@@@ Which one is 2 theta ?????
             READ(hFile,REC=Offset+6,ERR=999) R4
             TwoThetaStart = R4
-            The2ThetaStart(CurrDataRange) = TwoThetaStart
+            t2ThetaStart = TwoThetaStart
 ! Now we can start reading the raw data. The complete header can consist of any number
 ! of bytes, and we can only read per four. The data is in REAL*4 format. This may require some
 ! shifting of the bytes read in. It is actually possible that the last datapoint cannot be read.
@@ -407,8 +426,8 @@
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       INTEGER     tNOBS1, tNOBS2, hFile
-      REAL        tXOBS1(2*MOBS), tYOBS1(2*MOBS), tEOBS1(2*MOBS)
-      REAL        tXOBS2(2*MOBS), tYOBS2(2*MOBS), tEOBS2(2*MOBS)
+      REAL        tXOBS1(2*MOBS), tYOBS1(2*MOBS), tSECS1(2*MOBS)
+      REAL        tXOBS2(2*MOBS), tYOBS2(2*MOBS), tSECS2(2*MOBS)
       INTEGER     iP(2*MOBS)
       INTEGER     I, Shift
       REAL*8      TwoThetaStart, TwoThetaStep, CurrTwoTheta
@@ -501,8 +520,10 @@
             READ(hFile,REC=Offset+46,ERR=999) RecReal(2)
 ! Due to the EQUIVALENCE statement, R8 now holds the step size in degrees
             TwoThetaStep = R8
-            IF (TwoThetaStep .LT. 0.000001) RETURN
+            IF (TwoThetaStep .LT. 0.000001) GOTO 999
             READ(hFile,REC=Offset+49,ERR=999) StepTime
+! Next line to avoid DASH from unexpectedly rescaling the data if only a single pattern is present
+            IF (NumOfDataRanges .EQ. 1) StepTime = 1.0
 ! Next REAL*8 contains primary wavelength (Angstroms) for this data range
 ! Assuming a monochromated beam, this is the wavelength we would want
             READ(hFile,REC=Offset+61,ERR=999) RecReal(1)
@@ -552,8 +573,8 @@
               ENDDO
               DO I = 1, NumOfBins
                 READ(hFile,REC=Offset+I,ERR=999) R4
-                tYOBS1(tNOBS1 + I) = R4 / StepTime
-                tEOBS1(tNOBS1 + I) = SQRT(R4) / StepTime
+                tYOBS1(tNOBS1 + I) = R4
+                tSECS1(tNOBS1 + I) = StepTime
               ENDDO
               tNOBS2 = tNOBS1 + NumOfBins
 ! Now sort the resulting data according to 2 theta
@@ -562,28 +583,25 @@
               DO I = 1, tNOBS2
                 tXOBS2(I) = tXOBS1(iP(I))
                 tYOBS2(I) = tYOBS1(iP(I))
-                tEOBS2(I) = tEOBS1(iP(I))
+                tSECS2(I) = tSECS1(iP(I))
               ENDDO
+              tXOBS1 = 0.0
+              tYOBS1 = 0.0
+              tSECS1 = 0.0
 ! Now compare consecutive datapoints to see if they should be merged (i.e., have nearly equal 2 theta values)
               tXOBS1(1) = tXOBS2(1)
               tYOBS1(1) = tYOBS2(1)
-              tEOBS1(1) = tEOBS2(1)
+              tSECS1(1) = tSECS2(1)
               Last2Theta = tXOBS2(1)
               tNOBS1 = 1
               DO I = 2, tNOBS2
-                IF (ABS(tXOBS2(I) - Last2Theta) .LT. Smallest2ThetaStep) THEN
-! Merge
-                  tXOBS1(tNOBS1) = (tXOBS1(tNOBS1) + tXOBS2(I)) / 2.0
-                  tYOBS1(tNOBS1) = (tYOBS1(tNOBS1) + tYOBS2(I)) / 2.0
-                  tEOBS1(tNOBS1) = SQRT(tEOBS1(tNOBS1)**2 + tEOBS2(I)**2) / 2.0
-                ELSE
-! New
+                IF (ABS(tXOBS2(I) - Last2Theta) .GE. Smallest2ThetaStep) THEN
                   tNOBS1 = tNOBS1 + 1
-                  tXOBS1(tNOBS1) = tXOBS2(I)
-                  tYOBS1(tNOBS1) = tYOBS2(I)
-                  tEOBS1(tNOBS1) = tEOBS2(I)
                   Last2Theta = tXOBS2(I)
                 ENDIF
+                tXOBS1(tNOBS1) = (tYOBS1(tNOBS1)*tXOBS1(tNOBS1) + tYOBS2(I)*tXOBS2(I)) / (tYOBS1(tNOBS1)+tYOBS2(I))
+                tYOBS1(tNOBS1) = tYOBS1(tNOBS1) + tYOBS2(I)
+                tSECS1(tNOBS1) = tSECS1(tNOBS1) + tSECS2(I)
               ENDDO
             ENDIF
 ! Next data range starts after this one
@@ -593,8 +611,9 @@
           NumOfBins = tNOBS1
           DO I = 1, NumOfBins
             XOBS(I) = tXOBS1(I)
-            YOBS(I) = tYOBS1(I)
-            EOBS(I) = tEOBS1(I)
+! Poisson statistics
+            YOBS(I) = tYOBS1(I) / tSECS1(I)
+            EOBS(I) = SQRT(tYOBS1(I)) / tSECS1(I)
           ENDDO
         CASE ('2')
 ! A version 2 file.
