@@ -455,12 +455,12 @@ C
                 call WDialogHide()
                 IXPos_IDD_Pawley_Status = WInfoDialog(6)
                 IYPos_IDD_Pawley_Status = WInfoDialog(7)
-                IWidth_IDD_Pawley_Status = WInfoDialog(8)
-                IHeight_IDD_Pawley_Status = WInfoDialog(9)
+!                IWidth_IDD_Pawley_Status = WInfoDialog(8)
+!                IHeight_IDD_Pawley_Status = WInfoDialog(9)
                 IXPos_IDD_SA_Input = IXPos_IDD_Pawley_Status
                 IYPos_IDD_SA_Input = IYPos_IDD_Pawley_Status
-                IWidth_IDD_SA_Input = IWidth_IDD_Pawley_Status
-                IHeight_IDD_SA_Input = IHeight_IDD_Pawley_Status
+!                IWidth_IDD_SA_Input = IWidth_IDD_Pawley_Status
+!                IHeight_IDD_SA_Input = IHeight_IDD_Pawley_Status
                 FromPawleyFit=.true.
                 CALL Pawley_Limits_Save()
                 call SA_Main()
@@ -490,14 +490,14 @@ C..
 C.. Write out the data file ...
 C.. We should check if there are data to write out!
 !      write(76,*) ' In QP ',Nbin,NumInternalDSC,DataSetChange
-      if (nbin.gt.0) then
+      IF (nbin .GT. 0) THEN
 C.. Allow a maximum of 300 reflections
-        if (ntic.eq.0) return
-        if (ntic .gt. 300) then
-          xranmax=min(xpmax,argk(300))
-        else
+        IF (ntic .EQ. 0) RETURN
+        IF (ntic .GT. 300) THEN
+          xranmax=MIN(xpmax,argk(300))
+        ELSE
           xranmax=xpmax
-        end if
+        END IF
         xranmin=xpmin
 
 
@@ -505,30 +505,32 @@ C.. Allow a maximum of 300 reflections
 !        xranmax=xbin(nbin)
 
 ! Substituting with this line seems to fix this bug? Is this a reasonable fix?
+! JvdS @ Doesn't this undo all of the above range checking?
+! JvdS if there >300 reflections / tic marks, all of them will be included this way?
 	  xranmax=xpmax
 
 
-        if (NumInternalDSC.ne.DataSetChange) then
+        IF (NumInternalDSC .NE. DataSetChange) THEN
 !          write(76,*) ' Writing polyf.dat',NumInternalDSC,DataSetChange
-          open(41,file='polyp.dat',status='unknown')
-          do i=1,nbin
-            if (xbin(i).gt.xranmax) goto 4110
-            write(41,4100) xbin(i),yobin(i),ebin(i)
- 4100       format(f10.4,2f12.2)
-          end do
- 4110     close(41)
-        end if
+          OPEN(41,file='polyp.dat',status='unknown')
+          DO i=1,nbin
+            IF (xbin(i) .GT. xranmax) GOTO 4110
+            WRITE(41,4100) xbin(i),yobin(i),ebin(i)
+ 4100       FORMAT(f10.4,2f12.2)
+          END DO
+ 4110     CLOSE(41)
+        END IF
         NumInternalDSC=DataSetChange
-      else
-        return
-      end if
-      if (.not.CELLOK) return
+      ELSE
+        RETURN
+      END IF
+      IF (.NOT. CELLOK) RETURN
 C 
-      open(42,file='polyp.ccl',status='unknown')
-      write(42,4210) 
- 4210 format('N Polyfitter file for quick Pawley refinement')
-      write(42,4220) (CellPar(i),i=1,6)
- 4220 format ('C ',3f10.5,3f10.3)
+      OPEN(42,file='polyp.ccl',status='unknown')
+      WRITE(42,4210) 
+ 4210 FORMAT('N Polyfitter file for quick Pawley refinement')
+      WRITE(42,4220) (CellPar(i),i=1,6)
+ 4220 FORMAT('C ',3f10.5,3f10.3)
       write(42,4230) 
  4230 format('F C 2 2.31 20.8439 1.02 10.2075 ',
      &'1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
