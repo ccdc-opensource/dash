@@ -299,7 +299,7 @@
       iw = 117
       DICVOL_Error = 0 ! Success
       DICVOL_NumOfSolutions = 0 ! Initialise number of solutions to 0 for all crystal systems
-      OPEN(iw,FILE='DICVOL.OUT',ERR=1900)
+      OPEN(iw,FILE=DV_FileName,ERR=1900)
 99001 FORMAT (A)
       IF ( amax.EQ.0.0 ) amax = 30.0
       IF ( Bmax.EQ.0.0 ) Bmax = 30.0

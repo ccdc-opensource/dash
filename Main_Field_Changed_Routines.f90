@@ -744,7 +744,7 @@
 
       REAL    Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
       INTEGER Isystem(6), UseErr, I, Iord
-      INTEGER IHANDLE
+      INTEGER iHandle
       REAL    Epsilon
       REAL    MaxLen
       LOGICAL Confirm ! Function
@@ -862,9 +862,9 @@
                     Isystem(4) .EQ. 1,Isystem(5) .EQ. 1,Isystem(6) .EQ. 1,Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
       CALL WCursorShape(CurCrossHair)
 ! Pop up a window showing the DICVOL output file in a text editor
-      CALL WindowOpenChild(IHANDLE)
-      CALL WEditFile('DICVOL.OUT',Modeless,0,0,4)
-      CALL SetChildWinAutoClose(IHANDLE)
+      CALL WindowOpenChild(iHandle)
+      CALL WEditFile(DV_FileName,Modeless,0,0,4)
+      CALL SetChildWinAutoClose(iHandle)
       IF (NumOfDICVOLSolutions .EQ. 0) THEN
         CALL WDialogSelect(IDD_DV_Results)
         CALL WDialogHide()

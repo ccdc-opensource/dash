@@ -948,17 +948,12 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
-      REAL Rvpar(2), Rdens, Rmolwt, Rexpzp
+      REAL    Rvpar(2), Rdens, Rmolwt, Rexpzp
       LOGICAL system(6)
-      INTEGER I, Iord
-      INTEGER IHANDLE
-      REAL    Epsilon
-      REAL    MaxLen
+      INTEGER I, iOrd, iHandle, NumDoF, iLen
+      REAL    Epsilon, MaxLen, MaxSinBeta, tBeta
       LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm, WDialogGetCheckBoxLogical
       REAL,    EXTERNAL :: TwoTheta2dSpacing
-      REAL    MaxSinBeta
-      REAL    tBeta
-      INTEGER NumDoF, ilen
       CHARACTER*2 nStr
 
       CALL PushActiveWindowID
@@ -975,23 +970,23 @@
 !              CALL EstimateZeroPointError
               CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
               CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
-              CALL WDialogGetReal(IDF_Indexing_Maxa, amax)
+              CALL WDialogGetReal(IDF_Indexing_Maxa,   amax)
               Bmax = amax
               Cmax = amax
-              CALL WDialogGetReal       (IDF_Indexing_MinAng,      Bemin)
-              CALL WDialogGetReal       (IDF_Indexing_MaxAng,      Bemax)
-              CALL WDialogGetReal       (IDF_Indexing_Density,     Rdens)
-              CALL WDialogGetReal       (IDF_Indexing_MolWt,       Rmolwt)
-              CALL WDialogGetReal       (IDF_ZeroPoint,            Rexpzp)
+              CALL WDialogGetReal(IDF_Indexing_MinAng,      Bemin)
+              CALL WDialogGetReal(IDF_Indexing_MaxAng,      Bemax)
+              CALL WDialogGetReal(IDF_Indexing_Density,     Rdens)
+              CALL WDialogGetReal(IDF_Indexing_MolWt,       Rmolwt)
+              CALL WDialogGetReal(IDF_ZeroPoint,            Rexpzp)
               system(1) = WDialogGetCheckBoxLogical(IDF_Indexing_Cubic)
               system(2) = WDialogGetCheckBoxLogical(IDF_Indexing_Tetra)
               system(3) = WDialogGetCheckBoxLogical(IDF_Indexing_Hexa)
               system(4) = WDialogGetCheckBoxLogical(IDF_Indexing_Ortho)
               system(5) = WDialogGetCheckBoxLogical(IDF_Indexing_Monoclinic)
               system(6) = WDialogGetCheckBoxLogical(IDF_Indexing_Triclinic)
-              CALL WDialogGetReal       (IDF_eps,                  Epsilon)
-              CALL WDialogGetReal       (IDF_Indexing_Fom,         fom)
-              CALL WDialogGetReal       (IDF_Indexing_ScaleFactor, DV_ScaleFactor)
+              CALL WDialogGetReal(IDF_eps,                  Epsilon)
+              CALL WDialogGetReal(IDF_Indexing_Fom,         fom)
+              CALL WDialogGetReal(IDF_Indexing_ScaleFactor, DV_ScaleFactor)
 ! Number of degrees of freedom, we don't even count the zero point
               NumDoF = 0
               IF (system(1)) NumDof = MAX(NumDoF,1)
@@ -1056,8 +1051,8 @@
                 epsil(I) = Epsilon * DV_ScaleFactor
               ENDDO
               DO I = 1, NTPeak
-                IOrd = IOrdTem(I)
-                d(I) = AllPkPosVal(IOrd) - Rexpzp
+                iOrd = IOrdTem(I)
+                d(I) = AllPkPosVal(iOrd) - Rexpzp
               ENDDO
               CALL WCursorShape(CurHourGlass)
               NumOfDICVOLSolutions = 0
@@ -1116,8 +1111,8 @@
               CALL WDialogUnload(IDD_DICVOLRunning)
               CALL WCursorShape(CurCrossHair)
 ! Pop up a window showing the DICVOL output file in a text editor
-              CALL WindowOpenChild(IHANDLE)
-              CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
+              CALL WindowOpenChild(iHandle)
+              CALL WEditFile(DV_FileName,Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
 ! If 'ViewOnly' is specified:
 ! 1. The file can be accessed while it is displayed.
 ! 2. There is no 'Save as...' option in the menu.
@@ -1126,7 +1121,7 @@
 ! Hence, this way, DICVOL can be run several times in succession and the results can be compared
 ! on screen. To save one of the output files (that all have the same name),
 ! the user must select all text and copy and paste it to an other editor window.
-              CALL SetChildWinAutoClose(IHANDLE)
+              CALL SetChildWinAutoClose(iHandle)
               IF (NumOfDICVOLSolutions .EQ. 0) THEN
                 CALL ErrorMessage('No solutions were found.')
                 GOTO 999
@@ -1143,7 +1138,7 @@
                 CellPar(6) = DICVOLSolutions(1)%gamma
                 LatBrav = DICVOLSolutions(1)%CrystalSystem
                 CALL Upload_CrystalSystem
-                CALL UpdateCell()
+                CALL UpdateCell
               ENDIF
 ! Pop up the next Wizard window showing the solutions, so that the user can choose one to be imported into DASH
               CALL WDialogSelect(IDD_PW_Page9)
@@ -1167,6 +1162,11 @@
                 IF (DICVOLSolutions(I)%M .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,10,I,DICVOLSolutions(I)%M,'(F7.1)')
                 IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,11,I,DICVOLSolutions(I)%F,'(F7.1)')
               ENDDO
+! Ungrey the "Previous Results >" button in the DICVOL Wizard window
+              CALL WDialogSelect(IDD_PW_Page8)
+              CALL WDialogFieldState(IDB_PrevRes,Enabled)
+              CALL WizardWindowShow(IDD_PW_Page9)
+            CASE (IDB_PrevRes)
               CALL WizardWindowShow(IDD_PW_Page9)
           END SELECT
         CASE (FieldChanged)
@@ -1193,7 +1193,10 @@
 
       INCLUDE 'lattice.inc'
 
-      INTEGER irow, istatus
+      INTEGER iRow, iStatus, iHandle
+      CHARACTER(MaxPathLength) :: tFileName
+      CHARACTER(LEN=45) :: FILTER
+      INTEGER iFlags
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page9)
@@ -1206,24 +1209,46 @@
               CALL WizardWindowShow(IDD_PW_Page8)
             CASE (IDNEXT)
               CALL WizardWindowShow(IDD_PW_Page1)
+            CASE (IDB_View)
+! Pop up a window showing the DICVOL output file in a text editor
+              CALL WindowOpenChild(iHandle)
+              CALL WEditFile(DV_FileName,Modeless,0,FileMustExist+ViewOnly+NoToolBar,4)
+! If 'ViewOnly' is specified:
+! 1. The file can be accessed while it is displayed.
+! 2. There is no 'Save as...' option in the menu.
+! If the output file is viewed without 'ViewOnly', the file cannot be accessed, which means that
+! DICVOL returns with an error message which means that there are no solutions.
+! Hence, this way, DICVOL can be run several times in succession and the results can be compared
+! on screen. To save one of the output files (that all have the same name),
+! the user must use the "Save As..." button from the same window.
+              CALL SetChildWinAutoClose(iHandle)
+            CASE (IDBSAVE)
+              iFlags = SaveDialog + AppendExt + PromptOn
+              FILTER = 'DICVOL output files (*.out)|*.out|'
+              tFileName = ''
+              CALL WSelectFile(FILTER,iFlags,tFileName,'Save DICVOL output file')
+! The following is also correct if we save to a different directory.
+              IF ((WInfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
+                CALL IOsCopyFile(DV_FileName,tFileName)
+              ENDIF
           END SELECT
           CALL PopActiveWindowID
           RETURN
       END SELECT
-      DO irow = 1, NumOfDICVOLSolutions
-        CALL WGridGetCellCheckBox(IDF_DV_Summary_0,1,irow,istatus)
-        IF (istatus .EQ. 1) THEN
+      DO iRow = 1, NumOfDICVOLSolutions
+        CALL WGridGetCellCheckBox(IDF_DV_Summary_0,1,iRow,iStatus)
+        IF (iStatus .EQ. 1) THEN
 ! Import the unit cell parameters into DASH
-          CellPar(1) = DICVOLSolutions(irow)%a
-          CellPar(2) = DICVOLSolutions(irow)%b
-          CellPar(3) = DICVOLSolutions(irow)%c
-          CellPar(4) = DICVOLSolutions(irow)%alpha
-          CellPar(5) = DICVOLSolutions(irow)%beta
-          CellPar(6) = DICVOLSolutions(irow)%gamma
-          LatBrav = DICVOLSolutions(irow)%CrystalSystem
-          CALL WGridPutCellCheckBox(IDF_DV_Summary_0,1,irow,0)
+          CellPar(1) = DICVOLSolutions(iRow)%a
+          CellPar(2) = DICVOLSolutions(iRow)%b
+          CellPar(3) = DICVOLSolutions(iRow)%c
+          CellPar(4) = DICVOLSolutions(iRow)%alpha
+          CellPar(5) = DICVOLSolutions(iRow)%beta
+          CellPar(6) = DICVOLSolutions(iRow)%gamma
+          LatBrav = DICVOLSolutions(iRow)%CrystalSystem
+          CALL WGridPutCellCheckBox(IDF_DV_Summary_0,1,iRow,0)
           CALL Upload_CrystalSystem
-          CALL UpdateCell()
+          CALL UpdateCell
         ENDIF
       ENDDO               
       CALL PopActiveWindowID
