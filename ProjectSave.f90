@@ -69,6 +69,7 @@
         CALL FileWriteLogical(tFileHandle,RecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
         CALL FileWriteInteger(tFileHandle,RecNr,LBIN)
       ENDIF
+! Store the Z-matrices
       CALL FileWriteInteger(tFileHandle,RecNr,nfrag)
       IF (nfrag .GT. 0) THEN
         DO ifrg = 1, maxfrg
