@@ -38,12 +38,12 @@
 !               'DASH powder diffraction files (*.xye)|*.xye|'//&
 !               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
       FILTER = 'All files (*.*)|*.*|'//&
-               'All powder diffraction files|*.cpi;*.mdi;*.pod;*.raw;*.rd;*.sd;*.txt;*.udf;*.uxd;*.xye;*.x01|'//&
+               'All powder diffraction files|*.asc;*.cpi;*.mdi;*.pod;*.raw;*.rd;*.sd;*.txt;*.udf;*.uxd;*.xye;*.x01|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
       tFileName = ' '
-      CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open Powder Diffraction File',IFTYPE)
+      CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Open Powder Diffraction File', IFTYPE)
 ! Did the user press cancel?
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) THEN
         DiffractionFileBrowse = 2
@@ -146,6 +146,7 @@
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
 
+      INTEGER, EXTERNAL :: Load_asc_File
       INTEGER, EXTERNAL :: Load_cpi_File
       INTEGER, EXTERNAL :: Load_dat_File
       INTEGER, EXTERNAL :: Load_mdi_File
@@ -185,6 +186,8 @@
       CALL ILowerCase(EXT4)
       NoWavelengthInXYE = .FALSE.
       SELECT CASE (EXT4)
+        CASE ('asc ')
+          ISTAT = Load_asc_File(TheFileName, ESDsFilled)
         CASE ('cpi ')
           ISTAT = Load_cpi_File(TheFileName, ESDsFilled)
         CASE ('dat ')
@@ -287,7 +290,270 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_cpi_File(TheFileName,ESDsFilled)
+      INTEGER FUNCTION Load_asc_File(TheFileName, ESDsFilled)
+!
+! This function tries to load a *.asc file (ASCII format from Rigaku).
+! The routine basically assumes that the file is OK.
+!
+! Note that this function should only be called from DiffractionFileLoad
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+!
+! RETURNS : 0 for success
+!           1 for error (could be file not found/file in use/no valid data)
+!
+      USE WINTERACTER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      LOGICAL,       INTENT (  OUT) :: ESDsFilled
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
+      INTEGER, EXTERNAL :: GetNumOfColumns
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption
+      LOGICAL, EXTERNAL :: StrFind
+      CHARACTER*255 tString ! String containing last line read from file
+      CHARACTER*255 tSubString, Cline
+      INTEGER       tLen, NumOfBins, NumOfBinsFile
+      REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
+      INTEGER       I, J, hFile, NumOfColumns2Read
+      INTEGER       MEAS_MODE ! 0 = undefined, 1 = continuous, 2 = step
+      REAL          Lambda1
+      REAL          TempInput(8) ! Max. num. of columns is 8
+
+! Current status, initialise to 'error'
+      Load_asc_File = 1
+      Lambda1       = 0.0
+      TwoThetaStart = 0.0
+      TwoThetaEnd   = 0.0
+      TwoThetaStep  = 0.0
+      NumOfBinsFile = 0
+      MEAS_MODE = 0
+      hFile = 10
+      OPEN(UNIT=hFile, FILE=TheFileName, STATUS='OLD', ERR=999)
+! *.asc files look like this:
+!
+!*TYPE		=  Raw
+!*CLASS		=  ASCII CLASS
+!*SAMPLE		=  ASZTK
+!*COMMENT	=  Qualitative (demo)
+!*FNAME		=  Asztk.raw
+!*DATE		=  25-Dec-97 19:12
+!
+!*GROUP_COUNT	=  1                         I think that GROUP_COUNT = number of dataranges
+!*GONIO		=  Wide angle goniometer, 185
+!*ATTACHMENT	=  Standerd specimen attachment
+!*ASC		=  0, 0, 0.000000, 0.000000
+!*FILTER		=  K beta filter
+!*SLIT_NAME	=  0, Divergence
+!*SLIT_NAME	=  1, Scattering
+!*SLIT_NAME	=  2, Receiving
+!*COUNTER	=  , 0
+!*POS_FORMAT	=  0
+!*SCAN_AXIS	=  2theta/theta
+!*MEAS_MODE	=  Continuous Scanning
+!*TARGET		=  29
+!*XRAY_CHAR	=  K-ALPHA1
+!*WAVE_LENGTH1	=  1.54056
+!*WAVE_LENGTH2	=  1.5444
+!*THICKNESS	=  0, 0.000000
+!*MU		=  0, 0.000000
+!*SCAN_MODE	=  2theta/theta
+!*SPEED_DIM	=  sec./step
+!*XUNIT		=  deg.
+!*YUNIT		=  cps
+!*SCALE_MODE	=  1
+!*REP_COUNT	=  1
+!*SE_COUNT	=  12
+!*SYS_ERROR	=  0, 28.394, 0.000000, 1, 1, 1
+!<snip>
+!*SYS_ERROR	=  11, 0.000000, 0.000000, 0, 0, 0
+!*STD_MATERIAL	=  Unknown, Unknown, 5.4301, 5.4301, 5.4301, 90, 90, 90
+!*LATT_CONS	=  0, Unknown, Unknown, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000
+!*SEC_COUNT	=  1
+!*TSPEC_SIZE	=  0
+!*EXTRA_SIZE	=  0
+!*MEMO		=  
+!
+!*BEGIN
+!*GROUP		=  0                 The BEGIN/END/GROUP labels suggest that multiple data ranges are possible.
+!*START		=  3
+!*STOP		=  90
+!*STEP		=  0.02
+!*OFFSET		=  0.000000
+!*SPEED		=  0.4
+!*SLIT_SPEC	=  0, Slit ( 60 min ), 1.74, 10
+!*SLIT_SPEC	=  1, Slit ( 60 min ), 0.94, 20
+!*SLIT_SPEC	=  2, Slit ( 0.15 mm ), 0.15, 20
+!*KV		=  60
+!*MA		=  200
+!*LOW		=  0.000000
+!*HIGH		=  0.000000
+!*CTEMPER	=  0, 0.000000
+!*CTEMPER	=  1, 0.000000
+!*CTEMPER	=  2, 0.000000
+!*PAREX		=  0, 0.000000
+!<snip>
+!*PAREX		=  15, 0.000000
+!*FULL_SCALE	=  30000
+!*INDEX		=  0, 0, 0
+!*COUNT		=  4351                                The number of values (bins)
+!948, 952.8, 990, 962.8
+!994.8, 948, 938.4, 890.4
+!931.2, 897.6, 912, 907.2
+!<snip>
+!181.6, 173.2, 213.6, 241.2
+!333.2, 417.6, 469.2, 425.6
+!354, 278, 230.4, 174
+!119.6, 126, 0.000000
+!*END
+!
+!*EOF
+!
+!
+    9 READ(hFile, FMT='(A)', ERR=999, END=999) tString
+      CALL StrUpperCase(tString)
+      CALL StrClean(tString, tLen)
+      IF (StrFind(tString, tLen, '*WAVE_LENGTH1', 13) .NE. 0) THEN
+! Extract wavelength
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        READ (tSubString, *, ERR=999) Lambda1
+      ENDIF
+      IF (StrFind(tString, tLen, '*MEAS_MODE', 10) .NE. 0) THEN
+! Extract measurement mode (step / scan)
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        IF (tSubString .EQ. "CONTINUOUS") MEAS_MODE = 1
+      ENDIF
+      IF (StrFind(tString, tLen, '*START', 6) .NE. 0) THEN
+! Extract TwoThetaStart
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        READ (tSubString, *, ERR=999) TwoThetaStart
+      ENDIF
+      IF (StrFind(tString, tLen, '*STOP', 5) .NE. 0) THEN
+! Extract TwoThetaEnd
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        READ (tSubString, *, ERR=999) TwoThetaEnd
+      ENDIF
+      IF (StrFind(tString, tLen, '*STEP', 5) .NE. 0) THEN
+! Extract TwoThetaStep
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        READ (tSubString, *, ERR=999) TwoThetaStep
+      ENDIF
+! Detect start of data
+      IF (StrFind(tString, tLen, '*COUNT =', 8) .NE. 0) THEN
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        CALL GetSubString(tString, ' ', tSubString)
+        READ (tSubString, *, ERR=999) NumOfBinsFile
+        GOTO 10
+      ENDIF
+      GOTO 9
+   10 CONTINUE
+! Calculate how many bins we expect.
+! Quick check if values have been read at all.
+      IF (TwoThetaStart .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta starting value not found.')
+        GOTO 999
+      ENDIF
+      IF (TwoThetaEnd   .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta end value not found.')
+        GOTO 999
+      ENDIF
+      IF (TwoThetaStep  .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta step size not found.')
+        GOTO 999
+      ENDIF
+      IF (NumOfBinsFile .EQ. 0) THEN
+        CALL ErrorMessage('Number of data points not found not found.')
+        GOTO 999
+      ENDIF
+! Note that NINT correctly rounds to the nearest whole number
+      NumOfBins = 1 + NINT((TwoThetaEnd - TwoThetaStart) / TwoThetaStep)
+      ! Adjust number of bins if continuous scan
+      IF (MEAS_MODE .EQ. 1) NumOfBins = NumOfBins - 1
+! Check that we will not read more than MOBS data points
+      IF (NumOfBins .GT. MOBS) THEN
+! Warn the user
+        CALL ProfileRead_TruncationWarning(TheFileName, MOBS)
+        NumOfBins = MOBS
+      ENDIF
+! Check that we will not read less than 1 data point
+      IF (NumOfBins .EQ. 0) THEN
+! The user should be warned here
+        CALL ErrorMessage("The file does not contain enough data points.")
+        GOTO 999
+      ENDIF
+! Fill the 2theta values first
+      CurrTwoTheta = TwoThetaStart
+      IF (MEAS_MODE .EQ. 1) CurrTwoTheta = CurrTwoTheta - (TwoThetaStep/2.0)
+      DO I = 1, NumOfBins
+        XOBS(I) = CurrTwoTheta
+        CurrTwoTheta = CurrTwoTheta + TwoThetaStep
+      ENDDO
+      READ(UNIT=hFile, FMT='(A)', ERR=999, END=100) Cline
+      I = 0
+! Next, we have to determine how many columns to read from the next line.
+! There are two conditions:
+! 1. the number of columns actually present in the string (GetNumOfColumns)
+! 2. the number of data point still to be read (NumOfBins - I)
+   11 NumOfColumns2Read = MIN(GetNumOfColumns(Cline),NumOfBins - I)
+      READ(Cline, *, ERR=999) TempInput(1:NumOfColumns2Read)
+! Next couple of lines rather clumsy, but safe.
+      DO J = 1, NumOfColumns2Read
+        YOBS(I+J) = TempInput(J)
+      ENDDO
+      I = I + NumOfColumns2Read
+      READ(UNIT=10, FMT='(A)', ERR=999, END=100) Cline
+      GOTO 11
+  100 NOBS = I
+      IF (NOBS .LT. NumOfBins) CALL WarningMessage('File contained less data points than expected.'//CHAR(13)// &
+                                                   'Will continue with points actually read only.')
+      IF (NOBS .EQ. 0) THEN
+! The user should be warned here
+        CALL ErrorMessage("The file does not contain enough data points.")
+        GOTO 999
+      ENDIF
+      ESDsFilled = .FALSE.
+! If wavelength present in file add in a test: if wavelength close to known anode material,
+! set source to laboratory. Otherwise, source is synchrotron.
+      IF (Lambda1 .GT. 0.01) THEN
+! Initialise source material to synchrotron
+        JRadOption = 2
+        DO I = 2, 6
+          IF (ABS(Lambda1 - FnWavelengthOfMenuOption(I)) .LT. 0.0003) JRadOption = 1
+        ENDDO
+        CALL Upload_Source
+        CALL Set_Wavelength(Lambda1)
+      ENDIF
+      Load_asc_File = 0
+! Exit code is error by default, so we can simply return
+ 999  CLOSE(hFile)
+
+      END FUNCTION Load_asc_File
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION Load_cpi_File(TheFileName, ESDsFilled)
 !
 ! This function tries to load a *.cpi file (ASCII format from Sietronics).
 ! The routine basically assumes that the file is OK.
@@ -333,7 +599,7 @@
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
       hFile = 10
-      OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile, FILE=TheFileName, STATUS='OLD', ERR=999)
 ! *.cpi files look like this:
 !
 !SIETRONICS XRD SCAN               ! File identification marker (copy exactly)
@@ -358,19 +624,19 @@
 !
 
 ! Read the header line
-      READ(hFile,FMT='(A)',ERR=999,END=999) tString
+      READ(hFile, FMT='(A)', ERR=999, END=999) tString
       IF ((tString .NE. 'SIETRONICS XRD SCAN') .AND. (tString .NE. 'Calculated Values from PowderCell')) THEN
         CALL ErrorMessage('File identification marker missing.')
         GOTO 999
       ENDIF
-      READ(hFile,*,ERR=999,END=999) TwoThetaStart
-      READ(hFile,*,ERR=999,END=999) TwoThetaEnd
-      READ(hFile,*,ERR=999,END=999) TwoThetaStep
-      READ(hFile,'(A2)',ERR=999,END=999) Anode
-      READ(hFile,*,ERR=999,END=999) Lambda1
-      READ(hFile,FMT='(A)',ERR=999,END=999) tString
+      READ(hFile, *, ERR=999, END=999) TwoThetaStart
+      READ(hFile, *, ERR=999, END=999) TwoThetaEnd
+      READ(hFile, *, ERR=999, END=999) TwoThetaStep
+      READ(hFile, '(A2)', ERR=999, END=999) Anode
+      READ(hFile, *, ERR=999, END=999) Lambda1
+      READ(hFile, FMT='(A)', ERR=999, END=999) tString
       DO WHILE (tString .NE. 'SCANDATA')
-        READ(hFile,FMT='(A)',ERR=999,END=999) tString
+        READ(hFile, FMT='(A)', ERR=999, END=999) tString
       ENDDO
 ! Calculate how many bins we expect.
 ! Quick check if values have been read at all.
@@ -391,7 +657,7 @@
 ! Check that we will not read more than MOBS data points
       IF (NumOfBins .GT. MOBS) THEN
 ! Warn the user
-        CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+        CALL ProfileRead_TruncationWarning(TheFileName, MOBS)
         NumOfBins = MOBS
       ENDIF
 ! Check that we will not read less than 1 data point
@@ -437,7 +703,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_dat_File(TheFileName,ESDsFilled)
+      INTEGER FUNCTION Load_dat_File(TheFileName, ESDsFilled)
 !
 ! This function tries to load a *.dat file (ASCII format used by Armel Le Bail).
 ! The routine basically assumes that the file is OK.
@@ -479,7 +745,7 @@
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
       hFile = 10
-      OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile, FILE=TheFileName, STATUS='OLD', ERR=999)
 ! *.dat files look like this:
 !
 
@@ -497,7 +763,7 @@
 
 
 ! Read the header line
-    9 READ(hFile,*,ERR=999,END=999) TwoThetaStart, TwoThetaStep, TwoThetaEnd
+    9 READ(hFile, *, ERR=999, END=999) TwoThetaStart, TwoThetaStep, TwoThetaEnd
 ! The number of counts per 2theta should commence from here.
 ! Calculate how many bins we expect.
 ! Quick check if values have been read at all.
@@ -518,7 +784,7 @@
 ! Check that we will not read more than MOBS data points
       IF (NumOfBins .GT. MOBS) THEN
 ! Warn the user
-        CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+        CALL ProfileRead_TruncationWarning(TheFileName, MOBS)
         NumOfBins = MOBS
       ENDIF
 ! Check that we will not read less than 1 data point
@@ -568,7 +834,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_mdi_File(TheFileName,ESDsFilled)
+      INTEGER FUNCTION Load_mdi_File(TheFileName, ESDsFilled)
 !
 ! This function tries to load a *.mdi file (ASCII format from Materials Data Inc.).
 ! The routine basically assumes that the file is OK.
@@ -1083,7 +1349,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_sci_File(TheFileName,ESDsFilled)
+      INTEGER FUNCTION Load_sci_File(TheFileName, ESDsFilled)
 !
 ! This function tries to load a *.txt file (Scintag ASCII powder pattern format).
 !
