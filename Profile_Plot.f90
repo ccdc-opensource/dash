@@ -49,22 +49,24 @@
       CALL Plot_Panel()
       CALL Plot_Custom_Axes()
       CALL IPgBorder()
+      IF (.NOT. NoData) THEN
 ! Observed profile
-      SELECT CASE (ABS(IPTYPE))
-        CASE (1) 
-          CALL Plot_Observed_Profile()
-        CASE (2) 
-          CALL Plot_ObsCalc_Profile()
-      END SELECT
-      IF (.NOT. PastPawley) THEN
+        SELECT CASE (ABS(IPTYPE))
+          CASE (1) 
+            CALL Plot_Observed_Profile()
+          CASE (2) 
+            CALL Plot_ObsCalc_Profile()
+        END SELECT
+        IF (.NOT. PastPawley) THEN
 ! Plot peakfit ranges
-        IF (NumPeakFitRange .GT. 0) CALL Plot_PeakFit_Info()
+          IF (NumPeakFitRange .GT. 0) CALL Plot_PeakFit_Info()
 ! Plot Background
-        IF (PlotBackground()) CALL Plot_Background()
-      ENDIF
+          IF (PlotBackground()) CALL Plot_Background()
+        ENDIF
 !  Plot tic marks etc. if appropriate
-      IF (NTIC .NE. 0) CALL Plot_Calculated_Tics()
+        IF (NTIC .NE. 0) CALL Plot_Calculated_Tics()
 !   Switch off hardcopy
+      ENDIF
       IF (IPTYPE .LT. 0) THEN
         CALL IGrHardCopy('S')
         CALL IGrInit('P')
