@@ -52,8 +52,6 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INCLUDE 'GLBVAR.INC'
-
       LOGICAL FExists
       INTEGER KLEN
 
@@ -77,8 +75,7 @@
       ENDIF
 ! Disable Pawley refinement button if we are 'PastPawley'
       IF (PastPawley) CALL SetModeMenuState(-1,-1)
-      STATBARSTR(1) = FNAME
-      CALL WindowOutStatusBar(1,STATBARSTR(1))
+      CALL WindowOutStatusBar(1,FNAME)
 ! update the file name of the project in the SA pop up
       CALL SetSAFileName(FNAME(1:KLEN))
       
@@ -117,8 +114,6 @@
       INTEGER i
       INTEGER ihcver,ipiker,iloger,idsler
       INTEGER, EXTERNAL :: GetCrystalSystem, GETTIC
-      LOGICAL, EXTERNAL :: FnPatternOK, FnWavelengthOK
-      REAL, EXTERNAL :: TwoTheta2dSpacing
       INTEGER iHandle
       LOGICAL TicExists
       LOGICAL HcvExists
@@ -217,10 +212,7 @@
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
       CALL WDialogSelect(IDD_PW_Page8)
       CALL WDialogFieldState(IDB_PrevRes,Disabled)
-      IF (FnPatternOK() .AND. FnWavelengthOK()) THEN
-        CALL WDialogSelect(IDD_ViewPawley)
-        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(RefArgK(NumOfRef)))
-      ENDIF
+      CALL Update_TruncationLimits
       RETURN
  999  CALL ErrorMessage('Error reading .sdi file.')
       CLOSE(iHandle) 
@@ -338,7 +330,7 @@
             ScalFac = Temp        
         END SELECT
       ENDDO       
- 100  BACKREF = .FALSE.
+ 100  BackRef = .FALSE.
       iErr = 0
   999 CLOSE(hFile)
 
