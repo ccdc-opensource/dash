@@ -114,11 +114,12 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
 
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
@@ -131,7 +132,7 @@
 
       INTEGER I
       REAL Grid_ProfileChi, Grid_IntensityChi
-      CHARACTER*255 Grid_Buffer
+      CHARACTER(MaxPathLength) Grid_Buffer
 
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
       OPEN(unit=101, file=log_file(1:log_flen), status = 'unknown', err = 99)

@@ -120,12 +120,7 @@
       IF (ISTAT .EQ. 0) RETURN
 ! Enable the appropriate menus:
       CALL SetModeMenuState(1,-1)
-      IF (LEN_TRIM(FNAME) .GT. 80) THEN
-        CALL DebugErrorMessage('FNAME too long in DiffractionFileOpen')
-        DashRawFile = FNAME(1:80)
-      ELSE
-        DashRawFile = FNAME(1:LEN_TRIM(FNAME))
-      ENDIF
+      DashRawFile = FNAME(1:LEN_TRIM(FNAME))
 ! Set minimum and maximum truncation values in Wizard in accordance with data read in
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)

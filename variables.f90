@@ -35,12 +35,12 @@
       DATA ProgramVersion / 'DASH 2.0' /
 
 ! File information; Names of files used by DASH For I/O
-      CHARACTER*80  DashTicFile
-      CHARACTER*80  DashHcvFile
-      CHARACTER*80  DashHklFile
-      CHARACTER*80  DashPikFile
-      CHARACTER*80  DashRawFile
-      CHARACTER*80  DashDslFile
+      CHARACTER(MaxPathLength)  DashTicFile
+      CHARACTER(MaxPathLength)  DashHcvFile
+      CHARACTER(MaxPathLength)  DashHklFile
+      CHARACTER(MaxPathLength)  DashPikFile
+      CHARACTER(MaxPathLength)  DashRawFile
+      CHARACTER(MaxPathLength)  DashDslFile
 
       LOGICAL TicExists
       LOGICAL HcvExists

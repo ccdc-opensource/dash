@@ -47,8 +47,8 @@
       REAL                pdbAtmCoords
       COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:MaxRun)
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
 
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
@@ -704,12 +704,14 @@
 !
       SUBROUTINE AddSingleSolution(ProfileChi,IntensityChi)
 
+      USE VARIABLES
+
       IMPLICIT NONE
 
       REAL ProfileChi, IntensityChi
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
 
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
@@ -722,6 +724,8 @@
 !
       SUBROUTINE AddMultiSolution(ProfileChi,IntensityChi)
 
+      USE VARIABLES
+
       IMPLICIT NONE
 
       REAL ProfileChi, IntensityChi
@@ -732,13 +736,13 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
+      CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
 
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
-      CHARACTER*85 new_fname
+      CHARACTER(MaxPathLength) new_fname
 
       CALL AppendNumToFileName(SA_Run_Number,cssr_file,new_fname)
       CALL IOsDeleteFile(new_fname)

@@ -57,7 +57,7 @@
 
 ! nfrag = number of fragments
 
-      CHARACTER*80    frag_file(1:maxfrg)
+      CHARACTER*255    frag_file(1:maxfrg)
 
 ! frag_file = name of the .zmatrix file containing fragment number ifrag
 
