@@ -320,6 +320,12 @@
       CALL PrjReadWriteSolutions
       CALL PrjErrTrace
       IF (RW .EQ. cRead) THEN
+! Grey out the "Save... chi sqrd progress"
+        CALL WDialogSelect(IDD_OutputSolutions)
+        CALL WDialogFieldState(IDF_GROUP2,Disabled)
+        CALL WDialogFieldState(IDB_OutputChiSqd,Disabled)
+        CALL WDialogFieldState(IDF_LABEL5,Disabled)
+        CALL WDialogFieldState(IDF_LABEL3,Disabled)
         CALL WDialogSelect(IDD_ViewPawley)
         CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
         CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
