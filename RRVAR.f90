@@ -32,6 +32,13 @@
 ! iopta  = optimise valence angle 1=YES, 0=NO.
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
 
+      LOGICAL RR_Show_bond(1:RR_maxatm,1:RR_maxfrg)
+      LOGICAL RR_Show_angle(1:RR_maxatm,1:RR_maxfrg)
+      LOGICAL RR_Show_torsion(1:RR_maxatm,1:RR_maxfrg)
+
+! Optimising torsions/angles/bonds with Hydrogens in them does not make much sense,
+! so these parameters can be hidden from the Rietveld refinement dialogue.
+
       REAL RR_tran(1:3,1:RR_maxfrg,1:RR_maxcopies)
       REAL RR_rot(1:4,1:RR_maxfrg,1:RR_maxcopies)
       REAL RR_blen(1:RR_maxatm,1:RR_maxfrg,1:RR_maxcopies)
