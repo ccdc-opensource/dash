@@ -579,7 +579,6 @@
       DO iFrg = 1, maxfrg
         CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, gotzmfile(iFrg))
         IF (gotzmfile(iFrg)) THEN
-          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmNumberOfCopies(iFrg))
           CALL FileRWString (hPrjFile, iPrjRecNr, RW, frag_file(iFrg))
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmpar(iFrg))
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, icomflg(iFrg))
@@ -622,7 +621,8 @@
               CALL FileReadReal(hPrjFile,iPrjRecNr,zmInitialQs(3,iFrg))
             ENDIF
             CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxDef(iFrg))
-            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(1,iFrg))
+            CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(2,iFrg))
             CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(1,iFrg))
             CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(2,iFrg))
             CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(3,iFrg))

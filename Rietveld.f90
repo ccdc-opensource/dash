@@ -43,7 +43,6 @@
 
       INTEGER KK, i, J
       INTEGER iFrg
-      INTEGER iFrgCopy
       INTEGER iRow, iCol, iField
       REAL ChiSqd, ChiProSqd 
       INTEGER tFieldState
@@ -56,50 +55,48 @@
 ! Loop over all the fragments
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            ! Position centre of mass inside unit cell
-            RR_tran(1,iFrg,iFrgCopy) = BestValuesDoF(KK+1,Curr_SA_Run)
-            RR_tran(2,iFrg,iFrgCopy) = BestValuesDoF(KK+2,Curr_SA_Run)
-            RR_tran(3,iFrg,iFrgCopy) = BestValuesDoF(KK+3,Curr_SA_Run)
-            KK = KK + 3
+          ! Position centre of mass inside unit cell
+          RR_tran(1,iFrg) = BestValuesDoF(KK+1,Curr_SA_Run)
+          RR_tran(2,iFrg) = BestValuesDoF(KK+2,Curr_SA_Run)
+          RR_tran(3,iFrg) = BestValuesDoF(KK+3,Curr_SA_Run)
+          KK = KK + 3
 ! If more than one atom then proceed
-            IF (natoms(iFrg) .GT. 1) THEN
+          IF (natoms(iFrg) .GT. 1) THEN
 ! If we have at least two atoms, there are two options:
 ! 1. Rotate the whole molecule freely, using quaternions
 ! 2. Specify the rotation axis (e.g. if molecule on mirror plane)
-              IF (UseQuaternions(iFrg)) THEN
-                RR_rot(1,iFrg,iFrgCopy) = BestValuesDoF(KK+1,Curr_SA_Run)
-                RR_rot(2,iFrg,iFrgCopy) = BestValuesDoF(KK+2,Curr_SA_Run)
-                RR_rot(3,iFrg,iFrgCopy) = BestValuesDoF(KK+3,Curr_SA_Run)
-                RR_rot(4,iFrg,iFrgCopy) = BestValuesDoF(KK+4,Curr_SA_Run)
-                KK = KK + 4
-              ELSE
+            IF (UseQuaternions(iFrg)) THEN
+              RR_rot(1,iFrg) = BestValuesDoF(KK+1,Curr_SA_Run)
+              RR_rot(2,iFrg) = BestValuesDoF(KK+2,Curr_SA_Run)
+              RR_rot(3,iFrg) = BestValuesDoF(KK+3,Curr_SA_Run)
+              RR_rot(4,iFrg) = BestValuesDoF(KK+4,Curr_SA_Run)
+              KK = KK + 4
+            ELSE
 ! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
-                RR_rot(1,iFrg,iFrgCopy) = BestValuesDoF(KK+1,Curr_SA_Run)
-                RR_rot(2,iFrg,iFrgCopy) = BestValuesDoF(KK+2,Curr_SA_Run)
-                KK = KK + 2
-              ENDIF
+              RR_rot(1,iFrg) = BestValuesDoF(KK+1,Curr_SA_Run)
+              RR_rot(2,iFrg) = BestValuesDoF(KK+2,Curr_SA_Run)
+              KK = KK + 2
             ENDIF
-            DO I = 1, natoms(iFrg)
-              IF (IOPTB(i,iFrg) .EQ. 1) THEN
-                KK = KK + 1
-                RR_blen(i,iFrg,iFrgCopy) = BestValuesDoF(KK,Curr_SA_Run)
-              ELSE
-                RR_blen(i,iFrg,iFrgCopy) = blen(i,iFrg)
-              ENDIF
-              IF (IOPTA(i,iFrg) .EQ. 1) THEN
-                KK = KK + 1
-                RR_alph(i,iFrg,iFrgCopy) = BestValuesDoF(KK,Curr_SA_Run)
-              ELSE
-                RR_alph(i,iFrg,iFrgCopy) = alph(i,iFrg)
-              ENDIF
-              IF (IOPTT(i,iFrg) .EQ. 1) THEN
-                KK = KK + 1
-                RR_bet(i,iFrg,iFrgCopy) = BestValuesDoF(KK,Curr_SA_Run)
-              ELSE
-                RR_bet(i,iFrg,iFrgCopy) = bet(i,iFrg)
-              ENDIF
-            ENDDO
+          ENDIF
+          DO I = 1, natoms(iFrg)
+            IF (IOPTB(i,iFrg) .EQ. 1) THEN
+              KK = KK + 1
+              RR_blen(i,iFrg) = BestValuesDoF(KK,Curr_SA_Run)
+            ELSE
+              RR_blen(i,iFrg) = blen(i,iFrg)
+            ENDIF
+            IF (IOPTA(i,iFrg) .EQ. 1) THEN
+              KK = KK + 1
+              RR_alph(i,iFrg) = BestValuesDoF(KK,Curr_SA_Run)
+            ELSE
+              RR_alph(i,iFrg) = alph(i,iFrg)
+            ENDIF
+            IF (IOPTT(i,iFrg) .EQ. 1) THEN
+              KK = KK + 1
+              RR_bet(i,iFrg) = BestValuesDoF(KK,Curr_SA_Run)
+            ELSE
+              RR_bet(i,iFrg) = bet(i,iFrg)
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -132,28 +129,26 @@
       iField = IDF_RR_ZmatrixGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            ! Translations
-            CALL WGridLabelRow(iField, iRow, 'x')
+          ! Translations
+          CALL WGridLabelRow(iField, iRow, 'x')
+          iRow = iRow + 1
+          CALL WGridLabelRow(iField, iRow, 'y')
+          iRow = iRow + 1
+          CALL WGridLabelRow(iField, iRow, 'z')
+          iRow = iRow + 1
+          ! Rotations
+          IF (natoms(iFrg) .NE. 1) THEN
+            CALL WGridLabelRow(iField, iRow, 'Q0')
             iRow = iRow + 1
-            CALL WGridLabelRow(iField, iRow, 'y')
+            CALL WGridLabelRow(iField, iRow, 'Q1')
             iRow = iRow + 1
-            CALL WGridLabelRow(iField, iRow, 'z')
-            iRow = iRow + 1
-            ! Rotations
-            IF (natoms(iFrg) .NE. 1) THEN
-              CALL WGridLabelRow(iField, iRow, 'Q0')
+            IF (UseQuaternions(iFrg)) THEN
+              CALL WGridLabelRow(iField, iRow, 'Q2')
               iRow = iRow + 1
-              CALL WGridLabelRow(iField, iRow, 'Q1')
+              CALL WGridLabelRow(iField, iRow, 'Q3')
               iRow = iRow + 1
-              IF (UseQuaternions(iFrg)) THEN
-                CALL WGridLabelRow(iField, iRow, 'Q2')
-                iRow = iRow + 1
-                CALL WGridLabelRow(iField, iRow, 'Q3')
-                iRow = iRow + 1
-              ENDIF
             ENDIF
-          ENDDO
+          ENDIF
         ENDIF
       ENDDO
       CALL WGridRows(iField, iRow-1)
@@ -210,10 +205,10 @@
 
       IMPLICIT NONE
 
-      INTEGER iFrg, i, iFrgCopy
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER iFrg, i
       INTEGER iRow, iCol, iField
       INTEGER Num
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
@@ -235,12 +230,10 @@
       iField = IDF_RR_BondGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 2, natoms(iFrg)
-              IF (RR_Show_bond(i, iFrg)) THEN
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 2, natoms(iFrg)
+            IF (RR_Show_bond(i, iFrg)) THEN
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -251,17 +244,15 @@
       Num = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 2, natoms(iFrg)
-              IF (RR_Show_bond(i, iFrg)) THEN
-                CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))// &
-                  ':'//OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg))))
-                CALL WGridPutCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy), "(F7.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg,iFrgCopy))
-                IF (RR_ioptb(i,iFrg,iFrgCopy) .EQ. 1) Num = Num + 1
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 2, natoms(iFrg)
+            IF (RR_Show_bond(i, iFrg)) THEN
+              CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))// &
+                ':'//OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg))))
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_blen(i,iFrg), "(F7.5)")
+              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg))
+              IF (RR_ioptb(i,iFrg) .EQ. 1) Num = Num + 1
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -281,10 +272,10 @@
 
       IMPLICIT NONE
 
-      INTEGER iFrg, i, iFrgCopy
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER iFrg, i
       INTEGER iRow, iCol, iField
       INTEGER Num
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
@@ -307,12 +298,10 @@
       iField = IDF_RR_AngleGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 3, natoms(iFrg)
-              IF (RR_Show_angle(i, iFrg)) THEN
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 3, natoms(iFrg)
+            IF (RR_Show_angle(i, iFrg)) THEN
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -323,18 +312,16 @@
       Num = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 3, natoms(iFrg)
-              IF (RR_Show_angle(i, iFrg)) THEN
-                CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
-                                    OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
-                                    OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg))))
-                CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg,iFrgCopy))
-                IF (RR_iopta(i,iFrg,iFrgCopy) .EQ. 1) Num = Num + 1
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 3, natoms(iFrg)
+            IF (RR_Show_angle(i, iFrg)) THEN
+              CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
+                                  OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
+                                  OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg))))
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg), "(F9.5)")
+              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg))
+              IF (RR_iopta(i,iFrg) .EQ. 1) Num = Num + 1
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -354,10 +341,10 @@
 
       IMPLICIT NONE
 
-      INTEGER iFrg, i, iFrgCopy
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER iFrg, i
       INTEGER iRow, iCol, iField
       INTEGER Num
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Rietveld2)
@@ -378,12 +365,10 @@
       iField = IDF_RR_TorsionGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 4, natoms(iFrg)
-              IF (RR_Show_torsion(i, iFrg)) THEN
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 4, natoms(iFrg)
+            IF (RR_Show_torsion(i, iFrg)) THEN
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -394,19 +379,17 @@
       Num = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 4, natoms(iFrg)
-              IF (RR_Show_torsion(i, iFrg)) THEN
-                CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
-                                      OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
-                                      OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg)))//':'// &
-                                      OriginalLabel(iz3(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz3(i,iFrg),iFrg))))
-                CALL WGridPutCellReal(iField, iCol, iRow, RR_bet(i,iFrg,iFrgCopy), "(F10.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg,iFrgCopy))
-                IF (RR_ioptt(i,iFrg,iFrgCopy) .EQ. 1) Num = Num + 1
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 4, natoms(iFrg)
+            IF (RR_Show_torsion(i, iFrg)) THEN
+              CALL WGridLabelRow(iField, iRow, OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
+                                    OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
+                                    OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg)))//':'// &
+                                    OriginalLabel(iz3(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz3(i,iFrg),iFrg))))
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_bet(i,iFrg), "(F10.5)")
+              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg))
+              IF (RR_ioptt(i,iFrg) .EQ. 1) Num = Num + 1
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -498,47 +481,47 @@
               CALL Set_Show_bond
             CASE (IDB_Clear1)
               iValues = 0
-              CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid,2,iValues,100)
+              CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, 100)
               CALL WDialogPutInteger(IDI_Num1,0)
             CASE (IDB_Clear2)
               iValues = 0
-              CALL WGridPutCheckBox(IDF_RR_TorsionGrid,2,iValues,100)
+              CALL WGridPutCheckBox(IDF_RR_TorsionGrid, 2, iValues, 100)
               CALL WDialogPutInteger(IDI_Num2,0)
             CASE (IDB_Clear3)
               iValues = 0
-              CALL WGridPutCheckBox(IDF_RR_AngleGrid,2,iValues,100)
+              CALL WGridPutCheckBox(IDF_RR_AngleGrid, 2, iValues, 100)
               CALL WDialogPutInteger(IDI_Num3,0)
             CASE (IDB_Clear4)
               iValues = 0
-              CALL WGridPutCheckBox(IDF_RR_BondGrid,2,iValues,100)
+              CALL WGridPutCheckBox(IDF_RR_BondGrid, 2, iValues, 100)
               CALL WDialogPutInteger(IDI_Num4,0)
             CASE (IDB_Set1)
               iValues = 1
               NVALUES = 100
-              CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid,2,iValues,NVALUES)
-              CALL WGridGetCheckBox(IDF_RR_ZmatrixGrid,2,iValues,NVALUES)
+              CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
               CALL WDialogPutInteger(IDI_Num1,NVALUES)
             CASE (IDB_Set2)
               iValues = 1
               NVALUES = 100
-              CALL WGridPutCheckBox(IDF_RR_TorsionGrid,2,iValues,NVALUES)
-              CALL WGridGetCheckBox(IDF_RR_TorsionGrid,2,iValues,NVALUES)
+              CALL WGridPutCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
               CALL WDialogPutInteger(IDI_Num2,NVALUES)
             CASE (IDB_Set3)
               iValues = 1
               NVALUES = 100
-              CALL WGridPutCheckBox(IDF_RR_AngleGrid,2,iValues,NVALUES)
-              CALL WGridGetCheckBox(IDF_RR_AngleGrid,2,iValues,NVALUES)
+              CALL WGridPutCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
               CALL WDialogPutInteger(IDI_Num3,NVALUES)
             CASE (IDB_Set4)
               iValues = 1
               NVALUES = 100
-              CALL WGridPutCheckBox(IDF_RR_BondGrid,2,iValues,NVALUES)
-              CALL WGridGetCheckBox(IDF_RR_BondGrid,2,iValues,NVALUES)
-              CALL WDialogPutInteger(IDI_Num4,NVALUES)
+              CALL WGridPutCheckBox(IDF_RR_BondGrid, 2, iValues, NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_BondGrid, 2, iValues, NVALUES)
+              CALL WDialogPutInteger(IDI_Num4, NVALUES)
             CASE (IDB_PO_Settings)
               CALL WDialogSelect(IDD_RR_PO_Dialog)
-              CALL WDialogShow(-1,-1,0,SemiModeLess)
+              CALL WDialogShow(-1, -1, 0, SemiModeLess)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -550,7 +533,7 @@
               CALL Set_Show_bond
             CASE (IDF_RR_ZmatrixGrid)
               NVALUES = 100
-              CALL WGridGetCheckBox(IDF_RR_ZmatrixGrid,2,iValues,NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
               Num = 0
               DO i = 1, NVALUES
                 IF (iValues(i) .EQ. 1) Num = Num + 1
@@ -558,7 +541,7 @@
               CALL WDialogPutInteger(IDI_Num1,Num)
             CASE (IDF_RR_TorsionGrid)
               NVALUES = 100
-              CALL WGridGetCheckBox(IDF_RR_TorsionGrid,2,iValues,NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
               Num = 0
               DO i = 1, NVALUES
                 IF (iValues(i) .EQ. 1) Num = Num + 1
@@ -566,7 +549,7 @@
               CALL WDialogPutInteger(IDI_Num2,Num)
             CASE (IDF_RR_AngleGrid)
               NVALUES = 100
-              CALL WGridGetCheckBox(IDF_RR_AngleGrid,2,iValues,NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
               Num = 0
               DO i = 1, NVALUES
                 IF (iValues(i) .EQ. 1) Num = Num + 1
@@ -574,7 +557,7 @@
               CALL WDialogPutInteger(IDI_Num3,Num)
             CASE (IDF_RR_BondGrid)
               NVALUES = 100
-              CALL WGridGetCheckBox(IDF_RR_BondGrid,2,iValues,NVALUES)
+              CALL WGridGetCheckBox(IDF_RR_BondGrid, 2, iValues, NVALUES)
               Num = 0
               DO i = 1, NVALUES
                 IF (iValues(i) .EQ. 1) Num = Num + 1
@@ -598,9 +581,9 @@
 
       IMPLICIT NONE      
 
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       INTEGER tFieldState, iH, iK, iL
       REAL ChiSqd, ChiProSqd 
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_RR_PO_Dialog)
@@ -701,7 +684,7 @@
 
       IMPLICIT NONE
 
-      INTEGER i, iRow, iCol, iField, iFrg, iFrgCopy
+      INTEGER i, iRow, iCol, iField, iFrg
 
 ! Fill and display dialogue
       CALL PushActiveWindowID
@@ -711,35 +694,33 @@
       iField = IDF_RR_ZmatrixGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            ! Translations
-            CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(1,iFrg,iFrgCopy))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg,iFrgCopy))
+          ! Translations
+          CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(1,iFrg))
+          CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg))
+          iRow = iRow + 1
+          CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(2,iFrg))
+          CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg))
+          iRow = iRow + 1
+          CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(3,iFrg))
+          CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg))
+          iRow = iRow + 1
+          ! Rotations
+          IF (natoms(iFrg) .NE. 1) THEN
+            CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(1,iFrg))
+            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg))
             iRow = iRow + 1
-            CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(2,iFrg,iFrgCopy))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg,iFrgCopy))
+            CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(2,iFrg))
+            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg))
             iRow = iRow + 1
-            CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(3,iFrg,iFrgCopy))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg,iFrgCopy))
-            iRow = iRow + 1
-            ! Rotations
-            IF (natoms(iFrg) .NE. 1) THEN
-              CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(1,iFrg,iFrgCopy))
-              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg,iFrgCopy))
+            IF (UseQuaternions(iFrg)) THEN
+              CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(3,iFrg))
+              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg))
               iRow = iRow + 1
-              CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(2,iFrg,iFrgCopy))
-              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg,iFrgCopy))
+              CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(4,iFrg))
+              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg))
               iRow = iRow + 1
-              IF (UseQuaternions(iFrg)) THEN
-                CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(3,iFrg,iFrgCopy))
-                CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg,iFrgCopy))
-                iRow = iRow + 1
-                CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(4,iFrg,iFrgCopy))
-                CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg,iFrgCopy))
-                iRow = iRow + 1
-              ENDIF
             ENDIF
-          ENDDO
+          ENDIF
         ENDIF
       ENDDO
       iRow = 1
@@ -747,14 +728,12 @@
       iField = IDF_RR_BondGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 2, natoms(iFrg)
-              IF (RR_Show_bond(i, iFrg)) THEN
-                CALL WGridGetCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy))
-                CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg,iFrgCopy))
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 2, natoms(iFrg)
+            IF (RR_Show_bond(i, iFrg)) THEN
+              CALL WGridGetCellReal(iField, iCol, iRow, RR_blen(i,iFrg))
+              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg))
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -763,14 +742,12 @@
       iField = IDF_RR_AngleGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 3, natoms(iFrg)
-              IF (RR_Show_angle(i, iFrg)) THEN
-                CALL WGridGetCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy))
-                CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg,iFrgCopy))
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 3, natoms(iFrg)
+            IF (RR_Show_angle(i, iFrg)) THEN
+              CALL WGridGetCellReal(iField, iCol, iRow, RR_alph(i,iFrg))
+              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg))
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -779,14 +756,12 @@
       iField = IDF_RR_TorsionGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 4, natoms(iFrg)
-              IF (RR_Show_torsion(i, iFrg)) THEN
-                CALL WGridGetCellReal(iField, iCol, iRow, RR_bet(i,iFrg,iFrgCopy))
-                CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg,iFrgCopy))
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 4, natoms(iFrg)
+            IF (RR_Show_torsion(i, iFrg)) THEN
+              CALL WGridGetCellReal(iField, iCol, iRow, RR_bet(i,iFrg))
+              CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg))
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -809,7 +784,7 @@
 
       IMPLICIT NONE
 
-      INTEGER i, iRow, iCol, iField, iFrg, iFrgCopy
+      INTEGER i, iRow, iCol, iField, iFrg
 
 ! Fill and display dialogue
       CALL PushActiveWindowID
@@ -819,35 +794,33 @@
       iField = IDF_RR_ZmatrixGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            ! Translations
-            CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(1,iFrg,iFrgCopy), "(F7.5)")
-            CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg,iFrgCopy))
+          ! Translations
+          CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(1,iFrg), "(F7.5)")
+          CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg))
+          iRow = iRow + 1
+          CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(2,iFrg), "(F7.5)")
+          CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg))
+          iRow = iRow + 1
+          CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(3,iFrg), "(F7.5)")
+          CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg))
+          iRow = iRow + 1
+          ! Rotations
+          IF (natoms(iFrg) .NE. 1) THEN
+            CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(1,iFrg), "(F8.5)")
+            CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg))
             iRow = iRow + 1
-            CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(2,iFrg,iFrgCopy), "(F7.5)")
-            CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg,iFrgCopy))
+            CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(2,iFrg), "(F8.5)")
+            CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg))
             iRow = iRow + 1
-            CALL WGridPutCellReal(iField, iCol, iRow, RR_tran(3,iFrg,iFrgCopy), "(F7.5)")
-            CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg,iFrgCopy))
-            iRow = iRow + 1
-            ! Rotations
-            IF (natoms(iFrg) .NE. 1) THEN
-              CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(1,iFrg,iFrgCopy), "(F8.5)")
-              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg,iFrgCopy))
+            IF (UseQuaternions(iFrg)) THEN
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(3,iFrg), "(F8.5)")
+              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg))
               iRow = iRow + 1
-              CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(2,iFrg,iFrgCopy), "(F8.5)")
-              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg,iFrgCopy))
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(4,iFrg), "(F8.5)")
+              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg))
               iRow = iRow + 1
-              IF (UseQuaternions(iFrg)) THEN
-                CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(3,iFrg,iFrgCopy), "(F8.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg,iFrgCopy))
-                iRow = iRow + 1
-                CALL WGridPutCellReal(iField, iCol, iRow, RR_rot(4,iFrg,iFrgCopy), "(F8.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg,iFrgCopy))
-                iRow = iRow + 1
-              ENDIF
             ENDIF
-          ENDDO
+          ENDIF
         ENDIF
       ENDDO
       iRow = 1
@@ -855,14 +828,12 @@
       iField = IDF_RR_BondGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 2, natoms(iFrg)
-              IF (RR_Show_bond(i, iFrg)) THEN
-                CALL WGridPutCellReal(iField, iCol, iRow, RR_blen(i,iFrg,iFrgCopy), "(F7.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg,iFrgCopy))
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 2, natoms(iFrg)
+            IF (RR_Show_bond(i, iFrg)) THEN
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_blen(i,iFrg), "(F7.5)")
+              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg))
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -871,14 +842,12 @@
       iField = IDF_RR_AngleGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 3, natoms(iFrg)
-              IF (RR_Show_angle(i, iFrg)) THEN
-                CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg,iFrgCopy), "(F9.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg,iFrgCopy))
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 3, natoms(iFrg)
+            IF (RR_Show_angle(i, iFrg)) THEN
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_alph(i,iFrg), "(F9.5)")
+              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg))
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -887,14 +856,12 @@
       iField = IDF_RR_TorsionGrid
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 4, natoms(iFrg)
-              IF (RR_Show_torsion(i, iFrg)) THEN
-                CALL WGridPutCellReal(iField, iCol, iRow, RR_bet(i,iFrg,iFrgCopy), "(F10.5)")
-                CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg,iFrgCopy))
-                iRow = iRow + 1
-              ENDIF
-            ENDDO
+          DO i = 4, natoms(iFrg)
+            IF (RR_Show_torsion(i, iFrg)) THEN
+              CALL WGridPutCellReal(iField, iCol, iRow, RR_bet(i,iFrg), "(F10.5)")
+              CALL WGridPutCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg))
+              iRow = iRow + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -915,82 +882,74 @@
 
       IMPLICIT NONE
 
-      INTEGER i, iFrg, iFrgCopy, iParam
+      INTEGER i, iFrg, iParam
 
       iParam = 1
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            ! Translations
-            IF (RR_iopttran(1,iFrg,iFrgCopy) .EQ. 1) THEN
-              RR_tran(1,iFrg,iFrgCopy) = RR_Params(iParam)
+          ! Translations
+          IF (RR_iopttran(1,iFrg) .EQ. 1) THEN
+            RR_tran(1,iFrg) = RR_Params(iParam)
+            iParam = iParam + 1
+          ENDIF
+          IF (RR_iopttran(2,iFrg) .EQ. 1) THEN
+            RR_tran(2,iFrg) = RR_Params(iParam)
+            iParam = iParam + 1
+          ENDIF
+          IF (RR_iopttran(3,iFrg) .EQ. 1) THEN
+            RR_tran(3,iFrg) = RR_Params(iParam)
+            iParam = iParam + 1
+          ENDIF
+          ! Rotations
+          IF (natoms(iFrg) .NE. 1) THEN
+            IF (RR_ioptrot(1,iFrg) .EQ. 1) THEN
+              RR_rot(1,iFrg) = RR_Params(iParam)
               iParam = iParam + 1
             ENDIF
-            IF (RR_iopttran(2,iFrg,iFrgCopy) .EQ. 1) THEN
-              RR_tran(2,iFrg,iFrgCopy) = RR_Params(iParam)
+            IF (RR_ioptrot(2,iFrg) .EQ. 1) THEN
+              RR_rot(2,iFrg) = RR_Params(iParam)
               iParam = iParam + 1
             ENDIF
-            IF (RR_iopttran(3,iFrg,iFrgCopy) .EQ. 1) THEN
-              RR_tran(3,iFrg,iFrgCopy) = RR_Params(iParam)
-              iParam = iParam + 1
-            ENDIF
-            ! Rotations
-            IF (natoms(iFrg) .NE. 1) THEN
-              IF (RR_ioptrot(1,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_rot(1,iFrg,iFrgCopy) = RR_Params(iParam)
+            IF (UseQuaternions(iFrg)) THEN
+              IF (RR_ioptrot(3,iFrg) .EQ. 1) THEN
+                RR_rot(3,iFrg) = RR_Params(iParam)
                 iParam = iParam + 1
               ENDIF
-              IF (RR_ioptrot(2,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_rot(2,iFrg,iFrgCopy) = RR_Params(iParam)
+              IF (RR_ioptrot(4,iFrg) .EQ. 1) THEN
+                RR_rot(4,iFrg) = RR_Params(iParam)
                 iParam = iParam + 1
               ENDIF
-              IF (UseQuaternions(iFrg)) THEN
-                IF (RR_ioptrot(3,iFrg,iFrgCopy) .EQ. 1) THEN
-                  RR_rot(3,iFrg,iFrgCopy) = RR_Params(iParam)
-                  iParam = iParam + 1
-                ENDIF
-                IF (RR_ioptrot(4,iFrg,iFrgCopy) .EQ. 1) THEN
-                  RR_rot(4,iFrg,iFrgCopy) = RR_Params(iParam)
-                  iParam = iParam + 1
-                ENDIF
-              ENDIF
+            ENDIF
+          ENDIF
+        ENDIF
+      ENDDO
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO i = 2, natoms(iFrg)
+            IF (RR_ioptb(i,iFrg) .EQ. 1) THEN
+              RR_blen(i,iFrg) = RR_Params(iParam)
+              iParam = iParam + 1
             ENDIF
           ENDDO
         ENDIF
       ENDDO
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 2, natoms(iFrg)
-              IF (RR_ioptb(i,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_blen(i,iFrg,iFrgCopy) = RR_Params(iParam)
-                iParam = iParam + 1
-              ENDIF
-            ENDDO
+          DO i = 3, natoms(iFrg)
+            IF (RR_iopta(i,iFrg) .EQ. 1) THEN
+              RR_alph(i,iFrg) = RR_Params(iParam)
+              iParam = iParam + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 3, natoms(iFrg)
-              IF (RR_iopta(i,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_alph(i,iFrg,iFrgCopy) = RR_Params(iParam)
-                iParam = iParam + 1
-              ENDIF
-            ENDDO
-          ENDDO
-        ENDIF
-      ENDDO
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 4, natoms(iFrg)
-              IF (RR_ioptt(i,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_bet(i,iFrg,iFrgCopy) = RR_Params(iParam)
-                iParam = iParam + 1
-              ENDIF
-            ENDDO
+          DO i = 4, natoms(iFrg)
+            IF (RR_ioptt(i,iFrg) .EQ. 1) THEN
+              RR_bet(i,iFrg) = RR_Params(iParam)
+              iParam = iParam + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -1014,94 +973,86 @@
 
       IMPLICIT NONE
 
-      INTEGER i, iFrg, iFrgCopy, iParam
+      INTEGER i, iFrg, iParam
       REAL Damping
 
       Damping = 0.01
       iParam = 1
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            ! Translations
-            IF (RR_iopttran(1,iFrg,iFrgCopy) .EQ. 1) THEN
-              RR_Params(iParam) = RR_tran(1,iFrg,iFrgCopy)
+          ! Translations
+          IF (RR_iopttran(1,iFrg) .EQ. 1) THEN
+            RR_Params(iParam) = RR_tran(1,iFrg)
+            RR_InitSteps(iParam) = 0.1 * Damping
+            iParam = iParam + 1
+          ENDIF
+          IF (RR_iopttran(2,iFrg) .EQ. 1) THEN
+            RR_Params(iParam) = RR_tran(2,iFrg)
+            RR_InitSteps(iParam) = 0.1 * Damping
+            iParam = iParam + 1
+          ENDIF
+          IF (RR_iopttran(3,iFrg) .EQ. 1) THEN
+            RR_Params(iParam) = RR_tran(3,iFrg)
+            RR_InitSteps(iParam) = 0.1 * Damping
+            iParam = iParam + 1
+          ENDIF
+          ! Rotations
+          IF (natoms(iFrg) .NE. 1) THEN
+            IF (RR_ioptrot(1,iFrg) .EQ. 1) THEN
+              RR_Params(iParam) = RR_rot(1,iFrg)
               RR_InitSteps(iParam) = 0.1 * Damping
               iParam = iParam + 1
             ENDIF
-            IF (RR_iopttran(2,iFrg,iFrgCopy) .EQ. 1) THEN
-              RR_Params(iParam) = RR_tran(2,iFrg,iFrgCopy)
+            IF (RR_ioptrot(2,iFrg) .EQ. 1) THEN
+              RR_Params(iParam) = RR_rot(2,iFrg)
               RR_InitSteps(iParam) = 0.1 * Damping
               iParam = iParam + 1
             ENDIF
-            IF (RR_iopttran(3,iFrg,iFrgCopy) .EQ. 1) THEN
-              RR_Params(iParam) = RR_tran(3,iFrg,iFrgCopy)
-              RR_InitSteps(iParam) = 0.1 * Damping
-              iParam = iParam + 1
-            ENDIF
-            ! Rotations
-            IF (natoms(iFrg) .NE. 1) THEN
-              IF (RR_ioptrot(1,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_Params(iParam) = RR_rot(1,iFrg,iFrgCopy)
+            IF (UseQuaternions(iFrg)) THEN
+              IF (RR_ioptrot(3,iFrg) .EQ. 1) THEN
+                RR_Params(iParam) = RR_rot(3,iFrg)
                 RR_InitSteps(iParam) = 0.1 * Damping
                 iParam = iParam + 1
               ENDIF
-              IF (RR_ioptrot(2,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_Params(iParam) = RR_rot(2,iFrg,iFrgCopy)
+              IF (RR_ioptrot(4,iFrg) .EQ. 1) THEN
+                RR_Params(iParam) = RR_rot(4,iFrg)
                 RR_InitSteps(iParam) = 0.1 * Damping
                 iParam = iParam + 1
               ENDIF
-              IF (UseQuaternions(iFrg)) THEN
-                IF (RR_ioptrot(3,iFrg,iFrgCopy) .EQ. 1) THEN
-                  RR_Params(iParam) = RR_rot(3,iFrg,iFrgCopy)
-                  RR_InitSteps(iParam) = 0.1 * Damping
-                  iParam = iParam + 1
-                ENDIF
-                IF (RR_ioptrot(4,iFrg,iFrgCopy) .EQ. 1) THEN
-                  RR_Params(iParam) = RR_rot(4,iFrg,iFrgCopy)
-                  RR_InitSteps(iParam) = 0.1 * Damping
-                  iParam = iParam + 1
-                ENDIF
-              ENDIF
+            ENDIF
+          ENDIF
+        ENDIF
+      ENDDO
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+          DO i = 2, natoms(iFrg)
+            IF (RR_ioptb(i,iFrg) .EQ. 1) THEN
+              RR_Params(iParam) = RR_blen(i,iFrg)
+              RR_InitSteps(iParam) = 5.0 * Damping
+              iParam = iParam + 1
             ENDIF
           ENDDO
         ENDIF
       ENDDO
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 2, natoms(iFrg)
-              IF (RR_ioptb(i,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_Params(iParam) = RR_blen(i,iFrg,iFrgCopy)
-                RR_InitSteps(iParam) = 5.0 * Damping
-                iParam = iParam + 1
-              ENDIF
-            ENDDO
+          DO i = 3, natoms(iFrg)
+            IF (RR_iopta(i,iFrg) .EQ. 1) THEN
+              RR_Params(iParam) = RR_alph(i,iFrg)
+              RR_InitSteps(iParam) = 1.0 * Damping
+              iParam = iParam + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 3, natoms(iFrg)
-              IF (RR_iopta(i,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_Params(iParam) = RR_alph(i,iFrg,iFrgCopy)
-                RR_InitSteps(iParam) = 1.0 * Damping
-                iParam = iParam + 1
-              ENDIF
-            ENDDO
-          ENDDO
-        ENDIF
-      ENDDO
-      DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 4, natoms(iFrg)
-              IF (RR_ioptt(i,iFrg,iFrgCopy) .EQ. 1) THEN
-                RR_Params(iParam) = RR_bet(i,iFrg,iFrgCopy)
-                RR_InitSteps(iParam) = 0.05 * Damping
-                iParam = iParam + 1
-              ENDIF
-            ENDDO
+          DO i = 4, natoms(iFrg)
+            IF (RR_ioptt(i,iFrg) .EQ. 1) THEN
+              RR_Params(iParam) = RR_bet(i,iFrg)
+              RR_InitSteps(iParam) = 0.05 * Damping
+              iParam = iParam + 1
+            ENDIF
           ENDDO
         ENDIF
       ENDDO
@@ -1148,124 +1099,122 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
+      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
       INTEGER KATOM, i, KI
-      INTEGER iFrg, iFrgCopy
+      INTEGER iFrg
       REAL CKK1, CKK2, CKK3, TRAN(1:3)
       REAL QQSUM, QDEN, QUATER(0:3), tQ(0:3), ROTA(1:3,1:3), CART(1:3,1:MAXATM), Duonion(0:1)
       INTEGER JQ, ICFRG
       REAL XC, YC, ZC
-      LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
 
       KATOM = 0
 ! Loop over all the fragments
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            ! Position centre of mass inside unit cell
-            RR_tran(1,iFrg,iFrgCopy) = RR_tran(1,iFrg,iFrgCopy) - INT(RR_tran(1,iFrg,iFrgCopy))
-            RR_tran(2,iFrg,iFrgCopy) = RR_tran(2,iFrg,iFrgCopy) - INT(RR_tran(2,iFrg,iFrgCopy))
-            RR_tran(3,iFrg,iFrgCopy) = RR_tran(3,iFrg,iFrgCopy) - INT(RR_tran(3,iFrg,iFrgCopy))
-            CKK1 = RR_tran(1,iFrg,iFrgCopy)
-            CKK2 = RR_tran(2,iFrg,iFrgCopy)
-            CKK3 = RR_tran(3,iFrg,iFrgCopy)
-            TRAN(1) = CKK1*F2CMAT(1,1) + CKK2*F2CMAT(1,2) + CKK3*F2CMAT(1,3)
-            TRAN(2) = CKK1*F2CMAT(2,1) + CKK2*F2CMAT(2,2) + CKK3*F2CMAT(2,3)
-            TRAN(3) = CKK1*F2CMAT(3,1) + CKK2*F2CMAT(3,2) + CKK3*F2CMAT(3,3)
+          ! Position centre of mass inside unit cell
+          RR_tran(1,iFrg) = RR_tran(1,iFrg) - INT(RR_tran(1,iFrg))
+          RR_tran(2,iFrg) = RR_tran(2,iFrg) - INT(RR_tran(2,iFrg))
+          RR_tran(3,iFrg) = RR_tran(3,iFrg) - INT(RR_tran(3,iFrg))
+          CKK1 = RR_tran(1,iFrg)
+          CKK2 = RR_tran(2,iFrg)
+          CKK3 = RR_tran(3,iFrg)
+          TRAN(1) = CKK1*F2CMAT(1,1) + CKK2*F2CMAT(1,2) + CKK3*F2CMAT(1,3)
+          TRAN(2) = CKK1*F2CMAT(2,1) + CKK2*F2CMAT(2,2) + CKK3*F2CMAT(2,3)
+          TRAN(3) = CKK1*F2CMAT(3,1) + CKK2*F2CMAT(3,2) + CKK3*F2CMAT(3,3)
 ! If more than one atom then proceed
-            IF (natoms(iFrg).GT.1) THEN
+          IF (natoms(iFrg).GT.1) THEN
 ! If we have at least two atoms, there are two options:
 ! 1. Rotate the whole molecule freely, using quaternions
 ! 2. Specify the rotation axis (e.g. if molecule on mirror plane)
-              IF (UseQuaternions(iFrg)) THEN
-                QQSUM = 0.0
-                DO JQ = 1, 4
-                  QQSUM = QQSUM + RR_rot(JQ,iFrg,iFrgCopy)**2
-                ENDDO
+            IF (UseQuaternions(iFrg)) THEN
+              QQSUM = 0.0
+              DO JQ = 1, 4
+                QQSUM = QQSUM + RR_rot(JQ,iFrg)**2
+              ENDDO
 ! QQSUM now holds the sum of the squares of the quaternions
-                QDEN = 1.0 / SQRT(QQSUM)
-                DO JQ = 0, 3
-                  QUATER(JQ) = QDEN * RR_rot(JQ+1,iFrg,iFrgCopy)
-                ENDDO
+              QDEN = 1.0 / SQRT(QQSUM)
+              DO JQ = 0, 3
+                QUATER(JQ) = QDEN * RR_rot(JQ+1,iFrg)
+              ENDDO
 ! QUATER now holds the normalised quaternions
-                CALL ROTMAK(QUATER,ROTA)
+              CALL ROTMAK(QUATER,ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the quaternions
-              ELSE
+            ELSE
 ! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
-                Duonion(0) = RR_rot(1,iFrg,iFrgCopy)
-                Duonion(1) = RR_rot(2,iFrg,iFrgCopy)
-                QDEN = 1.0 / SQRT(Duonion(0)**2 + Duonion(1)**2)
-                Duonion(0) = Duonion(0) * QDEN 
-                Duonion(1) = Duonion(1) * QDEN 
-                QUATER(0) = Duonion(0) * zmSingleRotationQs(0,iFrg)
-                QUATER(1) = Duonion(1) * zmSingleRotationQs(1,iFrg)
-                QUATER(2) = Duonion(1) * zmSingleRotationQs(2,iFrg)
-                QUATER(3) = Duonion(1) * zmSingleRotationQs(3,iFrg)
+              Duonion(0) = RR_rot(1,iFrg)
+              Duonion(1) = RR_rot(2,iFrg)
+              QDEN = 1.0 / SQRT(Duonion(0)**2 + Duonion(1)**2)
+              Duonion(0) = Duonion(0) * QDEN 
+              Duonion(1) = Duonion(1) * QDEN 
+              QUATER(0) = Duonion(0) * zmSingleRotationQs(0,iFrg)
+              QUATER(1) = Duonion(1) * zmSingleRotationQs(1,iFrg)
+              QUATER(2) = Duonion(1) * zmSingleRotationQs(2,iFrg)
+              QUATER(3) = Duonion(1) * zmSingleRotationQs(3,iFrg)
 ! QUATER now holds the normalised quaternion corresponding to the single rotation axis
 ! Now premultiply with the original molecular orientation (JvdS I don't understand why
 ! they must be premultiplied: I would say they should be postmultiplied)
-                tQ(0) =   QUATER(0)*zmInitialQs(0,iFrg) - QUATER(1)*zmInitialQs(1,iFrg) &
-                        - QUATER(2)*zmInitialQs(2,iFrg) - QUATER(3)*zmInitialQs(3,iFrg)
-                tQ(1) =   QUATER(0)*zmInitialQs(1,iFrg) + QUATER(1)*zmInitialQs(0,iFrg) &
-                        - QUATER(2)*zmInitialQs(3,iFrg) + QUATER(3)*zmInitialQs(2,iFrg)
-                tQ(2) =   QUATER(0)*zmInitialQs(2,iFrg) + QUATER(1)*zmInitialQs(3,iFrg) &
-                        + QUATER(2)*zmInitialQs(0,iFrg) - QUATER(3)*zmInitialQs(1,iFrg)
-                tQ(3) =   QUATER(0)*zmInitialQs(3,iFrg) - QUATER(1)*zmInitialQs(2,iFrg) &
-                        + QUATER(2)*zmInitialQs(1,iFrg) + QUATER(3)*zmInitialQs(0,iFrg)
-                CALL ROTMAK(tQ,ROTA)
+              tQ(0) =   QUATER(0)*zmInitialQs(0,iFrg) - QUATER(1)*zmInitialQs(1,iFrg) &
+                      - QUATER(2)*zmInitialQs(2,iFrg) - QUATER(3)*zmInitialQs(3,iFrg)
+              tQ(1) =   QUATER(0)*zmInitialQs(1,iFrg) + QUATER(1)*zmInitialQs(0,iFrg) &
+                      - QUATER(2)*zmInitialQs(3,iFrg) + QUATER(3)*zmInitialQs(2,iFrg)
+              tQ(2) =   QUATER(0)*zmInitialQs(2,iFrg) + QUATER(1)*zmInitialQs(3,iFrg) &
+                      + QUATER(2)*zmInitialQs(0,iFrg) - QUATER(3)*zmInitialQs(1,iFrg)
+              tQ(3) =   QUATER(0)*zmInitialQs(3,iFrg) - QUATER(1)*zmInitialQs(2,iFrg) &
+                      + QUATER(2)*zmInitialQs(1,iFrg) + QUATER(3)*zmInitialQs(0,iFrg)
+              CALL ROTMAK(tQ,ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the single rotation axis
-              ENDIF
             ENDIF
-            CALL makexyz(natoms(iFrg),RR_blen(1,iFrg,iFrgCopy),RR_alph(1,iFrg,iFrgCopy),RR_bet(1,iFrg,iFrgCopy),        &
-                         IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+          ENDIF
+          CALL makexyz(natoms(iFrg),RR_blen(1,iFrg),RR_alph(1,iFrg),RR_bet(1,iFrg),        &
+                       IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
 ! Determine origin for rotations
-            ICFRG = ICOMFLG(iFrg)
+          ICFRG = ICOMFLG(iFrg)
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
-            IF (ICFRG.EQ.0) THEN
-              XC = 0.0
-              YC = 0.0
-              ZC = 0.0
-              IF (Get_UseCrystallographicCoM()) THEN
-                DO I = 1, natoms(iFrg)
-                  XC = XC + AtomicWeighting(I,iFrg)*CART(1,I)
-                  YC = YC + AtomicWeighting(I,iFrg)*CART(2,I)
-                  ZC = ZC + AtomicWeighting(I,iFrg)*CART(3,I)
-                ENDDO
-              ELSE
-                DO I = 1, natoms(iFrg)
-                  XC = XC + CART(1,I)
-                  YC = YC + CART(2,I)
-                  ZC = ZC + CART(3,I)
-                ENDDO
-                XC = XC/FLOAT(natoms(iFrg))
-                YC = YC/FLOAT(natoms(iFrg))
-                ZC = ZC/FLOAT(natoms(iFrg))
-              ENDIF
-! Otherwise, use atom number ICFRG
+          IF (ICFRG.EQ.0) THEN
+            XC = 0.0
+            YC = 0.0
+            ZC = 0.0
+            IF (Get_UseCrystallographicCoM()) THEN
+              DO I = 1, natoms(iFrg)
+                XC = XC + AtomicWeighting(I,iFrg)*CART(1,I)
+                YC = YC + AtomicWeighting(I,iFrg)*CART(2,I)
+                ZC = ZC + AtomicWeighting(I,iFrg)*CART(3,I)
+              ENDDO
             ELSE
-              XC = CART(1,ICFRG)
-              YC = CART(2,ICFRG)
-              ZC = CART(3,ICFRG)
+              DO I = 1, natoms(iFrg)
+                XC = XC + CART(1,I)
+                YC = YC + CART(2,I)
+                ZC = ZC + CART(3,I)
+              ENDDO
+              XC = XC/FLOAT(natoms(iFrg))
+              YC = YC/FLOAT(natoms(iFrg))
+              ZC = ZC/FLOAT(natoms(iFrg))
             ENDIF
+! Otherwise, use atom number ICFRG
+          ELSE
+            XC = CART(1,ICFRG)
+            YC = CART(2,ICFRG)
+            ZC = CART(3,ICFRG)
+          ENDIF
 ! Subtract the origin from all atom positions
-            DO I = 1, natoms(iFrg)
-              CART(1,I) = CART(1,I) - XC
-              CART(2,I) = CART(2,I) - YC
-              CART(3,I) = CART(3,I) - ZC
-            ENDDO
+          DO I = 1, natoms(iFrg)
+            CART(1,I) = CART(1,I) - XC
+            CART(2,I) = CART(2,I) - YC
+            CART(3,I) = CART(3,I) - ZC
+          ENDDO
 ! Apply rotation and translation to the atoms of this Z-matrix
-            CALL DO_ATOM_POS(TRAN,ROTA,CART,natoms(iFrg))
+          CALL DO_ATOM_POS(TRAN,ROTA,CART,natoms(iFrg))
 ! When we are here, we have the actual co-ordinates of all the atoms in this Z-matrix
 ! in Cartesian (orthogonal) co-ordinates. We need fractional co-ordinates: convert.
-            DO I = 1, natoms(iFrg)
-              KI = KATOM + I
+          DO I = 1, natoms(iFrg)
+            KI = KATOM + I
 ! Note that we must reorder the atoms such that the hydrogens are appended after the 
 ! non-hydrogens.
-              XATO(1,OrderedAtm(KI)) = CART(1,I)*c2fmat(1,1) + CART(2,I)*c2fmat(1,2) + CART(3,I)*c2fmat(1,3)
-              XATO(2,OrderedAtm(KI)) = CART(1,I)*c2fmat(2,1) + CART(2,I)*c2fmat(2,2) + CART(3,I)*c2fmat(2,3)
-              XATO(3,OrderedAtm(KI)) = CART(1,I)*c2fmat(3,1) + CART(2,I)*c2fmat(3,2) + CART(3,I)*c2fmat(3,3)
-            ENDDO
-            KATOM = KATOM + natoms(iFrg)
+            XATO(1,OrderedAtm(KI)) = CART(1,I)*c2fmat(1,1) + CART(2,I)*c2fmat(1,2) + CART(3,I)*c2fmat(1,3)
+            XATO(2,OrderedAtm(KI)) = CART(1,I)*c2fmat(2,1) + CART(2,I)*c2fmat(2,2) + CART(3,I)*c2fmat(2,3)
+            XATO(3,OrderedAtm(KI)) = CART(1,I)*c2fmat(3,1) + CART(2,I)*c2fmat(3,2) + CART(3,I)*c2fmat(3,3)
           ENDDO
+          KATOM = KATOM + natoms(iFrg)
         ENDIF
       ENDDO
 
@@ -1303,18 +1252,18 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
+      INTEGER, EXTERNAL :: WritePDBCommon
       INTEGER iSol
-      INTEGER pdbBond(1:maxbnd_2*maxcopies*maxfrg,1:2)
+      INTEGER pdbBond(1:maxbnd_2*maxfrg,1:2)
       INTEGER TotNumBonds, NumOfAtomsSoFar
       CHARACTER*4 LabelStr
       CHARACTER*2 ColourStr
       CHARACTER*2 SolStr
       INTEGER AtomLabelOption, AtomColourOption
-      INTEGER I, iFrg, iFrgCopy, J, iiact, BondNr
+      INTEGER I, iFrg, J, iiact, BondNr
       REAL    xc, yc, zc
       INTEGER iAtom
       INTEGER hFilePDB
-      INTEGER, EXTERNAL :: WritePDBCommon
 
       CALL PushActiveWindowID
       hFilePDB = 65
@@ -1345,33 +1294,31 @@
       iAtom = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 1, natoms(iFrg)
-              iiact = iiact + 1
-              iAtom = iAtom + 1
-              xc = RR_XATO_Orig(1,OrderedAtm(iAtom)) * f2cpdb(1,1) + &
-                   RR_XATO_Orig(2,OrderedAtm(iAtom)) * f2cpdb(1,2) + &
-                   RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(1,3)
-              yc = RR_XATO_Orig(2,OrderedAtm(iAtom)) * f2cpdb(2,2) + &
-                   RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(2,3)
-              zc = RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(3,3)
+          DO i = 1, natoms(iFrg)
+            iiact = iiact + 1
+            iAtom = iAtom + 1
+            xc = RR_XATO_Orig(1,OrderedAtm(iAtom)) * f2cpdb(1,1) + &
+                 RR_XATO_Orig(2,OrderedAtm(iAtom)) * f2cpdb(1,2) + &
+                 RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(1,3)
+            yc = RR_XATO_Orig(2,OrderedAtm(iAtom)) * f2cpdb(2,2) + &
+                 RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(2,3)
+            zc = RR_XATO_Orig(3,OrderedAtm(iAtom)) * f2cpdb(3,3)
 ! Note that elements are right-justified
-              IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
-                IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
-                  ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
-                ELSE
-                  ColourStr(1:2) = asym(i,iFrg)(1:2)
-                ENDIF
+            IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
+              IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
+                ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
+              ELSE
+                ColourStr(1:2) = asym(i,iFrg)(1:2)
               ENDIF
-              IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
-                LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
-              ELSE  ! Orignal atom labels
-                LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
-              ENDIF
-              WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
- 1120         FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
-            ENDDO ! loop over atoms
-          ENDDO
+            ENDIF
+            IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
+              LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
+            ELSE  ! Orignal atom labels
+              LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
+            ENDIF
+            WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
+ 1120       FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+          ENDDO ! loop over atoms
         ENDIF
       ENDDO ! loop over Z-matrices
 
@@ -1384,32 +1331,30 @@
       iAtom = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            DO i = 1, natoms(iFrg)
-              iiact = iiact + 1
-              iAtom = iAtom + 1
-              xc = Xato(1,OrderedAtm(iAtom)) * f2cpdb(1,1) + &
-                   Xato(2,OrderedAtm(iAtom)) * f2cpdb(1,2) + &
-                   Xato(3,OrderedAtm(iAtom)) * f2cpdb(1,3)
-              yc = Xato(2,OrderedAtm(iAtom)) * f2cpdb(2,2) + &
-                   Xato(3,OrderedAtm(iAtom)) * f2cpdb(2,3)
-              zc = Xato(3,OrderedAtm(iAtom)) * f2cpdb(3,3)
+          DO i = 1, natoms(iFrg)
+            iiact = iiact + 1
+            iAtom = iAtom + 1
+            xc = Xato(1,OrderedAtm(iAtom)) * f2cpdb(1,1) + &
+                 Xato(2,OrderedAtm(iAtom)) * f2cpdb(1,2) + &
+                 Xato(3,OrderedAtm(iAtom)) * f2cpdb(1,3)
+            yc = Xato(2,OrderedAtm(iAtom)) * f2cpdb(2,2) + &
+                 Xato(3,OrderedAtm(iAtom)) * f2cpdb(2,3)
+            zc = Xato(3,OrderedAtm(iAtom)) * f2cpdb(3,3)
 ! Note that elements are right-justified
-              IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
-                IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
-                  ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
-                ELSE
-                  ColourStr(1:2) = asym(i,iFrg)(1:2)
-                ENDIF
+            IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
+              IF (asym(i,iFrg)(2:2) .EQ. ' ') THEN
+                ColourStr(1:2) = ' '//asym(i,iFrg)(1:1)
+              ELSE
+                ColourStr(1:2) = asym(i,iFrg)(1:2)
               ENDIF
-              IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
-                LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
-              ELSE  ! Orignal atom labels
-                LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
-              ENDIF
-              WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
-            ENDDO ! loop over atoms
-          ENDDO
+            ENDIF
+            IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
+              LabelStr = asym(i,iFrg)(1:LEN_TRIM(asym(i,iFrg)))//SolStr
+            ELSE  ! Orignal atom labels
+              LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
+            ENDIF
+            WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), xc, yc, zc, occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
+          ENDDO ! loop over atoms
         ENDIF
       ENDDO ! loop over Z-matrices
 
@@ -1418,16 +1363,14 @@
       NumOfAtomsSoFar = 0
       DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
-          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-            IF (NumberOfBonds(iFrg) .GT. 0) THEN
-              DO J = 1, NumberOfBonds(iFrg)
-                pdbBond(J+TotNumBonds,1) = Bonds(1,J,iFrg) + NumOfAtomsSoFar
-                pdbBond(J+TotNumBonds,2) = Bonds(2,J,iFrg) + NumOfAtomsSoFar
-              ENDDO
-            ENDIF
-            NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
-            TotNumBonds = TotNumBonds + NumberOfBonds(iFrg)
-          ENDDO
+          IF (NumberOfBonds(iFrg) .GT. 0) THEN
+            DO J = 1, NumberOfBonds(iFrg)
+              pdbBond(J+TotNumBonds,1) = Bonds(1,J,iFrg) + NumOfAtomsSoFar
+              pdbBond(J+TotNumBonds,2) = Bonds(2,J,iFrg) + NumOfAtomsSoFar
+            ENDDO
+          ENDIF
+          NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
+          TotNumBonds = TotNumBonds + NumberOfBonds(iFrg)
         ENDIF
       ENDDO ! loop over Z-matrices
       DO iSol = 1, 2
@@ -1497,7 +1440,11 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
-      INTEGER iFlags, iFType, hFile, ii, iiact, iTotal, iFrg, i, iFrgCopy, k, iOrig
+      CHARACTER*1, EXTERNAL :: ChrLowerCase
+      INTEGER, EXTERNAL :: WritePDBCommon
+      REAL, EXTERNAL :: UnitCellVolume
+      LOGICAL, EXTERNAL :: Get_DivideByEsd
+      INTEGER iFlags, iFType, hFile, ii, iiact, iTotal, iFrg, i, k, iOrig
       INTEGER iTem, j, iBond1, iBond2, NumOfAtomsSoFar, tLen, iRadSelection
       INTEGER tLen1, tLen2, NumOfAtmPerElm(1:MaxElm), iScat, K1, tElement
       CHARACTER(MaxPathLength) :: tFileName
@@ -1505,10 +1452,6 @@
       REAL    xc, yc, zc
       CHARACTER*80 tString, tString1, tString2
       CHARACTER*2  LATT
-      CHARACTER*1, EXTERNAL :: ChrLowerCase
-      INTEGER, EXTERNAL :: WritePDBCommon
-      REAL, EXTERNAL :: UnitCellVolume
-      LOGICAL, EXTERNAL :: Get_DivideByEsd
 
       iFlags = SaveDialog + AppendExt + PromptOn
       FILTER = 'pdb (*.pdb)|*.pdb|'// &
@@ -1534,55 +1477,51 @@
             itotal = 0
             DO iFrg = 1, maxfrg
               IF (gotzmfile(iFrg)) THEN
-                DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-                  itotal = iiact
-                  DO i = 1, natoms(iFrg)
-                    iiact = iiact + 1
-                    iOrig = izmbid(i,iFrg)
-                    ii = OrderedAtm(itotal + iOrig)
+                itotal = iiact
+                DO i = 1, natoms(iFrg)
+                  iiact = iiact + 1
+                  iOrig = izmbid(i,iFrg)
+                  ii = OrderedAtm(itotal + iOrig)
 ! The PDB atom lines
-                    xc = Xato(1,ii) * f2cpdb(1,1) + &
-                         Xato(2,ii) * f2cpdb(1,2) + &
-                         Xato(3,ii) * f2cpdb(1,3)
-                    yc = Xato(2,ii) * f2cpdb(2,2) + &
-                         Xato(3,ii) * f2cpdb(2,3)
-                    zc = Xato(3,ii) * f2cpdb(3,3)
+                  xc = Xato(1,ii) * f2cpdb(1,1) + &
+                       Xato(2,ii) * f2cpdb(1,2) + &
+                       Xato(3,ii) * f2cpdb(1,3)
+                  yc = Xato(2,ii) * f2cpdb(2,2) + &
+                       Xato(3,ii) * f2cpdb(2,3)
+                  zc = Xato(3,ii) * f2cpdb(3,3)
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
-                    IF (asym(iOrig,iFrg)(2:2).EQ.' ') THEN
-                      WRITE (hFile,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), xc, yc, zc, &
-                                      occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:1)
- 1120                 FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
-                    ELSE
-                      WRITE (hFile,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), xc, yc, zc, &
-                                      occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:2)
- 1130                 FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
-                    ENDIF
-                  ENDDO ! loop over atoms
-                ENDDO ! Loop over copies
+                  IF (asym(iOrig,iFrg)(2:2).EQ.' ') THEN
+                    WRITE (hFile,1120,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:3), xc, yc, zc, &
+                                    occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:1)
+ 1120               FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
+                  ELSE
+                    WRITE (hFile,1130,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4), xc, yc, zc, &
+                                    occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg), asym(iOrig,iFrg)(1:2)
+ 1130               FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+                  ENDIF
+                ENDDO ! loop over atoms
               ENDIF
             ENDDO ! loop over Z-matrices
 ! Per Z-matrix, write out the connectivity.
             NumOfAtomsSoFar = 0
             DO iFrg = 1, maxfrg
               IF (gotzmfile(iFrg)) THEN
-                DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-                  IF (NumberOfBonds(iFrg) .GT. 0) THEN
-                    DO J = 1, NumberOfBonds(iFrg)
+                IF (NumberOfBonds(iFrg) .GT. 0) THEN
+                  DO J = 1, NumberOfBonds(iFrg)
 ! Due to the backmapping, it is possible that the original number of the first atom is greater than the
 ! original number of the second atom. Mercury can't always read pdb files where this is the case.
-                      iBond1 = izmoid(Bonds(1,J,iFrg),iFrg) + NumOfAtomsSoFar
-                      iBond2 = izmoid(Bonds(2,J,iFrg),iFrg) + NumOfAtomsSoFar
-                      IF (iBond1 .GT. iBond2) THEN
-                        iTem   = iBond1
-                        iBond1 = iBond2
-                        iBond2 = iTem
-                      ENDIF
-                      WRITE(hFile,'(A6,I5,I5)',ERR=999) 'CONECT', iBond1, iBond2
-                    ENDDO
-                  ENDIF
-                  NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
-                ENDDO
+                    iBond1 = izmoid(Bonds(1,J,iFrg),iFrg) + NumOfAtomsSoFar
+                    iBond2 = izmoid(Bonds(2,J,iFrg),iFrg) + NumOfAtomsSoFar
+                    IF (iBond1 .GT. iBond2) THEN
+                      iTem   = iBond1
+                      iBond1 = iBond2
+                      iBond2 = iTem
+                    ENDIF
+                    WRITE(hFile,'(A6,I5,I5)',ERR=999) 'CONECT', iBond1, iBond2
+                  ENDDO
+                ENDIF
+                NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(iFrg)
               ENDIF
             ENDDO ! loop over Z-matrices
             WRITE (hFile,"('END')",ERR=999)
@@ -1601,17 +1540,15 @@
             itotal = 0
             DO iFrg = 1, maxfrg
               IF (gotzmfile(iFrg)) THEN
-                DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-                  itotal = iiact
-                  DO i = 1, natoms(iFrg)
-                    iiact = iiact + 1
-                    iOrig = izmbid(i,iFrg)
-                    ii = OrderedAtm(itotal + iOrig)
+                itotal = iiact
+                DO i = 1, natoms(iFrg)
+                  iiact = iiact + 1
+                  iOrig = izmbid(i,iFrg)
+                  ii = OrderedAtm(itotal + iOrig)
 ! The CSSR atom lines
-                    WRITE (hFile,1110,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4),(Xato(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
- 1110               FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
-                  ENDDO ! loop over atoms
-                ENDDO ! Loop over copies
+                  WRITE (hFile,1110,ERR=999) iiact, OriginalLabel(iOrig,iFrg)(1:4),(Xato(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
+ 1110             FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
+                ENDDO ! loop over atoms
               ENDIF
             ENDDO ! loop over Z-matrices
           CASE (3) ! ccl
@@ -1624,16 +1561,14 @@
             itotal = 0
             DO iFrg = 1, maxfrg
               IF (gotzmfile(iFrg)) THEN
-                DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-                  itotal = iiact
-                  DO i = 1, natoms(iFrg)
-                    iiact = iiact + 1
-                    iOrig = izmbid(i,iFrg)
-                    ii = OrderedAtm(itotal + iOrig)
-                    WRITE (hFile,1033,ERR=999) asym(iOrig,iFrg), (Xato(k,ii),k=1,3), RR_ITF*tiso(iOrig,iFrg), occ(iOrig,iFrg) 
- 1033               FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
-                  ENDDO ! loop over atoms
-                ENDDO ! Loop over copies
+                itotal = iiact
+                DO i = 1, natoms(iFrg)
+                  iiact = iiact + 1
+                  iOrig = izmbid(i,iFrg)
+                  ii = OrderedAtm(itotal + iOrig)
+                  WRITE (hFile,1033,ERR=999) asym(iOrig,iFrg), (Xato(k,ii),k=1,3), RR_ITF*tiso(iOrig,iFrg), occ(iOrig,iFrg) 
+ 1033             FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
+                ENDDO ! loop over atoms
               ENDIF
             ENDDO ! loop over Z-matrices
           CASE (4) ! cif
@@ -1725,16 +1660,14 @@
             itotal = 0
             DO iFrg = 1, maxfrg
               IF (gotzmfile(iFrg)) THEN
-                DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-                  itotal = iiact
-                  DO i = 1, natoms(iFrg)
-                    iiact = iiact + 1
-                    iOrig = izmbid(i,iFrg)
-                    ii = OrderedAtm(itotal + iOrig)
-                    WRITE (hFile,1034,ERR=999) OriginalLabel(iOrig,iFrg), (Xato(k,ii),k=1,3), occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg) 
- 1034               FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F5.2)
-                  ENDDO ! loop over atoms
-                ENDDO ! Loop over copies
+                itotal = iiact
+                DO i = 1, natoms(iFrg)
+                  iiact = iiact + 1
+                  iOrig = izmbid(i,iFrg)
+                  ii = OrderedAtm(itotal + iOrig)
+                  WRITE (hFile,1034,ERR=999) OriginalLabel(iOrig,iFrg), (Xato(k,ii),k=1,3), occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg) 
+ 1034             FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F5.2)
+                ENDDO ! loop over atoms
               ENDIF
             ENDDO ! loop over Z-matrices
           CASE (5) ! res
@@ -1780,10 +1713,8 @@
             NumOfAtmPerElm = 0
             DO iFrg = 1, maxfrg
               IF (gotzmfile(iFrg)) THEN
-                DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-                  DO i = 1, natoms(iFrg)
-                    CALL INC(NumOfAtmPerElm(zmElementCSD(i,iFrg)))
-                  ENDDO
+                DO i = 1, natoms(iFrg)
+                  CALL INC(NumOfAtmPerElm(zmElementCSD(i,iFrg)))
                 ENDDO
               ENDIF
             ENDDO
@@ -1805,23 +1736,21 @@
             itotal = 0
             DO iFrg = 1, maxfrg
               IF (gotzmfile(iFrg)) THEN
-                DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
-                  itotal = iiact
-                  DO i = 1, natoms(iFrg)
-                    iiact = iiact + 1
-                    iOrig = izmbid(i,iFrg)
-                    ii = OrderedAtm(itotal + iOrig)
+                itotal = iiact
+                DO i = 1, natoms(iFrg)
+                  iiact = iiact + 1
+                  iOrig = izmbid(i,iFrg)
+                  ii = OrderedAtm(itotal + iOrig)
 ! Determine this atom's entry number in the scattering factor list
-                    tElement = zmElementCSD(iOrig,iFrg)
-                    iScat = 0
-                    DO k1 = 1, tElement
-                      IF (NumOfAtmPerElm(k1) .NE. 0) iScat = iScat + 1
-                    ENDDO
-                    WRITE (hFile,1035,ERR=999) OriginalLabel(iOrig,iFrg), iScat, (Xato(k,ii),k=1,3), &
-                                        occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg)/(8.0*(PI**2)) 
- 1035               FORMAT (A5,1X,I2,1X,3(F10.5,1X),F5.3,1X,F5.3)
-                  ENDDO ! loop over atoms
-                ENDDO ! Loop over copies
+                  tElement = zmElementCSD(iOrig,iFrg)
+                  iScat = 0
+                  DO k1 = 1, tElement
+                    IF (NumOfAtmPerElm(k1) .NE. 0) iScat = iScat + 1
+                  ENDDO
+                  WRITE (hFile,1035,ERR=999) OriginalLabel(iOrig,iFrg), iScat, (Xato(k,ii),k=1,3), &
+                                      occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg)/(8.0*(PI**2)) 
+ 1035             FORMAT (A5,1X,I2,1X,3(F10.5,1X),F5.3,1X,F5.3)
+                ENDDO ! loop over atoms
               ENDIF
             ENDDO ! loop over Z-matrices
             WRITE (hFile,"('END ')",ERR=999)
