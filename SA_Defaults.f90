@@ -5,15 +5,14 @@
 
       CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
       COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
-      INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
-      COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      INTEGER cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      COMMON /outfillen/ cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
 
       LOGICAL outfilset
       COMMON /outfileset/ outfilset
       DATA outfilset/ .FALSE. /
 
       logsa_file = 'DASH.lsa'
-      logsa_flen = LEN_TRIM(logsa_file)
       IF (.NOT. outfilset) THEN
         cssr_file = 'SA_best.cssr'
         pdb_file  = 'SA_best.pdb'
@@ -42,8 +41,8 @@
 
       CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file   
       COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,log_file,pro_file
-      INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
-      COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      INTEGER cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      COMMON /outfillen/ cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
 
       LOGICAL outfilset
       COMMON /outfileset/ outfilset
