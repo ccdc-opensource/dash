@@ -222,10 +222,8 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
-      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
-      COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
-                      nd1, nmpert, nd3, nd4, bmIHANDLE
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
