@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 12/Dec/2001 18:28:53
+// Modified : 10/Jan/2002 12:23:09
 //
 ///////////////////////////////////////////////////
 //
@@ -212,7 +212,6 @@
 #define IDF_profchi2_label               1185
 #define IDD_input_parameters              140
 #define IDF_SA_Tredrate                  1179
-#define IDD_zmatrix_files                 134
 #define IDF_SA_T0_label1                 1161
 #define IDF_SA_Tredrate_trackbar         1148
 #define IDF_SA_NS_trackbar               1149
@@ -238,8 +237,6 @@
 #define IDF_npar_label                   1478
 #define IDF_npar                         1479
 #define IDF_parameter_grid               1480
-#define IDF_nfrag                        1488
-#define IDF_zmatrixfile_grid             1489
 #define IDF_LABEL7                       1463
 #define IDF_StopSA                       1195
 #define IDF_Pause_Annealing              1495
@@ -249,7 +246,6 @@
 #define IDD_Profile_Status                139
 #define IDF_Viewer                       1514
 #define IDD_DIALOG001                     132
-#define IDD_DIALOG002                     135
 #define IDD_DIALOG003                     137
 #define IDF_PawRef_Refine                1301
 #define IDF_IDF_PawRef_NBack             1291
@@ -1460,77 +1456,6 @@ BEGIN
 "[Checks] \n"
 " 1069 0 \n"
 " 1070 0 \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_zmatrix_files DIALOG 0, 0,  341,  121
-STYLE WS_CHILD | DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "Number of independent molecules in the asymmetric unit",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   20,   14,  182,    8
-    CONTROL "1",IDF_nfrag,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  220,   12,   44,   14
-    CONTROL "",IDF_zmatrixfile_grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_COLUMNLABELS | GS_ROWLABELS,   18,   32,  306,   56
-    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   20,  100,   40,   14
-    CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  282,  100,   40,   14
-END
-
-IDD_zmatrix_files RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-" 1488               1              10 \n"
-"[Trackbars] \n"
-"[Grids] \n"
-" 1489     3     20   135 \n"
-"   16 \n"
-"1 \n"
-"2 \n"
-"3 \n"
-"4 \n"
-"5 \n"
-"6 \n"
-"7 \n"
-"8 \n"
-"9 \n"
-"10 \n"
-"11 \n"
-"12 \n"
-"13 \n"
-"14 \n"
-"15 \n"
-"16 \n"
-"17 \n"
-"18 \n"
-"19 \n"
-"20 \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_DIALOG002 DIALOG 0, 0, 1000,   16
-STYLE DS_3DLOOK
-FONT    8, "MS Sans Serif"
-BEGIN
-    CONTROL "z-matrix filename",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,    0,    0,  200,   14
-    CONTROL "Browse",ISS2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   40,   14
-    CONTROL "View",ISS3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   40,   14
-END
-
-IDD_DIALOG002 RCDATA
-BEGIN
-"[Checks] \n"
-" 1066 0 \n"
-" 1067 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
