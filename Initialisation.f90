@@ -683,7 +683,6 @@
       CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
       CALL WDialogGetInteger(IDF_SA_RandomSeed2,tInteger)
       CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
-
       CALL WDialogGetInteger(IDF_SA_MaxRepeats,tInteger)
       CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
       CALL WDialogGetReal(IDF_SA_ChiTest,tReal)
@@ -692,7 +691,6 @@
       CALL FileWriteReal(tFileHandle,RecNr,tReal)
       CALL WDialogGetInteger(IDF_MaxMoves2,tInteger)
       CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
-
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
 ! Atom labels for SA solutions overlay. Two options: 
 ! 1. "Element symbol + solution number" (default)
@@ -890,7 +888,6 @@
       CALL WDialogPutInteger(IDF_SA_RandomSeed1,tInteger)
       CALL FileReadInteger(tFileHandle,RecNr,tInteger)
       CALL WDialogPutInteger(IDF_SA_RandomSeed2,tInteger)
-
       CALL FileReadInteger(tFileHandle,RecNr,tInteger)
       CALL WDialogPutInteger(IDF_SA_MaxRepeats,tInteger)
       CALL FileReadReal(tFileHandle,RecNr,tReal)
@@ -899,7 +896,6 @@
       CALL WDialogPutReal(IDF_MaxMoves1,tReal)
       CALL FileReadInteger(tFileHandle,RecNr,tInteger)
       CALL WDialogPutInteger(IDF_MaxMoves2,tInteger)
-
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
 ! Atom labels for SA solutions overlay. Two options: 
 ! 1. "Element symbol + solution number"
