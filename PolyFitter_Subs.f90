@@ -441,7 +441,8 @@
 ! Extract the informationfrom the dialog
       Icursel = WInfoDialog(CurrentDialog)
 
-      IFLAGS = SaveDialog + DirChange + PromptOn + AppendExt
+	 
+      IFLAGS = SaveDialog  + PromptOn + AppendExt
       FILTER = 'Dicvol files (*.dat)|*.dat|All files |*.*|'
       FNAME=' '
       CALL WSelectFile(FILTER,IFLAGS,FNAME,'Enter DICVOL file name')
