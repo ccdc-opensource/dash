@@ -14,6 +14,7 @@ C
 CX
 CC 19B
 CH Main body of a PR LSQ program, with dummy arguments
+! PR LSQ = Profile Refinement Least SQuares
 CA PNAME holds the name, probably of the calling program, to print
 CA PCXX is the routine for the peak centre
 CA PFXX is the routine for the peak function
@@ -200,10 +201,10 @@ C      WRITE (ITO,2000) ICYC
 2000  FORMAT (' >>> Starting cycle',I4)
 c
 C.. *** Winteracter calls ***
-      call WDialogPutInteger(IDF_Pawley_Cycle_Number,ICYC)
-      call WDialogPutInteger(IDF_Pawley_Total_Cycles,LASTCY)
-      call WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPts)
-      call WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MaxK)
+      CALL WDialogPutInteger(IDF_Pawley_Cycle_Number,ICYC)
+      CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,LASTCY)
+      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPts)
+      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MaxK)
 
 C>> JCC Add in check on number of reflections here, so that code doesnt bomb out in the Pawley attempt
 	IF (MaxK .GT. 400) GOTO 910
@@ -281,64 +282,64 @@ C	write(76,*) ' About to cycle round ',npts,' obs'
         if (npt30*(ipt/npt30).eq.ipt) then
         CALL WDialogPutProgressBar(IDF_Pawley_Progress_Bar,ipt,Absolute)
         end if
- 2     YBACK=0.
-      YPEAK=0.
-      YCALC=0.
-      NOBSNOW=IPT
-      KMAX=IOCCR(NOBSNOW)
-      ARGI=ZARGI(NOBSNOW)
-      OBS=ZOBS(NOBSNOW)
-      DOBS=ZDOBS(NOBSNOW)
-      WT=ZWT(NOBSNOW)
-      ICODE=ICODEZ(NOBSNOW)
-      IF (LVARV.GT.0 .AND. .NOT. SIMUL) CALL GMZER(DERIVV,1,LVARV)
+ 2      YBACK=0.
+        YPEAK=0.
+        YCALC=0.
+        NOBSNOW=IPT
+        KMAX=IOCCR(NOBSNOW)
+        ARGI=ZARGI(NOBSNOW)
+        OBS=ZOBS(NOBSNOW)
+        DOBS=ZDOBS(NOBSNOW)
+        WT=ZWT(NOBSNOW)
+        ICODE=ICODEZ(NOBSNOW)
+        IF (LVARV.GT.0 .AND. .NOT. SIMUL) CALL GMZER(DERIVV,1,LVARV)
 C
 C DEAL WITH CASE YCALC=0 (EITHER BY BEING EXCLUDED OR BY HAVING NO CONTRIBUTING
 C REFLECTIONS) - NB ICODE IS NON-ZERO FOR DO **NOT** USE:
-      IF (KMAX .EQ. 0 .AND. .NOT. ZBAKIN) ICODE= -1
-      IF (ICODE .NE. 0) THEN
-C        CALL RFACPR(5,PCXX)
-C        GO TO 2
-      ENDIF
+        IF (KMAX .EQ. 0 .AND. .NOT. ZBAKIN) ICODE= -1
+        IF (ICODE .NE. 0) THEN
+C          CALL RFACPR(5,PCXX)
+C          GO TO 2
+        ENDIF
 C
 C CALCULATE FUNCTION TO MATCH OBSERVED, AND ITS DERIVATIVES, AND DO SOME
 C STATISTICS:
-      IF (KMAX .NE. 0) CALL CALROU(PCXX,PFXX)
-      CALL BACKPR(2)
-      YCALC=YBACK+YPEAK
-      ZCAL(NOBSNOW)=YCALC
-      ZBAK(NOBSNOW)=YBACK
+        IF (KMAX .NE. 0) CALL CALROU(PCXX,PFXX)
+        CALL BACKPR(2)
+        YCALC=YBACK+YPEAK
+        ZCAL(NOBSNOW)=YCALC
+        ZBAK(NOBSNOW)=YBACK
 C
 C MAKE DERIVATIVES WRT BASIC VARIABLES FROM THOSE WRT VARIABLES:
-      CALL RELATE
+        CALL RELATE
 C
 C DIFFERENCE:
-      IF (SIMUL) OBS=YCALC
-      DIFF = OBS - YCALC
+        IF (SIMUL) OBS=YCALC
+        DIFF = OBS - YCALC
 C FROM WEIGHT GET SQRTWT AND WDIFF INTO COMM0N:
-	IF (NOBS.EQ.532) THEN
-		INOTH = 1
-	ENDIF
-      CALL WGHTLS(3,ARGI)
+        IF (NOBS.EQ.532) THEN
+          INOTH = 1
+        ENDIF
+        CALL WGHTLS(3,ARGI)
 C
 C ADD IN TO R FACTORS:
       CALL RFACPR(2,PCXX)
 C
 C>> JCC Trap for any problems 
-	IF ( IBMBER . GT. 0) GOTO 950
+        IF ( IBMBER . GT. 0) GOTO 950
 C ADD DERIVATIVES IN TO LSQ MATRIX:
-      CALL MATTOT(ALSQ,MATSZ)
+        CALL MATTOT(ALSQ,MATSZ)
 C
-      IF (DONE) THEN
-        NTEM=IOCCR(NOBSNOW)
-        K1=KIPT(NOBSNOW)+1
-        K2=KIPT(NOBSNOW+1)
-        KD=1+K2-K1
-        WRITE(IPK,*) ARGI,OBS-YBACK,DOBS,NTEM
-        IF (NTEM.GT.0) WRITE(IPK,*) (KNIPT(KK),PIK(KNIPT(KK)),KK=K1,K2)
-      END IF
+        IF (DONE) THEN
+          NTEM=IOCCR(NOBSNOW)
+          K1=KIPT(NOBSNOW)+1
+          K2=KIPT(NOBSNOW+1)
+          KD=1+K2-K1
+          WRITE(IPK,*) ARGI,OBS-YBACK,DOBS,NTEM
+         IF (NTEM.GT.0) WRITE(IPK,*) (KNIPT(KK),PIK(KNIPT(KK)),KK=K1,K2)
+        END IF
 C
-      NOBS=NOBS+1
+        NOBS=NOBS+1
 C NEXT OBSERVATION:
 C...      GO TO 2
       END DO ! IPT LOOP TO NPTS
@@ -1113,7 +1114,8 @@ C.. LORENTZIAN
         DR(I,2)= -C2TEM*AFII*FR(I,2)
         DI(I,2)= 0.
 C.. ASYMMETRY FUNCTION FOR UMBRELLA EFFECT
-	IF (II.EQ.0..OR.NEAR90) THEN
+! JvdS Assuming that II is an INTEGER, it should be tested against "0", not "0."
+	IF (II.EQ.0.OR.NEAR90) THEN
           FR(I,3)=1.
           DR(I,3)=0.
           DR(I,4)=0.

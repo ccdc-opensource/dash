@@ -54,22 +54,26 @@
       CHARACTER*20 cpdbops(mpdbops)
       COMMON /pdbops/ npdbops,cpdbops
 
-!>> JCC the original atom ids to list in the labels and the back mapping
+! The original atom ids to list in the labels and the back mapping
       COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
-!>> JCC Use standard PDB orthogonalisation
+! Use standard PDB orthogonalisation
       DOUBLE PRECISION f2cpdb, c2fpdb
       REAL qvals(4), qnrm
       COMMON /pdbcat/ f2cpdb(3,3), c2fpdb(3,3)
-!
+      LOGICAL tSavePDB, tSaveCSSR, tSaveCCL, tSaveRES
+
       ntem = NumberSGTable
 
 !     ep added.  Following subroutine saves calculated and observed
 !     diffraction patterns in .pro file
       CALL Sa_soln_store
+! Just in case the user decides to change this in the options menu just while we are in this routine:
+! make local copies of the variables that determine which files to save.
+      tSavePDB  = SavePDB
+      tSaveCSSR = SaveCSSR
+      tSaveCCL  = SaveCCL
+      tSaveRES  = SaveRES
 
-!       LOGICAL SavePDB, SaveCSSR, SaveCCL, SaveMOL2, SaveRES
-
-!
 !       Output a CSSR file to fort.64
 !       Output a PDB  file to fort.65
 !       Output a CCL  file to fort.66
@@ -77,7 +81,7 @@
 !       Write the file headers first
 !
 !       The CSSR file first
-      IF (SaveCSSR) THEN
+      IF (tSaveCSSR) THEN
         OPEN(UNIT=64,file=cssr_file(1:cssr_flen),status='unknown')
         WRITE(64,"(' ',I3,'   0  DASH solution')") natom
         WRITE(64,1030) SNGL(t),-SNGL(fopt),cpb,ntotmov
@@ -87,7 +91,7 @@
 	ENDIF
 
 !       Now the PDB...
-      IF (SavePDB) THEN
+      IF (tSavePDB) THEN
         OPEN(UNIT=65,file=pdb_file(1:pdb_flen),status='unknown')
 ! JCC included again
         CALL sagminv(f2cpdb,inv,3)
@@ -116,7 +120,7 @@
         WRITE(65,1080) inv(3,1),inv(3,2),inv(3,3)
 	ENDIF
 !       And the CCL
-      IF (SaveCCL) THEN
+      IF (tSaveCCL) THEN
         OPEN(UNIT=66,file=ccl_file(1:ccl_flen),status='unknown')
         WRITE(66,1090) SNGL(t),-SNGL(fopt),cpb,ntotmov
         WRITE(66,1100) (CellPar(ii),ii=1,6)
@@ -130,12 +134,12 @@
       CheckedFragNo = 0
       DO j = 1, nfrag
         itotal = iiact
-        DO WHILE ( CheckedFragNo .LE. CheckSize )
+        DO WHILE (CheckedFragNo .LE. CheckSize)
           CheckedFragNo = CheckedFragNo + 1
-          IF ( IZMCheck(CheckedFragNo) .EQ. 1 ) EXIT ! the loop
+          IF (IZMCheck(CheckedFragNo) .EQ. 1) EXIT ! the loop
         END DO
 ! Write out the translation/rotation information for each residue
-        IF (SavePDB) THEN
+        IF (tSavePDB) THEN
           WRITE(65,1039) j
           WRITE(65,1037) 
      &     (SNGL(parvals(ij)),ij = ipcount + 1, ipcount + 3)
@@ -153,7 +157,7 @@
           DO ij = 1,4
             qvals(ij) = qvals(ij)/qnrm
           END DO
-          IF (SavePDB) THEN
+          IF (tSavePDB) THEN
             WRITE(65,1038) (qvals(ij),ij = 1,4)
           ENDIF
           ipcount = ipcount + izmpar(CheckedFragNo)
@@ -165,7 +169,7 @@
           iorig = izmbid(i,CheckedFragNo)
 !         
 !         The CSSR atom lines
-          IF (SaveCSSR) THEN
+          IF (tSaveCSSR) THEN
             WRITE(64,1110) 
      &      iiact, asym(iorig,CheckedFragNo), (xatopt(k,ii),k=1,3),0,0,
      &      0,0,0,0,0,0,0.0
@@ -204,7 +208,7 @@
 !            write(65,1130) ii,asym(i,j),xc,yc,zc
 !          endif
 ! Now
-          IF (SavePDB) THEN
+          IF (tSavePDB) THEN
             IF (asym(iorig,CheckedFragNo)(2:2) .EQ. ' ') THEN
               WRITE(65,1120) iiact,asym(iorig,CheckedFragNo),xc,yc,zc
             ELSE
@@ -212,19 +216,19 @@
             ENDIF
           ENDIF
 !       The CCL atom lines
-        IF (SaveCCL) THEN
+        IF (tSaveCCL) THEN
           WRITE(66,1033) asym(iorig,CheckedFragNo),(xatopt(k,ii),k=1,3)
 	  ENDIF
         END DO
       END DO
-      IF (SaveCSSR) THEN
+      IF (tSaveCSSR) THEN
         CLOSE(64)
 	ENDIF
-      IF (SavePDB) THEN
+      IF (tSavePDB) THEN
         WRITE(65,"('END')")
         CLOSE(65)
       ENDIF
-      IF (SaveCCL) THEN
+      IF (tSaveCCL) THEN
         CLOSE(66)
 	ENDIF
       CALL UpdateViewer()
