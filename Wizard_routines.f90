@@ -244,7 +244,7 @@
                   CALL SelectMode(IDB_AnalyseSolutions)
                 CASE (6) ! Rietveld refinement
                   CALL WizardWindowShow(IDD_SAW_Page6)
-       !           CALL SelectMode(IDB_AnalyseSolutions)
+                  CALL WDialogFieldState(IDNEXT, Disabled)
               END SELECT
           END SELECT
       END SELECT
