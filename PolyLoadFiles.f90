@@ -2353,6 +2353,7 @@
       I=1
  10   READ(11,*,ERR=100,END=100) (IH(II,I),II=1,3),ARGK(I),DSTAR(I)
       I=I+1
+      IF (I .GT. MTIC) GOTO 100
       GOTO 10
  100  NTIC=I-1
       CLOSE(11)
