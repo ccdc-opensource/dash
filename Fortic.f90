@@ -1,7 +1,6 @@
-!*==FORTIC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-! LEVEL 14      SUBROUTINE FORTIC(PNAME,ALSQ,MATSZ,PCXX,PFXX,MAGROU,CALROU,FILNMR)
       SUBROUTINE FORTIC(PNAME,ALSQ,MATSZ,PCXX,PFXX,MAGROU,CALROU,FILNMR)
 !
 ! *** FORTIC from FORTY - WIFD***
@@ -19,7 +18,7 @@
 !
 !
       INCLUDE 'params.inc'
-!
+
       LOGICAL DFLTPR
       EXTERNAL DFLTPR, PCXX, PFXX, MAGROU, CALROU, RUNPAR, VARSPR
       CHARACTER*6 PNAME
@@ -63,7 +62,7 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
@@ -78,22 +77,22 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       LOGICAL LOGIPK
       COMMON /IPKCMN/ LOGIPK, IPK, PIK(MIPK)
-!
+
       COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
      &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS),    &
      &                JOCCR(MPTS)
 !     &KOBZ(MPTS)
       COMMON /CMNNOW/ NOBSNOW
-!
-!.. Note only 3 phases specifically hardwired here
+
+! Note only 3 phases specifically hardwired here
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-!
+
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-!
+
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -101,39 +100,41 @@
       COMMON /commun/ filnam_root
       CHARACTER*10 filnam_root
       filnam_root = filnmr
-!
+
       CALL PREFIN(PNAME)
-!
 ! SET UP PRECISE PROBLEM, AND READ MOST L CARDS:
       CALL REFSET
 ! THIS ROUTINE IS ONLY FOR ONE PHASE:
       CALL LOGPHA(1)
       CALL SETPR(PCXX,PFXX,MAGROU)
-!
 ! COLLECT CONSTRAINTS IMPOSED BY SYMMETRY, AND THOSE REQUESTED, AND
 ! SET UP PARAMETERS AS VARIABLES (NOT YET AS BASIC VARIABLES)
       CALL PARSPR(MAGROU)
-!
 ! MAKE LIST OF REFLECTION INDICES:
       CALL INRFPR(PCXX,PFXX)
-!.. Check if we have too many reflections
+! Check if we have too many reflections
       CALL CHKMAXREF(PCXX)
-!
 ! OUTPUT H,K,L IF REQUIRED:
       CALL HKLOUT(PCXX,ALSQ,MATSZ)
 
       END SUBROUTINE FORTIC
-!*==FORSYM.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
+!*****************************************************************************
 !
       SUBROUTINE FORSYM(pname,filnmr)
+
       CHARACTER*6 PNAME
       CHARACTER*10 filnmr
-      COMMON /commun/ filnam_root
-      CHARACTER*10 filnam_root
-      filnam_root = filnmr
 
+      COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
+      CHARACTER*10 filnam_root
+      COMMON /commun/ filnam_root
+
+      filnam_root = filnmr
+! JvdS I added NINIT = 1, otherwise INITIL, called by PREFIN, doesn't assign a filename to unit LPT
+! causing a file fort.12 to appear every time a .sdi file is opened (execpt the first time).
+      NINIT = 1
       CALL PREFIN(PNAME)
       CALL SYMOP
       CALL OPSYM(1)
@@ -143,7 +144,7 @@
 !
       SUBROUTINE MAKRHM
 !.. Makes a number of matrices to speed up the default calculation
-!
+
       DIMENSION H(3)
       INCLUDE 'SGinc\FFCALCTOP.INC'
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -163,5 +164,8 @@
           sctrh(i,ir) = SCALPR(TRANS(1,I),H)
         ENDDO
       ENDDO
-!
+
       END SUBROUTINE MAKRHM
+!
+!*****************************************************************************
+!
