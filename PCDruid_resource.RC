@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 11/Sep/2001 17:29:45
+// Modified : 12/Sep/2001 16:26:21
 //
 ///////////////////////////////////////////////////
 //
@@ -575,6 +575,10 @@
 #define IDF_REAL3                        1232
 #define IDF_LABEL3                       1233
 #define ID_Home                         40009
+#define ID_Right                        40012
+#define ID_Down                         40015
+#define ID_Left                         40004
+#define ID_Up                           40013
 
 ///////////////////////////////////////////////////
 //
@@ -2021,9 +2025,9 @@ CAPTION "DASH - Simulated Annealing Status"
 BEGIN
     CONTROL "Temperature",IDF_curr_temp_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   18,   35,   40,   12
     CONTROL "",IDF_curr_temp,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,   32,   32,   12
-    CONTROL "Minimum chi",IDF_min_chisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,   49,   40,   12
+    CONTROL "Minimum chi",IDF_min_chisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   14,   49,   40,   12
     CONTROL "",IDF_min_chisq,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,   46,   32,   12
-    CONTROL "Average chi",IDF_avchisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,   63,   40,   12
+    CONTROL "Average chi",IDF_avchisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   14,   63,   40,   12
     CONTROL "",IDF_av_chisq,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,   60,   32,   12
     CONTROL "Total moves",IDF_total_moves_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   18,  102,   40,   12
     CONTROL "",IDF_total_moves,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,  100,   32,   12
@@ -2039,10 +2043,10 @@ BEGIN
     CONTROL "0",IDF_SA_zero_move_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   62,  134,   10,    8
     CONTROL "View",IDF_Viewer,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  200,  152,   32,   20
     CONTROL "",IDF_SAMove_picture,"STATIC",WS_CHILD | WS_VISIBLE | SS_BLACKRECT | SS_NOTIFY | SS_CENTERIMAGE,   62,  114,  152,    8,WS_EX_CLIENTEDGE
-    CONTROL "2",IDF_minchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   52,   47,    8,    8
-    CONTROL "2",IDF_avchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   52,   60,    8,    8
-    CONTROL "Profile chi",IDF_profchisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   10,   77,   40,   12
-    CONTROL "2",IDF_profchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   52,   74,    8,    8
+    CONTROL "2",IDF_minchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   55,   48,    6,    8
+    CONTROL "2",IDF_avchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   55,   61,    6,    8
+    CONTROL "Profile chi",IDF_profchisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   14,   77,   40,   12
+    CONTROL "2",IDF_profchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   55,   75,    6,    8
     CONTROL "",IDF_profile_chisq2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  218,   74,   32,   12
     CONTROL "",IDF_SATotalMoves_picture,"STATIC",WS_CHILD | WS_VISIBLE | SS_BLACKRECT | SS_NOTIFY | SS_CENTERIMAGE,   62,  102,  152,    8,WS_EX_CLIENTEDGE
     CONTROL "Downhill",IDF_SA_move_type,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   88,  134,   30,    8
@@ -2805,7 +2809,11 @@ BEGIN
     ID_Remove_Background            "Remove background"
     ID_import_dpj_file              "Open DASH Pawley file"
     ID_import_xye_file              "Open powder diffraction file"
+    ID_Left                         "Move left"
+    ID_Right                        "Move right"
     ID_Home                         "Home (reset view)"
+    ID_Up                           "Move up"
+    ID_Down                         "Move down"
 END
 
 ///////////////////////////////////////////////////
@@ -2823,6 +2831,10 @@ BEGIN
    ID_Pawley_Refinement_Mode,
    ID_Structure_Solution_Mode,0,
    ID_Start_Wizard,0,
+   ID_Left,
+   ID_Right,
+   ID_Up,
+   ID_Down,
    ID_Home,0,
    ID_PolyFitter_Help,0,
    ID_FILE_EXIT,

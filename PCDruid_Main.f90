@@ -54,13 +54,13 @@
 
 ! New license information structure    
       TYPE License_Info
-        INTEGER          :: Day
-        INTEGER          :: Month
-        INTEGER          :: Year
-        INTEGER          :: DateCode
-        INTEGER          :: SerialNumber
-        INTEGER          :: LicenseType
-        INTEGER          :: Valid
+        INTEGER  :: Day
+        INTEGER  :: Month
+        INTEGER  :: Year
+        INTEGER  :: DateCode
+        INTEGER  :: SerialNumber
+        INTEGER  :: LicenseType
+        INTEGER  :: Valid
       END TYPE
       INTEGER NodeKey,DemoKey,SiteKey
       PARAMETER (NodeKey = 1)
@@ -227,6 +227,7 @@
 !C>> JCC data to indicate whether we are coming out of peak-fitting mode
       LOGICAL FromPeakFit
       LOGICAL Confirm ! Function
+      REAL xpgdif, ypgdif
 
       FromPeakFit = .FALSE.
 !
@@ -307,14 +308,42 @@
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Widths)
           CALL PopActiveWindowID
+        CASE (ID_Left)
+! We're going to move the graph to the left if we can
+          xpgdif=xpgmax-xpgmin
+          xpgmin=MAX(xpmin,xpgmin-0.25*xpgdif)
+          xpgmax=xpgmin+xpgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot(IPTYPE)
+        CASE (ID_Right)
+! We're going to move the graph to the right if we can
+          xpgdif=xpgmax-xpgmin
+          xpgmax=MIN(xpmax,xpgmax+0.25*xpgdif)
+          xpgmin=xpgmax-xpgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot(IPTYPE)
+        CASE (ID_Down)
+! We're going to move the graph down if we can
+          ypgdif=ypgmax-ypgmin
+          ypgmin=max(ypmin,ypgmin-0.25*ypgdif)
+          ypgmax=ypgmin+ypgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot(IPTYPE)
+        CASE (ID_Up)
+! We're going to move the graph up if we can
+          ypgdif=ypgmax-ypgmin
+          ypgmax=min(ypmax,ypgmax+0.25*ypgdif)
+          ypgmin=ypgmax-ypgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot(IPTYPE)
         CASE (ID_Home)
 ! Back to full profile range
-           xpgmin=xpmin
-           xpgmax=xpmax
-           ypgmin=ypmin
-           ypgmax=ypmax
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot(IPTYPE)        
+          xpgmin=xpmin
+          xpgmax=xpmax
+          ypgmin=ypmin
+          ypgmax=ypmax
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot(IPTYPE)        
         CASE (ID_PolyFitter_Help)
           CALL LaunchHelp()
         CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5)
