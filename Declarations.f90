@@ -244,8 +244,8 @@
 
 ! Note that the variable names in this COMMON block are not consistent.
 
-      DOUBLE PRECISION XOPT,       C,       XP,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
+      DOUBLE PRECISION XOPT,       C,       FOPT
+      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
 ! MVAR = 100 (the variable formerly also known as NMAX, almost subtly different from MPAR)
 ! XOPT = values of the parameters of the best SA solution so far
