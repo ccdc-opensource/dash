@@ -130,17 +130,17 @@
       CALL PolyFitter_EnableExternal
 ! Get the space group symbols ...
       IF (PolyFitter_OpenSpaceGroupSymbols() .NE. 0) GOTO 999 ! fail gracefully!
-      i=0
+      i = 0
  10   lintem=' '
       READ(110,1100,END=100) nl, lintem
  1100 FORMAT(Q,A)
       IF (lintem(1:1) .EQ. '-') GOTO 100
       IF (nl .LT. 70) THEN
-        DO ii=nl+1,70
-          lintem(ii:ii)=' '
+        DO ii = nl+1, 70
+          lintem(ii:ii) = ' '
         ENDDO
       ENDIF
-      i=i+1
+      i = i + 1
 !    14:a1     P 21/b 1 1    -P 2xab           PMC$I1A000$P2A660 
 !    14:a2     P 21/n 1 1    -P 2xn            PMC$I1A000$P2A666 
 !    14:a3     P 21/c 1 1    -P 2xac           PMC$I1A000$P2A606 
@@ -186,16 +186,10 @@
 
       INTEGER       lval
       CHARACTER*255 DashDir
-      CHARACTER*255 line
+      CHARACTER*MaxPathLength line
       CHARACTER*255 tDir, tFile
-      CHARACTER*MaxPathLength tString
       INTEGER*4 tProcess, tSize
 
-      tSize = MaxPathLength
-      tProcess = 0 ! this program
-      CALL GetModuleFileName(tProcess,tString,LOC(tSize))
-! tString should now contain the full path to PCDash.exe irrespective of the way
-! DASH has been invoked.
       ConvOn     = .FALSE.
       lval = GETENVQQ("DASH_DIR",DashDir)
       IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
@@ -205,7 +199,11 @@
       ENDIF
    10 OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 20)
       GOTO 25
-   20 CALL GetArg(0,line)
+   20 tSize = MaxPathLength
+      tProcess = 0 ! this program
+      CALL GetModuleFileName(tProcess,line,LOC(tSize))
+! tString should now contain the full path to PCDash.exe irrespective of the way
+! DASH has been invoked.
       CALL SplitPath(line,tDir,tFile)
       IF (LEN_TRIM(tDir) .EQ. 0) tDir = '.'//DIRSPACER
       OPEN(121,FILE=tDir(1:LEN_TRIM(tDir))//CONFIG, STATUS='OLD',ERR=30)
@@ -227,11 +225,13 @@
 
       USE WINTERACTER
       USE VARIABLES
-      USE dflib ! Windows environment variable handling: for GETENVQQ
-      USE dfport
+      USE DFLIB ! Windows environment variable handling: for GETENVQQ
+      USE DFPORT
+      USE KERNEL32
 
       INTEGER       errstat, lval, dlen
       CHARACTER*255 DashDir, Command
+      INTEGER*4 tProcess, tSize
 
       PolyFitter_OpenSpaceGroupSymbols = 0
 ! Try the default installation directory first
@@ -262,7 +262,9 @@
         RETURN
       ENDIF
 ! Try looking at the command path itself and deriving the path from that
-      CALL GetArg(0,Command)
+      tSize = MaxPathLength
+      tProcess = 0 ! this program
+      CALL GetModuleFileName(tProcess,Command,LOC(tSize))
       dlen = LEN_TRIM(Command)
       DO WHILE (Command(dlen:dlen) .NE. DIRSPACER)
         dlen = dlen - 1
