@@ -269,6 +269,48 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION Get_UseCrystallographicCoM
+
+! When .TRUE., when calculating the centre of rotation of a Z-matrix,
+! each atom is weighted by the square of its number of electrons
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      Get_UseCrystallographicCoM = WDialogGetCheckBoxLogical(IDF_CrystallographicCoM)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_UseCrystallographicCoM
+!
+!*****************************************************************************
+!
+      SUBROUTINE Set_UseCrystallographicCoM(TheValue)
+
+! When .TRUE., when calculating the centre of rotation of a Z-matrix,
+! each atom is weighted by the square of its number of electrons
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: TheValue
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogPutCheckBoxLogical(IDF_CrystallographicCoM,TheValue)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_UseCrystallographicCoM
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION Get_OutputChi2vsMoves
 
 ! When .TRUE., the profile chi**2 versus moves graph is written out to a file
@@ -326,6 +368,46 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_AutoLocalMinimisation
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION Get_AutoAlign
+
+! When .TRUE., the molecules of each solution in a multi run are set to a default position/orientation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      Get_AutoAlign = WDialogGetCheckBoxLogical(IDF_Align)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_AutoAlign
+!
+!*****************************************************************************
+!
+      SUBROUTINE Set_AutoAlign(TheValue)
+
+! When .TRUE., the molecules of each solution in a multi run are set to a default position/orientation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: TheValue
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogPutCheckBoxLogical(IDF_Align,TheValue)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Set_AutoAlign
 !
 !*****************************************************************************
 !
@@ -697,7 +779,7 @@
                     FNAME(1:LEN_TRIM(FNAME))//' ?')) THEN
           tFileHandle = 10
           OPEN(UNIT=tFileHandle,FILE=FNAME(1:LEN_TRIM(FNAME)),ERR=999)
-          WRITE(tFileHandle,'(F9.5)') TheWaveLength
+          WRITE(tFileHandle,'(F9.5)',ERR=999) TheWaveLength
           DO I = 1, BackupNOBS
             WRITE(tFileHandle,'(F6.3,X,F11.3,X,F12.5)',ERR=999) BackupXOBS(I), BackupYOBS(I), BackupEOBS(I)
           ENDDO
