@@ -187,7 +187,10 @@
       PARAMETER (IREFSM=2000)
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
 
+      REAL            DERIVB
+      INTEGER                          LVARB
       COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
@@ -218,7 +221,9 @@
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
                       NBASF4(MPRPKF,2,9), L4END(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
@@ -230,6 +235,7 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
+
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
 

@@ -2052,15 +2052,16 @@
 !
       INCLUDE 'PARAMS.INC'
 
-      DIMENSION ALSQ(MATSZ), MM(MaxBVar)
+      DIMENSION ALSQ(MATSZ)
 
+      INTEGER MM(MaxBVar)
       INTEGER         MATPNT
-      REAL                         BLSQ
+      REAL                               BLSQ
       COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
       EQUIVALENCE (MM(1),MATPNT(2))
 
       IF ((I .GT. MaxBVar) .OR. (J .GT. MaxBVar)) CALL DebugErrorMessage('Index into ALSQ out of range in ELEMAT')
-      IF (J.LT.I) THEN
+      IF (J .LT. I) THEN
         IND = MM(J) + I
       ELSE
         IND = MM(I) + J
@@ -4546,6 +4547,8 @@
 !P Slack constraints must have been set up in /SLKGEO/ via GEOMIN
 !P Parameters and variables must be set up via PARSSF
 !
+      INCLUDE 'PARAMS.INC'
+      
       LOGICAL ONCARD
       CHARACTER*4 NAME
       COMMON /ATNAM / ATNAME(150), ATNA(150,9)
@@ -4557,7 +4560,10 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -5025,6 +5031,8 @@
 !D and adds totals in to LSQ matrix.
 !O Prints obs and calc list if requested on I card.
 !
+      INCLUDE 'PARAMS.INC'
+      
       CHARACTER*5 F1
       CHARACTER*20 F2, F4, F5, F7
       CHARACTER*22 F3
@@ -5036,13 +5044,19 @@
       DIMENSION DETH2(3), DETH3(3)
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /DERVAR/ DERIVV(500), LVARV
+
+      REAL            DERIVV
+      INTEGER                          LVARV
+      COMMON /DERVAR/ DERIVV(MaxVVar), LVARV
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
+
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
      &                YMAX, CSQTOT
       EQUIVALENCE (IWGHT,IWGH(1))
+
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -5055,6 +5069,7 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
@@ -5361,8 +5376,7 @@
       IF (STHL-STHLMX) 6, 6, 4
     6 IF (STHL-10.E-5) 4, 5, 5
     5 IF (LATABS(H)) GOTO 4
-      GOTO 100
-!
+      RETURN
 !  IF HERE HAVE NO MORE VALUES OF H,K,L TO OFFER
   101 NOMORE = .TRUE.
   100 RETURN
@@ -7035,17 +7049,25 @@
 !D such would not be true of FCALC, the similar routine which does not cater
 !D for LSQ
 !
+      INCLUDE 'PARAMS.INC'
+      
       COMPLEX SUM1, TERM, FORM, HR, FORMFA
       LOGICAL TESTOV, LATABS
       DIMENSION RH(3), H(3)
       COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
+
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
+
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(300), DERIVT(300)
-      COMPLEX FC, DERIVT
+
+      COMPLEX         FC
+      REAL                FCMOD, COSAL, SINAL, FCDERS
+      COMPLEX                                                   DERIVT
+      COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(MaxF2VA), DERIVT(MaxF2VA)
+
       COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
      &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
@@ -7057,7 +7079,9 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
@@ -7455,12 +7479,17 @@
 !D Fills in array CELESD(6,6,2) for the variance-covariances of the
 !D quadratic products in both spaces, and CELLSD(6,6) for a,b,etc.
 !
+      INCLUDE 'PARAMS.INC'
+      
       DIMENSION ALSQ(MATSZ)
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       DIMENSION TOSTAR(6,6), TOSTTR(6,6), CELTMP(6,6), BGTOSM(6,6),     &
      &          SMTOBG(6,6), SMBGTR(6,6)
 !
@@ -7568,24 +7597,36 @@
 !A The matrix ALSQ is dimensioned everywhere except in MAIN programs as
 !A ALSQ(MATSZ), and handed through as a routine argument.
 !
-      CHARACTER*4 IPNAM1(2), IPNAM2(2), IUPPER(400), LOWER(400)
-      DIMENSION ALSQ(MATSZ), MM(400), ICORR(400)
-      COMMON /DERBAS/ DERIVB(400), LVARB
+      INCLUDE "PARAMS.INC"
+
+      CHARACTER*4 IPNAM1(2), IPNAM2(2), IUPPER(MaxBVar), LOWER(MaxBVar)
+      DIMENSION ALSQ(MATSZ), ICORR(MaxBVar)
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      COMMON /MATDAT/ MATPNT(401), BLSQ(400)
+
+      INTEGER MM(MaxBVar)
+      INTEGER         MATPNT
+      REAL                               BLSQ
+      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
+      EQUIVALENCE (MM(1),MATPNT(2))
+
+      LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
-      LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      EQUIVALENCE (MM(1),MATPNT(2))
-!
-      IF (SIMUL) GOTO 100
+
+      IF (SIMUL) RETURN
 ! IF MAXCOR  -VE, NO PRINTING AT ALL:
-      IF (MAXCOR.LT.0) GOTO 100
+      IF (MAXCOR.LT.0) RETURN
       DO I = 1, LVARB
-        BLSQ(I) = 1./SQRT(ALSQ(MM(I)+I))
+        BLSQ(I) = 1.0/SQRT(ALSQ(MM(I)+I))
       ENDDO
 ! BLSQ USED TEMPORARILY TO HOLD DIAGONAL - NOT NEEDED AS RHS NOW
 !
@@ -7613,8 +7654,7 @@
       ENDDO
       IF (IHEAD.EQ.0) WRITE (LPT,2006) MAXCOR
  2006 FORMAT (/' No correlations found above',I4,' per cent')
-      GOTO 100
-!
+      RETURN
 ! WHOLE MATRIX:
     2 CALL MESS(LPT,1,'Correlation matrix :')
       CALL NEWLIN(LPT)
@@ -7622,7 +7662,6 @@
 ! PUT INTO IUPPER AND LOWER THE PRINTING NAMES OF ALL BASIC VARIABLES:
         CALL PARNAM(IUPPER(I),LOWER(I),1,I)
       ENDDO
-!
       NV = 0
     7 NV = NV + 20
       NST = NV - 19
@@ -7634,21 +7673,18 @@
  2001 FORMAT (' ',10X,20(1X,A4))
       WRITE (LPT,2003) (LOWER(I),I=NST,NV)
  2003 FORMAT (' ',12X,20(1X,A4))
-!
       DO I = 1, LVARB
         K = NST - 1
         DO J = 1, NO
           K = K + 1
           ICORR(J) = NINT(100.*ELEMAT(ALSQ,MATSZ,I,K)*BLSQ(I)*BLSQ(K))
         ENDDO
-!
         WRITE (LPT,2002) (IUPPER(I),(LOWER(I)),J=1,2), (ICORR(J),J=1,NO)
  2002   FORMAT (' ',2(1X,A4),T112,2(1X,A4),T12,20I5)
       ENDDO
 ! END OF ONE PRINTING
-!
       IF (NV.LT.LVARB) GOTO 7
-  100 RETURN
+
       END SUBROUTINE MATCOR
 !
 !*****************************************************************************
@@ -7669,35 +7705,46 @@
 !
 !N It is intended to replace it by a QR inversion routine.
 !
+      INCLUDE "PARAMS.INC"
+
       CHARACTER*4 BS, VR
       LOGICAL TESTOV, OVER
       DIMENSION ALSQ(MATSZ)
-      COMMON /DERBAS/ DERIVB(400), LVARB
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      COMMON /MATDAT/ MATPNT(401), BLSQ(400)
+
+      INTEGER MM(MaxBVar)
+      INTEGER         MATPNT
+      REAL                               BLSQ
+      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
+      EQUIVALENCE (MM(1),MATPNT(2))
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-!
-      IF (SIMUL) GOTO 100
+
+      IF (SIMUL) RETURN
 ! DIMENSION OF MATRIX:
       N = LVARB
       IF (N) 100, 100, 11
-!
 ! SCALE MATRIX TO ALLOW FOR PARAMETERS OF DIFFERING SCALES:
    11 DO I = 1, N
         IR = MATPNT(I+1)
-        OVER = TESTOV(1.,ALSQ(IR+I))
+        OVER = TESTOV(1.0,ALSQ(IR+I))
         IF (OVER) THEN
           CALL PARNAM(BS,VR,1,I)
           CALL DebugErrorMessage('Element 0.0 in MATINV')
           WRITE (LPT,3000) I, BS, VR
-          DERIVB(I) = 0.
+          DERIVB(I) = 0.0
         ELSE
-          DERIVB(I) = 1./SQRT(ALSQ(IR+I))
+          DERIVB(I) = 1.0/SQRT(ALSQ(IR+I))
         ENDIF
         DO J = 1, I
           IS = MATPNT(J+1)
@@ -7707,19 +7754,18 @@
           ALSQ(IR+J) = ALSQ(IR+J)*DERIVB(I)
         ENDDO
         IF (OVER) THEN
-          DERIVB(I) = 1.
-          ALSQ(IR+I) = 1.
+          DERIVB(I) = 1.0
+          ALSQ(IR+I) = 1.0
 ! JvdS As all the other BLSQ assignments had been commented out, I decided to do this one as well.
-!          BLSQ(I) = 0.
+!          BLSQ(I) = 0.0
         ENDIF
       ENDDO
-!
       DO I = 1, N
         I1 = I + 1
         IR = MATPNT(I1)
         IS = MATPNT(I)
         ALSQ(IR+I) = 1./ALSQ(IR+I)
-! NEXT      BLSQ(I)=BLSQ(I)*ALSQ(IR+I)
+! NEXT      BLSQ(I) = BLSQ(I)*ALSQ(IR+I)
         IF (I.EQ.N) GOTO 1
 ! OR NEXT DO LOOP WILL FAIL
         DO K = I1, N
@@ -7727,15 +7773,13 @@
         ENDDO
         DO J = I1, N
           IQ = MATPNT(J+1)
-!
-! NEXT      BLSQ(J)=BLSQ(J)-BLSQ(I)*ALSQ(IR+J)
+! NEXT      BLSQ(J) = BLSQ(J)-BLSQ(I)*ALSQ(IR+J)
           DO K = J, N
             ALSQ(IQ+K) = ALSQ(IQ+K) + ALSQ(IS+K)*ALSQ(IR+J)
           ENDDO
         ENDDO
     1 ENDDO
       IF (N-1) 101, 101, 12
-!
 ! INVERSE OF ALSQ:
    12 N1 = N - 1
       DO IFOR = 1, N1
@@ -7779,6 +7823,7 @@
       ENDDO
   100 RETURN
  3000 FORMAT (/' WARNING in MATINV ** zero diagonal element for basic variable number',I5,2X,A4,1X,A4)
+
       END SUBROUTINE MATINV
 !
 !*****************************************************************************
@@ -7794,25 +7839,38 @@
 !A The matrix ALSQ is dimensioned everywhere except in MAIN programs as
 !A ALSQ(MATSZ).
 !
+      INCLUDE "PARAMS.INC"
+      
       DIMENSION ALSQ(MATSZ)
-      COMMON /DERBAS/ DERIVB(400), LVARB
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      COMMON /MATDAT/ MATPNT(401), BLSQ(400)
+
+      INTEGER MM(MaxBVar)
+      INTEGER         MATPNT
+      REAL                               BLSQ
+      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
+      EQUIVALENCE (MM(1),MATPNT(2))
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-!
-!
+
       IF (SIMUL) RETURN
 ! SET UP POINTERS:
       MATPNT(1) = 0
       DO I = 1, LVARB
         MATPNT(I+1) = MATPNT(I) + LVARB - I + 1
       ENDDO
-      NMAT = (LVARB+1)*(LVARB+2)/2
+      NMAT = (LVARB+1)*(LVARB+2)/2 ! JvdS Oct 2003 I suspect a typo here: should that have been (LVARB-1)*(LVARB+2)/2
+      ! or simply (N*N+N)/2 ?
       IF (MATSZ.LT.NMAT) THEN
         WRITE (LPT,3000) MATSZ, NMAT, LVARB
  3000 FORMAT (/' ERROR ** MATSZ given as',I6,' and needs to be  at least',I6,' for',I5,' basic variables')
@@ -7850,12 +7908,25 @@
 !N Eventually MATINV will modify BLSQ to give shifts, but for now we must
 !N form them separately.
 !
+      INCLUDE "PARAMS.INC"
+
       CHARACTER*4 BS, VR
-      DIMENSION ALSQ(MATSZ), MM(400), SHIFTS(400)
-      COMMON /DERBAS/ DERIVB(400), LVARB
+      DIMENSION ALSQ(MATSZ), SHIFTS(MaxBVar)
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      COMMON /MATDAT/ MATPNT(401), BLSQ(400)
+
+      INTEGER MM(MaxBVar)
+      INTEGER         MATPNT
+      REAL                               BLSQ
+      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
+      EQUIVALENCE (MM(1),MATPNT(2))
+
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
      &                YMAX, CSQTOT
@@ -7869,8 +7940,7 @@
      &                CHI2
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
-      EQUIVALENCE (MM(1),MATPNT(2))
-!
+
       IF (SIMUL) RETURN
 ! SCALE FOR ESD'S:
       CHI2 = SUMWD/(NOBS-LVARB)
@@ -7899,7 +7969,6 @@
       DO I = 1, LVARB
         BLSQ(I) = SHIFTS(I)
       ENDDO
-  100 RETURN
  3000 FORMAT (/' ERROR ** ill-conditioning starts at basic variable',' number',I5,2X,A4,1X,A4)
 
       END SUBROUTINE MATSHF
@@ -7922,9 +7991,21 @@
 !P          SQRTWT holds the square root of the weight
 !P          SIMUL is TRUE if this is only a simulation cycle
 !
-      DIMENSION ALSQ(MATSZ), MM(400)
-      COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /MATDAT/ MATPNT(401), BLSQ(400)
+      INCLUDE "PARAMS.INC"
+
+      DIMENSION ALSQ(MATSZ)
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
+
+      INTEGER MM(MaxBVar)
+      INTEGER         MATPNT
+      REAL                               BLSQ
+      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
+      EQUIVALENCE (MM(1),MATPNT(2))
+
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
      &                YMAX, CSQTOT
@@ -7934,9 +8015,8 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      EQUIVALENCE (MM(1),MATPNT(2))
 
-      IF (SIMUL) GOTO 100
+      IF (SIMUL) RETURN
       SQWDIF = SQRTWT*DIFF
       DO I = 1, LVARB
         DERIVB(I) = SQRTWT*DERIVB(I)
@@ -7949,7 +8029,7 @@
         ENDDO
         BLSQ(I) = BLSQ(I) + SQWDIF*DERIVB(I)
     1 ENDDO
-  100 RETURN
+
       END SUBROUTINE MATTOT
 !
 !*****************************************************************************
@@ -9229,6 +9309,8 @@
 !D A large, +ve value for the species type indicates only 1 name, not 2
 !D Picks up names via PRIWRD
 !
+      INCLUDE 'PARAMS.INC'
+      
       CHARACTER*4 IPNAM1, IPNAM2
       LOGICAL ONENAM
       DIMENSION LPAK(5)
@@ -9251,7 +9333,9 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
@@ -10007,12 +10091,18 @@
 !O Then lists the strict constraints.
 !O Any phases and sources are indicated by *P and *S
 !
+      INCLUDE 'PARAMS.INC'
+      
       CHARACTER*1 IJOIN(8)
       CHARACTER*4 IPR1(8), IPR2(8), NAM1, NAM2, NOLD
       LOGICAL F4, F5
       DIMENSION K1(8), K2(8)
       COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
-      COMMON /DERBAS/ DERIVB(400), LVARB
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
       INTEGER         NINIT, NBATCH, NSYSTM
       LOGICAL                                MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
@@ -10025,7 +10115,10 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -11777,10 +11870,21 @@
 !D a vector DERIVB in /DERBAS/, of LVARB derivatives of the same calculated
 !D function wrt basic variables.
 !
+      INCLUDE 'PARAMS.INC'
+      
       COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
-      COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /DERVAR/ DERIVV(500), LVARV
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
+      REAL            DERIVV
+      INTEGER                          LVARV
+      COMMON /DERVAR/ DERIVV(MaxVVar), LVARV
+
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -12030,8 +12134,14 @@
 !
 !O For entries 3,5 and 6 prints R factors on unit LPT.
 !
+      INCLUDE 'PARAMS.INC'
+      
       LOGICAL TESTOV
-      COMMON /DERBAS/ DERIVB(400), LVARB
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
@@ -12897,9 +13007,21 @@
 !D                in basic variables,
 !D          ESD is set to the square root of the sum of squares of their esds.
 !
+      INCLUDE "PARAMS.INC"
+      
       COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
-      COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /MATDAT/ MATPNT(401), BLSQ(400)
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
+
+      INTEGER MM(MaxBVar)
+      INTEGER         MATPNT
+      REAL                               BLSQ
+      COMMON /MATDAT/ MATPNT(MaxBVar+1), BLSQ(MaxBVar)
+      EQUIVALENCE (MM(1),MATPNT(2))
+
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       JROW = JROWPT(J)
@@ -15147,8 +15269,15 @@
       DIMENSION KKCOL(500), KBVCOL(500), A(500,200), KPRVR(2000)
       DIMENSION KREDUN(200)
       COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
-      COMMON /DERBAS/ DERIVB(400), LVARB
-      COMMON /DERVAR/ DERIVV(500), LVARV
+
+      REAL            DERIVB
+      INTEGER                          LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
+
+      REAL            DERIVV
+      INTEGER                          LVARV
+      COMMON /DERVAR/ DERIVV(MaxVVar), LVARV
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
@@ -15162,7 +15291,9 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+      INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
+      COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
@@ -15368,7 +15499,7 @@
       IF (LFIX.EQ.0) GOTO 23
       IF (NFIND(KK,KPRVR,LFIX).GT.0) GOTO 21
 ! IF NOT DESIGNATED "FIX" IT MUST BE A VARIABLE:
-   23 CALL ERRCHK(2,LVARV,500,0,'variables in LSQ')
+   23 CALL ERRCHK(2,LVARV,MaxBVar,0,'variables in LSQ')
       IF (IBMBER .NE. 0) RETURN
 ! COUNT VARIABLES/FAMILY/PHASE:
       NVARF(IFAM,JPHASE,JSOURC) = NVARF(IFAM,JPHASE,JSOURC) + 1
