@@ -1099,15 +1099,53 @@
           term6 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)*COSQS(IK,1,N)
           term7 = SINQS(IL,3,N)
           term8 = (term5+term6)*term7
-          AFCAL = AFCAL - (term4+term8)*fob(n,ir)
+          AFCAL = AFCAL - (term4+term8)*fob(N,IR)
           term4 = (term1+term2)*term3
           term8 = (term5-term6)*term7
-          BFCAL = BFCAL + (term4-term8)*fob(n,ir)
+          BFCAL = BFCAL + (term4-term8)*fob(N,IR)
         ENDDO
       ENDIF
       FFCALC_369 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_369
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_391(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P -4 21 c
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IL,3,N)
+          term2 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
+          AFCAL = AFCAL + 4.0*term1*term2*fob(N,IR)
+          term1 = SINQS(IL,3,N)
+          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
+          BFCAL = BFCAL - 4.0*term1*term2*fob(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          term1 = COSQS(IL,3,N)
+          term2 = SINQS(IH,2,N)*SINQS(IK,1,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          AFCAL = AFCAL + 4.0*term1*term2*fob(N,IR)
+          term1 = SINQS(IL,3,N)
+          term2 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)*COSQS(IK,1,N)
+          BFCAL = BFCAL + 4.0*term1*term2*fob(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_391 = AFCAL*AFCAL + BFCAL*BFCAL
+
+      END FUNCTION FFCALC_391
 !
 !*****************************************************************************
 !
@@ -1673,6 +1711,8 @@
       REAL AFCALC, BFCALC, SUMA, SUMB, V, PV
       INTEGER N, I, IV
 
+      
+
       AFCALC = 0.0
 ! Firstly if we are centric then calculate only cosine terms
       IF (CENTRC) THEN
@@ -1700,8 +1740,9 @@
           SUMB = 0.0
 ! SUM OVER SYMMETRY EQUIVALENTS:
           DO I = 1, NOPC
-! V is 2pi*(h*x+t)
+! V is 2pi*(h*x+t)  2*pi*((R*x+t)*h) = 2*pi*(x*(h*R+t))
             V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
+
             IV = V
             PV = V - FLOAT(IV)
             SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
