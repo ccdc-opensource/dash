@@ -265,6 +265,56 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION PlotErrorBars
+!
+! This function retrieves the value of the 'plot error bars' checkbox in the plot options panel
+!
+! JvdS 7 Aug 2001
+!
+! RETURNS : .TRUE.  if user requested the error bars     to be plotted
+!           .FALSE. if user requested the error bars not to be plotted
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      PlotErrorBars = WDialogGetCheckBoxLogical(IDF_ErrorBar_Check) 
+      CALL PopActiveWindowID
+
+      END FUNCTION PlotErrorBars
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION PlotBackground
+!
+! This function retrieves the value of the 'plot background' checkbox in the plot options panel
+!
+! JvdS 22 Jul 2001
+!
+! RETURNS : .TRUE.  if user requested the background     to be plotted
+!           .FALSE. if user requested the background not to be plotted
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      PlotBackground = WDialogGetCheckBoxLogical(IDF_background_check)
+      CALL PopActiveWindowID
+
+      END FUNCTION PlotBackground
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION ConnectPointsObs
 
 ! .TRUE. = when drawing the observed profile, the data points are joined by lines
