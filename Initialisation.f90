@@ -283,6 +283,7 @@
       DO ifrg = 1, maxfrg
         UseQuaternions(ifrg) = .TRUE.
       ENDDO
+      UsePreferredOrientation = .FALSE.
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
       CALL GetPathToMercuryFromRegistry
@@ -517,7 +518,7 @@
       OPEN(UNIT=tFileHandle,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Write a header
-      CALL FileWriteString(tFileHandle,RecNr,'DASH configuration file')
+      CALL FileWriteString(tFileHandle,RecNr,ProgramVersion//' configuration file')
       CALL FileWriteLogical(tFileHandle,RecNr,UseConfigFile)
       IF (.NOT. UseConfigFile) GOTO 999
 ! Save all colour definitions

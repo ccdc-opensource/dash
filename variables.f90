@@ -31,6 +31,9 @@
       CHARACTER(MaxPathLength) :: VIEWEXE
       CHARACTER(20)            :: VIEWARG
 
+      CHARACTER(8) :: ProgramVersion
+      DATA ProgramVersion / 'DASH 2.0' /
+
 ! File information; Names of files used by DASH For I/O
       CHARACTER*80  DashTicFile
       CHARACTER*80  DashHcvFile
@@ -129,6 +132,10 @@
 ! Set to .TRUE. whenever an .xye file is loaded that doesn't contain the wavelength
 ! When the wavelength is set, this variable is tested and the wavelength is
 ! written to the file.
+
+      LOGICAL UsePreferredOrientation
+      REAL G1
+      REAL PO_Axis(1:3) ! Normalised and converted to orthogonal co-ordinates
 
       END MODULE VARIABLES
 !
