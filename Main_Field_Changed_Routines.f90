@@ -366,6 +366,7 @@
             CASE (IDF_ZeroPoint)
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_ZeroPoint               
+              CALL Generate_TicMarks
           END SELECT
       END SELECT
       CALL PopActiveWindowID
