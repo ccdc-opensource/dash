@@ -1622,8 +1622,6 @@
           CALL WDialogPutRadioButton(IDF_PW_Option3)
         CASE (IDB_AnalyseSolutions)
           STATBARSTR(8)='Analyse solutions mode'
-          CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-          CALL WDialogPutRadioButton(IDF_PW_Option4)
       END SELECT
       CALL WindowOutStatusBar(8,STATBARSTR(8))
 ! Update the menu + the toolbar

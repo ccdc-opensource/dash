@@ -155,6 +155,8 @@
           CALL ShowWizardWindowZmatrices
         CASE (IDB_AnalyseSolutions)
           CALL SelectMode(IDB_AnalyseSolutions)
+          CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+          CALL WDialogPutRadioButton(IDF_PW_Option4)
           CALL WizardWindowShow(IDD_SAW_Page5)
         CASE (ID_FitPeaks)
           CALL WCursorShape(CurHourGlass)
