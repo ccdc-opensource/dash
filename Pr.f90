@@ -1137,8 +1137,6 @@
      &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
 !
       LOGICAL REFUSE, CYC1, NOPKRF
-      COMMON /PRSAVE/ KPOINT(200), SAVP2(200), SAVDER(300,200),         &
-     &                SAVPRC(200), SAVDPC(200), SAVFCN(200)
       COMMON /PRSTAT/ SMYC, SMYD, SMYO, SMIO, SMID, SMWYOS, IZCT, P5,   &
      &                IOP1, IOP2, KMI(9), KMA(9)
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6),          &
@@ -1159,9 +1157,6 @@
      &                NPCSOU(9,5)
       COMMON /TTHMNC/ TTHMON(5), KTHMON(5), C2TMON(5), S4TMON(5),       &
      &                OPCMON(5), ALPCOR, DLPCOR
-!
-      COMMON /POSCMN/ POSREF(MPSCMN)
-!
 !
       COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
      &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS),    &
@@ -2339,9 +2334,6 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
-      COMMON /POSCMN/ POSREF(MPSCMN)
-!
 !
       DATA FMT1/'(3I5  ,F10.3,F10.4,I5,30I4)'/
       DATA FMT2/'(3I5  ,3(F10.3,F10.4))'/
@@ -7414,82 +7406,6 @@
       ENDIF
       RETURN
       END SUBROUTINE WRDATA
-!*==WRINST.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!
-!
-!
-!
-! LEVEL 2      SUBROUTINE WRINST(N)
-      SUBROUTINE WRINST(N)
-!
-! *** WRINST by JCM 13 Aug 91 ***
-!
-!H Set and write first 155 elements of IWORK, instument parameters etc,
-!H for TIC & PICTIC
-!A On entry N=no. of points to set in IWORK(55)
-!
-      INCLUDE 'params.inc'
-!
-      COMMON /FCCDAT/ DATFIL, INSTNM, LONGTI, RUNUSR, STTIME, WSHIST,   &
-     &                XCAPT, YCAPT, MCAPT
-      CHARACTER DATFIL*80, INSTNM*8, LONGTI*80, RUNUSR*20, STTIME*20,   &
-     &          WSHIST*200, XCAPT*40, YCAPT*40, MCAPT*40
-!
-      COMMON /FOCDAT/ NOTC, NCYMIN, NCYMAX, DELTA, LDFIL, FI, INSTCO,   &
-     &                INSTST, NXCODE, LNPDFN, AL1, AL2, NOSPEC, NPT,    &
-     &                NUMRUN, RUNDUR, TTHET, XMN, XMX, YMN, YMX, NYCODE,&
-     &                NEMODE, EFIXED, USERPR(30), TDATA(MFOCDA),        &
-     &                BACK(MFOCDA), OBSDAT(MFOCDA), CALDAT(33000),      &
-     &                ERR(MFOCDA), STADAT(MFOCDA), YRANGE, IUNIT
-!
-      COMMON /WORKG / IWORK(256)
-      REAL RWORK(256)
-      CHARACTER*1024 CWORK
-! NON-STANDARD FORTRAN 77:
-!VMS
-      EQUIVALENCE (IWORK,CWORK)
-      EQUIVALENCE (IWORK,RWORK)
-!
-      IWORK(1) = NCYMIN
-      IWORK(2) = NCYMAX
-      RWORK(3) = DELTA
-      IWORK(4) = LDFIL
-      CWORK(17:96) = DATFIL
-      RWORK(25) = FI
-      IWORK(26) = INSTCO
-      CWORK(105:112) = INSTNM
-      IWORK(29) = INSTST
-      IWORK(30) = NXCODE
-      IWORK(31) = LNPDFN
-      RWORK(32) = AL1
-      RWORK(33) = AL2
-      CWORK(133:212) = LONGTI
-      IWORK(54) = 1
-! N SET AS INPUT ARGUMENT:
-      IWORK(55) = N
-      IWORK(56) = NUMRUN
-      CWORK(225:244) = RUNUSR
-      RWORK(62) = RUNDUR
-      CWORK(249:268) = STTIME
-      RWORK(68) = TTHET
-      CWORK(273:472) = WSHIST
-      RWORK(119) = XMN
-      RWORK(120) = XMX
-      RWORK(121) = YMN
-      RWORK(122) = YMX
-!* NOW RELYING ON CAPTS SET OUTSIDE
-      CWORK(489:528) = XCAPT
-      CWORK(529:568) = YCAPT
-      CWORK(569:608) = MCAPT
-      IWORK(153) = NYCODE
-      IWORK(154) = NEMODE
-      IWORK(155) = EFIXED
-!
-!      WRITE THIS DATA TO FILE
-!
-      CALL WRDATA(.FALSE.,IUNIT,IWORK,155)
-      RETURN
-      END SUBROUTINE WRINST
 !*==WRLINE.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !
