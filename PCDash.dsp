@@ -72,8 +72,8 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt /winapp
-# ADD F90 /browser /check:power /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /nologo /traceback /warn:argument_checking /warn:nofileopt /warn:unused
-# SUBTRACT F90 /check:bounds /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations /warn:truncated_source
+# ADD F90 /browser /check:power /compile_only /debug:full /include:"Debug/" /include:"c:\wint\lib.vf" /include:"c:\wint\include" /math_library:fast /nologo /optimize:0 /traceback /warn:argument_checking /warn:nofileopt /warn:unused
+# SUBTRACT F90 /assume:buffered_io /assume:noaccuracy_sensitive /check:bounds /check:format /check:output_conversion /check:overflow /check:underflow /warn:declarations /warn:truncated_source /fast
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /W4 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -97,10 +97,6 @@ LINK32=link.exe
 # Begin Group "Body"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
-# Begin Group "OLDFOR"
-
-# PROP Default_Filter ".for"
-# End Group
 # Begin Source File
 
 SOURCE=.\Basic_IO.f90
@@ -134,7 +130,9 @@ DEP_F90_BEGIN=\
 
 SOURCE=.\Ccslmain.f90
 DEP_F90_CCSLM=\
+	".\DRUID_HEADER.mod"\
 	".\Reflns.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -157,10 +155,72 @@ DEP_F90_CREAT=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\Declarations.f90
+DEP_F90_DECLA=\
+	".\params.inc"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\Dialog_Routines.f90
 DEP_F90_DIALO=\
 	".\DRUID_HEADER.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\DICVAR.f90
+# End Source File
+# Begin Source File
+
+SOURCE=.\DICVO2.f90
+DEP_F90_DICVO=\
+	".\Debug\DICVAR.MOD"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\DICVO3.f90
+DEP_F90_DICVO3=\
+	".\Debug\DICVAR.MOD"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\DICVO4.f90
+DEP_F90_DICVO4=\
+	".\Debug\DICVAR.MOD"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\DICVO5.f90
+DEP_F90_DICVO5=\
+	".\Debug\DICVAR.MOD"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\DICVO6.f90
+DEP_F90_DICVO6=\
+	".\Debug\DICVAR.MOD"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\DICVO7.f90
+DEP_F90_DICVO7=\
+	".\Debug\DICVAR.MOD"\
+	".\DRUID_HEADER.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\DICVOL91.f90
+DEP_F90_DICVOL=\
+	".\Debug\DICVAR.MOD"\
 	
 # End Source File
 # Begin Source File
@@ -171,6 +231,7 @@ SOURCE=.\DoAtomPositions.f90
 
 SOURCE=.\error_message.f90
 DEP_F90_ERROR=\
+	".\params.inc"\
 	".\Reflns.inc"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
@@ -186,11 +247,6 @@ DEP_F90_EVAL_=\
 # Begin Source File
 
 SOURCE=.\Fcn.f90
-DEP_F90_FCN_F=\
-	".\DRUID_HEADER.mod"\
-	".\params.inc"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
 # End Source File
 # Begin Source File
 
@@ -244,7 +300,7 @@ DEP_F90_FFCAL=\
 	".\SGinc\ffcalc_481.f90"\
 	".\SGinc\ffcalc_483.f90"\
 	".\SGinc\ffcalc_485.f90"\
-	".\SGinc\FFCALCTOP.f90"\
+	".\SGinc\ffcalctop.inc"\
 	
 # End Source File
 # Begin Source File
@@ -260,8 +316,10 @@ DEP_F90_FORTI=\
 
 SOURCE=.\forty.f90
 DEP_F90_FORTY=\
+	".\DRUID_HEADER.mod"\
 	".\params.inc"\
 	".\Reflns.inc"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
 # Begin Source File
@@ -339,6 +397,7 @@ DEP_F90_INTER=\
 	".\Lattice.inc"\
 	".\params.inc"\
 	".\statlog.inc"\
+	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -350,9 +409,11 @@ SOURCE=.\Mag.f90
 
 SOURCE=.\Main_Field_Changed_Routines.f90
 DEP_F90_MAIN_=\
+	".\Debug\DICVAR.MOD"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
+	".\params.inc"\
 	".\POLY_COLOURS.INC"\
 	".\statlog.inc"\
 	".\Variables.mod"\
@@ -367,6 +428,7 @@ DEP_F90_MCBAC=\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\params.inc"\
+	".\POLY_COLOURS.INC"\
 	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
@@ -422,13 +484,14 @@ DEP_F90_PAWLEY=\
 # End Source File
 # Begin Source File
 
-SOURCE=.\PCDruid_Main.f90
-DEP_F90_PCDRU=\
+SOURCE=.\PCDash_Main.f90
+DEP_F90_PCDAS=\
 	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\Lattice.inc"\
 	".\statlog.inc"\
+	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
 	
 # End Source File
@@ -514,6 +577,7 @@ DEP_F90_READ_=\
 
 SOURCE=.\Res2Mol2.f90
 DEP_F90_RES2M=\
+	".\Debug\SAMVAR.MOD"\
 	".\Variables.mod"\
 	
 # End Source File
@@ -613,6 +677,17 @@ DEP_F90_SA_SU=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\samabo.f90
+DEP_F90_SAMAB=\
+	".\Debug\SAMVAR.MOD"\
+	
+# End Source File
+# Begin Source File
+
+SOURCE=.\SAMVAR.f90
+# End Source File
+# Begin Source File
+
 SOURCE=.\SAsoln_store.f90
 DEP_F90_SASOL=\
 	".\DRUID_HEADER.mod"\
@@ -699,6 +774,13 @@ DEP_F90_VALCHI=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\variables.f90
+DEP_F90_VARIA=\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\Vicar.f90
 # End Source File
 # Begin Source File
@@ -773,6 +855,10 @@ SOURCE=.\statlog.inc
 # Begin Source File
 
 SOURCE=.\res\BACK.BMP
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\DASH.ico
 # End Source File
 # Begin Source File
 
