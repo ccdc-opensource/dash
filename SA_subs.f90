@@ -127,13 +127,6 @@
       REAL xtem, tempupper, templower, tempupper2, templower2
       INTEGER Upper, Lower
 
-      CHARACTER(MaxPathLength) :: CurrentDirectory
-      
-
-      CALL IosDirName(CurrentDirectory)      
-      OPEN(227,FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'xpvalues.txt',STATUS='UNKNOWN')
-
-
       Upper = 1
       Lower = 2
 

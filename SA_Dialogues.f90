@@ -1635,7 +1635,7 @@
       REAL TempPrevub, TempPrevlb, TempPrevx
       REAL Xinitial
       LOGICAL OutOfBounds
-     LOGICAL, EXTERNAL :: Confirm
+
           
       ICol = 0
       NumColumns = 3
@@ -1869,8 +1869,7 @@
 !             Check that x is in bounds
               CALL CheckXInBounds(IFRow, X(IFRow), OutOfBounds)
               IF(OutofBounds) THEN
-               CALL WMessageBox(OKOnly, ExclamationIcon, CommonOk, &
-                 'Initial value does not fall within defined ranges', 'Warning')
+               CALL WarningMessage('Initial value does not fall within defined ranges')
                  IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOk) THEN
                  GOTO 10
                ENDIF 
