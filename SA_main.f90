@@ -7,6 +7,7 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
+      USE PO_VAR
       
       IMPLICIT NONE
 
@@ -27,6 +28,7 @@
       CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*20 MaxMovesStr
       INTEGER, EXTERNAL :: DateToday
+      CHARACTER*36 tString36
 
       WriteSAParametersToFile = 1 ! Error
       CALL PushActiveWindowID
@@ -42,7 +44,7 @@
 
       CALL WDialogSelect(IDD_SA_input2)
       kk = 0
-      DO ifrg = 1, maxfrg
+      DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
 ! Write the name of the file
           ilen = LEN_TRIM(frag_file(iFrg))
@@ -63,6 +65,17 @@
           ENDDO
         ENDIF
       ENDDO
+! Preferred Orientation
+      IF (PrefParExists) THEN
+        WRITE(tFileHandle,'("  March-Dollase preferred orientation correction will be applied.")',ERR=999)
+        WRITE(tFileHandle,'("  Orientation: a* = ",F6.3,", b* = ",F6.3,", c* = ",F6.3)',ERR=999) (PrefPars(ii),ii=1,3)
+        kk = kk + 1
+        CALL WGridGetCellReal(IDF_parameter_grid,2,kk,lb)
+        CALL WGridGetCellReal(IDF_parameter_grid,3,kk,ub)
+        CALL WGridGetCellReal(IDF_parameter_grid,1,kk,x)
+        tString36 = 'Preferred Orientation'
+        WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,F12.5,1X,F12.5)",ERR=999) tString36,x,lb,ub
+      ENDIF
 ! Total number of parameters for this problem
 ! Number of atoms
       CALL WDialogSelect(IDD_SA_input3)
