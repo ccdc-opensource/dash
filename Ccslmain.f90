@@ -299,14 +299,16 @@
 !N any whose KKs are ALL encompassed by KK1(1), and delete them.  It is used
 !N to clear out family 4 each cycle for CAILS type refinement
 !
+      INCLUDE 'PARAMS.INC'
+
       LOGICAL KSAME, KWHOLE, KWIPE
       DIMENSION KK1(NPAR), AM(NPAR)
       DIMENSION KK2(20), KK3(20), AM2(20), KUN(5)
       COMMON /LENINT/ NBITS
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
-     &                KTPCON(200)
+     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KTPCON(MaxConstraints)
 
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
@@ -365,7 +367,7 @@
 ! IF NOT FOUND, BUT SUBTRACTING, EXIT:
       IF (IADD.EQ.-1) GOTO 100
 ! IT IS A REALLY NEW CONSTRAINT - ADD IT:
-      CALL ERRCHK(2,NUMCON,200,0,'LSQ constraints')
+      CALL ERRCHK(2,NUMCON,MaxConstraints,0,'LSQ constraints')
       IF (IBMBER .NE. 0) RETURN
       KPTCON(NUMCON+1) = KPTCON(NUMCON) + NPAR
       DO I = 1, NPAR
@@ -3988,6 +3990,8 @@
 !D unpacked for future reference.
 !N Also entries ADDFIX, ADDVAR, FVKPAK
 !
+      INCLUDE 'PARAMS.INC'
+
       LOGICAL FX, FIX, KWHOLE
       CHARACTER*4 FV(2), NAM1, NAM2
       DIMENSION K(5)
@@ -3995,8 +3999,8 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
-     &                KTPCON(200)
+     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KTPCON(MaxConstraints)
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -10244,6 +10248,7 @@
         KS = KSOURC
         IF (JR.GT.8) THEN
           WRITE (LPT,3000) NAM1, NAM2
+ 3000     FORMAT (/' ERROR ** redundant variable ',2(A4),'related to > 8 basics - cannot yet print')
           JNEXT = JROW + 7
           JR = 8
         ENDIF
@@ -10277,7 +10282,7 @@
       ENDDO
   100 RETURN
  2002 FORMAT (' ',10(A4,A1,A4,2X))
- 3000 FORMAT (/' ERROR ** redundant variable',2(A4),'related to > 8 basics - cannot yet print')
+
       END SUBROUTINE PRIVAR
 !
 !*****************************************************************************
@@ -10873,6 +10878,8 @@
 !
 !I Reads in L FIX and L VARY cards.
 !
+      INCLUDE 'PARAMS.INC'
+
       CHARACTER*4 NFV(2)
       LOGICAL FX
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
@@ -10880,8 +10887,8 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
-     &                KTPCON(200)
+     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KTPCON(MaxConstraints)
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -15266,8 +15273,8 @@
       INCLUDE 'PARAMS.INC'
 
       LOGICAL FOUND, KSAME, FX
-      DIMENSION KKCOL(500), KBVCOL(500), A(500,200), KPRVR(2000)
-      DIMENSION KREDUN(200)
+      DIMENSION KKCOL(500), KBVCOL(500), A(500,MaxConstraints), KPRVR(2000)
+      DIMENSION KREDUN(MaxConstraints)
       COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
 
       REAL            DERIVB
@@ -15282,8 +15289,8 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(201), KSTCON(200), &
-     &                KTPCON(200)
+     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KTPCON(MaxConstraints)
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -15412,11 +15419,11 @@
    41 ENDDO
 ! FILL IN MATRIX OF COEFFICIENTS IN CONSTRAINTS:
 ! IN MATRIX A, FIRST SUBSCRIPT = PARAMETER, SECOND=CONSTRAINT
-      CALL GMZER(A,500,200)
+      CALL GMZER(A,500,MaxConstraints)
       NCON = 0
       DO I = 1, NUMCON
         IF (KSTCON(I).EQ.0) GOTO 51
-        CALL ERRCHK(2,NCON,200,0,'strict constraints')
+        CALL ERRCHK(2,NCON,MaxConstraints,0,'strict constraints')
         IF (IBMBER .NE. 0) RETURN
         DO K = KPTCON(I), KPTCON(I+1) - 1
 ! NOT IF ALREADY FIXED:
@@ -15438,7 +15445,7 @@
 ! NO MORE NON-ZERO COEFFICIENTS LEFT - OUT
         GOTO 64
 ! PIVOT FOUND:
-! SWOP COLUMNS J AND NP (EVEN IF THEY ARE THE SAME), AND SCALE:
+! SWAP COLUMNS J AND NP (EVEN IF THEY ARE THE SAME), AND SCALE:
    63   KTEMP = KKCOL(J)
         KKCOL(J) = KKCOL(NP)
         KKCOL(NP) = KTEMP
@@ -15448,7 +15455,7 @@
           A(J,K) = A(NP,K)
           A(NP,K) = TEMP
         ENDDO
-! NOW SWOP ROWS I AND NP:
+! NOW SWAP ROWS I AND NP:
         DO K = 1, NPAR
           TEMP = A(K,I)
           A(K,I) = A(K,NP)
