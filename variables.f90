@@ -104,9 +104,6 @@
       LOGICAL SavePDB
 ! Flags to decide which molecular model files are written out when a best solution is found
 
-      LOGICAL ConnectPointsObs
-! .TRUE. = when drawing the observed profile, the data points are joined by lines
-
       REAL DefaultMaxResolution
 ! The maximum resolution cut-off, in Angstrom, set as default when a new powder pattern is read in.
 
