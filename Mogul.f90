@@ -1,4 +1,7 @@
-      SUBROUTINE CheckMogulUse(MogulUse)
+      
+!***********************************************************************      
+      
+      SUBROUTINE CheckMogulUse
 
       USE DRUID_HEADER
       USE VARIABLES
@@ -8,28 +11,15 @@
 
       LOGICAL, EXTERNAL :: Confirm
 
-      INTEGER I
-      LOGICAL, INTENT (IN   ) :: MogulUse
-
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetString(IDF_MogulExe,MOGULEXE)
+      CALL WDialogGetString(IDF_MogulExe, MOGULEXE)
       CALL PopActiveWindowID
-      I = LEN_TRIM(MOGULEXE)
-
-      IF (I .NE. 0) UseMogul = .TRUE. 
-      IF (UseMogul .EQ. .FALSE.) RETURN
-
-      IF (I .EQ. 0) THEN
-        IF (Confirm('Do you intend to use Mogul?')) THEN
-          UseMogul = .TRUE.        
-          RETURN
-        ELSE
-         UseMogul = .FALSE.
-         RETURN
-        ENDIF
+      IF (LEN_TRIM(MOGULEXE) .NE. 0) THEN
+        UseMogul = .TRUE. 
+      ELSE
+        IF (UseMogul) UseMogul = (Confirm('Do you intend to use Mogul?'))
       ENDIF
-      
       
       END SUBROUTINE CheckMogulUse
       
