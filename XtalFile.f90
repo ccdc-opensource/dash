@@ -240,11 +240,13 @@
             BestValuesDoF(KK+3,1) = RR_tran(3,iFrg,iFrgCopy)
             KK = KK +3
             ! Rotations
-            BestValuesDoF(KK+1,1) = RR_rot(1,iFrg,iFrgCopy)
-            BestValuesDoF(KK+2,1) = RR_rot(2,iFrg,iFrgCopy)
-            BestValuesDoF(KK+3,1) = RR_rot(3,iFrg,iFrgCopy)
-            BestValuesDoF(KK+4,1) = RR_rot(4,iFrg,iFrgCopy)
-            KK = KK +4
+            IF (natoms(iFrg) .GT. 1) THEN
+              BestValuesDoF(KK+1,1) = RR_rot(1,iFrg,iFrgCopy)
+              BestValuesDoF(KK+2,1) = RR_rot(2,iFrg,iFrgCopy)
+              BestValuesDoF(KK+3,1) = RR_rot(3,iFrg,iFrgCopy)
+              BestValuesDoF(KK+4,1) = RR_rot(4,iFrg,iFrgCopy)
+              KK = KK +4
+            ENDIF
             ! Torsions
             DO I = 1, natoms(iFrg)
               IF (IOPTB(I,iFrg) .EQ. 1) THEN
