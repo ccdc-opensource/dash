@@ -26,7 +26,6 @@
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
-      CHARACTER*MaxPathLength Grid_Buffer
       INTEGER RangeOption, I, iRow, iStatus
 
       CALL PushActiveWindowID
@@ -81,8 +80,12 @@
         CALL WGridGetCellCheckBox(IDF_SA_summary,2,iRow,istatus)
         IF (istatus .EQ. 1) THEN
 ! calls subroutine which opens Mercury window with .pdb file
-          CALL WGridGetCellString(IDF_SA_Summary,1,iRow,Grid_Buffer)
-          CALL ViewStructure(Grid_Buffer)
+!C          CALL WGridGetCellString(IDF_SA_Summary,1,iRow,Grid_Buffer)
+!C          CALL ViewStructure(Grid_Buffer)
+! @@ at the moment, this is wrong. But the solutions should be sorted against chi-sqrd.
+          Curr_SA_Run = iRow
+          CALL SA_STRUCTURE_OUTPUT_PDB
+          CALL ViewStructure('SA_best.pdb')
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(iRow)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,2,iRow,Unchecked)
