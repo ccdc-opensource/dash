@@ -155,6 +155,8 @@
 
       USE WINTERACTER
 
+      IMPLICIT NONE
+
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'POLY_COLOURS.INC'
 
@@ -167,11 +169,10 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX
-      COMMON /PROFIPM/ IPMIN, IPMAX
-
       REAL            XPG1, XPG2, YPG1, YPG2
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
+
+      INTEGER ISB
 
       CALL IGrSelect(1,0)
       CALL IGrArea(0.0,0.0,1.0,1.0)
@@ -197,7 +198,7 @@
         CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
       END DO
       CALL IPgClipRectangle('P')
-      CALL IPgBorder()
+      CALL IPgBorder
 
       END SUBROUTINE Plot_Initialise
 !
@@ -206,6 +207,8 @@
       SUBROUTINE Plot_Custom_Axes
 
       USE WINTERACTER
+     
+      IMPLICIT NONE
 
       INCLUDE 'POLY_COLOURS.INC'
 
@@ -218,10 +221,7 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX
-      COMMON /PROFIPM/ IPMIN, IPMAX
-
-      REAL YGGMIN, YGGMAX
+      REAL YGGMIN, YGGMAX, xggt, yggt
 
       CALL IGrColourN(KolNumMain)
       CALL IGrCharSize(1.,1.)
@@ -231,11 +231,10 @@
       CALL IPgUnitsToGrUnits(xpgmin,ypgmin,xggmin,yggmin)
       CALL IPgUnitsToGrUnits(xpgmax,ypgmax,xggmax,yggmax)
 ! Plot y=0 for tidiness
-      zero = 0.0
-      IF (ypgmin.lt.zero .and. ypgmax.gt.zero) THEN
-        CALL IPgUnitsToGrUnits(xpgmin,zero,xggt,yggt)
+      IF ((ypgmin.LT.0.0) .AND. (ypgmax.GT.0.0)) THEN
+        CALL IPgUnitsToGrUnits(xpgmin,0.0,xggt,yggt)
         CALL IGrMoveTo(xggt,yggt)
-        CALL IPgUnitsToGrUnits(xpgmax,zero,xggt,yggt)
+        CALL IPgUnitsToGrUnits(xpgmax,0.0,xggt,yggt)
         CALL IGrLineTo(xggt,yggt)
       ENDIF
       CALL IGrCharSize(1.,1.2)
@@ -381,16 +380,12 @@
       COMMON /CMN007/ CummChiSqd(MOBS)
 
       REAL    YDIF(MOBS), YADD
-      LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
+      LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs, Get_ShowCumChiSqd
       INTEGER I, II 
       REAL    sizmtem, xtem, ytem, xgtem, ygtem
-      REAL    tScale
+      LOGICAL tGet_ShowCumChiSqd
 
-! Rescale cummulative profile chi-squared
-      tScale = ypmax / CummChiSqd(NBIN)
-      DO i = 1, NBIN
-        CummChiSqd(i) = tScale * CummChiSqd(i)
-      ENDDO
+      tGet_ShowCumChiSqd = Get_ShowCumChiSqd()
       CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
 ! The y-values of the difference profile.
@@ -398,7 +393,11 @@
       DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
         YDIF(II) = YADD + YOBIN(II) - YCBIN(II)
       ENDDO
-      CALL IPgNewPlot(PgPolyLine,4,NBIN)
+      IF (tGet_ShowCumChiSqd) THEN
+        CALL IPgNewPlot(PgPolyLine,4,NBIN)
+      ELSE
+        CALL IPgNewPlot(PgPolyLine,3,NBIN)
+      ENDIF
       CALL IPgStyle(2,0,0,0,KolNumDif,0)
 ! Q & D hack
       IF (ConnectPointsObs()) THEN
@@ -409,7 +408,7 @@
 ! Calculated
       CALL IPgStyle(3,0,0,0,KolNumCal,0)
 ! Cummulative profile chi-squared
-      CALL IPgStyle(4,0,0,0,KolNumMTic,0)
+      IF (tGet_ShowCumChiSqd) CALL IPgStyle(4,0,0,0,KolNumMTic,0)
 ! The following four lines set the markers for the observed profile.
       CALL IPgMarker( 2, 13)
       sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
@@ -438,7 +437,7 @@
         ENDDO
       ENDIF
       CALL IPgXYPairs(XBIN,YCBIN)
-      CALL IPgXYPairs(XBIN,CummChiSqd)
+      IF (tGet_ShowCumChiSqd) CALL IPgXYPairs(XBIN,CummChiSqd)
       CALL IGrCharSize(1.0,1.0)
       CALL IGrColourN(KolNumMain)
 
