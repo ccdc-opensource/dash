@@ -1599,7 +1599,7 @@
                 CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X_init(I))
                 CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, I, LB(I))
                 CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, I, UB(I))
-                CALL ParseRawInput(I)
+          !F      CALL ParseRawInput(I)
               ENDDO
               CALL ShowWithWizardWindowSASettings
             CASE (IDCANCEL, IDCLOSE)
