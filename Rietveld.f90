@@ -106,7 +106,6 @@
       IF (PrefParExists) THEN
         KK = KK + 1
         RR_PO = BestValuesDoF(KK,Curr_SA_Run)
-        RR_var2PO = KK
       ELSE
         RR_PO = 1.0
       ENDIF
@@ -456,7 +455,6 @@
               CALL RietveldRefinement
             CASE (IDB_Calculate)
               CALL Dialog2RRVAR
-         !     CALL RRVAR2Params
               ! Initialise PO
               IF (PrefParExists) CALL PO_PRECFC(RR_PO)
               ! Initialise ITF
@@ -1105,7 +1103,6 @@
         iParam = iParam + 1
       ENDIF
       IF (RR_ioptPO .EQ. 1) THEN
-        RR_var2PO = iParam
         RR_Params(iParam) =  RR_PO
         RR_InitSteps(iParam) = 0.1 * Damping
         iParam = iParam + 1
