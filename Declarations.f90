@@ -99,7 +99,6 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
-
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
@@ -109,6 +108,8 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
+! MAX_NPFR (= 50) = MAXimum Number of Peak Fit Ranges
+! MAX_NPPR (= MPeak = 10) = MAXimum Number of Peaks per Peak Fit Range
 ! XPF_Range(1,i)  = start of hatched area
 ! XPF_Range(2,i)  = end   of hatched area
 ! IPF_Lo          = designates bin (so, pointer into XBIN) where the peak fit range starts.
@@ -117,13 +118,14 @@
 ! CurrentRange    = global variable used to indicate which peak fit range we are
 !                   dealing with at the moment, instead of passing this as an argument
 !                   across subroutines.
-! IPF_Range       = 
+! IPF_Range       = Number of points in this range (should be IPF_Hi - IPF_Lo, I guess)
 ! NumInPFR        = Number of peaks in this fit range (if user has indicated peak positions)
-! XPF_Pos         = 2 theta of the peak position
-! YPF_Pos         = number of counts of the peak position
-! IPF_RPt
-! XPeakFit
-! YPeakFit
+! XPF_Pos         = 2 theta of the peak position, not sure about the difference wrt PkPosVal
+! YPF_Pos         = Calculated number of counts of the peak position
+! IPF_RPt         = pointer into XPeakFit/YPeakFit where the calculated points for this peak start
+! MAX_FITPT (= 10000) = MAXimum number of FIT PoinTs
+! XPeakFit        = 2 theta of points of calculated peak (should all be equal to their corresponding XOBS/XBIN)
+! YPeakFit        = y-values of points of calculated peaks
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
@@ -131,7 +133,6 @@
                         PkAreaVal,                    PkAreaEsd,                    &
                         PkPosVal,                     PkPosEsd,                     &
                         PkPosAv
-
       COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
                         PkFnCal(MPkDes,Max_NPFR),                                   &
                         PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
@@ -144,7 +145,6 @@
       REAL              PkProb
       INTEGER           IOrdTem
       INTEGER           IHPk
-
       COMMON /ALLPEAKS/ NTPeak,                                                  &
                         AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
                         PkProb(MTPeak),                                          &
@@ -251,6 +251,38 @@
       INTEGER                                                        KBCKGD,        NBK, LBKD
       LOGICAL                                                                                      ZBAKIN
       COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5), KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
+
+      INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+! Note that the variable names in this COMMON block are not consistent.
+! Note that '150' should be equal to MAXATM, which is 100
+
+      REAL            XATOPT
+      COMMON /posopt/ XATOPT(3,150)
+
+! Coordinates of the atoms of the asymmetric unit of the best SA solution so far.
+
+      INTEGER NMAX
+      PARAMETER (NMAX=100)
+      DOUBLE PRECISION XOPT, C, XP, FOPT
+      COMMON /sacmn / XOPT(NMAX), C(NMAX), XP(NMAX), FOPT
+
+! NMAX = mvar = 100
+! XOPT = values of the parameters of the best SA solution so far
 
 
       END SUBROUTINE FoolCompiler
