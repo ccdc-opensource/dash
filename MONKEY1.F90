@@ -372,7 +372,6 @@
 
 
    20 CONTINUE
-! Second attempt: HKCU\Software\CCDC\Mercury\1.0\InstallDir
       i = RegCloseKey(hKey) ! Close the key handle.
 
       END SUBROUTINE GetPathToMogulFromRegistry
