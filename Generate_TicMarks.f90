@@ -20,8 +20,9 @@
 !
       IMPLICIT NONE
 
-      INCLUDE 'Lattice.inc'
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -31,6 +32,12 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
+
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       INTEGER msymmin
       PARAMETER (msymmin=10)
@@ -45,10 +52,10 @@
       INTEGER TicRead
       INTEGER GETTIC   ! Function
 !
-!      write(76,*) ' Space group number         : ',SGNumStr(IPosSg)
-!      write(76,*) ' Space Group (IT tables)    : ',SGHMaStr(IPosSg)
-!      write(76,*) ' Space Group Hall symbol    : ',SGHalStr(IPosSg)
-!      write(76,*) ' Space Group explicit symbol: ',SGShmStr(IPosSg)
+!  Space group number          : SGNumStr(IPosSg)
+!  Space Group (IT tables)     : SGHMaStr(IPosSg)
+!  Space Group Hall symbol     : SGHalStr(IPosSg)
+!  Space Group explicit symbol : SGShmStr(IPosSg)
 !
 ! Need more checks here.
 ! I think that everything should be set to continue
@@ -56,7 +63,11 @@
 ! we try to add any tick marks in the GUI.
 ! Now call fuller checking function
 !
-      IF (.NOT.Check_TicMark_Data()) RETURN
+      IF (.NOT.Check_TicMark_Data()) THEN
+        NTIC = 0
+        CALL Profile_Plot
+        RETURN
+      ENDIF
       IF (PastPawley) RETURN
       OPEN (42,FILE='polyf.ccl',STATUS='unknown')
       WRITE (42,4210)
