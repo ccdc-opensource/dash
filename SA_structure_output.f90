@@ -650,11 +650,11 @@
 ! Get atom label option from dialogue. Two options: 
 ! 1. "Element + solution #"
 ! 2. "Original atom labels"
-      CALL WDialogGetRadioButton(IDF_UseSolutionNr,AtomLabelOption)
+      CALL WDialogGetRadioButton(IDF_UseSolutionNr, AtomLabelOption)
 ! Get atom colour option from dialogue. Two options: 
 ! 1. "By solution number"
 ! 2. "By element"
-      CALL WDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
+      CALL WDialogGetRadioButton(IDF_ColourBySolution, AtomColourOption)
 ! JvdS Oct 2001
 ! Note that for the following code--which can colour an atom assigning a dummy element while retaining
 ! the original atom label even if this contains the contradictory element symbol--relies
@@ -672,7 +672,7 @@
         IF (iSol .EQ. (NumOf_SA_Runs + 1)) CALL Align
         WRITE(SolStr,'(I2)',ERR=999) iSol
         CALL StrClean(SolStr,ilen) ! Left justify
-        CALL WGridGetCellCheckBox(IDF_SA_summary,3,iSol,istatus)
+        CALL WGridGetCellCheckBox(IDF_SA_summary, 3, iSol, istatus)
         IF (istatus .EQ. 1) THEN
           NumOfOverlaidStructures = NumOfOverlaidStructures + 1
 ! Note that elements are right-justified
@@ -681,11 +681,11 @@
             IF (TickedRunNr .EQ. 11) TickedRunNr = 1 ! Re-use colours.
             SELECT CASE (TickedRunNr)
               CASE ( 1)
-                ColourStr = 'Co'  ! Cobalt        Blue
+                ColourStr = ' S'  ! Sulphur       Yellow
               CASE ( 2)
                 ColourStr = ' O'  ! Oxygen        Red
               CASE ( 3)
-                ColourStr = ' S'  ! Sulphur       Yellow
+                ColourStr = 'Co'  ! Cobalt        Dark Blue
               CASE ( 4)
                 ColourStr = 'Cl'  ! Chlorine      Green
               CASE ( 5)
