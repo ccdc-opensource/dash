@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE MULTIPEAK_FITTER()
+      SUBROUTINE MULTIPEAK_FITTER
 
       IMPLICIT NONE
 
@@ -41,7 +41,10 @@
 ! Perform simplex
       IBMBER = 0
       CALL SIMOPT(X,DX,COV,N,MULTIPEAK_CHISQ)
-      IF (IBMBER .NE. 0) RETURN
+      IF (IBMBER .NE. 0) THEN
+        CALL DebugErrorMessage('Error fitting peak.')
+        RETURN
+      ENDIF
       RangeFitYN(CurrentRange) = .TRUE.
       DO I = 1, N
         II = I + (I-1)*N
@@ -147,7 +150,6 @@
         TOTAREA = TOTAREA + Y(I) - YB
       ENDDO
       XDELT = X(IMAX) - X(IMAX-1)
-      ZXDELT = 0.25*XDELT
       TOTAREA = TOTAREA*XDELT
       YHSUM = 0.
       DO IP = 1, NPEAK
@@ -216,12 +218,18 @@
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /WWREFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
 
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
-     &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
+      REAL            ZARGK,         ZXDEL
+      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
+
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
+
       REAL            ZCAL
-      COMMON /YSTORE/ ZCAL(MPPTS)
+      COMMON /YSTORE/ ZCAL(MOBS)
       COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
       COMMON /ZSTOR2/ MN, MN2
       COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
@@ -231,17 +239,22 @@
      &                  NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
 
       LOGICAL REFUSE, CYC1, NOPKRF
-      COMMON /WWREFLNS/ REFH(3,WWREFDIM), AMUL(WWREFDIM),               &
-     &                  AICALC(WWREFDIM), AIOBS(WWREFDIM),              &
-     &                  ESDOBS(WWREFDIM), SOMEGA(WWREFDIM), GGCALC(300),&
-     &                  MAXKK(9), KMIN, KMAX, KMOD, KNOW,               &
-     &                  DSTAR(WWREFDIM), ISMAG(WWREFDIM), DKDDS, KOM23
-      COMMON /WWSOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),   &
-     &                  NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),    &
-     &                  NPCSOU(9,5)
-      COMMON /WWPHASE/ NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),       &
-     &                 SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
+      COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
 
@@ -366,11 +379,14 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
-                      ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       REAL            ZCAL
-      COMMON /YSTORE/ ZCAL(MPPTS)
+      COMMON /YSTORE/ ZCAL(MOBS)
 
       REAL              PkFnVal,                      PkFnEsd,                      &
                         PkFnCal,                                                    &
@@ -401,7 +417,6 @@
       DO II = 1, NumPeakFitRange
         IPF_RPt(II+1) = IPF_RPt(II) + IPF_Range(II)
       ENDDO
-      IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange) + IPF_Range(CurrentRange)
       DO I = 1, NPTS
         II = IPF_RPt(CurrentRange) + I
         XPeakFit(II) = ZARGI(I)

@@ -105,6 +105,7 @@
       CALL WDialogLoad(IDD_RRsubAngles)
       CALL WDialogLoad(IDD_RRsubTorsions)
       CALL WDialogLoad(IDD_RRsubAtoms)
+      CALL WDialogLoad(IDD_RRsubData)
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
@@ -198,6 +199,7 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -215,12 +217,6 @@
 
       LOGICAL          log_preset
       COMMON /presetl/ log_preset
-
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       REAL            XPG1, XPG2, YPG1, YPG2
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
@@ -294,8 +290,8 @@
         UR(I) = COS(TH)
         UI(I) = SIN(TH)
       ENDDO
-      DO ifrg = 1, maxfrg
-        UseQuaternions(ifrg) = .TRUE.
+      DO iFrg = 1, maxfrg
+        UseQuaternions(iFrg) = .TRUE.
       ENDDO
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
@@ -348,7 +344,7 @@
       JRadOption = 1 ! Initialise to X-ray lab data
       IXPos_IDD_Wizard = 0.5  * (WInfoScreen(1) - 756.0)
       IYPos_IDD_Wizard = 0.01 * WInfoScreen(2)
-      NTIC = 0
+      NumOfRef = 0
       CALL Clear_PeakFitRanges
       MARKER_SIZE = 0.35
       CHAR_SIZE = 1.0
@@ -375,9 +371,7 @@
       KolNumBack           = 236
       KolPGWindow       = Win_RGB(253,253,248)
       KolMain           = Win_RGB(20,20,150)
-!O      KolObs            = Win_RGB(161,0,0)
       KolObs            = Win_RGB(255,0,0)
-!O      KolCal            = Win_RGB(10,70,10)
       KolCal            = Win_RGB(0,0,255)
       KolDif            = Win_RGB(200,100,200)
       KolMTic           = Win_RGB(191,0,0)

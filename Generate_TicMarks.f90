@@ -4,6 +4,7 @@
       SUBROUTINE Generate_TicMarks
 
       USE VARIABLES
+      USE REFVAR
 !
 ! This is the routine that generates tic marks
 ! Multiple checks before attempting to calculate tic marks
@@ -33,12 +34,6 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          NTIC
-      INTEGER                IH
-      REAL                               ARGK
-      REAL                                           DSTAR
-      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
-
       INTEGER     msymmin
       PARAMETER ( msymmin = 10 )
       INTEGER            nsymmin
@@ -66,7 +61,7 @@
 ! we try to add any tick marks in the GUI.
 !
       IF (.NOT.Check_TicMark_Data()) THEN
-        NTIC = 0
+        NumOfRef = 0
         CALL Profile_Plot
         RETURN
       ENDIF

@@ -23,9 +23,12 @@
 !
       USE WINTERACTER
       USE DRUID_HEADER
+
+!      IMPLICIT NONE
 !
 ! Interaction here with Winteracter !!!!!!
 !
+      INTEGER MATSZ
       LOGICAL DFLTPR, PRNCYC
       EXTERNAL DFLTPR, PCXX, PFXX, MAGROU, CALROU, RUNPAR, VARSPR, PRNCYC
 
@@ -53,9 +56,13 @@
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
@@ -75,9 +82,12 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
+
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+
       INCLUDE 'REFLNS.INC'
+
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
@@ -88,18 +98,30 @@
      &                INANG(100,3), INTOR(100,6), DERBON(10), NVB(10),  &
      &                NUMBON, NTARNM, NUMANG, NUMTOR, KOM25
       LOGICAL SLONLY
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       COMMON /IPKCMN/ IPK, PIK(MIPK)
-      COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
-     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS), JOCCR(MPTS)
+
+      COMMON /CMN299/ KIPT(MOBS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
+     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MOBS), JOCCR(MOBS)
+
       COMMON /CMNNOW/ NOBSNOW
-!.. Note only 3 phases specifically hardwired here
-      COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
-     &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
+
+      REAL            ZARGK,         ZXDEL
+      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
+
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
+
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /SCRACH/ MESSAG, NAMFIL
@@ -110,9 +132,13 @@
       CHARACTER*10 filnam_root
 !
 !------------------ For debugging only
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
 !
 !----------------------
 !
@@ -303,7 +329,13 @@
             ENDIF
             K1 = KIPT(NOBSNOW) + 1
             K2 = KIPT(NOBSNOW+1)
+! We can only read in 50 values, so no need to write out more than that
+            IF (NTEM .GT. 50) THEN
+              K2 = K2 - (NTEM - 50)
+              NTEM = 50
+            ENDIF
             WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
+!C                       XBIN(I), YOBIN(I), EBIN(I), KTEM
             IF (NTEM.GT.0) WRITE (IPK,*) (KNIPT(KK),PIK(KNIPT(KK)),KK=K1,K2)
           ENDIF
           NOBS = NOBS + 1
@@ -357,8 +389,7 @@
       IF (PRNCYC(4)) CALL CLOFIL(IOP2)
       CLOSE (IPK)
 ! JCC Trap for any problems
-	IF (IBMBER .GT. 0) CALL DebugErrorMessage('Error in FORTY after HKLOUT')
-      IBMBER = 0   ! Ignore a problem that can occur in HKLOUT - Ken/Bill to check out please
+	IF (IBMBER .NE. 0) CALL DebugErrorMessage('Error in FORTY after HKLOUT')
   !    CALL DebugRoutine
       RETURN
 ! JCC Added in error handling here
@@ -375,6 +406,9 @@
 !*****************************************************************************
 !
       SUBROUTINE PFCN03(N)
+
+      USE REFVAR
+
 !
 ! *** PFCN03 from updated PFCN01 by WIFD/JCM 19 Jul 88 ***
 !
@@ -402,14 +436,14 @@
 !A i.e. whether this reflection is near enough to this intensity to contribute
 !A to it.
 !
-      INCLUDE 'params.inc'
+      INCLUDE 'PARAMS.INC'
 
       PARAMETER (NW=4)
       CHARACTER*4 WDCN03(NW)
       LOGICAL TESTOV
       DIMENSION C3FN(3), C3DN(3), IWCN03(3,NW)
-      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
-     &                DSTAR2, TWOTHD(5), DIFANG(6)
+      REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
+      COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
      &                ICDN(26,9), IERR, IO10, SDREAD
@@ -429,18 +463,28 @@
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
       LOGICAL STRKT
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
       DIMENSION NGENS(6), NSPC(6)
       EQUIVALENCE (NGENS(1),NGENPS(1,1))
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
+
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -451,27 +495,36 @@
       COMMON /PRKNOT/ ARGKNT(50), PKKNOT(512,9,50)
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-!.. Note only 3 phases specifically hardwired here
-      COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-      COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
-     &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      REAL ZTEM(MPPTS), RTEM(3,MRFLNZ), TF4PAR(MF4PAR)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
+      REAL            ZARGK,         ZXDEL
+      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
+
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ
+      REAL                                                                                 KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
+
+      REAL ZTEM(MOBS), RTEM(3,MFCSTO), TF4PAR(MF4PAR)
       LOGICAL         PFNVAR
       COMMON /PFNINF/ PFNVAR(8,9,5)
 
       REAL ARTEM(6)
-      INTEGER KORD(MRFLNZ)
+      INTEGER KORD(MFCSTO)
 
-      COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
-     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS), JOCCR(MPTS)
+      COMMON /CMN299/ KIPT(MOBS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
+     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MOBS), JOCCR(MOBS)
+
 ! O      COMMON /CMN300/ ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK), KARGO(MAXPIK), KARGK(MAXPIK)
       DIMENSION ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK), KARGO(MAXPIK), KARGK(MAXPIK)
 
@@ -502,7 +555,7 @@
 ! Peak positions may have changed - check and re-sort if necessary
       DO IR = 1, MAXK
         KNOW = IR
-        CALL CELDER(REFH(1,KNOW),ARTEM)
+        CALL CELDER(rHKL(1,KNOW),ARTEM)
         DSTAR(KNOW) = SQRT(DSTAR2)
         CALL PCXX(5)
         ZARGK(IR) = ARGK
@@ -516,7 +569,7 @@
         IRT = KORD(IR)
         ZTEM(IR) = ZARGK(IRT)
         DO I = 1, 3
-          RTEM(I,IR) = REFH(I,IRT)
+          RTEM(I,IR) = rHKL(I,IRT)
         ENDDO
         IF (CAIL) THEN
           TF4PAR(IR) = F4PAR(1,IRT)
@@ -525,7 +578,7 @@
       DO IR = 1, MAXK
         ZARGK(IR) = ZTEM(IR)
         DO I = 1, 3
-          REFH(I,IR) = RTEM(I,IR)
+          rHKL(I,IR) = RTEM(I,IR)
         ENDDO
         IF (CAIL) THEN
           F4PAR(1,IR) = TF4PAR(IR)
@@ -673,7 +726,7 @@
 ! Peak positions may have changed - check and re-sort if necessary
       DO IR = 1, MAXK
         KNOW = IR
-        CALL CELDER(REFH(1,KNOW),ARTEM)
+        CALL CELDER(rHKL(1,KNOW),ARTEM)
         DSTAR(KNOW) = SQRT(DSTAR2)
         CALL PCXX(5)
         ZARGK(IR) = ARGK
@@ -684,7 +737,7 @@
         IRT = KORD(IR)
         ZTEM(IR) = ZARGK(IRT)
         DO I = 1, 3
-          RTEM(I,IR) = REFH(I,IRT)
+          RTEM(I,IR) = rHKL(I,IRT)
         ENDDO
         IF (CAIL) THEN
           TF4PAR(IR) = F4PAR(1,IRT)
@@ -694,7 +747,7 @@
       DO IR = 1, MAXK
         ZARGK(IR) = ZTEM(IR)
         DO I = 1, 3
-          REFH(I,IR) = RTEM(I,IR)
+          rHKL(I,IR) = RTEM(I,IR)
         ENDDO
         IF (CAIL) THEN
           F4PAR(1,IR) = TF4PAR(IR)
@@ -809,20 +862,6 @@
         ENDDO
  3520   ARIMIN = ARGK + ZXDEL(KNOW)*FLOAT(IMINT-IPMAX)
         ARIMAX = ARGK + ZXDEL(KNOW)*FLOAT(IMAXT-IPMAX)
-!O        IIMAX = NPTS
-!O        DO I = KOBZ(KNOW), NPTS
-!O          IF (ZARGI(I).GE.ARIMAX) THEN
-!O            IIMAX = I
-!O            GOTO 3542
-!O          ENDIF
-!O        ENDDO
-!O 3542   IIMIN = 1
-!O        DO I = KOBZ(KNOW), 1, -1
-!O          IF (ZARGI(I).LE.ARIMIN) THEN
-!O            IIMIN = I
-!O            GOTO 3544
-!O          ENDIF
-!O        ENDDO
 ! JvdS I think this solves JCC's comment below on boundaries being exceeded.
         DO I = KOBZ(KNOW), NPTS
           IF (ZARGI(I).GE.ARIMAX) THEN
@@ -960,12 +999,21 @@
       COMPLEX CFFT, DFFT, DDT, CFF
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
-     &                SCALEP(9), KSCALP(9), PHMAG(9)
-      LOGICAL PHMAG
-      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6),    &
-     &                DTDWL, NPKCSP(9,5), ARGMIN(5), ARGMAX(5),         &
-     &                ARGSTP(5), PCON
+
+      INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
+      REAL                                                       SCALEP
+      INTEGER                                                               KSCALP
+      LOGICAL                                                                          PHMAG
+      COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
+
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
+
       COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
      &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
      &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
@@ -973,11 +1021,19 @@
      &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSAVZ/ PKCONV(512,9)
-      COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
+
+      REAL            ZARGK,         ZXDEL
+      COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
+
       INCLUDE 'REFLNS.INC'
+
+      INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
+      INTEGER         NPFSOU
+      REAL                         SCALES
+      INTEGER                                 KSCALS,    NPCSOU
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
+                      NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+
       DIMENSION CFFT(8), DFFT(8), DDT(8), FR(512,8), FI(512,8),         &
      &          DR(512,8), DI(512,8), FRT(512), FIT(512)
       LOGICAL         PFNVAR
