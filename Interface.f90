@@ -1697,3 +1697,101 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE FitPeaks
+
+      USE WINTERACTER
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM,                    PF_IntBreadth
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
+
+      INTEGER tCurrentRange
+
+      CALL WCursorShape(CurHourGlass)
+      DO tCurrentRange = 1, NumPeakFitRange
+        IF (.NOT. RangeFitYN(tCurrentRange)) THEN
+          CurrentRange = tCurrentRange
+          CALL MultiPeak_Fitter
+          CALL Profile_Plot
+        ENDIF
+      ENDDO
+      CALL WCursorShape(CurCrossHair)
+! Grey out 'Fit Peaks' button on toolbar
+      CALL UpdatePeaksButtonsStates
+! Disable Pawley refinement button and 'Next >' button in Wizard window
+      CALL CheckIfWeCanDoAPawleyRefinement
+
+      END SUBROUTINE FitPeaks
+!
+!*****************************************************************************
+!
+      SUBROUTINE CheckIfPeaksFitted
+!
+! This subroutine:
+! 1. checks if all peak-fit ranges have been fitted
+! 2. if not:
+!    a. remaining peaks are fitted (just like the fit-peak-range button)
+!    b. the user is shown an info window telling them what happened
+!    (this is deliberately not a confirm, because that would add complications)
+!
+      
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM,                    PF_IntBreadth
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
+
+      LOGICAL all_ranges_fitted
+      INTEGER tCurrentRange
+
+      all_ranges_fitted = .TRUE.
+      DO tCurrentRange = 1, NumPeakFitRange
+        IF (.NOT. RangeFitYN(tCurrentRange)) all_ranges_fitted = .FALSE.
+      ENDDO
+      IF (.NOT. all_ranges_fitted) THEN
+        CALL FitPeaks
+        CALL InfoMessage("Some peaks had not been fitted yet."//CHAR(13)//"They have been fitted automatically.")
+      ENDIF
+      
+      END SUBROUTINE CheckIfPeaksFitted
+!
+!*****************************************************************************
+!

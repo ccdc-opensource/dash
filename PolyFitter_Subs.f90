@@ -605,20 +605,13 @@
             ELSE
               NumPeakFitRange = NumPeakFitRange + 1
               RangeFitYN(NumPeakFitRange) = .FALSE.
-              CALL UpdateFitPeaksButtonState
-! Ungrey 'Delete all peak fit ranges' button on toolbar
-              CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
-! Ungrey 'Clear Peaks' button in Wizard window
-              CALL PushActiveWindowID
-              CALL WDialogSelect(IDD_PW_Page10)
-              CALL WDialogFieldState(IDF_ClearPeakFitRanges,Enabled)
-              CALL PopActiveWindowID
               XPF_Range(1,NumPeakFitRange) = XPFR1
               XPF_Range(2,NumPeakFitRange) = XPFR2
               IPF_Lo(NumPeakFitRange) = IPFL1
               IPF_Hi(NumPeakFitRange) = IPFL2
               IPF_Range(NumPeakFitRange) = 1 + IPF_Hi(NumPeakFitRange) - IPF_Lo(NumPeakFitRange)
               NumInPFR(NumPeakFitRange) = 0
+              CALL UpdatePeaksButtonsStates
 ! Now we have the range in terms of the profile point index
               CALL IGrColourN(KolNumPanelDark)
               CALL IGrFillPattern(Hatched, Medium, DiagUp)
@@ -719,17 +712,7 @@
                 ReplotNecessary        = .TRUE.
                 RecalculationNecessary = .TRUE.
 ! The cursor is sitting inside the peak range - remove the range
-! If there is only a single range, simply set number of ranges to 0
-                IF (NumPeakFitRange .EQ. 1) THEN
-                  NumPeakFitRange = 0
-! Grey out 'Delete all peak fit ranges' button on toolbar
-                  CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
-! Grey out 'Clear Peaks' button in Wizard window
-                  CALL PushActiveWindowID
-                  CALL WDialogSelect(IDD_PW_Page10)
-                  CALL WDialogFieldState(IDF_ClearPeakFitRanges,Disabled)
-                  CALL PopActiveWindowID
-                ELSE IF (CurrentRange .EQ. NumPeakFitRange) THEN
+                IF (CurrentRange .EQ. NumPeakFitRange) THEN
 ! The range to be deleted is the last range in the list, no re-shuffling needed
                   NumPeakFitRange = NumPeakFitRange - 1
                 ELSE
@@ -834,9 +817,8 @@
         CALL Upload_Widths
       ENDIF
       IF (ReplotNecessary) CALL Profile_Plot
-      CALL UpdateFitPeaksButtonState
+      CALL UpdatePeaksButtonsStates
       CALL CheckIfWeCanDoAPawleyRefinement
-      CALL CheckIfWeCanIndex
 
       END SUBROUTINE Check_KeyDown_PeakFit_Inner
 !
@@ -900,11 +882,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE UpdateFitPeaksButtonState
-!
-! This routine determines whether the Fit Peaks button should be greyed out or not.
-! The button is ungreyed if at least one non-fitted peak fit range exists
-!
+      SUBROUTINE UpdatePeaksButtonsStates
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -933,77 +911,54 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
-      INTEGER I, iState
+      INTEGER I, iState, NPeaksFitted, IndexOption
 
+      CALL PushActiveWindowID
+! Determines whether the Fit Peaks button should be greyed out or not.
+! The button is ungreyed if at least one non-fitted peak fit range exists
       iState = WintOff
       IF (NumPeakFitRange .NE. 0) THEN
         DO I = 1, NumPeakFitRange
           IF (.NOT. RangeFitYN(I)) iState = WintOn
         ENDDO
       ENDIF
-      CALL WMenuSetState(ID_FitPeaks,ItemEnabled,iState)
-
-      END SUBROUTINE UpdateFitPeaksButtonState
-!
-!*****************************************************************************
-!
-      SUBROUTINE CheckIfWeCanIndex
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      REAL              PF_FWHM,                    PF_IntBreadth
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
-                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
-
-      INTEGER I, NPeaksFitted
-      INTEGER IndexOption
-
+      CALL WMenuSetState(ID_FitPeaks, ItemEnabled, iState)
+! Ungrey / grey out 'Delete all peak fit ranges' button on toolbar
+      IF (NumPeakFitRange .EQ. 0) THEN
+        iState = WintOff
+      ELSE
+        iState = WintOn
+      ENDIF
+      CALL WMenuSetState(ID_ClearPeakFitRanges, ItemEnabled, iState)
+! Ungrey / grey out 'Clear Peaks' button in Wizard window
+      CALL WDialogSelect(IDD_PW_Page10)
+      CALL WDialogFieldStateLogical(IDF_ClearPeakFitRanges, NumPeakFitRange .NE. 0)
       NPeaksFitted = 0
 ! Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
       IF (NumPeakFitRange .GT. 0) THEN
         DO I = 1, NumPeakFitRange
-          IF (RangeFitYN(I)) THEN
+          IF (NumInPFR(I) .EQ. 0) THEN
+            NPeaksFitted = NPeaksFitted + 1
+          ELSE
             NPeaksFitted = NPeaksFitted + NumInPFR(I)
           ENDIF
         ENDDO
       ENDIF
-      CALL PushActiveWindowID
       IF (NPeaksFitted .GE. 10) THEN
         CALL WDialogSelect(IDD_PW_Page7)
-        CALL WDialogFieldState(IDNEXT,Enabled)
+        CALL WDialogFieldState(IDNEXT, Enabled)
         CALL WDialogSelect(IDD_PW_Page8)
-        CALL WDialogFieldState(IDNEXT,Enabled) ! The 'Run >' button
+        CALL WDialogFieldState(IDNEXT, Enabled) ! The 'Run >' button
       ELSE
         CALL WDialogSelect(IDD_PW_Page7)
-        CALL WDialogGetRadioButton(IDF_RADIO3,IndexOption) ! 'Index now' or 'Enter known cell'
-        CALL WDialogFieldStateLogical(IDNEXT,IndexOption .EQ. 2)
+        CALL WDialogGetRadioButton(IDF_RADIO3, IndexOption) ! 'Index now' or 'Enter known cell'
+        CALL WDialogFieldStateLogical(IDNEXT, IndexOption .EQ. 2)
         CALL WDialogSelect(IDD_PW_Page8)
-        CALL WDialogFieldState(IDNEXT,Disabled) ! The 'Run >' button
+        CALL WDialogFieldState(IDNEXT, Disabled) ! The 'Run >' button
       ENDIF
       CALL PopActiveWindowID
 
-      END SUBROUTINE CheckIfWeCanIndex
+      END SUBROUTINE UpdatePeaksButtonsStates
 !
 !*****************************************************************************
 !

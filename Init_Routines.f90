@@ -158,18 +158,10 @@
       CALL Upload_Widths
 ! Redraw
       CALL Profile_Plot
-! Grey out 'Fit Peaks' button on toolbar
-      CALL UpdateFitPeaksButtonState
-! Grey out 'Delete all peak fit ranges' button on toolbar
-      CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
-! Grey out 'Clear Peaks' button in Wizard window
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page10)
-      CALL WDialogFieldState(IDF_ClearPeakFitRanges,Disabled)
-      CALL PopActiveWindowID
 ! Disable Pawley refinement button and 'Next >' button in Wizard window
       CALL CheckIfWeCanDoAPawleyRefinement
-      CALL CheckIfWeCanIndex
+! Grey out 'Fit Peaks' button on toolbar
+      CALL UpdatePeaksButtonsStates
 
       END SUBROUTINE Clear_PeakFitRanges
 !

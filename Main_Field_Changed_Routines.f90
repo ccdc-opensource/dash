@@ -609,6 +609,7 @@
       REAL    tBeta
       INTEGER NumDoF
 
+      CALL CheckIfPeaksFitted
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Index_Preparation)
       CALL WDialogGetReal(IDF_wavelength1, Lambda)
