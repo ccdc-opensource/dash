@@ -33,7 +33,7 @@
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDCANCEL, IDOK_ep)
+            CASE (IDCANCEL, IDCLOSE)
               CALL WDialogHide()
 ! Closes all SA profile child windows which are still open when OK button clicked
               DO i = 1, MaxNumChildWin
@@ -60,7 +60,7 @@
       END SELECT
 !ep allows you to view pdb file of SA Solutions, each clicked
 !   check box in fresh mercury window
-      DO irow = 1,maxruns
+      DO irow = 1, MaxRuns
         CALL WGridGetCellCheckBox(IDF_SA_summary,2,irow,istatus)
         IF (istatus.eq.1) THEN
 ! calls subroutine which opens Mercury window with .pdb file

@@ -89,7 +89,6 @@
       INCLUDE 'DialogPosCmn.inc'
 
       INTEGER :: IPW_Option
-      LOGICAL FnUnitCellOK ! Function
       CHARACTER*MaxPathLength tString
 
       CALL PushActiveWindowID
@@ -115,12 +114,12 @@
                   ENDIF
                   CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
                 CASE (2) ! Preparation for Pawley refinement
-                  CALL WDialogSelect(IDD_PW_Page1)
-! If the cell is OK, the Next> button should be enabled
-                  IF (FnUnitCellOK()) THEN
-                    CALL WDialogFieldState(IDNEXT,Enabled)
-                  ELSE
+                  CALL WDialogSelect(IDD_PW_Page2)
+! If we have loaded a powder pattern, the Next> button should be enabled
+                  IF (NoData) THEN
                     CALL WDialogFieldState(IDNEXT,Disabled)
+                  ELSE
+                    CALL WDialogFieldState(IDNEXT,Enabled)
                   END IF
                   CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
                 CASE (3) ! Simulated annealing structure solution
@@ -860,6 +859,72 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DealWithWizardWindowDiffractionSetup2
+!
+! The above 9 windows have taken me months to program.
+! This window bypasses all of them, because Elna wants that.
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'DialogPosCmn.inc'
+      INCLUDE 'lattice.inc'
+      INCLUDE 'statlog.inc'
+
+      INTEGER IRadSelection
+      CHARACTER(LEN=MaxPathLength) CTEMP
+      REAL    Temp
+      INTEGER ISTAT
+      INTEGER DiffractionFileBrowse ! Function
+      INTEGER DiffractionFileOpen ! Function
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page2)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              CALL WizardWindowHide
+              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDNEXT)
+              CALL WizardWindowHide
+              CALL WDialogSelect(IDD_PW_Page1)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (ID_PW_DF_Open)
+              CALL WDialogGetString(IDF_PW_DataFileName_String,CTEMP)
+              ISTAT = DiffractionFileOpen(CTEMP)
+            CASE (IDBBROWSE)
+              ISTAT = DiffractionFileBrowse()
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_LabX_Source,IDF_SynX_Source,IDF_CWN_Source,IDF_TOF_source)
+              CALL WDialogGetRadioButton(IDF_LabX_Source,JRadOption)
+              CALL Upload_Source
+              CALL Generate_TicMarks 
+            CASE (IDF_wavelength1)
+              CALL WDialogGetReal(IDF_wavelength1,Temp)
+              CALL UpdateWavelength(Temp)
+              CALL Generate_TicMarks 
+            CASE (IDF_Wavelength_Menu)
+              CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
+              CALL SetWavelengthToSelection(IRadSelection)
+              CALL Generate_TicMarks 
+          END SELECT                
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowDiffractionSetup2
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardWindowUnitCellParameters
 
       USE WINTERACTER
@@ -893,7 +958,9 @@
 ! Did we get here from the main wizard window?
               CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
               CALL WDialogGetRadioButton(IDF_PW_Option1,IOption)
-              IF (IOption .NE. 2) THEN
+              IF (IOption .EQ. 2) THEN
+                CALL WDialogSelect(IDD_PW_Page2)
+              ELSE
 ! Did we get here from 'Enter known cell' in wizard window Indexing I?
                 CALL WDialogSelect(IDD_PW_Page7)
                 CALL WDialogGetRadioButton(IDF_RADIO3,IOption) ! 'Index now' or 'Enter known cell'
@@ -904,7 +971,7 @@
               CALL WizardWindowHide
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
-              CALL WDialogSelect(IDD_PW_Page2)
+              CALL WDialogSelect(IDD_PW_Page10)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDAPPLY)
               CALL Download_SpaceGroup(IDD_PW_Page1)
@@ -945,7 +1012,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE DealWithWizardWindowDiffractionSetup2
+      SUBROUTINE DealWithWizardWindowPawley1
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -953,20 +1020,10 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
-      INCLUDE 'lattice.inc'
-      INCLUDE 'statlog.inc'
-
-      INTEGER IRadSelection
-      CHARACTER(LEN=MaxPathLength) CTEMP
-      REAL    Temp
-      INTEGER ISTAT
-      INTEGER DiffractionFileBrowse ! Function
-      INTEGER DiffractionFileOpen ! Function
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page2)
+      CALL WDialogSelect(IDD_PW_Page10)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -974,33 +1031,18 @@
               CALL WizardWindowHide
               CALL WDialogSelect(IDD_PW_Page1)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-            CASE (IDFINISH, IDCANCEL)
+            CASE (IDNEXT)
+              CALL WizardWindowHide
+              CALL ShowPawleyFitWindow
+            CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
-            CASE (ID_PW_DF_Open)
-              CALL WDialogGetString(IDF_PW_DataFileName_String,CTEMP)
-              ISTAT = DiffractionFileOpen(CTEMP)
-            CASE (IDBBROWSE)
-              ISTAT = DiffractionFileBrowse()
+            CASE (IDF_ClearPeakFitRanges)
+              CALL Init_PeakFitRanges
           END SELECT
-        CASE (FieldChanged)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_LabX_Source,IDF_SynX_Source,IDF_CWN_Source,IDF_TOF_source)
-              CALL WDialogGetRadioButton(IDF_LabX_Source,JRadOption)
-              CALL Upload_Source
-              CALL Generate_TicMarks 
-            CASE (IDF_wavelength1)
-              CALL WDialogGetReal(IDF_wavelength1,Temp)
-              CALL UpdateWavelength(Temp)
-              CALL Generate_TicMarks 
-            CASE (IDF_Wavelength_Menu)
-              CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
-              CALL SetWavelengthToSelection(IRadSelection)
-              CALL Generate_TicMarks 
-          END SELECT                
       END SELECT
       CALL PopActiveWindowID
 
-      END SUBROUTINE DealWithWizardWindowDiffractionSetup2
+      END SUBROUTINE DealWithWizardWindowPawley1
 !
 !*****************************************************************************
 !

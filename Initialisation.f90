@@ -85,12 +85,12 @@
       CALL WDialogLoad(IDD_PW_Page7)
       CALL WDialogLoad(IDD_PW_Page8)
       CALL WDialogLoad(IDD_PW_Page9)
+      CALL WDialogLoad(IDD_PW_Page10)
       CALL WDialogLoad(IDD_SA_Multi_completed_ep)
       CALL WDialogLoad(IDD_License_Dialog)
       CALL WDialogLoad(IDD_Background_Fit)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
       CALL WDialogLoad(IDD_DV_Results)
-      CALL WDialogLoad(IDD_EditZMatrix)
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
