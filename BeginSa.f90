@@ -15,6 +15,9 @@
 
       INTEGER CheckOverwriteSaOutput ! Function
       INTEGER test                   ! Function
+      REAL    T1
+      REAL    SA_Duration ! The time the SA took, in seconds
+      CHARACTER*10 SA_DurationStr
 
       test = CheckOverwriteSaOutput()
       IF (test .EQ. 0) THEN
@@ -31,7 +34,11 @@
       END IF
       CALL WDialogShow(IXPos_IDD_SA_Input,IYPos_IDD_SA_Input,0,Modeless)
       DoSaRedraw = .TRUE.
+      T1 = SECNDS(0.0)
       CALL SimulatedAnnealing(imyexit)
+      SA_Duration = SECNDS(T1)
+      WRITE(SA_DurationStr,'(F10.1)') SA_Duration
+      CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
 ! After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       DoSaRedraw = .FALSE.
