@@ -16,8 +16,8 @@
       LOGICAL         IHMINLT0, IKMINLT0, ILMINLT0
       COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0
 
-      INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
-      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
+      INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX
+      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX
 
 !     The following integers represent h,k,l,h+k,h+l,k+l and h+k+l
       INTEGER H_, K_, L_, HPK, HPL, KPL, HPKPL
@@ -25,34 +25,35 @@
 !     and then multiplied by 2
       INTEGER H_m, K_m, L_m, HPKm, HPLm, KPLm, HPKPLm
       INTEGER IR, JHMAX, JHMIN, Item, IREMAIN, LL, LLM
+      INTEGER IIMIN, IIMAX
       INTEGER, EXTERNAL :: GETTIC
 
-      IHMIN = 9999
-      IKMIN = 9999
-      ILMIN = 9999
-      IIMIN = 9999
-      IHMAX = -9999
-      IKMAX = -9999
-      ILMAX = -9999
-      IIMAX = -9999
-      DO iR = 1, NumOfRef
-        IHMIN = MIN(iHKL(1,IR),IHMIN)
-        IKMIN = MIN(iHKL(2,IR),IKMIN)
-        ILMIN = MIN(iHKL(3,IR),ILMIN)
-        IHMAX = MAX(iHKL(1,IR),IHMAX)
-        IKMAX = MAX(iHKL(2,IR),IKMAX)
-        ILMAX = MAX(iHKL(3,IR),ILMAX)
+      IHMIN = iHKL(1,1)
+      IKMIN = iHKL(2,1)
+      ILMIN = iHKL(3,1)
+      IIMIN = -(iHKL(1,1) + iHKL(2,1))
+      IHMAX = iHKL(1,1)
+      IKMAX = iHKL(2,1)
+      ILMAX = iHKL(3,1)
+      IIMAX = -(iHKL(1,1) + iHKL(2,1))
+      DO iR = 2, NumOfRef
+        IHMIN = MIN(iHKL(1,iR),IHMIN)
+        IKMIN = MIN(iHKL(2,iR),IKMIN)
+        ILMIN = MIN(iHKL(3,iR),ILMIN)
+        IHMAX = MAX(iHKL(1,iR),IHMAX)
+        IKMAX = MAX(iHKL(2,iR),IKMAX)
+        ILMAX = MAX(iHKL(3,iR),ILMAX)
 ! Now calculate 'i' index for hexagonals
-        ITEM = -(iHKL(1,IR) + iHKL(2,IR))
-        IIMIN = MIN(ITEM,IIMIN)
-        IIMAX = MAX(ITEM,IIMAX)
+        iTem = -(iHKL(1,iR) + iHKL(2,iR))
+        IIMIN = MIN(iTem,IIMIN)
+        IIMAX = MAX(iTem,IIMAX)
       ENDDO
-      IHMINLT0 = IHMIN.LT.0
-      IKMINLT0 = IKMIN.LT.0
-      ILMINLT0 = ILMIN.LT.0
-      IF (ABS(IHMIN).GT.ABS(IHMAX)) IHMAX = ABS(IHMIN)
-      IF (ABS(IKMIN).GT.ABS(IKMAX)) IKMAX = ABS(IKMIN)
-      IF (ABS(ILMIN).GT.ABS(ILMAX)) ILMAX = ABS(ILMIN)
+      IHMINLT0 = (IHMIN .LT. 0)
+      IKMINLT0 = (IKMIN .LT. 0)
+      ILMINLT0 = (ILMIN .LT. 0)
+      IHMAX = MAX(ABS(IHMIN),ABS(IHMAX))
+      IKMAX = MAX(ABS(IKMIN),ABS(IKMAX))
+      ILMAX = MAX(ABS(ILMIN),ABS(ILMAX))
 !
 !     Decides for each space group, which structure factor
 !     calculation should be invoked for each particular reflection.
