@@ -36,12 +36,6 @@
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
       CALL WDialogSelect(IDD_SA_Action1)
-! Check on viewer
-      IF (ViewOn) THEN
-        CALL WDialogFieldState(IDF_Viewer,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDF_Viewer,Disabled)
-      ENDIF
       CALL WizardWindowShow(IDD_SA_Action1)
       DoSaRedraw = .TRUE.
       T1 = SECNDS(0.0)

@@ -1,4 +1,3 @@
-!*==SA_STRUCTURE_OUTPUT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
@@ -39,7 +38,7 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
       REAL                pdbAtmCoords
-      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:30)
+      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:MaxRun)
 
       CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file   
       COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file
@@ -138,7 +137,7 @@
         WRITE (65,1080) inv(3,1), inv(3,2), inv(3,3)
  1080   FORMAT ('SCALE3    ',3F10.5,'      0.00000')
       ENDIF
-!       And the CCL
+! And the CCL
       IF (tSaveCCL) THEN
         OPEN (UNIT=66,FILE=ccl_file(1:ccl_flen),STATUS='unknown')
         IF (T .GT. 999.9) THEN
@@ -179,7 +178,6 @@
             ipcount = ipcount + izmpar(ifrg)
           ENDIF
           DO i = 1, natoms(ifrg)
-! Was     ii = ii + 1
             iiact = iiact + 1
             ii = itotal + izmbid(i,ifrg)
             iorig = izmbid(i,ifrg)
@@ -258,6 +256,7 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
@@ -280,7 +279,7 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
       REAL                pdbAtmCoords
-      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:30)
+      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:MaxRun)
 
       INTEGER     mpdbops
       PARAMETER ( mpdbops = 192 )
@@ -353,7 +352,6 @@
  1070 FORMAT ('SCALE2    ',3F10.5,'      0.00000')
       WRITE (65,1080) inv(3,1), inv(3,2), inv(3,3)
  1080 FORMAT ('SCALE3    ',3F10.5,'      0.00000')
-
 ! Per z-matrix, determine the connectivity. This has to be done only once.
       TotNumBonds = 0
       NumOfAtomsSoFar = 0
@@ -375,6 +373,11 @@
 ! 1. "By solution number"
 ! 2. "By element"
       CALL WDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
+! Get atom colour option from dialogue. Two options: 
+! 1. "By solution number"
+! 2. "By element"
+!U      CALL WDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
+
 ! JvdS Oct 2001
 ! Note that for the following code--which can colour an atom assigning a dummy element while retaining
 ! the original atom label even if this contains the contradictory element symbol--relies

@@ -159,6 +159,8 @@
       LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
    
       CALL EndWizardCommon
+      CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+      CALL WDialogPutRadioButton(IDF_PW_Option3)
       PastPawley = .FALSE.
 ! Ungrey 'Delete all peak fit ranges' button on toolbar
       IF (NumPeakFitRange .GT. 0) CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
@@ -274,7 +276,6 @@
       CALL Init_BackGround
       CALL Rebin_Profile
       CALL GetProfileLimits
-      CALL Profile_Plot
 
       END SUBROUTINE WizardApplyDiffractionFileInput
 !
@@ -302,6 +303,7 @@
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
+              CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
@@ -431,10 +433,12 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL WizardApplyDiffractionFileInput
+              CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
+              CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page6)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
@@ -446,6 +450,7 @@
               CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
+              CALL Profile_Plot
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -500,7 +505,6 @@
       CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
       CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
                                           WDialogGetCheckBoxLogical(IDF_UseSplineYN))
-      CALL Profile_Plot
       CALL PopActiveWindowID
 
       END SUBROUTINE WizardApplyBackground
@@ -526,11 +530,14 @@
             CASE (IDBACK)
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
+              CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page5)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
               CALL WizardApplyBackground
+              CALL Profile_Plot
+              CALL CheckIfWeCanIndex
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
@@ -544,6 +551,11 @@
 ! Force display of background
               CALL WDialogSelect(IDD_Plot_Option_Dialog)
               CALL WDialogPutCheckBoxLogical(IDF_background_check,.TRUE.)
+              CALL Profile_Plot
+            CASE (IDAPPLY)
+              CALL WizardApplyDiffractionFileInput
+              CALL WizardApplyProfileRange
+              CALL WizardApplyBackground
               CALL Profile_Plot
           END SELECT
       END SELECT
@@ -599,6 +611,8 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
           END SELECT
+        CASE (FieldChanged)
+          CALL CheckIfWeCanIndex
       END SELECT
       CALL PopActiveWindowID
 
@@ -651,6 +665,7 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
+              CALL CheckIfWeCanIndex
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDNEXT)
 !              CALL EstimateZeroPointError
@@ -978,33 +993,41 @@
             CASE (IDNEXT)
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
+              CALL CheckUnitCellConsistency
               CALL WizardWindowShow(IDD_PW_Page10)
             CASE (IDAPPLY)
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_ZeroPoint               
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
+              CALL CheckUnitCellConsistency
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_a_latt)
               CALL WDialogGetReal(IDF_a_latt,CellPar(1))
               CALL UpdateCell
+              CALL CheckUnitCellConsistency
             CASE (IDF_b_latt)
               CALL WDialogGetReal(IDF_b_latt,CellPar(2))
               CALL UpdateCell
+              CALL CheckUnitCellConsistency
             CASE (IDF_c_latt)
               CALL WDialogGetReal(IDF_c_latt,CellPar(3))
               CALL UpdateCell
+              CALL CheckUnitCellConsistency
             CASE (IDF_alp_latt)
               CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
               CALL UpdateCell
+              CALL CheckUnitCellConsistency
             CASE (IDF_bet_latt)
               CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
               CALL UpdateCell
+              CALL CheckUnitCellConsistency
             CASE (IDF_gam_latt)
               CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
               CALL UpdateCell
+              CALL CheckUnitCellConsistency
             CASE (IDF_Crystal_System_Menu)
               CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
               CALL Upload_CrystalSystem

@@ -35,7 +35,7 @@
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       LOGICAL          PRO_saved
-      COMMON /PROCOM/  PRO_saved(1:30)
+      COMMON /PROCOM/  PRO_saved(1:MaxRun)
 
       INTEGER I
       LOGICAL, EXTERNAL :: Get_SavePRO

@@ -16,7 +16,7 @@
 !   Shared variables for any routine with 'USE VARIABLES'
 !
       IMPLICIT NONE
-!
+
       LOGICAL               :: SAVEF
       DATA SAVEF / .FALSE. / ! File needs saving
 
@@ -41,7 +41,7 @@
       DATA CONFIG / 'Dash.cfg' /
 ! External binaries
       CHARACTER(MaxPathLength) :: VIEWEXE
-      DATA VIEWEXE / 'C:\Program Files\DASH\mercury.exe' /
+      DATA VIEWEXE / 'C:\Program Files\CCDC\Mercury 1.0\mercury.exe' /
 
       CHARACTER(MaxPathLength) :: CONVEXE
       DATA CONVEXE / 'C:\Program Files\DASH\zmconv.exe' /
@@ -57,12 +57,14 @@
 ! File information; Names of files used by DASH For I/O
       CHARACTER*80  DashTicFile
       CHARACTER*80  DashHcvFile
+      CHARACTER*80  DashHklFile
       CHARACTER*80  DashPikFile
       CHARACTER*80  DashRawFile
       CHARACTER*80  DashDslFile
 
       LOGICAL TicExists
       LOGICAL HcvExists
+      LOGICAL HklExists
       LOGICAL PikExists
       LOGICAL RawExists
       LOGICAL DslExists
@@ -145,6 +147,11 @@
 ! no changes to any of the variables involved in calculating the tickmarks
 ! (wavelength, zeropoint and unit cell parameters) is expected any more.
 ! This variable is then tested before calculating the tickmarks.
+
+      LOGICAL NoWavelengthInXYE
+! Set to .TRUE. whenever an .xye file is loaded that doesn't contain the wavelength
+! When the wavelength is set, this variable is tested and the wavelength is
+! written to the file.
 
       END MODULE VARIABLES
 !

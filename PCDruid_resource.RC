@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 22/Nov/2001 14:24:53
+// Modified : 23/Nov/2001 15:56:12
 //
 ///////////////////////////////////////////////////
 //
@@ -491,6 +491,11 @@
 #define IDD_PW_Page10                     119
 #define IDF_OutputPRO                    1043
 #define IDF_LABEL20                      1100
+#define IDF_ShowChi2                     1217
+#define IDF_ShowTicked                   1218
+#define IDF_REAL1                        1219
+#define IDF_REAL2                        1220
+#define IDF_LABEL3                       1221
 
 ///////////////////////////////////////////////////
 //
@@ -569,26 +574,26 @@ IDD_Crystal_Symmetry DIALOG 0, 0,  282,  116
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "a",IDF_a_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   26,   22,   16,    8
-    CONTROL "Lattice constants",IDF_lattice_constant_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   14,    6,  230,   48
-    CONTROL "Crystal System",IDF_Crystal_system_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   14,   58,   96,   48
-    CONTROL "Space Group",IDF_Space_Group_Group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  119,   58,   96,   48
-    CONTROL "b",IDF_b_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   97,   22,   16,    8
-    CONTROL "c",IDF_c_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  172,   22,   16,    8
-    CONTROL "Alpha",IDF_alp_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   18,   35,   24,    8
-    CONTROL "Beta",IDF_bet_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   96,   35,   17,    8
-    CONTROL "Gamma",IDF_gam_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  162,   35,   26,    8
-    CONTROL "",IDF_a_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   47,   18,   40,   14
-    CONTROL "",IDF_b_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  117,   18,   40,   14
-    CONTROL "",IDF_c_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  193,   18,   40,   14
-    CONTROL "",IDF_alp_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   47,   34,   40,   14
-    CONTROL "",IDF_bet_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  117,   34,   40,   14
-    CONTROL "",IDF_gam_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  193,   34,   40,   14
-    CONTROL "",IDF_Crystal_System_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,   22,   70,   80,   48
-    CONTROL "",IDF_Space_Group_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  127,   70,   80,   50
-    CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  228,   92,   40,   14
-    CONTROL "0.0000",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  228,   67,   40,   14
-    CONTROL "Zero-point",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  224,   58,   48,   28
+    CONTROL "a",IDF_a_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   28,   77,   16,    8
+    CONTROL "Lattice constants",IDF_lattice_constant_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   16,   61,  230,   48
+    CONTROL "Crystal System",IDF_Crystal_system_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   14,    6,   96,   48
+    CONTROL "Space Group",IDF_Space_Group_Group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  119,    6,   96,   48
+    CONTROL "b",IDF_b_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   99,   77,   16,    8
+    CONTROL "c",IDF_c_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  174,   77,   16,    8
+    CONTROL "Alpha",IDF_alp_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   20,   90,   24,    8
+    CONTROL "Beta",IDF_bet_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   98,   90,   17,    8
+    CONTROL "Gamma",IDF_gam_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  164,   90,   26,    8
+    CONTROL "",IDF_a_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   49,   73,   40,   14
+    CONTROL "",IDF_b_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  119,   73,   40,   14
+    CONTROL "",IDF_c_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  195,   73,   40,   14
+    CONTROL "",IDF_alp_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   49,   89,   40,   14
+    CONTROL "",IDF_bet_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  119,   89,   40,   14
+    CONTROL "",IDF_gam_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  195,   89,   40,   14
+    CONTROL "",IDF_Crystal_System_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,   22,   18,   80,   48
+    CONTROL "",IDF_Space_Group_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  127,   18,   80,   50
+    CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  228,   40,   40,   14
+    CONTROL "0.0000",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  228,   15,   40,   14
+    CONTROL "Zero-point",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  224,    6,   48,   28
 END
 
 IDD_Crystal_Symmetry RCDATA
@@ -898,19 +903,6 @@ BEGIN
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
 END
 
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
@@ -1161,27 +1153,27 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "Enter trial lattice constants, crystal system (and space group if known).",IDF_PW_Page2_title,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  100,   17,  240,   10
+    CONTROL "Enter crystal system, trial lattice constants (and space group if known).",IDF_PW_Page2_title,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  100,   17,  240,   12
     CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  292,  150,   40,   14
-    CONTROL "a",IDF_a_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  111,   50,   16,    8
-    CONTROL "Lattice constants",IDF_lattice_constant_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   99,   34,  230,   48
-    CONTROL "Crystal System",IDF_Crystal_system_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   99,   86,   96,   48
-    CONTROL "Space Group",IDF_Space_Group_Group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  204,   86,   96,   48
-    CONTROL "b",IDF_b_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  182,   50,   16,    8
-    CONTROL "c",IDF_c_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  257,   50,   16,    8
-    CONTROL "Alpha",IDF_alp_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  103,   63,   24,    8
-    CONTROL "Beta",IDF_bet_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  181,   63,   17,    8
-    CONTROL "Gamma",IDF_gam_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  247,   63,   26,    8
-    CONTROL "",IDF_a_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,   46,   40,   14
-    CONTROL "",IDF_b_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  202,   46,   40,   14
-    CONTROL "",IDF_c_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  278,   46,   40,   14
-    CONTROL "",IDF_alp_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,   62,   40,   14
-    CONTROL "",IDF_bet_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  202,   62,   40,   14
-    CONTROL "",IDF_gam_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  278,   62,   40,   14
-    CONTROL "",IDF_Crystal_System_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  107,   98,   80,   48
-    CONTROL "",IDF_Space_Group_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  212,   98,   80,   50
-    CONTROL "0.0000",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  313,   95,   40,   14
-    CONTROL "Zero-point",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  309,   86,   48,   28
+    CONTROL "a",IDF_a_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  111,  105,   16,    8
+    CONTROL "Lattice constants",IDF_lattice_constant_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   99,   89,  230,   48
+    CONTROL "Crystal System",IDF_Crystal_system_group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   99,   34,   96,   48
+    CONTROL "Space Group",IDF_Space_Group_Group,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  204,   34,   96,   48
+    CONTROL "b",IDF_b_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  182,  105,   16,    8
+    CONTROL "c",IDF_c_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  257,  105,   16,    8
+    CONTROL "Alpha",IDF_alp_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  103,  118,   24,    8
+    CONTROL "Beta",IDF_bet_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  181,  118,   17,    8
+    CONTROL "Gamma",IDF_gam_latt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  247,  118,   26,    8
+    CONTROL "",IDF_a_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  101,   40,   14
+    CONTROL "",IDF_b_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  202,  101,   40,   14
+    CONTROL "",IDF_c_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  278,  101,   40,   14
+    CONTROL "",IDF_alp_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  132,  117,   40,   14
+    CONTROL "",IDF_bet_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  202,  117,   40,   14
+    CONTROL "",IDF_gam_latt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  278,  117,   40,   14
+    CONTROL "",IDF_Crystal_System_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  107,   46,   80,   48
+    CONTROL "",IDF_Space_Group_Menu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  212,   46,   80,   50
+    CONTROL "0.0000",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  313,   43,   40,   14
+    CONTROL "Zero-point",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  309,   34,   48,   28
 END
 
 IDD_PW_Page1 RCDATA
@@ -1279,19 +1271,6 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  167,   77,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-END
-
-IDD_PW_Page3 RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
 END
 
 IDD_Pawley_Status DIALOG 0, 0,  400,  185
@@ -1738,16 +1717,16 @@ BEGIN
     CONTROL "314",IDF_SA_RandomSeed1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  332,  110,   43,   14
     CONTROL "159",IDF_SA_RandomSeed2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  332,  126,   43,   14
     CONTROL "1",IDF_SA_MaxRepeats,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  343,   43,   32,   14
-    CONTROL "Number of SA runs (<30)",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  253,   45,   80,   10
-    CONTROL "Maximum number of moves per run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,  250,   83,   58,   20
+    CONTROL "Number of SA runs (<100)",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  253,   45,   80,   10
+    CONTROL "Max. number of moves / run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_RIGHT,  247,   84,   54,   20
     CONTROL "Profile chi       multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | SS_LEFT,  253,   64,   80,   10
     CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  343,   62,   32,   14
     CONTROL "Termination Criteria. Please note that only multiple runs use these criteria. A single run will run until the user stops it.",IDF_SA_Input3_termhead,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  250,   12,  125,   26
     CONTROL "&Print...",IDF_PrintSA,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  236,  150,   40,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  311,   87,   24,   12
-    CONTROL "x  10",IDF_LABEL21,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,  337,   88,   16,    8
-    CONTROL "7",IDF_MaxMoves2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE,  354,   81,   22,   12
+    CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  305,   87,   30,   12
+    CONTROL "x  10",IDF_LABEL21,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_RIGHT,  336,   88,   18,    8
+    CONTROL "7",IDF_MaxMoves2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE,  357,   81,   22,   12
     CONTROL "2",IDF_LABEL20,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  284,   61,    8,    8
 END
 
@@ -1768,7 +1747,7 @@ BEGIN
 " 1158               1           50000 \n"
 " 1163               1           29000 \n"
 " 1165               1           29000 \n"
-" 1374               1              30 \n"
+" 1374               1              99 \n"
 " 1378      1.0000          0.34028E+039 \n"
 " 1139     0.10000E-002      100.00      \n"
 " 1235               1               9 \n"
@@ -2011,19 +1990,6 @@ BEGIN
     CONTROL "&View fit list file",ID_Edit_PawleyLog,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  136,   68,   50,   14
 END
 
-IDD_Pawley_ErrorLog RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
 IDD_SAW_Page1 DIALOG 0, 0,  400,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
@@ -2096,12 +2062,19 @@ BEGIN
     CONTROL "Simulated Annealing completed.  The following solutions were generated.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  121,    8,  220,   10
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  165,  160,   40,   14
     CONTROL "&Show overlay",IDB_ShowOverlap,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  236,  160,   60,   14
-    CONTROL "E&lement symbol + solution number",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  124,  121,  114,   14
-    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  124,  135,  114,   14
-    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  263,  121,   70,   14
-    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  263,  135,   70,   14
-    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  116,  111,  128,   42
-    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  255,  111,   88,   42
+    CONTROL "E&lement symbol + solution number",IDF_UseSolutionNr,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   21,  121,  122,   14
+    CONTROL "&Original atom labels",IDF_UseOriginal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   21,  135,  122,   14
+    CONTROL "By solution &number",IDF_ColourBySolution,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  169,  121,   75,   14
+    CONTROL "By &element",IDF_ColourByElement,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  169,  135,   75,   14
+    CONTROL "Atom labels for overlay",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   13,  111,  138,   42
+    CONTROL "Atom colours for overlay",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  161,  111,   94,   42
+    CONTROL "Solution range for overlay",IDF_GROUP5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  266,  111,  180,   42
+    CONTROL "Show chi",IDF_ShowChi2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  273,  121,   48,   14
+    CONTROL "Show selected",IDF_ShowTicked,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  273,  135,   70,   14
+    CONTROL "0.0",IDF_REAL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  326,  120,   36,   14
+    CONTROL "0.0",IDF_REAL2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  400,  120,   36,   14
+    CONTROL "through",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  367,  123,   28,    8
+    CONTROL "2",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  310,  121,    8,    8
 END
 
 IDD_SA_Multi_completed_ep RCDATA
@@ -2111,12 +2084,14 @@ BEGIN
 " 1164 1 \n"
 " 1216 0 \n"
 " 1200 1 \n"
+" 1217 0 \n"
+" 1218 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1136     5     30   128 \n"
+" 1136     5     99   128 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -2148,6 +2123,75 @@ BEGIN
 "28 \n"
 "29 \n"
 "30 \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
+" \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
@@ -2280,17 +2324,15 @@ BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "20",IDF_NumOfIterations,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  176,   18,   30,   14
-    CONTROL "Number of iterations",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  112,   20,   62,    8
-    CONTROL "Window",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  146,   39,   28,    8
-    CONTROL "100",IDF_WindowWidth,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  176,   37,   30,   14
-    CONTROL "Use &Monte Carlo for background correction",IDF_UseMCYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  112,   57,  140,   14
-    CONTROL "Use &spline smoothing",IDF_UseSplineYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  112,   73,   78,   14
-    CONTROL "S. Brückner (2000). J. Appl. Cryst. 33, 977-979.",IDF_LABEL11,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  118,  107,  140,    8
-    CONTROL "W.I.F. David && D.S. Sivia (2001). J. Appl. Cryst. 34, 318-324.",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  118,  120,  174,    8
-    CONTROL "&Preview",IDF_Preview,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  262,  150,   40,   14
-    CONTROL "References",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  111,   95,  186,   40
+    CONTROL "20",IDF_NumOfIterations,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  188,   44,   32,   14
+    CONTROL "Number of iterations",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  114,   46,   70,    8
+    CONTROL "Window",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  144,   65,   40,    8
+    CONTROL "100",IDF_WindowWidth,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  188,   63,   32,   14
+    CONTROL "Use &Monte Carlo for background correction",IDF_UseMCYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  112,   88,  150,   14
+    CONTROL "Use &spline smoothing",IDF_UseSplineYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  112,  104,   90,   14
+    CONTROL "&Preview",IDF_Preview,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  247,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  306,  150,   40,   14
 END
 
 IDD_PW_Page6 RCDATA

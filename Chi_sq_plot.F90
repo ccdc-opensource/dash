@@ -23,6 +23,7 @@
 !  Definitions and array declarations.
 !
       INCLUDE 'PARAMS.INC'
+
       INTEGER           :: ntotmov
       INTEGER           :: iteration
       REAL              :: cpb
@@ -44,7 +45,7 @@
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
 ! Max number or SA runs is 30
-      REAL, DIMENSION(MaxIter,30) :: chi_sqd
+      REAL, DIMENSION(MaxIter,MaxRun) :: chi_sqd
       INTEGER           :: it_count
       INTEGER           :: Run_Number
       COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, Run_Number
@@ -98,7 +99,7 @@
       REAL           :: x_max
       REAL           :: x_min
       REAL           :: y_max
-      REAL, DIMENSION(MaxIter, 30) :: chi_sqd
+      REAL, DIMENSION(MaxIter, MaxRun) :: chi_sqd
       REAL, DIMENSION(MaxIter+1) :: Xarray
       REAL           ::DynamicMaxX
       REAL           ::TempMaxX

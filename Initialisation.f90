@@ -359,6 +359,7 @@
       ChildWinHandlerSet = .FALSE.
       DashRawFile = ' '
       DashHcvFile = ' '
+      DashHklFile = ' '
       DashPikFile = ' '
       DashTicFile = ' '
       SavePDB  = .TRUE.
@@ -369,6 +370,7 @@
       ZeroPoint = 0.0
       PastPawley = .FALSE.
       DefaultMaxResolution = 1.75
+      NoWavelengthInXYE = .FALSE.
       LOG_HYDROGENS = .FALSE.
       T0 = 0.0
       RT = 0.02

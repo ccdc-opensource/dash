@@ -20,8 +20,8 @@
 !           2 if user pressed cancel
 !
       USE WINTERACTER
-      USE VARIABLES
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -73,8 +73,8 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE VARIABLES
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -177,8 +177,8 @@
 !           0 for error (could be file not found/file in use/no valid data)
 !
       USE WINTERACTER
-      USE VARIABLES
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -248,7 +248,8 @@
       INTEGER          I
       INTEGER          POS
       LOGICAL          ESDsFilled
-      INTEGER          INTEGRATED_GUESS, MAX_INTENSITY_INDEX
+      REAL             INTEGRATED_GUESS
+      INTEGER          MAX_INTENSITY_INDEX
 
 ! Initialise to failure
       DiffractionFileLoad = 0
@@ -267,6 +268,7 @@
       CALL ILowerCase(EXT4)
       ISTAT = 0
       ESDsFilled = .FALSE.
+      NoWavelengthInXYE = .FALSE.
       SELECT CASE (EXT4)
         CASE ('dat ')
           ISTAT = Load_dat_File(TheFileName,ESDsFilled)
@@ -322,14 +324,14 @@
           YPMAX = YOBS(I)
         ENDIF
       ENDDO
-      INTEGRATED_GUESS = 0
+      INTEGRATED_GUESS = 0.0
       DO I = MAX(1,MAX_INTENSITY_INDEX - 5), MIN(NOBS,MAX_INTENSITY_INDEX + 5)
         INTEGRATED_GUESS = INTEGRATED_GUESS + YOBS(I)
       ENDDO
-      IF (INTEGRATED_GUESS .GT. 250000) THEN
-        SCALFAC = 0.01 * INTEGRATED_GUESS/250000
+      IF (INTEGRATED_GUESS .GT. 250000.0) THEN
+        SCALFAC = 0.01 * INTEGRATED_GUESS/250000.0
       ELSE IF (YPMAX .GT. 100000) THEN
-        SCALFAC = 0.01 * YPMAX/100000
+        SCALFAC = 0.01 * YPMAX/100000.0
       ENDIF
       BackupNOBS = NOBS
       DO I = 1, NOBS
@@ -1296,73 +1298,74 @@
 ! JvdS End of Q & D hack.
 ! ####################
       ELSE
-! If we are here, the .xye file didn't contain the wavelength: ask the user if he wants to include it now
-        CALL PushActiveWindowID
-        CALL WDialogLoad(IDD_XYE)
-        CALL WDialogSelect(IDD_XYE)
-        CALL WDialogShow(-1,-1,IDOK,SemiModeless)
-        OK = .FALSE.
-        DO WHILE (.TRUE.)
-          CALL WMessage(EventType,EventInfo)
-          SELECT CASE (EventType)
-            CASE (PushButton)
-              SELECT CASE (EventInfo%VALUE1)
-                CASE (IDOK)
-                  OK = .TRUE.
-                  CALL WDialogGetReal(IDF_wavelength1,Lambda1)
-                  GOTO 11
-                CASE (IDCANCEL)
-                  OK = .FALSE.
-                  GOTO 11
-              END SELECT
-            CASE (FieldChanged)
-              SELECT CASE (EventInfo%VALUE1)
-                CASE (IDF_Wavelength_Menu) ! Wavelength menu selection
-                  CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
-                  Lambda1 = FnWavelengthOfMenuOption(IRadSelection)
-                  CALL WDialogPutReal(IDF_wavelength1,Lambda1)
-                CASE (IDF_wavelength1)
-                  ! Do nothing 
-              END SELECT
-          END SELECT
-        ENDDO
- 11     CALL WDialogSelect(IDD_XYE)
-        CALL WDialogUnload
-        CALL PopActiveWindowID
-        CLOSE(10)
-        OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-        OPEN(UNIT=64,FILE='TempFile.xye',ERR=12)
-        GOTO 13
-  12    CONTINUE
-        CALL ErrorMessage('Error: no changes made.')
-        CLOSE(64)
-        OK = .FALSE.
-  13    CONTINUE
-        IF (OK) THEN
-! This simply assumes that it was a valid .xye file
-          WRITE(64,'(F9.5)') Lambda1
-! Read a line from the original file
-  14      READ(UNIT=10,FMT='(A)',ERR=12,END=15) Cline
-! Write the trimmed version to another file          
-          WRITE(64,'(A)') Cline(1:LEN_TRIM(Cline))
-          GOTO 14
-  15      CONTINUE ! EoF
-          CLOSE(64)
-          CLOSE(10)
-! Delete old .xye file
-          CALL IOsDeleteFile(TheFileName)
-! Move temp file to old .xye
-          CALL IOsRenameFile('TempFile.xye',TheFileName)
-          OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-          I = 1
-! Check if wavelength available on very first line
-          READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
-          IF (GetNumOfColumns(Cline) .NE. 1) THEN
+! If we are here, the .xye file didn't contain the wavelength
+        NoWavelengthInXYE = .TRUE.
+!U        CALL PushActiveWindowID
+!U        CALL WDialogLoad(IDD_XYE)
+!U        CALL WDialogSelect(IDD_XYE)
+!U        CALL WDialogShow(-1,-1,IDOK,SemiModeless)
+!U        OK = .FALSE.
+!U        DO WHILE (.TRUE.)
+!U          CALL GetEvent
+!U          SELECT CASE (EventType)
+!U            CASE (PushButton)
+!U              SELECT CASE (EventInfo%VALUE1)
+!U                CASE (IDOK)
+!U                  OK = .TRUE.
+!U                  CALL WDialogGetReal(IDF_wavelength1,Lambda1)
+!U                  GOTO 11
+!U                CASE (IDCANCEL)
+!U                  OK = .FALSE.
+!U                  GOTO 11
+!U              END SELECT
+!U            CASE (FieldChanged)
+!U              SELECT CASE (EventInfo%VALUE1)
+!U                CASE (IDF_Wavelength_Menu) ! Wavelength menu selection
+!U                  CALL WDialogGetMenu(IDF_Wavelength_Menu,IRadSelection)
+!U                  Lambda1 = FnWavelengthOfMenuOption(IRadSelection)
+!U                  CALL WDialogPutReal(IDF_wavelength1,Lambda1)
+!U                CASE (IDF_wavelength1)
+!U                  ! Do nothing 
+!U              END SELECT
+!U          END SELECT
+!U        ENDDO
+!U 11     CALL WDialogSelect(IDD_XYE)
+!U        CALL WDialogUnload
+!U        CALL PopActiveWindowID
+!U        CLOSE(10)
+!U        OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+!U        OPEN(UNIT=64,FILE='TempFile.xye',ERR=12)
+!U        GOTO 13
+!U  12    CONTINUE
+!U        CALL ErrorMessage('Error: no changes made.')
+!U        CLOSE(64)
+!U        OK = .FALSE.
+!U  13    CONTINUE
+!U        IF (OK) THEN
+!U! This simply assumes that it was a valid .xye file
+!U          WRITE(64,'(F9.5)') Lambda1
+!U! Read a line from the original file
+!U  14      READ(UNIT=10,FMT='(A)',ERR=12,END=15) Cline
+!U! Write the trimmed version to another file          
+!U          WRITE(64,'(A)') Cline(1:LEN_TRIM(Cline))
+!U          GOTO 14
+!U  15      CONTINUE ! EoF
+!U          CLOSE(64)
+!U          CLOSE(10)
+!U! Delete old .xye file
+!U          CALL IOsDeleteFile(TheFileName)
+!U! Move temp file to old .xye
+!U          CALL IOsRenameFile('TempFile.xye',TheFileName)
+!U          OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+!U          I = 1
+!U! Check if wavelength available on very first line
+!U          READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
+!U          IF (GetNumOfColumns(Cline) .NE. 1) THEN
             CLOSE(10)
             OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-            GOTO 12
-          ENDIF
-        ENDIF
+!U            GOTO 12
+!U          ENDIF
+!U        ENDIF
       ENDIF
 ! Modified to handle files without esds - used to read in YOBS as the esd
  10   READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
@@ -1405,21 +1408,17 @@
         CALL ErrorMessage("The file contains no valid data.")
         RETURN
       ENDIF
-! If wavelength not present in file, initialise to Cu
-      IF (Lambda1 .LT. 0.00001) THEN
-        CALL Set_Wavelength(WavelengthOf('Cu'))
-        JRadOption = 1
-      ELSE
+! If wavelength present in file add in a test: if wavelength close to known anode material,
+! set source to laboratory. Otherwise, source is synchrotron.
+      IF (Lambda1 .GT. 0.01) THEN
 ! Initialise source material to synchrotron
         JRadOption = 2
-! Now add in a test: if wavelength close to known anode material,
-! set source to laboratory. Otherwise, source is synchrotron.
         DO I = 2, 6
           IF (ABS(Lambda1 - FnWavelengthOfMenuOption(I)) .LT. 0.0003) JRadOption = 1
         ENDDO
+        CALL Upload_Source
+        CALL Set_Wavelength(Lambda1)
       ENDIF
-      CALL Upload_Source
-      CALL Set_Wavelength(Lambda1)
       Load_xye_File = 1
       RETURN
  999  CONTINUE
@@ -1476,7 +1475,6 @@
       NOBS = NOBS - Shift
       CALL Rebin_Profile
       CALL GetProfileLimits
-      CALL Profile_Plot
 
       END SUBROUTINE TruncateData
 !
@@ -1510,7 +1508,7 @@
       XPMAX = XBIN(NBIN)
       YPMIN = XBIN(1)
       YPMAX = XBIN(1)
-      DO I = 1, NBIN
+      DO I = 2, NBIN
         YPMIN = MIN(YOBIN(I),YPMIN)
         YPMAX = MAX(YOBIN(I),YPMAX)
       ENDDO

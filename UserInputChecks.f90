@@ -98,3 +98,89 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE CheckUnitCellConsistency
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'Lattice.inc'
+
+      LOGICAL ABC_Same, AB_Same, AC_Same, BC_Same, Ang_Same, Alp_90, Bet_90, Gam_90, Gam_120
+      INTEGER tLatBrav
+      LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm
+      REAL SmallVal
+
+!            1 = Triclinic
+!            2 = Monoclinic-a
+!            3 = Monoclinic-b
+!            4 = Monoclinic-c
+!            5 = Orthorhombic
+!            6 = Tetragonal
+!            7 = Trigonal
+!            8 = Rhombohedral
+!            9 = Hexagonal
+!           10 = Cubic
+
+      IF (.NOT. FnUnitCellOK()) RETURN
+      SmallVal = 1.E-6
+      AB_Same  = ABS(CellPar(2)-CellPar(1)) .LE. SmallVal 
+      BC_Same  = ABS(CellPar(3)-CellPar(2)) .LE. SmallVal 
+      AC_Same  = ABS(CellPar(3)-CellPar(1)) .LE. SmallVal 
+      ABC_Same = (AB_Same .AND. BC_Same) 
+      Alp_90   = (ABS(CellPar(4)- 90.0) .LE. SmallVal)
+      Bet_90   = (ABS(CellPar(5)- 90.0) .LE. SmallVal)
+      Gam_90   = (ABS(CellPar(6)- 90.0) .LE. SmallVal)
+      Gam_120  = (ABS(CellPar(6)-120.0) .LE. SmallVal)
+      Ang_Same = ABS(CellPar(6)-CellPar(5)) .LE. SmallVal .AND. &
+                 ABS(CellPar(5)-CellPar(4)) .LE. SmallVal
+      IF (ABC_Same .AND. Ang_Same) THEN
+        IF (Alp_90) THEN
+          tLatBrav = 10 ! Cubic
+          GOTO 10
+        ELSE
+          tLatBrav = 8 ! Rhombohedral
+          GOTO 10
+        ENDIF
+      ENDIF
+      IF (AB_Same) THEN
+        IF (Ang_Same .AND. Alp_90) THEN
+          tLatBrav = 6 ! Tetragonal
+          GOTO 10
+        ELSE IF (Alp_90 .AND. Bet_90 .AND. Gam_120) THEN
+          tLatBrav = 9 ! Hexagonal
+          GOTO 10
+        ENDIF
+      ENDIF
+      IF (Ang_Same .AND. Alp_90) THEN
+        tLatBrav = 5 ! Orthorhombic
+        GOTO 10
+      ENDIF
+      IF (           Alp_90 .AND.       Bet_90 .AND. .NOT. Gam_90) THEN
+        tLatBrav = 4 ! Monoclinic-c
+        GOTO 10
+      ELSE IF (      Alp_90 .AND. .NOT. Bet_90 .AND.       Gam_90) THEN
+        tLatBrav = 3 ! Monoclinic-b
+        GOTO 10
+      ELSE IF (.NOT. Alp_90 .AND.       Bet_90 .AND.       Gam_90) THEN
+        tLatBrav = 2 ! Monoclinic-a
+        GOTO 10
+      ENDIF
+      tLatBrav = 1 ! Triclinic
+   10 CONTINUE
+! Now, tLatBrav holds the crystal system as determined from the unit cell parameters.
+! Compare it to the crystal system as set by the user (LatBrav) and issue a warning
+! message if they don't match.
+      IF (LatBrav .EQ. tLatBrav) RETURN
+      IF (Confirm('The unit cell parameters point to a crystal system of higher symmetry.'//CHAR(13)// &
+          'Would you like to set the crystal system to '// &
+          CrystalSystemString(tLatBrav)(1:LEN_TRIM(CrystalSystemString(tLatBrav)))//' ?')) THEN
+        LatBrav = tLatBrav
+        CALL Upload_CrystalSystem
+      ENDIF
+
+      END SUBROUTINE CheckUnitCellConsistency
+!
+!*****************************************************************************
+!

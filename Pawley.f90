@@ -148,6 +148,7 @@
       LOGICAL SaveProject ! Function
       INTEGER Ilen, IER
       CHARACTER*80 SDIFile
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
@@ -292,6 +293,33 @@
               CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
               NoData = .FALSE.
               CALL ShowWizardWindowZmatrices
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_PawRef_RefSigm1_Check)
+              IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) THEN
+                CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Disabled)
+              ELSE
+                CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Enabled)
+              ENDIF
+            CASE (IDF_PawRef_RefSigm2_Check)
+              IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) THEN
+                CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Disabled)
+              ELSE
+                CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Enabled)
+              ENDIF
+            CASE (IDF_PawRef_RefGamm1_Check)
+              IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) THEN
+                CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Disabled)
+              ELSE
+                CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Enabled)
+              ENDIF
+            CASE (IDF_PawRef_RefGamm2_Check)
+              IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) THEN
+                CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Disabled)
+              ELSE
+                CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Enabled)
+              ENDIF
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -746,6 +774,7 @@
         n = 75
       ENDIF
       WRITE(DashHcvFile,'(A,A)') base(1:n),'.hcv'
+      WRITE(DashHklFile,'(A,A)') base(1:n),'.hkl'
       WRITE(DashPikFile,'(A,A)') base(1:n),'.pik'
       WRITE(DashTicFile,'(A,A)') base(1:n),'.tic'
 
@@ -785,6 +814,7 @@
 	DashPikFile = ' '
       DashTicFile = ' '
       DashHcvFile = ' '
+      DashHklFile = ' '
       DashDslFile = ' '
       IDot = 0
       DO I = LSDI, 1, -1
@@ -796,6 +826,7 @@
  50   DashPikFile(1:LSDI) = SDIFileName(1:LSDI)
       DashTicFile(1:LSDI) = SDIFileName(1:LSDI)
       DashHcvFile(1:LSDI) = SDIFileName(1:LSDI)
+      DashHklFile(1:LSDI) = SDIFileName(1:LSDI)
       DashDslFile(1:LSDI) = SDIFileName(1:LSDI)
       IF (IDot .EQ. 0) THEN
         L1 = LSDI + 1
@@ -807,14 +838,17 @@
       DashPikFile(L1:L4)='.pik'
       DashTicFile(L1:L4)='.tic'
       DashHcvFile(L1:L4)='.hcv'
+      DashHklFile(L1:L4)='.hkl'
       DashDslFile(L1:L4)='.dsl'
       CALL WRTDSL(DashDslFile,L4) ! Ignore any errors
       CALL IOSCopyFile('polyp.pik',DashPikFile)
       CALL IOSCopyFile('polyp.tic',DashTicFile)
       CALL IOSCopyFile('polyp.hcv',DashHcvFile)
+      CALL IOSCopyFile('polyp.hkl',DashHklFile)
       OPEN(81,file=SDIFileName(1:LSDI),status='unknown')
       WRITE(81,8110) DashTicFile(1:LEN_TRIM(DashTicFile))
       WRITE(81,8120) DashHcvFile(1:LEN_TRIM(DashHcvFile))
+      WRITE(81,8121) DashHklFile(1:LEN_TRIM(DashHklFile))
       WRITE(81,8130) DashPikFile(1:LEN_TRIM(DashPikFile))
       WRITE(81,8136) DashRawFile(1:LEN_TRIM(DashRawFile))
       WRITE(81,8135) DashDslFile(1:LEN_TRIM(DashDslFile))
@@ -823,6 +857,7 @@
       WRITE(81,8160) PAWLEYCHISQ
  8110 FORMAT(' TIC ',A)
  8120 FORMAT(' HCV ',A)
+ 8121 FORMAT(' HKL ',A)
  8130 FORMAT(' PIK ',A)
  8135 FORMAT(' DSL ',A)
  8136 FORMAT(' RAW ',A)
