@@ -315,7 +315,7 @@
       CALL WDialogGetReal(IDF_Indexing_Density, Rdens)
       CALL WDialogGetReal(IDF_Indexing_MolWt,   Rmolwt)
       CALL WDialogGetReal(IDF_Indexing_Fom,     Rfom)
-      CALL WDialogGetReal(IDF_Indexing_zero,    Rexpzp)
+      CALL WDialogGetReal(IDF_ZeroPoint,        Rexpzp)
       CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      Isystem(1))
       CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      Isystem(2))
       CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       Isystem(3))

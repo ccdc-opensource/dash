@@ -1,4 +1,4 @@
-! Winteracter module created : 13/Sep/2001 15:10:43
+! Winteracter module created : 13/Sep/2001 20:38:09
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -388,7 +388,6 @@
           INTEGER, PARAMETER :: IDF_Indexing_Fom_Label          =  1345
           INTEGER, PARAMETER :: IDF_Indexing_Fom                =  1346
           INTEGER, PARAMETER :: IDF_Indexing_UseErrors          =  1347
-          INTEGER, PARAMETER :: IDF_Indexing_zero               =  1348
           INTEGER, PARAMETER :: IDF_Indexing_zpt                =  1349
           INTEGER, PARAMETER :: IDF_Indexing_exp                =  1350
           INTEGER, PARAMETER :: IDD_License_Dialog              =   154
@@ -403,7 +402,7 @@
           INTEGER, PARAMETER :: IDF_License_SiteCodeLabel       =  1357
           INTEGER, PARAMETER :: ID_Wizard_Icon                  = 20015
           INTEGER, PARAMETER :: ID_Start_Wizard                 = 40043
-          INTEGER, PARAMETER :: ID_Background_Fit               =   155
+          INTEGER, PARAMETER :: IDD_Background_Fit              =   129
           INTEGER, PARAMETER :: IDF_background_text             =  1360
           INTEGER, PARAMETER :: IDF_Background_Pass             =  1361
           INTEGER, PARAMETER :: IDF_Background_Accept           =  1362
