@@ -76,8 +76,10 @@
       czmpar(5,ifrg) = 'Q2(frag )'
       czmpar(6,ifrg) = 'Q3(frag )'
       czmpar(7,ifrg) = 'Q4(frag )'
-      kzmpar(ii,ifrg) = 2 ! Quaternion
-      xzmpar(ii,ifrg) = 0.5
+      DO ii = 4, 7
+        kzmpar(ii,ifrg) = 2 ! Quaternion
+        xzmpar(ii,ifrg) = 0.5
+      ENDDO
       DO i = 1, 7
         WRITE (czmpar(i,ifrg)(8:8),880) ifrg
       ENDDO
