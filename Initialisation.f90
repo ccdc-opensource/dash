@@ -59,6 +59,7 @@
 !C>> JCC Rather than continually load/unload the various widgets, upload them all only once
 !C>> This way, the state can be memorised from session to session
       SUBROUTINE PolyFitter_UploadDialogues
+
       USE WINTERACTER
       USE DRUID_HEADER
 
@@ -93,6 +94,9 @@
       CALL WDialogLoad(IDD_PW_Page1)
       CALL WDialogLoad(IDD_PW_Page2)
       CALL WDialogLoad(IDD_PW_Page3)
+      CALL WDialogLoad(IDD_PW_Page4)
+      CALL WDialogLoad(IDD_PW_Page5)
+      CALL WDialogLoad(IDD_PW_Page6)
       CALL WDialogLoad(IDD_SA_Completed)
 ! ep      CALL WDialogLoad(IDD_SA_Multi_Completed) 
       CALL WDialogLoad(IDD_SA_Multi_completed_ep)
@@ -174,26 +178,27 @@
 ! Failure, so exit gracefully
       CALL WindowClose()
       STOP
+
       END SUBROUTINE PolyFitterInitialise
 !
 !*****************************************************************************
 !
       SUBROUTINE InitialiseVariables
-!
+
       USE WINTERACTER
       USE DRUID_HEADER
-!
+
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-       itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
+        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
 
       INCLUDE 'statlog.inc'
       INCLUDE 'lattice.inc'
-      INCLUDE 'GLBVAR.INC' ! Contains JRadOption
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Poly_Colours.inc'
       INCLUDE 'DialogPosCmn.inc'
 
@@ -203,39 +208,41 @@
       DashHcvFile = ' '
       DashPikFile = ' '
       DashTicFile = ' '
-      IDCurrent_Cursor_Mode = ID_Default_Mode
+!O      IDCurrent_Cursor_Mode = ID_Default_Mode
+      IDCurrent_Cursor_Mode = ID_Peak_Fitting_Mode
       DataSetChange = 0
       NumInternalDSC = -1
       ZeroPoint = 0.0
       CALL UpdateWavelength(WaveLengthOf('Cu'))
-
-!>>JCC Added
+      CALL WDialogSelect(IDD_PW_Page5)
+      CALL WDialogGetReal(IDF_MaxResolution,tReal)
+      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
       SLIMVALUE = 1.0
       SCALFAC   = 0.01
       BACKREF   = .TRUE.
 
       JRadOption = 1 ! Initialise to X-ray lab data
 
-      IXPos_IDD_Pawley_Status=0.1*XBSWidth
-      IYPos_IDD_Pawley_Status=0.06*XBSHeight
-      IXPos_IDD_SA_Input=0.1*XBSWidth
-      IYPos_IDD_SA_Input=0.06*XBSHeight
-      IXPos_IDD_Wizard=0.1*XBSWidth
-      IYPos_IDD_Wizard=0.06*XBSHeight
+      IXPos_IDD_Pawley_Status = 0.1  * XBSWidth
+      IYPos_IDD_Pawley_Status = 0.06 * XBSHeight
+      IXPos_IDD_SA_Input = 0.1  * XBSWidth
+      IYPos_IDD_SA_Input = 0.06 * XBSHeight
+      IXPos_IDD_Wizard = 0.1  * XBSWidth
+      IYPos_IDD_Wizard = 0.06 * XBSHeight
 
-      FromPawleyFit=.false. 
+      FromPawleyFit = .FALSE. 
 
-      NUMOBSTIC=0
-      NTIC=0
-      LBIN=1
+      NUMOBSTIC = 0
+      NTIC = 0
+      LBIN = 1
 
-      MARKER_SIZE=0.35
-      CHAR_SIZE=1.0
+      MARKER_SIZE = 0.35
+      CHAR_SIZE = 1.0
 
-      XPG1=0.12
-      XPG2=0.95
-      YPG1=0.12
-      YPG2=0.93
+      XPG1 = 0.12
+      XPG2 = 0.95
+      YPG1 = 0.12
+      YPG2 = 0.93
 
       KolNumPGWindow=220
       KolNumMain=221
