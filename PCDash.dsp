@@ -133,17 +133,6 @@ SOURCE=.\Basic_Vectors.f90
 # End Source File
 # Begin Source File
 
-SOURCE=.\BeginSa.f90
-DEP_F90_BEGIN=\
-	".\DRUID_HEADER.mod"\
-	".\GLBVAR.INC"\
-	".\Lattice.inc"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
 SOURCE=.\Ccslmain.f90
 DEP_F90_CCSLM=\
 	".\DRUID_HEADER.mod"\
@@ -628,6 +617,13 @@ DEP_F90_RES2M=\
 # Begin Source File
 
 SOURCE=.\SA_Begin.f90
+DEP_F90_SA_BE=\
+	".\DRUID_HEADER.mod"\
+	".\GLBVAR.INC"\
+	".\Lattice.inc"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
 # End Source File
 # Begin Source File
 
@@ -748,6 +744,7 @@ SOURCE=.\SAMVAR.f90
 SOURCE=.\SAsoln_store.f90
 DEP_F90_SASOL=\
 	".\params.inc"\
+	".\Variables.mod"\
 	
 # End Source File
 # Begin Source File

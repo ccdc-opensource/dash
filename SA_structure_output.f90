@@ -39,10 +39,11 @@
       REAL                pdbAtmCoords
       COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:30)
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file
+
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
 
       PARAMETER (mpdbops=192)
       CHARACTER*20 cpdbops(mpdbops)
@@ -714,7 +715,6 @@
         ENDIF
       ENDDO
       r(4,4) = 1.0
-      RETURN
 
       END SUBROUTINE PDB_POSTRANS
 !*==ADDSINGLESOLUTION.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
@@ -725,10 +725,11 @@
 
       REAL ProfileChi, IntensityChi
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file
+
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
@@ -756,10 +757,11 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file   
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file
+
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
 
       CHARACTER*85 new_fname
 
@@ -770,10 +772,12 @@
       CALL AppendNumToFileName(SA_Run_Number,ccl_file,new_fname)
       CALL IOsDeleteFile(new_fname)
       CALL IOsRenameFile(ccl_file(1:LEN_TRIM(ccl_file)),new_fname)
-! ep appended
       CALL AppendNumToFileName(SA_Run_Number,pro_file,new_fname)
       CALL IOsDeleteFile(new_fname)
       CALL IOsRenameFile(pro_file(1:LEN_TRIM(pro_file)),new_fname)
+      CALL AppendNumToFileName(SA_Run_Number,bin_file,new_fname)
+      CALL IOsDeleteFile(new_fname)
+      CALL IOsRenameFile(bin_file(1:LEN_TRIM(bin_file)),new_fname)
       CALL AppendNumToFileName(SA_Run_Number,pdb_file,new_fname)
       CALL IOsDeleteFile(new_fname)
       CALL IOsRenameFile(pdb_file(1:LEN_TRIM(pdb_file)),new_fname)

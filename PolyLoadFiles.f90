@@ -292,8 +292,6 @@
 !        CALL ScrUpdateFileName
         RETURN
       ENDIF
-! Set the default SA output files to <fname>.cssr etc (fname gets any extension removed)
-      CALL sa_SetOutputFiles(TheFileName)
 ! Fill the E.S.D.s if that hasn't been taken care of yet
       IF (.NOT. ESDsFilled) THEN
         DO I = 1, NOBS

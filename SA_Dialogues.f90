@@ -18,7 +18,6 @@
       CALL WizardWindowShow(IDD_SAW_Page1)
 ! @@ Enable or disable the "Next" button
    !   CALL WDialogFieldState(IDNEXT,Enabled)
-      CALL SA_SetOutputFilenamesToDefaults()
       PastPawley = .TRUE.
 ! Grey out 'Delete all peak fit ranges' button on toolbar
       CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOff)
@@ -82,7 +81,6 @@
             CASE (IDBACK)
 ! Go back to the Pawley refinement or the initial wizard
               CALL EndWizardPastPawley
-              CALL SetWizardState(0)
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
 ! Go to the next stage of the SA input

@@ -29,6 +29,12 @@
       INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
       COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
 
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+
 ! Used to manage the child windows which display the profile plots
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
@@ -37,6 +43,9 @@
 ! the number of columns in the store-arrays is set to the maximum number of 
 ! child windows allowed
       COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
+
+      LOGICAL          PRO_saved
+      COMMON /PROCOM/  PRO_saved(1:30)
 
       INTEGER irow, iz, temprow
       REAL yadd, ydif
@@ -47,12 +56,32 @@
       DIMENSION ycalcep(MOBS)
       DIMENSION ydif(MOBS)
       EXTERNAL DealWithProfilePlot
+      CHARACTER*2 RunStr
+      INTEGER RunNr
 !
 !   reading in the data from the saved .pro files
 !
+
+
+
       temprow = irow
       CALL WGridGetCellString(IDF_SA_Summary,1,temprow,Grid_Buffer)
       Iz = LEN_TRIM(Grid_Buffer)
+! As it is now possible to switch saving .pro files on/off, even during SA,
+! we must now test if the .pro requested has been saved.
+! The solutions have been ordered wrt chi**2. We must parse the original run nr from the
+! number of the .pdb file. Unless we didn't do a multirun of course.
+      IF (MaxRuns .EQ. 1) THEN
+        RunNr  = 1
+      ELSE
+        RunStr = Grid_Buffer(Iz-5:Iz-4)
+        IF (RunStr(1:1) .EQ. '0') THEN
+          RunStr(1:1) = RunStr(2:2)
+          RunStr(2:2) = ' '
+        ENDIF
+        READ(RunStr,'(I2)') RunNr
+      ENDIF
+      IF (.NOT. PRO_saved(RunNr)) RETURN
       Iz = Iz-4
       filename = grid_buffer(1:Iz)//'.pro'
       OPEN(unit=61, file=filename, status = 'old', err=999)
@@ -88,7 +117,8 @@
       ENDDO      
 !   call subroutine which plots data
       CALL plot_pro_file(ihandle)
-999   CONTINUE
+      RETURN
+999   CALL ErrorMessage('The .pro file could not be opened.')
 
       END SUBROUTINE organise_sa_result_data
 !
