@@ -206,7 +206,6 @@
       ZeroPoint  = XDD(1)
       CALL Upload_Cell_Constants
       CALL Upload_ZeroPoint
-!  First ensure that we have the plotting mode correct
       CALL Generate_TicMarks
       IF (NVal .LE. NDD+2) RETURN
 ! Now attempt a quick Pawley refinement
