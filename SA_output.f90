@@ -22,9 +22,6 @@
                 tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
                 nd2, nd3, nd4
 
-      CALL WDialogSelect(IDD_SA_Completed)
-      CALL WDialogPutReal(IDF_SA_Complete_pcs,CHIPROBEST(iteration),'(F8.2)')
-      CALL WDialogPutReal(IDF_SA_Complete_ics,chimin,'(F8.2)')
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WDialogPutReal(IDF_curr_temp,T,'(F8.2)')
       CALL WDialogPutReal(IDF_min_chisq,chimin,'(F8.2)')
