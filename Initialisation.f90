@@ -269,6 +269,10 @@
       INTEGER                    ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiHandle
 
+      REAL                PeakFindPos
+      INTEGER                                           nPeaksFound
+      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
       PARAMETER (iWidth = 300, iHeight = 1)
@@ -315,8 +319,9 @@
       ENDDO
       CALL Clear_SA ! Sets NumOf_SA_Runs to 0
       CALL Update_Solutions
+      nPeaksFound = 0
       CALL WDialogSelect(IDD_SAW_Page5)
-      CALL WDialogFieldState(IDB_Prog3,Disabled)
+      CALL WDialogFieldState(IDB_Prog3, Disabled)
       UseQuaternions = .TRUE.
 ! Initialise arrays to do with administration of open child windows
       ChildWinAutoClose = .FALSE.
@@ -340,8 +345,8 @@
       CALL Set_Wavelength(WaveLengthOf('Cu'))
 ! Now initialise the maximum resolution in the dialogue window
       CALL WDialogSelect(IDD_PW_Page5)
-      CALL WDialogPutReal(IDF_MaxResolution,DefaultMaxResolution)
-      CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(DefaultMaxResolution))
+      CALL WDialogPutReal(IDF_MaxResolution, DefaultMaxResolution)
+      CALL WDialogPutReal(IDF_Max2Theta, dSpacing2TwoTheta(DefaultMaxResolution))
       CALL WDialogSelect(IDD_SA_input3_2)
       ISeed1 = 314
       ISeed2 = 159
@@ -352,13 +357,13 @@
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogPutString(IDF_ViewExe,ViewExe)
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
-      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,.TRUE.)
+      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, .TRUE.)
       SA_SimplexDampingFactor = 0.1
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
       CALL WDialogSelect(IDD_PW_Page8)
       CALL WDialogFieldState(IDB_PrevRes,Disabled)
 ! Grey out 'Remove background' button on toolbar
-      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
+      CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOff)
       SlimValue = 1.0
       ScalFac   = 0.01
       BackRef   = .TRUE.

@@ -752,12 +752,9 @@
               CALL Get_IPMaxMin 
               CALL Profile_Plot
             CASE (IDB_1st)  
-              DO I = 2, NBIN
-                tYOBIN(I-1) = YOBIN(I) - YOBIN(I-1)
-              ENDDO
               NBIN = NBIN - 1
               DO I = 1, NBIN
-                YOBIN(I) = tYOBIN(I)
+                YOBIN(I) = YOBIN(I+1) - YOBIN(I)
               ENDDO
               CALL GetProfileLimits
               CALL Get_IPMaxMin 
@@ -881,6 +878,8 @@
               END SELECT
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
+            CASE (IDB_FindPeaks)
+              CALL FindPeaks
           END SELECT
         CASE (FieldChanged)
           CALL CheckIfWeCanIndex
