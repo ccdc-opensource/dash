@@ -1,4 +1,4 @@
-! Winteracter module created : 29/May/2002 11:45:48
+! Winteracter module created : 14/Jun/2002 16:34:50
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -487,7 +487,6 @@
           INTEGER, PARAMETER :: IDF_BisoOccMenu                 =  1384
           INTEGER, PARAMETER :: IDB_Relabel                     =  1385
           INTEGER, PARAMETER :: IDF_IDoNotAgree                 =  1386
-          INTEGER, PARAMETER :: IDB_ExclRegions                 =  1387
           INTEGER, PARAMETER :: IDF_zmFile1                     =  1388
           INTEGER, PARAMETER :: IDF_zmFile2                     =  1389
           INTEGER, PARAMETER :: IDF_zmFile3                     =  1390
