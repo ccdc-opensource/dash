@@ -102,11 +102,10 @@
             ELSE 
               CALL FileErrorPopup(frag_file(iFrg), iDummy)
             ENDIF ! If the read on the Z-matrix was ok
-            CALL UpdateZmatrixSelection
-            CALL WizardWindowShow(IDD_SAW_Page1)
+            CALL ShowWizardWindowZmatrices
           CASE ('SDI    ')
             CALL SDIFileOpen(ArgString)
-            CALL WizardWindowShow(IDD_SAW_Page1)
+            CALL ShowWizardWindowZmatrices
           CASE ('PDB    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'CSSR   ', 'CIF    ')
             CALL WDialogSelect(IDD_SAW_Page1)
             iFrg = 1
@@ -130,8 +129,8 @@
 ! More Z-matrices to read?
             tNextzmNum = tNextzmNum + 1
             IF (tNextzmNum .LE. tNumZMatrices) GOTO 10
-  999       CALL UpdateZmatrixSelection
-            CALL WizardWindowShow(IDD_SAW_Page1)
+  999       CONTINUE
+            CALL ShowWizardWindowZmatrices
           CASE ('RAW    ', 'CPI    ', 'DAT    ', 'TXT    ', 'MDI    ', 'POD    ', &
                 'RD     ', 'SD     ', 'UDF    ', 'UXD    ', 'XYE    ', 'X01    ')
             iDummy = DiffractionFileOpen(ArgString)
