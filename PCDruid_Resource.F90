@@ -1,4 +1,4 @@
-! Winteracter module created : 31/Mar/2003 15:28:07
+! Winteracter module created : 02/Apr/2003 16:12:32
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -652,8 +652,11 @@
           INTEGER, PARAMETER :: IDD_DIALOG007                   =   189
           INTEGER, PARAMETER :: IDD_TEMPLATE022                 =   191
           INTEGER, PARAMETER :: IDD_TEMPLATE023                 =   192
-          INTEGER, PARAMETER :: IDF_CHECK1                      =  1507
+          INTEGER, PARAMETER :: IDC_ITF                         =  1506
           INTEGER, PARAMETER :: IDD_TEMPLATE024                 =   193
-          INTEGER, PARAMETER :: IDF_CHECK2                      =  1508
-          INTEGER, PARAMETER :: IDF_REAL2                       =  1509
+          INTEGER, PARAMETER :: IDC_PO                          =  1508
+          INTEGER, PARAMETER :: IDR_PO                          =  1509
+          INTEGER, PARAMETER :: IDR_ITF                         =  1507
+          INTEGER, PARAMETER :: IDR_INTCHI                      =  1510
+          INTEGER, PARAMETER :: IDR_PROCHI                      =  1511
       END MODULE Druid_Header
