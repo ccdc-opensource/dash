@@ -66,7 +66,6 @@
       CALL WDialogLoad(IDD_SA_Action1)
       CALL WDialogLoad(IDD_Plot_Option_Dialog)
       CALL WDialogLoad(IDD_Configuration)
-      CALL WDialogLoad(IDD_Pawley_Status)
       CALL WDialogLoad(IDD_Peak_Positions)
       CALL WDialogLoad(IDD_Index_Preparation)
 ! Set the colours of the grid manually
@@ -90,6 +89,8 @@
       CALL WDialogLoad(IDD_PW_Page8)
       CALL WDialogLoad(IDD_PW_Page9)
       CALL WDialogLoad(IDD_PW_Page10)
+      CALL WDialogLoad(IDD_Pawley_Status)
+      CALL WDialogLoad(IDD_ExclRegions)
       CALL WDialogLoad(IDD_SAW_Page1)
       CALL WDialogLoad(IDD_zmEdit)
       CALL WDialogLoad(IDD_zmEditRotations)
