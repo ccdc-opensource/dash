@@ -141,7 +141,6 @@
       LOGICAL, EXTERNAL :: FnUnitCellOK
       LOGICAL, EXTERNAL :: NearlyEqual
       LOGICAL ABC_Same, AB_Same, AC_Same, BC_Same, Ang_Same, Alp_90, Bet_90, Gam_90, Gam_120
-      INTEGER tLatBrav
 
 !            1 = Triclinic
 !            2 = Monoclinic-a
