@@ -119,6 +119,8 @@
       INTEGER i
       INTEGER ihcver,ipiker,iloger,idsler, isst, ised
       INTEGER, EXTERNAL :: GetCrystalSystem, GETTIC
+      LOGICAL, EXTERNAL :: FnPatternOK, FnWavelengthOK
+      REAL, EXTERNAL :: TwoTheta2dSpacing
       INTEGER tFileHandle
       LOGICAL TicExists
       LOGICAL HcvExists
@@ -221,10 +223,12 @@
       CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
       CALL Clear_SA
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
-      CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page8)
       CALL WDialogFieldState(IDB_PrevRes,Disabled)
-      CALL PopActiveWindowID
+      IF (FnPatternOK() .AND. FnWavelengthOK()) THEN
+        CALL WDialogSelect(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(RefArgK(NumOfRef)))
+      ENDIF
       RETURN
  999  CALL ErrorMessage('Error reading .sdi file.')
       CLOSE(tFileHandle) 

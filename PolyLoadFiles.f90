@@ -121,17 +121,19 @@
       DashRawFile = FNAME(1:LEN_TRIM(FNAME))
 ! Set minimum and maximum truncation values in Wizard in accordance with data read in
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page5)
-! Initialise truncation of start of powder pattern
-      CALL WDialogPutReal(IDF_Min2Theta,XPMIN,'(F6.3)')
 ! In principle, set resolution so as to truncate at DefaultMaxResolution.
 ! However, if truncation resolution not attainable with current data range / wavelength,
 ! adjust the setting of the maximum resolution to maximum possible.
       IF (FnWavelengthOK()) THEN
         tMaxResolution = MAX(TwoTheta2dSpacing(XPMAX),DefaultMaxResolution)
+        CALL WDialogSelect(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
       ELSE
         tMaxResolution = DefaultMaxResolution
       ENDIF
+      CALL WDialogSelect(IDD_PW_Page5)
+! Initialise truncation of start of powder pattern
+      CALL WDialogPutReal(IDF_Min2Theta,XPMIN,'(F6.3)')
       CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
       CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tMaxResolution))
       CALL PopActiveWindowID

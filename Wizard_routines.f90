@@ -544,6 +544,8 @@
         IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
           CALL WDialogPutReal(IDF_Max2Theta,tMax)
           CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
+          CALL WDialogSelect(IDD_ViewPawley)
+          CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
         ENDIF
       ENDIF
       CALL PopActiveWindowID
@@ -634,6 +636,8 @@
               IF (tMax .LT. tMin) tMax = tMin
               CALL WDialogPutReal(IDF_Max2Theta,tMax)
               CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
+              CALL WDialogSelect(IDD_ViewPawley)
+              CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
             CASE (IDF_MaxResolution)
 ! When entering a maximum value for the resolution, update maximum value for 2 theta
               CALL WDialogGetReal(IDF_MaxResolution,tReal)
@@ -642,6 +646,8 @@
               CALL WDialogGetReal(IDF_Min2Theta,tMin)
               IF (tMax .LT. tMin) tMax = tMin
               CALL WDialogPutReal(IDF_Max2Theta,tMax)
+              CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
+              CALL WDialogSelect(IDD_ViewPawley)
               CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
           END SELECT
       END SELECT
