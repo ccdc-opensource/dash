@@ -38,8 +38,11 @@
       COMMON /WindowPosition/ Ix, Iy
       DATA Ix /10/, Iy /450/
 !
-      INTEGER SA_Run_Number
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
       COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, Run_Number
 
       EXTERNAL DealWithChiSqdPlot
@@ -106,7 +109,12 @@
       REAL, DIMENSION(MaxIter+1) :: Xarray
       INTEGER ChiHandle
       COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, Run_Number
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       CALL WindowSelect(ChiHandle)
       CALL WindowClear()
