@@ -25,11 +25,11 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=512)  FILTER
+      CHARACTER(LEN=200)  FILTER
       INTEGER             IFLAGS
       INTEGER             IFTYPE    ! Needed for Winteracter routine
-      CHARACTER(LEN=MaxPathLength) tFileName ! Temporary filename
-      INTEGER DiffractionFileOpen ! Function
+      CHARACTER(LEN=MaxPathLength) tFileName
+      INTEGER, EXTERNAL :: DiffractionFileOpen
 
       IFLAGS = LoadDialog + DirChange + PromptOn
 ! It seems that Winteracter cannot cope with strings of this length
