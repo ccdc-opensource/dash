@@ -17,6 +17,7 @@
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
@@ -875,10 +876,10 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page10)
       IF (WeCanDoAPawleyRefinement()) THEN
-        CALL SetModeMenuState(0,1,0)
+        CALL SetModeMenuState(0,1)
         CALL WDialogFieldState(IDNEXT,Enabled)
       ELSE
-        CALL SetModeMenuState(0,-1,0)
+        CALL SetModeMenuState(0,-1)
         CALL WDialogFieldState(IDNEXT,Disabled)
       ENDIF
       CALL PopActiveWindowID

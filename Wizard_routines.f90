@@ -9,8 +9,8 @@
       IMPLICIT NONE
 
       CALL SetWizardState(-1)
+      CALL SetModeMenuState(1,0)
       CALL SelectMode(ID_Peak_Fitting_Mode)
-!      CALL SetModeMenuState(0,-1,-1)
       CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
 
       END SUBROUTINE StartWizard
@@ -91,7 +91,7 @@
       IMPLICIT NONE
 
       CALL EndWizardCommon
-      IF (.NOT. NoData) CALL SetModeMenuState(1,0,0)
+      IF (.NOT. NoData) CALL SetModeMenuState(1,0)
       CALL PushActiveWindowID
       CALL Upload_CrystalSystem
       CALL Upload_Cell_Constants()
@@ -141,9 +141,9 @@
    
       CALL EndWizardCommon
       IF (WeCanDoAPawleyRefinement()) THEN
-        CALL SetModeMenuState(1,1,1)
+        CALL SetModeMenuState(1,1)
       ELSE
-        CALL SetModeMenuState(1,-1,1)
+        CALL SetModeMenuState(1,-1)
       ENDIF
       CALL SelectMode(ID_Peak_Fitting_Mode)
       PastPawley = .FALSE.

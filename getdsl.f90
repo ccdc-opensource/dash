@@ -276,7 +276,7 @@
         RETURN
       ENDIF
 ! Disable Pawley refinement button if we are 'PastPawley'
-      IF (PastPawley) CALL SetModeMenuState(-1,-1,0)
+      IF (PastPawley) CALL SetModeMenuState(-1,-1)
       STATBARSTR(1) = FNAME
       CALL WindowOutStatusBar(1,STATBARSTR(1))
 !  update the file name of the project in the SA pop up
@@ -425,9 +425,9 @@
 ! enable the buttons,
       IF (.NOT. NoData) THEN
         IF (idsler .EQ. 0) THEN
-          CALL SetModeMenuState(0,1,0)
+          CALL SetModeMenuState(0,1)
         ELSE
-          CALL SetModeMenuState(0,-1,0)
+          CALL SetModeMenuState(0,-1)
         ENDIF
       ENDIF
 
