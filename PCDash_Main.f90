@@ -77,7 +77,6 @@
       CALL WMessageEnable(TabChanged, Enabled)
       CALL CheckLicence
 ! Grey out al buttons to do with project file.
- !     CALL WMenuSetState(IDB_New,ItemEnabled,WintOff)
  !     CALL WMenuSetState(IDB_Open,ItemEnabled,WintOff)
  !     CALL WMenuSetState(IDB_Save,ItemEnabled,WintOff)
  !     CALL WMenuSetState(IDB_SaveAs,ItemEnabled,WintOff)
@@ -230,8 +229,6 @@
       STATBARSTR(8)=' '
       CALL WindowOutStatusBar(8,STATBARSTR(8))
       SELECT CASE (EventInfo%VALUE1)
-        CASE (IDB_New)
-          CALL Clear_Project
         CASE (IDB_Open)
           CALL PrjFileBrowse
         CASE (IDB_Save)

@@ -64,7 +64,7 @@
 !
 !*****************************************************************************
 !
-! JCC Rather than continually load/unload the various widgets, upload them all only once
+! Rather than continually load/unload the various widgets, upload them all only once
 ! This way, the state can be memorised from session to session
       SUBROUTINE PolyFitter_UploadDialogues
 
@@ -266,7 +266,6 @@
       INTEGER I, J
       INTEGER iRed, iGreen, iBlue, iRGBvalue
       REAL    UM, TH
-!O      LOGICAL MercuryExists
 
       LOGICAL            ShowAgain
       COMMON  / DBGMSG / ShowAgain
@@ -303,25 +302,6 @@
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
       VIEWARG = ''
-
-!O! In order to facilitate distributing an installed version of DASH on a CD together with
-!O! an installed version of Mercury: test if DASH was launched from the directory on the CD
-!O! and if Mercury is in the directory that we will burn onto the CD.
-!O! If it does, for now, assume that that is where we will get Mercury from: do not check the registry.
-!O! The reason for not checking the registry is, that that might come up with an old version of Mercury,
-!O! whereas we want to use the CD to show off the latest version.
-!O      MercuryExists = .FALSE.
-!O! First, check that the DASH installation directory is the directory we put on the CD.
-!O      IF (InstallationDirectory(3:LEN_TRIM(InstallationDirectory)) .EQ. '\CCDC\DASH 2.0\') THEN
-!O! Check if \CCDC\Mercury 1.1\Mercury.exe exists on this drive
-!O        VIEWEXE = InstallationDirectory(1:2)//'\CCDC\Mercury 1.1\Mercury.exe'
-!O        INQUIRE(FILE=VIEWEXE,EXIST=MercuryExists) 
-!O      ENDIF
-!O      IF (.NOT. MercuryExists) THEN
-!O        VIEWEXE = ''
-!O        CALL GetPathToMercuryFromRegistry
-!O      ENDIF
-
       VIEWEXE = ''
       CALL GetPathToMercuryFromRegistry
       DO I = 0, maxfrg
@@ -373,7 +353,6 @@
       CALL WDialogFieldState(IDB_PrevRes,Disabled)
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
-      CALL Clear_Project
       SLIMVALUE = 1.0
       SCALFAC   = 0.01
       BACKREF   = .TRUE.
