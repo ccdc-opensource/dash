@@ -954,6 +954,56 @@
 !
 !*****************************************************************************
 !
+      REAL FUNCTION FFCALC_360(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P 4/n (origin choice 2, inversion at origin)
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN     ! h = 2n,   k = 2n
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = 4.0*COSQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = term2*term1 + term2*term3
+          AFCAL = AFCAL + term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN ! h = 2n,   k = 2n+1
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = 4.0*SINQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = -term2*term1 - term2*term3
+          AFCAL = AFCAL + term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN ! h = 2n+1, k = 2n
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = 4.0*SINQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = -term2*term1 + term2*term3
+          AFCAL = AFCAL + term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN ! h = 2n+1, k = 2n+1
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = 4.0*COSQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = term2*term1 - term2*term3
+          AFCAL = AFCAL + term5*fob(N,iR)
+        ENDDO
+      ENDIF
+      FFCALC_360 = AFCAL*AFCAL
+
+      END FUNCTION FFCALC_360
+!
+!*****************************************************************************
+!
       REAL FUNCTION FFCALC_362(IR)
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
@@ -1204,7 +1254,6 @@
 ! Structure factor calculations for space group P -4 21 c
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
-
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1437,8 +1486,6 @@
 !	 Structure factor calculations for space group P-31m
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
-!
-!
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1480,8 +1527,6 @@
 !	 Structure factor calculations for space group P-3m1
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
-!
-!
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1610,7 +1655,6 @@
 !	 Structure factor calculations for space group P622
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
-!
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1646,7 +1690,6 @@
 !	 Structure factor calculations for space group P-6m2
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
-!
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1686,6 +1729,9 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
+!	 Structure factor calculations for space group P -6 2 m
+! Loop is performed over the atoms in the asymmetric unit
+! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1728,7 +1774,6 @@
 !	 Structure factor calculations for space group P6/mmm
 ! Loop is performed over the atoms in the asymmetric unit
 ! See get_logref.inc for a description of the LOGREF conditions
-!
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1798,8 +1843,6 @@
       REAL AFCALC, BFCALC, SUMA, SUMB, V, PV
       INTEGER N, I, IV
 
-      
-
       AFCALC = 0.0
 ! Firstly if we are centric then calculate only cosine terms
       IF (CENTRC) THEN
@@ -1829,7 +1872,6 @@
           DO I = 1, NOPC
 ! V is 2pi*(h*x+t)  2*pi*((R*x+t)*h) = 2*pi*(x*(h*R+t))
             V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
-
             IV = V
             PV = V - FLOAT(IV)
             SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))

@@ -216,6 +216,18 @@
             LOGREF(3,IR) = (HPL.NE.HPLm) .AND. (K_.EQ.K_m) ! h+l = 2n+1, k = 2n
             LOGREF(4,IR) = (HPL.NE.HPLm) .AND. (K_.NE.K_m) ! h+l = 2n+1, k = 2n+1
           ENDDO
+        CASE (360)                             ! P4/n (origin choice 2: inversion at origin)
+          NLGREF = 4
+          DO IR = 1, NumOfRef
+            H_ = iHKL(1,IR)
+            K_ = iHKL(2,IR)
+            H_m = 2*(H_/2)
+            K_m = 2*(K_/2)
+            LOGREF(1,IR) = (H_.EQ.H_m) .AND. (K_.EQ.K_m) ! h = 2n,   k = 2n
+            LOGREF(2,IR) = (H_.EQ.H_m) .AND. (K_.NE.K_m) ! h = 2n,   k = 2n+1
+            LOGREF(3,IR) = (H_.NE.H_m) .AND. (K_.EQ.K_m) ! h = 2n+1, k = 2n
+            LOGREF(4,IR) = (H_.NE.H_m) .AND. (K_.NE.K_m) ! h = 2n+1, k = 2n+1
+          ENDDO
         CASE (362)                             ! P42/n (origin choice 2: inversion at origin)
           NLGREF = 8
           DO IR = 1, NumOfRef
@@ -288,7 +300,7 @@
       END SELECT
       SELECT CASE (NumberSGTable)
 ! adjustments for presence of kx and hy terms
-        CASE (356, 362, 365, 369, 391)
+        CASE (356, 360, 362, 365, 369, 391)
           JHMIN = MIN(IHMIN,IKMIN)
           JHMAX = MAX(IHMAX,IKMAX)
           IHMIN = JHMIN
