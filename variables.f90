@@ -44,13 +44,14 @@
 
 ! New license information structure    
       TYPE License_Info
+        CHARACTER(80) KeyStr
         INTEGER   ExpiryDate
         INTEGER   DaysLeft
         INTEGER   SerialNumber
         INTEGER   LicenceType
         INTEGER   Valid
       END TYPE
-      INTEGER NodeKey,DemoKey,SiteKey
+      INTEGER NodeKey, DemoKey, SiteKey
       PARAMETER (NodeKey = 1)
       PARAMETER (DemoKey = 2)
       PARAMETER (SiteKey = 3)

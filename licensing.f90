@@ -27,7 +27,7 @@
           CASE (-4)
             CALL ErrorMessage("Your DASH licence is invalid for this machine.")
         END SELECT
-        CALL LicencePopup
+        CALL LicencePopup(Info)
         CALL ReadLicenceValid(Info)
       ENDDO
       IF (Info%DaysLeft .LE. 7) THEN
@@ -43,7 +43,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE LicencePopup
+      SUBROUTINE LicencePopup(Info)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -61,6 +61,7 @@
       Info%Valid = 0
       CALL WDialogSelect(IDD_License_Dialog)
       CALL WDialogShow(-1,-1,0,SemiModeless)
+      CALL WDialogPutString(IDF_License_String,Info%KeyStr)
       CALL WMessageEnable(FieldChanged,Enabled)
       IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
         CALL WDialogFieldState(IDF_License_SiteCode,Enabled)
@@ -230,11 +231,13 @@
       INTEGER      dummy, hFile
 
       Info%Valid = -1
+      Info%KeyStr = ''
       hFile = 10
       OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='OLD',ERR=999)
    10 READ(hFile,'(A)',ERR=999,END=999) line
       IF (line(1:1) .EQ. '#') GOTO 10
       CALL INextString(line,CLString)
+      Info%KeyStr = CLString
       CALL DecodeLicence(CLString,Info)
       IF (Info%Valid .EQ. 1) THEN
         IF (Info%LicenceType .EQ. DemoKey) CALL ShowLicenceAgreement(Info)

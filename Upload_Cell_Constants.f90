@@ -40,8 +40,22 @@
       LOGICAL NOCREF
       REAL    GReal(3,3), GRec(3,3)
       INTEGER KELPT(6,10)
-      DATA KELPT /2,3,4,5,6,7, 2,3,4,5,10,10, 2,3,4,10,5,10, 2,3,4,10,10,5, &
-      2,3,4,10,10,10, 2,2,3,10,10,10, 2,2,3,9,10,10, 2,2,2,3,3,3, 2,2,3,9,10,10, 2,2,2,10,10,10/ 
+      DATA KELPT /   2,  3,  4,  5,  6,  7, &  ! Triclinic
+                     2,  3,  4,  5, 10, 10, &
+                     2,  3,  4, 10,  5, 10, &
+                     2,  3,  4, 10, 10,  5, &
+                     2,  3,  4, 10, 10, 10, &  ! Orthorhombic
+                     2,  2,  3, 10, 10, 10, &  ! Tetragonal
+                     2,  2,  3,  9, 10, 10, &
+                     2,  2,  2,  3,  3,  3, &
+                     2,  2,  3,  9, 10, 10, &
+                     2,  2,  2, 10, 10, 10  /  ! Cubic
+      ! 1 = zero point
+      ! 2 = a
+      ! 3 = b
+      ! 4 = c
+      ! etc.
+
       LOGICAL FnWaveLengthOK, FnUnitCellOK ! Function
       INTEGER I, II, iOrd, NDD
       REAL    DDMAX

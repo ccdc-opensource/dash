@@ -617,6 +617,7 @@
 ! a. identical to release version
 ! b. it's difficult to keep track of the validity of the .sdi file
       CALL WDialogFieldStateLogical(IDNEXT,nfrag .NE. 0)
+      CALL WDialogFieldStateLogical(IDB_PO,nfrag .NE. 0) 
       IF (izmtot .EQ. 0) THEN            
         CALL WDialogClearField(IDF_ZM_allpars)
       ELSE
