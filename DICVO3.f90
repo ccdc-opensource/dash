@@ -1087,6 +1087,7 @@
         cmin = AMAX1(cmin,fmin*fmin/amax/zco)
         ASSIGN 200 TO Ias
  250    CALL TRICLINI2
+        IF (DICVOL_Error .NE. 0) RETURN
         IF ( Jrt.GE.jrd ) THEN
           IF ( jrd.NE.0 ) THEN
             IF ( ndich(8).EQ.0 ) THEN
@@ -1100,6 +1101,7 @@
               jjdd = 1
               iidd = 1
               CALL TRICLINI2
+              IF (DICVOL_Error .NE. 0) RETURN
             ENDIF
           ENDIF
           IF ( ndich(8).NE.0 ) GOTO 99999

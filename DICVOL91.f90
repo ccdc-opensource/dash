@@ -357,6 +357,7 @@
           n = n - 1
           IF ( n.EQ.0 ) THEN
             WRITE (iw,*) ' EXPERIMENTAL ERROR TOO LARGE !'
+            DICVOL_Error = cDIVCOLExpErrTooLarge
             GOTO 2000
           ENDIF
           GOTO 300
@@ -460,6 +461,7 @@
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
             CALL CUBIQU(Na)
+            IF (DICVOL_Error .NE. 0) RETURN
             Difvol = ABS(Vv-v)
             IF ( Difvol.GT.1E-12 ) GOTO 1200
 !            WRITE (iw,99021)
@@ -486,6 +488,7 @@
 !          WRITE (iw,99020)
 !99020 FORMAT (8X,'CUBIC SYSTEM')
           CALL CUBIQU(Na)
+          IF (DICVOL_Error .NE. 0) RETURN
           Difvol = ABS(Vv-v)
           IF ( Difvol.LE.1E-12 ) THEN
 !            WRITE (iw,99021)
@@ -513,6 +516,7 @@
 !99022 FORMAT (8X,'TETRAGONAL SYSTEM')
               Ichoix = -1
               CALL TETHEX(Nc,Ichoix)
+              IF (DICVOL_Error .NE. 0) RETURN
               Difvol = ABS(Vv-v)
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
@@ -525,6 +529,7 @@
 !99023 FORMAT (8X,'HEXAGONAL SYSTEM')
               Ichoix = 1
               CALL TETHEX(Nc,Ichoix)
+              IF (DICVOL_Error .NE. 0) RETURN
               Difvol = ABS(Vv-v)
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
@@ -536,6 +541,7 @@
 !              WRITE (iw,99024)
 !99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
               CALL ORTHOR(Na,Nb,Nc)
+              IF (DICVOL_Error .NE. 0) RETURN
               Difvol = ABS(Vv-v)
               IF ( Difvol.GT.1E-12 ) GOTO 320
 !              WRITE (iw,99021)
@@ -598,6 +604,7 @@
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
           CALL MONOC1(Na,Nb,Nc)
+          IF (DICVOL_Error .NE. 0) RETURN
           Difvol = ABS(Vv-v)
           IF ( Difvol.GT.1E-12 ) GOTO 500
 !          WRITE (iw,99021)
@@ -663,6 +670,7 @@
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
         CALL TRICLINI1(Vmin,Vmax)
+        IF (DICVOL_Error .NE. 0) RETURN
         Difvol = ABS(v-Vv)
         IF ( Difvol.GT.1E-12 ) GOTO 1000
 !        WRITE (iw,99021)
@@ -716,6 +724,7 @@
 !99022 FORMAT (8X,'TETRAGONAL SYSTEM')
               Ichoix = -1
               CALL TETHEX(Nc,Ichoix)
+              IF (DICVOL_Error .NE. 0) RETURN
               Difvol = ABS(Vv-v)
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
@@ -731,6 +740,7 @@
 !99023 FORMAT (8X,'HEXAGONAL SYSTEM')
               Ichoix = 1
               CALL TETHEX(Nc,Ichoix)
+              IF (DICVOL_Error .NE. 0) RETURN
               Difvol = ABS(Vv-v)
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
@@ -745,6 +755,7 @@
 !              WRITE (iw,99024)
 !99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
               CALL ORTHOR(Na,Nb,Nc)
+              IF (DICVOL_Error .NE. 0) RETURN
               Difvol = ABS(Vv-v)
               IF ( Difvol.GT.1E-12 ) THEN
 !                OrthorhombicSolutionFound = .TRUE.
@@ -812,6 +823,7 @@
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
             CALL MONOC1(Na,Nb,Nc)
+            IF (DICVOL_Error .NE. 0) RETURN
             Difvol = ABS(Vv-v)
             IF ( Difvol.GT.1E-12 ) GOTO 1400
 !            WRITE (iw,99021)
@@ -868,6 +880,7 @@
 !99037 FORMAT (8X,'TRICLINIC SYSTEM')
             IF ( Kz1.EQ.0 ) Kz1 = kz
             CALL TRICLINI1(Vmin,Vmax)
+            IF (DICVOL_Error .NE. 0) RETURN
             Difvol = ABS(Vv-v)
             IF ( Difvol.GT.1E-12 ) GOTO 1800
 !            WRITE (iw,99021)
@@ -886,9 +899,9 @@
 !      WRITE (iw,99038)
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS'/2X,37('*'))
       GOTO 2000
- 1900 CALL ErrorMessage('Error accessing output file')
+ 1900 CALL ErrorMessage('Error opening output file')
       CLOSE (IW)
-      DICVOL_Error = 1
+      DICVOL_Error = cDICVOL_ErrorOnWrite
       RETURN
  2000 WRITE (iw,99019)
 99019 FORMAT (/14X,'DICVOL91 : USEFUL REFERENCES'/14X,'--------'/16X,                                              &
