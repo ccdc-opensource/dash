@@ -192,7 +192,7 @@
 !
       DO ICYC = NCYC1, LASTCY
 !      WRITE (ITO,2000) ICYC
- 2000   FORMAT (' >>> Starting cycle',I4)
+! 2000   FORMAT (' >>> Starting cycle',I4)
 !
 !.. *** Winteracter calls ***
         CALL WDialogPutInteger(IDF_Pawley_Cycle_Number,ICYC)
@@ -202,8 +202,6 @@
 !
 !>> JCC Add in check on number of reflections here, so that code doesnt bomb out in the Pawley attempt
         IF (MaxK.GT.400) GOTO 910
-!
-!
         IF (PRECYC .AND. ICYC.NE.NCYC1) THEN
           SIMUL = .FALSE.
           PRECYC = .FALSE.
@@ -274,8 +272,7 @@
         Npt30 = Npts/30
         DO IPT = 1, NPTS
           IF (npt30*(ipt/npt30).EQ.ipt) THEN
-            CALL WDialogPutProgressBar(IDF_Pawley_Progress_Bar,ipt,     &
-     &                                 Absolute)
+            CALL WDialogPutProgressBar(IDF_Pawley_Progress_Bar,ipt,Absolute)
           ENDIF
           YBACK = 0.
           YPEAK = 0.
@@ -312,9 +309,7 @@
           IF (SIMUL) OBS = YCALC
           DIFF = OBS - YCALC
 ! FROM WEIGHT GET SQRTWT AND WDIFF INTO COMM0N:
-          IF (NOBS.EQ.532) THEN
-            INOTH = 1
-          ENDIF
+          IF (NOBS.EQ.532) INOTH = 1
           CALL WGHTLS(3,ARGI)
 !
 ! ADD IN TO R FACTORS:
@@ -324,17 +319,14 @@
           IF (IBMBER.GT.0) GOTO 950
 ! ADD DERIVATIVES IN TO LSQ MATRIX:
           CALL MATTOT(ALSQ,MATSZ)
-!
           IF (DONE) THEN
             NTEM = IOCCR(NOBSNOW)
             K1 = KIPT(NOBSNOW) + 1
             K2 = KIPT(NOBSNOW+1)
             KD = 1 + K2 - K1
             WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
-            IF (NTEM.GT.0) WRITE (IPK,*)                                &
-     &                            (KNIPT(KK),PIK(KNIPT(KK)),KK=K1,K2)
+            IF (NTEM.GT.0) WRITE (IPK,*) (KNIPT(KK),PIK(KNIPT(KK)),KK=K1,K2)
           ENDIF
-!
           NOBS = NOBS + 1
 ! NEXT OBSERVATION:
 !...      GO TO 2
@@ -343,7 +335,6 @@
 !
 ! HERE ON NO MORE PROFILE OBSERVATIONS - PRINT R FACTORS:
         CALL RFACPR(3,PCXX)
-!
 !>> JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 ! SLACK CONSTRAINTS - FIRST PAWLEY-TYPE:
@@ -360,7 +351,6 @@
 ! IF CAIL, OUTPUT EIGENVALUES & EIGENVECTORS IF REQUIRED BY "I PREE"
         IF (DONE) CALL EIGEN(ALSQ,MATSZ)
         IF (DONE) CALL HESCOR(ALSQ,MATSZ)
-!
 !>> JCC Trap for any problems
         IF (IBMBER.GT.0) GOTO 950
 ! INVERT MATRIX:
@@ -371,31 +361,25 @@
         IF (IBMBER.GT.0) GOTO 950
 ! APPLY SHIFTS AND PRINT:
         CALL APSHPR(ALSQ,MATSZ,PCXX,PFXX,MAGROU)
-!
 ! IF PREVIOUS CYCLE HAD CONVERGED ACCORDING TO I CONV, FINISH:
         IF (DONE) GOTO 39
         DONE = (AMAXSH.LT.CONV .OR. ICYC.EQ.LASTCY-1 .OR. NCYC.EQ.1)
 ! OUTPUT NEW CRYSTAL DATA FOR PENULTIMATE CYCLE:
         IF (DONE) CALL NWINPR(PCXX,PFXX,MAGROU)
-!
 !.. *** Winteracter calls ***
         CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
         CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RWPOBS,'(F12.2)')
         CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RWPEXP,'(F12.2)')
-!
-!
       ENDDO
-!
 ! PRINT CORRELATION MATRIX:
    39 CALL MATCOR(ALSQ,MATSZ)
-!
 ! OUTPUT H,K,L IF REQUIRED:
       CALL HKLOUT(PCXX,ALSQ,MATSZ)
-      CALL clofil(iscr)
+      CALL CLOFIL(ISCR)
       IF (PRNCYC(4)) CALL CLOFIL(IOP2)
-      CLOSE (ipk)
+      CLOSE (IPK)
 !>> JCC Trap for any problems
-!	IF ( IBMBER . GT. 0) GOTO 950
+	IF (IBMBER .GT. 0) CALL DebugErrorMessage('Error in FORTY after HKLOUT')
       IBMBER = 0   ! Ignore a problem that can occur in HKLOUT - Ken/Bill to check out please
       RETURN
 !>> JCC Added in error handling here

@@ -2080,8 +2080,6 @@
 !
       INCLUDE 'PARAMS.INC'
       DIMENSION ALSQ(MATSZ)
-!%
-!      DIMENSION IH(3),ADIAG(%BVAR%),ICOV(30)
       DIMENSION IH(3), ADIAG(400), ICOV(30)
       CHARACTER*80 FMT1, FMT2
 !
@@ -2145,7 +2143,7 @@
       IF (CAIL) THEN
         MESSAG = 'HCV listing'
         NAMFIL = '.HCV'
-        lcv = 72
+        LCV = 72
         CALL OPNFIL(LCV,113)
       ENDIF
       MESSAG = 'reflection positions file'
@@ -2194,8 +2192,7 @@
             IF (FIXED) THEN
               WRITE (LKH,FMT2) IH, F4PAR(1,I), F4PESD(1,I)
             ELSE
-              WRITE (LKH,FMT2) (REFH(J,I),J=1,3), F4PAR(1,I),           &
-     &                         F4PESD(1,I)
+              WRITE (LKH,FMT2) (REFH(J,I),J=1,3), F4PAR(1,I), F4PESD(1,I)
             ENDIF
           ENDIF
           IF (IPRNT(5).GT.0) THEN
@@ -2220,13 +2217,11 @@
             L1 = K + IPRNT(5)
             IF (L1.GT.L4END(JPHASE)) L1 = L4END(JPHASE)
             DO L = K + 1, L1
-              ICOV(L-K) = NINT(100.*ELEMAT(ALSQ,MATSZ,K,L)/(ADIAG(K)*   &
-     &                    ADIAG(L)))
+              ICOV(L-K) = NINT(100.*ELEMAT(ALSQ,MATSZ,K,L)/(ADIAG(K)*ADIAG(L)))
             ENDDO
 !  89      CIITEM=F4PESD(1,I)
    89       CIITEM = ADIAG(K)**2
-            WRITE (LKH,FMT1) IH, F4PAR(1,I), adiag(K), K - KBASE,       &
-     &                       (ICOV(L),L=1,IPRNT(5))
+            WRITE (LKH,FMT1) IH, F4PAR(1,I), adiag(K), K - KBASE, (ICOV(L),L=1,IPRNT(5))
             ICLUMP(I) = K - KBASE
             DO L = 1, IPRNT(5)
               ICORL(L,I) = ICOV(L)
@@ -2234,9 +2229,7 @@
           ENDIF
         ENDIF
 !* THIS WON'T DO - NGEN4 IS AT PRESENT IN COMMON WHICH IS SWOPPED - SORT OUT
-        IF (SAPS .OR. APES) WRITE (LKH,FMT2) IH,                        &
-     &                             (F4PAR(IG,I),F4PESD(IG,I),IG=1,      &
-     &                             NGEN4(JPHASE,JSOURC))
+        IF (SAPS .OR. APES) WRITE (LKH,FMT2) IH,(F4PAR(IG,I),F4PESD(IG,I),IG=1,NGEN4(JPHASE,JSOURC))
       ENDDO
       IF (CAIL) CALL HKL2HCV(IPRNT(5))
       CALL CLOFIL(LKH)
@@ -3094,8 +3087,6 @@
 !
       INCLUDE 'params.inc'
 !
-!%
-!      DIMENSION IH(3),H(3),TEMREF(3,%REFS%),IORDER(%REFS%),
       DIMENSION IH(3), H(3), TEMREF(3,ITMREF), IORDER(ITMREF),          &
      &          TEMMUL(ITMREF), ARG(ITMREF), TF4P(6,ITMREF), TEMP(6),   &
      &          ARGN(ITMREF), ANT(ITMREF)
@@ -3261,8 +3252,7 @@
 ! CHECK LIMITS OF ARGK:
         KNOW = 1
         CALL PCXX(5)
-        IF (ARGK.LT.ARGMIN(JSOURC) .OR.                                 &
-     &      (ARGMAX(JSOURC).NE.0..AND.ARGK.GT.ARGMAX(JSOURC))) GOTO 2
+        IF (ARGK.LT.ARGMIN(JSOURC) .OR. (ARGMAX(JSOURC).NE.0. .AND. ARGK.GT.ARGMAX(JSOURC))) GOTO 2
 !
 ! CHECK REFLECTION IN GIVEN ASYMMETRIC UNIT:
         IF (MUL.EQ.0) THEN
@@ -3272,21 +3262,16 @@
         ENDIF
 !
 ! HERE TO ACCEPT A SET OF INDICES:
-!%
-!      CALL ERRCHK(2,MAXKK(JPHASE),%REFS%,0,'reflections')
         CALL ERRCHK(2,MAXKK(JPHASE),ITMREF,0,'reflections')
-!
         CALL GMEQ(H,TEMREF(1,MAXKK(JPHASE)),1,3)
         TEMMUL(MAXKK(JPHASE)) = FLOAT(MUL)
         ARG(MAXKK(JPHASE)) = ARGK
         GOTO 2
-!
 ! ALL INDICES STORED NOW
     4   IF (MMODER.EQ.1) CALL CLOFIL(INHKL)
       ENDDO
 !
-      IF (MAXKK(JPHASE).LE.0)                                           &
-     &     CALL ERRMES(1,0,'no reflections found in data limits')
+      IF (MAXKK(JPHASE).LE.0) CALL ERRMES(1,0,'no reflections found in data limits')
 !
 ! SORT INTO ORDER
       CALL SORTX(ARG,IORDER,MAXKK(JPHASE))
@@ -3299,8 +3284,7 @@
           FC = CABS(FCAL)
           FCSQ = FC*FC
           WRITE (LPT,2050) FC, FCSQ
- 2050     FORMAT (//' Nuclear F(0,0,0)   is   ',                        &
-     &            F10.2/'        F(0,0,0)^2 is ',F12.2//)
+ 2050     FORMAT (//' Nuclear F(0,0,0)   is   ',F10.2/'        F(0,0,0)^2 is ',F12.2//)
         ENDIF
         IF (MAG) THEN
           WRITE (LPT,VFMM)
@@ -3325,8 +3309,7 @@
           DO K = KNOW, 1, -1
             IF (ARG(IORDER(KSORT)).GT.ARGN(K)) GOTO 143
             DO I = 1, 3
-              IF (ABS(TEMREF(I,IORDER(KSORT))-REFH(I,K)).GT..0001)      &
-     &            GOTO 144
+              IF (ABS(TEMREF(I,IORDER(KSORT))-REFH(I,K)) .GT. 0.0001) GOTO 144
             ENDDO
 ! SAME H,K,L WITH SAME ARG - IGNORE:
             GOTO 6
@@ -3383,8 +3366,6 @@
 ! COMMON /REFLNS/ USING AICALC FOR ARG, AND AIOBS FOR NUCLEAR (+VE) OR
 ! MAGNETIC (-VE) INTENSITIES.
             IF (TIC) THEN
-!%
-!             CALL ERRCHK(2,KTIC,%REFS%,0,'intensity contributions')
               CALL ERRCHK(2,KTIC,ITMREF,0,'intensity contributions')
               AICALC(KTIC) = ARGK
               AIOBS(KTIC) = FAC*FCSQ*FLOAT(MUL)
@@ -3396,8 +3377,6 @@
           IF (MAGNET) THEN
             CALL FMCALC(REFH(1,KNOW),FMCMOD,FMCSQR)
             IF (TIC) THEN
-!%
-!             CALL ERRCHK(2,KTIC,%REFS%,0,'intensity contributions')
               CALL ERRCHK(2,KTIC,ITMREF,0,'intensity contributions')
               AICALC(KTIC) = ARGK
               AIOBS(KTIC) = -FAC*FMCSQR*FLOAT(MUL)
@@ -3409,20 +3388,15 @@
 ! NOW THE PRINTING IF REQUIRED
           IF (TIC .OR. (IPRNT(2).GT.0)) THEN
             IF (.NOT.MAG) THEN
-              WRITE (LPT,2002) KNOW, ICHR, (IH(J),J=1,3), ARGK, DSP,    &
-     &                         MUL, AF, BF, FCSQ, ANT(KNOW)
+              WRITE (LPT,2002) KNOW, ICHR, (IH(J),J=1,3), ARGK, DSP, MUL, AF, BF, FCSQ, ANT(KNOW)
  2002         FORMAT (' ',I4,A1,3I4,F12.3,F10.5,I3,3F9.3,F12.3)
             ELSE
               IF (IPROP.LE.0) THEN
-                WRITE (LPT,2006) KNOW, ICHR, (IH(J),J=1,3), ARGK, DSP,  &
-     &                           MUL, FCSQ, FMCSQR, ANT(KNOW)
- 2006           FORMAT (' ',I4,A1,3I4,F12.3,F10.5,I3,2(3X,F9.3),3X,     &
-     &                  F12.2)
+                WRITE (LPT,2006) KNOW, ICHR, (IH(J),J=1,3), ARGK, DSP, MUL, FCSQ, FMCSQR, ANT(KNOW)
+ 2006           FORMAT (' ',I4,A1,3I4,F12.3,F10.5,I3,2(3X,F9.3),3X,F12.2)
               ELSE
-                WRITE (LPT,2012) KNOW, ICHR, (REFH(J,KNOW),J=1,3), ARGK,&
-     &                           DSP, MUL, FCSQ, FMCSQR, ANT(KNOW)
- 2012           FORMAT (' ',I4,A1,3F6.2,F12.3,F10.5,I3,2(3X,2F9.3),     &
-     &                  F12.2)
+                WRITE (LPT,2012) KNOW, ICHR, (REFH(J,KNOW),J=1,3), ARGK, DSP, MUL, FCSQ, FMCSQR, ANT(KNOW)
+ 2012           FORMAT (' ',I4,A1,3F6.2,F12.3,F10.5,I3,2(3X,2F9.3),F12.2)
               ENDIF
             ENDIF
           ENDIF
@@ -3436,8 +3410,6 @@
 ! COMMON /REFLNS/ USING AICALC FOR ARG, AND AIOBS FOR NUCLEAR (+VE) OR
 ! MAGNETIC (-VE) REFLECTIONS.
               IF (TIC) THEN
-!%
-!               CALL ERRCHK(2,KTIC,%REFS%,0,'intensity contributions')
                 CALL ERRCHK(2,KTIC,ITMREF,0,'intensity contributions')
                 AICALC(KTIC) = ARGK
                 AIOBS(KTIC) = 100.*MUL
@@ -3446,8 +3418,6 @@
 ! AND MAGNETIC F*F IF NECESSARY
             IF (MAG .AND. .NOT.MAGABS(REFH(J,KNOW),IKK)) THEN
               IF (TIC) THEN
-!%
-!               CALL ERRCHK(2,KTIC,%REFS%,0,'intensity contributions')
                 CALL ERRCHK(2,KTIC,ITMREF,0,'intensity contributions')
                 AICALC(KTIC) = ARGK
                 AIOBS(KTIC) = -100.*MUL
@@ -3460,8 +3430,7 @@
               WRITE (LPT,2004) KNOW, ICHR, (IH(J),J=1,3), ARGK, DSP, MUL
  2004         FORMAT (' ',I4,A1,1X,3I4,3X,F12.3,1X,F10.5,1X,I3)
             ELSE
-              WRITE (LPT,2014) KNOW, ICHR, (REFH(J,KNOW),J=1,3), ARGK,  &
-     &                         DSP, MUL
+              WRITE (LPT,2014) KNOW, ICHR, (REFH(J,KNOW),J=1,3), ARGK, DSP, MUL
  2014         FORMAT (' ',I4,A1,3F6.2,F12.3,1X,F10.5,1X,I3)
             ENDIF
           ENDIF

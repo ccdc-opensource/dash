@@ -74,7 +74,7 @@
       CALL StartWizard()
       DO WHILE (.TRUE.)
         CALL GetEvent
-      END DO
+      ENDDO
 
       END PROGRAM PCDash_Main
 !
@@ -143,7 +143,6 @@
       COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
 
 ! JCC data to indicate whether we are coming out of peak-fitting mode
-!U      LOGICAL FromPeakFit
       LOGICAL Confirm ! Function
       REAL xpgdif, ypgdif
       INTEGER ISTAT
@@ -183,7 +182,6 @@
                               'Do you wish to continue?')) RETURN
           END IF
           CALL SelectMode(ID_Pawley_Refinement_Mode)
-!O          CALL Quick_Pawley()
           CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)
           CALL SA_Main()
@@ -312,8 +310,6 @@
 
       INCLUDE 'GLBVAR.INC'
 
-!      INTEGER ICurPlotMode
-!
 !   Update window
 !
 !      ICurPlotMode = InfoGrScreen(PlotModeReq)
@@ -449,12 +445,15 @@
       CALL IOsDeleteFile('polyp.pik')
       CALL IOsDeleteFile('polyp.hcv')
       CALL IOsDeleteFile('polyp.dat')
+      CALL IOsDeleteFile('polyp.lis')
       CALL IOsDeleteFile('polys.ccl')
       CALL IOsDeleteFile('polys.lis')
       CALL IOsDeleteFile('polyp.pbk')
       CALL IOsDeleteFile('polyp.tbk')
       CALL IOsDeleteFile('polyp.hbk')
       CALL IOsDeleteFile('polyp.hbl')
+      CALL IOsDeleteFile('DICVOL.OUT')
+      CALL IOSDeleteFile('MakeZmatrix.log')
       CALL IDebugLevel(DbgMsgBox)
 
       END SUBROUTINE DeleteTempFiles
