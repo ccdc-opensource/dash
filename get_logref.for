@@ -1,8 +1,14 @@
+!
+!*****************************************************************************
+!
       SUBROUTINE GET_LOGREF(FILE,lenfil,ier)
-C
-!O      CHARACTER*80  file
+
       CHARACTER*(*), INTENT (IN   ) :: FILE
-      INCLUDE 'params.inc'
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'statlog.inc'
+
       COMMON /FCSTOR/MAXK,FOB(150,MFCSTO)
       LOGICAL LOGREF
       COMMON /FCSPEC/ NLGREF,IREFH(3,MFCSPE),LOGREF(8,MFCSPE)
@@ -17,16 +23,16 @@ C
 
       COMMON /CHISTO/ KKOR,WTIJ(MCHIHS),S2S(MCHIHS),S4S(MCHIHS),
      &IKKOR(MCHIHS),JKKOR(MCHIHS)
-C
+
       LOGICAL IHMINLT0,IKMINLT0,ILMINLT0
       COMMON /CSQLOG/ IHMINLT0,IKMINLT0,ILMINLT0
       COMMON /CSQINT/ IHMIN,IHMAX,IKMIN,IKMAX,ILMIN,ILMAX,IIMIN,IIMAX
-c
+
       COMMON /CHISTOP/ NOBS,NFIT,IFIT(MCHSTP),CHIOBS,
      &WT(MCHSTP),XOBS(MCHSTP),YOBS(MCHSTP),YCAL(MCHSTP),ESD(MCHSTP)
 
       COMMON /FPINF/PIK(0:50,MFPINF),KMINST(MFPINF),KMAXST(MFPINF)
-C
+
 C     These declarations are needed for the get_logref.inc
 C     file to work correctly
 C     The following integers represent h,k,l,h+k,h+l,k+l and h+k+l
@@ -34,11 +40,7 @@ C     The following integers represent h,k,l,h+k,h+l,k+l and h+k+l
 C     The following integers represent the previous integers, divided by 2 
 C     and then multiplied by 2
       INTEGER H_m,K_m,L_m,HPKm,HPLm,KPLm,HPKPLm
-c
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
-c
-C
+
       IHMIN=9999
       IKMIN=9999
       ILMIN=9999
@@ -47,10 +49,8 @@ C
       IKMAX=-9999
       ILMAX=-9999
       IIMAX=-9999
-
       ier = 0
-
-      OPEN(31,FILE=FILE(:Lenfil),STATUS='OLD',err=998)
+      OPEN(31,FILE=FILE(1:Lenfil),STATUS='OLD',err=998)
 C
 C**
 C      MAXXKK=100000
@@ -71,24 +71,21 @@ C       Now calculate 'i' index for hexagonals
         IIMIN=MIN(ITEM,IIMIN)
         IIMAX=MAX(ITEM,IIMAX)
       END DO
-C
+
  200  CONTINUE
-C
-C
+
       IHMINLT0=IHMIN.LT.0
       IKMINLT0=IKMIN.LT.0
       ILMINLT0=ILMIN.LT.0
 
-      IF (ABS(ihmin).GT.ABS(ihmax)) THEN
-        ihmax=ABS(ihmin)
+      IF (ABS(ihmin) .GT. ABS(ihmax)) THEN
+        ihmax = ABS(ihmin)
       ENDIF
-
-      IF (ABS(ikmin).GT.ABS(ikmax)) THEN
-        ikmax=ABS(ikmin)
+      IF (ABS(ikmin) .GT. ABS(ikmax)) THEN
+        ikmax = ABS(ikmin)
       ENDIF
-
-      IF (ABS(ilmin).GT.ABS(ilmax)) THEN
-        ilmax=ABS(ilmin)
+      IF (ABS(ilmin) .GT. ABS(ilmax)) THEN
+        ilmax = ABS(ilmin)
       ENDIF
 
 C
@@ -348,4 +345,8 @@ C
  998  ier=1
       CLOSE(31)
  999  RETURN
+
       END SUBROUTINE GET_LOGREF
+!
+!*****************************************************************************
+!
