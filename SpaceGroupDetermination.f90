@@ -68,7 +68,7 @@
       CLOSE(220)
 ! Calculate increase in error: (PawleyChisqd)^1/2 * sigma
      IF ((PawleyChiSqd .GT. 1.0) .AND. (PawleyChiSqd .LT. 100)) THEN
-       Correction = SQRT(PawleyChiSqd)
+       Correction = (SQRT(PawleyChiSqd))*3
      ELSE 
       Correction = 1.0
      END IF
@@ -145,14 +145,11 @@
      IMPLICIT NONE
 
      CHARACTER(MaxPathLength) :: CurrentDirectory
- 
+     LOGICAL, EXTERNAL :: Confirm
      LOGICAL Exists
 
-     CALL WMessageBox(YesNo, QuestionIcon, CommonYes, &
-          'Would you like to remove files generated'//CHAR(13)// &
-          'during space group determination?', 'Confirm')
-
-     IF(WinfoDialog(ExitButtonCommon) .EQ. CommonYes) THEN
+     IF (Confirm('Would you like to remove files generated'//CHAR(13)// &
+          'during space group determination?')) THEN
        CALL IosDirName(CurrentDirectory)
        CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'ADVANCED.asc')
        CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'table.asc')
@@ -165,8 +162,7 @@
        IF (exists) THEN
          CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'uncorrelated_peaks.asc')
        ENDIF
-     ENDIF
-     IF (WinfoDialog(ExitButtonCommon) .EQ. CommonNo) THEN
+     ELSE
        RETURN
      ENDIF
 
