@@ -250,7 +250,7 @@
       IF (.NOT. ESDsFilled) THEN
         DO I = 1, NOBS
 ! Number of counts can be zero, especially at low theta due to a variable slit
-! @ quick fix, not necessarily correct for simulated data (quite accurate for real data)
+! @ quick fix
           EOBS(I) = SQRT(MAX(1.0,YOBS(I)))
         ENDDO
       ENDIF
@@ -312,7 +312,7 @@
 !
       INTEGER FUNCTION Load_cpi_File(TheFileName,ESDsFilled)
 !
-! This function tries to load a *.dat file (ASCII format used by Armel Le Bail).
+! This function tries to load a *.cpi file (ASCII format from Sietronics).
 ! The routine basically assumes that the file is OK.
 !
 ! Note that this function should only be called from DiffractionFileLoad
