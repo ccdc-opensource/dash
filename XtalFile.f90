@@ -266,7 +266,7 @@
           ENDIF
         ENDDO
       ENDDO
-      CALL UpdateZmatrixSelection ! Needed? Useful?
+      CALL UpdateZmatrixSelection ! Needed? Useful? I think yes, because it allows starting SA with this structure.
       CALL SA_Parameter_Set
       CALL Create_AtomicWeightings(Get_HydrogenTreatment())
       CALL FillSymmetry_2
