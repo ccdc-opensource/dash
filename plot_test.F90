@@ -43,7 +43,6 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-
       INTEGER iz
       REAL yadd
       REAL Ymin
@@ -52,9 +51,8 @@
       CHARACTER*75 filename
       EXTERNAL DealWithProfilePlot
       CHARACTER*2 RunStr
-      INTEGER I, II, RecNr, RunNr, tFileHandle, iHandle
-      INTEGER iDummy
-      INTEGER, EXTERNAL :: GetBFIOError
+      INTEGER I, II, RunNr, tFileHandle, iHandle
+      REAL tReal1, tReal2, tReal3
 !
 !   reading in the data from the saved .bin files
 !
@@ -64,44 +62,40 @@
 ! we must now test if the .pro requested has been saved.
 ! The solutions have been ordered wrt chi**2. We must parse the original run nr from the
 ! number of the .pdb file. Unless we didn't do a multirun of course.
-      IF (MaxRuns .EQ. 1) THEN
-        RunNr  = 1
-      ELSE
+      IF (RESTART) THEN
         RunStr = Grid_Buffer(Iz-5:Iz-4)
         IF (RunStr(1:1) .EQ. '0') THEN
           RunStr(1:1) = RunStr(2:2)
           RunStr(2:2) = ' '
         ENDIF
         READ(RunStr,'(I2)') RunNr
+      ELSE
+        RunNr  = 1
       ENDIF
       IF (.NOT. PRO_saved(RunNr)) RETURN
 !
 !   open the plotting window, ihandle is the window's unique identifier
 !     
-      CALL WindowOpenChild(ihandle, x=10, y=450, width=800, height=400, title=filename)
-      IF (ihandle.EQ.-1) THEN
+      CALL WindowOpenChild(iHandle, x=10, y=450, width=800, height=400, title=filename)
+      IF (iHandle.EQ.-1) THEN
         CALL ErrorMessage("Exceeded maximum number of allowed windows.  Close a profile window.")
         RETURN
       ENDIF 
-      CALL RegisterChildWindow(ihandle,DealWithProfilePlot)
-      SAUsedChildWindows(ihandle) = 1
-      CALL WindowSelect(ihandle)
+      CALL RegisterChildWindow(iHandle,DealWithProfilePlot)
+      SAUsedChildWindows(iHandle) = 1
+      CALL WindowSelect(iHandle)
 !
 !   open the file
 !     
       Iz = Iz-4
-      filename = grid_buffer(1:Iz)//'.bin'
       tFileHandle = 10
-! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=tFileHandle,FILE=filename,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
-      RecNr = 1
-      iDummy = GetBFIOError() ! reset errors to zero
+      filename = grid_buffer(1:Iz)//'.pro'
+      OPEN(UNIT=tFileHandle,FILE=filename,status='unknown',ERR=999)
       DO I = 1, NBIN
-        CALL FileReadReal(tFileHandle,RecNr,store_ycalc(I,ihandle))
+        READ(tFileHandle,12,END=999,ERR=999) tReal1, tReal2, store_ycalc(I,ihandle), tReal3
+12      FORMAT(F12.4,3(1X,F12.4))
       ENDDO
       CLOSE(tFileHandle)
-! This should be tested after every FileReadReal...  this way, we will only catch an EoF error
-      IF (GetBFIOError() .NE. 0) GOTO 999
 !
 !   calculate the offset for the difference plot
 !
@@ -114,7 +108,12 @@
 !   call subroutine which plots data
       CALL plot_pro_file(ihandle)
       RETURN
-999   CALL ErrorMessage('Error while accessing .bin file.')
+999   CLOSE(tFileHandle)
+! Now close the child window that we had already opened.
+      CALL UnRegisterChildWindow(iHandle)
+      SAUsedChildWindows(iHandle) = 0
+      CALL WindowCloseChild(iHandle)
+      CALL ErrorMessage('Error while reading .pro file.')
 
       END SUBROUTINE organise_sa_result_data
 !
