@@ -30,8 +30,12 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       LOGICAL, EXTERNAL :: PlotBackground
 
+      IF ( in_batch ) RETURN
 !   Setup hardcopy options
       IF (IPTYPE .LT. 0) THEN
         CALL IGrInit('HP')
