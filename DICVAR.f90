@@ -1,6 +1,7 @@
 ! Variables for DICVOL
       MODULE DICVAR
       IMPLICIT NONE
+      INTEGER DICVOL_Error
       REAL coeff
       PARAMETER ( coeff = 1.E+08 )
       REAL Coef4
