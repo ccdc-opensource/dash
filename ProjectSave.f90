@@ -286,11 +286,8 @@
       IF (RW .EQ. cRead) THEN
         LatBrav = GetCrystalSystem(NumberSGTable)
         CALL Upload_CrystalSystem
-        CALL FillSymmetry
         PastPawley = .FALSE.
         CALL Generate_TicMarks
-        CALL GET_LOGREF
-        CALL MakRHm
       ENDIF
 ! Excluded regions
 
@@ -359,6 +356,11 @@
 
 ! Read / Write Preferred Orientation
       CALL PrjReadWritePO
+      IF (RW .EQ. cRead) THEN
+        CALL FillSymmetry_2
+        CALL GET_LOGREF
+        CALL MakRHm
+      ENDIF
 
       CALL PrjErrTrace
 
@@ -660,7 +662,6 @@
       IMPLICIT NONE
 
       INTEGER i, RW
-      REAL    tReal
 
 ! Read or Write?
       RW = iPrjReadOrWrite
@@ -670,12 +671,6 @@
       DO i = 1, 3
         CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PrefPars(i))
       ENDDO
-
-! @@ can be removed. Temp solution so that my old project files remain valid.
-
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,tReal)
-
-
 ! Update the appropriate Wizard window
       IF (iPrjReadOrWrite .EQ. cRead) CALL Update_PO
 
@@ -734,6 +729,48 @@
             CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,occ(iAtomNr,iFrg))
             CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,izmoid(iAtomNr,iFrg))
             izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the back mapping
+            CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,UseQuaternions(iFrg))
+            IF (RW .EQ. cWrite) THEN
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmInitialQs(0,iFrg)))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmInitialQs(1,iFrg)))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmInitialQs(2,iFrg)))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmInitialQs(3,iFrg)))
+            ELSE
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              zmInitialQs(0,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              zmInitialQs(1,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              zmInitialQs(2,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              zmInitialQs(3,iFrg) = DBLE(tReal)
+            ENDIF
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxDef(iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtm(iFrg))
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotAxFrac(1,iFrg))
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotAxFrac(2,iFrg))
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotAxFrac(3,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtms(1,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtms(2,iFrg))
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmSingleRotAxAtms(3,iFrg))
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotationAxis(1,iFrg))
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotationAxis(2,iFrg))
+            CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,zmSingleRotationAxis(3,iFrg))
+            IF (RW .EQ. cWrite) THEN
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(0,iFrg)))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(1,iFrg)))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(2,iFrg)))
+              CALL FileWriteReal(hPrjFile,iPrjRecNr,SNGL(zmSingleRotationQs(3,iFrg)))
+            ELSE
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              zmSingleRotationQs(0,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              zmSingleRotationQs(1,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              zmSingleRotationQs(2,iFrg) = DBLE(tReal)
+              CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
+              zmSingleRotationQs(3,iFrg) = DBLE(tReal)
+            ENDIF
           ENDDO
           CALL zmDoAdmin(iFrg)
 ! Precalculate the bonds
