@@ -27,7 +27,7 @@
 ! For common block CHISTOP and CHIBEST
 
       INTEGER MCHSTP
-      PARAMETER ( MCHSTP = 10000 )
+      PARAMETER ( MCHSTP = 15000 )
 
 ! For common blocks CHIFS1
 
