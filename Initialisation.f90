@@ -94,7 +94,7 @@
       CALL WDialogLoad(IDD_PW_Page10)
       CALL WDialogLoad(IDD_Pawley_Status)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
-      CALL WDialogLoad(IDD_ExclRegions)
+!F      CALL WDialogLoad(IDD_ExclRegions)
       CALL WDialogLoad(IDD_SAW_Page1)
       CALL WDialogLoad(IDD_zmEdit)
       CALL WDialogLoad(IDD_zmEditRotations)
@@ -106,9 +106,11 @@
       CALL WDialogLoad(IDD_SA_Action1)
       CALL WDialogLoad(IDD_Summary)
       CALL WDialogLoad(IDD_SAW_Page5)
+      CALL WDialogLoad(IDD_SAW_Page6)
       CALL WDialogLoad(IDD_Parameter_Status_2)
       CALL WDialogLoad(IDD_OutputSolutions)
       CALL WDialogLoad(IDD_Rietveld2)
+      CALL WDialogLoad(IDD_RR_PO_Dialog)
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
