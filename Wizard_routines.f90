@@ -8,7 +8,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'DialogPosCmnf90.inc'
+      INCLUDE 'DialogPosCmn.inc'
 
       CALL SetWizardState(-1)
       CALL ToggleMenus(0)
@@ -27,7 +27,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'DialogPosCmnf90.inc'
+      INCLUDE 'DialogPosCmn.inc'
 
       IXPos_IDD_Wizard = WInfoDialog(6)
       IYPos_IDD_Wizard = WInfoDialog(7)
@@ -318,7 +318,7 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmnf90.inc'
+      INCLUDE 'DialogPosCmn.inc'
 
       INTEGER :: IPW_Option
       LOGICAL FnUnitCellOK ! Function
@@ -376,7 +376,7 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmnf90.inc'
+      INCLUDE 'DialogPosCmn.inc'
 
       CHARACTER(LEN=MaxPathLength) :: CTEMP
 
@@ -422,7 +422,7 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmnf90.inc'
+      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 
@@ -499,7 +499,7 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmnf90.inc'
+      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'lattice.inc'
       INCLUDE 'statlog.inc'
 

@@ -95,7 +95,7 @@
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
-      INCLUDE 'DialogPosCmnf90.inc'
+      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'STATLOG.INC'
 
 !O      LOGICAL Run_Wizard

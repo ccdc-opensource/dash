@@ -11,7 +11,7 @@
 !
   TYPE(WIN_STYLE)    WINDOW
 !
-  include 'DialogPosCmnF90.inc'
+  include 'DialogPosCmn.inc'
 !
       parameter (mvar=100)
       common /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2

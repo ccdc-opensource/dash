@@ -202,7 +202,7 @@
       INCLUDE 'lattice.inc'
       INCLUDE 'GLBVAR.INC' ! Contains JRadOption
       INCLUDE 'Poly_Colours.inc'
-      INCLUDE 'DialogPosCmnf90.inc'
+      INCLUDE 'DialogPosCmn.inc'
       REAL    WaveLengthOf ! Function
 !
       IDCurrent_Cursor_Mode = ID_Default_Mode

@@ -23,7 +23,7 @@
 
       INTEGER      IDBZMBrowse(CheckSize),IDFZMpars(CheckSize),IDFZMFile(CheckSize)
       INTEGER      II
-      INCLUDE 'DialogPosCmnF90.inc'
+      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 !
