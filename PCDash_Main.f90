@@ -94,8 +94,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
 ! JCC data to indicate whether we are coming out of peak-fitting mode
       LOGICAL Confirm ! Function

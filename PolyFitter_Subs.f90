@@ -27,8 +27,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
       INTEGER IMOV, ISB
@@ -46,8 +46,6 @@
       XPGMAXOLD = XPGMAX
       YPGMINOLD = YPGMIN
       YPGMAXOLD = YPGMAX
-      IPMINOLD = IPMIN
-      IPMAXOLD = IPMAX
       IMOV = 0
       DO WHILE (.TRUE.)
         CALL GetEvent
@@ -151,7 +149,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
 ! acts on various KeyDown options for the main window
       IF (EventInfo%VALUE1 .NE. KeyBackSpace) THEN
@@ -159,8 +158,6 @@
         XPGMAXOLD = XPGMAX
         YPGMINOLD = YPGMIN
         YPGMAXOLD = YPGMAX
-        IPMINOLD  = IPMIN
-        IPMAXOLD  = IPMAX
       ENDIF
       SELECT CASE (EventInfo%VALUE1)
         CASE (KeyPageLeft)
@@ -382,7 +379,8 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -438,7 +436,8 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       REAL XCUR(2), YCUR(2), XGCUR(2), YGCUR(2)
 
@@ -462,9 +461,6 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
  
-      INTEGER IMOV
-      SAVE IMOV
-
       REAL xgcurold
       SAVE xgcurold
 
@@ -481,85 +477,77 @@
       CALL WMessageEnable(MouseButUp, Enabled)
 ! The first WMessage loop is solely concerned with determining the range
 ! over which we will fit the Bragg peak(s) so we will only check out
-! Expose,Resize, MouseMove, MouseButUp and a very limited number of
+! Expose, Resize, MouseMove, MouseButUp and a very limited number of
 ! KeyDown options at this first stage
-      IMOV = 0
       xgcurold = xgcur(1)
+      CALL IGrPlotMode('EOR')
+      CALL IGrColourN(KolNumLargeCrossHair)
+      CALL IGrFillPattern(Hatched,Medium,DiagUp)
+      CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
+      CALL IGrFillPattern(Outline,Medium,DiagUp)
+      CALL IGrPlotMode(' ')
       DO WHILE (.TRUE.)
         CALL GetEvent
-          xgcur(2) = EventInfo%GX
-          ygcur(2) = EventInfo%GY
-          CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
-          SELECT CASE (EventType)
-            CASE (KeyDown)
-              CALL Check_KeyDown_PeakFit_Inner
-            CASE (MouseButDown)
-              imov=0
-              xgcurold = xgcur(2)
-            CASE (MouseMove)
+        xgcur(2) = EventInfo%GX
+        ygcur(2) = EventInfo%GY
+        CALL IPgUnitsFromGrUnits(xgcur(2),ygcur(2),xcur(2),ycur(2))
+        SELECT CASE (EventType)
+          CASE (KeyDown)
+            CALL Check_KeyDown_PeakFit_Inner
+          CASE (MouseMove)
 ! Set up the cross-hairs for peak finding
-                  imov = imov + 1
-                  IF (imov.EQ.1) THEN
 ! Draw cross-hair
-                    CALL IGrColourN(KolNumLargeCrossHair)
-                    CALL IGrFillPattern(Hatched,Medium,DiagUp)
-                    CALL IGrRectangle(xgcur(1),gymin,xgcur(2),gymax)
-                    CALL IGrFillPattern(Outline,Medium,DiagUp)
-                  ELSE
 ! Remove old cross-hair
-                    IF (imov.EQ.2) THEN
-                      CALL profile_plot
-                      CALL IGrPlotMode('EOR')
-                    ELSE
-                      CALL IGrFillPattern(Hatched,Medium,DiagUp)
-                      CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
-                      CALL IGrFillPattern(Outline,Medium,DiagUp)
-                    ENDIF
+            CALL IGrPlotMode('EOR')
+            CALL IGrColourN(KolNumLargeCrossHair)
+            CALL IGrFillPattern(Hatched,Medium,DiagUp)
+            CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
+            CALL IGrFillPattern(Outline,Medium,DiagUp)
 ! Paint new cross-hair
-                    CALL IGrColourN(KolNumLargeCrossHair)
-                    CALL IGrFillPattern(Hatched,Medium,DiagUp)
-                    CALL IGrRectangle(xgcur(1),gymin,xgcur(2),gymax)
-                    CALL IGrFillPattern(Outline,Medium,DiagUp)
-                  ENDIF
-                  xgcurold=xgcur(2)
-                  CALL IRealToString(xcur(2),statbarstr(2)(1:),'(F10.3)')
-                IF (ypgmax-ypgmin.le.100.) THEN
-                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(F10.3)')
-                ELSE
-                  CALL IRealToString(ycur(2),statbarstr(3)(1:),'(F10.1)')
-                ENDIF
-                DO ISB = 2, 3
-                  CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
-                ENDDO 
-            CASE (MouseButUp)
+            CALL IGrFillPattern(Hatched,Medium,DiagUp)
+            CALL IGrRectangle(xgcur(1),gymin,xgcur(2),gymax)
+            CALL IGrFillPattern(Outline,Medium,DiagUp)
+            xgcurold = xgcur(2)
+            CALL IGrPlotMode(' ')
+            CALL IRealToString(xcur(2),statbarstr(2)(1:),'(F10.3)')
+            IF (ypgmax-ypgmin.le.100.) THEN
+              CALL IRealToString(ycur(2),statbarstr(3)(1:),'(F10.3)')
+            ELSE
+              CALL IRealToString(ycur(2),statbarstr(3)(1:),'(F10.1)')
+            ENDIF
+            DO ISB = 2, 3
+              CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
+            ENDDO 
+          CASE (MouseButUp)
 ! MouseButUp action for selecting the peak fitting region
 ! Remove old cross-hair
-              CALL IGrFillPattern(Hatched,Medium,DiagUp)
-              CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
-              CALL IGrFillPattern(Outline,Medium,DiagUp)
-              XPFR1 = MIN(xcur(1),xcur(2))
-              XPFR2 = MAX(xcur(1),xcur(2))
+            CALL IGrPlotMode('EOR')
+            CALL IGrFillPattern(Hatched,Medium,DiagUp)
+            CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
+            CALL IGrFillPattern(Outline,Medium,DiagUp)
+            CALL IGrPlotMode(' ')
+            XPFR1 = MIN(xcur(1),xcur(2))
+            XPFR2 = MAX(xcur(1),xcur(2))
 ! Determine peak fitting range
-              IPFL1 = 1
-              DO ii = 1, NBIN
-                IF (XBIN(ii).GE.XPFR1) THEN
-                  IPFL1 = ii
-                  GOTO 55
-                ENDIF
-              ENDDO
- 55           IPFL2 = NBIN
-              DO ii = NBIN, 1, -1
-                IF (XBIN(ii).LE.XPFR2) THEN
-                  IPFL2 = ii
-                  GOTO 60
-                ENDIF
-              ENDDO
- 60           CONTINUE
-              IPFRANGE = 1 + IPFL2 - IPFL1
-           IF (IPFRANGE .LT. 15) THEN
-             CALL ErrorMessage('Not enough points for peak fitting!'//CHAR(13)//'Try a larger range.')
-             CALL IGrPlotMode(' ')
-           ELSE
+            IPFL1 = 1
+            DO ii = 1, NBIN
+              IF (XBIN(ii).GE.XPFR1) THEN
+                IPFL1 = ii
+                GOTO 55
+              ENDIF
+            ENDDO
+ 55         IPFL2 = NBIN
+            DO ii = NBIN, 1, -1
+              IF (XBIN(ii).LE.XPFR2) THEN
+                IPFL2 = ii
+                GOTO 60
+              ENDIF
+            ENDDO
+ 60         CONTINUE
+            IPFRANGE = 1 + IPFL2 - IPFL1
+            IF (IPFRANGE .LT. 15) THEN
+              CALL ErrorMessage('Not enough points for peak fitting!'//CHAR(13)//'Try a larger range.')
+            ELSE
               NumPeakFitRange = NumPeakFitRange + 1
 ! Ungrey 'Delete all peak fit ranges' button on toolbar
               CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
@@ -572,14 +560,17 @@
               XPF_Range(2,NumPeakFitRange) = XPFR2
               IPF_Lo(NumPeakFitRange) = IPFL1
               IPF_Hi(NumPeakFitRange) = IPFL2
-              IPF_Range(NumPeakFitRange)=1+IPF_Hi(NumPeakFitRange)-IPF_Lo(NumPeakFitRange)
+              IPF_Range(NumPeakFitRange) = 1 + IPF_Hi(NumPeakFitRange) - IPF_Lo(NumPeakFitRange)
 ! Now we have the range in terms of the profile point index
-              CALL IGrPlotMode(' ')
               DO ISB = 2, 3
                 statbarstr(isb)='          '
                 CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
               ENDDO                
-              CALL Profile_Plot
+!O              CALL Profile_Plot
+              CALL IGrColourN(KolNumPanelDark)
+              CALL IGrFillPattern(Hatched,Medium,DiagUp)
+              CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
+              CALL IGrFillPattern(Outline,Medium,DiagUp)
             ENDIF
             RETURN 
         END SELECT
@@ -612,7 +603,8 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
       REAL XCUR(2), YCUR(2), XGCUR(2), YGCUR(2)
 

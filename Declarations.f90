@@ -73,8 +73,8 @@
 
 ! Various maxima and minima related to graphics
 
-      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
-      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
 
 ! IPMIN = bin number (so, pointer into XBIN) of the first bin visible on screen
 !         only useful when the user has zoomed in, otherwise IPMIN = 1
