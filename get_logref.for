@@ -1,6 +1,6 @@
       SUBROUTINE GET_LOGREF(FILE,lenfil,ier)
 C
-      include 'params.inc'
+      INCLUDE 'params.inc'
       COMMON /FCSTOR/MAXK,FOB(150,MFCSTO)
       LOGICAL LOGREF
       COMMON /FCSPEC/ NLGREF,IREFH(3,MFCSPE),LOGREF(8,MFCSPE)
@@ -34,9 +34,9 @@ C     and then multiplied by 2
       INTEGER H_m,K_m,L_m,HPKm,HPLm,KPLm,HPKPLm
 c
       INCLUDE 'GLBVAR.INC'
-      include 'statlog.inc'
+      INCLUDE 'statlog.inc'
 c
-      character*80  file
+      CHARACTER*80  file
 C
       IHMIN=9999
       IKMIN=9999
@@ -56,7 +56,7 @@ C      MAXXKK=100000
       MAXXKK = MFCSPE
       MAXK=0
       DO IR=1,MAXXKK
-        READ(31,*,err=998,end=200) 
+        READ(31,*,err=998,END=200) 
      &     (IREFH(I,IR),I=1,3),ARGK(IR),DSTAR(IR)
         MAXK=MAXK+1
         IHMIN=MIN(IREFH(1,IR),IHMIN)
@@ -71,24 +71,24 @@ C       Now calculate 'i' index for hexagonals
         IIMAX=MAX(ITEM,IIMAX)
       END DO
 C
- 200  continue
+ 200  CONTINUE
 C
 C
       IHMINLT0=IHMIN.LT.0
       IKMINLT0=IKMIN.LT.0
       ILMINLT0=ILMIN.LT.0
 
-      if (abs(ihmin).gt.abs(ihmax)) then
-        ihmax=abs(ihmin)
-      endif
+      IF (ABS(ihmin).GT.ABS(ihmax)) THEN
+        ihmax=ABS(ihmin)
+      ENDIF
 
-      if (abs(ikmin).gt.abs(ikmax)) then
-        ikmax=abs(ikmin)
-      endif
+      IF (ABS(ikmin).GT.ABS(ikmax)) THEN
+        ikmax=ABS(ikmin)
+      ENDIF
 
-      if (abs(ilmin).gt.abs(ilmax)) then
-        ilmax=abs(ilmin)
-      endif
+      IF (ABS(ilmin).GT.ABS(ilmax)) THEN
+        ilmax=ABS(ilmin)
+      ENDIF
 
 C
 ! JvdS Replaced include by its contents (the include file was used only once)
@@ -138,13 +138,13 @@ C     of "does K_ equal K_m?" tests whether or not k is even.
             LOGREF(1,IR)=K_.EQ.K_m ! k=2n
           END DO
 
-      CASE(44,50,61,67,116,176,298)             ! P 1 c 1, C 1 c 1, P 1 2/c 1, C 1 21/c 1, C 2 2 21
-        NLGREF=1                          ! C m c 21,C m c m,
-        DO IR=1,MAXK
-          L_=IREFH(3,IR)
-          L_m=2*(L_/2)
-          LOGREF(1,IR)=(L_.EQ.L_m) ! l=2n
-        END DO
+        CASE(44,50,61,67,116,176,298)             ! P 1 c 1, C 1 c 1, P 1 2/c 1, C 1 21/c 1, C 2 2 21
+          NLGREF=1                          ! C m c 21,C m c m,
+          DO IR=1,MAXK
+            L_=IREFH(3,IR)
+            L_m=2*(L_/2)
+            LOGREF(1,IR)=(L_.EQ.L_m) ! l=2n
+          END DO
 
         CASE(64,304)                            ! P 1 21/c 1 , C m c a
           NLGREF=1
@@ -170,21 +170,21 @@ C     of "does K_ equal K_m?" tests whether or not k is even.
             LOGREF(1,IR)=HPK.EQ.HPKm ! h+k=2n
           END DO
 
-      CASE(52,69)                         ! I 1 a 1,I 1 2/a 1
-        NLGREF=1
-        DO IR=1,MAXK
-          H_=IREFH(1,IR)
-          H_m=2*(H_/2)
-          LOGREF(1,IR)=(H_.EQ.H_m) ! h=2n
-        END DO
+        CASE(52,69)                         ! I 1 a 1,I 1 2/a 1
+          NLGREF=1
+          DO IR=1,MAXK
+            H_=IREFH(1,IR)
+            H_m=2*(H_/2)
+            LOGREF(1,IR)=(H_.EQ.H_m) ! h=2n
+          END DO
 
-      CASE(112)                           ! P 21 21 2
-        NLGREF=1
-        DO IR=1,MAXK
-          HPK=IREFH(1,IR)+IREFH(2,IR)
-          HPKm=2*(HPK/2)
-          LOGREF(1,IR)=(HPK.EQ.HPKm) ! h+k=2n
-        END DO
+        CASE(112)                           ! P 21 21 2
+          NLGREF=1
+          DO IR=1,MAXK
+            HPK=IREFH(1,IR)+IREFH(2,IR)
+            HPKm=2*(HPK/2)
+            LOGREF(1,IR)=(HPK.EQ.HPKm) ! h+k=2n
+          END DO
 
         CASE(115,290)                           ! P21 21 21, P b c a
           NLGREF=4
@@ -199,23 +199,23 @@ C     of "does K_ equal K_m?" tests whether or not k is even.
             LOGREF(4,IR)=(HPK.NE.HPKm).AND.(KPL.NE.KPLm) !h+k=2n+1,k+l=2n+1
           END DO
 
-      CASE(143)                           ! P c a 21
-      NLGREF=4
-      DO IR=1,MAXK
-        H_=IREFH(1,IR)
-        L_=IREFH(3,IR)
-        H_m=2*(H_/2)
-        L_m=2*(L_/2)
-        LOGREF(1,IR)=(H_.EQ.H_m).AND.(L_.EQ.L_m) ! h=2n  ,l=2n
-        LOGREF(2,IR)=(H_.EQ.H_m).AND.(L_.NE.L_m) ! h=2n  ,l=2n+1
-        LOGREF(3,IR)=(H_.NE.H_m).AND.(L_.EQ.L_m) ! h=2n+1,l=2n
-        LOGREF(4,IR)=(H_.NE.H_m).AND.(L_.NE.L_m) ! h=2n+1,l=2n+1
-      END DO
-
-      CASE(164,284)                             ! P n a 21, P b c n
-        NLGREF=4
+        CASE(143)                           ! P c a 21
+          NLGREF=4
           DO IR=1,MAXK
-          HPK=IREFH(1,IR)+IREFH(2,IR)
+            H_=IREFH(1,IR)
+            L_=IREFH(3,IR)
+            H_m=2*(H_/2)
+            L_m=2*(L_/2)
+            LOGREF(1,IR)=(H_.EQ.H_m).AND.(L_.EQ.L_m) ! h=2n  ,l=2n
+            LOGREF(2,IR)=(H_.EQ.H_m).AND.(L_.NE.L_m) ! h=2n  ,l=2n+1
+            LOGREF(3,IR)=(H_.NE.H_m).AND.(L_.EQ.L_m) ! h=2n+1,l=2n
+            LOGREF(4,IR)=(H_.NE.H_m).AND.(L_.NE.L_m) ! h=2n+1,l=2n+1
+          END DO
+
+        CASE(164,284)                             ! P n a 21, P b c n
+          NLGREF=4
+          DO IR=1,MAXK
+            HPK=IREFH(1,IR)+IREFH(2,IR)
             L_=IREFH(3,IR)
             HPKm=2*(HPK/2)
             L_m=2*(L_/2)
@@ -223,48 +223,48 @@ C     of "does K_ equal K_m?" tests whether or not k is even.
             LOGREF(2,IR)=(HPK.EQ.HPKm).AND.(L_.NE.L_m) !h+k=2n,  l=2n+1
             LOGREF(3,IR)=(HPK.NE.HPKm).AND.(L_.EQ.L_m) !h+k=2n+1,l=2n
             LOGREF(4,IR)=(HPK.NE.HPKm).AND.(L_.NE.L_m) !h+k=2n+1,l=2n+1
-        END DO
+          END DO
 
-      CASE(212)                           ! F d d 2
-        NLGREF=4
+        CASE(212)                           ! F d d 2
+          NLGREF=4
           DO IR=1,MAXK
-          HPKPL=IREFH(1,IR)+IREFH(2,IR)+IREFH(3,IR)
-          IREMAIN=MOD(HPKPL,4)
+            HPKPL=IREFH(1,IR)+IREFH(2,IR)+IREFH(3,IR)
+            IREMAIN=MOD(HPKPL,4)
             LOGREF(1,IR)=(IREMAIN.EQ.0) !h+k+l=4n
             LOGREF(2,IR)=(IREMAIN.EQ.1) !h+k+l=4n+1
             LOGREF(3,IR)=(IREMAIN.EQ.2) !h+k+l=4n+2
             LOGREF(4,IR)=(IREMAIN.EQ.3) !h+k+l=4n+3
-        END DO
+          END DO
 
-      CASE(266)                           ! P c c n
-        NLGREF=4
-        DO IR=1,MAXK
-          HPK=IREFH(1,IR)+IREFH(2,IR)
-          HPL=IREFH(1,IR)+IREFH(3,IR)
-          HPKm=2*(HPK/2)
-          HPLm=2*(HPL/2)
-          LOGREF(1,IR)=(HPK.EQ.HPKm).AND.(HPL.EQ.HPLm) ! h+k=2n  ,h+l=2n
-          LOGREF(2,IR)=(HPK.EQ.HPKm).AND.(HPL.NE.HPLm) ! h+k=2n  ,h+l=2n+1
-          LOGREF(3,IR)=(HPK.NE.HPKm).AND.(HPL.EQ.HPLm) ! h+k=2n+1,h+l=2n
-          LOGREF(4,IR)=(HPK.NE.HPKm).AND.(HPL.NE.HPLm) ! h+k=2n+1,h+l=2n+1
-      END DO
+        CASE(266)                           ! P c c n
+          NLGREF=4
+          DO IR=1,MAXK
+            HPK=IREFH(1,IR)+IREFH(2,IR)
+            HPL=IREFH(1,IR)+IREFH(3,IR)
+            HPKm=2*(HPK/2)
+            HPLm=2*(HPL/2)
+            LOGREF(1,IR)=(HPK.EQ.HPKm).AND.(HPL.EQ.HPLm) ! h+k=2n  ,h+l=2n
+            LOGREF(2,IR)=(HPK.EQ.HPKm).AND.(HPL.NE.HPLm) ! h+k=2n  ,h+l=2n+1
+            LOGREF(3,IR)=(HPK.NE.HPKm).AND.(HPL.EQ.HPLm) ! h+k=2n+1,h+l=2n
+            LOGREF(4,IR)=(HPK.NE.HPKm).AND.(HPL.NE.HPLm) ! h+k=2n+1,h+l=2n+1
+          END DO
 
 
-      CASE(269)                           ! P b c m
-        NLGREF=4
-        DO IR=1,MAXK
-          K_=IREFH(2,IR)
-          L_=IREFH(3,IR)
-          K_m=2*(K_/2)
-          L_m=2*(L_/2)
-          LOGREF(1,IR)=(K_.EQ.K_m).AND.(L_.EQ.L_m) ! k=2n  ,l=2n
-          LOGREF(2,IR)=(K_.EQ.K_m).AND.(L_.NE.L_m) ! k=2n  ,l=2n+1
-          LOGREF(3,IR)=(K_.NE.K_m).AND.(L_.EQ.L_m) ! k=2n+1,l=2n
-          LOGREF(4,IR)=(K_.NE.K_m).AND.(L_.NE.L_m) ! k=2n+1,l=2n+1
-      END DO
+        CASE(269)                           ! P b c m
+          NLGREF=4
+          DO IR=1,MAXK
+            K_=IREFH(2,IR)
+            L_=IREFH(3,IR)
+            K_m=2*(K_/2)
+            L_m=2*(L_/2)
+            LOGREF(1,IR)=(K_.EQ.K_m).AND.(L_.EQ.L_m) ! k=2n  ,l=2n
+            LOGREF(2,IR)=(K_.EQ.K_m).AND.(L_.NE.L_m) ! k=2n  ,l=2n+1
+            LOGREF(3,IR)=(K_.NE.K_m).AND.(L_.EQ.L_m) ! k=2n+1,l=2n
+            LOGREF(4,IR)=(K_.NE.K_m).AND.(L_.NE.L_m) ! k=2n+1,l=2n+1
+          END DO
 
-      CASE(292)                           ! P n m a
-        NLGREF=4
+        CASE(292)                           ! P n m a
+          NLGREF=4
           DO IR=1,MAXK
             HPL=IREFH(1,IR)+IREFH(3,IR)
             K_=IREFH(2,IR)
@@ -294,9 +294,9 @@ c           write(76,*) h_,k_,irefh(3,ir),iremain
             LOGREF(6,IR)=(H_.EQ.H_m).AND.(K_.NE.K_m).AND.(IREMAIN.EQ.2) ! h=2n  ,k=2n+1,h+k+l=4n+2
             LOGREF(7,IR)=(H_.NE.H_m).AND.(K_.EQ.K_m).AND.(IREMAIN.EQ.2) ! h=2n+1,k=2n,  h+k+l=4n+2
             LOGREF(8,IR)=(H_.NE.H_m).AND.(K_.NE.K_m).AND.(IREMAIN.EQ.2) ! h=2n+1,k=2n+1,h+k+l=4n+2
-            if (H_.EQ.2.AND.K_.EQ.2.AND.IREMAIN.EQ.2) then
+            IF (H_.EQ.2.AND.K_.EQ.2.AND.IREMAIN.EQ.2) THEN
 c              write (76,*) "found : ", h_,k_,IREFH(3,IR),logref(5,IR)
-            endif
+            ENDIF
           END DO
 
         CASE(369)                         ! P 41 21 2
@@ -332,9 +332,9 @@ c      write(77,*) (irefh(iii,ir),iii=1,3),(logref(iii,ir),iii=1,3)
         CASE(430,431,432,433,434,435,449,451,462,468) 
           JHMIN=MIN(IIMIN,IHMIN,IKMIN)
           JHMAX=MAX(IIMAX,IHMAX,IKMAX)
-          if (abs(jhmin).gt.abs(jhmax)) then
-            jhmax=abs(jhmin)
-          endif
+          IF (ABS(jhmin).GT.ABS(jhmax)) THEN
+            jhmax=ABS(jhmin)
+          ENDIF
           IHMIN=JHMIN
           IKMIN=JHMIN
           IHMAX=JHMAX
@@ -379,8 +379,8 @@ c     & ihminlt0,ikminlt0,ilminlt0
 C
       CLOSE(31)
 C
-      goto 999
+      GOTO 999
  998  ier=1
-       close(31)
+      CLOSE(31)
  999  RETURN
-      END
+      END SUBROUTINE GET_LOGREF
