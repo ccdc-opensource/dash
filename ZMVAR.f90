@@ -21,6 +21,8 @@
 
 ! maxfrg = Maximum number of fragments = individual Z-matrices
 ! At the moment the maximum number of fragments is limited by the interface
+! In variables declared as (0:maxfrg), position 0 is reserved for a temporary copy
+! used when editing a Z-matrix.
 
       INTEGER MaxDOF
       PARAMETER ( MaxDOF = 30 )
@@ -57,7 +59,7 @@
 
 ! nfrag = number of fragments
 
-      CHARACTER*255    frag_file(1:maxfrg)
+      CHARACTER*255    frag_file(0:maxfrg)
 
 ! frag_file = name of the .zmatrix file containing fragment number ifrag
 
@@ -75,7 +77,7 @@
 ! zmFileChanged Set to .TRUE.  when Z-matrix opened/deleted.
 !               Set to .FALSE. after SA parameter boundaries dialogue has been initialised
 
-      INTEGER          icomflg(1:maxfrg)
+      INTEGER          icomflg(0:maxfrg)
       REAL             AtomicWeighting(1:maxatm,1:maxfrg)
       LOGICAL          UseQuaternions(1:maxfrg)
       REAL             zmSingleRotationAxis(1:3,1:maxfrg)
@@ -113,9 +115,9 @@
 ! xzmpar = initial value of parameter
 
       INTEGER         ntatm
-      INTEGER         natoms(1:maxfrg)
-      INTEGER         ioptb(1:maxatm,1:maxfrg), iopta(1:maxatm,1:maxfrg), ioptt(1:maxatm,1:maxfrg)
-      INTEGER         iz1(1:maxatm,1:maxfrg), iz2(1:maxatm,1:maxfrg), iz3(1:maxatm,1:maxfrg)
+      INTEGER         natoms(0:maxfrg)
+      INTEGER         ioptb(1:maxatm,0:maxfrg), iopta(1:maxatm,0:maxfrg), ioptt(1:maxatm,0:maxfrg)
+      INTEGER         iz1(1:maxatm,0:maxfrg), iz2(1:maxatm,0:maxfrg), iz3(1:maxatm,0:maxfrg)
 
 ! ntatm  = total number of atoms. Must be equal to NATOM in /POSNS/
 ! natoms = number of atoms in this fragment (=Z-matrix)
@@ -124,8 +126,7 @@
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
 ! iz1, iz2, iz3 = atoms with respect to which the current atom is defined in the Z-matrix
 
-!O      DOUBLE PRECISION blen(1:maxatm,1:maxfrg), alph(1:maxatm,1:maxfrg), bet(1:maxatm,1:maxfrg)
-      DOUBLE PRECISION blen(1:maxatm,1:maxfrg), alph(1:maxatm,1:maxfrg), bet(1:maxatm,1:maxfrg)
+      DOUBLE PRECISION blen(1:maxatm,0:maxfrg), alph(1:maxatm,0:maxfrg), bet(1:maxatm,0:maxfrg)
 
 ! blen   = bond length     (wrt iz1)
 ! alph   = valence angle   (wrt iz1 & iz2)
@@ -136,8 +137,8 @@
 ! f2cmat = 3x3 matrix for conversion from fractional to Cartesian  coordinates 
 ! c2fmat = 3x3 matrix for conversion from Cartesian  to fractional coordinates 
 
-      CHARACTER*3     asym(1:maxatm,1:maxfrg)
-      CHARACTER*5     OriginalLabel(1:maxatm,1:maxfrg)
+      CHARACTER*3     asym(1:maxatm,0:maxfrg)
+      CHARACTER*5     OriginalLabel(1:maxatm,0:maxfrg)
 
 ! asym = Atom SYMbol--e.g. 'H  ' for hydrogen, 'Ag ' for silver--of the current atom.
 ! OriginalLabel = the label of the atom as read from the .res/.mol2/etc. file
@@ -145,18 +146,18 @@
 ! Note that we allow five characters, .pdb allows 4, .res and .cssr can't cope with the
 ! atom label being a real 'name', it must be the element + a number
 
-      REAL tiso(1:maxatm,1:maxfrg), occ(1:maxatm,1:maxfrg)
+      REAL tiso(1:maxatm,0:maxfrg), occ(1:maxatm,0:maxfrg)
 
 ! tiso = Isotropic temperature factor of the current atom
 ! occ  = Occupancy of the current atom
 
-      INTEGER izmoid(1:maxatm,1:maxfrg), izmbid(1:maxatm,1:maxfrg)
+      INTEGER izmoid(1:maxatm,0:maxfrg), izmbid(1:maxatm,0:maxfrg)
 
 ! The original atom ids to list in the labels and the back mapping
 
-      INTEGER NumberOfBonds(1:maxfrg)
-      INTEGER BondType(1:maxbnd_2,1:maxfrg)
-      INTEGER Bonds(1:2,1:maxbnd_2,1:maxfrg)
+      INTEGER NumberOfBonds(0:maxfrg)
+      INTEGER BondType(1:maxbnd_2,0:maxfrg)
+      INTEGER Bonds(1:2,1:maxbnd_2,0:maxfrg)
 
 ! Bondtypes and bonds. Precalculated and stored for speed. 90,000 bytes
 !   BondType:
@@ -168,6 +169,10 @@
 !     6 = polymeric single
 !     7 = delocalised
 !     9 = pi-bond
+
+      INTEGER CurrentlyEditedFrag
+
+! Holds the number of the Z-matrix which is being edited if the Z-matrix edit dialogue is visible.
   
       END MODULE ZMVAR
 !
