@@ -2,7 +2,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SA_structure_output(t,fopt,cpb,parvals,ntotmov)
+      SUBROUTINE SA_structure_output(T,fopt,cpb,parvals,ntotmov,RunNr)
 
       USE VARIABLES
 !
@@ -11,7 +11,7 @@
       DOUBLE PRECISION t, fopt
       REAL cpb
       DOUBLE PRECISION parvals(*) ! The current torsion parameters (can't be called X here)
-      INTEGER ntotmov
+      INTEGER ntotmov, RunNr
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -60,6 +60,9 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+      REAL                pdbAtmCoords
+      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:30)
 
       CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
       COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
@@ -245,15 +248,18 @@
                                 occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:2)
  1130           FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
               ENDIF
+              pdbAtmCoords(1,iorig,ifrg,RunNr) = xc
+              pdbAtmCoords(2,iorig,ifrg,RunNr) = yc
+              pdbAtmCoords(3,iorig,ifrg,RunNr) = zc
             ENDIF
 !         The CCL atom lines
             IF (tSaveCCL) THEN
-              WRITE (66,1033) asym(iorig,ifrg), (xatopt(k,ii),k=1,3)
- 1033         FORMAT ('A ',A3,' ',3F10.5,'  3.0  1.0')
+              WRITE (66,1033) asym(iorig,ifrg), (xatopt(k,ii),k=1,3), tiso(iorig,ifrg), occ(iorig,ifrg) 
+ 1033         FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
             ENDIF
-          ENDDO
+          ENDDO ! loop over atoms
         ENDIF
-      ENDDO
+      ENDDO ! loop over z-matrices
       IF (tSaveCSSR) CLOSE (64)
       IF (tSavePDB) THEN
         WRITE (65,"('END')")
@@ -265,6 +271,223 @@
  1380 FORMAT ('REMARK 290 ')
 
       END SUBROUTINE SA_STRUCTURE_OUTPUT
+!
+!*****************************************************************************
+!
+      SUBROUTINE SA_STRUCTURE_OUTPUT_OVERLAP(LastRunNr)
+
+      USE VARIABLES
+      USE SAMVAR
+!
+!       Called at the end of the SA
+!
+      INTEGER LastRunNr
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+      INCLUDE 'statlog.inc'
+
+      CHARACTER*3     asym
+      CHARACTER*5                          OriginalLabel
+      COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
+
+      INTEGER         ntatm, natoms
+      INTEGER         ioptb,                iopta,                ioptt
+      INTEGER         iz1,                  iz2,                  iz3
+      COMMON /zmcomi/ ntatm, natoms(maxfrg),                                             &
+     &                ioptb(maxatm,maxfrg), iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),  &
+     &                iz1(maxatm,maxfrg),   iz2(maxatm,maxfrg),   iz3(maxatm,maxfrg)
+
+      INTEGER         izmpar
+      CHARACTER*36                    czmpar
+      INTEGER                                                kzmpar
+      REAL                                                                          xzmpar
+      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
+
+      INTEGER         nfrag
+      COMMON /frgcom/ nfrag
+
+      DOUBLE PRECISION blen,                alph,                bet,                f2cmat
+      COMMON /zmcomr/  blen(maxatm,maxfrg), alph(maxatm,maxfrg), bet(maxatm,maxfrg), f2cmat(3,3)
+
+      REAL            tiso,                occ
+      COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
+
+      DOUBLE PRECISION inv(3,3)
+
+      COMMON /posopt/ XATOPT(3,150)
+
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+      REAL                pdbAtmCoords
+      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:30)
+
+      LOGICAL         gotzmfile
+      COMMON /zmlgot/ gotzmfile(maxfrg)
+
+      PARAMETER (mpdbops=192)
+      CHARACTER*20 cpdbops(mpdbops)
+      COMMON /pdbops/ npdbops, cpdbops
+
+! The original atom ids to list in the labels and the back mapping
+      COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
+
+! Use standard PDB orthogonalisation
+      DOUBLE PRECISION f2cpdb
+      COMMON /pdbcat/ f2cpdb(3,3)
+      INTEGER RunNr
+      REAL*8 CART(MAXATM,3)
+      CHARACTER*2  AtmElement(1:MAXATM_2)
+      INTEGER  pdbBond(1:MAXBND*maxfrg,1:2)
+      INTEGER TotNumBonds, NumOfAtomsSoFar
+      CHARACTER*4 LabelStr
+      CHARACTER*2 RunStr
+      LOGICAL, EXTERNAL :: ChrIsLetter
+
+!       Write the file headers first
+!
+! Now the PDB...
+      OPEN (UNIT=65,FILE='Test_Overlap.pdb',STATUS='unknown',ERR=999)
+! JCC included again
+      CALL sagminv(f2cpdb,inv,3)
+! Add in a Header record
+      WRITE (65,1036)
+ 1036 FORMAT ('HEADER PDB Solution File generated by DASH')
+      WRITE (65,1050) (CellPar(ii),ii=1,6), SGHMaStr(NumberSGTable)
+ 1050 FORMAT ('CRYST1',3F9.3,3F7.2,X,A12)
+! JCC Add in V2 pdb records to store space group and symmetry
+      WRITE (65,1380)
+      WRITE (65,1381)
+ 1381 FORMAT ('REMARK 290 CRYSTALLOGRAPHIC SYMMETRY')
+      WRITE (65,1382) SGHMaStr(NumberSGTable)
+ 1382 FORMAT ('REMARK 290 SYMMETRY OPERATORS FOR SPACE GROUP: ',A)
+      WRITE (65,1380)
+      WRITE (65,1383)
+ 1383 FORMAT ('REMARK 290      SYMOP   SYMMETRY')
+      WRITE (65,1384)
+ 1384 FORMAT ('REMARK 290     NNNMMM   OPERATOR')
+      DO i = 1, npdbops
+        WRITE (65,1385) (i*1000+555), cpdbops(i)
+ 1385   FORMAT ('REMARK 290',5X,I6,3X,A)
+      ENDDO
+      WRITE (65,1380)
+      WRITE (65,1386)
+ 1386 FORMAT ('REMARK 290     WHERE NNN -> OPERATOR NUMBER')
+      WRITE (65,1387)
+ 1387 FORMAT ('REMARK 290           MMM -> TRANSLATION VECTOR')
+      WRITE (65,1380)
+      WRITE (65,1388)
+ 1388 FORMAT ('REMARK 290 REMARK:')
+! JCC included again
+      WRITE (65,1060) inv(1,1), inv(1,2), inv(1,3)
+ 1060 FORMAT ('SCALE1    ',3F10.5,'      0.00000')
+      WRITE (65,1070) inv(2,1), inv(2,2), inv(2,3)
+ 1070 FORMAT ('SCALE2    ',3F10.5,'      0.00000')
+      WRITE (65,1080) inv(3,1), inv(3,2), inv(3,3)
+ 1080 FORMAT ('SCALE3    ',3F10.5,'      0.00000')
+! Per z-matrix, determine the connectivity. This has to be done only once.
+      TotNumBonds = 0
+      NumOfAtomsSoFar = 0
+      DO ifrg = 1, maxfrg
+        IF (gotzmfile(ifrg)) THEN
+          natcry = NATOMS(ifrg)
+          CALL MAKEXYZ(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),      &
+         &             IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART(1,1),     &
+         &             CART(1,2),CART(1,3))
+! Conversion of asym to aelem : very dirty, but works
+          DO I = 1, natcry
+            axyzo(I,1) = SNGL(CART(I,1))
+            axyzo(I,2) = SNGL(CART(I,2))
+            axyzo(I,3) = SNGL(CART(I,3))
+            AtmElement(I)(1:2) = asym(I,ifrg)(1:2)
+          ENDDO
+          CALL AssignCSDElement(AtmElement)
+! Calculate bonds
+          CALL MakeBonds
+! OUTPUT : nbocry             = number of bonds
+!          bond(1:MAXBND,1:2) = the atoms connected by the bond
+          DO J = 1, nbocry
+            pdbBond(J+TotNumBonds,1) = bond(J,1) + NumOfAtomsSoFar
+            pdbBond(J+TotNumBonds,2) = bond(J,2) + NumOfAtomsSoFar
+          ENDDO
+          NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
+          TotNumBonds = TotNumBonds + nbocry
+        ENDIF
+      ENDDO ! loop over z-matrices
+      iiact = 0
+      DO RunNr = 1, LastRunNr
+        SELECT CASE(RunNr)
+          CASE ( 1)
+            LabelStr = 'Co' ! Cobalt        Blue
+          CASE ( 2)
+            LabelStr = 'O'  ! Oxygen        Red
+          CASE ( 3)
+            LabelStr = 'S'  ! Sulphur       Yellow
+          CASE ( 4)
+            LabelStr = 'Cl' ! Chlorine      Green
+          CASE ( 5)
+            LabelStr = 'N'  ! Nitrogen      Light blue
+          CASE ( 6)
+            LabelStr = 'Br' ! Bromine       Brown
+          CASE ( 7)
+            LabelStr = 'I'  ! Iodine        Pink
+          CASE ( 8)
+            LabelStr = 'C'  ! Carbon        Grey
+          CASE ( 9)
+            LabelStr = 'H'  ! Hydrogen      White
+          CASE (10)
+            LabelStr = 'P'  ! Phosphorus
+        END SELECT
+        WRITE(RunStr,'(I2)') RunNr
+        CALL StrClean(RunStr,ilen) ! Left justify
+        LabelStr = LabelStr(1:LEN_TRIM(LabelStr))//RunStr
+        DO ifrg = 1, maxfrg
+          IF (gotzmfile(ifrg)) THEN
+            DO i = 1, natoms(ifrg)
+              iiact = iiact + 1
+              xc = pdbAtmCoords(1,i,ifrg,RunNr)        ! We could replace (ii) by (orig,ifrg) and get rid of ii and itotal
+              yc = pdbAtmCoords(2,i,ifrg,RunNr)
+              zc = pdbAtmCoords(3,i,ifrg,RunNr)
+! Note that elements are right-justified
+! WebLab viewer even wants the elements in the atom names to be right justified.
+              IF (.NOT. ChrIsLetter(LabelStr(2:2))) THEN
+                WRITE (65,1120) iiact, LabelStr(1:3), xc, yc, zc, &
+                                occ(i,ifrg), tiso(i,ifrg), LabelStr(1:1)
+ 1120           FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
+              ELSE
+                WRITE (65,1130) iiact, LabelStr(1:4), xc, yc, zc, &
+                                occ(i,ifrg), tiso(i,ifrg), LabelStr(1:2)
+ 1130           FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+              ENDIF
+            ENDDO ! loop over atoms
+          ENDIF
+        ENDDO ! loop over z-matrices
+      ENDDO ! loop over runs
+      DO RunNr = 1, LastRunNr
+        DO BondNr = 1, TotNumBonds
+          WRITE(65,'(A6,I5,I5)') 'CONECT', (pdbBond(BondNr,1)+NATOM*(RunNr-1)), (pdbBond(BondNr,2)+NATOM*(RunNr-1))
+        ENDDO
+      ENDDO ! loop over runs
+      WRITE (65,"('END')")
+      CLOSE (65)
+      CALL ViewStructure('Test_Overlap.pdb')
+      RETURN
+ 1380 FORMAT ('REMARK 290 ')
+  999 CALL ErrorMessage('Could not open temporary file.')
+
+      END SUBROUTINE SA_STRUCTURE_OUTPUT_OVERLAP
 !*==SAGMINV.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
@@ -316,8 +539,6 @@
           ENDDO
   140   ENDDO
       ENDDO
-!.....
-!
       DO K = 1, IS
         KF = II(K)
         KL = IL(KF)
