@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 10/Jan/2002 12:23:09
+// Modified : 11/Jan/2002 10:36:32
 //
 ///////////////////////////////////////////////////
 //
@@ -1711,7 +1711,7 @@ BEGIN
     CONTROL "0",IDF_SA_zero_move_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   62,  123,   10,    8
     CONTROL "&View",IDF_Viewer,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  201,  141,   40,   20
     CONTROL "",IDF_SAMove_picture,"STATIC",WS_CHILD | WS_VISIBLE | SS_BLACKRECT | SS_NOTIFY | SS_CENTERIMAGE,   64,  101,  152,    8,WS_EX_CLIENTEDGE
-    CONTROL "2",IDF_minchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   55,   37,    6,    8
+    CONTROL "2",IDF_minchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   55,   36,    6,    8
     CONTROL "2",IDF_avchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   55,   50,    6,    8
     CONTROL "Profile chi",IDF_profchisq_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   14,   66,   40,   10
     CONTROL "2",IDF_profchi2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   55,   64,    6,    8
