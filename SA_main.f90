@@ -249,7 +249,6 @@
 
       IMPLICIT NONE
 
-  !    INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
