@@ -1,3 +1,6 @@
+!
+!*****************************************************************************
+!
       SUBROUTINE Quick_Pawley
 
       USE WINTERACTER
@@ -154,15 +157,15 @@
                   CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
 !>> JCC Reset the R-values if possible
                   IF (LastValuesSet) THEN
-                        CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,
-     &                         RLastValues(1),'(f12.2)') 
-                        call WDialogPutReal(IDF_Pawley_Cycle_ChiSq,
+                        CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,       &
+     &                         RLastValues(1),'(F12.2)') 
+                        call WDialogPutReal(IDF_Pawley_Cycle_ChiSq,     &
      &                         RLastValues(2),'(F12.3)')
-                          call WDialogPutReal(IDF_Pawley_Cycle_RwpExp,
+                          call WDialogPutReal(IDF_Pawley_Cycle_RwpExp,  &
      &                         RLastValues(3),'(F12.2)')
-                                    call WDialogPutInteger(
+                                    call WDialogPutInteger(             &
      &                         IDF_Pawley_Cycle_NumPts,ILastValues(1))
-                                    call WDialogPutInteger(
+                                    call WDialogPutInteger(             &
      &                         IDF_Pawley_Cycle_NumRefs,ILastValues(2))
                                     CALL retrieve_polybackup
                             END IF
@@ -248,7 +251,6 @@
 !
 !   Type declarations
 !
-      LOGICAL    :: SKIP = .FALSE.
       INTEGER    :: I, IDNUMBER
      
       INCLUDE 'statlog.inc'
@@ -267,7 +269,6 @@
 !
 !>> JCC Cell/Lattice declarations now in an include file
       INCLUDE 'Lattice.inc'
-      character(len=45) FILTER
       parameter (msymmin=10)
       character*20 symline
       common /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
@@ -620,7 +621,6 @@
       character*10 fname
 !>> JCC Declaration: FORTY is now an integer function
       integer FORTY
-      integer inferr
 !
       fname='polyp'
       xxx='CN11LS'
@@ -710,7 +710,7 @@
       CALL WDialogShow(IXPos_IDD_Pawley_Status,                         &
      &IYPos_IDD_Pawley_Status,0,Modeless)
 
-      call Quick_Pawley_ReRefine() 
+      CALL Quick_Pawley_ReRefine() 
       New_Pawley_Refinement = Quick_Pawley_Fit()
 
       end function New_Pawley_Refinement
@@ -739,8 +739,7 @@
 !
 !   Type declarations
 !
-      LOGICAL :: SKIP = .FALSE.
-      INTEGER :: I,IDNUMBER
+      INTEGER :: IDNUMBER
       INCLUDE 'statlog.inc'
       INCLUDE 'params.inc'
 !>> JCC Cell/lattice declarations now in an include file
@@ -756,8 +755,8 @@
      &PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),          &
      &PkPosAv(MAX_NPFR)
 
-      parameter (msymmin=10)
-      character*20 symline
+      PARAMETER (msymmin=10)
+      CHARACTER*20 symline
       common /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),                      &
@@ -777,7 +776,7 @@
 !... Check what's happening in IDD_Pawley_Status
 !
 ! Now check on which button was pressed ...
-      If (NumPawleyRef.eq.0) then
+      If (NumPawleyRef.EQ.0) THEN
         CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefInts_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
@@ -797,7 +796,7 @@
             CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
           CALL WDialogFieldState(IDF_IDF_PawRef_NBack,Disabled)
         ENDIF
-      Else
+      ELSE
         CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefInts_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
@@ -817,16 +816,16 @@
         IF (.NOT. BACKREF) THEN
           CALL WDialogFieldState(IDF_IDF_PawRef_NBack,Disabled)
         ENDIF
-      End If
+      END IF
       CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
       SkipPawleyRef=.false.
       DO WHILE(.NOT.SkipPawleyRef)
         CALL GetEvent
         SELECT CASE (EventType)
-              CASE (MouseButDown)
-                    CALL Plot_Alter
-              CASE (KeyDown)
-                  CALL Check_KeyDown
+          CASE (MouseButDown)
+            CALL Plot_Alter
+          CASE (KeyDown)
+            CALL Check_KeyDown
           CASE (PushButton)
             IDNumber=EventInfo%Value1
             SELECT CASE (EventInfo%Value1)
@@ -857,12 +856,10 @@
 !            END SELECT
         END SELECT
       END DO
-      If (SkipPawleyRef) Return
- 888  NumPawleyRef=NumPawleyRef+1
+      If (SkipPawleyRef) RETURN
+ 888  NumPawleyRef = NumPawleyRef + 1
       Call WDialogGetCheckBox(IDF_PawRef_RefWid_Check,IWid_Check)
-      If (IWid_Check.eq.Checked) then
-       CALL WDialogGetRadioButton(IDF_PawRef_RefWid_Radio1,IWid_Option)
-      End If
+      If (IWid_Check.EQ.Checked) CALL WDialogGetRadioButton(IDF_PawRef_RefWid_Radio1,IWid_Option)
       CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
       CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
 !
@@ -872,62 +869,62 @@
 !.. If no wavelength then assume Cu Ka1 wvln=1.54051
 !..
 !
-      open(42,file='polyp.ccl',status='unknown')
-      open(43,file='polyp.ccn',status='old')
+      OPEN(42,file='polyp.ccl',status='unknown')
+      OPEN(43,file='polyp.ccn',status='old')
       FirstVaryLine=.true.
 !..
-   10 read(43,5300,end=900) nl,line
- 5300 format(q,a)
+   10 READ(43,5300,END=900) nl,line
+ 5300 FORMAT(q,a)
       SELECT CASE (line(1:1))
         CASE ('I')
-          write(42,4240) NTCycles
- 4240     format('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0')
+          WRITE(42,4240) NTCycles
+ 4240     FORMAT('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0')
         CASE ('L')
           SELECT CASE (line(3:6))
             CASE('RTYP')
               CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
               IRtyp=2-Item
-              write(42,4245) IRTYP,xranmin,xranmax
- 4245         format('L RTYP  'i3,2f10.3,'  0.001')
+              WRITE(42,4245) IRTYP,xranmin,xranmax
+ 4245         FORMAT('L RTYP  'i3,2f10.3,'  0.001')
             CASE('VARY')
-              If (FirstVaryLine) then
-                write(42,4300) 
- 4300 format('L VARY ONLY ALL INTS')
+              IF (FirstVaryLine) THEN
+                WRITE(42,4300) 
+ 4300 FORMAT('L VARY ONLY ALL INTS')
                 CALL WDialogGetCheckBox(IDF_PawRef_RefBack_Check,Item)
-                If (Item.eq.1) write(42,4310)
- 4310 format('L VARY ALL BACK ')
+                IF (Item.eq.1) WRITE(42,4310)
+ 4310 FORMAT('L VARY ALL BACK ')
                 CALL WDialogGetCheckBox(IDF_PawRef_RefCell_Check,Item)
-                If (Item.eq.1) write(42,4320)
- 4320 format('L VARY ALL CELL ')
+                IF (Item.eq.1) WRITE(42,4320)
+ 4320 FORMAT('L VARY ALL CELL ')
                 CALL WDialogGetCheckBox(IDF_PawRef_RefZero_Check,Item)
-                If (Item.eq.1) write(42,4330)
- 4330 format('L VARY ZERO 1 ')
-             Call WDialogGetCheckBox(IDF_PawRef_RefWid_Check,IWid_Check)
-                If (IWid_Check.eq.Checked) then
+                IF (Item.eq.1) WRITE(42,4330)
+ 4330 FORMAT('L VARY ZERO 1 ')
+             CALL WDialogGetCheckBox(IDF_PawRef_RefWid_Check,IWid_Check)
+                IF (IWid_Check.eq.Checked) THEN
         CALL WDialogGetRadioButton(IDF_PawRef_RefWid_Radio1,IWid_Option)
                   SELECT CASE (IWid_Option)
                     CASE(1)
-                      write(42,4410)
- 4410     format('L VARY SIGM 1')
+                      WRITE(42,4410)
+ 4410     FORMAT('L VARY SIGM 1')
                     CASE(2)
-                      write(42,4420)
- 4420     format('L VARY SIGM 2')
+                      WRITE(42,4420)
+ 4420     FORMAT('L VARY SIGM 2')
                     CASE(3)
-                      write(42,4430)
- 4430     format('L VARY GAMM 1')
+                      WRITE(42,4430)
+ 4430     FORMAT('L VARY GAMM 1')
                     CASE(4)
-                      write(42,4440)
- 4440     format('L VARY GAMM 2')
+                      WRITE(42,4440)
+ 4440     FORMAT('L VARY GAMM 2')
                   END SELECT 
-                end if
-              End If
-              FirstVaryLine=.false.
+                END IF
+              END IF
+              FirstVaryLine=.FALSE.
             CASE DEFAULT
-              write(42,5310) line(:nl)              
+              WRITE(42,5310) line(:nl)              
           END SELECT
         CASE DEFAULT
-          write(42,5310) line(:nl)
- 5310     format(a)
+          WRITE(42,5310) line(:nl)
+ 5310     FORMAT(a)
       END SELECT
 !      write(76,*) ' NPawBack ',NPawBack
 !      nblin=1+(NPawBack-1)/5
@@ -944,11 +941,11 @@
 !        write(42,4280) backstr
 ! 4280 format(a)
 !      end do
-      goto 10
- 900  close(42)
-      close(43)    
-!
-      end
+      GOTO 10
+ 900  CLOSE(42)
+      CLOSE(43)    
+
+      END
 !
 !*****************************************************************************
 !
@@ -994,11 +991,13 @@
       IPPMINOLD=IPMINOLD
       IPPMAXOLD=IPMAXOLD
 
-      END
+      END SUBROUTINE PAWLEY_LIMITS_SAVE
+!
+!*****************************************************************************
 !
       SUBROUTINE PAWLEY_LIMITS_RESTORE
 
-      include 'params.inc'
+      INCLUDE 'params.inc'
 
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,           &
      &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD,            &
@@ -1222,7 +1221,7 @@
       USE VARIABLES
 
       CHARACTER(LEN=80) :: SDIFileName
-      CHARACTER(LEN=255) :: Currentdir
+!      CHARACTER(LEN=255) :: Currentdir
       CHARACTER(LEN=45) :: FILTER
       INTEGER IFLAGS
       
@@ -1248,3 +1247,6 @@
       END IF
 
       END FUNCTION SaveProject
+!
+!*****************************************************************************
+!
