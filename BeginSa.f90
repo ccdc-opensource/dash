@@ -100,45 +100,41 @@
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
-      INTEGER I, Iflags, Idummy
+      INTEGER I, Iflags
       CHARACTER*80 filehead
 !ep added extpro
-      LOGICAL extcssr,extpdb,extccl, extpro
+      LOGICAL extcssr, extpdb, extccl, extpro
 !
       INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
-      IF (.NOT. extcssr) THEN
-        DO I = 1, 100
-          CALL AppendNumToFileName(I,cssr_file,new_fname)
-            INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extcssr) 
-            IF (extcssr) EXIT
-        END DO
-      END IF
+      IF (extcssr) GOTO 10
+      DO I = 1, 30
+        CALL AppendNumToFileName(I,cssr_file,new_fname)
+        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extcssr) 
+        IF (extcssr) GOTO 10
+      ENDDO
       INQUIRE(FILE=pdb_file(1:pdb_flen),  EXIST=extpdb)
-      IF (.NOT. extpdb) THEN
-        DO I = 1, 100
-          CALL AppendNumToFileName(I,pdb_file,new_fname)
-            INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extpdb) 
-            IF (extpdb) EXIT
-        END DO
-      END IF
+      IF (extpdb) GOTO 10
+      DO I = 1, 30
+        CALL AppendNumToFileName(I,pdb_file,new_fname)
+        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extpdb) 
+        IF (extpdb) GOTO 10
+      ENDDO
       INQUIRE(FILE=ccl_file(1:ccl_flen),  EXIST=extccl)
-      IF (.NOT. extccl) THEN
-        DO I = 1, 100
-          CALL AppendNumToFileName(I,ccl_file,new_fname)
-            INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extccl) 
-            IF (extccl) EXIT
-        END DO
-      END IF
+      IF (extccl) GOTO 10
+      DO I = 1, 30
+        CALL AppendNumToFileName(I,ccl_file,new_fname)
+        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extccl) 
+        IF (extccl) GOTO 10
+      ENDDO
 !     ep added.  Pro_file contains the powder diffraction data and fit....
       INQUIRE(FILE=pro_file(1:pro_flen),  EXIST=extpro)
-      IF (.NOT.extpro) THEN
-        DO I = 1,100
-          CALL AppendNumToFileName(I,pro_file,new_fname)
-            INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extpro) 
-            IF (extpro) EXIT
-        END DO
-      END IF
-      CheckOverwriteSaOutput = 1
+      IF (extpro) GOTO 10
+      DO I = 1, 30
+        CALL AppendNumToFileName(I,pro_file,new_fname)
+        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extpro) 
+        IF (extpro) GOTO 10
+      ENDDO
+   10 CheckOverwriteSaOutput = 1
       DO WHILE (extcssr .OR. extpdb .OR. extccl .OR. extpro)
         CALL WMessageBox(YesNoCancel, QuestionIcon, CommonYes, &
                     "Do you wish to overwrite existing files? "//CHAR(13) &
@@ -147,26 +143,22 @@
         IF (WInfoDialog(4) .EQ. 1) THEN ! Yes - Overwrite
           RETURN 
         ELSE IF (WinfoDialog(4) .EQ. 2) THEN ! No - so enter a new file name
-          Iflags = SaveDialog+NonExPath+DirChange+AppendExt
-          Idummy = 1
+          Iflags = SaveDialog + NonExPath + DirChange + AppendExt
           filehead = ' '
 !ep appended
           CALL WSelectFile('ccl files|*.ccl|cssr files|*.cssr|pdb files|*.pdb|pro files|*.pro|',&
-                           Iflags, &
-                           filehead,&
-                           'Choose SA output file name')
+                           Iflags,filehead,'Choose SA output file name')
           IF (filehead .NE. ' ') CALL sa_SetOutputFiles(filehead)
         ELSE ! Cancel
           CheckOverwriteSaOutput = 0
           RETURN
-        END IF
+        ENDIF
         INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
         INQUIRE(FILE=pdb_file(1:pdb_flen),  EXIST=extpdb)
         INQUIRE(FILE=ccl_file(1:ccl_flen),  EXIST=extccl)
         INQUIRE(FILE=pro_file(1:pro_flen),  EXIST=extpro)
 ! Read in a new file name
       END DO
-      RETURN 
 
       END FUNCTION CheckOverwriteSaOutput
 !
@@ -177,8 +169,7 @@
 ! Covers the eventuality of the default space group option.
 ! We need to determine the number of symmetry operators etc.
       LOGICAL SDREAD
-      COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),&
-      ICDN(26,9),IERR,IO10,SDREAD
+      COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),ICDN(26,9),IERR,IO10,SDREAD
       common/iounit/lpt,iti,ito,iplo,luni,iout
       CHARACTER*6 xxx
       CHARACTER*10 fname
@@ -191,7 +182,7 @@
  
       OPEN(42,file='polys.ccl',status='unknown')
       WRITE(42,4210) 
- 4210 FORMAT('N DeterMining the space group ')
+ 4210 FORMAT('N Determining the space group ')
       IF (NumberSGTable .GE. 1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin .GT. 0) THEN
@@ -208,7 +199,6 @@
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
-      RETURN
 
       END SUBROUTINE FillSymmetry
 !
