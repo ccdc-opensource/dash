@@ -8,11 +8,12 @@
       USE WINTERACTER
       USE VARIABLES
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Poly_Colours.inc'
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
@@ -20,14 +21,18 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
 !
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
+      INTEGER IMOV, ISB
+      REAL XMINT, XMAXT, YMINT, YMAXT, xgcurold, ygcurold
+
 
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
@@ -131,7 +136,7 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
@@ -154,125 +159,125 @@
         YPGMAXOLD = YPGMAX
         IPMINOLD  = IPMIN
         IPMAXOLD  = IPMAX
-      END IF
+      ENDIF
       SELECT CASE (EventInfo%VALUE1)
-         CASE (KeyPageLeft)
-           xpgdif=xpgmax-xpgmin
-           xpgmin=MAX(xpmin,xpgmin-0.02*xpgdif)
-           xpgmax=xpgmin+xpgdif
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyPageRight)
+        CASE (KeyPageLeft)
+          xpgdif=xpgmax-xpgmin
+          xpgmin=MAX(xpmin,xpgmin-0.02*xpgdif)
+          xpgmax=xpgmin+xpgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyPageRight)
 ! We're going to move the graph to the right if we can
-           xpgdif=xpgmax-xpgmin
-           xpgmax=MIN(xpmax,xpgmax+0.02*xpgdif)
-           xpgmin=xpgmax-xpgdif
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyCursorLeft)
+          xpgdif=xpgmax-xpgmin
+          xpgmax=MIN(xpmax,xpgmax+0.02*xpgdif)
+          xpgmin=xpgmax-xpgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyCursorLeft)
 ! We're going to move the graph to the left if we can
-           xpgdif=xpgmax-xpgmin
-           xpgmin=MAX(xpmin,xpgmin-0.25*xpgdif)
-           xpgmax=xpgmin+xpgdif
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyCursorRight)
+          xpgdif=xpgmax-xpgmin
+          xpgmin=MAX(xpmin,xpgmin-0.25*xpgdif)
+          xpgmax=xpgmin+xpgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyCursorRight)
 ! We're going to move the graph to the right if we can
-           xpgdif=xpgmax-xpgmin
-           xpgmax=MIN(xpmax,xpgmax+0.25*xpgdif)
-           xpgmin=xpgmax-xpgdif
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyLeftExtreme)
+          xpgdif=xpgmax-xpgmin
+          xpgmax=MIN(xpmax,xpgmax+0.25*xpgdif)
+          xpgmin=xpgmax-xpgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyLeftExtreme)
 ! We're going to move the graph as far left as we can
-           xpgdif=xpgmax-xpgmin
-           xpgmin=xpmin
-           xpgmax=xpgmin+xpgdif
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyRightExtreme)
+          xpgdif=xpgmax-xpgmin
+          xpgmin=xpmin
+          xpgmax=xpgmin+xpgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyRightExtreme)
 ! We're going to move the graph as far right as we can
-           xpgdif=xpgmax-xpgmin
-           xpgmax=xpmax
-           xpgmin=xpgmax-xpgdif
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot      
-         CASE (KeyPageDown)
+          xpgdif=xpgmax-xpgmin
+          xpgmax=xpmax
+          xpgmin=xpgmax-xpgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot      
+        CASE (KeyPageDown)
 ! We're going to expand the xscale by sqrt(2) if we can
-           xpgdif=xpgmax-xpgmin
-           xpgav=0.5*(xpgmax+xpgmin)
-           xtem=MIN(0.5*(xpmax-xpmin),0.7071*xpgdif)
-           xpgmin=xpgav-xtem
-           xpgmax=xpgav+xtem
-           IF (xpgmin.LT.xpmin) THEN
-             xpgmin=xpmin
-             xpgmax=xpgmin+2.*xtem
-           ELSE IF (xpgmax.GT.xpmax) THEN
-             xpgmax=xpmax
-             xpgmin=xpgmax-2.*xtem
-           END IF
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyPageUp)
+          xpgdif=xpgmax-xpgmin
+          xpgav=0.5*(xpgmax+xpgmin)
+          xtem=MIN(0.5*(xpmax-xpmin),0.7071*xpgdif)
+          xpgmin=xpgav-xtem
+          xpgmax=xpgav+xtem
+          IF (xpgmin.LT.xpmin) THEN
+            xpgmin=xpmin
+            xpgmax=xpgmin+2.*xtem
+          ELSE IF (xpgmax.GT.xpmax) THEN
+            xpgmax=xpmax
+            xpgmin=xpgmax-2.*xtem
+          ENDIF
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyPageUp)
 ! We're going to contract the xscale by sqrt(2)
-           xpgdif=xpgmax-xpgmin
-           xpgav=0.5*(xpgmax+xpgmin)
-           xtem=0.3536*xpgdif
-           xpgmin=xpgav-xtem
-           xpgmax=xpgav+xtem
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyCursorDown)
+          xpgdif=xpgmax-xpgmin
+          xpgav=0.5*(xpgmax+xpgmin)
+          xtem=0.3536*xpgdif
+          xpgmin = xpgav - xtem
+          xpgmax = xpgav + xtem
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyCursorDown)
 ! We're going to move the graph down if we can
-           ypgdif=ypgmax-ypgmin
-           ypgmin=MAX(ypmin,ypgmin-0.25*ypgdif)
-           ypgmax=ypgmin+ypgdif
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyCursorUp)
+          ypgdif = ypgmax - ypgmin
+          ypgmin = MAX(ypmin,ypgmin-0.25*ypgdif)
+          ypgmax = ypgmin + ypgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyCursorUp)
 ! We're going to move the graph up if we can
-           ypgdif=ypgmax-ypgmin
-           ypgmax=MIN(ypmax,ypgmax+0.25*ypgdif)
-           ypgmin=ypgmax-ypgdif
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyUpExtreme)
+          ypgdif = ypgmax - ypgmin
+          ypgmax = MIN(ypmax,ypgmax+0.25*ypgdif)
+          ypgmin = ypgmax - ypgdif
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyUpExtreme)
 ! We're going to scale to min/max y over the current range
-           ii = ypgmin
-           ypgmin=ypgmax
-           ypgmax=ii
-           DO ii=1,nobs
-             IF(xobs(ii).ge.xpgmin.and.xobs(ii).le.xpgmax) THEN
-               ypgmin=MIN(yobs(ii),ypgmin)
-               ypgmax=MAX(yobs(ii),ypgmax)
-             END IF
-           END DO
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyBackspace)
+          ii = ypgmin
+          ypgmin=ypgmax
+          ypgmax=ii
+          DO ii=1,NBIN
+            IF(XBIN(ii).GE.xpgmin .AND. XBIN(ii).LE.xpgmax) THEN
+              ypgmin=MIN(yobin(ii),ypgmin)
+              ypgmax=MAX(yobin(ii),ypgmax)
+            ENDIF
+          ENDDO
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyBackspace)
 ! Undo last zoom action
-           xpgmint=xpgmin
-           xpgmaxt=xpgmax
-           ypgmint=ypgmin
-           ypgmaxt=ypgmax
-           xpgmin=xpgminold
-           xpgmax=xpgmaxold
-           ypgmin=ypgminold
-           ypgmax=ypgmaxold
-           xpgminold=xpgmint
-           xpgmaxold=xpgmaxt
-           ypgminold=ypgmint
-           ypgmaxold=ypgmaxt
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot
-         CASE (KeyHome)
+          xpgmint=xpgmin
+          xpgmaxt=xpgmax
+          ypgmint=ypgmin
+          ypgmaxt=ypgmax
+          xpgmin=xpgminold
+          xpgmax=xpgmaxold
+          ypgmin=ypgminold
+          ypgmax=ypgmaxold
+          xpgminold=xpgmint
+          xpgmaxold=xpgmaxt
+          ypgminold=ypgmint
+          ypgmaxold=ypgmaxt
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot
+        CASE (KeyHome)
 ! Back to full profile range
-           xpgmin=xpmin
-           xpgmax=xpmax
-           ypgmin=ypmin
-           ypgmax=ypmax
-           CALL Get_IPMaxMin() 
-           CALL Profile_Plot     
+          xpgmin=xpmin
+          xpgmax=xpmax
+          ypgmin=ypmin
+          ypgmax=ypmax
+          CALL Get_IPMaxMin() 
+          CALL Profile_Plot     
       END SELECT
 
       END SUBROUTINE Check_KeyDown
@@ -419,11 +424,6 @@
       REAL                               ARGK
       REAL                                           DSTAR
       COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
-
-! @@ Jvds Why do we need PROFOBS here? Wasn't PROFBIN supposed to have been implemented?
-      INTEGER          NOBS
-      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
@@ -600,7 +600,6 @@
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
@@ -876,10 +875,10 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page10)
       IF (WeCanDoAPawleyRefinement()) THEN
-        CALL SetModeMenuState(1,1,0)
+        CALL SetModeMenuState(0,1,0)
         CALL WDialogFieldState(IDNEXT,Enabled)
       ELSE
-        CALL SetModeMenuState(1,-1,0)
+        CALL SetModeMenuState(0,-1,0)
         CALL WDialogFieldState(IDNEXT,Disabled)
       ENDIF
       CALL PopActiveWindowID

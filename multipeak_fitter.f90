@@ -345,8 +345,6 @@
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 !
-      COMMON /PROFOBS/ NOBS, XOBS(MOBS), YOBS(MOBS), YCAL(MOBS),        &
-     &                 YBAK(MOBS), EOBS(MOBS)
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)

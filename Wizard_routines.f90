@@ -136,8 +136,15 @@
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
+
+      LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
    
       CALL EndWizardCommon
+      IF (WeCanDoAPawleyRefinement()) THEN
+        CALL SetModeMenuState(1,1,1)
+      ELSE
+        CALL SetModeMenuState(1,-1,1)
+      ENDIF
       CALL SelectMode(ID_Peak_Fitting_Mode)
       PastPawley = .FALSE.
 ! Ungrey 'Delete all peak fit ranges' button on toolbar

@@ -1346,6 +1346,10 @@
 
       INCLUDE 'GLBVAR.INC'
 
+      IF (WMenuGetState(TheMode,ItemEnabled) .EQ. Disabled) THEN
+        CALL DebugErrorMessage('Programming error: requested menu item is greyed out')
+        CALL WMenuSetState(TheMode,ItemEnabled,Enabled)
+      ENDIF
 ! Update the status bar
       SELECT CASE (TheMode)
         CASE (ID_Peak_Fitting_Mode)
