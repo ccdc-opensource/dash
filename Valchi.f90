@@ -440,8 +440,8 @@
       DO iR = 1, NumOfRef
         prfcor = 0.0
         DO i = 1, iHMUL(iR)
-          csqa = PrefCsqa(i,iR)
-          ssqa = 1.0 - csqa
+          csqa = PrefCsqa(i,iR) ! Precalculated COS(alpha)**2
+          ssqa = 1.0 - csqa     ! SIN(alpha)**2 = 1.0 - COS(alpha)**2
           prfcor = prfcor + (csqa*(PrfPar**2) + ssqa/PrfPar)**(-1.5)
         ENDDO
         XICALC(iR) = prfcor / FLOAT(iHMUL(iR))
