@@ -94,11 +94,11 @@
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
 
       REAL    YPGDIF, YTIC1, YTIC2, xgtem, ygtem
       INTEGER II
@@ -170,11 +170,11 @@
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
 
       INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
       COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
@@ -220,14 +220,16 @@
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
 
       INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
       COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+
+      REAL YGGMIN, YGGMAX
 
       CALL IGrColourN(KolNumMain)
       CALL IGrCharSize(1.,1.)
@@ -296,11 +298,11 @@
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
 
       INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
       COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
@@ -371,11 +373,11 @@
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
 
       INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
       COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
@@ -457,11 +459,11 @@
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
 
       INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
       COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD

@@ -86,12 +86,11 @@
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
+                       XGGMIN,    XGGMAX
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
 
       LOGICAL    FExists
       INTEGER    KLEN
@@ -111,15 +110,6 @@
         CALL ErrorMessage("The file "//TheFileName(1:KLEN)//" does not exist!")
         RETURN
       ENDIF
-!   Check if file needs saving
-      IF (SAVEF) THEN
-        IF (.NOT. Confirm('Program contains an unsaved project.'//CHAR(13)//'Do you wish to '// &
-          'continue?')) RETURN
-      ENDIF
-!   If answer 'Yes'
-! It is slightly odd that SAVEF is set to .FALSE. here. We are about to load the powder patttern:
-! how much more necessary to save a project file can it get?
-      SAVEF = .FALSE.
 ! This is the point of no return: the selected file will be new file, valid data or not
 ! Change global variable FNAME
       FNAME = TheFileName
@@ -130,14 +120,6 @@
       IF (ISTAT .EQ. 0) RETURN
 ! Enable the appropriate menus:
       CALL SetModeMenuState(1,-1)
-! JvdS Was:
-!      CALL SetModeMenuState(1,0,0)
-! however, that sometimes enables Pawley fit after just having read a new data file
-! (the zeros mean: don't change state)
-! Partially, this seems to be caused by nothing in the program being
-! initialised when a file is read in: all the old tick marks etc. are still there.
-! I think that reading in a new powder diffraction file should initialise all other
-! data to 'unknown'.
       IF (LEN_TRIM(FNAME) .GT. 80) THEN
         CALL DebugErrorMessage('FNAME too long in DiffractionFileOpen')
         DashRawFile = FNAME(1:80)
@@ -149,7 +131,8 @@
       CALL WDialogSelect(IDD_PW_Page5)
 ! Initialise truncation of start of powder pattern
       CALL WDialogPutReal(IDF_Min2Theta,XPMIN,'(F6.3)')
-! In principle, set resolution so as to truncate after DefaultMaxResolution.
+      CALL WDialogRangeReal(IDF_Min2Theta,XPMIN,XPMAX)
+! In principle, set resolution so as to truncate at DefaultMaxResolution.
 ! However, if truncation resolution not attainable with current data range / wavelength,
 ! adjust the setting of the maximum resolution to maximum possible.
       IF (FnWavelengthOK()) THEN
@@ -158,6 +141,7 @@
         tMaxResolution = DefaultMaxResolution
       ENDIF
       CALL WDialogPutReal(IDF_MaxResolution,tMaxResolution)
+      CALL WDialogRangeReal(IDF_MaxResolution,XPMIN,XPMAX)
       CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tMaxResolution))
       CALL PopActiveWindowID
 
@@ -204,11 +188,11 @@
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
 
       INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
       COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
@@ -1493,11 +1477,11 @@
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
+                       XGGMIN,    XGGMAX
 
       INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
       COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
