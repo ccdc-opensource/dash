@@ -470,8 +470,6 @@ C
           DO J = 1, 4
             KANGM(J,I) = 0
           ENDDO
-!%
-!        DO 2 J=1,%PSIS%
           DO J = 1, 4
             KPHIH(J,I) = 0
           ENDDO
@@ -583,8 +581,6 @@ C
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!%
-!      COMMON/SCRAT/MODE(%MPAT%),IROT(%MPAT%),TEMP(3,3),MFUN(10,%MPAT%),LENG(3)
       COMMON /SCRAT / MODE(20), IROT(20), TEMP(3,3), MFUN(10,20),       &
      &                LENG(3)
       DATA JAX, RCAX/'X', 'Y', 'Z', 'a*', 'b*', 'c*'/
@@ -746,8 +742,6 @@ C
      &                'is neither an atom name nor an allowed Q word')
           IER = IER + 1
         ELSE
-!%
-!          IF (NTYP.EQ.5)IAT=LMATCH(WORD,FONAME,NUMFNM,%FORM%)
           IF (NTYP.EQ.5) IAT = LMATCH(WORD,FONAME,NUMFNM,20)
           GOTO 100
         ENDIF
@@ -984,17 +978,11 @@ C
 !
       LOGICAL ONCARD
       CHARACTER*4 INEED
-!%
-!      DIMENSION IH(3),H(3),TEMREF(3,%REFS%),IORDER(%REFS%)
-!%
-!      DIMENSION TEMMUL(%REFS%),ARG(%REFS%),TF4P(6,%REFS%),TEMP(6)
-!%
-!      DIMENSION ARGN(%REFS%),ANT(%REFS%)
       COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9),        &
      &                SCALEP(9), KSCALP(9), PHMAG(9)
       LOGICAL PHMAG
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
@@ -1564,8 +1552,6 @@ C
 !
 !   MATTOT  ADDS IN CONTRIBUTIONS TO LSQ MATRIX AND RHS FOR THIS OBSERVATION
 !
-!%
-!      DIMENSION ALSQ(MATSZ),MM(%BVAR%)
 !
       INCLUDE 'PARAMS.INC'
 !
@@ -5339,7 +5325,7 @@ C
                 CALL Diffraction_File_Open(CTEMP)
 !C>> JCC Have to reselect after the file open
                 CALL WDialogSelect(IDD_PW_Page2)
-              CASE (ID_PW_DF_Browse)
+              CASE (IDBBROWSE)
                 CALL Diffraction_File_Browse
 !C>> JCC Have to reselect after the file open
                 CALL WDialogSelect(IDD_PW_Page2)
@@ -21021,8 +21007,6 @@ C
 !
       IF (INREAD(7).GT.0) CALL INPUTG
       NQ = NL*NM*NN
-!%
-!      CALL ERRCHK(1,NQ,%GPTS%,0,'Gauss points, product of all 3')
       CALL ERRCHK(1,NQ,1000,0,'Gauss points, product of all 3')
       U = 0.
       V = 0.
@@ -21185,8 +21169,6 @@ C
 !I Reads in all "G" cards.
 !O Writes its findings to unit LPT.
 !
-!%
-!      CHARACTER *4 GWD,GTABLE(%GCRD%)
       CHARACTER*4 GWD, GTABLE(4)
       COMMON /ABSDAT/ AMU, MODEA
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
@@ -21203,8 +21185,6 @@ C
       DATA GTABLE/'FACE', 'PNTS', 'MU', 'MODE'/
 !
 ! SET "NO G CARDS READ":
-!%
-!      CALL JGMZER(IGREAD,1,%GCRD%)
       CALL JGMZER(IGREAD,1,4)
 !
 ! INITIALISE COUNTS OF ITEMS WHICH MAY COME ON MORE THAN 1 CARD:
@@ -21221,8 +21201,6 @@ C
         CALL CARDIN(ID)
         ID = ID + NYZ
         CALL RDWORD(GWD,LEN,3,IPT,80,0,IER)
-!%
-!  42  L=NCFIND(GWD,GTABLE,%GCRD%)
    42   L = NCFIND(GWD,GTABLE,4)
         IF (L.LE.0) THEN
           CALL ERRCH2(GWD,2,'cannot recognise word','on "G" card')
@@ -21235,8 +21213,6 @@ C
 !
 ! FACE:
    31   IER = IERR
-!%
-!      CALL ERRCHK(2,NP,%CPLN%,0,'plane faces')
         CALL ERRCHK(2,NP,15,0,'plane faces')
         IF (IER.NE.IERR) GOTO 3
 !
@@ -21792,8 +21768,6 @@ C
       EQUIVALENCE (NSPC(1),NSPCPS(1,1))
       COMMON /SCLDAT/ ISCALE, NSCALE, SCALE(20), KSCALE(20), NSCL,      &
      &                LSCD(10)
-!%
-!      DIMENSION DERIVA(%VVAR%)
       DIMENSION DERIVA(500)
 !
       STHL = VCTMOD(0.5,H,2)
@@ -22142,8 +22116,6 @@ C
       COMMON /MPODAC/ MPNAM(200)
       CHARACTER*4 MPNAM
       COMMON /POLFOR/ MPLFOR(20,6), NUMGEN, PFORFA(7), LMAX
-!%
-!      COMMON /SCRAT1/AMPS(%MPOL%),MPTMP(%MPOL%),LABEL(%MPOL%),LTMP(3),
       COMMON /SCRAT1/ AMPS(200), MPTMP(200), LABEL(200), LTMP(3),       &
      &                LPK(10,3), NMPL
       DATA WWORDS/'RADF', 'ROTN'/
@@ -22172,8 +22144,6 @@ C
         CALL INPUTJ(IDT,NTYP,IAT,IPT,IE)
         IF (NTYP.NE.1) GOTO 28
         IF (MPNMTB(IAT).EQ.0) THEN
-!%
-!      CALL ERRCHK(2,NMPAT,%MPAT%,0,'atoms with multipoles')
           CALL ERRCHK(2,NMPAT,20,0,'atoms with multipoles')
           MPATAB(NMPAT) = IAT
           MPNMTB(IAT) = NMPAT
@@ -22190,8 +22160,6 @@ C
         IF (LT.LT.0 .OR. LT.GT.LTMP(2)) GOTO 29
         IF (WORD(4:4).EQ.'-') LT = -LT
         LTMP(3) = LTMP(2) + 1 - LT
-!%
-!      CALL ERRCHK(2,NMPL,%MPOL%,0,'multipoles')
         CALL ERRCHK(2,NMPL,200,0,'multipoles')
         CALL RDREAL(AMPS(NMPL),IPT1,IPT,80,IE)
         IF (IE.NE.0) GOTO 29
@@ -22849,8 +22817,6 @@ C
       CHARACTER*4 FONAME, FONA
       COMMON /POLFOR/ MPLFOR(20,6), NUMGEN, PFORFA(7), LMAX
 !
-!%
-!      CALL JGMZER(MPLFOR,%MPFO%,%MPFL%)
       CALL JGMZER(MPLFOR,20,6)
       NAMFRE = NUMFNM + 1
       DO J = 1, NJ
@@ -22861,8 +22827,6 @@ C
         IF (IE.EQ.100) GOTO 2
         IF (IE.NE.0) CALL ERRMES(1,1,' in form-factor name')
         IF (WORD.EQ.'RADF') THEN
-!%
-!        DO 6 I=1,%MPFL%
           DO I = 1, 6
             MPLFOR(IAT,I) = -999
           ENDDO
@@ -22871,8 +22835,6 @@ C
           IF (IFORM.EQ.0) THEN
             FONAME(NAMFRE) = WORD
             IFORM = NAMFRE
-!%
-!          CALL ERRCHK(2,NAMFRE,%MPFO%,0,'Too many form-factors')
             CALL ERRCHK(2,NAMFRE,20,0,'Too many form-factors')
           ENDIF
           CALL RDINTG(L,IPT1,IPT,80,IE)
@@ -23348,8 +23310,6 @@ C
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!%
-!      COMMON /SCRAT/MODE(%MPAT%),IROT(%MPAT%),TEMP(3,3),MFUN(10,%MPAT%),LENG(3)
       COMMON /SCRAT / MODE(20), IROT(20), TEMP(3,3), MFUN(10,20),       &
      &                LENG(3)
       DATA S/1.8896/
@@ -23358,15 +23318,11 @@ C
 !
 !  INITIALISE
    30 NRADF = 0
-!%
-!      CALL JGMZER(NTERMS,1,%RADF%)
       CALL JGMZER(NTERMS,1,5)
       GOTO 100
 !
 !  READ REST OF CARD STARTING W <ATOM> RADF:
     1 IF (NRADF.EQ.0 .OR. IRADF(NRADF).NE.JAT) THEN
-!%
-!        CALL ERRCHK(2,NRADF,%RADF%,0,
         CALL ERRCHK(2,NRADF,5,0,'radial functions')
         IRADF(NRADF) = JAT
       ENDIF
@@ -24069,14 +24025,10 @@ C
       NSCL = NSCL + 1
       ISKEEP = NSCALE + 1
       LSCD(NSCL) = ISKEEP
-!%
-!      CALL RDNUMS(SCALE(ISKEEP),7,%SCAL%,NUM,IER)
       CALL RDNUMS(SCALE(ISKEEP),7,20,NUM,IER)
       IF (IER.NE.0) IERR = IERR + 1
       NSCALE = NSCALE + NUM
       IER = IERR
-!%
-!      CALL ERRCHK(1,NSCALE,%SCAL%,1,'scale factors')
       CALL ERRCHK(1,NSCALE,20,1,'scale factors')
       IF (IER.NE.IERR) GOTO 100
 !
@@ -24954,8 +24906,6 @@ C
 !
    99 II = JJ - NEW
       DO J = 1, NEW
-!%
-!      CALL ERRCHK(2,NMPOL,%MPOL%,0,'multipoles')
         CALL ERRCHK(2,NMPOL,200,0,'multipoles')
         POLAMP(NMPOL,1) = VAL
         CALL NAMPOL(MPNAM(NMPOL),KMAX,INDX(II+J))
@@ -24965,8 +24915,6 @@ C
       ISTART = NMPOL - JJ + 1
 !
 ! RECORD NEW CHUNK:
-!%
-!      CALL ERRCHK(2,NCLUMP,%MBLK%,0,
       CALL ERRCHK(2,NCLUMP,100,0,'blocks of l values for multipoles')
       KCLUMP(NCLUMP) = JJ
       IF (JJ.NE.1) THEN
@@ -25049,8 +24997,6 @@ C
 !O Writes its findings to unit LPT
 !
       CHARACTER*27 X27
-!%
-!      CHARACTER *4 DTABLE(%DCRD%),DWD
       CHARACTER*4 DTABLE(8), DWD
       DIMENSION ITEMP(9), UMAT(9)
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
@@ -25072,8 +25018,6 @@ C
       DATA X27/'                           '/
 !
 ! SET "NO D CARDS READ":
-!%
-!      CALL JGMZER(IDREAD,1,%DCRD%)
       CALL JGMZER(IDREAD,1,8)
 !
 ! CLEAR COUNT OF UB MATRIX ELEMENTS READ:
@@ -25096,8 +25040,6 @@ C
         CALL CARDIN(ID)
         ID = ID + NYZ
         CALL RDWORD(DWD,LEN,3,IPT,80,0,IER)
-!%
-!  42  L=NCFIND(DWD,DTABLE,%DCRD%)
    42   L = NCFIND(DWD,DTABLE,8)
         IF (L.LE.0) THEN
           CALL ERRCH2(DWD,2,'word','on D card not recognised')
@@ -25144,8 +25086,6 @@ C
         GOTO 43
 !
 ! WVLN:
-!%
-!  32  CALL RDNUMS(ALAMBD,IPT,%LAMB%,NLAMB,IER)
    32   CALL RDNUMS(ALAMBD,IPT,5,NLAMB,IER)
         IF (NLAMB.GT.0) GOTO 52
         CALL ERRMES(1,1,'no values on D WVLN card')
