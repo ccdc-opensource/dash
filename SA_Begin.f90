@@ -29,12 +29,19 @@
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
                               chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
 
+      LOGICAL         UseRene, UseESD
+      INTEGER                          nwidth
+      REAL                                     width, minstep, rwidth, SqrtCorrObs 
+      LOGICAL                                                                       InPeak
+      COMMON / RENE / UseRene, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+
       LOGICAL         InSA
       COMMON /SADATA/ InSA
 
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput, DateToday, DateDaysElapsed, &
                            TimeNowSeconds, Get_HydrogenTreatment
       CHARACTER*20, EXTERNAL :: Integer2String
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       CHARACTER*100 SA_DurationStr
       INTEGER StartDate, EndDate, DaysElapsed, DSLen
       INTEGER StartTime, EndTime, NItems
@@ -46,6 +53,9 @@
         CALL WizardWindowShow(IDD_SA_input3_2)
         RETURN
       ENDIF
+      CALL WDialogSelect(IDD_SA_input3_2)
+      UseRene = WDialogGetCheckBoxLogical(IDC_UseRene)
+      IF (UseRene) CALL InitRene
       OneDay = 24 * 60 * 60
 ! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
 ! changed while the SA is running).
@@ -60,10 +70,10 @@
       CALL GET_LOGREF
 ! Ungrey the "Save... chi sqrd progress"
       CALL WDialogSelect(IDD_OutputSolutions)
-      CALL WDialogFieldState(IDF_GROUP2,Enabled)
-      CALL WDialogFieldState(IDB_OutputChiSqd,Enabled)
-      CALL WDialogFieldState(IDF_LABEL5,Enabled)
-      CALL WDialogFieldState(IDF_LABEL3,Enabled)
+      CALL WDialogFieldState(IDF_GROUP2, Enabled)
+      CALL WDialogFieldState(IDB_OutputChiSqd, Enabled)
+      CALL WDialogFieldState(IDF_LABEL5, Enabled)
+      CALL WDialogFieldState(IDF_LABEL3, Enabled)
 ! Pop up the SA status window
       CALL WizardWindowShow(IDD_SA_Action1)
 !O      CALL WDialogSelect(IDD_Parameter_Status_2)
@@ -71,7 +81,7 @@
       StartDate = DateToday()
       StartTime = TimeNowSeconds()
       CALL Init_MultiRun
-      CALL WDialogFieldState(IDB_Summary,Enabled)
+      CALL WDialogFieldState(IDB_Summary, Enabled)
       IPTYPE = 2
 !C Clear Chi-sqd array between starting sets of SA Runs
       Chi_sqd = 0.0

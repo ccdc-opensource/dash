@@ -47,6 +47,12 @@
       INTEGER         NStPar
       COMMON /pextra/ NStPar
 
+      LOGICAL         UseRene, UseESD
+      INTEGER                          nwidth
+      REAL                                     width, minstep, rwidth, SqrtCorrObs 
+      LOGICAL                                                                       InPeak
+      COMMON / RENE / UseRene, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+
       REAL, EXTERNAL :: FFCALC_001, FFCALC_002, FFCALC_039, FFCALC_040, FFCALC_044, FFCALC_050, &
                         FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061, FFCALC_064, FFCALC_065
       REAL, EXTERNAL :: FFCALC_066, FFCALC_067, FFCALC_069, FFCALC_112, FFCALC_115, FFCALC_116, &
@@ -284,25 +290,29 @@
         ENDDO
       ENDIF
 ! BICALC(1:NumOfRef) now contains the calculated intensities corrected for preferred orientation
-      SUM1 = 0.0
-      SUM2 = 0.0
-      DO IK = 1, KKOR
-        II = IKKOR(IK)
-        JJ = JKKOR(IK)
-        SUM1 = SUM1 + BICALC(II)*WTIJ(IK)*AIOBS(JJ) + BICALC(JJ)*WTIJ(IK)*AIOBS(II)
-        SUM2 = SUM2 + BICALC(II)*WTIJ(IK)*BICALC(JJ)
-      ENDDO
-      RESCL = 0.5*SUM1/SUM2
-      CHIVAL = 0.0
-      DO IK = 1, KKOR
-        II = IKKOR(IK)
-        JJ = JKKOR(IK)
-        DELI = AIOBS(II) - RESCL*BICALC(II)
-        DELJ = AIOBS(JJ) - RESCL*BICALC(JJ)
-        CHIADD = DELI*WTIJ(IK)*DELJ
-        CHIVAL = CHIVAL + CHIADD
-      ENDDO
-      CHIVAL = CHIVAL/FLOAT(NumOfRef-2)
+      IF (UseRene) THEN
+        CALL CalculateSimilarity(CHIVAL)
+      ELSE
+        SUM1 = 0.0
+        SUM2 = 0.0
+        DO IK = 1, KKOR
+          II = IKKOR(IK)
+          JJ = JKKOR(IK)
+          SUM1 = SUM1 + BICALC(II)*WTIJ(IK)*AIOBS(JJ) + BICALC(JJ)*WTIJ(IK)*AIOBS(II)
+          SUM2 = SUM2 + BICALC(II)*WTIJ(IK)*BICALC(JJ)
+        ENDDO
+        RESCL = 0.5*SUM1/SUM2
+        CHIVAL = 0.0
+        DO IK = 1, KKOR
+          II = IKKOR(IK)
+          JJ = JKKOR(IK)
+          DELI = AIOBS(II) - RESCL*BICALC(II)
+          DELJ = AIOBS(JJ) - RESCL*BICALC(JJ)
+          CHIADD = DELI*WTIJ(IK)*DELJ
+          CHIVAL = CHIVAL + CHIADD
+        ENDDO
+        CHIVAL = CHIVAL/FLOAT(NumOfRef-2)
+      ENDIF
 
       END SUBROUTINE VALCHI
 !

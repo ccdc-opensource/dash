@@ -274,9 +274,11 @@
       INTEGER                                           nPeaksFound
       COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
 
-      INTEGER         nwidth
-      REAL                    rwidth, SqrtCorrObs, DummyESD
-      COMMON / RENE / nwidth, rwidth, SqrtCorrObs, DummyESD(1:MOBS)
+      LOGICAL         UseRene, UseESD
+      INTEGER                          nwidth
+      REAL                                     width, minstep, rwidth, SqrtCorrObs 
+      LOGICAL                                                                       InPeak
+      COMMON / RENE / UseRene, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
 
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
@@ -286,9 +288,17 @@
       INTEGER iRed, iGreen, iBlue, iRGBvalue
       REAL    UM, TH
 
-      DummyESD = 1.0
 ! The initialisations should be split up into 'one off initialisations' (at the start up
 ! of DASH only) and 'whenever a new project file is opened'
+      CALL WDialogSelect(IDD_SA_input3_2)
+      width = 0.0
+      CALL WDialogPutReal(IDF_Width, width, '(F7.3)')
+      minstep = 0.02
+      CALL WDialogPutReal(IDF_MinStep, minstep, '(F7.3)')
+      UseRene = .FALSE.
+      CALL WDialogPutCheckBoxLogical(IDC_UseRene, UseRene)
+      UseESD = .TRUE.
+      CALL WDialogPutCheckBoxLogical(IDC_UseESD, UseESD)
       DO I = 1, MVAR
         ModalFlag(I) = 1
       ENDDO
