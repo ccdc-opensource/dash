@@ -21,17 +21,17 @@ C
 c
 C>> JCC Now Cell/lattice declarations in an include file
       INCLUDE 'Lattice.inc'
-	INCLUDE 'GLBVAR.INC' ! Contains ALambda
+      INCLUDE 'GLBVAR.INC' ! Contains ALambda
 
       parameter (msymmin=10)
       character*20 symline
-	common /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
+      common /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
       character*80 ticfile
 C>> JCC Added declaration
-	LOGICAL Check_TicMark_Data
-	LOGICAL FnWavelengthOK ! Function
-	REAL    WavelengthOf ! Function
-	INTEGER TicRead
+      LOGICAL Check_TicMark_Data
+      LOGICAL FnWavelengthOK ! Function
+      REAL    WavelengthOf ! Function
+      INTEGER TicRead
 C
 !      write(76,*) ' Space group number         : ',SGNumStr(IPosSg)
 !      write(76,*) ' Space Group (IT tables)    : ',SGHMaStr(IPosSg)
@@ -50,7 +50,7 @@ C>> we try to add any tick marks in the GUI.
 C>> Now call fuller checking function
 
 
-	IF (.NOT. Check_TicMark_Data()) RETURN
+      IF (.NOT. Check_TicMark_Data()) RETURN
 C 
       open(42,file='polyf.ccl',status='unknown')
       write(42,4210) 
@@ -60,9 +60,8 @@ C
       write(42,4230) 
  4230 format('F C 2 2.31 20.8439 1.02 10.2075 ',
      &'1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0')
-	IPosSG = NumberSGTable
-      if (IPosSG.ge.1) then
-        call DecodeSGSymbol(SGShmStr(IPosSg))
+      if (NumberSGTable.ge.1) then
+        call DecodeSGSymbol(SGShmStr(NumberSGTable))
         if (nsymmin.gt.0) then
           do isym=1,nsymmin
             write(42,4235) symline(isym)
@@ -78,10 +77,10 @@ C
       write(42,4245) xpmin,xpmax
  4245 format('L RTYP    2 ',2f10.3,'   0.001')
       IF (.NOT. FnWavelengthOK()) ALambda = WavelengthOf('Cu')
-	WRITE(42,4250) ALambda
+      WRITE(42,4250) ALambda
  4250 FORMAT('L WVLN ',F10.5)
       IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint=0.0
-	WRITE(42,4260) zeropoint
+      WRITE(42,4260) zeropoint
  4260 FORMAT('L ZERO ',F10.5)
       WRITE(42,4270) 
  4270 FORMAT('L SCAL   0.10000'/
@@ -104,8 +103,8 @@ c
 C>> JCC Was
 C      call Load_Tic_File(9,ticfile)
 C>> Now
-	TicRead =  Load_Tic_File(9,ticfile)
-	IF (TicRead .EQ. 1) CALL Profile_Plot(IPTYPE)
+      TicRead =  Load_Tic_File(9,ticfile)
+      IF (TicRead .EQ. 1) CALL Profile_Plot(IPTYPE)
 
       END
 C
@@ -117,8 +116,20 @@ C
       EXTERNAL PCCN01,PFCN03,DUMMY,CALPR
       COMMON /GLOBAL/NINIT,NBATCH,NSYSTM,MULFAS,MULSOU,MULONE
       DIMENSION ALSQ(100000)
+	LOGICAL SDREAD
       COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),
      & ICDN(26,9),IERR,IO10,SDREAD
+
+!U    COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),
+!U   & ICDN(26,9),IERR,IO10,SDREAD
+!U    LOGICAL SDREAD
+!U    DIMENSION INREAD(26),ICDNO(26)
+!U    EQUIVALENCE (INREAD(1),INREA(1,1))
+!U    EQUIVALENCE (ICDNO(1),ICDN(1,1))
+
+
+
+
       common/iounit/lpt,iti,ito,iplo,luni,iout
       integer matsz
       character*6 xxx
@@ -135,21 +146,21 @@ C
 !
 !*****************************************************************************
 !
-	LOGICAL FUNCTION Check_TicMark_Data
+      LOGICAL FUNCTION Check_TicMark_Data
 
-	COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,
+      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,
      &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, 
      &XGGMIN,XGGMAX,YGGMIN,YGGMAX
 
-	LOGICAL FnUnitCellOK ! Function
-	LOGICAL FnWaveLengthOK ! Function
+      LOGICAL FnUnitCellOK ! Function
+      LOGICAL FnWaveLengthOK ! Function
 c
-	Check_TicMark_Data = (XPMAX - XPMIN) . GT. 0.1 ! Check that we have some data
-	Check_TicMark_Data = Check_TicMark_Data .AND. 
+      Check_TicMark_Data = (XPMAX - XPMIN) . GT. 0.1 ! Check that we have some data
+      Check_TicMark_Data = Check_TicMark_Data .AND. 
      & FnUnitCellOK() .AND. FnWaveLengthOK()
-	RETURN
+      RETURN
 
-	END FUNCTION Check_TicMark_Data
+      END FUNCTION Check_TicMark_Data
 !
 !*****************************************************************************
 !
