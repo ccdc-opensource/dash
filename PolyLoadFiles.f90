@@ -303,6 +303,7 @@
       NoData = .FALSE.
       CALL Clear_PeakFitRanges
 !      CALL Profile_Plot
+      CALL sa_SetOutputFiles(TheFileName)
       CALL ScrUpdateFileName
 !      CALL FourierPattern(1,1000)
 

@@ -436,7 +436,7 @@
       INTEGER iR, i
       REAL    PrfPar, prfcor, csqa, ssqa
 
-      PrfPar = X(iPrfPar) ! current value of the extent of the preferred orientation
+      PrfPar = SNGL(X(iPrfPar)) ! current value of the extent of the preferred orientation
       DO iR = 1, NumOfRef
         prfcor = 0.0
         DO i = 1, iHMUL(iR)
