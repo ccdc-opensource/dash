@@ -10,6 +10,7 @@
       USE PO_VAR
       USE ZMVAR
       USE SOLVAR
+      USE RRVAR
 
       IMPLICIT NONE
 
@@ -112,7 +113,12 @@
       REAL XP(MVAR)
       REAL xtem, tempupper, templower, tempupper2, templower2
       REAL Sgn
+      LOGICAL Use_Sharpen
+      REAL ITFRange ! For blurring when using Sharpen
+      REAL Initial_T ! As calculated during intial run, not as set by the user.
 
+      Use_Sharpen = .FALSE.
+      ITFRange = 10.0 ! I.e. ITF runs from 50.0 -> 1.0
       NumParPerTrial = 1
       TotNumTrials = 0
       TotNumRetrials = 0
@@ -174,6 +180,8 @@
         IF (RULB(I) .GT. 1.0E-3) THEN
 ! NPAR is the number of parameters that are allowed to vary (i.e., not fixed)
 ! so in a way, NPAR is the number of parameters that are parameters.
+! Note that confusingly enough, in the CCSL code the definitions of "parameter" and "variable"
+! is the opposite way round.
           NPAR = NPAR + 1
           IP(NPAR) = I
         ENDIF
@@ -231,13 +239,13 @@
       CALL WDialogSelect(IDD_Summary)
       CALL WGridRows(IDF_SA_Summary, Curr_SA_Run)
       WRITE(RowLabelStr,'(I2)') Curr_SA_Run
-      CALL WGridLabelRow(IDF_SA_summary,Curr_SA_Run,RowLabelStr)
-      CALL WGridPutCellInteger (IDF_SA_Summary,1,Curr_SA_Run,NumOf_SA_Runs+1) 
-      CALL WGridPutCellCheckBox(IDF_SA_Summary,3,Curr_SA_Run,1)
-      CALL WGridPutCellReal    (IDF_SA_Summary,4,Curr_SA_Run,CHIPROBEST,'(F7.2)')
-      CALL WGridPutCellReal    (IDF_SA_Summary,5,Curr_SA_Run,FOPT,'(F7.2)')
-      CALL WDialogPutInteger(IDF_Limit1,1)
-      CALL WDialogPutInteger(IDF_Limit2,Curr_SA_Run)
+      CALL WGridLabelRow(IDF_SA_summary, Curr_SA_Run, RowLabelStr)
+      CALL WGridPutCellInteger (IDF_SA_Summary,1,Curr_SA_Run, NumOf_SA_Runs+1) 
+      CALL WGridPutCellCheckBox(IDF_SA_Summary,3,Curr_SA_Run, 1)
+      CALL WGridPutCellReal    (IDF_SA_Summary,4,Curr_SA_Run, CHIPROBEST, '(F7.2)')
+      CALL WGridPutCellReal    (IDF_SA_Summary,5,Curr_SA_Run, FOPT, '(F7.2)')
+      CALL WDialogPutInteger(IDF_Limit1, 1)
+      CALL WDialogPutInteger(IDF_Limit2, Curr_SA_Run)
       PrevRejected = .TRUE.
 ! Plot the profile
       CALL Profile_Plot
@@ -252,6 +260,16 @@
 ! ##########################################
   100 CONTINUE
       Curr_SA_Iteration = Curr_SA_Iteration + 1
+      IF (Use_Sharpen) THEN
+        IF (MAKET0) THEN
+          RR_ITF = 1.0 !ITFRange
+        ELSE
+          RR_ITF = MAX(1.0, (T/(100.0*Initial_T)) * (ITFRange-1.0) + 1.0)
+        ENDIF
+        CALL CreateFobITF
+        CALL FCN(X,F,0)
+        CALL FCN(XOPT,FOPT,0)
+      ENDIF
       NUP = 0
       NREJ = 0
       NDOWN = 0
@@ -524,6 +542,7 @@
       IF (MAKET0) THEN
 ! Start temperature increased by 50% as asked for
         T = FPSD*1.5
+        Initial_T = T
 ! Having done an SA cycle at T = 100000, the initial values are now randomised.
 ! If the user had requested the values supplied to be used, reset them.
         CALL MAKXIN(nvar)
@@ -544,7 +563,7 @@
       CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
 !  Check termination criteria.
 !  Terminate SA if appropriate.
-      IF (CheckTerm(NTOTMOV, CHIPROBEST) .OR. (iMyExit .NE. 0)) THEN
+      IF (CheckTerm(NTOTMOV) .OR. (iMyExit .NE. 0)) THEN
 ! End of a run in a multi-run. This is the place for a final local minimisation
         NumOf_SA_Runs = Curr_SA_Run
 ! Get AutoLocalMinimisation from the Configuration Window
@@ -792,12 +811,13 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION CheckTerm(Nmoves,BestProChiSq)
+      LOGICAL FUNCTION CheckTerm(Nmoves)
 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: Nmoves
-      REAL,    INTENT (IN   ) :: BestProChiSq
+
+      INCLUDE 'PARAMS.INC'
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -806,7 +826,23 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      CheckTerm = ((Nmoves.GT.MaxMoves) .OR. (BestProChiSq.LT.(ChiMult*PAWLEYCHISQ)))
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
+      REAL             XOPT,       C,       FOPT
+      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
+
+      REAL             CHIPROBEST
+      COMMON /PLTSTO2/ CHIPROBEST
+
+      REAL Best_CHI
+
+      IF (Is_SX) THEN
+        Best_CHI = FOPT
+      ELSE
+        Best_CHI = CHIPROBEST
+      ENDIF
+      CheckTerm = ((Nmoves .GT. MaxMoves) .OR. (Best_CHI .LT. (ChiMult*PAWLEYCHISQ)))
 
       END FUNCTION CheckTerm
 !
