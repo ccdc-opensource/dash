@@ -282,6 +282,7 @@
       DOUBLE PRECISION dcel(6)
       INTEGER I, II, KK, ifrg
 
+      CALL PushActiveWindowID
       DO I = 1, 6
         dcel(I) = DBLE(CellPar(I))
       ENDDO
@@ -348,6 +349,7 @@
         prevub(i) = ub(i)
         prevlb(i) = lb(i)
       ENDDO
+      CALL PopActiveWindowID
 
       END SUBROUTINE SA_Parameter_Set
 !
