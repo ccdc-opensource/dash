@@ -147,7 +147,7 @@
       END IF
       ZmStateChanged = .TRUE.
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
-      DO                   ! Loop until user terminates
+      DO WHILE (.TRUE.)                  ! Loop until user terminates
 ! Let's check the z-matrix check boxes
         IF (ZmStateChanged) THEN
           DO II = 1, 5
@@ -296,7 +296,7 @@
 !.. We are now on window number 2
  444  CALL WDialogSelect(IDD_SA_input2)
       CALL WDialogShow(IXPos_IDD_SA_Input,IYPos_IDD_SA_Input,0,Modeless)
-      DO                                 ! Loop until user terminates
+      DO WHILE (.TRUE.)                                ! Loop until user terminates
         CALL GetEvent
         SELECT CASE (EventType)
 !.. Interact with the main window and look at the Pawley refinement...
@@ -313,7 +313,8 @@
 ! Go back to the 1st window
 !>> JCC Check if the limits have changed and warn about it 
                 IF (LimsChanged) THEN
-                  IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
+                  IF (Confirm("Note: Going back will erase the edits made to the current parameters,'//&
+                  &' overwrite changes?")) LimsChanged = .FALSE.
                 END IF
                 IF (.NOT. LimsChanged) THEN
                   IXPos_IDD_SA_Input = WInfoDialog(6)
@@ -450,7 +451,7 @@
       CALL WDialogPutTrackbar(IDF_SA_NT_trackbar,IPOS)
       NMoves = NT * NS * NVAR
       CALL WDialogPutInteger(IDF_SA_Moves,NMoves)
-      DO                                 ! Loop until user terminates
+      DO WHILE (.TRUE.)                                ! Loop until user terminates
         CALL GetEvent
         SELECT CASE (EventType)
 !.. Interact with the main window and look at the Pawley refinement...
@@ -601,6 +602,7 @@
 !>> JCC Handle via the PDB standard
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
+
       INTEGER ioptb,iopta,ioptt,iz1,iz2,iz3
       COMMON /zmcomi/ ntatm,natoms(maxfrg),&
         ioptb(maxatm,maxfrg),iopta(maxatm,maxfrg),ioptt(maxatm,maxfrg),&

@@ -24,7 +24,7 @@
         
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
       CALL WDialogShow(-1,-1,0,Modeless)
-      DO
+      DO WHILE (.TRUE.)
         CALL GetEvent
         SELECT CASE (EventType)
 ! will close the profile plot window
