@@ -142,7 +142,7 @@
               iFlags = LoadDialog + PromptOn + DirChange + AppendExt
               FilterStr = "All files (*.*)|*.*|"//&
                           "Z-matrix files (*.zmatrix)|*.zmatrix|"//&
-                          "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"
+                          "Molecular model files|*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"
               iSelection = 2
               CALL WSelectFile(FilterStr, iFlags, tFileName,'Load Z-matrix file',iSelection)
 ! Did the user press cancel?
@@ -167,10 +167,6 @@
                   gotzmfile(iFrg) = .TRUE.
 ! Initialise 'Number of' field to 1
                   CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
-                  zmInitialQs(0,iFrg) = 1.0
-                  zmInitialQs(1,iFrg) = 0.0
-                  zmInitialQs(2,iFrg) = 0.0
-                  zmInitialQs(3,iFrg) = 0.0
 ! JCC traps for Z-matrix reading
                 ELSE 
                   gotzmfile(iFrg) = .FALSE. 
@@ -1232,14 +1228,11 @@
 
       INCLUDE 'PARAMS.INC'
 
-      DOUBLE PRECISION x,lb,ub,vm,xpreset
+      DOUBLE PRECISION x,lb,ub,vm
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
 
       DOUBLE PRECISION prevub, prevlb ! For saving the previous range
       COMMON /pvalues/ prevub(mvar), prevlb(mvar)
-      COMMON /presetr/ xpreset(mvar)
-      LOGICAL log_preset
-      COMMON /presetl/ log_preset
 
       DOUBLE PRECISION T0, rt
       COMMON /saparl/  T0, rt

@@ -654,12 +654,13 @@
         IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
         iFlags = LoadDialog + DirChange + AppendExt
         FilterStr = "All files (*.*)|*.*|"//&
-                    "Molecular model files|*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"//&
-                    "Protein DataBank files (*.pdb)|*.pdb|"//&
-                    "Mol2 files (*.mol2, *.ml2)|*.mol2;*.ml2|"//&
-                    "mdl mol files|*.mol;*.mdl|"//&
-                    "SHELX files (*.res)|*.res|"//&
-                    "cssr files (*.cssr)|*.cssr|"
+                    "Molecular model files|*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"
+!O                    "CIF files (*.cif)|*.cif|"//&
+!O                    "Protein DataBank files (*.pdb)|*.pdb|"//&
+!O                    "Mol2 files (*.mol2, *.ml2)|*.mol2;*.ml2|"//&
+!O                    "mdl mol files|*.mol;*.mdl|"//&
+!O                    "SHELX files (*.res)|*.res|"//&
+!O                    "cssr files (*.cssr)|*.cssr|"
         iSelection = 2
         tFileName = ''
         CALL WSelectFile(FilterStr, iFlags, tFileName,"Select a file for conversion",iSelection)
@@ -723,6 +724,8 @@
       ExtensionStr = tInputFile(iPos+1:iLen)
       CALL ILowerCase(ExtensionStr)
       SELECT CASE (ExtensionStr)
+        CASE ('cif ')
+          fmt = '-cif'
         CASE ('cssr')
           IF (CSSR2Mol2(tInputFile) .NE. 1) RETURN
 ! Replace 'cssr' by 'mol2'
