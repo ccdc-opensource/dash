@@ -1,4 +1,4 @@
-! Winteracter module created : 18/Oct/2001 17:41:03
+! Winteracter module created : 24/Oct/2001 21:02:03
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -146,9 +146,8 @@
           INTEGER, PARAMETER :: IDD_PW_Page1                    =   122
           INTEGER, PARAMETER :: IDD_PW_Page2                    =   123
           INTEGER, PARAMETER :: IDF_PW_Data_Group               =  1239
-          INTEGER, PARAMETER :: IDF_PW_Data_fFilename           =  1200
+          INTEGER, PARAMETER :: IDF_PW_Data_Filename            =  1143
           INTEGER, PARAMETER :: IDF_PW_DataFileName_String      =  1201
-          INTEGER, PARAMETER :: ID_PW_DF_Browse                 =  1202
           INTEGER, PARAMETER :: IDF_WelcomeWizard               =  1203
           INTEGER, PARAMETER :: IDF_PW_Option1                  =  1199
           INTEGER, PARAMETER :: IDF_PW_Logo1                    =  1204
@@ -162,19 +161,8 @@
           INTEGER, PARAMETER :: IDF_PW_bet_latt_label           =  1225
           INTEGER, PARAMETER :: IDF_PW_c_latt_label             =  1228
           INTEGER, PARAMETER :: IDF_PW_gam_latt_label           =  1229
-          INTEGER, PARAMETER :: IDF_PW_Source_Group             =  1234
-          INTEGER, PARAMETER :: IDF_PW_LabX_Source              =  1235
-          INTEGER, PARAMETER :: IDF_PW_SynX_Source              =  1236
-          INTEGER, PARAMETER :: IDF_PW_CWN_Source               =  1237
-          INTEGER, PARAMETER :: IDF_PW_TOF_source               =  1238
-          INTEGER, PARAMETER :: IDF_PW_CW_group                 =  1240
-          INTEGER, PARAMETER :: IDF_PW_wavelength1              =  1243
           INTEGER, PARAMETER :: IDF_PW_radiation_label          =  1245
-          INTEGER, PARAMETER :: IDF_PW_TOF_group                =  1247
           INTEGER, PARAMETER :: IDF_PW_Flight_Path_Label        =  1248
-          INTEGER, PARAMETER :: IDF_PW_flight_path              =  1249
-          INTEGER, PARAMETER :: IDF_PW_2theta_label             =  1250
-          INTEGER, PARAMETER :: IDF_PW_2theta0                  =  1251
           INTEGER, PARAMETER :: IDD_PW_Page3                    =   124
           INTEGER, PARAMETER :: IDF_PWa_Data_Group              =  1261
           INTEGER, PARAMETER :: IDF_PWa_Data_fFilename          =  1262
@@ -259,7 +247,6 @@
           INTEGER, PARAMETER :: IDD_Parameter_Status            =   136
           INTEGER, PARAMETER :: IDD_Anneal_Status               =   138
           INTEGER, PARAMETER :: IDD_Profile_Status              =   139
-          INTEGER, PARAMETER :: IDF_SA1_cancel                  =  1178
           INTEGER, PARAMETER :: IDF_Viewer                      =  1514
           INTEGER, PARAMETER :: IDD_DIALOG001                   =   132
           INTEGER, PARAMETER :: IDD_DIALOG002                   =   135
@@ -300,21 +287,14 @@
           INTEGER, PARAMETER :: IDB_ZMatrix_Browse3             =  1121
           INTEGER, PARAMETER :: IDB_ZMatrix_Browse4             =  1122
           INTEGER, PARAMETER :: IDB_ZMatrix_Browse5             =  1123
-          INTEGER, PARAMETER :: IDD_SA_input1                   =   119
           INTEGER, PARAMETER :: IDF_ZM_pars1                    =  1124
           INTEGER, PARAMETER :: IDF_ZM_pars2                    =  1125
           INTEGER, PARAMETER :: IDF_ZM_pars3                    =  1126
           INTEGER, PARAMETER :: IDF_ZM_pars4                    =  1127
           INTEGER, PARAMETER :: IDF_ZM_pars5                    =  1128
-          INTEGER, PARAMETER :: IDF_ZM_file_check1              =  1129
-          INTEGER, PARAMETER :: IDF_ZM_file_check2              =  1130
-          INTEGER, PARAMETER :: IDF_ZM_file_check3              =  1131
-          INTEGER, PARAMETER :: IDF_ZM_file_check4              =  1132
-          INTEGER, PARAMETER :: IDF_ZM_file_check5              =  1133
           INTEGER, PARAMETER :: IDF_ZM_file_label               =  1134
           INTEGER, PARAMETER :: IDF_ZM_allpars_label            =  1135
           INTEGER, PARAMETER :: IDD_SA_input2                   =   120
-          INTEGER, PARAMETER :: IDB_SA1_next                    =  1137
           INTEGER, PARAMETER :: IDD_TEMPLATE009                 =   141
           INTEGER, PARAMETER :: IDF_SA2_label                   =  1141
           INTEGER, PARAMETER :: IDD_SA_input3                   =   142
@@ -323,7 +303,6 @@
           INTEGER, PARAMETER :: IDF_SA_T0_trackbar              =  1147
           INTEGER, PARAMETER :: IDF_SA_Moves                    =  1158
           INTEGER, PARAMETER :: IDF_SA_NT_label                 =  1160
-          INTEGER, PARAMETER :: IDF_SA_RandomSeed3              =  1164
           INTEGER, PARAMETER :: IDF_SA_RandomSeed2              =  1165
           INTEGER, PARAMETER :: IDD_SA_Action1                  =   143
           INTEGER, PARAMETER :: IDF_SA_Simplex_Button           =  1166
@@ -344,7 +323,6 @@
           INTEGER, PARAMETER :: IDF_TBarGroup1                  =  1190
           INTEGER, PARAMETER :: IDF_SA_move_type2               =  1196
           INTEGER, PARAMETER :: IDF_SA_move_type3               =  1197
-          INTEGER, PARAMETER :: IDF_clear_zmatrix               =  1294
           INTEGER, PARAMETER :: IDF_Data_Download               =  1043
           INTEGER, PARAMETER :: ID_PWa_DF_Open                  =  1047
           INTEGER, PARAMETER :: ID_Index_Output                 =  1295
@@ -406,12 +384,7 @@
           INTEGER, PARAMETER :: IDF_Pawley_ErrorLog_intro3      =  1371
           INTEGER, PARAMETER :: ID_Edit_PawleyLog               =  1372
           INTEGER, PARAMETER :: IDF_SA_ChiTest                  =  1378
-          INTEGER, PARAMETER :: IDD_SA_Multi_Completed          =   158
-          INTEGER, PARAMETER :: IDD_TEMPLATE010                 =   159
-          INTEGER, PARAMETER :: IDF_SA_Solution_Grid            =  1379
           INTEGER, PARAMETER :: IDF_SA_Input3_termhead          =  1380
-          INTEGER, PARAMETER :: IDF_SA_Completed_Picture        =  1381
-          INTEGER, PARAMETER :: IDF_SA_Completed_label          =  1382
           INTEGER, PARAMETER :: IDF_SA_ChiTest_Label            =  1377
           INTEGER, PARAMETER :: IDD_SA_RunLabel                 =  1383
           INTEGER, PARAMETER :: ID_Tutorial_1                   = 40038
@@ -499,4 +472,7 @@
           INTEGER, PARAMETER :: IDD_PW_Page8                    =   150
           INTEGER, PARAMETER :: IDF_LABEL19                     =  1297
           INTEGER, PARAMETER :: IDD_DIALOG006                   =   152
+          INTEGER, PARAMETER :: IDD_PW_Page6a                   =   119
+          INTEGER, PARAMETER :: IDF_RADIO3                      =  1129
+          INTEGER, PARAMETER :: IDF_RADIO4                      =  1130
       END MODULE Druid_Header
