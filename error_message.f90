@@ -49,12 +49,10 @@
 	  call pcxx(2)
 	  armx=argk+aadd
 	  ii=1
-!	  WRITE(76,*) II,ARMX
   	  do while ((zargi(ii) .LT. armx) .AND. (ii .LE. MPPTS))
 	    ii=ii+1
 	  end do
 	  npts=min(npts,ii)
-!	  WRITE(76,*) II,npts,maxk,ARMX
 	  if (aadd.ne.0.0) argmax(1)=armx
 !
 	END
