@@ -134,24 +134,23 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      INTEGER IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
 
-!C>> JCC data to indicate whether we are coming out of peak-fitting mode
+      INTEGER          IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+      COMMON /PROFIPM/ IPMIN, IPMAX, IPMINOLD, IPMAXOLD
+
+! JCC data to indicate whether we are coming out of peak-fitting mode
 !U      LOGICAL FromPeakFit
       LOGICAL Confirm ! Function
       REAL xpgdif, ypgdif
       INTEGER ISTAT
       INTEGER DiffractionFileBrowse ! Function
 
-!
 !   Branch depending on chosen menu item
-!
+
  10   CALL WCursorShape(CurCrossHair)
       STATBARSTR(8)=' '
       CALL WindowOutStatusBar(8,STATBARSTR(8))
@@ -171,6 +170,11 @@
           CALL WDialogSelect(IDD_Plot_Option_Dialog)
           CALL WDialogShow(-1,-1,0,Modeless)
           CALL PopActiveWindowID
+        CASE (ID_Configuration)
+          CALL PushActiveWindowID
+          CALL WDialogSelect(IDD_Configuration)
+          CALL WDialogShow(-1,-1,0,Modeless)
+          CALL PopActiveWindowID
         CASE (ID_Peak_Fitting_Mode)
           CALL SelectMode(ID_Peak_Fitting_Mode)
         CASE (ID_Pawley_Refinement_Mode)
@@ -179,7 +183,8 @@
                               'Do you wish to continue?')) RETURN
           END IF
           CALL SelectMode(ID_Pawley_Refinement_Mode)
-          CALL Quick_Pawley()
+!O          CALL Quick_Pawley()
+          CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)
           CALL SA_Main()
         CASE (ID_get_crystal_symmetry)
@@ -446,6 +451,10 @@
       CALL IOsDeleteFile('polyp.dat')
       CALL IOsDeleteFile('polys.ccl')
       CALL IOsDeleteFile('polys.lis')
+      CALL IOsDeleteFile('polyp.pbk')
+      CALL IOsDeleteFile('polyp.tbk')
+      CALL IOsDeleteFile('polyp.hbk')
+      CALL IOsDeleteFile('polyp.hbl')
       CALL IDebugLevel(DbgMsgBox)
 
       END SUBROUTINE DeleteTempFiles

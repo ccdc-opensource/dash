@@ -180,7 +180,8 @@
       CALL Generate_TicMarks()
       IF (NVal .LE. NDD+2) RETURN
 !.. Now attempt a quick Pawley refinement
-      CALL Quick_Pawley()                     
+!O      CALL Quick_Pawley()                     
+      CALL ShowPawleyFitWindow
 
       END SUBROUTINE RefineLattice
 !
