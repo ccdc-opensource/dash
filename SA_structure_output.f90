@@ -604,6 +604,7 @@
 !N NI and NJ must be at least 1
 !
       REAL*8 A(NI,NJ), B(NI,NJ)
+
       DO I = 1, NI
         DO J = 1, NJ
           B(I,J) = A(I,J)
@@ -616,9 +617,13 @@
 !
       SUBROUTINE PDB_SymmRecords()
 
-      PARAMETER (msymmin=10)
-      CHARACTER*20 symline
-      COMMON /symgencmn/ nsymmin, symmin(4,4,msymmin), symline(msymmin)
+      INTEGER     msymmin
+      PARAMETER ( msymmin = 10 )
+      INTEGER            nsymmin
+      REAL                        symmin
+      CHARACTER*20                                           symline
+      COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
+
       CHARACTER*50 stout
 
       PARAMETER (mpdbops=192)
@@ -677,7 +682,6 @@
           m = m + 1
         ENDDO
         cpdbops(k) = stout(m:20)
-
       ENDDO
 
       END SUBROUTINE PDB_SYMMRECORDS
