@@ -115,9 +115,42 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithMainWizardWindow')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithMainWizardWindow
+!
+!*****************************************************************************
+!
+      SUBROUTINE WizardApplyFinish_1
+!
+! This subroutine deals with the Finish button of the first series of wizard windows:
+!
+! Load file -> ( diffraction setup -> ) truncate start/end -> { excluded regions -> } Background
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER(MaxPathLength) CTEMP
+      INTEGER ISTAT
+      INTEGER DiffractionFileLoad ! Function
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page3)
+      CALL WDialogGetString(IDF_PWa_DataFileName_String,CTEMP)
+      CALL PopActiveWindowID
+      ISTAT = DiffractionFileLoad(CTEMP)
+! Should never fail: the finish button can only be ungreyed if we have loaded this pattern 
+! before. Even if it fails, the pattern should still be in memory.
+! This only fails if the user went '<Back' and 'Next>' through the windows applying
+! truncation and background.
+      IF (ISTAT .NE. 1) CALL ErrorMessage('Could not load powder diffraction pattern.')
+      CALL WizardApplyProfileRange
+      CALL WizardApplyBackground
+      CALL EndWizard
+
+      END
 !
 !*****************************************************************************
 !
@@ -132,7 +165,7 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
 
-      CHARACTER(LEN=MaxPathLength) CTEMP
+      CHARACTER(MaxPathLength) CTEMP
       INTEGER ISTAT
       INTEGER DiffractionFileBrowse ! Function
       INTEGER DiffractionFileOpen ! Function
@@ -144,10 +177,7 @@
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
-              CALL WizardApplyProfileRange
-! Subtract the background
-              CALL WizardApplyBackground
-              CALL EndWizard
+              CALL WizardApplyFinish_1
             CASE (IDCANCEL)
               CALL EndWizard
             CASE (IDBACK)
@@ -190,7 +220,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithWizardWindowDiffractionFileInput')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithWizardWindowDiffractionFileInput
 !
@@ -220,10 +249,7 @@
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
-              CALL WizardApplyProfileRange
-! Subtract the background
-              CALL WizardApplyBackground
-              CALL EndWizard
+              CALL WizardApplyFinish_1
             CASE (IDCANCEL)
               CALL EndWizard
             CASE (IDBACK)
@@ -260,7 +286,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithWizardWindowDiffractionFileInput')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithWizardWindowDiffractionSetup
 !
@@ -324,10 +349,7 @@
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
-              CALL WizardApplyProfileRange
-! Subtract the background
-              CALL WizardApplyBackground
-              CALL EndWizard
+              CALL WizardApplyFinish_1
             CASE (IDCANCEL)
               CALL EndWizard
             CASE (IDBACK)
@@ -337,6 +359,7 @@
               CALL WDialogSelect(IDD_PW_Page4)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDNEXT)
+              CALL WizardApplyProfileRange
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
@@ -345,7 +368,7 @@
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
             CASE DEFAULT
-              CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowDiffractionFileInput 1')
+              CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowProfileRange 1')
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -377,10 +400,9 @@
               CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
           END SELECT
         CASE DEFAULT
-          CALL DebugErrorMessage('Forgot to handle event in DealWithWizardWindowDiffractionFileInput')
+          CALL DebugErrorMessage('Forgot to handle event in DealWithWizardWindowProfileRange')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithWizardWindowProfileRange
 !
@@ -436,10 +458,7 @@
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
-              CALL WizardApplyProfileRange
-! Subtract the background
-              CALL WizardApplyBackground
-              CALL EndWizard
+              CALL WizardApplyFinish_1
             CASE (IDCANCEL)
               CALL EndWizard
             CASE (IDBACK)
@@ -465,7 +484,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithWizardWindowDiffractionFileInput')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithWizardWindowBackground
 !
@@ -539,7 +557,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithWizardWindowUnitCellParameters')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithWizardWindowUnitCellParameters
 !
@@ -606,7 +623,6 @@
           CALL DebugErrorMessage('Forgot to handle event in DealWithWizardWindowDiffractionSetup')
       END SELECT
       CALL PopActiveWindowID
-      RETURN
 
       END SUBROUTINE DealWithWizardWindowDiffractionSetup2
 !
