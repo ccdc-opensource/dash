@@ -35,6 +35,9 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
+      LOGICAL           Resume_SA
+      COMMON /RESUMESA/ Resume_SA
+
       LOGICAL, EXTERNAL :: Get_AutoAlign
       INTEGER, EXTERNAL :: PrjSaveAs
       INTEGER IV, iRow, iStatus, iLimit1, iLimit2, tInteger, iOption, iDummy
@@ -108,19 +111,26 @@
               CALL UpdateOutputSolutionsWindow
             CASE (IDB_ShowOverlap)
               CALL SA_STRUCTURE_OUTPUT_OVERLAP(IDD_SAW_Page5)
+            CASE (IDB_Resume) ! Resumes the simulated annealing, appending the new runs to
+                              ! the existing runs
+              Resume_SA = .TRUE. ! Initialisation
+              CALL CloseOutputSolutionsChildWindows
+              CALL ShowWizardWindowParameterBounds
+              CALL PopActiveWindowID
+              RETURN
           END SELECT
         CASE (FieldChanged)
           CALL UpdateOutputSolutionsWindow
       END SELECT
-!ep allows you to view pdb file of SA Solutions, each clicked
+!ep Allows you to view pdb file of SA Solutions, each clicked
 !   check box in fresh mercury window
       DO iRow = 1, NumOf_SA_Runs
         CALL WGridGetCellCheckBox(IDF_SA_summary, 2, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
-! calls subroutine which opens Mercury window with .pdb file
+! Calls subroutine which opens Mercury window with .pdb file
           CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow))
           CALL ViewStructure('SA_best.pdb')
-! calls subroutine which plots observed diffraction pattern with calculated pattern
+! Calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(iRow)
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
           CALL PopActiveWindowID
@@ -1145,12 +1155,7 @@
 !*******************************************************************************
 !
       SUBROUTINE DealWithProfilePlot
-! ep July 2001 
-! Called from Begin_Sa subroutine.  Calls window which contains summary of
-! results from simulated annealing run.  Handles messages from the window.
-! Grid includes a "view" button which allows the user to view the molecular
-! model via Mercury and the profile data in a graph window
-!!April2002 Added Zoom functionality.  Still needs a bit of tidying....
+! April2002 Added Zoom functionality.  Still needs a bit of tidying....
       
       USE VARIABLES
 
@@ -1226,7 +1231,7 @@
       CALL WindowSelect(Ihandle)
       CALL WMessageEnable(MouseMove, Enabled)
       CALL WMessageEnable(MouseButUp, Enabled)
-! JCC Set the scale correctly. 
+! Set the scale correctly. 
       CALL IGrUnits(0.0, 0.0, 1.0, 1.0)
       CALL IPgArea(0.1,0.1,0.9,0.9)
       CALL IPgUnits(xmin(iHandle),ymin(iHandle),xmax(iHandle),ymax(iHandle))

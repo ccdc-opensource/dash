@@ -17,8 +17,14 @@
       INTEGER                                           Curr_Iter, MaxIterationSoFar
       REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
       LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
+
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER         nmpert, bmIHANDLE
       COMMON /sagdat/ nmpert, bmIHANDLE
@@ -27,6 +33,9 @@
       INTEGER                 Ix, Iy
       COMMON /WindowPosition/ Ix, Iy
       DATA Ix /10/, Iy /450/
+
+      LOGICAL           Resume_SA
+      COMMON /RESUMESA/ Resume_SA
 
       EXTERNAL DealWithChiSqdPlot
 
@@ -45,6 +54,11 @@
       CALL WDialogSelect(IDD_SAW_Page5)
       CALL WDialogFieldState(IDB_Prog3, Disabled)
       CALL PopActiveWindowID
+      IF (Resume_SA) THEN
+        RunStart = NumOf_SA_Runs
+      ELSE
+        RunStart = 0
+      ENDIF
       CALL plotting_Chi_sqd
 
       END SUBROUTINE OpenChiSqPlotWindow
@@ -68,8 +82,10 @@
       INTEGER                                           Curr_Iter, MaxIterationSoFar
       REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
       LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
 
       INTEGER J
 
@@ -168,8 +184,10 @@
       INTEGER                                           Curr_Iter, MaxIterationSoFar
       REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
       LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -278,17 +296,17 @@
 !
 !  Draw graph.
 !
-      IF (NumOf_SA_Runs .GT. 0) THEN
 ! Plot Chi-sqd values to maximum number of moves for completed SA runs
-        CALL IPgNewPlot(PgPolyLine,NumOf_SA_Runs,MaxIterationSoFar,0,1)
-        DO j = 1, NumOf_SA_Runs
+      IF ((NumOf_SA_Runs-RunStart) .GT. 0) THEN
+        CALL IPgNewPlot(PgPolyLine,NumOf_SA_Runs-RunStart,MaxIterationSoFar,0,1)
+        DO j = 1, NumOf_SA_Runs-RunStart
           CALL IPgStyle(  j,  0,  0,  0,  KolNumObs)
         ENDDO
-        DO ISET = 1, NumOf_SA_Runs
+        DO ISET = RunStart+1, NumOf_SA_Runs
           CALL IPgXYPairs(Xarray, Chi_sqd(1,ISET))
         ENDDO
       ENDIF
-! Plot Chi-sqd values iteration by iteration
+! Plot Chi-sqd values for current run iteration by iteration
       IF (Curr_Iter .GT. 1) THEN
         CALL IPgNewPlot(PgPolyLine,1,Curr_Iter,0,1)
         CALL IPgStyle(  1,  0,  0,  0,  KolNumCal)
@@ -330,8 +348,10 @@
       INTEGER                                           Curr_Iter, MaxIterationSoFar
       REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
       LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
 
       INTEGER         nmpert, bmIHANDLE
       COMMON /sagdat/ nmpert, bmIHANDLE
@@ -414,8 +434,10 @@
       INTEGER                                           Curr_Iter, MaxIterationSoFar
       REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
       LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
 
       INTEGER                    ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiHandle
@@ -505,8 +527,10 @@
       INTEGER                                           Curr_Iter, MaxIterationSoFar
       REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
       LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult

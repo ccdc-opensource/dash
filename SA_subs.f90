@@ -77,6 +77,9 @@
       LOGICAL                       NewOptimumFound, WasMinimised
       COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
 
+      LOGICAL           Resume_SA
+      COMMON /RESUMESA/ Resume_SA
+
       REAL, EXTERNAL :: EXPREP
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
@@ -108,11 +111,14 @@
       WasMinimised = .FALSE.
       NumParPerTrial = 1
       TotNumTrials = 0
-      Curr_SA_Run = 0
-      NumOf_SA_Runs = 0
-      DO I = 1, 99
-        iSol2Run(I) = I
-      ENDDO
+      IF (.NOT. Resume_SA) THEN
+        Curr_SA_Run = 0
+        NumOf_SA_Runs = 0
+        DO I = 1, 99
+          iSol2Run(I) = I
+        ENDDO
+      ENDIF
+      iSolTicked = 1
 ! Set up a random number generator store
 ! Use a quick and dirty one from NR
       CALL RANX2Init
@@ -170,6 +176,7 @@
           vm(kk) = 0.01
         ENDIF
       CALL OpenChiSqPlotWindow
+      Resume_SA = .FALSE.
 ! ####################################
 !   Starting point for multiple runs
 ! ####################################
