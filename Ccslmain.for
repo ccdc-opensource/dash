@@ -11383,7 +11383,6 @@ C
 C%
 C      CHARACTER*%FNAM% DEXT
       CHARACTER*100 DEXT
-      CHARACTER*18 VFMT
       CHARACTER*40 SAVMES
       CHARACTER*26 MESS(2)
       CHARACTER*32 WFMT
@@ -15165,61 +15164,8 @@ C
       END
 C
 C
-C
-C
-C LEVEL 1      SUBROUTINE QARRIN(N,K,F,DF,IEND)
-      SUBROUTINE QARRIN(N,K,F,DF,IEND)
-C
-C *** QARRIN DUMMY by JCM 17 Oct 85 ***
-C
-CX
-CC 2B
-CH In the library, simply a dummy routine.  If the user wishes some special
-CH new input format for "ARRNGE" type main programs, he provides a new
-CH version of QUARRIN.
-CA A replacement routine should set:
-CA N=serial number of next reflection
-CA K= h,k,l for next reflection
-CA F=observation
-CA DF=standard deviation
-CA IEND is a logical, set TRUE if there are no more reflections.
-C
-CD In ARRNGE and similar main programs, if in /ARRDAT/ IFOR(1)=0, it is
-CD expected that the user has included his own version of QUARRIN.
-C
-      LOGICAL IEND
-      RETURN
-      END
-C
-C
-C
-C
-C LEVEL 1      SUBROUTINE QLSQIN(K,IEND)
-      SUBROUTINE QLSQIN(K,IEND)
-C
-C *** QLSQIN DUMMY by JCM 17 Nov 84 ***
-C
-CX
-CC 6B
-CH In the library, simply a dummy routine.  If the user wishes some special
-CH new input format for Least Squares routines, he provides a new version
-CH QLSQIN.
-C
-CD Called if data input type 0 is specified.  The user's routine must set:
-CD   K(1:3) = h,k,l
-CD   LOGICAL IEND = TRUE if there are no more data,
-CD  and in /OBSCAL/, OBS=the observation, DOBS=its esd.
-C
-      LOGICAL IEND
-      DIMENSION K(3)
-      COMMON /IOUNIT/LPT,ITI,ITO,IPLO,LUNI,IOUT
-      COMMON /OBSCAL/OBS,DOBS,GCALC,YCALC,DIFF,ICODE,SUMWD,NOBS,
-     & IWGH(5),WTC(4),WT,SQRTWT,WDIFF,YBACK,YPEAK,YMAX,CSQTOT
-      EQUIVALENCE (IWGHT,IWGH(1))
-C
-      RETURN
-      END
-C
+
+
 C
 C
 C
