@@ -91,7 +91,7 @@
 !                      Each copy is identical (including occupancies / single axis) except for:
 !                      1. its translation x, y, z
 !                      2. its quaternions
-!                      3. its torsion angles
+!                      3. its torsion angles/valence angles/bond lengths
 
       LOGICAL          gotzmfile(0:maxfrg)
 
@@ -152,8 +152,8 @@
       INTEGER         iz1(1:maxatm,0:maxfrg), iz2(1:maxatm,0:maxfrg), iz3(1:maxatm,0:maxfrg)
 
 ! natoms = number of atoms in this fragment (=Z-matrix)
-! ioptb  = optimise bond length 1=YES, 0=NO. Not implemented.
-! iopta  = optimise valence angle 1=YES, 0=NO. Not implemented.
+! ioptb  = optimise bond length 1=YES, 0=NO.
+! iopta  = optimise valence angle 1=YES, 0=NO.
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
 ! iz1, iz2, iz3 = atoms with respect to which the current atom is defined in the Z-matrix
 
