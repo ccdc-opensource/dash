@@ -29,7 +29,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER*MaxPathLength, INTENT (IN   ) :: TheFileName
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
       INTEGER maxatom, maxbond, maxelm
       PARAMETER (maxatom=100, maxbond=100, maxelm=108)
@@ -174,7 +174,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER*MaxPathLength, INTENT (IN   ) :: TheFileName
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
       INTEGER maxatom, maxbond, maxelm
       PARAMETER (maxatom=100, maxbond=100, maxelm=108)
