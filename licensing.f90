@@ -419,7 +419,7 @@
       CHARACTER*5000 kString
       CHARACTER*4 NextLine
       CHARACTER*18 tDateStr
-      INTEGER tDate
+      INTEGER tDate, iOption
 
 ! Initialise to failure
       ShowLicenceAgreement = -7
@@ -427,67 +427,81 @@
 ! Convert expiry date to a string
       tDate = Info%Year*10000 + Info%Month*100 + Info%Day
       CALL Date2String(tDate,tDateStr)
-      kString = 'In order to install this evaluation version of DASH, you must first read and accept '// &
-                'the terms of the following licence agreement:'//NextLine// &
-                'DASH (the "Program") is a copyright work belonging to CCDC Software Limited ("CCDC").'// &
-                '  In consideration of the access to the Program granted you, you agree to install'// &
-                ' and use the Program solely in accordance with the following terms.'//NextLine// &
-                'You are permitted to install and to use a single copy of the Program and the'// &
-                ' documentation until '//tDateStr(1:LEN_TRIM(tDateStr))//' for the purpose of'// &
-                ' evaluating whether or not the software meets your requirements. Within 14 days'// &
-                ' of the end of such period you agree to delete all copies of the installed Program'// &
-                ' from your computers and storage systems.'//NextLine// &
-                'You may not supply, assign, transfer or sublicense (in whole or part) the Program'// &
-                ' to any third party as part of a commercial transaction or for any consideration,'// &
-                ' in money, money''s worth or otherwise, or free of charge.  The Program shall only'// &
-                ' be accessible to your employees.'//NextLine// &
-                'You may not bundle this Program together with any other software product or'// &
-                ' products without the prior written consent of CCDC.'//NextLine// &
-                'You may copy the Program only to the extent strictly necessary for backup'// &
-                ' purposes. Subject thereto or as otherwise expressly permitted by applicable'// &
-                ' law, you may not copy, reproduce, translate, adapt, decompile, modify,'// &
-                ' reverse engineer or disassemble the Program. You shall ensure at all times'// &
-                ' that all copies of the Programs made by you contain the copyright notice '// &
-                'issued by CCDC and contained in the Program.  You shall not amend or obscure'// &
-                ' this notice or any logos or trademarks of CCDC contained in the Program.'//NextLine// &
-                'THE PROGRAM IS SUPPLIED TO YOU WITHOUT CHARGE, AND ACCORDINGLY YOU AGREE'// &
-                ' THAT THE PROGRAM IS PROVIDED ON AN *AS IS* BASIS, AND NO REPRESENTATION'// &
-                ' IS MADE OR WARRANTY GIVEN, WHETHER WITH REGARD TO THE FUNCTIONALITY OR'// &
-                ' FITNESS FOR PURPOSE OF THE PROGRAM OR OTHERWISE, AND ALL SUCH REPRESENTATIONS'// &
-                ' AND WARRANTIES, WHETHER EXPRESSED OR IMPLIED (BY LAW OR OTHERWISE) ARE'// &
-                ' HEREBY EXCLUDED TO THE FULLEST EXTENT PERMITTED BY LAW. WITHOUT PREJUDICE'// &
-                ' TO THE FOREGOING IN NO EVENT SHALL CCDC BE LIABLE TO YOU, IN CONTRACT, IN'// &
-                ' TORT OR OTHERWISE, FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY OR'// &
-                ' CONSEQUENTIAL LOSS OR DAMAGE, INCLUDING, WITHOUT LIMITATION, ADMINISTRATION'// &
-                ' COSTS, LOSS OF BUSINESS AND GOODWILL, LOSS UNDER CURRENT AND FUTURE'// &
-                ' CONTRACTS, LOSS OF PROFIT OR OPPORTUNITY OR FINANCIAL LOSS OF ANY KIND'// &
-                ' ARISING IN ANY WAY OUT OF OR IN CONNECTION WITH YOUR USE OF THE PROGRAM.'//NextLine// &
-                'You agree to minimise any adverse effect of downloading and using the'// &
-                ' Program, including by keeping back up data and implementing adequate '// &
-                'disaster recovery procedures.  Accordingly, CCDC shall be in no manner'// &
-                ' liable for any effect which the Program may have on your data, software,'// &
-                ' hardware or other systems or products.'//NextLine// &
-                'The foregoing terms and conditions and any dispute in connection with'// &
-                ' them shall be governed by and construed in accordance with English law '// &
-                'and shall be subject to the exclusive jurisdiction of the English courts.'//NextLine// &
-                'If you agree to the foregoing terms and conditions then please click'// &
-                ' on the "Accept" button below. If you do not accept the foregoing terms'// &
-                ' and conditions you should not click on the "Accept" button but should'// &
-                ' click on the "Do NOT Accept" button below.'
+      kString = 'In order to run this evaluation version of DASH, you must first read and agree to the '// &
+                'terms of the following licence agreement:'//NextLine// &
+                'DASH (the "Program") is a copyright work belonging to CCDC Software Limited.  In '// &
+                'consideration of the access to the Program granted you, you agree to run and use the '// &
+                'Program solely in accordance with the following terms.'//NextLine// &
+                'You are permitted to run and to use the Program and the documentation for a period of 60'// &
+                ' days until '//tDateStr(1:LEN_TRIM(tDateStr))//' for the purpose of evaluating whether or not the software '// &
+                'meets your requirements. Within 14 days of the end of such period you agree to delete '// &
+                'all copies of the Program from your computers and storage systems.'//NextLine// &
+                'You may not supply, assign, transfer or sublicense (in whole or part) the Program to any'// &
+                ' third party as part of a commercial transaction or for any consideration, in money,'// &
+                ' money''s worth or otherwise, or free of charge.  The Program shall only be accessible'// &
+                ' to your employees.'//NextLine// &
+                'You may not bundle this Program together with any other software product or products'// &
+                ' without the prior written consent of CCDC Software Limited.'//NextLine// &
+                'You may copy the Program only to the extent strictly necessary for evaluation and'// &
+                ' back-up purposes. Subject thereto or as otherwise expressly permitted by applicable'// &
+                ' law, you may not copy, reproduce, translate, adapt, decompile, modify, reverse'// &
+                ' engineer or disassemble the Program. You shall ensure at all times that all'// &
+                ' copies of the Programs made by you contain the copyright notice issued by CCDC'// &
+                ' and contained in the Program.  You shall not amend or obscure this notice or'// &
+                ' any logos or trademarks of CCDC contained in the Program.'//NextLine// &
+                'THE PROGRAM IS SUPPLIED TO YOU WITHOUT CHARGE, AND ACCORDINGLY YOU AGREE THAT THE'// &
+                ' PROGRAM IS PROVIDED ON AN *AS IS* BASIS, AND NO REPRESENTATION IS MADE OR WARRANTY'// &
+                ' GIVEN, WHETHER WITH REGARD TO THE FUNCTIONALITY OR FITNESS FOR PURPOSE OF THE'// &
+                ' PROGRAM OR OTHERWISE, AND ALL SUCH REPRESENTATIONS AND WARRANTIES, WHETHER '// &
+                'EXPRESSED OR IMPLIED (BY LAW OR OTHERWISE) ARE HEREBY EXCLUDED TO THE FULLEST'// &
+                ' EXTENT PERMITTED BY LAW. WITHOUT PREJUDICE TO THE FOREGOING IN NO EVENT SHALL'// &
+                ' CCDC SOFTWARE LIMITED BE LIABLE TO YOU, IN CONTRACT, IN TORT OR OTHERWISE,'// &
+                ' FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY OR CONSEQUENTIAL LOSS OR DAMAGE,'// &
+                ' INCLUDING, WITHOUT LIMITATION, ADMINISTRATION COSTS, LOSS OF BUSINESS AND GOODWILL,'// &
+                ' LOSS UNDER CURRENT AND FUTURE CONTRACTS, LOSS OF PROFIT OR OPPORTUNITY OR FINANCIAL'// &
+                ' LOSS OF ANY KIND ARISING IN ANY WAY OUT OF OR IN CONNECTION WITH YOUR USE OF THE PROGRAM.'//NextLine// &
+                'You agree to minimise any adverse effect of downloading, installing and using the'// &
+                ' Program, including by keeping back-up data and implementing adequate disaster '// &
+                'recovery procedures.  Accordingly, CCDC Software Limited shall be in no manner '// &
+                'liable for any effect which the Program may have on your data, software, hardware'// &
+                ' or other systems or products.'//NextLine// &
+                'No amendment, variation or discharge of these terms and conditions is valid '// &
+                'unless accepted in writing by both parties.'//NextLine// &
+                'The failure of either party to exercise or enforce any rights under these terms'// &
+                ' and conditions shall not amount to a waiver of those rights.'//NextLine// &
+                'The illegality or invalidity of any part of these terms and conditions shall not'// &
+                ' affect the legality or validity of the remainder of them.'//NextLine// &
+                'These terms and conditions are not intended to confer rights on any third party,'// &
+                ' whether pursuant to the Contracts (Rights of Third Parties) Act 1999 or otherwise,'// &
+                ' and no third party shall have any right to enforce any provision of these terms'// &
+                ' and conditions.'//NextLine// &
+                'The foregoing terms and conditions and any dispute in connection with them shall be'// &
+                ' governed by and construed in accordance with English law and shall be subject to the'// &
+                ' exclusive jurisdiction of the English courts.'//NextLine// &
+                'If you agree to the foregoing terms and conditions then please select the "I'// &
+                ' have read the full text above and I Agree" option below. If you do not agree'// &
+                ' to the foregoing terms and conditions you should select the "I do NOT Agree"'// &
+                ' option below. After making your selection, please click OK to proceed.'
+
       CALL WDialogSelect(IDD_LicenceAgreement)
       CALL WDialogPutString(IDF_Agreement,kString)
-      CALL WDialogShow(-1,-1,ID_Licensing_Exit,SemiModeless)
+      CALL WDialogShow(-1,-1,0,SemiModeless)
       DO WHILE (.TRUE.)
         CALL GetEvent
         SELECT CASE (EventType)
           CASE (PushButton) ! one of the buttons was pushed
             SELECT CASE (EventInfo%VALUE1)
-              CASE (IDCANCEL, ID_Licensing_Exit)
+              CASE (IDCANCEL)
                 ShowLicenceAgreement = -7
                 CALL WDialogHide
                 RETURN
-              CASE (IDB_IAgree)
-                ShowLicenceAgreement = 0
+              CASE (IDOK)
+                CALL WDialogGetRadioButton(IDF_IDoNotAgree,iOption)
+                IF (iOption .EQ. 2) THEN
+                  ShowLicenceAgreement = 0
+                ELSE
+                  ShowLicenceAgreement = -7
+                ENDIF
                 CALL WDialogHide
                 RETURN
             END SELECT

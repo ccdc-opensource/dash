@@ -1,4 +1,4 @@
-! Winteracter module created : 23/Jan/2002 16:51:14
+! Winteracter module created : 26/Jan/2002 15:57:30
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -478,7 +478,7 @@
           INTEGER, PARAMETER :: IDF_CrystallographicCoM         =  1215
           INTEGER, PARAMETER :: IDF_Align                       =  1224
           INTEGER, PARAMETER :: IDF_Agreement                   =  1225
-          INTEGER, PARAMETER :: IDB_IAgree                      =  1228
+          INTEGER, PARAMETER :: IDF_IAgree                      =  1228
           INTEGER, PARAMETER :: IDD_SAW_Page2                   =   134
           INTEGER, PARAMETER :: IDF_PO_a                        =  1229
           INTEGER, PARAMETER :: IDF_PO_b                        =  1236
@@ -521,4 +521,5 @@
           INTEGER, PARAMETER :: IDF_BUTTON5                     =  1382
           INTEGER, PARAMETER :: IDF_BUTTON6                     =  1384
           INTEGER, PARAMETER :: IDB_Relabel                     =  1385
+          INTEGER, PARAMETER :: IDF_IDoNotAgree                 =  1386
       END MODULE Druid_Header
