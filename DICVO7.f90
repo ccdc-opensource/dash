@@ -498,7 +498,7 @@
           WRITE (iw,99002) Dir(1), Dir(2), Vol
 99002   FORMAT (//20X,'T E T R A G O N A L   S Y S T E M  '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,&
      &          'VOLUME=',F9.2)
-!          CALL AddDICVOLSolution(6,Dir(1),Dir(1),Dir(2),90.0,90.0,90.0)
+          CALL AddDICVOLSolution(6,Dir(1),Dir(1),Dir(2),90.0,90.0,90.0,Vol)
         ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99003) Ecart(1), Ecart(2)
 99003   FORMAT (6X,'STANDARD DEVIATIONS :',4X,F9.5,4X,F9.5,11X,F9.2)
@@ -508,7 +508,7 @@
           WRITE (iw,99004) Dir(1), Dir(2), Vol
 99004   FORMAT (//20X,'H E X A G O N A L    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,  &
      &          'VOLUME=',F9.2)
-!          CALL AddDICVOLSolution(9,Dir(1),Dir(1),Dir(2),90.0,90.0,120.0)
+          CALL AddDICVOLSolution(9,Dir(1),Dir(1),Dir(2),90.0,90.0,120.0,Vol)
         ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99005) Ecart(1), Ecart(2)
 99005   FORMAT (6X,'STANDARD DEVIATIONS :',4X,F9.5,4X,F9.5,11X,F9.2)
@@ -518,7 +518,7 @@
           WRITE (iw,99006) (Dir(I),I=1,3), Vol
 99006   FORMAT (//20X,'O R T H O R H O M B I C    S Y S T E M '//2X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'B=',    &
      &          F9.5,2X,'C=',F9.5,3X,'VOLUME=',F8.2)
-!          CALL AddDICVOLSolution(5,Dir(1),Dir(2),Dir(3),90.0,90.0,90.0)
+          CALL AddDICVOLSolution(5,Dir(1),Dir(2),Dir(3),90.0,90.0,90.0,Vol)
         ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99007) (Ecart(I),I=1,3)
 99007   FORMAT (2X,'STANDARD DEVIATIONS :',4X,3(F9.5,4X),6X,F8.2)
@@ -528,7 +528,7 @@
           WRITE (iw,99008) (Dir(I),I=1,4), Vol
 99008   FORMAT (//20X,'M O N O C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS :',1X,'A=',F7.4,' B=',F7.4,     &
      &          ' C=',F7.4,1X,'BETA=',F7.3,1X,'VOLUME=',F7.2)
-!          CALL AddDICVOLSolution(3,Dir(1),Dir(2),Dir(3),90.0,Dir(4),90.0)
+          CALL AddDICVOLSolution(3,Dir(1),Dir(2),Dir(3),90.0,Dir(4),90.0,Vol)
         ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99009) (Ecart(I),I=1,4)
 99009   FORMAT (1X,'STANDARD DEVIATIONS :',1X,F7.4,3X,F7.4,3X,F7.4,6X,F7.3/)
@@ -545,7 +545,7 @@
           WRITE (iw,99010) (Dir(I),I=1,6), Vol
 99010   FORMAT (//20X,'T R I C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS AND THEIR STANDARD DEVIATIONS :'/1&
      &          X,'A=',F7.4,' B=',F7.4,' C=',F7.4,2X,'ALP=',F7.3,1X,'BET=',F7.3,' GAM=',F7.3,1X,'VOL=',F7.2)
-!          CALL AddDICVOLSolution(1,Dir(1),Dir(2),Dir(3),Dir(4),Dir(5),Dir(6))
+          CALL AddDICVOLSolution(1,Dir(1),Dir(2),Dir(3),Dir(4),Dir(5),Dir(6),Vol)
         ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99011) (Ecart(I),I=1,6)
 99011   FORMAT (3X,F7.4,3X,F7.4,3X,F7.4,6X,F7.3,5X,F7.3,5X,F7.3,6X,F5.2/)
@@ -554,7 +554,7 @@
         IF ( Ktestwolff.EQ.0 ) THEN
           WRITE (iw,99012) Dir(1), Vol
 99012   FORMAT (//20X,' C U B I C    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,4X,'VOLUME=',F9.2)
-!          CALL AddDICVOLSolution(10,Dir(1),Dir(1),Dir(1),90.0,90.0,90.0)
+          CALL AddDICVOLSolution(10,Dir(1),Dir(1),Dir(1),90.0,90.0,90.0,Vol)
         ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99013) Ecart(1)
 99013   FORMAT (6X,'STANDARD DEVIATIONS :',4X,F9.5,11X,F9.2)
@@ -625,10 +625,8 @@
       Deltaq = Deltaq/nini
       Dtheta = Dtheta/nini
       fwolff = q(n)/(2.*nposs*Deltaq)
-      CALL AddDICVOL_F(fwolff)
       IF ( Ktestwolff.EQ.0 ) THEN
         Findex = nini/(nposs*Dtheta)
-        CALL AddDICVOL_M(Findex)
         Fvar = 100.*(1.-(nposs*Dtheta*Dtheta/(2.*nini*dth*dth)))
         IF ( Fvar.LE.0.1 ) Fvar = 0.0
         WRITE (iw,99018) nini, nposs
@@ -682,6 +680,8 @@
       Ktestwolff = 0
       GOTO 400
  600  v = Vol
+      CALL AddDICVOL_M(fwolff)
+      CALL AddDICVOL_F(Findex)
       WRITE (iw,99022) v, nini, fwolff, nini, Findex, Dtheta, nposs
 99022 FORMAT (2x,'=====>  CELL VOLUME = ',F7.1,' A**3     M(',I2,')=',F6.1,'  F(',I2,')=',F6.1,'(',F6.4,',',I3,')')
 99999 END SUBROUTINE AFFPAR
