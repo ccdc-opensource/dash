@@ -17,10 +17,12 @@
       INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'statlog.inc'
 
-      INTEGER        IDFZMFile,           IDBZMBrowse,             &
-                     IDFZMpars,           IZMVB
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),   &
-                     IDFZMpars(1:maxfrg), IZMVB(1:maxfrg)
+      INTEGER        IDFZMFile,           IDBZMBrowse,                &
+                     IDFZMpars,           IDBZMView,                  &
+                     IDBZMDelete
+      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
+                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
+                     IDBZMDelete(1:maxfrg)
 
       CALL WDialogSelect(IDD_SAW_Page1)
 ! @ Enable or disable the "Next" button
@@ -48,10 +50,12 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
-      INTEGER        IDFZMFile,           IDBZMBrowse,             &
-                     IDFZMpars,           IZMVB
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),   &
-                     IDFZMpars(1:maxfrg), IZMVB(1:maxfrg)
+      INTEGER        IDFZMFile,           IDBZMBrowse,                &
+                     IDFZMpars,           IDBZMView,                  &
+                     IDBZMDelete
+      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
+                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
+                     IDBZMDelete(1:maxfrg)
 
       INTEGER         nfrag
       COMMON /frgcom/ nfrag
@@ -62,10 +66,11 @@
 
 ! JCC Added in declarations
 ! The implementation has changed - this is now a function
-      INTEGER Read_One_Zm
+      INTEGER, EXTERNAL :: Read_One_Zm
       INTEGER zmread
       LOGICAL ZmStateChanged
       INTEGER ifrg
+      LOGICAL, EXTERNAL :: Confirm
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page1)
@@ -122,10 +127,20 @@
               CALL FileErrorPopup(frag_file(ifrg),zmread)
               frag_file(ifrg) = ' '
             ENDIF ! If the read on the zmatrix was ok
+          CASE (IDB_ZmatrixDelete1, IDB_ZmatrixDelete2, IDB_ZmatrixDelete3, IDB_ZmatrixDelete4, IDB_ZmatrixDelete5)
+            IF (Confirm('Do you want to clear this z-matrix?')) THEN
+              ZmStateChanged = .TRUE.
+              ifrg = 1
+              DO WHILE (IDBZMDelete(ifrg) .NE. EventInfo%VALUE1)
+                ifrg = ifrg + 1
+              ENDDO
+              gotzmfile(ifrg) = .FALSE.
+              frag_file(ifrg) = ' '
+            ENDIF ! Delete this z-matrix
 ! View individual z-matrices in e.g. Mercury
           CASE (IDB_ZMatrixView1, IDB_ZMatrixView2, IDB_ZMatrixView3, IDB_ZMatrixView4, IDB_ZMatrixView5)
             ifrg = 1
-            DO WHILE (IZMVB(ifrg) .NE. EventInfo%VALUE1)
+            DO WHILE (IDBZMView(ifrg) .NE. EventInfo%VALUE1)
               ifrg = ifrg + 1
             ENDDO
             IF (.NOT. gotzmfile(ifrg)) THEN
@@ -170,10 +185,12 @@
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
-      INTEGER        IDFZMFile,           IDBZMBrowse,             &
-                     IDFZMpars,           IZMVB
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),   &
-                     IDFZMpars(1:maxfrg), IZMVB(1:maxfrg)
+      INTEGER        IDFZMFile,           IDBZMBrowse,                &
+                     IDFZMpars,           IDBZMView,                  &
+                     IDBZMDelete
+      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
+                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
+                     IDBZMDelete(1:maxfrg)
 
       LOGICAL LimsChanged
       DATA LimsChanged / .FALSE. /
@@ -317,10 +334,12 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
-      INTEGER        IDFZMFile,           IDBZMBrowse,             &
-                     IDFZMpars,           IZMVB
-      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),   &
-                     IDFZMpars(1:maxfrg), IZMVB(1:maxfrg)
+      INTEGER        IDFZMFile,           IDBZMBrowse,                &
+                     IDFZMpars,           IDBZMView,                  &
+                     IDBZMDelete
+      COMMON /IDFZM/ IDFZMFile(1:maxfrg), IDBZMBrowse(1:maxfrg),      &
+                     IDFZMpars(1:maxfrg), IDBZMView(1:maxfrg),        &
+                     IDBZMDelete(1:maxfrg)
       
       DOUBLE PRECISION T0, rt
       COMMON /saparl/  T0, rt
