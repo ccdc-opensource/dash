@@ -99,6 +99,12 @@
       CALL WDialogLoad(IDD_DV_Results)
       CALL WDialogLoad(IDD_LicenceAgreement)
       CALL WDialogLoad(IDD_Parameter_Status_2)
+      CALL WDialogLoad(IDD_Rietveld)
+      CALL WDialogLoad(IDD_RRsubZmatrices)
+      CALL WDialogLoad(IDD_RRsubBonds)
+      CALL WDialogLoad(IDD_RRsubAngles)
+      CALL WDialogLoad(IDD_RRsubTorsions)
+      CALL WDialogLoad(IDD_RRsubAtoms)
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
@@ -333,8 +339,6 @@
       CALL WDialogPutString(IDF_ViewArg,ViewArg)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,.TRUE.)
       SA_SimplexDampingFactor = 0.1
-      CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,.FALSE.)
-      CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,.FALSE.)
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
       CALL Clear_Zmatrices
