@@ -342,41 +342,40 @@
       COMMON /HLPFR/ CurrHiLiPFR
 
       REAL xCur, yCur
-      REAL gxleft, gybot, gxright, gytop
-      REAL XGGMIN, XGGMAX, YGGMIN, YGGMAX
+      REAL ulpx, lrpx, ulgx, ulgy, lrgx, lrgy
 
       IF (PastPawley .OR. (NumPeakFitRange .EQ. 0)) RETURN
-      CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur,yCur)
-      CALL IPgUnitsToGrUnits(xpgmin,ypgmin,xggmin,yggmin)
-      CALL IPgUnitsToGrUnits(xpgmax,ypgmax,xggmax,yggmax)
+      CALL IPgUnitsFromGrUnits(EventInfo%GX, EventInfo%GY, xCur, yCur)
 ! Get current PFR
       CALL DetermineCurrentPeakFitRange(xCur, yCur)
 ! Check if current range equal current highlighted
       IF (CurrentRange .NE. CurrHiLiPFR) THEN
         CALL IGrPlotMode('EOR')
         CALL IGrColourN(KolNumPGWindow)
-        CALL IGrFillPattern(Outline,Medium,DiagUp)
+        CALL IGrFillPattern(Outline, Medium, DiagUp)
 ! Unhighlight current highlighted
         IF (CurrHiLiPFR .NE. 0) THEN
-          CALL IPgUnitsToGrUnits(XPF_Range(1,CurrHiLiPFR),ypgmin,gxleft,gybot)
-          CALL IPgUnitsToGrUnits(XPF_Range(2,CurrHiLiPFR),ypgmax,gxright,gytop)
-          gxleft  = MAX(gxleft,xggmin)
-          gxleft  = MIN(gxleft,xggmax)
-          gxright = MIN(gxright,xggmax)
-          gxright = MAX(gxright,xggmin)
-          CALL IGrRectangle(gxleft,gybot,gxright,gytop) 
+          ulpx = MAX(XPF_Range(1,CurrHiLiPFR), XPGMIN)
+          ulpx = MIN(ulpx, XPGMAX)
+          lrpx = MAX(XPF_Range(2,CurrHiLiPFR), XPGMIN)
+          lrpx = MIN(lrpx, XPGMAX)
+          CALL IPgUnitsToGrUnits(ulpx, YPGMAX, ulgx, ulgy)
+          CALL IPgUnitsToGrUnits(lrpx, YPGMIN, lrgx, lrgy)
+          CALL IGrColourN(KolNumPanelDark)
+          CALL IGrRectangle(ulgx, ulgy, lrgx, lrgy) 
         ENDIF
 ! Highlight current PFR
         IF (CurrentRange .NE. 0) THEN
-          CALL IPgUnitsToGrUnits(XPF_Range(1,CurrentRange),ypgmin,gxleft,gybot)
-          CALL IPgUnitsToGrUnits(XPF_Range(2,CurrentRange),ypgmax,gxright,gytop)
-          gxleft  = MAX(gxleft,xggmin)
-          gxleft  = MIN(gxleft,xggmax)
-          gxright = MIN(gxright,xggmax)
-          gxright = MAX(gxright,xggmin)
-          CALL IGrRectangle(gxleft,gybot,gxright,gytop) 
+          ulpx = MAX(XPF_Range(1,CurrentRange), XPGMIN)
+          ulpx = MIN(ulpx, XPGMAX)
+          lrpx = MAX(XPF_Range(2,CurrentRange), XPGMIN)
+          lrpx = MIN(lrpx, XPGMAX)
+          CALL IPgUnitsToGrUnits(ulpx, YPGMAX, ulgx, ulgy)
+          CALL IPgUnitsToGrUnits(lrpx, YPGMIN, lrgx, lrgy)
+          CALL IGrColourN(KolNumPanelDark)
+          CALL IGrRectangle(ulgx, ulgy, lrgx, lrgy) 
         ENDIF
-        CALL IGrFillPattern(Outline,Medium,DiagUp)
+        CALL IGrFillPattern(Outline, Medium, DiagUp)
         CALL IGrPlotMode('Normal')
         CALL IGrColourN(InfoGrScreen(PrevColReq))
         CurrHiLiPFR = CurrentRange
@@ -413,9 +412,9 @@
       IF (NumOfRef .EQ. 0) RETURN
 ! Set the scale correctly. 
       CALL IGrUnits(0.0,0.0,1.0,1.0)
-      CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
+      CALL IPgArea(XPG1, YPG1, XPG2, YPG2)
       CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
-      CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur,yCur)
+      CALL IPgUnitsFromGrUnits(EventInfo%GX, EventInfo%GY, xCur, yCur)
 ! xCur and yCur are now the current mouse coordinates in Pg units
       diff = ABS(RefArgK(1) - xCur)
       ClosestRef = 1
@@ -455,18 +454,18 @@
 
       IF (NoData) RETURN
 ! Set the scale correctly. 
-      CALL IGrUnits(0.0,0.0,1.0,1.0)
-      CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
-      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
-      CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur,yCur)
-      CALL IRealToString(xCur,tString,'(F10.3)')
-      CALL WindowOutStatusBar(6,tString)
-      IF (ypgmax-ypgmin .LE. 100.0) THEN
-        CALL IRealToString(yCur,tString,'(F10.3)')
+      CALL IGrUnits(0.0, 0.0, 1.0, 1.0)
+      CALL IPgArea(XPG1, YPG1, XPG2, YPG2)
+      CALL IPgUnits(XPGMIN, YPGMIN, XPGMAX, YPGMAX)
+      CALL IPgUnitsFromGrUnits(EventInfo%GX, EventInfo%GY, xCur, yCur)
+      CALL IRealToString(xCur, tString, '(F10.3)')
+      CALL WindowOutStatusBar(6, tString)
+      IF (YPGMAX-YPGMIN .LE. 100.0) THEN
+        CALL IRealToString(yCur,tString, '(F10.3)')
       ELSE
-        CALL IRealToString(yCur,tString,'(F10.1)')
+        CALL IRealToString(yCur, tString, '(F10.1)')
       ENDIF
-      CALL WindowOutStatusBar(7,tString)
+      CALL WindowOutStatusBar(7, tString)
 
       END SUBROUTINE UpdateMousePosition
 !
@@ -537,7 +536,7 @@
       CALL IPgUnitsToGrUnits(xpgmin,ypgmin,gxmin,gymin)
       CALL IPgUnitsToGrUnits(xpgmax,ypgmax,gxmax,gymax)
       xgcur(1) = EventInfo%GX
-      CALL IPgUnitsFromGrUnits(xgcur(1),EventInfo%GY,xcur(1),ycur(1))
+      CALL IPgUnitsFromGrUnits(xgcur(1), EventInfo%GY, xcur(1), ycur(1))
       XCurFirst = xcur(1)
 ! The GetEvent() loop is solely concerned with determining the range
 ! over which we will fit the Bragg peak(s) so we will only check out
@@ -548,7 +547,7 @@
       CALL IGrColourN(KolNumLargeCrossHair)
       CALL IGrFillPattern(Hatched,Medium,DiagUp)
       CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
-      CALL IGrFillPattern(Outline,Medium,DiagUp)
+      CALL IGrFillPattern(Outline, Medium, DiagUp)
       CALL IGrPlotMode('Normal')
       CALL IGrColourN(InfoGrScreen(PrevColReq))
       DO WHILE (.TRUE.)
@@ -626,8 +625,8 @@
               NumInPFR(NumPeakFitRange) = 0
 ! Now we have the range in terms of the profile point index
               CALL IGrColourN(KolNumPanelDark)
-              CALL IGrFillPattern(Hatched,Medium,DiagUp)
-              CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
+              CALL IGrFillPattern(Hatched, Medium, DiagUp)
+              CALL IGrRectangle(xgcur(1), gymin, xgcurold, gymax)
               CALL IGrFillPattern(Outline)
               CALL IGrColourN(InfoGrScreen(PrevColReq))
             ENDIF
