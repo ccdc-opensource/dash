@@ -1671,7 +1671,7 @@
         CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 5, iRow, iStatus)
         IF (iStatus .EQ. Checked) THEN
           CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem) 
-!! Mogul Experiments	      
+!! Mogul 	      
 		  CALL WriteMogulMol2(iFRow) 
           CALL ShowBiModalDialog(IFRow, xtem)
         ENDIF
@@ -2076,6 +2076,7 @@
               CALL WDialogSelect(IDD_SA_Modal_Input2)
               CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))                                              
           END SELECT
+          CALL WDialogClearField(IDF_MogulText)
           prevub(RowNumber) = UB(RowNumber)
           prevlb(RowNumber) = LB(RowNumber)
           CALL WDialogSelect(IDD_SA_Modal_Input2)
@@ -2124,7 +2125,7 @@
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds
 
-      REAL xtem, ttem
+      REAL xtem,ttem
 
       TempBounds(1,BoundColumn) = xtem
       CALL OneEightyToThreeSixty(xtem) 
@@ -2136,6 +2137,8 @@
       IF (ttem .GE. 360.0) ttem = ttem - 360.0
       CALL ThreeSixtyToOneEighty(ttem) 
       TempBounds(3,BoundColumn) = ttem
+
+      CALL ThreeSixtyToOneEighty(xtem)
 
       END SUBROUTINE DetermineTrimodalBounds
 !
