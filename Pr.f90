@@ -157,7 +157,6 @@
 !H Like ADJUST, but special to deal with family 4, genus 2
 !A On entry PAR is the parameter to be updated
 !
-!
       INCLUDE 'PARAMS.INC'
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -811,8 +810,7 @@
      &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS), JOCCR(MPTS)
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
       COMMON /CMNNOW/ NOBSNOW
-      LOGICAL LOGIPK
-      COMMON /IPKCMN/ LOGIPK, IPK, PIK(MIPK)
+      COMMON /IPKCMN/ IPK, PIK(MIPK)
 
 ! IF X-RAY, DEAL FIRST WITH LP FOR THIS ARGI:
       IF (LX) CALL TTHMLX(2)
@@ -1763,7 +1761,7 @@
 
       INCLUDE 'PARAMS.INC'
       DIMENSION ALSQ(MATSZ)
-      DIMENSION IH(3), ADIAG(400), ICOV(30)
+      DIMENSION IH(3), ADIAG(MaxBVar), ICOV(30)
       CHARACTER*80 FMT1, FMT2
 
       PARAMETER (IREFSM=2000)
@@ -1773,7 +1771,7 @@
 
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
 
-      COMMON /DERBAS/ DERIVB(400), LVARB
+      COMMON /DERBAS/ DERIVB(MaxBVar), LVARB
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
@@ -4542,16 +4540,12 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
-      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED,&
-     &                PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
-     &        TIC
+      COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
+      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
-     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
-     &                NPCSOU(9,5)
-      COMMON /WHEN  / DAT, TIM(2), MAIN
+     &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5), NPCSOU(9,5)
+      COMMON /WHEN  / TIM(2), MAIN
       CHARACTER*5 TIM
-      CHARACTER*10 DAT
       CHARACTER*6 MAIN
       DATA SWORDS/'NTOF', 'NCON', 'LABX', 'SYNX', 'EDIS'/
       DATA SORCWD/'Time of flight neutron',                             &
@@ -4778,16 +4772,14 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-      COMMON /WHEN  / DAT, TIM(2), MAIN
+      COMMON /WHEN  / TIM(2), MAIN
 
       CHARACTER*5 TIM
-      CHARACTER*10 DAT
       CHARACTER*6 MAIN
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
       SAVE SMYOB, SWYOBS
       CHARACTER*20 Integer2String
-      INTEGER iDummy
 
       GOTO (1,2,3,4,5,6,100,100,100,100,11,12,13), IRFAC
 ! INITIAL ENTRY : CLEARS ALL IF SINGLE PHASE
@@ -5029,6 +5021,7 @@
 ! It seems that KMIN is far bigger than KNOW
 !   6  GGCALC(KNOW-KMIN+1)=GCALC
 ! For now just check the bound and skip if its outside the range ..
+! JvdS I think I have solved this by changing the assigment of KMIN at the start of CALPR
     6 CONTINUE
       II = KNOW - KMIN + 1
       IF (II.GT.0 .AND. II.LE.500) THEN

@@ -1082,12 +1082,16 @@
 !A On entry NI and NJ are the dimensions of the required matrix
 !A On exit  the integer matrix JA, of dimensions NIxNJ is cleared to zero.
 !
-      DIMENSION JA(1)
+      INTEGER, INTENT (  OUT) :: JA(*)
+      INTEGER, INTENT (IN   ) :: NI, NJ
+
+      INTEGER I, NIJ
+
       NIJ = NI*NJ
       DO I = 1, NIJ
         JA(I) = 0
       ENDDO
-      RETURN
+
       END SUBROUTINE JGMZER
 !
 !*****************************************************************************

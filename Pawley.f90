@@ -629,6 +629,7 @@
       xxx = 'CN11LS'
       MATSZ = QPFDIM
       NINIT = 1
+      ALSQ = 0.0
 ! JCC trap the return status
       CALL make_polybackup ! make a backup of the polyp files
       Quick_Pawley_Fit = FORTY(xxx,ALSQ,MATSZ,PCCN01,PFCN03,DUMMY,CALPR,fname)

@@ -91,11 +91,9 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-      LOGICAL LOGIPK
-      COMMON /IPKCMN/ LOGIPK, IPK, PIK(MIPK)
+      COMMON /IPKCMN/ IPK, PIK(MIPK)
       COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
-     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS),    &
-     &                JOCCR(MPTS)
+     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS), JOCCR(MPTS)
       COMMON /CMNNOW/ NOBSNOW
 !.. Note only 3 phases specifically hardwired here
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
@@ -120,7 +118,7 @@
 !
 ! JCC add error handling declarations
       INTEGER IEOCC
-      INTEGER PREFIN
+      INTEGER, EXTERNAL :: PREFIN
 ! JCC This is for testing for mathematical errors in the CCSL that used to STOP the program
       INTEGER IBMBER
       COMMON /CCSLER/ IBMBER
@@ -173,7 +171,7 @@
         CALL WDialogPutInteger(IDF_Pawley_Cycle_Number,ICYC)
         CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,LASTCY)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPTS)
-        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MaxK)
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MAXK)
 ! JCC Add in check on number of reflections here, so that code doesn't bomb out in the Pawley attempt
         IF (MAXK.GT.400) THEN
           FORTY = -1

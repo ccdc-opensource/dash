@@ -80,6 +80,8 @@
                        XGGMIN,    XGGMAX
 
 ! Various maxima and minima related to graphics
+! XPMIN = XBIN(1)
+! XPMAX = XBIN(NBIN)
 
       INTEGER          IPMIN, IPMAX
       COMMON /PROFIPM/ IPMIN, IPMAX

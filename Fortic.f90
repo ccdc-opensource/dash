@@ -20,7 +20,7 @@
       INCLUDE 'params.inc'
 
       LOGICAL DFLTPR
-      EXTERNAL DFLTPR, PCXX, PFXX, MAGROU, CALROU, RUNPAR, VARSPR
+      EXTERNAL DFLTPR, PCXX, PFXX, MAGROU, CALROU, VARSPR
       CHARACTER*6 PNAME
       DIMENSION ALSQ(MATSZ)
       COMMON /DERVAR/ DERIVV(500), LVARV
@@ -78,14 +78,10 @@
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
 
-      LOGICAL LOGIPK
-      COMMON /IPKCMN/ LOGIPK, IPK, PIK(MIPK)
+      COMMON /IPKCMN/ IPK, PIK(MIPK)
 
       COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
-     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS),    &
-     &                JOCCR(MPTS)
-!     &KOBZ(MPTS)
-      COMMON /CMNNOW/ NOBSNOW
+     &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS), JOCCR(MPTS)
 
 ! Note only 3 phases specifically hardwired here
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
