@@ -26,14 +26,14 @@
       SA_Run_Number = 0
       CALL WDialogGetInteger(IDF_SA_MaxRepeats,MaxRuns)
       CALL WDialogGetReal(IDF_MaxMoves1,MaxMoves1)
-      IF (MaxMoves1 .LT.    0.001) MaxMoves1 =    0.001
-      IF (MaxMoves1 .GT. 1000.0  ) MaxMoves1 = 1000.0
+      IF (MaxMoves1 .LT.   0.001) MaxMoves1 =   0.001
+      IF (MaxMoves1 .GT. 100.0  ) MaxMoves1 = 100.0
       CALL WDialogGetInteger(IDF_MaxMoves2,MaxMoves2)
-      IF (MaxMoves2 .LT.  1) MaxMoves2 =  1
-      IF (MaxMoves2 .GT. 10) MaxMoves2 = 10
+      IF (MaxMoves2 .LT. 1) MaxMoves2 = 1
+      IF (MaxMoves2 .GT. 8) MaxMoves2 = 8
       tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
       IF (tMaxMoves .LT. 10.0) tMaxMoves = 10.0
-      IF (tMaxMoves .GT. 10.0E12) tMaxMoves = 10.0E12
+      IF (tMaxMoves .GT.  2.0E9) tMaxMoves = 2.0E9
       MaxMoves = NINT(tMaxMoves)
       CALL WDialogGetReal(IDF_SA_ChiTest,   ChiMult)
       RESTART = ((MaxRuns .GT. 1) .AND. (ChiMult .GT. 0.0))
