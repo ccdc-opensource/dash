@@ -63,8 +63,12 @@
         WRITE(Exp,'(I2)') valid_license
         CALL WMessageBox(OKOnly,InformationIcon,CommonOk, &
           "Information: Your DASH license will expire in "//Exp//" days", &
-          "Soon-to-expire license")
+          "Soon-to-expire licence")
       ENDIF
+! JvdS Now we can remove the licence dialogue from memory:
+      CALL WDialogSelect(IDD_License_Dialog)
+      CALL WDialogUnload
+      CALL WDialogSelect(0)
       RETURN
 
       END SUBROUTINE check_license
@@ -137,8 +141,6 @@
                 CALL Write_License_Request_Form()
                 CALL WExit
             END SELECT
-          CASE (Expose,Resize)
-            CALL Redraw()
           CASE (CloseRequest)
             CALL WExit
           CASE (FieldChanged)
