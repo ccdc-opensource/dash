@@ -34,28 +34,26 @@
       EXTERNAL CHIFUN
       LOGICAL LERANL
       COMMON /PKCOM3/ LERANL
-!
+
       LERANL = .FALSE.
       CALL VCOPY(X,V,N)
       CHIMIN = CHIFUN(N,V)
       ZERO = 0.0
       ITER = 0
-!.. Zero things ...
+! Zero things ...
       DO I = 1, 150
-        EX(I) = 0.
+        EX(I) = 0.0
       ENDDO
       DO I = 1, 51
         IR(I) = 0
-        C(I) = 0.
+        C(I) = 0.0
       ENDDO
     1 ITER = ITER + 1
       IF (ITER.GT.MAXITR) GOTO 999
       N1000 = N*1000
       CALL SIMPLEX(V,N,DX,EX,C,IR,N1000,CHIFUN)
-!
       CALL VCOPY(EX,V,N)
       CHI = CHIFUN(N,V)
-!
 !      IF ((1.0-CHI/CHIMIN).GT.0.0001) THEN
       IF ((1.0-CHI/CHIMIN).GT.0.005) THEN
         CHIMIN = CHI
@@ -68,13 +66,13 @@
       CALL HSINT2(C0,C1,C2,DELTA,N,HESS)
       CALL INVERT(HESS,COVAR,N,INDX)
       LERANL = .FALSE.
+
       END SUBROUTINE SIMOPT
 !
 !*****************************************************************************
 !
       SUBROUTINE VCOPY(X,Y,N)
-!     -----------------------
-!
+
       REAL X(*), Y(*)
 
       DO I = 1, N
@@ -86,8 +84,7 @@
 !*****************************************************************************
 !
       SUBROUTINE VRFILL(X,A,N)
-!     ------------------------
-!
+
       REAL X(*)
 
       DO I = 1, N
@@ -99,8 +96,7 @@
 !*****************************************************************************
 !
       SUBROUTINE SIMPLEX(V,N,D,EX,C,IR,MX,CHIFUN)
-!     ------------------------------------
-!
+
       EXTERNAL CHIFUN
       REAL V(N,*), EX(N,*), C(*), D(*)
       INTEGER IR(*)

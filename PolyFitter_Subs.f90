@@ -31,7 +31,7 @@
       COMMON /PROFIPM/ IPMIN, IPMAX
 
       REAL XCUR(2),YCUR(2),XGCUR(2),YGCUR(2)
-      INTEGER IMOV, ISB
+      INTEGER ISB
       REAL XMINT, XMAXT, YMINT, YMAXT, xgcurold, ygcurold
 
 
@@ -42,11 +42,16 @@
       xgcur(1) = EventInfo%GX
       ygcur(1) = EventInfo%GY
       CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
+      xgcurold = xgcur(1)
+      ygcurold = ygcur(1)
       XPGMINOLD = XPGMIN
       XPGMAXOLD = XPGMAX
       YPGMINOLD = YPGMIN
       YPGMAXOLD = YPGMAX
-      IMOV = 0
+      CALL IGrFillPattern(0,1,1)
+      CALL IGrPlotMode('EOR')
+      CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+      CALL IGrPlotMode(' ')
       DO WHILE (.TRUE.)
         CALL GetEvent
         IF (EventInfo%WIN .EQ. 0) THEN
@@ -70,28 +75,16 @@
             ENDDO
           ENDIF
           SELECT CASE (EventType)
-!U            CASE (Expose,Resize)
-!U              CALL Redraw()
-!U! JvdS @ The following line is now never dealt with
-!U              IMOV = 0        
             CASE (MouseMove)
               xgcur(2) = EventInfo%GX
               ygcur(2) = EventInfo%GY
-              IMOV = IMOV + 1
               CALL IGrPlotMode('EOR')
               CALL IGrColourN(KolNumRectSelect)
-              IF (IMOV .EQ. 1) THEN
-                CALL IGrFillPattern(0,1,1)
-                CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
-                xgcurold = xgcur(2)
-                ygcurold = ygcur(2)
-              ELSE
-                CALL IGrFillPattern(0,1,1)
-                CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
-                CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
-                xgcurold = xgcur(2)
-                ygcurold = ygcur(2)
-              ENDIF 
+              CALL IGrFillPattern(0,1,1)
+              CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+              CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
+              xgcurold = xgcur(2)
+              ygcurold = ygcur(2)
               CALL IGrPlotMode(' ')
               CALL IGrColourN(InfoGrScreen(PrevColReq))
             CASE (MouseButUp)
@@ -110,11 +103,6 @@
                 XPGMAX=MAX(XCUR(1),XCUR(2))  
                 YPGMIN=MIN(YCUR(1),YCUR(2))
                 YPGMAX=MAX(YCUR(1),YCUR(2))
-!              ELSE IF (zmessage%value1.eq.RightButton) then
-!                xpgmin=xpmin
-!                xpgmax=xpmax
-!                ypgmin=ypmin
-!                ypgmax=ypmax
               ENDIF
               CALL IGrColourN(InfoGrScreen(PrevColReq))
               CALL Get_IPMaxMin()
@@ -280,94 +268,6 @@
       END SELECT
 
       END SUBROUTINE Check_KeyDown
-!
-!*****************************************************************************
-!
-      SUBROUTINE Create_DicvolIndexFile
-     
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      INCLUDE 'PARAMS.INC'
-
-      COMMON /ALLPEAKS/ NTPeak, AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak), &
-        PkProb(MTPeak), IOrdTem(MTPeak), IHPk(3,MTPeak)
-
-      INTEGER IFTYPE
-      INTEGER IFLAGS, KLEN
-      CHARACTER(LEN=75) :: FILTER
-      REAL    Rvpar(2), Rcpar(5), Lambda, Rdens, Rmolwt, Rfom, Rexpzp, Reps
-      INTEGER Isystem(6), UseErr, I, Iord
-      REAL    Epsilon
-
-! Get a file name
-
-! Extract the information from the dialog
-      CALL PushActiveWindowID
-      IFLAGS = SaveDialog  + PromptOn + AppendExt
-      FILTER = 'All files (*.*)|*.*|DICVOL files (*.dat)|*.dat|'
-      FNAME=' '
-      IFTYPE = 2
-      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Enter DICVOL file name',IFTYPE)
-      KLEN = LEN_TRIM(FNAME)
-      IF (KLEN .EQ. 0) RETURN
-      CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogGetReal(IDF_wavelength1, Lambda)
-      CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
-      CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
-      CALL WDialogGetReal(IDF_Indexing_Maxa, Rcpar(1))
-      CALL WDialogGetReal(IDF_Indexing_Maxb, Rcpar(2))
-      CALL WDialogGetReal(IDF_Indexing_Maxc, Rcpar(3))
-      CALL WDialogGetReal(IDF_Indexing_MinAng, Rcpar(4))
-      CALL WDialogGetReal(IDF_Indexing_MaxAng, Rcpar(5))
-      CALL WDialogGetReal(IDF_Indexing_Density, Rdens)
-      CALL WDialogGetReal(IDF_Indexing_MolWt,   Rmolwt)
-      CALL WDialogGetReal(IDF_Indexing_Fom,     Rfom)
-      CALL WDialogGetReal(IDF_ZeroPoint,        Rexpzp)
-      CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      Isystem(1))
-      CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      Isystem(2))
-      CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       Isystem(3))
-      CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      Isystem(4))
-      CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, Isystem(5))
-      CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  Isystem(6))
-      CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
-      CALL WDialogGetReal(IDF_eps,Epsilon)
-! Write it out 
-      OPEN(UNIT=117,FILE=FNAME(1:KLEN),STATUS='UNKNOWN',ERR=99)
-      WRITE(117,*,ERR=100) 'DICVOL input file created by DASH'
-      WRITE(117,'(8(I3,1X))',ERR=100)  NTPeak, 2, (Isystem(i),i=1,6)
-      WRITE(117,'(7(F8.2,1X))',ERR=100)  Rcpar(1),Rcpar(2),Rcpar(3),Rvpar(1),Rvpar(2),Rcpar(4),Rcpar(5)
-      WRITE(117,'(F10.6,1X,3(F8.4,1X))',ERR=100)  Lambda, Rmolwt, Rdens, Rdens/50.0
-      IF (UseErr .EQ. 2) THEN
-        Reps = 1.0
-      ELSE
-        Reps = Epsilon
-      ENDIF
-      WRITE(117,'(F5.3,1X,F6.2,1X,F9.6)',ERR=100) Reps, Rfom, Rexpzp
-      IF (UseErr .EQ. 2) THEN
-        DO I = 1, NTPeak
-          IOrd = IOrdTem(i)
-          WRITE(117,'(F12.4,1X,F12.4)',ERR=100) AllPkPosVal(IOrd), AllPkPosEsd(IOrd)*10.0
-        ENDDO
-      ELSE
-        DO I = 1, NTPeak
-          IOrd = IOrdTem(i)
-          WRITE(117,'(F12.4)',ERR=100) AllPkPosVal(IOrd)
-        ENDDO
-      ENDIF        
-      CLOSE(117)
-      CALL PopActiveWindowID
-      RETURN
- 99   CONTINUE
-      CALL ErrorMessage("Sorry, could not open the file"//CHAR(13)//FNAME(1:KLEN))
-      CALL PopActiveWindowID
-      RETURN
- 100  CONTINUE
-      CALL ErrorMessage("Sorry, could not write to the file"//CHAR(13)//FNAME(1:KLEN))
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Create_DicvolIndexFile
 !
 !*****************************************************************************
 !
@@ -603,6 +503,7 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
+
       INTEGER          IPMIN, IPMAX
       COMMON /PROFIPM/ IPMIN, IPMAX
 
@@ -957,6 +858,94 @@
       WeCanDoAPawleyRefinement = (Check_TicMark_Data() .AND. (NPeaksFitted .GE. 3))
 
       END FUNCTION WeCanDoAPawleyRefinement
+!
+!*****************************************************************************
+!
+      SUBROUTINE Create_DicvolIndexFile
+     
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      INCLUDE 'PARAMS.INC'
+
+      COMMON /ALLPEAKS/ NTPeak, AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak), &
+        PkProb(MTPeak), IOrdTem(MTPeak), IHPk(3,MTPeak)
+
+      INTEGER IFTYPE
+      INTEGER IFLAGS, KLEN
+      CHARACTER(LEN=75) :: FILTER
+      REAL    Rvpar(2), Rcpar(5), Lambda, Rdens, Rmolwt, Rfom, Rexpzp, Reps
+      INTEGER Isystem(6), UseErr, I, Iord
+      REAL    Epsilon
+
+! Get a file name
+
+! Extract the information from the dialog
+      CALL PushActiveWindowID
+      IFLAGS = SaveDialog  + PromptOn + AppendExt
+      FILTER = 'All files (*.*)|*.*|DICVOL files (*.dat)|*.dat|'
+      FNAME=' '
+      IFTYPE = 2
+      CALL WSelectFile(FILTER,IFLAGS,FNAME,'Enter DICVOL file name',IFTYPE)
+      KLEN = LEN_TRIM(FNAME)
+      IF (KLEN .EQ. 0) RETURN
+      CALL WDialogSelect(IDD_Index_Preparation)
+      CALL WDialogGetReal(IDF_wavelength1, Lambda)
+      CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
+      CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
+      CALL WDialogGetReal(IDF_Indexing_Maxa, Rcpar(1))
+      CALL WDialogGetReal(IDF_Indexing_Maxb, Rcpar(2))
+      CALL WDialogGetReal(IDF_Indexing_Maxc, Rcpar(3))
+      CALL WDialogGetReal(IDF_Indexing_MinAng, Rcpar(4))
+      CALL WDialogGetReal(IDF_Indexing_MaxAng, Rcpar(5))
+      CALL WDialogGetReal(IDF_Indexing_Density, Rdens)
+      CALL WDialogGetReal(IDF_Indexing_MolWt,   Rmolwt)
+      CALL WDialogGetReal(IDF_Indexing_Fom,     Rfom)
+      CALL WDialogGetReal(IDF_ZeroPoint,        Rexpzp)
+      CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      Isystem(1))
+      CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      Isystem(2))
+      CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       Isystem(3))
+      CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      Isystem(4))
+      CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, Isystem(5))
+      CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  Isystem(6))
+      CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
+      CALL WDialogGetReal(IDF_eps,Epsilon)
+! Write it out 
+      OPEN(UNIT=117,FILE=FNAME(1:KLEN),STATUS='UNKNOWN',ERR=99)
+      WRITE(117,*,ERR=100) 'DICVOL input file created by DASH'
+      WRITE(117,'(8(I3,1X))',ERR=100)  NTPeak, 2, (Isystem(i),i=1,6)
+      WRITE(117,'(7(F8.2,1X))',ERR=100)  Rcpar(1),Rcpar(2),Rcpar(3),Rvpar(1),Rvpar(2),Rcpar(4),Rcpar(5)
+      WRITE(117,'(F10.6,1X,3(F8.4,1X))',ERR=100)  Lambda, Rmolwt, Rdens, Rdens/50.0
+      IF (UseErr .EQ. 2) THEN
+        Reps = 1.0
+      ELSE
+        Reps = Epsilon
+      ENDIF
+      WRITE(117,'(F5.3,1X,F6.2,1X,F9.6)',ERR=100) Reps, Rfom, Rexpzp
+      IF (UseErr .EQ. 2) THEN
+        DO I = 1, NTPeak
+          IOrd = IOrdTem(i)
+          WRITE(117,'(F12.4,1X,F12.4)',ERR=100) AllPkPosVal(IOrd), AllPkPosEsd(IOrd)*10.0
+        ENDDO
+      ELSE
+        DO I = 1, NTPeak
+          IOrd = IOrdTem(i)
+          WRITE(117,'(F12.4)',ERR=100) AllPkPosVal(IOrd)
+        ENDDO
+      ENDIF        
+      CLOSE(117)
+      CALL PopActiveWindowID
+      RETURN
+ 99   CONTINUE
+      CALL ErrorMessage("Sorry, could not open the file"//CHAR(13)//FNAME(1:KLEN))
+      CALL PopActiveWindowID
+      RETURN
+ 100  CONTINUE
+      CALL ErrorMessage("Sorry, could not write to the file"//CHAR(13)//FNAME(1:KLEN))
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Create_DicvolIndexFile
 !
 !*****************************************************************************
 !

@@ -19,19 +19,20 @@
         DX(I) = SQRT(AMAX1(0.,COV(II)))
       ENDDO
       CALL OUTPUT_PRO(N,X,DX)
-!
+
       END SUBROUTINE MULTIPEAK_FITTER
 !
 !*****************************************************************************
 !
       SUBROUTINE GETVAR(N,V,D)
-!
+
       INCLUDE 'PARAMS.INC'
-!
+
       PARAMETER (MPAR=50)
       REAL V(MPAR), D(MPAR)
       PARAMETER (MPT=2000)
       COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
@@ -161,7 +162,7 @@
         V(KK+2) = XPOS(I)
       ENDDO
       DO I = 1, N
-        D(I) = 0.1*abs(V(I))
+        D(I) = 0.1*ABS(V(I))
       ENDDO
       DO IP = 1, NPEAK
         KK = 6 + 2*IP
@@ -183,6 +184,7 @@
 !
       DIMENSION TR(1024), TI(1024)
       EXTERNAL WWFFTADD
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /WWFFTDA/ KJUMP, UR(15), UI(15)
 
@@ -287,7 +289,7 @@
 !
       SUBROUTINE INITSP(N,V,D)
 !.. Do all the initialisation
-!
+
       INCLUDE 'PARAMS.INC'
 
       PARAMETER (MPAR=50)
@@ -295,8 +297,8 @@
       PARAMETER (MPT=2000)
       COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
 
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /WWREFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
 
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
@@ -350,13 +352,6 @@
 !.. speedup attempt
       REAL ixres
 
-      PI = 4.*ATAN(1.)
-      RAD = PI/180.
-      DEG = 1./RAD
-      TWOPI = 2.*PI
-      FOURPI = 4.*PI
-      PIBY2 = 0.5*PI
-      ALOG2 = LOG(2.)
 ! If there are no peaks specified, assume there is one. Estimate its position by 
 ! by finding the 2 theta value with the highest number of counts
       IF (NumInPFR(CurrentRange) .EQ. 0) THEN

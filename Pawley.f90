@@ -240,8 +240,6 @@
               CALL WDialogGetInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
               LastValuesSet = .TRUE.
               CALL make_polybackup
-! Set the file names to point to the poly files
-              CALL set_saFileNames('polyp')
 ! Disable the Solve button until the user does a Save
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
               CALL WDialogSelect(IDD_Pawley_Status)
@@ -667,16 +665,16 @@
       REAL            ZCAL !,        ZBAK
       COMMON /YSTORE/ ZCAL(MPPTS) !, ZBAK(MPPTS)
 
-      INTEGER I
+  !    INTEGER I
 
       NBIN = NPTS
-      DO I = 1, NBIN
+  !    DO I = 1, NBIN
   !      XBIN(I)  = ZARGI(I)
   !      YOBIN(I) = ZOBS(I)
-        YCBIN(I) = ZCAL(I)
+  !      YCBIN(I) = ZCAL(I)
   !      YBBIN(I) = ZBAK(I)
   !      EBIN(I)  = ZDOBS(I)
-      ENDDO
+  !    ENDDO
       IPTYPE = 2
       CALL Profile_Plot
 
@@ -759,28 +757,6 @@
       copyhkl = .FALSE. 
 
       END SUBROUTINE delete_polybackup
-!
-!*****************************************************************************
-!
-      SUBROUTINE set_saFileNames(base)
-
-      USE VARIABLES
-
-      CHARACTER*(*), INTENT (IN   ) :: base
-
-      INTEGER n
-
-      n = LEN_TRIM(base)
-      IF (n .GT. 75) THEN
-        CALL DebugErrorMessage('base too long in set_saFileNames')
-        n = 75
-      ENDIF
-      WRITE(DashHcvFile,'(A,A)') base(1:n),'.hcv'
-      WRITE(DashHklFile,'(A,A)') base(1:n),'.hkl'
-      WRITE(DashPikFile,'(A,A)') base(1:n),'.pik'
-      WRITE(DashTicFile,'(A,A)') base(1:n),'.tic'
-
-      END SUBROUTINE set_saFileNames
 !
 !*****************************************************************************
 !
