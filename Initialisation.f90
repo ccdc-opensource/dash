@@ -398,12 +398,6 @@
       SA_SimplexDampingFactor = 0.1
       CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR,.FALSE.)
       CALL WDialogPutCheckBoxLogical(IDF_OutputCCL,.FALSE.)
-      CALL WDialogSelect(IDD_SAW_Page1)
-      IF (ConvOn) THEN
-        CALL WDialogFieldState(IDB_SA_Project_Import,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDB_SA_Project_Import,Disabled)
-      ENDIF
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
       CALL ClearZmatrices
@@ -463,6 +457,12 @@
       INQUIRE(FILE=VIEWEXE(1:LEN_TRIM(VIEWEXE)),EXIST=ViewOn)
       INQUIRE(FILE=CONVEXE(1:LEN_TRIM(CONVEXE)),EXIST=ConvOn)
 
+      CALL WDialogSelect(IDD_SAW_Page1)
+      IF (ConvOn) THEN
+        CALL WDialogFieldState(IDB_SA_Project_Import,Enabled)
+      ELSE
+        CALL WDialogFieldState(IDB_SA_Project_Import,Disabled)
+      ENDIF
 
       CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
                                         KolPGWindow%IGreen,&
