@@ -568,13 +568,13 @@
               CASE ('VARY')
                 IF (FirstVaryLine) THEN
                   WRITE(hFile,'(A)',ERR=999) 'L VARY ONLY ALL INTS'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check)) WRITE(42,'(A)',ERR=999) 'L VARY ALL BACK '
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check)) WRITE(42,'(A)',ERR=999) 'L VARY ALL CELL '
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check)) WRITE(42,'(A)',ERR=999) 'L VARY ZERO 1 '
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(42,'(A)',ERR=999) 'L VARY SIGM 1'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(42,'(A)',ERR=999) 'L VARY SIGM 2'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(42,'(A)',ERR=999) 'L VARY GAMM 1'
-                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(42,'(A)',ERR=999) 'L VARY GAMM 2'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL BACK '
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL CELL '
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY ZERO 1 '
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 1'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 2'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 1'
+                  IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 2'
                 ENDIF
                 FirstVaryLine = .FALSE.
               CASE ('BACK')
@@ -694,13 +694,13 @@
           WRITE(hFile,'(A)',ERR=999) backstr
         ENDDO
         WRITE(hFile,'(A)',ERR=999) 'L VARY ONLY ALL INTS'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY ALL BACK'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check )) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY ALL CELL'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check )) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY ZERO 1 '
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY SIGM 1'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY SIGM 2'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY GAMM 1'
-        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(tFileHandle,'(A)',ERR=999) 'L VARY GAMM 2'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL BACK'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL CELL'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ZERO 1 '
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 1'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 2'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 1'
+        IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 2'
         CLOSE(hFile)
       ENDIF   
       CALL PopActiveWindowID
