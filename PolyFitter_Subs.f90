@@ -113,7 +113,7 @@
 !                ypgmax=ypmax
               END IF
               CALL IGrColourN(InfoGrScreen(PrevColReq))
-              CALL WCursorShape(CurArrow)
+              CALL WCursorShape(CurCrossHair)
               CALL Get_IPMaxMin()
               CALL Profile_Plot(IPTYPE)
               EXIT  
