@@ -13,12 +13,8 @@
       INTEGER iz1(*), iz2(*), iz3(*)
       DOUBLE PRECISION blen(*), alph(*), bet(*), Cartesian(1:3,*)
 
-      REAL*8 radian, pi, sqrtpi, twosix, logten
+      REAL*8 radian
       PARAMETER (radian=57.29577951308232088D0)
-      PARAMETER (pi=3.141592653589793238D0)
-      PARAMETER (sqrtpi=1.772453850905516027D0)
-      PARAMETER (twosix=1.122462048309372981D0)
-      PARAMETER (logten=2.302585092994045684D0)
 
 ! Local
 ! replace radian with rad=(1/radian)
@@ -48,21 +44,19 @@
 ! As long as atoms remain linear with the first
 ! two atoms, keep placing them along the z-axis
       i = 3
-      IF (N.GT.3) THEN
-        DO WHILE (NINT(Cartesian(1,i)*10000).EQ.0 .AND. i.LT.N)
-          i = i + 1
-          i1 = iz1(i)
-          i2 = iz2(i)
-          IF (Cartesian(3,i1).GT.Cartesian(3,i2)) THEN
-            sign = 1.0D0
-          ELSE
-            sign = -1.0D0
-          ENDIF
-          Cartesian(1,i) = blen(i)*SIN(alph(i)*rad)
-          Cartesian(2,i) = 0.0D0
-          Cartesian(3,i) = Cartesian(3,i1) - sign*blen(i)*COS(alph(i)*rad)
-        ENDDO
-      ENDIF
+      DO WHILE (NINT(Cartesian(1,i)*10000).EQ.0 .AND. i.LT.N)
+        i = i + 1
+        i1 = iz1(i)
+        i2 = iz2(i)
+        IF (Cartesian(3,i1).GT.Cartesian(3,i2)) THEN
+          sign = 1.0D0
+        ELSE
+          sign = -1.0D0
+        ENDIF
+        Cartesian(1,i) = blen(i)*SIN(alph(i)*rad)
+        Cartesian(2,i) = 0.0D0
+        Cartesian(3,i) = Cartesian(3,i1) - sign*blen(i)*COS(alph(i)*rad)
+      ENDDO
 ! Loop over each atom in turn, finding its coordinates
       k = i + 1
       IF (k.LE.n) THEN
@@ -93,21 +87,19 @@
       REAL*8 bond, angle1, angle2
       INTEGER i, i1, i2, i3
 ! Constants
-      REAL*8 radian, pi
+      REAL*8 radian
       PARAMETER (radian=57.29577951308232088D0)
-      PARAMETER (pi=3.141592653589793238D0)
       REAL*8 small
       PARAMETER (small=1.D-8)
 ! Local
       REAL*8 ang_1, ang_2
       REAL*8 sin_1, cos_1, sin_2, cos_2
-      REAL*8 cosine, one_over_sine, norm, eps, sinarg
+      REAL*8 cosine, one_over_sine, norm, sinarg
       REAL*8 u1(3), u2(3), u3(3), u4(3), rad
 !
 ! convert the angle values from degrees to radians;
 ! then find their sine and cosine values
 !
-      eps = 0.00000001D0
       rad = 1.0/radian
       ang_1 = angle1*rad
       ang_2 = angle2*rad
@@ -160,12 +152,8 @@
       INTEGER iz1(*), iz2(*), iz3(*)
       REAL blen(*), alph(*), bet(*), Cartesian(1:3,*)
 
-      REAL radian, pi, sqrtpi, twosix, logten
+      REAL radian
       PARAMETER (radian=57.29577951308232088)
-      PARAMETER (pi=3.141592653589793238)
-      PARAMETER (sqrtpi=1.772453850905516027)
-      PARAMETER (twosix=1.122462048309372981)
-      PARAMETER (logten=2.302585092994045684)
 
 ! Local
 ! replace radian with rad=(1/radian)
@@ -241,21 +229,19 @@
       REAL bond, angle1, angle2
       INTEGER i, i1, i2, i3
 ! Constants
-      REAL radian, pi
+      REAL radian
       PARAMETER (radian=57.29577951308232088)
-      PARAMETER (pi=3.141592653589793238)
       REAL small
       PARAMETER (small=1.E-8)
 ! Local
       REAL ang_1, ang_2
       REAL sin_1, cos_1, sin_2, cos_2
-      REAL cosine, one_over_sine, norm, eps, sinarg
+      REAL cosine, one_over_sine, norm, sinarg
       REAL u1(3), u2(3), u3(3), u4(3), rad
 !
 ! convert the angle values from degrees to radians;
 ! then find their sine and cosine values
 !
-      eps = 0.00000001
       rad = 1.0/radian
       ang_1 = angle1*rad
       ang_2 = angle2*rad
