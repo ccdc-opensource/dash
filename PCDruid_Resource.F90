@@ -1,4 +1,4 @@
-! Winteracter module created : 30/Jul/2001 17:28:44
+! Winteracter module created : 01/Aug/2001 14:51:10
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -562,4 +562,8 @@
           INTEGER, PARAMETER :: IDD_SAW_Page1                   =   102
           INTEGER, PARAMETER :: IDBACK                          =  1001
           INTEGER, PARAMETER :: IDNEXT                          =  1040
+          INTEGER, PARAMETER :: IDD_SA_Multi_completed_ep       =   127
+          INTEGER, PARAMETER :: IDD_TEMPLATE011                 =   128
+          INTEGER, PARAMETER :: IDF_SA_Summary                  =  1136
+          INTEGER, PARAMETER :: IDOK_ep                         =  1139
       END MODULE Druid_Header
