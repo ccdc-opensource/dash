@@ -589,6 +589,7 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
+      LOGICAL, EXTERNAL :: Get_AutoAlign
       INTEGER, EXTERNAL :: WritePDBCommon
       INTEGER iSol, TickedRunNr, NumOfOverlaidStructures
       INTEGER pdbBond(1:maxbnd_2*maxfrg,1:2)
@@ -639,7 +640,9 @@
       TickedRunNr = 0
       NumOfOverlaidStructures = 0
       DO iSol = 1, tNumOf_SA_Runs
-        IF (iSol .EQ. (NumOf_SA_Runs + 1)) CALL Align
+        IF (iSol .EQ. (NumOf_SA_Runs + 1)) THEN
+          IF (Get_AutoAlign()) CALL Align
+        ENDIF
         WRITE(SolStr,'(I2)',ERR=999) iSol
         CALL StrClean(SolStr,ilen) ! Left justify
         CALL WGridGetCellCheckBox(IDF_SA_summary, 3, iSol, istatus)

@@ -295,6 +295,7 @@
       INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
 
+      LOGICAL, EXTERNAL :: Get_AutoAlign
       INTEGER I, iRow, iStatus, iLimit1, iLimit2, tInteger
 
       CALL PushActiveWindowID
@@ -345,6 +346,7 @@
                 ENDIF
               ENDDO
             CASE (IDB_ShowOverlap)
+              IF (Get_AutoAlign()) CALL Align
               CALL SA_STRUCTURE_OUTPUT_OVERLAP(IDD_Summary)
           END SELECT
         CASE (FieldChanged)
