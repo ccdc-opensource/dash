@@ -25,9 +25,9 @@
 
 !C>> JCC The next common allows low-level setting of SLIM (not accessible through the front
 !C     end, but may be in future. I've allowed reading via the dsl file)
-	  REAL SLIMVALUE
+	  REAL SLIMVALUE, SCALFAC
 	  LOGICAL BACKREF
-	  COMMON /PWLYST/ SLIMVALUE,BACKREF
+	  COMMON /PWLYST/ SLIMVALUE,SCALFAC,BACKREF
 
       INTEGER :: LatBrav
       REAL :: CELLPAR,ZEROPOINT,ALAMBDA 

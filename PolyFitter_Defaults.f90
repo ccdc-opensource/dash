@@ -44,6 +44,7 @@
       ZEROPOINT=0.0
 !>>JCC Added
 	  SLIMVALUE=1.0
+	  SCALFAC  = 0.01
 	  BACKREF =.TRUE.
 !
       IRadOption=2

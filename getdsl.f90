@@ -143,6 +143,11 @@
 				SlimValue = Temp 
 				CALL WDialogSelect(IDD_Pawley_Status)
 				call WDialogPutReal(IDF_Slim_Parameter,Temp,'(f7.3)')
+			Case ('sca')
+				I = InfoError(1) ! reset the errors
+				call INextReal(line,Temp)
+				IF ( InfoError(1) .NE. 0) GOTO 999					
+				ScalFac = Temp 	    
 	    End Select
 
 				
@@ -195,6 +200,8 @@
 	 WRITE(77,110) 'zer',ZeroPoint
 	 WRITE(77,*)'! Pawley-fit SLIM parameter setting'
 	 WRITE(77,110) 'sli',SLIMVALUE
+	 WRITE(77,*)'! Pawley-fit Scale factor setting'
+	 WRITE(77,110) 'sca',SCALFAC
 100  FORMAT(a3,1x,4(f10.4,1x))
 110  FORMAT(a3,1x,f10.4)
 	 CLOSE(77)

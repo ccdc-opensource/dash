@@ -44,14 +44,15 @@
       IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
 
 !C>> JCC The next common allows setting of SLIM, and controls the background options
-	  REAL SLIMVALUE
+	  REAL SLIMVALUE, SCALFAC
 	  LOGICAL BACKREF
-	  COMMON /PWLYST/ SLIMVALUE,BACKREF
+	  COMMON /PWLYST/ SLIMVALUE, SCALFAC, BACKREF
 
       include 'statlog.inc'
 	  CHARACTER*255 Cline
 	  INTEGER IS
 
+      LOGICAL ReadWarning
 !
 !>> JCC - set return value. 1 for success
 	  Load_Diffraction_File = 1
@@ -67,16 +68,34 @@
 	  READ(Cline,*, IOSTAT = IS) XOBS(I),YOBS(I),EOBS(I)
 	  IF (IS .NE. 0) THEN
        READ(Cline,*, ERR=100,END=100) XOBS(I),YOBS(I)
-	   EOBS(I)	= SQRT(YOBS(I))
+	   IF (YOBS(I) .GE. 0.0) THEN
+		   EOBS(I)	= SQRT(YOBS(I))
+	   ENDIF
 	  ENDIF
 
-! Skip negative 2-theta data
+! Skip negative 2-theta data and negative intensities
 
 	  IF ( XOBS(I) .LE. 0.0 ) GOTO 10
+	  IF ( YOBS(I) .LT. 0.0 ) GOTO 10
 
 ! Skip points with zero esd
 
       IF ( EOBS(I) .LE. 0.0 ) GOTO 10
+
+	  IF (I.GT.1) THEN
+		IF ( ABS(XOBS(I) - XOBS(I-1)) .LT. 0.0000001) THEN
+			IF (.NOT.ReadWarning) THEN
+				ReadWarning = .TRUE.
+				CALL WMessageBox(OkOnly,ExclamationIcon,&
+				                 CommonOk,&
+								 "Warning: The data file contains "//&
+								 "multiple observations for the same "//&
+								 "2-theta"//CHAR(13)//"Only the first observation"//&
+								 "will be used","Bad data file")
+			END IF
+			GOTO 10
+		END IF
+	  END IF
 
       I=I+1
 
@@ -114,6 +133,8 @@
         YPMAX=MAX(YOBS(I),YPMAX)
       END DO
 !
+
+      IF (YPMAX .GT. 100000) SCALFAC = 0.01 * YPMAX/100000
       NBIN=(NOBS/LBIN)
       DO I=1,NBIN
         IST=(I-1)*LBIN
