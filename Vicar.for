@@ -16,43 +16,32 @@ c  replace radian with rad=(1/radian)
       integer i,k,i1,i2,i3
       real*8 bond,angle1,angle2,sign, rad
 
-c      do i=1,n
-c      write (6,*) blen(i),alph(i),bet(i)
-c      end do
-c      do i=1,n
-c      write (6,*) iz1(i),iz2(i),iz3(i)
-c      end do
-
 c cosmetic change to demo cvs
-
+	IF (N .LT. 1) RETURN
       rad = 1.0/radian
 c     First atom is placed at the origin
-      if (n .ge. 1) then
-         x(1) = 0.0d0
-         y(1) = 0.0d0
-         z(1) = 0.0d0
-      endif
+      x(1) = 0.0D0
+      y(1) = 0.0D0
+      z(1) = 0.0D0
 C     Second atom is placed along the z-axis
-      if (n .ge. 2) then
-         x(2) = 0.0d0
-         y(2) = 0.0d0
-         z(2) = blen(2)
-      endif
+	IF (N .LT. 2) RETURN
+      x(2) = 0.0D0
+      y(2) = 0.0D0
+      z(2) = blen(2)
 C     Third atom is placed in the x,z-plane
-      if (n .ge. 3) then
-         x(3) = blen(3) * sin(alph(3)*rad)
-         y(3) = 0.0d0
-         if (iz1(3) .eq. 1) then
-            z(3) = blen(3) * cos(alph(3)*rad)
-         else
-            z(3) = z(2) - blen(3)*cos(alph(3)*rad)
-         end if
-      endif
+	IF (N .LT. 3) RETURN
+      x(3) = blen(3) * SIN(alph(3)*rad)
+      y(3) = 0.0D0
+      IF (iz1(3) .EQ. 1) THEN
+        z(3) = blen(3) * COS(alph(3)*rad)
+      ELSE
+        z(3) = z(2) - blen(3)*COS(alph(3)*rad)
+      END IF
 C     As long as atoms remain linear with the first
 C     two atoms, keep placing them along the z-axis
       i = 3
       if (n .gt. 3) then
-         dowhile (nint(x(i)*10000) .eq. 0)
+         do while (nint(x(i)*10000) .eq. 0)
             i = i + 1
             i1 = iz1(i)
             i2 = iz2(i)
@@ -85,8 +74,10 @@ C     Loop over each atom in turn, finding its coordinates
 C     "xyzatm" computes the Cartesian coordinates of a single
 C     atom from its defining internal coordinate values
 
-      subroutine xyzatm(x,y,z,i,i1,bond,i2,angle1,i3,angle2)
-      implicit none
+      SUBROUTINE xyzatm(x,y,z,i,i1,bond,i2,angle1,i3,angle2)
+
+      IMPLICIT NONE
+
 C     Arguments
       real*8 x(*),y(*),z(*)
       real*8 bond,angle1,angle2
@@ -120,8 +111,6 @@ c
       u1(1) = x(i2) - x(i3)
       u1(2) = y(i2) - y(i3)
       u1(3) = z(i2) - z(i3)
-c      write(6,*) i2,i3
-c      write(6,*) (u1(1)*u1(1) + u1(2)*u1(2) + u1(3)*u1(3))
       norm = 1.0/sqrt(u1(1)*u1(1) + u1(2)*u1(2) + u1(3)*u1(3))
       u1(1) = u1(1) * norm
       u1(2) = u1(2) * norm
@@ -129,8 +118,6 @@ c      write(6,*) (u1(1)*u1(1) + u1(2)*u1(2) + u1(3)*u1(3))
       u2(1) = x(i1) - x(i2)
       u2(2) = y(i1) - y(i2)
       u2(3) = z(i1) - z(i2)
-c      write(6,*) i1,i2
-c      write(6,*) (u2(1)*u2(1) + u2(2)*u2(2) + u2(3)*u2(3))
       norm = 1.0/sqrt(u2(1)*u2(1) + u2(2)*u2(2) + u2(3)*u2(3))
       u2(1) = u2(1) * norm
       u2(2) = u2(2) * norm
@@ -162,5 +149,6 @@ c         sine = 1.0/sqrt(cosine**2 - 1.0d0)
      &                              + u3(2)*sin_1*sin_2)
       z(i) = z(i1) + bond * (-u2(3)*cos_1 + u4(3)*sin_1*cos_2
      &                              + u3(3)*sin_1*sin_2)
-      return
-      end
+      RETURN
+
+      END
