@@ -141,7 +141,6 @@
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
-      INCLUDE 'statlog.inc'
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Structural_Information)
@@ -173,7 +172,6 @@
             CASE (IDD_Crystal_Symmetry)
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
               CALL Download_SpaceGroup(IDD_Crystal_Symmetry)
-              NumPawleyRef = 0
             CASE (IDD_Peak_Widths)
           END SELECT
       END SELECT
@@ -290,7 +288,6 @@
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'LATTICE.INC'
-      INCLUDE 'statlog.inc'
 
       INTEGER SGNrMenu2Table ! Function
       REAL    tReal
@@ -361,7 +358,6 @@
 ! Update the wizard
                 CALL WDialogSelect(IDD_PW_Page1)
                 CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
-                NumPawleyRef = 0
                 CALL Generate_TicMarks
               ENDIF
             CASE (IDF_ZeroPoint)
@@ -463,164 +459,164 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithDVResults
-!
-!*****************************************************************************
-!
-      DOUBLE PRECISION FUNCTION F(X)
-
-      IMPLICIT NONE
-
-      DOUBLE PRECISION, INTENT (IN   ) :: X
-
-      INCLUDE 'GLBVAR.INC'
-
-      DOUBLE PRECISION TwoTheta1, TwoTheta2
-      INTEGER                               I, J
-      COMMON /Newton/  TwoTheta1, TwoTheta2, I, J
-
-      DOUBLE PRECISION Part1, Part2, a
-      REAL, EXTERNAL :: Degrees2Radians, TwoTheta2dSpacing
-
-      a = Degrees2Radians((TwoTheta1 - x) / 2)
-      Part1 = DBLE(i)*(ALambda / (2*DSin(a)))
-      IF (ABS(Part1 - (FLOAT(i)*TwoTheta2dSpacing(TwoTheta1 - x))) .GT. 0.001 ) CALL DebugErrorMessage('Mistake 1')
-      a = Degrees2Radians((TwoTheta2 - x) / 2)
-      Part2 = DBLE(j)*(ALambda / (2*DSin(a)))
-      IF (DABS(Part2 - (DBLE(j)*TwoTheta2dSpacing(TwoTheta2 - x))) .GT. 0.001 ) CALL DebugErrorMessage('Mistake 2')
-      F = Part1 - Part2
-
-      END FUNCTION F
-!
-!*****************************************************************************
-!
-      DOUBLE PRECISION FUNCTION dfdx(X)
-
-      IMPLICIT NONE
-
-      DOUBLE PRECISION, INTENT (IN   ) :: X
-
-      INCLUDE 'GLBVAR.INC'
-
-      DOUBLE PRECISION TwoTheta1, TwoTheta2
-      INTEGER                               I, J
-      COMMON /Newton/  TwoTheta1, TwoTheta2, I, J
-
-      DOUBLE PRECISION Part1, Part2, a
-      REAL, EXTERNAL :: Degrees2Radians
-
-      a = Degrees2Radians((TwoTheta1 - x) / 2)
-      Part1 = ((-DBLE(i)*ALambda) / 4.0) * (DCos(a) / (DSin(a)**2))
-      a = Degrees2Radians((TwoTheta2 - x) / 2)
-      Part2 = ((-DBLE(j)*ALambda) / 4.0) * (DCos(a) / (DSin(a)**2))
-      dfdx = Part1 - Part2
-
-      END FUNCTION dfdx
-!
-!*****************************************************************************
-!
-      SUBROUTINE QuickNewton(x) ! just for calculating the zeropoint
-
-      IMPLICIT NONE 
-
-      DOUBLE PRECISION, INTENT (  OUT) :: x
-
-      DOUBLE PRECISION Xold, Shift
-      DOUBLE PRECISION, EXTERNAL :: f, dfdx
-
-      x = 0.0
-      Xold = x + 1.0
-      DO WHILE (DABS(Xold-x) .GT. 0.00001) ! Convergence
-        IF (DABS(dfdx(x)) .LT. 0.00001) THEN
-          x = 1.1
-          RETURN
-        ENDIF
-! Calculate the shift
-        Shift = -f(x) / (dfdx(x)*100.0)
-! The zero point should be very small, less than 1.0
-! Our initial estimate is always zero, so if the shift is more than 1.0, just stop
-        IF (DABS(Shift) .GT. 1.0) THEN
-          x = 1.1
-          RETURN
-        ENDIF
-        Xold = x
-        x = x + shift      
-      ENDDO
-
-      END SUBROUTINE QuickNewton
-!
-!*****************************************************************************
-!
-      SUBROUTINE EstimateZeroPointError
-!
-! Experiment: can we estimate the zero point assuming that several
-! of the peak positions are the higher order of an other peak position?
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-      USE DICVAR
-
-      IMPLICIT NONE
-
-      INCLUDE 'PARAMS.INC'
-
-      INTEGER           NTPeak
-      REAL              AllPkPosVal,         AllPkPosEsd
-      REAL              PkProb
-      INTEGER           IOrdTem
-      INTEGER           IHPk
-      COMMON /ALLPEAKS/ NTPeak,                                                  &
-                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
-                        PkProb(MTPeak),                                          &
-                        IOrdTem(MTPeak),                                         &
-                        IHPk(3,MTPeak)
-
-      REAL            TwoTheta1, TwoTheta2
-      INTEGER                               I, J
-      COMMON /Newton/ TwoTheta1, TwoTheta2, I, J
-
-      REAL    ZeroPointError(1:80000)
-      INTEGER Peak1, Peak2, IOrd1, IOrd2, II
-      DOUBLE PRECISION    zp
-
-      IF (NTPeak .LT. 2) THEN
-        CALL DebugErrorMessage("Can't estimate zero point from less than 2 peaks.")
-        RETURN
-      ENDIF
-      II = 0
-! Peaks are ordered: d-spacing(N) > d-spacing(N+1)
-      DO Peak1 = 1, NTPeak-1
-        IOrd1 = IOrdTem(Peak1)
-        TwoTheta1 = AllPkPosVal(IOrd1)
-        DO Peak2 = Peak1+1, NTPeak
-          IOrd2 = IOrdTem(Peak2)
-          TwoTheta2 = AllPkPosVal(IOrd2)
-          DO I = 1, 9
-            DO J = I+1, 10
-! Now calculate zeropoint
-              CALL QuickNewton(zp)
-              IF (DABS(zp) .LT. 1.0) THEN
-                II = II + 1
-                IF (II .GT. 80000) THEN
-                  CALL DebugErrorMessage('ZeroPointError-array out of bounds')
-                ELSE
-                  ZeroPointError(II) = zp
-                ENDIF
-              ENDIF
-            ENDDO
-          ENDDO
-        ENDDO
-      ENDDO
-      OPEN(10,FILE='ZeroPoint.txt',ERR=999)
-      DO Peak1 = 1, II
-        WRITE(10,'(F8.6)') ZeroPointError(Peak1)
-      ENDDO
-      CLOSE(10)
-      RETURN
-  999 CALL ErrorMessage('Could not open zero point error file.')
-
-      END SUBROUTINE EstimateZeroPointError
-!
+!U!
+!U!*****************************************************************************
+!U!
+!U      DOUBLE PRECISION FUNCTION F(X)
+!U
+!U      IMPLICIT NONE
+!U
+!U      DOUBLE PRECISION, INTENT (IN   ) :: X
+!U
+!U      INCLUDE 'GLBVAR.INC'
+!U
+!U      DOUBLE PRECISION TwoTheta1, TwoTheta2
+!U      INTEGER                               I, J
+!U      COMMON /Newton/  TwoTheta1, TwoTheta2, I, J
+!U
+!U      DOUBLE PRECISION Part1, Part2, a
+!U      REAL, EXTERNAL :: Degrees2Radians, TwoTheta2dSpacing
+!U
+!U      a = Degrees2Radians((TwoTheta1 - x) / 2)
+!U      Part1 = DBLE(i)*(ALambda / (2*DSin(a)))
+!U      IF (ABS(Part1 - (FLOAT(i)*TwoTheta2dSpacing(TwoTheta1 - x))) .GT. 0.001 ) CALL DebugErrorMessage('Mistake 1')
+!U      a = Degrees2Radians((TwoTheta2 - x) / 2)
+!U      Part2 = DBLE(j)*(ALambda / (2*DSin(a)))
+!U      IF (DABS(Part2 - (DBLE(j)*TwoTheta2dSpacing(TwoTheta2 - x))) .GT. 0.001 ) CALL DebugErrorMessage('Mistake 2')
+!U      F = Part1 - Part2
+!U
+!U      END FUNCTION F
+!U!
+!U!*****************************************************************************
+!U!
+!U      DOUBLE PRECISION FUNCTION dfdx(X)
+!U
+!U      IMPLICIT NONE
+!U
+!U      DOUBLE PRECISION, INTENT (IN   ) :: X
+!U
+!U      INCLUDE 'GLBVAR.INC'
+!U
+!U      DOUBLE PRECISION TwoTheta1, TwoTheta2
+!U      INTEGER                               I, J
+!U      COMMON /Newton/  TwoTheta1, TwoTheta2, I, J
+!U
+!U      DOUBLE PRECISION Part1, Part2, a
+!U      REAL, EXTERNAL :: Degrees2Radians
+!U
+!U      a = Degrees2Radians((TwoTheta1 - x) / 2)
+!U      Part1 = ((-DBLE(i)*ALambda) / 4.0) * (DCos(a) / (DSin(a)**2))
+!U      a = Degrees2Radians((TwoTheta2 - x) / 2)
+!U      Part2 = ((-DBLE(j)*ALambda) / 4.0) * (DCos(a) / (DSin(a)**2))
+!U      dfdx = Part1 - Part2
+!U
+!U      END FUNCTION dfdx
+!U!
+!U!*****************************************************************************
+!U!
+!U      SUBROUTINE QuickNewton(x) ! just for calculating the zeropoint
+!U
+!U      IMPLICIT NONE 
+!U
+!U      DOUBLE PRECISION, INTENT (  OUT) :: x
+!U
+!U      DOUBLE PRECISION Xold, Shift
+!U      DOUBLE PRECISION, EXTERNAL :: f, dfdx
+!U
+!U      x = 0.0
+!U      Xold = x + 1.0
+!U      DO WHILE (DABS(Xold-x) .GT. 0.00001) ! Convergence
+!U        IF (DABS(dfdx(x)) .LT. 0.00001) THEN
+!U          x = 1.1
+!U          RETURN
+!U        ENDIF
+!U! Calculate the shift
+!U        Shift = -f(x) / (dfdx(x)*100.0)
+!U! The zero point should be very small, less than 1.0
+!U! Our initial estimate is always zero, so if the shift is more than 1.0, just stop
+!U        IF (DABS(Shift) .GT. 1.0) THEN
+!U          x = 1.1
+!U          RETURN
+!U        ENDIF
+!U        Xold = x
+!U        x = x + shift      
+!U      ENDDO
+!U
+!U      END SUBROUTINE QuickNewton
+!U!
+!U!*****************************************************************************
+!U!
+!U      SUBROUTINE EstimateZeroPointError
+!U!
+!U! Experiment: can we estimate the zero point assuming that several
+!U! of the peak positions are the higher order of an other peak position?
+!U
+!U      USE WINTERACTER
+!U      USE DRUID_HEADER
+!U      USE VARIABLES
+!U      USE DICVAR
+!U
+!U      IMPLICIT NONE
+!U
+!U      INCLUDE 'PARAMS.INC'
+!U
+!U      INTEGER           NTPeak
+!U      REAL              AllPkPosVal,         AllPkPosEsd
+!U      REAL              PkProb
+!U      INTEGER           IOrdTem
+!U      INTEGER           IHPk
+!U      COMMON /ALLPEAKS/ NTPeak,                                                  &
+!U                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+!U                        PkProb(MTPeak),                                          &
+!U                        IOrdTem(MTPeak),                                         &
+!U                        IHPk(3,MTPeak)
+!U
+!U      REAL            TwoTheta1, TwoTheta2
+!U      INTEGER                               I, J
+!U      COMMON /Newton/ TwoTheta1, TwoTheta2, I, J
+!U
+!U      REAL    ZeroPointError(1:80000)
+!U      INTEGER Peak1, Peak2, IOrd1, IOrd2, II
+!U      DOUBLE PRECISION    zp
+!U
+!U      IF (NTPeak .LT. 2) THEN
+!U        CALL DebugErrorMessage("Can't estimate zero point from less than 2 peaks.")
+!U        RETURN
+!U      ENDIF
+!U      II = 0
+!U! Peaks are ordered: d-spacing(N) > d-spacing(N+1)
+!U      DO Peak1 = 1, NTPeak-1
+!U        IOrd1 = IOrdTem(Peak1)
+!U        TwoTheta1 = AllPkPosVal(IOrd1)
+!U        DO Peak2 = Peak1+1, NTPeak
+!U          IOrd2 = IOrdTem(Peak2)
+!U          TwoTheta2 = AllPkPosVal(IOrd2)
+!U          DO I = 1, 9
+!U            DO J = I+1, 10
+!U! Now calculate zeropoint
+!U              CALL QuickNewton(zp)
+!U              IF (DABS(zp) .LT. 1.0) THEN
+!U                II = II + 1
+!U                IF (II .GT. 80000) THEN
+!U                  CALL DebugErrorMessage('ZeroPointError-array out of bounds')
+!U                ELSE
+!U                  ZeroPointError(II) = zp
+!U                ENDIF
+!U              ENDIF
+!U            ENDDO
+!U          ENDDO
+!U        ENDDO
+!U      ENDDO
+!U      OPEN(10,FILE='ZeroPoint.txt',ERR=999)
+!U      DO Peak1 = 1, II
+!U        WRITE(10,'(F8.6)') ZeroPointError(Peak1)
+!U      ENDDO
+!U      CLOSE(10)
+!U      RETURN
+!U  999 CALL ErrorMessage('Could not open zero point error file.')
+!U
+!U      END SUBROUTINE EstimateZeroPointError
+!U!
 !*****************************************************************************
 !
       SUBROUTINE RunDICVOL
