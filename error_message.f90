@@ -1,20 +1,3 @@
-      SUBROUTINE ERROR_MESSAGE(IOPT)
-!
-      USE WINTERACTER
-!      USE DRUID_HEADER
-!
-      SELECT CASE (IOPT)
-         CASE (1)
-           CALL WMessageBox(OKOnly,InformationIcon,CommonOK,  &
-           'Error reading INF file','Error')
-         CASE (2)
-           CALL WMessageBox(OKOnly,InformationIcon,CommonOK,  &
-           'Error reading CONTROL file','Error')
-      END SELECT
-!
-      END
-!
-!
 !
 	SUBROUTINE CHKMAXREF(PCXX)
 ! Checks if the maximum number of reflections have been exceeded
