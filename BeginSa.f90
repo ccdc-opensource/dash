@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE BeginSa(imyexit)
+      SUBROUTINE BeginSa
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -9,10 +9,14 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (  OUT) :: imyexit
-
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
+
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput
       REAL    T1
@@ -21,7 +25,8 @@
       INTEGER Ierrflag
 
       IF (CheckOverwriteSaOutput() .EQ. 0) THEN
-        imyexit = 3
+        CALL WDialogSelect(IDD_SA_input3)
+        CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
         RETURN
       ENDIF
       CALL WDialogSelect(IDD_SA_Action1)
@@ -34,7 +39,15 @@
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
       DoSaRedraw = .TRUE.
       T1 = SECNDS(0.0)
-      CALL SimulatedAnnealing(imyexit)
+      CALL PDB_SymmRecords()
+      CALL Init_MultiRun()
+! Grey out start next button if not multirun
+      IF (RESTART) THEN
+        CALL WDialogFieldState(IDF_StartNext,Enabled)
+      ELSE
+        CALL WDialogFieldState(IDF_StartNext,Disabled)
+      ENDIF
+      CALL SimulatedAnnealing
       SA_Duration = SECNDS(T1)
       WRITE(SA_DurationStr,'(F10.1)') SA_Duration
   !    CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')

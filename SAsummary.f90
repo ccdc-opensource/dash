@@ -15,9 +15,6 @@
       INCLUDE 'PARAMS.INC' 
       INCLUDE 'DialogPosCmn.inc'
 
-      INTEGER         JMyExit
-      COMMON /MyExit/ JMyExit
-       
 !ep    need the common block to identify the number rows in the grid          
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
@@ -45,12 +42,7 @@
               ENDDO
 ! Close Chi-sqd plot 
               CALL Close_Chisq_Plot
-              SELECT CASE (JMyExit)
-                CASE (2)
-                  CALL WDialogSelect(IDD_SA_input2)
-                CASE (3)
-                  CALL WDialogSelect(IDD_SA_input3)
-              END SELECT
+              CALL WDialogSelect(IDD_SA_input3)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
               CALL PopActiveWindowID
               RETURN

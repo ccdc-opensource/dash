@@ -1,4 +1,4 @@
-! Winteracter module created : 05/Nov/2001 21:05:11
+! Winteracter module created : 06/Nov/2001 16:56:49
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -238,7 +238,7 @@
           INTEGER, PARAMETER :: IDF_nfrag                       =  1488
           INTEGER, PARAMETER :: IDF_zmatrixfile_grid            =  1489
           INTEGER, PARAMETER :: IDF_LABEL7                      =  1463
-          INTEGER, PARAMETER :: IDF_SA_NewAnneal_Button         =  1195
+          INTEGER, PARAMETER :: IDF_StopSA                      =  1195
           INTEGER, PARAMETER :: IDF_Pause_Annealing             =  1495
           INTEGER, PARAMETER :: IDF_Status_tab                  =  1498
           INTEGER, PARAMETER :: IDD_Parameter_Status            =   136
@@ -261,7 +261,7 @@
           INTEGER, PARAMETER :: IDF_PawRef_RefCell_Check        =  1292
           INTEGER, PARAMETER :: IDF_PawRef_RefZero_Check        =  1293
           INTEGER, PARAMETER :: IDB_PawRef_Accept               =  1287
-          INTEGER, PARAMETER :: IDF_PawRef_Line                 =  1299
+          INTEGER, PARAMETER :: IDF_StartNext                   =  1175
           INTEGER, PARAMETER :: IDF_Pawley_Options_Group        =  1302
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_ChiSq_Label1   =  1317
           INTEGER, PARAMETER :: ID_get_crystal_symmetry         = 40041
@@ -308,7 +308,6 @@
           INTEGER, PARAMETER :: IDF_minchisq_picture            =  1169
           INTEGER, PARAMETER :: IDF_prochisq_picture            =  1170
           INTEGER, PARAMETER :: IDF_avchisq_picture             =  1171
-          INTEGER, PARAMETER :: IDF_SA_Reanneal_Button          =  1175
           INTEGER, PARAMETER :: IDF_SA_total_moves_label        =  1176
           INTEGER, PARAMETER :: IDF_SA_zero_move_label          =  1177
           INTEGER, PARAMETER :: IDB_PawRef_Save                 =  1180
