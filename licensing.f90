@@ -474,8 +474,8 @@
                 ' governed by and construed in accordance with English law and shall be subject to the'// &
                 ' exclusive jurisdiction of the English courts.'//NextLine// &
                 'If you agree to the foregoing terms and conditions then please select the "I'// &
-                ' have read the full text above and I Agree" option below. If you do not agree'// &
-                ' to the foregoing terms and conditions you should select the "I do NOT Agree"'// &
+                ' have read the full text above and I AGREE" option below. If you do not agree'// &
+                ' to the foregoing terms and conditions you should select the "I DO NOT AGREE"'// &
                 ' option below. After making your selection, please click OK to proceed.'
       CALL WDialogSelect(IDD_LicenceAgreement)
       CALL WDialogPutString(IDF_Agreement,kString)
