@@ -43,9 +43,13 @@
         CALL WDialogSelect(IDD_SAW_Page5)
         CALL WGridRows(IDF_SA_Summary, 5)
         CALL WDialogClearField(IDF_SA_Summary)
+        CALL WDialogPutInteger(IDF_Limit1,1)
+        CALL WDialogPutInteger(IDF_Limit2,1)
         CALL WDialogSelect(IDD_Summary)
         CALL WGridRows(IDF_SA_Summary, 5)
         CALL WDialogClearField(IDF_SA_Summary)
+        CALL WDialogPutInteger(IDF_Limit1,1)
+        CALL WDialogPutInteger(IDF_Limit2,1)
       ELSE
         CALL WDialogSelect(IDD_SAW_Page5)
         CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
@@ -57,6 +61,8 @@
           CALL WGridPutCellReal    (IDF_SA_Summary,4,iSol,ProfileChiSqd(iSol2Run(iSol)),'(F7.2)')
           CALL WGridPutCellReal    (IDF_SA_Summary,5,iSol,IntensityChiSqd(iSol2Run(iSol)),'(F7.2)')
         ENDDO
+        CALL WDialogPutInteger(IDF_Limit1,1)
+        CALL WDialogPutInteger(IDF_Limit2,NumOf_SA_Runs)
         CALL WDialogSelect(IDD_Summary)
         CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
         DO iSol = 1, NumOf_SA_Runs
@@ -67,6 +73,8 @@
           CALL WGridPutCellReal    (IDF_SA_Summary,4,iSol,ProfileChiSqd(iSol2Run(iSol)),'(F7.2)')
           CALL WGridPutCellReal    (IDF_SA_Summary,5,iSol,IntensityChiSqd(iSol2Run(iSol)),'(F7.2)')
         ENDDO
+        CALL WDialogPutInteger(IDF_Limit1,1)
+        CALL WDialogPutInteger(IDF_Limit2,NumOf_SA_Runs)
       ENDIF
       CALL PopActiveWindowID
 
