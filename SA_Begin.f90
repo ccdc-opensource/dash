@@ -122,43 +122,43 @@
         ENDIF
       ENDIF
 !C Divide number of seconds into hours, minutes and seconds
-        nhours = DiffSecs / 3600
-        IF (nhours .NE. 0) THEN
-          DiffSecs = DiffSecs - nhours*3600
-          IF (NItems .GT. 0) THEN
-            SA_DurationStr = SA_DurationStr(1:DSLen)//", "
-            DSLen = DSLen + 2
-          ENDIF
-          tIntStr = Integer2String(nhours)
-          SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" hours"
-          DSLen = LEN_TRIM(SA_DurationStr)
-          IF (nhours .EQ. 1) DSLen = DSLen - 1
-          NItems = NItems + 1
+      nhours = DiffSecs / 3600
+      IF (nhours .NE. 0) THEN
+        DiffSecs = DiffSecs - nhours*3600
+        IF (NItems .GT. 0) THEN
+          SA_DurationStr = SA_DurationStr(1:DSLen)//", "
+          DSLen = DSLen + 2
         ENDIF
-        nminutes = DiffSecs / 60
-        IF (nminutes .NE. 0) THEN
-          DiffSecs = DiffSecs - nminutes*60
-          IF (NItems .GT. 0) THEN
-            SA_DurationStr = SA_DurationStr(1:DSLen)//", "
-            DSLen = DSLen + 2
-          ENDIF
-          tIntStr = Integer2String(nminutes)
-          SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" minutes"
-          DSLen = LEN_TRIM(SA_DurationStr)
-          IF (nminutes .EQ. 1) DSLen = DSLen - 1
-          NItems = NItems + 1
+        tIntStr = Integer2String(nhours)
+        SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" hours"
+        DSLen = LEN_TRIM(SA_DurationStr)
+        IF (nhours .EQ. 1) DSLen = DSLen - 1
+        NItems = NItems + 1
+      ENDIF
+      nminutes = DiffSecs / 60
+      IF (nminutes .NE. 0) THEN
+        DiffSecs = DiffSecs - nminutes*60
+        IF (NItems .GT. 0) THEN
+          SA_DurationStr = SA_DurationStr(1:DSLen)//", "
+          DSLen = DSLen + 2
         ENDIF
-        IF (DiffSecs .NE. 0) THEN
-          IF (NItems .GT. 0) THEN
-            SA_DurationStr = SA_DurationStr(1:DSLen)//", "
-            DSLen = DSLen + 2
-          ENDIF
-          tIntStr = Integer2String(DiffSecs)
-          SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" seconds"
-          DSLen = LEN_TRIM(SA_DurationStr)
-          IF (DiffSecs .EQ. 1) DSLen = DSLen - 1
-          NItems = NItems + 1
+        tIntStr = Integer2String(nminutes)
+        SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" minutes"
+        DSLen = LEN_TRIM(SA_DurationStr)
+        IF (nminutes .EQ. 1) DSLen = DSLen - 1
+        NItems = NItems + 1
+      ENDIF
+      IF (DiffSecs .NE. 0) THEN
+        IF (NItems .GT. 0) THEN
+          SA_DurationStr = SA_DurationStr(1:DSLen)//", "
+          DSLen = DSLen + 2
         ENDIF
+        tIntStr = Integer2String(DiffSecs)
+        SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" seconds"
+        DSLen = LEN_TRIM(SA_DurationStr)
+        IF (DiffSecs .EQ. 1) DSLen = DSLen - 1
+        NItems = NItems + 1
+      ENDIF
       CALL InfoMessage('The Simulated Annealing took '//SA_DurationStr(1:DSLen))
 !C After completion, save the list of solutions
       CALL SaveMultiRun_LogData
