@@ -296,19 +296,9 @@
 ! The variable NAME now holds 'Cl6 ' etc. for every atom. 
 ! We must extract the element from that
       DO I = 1, natom    
-        AtmElement(I) = '  '
-        I2 = 1
-        DO I1 = 1, 4
-          IF (ChrIsLetter(NAME(I)(I1:I1))) THEN
-            IF (I2 .EQ. 3) THEN
-              CALL DebugErrorMessage('Element more than two chars in CSSR2Mol2.')
-              I2 = 2
-            ENDIF
-            AtmElement(I)(I2:I2) = NAME(I)(I1:I1)
-            I2 = I2 + 1
-          ENDIF
-          CALL StrUpperCase(AtmElement(I))
-        ENDDO
+        AtmElement(I) = NAME(I)(1:2)
+        IF (.NOT. ChrIsLetter(AtmElement(I)(2:2))) AtmElement(natom)(2:2) = ' '
+        CALL StrUpperCase(AtmElement(I))
       ENDDO
       CLOSE(InputFile)
 ! Given the element, assign the bond radius
@@ -331,9 +321,9 @@
       WRITE(OutputFile,"('@<TRIPOS>ATOM')")
       DO i = 1, natom
         AtmElement(i)(2:2) = ChrLowerCase(AtmElement(i)(2:2))
-        WRITE(OutputFile,270) i,AtmElement(i),(Coordinates(j,i),j=1,3),sybatom(i)
+        WRITE(OutputFile,270) i,NAME(I),(Coordinates(j,i),j=1,3),sybatom(i)
+  270   FORMAT(I3,1X,A4,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
       ENDDO
-  270 FORMAT(I3,1X,A2,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
       WRITE(OutputFile,"('@<TRIPOS>BOND')")
       DO i = 1, nbond
         WRITE(OutputFile,'(4(I3,1X))') i,bat(i,1),bat(i,2),1
