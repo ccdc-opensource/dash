@@ -702,9 +702,11 @@
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
-      LOGICAL RESTART
-      INTEGER SA_Run_Number
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
+      LOGICAL         RESTART
+      INTEGER                  SA_Run_Number
+      INTEGER                                 MaxRuns, MaxMoves
+      REAL                                                       ChiMult
+      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
       SA_Run_Number = 1
       CALL Log_SARun_Entry(pdb_file,ProfileChi,IntensityChi)
