@@ -356,3 +356,37 @@
 !
 !*****************************************************************************
 ! 
+      SUBROUTINE FileGetExtension(TheFile, TheExtension, TheLength)
+!
+! OUTPUT  TheExtension = the extension, without the dot
+!
+      USE VARIABLES
+      
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFile
+      CHARACTER*(*), INTENT (  OUT) :: TheExtension
+      INTEGER,       INTENT (INOUT) :: TheLength      ! The length of the extension.
+
+      INTEGER iLen, iPos
+
+      iLen = LEN_TRIM(TheFile)
+! Find the last occurence of '.' in tInputFile
+      iPos = iLen - 1 ! Last character of tInputFile is not tested
+! The longest extension possible is TheLength
+      DO WHILE ((iPos .NE. 0) .AND. (TheFile(iPos:iPos) .NE. DIRSPACER) .AND. (TheFile(iPos:iPos) .NE. '.') .AND. (iPos .NE. (iLen-TheLength-1)))
+        iPos = iPos - 1
+      ENDDO
+! If we haven't found a '.' by now, we cannot deal with the extension anyway
+      TheExtension = ''
+      IF (TheFile(iPos:iPos) .NE. '.') THEN
+        TheLength = 0
+      ELSE
+        TheExtension = TheFile(iPos+1:iLen)
+        TheLength = LEN_TRIM(TheExtension)
+      ENDIF
+
+      END SUBROUTINE FileGetExtension
+!
+!*****************************************************************************
+! 

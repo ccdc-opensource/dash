@@ -1,11 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Init_StdOut
-! Selects the 'working directory' (which is changed every time the directory is changed
-! when e.g. a Z-matrix is loaded, so this is not really '_the_' working directory).
-! Checks if in that directory (but, as said, that directory changes all the time)
-! temporary files can be created.
+      SUBROUTINE GetInstallationDirectory
  
       USE WINTERACTER
       USE VARIABLES
@@ -13,8 +9,6 @@
 
       IMPLICIT NONE
 
-      INTEGER :: IFlags
-      CHARACTER(MaxPathLength) :: Dirname
       CHARACTER(MaxPathLength) tString
       CHARACTER(MaxPathLength) tFile
       INTEGER*4 tProcess, tSize
@@ -30,6 +24,26 @@
       CALL IOsDirChange(InstallationDirectory)
       CALL IOsDirName(InstallationDirectory)
       InstallationDirectory = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//DIRSPACER
+
+      END SUBROUTINE GetInstallationDirectory
+!
+!*****************************************************************************
+!
+      SUBROUTINE Init_StdOut
+! Selects the 'working directory' (which is changed every time the directory is changed
+! when e.g. a Z-matrix is loaded, so this is not really '_the_' working directory).
+! Checks if in that directory (but, as said, that directory changes all the time)
+! temporary files can be created.
+ 
+      USE WINTERACTER
+      USE VARIABLES
+      USE KERNEL32
+
+      IMPLICIT NONE
+
+      INTEGER :: IFlags
+      CHARACTER(MaxPathLength) :: Dirname
+
       DO WHILE (.TRUE.)
         IFlags = DirChange + DirCreate
         Dirname = ' '
@@ -201,9 +215,6 @@
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
-      LOGICAL          log_preset
-      COMMON /presetl/ log_preset
-
       REAL            XPG1, XPG2, YPG1, YPG2
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
 
@@ -328,7 +339,6 @@
       LOG_HYDROGENS = .FALSE.
       T0 = 0.0
       RT = 0.02
-      log_preset = .FALSE.
       CALL Set_Wavelength(WaveLengthOf('Cu'))
 ! Now initialise the maximum resolution in the dialogue window
       CALL WDialogSelect(IDD_PW_Page5)
