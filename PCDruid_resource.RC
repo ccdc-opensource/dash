@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 22/Mar/2002 09:20:29
+// Modified : 31/Mar/2002 16:46:35
 //
 ///////////////////////////////////////////////////
 //
@@ -618,9 +618,8 @@
 #define IDF_RR_ExclRegions               1454
 #define IDF_RR_ZeroPoint                 1455
 #define IDB_Undo                         1456
-#define ID_Save                         40027
-#define ID_New                          40024
-#define ID_Open                         40026
+#define IDB_Open                        40024
+#define IDB_Save                        40026
 #define IDB_Edit                         1468
 #define IDB_Summary                      1469
 #define IDB_Bin                          1470
@@ -628,6 +627,7 @@
 #define IDF_BinData                      1471
 #define IDF_LBIN                         1472
 #define IDF_SGDet                        1473
+#define IDB_New                         40028
 
 ///////////////////////////////////////////////////
 //
@@ -3945,9 +3945,10 @@ BEGIN
     ID_ClearPeakFitRanges           "Delete peak fit ranges"
     ID_Delabc                       "Clear cell parameters"
     ID_FitPeaks                     "Fit peaks"
-    ID_New                          "New project"
-    ID_Open                         "Open project"
-    ID_Save                         "Save project"
+    IDB_New                         "New project"
+    IDB_Open                        "Open project"
+    IDB_Save                        "Save project"
+    IDB_SaveAs                      "Save As..."
 END
 
 ///////////////////////////////////////////////////
@@ -3957,9 +3958,10 @@ END
 ID_TOOLBAR1 RCDATA
 BEGIN
      16, 16,
-   ID_New,
-   ID_Open,
-   ID_Save,
+   IDB_New,
+   IDB_Open,
+   IDB_Save,
+   IDB_SaveAs,
    ID_import_xye_file,0,
    ID_Remove_Background,0,
    ID_Peak_Fitting_Mode,
