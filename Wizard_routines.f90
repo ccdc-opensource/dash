@@ -15,7 +15,7 @@
       CALL SetModeMenuState(0,-1,-1)
       CALL ToggleMenus(0)
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,IDNEXT,Modeless)
 
       END SUBROUTINE StartWizard
 !
