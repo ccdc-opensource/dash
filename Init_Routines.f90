@@ -12,9 +12,54 @@
       CALL Clear_Zmatrices
       PrjFileName = ''
 ! CALL UpdatePrjFileName('')
+      CALL Clear_PO
 
       END SUBROUTINE Clear_Project
+!
+!*****************************************************************************
+!
+      SUBROUTINE Clear_PO
 
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE PO_VAR
+
+      IMPLICIT NONE
+
+      PrefPars(1) = 0.0
+      PrefPars(2) = 0.0
+      PrefPars(3) = 1.0
+      PrefPars(4) = 1.0
+      PrefParExists = .FALSE.
+      CALL Update_PO
+
+      END SUBROUTINE Clear_PO
+!
+!*****************************************************************************
+!
+      SUBROUTINE Update_PO
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE PO_VAR
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SAW_Page2)
+      CALL WDialogPutCheckBoxLogical(IDF_Use_PO,PrefParExists)
+      CALL WDialogPutInteger(IDF_PO_a,NINT(PrefPars(1)))
+      CALL WDialogPutInteger(IDF_PO_b,NINT(PrefPars(2)))
+      CALL WDialogPutInteger(IDF_PO_c,NINT(PrefPars(3)))
+      CALL WDialogFieldStateLogical(IDF_PO_a,PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_PO_b,PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_PO_c,PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_LABELa,PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_LABELb,PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_LABELc,PrefParExists)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Update_PO
 !
 !*****************************************************************************
 !
@@ -143,6 +188,21 @@
       CALL UpdateZmatrixSelection
 
       END SUBROUTINE Clear_Zmatrices
+!
+!*****************************************************************************
+!
+      SUBROUTINE Clear_SA
+
+      IMPLICIT NONE
+
+      LOGICAL         RESTART
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      NumOf_SA_Runs = 0
+
+      END SUBROUTINE Clear_SA
 !
 !*****************************************************************************
 !
