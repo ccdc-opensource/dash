@@ -16,8 +16,8 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL XOPT,       C,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
@@ -28,8 +28,9 @@
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
 
-      INTEGER              iMyExit, num_new_min
-      COMMON / CMN000001 / iMyExit, num_new_min
+      INTEGER              iMyExit 
+      LOGICAL                       NewOptimumFound, WasMinimised
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
@@ -101,6 +102,7 @@
       LOG_HYDROGENS = tLOG_HYDROGENS
       IF (DesorbHydrogens) CALL create_fob(.TRUE.)
       IF (tAccept) THEN
+        IF (.NOT. Auto) WasMinimised = .TRUE.
         DO II = 1, N
           I = IP(II)
           XOPT(I) = XSIM(II)
@@ -113,7 +115,7 @@
           ENDDO
         ENDDO
         CALL valchipro(CHIPROBEST)
-        num_new_min = num_new_min + 1
+        NewOptimumFound = .TRUE.
         CALL WDialogSelect(IDD_SA_Action1)
         CALL WDialogPutReal(IDF_min_chisq, FOPT, '(F8.2)')
         CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
@@ -153,8 +155,8 @@
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
-      REAL             XOPT,       C,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
