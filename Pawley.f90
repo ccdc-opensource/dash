@@ -83,16 +83,11 @@
 
 ! Reset the R-values if possible
           IF (LastValuesSet) THEN
-            CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,                   &
-     &                         RLastValues(1),'(f12.2)') 
-            CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,                 &
-     &                         RLastValues(2),'(F12.3)')
-            CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,                &
-     &                         RLastValues(3),'(F12.2)')
-            CALL WDialogPutInteger(                                     &
-     &                         IDF_Pawley_Cycle_NumPts,ILastValues(1))
-            CALL WDialogPutInteger(                                     &
-     &                         IDF_Pawley_Cycle_NumRefs,ILastValues(2))
+            CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(f12.2)') 
+            CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,RLastValues(2),'(F12.3)')
+            CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3),'(F12.2)')
+            CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
+            CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
             CALL retrieve_polybackup()
           END IF
 
@@ -153,16 +148,11 @@
                   CALL WDialogFieldState(IDB_PawRef_Skip,Enabled)
 !>> JCC Reset the R-values if possible
                   IF (LastValuesSet) THEN
-                        CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,       &
-     &                         RLastValues(1),'(F12.2)') 
-                        call WDialogPutReal(IDF_Pawley_Cycle_ChiSq,     &
-     &                         RLastValues(2),'(F12.3)')
-                          call WDialogPutReal(IDF_Pawley_Cycle_RwpExp,  &
-     &                         RLastValues(3),'(F12.2)')
-                                    call WDialogPutInteger(             &
-     &                         IDF_Pawley_Cycle_NumPts,ILastValues(1))
-                                    call WDialogPutInteger(             &
-     &                         IDF_Pawley_Cycle_NumRefs,ILastValues(2))
+                        CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(F12.2)') 
+                        call WDialogPutReal(IDF_Pawley_Cycle_ChiSq,RLastValues(2),'(F12.3)')
+                          call WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3),'(F12.2)')
+                                    call WDialogPutInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
+                                    call WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
                                     CALL retrieve_polybackup
                             END IF
                               goto 555
@@ -175,15 +165,7 @@
                       CELLPAR(JJ)=DEGREE(ARCCOS(CELL(II,2,1)))
                     END DO
                     ZEROPOINT = ZEROSP(1,1,1)
-!O        Call WDialogSelect(IDD_Peak_Positions)
-!O        Call WDialogPutReal(IDF_a_refine,CellPar(1),'(F10.5)')
-!O        Call WDialogPutReal(IDF_b_refine,CellPar(2),'(F10.5)')      
-!O        Call WDialogPutReal(IDF_c_refine,CellPar(3),'(F10.5)')      
-!O        Call WDialogPutReal(IDF_alp_refine,CellPar(4),'(F10.3)')      
-!O        Call WDialogPutReal(IDF_bet_refine,CellPar(5),'(F10.3)')      
-!O        Call WDialogPutReal(IDF_gam_refine,CellPar(6),'(F10.3)')
                     CALL Upload_Cell_Constants()
-!O        Call WDialogPutReal(IDF_zeropt_refine,ZeroPoint,'(F10.4)')
                     CALL Upload_Zero_Point() 
                   call Generate_TicMarks()
                   call Load_Pawley_Pro
@@ -303,22 +285,18 @@
 ! Now check on which button was pressed ...
       IF (NumPawleyRef .EQ. 0) THEN
         CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Disabled)
-        CALL WDialogFieldState(IDF_PawRef_RefInts_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
-!ccc gone        CALL WDialogFieldState(IDF_PawRef_RefWid_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Disabled)
 !
         CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefInts_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Unchecked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Unchecked)
-!ccc gone        CALL WDialogPutCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefSigm1_Check,Unchecked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefSigm2_Check,Unchecked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefGamm1_Check,Unchecked)
@@ -328,22 +306,18 @@
 !>> JCC Only change the setting if this is the second Pawley fit
       ELSE IF (NumPawleyRef .EQ. 1) THEN
         CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefInts_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
-!ccc gone        CALL WDialogFieldState(IDF_PawRef_RefWid_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Enabled)
 !
         CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefInts_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Checked)
-!ccc gone        CALL WDialogPutCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
         CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
         CALL WDialogPutCheckBox(IDF_PawRef_RefSigm1_Check,Unchecked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefSigm2_Check,Unchecked)
@@ -353,20 +327,16 @@
         CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
       ELSE
         CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefInts_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
-!ccc gone        CALL WDialogFieldState(IDF_PawRef_RefWid_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Enabled)
 !
         CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefInts_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
-!ccc gone        CALL WDialogPutCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
         CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
       END IF
       IF (.NOT. BACKREF) THEN
@@ -507,7 +477,7 @@
      &'L PKFN LIMS 0.005')
 !>> JCC Need to check these variables, and set them to some decent defaults
 !>> Currently the default values are all zero, which invariably fail.
-!>> 
+! JvdS @ PkFnVarVal(1,3) and PkFnVarVal(1,4) seem to switch somewhere: which is which?
       WRITE(42,4271) PkFnVarVal(1,1),PkFnVarVal(2,1)
       WRITE(42,4272) PkFnVarVal(1,2),PkFnVarVal(2,2)
       WRITE(42,4273) PkFnVarVal(1,3)
@@ -676,21 +646,21 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION New_Pawley_Refinement()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      INCLUDE 'DialogPosCmn.inc'
-
-      CALL WDialogSelect(IDD_Pawley_Status)
-      CALL WDialogShow(IXPos_IDD_Pawley_Status,                         &
-     &IYPos_IDD_Pawley_Status,0,Modeless)
-
-      CALL Quick_Pawley_ReRefine() 
-      New_Pawley_Refinement = Quick_Pawley_Fit()
-
-      END FUNCTION New_Pawley_Refinement
+!U      INTEGER FUNCTION New_Pawley_Refinement()
+!U
+!U      USE WINTERACTER
+!U      USE DRUID_HEADER
+!U
+!U      INCLUDE 'DialogPosCmn.inc'
+!U
+!U      CALL WDialogSelect(IDD_Pawley_Status)
+!U      CALL WDialogShow(IXPos_IDD_Pawley_Status,                         &
+!U     &IYPos_IDD_Pawley_Status,0,Modeless)
+!U
+!U      CALL Quick_Pawley_ReRefine() 
+!U      New_Pawley_Refinement = Quick_Pawley_Fit()
+!U
+!U      END FUNCTION New_Pawley_Refinement
 !
 !*****************************************************************************
 !
@@ -754,14 +724,12 @@
 ! Now check on which button was pressed ...
       If (NumPawleyRef.EQ.0) THEN
         CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Disabled)
-        CALL WDialogFieldState(IDF_PawRef_RefInts_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefWid_Check,Disabled)
 !
         CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefInts_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Unchecked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Unchecked)
@@ -774,14 +742,12 @@
         ENDIF
       ELSE
         CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefInts_Check,Disabled)
         CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
         CALL WDialogFieldState(IDF_PawRef_RefWid_Check,Enabled)
 !
         CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefInts_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Checked)
         CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Checked)
@@ -1198,17 +1164,12 @@
 !      CALL IOsDirName(Currentdir)
       IFLAGS = SaveDialog + AppendExt + PromptOn
       FILTER = 'Diffraction information files (*.sdi)|*.sdi|'
-!O    DO I = 1,LEN_TRIM(SDIFileName)
-!O          SDIFileName(I:I)=' '
-!O    END DO
       SDIFileName = ' '
-      CALL WSelectFile(FILTER,IFLAGS,SDIFileName,                       &
-     &'Save diffraction information for structure solution')
+      CALL WSelectFile(FILTER,IFLAGS,SDIFileName,'Save diffraction information for structure solution')
 
 !.. Go back to original directory
 !      CALL IOsDirChange(Currentdir)
-      IF ((WinfoDialog(4) .EQ. CommonOk) .AND.                          &
-     &    (SDIFileName .NE. ' ')) THEN
+      IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (SDIFileName .NE. ' ')) THEN
         CALL CreateSDIFile(SDIFileName)
         CALL Set_saFileNames(SDIFileName(1:LEN_TRIM(SDIFileName) - 4))
         SaveProject = 1
