@@ -58,10 +58,11 @@
 
       LOGICAL, EXTERNAL :: Confirm
 
-      RETURN
+#ifdef ONTBUG
       IF (ShowAgain) THEN
         ShowAgain = Confirm('Debug error : '//TheMessage(1:LEN_TRIM(TheMessage))//CHAR(13)//'More Debug Error messages?')
       ENDIF
+#endif
 
       END SUBROUTINE DebugErrorMessage
 !
@@ -386,6 +387,9 @@
           GOTO 10
         CASE (IDD_SAW_Page5)
           CALL DealWithAnalyseSolutionsWindow
+          GOTO 10
+        CASE (IDD_OutputSolutions)
+          CALL DealWithOutputSolutions
           GOTO 10
         CASE (IDD_Summary)
           CALL DealWithSaSummary
