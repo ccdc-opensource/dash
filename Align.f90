@@ -180,7 +180,8 @@
           CentreOfMass(j) = 0.50
         END DO
       END IF
-
+! Looks to see if there are further generators (Table 15, IT VolA) needed to explore 
+!  all the correct space. 
       CALL SpecialOriginRequirements(NumberSGTable, CentreofMass, Origin, NumberofOrigins)
 !
 ! Start to create matrix which contains possible positions for the centre of mass.  This loop
@@ -734,7 +735,7 @@
 
 
      SUBROUTINE SpecialOriginRequirements(NumberSGTable, CentreofMass, Origin, NumberofOrigins)
-
+! Not really origins, rather further generators
      REAL, DIMENSION (3,4) :: Origin
      REAL, DIMENSION (3) :: CentreofMass
      INTEGER NumberSGTable

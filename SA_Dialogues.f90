@@ -1644,7 +1644,7 @@
       REAL Xinitial
       LOGICAL OutOfBounds
 
-          
+! Initialise variables          
       ICol = 0
       NumColumns = 3
       Upper = 1
@@ -1652,7 +1652,7 @@
       Zero = 0.0000
       OneEighty = 180.0000
 
-!     There must be a better way!  Given the number of the parameter want to know
+!     Given the number of the parameter want to know
 !     which zmatrix, fragment, copy it belongs to.
       dof = 0
       frag = 0
@@ -1685,7 +1685,7 @@
       CALL WDialogClearField(IDF_ReportUpper1)
       CALL WDialogClearField(IDF_ReportUpper2)
 
-!     Fill fields
+!     Initialise fields 
       CALL WDialogPutString(IDF_TorsionName, parlabel(IFRow))
       CALL WDialogPutReal(IDF_Initial, Xinitial, '(F12.5)')
       IF (ModalFlag(IfRow) .EQ. 1) THEN ! Not been set before
@@ -1718,15 +1718,11 @@
             CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
           ENDIF
         ELSEIF (ModalFlag(IFRow) .EQ. 3) THEN
-          CALL WDialogPutRadioButton(IDF_TriModalRadio)
-          
+          CALL WDialogPutRadioButton(IDF_TriModalRadio)          
           CALL WDialogGetReal(IDF_ModalUpper, xtem)
-          CALL DetermineTrimodalBounds(xtem, Upper)
-               
+          CALL DetermineTrimodalBounds(xtem, Upper)              
           CALL WDialogGetReal(IDF_ModalLower, xtem)
           CALL DetermineTrimodalBounds(xtem, Lower)
-
-
           CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
           CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
           CALL WDialogPutReal(IDF_ReportLower1, Tempbounds(2,Lower))
@@ -1741,6 +1737,7 @@
       CALL WDialogShow(-1, -1, IDD_ModalDialog, SemiModeless)
       CALL PushActiveWindowID
 
+!     Dialog's responses 
       DO
 10    CONTINUE
       CALL GetEvent
@@ -1788,14 +1785,10 @@
                xtem = MIN(SNGL(ub(IFrow)),xtem)
                TempPrevlb = LB(IFRow)               
                lb(IFRow) = DBLE(xtem)
-
-!               xtem = MAX(lb(IFrow),x(IFrow))
-!               X(IFrow) = DBLE(xtem)
-!               CALL WDialogPutReal(IDF_Initial,SNGL(x(IFrow)),'(F12.5)')
                CALL WDialogPutReal(IDF_ModalLower,SNGL(lb(IFrow)),'(F12.5)')
-
+!              How ranges are calculated depends on state of Modal RadioButton  
                CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
-                 SELECT CASE (ISET)
+                 SELECT CASE (ISET) !bimodal radiobutton active
                    CASE (1)
                     CALL WDialogClearField(IDF_ReportLower2)
                     CALL WDialogClearField(IDF_ReportUpper2)
@@ -1815,7 +1808,7 @@
                       ENDIF
                     ModalFlag(IFRow) = 2  
                                      
-                   CASE (2)             
+                   CASE (2) !Trimodal radiobutton active           
                      CALL WDialogGetReal(IDF_ModalLower, xtem)
                      CALL DetermineTrimodalBounds(xtem, Lower)
 
@@ -1835,12 +1828,9 @@
               TempPrevUb = UB(IFRow)             
               ub(IFrow) = DBLE(xtem)
               CALL WDialogPutReal(IDF_ModalUpper,SNGL(ub(IFrow)),'(F12.5)')
-
-!              xtem = MIN(ub(IFrow),x(IFrow))
-!              X(IFrow) = DBLE(xtem)
-!              CALL WDialogPutReal(IDF_Initial,SNGL(x(IFrow)),'(F12.5)')           
+!             How ranges are calculated depends on state of Modal RadioButton      
               CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
-                 SELECT CASE (ISET)
+                 SELECT CASE (ISET) ! Bimodal Radiobutton active
                    CASE (1)
                      CALL WDialogClearField(IDF_ReportLower2)
                      CALL WDialogClearField(IDF_ReportUpper2)
@@ -1859,7 +1849,7 @@
                         CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
                       ENDIF
                       ModalFlag(IFRow) = 2
-                   CASE (2)
+                   CASE (2) !Trimodal Radiobutton active
                      CALL WDialogGetReal(IDF_ModalUpper, xtem)
                      CALL DetermineTrimodalBounds(xtem, Upper)               
                      CALL WDialogGetReal(IDF_ModalLower, xtem)
@@ -1871,10 +1861,11 @@
                      CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))
                    END SELECT
             END SELECT
+
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK)
-
+!             Record parameters in appropriate arrays
               CALL WDialogGetDouble(IDF_Initial, tempdouble)
               X(IFRow) = tempdouble
               CALL WDialogGetDouble(IDF_ModalLower, tempdouble)
@@ -1892,10 +1883,11 @@
               CALL WDialogSelect(IDD_SA_Modal_Input2)
               CALL WGridColourRow(IDF_parameter_grid_modal, IFRow, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))
               LimsChanged = .TRUE.
+!           Return bounds to previous values
             CASE (IDCANCEL)
               ub(IFRow) = tempprevub
               lb(IFRow) = tempprevlb
-
+!           Return to "unimodal" mode. Modal torsion angle is no longer applied
             CASE (IDF_BiModalReset)
               ub(IFrow) = OneEighty
               lb(IFrow) = (-1) * OneEighty
@@ -1909,11 +1901,8 @@
           prevub(IFRow) = UB(IFRow)
           prevlb(IFRow) = LB(IFRow)
           CALL WDialogSelect(IDD_SA_Modal_Input2)
-          CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5, IFRow, UnChecked)          
-
-  
-          RETURN 
-             
+          CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5, IFRow, UnChecked)            
+          RETURN              
       END SELECT
       ENDDO
 
@@ -1996,6 +1985,10 @@
 
       SUBROUTINE CheckTrimodalBounds(OneEightyScale)
 
+! Determines whether it is appropriate to use a -180 to 0 and 0 to 180 degree 
+! scale.  A 0-360 degree scale may be more appropriate (OneEightyScale = .FALSE.)
+
+
       REAL, DIMENSION (3,2) :: TempBounds
 
       COMMON /TriModalBounds/  TempBounds
@@ -2025,6 +2018,9 @@
 
       SUBROUTINE CheckBimodalBounds(row,OneEightyScale)
 
+! Determines whether it is appropriate to use a -180 to 0 and 0 to 180 degree 
+! scale.  A 0-360 degree scale may be more appropriate (OneEightyScale = .FALSE.)
+
       INCLUDE 'PARAMS.INC'
 
       DOUBLE PRECISION x,       lb,       ub,       vm
@@ -2048,6 +2044,9 @@
 !
 
       SUBROUTINE CheckXInBounds(npar, XIn, OutofBounds)
+
+! This Subroutine determines if a trial torsion angle value is within
+! modal torsion angle ranges defined.
 
       USE WINTERACTER
       USE DRUID_HEADER

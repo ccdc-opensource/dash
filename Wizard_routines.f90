@@ -1385,6 +1385,7 @@
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
               IF (NumberSGTable .EQ. LPosSG(LatBrav)) CALL WarningMessage('Space-group symmetry has not been reset.')
+              CALL WDialogSelect(IDD_PW_Page10)
               CALL WDialogPutString(IDF_Label5, 'The next step is Pawley Refinement') 
               CALL WizardWindowShow(IDD_PW_Page10)
             CASE (IDAPPLY)
@@ -1402,6 +1403,7 @@
                CALL Generate_TicMarks
                CALL Download_SpaceGroup(IDD_PW_Page1) 
                SpaceGroupDetermination = .TRUE.
+               CALL WDialogSelect(IDD_PW_Page10)
                CALL WDialogPutString(IDF_Label5, 'The next step in Space Group Determination is Pawley Refinement') 
                CALL WizardWindowShow(IDD_PW_Page10)
           END SELECT
