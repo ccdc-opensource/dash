@@ -33,8 +33,8 @@
       LOGICAL         InSA
       COMMON /SADATA/ InSA
 
-      INTEGER, EXTERNAL :: CheckOverwriteSaOutput, DateToday, DateDaysElapsed, TimeNowSeconds
-      LOGICAL, EXTERNAL :: Get_UseHydrogens
+      INTEGER, EXTERNAL :: CheckOverwriteSaOutput, DateToday, DateDaysElapsed, &
+                           TimeNowSeconds, Get_HydrogenTreatment
       CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*100 SA_DurationStr
       INTEGER StartDate, EndDate, DaysElapsed, DSLen
@@ -51,8 +51,11 @@
 ! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
 ! changed while the SA is running).
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
-      LOG_HYDROGENS = Get_UseHydrogens()
+      CALL WDialogFieldState(IDR_HydrogensIgnore, Disabled)
+      CALL WDialogFieldState(IDR_HydrogensAbsorb, Disabled)
+      CALL WDialogFieldState(IDR_HydrogensExplicit, Disabled)
+      LOG_HYDROGENS = (Get_HydrogenTreatment() .EQ. 3)
+      CALL CREATE_FOB(Get_HydrogenTreatment() .EQ. 2)
       CALL Create_AtomicWeightings
       CALL FillSymmetry_2
       CALL GET_LOGREF
@@ -158,7 +161,9 @@
       CALL OutputChi2vsMoves
       CALL SetModeMenuState(0,0)
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogFieldState(IDF_UseHydrogens,Enabled)
+      CALL WDialogFieldState(IDR_HydrogensIgnore, Enabled)
+      CALL WDialogFieldState(IDR_HydrogensAbsorb, Enabled)
+      CALL WDialogFieldState(IDR_HydrogensExplicit, Enabled)
 !O      Ierrflag = InfoError(1)
 !O      CALL WindowSelect(0)
 !O! Wait for the user to raise the window. Under NT the "WindowRaise call" 

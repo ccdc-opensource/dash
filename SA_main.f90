@@ -272,7 +272,7 @@
       CHARACTER*36 parlabel(mvar)
       DOUBLE PRECISION dcel(6)
       INTEGER I, II, kk, iFrg, iFrgCopy, iH, iK, iL
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM, Get_HydrogenTreatment
       REAL    tLattice(1:3,1:3)
       REAL    Beta_m, Alpha_m, q0m, q1m, q2m, q3m
       REAL    Length
@@ -294,7 +294,7 @@
 ! Calculate the reciprocal lattice
       CALL DGMINV(f2cmat,c2fmat,3)
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
-      CALL CREATE_FOB
+      CALL CREATE_FOB(Get_HydrogenTreatment() .EQ. 2)
       CALL Create_AtomicWeightings
 ! Per Z-matrix, determine whether to use quaternions or a single axis
       DO iFrg = 1, maxfrg

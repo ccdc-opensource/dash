@@ -217,43 +217,51 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_AbsorbHydrogens
-
-! When .TRUE., hydrogen atoms are included in the structure factor calculations
-
+      INTEGER FUNCTION Get_HydrogenTreatment
+! 1 = ignore
+! 2 = absorb
+! 3 = explicit
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER iState
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      Get_AbsorbHydrogens = WDialogGetCheckBoxLogical(IDC_AbsorbH)
+      CALL WDialogGetRadioButton(IDR_HydrogensIgnore, iState)
+      Get_HydrogenTreatment = iState
       CALL PopActiveWindowID
 
-      END FUNCTION Get_AbsorbHydrogens
+      END FUNCTION Get_HydrogenTreatment
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_UseHydrogens
-
-! When .TRUE., hydrogen atoms are included in the structure factor calculations
-
+      SUBROUTINE Set_HydrogenTreatment(iState)
+! 1 = ignore
+! 2 = absorb
+! 3 = explicit
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER, INTENT (IN   ) :: iState
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      Get_UseHydrogens = WDialogGetCheckBoxLogical(IDF_UseHydrogens)
+      SELECT CASE (iState)
+        CASE (1)
+          CALL WDialogPutRadioButton(IDR_HydrogensIgnore)
+        CASE (2)
+          CALL WDialogPutRadioButton(IDR_HydrogensAbsorb)
+        CASE (3)
+          CALL WDialogPutRadioButton(IDR_HydrogensExplicit)
+      END SELECT
       CALL PopActiveWindowID
 
-      END FUNCTION Get_UseHydrogens
+      END SUBROUTINE Set_HydrogenTreatment
 !
 !*****************************************************************************
 !
@@ -315,30 +323,6 @@
       CALL PopActiveWindowID
 
       END FUNCTION UseHydrogensDuringAuto
-!
-!*****************************************************************************
-!
-      SUBROUTINE Set_UseHydrogens(TheValue)
-
-! When .TRUE., hydrogen atoms are included in the structure factor calculations
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      LOGICAL, INTENT (IN   ) :: TheValue
-
-      LOGICAL           LOG_HYDROGENS
-      COMMON /HYDROGEN/ LOG_HYDROGENS
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutCheckBoxLogical(IDF_UseHydrogens,TheValue)
-      LOG_HYDROGENS = TheValue
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Set_UseHydrogens
 !
 !*****************************************************************************
 !

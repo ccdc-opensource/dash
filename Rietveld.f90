@@ -50,6 +50,7 @@
 
       CALL WDialogSelect(IDD_Rietveld2)
       LOG_HYDROGENS = .TRUE.
+      CALL CREATE_FOB(.FALSE.)
 ! Load all values of all bonds, angles etc. into RRVAR variables
       KK = 0
 ! Loop over all the fragments
@@ -631,9 +632,10 @@
                 tFieldState = Enabled
               ELSE
                 tFieldState = Disabled
+                CALL WDialogPutCheckBox(IDC_PO, 0)
               ENDIF
-              CALL WDialogFieldState(IDC_PO,tFieldState)
-              CALL WDialogFieldState(IDR_PO,tFieldState)
+              CALL WDialogFieldState(IDC_PO, tFieldState)
+              CALL WDialogFieldState(IDR_PO, tFieldState)
               CALL WDialogPutReal(IDR_INTCHI, ChiSqd, "(F9.2)")
               CALL WDialogPutReal(IDR_PROCHI, ChiProSqd, "(F9.2)")
               CALL Profile_Plot
@@ -646,12 +648,12 @@
               ELSE
                 tFieldState = Disabled
               ENDIF
-              CALL WDialogFieldState(IDF_PO_a,tFieldState)
-              CALL WDialogFieldState(IDF_PO_b,tFieldState)
-              CALL WDialogFieldState(IDF_PO_c,tFieldState)
-              CALL WDialogFieldState(IDF_LABELa,tFieldState)
-              CALL WDialogFieldState(IDF_LABELb,tFieldState)
-              CALL WDialogFieldState(IDF_LABELc,tFieldState)
+              CALL WDialogFieldState(IDF_PO_a, tFieldState)
+              CALL WDialogFieldState(IDF_PO_b, tFieldState)
+              CALL WDialogFieldState(IDF_PO_c, tFieldState)
+              CALL WDialogFieldState(IDF_LABELa, tFieldState)
+              CALL WDialogFieldState(IDF_LABELb, tFieldState)
+              CALL WDialogFieldState(IDF_LABELc, tFieldState)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -677,7 +679,7 @@
         RETURN
       ENDIF
       CALL WCursorShape(CurHourGlass)
-      CALL RR_SIMOPT(RR_Params,RR_InitSteps,RR_npar,ChiSqd)
+      CALL RR_SIMOPT(RR_Params, RR_InitSteps, RR_npar, ChiSqd)
       CALL Params2RRVAR
       CALL RRVAR2Dialog
       CALL VALCHIPRO(ChiProSqd)
@@ -788,10 +790,10 @@
           ENDDO
         ENDIF
       ENDDO
-      CALL WDialogGetCheckBox(IDC_ITF,RR_ioptITF)
-      CALL WDialogGetReal(IDR_ITF,RR_ITF)
-      CALL WDialogGetCheckBox(IDC_PO,RR_ioptPO)
-      CALL WDialogGetReal(IDR_PO,RR_PO)
+      CALL WDialogGetCheckBox(IDC_ITF, RR_ioptITF)
+      CALL WDialogGetReal(IDR_ITF, RR_ITF)
+      CALL WDialogGetCheckBox(IDC_PO, RR_ioptPO)
+      CALL WDialogGetReal(IDR_PO, RR_PO)
       CALL PopActiveWindowID
 
       END SUBROUTINE Dialog2RRVAR
@@ -1114,8 +1116,7 @@
         RR_InitSteps(iParam) = 0.1 * Damping
         iParam = iParam + 1
       ENDIF
-      RR_nvar = iParam - 1
-      RR_npar = RR_nvar
+      RR_npar = iParam - 1
 
       END SUBROUTINE RRVAR2Params
 !
@@ -1627,8 +1628,8 @@
                     DO J = 1, NumberOfBonds(iFrg)
 ! Due to the backmapping, it is possible that the original number of the first atom is greater than the
 ! original number of the second atom. Mercury can't always read pdb files where this is the case.
-                      iBond1 = izmoid(Bonds(1,J,iFrg),iFrg)+NumOfAtomsSoFar
-                      iBond2 = izmoid(Bonds(2,J,iFrg),iFrg)+NumOfAtomsSoFar
+                      iBond1 = izmoid(Bonds(1,J,iFrg),iFrg) + NumOfAtomsSoFar
+                      iBond2 = izmoid(Bonds(2,J,iFrg),iFrg) + NumOfAtomsSoFar
                       IF (iBond1 .GT. iBond2) THEN
                         iTem   = iBond1
                         iBond1 = iBond2
@@ -1723,12 +1724,12 @@
               tLen = tLen + 4
               WRITE (hFile,"(A)",ERR=999) tString(1:tLen)
             ENDDO
-            WRITE (hFile,'("_cell_length_a    ",F8.4)',ERR=999) CellPar(1)
-            WRITE (hFile,'("_cell_length_b    ",F8.4)',ERR=999) CellPar(2)
-            WRITE (hFile,'("_cell_length_c    ",F8.4)',ERR=999) CellPar(3)
-            WRITE (hFile,'("_cell_angle_alpha ",F8.4)',ERR=999) CellPar(4)
-            WRITE (hFile,'("_cell_angle_beta  ",F8.4)',ERR=999) CellPar(5)
-            WRITE (hFile,'("_cell_angle_gamma ",F8.4)',ERR=999) CellPar(6)
+            WRITE (hFile,'("_cell_length_a    ", F8.4)',ERR=999) CellPar(1)
+            WRITE (hFile,'("_cell_length_b    ", F8.4)',ERR=999) CellPar(2)
+            WRITE (hFile,'("_cell_length_c    ", F8.4)',ERR=999) CellPar(3)
+            WRITE (hFile,'("_cell_angle_alpha ", F8.4)',ERR=999) CellPar(4)
+            WRITE (hFile,'("_cell_angle_beta  ", F8.4)',ERR=999) CellPar(5)
+            WRITE (hFile,'("_cell_angle_gamma ", F8.4)',ERR=999) CellPar(6)
             WRITE (hFile,'("_cell_volume",F7.1)',ERR=999) UnitCellVolume(CellPar(1),CellPar(2),CellPar(3),CellPar(4),CellPar(5),CellPar(6))
             WRITE (hFile,'("_cell_formula_units_Z  ?")',ERR=999)
             SELECT CASE (JRadOption)

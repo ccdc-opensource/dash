@@ -89,6 +89,7 @@
       INTEGER IFLAGS, IFTYPE
       CHARACTER*MaxPathLength tFileName
       CHARACTER*75  FILTER
+      INTEGER, EXTERNAL :: Get_HydrogenTreatment
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
@@ -114,13 +115,13 @@
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_UseHydrogens,IDF_AutoLocalOptimise)
-              IF (WDialogGetCheckBoxLogical(IDF_UseHydrogens)) THEN
+            CASE (IDR_HydrogensIgnore, IDR_HydrogensAbsorb, IDR_HydrogensExplicit, IDF_AutoLocalOptimise)
+              IF (Get_HydrogenTreatment() .EQ. 3) THEN ! Explicit
 ! If hydrogens are used during SA, force use of hydrogens during autominimise
-                CALL WDialogPutCheckBoxLogical(IDF_UseHydrogensAuto,.TRUE.)
-                CALL WDialogFieldState(IDF_UseHydrogensAuto,Disabled)
+                CALL WDialogPutCheckBoxLogical(IDF_UseHydrogensAuto, .TRUE.)
+                CALL WDialogFieldState(IDF_UseHydrogensAuto, Disabled)
               ELSE
-                CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto,WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
+                CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto, WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
               ENDIF
           END SELECT
       END SELECT
