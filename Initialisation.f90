@@ -335,6 +335,8 @@
 
       INTEGER         nvar, ns, nt, maxevl, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, maxevl, iseed1, iseed2
+      DOUBLE PRECISION T0, rt
+      COMMON /saparl/  T0, rt
 
       LOGICAL           ChildWinAutoClose
       COMMON /ChWinAC/  ChildWinAutoClose(1:20)
@@ -366,6 +368,8 @@
       PastPawley = .FALSE.
       DefaultMaxResolution = 1.75
       LOG_HYDROGENS = .FALSE.
+      T0 = 0.0
+      RT = 0.02
       log_preset = .FALSE.
       CALL Set_Wavelength(WaveLengthOf('Cu'))
 ! Now initialise the maximum resolution in the dialogue window
@@ -532,7 +536,6 @@
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
       INTEGER    RecNr
-      INTEGER*4    ISEED
       INTEGER    tFileHandle
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, SaveCSSR, SaveCCL, &
                            Get_ColourFlexibleTorsions, ConnectPointsObs, &
@@ -542,6 +545,7 @@
                            Get_UseHydrogens, Get_SavePRO
       REAL, EXTERNAL :: WavelengthOf
       INTEGER*4 tInteger
+      REAL*4    tReal
 
       tFileName = 'D3.cfg'
       tFileHandle = 10
@@ -673,10 +677,31 @@
       CALL FileWriteReal(tFileHandle,RecNr,SA_SimplexDampingFactor)
 ! Save the seeds for the random number generator
       CALL WDialogSelect(IDD_SA_input3)
-      CALL WDialogGetInteger(IDF_SA_RandomSeed1,ISEED)
-      CALL FileWriteInteger(tFileHandle,RecNr,ISEED)
-      CALL WDialogGetInteger(IDF_SA_RandomSeed2,ISEED)
-      CALL FileWriteInteger(tFileHandle,RecNr,ISEED)
+      CALL WDialogGetInteger(IDF_SA_RandomSeed1,tInteger)
+      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL WDialogGetInteger(IDF_SA_RandomSeed2,tInteger)
+      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+
+      CALL WDialogGetInteger(IDF_SA_MaxRepeats,tInteger)
+      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+      CALL WDialogGetReal(IDF_SA_ChiTest,tReal)
+      CALL FileWriteReal(tFileHandle,RecNr,tReal)
+      CALL WDialogGetReal(IDF_MaxMoves1,tReal)
+      CALL FileWriteReal(tFileHandle,RecNr,tReal)
+      CALL WDialogGetInteger(IDF_MaxMoves2,tInteger)
+      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+
+      CALL WDialogSelect(IDD_SA_Multi_completed_ep)
+! Atom labels for SA solutions overlay. Two options: 
+! 1. "Element symbol + solution number" (default)
+! 2. "Orignal atom labels"
+      CALL WDialogGetRadioButton(IDF_UseSolutionNr,tInteger)
+      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
+! Atom colours for SA solutions overlay. Two options: 
+! 1. "By solution number" (default)
+! 2. "By element"
+      CALL WDialogGetRadioButton(IDF_ColourBySolution,tInteger)
+      CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
 
 
 
@@ -863,6 +888,37 @@
       CALL WDialogPutInteger(IDF_SA_RandomSeed1,tInteger)
       CALL FileReadInteger(tFileHandle,RecNr,tInteger)
       CALL WDialogPutInteger(IDF_SA_RandomSeed2,tInteger)
+
+      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL WDialogPutInteger(IDF_SA_MaxRepeats,tInteger)
+      CALL FileReadReal(tFileHandle,RecNr,tReal)
+      CALL WDialogPutReal(IDF_SA_ChiTest,tReal)
+      CALL FileReadReal(tFileHandle,RecNr,tReal)
+      CALL WDialogPutReal(IDF_MaxMoves1,tReal)
+      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      CALL WDialogPutInteger(IDF_MaxMoves2,tInteger)
+
+      CALL WDialogSelect(IDD_SA_Multi_completed_ep)
+! Atom labels for SA solutions overlay. Two options: 
+! 1. "Element symbol + solution number" (default)
+! 2. "Orignal atom labels"
+      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      SELECT CASE (tInteger)
+        CASE (1)
+          CALL WDialogPutRadioButton(IDF_UseSolutionNr)
+        CASE (2)
+          CALL WDialogPutRadioButton(IDF_UseOriginal)
+      END SELECT
+! Atom colours for SA solutions overlay. Two options: 
+! 1. "By solution number" (default)
+! 2. "By element"
+      CALL FileReadInteger(tFileHandle,RecNr,tInteger)
+      SELECT CASE (tInteger)
+        CASE (1)
+          CALL WDialogPutRadioButton(IDF_ColourBySolution)
+        CASE (2)
+          CALL WDialogPutRadioButton(IDF_ColourByElement)
+      END SELECT
 
 
 
