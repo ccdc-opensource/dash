@@ -35,7 +35,7 @@
       CHARACTER                ::  DIRSPACER
       DATA DIRSPACER / '\' / ! Windows spacer
       CHARACTER(8)             ::  CONFIG
-      DATA CONFIG / 'Dash.cfg' /
+      DATA CONFIG / 'D3.cfg' /
 ! External binaries
       CHARACTER(MaxPathLength) :: VIEWEXE
       DATA VIEWEXE / 'C:\Program Files\CCDC\Mercury 1.0\mercury.exe' /
@@ -47,7 +47,7 @@
       DATA VIEWARG / '' /
       
       LOGICAL ViewOn
-      LOGICAL ConvOn       ! Set if external z-matix conversion program available
+      LOGICAL ConvOn       ! Set if external Z-matrix conversion program available
       LOGICAL ViewAct
       LOGICAL AutoUpdate
 
