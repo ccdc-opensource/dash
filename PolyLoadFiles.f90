@@ -39,7 +39,7 @@
 !               'DASH powder diffraction files (*.xye)|*.xye|'//&
 !               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
       FILTER = 'All files (*.*)|*.*|'//&
-               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
+               'All powder diffraction files|*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
@@ -78,7 +78,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=MaxPathLength), INTENT (INOUT) :: TheFileName
+      CHARACTER*(*), INTENT (INOUT) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -96,11 +96,10 @@
       INTEGER    KLEN
 ! Note that FNAME is a global variable
       INTEGER    ISTAT
-      INTEGER    DiffractionFileLoad ! Function
-!      LOGICAL    Confirm ! Function
       REAL       tMaxResolution
-      REAL       TwoTheta2dSpacing, dSpacing2TwoTheta ! Function
-      LOGICAL    FnWavelengthOK ! Function
+      INTEGER, EXTERNAL :: DiffractionFileLoad
+      REAL, EXTERNAL :: TwoTheta2dSpacing, dSpacing2TwoTheta
+      LOGICAL, EXTERNAL :: FnWavelengthOK
 
       DiffractionFileOpen = 0
       KLEN = LEN_TRIM(TheFileName)
@@ -215,12 +214,13 @@
 
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
-      INTEGER          Load_dat_File ! Function
-      INTEGER          Load_raw_File ! Function
-      INTEGER          Load_rd_File  ! Function
-      INTEGER          Load_udf_File ! Function
-      INTEGER          Load_uxd_File ! Function
-      INTEGER          Load_xye_File ! Function
+      INTEGER, EXTERNAL :: Load_dat_File
+      INTEGER, EXTERNAL :: Load_raw_File
+      INTEGER, EXTERNAL :: Load_pod_File
+      INTEGER, EXTERNAL :: Load_rd_File
+      INTEGER, EXTERNAL :: Load_udf_File
+      INTEGER, EXTERNAL :: Load_uxd_File
+      INTEGER, EXTERNAL :: Load_xye_File
       INTEGER          ISTAT
       INTEGER          I
       INTEGER          POS
@@ -249,6 +249,8 @@
       SELECT CASE (EXT4)
         CASE ('dat ', 'txt ')
           ISTAT = Load_dat_File(TheFileName,ESDsFilled)
+        CASE ('pod ')
+          ISTAT = Load_pod_File(TheFileName,ESDsFilled)
         CASE ('raw ')
           ISTAT = Load_raw_File(TheFileName,ESDsFilled)
         CASE ('rd  ','sd  ')
@@ -475,6 +477,85 @@
 !
 !*****************************************************************************
 !
+      INTEGER FUNCTION Load_pod_File(TheFileName,ESDsFilled)
+!
+! This function tries to load a *.pod file (ASCII format from Daresbury).
+! The routine basically assumes that the file is OK.
+!
+! Note that this function should only be called from DiffractionFileLoad
+!
+! JvdS 5 March 2002
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+! In this case, although the file does not contain ESDs, it does contain 
+! an incident beam correction, so the ESDs calculated here are the 'right' ones
+!
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data)
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      LOGICAL,       INTENT (  OUT) :: ESDsFilled
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
+
+!&SRS
+! SRSRUN = Sum of 9129                                                           
+!SRSSTN='PD23',SRSPRJ='POWDERDF',SRSEXP='12345432',                              
+! SRSTLE='Zn(TPP)(DABCO) sandwich                                     ',         
+!SRSCN1='        ',SRSCN2='        ',SRSCN3='        ',                          
+!&END                                                                            
+! c    tth =    3.0000,                                                          
+! c    ome =    1.5000,                                                          
+! c   mono =   11.0359,                                                          
+! c  slits =      0.00,                                                          
+! c  table =    0.2000,                                                          
+! c   rot1 =      0.00,                                                          
+! c   rot2 =      0.00,                                                          
+! c  trans =      0.00,                                                          
+! c    chi =    90.000,                                                          
+! c    phi =    0.0100,                                                          
+! c   scat =    0.0000,                                                          
+! c  spare =    0.0000,                                                          
+! c  bt-fh =     0.000,                                                          
+! c  bt-bh =     0.000,                                                          
+! c  bt-fv =     0.000,                                                          
+! c  bt-bv =     0.000,                                                          
+! c  bsl-r =     5.000,                                                          
+! c  bsl-l =     5.000,                                                          
+! c  bsl-t =     0.500,                                                          
+! c  bsl-b =     0.500,                                                          
+!    TWOTHETA   OMEGA   TIME    CHAN1    CHAN2     CHAN3   SCALE
+!    3000.       0.       0.   19094.       0.    1545.   1.3044
+!    3010.       0.       0.   19094.       0.    1504.   1.3261
+!    3020.       0.       0.   19094.       0.    1540.   1.3151
+! <SNIP>
+!   69980.       0.       0.   19094.       0.    1181.   0.8063
+!   69990.       0.       0.   19094.       0.    1180.   0.7983
+!   70000.       0.       0.   19094.       0.    1185.   0.7856
+!SCAN ENDED
+
+! Current status, initialise to 'error'
+      Load_pod_File  = 0
+
+
+ 
+      END FUNCTION Load_pod_File
+!
+!*****************************************************************************
+!
       INTEGER FUNCTION Load_rd_File(TheFileName,ESDsFilled)
 !
 ! This function tries to load a *.rd or *.sd file (binary format from Philips machines).
@@ -527,7 +608,7 @@
       CHARACTER*2  Version
       INTEGER      Offset
       LOGICAL      CONTINUOUS
-      REAL         WavelengthOf ! Function
+      REAL, EXTERNAL :: WavelengthOf
 
 ! Current status, initialise to 'error'
       Load_rd_File  = 0
