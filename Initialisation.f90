@@ -284,7 +284,6 @@
       DO ifrg = 1, maxfrg
         UseQuaternions(ifrg) = .TRUE.
       ENDDO
-      UsePreferredOrientation = .FALSE.
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
       CALL GetPathToMercuryFromRegistry

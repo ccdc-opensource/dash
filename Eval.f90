@@ -169,10 +169,6 @@
           KATOM = KATOM + NATS
         ENDIF
       ENDDO
-      IF (UsePreferredOrientation) THEN
-        kk = kk + 1
-        G1 = CHROM(KK)
-      ENDIF
 
       END SUBROUTINE MAKEFRAC
 !

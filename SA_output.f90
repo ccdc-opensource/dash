@@ -36,6 +36,7 @@
       REAL tenow1, tenow2, ruler, rulex1, rulex2
       REAL, PARAMETER ::  rminh = 0.01
       REAL, PARAMETER ::  rmaxh = 0.99
+      INTEGER I
 
       CALL WDialogSelect(IDD_SA_Action1)
       CALL WDialogPutReal(IDF_curr_temp,T,'(F8.2)')
@@ -139,20 +140,18 @@
       CALL IGrArea(0.0,0.0,1.0,1.0)
 ! Following lines write values to dialogue that hasn't been loaded into memory,
 ! nor is it displayed.
-!U      CALL WDialogSelect(IDD_Parameter_Status)
+!U      CALL WDialogSelect(IDD_Parameter_Status_2)
 !U      DO I = 1, n
 !U        CALL WGridPutCellReal(IDF_CPL_grid,1,I,SNGL(xopt(i)),'(F12.5)')
 !U      ENDDO
-!U      IF (kopt .EQ. 1) THEN
-!U        DO I = 1, n
-!U          CALL WGridPutCellReal(IDF_CPL_grid,2,I,SNGL(flav(i)),'(F12.5)')
-!U          CALL WGridPutCellReal(IDF_CPL_grid,3,I,SNGL(vm(i)),'(F12.5)')
-!U          CALL WGridPutCellReal(IDF_CPL_grid,4,I,SNGL(dxvav(i)),'(F12.5)')
-!U          CALL WGridPutCellReal(IDF_CPL_grid,5,I,SNGL(xvsig(i)),'(F12.5)')
-!U          CALL WGridPutCellReal(IDF_CPL_grid,6,I,SNGL(lb(i)),'(F12.5)')
-!U          CALL WGridPutCellReal(IDF_CPL_grid,7,I,SNGL(ub(i)),'(F12.5)')
-!U        ENDDO
-!U      ENDIF
+!U      DO I = 1, n
+!U        CALL WGridPutCellReal(IDF_CPL_grid,2,I,SNGL(flav(i)),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,3,I,SNGL(vm(i)),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,4,I,SNGL(dxvav(i)),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,5,I,SNGL(xvsig(i)),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,6,I,SNGL(lb(i)),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,7,I,SNGL(ub(i)),'(F12.5)')
+!U      ENDDO
 
       END SUBROUTINE SA_OUTPUT
 !

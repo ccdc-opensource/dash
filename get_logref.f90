@@ -16,10 +16,9 @@
       REAL                  FOB
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
 
-      INTEGER         NLGREF, IREFH
+      INTEGER         NLGREF, iREFH
       LOGICAL                                  LOGREF
-      COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
-
+      COMMON /FCSPEC/ NLGREF, iREFH(3,MFCSPE), LOGREF(8,MFCSPE)
 
 ! JvdS should be the same thing
 !O      COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
