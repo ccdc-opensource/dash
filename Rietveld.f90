@@ -588,17 +588,13 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE PO_VAR
-      USE REFVAR
       USE RRVAR
 
       IMPLICIT NONE      
 
-      INTEGER tFieldState, I, iH, iK, iL, II, iR
-      REAL phases(1:48), RefHT(1:3,1:48)
-      REAL PrfDir(1:3), H(1:3), RefLen
+      INTEGER tFieldState, iH, iK, iL
       REAL ChiSqd, ChiProSqd 
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
-      REAL, EXTERNAL :: VCTMOD, SCLPRD
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_RR_PO_Dialog)
@@ -607,45 +603,32 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK, IDCANCEL)
               CALL WDialogHide
-              !C Update the main Rietveld window
               PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
-              IF (PrefParExists) THEN
-                tFieldState = Enabled
-              ELSE
-                tFieldState = Disabled
-              ENDIF
-              CALL WDialogSelect(IDD_Rietveld2)
-              CALL WDialogFieldState(IDC_PO,tFieldState)
-              CALL WDialogFieldState(IDR_PO,tFieldState)
               !C Initialise preferred orientation and recalculate pattern + chi-sqrds
-              ! Initialise PO
+              !C Initialise PO
               IF (PrefParExists) THEN
-  !              CALL WDialogGetInteger(IDF_PO_a,iH)
-  !              CALL WDialogGetInteger(IDF_PO_b,iK)
-  !              CALL WDialogGetInteger(IDF_PO_c,iL)
-  !              PrefPars(1) = FLOAT(iH)
-  !              PrefPars(2) = FLOAT(iK)
-  !              PrefPars(3) = FLOAT(iL)
-  !              DO i = 1, 3
-  !                PrfDir(i) = PrefPars(i)
-  !              ENDDO
-  !              RefLen = VCTMOD(1.0,PrfDir,2)
-  !              PrfDir = PrfDir / RefLen
-  !              DO iR = 1, NumOfRef
-  !                DO ii = 1, 3
-  !                  H(ii) = SNGL(iHKL(ii,iR))
-  !                ENDDO
-  !                RefLen = VCTMOD(1.0,H,2) ! Calculate length of reciprocal-space vector
-  !                CALL SYMREF(H,RefHT,iHMUL(iR),phases)
-  !                DO ii = 1, iHMUL(iR)
-  !                  PrefCsqa(ii,iR) = (SCLPRD(PrfDir,RefHT(1,ii),2)/RefLen)**2
-  !                ENDDO
-  !              ENDDO
+                CALL WDialogGetInteger(IDF_PO_a,iH)
+                CALL WDialogGetInteger(IDF_PO_b,iK)
+                CALL WDialogGetInteger(IDF_PO_c,iL)
+                PrefPars(1) = FLOAT(iH)
+                PrefPars(2) = FLOAT(iK)
+                PrefPars(3) = FLOAT(iL)
+                CALL WDialogSelect(IDD_Rietveld2)
+                CALL WDialogGetReal(IDR_PO,RR_PO)
                 CALL FillSymmetry_2
                 CALL PO_PRECFC(RR_PO)
               ENDIF
               CALL RR_VALCHI(ChiSqd)
               CALL VALCHIPRO(ChiProSqd)
+              !C Update the main Rietveld window
+              CALL WDialogSelect(IDD_Rietveld2)
+              IF (PrefParExists) THEN
+                tFieldState = Enabled
+              ELSE
+                tFieldState = Disabled
+              ENDIF
+              CALL WDialogFieldState(IDC_PO,tFieldState)
+              CALL WDialogFieldState(IDR_PO,tFieldState)
               CALL WDialogPutReal(IDR_INTCHI, ChiSqd, "(F9.2)")
               CALL WDialogPutReal(IDR_PROCHI, ChiProSqd, "(F9.2)")
               CALL Profile_Plot
