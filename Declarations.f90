@@ -78,7 +78,6 @@
 ! IPMAX = bin number (so, pointer into XBIN) of the last bin visible on screen
 !         only useful when the user has zoomed in, otherwise IPMAX = NBIN
 
-
       INTEGER          NTIC
       INTEGER                IH
       REAL                               ARGK
@@ -171,10 +170,16 @@
 ! It's probably better to get rid of IOrdTem and sort the list directly
 ! If the right algorithm is chosen, that would speed up multiple sorts and reduce memory.
 
-      CHARACTER*3 asym
+      CHARACTER*3     asym
       COMMON /zmcomc/ asym(maxatm,maxfrg)
 ! asym = Atom SYMbol, e.g. 'H  ' for hydrogen, 'Ag ' for silver.
 !
+
+      INTEGER         IBACK, NBACK
+      REAL                             ARGBAK,        BACKGD
+      INTEGER                                                        KBCKGD,        NBK, LBKD
+      LOGICAL                                                                                      ZBAKIN
+      COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5), KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
 
 
       END SUBROUTINE FoolCompiler
