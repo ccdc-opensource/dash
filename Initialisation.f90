@@ -169,7 +169,6 @@
       NumberSGTable = 1
 ! Initialise the space group menus in the main window and the wizard.
       CALL SetSpaceGroupMenu
-
       RETURN
  999  CONTINUE
 ! Failure, so exit gracefully
@@ -187,11 +186,9 @@
       INCLUDE 'PARAMS.INC'
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
       COMMON /PLTINI/ XPG1,XPG2,YPG1,YPG2
-
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
 
       INCLUDE 'statlog.inc'
@@ -199,42 +196,47 @@
       INCLUDE 'GLBVAR.INC' ! Contains JRadOption
       INCLUDE 'Poly_Colours.inc'
       INCLUDE 'DialogPosCmn.inc'
+
       REAL    WaveLengthOf ! Function
-!
+
+      DashRawFile = ' '
+      DashHcvFile = ' '
+      DashPikFile = ' '
+      DashTicFile = ' '
       IDCurrent_Cursor_Mode = ID_Default_Mode
       DataSetChange = 0
       NumInternalDSC = -1
-      ZEROPOINT = 0.0
+      ZeroPoint = 0.0
       CALL UpdateWavelength(WaveLengthOf('Cu'))
 
 !>>JCC Added
       SLIMVALUE = 1.0
       SCALFAC   = 0.01
       BACKREF   = .TRUE.
-!
+
       JRadOption = 1 ! Initialise to X-ray lab data
-!
+
       IXPos_IDD_Pawley_Status=0.1*XBSWidth
       IYPos_IDD_Pawley_Status=0.06*XBSHeight
       IXPos_IDD_SA_Input=0.1*XBSWidth
       IYPos_IDD_SA_Input=0.06*XBSHeight
       IXPos_IDD_Wizard=0.1*XBSWidth
       IYPos_IDD_Wizard=0.06*XBSHeight
-!
+
       FromPawleyFit=.false. 
-!
+
       NUMOBSTIC=0
       NTIC=0
       LBIN=1
-!
+
       MARKER_SIZE=0.35
       CHAR_SIZE=1.0
-!
+
       XPG1=0.12
       XPG2=0.95
       YPG1=0.12
       YPG2=0.93
-!
+
       KolNumPGWindow=220
       KolNumMain=221
       KolNumObs=222
@@ -252,7 +254,7 @@
       KolNumPeakFit=234
       KolNumPeakPos=235
       KolNumBack=236
-!
+
       KolDefPGWindow=Win_RGB(253,253,248)
       KolDefMain=Win_RGB(20,20,150)
       KolDefObs=Win_RGB(161,0,0)
@@ -275,7 +277,7 @@
       KolDefPeakFit=Win_RGB(20,20,240)
       KolDefPeakPos=Win_RGB(50,50,200)
       KolDefBack=Win_RGB(164,211,105)
-!
+
       KolPGWindow=KolDefPGWindow
       KolMain=KolDefMain
       KolObs=KolDefObs
@@ -293,7 +295,7 @@
       KolPeakFit=KolDefPeakFit
       KolPeakPos=KolDefPeakPos
       KolBack=KolDefBack
-!
+
       CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
                                         KolPGWindow%IGreen,&
                                         KolPGWindow%IBlue)
@@ -411,7 +413,7 @@
       PolyFitter_OpenSpaceGroupSymbols = errstat
       RETURN
 
-      END Function PolyFitter_OpenSpaceGroupSymbols
+      END FUNCTION PolyFitter_OpenSpaceGroupSymbols
 !
 !*****************************************************************************
 ! 
@@ -419,7 +421,7 @@
 
       USE WINTERACTER
       USE VARIABLES
-      USE dflib ! Windows environment variable handling: for GETENVQQ
+      USE DFLIB ! Windows environment variable handling: for GETENVQQ
 
       INTEGER       lval
       CHARACTER*255 DashDir
@@ -434,12 +436,12 @@
       lval = GETENVQQ("DASH_DIR",DashDir)
       IF ((lval .LE. LEN(DashDir)) .AND. (lval .GT. 0)) THEN
         CONVEXE = DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//'zmconv.exe'
-        OPEN(121, file=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//CONFIG, status='old', err = 10)
+        OPEN(121, FILE=DashDir(1:LEN_TRIM(DashDir))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 10)
         GOTO 20
- 10     OPEN(121, file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, status='old', err = 30)
+ 10     OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 30)
  20     CONTINUE
       ELSE
-        OPEN(121, file=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, status='old', err = 22)
+        OPEN(121, FILE=INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//CONFIG, STATUS='OLD', ERR = 22)
         GOTO 24
  22     CONTINUE
         CALL Getarg(0,line)
@@ -448,7 +450,7 @@
           dlen = dlen - 1
         END DO
         dlen = dlen - 1
-        OPEN(121, file=line(1:dlen)//DIRSPACER//CONFIG, status='old', err = 30)
+        OPEN(121, FILE=line(1:dlen)//DIRSPACER//CONFIG, STATUS='OLD', ERR = 30)
         INSTDIR = line(1:dlen)
  24     CONTINUE
         CONVEXE = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'zmconv.exe'
