@@ -9,8 +9,6 @@
 
       IMPLICIT NONE
 
-      TYPE(WIN_STYLE)   :: MAIN_WINDOW
-
       INTEGER :: IWIDTHS(10)
       INTEGER :: IWID
 
@@ -18,24 +16,11 @@
       CALL WInitialise(' ')
 ! Try to redirect stdout - change working directory if unsuccessful
       CALL Init_StdOut()
-!   Set up root window options
-!
-!     - System menu
-!     - Minimise button
-!     - Maximise button
-!     - Status bar
-!
-      MAIN_WINDOW%FLAGS  = SysMenuOn + MinButton + MaxButton + StatusBar
-! Place window on the screen with a fractional size determined from the screen size
-      MAIN_WINDOW%WIDTH  = 0.8   * WInfoScreen(1)
-      MAIN_WINDOW%HEIGHT = 0.375 * WInfoScreen(2)
-      MAIN_WINDOW%X      = 0.1   * WInfoScreen(1)
-      MAIN_WINDOW%Y      = 0.01  * FLOAT(WInfoScreen(2)) + 365.0
-! Set druid_header menu id and window title
-      MAIN_WINDOW%MENUID = IDR_MENU1
-      MAIN_WINDOW%TITLE  = "DASH"
 ! Open root window
-      CALL WindowOpen(MAIN_WINDOW,128)
+      CALL WindowOpen(FLAGS = SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
+                      Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
+                      HEIGHT = (WInfoScreen(2)*3)/8, MENUID = IDR_MENU1, &
+                      TITLE = "DASH",NCOL256=128)
 ! Load and display the toolbar
       CALL WMenuToolbar(ID_TOOLBAR1)
       CALL WCursorShape(CurCrossHair)
