@@ -26,6 +26,7 @@
 !END 
 !
       USE VARIABLES
+      USE SAMVAR
 
       IMPLICIT NONE
 
@@ -43,14 +44,37 @@
       INTEGER      OutputFile
       REAL         a, b, c, alpha, beta, gamma
       REAL         tLattice(1:3,1:3)
-      INTEGER      Ilen
+      INTEGER      Ilen, NewLength
       LOGICAL      ChrIsLetter ! Function
       REAL         tX, tY, tZ
-      CHARACTER*255 tString
+      CHARACTER*255 tString, tSubString
       REAL         DummyReal
       INTEGER      DummyInteger
       CHARACTER*1  ChrLowerCase ! Function
-      CHARACTER*4  Labels(1:maxatom)
+      CHARACTER*5  Labels(1:maxatom)
+      INTEGER      CSD_El_nr(maxatom)
+      CHARACTER*2  BondStr(0:9)
+
+!   Sam's                            mol2
+!     1       (single)                1
+!     2       (double)                2
+!     3       (triple)                3
+!     4       (quadruple)             un
+!     5       (aromatic)              ar
+!     6       (polymeric)             un
+!     7       (delocalised double)    un
+!     9       (pi)                    un
+
+      BondStr(0) = 'un'   ! unspecified
+      BondStr(1) = ' 1'
+      BondStr(2) = ' 2'
+      BondStr(3) = ' 3'
+      BondStr(4) = 'un'
+      BondStr(5) = 'ar'
+      BondStr(6) = 'un'
+      BondStr(7) = 'un'
+      BondStr(8) = 'un'
+      BondStr(9) = 'un'
 
 ! Initialise to 'failure'
       Res2Mol2 = 0
@@ -78,16 +102,18 @@
         CASE DEFAULT ! If it's none of the above, it is probably an atom
 ! Check if first character is a letter. If not, skip this line and read the next.
           IF (.NOT. ChrIsLetter(tString(1:1))) GOTO 10
-! If the third character is still a letter, it couldn't have been an element.
-! Skip this line and read the next. (Note that 'C X', where C an element and X any letter, 
-! should not be possible.)
-          IF (ChrIsLetter(tString(3:3))) GOTO 10
-! Now we are up to the point where we can assume that the first one or two characters,
-! but not the third, form an element.
+! If the first four are characters, it was another keyword
+          IF (ChrIsLetter(tString(2:2)) .AND.            &
+              ChrIsLetter(tString(3:3)) .AND.            &
+              ChrIsLetter(tString(4:4))) GOTO 10
+! From now on, we assume it was an atom. Atomic element symbols can only have 2 characters in DASH
           natom = natom + 1
           AtmElement(natom)(1:2) = tString(1:2)
           IF (.NOT. ChrIsLetter(tString(2:2))) AtmElement(natom)(2:2) = ' '
-          READ(tString,*,ERR=990) Labels(natom), DummyInteger, Coordinates(1,natom), Coordinates(2,natom), Coordinates(3,natom)
+          CALL StrClean(tString,NewLength)
+          CALL GetSubString(tString,' ',tSubString)
+          Labels(natom) = tSubString(1:5)
+          READ(tString,*,ERR=990) DummyInteger, Coordinates(1,natom), Coordinates(2,natom), Coordinates(3,natom)
       END SELECT
 ! Read next line
       GOTO 10
@@ -108,9 +134,27 @@
       ENDDO
       CLOSE(InputFile)
 ! Given the element, assign the bond radius
-      CALL ass_type(natom,AtmElement,bndr)
+      CALL ass_type(natom,AtmElement,bndr,CSD_El_nr)
 ! Make the bonds using a simple distance criterion
       CALL make_bond(natom,Coordinates,bndr,nbond,bat)
+! Now assign more sophisticated bond types using Sam Motherwell's code
+! Total number of atoms
+      tatom = natom
+! Total number of bonds
+      tbond = nbond
+! The bonds
+      DO I = 1, nbond
+        bond(I,1) = bat(I,1)
+        bond(I,2) = bat(I,2)
+      ENDDO
+! Assign elements (CSD numbering numbers elements in alphabetical order, starting with carbon and hydrogen)
+! Since designed to deal with CSD entries instead of z-matrices, there can be more than one residue.
+! We ignore this for the moment and force all atoms to belong to residue 1
+      DO I = 1, natom
+        aelem(I) = CSD_El_nr(I)
+      ENDDO
+      CALL SAMABO
+
       CALL sybylatom(natom,AtmElement,sybatom,nbond,bat)
       Ilen = LEN_TRIM(TheFileName)
 ! Replace 'res' by 'mol2'
@@ -132,7 +176,7 @@
       ENDDO
       WRITE(OutputFile,"('@<TRIPOS>BOND')")
       DO i = 1, nbond
-        WRITE(OutputFile,'(4(I3,1X))') i,bat(i,1),bat(i,2),1
+        WRITE(OutputFile,'(3(I3,1X),A2)') i,bat(i,1),bat(i,2),BondStr(btype(I))
       ENDDO
       CLOSE(OutputFile)
       Res2Mol2 = 1
@@ -196,6 +240,7 @@
       LOGICAL      ChrIsLetter ! Function
       REAL         tX, tY, tZ
       CHARACTER*1  ChrLowerCase
+      INTEGER      CSD_El_nr(maxatom)
 
 ! Initialise to 'failure'
       CSSR2Mol2 = 0
@@ -267,7 +312,7 @@
       ENDDO
       CLOSE(InputFile)
 ! Given the element, assign the bond radius
-      CALL ass_type(natom,AtmElement,bndr)
+      CALL ass_type(natom,AtmElement,bndr,CSD_El_nr)
 ! Make the bonds using a simple distance criterion
       CALL make_bond(natom,Coordinates,bndr,nbond,bat)
       CALL sybylatom(natom,AtmElement,sybatom,nbond,bat)
@@ -351,7 +396,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ass_type(natom,AtmElement,bndr)
+      SUBROUTINE ass_type(natom,AtmElement,bndr,CSD_El_nr)
 
       INTEGER maxatom, maxbond, maxelm
       PARAMETER (maxatom=100, maxbond=100, maxelm=108)
@@ -359,6 +404,7 @@
       INTEGER     natom
       CHARACTER*2 AtmElement(maxatom)
       REAL        bndr(maxatom)
+      INTEGER, INTENT (  OUT) :: CSD_El_nr(maxatom)
   
       REAL         rsd(maxelm)
       CHARACTER*2  el(maxelm)
@@ -399,8 +445,8 @@
            1.72,1.58,1.33,1.37,0.00,1.62,1.78,1.94,0.00,1.45,1.56,0.00, &
            0.68/
 
-      INTEGER     I, J
-      LOGICAL     FOUND
+      INTEGER I, J
+      LOGICAL FOUND
 
 ! We know AtmElement, now get the bond radius
       DO I = 1, natom
@@ -408,6 +454,7 @@
         DO J = 1, maxelm
           IF (AtmElement(I)(1:2) .EQ. el(J)(1:2)) THEN
              bndr(I) = rsd(J)
+             CSD_El_nr(I) = J
              FOUND = .TRUE.
           ENDIF
         ENDDO
@@ -416,7 +463,6 @@
           bndr(I) = 1.0
         ENDIF
       ENDDO
-      RETURN
 
       END SUBROUTINE ass_type
 !
@@ -453,7 +499,6 @@
           ENDIF
         ENDDO
       ENDDO
-      RETURN
 
       END SUBROUTINE make_bond
 !
