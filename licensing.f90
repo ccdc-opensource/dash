@@ -9,42 +9,29 @@
 
       IMPLICIT NONE
 
-      INTEGER tValidLicence
-      INTEGER, EXTERNAL :: Read_License_Valid
       CHARACTER*2 Exp
-      CHARACTER*200 MessageStr
-      LOGICAL, EXTERNAL :: Confirm
+      TYPE (License_Info) Info
 
       CALL WDialogLoad(IDD_LicenceAgreement)
       CALL WDialogLoad(IDD_License_Dialog)
-      tValidLicence = 0
-      DO WHILE (tValidLicence .LE. 0) 
-        tValidLicence = Read_License_Valid()
-        SELECT CASE (tValidLicence)
-          CASE (-7)
-            MessageStr = "DASH problem: Demo licence not valid."
-          CASE (-3)
-            MessageStr = "DASH problem: Licence key not valid."
-          CASE (-2)
-            MessageStr = "DASH problem: Could not find or open the licence file"//CHAR(13)//&
-              InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"License.dat."
+      CALL ReadLicenceValid(Info)
+      DO WHILE (Info%Valid .LE. 0) 
+        SELECT CASE (Info%Valid)
           CASE (-1)
-            MessageStr = "DASH problem: Your DASH licence is invalid for this machine."
-          CASE (0)
-            MessageStr = "DASH problem: Your DASH licence has expired."
+            CALL ErrorMessage("Could not find or open the licence file"//CHAR(13)//&
+              InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"License.dat.")
+          CASE (-2) ! Checksum not OK
+            CALL ErrorMessage("Your DASH licence key is not valid.")
+          CASE (-3)
+            CALL ErrorMessage("Your DASH licence has expired.")
+          CASE (-4)
+            CALL ErrorMessage("Your DASH licence is invalid for this machine.")
         END SELECT
-        IF (tValidLicence .LE. 0) THEN
-          MessageStr = MessageStr(1:LEN_TRIM(MessageStr))//CHAR(13)//&
-                       "Would you like to enter a new licence?"
-          IF (Confirm(MessageStr)) THEN
-            CALL LicencePopup
-          ELSE
-            CALL DoExit
-          ENDIF
-        ENDIF
+        CALL LicencePopup
+        CALL ReadLicenceValid(Info)
       ENDDO
-      IF (tValidLicence .LE. 7) THEN
-        WRITE(Exp,'(I2)') tValidLicence
+      IF (Info%DaysLeft .LE. 7) THEN
+        WRITE(Exp,'(I2)') Info%DaysLeft
         CALL InfoMessage("Your DASH licence will expire in "//Exp//" days.")
       ENDIF
       CALL WDialogSelect(IDD_LicenceAgreement)
@@ -62,12 +49,13 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-      LOGICAL    :: INLOOP
-      INTEGER     Valid, ICode
+      IMPLICIT NONE
+
+      LOGICAL     INLOOP
+      INTEGER     ICode
       CHARACTER*MaxPathLength ClString
       TYPE (License_Info) Info
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      INTEGER, EXTERNAL :: DateToday
 
       INLOOP = .TRUE.
       Info%Valid = 0
@@ -92,31 +80,40 @@
                 CALL WDialogGetString(IDF_License_String, CLString)
                 CALL DecodeLicence(CLString,Info)
                 IF (Info%Valid .LT. 0 ) THEN
-                  CALL ErrorMessage("Sorry, the licence key is invalid--please check your input.")
-                ELSE IF (WDialogGetCheckBoxLogical(IDF_License_Site) .AND. (Info%LicenseType .NE. SiteKey)) THEN
-                  CALL ErrorMessage("Sorry, the licence key is not a site licence.")
-                ELSE IF ((.NOT. WDialogGetCheckBoxLogical(IDF_License_Site)) .AND. (Info%LicenseType .EQ. SiteKey)) THEN
-                  CALL ErrorMessage("The licence key is a site licence:"//CHAR(13)//&
-                                    "please select the Site Licence check-box and enter your site code as well.")
+                  SELECT CASE (Info%Valid)
+                    CASE (-2) ! Checksum not OK
+                      CALL ErrorMessage("Licence key not valid.")
+                    CASE (-3)
+                      CALL ErrorMessage("Your DASH licence has expired.")
+                    CASE (-4)
+                      CALL ErrorMessage("Your DASH licence is invalid for this machine.")
+                  END SELECT
                 ELSE
-                  Valid = License_Valid(Info)
                   IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
-                    CALL WDialogGetInteger(IDF_License_SiteCode, ICode) 
-                    IF (Info%SerialNumber .NE. ICode) Valid = -99
-                  ENDIF
-                  IF (Valid .GT. 0) THEN
-                    CALL WriteLicenceFile(CLString)
-                    INLOOP = .FALSE.
-                  ELSE IF (Valid .EQ. 0) THEN
-                    CALL ErrorMessage("Sorry, the licence key has expired.")
-                  ELSE IF (Valid .EQ. -1) THEN
-                    CALL ErrorMessage("Sorry, the licence key is not valid for this machine.")
-                  ELSE IF (Valid .EQ. -99) THEN
-                    CALL ErrorMessage("Sorry, the licence key is not valid for this site.") 
+                    IF (Info%LicenceType .NE. SiteKey) THEN
+                      CALL ErrorMessage("Sorry, the licence key is not a site licence.")
+                      Info%Valid = -6
+                    ELSE
+                      CALL WDialogGetInteger(IDF_License_SiteCode, ICode) 
+                      IF (Info%SerialNumber .NE. ICode) THEN
+                        CALL ErrorMessage("Sorry, the licence key is not valid for this site.") 
+                        Info%Valid = -6
+                      ENDIF
+                    ENDIF
+                  ELSE
+                    IF (Info%LicenceType .EQ. SiteKey) THEN ! Key indicates site licence, but user didn't fill out
+                      CALL ErrorMessage("The licence key is a site licence:"//CHAR(13)//&
+                                    "please select the Site Licence check-box and enter your site code as well.")
+                      Info%Valid = -6
+                    ENDIF
                   ENDIF
                 ENDIF
+                IF (Info%Valid .GT. 0) THEN
+                  CALL WriteLicenceFile(CLString)
+                  INLOOP = .FALSE.
+                ENDIF
               CASE (ID_Licence_Request)
-                CALL Write_License_Request_Form
+                CALL WriteLicenceRequestForm
                 CALL WExit
             END SELECT
           CASE (CloseRequest)
@@ -139,6 +136,8 @@
 !*****************************************************************************
 !
       SUBROUTINE decipher(v,w)
+
+      IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: v(2)
       INTEGER, INTENT (  OUT) :: w(2)
@@ -182,6 +181,7 @@
       INTEGER*2 tCheckSum
       EQUIVALENCE (tCheckSum,cs)
       INTEGER*2 checksum
+      INTEGER, EXTERNAL :: Get_DashSerialNumber, DateToday
 
       Info%Valid = 1
 ! JvdS Next lines very dirty: v is INTEGER*4, but their XOR is INTEGER*2. Not possible.
@@ -189,83 +189,59 @@
       cs = IEOR(v(1),v(2))
       cs = IEOR(cs,16#1504)
 ! Check the checksum
-      IF (tCheckSum .NE. checksum) GOTO 99
+      IF (tCheckSum .NE. checksum) THEN
+! If the checksum is invalid, then that's the end of our checks.
+        Info%Valid = -2
+        RETURN
+      ENDIF
       CALL decipher(v,w)
       Info%SerialNumber = w(1)
-      Info%LicenseType  = w(2)/100000000
-      Info%DateCode     = w(2) - Info%LicenseType*100000000
-      Info%Year         =  Info%DateCode/10000
-      Info%Month        = (Info%DateCode - Info%Year*10000)/100
-      Info%Day          = (Info%DateCode - Info%Year*10000 - Info%Month*100)
-      IF (Info%LicenseType .EQ. SiteKey) Info%SerialNumber = Info%SerialNumber - 145789123 ! demangle into a site number
-      RETURN 
- 99   CONTINUE ! CALL ErrorMessage('Invalid licence key.')
-      Info%Valid = -1
+      Info%LicenceType  = w(2)/100000000
+      Info%ExpiryDate   = w(2) - Info%LicenceType*100000000
+      IF (Info%LicenceType .EQ. SiteKey) Info%SerialNumber = Info%SerialNumber - 145789123 ! demangle into a site number
+      Info%DaysLeft = MAX(0, Info%ExpiryDate - DateToday())
+      IF (Info%DaysLeft .EQ. 0) THEN
+! If the licence key has expired, then that's the end of our checks.
+        Info%Valid = -3
+        RETURN
+      ENDIF
+      IF (Info%LicenceType .EQ. NodeKey) THEN
+! For node-locked licences check the serial id. Site-Wide licences just encode a serial id for our reference
+! so if we catch any non-authorized users using the key, we know where it came from. Perhaps we may want to make
+! the user key in this site code on installation for checking purposes.
+        IF (Info%SerialNumber .NE. Get_DashSerialNumber("C:\\"C)) Info%Valid = -4
+      ENDIF
+      RETURN
+   99 Info%Valid = -2
 
       END SUBROUTINE DecodeLicence
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Read_License_Valid()
-!
-! RETURNS  -2 : Error opening / reading file
-!          -3 : Licence key invalid (checksum error)
-!          -7 : User disagreed with evaluation licence
-!
+      SUBROUTINE ReadLicenceValid(Info)
+
       USE VARIABLES  
 
-      CHARACTER*80 line, CLString
-      INTEGER      dummy
-      TYPE(License_Info) Info
-      INTEGER, EXTERNAL :: ShowLicenceAgreement
-      INTEGER tRead_License_Valid, ttRead_License_Valid
+      IMPLICIT NONE
 
-      Read_License_Valid = -2
-      OPEN(UNIT=117,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='OLD',ERR=99)
-   10 READ(117,'(A)',ERR=99,END=99) line
+      TYPE(License_Info) Info
+
+      CHARACTER*80 line, CLString
+      INTEGER      dummy, hFile
+
+      Info%Valid = -1
+      hFile = 10
+      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='OLD',ERR=999)
+   10 READ(hFile,'(A)',ERR=999,END=999) line
       IF (line(1:1) .EQ. '#') GOTO 10
-      CALL INextString(line,clstring)
+      CALL INextString(line,CLString)
       CALL DecodeLicence(CLString,Info)
       IF (Info%Valid .EQ. 1) THEN
-        tRead_License_Valid = License_Valid(Info)
-        IF (tRead_License_Valid .GT. 0) THEN
-          IF (Info%LicenseType .EQ. DemoKey) THEN
-            ttRead_License_Valid = ShowLicenceAgreement(Info)
-            IF (ttRead_License_Valid .EQ. -7) tRead_License_Valid = -7
-          ENDIF
-        ENDIF
-        Read_License_Valid = tRead_License_Valid
-      ELSE ! Invalid checksum
-        Read_License_Valid = -3
+        IF (Info%LicenceType .EQ. DemoKey) CALL ShowLicenceAgreement(Info)
       ENDIF
-! Have a decodable key ...
- 99   CLOSE(117,iostat=dummy)
+  999 CLOSE(hFile,iostat=dummy)
 
-      END FUNCTION Read_License_Valid
-!
-!*****************************************************************************
-!
-      INTEGER FUNCTION License_Valid(Info)
-
-      USE VARIABLES
-
-      TYPE(License_Info)   Info
-
-      INTEGER, EXTERNAL :: DateToday
-      INTEGER              snum
-      INTEGER              Get_DashSerialNumber
-
-! Check the date
-      License_Valid = MAX(0, Info%DateCode - DateToday())
-! For node-locked licenses check the serial id. Site-Wide licenses just encode a serial id for our reference
-! so if we catch any non-authorized users using the key, we know where it came from. Perhaps we may want to make
-! the user key in this site code on installation for checking purposes.
-      IF (Info%LicenseType .EQ. NodeKey) THEN
-        snum = Get_DashSerialNumber("C:\\"C)
-        IF (snum .NE. Info%SerialNumber) License_Valid = -1
-      ENDIF       
-
-      END FUNCTION License_Valid 
+      END SUBROUTINE ReadLicenceValid
 !
 !*****************************************************************************
 !
@@ -275,19 +251,17 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-      INTEGER        IUN
-      PARAMETER (IUN = 117)
+      IMPLICIT NONE
+
       CHARACTER*(*)  LString
-      CHARACTER*8    Months(12)
       CHARACTER*11   Ctypestr
-      DATA Months / 'January', 'February', 'March', 'April', &
-                    'May', 'June', 'July', 'August', &
-                    'September', 'October', 'November', 'December' /
       TYPE (License_Info) Info
+      CHARACTER(17) DateStr
+      INTEGER       hFile, tLen
 
       CALL DecodeLicence(LString,Info)
       IF (Info%Valid .LE. 0) GOTO 99
-      SELECT CASE ( Info%LicenseType ) 
+      SELECT CASE ( Info%LicenceType ) 
         CASE (DemoKey)
           Ctypestr = 'Demo'
         CASE (NodeKey)
@@ -297,35 +271,38 @@
         CASE DEFAULT
           GOTO 99
       END SELECT
-      OPEN(UNIT=IUN,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='UNKNOWN',ERR=99)
-      WRITE(iun,'(A)',ERR=99)     "# Licence File for "//ProgramVersion
-      WRITE(iun,'(A)',ERR=99)     "#"
-      WRITE(iun,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' licence '
-      IF      (Info%LicenseType .EQ. NodeKey) THEN
-        WRITE(iun,'(A,z8)',ERR=99) '# Your DASH Serial ID for this machine is ',Info%SerialNumber
-      ELSE IF (Info%LicenseType .EQ. SiteKey) THEN
-        WRITE(iun,'(A,z8)',ERR=99) '# Your DASH Site ID is ',Info%SerialNumber
+      hFile = 10
+      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='UNKNOWN',ERR=99)
+      WRITE(hFile,'(A)',ERR=99)     "# Licence File for "//ProgramVersion
+      WRITE(hFile,'(A)',ERR=99)     "#"
+      WRITE(hFile,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' licence '
+      IF      (Info%LicenceType .EQ. NodeKey) THEN
+        WRITE(hFile,'(A,Z8)',ERR=99) '# Your DASH Serial ID for this machine is ',Info%SerialNumber
+      ELSE IF (Info%LicenceType .EQ. SiteKey) THEN
+        WRITE(hFile,'(A,Z8)',ERR=99) '# Your DASH Site ID is ',Info%SerialNumber
       ENDIF
-      IF (Info%Year .EQ. 9999) THEN
-        WRITE(iun,'(A)',ERR=99)'# The licence is non-expiring'
+      IF (Info%ExpiryDate .EQ. 99990000) THEN
+        WRITE(hFile,'(A)',ERR=99)'# The licence is non-expiring'
       ELSE
-        WRITE(iun,2,ERR=99) Info%Day, Months(Info%Month), Info%Year
-    2   FORMAT('# The licence expires on ',I3,1X,A,1X,I4)
+        CALL Date2String(Info%ExpiryDate,DateStr,tLen)
+        WRITE(hFile,'(A)',ERR=99) '# The licence expires on '//DateStr(1:tLen)
       ENDIF
-      WRITE(iun,'(A)',ERR=99)"# Licence key follows :"
-      WRITE(iun,'(A)',ERR=99) LString(1:LEN_TRIM(LString))
+      WRITE(hFile,'(A)',ERR=99)"# Licence key follows :"
+      WRITE(hFile,'(A)',ERR=99) LString(1:LEN_TRIM(LString))
    99 CONTINUE
-      CLOSE(iun)
+      CLOSE(hFile)
 
       END SUBROUTINE WriteLicenceFile
 !
 !*****************************************************************************
 !
-      SUBROUTINE Write_License_Request_Form
+      SUBROUTINE WriteLicenceRequestForm
 
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+
+      IMPLICIT NONE
 
       CHARACTER*40 fstr
       INTEGER      Iflags, Idummy, Sn
@@ -381,13 +358,15 @@
       CALL ErrorMessage("Sorry, could not write to the file "//CHAR(13)//fname(1:LEN_TRIM(Fname)))
       CLOSE(iun,iostat=idummy)      
 
-      END SUBROUTINE Write_License_Request_Form
+      END SUBROUTINE WriteLicenceRequestForm
 !
 !*****************************************************************************
 !
       INTEGER FUNCTION Get_DashSerialNumber( lpszDriveName )
 
       USE DFWIN
+
+      IMPLICIT NONE
 
       CHARACTER*(*)   lpszDriveName
       CHARACTER*100   lpszSystemName
@@ -418,8 +397,12 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION ShowLicenceAgreement(Info)
-
+      SUBROUTINE ShowLicenceAgreement(Info)
+!
+! RETURNS : 1 = I do NOT agree
+!           2 = I agree
+!           3 = I want to enter a new key
+!
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -431,23 +414,23 @@
       CHARACTER*5000 kString
       CHARACTER*4 NextLine
       CHARACTER*18 tDateStr
-      INTEGER tDate, iOption
+      INTEGER  iOption, tLen
 
 ! Initialise to failure
-      ShowLicenceAgreement = -7
+      Info%Valid = -5
       NextLine = CHAR(13)//CHAR(10)//CHAR(13)//CHAR(10)
 ! Convert expiry date to a string
-      tDate = Info%Year*10000 + Info%Month*100 + Info%Day
-      CALL Date2String(tDate,tDateStr)
+      CALL Date2String(Info%ExpiryDate,tDateStr,tLen)
       kString = 'In order to run this evaluation version of DASH, you must first read and agree to the '// &
                 'terms of the following licence agreement:'//NextLine// &
                 'DASH (the "Program") is a copyright work belonging to CCDC Software Limited.  In '// &
                 'consideration of the access to the Program granted you, you agree to run and use the '// &
                 'Program solely in accordance with the following terms.'//NextLine// &
-                'You are permitted to run and to use the Program and the documentation for a period of 60'// &
-                ' days until '//tDateStr(1:LEN_TRIM(tDateStr))//' for the purpose of evaluating whether or not the software '// &
-                'meets your requirements. Within 14 days of the end of such period you agree to delete '// &
-                'all copies of the Program from your computers and storage systems.'//NextLine// &
+                'You are permitted to run and to use the Program and the documentation'// &
+                ' until '//tDateStr(1:tLen)//' for the purpose of evaluating whether or not the software '// &
+                'meets your requirements. Within 14 days of this date you agree to delete '// &
+                'all copies of the Program from your computers and storage systems unless an extension '// &
+                'of the evaluation period is granted by CCDC Software Limited.'//NextLine// &
                 'You may not supply, assign, transfer or sublicense (in whole or part) the Program to any'// &
                 ' third party as part of a commercial transaction or for any consideration, in money,'// &
                 ' money''s worth or otherwise, or free of charge.  The Program shall only be accessible'// &
@@ -494,7 +477,6 @@
                 ' have read the full text above and I Agree" option below. If you do not agree'// &
                 ' to the foregoing terms and conditions you should select the "I do NOT Agree"'// &
                 ' option below. After making your selection, please click OK to proceed.'
-
       CALL WDialogSelect(IDD_LicenceAgreement)
       CALL WDialogPutString(IDF_Agreement,kString)
       CALL WDialogShow(-1,-1,0,SemiModeless)
@@ -504,23 +486,24 @@
           CASE (PushButton) ! one of the buttons was pushed
             SELECT CASE (EventInfo%VALUE1)
               CASE (IDCANCEL)
-                ShowLicenceAgreement = -7
-                CALL WDialogHide
-                RETURN
+                CALL DoExit
               CASE (IDOK)
                 CALL WDialogGetRadioButton(IDF_IDoNotAgree,iOption)
-                IF (iOption .EQ. 2) THEN
-                  ShowLicenceAgreement = 0
-                ELSE
-                  ShowLicenceAgreement = -7
-                ENDIF
+                SELECT CASE (iOption)
+                  CASE (1)
+                    CALL DoExit
+                  CASE (2)
+                    Info%Valid =  1
+                  CASE (3)
+                    Info%Valid = -5
+                END SELECT
                 CALL WDialogHide
                 RETURN
             END SELECT
         END SELECT
       ENDDO
 
-      END FUNCTION ShowLicenceAgreement
+      END SUBROUTINE ShowLicenceAgreement
 !
 !*****************************************************************************
 !
