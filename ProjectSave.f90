@@ -161,6 +161,10 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
@@ -182,12 +186,14 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      INTEGER I, j, tInteger, RW
-      LOGICAL tLogical
-      REAL    tReal
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
+
       INTEGER, EXTERNAL :: GetCrystalSystem
-      CHARACTER*255 tString
+      LOGICAL, EXTERNAL :: FnPatternOK, FnWavelengthOK
+      REAL, EXTERNAL :: TwoTheta2dSpacing
+      INTEGER I, j, RW
+      CHARACTER*(255) tString
 
       ErrCounter = 0
       CALL PushActiveWindowID
@@ -207,64 +213,6 @@
         CALL Upload_Source
         CALL Upload_Wavelength
       ENDIF
-! We Read / Write the original pattern + all information to get the processed pattern:
-! - Truncation limits
-! - Background subtraction parameters
-! - LBIN
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,BackupNOBS)
-      IF (BackupNOBS .EQ. 0) THEN
-        NoData = .TRUE.
-      ELSE
-        NoData = .FALSE.
-        DO I = 1, BackupNOBS
-          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BackupXOBS(I))
-          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BackupYOBS(I))
-          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BackupEOBS(I))
-        ENDDO
-! Read / Write LBIN
-        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,LBIN)
-! Read / Write start / end
-        CALL WDialogSelect(IDD_PW_Page5)
-        IF (RW .EQ. cWrite) THEN
-          CALL FileWriteLogical(hPrjFile,iPrjRecNr,WDialogGetCheckBoxLogical(IDF_TruncateStartYN))
-          CALL WDialogGetReal(IDF_Min2Theta,tReal)
-          CALL FileWriteReal(hPrjFile,iPrjRecNr,tReal)
-          CALL FileWriteLogical(hPrjFile,iPrjRecNr,WDialogGetCheckBoxLogical(IDF_TruncateEndYN))
-          CALL WDialogGetReal(IDF_Max2Theta,tReal)
-          CALL FileWriteReal(hPrjFile,iPrjRecNr,tReal)
-        ELSE
-          CALL FileReadLogical(hPrjFile,iPrjRecNr,tLogical)
-          CALL WDialogPutCheckBoxLogical(IDF_TruncateStartYN,tLogical)
-          CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-          CALL WDialogPutReal(IDF_Min2Theta,tReal)
-          CALL FileReadLogical(hPrjFile,iPrjRecNr,tLogical)
-          CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN,tLogical)
-          CALL FileReadReal(hPrjFile,iPrjRecNr,tReal)
-          CALL WDialogPutReal(IDF_Max2Theta,tReal)
-        ENDIF
-! Read / Write the parameters for the background algorithm
-        CALL WDialogSelect(IDD_PW_Page6)
-        IF (RW .EQ. cWrite) THEN
-          CALL WDialogGetInteger(IDF_NumOfIterations,tInteger)
-          CALL FileWriteInteger(hPrjFile,iPrjRecNr,tInteger)
-          CALL WDialogGetInteger(IDF_WindowWidth,tInteger)
-          CALL FileWriteInteger(hPrjFile,iPrjRecNr,tInteger)
-          CALL FileWriteLogical(hPrjFile,iPrjRecNr,WDialogGetCheckBoxLogical(IDF_UseMCYN))
-        ELSE
-          CALL FileReadInteger(hPrjFile,iPrjRecNr,tInteger)
-          CALL WDialogPutInteger(IDF_NumOfIterations,tInteger)
-          CALL FileReadInteger(hPrjFile,iPrjRecNr,tInteger)
-          CALL WDialogPutInteger(IDF_WindowWidth,tInteger)
-          CALL FileReadLogical(hPrjFile,iPrjRecNr,tLogical)
-          CALL WDialogPutCheckBoxLogical(IDF_UseMCYN,tLogical)
-        ENDIF
-        IF (RW .EQ. cRead) THEN
-          CALL WizardApplyDiffractionFileInput
-          CALL WizardApplyProfileRange
-          CALL WizardApplyBackground
-          IPTYPE = 1
-        ENDIF
-      ENDIF
 ! Read / Write unit cell
       DO I = 1, 6
         CALL FileRWReal(hPrjFile,iPrjRecNr,RW,CellPar(I))
@@ -274,37 +222,61 @@
       IF (RW .EQ. cRead) CALL Upload_ZeroPoint
 ! Read / Write space group
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumberSGTable)
-! Calculate tick marks
       IF (RW .EQ. cRead) THEN
         LatBrav = GetCrystalSystem(NumberSGTable)
         CALL Upload_CrystalSystem
-        PastPawley = .FALSE.
-        CALL Generate_TicMarks
-        PastPawley = .TRUE.
       ENDIF
+
+      CALL PrjErrTrace
 
 ! Read / Write Pawley refinement related stuff
 
-      CALL PrjErrTrace
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PAWLEYCHISQ)
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeSigma(1))
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeSigma(2))
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeGamma(1))
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeGamma(2))
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeHPSL)
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PeakShapeHMSL)
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NBIN)
 
 ! Read / Write the .pik file
 !            WRITE (IPK,*) ARGI, OBS - YBACK, DOBS, NTEM
 !        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
       IF (RW .EQ. cRead) CALL WizardWindowShow(IDD_SAW_Page5)
-      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PAWLEYCHISQ)
-! If we are this way down the file, NBIN was determined by original pattern + truncation + LBIN.
-! However, after we have done a Pawley fit, data points beyond the 350th reflection have been discarded,
-! and NBIN has a new value.
-! @@ I think things go wrong here.
-      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NBIN)
 ! Read / Write observed pattern minus the background fitted during the Pawley refinement.
 ! This is the observed pattern read in by GETPIK.
-
       CALL PrjErrTrace
-
+      DO I = 1, NBIN
+        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,XBIN(I))
+      ENDDO
+      CALL PrjErrTrace
       DO I = 1, NBIN
         CALL FileRWReal(hPrjFile,iPrjRecNr,RW,YOBIN(I))
       ENDDO
+      CALL PrjErrTrace
+      DO I = 1, NBIN
+        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,EBIN(I))
+      ENDDO
+      IF (RW .EQ. cRead) THEN
+        LBIN = 1
+        XOBS = 0.0
+        YOBS = 0.0
+        EOBS = 0.0
+        NOBS = NBIN
+        BackupXOBS = 0.0
+        BackupYOBS = 0.0
+        BackupEOBS = 0.0
+        BackupNOBS = NBIN
+        DO I = 1, NBIN
+          BackupXOBS(I) = XBIN(I)
+          BackupYOBS(I) = YOBIN(I)
+          BackupEOBS(I) = EBIN(I)
+          XOBS(I)       = XBIN(I)
+          YOBS(I)       = YOBIN(I)
+          EOBS(I)       = EBIN(I)
+        ENDDO
+      ENDIF
       IF (RW .EQ. cRead) THEN
         DO I = 1, NBIN
           WTSA(I) = 1.0 / EBIN(I)**2
@@ -322,7 +294,17 @@
           IFITA(NFITA) = I
         ENDIF
       ENDDO
-      IF (RW .EQ. cRead) CALL Profile_Plot
+      IF (RW .EQ. cRead) THEN
+        NoData = .FALSE.
+        CALL GetProfileLimits
+        CALL Get_IPMaxMin 
+        IPTYPE = 1
+! Calculate tick marks
+        PastPawley = .FALSE.
+        CALL Generate_TicMarks
+        PastPawley = .TRUE.
+        CALL Profile_Plot
+      ENDIF
 
       CALL PrjErrTrace
 
@@ -345,12 +327,28 @@
 
       CALL PrjErrTrace
 
-! Read / Write range and fixed yes/no per parameter
-      CALL SA_Parameter_Set
+! Update ranges and fixed yes/no per parameter
+      IF (RW .EQ. cRead) CALL SA_Parameter_Set
 ! Read / Write solutions
       CALL PrjReadWriteSolutions
 
       CALL PrjErrTrace
+
+      CALL WDialogSelect(IDD_ViewPawley)
+      CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
+      CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
+      CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
+      CALL WDialogPutReal(IDF_Gamma2,PeakShapeGamma(2),'(F10.4)')
+      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NBIN)
+      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,NumOfRef)
+      CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
+! Grey out the "Previous Results >" button in the DICVOL Wizard window
+      CALL WDialogSelect(IDD_PW_Page8)
+      CALL WDialogFieldState(IDB_PrevRes,Disabled)
+      IF (FnPatternOK() .AND. FnWavelengthOK()) THEN
+        CALL WDialogSelect(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(RefArgK(NumOfRef)))
+      ENDIF
 
       CLOSE(hPrjFile)
       CALL PopActiveWindowID
@@ -365,7 +363,7 @@
 !
       SUBROUTINE PrjReadWriteSolutions
 !
-! Read or writes information on peak fit ranges to / from binary project file.
+! Read or writes information on solutions to / from binary project file.
 !
       USE WINTERACTER
       USE DRUID_HEADER
@@ -397,6 +395,7 @@
                       KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
+      LOGICAL, EXTERNAL :: Get_AutoAlign
       INTEGER ii, I, J, RW
       DOUBLE PRECISION X(MVAR)
 
@@ -423,6 +422,11 @@
               XAtmCoords(2,ii,I) = Xato(2,ii)
               XAtmCoords(3,ii,I) = Xato(3,ii)
             ENDDO
+! Re-align if so asked for by user
+            IF (Get_AutoAlign()) THEN
+              Curr_SA_Run = I ! Used by Align()
+              CALL Align
+            ENDIF
           ENDIF
         ENDDO
         IF (iPrjReadOrWrite .EQ. cRead) THEN
@@ -459,7 +463,7 @@
 !
       SUBROUTINE PrjReadWriteIntensities
 !
-! Reads or writes information on preferred orientation to / from binary project file.
+! Reads or writes information on intensities to / from binary project file.
 !
       USE PRJVAR
       USE REFVAR
@@ -562,7 +566,7 @@
 !
       SUBROUTINE PrjReadWriteZmatrices
 !
-! Reads or writes information on peak fit ranges to / from binary project file.
+! Reads or writes information on Z-matrices to / from binary project file.
 !
       USE DRUID_HEADER
       USE PRJVAR
