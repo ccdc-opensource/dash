@@ -33,6 +33,7 @@ C     The following integers represent the previous integers, divided by 2
 C     and then multiplied by 2
       INTEGER H_m,K_m,L_m,HPKm,HPLm,KPLm,HPKPLm
 c
+      INCLUDE 'GLBVAR.INC'
       include 'statlog.inc'
 c
       character*80  file

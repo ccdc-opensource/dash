@@ -57,5 +57,14 @@
       REAL CHAR_SIZE,MARKER_SIZE
       COMMON /PROFDEF/CHAR_SIZE,MARKER_SIZE
 
-! Sizes of the characters and markers used in drawin the profiles in the main window
+! Sizes of the characters and markers used in drawing the profiles in the main window
+
+      INTEGER NumberSGTable
+      COMMON /NSGTCMN/ NumberSGTable
+
+! NumberSGTable stores the number of the Space Group from the space group table.
+! Each setting has its own number, so there are 530 entries in total.
+! This variable was originally in 'statlog.inc', all other space-group related variables
+! were and are in 'lattice.inc'.
+
 
