@@ -6,6 +6,8 @@
 !*****************************************************************************
 !
       SUBROUTINE Generate_TicMarks
+
+      USE VARIABLES
 !
 !.. This is the routine that generates tic marks
 !.. Multiple checks before attempting to calculate tic marks
@@ -54,38 +56,36 @@
 !      write(76,*) ' Space Group Hall symbol    : ',SGHalStr(IPosSg)
 !      write(76,*) ' Space Group explicit symbol: ',SGShmStr(IPosSg)
 !
-!>> Need more checks here.
-!>> I think that everything should be set to continue
-!>> so I added in these checks. Everything should be bonafide before
-!>> we try to add any tick marks in the GUI.
-!>> Now call fuller checking function
+! Need more checks here.
+! I think that everything should be set to continue
+! so I added in these checks. Everything should be bonafide before
+! we try to add any tick marks in the GUI.
+! Now call fuller checking function
 !
       IF (.NOT.Check_TicMark_Data()) RETURN
+      IF (PastPawley) RETURN
       OPEN (42,FILE='polyf.ccl',STATUS='unknown')
       WRITE (42,4210)
  4210 FORMAT ('N Polyfitter file')
       WRITE (42,4220) (CellPar(I),I=1,6)
  4220 FORMAT ('C ',3F10.5,3F10.3)
       WRITE (42,4230)
- 4230 FORMAT ('F C 2 2.31 20.8439 1.02 10.2075 ',                       &
-     &        '1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0')
+ 4230 FORMAT ('F C 2 2.31 20.8439 1.02 10.2075 1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0')
       IF (NumberSGTable.GE.1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin.GT.0) THEN
           DO isym = 1, nsymmin
             WRITE (42,4235) symline(isym)
- 4235       FORMAT ('S ',a)
+ 4235       FORMAT ('S ',A)
           ENDDO
         ENDIF
       ENDIF
       WRITE (42,4240)
- 4240 FORMAT ('I NCYC 6 PRCV 14 MCOR 0 FRIE 1'/'L REFI RIET'/           &
-     &        'L SORC SYNX'/'L WGHT 3')
+ 4240 FORMAT ('I NCYC 6 PRCV 14 MCOR 0 FRIE 1'/'L REFI RIET'/'L SORC SYNX'/'L WGHT 3')
       WRITE (42,4245) xpmin, xpmax
  4245 FORMAT ('L RTYP    2 ',2F10.3,'   0.001')
       WRITE (42,4250) ALambda
  4250 FORMAT ('L WVLN ',F10.5)
-      IF ((ZeroPoint.LT.-1.0) .OR. (ZeroPoint.GT.1.0)) ZeroPoint = 0.0
       WRITE (42,4260) ZeroPoint
  4260 FORMAT ('L ZERO ',F10.5)
       WRITE (42,4270)
@@ -107,7 +107,6 @@
 !
 !*****************************************************************************
 !
-! LEVEL 50      subroutine Generate_TicMarks_CCSLcode
       SUBROUTINE Generate_TicMarks_CCSLcode
 ! DIMENSION OF ALSQ BELOW, AND SETTING OF MATSZ, TO BE ALTERED TO BE SOMETHING
 ! A LITTLE LARGER THAN N*(N+3)/2 WHERE THERE WILL BE N BASIC VARIABLES
