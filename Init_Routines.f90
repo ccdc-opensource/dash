@@ -79,6 +79,30 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE Clear_ExclRegions
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER iRow
+      CHARACTER*2 RowLabelStr
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_ExclRegions)
+      CALL WGridRows(IDF_ExclRegionsGrid, 10)
+      DO iRow = 1, 10
+        WRITE(RowLabelStr,'(I2)') iRow
+        CALL WGridLabelRow(IDF_ExclRegionsGrid,iRow,RowLabelStr)
+      ENDDO
+      CALL WDialogClearField(IDF_ExclRegionsGrid)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Clear_ExclRegions
+!
+!*****************************************************************************
+!
       SUBROUTINE Clear_PO
 
       USE PO_VAR
