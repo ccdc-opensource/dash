@@ -1361,16 +1361,6 @@
       CALL WSelectFile(FilterStr, IFLAGS, FNAME,"Select a file for conversion",ISEL)
       Ilen = LEN_TRIM(FNAME)
       IF (Ilen .EQ. 0) RETURN
-! JvdS Was:
-!O      Ilen = LEN_TRIM(fname)
-!O      IF (Ilen .EQ. 0) RETURN
-!O      if (Isel .EQ. 1) THEN
-!O        fmt = '-pdb'
-!O      else if (Isel .EQ. 2) THEN
-!O        fmt = '-mol2'
-!O      else if (Isel .EQ. 3) THEN
-!O        fmt = '-mol'
-!O      END IF 
 ! Find the last occurence of '.' in TheFileName
       POS = Ilen-1 ! Last character of TheFileName is not tested
 ! The longest extension allowed is four
