@@ -181,8 +181,7 @@
           CALL INextReal(line,PAWLEYCHISQ)
       END SELECT
       GOTO 10 
- 100  CONTINUE
-      CLOSE(tFileHandle)
+ 100  CLOSE(tFileHandle)
       IF (DslExists) THEN
         CALL GETDSL(DashDslFile,idsler)
         DslExists = (idsler .EQ. 0)

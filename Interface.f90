@@ -834,7 +834,6 @@
           DO I = 1, BackupNOBS
             WRITE(tFileHandle,'(F6.3,X,F11.3,X,F12.5)',ERR=999) BackupXOBS(I), BackupYOBS(I), BackupEOBS(I)
           ENDDO
-          CLOSE(tFileHandle)
         ENDIF
       ENDIF
       GOTO 10
