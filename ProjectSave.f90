@@ -386,6 +386,7 @@
       USE PRJVAR
       USE ZMVAR
       USE ATMVAR
+      USE SOLVAR
 
       IMPLICIT NONE
 
@@ -395,13 +396,6 @@
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                                    ChiMult
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
-
-      REAL            BestValuesDoF
-      COMMON /SOLCOM/ BestValuesDoF(1:mvar,1:MaxRun)
-
-      REAL                XAtmCoords
-      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:maxatm,1:MaxRun)
-
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
@@ -428,10 +422,13 @@
 ! Read / Write solutions
       IF (NumOf_SA_Runs .NE. 0) THEN
         DO I = 1, NumOf_SA_Runs
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iSolOrder(I))
           DO J = 1, nvar
             CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BestValuesDoF(J,I))
             X(J) = DBLE(BestValuesDoF(J,I))
           ENDDO
+          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,ProfileChiSqd(I))
+          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,IntensityChiSqd(I))
           IF (iPrjReadOrWrite .EQ. cRead) THEN
 ! Fill pdbAtmCoords
             CALL makefrac(X)

@@ -7,9 +7,9 @@
 
       IMPLICIT NONE
 
-      REAL IntensityChiSqd(1:99) ! MaxRun
-
       REAL ProfileChiSqd(1:99) ! MaxRun
+
+      REAL IntensityChiSqd(1:99) ! MaxRun
 
       REAL BestValuesDoF(1:100,1:99)  ! mvar, MaxRun
 

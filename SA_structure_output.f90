@@ -1,15 +1,16 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SA_structure_output(T,fopt,parvals,ntotmov)
+      SUBROUTINE SA_structure_output(T,parvals,ntotmov)
 
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR
+      USE SOLVAR
 
       IMPLICIT NONE
 
-      DOUBLE PRECISION t, fopt
+      DOUBLE PRECISION t
       DOUBLE PRECISION parvals(*) ! The current torsion parameters (can't be called X here)
       INTEGER ntotmov
 
@@ -23,8 +24,8 @@
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
 
-      REAL                XAtmCoords
-      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:maxatm,1:MaxRun)
+      DOUBLE PRECISION XOPT,       C,       XP,       FOPT
+      COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
@@ -62,9 +63,6 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
-      INTEGER              iMyExit, num_new_min
-      COMMON / CMN000001 / iMyExit, num_new_min
-
       REAL qvals(4), qnrm
 ! Use standard PDB orthogonalisation
       LOGICAL tSavePDB, tSaveCSSR, tSaveCCL, tSaveCIF, tSaveRES
@@ -91,22 +89,13 @@
       ELSE
         WRITE (TemperatureStr,"('T=',F6.2)") SNGL(T)
       ENDIF
-! When iMyExit = 5, we are going to view the structure. Just write out .pdb
-      IF (iMyExit .EQ. 5) THEN
-        tSavePDB  = .TRUE.
-        tSaveCSSR = .FALSE.
-        tSaveCCL  = .FALSE.
-        tSaveCIF  = .FALSE.
-        tSaveRES  = .FALSE.
-      ELSE
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
-        tSavePDB  = SavePDB()
-        tSaveCSSR = SaveCSSR()
-        tSaveCCL  = SaveCCL()
-        tSaveCIF  = SaveCIF()
-        tSaveRES  = SaveRES()
-      ENDIF
+      tSavePDB  = SavePDB()
+      tSaveCSSR = SaveCSSR()
+      tSaveCCL  = SaveCCL()
+      tSaveCIF  = SaveCIF()
+      tSaveRES  = SaveRES()
 !
 !       Output a CSSR file to fort.64
 !       Output a PDB  file to fort.65
@@ -131,11 +120,7 @@
       ENDIF
 ! PDB ...
       IF (tSavePDB) THEN
-        IF (iMyExit .EQ. 5) THEN
-          tFileName = 'SA_best.pdb'
-        ELSE
-          tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pdb'
-        ENDIF
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pdb'
         hFilePDB = 65
         OPEN (UNIT=hFilePDB,FILE=tFileName,STATUS='unknown')
 ! Add in a Header record
@@ -494,15 +479,13 @@
       USE DRUID_HEADER
       USE ZMVAR
       USE ATMVAR
+      USE SOLVAR
 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: TheRunNr
 
       INCLUDE 'PARAMS.INC'
-
-      REAL                XAtmCoords
-      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:maxatm,1:MaxRun)
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
@@ -583,6 +566,7 @@
       USE VARIABLES
       USE ZMVAR
       USE ATMVAR
+      USE SOLVAR
 
       IMPLICIT NONE
 
@@ -590,9 +574,6 @@
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
-
-      REAL                XAtmCoords
-      COMMON /PDBOVERLAP/ XAtmCoords(1:3,1:maxatm,1:MaxRun)
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
