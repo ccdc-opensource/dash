@@ -49,7 +49,7 @@
 ! two atoms, keep placing them along the z-axis
       i = 3
       IF (N.GT.3) THEN
-        DO WHILE (NINT(Cartesian(1,i)*10000).EQ.0)
+        DO WHILE (NINT(Cartesian(1,i)*10000).EQ.0 .AND. i.LT.N)
           i = i + 1
           i1 = iz1(i)
           i2 = iz2(i)
