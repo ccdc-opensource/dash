@@ -3,8 +3,6 @@
 !*****************************************************************************
 !
       INTEGER FUNCTION PrjSaveAs
-
-! A wrapper around PrjSave to let the user choose the filename.
 !
 ! RETURNS 0 for success
 !
@@ -14,7 +12,6 @@
 
       IMPLICIT NONE      
 
-      INTEGER, EXTERNAL :: PrjSave
       CHARACTER(MaxPathLength) :: tFileName
       CHARACTER(LEN=45) :: FILTER
       INTEGER iFLAGS
@@ -27,34 +24,11 @@
       CALL WSelectFile(FILTER,iFLAGS,tFileName,'Save project file')
       IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
         PrjFileName = tFileName
-        PrjSaveAs = PrjSave()
+        CALL PrjReadWrite(PrjFileName, cWrite)
+        PrjSaveAs = 0 ! Yeah, right
       ENDIF
 
       END FUNCTION PrjSaveAs
-!
-!*****************************************************************************
-!
-      INTEGER FUNCTION PrjSave
-!
-! If project file name exists, overwrite without warning.
-! If project file name blank, ask for a name.
-!
-! RETURNS 0 for success
-!
-      USE PRJVAR
-
-      IMPLICIT NONE
-
-      INTEGER, EXTERNAL :: PrjSaveAs
-
-      IF (LEN_TRIM(PrjFileName) .EQ. 0) THEN
-        PrjSave = PrjSaveAs()
-      ELSE
-        CALL PrjReadWrite(PrjFileName,cWrite)
-        PrjSave = 0 ! Yeah, right
-      ENDIF
-
-      END FUNCTION PrjSave
 !
 !*****************************************************************************
 !
