@@ -119,7 +119,12 @@
         CASE (PushButton) ! one of the buttons was pushed
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDFINISH, IDCANCEL)
+            CASE (IDFINISH)
+              CALL WizardApplyProfileRange
+! Subtract the background
+              CALL WizardApplyBackground
+              CALL EndWizard
+            CASE (IDCANCEL)
               CALL EndWizard
             CASE (IDBACK)
               IXPos_IDD_Wizard = WInfoDialog(6)
@@ -177,12 +182,9 @@
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
-! Truncate the data
-
-
+              CALL WizardApplyProfileRange
 ! Subtract the background
-            
-            
+              CALL WizardApplyBackground
               CALL EndWizard
             CASE (IDCANCEL)
               CALL EndWizard
@@ -226,6 +228,41 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE WizardApplyProfileRange
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER ISTATE
+      REAL    tReal
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page5)
+      CALL WDialogGetCheckBox(IDF_TruncateStartYN,ISTATE)
+      IF (ISTATE .EQ. 1) THEN
+        CALL WDialogGetReal(IDF_Min2Theta,tReal)
+      ELSE
+! If the user doesn't want to truncate the data, just restore the old values
+        tReal = 0.0
+      ENDIF
+      CALL TruncateDataStart(tReal)
+      CALL WDialogGetCheckBox(IDF_TruncateEndYN,ISTATE)
+      IF (ISTATE .EQ. 1) THEN
+        CALL WDialogGetReal(IDF_Max2Theta,tReal)
+      ELSE
+! If the user doesn't want to truncate the data, just restore the old values
+        tReal = 90.0
+      ENDIF
+      CALL TruncateData(tReal)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE WizardApplyProfileRange
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardWindowProfileRange
 
       USE WINTERACTER
@@ -249,12 +286,9 @@
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
-! Truncate the data
-
-
+              CALL WizardApplyProfileRange
 ! Subtract the background
-            
-
+              CALL WizardApplyBackground
               CALL EndWizard
             CASE (IDCANCEL)
               CALL EndWizard
@@ -271,10 +305,7 @@
               CALL WDialogSelect(IDD_PW_Page6)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDAPPLY)
-              CALL WDialogGetReal(IDF_Min2Theta,tReal)
-              CALL TruncateDataStart(tReal)
-              CALL WDialogGetReal(IDF_Max2Theta,tReal)
-              CALL TruncateData(tReal)
+              CALL WizardApplyProfileRange
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowDiffractionFileInput 1')
           END SELECT
@@ -317,36 +348,45 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE WizardApplyBackground
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER ISTATE, tInt1, tInt2
+      LOGICAL tUseMC, tUseSpline
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page6)
+      CALL WDialogGetCheckBox(IDF_UseMCYN,ISTATE)
+      tUseMC = (ISTATE .EQ. 1)
+      CALL WDialogGetCheckBox(IDF_UseSplineYN,ISTATE)
+      tUseSpline = (ISTATE .EQ. 1)
+      CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
+      CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
+      CALL SubtractBackground(tInt1,tInt2,tUseMC,tUseSpline)
+      CALL Profile_Plot(IPTYPE)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE WizardApplyBackground
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardWindowBackground
 
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
 
-!      IMPLICIT NONE
+      IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
-
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
 
       INTEGER ISTATE, tInt1, tInt2
       LOGICAL tUseMC, tUseSpline
@@ -358,7 +398,9 @@
 ! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
-            
+              CALL WizardApplyProfileRange
+! Subtract the background
+              CALL WizardApplyBackground
               CALL EndWizard
             CASE (IDCANCEL)
               CALL EndWizard
@@ -375,45 +417,10 @@
               tUseSpline = (ISTATE .EQ. 1)
               CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
               CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-              CALL BackMCBruckner(tInt1,tInt2,tUseMC,tUseSpline)
+              CALL CalculateBackground(tInt1,tInt2,tUseMC,tUseSpline)
               CALL Profile_Plot(IPTYPE)
             CASE (IDAPPLY)
-              CALL WDialogGetCheckBox(IDF_UseMCYN,ISTATE)
-              tUseMC = (ISTATE .EQ. 1)
-              CALL WDialogGetCheckBox(IDF_UseSplineYN,ISTATE)
-              tUseSpline = (ISTATE .EQ. 1)
-              CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
-              CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-              CALL BackMCBruckner(tInt1,tInt2,tUseMC,tUseSpline)
-! Subtract the background
-              IOBS = 0
-              YPMIN = YOBS(1) - YBBIN(1)
-              YPMAX = YPMIN
-              DO I = 1, NBIN
-                DO J = 1, LBIN
-                  IOBS = IOBS + 1
-                  YOBS(IOBS) = YOBS(IOBS) - YBBIN(I)
-                  YPMIN = MIN(YOBS(IOBS),YPMIN)
-                  YPMAX = MAX(YOBS(IOBS),YPMAX)
-                END DO
-                YOBIN(I) = YOBIN(I) - YBBIN(I)
-                YBBIN(I) = 0.0
-              END DO
-              XPGMIN = XPMIN
-              XPGMAX = XPMAX                       
-              YPGMIN = YPMIN
-              YPGMAX = YPMAX
-              CALL UPLOAD_RANGE()
-              XPGMINOLD = XPMIN
-              XPGMAXOLD = XPMAX
-              YPGMINOLD = YPMIN
-              YPGMAXOLD = YPMAX
-              IPMIN = 1
-              IPMAX = NBIN
-              IPMINOLD = IPMIN
-              IPMAXOLD = IPMAX
-              BACKREF = .FALSE.
-              CALL Profile_Plot(IPTYPE)
+              CALL WizardApplyBackground
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithWizardWindowDiffractionFileInput 1')
           END SELECT
