@@ -12,8 +12,7 @@ C..   Check the lattice constants
 C..   Check the wavelength
 C..   Check the space group
       LOGICAL           :: SKIP    = .FALSE.
-      LOGICAL :: GOTCELL(6),GOTALLCELL, BackFrom2
-      INTEGER           :: I,ITYPE,IDNUMBER,IPW_Option
+      INTEGER           :: I,IDNUMBER,IPW_Option
       INCLUDE 'statlog.inc' 
 C
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,
@@ -22,6 +21,7 @@ C
 c
 C>> JCC Now Cell/lattice declarations in an include file
       INCLUDE 'Lattice.inc'
+	INCLUDE 'GLBVAR.INC' ! Contains ALambda
 
       parameter (msymmin=10)
       character*20 symline
@@ -29,8 +29,9 @@ C>> JCC Now Cell/lattice declarations in an include file
       character*80 ticfile
 C>> JCC Added declaration
 	LOGICAL Check_TicMark_Data
+	LOGICAL FnWavelengthOK ! Function
+	REAL    WavelengthOf ! Function
 	INTEGER TicRead
-	COMMON /PLTYPE/ IPTYPE
 C
 !      write(76,*) ' Space group number         : ',SGNumStr(IPosSg)
 !      write(76,*) ' Space Group (IT tables)    : ',SGHMaStr(IPosSg)
@@ -38,22 +39,19 @@ C
 !      write(76,*) ' Space Group explicit symbol: ',SGShmStr(IPosSg)
 C
 C.. We should only proceed with this if we have good cell constants 
-C.. If no wavelength then assume Cu Ka1 wvln=1.54045
+C.. If no wavelength then assume Cu Ka1 wvln=1.54056
 C..
    
 C>> JCC
 C>> Need more checks here.
 C>> I think that everything should be set to continue
 C>> so I added in these checks. Everything should be bonafide before
-C>> we try to add any tic marks in the GUI.
-C>> Was
-C>>	if (.not.CELLOK) return
+C>> we try to add any tick marks in the GUI.
 C>> Now call fuller checking function
 
 
-	if (.not.Check_TicMark_Data() ) return
+	IF (.NOT. Check_TicMark_Data()) RETURN
 C 
-!	write (76,*) ' Generating the tic marks ....'
       open(42,file='polyf.ccl',status='unknown')
       write(42,4210) 
  4210 format('N Polyfitter file')
@@ -64,7 +62,6 @@ C
      &'1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
       if (IPosSG.ge.1) then
         call DecodeSGSymbol(SGShmStr(IPosSg))
-!        write(76,*) nsymmin,' symmetry operators'
         if (nsymmin.gt.0) then
           do isym=1,nsymmin
             write(42,4235) symline(isym)
@@ -79,22 +76,14 @@ C
      &'L WGHT 3')
       write(42,4245) xpmin,xpmax
  4245 format('L RTYP    2 ',2f10.3,'   0.001')
-      if (WVLNOK) then
-        write(42,4250) ALambda
-      else
-        ALambda=1.54051
-        write(42,4250) ALambda
-      end if
- 4250 format('L WVLN ',f10.5)
-      if (zeropoint.gt.-1.0.and.zeropoint.lt.1.0) then
-        write(42,4260) zeropoint
-      else
-        zeropoint=0.0
-        write(42,4260) zeropoint
-      end if
- 4260 format('L ZERO ',f10.5)
-      write(42,4270) 
- 4270 format('L SCAL   0.10000'/
+      IF (.NOT. FnWavelengthOK()) ALambda = WavelengthOf('Cu')
+	WRITE(42,4250) ALambda
+ 4250 FORMAT('L WVLN ',F10.5)
+      IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint=0.0
+	WRITE(42,4260) zeropoint
+ 4260 FORMAT('L ZERO ',F10.5)
+      WRITE(42,4270) 
+ 4270 FORMAT('L SCAL   0.10000'/
      &'L SLIM 2.0'/
      &'L PKCN TYPE 1'/
      &'L PKFN TYPE 3'/
@@ -106,18 +95,18 @@ C
      &'L BACK 2 0.0 0.0 0.0 0.0 0.0'/
      &'L VARY ONLY ALL INTS'/
      &'L VARY ALL BACK ')
-      close(42)
+      CLOSE(42)
 c
-      call Generate_TicMarks_CCSLcode
+      CALL Generate_TicMarks_CCSLcode
       ticfile='polyf.tic'
       lenfil=9
 C>> JCC Was
 C      call Load_Tic_File(9,ticfile)
 C>> Now
 	TicRead =  Load_Tic_File(9,ticfile)
-	IF (TicRead .EQ. 1) CALL Profile_Plot(Iptype)
+	IF (TicRead .EQ. 1) CALL Profile_Plot(IPTYPE)
 
-      end
+      END
 C
 C LEVEL 50      subroutine Generate_TicMarks_CCSLcode
       subroutine Generate_TicMarks_CCSLcode
@@ -142,14 +131,24 @@ C
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
       END
+!
+!*****************************************************************************
+!
+	LOGICAL FUNCTION Check_TicMark_Data
 
-	logical function Check_TicMark_Data
-	include 'statlog.inc'
 	COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,
      &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, 
      &XGGMIN,XGGMAX,YGGMIN,YGGMAX
+
+	LOGICAL FnUnitCellOK ! Function
+	LOGICAL FnWaveLengthOK ! Function
 c
 	Check_TicMark_Data = (XPMAX - XPMIN) . GT. 0.1 ! Check that we have some data
-	Check_TicMark_Data = Check_TicMark_Data .AND. CELLOK.AND.WVLNOK
-	return
-	end function Check_TicMark_Data
+	Check_TicMark_Data = Check_TicMark_Data .AND. 
+     & FnUnitCellOK() .AND. FnWaveLengthOK()
+	RETURN
+
+	END FUNCTION Check_TicMark_Data
+!
+!*****************************************************************************
+!
