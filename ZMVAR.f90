@@ -101,7 +101,7 @@
 
 ! We want to have some variables that specify the orientation of the Z-matrix when 
 ! rotation is restricted to a single axis      
-      REAL             zmInitialQs(0:3,0:maxfrg)
+      DOUBLE PRECISION zmInitialQs(0:3,0:maxfrg)
 
       INTEGER          zmSingleRotAxDef(0:maxfrg)
 ! 1 = to atom

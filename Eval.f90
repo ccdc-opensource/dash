@@ -32,12 +32,12 @@
 
       REAL*8 CKK1, CKK2, CKK3
       REAL*8 TRAN(1:3), ROTA(1:3,1:3), CART(1:3,1:MAXATM)
-      REAL*8 QUATER(4), QQSUM, QDEN
+      REAL*8 QUATER(0:3), QQSUM, QDEN
       REAL*8 XC, YC, ZC, ZERO
       INTEGER KK, KATOM, iFrg, iFrgCopy, NATS, KK1, KK2, KK3, JQ, JQS, I, ICFRG, KI
       LOGICAL, EXTERNAL :: Get_UseCrystallographicCoM
-      REAL*8 Duonion(1:2)
-      DOUBLE PRECISION tX, tY, tZ
+      REAL*8 Duonion(0:1)
+      DOUBLE PRECISION tX, tY, tZ, tQ(0:3)
 
       KK = 0
       KATOM = 0
@@ -66,14 +66,14 @@
 ! 2. Specify the rotation axis (e.g. if molecule on mirror plane)
               IF (UseQuaternions(iFrg)) THEN
                 QQSUM = 0.0
-                DO JQ = 1, 4
-                  JQS = JQ + KK
+                DO JQ = 0, 3
+                  JQS = 1 + JQ + KK
                   QQSUM = QQSUM + CHROM(JQS)**2
                 ENDDO
 ! QQSUM now holds the sum of the squares of the quaternions
                 QDEN = 1.0 / SQRT(QQSUM)
-                DO JQ = 1, 4
-                  JQS = JQ + KK
+                DO JQ = 0, 3
+                  JQS = 1 + JQ + KK
                   QUATER(JQ) = QDEN * CHROM(JQS)
                 ENDDO
 ! QUATER now holds the normalised quaternions
@@ -82,27 +82,27 @@
                 KK = KK + 4
               ELSE
 ! Single axis, so we use the 2D analogue of quaternions: a complex number of length 1.0
-                Duonion(1) = CHROM(KK+1)
-                Duonion(2) = CHROM(KK+2)
-                QDEN = 1.0 / SQRT(Duonion(1)**2 + Duonion(2)**2)
+                Duonion(0) = CHROM(KK+1)
+                Duonion(1) = CHROM(KK+2)
+                QDEN = 1.0 / SQRT(Duonion(0)**2 + Duonion(1)**2)
+                Duonion(0) = Duonion(0) * QDEN 
                 Duonion(1) = Duonion(1) * QDEN 
-                Duonion(2) = Duonion(2) * QDEN 
-                QUATER(1) = Duonion(1) * zmSingleRotationQs(0,iFrg)
-                QUATER(2) = Duonion(2) * zmSingleRotationQs(1,iFrg)
-                QUATER(3) = Duonion(2) * zmSingleRotationQs(2,iFrg)
-                QUATER(4) = Duonion(2) * zmSingleRotationQs(3,iFrg)
-! Sum the squares of the components
-                QQSUM = 0.0
-                DO JQ = 1, 4
-                  QQSUM = QQSUM + QUATER(JQ)**2
-                ENDDO
-                QDEN = 1.0 / SQRT(QQSUM)
-! Normalise the quaternion
-                DO JQ = 1, 4
-                  QUATER(JQ) = QDEN * QUATER(JQ)
-                ENDDO
-! QUATER now holds the normalised quaternions
-                CALL ROTMAK(QUATER,ROTA)
+                QUATER(0) = Duonion(0) * zmSingleRotationQs(0,iFrg)
+                QUATER(1) = Duonion(1) * zmSingleRotationQs(1,iFrg)
+                QUATER(2) = Duonion(1) * zmSingleRotationQs(2,iFrg)
+                QUATER(3) = Duonion(1) * zmSingleRotationQs(3,iFrg)
+! QUATER now holds the normalised quaternion corresponding to the single rotation axis
+! Now premultiply with the original molecular orientation (JvdS I don't understand why
+! they must be premultiplied: I would say they should be postmultiplied)
+                tQ(0) =   QUATER(0)*zmInitialQs(0,iFrg) - QUATER(1)*zmInitialQs(1,iFrg) &
+                        - QUATER(2)*zmInitialQs(2,iFrg) - QUATER(3)*zmInitialQs(3,iFrg)
+                tQ(1) =   QUATER(0)*zmInitialQs(1,iFrg) + QUATER(1)*zmInitialQs(0,iFrg) &
+                        - QUATER(2)*zmInitialQs(3,iFrg) + QUATER(3)*zmInitialQs(2,iFrg)
+                tQ(2) =   QUATER(0)*zmInitialQs(2,iFrg) + QUATER(1)*zmInitialQs(3,iFrg) &
+                        + QUATER(2)*zmInitialQs(0,iFrg) - QUATER(3)*zmInitialQs(1,iFrg)
+                tQ(3) =   QUATER(0)*zmInitialQs(3,iFrg) - QUATER(1)*zmInitialQs(2,iFrg) &
+                        + QUATER(2)*zmInitialQs(1,iFrg) + QUATER(3)*zmInitialQs(0,iFrg)
+                CALL ROTMAK(tQ,ROTA)
 ! ROTA now holds the 3x3 rotation matrix corresponding to the single rotation axis
                 KK = KK + 4 ! We always reserve 4 parameters for rotations, whether needed or not
               ENDIF

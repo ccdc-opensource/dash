@@ -510,6 +510,7 @@
       REAL    RotMat(1:3,1:3)
       REAL    COM(1:3), tX, tY, tZ
       REAL*8  DQ(0:3), DRotMat(1:3,1:3)
+      LOGICAL tUseSingleAxis
 
       iFrg = 0
       CALL PushActiveWindowID
@@ -619,14 +620,28 @@
               CALL WDialogGetRadioButton(IDF_RotOrgCOM,iOption)
               CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr,iOption .EQ. 2)
             CASE (IDF_UseSingleAxis, IDF_RotAxAtom, IDF_RotAxFrac, IDF_RotAxPln)
-              UseQuaternions(iFrg) = .NOT. WDialogGetCheckBoxLogical(IDF_UseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_RotAxAtom, .NOT. UseQuaternions(iFrg))
-              CALL WDialogFieldStateLogical(IDF_RotAxFrac, .NOT. UseQuaternions(iFrg))
-              CALL WDialogFieldStateLogical(IDF_RotAxPln,  .NOT. UseQuaternions(iFrg))
+              tUseSingleAxis = WDialogGetCheckBoxLogical(IDF_UseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_GROUP3,    tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_Alpha,     tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_Beta,      tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_Gamma,     tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDB_Convert,   tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_LABEL4,    tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_LABEL5,    tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_LABEL6,    tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_LABEL7,    tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_Q0,        tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_Q1,        tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_Q2,        tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_Q3,        tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_GROUP2,    tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_RotAxAtom, tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_RotAxFrac, tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_RotAxPln,  tUseSingleAxis)
               iOpt1State = Disabled
               iOpt2State = Disabled
               iOpt3State = Disabled
-              IF (.NOT. UseQuaternions(iFrg)) THEN
+              IF (tUseSingleAxis) THEN
                 CALL WDialogGetRadioButton(IDF_RotAxAtom,iOption)
                 SELECT CASE (iOption)
                   CASE (1)
@@ -813,10 +828,10 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       iFrg = 0
-      CALL WDialogPutReal(IDF_Q0,zmInitialQs(0,iFrg))
-      CALL WDialogPutReal(IDF_Q1,zmInitialQs(1,iFrg))
-      CALL WDialogPutReal(IDF_Q2,zmInitialQs(2,iFrg))
-      CALL WDialogPutReal(IDF_Q3,zmInitialQs(3,iFrg))
+      CALL WDialogPutReal(IDF_Q0,SNGL(zmInitialQs(0,iFrg)))
+      CALL WDialogPutReal(IDF_Q1,SNGL(zmInitialQs(1,iFrg)))
+      CALL WDialogPutReal(IDF_Q2,SNGL(zmInitialQs(2,iFrg)))
+      CALL WDialogPutReal(IDF_Q3,SNGL(zmInitialQs(3,iFrg)))
       CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr,icomflg(iFrg) .NE. 0)
       IF (icomflg(iFrg) .EQ. 0) THEN ! Use centre of mass
 ! Set radio button
@@ -828,19 +843,23 @@
         CALL WDialogPutInteger(IDF_RotOrgAtomNr,izmoid(icomflg(iFrg),iFrg))
       ENDIF
       CALL WDialogPutCheckBoxLogical(IDF_UseSingleAxis, .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_GROUP3,         .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_Alpha,          .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_Beta,           .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_Gamma,          .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDB_Convert,        .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_LABEL4,         .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_LABEL5,         .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_LABEL6,         .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_LABEL7,         .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_Q0,             .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_Q1,             .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_Q2,             .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_Q3,             .NOT. UseQuaternions(iFrg))
+      CALL WDialogFieldStateLogical(IDF_GROUP2,         .NOT. UseQuaternions(iFrg))
       CALL WDialogFieldStateLogical(IDF_RotAxAtom,      .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_AtomNr,         .NOT. UseQuaternions(iFrg))
       CALL WDialogFieldStateLogical(IDF_RotAxFrac,      .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_LABELa,         .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_LABELb,         .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_LABELc,         .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_a,              .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_b,              .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_c,              .NOT. UseQuaternions(iFrg))
       CALL WDialogFieldStateLogical(IDF_RotAxPln,       .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_RotAxPlnAtm1,   .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_RotAxPlnAtm2,   .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_RotAxPlnAtm3,   .NOT. UseQuaternions(iFrg))
       CALL WDialogPutInteger(IDF_AtomNr,izmoid(zmSingleRotAxAtm(iFrg),iFrg))
       CALL WDialogPutReal(IDF_a,zmSingleRotAxFrac(1,iFrg))
       CALL WDialogPutReal(IDF_b,zmSingleRotAxFrac(2,iFrg))
@@ -862,6 +881,11 @@
           CALL WDialogPutRadioButton(IDF_RotAxPln)
           iOpt3State = Enabled
       END SELECT
+      IF (UseQuaternions(iFrg)) THEN
+        iOpt1State = Disabled
+        iOpt2State = Disabled
+        iOpt3State = Disabled
+      ENDIF
       CALL WDialogFieldState(IDF_AtomNr,       iOpt1State)
       CALL WDialogFieldState(IDF_LABELa,       iOpt2State)
       CALL WDialogFieldState(IDF_LABELb,       iOpt2State)
@@ -923,14 +947,19 @@
       
       INTEGER iFrg, iOption, tInteger
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      REAL    tReal
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       iFrg = 0
-      CALL WDialogGetReal(IDF_Q0,zmInitialQs(0,iFrg))
-      CALL WDialogGetReal(IDF_Q1,zmInitialQs(1,iFrg))
-      CALL WDialogGetReal(IDF_Q2,zmInitialQs(2,iFrg))
-      CALL WDialogGetReal(IDF_Q3,zmInitialQs(3,iFrg))
+      CALL WDialogGetReal(IDF_Q0,tReal)
+      zmInitialQs(0,iFrg) = DBLE(tReal)
+      CALL WDialogGetReal(IDF_Q1,tReal)
+      zmInitialQs(1,iFrg) = DBLE(tReal)
+      CALL WDialogGetReal(IDF_Q2,tReal)
+      zmInitialQs(2,iFrg) = DBLE(tReal)
+      CALL WDialogGetReal(IDF_Q3,tReal)
+      zmInitialQs(3,iFrg) = DBLE(tReal)
       CALL WDialogGetRadioButton(IDF_RotOrgCOM,iOption)
       SELECT CASE (iOption)
         CASE (1) ! C.O.M.
