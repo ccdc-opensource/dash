@@ -780,7 +780,6 @@
       INTEGER, EXTERNAL :: WRTDSL
       INTEGER LSDI, iDot, I, L1, L4, iDummy, iFile
       CHARACTER*(MaxPathLength) DirName, FileName
-      LOGICAL NoHKL
 
 ! Initialise to error
       CreateSDIFile = 1
@@ -790,11 +789,10 @@
         CALL DebugErrorMessage('SDIFileName too long in CreateSDIFile')
         LSDI = MaxPathLength
       ENDIF
-! First copy the .pik, .tic, .hcv and .khl files
+! First copy the .pik, .tic and .hcv files
 	DashPikFile = ' '
       DashTicFile = ' '
       DashHcvFile = ' '
-      DashHklFile = ' '
       DashDslFile = ' '
       IDot = 0
       DO I = LSDI, 1, -1
@@ -806,7 +804,6 @@
  50   DashPikFile(1:LSDI) = SDIFileName(1:LSDI)
       DashTicFile(1:LSDI) = SDIFileName(1:LSDI)
       DashHcvFile(1:LSDI) = SDIFileName(1:LSDI)
-      DashHklFile(1:LSDI) = SDIFileName(1:LSDI)
       DashDslFile(1:LSDI) = SDIFileName(1:LSDI)
       IF (IDot .EQ. 0) THEN
         L1 = LSDI + 1
@@ -818,7 +815,6 @@
       DashPikFile(L1:L4)='.pik'
       DashTicFile(L1:L4)='.tic'
       DashHcvFile(L1:L4)='.hcv'
-      DashHklFile(L1:L4)='.hkl'
       DashDslFile(L1:L4)='.dsl'
       IF (WRTDSL(DashDslFile,L4) .NE. 0) RETURN
 ! Clear errors
@@ -838,22 +834,12 @@
         CALL ErrorMessage('Error while writing .hcv file.')
         RETURN
       ENDIF
-      NoHKL = .FALSE.
-      CALL IOSCopyFile('polyp.hkl',DashHklFile)
-      IF (InfoError(1) .NE. 0) THEN
-        CALL DebugErrorMessage('Error while writing .hkl file.')
-        NoHKL = .TRUE.
-      ENDIF
       OPEN(iFile,file=SDIFileName(1:LSDI),status='unknown',ERR=999)
 ! Write all file names with relative paths
       CALL SplitPath(DashTicFile, DirName, FileName)
       WRITE(iFile,'(A)',ERR=999) " TIC ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
       CALL SplitPath(DashHcvFile, DirName, FileName)
       WRITE(iFile,'(A)',ERR=999) " HCV ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
-      IF (.NOT. NoHKL) THEN
-        CALL SplitPath(DashHklFile, DirName, FileName)
-        WRITE(iFile,'(A)',ERR=999) " HKL ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
-      ENDIF
       CALL SplitPath(DashPikFile, DirName, FileName)
       WRITE(iFile,'(A)',ERR=999) " PIK ."//DIRSPACER//FileName(1:LEN_TRIM(FileName))
       CALL SplitPath(DashRawFile, DirName, FileName)
