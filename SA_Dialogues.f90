@@ -16,10 +16,10 @@
            
       INCLUDE 'DialogPosCmn.inc'
 
-      CALL WDialogSelect(IDD_SAW_Page1)
-! @ Enable or disable the "Next" button
-      CALL WDialogFieldState(IDNEXT,Enabled)
-      CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+      CALL UpdateZmatrixSelection
+      CALL WizardWindowShow(IDD_SAW_Page1)
+! @@ Enable or disable the "Next" button
+   !   CALL WDialogFieldState(IDNEXT,Enabled)
       CALL SA_SetOutputFilenamesToDefaults()
       PastPawley = .TRUE.
 ! Grey out 'Delete all peak fit ranges' button on toolbar
