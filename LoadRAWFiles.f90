@@ -77,11 +77,13 @@
             CALL WDialogShow(-1,-1,IDOK,Modal)
             IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
               Load_raw_File = 2
+              CALL WDialogUnload
+              CALL PopActiveWindowID
               RETURN
             ENDIF
             CALL WDialogGetMenu(IDF_DataRangeMenu,iRange)
 ! irange is the data range to be read.
-            CALL WDialogUnload(IDD_DataRangeSTOE)
+            CALL WDialogUnload
             CALL PopActiveWindowID
           ENDIF
           Load_raw_File = Load_rawSTOE_File(TheFileName,iRange)
@@ -108,11 +110,13 @@
             CALL WDialogShow(-1,-1,IDOK,Modal)
             IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
               Load_raw_File = 2
+              CALL WDialogUnload
+              CALL PopActiveWindowID
               RETURN
             ENDIF
             CALL WDialogGetMenu(IDF_DataRangeMenu,iHighlightList)
 ! The array iHighlightList now contains '1' for every data range to be read, '0' otherwise.
-            CALL WDialogUnload(IDD_DataRangeBruker)
+            CALL WDialogUnload
             CALL PopActiveWindowID
             AtLeastOneSelected = .FALSE.
             DO I = 1, tNumOfRanges
