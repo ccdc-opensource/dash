@@ -19,16 +19,16 @@
         IF      (valid_license .EQ. -7) THEN
           MessageStr = "Demo license not valid."
         ELSE IF (valid_license .LE. -2) THEN
-          MessageStr = "DASH problem: could not find or open the license file"//CHAR(13)//&
+          MessageStr = "DASH problem: could not find or open the licence file"//CHAR(13)//&
             InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"License.dat."
         ELSE IF (valid_license .EQ. -1) THEN
-          MessageStr = "DASH problem: Your DASH license is invalid for this machine."
+          MessageStr = "DASH problem: Your DASH licence is invalid for this machine."
         ELSE IF (valid_license .EQ.  0) THEN
-          MessageStr = "DASH problem: Your DASH license has expired."
+          MessageStr = "DASH problem: Your DASH licence has expired."
         ENDIF
         IF (valid_license .LE. 0) THEN
           MessageStr = MessageStr(1:LEN_TRIM(MessageStr))//CHAR(13)//&
-                       "Would you like to enter a new license?"
+                       "Would you like to enter a new licence?"
           IF (Confirm(MessageStr)) THEN
             CALL LicensePopup
           ELSE
@@ -38,7 +38,7 @@
       ENDDO
       IF (valid_license .LE. 7) THEN
         WRITE(Exp,'(I2)') valid_license
-        CALL InfoMessage("Your DASH license will expire in "//Exp//" days.")
+        CALL InfoMessage("Your DASH licence will expire in "//Exp//" days.")
       ENDIF
 ! Now we can remove the licence dialogue from memory:
       CALL WDialogSelect(IDD_License_Dialog)
@@ -84,12 +84,12 @@
                 CALL WDialogGetString(IDF_License_String, CLString)
                 CALL Decode_License(CLString,Info)
                 IF (Info%Valid .LT. 0 ) THEN
-                  CALL ErrorMessage("Sorry, the license key is invalid--please check your input.")
+                  CALL ErrorMessage("Sorry, the licence key is invalid--please check your input.")
                 ELSE IF (WDialogGetCheckBoxLogical(IDF_License_Site) .AND. (Info%LicenseType .NE. SiteKey)) THEN
-                  CALL ErrorMessage("Sorry, the license key is not a site license.")
+                  CALL ErrorMessage("Sorry, the licence key is not a site licence.")
                 ELSE IF ((.NOT. WDialogGetCheckBoxLogical(IDF_License_Site)) .AND. (Info%LicenseType .EQ. SiteKey)) THEN
-                  CALL ErrorMessage("The license key is a site license:"//CHAR(13)//&
-                                    "please select the Site License check-box and enter your site code as well.")                                             
+                  CALL ErrorMessage("The licence key is a site licence:"//CHAR(13)//&
+                                    "please select the Site Licence check-box and enter your site code as well.")
                 ELSE
                   Valid = License_Valid(Info)
                   IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
@@ -100,11 +100,11 @@
                     CALL Write_License_File(CLString)
                     INLOOP = .FALSE.
                   ELSE IF (Valid .EQ. 0) THEN
-                    CALL ErrorMessage("Sorry, the license key has expired.")
+                    CALL ErrorMessage("Sorry, the licence key has expired.")
                   ELSE IF (Valid .EQ. -1) THEN
-                    CALL ErrorMessage("Sorry, the license key is not valid for this machine.")
+                    CALL ErrorMessage("Sorry, the licence key is not valid for this machine.")
                   ELSE IF (Valid .EQ. -99) THEN
-                    CALL ErrorMessage("Sorry, the license key is not valid for this site.") 
+                    CALL ErrorMessage("Sorry, the licence key is not valid for this site.") 
                   ENDIF
                 ENDIF
               CASE (ID_Licence_Request)
@@ -218,7 +218,7 @@
             tRead_License_Valid = License_Valid(Info)
             IF (tRead_License_Valid .GT. 0) THEN
               IF (Info%LicenseType .EQ. DemoKey) THEN
-                ttRead_License_Valid = ShowLicenceAgreement()
+                ttRead_License_Valid = ShowLicenceAgreement(Info)
                 IF (ttRead_License_Valid .EQ. -7) tRead_License_Valid = -7
               ENDIF
             ENDIF
@@ -287,21 +287,21 @@
           GOTO 99
       END SELECT
       OPEN(UNIT=IUN,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='UNKNOWN',ERR=99)
-      WRITE(iun,'(A)',ERR=99)     "# License File for DASH"
+      WRITE(iun,'(A)',ERR=99)     "# Licence File for DASH"
       WRITE(iun,'(A)',ERR=99)     "#"
-      WRITE(iun,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' license '
+      WRITE(iun,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' licence '
       IF      (Info%LicenseType .EQ. NodeKey) THEN
         WRITE(iun,'(A,z8)',ERR=99) '# Your DASH Serial ID for this machine is ',Info%SerialNumber
       ELSE IF (Info%LicenseType .EQ. SiteKey) THEN
         WRITE(iun,'(A,z8)',ERR=99) '# Your DASH Site ID is ',Info%SerialNumber
       ENDIF
       IF (Info%Year .EQ. 9999) THEN
-        WRITE(iun,'(A)',ERR=99)'# The license is non-expiring'
+        WRITE(iun,'(A)',ERR=99)'# The licence is non-expiring'
       ELSE
-        WRITE(iun,2,ERR=99)Info%Day, Months(Info%Month), Info%Year
-    2   FORMAT('# The license expires on ',I3,1X,A,1X,I4)
+        WRITE(iun,2,ERR=99) Info%Day, Months(Info%Month), Info%Year
+    2   FORMAT('# The licence expires on ',I3,1X,A,1X,I4)
       ENDIF
-      WRITE(iun,'(A)',ERR=99)"# License key follows :"
+      WRITE(iun,'(A)',ERR=99)"# Licence key follows :"
       WRITE(iun,'(A)',ERR=99) LString(1:LEN_TRIM(LString))
    99 CONTINUE
       CLOSE(iun)
@@ -329,10 +329,10 @@
       IF (Fname(1:1) .EQ. ' ') RETURN
       OPEN(unit = Iun, file = Fname(1:LEN_TRIM(Fname)),status = 'unknown',err=99)
       Sn = Get_DashSerialNumber("C:\\"C)
-      WRITE(Iun,'(A)',ERR=100) 'This file is provided to submit requests for DASH licenses'
-      WRITE(Iun,'(A)',ERR=100) 'A DASH evaluation  will allow you to run DASH on any PC'
-      WRITE(Iun,'(A)',ERR=100) 'A site license will allow you to install DASH on any PC on your own site'
-      WRITE(Iun,'(A)',ERR=100) 'Most licenses, however, are node-locked. For this, we use a unique identifier'
+      WRITE(Iun,'(A)',ERR=100) 'This file is provided to submit requests for DASH licences.'
+      WRITE(Iun,'(A)',ERR=100) 'A DASH evaluation licence will allow you to run DASH on any PC.'
+      WRITE(Iun,'(A)',ERR=100) 'A site licence will allow you to install DASH on any PC on your own site.'
+      WRITE(Iun,'(A)',ERR=100) 'Most licences, however, are node-locked. For this, we use a unique identifier.'
       WRITE(Iun,'(A,Z8)',ERR=100)'For this PC, this is ',Sn
       WRITE(Iun,*,ERR=100)
       WRITE(Iun,'(A)',ERR=100) 'Please complete as applicable:'
@@ -341,7 +341,7 @@
       WRITE(Iun,*,ERR=100)
       WRITE(Iun,'(A)',ERR=100) 'I work in industry/an academic institution'
       WRITE(Iun,*,ERR=100)
-      WRITE(Iun,'(A)',ERR=100) 'Please enter your address here: '
+      WRITE(Iun,'(A)',ERR=100) 'Please enter your address here:'
       WRITE(Iun,*,ERR=100)
       WRITE(Iun,'(A)',ERR=100) 'Name: '
       WRITE(Iun,'(A)',ERR=100) 'Address: '
@@ -355,9 +355,9 @@
         "A file "//Fname(1:LEN_TRIM(Fname))//" has been created."//CHAR(13)//&
         "You should edit this file and then send it to"//CHAR(13)//CHAR(13)//&
         "software@ccdc.cam.ac.uk"//CHAR(13)//CHAR(13)//&
-        "Would you like to edit this file now?","Edit license request file")
+        "Would you like to edit this file now?","Edit licence request file")
       IF (WinfoDialog(4) .EQ. 1) THEN
-        CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,'Edit license request file'),IHan)
+        CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,'Edit licence request file'),IHan)
         CALL WEditFile(Fname(1:LEN_TRIM(Fname)), Modal, 0, 0, SystemFixed)
       ENDIF
       RETURN
@@ -406,7 +406,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION ShowLicenceAgreement
+      INTEGER FUNCTION ShowLicenceAgreement(Info)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -414,13 +414,69 @@
 
       IMPLICIT NONE
 
-      CHARACTER*5000 kString
+      TYPE(License_Info) Info
 
+      CHARACTER*5000 kString
+      CHARACTER*4 NextLine
+      CHARACTER*18 tDateStr
+      INTEGER tDate
+
+! Initialise to failure
       ShowLicenceAgreement = -7
-      kString = 'Your licence agreement here.'
+      NextLine = CHAR(13)//CHAR(10)//CHAR(13)//CHAR(10)
+! Convert expiry date to a string
+      tDate = Info%Year*10000 + Info%Month*100 + Info%Day
+      CALL Date2String(tDate,tDateStr)
+      kString = 'In order to install this evaluation version of DASH, you must first read and accept '// &
+                'the terms of the following licence agreement:'//NextLine// &
+                'DASH (the "Program") is a copyright work belonging to CCDC Software Limited ("CCDC").'// &
+                '  In consideration of the access to the Program granted you, you agree to install'// &
+                ' and use the Program solely in accordance with the following terms.'//NextLine// &
+                'You are permitted to install and to use a single copy of the Program and the'// &
+                ' documentation until '//tDateStr(1:LEN_TRIM(tDateStr))//' for the purpose of'// &
+                ' evaluating whether or not the software meets your requirements. Within 14 days'// &
+                ' of the end of such period you agree to delete all copies of the installed Program'// &
+                ' from your computers and storage systems.'//NextLine// &
+                'You may not supply, assign, transfer or sublicense (in whole or part) the Program'// &
+                ' to any third party as part of a commercial transaction or for any consideration,'// &
+                ' in money, money''s worth or otherwise, or free of charge.  The Program shall only'// &
+                ' be accessible to your employees.'//NextLine// &
+                'You may not bundle this Program together with any other software product or'// &
+                ' products without the prior written consent of CCDC.'//NextLine// &
+                'You may copy the Program only to the extent strictly necessary for backup'// &
+                ' purposes. Subject thereto or as otherwise expressly permitted by applicable'// &
+                ' law, you may not copy, reproduce, translate, adapt, decompile, modify,'// &
+                ' reverse engineer or disassemble the Program. You shall ensure at all times'// &
+                ' that all copies of the Programs made by you contain the copyright notice '// &
+                'issued by CCDC and contained in the Program.  You shall not amend or obscure'// &
+                ' this notice or any logos or trademarks of CCDC contained in the Program.'//NextLine// &
+                'THE PROGRAM IS SUPPLIED TO YOU WITHOUT CHARGE, AND ACCORDINGLY YOU AGREE'// &
+                ' THAT THE PROGRAM IS PROVIDED ON AN *AS IS* BASIS, AND NO REPRESENTATION'// &
+                ' IS MADE OR WARRANTY GIVEN, WHETHER WITH REGARD TO THE FUNCTIONALITY OR'// &
+                ' FITNESS FOR PURPOSE OF THE PROGRAM OR OTHERWISE, AND ALL SUCH REPRESENTATIONS'// &
+                ' AND WARRANTIES, WHETHER EXPRESSED OR IMPLIED (BY LAW OR OTHERWISE) ARE'// &
+                ' HEREBY EXCLUDED TO THE FULLEST EXTENT PERMITTED BY LAW. WITHOUT PREJUDICE'// &
+                ' TO THE FOREGOING IN NO EVENT SHALL CCDC BE LIABLE TO YOU, IN CONTRACT, IN'// &
+                ' TORT OR OTHERWISE, FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY OR'// &
+                ' CONSEQUENTIAL LOSS OR DAMAGE, INCLUDING, WITHOUT LIMITATION, ADMINISTRATION'// &
+                ' COSTS, LOSS OF BUSINESS AND GOODWILL, LOSS UNDER CURRENT AND FUTURE'// &
+                ' CONTRACTS, LOSS OF PROFIT OR OPPORTUNITY OR FINANCIAL LOSS OF ANY KIND'// &
+                ' ARISING IN ANY WAY OUT OF OR IN CONNECTION WITH YOUR USE OF THE PROGRAM.'//NextLine// &
+                'You agree to minimise any adverse effect of downloading and using the'// &
+                ' Program, including by keeping back up data and implementing adequate '// &
+                'disaster recovery procedures.  Accordingly, CCDC shall be in no manner'// &
+                ' liable for any effect which the Program may have on your data, software,'// &
+                ' hardware or other systems or products.'//NextLine// &
+                'The foregoing terms and conditions and any dispute in connection with'// &
+                ' them shall be governed by and construed in accordance with English law '// &
+                'and shall be subject to the exclusive jurisdiction of the English courts.'//NextLine// &
+                'If you agree to the foregoing terms and conditions then please click'// &
+                ' on the "Accept" button below. If you do not accept the foregoing terms'// &
+                ' and conditions you should not click on the "Accept" button but should'// &
+                ' click on the "Do NOT Accept" button below.'
       CALL WDialogSelect(IDD_LicenceAgreement)
       CALL WDialogPutString(IDF_Agreement,kString)
-      CALL WDialogShow(-1,-1,0,SemiModeless)
+      CALL WDialogShow(-1,-1,ID_Licensing_Exit,SemiModeless)
       DO WHILE (.TRUE.)
         CALL GetEvent
         SELECT CASE (EventType)
