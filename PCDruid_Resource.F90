@@ -1,4 +1,4 @@
-! Winteracter module created : 23/Oct/2003 16:07:04
+! Winteracter module created : 24/Oct/2003 15:25:39
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -713,4 +713,5 @@
           INTEGER, PARAMETER :: IDB_Smooth                      =  1148
           INTEGER, PARAMETER :: IDF_SmoothWindow                =  1149
           INTEGER, PARAMETER :: IDB_1st                         =  1150
+          INTEGER, PARAMETER :: IDF_RecalcESDs                  =  1154
       END MODULE Druid_Header

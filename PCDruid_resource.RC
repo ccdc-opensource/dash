@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 23/Oct/2003 16:07:04
+// Modified : 24/Oct/2003 15:25:39
 //
 ///////////////////////////////////////////////////
 //
@@ -726,6 +726,7 @@
 #define IDB_Smooth                       1148
 #define IDF_SmoothWindow                 1149
 #define IDB_1st                          1150
+#define IDF_RecalcESDs                   1154
 
 ///////////////////////////////////////////////////
 //
@@ -4239,7 +4240,7 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLO
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Single Crystal Step 3: Reflections"
 BEGIN
-    CONTROL "Diffraction data",IDF_PW_Data_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   90,   22,  274,   59
+    CONTROL "Diffraction data",IDF_PW_Data_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   90,   22,  274,   80
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "File",IDF_PW_Data_Filename,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   95,   39,   18,    8
     CONTROL "",IDF_PW_DataFileName_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,  119,   37,  236,   14
@@ -4249,11 +4250,13 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "Sa&ve as...",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  321,  150,   40,   14
+    CONTROL "Recalculate ESDs",IDF_RecalcESDs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  120,   79,  100,   14
 END
 
 IDD_SX_Page2 RCDATA
 BEGIN
 "[Checks] \n"
+" 1154 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
