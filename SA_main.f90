@@ -273,7 +273,7 @@
       ENDDO
       f2cmat = DBLE(tLattice)
 ! Calculate the reciprocal lattice
-      CALL SAGMINV(f2cmat,c2fmat,3)
+      CALL DGMINV(f2cmat,c2fmat,3)
       tRecLattice = SNGL(c2fmat)
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
       CALL CREATE_FOB

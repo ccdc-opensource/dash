@@ -168,30 +168,6 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION Radians2Degrees(TheAngle)     
-
-      IMPLICIT NONE
-
-      REAL, INTENT (IN   ) :: TheAngle
-
-      Radians2Degrees = TheAngle * (30.0 / ASIN(0.5))
-
-      END FUNCTION Radians2Degrees
-!
-!*****************************************************************************
-!
-      REAL FUNCTION Degrees2Radians(TheAngle)     
-
-      IMPLICIT NONE
-
-      REAL, INTENT (IN   ) :: TheAngle
-
-      Degrees2Radians = TheAngle * (ASIN(0.5) / 30.0)
-
-      END FUNCTION Degrees2Radians
-!
-!*****************************************************************************
-!
       REAL FUNCTION TwoTheta2dSpacing(TheTwoTheta)     
 !
 ! Calculates the d-spacing for the given 2 theta value using the wavelength in ALambda
@@ -202,9 +178,8 @@
 
       INCLUDE 'GLBVAR.INC'
 
-      LOGICAL FnWaveLengthOK ! Function
-      REAL Degrees2Radians ! Function
-      REAL WavelengthOf ! Function
+      LOGICAL, EXTERNAL :: FnWaveLengthOK
+      REAL, EXTERNAL :: Degrees2Radians, WavelengthOf
 
       IF (.NOT. FnWaveLengthOK()) THEN
         CALL ErrorMessage('Wavelength invalid, will be set to Cu')
@@ -231,10 +206,8 @@
 
       INCLUDE 'GLBVAR.INC'
 
-      LOGICAL FnWaveLengthOK ! Function
-      REAL WavelengthOf ! Function
-      REAL TwoTheta2dSpacing ! Function
-      REAL Radians2Degrees ! Function
+      LOGICAL, EXTERNAL :: FnWaveLengthOK 
+      REAL, EXTERNAL :: WavelengthOf, TwoTheta2dSpacing, Radians2Degrees
 
       IF (.NOT. FnWaveLengthOK()) THEN
         CALL ErrorMessage('Wavelength invalid, will be set to Cu')
@@ -919,8 +892,7 @@
 
       REAL    tMaxResolution
       INTEGER I, IRadSelection
-      REAL    FnWavelengthOfMenuOption ! Function
-      REAL    TwoTheta2dSpacing, dSpacing2TwoTheta ! Function
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption, TwoTheta2dSpacing, dSpacing2TwoTheta
 
       CALL PushActiveWindowID
 ! This is the right place to update the maximum resolution (even if it's not necessary)
@@ -1646,6 +1618,8 @@
           STATBARSTR(8)='Pawley refinement mode'
         CASE (ID_Structure_Solution_Mode)
           STATBARSTR(8)='Structure solution mode'
+        CASE (IDB_AnalyseSolutions)
+          STATBARSTR(8)='Analyse solutions mode'
       END SELECT
       CALL WindowOutStatusBar(8,STATBARSTR(8))
 ! Update the menu + the toolbar
