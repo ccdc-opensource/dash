@@ -40,6 +40,7 @@
       CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
 !!ep added
       CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed,Disabled)
+      CALL WDialogFieldState(IDBACK, Disabled)
 ! If the background has been subtracted after the pattern was read in, then the
 ! order of the background polynomial defaults to 2, otherwise to 10.
       IF (.NOT. BACKREF) THEN
@@ -306,6 +307,9 @@
 !ep added
             CASE (IDF_Paw_Ref_SgDet_Proceed)
               CALL SpaceGroupDetermination(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd
+              CALL WDialogFieldState(IDBACK, Enabled)
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_PW_Page1)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)

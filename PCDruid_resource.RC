@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 15/Mar/2002 12:38:09
+// Modified : 15/Mar/2002 16:27:11
 //
 ///////////////////////////////////////////////////
 //
@@ -1034,19 +1034,6 @@ BEGIN
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
 END
 
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
@@ -1484,7 +1471,8 @@ BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "Space Group Determination",IDF_SGdetGROUP,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,  188,  298,   40
     CONTROL "Proceed",IDF_Paw_Ref_SGDet_Proceed,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  204,   40,   14
-    CONTROL "The Pawley refinement must have been performed in the most general extinction group of the crystal system under consideration.",IDF_SGDet_LABEL,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  154,  204,  222,   16
+    CONTROL "The Pawley refinement must have been performed in the most general extinction group of the crystal system under consideration.",IDF_SGDet_LABEL,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  145,  201,  196,   20
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  346,  204,   40,   14
 END
 
 IDD_Pawley_Status RCDATA
