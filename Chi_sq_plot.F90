@@ -29,7 +29,7 @@
 
       EXTERNAL DealWithChiSqdPlot
 
-      CALL WindowOpenChild(ChiHandle,SysMenuOn+MinButton+AlwaysOnTop, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
+      CALL WindowOpenChild(ChiHandle,SysMenuOn+MinButton+OwnedByRoot, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
       ChiSqdChildWindows(ChiHandle) = 1
       CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
       Zoomed = .FALSE.
