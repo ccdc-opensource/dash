@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/Aug/2001 20:34:31
+// Modified : 10/Aug/2001 16:05:41
 //
 ///////////////////////////////////////////////////
 //
@@ -763,7 +763,7 @@ BEGIN
     CONTROL "Gamma",IDF_gam_refine_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  152,   80,   24,    8
     CONTROL "Zero-point",IDF_zeropt_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  178,   80,   36,    8
     CONTROL "Lattice parameter refinement",IDF_CellRefinement_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    6,   72,  130,    8
-    CONTROL "Create Dicvol File..",ID_Index_Output,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT | BS_MULTILINE,  222,   84,   44,   20
+    CONTROL "Create DICVOL File...",ID_Index_Output,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT | BS_MULTILINE,  222,   80,   50,   24
 END
 
 IDD_Peak_Positions RCDATA
