@@ -6,15 +6,27 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE DFLIB
+      USE ZMVAR
 
       IMPLICIT NONE
 
       INTEGER IWID, IWIDTHS(10)
+      CHARACTER(MaxPathLength) ArgString, tDirName, tFileName
+      CHARACTER(7) StrFileExtension ! maximum = 7 = .zmatrix
+      INTEGER ExtLen, iFrg, iDummy
+      INTEGER, EXTERNAL :: Read_One_zm, DiffractionFileOpen
+      INTEGER       tNumZMatrices
+      CHARACTER(80) tZmatrices(10)
+      INTEGER       tNextzmNum
+      INTEGER       tCounter
 
 ! Initialise Winteracter
       CALL WInitialise(' ')
+      CALL GetInstallationDirectory
+! Check if there are any command line arguments
 ! Try to redirect stdout - change working directory if unsuccessful
-      CALL Init_StdOut
+      IF (NARGS() .EQ. 0) CALL Init_StdOut
 ! Open root window
       CALL WindowOpen(FLAGS = SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
                       Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
@@ -44,14 +56,93 @@
       CALL WMessageEnable(TabChanged, Enabled)
       CALL CheckLicence
 ! Grey out al buttons to do with project file.
-      CALL WMenuSetState(IDB_New,ItemEnabled,WintOff)
-      CALL WMenuSetState(IDB_Open,ItemEnabled,WintOff)
-      CALL WMenuSetState(IDB_Save,ItemEnabled,WintOff)
-      CALL WMenuSetState(IDB_SaveAs,ItemEnabled,WintOff)
+  !O    CALL WMenuSetState(IDB_New,ItemEnabled,WintOff)
+  !O    CALL WMenuSetState(IDB_Open,ItemEnabled,WintOff)
+  !O    CALL WMenuSetState(IDB_Save,ItemEnabled,WintOff)
+  !O    CALL WMenuSetState(IDB_SaveAs,ItemEnabled,WintOff)
 ! Main message loop
+      IF (NARGS() .GT. 1) THEN
+        CALL GetArg(1,ArgString) 
+        CALL DebugErrorMessage(ArgString)
+! Parse directory and go there
+        CALL SplitPath(ArgString,tDirName,tFileName)
+        CALL IOsDirChange(tDirName)
+! Parse directory and go there
+        ExtLen = 7
+        CALL FileGetExtension(ArgString,StrFileExtension,ExtLen)
+        CALL StrUpperCase(StrFileExtension)
+        SELECT CASE (StrFileExtension)
+          CASE ('DASH   ')
+            CALL PrjFileOpen(ArgString)
+          CASE ('ZMATRIX')
+            iFrg = 1
+            frag_file(iFrg) = ArgString
+            iDummy = Read_One_ZM(iFrg)
+            IF (iDummy .EQ. 0) THEN ! successful read
+              gotzmfile(iFrg) = .TRUE.
+! Initialise 'Number of' field to 1
+              CALL WDialogSelect(IDD_SAW_Page1)
+              CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
+! JCC traps for Z-matrix reading
+            ELSE 
+              gotzmfile(iFrg) = .FALSE. 
+              CALL FileErrorPopup(frag_file(iFrg),iDummy)
+            ENDIF ! If the read on the Z-matrix was ok
+            CALL UpdateZmatrixSelection
+            CALL WizardWindowShow(IDD_SAW_Page1)
+          CASE ('SDI    ')
+            CALL SDIFileOpen(ArgString)
+            CALL WizardWindowShow(IDD_SAW_Page1)
+          CASE ('PDB    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'CSSR   ')
+              CALL WDialogSelect(IDD_SAW_Page1)
+            iFrg = 1
+            CALL zmConvert(ArgString,tNumZMatrices,tZmatrices)
+            IF (tNumZMatrices .EQ. 0) GOTO 999
+            tNextzmNum  = 1
+   10       CONTINUE
+            frag_file(iFrg) = tDirName(1:LEN_TRIM(tDirName))//tZmatrices(tNextzmNum)
+            iDummy = Read_One_ZM(iFrg)
+            IF (iDummy .EQ. 0) THEN ! successful read
+              gotzmfile(iFrg) = .TRUE.
+! Initialise 'Number of' field to 1
+              CALL WDialogPutInteger(IDFzmNumber(iFrg),1)
+! Find next free slot ("iFrg")
+              tCounter = 1
+              DO WHILE ((gotzmfile(iFrg)) .AND. (tCounter .LT. maxfrg))
+                CALL INC(tCounter)
+                CALL INC(iFrg)
+                IF (iFrg .GT. maxfrg) iFrg = 1
+              ENDDO
+            ELSE
+              gotzmfile(iFrg) = .FALSE.
+              CALL FileErrorPopup(frag_file(iFrg),iDummy)
+! Slot still free, so iFrg still OK.
+            ENDIF
+! More Z-matrices to read?
+            CALL INC(tNextzmNum)
+            IF (tNextzmNum .GT. tNumZMatrices) GOTO 999
+! If no free slot found, exit
+            IF (gotzmfile(iFrg)) THEN
+              CALL InfoMessage('File contained more Z-matrices than available slots.')
+              GOTO 999
+            ENDIF
+! Read next Z-matrix.
+            GOTO 10
+  999       CALL UpdateZmatrixSelection
+            CALL WizardWindowShow(IDD_SAW_Page1)
+          CASE ('RAW    ', 'CPI    ', 'DAT    ', 'TXT    ', 'MDI    ', 'POD    ', &
+                'RD     ', 'SD     ', 'UDF    ', 'UXD    ', 'XYE    ', 'X01    ')
+            iDummy = DiffractionFileOpen(ArgString)
+            CALL WizardWindowShow(IDD_PW_Page3)
+          CASE DEFAULT
+            CALL ErrorMessage('Unrecognised file format.')
+            CALL StartWizard
+        END SELECT
+      ELSE
 ! Go through the PolyFitter wizard
 ! Comment this next line out to remove the wizard
-      CALL StartWizard
+        CALL StartWizard
+      ENDIF
 !      CALL ShowWindowRietveld
       DO WHILE (.TRUE.)
         CALL GetEvent
@@ -348,7 +439,7 @@
                CHAR(13)//&
                ProgramVersion//CHAR(13)//&
                CHAR(13)//&
-               'Copyright July 2002'
+               'Copyright July 2003'
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
 
       END SUBROUTINE About
