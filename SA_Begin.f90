@@ -30,12 +30,6 @@
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
                               chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
 
-      LOGICAL         UseRene, UseRelease, UseESD
-      INTEGER                                     nwidth
-      REAL                                                width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                                   InPeak
-      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
-
       LOGICAL         InSA
       COMMON /SADATA/ InSA
 
@@ -55,8 +49,6 @@
         RETURN
       ENDIF
       CALL WDialogSelect(IDD_SA_input3_2)
-      UseRene = WDialogGetCheckBoxLogical(IDC_UseRene)
-      IF (UseRene) CALL InitRene
       ! Initialise LOGICALs that tell us if this parameter is either a translation or a torsion
       ! angle that is allowed to vary over its full range. Because if so, e.g. a translation of, say, 1.10
       ! should be renormalised to 0.10 during the SA
