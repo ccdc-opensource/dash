@@ -6,22 +6,45 @@
       USE WINTERACTER
       USE DRUID_HEADER 
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR), &
-      IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR),NumPeakFitRange, &
-      CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), & 
-      XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-      IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
+      REAL              XPF_Range
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
 
-      COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),PkFnEsd(MPkDes,Max_NPFR), &
-      PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &
-      PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-      PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),PkPosAv(MAX_NPFR)
+      REAL              PkFnVal,                      PkFnEsd,                      &
+                        PkFnCal,                                                    &
+                        PkFnVarVal,                   PkFnVarEsd,                   &
+                        PkAreaVal,                    PkAreaEsd,                    &
+                        PkPosVal,                     PkPosEsd,                     &
+                        PkPosAv
+      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+                        PkFnCal(MPkDes,Max_NPFR),                                   &
+                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+                        PkPosAv(MAX_NPFR)
 
-      REAL FitPar(MPkDes),FitEsd(MPkDes)
+      REAL    FitPar(MPkDes), FitEsd(MPkDes)
       INTEGER IOrdTem(MAX_NPFR)
+      INTEGER I, IOrd, IPtPS
+      REAL    ptem3, ptem4
+      INTEGER NumSigmaPar, NumGammaPar, NumHPSLPar, NumHMSLPar
 
 !C>> JCC This is for testing for mathematical errors used to PAUSE the program: The pause seemed to
 !C>> be causing a repeated CMD window to appear on screen ....
@@ -32,8 +55,8 @@
       CALL PushActiveWindowID
 ! Write out sigmas
       CALL WDialogSelect(IDD_Sigma_info)
-      CALL WDialogClearField(IDD_Sigma_Grid)
       CALL WGridRows(IDF_Sigma_Grid,NumPeakFitRange)
+      CALL WDialogClearField(IDF_Sigma_Grid)
       IF (NumPeakFitRange .GT. 0) THEN
         DO I = 1, NumPeakFitRange
           iord = IOrdTem(I)
@@ -53,18 +76,14 @@
           CALL WDialogPutReal(IDF_Sigma2,PkFnVarVal(2,1),'(F10.4)')
           DO I = 1, NumPeakFitRange
             iord = IOrdTem(I)
-            CALL WGridPutCellReal(IDF_Sigma_Grid,4,i,PkFnCal(1,iord),'(F12.5)')
+            CALL WGridPutCellReal(IDF_Sigma_Grid,4,I,PkFnCal(1,iord),'(F12.5)')
           END DO
         END IF
-      ELSE
-        DO I = 1, 4
-          CALL WGridClearCell(IDF_Sigma_Grid,I,1)
-        END DO
       END IF
 ! Write out gammas
       CALL WDialogSelect(IDD_Gamma_info)
-      CALL WDialogClearField(IDD_Gamma_Grid)
       CALL WGridRows(IDF_Gamma_Grid,NumPeakFitRange)
+      CALL WDialogClearField(IDF_Gamma_Grid)
       IF (NumPeakFitRange .GT. 0) THEN
         DO I = 1, NumPeakFitRange
           iord = IOrdTem(I)
@@ -87,15 +106,11 @@
             CALL WGridPutCellReal(IDF_Gamma_Grid,4,I,PkFnCal(2,iord),'(F12.5)')
           END DO
         END IF
-      ELSE
-        DO I = 1, 4
-          CALL WGridClearCell(IDF_Gamma_Grid,I,1)
-        END DO
       END IF
 ! Write out HPSL
       CALL WDialogSelect(IDD_HPSL_info)
-      CALL WDialogClearField(IDD_HPSL_Grid)
       CALL WGridRows(IDF_HPSL_Grid,NumPeakFitRange)
+      CALL WDialogClearField(IDF_HPSL_Grid)
       IF (NumPeakFitRange .GT. 0) THEN
         DO I = 1, NumPeakFitRange
           iord = IOrdTem(I)
@@ -124,15 +139,11 @@
             CALL WGridPutCellReal(IDF_HPSL_Grid,4,i,PkFnCal(3,iord),'(F12.5)')
           END DO
         END IF
-      ELSE
-        DO I = 1, 4
-          CALL WGridClearCell(IDF_HPSL_Grid,I,1)
-        END DO
       END IF
 ! Write out HMSL
       CALL WDialogSelect(IDD_HMSL_info)
-      CALL WDialogClearField(IDD_HMSL_Grid)
       CALL WGridRows(IDF_HMSL_Grid,NumPeakFitRange)
+      CALL WDialogClearField(IDF_HMSL_Grid)
       IF (NumPeakFitRange .GT. 0) THEN
         DO I = 1, NumPeakFitRange
           iord = IOrdTem(I)
@@ -141,7 +152,7 @@
           CALL WGridPutCellReal(IDF_HMSL_Grid,3,i,PkFnEsd(4,iord),'(F12.5)')
         END DO
 ! Let's fit HMSL
-        IF (NumPeakFitRange.ge.2) THEN
+        IF (NumPeakFitRange.GE.2) THEN
           NumHMSLPar = 1
           IPtPS = 4
           IBMBER = 0
@@ -161,10 +172,6 @@
             CALL WGridPutCellReal(IDF_HMSL_Grid,4,I,PkFnCal(4,iord),'(F12.5)')
           END DO
         END IF
-      ELSE
-        DO I = 1, 4
-          CALL WGridClearCell(IDF_HMSL_Grid,I,1)
-        END DO
       END IF
 !.. Warn if HPSL is less than HMSL
       IF (NumPeakFitRange .GE. 2) THEN
@@ -317,7 +324,7 @@
       PARAMETER (MVAL=50)
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
-!C>> JCC This is for testing for mathematical errors used to PAUSE the program: THe pause seemed to#
+!C>> JCC This is for testing for mathematical errors used to PAUSE the program: The pause seemed to
 !C>> be causing a repeated CMD window to appear on screen ....
       INTEGER IBMBER
       COMMON / CCSLER / IBMBER 
