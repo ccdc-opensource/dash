@@ -86,7 +86,6 @@
 
       IMPLICIT NONE
 
-      INTEGER, EXTERNAL :: Get_HydrogenTreatment
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER IFLAGS, IFTYPE
       CHARACTER*MaxPathLength tFileName
@@ -127,16 +126,7 @@
               ENDIF
           END SELECT
         CASE (FieldChanged)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDR_HydrogensIgnore, IDR_HydrogensAbsorb, IDR_HydrogensExplicit, IDF_AutoLocalOptimise)
-              IF (Get_HydrogenTreatment() .EQ. 3) THEN ! Explicit
-! If hydrogens are used during SA, force use of hydrogens during autominimise
-                CALL WDialogPutCheckBoxLogical(IDF_UseHydrogensAuto, .TRUE.)
-                CALL WDialogFieldState(IDF_UseHydrogensAuto, Disabled)
-              ELSE
-                CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto, WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
-              ENDIF
-          END SELECT
+          ! Do nothing
       END SELECT
       CALL PopActiveWindowID
 
@@ -589,11 +579,13 @@
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              AllPkAreaVal
       REAL              PkProb
       INTEGER           IOrdTem
       INTEGER           IHPk
       COMMON /ALLPEAKS/ NTPeak,                                                  &
                         AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        AllPkAreaVal(MTPeak),                                    &
                         PkProb(MTPeak),                                          &
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
