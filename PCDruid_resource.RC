@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 25/Sep/2001 16:11:20
+// Modified : 28/Sep/2001 10:00:11
 //
 ///////////////////////////////////////////////////
 //
@@ -390,7 +390,6 @@
 #define IDF_Indexing_CellRange           1335
 #define IDF_Indexing_CellAngle           1336
 #define ID_Indexing_Create               1337
-#define IDF_Indexing_chemgroup           1339
 #define IDF_Indexing_Misc                1340
 #define IDF_Indexing_Density_Label       1341
 #define IDF_Indexing_MolWt_Label         1342
@@ -488,6 +487,8 @@
 #define IDF_RADIO1                       1140
 #define IDF_Indexing_UseErrors           1142
 #define IDF_eps                          1172
+#define IDF_LABEL16                      1207
+#define IDF_Indexing_ScaleFactor         1208
 
 ///////////////////////////////////////////////////
 //
@@ -1871,59 +1872,60 @@ BEGIN
 ,0
 END
 
-IDD_Index_Preparation DIALOG 0, 0,  339,  230
+IDD_Index_Preparation DIALOG 0, 0,  340,  241
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Create indexing files"
 BEGIN
     CONTROL "Information",IDF_Indexing_Info,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,    4,  322,   36
-    CONTROL "Crystal systems to search",IDF_Indexing_Systems,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,    8,  146,  140,   52
-    CONTROL "Unit cell limits",IDF_Indexing_Cell,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,    8,   44,  140,   96
+    CONTROL "Crystal systems to search",IDF_Indexing_Systems,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,    8,  147,  140,   56
+    CONTROL "Unit cell limits",IDF_Indexing_Cell,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,    8,   45,  140,   96
     CONTROL "This interface allows the user to produce simple DICVOL format output files. Values left as zero will  be treated as defaults. The user should edit the resultant file to set more complex settings.",IDF_Indexing_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   16,   16,  298,   16
-    CONTROL "Triclinic",IDF_Indexing_triclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  159,   54,    8
-    CONTROL "Monoclinic",IDF_Indexing_Monoclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  171,   54,    8
-    CONTROL "Orthorhombic",IDF_Indexing_Ortho,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  183,   54,    8
-    CONTROL "Tetragonal",IDF_Indexing_tetra,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   78,  159,   52,    8
-    CONTROL "Hexagonal",IDF_Indexing_Hexa,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   78,  171,   52,    8
-    CONTROL "Cubic",IDF_Indexing_Cubic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   78,  183,   52,    8
-    CONTROL "1.5406",IDF_Indexing_Lambda,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  244,   99,   36,   12
-    CONTROL "Wavelength / Å",IDF_Indexing_Lamda_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  164,  103,   64,    8
-    CONTROL "Volume / Å",IDF_Indexing_Vol,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   18,   66,   45,    8
-    CONTROL "c / Å",IDF_Indexing_CellRange,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,  108,   45,    8
-    CONTROL "ß /",IDF_Indexing_CellAngle,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,  121,   45,    8
-    CONTROL "Minimum",IDF_Indexing_Min,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   65,   45,   30,    8
-    CONTROL "Maximum",IDF_Indexing_Max,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  106,   45,   32,    8
-    CONTROL "0.0",IDF_Indexing_MinVol,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   65,   62,   30,   14
-    CONTROL "3000.0",IDF_Indexing_MaxVol,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,   62,   35,   14
-    CONTROL "0.0",IDF_Indexing_MinLen,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   65,  104,   30,   14
-    CONTROL "30.0",IDF_Indexing_Maxc,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,  104,   35,   14
-    CONTROL "90.0",IDF_Indexing_MinAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   65,  118,   30,   14
-    CONTROL "125.0",IDF_Indexing_MaxAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,  118,   35,   14
-    CONTROL "Save DICVOL File ...",ID_Indexing_Create,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  123,  208,   82,   14
-    CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  227,  208,   40,   14
-    CONTROL "Chemistry (Optional)",IDF_Indexing_chemgroup,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  158,   44,  172,   40
-    CONTROL "Other Settings (optional)",IDF_Indexing_Misc,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  158,  169,  172,   28
-    CONTROL "Measured density of compound",IDF_Indexing_Density_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  162,   57,  114,    8
-    CONTROL "Molecular weight of formula unit (a.m.u.)",IDF_Indexing_MolWt_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  162,   71,  116,    8
-    CONTROL "0.0",IDF_Indexing_Density,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  282,   53,   40,   12
-    CONTROL "0.0",IDF_Indexing_MolWt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  282,   68,   40,   12
-    CONTROL "Minimum figure-of-merit",IDF_Indexing_Fom_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  167,  183,   74,    8
-    CONTROL "5.0000",IDF_Indexing_Fom,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  252,  180,   28,   12
-    CONTROL "Experimental zero-point",IDF_Indexing_zpt,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  164,  118,   76,    8
-    CONTROL "0.0",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  244,  114,   36,   12
-    CONTROL "Experimental Details",IDF_Indexing_exp,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  158,   90,  172,   72
-    CONTROL "Run DICVOL",IDF_RunDICVOL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   40,  208,   60,   14
-    CONTROL "3",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   52,   62,    4,    8
-    CONTROL "a / Å",IDF_Indexing_CellRange2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,   80,   45,    8
-    CONTROL "0.0",IDF_Indexing_MinLen2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   65,   76,   30,   14
-    CONTROL "30.0",IDF_Indexing_Maxa,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,   76,   35,   14
-    CONTROL "b / Å",IDF_Indexing_CellRange3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,   94,   45,    8
-    CONTROL "0.0",IDF_Indexing_MinLen3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   65,   90,   30,   14
-    CONTROL "30.0",IDF_Indexing_Maxb,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,   90,   35,   14
-    CONTROL "o",IDF_LABEL15,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   28,  118,    4,    8
-    CONTROL "Use fixed error",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  165,  130,   71,   14
-    CONTROL "Use errors from DASH",IDF_Indexing_UseErrors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  165,  144,   82,   14
-    CONTROL "0.30000E-01",IDF_eps,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  244,  130,   36,   13
+    CONTROL "Triclinic",IDF_Indexing_triclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  162,   54,    8
+    CONTROL "Monoclinic",IDF_Indexing_Monoclinic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  174,   54,    8
+    CONTROL "Orthorhombic",IDF_Indexing_Ortho,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   18,  186,   54,    8
+    CONTROL "Tetragonal",IDF_Indexing_tetra,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   78,  162,   52,    8
+    CONTROL "Hexagonal",IDF_Indexing_Hexa,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   78,  174,   52,    8
+    CONTROL "Cubic",IDF_Indexing_Cubic,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   78,  186,   52,    8
+    CONTROL "1.5406",IDF_Indexing_Lambda,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  253,   54,   36,   14
+    CONTROL "Wavelength / Å",IDF_Indexing_Lamda_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  164,   58,   64,    8
+    CONTROL "Volume / Å",IDF_Indexing_Vol,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   18,   65,   45,    8
+    CONTROL "c / Å",IDF_Indexing_CellRange,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,  109,   45,    8
+    CONTROL "ß /",IDF_Indexing_CellAngle,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,  122,   45,    8
+    CONTROL "Minimum",IDF_Indexing_Min,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   65,   46,   30,    8
+    CONTROL "Maximum",IDF_Indexing_Max,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  106,   46,   32,    8
+    CONTROL "0.0",IDF_Indexing_MinVol,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   65,   61,   30,   14
+    CONTROL "3000.0",IDF_Indexing_MaxVol,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,   61,   35,   14
+    CONTROL "0.0",IDF_Indexing_MinLen,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   65,  105,   30,   14
+    CONTROL "30.0",IDF_Indexing_Maxc,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,  105,   35,   14
+    CONTROL "90.0",IDF_Indexing_MinAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   65,  119,   30,   14
+    CONTROL "125.0",IDF_Indexing_MaxAng,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,  119,   35,   14
+    CONTROL "Save DICVOL File ...",ID_Indexing_Create,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  123,  214,   82,   14
+    CONTROL "Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  227,  214,   40,   14
+    CONTROL "Other Settings",IDF_Indexing_Misc,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,  158,  159,  172,   44
+    CONTROL "Measured density (optional)",IDF_Indexing_Density_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  166,  120,   90,    8
+    CONTROL "Molecular weight (a.m.u.) (optional)",IDF_Indexing_MolWt_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  166,  136,  106,    8
+    CONTROL "0.0",IDF_Indexing_Density,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  277,  116,   40,   14
+    CONTROL "0.0",IDF_Indexing_MolWt,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  277,  132,   40,   14
+    CONTROL "Minimum figure-of-merit",IDF_Indexing_Fom_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  167,  173,   74,    8
+    CONTROL "5.0000",IDF_Indexing_Fom,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  252,  169,   30,   14
+    CONTROL "Experimental zero-point",IDF_Indexing_zpt,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  164,   73,   76,    8
+    CONTROL "0.0",IDF_ZeroPoint,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  253,   69,   36,   14
+    CONTROL "Experimental Details",IDF_Indexing_exp,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  158,   45,  172,  108
+    CONTROL "Run DICVOL",IDF_RunDICVOL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   40,  214,   60,   14
+    CONTROL "3",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   52,   61,    4,    8
+    CONTROL "a / Å",IDF_Indexing_CellRange2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,   81,   45,    8
+    CONTROL "0.0",IDF_Indexing_MinLen2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   65,   77,   30,   14
+    CONTROL "30.0",IDF_Indexing_Maxa,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,   77,   35,   14
+    CONTROL "b / Å",IDF_Indexing_CellRange3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   18,   95,   45,    8
+    CONTROL "0.0",IDF_Indexing_MinLen3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   65,   91,   30,   14
+    CONTROL "30.0",IDF_Indexing_Maxb,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  104,   91,   35,   14
+    CONTROL "o",IDF_LABEL15,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   28,  119,    4,    8
+    CONTROL "Use fixed error",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  165,   87,   71,   14
+    CONTROL "Use errors from DASH",IDF_Indexing_UseErrors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  165,  101,   82,   14
+    CONTROL "0.30000E-01",IDF_eps,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  253,   85,   36,   14
+    CONTROL "Scale factor",IDF_LABEL16,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  201,  188,   40,    8
+    CONTROL "1.0000",IDF_Indexing_ScaleFactor,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  252,  185,   30,   14
 END
 
 IDD_Index_Preparation RCDATA
@@ -1954,6 +1956,7 @@ BEGIN
 " 1353      0.0000          0.34028E+039 \n"
 " 1174      0.0000          0.34028E+039 \n"
 " 1172      0.0000           1.0000      \n"
+" 1208     0.10000E-001      10.000      \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
