@@ -402,9 +402,6 @@
 ! 3. .ccl ?
       WRITE(tFileHandle,REC=RecNr,ERR=999) SaveCCL
       RecNr = RecNr + 1
-! 4. .res ?
-      WRITE(tFileHandle,REC=RecNr,ERR=999) SaveRES
-      RecNr = RecNr + 1
 ! Auto local minimisation at the end of every run in multirun YES / NO
       WRITE(tFileHandle,REC=RecNr,ERR=999) AutoLocalMinimisation
       RecNr = RecNr + 1
@@ -458,7 +455,6 @@
       SavePDB  = .TRUE.
       SaveCSSR = .TRUE.
       SaveCCL  = .TRUE.
-      SaveRES  = .TRUE.
       AutoLocalMinimisation = .TRUE.
       UseConfigFile = .TRUE.
 !O      IDCurrent_Cursor_Mode = ID_Default_Mode
