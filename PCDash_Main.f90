@@ -191,8 +191,8 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
                        XGGMIN,    XGGMAX
 
-      INTEGER          IPMIN, IPMAX
-      COMMON /PROFIPM/ IPMIN, IPMAX
+      INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
+      COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN

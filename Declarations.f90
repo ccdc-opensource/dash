@@ -97,13 +97,18 @@
 ! XPMIN = XBIN(1)
 ! XPMAX = XBIN(NBIN)
 
-      INTEGER          IPMIN, IPMAX
-      COMMON /PROFIPM/ IPMIN, IPMAX
+      INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
+      COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
 
 ! IPMIN = bin number (so, pointer into XBIN) of the first bin visible on screen
 !         only useful when the user has zoomed in, otherwise IPMIN = 1
 ! IPMAX = bin number (so, pointer into XBIN) of the last bin visible on screen
 !         only useful when the user has zoomed in, otherwise IPMAX = NBIN
+! iStart = bin number (so, pointer into XBIN) of the first bin that should be drawn, i.e. MAX(IPMIN-1,1)
+!          only useful when the user has zoomed in, otherwise iStart = 1
+! iStop = bin number (so, pointer into XBIN) of the last bin that should be drawn, i.e. MIN(IPMAX+1,NBIN)
+!          only useful when the user has zoomed in, otherwise iStop = NBIN
+! nPoints = 1 + iStop - iStart
 
 
 !O! JCC GGCALC dimension increased to 500
