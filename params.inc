@@ -6,12 +6,12 @@
 ! For common block FCSPEC
 
       INTEGER MFCSPE
-      PARAMETER ( MFCSPE = 10000 )
+      PARAMETER ( MFCSPE = MFCSTO )
 
 ! For common block SAREFLNS
 
       INTEGER MSAREF
-      PARAMETER ( MSAREF = 10000 )
+      PARAMETER ( MSAREF = MFCSTO )
 
 ! Maximum number of Simulated Annealing REFlections
 
@@ -54,7 +54,7 @@
 ! For common block PROFTIC
 
       INTEGER MTIC
-      PARAMETER ( MTIC = 10000 )
+      PARAMETER ( MTIC = MFCSTO )
 
 ! For common block PEAKFIT2
 
@@ -70,7 +70,7 @@
 ! For use in common block REFLNZ and WWREFLNZ
 
       INTEGER MRFLNZ
-      PARAMETER ( MRFLNZ = 10000 )
+      PARAMETER ( MRFLNZ = MFCSTO )
 
 ! For use in common block IPKCMN
 
@@ -85,7 +85,7 @@
 ! For use in common block WWREFLN (cf common block in REFLNS.INC)
 
       INTEGER WWREFDIM
-      PARAMETER ( WWREFDIM = 10000 )
+      PARAMETER ( WWREFDIM = MFCSTO )
 
 ! For use in common block ALLPEAKS
 
