@@ -70,8 +70,10 @@
 
 ! NPTS is approximately NBIN.
 ! These variables hold the profile during peak fitting and Pawley refinement.
+! ZARGI = XBIN
+! ZOBS = YOBIN
+! ZDOBS = EBIN
 ! KOBZ holds for each reflection the data point closest to it.
-! As such, it should have been dimensioned KOBZ(REFDIM)
 
       REAL            ZCAL
       COMMON /YSTORE/ ZCAL(MOBS)
@@ -103,9 +105,15 @@
       LOGICAL                 LOGREF
       COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
 
+! Logicals indicating which reflections are absent.
+
       REAL              AIOBS,         AICALC
       COMMON /SAREFLNS/ AIOBS(MFCSTO), AICALC(MFCSTO)
 
+! AIOBS = observed intensity, per reflection
+! AICALC = part of the calculated intensity due to structural parameters (atoms)
+!
+ 
 !O! JCC GGCALC dimension increased to 500
 !O      REAL            REFH,           AMUL
 !O      REAL            ESDOBS,         SOMEGA,       GGCALC
