@@ -26,7 +26,7 @@
       USE ZMVAR            ! Number of zmatrices, nfrag
       USE SOLVAR
 
-!      IMPLICIT NONE
+      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'lattice.inc' ! Cellpar, space group strings and NumberSGTable
@@ -35,7 +35,11 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      PARAMETER (mpdbops=192)
+
+      INTEGER     mpdbops
+      PARAMETER ( mpdbops = 192 )
+
+      REAL                 rpdb
       COMMON /fullsymmops/ rpdb(4,4,mpdbops) !Symmetry operations
 ! Required for NATOM
       INTEGER         NATOM
@@ -51,8 +55,10 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 !Required for npdbops
-      CHARACTER*20 cpdbops(mpdbops)
+      INTEGER         npdbops
+      CHARACTER*20             cpdbops(mpdbops)
       COMMON /pdbops/ npdbops, cpdbops
+
 !Required to check if x,y, or z have been fixed or bounds changed from defaults
 
 !Can't call first common block member x
@@ -101,7 +107,8 @@
       INTEGER bestorigin(1)
       INTEGER NumberofOrigins
       INTEGER ActualOrigin
-      INTEGER Odd
+      INTEGER Odd, IZ
+      REAL Atomtwoz, AtomOnez
 
       EXTERNAL ErrorMessage
 
@@ -113,7 +120,7 @@
 !!        RETURN
 !!      END IF       
 ! If number of Z-matrices greater than 1, do not align
-      IF (TotNumZMatrices .GT. 1) RETURN
+      IF (nfrag .GT. 1) RETURN
 
 ! Check if any x,y,z coords have been fixed or upper and lower bounds changed from defaults.
 ! If they have then alignment not carried out.  If user fixed an axis which is an infinite
@@ -627,7 +634,10 @@
       REAL        CoMFM
       DIMENSION   CoMFM(3)
 !
-      PARAMETER (mpdbops=192)
+
+      INTEGER     mpdbops
+      PARAMETER ( mpdbops = 192 )
+
       COMMON /fullsymmops/ rpdb(4,4,mpdbops)
 
 ! Generate correct origin by manipulating XATOPT (XATOPT = XAtmCoords)
