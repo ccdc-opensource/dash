@@ -112,7 +112,6 @@
       PrefPars(1) = 0.0
       PrefPars(2) = 0.0
       PrefPars(3) = 1.0
-      PrefPars(4) = 1.0
       PrefParExists = .FALSE.
       CALL Update_PO
 

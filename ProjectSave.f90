@@ -660,15 +660,22 @@
       IMPLICIT NONE
 
       INTEGER i, RW
+      REAL    tReal
 
 ! Read or Write?
       RW = iPrjReadOrWrite
       CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,PrefParExists)
 ! Read/write preferred orientation parameters anyway, to enable the user
 ! to switch PO on and off without having to re-enter direction etc.
-      DO i = 1, 4
+      DO i = 1, 3
         CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PrefPars(i))
       ENDDO
+
+! @@ can be removed. Temp solution so that my old project files remain valid.
+
+      CALL FileRWReal(hPrjFile,iPrjRecNr,RW,tReal)
+
+
 ! Update the appropriate Wizard window
       IF (iPrjReadOrWrite .EQ. cRead) CALL Update_PO
 
