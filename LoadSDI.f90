@@ -113,6 +113,9 @@
       REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
       COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
       CHARACTER(LEN = MaxPathLength) :: line
       INTEGER nl
       CHARACTER*12 KeyChar
@@ -139,6 +142,7 @@
       PikExists = .FALSE.
       DslExists = .FALSE.
       CALL Clear_PeakFitRanges
+      Is_SX = .FALSE.
  10   line = ' '
       READ(iHandle,'(A)',END=100,ERR=999) line
       nl = LEN_TRIM(line)
@@ -171,6 +175,8 @@
           CALL Upload_CrystalSystem
         CASE ('paw')
           CALL INextReal(line,PAWLEYCHISQ)
+        CASE ('sin') ! Single crystal
+          Is_SX = .TRUE.
       END SELECT
       GOTO 10 
  100  CLOSE(iHandle)
