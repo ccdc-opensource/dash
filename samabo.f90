@@ -47,8 +47,8 @@
       REAL    Tol, Distance
       INTEGER Iat, Jat
 
-      IF (natcry .LE. 1) RETURN
       nbocry = 0
+      IF (natcry .LE. 1) RETURN
       Tol = 0.5
       DO Iat = 1, natcry-1
         DO Jat = Iat+1, natcry
@@ -178,13 +178,13 @@
 ! ICOB list of bondtypes for ICON
 !--------------------------------------------------------------------
 ! 
-      IF (natcry .LE. 1) RETURN
 ! Hydrogen and Deuterium are the same
       DO I = 1, natcry
         IF (aelem(I).EQ.27) aelem(I) = 2
       ENDDO
 ! Generate bonds using a distance criterion
       CALL MakeBonds
+      IF (nbocry .EQ. 0) RETURN
 ! set up 3D connectivity arrays NHYC, NCAC etc in common
 ! using BOND() as input
 ! process the bonds, setting number of connections NCAC exclude terminal H
