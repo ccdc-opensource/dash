@@ -60,30 +60,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE FORSYM(pname,filnmr)
-
-      CHARACTER*6 PNAME
-      CHARACTER*10 filnmr
-
-      COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
-
-      CHARACTER*10 filnam_root
-      COMMON /commun/ filnam_root
-
-      INTEGER         IBMBER
-      COMMON /CCSLER/ IBMBER
-
-      filnam_root = filnmr
-      NINIT = 1
-      CALL PREFIN(PNAME)
-      CALL SYMOP
-      IF (IBMBER .NE. 0) RETURN
-      CALL OPSYM(1)
-
-      END SUBROUTINE FORSYM
-!
-!*****************************************************************************
-!
       SUBROUTINE MAKRHM
 ! Makes a number of matrices to speed up the default calculation
 
