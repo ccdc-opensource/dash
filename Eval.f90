@@ -24,6 +24,7 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
       DATA ZERO, ONE/0.0D0, 1.0D0/
+      LOGICAL UseCrystallographicCentreOfMass
 
       KK = 0
       KATOM = 0
@@ -88,11 +89,23 @@
             XC = ZERO
             YC = ZERO
             ZC = ZERO
-            DO I = 1, NATS
-              XC = XC + AtomicWeighting(I,ifrg)*CART(I,1)
-              YC = YC + AtomicWeighting(I,ifrg)*CART(I,2)
-              ZC = ZC + AtomicWeighting(I,ifrg)*CART(I,3)
-            ENDDO
+            UseCrystallographicCentreOfMass = .FALSE.
+            IF (UseCrystallographicCentreOfMass) THEN
+              DO I = 1, NATS
+                XC = XC + AtomicWeighting(I,ifrg)*CART(I,1)
+                YC = YC + AtomicWeighting(I,ifrg)*CART(I,2)
+                ZC = ZC + AtomicWeighting(I,ifrg)*CART(I,3)
+              ENDDO
+            ELSE
+              DO I = 1, NATS
+                XC = XC + CART(I,1)
+                YC = YC + CART(I,2)
+                ZC = ZC + CART(I,3)
+              ENDDO
+              XC = XC/DBLE(NATS)
+              YC = YC/DBLE(NATS)
+              ZC = ZC/DBLE(NATS)
+            ENDIF
 ! Otherwise, use atom number ICFRG
           ELSE
             XC = CART(ICFRG,1)
