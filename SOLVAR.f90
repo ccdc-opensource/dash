@@ -7,17 +7,20 @@
 
       IMPLICIT NONE
 
-      INTEGER iSol2Run(1:99)
+      INTEGER     MaxRun2
+      PARAMETER ( MaxRun2 = 999 )
 
-      INTEGER iSolTicked(1:99)
+      INTEGER iSol2Run(1:MaxRun2)
 
-      REAL ProfileChiSqd(1:99) ! MaxRun
+      INTEGER iSolTicked(1:MaxRun2)
 
-      REAL IntensityChiSqd(1:99) ! MaxRun
+      REAL ProfileChiSqd(1:MaxRun2) ! MaxRun
 
-      REAL BestValuesDoF(1:100,1:99)  ! mvar, MaxRun
+      REAL IntensityChiSqd(1:MaxRun2) ! MaxRun
 
-      REAL XAtmCoords(1:3,1:150,0:99) ! MaxAtm, MaxRun 
+      REAL BestValuesDoF(1:100,1:MaxRun2)  ! mvar, MaxRun
+
+      REAL XAtmCoords(1:3,1:150,0:MaxRun2) ! MaxAtm, MaxRun 
 ! Co-ordinates of the atoms of the asymmetric unit of the best SA solution so far per run.
 ! XAtmCoords(1:3,1:150,0) is for Rietveld refinement (needed by SA_STRUCTURE_OUTPUT_PDB()
 ! needed by ViewStructure())

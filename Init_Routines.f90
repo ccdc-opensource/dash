@@ -64,7 +64,7 @@
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER iSol
-      CHARACTER*2 RowLabelStr
+      CHARACTER*3 RowLabelStr
 
       CALL PushActiveWindowID
       IF (NumOf_SA_Runs .EQ. 0) THEN
@@ -85,7 +85,7 @@
         CALL WDialogSelect(IDD_SAW_Page5)
         CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
         DO iSol = 1, NumOf_SA_Runs
-          WRITE(RowLabelStr,'(I2)') iSol
+          WRITE(RowLabelStr,'(I3)') iSol
           CALL WGridLabelRow(IDF_SA_summary, iSol, RowLabelStr)
           CALL WGridPutCellInteger (IDF_SA_Summary, 1, iSol, iSol2Run(iSol)) 
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iSol, iSolTicked(iSol2Run(iSol)))
@@ -97,7 +97,7 @@
         CALL WDialogSelect(IDD_Summary)
         CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
         DO iSol = 1, NumOf_SA_Runs
-          WRITE(RowLabelStr,'(I2)') iSol
+          WRITE(RowLabelStr,'(I3)') iSol
           CALL WGridLabelRow(IDF_SA_summary, iSol, RowLabelStr)
           CALL WGridPutCellInteger (IDF_SA_Summary, 1, iSol, iSol2Run(iSol)) 
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iSol, iSolTicked(iSol2Run(iSol)))

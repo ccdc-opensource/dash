@@ -327,7 +327,7 @@
       WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED2', iseed2
       WRITE(iHandle,'(A)',ERR=999) '# On a distributed system, NRUNS should probably be set to:'
       WRITE(iHandle,'(A)',ERR=999) '#     (total number of runs / number of processors)'
-      WRITE(iHandle,'(A,X,I2)',ERR=999) 'NRUNS', MaxRuns
+      WRITE(iHandle,'(A,X,I3)',ERR=999) 'NRUNS', MaxRuns
       WRITE(iHandle,'(A)',ERR=999) '# Maximum number of moves: real followed by integer e.g. "3.0 7" means "3.0E7"'
       CALL NMoves2RealInt(MaxMoves, tReal, tInt)
       WRITE(iHandle,'(A,X,F9.5,X,I2)',ERR=999) 'MAXMOVES', tReal, tInt
@@ -433,15 +433,15 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
-      CHARACTER*255    dash_files(1:MaxRun), tDirName, FileName, tExtension
-      REAL All_BestValuesDoF(1:100,1:MaxRun)  ! mvar, MaxRun
-      REAL All_ProfileChiSqd(1:MaxRun)
-      REAL All_IntensityChiSqd(1:MaxRun)
+      CHARACTER*255    dash_files(1:MaxRun2), tDirName, FileName, tExtension
+      REAL All_BestValuesDoF(1:100,1:MaxRun2)  ! mvar, MaxRun
+      REAL All_ProfileChiSqd(1:MaxRun2)
+      REAL All_IntensityChiSqd(1:MaxRun2)
       INTEGER tot_nruns, number_of_dash_files, I, iRun, iDoF, iLen
       INTEGER nvar_expected, ExtLength
 
       in_batch = .TRUE.
-      number_of_dash_files = MaxRun
+      number_of_dash_files = MaxRun2
       CALL IOsDirInfo(DirName, "*.dash", dash_files, number_of_dash_files)
       tDirName = DirName
       iLen = LEN_TRIM(tDirName)
