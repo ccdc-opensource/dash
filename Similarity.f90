@@ -1,4 +1,7 @@
 !
+! Code having to do with calculating the similarity measure described in:
+! R. de Gelder, R. Wehrens, J.A. Hageman (2001), J. Comp. Chem. 22, 273-289.
+!
 !*****************************************************************************
 !
       SUBROUTINE InitRene
