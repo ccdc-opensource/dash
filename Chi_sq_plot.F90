@@ -220,18 +220,19 @@
 !
 !  Label bottom X axis
 !
-      CALL IPgXLabelPos(  0.90)
+      CALL IPgXLabelPos(  0.70)
       CALL IPgXLabel('Number of Moves / 100000','C')
 !
 !  Label left Y axis
 !
-      CALL IPgYLabelPos(  0.80)
+      CALL IPgYLabelPos(  0.70)
       CALL IPgYLabelLeft('Profile Chi-squared','C9')
 !
 !  Draw axes
 !
       CALL IGrColourN(KolNumMain)
       CALL IPgAxes
+      CALL IPgBorder
 !
 !  Adjust tick position for X Axes
 !
