@@ -44,17 +44,10 @@
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
-      CHARACTER(MaxPathLength) TemTicFile
       LOGICAL, EXTERNAL :: Check_TicMark_Data
-      INTEGER I, isym, LenFil
-      INTEGER TicRead
+      INTEGER I, isym
       INTEGER, EXTERNAL :: GETTIC
-!
-!  Space group number          : SGNumStr(IPosSg)
-!  Space Group (IT tables)     : SGHMaStr(IPosSg)
-!  Space Group Hall symbol     : SGHalStr(IPosSg)
-!  Space Group explicit symbol : SGShmStr(IPosSg)
-!
+
 ! Need more checks here.
 ! I think that everything should be set to continue
 ! so I added in these checks. Everything should be bonafide before
@@ -108,10 +101,7 @@
         CALL Upload_CrystalSystem
         GOTO 10
       ENDIF
-      TemTicFile = 'polyf.tic'
-      lenfil = 9
-      TicRead = GETTIC(9,TemTicFile)
-      IF (TicRead.EQ.1) CALL Profile_Plot
+      IF (GETTIC('polyf.tic') .EQ. 0) CALL Profile_Plot
 
       END SUBROUTINE GENERATE_TICMARKS
 !
@@ -127,7 +117,9 @@
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       LOGICAL MULFAS, MULSOU, MULONE
       DIMENSION ALSQ(100000)
-      LOGICAL SDREAD
+
+      INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
+      LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
 
       INTEGER         LPT, LUNI
@@ -151,6 +143,8 @@
 !*****************************************************************************
 !
       LOGICAL FUNCTION Check_TicMark_Data
+
+      IMPLICIT NONE
 
       LOGICAL, EXTERNAL :: FnPatternOK, FnUnitCellOK, FnWaveLengthOK
 
