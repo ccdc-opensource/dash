@@ -1410,11 +1410,6 @@
             CASE (IDB_SA3_finish) ! 'Solve >' button
 ! We've finished the SA input
               CALL WizardWindowHide
-              CALL Create_AtomicWeightings
-              IF (PrefParExists) THEN
-                CALL PO_Init
-                CALL PO_PRECFC
-              ENDIF
               CALL BeginSA
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
