@@ -167,6 +167,7 @@
                   IF ( irj(I,1).EQ.0 ) GOTO 100
                 ENDDO
                 Ndich(1) = Ndich(1) + 1
+      CALL PeekEvent
                 DO Ia2 = 1, 2
                   Aw = Ia2 - 1
                   Amoi2 = Amoi1 + (Aw*pas2)
@@ -181,6 +182,7 @@
                       CALL CUDHKL1(Kram2,Krap2,2)
                       IF ( nt.NE.-1 ) THEN
                         Ndich(2) = Ndich(2) + 1
+      CALL PeekEvent
                         DO Ia3 = 1, 2
                           Aw = Ia3 - 1
                           Amoi3 = Amoi2 + (Aw*pas4)
@@ -195,6 +197,7 @@
                               CALL CUDHKL1(Kram3,Krap3,3)
                               IF ( nt.NE.-1 ) THEN
                                 Ndich(3) = Ndich(3) + 1
+      CALL PeekEvent
                                 DO Ia4 = 1, 2
                                   Aw = Ia4 - 1
                                   Amoi4 = Amoi3 + (Aw*pas8)
@@ -209,6 +212,7 @@
                                       CALL CUDHKL1(Kram4,Krap4,4)
                                       IF ( nt.NE.-1 ) THEN
                                         Ndich(4) = Ndich(4) + 1
+      CALL PeekEvent
                                         DO Ia5 = 1, 2
                                          Aw = Ia5 - 1
                                          Amoi5 = Amoi4 + (Aw*pas16)
@@ -223,6 +227,7 @@
                                          CALL CUDHKL1(Kram5,Krap5,5)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(5) = Ndich(5) + 1
+      CALL PeekEvent
                                          DO Ia6 = 1, 2
                                          Aw = Ia6 - 1
                                          Amoi6 = Amoi5 + (Aw*pas32)
@@ -237,6 +242,7 @@
                                          CALL CUDHKL1(Kram6,Krap6,6)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(6) = Ndich(6) + 1
+      CALL PeekEvent
                                          DO Ia7 = 1, 2
                                          Aw = Ia7 - 1
                                          Amoi7 = Amoi6 + (Aw*pas64)
@@ -253,6 +259,7 @@
                                          CALL CUDHKL1(Kram7,Krap7,7)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(7) = Ndich(7) + 1
+      CALL PeekEvent
                                          Aare = aa
                                          aa = Amoi7 + (pas64/2.)
                                          Vap = aa*aa*aa
@@ -493,6 +500,7 @@
                   IF ( irj(I,1).EQ.0 ) GOTO 50
                 ENDDO
                 Ndich(1) = Ndich(1) + 1
+      CALL PeekEvent
                 DO Ia2 = 1, 2
                   Aw = Ia2 - 1
                   Amoi2 = Amoi1 + (Aw*pas2)
@@ -515,6 +523,7 @@
                         CALL TEDHKL1(Kram2,Krap2,Krcm2,Krcp2,Ichoix,2)
                         IF ( nt.NE.-1 ) THEN
                           Ndich(2) = Ndich(2) + 1
+      CALL PeekEvent
                           DO Ia3 = 1, 2
                             Aw = Ia3 - 1
                             Amoi3 = Amoi2 + (Aw*pas4)
@@ -537,6 +546,7 @@
                                   CALL TEDHKL1(Kram3,Krap3,Krcm3,Krcp3,Ichoix,3)
                                   IF ( nt.NE.-1 ) THEN
                                     Ndich(3) = Ndich(3) + 1
+      CALL PeekEvent
                                     DO Ia4 = 1, 2
                                       Aw = Ia4 - 1
                                       Amoi4 = Amoi3 + (Aw*pas8)
@@ -559,6 +569,7 @@
                                          CALL TEDHKL1(Kram4,Krap4,Krcm4,Krcp4,Ichoix,4)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(4) = Ndich(4) + 1
+      CALL PeekEvent
                                          DO Ia5 = 1, 2
                                          Aw = Ia5 - 1
                                          Amoi5 = Amoi4 + (Aw*pas16)
@@ -581,6 +592,7 @@
                                          CALL TEDHKL1(Kram5,Krap5,Krcm5,Krcp5,Ichoix,5)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(5) = Ndich(5) + 1
+      CALL PeekEvent
                                          DO Ia6 = 1, 2
                                          Aw = Ia6 - 1
                                          Amoi6 = Amoi5 + (Aw*pas32)
@@ -603,6 +615,7 @@
                                          CALL TEDHKL1(Kram6,Krap6,Krcm6,Krcp6,Ichoix,6)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(6) = Ndich(6) + 1
+      CALL PeekEvent
                                          DO Ia7 = 1, 2
                                          Aw = Ia7 - 1
                                          Amoi7 = Amoi6 + (Aw*pas64)
@@ -629,6 +642,7 @@
                                          CALL TEDHKL1(Kram7,Krap7,Krcm7,Krcp7,Ichoix,7)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(7) = Ndich(7) + 1
+      CALL PeekEvent
                                          Aare = aa
                                          Ccre = cc
                                          aa = Amoi7 + (pas64/2.)
@@ -789,8 +803,7 @@
 !
 ! Dummy arguments
 !
-      INTEGER :: Ichoix, K1, Kram, Krap, Krcm, Krcp
-      INTENT (IN) Ichoix, K1, Kram, Krap, Krcm, Krcp
+      INTEGER, INTENT (IN   ) :: Kram, Krap, Krcm, Krcp, Ichoix, K1
 !
 ! Local variables
 !
@@ -904,6 +917,7 @@
                     IF ( irj(I,1).EQ.0 ) GOTO 20
                   ENDDO
                   Ndich(1) = Ndich(1) + 1
+      CALL PeekEvent
                   DO Ia2 = 1, 2
                     Aw = Ia2 - 1
                     Amoi2 = Amoi1 + (Aw*pas2)
@@ -933,6 +947,7 @@
                             CALL ORDHKL1(Kram2,Krap2,Krbm2,Krbp2,Krcm2,Krcp2,2)
                             IF ( nt.NE.-1 ) THEN
                               Ndich(2) = Ndich(2) + 1
+      CALL PeekEvent
                               DO Ia3 = 1, 2
                                 Aw = Ia3 - 1
                                 Amoi3 = Amoi2 + (Aw*pas4)
@@ -962,6 +977,7 @@
                                         CALL ORDHKL1(Kram3,Krap3,Krbm3,Krbp3,Krcm3,Krcp3,3)
                                         IF ( nt.NE.-1 ) THEN
                                          Ndich(3) = Ndich(3) + 1
+      CALL PeekEvent
                                          DO Ia4 = 1, 2
                                          Aw = Ia4 - 1
                                          Amoi4 = Amoi3 + (Aw*pas8)
@@ -991,6 +1007,7 @@
                                          CALL ORDHKL1(Kram4,Krap4,Krbm4,Krbp4,Krcm4,Krcp4,4)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(4) = Ndich(4) + 1
+      CALL PeekEvent
                                          DO Ia5 = 1, 2
                                          Aw = Ia5 - 1
                                          Amoi5 = Amoi4 + (Aw*pas16)
@@ -1022,6 +1039,7 @@
                                          CALL ORDHKL1(Kram5,Krap5,Krbm5,Krbp5,Krcm5,Krcp5,5)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(5) = Ndich(5) + 1
+      CALL PeekEvent
                                          DO Ia6 = 1, 2
                                          Aw = Ia6 - 1
                                          Amoi6 = Amoi5 + (Aw*pas32)
@@ -1051,6 +1069,7 @@
                                          CALL ORDHKL1(Kram6,Krap6,Krbm6,Krbp6,Krcm6,Krcp6,6)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(6) = Ndich(6) + 1
+      CALL PeekEvent
                                          DO Ia7 = 1, 2
                                          Aw = Ia7 - 1
                                          Amoi7 = Amoi6 + (Aw*pas64)
@@ -1086,6 +1105,7 @@
                                          CALL ORDHKL1(Kram7,Krap7,Krbm7,Krbp7,Krcm7,Krcp7,7)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(7) = Ndich(7) + 1
+      CALL PeekEvent
                                          Aare = aa
                                          Bbre = bb
                                          Ccre = cc
@@ -1432,6 +1452,7 @@
      &                           .EQ.ik(J,1,1) .AND. il(I,1,1).EQ.il(J,1,1) ) GOTO 85
                           ENDDO
                           Ndich(1) = Ndich(1) + 1
+      CALL PeekEvent
                           DO Ibet2 = 0, 1
                             Beinf2 = Beinf1 + (Ibet2*Pab2)
                             Besup2 = Beinf2 + Pab2
@@ -1479,6 +1500,7 @@
      &                                     ik(I,1,2).EQ.ik(J,1,2) .AND. il(I,1,2).EQ.il(J,1,2) ) GOTO 76
                                          ENDDO
                                          Ndich(2) = Ndich(2) + 1
+      CALL PeekEvent
                                          DO Ibet3 = 0, 1
                                          Beinf3 = Beinf2 + (Ibet3*Pab4)
                                          Besup3 = Beinf3 + Pab4
@@ -1527,6 +1549,7 @@
      &                                     ik(I,1,3).EQ.ik(J,1,3) .AND. il(I,1,3).EQ.il(J,1,3) ) GOTO 72
                                          ENDDO
                                          Ndich(3) = Ndich(3) + 1
+      CALL PeekEvent
                                          DO Ibet4 = 0, 1
                                          Beinf4 = Beinf3 + (Ibet4*Pab8)
                                          Besup4 = Beinf4 + Pab8
@@ -1575,6 +1598,7 @@
      &                                     ik(I,1,4).EQ.ik(J,1,4) .AND. il(I,1,4).EQ.il(J,1,4) ) GOTO 68
                                          ENDDO
                                          Ndich(4) = Ndich(4) + 1
+      CALL PeekEvent
                                          DO Ibet5 = 0, 1
                                          Beinf5 = Beinf4 + (Ibet5*Pab16)
                                          Besup5 = Beinf5 + Pab16
@@ -1623,6 +1647,7 @@
      &                                     ik(I,1,5).EQ.ik(J,1,5) .AND. il(I,1,5).EQ.il(J,1,5) ) GOTO 64
                                          ENDDO
                                          Ndich(5) = Ndich(5) + 1
+      CALL PeekEvent
                                          DO Ibet6 = 0, 1
                                          beinf6 = Beinf5 + (Ibet6*Pab32)
                                          Besup6 = beinf6 + Pab32
@@ -1671,6 +1696,7 @@
      &                                     ik(I,1,6).EQ.ik(J,1,6) .AND. il(I,1,6).EQ.il(J,1,6) ) GOTO 60
                                          ENDDO
                                          Ndich(6) = Ndich(6) + 1
+      CALL PeekEvent
                                          DO Ibet7 = 0, 1
                                          Beinf7 = beinf6 + (Ibet7*pab64)
                                          Besup7 = Beinf7 + pab64
@@ -1719,6 +1745,7 @@
      &                                     ik(I,1,7).EQ.ik(J,1,7) .AND. il(I,1,7).EQ.il(J,1,7) ) GOTO 56
                                          ENDDO
                                          Ndich(7) = Ndich(7) + 1
+      CALL PeekEvent
                                          Aare = aa
                                          Bbre = bb
                                          Ccre = cc

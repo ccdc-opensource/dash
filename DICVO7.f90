@@ -5,7 +5,15 @@
 !     |       A F F I N E M E N T   D E S   P A R A M E T R E S        |
 !     ------------------------------------------------------------------
       SUBROUTINE AFFPAR(Ind,Nrind,Vap)
-
+!
+! This is where we jump to whenever a solution is found. Ind is the crystal system:
+! 1 = Cubic
+! 2 = Tetragonal
+! 3 = Hexagonal
+! 4 = Orthorhombic
+! 5 = Monoclinic
+! 6 = Triclinic
+!
       USE DICVAR
       USE WINTERACTER
       USE DRUID_HEADER
@@ -14,9 +22,8 @@
 !
 ! Dummy arguments
 !
-      INTEGER :: Ind, Nrind
-      REAL :: Vap
-      INTENT (IN) Nrind, Vap
+      INTEGER, INTENT (IN   ) :: Ind, Nrind
+      REAL,    INTENT (IN   ) :: Vap
 !
 ! Local variables
 !
@@ -48,6 +55,9 @@
         DICVOL_Error = cDICVOL_TooManySolutions
         RETURN
       ENDIF
+      DICVOL_NumOfSolutions(Ind) = DICVOL_NumOfSolutions(Ind) + 1
+! Misnomer...
+      CALL DICVOL_FinishedCrystalSystem(LSHIFT(1,Ind-1))
       DO I = 1, 3
         Error(I) = 0.0001
         Error(I+3) = .001
@@ -65,8 +75,10 @@
       Bidon1 = 1.001
       Bidon2 = 1000./1001.
       Bebe = pirad*beta
-      IF ( Ind.EQ.5 ) aa = aa/SIN(Bebe)
-      IF ( Ind.EQ.5 ) cc = cc/SIN(Bebe)
+      IF ( Ind.EQ.5 ) THEN
+        aa = aa/SIN(Bebe)
+        cc = cc/SIN(Bebe)
+      ENDIF
       par(1) = aa
       par(2) = bb
       par(3) = cc
@@ -307,12 +319,11 @@
       nposs = -1
       Qnc = q(n) + epsq(n)
       SELECT CASE (Ind)
-        CASE (1:4)
-        CASE (6)
+        CASE (6) ! Triclinic
           Cosa = COS(pirad*par(4))
           Cosb = COS(pirad*par(5))
           Cosg = COS(pirad*par(6))
-        CASE DEFAULT
+        CASE (5) ! Monoclinic
           Cosb = COS(pirad*par(4))
       END SELECT
       M1 = 0
@@ -325,8 +336,10 @@
           irj(ir,8) = 0
         ENDDO
       ENDIF
-      IF ( Ind.EQ.1 ) nposs = 0
-      IF ( Ind.EQ.1 ) M1 = 1
+      IF ( Ind.EQ.1 ) THEN ! Cubic
+        nposs = 0
+        M1 = 1
+      ENDIF 
       DO M = M1, mh2
         IF ( Ind.EQ.6 .AND. M.NE.0 ) K1 = -mk2
         IF ( Ind.LT.4 ) K2 = M
@@ -336,8 +349,10 @@
           IF ( Ind.EQ.6 .AND. (M.NE.0 .OR. K.NE.0) ) L1 = -ml2
           DO Mxl = L1, L2
             SELECT CASE (Ind)
+            CASE (1)
+              Calq = (M*M+K*K+Mxl*Mxl)*Ae2
             CASE (2)
-              Calq = (M*M+K*K)*Ae2 + Mxl*Mxl*Be2
+              Calq = (M*M+K*K    )*Ae2 + Mxl*Mxl*Be2
             CASE (3)
               Calq = (M*M+K*K+M*K)*Ae2 + Mxl*Mxl*Be2
             CASE (4)
@@ -347,8 +362,6 @@
             CASE (6)
               Calq = M*M*Ae2 + K*K*Be2 + Mxl*Mxl*Ce2 + 2.*M*K*Ae*Be*Cosg + 2.*K*Mxl*Be*Ce*Cosa +                   &
      &               2.*M*Mxl*Ae*Ce*Cosb
-            CASE DEFAULT
-              Calq = (M*M+K*K+Mxl*Mxl)*Ae2
             END SELECT
             IF ( Calq.LE.Qnc ) THEN
               nposs = nposs + 1
@@ -433,6 +446,8 @@
         Pk2 = Pk*Pk
         Pl2 = Pl*Pl
         SELECT CASE (Ind)
+        CASE (1)
+          Calq = (Ph2+Pk2+Pl2)*Ae2
         CASE (2)
           Calq = (Ph2+Pk2)*Ae2 + Pl2*Be2
         CASE (3)
@@ -443,8 +458,6 @@
           Calq = Ph2*Ae2 + Pk2*Be2 + Pl2*Ce2 + 2.*Ph*Pl*Ae*Ce*Cosb
         CASE (6)
           Calq = Ph2*Ae2 + Pk2*Be2 + Pl2*Ce2 + 2.*Ph*Pk*Ae*Be*Cosg + 2.*Pk*Pl*Be*Ce*Cosa + 2.*Ph*Pl*Ae*Ce*Cosb
-        CASE DEFAULT
-          Calq = (Ph2+Pk2+Pl2)*Ae2
         END SELECT
         Difq1 = ABS(q(I)-Calq)
         Dcal = SQRT(Calq)
@@ -484,13 +497,12 @@
         Be2 = Be*Be
         Ce2 = Ce*Ce
         SELECT CASE (Ind)
-          CASE (1,2,3,4)
+          CASE (5)
+            Cosb = COS(pirad*par(4))
           CASE (6)
             Cosa = COS(pirad*par(4))
             Cosb = COS(pirad*par(5))
             Cosg = COS(pirad*par(6))
-          CASE DEFAULT
-            Cosb = COS(pirad*par(4))
         END SELECT
       ENDIF
       SELECT CASE (Ind)
@@ -551,7 +563,7 @@
         ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99011) (Ecart(I),I=1,6)
 99011   FORMAT (3X,F7.4,3X,F7.4,3X,F7.4,6X,F7.3,5X,F7.3,5X,F7.3,6X,F5.2/)
-      CASE DEFAULT
+      CASE (1)
         Vol = Dir(1)**3
         IF ( Ktestwolff.EQ.0 ) THEN
           WRITE (iw,99012) Dir(1), Vol
@@ -646,7 +658,7 @@
         Fitest = 2.*nini/R
         IF ( Fwtest.LE.fwolff .AND. Fitest.LE.Findex ) GOTO 600
         WRITE (iw,99021)
-99021   FORMAT (/10X,'WARNING !'/14X,'THE NEXT SOLUTION IS SAME THAN THE LATER SOLUTION BUT IT IS NOT REFINED.'///)
+99021   FORMAT (/10X,'WARNING !'/14X,'THE NEXT SOLUTION IS THE SAME AS THE LAST SOLUTION BUT IT IS NOT REFINED.'///)
       ELSEIF ( fwolff.GT.fom ) THEN
         Ktestwolff = 0
         GOTO 400
@@ -698,8 +710,7 @@
 !
 ! Dummy arguments
 !
-      INTEGER :: Ind
-      INTENT (IN) Ind
+      INTEGER, INTENT (IN   ) :: Ind
 !
 ! Local variables
 !
@@ -707,19 +718,21 @@
 
       rec(1) = 1./par(1)
       SELECT CASE (Ind)
-      CASE (1) ! Cubic ?
-      CASE (3)
+      CASE (1) ! Cubic
+      CASE (2) ! Tetragonal
+        rec(2) = 1./par(2)
+      CASE (3) ! Hexagonal
         rec(1) = 2./par(1)/SQRT(3.)
         rec(2) = 1./par(2)
-      CASE (4) ! Orthorhombic ?
+      CASE (4) ! Orthorhombic
         rec(2) = 1./par(2)
         rec(3) = 1./par(3)
-      CASE (5)
+      CASE (5) ! Monoclinic
         rec(1) = rec(1)/SIN(par(4)*Pirad)
         rec(2) = 1./par(2)
         rec(3) = 1./par(3)/SIN(par(4)*Pirad)
         rec(4) = 180. - par(4)
-      CASE (6) ! Triclinic ?
+      CASE (6) ! Triclinic
         Cosa = COS(par(4)*Pirad)
         Cosb = COS(par(5)*Pirad)
         Cosg = COS(par(6)*Pirad)
@@ -734,8 +747,6 @@
         rec(4) = Pideg*ACOS((Cosb*Cosg-Cosa)/Sinb/Sing)
         rec(5) = Pideg*ACOS((Cosa*Cosg-Cosb)/Sina/Sing)
         rec(6) = Pideg*ACOS((Cosa*Cosb-Cosg)/Sina/Sinb)
-      CASE DEFAULT ! Tetragonal ?
-        rec(2) = 1./par(2)
       END SELECT
 
       END SUBROUTINE PASAJE
