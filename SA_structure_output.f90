@@ -6,7 +6,6 @@
 
       USE VARIABLES
 !
-!
 !       Called when a new minimum is found
 !
       DOUBLE PRECISION t, fopt
@@ -246,22 +245,17 @@
           ENDIF
 !       The CCL atom lines
           IF (tSaveCCL) THEN
-            WRITE (66,1033) asym(iorig,CheckedFragNo),                  &
-     &                      (xatopt(k,ii),k=1,3)
+            WRITE (66,1033) asym(iorig,CheckedFragNo), (xatopt(k,ii),k=1,3)
  1033       FORMAT ('A ',A3,' ',3F10.5,'  3.0  1.0')
           ENDIF
         ENDDO
       ENDDO
-      IF (tSaveCSSR) THEN
-        CLOSE (64)
-      ENDIF
+      IF (tSaveCSSR) CLOSE (64)
       IF (tSavePDB) THEN
         WRITE (65,"('END')")
         CLOSE (65)
       ENDIF
-      IF (tSaveCCL) THEN
-        CLOSE (66)
-      ENDIF
+      IF (tSaveCCL) CLOSE (66)
       CALL UpdateViewer()
       RETURN
  1380 FORMAT ('REMARK 290 ')
