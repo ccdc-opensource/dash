@@ -1487,10 +1487,6 @@
 !!O              CALL WizardWindowShow(IDD_SA_input2)
               CALL WizardWindowShow(IDD_SA_Modal_input2)
             CASE (IDB_SA3_finish) ! 'Solve >' button
-              IF (Get_AutoAlign()) THEN
-                CALL WarningMessage('Auto Align is active. It will not be possible to Restart'//CHAR(13)// & 
-                'or Rietveld refine these solutions.')
-              ENDIF
 ! We've finished the SA input
               CALL WizardWindowHide
               CALL BeginSA
@@ -1918,6 +1914,8 @@
 !*****************************************************************************
 !
       SUBROUTINE ThreeSixtyToOneEighty(Angle)
+
+      IMPLICIT NONE
       
       REAL Angle
       REAL TempAngle
@@ -1940,6 +1938,8 @@
 !*****************************************************************************
 !
       SUBROUTINE OneEightyToThreeSixty(Angle)
+
+      IMPLICIT NONE
       
       REAL Angle
       REAL TempAngle
@@ -1961,6 +1961,8 @@
 !*****************************************************************************
 !
       SUBROUTINE DetermineTriModalBounds(xtem, BoundColumn)
+
+      IMPLICIT NONE
 
       REAL xtem, ttem, zero
       INTEGER BoundColumn
@@ -1995,6 +1997,8 @@
 ! scale.  A 0-360 degree scale may be more appropriate (OneEightyScale = .FALSE.)
 
 
+      IMPLICIT NONE
+
       REAL, DIMENSION (3,2) :: TempBounds
 
       COMMON /TriModalBounds/  TempBounds
@@ -2026,6 +2030,8 @@
 
 ! Determines whether it is appropriate to use a -180 to 0 and 0 to 180 degree 
 ! scale.  A 0-360 degree scale may be more appropriate (OneEightyScale = .FALSE.)
+
+      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
 
