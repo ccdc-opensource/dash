@@ -36,17 +36,16 @@
 
       CHARACTER*20 tStr
       CHARACTER*20, EXTERNAL :: Integer2String
-      INTEGER MaxNumRef, len
+      INTEGER len
 
       NumOfRef = maxk
-      MaxNumRef = MaxBVar-50
       IF (NumOfRef .GT. MaxNumRef) THEN
         NumOfRef = MaxNumRef
         IF (.NOT. routine_called) THEN
           tStr = Integer2String(MaxNumRef)
           CALL StrClean(tStr, len)
-          CALL InfoMessage('DASH has a maximum limit of 350 reflections.'//CHAR(13)//&
-                           'Only the "//tStr(1:len)//" lowest angle reflections will be indexed and used.')
+          CALL InfoMessage('DASH has a maximum limit of '//tStr(1:len)//' reflections.'//CHAR(13)//&
+                           'Only the '//tStr(1:len)//' lowest angle reflections will be indexed and used.')
           routine_called = .TRUE.
         ENDIF
       ENDIF
