@@ -1705,12 +1705,16 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE SOLVAR
 
       IMPLICIT NONE
 
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
       INTEGER, EXTERNAL :: XtalFileOpen, XtalFileBrowse 
       CHARACTER(MaxPathLength) SDIFile, XtalFile
-      INTEGER Curr_SA_Run, iStat
+      INTEGER Curr_SA_Run, iStat, IV
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page6)
@@ -1737,10 +1741,23 @@
             CASE (IDB_xtal_file_Browse)
               iStat = XtalFileBrowse()
               CALL WDialogFieldStateLogical(IDNEXT, (iStat .EQ. 0))
+              CALL WDialogFieldStateLogical(IDB_Restart, (iStat .EQ. 0))
             CASE (IDB_xtal_file_Open)
               CALL WDialogGetString(IDF_Xtal_File_Name, XtalFile)
               iStat = XtalFileOpen(XtalFile)
               CALL WDialogFieldStateLogical(IDNEXT, (iStat .EQ. 0))
+              CALL WDialogFieldStateLogical(IDB_Restart, (iStat .EQ. 0))
+            CASE (IDB_Restart)
+! Fill SA Parameter Bounds Wizard Window with the values from this solution.
+              CALL WDialogSelect(IDD_SA_Modal_input2)
+              DO IV = 1, NVAR
+                CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IV, BestValuesDoF(IV,1))
+              ENDDO
+! Untick "Randomise initial values"
+              CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .FALSE.)
+              ! Change mode to structure solution
+              CALL SelectMode(ID_Structure_Solution_Mode)
+              CALL ShowWizardWindowParameterBounds
           END SELECT
       END SELECT
       CALL PopActiveWindowID
