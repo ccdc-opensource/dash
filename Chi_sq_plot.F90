@@ -100,13 +100,16 @@
 
       INTEGER        :: Run_Number
       INTEGER        :: it_count
-      INTEGER        :: iMaxMoves
       INTEGER        :: ixaxis
       REAL           :: x_max
       REAL           :: x_min
       REAL           :: y_max
       REAL, DIMENSION(MaxIter, 30) :: chi_sqd
       REAL, DIMENSION(MaxIter+1) :: Xarray
+      REAL           ::DynamicMaxX
+      REAL           ::TempMaxX
+      INTEGER        ::NumDynamicX
+      DATA  DynamicMaxX / 0.0 /
       INTEGER ChiHandle
       COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, Run_Number
 
@@ -118,6 +121,12 @@
 
       CALL WindowSelect(ChiHandle)
       CALL WindowClear()
+
+! First Run so set DynamicMaxX to zero.  IF "stop" pressed in SA run Window want to reset
+! DynamicMAxX
+      IF((Run_number.EQ.1).AND.(It_count.EQ.2)) THEN
+        DDynamicMaxX = 0.0
+      END IF
 
 ! calculate array of x values for graph
       ixaxis = NINT(MaxMoves/(x_min))
@@ -134,9 +143,10 @@
           x_max = Xarray(it_count)
         END IF
       END IF
-! Xaxis is static when Run_number greater than 1
+! Xaxis max is largest value of x recorded so far
       IF (Run_Number.gt.1) THEN
-        x_max = MaxMoves
+!!       x_max = MaxMoves
+         x_max = DynamicMaxX
       END IF
 
 !  Start new presentation graphics plot
@@ -217,10 +227,12 @@
 !  Draw graph.
 !
 !
+
       IF (Run_Number.GT.1) THEN
 ! Plot Chi-sqd values to maximum number of moves for completed SA runs
-        iMaxMoves = NINT(x_Max/(x_min)) 
-        CALL IPgNewPlot(PgPolyLine,(Run_Number-1),iMaxMoves,0,1)
+!!        iMaxMoves = NINT(x_Max/(x_min)) 
+!!        CALL IPgNewPlot(PgPolyLine,(Run_Number-1),iMaxMoves,0,1)
+        CALL IPgNewPlot(PgPolyLine,(Run_Number-1),NumDynamicX,0,1)
           DO j = 1,(Run_Number-1)
             CALL IPgStyle(  j,  0,  0,  0,      KolNumobs)
           END DO
@@ -230,8 +242,20 @@
       END IF
 ! Plot Chi-sqd values iteration by iteration
         CALL IPgNewPlot(PgPolyLine,1,it_count,0,1)
-        CALL IPgStyle(  1,  0,  0,  0,      KolNumobs)
+        CALL IPgStyle(  1,  0,  0,  0,      KolNumCal)
         CALL IPgXYPairs(Xarray, chi_sqd(1,Run_number))
+! Record the largest value of x so far.  This is used as the maxmimum value for x when drawing
+! x_axis.  
+        IF ((it_count*x_min).LE.(MaxMoves)) THEN
+          TempMaxX = it_count*x_min
+            IF(TempMaxX.GT.DynamicMaxX) THEN
+              DynamicMaxX = TempMaxX
+              NumDynamicX = DynamicMaxX/x_min
+            END IF
+        END IF
+
+
+
        
 
       END SUBROUTINE plotting_chi_sqd
