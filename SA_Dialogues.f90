@@ -377,7 +377,7 @@
       INTEGER iFrg, iOption, iColumn, iAtomNr, iDummy, iBondNr, iRow, iCol
       REAL    tReal
       LOGICAL ThisOne
-      INTEGER, EXTERNAL :: zmSaveAs, WriteMol2, zmRebuild
+      INTEGER, EXTERNAL :: zmSave, zmSaveAs, WriteMol2, zmRebuild
       INTEGER tLength, I, iBondNr2
       CHARACTER(MaxPathLength) temp_file
       CHARACTER(MaxPathLength) tOldFileName
@@ -439,7 +439,7 @@
               CALL WDialogHide
             CASE (IDBSAVE)
               CALL zmCopyDialog2Temp
-              CALL zmSave(iFrg)
+              iDummy = zmSave(iFrg)
             CASE (IDB_SaveAs)
               CALL zmCopyDialog2Temp
               iDummy = zmSaveAs(iFrg)
@@ -758,6 +758,10 @@
       CALL WSelectFile(FILTER,iFLAGS,zmFileName,'Save Z-matrix')
       IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(zmFileName) .NE. 0)) THEN
         frag_file(iFrg) = zmFileName
+        CALL PushActiveWindowID
+        CALL WDialogSelect(IDD_zmEdit)
+        CALL WDialogPutString(IDF_FileName,frag_file(iFrg))
+        CALL PopActiveWindowID
         zmSaveAs = zmSave(iFrg)
       ENDIF
 
