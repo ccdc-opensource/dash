@@ -39,7 +39,7 @@
 !               'DASH powder diffraction files (*.xye)|*.xye|'//&
 !               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
       FILTER = 'All files (*.*)|*.*|'//&
-               'All powder diffraction files|*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye;*.x*|'//&
+               'All powder diffraction files|*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye;*.x01|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
@@ -195,7 +195,7 @@
       INTEGER, EXTERNAL :: Load_udf_File
       INTEGER, EXTERNAL :: Load_uxd_File
       INTEGER, EXTERNAL :: Load_xye_File
-      INTEGER, EXTERNAL :: Load_xnn_File
+      INTEGER, EXTERNAL :: Load_x01_File
       INTEGER          ISTAT
       INTEGER          I
       INTEGER          POS
@@ -219,11 +219,6 @@
       EXT4 = '    '
       EXT4 = TheFileName(POS+1:KLEN)
       CALL ILowerCase(EXT4)
-! Bede files have sequence numbers in their extensions
-      IF (EXT4(1:1) .EQ. 'x') THEN
-        IF (ChrIsDigit(EXT4(2:2))) EXT4(2:2) = 'n' 
-        IF (ChrIsDigit(EXT4(3:3))) EXT4(3:3) = 'n' 
-      ENDIF
       ISTAT = 0
       ESDsFilled = .FALSE.
       NoWavelengthInXYE = .FALSE.
@@ -242,8 +237,8 @@
           ISTAT = Load_uxd_File(TheFileName,ESDsFilled)
         CASE ('xye ')
           ISTAT = Load_xye_File(TheFileName,ESDsFilled)
-        CASE ('xnn ')
-          ISTAT = Load_xnn_File(TheFileName,ESDsFilled)
+        CASE ('x01 ')
+          ISTAT = Load_x01_File(TheFileName,ESDsFilled)
       END SELECT
       DiffractionFileLoad = ISTAT
       IF (ISTAT .EQ. 0) THEN
@@ -1453,7 +1448,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_xnn_File(TheFileName,ESDsFilled)
+      INTEGER FUNCTION Load_x01_File(TheFileName,ESDsFilled)
 !
 ! This function tries to load a *.xnn [nn = 01, 02 etc] file (Bede ASCII powder pattern format).
 !
@@ -1544,7 +1539,7 @@
 !     40.000000      180.600000
 
 ! Initialise to failure
-      Load_xnn_File = 0
+      Load_x01_File = 0
       Lambda1       = 0.0
       ReadWarning   = .FALSE.
       hFile = 10
@@ -1618,12 +1613,12 @@
       JRadOption = 1
       CALL Upload_Source
       CALL Set_Wavelength(Lambda1)
-      Load_xnn_File = 1
+      Load_x01_File = 1
       RETURN
  999  CONTINUE
       CLOSE(hFile)
 
-      END FUNCTION Load_xnn_File
+      END FUNCTION Load_x01_File
 !
 !*****************************************************************************
 !
