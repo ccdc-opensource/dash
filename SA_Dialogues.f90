@@ -179,7 +179,7 @@
       COMMON /saparl/  T0, rt
       INTEGER JPOS, NMOVES, IFCOl, IFRow, ICHK
       REAL         rpos
-      INTEGER      ipos
+      INTEGER      ipos, tMaxRuns, tFieldState
 
 ! We are now on window number 2
       CALL PushActiveWindowID
@@ -200,12 +200,10 @@
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL WDialogSelect(IDD_SA_input3)
-              T0 = 0.0
               RPOS = T0
               CALL WDialogPutReal(IDF_SA_T0,RPOS,'(F7.2)')
               IPOS = 1000 - NINT(RPOS)
               CALL WDialogPutTrackbar(IDF_SA_T0_trackbar,IPOS)
-              RT = 0.02
               RPOS = RT
               CALL WDialogPutReal(IDF_SA_Tredrate,RPOS,'(F6.3)')
               IPOS = 501 - NINT(1000.*RPOS)
@@ -222,6 +220,18 @@
               CALL WDialogPutTrackbar(IDF_SA_NT_trackbar,IPOS)
               NMoves = NT * NS * NVAR
               CALL WDialogPutInteger(IDF_SA_Moves,NMoves)
+              CALL WDialogGetInteger(IDF_SA_MaxRepeats,tMaxRuns)
+              IF (tMaxRuns .EQ. 1) THEN
+                tFieldState = Disabled
+              ELSE
+                tFieldState = Enabled
+              ENDIF
+                CALL WDialogFieldState(IDF_SA_ChiTest_Label,tFieldState)
+                CALL WDialogFieldState(IDF_SA_ChiTest,tFieldState)
+                CALL WDialogFieldState(IDF_SA_MaxMoves_Label,tFieldState)
+                CALL WDialogFieldState(IDF_MaxMoves1,tFieldState)
+                CALL WDialogFieldState(IDF_LABEL21,tFieldState)
+                CALL WDialogFieldState(IDF_MaxMoves2,tFieldState)
               CALL WizardWindowShow(IDD_SA_input3)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
