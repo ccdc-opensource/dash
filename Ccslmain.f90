@@ -8339,30 +8339,19 @@
 ! IF GENIE FILE, VAX-SPECIFIC BECAUSE OF RECORDTYPE:
 !VMS
       IF (MODE5.EQ.2) THEN
-!VMS
         OPEN (UNIT=LUN,FILE=NAMFIL,ACCESS=FILACC(IA),FORM=FILFOR(IF),STATUS=FILSTA(IS),ERR=52,IOSTAT=IOE,RECL=128)
-!VMS
         GOTO 22
-!VMS
       ENDIF
-!VMS
       IF (MODE1.EQ.1) THEN
 ! MUST SPECIFY READONLY FOR READ FILES ON VAX TO AVOID PROTECTION FAILURES
 ! WHEN READING FROM FOREIGN DIRECTORIES
-!VMS
         OPEN (UNIT=LUN,FILE=NAMFIL,ACCESS=FILACC(IA),FORM=FILFOR(IF),STATUS=FILSTA(IS),ERR=52,IOSTAT=IOE)
-!VMS
       ELSE
-!VMS
         IF (MODE4.EQ.0) THEN
-!VMS
           OPEN (UNIT=LUN,FILE=NAMFIL,ACCESS=FILACC(IA),FORM=FILFOR(IF),STATUS=FILSTA(IS),ERR=52,IOSTAT=IOE)
-!VMS
         ELSE
           OPEN (UNIT=LUN,FILE=NAMFIL,ACCESS=FILACC(IA),FORM=FILFOR(IF),STATUS=FILSTA(IS),ERR=52,IOSTAT=IOE)
-!VMS
         ENDIF
-!VMS
       ENDIF
    22 IF (MODE2.EQ.3 .OR. MODE2.EQ.4) GOTO 101
 !  REPORT DONE
@@ -8377,7 +8366,7 @@
  2002 FORMAT ('(/1X,A',I2,',1X,A',I2,','' opened'')')
       WRITE (LPT,WFMT) SAVMES(1:IL), NAMFIL(1:LNAM)
       GOTO 101
-!  NO RESPONSE - 'RETURN' TYPED
+! NO RESPONSE - 'RETURN' TYPED
 ! DETECT SPECIALLY THE RESPONSE "RETURN" ON RVAX REQUEST FOR O/P FILE:
    40 IF (LUN.EQ.LPT .AND. MODE.EQ.2142) THEN
         NAMFIL = MAIN//'.LIS'
@@ -8433,12 +8422,9 @@
       IOTAB(IU) = MODE
   100 MESSAG = ' '
       END FUNCTION NOPFIL
-!*==NPACK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE NPACK(NPK,L,N,MODE,LPACK)
       SUBROUTINE NPACK(NPK,L,N,MODE,LPACK)
 !
 ! *** NPACK updated by JCM 11 Jan 88 ***
@@ -8470,34 +8456,27 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LENINT/ NBITS
-!
-!
+
       IF (N.LE.0) CALL ERRIN2(N,0,'misuse of NPACK - N=',' ')
-!
       GOTO (21,22,23), MODE + 1
-!
 ! SETTING UP:
    21 AM = 1.
       DO I = 1, N
         LPACK(I,1) = L(I)
         IF (LPACK(I,1).LT.0) GOTO 10
-!
 ! POSITIVE MAX VALUE:
         LPACK(I,2) = 0
         LPACK(I,3) = LPACK(I,1) + 1
         GOTO 13
-!
 ! NEGATIVE 'MAX' VALUE:
    10   LPACK(I,2) = -LPACK(I,1)
         LPACK(I,3) = -2*LPACK(I,1) + 1
    13   AM = AM*FLOAT((IABS(LPACK(I,1))+LPACK(I,2)+1))
       ENDDO
-!
 ! TEST LARGEST POSSIBLE PACKED NUMBER WILL FIT IN MACHINE INTEGER, LESS SIGN
       IF (AM.LT.2.**NBITS) GOTO 100
       WRITE (LPT,3002) AM, NBITS
       GOTO 100
-!
 ! MODE=1:  PACKING:
    22 NPK1 = 0
       DO I = 1, N
@@ -8510,7 +8489,6 @@
       ENDDO
       NPK = NPK1
       GOTO 100
-!
 ! MODE 2:  UNPACKING:
    23 NPK1 = NPK
       DO I = 1, N
@@ -8521,15 +8499,12 @@
       ENDDO
   100 RETURN
  3002 FORMAT (/' ERROR ** LARGEST POSSIBLE PACKED NUMBER IS',G14.7,     &
-     &        ' AND WILL NOT FIT INTO',I5,' BITS')
+              ' AND WILL NOT FIT INTO',I5,' BITS')
  3003 FORMAT (/' ERROR ** ITEM',I8,' CANNOT BE PACKED USING',' MAX=',I8)
       END SUBROUTINE NPACK
-!*==NSIGFG.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION NSIGFG(DX)
       FUNCTION NSIGFG(DX)
 !
 ! *** NSIGFG new by PJB 9 Mar 1994 ***
@@ -8551,12 +8526,9 @@
     2 NSIGFG = IFIG
       RETURN
       END FUNCTION NSIGFG
-!*==NSYMBL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION NSYMBL(I)
       FUNCTION NSYMBL(I)
 !
 ! *** NSYMBL by JCM 11 Oct 83 ***
@@ -8570,23 +8542,19 @@
 !D of the matching symbol.
 !
       CHARACTER*1 I
-      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10),         &
-     &                ISMBOL(21)
+      COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10), ISMBOL(21)
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
-!
+
       DO J = 1, 21
         IF (I.EQ.ISMBOL(J)) GOTO 2
       ENDDO
       J = 0
     2 NSYMBL = J
-      RETURN
+
       END FUNCTION NSYMBL
-!*==NTICK.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION NTICK(NTIME)
       FUNCTION NTICK(NTIME)
 !
 ! *** NTICK by JCM 7 Jan 88 ***
@@ -8599,14 +8567,11 @@
 !
       NTIME = NTIME + 1
       NTICK = NTIME
-      RETURN
+
       END FUNCTION NTICK
-!*==NUMDEN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE NUMDEN(X,N1,N2,KI,KO)
       SUBROUTINE NUMDEN(X,N1,N2,KI,KO)
 !
 ! *** NUMDEN by JCM ***
@@ -8655,7 +8620,6 @@
           CTEMP = ABS(BTEMP)
         ENDDO
     2 ENDDO
-!
 ! HERE NO FRACTION WILL FIT
       NBIG = 99
       GOTO 5
@@ -8664,12 +8628,9 @@
     5 KO = NBIG*NEG
       RETURN
       END SUBROUTINE NUMDEN
-!*==NWINT2.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE NWINT2
       SUBROUTINE NWINT2
 !
 ! *** NWINT2 updated by JCM 10 May 88 ***
@@ -8697,8 +8658,7 @@
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
       COMMON /ZEROPT/ ZERO, KZERO
-!
-!
+
       ID = 0
     1 ID = ID + 1
       IF (ID.GT.NTOTAL(1)) GOTO 100
@@ -8708,22 +8668,18 @@
       IF (L.EQ.3) GOTO 3
       IF (L.EQ.12) GOTO 11
       IF (L.NE.9) GOTO 2
-!
 ! OUTPUT NEW I CARD:
       CALL OTPUTI
       GOTO 1
-!
 ! OUTPUT NEW C CARD WITH NEW VALUES:
     3 CALL CELNEW
       GOTO 1
-!
 ! L CARD - DISCOVER IF "ZERO"
    11 CALL RDWORD(WD,LEN,3,IPT,80,0,IER)
       IF (WD.NE.'ZERO') GOTO 2
       WRITE (NEWIN,2005) ZERO
  2005 FORMAT ('L ZERO',F10.4)
       GOTO 1
-!
 ! COPY UNCHANGED CARD:
     2 WRITE (NEWIN,2000) (ICARD(I:I),I=1,LENGT(ICARD))
  2000 FORMAT (80A1)
@@ -8731,12 +8687,9 @@
 !
   100 RETURN
       END SUBROUTINE NWINT2
-!*==ONCARD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      LOGICAL FUNCTION ONCARD(C,WORD,A)
       LOGICAL FUNCTION ONCARD(C,WORD,A)
 !
 ! *** ONCARD corrected by JCM 6 Mar 89 ***
@@ -8764,7 +8717,7 @@
       COMMON /IINFO / IIN, ACOEFF(20)
       COMMON /IINFOW/ IIREAD(20)
       CHARACTER*4 IIREAD
-!
+
       ONCARD = .TRUE.
       IF (C.NE.'I') GOTO 1
 ! I IS SPECIAL:
@@ -8773,10 +8726,8 @@
         IF (WORD.EQ.IIREAD(I)) GOTO 3
       ENDDO
       GOTO 101
-!
     3 A = ACOEFF(I)
       GOTO 100
-!
 ! OTHER THAN I:
     1 L = LETTER(C)
       ID = IABS(INREAD(L))
@@ -8792,20 +8743,15 @@
         IF (IER.NE.100 .AND. IPT.LE.80) GOTO 5
       ENDDO
       GOTO 101
-!
 ! FOUND WORD - READ NUMBER:
     6 CALL RDREAL(A,IPT,IPT,80,IER)
       GOTO 100
-!
   101 ONCARD = .FALSE.
   100 RETURN
       END FUNCTION ONCARD
-!*==OPNFIL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE OPNFIL(L,M)
       SUBROUTINE OPNFIL(L,M)
 !
 ! *** OPNFIL updated by JCM 1 Aug 88 ***
@@ -8829,12 +8775,11 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LOONEY/ IOTAB(15), LUNTAB(15)
-!
+
       IF (L.EQ.-9999) THEN
         L = NOPFIL(M)
         RETURN
       ENDIF
-!
 ! REQUEST TO OPEN SPECIFIC UNIT NUMBER:
 !
 ! L MUST BE IN TABLE SO THAT NOPFIL CAN FIND IT:
@@ -10629,12 +10574,9 @@
     1 ENDDO
   100 RETURN
       END SUBROUTINE RDBOND
-!*==RDDATA.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 5      SUBROUTINE RDDATA(NUNIT,K,H,F,IN,IOU)
       SUBROUTINE RDDATA(NUNIT,K,H,F,IN,IOU)
 !
 ! *** RDDATA by JCM 5 Apr 89 ***
@@ -10708,12 +10650,9 @@
     5 IOU = IOU*(I-1+100*READTI)
   100 RETURN
       END SUBROUTINE RDDATA
-!*==RDFV.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 8      SUBROUTINE RDFV
       SUBROUTINE RDFV
 !
 ! *** RDFV updated by JCM 4 Jul 88 ***
@@ -10886,12 +10825,9 @@
   100 RETURN
  3000 FORMAT (/' *** PROGRAM ERROR in RDFV ** ''ALL'' read, but',' KK,IFAM,IGEN,ISPC=',4I5)
       END SUBROUTINE RDFV
-!*==RDINTG.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE RDINTG(N,IPT1,IPT2,IPTEND,IER)
       SUBROUTINE RDINTG(N,IPT1,IPT2,IPTEND,IER)
 !
 ! *** RDINTG by JCM 10 Oct 83 ***
@@ -10974,12 +10910,9 @@
       IF ((ISIG.EQ.0) .AND. (IER.EQ.0)) IER = 100
       RETURN
       END SUBROUTINE RDINTG
-!*==RDNUMS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 4      SUBROUTINE RDNUMS(A,IPT1,NBOUND,NUM,IER)
       SUBROUTINE RDNUMS(A,IPT1,NBOUND,NUM,IER)
 !
 ! *** RDNUMS corrected by JCM 23 Apr 92 ***
@@ -11023,14 +10956,13 @@
       DIMENSION A(NBOUND)
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-!
+
       IPT = IPT1
       IER = 0
       NUM = 0
     1 CALL RDREAL(X,IPT,IPT,80,IE)
       IF ((IE.EQ.100) .OR. IPT.GT.80) GOTO 100
       IF (IE.EQ.0) GOTO 2
-!
 ! IF HERE, IT IS EITHER "STEP" OR AN ERROR:
       IF (IE.NE.19) GOTO 4
       IP = IPT
@@ -11042,24 +10974,20 @@
       IF (IE.NE.0) GOTO 4
       CALL RDREAL(Z,IPT,IPT,80,IE)
       IF (IE.NE.0) GOTO 4
-!
       IF (Z.GT.0.) GOTO 7
       Z = -Z
       X1 = X
       X = Y
       Y = X1
-!
     7 IF (.NOT.TESTOV(Y,Z)) GOTO 6
       WRITE (LPT,3002) X, Y, Z
       IER = 3
       GOTO 100
-!
     6 NPT = NINT((Y-X+10.E-5)/Z) + 1
       IF (NPT.GE.1) GOTO 8
       WRITE (LPT,3003) X, Y, Z
       IER = 4
       GOTO 100
-!
     8 N1 = NUM + NPT
       IF (N1.GT.NBOUND) GOTO 5
       DO I = 1, NPT
@@ -11067,32 +10995,24 @@
       ENDDO
       NUM = N1
       GOTO 1
-!
 ! CANNOT MAKE SENSE OF CARD:
     4 IER = 1
-      CALL ERRIN2(IPT,2,'cannot interpret card at point',               &
-     &            'expecting real number or "STEP"')
+      CALL ERRIN2(IPT,2,'cannot interpret card at point','expecting real number or "STEP"')
       GOTO 100
-!
     2 NUM = NUM + 1
       IF (NUM.LE.NBOUND) GOTO 3
     5 CALL ERRIN2(NBOUND,2,'more than','numbers read by RDNUMS')
       IER = 2
       GOTO 100
-!
     3 A(NUM) = X
       GOTO 1
-!
   100 RETURN
  3002 FORMAT (' ERROR ** zero step length from',3F10.4)
  3003 FORMAT (' ERROR ** step',3F10.4,' gives -ve number of points')
       END SUBROUTINE RDNUMS
-!*==RDREAL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      SUBROUTINE RDREAL(X,IPT1,IPT2,IPTEND,IER)
       SUBROUTINE RDREAL(X,IPT1,IPT2,IPTEND,IER)
 !
 ! *** RDREAL updated by JCM 11 Sep 91 ***
@@ -11132,9 +11052,8 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-      DATA TENTBL/0.1D0, 0.01D0, 0.001D0, 0.0001D0, 0.00001D0,          &
-     &     0.000001D0, 0.0000001D0, 0.00000001D0/
-!
+      DATA TENTBL/0.1D0, 0.01D0, 0.001D0, 0.0001D0, 0.00001D0, 0.000001D0, 0.0000001D0, 0.00000001D0/
+
       IPT = IPT1
       IER = 0
       XX = 0.
@@ -11151,11 +11070,9 @@
 ! TEST FOR DIGIT FIRST, AS MOST LIKELY CHARACTER TO OCCUR:
       N = NDIGIT(IC)
       IF (N.LT.0) GOTO 2
-!
 ! DIGIT:
       XX = 10.*XX + FLOAT(N)
       GOTO 17
-!
 ! NEITHER DIGIT NOR SPACE:
     2 N = NSYMBL(IC)
 ! JUMP IF SYMBOL (NOT LETTER):
@@ -11165,7 +11082,6 @@
       IF (L.GT.0) IER = L
       IF (L.EQ.0) IER = -100
       GOTO 5
-!
 ! SYMBOL: + AND - EXPECTED AT START;  COMMA COULD TERMINATE
 ! COULD ALSO BE DECIMAL POINT OR SLASH:
     6 IF (N.EQ.2) GOTO 15
@@ -11175,27 +11091,21 @@
       IF ((N.EQ.10) .AND. (IPSH.EQ.0)) GOTO 9
       IER = -N
       GOTO 5
-!
 ! DECIMAL POINT:
     7 IPSH = 1
 ! NOW READ FRACTION:
       GOTO 10
-!
 ! SLASH:
     9 IPSH = -1
 ! NOW READ DENOMINATOR:
       GOTO 10
-!
 ! MINUS:
     8 SIG = -1.
-!
 ! SET "SOMETHING OTHER THAN SPACE READ"
    17 ISIG = 1
-!
 ! NEXT CHARACTER:
     3 IPT = IPT + 1
       GOTO 1
-!
 ! READ EITHER FRACTIONAL PART OR DENOMINATOR:
    10 YY = 0.
       ISIG = 1
@@ -11238,12 +11148,9 @@
       IF ((ISIG.EQ.0) .AND. (IER.EQ.0) .AND. (IC.NE.',')) IER = 100
       RETURN
       END SUBROUTINE RDREAL
-!*==RDRELA.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 8      SUBROUTINE RDRELA
       SUBROUTINE RDRELA
 !
 ! *** RDRELA updated JCM 13 Jan 88 ***
@@ -11284,9 +11191,7 @@
         CALL ERRIN2(IRTYP,2,'Relation type','not implemented')
         GOTO 1
       ENDIF
-!
       GOTO (11,12), IRTYP
-!
 ! TYPE 1 CONSTRAINT - A1 TIMES P1 = A2 TIMES P2
    11 CALL RDREAL(AM(1),IPT,IPT,80,IER)
       CALL PARRD(IPT,IPT,KK1(1),IFAM1,IGEN1,ISPC1)
@@ -11299,7 +11204,6 @@
       AM(2) = -AM(2)
       CALL ADDCON(2,KK1,AM,1)
       GOTO 1
-!
 ! TYPE 2 - A LINEAR COMBINATION OF PARAMETERS, WITH CONSTANT COEFFICIENTS,
 !          MUST BE CONSTANT.  ALL PARAMETERS ON ONE CARD - CONSTANTS FIRST
 ! READ AS MANY PAIRS OF CONSTANT, PARAMETER SPEC AS GIVEN:
@@ -11310,23 +11214,17 @@
       CALL PARRD(IPT,IPT,KK1(IPARS),IFAM,IGEN,ISPC)
       IF (KK1(IPARS).LE.0) GOTO 99
       GOTO 5
-!
 ! NOW ABSORB TYPE 2 CONSTRAINT:
    21 CALL ADDCON(IPARS-1,KK1,AM,4)
       GOTO 1
-!
 ! ERRORS:
    99 CALL ERRIN2(IPT,2,'cannot interpret L RELA card at point',' ')
       GOTO 1
-!
   100 RETURN
       END SUBROUTINE RDRELA
-!*==RDWORD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE RDWORD(WORD,IWDLEN,IPT1,IPT2,IPTEND,IANY,IER)
       SUBROUTINE RDWORD(WORD,IWDLEN,IPT1,IPT2,IPTEND,IANY,IER)
 !
 ! *** RDWORD updated by JCM 28 Apr 90 ***
@@ -11380,7 +11278,7 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       MAX = LEN(WORD)
       IPT = IPT1
     4 WORD = ' '
@@ -11394,12 +11292,10 @@
 ! TEST FOR LETTER FIRST, AS MOST LIKELY CHARACTER TO OCCUR:
       N1 = LETTER(IC)
       IF (N1.LE.0) GOTO 2
-!
 ! LETTER, OR SUBSEQUENT NON-SPACE:
     5 IWDLEN = IWDLEN + 1
       IF (IWDLEN.LE.MAX) WORD(IWDLEN:IWDLEN) = IC
       GOTO 3
-!
 ! NEITHER LETTER NOR SPACE:
 ! IF INITIAL LETTER READ, OR IF IER IS -VE ON ENTRY,  ANY SYMBOL IS  ACCEPTABLE:
     2 IF (IWDLEN.GT.0 .OR. IANY.LT.0) GOTO 5
@@ -11411,9 +11307,7 @@
 ! BY NOW IT IS AN UNRECOGNISABLE SYMBOL:
       IF (N1.EQ.0) IER = -100
       GOTO 101
-!
 ! SYMBOL AT START OF WORD:
-!
     6 IF (IANY.GT.0) THEN
         IF (N1.EQ.17) THEN
           IF (SAID(ICARD(IPT+1:IPT+1),'P')) THEN
@@ -11427,22 +11321,17 @@
       ENDIF
       IER = -N1
       GOTO 101
-!
 ! NEXT CHARACTER:
     3 IPT = IPT + 1
       GOTO 1
-!
   102 IPT = IPT + 1
   101 IF ((IWDLEN.EQ.0) .AND. (IER.EQ.0)) IER = 100
       IPT2 = IPT
       RETURN
       END SUBROUTINE RDWORD
-!*==RECELL.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 3      SUBROUTINE RECELL(N,M)
       SUBROUTINE RECELL(N,M)
 !
 ! *** RECELL by JCM 13 Jul 83 ***
@@ -11490,7 +11379,7 @@
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-!
+
       NOUT = N
       MM = M
       IF ((NOUT.NE.1) .AND. (NOUT.NE.2)) CALL ERRMES(-1,0,'RECELL entry neither 1 nor 2')
@@ -11570,12 +11459,9 @@
 !* SOMEWHERE HERE MAKE ESDS TO PRINT LATER
       RETURN
       END SUBROUTINE RECELL
-!*==RECIP.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 10      SUBROUTINE RECIP
       SUBROUTINE RECIP
 !
 ! *** RECIP by JCM 13 Jul 83 ***
@@ -12168,10 +12054,9 @@
  2005 FORMAT (' Chi squared for conventional obs',                      &
      &        ' and all slack constraints = ',G12.3)
       END SUBROUTINE RFACS
-!*==ROTOSM.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-! LEVEL 2      SUBROUTINE ROTOSM(H,RH,IOP,ISS)
       SUBROUTINE ROTOSM(H,RH,IOP,ISS)
 !
 ! *** ROTOSM corrected by PJB 31-May-1994 ***
@@ -12320,12 +12205,9 @@
       SAID = .FALSE.
   100 RETURN
       END FUNCTION SAID
-!*==SAYS.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 2      LOGICAL FUNCTION SAYS(WANT)
       LOGICAL FUNCTION SAYS(WANT)
 !
 ! *** SAYS by PJB 1-Oct-93 ***
@@ -12362,12 +12244,9 @@
       SAYS = .TRUE.
   100 RETURN
       END FUNCTION SAYS
-!*==SCLCHN.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      SUBROUTINE SCLCHN(NP,A,NFIX,FIX)
       SUBROUTINE SCLCHN(NP,A,NFIX,FIX)
 !
 ! *** SCLCHN by JCM 13 Jul 83 ***
@@ -12394,12 +12273,9 @@
       IF (J1.NE.NP) GOTO 1
       RETURN
       END SUBROUTINE SCLCHN
-!*==SCLPRD.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 1      FUNCTION SCLPRD(H1,H2,IR)
       FUNCTION SCLPRD(H1,H2,IR)
 !
 ! *** SCLPRD by JCM 26 Apr 84 ***
@@ -12429,12 +12305,9 @@
       SCLPRD = SNGL(SCL)
       RETURN
       END FUNCTION SCLPRD
-!*==SETANI.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 11      SUBROUTINE SETANI
       SUBROUTINE SETANI
 !
 ! *** SETANI by JCM 23 Sep 83 ***
@@ -12518,12 +12391,10 @@
           CALL ERRATM(LABB,2,'on T card')
           GOTO 100
         ENDIF
-!
 ! NAME FOR ATF MATCHED WITH NAME IN ATOM LIST:
         IAPT(J) = IP
         IT = IATYP(IP)
         IF (IT.NE.0) GOTO 11
-!
 ! CONVERT ITF ALREADY READ TO BE AN ATF, AND SET ITF TO ZERO:
         DO I = 1, 3
           ATF(I,IP) = TF(J)
@@ -12531,21 +12402,17 @@
         ENDDO
         TF(J) = 0.
         GOTO 12
-!
 ! CHECK IF TYPE 1, AND FORCE THESE TO BE 2:
    11   IF (IT.NE.1) GOTO 3
-        CALL MESS(LPT,1,' *** WARNING ** ATF type 1 redefined to '//    &
-     &            'exclude cosines - type 2 assumed')
+        CALL MESS(LPT,1,' *** WARNING ** ATF type 1 redefined to exclude cosines - type 2 assumed')
    12   IATYP(IP) = 2
         IT = 2
-!
 ! JOIN HERE ON ALL OTHER TYPES:
     3   WRITE (LPT,2002) LABB, IATYP(IP), (ATF(I,IP),I=1,6)
  2002   FORMAT (' ',A4,I5,6F10.4)
         GOTO (22,22,23,24,5), IT
    22   FAC = 0.25
         GOTO 30
-!
    23   FAC = TWOPI*PI
    30   ACOEFF(1) = FAC*CPARS(1,2)
         ACOEFF(2) = FAC*CPARS(2,2)
@@ -12566,15 +12433,11 @@
           ATF(I,IP) = ATF(I,IP)*ACOEFF(I)
         ENDDO
     5 ENDDO
-!
   100 RETURN
       END SUBROUTINE SETANI
-!*==SETFOR.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-! LEVEL 11      SUBROUTINE SETFOR
       SUBROUTINE SETFOR
 !
 ! *** SETFOR updated by JCM 24 Nov 91 ***
@@ -12799,8 +12662,7 @@
 ! IF IER IS RETURNED AS 100 WE HAVE READ ALL SPACES:
       IF (IER.EQ.100) GOTO 10
       IF (IER.NE.0) THEN
-        CALL ERRIN2(IPKEEP,2,'cannot read number from "F" card at point'&
-     &              ,' ')
+        CALL ERRIN2(IPKEEP,2,'cannot read number from "F" card at point',' ')
         GOTO 6
       ENDIF
 !
