@@ -86,6 +86,9 @@
       CALL WDialogLoad(IDD_PW_Page4)
       CALL WDialogLoad(IDD_PW_Page5)
       CALL WDialogLoad(IDD_PW_Page6)
+      CALL WDialogLoad(IDD_PW_Page7)
+      CALL WDialogLoad(IDD_PW_Page8)
+      CALL WDialogLoad(IDD_PW_Page9)
 ! ep      CALL WDialogLoad(IDD_SA_Multi_Completed) 
       CALL WDialogLoad(IDD_SA_Multi_completed_ep)
       CALL WDialogLoad(IDD_License_Dialog)
@@ -437,14 +440,19 @@
       INTEGER         nvar, ns, nt, neps, maxevl, iprint, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, neps, maxevl, iprint, iseed1, iseed2
 
-      LOGICAL         ChildWinAutoClose
-      COMMON /ChWAC/  ChildWinAutoClose(1:20)
+      LOGICAL           ChildWinAutoClose
+      COMMON /ChWinAC/  ChildWinAutoClose(1:20)
+
+      INTEGER*4         ChildWinHandler
+      LOGICAL                                  ChildWinHandlerSet
+      COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
 
       REAL    WaveLengthOf ! Function
       REAL    dSpacing2TwoTheta ! Function
       INTEGER ISeed3
 
       ChildWinAutoClose = .FALSE.
+      ChildWinHandlerSet = .FALSE.
       DashRawFile = ' '
       DashHcvFile = ' '
       DashPikFile = ' '
