@@ -3,7 +3,7 @@
 !
       SUBROUTINE organise_sa_result_data(irow)
 !ep July 2001
-!   called from SASummary.for
+!   called from SASummary.f90
 !     This subroutine manipulates the data required to plot the observed  
 !   diffraction pattern with the calculated pattern and difference.  The
 !   data is read in from the .pro file and stored in COMMON BLOCK ProFilePLotStore
@@ -143,8 +143,8 @@
       REAL Ymax, Ymin
       REAL Xmax, Xmin
 
-      YMin = MINVAL(YOBIN)
-      YMax = MAXVAL(YOBIN)
+      YMin = MINVAL(YOBIN(1:NBIN))
+      YMax = MAXVAL(YOBIN(1:NBIN))
       Xmin = XBIN(1)
       Xmax = XBIN(nbin)
 
