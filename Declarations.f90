@@ -215,6 +215,14 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
+      LOGICAL         InWizard, InWizardWindow
+      INTEGER                                   CurrentWizardWindow
+      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+
+! InWizard            = when .TRUE., wizard is active
+! InWizardWindow      = when .TRUE., a wizard window is currently visible
+! CurrentWizardWindow = Winteracter ID of current Wizard window
+
       END SUBROUTINE FoolCompiler
 !
 !*****************************************************************************

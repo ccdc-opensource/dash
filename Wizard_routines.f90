@@ -8,10 +8,15 @@
 
       IMPLICIT NONE
 
+      LOGICAL         InWizard, InWizardWindow
+      INTEGER                                   CurrentWizardWindow
+      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+
       CALL SetWizardState(-1)
       CALL SetModeMenuState(1,0)
       CALL SelectMode(ID_Peak_Fitting_Mode)
       CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+      InWizard = .TRUE.
 
       END SUBROUTINE StartWizard
 !
@@ -26,9 +31,16 @@
 
       INCLUDE 'DialogPosCmn.inc'
 
+      LOGICAL         InWizard, InWizardWindow
+      INTEGER                                   CurrentWizardWindow
+      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+
+      IF (.NOT. InWizardWindow) RETURN
+      CALL WDialogSelect(CurrentWizardWindow)
       IXPos_IDD_Wizard = WInfoDialog(6)
       IYPos_IDD_Wizard = WInfoDialog(7)
       CALL WDialogHide()
+      InWizardWindow = .FALSE.
 
       END SUBROUTINE WizardWindowHide
 !
@@ -45,26 +57,18 @@
 
       INCLUDE 'DialogPosCmn.inc'
  
+      LOGICAL         InWizard, InWizardWindow
+      INTEGER                                   CurrentWizardWindow
+      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+
+! Hide any visible Wizard window
+      CALL WizardWindowHide
       CALL WDialogSelect(TheDialogID)
+      CurrentWizardWindow = TheDialogID
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+      InWizardWindow = .TRUE.
 
       END SUBROUTINE WizardWindowShow
-!
-!*****************************************************************************
-!
-      SUBROUTINE WizardWindowBackNext(TheDialogID)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: TheDialogID
- 
-      CALL WizardWindowHide
-      CALL WizardWindowShow(TheDialogID)
-
-      END SUBROUTINE WizardWindowBackNext
 !
 !*****************************************************************************
 !
@@ -75,8 +79,13 @@
 
       IMPLICIT NONE
 
+      LOGICAL         InWizard, InWizardWindow
+      INTEGER                                   CurrentWizardWindow
+      COMMON /Wizard/ InWizard, InWizardWindow, CurrentWizardWindow
+
       CALL WizardWindowHide
       CALL SetWizardState(1)
+      InWizard = .FALSE.
 
       END SUBROUTINE EndWizardCommon
 !
@@ -91,12 +100,12 @@
       IMPLICIT NONE
 
       CALL EndWizardCommon
-      IF (.NOT. NoData) CALL SetModeMenuState(1,0)
-      CALL PushActiveWindowID
+! Legacy code from first release. Should not be necessary any more?
+! The wizard windows can only be closed by DASH, and when it closes the
+! windows that need this code, it updates all these variables automatically?
       CALL Upload_CrystalSystem
       CALL Upload_Cell_Constants()
       CALL Upload_Range()
-      CALL PopActiveWindowID
       CALL Generate_TicMarks
 
       END SUBROUTINE EndWizard
@@ -140,13 +149,13 @@
       LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
    
       CALL EndWizardCommon
+      PastPawley = .FALSE.
       IF (WeCanDoAPawleyRefinement()) THEN
         CALL SetModeMenuState(1,1)
       ELSE
         CALL SetModeMenuState(1,-1)
       ENDIF
       CALL SelectMode(ID_Peak_Fitting_Mode)
-      PastPawley = .FALSE.
 ! Ungrey 'Delete all peak fit ranges' button on toolbar
       IF (NumPeakFitRange .GT. 0) CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
 ! Ungrey 'Remove background' button on toolbar
@@ -184,8 +193,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'DialogPosCmn.inc'
-
       INTEGER :: IPW_Option
       CHARACTER*MaxPathLength tString
 
@@ -197,7 +204,6 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDNEXT)
-              CALL WizardWindowHide
 ! We're off the main page and on to new pages depending on the option.
               CALL WDialogGetRadioButton(IDF_PW_Option1,IPW_Option)
               SELECT CASE (IPW_Option)
@@ -210,7 +216,7 @@
                   ELSE
                     CALL WDialogFieldState(IDNEXT,Enabled)
                   ENDIF
-                  CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+                  CALL WizardWindowShow(IDD_PW_Page3)
                 CASE (2) ! Preparation for Pawley refinement
                   CALL WDialogSelect(IDD_PW_Page2)
 ! If we have loaded a powder pattern, the Next> button should be enabled
@@ -219,7 +225,7 @@
                   ELSE
                     CALL WDialogFieldState(IDNEXT,Enabled)
                   END IF
-                  CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+                  CALL WizardWindowShow(IDD_PW_Page2)
                 CASE (3) ! Simulated annealing structure solution
                   CALL ShowWizardWindowZmatrices
               END SELECT
@@ -287,10 +293,10 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowBackNext(IDD_Polyfitter_Wizard_01)
+              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
-              CALL WizardWindowBackNext(IDD_PW_Page4)
+              CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (ID_PWa_DF_Open)
@@ -338,9 +344,9 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowBackNext(IDD_PW_Page3)
+              CALL WizardWindowShow(IDD_PW_Page3)
             CASE (IDNEXT)
-              CALL WizardWindowBackNext(IDD_PW_Page5)
+              CALL WizardWindowShow(IDD_PW_Page5)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
           END SELECT
@@ -428,11 +434,11 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL WizardApplyDiffractionFileInput
-              CALL WizardWindowBackNext(IDD_PW_Page4)
+              CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
-              CALL WizardWindowBackNext(IDD_PW_Page6)
+              CALL WizardWindowShow(IDD_PW_Page6)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDB_ConvertT2R) ! Convert max. 2 theta to max. resolution
@@ -523,12 +529,12 @@
             CASE (IDBACK)
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
-              CALL WizardWindowBackNext(IDD_PW_Page5)
+              CALL WizardWindowShow(IDD_PW_Page5)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
               CALL WizardApplyBackground
-              CALL WizardWindowBackNext(IDD_PW_Page7)
+              CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDF_Preview)
@@ -559,7 +565,6 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'DialogPosCmn.inc'
 
       INTEGER IndexOption
       LOGICAL FnUnitCellOK ! Function
@@ -570,9 +575,8 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowBackNext(IDD_PW_Page6)
+              CALL WizardWindowShow(IDD_PW_Page6)
             CASE (IDNEXT)
-              CALL WizardWindowHide
               CALL WDialogGetRadioButton(IDF_RADIO3,IndexOption) ! 'Index now' or 'Enter known cell'
               SELECT CASE (IndexOption)
                 CASE (1) ! Index pattern now
@@ -584,6 +588,7 @@
                   ELSE
                     CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
                   ENDIF
+                  CALL WizardWindowShow(IDD_PW_Page8)
                 CASE (2) ! Enter known unit cell parameters
                   CALL WDialogSelect(IDD_PW_Page1)
 ! If the cell is OK, the Next> button should be enabled
@@ -592,8 +597,8 @@
                   ELSE
                     CALL WDialogFieldState(IDNEXT,Disabled)
                   END IF
+                  CALL WizardWindowShow(IDD_PW_Page1)
               END SELECT
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
           END SELECT
@@ -616,7 +621,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
-      INCLUDE 'DialogPosCmn.inc'
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
@@ -650,7 +654,7 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
-              CALL WizardWindowBackNext(IDD_PW_Page7)
+              CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDNEXT)
 !              CALL EstimateZeroPointError
               Lambda = ALambda
@@ -761,8 +765,6 @@
               GOTO 999
             ENDIF  
             IF (DICVOL_Error .EQ. cDICVOL_TooManySolutions) CALL WarningMessage('More than 30 solutions found, please check your data.')
-! Close current Wizard window
-            CALL WizardWindowHide
 ! If only a single solution, and no valid cell available, import that solution by default
             IF ((NumOfDICVOLSolutions.EQ.1) .AND. (.NOT. FnUnitCellOK())) THEN
 ! Import the unit cell parameters into DASH
@@ -798,7 +800,7 @@
               IF (DICVOLSolutions(I)%M .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,10,I,DICVOLSolutions(I)%M,'(F7.1)')
               IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,11,I,DICVOLSolutions(I)%F,'(F7.1)')
             ENDDO
-            CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CALL WizardWindowShow(IDD_PW_Page9)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -833,9 +835,9 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
-              CALL WizardWindowBackNext(IDD_PW_Page8)
+              CALL WizardWindowShow(IDD_PW_Page8)
             CASE (IDNEXT)
-              CALL WizardWindowBackNext(IDD_PW_Page1)
+              CALL WizardWindowShow(IDD_PW_Page1)
           END SELECT
           CALL PopActiveWindowID
           RETURN
@@ -890,9 +892,9 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowBackNext(IDD_Polyfitter_Wizard_01)
+              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
-              CALL WizardWindowBackNext(IDD_PW_Page1)
+              CALL WizardWindowShow(IDD_PW_Page1)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (ID_PW_DF_Open)
@@ -942,7 +944,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'DialogPosCmn.inc'
       INCLUDE 'lattice.inc'
 
       INTEGER IOption
@@ -957,7 +958,6 @@
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
             CASE (IDBACK)
-              CALL WizardWindowHide
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
 ! There were three ways to get here:
@@ -968,18 +968,21 @@
               CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
               CALL WDialogGetRadioButton(IDF_PW_Option1,IOption)
               IF (IOption .EQ. 2) THEN
-                CALL WDialogSelect(IDD_PW_Page2)
+                CALL WizardWindowShow(IDD_PW_Page2)
               ELSE
 ! Did we get here from 'Enter known cell' in wizard window Indexing I?
                 CALL WDialogSelect(IDD_PW_Page7)
                 CALL WDialogGetRadioButton(IDF_RADIO3,IOption) ! 'Index now' or 'Enter known cell'
-                IF (IOption .EQ. 1) CALL WDialogSelect(IDD_PW_Page9)
+                IF (IOption .EQ. 1) THEN
+                  CALL WizardWindowShow(IDD_PW_Page9)
+                ELSE
+                  CALL WizardWindowShow(IDD_PW_Page7)
+                ENDIF
               ENDIF
-              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDNEXT)
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
-              CALL WizardWindowBackNext(IDD_PW_Page10)
+              CALL WizardWindowShow(IDD_PW_Page10)
             CASE (IDAPPLY)
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_ZeroPoint               
@@ -1039,9 +1042,8 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowBackNext(IDD_PW_Page1)
+              CALL WizardWindowShow(IDD_PW_Page1)
             CASE (IDNEXT)
-              CALL WizardWindowHide
               CALL ShowPawleyFitWindow
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
