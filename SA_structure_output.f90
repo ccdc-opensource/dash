@@ -233,13 +233,14 @@
           yc = xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)*SNGL(f2cpdb(2,3))
           zc = xatopt(3,ii)*SNGL(f2cpdb(3,3))
 ! Note that elements are right-justified
+! WebLab viewer even wants the elements in the atom names to be right justified.
           IF (tSavePDB) THEN
             IF (asym(iorig,CheckedFragNo)(2:2).EQ.' ') THEN
-              WRITE (65,1120) iiact, OriginalLabel(iorig,CheckedFragNo)(1:5), xc, yc, zc, asym(iorig,CheckedFragNo)(1:1)
- 1120         FORMAT ('HETATM',I5,' ',A5,'NONE    1    ',3F8.3,'  1.00  0.00           ',A1)
+              WRITE (65,1120) iiact, OriginalLabel(iorig,CheckedFragNo)(1:3), xc, yc, zc, asym(iorig,CheckedFragNo)(1:1)
+ 1120         FORMAT ('HETATM',I5,'  ',A3,' NONE    1    ',3F8.3,'  1.00  0.00           ',A1,'  ')
             ELSE
-              WRITE (65,1130) iiact, OriginalLabel(iorig,CheckedFragNo)(1:5), xc, yc, zc, asym(iorig,CheckedFragNo)(1:2)
- 1130         FORMAT ('HETATM',I5,' ',A5,'NONE    1    ',3F8.3,'  1.00  0.00          ',A2)
+              WRITE (65,1130) iiact, OriginalLabel(iorig,CheckedFragNo)(1:4), xc, yc, zc, asym(iorig,CheckedFragNo)(1:2)
+ 1130         FORMAT ('HETATM',I5,' ',A4,' NONE    1    ',3F8.3,'  1.00  0.00          ',A2,'  ')
             ENDIF
           ENDIF
 !       The CCL atom lines
@@ -588,3 +589,6 @@
       IF (AutoUpdate .AND. ViewAct) CALL ViewBest
 
       END SUBROUTINE UPDATEVIEWER
+!
+!*****************************************************************************
+!
