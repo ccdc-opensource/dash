@@ -58,11 +58,11 @@
 
       LOGICAL, EXTERNAL :: Confirm
 
-#ifdef ONTBUG
+!DEC$ IF DEFINED (ONTBUG)
       IF (ShowAgain) THEN
         ShowAgain = Confirm('Debug error : '//TheMessage(1:LEN_TRIM(TheMessage))//CHAR(13)//'More Debug Error messages?')
       ENDIF
-#endif
+!DEC$ ENDIF
 
       END SUBROUTINE DebugErrorMessage
 !
@@ -155,7 +155,7 @@
 !
       IMPLICIT NONE
 
-      INTEGER,  INTENT (IN   ) :: TheIHANDLE
+      INTEGER, INTENT (IN   ) :: TheIHANDLE
       EXTERNAL TheSubroutine
 
       INTEGER*4         ChildWinHandler
