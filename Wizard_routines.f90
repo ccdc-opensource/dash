@@ -112,10 +112,6 @@
 !
       SUBROUTINE EndWizard
 
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
       IMPLICIT NONE
 
       CALL EndWizardCommon
@@ -224,8 +220,8 @@
 
       IMPLICIT NONE
 
-      INTEGER IPW_Option
       LOGICAL, EXTERNAL :: FnPatternOK
+      INTEGER IPW_Option
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
@@ -711,9 +707,8 @@
       INTEGER          IPMIN, IPMAX
       COMMON /PROFIPM/ IPMIN, IPMAX
 
-      INTEGER tInt1, tInt2, tFieldState
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-
+      INTEGER tInt1, tInt2, tFieldState
       REAL             tXPMIN,     tXPMAX,     tYPMIN,     tYPMAX,       &
                        tXPGMIN,    tXPGMAX,    tYPGMIN,    tYPGMAX,      &
                        tXPGMINOLD, tXPGMAXOLD, tYPGMINOLD, tYPGMAXOLD,   &
@@ -1466,7 +1461,6 @@
 
       LOGICAL SpaceGroupDetermination
       COMMON /SGFLAG/ SpaceGroupDetermination
-
 
       LOGICAL, EXTERNAL :: Confirm
 
