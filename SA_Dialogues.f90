@@ -1421,6 +1421,10 @@
       LOGICAL                                                   LimsChanged
       COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
 
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
+
       CHARACTER*20, EXTERNAL :: Integer2String
       INTEGER I, iCheck, iFrg, KK
       CHARACTER(LEN=3) :: MenuOptions(1:maxfrg+1)
@@ -1436,7 +1440,7 @@
           CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, I, prevub(I))
         ENDIF
 ! Disable modal button for everything but torsion angles
-        IF (kzmpar2(i) .NE. 3) CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
+        IF (ModalFlag(i) .EQ. 0) CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
       ENDDO
       LimsChanged = .FALSE.
       KK = 0
@@ -1470,7 +1474,6 @@
 
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
-
 
       REAL            T0, RT
       COMMON /saparl/ T0, RT
@@ -1507,7 +1510,7 @@
                 IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) THEN
                   LimsChanged = .FALSE. 
                   DO I = 1, nvar
-                    ModalFlag(I) = 1
+                    ModalFlag(I) = 0 ! 0 means: not a torsion angle
                     CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
                   ENDDO
                 ENDIF                 
@@ -1639,7 +1642,7 @@
                     CALL WGridStateCell(IDF_parameter_grid_modal, 1, IFRow, Enabled)
                     CALL WGridStateCell(IDF_parameter_grid_modal, 2, IFRow, Enabled)
                     CALL WGridStateCell(IDF_parameter_grid_modal, 3, IFRow, Enabled)
-                    IF (kzmpar2(IFRow) .EQ. 3) THEN
+                    IF (ModalFlag(IFRow) .NE. 0) THEN ! It's a torsion angle
                       CALL WGridStateCell(IDF_parameter_grid_modal, 5, IFRow, Enabled)
                     ENDIF
                   ENDIF
@@ -1775,7 +1778,7 @@
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
       INTEGER ICol, NumColumns
-      INTEGER i, k, dof, frag
+      INTEGER i, k, frag, dof
       INTEGER Upper, Lower
       REAL    Zero, OneEighty, xtem
 
@@ -1788,7 +1791,6 @@
       OneEighty = 180.0000
 !     Given the number of the parameter want to know
 !     which zmatrix, fragment it belongs to.
-      dof = 0
       frag = 0
       DO i = 1, maxDOF
         DO k = 1, nfrag
@@ -1800,9 +1802,7 @@
         ENDDO
         IF (frag .NE. 0) EXIT
       ENDDO
- 
       CALL WDialogSelect(IDD_ModalDialog)
-
 !     Clear Fields
       CALL WDialogClearField(IDF_ModalUpper)
       CALL WDialogClearField(IDF_ModalLower)
@@ -1812,7 +1812,7 @@
       CALL WDialogClearField(IDF_ReportUpper2)
 
 !     Initialise fields 
-      CALL WDialogPutString(IDF_TorsionName, czmpar(i,k))
+      CALL WDialogPutString(IDF_TorsionName, czmpar(dof,frag))
       CALL WDialogPutReal(IDF_Initial, Xinitial, '(F12.5)')
       IF (ModalFlag(IfRow) .EQ. 1) THEN ! Not been set before
         CALL WDialogPutRadioButton(IDF_BiModalRadio) 
@@ -1925,9 +1925,9 @@
                 CALL WDialogPutReal(IDF_ReportUpper1, ttem)
               ELSE
                 CALL WDialogGetReal(IDF_ModalUpper, xtem)
-                CALL WDialogPutReal(IDF_ReportLower1, (xtem * (-1)))
+                CALL WDialogPutReal(IDF_ReportLower1, -xtem)
                 CALL WDialogGetReal(IDF_ModalLower, xtem)
-                CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
+                CALL WDialogPutReal(IDF_ReportUpper1, -xtem)
               ENDIF
               ModalFlag(RowNumber) = 2
             CASE (IDF_TriModalRadio)
@@ -1944,48 +1944,46 @@
               CALL WDialogGetReal(IDF_Initial, xtem)       
               TempPrevx = xtem
               xtem = MAX(lb(RowNumber),xtem)
-              X(RowNumber)=(MIN(ub(RowNumber),xtem))
+              X(RowNumber) = (MIN(ub(RowNumber),xtem))
               CALL WDialogPutReal(IDF_Initial, x(RowNumber), '(F12.5)')
             CASE (IDF_ModalLower)
-               CALL WDialogGetReal(IDF_ModalLower, xtem)
-               xtem = MIN(ub(RowNumber),xtem)
-               TempPrevlb = LB(RowNumber)               
-               lb(RowNumber) = xtem
-               CALL WDialogPutReal(IDF_ModalLower,lb(RowNumber),'(F12.5)')
+              CALL WDialogGetReal(IDF_ModalLower, xtem)
+              xtem = MIN(ub(RowNumber),xtem)
+              TempPrevlb = LB(RowNumber)               
+              lb(RowNumber) = xtem
+              CALL WDialogPutReal(IDF_ModalLower,lb(RowNumber),'(F12.5)')
 ! How ranges are calculated depends on state of Modal RadioButton  
-               CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
-                 SELECT CASE (ISET) !bimodal radiobutton active
-                   CASE (1)
-                    CALL WDialogClearField(IDF_ReportLower2)
-                    CALL WDialogClearField(IDF_ReportUpper2)
+              CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
+              SELECT CASE (ISET) ! Bimodal radiobutton active
+                CASE (1)
+                  CALL WDialogClearField(IDF_ReportLower2)
+                  CALL WDialogClearField(IDF_ReportUpper2)
+                  CALL WDialogGetReal(IDF_ModalUpper, xtem)
+                  CALL WDialogGetReal(IDF_ModalLower, ttem)
+                  IF (xtem*ttem .LT. 0.00) THEN
+                    xtem = MAX(xtem, ttem)
+                    xtem = xtem - 180.00
+                    CALL WDialogPutReal(IDF_ReportLower1, xtem)
+                    ttem = ttem + 180.00
+                    CALL WDialogPutReal(IDF_ReportUpper1, ttem)
+                  ELSE
                     CALL WDialogGetReal(IDF_ModalUpper, xtem)
-                    CALL WDialogGetReal(IDF_ModalLower, ttem)
-                      IF (xtem*ttem .LT. 0.00) THEN
-                        xtem = MAX(xtem, ttem)
-                        xtem = xtem - 180.00
-                        CALL WDialogPutReal(IDF_ReportLower1, xtem)
-                        ttem = ttem + 180.00
-                        CALL WDialogPutReal(IDF_ReportUpper1, ttem)
-                      ELSE
-                        CALL WDialogGetReal(IDF_ModalUpper, xtem)
-                        CALL WDialogPutReal(IDF_ReportLower1, (xtem * (-1)))
-                        CALL WDialogGetReal(IDF_ModalLower, xtem)
-                        CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
-                      ENDIF
-                    ModalFlag(RowNumber) = 2  
-                                     
-                   CASE (2) !Trimodal radiobutton active           
-                     CALL WDialogGetReal(IDF_ModalLower, xtem)
-                     CALL DetermineTrimodalBounds(xtem, Lower)
-
-                     CALL WDialogGetReal(IDF_ModalUpper, xtem)
-                     CALL DetermineTrimodalBounds(xtem, Upper)
-                     CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
-                     CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
-                     CALL WDialogPutReal(IDF_ReportLower1, Tempbounds(2,Lower))
-                     CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))
-                     ModalFlag(RowNumber) = 3
-                 END SELECT
+                    CALL WDialogPutReal(IDF_ReportLower1, (xtem * (-1)))
+                    CALL WDialogGetReal(IDF_ModalLower, xtem)
+                    CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
+                  ENDIF
+                  ModalFlag(RowNumber) = 2  
+                CASE (2) !Trimodal radiobutton active           
+                  CALL WDialogGetReal(IDF_ModalLower, xtem)
+                  CALL DetermineTrimodalBounds(xtem, Lower)
+                  CALL WDialogGetReal(IDF_ModalUpper, xtem)
+                  CALL DetermineTrimodalBounds(xtem, Upper)
+                  CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
+                  CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
+                  CALL WDialogPutReal(IDF_ReportLower1, Tempbounds(2,Lower))
+                  CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))
+                  ModalFlag(RowNumber) = 3
+              END SELECT
             CASE (IDF_ModalUpper)
 ! Check the bounding - only update if parameter is set to vary
               CALL WDialogGetReal(IDF_ModalUpper,xtem)
@@ -2051,14 +2049,14 @@
               LB(RowNumber) = iLB
               X(RowNumber) = iX
               ModalFlag(RowNumber) = iRadio
-              CALL WDialogHide()
+              CALL WDialogHide
 !           Return to "unimodal" mode. Modal torsion angle is no longer applied
             CASE (IDF_BiModalReset)
               ub(RowNumber) = OneEighty
               lb(RowNumber) = (-1) * OneEighty
               X(RowNumber) = iX
               ModalFlag(RowNumber) = 1 
-              CALL WDialogHide()
+              CALL WDialogHide
               CALL WDialogSelect(IDD_SA_Modal_Input2)
               CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))                                              
           END SELECT
@@ -2082,15 +2080,8 @@
       
       REAL, INTENT (INOUT) :: Angle
 
-      IF ((Angle .GE. -180.0) .AND. (Angle .LE.  180.0)) RETURN
-      IF ((Angle .GT.  180.0) .AND. (Angle .LE.  360.0)) THEN
-        Angle = Angle - 360.0
-        RETURN
-      ENDIF
-  !    CALL DebugErrorMessage("Modal torsion angle not in range I")
-      IF ((Angle .LT. -180.0) .AND. (Angle .GE. -360.0)) THEN
-        Angle = 360.0 - Angle    ! ? Is this correct?
-      ENDIF
+      IF (Angle .GT.  180.0) Angle = Angle - 360.0
+      IF (Angle .LT. -180.0) Angle = Angle + 360.0
 
       END SUBROUTINE ThreeSixtyToOneEighty
 !
@@ -2102,12 +2093,7 @@
       
       REAL, INTENT (INOUT) :: Angle
 
-      IF ((Angle .GE. 0.00) .AND. (Angle .LE.  360.00)) RETURN
-      IF ((Angle .LT. 0.00) .AND. (Angle .GE. -180.00)) THEN
-        Angle = Angle + 360.0
-        RETURN
-      ENDIF
-   !   CALL DebugErrorMessage("Modal torsion angle not in range II")
+      IF (Angle .LT. 0.0) Angle = Angle + 360.0
 
       END SUBROUTINE OneEightyToThreeSixty
 !
@@ -2117,25 +2103,21 @@
 
       IMPLICIT NONE
 
-      REAL xtem, ttem, zero
-      INTEGER BoundColumn
+      INTEGER, INTENT (IN   ) :: BoundColumn
 
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds
 
-      zero = 0.000     
+      REAL xtem, ttem
+
       TempBounds(1,BoundColumn) = xtem
       CALL OneEightyToThreeSixty(xtem) 
-      ttem = xtem + 120.00
-      IF (ttem .GE. 360.00) THEN
-        Ttem = ttem - 360.00
-      ENDIF
+      ttem = xtem + 120.0
+      IF (ttem .GE. 360.0) ttem = ttem - 360.0
       CALL ThreeSixtyToOneEighty(ttem)
       TempBounds(2,BoundColumn) = ttem                  
-      ttem = xtem + 240.00
-      IF (ttem .GE. 360.00) THEN
-        Ttem = ttem - 360.00
-      ENDIF
+      ttem = xtem + 240.0
+      IF (ttem .GE. 360.0) ttem = ttem - 360.0
       CALL ThreeSixtyToOneEighty(ttem) 
       TempBounds(3,BoundColumn) = ttem
 
@@ -2191,8 +2173,8 @@
       LOGICAL OneEightyScale
 
       OneEightyScale = .TRUE.
-      IF (UB(row) * LB(row) .LT. 0.00) THEN
-        IF (ABS(UB(Row)) .GT. 90.00) THEN
+      IF (UB(row) * LB(row) .LT. 0.0) THEN
+        IF (ABS(UB(Row)) .GT. 90.0) THEN
           OneEightyScale = .FALSE.
         ENDIF
       ENDIF
@@ -2201,14 +2183,14 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION OutOfBounds(npar, XIn)
+      LOGICAL FUNCTION OutOfBounds(iPar, XIn)
 
 ! This Subroutine determines if a trial torsion angle value is within
 ! modal torsion angle ranges defined.
 
       IMPLICIT NONE      
 
-      INTEGER, INTENT (IN   ) :: npar
+      INTEGER, INTENT (IN   ) :: iPar
       REAL,    INTENT (INOUT) :: XIn
 
       INCLUDE 'PARAMS.INC'
@@ -2230,50 +2212,50 @@
       Upper = 1
       Lower = 2
       OutOfBounds = .FALSE.
-      SELECT CASE(ModalFlag(npar))
-        CASE (2) ! bimodal ranges
-          IF (UB(npar) * LB(npar) .LT. 0.0) THEN ! range such as -170 to 170 defined                                                  
-            TempUpper = UB(npar)         ! so use 0-360 degree scale
-            TempLower = LB(npar)
+      SELECT CASE(ModalFlag(iPar))
+        CASE (2) ! Bimodal ranges
+          IF ((XIn .LT. -180.0) .OR. (XIn .GT. 180.0)) THEN
+            OutOfBounds = .TRUE.
+            RETURN
+          ENDIF
+          IF (UB(iPar) * LB(iPar) .LT. 0.0) THEN ! Range such as -10 to 10 defined                                                  
+            TempLower = LB(iPar)                 ! so use 0 to 360 degree scale
+            TempUpper = UB(iPar)
             TempLower2 = TempUpper - 180.00
             TempUpper2 = TempLower + 180.00
-            CALL OneEightyToThreeSixty(TempUpper)
+
+     !F       TempLower2 = TempLower + 180.00
+     !F       TempUpper2 = TempUpper + 180.00
+
             CALL OneEightyToThreeSixty(TempLower)
-            CALL OneEightyToThreeSixty(TempUpper2)
+            CALL OneEightyToThreeSixty(TempUpper)
             CALL OneEightyToThreeSixty(TempLower2)
+            CALL OneEightyToThreeSixty(TempUpper2)
             xtem = XIn                                                                                     
-            IF ((xtem .LT. -180.00) .OR. (xtem .GT. 180.00)) THEN
-              OutOfBounds = .TRUE.
-            ELSE
-              CALL OneEightytoThreeSixty(xtem)
-              IF (((xtem .LT. MAX(TempLower, TempLower2)) .AND. &
-                   (xtem .GT. MIN(TempLower, TempLower2))) .OR. &
-                  ((xtem .LT. MAX(TempUpper, TempUpper2)) .AND. &
-                   (xtem .GT. MIN(TempUpper, TempUpper2)))) THEN
-                OutOfBounds = .TRUE.                                       
+            CALL OneEightytoThreeSixty(xtem)
+            IF (((xtem .LT. MAX(TempLower, TempLower2)) .AND. &
+                 (xtem .GT. MIN(TempLower, TempLower2))) .OR. &
+                ((xtem .LT. MAX(TempUpper, TempUpper2)) .AND. &
+                 (xtem .GT. MIN(TempUpper, TempUpper2)))) THEN
+              OutOfBounds = .TRUE.                                       
+            ENDIF
+          ELSE ! Range such as 30 to 90 degs or -30 to -90 defined
+            IF ((XIn .LT. LB(iPar)) .OR. (XIn .GT. UB(iPar))) THEN
+              IF (((XIn .LT. -UB(iPar)) .OR. (XIn .GT. -LB(iPar)))) THEN ! Out of bounds            
+                OutOfBounds = .TRUE.
               ENDIF
             ENDIF
-          ELSEIF (UB(npar) * LB(npar) .GE. 0.0) THEN ! range such as 30-90 degs or -30- -90 defined
-              IF ((XIn .LT. -180.0) .OR. (XIn .GT. 180.0)) THEN
-                OutOfBounds = .TRUE.     
-              ELSE
-                IF ((XIn .LT. LB(npar)) .OR. (XIn .GT. UB(npar))) THEN
-                  IF (((XIn .LT. (-1)*UB(npar)) .OR. (XIn .GT. (-1)*LB(npar)))) THEN !out of bounds            
-                    OutOfBounds = .TRUE.
-                  ENDIF
-                ENDIF
-              ENDIF
           ENDIF
         CASE (3) !trimodal ranges
           xtem = XIn
-          CALL DetermineTriModalBounds(UB(npar), Upper)
-          CALL DetermineTriModalBounds(LB(npar), Lower)
+          CALL DetermineTriModalBounds(UB(iPar), Upper)
+          CALL DetermineTriModalBounds(LB(iPar), Lower)
           IF ((xtem .LT. -180.0) .OR. (xtem .GT.180.0)) THEN
             OutOfBounds = .TRUE.
           ELSE                 
             CALL CheckTriModalBounds(OneEightyScale)
-            IF (.NOT. OneEightyScale) THEN ! A range such as -170 to 170 has been defined
-              CALL OneEightytoThreeSixty(xtem)    ! so use 0-360 scale
+            IF (.NOT. OneEightyScale) THEN ! A range such as -10 to 10 has been defined
+              CALL OneEightytoThreeSixty(xtem)    ! so use 0 to 360 scale
               DO I = 1, 3
                 CALL OneEightyToThreeSixty(TempBounds(I,Upper))
                 CALL OneEightyToThreeSixty(TempBounds(I,Lower))
