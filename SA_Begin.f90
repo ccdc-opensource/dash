@@ -206,10 +206,18 @@
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
-      PARAMETER (msymmin=10)
-      CHARACTER*20 symline
-      COMMON /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
+
+      INTEGER     msymmin
+      PARAMETER ( msymmin = 10 )
+      INTEGER            nsymmin
+      REAL                        symmin
+      CHARACTER*20                                           symline
+      COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
  
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
+   10 IBMBER = 0
       OPEN(42,file='polys.ccl',status='unknown')
       WRITE(42,4210) 
  4210 FORMAT('N Determining the space group ')
@@ -229,6 +237,14 @@
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
+      IF (IBMBER .NE. 0) THEN
+        NumberSGTable = 1 ! P1
+        CALL ErrorMessage('Error while determining space group: space group reset to P1.')
+! Set the crystal system
+        LatBrav = GetCrystalSystem(NumberSGTable)
+        CALL Upload_CrystalSystem
+        GOTO 10
+      ENDIF
 
       END SUBROUTINE FillSymmetry
 !
