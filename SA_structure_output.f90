@@ -799,7 +799,6 @@
       WritePDBCommon = 1
       CALL InverseMatrix(f2cpdb,inv,3)
 ! Add in a Header record
-
 ! In the space group table file, rhombohedral and hexagonal axes for trigonal space groups
 ! are flagged with ":R" and ":H" respectively. According to the pdb specification:
 ! "For a rhombohedral space group in the hexagonal setting, the lattice type symbol used is H."

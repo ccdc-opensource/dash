@@ -378,6 +378,9 @@
 !O        CASE (IDD_SA_input2)
 !O          CALL DealWithWizardWindowParameterBounds
 !O          GOTO 10
+        CASE (IDD_ModalDialog)
+          CALL DealWithBiModalDialog()
+          GOTO 10
         CASE (IDD_SA_Modal_input2)
           CALL DealWithWizardWindowParameterBounds
           GOTO 10
