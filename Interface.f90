@@ -1017,7 +1017,7 @@
         RETURN
       ENDIF
       CALL SORT_REAL(AllPkPosVal,IOrdTem,NTPeak)
-! IOrdTem now contains and ordered list of pointers into AllPkPosVal
+! IOrdTem now contains an ordered list of pointers into AllPkPosVal
 ! JvdS @@ why not order the list itself?
       IF (NumOfRef .NE. 0) THEN
 ! Let's find the closest peaks and their distribution around the observed peak positions
@@ -1606,6 +1606,7 @@
 
       INCLUDE 'GLBVAR.INC'
 
+      CALL PushActiveWindowID
       IF (WMenuGetState(TheMode,ItemEnabled) .EQ. Disabled) THEN
         CALL DebugErrorMessage('Programming error: requested menu item is greyed out')
         CALL WMenuSetState(TheMode,ItemEnabled,Enabled)
@@ -1618,14 +1619,19 @@
           STATBARSTR(8)='Pawley refinement mode'
         CASE (ID_Structure_Solution_Mode)
           STATBARSTR(8)='Structure solution mode'
+          CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+          CALL WDialogPutRadioButton(IDF_PW_Option3)
         CASE (IDB_AnalyseSolutions)
           STATBARSTR(8)='Analyse solutions mode'
+          CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+          CALL WDialogPutRadioButton(IDF_PW_Option4)
       END SELECT
       CALL WindowOutStatusBar(8,STATBARSTR(8))
 ! Update the menu + the toolbar
       CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
       IDCurrent_Cursor_mode = TheMode
       CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
+      CALL PopActiveWindowID
       
       END SUBROUTINE SelectMode
 !
