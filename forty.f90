@@ -88,8 +88,8 @@
 
       INCLUDE 'REFLNS.INC'
 
-      COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
-     &                NSKTOT, KOM24
+      COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP, NSKTOT, KOM24
+
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
      &                ISYM(500), ILAT(500), CELLTR(3,500), XSLAK(3,500),&
      &                COSIN(3,3), IABASE(500), NST1, SLONLY, TOSTAR(6,6)&
@@ -106,6 +106,8 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
                       NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
+      INTEGER         IPK
+      REAL                 PIK
       COMMON /IPKCMN/ IPK, PIK(MIPK)
 
       INTEGER         KIPT,       KNIPT
@@ -131,6 +133,10 @@
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+
+      REAL            CummChiSqd
+      COMMON /CMN007/ CummChiSqd(MOBS)
+
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -207,7 +213,7 @@
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPTS)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MAXK)
 ! JCC Add in check on number of reflections here, so that code doesn't bomb out in the Pawley attempt
-        IF (MAXK.GT.400) THEN
+        IF (MAXK.GT.350) THEN
           FORTY = -1
           IF (IPK.NE.0) CLOSE (IPK,IOSTAT=istat)
           RETURN
@@ -324,6 +330,7 @@
           ELSE
             CALL RFACPR(5,PCXX) ! YCALC .EQ. 0.0, i.e. excluded region or just no peaks
           ENDIF
+          CummChiSqd(iPT) = SUMWD
 ! JCC Trap for any problems
           IF (IBMBER.GT.0) GOTO 950
 ! ADD DERIVATIVES IN TO LSQ MATRIX:
@@ -608,7 +615,6 @@
         ENDDO
    30   CONTINUE
       ENDDO
-!      IPOINT(1)=0
       KOUNT = 0
       DO KNOW = 1, MAXK
         ARGK = ZARGK(KNOW)

@@ -111,7 +111,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Plot_Panel()
+      SUBROUTINE Plot_Panel
 
       USE WINTERACTER
 
@@ -151,7 +151,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Plot_Initialise()
+      SUBROUTINE Plot_Initialise
 
       USE WINTERACTER
 
@@ -252,7 +252,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Plot_Background()
+      SUBROUTINE Plot_Background
 
       USE WINTERACTER
 
@@ -273,7 +273,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Plot_Observed_Profile()
+      SUBROUTINE Plot_Observed_Profile
 
       USE WINTERACTER
 
@@ -348,7 +348,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Plot_ObsCalc_Profile()
+      SUBROUTINE Plot_ObsCalc_Profile
 
       USE WINTERACTER
 
@@ -374,11 +374,23 @@
       INTEGER          IPMIN, IPMAX
       COMMON /PROFIPM/ IPMIN, IPMAX
 
-      REAL YDIF(MOBS), YADD
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+
+      REAL            CummChiSqd
+      COMMON /CMN007/ CummChiSqd(MOBS)
+
+      REAL    YDIF(MOBS), YADD
       LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
       INTEGER I, II 
-      REAL sizmtem, xtem, ytem, xgtem, ygtem
+      REAL    sizmtem, xtem, ytem, xgtem, ygtem
+      REAL    tScale
 
+! Rescale cummulative profile chi-squared
+      tScale = ypmax / CummChiSqd(NBIN)
+      DO i = 1, NBIN
+        CummChiSqd(i) = tScale * CummChiSqd(i)
+      ENDDO
       CALL IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
 ! The y-values of the difference profile.
@@ -386,7 +398,7 @@
       DO II = MAX(1,IPMIN-1), MIN(NBIN,IPMAX+1)
         YDIF(II) = YADD + YOBIN(II) - YCBIN(II)
       ENDDO
-      CALL IPgNewPlot(PgPolyLine,3,NBIN)
+      CALL IPgNewPlot(PgPolyLine,4,NBIN)
       CALL IPgStyle(2,0,0,0,KolNumDif,0)
 ! Q & D hack
       IF (ConnectPointsObs()) THEN
@@ -394,7 +406,10 @@
       ELSE
         CALL IPgStyle(1,0,3,0,0,KolNumObs)
       ENDIF
+! Calculated
       CALL IPgStyle(3,0,0,0,KolNumCal,0)
+! Cummulative profile chi-squared
+      CALL IPgStyle(4,0,0,0,KolNumMTic,0)
 ! The following four lines set the markers for the observed profile.
       CALL IPgMarker( 2, 13)
       sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
@@ -423,6 +438,7 @@
         ENDDO
       ENDIF
       CALL IPgXYPairs(XBIN,YCBIN)
+      CALL IPgXYPairs(XBIN,CummChiSqd)
       CALL IGrCharSize(1.0,1.0)
       CALL IGrColourN(KolNumMain)
 
@@ -430,7 +446,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Plot_PeakFit_Info()
+      SUBROUTINE Plot_PeakFit_Info
 !
 ! Plots all the information about the Peak Fitting Option
 ! Highlight (recolour) the peak fit range and label the peaks.
