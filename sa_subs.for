@@ -3,6 +3,8 @@
 !
       SUBROUTINE SimulatedAnnealing(imyexit)
 
+      USE WINTERACTER
+      USE DRUID_HEADER
       USE VARIABLES
 
       EXTERNAL FCN
@@ -13,20 +15,21 @@
       DOUBLE PRECISION XOPT,C,FSTAR,XP,FOPT
       COMMON /sacmn/ XOPT(NMAX),C(NMAX),FSTAR(MXEPS),XP(NMAX),FOPT
 
-      INTEGER NACP(NMAX), NS, NT, NFCNEV, ISEED1, ISEED2
       INTEGER MAXEVL, IPRINT, NACC
       LOGICAL MAXLOG,MAKET0
 
       COMMON /frgcom/ nfrag,lfrag(maxfrg)
       PARAMETER (mvar=100)
-      DOUBLE PRECISION x,lb,ub,vm,xpreset
+      DOUBLE PRECISION x,lb,ub,vm
       COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
+      DOUBLE PRECISION xpreset
       COMMON /presetr/ xpreset(mvar)
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
       DOUBLE PRECISION T,T0,rt,eps,target_value
       COMMON /saparl/ T0,rt,eps,target_value
+      INTEGER NACP(NMAX), NS, NT, NFCNEV, ISEED1, ISEED2
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
       COMMON /shadl/ log_shad(mvar)
       COMMON /shadi/ kshad(mvar)
@@ -41,9 +44,9 @@
 
 C  Type all internal variables.
       DOUBLE PRECISION FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
-      DOUBLE PRECISION  F, FP, P, PP, RATIO ,DX
+      DOUBLE PRECISION F, FP, P, PP, RATIO, DX
       DOUBLE PRECISION RANIN
-      INTEGER  NUP, NDOWN, NREJ, H, I, J, M
+      INTEGER NUP, NDOWN, NREJ, H, I, J, M
       INTEGER MRAN,MRAN1,IARR,IAR1
 
 C  Type all functions.
@@ -95,10 +98,42 @@ C    vs. Number of moves plots
       INTEGER ChiSqdChildWindows
       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin)
 
+      REAL bchmin, bpwval, bchpro, tempvl
+      REAL avchi1, avchi2, avchi3, avchi4
+      INTEGER nd1, nd2, nd3, nd4, IHANDLE
+      COMMON / sagdat / bchmin, bpwval, bchpro, 
+     &           tempvl, avchi1, avchi2, avchi3, avchi4, nd1, 
+     &           nd2, nd3, nd4, IHANDLE
+
+	INTEGER ilt
+      CHARACTER(LEN=MaxPathLength) temperfile
+
 C JCC Initialise PDB output records 
 
       CALL PDB_SymmRecords()
       CALL Init_MultiRun()
+! Load the 'temperature scale bar' into the dialogue
+! (this way, it is scaled to fit, I couldn't find another way to match the
+! width of the bitmap with the width of IDF_T_picture on the screen).
+      CALL WDialogSelect(IDD_SA_Action1)
+      temperfile = INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Images'
+     &//DIRSPACER//'temperature1.bmp'
+      ilt = LEN_TRIM(temperfile)
+      CALL IGrSelect(3,IDF_T_picture)
+      CALL IGrUnits(0.0,0.0,4.0,1.0)
+      CALL IGrLoadImage(temperfile(1:ilt))
+	IHANDLE = 0
+      CALL WBitmapGet(IHANDLE,0) ! 0 = whole drawable
+! Minimum chi squared
+      CALL IGrSelect(3,IDF_minchisq_picture)
+      CALL WBitmapPut(IHANDLE,0,0)
+! Average chi-squared
+      CALL IGrSelect(3,IDF_avchisq_picture)
+      CALL WBitmapPut(IHANDLE,0,0)
+! Profile chi squared
+      CALL IGrSelect(3,IDF_prochisq_picture)
+      CALL WBitmapPut(IHANDLE,0,0)
+
  1    CONTINUE ! The start point for multiple runs.
 c
 C  Set initial values.
@@ -129,9 +164,9 @@ c
       ITERATION = 1
       NACC = 0
       NFCNEV = 0
-      NTOTMOV=0
-      NP=0
-      RFIX=1E-3
+      NTOTMOV = 0
+      NP = 0
+      RFIX = 1E-3
       DO 10, I = 1, N
          XOPT(I) = X(I)
          NACP(I) = 0
@@ -205,7 +240,7 @@ C.. Use a quick and dirty one from NR
         PRJMAT2(II) = 0.0
       END DO
       nmpert=nt*ns*np
-      call sa_move_status(0,nmpert,0)
+      call sa_move_status(nmpert,0)
       DO 400, M = 1, NT
 C.. MRAN RANGE IS 0 -> IM=7875
          MRAN=MOD(MRAN*IA+IC,IM)
@@ -300,7 +335,7 @@ C  acceptance or rejection.
                END IF
 200         CONTINUE
             movenow=m*np*ns
-            CALL sa_move_status(1,nmpert,movenow)
+            CALL sa_move_status(nmpert,movenow)
             CALL sa_refresh(imyexit,iteration,num_new_min,cpb)
             IF ((imyexit .GT. 0) .AND. (imyexit .LE. 3)) THEN
 ! If we are here, the user pressed 'Stop & Edit'
