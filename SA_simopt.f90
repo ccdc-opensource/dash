@@ -76,13 +76,11 @@
       ENDIF
       N = NPAR
       IF (PrefParExists) THEN
-!O! Jvds 4 July 2002. Problem here: PO_PRECFC() uses X(MVAR), the current values, whereas we want to use 
-!O! XOPT(MVAR), the best values so far.
-!O! Quick fix...
+! Jvds 4 July 2002. Problem here: PO_PRECFC() uses X(MVAR), the current values, whereas we want to use 
+! XOPT(MVAR), the best values so far.
+! Quick fix...
         tX147 = X(iPrfPar)
         X(iPrfPar) = XOPT(iPrfPar)
-        CALL PO_PRECFC
-        IF ((UB(iPrfPar) - LB(iPrfPar)) .GT. 1.0D-3) N = NPAR - 1
       ENDIF
       DO II = 1, N
         I = IP(II)
@@ -140,12 +138,17 @@
 !
       REAL FUNCTION SA_FCN(N,P)
 
+      USE PO_VAR
+
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
 
       REAL P(MVAR)
       INTEGER N
+
+      DOUBLE PRECISION x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
       DOUBLE PRECISION XOPT,       C,       FOPT
       COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
@@ -166,6 +169,11 @@
         I = IP(II)
         DBLEP(I) = DBLE(P(II))
       ENDDO
+      IF (PrefParExists) THEN
+! PO_PRECFC() uses X(MVAR)
+        X(iPrfPar) = DBLEP(iPrfPar)
+        CALL PO_PRECFC
+      ENDIF
       CALL FCN(DBLEP,CHIANS,0)
       SA_FCN = SNGL(CHIANS)
 
