@@ -1205,11 +1205,11 @@
 
       IMPLICIT NONE
 
+      REAL, EXTERNAL :: Radians2Degrees
       REAL X1(3), X2(3), X3(3), ANGLE
       REAL U(3), V(3), DU, DV, COSA
       REAL RTOL
       PARAMETER (RTOL=0.000001)
-      REAL, EXTERNAL :: Radians2Degrees
 
       CALL SAMVEC(X2,X1,U,DU)
       CALL SAMVEC(X2,X3,V,DV)

@@ -319,10 +319,10 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER iOption, NumOfFileTypes, iRow, iStatus, NumSelSol, CheckedSol(1:5)
       CHARACTER(100) LineStr(0:5)
       INTEGER iLine, I, J
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       CHARACTER(MaxPathLength) tFileName
       INTEGER tLen
       CHARACTER(50) BaseStr
@@ -463,11 +463,11 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       CHARACTER(4) ExtStr(1:6)
       INTEGER      ExistingFiles(1:6) ! per extension
       INTEGER iOption, NumOfFileTypes, iStatus
       INTEGER tLen, tLen2, I, J, tExitButton
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       CHARACTER(MaxPathLength) tFileName
       CHARACTER(3) RunNumStr
       LOGICAL OutputExists, OverwriteAll, WriteThisFile

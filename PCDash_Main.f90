@@ -11,6 +11,8 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: Read_One_zm, DiffractionFileOpen
+      LOGICAL, EXTERNAL :: FnPatternOK
       INTEGER IWID, IWIDTHS(10)
       CHARACTER(MaxPathLength) ArgString, tDirName, tFileName
       CHARACTER(7) StrFileExtension ! maximum = 7 = .zmatrix
@@ -19,8 +21,6 @@
       CHARACTER(80) tZmatrices(10)
       INTEGER       tNextzmNum
       INTEGER       tCounter
-      INTEGER, EXTERNAL :: Read_One_zm, DiffractionFileOpen
-      LOGICAL, EXTERNAL :: FnPatternOK
 
 ! The following variables are there to allow the dialogue fields in the
 ! window dealing with Z-matrices to be handled by DO...ENDDO loops.
@@ -377,10 +377,10 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
+      LOGICAL, EXTERNAL :: FnWavelengthOK
       CHARACTER(MaxPathLength) :: tFileName
       CHARACTER(LEN=45) :: FILTER
       INTEGER iFlags, hFile, I
-      LOGICAL, EXTERNAL :: FnWavelengthOK
       
       iFlags = SaveDialog + AppendExt + PromptOn
       FILTER = 'Powder diffraction files (*.xye)|*.xye|'

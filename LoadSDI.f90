@@ -116,12 +116,12 @@
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
 
+      INTEGER, EXTERNAL :: GetCrystalSystem, GETTIC
       CHARACTER(LEN = MaxPathLength) :: line
       INTEGER nl
       CHARACTER*12 KeyChar
       INTEGER i
       INTEGER ihcver,ipiker,iloger,idsler
-      INTEGER, EXTERNAL :: GetCrystalSystem, GETTIC
       INTEGER iHandle
       LOGICAL TicExists
       LOGICAL HcvExists
@@ -406,8 +406,8 @@
       INTEGER         IHCOV
       COMMON /CORHES/ IHCOV(30,MaxRef)
 
-      INTEGER KK, I, NLIN, NCOR, iR, II, JJ, IK, MINCOR, KL
       INTEGER, EXTERNAL :: GetNumOfColumns
+      INTEGER KK, I, NLIN, NCOR, iR, II, JJ, IK, MINCOR, KL
       INTEGER hFile
 
       iErr = 1

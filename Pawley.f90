@@ -179,6 +179,10 @@
       DATA    SpaceGroupDetermination /.FALSE./
       COMMON /SGFLAG/ SpaceGroupDetermination
 
+      INTEGER, EXTERNAL :: Quick_Pawley_Fit, GETTIC
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      REAL, EXTERNAL :: DEGREE
+      LOGICAL, EXTERNAL :: SaveProject
 ! Save the boxes from Pawley fit to Pawley fit
       REAL RLastValues(3)
       INTEGER ILastValues(2)
@@ -188,15 +192,11 @@
 ! Local variables logging errors in the pawley fit
       INTEGER IDUMMY, ipt
       INTEGER PawleyErrorLog  
-      INTEGER, EXTERNAL :: Quick_Pawley_Fit, GETTIC
-      REAL, EXTERNAL :: DEGREE
       INTEGER ieocc, II, JJ
       LOGICAL LastValuesSet
       SAVE    LastValuesSet
-      LOGICAL, EXTERNAL :: SaveProject
       INTEGER Ilen, IER
       CHARACTER(MaxPathLength) SDIFile
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER Inum
       CHARACTER(MaxPathLength) :: CurrentDirectory
       LOGICAL Exists

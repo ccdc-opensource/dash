@@ -310,10 +310,10 @@
 
       INCLUDE 'PARAMS.INC'
 
-      CHARACTER(MaxPathLength) CTEMP
-      INTEGER ISTAT
       INTEGER, EXTERNAL :: DiffractionFileBrowse, DiffractionFileOpen
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
+      CHARACTER(MaxPathLength) CTEMP
+      INTEGER ISTAT
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page3)
@@ -444,11 +444,11 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-      REAL Temp
-      INTEGER IRadSelection
       REAL, EXTERNAL :: TwoTheta2dSpacing
       LOGICAL, EXTERNAL :: FnWavelengthOK
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      REAL Temp
+      INTEGER IRadSelection
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page4)
@@ -503,9 +503,9 @@
 
       IMPLICIT NONE
 
-      REAL    tMin, tMax
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
       REAL, EXTERNAL :: TwoTheta2dSpacing
+      REAL    tMin, tMax
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
@@ -555,9 +555,9 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
-      REAL tReal, tMin, tMax
       REAL, EXTERNAL :: TwoTheta2dSpacing, dSpacing2TwoTheta
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
+      REAL tReal, tMin, tMax
       INTEGER tFieldState
 
       CALL PushActiveWindowID
@@ -653,8 +653,8 @@
 
       INCLUDE 'lattice.inc'
 
-      INTEGER tInt1, tInt2
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER tInt1, tInt2
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
@@ -847,8 +847,8 @@
 
       INCLUDE 'GLBVAR.INC'
 
-      INTEGER IndexOption
       LOGICAL, EXTERNAL :: FnUnitCellOK
+      INTEGER IndexOption
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page7)
@@ -928,8 +928,8 @@
 
       INTEGER, INTENT (IN   ) :: TheCrystalSystem 
 
-      CHARACTER*20 tString
       CHARACTER*20, EXTERNAL :: Integer2String
+      CHARACTER*20 tString
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_DICVOLRunning)
@@ -987,12 +987,12 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
+      LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm, WDialogGetCheckBoxLogical
+      REAL,    EXTERNAL :: TwoTheta2dSpacing
       REAL    Rvpar(2), Rdens, Rmolwt, Rexpzp
       LOGICAL system(6)
       INTEGER I, iOrd, iHandle, NumDoF, iLen
       REAL    Epsilon, MaxLen, MaxSinBeta, tBeta
-      LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm, WDialogGetCheckBoxLogical
-      REAL,    EXTERNAL :: TwoTheta2dSpacing
       CHARACTER*2 nStr
 
       CALL PushActiveWindowID
@@ -1305,11 +1305,11 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
+      INTEGER, EXTERNAL :: DiffractionFileBrowse, DiffractionFileOpen
       INTEGER IRadSelection
       CHARACTER(LEN=MaxPathLength) CTEMP
       REAL    Temp
       INTEGER ISTAT
-      INTEGER, EXTERNAL :: DiffractionFileBrowse, DiffractionFileOpen
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page2)

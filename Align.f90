@@ -110,8 +110,6 @@
       INTEGER Odd, IZ
       REAL Atomtwoz, AtomOnez
 
-      EXTERNAL ErrorMessage
-
 !
 !--------- Check to see if align algorithm should be applied-----------
 ! For now, if the space group is trigonal, hexagonal or cubic, does not attempt alignment.  

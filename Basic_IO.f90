@@ -188,7 +188,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE RegisterChildWindow(TheIHANDLE,TheSubroutine)
+      SUBROUTINE RegisterChildWindow(TheIHANDLE, TheSubroutine)
 !
 ! This routine 'registers' a child window with the GetEvent routines.
 ! For each child window, it stores the address of the subroutine

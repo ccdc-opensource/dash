@@ -43,8 +43,8 @@
       COMMON /CCSLER/ IBMBER
 
       LOGICAL, EXTERNAL :: Check_TicMark_Data
-      INTEGER I, isym
       INTEGER, EXTERNAL :: GETTIC
+      INTEGER I, isym
 
 ! Need more checks here.
 ! I think that everything should be set to continue

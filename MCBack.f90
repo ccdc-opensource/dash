@@ -46,8 +46,8 @@
 
       IMPLICIT NONE
 
-      INTEGER tInt1, tInt2
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER tInt1, tInt2
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Background_Fit)

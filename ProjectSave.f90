@@ -14,10 +14,10 @@
 
       IMPLICIT NONE      
 
+      INTEGER, EXTERNAL :: PrjSave
       CHARACTER(MaxPathLength) :: tFileName
       CHARACTER(LEN=45) :: FILTER
       INTEGER iFLAGS
-      INTEGER, EXTERNAL :: PrjSave
       
 ! Save the project file
       PrjSaveAs = 1 ! Failure
@@ -445,8 +445,8 @@
       INTEGER         ErrCounter
       COMMON /CMN008/ ErrCounter
 
-      INTEGER tInteger
       CHARACTER*20, EXTERNAL :: Integer2String
+      INTEGER tInteger
       
       tInteger = 10101
       CALL FileRWInteger(hPrjFile,iPrjRecNr,iPrjReadOrWrite,tInteger)

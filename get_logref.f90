@@ -19,6 +19,7 @@
       INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX
       COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX
 
+      INTEGER, EXTERNAL :: GETTIC
 !     The following integers represent h,k,l,h+k,h+l,k+l and h+k+l
       INTEGER H_, K_, L_, HPK, HPL, KPL, HPKPL
 !     The following integers represent the previous integers, divided by 2
@@ -26,7 +27,6 @@
       INTEGER H_m, K_m, L_m, HPKm, HPLm, KPLm, HPKPLm
       INTEGER IR, JHMAX, JHMIN, Item, IREMAIN, LL, LLM
       INTEGER IIMIN, IIMAX
-      INTEGER, EXTERNAL :: GETTIC
 
       IHMIN = iHKL(1,1)
       IKMIN = iHKL(2,1)

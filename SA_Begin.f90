@@ -300,13 +300,13 @@
       CHARACTER*10 filnam_root
       COMMON /commun/ filnam_root
 
+      INTEGER, EXTERNAL :: GetCrystalSystem
+      REAL, EXTERNAL :: VCTMOD, SCLPRD
       CHARACTER*6 PNAME
       INTEGER hFile, iSym
-      INTEGER, EXTERNAL :: GetCrystalSystem
       REAL phases(1:48), RefHT(1:3,1:48)
       REAL PrfDir(1:3), H(1:3), RefLen
       INTEGER i, ii, iR
-      REAL, EXTERNAL :: VCTMOD, SCLPRD
 
    10 IBMBER = 0
       hFile = 42

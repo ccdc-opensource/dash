@@ -121,12 +121,12 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
+      INTEGER, EXTERNAL :: HKLFFileBrowse, HKLFFileOpen
+      LOGICAL, EXTERNAL :: SaveProject
       INTEGER IRadSelection
       CHARACTER(LEN=MaxPathLength) CTEMP
       REAL    Temp
       INTEGER iErr
-      INTEGER, EXTERNAL :: HKLFFileBrowse, HKLFFileOpen
-      LOGICAL, EXTERNAL :: SaveProject
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SX_Page2)
@@ -192,10 +192,10 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: HKLFFileOpen
       CHARACTER(LEN=60) FILTER
       INTEGER           IFLAGS, IFTYPE 
       CHARACTER(LEN=MaxPathLength) tFileName
-      INTEGER, EXTERNAL :: HKLFFileOpen
 
       HKLFFileBrowse = 1
       IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
@@ -238,9 +238,9 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
+      INTEGER, EXTERNAL :: HKLFFileLoad
       LOGICAL FExists
       INTEGER KLEN
-      INTEGER, EXTERNAL :: HKLFFileLoad
 
       HKLFFileOpen = 1
       KLEN = LEN_TRIM(TheFileName)

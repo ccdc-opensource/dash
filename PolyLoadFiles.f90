@@ -24,11 +24,11 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: DiffractionFileOpen
       CHARACTER(LEN=200)  FILTER
       INTEGER             IFLAGS
       INTEGER             IFTYPE    ! Needed for Winteracter routine
       CHARACTER(LEN=MaxPathLength) tFileName
-      INTEGER, EXTERNAL :: DiffractionFileOpen
 
       IFLAGS = LoadDialog + DirChange + PromptOn
 ! It seems that Winteracter cannot cope with strings of this length
@@ -148,8 +148,6 @@
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
 
-      INTEGER          KLEN
-      CHARACTER(LEN=4) EXT4
       INTEGER, EXTERNAL :: Load_cpi_File
       INTEGER, EXTERNAL :: Load_dat_File
       INTEGER, EXTERNAL :: Load_mdi_File
@@ -161,6 +159,8 @@
       INTEGER, EXTERNAL :: Load_uxd_File
       INTEGER, EXTERNAL :: Load_xye_File
       INTEGER, EXTERNAL :: Load_x01_File
+      INTEGER          KLEN
+      CHARACTER(LEN=4) EXT4
       INTEGER          ISTAT
       INTEGER          I
       INTEGER          POS
@@ -320,14 +320,14 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      INTEGER, EXTERNAL :: GetNumOfColumns
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption
       CHARACTER*255 tString ! String containing last line read from file
       INTEGER       I, NumOfBins
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       INTEGER       hFile
-      INTEGER, EXTERNAL :: GetNumOfColumns
       REAL          Lambda1
       CHARACTER*2   Anode
-      REAL, EXTERNAL :: FnWavelengthOfMenuOption
 
 ! Current status, initialise to 'error'
       Load_cpi_File = 1
@@ -470,12 +470,12 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      INTEGER, EXTERNAL :: GetNumOfColumns
       CHARACTER*255 Cline ! String containing last line read from file
       INTEGER       I, J, NumOfBins
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       REAL          TempInput(8) ! Max. num. of columns is 8
       INTEGER       NumOfColumns2Read, hFile
-      INTEGER, EXTERNAL :: GetNumOfColumns
 
 ! Current status, initialise to 'error'
       Load_dat_File = 1
@@ -603,13 +603,13 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      REAL, EXTERNAL :: WavelengthOf, FnWavelengthOfMenuOption
       CHARACTER*255 tString ! String containing last line read from file
       CHARACTER*255 tSubString
       INTEGER       I, NumOfBins, hFile, iDummy
       REAL          Lambda1
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta, rDummy
       CHARACTER*2   Anode
-      REAL, EXTERNAL :: WavelengthOf, FnWavelengthOfMenuOption
       CHARACTER*2 ListIn, ListOut
 
 ! Current status, initialise to 'error'
@@ -883,6 +883,7 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      REAL, EXTERNAL :: WavelengthOf
       INTEGER      I, NumOfBins
       REAL         Lambda1
       REAL*8       TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
@@ -901,7 +902,6 @@
       CHARACTER*2  Version
       INTEGER      Offset, hFile
       LOGICAL      CONTINUOUS
-      REAL, EXTERNAL :: WavelengthOf
 
 ! Current status, initialise to 'error'
       Load_rd_File  = 1
@@ -1125,11 +1125,11 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      INTEGER, EXTERNAL :: GetNumOfColumns, StrFind
+      REAL, EXTERNAL :: WavelengthOf
       CHARACTER*255 Cline, tString, tSubString
       INTEGER       I, NumOfBins, hFile, tLen
       LOGICAL       ReadWarning
-      INTEGER, EXTERNAL :: GetNumOfColumns, StrFind
-      REAL, EXTERNAL :: WavelengthOf
       REAL          Lambda1
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       LOGICAL       IsCPS, ContainsESDs, ContainsAngles, Contains2ThetaInfo, CountsLineFound
@@ -1436,13 +1436,13 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      REAL, EXTERNAL :: WavelengthOf
       CHARACTER*255 Cline ! String containing last line read from file
       CHARACTER*255 tSubString
       INTEGER       I, NumOfBins, hFile
       REAL          Lambda1
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       CHARACTER*2   Anode
-      REAL, EXTERNAL :: WavelengthOf
 
 ! Current status, initialise to 'error'
       Load_udf_File = 1
@@ -1635,6 +1635,9 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      INTEGER, EXTERNAL :: GetNumOfColumns
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
+      REAL, EXTERNAL :: WavelengthOf
       CHARACTER*511 Cline ! String containing last line read from file
       INTEGER       J, MaxNumOfBins
       REAL          Lambda1
@@ -1647,9 +1650,6 @@
       INTEGER       COUNTS, THETACOUNTS, THETACOUNTSTIME
       PARAMETER    (COUNTS = 1, THETACOUNTS = 2, THETACOUNTSTIME = 3)
       INTEGER       MaxNumOfColumns, NumOfColumns2Read
-      INTEGER, EXTERNAL :: GetNumOfColumns
-      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
-      REAL, EXTERNAL :: WavelengthOf
       INTEGER       KeyWordPos, KeyWordLen, StrLen, I, hFile
 
 ! Current status, initialise to 'error'
@@ -1924,11 +1924,11 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption
+      INTEGER, EXTERNAL :: GetNumOfColumns
       CHARACTER*255 Cline
       INTEGER       I, IS, hFile
       LOGICAL       ReadWarning
-      REAL, EXTERNAL :: FnWavelengthOfMenuOption
-      INTEGER, EXTERNAL :: GetNumOfColumns
       REAL          Lambda1
 
 ! Initialise to failure
@@ -2053,11 +2053,11 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      INTEGER, EXTERNAL :: GetNumOfColumns, StrFind
+      REAL, EXTERNAL :: WavelengthOf
       CHARACTER*255 Cline, tString, tSubString
       INTEGER       I, NumOfBins, hFile, tLen
       LOGICAL       ReadWarning
-      INTEGER, EXTERNAL :: GetNumOfColumns, StrFind
-      REAL, EXTERNAL :: WavelengthOf
       REAL          Lambda1
       REAL          cps
 

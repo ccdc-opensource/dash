@@ -526,9 +526,6 @@
       INTEGER     BFIOErrorCode
       COMMON /IO/ BFIOErrorCode
 
-      CHARACTER*MaxPathLength tFileName
-      CHARACTER*MaxPathLength DefaultWorkingDir
-      INTEGER    RecNr
       LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, SaveCCL, SaveCIF, SaveRES,  &
                            Get_ColourFlexibleTorsions, ConnectPointsObs,  &
                            PlotErrorBars, PlotBackground,                 &
@@ -538,6 +535,9 @@
                            Get_AutoLocalMinimisation, Get_DivideByEsd
       LOGICAL, EXTERNAL :: UseHydrogensDuringAuto, Get_ShowCumChiSqd, Get_AutoAlign
       REAL, EXTERNAL :: WavelengthOf
+      CHARACTER*MaxPathLength tFileName
+      CHARACTER*MaxPathLength DefaultWorkingDir
+      INTEGER    RecNr
       INTEGER*4 tInteger
       REAL*4    tReal
       INTEGER RW, hFile

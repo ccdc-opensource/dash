@@ -56,9 +56,9 @@
                       SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
       EXTERNAL DealWithProfilePlot
+      CHARACTER(20), EXTERNAL :: Integer2String
       INTEGER  I, iHandle, TheRunNr
       REAL     rDummy
-      CHARACTER(20), EXTERNAL :: Integer2String
 !
 !   open the plotting window, iHandle is the window's unique identifier
 !     
@@ -68,20 +68,20 @@
         CALL ErrorMessage("Exceeded maximum number of allowed windows.  Close a profile window.")
         RETURN
       ENDIF 
-      CALL RegisterChildWindow(iHandle,DealWithProfilePlot)
+      CALL RegisterChildWindow(iHandle, DealWithProfilePlot)
       SAUsedChildWindows(iHandle) = 1
       CALL WindowSelect(iHandle)
       CALL WindowClear
 
 ! Fill Xato
       DO I = 1, NATOM
-        Xato(1,I) = XAtmCoords(1,I,TheRunNr)
-        Xato(2,I) = XAtmCoords(2,I,TheRunNr)
-        Xato(3,I) = XAtmCoords(3,I,TheRunNr)
+        Xato(1,I) = XAtmCoords(1, I, TheRunNr)
+        Xato(2,I) = XAtmCoords(2, I, TheRunNr)
+        Xato(3,I) = XAtmCoords(3, I, TheRunNr)
       ENDDO
 ! Fill Preferred Orientation part
       IF (PrefParExists) THEN
-        CALL PO_PRECFC(BestValuesDoF(iPrfPar,TheRunNr))
+        CALL PO_PRECFC(BestValuesDoF(iPrfPar, TheRunNr))
       ENDIF
 ! VALCHI fills BICALC
       CALL VALCHI(rDummy,0)    ! Structural part

@@ -42,14 +42,6 @@
       REAL          RULB
       COMMON /RULB/ RULB(Mvar)
 
-      REAL RANARR(30000), RANAR1(30000)
-      REAL DXVAV(mvar), XVSIG(mvar), FLAV(mvar)
-      REAL X0SUM(mvar), XSUM(mvar), XXSUM(mvar)
-      REAL XDSS(mvar), A0SUM(mvar)
-
-!  Type all functions.
-      REAL, EXTERNAL :: EXPREP
-
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
 
@@ -89,6 +81,7 @@
       INTEGER              iMyExit, num_new_min
       COMMON / CMN000001 / iMyExit, num_new_min
 
+      REAL, EXTERNAL :: EXPREP
       LOGICAL, EXTERNAL :: Get_AutoLocalMinimisation, IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
       INTEGER NACC
@@ -101,7 +94,10 @@
       INTEGER MRAN, MRAN1, IARR, IAR1
       REAL T
       INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
-
+      REAL RANARR(30000), RANAR1(30000)
+      REAL DXVAV(mvar), XVSIG(mvar), FLAV(mvar)
+      REAL X0SUM(mvar), XSUM(mvar), XXSUM(mvar)
+      REAL XDSS(mvar), A0SUM(mvar)
       INTEGER IM, IA, IC
       INTEGER JRAN, num_old_min, NTOTMOV
       INTEGER III, IH, KK, iFrg
@@ -787,9 +783,9 @@
       REAL             x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
-      INTEGER IV
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: RANMAR
+      INTEGER IV
 
 ! Get the "IDF_RandomInitVal" checkbox
       CALL PushActiveWindowID

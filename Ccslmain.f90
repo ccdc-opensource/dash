@@ -5686,10 +5686,10 @@
       DATA ISMBO1/'.', ',', ':', ';', '!', '?', '''', '"', '$', '/',    &
      &     '(', ')', '|', '-', '+', '=', '*', '#', '&', '>', '<'/
 
+      INTEGER, EXTERNAL :: DateToday
       CHARACTER*8  tDate      ! '20010215' for 15 Feb 2001
       CHARACTER*17 DateStr
       CHARACTER*9  MonthStr
-      INTEGER, EXTERNAL :: DateToday
       INTEGER tLen
 !
 ! FOR THE CONVENIENCE OF THOSE WHO FIND THE ABOVE STATEMENT EYE-CROSSING,

@@ -23,17 +23,17 @@
 !  C      1.4929873  0  113.1748255  0 -179.7006193  1   55   52   49  3.0  1.0   38 C7 C8 C9 C1
 !  C      1.5029990  0  113.0372990  0  179.9092170  0   57   54   51  3.0  1.0   59 C5 C6 C7 C8
 !
+      INTEGER, EXTERNAL :: GetNumOfColumns
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
       CHARACTER*255 line
       CHARACTER*255 tSubString
       INTEGER ErrorStatus
       REAL ta, tb, tc, talpha, tbeta, tgamma
       INTEGER I, J, NumCol
-      INTEGER, EXTERNAL :: GetNumOfColumns
-      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
       INTEGER nlin, natof
       INTEGER AsymLen, IDlen
       CHARACTER*3 tIDstr
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
 ! JCC Initialise return value to successful (zero)
 ! If the return value is non-zero, then an error occurred. The return status corresponds
