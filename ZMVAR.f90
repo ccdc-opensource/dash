@@ -98,6 +98,13 @@
       INTEGER          icomflg(0:maxfrg)
       REAL             AtomicWeighting(1:maxatm,0:maxfrg)
       LOGICAL          UseQuaternions(0:maxfrg)
+! icomflg         = Centre of mass flag.
+!                   0 = use centre of mass of molecule as centre of rotation
+!           otherwise = use atom number icomflg as centre of rotation (necessary if atom on special position)
+! AtomicWeigthing = Weight of that atom used for calculating centre of mass.
+!  if all weights = 1.0 : geometric centre of mass
+! UseQuaternions    .TRUE.  : all rotations allowed, described by 4 quaternions
+!                   .FALSE. : only rotations about a single axis allowed (e.g. when on special position)
 
 ! We want to have some variables that specify the orientation of the Z-matrix when 
 ! rotation is restricted to a single axis      
@@ -112,13 +119,6 @@
       INTEGER          zmSingleRotAxAtms(1:3,0:maxfrg)
       DOUBLE PRECISION zmSingleRotationQs(0:3,0:maxfrg)
 
-! icomflg         = Centre of mass flag.
-!                   0 = use centre of mass of molecule as centre of rotation
-!           otherwise = use atom number icomflg as centre of rotation (necessary if atom on special position)
-! AtomicWeigthing = Weight of that atom used for calculating centre of mass.
-!  if all weights = 1.0 : geometric centre of mass
-! UseQuaternions    .TRUE.  : all rotations allowed, described by 4 quaternions
-!                   .FALSE. : only rotations about a single axis allowed (e.g. when on special position)
 ! zmSingleRotAxAtm
 ! zmSingleRotAxFrac
 ! zmSingleRotAxAtms : the three atoms defining a plane thenormal of which is the direction of rotation
@@ -141,7 +141,7 @@
 !          3 = torsion        (1 D.O.F. per flexible torsion)
 !          4 = valence angle
 !          5 = bond length
-!          6 = rotation about a single axis (also 4 D.O.F., could be made 1 or 2)
+!          6 = rotation about a single axis (2 D.O.F.)
 ! kzmpar2 = as kzmpar, but per parameter rather than per Z-matrix per parameter.
 !           This way, e.g. preferred orientation (which doesn't belong to a Z-matrix)
 !           can be dealt with.
