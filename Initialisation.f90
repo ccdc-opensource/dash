@@ -90,6 +90,7 @@
       CALL WDialogLoad(IDD_Background_Fit)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
       CALL WDialogLoad(IDD_DV_Results)
+      CALL WDialogLoad(IDD_LicenceAgreement)
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
