@@ -280,7 +280,7 @@ C..   Check the space group
 !
       LOGICAL :: NODATA
       LOGICAL           :: SKIP    = .FALSE.
-      INTEGER           :: I,IDNUMBER,IPW_Option
+      INTEGER           :: I,IDNUMBER
      
       INCLUDE 'statlog.inc'
       INCLUDE 'DialogPosCmn.inc'
@@ -798,7 +798,7 @@ C..   Check the space group
 !
       LOGICAL :: NODATA
       LOGICAL           :: SKIP    = .FALSE.
-      INTEGER           :: I,IDNUMBER,IPW_Option
+      INTEGER           :: I,IDNUMBER
       INCLUDE 'statlog.inc'
 	INCLUDE 'params.inc'
 C>> JCC Cell/lattice declarations now in an include file

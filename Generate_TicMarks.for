@@ -12,7 +12,7 @@ C..   Check the lattice constants
 C..   Check the wavelength
 C..   Check the space group
       LOGICAL           :: SKIP    = .FALSE.
-      INTEGER           :: I,IDNUMBER,IPW_Option
+      INTEGER           :: I,IDNUMBER
       INCLUDE 'statlog.inc' 
 C
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,

@@ -304,12 +304,6 @@
             CALL WDialogSelect(EventInfo%WIN)
             CALL WDialogHide()
           END IF
-        CASE (IDF_Dismiss_StrInf)
-          CALL DebugErrorMessage('dkfhsd')
-        CASE (IDF_Data_Download)
-! Download the data from the structural information pages
-          CALL Check_Crystal_Symmetry()
-          CALL DownloadWavelength(IDD_Data_Properties)        
         CASE(ID_Index_Output)
 ! Set the wavelength
           CALL DownLoadWavelength(IDD_Data_Properties)
@@ -863,9 +857,6 @@
       REAL ARGKPLT(10),DSPLT(10)
       INTEGER IHPLT(3,10)
       INCLUDE 'Poly_Colours.inc'
-      REAL CHAR_SIZE,MARKER_SIZE
-      LOGICAL ERROR_BAR
-      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
       COMMON /CURVAL/ XCurFirst,YCurFirst
 
       INTEGER CurrentRange 
@@ -1261,9 +1252,6 @@
       REAL ARGKPLT(10),DSPLT(10)
       INTEGER IHPLT(3,10)
       INCLUDE 'Poly_Colours.inc'
-      REAL CHAR_SIZE,MARKER_SIZE
-      LOGICAL ERROR_BAR
-      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
 
       INTEGER CurrentRange 
       COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
