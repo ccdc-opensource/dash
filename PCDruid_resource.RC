@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 21/May/2002 14:11:55
+// Modified : 29/May/2002 11:45:48
 //
 ///////////////////////////////////////////////////
 //
@@ -626,7 +626,6 @@
 #define IDD_ViewPawley                    127
 #define IDB_ClearAll                     1406
 #define IDM_ViewPawley                  40030
-#define IDF_PO_G1                        1407
 #define IDF_CHECK7                       1248
 #define IDF_ShowCumChiSqd                1408
 #define IDD_OutputSolutions               128
@@ -3669,8 +3668,6 @@ BEGIN
     CONTROL "",IDF_Sigma2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   69,   30,   30,   14
     CONTROL "",IDF_Gamma1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  165,   15,   30,   14
     CONTROL "",IDF_Gamma2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  165,   30,   30,   14
-    CONTROL "Preferred orientation",IDF_LABEL10,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   93,   76,    8
-    CONTROL "",IDF_PO_G1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,   85,   91,   40,   14
 END
 
 IDD_ViewPawley RCDATA
