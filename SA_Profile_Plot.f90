@@ -34,15 +34,15 @@
       COMMON /YSTORE/ ZCAL(MPPTS),ZBAK(MPPTS)
       COMMON /ZSTOR1/ ZXDELT,IIMIN,IIMAX,XDIFT,XMINT
 !
-      COMMON /PLTYPE/ IPTYPE
-!
 
       COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
      itypot(mobstic),iordot(mobstic),&
      uobstic(20,mobstic),zobstic(20,mobstic)
 
       COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-      include 'statlog.inc'
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'statlog.inc'
 !
 !
       COMMON /CHISTOP/ NOBSA,NFITA,IFITA(MCHSTP),CHIOBSA,&
