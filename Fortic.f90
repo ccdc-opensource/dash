@@ -48,8 +48,11 @@
       CALL PARSPR(MAGROU)
 ! MAKE LIST OF REFLECTION INDICES:
       CALL INRFPR(PCXX,PFXX)
+
+! When we are here, MAXKK(1) contains the maximum reflection
+
 ! Check if we have too many reflections
-      CALL CHKMAXREF
+   !   CALL CHKMAXREF
 ! OUTPUT H,K,L IF REQUIRED:
       CALL HKLOUT(PCXX,ALSQ,MATSZ)
 
