@@ -98,8 +98,6 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
-      INTEGER GetCrystalSystemFromUnitCell ! Function
-
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Structural_Information)
       SELECT CASE (EventType)
@@ -108,7 +106,6 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK) ! The 'OK' button
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
-              CALL SetCrystalSystem(GetCrystalSystemFromUnitCell())
               CALL Upload_Cell_Constants
               CALL DownloadWavelength(IDD_Data_Properties)
               CALL Generate_TicMarks
@@ -261,7 +258,6 @@
       INCLUDE 'LATTICE.INC'
       INCLUDE 'statlog.inc'
 
-      INTEGER GetCrystalSystemFromUnitCell ! Function
       INTEGER SGNrMenu2Table ! Function
       REAL    tReal
       LOGICAL ValidCellAxisLength, NearlyEqual ! Functions
@@ -277,7 +273,6 @@
               CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_Zero_Point
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
-              CALL SetCrystalSystem(GetCrystalSystemFromUnitCell())
               CALL Generate_TicMarks
             CASE DEFAULT
               CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 1')
@@ -325,12 +320,10 @@
               IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
                 CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
                 CALL UserSetCrystalSystem(LatBrav)
-                CALL SetSpaceGroupMenu
                 CALL Generate_TicMarks
               ENDIF
             CASE (IDF_Space_Group_Menu)  
               IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
-!O                CALL Update_Space_Group(IDD_Crystal_Symmetry)
                 CALL WDialogGetMenu(IDF_Space_Group_Menu,ISPosSG)
                 NumberSGTable = SGNrMenu2Table(ISPosSG)
 ! Update the wizard
@@ -423,7 +416,6 @@
       INCLUDE 'lattice.inc'
 
       LOGICAL FnUnitCellOK ! Function
-      INTEGER GetCrystalSystemFromUnitCell ! Function
 
       CALL PushActiveWindowID
 ! Update values of constrained cell parameters to match the parameters they're constrained to
@@ -453,8 +445,6 @@
       IF (FnUnitCellOK()) THEN
 ! Enable the wizard next button
         CALL WDialogFieldState(IDNEXT,Enabled)
-        CALL SetCrystalSystem(GetCrystalSystemFromUnitCell())
-        CALL SetSpaceGroupMenu
       ELSE
 ! Disable the wizard next button
         CALL WDialogFieldState(IDNEXT,Disabled)
@@ -463,17 +453,6 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE UpdateCell
-!
-!*****************************************************************************
-!
-!U!O      NumBrSG = LPosSG(LatBrav+1) - LPosSG(LatBrav)
-!U!O! Only update if the current setting is not of the correct lattice type
-!U!O      IF ((LatBrav .EQ. 1) .OR. &
-!U!O          (IPosSg .GE. LPosSg(LatBrav) .AND. IPosSg .LT. LPosSg(LatBrav) + NumBrSg) ) THEN
-!U!O! Selection of same lattice so retain current space group
-!U!O        CALL PopActiveWindowID
-!U!O        RETURN
-!U!O      END IF
 !
 !*****************************************************************************
 !
@@ -589,41 +568,13 @@
       CALL WDialogSelect(IUploadFrom)
       CALL WDialogGetMenu(IDF_Space_Group_Menu,ISPosSG)
       NumberSGTable = SGNrMenu2Table(ISPosSG)
-      CALL SetSpaceGroupMenu
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
+      CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
       CALL PopActiveWindowID
 
       END SUBROUTINE Update_Space_Group
-!
-!*****************************************************************************
-!
-      SUBROUTINE SetCrystalSystem(TheCrystalSystem)
-! This routine sets the menus in the main window and in the wizard to a new
-! crystal system. No checks on consistency are performed.
-! JvdS Not quite sure when this routine was supposed to be called.
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: TheCrystalSystem
-
-      INCLUDE 'Lattice.inc'
-
-      IF ((TheCrystalSystem .GE. 1) .AND. (TheCrystalSystem .LE. 10)) THEN
-        LatBrav = TheCrystalSystem
-      ELSE
-        CALL DebugErrorMessage('Crystal Sytem out of range in SetCrystalSystem()')
-        LatBrav = 1
-      END IF
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
-      CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE SetCrystalSystem
 !
 !*****************************************************************************
 !
@@ -642,17 +593,13 @@
 
       INCLUDE 'Lattice.inc'
 
-      INTEGER I
-
       IF ((TheCrystalSystem .GE. 1) .AND. (TheCrystalSystem .LE. 10)) THEN
         LatBrav = TheCrystalSystem
       ELSE
         CALL DebugErrorMessage('Crystal Sytem out of range in UserSetCrystalSystem()')
         LatBrav = 1
       END IF
-      DO I = 1, 6
-        CellParConstrained(I) = .FALSE.
-      ENDDO
+      CellParConstrained = .FALSE.
       CALL PushActiveWindowID
       SELECT CASE (LatBrav)
         CASE ( 1) ! Triclinic
@@ -711,103 +658,18 @@
           CellPar(4) =  90.0
           CellPar(5) =  90.0
           CellPar(6) =  90.0
-          CellParConstrained(2) = .TRUE.
-          CellParConstrained(3) = .TRUE.
-          CellParConstrained(4) = .TRUE.
-          CellParConstrained(5) = .TRUE.
-          CellParConstrained(6) = .TRUE.
+          CellParConstrained = .TRUE.
+          CellParConstrained(1) = .FALSE.
       END SELECT
       CALL Upload_Cell_Constants
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
       CALL WDialogSelect(IDD_PW_Page1)
       CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL SetSpaceGroupMenu
       CALL PopActiveWindowID
 
       END SUBROUTINE UserSetCrystalSystem
-!
-!*****************************************************************************
-!
-      INTEGER FUNCTION GetCrystalSystemFromUnitCell
-!
-! This function determines the crystal system (Tri/Mon/...) from the unit cell parameters
-! In DASH, the crystal system is kept in variable LatBrav
-!
-! RETURNS :  1 = Triclinic
-!            2 = Monoclinic-a
-!            3 = Monoclinic-b
-!            4 = Monoclinic-c
-!            5 = Orthorhombic
-!            6 = Tetragonal
-!          ( 7 = Trigonal          Never returned )
-!            8 = Rhombohedral
-!            9 = Hexagonal
-!           10 = Cubic
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INCLUDE 'Lattice.inc'
-
-      LOGICAL ABC_Same, AB_Same, AC_Same, BC_Same, Ang_Same, Alp_90, Bet_90, Gam_90, Gam_120
-      LOGICAL FnUnitCellOK ! Function
-      LOGICAL NearlyEqual ! Function
-
-      GetCrystalSystemFromUnitCell = LatBrav
-      RETURN
-! Check if cell parameters are available and make sense, otherwise set crystal system to unknown
-      IF (.NOT. FnUnitCellOK()) THEN
-        GetCrystalSystemFromUnitCell = 1 ! Triclinic
-        RETURN
-      ENDIF
-      AB_Same  = NearlyEqual(CellPar(2),CellPar(1))
-      BC_Same  = NearlyEqual(CellPar(3),CellPar(2))
-      AC_Same  = NearlyEqual(CellPar(3),CellPar(1))
-      ABC_Same = (AB_Same .AND. BC_Same)
-      Alp_90   = NearlyEqual(CellPar(4),90.0)
-      Bet_90   = NearlyEqual(CellPar(5),90.0)
-      Gam_90   = NearlyEqual(CellPar(6),90.0)
-      Gam_120  = NearlyEqual(CellPar(6),120.0)
-      Ang_Same = NearlyEqual(CellPar(6),CellPar(5)) .AND. &
-                 NearlyEqual(CellPar(5),CellPar(4))
-      IF (ABC_Same .AND. Ang_Same) THEN
-        IF (Alp_90) THEN
-          GetCrystalSystemFromUnitCell = 10 ! Cubic
-          RETURN
-        ELSE
-          GetCrystalSystemFromUnitCell = 8 ! Rhombohedral
-          RETURN
-        END IF
-      END IF
-      IF (AB_Same) THEN
-        IF (Ang_Same .AND. Alp_90) THEN
-          GetCrystalSystemFromUnitCell = 6 ! Tetragonal
-          RETURN
-        ELSE IF (Alp_90 .AND. Bet_90 .AND. Gam_120) THEN
-          GetCrystalSystemFromUnitCell = 9 ! Hexagonal
-          RETURN
-        END IF
-      END IF
-      IF (Ang_Same .AND. Alp_90) THEN
-        GetCrystalSystemFromUnitCell = 5 ! Orthorhombic
-        RETURN
-      END IF
-      IF      (      Alp_90 .AND.       Bet_90 .AND. .NOT. Gam_90) THEN
-        GetCrystalSystemFromUnitCell = 4 ! Monoclinic c
-        RETURN
-      ELSE IF (      Alp_90 .AND. .NOT. Bet_90 .AND.       Gam_90) THEN
-        GetCrystalSystemFromUnitCell = 3 ! Monoclinic b
-        RETURN
-      ELSE IF (.NOT. Alp_90 .AND.       Bet_90 .AND.       Gam_90) THEN
-        GetCrystalSystemFromUnitCell = 2 ! Monoclinic a
-        RETURN
-      END IF
-      GetCrystalSystemFromUnitCell = 1 ! Triclinic
-      RETURN
-
-      END FUNCTION GetCrystalSystemFromUnitCell
 !
 !*****************************************************************************
 !
@@ -847,8 +709,6 @@
 !     5 = Cr
 !     6 = Fe
 !
-! JvdS 5 Aug 2001
-!
 ! INPUT   : TheOption = the number of the selected option, e.g. 'Cu' = 2
 !
 ! RETURNS : The wavelength of the anode material of that menu option in Angstrom
@@ -886,69 +746,26 @@
 !
 !*****************************************************************************
 !
-!C>> ID Lattice from space group number
-      INTEGER FUNCTION GetCrystalSystem_2(ISpaceGroup,IDashSg)
+      INTEGER FUNCTION GetCrystalSystem_2(IDashSg)
+!
+! This function determines the crystal system given one of the 530 space groups in DASH
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: ISpaceGroup
       INTEGER, INTENT (IN   ) :: IDashSg
 
       INCLUDE 'Lattice.inc'
 
-      INTEGER,PARAMETER ::  TricLim =   2
-      INTEGER,PARAMETER ::  MonoLim =  15
-      INTEGER,PARAMETER ::  OrthLim =  74
-      INTEGER,PARAMETER ::  TetrLim = 142
-      INTEGER,PARAMETER ::  TrigLim = 167
-      INTEGER,PARAMETER ::  HexaLim = 194
-
       INTEGER I
 
-      IF      (ISpaceGroup .LE. TricLim) THEN
-        GetCrystalSystem_2 = 1
-      ELSE IF (ISpaceGroup .LE. MonoLim) THEN
-! More work required: a, b or c?
-        GetCrystalSystem_2 = 2
-        DO I = LEN_TRIM(SGNumStr(IDashSg)),1,-1
-          SELECT CASE(SGNumStr(IDashSg)(I:I)) 
-            CASE ('a')
-              GetCrystalSystem_2 = 2
-            CASE ('b')
-              GetCrystalSystem_2 = 3
-            CASE ('c')
-              GetCrystalSystem_2 = 4
-            CASE (':')
-              GOTO 1
-          END SELECT
-        END DO
-   1    CONTINUE
-      ELSE IF (ISpaceGroup .LE. OrthLim) THEN
-        GetCrystalSystem_2 = 5
-      ELSE IF (ISpaceGroup .LE. TetrLim) THEN
-        GetCrystalSystem_2 = 6
-      ELSE IF (ISpaceGroup .LE. TrigLim) THEN
-! More work required - trigonal or rhombohedral
-        GetCrystalSystem_2 = 7
-        DO I = LEN_TRIM(SGNumStr(IDashSg)),1,-1
-          SELECT CASE(SGNumStr(IDashSg)(I:I)) 
-            CASE ('H')
-              GetCrystalSystem_2 = 7
-            CASE ('R')
-              GetCrystalSystem_2 = 8
-            CASE (':')
-              GOTO 2
-          END SELECT
-        END DO
-   2    CONTINUE
-      ELSE IF (ISpaceGroup .LE. HexaLim) THEN
-        GetCrystalSystem_2 = 9
-      ELSE IF (ISpaceGroup .LE. 230) THEN
-        GetCrystalSystem_2 = 10
-      ELSE
-        CALL ErrorMessage('Space group out of range.')
-        GetCrystalSystem_2 = 1 ! Triclininc
-      ENDIF
+      DO I = 2, 11
+        IF (IDashSg .LT. LPosSG(I)) THEN
+          GetCrystalSystem_2 = I - 1
+          RETURN
+        ENDIF
+      ENDDO
+      CALL DebugErrorMessage('Space group out of range.')
+      GetCrystalSystem_2 = 1 ! Triclininc
       RETURN
 
       END FUNCTION GetCrystalSystem_2

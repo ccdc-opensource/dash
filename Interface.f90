@@ -91,23 +91,15 @@
 
       INCLUDE 'Lattice.inc'
 
-      REAL a,b,c,alpha,beta,gamma   
-
       CALL PushActiveWindowID
 ! Get all the cell constants from the selected area
       CALL WDialogSelect(IDownFrom)
-      CALL WDialogGetReal(IDF_a_latt,a)
-      CALL WDialogGetReal(IDF_b_latt,b)      
-      CALL WDialogGetReal(IDF_c_latt,c)      
-      CALL WDialogGetReal(IDF_alp_latt,alpha)      
-      CALL WDialogGetReal(IDF_bet_latt,beta)      
-      CALL WDialogGetReal(IDF_gam_latt,gamma)
-      IF (a     .GT. 0.0) CellPar(1) = a
-      IF (b     .GT. 0.0) CellPar(2) = b
-      IF (c     .GT. 0.0) CellPar(3) = c
-      IF (alpha .GT. 0.0) CellPar(4) = alpha
-      IF (beta  .GT. 0.0) CellPar(5) = beta
-      IF (gamma .GT. 0.0) CellPar(6) = gamma
+      CALL WDialogGetReal(IDF_a_latt,CellPar(1))
+      CALL WDialogGetReal(IDF_b_latt,CellPar(2))      
+      CALL WDialogGetReal(IDF_c_latt,CellPar(3))      
+      CALL WDialogGetReal(IDF_alp_latt,CellPar(4))      
+      CALL WDialogGetReal(IDF_bet_latt,CellPar(5))      
+      CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
       CALL PopActiveWindowID
 
       END SUBROUTINE Download_Cell_Constants
@@ -324,28 +316,6 @@
       IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
 
       END SUBROUTINE Upload_Positions
-!
-!*****************************************************************************
-!
-      SUBROUTINE Upload_Wizard_Information()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
-
-      CALL PushActiveWindowID
-      CALL SetCrystalSystem(LatBrav)
-      CALL SetSpaceGroupMenu
-      CALL Upload_Cell_Constants()
-      CALL Upload_Range()
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Upload_Wizard_Information      
 !
 !*****************************************************************************
 !

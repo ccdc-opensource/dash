@@ -112,7 +112,7 @@
       CALL make_bond(natom,Coordinates,bndr,nbond,bat)
       CALL sybylatom(natom,AtmElement,sybatom,nbond,bat)
       Ilen = LEN_TRIM(TheFileName)
-! Replace 'cssr' by 'mol2'
+! Replace 'res' by 'mol2'
       mol2file = TheFileName(1:Ilen-3)//'mol2'
       OutputFile = 3
       OPEN(UNIT=OutputFile,file=mol2file,form='formatted',err=997)
