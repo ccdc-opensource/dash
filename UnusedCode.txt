@@ -17489,6 +17489,175 @@ C
  2000 FORMAT (/' Crystal volume ',F12.5)
       RETURN
       END SUBROUTINE SETGAU
+!*==INPUTG.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
+!
+!
+!
+!
+! LEVEL 4      SUBROUTINE INPUTG
+      SUBROUTINE INPUTG
+!
+! *** INPUTG updated by JCM 14 Oct 86 ***
+!
+!X
+!C 2A
+!H Reads and interprets all "G" cards, for Gaussian integration of various
+!H integrals over a crystal defined by its plane faces.
+!
+!D Absorbs all the "G" cards given.  It will normally be called by a
+!D setting up routine (e.g. SETABS) which then checks whether it has had
+!D enough "G" cards to make sense, and gives default values for any missing.
+!D
+!D The syntax of "G" cards is thus like that of M, D, L cards; a word of up to
+!D 4 symbols (usually letters, and the first must be a letter) follows the
+!D "G space" which starts the card, and what follows after that depends on
+!D the word.  Possible words recognised are:
+!D
+!D G FACE followed by an integer and other numbers: a specification of a plane
+!D        face of the crystal, according to the integer.
+!D        (1 means read A,B,C,D in the equation AX+BY+CZ>=D)
+!D
+!D G PNTS followed by 3 integers which are the number of Gauss points required
+!D        for integration in the x, y, and z directions.  These may be any
+!D        integer in the range 1-20,32,40 (the list is being extended.)
+!D
+!D        The MAIN program may wish to alter these during a run.  This would
+!D        involve resetting NL,NM and NN in COMMON /GAUSS/, and obeying
+!D        SETGAU again.
+!D
+!D        If no G PNTS card is given, 5 points will be taken in all 3 directions
+!D
+!D G MU followed by the coefficient of absorption.  Its units must tie up with
+!D        A,B,C,D above. (This card is not essential; if the MAIN program
+!D        calls for different values of mu, these are simply written to AMU
+!D        in the COMMON /ABSDAT/)
+!D
+!D G MODE followed by an integer which gives mode of use of ABSOR or ABMULT,
+!D        i.e. which integral(s) are to be calculated.
+!
+!I Reads in all "G" cards.
+!O Writes its findings to unit LPT.
+!
+!%
+!      CHARACTER *4 GWD,GTABLE(%GCRD%)
+      CHARACTER*4 GWD, GTABLE(4)
+      COMMON /ABSDAT/ AMU, MODEA
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
+     &                ICDN(26,9), IERR, IO10, SDREAD
+      LOGICAL SDREAD
+      DIMENSION INREAD(26), ICDNO(26)
+      EQUIVALENCE (INREAD(1),INREA(1,1))
+      EQUIVALENCE (ICDNO(1),ICDN(1,1))
+      COMMON /CPLANE/ AA(15), BB(15), CC(15), DD(15), NP
+      COMMON /GAUSS/ WW(1000), NL, NM,   &
+     &                NN, NQ
+      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      COMMON /GREAD/ IGREAD(4)
+      DATA GTABLE/'FACE', 'PNTS', 'MU', 'MODE'/
+!
+! SET "NO G CARDS READ":
+!%
+!      CALL JGMZER(IGREAD,1,%GCRD%)
+      CALL JGMZER(IGREAD,1,4)
+!
+! INITIALISE COUNTS OF ITEMS WHICH MAY COME ON MORE THAN 1 CARD:
+      NP = 0
+!
+! READ ALL "G" CARDS:
+      INREAD(7) = -IABS(INREAD(7))
+      ID = IABS(INREAD(7))
+      NCARD = ICDNO(7)
+      IF (NCARD.LE.0) CALL ERRMES(2,0,'"G" cards')
+!
+      DO ICD = 1, NCARD
+!
+        CALL CARDIN(ID)
+        ID = ID + NYZ
+        CALL RDWORD(GWD,LEN,3,IPT,80,0,IER)
+!%
+!  42  L=NCFIND(GWD,GTABLE,%GCRD%)
+   42   L = NCFIND(GWD,GTABLE,4)
+        IF (L.LE.0) THEN
+          CALL ERRCH2(GWD,2,'cannot recognise word','on "G" card')
+          GOTO 3
+        ENDIF
+!
+! SET "HAVE READ PARTICULAR WORD" (COUNTING NUMBER OF CARDS), THEN BRANCH:
+        IGREAD(L) = IGREAD(L) + 1
+        GOTO (31,32,33,34), L
+!
+! FACE:
+   31   IER = IERR
+!%
+!      CALL ERRCHK(2,NP,%CPLN%,0,'plane faces')
+        CALL ERRCHK(2,NP,15,0,'plane faces')
+        IF (IER.NE.IERR) GOTO 3
+!
+        CALL RDREAL(AA(NP),IPT,IPT,80,IER)
+        CALL RDREAL(BB(NP),IPT,IPT,80,IER)
+        CALL RDREAL(CC(NP),IPT,IPT,80,IER)
+        CALL RDREAL(DD(NP),IPT,IPT,80,IER)
+        IF (DD(NP).GT.0.) GOTO 3
+        AA(NP) = -AA(NP)
+        BB(NP) = -BB(NP)
+        CC(NP) = -CC(NP)
+        DD(NP) = -DD(NP)
+        GOTO 3
+!
+! PNTS:
+   32   CALL RDINTG(NL,IPT,IPT,80,IER)
+        CALL RDINTG(NM,IPT,IPT,80,IER)
+        CALL RDINTG(NN,IPT,IPT,80,IER)
+        WRITE (LPT,2000) NL, NM, NN
+ 2000   FORMAT (/' Gauss points for integration in x,y and ',           &
+     &          'z directions are',3I5)
+        GOTO 3
+!
+! MU:
+   33   CALL RDREAL(AMU,IPT,IPT,80,IER)
+        WRITE (LPT,2003) AMU
+ 2003   FORMAT (/' Coefficient of absorption is ',F10.5)
+        GOTO 43
+!
+! MODE:
+   34   CALL RDINTG(MODEA,IPT,IPT,80,IER)
+        WRITE (LPT,2004) MODEA
+ 2004   FORMAT (/' Absorption integral mode',I3)
+        IF (MODEA.GT.0 .AND. MODEA.LT.8) GOTO 29
+        CALL ERRMES(1,1,'No integral of this number')
+        GOTO 43
+!
+   29   GOTO (21,22,23,24,25,26,27), MODEA
+!
+   21   CALL MESS(LPT,0,'Conventional absorption correction')
+        GOTO 43
+   22   CALL MESS(LPT,0,'Depolarisation - integral using path in only')
+        GOTO 43
+   23   CALL MESS(LPT,0,'Extinction - derivative integral')
+        GOTO 43
+   24   CALL MESS(LPT,0,'Absorption+depolarisation')
+        GOTO 43
+   25   CALL MESS(LPT,0,'Absorption+extinction')
+        GOTO 43
+   26   CALL MESS(LPT,0,'Depolarisation+extinction')
+        GOTO 43
+   27   CALL MESS(LPT,0,'Absorption,depolarisation and extinction')
+        GOTO 43
+!
+! HERE TO CONTINUE READING AFTER <WORD> <NUMBER> FORMAT:
+   43   CALL RDWORD(GWD,LEN,IPT,IPT,80,0,IER)
+        IF (IER.EQ.100) GOTO 3
+        GOTO 42
+    3 ENDDO
+!
+      WRITE (LPT,2001) NP
+ 2001 FORMAT (/' Equations of',I3,' faces (with no + signs):')
+      DO I = 1, NP
+        WRITE (LPT,2002) AA(I), BB(I), CC(I), DD(I)
+ 2002   FORMAT (1X,F10.5,'x',F10.5,'y',F10.5,'z >=',F10.5)
+      ENDDO
+      RETURN
+      END SUBROUTINE INPUTG
 !
 !*****************************************************************************
 !
