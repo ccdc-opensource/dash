@@ -312,6 +312,8 @@
       ENDDO
       CALL Clear_SA ! Sets NumOf_SA_Runs to 0
       CALL Update_Solutions
+      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL WDialogFieldState(IDB_Prog3,Disabled)
       UseQuaternions = .TRUE.
 ! Initialise arrays to do with administration of open child windows
       ChildWinAutoClose = .FALSE.
