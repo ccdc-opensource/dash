@@ -47,6 +47,15 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
+      in_batch = .FALSE.
+      IF (NARGS() .GT. 1) THEN
+        CALL GetArg(1, ArgString) 
+        ExtLen = 7
+        CALL FileGetExtension(ArgString, StrFileExtension, ExtLen)
+        CALL StrUpperCase(StrFileExtension)
+        IF (StrFileExtension .EQ. 'DUFF   ') &
+          in_batch = .TRUE.
+      ENDIF
       first_zm_in_win = 1
 ! Initialise Winteracter
       CALL WInitialise(' ')
@@ -55,26 +64,28 @@
 ! Try to redirect stdout - change working directory if unsuccessful
       IF (NARGS() .EQ. 0) CALL Init_StdOut
 ! Open root window
-      CALL WindowOpen(FLAGS = SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
-                      Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
-                      HEIGHT = (WInfoScreen(2)*3)/8, MENUID = IDR_MENU1, &
-                      TITLE = "DASH",NCOL256=128)
+      IF ( .NOT. in_batch ) THEN
+        CALL WindowOpen(FLAGS = SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
+                        Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
+                        HEIGHT = (WInfoScreen(2)*3)/8, MENUID = IDR_MENU1, &
+                        TITLE = "DASH", NCOL256=128)
 ! Load and display the toolbar
-      CALL WMenuToolbar(ID_TOOLBAR1)
-      CALL WCursorShape(CurCrossHair)
+        CALL WMenuToolbar(ID_TOOLBAR1)
+        CALL WCursorShape(CurCrossHair)
 ! Disable the menu buttons
-      CALL SetModeMenuState(1,-1)
+        CALL SetModeMenuState(1,-1)
 ! Setup array of widths for status bar
-      IWIDTHS(1) = 6200
-      DO IWID = 2, 4
-        IWIDTHS(IWID) = 800
-      END DO
-      IWIDTHS(5)= 1500 
+        IWIDTHS(1) = 6200
+        DO IWID = 2, 4
+          IWIDTHS(IWID) = 800
+        END DO
+        IWIDTHS(5)= 1500 
 ! Split status bar into more than one part
-      CALL WindowStatusBarParts(5, IWIDTHS)
-    !  CALL IDebugLevel(DbgMsgBox)
-      CALL WMessageEnable(PushButton, Enabled)
-      CALL WMessageEnable(FieldChanged, Enabled)
+        CALL WindowStatusBarParts(5, IWIDTHS)
+      !  CALL IDebugLevel(DbgMsgBox)
+        CALL WMessageEnable(PushButton, Enabled)
+        CALL WMessageEnable(FieldChanged, Enabled)
+      ENDIF
       CALL CheckLicence
 ! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues
