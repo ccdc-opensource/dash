@@ -48,21 +48,21 @@
                            'Only the '//tStr(1:len)//' lowest angle reflections will be indexed and used.')
           routine_called = .TRUE.
         ENDIF
-      ENDIF
-      know = NumOfRef
+        know = NumOfRef
 ! Calculate peak centre of KNOW in ARGK, and its derivatives
-      CALL PCCN01(2)
+        CALL PCCN01(2)
 ! argk now contains the peak position of the last reflection
-      NPTS = 1
-      DO WHILE ((XBIN(NPTS) .LT. argk) .AND. (NPTS .LT. MOBS))
-        CALL INC(NPTS) ! NPTS is the number of points used for Pawley refinement.
-      ENDDO
-      argmax(1) = argk
-      maxk = NumOfRef
-      NBIN = NPTS
-      DataSetChange = DataSetChange + 1
-      CALL GetProfileLimits
-      CALL Get_IPMaxMin 
+        NPTS = 1
+        DO WHILE ((XBIN(NPTS) .LT. argk) .AND. (NPTS .LT. MOBS))
+          CALL INC(NPTS) ! NPTS is the number of points used for Pawley refinement.
+        ENDDO
+        argmax(1) = argk
+        maxk = NumOfRef
+        NBIN = NPTS
+        DataSetChange = DataSetChange + 1
+        CALL GetProfileLimits
+        CALL Get_IPMaxMin 
+      ENDIF
 
       END SUBROUTINE CHKMAXREF
 !
