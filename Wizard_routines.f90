@@ -150,7 +150,7 @@
    
       CALL EndWizard
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-      CALL WDialogPutRadioButton(IDF_PW_Option3)
+      CALL WDialogPutRadioButton(IDF_PW_Option4)
       PastPawley = .FALSE.
 ! Ungrey 'Delete peak fit ranges' button on toolbar
       IF (NumPeakFitRange .GT. 0) CALL WMenuSetState(ID_ClearPeakFitRanges,ItemEnabled,WintOn)
