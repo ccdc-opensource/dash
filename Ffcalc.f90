@@ -1,15 +1,17 @@
+! This file contains the calculations of the squares of the structure factors.
+! Loops are performed over the atoms in the asymmetric unit
+! See get_logref.f90 for a description of the LOGREF conditions
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_001(IR)
+      REAL FUNCTION FFCALC_001(IR)                  ! P 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
       REAL C3F, S3F, XCC, XSC, XCS, XSS, CCC, CSS, SCS, SSC, SCC, CSC, CCS, SSS
-! Structure factor calculations for space group P1
-! Loop is performed over the atoms in the asymmetric unit
-      AFCAL = 0.
-      BFCAL = 0.
+
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -37,15 +39,13 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_002(IR)
+      REAL FUNCTION FFCALC_002(IR)                  ! P -1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
       REAL C3F, S3F, CCC, CSS, SCS, SSC
 
-! Structure factor calculations for space group P-1
-! Loop is performed over the atoms in the asymmetric unit
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -64,15 +64,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_039(IR)
+      REAL FUNCTION FFCALC_039(IR)                  ! P 1 21 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P 1 21 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -97,15 +94,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_040(IR)
+      REAL FUNCTION FFCALC_040(IR)                  ! C 1 2 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group C 1 2 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -121,15 +115,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_044(IR)
+      REAL FUNCTION FFCALC_044(IR)                  ! P 1 c 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P 1 c 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -154,15 +145,72 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_050(IR)
+      REAL FUNCTION FFCALC_045(IR)                  ! P 1 n 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group C 1 c 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_045 = AFCAL*AFCAL + BFCAL*BFCAL
+
+      END FUNCTION FFCALC_045
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_046(IR)                  ! P 1 a 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_046 = AFCAL*AFCAL + BFCAL*BFCAL
+
+      END FUNCTION FFCALC_046
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_050(IR)                  ! C 1 c 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -192,10 +240,8 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group I 1 a 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -225,9 +271,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P1 21/m 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -253,8 +297,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group C 1 2/m 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -274,8 +316,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 1 2/c 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -302,8 +342,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 1 2/n 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -330,9 +368,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 1 21/c 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -358,9 +394,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 1 21/n 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -386,10 +420,8 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 1 21/a 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
 
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -415,9 +447,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group c 1 2/c 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -443,9 +473,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group I 1 2/a 1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -471,10 +499,8 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 21 21 2
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -500,10 +526,8 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 21 21 21
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -539,10 +563,8 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group C 2 2 21
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -568,10 +590,8 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P c a 21
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -607,10 +627,8 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P n a 21
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -646,10 +664,8 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group C m c 21
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -675,15 +691,13 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group F d d 2
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
 !
 ! Note the use here of a prefactor of '2' for logrefs of 1 and 3
 ! to take into account the double weighting of these SF expression
 ! as seen in Vol B
 !
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -735,9 +749,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P c c n
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -769,9 +781,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P b c m
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -803,9 +813,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P b c n
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -837,8 +845,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P b c a
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -871,8 +877,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P n m a
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -905,8 +909,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group C m c m
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -957,8 +959,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group I-4
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
       IH = iHKL(1,IR)
@@ -987,8 +987,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 4/n (origin choice 2, inversion at origin)
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1037,8 +1035,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 42/n (origin choice 2, inversion at origin)
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1123,8 +1119,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group I 41/a (origin choice 2)
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1209,8 +1203,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P 41 21 2
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
       IH = iHKL(1,IR)
@@ -1280,8 +1272,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P -4 21 c
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1316,7 +1306,6 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! SUM OVER ATOMS IN ASYMMETRIC UNIT:
 !.. For P3
       AFCAL = 0.
       BFCAL = 0.
@@ -1348,12 +1337,9 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! SUM OVER ATOMS IN ASYMMETRIC UNIT:
 !.. For P31
       AFCAL = 0.
       BFCAL = 0.
-!      CFCAL=0.
-!      DFCAL=0.
       RH = 6.283185307179*FLOAT(iHKL(1,IR))
       RK = 6.283185307179*FLOAT(iHKL(2,IR))
       RI = -(RH+RK)
@@ -1368,15 +1354,7 @@
         ARG3 = RI*XV + RH*YV + RLZV - VL
         AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
         BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
-!        ARG2=RK*XV+RI*YV+RLZV-VL
-!        ARG3=RI*XV+RH*YV+RLZV+VL
-!        CFCAL=CFCAL+(COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
-!        DFCAL=DFCAL+(SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
       ENDDO
-!      RAT=0.0
-!      FF1=AFCAL*AFCAL+BFCAL*BFCAL
-!      FF2=CFCAL*CFCAL+DFCAL*DFCAL
-!      FFCALC_431=RAT*FF1+(1.-RAT)*FF2
       FFCALC_431 = AFCAL*AFCAL + BFCAL*BFCAL
 
       END FUNCTION FFCALC_431
@@ -1387,7 +1365,6 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! SUM OVER ATOMS IN ASYMMETRIC UNIT:
 !.. For P32
       AFCAL = 0.
       BFCAL = 0.
@@ -1417,8 +1394,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group R3 hexagonal axes
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       BFCAL = 0.
       IH = iHKL(1,IR)
@@ -1450,8 +1425,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P-3
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1481,8 +1454,6 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group R-3 hexagonal axes
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1511,9 +1482,7 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!	 Structure factor calculations for space group P-31m
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
+! Structure factor calculations for space group P-31m
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1552,9 +1521,7 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!	 Structure factor calculations for space group P-3m1
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
+! Structure factor calculations for space group P-3m1
       AFCAL = 0.
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1593,9 +1560,7 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!	 Structure factor calculations for space group P6
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
+! Structure factor calculations for space group P6
       AFCAL = 0.
       BFCAL = 0.
       IH = iHKL(1,IR)
@@ -1622,9 +1587,7 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!	 Structure factor calculations for space group P-6
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
+! Structure factor calculations for space group P-6
       AFCAL = 0.
       BFCAL = 0.
       IH = iHKL(1,IR)
@@ -1654,9 +1617,7 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!	 Structure factor calculations for space group P6/m
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
+! Structure factor calculations for space group P6/m
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -1680,9 +1641,7 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!	 Structure factor calculations for space group P622
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
+! Structure factor calculations for space group P622
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1715,9 +1674,7 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!	 Structure factor calculations for space group P-6m2
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
+! Structure factor calculations for space group P-6m2
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1757,9 +1714,7 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!	 Structure factor calculations for space group P -6 2 m
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
+! Structure factor calculations for space group P -6 2 m
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1799,9 +1754,7 @@
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!	 Structure factor calculations for space group P6/mmm
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
+! Structure factor calculations for space group P6/mmm
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)

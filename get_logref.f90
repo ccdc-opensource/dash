@@ -99,7 +99,7 @@
             L_m = 2*(L_/2)
             LOGREF(1,IR) = (L_.EQ.L_m) ! l = 2n
           ENDDO
-        CASE (62)                              ! P 1 2/n 1
+        CASE (62,45)                           ! P 1 2/n 1, P 1 n 1
           NLGREF = 1
           DO IR = 1, NumOfRef
             HPL = iHKL(1,IR) + iHKL(3,IR)
@@ -113,33 +113,26 @@
             KPLm = 2*(KPL/2)
             LOGREF(1,IR) = KPL.EQ.KPLm ! k+l = 2n
           ENDDO
-        CASE (65)                              ! P 1 21/n 1
+        CASE (65,391)                          ! P 1 21/n 1, P -4 21 c
           NLGREF = 1
           DO IR = 1, NumOfRef
             HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
             HPKPLm = 2*(HPKPL/2)
             LOGREF(1,IR) = HPKPL.EQ.HPKPLm ! h+k+l = 2n
           ENDDO
-        CASE (66)                              ! P 1 21/a 1
+        CASE (66,112)                          ! P 1 21/a 1, P 21 21 2
           NLGREF = 1
           DO IR = 1, NumOfRef
             HPK = iHKL(1,IR) + iHKL(2,IR)
             HPKm = 2*(HPK/2)
             LOGREF(1,IR) = HPK.EQ.HPKm ! h+k = 2n
           ENDDO
-        CASE (52,69)                           ! I 1 a 1, I 1 2/a 1
+        CASE (46,52,69)                        ! P 1 a 1, I 1 a 1, I 1 2/a 1
           NLGREF = 1
           DO IR = 1, NumOfRef
             H_ = iHKL(1,IR)
             H_m = 2*(H_/2)
             LOGREF(1,IR) = (H_.EQ.H_m) ! h = 2n
-          ENDDO
-        CASE (112)                             ! P 21 21 2
-          NLGREF = 1
-          DO IR = 1, NumOfRef
-            HPK = iHKL(1,IR) + iHKL(2,IR)
-            HPKm = 2*(HPK/2)
-            LOGREF(1,IR) = (HPK.EQ.HPKm) ! h+k = 2n
           ENDDO
         CASE (115,290)                         ! P21 21 21, P b c a
           NLGREF = 4
@@ -288,13 +281,6 @@
             LOGREF(3,IR) = (IREMAIN.EQ.2) ! 2h+2k+l = 4n+2
             LOGREF(4,IR) = (IREMAIN.EQ.3) ! 2h+2k+l = 4n+3
           ENDDO
-        CASE (391)                             ! P -4 21 c
-          NLGREF = 1
-          DO IR = 1, NumOfRef
-            HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
-            HPKPLm = 2*(HPKPL/2)
-            LOGREF(1,IR) = HPKPL.EQ.HPKPLm ! h+k+l = 2n
-          ENDDO
         CASE (431,432)                         ! P31, P32
           NLGREF = 3
           DO IR = 1, NumOfRef
@@ -306,7 +292,7 @@
           ENDDO
       END SELECT
       SELECT CASE (NumberSGTable)
-! adjustments for presence of kx and hy terms
+! Adjustments for presence of kx and hy terms
         CASE (356, 360, 362, 365, 369, 391)
           JHMIN = MIN(IHMIN,IKMIN)
           JHMAX = MAX(IHMAX,IKMAX)
@@ -316,7 +302,7 @@
           IKMAX = JHMAX
           IHMINLT0 = IHMIN.LT.0
           IKMINLT0 = IKMIN.LT.0
-! adjustments for presence of 'i' index
+! Adjustments for presence of 'i' index
         CASE (430:435,449,451,462,468,469,471,481,483,485)
           JHMIN = MIN(IIMIN,IHMIN,IKMIN)
           JHMAX = MAX(IIMAX,IHMAX,IKMAX)
