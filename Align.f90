@@ -16,13 +16,16 @@
 
       USE DRUID_HEADER
       USE VARIABLES
-      USE ZMVAR            !Number of zmatrices, nfrag
+      USE ATMVAR
+      USE ZMVAR            ! Number of zmatrices, nfrag
+
 !      IMPLICIT NONE
-      INCLUDE 'GLBVAR.INC' !NumberSGTable
-      INCLUDE 'lattice.inc'!Cellpar and space group strings
+
+      INCLUDE 'GLBVAR.INC'  ! NumberSGTable
+      INCLUDE 'lattice.inc' ! Cellpar and space group strings
 
 ! Required for XATOPT
-      COMMON /posopt/ XATOPT(3,150)
+      COMMON /posopt/ XATOPT(3,MaxAtm_3)
 !
       PARAMETER (mpdbops=192)
       COMMON /fullsymmops/ rpdb(4,4,mpdbops)!Symmetry operations
@@ -40,7 +43,6 @@
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 !Required for npdbops
-!!      PARAMETER (mpdbops=192)
       CHARACTER*20 cpdbops(mpdbops)
       COMMON /pdbops/ npdbops, cpdbops
 !Required to check if x,y, or z have been fixed or bounds changed from defaults
@@ -52,7 +54,7 @@
 
 !
       INTEGER MaxNumAtom !in an include somewhere??
-      PARAMETER (MaxNumAtom = 100)
+      PARAMETER (MaxNumAtom = 150)
 
 ! Local Variables
       CHARACTER(len = 255) :: line
