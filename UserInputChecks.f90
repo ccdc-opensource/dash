@@ -147,7 +147,7 @@
       LOGICAL ABC_Same, AB_Same, AC_Same, BC_Same, Ang_Same, Alp_90, Bet_90, Gam_90, Gam_120
       INTEGER tLatBrav
       LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm
-      REAL SmallVal
+      LOGICAL, EXTERNAL :: NearlyEqual
 
 !            1 = Triclinic
 !            2 = Monoclinic-a
@@ -161,17 +161,16 @@
 !           10 = Cubic
 
       IF (.NOT. FnUnitCellOK()) RETURN
-      SmallVal = 1.E-6
-      AB_Same  = ABS(CellPar(2)-CellPar(1)) .LE. SmallVal 
-      BC_Same  = ABS(CellPar(3)-CellPar(2)) .LE. SmallVal 
-      AC_Same  = ABS(CellPar(3)-CellPar(1)) .LE. SmallVal 
+      AB_Same  = NearlyEqual(CellPar(2),CellPar(1))
+      BC_Same  = NearlyEqual(CellPar(3),CellPar(2))
+      AC_Same  = NearlyEqual(CellPar(3),CellPar(1))
       ABC_Same = (AB_Same .AND. BC_Same) 
-      Alp_90   = (ABS(CellPar(4)- 90.0) .LE. SmallVal)
-      Bet_90   = (ABS(CellPar(5)- 90.0) .LE. SmallVal)
-      Gam_90   = (ABS(CellPar(6)- 90.0) .LE. SmallVal)
-      Gam_120  = (ABS(CellPar(6)-120.0) .LE. SmallVal)
-      Ang_Same = ABS(CellPar(6)-CellPar(5)) .LE. SmallVal .AND. &
-                 ABS(CellPar(5)-CellPar(4)) .LE. SmallVal
+      Alp_90   = NearlyEqual(CellPar(4), 90.0)
+      Bet_90   = NearlyEqual(CellPar(5), 90.0)
+      Gam_90   = NearlyEqual(CellPar(6), 90.0)
+      Gam_120  = NearlyEqual(CellPar(6),120.0)
+      Ang_Same = NearlyEqual(CellPar(6),CellPar(5)) .AND. &
+                 NearlyEqual(CellPar(5),CellPar(4))
       IF (ABC_Same .AND. Ang_Same) THEN
         IF (Alp_90) THEN
           tLatBrav = 10 ! Cubic
