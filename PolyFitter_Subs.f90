@@ -1058,6 +1058,7 @@
 !C Try to get the peak shape parameters from the View Pawley dialogue. If this fails, use the
 !C values in memory.
       CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_ViewPawley)
       CALL WDialogGetReal(IDF_Sigma1, tPeakShapeSigma(1))
       CALL WDialogGetReal(IDF_Sigma2, tPeakShapeSigma(2))
       CALL WDialogGetReal(IDF_Gamma1, tPeakShapeGamma(1))
