@@ -495,8 +495,8 @@
       CALL IGrFillPattern(Hatched, Medium, DiagUp)
       CALL IGrCharSize(Char_Size, Char_Size)
       DO i = 1, NumPeakFitRange
-        IF (((XPF_Range(1,i) .GE. XPGMIN) .AND. (XPF_Range(1,i) .LE. XPGMAX)) .OR. &
-            ((XPF_Range(2,i) .GE. XPGMIN) .AND. (XPF_Range(2,i) .LE. XPGMAX))) THEN
+        IF ( .NOT. (((XPF_Range(1,i) .LT. XPGMIN) .AND. (XPF_Range(2,i) .LT. XPGMIN)) .OR. &
+                    ((XPF_Range(1,i) .GT. XPGMAX) .AND. (XPF_Range(2,i) .GT. XPGMAX)))) THEN
           ulpx = MAX(XPF_Range(1,i), XPGMIN)
           ulpx = MIN(ulpx, XPGMAX)
           lrpx = MAX(XPF_Range(2,i), XPGMIN)
