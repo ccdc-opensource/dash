@@ -27,6 +27,7 @@
       tFileName = PrjFileName
       CALL WSelectFile(FILTER,iFLAGS,tFileName,'Save project file')
       IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
+        PrjFileName = tFileName
         PrjSaveAs = PrjSave()
       ENDIF
 
@@ -50,7 +51,7 @@
       IF (LEN_TRIM(PrjFileName) .EQ. 0) THEN
         PrjSave = PrjSaveAs()
       ELSE
-        CALL PrjReadWrite(PrjFileName,cRead)
+        CALL PrjReadWrite(PrjFileName,cWrite)
         PrjSave = 0 ! Yeah, right
       ENDIF
 
@@ -80,7 +81,7 @@
       FILTER = 'All files (*.*)|*.*|'//&
                'DASH project files (*.dash)|*.dash|'
       tFileName = ''
-! IFTYPE specifies which of the file types in the list is the default
+! iFType specifies which of the file types in the list is the default
       iFType = 2
       tFileName = PrjFileName
       CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open DASH project file',iFType)
@@ -189,18 +190,29 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
+      INTEGER         ErrCounter
+      COMMON /CMN008/ ErrCounter
+
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+
       INTEGER I, j, tInteger, RW, tCurrentWizardWindow
       LOGICAL tLogical
       REAL    tReal
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: GetCrystalSystem
+      CHARACTER*255 tString
 
+      ErrCounter = 0
       CALL PushActiveWindowID
       iPrjReadOrWrite = ReadOrWrite
       RW = iPrjReadOrWrite
       hPrjFile = 10
       OPEN(UNIT=hPrjFile,FILE=ThePrjFile,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       iPrjRecNr = 1
+! Read / Write the header
+      tString = ProgramVersion//' project file'
+      CALL FileRWString(hPrjFile,iPrjRecNr,RW,tString)
 ! Read / Write Wizard Window
       IF (RW .EQ. cWrite) THEN
         CALL FileWriteInteger(hPrjFile,iPrjRecNr,CurrentWizardWindow)
@@ -288,7 +300,10 @@
         CALL FillSymmetry
         PastPawley = .FALSE.
         CALL Generate_TicMarks
+        CALL GET_LOGREF
       ENDIF
+! Excluded regions
+
 ! Read / Write Pawley refinement related stuff
 ! Read / Write the peak fit ranges
       CALL PrjReadWritePeakFitRanges
@@ -307,6 +322,7 @@
                       (CurrentWizardWindow .EQ. IDD_SA_input3))
       ENDIF
       IF (PastPawley) THEN
+        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PAWLEYCHISQ)
 ! If we are this way down the file, NBIN was determined by original pattern + truncation + LBIN.
 ! However, after we have done a Pawley fit, data points beyond the 350th reflection have been discarded,
 ! and NBIN has a new value.
@@ -318,7 +334,7 @@
         ENDDO
         IF (RW .EQ. cRead) THEN
           DO I = 1, NBIN
-            WTSA(I) = 1.0/EBIN(I)**2
+            WTSA(I) = 1.0 / EBIN(I)**2
           ENDDO
         ENDIF
         NFITA = 0
@@ -335,23 +351,30 @@
         ENDDO
       ENDIF
       IF (RW .EQ. cRead) CALL Profile_Plot
+
+      CALL PrjErrTrace
+
       IF (PastPawley) THEN
-        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumOfRef)
-        DO I = 1, NumOfRef
-          CALL FileRWReal(hPrjFile,iPrjRecNr,RW,AIOBS(I))
-! @@ plus correlations
-
-        ENDDO
-! Read / Write Preferred Orientation
-
-
+        CALL PrjReadWriteIntensities
       ENDIF
+
+      CALL PrjErrTrace
+
 ! Read / Write the Z-matrices
       CALL PrjReadWriteZmatrices
-! Do we want the range and fixed yes/no per parameter as well?
-! Read / Write solutions
+
+      CALL PrjErrTrace
+
+! Read / Write Preferred Orientation
+      CALL PrjReadWritePO
+
+      CALL PrjErrTrace
+
+! Read / Write range and fixed yes/no per parameter
+      CALL SA_Parameter_Set
 ! Read / Write number of solutions
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumOf_SA_Runs)
+! Read / Write solutions
       IF (NumOf_SA_Runs .NE. 0) THEN
         DO I = 1, NumOf_SA_Runs
           DO J = 1, nvar
@@ -359,6 +382,9 @@
           ENDDO
         ENDDO
       ENDIF
+
+      CALL PrjErrTrace
+
 
 
       CLOSE(hPrjFile)
@@ -369,6 +395,28 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE PrjReadWrite
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjErrTrace
+
+      USE PRJVAR
+
+      IMPLICIT NONE
+
+      INTEGER         ErrCounter
+      COMMON /CMN008/ ErrCounter
+
+      INTEGER tInteger
+      CHARACTER*20, EXTERNAL :: Integer2String
+      
+      tInteger = 10101
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,iPrjReadOrWrite,tInteger)
+      ErrCounter = ErrCounter + 1
+      IF ((iPrjReadOrWrite .EQ. cRead) .AND. (tInteger .NE. 10101))  &
+         CALL DebugErrorMessage('Prj read error '//Integer2String(ErrCounter))
+
+      END SUBROUTINE PrjErrTrace
 !
 !*****************************************************************************
 !
@@ -469,9 +517,112 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE PrjReadWriteIntensities
+!
+! Reads or writes information on preferred orientation to / from binary project file.
+!
+      USE PRJVAR
+      USE REFVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER         IHCOV
+      COMMON /CORHES/ IHCOV(30,MaxRef)
+
+      INTEGER         KKOR
+      REAL                  WTIJ
+      INTEGER                             IKKOR,         JKKOR
+      COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
+
+      INTEGER I, RW, iR, NCOR
+      INTEGER NKKOR(MCHIHS)
+      INTEGER MINCOR, IK, II, JJ
+
+! Read or Write?
+      RW = iPrjReadOrWrite
+      KKOR = 0
+      MINCOR = 20
+      CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NumOfRef)
+      DO iR = 1, NumOfRef
+! Observed intensity
+        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,AIOBS(iR))
+! Weight of this intensity
+        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,WTI(iR))
+        IF (RW .EQ. cWrite) THEN
+! Determine number of correlations to write out
+          NCOR = 14
+          DO WHILE ((NCOR .GE. 1) .AND. (IHCOV(NCOR,iR) .EQ. 0))
+            NCOR = NCOR - 1
+          ENDDO
+        ENDIF
+! Number of correlations
+        CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,NCOR)
+        IF (NCOR .GT. 0) THEN
+          DO I = 1, NCOR
+            CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,IHCOV(I,iR))
+          ENDDO
+        ENDIF
+! Now work out which terms should be kept for the chi-squared calculation
+        KKOR = KKOR + 1
+        IKKOR(KKOR) = iR
+        JKKOR(KKOR) = iR
+        NKKOR(KKOR) = 100
+        IF (NCOR .GT. 0) THEN
+          DO I = 1, NCOR
+            IF (ABS(IHCOV(I,iR)).GE.MINCOR) THEN
+              KKOR = KKOR + 1
+              IKKOR(KKOR) = iR
+              JKKOR(KKOR) = iR + I
+              NKKOR(KKOR) = IHCOV(I,iR)
+            ENDIF
+          ENDDO
+        ENDIF
+      ENDDO
+      DO IK = 1, KKOR
+        II = IKKOR(IK)
+        JJ = JKKOR(IK)
+        IF (II .EQ. JJ) THEN
+          WTIJ(IK) = WTI(II) * WTI(JJ)
+        ELSE
+          WTIJ(IK) = 0.02*WTI(II)*WTI(JJ)*FLOAT(NKKOR(IK))
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE PrjReadWriteIntensities
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjReadWritePO
+!
+! Reads or writes information on preferred orientation to / from binary project file.
+!
+      USE PRJVAR
+      USE PO_VAR
+
+      IMPLICIT NONE
+
+      INTEGER i, RW
+
+! Read or Write?
+      RW = iPrjReadOrWrite
+      CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,PrefParExists)
+! Read/write preferred orientation parameters anyway, to enable the user
+! to switch PO on and off without having to re-enter direction etc.
+      DO i = 1, 4
+        CALL FileRWReal(hPrjFile,iPrjRecNr,RW,PrefPars(i))
+      ENDDO
+! Update the appropriate Wizard window
+      IF (iPrjReadOrWrite .EQ. cRead) CALL Update_PO
+
+      END SUBROUTINE PrjReadWritePO
+!
+!*****************************************************************************
+!
       SUBROUTINE PrjReadWriteZmatrices
 !
-! Read or writes information on peak fit ranges to / from binary project file.
+! Reads or writes information on peak fit ranges to / from binary project file.
 !
       USE PRJVAR
       USE ZMVAR
@@ -483,11 +634,16 @@
 
 ! Read or Write?
       RW = iPrjReadOrWrite
+      CALL WDialogSelect(IDD_SAW_Page1)
       CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,nfrag)
       DO iFrg = 1, maxfrg
+        CALL FileRWLogical(hPrjFile,iPrjRecNr,RW,gotzmfile(iFrg))
         IF (gotzmfile(iFrg)) THEN
+          IF (RW .EQ. cWrite) CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
           CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,zmNumberOfCopies(iFrg))
+          IF (RW .EQ. cRead ) CALL WDialogPutInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
           CALL FileRWString (hPrjFile,iPrjRecNr,RW,frag_file(iFrg))
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,izmpar(iFrg))
           CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,icomflg(iFrg))
           CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,natoms(iFrg))
           DO iAtomNr = 1, natoms(iFrg)
@@ -516,6 +672,9 @@
             CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,izmoid(iAtomNr,iFrg))
             izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the back mapping
           ENDDO
+          CALL zmDoAdmin(iFrg)
+! Precalculate the bonds
+          CALL zmGenerateBonds(iFrg)
         ENDIF
       ENDDO
       IF (RW .EQ. cRead) CALL UpdateZmatrixSelection
