@@ -173,6 +173,8 @@
       IF (.NOT. NoData) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
 ! Ungrey 'Load diffraction pattern' button on toolbar
       CALL WMenuSetState(ID_import_xye_file,ItemEnabled,WintOn)
+! Ungrey 'Fit Peaks' button on toolbar
+      CALL UpdateFitPeaksButtonState
 ! Ungrey 'Load DASH Pawley file' button on toolbar
       CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOn)
 ! Make unit cell etc. under 'View' no longer read only 
@@ -194,6 +196,11 @@
 ! @@ ?
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
+      CALL WDialogSelect(IDD_ViewPawley)
+      CALL WDialogFieldState(IDF_Sigma1,Enabled)
+      CALL WDialogFieldState(IDF_Sigma2,Enabled)
+      CALL WDialogFieldState(IDF_Gamma1,Enabled)
+      CALL WDialogFieldState(IDF_Gamma2,Enabled)
       IPTYPE = 1
       CALL Profile_Plot
 
