@@ -401,6 +401,12 @@
         CASE (IDD_PW_Page10)
           CALL DealWithWizardWindowPawley1
           GOTO 10
+        CASE (IDD_SX_Page1)
+          CALL DealWithWizardWindowSingleCrystalData1
+          GOTO 10
+        CASE (IDD_SX_Page2)
+          CALL DealWithWizardWindowSingleCrystalData2
+          GOTO 10
         CASE (IDD_Pawley_Status)
           CALL DealWithPawleyFitWindow
           GOTO 10

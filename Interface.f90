@@ -781,13 +781,15 @@
       CellParID(5) = IDF_bet_latt
       CellParID(6) = IDF_gam_latt
       CALL PushActiveWindowID
-      DO WindowNr = 1, 3
+      DO WindowNr = 1, 4
         SELECT CASE (WindowNr)
           CASE (1) 
             CALL WDialogSelect(IDD_Crystal_Symmetry)
           CASE (2) 
             CALL WDialogSelect(IDD_PW_Page1)
           CASE (3) 
+            CALL WDialogSelect(IDD_SX_Page1)
+          CASE (4) 
             CALL WDialogSelect(IDD_Peak_Positions)
         END SELECT
 ! Update all the unit cell lengths ...
@@ -807,7 +809,7 @@
           ENDIF
         ENDDO
 ! Update their Enabled/Disabled state depending on whether they are constrained by the crystal system
-        IF (WindowNr .NE. 3) THEN
+        IF (WindowNr .NE. 4) THEN
           IF (PastPawley) THEN ! Just make everything read only
             DO I = 1, 6
               CALL WDialogFieldState(CellParID(I),DialogReadOnly)
@@ -1270,13 +1272,16 @@
           CellPar(3) = CellPar(1)
       END SELECT
 ! Update all windows so that they show the contents of the global variables.
-! This is in the cell parameters tab, in the wizard, and in the peak positions tab.
+! This is in the cell parameters tab, in the two wizard windows, and in the peak positions tab.
       CALL Upload_Cell_Constants
       CALL WDialogSelect(IDD_PW_Page1)
 ! Enable/disable the wizard next button
       CALL WDialogFieldStateLogical(IDNEXT,FnUnitCellOK())
 !!Enable/disable the space group determination button
-      CALL WDialogFieldStateLogical (IDF_SGDet, FnUnitCellOK())
+      CALL WDialogFieldStateLogical(IDF_SGDet, FnUnitCellOK())
+! Enable/disable the single xtal wizard next button
+      CALL WDialogSelect(IDD_SX_Page1)
+      CALL WDialogFieldStateLogical(IDNEXT,FnUnitCellOK())
       CALL Generate_TicMarks
       CALL PopActiveWindowID
 
@@ -1369,6 +1374,8 @@
       CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
       CALL WDialogSelect(IDD_PW_Page1)
       CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+      CALL WDialogSelect(IDD_SX_Page1)
+      CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
       CALL PopActiveWindowID
 
       END SUBROUTINE SetSpaceGroupMenu
@@ -1396,6 +1403,8 @@
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
       CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
+      CALL WDialogSelect(IDD_SX_Page1)
       CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
       CALL PopActiveWindowID
 
@@ -1468,6 +1477,8 @@
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
       CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL WDialogSelect(IDD_SX_Page1)
       CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
       CALL SetSpaceGroupMenu
       CALL PopActiveWindowID
