@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 11/Mar/2002 09:33:43
+// Modified : 12/Mar/2002 10:34:35
 //
 ///////////////////////////////////////////////////
 //
@@ -586,14 +586,14 @@
 #define ID_FitPeaks                     40020
 #define IDD_Rietveld                      172
 #define IDF_TAB1                         1399
-#define IDF_GRID1                        1397
+#define IDF_RR_ZmatrixGrid               1397
 #define IDB_Refine                       1398
 #define IDD_RRsubBonds                    180
 #define IDD_DIALOG008                     181
 #define IDD_RRsubZmatrices                173
-#define IDF_GRID2                        1439
-#define IDF_GRID3                        1440
-#define IDF_GRID4                        1441
+#define IDF_RR_AngleGrid                 1438
+#define IDF_RR_TorsionGrid               1440
+#define IDF_RR_AtomGrid                  1439
 #define IDD_RRsubAngles                   182
 #define IDD_TEMPLATE020                   179
 #define IDD_RRsubTorsions                 183
@@ -601,6 +601,26 @@
 #define IDD_RRsubAtoms                    185
 #define IDD_DIALOG012                     187
 #define IDD_DIALOG014                     190
+#define IDF_RR_BondGrid                  1441
+#define IDB_Invert                       1442
+#define IDB_FixAll                       1443
+#define IDB_FixNone                      1444
+#define IDD_RRsubData                     174
+#define IDF_RRa                          1445
+#define IDF_RRb                          1446
+#define IDF_RRc                          1447
+#define IDF_RRalpha                      1448
+#define IDF_RRgamma                      1449
+#define IDF_RRbeta                       1450
+#define IDF_RR_Damping                   1451
+#define IDF_RR_DataStart                 1452
+#define IDF_RR_DataEnd                   1453
+#define IDF_RR_ExclRegions               1454
+#define IDF_RR_ZeroPoint                 1455
+#define IDB_Undo                         1456
+#define ID_Save                         40027
+#define ID_New                          40024
+#define ID_Open                         40026
 
 ///////////////////////////////////////////////////
 //
@@ -1007,19 +1027,6 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
-END
-
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
@@ -2181,7 +2188,7 @@ IDD_TEMPLATE011 DIALOG 0, 0, 1000,   16
 STYLE DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "Solution Filename",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_READONLY,    0,    0,  240,   14
+    CONTROL "Solution Filename",ISS1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY,    0,    0,  240,   14
     CONTROL "View",ISS2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_PUSHLIKE,    0,    0,   30,   14
     CONTROL "Overlay",ISS7,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT,    0,    0,   34,   14
     CONTROL "Profile Chi-sqd",ISS3,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_CENTER | ES_MULTILINE | ES_READONLY,    0,    0,   54,   14
@@ -3461,11 +3468,12 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLO
 FONT    8, "MS Sans Serif"
 CAPTION "Rietveld Refinement"
 BEGIN
-    CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   75,  184,   40,   14
-    CONTROL "Refine",IDB_Refine,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   16,  184,   40,   14
-    CONTROL "View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  192,  184,   40,   14
-    CONTROL "Save",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  133,  184,   40,   14
-    CONTROL "",IDF_TAB1,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   13,   11,  220,  162
+    CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  151,  189,   40,   14
+    CONTROL "Refine",IDB_Refine,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,    9,  189,   40,   14
+    CONTROL "View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  197,  189,   40,   14
+    CONTROL "Save",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  103,  189,   40,   14
+    CONTROL "",IDF_TAB1,"SYSTABCONTROL32",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | TCS_TABS | TCS_SINGLELINE | TCS_MULTILINE | TCS_RIGHTJUSTIFY,   13,    8,  220,  172
+    CONTROL "Undo",IDB_Undo,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   56,  189,   40,   14
 END
 
 IDD_Rietveld RCDATA
@@ -3473,12 +3481,13 @@ BEGIN
 "[Checks] \n"
 "[Menus] \n"
 "[Tabs] \n"
-" 1399     5   173 \n"
+" 1399     6   173 \n"
 "  173  Z-matrices \n"
 "  180  Bonds \n"
 "  182  Angles \n"
 "  183  Torsions \n"
 "  185  Atoms \n"
+"  174  Data \n"
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
@@ -3487,11 +3496,14 @@ BEGIN
 ,0
 END
 
-IDD_RRsubZmatrices DIALOG 0, 0,  200,  140
+IDD_RRsubZmatrices DIALOG 0, 0,  200,  155
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_GRID1,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  164,  129
+    CONTROL "",IDF_RR_ZmatrixGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  164,  129
+    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
+    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
+    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
 END
 
 IDD_RRsubZmatrices RCDATA
@@ -3531,11 +3543,14 @@ BEGIN
 ,0
 END
 
-IDD_RRsubBonds DIALOG 0, 0,  200,  140
+IDD_RRsubBonds DIALOG 0, 0,  200,  155
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_GRID1,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  113,  129
+    CONTROL "",IDF_RR_BondGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  113,  129
+    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
+    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
+    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
 END
 
 IDD_RRsubBonds RCDATA
@@ -3546,7 +3561,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1397     3    150   181 \n"
+" 1441     3    150   181 \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
@@ -3575,11 +3590,14 @@ BEGIN
 ,0
 END
 
-IDD_RRsubAngles DIALOG 0, 0,  200,  140
+IDD_RRsubAngles DIALOG 0, 0,  200,  155
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_GRID2,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  113,  129
+    CONTROL "",IDF_RR_AngleGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  113,  129
+    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
+    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
+    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
 END
 
 IDD_RRsubAngles RCDATA
@@ -3590,7 +3608,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1439     3    150   184 \n"
+" 1438     3    150   184 \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
@@ -3619,11 +3637,14 @@ BEGIN
 ,0
 END
 
-IDD_RRsubTorsions DIALOG 0, 0,  200,  140
+IDD_RRsubTorsions DIALOG 0, 0,  200,  155
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_GRID3,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  113,  129
+    CONTROL "",IDF_RR_TorsionGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  113,  129
+    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
+    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
+    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
 END
 
 IDD_RRsubTorsions RCDATA
@@ -3663,11 +3684,14 @@ BEGIN
 ,0
 END
 
-IDD_RRsubAtoms DIALOG 0, 0,  200,  140
+IDD_RRsubAtoms DIALOG 0, 0,  200,  155
 STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
 FONT    8, "MS Sans Serif"
 BEGIN
-    CONTROL "",IDF_GRID4,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  122,  129
+    CONTROL "",IDF_RR_AtomGrid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS,   10,    5,  122,  129
+    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
+    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
+    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
 END
 
 IDD_RRsubAtoms RCDATA
@@ -3678,7 +3702,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1441     5    150   190 \n"
+" 1439     5    150   190 \n"
 "[Colours] \n"
 "[Lengths] \n"
 ,0
@@ -3708,6 +3732,51 @@ BEGIN
 "[Colours] \n"
 "[Lengths] \n"
 " 1021     5 \n"
+,0
+END
+
+IDD_RRsubData DIALOG 0, 0,  200,  155
+STYLE WS_CHILD | DS_CONTROL | DS_3DLOOK
+FONT    8, "MS Sans Serif"
+BEGIN
+    CONTROL "Fix All",IDB_FixAll,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   16,  139,   40,   14
+    CONTROL "Fix None",IDB_FixNone,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   74,  139,   40,   14
+    CONTROL "Invert",IDB_Invert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  132,  139,   40,   14
+    CONTROL "a",IDF_RRa,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,    8,   40,   14
+    CONTROL "b",IDF_RRb,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   22,   40,   14
+    CONTROL "c",IDF_RRc,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   36,   40,   14
+    CONTROL "alpha",IDF_RRalpha,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   50,   40,   14
+    CONTROL "gamma",IDF_RRgamma,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   78,   40,   14
+    CONTROL "beta",IDF_RRbeta,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   64,   40,   14
+    CONTROL "Use Hydrogens",IDF_UseHydrogens,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   76,    8,   80,   14
+    CONTROL "Damping",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   72,   37,   40,    8
+    CONTROL "Data start",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   72,   59,   40,    8
+    CONTROL "Data end",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   72,   75,   40,    8
+    CONTROL "1.0000",IDF_RR_Damping,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  121,   35,   40,   14
+    CONTROL "3.0000",IDF_RR_DataStart,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  121,   56,   40,   14
+    CONTROL "45.000",IDF_RR_DataEnd,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  121,   72,   40,   14
+    CONTROL "Excluded Regions...",IDF_RR_ExclRegions,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   81,  106,   80,   14
+    CONTROL "Zero point",IDF_RR_ZeroPoint,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   14,   92,   60,   14
+END
+
+IDD_RRsubData RCDATA
+BEGIN
+"[Checks] \n"
+" 1445 0 \n"
+" 1446 0 \n"
+" 1447 0 \n"
+" 1448 0 \n"
+" 1449 0 \n"
+" 1450 0 \n"
+" 1296 0 \n"
+" 1455 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
 ,0
 END
 
@@ -3825,7 +3894,6 @@ BEGIN
     ID_Pawley_Refinement_Mode       "Pawley refinement mode"
     ID_Start_Wizard                 "Launch the DASH Wizard"
     ID_Remove_Background            "Remove background"
-    ID_import_dpj_file              "Open DASH Pawley file"
     ID_import_xye_file              "Open powder diffraction file"
     ID_Left                         "Move left"
     ID_Right                        "Move right"
@@ -3835,6 +3903,9 @@ BEGIN
     ID_ClearPeakFitRanges           "Delete peak fit ranges"
     ID_Delabc                       "Clear cell parameters"
     ID_FitPeaks                     "Fit peaks"
+    ID_New                          "New project"
+    ID_Open                         "Open project"
+    ID_Save                         "Save project"
 END
 
 ///////////////////////////////////////////////////
@@ -3844,7 +3915,9 @@ END
 ID_TOOLBAR1 RCDATA
 BEGIN
      16, 16,
-   ID_import_dpj_file,
+   ID_New,
+   ID_Open,
+   ID_Save,
    ID_import_xye_file,0,
    ID_Remove_Background,0,
    ID_Peak_Fitting_Mode,
