@@ -35,52 +35,6 @@
 !
 !*****************************************************************************
 !
-      CHARACTER*1 FUNCTION ChrLowerCase(TheChar)
-
-      IMPLICIT NONE
-
-      CHARACTER*1, INTENT (IN   ) :: TheChar
-
-      CHARACTER*26 lc, UC
-      PARAMETER (lc = 'abcdefghijklmnopqrstuvwxyz')
-      PARAMETER (UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-      INTEGER POS
-
-      ChrLowerCase = TheChar
-      DO POS = 1, 26
-        IF (UC(POS:POS) .EQ. TheChar) THEN
-          ChrLowerCase = lc(POS:POS)
-          RETURN
-        ENDIF
-      END DO
-
-      END FUNCTION ChrLowerCase
-!
-!*****************************************************************************
-!
-      CHARACTER*1 FUNCTION ChrUpperCase(TheChar)
-
-      IMPLICIT NONE
-
-      CHARACTER*1, INTENT (IN   ) :: TheChar
-
-      CHARACTER*26 lc, UC
-      PARAMETER (lc = 'abcdefghijklmnopqrstuvwxyz')
-      PARAMETER (UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-      INTEGER POS
-
-      ChrUpperCase = TheChar
-      DO POS = 1, 26
-        IF (lc(POS:POS) .EQ. TheChar) THEN
-          ChrUpperCase = UC(POS:POS)
-          RETURN
-        ENDIF
-      END DO
-
-      END FUNCTION ChrUpperCase
-!
-!*****************************************************************************
-!
       REAL FUNCTION WavelengthOf(TheAnodeMaterial)
 !
 ! This function return the wavelength of an X-ray tube given the material the anode is made of.
@@ -118,47 +72,6 @@
          END SELECT
 
       END FUNCTION  WavelengthOf
-!
-!*****************************************************************************
-!
-      INTEGER FUNCTION GetNumOfColumns(TheString)
-!
-! This function determines the number of columns in a string
-! a column is a consecutive sequence of non-blank characters embedded in two blank-characters
-!
-! JvdS 27 July 2001
-!
-! INPUT   : TheString = the string
-!
-! RETURNS : Number of columns
-!
-
-      IMPLICIT NONE
-
-      CHARACTER*(*), INTENT (IN   ) :: TheString
-
-      INTEGER POS
-      INTEGER tNumOfColumns
-      INTEGER StrLen
-
-      StrLen = LEN_TRIM(TheString)
-      tNumOfColumns = 0
-      POS = 1
-      DO WHILE (POS .LE. StrLen)
-! Skip spaces
-        DO WHILE ((POS .LE. StrLen) .AND. (TheString(POS:POS) .EQ. ' '))
-          POS = POS + 1
-        END DO
-! If we hit a non-space: it's a column
-        IF ((POS .LE. StrLen) .AND. (TheString(POS:POS) .NE. ' ')) tNumOfColumns = tNumOfColumns + 1
-! Scan past rest of column (find next space / end of string)
-        DO WHILE ((POS .LE. StrLen) .AND. (TheString(POS:POS) .NE. ' '))
-          POS = POS + 1
-        END DO
-      END DO
-      GetNumOfColumns = tNumOfColumns
-
-      END FUNCTION GetNumOfColumns
 !
 !*****************************************************************************
 !
@@ -422,6 +335,8 @@
       INTEGER          I, J, JJ
       INTEGER          POS
       LOGICAL          ESDsFilled
+      REAL             tReal
+      REAL             dSpacing2TwoTheta ! Function
 
       BACKREF = .TRUE.
       Diffraction_File_Load = 0
@@ -497,7 +412,7 @@
         YPMIN = MIN(YOBS(I),YPMIN)
         IF (YPMAX .LT. YOBS(I)) THEN
           MAX_INTENSITY_INDEX = I
-          YPMAX=YOBS(I)
+          YPMAX = YOBS(I)
         END IF
       END DO
       INTEGRATED_GUESS = 0
@@ -510,6 +425,7 @@
         SCALFAC = 0.01 * YPMAX/100000
       END IF
       OriginalNOBS = NOBS
+      EndNOBS = OriginalNOBS
       NBIN = (NOBS/LBIN)
       DO I = 1, NBIN
         IST = (I-1)*LBIN
@@ -544,6 +460,19 @@
       IPMAXOLD = IPMAX
       IPTYPE = 1
       CALL Profile_Plot(IPTYPE)
+! Set minimum and maximum truncation values in Wizard in accordance with data read in
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page5)
+      CALL WDialogPutReal(IDF_Min2Theta,XPMIN)
+! If truncation resolution not attainable with current data range / wavelength, adjust the maximum resolution
+      CALL WDialogGetReal(IDF_MaxResolution,tReal)
+      IF (dSpacing2TwoTheta(tReal) .GT. XPMAX) THEN
+        CALL WDialogPutReal(IDF_Max2Theta,XPMAX)
+        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(XPMAX))
+      ELSE
+        CALL WDialogPutReal(IDF_Max2Theta,dSpacing2TwoTheta(tReal))
+      ENDIF
+      CALL PopActiveWindowID
       NoData = .FALSE.
       CALL ScrUpdateFileName
 
@@ -1060,64 +989,6 @@
       RETURN
 
       END FUNCTION Load_rd_File
-!
-!*****************************************************************************
-!
-      SUBROUTINE GetSubString(TheString, TheDelimiter, TheSubString)
-!
-! This subroutine returns the substring of a string until a certain character is found.
-! This way, individual fields delimited by a character can be extracted from a string.
-!
-! JvdS 24 Aug 2001
-!
-! INPUT  : TheString    = the string that should be scanned.
-!          TheDelimiter = the character that separates fields. The beginning and the end of TheString
-!                         are separators as well.
-!
-! OUTPUT : TheSubString contains the substring, excluding the delimiter
-!          TheString    has the substring and the delimiter removed on exit.
-!
-      IMPLICIT NONE
-
-      CHARACTER*(*), INTENT (INOUT) :: TheString
-      CHARACTER    , INTENT (IN   ) :: TheDelimiter
-      CHARACTER*(*), INTENT (  OUT) :: TheSubString
-
-      INTEGER POS, tLEN, I, tPOS
-
-      tLEN = LEN_TRIM(TheString)
-      TheSubString = ' '
-      IF (tLEN .EQ. 0) RETURN
-! Find first occurrence of TheDelimiter
-      POS = 1
-      DO WHILE ((POS .LT. tLEN) .AND. (TheString(POS:POS) .NE. TheDelimiter))
-        POS = POS + 1
-      ENDDO
-! The delimiter itself should not be copied
-      IF (TheString(POS:POS) .EQ. TheDelimiter) THEN
-        tPOS = POS - 1
-      ELSE
-        tPOS = POS
-      ENDIF
-      IF (tPOS .NE. 0) THEN
-! Fill the substring
-        TheSubString(1:tPOS) = TheString(1:tPOS)
-      ENDIF
-! Remove the substring, including the delimiter, from the string
-      IF (POS .EQ. tLEN) THEN
-        TheString = ' '
-      ELSE
-        DO I = 1, tLEN-POS
-          TheString(I:I) = TheString(I+POS:I+POS)
-        ENDDO
-! Overwrite remainder with spaces
-        DO I = 1+(tLEN-POS), tLEN
-          TheString(I:I) = ' '
-        ENDDO
-      ENDIF
-
-      END SUBROUTINE GetSubString
-
 !
 !*****************************************************************************
 !
@@ -1835,7 +1706,7 @@
       REAL RMaxTTheta
       INTEGER I, J, JJ
 
-      DO I = 1, OriginalNOBS
+      DO I = 1, EndNOBS
         IF (XOBS(I) .GT. RMaxTTheta) EXIT
       END DO
       IF (I .LE. 1) RETURN
@@ -1902,6 +1773,9 @@
       INCLUDE 'statlog.inc'
 
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
+
+      REAL tXOBS(MOBS),tYOBS(MOBS),tYCAL(MOBS),tYBAK(MOBS),tEOBS(MOBS)
+
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
         YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
@@ -1920,20 +1794,51 @@
  
       INTEGER I, J, JJ, Shift
 
-      DO I = 1, OriginalNOBS
-        IF (XOBS(I) .GT. TheMin2Theta) EXIT
-      END DO
-      IF (I .LE. 1) RETURN
-      Shift = I-1
-!@ Very dirty: loose all data lower than TheMin2Theta
-      OriginalNOBS = OriginalNOBS - Shift
-      DO I = 1, OriginalNOBS
-        XOBS(I) = XOBS(I+Shift)
-        YOBS(I) = YOBS(I+Shift)
-        YCAL(I) = YCAL(I+Shift)
-        YBAK(I) = YBAK(I+Shift)
-        EOBS(I) = EOBS(I+Shift)
+! We might have been through this routine before: undo that (in case the user wants to 
+! truncate at a 2 theta value lower than currently visible) and store the result (i.e. the
+! original pattern) in tXOBS.
+
+! If EndNOBS <> OriginalNOBS, truncated data is stored after the original pattern
+      IF (EndNOBS .NE. OriginalNOBS) THEN
+        DO I = 1, OriginalNOBS-EndNOBS
+          tXOBS(I) = XOBS(I+EndNOBS)
+          tYOBS(I) = YOBS(I+EndNOBS)
+          tYCAL(I) = YCAL(I+EndNOBS)
+          tYBAK(I) = YBAK(I+EndNOBS)
+          tEOBS(I) = EOBS(I+EndNOBS)
+        ENDDO
+      ENDIF
+! The data that was truncated at the beginning is now part of NOBS again
+      NOBS = NOBS + OriginalNOBS - EndNOBS
+! Copy the rest of the pattern to tXOBS etc., including any parts truncated at the end.
+      DO I = 1, EndNOBS
+        tXOBS(I+OriginalNOBS-EndNOBS) = XOBS(I)
+        tYOBS(I+OriginalNOBS-EndNOBS) = YOBS(I)
+        tYCAL(I+OriginalNOBS-EndNOBS) = YCAL(I)
+        tYBAK(I+OriginalNOBS-EndNOBS) = YBAK(I)
+        tEOBS(I+OriginalNOBS-EndNOBS) = EOBS(I)
       ENDDO
+      DO I = 1, NOBS
+        IF (tXOBS(I) .GT. TheMin2Theta) EXIT
+      END DO
+      Shift = I-1
+      EndNOBS = OriginalNOBS - Shift
+      DO I = 1, EndNOBS
+        XOBS(I) = tXOBS(I+Shift)
+        YOBS(I) = tYOBS(I+Shift)
+        YCAL(I) = tYCAL(I+Shift)
+        YBAK(I) = tYBAK(I+Shift)
+        EOBS(I) = tEOBS(I+Shift)
+      ENDDO
+      IF (Shift .NE. 0) THEN
+        DO I = 1, Shift
+          XOBS(EndNOBS+I) = tXOBS(I)
+          YOBS(EndNOBS+I) = tYOBS(I)
+          YCAL(EndNOBS+I) = tYCAL(I)
+          YBAK(EndNOBS+I) = tYBAK(I)
+          EOBS(EndNOBS+I) = tEOBS(I)
+        ENDDO
+      ENDIF
       NOBS = NOBS - Shift
       NBIN=(NOBS/LBIN)
       DO I = 1, NBIN
@@ -2002,117 +1907,6 @@
         "Data truncation on read in")
 
       END SUBROUTINE ProfileRead_TruncationWarning
-!
-!*****************************************************************************
-!
-      SUBROUTINE Background_Fit
-
-      USE VARIABLES
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
-
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-
-      INTEGER I, J, IBpass
-      LOGICAL QUIT
-
-! JvdS When called from within the Wizard, this entire routine should just be a step
-! JvdS within the Wizard. It's quite stand-alone now.
-
-! Remember current dialogue window
-      CALL PushActiveWindowID
-! Grey out all other menus
-      CALL ToggleMenus(0)
-! The reason behind this greying out seems to be that the next dialogue
-! window cannot be made modal because it needs to draw the calculated background 
-! to the main screen. And the user should be able to zoom in on parts of the graph
-! to decide whether or not to accept the background.
-      CALL WDialogSelect(ID_Background_Fit)
-! Initialise the background
-      CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-      CALL BackMCBruckner(IBpass,20,.TRUE.,.TRUE.)
-      CALL Profile_Plot(IPTYPE)
-      CALL WDialogShow(-1,-1,0,Modeless)
-      QUIT = .FALSE.
-      DO WHILE(.NOT. QUIT)
-        CALL GetEvent
-        IF (EventType .EQ. PushButton) THEN
-! Process it
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Background_Apply)
-              CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-              CALL BackMCBruckner(IBpass,20,.TRUE.,.TRUE.)
-              CALL Profile_Plot(IPTYPE)
-            CASE (IDF_Background_Accept)
-! Subtract the background
-              IOBS = 0
-              YPMIN = YOBS(1) - YBBIN(1)
-              YPMAX = YPMIN
-              DO I = 1, NBIN
-                DO J = 1, LBIN
-                  IOBS = IOBS + 1
-                  YOBS(IOBS) = YOBS(IOBS) - YBBIN(I)
-                  YPMIN = MIN(YOBS(IOBS),YPMIN)
-                  YPMAX = MAX(YOBS(IOBS),YPMAX)
-                END DO
-                YOBIN(I) = YOBIN(I) - YBBIN(I)
-                YBBIN(I) = 0.0
-              END DO
-              XPGMIN = XPMIN
-              XPGMAX = XPMAX                       
-              YPGMIN = YPMIN
-              YPGMAX = YPMAX
-              CALL UPLOAD_RANGE()
-              XPGMINOLD = XPMIN
-              XPGMAXOLD = XPMAX
-              YPGMINOLD = YPMIN
-              YPGMAXOLD = YPMAX
-              IPMIN = 1
-              IPMAX = NBIN
-              IPMINOLD = IPMIN
-              IPMAXOLD = IPMAX
-              QUIT = .TRUE. 
-              BACKREF = .FALSE.
-            CASE (IDCANCEL)
-! If user Cancels, assume no knowledge on background
-              DO I = 1, NBIN
-                YBBIN(I) = 0.0
-              END DO
-              QUIT = .TRUE.
-          END SELECT
-        END IF
-      END DO
-      CALL WDialogSelect(ID_Background_Fit)
-      CALL WDialogHide()
-      CALL Profile_Plot(IPTYPE)
-! JvdS I think the following line introduces a bug.
-! Assume we've just loaded a .xye file through the wizard (that's why this routine was called).
-! It is now possible to load another .xye file through the icon on the main menu.
-! That causes some states to be defined twice, and the wizard window locks up.
-      CALL ToggleMenus(1)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Background_Fit
 !
 !*****************************************************************************
 !
