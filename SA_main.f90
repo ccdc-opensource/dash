@@ -233,22 +233,15 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
-      DOUBLE PRECISION XOPT,       C,       XP,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
-
 ! JCC Handle via the PDB standard
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
 
-      DOUBLE PRECISION x,lb,ub,vm,xpreset
-      COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
-      COMMON /presetr/ xpreset(mvar)
+      DOUBLE PRECISION x,       lb,       ub,       vm
+      COMMON /values/  x(mvar), lb(mvar), ub(mvar), vm(mvar)
 
-      DOUBLE PRECISION prevub, prevlb ! For saving the previous range
+      DOUBLE PRECISION prevub,       prevlb       ! For saving the previous range
       COMMON /pvalues/ prevub(mvar), prevlb(mvar)
-
-      LOGICAL log_preset
-      COMMON /presetl/ log_preset
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -256,8 +249,9 @@
       INTEGER         NStPar
       COMMON /pextra/ NStPar
 
-      DOUBLE PRECISION T0,rt
-      COMMON /saparl/ T0,rt
+      DOUBLE PRECISION T0, rt
+      COMMON /saparl/  T0, rt
+
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
@@ -283,17 +277,17 @@
       CALL SAGMINV(f2cmat,c2fmat,3)
       tRecLattice = SNGL(c2fmat)
       CALL frac2pdb(f2cpdb,dcel(1),dcel(2),dcel(3),dcel(4),dcel(5),dcel(6))
-      CALL CREATE_FOB()
+      CALL CREATE_FOB
       CALL WDialogSelect(IDD_SAW_Page2)
 ! Per Z-matrix, determine whether to use quaternions or a single axis
-      DO ifrg = 1, maxfrg
+      DO iFrg = 1, maxfrg
         IF (gotzmfile(iFrg)) THEN
           CALL WGridGetCellMenu(IDF_RotationsGrid,1,iFrg,iOption)
           UseQuaternions(iFrg) = (iOption .NE. 3)
-          IF (.NOT. UseQuaternions(ifrg)) THEN
-            CALL WGridGetCellReal(IDF_RotationsGrid,2,ifrg,zmSingleRotationAxis(1,iFrg))
-            CALL WGridGetCellReal(IDF_RotationsGrid,3,ifrg,zmSingleRotationAxis(2,iFrg))
-            CALL WGridGetCellReal(IDF_RotationsGrid,4,ifrg,zmSingleRotationAxis(3,iFrg))
+          IF (.NOT. UseQuaternions(iFrg)) THEN
+            CALL WGridGetCellReal(IDF_RotationsGrid,2,iFrg,zmSingleRotationAxis(1,iFrg))
+            CALL WGridGetCellReal(IDF_RotationsGrid,3,iFrg,zmSingleRotationAxis(2,iFrg))
+            CALL WGridGetCellReal(IDF_RotationsGrid,4,iFrg,zmSingleRotationAxis(3,iFrg))
 ! Initialise the parts of the quaternions of the single rotation axis that are due to the axis
 ! The variable zmSingleRotationAxis holds the fractional co-ordinates,
 ! we need orthogonal co-ordinates => convert
@@ -366,7 +360,6 @@
       DO iFrg = 1, maxfrg
 ! Only include those that are now checked
         IF (gotzmfile(iFrg)) THEN
-
           DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
             TotNumZMatrices = TotNumZMatrices + 1
             DO ii = 1, izmpar(iFrg)
@@ -429,8 +422,6 @@
               END SELECT
             ENDDO
           ENDDO
-
-
 !JCC End of check on selection
         ENDIF
       ENDDO
@@ -545,7 +536,7 @@
           ENDIF
           izmtot = izmtot + NumberOfDOF
 ! Enable 'Number of' field
-          CALL WDialogFieldState(IDFzmNumber(ifrg),Enabled)
+          CALL WDialogFieldState(IDFzmNumber(iFrg),Enabled)
 ! Due to lack of space: display the name of file only, without its full path
           CALL SplitPath(frag_file(iFrg),DirName,FileName)
           CALL WDialogPutString(IDFZMFile(iFrg),FileName)
