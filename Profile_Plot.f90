@@ -287,6 +287,7 @@
       USE WINTERACTER
 
       INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'GLBVAR.INC'
 
       INCLUDE 'PARAMS.INC'
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
@@ -295,11 +296,9 @@
       YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
       XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      REAL CHAR_SIZE,MARKER_SIZE
-      LOGICAL ERROR_BAR
-      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
       LOGICAL PlotErrorBars ! Function
 
+       call IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
 ! Do the error bars - we've precalculated the min & max pointers
       CALL IGrColourN(KolNumObs)
@@ -341,6 +340,7 @@
 
       USE WINTERACTER
 
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'POLY_COLOURS.INC'
 
       INCLUDE 'PARAMS.INC'
@@ -350,9 +350,6 @@
         YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
         XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      REAL CHAR_SIZE,MARKER_SIZE
-      LOGICAL ERROR_BAR
-      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
 
 !      CALL IPgNewGraph(1,nbin,' ',' ','X')
       CALL IPgNewPlot(PgPolyLine,1,NBIN)
@@ -368,6 +365,7 @@
       USE WINTERACTER
 
       INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'GLBVAR.INC'
 !
       INCLUDE 'PARAMS.INC'
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
@@ -376,12 +374,10 @@
       YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
       XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      REAL CHAR_SIZE,MARKER_SIZE
-      LOGICAL ERROR_BAR
-      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
       LOGICAL PlotErrorBars ! Function
       REAL YDIF(MOBS),YCTEM(MOBS)
 !
+       call IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
 !      CALL IPgNewGraph(3,nbin,' ',' ','XY')
       CALL IPgNewPlot(PgPolyLine,3,NBIN)
@@ -436,8 +432,9 @@
 ! Highlight (recolour) the peak fit range and label the peaks.
 ! If already fitted then show the fitted profile as well.
       USE WINTERACTER
+
       INCLUDE 'POLY_COLOURS.INC'
-!
+      INCLUDE 'GLBVAR.INC'
 
       INCLUDE 'PARAMS.INC'
         COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
@@ -454,9 +451,6 @@
       XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
       IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
 !
-      REAL CHAR_SIZE,MARKER_SIZE
-      LOGICAL ERROR_BAR
-      COMMON /PROFDEF/ERROR_BAR,CHAR_SIZE,MARKER_SIZE
       character*1 ChrPkNum
       character*2 ChrPkNum2
 !
@@ -611,6 +605,7 @@
         YCALbest(i)=RESCL*YCALbest(I)
       END DO
       CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
+       call IGrColourN(KolNumMain)
       CALL IPgYLabelLeft('Observed profile','C9')
 !
 !      CALL IPgNewGraph(3,nobs,' ',' ','XY')
