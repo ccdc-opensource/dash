@@ -353,7 +353,7 @@
 !*****************************************************************************
 !
       SUBROUTINE Plot_ObsCalc_Profile()
-!
+
       USE WINTERACTER
 
       INCLUDE 'POLY_COLOURS.INC'
@@ -363,9 +363,10 @@
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
       COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
       COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-      YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-      XGGMIN,XGGMAX,YGGMIN,YGGMAX
+        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
+        XGGMIN,XGGMAX,YGGMIN,YGGMAX
       COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+
       LOGICAL PlotErrorBars ! Function
       REAL YDIF(MOBS)
 
@@ -382,7 +383,7 @@
       CALL IPgStyle(2,0,3,0,0,KolNumObs)
       CALL IPgStyle(3,0,0,0,KolNumCal,0)
 ! Now draw the difference plofile
-      CALL IPgXYPairs(xbin,ydif)
+      CALL IPgXYPairs(XBIN,ydif)
 ! The following four lines set the markers for the observed profile.
       CALL IPgMarker( 2, 13)
       sizmtem = marker_size*FLOAT(500)/FLOAT(ipmax-ipmin)
@@ -396,17 +397,17 @@
 !
       CALL IGrColourN(KolNumObs)
       IF (PlotErrorBars()) THEN
-      DO I = IPMIN, IPMAX
-        xtem = xbin(I)
-        ytem = MAX(YOBIN(I)-EBIN(I),ypgmin)
-        ytem = MIN(ytem,ypgmax)
-        CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-        CALL IGrMoveTo(xgtem,ygtem)
-        ytem = MIN(YOBIN(I)+EBIN(I),ypgmax)
-        ytem = MAX(ytem,ypgmin)
-        CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-        CALL IGrLineTo(xgtem,ygtem)
-      END DO
+        DO I = IPMIN, IPMAX
+          xtem = xbin(I)
+          ytem = MAX(YOBIN(I)-EBIN(I),ypgmin)
+          ytem = MIN(ytem,ypgmax)
+          CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+          CALL IGrMoveTo(xgtem,ygtem)
+          ytem = MIN(YOBIN(I)+EBIN(I),ypgmax)
+          ytem = MAX(ytem,ypgmin)
+          CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+          CALL IGrLineTo(xgtem,ygtem)
+        END DO
       END IF
       CALL IPgXYPairs(XBIN,YCBIN)
       CALL IGrCharSize(1.0,1.0)
@@ -446,6 +447,7 @@
 
       iord_peak = 0
       DO i = 1, NumPeakFitRange
+! Draw the hatched rectangle indicating the area swept out by the user
         CALL IGrColourN(KolNumPanelDark)
         CALL IGrFillPattern(Hatched,Medium,DiagUp)
         CALL IPgUnitsToGrUnits(XPF_Range(1,i),ypgmin,gxleft,gybot)
@@ -455,62 +457,30 @@
         gxright = MIN(gxright,xggmax)
         gxright = MAX(gxright,xggmin)
         CALL IGrRectangle(gxleft,gybot,gxright,gytop) 
+! Then the fitted peak
         ipf1 = IPF_RPt(i) + 1
         ipf2 = IPF_RPt(i+1)
 ! Now we do a quick check to see if the range has been set
         IF (ipf2 .NE. 0) THEN
-          xp1=XPeakFit(ipf1)
-          xp2=XPeakFit(ipf2)
-          IF (xp2 .GT. xpgmin .AND. xp1 .LT. xpgmax) THEN
+          IF (XPeakFit(ipf2) .GT. xpgmin .AND. XPeakFit(ipf1) .LT. xpgmax) THEN
 ! We can plot the calculated fit
-            DO ii = ipf1, ipf2
-              IF (XpeakFit(ii) .GE. xpgmin) THEN
-                ix1 = ii
+            DO II = ipf1, ipf2
+              IF (XpeakFit(II) .GE. xpgmin) THEN
+! If this two theta is within the drawing area, and the previous wasn't
+! then we need to start at the _previous_ point. Unless that point doesn't exist, of course.
+                ix1 = MAX(II-1,ipf1)
                 GOTO 110
               END IF
             END DO
- 110        DO ii = ipf2, ipf1, -1
-              IF (XpeakFit(ii) .LE. xpgmax) THEN
-                ix2 = ii
+ 110        DO II = ipf2, ipf1, -1
+              IF (XpeakFit(II) .LE. xpgmax) THEN
+                ix2 = MIN(II+1,ipf2)
                 GOTO 120
               END IF
             END DO
- 120        CALL IPgUnitsToGrUnits(xpeakfit(ix1),ypeakfit(ix1),xgtem,ygtem)
-            CALL IGrMoveTo(xgtem,ygtem)
-            CALL IGrColourN(KolNumCTic)
-! Software clipping - there must be a better way
-!
-! JCC - I've totally recoded this so that its clearer. It will be a bit slower, since it recalculates both
-! points on every iteration, but it does now work!
-            DO ip=ix1+1,ix2
-! Get the coordinates between the 2 current points
-              CALL IPgUnitsToGrUnits(xpeakfit(ip - 1),ypeakfit(ip - 1),xg_coord1,yg_coord1)
-              CALL IPgUnitsToGrUnits(xpeakfit(ip),    ypeakfit(ip),    xg_coord2,yg_coord2)
-! Check the y-coordinate ranges
-! 1. All out of box so ignore
-              IF (yg_coord1 .LT. gybot .AND. yg_coord2 .LT. gybot) CYCLE
-              IF (yg_coord1 .GT. gytop .AND. yg_coord2 .GT. gytop) CYCLE
-              CALL IGrMoveTo(xg_coord1, yg_coord1)
-              IF (yg_coord1 .LT. gybot) THEN
-! Move the start point to the intercept point in the box
-                xtem = xg_coord1 + (xg_coord2 - xg_coord1)*(gybot-yg_coord1)/(yg_coord2-yg_coord1)
-                CALL IGrMoveTo(xtem,gybot)
-              ELSE IF (yg_coord2 .LT. gybot) THEN
-! Move the end point to the intercept point in the box
-                xg_coord2 = xg_coord2 + (xg_coord2 - xg_coord1)*(gybot-yg_coord1)/(yg_coord2-yg_coord1)
-                yg_coord2 = gybot
-              ENDIF
-              IF (yg_coord1 .GT. gytop) THEN
-! Move the start point to the intercept point in the box
-                xtem = xg_coord1 + (xg_coord2 - xg_coord1)*(gytop-yg_coord1)/(yg_coord2-yg_coord1)
-                CALL IGrMoveTo(xtem,gytop)
-              ELSE IF (yg_coord2 .GT. gytop) THEN
-! Move the end point to the intercept point in the box
-                xg_coord2 = xg_coord2 + (xg_coord2 - xg_coord1)*(gytop-yg_coord1)/(yg_coord2-yg_coord1)
-                yg_coord2 = gytop
-              END IF
-              CALL IGrLineTo(xg_coord2,yg_coord2)
-            END DO
+ 120        CALL IPgNewPlot(PgPolyLine,1, (1+ix2-ix1) )
+            CALL IPgStyle(1,0,0,0,KolNumCTic,0)
+            CALL IPgXYPairs(xpeakfit(ix1),ypeakfit(ix1))
           END IF
         END IF
         IPresColN=InfoGrScreen(ColourReq)
