@@ -1338,7 +1338,7 @@
 ! There are three conditions:
 ! 1. the maximum number of columns as requested by the user (MaxNumColumns)
 ! 2. the number of columns actually present in the string (GetNumOfColumns)
-! 3. the number of data point still to be read (MaxNumOfBins - I)
+! 3. the number of data points still to be read (MaxNumOfBins - I)
                NumOfColumns2Read = MIN(MaxNumOfColumns, GetNumOfColumns(Cline))
                NumOfColumns2Read = MIN(NumOfColumns2Read, 1 + MaxNumOfBins - I)
                READ(Cline,*,ERR=999) TempInput(1:NumOfColumns2Read)

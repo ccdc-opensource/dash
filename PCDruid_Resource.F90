@@ -1,4 +1,4 @@
-! Winteracter module created : 18/Oct/2001 12:29:17
+! Winteracter module created : 18/Oct/2001 17:41:03
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -239,7 +239,6 @@
           INTEGER, PARAMETER :: IDF_SA_TRR_label2               =  1156
           INTEGER, PARAMETER :: IDF_LABEL11                     =  1466
           INTEGER, PARAMETER :: IDF_LABEL14                     =  1469
-          INTEGER, PARAMETER :: IDF_SA3_cancel                  =  1145
           INTEGER, PARAMETER :: IDF_SA_cool_label               =  1162
           INTEGER, PARAMETER :: IDF_SA_NS_label                 =  1159
           INTEGER, PARAMETER :: IDF_SA_TRR_label3               =  1157
@@ -319,10 +318,8 @@
           INTEGER, PARAMETER :: IDD_TEMPLATE009                 =   141
           INTEGER, PARAMETER :: IDF_SA2_label                   =  1141
           INTEGER, PARAMETER :: IDD_SA_input3                   =   142
-          INTEGER, PARAMETER :: IDB_SA3_back                    =  1143
           INTEGER, PARAMETER :: IDB_SA3_finish                  =  1144
           INTEGER, PARAMETER :: IDF_SA_RandomSeed1              =  1163
-          INTEGER, PARAMETER :: IDF_SA2_cancel                  =  1146
           INTEGER, PARAMETER :: IDF_SA_T0_trackbar              =  1147
           INTEGER, PARAMETER :: IDF_SA_Moves                    =  1158
           INTEGER, PARAMETER :: IDF_SA_NT_label                 =  1160
