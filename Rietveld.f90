@@ -305,6 +305,8 @@
               CALL SA_STRUCTURE_OUTPUT_PDB(0)
               CALL ViewStructure('SA_best.pdb')
             CASE (IDB_Compare)
+              CALL Dialog2RRVAR
+              CALL RR_MAKEFRAC
               CALL RR_Compare
           END SELECT
         CASE (FieldChanged)
