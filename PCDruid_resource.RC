@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 18/Nov/2002 14:54:32
+// Modified : 23/Dec/2002 17:08:33
 //
 ///////////////////////////////////////////////////
 //
@@ -643,6 +643,8 @@
 #define IDB_PrevRes                      1490
 #define IDD_Pause                         135
 #define IDF_RandomInitVal                1361
+#define IDB_SaveTBL                      1362
+#define IDF_OutputSolMenu2               1414
 
 ///////////////////////////////////////////////////
 //
@@ -3727,12 +3729,12 @@ BEGIN
 ,0
 END
 
-IDD_OutputSolutions DIALOG 0, 0,  283,  236
+IDD_OutputSolutions DIALOG 0, 0,  283,  275
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Save Solutions"
 BEGIN
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  131,  215,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  131,  253,   40,   14
     CONTROL ".c&ssr",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   56,   42,   36,   14
     CONTROL ".cc&l",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   42,   32,   14
     CONTROL ".&pro",IDF_OutputPRO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  195,   42,   34,   14
@@ -3741,12 +3743,12 @@ BEGIN
     CONTROL ".c&if",IDF_OutputCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  126,   42,   30,   14
     CONTROL "Save",IDB_Output2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   16,   21,   30,   14
     CONTROL "",IDF_OutputSolMenu,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,   51,   21,   80,   40
-    CONTROL "Save...",IDB_OutputChiSqd,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   15,  187,   40,   14
-    CONTROL "chi      versus number of moves",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   60,  189,  120,   10
+    CONTROL "Save...",IDB_OutputChiSqd,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   15,  225,   40,   14
+    CONTROL "chi      versus number of moves",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   60,  227,  120,   10
     CONTROL "in the following formats:",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  136,   23,   80,   10
-    CONTROL "Solutions",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,    8,  262,  160
-    CONTROL "Progress",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  173,  262,   36
-    CONTROL "2",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   70,  186,    6,    8
+    CONTROL "Solutions",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,    8,  262,  156
+    CONTROL "Progress",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  211,  262,   36
+    CONTROL "2",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   70,  224,    6,    8
     CONTROL "",IDF_DirAndBaseName,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   16,   73,  200,   14
     CONTROL "Directory and base name:",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   17,   62,   90,    8
     CONTROL "Browse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  220,   73,   40,   14
@@ -3756,6 +3758,10 @@ BEGIN
     CONTROL "",IDF_egLine3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   17,  126,  240,   10
     CONTROL "",IDF_egLine4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   17,  136,  240,   10
     CONTROL "",IDF_egLine5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   17,  146,  240,   10
+    CONTROL "Parameters",IDF_GROUP3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,    8,  169,  262,   36
+    CONTROL "Save...",IDB_SaveTBL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   16,  183,   40,   14
+    CONTROL "",IDF_OutputSolMenu2,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  119,  183,   80,   40
+    CONTROL "the parameters of",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   58,  185,   60,   10
 END
 
 IDD_OutputSolutions RCDATA
@@ -3772,6 +3778,10 @@ BEGIN
 "the best solution \n"
 "selected solutions \n"
 "all solutions \n"
+" 1414     3     2 \n"
+"the best solution \n"
+"selected solutions \n"
+"alll solutions \n"
 "[Tabs] \n"
 "[Ranges] \n"
 " 1260      1.0000           9.0000      \n"
