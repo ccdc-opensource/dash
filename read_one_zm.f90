@@ -40,19 +40,19 @@
 ! to the appropriate FOR$IOS flag
       Read_One_Zm = 0
 ! JCC Added in error trap for missing file/ file opening problems
-      OPEN (UNIT=19,FILE=frag_file(iFrg),STATUS='old',ERR=999,IOSTAT=ErrorStatus)
+      OPEN (UNIT=19, FILE=frag_file(iFrg), STATUS='old', ERR=999, IOSTAT=ErrorStatus)
 ! JCC Added in a read error trap, in case user selects incorrect file
 ! First line is a title
-      READ (19,'(A)',ERR=999,IOSTAT=ErrorStatus) line
+      READ (19, '(A)', ERR=999, IOSTAT=ErrorStatus) line
 ! Second line contains unit cell parameters
 !1.0 1.0 1.0 90.0 90.0 90.0
 ! These are never used, so just read into dummy variables.
-      READ (19,*,ERR=999,IOSTAT=ErrorStatus) ta, tb, tc, talpha, tbeta, tgamma
+      READ (19, *, ERR=999, IOSTAT=ErrorStatus) ta, tb, tc, talpha, tbeta, tgamma
 ! Third line contains number of atoms and an integer IAT, defining the centre for the rotations.
 ! IAT = 0        : use centre of mass
 ! IAT = non-zero : use atom nr. IAT   (necessary if atom on special position).
 !  59   0
-      READ (19,*,ERR=999,IOSTAT=ErrorStatus) natof, icomflg(iFrg)
+      READ (19, *, ERR=999, IOSTAT=ErrorStatus) natof, icomflg(iFrg)
       IF (natof .GT. maxatm) THEN
         CALL WarningMessage('Z-matrix contains too many atoms--truncated.')
         natof = maxatm
@@ -61,25 +61,25 @@
       DO i = 1, natoms(iFrg)
 ! Remaining lines contain the Z-matrix
 !  C      1.5152617  0  113.2370014  0 -179.8250018  0   54   51   48  3.0  1.0   58 C6 C7 C8 C9
-        READ (19,1900,ERR=999,IOSTAT=ErrorStatus) nlin, line
+        READ (19, 1900, ERR=999, IOSTAT=ErrorStatus) nlin, line
 ! JCC Added in traps on internal read
-        READ (line(3:5),'(A3)',ERR=999,IOSTAT=ErrorStatus) tStr3
+        READ (line(3:5), '(A3)', ERR=999, IOSTAT=ErrorStatus) tStr3
         CALL StrClean(tStr3,AsymLen)
         ElSym(i, iFrg)(1:1) = ChrUpperCase(tStr3(1:1))
         ElSym(i, iFrg)(2:2) = ChrLowerCase(tStr3(2:2))
         zmElementCSD(i, iFrg) = ElmSymbol2CSD(ElSym(i, iFrg))
 ! First item--the element--has been read. Rest more tricky.
 ! First, convert tabs to spaces and remove redundant spaces
-        CALL StrClean(line,nlin)
+        CALL StrClean(line, nlin)
 ! First column--the element--has been read: remove it
-        CALL GetSubString(Line,' ',tSubString)
+        CALL GetSubString(Line, ' ', tSubString)
 ! Then count the number of columns
         NumCol = GetNumOfColumns(Line)
         IF (NumCol .LT. 11) THEN
           ErrorStatus = 99
           GOTO 999
         ENDIF
-        READ (line(1:nlin),*,ERR=999,IOSTAT=ErrorStatus) blen(i, iFrg),&
+        READ (line(1:nlin), *, ERR=999, IOSTAT=ErrorStatus) blen(i, iFrg),&
               ioptb(i, iFrg), alph(i, iFrg), iopta(i, iFrg), bet(i, iFrg),&
               ioptt(i, iFrg), iz1(i, iFrg), iz2(i, iFrg), iz3(i, iFrg),   &
               tiso(i, iFrg), occ(i, iFrg)
@@ -92,7 +92,7 @@
         ENDDO
 ! Remove what we have just read from the string
         DO J = 1, 11
-          CALL GetSubString(Line,' ',tSubString)
+          CALL GetSubString(Line, ' ', tSubString)
         ENDDO
         nlin = LEN_TRIM(Line)
 ! How many columns do we have left?
@@ -100,16 +100,16 @@
         IF (NumCol .EQ. 0) THEN
           izmoid(i, iFrg) = i
         ELSE
-          READ (line(1:nlin),*,IOSTAT=ErrorStatus) izmoid(i, iFrg)
+          READ (line(1:nlin), *, IOSTAT=ErrorStatus) izmoid(i, iFrg)
         ENDIF
         IF (NumCol .GE. 2) THEN
-          CALL GetSubString(Line,' ',tSubString) ! That should be the original atom number
-          CALL GetSubString(Line,' ',tSubString) ! And that should be what we really want:
+          CALL GetSubString(Line, ' ', tSubString) ! That should be the original atom number
+          CALL GetSubString(Line, ' ', tSubString) ! And that should be what we really want:
                                                  ! the original atom label
         ELSE
 ! Emulate original atom labels by adding original atom number to element, e.g. 'C4'
           WRITE(tIDstr,'(I3)') izmoid(i, iFrg)
-          CALL StrClean(tIDstr,IDlen)
+          CALL StrClean(tIDstr, IDlen)
           tSubString = ElementStr(zmElementCSD(i, iFrg))
           tSubString = tSubString(1:LEN_TRIM(tSubString))//tIDstr
         ENDIF
