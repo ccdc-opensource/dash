@@ -308,10 +308,6 @@
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
-! Set allowed range for data truncation
-              CALL WDialogSelect(IDD_PW_Page5)
-              CALL WDialogRangeReal(IDF_Max2Theta,XBIN(1),XBIN(NBIN))
-              CALL WDialogRangeReal(IDF_Min2Theta,XBIN(1),XBIN(NBIN))
               CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDCANCEL, IDCLOSE)
@@ -375,9 +371,6 @@
               ELSE
                 CALL WDialogGetReal(IDF_wavelength1,Temp)
                 CALL Set_Wavelength(Temp)
-! Set allowed range for resolution
-                CALL WDialogSelect(IDD_PW_Page5)
-                CALL WDialogRangeReal(IDF_MaxResolution,TwoTheta2dSpacing(XBIN(NBIN)),50.0)
                 CALL WizardWindowShow(IDD_PW_Page5)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
@@ -415,6 +408,7 @@
 
       REAL    tMin, tMax
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      REAL, EXTERNAL :: TwoTheta2dSpacing
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
@@ -431,6 +425,16 @@
         tMax = 90.0
       ENDIF
       CALL TruncateData(tMin,tMax)
+! Now update the values in the min/max fields to reflect what has actually happened
+! (e.g. in case min was .GT. max)
+      IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
+        CALL WDialogPutReal(IDF_Min2Theta,tMin)
+      ENDIF
+      IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
+        CALL WDialogPutReal(IDF_Max2Theta,tMax)
+        CALL WDialogPutReal(IDF_MaxResolution,TwoTheta2dSpacing(tMax))
+      ENDIF
+! Now check if we have reasonable data left. If not, don't allow pressing 'Next >'
       CALL PopActiveWindowID
 
       END SUBROUTINE WizardApplyProfileRange
@@ -446,9 +450,8 @@
       IMPLICIT NONE
 
       REAL tReal
-      REAL, EXTERNAL :: TwoTheta2dSpacing
-      REAL, EXTERNAL :: dSpacing2TwoTheta
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      REAL, EXTERNAL :: TwoTheta2dSpacing, dSpacing2TwoTheta
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
       INTEGER tFieldState
 
       CALL PushActiveWindowID
@@ -461,10 +464,14 @@
               CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDNEXT)
-              CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
               CALL Profile_Plot
-              CALL WizardWindowShow(IDD_PW_Page6)
+! Now check if we have reasonable data left. If not, don't allow pressing 'Next >'
+              IF (.NOT. FnPatternOK()) THEN
+                CALL ErrorMessage('Invalid profile range.')
+              ELSE
+                CALL WizardWindowShow(IDD_PW_Page6)
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDAPPLY)
@@ -551,12 +558,10 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
               CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page5)
             CASE (IDNEXT)
-              CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
               CALL WizardApplyBackground
               CALL Profile_Plot
@@ -565,7 +570,6 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDF_Preview)
-              CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
               IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
                 CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
@@ -579,7 +583,6 @@
               CALL WDialogPutCheckBoxLogical(IDF_background_check,.TRUE.)
               CALL Profile_Plot
             CASE (IDAPPLY)
-              CALL WizardApplyDiffractionFileInput
               CALL WizardApplyProfileRange
               CALL WizardApplyBackground
               CALL Profile_Plot
@@ -592,7 +595,6 @@
                 tFieldState = Enabled
               ELSE
                 tFieldState = Disabled
-                CALL WizardApplyDiffractionFileInput
                 CALL WizardApplyProfileRange
                 CALL Clear_BackGround
                 CALL Profile_Plot
