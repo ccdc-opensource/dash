@@ -504,6 +504,7 @@
       CALL Profile_Plot(IPTYPE)
       NoData = .FALSE.
       CALL ScrUpdateFileName
+!      CALL FourierPattern(1,1000)
 
       END FUNCTION DiffractionFileLoad
 !
@@ -1645,35 +1646,6 @@
 ! Exit code is error by default, so we can simply return
 
       END FUNCTION Load_uxd_File
-!
-!*****************************************************************************
-!
-      SUBROUTINE AddWavelengthToXYE
-!
-! Old xye files don't contain the wavelength. If such an old xye file is detected,
-! this routine is called to give the user the opportunity to add the wavelength
-! to the xye file.
-!
-! JvdS Sep 2001
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      LOGICAL Confirm ! Function
-
-      IF (Confirm('This is an old .xye file, which does not contain the experimental wavelength.'//CHAR(13)//&
-          'Would you like to add the wavelength now?')) THEN
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_AddWavelengthToXYE)
-      CALL WDialogShow(-1,-1,0,Modeless)
-      CALL PopActiveWindowID
-
-      ENDIF
-
-      END SUBROUTINE AddWavelengthToXYE
 !
 !*****************************************************************************
 !

@@ -166,13 +166,8 @@
 ! Draw axes and add scales
       CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
       CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
-      IF ((xpgmax-xpgmin) .LE. 200.0) THEN
-        CALL IRealToString(xpgmin,statbarstr(4)(1:),'(F10.3)')
-        CALL IRealToString(xpgmax,statbarstr(5)(1:),'(F10.3)')
-      ELSE
-        CALL IRealToString(xpgmin,statbarstr(4)(1:),'(F10.1)')
-        CALL IRealToString(xpgmax,statbarstr(5)(1:),'(F10.1)')
-      END IF
+      CALL IRealToString(xpgmin,statbarstr(4)(1:),'(F10.3)')
+      CALL IRealToString(xpgmax,statbarstr(5)(1:),'(F10.3)')
       IF ((ypgmax-ypgmin) .LE. 100.0) THEN      
         CALL IRealToString(ypgmin,statbarstr(6)(1:),'(F10.3)')
         CALL IRealToString(ypgmax,statbarstr(7)(1:),'(F10.3)')
@@ -267,18 +262,18 @@
       CALL IGrColourN(KolNumObs)
       IF ( PlotErrorBars() ) THEN
         DO I = IPMIN, IPMAX
-          xtem = xbin(i)
-          ytem = MAX(yobin(i)-ebin(i),ypgmin)
+          xtem = XBIN(I)
+          ytem = MAX(YOBIN(I)-EBIN(I),ypgmin)
           ytem = MIN(ytem,ypgmax)
           CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
           CALL IGrMoveTo(xgtem,ygtem)
-          ytem = MIN(yobin(i)+ebin(i),ypgmax)
+          ytem = MIN(YOBIN(I)+EBIN(I),ypgmax)
           ytem = MAX(ytem,ypgmin)
           CALL IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
           CALL IGrLineTo(xgtem,ygtem)
         END DO
       END IF
-!      CALL IPgNewGraph(1,nbin,' ',' ','XY')
+!      CALL IPgNewGraph(1,NBIN,' ',' ','XY')
 ! Must allow options here ...      CALL IPgStyle(1,0,3,0,KolNumCal,KolNumObs)
       CALL IPgNewPlot(PgScatterPlot,1,NBIN)
       CALL IPgStyle(1,14,3,0,0,KolNumObs)
