@@ -369,6 +369,14 @@
 !         'C:\Program Files\CCDC\DASH 2.0\benzene_001.res'
 ! where 001 = SA_RunNumberStr = SA_Run_Number in format '(I3.3)'
 
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
+! Is_SX  = .TRUE. indicates that we are dealing with single crystal data. This is currently
+! relevant for the plotting of chi-sqrd vs. number of moves during the SA (powder uses the profile chi-sqrd,
+! single crystal uses the intensity chi-sqrd) but may also become more important later on due
+! to the subtle differences between a real powder pattern and a powder pattern generated from single cystal data.
+
       END SUBROUTINE FoolCompiler
 !
 !*****************************************************************************
