@@ -2,7 +2,11 @@
 !*****************************************************************************
 !
       SUBROUTINE Profile_Plot(TheIPTYPE)
-
+!
+! JvdS There is only one place in the DASH code where this function is NOT
+! called with 'IPTYPE' as argument: and that's when it's called with '-IPTYPE'
+! to produce hard copy.
+!
       USE WINTERACTER
       USE VARIABLES
 
@@ -25,6 +29,12 @@
 
       LOGICAL PlotBackground ! Function
 
+!
+! IGrArea
+! IPgArea
+! IPgClipRectangle
+
+
 !   Setup hardcopy options
       IF (TheIPTYPE .LT. 0) THEN
         CALL IGrInit('HP')
@@ -38,11 +48,11 @@
 ! Plot peakfit ranges
       IF (NumPeakFitRange .GT. 0) CALL Plot_PeakFit_Info()
 ! Observed profile
-      SELECT CASE(ABS(TheIPTYPE))
-       CASE(1) 
-         CALL Plot_Observed_Profile()
-       CASE(2) 
-         CALL Plot_ObsCalc_Profile()
+      SELECT CASE (ABS(TheIPTYPE))
+        CASE (1) 
+          CALL Plot_Observed_Profile()
+        CASE (2) 
+          CALL Plot_ObsCalc_Profile()
       END SELECT
       IF (PlotBackground()) CALL Plot_Background()
 !  Plot tic marks etc. if appropriate
@@ -574,76 +584,76 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Plot_SA_Profile()
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-!
-      INCLUDE 'POLY_COLOURS.INC'
-
-      INCLUDE 'PARAMS.INC'
-
-      REAL ydif(MCHSTP)
-!
-      COMMON /CHISTOP/ NOBS,NFIT,IFIT(MCHSTP),CHIOBS,&
-      WT(MCHSTP),XOBS(MCHSTP),YOBS(MCHSTP),YCAL(MCHSTP),ESD(MCHSTP)
-!
-      COMMON /sappcmn/ xpmin,xpmax,ypmin,ypmax
-      COMMON /sapgcmn/ xpgmin,xpgmax,ypgmin,ypgmax
-      COMMON /chibest/ ycalbest(MCHSTP)
-!
-      BACK=0.
-      YOSUM=0.
-      YCSUM=0.
-      DO II=1,NFIT
-        I=IFIT(II)
-        YOSUM=YOSUM+YOBS(I)
-        YCSUM=YCSUM+YCALbest(I)
-      END DO
-      RESCL=YOSUM/YCSUM
-      DO I=1,NOBS
-        YCALbest(i)=RESCL*YCALbest(I)
-      END DO
-      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
-       call IGrColourN(KolNumMain)
-      CALL IPgYLabelLeft('Observed profile','C9')
-!
-!      CALL IPgNewGraph(3,nobs,' ',' ','XY')
-      CALL IPgNewPlot(PgPolyLine,3,NOBS)
-      YADD=0.5*(YPGMAX+YPGMIN)
-      DO II=1,NOBS!IPMIN,IPMAX
-        YDIF(II)=YADD+YOBS(II)-YCALBEST(II)
-      END DO
-      CALL IPgStyle(1,0,0,0,KolNumDif,0)
-      CALL IPgStyle(2,0,3,0,0,KolNumObs)
-      CALL IPgStyle(3,0,0,0,KolNumCal,0)
-      CALL IPgXYPairs(xobs,ydif)
-      CALL IGrCharSize(.3,.3)
-      CALL IPgMarker( 2, 13)
-!      sizmtem=marker_size*float(500)/float(ipmax-ipmin)
-!      sizmtem=min(marker_size,sizmtem)
-!      CALL IGrCharSize(sizmtem,sizmtem)
-      CALL IPgXYPairs(xobs,yobs)
-!
-! Do the error bars - we've precalculated the min & max pointers
-!
-      CALL IGrColourN(KolNumObs)
-      DO I=1,nobs!IPMIN,IPMAX
-        xtem=xobs(i)
-        ytem=max(yobs(i)-esd(i),ypgmin)
-        ytem=min(ytem,ypgmax)
-        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-        call IGrMoveTo(xgtem,ygtem)
-        ytem=min(yobs(i)+esd(i),ypgmax)
-        ytem=max(ytem,ypgmin)
-        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
-        call IGrLineTo(xgtem,ygtem)
-      END DO
-      CALL IPgXYPairs(xobs,ycalbest)
-      CALL IGrCharSize(1.,1.)
-      CALL IGrColourN(KolNumMain)
-!
-      END SUBROUTINE Plot_SA_Profile
+!U      SUBROUTINE Plot_SA_Profile()
+!U!
+!U      USE WINTERACTER
+!U      USE DRUID_HEADER
+!U!
+!U      INCLUDE 'POLY_COLOURS.INC'
+!U
+!U      INCLUDE 'PARAMS.INC'
+!U
+!U      REAL ydif(MCHSTP)
+!U!
+!U      COMMON /CHISTOP/ NOBS,NFIT,IFIT(MCHSTP),CHIOBS,&
+!U      WT(MCHSTP),XOBS(MCHSTP),YOBS(MCHSTP),YCAL(MCHSTP),ESD(MCHSTP)
+!U!
+!U      COMMON /sappcmn/ xpmin,xpmax,ypmin,ypmax
+!U      COMMON /sapgcmn/ xpgmin,xpgmax,ypgmin,ypgmax
+!U      COMMON /chibest/ ycalbest(MCHSTP)
+!U!
+!U      BACK=0.
+!U      YOSUM=0.
+!U      YCSUM=0.
+!U      DO II=1,NFIT
+!U        I=IFIT(II)
+!U        YOSUM=YOSUM+YOBS(I)
+!U        YCSUM=YCSUM+YCALbest(I)
+!U      END DO
+!U      RESCL=YOSUM/YCSUM
+!U      DO I=1,NOBS
+!U        YCALbest(i)=RESCL*YCALbest(I)
+!U      END DO
+!U      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
+!U       call IGrColourN(KolNumMain)
+!U      CALL IPgYLabelLeft('Observed profile','C9')
+!U!
+!U!      CALL IPgNewGraph(3,nobs,' ',' ','XY')
+!U      CALL IPgNewPlot(PgPolyLine,3,NOBS)
+!U      YADD=0.5*(YPGMAX+YPGMIN)
+!U      DO II=1,NOBS!IPMIN,IPMAX
+!U        YDIF(II)=YADD+YOBS(II)-YCALBEST(II)
+!U      END DO
+!U      CALL IPgStyle(1,0,0,0,KolNumDif,0)
+!U      CALL IPgStyle(2,0,3,0,0,KolNumObs)
+!U      CALL IPgStyle(3,0,0,0,KolNumCal,0)
+!U      CALL IPgXYPairs(xobs,ydif)
+!U      CALL IGrCharSize(.3,.3)
+!U      CALL IPgMarker( 2, 13)
+!U!      sizmtem=marker_size*float(500)/float(ipmax-ipmin)
+!U!      sizmtem=min(marker_size,sizmtem)
+!U!      CALL IGrCharSize(sizmtem,sizmtem)
+!U      CALL IPgXYPairs(xobs,yobs)
+!U!
+!U! Do the error bars - we've precalculated the min & max pointers
+!U!
+!U      CALL IGrColourN(KolNumObs)
+!U      DO I=1,nobs!IPMIN,IPMAX
+!U        xtem=xobs(i)
+!U        ytem=max(yobs(i)-esd(i),ypgmin)
+!U        ytem=min(ytem,ypgmax)
+!U        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+!U        call IGrMoveTo(xgtem,ygtem)
+!U        ytem=min(yobs(i)+esd(i),ypgmax)
+!U        ytem=max(ytem,ypgmin)
+!U        call IPgUnitsToGrUnits(xtem,ytem,xgtem,ygtem)
+!U        call IGrLineTo(xgtem,ygtem)
+!U      END DO
+!U      CALL IPgXYPairs(xobs,ycalbest)
+!U      CALL IGrCharSize(1.,1.)
+!U      CALL IGrColourN(KolNumMain)
+!U!
+!U      END SUBROUTINE Plot_SA_Profile
 !
 !*****************************************************************************
 !
@@ -654,8 +664,6 @@
 
       USE WINTERACTER
       INCLUDE 'POLY_COLOURS.INC'
-!
-
 
       INCLUDE 'PARAMS.INC'
 
@@ -753,3 +761,6 @@
       IPMAXOLD=IPMAX
 
       END SUBROUTINE Synchronize_Data
+!
+!*****************************************************************************
+!
