@@ -26,13 +26,16 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+                      KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+                      SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
+
+      REAL         atem,                      btem
+      COMMON /FOB/ atem(1:MaxAtm_3,1:MaxRef), btem(1:MaxAtm_3,1:MaxRef)
 
       INTEGER iFrg, i, item, iRef, iFrgCopy
       INTEGER tNumHydrogens, tNumNonHydrogens, tAtomNumber
-      REAL ssq, atem, btem
+      REAL ssq
       REAL, EXTERNAL :: ascfac
       INTEGER, EXTERNAL :: ElmSymbol2CSD
       INTEGER tElemNumber
@@ -83,9 +86,9 @@
               tElemNumber = ElmSymbol2CSD(asym(i,iFrg)(1:2))
               DO iRef = 1, NumOfRef
                 ssq = 0.25*DSTAR(iRef)**2
-                atem = occ(i,iFrg) * AScFac(ssq,tElemNumber)
-                btem = tiso(i,iFrg)*ssq
-                FOB(item,iRef) = atem*EXP(-btem)
+                atem(item,iRef) = occ(i,iFrg) * AScFac(ssq,tElemNumber)
+                btem(item,iRef) = tiso(i,iFrg)*ssq
+                FOB(item,iRef) = atem(item,iRef)*EXP(-btem(item,iRef))
               ENDDO
             ENDDO
           ENDDO
@@ -110,14 +113,13 @@
       REAL            FOB
       COMMON /FCSTOR/ FOB(MaxAtm_3,MFCSTO)
 
+      REAL         atem,                      btem
+      COMMON /FOB/ atem(1:MaxAtm_3,1:MaxRef), btem(1:MaxAtm_3,1:MaxRef)
+
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
       INTEGER item, tNumHydrogens, tNumNonHydrogens, iFrg, iFrgCopy, i, iRef
-      INTEGER tElemNumber
-      REAL atem, btem, ssq
-      REAL, EXTERNAL :: ascfac
-      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
       item = 0
       tNumHydrogens = 0
@@ -133,12 +135,8 @@
                 tNumNonHydrogens = tNumNonHydrogens + 1
                 item = tNumNonHydrogens
               ENDIF
-              tElemNumber = ElmSymbol2CSD(asym(i,iFrg)(1:2))
               DO iRef = 1, NumOfRef
-                ssq = 0.25*DSTAR(iRef)**2
-                atem = occ(i,iFrg) * AScFac(ssq,tElemNumber)
-                btem = tiso(i,iFrg)*ssq
-                FOB(item,iRef) = atem*EXP(-RR_ITF*btem)
+                FOB(item,iRef) = atem(item,iRef)*EXP(-RR_ITF*btem(item,iRef))
               ENDDO
             ENDDO
           ENDDO
