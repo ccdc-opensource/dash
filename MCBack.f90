@@ -1,33 +1,20 @@
-
-      SUBROUTINE BackFit(FilterWidth)
-
-      USE WINTERACTER
-
-      INCLUDE 'PARAMS.INC'
-
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-
-      INTEGER FilterWidth
-
-      CALL WCursorShape(CurHourGlass)
-! Calculate values in common array
-      CALL BackMCBruckner(XBIN,YOBIN,EBIN,NBIN,FilterWidth,YBBIN)
-      CALL WCursorShape(CurArrow)
-
-      END SUBROUTINE BackFit
 !
 !*****************************************************************************
 !
-      SUBROUTINE BackMCBruckner(XBIN,YOBIN,EBIN,ndat,nbruckwin,ybbin)
+      SUBROUTINE BackMCBruckner(nbruckwin)
+
+      USE WINTERACTER
+
+      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
+      INTEGER  NBIN, LBIN
+      REAL     XBIN, YOBIN, YCBIN, YBBIN, EBIN
+      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
 
-      REAL,    DIMENSION(MOBS), INTENT(IN   ) :: XBIN, YOBIN, EBIN
-      INTEGER,                  INTENT(IN   ) :: NDAT
-      INTEGER,                  INTENT(IN   ) :: nbruckwin
-      REAL,    DIMENSION(MOBS), INTENT(  OUT) :: ybbin
-! JvdS New, local copies of ybbin etc. are created here, but that's not necessary
+        INTEGER,                  INTENT(IN   ) :: nbruckwin
 
+      INTEGER MAXSSPL
       PARAMETER (MAXSSPL=5000)
       REAL,    DIMENSION(MAXSSPL)         :: xkt
       INTEGER, DIMENSION(MAXSSPL)         :: ikt
@@ -36,6 +23,11 @@
       REAL,    DIMENSION(-200:MOBS+200)   :: ys
       INTEGER, DIMENSION(MOBS)            :: jft
       REAL                                tRandomNumber
+      INTEGER I, II, IIII, I1, I2, KK, jf1, jf0, jfp1, jfn, n0, ndiv
+      INTEGER mbruckiter, iter, IILO, IIHI, nsep, ninsep, ngood
+      INTEGER knotem, npartem
+      INTRINSIC MOD
+      REAL rat, stem
 
 !
 !  This subroutine determines the background using a smoothing
@@ -43,21 +35,22 @@
 !  Modified by WIFD to smooth residual noise using SplineSmooth 
 !  and raise background to correct value using a Monte Carlo sampling procedure)
 !
-      mbruckiter = 30
+      CALL WCursorShape(CurHourGlass)
+      mbruckiter = 20
       DO I = -nbruckwin, 0
         ys(I) = yobin(1)
       END DO
-      DO I = 1, ndat
+      DO I = 1, NBIN
         ys(I) = yobin(I)
       END DO
       DO I = 1, nbruckwin
-        ii = ndat + I
-        ys(ii) = yobin(ndat)
+        ii = NBIN + I
+        ys(ii) = yobin(NBIN)
       END DO
       IIII = 0
       DO iter = 1, mbruckiter
 ! Loop over data points
-        DO I = 1, ndat
+        DO I = 1, NBIN
           iilo = I - nbruckwin
           iihi = I + nbruckwin
           ybbin(I) = 0.0
@@ -67,7 +60,7 @@
           END DO
           ybbin(I) = (ybbin(I)-ys(I))/FLOAT(2 * nbruckwin)
         END DO
-        DO I = 1, ndat
+        DO I = 1, NBIN
 ! rat = ratio?
           rat = (ybbin(I)-ys(I))/ebin(I)
           stem = 1.0 / (1.0 + EXP(MIN(20.0,-rat)))  
@@ -82,17 +75,13 @@
       ngood   =  0
       knotem  =  0  
       npartem =  0
-      DO i = 1, ndat
+      DO i = 1, NBIN
         IF (ybbin(i) .EQ. yobin(i)) THEN
           es(i) = 1.E6 * ebin(i)
         ELSE
           es(i) = ebin(i)
-! JvdS should the following lines be replaced by
-!           IF (MOD(ngood,nsep) .EQ. 0) THEN
-!            IF (MOD(knotem,ninsep) .EQ. 0) THEN
-! ?
-          IF (ngood .EQ. nsep*(ngood/nsep)) THEN
-            IF (knotem .EQ. ninsep*(knotem/ninsep)) THEN
+          IF (MOD(ngood,nsep) .EQ. 0) THEN
+            IF (MOD(knotem,ninsep) .EQ. 0) THEN
               npartem = npartem + 1
               ipartem(npartem) = knotem + 1
             END IF
@@ -103,10 +92,10 @@
           ngood = ngood + 1
         END IF
       END DO
-      ikt(knotem) = ndat
+      ikt(knotem) = NBIN
       ipartem(npartem) = knotem
       jft(1) = 1
-      jft(ndat) = knotem - 1
+      jft(NBIN) = knotem - 1
       DO kk = 1, knotem-1
         i1 = ikt(kk)
         i2 = ikt(kk+1) - 1
@@ -123,24 +112,25 @@
         ndiv = 1 + ikt(jfp1) - n0
         CALL SplineSmooth(xbin(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,ybbin(n0))
       END DO
+      CALL WCursorShape(CurArrow)
 
       END SUBROUTINE BackMCBruckner
 !
 !*****************************************************************************
 !
-      SUBROUTINE SplineSmooth(x,y,e,ndat,jf0,jfs,xkk,nkn,smo)
+      SUBROUTINE SplineSmooth(x,y,e,NDAT,jf0,jfs,xkk,nkn,smo)
 
-      REAL    x(ndat),y(ndat),e(ndat)
+      REAL    x(NDAT),y(NDAT),e(NDAT)
       INTEGER NDAT
-      INTEGER jfs(ndat)
+      INTEGER jfs(NDAT)
       REAL    xkk(nkn)
-      REAL    smo(ndat)
+      REAL    smo(NDAT)
 
       REAL*8  xdel(nkn),u(nkn,nkn)
       REAL*8  bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
 
       REAL*8  xdd
-      REAL*8  a(ndat),b(ndat),c(ndat),d(ndat)
+      REAL*8  a(NDAT),b(NDAT),c(NDAT),d(NDAT)
 
       REAL*8  deri(nkn),ans(nkn)
       REAL*8  w
@@ -205,7 +195,7 @@
 !O        smo(i) = SNGL(a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1)
 ! This caused an underflow error
         TempResult = a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1
-        IF (TempResult .LT. 0.000001) TempResult = 0.0
+        IF (ABS(TempResult) .LT. 0.000001) TempResult = 0.0
         smo(i) = SNGL(TempResult)
       END DO
 !
