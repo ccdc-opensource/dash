@@ -200,7 +200,7 @@
       HKLFFileBrowse = 1
       IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
       FILTER = 'All files (*.*)|*.*|'//&
-               'DASH Pawley files (*.hklf)|*.hklf|'
+               'SHELX .hkl files (*.hkl)|*.hkl|'
       tFileName = ' '
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
@@ -257,7 +257,7 @@
 ! Next line is necessary due to the way ScrUpdateFileName in SDIFileLoad works
       FNAME = TheFileName
       IF (NoData) THEN
-        CALL ErrorMessage("Could not read the hklf file "//FNAME(1:KLEN)//&
+        CALL ErrorMessage("Could not read the hkl file "//FNAME(1:KLEN)//&
                           CHAR(13)//"successfully.")
         RETURN
       ENDIF
@@ -302,11 +302,9 @@
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
-!.. New store common ...
-!C MCHIHS can be replaced by MFCSTO in this COMMON
       INTEGER         jHKL           
       REAL                            WTJ,         AJOBS
-      COMMON /SXFSTO/ jHKL(3,MCHIHS), WTJ(MCHIHS), AJOBS(MFCSTO)
+      COMMON /SXFSTO/ jHKL(3,MFCSTO), WTJ(MFCSTO), AJOBS(MFCSTO)
 
       INTEGER          NFITA, IFITA
       REAL                                 WTSA
@@ -339,7 +337,7 @@
       KK = 0
       DO iR = 1, MFCSTO
         READ(hFile,'(Q,A)',END=100,ERR=998) NLIN, LINE
-!C SHELX .hkl files are terminated by a line containing h = k = l = 0
+!C SHELX .hkl files are terminated by a line containing h = k = l = 0 or h = k = l = 99
         READ(LINE(1:NLIN),*,END=998,ERR=998) (jHKL(I,iR),I=1,3)
         IF (((jHKL(1,iR) .EQ.  0) .AND. &
              (jHKL(2,iR) .EQ.  0) .AND. &
@@ -433,7 +431,6 @@
         WRITE(hFile,*) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), iR
       ENDDO
       CLOSE(hFile)
-!C No need to write out a fake .hkl file: the .hkl file is used for space group determination only.
       CALL Clear_BackGround
       NoData = .FALSE.
       CALL Set_Wavelength(1.0)
@@ -454,7 +451,7 @@
       HKLFFileLoad = 0
       RETURN
   998 CLOSE(hFile)
-      CALL ErrorMessage("Error opening .hklf file.")
+      CALL ErrorMessage("Error opening .hkl file.")
       RETURN
   999 CLOSE(hFile)
       CALL ErrorMessage("Error writing .pik/.hcv file.")
@@ -465,8 +462,7 @@
 !
       SUBROUTINE OrderReflections
 
-! Covers the eventuality of the default space group option.
-! We need to determine the number of symmetry operators etc.
+! Calculates 2 theta for every reflection.
 
       IMPLICIT NONE
 
@@ -548,10 +544,9 @@
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
-!.. New store common ...
       INTEGER         jHKL           
       REAL                            WTJ,         AJOBS
-      COMMON /SXFSTO/ jHKL(3,MCHIHS), WTJ(MCHIHS), AJOBS(MFCSTO)
+      COMMON /SXFSTO/ jHKL(3,MFCSTO), WTJ(MFCSTO), AJOBS(MFCSTO)
 
       REAL   DStarTem(MFCSTO)
       INTEGER iR, jR, I, hFile, NewNumOfRef
@@ -565,14 +560,12 @@
       CALL RECIP
       IF (IBMBER .NE. 0) RETURN
       CALL OPSYM(1)
-!O      WRITE(76,*) ' Number of reflections ', NumOfRef
       DO iR = 1, NumOfRef
         DO I = 1, 3
           H(i) = FLOAT(jHKL(I,iR))
         ENDDO
         CALL CELDER(H, DERS)
 !C wavelength = 1 Angstrom
-!O        WRITE(76,*) '**',(jHKL(I,iR),I=1,3), DSTAR2, sthl
         IF (sthl .LT. -1.0) THEN
           sthl = -1.0
           CALL DebugErrorMessage("sthl .LT. -1.0")
@@ -583,7 +576,6 @@
         ENDIF
         ArgKKtem(iR) = 2.0 * ASIND(sthl)
         DStarTem(iR) = 2.0 * sthl
-!O        WRITE(76,*) '**>',ArgKKtem(iR)
       ENDDO
       CALL Sort_Real(ArgKKtem, iOrdTem, NumOfRef)
       CALL PushActiveWindowID
@@ -604,7 +596,6 @@
             iHKL(I,iR) = jHKL(i,jR)
           ENDDO
         ENDIF
-!O        WRITE(76,*) '>> ',iR,'>> ', (iHKL(I,iR),I=1,3), RefArgK(iR), AIOBS(iR), 1.0/(WTI(iR))
       ENDDO
       NumOfRef = NewNumOfRef
 !C Write out a fake .tic file
