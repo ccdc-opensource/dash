@@ -351,9 +351,9 @@
       CALL WDialogFieldState(IDB_PrevRes,Disabled)
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
-      SLIMVALUE = 1.0
-      SCALFAC   = 0.01
-      BACKREF   = .TRUE.
+      SlimValue = 1.0
+      ScalFac   = 0.01
+      BackRef   = .TRUE.
       JRadOption = 1 ! Initialise to X-ray lab data
       IXPos_IDD_Wizard = 0.5  * (WInfoScreen(1) - 756.0)
       IYPos_IDD_Wizard = 0.01 * WInfoScreen(2)

@@ -117,7 +117,7 @@
       DiffractionFileOpen = ISTAT
       IF (ISTAT .EQ. 0) RETURN
 ! Enable the appropriate menus:
-      CALL SetModeMenuState(1,-1,-1)
+      CALL SetModeMenuState(1,-1)
       DashRawFile = FNAME(1:LEN_TRIM(FNAME))
 ! Set minimum and maximum truncation values in Wizard in accordance with data read in
       CALL PushActiveWindowID
@@ -285,9 +285,9 @@
         INTEGRATED_GUESS = INTEGRATED_GUESS + YOBS(I)
       ENDDO
       IF (INTEGRATED_GUESS .GT. 250000.0) THEN
-        SCALFAC = 0.01 * INTEGRATED_GUESS/250000.0
+        ScalFac = 0.01 * INTEGRATED_GUESS/250000.0
       ELSE IF (tYPMAX .GT. 100000) THEN
-        SCALFAC = 0.01 * tYPMAX/100000.0
+        ScalFac = 0.01 * tYPMAX/100000.0
       ENDIF
       BackupXOBS = 0.0
       BackupYOBS = 0.0

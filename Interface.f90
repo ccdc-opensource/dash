@@ -1606,7 +1606,7 @@
 !*****************************************************************************
 !
 ! Subroutine for controlling the configuration of the menus and tool buttons in DASH
-      SUBROUTINE SetModeMenuState(PeakOn,PawleyOn,StrucSolOn)
+      SUBROUTINE SetModeMenuState(PeakOn,PawleyOn)
 ! If PeakOn is positive then peak fitting will be enabled
 ! If PawleyOn is positive then Pawley fitting will be enabled
 ! If PeakOn is negative then peak fitting will be disabled
@@ -1619,7 +1619,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: PeakOn, PawleyOn, StrucSolOn
+      INTEGER, INTENT (IN   ) :: PeakOn, PawleyOn
 
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
@@ -1639,11 +1639,6 @@
       ELSE IF (PawleyOn .LT. 0) THEN
         CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOff)
       ENDIF
-!O      IF (StrucSolOn .GT. 0) THEN
-!O        CALL WMenuSetState(IDB_AnalyseSolutions,ItemEnabled,WintOn)
-!O      ELSE IF (StrucSolOn .LT. 0) THEN
-!O        CALL WMenuSetState(IDB_AnalyseSolutions,ItemEnabled,WintOff)
-!O      ENDIF
       IF ((NumOf_SA_Runs .EQ. 0) .OR. InSA) THEN
         CALL WMenuSetState(IDB_AnalyseSolutions,ItemEnabled,WintOff)
       ELSE
