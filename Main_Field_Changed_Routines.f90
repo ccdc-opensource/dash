@@ -811,33 +811,6 @@
 !
 !*****************************************************************************
 !
-!C>> Sequence of subroutines that handle the downloading of each field in turn
-      SUBROUTINE DownLoadWavelength(From)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      INTEGER, INTENT (IN   ) :: From
-
-      INCLUDE 'statlog.inc'
-      INCLUDE 'Lattice.inc'
-      REAL Temp
-
-      CALL PushActiveWindowID
-      IF (From .EQ. IDD_Data_Properties) THEN
-        CALL WDialogSelect(IDD_Data_Properties)
-        CALL WDialogGetReal(IDF_wavelength1,Temp)
-      ELSE IF (From .EQ. IDD_Index_Preparation) THEN
-        CALL WDialogSelect(IDD_Index_Preparation)
-        CALL WDialogGetReal(IDF_Indexing_Lambda,Temp)
-      END IF
-      CALL UpdateWavelength(Temp)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE DownLoadWavelength
-!
-!*****************************************************************************
-!
       SUBROUTINE SetWavelengthToSelection(Iselection)
 
       IMPLICIT NONE
@@ -910,54 +883,6 @@
       RETURN
 
       END FUNCTION FnWavelengthOfMenuOption
-!
-!*****************************************************************************
-!
-      SUBROUTINE UpdateWavelength(TheWaveLength)
-! Should be renamed to 'SetWavelength'/'UploadWavelength'
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      REAL, INTENT (IN   ) :: TheWaveLength
-
-      INCLUDE 'GLBVAR.INC' ! Contains ALambda
-
-      INTEGER I, IRadSelection
-      REAL    FnWavelengthOfMenuOption ! Function
-
-      IF ((TheWaveLength .GT. 0.1) .AND. (TheWaveLength .LT. 20.0)) THEN
-        ALambda = TheWaveLength
-      ENDIF
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogPutReal(IDF_wavelength1,ALambda,'(F10.5)')
-      CALL WDialogSelect(IDD_PW_Page2)
-      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(F10.5)')
-      CALL WDialogSelect(IDD_PW_Page4)
-      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(F10.5)')
-      CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogPutReal(IDF_Indexing_Lambda,ALambda,'(F10.5)')
-! Now add in a test: if lab data, and wavelength close to known material,
-! set anode material in Winteracter menus. Otherwise, anode is unknown.
-      IF (JRadOption .EQ. 1) THEN ! X-ray lab data
-! Initialise anode material to unknown
-        IRadSelection = 1 ! <...> in the Winteracter menu
-        DO I = 2, 6
-          IF (ABS(ALambda - FnWavelengthOfMenuOption(I)) .LT. 0.0003) IRadSelection = I
-        END DO
-        CALL WDialogSelect(IDD_Data_Properties)
-        CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
-        CALL WDialogSelect(IDD_PW_Page2)
-        CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
-        CALL WDialogSelect(IDD_PW_Page4)
-        CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
-      ENDIF
-      CALL PopActiveWindowID
-
-      END SUBROUTINE UpdateWavelength
 !
 !*****************************************************************************
 !
