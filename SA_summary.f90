@@ -232,8 +232,10 @@
       INTEGER                                           Curr_Iter, MaxIterationSoFar
       REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
       LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
-                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -300,7 +302,7 @@
                 hFile = 10
                 OPEN(UNIT=hFile,FILE=tFileName,ERR=999)
                 DO I = 1, MaxIterationSoFar
-                  WRITE(hFile,'(I10,1X,99(F9.2,1X))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
+                  WRITE(hFile,'(I10,(1X,F9.2))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
                 ENDDO
                 CLOSE(hFile)
               ENDIF
