@@ -67,7 +67,6 @@
       IPMAX = NBIN
       IPMINOLD = IPMIN
       IPMAXOLD = IPMAX
-      QUIT = .TRUE. 
       BACKREF = .FALSE.
 
       END SUBROUTINE SubtractBackground
