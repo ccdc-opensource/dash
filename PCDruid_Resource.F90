@@ -1,4 +1,4 @@
-! Winteracter module created : 24/Nov/2001 15:09:35
+! Winteracter module created : 25/Nov/2001 17:07:38
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -481,4 +481,5 @@
           INTEGER, PARAMETER :: IDF_Limit1                      =  1219
           INTEGER, PARAMETER :: IDF_Limit2                      =  1220
           INTEGER, PARAMETER :: IDF_InvertSelection             =  1221
+          INTEGER, PARAMETER :: IDF_OutputChi2vsMoves           =  1099
       END MODULE Druid_Header

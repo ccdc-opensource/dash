@@ -227,7 +227,7 @@
 !
       LOGICAL FUNCTION Get_UseHydrogens
 
-! When .TRUE., each run in a multi run ends with a local minimisation
+! When .TRUE., hydrogen atoms are included in the structure factor calculations
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -247,7 +247,7 @@
 !
       SUBROUTINE Set_UseHydrogens(TheValue)
 
-! When .TRUE., each run in a multi run ends with a local minimisation
+! When .TRUE., hydrogen atoms are included in the structure factor calculations
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -266,6 +266,26 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE Set_UseHydrogens
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION Get_OutputChi2vsMoves
+
+! When .TRUE., the profile chi**2 versus moves graph is written out to a file
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      Get_OutputChi2vsMoves = WDialogGetCheckBoxLogical(IDF_OutputChi2vsMoves)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_OutputChi2vsMoves
 !
 !*****************************************************************************
 !
@@ -311,7 +331,7 @@
 !
       LOGICAL FUNCTION Get_SavePRO
 
-! When .TRUE., each run in a multi run ends with a local minimisation
+! When .TRUE., a file containing the calculated profile is saved for each SA run
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -331,7 +351,7 @@
 !
       SUBROUTINE Set_SavePRO(TheValue)
 
-! When .TRUE., each run in a multi run ends with a local minimisation
+! When .TRUE., a file containing the calculated profile is saved for each SA run
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -441,7 +461,7 @@
 !
       LOGICAL FUNCTION PlotPeakFitDifferenceProfile
 
-! .TRUE. = when drawing the observed profile, the data points are joined by lines
+! .TRUE. = when fitting peaks, the difference profile is plotted.
 
       USE WINTERACTER
       USE DRUID_HEADER

@@ -544,7 +544,7 @@
                            PlotErrorBars, PlotBackground,            &
                            PlotPeakFitDifferenceProfile,             &
                            WDialogGetCheckBoxLogical,                &
-                           Get_UseHydrogens, Get_SavePRO
+                           Get_UseHydrogens, Get_SavePRO, Get_OutputChi2vsMoves
       REAL, EXTERNAL :: WavelengthOf
       INTEGER*4 tInteger
       REAL*4    tReal
@@ -675,6 +675,8 @@
       CALL FileWriteLogical(tFileHandle,RecNr,Get_SavePRO())
 ! Auto local minimisation at the end of every run in multirun YES / NO
       CALL FileWriteLogical(tFileHandle,RecNr,Get_AutoLocalMinimisation())
+! Save output profile chi**2 versus moves plot YES / NO
+      CALL FileWriteLogical(tFileHandle,RecNr,Get_OutputChi2vsMoves())
 ! Save the damping factor for the local minimisation
       CALL FileWriteReal(tFileHandle,RecNr,SA_SimplexDampingFactor)
 ! Save the seeds for the random number generator
@@ -693,12 +695,12 @@
       CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
       CALL WDialogSelect(IDD_SA_Multi_completed_ep)
 ! Atom labels for SA solutions overlay. Two options: 
-! 1. "Element symbol + solution number" (default)
+! 1. "Element symbol + solution number"
 ! 2. "Orignal atom labels"
       CALL WDialogGetRadioButton(IDF_UseSolutionNr,tInteger)
       CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
 ! Atom colours for SA solutions overlay. Two options: 
-! 1. "By solution number" (default)
+! 1. "By solution number"
 ! 2. "By element"
       CALL WDialogGetRadioButton(IDF_ColourBySolution,tInteger)
       CALL FileWriteInteger(tFileHandle,RecNr,tInteger)
@@ -881,6 +883,9 @@
 ! Auto local minimisation at the end of every run in multirun YES / NO
       CALL FileReadLogical(tFileHandle,RecNr,tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise,tLogical)
+! Read output profile chi**2 versus moves plot YES / NO
+      CALL FileReadLogical(tFileHandle,RecNr,tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_OutputChi2vsMoves,tLogical)
 ! Read the damping factor for the local minimisation
       CALL FileReadReal(tFileHandle,RecNr,SA_SimplexDampingFactor)
 ! Read the seeds for the random number generator
