@@ -26,6 +26,7 @@
       REAL    SA_Duration ! The time the SA took, in seconds
       CHARACTER*10 SA_DurationStr
       INTEGER Ierrflag
+      INTEGER I
 
       IF (CheckOverwriteSaOutput() .EQ. 0) THEN
         CALL WizardWindowShow(IDD_SA_input3)
@@ -74,6 +75,10 @@
 !ep SASummary presents a grid summarising results of the Simulated
 !   Annealing runs.  
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
+! Initialise all overlay checkboxes to 'Checked'
+      DO I = 1, SA_Run_Number
+        CALL WGridPutCellCheckBox(IDF_SA_summary,3,I,Checked)
+      ENDDO
       CALL WDialogShow(-1,-1,0,Modeless)
       Ierrflag =  InfoError(1)
       DoSaRedraw = .FALSE.
