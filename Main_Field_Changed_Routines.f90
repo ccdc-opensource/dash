@@ -40,6 +40,8 @@
 			 if (CellOk) call Generate_TicMarks
         CASE(IDF_Indexing_Lambda,IDD_Index_Preparation)
              CALL DownloadWavelength(IDD_Index_Preparation)
+			 call PolyFitter_Wizard_Check_Status()
+		     if (CellOk) call Generate_TicMarks	
 	    CASE(IDD_Crystal_Symmetry) ! Deal with the changing pane from symmetry
 !C>> JCC Moved this to a subroutine.
 			 CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
@@ -94,10 +96,14 @@
              CALL WDialogSelect(IDD_Data_Properties)
 !             CALL Get_Main_IRadOption()
 		   CALL Set_Main_IRadOption()
+		   call PolyFitter_Wizard_Check_Status()
+		   if (CellOk) call Generate_TicMarks		
 !C>> JCC Handle a few other events 
 		CASE(IDF_Wavelength_Menu) ! Wavelength menu selection
 		   CALL WDialogSelect(IDD_Data_Properties)
 		   CALL Set_Main_IRadOption()  
+		   call PolyFitter_Wizard_Check_Status()
+		   if (CellOk) call Generate_TicMarks		
 		END SELECT
 !
       SELECT CASE (JDNumber)
