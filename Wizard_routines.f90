@@ -21,7 +21,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE EndWizard
+      SUBROUTINE EndWizardCommon
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -37,17 +37,34 @@
       IXPos_IDD_Wizard = WInfoDialog(6)
       IYPos_IDD_Wizard = WInfoDialog(7)
       CALL WDialogHide()
+      CALL SetWizardState(1)
+
+      END SUBROUTINE EndWizardCommon
+!
+!*****************************************************************************
+!
+      SUBROUTINE EndWizard
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+      INCLUDE 'statlog.inc'
+      INCLUDE 'DialogPosCmn.inc'
+
+      CALL EndWizardCommon
       CALL ToggleMenus(1)
       IF (.NOT. NoData) CALL SetModeMenuState(1,0,0)
-
       CALL PushActiveWindowID
       CALL Upload_CrystalSystem
       CALL Upload_Cell_Constants()
       CALL Upload_Range()
       CALL PopActiveWindowID
-
       CALL Generate_TicMarks
-      CALL SetWizardState(1)
 
       END SUBROUTINE EndWizard
 !
@@ -715,6 +732,7 @@
               CALL WDialogSelect(IDD_PW_Page9)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDF_RunDICVOL)
+!              CALL EstimateZeroPointError
               Lambda = ALambda
               CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
               CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
