@@ -517,7 +517,7 @@
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
-              CALL WDialogSelect(IDD_PW_Page2)
+              CALL WDialogSelect(IDD_PW_Page1)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDFINISH, IDCANCEL)
               CALL EndWizard
@@ -562,6 +562,7 @@
       IMPLICIT NONE
 
       INCLUDE 'Lattice.inc'
+      INCLUDE 'statlog.inc'
 
       CALL PushActiveWindowID
       CALL SetCrystalSystem(LatBrav)
@@ -573,7 +574,9 @@
       END DO
       ISPosSG=1+IPosSG-LposSG(LatBrav)
       CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+
 ! JvdS @ Why isn't NumberSGTable updated ?
+      NumberSGTable = IPosSG
       CALL Upload_Cell_Constants()
       CALL Upload_Range()
       CALL PopActiveWindowID

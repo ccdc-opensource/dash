@@ -363,8 +363,6 @@
 ! Enable the wizard next button
         CALL WDialogFieldState(IDNEXT,Enabled)
         CALL SetCrystalSystem(GetCrystalSystemFromUnitCell())
-        CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
-        CALL SetCrystalSystem(LatBrav)
         CALL SetSpaceGroupMenu(LatBrav)
       ELSE
 ! Disable the wizard next button
@@ -413,6 +411,14 @@
       ELSE
         NumBrSG = LPosSG(TheCrystalSystem+1) - LPosSG(TheCrystalSystem)
       ENDIF
+
+      IF ((LatBrav .EQ. 1) .OR. &
+          (IPosSg .GE. LPosSg(LatBrav) .AND. IPosSg .LT. LPosSg(LatBrav) + NumBrSg) ) THEN
+! Selection of same lattice so retain current space group
+        CALL PopActiveWindowID
+        RETURN
+      END IF
+
       ISPosSG = 1
       DO tISG = 1, NumBrSG
         tJSG = LPosSG(TheCrystalSystem) + tISG - 1
@@ -449,6 +455,8 @@
       INCLUDE 'statlog.inc'
       INCLUDE 'Lattice.inc'
 
+      INTEGER tOldNumberSGTable
+
       CALL PushActiveWindowID
       IF (IUploadFrom .EQ. IDD_Crystal_Symmetry) THEN
         CALL WDialogSelect(IDD_Crystal_Symmetry)
@@ -462,10 +470,11 @@
         LatBrav = TheCrystalSystem
         ISPosSG = ISgnum - LPosSG(LatBrav) + 1
       END IF
+      tOldNumberSGTable = LPosSG(LatBrav) + ISPosSG - 1
       CALL SetSpaceGroupMenu(LatBrav)
 ! Actual space group has been reset to the first of the list belonging to this crystal system,
 ! reset it to its original value
-      NumberSGTable = LPosSG(LatBrav) + ISPosSG - 1 
+      NumberSGTable = tOldNumberSGTable 
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
       CALL WDialogSelect(IDD_PW_Page1)
