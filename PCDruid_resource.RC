@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 12/Jul/2002 15:54:00
+// Modified : 17/Jul/2002 13:07:39
 //
 ///////////////////////////////////////////////////
 //
@@ -642,6 +642,8 @@
 #define IDF_egLine5                      1486
 #define IDF_egLine0                      1487
 #define IDB_Configuration                1488
+#define IDB_Prog3                        1489
+#define IDB_Prog2                        1493
 
 ///////////////////////////////////////////////////
 //
@@ -1051,6 +1053,19 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
+END
+
+IDD_Width_Equations RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
@@ -1813,6 +1828,7 @@ BEGIN
     CONTROL "Simulated annealing run number 1 of 1",IDD_SA_RunLabel,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,   22,    8,  184,   10
     CONTROL "&Edit",IDB_Edit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  106,  158,   40,   14
     CONTROL "S&olutions",IDB_Summary,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  206,  158,   40,   14
+    CONTROL "Button",IDB_Prog3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,   24,  158,   18,   15
 END
 
 IDD_SA_Action1 RCDATA
@@ -3879,6 +3895,7 @@ IDB_zmDelete3                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 IDB_zmDelete4                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 IDB_Delabc                      BITMAP DISCARDABLE "res\\Del_abc.bmp"
 IDF_PicHourglass                BITMAP DISCARDABLE "res\\Hourglass2.bmp"
+IDB_Prog3                       BITMAP DISCARDABLE "res\\ChiSqd3.bmp"
 
 ///////////////////////////////////////////////////
 //
