@@ -1,6 +1,49 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION NearlyEqual(Value1, Value2)
+!
+! This function compares two REALs and determines if they are effectively equal
+!
+! INPUT   : Value1 and Value2 = the values to be compared
+!
+! RETURNS : .TRUE.  if Value1 and Value2 differ by less than 0.000001
+!           .FALSE. otherwise
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Value1, Value2
+
+      NearlyEqual = (ABS(Value1 - Value2) .LT. 0.000001)
+
+      END FUNCTION NearlyEqual
+!
+!*****************************************************************************
+!
+      REAL FUNCTION Radians2Degrees(TheAngle)     
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheAngle
+
+      Radians2Degrees = TheAngle * (30.0 / ASIN(0.5))
+
+      END FUNCTION Radians2Degrees
+!
+!*****************************************************************************
+!
+      REAL FUNCTION Degrees2Radians(TheAngle)     
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheAngle
+
+      Degrees2Radians = TheAngle * (ASIN(0.5) / 30.0)
+
+      END FUNCTION Degrees2Radians
+!
+!*****************************************************************************
+!
       SUBROUTINE SORT_REAL(VAL,IP,N)
 !
 !X
@@ -57,19 +100,14 @@
 !
       SUBROUTINE InverseMatrix(A,B,N)
 !
-!X
-!C 12C
-!H Inverts matrix A into matrix B.
-!A On entry A is a square NxN real matrix
-!A On exit  B is its inverse
+! Inverts matrix A into matrix B.
+! On entry A is a square NxN real matrix
+! On exit  B is its inverse
 !
       DIMENSION II(100), IL(100), IG(100), A(N,N), B(N,N)
 
-      DO J = 1, N
-        DO I = 1, N
-          B(I,J) = A(I,J)
-        ENDDO
-      ENDDO
+! Initialise b with values from a
+      B = A
       D = 1.0
       IS = N - 1
       DO K = 1, N
@@ -90,7 +128,10 @@
         II(K) = KF
         IL(KF) = KF
         D = D * P
-        IF (D.EQ.0.) GOTO 999
+        IF (D .EQ. 0.0) THEN
+          CALL DebugErrorMessage('D .EQ. 0.0 in InverseMatrix()')
+          RETURN
+        ENDIF
         DO I = 1, N
           IF (I.EQ.KF) THEN
             B(I,K) = 1.0/P
@@ -132,8 +173,92 @@
         IG(K) = KF
         D = -D
   190 ENDDO
-  999 RETURN
+
       END SUBROUTINE InverseMatrix
+!
+!*****************************************************************************
+!
+      SUBROUTINE DGMINV(A,B,N)
+!
+! Inverts matrix A into matrix B.
+! On entry A is a square NxN real matrix
+! On exit  B is its inverse
+!
+      IMPLICIT REAL*8 (A-H,O-Z)
+      INTEGER         II(500), IL(500), IG(500)
+      REAL*8          A(N,N), B(N,N)
+      INTEGER         I, J, IS, K
+
+! Initialise b with values from a
+      B = A
+      D = 1.0
+      IS = N - 1
+      DO K = 1, N
+        IL(K) = 0
+        IG(K) = K
+      ENDDO
+      DO K = 1, N
+        R = 0.0
+        DO 40 I = 1, N
+          IF (IL(I) .NE. 0) GOTO 40
+          W = B(I,K)
+          X = ABS(W)
+          IF (R .GT. X) GOTO 40
+          R  = X
+          P  = W
+          KF = I
+   40   CONTINUE
+        II(K) = KF
+        IL(KF) = KF
+        D = D * P
+        IF (D .EQ. 0.0) THEN
+          CALL DebugErrorMessage('D .EQ. 0.0 in DGMINV()')
+          RETURN
+        ENDIF
+        DO I = 1, N
+          IF (I .EQ. KF) THEN
+            B(I,K) = 1.0/P
+          ELSE
+            B(I,K) = -B(I,K)/P
+          ENDIF
+        ENDDO
+        DO 140 J = 1, N
+          IF (J .EQ. K) GOTO 140
+          W = B(KF,J)
+          IF (W .EQ. 0.0) GOTO 140
+          DO  I = 1, N
+            IF (I .EQ. KF) THEN
+              B(I,J) = W/P
+            ELSE
+              B(I,J) = B(I,J)+W*B(I,K)
+            ENDIF
+          ENDDO
+  140   CONTINUE
+      ENDDO
+      DO K = 1, IS
+        KF = II(K)
+        KL = IL(KF)
+        KG = IG(K)
+        IF (KF .NE. KG) THEN
+          DO I = 1, N
+            R = B(I,KF)
+            B(I,KF) = B(I,KG)
+            B(I,KG) = R
+          ENDDO
+          DO J = 1, N
+            R = B(K,J)
+            B(K,J) = B(KL,J)
+            B(KL,J) = R
+          ENDDO
+          IL(KF) = K
+          IL(KG) = KL
+          IG(KL) = IG(K)
+          IG(K) = KF
+          D = -D
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE DGMINV
 !
 !*****************************************************************************
 !
