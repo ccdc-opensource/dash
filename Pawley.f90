@@ -257,15 +257,6 @@
                   ENDIF
                   CALL PopActiveWindowID
                   RETURN
-!O                CASE (-1)
-!O                  NumPawleyRef = NumPawleyRef - 1
-!O! Return to data viewing
-!O                  CALL EndWizard
-!O! This handles cases where the number of reflections is exceeded
-!O                  CALL ErrorMessage("Sorry, can only Pawley refine a maximum of 350 reflections."//CHAR(13)// &
-!O                                    "You must truncate your data set.")
-!O                  CALL PopActiveWindowID
-!O                  RETURN
                 CASE DEFAULT
                   IF (PawleyErrorLog(2) .GT. 0) CALL PawleyWarning ! Check the log messages and reset
               END SELECT
@@ -470,13 +461,13 @@
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
       
+      LOGICAL, EXTERNAL :: FnUnitCellOK, FnWaveLengthOK, FnPatternOK
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, NearlyEqual
+      REAL,    EXTERNAL :: WavelengthOf
       INTEGER NPawBack
       CHARACTER*4 ChRadOption(4)
       DATA CHRADOPTION /'LABX','SYNX','SYNX','TOFN'/
       INTEGER I
-      LOGICAL, EXTERNAL :: FnUnitCellOK, FnWaveLengthOK, FnPatternOK
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, NearlyEqual
-      REAL,    EXTERNAL :: WavelengthOf
       INTEGER NTCycles
       INTEGER ITEM, ISYM, IRTYP
       INTEGER tFileHandle, hFile
