@@ -17,32 +17,49 @@
 !
       IMPLICIT NONE
 !
-      LOGICAL                       :: SAVEF = .FALSE. ! File needs saving
+      LOGICAL                       :: SAVEF
+      DATA SAVEF / .FALSE. / ! File needs saving
 
-      INTEGER, PARAMETER :: MaxPathLength =  255
-      LOGICAL                       :: PLOTT = .FALSE. ! Graphic plotted?
-      CHARACTER(LEN=MaxPathLength)  :: FNAME = ' '     ! Current filename
+      INTEGER MaxPathLength
+      PARAMETER (MaxPathLength = 255)
+
+      LOGICAL               ::    PLOTT
+      DATA PLOTT / .FALSE. / ! Graphic plotted?
+
+      CHARACTER(MaxPathLength) ::  FNAME
+      DATA FNAME / ' ' /     ! Current filename
+
 ! Added these in for portability reasons       
-      CHARACTER(LEN=MaxPathLength)  :: INSTDIR =     'C:\Program Files\DASH' ! Default installation directory
-      CHARACTER(LEN=21)             :: SPACEGROUPS = 'SpaceGroupSymbols.dat' ! Table name
-      CHARACTER                     :: DIRSPACER   = '\' ! Windows spacer
-      CHARACTER(LEN=8)              :: CONFIG      = 'Dash.cfg'
-! External binaries
-      CHARACTER(LEN=MaxPathLength)  :: VIEWEXE     = 'C:\Program Files\DASH\mercury.exe'
-      CHARACTER(LEN=MaxPathLength)  :: CONVEXE     = 'C:\Program Files\DASH\zmconv.exe'
-      CHARACTER(LEN=20)             :: VIEWARG     = ''
+      CHARACTER(MaxPathLength) ::  INSTDIR
+      DATA INSTDIR / 'C:\Program Files\DASH' / ! Default installation directory
 
+      CHARACTER(21)            ::  SPACEGROUPS
+      DATA SPACEGROUPS / 'SpaceGroupSymbols.dat' / ! Table name
+      CHARACTER               ::  DIRSPACER
+      DATA DIRSPACER / '\' / ! Windows spacer
+      CHARACTER(8)             ::  CONFIG
+      DATA CONFIG / 'Dash.cfg' /
+! External binaries
+      CHARACTER(MaxPathLength) :: VIEWEXE
+      DATA VIEWEXE / 'C:\Program Files\DASH\mercury.exe' /
+
+      CHARACTER(MaxPathLength) :: CONVEXE
+      DATA CONVEXE / 'C:\Program Files\DASH\zmconv.exe' /
+
+      CHARACTER(20)           ::  VIEWARG
+      DATA VIEWARG / '' /
+      
       LOGICAL ViewOn
       LOGICAL ConvOn       ! Set if external z-matix conversion program available
       LOGICAL ViewAct
       LOGICAL AutoUpdate
 
 ! File information; Names of files used by DASH For I/O
-      CHARACTER*80 :: DashTicFile
-      CHARACTER*80 :: DashHcvFile
-      CHARACTER*80 :: DashPikFile
-      CHARACTER*80 :: DashRawFile
-      CHARACTER*80 :: DashDslFile
+      CHARACTER*80  DashTicFile
+      CHARACTER*80  DashHcvFile
+      CHARACTER*80  DashPikFile
+      CHARACTER*80  DashRawFile
+      CHARACTER*80  DashDslFile
 
       LOGICAL TicExists
       LOGICAL HcvExists
@@ -52,21 +69,21 @@
 
 ! New license information structure    
       TYPE License_Info
-        INTEGER  :: Day
-        INTEGER  :: Month
-        INTEGER  :: Year
-        INTEGER  :: DateCode
-        INTEGER  :: SerialNumber
-        INTEGER  :: LicenseType
-        INTEGER  :: Valid
+        INTEGER   Day
+        INTEGER   Month
+        INTEGER   Year
+        INTEGER   DateCode
+        INTEGER   SerialNumber
+        INTEGER   LicenseType
+        INTEGER   Valid
       END TYPE
       INTEGER NodeKey,DemoKey,SiteKey
       PARAMETER (NodeKey = 1)
       PARAMETER (DemoKey = 2)
       PARAMETER (SiteKey = 3)
 
-      INTEGER           :: EventType
-      TYPE(WIN_MESSAGE) :: EventInfo
+      INTEGER            EventType
+      TYPE(WIN_MESSAGE)  EventInfo
 ! These global variables hold the last event reported by Winteracter
 
       LOGICAL NoData
