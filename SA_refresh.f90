@@ -36,16 +36,17 @@
               CALL WDialogShow(-1,-1,IDOK,Modeless)
             CASE (IDB_Prog3)
               CALL OpenChiSqPlotWindow
-              CALL plotting_Chi_sqd
             CASE (IDF_StartNext) ! 'Start Next'
-              iMyExit = 4
+              IF (iMyExit .NE. 6) iMyExit = 4
             CASE (IDF_StopSA, IDCANCEL) ! 'Stop'
 ! Go to the SA results
-              iMyExit = 3
+              IF (iMyExit .NE. 6) iMyExit = 3
             CASE (IDB_Edit)             ! 'Edit'
+              IF (iMyExit .NE. 6) THEN
 ! Close Chi Squared plot window
-              CALL Close_Chisq_plot
-              iMyExit = 5
+                CALL Close_Chisq_plot
+                iMyExit = 5
+              ENDIF
             CASE (IDF_SA_Simplex_Button) ! 'Local minimisation'
               CALL LocalMinimise(.FALSE.)
             CASE (IDB_Summary)           ! 'Solutions'
