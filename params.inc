@@ -35,11 +35,6 @@
 
       INTEGER MCHFS2
       PARAMETER ( MCHFS2 = 10000 )
-    
-! For common block PRJMAT
-
-      INTEGER MPRJMT
-      PARAMETER ( MPRJMT = 10000 )
 
 ! For common block FPINF, FPINF1
 
