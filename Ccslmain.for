@@ -1957,7 +1957,7 @@ C NUMVAL IS THE NUMBER OF ENTRIES IN FBUF
         VALFMT='(2F10.2,2F10.5)'
         NUMVAL=5
       ELSE
-        IF (IFOR(6) .EQ	.0) THEN
+        IF (IFOR(6) .EQ .0) THEN
           VALFMT='(2F10.2)'
         ELSE
          VALFMT='(2F10.2,4F10.2)'
@@ -2380,7 +2380,7 @@ C3084      FORM(16:16)=' '
 2000  FORMAT (I2)
       WRITE (ITO,FORM) (MESS(I:I),I=1,L1)
 CUNIX
-C      	CALL FLUSH(ITO)
+C           CALL FLUSH(ITO)
       READ (ITI,1000) ICARD
 1000  FORMAT (A80)
       RETURN
@@ -3166,7 +3166,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
+      RETURN
 C
    3  IB = MOD(NC,NBITS)
       IF (IB .EQ. 0) IB = NBITS
@@ -5212,18 +5212,18 @@ C
       DATA GRID/.025/
 C>> JCC Implement error tracking rather than stopping
 
-	INTEGER IBMBER
+      INTEGER IBMBER
       COMMON / CCSLER / IBMBER
-	IBMBER = 0
+      IBMBER = 0
 C
 C  SAVE CURRENT SPACE
       MSPCE=NSPCE
       CALL PLCONV(XX,YY,NSPCE,A1,B1,3)
 C>> JCC Added
-	IF (IBMBER .NE. 0) RETURN
+      IF (IBMBER .NE. 0) RETURN
       CALL SPCSET(3)
 C>> JCC Added
-	IF (IBMBER .NE. 0) RETURN
+      IF (IBMBER .NE. 0) RETURN
 C
 C  DRAW CIRCLE
       CALL KANGA1(A1+R,B1,3)
@@ -5818,8 +5818,8 @@ C A NEW VECTOR FOUND IN VEC2 - STORE IT IN VEC1:
 C>> JCC 
 C   Was      STOP
 C>> Handle through further function
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 
    5  CALL GMEQ(VEC2,VEC1(1,I),1,3)
       CALL FRAC3(VEC1(1,I))
@@ -5874,8 +5874,8 @@ C A NEW VECTOR FOUND IN VEC2 - STORE IT IN VEC1:
 C>> JCC Handle through separate function
 C Was        STOP
 C Now
-	 CALL BMBOUT
-	 RETURN
+       CALL BMBOUT
+       RETURN
       ENDIF
 C
       CALL GMEQ(VEC2,VEC1(1,I),1,3)
@@ -5936,8 +5936,8 @@ C HAVE NEW VECTOR:
 C>> JCC Handle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
 C TO STORE NEW VECTOR:
    5  CALL GMEQ(VEC2,VEC1(1,I),1,3)
@@ -5996,8 +5996,8 @@ C HAVE NEW VECTOR:
 C>> JCC Handle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
 C TO STORE NEW VECTOR:
    5  CALL GMEQ(VEC2,VEC1(1,I),1,3)
@@ -6054,7 +6054,7 @@ C
 C>> JCC Handle through extra function
 C Was    IF (NACT .EQ. 0)  STOP
 C Now
-	IF (NACT .EQ. 0) CALL BMBOUT
+      IF (NACT .EQ. 0) CALL BMBOUT
  100  RETURN
       END
 C
@@ -6118,7 +6118,7 @@ C>> JCC Handle through external function
 C>> Was
 C      IF (NACT .EQ. 0) STOP
 C>> Now
-	 IF (NACT .EQ. 0) CALL BMBOUT
+       IF (NACT .EQ. 0) CALL BMBOUT
  100  RETURN
       END
 C
@@ -6175,7 +6175,7 @@ C
 C>> JCC Handle thru' external function
 C>> Was     IF (NACT .EQ. 0) STOP
 C>> Now
-	IF (NACT .EQ. 0) CALL BMBOUT
+      IF (NACT .EQ. 0) CALL BMBOUT
 
  100  RETURN
       END
@@ -6235,7 +6235,7 @@ C
 C>> JCC Handle thru' external function
 C>> Was     IF (NACT .EQ. 0) STOP
 C>> Now
-	IF (NACT .EQ. 0) CALL BMBOUT
+      IF (NACT .EQ. 0) CALL BMBOUT
  100  RETURN
       END
 C
@@ -6281,8 +6281,8 @@ C
 C>> JCC Handle through extra function
 C Was      STOP
 C Now
-		 CALL BMBOUT
-		 RETURN
+             CALL BMBOUT
+             RETURN
 
         ELSE
          GO TO 100
@@ -6312,7 +6312,7 @@ C
 C>> JCC Handle thru' external function
 C>> Was     IF (NACT .EQ. 0) STOP
 C>> Now
-	IF (NACT .EQ. 0) CALL BMBOUT
+      IF (NACT .EQ. 0) CALL BMBOUT
  100  RETURN
       END
 C
@@ -6370,7 +6370,7 @@ C
 C>> JCC Handle thru' external function
 C>> Was     IF (NACT .EQ. 0) STOP
 C>> Now
-	IF (NACT .EQ. 0) CALL BMBOUT
+      IF (NACT .EQ. 0) CALL BMBOUT
  100  RETURN
       END
 C
@@ -7193,7 +7193,7 @@ CA                   for all other elements IFTAB(N)=I where MULTAB(I,J)=N
 CA                   and J is an element of S.
 CA                   Negative values of the entries indicate that it is the
 CA                   centre related partner that is required.
-CA	    IFTAB(1) = NFAC
+CA        IFTAB(1) = NFAC
 CA          abs(NFAC) is the number of factors; NFAC is negative
 CA                    if S is centro-symmetric.
 CN The factors found by FACTGP need not necessarily form a complete group
@@ -7901,7 +7901,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
+      RETURN
 C
 C CHECK WE DO NOT ALREADY HAVE A OR -A:
    3  DO 4 I=1,4
@@ -7923,7 +7923,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
+      RETURN
 C
     8  NOPL=NOPL+1
       NSTAT(NNEW)=NDO
@@ -8189,7 +8189,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
+      RETURN
 C
   14  IF (N .LT. 5) THEN
         NN = N
@@ -12372,7 +12372,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
+      RETURN
 C
    1  NLEN=LEN(ICHR)
       J=0
@@ -12506,7 +12506,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
+      RETURN
 C
  100  RETURN
       END
@@ -13344,7 +13344,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
+      RETURN
   18  N1=LSCD(I)
       N2=LSCD(I+1)-1
       LSCD(I)=-LSCD(I)
@@ -13478,7 +13478,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN      
+      RETURN      
 C
    3  NUM=NUM+1
       L=NUM
@@ -13744,7 +13744,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
+      RETURN
       ENDIF
 C
 C FORM ANSWER IN IANS.  PUT SAMPLE BIT INTO IBT:
@@ -13816,7 +13816,7 @@ C Was
 C     STOP
 C Now
         CALL BMBOUT
-	  RETURN
+        RETURN
       ENDIF
 C
 C FORM ANSWER IN IANS.  PUT SAMPLE BIT INTO IBT:
@@ -14638,7 +14638,7 @@ C Was
 C     STOP
 C Now
         CALL BMBOUT
-	  RETURN
+        RETURN
       ENDIF
 C
 C CLEAR MATRIX AND RHS:
@@ -14715,8 +14715,8 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
-	  
+      RETURN
+        
       ENDIF
 C
       DERIVB(I)=SQRT(CHITOT*ALSQ(IR+I))
@@ -15362,7 +15362,7 @@ C
 C LEVEL 3      FUNCTION NOPFIL(MODE)
       FUNCTION NOPFIL(MODE)
 
-	USE WINTERACTER
+      USE WINTERACTER
 C
 C *** NOPFIL updated by PJB 24-Oct-1994 ***
 C
@@ -15450,7 +15450,7 @@ C      CHARACTER*%FNAM% DEXT
       CHARACTER *10 DAT
       CHARACTER *6 MAIN
 C>> JCC Declaration
-	INTEGER ISPAG
+      INTEGER ISPAG
       DATA LM/13,14/
       DATA FILSTA/'OLD','NEW','UNKNOWN'/
       DATA FILACC/'SEQUENTIAL','DIRECT','APPEND'/
@@ -15541,7 +15541,7 @@ C
 C JOIN HERE IF FIRST TRY FAILED, & IT MAY BE USEFUL TO TRY .CRY FOR .CCL:
 C    6   WRITE (ITO,VFMT) MESS(IO)(1:LM(IO)),MESSAG
 
-	ISPAG = 0
+      ISPAG = 0
 
     6    CONTINUE
 C   The above line added to supress unwanted output in the
@@ -15549,11 +15549,11 @@ C   noninteractive version
 C>> JCC
 C>> It seems that the program can get caught in an infinite spaghetti loop here
 C>> so I've added in a pass count check. 
-	ISPAG = ISPAG + 1
-	IF (ISPAG .GT. 10) THEN
-		NOPFIL = -1
-		RETURN
-	ENDIF
+      ISPAG = ISPAG + 1
+      IF (ISPAG .GT. 10) THEN
+            NOPFIL = -1
+            RETURN
+      ENDIF
 CUNIX
 C           CALL FLUSH(ITO)
 C SPECIAL BRUCE BLIP TO USE BOTH .CCL AND .CRY FILES WITHOUT KNOWING WHICH:
@@ -15606,7 +15606,7 @@ CVMS
 C MUST SPECIFY READONLY FOR READ FILES ON VAX TO AVOID PROTECTION FAILURES
 C WHEN READING FROM FOREIGN DIRECTORIES
 CVMS
-!	CALL ErrorMessage('NAMFIL = '//NAMFIL)
+!     CALL ErrorMessage('NAMFIL = '//NAMFIL)
       OPEN (UNIT=LUN,FILE=NAMFIL,ACCESS=FILACC(IA),FORM=FILFOR(IF),
 CVMS
 
@@ -16633,7 +16633,7 @@ C Was
 C     STOP
 C Now
       CALL BMBOUT
-	RETURN
+      RETURN
 C
  100  RETURN
       END
@@ -16918,11 +16918,11 @@ C Was
 C     IF (ANORM.LT.-.002) STOP 'Error in Normalisation'
 C Now
       IF (ANORM.LT.-.002) THEN
-		WRITE(LPT,*) 'Error in Normalisation'
-		WRITE(ITO,*) 'Error in Normalisation'
-		CALL BMBOUT
-		RETURN
-	ENDIF
+            WRITE(LPT,*) 'Error in Normalisation'
+            WRITE(ITO,*) 'Error in Normalisation'
+            CALL BMBOUT
+            RETURN
+      ENDIF
 
       IF (ANORM.LE..0002) THEN
         ANORM=0.
@@ -18287,8 +18287,8 @@ C  SYMMETRY AXIS INSIDE UNIT - ERROR\
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
 C  AXIS IS ON UNIT
     4 IF (IN.GT.10) GO TO 5
@@ -18517,7 +18517,7 @@ C
       EQUIVALENCE (ICARD,MESSAG)
 
 C>> JCC Initialise return value ( successful = 1, anything else is failure)
-	PREFIN = 1
+      PREFIN = 1
 
 C
 C INITIALISE WHOLE SYSTEM - DATE, TIME, CONSTANTS, I/O UNIT NUMBERS ETC:
@@ -18544,10 +18544,10 @@ CRAL
       CALL OPNFIL(ICRYDA,111)
 C>> JCC
 C>>  Check the value of ICRYDA. An error may have occurred on opening the file
-	IF (ICRYDA .EQ. -1) THEN
-		PREFIN = 0
-		RETURN
-	ENDIF
+      IF (ICRYDA .EQ. -1) THEN
+            PREFIN = 0
+            RETURN
+      ENDIF
 C OPEN SCRATCH FILE TO HOLD COPY OF CRYSTAL DATA:
    10 IO10=NOPFIL(10005)
 C SET NO ERRORS DETECTED ON INPUT - SYSTEM PLOUGHS ON AS LONG AS IT CAN:
@@ -19027,8 +19027,8 @@ C  CHECK WHETHER BASE PLANE IS PRIMITIVE
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
 C
   11  NPRIM(1,1)=N1-1
@@ -19058,8 +19058,8 @@ C  ERROR IF WE GET HERE
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
 C
    5  NPRIM(1,2)=N1-1
@@ -19917,8 +19917,8 @@ C 'ALL'
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	 CALL BMBOUT
-	 RETURN
+       CALL BMBOUT
+       RETURN
 C
       ENDIF
 C
@@ -20961,7 +20961,7 @@ CA On entry DPROP(3) is the change in propagation vector
 C
       DIMENSION DPROP(3)
 C>> JCC Moved to an include file
-	INCLUDE 'REFLNS.INC'
+      INCLUDE 'REFLNS.INC'
 C
       DO 1 KNOW=1,MAXK
       IF (ISMAG(KNOW).EQ.0) GO TO 1
@@ -21045,8 +21045,8 @@ C CHECK CORRECT SEQUENCE
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
 C
 C AT END, SET NO MORE REJECTIONS
@@ -21247,8 +21247,8 @@ C N1 AND A1 RECORD POSITION AND VALUE OF 1ST NON-ZERO
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
    4  N2=I
       A2=-A
@@ -21311,8 +21311,8 @@ C N1 AND A1 RECORD POSITION AND VALUE OF 1ST NON-ZERO
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
    4  N2=LKUP(I,J)
       A2=-A
@@ -24809,8 +24809,8 @@ C  HERE IF NOT FIRST:
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
 C
    31 IF (NNORD(M).EQ.0 .OR. NNORD(M).GT.10) GO TO 3
@@ -25448,8 +25448,8 @@ C SHOULD HAVE MADE GOOD UNIT BY NOW:
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	CALL BMBOUT
-	RETURN
+      CALL BMBOUT
+      RETURN
 C
 C
 C NEITHER TRICLINIC NOR CUBIC - TRY ALL MIRRORS:
@@ -25898,8 +25898,8 @@ C TEST RELATIVE FOR BEING IN GIVEN BOX - "ON" AS AN ANSWER IS AN ERROR:
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	 CALL BMBOUT
-	 RETURN
+       CALL BMBOUT
+       RETURN
 C
       ENDIF
 C
@@ -26343,8 +26343,8 @@ C
 C>>JCC HAndle through extra function
 C Was      STOP
 C Now
-	  CALL BMBOUT
-	  RETURN
+        CALL BMBOUT
+        RETURN
 C
       ENDIF
 C
@@ -27309,18 +27309,18 @@ C IS THERE A SECOND GENERATOR OF THE SUB-GROUP WHICH MAKES THIS ATOM SPECIAL?
 
 C>> JCC Added ion BMBOUT 
 
-	SUBROUTINE BMBOUT
+      SUBROUTINE BMBOUT
 C BMBOUT BoMBs OUT of the code. Essentially this replaces STOP in the code but 
 C implements a pseudo-error throwing mechanism. We cant have STOP being called while
 C the GUI is running, since this will annoy users a lot
 
-	INTEGER IBMBER
-	COMMON / CCSLER / IBMBER 
-	DATA IBMBER / 0 /
+      INTEGER IBMBER
+      COMMON / CCSLER / IBMBER 
+      DATA IBMBER / 0 /
 C
 C If you want to stop on an error, then comment out the next line
-C	STOP
+C     STOP
 C
-	IBMBER = 1 ! The alternative: track with a flag
-	RETURN
-	END
+      IBMBER = 1 ! The alternative: track with a flag
+      RETURN
+      END
