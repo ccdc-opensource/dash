@@ -11,6 +11,8 @@
       PARAMETER (cDICVOL_TooManySolutions = 2)
       INTEGER cDIVCOLExpErrTooLarge
       PARAMETER (cDIVCOLExpErrTooLarge = 3)
+      INTEGER cDICVOL_ErrorInterrupted
+      PARAMETER (cDICVOL_ErrorInterrupted = 4)
       
       REAL DV_ScaleFactor
 ! To scale all the data, so that large unit cells can be treated as though they were small.
