@@ -11,7 +11,6 @@
       USE DRUID_HEADER
 	  USE VARIABLES
       TYPE(WIN_STYLE)    WINDOW
-	  TYPE(WIN_MESSAGE)  MESSAGE
 	  
 !ep	 need the common block to identify the number rows in the grid	  	
 	  COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MinMoves, MaxMoves, ChiMult
@@ -20,20 +19,20 @@
 	  CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
 	  CALL WDialogShow(-1,-1,0,Modeless)
 	  DO
-			CALL WMessage(ITYPE, MESSAGE)
-			IF (MESSAGE%WIN .EQ. 0) THEN
-				Quit = process_mainwindow_message(ITYPE, MESSAGE)
+			CALL GetEvent
+			IF (EventInfo%WIN .EQ. 0) THEN
+				CALL process_mainwindow_message
 			ELSE
-			    SELECT CASE (ITYPE)
+			    SELECT CASE (EventType)
 ! will close the profile plot window
 				  CASE (CloseRequest)
-				    CALL WindowCloseChild(message%win)
+				    CALL WindowCloseChild(EventInfo%win)
 ! exposing or resizing of profile plot windows - will replot
 				  CASE (expose, resize)
-				    CALL replot_pro_file(message%win)
+				    CALL replot_pro_file(EventInfo%win)
 ! Ok button of summary window pushed, dialog closed
 				  CASE (PushButton)
-					IF ( IDOK_ep .EQ. MESSAGE%VALUE1) THEN
+					IF ( IDOK_ep .EQ. EventInfo%VALUE1) THEN
 ! @ will close all child windows indiscriminantly - change!
                                 do i = 1, maxruns
                                    call WindowCloseChild(i)
