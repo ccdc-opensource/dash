@@ -289,10 +289,15 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       CHARACTER(MaxPathLength) CTEMP
       INTEGER ISTAT
-      INTEGER DiffractionFileBrowse ! Function
-      INTEGER DiffractionFileOpen ! Function
+      INTEGER, EXTERNAL :: DiffractionFileBrowse, DiffractionFileOpen
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page3)
@@ -303,6 +308,10 @@
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
               CALL WizardApplyDiffractionFileInput
+! Set allowed range for data truncation
+              CALL WDialogSelect(IDD_PW_Page5)
+              CALL WDialogRangeReal(IDF_Max2Theta,XBIN(1),XBIN(NBIN))
+              CALL WDialogRangeReal(IDF_Min2Theta,XBIN(1),XBIN(NBIN))
               CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDCANCEL, IDCLOSE)
@@ -341,16 +350,12 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       REAL Temp
       INTEGER IRadSelection
@@ -370,7 +375,7 @@
               ELSE
 ! Set allowed range for resolution
                 CALL WDialogSelect(IDD_PW_Page5)
-                CALL WDialogRangeReal(IDF_MaxResolution,50.0,TwoTheta2dSpacing(XPMAX))
+                CALL WDialogRangeReal(IDF_MaxResolution,TwoTheta2dSpacing(XBIN(NBIN)),50.0)
                 CALL WizardWindowShow(IDD_PW_Page5)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)

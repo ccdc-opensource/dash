@@ -1418,14 +1418,16 @@
 ! Setting TheMin2Theta to 0.0 / TheMax2Theta to 90.0 effectively 
 ! restores beginning or end to original state
 !
+! OUTPUT : On exit, TheMin2Theta and TheMax2Theta contain the actual minimum and maximum
+!
 ! Note: restores XOBS etc. from BackupXOBS etc., so can't be called _after_ background subtraction.
 !
       USE VARIABLES
 
       IMPLICIT NONE
 
-      REAL, INTENT (IN   ) :: TheMin2Theta
-      REAL, INTENT (IN   ) :: TheMax2Theta
+      REAL, INTENT (INOUT) :: TheMin2Theta
+      REAL, INTENT (INOUT) :: TheMax2Theta
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -1439,16 +1441,24 @@
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
       INTEGER I, Shift
+      REAL    tReal
 
+      IF (TheMin2Theta .GT. TheMax2Theta) THEN
+        tReal = TheMax2Theta
+        TheMax2Theta = TheMin2Theta
+        TheMin2Theta = tReal
+      ENDIF
 ! Find TheMax2Theta in BackupXOBS
       DO I = BackupNOBS, 1, -1
         IF (BackupXOBS(I) .LE. TheMax2Theta) EXIT
       ENDDO
+      TheMax2Theta = BackupXOBS(I)
       NOBS = I
 ! Find TheMin2Theta in BackupXOBS
       DO I = 1, NOBS
         IF (BackupXOBS(I) .GE. TheMin2Theta) EXIT
       ENDDO
+      TheMin2Theta = BackupXOBS(I)
       Shift = I - 1
       DO I = 1, NOBS
         XOBS(I) = BackupXOBS(I+Shift)
