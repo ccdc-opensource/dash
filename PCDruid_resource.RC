@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/May/2002 15:29:14
+// Modified : 10/May/2002 09:36:43
 //
 ///////////////////////////////////////////////////
 //
@@ -627,6 +627,7 @@
 #define IDF_Gamma                        1250
 #define IDD_ViewPawley                    127
 #define IDB_ClearAll                     1406
+#define IDM_ViewPawley                  40030
 
 ///////////////////////////////////////////////////
 //
@@ -3770,6 +3771,7 @@ BEGIN
         MENUITEM "&Peak Positions",                          ID_get_peak_positions
         MENUITEM "Cell Parameters",                          ID_get_crystal_symmetry
         MENUITEM "Peak &Widths",                             ID_get_peak_widths
+        MENUITEM "Pawley / SA",                              IDM_ViewPawley
     END
     POPUP "&Options"
     BEGIN
