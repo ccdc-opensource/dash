@@ -129,7 +129,7 @@
       DiffractionFileOpen = ISTAT
       IF (ISTAT .EQ. 0) RETURN
 ! Enable the appropriate menus:
-      CALL SetModeMenuState(1,-1,-1)
+      CALL SetModeMenuState(1,-1,0)
 ! JvdS Was:
 !      CALL SetModeMenuState(1,0,0)
 ! however, that sometimes enables Pawley fit after just having read a new data file

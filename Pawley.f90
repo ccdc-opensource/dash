@@ -21,6 +21,7 @@
       INTEGER IDUMMY
       INTEGER NTCycles
 
+      CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
       CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
