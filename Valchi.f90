@@ -23,8 +23,6 @@
 !
       COMMON /ITRINF/ iteration
 !
-      COMMON /temtemtem/ kpp
-!
       CALL PRECFC
       SUM1 = 0.
       SUM2 = 0.
