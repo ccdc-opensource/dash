@@ -26,33 +26,45 @@
             CASE (IDF_ObservedData_Colour)
               SelectedColour = KolObs
               CALL WSelectColour(SelectedColour)
-              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+              IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
                 CALL IGrPaletteRGB(KolNumObs,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                KolObs = SelectedColour
+              ENDIF
             CASE (IDF_CalculatedData_Colour)
               SelectedColour = KolCal
               CALL WSelectColour(SelectedColour)
-              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+              IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
                 CALL IGrPaletteRGB(KolNumCal,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                KolCal = SelectedColour
+              ENDIF
             CASE (IDF_DifferenceData_Colour)
               SelectedColour = KolDif
               CALL WSelectColour(SelectedColour)
-              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+              IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
                 CALL IGrPaletteRGB(KolNumDif,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                KolDif = SelectedColour
+              ENDIF
             CASE (IDF_Axes_Colour)
               SelectedColour = KolMain
               CALL WSelectColour(SelectedColour)
-              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+              IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
                 CALL IGrPaletteRGB(KolNumMain,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                KolMain = SelectedColour
+              ENDIF
             CASE (IDF_TickMark_Colour)
               SelectedColour = KolCTic
               CALL WSelectColour(SelectedColour)
-              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+              IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
                 CALL IGrPaletteRGB(KolNumCTic,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                KolCTic = SelectedColour
+              ENDIF
             CASE (IDF_PeakFitting_Colour)
               SelectedColour = KolMTic
               CALL WSelectColour(SelectedColour)
-              IF (WInfoDialog(4) .EQ. CommonOK) &    ! Set colour if user clicked OK 
+              IF (WInfoDialog(4) .EQ. CommonOK) THEN ! Set colour if user clicked OK 
                 CALL IGrPaletteRGB(KolNumMTic,SelectedColour%IRed,SelectedColour%IGreen,SelectedColour%IBlue)
+                KolMTic = SelectedColour
+              ENDIF
           END SELECT
           CALL Profile_Plot(IPTYPE)
         CASE (FieldChanged)
@@ -97,6 +109,7 @@
             CASE (IDOK) ! The 'OK' button
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
               CALL SetCrystalSystem(GetCrystalSystemFromUnitCell())
+              CALL Upload_Cell_Constants
               CALL DownloadWavelength(IDD_Data_Properties)
               CALL Generate_TicMarks
               CALL WDialogSelect(IDD_Structural_Information)
@@ -308,7 +321,7 @@
             CASE (IDF_Crystal_System_Menu)
               IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
                 CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
-                CALL SetCrystalSystem(LatBrav)
+                CALL UserSetCrystalSystem(LatBrav)
                 CALL SetSpaceGroupMenu
                 CALL Generate_TicMarks
               ENDIF
@@ -323,6 +336,9 @@
                 NumPawleyRef = 0
                 CALL Generate_TicMarks
               ENDIF
+            CASE (IDF_ZeroPoint)
+              CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+              CALL Upload_Zero_Point               
 !            CASE DEFAULT
 !              CALL DebugErrorMessage('Forgot to handle something in DealWithCrystalSymmetryPane 2')
           END SELECT
@@ -497,12 +513,12 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
+
 ! JvdS MaxSPGR is set to 530 in 'lattice.inc'
 ! Not necessary any more: with 'crystal system = unknown' eliminated,
 ! the number of possible space groups is always a subset determined by the
 ! crystal system. It's only a local variable, and it's safer this way, so just leave it for now.
       CHARACTER(LEN=24) :: SGHMaBrStr(MaxSPGR)
-
       INTEGER tISG, tJSG, ISPosSG, NumBrSG
 
       CALL PushActiveWindowID
@@ -560,6 +576,7 @@
       SUBROUTINE SetCrystalSystem(TheCrystalSystem)
 ! This routine sets the menus in the main window and in the wizard to a new
 ! crystal system. No checks on consistency are performed.
+! JvdS Not quite sure when this routine was supposed to be called.
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -584,6 +601,76 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE SetCrystalSystem
+!
+!*****************************************************************************
+!
+      SUBROUTINE UserSetCrystalSystem(TheCrystalSystem)
+! 
+! This subroutine is only called when the user explicitly requested this crystal system
+! therefore, the angles etc. can be changed to the corresponding values
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheCrystalSystem
+
+      INCLUDE 'Lattice.inc'
+
+      IF ((TheCrystalSystem .GE. 1) .AND. (TheCrystalSystem .LE. 10)) THEN
+        LatBrav = TheCrystalSystem
+      ELSE
+        CALL DebugErrorMessage('Crystal Sytem out of range in UserSetCrystalSystem()')
+        LatBrav = 1
+      END IF
+      SELECT CASE (LatBrav)
+        CASE ( 1) ! Triclinic
+        CASE ( 2) ! Monoclinic a
+          CellPar(5) =  90.0
+          CellPar(6) =  90.0
+        CASE ( 3) ! Monoclinic b
+          CellPar(4) =  90.0
+          CellPar(6) =  90.0
+        CASE ( 4) ! Monoclinic c
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+        CASE ( 5) ! Orthorhombic
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+          CellPar(6) =  90.0
+        CASE ( 6) ! Tetragonal
+          CellPar(2) = CellPar(1)
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+          CellPar(6) =  90.0
+        CASE ( 7, 9) ! Trigonal / Hexagonal
+          CellPar(2) = CellPar(1)
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+          CellPar(6) = 120.0
+        CASE ( 8) ! Rhombohedral
+          CellPar(2) = CellPar(1)
+          CellPar(3) = CellPar(1)
+          CellPar(5) = CellPar(4)
+          CellPar(6) = CellPar(4)
+        CASE (10) ! Cubic
+          CellPar(2) = CellPar(1)
+          CellPar(3) = CellPar(1)
+          CellPar(4) =  90.0
+          CellPar(5) =  90.0
+          CellPar(6) =  90.0
+      END SELECT
+      CALL Upload_Cell_Constants
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE UserSetCrystalSystem
 !
 !*****************************************************************************
 !
@@ -793,6 +880,8 @@
       CALL WDialogPutReal(IDF_wavelength1,ALambda,'(f10.5)')
       CALL WDialogSelect(IDD_PW_Page2)
       CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(f10.5)')
+      CALL WDialogSelect(IDD_PW_Page4)
+      CALL WDialogPutReal(IDF_PW_wavelength1,ALambda,'(f10.5)')
       CALL WDialogSelect(IDD_Index_Preparation)
       CALL WDialogPutReal(IDF_Indexing_Lambda,ALambda,'(f10.5)')
 ! Now add in a test: if lab data, and wavelength close to known material,
@@ -806,6 +895,8 @@
         CALL WDialogSelect(IDD_Data_Properties)
         CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
         CALL WDialogSelect(IDD_PW_Page2)
+        CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
+        CALL WDialogSelect(IDD_PW_Page4)
         CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
       ENDIF
       CALL PopActiveWindowID
@@ -960,32 +1051,6 @@
       RETURN
 
       END SUBROUTINE SetModeMenuState
-!
-!*****************************************************************************
-!
-!U!>> JCC Subroutine for controlling the selection of the mode menu and tool buttons in DASH
-!U      SUBROUTINE SelectModeMenuState(Selection)
-!U
-!U      USE WINTERACTER
-!U      USE DRUID_HEADER
-!U
-!U      IMPLICIT NONE
-!U
-!U      INTEGER, INTENT (IN   ) :: Selection
-!U
-!U      CALL WMenuSetState(ID_Peak_Fitting_Mode,      ItemChecked,WintOff)
-!U      CALL WMenuSetState(ID_Pawley_Refinement_Mode, ItemChecked,WintOff)
-!U      CALL WMenuSetState(ID_Structure_Solution_Mode,ItemChecked,WintOff)
-!U      IF      (Selection .EQ. ID_Peak_Fitting_Mode)       THEN
-!U        CALL WMenuSetState(ID_Peak_Fitting_Mode,      ItemChecked,WintOn)
-!U      ELSE IF (Selection .EQ. ID_Pawley_Refinement_Mode)  THEN 
-!U        CALL WMenuSetState(ID_Pawley_Refinement_Mode, ItemChecked,WintOn)
-!U      ELSE IF (Selection .EQ. ID_Structure_Solution_Mode) THEN 
-!U        CALL WMenuSetState(ID_Structure_Solution_Mode,ItemChecked,WintOn)
-!U      END IF
-!U      RETURN
-!U
-!U      END SUBROUTINE SelectModeMenuState
 !
 !*****************************************************************************
 !

@@ -11,6 +11,8 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogPutReal(IDF_zeropt_refine,ZeroPoint,'(F10.4)')
+      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Zero_Point
@@ -97,21 +99,23 @@
       ENDIF
 !C>> And in the peak positions box
       CALL WDialogSelect(IDD_Peak_Positions)
-      IF (CellPar(1) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_a_refine)
-      ELSE
+
+      IF (ValidCellAxisLength(CellPar(1))) THEN
         CALL WDialogPutReal(IDF_a_refine,CellPar(1),'(F10.5)')
-      ENDIF
-      IF (CellPar(2) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_b_refine)
       ELSE
+        CALL WDialogClearField(IDF_a_refine)
+      ENDIF
+      IF (ValidCellAxisLength(CellPar(2))) THEN
         CALL WDialogPutReal(IDF_b_refine,CellPar(2),'(F10.5)')
-      ENDIF
-      IF (CellPar(3) .LT. 0.00001) THEN
-        CALL WDialogClearField(IDF_c_refine)
       ELSE
-        CALL WDialogPutReal(IDF_c_refine,CellPar(3),'(F10.5)')
+        CALL WDialogClearField(IDF_b_refine)
       ENDIF
+      IF (ValidCellAxisLength(CellPar(3))) THEN
+        CALL WDialogPutReal(IDF_c_refine,CellPar(3),'(F10.5)')
+      ELSE
+        CALL WDialogClearField(IDF_c_refine)
+      ENDIF
+
       IF (CellPar(4) .LT. 0.00001) THEN
         CALL WDialogClearField(IDF_alp_refine)
       ELSE
@@ -171,6 +175,9 @@
       USE DRUID_HEADER
 
       INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
+      INCLUDE 'statlog.inc'
 
       REAL ChiGetLattice
       EXTERNAL ChiGetLattice
@@ -178,10 +185,7 @@
       PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
       REAL XDD(MPAR),DXDD(MPAR),COVDD(MMPAR)
 
-      INCLUDE 'lattice.inc'
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
-
-      INCLUDE 'GLBVAR.INC'
 
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
       PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
@@ -189,7 +193,6 @@
 
       INTEGER IASS(6)
       LOGICAL NOCREF
-
       REAL GReal(3,3),GRec(3,3)
       INTEGER KELPT(6,10)
       DATA KELPT /2,3,4,5,6,7, 2,3,4,5,10,10, 2,3,4,10,5,10, 2,3,4,10,10,5, &
@@ -197,9 +200,6 @@
       2,2,2,3,3,3, 2,2,3,9,10,10, 2,2,2,10,10,10/ 
 !>> JCC Check the wavelength: if the user has not set it, then
 !>> we should not be here!
-
-      INCLUDE 'statlog.inc'
-
       LOGICAL FnWaveLengthOK ! Function
 
       IF (.NOT. FnWaveLengthOK()) RETURN
@@ -237,12 +237,12 @@
       DO I = 1, 3
         GREAL(I,I) = CELLPAR(I)**2
       END DO
-      GREAL(1,2)=CELLPAR(1)*CELLPAR(2)*COSD(CELLPAR(6))
-      GREAL(1,3)=CELLPAR(1)*CELLPAR(3)*COSD(CELLPAR(5))     
-      GREAL(2,3)=CELLPAR(2)*CELLPAR(3)*COSD(CELLPAR(4))
-      GREAL(2,1)=GREAL(1,2)    
-      GREAL(3,1)=GREAL(1,3)         
-      GREAL(3,2)=GREAL(2,3)
+      GREAL(1,2) = CELLPAR(1)*CELLPAR(2)*COSD(CELLPAR(6))
+      GREAL(1,3) = CELLPAR(1)*CELLPAR(3)*COSD(CELLPAR(5))     
+      GREAL(2,3) = CELLPAR(2)*CELLPAR(3)*COSD(CELLPAR(4))
+      GREAL(2,1) = GREAL(1,2)    
+      GREAL(3,1) = GREAL(1,3)         
+      GREAL(3,2) = GREAL(2,3)
 ! Real = direct space
 ! GREC = Reciprocal space vectors
       CALL InverseMatrix(GREAL,GREC,3)
@@ -320,23 +320,22 @@
       XDD(9) = 0.5 * XDD(2)
       XDD(10) = 0.0
       DO I = 1 ,3
-        GREC(I,I)=XDD(KELPT(I, LatBrav ))
+        GREC(I,I) = XDD(KELPT(I, LatBrav))
       END DO
-      GREC(1,2)=XDD(KELPT(4, LatBrav ))
-      GREC(1,3)=XDD(KELPT(5, LatBrav ))     
-      GREC(2,3)=XDD(KELPT(6, LatBrav ))
-      GREC(2,1)=GREC(1,2)    
-      GREC(3,1)=GREC(1,3)         
-      GREC(3,2)=GREC(2,3)
+      GREC(1,2) = XDD(KELPT(4, LatBrav))
+      GREC(1,3) = XDD(KELPT(5, LatBrav))     
+      GREC(2,3) = XDD(KELPT(6, LatBrav))
+      GREC(2,1) = GREC(1,2)    
+      GREC(3,1) = GREC(1,3)         
+      GREC(3,2) = GREC(2,3)
       CALL InverseMatrix(GREC,GREAL,3)
-      DO I=1,3
-        CellPar(I)=SQRT(MAX(0.,Greal(I,I)))
+      DO I = 1, 3
+        CellPar(I) = SQRT(MAX(0.0,Greal(I,I)))
       END DO
-      Cellpar(4)=ACOSD(GReal(2,3)/(CellPar(2)*CellPar(3)))  
-      Cellpar(5)=ACOSD(GReal(1,3)/(CellPar(1)*CellPar(3)))            
-      Cellpar(6)=ACOSD(GReal(1,2)/(CellPar(1)*CellPar(2)))
-      ZeroPoint=XDD(1)
-!U 999  CONTINUE
+      CellPar(4) = ACOSD(GReal(2,3)/(CellPar(2)*CellPar(3)))  
+      CellPar(5) = ACOSD(GReal(1,3)/(CellPar(1)*CellPar(3)))            
+      CellPar(6) = ACOSD(GReal(1,2)/(CellPar(1)*CellPar(2)))
+      ZeroPoint  = XDD(1)
       CALL Upload_Cell_Constants()
       CALL Upload_Zero_Point()
 !  First ensure that we have the plotting mode correct
@@ -357,6 +356,7 @@
 
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
       INCLUDE 'lattice.inc'
+
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
       ChiGetLattice = 0.0
@@ -366,80 +366,63 @@
 !
 ! p1, p2 and p3 are the dot products aa, bb and cc
 ! setting them to the same value means: a = b = c
-      p1=p(2)
-      p2=p(2)
-      p3=p(2)
+      p1 = p(2)
+      p2 = p(2)
+      p3 = p(2)
 ! p4, p5 and p6 are the dot products ab, ac and ab
 ! setting them to zero means: angle is 90.0
       p4 = 0.0
       p5 = 0.0
       p6 = 0.0
-! Correct values if not cubic
+! Adjust values if not cubic
       SELECT CASE (LatBrav)
         CASE ( 1) ! Triclinic
-          p2=p(3)
-          p3=p(4)
-          p4=p(5)
-          p5=p(6)
-          p6=p(7)
+          p2 = p(3)
+          p3 = p(4)
+          p4 = p(5)
+          p5 = p(6)
+          p6 = p(7)
         CASE ( 2) ! Monoclinic a
-          p2=p(3)
-          p3=p(4)
-          p6=p(5)
+          p2 = p(3)
+          p3 = p(4)
+          p6 = p(5)
         CASE ( 3) ! Monoclinic b
-          p2=p(3)
-          p3=p(4)
-          p5=p(5)
+          p2 = p(3)
+          p3 = p(4)
+          p5 = p(5)
         CASE ( 4) ! Monoclinic c
-          p2=p(3)
-          p3=p(4)
-          p4=p(5)
+          p2 = p(3)
+          p3 = p(4)
+          p4 = p(5)
         CASE ( 5) ! Orthorhombic
-          p2=p(3)
-          p3=p(4)
+          p2 = p(3)
+          p3 = p(4)
         CASE ( 6) ! Tetragonal
-          p3=p(3)
+          p3 = p(3)
         CASE ( 7, 9) ! Trigonal / Hexagonal
-          p3=p(3)
-          p4=0.5*p(2)
+          p3 = p(3)
+          p4 =0.5*p(2)
         CASE ( 8) ! Rhombohedral
-          p4=p(3)
-          p5=p(3)
-          p6=p(3)
+          p4 = p(3)
+          p5 = p(3)
+          p6 = p(3)
         CASE (10) ! Cubic
       END SELECT
-
-!
-!      p1=min(aashi(1),p1)
-!      p1=max(aaslo(1),p1)
-!
-!      p2=min(aashi(2),p2)
-!      p2=max(aaslo(2),p2)
-!
-!      p3=min(aashi(3),p3)
-!      p3=max(aaslo(3),p3)
-!
-!      p4=min(aashi(4),p4)
-!      p4=max(aaslo(4),p4)
-!
-!      p5=min(aashi(5),p5)
-!      p5=max(aaslo(5),p5)
-!
-!      p6=min(aashi(6),p6)
-!      p6=max(aaslo(6),p6)
-!      
       DO I = 1, NVAL
         vh = IHLR(1,I)
         vk = IHLR(2,I)
         vl = IHLR(3,I)
+! d-value
         dd = vh*vh*p1 + vk*vk*p2 + vl*vl*p3 + 2.0 * (vh*vk*p4 + vh*vl*p5 + vk*vl*p6)
+! 2 theta value
         tthc = 2.0 * ASIND(0.5 * ALambda * SQRT(dd))
+! Correct for zero-point error
         ZI = tthc + zp
         CTem = (ZI - YVal(I)) / EVal(I)
         ChiGetLattice = ChiGetLattice + CTem * CTem
       END DO
-
       RETURN
+
       END FUNCTION ChiGetLattice
 !
 !*****************************************************************************
