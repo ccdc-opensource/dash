@@ -65,9 +65,6 @@
 
       IMPLICIT NONE
 
-      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-
       INTEGER         NOP, NCENT, NOPC, NLAT, NGEN
       LOGICAL                                       CENTRC
       INTEGER                                               KOM13
@@ -88,7 +85,7 @@
         DO ii = 1, 3
           h(ii) = FLOAT(iHKL(ii,iR))
         ENDDO
-        DO i = 1, nopc
+        DO i = 1, NOPC
           CALL rotsym(H,RHSTO(1,i,iR),I,-1)
           sctrh(i,iR) = SCALPR(TRANS(1,I),H)
         ENDDO
