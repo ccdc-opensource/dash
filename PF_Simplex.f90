@@ -26,12 +26,18 @@
 !
 !-----------------------------------------------------------------------
 !
-      PARAMETER (MAXITR=100)
       REAL X(N), DX(N), COVAR(N,N)
-      REAL HESS(2500), DELTA(50), C0, C1(2,50), C2(2500)
-      REAL V(2550), EX(150), C(51)
-      INTEGER IR(51), INDX(50)
+      INTEGER N
       EXTERNAL CHIFUN
+
+      INTEGER    MAXITR
+      PARAMETER (MAXITR=100)
+      INTEGER     MPAR,        MMPAR
+      PARAMETER ( MPAR = 100 , MMPAR = MPAR * MPAR )
+      REAL HESS(MMPAR), DELTA(MPAR), C0, C1(2,MPAR), C2(MMPAR)
+      REAL V((MPAR+1)*MAXITR), EX(3*MPAR), C(MPAR+1)
+      INTEGER IR(MPAR+1), INDX(MPAR)
+
       LOGICAL LERANL
       COMMON /PKCOM3/ LERANL
 
@@ -386,7 +392,7 @@
 ! be causing a repeated CMD window to appear on screen...
       INTEGER IBMBER
       COMMON /CCSLER/ IBMBER
-!
+
       CALL VRFILL(COVAR,0.0,N*N)
       DO I = 1, N
         COVAR(I,I) = 2.0
@@ -408,8 +414,7 @@
 !----------------------------------------------------------------------C
 !
       SUBROUTINE LUDCMP(A,N,NP,INDX,D)
-!     --------------------------------
-!
+
       INTEGER    MVAR
       PARAMETER (MVAR = 100)
       PARAMETER (TINY=1.0E-20)
@@ -484,8 +489,7 @@
 !*****************************************************************************
 !
       SUBROUTINE LUBKSB(A,N,NP,INDX,B)
-!     --------------------------------
-!
+
       DIMENSION A(NP,NP), INDX(N), B(N)
 
       II = 0
