@@ -19,8 +19,9 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      INTEGER              iMyExit, num_new_min
-      COMMON / CMN000001 / iMyExit, num_new_min
+      INTEGER              iMyExit 
+      LOGICAL                       NewOptimumFound, WasMinimised
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
 
       REAL                    chi_sqd
       INTEGER                                           Curr_Iter, MaxIterationSoFar
@@ -29,11 +30,11 @@
       COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
                               chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed
 
-      LOGICAL         UseRene, UseESD
-      INTEGER                          nwidth
-      REAL                                     width, minstep, rwidth, SqrtCorrObs 
-      LOGICAL                                                                       InPeak
-      COMMON / RENE / UseRene, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
+      LOGICAL         UseRene, UseRelease, UseESD
+      INTEGER                                     nwidth
+      REAL                                                width, minstep, rwidth, SqrtCorrObs 
+      LOGICAL                                                                                   InPeak
+      COMMON / RENE / UseRene, UseRelease, UseESD, nwidth, width, minstep, rwidth, SqrtCorrObs, InPeak(1-100:MOBS+100)
 
       LOGICAL         InSA
       COMMON /SADATA/ InSA
@@ -56,6 +57,10 @@
       CALL WDialogSelect(IDD_SA_input3_2)
       UseRene = WDialogGetCheckBoxLogical(IDC_UseRene)
       IF (UseRene) CALL InitRene
+      ! Initialise LOGICALs that tell us if this parameter is either a translation or a torsion
+      ! angle that is allowed to vary over its full range. Because if so, e.g. a translation of, say, 1.10
+      ! should be renormalised to 0.10 during the SA
+      CALL InitRenormalisationLogicals
       OneDay = 24 * 60 * 60
 ! Get 'Use Hydrogens' from the configuration window and disable that option (should not be 
 ! changed while the SA is running).
@@ -377,6 +382,58 @@
       CLOSE(hFile)
 
       END SUBROUTINE FillSymmetry_2
+!
+!*****************************************************************************
+!
+      SUBROUTINE InitRenormalisationLogicals
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER         nvar, NS, NT, iSeed1, iSeed2
+      COMMON /sapars/ nvar, NS, NT, iSeed1, iSeed2
+
+      REAL             x,       lb,       ub,       vm
+      COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
+
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
+
+      INTEGER iPar
+
+! Loop over parameters
+      DO iPar = 1, nvar
+           IsFullRangeTrans(iPar) = .FALSE.
+           IsFullRangeTorsion(iPar) = .FALSE.
+! Is it a translation?
+        IF (kzmpar2(iPar) .EQ. 1) THEN
+! Full range?
+          IF ((UB(iPar) - LB(iPar)) .GT. 0.9999) THEN
+            IsFullRangeTrans(iPar) = .TRUE.
+! Reset range
+            LB(iPar) = 0.0
+            UB(iPar) = 1.0
+          ENDIF
+        ENDIF
+! Is it a unimodal torsion?
+        IF (ModalFlag(iPar) .EQ. 1) THEN
+! Full range?
+          IF ((UB(iPar) - LB(iPar)) .GT. 359.9999) THEN
+            IsFullRangeTorsion(iPar) = .TRUE.
+! Reset range
+            LB(iPar) = -180.0
+            UB(iPar) = +180.0
+          ENDIF
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE InitRenormalisationLogicals
 !
 !*****************************************************************************
 !
