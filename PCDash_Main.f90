@@ -108,9 +108,10 @@
 
       LOGICAL, EXTERNAL :: Confirm
       REAL xpgdif, ypgdif
-      INTEGER ISTAT, IBpass
+      INTEGER ISTAT, tInt1, tInt2
       INTEGER, EXTERNAL :: DiffractionFileBrowse, PrjSave, PrjSaveAs
       INTEGER iDummy, tCurrentRange
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
 !   Branch depending on chosen menu item
 
@@ -133,10 +134,11 @@
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Background_Fit)
 ! Initialise the background
-          CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-          CALL CalculateBackground(IBpass,20,.TRUE.)
+          CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
+          CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
+          CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
           CALL Profile_Plot
-          CALL WDialogShow(-1,-1,0,SemiModeless)
+          CALL WDialogShow(-1,-1,0,Modeless)
           CALL PopActiveWindowID
         CASE (ID_FILE_PRINT)
           IPTYPE = -IPTYPE
