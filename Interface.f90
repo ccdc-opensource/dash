@@ -479,7 +479,7 @@
 !
       LOGICAL FUNCTION Get_ColourFlexibleTorsions
 
-! When .TRUE., flexible torsions are coloured when viewing a z-matrix
+! When .TRUE., flexible torsions are coloured when viewing a Z-matrix
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -500,8 +500,6 @@
       LOGICAL FUNCTION PlotErrorBars
 !
 ! This function retrieves the value of the 'plot error bars' checkbox in the plot options panel
-!
-! JvdS 7 Aug 2001
 !
 ! RETURNS : .TRUE.  if user requested the error bars     to be plotted
 !           .FALSE. if user requested the error bars not to be plotted
@@ -525,8 +523,6 @@
       LOGICAL FUNCTION PlotBackground
 !
 ! This function retrieves the value of the 'plot background' checkbox in the plot options panel
-!
-! JvdS 22 Jul 2001
 !
 ! RETURNS : .TRUE.  if user requested the background     to be plotted
 !           .FALSE. if user requested the background not to be plotted
@@ -711,11 +707,7 @@
             ENDDO
           ELSE
             DO I = 1, 6
-              IF (CellParConstrained(I)) THEN
-                CALL WDialogFieldState(CellParID(I),DialogReadOnly)
-              ELSE
-                CALL WDialogFieldState(CellParID(I),Enabled)
-              ENDIF
+              CALL WDialogFieldStateLogical(CellParID(I),.NOT. CellParConstrained(I))
             ENDDO
           ENDIF
         ENDIF
