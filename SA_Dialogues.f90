@@ -233,7 +233,7 @@
               DO WHILE (IDBZMView(iFrg) .NE. EventInfo%VALUE1)
                 iFrg = iFrg + 1
               ENDDO
-              CALL ViewZmatrix(iFrg)
+              CALL zmView(iFrg)
 ! Edit individual Z-matrices
             CASE (IDB_zmEdit1, IDB_zmEdit2, IDB_zmEdit3, IDB_zmEdit4, IDB_zmEdit5, IDB_zmEdit6)
               iFrg = 1
@@ -1045,11 +1045,97 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE zmView(iFrg)
+
+      USE WINTERACTER
+      USE VARIABLES
+      USE ZMVAR
+      USE SAMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iFrg
+
+      INTEGER I
+      CHARACTER(MaxPathLength) temp_file
+      REAL*8 CART(1:3,1:MAXATM)
+      INTEGER, EXTERNAL :: WriteMol2
+      LOGICAL, EXTERNAL :: Get_ColourFlexibleTorsions
+      INTEGER atom
+      INTEGER Element
+      INTEGER NumOfFlexTorsions
+      INTEGER tLength, BondNr
+
+      natcry = NATOMS(iFrg)
+      CALL MAKEXYZ_2(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),CART)
+      DO I = 1, natcry
+        axyzo(I,1) = SNGL(CART(1,I))
+        axyzo(I,2) = SNGL(CART(2,I))
+        axyzo(I,3) = SNGL(CART(3,I))
+        aelem(I) = zmElementCSD(I,iFrg)
+        atomlabel(I) = OriginalLabel(I,iFrg)
+      ENDDO
+      nbocry = NumberOfBonds(iFrg)
+      DO BondNr = 1, nbocry
+        btype(BondNr)  = BondType(BondNr,iFrg)
+        bond(BondNr,1) = Bonds(1,BondNr,iFrg)
+        bond(BondNr,2) = Bonds(2,BondNr,iFrg)
+      ENDDO
+! Q & D hack to display flexible torsion angles in different colors by forcing different
+! element types.
+      IF (Get_ColourFlexibleTorsions() .AND. (natcry.GE.4)) THEN
+        DO I = 1, natcry
+          aelem(I) = 1       ! Carbon        Grey
+        ENDDO
+        NumOfFlexTorsions = 0
+        DO atom = 4, natcry
+          IF (ioptt(atom,iFrg) .EQ. 1) THEN
+            NumOfFlexTorsions = NumOfFlexTorsions + 1
+            SELECT CASE(NumOfFlexTorsions)
+              CASE (1)
+                Element = 23 ! Cobalt        Blue
+              CASE (2)
+                Element = 64 ! Oxygen        Red
+              CASE (3)
+                Element = 81 ! Sulphur       Yellow
+              CASE (4)
+                Element = 21 ! Chlorine      Green
+              CASE (5)
+                Element = 56 ! Nitrogen      Light blue
+              CASE (6)
+                Element = 16 ! Bromine       Brown
+              CASE (7)
+                Element = 43 ! Iodine        Pink
+              CASE (8)
+                Element =  2 ! Hydrogen      White
+              CASE (9)
+                Element = 66 ! Phosphorus
+            END SELECT
+            aelem(atom) = Element
+            aelem(IZ1(atom,iFrg)) = Element
+            aelem(IZ2(atom,iFrg)) = Element
+            aelem(IZ3(atom,iFrg)) = Element
+          ENDIF
+        ENDDO
+      ENDIF
+      tLength = LEN_TRIM(frag_file(iFrg))
+      temp_file = frag_file(iFrg)(1:tLength-8)//'_temp.mol2'
+! Show the mol2 file
+      IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) THEN
+        CALL ViewStructure(temp_file)
+      ELSE
+        CALL DebugErrorMessage('Error writing temporary file.')
+      ENDIF
+      CALL IOSDeleteFile(temp_file)
+
+      END SUBROUTINE zmView
+!
+!*****************************************************************************
+!
       SUBROUTINE zmRelabel(iFrg)
 
 ! This routine re-labels atoms in Z-matrix number iFrg
 ! The new labels consist of element + sequential number
-! zmDoAdmin(iFrg) should always be called, we could add it to this subroutine
 
       USE ZMVAR
 
@@ -1066,6 +1152,7 @@
         OriginalLabel(iAtomNr,iFrg) = asym(iAtomNr,iFrg)(1:LEN_TRIM(asym(iAtomNr,iFrg)))// &
                                       LastNumberSoFarStr(1:LEN_TRIM(LastNumberSoFarStr))
       ENDDO
+          CALL zmDoAdmin(iFrg)
 
       END SUBROUTINE zmRelabel
 !
@@ -1087,10 +1174,7 @@
       INTEGER iFrg
 
       DO iFrg = 1, maxfrg
-        IF (gotzmfile(iFrg)) THEN
-          CALL zmRelabel(iFrg)
-          CALL zmDoAdmin(iFrg)
-        ENDIF
+        IF (gotzmfile(iFrg)) CALL zmRelabel(iFrg)
       ENDDO
 
       END SUBROUTINE zmRelabelAll
@@ -1230,7 +1314,6 @@
               blen(i,iFrg), ioptb(i,iFrg), alph(i,iFrg), iopta(i,iFrg), bet(i,iFrg), ioptt(i,iFrg), &
               iz1(i,iFrg), iz2(i,iFrg), iz3(i,iFrg),   &
               tiso(i,iFrg), occ(i,iFrg), izmoid(i,iFrg), OriginalLabel(i,iFrg)
-
       ENDDO
       CLOSE(tFileHandle,ERR=999)
       zmSave = 0 ! Success
@@ -1307,7 +1390,10 @@
       LOGICAL                                                   LimsChanged
       COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
 
-      INTEGER I, iCheck
+      INTEGER I, iCheck, iFrg, KK
+      CHARACTER(LEN=3) :: MenuOptions(1:maxfrg+1)
+      CHARACTER*20 tStr
+      CHARACTER*20, EXTERNAL :: Integer2String
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
@@ -1322,6 +1408,17 @@
         IF (kzmpar2(i) .NE. 3) CALL WGridStateCell(IDF_parameter_grid_modal,5,i,DialogReadOnly)
       ENDDO
       LimsChanged = .FALSE.
+      KK = 0
+      DO iFrg = 1, maxfrg
+        ! Only include those that are now checked
+        IF (gotzmfile(iFrg)) THEN
+          KK = KK + 1
+          tStr = Integer2String(iFrg)
+          MenuOptions(KK) = tStr(1:3)
+        ENDIF
+      ENDDO
+      MenuOptions(KK+1) = "All"
+      CALL WDialogPutMenu(IDF_MENU1, MenuOptions, nfrag+1, 1)
       CALL WizardWindowShow(IDD_SA_Modal_input2)
       CALL PopActiveWindowID
 
@@ -1366,7 +1463,7 @@
       INTEGER ipos, tMaxRuns, tFieldState, I
       INTEGER iRow, iStatus
       INTEGER iFrg, iFrgCopy
-      INTEGER kk
+      INTEGER kk, iOption, jFrg
       CHARACTER*36 parlabel(mvar)
 
 ! We are now on window number 2
@@ -1436,8 +1533,23 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_Relabel)
+              CALL WDialogGetMenu(IDF_MENU1, iOption)
               ! Update memory
-              CALL zmRelabelAll
+              IF (iOption .EQ. nfrag+1) THEN
+                CALL zmRelabelAll
+              ELSE
+                KK = 0
+                jFrg = -1
+                DO iFrg = 1, maxfrg
+                  ! Only include those that are now checked
+                  IF (gotzmfile(iFrg)) THEN
+                    KK = KK + 1
+                    IF (KK .EQ. iOption) jFrg = iFrg 
+                  ENDIF
+                ENDDO
+                IF (jFrg .EQ. -1) CALL DebugErrorMessage("jFrg .EQ. -1")
+                CALL zmRelabel(jFrg)
+              ENDIF
               ! Update current Wizard window
               ! Run through all possible fragments
               kk = 0
@@ -1456,6 +1568,27 @@
               DO i = 1, kk
                 CALL WGridLabelRow(IDF_parameter_grid_modal,i,parlabel(i))
               ENDDO
+            CASE (IDB_View)
+              CALL WDialogGetMenu(IDF_MENU1, iOption)
+              ! Update memory
+              IF (iOption .EQ. nfrag+1) THEN ! "All"
+                DO iFrg = 1, maxfrg
+                  ! Only include those that are now checked
+                  IF (gotzmfile(iFrg)) CALL zmView(iFrg)
+                ENDDO
+              ELSE
+                KK = 0
+                jFrg = -1
+                DO iFrg = 1, maxfrg
+                  ! Only include those that are now checked
+                  IF (gotzmfile(iFrg)) THEN
+                    KK = KK + 1
+                    IF (KK .EQ. iOption) jFrg = iFrg 
+                  ENDIF
+                ENDDO
+                IF (jFrg .EQ. -1) CALL DebugErrorMessage("jFrg .EQ. -1")
+                CALL zmView(jFrg)
+              ENDIF
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
