@@ -3,7 +3,10 @@
 ! Doesn't treat Sohnke groups any differently from any other space group and
 ! therefore sometimes get "unaligned" solutions.  Not everything behaves well 
 ! all the time, for example Pca21 has caused problems.
-!Nov2001 added nasty fix which will help with cases like Pca21
+! Nov2001 added nasty fix which will help with cases like Pca21
+! TODO Trigonal and hexagonal space groups ignored since x-y type symmetry 
+!      operations are not decoded correctly
+!      Three equivalent axes (i.e. cubic groups) are not taken account of 
 !********************************************************************************
 	SUBROUTINE ALIGN()
 
@@ -92,8 +95,12 @@
         DO j = 1,NumofShifts
           Shift(j) = ShiftString(((j*5)-4):(j*5))
         END DO 
-      CLOSE(220)   
-       
+      CLOSE(220)  
+! For now, if the space group is trigonal or hexagonal does not attempt alignment.  Space
+! group decoding currently does not handle x-y type instructions       
+      IF ((NumberSGTable.ge.430).and.(NumberSGTable.le.488)) THEN
+       RETURN
+      END IF       
 !
 ! Clear Sumx, sumy and sumz
       Sumx = 0.0
@@ -139,7 +146,7 @@
 ! will look at translations allowed for the space group and apply them to the original centre
 ! of mass.  Shifthandler identifies whether the shift is a translation, in which case it returns
 ! the value of the translation.  If the axes allows infinite translations the centre of mass
-! is set to zero and no shift value is returned.  The infinite axis is flagged in the matrix
+! is set to 0.5 and no shift value is returned.  The infinite axis is flagged in the matrix
 ! InfiniteAxes
 !
 ! First entry into CoMMatrix is the original centre of mass
@@ -340,10 +347,10 @@
      END IF
 
 ! The following is a nasty, rough and ready fix.  If there is an infinite translation axes
-! present the centre of mass coordinate for that axes is set to 0.0.  In some cases an inversion
+! present the centre of mass coordinate for that axes is set to 0.5.  In some cases an inversion
 ! can be applied to a molecule and then the axes which are not infinite translation axes reset
 ! with symmetry operations.  However the infinite translation axes still carries the inversion
-! since 0.0 goes to 0.0.  So this quick and dirty fix looks at infinite translation axes and
+! and (0.5)^2 = (-0.5)^2.  So this quick and dirty fix looks at infinite translation axes and
 ! reflects the molecule upon an arbitrary criterion.
      IF(inversion.eq.1) THEN
        IF (InfiniteAxes(3).eq.1) THEN
@@ -377,7 +384,7 @@
        END IF
       END IF
 
-! FinalMol Contains the solution in fractional coordinates.  Write to Xatopt. 
+! FinalMol contains the solution in fractional coordinates.  Write to Xatopt. 
      DO J = 1, NATOM
         DO K = 1,3
          XATOPT(K,J) = FinalMol(K,J)
