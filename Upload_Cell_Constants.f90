@@ -199,7 +199,6 @@
       CALL Upload_Cell_Constants()
       CALL Upload_ZeroPoint()
 !  First ensure that we have the plotting mode correct
-      CALL IGrPlotMode(' ') 
       CALL Generate_TicMarks()
       IF (NVal .LE. NDD+2) RETURN
 ! Now attempt a quick Pawley refinement
