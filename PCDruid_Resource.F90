@@ -1,4 +1,4 @@
-! Winteracter module created : 27/Feb/2002 13:51:57
+! Winteracter module created : 11/Mar/2002 09:33:43
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -571,4 +571,21 @@
           INTEGER, PARAMETER :: IDBPAUSE                        =  1425
           INTEGER, PARAMETER :: IDF_PicHourglass                =  1430
           INTEGER, PARAMETER :: ID_FitPeaks                     = 40020
+          INTEGER, PARAMETER :: IDD_Rietveld                    =   172
+          INTEGER, PARAMETER :: IDF_TAB1                        =  1399
+          INTEGER, PARAMETER :: IDF_GRID1                       =  1397
+          INTEGER, PARAMETER :: IDB_Refine                      =  1398
+          INTEGER, PARAMETER :: IDD_RRsubBonds                  =   180
+          INTEGER, PARAMETER :: IDD_DIALOG008                   =   181
+          INTEGER, PARAMETER :: IDD_RRsubZmatrices              =   173
+          INTEGER, PARAMETER :: IDF_GRID2                       =  1439
+          INTEGER, PARAMETER :: IDF_GRID3                       =  1440
+          INTEGER, PARAMETER :: IDF_GRID4                       =  1441
+          INTEGER, PARAMETER :: IDD_RRsubAngles                 =   182
+          INTEGER, PARAMETER :: IDD_TEMPLATE020                 =   179
+          INTEGER, PARAMETER :: IDD_RRsubTorsions               =   183
+          INTEGER, PARAMETER :: IDD_DIALOG010                   =   184
+          INTEGER, PARAMETER :: IDD_RRsubAtoms                  =   185
+          INTEGER, PARAMETER :: IDD_DIALOG012                   =   187
+          INTEGER, PARAMETER :: IDD_DIALOG014                   =   190
       END MODULE Druid_Header
