@@ -408,6 +408,15 @@ DEP_F90_INTER=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\licensing.f90
+DEP_F90_LICEN=\
+	".\DRUID_HEADER.mod"\
+	".\Variables.mod"\
+	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+# End Source File
+# Begin Source File
+
 SOURCE=.\LoadRAWFiles.f90
 DEP_F90_LOADR=\
 	".\DRUID_HEADER.mod"\
@@ -574,6 +583,7 @@ DEP_F90_PR_F9=\
 
 SOURCE=.\Profile_Plot.f90
 DEP_F90_PROFI=\
+	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
 	".\params.inc"\
 	".\POLY_COLOURS.INC"\
@@ -819,7 +829,6 @@ DEP_F90_WIFD9=\
 
 SOURCE=.\Wizard_routines.f90
 DEP_F90_WIZAR=\
-	".\Debug\DICVAR.MOD"\
 	".\DialogPosCmn.inc"\
 	".\DRUID_HEADER.mod"\
 	".\GLBVAR.INC"\
@@ -828,6 +837,9 @@ DEP_F90_WIZAR=\
 	".\statlog.inc"\
 	".\Variables.mod"\
 	"c:\wint\lib.vf\WINTERACTER.mod"\
+	
+NODEP_F90_WIZAR=\
+	".\Debug\DICVAR.MOD"\
 	
 # End Source File
 # End Group
@@ -857,10 +869,6 @@ SOURCE=.\params.inc
 # Begin Source File
 
 SOURCE=.\POLY_COLOURS.INC
-# End Source File
-# Begin Source File
-
-SOURCE=.\posns.inc
 # End Source File
 # Begin Source File
 
@@ -913,19 +921,6 @@ SOURCE=.\res\WizardWelcome.bmp
 # Begin Source File
 
 SOURCE=.\SGinc\ffcalctop.inc
-# End Source File
-# End Group
-# Begin Group "Licensing"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\licensing.f90
-DEP_F90_LICEN=\
-	".\DRUID_HEADER.mod"\
-	".\Variables.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
 # End Source File
 # End Group
 # Begin Source File
