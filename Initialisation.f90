@@ -98,7 +98,6 @@
       CALL WDialogLoad(IDD_zmEdit)
       CALL WDialogLoad(IDD_zmEditRotations)
       CALL WDialogLoad(IDD_SAW_Page2)
-!O      CALL WDialogLoad(IDD_SA_input2)
       CALL WDialogLoad(IDD_SA_Modal_input2)
       CALL WDialogLoad(IDD_ModalDialog)
       CALL WDialogLoad(IDD_SA_input3)
@@ -307,7 +306,8 @@
         izmoid(0,I) = 0
         izmbid(0,I) = 0
       ENDDO
-      CALL Clear_SA
+      CALL Clear_SA ! Sets NumOf_SA_Runs to 0
+      CALL Update_Solutions
       UseQuaternions = .TRUE.
 ! Initialise arrays to do with administration of open child windows
       ChildWinAutoClose = .FALSE.
