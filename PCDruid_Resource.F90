@@ -1,4 +1,4 @@
-! Winteracter module created : 27/Apr/2004 10:06:04
+! Winteracter module created : 30/Apr/2004 11:41:43
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -462,7 +462,6 @@
           INTEGER, PARAMETER :: IDF_zmFile3                     =  1390
           INTEGER, PARAMETER :: IDF_zmFile4                     =  1391
           INTEGER, PARAMETER :: IDB_Set                         =  1392
-          INTEGER, PARAMETER :: IDF_FileName                    =  1393
           INTEGER, PARAMETER :: IDF_BisoOccValue                =  1394
           INTEGER, PARAMETER :: IDF_LABEL3                      =  1395
           INTEGER, PARAMETER :: IDB_ReOrder                     =  1400
@@ -628,7 +627,6 @@
           INTEGER, PARAMETER :: IDF_PW_Option6                  =  1549
           INTEGER, PARAMETER :: IDD_SX_Page1                    =   120
           INTEGER, PARAMETER :: IDD_SX_Page2                    =   141
-          INTEGER, PARAMETER :: IDF_ITF                         =  1478
           INTEGER, PARAMETER :: IDF_HPSL                        =  1479
           INTEGER, PARAMETER :: IDF_HMSL                        =  1480
           INTEGER, PARAMETER :: IDD_SX_Page1a                   =   132
