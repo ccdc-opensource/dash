@@ -230,7 +230,7 @@
         CASE (0) ! Main window
           SELECT CASE (EventType)
             CASE (Expose,Resize)
-              CALL Redraw()
+              CALL Profile_Plot
               GOTO 10
             CASE (MenuSelect)
               CALL ProcessMenu
@@ -333,6 +333,9 @@
           GOTO 10
         CASE (IDD_PW_Page7)
           CALL DealWithWizardWindowIndexing1
+          GOTO 10
+        CASE (IDD_DICVOLRunning)
+          CALL DealWithDICVOLRunning
           GOTO 10
         CASE (IDD_PW_Page8)
           CALL DealWithWizardWindowIndexing2
