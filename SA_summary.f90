@@ -77,8 +77,8 @@
             CASE (IDB_Prog3)
               CALL OpenChiSqPlotWindow
             CASE (IDB_Select)
-              CALL WDialogGetInteger(IDF_Limit1,iLimit1)
-              CALL WDialogGetInteger(IDF_Limit2,iLimit2)
+              CALL WDialogGetInteger(IDF_Limit1, iLimit1)
+              CALL WDialogGetInteger(IDF_Limit2, iLimit2)
               IF (iLimit1 .GT. iLimit2) THEN
                 tInteger = iLimit2
                 iLimit2  = iLimit1
@@ -138,7 +138,7 @@
             CALL WGridPutCellReal(IDF_parameter_grid_modal,1,IV,BestValuesDoF(IV,iSol2Run(iRow)))
           ENDDO
 ! Untick "Randomise initial values"
-          CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal,.FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .FALSE.)
           CALL ShowWizardWindowParameterBounds
           CALL PopActiveWindowID
           RETURN

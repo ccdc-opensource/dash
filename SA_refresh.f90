@@ -51,7 +51,7 @@
             CASE (IDB_Summary)           ! 'Solutions'
               CALL WDialogFieldState(IDB_Summary,Disabled)
               CALL WDialogSelect(IDD_Summary)
-              CALL WDialogShow(-1,-1,0,Modeless)
+              CALL WDialogShow(-1, -1, 0, Modeless)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
