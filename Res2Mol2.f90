@@ -89,9 +89,7 @@
 ! needs orthogonal co-ordinates => convert
       IF (IsFractional) THEN
         DO I = 1, natcry
-          axyzo(1,I) = Coordinates(1,I) * tLattice(1,1) + Coordinates(2,I) * tLattice(1,2) + Coordinates(3,I) * tLattice(1,3)
-          axyzo(2,I) = Coordinates(1,I) * tLattice(2,1) + Coordinates(2,I) * tLattice(2,2) + Coordinates(3,I) * tLattice(2,3)
-          axyzo(3,I) = Coordinates(1,I) * tLattice(3,1) + Coordinates(2,I) * tLattice(3,2) + Coordinates(3,I) * tLattice(3,3)
+          CALL PremultiplyVectorByMatrix(tLattice, Coordinates(1,I), axyzo(1,I))
         ENDDO
       ELSE
         DO I = 1, natcry
@@ -244,18 +242,16 @@
         CALL LatticeCellParameters2Lattice(CellPar(1), CellPar(2), CellPar(3), &
                                            CellPar(4), CellPar(5), CellPar(6), tLattice)
 ! tLattice now holds the matrix for fractional to c-along-z orthogonal
-        CALL InverseMatrix(tLattice,tRecLattice,3)
+        CALL InverseMatrix(tLattice, tRecLattice, 3)
 ! tRecLattice now holds the matrix for c-along-z orthogonal to fractional
         CALL LatticeCellParameters2Lattice_2(CellPar(1), CellPar(2), CellPar(3), &
                                              CellPar(4), CellPar(5), CellPar(6), tLattice_2)
 ! tLattice_2 now holds the matrix for fractional to a-along-x orthogonal
-        CALL MultiplyMatrices(tLattice_2,tRecLattice,tLattice,3,3,3)
+        CALL MultiplyMatrices(tLattice_2, tRecLattice, tLattice, 3, 3, 3)
 ! tLattice now holds the matrix for c-along-z orthogonal to a-along-x orthogonal
 ! axyzo now holds the orthogonal co-ordinates if c is along z  
         DO I = 1, natcry
-          NEWaxyzo(1,I) = axyzo(1,I) * tLattice(1,1) + axyzo(2,I) * tLattice(1,2) + axyzo(3,I) * tLattice(1,3)
-          NEWaxyzo(2,I) = axyzo(1,I) * tLattice(2,1) + axyzo(2,I) * tLattice(2,2) + axyzo(3,I) * tLattice(2,3)
-          NEWaxyzo(3,I) = axyzo(1,I) * tLattice(3,1) + axyzo(2,I) * tLattice(3,2) + axyzo(3,I) * tLattice(3,3)
+          CALL PremultiplyVectorByMatrix(tLattice, axyzo(1,I), NEWaxyzo(1,I))
         ENDDO
 ! NEWaxyzo now holds the orthogonal co-ordinates if a is along x
       ELSE
@@ -307,6 +303,7 @@
 
       tElem(1:1) = ChrUpperCase(TheElementSymbol(1:1))
       tElem(2:2) = ChrLowerCase(TheElementSymbol(2:2))
+      IF (tElem(1:1) .EQ. ' ') tElem(1:1) = tElem(2:2)
       DO I = 1, MaxElm
         IF (tElem .EQ. ElementStr(I)) THEN
           ElmSymbol2CSD = I

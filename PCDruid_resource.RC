@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 29/Oct/2003 10:53:29
+// Modified : 30/Oct/2003 13:55:28
 //
 ///////////////////////////////////////////////////
 //
@@ -446,8 +446,6 @@
 #define IDD_Parameter_Status_2            156
 #define IDD_DIALOG004                     158
 #define IDD_SAW_Page1                     159
-#define IDB_Down1                        1299
-#define IDB_Up2                          1307
 #define IDF_LABEL10                      1465
 #define IDB_zmEdit1                      1305
 #define IDB_zmEdit2                      1306
@@ -694,16 +692,6 @@
 #define IDF_FWHM_Grid                    1396
 #define IDB_SaveSol                      1406
 #define IDB_LoadSol                      1535
-#define IDB_Down2                        1300
-#define IDB_Up1                          1536
-#define IDB_Down3                        1303
-#define IDB_Up3                          1537
-#define IDB_Down4                        1313
-#define IDB_Up4                          1538
-#define IDB_Down5                        1315
-#define IDB_Up5                          1539
-#define IDB_Down6                        1317
-#define IDB_Up6                          1540
 #define IDF_MENU1                        1546
 #define IDB_Restart                      1547
 #define IDF_PW_Option6                   1549
@@ -724,7 +712,7 @@
 #define IDB_FindPeaks                    1155
 #define IDF_IniOrAxis                    1156
 #define IDF_IniOrEuler                   1157
-#define IDF_IniOrQuater                  1380
+#define IDF_IniOrQuater                  1298
 #define IDF_AtomNr1                      1548
 #define IDB_ViewRot                      1488
 #define IDF_a2                           1147
@@ -1142,19 +1130,6 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
-END
-
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  112
@@ -2779,15 +2754,15 @@ BEGIN
     CONTROL "0.0",IDF_Alpha,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   80,  202,   38,   14
     CONTROL "0.0",IDF_Beta,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  123,  202,   38,   14
     CONTROL "0.0",IDF_Gamma,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  166,  202,   38,   14
-    CONTROL "Align with axis",IDF_IniOrAxis,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   16,  182,   60,   14
-    CONTROL "Euler angles",IDF_IniOrEuler,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   16,  202,   60,   14
-    CONTROL "Quaternions",IDF_IniOrQuater,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   16,  222,   60,   14
     CONTROL "View2",IDB_ViewRot,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   20,  250,   40,   14
     CONTROL "0.0",IDF_a2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,   97,  182,   30,   14
     CONTROL "0.0",IDF_b2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  133,  182,   30,   14
     CONTROL "1.0000",IDF_c2,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  169,  182,   30,   14
     CONTROL "0",IDF_AtomNr1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  117,   82,   32,   14
     CONTROL "and",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  150,   84,   20,    8
+    CONTROL "Align with axis",IDF_IniOrAxis,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   16,  182,   60,   14
+    CONTROL "Euler angles",IDF_IniOrEuler,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   16,  202,   60,   14
+    CONTROL "Quaternions",IDF_IniOrQuater,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   16,  222,   60,   14
 END
 
 IDD_zmEditRotations RCDATA
@@ -2801,7 +2776,7 @@ BEGIN
 " 1117 0 \n"
 " 1156 0 \n"
 " 1157 1 \n"
-" 1380 0 \n"
+" 1298 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"

@@ -7,6 +7,14 @@
 
       IMPLICIT NONE
 
+! When adding a variable to this file that contains "0:maxfrg" in its definition, the following should
+! probably also be updated:
+! Read_One_Zm()
+! zmCopy()
+! zmRotCopyDialog2Temp()
+! zmRotCopyTemp2Dialog()
+! PrjReadWriteZmatrices()
+
       REAL f2cmat(1:3, 1:3), c2fmat(1:3, 1:3)
 
 ! f2cmat = 3x3 matrix for conversion from fractional to Cartesian  coordinates 
@@ -52,7 +60,6 @@
       CHARACTER*255    frag_file(0:maxfrg)
 ! frag_file = name of the .zmatrix file containing fragment number iFrag
 
-
       INTEGER          icomflg(0:maxfrg)
       REAL             AtomicWeighting(1:maxatm, 0:maxfrg)
       LOGICAL          UseQuaternions(0:maxfrg)
@@ -64,19 +71,33 @@
 ! UseQuaternions    .TRUE.  : all rotations allowed, described by 4 quaternions
 !                   .FALSE. : only rotations about a single axis allowed (e.g. when on special position)
 
-! We want to have some variables that specify the orientation of the Z-matrix when 
-! rotation is restricted to a single axis      
-      REAL     zmInitialQs(0:3,0:maxfrg)
+! ### Initial orientation when single axis
 
-      INTEGER  zmSingleRotAxDef(0:maxfrg)
+! We want to have some variables that specify the orientation of the Z-matrix when 
+! rotation is restricted to a single axis  
+    
+      REAL             zmInitialQs(0:3,0:maxfrg) ! For convenience, basically a temporary variable
+
+      INTEGER          zmSingleRAIniOrDef(0:maxfrg)
+! 1 = Align with axis (only possible when axis itself is defined from atoms)
+! 2 = Euler angles
+! 3 = Quaternions
+
+      REAL             zmSingleRAIniOrFrac(1:3, 0:maxfrg) ! Fractional co-ords of axis to align with
+      REAL             zmSingleRAIniOrEuler(1:3, 0:maxfrg) ! The Euler angles
+      REAL             zmSingleRAIniOrQuater(0:3, 0:maxfrg) ! The quaternions
+
+! ### The single axis itself
+
+      INTEGER          zmSingleRotAxDef(0:maxfrg)
 ! 1 = to atom
 ! 2 = fractional co-ordinates
 ! 3 = normal to plane
 
-      INTEGER  zmSingleRotAxAtm(1:2, 0:maxfrg)
-      REAL     zmSingleRotAxFrac(1:3, 0:maxfrg)
-      INTEGER  zmSingleRotAxAtms(1:3, 0:maxfrg)
-      REAL     zmSingleRotationQs(0:3, 0:maxfrg)
+      INTEGER          zmSingleRotAxAtm(1:2, 0:maxfrg)
+      REAL             zmSingleRotAxFrac(1:3, 0:maxfrg)
+      INTEGER          zmSingleRotAxPlnAtm(1:3, 0:maxfrg)
+      REAL             zmSingleRotationQs(0:3, 0:maxfrg)
 ! zmSingleRotAxAtm  : Line through two atoms
 ! zmSingleRotAxFrac : Fractional co-ordinates
 ! zmSingleRotAxAtms : Three atoms defining a plane the normal of which is the direction of rotation
@@ -84,13 +105,12 @@
 !                     but stored in the DASH numbering
 ! zmSingleRotationQs   = Factors in the quaternion-expression of the rotation about a single axis
 !                        which are due to the orientation of the single axis
-    
-      INTEGER         izmpar(0:maxfrg)
-      CHARACTER*36    czmpar(1:MaxDOF, 0:maxfrg)
-      INTEGER         kzmpar(1:MaxDOF, 0:maxfrg)
-      INTEGER         kzmpar2(1:MVAR_2)
-      REAL            xzmpar(1:MaxDOF, 0:maxfrg)
 
+      INTEGER          izmpar(0:maxfrg)
+      CHARACTER*36     czmpar(1:MaxDOF, 0:maxfrg)
+      INTEGER          kzmpar(1:MaxDOF, 0:maxfrg)
+      INTEGER          kzmpar2(1:MVAR_2)
+      REAL             xzmpar(1:MaxDOF, 0:maxfrg)
 ! izmpar = number of degrees of freedom ('parameters') per Z-matrix
 ! czmpar = Character string associated with this parameter value
 ! kzmpar = type of parameter
@@ -105,9 +125,9 @@
 !           can be dealt with.
 ! xzmpar = initial value of parameter
 
-      INTEGER         natoms(0:maxfrg)
-      INTEGER         ioptb(1:maxatm, 0:maxfrg), iopta(1:maxatm, 0:maxfrg), ioptt(1:maxatm, 0:maxfrg)
-      INTEGER         iz1(1:maxatm, 0:maxfrg), iz2(1:maxatm, 0:maxfrg), iz3(1:maxatm, 0:maxfrg)
+      INTEGER          natoms(0:maxfrg)
+      INTEGER          ioptb(1:maxatm, 0:maxfrg), iopta(1:maxatm, 0:maxfrg), ioptt(1:maxatm, 0:maxfrg)
+      INTEGER          iz1(1:maxatm, 0:maxfrg), iz2(1:maxatm, 0:maxfrg), iz3(1:maxatm, 0:maxfrg)
 
 ! natoms = number of atoms in this fragment (=Z-matrix)
 ! ioptb  = optimise bond length 1=YES, 0=NO.
@@ -115,37 +135,34 @@
 ! ioptt  = optimise torsion angle 1=YES, 0=NO.
 ! iz1, iz2, iz3 = atoms with respect to which the current atom is defined in the Z-matrix
 
-      REAL blen(1:maxatm, 0:maxfrg), alph(1:maxatm, 0:maxfrg), bet(1:maxatm, 0:maxfrg)
-
+      REAL             blen(1:maxatm, 0:maxfrg), alph(1:maxatm, 0:maxfrg), bet(1:maxatm, 0:maxfrg)
 ! blen   = bond length     (wrt iz1)
 ! alph   = valence angle   (wrt iz1 & iz2)
 ! bet    = torsion angle   (wrt iz1, iz2 & iz3)
 
-      CHARACTER*3     asym(1:maxatm, 0:maxfrg)
-      INTEGER         zmElementCSD(1:maxatm, 0:maxfrg)
-      CHARACTER*5     OriginalLabel(1:maxatm, 0:maxfrg)
-
-! asym = Atom SYMbol--e.g. 'H  ' for hydrogen, 'Ag ' for silver--of the current atom.
+      CHARACTER*2      ElSym(1:maxatm, 0:maxfrg)
+      INTEGER          zmElementCSD(1:maxatm, 0:maxfrg)
+      CHARACTER*5      OriginalLabel(1:maxatm, 0:maxfrg)
+! ElSym = Element Symbol--e.g. 'H ' for hydrogen, 'Ag' for silver--of the current atom.
 ! zmElement = CSD element number. MaxElm = dummy.
 ! OriginalLabel = the label of the atom as read from the .res/.mol2/etc. file
 ! (read from column 14 in the Z-matrix file)
 ! Note that we allow five characters, .pdb allows 4, .res and .cssr can't cope with the
 ! atom label being a real 'name', it must be the element + a number
 
-      REAL tiso(1:maxatm, 0:maxfrg), occ(1:maxatm, 0:maxfrg)
-
+      REAL             tiso(1:maxatm, 0:maxfrg)
+      REAL             occ(1:maxatm, 0:maxfrg)
 ! tiso = Isotropic temperature factor of the current atom
 ! occ  = Occupancy of the current atom
 
-      INTEGER izmoid(0:maxatm, 0:maxfrg), izmbid(0:maxatm, 0:maxfrg)
-
+      INTEGER          izmoid(0:maxatm, 0:maxfrg)
+      INTEGER          izmbid(0:maxatm, 0:maxfrg)
 ! The original atom ids to list in the labels and the back mapping
 ! Atom number 0 means 'not specified' and always maps onto itself
 
-      INTEGER NumberOfBonds(0:maxfrg)
-      INTEGER BondType(1:maxbnd_2, 0:maxfrg)
-      INTEGER Bonds(1:2, 1:maxbnd_2, 0:maxfrg)
-
+      INTEGER          NumberOfBonds(0:maxfrg)
+      INTEGER          BondType(1:maxbnd_2, 0:maxfrg)
+      INTEGER          Bonds(1:2, 1:maxbnd_2, 0:maxfrg)
 ! Bondtypes and bonds. Precalculated and stored for speed. 90,000 bytes
 !   BondType:
 !     1 = single
@@ -157,9 +174,8 @@
 !     7 = delocalised
 !     9 = pi-bond
 
-      INTEGER CurrentlyEditedFrag
-      LOGICAL zmAtomDeleted
-
+      INTEGER          CurrentlyEditedFrag
+      LOGICAL          zmAtomDeleted
 ! CurrentlyEditedFrag Holds the number of the Z-matrix which is being edited 
 !                     if the Z-matrix edit dialogue is active.
 ! zmAtomDeleted       We don't want to remake a Z-matrix if not necessary (it might be

@@ -251,16 +251,16 @@
 ! In order to be able to delete atoms from the Z-matrix at random, we need their
 ! Cartesian co-ordinates.
       natcry = natoms(iFrg)
-      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),axyzo)
+      CALL makexyz(natcry,BLEN(1, iFrg),ALPH(1, iFrg),BET(1, iFrg),IZ1(1, iFrg),IZ2(1, iFrg),IZ3(1, iFrg),axyzo)
       DO I = 1, natcry
         aelem(I) = zmElementCSD(I, iFrg)
         atomlabel(I) = OriginalLabel(I, iFrg)
       ENDDO
       nbocry = NumberOfBonds(iFrg)
       DO BondNr = 1, nbocry
-        btype(BondNr)  = BondType(BondNr,iFrg)
-        bond(BondNr,1) = Bonds(1,BondNr,iFrg)
-        bond(BondNr,2) = Bonds(2,BondNr,iFrg)
+        btype(BondNr)  = BondType(BondNr, iFrg)
+        bond(BondNr,1) = Bonds(1,BondNr, iFrg)
+        bond(BondNr,2) = Bonds(2,BondNr, iFrg)
       ENDDO
 ! Bonds have already been calculated and will be updated automatically: there is no option
 ! to add atoms, so we can only remove atoms and their bonds.
@@ -391,23 +391,23 @@
 
                 zmAtomDeleted = .TRUE.
 ! Delete the atom
-                iAtomNr = izmbid(iRow,iFrg)
+                iAtomNr = izmbid(iRow, iFrg)
 ! It is very likely that we will end up with one of the atoms having an 'orignal ID' that
 ! is greater than the current number of atoms. This would give boundary overflows.
 ! We can retain the original order (minus one atom) but that involves subtracting 1
 ! from atom IDs following the one we have deleted
                 DO i = 1, natoms(iFrg)
-                  IF (izmoid(i,iFrg) .GT. izmoid(iAtomNr,iFrg)) izmoid(i,iFrg) = izmoid(i,iFrg) - 1
+                  IF (izmoid(i, iFrg) .GT. izmoid(iAtomNr, iFrg)) izmoid(i, iFrg) = izmoid(i, iFrg) - 1
                 ENDDO
 ! Remove any bonds this atom was involved in
                 IF (NumberOfBonds(iFrg) .GT. 0) THEN
                   iBondNr = 1
                   DO WHILE (iBondNr .LE. NumberOfBonds(iFrg))
-                    IF ((Bonds(1,iBondNr,iFrg) .EQ. iAtomNr) .OR. (Bonds(2,iBondNr,iFrg) .EQ. iAtomNr)) THEN
+                    IF ((Bonds(1,iBondNr, iFrg) .EQ. iAtomNr) .OR. (Bonds(2,iBondNr, iFrg) .EQ. iAtomNr)) THEN
                       DO iBondNr2 = iBondNr, NumberOfBonds(iFrg)-1
-                        BondType(iBondNr2,iFrg) = BondType(iBondNr2+1,iFrg)
-                        Bonds(1,iBondNr2,iFrg)  = Bonds(1,iBondNr2+1,iFrg)
-                        Bonds(2,iBondNr2,iFrg)  = Bonds(2,iBondNr2+1,iFrg)
+                        BondType(iBondNr2, iFrg) = BondType(iBondNr2+1, iFrg)
+                        Bonds(1,iBondNr2, iFrg)  = Bonds(1,iBondNr2+1, iFrg)
+                        Bonds(2,iBondNr2, iFrg)  = Bonds(2,iBondNr2+1, iFrg)
                       ENDDO
                       NumberOfBonds(iFrg) = NumberOfBonds(iFrg) - 1
                     ELSE
@@ -416,20 +416,20 @@
                   ENDDO
                   IF (NumberOfBonds(iFrg) .GT. 0) THEN
                     DO iBondNr = 1, NumberOfBonds(iFrg)
-                      IF (Bonds(1,iBondNr,iFrg) .GT. iAtomNr) Bonds(1,iBondNr,iFrg) = Bonds(1,iBondNr,iFrg) - 1
-                      IF (Bonds(2,iBondNr,iFrg) .GT. iAtomNr) Bonds(2,iBondNr,iFrg) = Bonds(2,iBondNr,iFrg) - 1
+                      IF (Bonds(1,iBondNr, iFrg) .GT. iAtomNr) Bonds(1,iBondNr, iFrg) = Bonds(1,iBondNr, iFrg) - 1
+                      IF (Bonds(2,iBondNr, iFrg) .GT. iAtomNr) Bonds(2,iBondNr, iFrg) = Bonds(2,iBondNr, iFrg) - 1
                     ENDDO
                   ENDIF
                 ENDIF
 ! If not last atom in list, shuffle remaining
                 IF (iAtomNr .NE. NATOMS(iFrg)) THEN 
                   DO I = iAtomNr, NATOMS(iFrg)-1
-                    asym(I,iFrg) = asym(I+1,iFrg)
-                    zmElementCSD(I,iFrg) = zmElementCSD(I+1,iFrg)
-                    tiso(I,iFrg) = tiso(I+1,iFrg)
-                    occ(I,iFrg)  = occ(I+1,iFrg)
-                    OriginalLabel(I,iFrg) = OriginalLabel(I+1,iFrg)
-                    izmoid(I,iFrg) = izmoid(I+1,iFrg)
+                    ElSym(I, iFrg) = ElSym(I+1, iFrg)
+                    zmElementCSD(I, iFrg) = zmElementCSD(I+1, iFrg)
+                    tiso(I, iFrg) = tiso(I+1, iFrg)
+                    occ(I, iFrg)  = occ(I+1, iFrg)
+                    OriginalLabel(I, iFrg) = OriginalLabel(I+1, iFrg)
+                    izmoid(I, iFrg) = izmoid(I+1, iFrg)
                   ENDDO
                 ENDIF
                 natcry = NATOMS(iFrg)
@@ -444,9 +444,9 @@
                 natcry = natcry - 1
                 nbocry = NumberOfBonds(iFrg)
                 DO iBondNr = 1, nbocry
-                  btype(iBondNr)  = BondType(iBondNr,iFrg)
-                  bond(iBondNr,1) = Bonds(1,iBondNr,iFrg)
-                  bond(iBondNr,2) = Bonds(2,iBondNr,iFrg)
+                  btype(iBondNr)  = BondType(iBondNr, iFrg)
+                  bond(iBondNr,1) = Bonds(1,iBondNr, iFrg)
+                  bond(iBondNr,2) = Bonds(2,iBondNr, iFrg)
                 ENDDO
 ! If this was the pivot atom, use centre of mass
                 IF (icomflg(iFrg) .EQ. iAtomNr) icomflg(iFrg) = 0 
@@ -455,7 +455,7 @@
                   natoms(iFrg) = natoms(iFrg) - 1
                 ENDIF
                 DO i = 1, natoms(iFrg)
-                  izmbid(izmoid(i,iFrg),iFrg) = i ! the back mapping
+                  izmbid(izmoid(i, iFrg), iFrg) = i ! the back mapping
                 ENDDO
                 CALL zmCopyTemp2Dialog
               ENDIF
@@ -493,18 +493,23 @@
       USE ZMVAR
       USE SAMVAR
 
-      IMPLICIT NONE      
+      IMPLICIT NONE    
+      
+      INCLUDE 'lattice.inc'  
 
       INTEGER, EXTERNAL :: WriteMol2, Get_HydrogenTreatment
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, Get_UseCrystallographicCoM
       REAL, EXTERNAL :: Degrees2Radians
-      INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State, iAtomNr
+      INTEGER I, iFrg, iOption, iOption2, iOpt1State, iOpt2State, iOpt3State
+      INTEGER iAtomNr, iAtomNr1, iAtomNr2, iAtomNr3
       REAL    Alpha, Beta, Gamma, Q(0:3)
       REAL    taxyzo(1:3, 1:MAXATM_2)
       CHARACTER(50) temp_file
       REAL    RotMat(1:3,1:3)
-      REAL    COM(1:3), tX, tY, tZ
+      REAL    COM(1:3), v(1:3), v1(1:3), v2(1:3)
       LOGICAL tUseSingleAxis
+      REAL    Angle, Axis(1:3)
+      REAL    Point1(1:3), Point2(1:3), Point3(1:3) 
 
       iFrg = 0
       CALL PushActiveWindowID
@@ -518,6 +523,14 @@
             CASE (IDCANCEL)
               CALL WDialogHide
             CASE (IDB_ViewRot, IDB_View)
+
+! @@ Why do I not just call zmRotCopyDialog2Temp() here and use the routines that we use later on with the
+! "real" Z-matrix?
+
+! Calculate the unit cell axes in terms of the orthogonal lattice from
+! the unit cell parameters
+              CALL LatticeCellParameters2Lattice(CellPar(1), CellPar(2), CellPar(3), &
+                                         CellPar(4), CellPar(5), CellPar(6), f2cmat)
               natcry = NATOMS(iFrg)
               DO iAtomNr = 1, natcry
                 taxyzo(1,iAtomNr) = axyzo(1,iAtomNr)
@@ -532,19 +545,16 @@
                   COM = 0.0
                   IF (Get_UseCrystallographicCoM()) THEN
                     CALL zmCreate_AtomicWeightings(iFrg, Get_HydrogenTreatment())
-                    DO iAtomNr = 1, natcry
-                      COM(1) = COM(1) + AtomicWeighting(iAtomNr,iFrg)*axyzo(1,iAtomNr)
-                      COM(2) = COM(2) + AtomicWeighting(iAtomNr,iFrg)*axyzo(2,iAtomNr)
-                      COM(3) = COM(3) + AtomicWeighting(iAtomNr,iFrg)*axyzo(3,iAtomNr)
-                    ENDDO
                   ELSE
                     DO iAtomNr = 1, natcry
-                      COM(1) = COM(1) + axyzo(1,iAtomNr)
-                      COM(2) = COM(2) + axyzo(2,iAtomNr)
-                      COM(3) = COM(3) + axyzo(3,iAtomNr)
+                      AtomicWeighting(iAtomNr, iFrg) = 1.0 / FLOAT(natcry)
                     ENDDO
-                    COM = COM / FLOAT(natcry)
                   ENDIF
+                  DO iAtomNr = 1, natcry
+                    COM(1) = COM(1) + AtomicWeighting(iAtomNr, iFrg)*axyzo(1,iAtomNr)
+                    COM(2) = COM(2) + AtomicWeighting(iAtomNr, iFrg)*axyzo(2,iAtomNr)
+                    COM(3) = COM(3) + AtomicWeighting(iAtomNr, iFrg)*axyzo(3,iAtomNr)
+                  ENDDO
 ! Otherwise, use atom number ICFRG
                 CASE (2) ! Use atom nr.
                   CALL WDialogGetInteger(IDF_RotOrgAtomNr, iAtomNr)
@@ -553,9 +563,9 @@
                     CALL PopActiveWindowID
                     RETURN
                   ENDIF
-                  COM(1) = axyzo(1,izmbid(iAtomNr,iFrg))
-                  COM(2) = axyzo(2,izmbid(iAtomNr,iFrg))
-                  COM(3) = axyzo(3,izmbid(iAtomNr,iFrg))
+                  COM(1) = axyzo(1,izmbid(iAtomNr, iFrg))
+                  COM(2) = axyzo(2,izmbid(iAtomNr, iFrg))
+                  COM(3) = axyzo(3,izmbid(iAtomNr, iFrg))
               END SELECT
               DO iAtomNr = 1, natcry
                 axyzo(1,iAtomNr) = axyzo(1,iAtomNr) - COM(1)
@@ -566,6 +576,31 @@
               CALL WDialogGetRadioButton(IDF_IniOrQuater, iOption)
               SELECT CASE (iOption)
                 CASE (1) ! Define from axis (only possible when axis is defined from atoms, not from another axis)
+                  CALL WDialogGetRadioButton(IDF_IniOrQuater, iOption2)
+                  SELECT CASE (iOption2)
+                    CASE (IDF_RotAxAtom)
+                      CALL WDialogGetInteger(IDF_AtomNr1, iAtomNr1)
+                      CALL WDialogGetInteger(IDF_AtomNr2, iAtomNr2)
+                      v1(1) = axyzo(1,izmbid(iAtomNr2, iFrg)) - axyzo(1,izmbid(iAtomNr1, iFrg))
+                      v1(2) = axyzo(2,izmbid(iAtomNr2, iFrg)) - axyzo(2,izmbid(iAtomNr1, iFrg))
+                      v1(3) = axyzo(3,izmbid(iAtomNr2, iFrg)) - axyzo(3,izmbid(iAtomNr1, iFrg))
+                    CASE (IDF_RotAxPln)
+                      CALL WDialogGetInteger(IDF_RotAxPlnAtm1, iAtomNr1)
+                      CALL WDialogGetInteger(IDF_RotAxPlnAtm2, iAtomNr2)
+                      CALL WDialogGetInteger(IDF_RotAxPlnAtm3, iAtomNr3)
+                      Point1 = axyzo(:, izmbid(iAtomNr1, iFrg))
+                      Point2 = axyzo(:, izmbid(iAtomNr2, iFrg))
+                      Point3 = axyzo(:, izmbid(iAtomNr3, iFrg))
+                      Point1 = Point1 - Point2
+                      Point3 = Point3 - Point2
+                      CALL VectorCrossProduct(Point1, Point3, v1)
+                  END SELECT
+                  CALL WDialogGetReal(IDF_a2, Axis(1))
+                  CALL WDialogGetReal(IDF_b2, Axis(2))
+                  CALL WDialogGetReal(IDF_c2, Axis(3))
+                  CALL PremultiplyVectorByMatrix(f2cmat, Axis, v2) ! frac -> cart
+          !        CALL Vector2Quaternion(v1, )
+          !        CALL Vector2Quaternion(v2, )
 
                 CASE (2) ! Defined as Euler angles => convert to Quaternions
                   CALL WDialogGetReal(IDF_Alpha, Alpha)
@@ -581,18 +616,16 @@
                   CALL WDialogGetReal(IDF_Q2, Q(2))
                   CALL WDialogGetReal(IDF_Q3, Q(3))
               END SELECT
-              CALL ROTMAK(Q, RotMat)
+              CALL Quaternion2Matrix(Q, RotMat)
               DO I = 1, natcry
-                tX = axyzo(1,I) * RotMat(1,1) + axyzo(2,I) * RotMat(1,2) + axyzo(3,I) * RotMat(1,3)
-                tY = axyzo(1,I) * RotMat(2,1) + axyzo(2,I) * RotMat(2,2) + axyzo(3,I) * RotMat(2,3)
-                tZ = axyzo(1,I) * RotMat(3,1) + axyzo(2,I) * RotMat(3,2) + axyzo(3,I) * RotMat(3,3)
-                axyzo(1,I) = tX
-                axyzo(2,I) = tY
-                axyzo(3,I) = tZ
+                CALL PremultiplyVectorByMatrix(RotMat, axyzo(1,I), v)
+                axyzo(1,I) = v(1)
+                axyzo(2,I) = v(2)
+                axyzo(3,I) = v(3)
               ENDDO
               DO iAtomNr = 1, natcry
-                atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
-                aelem(iAtomNr) = zmElementCSD(iAtomNr,iFrg)
+                atomlabel(iAtomNr) = OriginalLabel(iAtomNr, iFrg)
+                aelem(iAtomNr) = zmElementCSD(iAtomNr, iFrg)
               ENDDO
               temp_file = 'temp.mol2'
 ! Show the mol2 file
@@ -616,33 +649,23 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_RotOrgCOM, IDF_RotOrgAtom)
-              CALL WDialogGetRadioButton(IDF_RotOrgCOM,iOption)
-              CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr,iOption .EQ. 2)
-            CASE (IDF_UseSingleAxis, IDF_RotAxAtom, IDF_RotAxFrac, IDF_RotAxPln)
+              CALL WDialogGetRadioButton(IDF_RotOrgCOM, iOption)
+              CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr, iOption .EQ. 2)
+            CASE (IDF_UseSingleAxis, IDF_RotAxAtom, IDF_RotAxFrac, IDF_RotAxPln, IDF_IniOrAxis, IDF_IniOrEuler, IDF_IniOrQuater)
               tUseSingleAxis = WDialogGetCheckBoxLogical(IDF_UseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_GROUP3,    tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_LABEL8,    tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_Alpha,     tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_Beta,      tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_Gamma,     tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDB_Convert,   tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_LABEL4,    tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_LABEL5,    tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_LABEL6,    tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_LABEL7,    tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_Q0,        tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_Q1,        tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_Q2,        tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_Q3,        tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_GROUP2,    tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_RotAxAtom, tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_RotAxFrac, tUseSingleAxis)
-              CALL WDialogFieldStateLogical(IDF_RotAxPln,  tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_GROUP2,      tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_RotAxAtom,   tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_RotAxFrac,   tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_RotAxPln,    tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_GROUP3,      tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_IniOrAxis,   tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_IniOrEuler,  tUseSingleAxis)
+              CALL WDialogFieldStateLogical(IDF_IniOrQuater, tUseSingleAxis)
               iOpt1State = Disabled
               iOpt2State = Disabled
               iOpt3State = Disabled
               IF (tUseSingleAxis) THEN
-                CALL WDialogGetRadioButton(IDF_RotAxAtom,iOption)
+                CALL WDialogGetRadioButton(IDF_RotAxAtom, iOption)
                 SELECT CASE (iOption)
                   CASE (1)
                     iOpt1State = Enabled
@@ -652,19 +675,42 @@
                     iOpt3State = Enabled
                 END SELECT
               ENDIF
-              CALL WDialogFieldState(IDF_AtomNr1,       iOpt1State)
+              CALL WDialogFieldState(IDF_AtomNr1,      iOpt1State)
+              CALL WDialogFieldState(IDF_LABEL12,      iOpt1State)
+              CALL WDialogFieldState(IDF_AtomNr2,      iOpt1State)
               CALL WDialogFieldState(IDF_LABELa,       iOpt2State)
               CALL WDialogFieldState(IDF_LABELb,       iOpt2State)
               CALL WDialogFieldState(IDF_LABELc,       iOpt2State)
-              CALL WDialogFieldState(IDF_a1,            iOpt2State)
-              CALL WDialogFieldState(IDF_b1,            iOpt2State)
-              CALL WDialogFieldState(IDF_c1,            iOpt2State)
-              CALL WDialogFieldState(IDF_a2,            iOpt2State)
-              CALL WDialogFieldState(IDF_b2,            iOpt2State)
-              CALL WDialogFieldState(IDF_c2,            iOpt2State)
+              CALL WDialogFieldState(IDF_a1,           iOpt2State)
+              CALL WDialogFieldState(IDF_b1,           iOpt2State)
+              CALL WDialogFieldState(IDF_c1,           iOpt2State)
               CALL WDialogFieldState(IDF_RotAxPlnAtm1, iOpt3State)
               CALL WDialogFieldState(IDF_RotAxPlnAtm2, iOpt3State)
               CALL WDialogFieldState(IDF_RotAxPlnAtm3, iOpt3State)
+              iOpt1State = Disabled
+              iOpt2State = Disabled
+              iOpt3State = Disabled
+              IF (tUseSingleAxis) THEN
+                CALL WDialogGetRadioButton(IDF_IniOrAxis, iOption)
+                SELECT CASE (iOption)
+                  CASE (1)
+                    iOpt1State = Enabled
+                  CASE (2)
+                    iOpt2State = Enabled
+                  CASE (3)
+                    iOpt3State = Enabled
+                END SELECT
+              ENDIF
+              CALL WDialogFieldState(IDF_a2,    iOpt1State)
+              CALL WDialogFieldState(IDF_b2,    iOpt1State)
+              CALL WDialogFieldState(IDF_c2,    iOpt1State)
+              CALL WDialogFieldState(IDF_Alpha, iOpt2State)
+              CALL WDialogFieldState(IDF_Beta,  iOpt2State)
+              CALL WDialogFieldState(IDF_Gamma, iOpt2State)
+              CALL WDialogFieldState(IDF_Q0,    iOpt3State)
+              CALL WDialogFieldState(IDF_Q1,    iOpt3State)
+              CALL WDialogFieldState(IDF_Q2,    iOpt3State)
+              CALL WDialogFieldState(IDF_Q3,    iOpt3State)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -688,37 +734,41 @@
       frag_file(iFrg2) = frag_file(iFrg1)
       natoms(iFrg2)    = natoms(iFrg1)
       icomflg(iFrg2)   = icomflg(iFrg1)
-      UseQuaternions(iFrg2)         = UseQuaternions(iFrg1)
-      zmSingleRotAxDef(iFrg2)       = zmSingleRotAxDef(iFrg1)
-      zmSingleRotAxAtm(1,iFrg2)     = zmSingleRotAxAtm(1,iFrg1)
-      zmSingleRotAxAtm(2,iFrg2)     = zmSingleRotAxAtm(2,iFrg1)
-      zmSingleRotAxFrac(:,iFrg2)    = zmSingleRotAxFrac(:,iFrg1)
-      zmSingleRotAxAtms(:,iFrg2)    = zmSingleRotAxAtms(:,iFrg1)
-      zmInitialQs(:,iFrg2)          = zmInitialQs(:,iFrg1)
+      UseQuaternions(iFrg2)           = UseQuaternions(iFrg1)
+      zmSingleRAIniOrDef(iFrg2)       = zmSingleRAIniOrDef(iFrg1)
+      zmSingleRAIniOrFrac(:, iFrg2)   = zmSingleRAIniOrFrac(:, iFrg1)
+      zmSingleRAIniOrEuler(:, iFrg2)  = zmSingleRAIniOrEuler(:, iFrg1)
+      zmSingleRAIniOrQuater(:, iFrg2) = zmSingleRAIniOrQuater(:, iFrg1)
+      zmSingleRotAxDef(iFrg2)         = zmSingleRotAxDef(iFrg1)
+      zmSingleRotAxAtm(1, iFrg2)      = zmSingleRotAxAtm(1, iFrg1)
+      zmSingleRotAxAtm(2, iFrg2)      = zmSingleRotAxAtm(2, iFrg1)
+      zmSingleRotAxFrac(:, iFrg2)     = zmSingleRotAxFrac(:, iFrg1)
+      zmSingleRotAxPlnAtm(:, iFrg2)   = zmSingleRotAxPlnAtm(:, iFrg1)
+      zmInitialQs(:, iFrg2)           = zmInitialQs(:, iFrg1)
       DO iAtomNr = 1, natoms(iFrg1)
-        ioptb(iAtomNr,iFrg2)         = ioptb(iAtomNr,iFrg1)
-        iopta(iAtomNr,iFrg2)         = iopta(iAtomNr,iFrg1)
-        ioptt(iAtomNr,iFrg2)         = ioptt(iAtomNr,iFrg1)
-        iz1(iAtomNr,iFrg2)           = iz1(iAtomNr,iFrg1)
-        iz2(iAtomNr,iFrg2)           = iz2(iAtomNr,iFrg1)
-        iz3(iAtomNr,iFrg2)           = iz3(iAtomNr,iFrg1)
-        blen(iAtomNr,iFrg2)          = blen(iAtomNr,iFrg1)
-        alph(iAtomNr,iFrg2)          = alph(iAtomNr,iFrg1)
-        bet(iAtomNr,iFrg2)           = bet(iAtomNr,iFrg1)
-        asym(iAtomNr,iFrg2)          = asym(iAtomNr,iFrg1)
-        zmElementCSD(iAtomNr,iFrg2)  = zmElementCSD(iAtomNr,iFrg1)
-        OriginalLabel(iAtomNr,iFrg2) = OriginalLabel(iAtomNr,iFrg1)
-        tiso(iAtomNr,iFrg2)          = tiso(iAtomNr,iFrg1)
-        occ(iAtomNr,iFrg2)           = occ(iAtomNr,iFrg1)
-        izmoid(iAtomNr,iFrg2)        = izmoid(iAtomNr,iFrg1)
-        izmbid(iAtomNr,iFrg2)        = izmbid(iAtomNr,iFrg1)
+        ioptb(iAtomNr, iFrg2)         = ioptb(iAtomNr, iFrg1)
+        iopta(iAtomNr, iFrg2)         = iopta(iAtomNr, iFrg1)
+        ioptt(iAtomNr, iFrg2)         = ioptt(iAtomNr, iFrg1)
+        iz1(iAtomNr, iFrg2)           = iz1(iAtomNr, iFrg1)
+        iz2(iAtomNr, iFrg2)           = iz2(iAtomNr, iFrg1)
+        iz3(iAtomNr, iFrg2)           = iz3(iAtomNr, iFrg1)
+        blen(iAtomNr, iFrg2)          = blen(iAtomNr, iFrg1)
+        alph(iAtomNr, iFrg2)          = alph(iAtomNr, iFrg1)
+        bet(iAtomNr, iFrg2)           = bet(iAtomNr, iFrg1)
+        ElSym(iAtomNr, iFrg2)         = ElSym(iAtomNr, iFrg1)
+        zmElementCSD(iAtomNr, iFrg2)  = zmElementCSD(iAtomNr, iFrg1)
+        OriginalLabel(iAtomNr, iFrg2) = OriginalLabel(iAtomNr, iFrg1)
+        tiso(iAtomNr, iFrg2)          = tiso(iAtomNr, iFrg1)
+        occ(iAtomNr, iFrg2)           = occ(iAtomNr, iFrg1)
+        izmoid(iAtomNr, iFrg2)        = izmoid(iAtomNr, iFrg1)
+        izmbid(iAtomNr, iFrg2)        = izmbid(iAtomNr, iFrg1)
       ENDDO
       NumberOfBonds(iFrg2) = NumberOfBonds(iFrg1)
       IF (NumberOfBonds(iFrg1) .GT. 0) THEN
         DO iBondNr = 1, NumberOfBonds(iFrg1)
-          BondType(iBondNr,iFrg2) = BondType(iBondNr,iFrg1)
-          Bonds(1,iBondNr,iFrg2)  = Bonds(1,iBondNr,iFrg1)
-          Bonds(2,iBondNr,iFrg2)  = Bonds(2,iBondNr,iFrg1)
+          BondType(iBondNr, iFrg2) = BondType(iBondNr, iFrg1)
+          Bonds(1,iBondNr, iFrg2)  = Bonds(1,iBondNr, iFrg1)
+          Bonds(2,iBondNr, iFrg2)  = Bonds(2,iBondNr, iFrg1)
         ENDDO
       ENDIF
       CALL zmDoAdmin(iFrg2)
@@ -758,10 +808,10 @@
       ENDIF
       tOldFileName = frag_file(iFrg)
       DO iAtomNr = 1, natcry
-        atomlabel(iAtomNr) = OriginalLabel(iAtomNr,iFrg)
-        aelem(iAtomNr) = zmElementCSD(iAtomNr,iFrg)
+        atomlabel(iAtomNr) = OriginalLabel(iAtomNr, iFrg)
+        aelem(iAtomNr) = zmElementCSD(iAtomNr, iFrg)
       ENDDO
-      IF (WriteMol2('Rebuild_temp.mol2',.FALSE.,iFrg) .NE. 1) GOTO 999 ! Writing mol2 file failed
+      IF (WriteMol2('Rebuild_temp.mol2',.FALSE., iFrg) .NE. 1) GOTO 999 ! Writing mol2 file failed
       CALL zmConvert('Rebuild_temp.mol2',tNumZMatrices,tZmatrices)
 ! Check that we still have 1 Z-matrix
       IF (tNumZMatrices .EQ. 0) GOTO 999 ! Conversion failed
@@ -804,22 +854,22 @@
 ! Set number of rows
       CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
       DO iRow = 1, natoms(iFrg)
-        iAtomNr = izmbid(iRow,iFrg)
+        iAtomNr = izmbid(iRow, iFrg)
 ! Show the number of the atom in the zeroth column
         WRITE(RowLabelStr,'(I3)') iRow
         CALL WGridLabelRow(IDF_AtomPropGrid,iRow,RowLabelStr)
 ! atom labels
-        CALL WGridPutCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr,iFrg))
+        CALL WGridPutCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr, iFrg))
 ! atom elements
-        CALL WGridPutCellString(IDF_AtomPropGrid,3,iRow,ElementStr(zmElementCSD(iAtomNr,iFrg)))
+        CALL WGridPutCellString(IDF_AtomPropGrid,3,iRow,ElementStr(zmElementCSD(iAtomNr, iFrg)))
 ! Biso
-        CALL WGridPutCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr,iFrg),'(F5.3)')
+        CALL WGridPutCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr, iFrg),'(F5.3)')
 ! occupancies
-        CALL WGridPutCellReal(IDF_AtomPropGrid,5,iRow,occ(iAtomNr,iFrg),'(F5.3)')
+        CALL WGridPutCellReal(IDF_AtomPropGrid,5,iRow,occ(iAtomNr, iFrg),'(F5.3)')
       ENDDO
 ! If only a single atom left, grey out "Rotations..." and "Re-order"
-      CALL WDialogFieldStateLogical(IDB_Rotations,natoms(iFrg) .GT. 1)
-      CALL WDialogFieldStateLogical(IDB_ReOrder,natoms(iFrg) .GT. 1)
+      CALL WDialogFieldStateLogical(IDB_Rotations, natoms(iFrg) .GT. 1)
+      CALL WDialogFieldStateLogical(IDB_ReOrder, natoms(iFrg) .GT. 1)
       CALL PopActiveWindowID
 
       END SUBROUTINE zmCopyTemp2Dialog
@@ -835,86 +885,97 @@
       IMPLICIT NONE 
       
       INTEGER iFrg, iOpt1State, iOpt2State, iOpt3State
+      LOGICAL tUseSingleAxis
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       iFrg = 0
-      CALL WDialogPutReal(IDF_Q0, zmInitialQs(0,iFrg))
-      CALL WDialogPutReal(IDF_Q1, zmInitialQs(1,iFrg))
-      CALL WDialogPutReal(IDF_Q2, zmInitialQs(2,iFrg))
-      CALL WDialogPutReal(IDF_Q3, zmInitialQs(3,iFrg))
       CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr, icomflg(iFrg) .NE. 0)
       IF (icomflg(iFrg) .EQ. 0) THEN ! Use centre of mass
-! Set radio button
         CALL WDialogPutRadioButton(IDF_RotOrgCOM)
+        CALL WDialogPutInteger(IDF_RotOrgAtomNr, 1)
       ELSE ! use atom number
-! Set radio button
         CALL WDialogPutRadioButton(IDF_RotOrgAtom)
-! Set atom number
-        CALL WDialogPutInteger(IDF_RotOrgAtomNr,izmoid(icomflg(iFrg),iFrg))
+        CALL WDialogPutInteger(IDF_RotOrgAtomNr, izmoid(icomflg(iFrg), iFrg))
       ENDIF
-      CALL WDialogPutCheckBoxLogical(IDF_UseSingleAxis, .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_GROUP3,         .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_Alpha,          .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_Beta,           .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_Gamma,          .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDB_Convert,        .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_LABEL4,         .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_LABEL5,         .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_LABEL6,         .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_LABEL7,         .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_Q0,             .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_Q1,             .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_Q2,             .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_Q3,             .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_GROUP2,         .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_RotAxAtom,      .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_RotAxFrac,      .NOT. UseQuaternions(iFrg))
-      CALL WDialogFieldStateLogical(IDF_RotAxPln,       .NOT. UseQuaternions(iFrg))
-      CALL WDialogPutInteger(IDF_AtomNr1, izmoid(zmSingleRotAxAtm(1,iFrg), iFrg))
-      CALL WDialogPutInteger(IDF_AtomNr2, izmoid(zmSingleRotAxAtm(2,iFrg), iFrg))
-      CALL WDialogPutReal(IDF_a1, zmSingleRotAxFrac(1,iFrg))
-      CALL WDialogPutReal(IDF_b1, zmSingleRotAxFrac(2,iFrg))
-      CALL WDialogPutReal(IDF_c1, zmSingleRotAxFrac(3,iFrg))
-      CALL WDialogPutReal(IDF_a2, zmSingleRotAxFrac(1,iFrg))
-      CALL WDialogPutReal(IDF_b2, zmSingleRotAxFrac(2,iFrg))
-      CALL WDialogPutReal(IDF_c2, zmSingleRotAxFrac(3,iFrg))
-      CALL WDialogPutInteger(IDF_RotAxPlnAtm1, izmoid(zmSingleRotAxAtms(1,iFrg), iFrg))
-      CALL WDialogPutInteger(IDF_RotAxPlnAtm2, izmoid(zmSingleRotAxAtms(2,iFrg), iFrg))
-      CALL WDialogPutInteger(IDF_RotAxPlnAtm3, izmoid(zmSingleRotAxAtms(3,iFrg), iFrg))
+      tUseSingleAxis = .NOT. UseQuaternions(iFrg)
+      CALL WDialogPutCheckBoxLogical(IDF_UseSingleAxis, tUseSingleAxis)
+      CALL WDialogPutInteger(IDF_AtomNr1, izmoid(zmSingleRotAxAtm(1, iFrg), iFrg))
+      CALL WDialogPutInteger(IDF_AtomNr2, izmoid(zmSingleRotAxAtm(2, iFrg), iFrg))
+      CALL WDialogPutReal(IDF_a1, zmSingleRotAxFrac(1, iFrg))
+      CALL WDialogPutReal(IDF_b1, zmSingleRotAxFrac(2, iFrg))
+      CALL WDialogPutReal(IDF_c1, zmSingleRotAxFrac(3, iFrg))
+      CALL WDialogPutInteger(IDF_RotAxPlnAtm1, izmoid(zmSingleRotAxPlnAtm(1, iFrg), iFrg))
+      CALL WDialogPutInteger(IDF_RotAxPlnAtm2, izmoid(zmSingleRotAxPlnAtm(2, iFrg), iFrg))
+      CALL WDialogPutInteger(IDF_RotAxPlnAtm3, izmoid(zmSingleRotAxPlnAtm(3, iFrg), iFrg))
+      CALL WDialogPutReal(IDF_a2, zmSingleRAIniOrFrac(1, iFrg))
+      CALL WDialogPutReal(IDF_b2, zmSingleRAIniOrFrac(2, iFrg))
+      CALL WDialogPutReal(IDF_c2, zmSingleRAIniOrFrac(3, iFrg))
+      CALL WDialogPutReal(IDF_Alpha, zmSingleRAIniOrEuler(1, iFrg))
+      CALL WDialogPutReal(IDF_Beta,  zmSingleRAIniOrEuler(2, iFrg))
+      CALL WDialogPutReal(IDF_Gamma, zmSingleRAIniOrEuler(3, iFrg))
+      CALL WDialogPutReal(IDF_Q0, zmSingleRAIniOrQuater(0, iFrg))
+      CALL WDialogPutReal(IDF_Q1, zmSingleRAIniOrQuater(1, iFrg))
+      CALL WDialogPutReal(IDF_Q2, zmSingleRAIniOrQuater(2, iFrg))
+      CALL WDialogPutReal(IDF_Q3, zmSingleRAIniOrQuater(3, iFrg))
+      CALL WDialogFieldStateLogical(IDF_GROUP2,      tUseSingleAxis)
+      CALL WDialogFieldStateLogical(IDF_RotAxAtom,   tUseSingleAxis)
+      CALL WDialogFieldStateLogical(IDF_RotAxFrac,   tUseSingleAxis)
+      CALL WDialogFieldStateLogical(IDF_RotAxPln,    tUseSingleAxis)
+      CALL WDialogFieldStateLogical(IDF_GROUP3,      tUseSingleAxis)
+      CALL WDialogFieldStateLogical(IDF_IniOrAxis,   tUseSingleAxis)
+      CALL WDialogFieldStateLogical(IDF_IniOrEuler,  tUseSingleAxis)
+      CALL WDialogFieldStateLogical(IDF_IniOrQuater, tUseSingleAxis)
       iOpt1State = Disabled
       iOpt2State = Disabled
       iOpt3State = Disabled
       SELECT CASE (zmSingleRotAxDef(iFrg))
         CASE (1)
           CALL WDialogPutRadioButton(IDF_RotAxAtom)
-          iOpt1State = Enabled
+          IF (.NOT. UseQuaternions(iFrg)) iOpt1State = Enabled
         CASE (2)
           CALL WDialogPutRadioButton(IDF_RotAxFrac)
-          iOpt2State = Enabled
+          IF (.NOT. UseQuaternions(iFrg)) iOpt2State = Enabled
         CASE (3)
           CALL WDialogPutRadioButton(IDF_RotAxPln)
-          iOpt3State = Enabled
+          IF (.NOT. UseQuaternions(iFrg)) iOpt3State = Enabled
       END SELECT
-      IF (UseQuaternions(iFrg)) THEN
-        iOpt1State = Disabled
-        iOpt2State = Disabled
-        iOpt3State = Disabled
-      ENDIF
-      CALL WDialogFieldState(IDF_AtomNr1,       iOpt1State)
-      CALL WDialogFieldState(IDF_AtomNr2,       iOpt1State)
+      CALL WDialogFieldState(IDF_AtomNr1,      iOpt1State)
+      CALL WDialogFieldState(IDF_LABEL12,      iOpt1State)
+      CALL WDialogFieldState(IDF_AtomNr2,      iOpt1State)
       CALL WDialogFieldState(IDF_LABELa,       iOpt2State)
       CALL WDialogFieldState(IDF_LABELb,       iOpt2State)
       CALL WDialogFieldState(IDF_LABELc,       iOpt2State)
-      CALL WDialogFieldState(IDF_a1,            iOpt2State)
-      CALL WDialogFieldState(IDF_b1,            iOpt2State)
-      CALL WDialogFieldState(IDF_c1,            iOpt2State)
-      CALL WDialogFieldState(IDF_a2,            iOpt2State)
-      CALL WDialogFieldState(IDF_b2,            iOpt2State)
-      CALL WDialogFieldState(IDF_c2,            iOpt2State)
+      CALL WDialogFieldState(IDF_a1,           iOpt2State)
+      CALL WDialogFieldState(IDF_b1,           iOpt2State)
+      CALL WDialogFieldState(IDF_c1,           iOpt2State)
       CALL WDialogFieldState(IDF_RotAxPlnAtm1, iOpt3State)
       CALL WDialogFieldState(IDF_RotAxPlnAtm2, iOpt3State)
       CALL WDialogFieldState(IDF_RotAxPlnAtm3, iOpt3State)
+      iOpt1State = Disabled
+      iOpt2State = Disabled
+      iOpt3State = Disabled
+      SELECT CASE (zmSingleRAIniOrDef(iFrg))
+        CASE (1)
+          CALL WDialogPutRadioButton(IDF_IniOrAxis)
+          IF (.NOT. UseQuaternions(iFrg)) iOpt1State = Enabled
+        CASE (2)
+          CALL WDialogPutRadioButton(IDF_IniOrEuler)
+          IF (.NOT. UseQuaternions(iFrg)) iOpt2State = Enabled
+        CASE (3)
+          CALL WDialogPutRadioButton(IDF_IniOrQuater)
+          IF (.NOT. UseQuaternions(iFrg)) iOpt3State = Enabled
+      END SELECT
+      CALL WDialogFieldState(IDF_a2,    iOpt1State)
+      CALL WDialogFieldState(IDF_b2,    iOpt1State)
+      CALL WDialogFieldState(IDF_c2,    iOpt1State)
+      CALL WDialogFieldState(IDF_Alpha, iOpt2State)
+      CALL WDialogFieldState(IDF_Beta,  iOpt2State)
+      CALL WDialogFieldState(IDF_Gamma, iOpt2State)
+      CALL WDialogFieldState(IDF_Q0,    iOpt3State)
+      CALL WDialogFieldState(IDF_Q1,    iOpt3State)
+      CALL WDialogFieldState(IDF_Q2,    iOpt3State)
+      CALL WDialogFieldState(IDF_Q3,    iOpt3State)
       CALL PopActiveWindowID
 
       END SUBROUTINE zmRotCopyTemp2Dialog
@@ -941,16 +1002,16 @@
 !U! Set number of rows
 !U      CALL WGridRows(IDF_AtomPropGrid,natoms(iFrg))
       DO iRow = 1, natoms(iFrg)
-        iAtomNr = izmbid(iRow,iFrg)
+        iAtomNr = izmbid(iRow, iFrg)
 ! atom labels
-        CALL WGridGetCellString(IDF_AtomPropGrid,1,iRow,OriginalLabel(iAtomNr,iFrg))
+        CALL WGridGetCellString(IDF_AtomPropGrid, 1, iRow, OriginalLabel(iAtomNr, iFrg))
 ! atom elements
-        CALL WGridGetCellString(IDF_AtomPropGrid,3,iRow,asym(iAtomNr,iFrg))
-        zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+        CALL WGridGetCellString(IDF_AtomPropGrid, 3, iRow, ElSym(iAtomNr, iFrg))
+        zmElementCSD(iAtomNr, iFrg) = ElmSymbol2CSD(ElSym(iAtomNr, iFrg))
 ! Biso
-        CALL WGridGetCellReal(IDF_AtomPropGrid,4,iRow,tiso(iAtomNr,iFrg))
+        CALL WGridGetCellReal(IDF_AtomPropGrid, 4, iRow, tiso(iAtomNr, iFrg))
 ! occupancies
-        CALL WGridGetCellReal(IDF_AtomPropGrid,5,iRow,occ(iAtomNr,iFrg))
+        CALL WGridGetCellReal(IDF_AtomPropGrid, 5, iRow, occ(iAtomNr, iFrg))
       ENDDO
       CALL PopActiveWindowID
 
@@ -972,36 +1033,40 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_zmEditRotations)
       iFrg = 0
-      CALL WDialogGetReal(IDF_Q0, zmInitialQs(0,iFrg))
-      CALL WDialogGetReal(IDF_Q1, zmInitialQs(1,iFrg))
-      CALL WDialogGetReal(IDF_Q2, zmInitialQs(2,iFrg))
-      CALL WDialogGetReal(IDF_Q3, zmInitialQs(3,iFrg))
       CALL WDialogGetRadioButton(IDF_RotOrgCOM, iOption)
       SELECT CASE (iOption)
         CASE (1) ! C.O.M.
           icomflg(iFrg) = 0
         CASE (2) ! Atom number
           CALL WDialogGetInteger(IDF_RotOrgAtomNr,tInteger)
-          icomflg(iFrg) = izmbid(tInteger,iFrg)
+          icomflg(iFrg) = izmbid(tInteger, iFrg)
       END SELECT
       UseQuaternions(iFrg) = .NOT. WDialogGetCheckBoxLogical(IDF_UseSingleAxis)
-      CALL WDialogGetInteger(IDF_AtomNr1, tInteger)
-      zmSingleRotAxAtm(1,iFrg) = izmbid(tInteger,iFrg)
-      CALL WDialogGetInteger(IDF_AtomNr2, tInteger)
-      zmSingleRotAxAtm(2,iFrg) = izmbid(tInteger,iFrg)
-      CALL WDialogGetReal(IDF_a1, zmSingleRotAxFrac(1,iFrg))
-      CALL WDialogGetReal(IDF_b1, zmSingleRotAxFrac(2,iFrg))
-      CALL WDialogGetReal(IDF_c1, zmSingleRotAxFrac(3,iFrg))
-      CALL WDialogGetReal(IDF_a2, zmSingleRotAxFrac(1,iFrg))
-      CALL WDialogGetReal(IDF_b2, zmSingleRotAxFrac(2,iFrg))
-      CALL WDialogGetReal(IDF_c2, zmSingleRotAxFrac(3,iFrg))
-      CALL WDialogGetInteger(IDF_RotAxPlnAtm1, tInteger)
-      zmSingleRotAxAtms(1,iFrg) = izmbid(tInteger,iFrg)
-      CALL WDialogGetInteger(IDF_RotAxPlnAtm2, tInteger)
-      zmSingleRotAxAtms(2,iFrg) = izmbid(tInteger,iFrg)
-      CALL WDialogGetInteger(IDF_RotAxPlnAtm3, tInteger)
-      zmSingleRotAxAtms(3,iFrg) = izmbid(tInteger,iFrg)
       CALL WDialogGetRadioButton(IDF_RotAxAtom, zmSingleRotAxDef(iFrg))
+      CALL WDialogGetInteger(IDF_AtomNr1, tInteger)
+      zmSingleRotAxAtm(1, iFrg) = izmbid(tInteger, iFrg)
+      CALL WDialogGetInteger(IDF_AtomNr2, tInteger)
+      zmSingleRotAxAtm(2, iFrg) = izmbid(tInteger, iFrg)
+      CALL WDialogGetReal(IDF_a1, zmSingleRotAxFrac(1, iFrg))
+      CALL WDialogGetReal(IDF_b1, zmSingleRotAxFrac(2, iFrg))
+      CALL WDialogGetReal(IDF_c1, zmSingleRotAxFrac(3, iFrg))
+      CALL WDialogGetInteger(IDF_RotAxPlnAtm1, tInteger)
+      zmSingleRotAxPlnAtm(1, iFrg) = izmbid(tInteger, iFrg)
+      CALL WDialogGetInteger(IDF_RotAxPlnAtm2, tInteger)
+      zmSingleRotAxPlnAtm(2, iFrg) = izmbid(tInteger, iFrg)
+      CALL WDialogGetInteger(IDF_RotAxPlnAtm3, tInteger)
+      zmSingleRotAxPlnAtm(3, iFrg) = izmbid(tInteger, iFrg)
+      CALL WDialogGetRadioButton(IDF_IniOrAxis, zmSingleRAIniOrDef(iFrg))
+      CALL WDialogGetReal(IDF_a2, zmSingleRAIniOrFrac(1, iFrg))
+      CALL WDialogGetReal(IDF_b2, zmSingleRAIniOrFrac(2, iFrg))
+      CALL WDialogGetReal(IDF_c2, zmSingleRAIniOrFrac(3, iFrg))
+      CALL WDialogGetReal(IDF_Alpha, zmSingleRAIniOrEuler(1, iFrg))
+      CALL WDialogGetReal(IDF_Beta , zmSingleRAIniOrEuler(2, iFrg))
+      CALL WDialogGetReal(IDF_Gamma, zmSingleRAIniOrEuler(3, iFrg))
+      CALL WDialogGetReal(IDF_Q0, zmSingleRAIniOrQuater(0, iFrg))
+      CALL WDialogGetReal(IDF_Q1, zmSingleRAIniOrQuater(1, iFrg))
+      CALL WDialogGetReal(IDF_Q2, zmSingleRAIniOrQuater(2, iFrg))
+      CALL WDialogGetReal(IDF_Q3, zmSingleRAIniOrQuater(3, iFrg))
       CALL zmDoAdmin(iFrg)
       CALL PopActiveWindowID
 
@@ -1030,16 +1095,16 @@
       INTEGER tLength, BondNr
 
       natcry = NATOMS(iFrg)
-      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),axyzo)
+      CALL makexyz(natcry,BLEN(1, iFrg),ALPH(1, iFrg),BET(1, iFrg),IZ1(1, iFrg),IZ2(1, iFrg),IZ3(1, iFrg),axyzo)
       DO I = 1, natcry
-        aelem(I) = zmElementCSD(I,iFrg)
-        atomlabel(I) = OriginalLabel(I,iFrg)
+        aelem(I) = zmElementCSD(I, iFrg)
+        atomlabel(I) = OriginalLabel(I, iFrg)
       ENDDO
       nbocry = NumberOfBonds(iFrg)
       DO BondNr = 1, nbocry
-        btype(BondNr)  = BondType(BondNr,iFrg)
-        bond(BondNr,1) = Bonds(1,BondNr,iFrg)
-        bond(BondNr,2) = Bonds(2,BondNr,iFrg)
+        btype(BondNr)  = BondType(BondNr, iFrg)
+        bond(BondNr,1) = Bonds(1,BondNr, iFrg)
+        bond(BondNr,2) = Bonds(2,BondNr, iFrg)
       ENDDO
 ! Q & D hack to display flexible torsion angles in different colors by forcing different
 ! element types.
@@ -1049,15 +1114,15 @@
         ENDDO
         NumOfFlexTorsions = 0
         DO atom = 4, natcry
-          IF (ioptt(atom,iFrg) .EQ. 1) THEN
+          IF (ioptt(atom, iFrg) .EQ. 1) THEN
             NumOfFlexTorsions = NumOfFlexTorsions + 1
             SELECT CASE(NumOfFlexTorsions)
               CASE (1)
-                Element = 23 ! Cobalt        Blue
+                Element = 81 ! Sulphur       Yellow
               CASE (2)
                 Element = 64 ! Oxygen        Red
               CASE (3)
-                Element = 81 ! Sulphur       Yellow
+                Element = 23 ! Cobalt        Blue
               CASE (4)
                 Element = 21 ! Chlorine      Green
               CASE (5)
@@ -1072,16 +1137,16 @@
                 Element = 66 ! Phosphorus
             END SELECT
             aelem(atom) = Element
-            aelem(IZ1(atom,iFrg)) = Element
-            aelem(IZ2(atom,iFrg)) = Element
-            aelem(IZ3(atom,iFrg)) = Element
+            aelem(IZ1(atom, iFrg)) = Element
+            aelem(IZ2(atom, iFrg)) = Element
+            aelem(IZ3(atom, iFrg)) = Element
           ENDIF
         ENDDO
       ENDIF
       tLength = LEN_TRIM(frag_file(iFrg))
       temp_file = frag_file(iFrg)(1:tLength-8)//'_temp.mol2'
 ! Show the mol2 file
-      IF (WriteMol2(temp_file,.TRUE.,iFrg) .EQ. 1) THEN
+      IF (WriteMol2(temp_file,.TRUE., iFrg) .EQ. 1) THEN
         CALL ViewStructure(temp_file)
       ELSE
         CALL DebugErrorMessage('Error writing temporary file.')
@@ -1096,6 +1161,8 @@
 
 ! This routine re-labels atoms in Z-matrix number iFrg
 ! The new labels consist of element + sequential number
+! Note: it's less convenient to have C1, C2, ..., N1, N2, because we need the atom numbers
+! when defining rotations
 
       USE ZMVAR
 
@@ -1108,9 +1175,9 @@
       CHARACTER*(20) LastNumberSoFarStr
 
       DO iAtomNr = 1, natoms(iFrg)
-        LastNumberSoFarStr = Integer2String(izmoid(iAtomNr,iFrg))
-        OriginalLabel(iAtomNr,iFrg) = asym(iAtomNr,iFrg)(1:LEN_TRIM(asym(iAtomNr,iFrg)))// &
-                                      LastNumberSoFarStr(1:LEN_TRIM(LastNumberSoFarStr))
+        LastNumberSoFarStr = Integer2String(izmoid(iAtomNr, iFrg))
+        OriginalLabel(iAtomNr, iFrg) = ElSym(iAtomNr, iFrg)(1:LEN_TRIM(ElSym(iAtomNr, iFrg)))// &
+                                       LastNumberSoFarStr(1:LEN_TRIM(LastNumberSoFarStr))
       ENDDO
       CALL zmDoAdmin(iFrg)
 
@@ -1163,28 +1230,28 @@
         DO iAtomNr = 1, natoms(iFrg)-1
 ! Compare entry to next
 ! Never swap if same
-          IF ((zmElementCSD(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. zmElementCSD(izmbid(iAtomNr+1,iFrg),iFrg))) THEN
+          IF ((zmElementCSD(izmbid(iAtomNr  , iFrg), iFrg) .EQ. zmElementCSD(izmbid(iAtomNr+1, iFrg), iFrg))) THEN
             ShouldBeSwapped = .FALSE.
 ! Otherwise, never swap if first is Carbon or second is Hydrogen
-          ELSE IF ((zmElementCSD(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. 1) .OR. (zmElementCSD(izmbid(iAtomNr+1,iFrg),iFrg) .EQ. 2)) THEN
+          ELSE IF ((zmElementCSD(izmbid(iAtomNr  , iFrg), iFrg) .EQ. 1) .OR. (zmElementCSD(izmbid(iAtomNr+1, iFrg), iFrg) .EQ. 2)) THEN
             ShouldBeSwapped = .FALSE.
 ! Otherwise, always swap if second is Carbon or first is Hydrogen
-          ELSE IF ((zmElementCSD(izmbid(iAtomNr+1,iFrg),iFrg) .EQ. 1) .OR. (zmElementCSD(izmbid(iAtomNr  ,iFrg),iFrg) .EQ. 2)) THEN
+          ELSE IF ((zmElementCSD(izmbid(iAtomNr+1, iFrg), iFrg) .EQ. 1) .OR. (zmElementCSD(izmbid(iAtomNr  , iFrg), iFrg) .EQ. 2)) THEN
             ShouldBeSwapped = .TRUE.
 ! Otherwise, swap if first > second
           ELSE
-            ShouldBeSwapped = ((asym(izmbid(iAtomNr  ,iFrg),iFrg) .GT. asym(izmbid(iAtomNr+1,iFrg),iFrg)))
+            ShouldBeSwapped = ((ElSym(izmbid(iAtomNr  , iFrg), iFrg) .GT. ElSym(izmbid(iAtomNr+1, iFrg), iFrg)))
           ENDIF
           IF (ShouldBeSwapped) THEN
-            iTem                   = izmbid(iAtomNr  ,iFrg)
-            izmbid(iAtomNr  ,iFrg) = izmbid(iAtomNr+1,iFrg)
-            izmbid(iAtomNr+1,iFrg) = iTem
+            iTem                   = izmbid(iAtomNr  , iFrg)
+            izmbid(iAtomNr  , iFrg) = izmbid(iAtomNr+1, iFrg)
+            izmbid(iAtomNr+1, iFrg) = iTem
             Swaps = .TRUE.
           ENDIF
         ENDDO
       ENDDO
       DO iAtomNr = 1, natoms(iFrg)
-        izmoid(izmbid(iAtomNr,iFrg),iFrg) = iAtomNr ! the backward mapping
+        izmoid(izmbid(iAtomNr, iFrg), iFrg) = iAtomNr ! the backward mapping
       ENDDO
 
       END SUBROUTINE zmReOrder
@@ -1270,10 +1337,10 @@
 ! Remaining lines contain the Z-matrix
 !  C      1.5152617  0  113.2370014  0 -179.8250018  0   54   51   48  3.0  1.0   58 C6 C7 C8 C9
       DO i = 1, natoms(iFrg)
-        WRITE (tFileHandle,'(2X,A3,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5)',ERR=999)  Asym(i,iFrg), &
-              blen(i,iFrg), ioptb(i,iFrg), alph(i,iFrg), iopta(i,iFrg), bet(i,iFrg), ioptt(i,iFrg), &
-              iz1(i,iFrg), iz2(i,iFrg), iz3(i,iFrg),   &
-              tiso(i,iFrg), occ(i,iFrg), izmoid(i,iFrg), OriginalLabel(i,iFrg)
+        WRITE (tFileHandle,'(2X,A2,X,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5)',ERR=999) ElSym(i, iFrg), &
+              blen(i, iFrg), ioptb(i, iFrg), alph(i, iFrg), iopta(i, iFrg), bet(i, iFrg), ioptt(i, iFrg), &
+              iz1(i, iFrg), iz2(i, iFrg), iz3(i, iFrg),   &
+              tiso(i, iFrg), occ(i, iFrg), izmoid(i, iFrg), OriginalLabel(i, iFrg)
       ENDDO
       CLOSE(tFileHandle,ERR=999)
       zmSave = 0 ! Success
@@ -1302,7 +1369,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Ungrey 'Load DASH Pawley file' button on toolbar
-              CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOn)
+              CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOn)
               CALL WizardWindowShow(IDD_SAW_Page1)
             CASE (IDNEXT)
               CALL SA_Parameter_Set
@@ -1358,14 +1425,14 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
       DO I = 1, NVAR
-        CALL WGridGetCellReal(IDF_parameter_grid_modal,1,I,prevx(I))
-        CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,4,I,iCheck)
+        CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, prevx(I))
+        CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 4, I, iCheck)
         IF (iCheck .EQ. UnChecked) THEN
-          CALL WGridGetCellReal(IDF_parameter_grid_modal,2,I,prevlb(I))
-          CALL WGridGetCellReal(IDF_parameter_grid_modal,3,I,prevub(I))
+          CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, I, prevlb(I))
+          CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, I, prevub(I))
         ENDIF
 ! Disable modal button for everything but torsion angles
-        IF (kzmpar2(i) .NE. 3) CALL WGridStateCell(IDF_parameter_grid_modal,5,i,DialogReadOnly)
+        IF (kzmpar2(i) .NE. 3) CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
       ENDDO
       LimsChanged = .FALSE.
       KK = 0
@@ -1486,7 +1553,7 @@
               DO iFrg = 1, nFrag
                 DO i = 1, izmpar(iFrg)
                   kk = kk + 1
-                  parlabel(kk) = czmpar(i,iFrg)
+                  parlabel(kk) = czmpar(i, iFrg)
                 ENDDO
               ENDDO
               ! Note that we do not update "Preferred orientation"
@@ -1630,7 +1697,7 @@
             CASE (IDF_PrintSA)
               IF (WriteSAParametersToFile('SA_PARAMS.TXT') .EQ. 0) THEN
                 CALL WindowOpenChild(IHANDLE)
-                CALL WEditFile('SA_PARAMS.TXT',Modeless,0,FileMustExist,4)
+                CALL WEditFile('SA_PARAMS.TXT', Modeless, 0, FileMustExist, 4)
 ! Note that the implementation of this editor child window is different from those used for
 ! the Z-matrix and the DICVOL results. This editor window is not 'ViewOnly', which has three consequences:
 ! 1. The file can be edited. The user can add a titel, for instance.

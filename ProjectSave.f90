@@ -597,9 +597,9 @@
             CALL FileReadReal(hPrjFile, iPrjRecNr, alph(iAtomNr,iFrg))
             CALL FileReadReal(hPrjFile, iPrjRecNr, bet(iAtomNr,iFrg))
           ENDIF
-          CALL FileRWString (hPrjFile, iPrjRecNr, RW, asym(iAtomNr,iFrg))
+          CALL FileRWString (hPrjFile, iPrjRecNr, RW, ElSym(iAtomNr,iFrg))
           IF (RW .EQ. cRead) THEN
-            zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+            zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(ElSym(iAtomNr,iFrg))
           ENDIF
           CALL FileRWString (hPrjFile, iPrjRecNr, RW, OriginalLabel(iAtomNr,iFrg))
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, tiso(iAtomNr,iFrg))
@@ -624,9 +624,9 @@
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(1,iFrg))
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(2,iFrg))
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(3,iFrg))
-          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(1,iFrg))
-          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(2,iFrg))
-          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtms(3,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxPlnAtm(1,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxPlnAtm(2,iFrg))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxPlnAtm(3,iFrg))
           IF (RW .EQ. cWrite) THEN
             CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(0,iFrg))
             CALL FileWriteReal(hPrjFile, iPrjRecNr, zmSingleRotationQs(1,iFrg))

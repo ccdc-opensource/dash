@@ -68,6 +68,9 @@
 !*****************************************************************************
 !
       SUBROUTINE LatticeCellParameters2Lattice_2(a, b, c, tAlpha, tBeta, tGamma, TheLattice)
+
+! Same as FRAC2PDB()
+
 !
 ! To be used when writing out mol2 files only
 !
@@ -238,6 +241,93 @@
       ResultVector(3) = Vector1(1) * Vector2(2) - Vector1(2) * Vector2(1)
 
       END SUBROUTINE VectorCrossProduct
+!
+!*****************************************************************************
+!
+      SUBROUTINE Vector2Quaternion(Vector, Q)
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Vector(1:3)
+      REAL, INTENT (  OUT) :: Q(0:3)
+
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+
+      REAL tVector(1:3)
+      REAL Length, Alpha, Beta
+      INTEGER iAxis
+
+      tVector = Vector  ! to resolve call by value / call by reference conflict
+      ! Normalise the axis
+      Length = SQRT(tVector(1)**2 + tVector(2)**2 + tVector(3)**2)
+      DO iAxis = 1, 3
+        tVector(iAxis) = tVector(iAxis) / Length
+        IF (tVector(iAxis) .GT.  0.99999) tVector(iAxis) =  0.99999
+        IF (tVector(iAxis) .LT. -0.99999) tVector(iAxis) = -0.99999
+      ENDDO
+! Calculate the orientation of the axis
+! Note: Alpha and Beta in radians
+      Beta  = ACOS(tVector(3))
+      IF (ABS(tVector(3)) .GT. 0.99998) THEN
+! The axis coincides with the z-axis, so alpha becomes undefined: set alpha to 0.0
+        Alpha = 0.0
+! I turns out that we can get problems with rounding errors here
+      ELSE IF ((-tVector(2)/SIN(Beta)) .GT.  0.99999) THEN
+        Alpha = 0.0
+      ELSE IF ((-tVector(2)/SIN(Beta)) .LT. -0.99999) THEN
+        Alpha = PI
+      ELSE
+        Alpha = ACOS(-tVector(2)/SIN(Beta))
+        IF ((ASIN((tVector(1)))/SIN(Beta)) .LT. 0.0) Alpha = TWOPI - Alpha
+      ENDIF
+! It's an axis, so Gamma can be set to 0.0
+      Q(0) = COS(0.5*Beta) * COS(0.5*Alpha)
+      Q(1) = SIN(0.5*Beta) * COS(0.5*Alpha)
+      Q(2) = SIN(0.5*Beta) * SIN(0.5*Alpha)
+      Q(3) = COS(0.5*Beta) * SIN(0.5*Alpha)
+
+      END SUBROUTINE Vector2Quaternion
+!
+!*****************************************************************************
+!
+      SUBROUTINE PremultiplyVectorByMatrix(Matrix, Vector, Ret)
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Matrix(1:3, 1:3)
+      REAL, INTENT (IN   ) :: Vector(1:3)
+      REAL, INTENT (  OUT) :: Ret(1:3)
+
+      Ret(1) = Matrix(1,1)*Vector(1) + Matrix(1,2)*Vector(2) + Matrix(1,3)*Vector(3)
+      Ret(2) = Matrix(2,1)*Vector(1) + Matrix(2,2)*Vector(2) + Matrix(2,3)*Vector(3)
+      Ret(3) = Matrix(3,1)*Vector(1) + Matrix(3,2)*Vector(2) + Matrix(3,3)*Vector(3)
+
+      END SUBROUTINE PremultiplyVectorByMatrix
+!
+!*****************************************************************************
+!
+      SUBROUTINE QuaternionMultiply(Q1, Q2, Ret)
+
+! quaternion A times quaternion B:
+!
+! {A0*1 + A1*i + A2*j + A3*k} * {B0*1 + B1*i + B2*j + B3*k} =
+!   (A0*B0 - A1*B1 - A2*B2 - A3*B3)*1 +
+!   (A0*B1 + A1*B0 + A2*B3 - A3*B2)*i +
+!   (A0*B2 - A1*B3 + A2*B0 + A3*B1)*j +
+!   (A0*B3 + A1*B2 - A2*B1 + A3*B0)*k
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Q1(0:3), Q2(0:3)
+      REAL, INTENT (  OUT) :: Ret(0:3)
+
+      Ret(0) = Q1(0)*Q2(0) - Q1(1)*Q2(1) - Q1(2)*Q2(2) - Q1(3)*Q2(3)
+      Ret(1) = Q1(0)*Q2(1) + Q1(1)*Q2(0) + Q1(2)*Q2(3) - Q1(3)*Q2(2)
+      Ret(2) = Q1(0)*Q2(2) - Q1(1)*Q2(3) + Q1(2)*Q2(0) + Q1(3)*Q2(1)
+      Ret(3) = Q1(0)*Q2(3) + Q1(1)*Q2(2) - Q1(2)*Q2(1) + Q1(3)*Q2(0)
+
+      END SUBROUTINE QuaternionMultiply
 !
 !*****************************************************************************
 !

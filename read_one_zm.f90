@@ -33,7 +33,7 @@
       INTEGER I, J, NumCol
       INTEGER nlin, natof
       INTEGER AsymLen, IDlen
-      CHARACTER*3 tIDstr
+      CHARACTER*3 tIDstr, tStr3
 
 ! JCC Initialise return value to successful (zero)
 ! If the return value is non-zero, then an error occurred. The return status corresponds
@@ -63,11 +63,11 @@
 !  C      1.5152617  0  113.2370014  0 -179.8250018  0   54   51   48  3.0  1.0   58 C6 C7 C8 C9
         READ (19,1900,ERR=999,IOSTAT=ErrorStatus) nlin, line
 ! JCC Added in traps on internal read
-        READ (line(3:5),'(A3)',ERR=999,IOSTAT=ErrorStatus) asym(i,iFrg)
-        CALL StrClean(Asym,AsymLen)
-        Asym(i,iFrg)(1:1) = ChrUpperCase(Asym(i,iFrg)(1:1))
-        Asym(i,iFrg)(2:2) = ChrLowerCase(Asym(i,iFrg)(2:2))
-        zmElementCSD(i,iFrg) = ElmSymbol2CSD(asym(i,iFrg)(1:2))
+        READ (line(3:5),'(A3)',ERR=999,IOSTAT=ErrorStatus) tStr3
+        CALL StrClean(tStr3,AsymLen)
+        ElSym(i, iFrg)(1:1) = ChrUpperCase(tStr3(1:1))
+        ElSym(i, iFrg)(2:2) = ChrLowerCase(tStr3(2:2))
+        zmElementCSD(i, iFrg) = ElmSymbol2CSD(ElSym(i, iFrg))
 ! First item--the element--has been read. Rest more tricky.
 ! First, convert tabs to spaces and remove redundant spaces
         CALL StrClean(line,nlin)
@@ -79,16 +79,16 @@
           ErrorStatus = 99
           GOTO 999
         ENDIF
-        READ (line(1:nlin),*,ERR=999,IOSTAT=ErrorStatus) blen(i,iFrg),&
-              ioptb(i,iFrg), alph(i,iFrg), iopta(i,iFrg), bet(i,iFrg),&
-              ioptt(i,iFrg), iz1(i,iFrg), iz2(i,iFrg), iz3(i,iFrg),   &
-              tiso(i,iFrg), occ(i,iFrg)
+        READ (line(1:nlin),*,ERR=999,IOSTAT=ErrorStatus) blen(i, iFrg),&
+              ioptb(i, iFrg), alph(i, iFrg), iopta(i, iFrg), bet(i, iFrg),&
+              ioptt(i, iFrg), iz1(i, iFrg), iz2(i, iFrg), iz3(i, iFrg),   &
+              tiso(i, iFrg), occ(i, iFrg)
 ! Adjust torsion angle to be between -180.0 and +180.0
-        DO WHILE (bet(i,iFrg) .LT. -180.0)
-          bet(i,iFrg) = bet(i,iFrg) + 360.0
+        DO WHILE (bet(i, iFrg) .LT. -180.0)
+          bet(i, iFrg) = bet(i, iFrg) + 360.0
         ENDDO
-        DO WHILE (bet(i,iFrg) .GT.  180.0)
-          bet(i,iFrg) = bet(i,iFrg) - 360.0
+        DO WHILE (bet(i, iFrg) .GT.  180.0)
+          bet(i, iFrg) = bet(i, iFrg) - 360.0
         ENDDO
 ! Remove what we have just read from the string
         DO J = 1, 11
@@ -98,9 +98,9 @@
 ! How many columns do we have left?
         NumCol = GetNumOfColumns(Line)
         IF (NumCol .EQ. 0) THEN
-          izmoid(i,iFrg) = i
+          izmoid(i, iFrg) = i
         ELSE
-          READ (line(1:nlin),*,IOSTAT=ErrorStatus) izmoid(i,iFrg)
+          READ (line(1:nlin),*,IOSTAT=ErrorStatus) izmoid(i, iFrg)
         ENDIF
         IF (NumCol .GE. 2) THEN
           CALL GetSubString(Line,' ',tSubString) ! That should be the original atom number
@@ -108,34 +108,45 @@
                                                  ! the original atom label
         ELSE
 ! Emulate original atom labels by adding original atom number to element, e.g. 'C4'
-          WRITE(tIDstr,'(I3)') izmoid(i,iFrg)
+          WRITE(tIDstr,'(I3)') izmoid(i, iFrg)
           CALL StrClean(tIDstr,IDlen)
-          tSubString = ElementStr(zmElementCSD(i,iFrg))
+          tSubString = ElementStr(zmElementCSD(i, iFrg))
           tSubString = tSubString(1:LEN_TRIM(tSubString))//tIDstr
         ENDIF
-        OriginalLabel(i,iFrg) = tSubString(1:5)
-        izmbid(izmoid(i,iFrg),iFrg) = i   ! the backward mapping from atoms in the Z-matrix
+        OriginalLabel(i, iFrg) = tSubString(1:5)
+        izmbid(izmoid(i, iFrg), iFrg) = i   ! the backward mapping from atoms in the Z-matrix
       ENDDO
       CLOSE (19)
 ! Initialise all the stuff that isn't present in a .zmatrix file
       UseQuaternions(iFrg) = .TRUE.
-      zmInitialQs(0,iFrg) = 1.0
-      zmInitialQs(1,iFrg) = 0.0
-      zmInitialQs(2,iFrg) = 0.0
-      zmInitialQs(3,iFrg) = 0.0
-      zmSingleRotAxDef(iFrg) = 2  ! 2 = fractional co-ordinates
-      zmSingleRotAxAtm(1,iFrg) = 1
-      zmSingleRotAxAtm(2,iFrg) = 1
-      zmSingleRotAxFrac(1,iFrg) = 0.0
-      zmSingleRotAxFrac(2,iFrg) = 0.0
-      zmSingleRotAxFrac(3,iFrg) = 1.0
-      zmSingleRotAxAtms(1,iFrg) = 1
-      zmSingleRotAxAtms(2,iFrg) = 2
-      zmSingleRotAxAtms(3,iFrg) = 3
-      zmSingleRotationQs(0,iFrg) = 1.0
-      zmSingleRotationQs(1,iFrg) = 0.0
-      zmSingleRotationQs(2,iFrg) = 0.0
-      zmSingleRotationQs(3,iFrg) = 0.0
+      zmInitialQs(0, iFrg) = 1.0
+      zmInitialQs(1, iFrg) = 0.0
+      zmInitialQs(2, iFrg) = 0.0
+      zmInitialQs(3, iFrg) = 0.0
+      zmSingleRAIniOrDef(iFrg) = 3 ! Quaternions
+      zmSingleRAIniOrFrac(1, iFrg) = 0.0 ! Fractional co-ords of axis to align with
+      zmSingleRAIniOrFrac(2, iFrg) = 0.0 ! Fractional co-ords of axis to align with
+      zmSingleRAIniOrFrac(3, iFrg) = 1.0 ! Fractional co-ords of axis to align with
+      zmSingleRAIniOrEuler(1, iFrg) = 0.0 ! The Euler angles
+      zmSingleRAIniOrEuler(2, iFrg) = 0.0 ! The Euler angles
+      zmSingleRAIniOrEuler(3, iFrg) = 0.0 ! The Euler angles
+      zmSingleRAIniOrQuater(0, iFrg) = 1.0 ! The quaternions
+      zmSingleRAIniOrQuater(1, iFrg) = 0.0 ! The quaternions
+      zmSingleRAIniOrQuater(2, iFrg) = 0.0 ! The quaternions
+      zmSingleRAIniOrQuater(3, iFrg) = 0.0 ! The quaternions
+      zmSingleRotAxDef(iFrg) = 2  ! 2 = Fractional co-ordinates
+      zmSingleRotAxAtm(1, iFrg) = 1
+      zmSingleRotAxAtm(2, iFrg) = 1
+      zmSingleRotAxFrac(1, iFrg) = 0.0
+      zmSingleRotAxFrac(2, iFrg) = 0.0
+      zmSingleRotAxFrac(3, iFrg) = 1.0
+      zmSingleRotAxPlnAtm(1, iFrg) = 1
+      zmSingleRotAxPlnAtm(2, iFrg) = 2
+      zmSingleRotAxPlnAtm(3, iFrg) = 3
+      zmSingleRotationQs(0, iFrg) = 1.0
+      zmSingleRotationQs(1, iFrg) = 0.0
+      zmSingleRotationQs(2, iFrg) = 0.0
+      zmSingleRotationQs(3, iFrg) = 0.0
       CALL zmDoAdmin(iFrg)
 ! Now precalculate the bonds
       CALL zmGenerateBonds(iFrg)
@@ -164,12 +175,12 @@
 ! kzmpar = type of parameter (1 = translation, 2 = rotation)
 ! xzmpar = initial value of parameter
 ! czmpar = Character string associated with this parameter value
-      czmpar(1,iFrg) = ' x(frag )'
-      czmpar(2,iFrg) = ' y(frag )'
-      czmpar(3,iFrg) = ' z(frag )'
+      czmpar(1, iFrg) = ' x(frag )'
+      czmpar(2, iFrg) = ' y(frag )'
+      czmpar(3, iFrg) = ' z(frag )'
       DO ii = 1, 3
-        kzmpar(ii,iFrg) = 1 ! Translation
-        xzmpar(ii,iFrg) = 0.5
+        kzmpar(ii, iFrg) = 1 ! Translation
+        xzmpar(ii, iFrg) = 0.5
       ENDDO
       IF (natoms(iFrg) .EQ. 1) THEN
 ! Single atom: no rotations
@@ -177,64 +188,64 @@
       ELSE IF (UseQuaternions(iFrg)) THEN
 ! Molecule with quaternions
         izmpar(iFrg) = 7
-        czmpar(4,iFrg) = 'Q0(frag )'
-        czmpar(5,iFrg) = 'Q1(frag )'
-        czmpar(6,iFrg) = 'Q2(frag )'
-        czmpar(7,iFrg) = 'Q3(frag )'
+        czmpar(4, iFrg) = 'Q0(frag )'
+        czmpar(5, iFrg) = 'Q1(frag )'
+        czmpar(6, iFrg) = 'Q2(frag )'
+        czmpar(7, iFrg) = 'Q3(frag )'
         DO ii = 4, 7
-          kzmpar(ii,iFrg) = 2 ! Quaternion
-          xzmpar(ii,iFrg) = 0.5
+          kzmpar(ii, iFrg) = 2 ! Quaternion
+          xzmpar(ii, iFrg) = 0.5
         ENDDO
       ELSE
 ! Molecule with rotation restricted to a single axis
         izmpar(iFrg) = 5
-        czmpar(4,iFrg) = 'Q0(frag )'
-        czmpar(5,iFrg) = 'Q1(frag )'
+        czmpar(4, iFrg) = 'Q0(frag )'
+        czmpar(5, iFrg) = 'Q1(frag )'
         DO ii = 4, 5
-          kzmpar(ii,iFrg) = 6 ! Single axis
-          xzmpar(ii,iFrg) = SQRT(0.5)
+          kzmpar(ii, iFrg) = 6 ! Single axis
+          xzmpar(ii, iFrg) = SQRT(0.5)
         ENDDO
       ENDIF
       DO ii = 1, izmpar(iFrg)
-        WRITE (czmpar(ii,iFrg)(8:8),'(I1)') iFrg
+        WRITE (czmpar(ii, iFrg)(8:8),'(I1)') iFrg
       ENDDO
       DO i = 1, natoms(iFrg)
 ! IOPTB = 1 OPTIMISE BOND
-        IF (ioptb(i,iFrg).EQ.1) THEN
+        IF (ioptb(i, iFrg).EQ.1) THEN
           izmpar(iFrg) = izmpar(iFrg) + 1
           izm = izmpar(iFrg)
-          kzmpar(izm,iFrg) = 5
-          czmpar(izm,iFrg) = '('//OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
-                                  OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))// &
+          kzmpar(izm, iFrg) = 5
+          czmpar(izm, iFrg) = '('//OriginalLabel(i, iFrg)(1:LEN_TRIM(OriginalLabel(i, iFrg)))//':'// &
+                                  OriginalLabel(iz1(i, iFrg), iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i, iFrg), iFrg)))// &
                              ') bond'
-          xzmpar(izm,iFrg) = blen(i,iFrg)
+          xzmpar(izm, iFrg) = blen(i, iFrg)
         ENDIF
 ! IOPTA = 1 OPTIMISE ANGLE
-        IF (iopta(i,iFrg).EQ.1) THEN
+        IF (iopta(i, iFrg).EQ.1) THEN
           izmpar(iFrg) = izmpar(iFrg) + 1
           izm = izmpar(iFrg)
-          kzmpar(izm,iFrg) = 4
-          czmpar(izm,iFrg) = '('//OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
-                                  OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
-                                  OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg)))// &
+          kzmpar(izm, iFrg) = 4
+          czmpar(izm, iFrg) = '('//OriginalLabel(i, iFrg)(1:LEN_TRIM(OriginalLabel(i, iFrg)))//':'// &
+                                  OriginalLabel(iz1(i, iFrg), iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i, iFrg), iFrg)))//':'// &
+                                  OriginalLabel(iz2(i, iFrg), iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i, iFrg), iFrg)))// &
                              ') angle'
-          xzmpar(izm,iFrg) = alph(i,iFrg)
+          xzmpar(izm, iFrg) = alph(i, iFrg)
         ENDIF
 ! IOPTT = 1 OPTIMISE TORSION
-        IF (ioptt(i,iFrg).EQ.1) THEN
+        IF (ioptt(i, iFrg).EQ.1) THEN
 ! Boundary check on number of degrees of freedom
           IF (izmpar(iFrg) .EQ. MaxDOF) THEN
-            ioptt(i,iFrg) = 0
+            ioptt(i, iFrg) = 0
           ELSE
             izmpar(iFrg) = izmpar(iFrg) + 1
             izm = izmpar(iFrg)
-            kzmpar(izm,iFrg) = 3
-            czmpar(izm,iFrg) = '('//OriginalLabel(i,iFrg)(1:LEN_TRIM(OriginalLabel(i,iFrg)))//':'// &
-                                    OriginalLabel(iz1(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i,iFrg),iFrg)))//':'// &
-                                    OriginalLabel(iz2(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i,iFrg),iFrg)))//':'// &
-                                    OriginalLabel(iz3(i,iFrg),iFrg)(1:LEN_TRIM(OriginalLabel(iz3(i,iFrg),iFrg)))// &
+            kzmpar(izm, iFrg) = 3
+            czmpar(izm, iFrg) = '('//OriginalLabel(i, iFrg)(1:LEN_TRIM(OriginalLabel(i, iFrg)))//':'// &
+                                    OriginalLabel(iz1(i, iFrg), iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i, iFrg), iFrg)))//':'// &
+                                    OriginalLabel(iz2(i, iFrg), iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i, iFrg), iFrg)))//':'// &
+                                    OriginalLabel(iz3(i, iFrg), iFrg)(1:LEN_TRIM(OriginalLabel(iz3(i, iFrg), iFrg)))// &
                                ') torsion'
-            xzmpar(izm,iFrg) = bet(i,iFrg)
+            xzmpar(izm, iFrg) = bet(i, iFrg)
           ENDIF
         ENDIF
       ENDDO
@@ -255,9 +266,9 @@
       INTEGER I, BondNr
 
       natcry = NATOMS(iFrg)
-      CALL makexyz(natcry,BLEN(1,iFrg),ALPH(1,iFrg),BET(1,iFrg),IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),axyzo)
+      CALL makexyz(natcry,BLEN(1, iFrg),ALPH(1, iFrg),BET(1, iFrg),IZ1(1, iFrg),IZ2(1, iFrg),IZ3(1, iFrg),axyzo)
       DO I = 1, natcry
-        aelem(I) = zmElementCSD(I,iFrg)
+        aelem(I) = zmElementCSD(I, iFrg)
       ENDDO
 ! Calculate bonds and assign bond types.
       CALL SAMABO
@@ -274,9 +285,9 @@
 !                               9 = pi-bond
       NumberOfBonds(iFrg) = nbocry
       DO BondNr = 1, nbocry
-        BondType(BondNr,iFrg) = btype(BondNr)
-        Bonds(1,BondNr,iFrg)  = bond(BondNr,1)
-        Bonds(2,BondNr,iFrg)  = bond(BondNr,2)
+        BondType(BondNr, iFrg) = btype(BondNr)
+        Bonds(1,BondNr, iFrg)  = bond(BondNr,1)
+        Bonds(2,BondNr, iFrg)  = bond(BondNr,2)
       ENDDO
 
       END SUBROUTINE zmGenerateBonds

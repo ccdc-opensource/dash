@@ -1,4 +1,4 @@
-! Winteracter module created : 29/Oct/2003 10:53:29
+! Winteracter module created : 30/Oct/2003 13:55:28
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -433,8 +433,6 @@
           INTEGER, PARAMETER :: IDD_Parameter_Status_2          =   156
           INTEGER, PARAMETER :: IDD_DIALOG004                   =   158
           INTEGER, PARAMETER :: IDD_SAW_Page1                   =   159
-          INTEGER, PARAMETER :: IDB_Down1                       =  1299
-          INTEGER, PARAMETER :: IDB_Up2                         =  1307
           INTEGER, PARAMETER :: IDF_LABEL10                     =  1465
           INTEGER, PARAMETER :: IDB_zmEdit1                     =  1305
           INTEGER, PARAMETER :: IDB_zmEdit2                     =  1306
@@ -681,16 +679,6 @@
           INTEGER, PARAMETER :: IDF_FWHM_Grid                   =  1396
           INTEGER, PARAMETER :: IDB_SaveSol                     =  1406
           INTEGER, PARAMETER :: IDB_LoadSol                     =  1535
-          INTEGER, PARAMETER :: IDB_Down2                       =  1300
-          INTEGER, PARAMETER :: IDB_Up1                         =  1536
-          INTEGER, PARAMETER :: IDB_Down3                       =  1303
-          INTEGER, PARAMETER :: IDB_Up3                         =  1537
-          INTEGER, PARAMETER :: IDB_Down4                       =  1313
-          INTEGER, PARAMETER :: IDB_Up4                         =  1538
-          INTEGER, PARAMETER :: IDB_Down5                       =  1315
-          INTEGER, PARAMETER :: IDB_Up5                         =  1539
-          INTEGER, PARAMETER :: IDB_Down6                       =  1317
-          INTEGER, PARAMETER :: IDB_Up6                         =  1540
           INTEGER, PARAMETER :: IDF_MENU1                       =  1546
           INTEGER, PARAMETER :: IDB_Restart                     =  1547
           INTEGER, PARAMETER :: IDF_PW_Option6                  =  1549
@@ -711,7 +699,7 @@
           INTEGER, PARAMETER :: IDB_FindPeaks                   =  1155
           INTEGER, PARAMETER :: IDF_IniOrAxis                   =  1156
           INTEGER, PARAMETER :: IDF_IniOrEuler                  =  1157
-          INTEGER, PARAMETER :: IDF_IniOrQuater                 =  1380
+          INTEGER, PARAMETER :: IDF_IniOrQuater                 =  1298
           INTEGER, PARAMETER :: IDF_AtomNr1                     =  1548
           INTEGER, PARAMETER :: IDB_ViewRot                     =  1488
           INTEGER, PARAMETER :: IDF_a2                          =  1147
