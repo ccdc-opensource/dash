@@ -1634,6 +1634,8 @@
       DOUBLE PRECISION TempDouble
       REAL TempPrevub, TempPrevlb, TempPrevx
       REAL Xinitial
+      LOGICAL OutOfBounds
+     LOGICAL, EXTERNAL :: Confirm
           
       ICol = 0
       NumColumns = 3
@@ -1725,6 +1727,7 @@
       CALL PushActiveWindowID
 
       DO
+10    CONTINUE
       CALL GetEvent
       SELECT CASE (EventType) 
         CASE (FieldChanged)
@@ -1770,9 +1773,10 @@
                xtem = MIN(SNGL(ub(IFrow)),xtem)
                TempPrevlb = LB(IFRow)               
                lb(IFRow) = DBLE(xtem)
-               xtem = MAX(lb(IFrow),x(IFrow))
-               X(IFrow) = DBLE(xtem)
-               CALL WDialogPutReal(IDF_Initial,SNGL(x(IFrow)),'(F12.5)')
+
+!               xtem = MAX(lb(IFrow),x(IFrow))
+!               X(IFrow) = DBLE(xtem)
+!               CALL WDialogPutReal(IDF_Initial,SNGL(x(IFrow)),'(F12.5)')
                CALL WDialogPutReal(IDF_ModalLower,SNGL(lb(IFrow)),'(F12.5)')
 
                CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
@@ -1816,9 +1820,10 @@
               TempPrevUb = UB(IFRow)             
               ub(IFrow) = DBLE(xtem)
               CALL WDialogPutReal(IDF_ModalUpper,SNGL(ub(IFrow)),'(F12.5)')
-              xtem = MIN(ub(IFrow),x(IFrow))
-              X(IFrow) = DBLE(xtem)
-              CALL WDialogPutReal(IDF_Initial,SNGL(x(IFrow)),'(F12.5)')           
+
+!              xtem = MIN(ub(IFrow),x(IFrow))
+!              X(IFrow) = DBLE(xtem)
+!              CALL WDialogPutReal(IDF_Initial,SNGL(x(IFrow)),'(F12.5)')           
               CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
                  SELECT CASE (ISET)
                    CASE (1)
@@ -1854,12 +1859,22 @@
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK)
+
               CALL WDialogGetDouble(IDF_Initial, tempdouble)
               X(IFRow) = tempdouble
               CALL WDialogGetDouble(IDF_ModalLower, tempdouble)
               lb(IFRow) = tempdouble                                                                               
               CALL WDialogGetDouble(IDF_ModalUpper, tempdouble)
               ub(IFRow) = tempdouble
+!             Check that x is in bounds
+              CALL CheckXInBounds(IFRow, X(IFRow), OutOfBounds)
+              IF(OutofBounds) THEN
+               CALL WMessageBox(OKOnly, ExclamationIcon, CommonOk, &
+                 'Initial value does not fall within defined ranges', 'Warning')
+                 IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOk) THEN
+                 GOTO 10
+               ENDIF 
+              ENDIF
 
             CASE (IDCANCEL)
               ub(IFRow) = tempprevub
@@ -1871,13 +1886,16 @@
               X(IFRow) = tempprevx
               ModalFlag(IFRow) = 1                                   
           END SELECT
+          CALL PopActiveWindowID 
           CALL WDialogHide()
           CALL WDialogSelect(IDD_SA_Modal_Input2)
           CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5, IFRow, UnChecked)          
-          RETURN               
+         
+          RETURN 
+             
       END SELECT
       ENDDO
-      CALL PopActiveWindowID
+
       END SUBROUTINE DealWithBimodalDialog
 
 !
@@ -2005,4 +2023,106 @@
 !
 !*****************************************************************************
 !
-    
+
+      SUBROUTINE CheckXInBounds(npar, XIn, OutofBounds)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INCLUDE 'PARAMS.INC'
+
+      DOUBLE PRECISION x,lb,ub,vm
+      COMMON /values/ x(mvar),lb(mvar),ub(mvar),vm(mvar)
+
+      INTEGER                ModalFlag
+      COMMON /ModalTorsions/ ModalFlag(mvar)
+      SAVE   /ModalTorsions/    
+
+      REAL, DIMENSION (3,2) :: TempBounds
+      COMMON /TriModalBounds/  TempBounds 
+           
+      INTEGER npar, I, Upper, Lower
+
+      LOGICAL OneEightyScale
+      LOGICAL OutOfBounds
+      REAL xtem, tempupper, templower, tempupper2, templower2
+      DOUBLE PRECISION, INTENT (INOUT) :: XIn
+
+      Upper = 1
+      Lower = 2
+
+      OutOfBounds = .FALSE.
+      SELECT  CASE(ModalFlag(npar))
+        CASE (2) ! bimodal ranges
+          IF (UB(npar) * LB(npar) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
+            TempUpper = SNGL(UB(npar))         ! so use 0-360 degree scale
+            TempLower = SNGL(LB(npar))
+            TempLower2 = TempUpper - 180.00
+            TempUpper2 = TempLower + 180.00
+            CALL OneEightyToThreeSixty(TempUpper)
+            CALL OneEightyToThreeSixty(TempLower)
+            CALL OneEightyToThreeSixty(TempUpper2)
+            CALL OneEightyToThreeSixty(TempLower2)
+            xtem = XIn                                                                                     
+            IF ((xtem .LT. -180.00) .OR. (xtem .GT. 180.00)) THEN
+              OutOfBounds = .TRUE.
+            ELSE
+              CALL OneEightytoThreeSixty(xtem)
+              IF (((xtem .LT. MAX(TempLower, TempLower2)) .AND. (xtem .GT. MIN(TempLower, TempLower2))) &
+              .OR. ((xtem .LT. MAX(TempUpper, TempUpper2)) .AND. (xtem .GT. MIN(TempUpper, TempUpper2)))) THEN
+                OutOfBounds = .TRUE.                                       
+              ENDIF
+            ENDIF
+
+          ELSEIF (UB(npar) * LB(npar) .GT. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
+              IF ((XIn .LT. -180.00) .OR. (XIn .GT. 180.00)) THEN
+                OutOfBounds = .TRUE.     
+              ELSE
+                IF ((XIn .LT. LB(npar)) .OR. (XIn .GT. UB(npar))) THEN
+                  IF (((XIn .LT. (-1)*UB(npar)) .OR. (XIn .GT. (-1)*LB(npar)))) THEN !out of bounds            
+                    OutOfBounds = .TRUE.
+                  ENDIF
+                ENDIF
+              ENDIF
+          ENDIF
+
+        CASE(3) !trimodal ranges
+          xtem = XIn
+          CALL DetermineTriModalBounds(SNGL(UB(npar)), Upper)
+          CALL DetermineTriModalBounds(SNGL(LB(npar)), Lower)
+          IF ((xtem .LT. -180.00) .OR. (xtem .GT.180.00)) THEN
+            OutOfBounds = .TRUE.
+          ELSE                 
+            CALL CheckTriModalBounds(OneEightyScale)
+            IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
+              CALL OneEightytoThreeSixty(xtem)    ! so use 0-360 scale
+              DO I = 1,3
+                CALL OneEightyToThreeSixty(TempBounds(I,Upper))
+                CALL OneEightyToThreeSixty(TempBounds(I,Lower))
+              ENDDO
+            ENDIF
+
+!           Determine if XP is in any of the three torsion angle ranges              
+            TempUpper = MAX(Tempbounds(1,Upper), Tempbounds(1,Lower))!!UB(H)
+            TempLower = MIN(Tempbounds(1,Lower), Tempbounds(1,Upper))!!LB(H)
+            IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN
+              TempUpper = MAX(Tempbounds(2,Upper), Tempbounds(2,Lower))
+              TempLower = MIN(Tempbounds(2,Upper), Tempbounds(2,Lower))
+              IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN
+                TempUpper = MAX(Tempbounds(3,Upper), Tempbounds(3,Lower))
+                TempLower = MIN(Tempbounds(3,Upper), Tempbounds(3,Lower))
+                IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN        
+                  OutOfBounds = .TRUE.
+                ENDIF
+              ENDIF
+            ENDIF
+          ENDIF
+      END SELECT
+
+      RETURN 
+
+      END SUBROUTINE CheckXInBounds

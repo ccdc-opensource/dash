@@ -127,6 +127,13 @@
       REAL xtem, tempupper, templower, tempupper2, templower2
       INTEGER Upper, Lower
 
+      CHARACTER(MaxPathLength) :: CurrentDirectory
+      
+
+      CALL IosDirName(CurrentDirectory)      
+      OPEN(227,FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'xpvalues.txt',STATUS='UNKNOWN')
+
+
       Upper = 1
       Lower = 2
 
@@ -303,9 +310,14 @@
 !  select from which range the value of XP will be derived.
             IF (ModalFlag(H) .EQ. 2) THEN !Bimodal
               IF (RANARR(IARR) .GT. 0.5) THEN
-                XP(H) = (-1) * (XP(H))
-                IARR = IARR + 1             
-              ENDIF
+                IF (UB(H) * LB(H) .LT. 0.00) THEN
+                  XP(H) = XP(H) + 180.00
+                  CALL ThreeSixtyToOneEighty(XP(H))
+                ELSE
+                  XP(H) = (-1) * (XP(H))
+                ENDIF
+                IARR = IARR + 1 
+               ENDIF            
             ELSEIF (ModalFlag(H) .EQ. 3) THEN !Trimodal
               xtem = XP(H)
               CALL OneEightyToThreeSixty(xtem)
@@ -322,7 +334,6 @@
               XP(H) = xtem
               IARR = IARR + 1
             ENDIF
-
 !O! If translation, adjust to be between 0.0 and 1.0
 !O            IF (kzmpar2(H) .EQ. 1) THEN
 !O              DO WHILE (XP(H) .LT. 0.0)
@@ -351,7 +362,8 @@
                   IARR = IARR + 1
                 ENDIF   
               CASE (2) ! bimodal ranges
-! This does not sample complete range....
+                CALL CheckXInBounds(H, XP(H), OutOfBounds)
+                IF (OutOfBOunds) THEN
                 IF (UB(H) * LB(H) .LT. 0.00) THEN ! range such as -170 to 170 defined                                                  
                   TempUpper = SNGL(UB(H))         ! so use 0-360 degree scale
                   TempLower = SNGL(LB(H))
@@ -361,25 +373,13 @@
                   CALL OneEightyToThreeSixty(TempLower)
                   CALL OneEightyToThreeSixty(TempUpper2)
                   CALL OneEightyToThreeSixty(TempLower2)
-                  xtem = XP(H)                                                                                      
-                  IF ((xtem .LT. -180.00) .OR. (xtem .GT. 180.00)) THEN
-                    OutOfBounds = .TRUE.
-                  ELSE
                   CALL OneEightytoThreeSixty(xtem)
-                    IF (((xtem .LT. MAX(TempLower, TempLower2)) .AND. (xtem .GT. MIN(TempLower, TempLower2))) &
-                   .OR. ((xtem .LT. MAX(TempUpper, TempUpper2)) .AND. (xtem .GT. MIN(TempUpper, TempUpper2)))) THEN
-                      OutOfBounds = .TRUE.                                       
-                    ENDIF
-                  ENDIF
-                  IF (OutOfBounds) THEN !calculate new value in one of the two allowed ranges
                     IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
                       IARR = IARR + 1
                       xtem = MAX(TempUpper, TempUpper2) + (RULB(H) * RANARR(IARR))
-                      IARR = IARR + 1
                     ELSE
                       IARR = IARR + 1
                       xtem = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
-                      IARR = IARR + 1
                     ENDIF
                     IF (xtem .gt. 360.00) THEN
                       xtem = xtem - 360.00
@@ -387,80 +387,38 @@
                     CALL ThreeSixtyToOneEighty(xtem)
                     XP(H) = xtem
                     IARR = IARR + 1 
-                  ENDIF
                 ELSEIF (UB(H) * LB(H) .GT. 0.00) THEN ! range such as 30-90 degs or -30- -90 defined
-                  IF ((XP(H) .LT. -180.00) .OR. (XP(H) .GT. 180.00)) THEN
-                    OutOfBounds = .TRUE.     
+                  IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
+                    IARR = IARR + 1
+                    XP(H) = LB(H) + RULB(H) * RANARR(IARR)
                   ELSE
-                    IF ((XP(H) .LT. LB(H)) .OR. (XP(H) .GT. UB(H))) THEN
-                      IF (((XP(H) .LT. (-1)*UB(H)) .OR. (XP(H) .GT. (-1)*LB(H)))) THEN !out of bounds            
-                        OutOfBounds = .TRUE.
-                      ENDIF
-                    ENDIF
-                  ENDIF
-                  IF (OutOfBounds) THEN !calculate new value in one of the two defined ranges
-                    IF ((RANARR(IARR) .GT. 0.5) .AND. (RANARR(IARR) .LE. 1.00)) THEN
-                      IARR = IARR + 1
-                      XP(H) = LB(H) + RULB(H) * RANARR(IARR)
-                      IARR = IARR + 1
-                    ELSE
-                      IARR = IARR + 1 
-                      XP(H) = (-1)*LB(H) - RULB(H) * RANARR(IARR)
-                      IARR = IARR + 1
-                    ENDIF 
-                  ENDIF
+                    IARR = IARR + 1 
+                    XP(H) = (-1)*LB(H) - RULB(H) * RANARR(IARR)
+                  ENDIF 
+                  IARR = IARR + 1
                 ENDIF
+               ENDIF
 
               CASE(3) !trimodal ranges
-                xtem = XP(H)
-                CALL DetermineTriModalBounds(SNGL(UB(H)), Upper)
-                CALL DetermineTriModalBounds(SNGL(LB(H)), Lower)
-                IF ((xtem .LT. -180.00) .OR. (xtem .GT.180.00)) THEN
-                  OutOfBounds = .TRUE.
-                ELSE                 
-                  CALL CheckTriModalBounds(OneEightyScale)
-
-                  IF (OneEightyScale .EQ. .FALSE.) THEN ! A range such as -170 to 170 has been defined
-                    CALL OneEightytoThreeSixty(xtem)    ! so use 0-360 scale
-                    DO I = 1,3
-                     CALL OneEightyToThreeSixty(TempBounds(I,Upper))
-                     CALL OneEightyToThreeSixty(TempBounds(I,Lower))
-                    ENDDO
-                  ENDIF
-
-!             Determine if XP is in any of the three torsion angle ranges              
-                  TempUpper = Tempbounds(1,Upper)!!UB(H)
-                  TempLower = Tempbounds(1,Lower)!!LB(H)
-                  IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN
-                    TempUpper = TempBounds(2,Upper)
-                    TempLower = TempBounds(2,Lower)
-                    IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN
-                      TempUpper = TempBounds(3,Upper)
-                      TempLower = TempBounds(3,Lower)
-                      IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN        
-                        OutOfBounds = .TRUE.
-                      ENDIF
-                    ENDIF
-                  ENDIF
-                ENDIF
+                CALL CheckXinBounds(H, XP(H), OUtofBOunds)
                 IF (OutOfBounds) THEN ! calculate new value in one of three allowed ranges
                   xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
                   IARR = IARR + 1
                   IF ((RANARR(IARR) .GT. 0.33) .AND. (RANARR(IARR) .LE. 0.66)) THEN
                     xtem = xtem - 120.00
-                    IARR = IARR + 1
                   ELSEIF ((RANARR(IARR) .GT. 0.66) .AND. (RANARR(IARR) .LE. 1.00)) THEN
                     xtem = xtem -240.00
-                    IARR = IARR + 1
                     IF (xtem .LT. -180.00) THEN
                       xtem = 360.00 + xtem
                     ENDIF
                   ENDIF
                 ENDIF
+                CALL CheckTriModalBounds(OneEightyScale)
                 IF (OneEightyScale .EQ. .FALSE.) THEN ! Put XP back into OneEighty scale
                   CALL ThreeSixtyToOneEighty(xtem)
                 ENDIF
                 XP(H) = xtem
+                IARR = IARR + 1
             END SELECT
 
             CurrIsPO = (kzmpar2(H) .EQ. 7)
