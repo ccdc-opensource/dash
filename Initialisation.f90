@@ -108,7 +108,7 @@
       CALL WDialogLoad(IDD_Summary)
       CALL WDialogLoad(IDD_SAW_Page5)
       CALL WDialogLoad(IDD_SAW_Page6)
-      CALL WDialogLoad(IDD_Parameter_Status_2)
+!      CALL WDialogLoad(IDD_Parameter_Status_2)
       CALL WDialogLoad(IDD_OutputSolutions)
       CALL WDialogLoad(IDD_Rietveld2)
       CALL WDialogLoad(IDD_RR_PO_Dialog)
@@ -272,6 +272,10 @@
       INTEGER                                           nPeaksFound
       COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
 
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
@@ -351,6 +355,9 @@
       LOG_HYDROGENS = .FALSE.
       T0 = 0.0
       RT = 0.02
+      ChiMult = 5.0 ! Dodgy: this must agree with the default specified in the resource file...
+      MaxRuns = 10  ! Dodgy: this must agree with the default specified in the resource file...
+      MaxMoves = 10000000 ! Dodgy: this must agree with the default specified in the resource file...
       CALL Set_Wavelength(WaveLengthOf('Cu'))
 ! Now initialise the maximum resolution in the dialogue window
       DefaultMaxResolution = DASHDefaultMaxResolution
@@ -535,6 +542,9 @@
       INTEGER     BFIOErrorCode
       COMMON /IO/ BFIOErrorCode
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, SaveCCL, SaveCIF, SaveRES,  &
                            Get_ColourFlexibleTorsions, ConnectPointsObs,  &
                            PlotErrorBars, PlotBackground,                 &
@@ -542,7 +552,7 @@
                            WDialogGetCheckBoxLogical,                     &
                            Get_HydrogenTreatment, Get_SavePRO, Get_OutputChi2vsMoves, &
                            Get_AutoLocalMinimisation, Get_DivideByEsd
-      LOGICAL, EXTERNAL :: UseHydrogensDuringAuto, Get_ShowCumChiSqd, Get_AutoAlign
+      LOGICAL, EXTERNAL :: Get_UseHydrogensDuringAuto, Get_ShowCumChiSqd, Get_AutoAlign
       REAL, EXTERNAL :: WavelengthOf
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
@@ -551,6 +561,11 @@
       REAL*4    tReal
       INTEGER RW, hFile
 
+      !C Don't write out a configuration file when in batch mode.
+      !C The problem is that a few variables are read straight from the GUI windows--and
+      !C that is not possible in batch mode.
+      IF ( in_batch ) &
+        RETURN
       RW = 0
       tFileName = 'D3.cfg'
       hFile = 10
@@ -709,7 +724,7 @@
       CALL FileWriteInteger(hFile, RecNr, tInteger)
 ! Following is new in DASH 2.1
 ! Use hydrogens for auto local minimise
-      CALL FileWriteLogical(hFile, RecNr, UseHydrogensDuringAuto())
+      CALL FileWriteLogical(hFile, RecNr, Get_UseHydrogensDuringAuto())
 ! Plot cumulative chi-squared      
       CALL FileWriteLogical(hFile, RecNr, Get_ShowCumChiSqd())
 ! Following is new in DASH 2.2

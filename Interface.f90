@@ -273,13 +273,24 @@
 
       IMPLICIT NONE
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
       INTEGER iState
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetRadioButton(IDR_HydrogensIgnore, iState)
-      Get_HydrogenTreatment = iState
-      CALL PopActiveWindowID
+      IF ( in_batch ) THEN
+        Get_HydrogenTreatment = HydrogenTreatment
+      ELSE
+        CALL PushActiveWindowID
+        CALL WDialogSelect(IDD_Configuration)
+        CALL WDialogGetRadioButton(IDR_HydrogensIgnore, iState)
+        Get_HydrogenTreatment = iState
+        CALL PopActiveWindowID
+      ENDIF
 
       END FUNCTION Get_HydrogenTreatment
 !
@@ -352,7 +363,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION UseHydrogensDuringAuto
+      LOGICAL FUNCTION Get_UseHydrogensDuringAuto
 
 ! When .TRUE., hydrogen atoms are included in the structure factor calculations during the
 ! local minimisation at the end of each run.
@@ -362,14 +373,25 @@
 
       IMPLICIT NONE
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      UseHydrogensDuringAuto = WDialogGetCheckBoxLogical(IDF_UseHydrogensAuto)
-      CALL PopActiveWindowID
+      IF ( in_batch ) THEN
+        Get_UseHydrogensDuringAuto = UseHAutoMin
+      ELSE
+        CALL PushActiveWindowID
+        CALL WDialogSelect(IDD_Configuration)
+        Get_UseHydrogensDuringAuto = WDialogGetCheckBoxLogical(IDF_UseHydrogensAuto)
+        CALL PopActiveWindowID
+      ENDIF
 
-      END FUNCTION UseHydrogensDuringAuto
+      END FUNCTION Get_UseHydrogensDuringAuto
 !
 !*****************************************************************************
 !
@@ -383,12 +405,23 @@
 
       IMPLICIT NONE
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      Get_UseCrystallographicCoM = WDialogGetCheckBoxLogical(IDF_CrystallographicCoM)
-      CALL PopActiveWindowID
+      IF ( in_batch ) THEN
+        Get_UseCrystallographicCoM = UseCCoM
+      ELSE
+        CALL PushActiveWindowID
+        CALL WDialogSelect(IDD_Configuration)
+        Get_UseCrystallographicCoM = WDialogGetCheckBoxLogical(IDF_CrystallographicCoM)
+        CALL PopActiveWindowID
+      ENDIF
 
       END FUNCTION Get_UseCrystallographicCoM
 !
@@ -444,14 +477,56 @@
 
       IMPLICIT NONE
 
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      Get_AutoLocalMinimisation = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
-      CALL PopActiveWindowID
+      IF ( in_batch ) THEN
+        Get_AutoLocalMinimisation = AutoMinimise
+      ELSE
+        CALL PushActiveWindowID
+        CALL WDialogSelect(IDD_Configuration)
+        Get_AutoLocalMinimisation = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
+        CALL PopActiveWindowID
+      ENDIF
 
       END FUNCTION Get_AutoLocalMinimisation
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION Get_RandomInitVal
+
+! When .TRUE., SA parameters are set to random values.
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM
+      INTEGER                                                            HydrogenTreatment
+      COMMON /BATSET/ AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, HydrogenTreatment
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      IF ( in_batch ) THEN
+        Get_RandomInitVal = AutoMinimise
+      ELSE
+        CALL PushActiveWindowID
+        CALL WDialogSelect(IDD_SA_Modal_input2)
+        Get_RandomInitVal = WDialogGetCheckBoxLogical(IDF_RandomInitVal)
+        CALL PopActiveWindowID
+      ENDIF
+
+      END FUNCTION Get_RandomInitVal
 !
 !*****************************************************************************
 !

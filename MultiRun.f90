@@ -19,6 +19,14 @@
       REAL    MaxMoves1, tMaxMoves
       INTEGER MaxMoves2
 
+      !C All a bit dodgy: these are the only few variables that are read directly from the
+      !C interface, and therefore need special treatment when in batch mode.
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) &
+        RETURN
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Input3_2)
       CALL WDialogGetInteger(IDF_SA_MaxRepeats, MaxRuns)
