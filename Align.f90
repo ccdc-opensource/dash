@@ -43,7 +43,7 @@
       COMMON /fullsymmops/ rpdb(4,4,mpdbops) !Symmetry operations
 ! Required for NATOM
       INTEGER         NATOM
-      REAL                   X
+      REAL                   Xato
       INTEGER                          KX
       REAL                                        AMULT,      TF
       INTEGER         KTF
@@ -51,7 +51,7 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
+      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 !Required for npdbops
@@ -62,6 +62,7 @@
 !Required to check if x,y, or z have been fixed or bounds changed from defaults
 
 !Can't call first common block member x
+
       REAL             xx,       lb,       ub,       vm
       COMMON /values/  xx(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
 
