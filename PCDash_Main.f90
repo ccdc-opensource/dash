@@ -211,6 +211,7 @@
 
       CALL WHelpFile(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))// &
        'Documentation'//DIRSPACER//'manual'//DIRSPACER//'dash.html')
+!T      CALL WHelpFile('C:\Program Files\CCDC\Mercury 1.0\docs\Mercury.chm')
 
       END SUBROUTINE LaunchHelp
 !
@@ -222,6 +223,7 @@
 !
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -237,7 +239,7 @@
                'terms and conditions of a valid software licence, obtainable'//CHAR(13)//&
                'from the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
                CHAR(13)//&
-               'Version 2.0'//CHAR(13)//&
+               ProgramVersion//CHAR(13)//&
                CHAR(13)//&
                'Copyright February 2002'
       CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
