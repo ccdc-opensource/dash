@@ -62,6 +62,7 @@
       MaxIterationSoFar = 0
       CALL WDialogFieldState(IDB_Summary,Disabled)
       InSA = .TRUE.
+      CALL MakRHm
       CALL SimulatedAnnealing
       InSA = .FALSE.
       SA_Duration = SECNDS(T1)
@@ -202,14 +203,13 @@
       CHARACTER*10 filnam_root
       COMMON /commun/ filnam_root
 
-
       CHARACTER*6 PNAME
       INTEGER hFile, iSym
       INTEGER, EXTERNAL :: GetCrystalSystem
 
    10 IBMBER = 0
       hFile = 42
-      OPEN(hFile,file='polys.ccl',status='unknown',ERR=999)
+      OPEN(hFile,FILE='polys.ccl',status='unknown',ERR=999)
       WRITE(hFile,4210,ERR=999) 
  4210 FORMAT('N Determining the space group ')
       IF (NumberSGTable .GE. 1) THEN
@@ -222,8 +222,8 @@
         ENDIF
       ENDIF
       CLOSE(hFile)
-      filnam_root = 'polys'
       PNAME = 'SPGMAK'
+      filnam_root = 'polys'
       NINIT = 1
       CALL PREFIN(PNAME)
       CALL SYMOP
@@ -273,10 +273,6 @@
       CHARACTER*20                                           symline
       COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
 
-      INTEGER         NLGREF
-      LOGICAL                 LOGREF
-      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
-
       INTEGER           iHMUL
       COMMON /SAREFLN3/ iHMUL(MFCSTO)
 
@@ -289,26 +285,27 @@
       CHARACTER*6  PNAME
       REAL phases(1:48), RefHT(1:3,1:48)
       REAL PrfDir(1:3), H(1:3), RefLen
-      INTEGER i, ii, iR, isym
+      INTEGER i, ii, iR, hFile, iSym
       REAL, EXTERNAL :: VCTMOD, SCLPRD
 
       IF (.NOT. PrefParExists) RETURN
-      OPEN(42,file='polyx.ccl',status='unknown')
-      WRITE(42,4210) 
+      hFile = 42
+      OPEN(42,FILE='polyx.ccl',status='unknown',ERR=999)
+      WRITE(hFile,4210,ERR=999) 
  4210 FORMAT('N Handles preferred orientation')
-      WRITE(42,4220) (CellPar(i),i=1,6)
+      WRITE(hFile,4220,ERR=999) (CellPar(i),i=1,6)
  4220 FORMAT('C ',3F9.5,3F9.3)
       IF (NumberSGTable .GE. 1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin .GT. 0) THEN
-          DO isym = 1, nsymmin
-            WRITE(42,4235) symline(isym)
- 4235       FORMAT('S ',a)
+          DO iSym = 1, nsymmin
+            WRITE(hFile,4235,ERR=999) symline(iSym)
+ 4235       FORMAT('S ',A)
           ENDDO
         ENDIF
       ENDIF
-      CLOSE(42)
-      pname = 'EXTMAK'
+      CLOSE(hFile)
+      PNAME = 'EXTMAK'
       filnam_root = 'polyx'
       NINIT = 1
       CALL PREFIN(PNAME)
@@ -332,6 +329,9 @@
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
+      RETURN
+  999 CALL ErrorMessage('Error writing temporary file for space group decoding.')
+      CLOSE(hFile)
 
       END SUBROUTINE PO_Init
 !
