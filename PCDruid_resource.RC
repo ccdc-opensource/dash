@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 14/Jun/2002 16:34:50
+// Modified : 21/Jun/2002 12:22:47
 //
 ///////////////////////////////////////////////////
 //
@@ -633,6 +633,7 @@
 #define IDB_OutputChiSqd                 1415
 #define IDF_Directory                    1416
 #define IDF_BaseName                     1417
+#define IDF_RADIO6                       1407
 
 ///////////////////////////////////////////////////
 //
@@ -1042,6 +1043,19 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
+END
+
+IDD_Width_Equations RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
@@ -2253,7 +2267,7 @@ BEGIN
 " 1224 1 \n"
 " 1462 0 \n"
 " 1461 0 \n"
-" 1457 0 \n"
+" 1457 1 \n"
 " 1474 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
@@ -2514,15 +2528,17 @@ BEGIN
 ,0
 END
 
-IDD_LicenceAgreement DIALOG 0, 0,  298,  231
+IDD_LicenceAgreement DIALOG 0, 0,  298,  258
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Licence Agreement"
 BEGIN
-    CONTROL "",IDF_Agreement,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE | ES_READONLY,   18,   16,  262,  144
-    CONTROL "I do NOT agree",IDF_IDoNotAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   60,  170,   65,   14
-    CONTROL "I have read the full text above and I Agree",IDF_IAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   60,  184,  175,   14
-    CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  129,  208,   40,   14
+    CONTROL "",IDF_Agreement,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE | ES_READONLY,   18,   37,  262,  144
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  129,  236,   40,   14
+    CONTROL "I do NOT agree",IDF_IDoNotAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   62,  188,  100,   14
+    CONTROL "I have read the full text above and I Agree",IDF_IAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   62,  202,  175,   14
+    CONTROL "I want to enter an other licence key",IDF_RADIO6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   62,  216,  175,   14
+    CONTROL "In order to read the entire text, please use the scroll bar on the right-hand side.",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   19,   16,  260,   12
 END
 
 IDD_LicenceAgreement RCDATA
@@ -2530,6 +2546,7 @@ BEGIN
 "[Checks] \n"
 " 1386 1 \n"
 " 1228 0 \n"
+" 1407 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
