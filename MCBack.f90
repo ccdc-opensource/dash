@@ -243,7 +243,6 @@
         j0 = MIN(nkn-1,jfs(i)-jf0)
         j1 = j0 + 1
         w = DBLE(e(i))**-2
-!       b(i)=(dble(x(i))-xkk(j0))/xdel(j0)
         b(i) = ( DBLE( x(i)-xkk(j0) ) )/xdel(j0)
         a(i) = 1.0-b(i)
         ab = -a(i)*b(i)/6.0
@@ -295,7 +294,7 @@
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: m
-      REAL*8  xdel(m)
+      REAL*8,  INTENT (IN   ) :: xdel(m)
       REAL*8,  INTENT (  OUT) :: u(m,m)
 
       REAL*8  A(m,m),b(m,m),c(m,m)
