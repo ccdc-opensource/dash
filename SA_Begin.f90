@@ -20,6 +20,9 @@
       REAL                                                                    ChiMult
       COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      INTEGER              iMyExit, num_new_min
+      COMMON / CMN000001 / iMyExit, num_new_min
+
       REAL                    chi_sqd
       INTEGER                                           it_count
       REAL                                                        y_max
@@ -45,7 +48,6 @@
       CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
       LOG_HYDROGENS = Get_UseHydrogens()
 ! Pop up the SA status window
-      CALL WDialogSelect(IDD_SA_Action1)
       CALL WizardWindowShow(IDD_SA_Action1)
 !O      CALL WDialogSelect(IDD_Parameter_Status_2)
 !O      CALL WDialogShow(-1,-1,0,Modeless)
@@ -78,7 +80,16 @@
 !O      DO WHILE (WinfoWindow(WindowState) .EQ. WinMinimised)
 !O        CALL IOsWait(50) ! wait half a sec
 !O      ENDDO
-      CALL WizardWindowShow(IDD_SAW_Page5)
+      CALL WDialogSelect(IDD_Summary)
+      CALL WDialogHide
+      IF (iMyExit .EQ. 5) THEN
+        CALL WizardWindowShow(IDD_SA_input2)
+      ELSE
+        CALL WDialogSelect(IDD_SAW_Page5)
+        CALL WDialogPutInteger(IDF_Limit1,1)
+        CALL WDialogPutInteger(IDF_Limit2,NumOf_SA_Runs)
+        CALL WizardWindowShow(IDD_SAW_Page5)
+      ENDIF
 
       END SUBROUTINE BeginSA
 !
