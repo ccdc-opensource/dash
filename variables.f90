@@ -122,6 +122,7 @@
       TYPE T_UnitCell
         INTEGER :: CrystalSystem
         REAL    :: a, b, c, alpha, beta, gamma
+        REAL    :: Volume
         REAL    :: F, M
       END TYPE
 ! CrystalSystem = 
