@@ -43,7 +43,7 @@
 ! c-axis
       TheLattice(1,3) = c*COS(Degrees2Radians(beta))
 ! Maybe an odd way to do this, but it works:
-! the projection of c on the a*b* plane equals the projection of c on xy plane:
+! the projection of c on the a*b* plane equals the projection of c on the xy plane:
 ! (ac)a* + (bc)b* = (cx)x + (cy)y
 ! Multiplying from the right by y* yields:
 ! (ac)(a*y) + (bc)(b*y) = cy
