@@ -3,15 +3,15 @@
 !*****************************************************************************
 !
       SUBROUTINE create_fob()
-!
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'IZMCheck.inc'
-!
+
       REAL tiso, occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
       DOUBLE PRECISION blen, alph, bet, f2cmat
       INTEGER ioptb, iopta, ioptt, iz1, iz2, iz3
-!
+
       COMMON /zmcomi/ ntatm, natoms(maxfrg), ioptb(maxatm,maxfrg),      &
      &                iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),       &
      &                iz1(maxatm,maxfrg), iz2(maxatm,maxfrg),           &
@@ -21,9 +21,9 @@
       CHARACTER*3     asym
       CHARACTER*5                          OriginalLabel
       COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
-!
+
       COMMON /frgcom/ nfrag
-!
+
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
@@ -41,9 +41,9 @@
 
       LOGICAL HYDNOT
       COMMON /HIDDAT/ HYDNOT(150), nsatom, isatom(150)
-!
+
       INTEGER jj
-!
+
       item = 0
       NSATOM = 0
       ifrg = 0
@@ -68,7 +68,7 @@
         ENDDO
       ENDDO
       natom = item
-!
+
       END SUBROUTINE CREATE_FOB
 !*==ASCFAC.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -82,7 +82,7 @@
       REAL a1(melem), b1(melem), a2(melem), b2(melem)
       REAL a3(melem), b3(melem), a4(melem), b4(melem)
       REAL cv(melem)
-!
+
       DATA SYMBA/       'H  ', 'He ', 'Li ', 'Be ', 'B  ', 'C  ', 'N  ', &
      &           'O  ', 'F  ', 'Ne ', 'Na ', 'Mg ', 'Al ', 'Si ', 'P  ',      &
      &           'S  ', 'Cl ', 'Ar ', 'K  ', 'Ca ', 'Sc ', 'Ti ', 'V  ',      &
@@ -96,7 +96,7 @@
      &           'Hg ', 'Tl ', 'Pb ', 'Bi ', 'Po ', 'At ', 'Rn ', 'Fr ',      &
      &           'Ra ', 'Ac ', 'Th ', 'Pa ', 'U  ', 'Np ', 'Pu ', 'Am ',      &
      &           'Cm ', 'Bk ', 'Cf ', 'Du '/
-!
+
       DATA A1/0.48992, 0.87340, 1.12820, 1.59190, 2.05450,      &
      &     2.31000, 12.21260, 3.04850, 3.53920, 3.95530, 4.76260,       &
      &     5.42040, 6.42020, 6.29150, 6.43450, 6.90530, 11.46040,       &
@@ -114,7 +114,7 @@
      &     34.67260, 35.31630, 35.56310, 35.92990, 35.76300, 35.65970,  &
      &     35.56450, 35.88470, 36.02280, 36.18740, 36.52540, 36.67060,  &
      &     36.64880, 36.78810, 36.91850, 0.0000/
-!
+
       DATA B1/20.65930, 9.10370, 3.95460, 43.64270, 23.21850,   &
      &     20.84390, 0.00570, 13.27710, 10.28250, 8.40420, 3.28500,     &
      &     2.82750, 3.03870, 2.43860, 1.90670, 1.46790, 0.01040,        &
@@ -329,7 +329,7 @@
 ! Elements (plus other CSD 'element' definitions What's 'Zz'??)
       DATA atnr/    6,     1,    89,    47,    13,    95,    18,    33,    85,    79,   &
                     5,    56,     4,    83,    97,    35,    20,    48,    58,    98,   &
-                   17,    96,    27,    24,    55,    29,     0,    66,    68,    99,   &
+                   17,    96,    27,    24,    55,    29,     1,    66,    68,    99,   &
                    63,     9,    26,   100,    87,    31,    64,    32,     2,    72,   &
                    80,    67,    53,    49,    77,    19,    36,    57,     3,    71,   &
                     0,   101,    12,    25,    42,     7,    11,    41,    60,    10,   &
