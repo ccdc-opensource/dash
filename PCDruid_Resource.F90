@@ -1,4 +1,4 @@
-! Winteracter module created : 12/Sep/2001 20:24:40
+! Winteracter module created : 13/Sep/2001 14:02:41
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -11,7 +11,6 @@
           INTEGER, PARAMETER :: ID_HELP                         = 40007
           INTEGER, PARAMETER :: ID_HELP_ABOUT                   = 40008
           INTEGER, PARAMETER :: ID_ViewMenu                     = 40011
-          INTEGER, PARAMETER :: ID_Exit                         = 40112
           INTEGER, PARAMETER :: IDD_Plot_Option_Dialog          =   103
           INTEGER, PARAMETER :: IDF_SymbolSize_Label            =  1002
           INTEGER, PARAMETER :: ID_get_peak_positions           = 40017
@@ -30,19 +29,11 @@
           INTEGER, PARAMETER :: IDF_CharacterSize_Label         =  1016
           INTEGER, PARAMETER :: IDF_CharacterSize               =  1017
           INTEGER, PARAMETER :: ID_import_xye_file              = 40014
-          INTEGER, PARAMETER :: ID_get_lattice_constants        = 40024
           INTEGER, PARAMETER :: ID_get_peak_widths              = 40025
-          INTEGER, PARAMETER :: ID_import_data                  = 40026
-          INTEGER, PARAMETER :: ID_import_pro_file              = 40027
           INTEGER, PARAMETER :: ID_import_dpj_file              = 40021
-          INTEGER, PARAMETER :: ID_get_peak_intensities         = 40030
           INTEGER, PARAMETER :: ID_help_about_Polyfitter        = 40031
           INTEGER, PARAMETER :: ID_PolyFitter_Help              = 40032
           INTEGER, PARAMETER :: ID_Polyfitter_Tips              = 40033
-          INTEGER, PARAMETER :: ID_Level1_Tips                  = 40034
-          INTEGER, PARAMETER :: ID_Level2_Tips                  = 40035
-          INTEGER, PARAMETER :: ID_Level3_Tips                  = 40036
-          INTEGER, PARAMETER :: ID_Level0_Tips                  = 40037
           INTEGER, PARAMETER :: ID_Druid_Mode_Menu              = 40022
           INTEGER, PARAMETER :: ID_Peak_Fitting_Mode            = 40023
           INTEGER, PARAMETER :: ID_Default_Mode                 = 40028
@@ -146,13 +137,10 @@
           INTEGER, PARAMETER :: IDF_gam_refine_label            =  1107
           INTEGER, PARAMETER :: IDF_zeropt_label                =  1108
           INTEGER, PARAMETER :: IDF_CellRefinement_Label        =  1109
-          INTEGER, PARAMETER :: ID_import_ccl_file              = 40104
           INTEGER, PARAMETER :: IDD_Polyfitter_Wizard_01        =   121
           INTEGER, PARAMETER :: IDF_PW01_Text1                  =  1197
           INTEGER, PARAMETER :: IDB_SA_Project_Open             =  1198
           INTEGER, PARAMETER :: IDF_PW0_Skip                    =  1216
-          INTEGER, PARAMETER :: IDF_PW_Logo2                    =  1207
-          INTEGER, PARAMETER :: IDF_PW_Logo3                    =  1208
           INTEGER, PARAMETER :: ID_PW_DF_Open                   =  1210
           INTEGER, PARAMETER :: IDFINISH                        =  1048
           INTEGER, PARAMETER :: IDD_PW_Page1                    =   122
@@ -188,7 +176,6 @@
           INTEGER, PARAMETER :: IDF_PW_2theta_label             =  1250
           INTEGER, PARAMETER :: IDF_PW_2theta0                  =  1251
           INTEGER, PARAMETER :: IDD_PW_Page3                    =   124
-          INTEGER, PARAMETER :: IDF_PW_Logo4                    =  1256
           INTEGER, PARAMETER :: IDF_PWa_Data_Group              =  1261
           INTEGER, PARAMETER :: IDF_PWa_Data_fFilename          =  1262
           INTEGER, PARAMETER :: IDF_PWa_DataFileName_String     =  1263
@@ -214,7 +201,6 @@
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_NumPts         =  1274
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_ChiSq_Label2   =  1318
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_ChiSq          =  1276
-          INTEGER, PARAMETER :: IDF_Pawley_Status_Pic           =  1277
           INTEGER, PARAMETER :: IDF_Pawley_Status_Group         =  1278
           INTEGER, PARAMETER :: IDD_SA_Action2                  =   126
           INTEGER, PARAMETER :: IDF_CPL_GRID                    =  1401
@@ -235,21 +221,11 @@
           INTEGER, PARAMETER :: IDF_av_chisq                    =  1431
           INTEGER, PARAMETER :: IDF_avchisq_label               =  1432
           INTEGER, PARAMETER :: IDF_profchi2_label              =  1185
-          INTEGER, PARAMETER :: IDF_controlfile_label           =  1434
-          INTEGER, PARAMETER :: IDF_inputfile_string            =  1435
-          INTEGER, PARAMETER :: IDF_inputfile_browse            =  1436
-          INTEGER, PARAMETER :: IDF_save_inputfile_button       =  1437
-          INTEGER, PARAMETER :: IDF_saveas_inputfile_button     =  1440
-          INTEGER, PARAMETER :: IDF_savefile_group              =  1444
           INTEGER, PARAMETER :: IDD_input_parameters            =   140
-          INTEGER, PARAMETER :: IDF_inputfile_help_button       =  1441
-          INTEGER, PARAMETER :: IDF_getinput_group              =  1442
-          INTEGER, PARAMETER :: IDF_miscinput_group             =  1443
           INTEGER, PARAMETER :: IDF_space_group_label           =  1449
           INTEGER, PARAMETER :: IDF_SA_Tredrate                 =  1179
           INTEGER, PARAMETER :: IDD_space_group                 =   130
           INTEGER, PARAMETER :: IDF_spacegp_group               =  1450
-          INTEGER, PARAMETER :: IDD_control_file                =   129
           INTEGER, PARAMETER :: IDD_input_data                  =   133
           INTEGER, PARAMETER :: IDD_zmatrix_files               =   134
           INTEGER, PARAMETER :: IDF_SA_T0_label1                =  1161
@@ -302,8 +278,6 @@
           INTEGER, PARAMETER :: IDF_Profile_Plot                =  1501
           INTEGER, PARAMETER :: IDF_ProfileType_Radio1          =  1408
           INTEGER, PARAMETER :: IDF_ProfileType_Radio2          =  1503
-          INTEGER, PARAMETER :: IDF_Profile_Zoom_Button         =  1414
-          INTEGER, PARAMETER :: IDF_Profile_FullRange_Button    =  1415
           INTEGER, PARAMETER :: IDF_SA1_cancel                  =  1178
           INTEGER, PARAMETER :: IDF_peakcont_label              =  1502
           INTEGER, PARAMETER :: IDF_pikfile_browse_button       =  1504
@@ -336,36 +310,7 @@
           INTEGER, PARAMETER :: IDF_PawRef_Line                 =  1299
           INTEGER, PARAMETER :: IDB_PawRef_Skip                 =  1300
           INTEGER, PARAMETER :: IDF_Pawley_Options_Group        =  1302
-          INTEGER, PARAMETER :: IDF_PawRefOptionsPicture        =  1303
-          INTEGER, PARAMETER :: IDR_MENU2                       = 30002
-          INTEGER, PARAMETER :: ID_BITMAP1                      = 20002
-          INTEGER, PARAMETER :: ID_BITMAP2                      = 20003
-          INTEGER, PARAMETER :: ID_BITMAP3                      = 20004
-          INTEGER, PARAMETER :: ID_BITMAP4                      = 20005
-          INTEGER, PARAMETER :: ID_BITMAP5                      = 20006
-          INTEGER, PARAMETER :: ID_BITMAP6                      = 20007
-          INTEGER, PARAMETER :: ID_BITMAP7                      = 20008
-          INTEGER, PARAMETER :: ID_BITMAP8                      = 20009
-          INTEGER, PARAMETER :: ID_BITMAP9                      = 20010
-          INTEGER, PARAMETER :: ID_BITMAP10                     = 20011
-          INTEGER, PARAMETER :: ID_ICON2                        = 20012
-          INTEGER, PARAMETER :: ID_ICON3                        = 20013
-          INTEGER, PARAMETER :: ID_STRING001                    = 20014
-          INTEGER, PARAMETER :: ID_STRING002                    = 20015
-          INTEGER, PARAMETER :: ID_STRING003                    = 20016
-          INTEGER, PARAMETER :: ID_STRING004                    = 20017
-          INTEGER, PARAMETER :: ID_STRING005                    = 20018
-          INTEGER, PARAMETER :: ID_STRING006                    = 20019
-          INTEGER, PARAMETER :: ID_STRING007                    = 20020
-          INTEGER, PARAMETER :: ID_STRING008                    = 20021
-          INTEGER, PARAMETER :: ID_STRING009                    = 20022
-          INTEGER, PARAMETER :: ID_STRING010                    = 20023
-          INTEGER, PARAMETER :: ID_STRING011                    = 20024
-          INTEGER, PARAMETER :: ID_STRING012                    = 20025
-          INTEGER, PARAMETER :: ID_STRING013                    = 20026
-          INTEGER, PARAMETER :: ID_STRING014                    = 20027
           INTEGER, PARAMETER :: IDF_Pawley_Cycle_ChiSq_Label1   =  1317
-          INTEGER, PARAMETER :: IDF_StrInf_Picture              =  1318
           INTEGER, PARAMETER :: ID_get_crystal_symmetry         = 40041
           INTEGER, PARAMETER :: ID_get_data_properties          = 40042
           INTEGER, PARAMETER :: IDF_PawRef_RefSigm1_Check       =  1320
@@ -401,12 +346,9 @@
           INTEGER, PARAMETER :: IDF_ZM_allpars_label            =  1135
           INTEGER, PARAMETER :: IDD_SA_input2                   =   120
           INTEGER, PARAMETER :: IDB_SA1_next                    =  1137
-          INTEGER, PARAMETER :: IDF_SA1_picture                 =  1138
           INTEGER, PARAMETER :: IDD_TEMPLATE009                 =   141
-          INTEGER, PARAMETER :: IDF_SA2_picture                 =  1140
           INTEGER, PARAMETER :: IDF_SA2_label                   =  1141
           INTEGER, PARAMETER :: IDD_SA_input3                   =   142
-          INTEGER, PARAMETER :: IDF_SA3_picture                 =  1142
           INTEGER, PARAMETER :: IDB_SA3_back                    =  1143
           INTEGER, PARAMETER :: IDB_SA3_finish                  =  1144
           INTEGER, PARAMETER :: IDF_SA_RandomSeed1              =  1163
@@ -423,9 +365,6 @@
           INTEGER, PARAMETER :: IDF_minchisq_picture            =  1169
           INTEGER, PARAMETER :: IDF_prochisq_picture            =  1170
           INTEGER, PARAMETER :: IDF_avchisq_picture             =  1171
-          INTEGER, PARAMETER :: IDF_SA_Pause_Button             =  1172
-          INTEGER, PARAMETER :: IDF_SA_Stop_Button              =  1173
-          INTEGER, PARAMETER :: IDF_SA_Play_Button              =  1174
           INTEGER, PARAMETER :: IDF_SA_Reanneal_Button          =  1175
           INTEGER, PARAMETER :: IDF_SA_total_moves_label        =  1176
           INTEGER, PARAMETER :: IDF_SA_zero_move_label          =  1177
@@ -436,7 +375,6 @@
           INTEGER, PARAMETER :: IDF_TBarGroup3                  =  1192
           INTEGER, PARAMETER :: IDF_TBarGroup4                  =  1193
           INTEGER, PARAMETER :: IDF_TBarGroup1                  =  1190
-          INTEGER, PARAMETER :: IDF_SA_Eject_Button             =  1194
           INTEGER, PARAMETER :: IDF_SA_move_type2               =  1196
           INTEGER, PARAMETER :: IDF_SA_move_type3               =  1197
           INTEGER, PARAMETER :: IDF_clear_zmatrix               =  1294
