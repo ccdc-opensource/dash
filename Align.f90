@@ -86,6 +86,7 @@
       REAL, DIMENSION(3,MaxNumAtom) ::ConnArray
       
       EXTERNAL ErrorMessage
+      INTEGER iFrg
 
 !        
 !--------- Check to see if align algorithm should be applied-----------
@@ -94,10 +95,14 @@
       IF (NumberSGTable.GE.430) THEN
         RETURN
       END IF       
-! If number of zmatrices greater than 1, do not align
+! If number of Z-matrices greater than 1, do not align
       IF (nfrag.GT.1) THEN
         RETURN
       ENDIF
+! If more than one copy for any Z-matrix, do not align
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg) .AND. (zmNumberOfCopies(iFrg).GT.1)) RETURN 
+      ENDDO
 ! Check if any x,y,z coords have been fixed or upper and lower bounds changed from defaults.
 ! If they have then do not align
       DO j = 1,3

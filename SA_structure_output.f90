@@ -45,7 +45,7 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
       REAL                pdbAtmCoords
-      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:MaxRun)
+      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxcopies,1:maxfrg,1:MaxRun)
 
       CHARACTER(MaxPathLength) cssr_file, pdb_file, ccl_file, log_file, pro_file
       COMMON /outfilnam/       cssr_file, pdb_file, ccl_file, log_file, pro_file
@@ -65,7 +65,7 @@
       LOGICAL tSavePDB, tSaveCSSR, tSaveCCL
       INTEGER ipcount
       LOGICAL, EXTERNAL :: SaveCSSR, SaveCCL
-      INTEGER I, J, II, K, npdbops, iiact, iTotal, ifrg, IJ, iOrig
+      INTEGER I, J, II, K, npdbops, iiact, iTotal, iFrg, iFrgCopy, IJ, iOrig
       REAL xc, yc, zc
       INTEGER TotNumBonds, NumOfAtomsSoFar
 
@@ -162,64 +162,66 @@
       itotal = 0
       ipcount = 0
       DO ifrg = 1, maxfrg
-        IF (gotzmfile(ifrg)) THEN
-          itotal = iiact
+        IF (gotzmfile(iFrg)) THEN
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            itotal = iiact
 ! Write out the translation/rotation information for each residue
-          IF (tSavePDB) THEN
-            WRITE (65,1039) ifrg
- 1039       FORMAT ('REMARK Start of molecule number ',I6)
-            WRITE (65,1037) (SNGL(parvals(ij)),ij=ipcount+1,ipcount+3)
- 1037       FORMAT ('REMARK Translations: ',3F10.6)
-          ENDIF
-          IF (natoms(ifrg).GT.1) THEN
-! Normalise the Q-rotations before writing them out ...
-            qvals(1) = SNGL(parvals(ipcount+4))
-            qvals(2) = SNGL(parvals(ipcount+5))
-            qvals(3) = SNGL(parvals(ipcount+6))
-            qvals(4) = SNGL(parvals(ipcount+7))
-            qnrm = SQRT(qvals(1)**2 + qvals(2)**2 + qvals(3)**2 + qvals(4)**2)
-            qvals = qvals / qnrm
             IF (tSavePDB) THEN
-              WRITE (65,1038) (qvals(ij),ij=1,4)
- 1038         FORMAT ('REMARK Q-Rotations : ',4F10.6)
+              WRITE (65,1039) ifrg
+ 1039         FORMAT ('REMARK Start of molecule number ',I6)
+              WRITE (65,1037) (SNGL(parvals(ij)),ij=ipcount+1,ipcount+3)
+ 1037         FORMAT ('REMARK Translations: ',3F10.6)
             ENDIF
-            ipcount = ipcount + izmpar(ifrg)
-          ENDIF
-          DO i = 1, natoms(ifrg)
-            iiact = iiact + 1
-            ii = itotal + izmbid(i,ifrg)
-            iorig = izmbid(i,ifrg)
+            IF (natoms(iFrg).GT.1) THEN
+! Normalise the Q-rotations before writing them out ...
+              qvals(1) = SNGL(parvals(ipcount+4))
+              qvals(2) = SNGL(parvals(ipcount+5))
+              qvals(3) = SNGL(parvals(ipcount+6))
+              qvals(4) = SNGL(parvals(ipcount+7))
+              qnrm = SQRT(qvals(1)**2 + qvals(2)**2 + qvals(3)**2 + qvals(4)**2)
+              qvals = qvals / qnrm
+              IF (tSavePDB) THEN
+                WRITE (65,1038) (qvals(ij),ij=1,4)
+ 1038           FORMAT ('REMARK Q-Rotations : ',4F10.6)
+              ENDIF
+              ipcount = ipcount + izmpar(iFrg)
+            ENDIF
+            DO i = 1, natoms(iFrg)
+              iiact = iiact + 1
+              ii = itotal + izmbid(i,iFrg)
+              iorig = izmbid(i,iFrg)
 ! The CSSR atom lines
-            IF (tSaveCSSR) THEN
-              WRITE (64,1110) iiact, OriginalLabel(iorig,ifrg)(1:4),(xatopt(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
- 1110         FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
-            ENDIF
+              IF (tSaveCSSR) THEN
+                WRITE (64,1110) iiact, OriginalLabel(iorig,iFrg)(1:4),(xatopt(k,ii),k=1,3), 0, 0, 0, 0, 0, 0, 0, 0, 0.0
+ 1110           FORMAT (I4,1X,A4,2X,3(F9.5,1X),8I4,1X,F7.3)
+              ENDIF
 ! The PDB atom lines
-            xc = xatopt(1,ii)*SNGL(f2cpdb(1,1)) + xatopt(2,ii)*SNGL(f2cpdb(1,2)) + xatopt(3,ii)*SNGL(f2cpdb(1,3))
-            yc =                                  xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)*SNGL(f2cpdb(2,3))
-            zc =                                                                   xatopt(3,ii)*SNGL(f2cpdb(3,3))
+              xc = xatopt(1,ii)*SNGL(f2cpdb(1,1)) + xatopt(2,ii)*SNGL(f2cpdb(1,2)) + xatopt(3,ii)*SNGL(f2cpdb(1,3))
+              yc =                                  xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)*SNGL(f2cpdb(2,3))
+              zc =                                                                   xatopt(3,ii)*SNGL(f2cpdb(3,3))
 ! Note that elements are right-justified
 ! WebLab viewer even wants the elements in the atom names to be right justified.
-            IF (tSavePDB) THEN
-              IF (asym(iorig,ifrg)(2:2).EQ.' ') THEN
-                WRITE (65,1120) iiact, OriginalLabel(iorig,ifrg)(1:3), xc, yc, zc, &
-                                occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:1)
- 1120           FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
-              ELSE
-                WRITE (65,1130) iiact, OriginalLabel(iorig,ifrg)(1:4), xc, yc, zc, &
-                                occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:2)
- 1130           FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+              IF (tSavePDB) THEN
+                IF (asym(iorig,ifrg)(2:2).EQ.' ') THEN
+                  WRITE (65,1120) iiact, OriginalLabel(iorig,ifrg)(1:3), xc, yc, zc, &
+                                  occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:1)
+ 1120             FORMAT ('HETATM',I5,'  ',A3,' NON     1    ',3F8.3,2F6.2,'           ',A1,'  ')
+                ELSE
+                  WRITE (65,1130) iiact, OriginalLabel(iorig,ifrg)(1:4), xc, yc, zc, &
+                                  occ(iorig,ifrg), tiso(iorig,ifrg), asym(iorig,ifrg)(1:2)
+ 1130             FORMAT ('HETATM',I5,' ',A4,' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+                ENDIF
+                pdbAtmCoords(1,iorig,iFrgCopy,iFrg,SA_Run_Number) = xc
+                pdbAtmCoords(2,iorig,iFrgCopy,iFrg,SA_Run_Number) = yc
+                pdbAtmCoords(3,iorig,iFrgCopy,iFrg,SA_Run_Number) = zc
               ENDIF
-              pdbAtmCoords(1,iorig,ifrg,SA_Run_Number) = xc
-              pdbAtmCoords(2,iorig,ifrg,SA_Run_Number) = yc
-              pdbAtmCoords(3,iorig,ifrg,SA_Run_Number) = zc
-            ENDIF
-!         The CCL atom lines
-            IF (tSaveCCL) THEN
-              WRITE (66,1033) asym(iorig,ifrg), (xatopt(k,ii),k=1,3), tiso(iorig,ifrg), occ(iorig,ifrg) 
+! The CCL atom lines
+              IF (tSaveCCL) THEN
+                WRITE (66,1033) asym(iorig,iFrg), (xatopt(k,ii),k=1,3), tiso(iorig,iFrg), occ(iorig,iFrg) 
  1033         FORMAT ('A ',A3,' ',F10.5,1X,F10.5,1X,F10.5,1X,F4.2,1X,F4.2)
-            ENDIF
-          ENDDO ! loop over atoms
+              ENDIF
+            ENDDO ! loop over atoms
+          ENDDO ! Loop over copies
         ENDIF
       ENDDO ! loop over Z-matrices
       IF (tSaveCSSR) CLOSE (64)
@@ -229,11 +231,13 @@
         NumOfAtomsSoFar = 0
         DO ifrg = 1, maxfrg
           IF (gotzmfile(ifrg)) THEN
-            DO J = 1, NumberOfBonds(ifrg)
-              WRITE(65,'(A6,I5,I5)') 'CONECT', izmoid(Bonds(1,J,ifrg),ifrg)+NumOfAtomsSoFar, izmoid(Bonds(2,J,ifrg),ifrg)+NumOfAtomsSoFar
+            DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+              DO J = 1, NumberOfBonds(ifrg)
+                WRITE(65,'(A6,I5,I5)') 'CONECT', izmoid(Bonds(1,J,ifrg),ifrg)+NumOfAtomsSoFar, izmoid(Bonds(2,J,ifrg),ifrg)+NumOfAtomsSoFar
+              ENDDO
+              NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
+              TotNumBonds = TotNumBonds + NumberOfBonds(ifrg)
             ENDDO
-            NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
-            TotNumBonds = TotNumBonds + NumberOfBonds(ifrg)
           ENDIF
         ENDDO ! loop over Z-matrices
         WRITE (65,"('END')")
@@ -278,7 +282,7 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 
       REAL                pdbAtmCoords
-      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxfrg,1:MaxRun)
+      COMMON /PDBOVERLAP/ pdbAtmCoords(1:3,1:maxatm,1:maxcopies,1:maxfrg,1:MaxRun)
 
       INTEGER     mpdbops
       PARAMETER ( mpdbops = 192 )
@@ -299,7 +303,7 @@
 
       DOUBLE PRECISION inv(3,3)
       INTEGER RunNr, TickedRunNr, NumOfOverlaidStructures
-      INTEGER  pdbBond(1:maxbnd_2*maxfrg,1:2)
+      INTEGER  pdbBond(1:maxbnd_2*maxcopies*maxfrg,1:2)
       INTEGER TotNumBonds, NumOfAtomsSoFar
       CHARACTER*4 LabelStr
       CHARACTER*2 ColourStr
@@ -308,7 +312,7 @@
       INTEGER AtomLabelOption, AtomColourOption, RangeOption
       INTEGER GridRowNr
       CHARACTER(MaxPathLength) tString
-      INTEGER II, I, ifrg, J, iiact, ISTATUS, BondNr, ilen
+      INTEGER II, I, iFrg, iFrgCopy, J, iiact, ISTATUS, BondNr, ilen
       REAL xc, yc, zc
       LOGICAL UseThisSolution
       INTEGER Limit1, Limit2
@@ -360,12 +364,14 @@
       NumOfAtomsSoFar = 0
       DO ifrg = 1, maxfrg
         IF (gotzmfile(ifrg)) THEN
-          DO J = 1, NumberOfBonds(ifrg)
-            pdbBond(J+TotNumBonds,1) = Bonds(1,J,ifrg) + NumOfAtomsSoFar
-            pdbBond(J+TotNumBonds,2) = Bonds(2,J,ifrg) + NumOfAtomsSoFar
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO J = 1, NumberOfBonds(ifrg)
+              pdbBond(J+TotNumBonds,1) = Bonds(1,J,ifrg) + NumOfAtomsSoFar
+              pdbBond(J+TotNumBonds,2) = Bonds(2,J,ifrg) + NumOfAtomsSoFar
+            ENDDO
+            NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
+            TotNumBonds = TotNumBonds + NumberOfBonds(ifrg)
           ENDDO
-          NumOfAtomsSoFar = NumOfAtomsSoFar + natoms(ifrg)
-          TotNumBonds = TotNumBonds + NumberOfBonds(ifrg)
         ENDIF
       ENDDO ! loop over Z-matrices
 ! Get atom label option from dialogue. Two options: 
@@ -458,27 +464,30 @@
           LabelStr = LabelStr(1:LEN_TRIM(LabelStr))//RunStr
           DO ifrg = 1, maxfrg
             IF (gotzmfile(ifrg)) THEN
-              DO i = 1, natoms(ifrg)
-                iiact = iiact + 1
-                xc = pdbAtmCoords(1,i,ifrg,RunNr)
-                yc = pdbAtmCoords(2,i,ifrg,RunNr)
-                zc = pdbAtmCoords(3,i,ifrg,RunNr)
+
+              DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+                DO i = 1, natoms(ifrg)
+                  iiact = iiact + 1
+                  xc = pdbAtmCoords(1,i,iFrgCopy,ifrg,RunNr)
+                  yc = pdbAtmCoords(2,i,iFrgCopy,ifrg,RunNr)
+                  zc = pdbAtmCoords(3,i,iFrgCopy,ifrg,RunNr)
 ! Note that elements are right-justified
-                IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
-                  IF (asym(i,ifrg)(2:2) .EQ. ' ') THEN
-                    ColourStr(1:2) = ' '//asym(i,ifrg)(1:1)
-                  ELSE
-                    ColourStr(1:2) = asym(i,ifrg)(1:2)
+                  IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
+                    IF (asym(i,ifrg)(2:2) .EQ. ' ') THEN
+                      ColourStr(1:2) = ' '//asym(i,ifrg)(1:1)
+                    ELSE
+                      ColourStr(1:2) = asym(i,ifrg)(1:2)
+                    ENDIF
                   ENDIF
-                ENDIF
-                IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
-                  LabelStr = asym(i,ifrg)(1:LEN_TRIM(asym(i,ifrg)))//RunStr
-                ELSE  ! Orignal atom labels
-                  LabelStr(1:4) = OriginalLabel(i,ifrg)(1:4)
-                ENDIF
-                WRITE (65,1120) iiact, LabelStr(1:4), xc, yc, zc, occ(i,ifrg), tiso(i,ifrg), ColourStr(1:2)
- 1120           FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
-              ENDDO ! loop over atoms
+                  IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
+                    LabelStr = asym(i,ifrg)(1:LEN_TRIM(asym(i,ifrg)))//RunStr
+                  ELSE  ! Orignal atom labels
+                    LabelStr(1:4) = OriginalLabel(i,ifrg)(1:4)
+                  ENDIF
+                  WRITE (65,1120) iiact, LabelStr(1:4), xc, yc, zc, occ(i,ifrg), tiso(i,ifrg), ColourStr(1:2)
+ 1120             FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+                ENDDO ! loop over atoms
+              ENDDO
             ENDIF
           ENDDO ! loop over Z-matrices
         ENDIF ! Was this solution ticked to be displayed?

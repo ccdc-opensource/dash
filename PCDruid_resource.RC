@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 30/Jan/2002 15:51:53
+// Modified : 01/Feb/2002 13:55:18
 //
 ///////////////////////////////////////////////////
 //
@@ -383,7 +383,7 @@
 #define ID_Tutorial_3                   40044
 #define ID_Tutorial_4                   40045
 #define ID_Tutorial_5                   40002
-#define IDD_SAW_Page1                     102
+#define IDD_SAW_Page1_old                 102
 #define IDBACK                           1001
 #define IDNEXT                           1040
 #define IDD_SA_Multi_completed_ep         127
@@ -504,7 +504,7 @@
 #define IDF_LABELc                       1294
 #define IDD_Parameter_Status_2            156
 #define IDD_DIALOG004                     158
-#define IDD_SAW_Page1a                    159
+#define IDD_SAW_Page1                     159
 #define IDF_zmNumOf1                     1298
 #define IDF_zmNumOf2                     1299
 #define IDF_zmNumOf3                     1300
@@ -537,6 +537,10 @@
 #define IDF_IDoNotAgree                  1386
 #define IDD_DIALOG002                     162
 #define IDF_BUTTON8                      1387
+#define IDF_zmFile1                      1388
+#define IDF_zmFile2                      1389
+#define IDF_zmFile3                      1390
+#define IDF_zmFile4                      1391
 
 ///////////////////////////////////////////////////
 //
@@ -1982,7 +1986,7 @@ BEGIN
 ,0
 END
 
-IDD_SAW_Page1 DIALOG 0, 0,  400,  170
+IDD_SAW_Page1_old DIALOG 0, 0,  400,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Molecular Z-Matrices"
@@ -2026,7 +2030,7 @@ BEGIN
     CONTROL "",IDB_ZmatrixDelete5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  296,  120,   16,   12
 END
 
-IDD_SAW_Page1 RCDATA
+IDD_SAW_Page1_old RCDATA
 BEGIN
 "[Checks] \n"
 "[Menus] \n"
@@ -2676,7 +2680,7 @@ FONT    8, "MS Sans Serif"
 CAPTION "Licence Agreement"
 BEGIN
     CONTROL "",IDF_Agreement,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE | ES_READONLY,   18,   16,  262,  144
-    CONTROL "I do NOT agree",IDF_IDoNotAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   60,  170,   60,   14
+    CONTROL "I do NOT agree",IDF_IDoNotAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   60,  170,   65,   14
     CONTROL "I have read the full text above and I Agree",IDF_IAgree,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   60,  184,  175,   14
     CONTROL "OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  129,  208,   40,   14
 END
@@ -2855,7 +2859,7 @@ BEGIN
 ,0
 END
 
-IDD_SAW_Page1a DIALOG 0, 0,  400,  170
+IDD_SAW_Page1 DIALOG 0, 0,  400,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Molecular Z-Matrices"
@@ -2863,10 +2867,10 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "",IDF_SA_Project_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   94,   21,  200,   14
     CONTROL "B&rowse...",IDB_SA_Project_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  343,   21,   36,   14
-    CONTROL "",IDF_ZMatrix_file1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,  137,   71,  100,   14
-    CONTROL "",IDF_ZMatrix_file2,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,  137,   87,  100,   14
-    CONTROL "",IDF_ZMatrix_file3,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,  137,  103,  100,   14
-    CONTROL "",IDF_ZMatrix_file4,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,  137,  119,  100,   14
+    CONTROL "",IDF_zmFile1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,  137,   71,  100,   14
+    CONTROL "",IDF_zmFile2,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,  137,   87,  100,   14
+    CONTROL "",IDF_zmFile3,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,  137,  103,  100,   14
+    CONTROL "",IDF_zmFile4,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN,  137,  119,  100,   14
     CONTROL "",IDB_zmBrowse1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  265,   72,   16,   12
     CONTROL "",IDB_zmBrowse2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  265,   88,   16,   12
     CONTROL "",IDB_zmBrowse3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT | BS_BITMAP,  265,  104,   16,   12
@@ -2908,7 +2912,7 @@ BEGIN
     CONTROL "Molecular Z-matrices",IDF_GROUP4,"BUTTON",WS_CHILD | WS_VISIBLE | BS_GROUPBOX | BS_TEXT,   87,   48,  300,   94
 END
 
-IDD_SAW_Page1a RCDATA
+IDD_SAW_Page1 RCDATA
 BEGIN
 "[Checks] \n"
 "[Menus] \n"
@@ -2919,6 +2923,10 @@ BEGIN
 " 1126               1              99 \n"
 " 1127               1              99 \n"
 " 1111               1              99 \n"
+" 1298               0               8 \n"
+" 1299               0               8 \n"
+" 1300               0               8 \n"
+" 1303               0               8 \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
@@ -3142,15 +3150,15 @@ IDF_Width_Equations             BITMAP DISCARDABLE "res\\WidthEquations.bmp"
 IDF_PW_Logo1                    BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
 IDF_WelcomeWizard               BITMAP DISCARDABLE "res\\WizardWelcome.bmp"
 ID_TOOLBAR1                     BITMAP DISCARDABLE "res\\toolbar1.bmp"
-IDB_ZMatrix_Browse1             BITMAP DISCARDABLE "res\\OpenFile.bmp"
-IDB_ZMatrix_Browse2             BITMAP DISCARDABLE "res\\OpenFile.bmp"
-IDB_ZMatrix_Browse3             BITMAP DISCARDABLE "res\\OpenFile.bmp"
-IDB_ZMatrix_Browse4             BITMAP DISCARDABLE "res\\OpenFile.bmp"
+IDB_zmBrowse1                   BITMAP DISCARDABLE "res\\OpenFile.bmp"
+IDB_zmBrowse2                   BITMAP DISCARDABLE "res\\OpenFile.bmp"
+IDB_zmBrowse3                   BITMAP DISCARDABLE "res\\OpenFile.bmp"
+IDB_zmBrowse4                   BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_ZMatrix_Browse5             BITMAP DISCARDABLE "res\\OpenFile.bmp"
-IDB_ZmatrixDelete1              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
-IDB_ZmatrixDelete2              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
-IDB_ZmatrixDelete3              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
-IDB_ZmatrixDelete4              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
+IDB_zmDelete1                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
+IDB_zmDelete2                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
+IDB_zmDelete3                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
+IDB_zmDelete4                   BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 IDB_ZmatrixDelete5              BITMAP DISCARDABLE "res\\DeleteFile.bmp"
 
 ///////////////////////////////////////////////////

@@ -37,7 +37,7 @@
       REAL                                           DSTAR
       COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
-      INTEGER ifrg, i, item, iref
+      INTEGER iFrg, i, item, iref, iFrgCopy
       INTEGER tNumHydrogens, tNumNonHydrogens, tAtomNumber
       REAL ssq, atem, btem
       REAL, EXTERNAL :: ascfac
@@ -52,16 +52,20 @@
       TotNumOfAtoms = 0
       NumOfHydrogens = 0
       NumOfNonHydrogens = 0
-      DO ifrg = 1, maxfrg
-        IF (gotzmfile(ifrg)) THEN
-          DO i = 1, natoms(ifrg)
-            TotNumOfAtoms = TotNumOfAtoms + 1
-            IF (asym(i,ifrg).EQ.'H  ') THEN
-              NumOfHydrogens = NumOfHydrogens + 1
-            ELSE
-              NumOfNonHydrogens = NumOfNonHydrogens + 1
-            ENDIF
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 1, natoms(iFrg)
+              TotNumOfAtoms = TotNumOfAtoms + 1
+              IF (asym(i,iFrg).EQ.'H  ') THEN
+                NumOfHydrogens = NumOfHydrogens + 1
+              ELSE
+                NumOfNonHydrogens = NumOfNonHydrogens + 1
+              ENDIF
+            ENDDO
           ENDDO
+
         ENDIF
       ENDDO
       natom = TotNumOfAtoms
@@ -70,25 +74,30 @@
       tNumHydrogens = 0
       tNumNonHydrogens = 0
       tAtomNumber = 0         ! To make life easier, we just use a mapping in MAKEFRAC
-      DO ifrg = 1, maxfrg
-        IF (gotzmfile(ifrg)) THEN
-          DO i = 1, natoms(ifrg)
-            tAtomNumber = tAtomNumber + 1
-            IF (asym(i,ifrg).EQ.'H  ') THEN
-              tNumHydrogens = tNumHydrogens + 1
-              item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
-            ELSE
-              tNumNonHydrogens = tNumNonHydrogens + 1
-              item = tNumNonHydrogens
-            ENDIF
-            OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
-            DO IREF = 1, MAXK
-              ssq = 0.25*DSTAR(iref)**2
-              atem = occ(i,ifrg)*ascfac(asym(i,ifrg),ssq)
-              btem = tiso(i,ifrg)*ssq
-              FOB(item,iref) = atem*EXP(-btem)
+      DO iFrg = 1, maxfrg
+        IF (gotzmfile(iFrg)) THEN
+         
+          DO iFrgCopy = 1, zmNumberOfCopies(iFrg)
+            DO i = 1, natoms(iFrg)
+              tAtomNumber = tAtomNumber + 1
+              IF (asym(i,iFrg).EQ.'H  ') THEN
+                tNumHydrogens = tNumHydrogens + 1
+                item = NumOfNonHydrogens + tNumHydrogens ! Start counting after non-hydrogens
+              ELSE
+                tNumNonHydrogens = tNumNonHydrogens + 1
+                item = tNumNonHydrogens
+              ENDIF
+              OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
+              DO IREF = 1, MAXK
+                ssq = 0.25*DSTAR(iref)**2
+                atem = occ(i,iFrg)*ascfac(asym(i,iFrg),ssq)
+                btem = tiso(i,iFrg)*ssq
+                FOB(item,iref) = atem*EXP(-btem)
+              ENDDO
             ENDDO
           ENDDO
+          
+
         ENDIF
       ENDDO
 
