@@ -268,7 +268,7 @@
 ! the orthogonal axes, but the unit cell is given as a, b, c, alpha, beta, gamma.
 ! It is not specified how the unit cell is to be constructed wrt. the orthogonal axes
 ! from the unit cell parameters.
-! Mercury turns out to chose: a along x. Everywhere else in DASH, we have used c along z
+! Mercury turns out to choose: a along x. Everywhere else in DASH, we have used c along z
 !
 ! RETURNS 0 for failure
 !         1 for success
