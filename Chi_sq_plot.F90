@@ -1,10 +1,10 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE PrepareChiSqPlotData(ntotmov, iteration, cpb)
+      SUBROUTINE PrepareChiSqPlotData(iteration, cpb)
 !
 !
-!  ep added subroutine.  Called from SimulatedAnnealing subroutine (sa_subs.for).
+!  ep added subroutine.  Called from SimulatedAnnealing subroutine (sa_subs.f90).
 !    This subroutine stores and manipulates data for a Profile Chi-sqd
 !  vs. number of moves plot.  Actual plotting is done by Subroutine Plotting_chi_sqd.
 !
@@ -18,15 +18,15 @@
       USE DRUID_HEADER
       USE WINTERACTER
 !
-!      IMPLICIT NONE
+      IMPLICIT NONE
 !
 !  Definitions and array declarations.
 !
+      INTEGER, INTENT (IN   ) :: iteration
+      REAL,    INTENT (IN   ) :: cpb
+
       INCLUDE 'PARAMS.INC'
 
-      INTEGER           :: ntotmov
-      INTEGER           :: iteration
-      REAL              :: cpb
       INTEGER                    ChiSqdChildWindows,                 ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
       DATA  ChiSqdChildWindows / 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 /
@@ -42,42 +42,40 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-! Max number or SA runs is 99
-      REAL, DIMENSION(MaxIter, MaxRun) :: chi_sqd
-      REAL           :: x_min
-      INTEGER        :: it_count
-      REAL           :: y_max
-      INTEGER        ::NumDynamicX
-      COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, NumDynamicX
+      REAL                    chi_sqd
+      INTEGER                                           it_count
+      REAL                                                        y_max
+      INTEGER                                                            MaxIterationSoFar
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
 
       EXTERNAL DealWithChiSqdPlot
+      INTEGER  J
 
-    !  Run_Number = SA_Run_Number + 1
-!
-! Clear Chi-sqd array between starting sets of SA Runs
-      IF ((Iteration.EQ.1).AND.(SA_Run_Number.EQ.1)) Chi_sqd = 0.0
+! chi_sqd is initialised to all zeros in BeginSa()
+
       it_count = iteration
-!
+      IF (iteration .GT. MaxIterationSoFar) MaxIterationSoFar = iteration
+
 ! Record chi-sqd value in array.  Chi-sqd values following it_count entry
 ! set to last Chi-sqd value entered.
-      chi_sqd(it_count, SA_Run_Number) = cpb
-      DO J = it_count+1, MaxIter
+      chi_sqd(iteration, SA_Run_Number) = cpb
+      DO J = iteration+1, MaxIter
         Chi_sqd(J, SA_Run_Number) = cpb
       ENDDO
-! Record y_max for graph
-      y_max = chi_sqd(1, SA_Run_Number)*1.25
-!
-! If first iteration then record number of moves for minimum value of x axis on graph
-      IF (It_count.EQ.1) x_min = FLOAT(ntotmov)
+
+! If first iteration...
+      IF (iteration.EQ.1) THEN
+! ...record y_max for graph
+        y_max = chi_sqd(1, SA_Run_Number)*1.25
+      ENDIF
  
 ! If this is the first SA run and 2 points for the line graph have been determined, open Child Window
-      IF ((SA_Run_Number.EQ.1) .AND. (it_count.EQ.2)) THEN
+      IF ((SA_Run_Number.EQ.1) .AND. (iteration.EQ.2)) THEN
         CALL WindowOpenChild(ChiHandle, x=Ix, y=Iy, width=400, height=300, title='SA Run Progress')
         ChiSqdChildWindows(ChiHandle) = 1
         CALL RegisterChildWindow(Chihandle,DealWithChiSqdPlot)
       ENDIF
-
-      IF ((ChiSqdChildWindows(ChiHandle).EQ.1).AND.(It_count.GE.2)) CALL plotting_chi_sqd(ChiHandle)
+      IF ((ChiSqdChildWindows(ChiHandle).EQ.1).AND.(iteration.GE.2)) CALL plotting_chi_sqd(ChiHandle)
 
       END SUBROUTINE PrepareChiSqPlotData
 !
@@ -90,24 +88,19 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN  ) :: ChiHandle
+      INTEGER, INTENT (IN   ) :: ChiHandle
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'poly_colours.inc'
 
-      INTEGER        :: ixaxis
       REAL           :: x_max
       REAL, DIMENSION(MaxIter+1) :: Xarray
-      REAL           ::DynamicMaxX
-      DATA  DynamicMaxX / 0.0 /
-      REAL           ::TempMaxX
 
-      REAL, DIMENSION(MaxIter, MaxRun) :: chi_sqd
-      REAL           :: x_min
-      INTEGER        :: it_count
-      REAL           :: y_max
-      INTEGER        ::NumDynamicX
-      COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, NumDynamicX
+      REAL                    chi_sqd
+      INTEGER                                           it_count
+      REAL                                                        y_max
+      INTEGER                                                            MaxIterationSoFar
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
@@ -115,36 +108,22 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
+      REAL            bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4
+      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
+      COMMON /sagdat/ bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4, &
+                      nd1, nmpert, nd3, nd4, bmIHANDLE
+
       INTEGER J, ISET
 
       CALL WindowSelect(ChiHandle)
       CALL WindowClear()
 
-! First Run so set DynamicMaxX to zero.  IF "stop" pressed in SA run Window want to reset
-! DynamicMAxX
-      IF((SA_Run_Number.EQ.1).AND.(It_count.EQ.2)) THEN
-        DynamicMaxX = 0.0
-      ENDIF
-
+! MaxIterationSoFar is initialised to zero in BeginSa
 ! calculate array of x values for graph
-      ixaxis = NINT(MaxMoves/(x_min))
-      DO j = 1, (ixaxis+1)
-        Xarray(j) = j*(x_min)
+      DO j = 1, MaxIterationSoFar
+        Xarray(j) = FLOAT(j * nmpert)
       ENDDO
-!
-! Set x_max for graph.  When have dynamic x-axis (first SA Run) the maximum value possible for 
-! the xaxis is the maximum number of moves
-      IF (SA_Run_Number.EQ.1) THEN
-        IF(it_count.GE.(NINT(MaxMoves/x_min))) THEN
-          x_max = MaxMoves
-        ELSE
-          x_max = Xarray(it_count)
-        ENDIF
-      ELSE
-! Xaxis max is largest value of x recorded so far
-        x_max = DynamicMaxX
-      ENDIF
-
+      x_max = MaxIterationSoFar * FLOAT(nmpert)
 !  Start new presentation graphics plot
 !
 !  Set Clipping Rectangle
@@ -153,15 +132,15 @@
 !
 !  Set style for each data set
 !
-      CALL IPgStyle(  1,  0,  0,  0,      KolNumobs)
+      CALL IPgStyle(  1,  0,  0,  0,  KolNumobs)
 !
 !  Set marker number for data sets not using default marker
 !
 !
 !  Set units for plot
 !
-      CALL IPgUnits(  x_min,      0.0000000, &
-                      x_max,    y_max)
+      CALL IPgUnits(  FLOAT(nmpert),      0.0000000,   &
+                      x_max,              y_max)
 !
 !  Set presentation graphics area
 !
@@ -173,7 +152,7 @@
       CALL IGrCharFont(3)
       CALL IGrCharSpacing('P')
       CALL IGrCharSize( 2.0, 1.5)
-      CALL IGrColourN( KolNumMain)
+      CALL IGrColourN(KolNumMain)
       CALL IPgTitle('Profile Chi-squared vs. Number of Moves','C')
 !
 !  Label bottom X axis
@@ -219,31 +198,20 @@
 !
 !  Draw graph.
 !
-      IF (SA_Run_Number.GT.1) THEN
+      IF (SA_Run_Number .GT. 1) THEN
 ! Plot Chi-sqd values to maximum number of moves for completed SA runs
-!!        iMaxMoves = NINT(x_Max/(x_min)) 
-!!        CALL IPgNewPlot(PgPolyLine,(SA_Run_Number-1),iMaxMoves,0,1)
-        CALL IPgNewPlot(PgPolyLine,(SA_Run_Number-1),NumDynamicX,0,1)
-          DO j = 1,(SA_Run_Number-1)
-            CALL IPgStyle(  j,  0,  0,  0,      KolNumobs)
-          END DO
-          DO ISET = 1, (SA_Run_Number-1)
-            CALL IPgXYPairs(Xarray, Chi_sqd(1,ISET))
-          ENDDO
+        CALL IPgNewPlot(PgPolyLine,(SA_Run_Number-1),MaxIterationSoFar,0,1)
+        DO j = 1, SA_Run_Number-1
+          CALL IPgStyle(  j,  0,  0,  0,  KolNumObs)
+        ENDDO
+        DO ISET = 1, SA_Run_Number-1
+          CALL IPgXYPairs(Xarray, Chi_sqd(1,ISET))
+        ENDDO
       ENDIF
 ! Plot Chi-sqd values iteration by iteration
-        CALL IPgNewPlot(PgPolyLine,1,it_count,0,1)
-        CALL IPgStyle(  1,  0,  0,  0,      KolNumCal)
-        CALL IPgXYPairs(Xarray, chi_sqd(1,SA_Run_Number))
-! Record the largest value of x so far.  This is used as the maxmimum value for x when drawing
-! x_axis.  
-        IF ((it_count*x_min).LE.(MaxMoves)) THEN
-          TempMaxX = it_count*x_min
-            IF(TempMaxX.GT.DynamicMaxX) THEN
-              DynamicMaxX = TempMaxX
-              NumDynamicX = NINT(DynamicMaxX/x_min)
-            ENDIF
-        ENDIF
+      CALL IPgNewPlot(PgPolyLine,1,it_count,0,1)
+      CALL IPgStyle(  1,  0,  0,  0,  KolNumCal)
+      CALL IPgXYPairs(Xarray, chi_sqd(1,SA_Run_Number))
 
       END SUBROUTINE plotting_chi_sqd
 !
@@ -254,6 +222,8 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+
+      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
 
@@ -268,7 +238,7 @@
           CALL UnRegisterChildWindow(EventInfo%win)
 ! exposing or resizing of profile plot windows 
         CASE (expose, resize)
-          CALL PLotting_chi_sqd(EventInfo%win)
+          CALL Plotting_chi_sqd(EventInfo%win)
       END SELECT
 
       END SUBROUTINE DealWithChiSqdPlot
@@ -280,13 +250,16 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
 
-      INTEGER ChiSqdChildWindows
-      INTEGER ChiHandle
+      INTEGER                    ChiSqdChildWindows,                 ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
       INTEGER Ix, Iy
       COMMON /WindowPosition/ Ix, Iy
+
+      INTEGER I
 
       DO I = 1, MaxNumChildWin
         IF (ChiSqdChildWindows(I) .EQ. 1) THEN
@@ -311,12 +284,11 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL, DIMENSION(MaxIter, MaxRun) :: chi_sqd
-      REAL           :: x_min
-      INTEGER        :: it_count
-      REAL           :: y_max
-      INTEGER        ::NumDynamicX
-      COMMON /CHISQDPLOTDATA/chi_sqd, x_min, it_count, y_max, NumDynamicX
+      REAL                    chi_sqd
+      INTEGER                                           it_count
+      REAL                                                        y_max
+      INTEGER                                                            MaxIterationSoFar
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), it_count, y_max, MaxIterationSoFar
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number
@@ -330,6 +302,11 @@
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
       COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
+      REAL            bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4
+      INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
+      COMMON /sagdat/ bchmin, bpwval, bchpro, tempvl, avchi1, avchi2, avchi3, avchi4, &
+                      nd1, nmpert, nd3, nd4, bmIHANDLE
+
       LOGICAL, EXTERNAL :: Get_OutputChi2vsMoves
       INTEGER tFileHandle, iLen, I, J
       CHARACTER*80 tFileName
@@ -340,8 +317,8 @@
       iLen = LEN_TRIM(tFileName)
       tFileName = tFileName(1:iLen-3)//'chi'
       OPEN(UNIT=tFileHandle,FILE=tFileName(1:iLen),ERR=999)
-      DO I = 1, NumDynamicX
-        WRITE(tFileHandle,'(99(F9.2,1X))',ERR=999) (chi_sqd(I,J),J=1,SA_Run_Number) ! SA_Run_Number = last completed SA run
+      DO I = 1, MaxIterationSoFar
+        WRITE(tFileHandle,'(I10,1X,99(F9.2,1X))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,SA_Run_Number) ! SA_Run_Number = last completed SA run
       ENDDO
       CLOSE(tFileHandle)
       RETURN
