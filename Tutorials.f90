@@ -11,26 +11,27 @@
 
       INTEGER, INTENT (IN   ) :: Tutorial_ID
 
-      CHARACTER*255 DirString, FileDir
-      CHARACTER*255 Files(100)
-      CHARACTER*255 CurDir
-      INTEGER       NFiles
-      INTEGER       I
+      CHARACTER(MaxPathLength) DirString, FileDir
+      CHARACTER(MaxPathLength) Files(100)
+      CHARACTER(MaxPathLength) CurDir
+      INTEGER                  NFiles, I
+      CHARACTER(1)             NumberStr
 
       NFiles = 100
       CALL IOsDirName(CurDir)
       SELECT CASE (Tutorial_ID)
         CASE (ID_Tutorial_1)
-          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial1"
+          NumberStr = '1'
         CASE (ID_Tutorial_2)
-          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial2"
+          NumberStr = '2'
         CASE (ID_Tutorial_3)
-          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial3"
+          NumberStr = '3'
         CASE (ID_Tutorial_4)
-          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial4"
+          NumberStr = '4'
         CASE (ID_Tutorial_5)
-          DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial5"
+          NumberStr = '5'
       END SELECT
+      DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"tutorial"//NumberStr
       FileDir = DirString(1:LEN_TRIM(DirString))//DIRSPACER//"data files"
       CALL IOsDirList(FileDir(1:LEN_TRIM(FileDir)),"",Files,Nfiles)
       CALL IOsDirChange(FileDir(1:LEN_TRIM(FileDir)))
@@ -39,7 +40,7 @@
       ENDDO
       CALL IOsDirChange(CurDir(1:LEN_TRIM(CurDir)))
       CALL WHelpFile(' ') ! In case the help file is open already
-      CALL WHelpFile(DirString(1:LEN_TRIM(DirString))//DIRSPACER//"index.htm")
+      CALL WHelpFile(DirString(1:LEN_TRIM(DirString))//DIRSPACER//"Tutorial"//NumberStr//".chm")
 
       END SUBROUTINE LaunchTutorial
 !
