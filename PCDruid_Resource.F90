@@ -1,4 +1,4 @@
-! Winteracter module created : 16/Oct/2001 21:19:00
+! Winteracter module created : 18/Oct/2001 12:29:17
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -140,7 +140,7 @@
           INTEGER, PARAMETER :: IDD_Polyfitter_Wizard_01        =   121
           INTEGER, PARAMETER :: IDF_PW01_Text1                  =  1197
           INTEGER, PARAMETER :: IDB_SA_Project_Open             =  1198
-          INTEGER, PARAMETER :: IDF_PW0_Skip                    =  1216
+          INTEGER, PARAMETER :: IDD_PW_Page9                    =   151
           INTEGER, PARAMETER :: ID_PW_DF_Open                   =  1210
           INTEGER, PARAMETER :: IDFINISH                        =  1048
           INTEGER, PARAMETER :: IDD_PW_Page1                    =   122
@@ -437,7 +437,7 @@
           INTEGER, PARAMETER :: IDF_Min2Theta                   =  1209
           INTEGER, PARAMETER :: IDF_LABEL8                      =  1464
           INTEGER, PARAMETER :: IDD_PW_Page4                    =   144
-          INTEGER, PARAMETER :: IDD_PW_page6                    =   145
+          INTEGER, PARAMETER :: IDD_PW_Page6                    =   145
           INTEGER, PARAMETER :: IDF_NumOfIterations             =  1211
           INTEGER, PARAMETER :: IDF_WindowWidth                 =  1212
           INTEGER, PARAMETER :: IDF_UseMCYN                     =  1213
@@ -498,4 +498,8 @@
           INTEGER, PARAMETER :: IDF_UseHydrogens                =  1296
           INTEGER, PARAMETER :: IDD_DataRangeSTOE               =   148
           INTEGER, PARAMETER :: IDF_DataRangeMenu               =  1264
+          INTEGER, PARAMETER :: IDD_PW_Page7                    =   149
+          INTEGER, PARAMETER :: IDD_PW_Page8                    =   150
+          INTEGER, PARAMETER :: IDF_LABEL19                     =  1297
+          INTEGER, PARAMETER :: IDD_DIALOG006                   =   152
       END MODULE Druid_Header

@@ -84,9 +84,13 @@
 
       INTEGER, INTENT (IN   ) :: TheIHANDLE
 
-      LOGICAL         ChildWinAutoClose
-      COMMON /ChWAC/  ChildWinAutoClose(1:20)
+      LOGICAL           ChildWinAutoClose
+      COMMON /ChWinAC/  ChildWinAutoClose(1:20)
 
+      IF ((TheIHANDLE.LT.1) .OR. (TheIHANDLE.GT.20)) THEN
+        CALL DebugErrorMessage('Invalid Child Window ID in SetChildWinAutoClose')
+        RETURN
+      ENDIF
       ChildWinAutoClose(TheIHANDLE) = .TRUE.
 
       END SUBROUTINE SetChildWinAutoClose
@@ -172,8 +176,8 @@
       COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
 
       EXTERNAL Handler
-
       POINTER (p, Handler)
+! 'p' is now a code pointer to the subroutine 'Handler'
 
   10  CALL WMessage(EventType,EventInfo)
       SELECT CASE (EventInfo%WIN)
@@ -207,15 +211,13 @@
               CALL Check_KeyDown_PeakFit_Inner
               GOTO 10
           END SELECT
-        CASE (1:20)
-          IF (EventType.EQ.CloseRequest) THEN
-            IF (ChildWinAutoClose(EventInfo%WIN)) THEN
-              CALL PushActiveWindowID
-              CALL WindowCloseChild(EventInfo%WIN)
-              ChildWinAutoClose(EventInfo%WIN) = .FALSE.
-              CALL PopActiveWindowID
-              GOTO 10
-            ENDIF
+        CASE (1:20) ! One of the Child Windows
+          IF (EventType.EQ.CloseRequest .AND. ChildWinAutoClose(EventInfo%WIN)) THEN
+            CALL PushActiveWindowID
+            CALL WindowCloseChild(EventInfo%WIN)
+            ChildWinAutoClose(EventInfo%WIN) = .FALSE.
+            CALL PopActiveWindowID
+            GOTO 10
           ENDIF
           IF (ChildWinHandlerSet(EventInfo%WIN)) THEN
             p = ChildWinHandler(EventInfo%WIN)
@@ -260,6 +262,15 @@
           GOTO 10
         CASE (IDD_PW_Page6)
           CALL DealWithWizardWindowBackground
+          GOTO 10
+        CASE (IDD_PW_Page7)
+          CALL DealWithWizardWindowIndexing1
+          GOTO 10
+        CASE (IDD_PW_Page8)
+          CALL DealWithWizardWindowIndexing2
+          GOTO 10
+        CASE (IDD_PW_Page9)
+          CALL DealWithWizardWindowDICVOLResults
           GOTO 10
         CASE (IDD_PW_Page1)
           CALL DealWithWizardWindowUnitCellParameters
@@ -345,15 +356,13 @@
                 CALL Check_KeyDown_PeakFit_Inner
                 GOTO 10
             END SELECT
-          CASE (1:20)
-            IF (EventType.EQ.CloseRequest) THEN
-              IF (ChildWinAutoClose(EventInfo%WIN)) THEN
-                CALL PushActiveWindowID
-                CALL WindowCloseChild(EventInfo%WIN)
-                ChildWinAutoClose(EventInfo%WIN) = .FALSE.
-                CALL PopActiveWindowID
-                GOTO 10
-              ENDIF
+          CASE (1:20) ! One of the Child Windows
+            IF (EventType.EQ.CloseRequest .AND. ChildWinAutoClose(EventInfo%WIN)) THEN
+              CALL PushActiveWindowID
+              CALL WindowCloseChild(EventInfo%WIN)
+              ChildWinAutoClose(EventInfo%WIN) = .FALSE.
+              CALL PopActiveWindowID
+              GOTO 10
             ENDIF
             IF (ChildWinHandlerSet(EventInfo%WIN)) THEN
               p = ChildWinHandler(EventInfo%WIN)
@@ -398,6 +407,15 @@
             GOTO 10
           CASE (IDD_PW_Page6)
             CALL DealWithWizardWindowBackground
+            GOTO 10
+          CASE (IDD_PW_Page7)
+            CALL DealWithWizardWindowIndexing1
+            GOTO 10
+          CASE (IDD_PW_Page8)
+            CALL DealWithWizardWindowIndexing2
+            GOTO 10
+          CASE (IDD_PW_Page9)
+            CALL DealWithWizardWindowDICVOLResults
             GOTO 10
           CASE (IDD_PW_Page1)
             CALL DealWithWizardWindowUnitCellParameters

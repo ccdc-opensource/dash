@@ -73,7 +73,7 @@
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_PW0_Skip, IDCANCEL) ! The 'Close' button
+            CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDNEXT)
               IXPos_IDD_Wizard = WInfoDialog(6)
@@ -289,7 +289,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
               CALL WizardApplyFinish_1
-            CASE (IDCANCEL)
+            CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
               IXPos_IDD_Wizard = WInfoDialog(6)
@@ -363,7 +363,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
               CALL WizardApplyFinish_1
-            CASE (IDCANCEL)
+            CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
               IXPos_IDD_Wizard = WInfoDialog(6)
@@ -463,7 +463,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
               CALL WizardApplyFinish_1
-            CASE (IDCANCEL)
+            CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
               IXPos_IDD_Wizard = WInfoDialog(6)
@@ -574,17 +574,23 @@
       CALL WDialogSelect(IDD_PW_Page6)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDFINISH)
               CALL WizardApplyFinish_1
-            CASE (IDCANCEL)
+            CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
               IXPos_IDD_Wizard = WInfoDialog(6)
               IYPos_IDD_Wizard = WInfoDialog(7)
               CALL WDialogHide()
               CALL WDialogSelect(IDD_PW_Page5)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDNEXT)
+              CALL WizardApplyBackground
+              IXPos_IDD_Wizard = WInfoDialog(6)
+              IYPos_IDD_Wizard = WInfoDialog(7)
+              CALL WDialogHide()
+              CALL WDialogSelect(IDD_PW_Page7)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDF_Preview)
               CALL WDialogGetCheckBox(IDF_UseMCYN,ISTATE)
@@ -608,6 +614,294 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DealWithWizardWindowIndexing1
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'DialogPosCmn.inc'
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page7)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (IDBACK)
+              IXPos_IDD_Wizard = WInfoDialog(6)
+              IYPos_IDD_Wizard = WInfoDialog(7)
+              CALL WDialogHide()
+              CALL WDialogSelect(IDD_PW_Page6)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDNEXT)
+              IXPos_IDD_Wizard = WInfoDialog(6)
+              IYPos_IDD_Wizard = WInfoDialog(7)
+              CALL WDialogHide()
+              CALL WDialogSelect(IDD_PW_Page8)
+! If this is synchrotron data, then set the default error in the peak positions to 0.02 rahter than 0.03.
+! This decreases the number of solutions and increases the speed of the search.
+              IF (JRadOption .EQ. 2) THEN
+                CALL WDialogPutReal(IDF_eps,0.02,'(F5.3)')
+              ELSE
+                CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
+              ENDIF
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowIndexing1
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowIndexing2
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE DICVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
+      INCLUDE 'DialogPosCmn.inc'
+
+      INTEGER           NTPeak
+      REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              PkProb
+      INTEGER           IOrdTem
+      INTEGER           IHPk
+      COMMON /ALLPEAKS/ NTPeak,                                                  &
+                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        PkProb(MTPeak),                                          &
+                        IOrdTem(MTPeak),                                         &
+                        IHPk(3,MTPeak)
+
+      REAL Rvpar(2), Lambda, Rdens, Rmolwt, Rexpzp
+      INTEGER Isystem(6), I, Iord
+      INTEGER IHANDLE
+      REAL    Epsilon
+      REAL    MaxLen
+      LOGICAL Confirm ! Function
+      REAL    TwoTheta2dSpacing ! Function
+      REAL    MaxSinBeta
+      REAL    tBeta
+      INTEGER NumDoF
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page8)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (IDBACK)
+              IXPos_IDD_Wizard = WInfoDialog(6)
+              IYPos_IDD_Wizard = WInfoDialog(7)
+              CALL WDialogHide()
+              CALL WDialogSelect(IDD_PW_Page7)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDNEXT)
+              IXPos_IDD_Wizard = WInfoDialog(6)
+              IYPos_IDD_Wizard = WInfoDialog(7)
+              CALL WDialogHide()
+              CALL WDialogSelect(IDD_PW_Page9)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDF_RunDICVOL)
+              Lambda = ALambda
+              CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
+              CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
+              CALL WDialogGetReal(IDF_Indexing_Maxa, amax)
+              Bmax = amax
+              Cmax = amax
+              CALL WDialogGetReal       (IDF_Indexing_MinAng,      Bemin)
+              CALL WDialogGetReal       (IDF_Indexing_MaxAng,      Bemax)
+              IF (Bemin .GT. Bemax) THEN
+                tBeta = Bemin
+                Bemin = Bemax
+                Bemax = tBeta
+              ENDIF
+              CALL WDialogGetReal       (IDF_Indexing_Density,     Rdens)
+              CALL WDialogGetReal       (IDF_Indexing_MolWt,       Rmolwt)
+              CALL WDialogGetReal       (IDF_ZeroPoint,            Rexpzp)
+              CALL WDialogGetCheckBox   (IDF_Indexing_Cubic,       Isystem(1))
+              CALL WDialogGetCheckBox   (IDF_Indexing_Tetra,       Isystem(2))
+              CALL WDialogGetCheckBox   (IDF_Indexing_Hexa,        Isystem(3))
+              CALL WDialogGetCheckBox   (IDF_Indexing_Ortho,       Isystem(4))
+              CALL WDialogGetCheckBox   (IDF_Indexing_Monoclinic,  Isystem(5))
+              CALL WDialogGetCheckBox   (IDF_Indexing_Triclinic,   Isystem(6))
+              CALL WDialogGetReal       (IDF_eps,                  Epsilon)
+              CALL WDialogGetReal       (IDF_Indexing_Fom,         fom)
+              CALL WDialogGetReal       (IDF_Indexing_ScaleFactor, DV_ScaleFactor)
+! Number of degrees of freedom, we don't even count the zero point
+              NumDoF = 0
+              IF (Isystem(1) .EQ. 1) NumDof = MAX(NumDoF,1)
+              IF (Isystem(2) .EQ. 1) NumDof = MAX(NumDoF,2)
+              IF (Isystem(3) .EQ. 1) NumDof = MAX(NumDoF,2)
+              IF (Isystem(4) .EQ. 1) NumDof = MAX(NumDoF,3)
+              IF (Isystem(5) .EQ. 1) NumDof = MAX(NumDoF,4)
+              IF (Isystem(6) .EQ. 1) NumDof = MAX(NumDoF,6)
+! Check if any crystal system checked at all
+              IF (NumDoF .EQ. 0) THEN
+                CALL ErrorMessage('Please check at least one crystal system.')
+                RETURN
+              ENDIF
+! Check if the number of observed lines is consistent with the crystal systems
+              IF (NTPeak .LT. NumDoF) THEN
+                CALL ErrorMessage('The number of observed lines is less than the number of degrees of freedom.')
+                RETURN
+              ENDIF
+! Warn the user if we have less observed lines than twice the number of degrees of freedom including the zero point
+              IF ((2*(NumDoF+1)) .GT. NTPeak) THEN
+                IF (.NOT. Confirm('The number of observed lines is less than twice the number of degrees of freedom,'//CHAR(13)//&
+                'do you wish to continue anyway?')) RETURN
+              ENDIF
+              IF (DV_ScaleFactor .LT. 0.1) DV_ScaleFactor = 0.1
+              IF (DV_ScaleFactor .GT. 5.0) DV_ScaleFactor = 5.0
+! Check if the maximum angle has a reasonable value. Only necessary when monoclinic is searched
+              IF (Isystem(5) .EQ. 1) THEN
+                IF ((Bemin .LT. 45.0) .OR. (Bemax .GT. 150.0)) THEN
+                  CALL ErrorMessage('The range of the angle beta does not make sense.')
+                  RETURN
+                ELSE
+! Correct maximum cell length for the angle beta
+ ! If 90.0 is inside the range, then that's the maximum
+                  IF ((Bemin .LT. 90.0) .AND. (Bemax .GT. 90.0)) THEN
+                    MaxSinBeta = 1.0 ! Beta = 90.0
+                  ELSE         
+                    MaxSinBeta = MAX(SIN(Bemin),SIN(Bemax))
+                  ENDIF
+                ENDIF
+              ELSE
+              MaxSinBeta = 1.0 ! Beta = 90.0
+            ENDIF
+! Add in very quick check: is the d-spacing belonging to the first peak greater
+! than the maximum cell length requested? If so, tell the user he/she is a moron.
+            MaxLen = MaxSinBeta*amax
+! Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
+            IF ((TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1)))*DV_ScaleFactor) .GT. MaxLen) THEN
+              CALL ErrorMessage('The maximum cell axis length is shorter than required for indexing the first peak.')
+              RETURN
+            ENDIF
+            n = NTPeak
+            wave2 = (Lambda / 2) * DV_ScaleFactor
+            epst = Epsilon + 0.015
+            DO I = 1, n
+              epsil(I) = Epsilon
+            ENDDO
+            DO I = 1, NTPeak
+              IOrd = IOrdTem(I)
+              d(I) = AllPkPosVal(IOrd) - Rexpzp
+            END DO
+            CALL WCursorShape(CurHourGlass)
+            NumOfDICVOLSolutions = 0
+            CALL DICVOL91(Isystem(1),Isystem(2),Isystem(3),Isystem(4),Isystem(5),Isystem(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
+            CALL WCursorShape(CurCrossHair)
+! Pop up a window showing the DICVOL output file in a text editor
+            CALL WindowOpenChild(IHANDLE)
+            CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+            CALL SetChildWinAutoClose(IHANDLE)
+            IF (NumOfDICVOLSolutions .EQ. 0) THEN
+              CALL ErrorMessage('No solutions were found.')
+              CALL PopActiveWindowID
+              RETURN
+            ENDIF  
+! Close current Wizard window
+            IXPos_IDD_Wizard = WInfoDialog(6)
+            IYPos_IDD_Wizard = WInfoDialog(7)
+            CALL WDialogHide()
+! Pop up the next Wizard window showing the solutions, so that the user can choose one to be imported into DASH
+            CALL WDialogSelect(IDD_PW_Page9)
+! Clear all fields in the grid
+            CALL WDialogClearField(IDF_DV_Summary_0)
+! Set the number of rows in the grid to the number of solutions.
+            CALL WGridRows(IDF_DV_Summary_0,NumOfDICVOLSolutions)
+            DO I = 1, NumOfDICVOLSolutions
+              CALL WGridPutCellString(IDF_DV_Summary_0, 2,I,CrystalSystemString(DICVOLSolutions(I)%CrystalSystem))
+              CALL WGridPutCellReal  (IDF_DV_Summary_0, 3,I,DICVOLSolutions(I)%a,'(F8.4)')
+              CALL WGridPutCellReal  (IDF_DV_Summary_0, 4,I,DICVOLSolutions(I)%b,'(F8.4)')
+              CALL WGridPutCellReal  (IDF_DV_Summary_0, 5,I,DICVOLSolutions(I)%c,'(F8.4)')
+              CALL WGridPutCellReal  (IDF_DV_Summary_0, 6,I,DICVOLSolutions(I)%alpha,'(F7.3)')
+              CALL WGridPutCellReal  (IDF_DV_Summary_0, 7,I,DICVOLSolutions(I)%beta,'(F7.3)')
+              CALL WGridPutCellReal  (IDF_DV_Summary_0, 8,I,DICVOLSolutions(I)%gamma,'(F7.3)')
+              CALL WGridPutCellReal  (IDF_DV_Summary_0, 9,I,DICVOLSolutions(I)%Volume,'(F9.2)')
+              IF (DICVOLSolutions(I)%M .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,10,I,DICVOLSolutions(I)%M,'(F7.1)')
+              IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0,11,I,DICVOLSolutions(I)%F,'(F7.1)')
+            END DO
+            CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowIndexing2
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowDICVOLResults
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'DialogPosCmn.inc'
+      INCLUDE 'lattice.inc'
+
+      INTEGER irow, istatus
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page9)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (IDBACK)
+              IXPos_IDD_Wizard = WInfoDialog(6)
+              IYPos_IDD_Wizard = WInfoDialog(7)
+              CALL WDialogHide()
+              CALL WDialogSelect(IDD_PW_Page8)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+            CASE (IDNEXT)
+              IXPos_IDD_Wizard = WInfoDialog(6)
+              IYPos_IDD_Wizard = WInfoDialog(7)
+              CALL WDialogHide()
+              CALL WDialogSelect(IDD_PW_Page1)
+              CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
+          END SELECT
+          CALL PopActiveWindowID
+          RETURN
+      END SELECT
+      DO irow = 1, NumOfDICVOLSolutions
+        CALL WGridGetCellCheckBox(IDF_DV_Summary_0,1,irow,istatus)
+        IF (istatus .EQ. 1) THEN
+! Import the unit cell parameters into DASH
+          CellPar(1) = DICVOLSolutions(irow)%a
+          CellPar(2) = DICVOLSolutions(irow)%b
+          CellPar(3) = DICVOLSolutions(irow)%c
+          CellPar(4) = DICVOLSolutions(irow)%alpha
+          CellPar(5) = DICVOLSolutions(irow)%beta
+          CellPar(6) = DICVOLSolutions(irow)%gamma
+          LatBrav = DICVOLSolutions(irow)%CrystalSystem
+          CALL WGridPutCellCheckBox(IDF_DV_Summary_0,1,irow,0)
+          CALL Upload_CrystalSystem
+          CALL UpdateCell()
+        ENDIF
+      ENDDO               
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowDICVOLResults
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardWindowUnitCellParameters
 
       USE WINTERACTER
@@ -625,7 +919,6 @@
       CALL WDialogSelect(IDD_PW_Page1)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               IXPos_IDD_Wizard = WInfoDialog(6)
@@ -705,7 +998,6 @@
       CALL WDialogSelect(IDD_PW_Page2)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
-! Which button was pressed is now in EventInfo%VALUE1
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               IXPos_IDD_Wizard = WInfoDialog(6)
