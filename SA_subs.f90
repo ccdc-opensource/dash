@@ -80,9 +80,6 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
-      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
-
       REAL            bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4
       INTEGER         nd1, nmpert, nd3, nd4, bmIHANDLE
       COMMON /sagdat/ bchmin, bpwval, bchpro, avchi1, avchi2, avchi3, avchi4, &
@@ -97,8 +94,7 @@
       INTEGER NACP(MVAR)
       LOGICAL MAKET0
       REAL FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
-      REAL RATIO, DX
-      REAL F, FP, P, PP
+      REAL RATIO, DX, F, FP, P, PP
       REAL RANIN
       INTEGER NUP, NDOWN, NREJ, H, I, J, M, II
       INTEGER MRAN, MRAN1, IARR, IAR1
@@ -270,8 +266,7 @@
       FPSUM1 = 0.0
       FPSUM2 = 0.0
 ! Update the SA status window
-      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,  &
-                     nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
+      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
       CALL sa_move_status(nmpert,0)
 ! ##########################################
 !   Starting point for multiple moves
@@ -455,8 +450,7 @@
                 CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
                 CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
 ! Update the SA status window
-                CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,  &
-                               NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov)
+                CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,NVAR,Last_NUP,Last_NDOWN,NREJ,ntotmov)
               ENDIF
 ! If the point is greater, use the Metropolis criterion to decide on
 ! acceptance or rejection.
@@ -525,9 +519,7 @@
       ntotmov = ntotmov + nmpert
       IF (num_new_min .NE. num_old_min) CALL Profile_Plot ! plot the profile
       num_old_min = num_new_min
-      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD, &
-                     dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,NREJ, &
-                     ntotmov)
+      CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,NREJ,ntotmov)
 ! If we have asked for an initial temperature to be calculated then do so
       IF (MAKET0) THEN
 ! Start temperature increased by 50% as asked for
