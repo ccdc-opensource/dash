@@ -114,12 +114,7 @@
       REAL XP(MVAR)
       REAL xtem, tempupper, templower, tempupper2
       REAL Initial_T ! As calculated during intial run, not as set by the user.
-      LOGICAL UseSemiLamarckian ! If true, random local minimisations will occur.
-      INTEGER SL_Frequency ! SemiLamarckian frequency: how often per run
-      REAL    SL_Threshold ! To compare the random number against: greater means "do not accept"
       
-      UseSemiLamarckian = .TRUE.
-      SL_Frequency = 10
       WasMinimised = .FALSE.
       NumParPerTrial = 1
       TotNumTrials = 0
@@ -132,7 +127,7 @@
       ENDIF
       iSolTicked = 1
 ! Set up a random number generator store
-! Use a quick and dirty one from NR
+! Use a quick and dirty one from Numerical Recipes
       CALL RANX2Init
       IM = 29282
       IA = 1255
@@ -160,7 +155,6 @@
         ENDIF
       ENDDO
       nmpert = NT * NS * NPAR ! Number of Moves per Temperature
-      SL_Threshold = 1/((MaxMoves/FLOAT(SL_Frequency))/nmpert)
 ! vm is adjusted during the SA. So re-initialise every time the SA is started to
 ! ensure that starting the SA more than once with the same parameters will give
 ! identical results.
@@ -542,10 +536,6 @@
 ! If termination criteria are not met, prepare for another loop.
 ! We will use the energy fluctuation to reduce the temperature
       T = T/(1.0+(RT*T)/(3.0*FPSD))
-
-      ! Following two lines randomly add in local minimisations at a preset average frequency
-   !   IF ( RANARR(IARR) .LT. SL_Threshold ) CALL LocalMinimise(.TRUE.)
-   !   IARR = IARR + 1
 
    !   IF (MOD(Curr_SA_Iteration,5) .EQ. 0) CALL LocalMinimise(.TRUE.)
 
