@@ -22,9 +22,6 @@
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
-      REAL              BICALC,         XICALC
-      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
-
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -436,9 +433,6 @@
 
       DOUBLE PRECISION x,       lb,       ub,       vm
       COMMON /values/  x(MVAR), lb(MVAR), ub(MVAR), vm(MVAR)
-
-      REAL              BICALC,         XICALC
-      COMMON /SAREFLN2/ BICALC(MFCSTO), XICALC(MFCSTO)
 
       INTEGER           iHMUL
       COMMON /SAREFLN3/ iHMUL(MFCSTO)
