@@ -425,7 +425,7 @@
 ! Read / Write solutions
       IF (NumOf_SA_Runs .NE. 0) THEN
         DO I = 1, NumOf_SA_Runs
-          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iSolOrder(I))
+          CALL FileRWInteger(hPrjFile,iPrjRecNr,RW,iSol2Run(I))
           DO J = 1, nvar
             CALL FileRWReal(hPrjFile,iPrjRecNr,RW,BestValuesDoF(J,I))
             X(J) = DBLE(BestValuesDoF(J,I))
