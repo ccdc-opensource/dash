@@ -61,18 +61,18 @@ C
 !U   1  ROBCHI_CREF=-2.0*CHI
 !U      END
 !UC
-C
-      FUNCTION ERFC_FUN(X)
-C     ----------------
-C
-      Z=ABS(X)
-      T=1.0/(1.0+0.5*Z)
-      ERFC_FUN=T*EXP(-Z*Z-1.26551223+T*(1.00002368+T*(0.37409196+
-     *     T*(0.09678418+T*(-0.18628806+T*(0.27886807+T*(-1.13520398+
-     *     T*(1.48851587+T*(-0.82215223+T*0.17087277)))))))))
-      IF (X.LT.0) ERFC_FUN=2.0-ERFC_FUN
-      END
-C
+!UC
+!U      FUNCTION ERFC_FUN(X)
+!UC     ----------------
+!UC
+!U      Z=ABS(X)
+!U      T=1.0/(1.0+0.5*Z)
+!U      ERFC_FUN=T*EXP(-Z*Z-1.26551223+T*(1.00002368+T*(0.37409196+
+!U     *     T*(0.09678418+T*(-0.18628806+T*(0.27886807+T*(-1.13520398+
+!U     *     T*(1.48851587+T*(-0.82215223+T*0.17087277)))))))))
+!U      IF (X.LT.0) ERFC_FUN=2.0-ERFC_FUN
+!U      END
+!UC
 C***********************************************************************
 
 c
@@ -98,7 +98,7 @@ C    DX       R*4    I       N      Initial step-lengths for X.
 C    COVAR    R*4    O     N x N    The covariance matrix.
 C
 C Other Requirements
-C     The user must provide a FUNCTION CHIFUN(X) which evalutes 
+C     The user must provide a FUNCTION CHIFUN(X) which evaluates 
 C Chi-squared (un-normalised) given the vector X.
 C
 C History
@@ -114,9 +114,9 @@ C
       EXTERNAL CHIFUN
       LOGICAL  LERANL
       COMMON   /PKCOM3/ LERANL
-      DATA     NMAX /50/
+!O      DATA     NMAX /50/
 C
-C...      IF (N.GT.NMAX) STOP' Sorry, too many parameters !'
+!O      IF (N.GT.NMAX) STOP' Sorry, too many parameters !'
       LERANL=.FALSE.
       CALL VCOPY(X,V,N)
       CHIMIN=CHIFUN(N,V)
@@ -181,7 +181,7 @@ C
       EXTERNAL CHIFUN
       REAL    V(N,*),EX(N,*),C(*),D(*)
       INTEGER IR(*)
-      LOGICAL RESTART,SLOW
+      LOGICAL SLOW
       DATA    ALPHA,BETA,GAMA/1.0,0.5,2.0/
 C.. Original      DATA    ALPHA,BETA,GAMA/1.0,0.5,2.0/
 C
@@ -436,7 +436,6 @@ C     ------------------------------------
 C
       REAL    HESS(N,*),COVAR(N,*)
       INTEGER INDX(*)
-      DATA    SMALL /1.0E-20/
 C>> JCC This is for testing for mathematical errors used to PAUSE the program: THe pause seemed to#
 C>> be causing a repeated CMD window to appear on screen ....
 	INTEGER IBMBER
