@@ -81,23 +81,11 @@
       USE DRUID_HEADER
       USE VARIABLES
 
-!      IMPLICIT NONE
+      IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
 
-    	COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),   &
-     & TF(150),KTF(150),SITE(150),KSITE(150),                    &
-     & ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
-      COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),     &
-     & ICDN(26,9),IERR,IO10,SDREAD
-      LOGICAL SDREAD
-      DIMENSION INREAD(26),ICDNO(26)
-      EQUIVALENCE (INREAD(1),INREA(1,1))
-      EQUIVALENCE (ICDNO(1),ICDN(1,1))
-
-
-      INTEGER IDummy
       INTEGER GetCrystalSystemFromUnitCell ! Function
 
       CALL PushActiveWindowID
@@ -129,7 +117,7 @@
             CASE (IDD_Peak_Positions)
             CASE (IDD_Crystal_Symmetry)
               CALL Download_Cell_Constants(IDD_Crystal_Symmetry)
-              CALL UpdateCell(IDD_Crystal_Symmetry)
+              CALL UpdateCell
               CALL Update_Space_Group(IDD_Crystal_Symmetry)
               NumPawleyRef = 0
             CASE (IDD_Peak_Widths)
@@ -260,11 +248,11 @@
       INCLUDE 'LATTICE.INC'
       INCLUDE 'statlog.inc'
 
-      INTEGER IDummy
       INTEGER GetCrystalSystemFromUnitCell ! Function
       INTEGER SGNrMenu2Table ! Function
       REAL    tReal
       LOGICAL ValidCellAxisLength, NearlyEqual ! Functions
+      INTEGER ISPosSG
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Crystal_Symmetry)
@@ -288,7 +276,7 @@
               CALL WDialogGetReal(IDF_a_latt,tReal)
               IF (.NOT. NearlyEqual(tReal,CellPar(1))) THEN
                 CellPar(1) = tReal
-                CALL UpdateCell(IDD_Crystal_Symmetry)
+                CALL UpdateCell
               ELSE ! Following line just in case user typed -9999.0
                 IF (.NOT. ValidCellAxisLength(tReal)) CALL WDialogClearField(IDF_a_latt)
               ENDIF
@@ -296,7 +284,7 @@
               CALL WDialogGetReal(IDF_b_latt,tReal)
               IF (.NOT. NearlyEqual(tReal,CellPar(2))) THEN
                 CellPar(2) = tReal
-                CALL UpdateCell(IDD_Crystal_Symmetry)
+                CALL UpdateCell
               ELSE ! Following line just in case user typed -9999.0
                 IF (.NOT. ValidCellAxisLength(tReal)) CALL WDialogClearField(IDF_b_latt)
               ENDIF
@@ -304,19 +292,19 @@
               CALL WDialogGetReal(IDF_c_latt,tReal)
               IF (.NOT. NearlyEqual(tReal,CellPar(3))) THEN
                 CellPar(3) = tReal
-                CALL UpdateCell(IDD_Crystal_Symmetry)
+                CALL UpdateCell
               ELSE ! Following line just in case user typed -9999.0
                 IF (.NOT. ValidCellAxisLength(tReal)) CALL WDialogClearField(IDF_c_latt)
               ENDIF
             CASE (IDF_alp_latt)
               CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
-              CALL UpdateCell(IDD_Crystal_Symmetry)
+              CALL UpdateCell
             CASE (IDF_bet_latt)
               CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
-              CALL UpdateCell(IDD_Crystal_Symmetry)
+              CALL UpdateCell
             CASE (IDF_gam_latt)
               CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
-              CALL UpdateCell(IDD_Crystal_Symmetry)               
+              CALL UpdateCell               
             CASE (IDF_Crystal_System_Menu)
               IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
                 CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
@@ -331,7 +319,7 @@
                 NumberSGTable = SGNrMenu2Table(ISPosSG)
 ! Update the wizard
                 CALL WDialogSelect(IDD_PW_Page1)
-                CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
+                CALL WDialogPutOption(IDF_Space_Group_Menu,ISPosSG)
                 NumPawleyRef = 0
                 CALL Generate_TicMarks
               ENDIF
@@ -402,14 +390,15 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE UpdateCell(IUploadFrom)
+      SUBROUTINE UpdateCell
+! 
+! This routine takes the unit cell parameters as they are in the global variables
+! CellPar and updates other menus accordingly.
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: IUploadFrom
 
       INCLUDE 'statlog.inc'
       INCLUDE 'lattice.inc'
@@ -418,6 +407,8 @@
       INTEGER GetCrystalSystemFromUnitCell ! Function
 
       CALL PushActiveWindowID
+! Update all windows so that they show the contents of the global variables.
+! This is in the cell parameters tab, in the wizard, and in the peak positions tab.
       CALL Upload_Cell_Constants()
       CALL WDialogSelect(IDD_PW_Page1)
       IF (FnUnitCellOK()) THEN
@@ -493,7 +484,8 @@
 !
       SUBROUTINE SetSpaceGroupMenu
 !
-! This subroutine determines which space groups are possible given the crystal system and
+! This subroutine determines which space groups are possible given the crystal system
+! as held in the global variable LatBrav and
 ! updates the space-group menus in the main window and the wizard to contain
 ! only those space groups
 !
@@ -505,8 +497,13 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
+! JvdS MaxSPGR is set to 530 in 'lattice.inc'
+! Not necessary any more: with 'crystal system = unknown' eliminated,
+! the number of possible space groups is always a subset determined by the
+! crystal system. It's only a local variable, and it's safer this way, so just leave it for now.
+      CHARACTER(LEN=24) :: SGHMaBrStr(MaxSPGR)
 
-      INTEGER tISG, tJSG
+      INTEGER tISG, tJSG, ISPosSG, NumBrSG
 
       CALL PushActiveWindowID
       NumBrSG = LPosSG(LatBrav+1) - LPosSG(LatBrav)
@@ -547,6 +544,7 @@
       INCLUDE 'Lattice.inc'
 
       INTEGER SGNrMenu2Table ! Function
+      INTEGER ISPosSG
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IUploadFrom)
