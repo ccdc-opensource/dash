@@ -844,7 +844,6 @@
       REAL, EXTERNAL :: RANMAR
       INTEGER I, II
 
-! Get the "IDF_RandomInitVal" checkbox
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Modal_input2)
       DO I = 1, NPAR
