@@ -68,12 +68,12 @@
     !  CALL IDebugLevel(DbgMsgBox)
       CALL WMessageEnable(PushButton, Enabled)
       CALL WMessageEnable(FieldChanged, Enabled)
+      CALL CheckLicence
 ! Load all Winteracter dialogues into memory
       CALL PolyFitter_UploadDialogues
 ! Initialise space group information
       CALL PolyFitterInitialise
       CALL InitialiseVariables
-      CALL CheckLicence
       CALL WMessageEnable(TabChanged, Enabled)
       CALL WMessageEnable(MouseMove, Enabled)
 ! Main message loop
@@ -446,7 +446,10 @@
 
       LOGICAL, EXTERNAL :: Confirm
 
-      IF (Confirm('Do you want to exit DASH?')) CALL DoExit
+      IF (Confirm('Do you want to exit DASH?')) THEN
+        CALL WriteConfigurationFile
+        CALL DoExit
+      ENDIF
 
       END SUBROUTINE WExit
 !
@@ -458,7 +461,6 @@
 
       INTEGER ISTAT
 
-      CALL WriteConfigurationFile
       CLOSE(UNIT=12, STATUS='DELETE', IOSTAT=ISTAT)
       CLOSE(UNIT=6, STATUS='DELETE', IOSTAT=ISTAT)  ! dash.out
       CALL DeleteTempFiles
