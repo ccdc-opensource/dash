@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 22/May/2003 16:09:25
+// Modified : 15/Jul/2003 09:38:29
 //
 ///////////////////////////////////////////////////
 //
@@ -585,7 +585,6 @@
 #define IDF_BinData                      1471
 #define IDF_LBIN                         1472
 #define IDF_SGDet                        1473
-#define IDB_New                         40028
 #define IDF_OutputPDB                    1457
 #define IDF_OutputRES                    1461
 #define IDF_OutputCIF                    1462
@@ -1149,19 +1148,6 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
-END
-
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  102
@@ -4389,31 +4375,30 @@ CAPTION "DASH Wizard : Simulated Annealing Protocol"
 BEGIN
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Solve >",IDB_SA3_finish,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "0.0",IDF_SA_T0,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,   99,  119,   28,   14
-    CONTROL "0.02",IDF_SA_Tredrate,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  135,  119,   28,   14
-    CONTROL "Moves each T",IDF_LABEL11,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  261,  108,   26,   18
-    CONTROL "N1",IDF_SA_NS_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  171,  107,   28,   10
-    CONTROL "20",IDF_SA_NS,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  171,  119,   28,   14
-    CONTROL "20",IDF_SA_NT,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  207,  119,   28,   14
-    CONTROL "",IDF_SA_Moves,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY,  259,  127,   30,   14
-    CONTROL "N2",IDF_SA_NT_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  207,  107,   28,   10
-    CONTROL "T0",IDF_SA_T0_label1,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   99,  107,   28,   10
-    CONTROL "Cool",IDF_SA_cool_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  135,  107,   28,   10
+    CONTROL "0.0",IDF_SA_T0,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,   98,   42,   28,   14
+    CONTROL "0.02",IDF_SA_Tredrate,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  130,   42,   28,   14
+    CONTROL "N1",IDF_SA_NS_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  162,   30,   24,   10
+    CONTROL "20",IDF_SA_NS,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  162,   42,   24,   14
+    CONTROL "20",IDF_SA_NT,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  190,   42,   24,   14
+    CONTROL "N2",IDF_SA_NT_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  190,   30,   24,   10
+    CONTROL "T0",IDF_SA_T0_label1,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,   98,   30,   28,   10
+    CONTROL "Cool",IDF_SA_cool_label,"STATIC",WS_CHILD | WS_VISIBLE | SS_CENTER,  130,   30,   28,   10
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "10",IDF_SA_MaxRepeats,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  324,   26,   32,   14
-    CONTROL "Number of SA runs",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  235,   28,   85,   10
-    CONTROL "Max. number of moves / run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  239,   70,   52,   20
-    CONTROL "Profile chi-sqd multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,  235,   47,   85,   10
-    CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  324,   45,   32,   14
+    CONTROL "10",IDF_SA_MaxRepeats,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  323,   26,   32,   14
+    CONTROL "Number of SA runs",IDF_SA_Repeat_Lab,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  234,   28,   85,   10
+    CONTROL "Max. number of moves / run",IDF_SA_MaxMoves_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  234,   69,   52,   20
+    CONTROL "Profile chi-sqd multiplier",IDF_SA_ChiTest_Label,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,  234,   47,   85,   10
+    CONTROL "5.0",IDF_SA_ChiTest,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  323,   45,   32,   14
     CONTROL "&Print...",IDF_PrintSA,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  236,  150,   40,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  299,   73,   30,   12
-    CONTROL "x  10",IDF_LABEL21,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  330,   74,   18,    8
-    CONTROL "7",IDF_MaxMoves2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE,  351,   67,   22,   12
-    CONTROL "1",IDF_NumDoFPerMove,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  190,   83,   30,   14
-    CONTROL "# of DoF changed / move",IDF_LABEL20,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   98,   85,   90,    8
+    CONTROL "1.0000",IDF_MaxMoves1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  294,   72,   30,   12
+    CONTROL "x  10",IDF_LABEL21,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  325,   73,   18,    8
+    CONTROL "7",IDF_MaxMoves2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE,  346,   66,   22,   12
+    CONTROL "1",IDF_NumDoFPerMove,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  184,   66,   30,   14
+    CONTROL "# of DoF changed / move",IDF_LABEL20,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   92,   68,   90,    8
     CONTROL "&More >",IDB_More,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  314,  150,   40,   14
-    CONTROL "Termination criteria",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  230,   12,  152,   84
+    CONTROL "Termination criteria",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  231,   12,  145,   82
+    CONTROL "Simulated Annealing",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   90,   12,  132,  112
 END
 
 IDD_SA_input3_2 RCDATA
@@ -4426,7 +4411,6 @@ BEGIN
 " 1179     0.10000E-002     0.50000      \n"
 " 1152               1             100 \n"
 " 1153               1             100 \n"
-" 1158               1           50000 \n"
 " 1374               1              99 \n"
 " 1378      1.0000          0.34028E+039 \n"
 " 1139     0.10000E-002      100.00      \n"
@@ -4570,7 +4554,6 @@ BEGIN
     ID_ClearPeakFitRanges           "Delete peak fit ranges"
     ID_Delabc                       "Clear cell parameters"
     ID_FitPeaks                     "Fit peaks"
-    IDB_New                         "New project"
     IDB_Open                        "Open project"
     IDB_Save                        "Save project"
     IDB_SaveAs                      "Save As..."
@@ -4584,7 +4567,6 @@ END
 ID_TOOLBAR1 RCDATA
 BEGIN
      16, 16,
-   IDB_New,
    IDB_Open,
    IDB_Save,
    IDB_SaveAs,

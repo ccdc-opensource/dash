@@ -1,23 +1,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Clear_Project
-
-      USE PRJVAR
-
-      IMPLICIT NONE
-
-      CALL Clear_PeakFitRanges
-      CALL Clear_UnitCell
-      CALL Clear_Zmatrices
-      PrjFileName = ''
-! CALL UpdatePrjFileName('')
-      CALL Clear_PO
-
-      END SUBROUTINE Clear_Project
-!
-!*****************************************************************************
-!
       SUBROUTINE Clear_Bins
 
       IMPLICIT NONE
