@@ -250,6 +250,82 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE FileRWString(TheFileHandle, TheRecNr, RW, TheString)
+
+      IMPLICIT NONE
+
+      INTEGER,       INTENT (IN   ) :: TheFileHandle
+      INTEGER,       INTENT (INOUT) :: TheRecNr
+      INTEGER,       INTENT (IN   ) :: RW
+      CHARACTER*(*), INTENT (INOUT) :: TheString
+
+      IF (RW .EQ. 1) THEN
+        CALL FileReadString(TheFileHandle,TheRecNr,TheString)
+      ELSE
+        CALL FileWriteString(TheFileHandle,TheRecNr,TheString)
+      ENDIF
+
+      END SUBROUTINE FileRWString
+!
+!*****************************************************************************
+!
+      SUBROUTINE FileRWInteger(TheFileHandle, TheRecNr, RW, TheInteger)
+
+      IMPLICIT NONE
+
+      INTEGER,   INTENT (IN   ) :: TheFileHandle
+      INTEGER,   INTENT (INOUT) :: TheRecNr
+      INTEGER,   INTENT (IN   ) :: RW
+      INTEGER*4, INTENT (INOUT) :: TheInteger
+
+      IF (RW .EQ. 1) THEN
+        CALL FileReadInteger(TheFileHandle,TheRecNr,TheInteger)
+      ELSE
+        CALL FileWriteInteger(TheFileHandle,TheRecNr,TheInteger)
+      ENDIF
+
+      END SUBROUTINE FileRWInteger
+!
+!*****************************************************************************
+!
+      SUBROUTINE FileRWReal(TheFileHandle, TheRecNr, RW, TheReal)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheFileHandle
+      INTEGER, INTENT (INOUT) :: TheRecNr
+      INTEGER, INTENT (IN   ) :: RW
+      REAL*4,  INTENT (INOUT) :: TheReal
+
+      IF (RW .EQ. 1) THEN
+        CALL FileReadReal(TheFileHandle,TheRecNr,TheReal)
+      ELSE
+        CALL FileWriteReal(TheFileHandle,TheRecNr,TheReal)
+      ENDIF
+
+      END SUBROUTINE FileRWReal
+!
+!*****************************************************************************
+!
+      SUBROUTINE FileRWLogical(TheFileHandle, TheRecNr, RW, TheLogical)
+
+      IMPLICIT NONE
+
+      INTEGER,   INTENT (IN   ) :: TheFileHandle
+      INTEGER,   INTENT (INOUT) :: TheRecNr
+      INTEGER,   INTENT (IN   ) :: RW
+      LOGICAL*4, INTENT (INOUT) :: TheLogical
+
+      IF (RW .EQ. 1) THEN
+        CALL FileReadLogical(TheFileHandle,TheRecNr,TheLogical)
+      ELSE
+        CALL FileWriteLogical(TheFileHandle,TheRecNr,TheLogical)
+      ENDIF
+
+      END SUBROUTINE FileRWLogical
+!
+!*****************************************************************************
+!
       SUBROUTINE SplitPath(PathName,DirName,FileName)
 !
 ! This routine splits a full filename into the name of the file and its path.
