@@ -47,21 +47,20 @@
 !
 !*****************************************************************************
 !
-      CHARACTER*(*) FUNCTION StrUpperCase(TheString)
+      SUBROUTINE StrUpperCase(TheString)
 
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (IN   ) :: TheString
+      CHARACTER*(*), INTENT (INOUT) :: TheString
 
       INTEGER I
       CHARACTER*1 ChrUpperCase
 
-      StrUpperCase = TheString
       DO I = 1, LEN_TRIM(TheString)
-        StrUpperCase(I:I) = ChrUpperCase(TheString(I:I))
+        TheString(I:I) = ChrUpperCase(TheString(I:I))
       END DO
 
-      END FUNCTION StrUpperCase
+      END SUBROUTINE StrUpperCase
 !
 !*****************************************************************************
 !

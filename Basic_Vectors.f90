@@ -2,8 +2,6 @@
 !*****************************************************************************
 !
 ! This unit contains subroutines for the manipulation of vectors and lattices.
-! Note that in all vector-related subroutines, the first vector in the argument list is
-! the one that is changed by the subroutine (cf. VectorAdd / VectorOrthogonalise / etc.).
 !
 !*****************************************************************************
 !
