@@ -299,7 +299,7 @@
               SDIFile = DashPikFile(1:Ilen-3)//'sdi'
               CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
 ! JvdS GET_LOGREF and GETTIC do the same thing.
-              CALL GET_LOGREF(DashTicFile,LEN_TRIM(DashTicFile),IER)
+              CALL GET_LOGREF(DashTicFile,IER)
               CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),IER)
               CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),IER)
               NoData = .FALSE.
@@ -614,8 +614,9 @@
       EXTERNAL PCCN01,PFCN03,DUMMY,CALPR
       COMMON /GLOBAL/NINIT,NBATCH,NSYSTM,MULFAS,MULSOU,MULONE
       DIMENSION ALSQ(QPFDIM)
-      COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),ICDN(26,9),IERR,IO10,SDREAD
-      LOGICAL SDREAD
+      INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
+      LOGICAL                                                                             SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       INTEGER MATSZ
