@@ -20,8 +20,7 @@
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
-      PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
-      IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)
+      PkProb(MTPeak), IOrdTem(MTPeak),IHPk(3,MTPeak)
 
       INTEGER IASS(6)
       LOGICAL NOCREF
@@ -40,10 +39,12 @@
       IF (.NOT. FnUnitCellOK()) RETURN
       NVal = 0
       DO I = 1, NTPeak
-        IOrd = IOrdTem(I)
+        IOrd = IOrdTem(I) ! IOrd is now a pointer into AllPkPosVal, sorted
+! Use peak only when probability > 0.95
         IF (PkProb(Iord) .GT. 0.95) THEN
           NVal = NVal + 1
           DO II = 1, 3
+! Yet another place where h, k and l are stored
             IHLR(II,NVal) = IHPk(II,I)
           END DO
           YVal(NVal) = AllPkPosVal(IOrd)
@@ -51,6 +52,7 @@
         END IF
       END DO
 !C>> JCC Updated to the correct values ...!
+! Number of degrees of freedom, including the zero point.
       SELECT CASE (LatBrav)
         CASE (1)        ! Triclinic
           NDD = 7

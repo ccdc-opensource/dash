@@ -13,7 +13,8 @@
       INCLUDE 'PARAMS.INC'
 
       COMMON /PLTSTO2/ CHIPROBEST(MAXITER)
-      COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
       REAL bchmin, bpwval, bchpro, tempvl
       REAL avchi1, avchi2, avchi3, avchi4
@@ -30,7 +31,7 @@
 !.. best chi-squared scale ...
       bchmin=alog10(max(1.0,chimin))
 !.. profile chi-squared scale ...
-      bpwval = alog10(MAX(1.0,PawleyChiSq))
+      bpwval = alog10(MAX(1.0,PAWLEYCHISQ))
       bchpro = alog10(MAX(1.0,CHIPROBEST(iteration)))
       IF (kopt .EQ. 1) THEN
         CALL WDialogPutReal(IDF_av_chisq,chiav,'(F8.2)')

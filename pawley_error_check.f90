@@ -1,52 +1,54 @@
-
-
-! Routines for error checking the pawley fit
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION PawleyErrorLog(Mode)
+!
+! Routine for error checking the pawley fit
 ! Modes can be as follows
 ! Mode = 1 : Add an error into local array
 ! Mode = 2 : Reset
-! Returns the number of errors that occurred
+!
+! RETURNS : the number of errors that occurred
+!
+      INTEGER, INTENT (IN   ) :: Mode
 
-	INTEGER FUNCTION PawleyErrorLog(Mode)
+      INTEGER Nerr
 
-	INTEGER Mode
-	INTEGER Nerr
+      SAVE Nerr
+      DATA Nerr / 0 /
 
-	SAVE Nerr
-	DATA Nerr / 0 /
+      PawleyErrorLog = Nerr
+      SELECT CASE (Mode)
+        CASE (1)
+          Nerr = Nerr + 1
+        CASE (2)
+          Nerr = 0
+      END SELECT
 
-    PawleyErrorLog = Nerr
+      END FUNCTION PawleyErrorLog
+!
+!*****************************************************************************
+!
+      SUBROUTINE PawleyWarning()
 
-	IF (Mode .EQ. 1) THEN
-		Nerr = Nerr + 1
-	ELSE IF (Mode .EQ. 2) THEN
-		Nerr = 0
-	END IF
-	RETURN
-	END FUNCTION PawleyErrorLog
+      USE WINTERACTER
+      USE DRUID_HEADER
 
+      INTEGER IRetVal
+      INTEGER IHan
 
-
-	SUBROUTINE PawleyWarning()
-	USE WINTERACTER
-	USE DRUID_HEADER
-	INTEGER ICurSel,IRetVal
-    INTEGER IHan
-
-	ICurSel = WInfoDialog(CurrentDialog)
-
-	CALL  WDialogSelect(IDD_Pawley_ErrorLog)
-	CALL  WDialogShow(-1,-1,0,Modal)
-	IretVal = WInfoDialog(ExitButton)
-
-
-	IF (IRetVal .EQ. ID_Edit_PawleyLog) THEN
-	    CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,&
-									   'View pawley fit log file'),IHan)
-		CALL WEditFile('polyp.lis', Modal, 0, 0, SystemFixed)
-		IRetVal =  InfoError(1)
-	ENDIF 
-
-	IF (ICurSel .GT. 0) CALL WDialogSelect(ICurSel)
-		
-	END SUBROUTINE PawleyWarning
-	
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Pawley_ErrorLog)
+      CALL WDialogShow(-1,-1,0,Modal)
+      IretVal = WInfoDialog(ExitButton)
+      IF (IRetVal .EQ. ID_Edit_PawleyLog) THEN
+        CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,'View pawley fit log file'),IHan)
+        CALL WEditFile('polyp.lis', Modal, 0, 0, SystemFixed)
+        IRetVal = InfoError(1)
+      ENDIF 
+      CALL PopActiveWindowID
+            
+      END SUBROUTINE PawleyWarning
+!
+!*****************************************************************************
+!

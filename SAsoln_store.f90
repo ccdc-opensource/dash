@@ -15,8 +15,9 @@
       REAL XOBS, YOBS, YCAL
       COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),&
       YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),&
-      YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
       COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file

@@ -173,12 +173,7 @@
         D(KK) = 0.002
                    !(X(IMAX)-X(IMAX-1))
       ENDDO
-!
-!      do i=1,n
-!        write(76,*) i,v(i),d(i)
-!      end do
-!
-      RETURN
+
       END SUBROUTINE GETVAR
 !*==WWFT01A.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -356,8 +351,9 @@
 !
       COMMON /PROFOBS/ NOBS, XOBS(MOBS), YOBS(MOBS), YCAL(MOBS),        &
      &                 YBAK(MOBS), EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS),&
-     &                 YBBIN(MOBS), EBIN(MOBS)
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 !.. speedup attempt
       REAL ixres
 !
@@ -368,17 +364,18 @@
       FOURPI = 4.*PI
       PIBY2 = 0.5*PI
       ALOG2 = LOG(2.)
-!.. Get the number of peaks and their positions
-      Ntem = NumInPFR(CurrentRange)
-!
-      IF (Ntem.EQ.0) THEN
+! If there are no peaks specified, assume there is one. Estimate its position by 
+! by finding the 2 theta value with the highest number of counts
+      IF (NumInPFR(CurrentRange) .EQ. 0) THEN
         NumInPFR(CurrentRange) = 1
-        YMaxTem = YOBin(IPF_Lo(CurrentRange))
+        YMaxTem = YOBIN(IPF_Lo(CurrentRange))
+        XPF_Pos(1,CurrentRange) = XBIN(IPF_Lo(CurrentRange))
+        YPF_Pos(1,CurrentRange) = YOBIN(IPF_Lo(CurrentRange))
         DO I = IPF_Lo(CurrentRange), IPF_Hi(CurrentRange)
-          IF (YOBin(I).GT.YMaxTem) THEN
-            XPF_Pos(1,CurrentRange) = XBin(I)
-            YPF_Pos(1,CurrentRange) = YOBin(I)
-            YMaxTem = YOBin(i)
+          IF (YOBIN(I) .GT. YMaxTem) THEN
+            XPF_Pos(1,CurrentRange) = XBIN(I)
+            YPF_Pos(1,CurrentRange) = YOBIN(I)
+            YMaxTem = YOBIN(I)
           ENDIF
         ENDDO
       ENDIF
@@ -411,7 +408,6 @@
 !      MNTEM=2*IXRES*NPTS
       IF (MN.LT.MNTEM) GOTO 10
       MN = MIN(2048,MN)
-!	WRITE(76,*) ' MN & NPTS ',MN,NPTS
       MN2 = MN/2
 !
       KNOW = 1
@@ -540,8 +536,7 @@
 ! attempt to solve by re-calculating the next range's value every time rather than asuuming it is set
 ! (it wont be set if we've not already got into this routine before for this peak)
 !
-        IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange)                 &
-     &                            + IPF_Range(CurrentRange)
+        IPF_RPt(CurrentRange+1) = IPF_RPt(CurrentRange) + IPF_Range(CurrentRange)
 !
 !.. We just need to modify a few variables
         DO I = 1, NPTS
@@ -558,16 +553,16 @@
         DO I = 1, NumInPFR(CurrentRange)
           jp = 1 + NPKGEN(1,1) + 2*I
           PkAreaVal(i,CurrentRange) = varval(jp)
-          IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.1*abs(varval(jp))
+          IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.1*ABS(varval(jp))
           PkAreaEsd(i,CurrentRange) = varesd(jp)
           jp = jp + 1
           PkPosVal(i,CurrentRange) = varval(jp)
           IF (varesd(jp).LT.1.E-5) varesd(jp) = 0.003
           PkPosEsd(i,CurrentRange) = varesd(jp)
           XPF_Pos(i,CurrentRange) = varval(jp)
-          atem = abs(varval(jp)-zargi(1))
+          atem = ABS(varval(jp)-zargi(1))
           DO ii = 1, npts
-            anewt = abs(varval(jp)-zargi(ii))
+            anewt = ABS(varval(jp)-zargi(ii))
             IF (anewt.LE.atem) THEN
               atem = anewt
               item = ii
@@ -577,40 +572,17 @@
         ENDDO
       ENDIF
 !
-!      do i=1,nvar
-!        write(76,*) i,varval(i),varesd(i)
-!      end do
-!
-!      write(85,*) ' '
-!      write(85,*) ' Current range is number ',CurrentRange
-!      do i=1,npeak
-!        write(85,*) ' Peak position ',i,
-!     &  PkPosVal(i,CurrentRange),PkPosEsd(i,CurrentRange)
-!        write(85,*) ' Peak area ',i,
-!     &  PkAreaVal(i,CurrentRange),PkAreaEsd(i,CurrentRange)
-!      end do
-!
-!      write(85,*) ' Peak shape values are:'
-!      do ip=1,npkgen(1,1)
-!        write(85,*) PkFnVal(ip,CurrentRange),
-!     &  PkFnEsd(ip,CurrentRange)
-!      end do
-!
       xranav = 0.5*(XPF_Range(1,CurrentRange)+XPF_Range(2,CurrentRange))
       PkPosAv(CurrentRange) = xranav
-!      do ip=1,npkgen(1,1)
-!        iunit=90+ip
-!        write(iunit,*) xranav,PkFnVal(ip,CurrentRange),
-!     &  PkFnEsd(ip,CurrentRange)
-!      end do
-!
       CALL Upload_Widths()
       CALL Upload_Positions()
 !
-      OPEN (83,FILE='multi.pro',STATUS='unknown')
-      DO i = 1, npts
-        WRITE (83,*) zargi(i), zbak(i), zobs(i), zcal(i), zdobs(i)
-      ENDDO
-      CLOSE (83)
+! JvdS I couln't find any other references to 'multi.pro', so I guess it is
+! never used (i.e. read).
+!U      OPEN (83,FILE='multi.pro',STATUS='unknown')
+!U      DO i = 1, npts
+!U        WRITE (83,*) zargi(i), zbak(i), zobs(i), zcal(i), zdobs(i)
+!U      ENDDO
+!U      CLOSE (83)
 !
       END SUBROUTINE OUTPUT_PRO
