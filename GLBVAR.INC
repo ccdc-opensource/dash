@@ -54,3 +54,8 @@
 
 ! Indicates whether the Simulated Annealing window should be redrawn
 
+      REAL CHAR_SIZE,MARKER_SIZE
+      COMMON /PROFDEF/CHAR_SIZE,MARKER_SIZE
+
+! Sizes of the characters and markers used in drawin the profiles in the main window
+
