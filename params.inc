@@ -13,6 +13,8 @@
       INTEGER MSAREF
       PARAMETER ( MSAREF = 10000 )
 
+! Maximum number of Simulated Annealing REFlections
+
 ! For common block CHISTO
 
       INTEGER MCHIHS
@@ -94,11 +96,6 @@
 
       INTEGER MPPTS
       PARAMETER ( MPPTS = 15000 )
-
-! For use in common block TICCOMM
-
-      INTEGER MObsTic
-      PARAMETER ( MObsTic = 50 )
 
 ! For use in common block REFLNZ and WWREFLNZ
 
