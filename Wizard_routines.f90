@@ -57,7 +57,7 @@
 !U      INTEGER :: IPW_Option
 !U
 !U      INCLUDE 'statlog.inc'
-!U      INCLUDE 'DialogPosCmnf90.inc'
+!U      INCLUDE 'DialogPosCmn.inc'
 !U      INCLUDE 'Lattice.inc'
 !U
 !U      INTEGER :: IRadSelection
@@ -454,12 +454,12 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Space_Group_Menu)
-              CALL Update_Space_Group(IDD_PW_Page1, IDummy, IDummy)
+              CALL Update_Space_Group(IDD_PW_Page1)
               NumPawleyRef = 0
             CASE (IDF_Crystal_System_Menu)
               CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
               CALL SetCrystalSystem(LatBrav)
-              CALL SetSpaceGroupMenu(LatBrav)
+              CALL SetSpaceGroupMenu
               CALL Generate_TicMarks
             CASE (IDF_a_latt)
               CALL WDialogGetReal(IDF_a_latt,CellPar(1))
@@ -532,7 +532,7 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_PW_LabX_Source,IDF_PW_SynX_Source,IDF_PW_CWN_Source,IDF_PW_TOF_source)
-              CALL WDialogGetRadioButton(IDF_LabX_Source,JRadOption)
+              CALL WDialogGetRadioButton(IDF_PW_LabX_Source,JRadOption)
               CALL SetSourceDataState(JRadOption)
               CALL Generate_TicMarks 
             CASE (IDF_PW_wavelength1)
@@ -561,22 +561,20 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
 
       CALL PushActiveWindowID
       CALL SetCrystalSystem(LatBrav)
-      NumBrSG = MAX(1,(LPosSG(LatBrav+1)-LPosSG(LatBrav)))
+      NumBrSG = LPosSG(LatBrav+1) - LPosSG(LatBrav)
       DO ISG = 1, NumBrSG
         JSG = LPosSG(LatBrav)+ISG-1
         SGHMaBrStr(ISG)( 1:12) = SGNumStr(JSG)(1:12)
         SGHMaBrStr(ISG)(13:24) = SGHMaStr(JSG)(1:12)
       END DO
-      ISPosSG=1+IPosSG-LposSG(LatBrav)
+      ISPosSG=1+NumberSGTable-LposSG(LatBrav)
       CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
-
-! JvdS @ Why isn't NumberSGTable updated ?
-      NumberSGTable = IPosSG
       CALL Upload_Cell_Constants()
       CALL Upload_Range()
       CALL PopActiveWindowID
