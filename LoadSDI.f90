@@ -177,7 +177,6 @@
 ! Set the crystal system
           LatBrav = GetCrystalSystem(NumberSGTable)
           CALL Upload_CrystalSystem
-          CALL FillSymmetry
         CASE ('paw')
           CALL INextReal(line,PAWLEYCHISQ)
       END SELECT

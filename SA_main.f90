@@ -483,7 +483,7 @@
         kzmpar2(kk) = 7 ! preferred orientation
         x(kk) = 1.0 ! no preferred orientation
         parlabel(kk) = 'Preferred Orientation'
-        lb(kk) =  0.0
+        lb(kk) =  0.8
         ub(kk) =  1.0
         iPrfPar = kk
       ENDIF

@@ -190,6 +190,8 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
+              IPTYPE = 1
+              CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page1)
             CASE (IDCANCEL, IDCLOSE)
               SpaceGroupDetermination = .FALSE.
