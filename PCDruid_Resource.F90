@@ -1,4 +1,4 @@
-! Winteracter module created : 13/Sep/2001 14:02:41
+! Winteracter module created : 13/Sep/2001 15:10:43
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -222,11 +222,7 @@
           INTEGER, PARAMETER :: IDF_avchisq_label               =  1432
           INTEGER, PARAMETER :: IDF_profchi2_label              =  1185
           INTEGER, PARAMETER :: IDD_input_parameters            =   140
-          INTEGER, PARAMETER :: IDF_space_group_label           =  1449
           INTEGER, PARAMETER :: IDF_SA_Tredrate                 =  1179
-          INTEGER, PARAMETER :: IDD_space_group                 =   130
-          INTEGER, PARAMETER :: IDF_spacegp_group               =  1450
-          INTEGER, PARAMETER :: IDD_input_data                  =   133
           INTEGER, PARAMETER :: IDD_zmatrix_files               =   134
           INTEGER, PARAMETER :: IDF_SA_T0_label1                =  1161
           INTEGER, PARAMETER :: IDF_SA_Tredrate_trackbar        =  1148
@@ -256,39 +252,16 @@
           INTEGER, PARAMETER :: IDF_npar_label                  =  1478
           INTEGER, PARAMETER :: IDF_npar                        =  1479
           INTEGER, PARAMETER :: IDF_parameter_grid              =  1480
-          INTEGER, PARAMETER :: IDF_inputdata_group             =  1484
-          INTEGER, PARAMETER :: IDF_reffile_label               =  1485
-          INTEGER, PARAMETER :: IDF_pikfile                     =  1486
-          INTEGER, PARAMETER :: IDF_reffile_browse_button       =  1487
           INTEGER, PARAMETER :: IDF_nfrag                       =  1488
           INTEGER, PARAMETER :: IDF_zmatrixfile_grid            =  1489
           INTEGER, PARAMETER :: IDF_LABEL7                      =  1463
-          INTEGER, PARAMETER :: IDF_reflections_label           =  1403
-          INTEGER, PARAMETER :: IDF_contributors_label          =  1405
-          INTEGER, PARAMETER :: IDF_numatoms_label              =  1406
-          INTEGER, PARAMETER :: IDF_reflections                 =  1407
-          INTEGER, PARAMETER :: IDF_contributors                =  1491
-          INTEGER, PARAMETER :: IDF_numatoms                    =  1492
           INTEGER, PARAMETER :: IDF_SA_NewAnneal_Button         =  1195
           INTEGER, PARAMETER :: IDF_Pause_Annealing             =  1495
           INTEGER, PARAMETER :: IDF_Status_tab                  =  1498
           INTEGER, PARAMETER :: IDD_Parameter_Status            =   136
           INTEGER, PARAMETER :: IDD_Anneal_Status               =   138
           INTEGER, PARAMETER :: IDD_Profile_Status              =   139
-          INTEGER, PARAMETER :: IDF_Profile_Plot                =  1501
-          INTEGER, PARAMETER :: IDF_ProfileType_Radio1          =  1408
-          INTEGER, PARAMETER :: IDF_ProfileType_Radio2          =  1503
           INTEGER, PARAMETER :: IDF_SA1_cancel                  =  1178
-          INTEGER, PARAMETER :: IDF_peakcont_label              =  1502
-          INTEGER, PARAMETER :: IDF_pikfile_browse_button       =  1504
-          INTEGER, PARAMETER :: IDF_reffile                     =  1505
-          INTEGER, PARAMETER :: IDF_hcvfile                     =  1507
-          INTEGER, PARAMETER :: IDF_hcvfile_browse_button       =  1508
-          INTEGER, PARAMETER :: IDF_corrint_label               =  1509
-          INTEGER, PARAMETER :: IDF_correlations_label          =  1510
-          INTEGER, PARAMETER :: IDF_correlations                =  1511
-          INTEGER, PARAMETER :: IDF_profile_chisq               =  1512
-          INTEGER, PARAMETER :: IDF_profile_chisq_label         =  1513
           INTEGER, PARAMETER :: IDF_Viewer                      =  1514
           INTEGER, PARAMETER :: IDD_DIALOG001                   =   132
           INTEGER, PARAMETER :: IDD_DIALOG002                   =   135
@@ -380,19 +353,6 @@
           INTEGER, PARAMETER :: IDF_clear_zmatrix               =  1294
           INTEGER, PARAMETER :: IDF_Data_Download               =  1043
           INTEGER, PARAMETER :: ID_PWa_DF_Open                  =  1047
-          INTEGER, PARAMETER :: IDD_Create_Zmatrix              =   150
-          INTEGER, PARAMETER :: ID_Create_Zmatrix_Cancel        =  1241
-          INTEGER, PARAMETER :: IDF_GROUP1                      =  1242
-          INTEGER, PARAMETER :: IDF_Create_Zmatrix_Label        =  1244
-          INTEGER, PARAMETER :: ID_Create_Zmatrix_Next          =  1260
-          INTEGER, PARAMETER :: IDD_SA_Completed                =   152
-          INTEGER, PARAMETER :: IDF_SA_lComplete_abel           =  1296
-          INTEGER, PARAMETER :: IDF_SA_Complete_pcs             =  1297
-          INTEGER, PARAMETER :: IDF_SA_Complete_ics             =  1298
-          INTEGER, PARAMETER :: IDF_SA_Complete_l2              =  1304
-          INTEGER, PARAMETER :: IDF_SA_Complete_l1              =  1305
-          INTEGER, PARAMETER :: IDF_SA_Complete_Ok              =  1306
-          INTEGER, PARAMETER :: IDF_Done_icon                   = 20014
           INTEGER, PARAMETER :: ID_Index_Output                 =  1295
           INTEGER, PARAMETER :: IDD_Index_Preparation           =   153
           INTEGER, PARAMETER :: IDF_Indexing_Systems            =  1307
