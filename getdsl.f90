@@ -294,20 +294,8 @@
 
       CHARACTER*(*), INTENT (IN   ) ::  SDIFile
 
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
-
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
-
-      INTEGER          NOBSA, NFITA, IFITA
-      REAL                                          CHIOBSA, WTSA
-      REAL             XOBSA,         YOBSA,         YCALA,         ESDA
-      COMMON /CHISTOP/ NOBSA, NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP),    &
-                       XOBSA(MCHSTP), YOBSA(MCHSTP), YCALA(MCHSTP), ESDA(MCHSTP)
-
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
@@ -403,18 +391,6 @@
         CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
         PikExists = (ipiker .EQ. 0)
         IF (PikExists) THEN
-! Now:
-! None of the arrays in PROFBIN has been filled: the arrays in CHISTOP were filled instead.
-! YCAL has been reset to 0.0
-          NBIN = NOBSA
-          DO I = 1, NBIN
-            XBIN(I)  = XOBSA(I)
-            YOBIN(I) = YOBSA(I)
-            EBIN(I)  = ESDA(I)
-          ENDDO
-          CALL Init_BackGround
-          NoData = .FALSE.
-          CALL GetProfileLimits
           FNAME = ''
           CALL ScrUpdateFileName
         ENDIF
@@ -444,11 +420,11 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER NTIC
-      INTEGER IH
-      REAL    ARGK
-      REAL    DSTAR
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
+      INTEGER          NTIC
+      INTEGER                IH
+      REAL                               ARGK
+      REAL                                           DSTAR
+      COMMON /PROFTIC/ NTIC, IH(3,MTIC), ARGK(MTIC), DSTAR(MTIC)
 
       INTEGER I, II
 
@@ -457,11 +433,11 @@
 ! JCC - add in an error trap for bad file opening
       OPEN(11,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
       I=1
- 10   READ(11,*,ERR=100,END=100) (IH(II,I),II=1,3),ARGK(I),DSTAR(I)
-      I=I+1
+ 10   READ(11,*,ERR=100,END=100) (IH(II,I),II=1,3), ARGK(I), DSTAR(I)
+      I = I + 1
       IF (I .GT. MTIC) GOTO 100
       GOTO 10
- 100  NTIC=I-1
+ 100  NTIC = I - 1
       CLOSE(11)
       RETURN
  999  GETTIC = 0

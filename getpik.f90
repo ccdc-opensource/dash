@@ -1,17 +1,20 @@
-!*==GETPIK.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
       SUBROUTINE GETPIK(FILE,lenfil,ier)
-!
-      CHARACTER*(*), INTENT(IN) :: FILE
-!
+
+      USE VARIABLES
+      
+      CHARACTER*(*), INTENT (IN   ) :: FILE
+      INTEGER,       INTENT (IN   ) :: lenfil
+      INTEGER,       INTENT (  OUT) :: ier
+
       INCLUDE 'PARAMS.INC'
-!
+
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
       LOGICAL LOGREF
       COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
-!
+
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -24,66 +27,76 @@
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+      INTEGER         KKOR
+      REAL                  WTIJ
+      INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
-!
+
       LOGICAL IHMINLT0, IKMINLT0, ILMINLT0
       COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0
-      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN,  &
-     &                IIMAX
-!
-      COMMON /CHISTOP/ NOBS, NFIT, IFIT(MCHSTP), CHIOBS, WT(MCHSTP),    &
-     &                 XOBS(MCHSTP), YOBS(MCHSTP), YCAL(MCHSTP),        &
-     &                 ESD(MCHSTP)
-!
+
+      INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
+      COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
+
+      INTEGER          NOBSA, NFITA, IFITA
+      REAL                                          CHIOBSA, WTSA
+      REAL             XOBSA,         YOBSA,         YCALA,         ESDA
+      COMMON /CHISTOP/ NOBSA, NFITA, IFITA(MCHSTP), CHIOBSA, WTSA(MCHSTP),    &
+     &                 XOBSA(MCHSTP), YOBSA(MCHSTP), YCALA(MCHSTP), ESDA(MCHSTP)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
       COMMON /FPINF1/ KREFT(MFPINF), KNIPT(50,MFPINF), PIKVAL(50,MFPINF)
+
       COMMON /FPINF2/ NTERMS
-!
-      COMMON /sappcmn/ xpmin, xpmax, ypmin, ypmax
-!
-      COMMON /sapgcmn/ xpgmin, xpgmax, ypgmin, ypgmax
-!
+
+      INTEGER I
+
       ier = 0
       OPEN (21,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998,IOSTAT=Istat)
-      CHIOBS = 0.
-      NFIT = 0
-      xpmin = 1.E20
-      xpmax = -1.E20
-      ypmin = 1.E20
-      ypmax = -1.E20
+      CHIOBSA = 0.
+      NFITA = 0
       NTERMS = 0
-      NOBS = 0
+      NOBSA = 0
       MMOBS = MCHSTP
       ittem = 0
       DO I = 1, MMOBS
-        READ (21,*,END=200) XOBS(I), YOBS(I), ESD(I), KTEM
+        READ (21,*,END=200) XOBSA(I), YOBSA(I), ESDA(I), KTEM
         KREFT(I) = KTEM
-        NOBS = NOBS + 1
-!..        ESD(I)=1./SQRT(WT(I))
-        WT(I) = 1.0/ESD(I)**2
-        YCAL(I) = 0.0
+        NOBSA = NOBSA + 1
+!..        ESDA(I)=1./SQRT(WTSA(I))
+        WTSA(I) = 1.0/ESDA(I)**2
+        YCALA(I) = 0.0
 !..        KTEM=KMAXST(I)-KMINST(I)
         IF (KTEM.GT.0) THEN
           NTERMS = NTERMS + KTEM
           READ (21,*,ERR=998) (KNIPT(K,I),PIKVAL(K,I),K=1,KTEM)
-          NFIT = NFIT + 1
-          IFIT(NFIT) = I
-          CHIOBS = CHIOBS + WT(I)*YOBS(I)**2
+          NFITA = NFITA + 1
+          IFITA(NFITA) = I
+          CHIOBSA = CHIOBSA + WTSA(I) * YOBSA(I)**2
         ENDIF
-        xpmin = MIN(xpmin,xobs(i))
-        xpmax = MAX(xpmax,xobs(i))
-        ypmin = MIN(ypmin,yobs(i))
-        ypmax = MAX(ypmax,yobs(i))
       ENDDO
-  200 xpgmin = xpmin
-      xpgmax = xpmax
-      ypgmin = ypmin
-      ypgmax = ypmax
+  200 CONTINUE
       CLOSE (21)
-      GOTO 999
+! Now:
+! None of the arrays in PROFBIN has been filled: the arrays in CHISTOP were filled instead.
+! YCAL has been reset to 0.0
+      NBIN = NOBSA
+      DO I = 1, NBIN
+        XBIN(I)  = XOBSA(I)
+        YOBIN(I) = YOBSA(I)
+        EBIN(I)  = ESDA(I)
+      ENDDO
+      CALL Init_BackGround
+      NoData = .FALSE.
+      CALL GetProfileLimits
+      RETURN
   998 ier = 1
       CLOSE (21,IOSTAT=ISTAT)
-  999 RETURN
-!
+
       END SUBROUTINE GETPIK
 !
 !*****************************************************************************

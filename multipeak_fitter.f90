@@ -1,4 +1,5 @@
-!*==MULTIPEAK_FITTER.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE MULTIPEAK_FITTER()
       REAL MULTIPEAK_CHISQ
@@ -20,9 +21,8 @@
       CALL OUTPUT_PRO(N,X,DX)
 !
       END SUBROUTINE MULTIPEAK_FITTER
-!*==GETVAR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
+!*****************************************************************************
 !
       SUBROUTINE GETVAR(N,V,D)
 !
@@ -32,8 +32,7 @@
       REAL V(MPAR), D(MPAR)
       PARAMETER (MPT=2000)
       COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
       REAL YHITE(MPEAK)
@@ -171,11 +170,9 @@
       ENDDO
 
       END SUBROUTINE GETVAR
-!*==WWFT01A.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-! LEVEL 1    SUBROUTINE WWFT01A(IT,INV,TR,TI)
       SUBROUTINE WWFT01A(IT,INV,TR,TI)
 !
 ! *** FT01A updated by JCM FROM HARWELL ROUTINE 9 Sep 91 ***
@@ -188,7 +185,7 @@
       EXTERNAL WWFFTADD
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /WWFFTDA/ KJUMP, UR(15), UI(15)
-!
+
       GOTO (1,2), KJUMP
     1 UM = 0.5
       DO I = 1, 15
@@ -278,29 +275,30 @@
       TI(IT) = TI(IT)*UM
   100 RETURN
       END SUBROUTINE WWFT01A
-!*==WWFFTADD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       BLOCKDATA WWFFTADD
       COMMON /WWFFTDA/ KJUMP, UR(15), UI(15)
       DATA KJUMP/1/
       END BLOCKDATA WWFFTADD
-!*==INITSP.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
       SUBROUTINE INITSP(N,V,D)
 !.. Do all the initialisation
 !
       INCLUDE 'PARAMS.INC'
-!
+
       PARAMETER (MPAR=50)
       REAL V(MPAR), D(MPAR)
       PARAMETER (MPT=2000)
       COMMON /LSQDAT/ NPT, X(MPT), Y(MPT), E(MPT)
-!
+
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
      &                VALMUB
       COMMON /WWREFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
-!
+
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
       COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
@@ -311,7 +309,7 @@
      &                  NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ,      &
      &                  REFUSE, CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,  &
      &                  NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-!
+
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /WWREFLNS/ REFH(3,WWREFDIM), AMUL(WWREFDIM),               &
      &                  AICALC(WWREFDIM), AIOBS(WWREFDIM),              &
@@ -326,7 +324,7 @@
       LOGICAL PHMAG
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
-!
+
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
       INTEGER           IPF_Lo,                     IPF_Hi
@@ -344,13 +342,13 @@
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
-!
+
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 !.. speedup attempt
       REAL ixres
-!
+
       PI = 4.*ATAN(1.)
       RAD = PI/180.
       DEG = 1./RAD
@@ -423,15 +421,13 @@
       IIMAX = NPTS
       XDIFT = ZARGI(IIMAX) - ZARGI(IIMIN)
       XMINT = ZARGI(IIMIN)
-!
-      RETURN
+
       END SUBROUTINE INITSP
-!*==OUTPUT_PRO.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!
+!*****************************************************************************
 !
       SUBROUTINE OUTPUT_PRO(NVAR,VARVAL,VARESD)
-!
+
       INCLUDE 'PARAMS.INC'
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -450,11 +446,11 @@
                         XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
                         IPF_RPt(MAX_NPFR),                                       &
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT)
-!
+
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
       COMMON /YSTORE/ ZCAL(MPPTS), ZBAK(MPPTS)
-!
+
       COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),                       &
      &                  PkFnEsd(MPkDes,Max_NPFR),                       &
      &                  PkFnCal(MPkDes,Max_NPFR), PkFnVarVal(3,MPkDes), &
@@ -463,17 +459,17 @@
      &                  PkAreaEsd(MAX_NPPR,MAX_NPFR),                   &
      &                  PkPosVal(MAX_NPPR,MAX_NPFR),                    &
      &                  PkPosEsd(MAX_NPPR,MAX_NPFR), PkPosAv(MAX_NPFR)
-!
+
       COMMON /WWPRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),  &
      &                  DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),       &
      &                  NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ,      &
      &                  REFUSE, CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,  &
      &                  NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
       LOGICAL REFUSE, CYC1, NOPKRF
-!
+
       PARAMETER (MPeak=10)
       COMMON /MULTPK/ NPEAK, AREA(MPEAK), XPOS(MPEAK), IPOS(MPEAK)
-!
+
       PARAMETER (MPAR=50)
       REAL VARVAL(MPAR), VARESD(MPAR)
 !
@@ -563,3 +559,6 @@
       CALL Upload_Widths()
 
       END SUBROUTINE OUTPUT_PRO
+!
+!*****************************************************************************
+!
