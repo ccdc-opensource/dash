@@ -92,7 +92,7 @@
       WRITE(OutputFile,"(2(I5,1X),'    1     0     0')",ERR=996) natcry, nbocry
       WRITE(OutputFile,"('SMALL')",ERR=996)
       WRITE(OutputFile,"('NO_CHARGES')",ERR=996)
-      WRITE(OutputFile,"(A80)",ERR=996) 'Temporary file created by DASH'
+      WRITE(OutputFile,*,ERR=996) 'Temporary file created by DASH'
       WRITE(OutputFile,"('@<TRIPOS>ATOM')",ERR=996)
       DO I = 1, natcry
         WRITE(OutputFile,270,ERR=996) I,atomlabel(I),(axyzo(I,j),j=1,3),sybatom(I)
