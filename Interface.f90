@@ -45,13 +45,12 @@
 !
 !*****************************************************************************
 !
-        SUBROUTINE WDialogGetCheckBoxLogical(TheFieldIdentifier, TheLogical)
+        LOGICAL FUNCTION WDialogGetCheckBoxLogical(TheFieldIdentifier)
 !
-! This subroutine provides a wrapper around the Winteracter WDialogGetCheckBox routine,
+! This function provides a wrapper around the Winteracter WDialogGetCheckBox routine,
 ! which takes the state of a check box and stores it in an integer.
 ! As a checkbox is the front-end equivalent of a variable of type LOGICAL,
-! it is more natural to have a routine that takes a logical as an argument
-! to be defined by the state of a check box.
+! it is more natural to have a routine that takes returns the state of a check box in a logical.
 ! This is that routine.
 !
       USE WINTERACTER
@@ -60,14 +59,13 @@
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: TheFieldIdentifier
-      LOGICAL, INTENT (  OUT) :: TheLogical
 
       INTEGER I
 
       CALL WDialogGetCheckBox(TheFieldIdentifier,I)
-      TheLogical = (I .EQ. Checked)
+      WDialogGetCheckBoxLogical = (I .EQ. Checked)
 
-      END SUBROUTINE WDialogGetCheckBoxLogical
+      END FUNCTION WDialogGetCheckBoxLogical
 !
 !*****************************************************************************
 !
@@ -236,13 +234,12 @@
 
       IMPLICIT NONE
 
-      INTEGER I
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetCheckBox(IDF_AutoLocalOptimise,I)
+      AutoLocalMinimisation = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
       CALL PopActiveWindowID
-      AutoLocalMinimisation = (I .EQ. 1)
 
       END FUNCTION AutoLocalMinimisation
 !
@@ -257,13 +254,12 @@
 
       IMPLICIT NONE
 
-      INTEGER I
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetCheckBox(IDF_ColFlexTors,I)
+      ColourFlexibleTorsions = WDialogGetCheckBoxLogical(IDF_ColFlexTors)
       CALL PopActiveWindowID
-      ColourFlexibleTorsions = (I .EQ. 1)
 
       END FUNCTION ColourFlexibleTorsions
 !
@@ -278,34 +274,52 @@
 
       IMPLICIT NONE
 
-      INTEGER I
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      CALL WDialogGetCheckBox(IDF_ConnectObsPoints,I)
+      ConnectPointsObs = WDialogGetCheckBoxLogical(IDF_ConnectObsPoints)
       CALL PopActiveWindowID
-      ConnectPointsObs = (I .EQ. 1)
 
       END FUNCTION ConnectPointsObs
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION SaveCSSR
+      LOGICAL FUNCTION PlotPeakFitDifferenceProfile
 
-! When .TRUE., each run in a multi run ends with a local minimisation
+! .TRUE. = when drawing the observed profile, the data points are joined by lines
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      INTEGER I
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      PlotPeakFitDifferenceProfile = WDialogGetCheckBoxLogical(IDF_PlotPeakFitDif)
+      CALL PopActiveWindowID
+
+      END FUNCTION PlotPeakFitDifferenceProfile
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION SaveCSSR
+
+! When .TRUE., a file in .cssr format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetCheckBox(IDF_OutputCSSR,I)
+      SaveCSSR = WDialogGetCheckBoxLogical(IDF_OutputCSSR)
       CALL PopActiveWindowID
-      SaveCSSR = (I .EQ. 1)
 
       END FUNCTION SaveCSSR
 !
@@ -313,20 +327,19 @@
 !
       LOGICAL FUNCTION SaveCCL
 
-! When .TRUE., each run in a multi run ends with a local minimisation
+! When .TRUE., a file in .ccl format is written out for each SA solution
 
       USE WINTERACTER
       USE DRUID_HEADER
 
       IMPLICIT NONE
 
-      INTEGER I
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetCheckBox(IDF_OutputCCL,I)
+      SaveCCL = WDialogGetCheckBoxLogical(IDF_OutputCCL)
       CALL PopActiveWindowID
-      SaveCCL = (I .EQ. 1)
 
       END FUNCTION SaveCCL
 !
@@ -535,7 +548,7 @@
         IRadSelection = 1 ! <...> in the Winteracter menu
         DO I = 2, 6
           IF (ABS(ALambda - FnWavelengthOfMenuOption(I)) .LT. 0.0003) IRadSelection = I
-        END DO
+        ENDDO
         CALL WDialogSelect(IDD_Data_Properties)
         CALL WDialogPutOption(IDF_Wavelength_Menu,IRadSelection)
         CALL WDialogSelect(IDD_PW_Page2)
@@ -633,8 +646,8 @@
           NTPeak = NTPeak + 1
           AllPkPosVal(NTPeak) = PkPosVal(I,J)
           AllPkPosEsd(NTPeak) = PkPosEsd(I,J)
-        END DO
-      END DO
+        ENDDO
+      ENDDO
       CALL SORT_REAL(AllPkPosVal,IOrdTem,NTPeak)
 ! IOrdTem now contains and oredered list of pointers into AllPkPosVal
 ! JvdS @ why not order the list itself?
@@ -653,13 +666,13 @@
               item = IR
               AbsTwoThetaDiff = anew
               TwoThetaDiff = xnew
-            END IF
+            ENDIF
             IF (xnew .GT. 0.0) THEN
               IR1 = MAX(1,IR-1)
 ! As both the peaks and the reflections are ordered, the position of the next peak can only be greater
               GOTO 20
-            END IF
-          END DO
+            ENDIF
+          ENDDO
  20       PkTicDif(I) = TwoThetaDiff
           DO II = 1, 3
             IHPk(II,I) = IH(II,item)
@@ -675,9 +688,9 @@
           DO II = 1, NTPeak
             PfTDMin = MIN(PfTDMin,PkTicDif(II))
             PfTDMax = MAX(PfTDMax,PkTicDif(II))
-          END DO
+          ENDDO
           SigmDif = 0.2886751345948*Abs(PfTDMax-PfTDMin)
-        END IF
+        ENDIF
         DO I = 1, NTPeak
           IOrd = IOrdTem(I)
           IA = IArgK(I)
@@ -693,12 +706,12 @@
             ProbAdd=EXP(-ArgTop*ArgBot)
             IF (ABS(ArgTop-DifMinSq).LT.1.e-10) THEN
               ProbTop=ProbTop+ProbAdd
-            END IF
+            ENDIF
             ProbTot=ProbTot+ProbAdd
-          END DO
+          ENDDO
           PkProb(IOrd)=ProbTop/ProbTot
-        END DO
-      END IF
+        ENDDO
+      ENDIF
 ! Write out all the peak positions in an ordered list ...
       CALL WGridRows(IDF_Peak_Positions_Grid,NTPeak)
       IF (NTPeak .GT. 0) THEN
@@ -714,10 +727,10 @@
           CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,6,I,IHPk(2,I))
           CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,7,I,IHPk(3,I))
           CALL WGridPutCellReal(IDF_Peak_Positions_Grid,8,I,PkProb(IOrd),'(F8.3)')
-        END DO
+        ENDDO
       ELSE
         CALL WDialogFieldState(ID_Index_Output,Disabled)
-      END IF
+      ENDIF
 ! Now do a refinement ...
       CALL RefineLattice()
       CALL PopActiveWindowID
@@ -776,7 +789,7 @@
               CALL WDialogPutRadioButton(IDF_SynX_Source)
             ELSE
               CALL WDialogPutRadioButton(IDF_CWN_Source)
-            END IF
+            ENDIF
           CASE (4) ! TOF neutron
             CALL WDialogFieldState(IDF_CW_group,Disabled)
             CALL WDialogFieldState(IDF_radiation_label,Disabled)
@@ -842,7 +855,7 @@
       ELSE
 ! Disable the wizard next button
         CALL WDialogFieldState(IDNEXT,Disabled)
-      END IF
+      ENDIF
       CALL Generate_TicMarks
       CALL PopActiveWindowID
 
@@ -923,7 +936,7 @@
         tJSG = LPosSG(LatBrav) + tISG - 1
         SGHMaBrStr(tISG)( 1:12) = SGNumStr(tJSG)(1:12)
         SGHMaBrStr(tISG)(13:24) = SGHMaStr(tJSG)(1:12)
-      END DO
+      ENDDO
       IF ((NumberSGTable .LT. LPosSg(LatBrav)) .OR. (NumberSGTable .GE. LPosSg(LatBrav+1))) THEN
 ! Current space group not possible in this crystal system: so update the space group to the first
 ! in the list of possibilities.
@@ -931,7 +944,7 @@
         ISPosSG = 1
       ELSE
         ISPosSG = NumberSGTable - LPosSG(LatBrav) + 1
-      END IF
+      ENDIF
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutMenu(IDF_Space_Group_Menu,SGHMaBrStr,NumBrSG,ISPosSG)
       CALL WDialogSelect(IDD_PW_Page1)
@@ -1205,17 +1218,17 @@
         CALL WMenuSetState(ID_Peak_Fitting_Mode,ItemEnabled,WintOn)
       ELSE IF (PeakOn .LT. 0) THEN
         CALL WMenuSetState(ID_Peak_Fitting_Mode,ItemEnabled,WintOff)
-      END IF
+      ENDIF
       IF (PawleyOn .GT. 0) THEN
         CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOn)
       ELSE IF (PawleyOn .LT. 0) THEN
         CALL WMenuSetState(ID_Pawley_Refinement_Mode,ItemEnabled,WintOff)
-      END IF
+      ENDIF
       IF (SolutionOn .GT. 0) THEN
         CALL WMenuSetState(ID_Structure_Solution_Mode,ItemEnabled,WintOn)
       ELSE IF (SolutionOn .LT. 0) THEN
         CALL WMenuSetState(ID_Structure_Solution_Mode,ItemEnabled,WintOff)
-      END IF
+      ENDIF
 
       END SUBROUTINE SetModeMenuState
 !

@@ -109,10 +109,8 @@
                   CALL WDialogGetString(IDF_PWa_DataFileName_String,tString)
 ! If no filename provided => grey out buttons 'Next' and 'Finish'
                   IF (LEN_TRIM(tString) .EQ. 0) THEN
-                    CALL WDialogFieldState(IDFINISH,Disabled)
                     CALL WDialogFieldState(IDNEXT,Disabled)
                   ELSE
-                    CALL WDialogFieldState(IDFINISH,Enabled)
                     CALL WDialogFieldState(IDNEXT,Enabled)
                   ENDIF
                   CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
@@ -282,17 +280,14 @@
               ISTAT = DiffractionFileOpen(CTEMP)
               IF (ISTAT .EQ. 1) THEN
                 CALL WDialogFieldState(IDNEXT,Enabled)
-                CALL WDialogFieldState(IDFINISH,Enabled)
               ELSE
                 CALL WDialogFieldState(IDNEXT,Disabled)
-                CALL WDialogFieldState(IDFINISH,Disabled)
               ENDIF
             CASE (IDBBROWSE)
               ISTAT = DiffractionFileBrowse()
 ! Don't change if the user pressed 'Cancel' (ISTAT = 2)
               IF      (ISTAT .EQ. 1) THEN
                 CALL WDialogFieldState(IDNEXT,Enabled)
-                CALL WDialogFieldState(IDFINISH,Enabled)
                 BackupNOBS = NOBS
                 DO I = 1, NOBS
                   BackupXOBS(I) = XOBS(I)
@@ -301,7 +296,6 @@
                 ENDDO
               ELSE IF (ISTAT .EQ. 0) THEN
                 CALL WDialogFieldState(IDNEXT,Disabled)
-                CALL WDialogFieldState(IDFINISH,Disabled)
               ENDIF
           END SELECT
       END SELECT
@@ -411,10 +405,10 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
 
-      INTEGER ISTATE
       REAL tReal
       REAL TwoTheta2dSpacing ! Function
       REAL dSpacing2TwoTheta ! Function
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
@@ -446,16 +440,14 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_TruncateStartYN)
 ! If set to 'TRUE', ungrey value field and vice versa
-              CALL WDialogGetCheckBox(IDF_TruncateStartYN,ISTATE)
-              IF (ISTATE .EQ. 1) THEN
+              IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
                 CALL WDialogFieldState(IDF_Min2Theta,Enabled)
               ELSE
                 CALL WDialogFieldState(IDF_Min2Theta,Disabled)
               ENDIF
             CASE (IDF_TruncateEndYN)
 ! If set to 'TRUE', ungrey value fields and vice versa
-              CALL WDialogGetCheckBox(IDF_TruncateEndYN,ISTATE)
-              IF (ISTATE .EQ. 1) THEN
+              IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
                 CALL WDialogFieldState(IDF_Max2Theta,Enabled)
                 CALL WDialogFieldState(IDF_MaxResolution,Enabled)
               ELSE
@@ -488,18 +480,15 @@
 
       INCLUDE 'GLBVAR.INC'
 
-      INTEGER ISTATE, tInt1, tInt2
-      LOGICAL tUseMC, tUseSpline
+      INTEGER tInt1, tInt2
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
-      CALL WDialogGetCheckBox(IDF_UseMCYN,ISTATE)
-      tUseMC = (ISTATE .EQ. 1)
-      CALL WDialogGetCheckBox(IDF_UseSplineYN,ISTATE)
-      tUseSpline = (ISTATE .EQ. 1)
       CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
       CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-      CALL SubtractBackground(tInt1,tInt2,tUseMC,tUseSpline)
+      CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
+                                          WDialogGetCheckBoxLogical(IDF_UseSplineYN))
       CALL Profile_Plot(IPTYPE)
       CALL PopActiveWindowID
 
@@ -518,8 +507,8 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'DialogPosCmn.inc'
 
-      INTEGER ISTATE, tInt1, tInt2
-      LOGICAL tUseMC, tUseSpline
+      INTEGER tInt1, tInt2
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
@@ -538,13 +527,10 @@
               CALL WDialogSelect(IDD_PW_Page7)
               CALL WDialogShow(IXPos_IDD_Wizard,IYPos_IDD_Wizard,0,Modeless)
             CASE (IDF_Preview)
-              CALL WDialogGetCheckBox(IDF_UseMCYN,ISTATE)
-              tUseMC = (ISTATE .EQ. 1)
-              CALL WDialogGetCheckBox(IDF_UseSplineYN,ISTATE)
-              tUseSpline = (ISTATE .EQ. 1)
               CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
               CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-              CALL CalculateBackground(tInt1,tInt2,tUseMC,tUseSpline)
+              CALL SubtractBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
+                                                  WDialogGetCheckBoxLogical(IDF_UseSplineYN))
               CALL Profile_Plot(IPTYPE)
           END SELECT
       END SELECT
