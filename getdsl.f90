@@ -158,10 +158,9 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE WRTDSL(FileName,LenFn)
+      INTEGER FUNCTION WRTDSL(FileName,LenFn)
 
-      USE WINTERACTER
-      USE DRUID_HEADER
+      IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
@@ -170,34 +169,46 @@
       CHARACTER*(*) FileName
       INTEGER       LenFn, Idum
 
-      COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),PkFnEsd(MPkDes,Max_NPFR), &
-        PkFnCal(MPkDes,Max_NPFR),PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes), &
-        PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR), &
-        PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),PkPosAv(MAX_NPFR)
+      REAL              PkFnVal,                      PkFnEsd,                      &
+                        PkFnCal,                                                    &
+                        PkFnVarVal,                   PkFnVarEsd,                   &
+                        PkAreaVal,                    PkAreaEsd,                    &
+                        PkPosVal,                     PkPosEsd,                     &
+                        PkPosAv
+      COMMON /PEAKFIT2/ PkFnVal(MPkDes,Max_NPFR),     PkFnEsd(MPkDes,Max_NPFR),     &
+                        PkFnCal(MPkDes,Max_NPFR),                                   &
+                        PkFnVarVal(3,MPkDes),         PkFnVarEsd(3,MPkDes),         &
+                        PkAreaVal(MAX_NPPR,MAX_NPFR), PkAreaEsd(MAX_NPPR,MAX_NPFR), &
+                        PkPosVal(MAX_NPPR,MAX_NPFR),  PkPosEsd(MAX_NPPR,MAX_NPFR),  &
+                        PkPosAv(MAX_NPFR)
 
+! Initialise to error      
+      WRTDSL = 1
       OPEN (UNIT = 77,FILE=FileName(1:LenFn),STATUS='UNKNOWN',ERR=999)
-      WRITE(77,*)'! Radiation wavelength and data type'
-      WRITE(77,'(A3,1X,F10.5,I2)') 'rad', ALambda, JRadOption
-      WRITE(77,*)'! Sigma shape parameters: format sigma1 esd sigma2 esd'
-      WRITE(77,100) 'sig',PkFnVarVal(1,1),PkFnVarEsd(1,1),PkFnVarVal(2,1),PkFnVarEsd(2,1)
-      WRITE(77,*)'! Gamma shape parameters: format gamma1 esd gamma2 esd'
-      WRITE(77,100) 'gam',PkFnVarVal(1,2),PkFnVarEsd(1,2),PkFnVarVal(2,2),PkFnVarEsd(2,2)
-      WRITE(77,*)'! Asymmetry parameters: format HPSL esd HMSL esd'
-      WRITE(77,100) 'asy',PkFnVarVal(1,3),PkFnVarEsd(1,3),PkFnVarVal(1,4),PkFnVarEsd(1,4)
-      WRITE(77,*)'! Calculated zero point'
-      WRITE(77,110) 'zer',ZeroPoint
-      WRITE(77,*)'! Pawley-fit SLIM parameter setting'
-      WRITE(77,110) 'sli',SLIMVALUE
-      WRITE(77,*)'! Pawley-fit Scale factor setting'
-      WRITE(77,110) 'sca',SCALFAC
+      WRITE(77,*,ERR=999)'! Radiation wavelength and data type'
+      WRITE(77,'(A3,1X,F10.5,I2)',ERR=999) 'rad', ALambda, JRadOption
+      WRITE(77,*,ERR=999)'! Sigma shape parameters: format sigma1 esd sigma2 esd'
+      WRITE(77,100,ERR=999) 'sig',PkFnVarVal(1,1),PkFnVarEsd(1,1),PkFnVarVal(2,1),PkFnVarEsd(2,1)
+      WRITE(77,*,ERR=999)'! Gamma shape parameters: format gamma1 esd gamma2 esd'
+      WRITE(77,100,ERR=999) 'gam',PkFnVarVal(1,2),PkFnVarEsd(1,2),PkFnVarVal(2,2),PkFnVarEsd(2,2)
+      WRITE(77,*,ERR=999)'! Asymmetry parameters: format HPSL esd HMSL esd'
+      WRITE(77,100,ERR=999) 'asy',PkFnVarVal(1,3),PkFnVarEsd(1,3),PkFnVarVal(1,4),PkFnVarEsd(1,4)
+      WRITE(77,*,ERR=999)'! Calculated zero point'
+      WRITE(77,110,ERR=999) 'zer',ZeroPoint
+      WRITE(77,*,ERR=999)'! Pawley-fit SLIM parameter setting'
+      WRITE(77,110,ERR=999) 'sli',SLIMVALUE
+      WRITE(77,*,ERR=999)'! Pawley-fit Scale factor setting'
+      WRITE(77,110,ERR=999) 'sca',SCALFAC
   100 FORMAT(A3,1X,4(F10.4,1X))
   110 FORMAT(A3,1X,F10.4)
       CLOSE(77)
+      WRTDSL = 0
       RETURN
 !C Error if we get here
-  999 CLOSE(77,IOSTAT=IDUM)
+  999 CALL ErrorMessage('Error while writing .dsl file.')
+      CLOSE(77,IOSTAT=IDUM)
 
-      END SUBROUTINE WRTDSL
+      END FUNCTION WRTDSL
 !
 !*****************************************************************************
 !
