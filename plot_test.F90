@@ -207,10 +207,10 @@
 !
 ! calculate the offset for the difference plot
 !
-      YADD = 0.5 * (YMax(ihandle)+YMin(ihandle))
-      DO I = 1, NBIN
-        store_diff(I,ihandle) = YADD + YOBIN(I) - store_ycalc(I,ihandle)
-      ENDDO
+!!      YADD = 0.5 * (YMax(ihandle)+YMin(ihandle))
+!!      DO I = 1, NBIN
+!!        store_diff(I,ihandle) = YADD + YOBIN(I) - store_ycalc(I,ihandle)
+!!      ENDDO
 
 ! call subroutine which plots data
       CALL plot_pro_file(iHandle)
