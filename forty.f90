@@ -101,7 +101,7 @@
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
-      COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XDIFT, XMINT
+      COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /SCRACH/ MESSAG, NAMFIL
@@ -168,15 +168,16 @@
       CALL OPNFIL(IPK,113)
       DONE = .FALSE.
       DO ICYC = NCYC1, LASTCY
+ !D     DO ICYC = 1, 1
 ! *** Winteracter calls ***
         CALL WDialogPutInteger(IDF_Pawley_Cycle_Number,ICYC)
         CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,LASTCY)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPTS)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MaxK)
 ! JCC Add in check on number of reflections here, so that code doesn't bomb out in the Pawley attempt
-        IF (MaxK.GT.400) THEN
+        IF (MAXK.GT.400) THEN
           FORTY = -1
-          IF (IPK.NE.0) CLOSE (ipk,IOSTAT=istat)
+          IF (IPK.NE.0) CLOSE (IPK,IOSTAT=istat)
           RETURN
         ENDIF
         IF (PRECYC .AND. ICYC.NE.NCYC1) THEN
@@ -461,16 +462,15 @@
       COMMON /ZSTORE/ NPTS, ZARGI(MPPTS), ZOBS(MPPTS), ZDOBS(MPPTS),    &
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
       REAL ZTEM(MPPTS), RTEM(3,MRFLNZ), TF4PAR(MF4PAR)
-      LOGICAL PFNVAR
-      COMMON /PFNINF/ NUMPFP(8,9,5), PFNVAR(8,9,5)
+      LOGICAL         PFNVAR
+      COMMON /PFNINF/ PFNVAR(8,9,5)
 
       REAL ARTEM(6)
       INTEGER KORD(MRFLNZ)
 
       COMMON /CMN299/ KIPT(MPTS), KNIPT(MAXPIK), ZNORM(MAXPIK),         &
      &                DZNDKQ(MAXPIK), DZNDVQ(9,MAXPIK), IOCCR(MPTS), JOCCR(MPTS)
-      COMMON /CMN300/ ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK)&
-     &                , KARGO(MAXPIK), KARGK(MAXPIK)
+      COMMON /CMN300/ ZNORMT(MAXPIK), DZNDKQT(MAXPIK), DZNDVQT(9,MAXPIK), KARGO(MAXPIK), KARGK(MAXPIK)
 
       DATA WDCN03/'SIGM', 'GAMM', 'HPSL', 'HMSL'/
       DATA IWCN03/3, 3, 0, 3, 4, 0, 3, 5, 0, 3, 6, 0/
@@ -495,6 +495,7 @@
 ! PROFILE REFINEMENT STAGE:
     2 MN = 512
       MN2 = MN/2
+      CALL DebugErrorMessage('In buggy code')
 ! Peak positions may have changed - check and re-sort if necessary
       DO IR = 1, MAXK
         KNOW = IR
@@ -520,13 +521,15 @@
       ENDDO
       DO IR = 1, MAXK
         ZARGK(IR) = ZTEM(IR)
+        DO I = 1, 3
+          REFH(I,IR) = RTEM(I,IR)
+        ENDDO
         IF (CAIL) THEN
           F4PAR(1,IR) = TF4PAR(IR)
         ENDIF
       ENDDO
       IOBS = 1
       DO IRT = 1, MAXK
-!        IR=KORD(IRT)
         IR = IRT
         DO I = IOBS, NPTS
           IF (ZARGI(I).GT.ZARGK(IR)) THEN
@@ -564,7 +567,7 @@
             GOTO 1510
           ENDIF
         ENDDO
- 1510   IMAX = MN
+ 1510   IMAXT = MN
         DO I = MN - 1, 1, -1
           IF (PKCONV(I,1).GE.PKCT) THEN
             IMAXT = I
@@ -673,10 +676,6 @@
         ZARGK(IR) = ARGK
       ENDDO
       CALL SORT_REAL(ZARGK,KORD,MAXK)
-! Set the number of peaks at each point to zero
-      DO II = 1, NPTS
-        IOCCR(II) = 0
-      ENDDO
 ! Now store the sorted values sequentially
       DO IR = 1, MAXK
         IRT = KORD(IR)
@@ -699,41 +698,46 @@
         ENDIF
       ENDDO
 ! REFH and ZARGK have now been sorted.
+! Set the number of contributing peaks at each data point to zero
+      DO II = 1, NPTS
+        IOCCR(II) = 0
+      ENDDO
       IOBS = 1
       DO IR = 1, MAXK
         DO I = IOBS, NPTS
           IF (ZARGI(I).GT.ZARGK(IR)) THEN
             KOBZ(IR) = I
-            GOTO 3030
+            IOBS = I
+            EXIT
           ENDIF
         ENDDO
- 3030   CONTINUE
       ENDDO
 ! Now do the knots
       KOUNT = 0
       IF (AKNOTS.LE.1.) THEN
-        KNOTS = AKNOTS*MAXK
+        KNOTS = NINT(AKNOTS*MAXK)
       ELSE
-        KNOTS = AKNOTS
+        KNOTS = NINT(AKNOTS)
       ENDIF
       KNOTS = MIN(50,KNOTS)
       KNOTS = MAX(5,KNOTS)
-      TTMIN = MIN(ZARGK(1),ZARGK(MAXK))
-      TTMAX = MAX(ZARGK(1),ZARGK(MAXK))
+      TTMIN = ZARGK(1)
+      TTMAX = ZARGK(MAXK)
       TTDIF = TTMAX - TTMIN
       TTINC = TTDIF/FLOAT(KNOTS-1)
       DO KNOW = 1, KNOTS
         ARGK = TTMIN + FLOAT(KNOW-1)*TTINC
         ARGKNT(KNOW) = ARGK
+! Calculate Sigma, Gamma, HPSL, HMSL and their derivatives at this ARGK
         CALL FDCN03(2)
 ! FFT CALCULATION STAGE IN PROFILE REFINEMENT
 ! THE INDIVIDUAL COMPONENTS FOR CONVOLUTION ARE IMMEDIATELY
 ! DESCRIBED IN FOURIER SPACE (GETS RID OF DISCONTINUITY PROBLEMS)
+! Fills PKCONV
         CALL FCSUB3(MN)
         MN21 = MN2 - 1
         DO II = 1, MN
           PKKNOT(II,1,KNOW) = PKCONV(II,1)
-          XDIFT = ZXDEL(1)*(II-MN21)
         ENDDO
         DO JJ = 1, NPKGEN(JPHASE,JSOURC)
           IF (PFNVAR(JJ,JPHASE,JSOURC)) THEN
@@ -751,7 +755,6 @@
 ! Do interpolation ... and come out with PKCONV
 ! The first peak is at the first knot
 ! and the last peak at the last knot.
-        JK = 1
         DO IK = JKNOT, KNOTS
           IF (ARGK.LT.ARGKNT(IK)) THEN
             JK = IK
@@ -763,6 +766,7 @@
         JK0 = MAX(2,JKNOT)
         JK0 = MIN(JK0,KNOTS-1)
         POFF = (ARGK-ARGKNT(JK0))/TTINC
+! Now calculate the weights of the interpolation. M = minus one, 0 = this point, P = plus one
         C3FNM = 0.5*POFF*(POFF-1.)
         C3FN0 = 1. - POFF**2
         C3FNP = 0.5*POFF*(POFF+1.)
@@ -780,7 +784,7 @@
 ! FIND THE PEAK MAXIMUM VALUE AND THEN WORK OUT THE PEAK LIMITS
         PKMAX = PKCONV(1,1)
         IPMAX = 1
-        DO I = 1, MN
+        DO I = 2, MN
           IF (PKCONV(I,1).GE.PKMAX) THEN
             PKMAX = PKCONV(I,1)
             IPMAX = I
@@ -788,15 +792,13 @@
         ENDDO
         PKCRIT = TOLR(1,JSOURC)
         PKCT = PKCRIT*PKMAX
-        IMINT = 1
         DO I = 2, MN
           IF (PKCONV(I,1).GE.PKCT) THEN
             IMINT = I
             GOTO 3510
           ENDIF
         ENDDO
- 3510   IMAX = MN
-        DO I = MN - 1, 1, -1
+ 3510   DO I = MN - 1, 1, -1
           IF (PKCONV(I,1).GE.PKCT) THEN
             IMAXT = I
             GOTO 3520
@@ -804,20 +806,37 @@
         ENDDO
  3520   ARIMIN = ARGK + ZXDEL(KNOW)*FLOAT(IMINT-IPMAX)
         ARIMAX = ARGK + ZXDEL(KNOW)*FLOAT(IMAXT-IPMAX)
-        IIMAX = NPTS
+!O        IIMAX = NPTS
+!O        DO I = KOBZ(KNOW), NPTS
+!O          IF (ZARGI(I).GE.ARIMAX) THEN
+!O            IIMAX = I
+!O            GOTO 3542
+!O          ENDIF
+!O        ENDDO
+!O 3542   IIMIN = 1
+!O        DO I = KOBZ(KNOW), 1, -1
+!O          IF (ZARGI(I).LE.ARIMIN) THEN
+!O            IIMIN = I
+!O            GOTO 3544
+!O          ENDIF
+!O        ENDDO
+! JvdS I think this solves JCC's comment below on boundaries being exceeded.
         DO I = KOBZ(KNOW), NPTS
           IF (ZARGI(I).GE.ARIMAX) THEN
-            IIMAX = I
+            IIMAX = I - 1 ! I is just _outside_ the peak, so we want I-1 to be the last point of the peak
             GOTO 3542
           ENDIF
         ENDDO
- 3542   IIMIN = 1
-        DO I = KOBZ(KNOW), 1, -1
+! When we arrive here, the limits of the peak were actually outside the powder pattern
+        IIMAX = NPTS
+ 3542   DO I = KOBZ(KNOW), 1, -1
           IF (ZARGI(I).LE.ARIMIN) THEN
-            IIMIN = I
+            IIMIN = I + 1 ! I is just _outside_ the peak, so we want I+1 to be the last point of the peak
             GOTO 3544
           ENDIF
         ENDDO
+! When we arrive here, the limits of the peak were actually outside the powder pattern
+        IIMIN = 1
  3544   DO II = IIMIN, IIMAX
           KOUNT = KOUNT + 1
           KARGO(KOUNT) = II
@@ -847,6 +866,7 @@
 ! JCC @@ Can get an array bound overflow error here so I've trapped for it temporarily.
 ! May want to check out why ...
 ! Added a hack ...
+! JvdS It should be better now, but it's not quite solved yet.
             IF (III.LE.512 .AND. III.GT.0) THEN
               PKTEM = PKCONV(III,1)
               YNORM = YNORM + C3FN(I)*PKTEM
@@ -856,7 +876,7 @@
                 DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKCONV(III,NPKD1)
               ENDDO
             ELSE
-         !     CALL DebugErrorMessage('(III.LE.512 .AND. III.GT.0) in forty.f90, III = '//Integer2String(II))
+          !    CALL DebugErrorMessage('(III.LE.512 .AND. III.GT.0) in forty.f90, III = '//Integer2String(III))
 ! JCC End of hack ...
             ENDIF
           ENDDO
@@ -928,7 +948,6 @@
 !
       SUBROUTINE FCSUB3(MNS)
 !
-!
 !X   For use with PFCN03 constant wavelength data with finite detector height
 !C 19B
 !H
@@ -958,8 +977,8 @@
      &                NPCSOU(9,5)
       DIMENSION CFFT(8), DFFT(8), DDT(8), FR(512,8), FI(512,8),         &
      &          DR(512,8), DI(512,8), FRT(512), FIT(512)
-      LOGICAL PFNVAR
-      COMMON /PFNINF/ NUMPFP(8,9,5), PFNVAR(8,9,5)
+      LOGICAL         PFNVAR
+      COMMON /PFNINF/ PFNVAR(8,9,5)
 
       SIG = PKFNVA(1)
       GAM = PKFNVA(2)

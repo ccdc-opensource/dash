@@ -620,22 +620,22 @@
       LOGICAL SDREAD
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      INTEGER matsz
+      INTEGER MATSZ
       CHARACTER*6 xxx
       CHARACTER*10 fname
-      INTEGER FORTY
+      INTEGER, EXTERNAL :: FORTY
 
-      fname='polyp'
-      xxx='CN11LS'
-      MATSZ=QPFDIM
-      NINIT=1
+      fname = 'polyp'
+      xxx = 'CN11LS'
+      MATSZ = QPFDIM
+      NINIT = 1
 ! JCC trap the return status
       CALL make_polybackup ! make a backup of the polyp files
       Quick_Pawley_Fit = FORTY(xxx,ALSQ,MATSZ,PCCN01,PFCN03,DUMMY,CALPR,fname)
 ! JCC Trap for an error on file opening
       IF (ICRYDA .NE. -1) CALL CLOFIL(ICRYDA)
       IF (IO10 .NE. -1)   CALL CLOFIL(IO10)
-      CALL CLOFIL(lpt)
+      CALL CLOFIL(LPT)
 
       END FUNCTION Quick_Pawley_Fit
 !
@@ -715,6 +715,9 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
+      INTEGER iDummy
+
+      iDummy = InfoError(1)
       IF (copypik) CALL IOsCopyFile('polyp.pbk','polyp.pik')
       IF (InfoError(1) .NE. 0) CALL DebugErrorMessage('cp polyp.pbk polyp.pik unsuccessful')
       IF (copytic) CALL IOsCopyFile('polyp.tbk','polyp.tic')

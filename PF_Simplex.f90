@@ -26,7 +26,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      PARAMETER (MAXITR=50)
+      PARAMETER (MAXITR=100)
       REAL X(N), DX(N), COVAR(N,N)
       REAL HESS(2500), DELTA(50), C0, C1(2,50), C2(2500)
       REAL V(2550), EX(150), C(51)
@@ -425,7 +425,7 @@
           IF (ABS(A(I,J)).GT.AAMAX) AAMAX = ABS(A(I,J))
         ENDDO
 ! JCC Removed the PAUSE
-        IF (AAMAX.EQ.0.0) THEN
+        IF (ABS(AAMAX).LT.0.000001) THEN
           IBMBER = 1
           RETURN
         ENDIF

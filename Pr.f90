@@ -1,30 +1,5 @@
-!*==ABCRPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-!CSL Mark 4 Update 54 4-July-95
-!
-!               C A M B R I D G E   C R Y S T A L L O G R A P H Y
-!
-!                      S U B R O U T I N E   L I B R A R Y
-!
-!   Parameter ATFS altered from 20     to 50
-!   Parameter ATOM altered from 50     to 150
-!   Parameter BVAR altered from 200    to 400
-!   Parameter CSTR altered from 20     to 300
-!   Parameter F2VA altered from 200    to 300
-!   Parameter MATS altered from 3000   to 80000
-!   Parameter OLAP altered from 70     to 200
-!   Parameter OMAX altered from 200    to 300
-!   Parameter PHAS altered from 1      to 9
-!   Parameter PSLK altered from 300    to 1000
-!   Parameter PVAR altered from 1000   to 2000
-!   Parameter REFS altered from 1000   to 10000
-!   Parameter SLAK altered from 20     to 500
-!   Parameter SORC altered from 1      to 5
-!   Parameter VVAR altered from 250    to 500
-!
-!                      P R O F I L E   R E F I N E M E N T
-!
+!*****************************************************************************
 !
       SUBROUTINE ABCRPR(N)
 !
@@ -43,8 +18,9 @@
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
      &                DSTAR2, TWOTHD(5), DIFANG(6)
       EQUIVALENCE (STHLMX,STHMXX(1))
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
@@ -766,7 +742,9 @@
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /DERVAR/ DERIVV(500), LVARV
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(300), DERIVT(300)
       COMPLEX FC, DERIVT
@@ -841,7 +819,10 @@
 ! CYCLE OVER K:
       K1 = KIPT(NOBSNOW) + 1
       K2 = KIPT(NOBSNOW+1)
-      KMIN = K1
+!O      KMIN = K1
+! JvdS should this be:
+      KMIN = KNIPT(K1)
+! ?????
       DO KK = K1, K2
         KNOW = KNIPT(KK)
         KMOD = KNOW
@@ -1315,8 +1296,9 @@
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(300), DERIVT(300)
       COMPLEX FC, DERIVT
@@ -1415,8 +1397,9 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -2220,8 +2203,9 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       LOGICAL MULFAS, MULSOU, MULONE
@@ -2452,8 +2436,9 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
@@ -2669,8 +2654,9 @@
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -4800,6 +4786,8 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
       SAVE SMYOB, SWYOBS
+      CHARACTER*20 Integer2String
+      INTEGER iDummy
 
       GOTO (1,2,3,4,5,6,100,100,100,100,11,12,13), IRFAC
 ! INITIAL ENTRY : CLEARS ALL IF SINGLE PHASE
@@ -5043,7 +5031,11 @@
 ! For now just check the bound and skip if its outside the range ..
     6 CONTINUE
       II = KNOW - KMIN + 1
-      IF (II.GT.0 .AND. II.LE.500) GGCALC(II) = GCALC
+      IF (II.GT.0 .AND. II.LE.500) THEN
+        GGCALC(II) = GCALC
+      ELSE
+        CALL DebugErrorMessage('II.GT.0 .AND. II.LE.500 in RFACPR, II = '//Integer2String(II))
+      ENDIF
       SOMEGA(KNOW) = SOMEGA(KNOW) + P5
       GOTO 100
   100 RETURN
@@ -5573,8 +5565,9 @@
       EQUIVALENCE (STHLMX,STHMXX(1))
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /DGEOM / IGEOM, UM(9), NLR, ANGLIN(3), ALAMBD(5,5), NLAMB, &
-     &                ILAMB
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
       EQUIVALENCE (WLGTH,ALAMBD(1,1))
       COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(300), DERIVT(300)
       COMPLEX FC, DERIVT

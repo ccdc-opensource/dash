@@ -41,7 +41,7 @@
      &                ZWT(MPPTS), ICODEZ(MPPTS), KOBZ(MPPTS)
       REAL            ZCAL
       COMMON /YSTORE/ ZCAL(MPPTS)
-      COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XDIFT, XMINT
+      COMMON /ZSTOR1/ ZXDELT, IIMIN, IIMAX, XMINT
       COMMON /ZSTOR2/ MN, MN2
       PARAMETER (MPAR=50)
       REAL P(MPAR)
@@ -92,8 +92,12 @@
           YNORM = 0.0
           DO I = 1, 3
             III = IARGI + I - 2
-            PKTEM = PKCONV(III,1)
-            YNORM = YNORM + C3FN(I)*PKTEM
+            IF (III .LT. 1 .OR. III .GT. 2048) THEN
+              CALL DebugErrorMessage('III .LT. 1 .OR. III .GT. 2048')
+            ELSE
+              PKTEM = PKCONV(III,1)
+              YNORM = YNORM + C3FN(I)*PKTEM
+            ENDIF
           ENDDO
           YCALC = AREA(JJ)*YNORM + YBACK
           ZCAL(II) = ZCAL(II) + YCALC
@@ -276,7 +280,7 @@
       CALL FT01A(MNS,INV,FRT,FIT)
 !
 !!!      DO 5 J=1,NPKGEN(JPHASE,JSOURC)
-!!!   5   CALL WWFT01A(MNS,INV,DR(1,J),DI(1,J))
+!!!   5   CALL FT01A(MNS,INV,DR(1,J),DI(1,J))
 !.. WRITE FUNCTION AND DERIVATIVES TO ARRAY PKADD
       XTEM = 1./ZXDEL(KNOW)
       DO I = 1, MNS
