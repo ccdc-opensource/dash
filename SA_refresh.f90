@@ -14,9 +14,6 @@
       INTEGER              iMyExit, num_new_min
       COMMON / CMN000001 / iMyExit, num_new_min
 
- !O     INTEGER                    ChiSqdChildWindows,                 ChiHandle
- !O     COMMON /ChiSqdWindowsUsed/ ChiSqdChildWindows(MaxNumChildWin), ChiHandle
-
       LOGICAL         RESTART
       INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                                    ChiMult
@@ -42,8 +39,6 @@
             CASE (IDF_StartNext) ! 'Start Next'
               iMyExit = 4
             CASE (IDF_StopSA, IDCANCEL) ! 'Stop'
-! Close Chi Squared plot window
-              CALL Close_Chisq_plot
 ! Go to the SA results
               iMyExit = 3
             CASE (IDB_Edit)
