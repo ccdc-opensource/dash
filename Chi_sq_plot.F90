@@ -276,7 +276,7 @@
 !     since this is the first run
       IF (NumOf_SA_Runs .EQ. 0) THEN
         XEndPoint(1) = XArray(1)
-        XEndPoint(2) = XArray(it_count) 
+        XEndPoint(2) = XArray(MAX(it_count,1)) 
         CALL IPgNewPlot(PgPolyLine,1,2,0,1)               
         CALL IPgStyle(  1,  0,  0,  0,  KolNumDif)
         CALL IPgXYPairs(XEndPoint, EndPoint)
