@@ -1654,9 +1654,12 @@
       END SELECT  ! EventType
 ! Modal Torsion Angle Button
       DO iRow = 1, NVAR
+	    iStatus = 0
         CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 5, iRow, iStatus)
         IF (iStatus .EQ. Checked) THEN
-          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)                 
+          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem) 
+!! Mogul Experiments	      
+		  CALL WriteMogulMol2(iFRow) 
           CALL ShowBiModalDialog(IFRow, xtem)
         ENDIF
       ENDDO

@@ -721,6 +721,13 @@
       CALL FileWriteLogical(hFile, RecNr, Get_DivideByEsd())
 ! Auto align      
       CALL FileWriteLogical(hFile, RecNr, Get_AutoAlign())
+! Save the mogul path
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogGetString(IDF_MogulExe, MogulExe)
+      CALL FileWriteString(hFile, RecNr, MogulExe)
+! Use Mogul
+      CALL FileWriteLogical(hFile, RecNr, UseMogul)
+
   999 CLOSE(hFile)
 
       END SUBROUTINE WriteConfigurationFile
@@ -995,6 +1002,13 @@
 ! Auto align      
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL Set_AutoAlign(tLogical)
+! Read the Mogul path
+      CALL WDialogSelect(IDD_Configuration)
+      CALL FileReadString(hFile,RecNr,MogulExe)
+      CALL WDialogPutString(IDF_MogulExe,MogulExe)
+! Use Mogul
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      UseMogul = tLogical
       CLOSE(hFile)
       RETURN
   999 CALL DebugErrorMessage('Error while opening config file')

@@ -112,6 +112,19 @@
                 VIEWEXE = tFileName
                 CALL WDialogPutString(IDF_ViewExe, VIEWEXE)
               ENDIF
+            CASE (IDBBROWSE2)
+              IFLAGS = LoadDialog + PromptOn
+              FILTER = 'All files (*.*)|*.*|'//&
+                       'All executables (*.exe)|*.exe|'
+! IFTYPE specifies which of the file types in the list is the default
+              IFTYPE = 2
+              tFileName = MogulExe
+              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select Mogul Executable', IFTYPE)
+! Did the user press cancel?
+              IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOK) THEN
+                MOGULEXE = tFileName
+                CALL WDialogPutString(IDF_MogulExe, MOGULEXE)
+              ENDIF
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
