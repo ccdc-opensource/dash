@@ -379,11 +379,10 @@
 ! basis-for-all-output. Its name is therefore now wrong. It is the default name for
 ! all .sdi, .hkl, .dash etc. etc. files.
 
-
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
 
-! Is_SX  = .TRUE. indicates that we are dealing with single crystal data. This is currently
+! Is_SX = .TRUE. indicates that we are dealing with single crystal data. This is currently
 ! relevant for the plotting of chi-sqrd vs. number of moves during the SA (powder uses the profile chi-sqrd,
 ! single crystal uses the intensity chi-sqrd) but may also become more important later on due
 ! to the subtle differences between a real powder pattern and a powder pattern generated from single cystal data.
