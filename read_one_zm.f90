@@ -7,6 +7,7 @@
       INTEGER FUNCTION read_one_zm(ifrg)
 
       USE ZMVAR
+      USE SAMVAR
 
       IMPLICIT NONE
 
@@ -35,6 +36,9 @@
       INTEGER item, II, izm, IKK, nlin, natof
       INTEGER AsymLen, IDlen
       CHARACTER*3 tIDstr
+      REAL*8 CART(maxatm,3)
+      CHARACTER*2  AtmElement(1:MAXATM_2)
+      INTEGER BondNr
 
 ! JCC Initialise return value to successful (zero)
 ! If the return value is non-zero, then an error occurred. The return status corresponds
@@ -179,6 +183,38 @@
           xzmpar(ii,ifrg) = 0.5
         ENDDO
       ENDIF
+! Now precalculate the bonds
+      natcry = NATOMS(ifrg)
+      CALL MAKEXYZ(natcry,BLEN(1,ifrg),ALPH(1,ifrg),BET(1,ifrg),      &
+     &             IZ1(1,ifrg),IZ2(1,ifrg),IZ3(1,ifrg),CART(1,1),     &
+     &             CART(1,2),CART(1,3))
+! Conversion of asym to aelem : very dirty, but works
+      DO I = 1, natcry
+        axyzo(I,1) = SNGL(CART(I,1))
+        axyzo(I,2) = SNGL(CART(I,2))
+        axyzo(I,3) = SNGL(CART(I,3))
+        AtmElement(I)(1:2) = asym(I,ifrg)(1:2)
+      ENDDO
+      CALL AssignCSDElement(AtmElement)
+! Calculate bonds and assign bond types.
+      CALL SAMABO
+! OUTPUT : nbocry             = number of bonds
+!          bond(1:MAXBND,1:2) = the atoms connected by the bond
+!          btype(1:MAXBND)    = the bond type
+!                               1 = single
+!                               2 = double
+!                               3 = triple
+!                               4 = quadruple
+!                               5 = aromatic
+!                               6 = polymeric single
+!                               7 = delocalised
+!                               9 = pi-bond
+      NumberOfBonds(ifrg) = nbocry
+      DO BondNr = 1, nbocry
+        BondType(BondNr,ifrg) = btype(BondNr)
+        Bonds(1,BondNr,ifrg)  = bond(BondNr,1)
+        Bonds(2,BondNr,ifrg)  = bond(BondNr,2)
+      ENDDO
       RETURN
 ! JCC Added in return status for failed reading and failed opening
   999 Read_One_Zm = ErrorStatus

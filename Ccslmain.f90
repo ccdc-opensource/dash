@@ -8634,7 +8634,6 @@
         IF (OVER) THEN
           CALL PARNAM(BS,VR,1,I)
           WRITE (LPT,3000) I, BS, VR
-!          WRITE (76,3000) I, BS, VR
           DERIVB(I) = 0.
         ELSE
           DERIVB(I) = 1./SQRT(ALSQ(IR+I))
@@ -8717,7 +8716,7 @@
         ENDDO
       ENDDO
   100 RETURN
- 3000 FORMAT (/' WARNING ** zero diagonal element for basic variable number',I5,2X,A4,1X,A4)
+ 3000 FORMAT (/' WARNING in MATINV ** zero diagonal element for basic variable number',I5,2X,A4,1X,A4)
       END SUBROUTINE MATINV
 !*==MATSET.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
 !

@@ -181,7 +181,6 @@ C
       ENDDO
 !
       PeakFnValue = atem/btem
-!	 write(76,*) IPFnV,NTem,PeakFnValue
 !
 !
 !      IF (I.eq.1) THEN
@@ -13570,8 +13569,6 @@ C
 C
       IF (N.GT.NMAX) STOP' Sorry, too many parameters !'
       CHIMIN=CCHI(N,X)
-c      WRITE(*,*)
-C      WRITE(76,100) CHIMIN
 C 100  FORMAT(' Chi-squared = ',1PE12.4)
       MODE=0
       NCHMAX=N*1000
@@ -13579,7 +13576,6 @@ C 100  FORMAT(' Chi-squared = ',1PE12.4)
       CALL VDBLE(DX,DV,N)
    1  CALL SUBPLX(SUBCHI,CCHI,N,TOL,NCHMAX,MODE,DV,V,CHIV,NCHI,
      *            WORK,IWORK,IFLAG)
-C      WRITE(76,100) SNGL(CHIV)
       CALL VSNGL(V,X,N)
       CALL VCOPY(X,WORK,N)
       CALL CHINIT(WORK,N,DELTA,C0,C1,C2,CCHI)
