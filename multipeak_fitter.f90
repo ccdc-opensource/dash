@@ -168,24 +168,22 @@
       DO IP = 1, NPEAK
         AREA(IP) = TOTAREA*YHITE(IP)/YHSUM
       ENDDO
-!      IF (CurrentRange.eq.1) Then
+!      IF (CurrentRange .EQ. 1) Then
       V(3) = SIGM
       V(4) = GAMM
       V(5) = MIN(HPSL,0.02)
       V(6) = MIN(HMSL,0.01)
 !      ELSE
-!.. Use the previous results
-!        XPosAvTem=0.
-!        Do I=1,NPeak
-!          XPosAvTem=XPosAvTem+XPos(I)
-!        End Do
-!        XPosAvTem=XPosAvTem/Float(NPeak)
-!        Do I=1,4
-!          I2=I+2
-!          vi2=v(i2)
-!          V(I2)=PeakFnValue(I,XPosAvTem)
-!        End Do
-!      END IF
+! Use the previous results
+!        XPosAvTem = 0.0
+!        DO I = 1, NPeak
+!          XPosAvTem = XPosAvTem + XPos(I)
+!        ENDDO
+!        XPosAvTem = XPosAvTem / FLOAT(NPeak)
+!        DO I = 1, 4
+!          V(I+2) = PeakFnValue(I,XPosAvTem)
+!        ENDDO
+!      ENDIF
       DO I = 1, NPEAK
         KK = 4 + 2*I
         V(KK+1) = AREA(I)
@@ -447,8 +445,8 @@
 !O      xranav = 0.5*(XPF_Range(1,CurrentRange)+XPF_Range(2,CurrentRange))
       xranav = xranav / SNGL(NumInPFR(CurrentRange))
       PkPosAv(CurrentRange) = xranav
-      CALL Upload_Positions()
-      CALL Upload_Widths()
+      CALL Upload_Positions
+      CALL Upload_Widths
 
       END SUBROUTINE OUTPUT_PRO
 !

@@ -570,16 +570,25 @@
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+
       COMMON /DERVAR/ DERIVV(500), LVARV
-      COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
       LOGICAL MULFAS, MULSOU, MULONE
+      COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
+      INTEGER         IBACK, NBACK
+      REAL                             ARGBAK,        BACKGD
+      INTEGER         KBCKGD,        NBK, LBKD
+      LOGICAL                                       ZBAKIN
       COMMON /GRDBCK/ IBACK, NBACK(5), ARGBAK(100,5), BACKGD(100,5),    &
-     &                KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
-      LOGICAL ZBAKIN
+                      KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
+
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
+
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
      &                YMAX, CSQTOT
@@ -592,6 +601,7 @@
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
       COMMON /POINTS/ LVRBS(500), LVRPR(500), LBSVR(400), LRDVR(300)
+
       REAL            ARGK, PKCNSP
       INTEGER                              KPCNSP
       REAL                                                DTDPCN,    DTDWL
@@ -599,12 +609,24 @@
       REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
-      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),    &
-     &                DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),         &
-     &                NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE,&
-     &                CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,            &
-     &                NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
-      LOGICAL REFUSE, CYC1, NOPKRF
+
+      REAL            ARGI, YNORM, PKFNSP,          KPFNSP
+      REAL            DERPFN
+      INTEGER                      NPKFSP
+      REAL                                        TOLER
+      INTEGER         NPKGEN
+      REAL                         PKFNVA,    DYNDVQ,    DYNDKQ
+      LOGICAL                                                    REFUSE
+      LOGICAL         CYC1, NOPKRF
+      REAL                          TOLR
+      INTEGER                                  NFFT
+      REAL                                           AKNOTS
+      INTEGER         NBASF4,             L4END,    L6ST, L6END
+      COMMON /PRPKFN/ ARGI, YNORM, PKFNSP(8,6,9,5), KPFNSP(8,6,9,5),     &
+                      DERPFN(8,6), NPKFSP(8,9,5), TOLER(8,9,5),          &
+                      NPKGEN(9,5), PKFNVA(8), DYNDVQ(8), DYNDKQ, REFUSE, &
+                      CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
+                      NBASF4(MPRPKF,2,9), L4END(9), L6ST, L6END
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -613,24 +635,28 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
                       NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
+      REAL            SCOEFF
       COMMON /SPLBCK/ SCOEFF(100,5)
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       GOTO (1,2,3,4), N
-      GOTO 100
+      RETURN
 ! READ ONE L BACK CARD:
     1 CALL BACKIN
-      GOTO 100
+      RETURN
 ! CALCULATE YBACK VALUE AT ARGI: BIFURCATE ON WHETHER IBACK LT/EQ/GT 0
     2 IF (IBACK) 200, 250, 300
 ! BACKGROUND INTERPOLATION APPROXIMATIONS
   200 GOTO (11,12), -IBACK
    11 YBACK = ALNINT(ARGBAK(1,JSOURC),BACKGD(1,JSOURC),ARGI,NBACK(JSOURC))
-      GOTO 100
+      RETURN
    12 YBACK = SPLINT(-1,NBACK(JSOURC),ARGBAK(1,JSOURC),BACKGD(1,JSOURC),SCOEFF(1,JSOURC),ARGI)
-      GOTO 100
+      RETURN
   250 CONTINUE
 ! BACKGROUND READ FROM FILE
-      GOTO 100
+      RETURN
 ! BACKGROUND AND DERIVATIVES CALCULATED FROM BACKGROUND FUNCTION
   300 GOTO (310,320,330,340), IBACK
 ! SIMPLE POLYNOMIAL MODEL
@@ -643,12 +669,12 @@
         IF (L.NE.0) DERIVV(L) = DERIVV(L) + AMUL
         AMUL = AMUL*BMUL
       ENDDO
-      GOTO 100
+      RETURN
 ! CHEBYSCHEV POLYNOMIAL (OF THE FIRST KIND) MODEL
   320 YBACK = BACKGD(1,JSOURC)
       L = KBCKGD(1,JSOURC)
       IF (L.NE.0) DERIVV(L) = DERIVV(L) + 1.
-      IF (NBACK(JSOURC).LE.1) GOTO 100
+      IF (NBACK(JSOURC).LE.1) RETURN
 ! XCHEB IS DEFINED BETWEEN -1 AND 1
       XCHEB = (2.*ARGI-(ARGMAX(JSOURC)+ARGMIN(JSOURC))) /(ARGMAX(JSOURC)-ARGMIN(JSOURC))
       CHEB0 = 0.
@@ -662,12 +688,12 @@
         CHEB0 = CHEB1
         CHEB1 = CHEB2
       ENDDO
-      GOTO 100
+      RETURN
 ! CHEBYSCHEV POLYNOMIAL (OF THE SECOND KIND) MODEL
   330 YBACK = BACKGD(1,JSOURC)
       L = KBCKGD(1,JSOURC)
       IF (L.NE.0) DERIVV(L) = DERIVV(L) + 1.
-      IF (NBACK(JSOURC).LE.1) GOTO 100
+      IF (NBACK(JSOURC).LE.1) RETURN
 ! XCHEB IS DEFINED BETWEEN -1 AND 1
       XCHEB = (2.*ARGI-(ARGMAX(JSOURC)+ARGMIN(JSOURC))) /(ARGMAX(JSOURC)-ARGMIN(JSOURC))
       CHEB0 = 0.
@@ -680,12 +706,12 @@
         CHEB0 = CHEB1
         CHEB1 = CHEB2
       ENDDO
-      GOTO 100
+      RETURN
 ! FOURIER COSINE SERIES
   340 YBACK = BACKGD(1,JSOURC)
       L = KBCKGD(1,JSOURC)
       IF (L.NE.0) DERIVV(L) = DERIVV(L) + 1.
-      IF (NBACK(JSOURC).LE.1) GOTO 100
+      IF (NBACK(JSOURC).LE.1) RETURN
 ! XTEM IS DEFINED BETWEEN 0 AND TWOPI
       XTEM = (ARGI-ARGMIN(JSOURC))/(ARGMAX(JSOURC)-ARGMIN(JSOURC))
       DO I = 2, NBACK(JSOURC)
@@ -697,7 +723,7 @@
       GOTO 100
 ! APPLY SHIFTS TO BACKGROUND PARAMETERS
     3 IF (IBACK.GT.0) THEN
-        IF (MULFAS .AND. JPHASE.GT.1) GOTO 100
+        IF (MULFAS .AND. JPHASE.GT.1) RETURN
         CALL ADJUST(BACKGD(ISPC,JSOURC))
       ENDIF
       GOTO 100
@@ -705,9 +731,12 @@
     4 DO I = 1, NBK
         IF (LBKD(I).GT.0) GOTO 42
       ENDDO
-      WRITE (LPT,3001) NBK, LBKD
- 3001 FORMAT (/' PROGRAM ERROR *** Too many background cards being written out - NBK =',I4/' LBKD holds ',10I3)
-      STOP
+!O      WRITE (LPT,3001) NBK, LBKD
+!O 3001 FORMAT (/' PROGRAM ERROR *** Too many background cards being written out - NBK =',I4/' LBKD holds ',10I3)
+!O      STOP
+      CALL DebugErrorMessage('Too many background cards being written out.')
+      IBMBER = IBMBER + 1
+      RETURN
    42 N1 = LBKD(I)
       N2 = LBKD(I+1) - 1
       LBKD(I) = -LBKD(I)
@@ -715,11 +744,11 @@
  2004 FORMAT ('L BACK',1X,I4,4X,6(F10.5,1X))
       IF (I.NE.1) WRITE (NEWIN,2005) (BACKGD(J,JSOURC),J=N1,N2)
  2005 FORMAT ('L BACK',1X,7(F10.5,1X))
-      GOTO 100
+      RETURN
       ENTRY BACKP8(NP,NV)
 ! RECORD THAT PARAMETER NP IS VARIABLE NUMBER NV:
       KBCKGD(NP,JSOURC) = NV
-      GOTO 100
+      RETURN
       ENTRY BACKP9
 ! RECORD ALL PARAMETERS FIXED:
       DO J = 1, NSOURC
@@ -5719,6 +5748,7 @@
 
       COMMON /SPLBCK/ SCOEFF(100,5)
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6), NZERSP(9,5)
+
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
@@ -5899,6 +5929,7 @@
                       NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
       COMMON /SPLBCK/ SCOEFF(100,5)
+
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
