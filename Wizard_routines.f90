@@ -83,7 +83,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE EndWizardCommon
+      SUBROUTINE EndWizard
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -93,7 +93,7 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
-      LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement, FnPatternOK
+      LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
 
       CALL WizardWindowHide
       IF (WeCanDoAPawleyRefinement()) THEN
@@ -105,23 +105,6 @@
       CALL WMenuSetState(ID_Start_Wizard,ItemEnabled,WintOn)
 !O! Ungrey "Subtract Background" button in Toolbar
 !O      IF (FnPatternOK()) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
-
-      END SUBROUTINE EndWizardCommon
-!
-!*****************************************************************************
-!
-      SUBROUTINE EndWizard
-
-      IMPLICIT NONE
-
-      CALL EndWizardCommon
-! Legacy code from first release. Should not be necessary any more?
-! The wizard windows can only be closed by DASH, and when it closes the
-! windows that need this code, it updates all these variables automatically?
-      CALL Upload_CrystalSystem
-      CALL Upload_Cell_Constants
-      CALL Upload_Range
-      CALL Generate_TicMarks
 
       END SUBROUTINE EndWizard
 !
@@ -165,7 +148,7 @@
 
       LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
    
-      CALL EndWizardCommon
+      CALL EndWizard
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
       CALL WDialogPutRadioButton(IDF_PW_Option3)
       PastPawley = .FALSE.
@@ -229,7 +212,7 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizardCommon
+              CALL EndWizard
             CASE (IDNEXT)
 ! We're off the main page and on to new pages depending on the option.
               CALL WDialogGetRadioButton(IDF_PW_Option1,IPW_Option)
