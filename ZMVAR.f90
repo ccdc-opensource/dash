@@ -141,7 +141,7 @@
 
 ! asym = Atom SYMbol--e.g. 'H  ' for hydrogen, 'Ag ' for silver--of the current atom.
 ! OriginalLabel = the label of the atom as read from the .res/.mol2/etc. file
-! (read from column 14 in the z-matrix file)
+! (read from column 14 in the Z-matrix file)
 ! Note that we allow five characters, .pdb allows 4, .res and .cssr can't cope with the
 ! atom label being a real 'name', it must be the element + a number
 
