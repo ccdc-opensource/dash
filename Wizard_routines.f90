@@ -842,8 +842,6 @@
               END SELECT
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
-            CASE (IDB_FindPeaks)
-              CALL FindPeaks
           END SELECT
         CASE (FieldChanged)
           CALL CheckIfWeCanIndex

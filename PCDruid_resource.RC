@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 21/Apr/2004 10:09:52
+// Modified : 21/Apr/2004 16:48:45
 //
 ///////////////////////////////////////////////////
 //
@@ -662,7 +662,6 @@
 #define IDR_HydrogensIgnore              1092
 #define IDR_HydrogensExplicit            1550
 #define IDF_RecalcESDs                   1154
-#define IDB_FindPeaks                    1155
 #define IDF_IniOrAxis                    1156
 #define IDF_IniOrEuler                   1157
 #define IDF_IniOrQuater                  1298
@@ -2121,7 +2120,6 @@ BEGIN
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "&Index pattern",IDF_RADIO3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  121,   93,  130,   14
     CONTROL "&Enter known unit cell parameters",IDF_RADIO4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  121,  113,  128,   14
-    CONTROL "Find peaks",IDB_FindPeaks,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  290,  100,   50,   14
 END
 
 IDD_PW_Page7 RCDATA

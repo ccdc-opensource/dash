@@ -1,4 +1,4 @@
-! Winteracter module created : 21/Apr/2004 10:09:52
+! Winteracter module created : 21/Apr/2004 16:48:45
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -649,7 +649,6 @@
           INTEGER, PARAMETER :: IDR_HydrogensIgnore             =  1092
           INTEGER, PARAMETER :: IDR_HydrogensExplicit           =  1550
           INTEGER, PARAMETER :: IDF_RecalcESDs                  =  1154
-          INTEGER, PARAMETER :: IDB_FindPeaks                   =  1155
           INTEGER, PARAMETER :: IDF_IniOrAxis                   =  1156
           INTEGER, PARAMETER :: IDF_IniOrEuler                  =  1157
           INTEGER, PARAMETER :: IDF_IniOrQuater                 =  1298
