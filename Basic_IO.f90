@@ -69,6 +69,13 @@
 
       IMPLICIT NONE
 
+      LOGICAL MseBtnPressed
+! The routines that act on the mousebutton presses are non-reentrant
+! and the one should not be called when the other is active, so we must keep a flag if we are dealing
+! with a mouse button press. 
+      DATA MseBtnPressed / .FALSE. /
+      COMMON /JvdS1/ MseBtnPressed
+
   10  CALL WMessage(EventType,EventInfo)
       SELECT CASE (EventInfo%WIN)
         CASE (0) ! Main window
@@ -84,10 +91,16 @@
               GOTO 10
             CASE (MouseButDown)
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
+                IF (MseBtnPressed) GOTO 10
+                MseBtnPressed = .TRUE.
                 CALL Plot_Alter
+                MseBtnPressed = .FALSE.
               ELSE IF(EventInfo%VALUE1 .EQ. RightButton) THEN
 ! Get to work on the cross-hair movement - fitting this time
+                IF (MseBtnPressed) GOTO 10
+                MseBtnPressed = .TRUE.
                 CALL Move_CrossHair_Fit
+                MseBtnPressed = .FALSE.
               END IF
               GOTO 10
             CASE (KeyDown)
@@ -155,6 +168,12 @@
 
       IMPLICIT NONE
 
+      LOGICAL MseBtnPressed
+! The routines that act on the mousebutton presses are non-reentrant
+! and the one should not be called when the other is active, so we must keep a flag if we are dealing
+! with a mouse button press. 
+      COMMON /JvdS1/ MseBtnPressed
+
   10  CALL WMessagePeek(EventType,EventInfo)
       IF (EventType .NE. NoMessage) THEN
         SELECT CASE (EventInfo%WIN)
@@ -171,10 +190,16 @@
                 GOTO 10
               CASE (MouseButDown)
                 IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
+                  IF (MseBtnPressed) GOTO 10
+                  MseBtnPressed = .TRUE.
                   CALL Plot_Alter
+                  MseBtnPressed = .FALSE.
                 ELSE IF(EventInfo%VALUE1 .EQ. RightButton) THEN
 ! Get to work on the cross-hair movement - fitting this time
+                  IF (MseBtnPressed) GOTO 10
+                  MseBtnPressed = .TRUE.
                   CALL Move_CrossHair_Fit
+                  MseBtnPressed = .FALSE.
                 END IF
                 GOTO 10
               CASE (KeyDown)
