@@ -1,4 +1,4 @@
-! Winteracter module created : 28/Sep/2001 15:33:38
+! Winteracter module created : 30/Sep/2001 18:58:25
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -477,5 +477,9 @@
           INTEGER, PARAMETER :: IDF_LABEL16                     =  1207
           INTEGER, PARAMETER :: IDF_Indexing_ScaleFactor        =  1208
           INTEGER, PARAMETER :: IDD_DV_Results                  =   133
-          INTEGER, PARAMETER :: IDF_DV_Summary                  =  1244
+          INTEGER, PARAMETER :: IDD_DIALOG005                   =   146
+          INTEGER, PARAMETER :: IDF_DV_Summary_0                =  1232
+          INTEGER, PARAMETER :: ISS9                            =  1233
+          INTEGER, PARAMETER :: ISS10                           =  1241
+          INTEGER, PARAMETER :: ISS11                           =  1242
       END MODULE Druid_Header
