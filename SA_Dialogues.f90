@@ -49,6 +49,7 @@
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
       CALL SetModeMenuState(-1,-1,1)
       CALL SelectMode(ID_Structure_Solution_Mode)
+      CALL Profile_Plot
 
 
       END SUBROUTINE ShowWizardWindowZmatrices

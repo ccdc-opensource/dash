@@ -410,9 +410,9 @@
           DO I = 1, NBIN
             XBIN(I)  = XOBSA(I)
             YOBIN(I) = YOBSA(I)
-            YBBIN(I) = 0.0
             EBIN(I)  = ESDA(I)
           ENDDO
+          CALL Init_BackGround
           NoData = .FALSE.
           CALL GetProfileLimits
           FNAME = ''

@@ -342,10 +342,8 @@
         BackupEOBS(I) = EOBS(I)
       ENDDO
       CALL Rebin_Profile
-      DO I = 1, NBIN
 ! JvdS Assume no knowledge on background
-        YBBIN(I) = 0.0
-      ENDDO
+      CALL Init_BackGround
       CALL GetProfileLimits
       IPTYPE = 1
       CALL Profile_Plot

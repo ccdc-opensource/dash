@@ -255,9 +255,9 @@
         XOBS(I) = BackupXOBS(I)
         YOBS(I) = BackupYOBS(I)
         EOBS(I) = BackupEOBS(I)
-! JvdS Assume no knowledge on background
-        YBAK(I) = 0.0
       ENDDO
+! JvdS Assume no knowledge on background
+      CALL Init_BackGround
       OriginalNOBS = NOBS
       EndNOBS = OriginalNOBS
       CALL Rebin_Profile
@@ -529,6 +529,9 @@
               CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
               CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN),        &
                                                    WDialogGetCheckBoxLogical(IDF_UseSplineYN))
+! Force display of background
+              CALL WDialogSelect(IDD_Plot_Option_Dialog)
+              CALL WDialogPutCheckBoxLogical(IDF_background_check,.TRUE.)
               CALL Profile_Plot
           END SELECT
       END SELECT

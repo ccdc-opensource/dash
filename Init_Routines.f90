@@ -60,3 +60,30 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE Init_BackGround
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS),  YCAL(MOBS),  YBAK(MOBS),  EOBS(MOBS)
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      INTEGER I
+
+      DO I = 1, NOBS
+        YBAK(I) = 0.0
+      ENDDO
+      DO I = 1, NBIN
+        YBBIN(I) = 0.0
+      ENDDO
+
+      END SUBROUTINE Init_BackGround
+!
+!*****************************************************************************
+!
