@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 08/Nov/2001 17:44:37
+// Modified : 12/Nov/2001 14:33:26
 //
 ///////////////////////////////////////////////////
 //
@@ -1269,7 +1269,7 @@ BEGIN
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Open",ID_PWa_DF_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  167,   77,   40,   14
-    CONTROL "Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
 END
 
 IDD_Pawley_Status DIALOG 0, 0,  400,  185
@@ -1954,7 +1954,7 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAM
 FONT    8, "MS Sans Serif"
 CAPTION "Background fitting using a Monte-carlo low pass filter"
 BEGIN
-    CONTROL "Adjust the window size of the low-pass filter until a suitable background is obtained. Press Cancel to fit the background as part of the Pawley refinement.",IDF_background_text,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   28,   16,  164,   24
+    CONTROL "Adjust the window size of the low-pass filter until a suitable background is obtained.",IDF_background_text,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   28,   16,  164,   24
     CONTROL "100",IDF_Background_Pass,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  150,   48,   41,   12
     CONTROL "Low-pass filter window size",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   28,   48,  102,    8
     CONTROL "&Cancel",IDCANCEL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  150,   76,   40,   14
