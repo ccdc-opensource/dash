@@ -1,8 +1,8 @@
- TIC .\Example.tic
- HCV .\Example.hcv
- PIK .\Example.pik
- RAW .\hct20.xye
- DSL .\Example.dsl
- Cell    9.93900   8.49868   7.31762   90.0000  111.1899   90.0000
+ TIC D:\cvsDASH\dash\Debug\Example.tic
+ HCV D:\cvsDASH\dash\Debug\Example.hcv
+ PIK D:\cvsDASH\dash\Debug\Example.pik
+ RAW D:\cvsDASH\dash\Debug\hct20.xye
+ DSL D:\cvsDASH\dash\Debug\Example.dsl
+ Cell    9.93975   8.49913   7.31815   90.0000  111.1889   90.0000
  SpaceGroup   39      4:b       P 1 21 1    
- PawleyChiSq       2.29
+ PawleyChiSq       2.79
