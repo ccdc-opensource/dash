@@ -95,6 +95,7 @@
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
       CALL WDialogLoad(IDD_DV_Results)
       CALL WDialogLoad(IDD_LicenceAgreement)
+      CALL WDialogLoad(IDD_Parameter_Status_2)
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
@@ -383,7 +384,6 @@
       KolBack           = Win_RGB(164,211,105)
 
       CALL ReadConfigurationFile
-      CALL WDialogSelect(IDD_SAW_Page1)
       CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
                                         KolPGWindow%IGreen,&
                                         KolPGWindow%IBlue)
