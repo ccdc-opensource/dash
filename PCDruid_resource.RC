@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 14/Oct/2003 18:11:37
+// Modified : 20/Oct/2003 18:36:50
 //
 ///////////////////////////////////////////////////
 //
@@ -722,6 +722,10 @@
 #define IDR_HydrogensAbsorb              1090
 #define IDR_HydrogensIgnore              1092
 #define IDR_HydrogensExplicit            1550
+#define IDB_Divide                       1147
+#define IDB_Smooth                       1148
+#define IDF_SmoothWindow                 1149
+#define IDB_1st                          1150
 
 ///////////////////////////////////////////////////
 //
@@ -1134,19 +1138,6 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
-END
-
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  112
@@ -1989,15 +1980,22 @@ BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "20",IDF_NumOfIterations,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  204,   50,   32,   14
-    CONTROL "Number of iterations",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  130,   52,   70,    8
-    CONTROL "Window",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  160,   71,   40,    8
-    CONTROL "100",IDF_WindowWidth,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  204,   69,   32,   14
-    CONTROL "Use &Monte Carlo for background correction",IDF_UseMCYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  128,   91,  150,   14
+    CONTROL "20",IDF_NumOfIterations,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  200,   92,   32,   14
+    CONTROL "Number of iterations",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  126,   94,   70,    8
+    CONTROL "Window",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  156,  109,   40,    8
+    CONTROL "100",IDF_WindowWidth,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  200,  107,   32,   14
+    CONTROL "Use &Monte Carlo for background correction",IDF_UseMCYN,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  124,  123,  150,   14
     CONTROL "&Preview",IDB_Preview,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  247,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  306,  150,   40,   14
-    CONTROL "&Subtract background",IDF_SubtractBackground,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   98,   28,   80,   14
+    CONTROL "&Subtract background",IDF_SubtractBackground,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   98,   76,   80,   14
+    CONTROL "Divide",IDB_Divide,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   97,   14,   40,   14
+    CONTROL "by ESD (for lab data, this is equivalent to plotting the square root)",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  141,   17,  220,    8
+    CONTROL "Smooth",IDB_Smooth,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   97,   34,   40,   14
+    CONTROL "with a window of",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  141,   37,   60,    8
+    CONTROL "2",IDF_SmoothWindow,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  203,   34,   32,   14
+    CONTROL "1st",IDB_1st,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   97,   54,   40,   14
+    CONTROL "Derivative",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  141,   57,   40,    8
 END
 
 IDD_PW_Page6 RCDATA
