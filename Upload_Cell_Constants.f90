@@ -1,36 +1,37 @@
-      SUBROUTINE Upload_Crystal_Data()
 !
+!*****************************************************************************
+!
+      SUBROUTINE Upload_Crystal_Data()
+
       USE WINTERACTER
       USE DRUID_HEADER
 
       INCLUDE 'lattice.inc'
+      INCLUDE 'GLBVAR.INC' ! Contains ALambda
 
 ! Update all the cell constants ...
       CALL Upload_Cell_Constants
       CALL Upload_Zero_Point
-      CALL UpdateWavelength(Alambda)
+      CALL UpdateWavelength(ALambda)
 ! Let's do a symmetry check
       CALL Check_Crystal_Symmetry()
       CALL RefineLattice()           
-!
+
       END SUBROUTINE Upload_Crystal_Data
 !
-
+!*****************************************************************************
+!
       SUBROUTINE Upload_Zero_Point()
 
       USE WINTERACTER
       USE DRUID_HEADER
 
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA 
+      INCLUDE 'Lattice.inc'
 
-      INTEGER ICurSel
-
-      ICurSel = WInfoDialog(CurrentDialog)
-! Update all the cell constants ...
+      CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogPutReal(IDF_zeropt_refine,ZeroPoint,'(F10.4)')
-! JvdS Sometimes it says .NE. -1, sometimes .NE. 0
-      IF (ICurSel .NE. 0) CALL WDialogSelect(ICurSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Zero_Point
 !
@@ -41,13 +42,10 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA 
+      INCLUDE 'Lattice.inc'
 
-      INTEGER ICurSel
-
-      ICurSel = WInfoDialog(CurrentDialog)
+      CALL PushActiveWindowID
 ! Update all the cell constants ...
-!C>> JCC      Call WDialogLoad(IDD_Crystal_Symmetry)
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
       CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')      
@@ -57,12 +55,12 @@
       CALL WDialogPutReal(IDF_gam_latt,CellPar(6),'(F10.3)')
 !C>> And in the wizard too
       CALL WDialogSelect(IDD_PW_Page1)
-      CALL WDialogPutReal(IDF_PW_a_latt,CellPar(1),'(F10.5)')
-      CALL WDialogPutReal(IDF_PW_b_latt,CellPar(2),'(F10.5)')      
-      CALL WDialogPutReal(IDF_PW_c_latt,CellPar(3),'(F10.5)')      
-      CALL WDialogPutReal(IDF_PW_alp_latt,CellPar(4),'(F10.3)')      
-      CALL WDialogPutReal(IDF_PW_bet_latt,CellPar(5),'(F10.3)')      
-      CALL WDialogPutReal(IDF_PW_gam_latt,CellPar(6),'(F10.3)')
+      CALL WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
+      CALL WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')      
+      CALL WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')      
+      CALL WDialogPutReal(IDF_alp_latt,CellPar(4),'(F10.3)')      
+      CALL WDialogPutReal(IDF_bet_latt,CellPar(5),'(F10.3)')      
+      CALL WDialogPutReal(IDF_gam_latt,CellPar(6),'(F10.3)')
 !C>> And in the peak positions box
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogPutReal(IDF_a_refine,CellPar(1),'(F10.5)')
@@ -71,7 +69,7 @@
       CALL WDialogPutReal(IDF_alp_refine,CellPar(4),'(F10.3)')      
       CALL WDialogPutReal(IDF_bet_refine,CellPar(5),'(F10.3)')      
       CALL WDialogPutReal(IDF_gam_refine,CellPar(6),'(F10.3)')
-      IF (ICurSel.NE.0) CALL WDialogSelect(ICurSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Cell_Constants
 !
@@ -82,54 +80,48 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA 
-      INTEGER ICurSel, IDownFrom
+      INTEGER, INTENT (IN) :: IDownFrom
+
+      INCLUDE 'Lattice.inc'
 
       REAL a,b,c,alpha,beta,gamma   
 
-      ICurSel = WInfoDialog(CurrentDialog)
+      IF ((IDownFrom .NE. IDD_Crystal_Symmetry) .AND. (IDownFrom .NE. IDD_PW_Page1)) RETURN
+      CALL PushActiveWindowID
 ! Get all the cell constants from the selected area
-!C>> JCC      Call WDialogLoad(IDD_Crystal_Symmetry)
-      IF (IDownFrom .EQ. IDD_Crystal_Symmetry) THEN
-        CALL WDialogSelect(IDD_Crystal_Symmetry)
-        CALL WDialogGetReal(IDF_a_latt,a)
-        CALL WDialogGetReal(IDF_b_latt,b)      
-        CALL WDialogGetReal(IDF_c_latt,c)      
-        CALL WDialogGetReal(IDF_alp_latt,alpha)      
-        CALL WDialogGetReal(IDF_bet_latt,beta)      
-        CALL WDialogGetReal(IDF_gam_latt,gamma)
-      ELSE IF (IDownFrom .EQ. IDD_PW_Page1) THEN
-        CALL WDialogSelect(IDD_PW_Page1)
-        CALL WDialogGetReal(IDF_PW_a_latt,a)
-        CALL WDialogGetReal(IDF_PW_b_latt,b)      
-        CALL WDialogGetReal(IDF_PW_c_latt,c)      
-        CALL WDialogGetReal(IDF_PW_alp_latt,alpha)      
-        CALL WDialogGetReal(IDF_PW_bet_latt,beta)      
-        CALL WDialogGetReal(IDF_PW_gam_latt,gamma)
-      END IF
-      IF (a     .GT. 0.0) cellpar(1) = a
-      IF (b     .GT. 0.0) cellpar(2) = b
-      IF (c     .GT. 0.0) cellpar(3) = c
-      IF (alpha .GT. 0.0) cellpar(4) = alpha
-      IF (beta  .GT. 0.0) cellpar(5) = beta
-      IF (gamma .GT. 0.0) cellpar(6) = gamma
-      IF (ICurSel .NE. 0) CALL WDialogSelect(ICurSel)
+      CALL WDialogSelect(IDownFrom)
+      CALL WDialogGetReal(IDF_a_latt,a)
+      CALL WDialogGetReal(IDF_b_latt,b)      
+      CALL WDialogGetReal(IDF_c_latt,c)      
+      CALL WDialogGetReal(IDF_alp_latt,alpha)      
+      CALL WDialogGetReal(IDF_bet_latt,beta)      
+      CALL WDialogGetReal(IDF_gam_latt,gamma)
+      IF (a     .GT. 0.0) CellPar(1) = a
+      IF (b     .GT. 0.0) CellPar(2) = b
+      IF (c     .GT. 0.0) CellPar(3) = c
+      IF (alpha .GT. 0.0) CellPar(4) = alpha
+      IF (beta  .GT. 0.0) CellPar(5) = beta
+      IF (gamma .GT. 0.0) CellPar(6) = gamma
+      CALL PopActiveWindowID
 
       END SUBROUTINE Download_Cell_Constants
 !
 !*****************************************************************************
 !
       SUBROUTINE Check_Crystal_Symmetry()
-!
+
       USE WINTERACTER
       USE DRUID_HEADER
 
       INCLUDE 'Lattice.inc'
-      INTEGER OldLatBrav,ICurSel
+      INTEGER OldLatBrav
 
-      ICurSel = WInfoDialog(CurrentDialog)
-!C>> JCC       Call WDialogLoad(IDD_Crystal_Symmetry)
+      CALL PushActiveWindowID
 ! The routine is called Check_Crystal_Symmetry, but it seems to fill the cell parameters
+! The following piece of code is a bit odd. It downloads the cell parameters from a dialogue window
+! a. There is a special routine to do so, why isn't it used?
+! b. There are two dialogue windows: which one to download from?
+! c. Why aren't the global variables CellPar() themselves used?
       CALL WDialogSelect(IDD_Crystal_Symmetry)
       CALL WDialogGetReal(IDF_a_latt,CellPar(1))
       CALL WDialogGetReal(IDF_b_latt,CellPar(2))      
@@ -141,62 +133,64 @@
       OldLatBrav = LatBrav
       CALL Check_Lattice_Type
       IF (OldLatBrav .NE. LatBrav) CALL Set_Crystal_Symmetry(LatBrav)
-      IF (ICurSel .NE. 0) CALL WDialogSelect(ICurSel)
+      CALL PopActiveWindowID
 
       END SUBROUTINE Check_Crystal_Symmetry
 !
+!*****************************************************************************
 !
-      SUBROUTINE Set_Crystal_Symmetry(LatNum)
+      SUBROUTINE Set_Crystal_Symmetry(TheLatticeSystem)
 
       USE WINTERACTER
       USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: TheLatticeSystem
 
       INCLUDE 'Lattice.inc'
 
-      INTEGER ICurSel
-
-!C>> JCC       Call WDialogLoad(IDD_Crystal_Symmetry)
-      IF (LatNum .GT. 0 .AND. LatNum .LT. 12) THEN
-        ICurSel = WInfoDialog(CurrentDialog)
-        LatBrav = LatNum
+      IF ((TheLatticeSystem .GE. 1) .AND. (TheLatticeSystem .LE. 11)) THEN
+        CALL PushActiveWindowID
+        LatBrav = TheLatticeSystem
         CALL WDialogSelect(IDD_Crystal_Symmetry)
-!C>> JCC ListBrav changed to LatBrav here.
-        CALL WDialogPutMenu(IDF_Crystal_System_Menu,CS_Options,NCS_Options,LatBrav)
-        CALL WDialogGetMenu(IDF_Crystal_System_Menu,IOption)
+        CALL WDialogPutOption(IDF_Crystal_System_Menu,LatBrav)
         CALL WDialogSelect(IDD_PW_Page1)
-        CALL WDialogPutMenu(IDF_PW_Crystal_System_Menu,CS_Options,NCS_Options,LatBrav)
-        IF (ICurSel .NE. 0)  CALL WDialogSelect(ICurSel)
+        CALL WDialogPutOption(IDF_PW_Crystal_System_Menu,LatBrav)
+        CALL PopActiveWindowID
       END IF
 
       END SUBROUTINE Set_Crystal_Symmetry
-
+!
+!*****************************************************************************
 !
       SUBROUTINE RefineLattice()
-!
+
       USE WINTERACTER
       USE DRUID_HEADER
-!
+
       REAL ChiGetLattice
       EXTERNAL ChiGetLattice
-!
+
       PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
       REAL XDD(MPAR),DXDD(MPAR),COVDD(MMPAR)
-!
+
       PARAMETER (MVAL=50)
+      COMMON /LATREFCMN/ LatBrav,IHLR(3,MVAL)
+      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
       COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
-      COMMON /LATREFCMN/ LatBrav,IHLR(3,MVAL)
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
-!
-      Parameter (MTPeak=100)
+      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+
+      PARAMETER (MTPeak=100)
       COMMON /ALLPEAKS/ NTPeak,AllPkPosVal(MTPeak),AllPkPosEsd(MTPeak),&
       PkArgK(MTPeak),PkTicDif(MTPeak),PkProb(MTPeak), &
       IOrdTem(MTPeak),IHPk(3,MTPeak),IArgK(MTPeak)
-!
+
       COMMON /AASVAL/ AAS(6),AASLO(6),AASHI(6)
       INTEGER IASS(6)
       LOGICAL NOCREF
-!
+
       REAL GReal(3,3),GRec(3,3)
       INTEGER KELPT(6,10)
       DATA KELPT /2,3,4,5,6,7, 2,3,4,5,10,10, 2,3,4,10,5,10, 2,3,4,10,10,5, &
@@ -207,7 +201,9 @@
 
       INCLUDE 'statlog.inc'
 
-      IF (.NOT. wvlnok) RETURN
+      LOGICAL FnWaveLengthOK ! Function
+
+      IF (.NOT. FnWaveLengthOK()) RETURN
       NVal = 0
       DO I = 1, NTPeak
         IOrd = IOrdTem(I)
@@ -235,11 +231,8 @@
       END SELECT
       IF (NDD .EQ. 0) RETURN
       IF (NVal .EQ. 0) THEN
-        IF (NTPeak .GT. NDD) THEN
-          CALL WMessageBox(OKOnly,ExclamationIcon,CommonOK,&
-             'Problems with cell refinement!'//CHAR(13)// &
-                       'Have you entered the cell constants?','Cell refinement failure')
-        END IF
+        IF (NTPeak .GT. NDD) CALL ErrorMessage('Problems with cell refinement!'//CHAR(13)// &
+                                               'Have you entered the cell constants?')
         RETURN
       END IF
       DO I = 1, 3
@@ -256,7 +249,6 @@
       CALL InverseMatrix(GREAL,GREC,3)
       XDD(1) = ZeroPoint
       DXDD(1) = 0.01*ABS(zeropoint)+0.001
-!
       DO I = 1, 3
         AAS(I) = GREC(I,I)
       END DO
@@ -379,46 +371,29 @@
       Cellpar(6)=ACOSD(GReal(1,2)/(CellPar(1)*CellPar(2)))
       ZeroPoint=XDD(1)
  999  CONTINUE
-! JvdS Isn't there a special subroutine to do this?
-!      CALL Upload_Cell_Constants()
-!C>> JCC      Call WDialogLoad(IDD_Crystal_Symmetry)
-      Call WDialogSelect(IDD_Crystal_Symmetry)
-      Call WDialogPutReal(IDF_a_latt,CellPar(1),'(F10.5)')
-      Call WDialogPutReal(IDF_b_latt,CellPar(2),'(F10.5)')      
-      Call WDialogPutReal(IDF_c_latt,CellPar(3),'(F10.5)')      
-      Call WDialogPutReal(IDF_alp_latt,CellPar(4),'(F10.3)')      
-      Call WDialogPutReal(IDF_bet_latt,CellPar(5),'(F10.3)')      
-      Call WDialogPutReal(IDF_gam_latt,CellPar(6),'(F10.3)')
-!C>> JCC      Call WDialogLoad(IDD_Peak_Positions)
-      Call WDialogSelect(IDD_Peak_Positions)
-      Call WDialogPutReal(IDF_a_refine,CellPar(1),'(F10.5)')
-      Call WDialogPutReal(IDF_b_refine,CellPar(2),'(F10.5)')      
-      Call WDialogPutReal(IDF_c_refine,CellPar(3),'(F10.5)')      
-      Call WDialogPutReal(IDF_alp_refine,CellPar(4),'(F10.3)')      
-      Call WDialogPutReal(IDF_bet_refine,CellPar(5),'(F10.3)')      
-      Call WDialogPutReal(IDF_gam_refine,CellPar(6),'(F10.3)')
-
-      Call WDialogPutReal(IDF_zeropt_refine,ZeroPoint,'(F10.4)')                      
+      CALL Upload_Cell_Constants()
+      CALL Upload_Zero_Point()
 !  First ensure that we have the plotting mode correct
-      call IGrPlotMode(' ') 
-      call Generate_TicMarks()
+      CALL IGrPlotMode(' ') 
+      CALL Generate_TicMarks()
       IF (NVal .LE. NDD+2) RETURN
 !.. Now attempt a quick Pawley refinement
       CALL Quick_Pawley()                     
-!
+
       END SUBROUTINE RefineLattice
 !
 !*****************************************************************************
 !
-      FUNCTION ChiGetLattice(N,P)
+      REAL FUNCTION ChiGetLattice(N,P)
 
       PARAMETER (MPAR=50)
-      REAL ChiGetLattice, P(MPAR)
-      PARAMETER (MVAL=50)
-      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
+      REAL P(MPAR)
 
+      INCLUDE 'GLBVAR.INC' ! Contains ALambda
+      PARAMETER (MVAL=50)
       COMMON /LATREFCMN/ LatBrav,IHLR(3,MVAL)
-      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT,ALAMBDA
+      COMMON /CELLREF/ CELLPAR(6),ZEROPOINT
+      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
 
       COMMON /AASVAL/ AAS(6),AASLO(6),AASHI(6)
 
@@ -516,11 +491,14 @@
         vk = IHLR(2,I)
         vl = IHLR(3,I)
         dd = vh*vh*p1 + vk*vk*p2 + vl*vl*p3 + 2.0 * (vh*vk*p4 + vh*vl*p5 + vk*vl*p6)
-        tthc = 2.0 * ASIND(0.5 * alambda * SQRT(dd))
+        tthc = 2.0 * ASIND(0.5 * ALambda * SQRT(dd))
         ZI = tthc + zp
         CTem = (ZI - YVal(I)) / EVal(I)
         ChiGetLattice = ChiGetLattice + CTem * CTem
       END DO
-!
+
       RETURN
       END FUNCTION ChiGetLattice
+!
+!*****************************************************************************
+!
