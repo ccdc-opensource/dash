@@ -1,4 +1,4 @@
-! Winteracter module created : 20/Apr/2004 17:22:34
+! Winteracter module created : 20/Apr/2004 18:21:48
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -388,7 +388,6 @@
           INTEGER, PARAMETER :: IDF_AutoLocalOptimise           =  1259
           INTEGER, PARAMETER :: IDF_OutputCSSR                  =  1260
           INTEGER, PARAMETER :: IDF_OutputCCL                   =  1277
-          INTEGER, PARAMETER :: IDF_UseHydrogens                =  1296
           INTEGER, PARAMETER :: IDD_DataRangeSTOE               =   148
           INTEGER, PARAMETER :: IDF_DataRangeMenu               =  1264
           INTEGER, PARAMETER :: IDD_PW_Page7                    =   149
@@ -478,7 +477,6 @@
           INTEGER, PARAMETER :: IDF_a1                          =  1145
           INTEGER, PARAMETER :: IDF_b1                          =  1146
           INTEGER, PARAMETER :: IDF_c1                          =  1217
-          INTEGER, PARAMETER :: IDD_DIALOG048                   =   166
           INTEGER, PARAMETER :: IDD_TabDataDefaults             =   170
           INTEGER, PARAMETER :: IDD_TabSAsetup                  =   167
           INTEGER, PARAMETER :: IDD_TabSAOutput                 =   169
@@ -502,40 +500,17 @@
           INTEGER, PARAMETER :: IDBPAUSE                        =  1425
           INTEGER, PARAMETER :: IDF_PicHourglass                =  1430
           INTEGER, PARAMETER :: ID_FitPeaks                     = 40020
-          INTEGER, PARAMETER :: IDD_Rietveld                    =   172
-          INTEGER, PARAMETER :: IDF_TAB1                        =  1399
           INTEGER, PARAMETER :: IDF_RR_ZmatrixGrid              =  1397
           INTEGER, PARAMETER :: IDB_Refine                      =  1398
           INTEGER, PARAMETER :: IDD_RRsubBonds                  =   180
-          INTEGER, PARAMETER :: IDD_DIALOG008                   =   181
           INTEGER, PARAMETER :: IDD_RRsubZmatrices              =   173
           INTEGER, PARAMETER :: IDF_RR_AngleGrid                =  1438
           INTEGER, PARAMETER :: IDF_RR_TorsionGrid              =  1440
-          INTEGER, PARAMETER :: IDF_RR_AtomGrid                 =  1439
           INTEGER, PARAMETER :: IDD_RRsubAngles                 =   182
-          INTEGER, PARAMETER :: IDD_TEMPLATE020                 =   179
           INTEGER, PARAMETER :: IDD_RRsubTorsions               =   183
-          INTEGER, PARAMETER :: IDD_DIALOG010                   =   184
           INTEGER, PARAMETER :: IDD_RRsubAtoms                  =   185
-          INTEGER, PARAMETER :: IDD_DIALOG012                   =   187
-          INTEGER, PARAMETER :: IDD_DIALOG014                   =   190
           INTEGER, PARAMETER :: IDF_RR_BondGrid                 =  1441
-          INTEGER, PARAMETER :: IDB_Invert                      =  1442
-          INTEGER, PARAMETER :: IDB_FixAll                      =  1443
-          INTEGER, PARAMETER :: IDB_FixNone                     =  1444
           INTEGER, PARAMETER :: IDD_RRsubData                   =   174
-          INTEGER, PARAMETER :: IDF_RRa                         =  1445
-          INTEGER, PARAMETER :: IDF_RRb                         =  1446
-          INTEGER, PARAMETER :: IDF_RRc                         =  1447
-          INTEGER, PARAMETER :: IDF_RRalpha                     =  1448
-          INTEGER, PARAMETER :: IDF_RRgamma                     =  1449
-          INTEGER, PARAMETER :: IDF_RRbeta                      =  1450
-          INTEGER, PARAMETER :: IDF_RR_Damping                  =  1451
-          INTEGER, PARAMETER :: IDF_RR_DataStart                =  1452
-          INTEGER, PARAMETER :: IDF_RR_DataEnd                  =  1453
-          INTEGER, PARAMETER :: IDF_RR_ExclRegions              =  1454
-          INTEGER, PARAMETER :: IDF_RR_ZeroPoint                =  1455
-          INTEGER, PARAMETER :: IDB_Undo                        =  1456
           INTEGER, PARAMETER :: IDB_Open                        = 40024
           INTEGER, PARAMETER :: IDB_Edit                        =  1468
           INTEGER, PARAMETER :: IDB_Summary                     =  1469
@@ -548,10 +523,6 @@
           INTEGER, PARAMETER :: IDF_OutputRES                   =  1461
           INTEGER, PARAMETER :: IDF_OutputCIF                   =  1462
           INTEGER, PARAMETER :: IDF_UseHydrogensAuto            =  1474
-          INTEGER, PARAMETER :: IDF_DivPFdiff                   =  1475
-          INTEGER, PARAMETER :: IDF_MultPFdiff                  =  1476
-          INTEGER, PARAMETER :: IDF_REAL1                       =  1477
-          INTEGER, PARAMETER :: IDF_CHECK11                     =  1481
           INTEGER, PARAMETER :: IDB_PO                          =  1482
           INTEGER, PARAMETER :: IDD_SAW_Page5                   =   102
           INTEGER, PARAMETER :: IDD_TEMPLATE021                 =   176
@@ -577,7 +548,6 @@
           INTEGER, PARAMETER :: IDF_Gamma                       =  1250
           INTEGER, PARAMETER :: IDD_ViewPawley                  =   127
           INTEGER, PARAMETER :: IDM_ViewPawley                  = 40030
-          INTEGER, PARAMETER :: IDF_CHECK7                      =  1248
           INTEGER, PARAMETER :: IDF_ShowCumChiSqd               =  1408
           INTEGER, PARAMETER :: IDD_OutputSolutions             =   128
           INTEGER, PARAMETER :: IDB_Output2                     =  1409
