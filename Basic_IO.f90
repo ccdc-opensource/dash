@@ -156,6 +156,9 @@
         CASE (IDD_PW_Page2)
           CALL DealWithWizardWindowDiffractionSetup2
           GOTO 10
+        CASE (IDD_DV_Results)
+          CALL DealWithDVResults
+          GOTO 10
       END SELECT
 
       END SUBROUTINE GetEvent
@@ -261,6 +264,9 @@
             GOTO 10
           CASE (IDD_PW_Page2)
             CALL DealWithWizardWindowDiffractionSetup2
+            GOTO 10
+          CASE (IDD_DV_Results)
+            CALL DealWithDVResults
             GOTO 10
         END SELECT
       ENDIF

@@ -410,6 +410,56 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DealWithDVResults
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'lattice.inc'
+
+      INTEGER irow, istatus
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_DV_Results)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCANCEL)
+              CALL WDialogHide()
+! Unload the dialogue from memory
+              CALL WDialogUnload
+              CALL PopActiveWindowID
+              RETURN
+          END SELECT
+      END SELECT
+      DO irow = 1, NumOfDICVOLSolutions
+        CALL WGridGetCellCheckBox(IDF_DV_Summary,1,irow,istatus)
+        IF (istatus .EQ. 1) THEN
+! Import the unit cell parameters into DASH
+          CellPar(1) = DICVOLSolutions(irow)%a
+          CellPar(2) = DICVOLSolutions(irow)%b
+          CellPar(3) = DICVOLSolutions(irow)%c
+          CellPar(4) = DICVOLSolutions(irow)%alpha
+          CellPar(5) = DICVOLSolutions(irow)%beta
+          CellPar(6) = DICVOLSolutions(irow)%gamma
+          CALL UserSetCrystalSystem(DICVOLSolutions(irow)%CrystalSystem)
+          CALL UpdateCell()
+          CALL WDialogHide()
+! Unload the dialogue from memory
+          CALL WDialogUnload
+          CALL PopActiveWindowID
+          RETURN
+        ENDIF
+      END DO               
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithDVResults
+!
+!*****************************************************************************
+!
       SUBROUTINE RunDICVOL
 
       USE WINTERACTER
@@ -421,6 +471,7 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
@@ -450,31 +501,34 @@
       CALL WDialogGetReal(IDF_Indexing_Maxa, amax)
       CALL WDialogGetReal(IDF_Indexing_Maxb, Bmax)
       CALL WDialogGetReal(IDF_Indexing_Maxc, Cmax)
+      CALL WDialogGetReal       (IDF_Indexing_MinAng,      Bemin)
+      CALL WDialogGetReal       (IDF_Indexing_MaxAng,      Bemax)
+      CALL WDialogGetReal       (IDF_Indexing_Density,     Rdens)
+      CALL WDialogGetReal       (IDF_Indexing_MolWt,       Rmolwt)
+      CALL WDialogGetReal       (IDF_ZeroPoint,            Rexpzp)
+      CALL WDialogGetCheckBox   (IDF_Indexing_Cubic,       Isystem(1))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Tetra,       Isystem(2))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Hexa,        Isystem(3))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Ortho,       Isystem(4))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Monoclinic,  Isystem(5))
+      CALL WDialogGetCheckBox   (IDF_Indexing_Triclinic,   Isystem(6))
+      CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,   UseErr)
+      CALL WDialogGetReal       (IDF_eps,                  Epsilon)
+      CALL WDialogGetReal       (IDF_Indexing_Fom,         fom)
+      CALL WDialogGetReal       (IDF_Indexing_ScaleFactor, DV_ScaleFactor)
+      IF (DV_ScaleFactor .LT. 0.1) DV_ScaleFactor = 0.1
+      IF (DV_ScaleFactor .GT. 5.0) DV_ScaleFactor = 5.0
 ! Add in very quick check: is the d-spacing belonging to the first peak greater
 ! than the maximum cell length requested? If so, tell the user he/she is a moron.
       MaxLen = MAX(amax,Bmax)
       MaxLen = MAX(MaxLen,Cmax)
 ! Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
-      IF (TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1))) .GT. MaxLen) THEN
+      IF ((TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1)))*DV_ScaleFactor) .GT. MaxLen) THEN
         IF (.NOT. Confirm('WARNING: the maximum cell axis length is shorter than required for indexing the first peak.'//CHAR(13)// &
         'Do you wish to continue anyway?')) RETURN
       ENDIF
-      CALL WDialogGetReal       (IDF_Indexing_MinAng,     Bemin)
-      CALL WDialogGetReal       (IDF_Indexing_MaxAng,     Bemax)
-      CALL WDialogGetReal       (IDF_Indexing_Density,    Rdens)
-      CALL WDialogGetReal       (IDF_Indexing_MolWt,      Rmolwt)
-      CALL WDialogGetReal       (IDF_Indexing_Fom,        fom)
-      CALL WDialogGetReal       (IDF_ZeroPoint,           Rexpzp)
-      CALL WDialogGetCheckBox   (IDF_Indexing_Cubic,      Isystem(1))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Tetra,      Isystem(2))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Hexa,       Isystem(3))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Ortho,      Isystem(4))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Monoclinic, Isystem(5))
-      CALL WDialogGetCheckBox   (IDF_Indexing_Triclinic,  Isystem(6))
-      CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
-      CALL WDialogGetReal       (IDF_eps,                 Epsilon)
       n = NTPeak
-      wave2 = Lambda / 2
+      wave2 = (Lambda / 2) * DV_ScaleFactor
       IF (UseErr .EQ. 2) THEN
         epst = 0.0
         DO I = 1, n
@@ -497,48 +551,71 @@
         IOrd = IOrdTem(I)
         d(I) = AllPkPosVal(IOrd) - Rexpzp
       END DO
-      NumOfDICVOLSolutions = 0
       CALL WCursorShape(CurHourGlass)
+      NumOfDICVOLSolutions = 0
       CALL DICVOL91(Isystem(1),Isystem(2),Isystem(3),Isystem(4),Isystem(5),Isystem(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
-      IF (DICVOL_Error .EQ. cDICVOL_TooManySolutions) THEN
-! If there are too many solutions, this might be due to the errors being set too high
-! A quick check would be:
-! a) is this synchrotron data? (if so, errors can be assumed to be smaller than the default value 0.03)
-! b) were the errors set to 0.03?
-! c) were at least 18 lines tried? (bit arbitrary, but < 10 lines is clearly nonsensical)
-!
-
-      ENDIF
       CALL WCursorShape(CurCrossHair)
+! Pop up a window showing the DICVOL output file in a text editor
       CALL WindowOpenChild(IHANDLE)
       CALL WEditFile('DICVOL.OUT',Modeless,0,FileMustExist+ViewOnly+NoToolbar+NoFileNewOpen,4)
+      IF (NumOfDICVOLSolutions .EQ. 0) THEN
+        CALL PopActiveWindowID
+        RETURN
+      ENDIF
+! Pop up a window showing the solutions, so that the user can choose one to be imported into DASH
+      CALL WDialogLoad(IDD_DV_Results)
+      CALL WDialogSelect(IDD_DV_Results)
+! Clear all fields in the grid
+      CALL WDialogClearField(IDF_DV_Summary)
+!      CALL WDialogSelect(IDD_DV_Results) ! I don't think this is necessary
+! Set the number of rows in the grid to the number of solutions.
+      CALL WGridRows(IDF_DV_Summary,NumOfDICVOLSolutions)
+      DO I = 1, NumOfDICVOLSolutions
+        CALL WGridPutCellString(IDF_DV_Summary, 2,I,CrystalSystemString(DICVOLSolutions(I)%CrystalSystem))
+        CALL WGridPutCellReal  (IDF_DV_Summary, 3,I,DICVOLSolutions(I)%a,'(F8.4)')
+        CALL WGridPutCellReal  (IDF_DV_Summary, 4,I,DICVOLSolutions(I)%b,'(F8.4)')
+        CALL WGridPutCellReal  (IDF_DV_Summary, 5,I,DICVOLSolutions(I)%c,'(F8.4)')
+        CALL WGridPutCellReal  (IDF_DV_Summary, 6,I,DICVOLSolutions(I)%alpha,'(F7.3)')
+        CALL WGridPutCellReal  (IDF_DV_Summary, 7,I,DICVOLSolutions(I)%beta,'(F7.3)')
+        CALL WGridPutCellReal  (IDF_DV_Summary, 8,I,DICVOLSolutions(I)%gamma,'(F7.3)')
+        CALL WGridPutCellReal  (IDF_DV_Summary, 9,I,DICVOLSolutions(I)%Volume,'(F9.2)')
+        IF (DICVOLSolutions(I)%M .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary,10,I,DICVOLSolutions(I)%M,'(F7.1)')
+        IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary,11,I,DICVOLSolutions(I)%F,'(F7.1)')
+      END DO
+      CALL WDialogShow(-1,-1,0,Modeless)
       CALL PopActiveWindowID
 
       END SUBROUTINE RunDICVOL
 !
 !*****************************************************************************
 !
-      SUBROUTINE AddDICVOLSolution(TheCrystalSystem,a,b,c,alpha,beta,gamma)
+      SUBROUTINE AddDICVOLSolution(TheCrystalSystem,The_a,The_b,The_c,The_alpha,The_beta,The_gamma,TheVolume)
 !
 ! This routine adds a solution generated by DICVOL to an array in DASH
 !
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE DICVAR
 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: TheCrystalSystem
-      REAL,    INTENT (IN   ) :: a, b, c, alpha, beta, gamma
+      REAL,    INTENT (IN   ) :: The_a, The_b, The_c, The_alpha, The_beta, The_gamma, TheVolume
 
       NumOfDICVOLSolutions = NumOfDICVOLSolutions + 1
+      IF (NumOfDICVOLSolutions .GT. MaxDICVOLSolutions) THEN
+        CALL DebugErrorMessage('NumOfDICVOLSolutions > MaxDICVOLSolutions in AddDICVOLSolution.')
+        NumOfDICVOLSolutions = MaxDICVOLSolutions
+      ENDIF
       DICVOLSolutions(NumOfDICVOLSolutions)%CrystalSystem = TheCrystalSystem
-      DICVOLSolutions(NumOfDICVOLSolutions)%a     = a
-      DICVOLSolutions(NumOfDICVOLSolutions)%b     = b
-      DICVOLSolutions(NumOfDICVOLSolutions)%c     = c
-      DICVOLSolutions(NumOfDICVOLSolutions)%alpha = alpha
-      DICVOLSolutions(NumOfDICVOLSolutions)%beta  = beta
-      DICVOLSolutions(NumOfDICVOLSolutions)%gamma = gamma
+      DICVOLSolutions(NumOfDICVOLSolutions)%a     = The_a / DV_ScaleFactor
+      DICVOLSolutions(NumOfDICVOLSolutions)%b     = The_b / DV_ScaleFactor
+      DICVOLSolutions(NumOfDICVOLSolutions)%c     = The_c / DV_ScaleFactor
+      DICVOLSolutions(NumOfDICVOLSolutions)%alpha = The_alpha
+      DICVOLSolutions(NumOfDICVOLSolutions)%beta  = The_beta
+      DICVOLSolutions(NumOfDICVOLSolutions)%gamma = The_gamma
+      DICVOLSolutions(NumOfDICVOLSolutions)%Volume = TheVolume
       DICVOLSolutions(NumOfDICVOLSolutions)%F = -1.0
       DICVOLSolutions(NumOfDICVOLSolutions)%M = -1.0
 ! F and M are calculated in a different part and added only subject to 
