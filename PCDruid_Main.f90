@@ -973,7 +973,7 @@
       USE WINTERACTER
       USE druid_header
 
-      IMPLICIT NONE
+!      IMPLICIT NONE
 
 !C>> SA bitmap
       INTEGER it, Ibmhandle
@@ -1005,7 +1005,8 @@
       CALL WDialogLoad(IDD_PW_Page2)
       CALL WDialogLoad(IDD_PW_Page3)
       CALL WDialogLoad(IDD_SA_Completed)
-      CALL WDialogLoad(IDD_SA_Multi_Completed)
+!	  CALL WDialogLoad(IDD_SA_Multi_Completed)
+      CALL WDialogLoad(IDD_SA_Multi_completed_ep)
       CALL WDialogLoad(IDD_License_Dialog)
       CALL WDialogLoad(ID_Background_Fit)
 !      CALL WDialogLoad(ID_Fit_data_request)
