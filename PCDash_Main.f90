@@ -44,6 +44,9 @@
       DATA IDFZMpars   / IDF_ZM_pars1,  IDF_ZM_pars2,  IDF_ZM_pars3,  IDF_ZM_pars4  /
       DATA IDFZMLabel  / IDF_LABEL1,    IDF_LABEL2,    IDF_LABEL3,    IDF_LABEL4    /
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       first_zm_in_win = 1
 ! Initialise Winteracter
       CALL WInitialise(' ')
@@ -93,6 +96,8 @@
         SELECT CASE (StrFileExtension)
           CASE ('DASH   ')
             CALL PrjFileOpen(ArgString)
+          CASE ('DUFF   ')
+            CALL BatchMode(ArgString)
           CASE ('ZMATRIX')
             iFrg = 1
             frag_file(iFrg) = ArgString
