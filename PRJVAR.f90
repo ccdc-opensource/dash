@@ -17,7 +17,7 @@
       INTEGER     cRead
       PARAMETER ( cRead = 1)
 
-      CHARACTER*255 PrjFileName   ! The name of the project file
+      CHARACTER*(255) PrjFileName   ! The name of the project file
 
       END MODULE PRJVAR
 !
