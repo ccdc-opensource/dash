@@ -36,7 +36,19 @@ C
       DO 10 I=1,NVAL
 C.. Include the d*^2 calculated function on the following line
 C        FITI= ...
-        DIF=RT2*ABS(YVAL(I)-FITI)/EVAL(I)
+! JvdS The following line generated a compiler error (Warning: Variable FITI is used before its value has been defined).
+! JvdS I assume that FITI = FIT(I).
+! JvdS FIT(*) is one of the arguments to this routine and is not used anywhere else,
+! JvdS also, it is inside a loop over I.
+
+! JvdS Note that due to this typo, ***NONE*** of the arguments passed to this routine was used.
+
+! JvdS The good news is: this function isn't used anywhere anyway.
+
+!JvdS the line of code was:
+!        DIF=RT2*ABS(YVAL(I)-FITI)/EVAL(I)
+! JvdS and now it is:
+        DIF=RT2*ABS(YVAL(I)-FIT(I))/EVAL(I)
         IF (DIF.LT.ERSMAL) THEN
           CHI=CHI+YJ0-YJ1*DIF**2
         ELSEIF (DIF.GT.ERFBIG) THEN
