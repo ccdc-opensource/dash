@@ -39,8 +39,8 @@
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
-      DOUBLE PRECISION T0,rt,eps
-      COMMON /saparl/ T0,rt,eps
+      DOUBLE PRECISION T0,rt
+      COMMON /saparl/ T0,rt
       INTEGER  NS, NT, IER, ISEED1, ISEED2
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
       COMMON /shadi/ kshad(mvar)
@@ -624,8 +624,8 @@
       LOGICAL log_preset
       COMMON /presetl/ log_preset
 
-      DOUBLE PRECISION T0,rt,eps
-      COMMON /saparl/ T0,rt,eps
+      DOUBLE PRECISION T0,rt
+      COMMON /saparl/ T0,rt
       INTEGER  NS, NT, ISEED1, ISEED2
       INTEGER  MAXEVL, IPRINT
       COMMON /sapars/ nvar,ns,nt,neps,maxevl,iprint,iseed1,iseed2
