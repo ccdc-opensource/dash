@@ -14,6 +14,8 @@
 
       IMPLICIT NONE 
 
+      INCLUDE 'GLBVAR.INC'
+
 ! @@ Enable or disable the "Next" button, only partially taken care of in UpdateZmatrixSelection
       CALL UpdateZmatrixSelection
       CALL WizardWindowShow(IDD_SAW_Page1)
@@ -48,6 +50,7 @@
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
       CALL SetModeMenuState(-1,-1)
       CALL SelectMode(ID_Structure_Solution_Mode)
+      IPTYPE = 1
       CALL Profile_Plot
 
       END SUBROUTINE ShowWizardWindowZmatrices
@@ -67,7 +70,7 @@
       INTEGER, EXTERNAL :: Read_One_Zm
       INTEGER       zmread
       INTEGER       iFrg, iSelection
-      LOGICAL, EXTERNAL :: Confirm
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       CHARACTER(MaxPathLength) SDIFile, DirName, tFileName
       CHARACTER*80  FileName
       CHARACTER*150 FilterStr
@@ -86,7 +89,7 @@
 ! Go back to the Pawley refinement or the initial wizard
               CALL EndWizardPastPawley
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
-            CASE (IDNEXT)
+            CASE (IDNEXT, IDB_PO)
 ! Go to the next stage of the SA input
 ! Grey out 'Load DASH Pawley file' button on toolbar
               CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOff)
@@ -98,44 +101,16 @@
                   IF (zmNumberOfCopies(iFrg) .EQ. 0) gotzmfile(iFrg) = .FALSE.
                 ENDIF
               ENDDO
-              CALL SA_Parameter_Set
-              CALL WizardWindowShow(IDD_SA_input2)
+! If the user has requested preferred orientation, make sure we pass the pertinent Wizard window
+              CALL WDialogSelect(IDD_SAW_Page2)
+              IF ((EventInfo%VALUE1 .EQ. IDB_PO) .OR. WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                CALL WizardWindowShow(IDD_SAW_Page2)
+              ELSE
+                CALL SA_Parameter_Set
+                CALL WizardWindowShow(IDD_SA_input2)
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
-            CASE (IDB_PO)
-! Go to the next stage of the SA input
-! Grey out 'Load DASH Pawley file' button on toolbar
-              CALL WMenuSetState(ID_import_dpj_file,ItemEnabled,WintOff)
-! Initialise the 'Additional SA Parameters' dialogue
-              CALL WDialogSelect(IDD_SAW_Page2)
-              DO iFrg = 1, maxfrg
-                IF (gotzmfile(iFrg)) THEN
-! Get the number of copies to use. If zero, set gotzmfile to .FALSE.
-                  CALL WDialogSelect(IDD_SAW_Page1)
-                  CALL WDialogGetInteger(IDFzmNumber(iFrg),zmNumberOfCopies(iFrg))
-                  IF (zmNumberOfCopies(iFrg) .EQ. 0) gotzmfile(iFrg) = .FALSE.
-                  CALL WDialogSelect(IDD_SAW_Page2)
-! Its label
-                  CALL SplitPath(frag_file(iFrg),DirName,FileName)
-                  CALL WGridLabelRow(IDF_RotationsGrid,iFrg,FileName)
-! Initialise "None" | "Quaternions" | "Single axis" menu to quaternions
-                  CALL WGridPutCellOption(IDF_RotationsGrid,1,iFrg,2)
-! Ungrey all "a or alpha" fields
-                  CALL WGridStateCell(IDF_RotationsGrid,2,iFrg,Enabled)
-                  CALL WGridStateCell(IDF_RotationsGrid,3,iFrg,Enabled)
-                  CALL WGridStateCell(IDF_RotationsGrid,4,iFrg,Enabled)
-                ELSE
-! Its label
-                  CALL WGridLabelRow(IDF_RotationsGrid,iFrg,'')
-! Initialise "None" | "Quaternions" | "Single axis" menu to none
-                  CALL WGridPutCellOption(IDF_RotationsGrid,1,iFrg,1)
-! Grey out all "a or alpha" fields
-                  CALL WGridStateCell(IDF_RotationsGrid,2,iFrg,DialogReadOnly)
-                  CALL WGridStateCell(IDF_RotationsGrid,3,iFrg,DialogReadOnly)
-                  CALL WGridStateCell(IDF_RotationsGrid,4,iFrg,DialogReadOnly)
-                ENDIF
-              ENDDO
-              CALL WizardWindowShow(IDD_SAW_Page2)
             CASE (IDB_SA_Project_Browse)
               CALL SDIFileBrowse
             CASE (IDB_SA_Project_Open)
@@ -927,7 +902,7 @@
       DATA LimsChanged / .FALSE. /
       SAVE LimsChanged
 
-      LOGICAL, EXTERNAL :: Confirm
+      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       REAL    xtem
       INTEGER JPOS, NMOVES, IFCOl, IFRow, ICHK
       REAL    rpos
@@ -946,7 +921,15 @@
               IF (LimsChanged) THEN
                 IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) LimsChanged = .FALSE.
               ENDIF
-              IF (.NOT. LimsChanged) CALL WizardWindowShow(IDD_SAW_Page2)
+              IF (.NOT. LimsChanged) THEN
+! If the user has requested preferred orientation, make sure we pass the pertinent Wizard window
+                CALL WDialogSelect(IDD_SAW_Page2)
+                IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                  CALL WizardWindowShow(IDD_SAW_Page2)
+                ELSE
+                  CALL WizardWindowShow(IDD_SAW_Page1)
+                ENDIF
+              ENDIF
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               CALL WDialogSelect(IDD_SA_input3)
