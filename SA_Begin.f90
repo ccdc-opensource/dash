@@ -274,7 +274,7 @@
       ENDIF
       IF (PrefParExists) THEN
         DO i = 1, 3
-          PrfDir(i) = PrefPars(i)
+          PrfDir(i) = FLOAT(PO_Direction(i))
         ENDDO
         RefLen = VCTMOD(1.0,PrfDir,2)
         PrfDir = PrfDir / RefLen

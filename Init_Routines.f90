@@ -119,9 +119,9 @@
 
       IMPLICIT NONE
 
-      PrefPars(1) = 0.0
-      PrefPars(2) = 0.0
-      PrefPars(3) = 1.0
+      PO_Direction(1) = 0
+      PO_Direction(2) = 0
+      PO_Direction(3) = 1
       PrefParExists = .FALSE.
       CALL Update_PO
 
@@ -138,16 +138,16 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page2)
-      CALL WDialogPutCheckBoxLogical(IDF_Use_PO,PrefParExists)
-      CALL WDialogPutInteger(IDF_PO_a,NINT(PrefPars(1)))
-      CALL WDialogPutInteger(IDF_PO_b,NINT(PrefPars(2)))
-      CALL WDialogPutInteger(IDF_PO_c,NINT(PrefPars(3)))
-      CALL WDialogFieldStateLogical(IDF_PO_a,PrefParExists)
-      CALL WDialogFieldStateLogical(IDF_PO_b,PrefParExists)
-      CALL WDialogFieldStateLogical(IDF_PO_c,PrefParExists)
-      CALL WDialogFieldStateLogical(IDF_LABELa,PrefParExists)
-      CALL WDialogFieldStateLogical(IDF_LABELb,PrefParExists)
-      CALL WDialogFieldStateLogical(IDF_LABELc,PrefParExists)
+      CALL WDialogPutCheckBoxLogical(IDF_Use_PO, PrefParExists)
+      CALL WDialogPutInteger(IDF_PO_a, PO_Direction(1))
+      CALL WDialogPutInteger(IDF_PO_b, PO_Direction(2))
+      CALL WDialogPutInteger(IDF_PO_c, PO_Direction(3))
+      CALL WDialogFieldStateLogical(IDF_PO_a, PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_PO_b, PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_PO_c, PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_LABELa, PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_LABELb, PrefParExists)
+      CALL WDialogFieldStateLogical(IDF_LABELc, PrefParExists)
       CALL PopActiveWindowID
 
       END SUBROUTINE Update_PO

@@ -552,7 +552,7 @@
 ! Read/write preferred orientation parameters anyway, to enable the user
 ! to switch PO on and off without having to re-enter direction etc.
       DO i = 1, 3
-        CALL FileRWReal(hPrjFile, iPrjRecNr, RW, PrefPars(i))
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, PO_Direction(i))
       ENDDO
 ! Update the appropriate Wizard window
       IF (iPrjReadOrWrite .EQ. cRead) CALL Update_PO
