@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 29/Jul/2003 16:50:05
+// Modified : 09/Aug/2003 15:18:22
 //
 ///////////////////////////////////////////////////
 //
@@ -1143,19 +1143,6 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
-END
-
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  112
@@ -2327,7 +2314,7 @@ BEGIN
 " 1461 0 \n"
 " 1457 1 \n"
 " 1474 1 \n"
-" 1548 1 \n"
+" 1548 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
