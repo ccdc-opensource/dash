@@ -490,7 +490,7 @@
         ENDIF
       ENDDO
 ! JvdS @@ Following is wrong (we need a valid .sdi as well), but 
-! a. identical to release version
+! a. identical to DASH 1.0
 ! b. it's difficult to keep track of the validity of the .sdi file
       CALL WDialogFieldStateLogical(IDNEXT,nfrag .NE. 0)
       CALL WDialogFieldStateLogical(IDB_PO,nfrag .NE. 0) 
