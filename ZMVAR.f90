@@ -164,9 +164,11 @@
 ! bet    = torsion angle   (wrt iz1, iz2 & iz3)
 
       CHARACTER*3     asym(1:maxatm,0:maxfrg)
+      INTEGER         zmElementCSD(1:maxatm,0:maxfrg)
       CHARACTER*5     OriginalLabel(1:maxatm,0:maxfrg)
 
 ! asym = Atom SYMbol--e.g. 'H  ' for hydrogen, 'Ag ' for silver--of the current atom.
+! zmElement = CSD element number. MaxElm = dummy.
 ! OriginalLabel = the label of the atom as read from the .res/.mol2/etc. file
 ! (read from column 14 in the Z-matrix file)
 ! Note that we allow five characters, .pdb allows 4, .res and .cssr can't cope with the

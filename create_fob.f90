@@ -38,7 +38,6 @@
       REAL ssq
       REAL, EXTERNAL :: ascfac
       INTEGER, EXTERNAL :: ElmSymbol2CSD
-      INTEGER tElemNumber
 
 ! JvdS Order all atoms such that the Hydrogen atoms are always at
 ! the end of the atom list. That way, if we don't want to use hydrogens
@@ -83,10 +82,9 @@
                 item = tNumNonHydrogens
               ENDIF
               OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
-              tElemNumber = ElmSymbol2CSD(asym(i,iFrg)(1:2))
               DO iRef = 1, NumOfRef
                 ssq = 0.25*DSTAR(iRef)**2
-                atem(item,iRef) = occ(i,iFrg) * AScFac(ssq,tElemNumber)
+                atem(item,iRef) = occ(i,iFrg) * AScFac(ssq,zmElementCSD(i,iFrg))
                 btem(item,iRef) = tiso(i,iFrg)*ssq
                 FOB(item,iRef) = atem(item,iRef)*EXP(-btem(item,iRef))
               ENDDO

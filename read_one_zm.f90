@@ -32,6 +32,7 @@
       INTEGER nlin, natof
       INTEGER AsymLen, IDlen
       CHARACTER*3 tIDstr
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
 ! JCC Initialise return value to successful (zero)
 ! If the return value is non-zero, then an error occurred. The return status corresponds
@@ -66,6 +67,7 @@
         Asym(i,iFrg)(1:1) = ChrUpperCase(Asym(i,iFrg)(1:1))
         Asym(i,iFrg)(2:2) = ChrLowerCase(Asym(i,iFrg)(2:2))
         Asym(i,iFrg)(3:3) = ChrLowerCase(Asym(i,iFrg)(3:3))
+        zmElementCSD(i,iFrg) = ElmSymbol2CSD(asym(i,iFrg)(1:2))
 ! First item--the element--has been read. Rest more tricky.
 ! First, convert tabs to spaces and remove redundant spaces
         CALL StrClean(line,nlin)
@@ -137,7 +139,7 @@
 ! Now precalculate the bonds
       CALL zmGenerateBonds(iFrg)
       RETURN
-! JCC Added in return status for failed reading and failed opening
+! Return status for failed reading and failed opening
   999 Read_One_Zm = ErrorStatus
       CLOSE (19)
       RETURN

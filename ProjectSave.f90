@@ -472,7 +472,7 @@
       CALL FileRWInteger(hPrjFile,iPrjRecNr,iPrjReadOrWrite,tInteger)
       ErrCounter = ErrCounter + 1
       IF ((iPrjReadOrWrite .EQ. cRead) .AND. (tInteger .NE. 10101))  &
-         CALL DebugErrorMessage('Prj read error '//Integer2String(ErrCounter))
+         CALL DebugErrorMessage('Prj read error at '//Integer2String(ErrCounter))
 
       END SUBROUTINE PrjErrTrace
 !
@@ -689,6 +689,7 @@
 
       INTEGER iFrg, RW, iAtomNr
       REAL    tReal
+      INTEGER, EXTERNAL :: ElmSymbol2CSD
 
 ! Read or Write?
       RW = iPrjReadOrWrite
@@ -724,6 +725,9 @@
               bet(iAtomNr,iFrg) = DBLE(tReal)
             ENDIF
             CALL FileRWString (hPrjFile,iPrjRecNr,RW,asym(iAtomNr,iFrg))
+            IF (RW .EQ. cRead) THEN
+              zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(asym(iAtomNr,iFrg)(1:2))
+            ENDIF
             CALL FileRWString (hPrjFile,iPrjRecNr,RW,OriginalLabel(iAtomNr,iFrg))
             CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,tiso(iAtomNr,iFrg))
             CALL FileRWReal   (hPrjFile,iPrjRecNr,RW,occ(iAtomNr,iFrg))
