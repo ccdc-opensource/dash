@@ -1,6 +1,30 @@
 !
 !*****************************************************************************
 !
+! Originally in PutSimplexChisq.f90
+!
+      SUBROUTINE PutSimplexChisq(CCHI)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      CHARACTER*7 chistr
+
+      COMMON /chitemcmn/ ncchi,ncchimin,cchimin
+
+      cchimin=min(cchimin,cchi)
+      if (cchi.eq.cchimin) then
+        chistr(1:7)='0000.00'
+        write(chistr(1:7),'(f7.2)') cchimin
+        CALL WDialogSelect(IDD_SA_Action1)
+        CALL WDialogPutString(IDF_Simplex_Now,chistr)
+        call valchipro(cpb)
+      end if
+
+	 END SUBROUTINE PutSimplexChisq
+!
+!*****************************************************************************
+!
 ! Originally in sa_upload.f90
 !
       SUBROUTINE sa_upload
