@@ -444,12 +444,12 @@
 !
       USE WINTERACTER
 
+      IMPLICIT NONE
+
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'POLY_COLOURS.INC'
 
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
@@ -488,8 +488,9 @@
       CHARACTER*2 ChrPkNum2
 
       REAL Difference(1:MAX_FITPT)
-      INTEGER JJ
+      INTEGER JJ, iord_peak, I, ipf1, ipf2, II, ix1, ix2, IPresColN, J
       LOGICAL, EXTERNAL :: PlotPeakFitDifferenceProfile
+      REAL gxleft, gybot, gxright, gytop, xgtem, ygtem, yt1, yt2, xg1, yg1, yg2
 
       iord_peak = 0
       DO i = 1, NumPeakFitRange
