@@ -1,4 +1,4 @@
-! Winteracter module created : 18/Apr/2003 16:57:05
+! Winteracter module created : 21/Apr/2003 13:39:27
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -630,7 +630,6 @@
           INTEGER, PARAMETER :: IDD_Pause                       =   135
           INTEGER, PARAMETER :: IDF_RandomInitVal               =  1361
           INTEGER, PARAMETER :: IDB_SaveTBL                     =  1362
-          INTEGER, PARAMETER :: IDF_OutputSolMenu2              =  1414
           INTEGER, PARAMETER :: IDD_SA_Modal_input2             =   137
           INTEGER, PARAMETER :: IDD_DIALOG003                   =   162
           INTEGER, PARAMETER :: IDF_parameter_grid_modal        =  1363
