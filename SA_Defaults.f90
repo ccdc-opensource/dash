@@ -8,11 +8,11 @@
 
       CHARACTER*(*), INTENT (IN   ) :: FileHead 
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file   
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
 
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
       INTEGER POS
 
@@ -35,13 +35,11 @@
       ccl_file  = FileHead(1:POS)//'.ccl'
       log_file  = FileHead(1:POS)//'.log'
       pro_file  = FileHead(1:POS)//'.pro'    
-      bin_file  = FileHead(1:POS)//'.bin'    
       cssr_flen = LEN_TRIM(cssr_file)
       pdb_flen  = LEN_TRIM(pdb_file)
       ccl_flen  = LEN_TRIM(ccl_file)
       log_flen  = LEN_TRIM(log_file)
       pro_flen  = LEN_TRIM(pro_file)
-      bin_flen  = LEN_TRIM(bin_file)
 
       END SUBROUTINE sa_SetOutputFiles
 !

@@ -118,11 +118,11 @@
 
       IMPLICIT NONE
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file   
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
 
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number

@@ -325,11 +325,11 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file   
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file, bin_file
+      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file
+      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
 
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen, bin_flen
+      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
 
       LOGICAL, EXTERNAL :: Get_OutputChi2vsMoves
       INTEGER tFileHandle, iLen, I, J
