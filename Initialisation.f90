@@ -13,7 +13,7 @@
 
       IMPLICIT NONE
 
-      INTEGER :: IFlags, ISTAT
+      INTEGER :: IFlags
       CHARACTER(LEN=MaxPathLength) :: Dirname
       CHARACTER*MaxPathLength tString
       CHARACTER*255 tFile
@@ -43,7 +43,7 @@
         RETURN
  110    CALL ErrorMessage("DASH problem: Could not open temporary files"//CHAR(13)// &
                           "in the directory "//DirName(1:LEN_TRIM(DirName))//CHAR(13)//&
-                          "Please pick an alternative directory for your DASH run")
+                          "Please pick an alternative directory for your DASH run.")
       ENDDO
 
       END SUBROUTINE Init_StdOut
