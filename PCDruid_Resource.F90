@@ -1,4 +1,4 @@
-! Winteracter module created : 06/Nov/2003 17:28:56
+! Winteracter module created : 24/Nov/2003 12:40:35
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -212,9 +212,9 @@
           INTEGER, PARAMETER :: IDF_LABEL7                      =  1463
           INTEGER, PARAMETER :: IDF_StopSA                      =  1195
           INTEGER, PARAMETER :: IDF_Pause_Annealing             =  1495
-          INTEGER, PARAMETER :: IDD_Parameter_Status            =   136
-          INTEGER, PARAMETER :: IDD_Anneal_Status               =   138
-          INTEGER, PARAMETER :: IDD_Profile_Status              =   139
+          INTEGER, PARAMETER :: IDF_IgnLT                       =  1537
+          INTEGER, PARAMETER :: IDF_AvgFriedelPairs             =  1538
+          INTEGER, PARAMETER :: IDF_CutOff                      =  1539
           INTEGER, PARAMETER :: IDF_PawRef_Refine               =  1301
           INTEGER, PARAMETER :: IDF_IDF_PawRef_NBack            =  1291
           INTEGER, PARAMETER :: IDF_PawRef_Solve                =  1283
