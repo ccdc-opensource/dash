@@ -307,6 +307,11 @@
 !      CALL Profile_Plot
       CALL sa_SetOutputFiles(TheFileName)
       CALL ScrUpdateFileName
+! Grey out the "Previous Results >" button in the DICVOL Wizard window
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page8)
+      CALL WDialogFieldState(IDB_PrevRes,Disabled)
+      CALL PopActiveWindowID
 !      CALL FourierPattern(1,1000)
 
       END FUNCTION DiffractionFileLoad
