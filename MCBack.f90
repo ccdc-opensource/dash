@@ -106,6 +106,8 @@
       INTEGER knotem, npartem
       INTRINSIC MOD
       REAL    rat, stem
+      REAL AvgBeg
+      INTEGER Nbeg
 !
 !  This subroutine determines the background using a smoothing
 !  procedure published by Sergio Brueckner in J. Appl. Cryst. (2000) 33, 977-979
@@ -113,8 +115,15 @@
 !  and raise background to correct value using a Monte Carlo sampling procedure
 !
       CALL WCursorShape(CurHourGlass)
+      !C Calculate the average of the first Nbeg points
+      AvgBeg = 0.0
+      Nbeg = 1
+      DO I = 1, Nbeg
+        AvgBeg = AvgBeg + YOBIN(I)
+      ENDDO
+      AvgBeg = AvgBeg / Nbeg
       DO I = -nbruckwin, 0
-        ys(I) = YOBIN(1)
+        ys(I) = AvgBeg
       ENDDO
       DO I = 1, NBIN
         ys(I) = YOBIN(I)
