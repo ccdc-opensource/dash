@@ -92,6 +92,7 @@
 ! COMMON /FCSPC2/ ARGK(MFCSP2), DSTAR(MFCSP2)
 
       REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
       INTEGER           IPF_Lo,                     IPF_Hi
       INTEGER           NumPeakFitRange,            CurrentRange
       INTEGER           IPF_Range
@@ -99,7 +100,7 @@
       REAL              XPF_Pos,                    YPF_Pos
       INTEGER           IPF_RPt
       REAL              XPeakFit,                   YPeakFit
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),                                   &
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
                         IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
                         NumPeakFitRange,            CurrentRange,                &
                         IPF_Range(MAX_NPFR),                                     &
@@ -112,6 +113,8 @@
 ! MAX_NPPR (= MPeak = 10) = MAXimum Number of Peaks per Peak Fit Range
 ! XPF_Range(1,i)  = start of hatched area
 ! XPF_Range(2,i)  = end   of hatched area
+! RangeFitYN      = has this range been fitted Yes / No
+! @ RangeFitYN has not been implemented yet.
 ! IPF_Lo          = designates bin (so, pointer into XBIN) where the peak fit range starts.
 ! IPF_Hi          = designates bin (so, pointer into XBIN) where the peak fit range ends.
 ! NumPeakFitRange = Number of peak fit ranges (hatched areas on the screen)
