@@ -12,6 +12,10 @@
 
       INCLUDE 'PARAMS.INC'
 
+      INTEGER    MVAR
+      PARAMETER (MVAR = 100)
+! Maximum number of 'parameters' / 'variables' (= degrees of freedom) in the SA
+
       INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
       COMMON /DialoguePosCmn/ IXPos_IDD_Wizard, IYPos_IDD_Wizard
 
@@ -207,14 +211,12 @@
       REAL            XATOPT
       COMMON /posopt/ XATOPT(3,150)
 
-! Coordinates of the atoms of the asymmetric unit of the best SA solution so far.
+! Co-ordinates of the atoms of the asymmetric unit of the best SA solution so far.
 
-      INTEGER NMAX
-      PARAMETER (NMAX=100)
-      DOUBLE PRECISION XOPT, C, XP, FOPT
-      COMMON /sacmn / XOPT(NMAX), C(NMAX), XP(NMAX), FOPT
+      DOUBLE PRECISION XOPT,       C,       XP,       FOPT
+      COMMON /sacmn /  XOPT(MVAR), C(MVAR), XP(MVAR), FOPT
 
-! NMAX = mvar = 100
+! MVAR = 100
 ! XOPT = values of the parameters of the best SA solution so far
 
       INTEGER         KKOR
@@ -227,7 +229,9 @@
       COMMON /FCSTOR/ MAXK, FOB(150,MFCSTO)
 
       INTEGER         NPAR, IP
-      COMMON /SIMSTO/ NPAR, IP(100)
+      COMMON /SIMSTO/ NPAR, IP(MVAR)
+! NPAR is the number of degrees of freedom that have not been fixed by the user
+! IP is their mapping
 
       LOGICAL         RESTART
       INTEGER                  SA_Run_Number

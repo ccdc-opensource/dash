@@ -409,8 +409,10 @@
       SUBROUTINE LUDCMP(A,N,NP,INDX,D)
 !     --------------------------------
 !
-      PARAMETER (NMAX=100,TINY=1.0E-20)
-      DIMENSION A(NP,NP), INDX(N), VV(NMAX)
+      INTEGER    MVAR
+      PARAMETER (MVAR = 100)
+      PARAMETER (TINY=1.0E-20)
+      DIMENSION A(NP,NP), INDX(N), VV(MVAR)
 ! JCC This is for testing for mathematical errors used to PAUSE the program: The pause seemed to
 ! be causing a repeated CMD window to appear on screen...
       INTEGER IBMBER
