@@ -9,8 +9,7 @@
 
       IMPLICIT NONE
 
-      INTEGER :: IWIDTHS(10)
-      INTEGER :: IWID
+      INTEGER IWID, IWIDTHS(10)
 
 ! Initialise Winteracter
       CALL WInitialise(' ')
