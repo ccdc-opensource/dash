@@ -1,14 +1,9 @@
-!***********************************************************************
 !
-!
-!
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+!*****************************************************************************
 !
       SUBROUTINE SIMOPT(X,DX,COVAR,N,CHIFUN)
 !     --------------------------------------
-!
-!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-!
+!!
 ! Purpose
 !     A SIMPLEX-based routine which optimises the values of the N
 ! parameters pertaining to the components of the vector X; it also
@@ -31,7 +26,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      PARAMETER (MAXITR=10)
+      PARAMETER (MAXITR=50)
       REAL X(N), DX(N), COVAR(N,N)
       REAL HESS(2500), DELTA(50), C0, C1(2,50), C2(2500)
       REAL V(2550), EX(150), C(51)
@@ -62,7 +57,7 @@
       CHI = CHIFUN(N,V)
 !
 !      IF ((1.0-CHI/CHIMIN).GT.0.0001) THEN
-      IF ((1.0-CHI/CHIMIN).GT.0.01) THEN
+      IF ((1.0-CHI/CHIMIN).GT.0.005) THEN
         CHIMIN = CHI
         GOTO 1
       ENDIF
@@ -74,33 +69,34 @@
       CALL INVERT(HESS,COVAR,N,INDX)
       LERANL = .FALSE.
       END SUBROUTINE SIMOPT
-!*==VCOPY.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!***<utilities>*********************************************************
+!*****************************************************************************
 !
       SUBROUTINE VCOPY(X,Y,N)
 !     -----------------------
 !
       REAL X(*), Y(*)
-!
+
       DO I = 1, N
         Y(I) = X(I)
       ENDDO
+
       END SUBROUTINE VCOPY
-!*==VRFILL.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE VRFILL(X,A,N)
 !     ------------------------
 !
       REAL X(*)
-!
+
       DO I = 1, N
         X(I) = A
       ENDDO
+
       END SUBROUTINE VRFILL
-!*==SIMPLEX.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!***<Simplex>*****************************************************
+!*****************************************************************************
 !
       SUBROUTINE SIMPLEX(V,N,D,EX,C,IR,MX,CHIFUN)
 !     ------------------------------------
@@ -176,7 +172,8 @@
       IF (CMIN.GT.CAIM .AND. .NOT.SLOW) GOTO 10
       CALL VCOPY(V(1,IR(N+1)),EX,N)
       END SUBROUTINE SIMPLEX
-!*==SIMP0.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE SIMP0(V,D,C,IR,N,CHIFUN)
 !     ----------------------------
@@ -192,7 +189,8 @@
       ENDDO
       CALL SSORT(C,IR,N)
       END SUBROUTINE SIMP0
-!*==SSORT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE SSORT(C,IR,N)
 !     ------------------------
@@ -213,7 +211,8 @@
         IR(J) = J
    20 ENDDO
       END SUBROUTINE SSORT
-!*==XCENT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE XCENT(V,XC,IH,N)
 !     ---------------------------
@@ -231,7 +230,8 @@
         XC(I) = XC(I)*XNORM
       ENDDO
       END SUBROUTINE XCENT
-!*==XZERO.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE XZERO(XH,X0,XC,N,A)
 !     ------------------------------
@@ -242,7 +242,8 @@
         X0(I) = A*(XC(I)-XH(I)) + XC(I)
       ENDDO
       END SUBROUTINE XZERO
-!*==EXPAND.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE EXPAND(CL,X0,X00,XC,N,C0,G,CHIFUN)
 !     --------------------------------------
@@ -259,7 +260,8 @@
         C0 = C00
       ENDIF
       END SUBROUTINE EXPAND
-!*==CONTRACT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE CONTRACT(CH,CS,C0,C00,X0,X00,XC,XH,B,N,CHIFUN)
 !     --------------------------------------------------
@@ -278,7 +280,8 @@
       ENDIF
       C00 = CHIFUN(N,X00)
       END SUBROUTINE CONTRACT
-!*==CONT2.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE CONT2(K,V,C,N,IR,CHIFUN)
 !     ----------------------------
@@ -296,9 +299,8 @@
    20 ENDDO
       CALL SSORT(C,IR,N)
       END SUBROUTINE CONT2
-!*==CHINIT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-!***<error analysis>****************************************************
+!*****************************************************************************
 !
       SUBROUTINE CHINIT(V,N,DELTA,C0,C1,C2,CHIFUN)
 !     -------------------------------------
@@ -324,7 +326,8 @@
         V(J) = V(J) - DELTA(J)
       ENDDO
       END SUBROUTINE CHINIT
-!*==DLINIT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE DLINIT(X,J,CMINUS,CPLUS,C0,CDELTA,DELTA,CHIFUN)
 !     ----------------------------------------------------
@@ -348,7 +351,8 @@
     1 DELTA = D
       X(J) = X0
       END SUBROUTINE DLINIT
-!*==HSINT1.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE HSINT1(C0,C1,D,N,HS)
 !     -------------------------------
@@ -359,7 +363,8 @@
         HS(I,I) = (C1(2,I)-C0-C0+C1(1,I))/(D(I)*D(I))
       ENDDO
       END SUBROUTINE HSINT1
-!*==HSINT2.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE HSINT2(C0,C1,C2,D,N,HS)
 !     ----------------------------------
@@ -373,7 +378,8 @@
         ENDDO
       ENDDO
       END SUBROUTINE HSINT2
-!*==INVERT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE INVERT(HESS,COVAR,N,INDX)
 !     ------------------------------------
@@ -396,7 +402,8 @@
         CALL LUBKSB(HESS,N,N,INDX,COVAR(1,I))
       ENDDO
       END SUBROUTINE INVERT
-!*==LUDCMP.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
 !----------------------------------------------------------------------C
 !  Two subroutines, for Cholesky decomposition of a matrix, copied out C
@@ -473,7 +480,8 @@
       ENDDO
       IF (A(N,N).EQ.0.0) A(N,N) = TINY
       END SUBROUTINE LUDCMP
-!*==LUBKSB.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE LUBKSB(A,N,NP,INDX,B)
 !     --------------------------------
@@ -505,3 +513,6 @@
       ENDDO
 
       END SUBROUTINE LUBKSB
+!
+!*****************************************************************************
+!

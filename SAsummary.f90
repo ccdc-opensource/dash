@@ -21,8 +21,11 @@
       REAL                                                       ChiMult
       COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
 !     required to handle the profile graphs plotted in child windows
-      INTEGER  SAUsedChildWindows
+
+      INTEGER                 SAUsedChildWindows
       COMMON /SAChildWindows/ SAUsedChildWindows(MaxNumChildWin)
+
+      CHARACTER*255 Grid_Buffer
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
@@ -54,7 +57,8 @@
         CALL WGridGetCellCheckBox(IDF_SA_summary,2,irow,istatus)
         IF (istatus.eq.1) THEN
 ! calls subroutine which opens Mercury window with .pdb file
-          CALL viewpdb(irow)
+          CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)
+          CALL ViewStructure(Grid_Buffer)
 ! calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(irow)
           CALL WGridPutCellCheckBox(IDF_SA_Summary,2,irow,Unchecked)
@@ -95,37 +99,13 @@
         CASE (CloseRequest)
           CALL WindowCloseChild(EventInfo%win)
           SAUsedChildWindows(EventInfo%win) = 0
-                  CALL UnRegisterChildWindow(EventInfo%win)
+          CALL UnRegisterChildWindow(EventInfo%win)
 ! exposing or resizing of profile plot windows - will replot
         CASE (expose, resize)
           CALL plot_pro_file(EventInfo%win)
       END SELECT
 
       END SUBROUTINE DealWithProfilePlot
-!
-!*******************************************************************************
-!
-      SUBROUTINE Viewpdb(irow)
-! ep July 2001
-! This subroutine is the Viewbest subroutine (in sa_refresh.f90) hacked about a bit.
-! Each time a "View" button is clicked in the summary window, this subroutine will
-! open a new Mercury window and display the relevant .pdb file
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      INTEGER, INTENT (IN  ) :: irow
-
-      CHARACTER*255 Grid_Buffer
-
-      CALL PushActiveWindowID
-!     Get grid_buffer which contains the name of the correct pdb file
-      CALL WDialogSelect(IDD_SA_Multi_completed_ep)
-      CALL WGridGetCellString(IDF_SA_Summary,1,irow,Grid_Buffer)
-      CALL ViewStructure(Grid_Buffer)
-      CALL PopActiveWindowID
-
-      END  SUBROUTINE Viewpdb
 !
 !*******************************************************************************
 !
