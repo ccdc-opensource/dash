@@ -118,12 +118,10 @@
       GOTO 100
 !
 ! WRITE OUT NEW 'L ABSC' CARD FOR PR:
-    4 WRITE (NEWIN,2001) NABTYP(JSOURC), ABSPR(1,JSOURC),               &
-     &                   ABSPR(2,JSOURC)
+    4 WRITE (NEWIN,2001) NABTYP(JSOURC), ABSPR(1,JSOURC), ABSPR(2,JSOURC)
  2001 FORMAT ('L ABSC',I2,2F10.4)
 !* NEED METHOD OF PUTTING OUT *S
       GOTO 100
-!
 ! DEAL WITH ABSENCE OF 'L ABSC' CARD:
     5 CALL MESS(LPT,1,'No L ABSC card - assuming no absorption correction')
       NABTYP(JSOURC) = 0
@@ -133,18 +131,13 @@
       DERABQ(1) = 0.
       DERABQ(2) = 0.
       GOTO 100
-!
 ! FIX ABS COR IF NO CARD WAS GIVEN:
     6 IF (NABTYP(JSOURC).EQ.0) CALL ADDFX5(6,2,0,1,JSOURC,4)
       GOTO 100
-!
-!
       ENTRY ABCPR8(NP,NV)
 ! RECORD NP'TH PARAMETER AS VARIABLE NUMBER NV:
       KABSPR(NP,JSOURC) = NV
       GOTO 100
-!
-!
       ENTRY ABCPR9
 ! RECORD ALL PARAMETERS FIXED:
       DO I = 1, 2
@@ -152,7 +145,6 @@
           KABSPR(I,J) = 0
         ENDDO
       ENDDO
-!
   100 RETURN
       END SUBROUTINE ABCRPR
 !*==ADDPAW.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
@@ -188,10 +180,7 @@
      &                NSKTOT, KOM24
 !
       NSKTOT = NSKTOT + 1
-!%
-!      CALL ERRCHK(2,NSLAK(NSLTYP),%PSLK%,0,
-      CALL ERRCHK(2,NSLAK(NSLTYP),1000,0,                               &
-     &            'Pawley-type slack constraiints')
+      CALL ERRCHK(2,NSLAK(NSLTYP),1000,0,'Pawley-type slack constraiints')
       NSLTEM = NSLAK(NSLTYP)
       IGSLAK(NSLTEM) = ISGEN
       ISPSLK(1,NSLTEM) = ISP(1)
@@ -254,8 +243,6 @@
 !O Puts this printing in lines for everything except family 2 parameters,
 !O    and in clumps per atom for family 2
 !
-!%
-!      LOGICAL SHFCEL,TESTOV,HEAD,NPROP
       EXTERNAL PCXX, PFXX, MAGSHF
       LOGICAL SHFCEL, HEAD, NPROP
       DIMENSION DPROP(3)
@@ -298,8 +285,7 @@
 !
       IF (SIMUL) GOTO 100
       WRITE (LPT,2000) ICYC
- 2000 FORMAT (/////'1 ++++++++++ Shifts in variables for cycle',I3,     &
-     &        ' ++++++++++ ')
+ 2000 FORMAT (/////'1 ++++++++++ Shifts in variables for cycle',I3,' ++++++++++ ')
 !
 ! START PRINT CONTROL:
       IG = 0
@@ -350,8 +336,7 @@
           ENDIF
           SHFCEL = .FALSE.
         ENDIF
-        IF (IFAM.EQ.3 .OR. IFAM.EQ.6 .AND. (JS.NE.JSOURC))              &
-     &      CALL LOGSOU(JSOURC)
+        IF (IFAM.EQ.3 .OR. IFAM.EQ.6 .AND. (JS.NE.JSOURC)) CALL LOGSOU(JSOURC)
 !
 ! BRANCH ON FAMILY:
         GOTO (11,12,13,14,15,16), IFAM
@@ -472,8 +457,7 @@
 !
 ! HERE TO PRINT NOT FAMILY 2 SHIFT AS BEFORE:
     6   IF (.NOT.HEAD) CALL MESS(LPT,1,'  Variable       New      '//   &
-     &        '     Esd          Shift          Old          Shift/Esd '&
-     &        )
+     &        '     Esd          Shift          Old          Shift/Esd ')
         HEAD = .TRUE.
         WRITE (LPT,2006) LNAM1, LNAM2, XNEW, ESD, SHIFT, XOLD, SHESD
  2006   FORMAT (' ',1X,A4,1X,A4,5G14.5)
@@ -540,22 +524,17 @@
       WRITE (LPT,2500) IBACK
  2500 FORMAT (/' Background refinement type ',I5)
       GOTO (310,320,330,340), IBACK
-      CALL ERRIN2(IBACK,1,'Type of background refinement',              &
-     &            'illegal - 1, 2, 3 or 4 only')
+      CALL ERRIN2(IBACK,1,'Type of background refinement','illegal - 1, 2, 3 or 4 only')
       GOTO 100
 !
   310 CALL MESS(LPT,1,'Polynomial function')
       GOTO 400
-!
   320 CALL MESS(LPT,1,'Chebyschev polynomial (1st kind) function')
       GOTO 400
-!
   330 CALL MESS(LPT,1,'Chebyschev polynomial (2nd kind) function')
       GOTO 400
-!
   340 CALL MESS(LPT,1,'Fourier cosine series function')
       GOTO 400
-!
   400 NBK = 0
 !
 ! 1ST BACKGROUND CARD NOW JOINS UP WITH FURTHER BACKGROUND CARDS
@@ -565,8 +544,6 @@
       IF (IER.NE.0) IERR = IERR + 1
       NBACK(KSOURC) = NBACK(KSOURC) + NUM
       IER = IERR
-!%
-!      CALL ERRCHK(1,NBACK(KSOURC),%BACK%,1,'background parameters')
       CALL ERRCHK(1,NBACK(KSOURC),100,1,'background parameters')
       IF (IER.NE.IERR) GOTO 100
 !
@@ -574,8 +551,6 @@
       CALL MESS(LPT,1,'Background parameter(s) :')
       CALL PRILIS(BACKGD(1,KSOURC),N,NBACK(KSOURC))
       GOTO 100
-!
-!
 !
 ! NOT 1ST CARD AND IBACK .LT. 0 : READ TYPE OF BACKGROUND WANTED -
 ! OCCURS ON EVERY CARD, SAME ON EACH IF IBACK .LT. 0:
@@ -590,8 +565,7 @@
 !
 !   2  IBACK=IB
     2 IF ((IBACK.GE.0) .OR. (IBACK.LE.-3)) THEN
-        CALL ERRIN2(IBACK,2,'type of background approximation',         &
-     &              'not allowed - only -1 or -2')
+        CALL ERRIN2(IBACK,2,'type of background approximation','not allowed - only -1 or -2')
         GOTO 100
       ENDIF
 !
@@ -600,54 +574,40 @@
 ! JUMP ON END OF CARD INFORMATION:
       IF (IER.EQ.100) GOTO 7
       IER = IERR
-!%
-!      CALL ERRCHK(2,NBACK(KSOURC),%BACK%,1,
       CALL ERRCHK(2,NBACK(KSOURC),100,1,'background table entries')
       IF (IER.NE.IERR) GOTO 100
 !
       CALL RDREAL(BACKGD(NBACK(KSOURC),KSOURC),IPT,IPT,80,IER)
       IF (IER.NE.100) GOTO 6
-      CALL ERRRE2(ARGBAK(NBACK(KSOURC),KSOURC),2,                       &
-     &            'no background value with arg=',' ')
+      CALL ERRRE2(ARGBAK(NBACK(KSOURC),KSOURC),2,'no background value with arg=',' ')
       GOTO 10
 !
     6 IF (NBACK(KSOURC).EQ.1) GOTO 1
-      IF (ARGBAK(NBACK(KSOURC),KSOURC).GT.ARGBAK(NBACK(KSOURC)-1,KSOURC)&
-     &    ) GOTO 1
-      WRITE (LPT,3004) ARGBAK(NBACK(KSOURC),KSOURC),                    &
-     &                 ARGBAK(NBACK(KSOURC)-1,KSOURC)
-      WRITE (ITO,3004) ARGBAK(NBACK(KSOURC),KSOURC),                    &
-     &                 ARGBAK(NBACK(KSOURC)-1,KSOURC)
+      IF (ARGBAK(NBACK(KSOURC),KSOURC).GT.ARGBAK(NBACK(KSOURC)-1,KSOURC)) GOTO 1
+      WRITE (LPT,3004) ARGBAK(NBACK(KSOURC),KSOURC), ARGBAK(NBACK(KSOURC)-1,KSOURC)
+      WRITE (ITO,3004) ARGBAK(NBACK(KSOURC),KSOURC), ARGBAK(NBACK(KSOURC)-1,KSOURC)
       IERR = IERR + 1
       GOTO 100
-!
     7 IF (NBACK(KSOURC).EQ.N-1) THEN
         CALL ERRMES(1,1,'no non-zero numbers given on L BACK card')
         GOTO 100
       ENDIF
-!
    10 IF (N.NE.1) GOTO 3
       WRITE (LPT,2000) IBACK
  2000 FORMAT (/' Background approximation type ',I5)
       GOTO (11,12), -IBACK
       CALL ERRIN2(IBACK,2,'Type of background','illegal')
       GOTO 100
-!
    11 CALL MESS(LPT,1,'Linear interpolation required')
       GOTO 4
-!
    12 CALL MESS(LPT,1,'Cubic spline approximation to be used')
-!
     4 CALL MESS(LPT,1,'Argument    Background')
-    3 WRITE (LPT,2001) (ARGBAK(J,KSOURC),BACKGD(J,KSOURC),J=N,          &
-     &                 NBACK(KSOURC))
+    3 WRITE (LPT,2001) (ARGBAK(J,KSOURC),BACKGD(J,KSOURC),J=N, NBACK(KSOURC))
  2001 FORMAT (1X,F12.2,F12.2)
       GOTO 100
-!
   100 RETURN
  3001 FORMAT (/' ERROR ** background type altered from',I4,' to',I4)
- 3004 FORMAT (/' ERROR ** arguments for backgrounds not in',            &
-     &        ' strictly ascending order'/' ',F12.2,' follows',F12.2)
+ 3004 FORMAT (/' ERROR ** arguments for backgrounds not in strictly ascending order'/' ',F12.2,' follows',F12.2)
       END SUBROUTINE BACKIN
 !*==BACKPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -763,8 +723,7 @@
       IF (L.NE.0) DERIVV(L) = DERIVV(L) + 1.
       IF (NBACK(JSOURC).LE.1) GOTO 100
 ! XCHEB IS DEFINED BETWEEN -1 AND 1
-      XCHEB = (2.*ARGI-(ARGMAX(JSOURC)+ARGMIN(JSOURC)))                 &
-     &        /(ARGMAX(JSOURC)-ARGMIN(JSOURC))
+      XCHEB = (2.*ARGI-(ARGMAX(JSOURC)+ARGMIN(JSOURC))) /(ARGMAX(JSOURC)-ARGMIN(JSOURC))
       CHEB0 = 0.
       CHEB1 = 1.
       DO I = 2, NBACK(JSOURC)
@@ -784,8 +743,7 @@
       IF (L.NE.0) DERIVV(L) = DERIVV(L) + 1.
       IF (NBACK(JSOURC).LE.1) GOTO 100
 ! XCHEB IS DEFINED BETWEEN -1 AND 1
-      XCHEB = (2.*ARGI-(ARGMAX(JSOURC)+ARGMIN(JSOURC)))                 &
-     &        /(ARGMAX(JSOURC)-ARGMIN(JSOURC))
+      XCHEB = (2.*ARGI-(ARGMAX(JSOURC)+ARGMIN(JSOURC))) /(ARGMAX(JSOURC)-ARGMIN(JSOURC))
       CHEB0 = 0.
       CHEB1 = 1.
       DO I = 2, NBACK(JSOURC)
@@ -838,12 +796,10 @@
  2005 FORMAT ('L BACK',1X,7(F10.5,1X))
       GOTO 100
 !
-!
       ENTRY BACKP8(NP,NV)
 ! RECORD THAT PARAMETER NP IS VARIABLE NUMBER NV:
       KBCKGD(NP,JSOURC) = NV
       GOTO 100
-!
 !
       ENTRY BACKP9
 ! RECORD ALL PARAMETERS FIXED:
@@ -894,8 +850,6 @@
       COMPLEX FCALC
 !
       INCLUDE 'params.inc'
-!%
-!      DIMENSION DERIVA(%VVAR%),CDERS(6),DERIV4(5)
       DIMENSION DERIVA(500), CDERS(6), DERIV4(5)
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
      &                DSTAR2, TWOTHD(5), DIFANG(6)
@@ -970,7 +924,7 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -1008,8 +962,7 @@
         CALL PCXX(2)
 !
         L2 = NVARF(2,JPHASE,1)
-        L123 = NVARF(1,JPHASE,JSOURC) + L2 + NVARF(3,JPHASE,JSOURC)     &
-     &         *NSOURC
+        L123 = NVARF(1,JPHASE,JSOURC) + L2 + NVARF(3,JPHASE,JSOURC) *NSOURC
         L1ST = LVFST1(1,JPHASE,1)
 !
 ! FORM P1 AND SOME FAMILY 1 QUOTIENT DERIVATIVES (ALL /P1):
@@ -1022,8 +975,7 @@
 !	out for numerical stability reasons and replaced by
 !	the line above
 !      IF (LX) FAC=ALPCOR*V(2)*V(2)
-        P1 = SCALEP(JPHASE)*SCALES(JSOURC)*EXP(-2.*SSQRD*TFAC)          &
-     &       *AMUL(KNOW)*FAC
+        P1 = SCALEP(JPHASE)*SCALES(JSOURC)*EXP(-2.*SSQRD*TFAC) *AMUL(KNOW)*FAC
 ! TFAC DERIVATIVE:
         L = KTFAC
         IF (L.NE.0) DERIVA(L) = -2.*SSQRD
@@ -1078,7 +1030,6 @@
             P2 = FC*CONJG(FC)
             FCMOD = SQRT(P2)
           ENDIF
-!
         ENDIF
 !
 ! P3:
@@ -1159,7 +1110,6 @@
           IF (L.GT.0) DERIVA(L) = DYNDKQ*CDERS(I)*FAC
         ENDDO
 !
-!
         GCALC = P1*P2*P3*P4*P5
         PIK(KNOW) = P1*P3*P4*P5
         YPEAK = YPEAK + GCALC
@@ -1205,9 +1155,6 @@
 !
 !
 !
-!
-!
-!
 ! LEVEL 9      SUBROUTINE CONTRI(PCXX,PFXX,IUNI)
       SUBROUTINE CONTRI(PCXX,PFXX,IUNI)
 !
@@ -1243,7 +1190,7 @@
       LOGICAL REFUSE, CYC1, NOPKRF
       COMMON /PRSTAT/ SMYC, SMYD, SMYO, SMIO, SMID, SMWYOS, IZCT, P5,   &
      &                IOP1, IOP2, KMI(9), KMA(9)
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -1381,8 +1328,6 @@
 !O and whose default extension is .IHM.
 !
       DIMENSION ALSQ(MATSZ)
-!%
-!      DIMENSION A(%BVAR%,%BVAR%),D(%BVAR%),E(%BVAR%)
       DIMENSION A(400,400), D(400), E(400)
 !
       INCLUDE 'PARAMS.INC'
@@ -1414,13 +1359,11 @@
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
-!
+
 ! OUT IF LIST NOT WANTED:
       IF (SIMUL .OR. .NOT.CAIL .OR. IPRNT(6).EQ.0) GOTO 100
-!
       I1 = IPRNT(6)/100
       I2 = IPRNT(6) - I1*100
-!
 ! SET UP MATRIX FROM INVERSE LSQ MATRIX:
 ! NUMBER OF BASIC VARIABLES IN FAMILY 4:
 !** ??? SUSPECT NEED FOR CYCLE OVER PHASES:
@@ -1447,14 +1390,9 @@
         NAMFIL = '.EIG'
         MAT = NOPFIL(1112)
 ! HOUSEHOLDER:
-!%
-!        CALL TRED2(A,N,%BVAR%,D,E,.TRUE.)
         CALL TRED2(A,N,400,D,E,.TRUE.)
 ! QL:
-!%
-!        CALL TQLI(D,E,N,%BVAR%,A,.TRUE.)
         CALL TQLI(D,E,N,400,A,.TRUE.)
-!
 ! PRINT EIGENVALUES:
         CALL MESS(LPT,2,                                                &
      &            'Eigenvalues of normal LSQ matrix relating to INTS:')
@@ -1467,8 +1405,8 @@
           WRITE (MAT) D(I), (A(L,I),L=1,N)
         ENDDO
       ENDIF
-!
   100 RETURN
+
       END SUBROUTINE EIGEN
 !*==EXCLIN.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -1480,7 +1418,7 @@
 !
 ! *** EXCLIN by JCM 18 Jun 85 ***
 !
-! INTRPETS ONE L EXCL CARD
+! INTERPRETS ONE L EXCL CARD
 !
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
      &                ICDN(26,9), IERR, IO10, SDREAD
@@ -1493,40 +1431,32 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
      &                NPCSOU(9,5)
-!
+
       IPT = 7
       N = NEXCL(KSOURC) + 1
 ! READ PAIRS OF NUMBERS TILL END OF CARD:
     1 CALL RDREAL(EXCLUD(NEXCL(KSOURC)+1,KSOURC),IPT,IPT,80,IER)
-      IF (IER.EQ.100) GOTO 101
-!
+      IF (IER.EQ.100) THEN
+        WRITE (LPT,2000) (EXCLUD(I,KSOURC),I=N,NEXCL(KSOURC))
+ 2000   FORMAT (/' Exclude '/(1X,F12.2,' TO',F12.2/))
+        RETURN
+      ENDIF
 ! CHECK NOT TOO MANY:
       IER = IERR
-!%
-!      CALL ERRCHK(1,NEXCL(KSOURC),%EXCL%,1,'excluded regions')
       CALL ERRCHK(1,NEXCL(KSOURC),40,1,'excluded regions')
-      IF (IER.NE.IERR) GOTO 100
-!
+      IF (IER.NE.IERR) RETURN
       CALL RDREAL(EXCLUD(NEXCL(KSOURC)+2,KSOURC),IPT,IPT,80,IER)
       NEXCL(KSOURC) = NEXCL(KSOURC) + 2
       IF (NEXCL(KSOURC).EQ.2) GOTO 1
-      IF (EXCLUD(NEXCL(KSOURC)-1,KSOURC)                                &
-     &    .LT.EXCLUD(NEXCL(KSOURC)-2,KSOURC)) GOTO 3
-      IF (EXCLUD(NEXCL(KSOURC),KSOURC).GT.EXCLUD(NEXCL(KSOURC)-1,KSOURC)&
-     &    ) GOTO 1
-    3 WRITE (LPT,3000) EXCLUD(NEXCL(KSOURC),KSOURC),                    &
-     &                 EXCLUD(NEXCL(KSOURC)-1,KSOURC)
-      WRITE (ITO,3000) EXCLUD(NEXCL(KSOURC),KSOURC),                    &
-     &                 EXCLUD(NEXCL(KSOURC)-1,KSOURC)
+      IF (EXCLUD(NEXCL(KSOURC)-1,KSOURC).LT.EXCLUD(NEXCL(KSOURC)-2,KSOURC)) THEN
+        WRITE (LPT,3000) EXCLUD(NEXCL(KSOURC),KSOURC),EXCLUD(NEXCL(KSOURC)-1,KSOURC)
+        WRITE (ITO,3000) EXCLUD(NEXCL(KSOURC),KSOURC),EXCLUD(NEXCL(KSOURC)-1,KSOURC)
+ 3000   FORMAT (/' ERROR ** boundaries for excluded regions not in strictly ascending order'/' Pair',F12.2,' and', F12.2)
+        RETURN
+      ENDIF
+      IF (EXCLUD(NEXCL(KSOURC),KSOURC).GT.EXCLUD(NEXCL(KSOURC)-1,KSOURC)) GOTO 1
       IERR = IERR + 1
-      GOTO 100
-!
-  101 WRITE (LPT,2000) (EXCLUD(I,KSOURC),I=N,NEXCL(KSOURC))
- 2000 FORMAT (/' Exclude '/(1X,F12.2,' TO',F12.2/))
-  100 RETURN
- 3000 FORMAT (/' ERROR ** boundaries for excluded regions',             &
-     &        'not in strictly ascending order'/' Pair',F12.2,' and',   &
-     &        F12.2)
+
       END SUBROUTINE EXCLIN
 !*==EXCRPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -2552,8 +2482,6 @@
       EXTERNAL PCXX, PFXX
       CHARACTER*2 INEX(2)
       CHARACTER*14 ARGTYP(2)
-!%
-!      CHARACTER *4 IWD,LTABLE(%LCRD%),LTICTB(5),LPH0TB(14)
       CHARACTER*4 IWD, LTABLE(22), LTICTB(5), LPH0TB(14)
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
      &                DSTAR2, TWOTHD(5), DIFANG(6)
@@ -2612,8 +2540,6 @@
       DATA ARGTYP/'Time of flight', '2 theta'/
 !
 ! SET 'NO L CARDS READ':
-!%
-!      CALL JGMZER(ILREAD,1,%LCRD%)
       CALL JGMZER(ILREAD,1,22)
 !
 ! READ ALL 'L' CARDS:
@@ -2624,14 +2550,11 @@
         CALL ERRMES(1,1,'No "L" cards given')
         GOTO 100
       ENDIF
-!
       DO ICD = 1, NCARD
         CALL CARDIN(ID)
         ID = ID + NYZ
         CALL RDWORD(IWD,LEN,3,IPT,80,0,IER)
 ! IGNORE L CARD IF NOT ONE WE WANT:
-!%
-!      L=NCFIND(IWD,LTABLE,%LCRD%)
         L = NCFIND(IWD,LTABLE,22)
         IF (L.LE.0) GOTO 3
 !* NB IF WE EVER WANT THESE AFTER THE INPUT PHASE WE MUST DO BETTER THAN THIS
@@ -2645,11 +2568,9 @@
         IF (LL.LE.0) GOTO 3
         ILREAD(L) = ILREAD(L) + 1
         GOTO (12,14,16,17,18,20,21,22,23,24,25,26,27,28), LL
-!
 ! L SCAL - THIS IS THE SCALE OF A SOURCE:
    12   CALL LSSCAL(1)
         GOTO 3
-!
 ! L RTYP:
    14   CALL RDINTG(MODERR(KSOURC),IPT,IPT,80,IER)
         MMODER = IABS(MODERR(KSOURC))
@@ -2661,27 +2582,18 @@
         CALL RDREAL(ARGSTP(KSOURC),IPT,IPT,80,IER)
         WRITE (LPT,2009) ARGTYP(IA), ARGMIN(KSOURC)
  2009   FORMAT (//' Data limits considered:'/' Minimum ',A14,' =',F12.2)
-        IF (ARGMAX(KSOURC).NE.0.) WRITE (LPT,2006) ARGTYP(IA),          &
-     &      ARGMAX(KSOURC)
+        IF (ARGMAX(KSOURC).NE.0.) WRITE (LPT,2006) ARGTYP(IA), ARGMAX(KSOURC)
  2006   FORMAT (' Maximum ',A14,' =',F12.2)
-        IF (ARGSTP(KSOURC).NE.0.) WRITE (LPT,2007) ARGTYP(IA),          &
-     &      ARGSTP(KSOURC)
+        IF (ARGSTP(KSOURC).NE.0.) WRITE (LPT,2007) ARGTYP(IA), ARGSTP(KSOURC)
  2007   FORMAT (' Step in ',A14,' =',F12.2)
         GOTO (71,72,73), MMODER
-    7   CALL ERRIN2(MODERR(KSOURC),2,'reflection input type',           &
-     &              'not allowed')
+    7   CALL ERRIN2(MODERR(KSOURC),2,'reflection input type','not allowed')
         GOTO 3
-!
-   71   CALL MESS(LPT,1,'Reflection indices input as sets of 3 I5'//    &
-     &            ' integers from .HKL file')
+   71   CALL MESS(LPT,1,'Reflection indices input as sets of 3 I5 integers from .HKL file')
         GOTO 10
-!
-   72   CALL MESS(LPT,1,'Reflection indices to be generated by program' &
-     &            //' then output to file .HKL')
+   72   CALL MESS(LPT,1,'Reflection indices to be generated by program then output to file .HKL')
         GOTO 10
-!
-   73   CALL MESS(LPT,1,'Reflection indices to be generated by program' &
-     &            //' - regenerate next run')
+   73   CALL MESS(LPT,1,'Reflection indices to be generated by program - regenerate next run')
    10   I = 2
         IF (MODERR(KSOURC).LT.0) I = 1
         CALL MESS(LPT,1,INEX(I)//'clude any space group absences')
@@ -2691,8 +2603,7 @@
    16   CALL RDINTG(IWGH(KSOURC),IPT,IPT,80,IER)
         IF (IWGH(KSOURC).GT.3 .OR. IWGH(KSOURC).LE.0) GOTO 8
         GOTO (41,42,43), IWGH(KSOURC)
-    8   CALL ERRIN2(IWGH(KSOURC),2,'weighting scheme',                  &
-     &              'not allowed - type 1, 2 or 3 only')
+    8   CALL ERRIN2(IWGH(KSOURC),2,'weighting scheme','not allowed - type 1, 2 or 3 only')
         GOTO 3
 !
 ! UNIT WEIGHTS:
@@ -2700,13 +2611,11 @@
         GOTO 3
 !
 ! WEIGHT TO BE USED AS READ:
-   42   CALL MESS(LPT,1,                                                &
-     &            'Weights to be used as read from reflection data')
+   42   CALL MESS(LPT,1,'Weights to be used as read from reflection data')
         GOTO 3
 !
 ! SIGMA READ, WEIGHT IS 1/SIGMA SQUARED:
-   43   CALL MESS(LPT,1,'Sigma read from reflection data'//             &
-     &            ' - weight is 1/sigma squared')
+   43   CALL MESS(LPT,1,'Sigma read from reflection data - weight is 1/sigma squared')
         GOTO 3
 !
 ! L PKCN:
@@ -2722,40 +2631,32 @@
 ! L OTYP:
    20   CALL RDINTG(MODEOB(KSOURC),IPT,IPT,80,IER)
         IF (MODEOB(KSOURC).LT.0 .OR. MODEOB(KSOURC).GT.4) THEN
-          CALL ERRIN2(MODEOB(KSOURC),2,'mode of giving obs data',       &
-     &                'unacceptable')
+          CALL ERRIN2(MODEOB(KSOURC),2,'mode of giving obs data','unacceptable')
           GOTO 3
         ENDIF
 !
         GOTO (61,62,63,64,65), MODEOB(KSOURC) + 1
-   61   CALL MESS(LPT,1,                                                &
-     &            'Observations to be input by user''s routine QPRIN')
+   61   CALL MESS(LPT,1,'Observations to be input by user''s routine QPRIN')
         GOTO 3
 !
-   62   CALL MESS(LPT,1,'Observations to be input as '//                &
-     &            'tof,Yobs,DYobs,(scale),(code), in formats F10 and I5'&
-     &            )
+   62   CALL MESS(LPT,1,'Observations to be input as tof,Yobs,DYobs,(scale),(code), in formats F10 and I5')
         GOTO 3
 !
    63   CALL MESS(LPT,1,'Observations to be input as tof,Yobs,DYobs,'// &
      &            '(scale),(code), unformatted from binary file')
         GOTO 3
 !
-   64   CALL MESS(LPT,1,                                                &
-     &   'Observations to be input as sets of n,obs in format 10(I2,I6)'&
-     &   )
+   64   CALL MESS(LPT,1,'Observations to be input as sets of n,obs in format 10(I2,I6)')
         GOTO 3
 !
-   65   CALL MESS(LPT,1,                                                &
-     &        'Observations to be input as sets of obs in format 10(I8)'&
-     &        )
+   65   CALL MESS(LPT,1,'Observations to be input as sets of obs in format 10(I8)')
         GOTO 3
 !
 ! L BACK:
    21   CALL BACKPR(1)
         GOTO 3
 !
-!*???ought these to be per phase?
+!*??? ought these to be per phase?
 ! L EXCL:
    22   CALL EXCLIN
         GOTO 3
@@ -2790,11 +2691,9 @@
         WRITE (LPT,2020) TWOTHD(KSOURC), TWSNTH(KSOURC)
  2020   FORMAT (/' 2 theta =',F10.3,' degrees;  2 sin theta =',F10.5)
         GOTO 3
-!
     3 ENDDO
-!
   100 IF (MULFAS) CALL P0TEMP(.FALSE.)
-      RETURN
+
       END SUBROUTINE INPLP0
 !*==INPLPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -2834,15 +2733,11 @@
 !CD If called from PICTIC, interprets only the 5 cards:
 !CD    RTYP, PKCN, ZERO WVLN, THE2
 !
-!
-!
       INCLUDE 'PARAMS.INC'
-!
+
       EXTERNAL PCXX, PFXX
       CHARACTER*2 INEX(2)
       CHARACTER*14 ARGTYP(2)
-!%
-!      CHARACTER *4 IWD,LTABLE(%LCRD%),LTICTB(5),LPHNTB(6)
       CHARACTER*4 IWD, LTABLE(22), LTICTB(5), LPHNTB(6)
       DIMENSION IH(3)
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5),  &
@@ -2904,7 +2799,6 @@
       DATA ARGTYP/'Time of flight', '2 theta'/
 !
 !C SET 'NO L CARDS READ':
-!%      CALL JGMZER(ILREAD,1,%LCRD%)
 !
 ! READ ALL 'L' CARDS:
       INREAD(12) = -IABS(INREAD(12))
@@ -2914,14 +2808,11 @@
         CALL ERRMES(1,1,'No "L" cards given')
         GOTO 100
       ENDIF
-!
       DO ICD = 1, NCARD
         CALL CARDIN(ID)
         ID = ID + NYZ
         CALL RDWORD(IWD,LEN,3,IPT,80,0,IER)
 ! IGNORE L CARD IF NOT ONE WE WANT:
-!%
-!      L=NCFIND(IWD,LTABLE,%LCRD%)
         L = NCFIND(IWD,LTABLE,22)
         IF (L.LE.0) GOTO 3
 ! NOW FIND OUT IF WE REALLY WANT IT:
@@ -2936,7 +2827,6 @@
           ILREAD(L) = ILREAD(L) + 1
           GOTO (14,17,18,23,28), LL
         ENDIF
-!
 ! L TFAC:
    11   CALL LLTFAC(1)
         GOTO 3
@@ -2961,57 +2851,42 @@
         CALL RDREAL(ARGSTP(KSOURC),IPT,IPT,80,IER)
         WRITE (LPT,2009) ARGTYP(IA), ARGMIN(KSOURC)
  2009   FORMAT (//' Data limits considered:'/' Minimum ',A14,' =',F12.2)
-        IF (ARGMAX(KSOURC).NE.0.) WRITE (LPT,2006) ARGTYP(IA),          &
-     &      ARGMAX(KSOURC)
+        IF (ARGMAX(KSOURC).NE.0.) WRITE (LPT,2006) ARGTYP(IA), ARGMAX(KSOURC)
  2006   FORMAT (' Maximum ',A14,' =',F12.2)
-        IF (ARGSTP(KSOURC).NE.0.) WRITE (LPT,2007) ARGTYP(IA),          &
-     &      ARGSTP(KSOURC)
+        IF (ARGSTP(KSOURC).NE.0.) WRITE (LPT,2007) ARGTYP(IA), ARGSTP(KSOURC)
  2007   FORMAT (' Step in ',A14,' =',F12.2)
         GOTO (71,72,73), MMODER
-    7   CALL ERRIN2(MODERR(KSOURC),2,'reflection input type',           &
-     &              'not allowed')
+    7   CALL ERRIN2(MODERR(KSOURC),2,'reflection input type','not allowed')
         GOTO 3
-!
-   71   CALL MESS(LPT,1,'Reflection indices input as sets of 3 I5 '//   &
-     &            'integers from .HKL file')
+   71   CALL MESS(LPT,1,'Reflection indices input as sets of 3 I5 integers from .HKL file')
         GOTO 10
-!
-   72   CALL MESS(LPT,1,'Reflection indices to be generated by program' &
-     &            //' then output to file .HKL')
+   72   CALL MESS(LPT,1,'Reflection indices to be generated by program then output to file .HKL')
         GOTO 10
-!
-   73   CALL MESS(LPT,1,'Reflection indices to be generated by program' &
-     &            //' - regenerate next run')
+   73   CALL MESS(LPT,1,'Reflection indices to be generated by program - regenerate next run')
    10   I = 2
         IF (MODERR(KSOURC).LT.0) I = 1
         CALL MESS(LPT,1,INEX(I)//'clude any space group absences')
         GOTO 3
-!
 ! L SPHA:
    15   CALL LPSCAL(1)
         GOTO 3
-!
 ! L PKCN:
    17   CALL RDWORD(IWD,LEN,IPT,IPT,80,-1,IER)
         IF (IWD.NE.'TYPE') CALL PCXX(1)
 !* TEMPORARY - PFXX - IE PFALL - IGNORES ITS OWN 'TYPE' CARDS
         GOTO 3
-!
 ! L ZERO:
    18   CALL ZEROPR(1)
         GOTO 3
-!
 ! L PKFN:
    19   CALL PFALL(1)
         GOTO 3
-!
 ! L WVLN:
    23   IF (TOF) GOTO 3
         CALL RDNUMS(ALAMBD(1,KSOURC),IPT,5,NLAMB,IER)
         WRITE (LPT,2002) NLAMB, (ALAMBD(I,KSOURC),I=1,NLAMB)
  2002   FORMAT (' ',I3,' Wavelength(s): ',5(1X,F9.6))
         GOTO 3
-!
 ! L THE2:
    28   CALL RDREAL(TWOTHD(KSOURC),IPT,IPT,80,IER)
         SINTH = SIN(RADIAN(TWOTHD(KSOURC)/2.))
@@ -3019,36 +2894,27 @@
         WRITE (LPT,2020) TWOTHD(KSOURC), TWSNTH(KSOURC)
  2020   FORMAT (/' 2 theta =',F10.3,' degrees;  2 sin theta =',F10.5)
         GOTO 3
-!
 ! L OMIT:
    29   DO I = 1, 3
           CALL RDINTG(IH(I),IPT,IPT,80,IER)
         ENDDO
         IER = IERR
-!%
-!      CALL ERRCHK(2,MIS,%OMIT%,0,'omitted reflections')
         CALL ERRCHK(2,MIS,100,0,'omitted reflections')
         IF (IER.NE.IERR) GOTO 3
-!
         CALL INDFLO(AMISS(1,MIS),IH)
         WRITE (LPT,2000) IH
- 2000   FORMAT (' Reflection',3I5,' to be EXcluded from the ',          &
-     &          'refinement')
+ 2000   FORMAT (' Reflection',3I5,' to be EXcluded from the refinement')
         GOTO 3
-!
 ! L REFK:
    30   CALL RDREAL(AKNOTS,IPT,IPT,80,IER)
         IF (AKNOTS.LE.1.) THEN
           WRITE (LPT,2051) AKNOTS
- 2051     FORMAT (/' Knots required at spacing of',F7.3,                &
-     &            ' times number of reflections')
+ 2051     FORMAT (/' Knots required at spacing of',F7.3,' times number of reflections')
         ELSE
           WRITE (LPT,2052) NINT(AKNOTS)
  2052     FORMAT (/' Knots required at',I4,' peaks')
         ENDIF
-!
     3 ENDDO
-!
   100 RETURN
       END SUBROUTINE INPLPR
 !*==INRFPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
@@ -3076,7 +2942,6 @@
 !D also, and possibly F4PAR(2.
 !D
 !D If entered with TIC = .TRUE. generates reflections.
-!
 !
       LOGICAL NOMORE, ISPABS, SFC, MAGABS, MAGNET
       CHARACTER*1 ICHR
@@ -3136,7 +3001,7 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /REFLNZ/ ZARGK(MRFLNZ), ZXDEL(MRFLNZ)
       COMMON /SATELL/ PROP(3), KPROP(3), KSTAB(24), NKSTAR, IPROP,      &
@@ -3229,7 +3094,6 @@
           ENDIF
         ENDIF
         GOTO 50
-!
    47   CALL GENMAG(H,NOMORE,MUL,SM,NFLAG)
         IF (NOMORE) THEN
 ! RESTORE FULL SYMMETRY IF NECESSARY (JBF modification)
@@ -3241,7 +3105,7 @@
    50   IF (.NOT.MAG .AND. MODERR(JSOURC).GT.0) THEN
           IF (ISPABS(H)) GOTO 2
         ENDIF
-        DSTAR(1) = VCTMOD(1.,H,2)
+        DSTAR(1) = VCTMOD(1.,H,2) ! @ What about the zero point error?
         IF (DSTAR(1).GT.DSTAMX) GOTO 2
 !
 ! CHECK WHETHER INDICES ARE IN LIST TO OMIT:
@@ -3301,7 +3165,6 @@
         PRECYC = NG4L.LT.NGENPS(4,JPHASE)
         IF (PRECYC) SIMUL = .TRUE.
       ENDIF
-!
       KNOW = 0
       KTIC = 0
       DO KSORT = 1, MAXKK(JPHASE)
@@ -3577,7 +3440,7 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
      &                NPFSOU(9,5), NSOBS(5), SCALES(5), KSCALS(5),      &
@@ -3623,7 +3486,6 @@
               NBASF4(K,1,JP) = NBASF4(I,1,JP)
               GOTO 4
     6       ENDDO
-!
     4       DO I = K - 1, 1, -1
               IF (NBASF4(I,2,JP).EQ.0) GOTO 7
               NBASF4(K,2,JP) = NBASF4(I,2,JP)
@@ -3735,10 +3597,6 @@
       EXTERNAL PFXX, PCXX
       EXTERNAL F2PARS
       EXTERNAL PRPARS
-!%
-!      CHARACTER *4 TEMWRD(%WORD%)
-!%
-!      DIMENSION ITMWRD(3,%WORD%)
       DIMENSION LPAK(5)
       COMMON /F2NAMS/ F2NAME(40)
       CHARACTER*4 F2NAME
@@ -3776,18 +3634,13 @@
         MFAM = 0
         MGEN = 0
         MSPC = 0
-!
 ! PREPARE FIX LIST AND CONSTRAINT LIST FOR CALLS OF ADDFIX, ADDCON
         NUMFV = 0
         NUMPAK = 0
         NUMCON = 0
         KPTCON(1) = 1
       ENDIF
-!
-!%
-!      CALL ERRCHK(1,NFAM,%FAMS%,0,'LSQ families of parameters')
       CALL ERRCHK(1,NFAM,6,0,'LSQ families of parameters')
-!
 ! STARTS OF FAMILIES OF PARAMETERS:
       IF (NFAM.GT.MFAM) MFAM = NFAM
       DO I = 1, NFAM
@@ -3813,13 +3666,9 @@
         KSOURC = 0
 ! SET UP VOCABULARY: FIRST, THE CORE FOR ALL STRUCTURE FACTOR LSQ:
         IWDNUM = 0
-!%
-!        CALL VOCAB(F2NAME,NF2NUM,%F2PR%)
         CALL VOCAB(F2NAME,NF2NUM,40)
 !
 ! THEN A DEFAULT PROFILE VOCABULARY:
-!%
-!        CALL VOCAB(PRNAME,NPRNUM,%PRPR%)
         CALL VOCAB(PRNAME,NPRNUM,14)
 !
 ! ADD SPECIAL VOCABULARY LINKED TO PEAK FUNCTION:
@@ -3901,8 +3750,6 @@
 !
       GOTO (1,100,3,4), N
 !
-!%
-!   1  CALL RDNUMS(SCALES,7,%SORC%,NUM,IER)
     1 CALL RDNUMS(SCALES,7,5,NUM,IER)
       IF (IER.NE.0) IERR = IERR + 1
       IER = IERR
@@ -3953,11 +3800,10 @@
 !O Writes all new and unchanged cards to unit NEWIN, using calls to
 !O parameter-specific routines
 !
-!
       EXTERNAL PCXX, PFXX, MAGSHF
-!
+
       INCLUDE 'PARAMS.INC'
-!
+
       CHARACTER*4 WORD, CHANGE(13)
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
      &                ICDN(26,9), IERR, IO10, SDREAD
@@ -3990,7 +3836,7 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
@@ -4019,7 +3865,6 @@
       ID = 0
       JPHASE = 1
       CALL PHMOVE(1,1)
-!
     1 ID = ID + 1
       IF (MULFAS .AND. ID.EQ.NCDF0+1) WRITE (NEWIN,2005)
       IF (ID.GT.NTOTAL(JPHASE)) THEN
@@ -4040,9 +3885,7 @@
         CALL RDWORD(WORD,IWDLEN,3,IPT,80,0,IER)
         N = NCFIND(WORD,CHANGE,13)
         IF (N.EQ.0) GOTO 2
-!
         GOTO (21,22,23,24,25,26,27,28,29,30,31,32,33), N
-!
       ELSEIF (L.EQ.1 .OR. L.EQ.6 .OR. L.EQ.20) THEN
 ! TREAT A, F AND T ALIKE:
 ! NOT IF CAIL/APES - THERE WILL BE NO STRUCTURE PARAMETERS:
@@ -4064,15 +3907,12 @@
         GOTO 1
       ENDIF
       GOTO 2
-!
 ! TFAC:
    21 CALL LLTFAC(4)
       GOTO 1
-!
 ! SCAL:
    22 CALL LSSCAL(4)
       GOTO 1
-!
 ! RTYP:
    23 MM = MODERR(JSOURC)
       IF (IABS(MM).NE.3) MM = ISIGN(1,MM)
@@ -4080,48 +3920,38 @@
         WRITE (NEWIN,2001) MM, ARGMIN(JSOURC), ARGMAX(JSOURC)
  2001   FORMAT ('L RTYP',I5,2F10.2)
       ELSE
-        WRITE (NEWIN,2002) MM, ARGMIN(JSOURC), ARGMAX(JSOURC),          &
-     &                     ARGSTP(JSOURC)
+        WRITE (NEWIN,2002) MM, ARGMIN(JSOURC), ARGMAX(JSOURC),ARGSTP(JSOURC)
  2002   FORMAT ('L RTYP',I5,3F10.3)
       ENDIF
       GOTO 1
-!
 ! PKCN:
    24 CALL RDWORD(WORD,LEN,IPT,IPT,80,-1,IER)
       IF (WORD.EQ.'TYPE') GOTO 2
       CALL PCXX(4)
 !* TEMPORARY - PFXX - IE PFALL - IGNORES ITS OWN 'TYPE' CARDS
       GOTO 1
-!
 ! PKFN:
    25 CALL PFALL(4)
       GOTO 1
-!
 ! ZERO:
    26 CALL ZEROPR(4)
       GOTO 1
-!
 ! L ATOM
    27 CALL GEOMCO(3)
       GOTO 1
-!
 ! L BACK
    28 IF (IBACK.LE.0) GOTO 2
       CALL BACKPR(4)
       GOTO 1
-!
 ! ABSC
    29 CALL ABCRPR(4)
       GOTO 1
-!
 ! EXTN
    30 CALL EXCRPR(4)
       GOTO 1
-!
 ! PROR
    31 CALL PREFOR(4)
       GOTO 1
-!
 ! TTHM
    32 CALL TTHMLX(4)
       GOTO 1
@@ -4129,13 +3959,10 @@
 ! SPHA:
    33 CALL LPSCAL(4)
       GOTO 1
-!
 ! COPY UNCHANGED CARD:
     2 WRITE (NEWIN,2000) (ICARD(I:I),I=1,LENGT(ICARD))
  2000 FORMAT (80A1)
       GOTO 1
-!
-!
   100 CLOSE (NEWIN)
  2005 FORMAT ('**')
       END SUBROUTINE NWINPR
@@ -4171,7 +3998,7 @@
         INREAD(12) = INRLP1
         ICDNO(12) = ICDLP1
       ENDIF
-      RETURN
+
       END SUBROUTINE P0TEMP
 !*==PARSPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -4192,7 +4019,7 @@
 !
       EXTERNAL MAGPAR
       DIMENSION ISPVEC(10)
-!
+
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       LOGICAL MULFAS, MULSOU, MULONE
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
@@ -4229,25 +4056,20 @@
 ! FIX ALL FAMILY 2 IF CAIL:
         CALL ADDFX5(2,0,0,JPHASE,1,5)
       ENDIF
-!
 ! DEAL WITH ABSENCE OF L TFAC CARD:
       IFAM = 1
       IGEN = 1
       ISPC = 1
       CALL LLTFAC(6)
-!
 ! DEAL WITH ABSENCE OF L ABSC CARD:
       DO JSOUR = 1, NSOURC
         JSOURC = JSOUR
         CALL ABCRPR(6)
       ENDDO
-!
 ! DEAL WITH ABSENCE OF L EXTN CARD:
       CALL EXCRPR(6)
-!
 ! DEAL WITH ABSENCE OF L PROR CARD:
       CALL PREFOR(6)
-!
 ! IF XRAY, DEAL WITH ABSENCE OF 'L TTHM' CARD:
       IF (LX) CALL TTHMLX(6)
 !
@@ -4363,11 +4185,9 @@
      &          *F4PAR(IG,ISPSLK(2,ISK))
         DERIVV(KF4PAR(IG,ISPSLK(1,ISK))) = AMSLAK(1,ISK)
         DERIVV(KF4PAR(IG,ISPSLK(2,ISK))) = -AMSLAK(2,ISK)
-!
         CALL RELATE
         OBS = YCALC
         DIFF = 0.
-!
 ! WEIGHT
 ! FOR NOW, EXTRA WEIGHT IS UNITY:
         SLAKWT(NSLTYP) = 1.
@@ -4422,14 +4242,10 @@
 !      IF (LX) CALL PCLX01(N)
 !
       GOTO 100
-!
-!
       ENTRY PCXX8(NP,NV)
 ! SET PEAK CENTRE PARAMETER NP IS VARIABLE NV:
       KPCNSP(NP,JPHASE,JSOURC) = NV
       GOTO 100
-!
-!
       ENTRY PCXX9
 ! SET ALL PEAK CENTRE PARAMETERS FIXED:
       DO JP = 1, NPHASE
@@ -4440,7 +4256,6 @@
         ENDDO
       ENDDO
       GOTO 100
-!
   100 RETURN
       END SUBROUTINE PCXX
 !*==PFALL.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
@@ -4525,14 +4340,12 @@
         ENDDO
         GOTO 100
       ENDIF
-!
       IF (WORD.EQ.'NFFT') THEN
         CALL RDINTG(NFFT,IPT,IPT,80,IER)
         WRITE (LPT,2007) NFFT
  2007   FORMAT (/' Number of fast Fourier transforms =',I2)
         GOTO 100
       ENDIF
-!
       L = NCFIND(WORD,PWD(1,JPHASE,JSOURC),NPKGEN(JPHASE,JSOURC))
       IF (L.LE.0) THEN
         CALL ERRCH2(WORD,2,'word','after PKFN not recognised')
@@ -4707,7 +4520,7 @@
       DIMENSION KOMM(N)
 !
       WRITE (ISCR) KOMM
-      RETURN
+
       END SUBROUTINE PHLOSE
 !*==PHMOVE.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
@@ -4817,7 +4630,7 @@
       DIMENSION KOMM17(1)
       EQUIVALENCE (KOMM17(1),NATOM)
       COMMON /POSNS2/ NATO(9)
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       DIMENSION KOMM23(1)
       EQUIVALENCE (KOMM23(1),REFH(1,1))
@@ -5007,12 +4820,6 @@
 !
 !
 !
-!
-!
-!
-!
-!
-!
 ! LEVEL 8      SUBROUTINE PREFOR(N)
       SUBROUTINE PREFOR(N)
 !
@@ -5031,7 +4838,7 @@
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       COMMON /PREORI/ NPRTYP, PRFDIR(3), PRFLEN, PRFPAR, KPRFPR, PRFCOR,&
      &                DERPRQ
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
 !
       GOTO (1,2,3,4,5,6), N
@@ -5085,8 +4892,7 @@
       GOTO 100
 !
 ! DEAL WITH ABSENCE OF 'L PROR' CARD:
-    5 CALL MESS(LPT,1,'No L PROR card - assuming no preferred '//       &
-     &          'orientation correction')
+    5 CALL MESS(LPT,1,'No L PROR card - assuming no preferred orientation correction')
       NPRTYP = 0
    50 PRFPAR = 1.
       PRFCOR = 1.
@@ -5219,22 +5025,18 @@
         ELSE
           IF (MULFAS) CALL P0TEMP(.TRUE.)
           CALL FINDCD('L','SORC',4,0,L)
-!
           IF (L.EQ.0) THEN
             NSOURC = 1
 !.. set to SYNX
             NDASOU(1) = 4
-            CALL MESS(LPT,1,'Default source of data       : '//         &
-     &                SORCWD(NDASOU(1)))
+            CALL MESS(LPT,1,'Default source of data       : '// SORCWD(NDASOU(1)))
             GOTO 4
           ENDIF
-!
 ! READ ALL SOURCES FROM THE ONE CARD ON CDF FOR FIRST PHASE:
           NSOURC = 0
           IPT = 7
     3     CALL RDWORD(WORD,LEN,IPT,IPT,80,0,IER)
           IF (IER.EQ.100) GOTO 4
-!
           CALL ERRCHK(2,NSOURC,5,0,'PR data sources')
           NDASOU(NSOURC) = NCFIND(WORD,SWORDS,5)
           IF (NDASOU(NSOURC).EQ.0) THEN
@@ -5243,13 +5045,10 @@
 !.. set to SYNX
             NTEM = 4
             NDASOU(NSOURC) = NTEM
-            CALL MESS(LPT,1,'Default source of data       : '//         &
-     &                SORCWD(NTEM))
+            CALL MESS(LPT,1,'Default source of data       : '//SORCWD(NTEM))
           ELSE
-            IF (NSOURC.EQ.1) CALL MESS(LPT,1,'Source of data       : '//&
-     &                                 SORCWD(NDASOU(1)))
-            IF (NSOURC.GT.1) WRITE (LPT,2005) NSOURC,                   &
-     &                              SORCWD(NDASOU(NSOURC))
+            IF (NSOURC.EQ.1) CALL MESS(LPT,1,'Source of data       : '//SORCWD(NDASOU(1)))
+            IF (NSOURC.GT.1) WRITE (LPT,2005) NSOURC, SORCWD(NDASOU(NSOURC))
  2005       FORMAT (' Source of data no.',I3,' : ',A27)
           ENDIF
           GOTO 3
@@ -5307,8 +5106,7 @@
           CALL RDWORD(WORD,LEN,7,IPT,80,0,IER)
           METHOD(JPHASE) = NCFIND(WORD,TYPEWD,6)
           IF (METHOD(JPHASE).EQ.0) THEN
-            CALL ERRCH2(WORD,0,'refinement type word',                  &
-     &                  'not recognised - assuming Rietveld analysis')
+            CALL ERRCH2(WORD,0,'refinement type word','not recognised - assuming Rietveld analysis')
             METHOD(JPHASE) = 1
           ELSE
             IF (MULFAS) THEN
@@ -5319,7 +5117,6 @@
             ENDIF
           ENDIF
         ENDIF
-!
 ! READ "L PKFN" *Sn "TYPE" CARDS:
         K = 0
     8   CALL FINDCD('L','PKFN',4,K,L)
@@ -5331,7 +5128,6 @@
         CALL RDINTG(NPFSOU(JPHASE,KSOURC),IPT,IPT,80,IER)
 ! CHECK COMPATIBILITY
         GOTO 8
-!
 ! CHECK ALL PEAK FUNCTION TYPES SET:
    12   DO I = 1, NSOURC
           IF (NPFSOU(JPHASE,I).EQ.0) THEN
@@ -5353,10 +5149,8 @@
             ENDIF
           ENDIF
         ENDDO
-!
       ENDDO
       CALL WRLINE(1,60,'-',1)
-!
 ! PUT VECTORS BACK:
       DO JPHASE = NPHASE, 2, -1
         CALL VCSWOP(INREA(1,JPHASE),INREA(1,1),26)
@@ -5448,7 +5242,7 @@
      &                PRECYC, TIC
       LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC,&
      &        TIC
-!>> JCC Moved to an include file
+! JCC Moved to an include file
       INCLUDE 'REFLNS.INC'
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
@@ -5486,8 +5280,6 @@
       SMID = 0.0
       RINUM = 0.
       RIDEN = 0.
-!%
-!      DO 21 I=1,%REFS%
       DO I = 1, REFDIM
         AIOBS(I) = 0.0
         ESDOBS(I) = 0.0
@@ -5559,10 +5351,8 @@
         CALL MESS(LPT,0,'- not available because denominators zero')
         GOTO 13
       ENDIF
-!
       WRITE (LPT,2016) 100.*SMYD/SMYO
- 2016 FORMAT (/' Profile R factors'/                                    &
-     &        ' 100 (Sum Y Diffs/Y Obs) =                  ',F8.2)
+ 2016 FORMAT (/' Profile R factors'/' 100 (Sum Y Diffs/Y Obs) =                  ',F8.2)
       WRITE (LPT,2021) 100.*SMYD/SMYOB
  2021 FORMAT (' 100 (Sum Y Diffs/(Sum Y Obs - Y Back)) =   ',F8.2)
       WRITE (LPT,2012) 100.*SQRT(SUMWD/SMWYOS)
@@ -5570,8 +5360,7 @@
      &        ' 100 Sqrt(Sum wt diffs sqrd/Sum wt obs sqrd)  ',         &
      &        '=        ',F8.2)
       WRITE (LPT,2022) 100.*SQRT(SUMWD/SWYOBS)
- 2022 FORMAT (' 100 Sqrt(Sum wt diffs sqrd/Sum wt (obs-back) ',         &
-     &        'sqrd)  = ',F8.2)
+ 2022 FORMAT (' 100 Sqrt(Sum wt diffs sqrd/Sum wt (obs-back) ','sqrd)  = ',F8.2)
       FREE = FLOAT(NOBS-LVARB)
       WRITE (LPT,2013) 100.*SQRT(FREE/SMWYOS)
  2013 FORMAT (/' Expected R factor =                  ',F8.2)
@@ -5616,8 +5405,7 @@
  2080 FORMAT (/' Phase',I3,' :')
 !
       WRITE (LPT,2011) 100.*SMID/SMIO
- 2011 FORMAT (/' Integrated Intensity R factor'/                        &
-     &        ' 100 (Sum I Diffs/Sum I Obs) = ',F8.2)
+ 2011 FORMAT (/' Integrated Intensity R factor'/' 100 (Sum I Diffs/Sum I Obs) = ',F8.2)
 !
 ! WEIGHTED, SQUARED INTENSITY R FACTOR:
       WRITE (LPT,2029) 100.*RINUM/RIDEN
@@ -5628,8 +5416,7 @@
 ! CHI SQUARED FOR INTENSITIES:
       WRITE (LPT,2028) RINUM/(FLOAT(MAXKK(JPHASE)-NVARF(2,JPHASE,1))),  &
      &                 MAXKK(JPHASE), NVARF(2,JPHASE,1)
- 2028 FORMAT (/' Chi squared for Intensities =',F10.4,' for',I5,        &
-     &        ' reflections and',I4,' structure variables')
+ 2028 FORMAT (/' Chi squared for Intensities =',F10.4,' for',I5,' reflections and',I4,' structure variables')
 !
 ! AND SUMS OF IDIFFS, IOBS:
       WRITE (LPT,2024) SMID, SMIO
@@ -5637,8 +5424,7 @@
 !
 ! AND OTHER CONSTITUENT PARTS:
       WRITE (LPT,2027) RINUM, RIDEN
- 2027 FORMAT (/' Sum weighted I diffs sqrd =',F12.2,' Sum weighted',    &
-     &        ' I obs sqrd =',F12.2)
+ 2027 FORMAT (/' Sum weighted I diffs sqrd =',F12.2,' Sum weighted',' I obs sqrd =',F12.2)
 !
 !  PRINT IOBS, ICALC ETC.
    14 IF (.NOT.PRNCYC(2) .AND. .NOT.PRECYC) GOTO 4
@@ -5648,17 +5434,13 @@
           F4PESD(1,I) = 0.
         ENDDO
       ENDIF
-      IF (MAG .AND. .NOT.FIXED) CALL MESS(LPT,1,'      h       k'//     &
-     &    '       l      Argument      I(obs)       I(calc)'//          &
+      IF (MAG .AND. .NOT.FIXED) CALL MESS(LPT,1,'      h       k       l      Argument      I(obs)       I(calc)'//          &
      &    '         Diff        Esd(obs)     F*F       Q*Q')
       IF (MAG .AND. FIXED) CALL MESS(LPT,1,'    h    k'//               &
      &                   '    l      Argument      I(obs)       I(calc)'&
      &                   //                                             &
-     &                 '         Diff        Esd(obs)     F*F       Q*Q'&
-     &                 )
-      IF (.NOT.MAG) CALL MESS(LPT,1,'    h    k    l    Argument'//     &
-     &                        '      I(obs)       I(calc)         Diff' &
-     &                        //'        Esd(obs)     F*F')
+     &                 '         Diff        Esd(obs)     F*F       Q*Q')
+      IF (.NOT.MAG) CALL MESS(LPT,1,'    h    k    l    Argument      I(obs)       I(calc)         Diff        Esd(obs)     F*F')
       DO K = 1, MAXKK(JPHASE)
         CALL INDFIX(REFH(1,K),IH)
         IF (AICALC(K).NE.-9999.) GOTO 26
@@ -5691,17 +5473,14 @@
         IF (MAG) THEN
           CALL FMCALC(REFH(1,K),FMCMOD,FMCSQR)
           IF (.NOT.FIXED) THEN
-            WRITE (LPT,2042) (REFH(I,K),I=1,3), ARGK, AIOBS(K),         &
-     &                       AICALC(K), AIDIFF, ESDOB, FNSQ, FMCSQR
+            WRITE (LPT,2042) (REFH(I,K),I=1,3), ARGK, AIOBS(K), AICALC(K), AIDIFF, ESDOB, FNSQ, FMCSQR
  2042       FORMAT (1X,3F8.3,F12.2,4F14.4,2F10.3)
           ELSE
-            WRITE (LPT,2043) IH, ARGK, AIOBS(K), AICALC(K), AIDIFF,     &
-     &                       ESDOB, FNSQ, FMCSQR
+            WRITE (LPT,2043) IH, ARGK, AIOBS(K), AICALC(K), AIDIFF, ESDOB, FNSQ, FMCSQR
  2043       FORMAT (1X,3I5,F12.2,4F14.4,2F10.3)
           ENDIF
         ELSE
-          WRITE (LPT,2006) IH, ARGK, AIOBS(K), AICALC(K), AIDIFF, ESDOB,&
-     &                     FNSQ
+          WRITE (LPT,2006) IH, ARGK, AIOBS(K), AICALC(K), AIDIFF, ESDOB, FNSQ
  2006     FORMAT (1X,3I5,F12.2,4F14.4,F10.3)
         ENDIF
         IF (PRECYC) THEN
@@ -5743,8 +5522,8 @@
 !
 ! ENTRY FROM CALXX TO KEEP GCALC OF ALL K FOR THIS ONE I, AND ADD IN
 ! CONTRIBUTIONS TO SOMEGA - KNOW HOLDS CURRENT K:
-!>> JCC There is an array bound error here sometimes - needs fixing.
-!>> It seems that KMIN is far bigger than KNOW
+! @ JCC There is an array bound error here sometimes - needs fixing.
+! It seems that KMIN is far bigger than KNOW
 !   6  GGCALC(KNOW-KMIN+1)=GCALC
 ! For now just check the bound and skip if its outside the range ..
     6 CONTINUE
@@ -5972,8 +5751,6 @@
         NGENPS(1,JPHASE) = 1
         NSPCPS(1,JPHASE) = 20
         NGENPS(6,JPHASE) = 3
-!%
-!      NSPCPS(6,JPHASE)=%BACK%
         NSPCPS(6,JPHASE) = 100
         NFAM = 6
         IF (RIET) THEN
@@ -5986,8 +5763,6 @@
             NGENPS(4,JPHASE) = NGEN4(JPHASE,JSOURC)
           ENDIF
 ! SPECIES IN FAMILY 4 ALSO SET WHEN MAX K KNOWN - THIS IS FOR PACKING KK:
-!%
-!        NSPCPS(4,JPHASE)=%REFS%
           NSPCPS(4,JPHASE) = ITMREF
         ENDIF
 ! IN CASE USER GIVES A CARDS ETC FOR A CAIL PHASE, AND L RELA ETC:
@@ -6125,7 +5900,6 @@
       NFUDGE = 0
 ! DEFAULT NO. OF FFT:
       NFFT = 1
-!
       DO J = 1, NSOURC
         NBACK(J) = 0
         NEXCL(J) = 0
@@ -6151,16 +5925,14 @@
 ! DEFAULT IF NO L OTYP CARD GIVING FORMAT TYPE OF OBSERVATION DATA:
       IF (ILREA(10,JSOURC).EQ.0) THEN
         MODEOB(JSOURC) = 1
-        CALL MESS(LPT,1,'No L OTYP card - assuming observations given'//&
-     &            ' in mode 1 (format 3F)')
+        CALL MESS(LPT,1,'No L OTYP card - assuming observations given in mode 1 (format 3F)')
       ENDIF
 !
 ! L BACK CARDS NEEDED:
       IF (ILREA(11,JSOURC).EQ.0) CALL ERRMES(2,1,'L BACK cards')
 !
 ! SET UP SPLINE COEFFICIENTS IF REQUIRED:
-      IF (IBACK.EQ.-2) CALL SPLINE(NBACK(JSOURC),ARGBAK(1,JSOURC),      &
-     &                             BACKGD(1,JSOURC),SCOEFF(1,JSOURC))
+      IF (IBACK.EQ.-2) CALL SPLINE(NBACK(JSOURC),ARGBAK(1,JSOURC), BACKGD(1,JSOURC),SCOEFF(1,JSOURC))
 !
 ! REMARK IF NO EXCLUDED ZONES:
       IF (ILREA(12,JSOURC).EQ.0) CALL MESS(LPT,1,'No excluded regions')
@@ -6173,13 +5945,11 @@
 !
 ! TOF AND/OR ED:
 ! NEED L THE2 CARD GIVING 2 THETA DEGREES:
-      IF ((TOF.OR.ED) .AND. ILREA(18,JSOURC).EQ.0)                      &
-     &     CALL ERRMES(2,1,'L THE2 card giving counter angle')
+      IF ((TOF.OR.ED) .AND. ILREA(18,JSOURC).EQ.0) CALL ERRMES(2,1,'L THE2 card giving counter angle')
 !
 ! CN, SR AND/OR LX:
 ! NEED L WVLN CARD:
-      IF ((CN.OR.LX.OR.SR) .AND. ILREA(13,JSOURC).EQ.0)                 &
-     &     CALL ERRMES(2,1,'L WVLN card giving wavelength')
+      IF ((CN.OR.LX.OR.SR) .AND. ILREA(13,JSOURC).EQ.0) CALL ERRMES(2,1,'L WVLN card giving wavelength')
 !
 ! LX:
 ! NEED L TTHM:
@@ -6201,7 +5971,6 @@
           PKCNSP(2,IJ,KSOURC) = PKCNSP(2,1,KSOURC)
         ENDDO
       ENDIF
-!
 ! MUST HAVE L ZERO CARD:
       IF (ILREAD(8).EQ.0) THEN
         CALL ERRMES(2,1,'L ZERO card giving zero point')
@@ -6211,17 +5980,14 @@
           ZEROSP(1,IJ,KSOURC) = ZEROSP(1,1,KSOURC)
         ENDDO
       ENDIF
-!
 ! DEFAULT IF NO L ABSC CARD FOR ABSORPTION CORRECTION:
       IF (ILREA(14,JSOURC).EQ.0) CALL ABCRPR(5)
 !
 ! DEFAULT IF NO RTYP CARD - TYPE 1:
       IF (ILREA(4,JSOURC).EQ.0) THEN
         MODERR(JSOURC) = 1
-        CALL MESS(LPT,1,'No L RTYP card - assuming  reflection '//      &
-     &            'indices input as a list of 3I5 h,k,l on given file')
+        CALL MESS(LPT,1,'No L RTYP card - assuming  reflection indices input as a list of 3I5 h,k,l on given file')
       ENDIF
-!
       CALL PCXX(6)
       WRITE (LPT,2008) STHMXX(JSOURC)
  2008 FORMAT (/' Maximum sin theta is',F10.4)
@@ -6327,8 +6093,6 @@
 ! CLEAR CONSTRAINT COUNTS FOR GEOMETRY AND PAWLEY:
       NUMBON = 0
       NSKTOT = 0
-!%
-!      CALL JGMZER(NSLAK,1,%SKTP%)
       CALL JGMZER(NSLAK,1,4)
 !
 ! DEFAULT IF NO L TFAC:
@@ -6419,34 +6183,23 @@
 !** WE WILL NEED OUTPUT FACILITIES FOR THESE *S CARDS AS WELL AS IN
       GOTO 100
 !
-!
 ! DEAL WITH ABSENCE OF 'L TTHM' CARD:
-    5 CALL MESS(LPT,1,'No L TTHM card - assuming monochromator'//       &
-     &          ' 2 theta = 0')
+    5 CALL MESS(LPT,1,'No L TTHM card - assuming monochromator 2 theta = 0')
       TTHMON(JSOURC) = 0.0
       GOTO 19
-!
 ! FIX TTHMON  IF NO CARD GIVEN:
     6 IF (ABS(TTHMON(JSOURC)).LT.0.001) CALL ADDFX5(6,1,2,1,JSOURC,4)
       GOTO 100
-!
-!
       ENTRY THMLX8(NV)
 ! RECORD PARAMETER AS VARIABLE NUMBER NV:
       KTHMON(JSOURC) = NV
       GOTO 100
-!
-!
       ENTRY THMLX9
 ! RECORD PARAMETER AS FIXED:
       KTHMON(JSOURC) = 0
-!
   100 RETURN
       END SUBROUTINE TTHMLX
 !*==VARSPR.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!
-!
-!
 !
 !
 !
@@ -6500,7 +6253,6 @@
         CALL LPSCA9
         CALL PHMOVE(-1,JPHASE)
       ENDDO
-!
 ! BE SURE TO PUT THESE IN THE APPROPRIATE "ALL PHASE" OR "ALL SOURCE" LOOPS:
       CALL PFALL9
       CALL EXCPR9
@@ -6525,8 +6277,7 @@
           CALL PHMOVE(1,JPHASE)
           CALL LOGPHA(JPHASE)
         ENDIF
-        IF ((IFAM.EQ.3.OR.IFAM.EQ.6) .AND. (JS.NE.JSOURC))              &
-     &      CALL LOGSOU(JSOURC)
+        IF ((IFAM.EQ.3.OR.IFAM.EQ.6) .AND. (JS.NE.JSOURC)) CALL LOGSOU(JSOURC)
         JP = JPHASE
         JS = JSOURC
 !
@@ -6617,7 +6368,6 @@
 !
 !
 !
-!
 ! LEVEL 1      SUBROUTINE VCSWOP(N1,N2,J)
       SUBROUTINE VCSWOP(N1,N2,J)
 !
@@ -6636,13 +6386,9 @@
         N1(I) = N2(I)
         N2(I) = NTEMP
       ENDDO
-      RETURN
+
       END SUBROUTINE VCSWOP
 !*==WRLINE.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!
-!
-!
-!
 !
 !
 !
@@ -6665,10 +6411,8 @@
       DO I = 1, N1
         WRITE (LPT,2001)
       ENDDO
-!
       WRITE (LPT,2000) (CHAR,I=1,LEN)
  2000 FORMAT (1X,120A1)
-!
       DO I = 1, N2
         WRITE (LPT,2001)
       ENDDO
@@ -6718,19 +6462,14 @@
 ! APPLY SHIFT IN COEFFICIENT:
     3 CALL ADJUST(ZEROSP(ISPC,JPHASE,JSOURC))
       GOTO 100
-!
 ! WRITE OUT NEW 'L ZERO' CARD FOR TOF:
     4 WRITE (NEWIN,2001) ZEROSP(1,JPHASE,JSOURC)
  2001 FORMAT ('L ZERO',F10.4)
       GOTO 100
-!
-!
       ENTRY ZERPR8(NP,NV)
 ! SET PARAMETER NP TO BE VARIABLE NV
       KZROSP(NP,JPHASE,JSOURC) = NV
       GOTO 100
-!
-!
       ENTRY ZERPR9
 ! SET ALL ZEROPOINT PARAMETERS FIXED:
       DO I = 1, NZERSP(JPHASE,JSOURC)

@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE sa_Defaults()
+      SUBROUTINE SA_SetOutputFilenamesToDefaults()
 
       CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
       COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
@@ -10,28 +10,25 @@
 
       LOGICAL outfilset
       COMMON /outfileset/ outfilset
-      DATA outfilset/ .FALSE. /
+      DATA outfilset / .FALSE. /
 
-      IF (.NOT. outfilset) THEN
-        cssr_file = 'SA_best.cssr'
-        pdb_file  = 'SA_best.pdb'
-        ccl_file  = 'SA_best.ccl'
-        log_file  = 'SA_best.log'
-! ep appended
-        pro_file  = 'SA_best.pro'
-        cssr_flen = LEN_TRIM(cssr_file)
-        pdb_flen  = LEN_TRIM(pdb_file)
-        ccl_flen  = LEN_TRIM(ccl_file)
-        log_flen  = LEN_TRIM(ccl_file)
-! ep appended
-        pro_flen  = LEN_TRIM(pro_file)
-      END IF
+      IF (outfilset) RETURN
+      cssr_file = 'SA_best.cssr'
+      pdb_file  = 'SA_best.pdb'
+      ccl_file  = 'SA_best.ccl'
+      log_file  = 'SA_best.log'
+      pro_file  = 'SA_best.pro'
+      cssr_flen = LEN_TRIM(cssr_file)
+      pdb_flen  = LEN_TRIM(pdb_file)
+      ccl_flen  = LEN_TRIM(ccl_file)
+      log_flen  = LEN_TRIM(ccl_file)
+      pro_flen  = LEN_TRIM(pro_file)
 
-      END SUBROUTINE sa_Defaults
+      END SUBROUTINE SA_SetOutputFilenamesToDefaults
 !
 !*****************************************************************************
 !
-!C>> JCC New subroutine to set the output file names
+! JCC New subroutine to set the output file names
       SUBROUTINE sa_SetOutputFiles(FileHead)
 
       IMPLICIT NONE
@@ -47,16 +44,6 @@
       COMMON /outfileset/ outfilset
 
       INTEGER POS
-
-! The first line causes array bounds to exceed
-!O      i = len_trim(filehead) + 1
-!O!C>> By default, set the output files to <sdifile head>.cssr etc
-!O!C Next code allows us to pass in a full filename (strips out the extension if present)
-!O       do while (i .GT. 0 .AND. filehead(i:i) .NE. '.')
-!O            i = i - 1
-!O       end do
-!O       if (i .EQ. 0) i = len_trim(filehead) + 1
-!O       i = i - 1
 
 ! Find the last occurrence of '.'
       POS = LEN_TRIM(FileHead)
