@@ -74,7 +74,7 @@
 ! mol2 files contain an unresolved ambiguity: atom co-ordinates are given wrt. the 
 ! the orthogonal axes, but the unit cell is given as a, b, c, alpha, beta, gamma.
 ! It is not specified how the unit cell is to be constructed from the unit cell parameters.
-! Mercury turns out to chose: a along x. Everywhere else in DASH, we have used c along z
+! Mercury turns out to choose: a along x. Everywhere else in DASH, we have used c along z
 !
 ! Calculates right-handed lattice from cell parameters, a along x, b in xy plane
 !
