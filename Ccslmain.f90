@@ -572,6 +572,9 @@
 !
 ! LEVEL 5      SUBROUTINE ADJUST(PAR)
       SUBROUTINE ADJUST(PAR)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
 !
 !
 ! *** ADJUST updated by JCM 11 Jan 88 ***
