@@ -38,21 +38,17 @@ C
       COMMON /POSNS/NATOM,X(3,150),KX(3,150),AMULT(150),
      & TF(150),KTF(150),SITE(150),KSITE(150),
      & ISGEN(3,150),SDX(3,150),SDTF(150),SDSITE(150),KOM17
-C ep appended
-        character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
-     &                     pro_file   
-        common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
-     &                     log_file, pro_file
-        common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
-     &                     log_flen, pro_flen
-c
-C>> JCC Cell/Lattice declarations now in an include file
-
+      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &pro_file   
+      COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
+     &log_file,pro_file
+      INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
+     &log_flen,pro_flen
 
 	parameter (mpdbops=192)
 	character*20 cpdbops(mpdbops)
 	common /pdbops/ npdbops,cpdbops
-
 
 C>> JCC the original atom ids to list in the labels and the back mapping
 	common /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
@@ -60,6 +56,7 @@ C>> JCC Use standard PDB orthogonalisation
 	double precision f2cpdb, c2fpdb
 	real qvals(4), qnrm
 	common /pdbcat/ f2cpdb(3,3), c2fpdb(3,3)
+	INCLUDE 'GLBVAR.INC'
 	include 'Lattice.inc'
       include 'statlog.inc'
 c
@@ -562,13 +559,14 @@ C Expand the symmetry generators into a list of symm ops by cross-multiplication
       Subroutine AddSingleSolution(ProfileChi,IntensityChi)
 
 	REAL ProfileChi,IntensityChi
-C ep appended
-      character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
-     &						pro_file
-      common /outfilnam/logsa_file,cssr_file,pdb_file,ccl_file,log_file,
-     &						pro_file
-      common /outfillen/logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,
-     &						pro_flen
+      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &pro_file   
+      COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
+     &log_file,pro_file
+      INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
+     &log_flen,pro_flen
+
 	LOGICAL RESTART
 	INTEGER SA_Run_Number
 	COMMON /MULRUN/ RESTART, SA_Run_Number, 
@@ -588,12 +586,13 @@ C ep appended
 	INTEGER SA_Run_Number
 	COMMON /MULRUN/ RESTART, SA_Run_Number, 
      &                MaxRuns,  MinMoves, MaxMoves, ChiMult
-C ep appended
-      character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
-     &    pro_file
-      common /outfilnam/logsa_file,cssr_file,pdb_file,ccl_file,log_file,
-     &    pro_file
-      common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,pro_flen
+      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &pro_file   
+      COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
+     &log_file,pro_file
+      INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
+     &log_flen,pro_flen
 c
 	character*85 new_fname
 

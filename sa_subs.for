@@ -102,14 +102,14 @@ c
 c
       common /sappcmn/ xpmin,xpmax,ypmin,ypmax
       common /chibest/ ycalbest(MCHSTP)
-c
-c ep appended
-        character*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
-     &					 pro_file	
-        common /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
-     &                     log_file, pro_file
-        common /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
-     &                     log_flen, pro_flen
+
+      CHARACTER*80 logsa_file,cssr_file,pdb_file,ccl_file,log_file,
+     &pro_file   
+      COMMON /outfilnam/ logsa_file,cssr_file,pdb_file,ccl_file,
+     &log_file,pro_file
+      INTEGER logsa_flen,cssr_flen,pdb_flen,ccl_flen,log_flen,pro_flen
+      COMMON /outfillen/ logsa_flen,cssr_flen,pdb_flen,ccl_flen,
+     &log_flen,pro_flen
 C
       DOUBLE PRECISION PRJAV,PRJSD
       DOUBLE PRECISION PRJMAT0,PRJMAT1,PRJMAT2
@@ -230,6 +230,10 @@ c
 C  If the function is to be minimized, switch the sign of the function.
 C  Note that all intermediate and final output switches the sign back
 C  to eliminate any possible confusion for the user.
+
+! JvdS According to the compiler, this part was never initialised.
+! As it usually works, I assume MAXLOG is usually 0 probably meaning .FALSE.
+      MAXLOG = .FALSE.
       IF(.NOT. MAXLOG) F = -F
       NFCNEV = NFCNEV + 1
       FOPT = F
