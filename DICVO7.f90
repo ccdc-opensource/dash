@@ -1,4 +1,6 @@
-!*==AFFPAR.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     |       A F F I N E M E N T   D E S   P A R A M E T R E S        |
 !     ------------------------------------------------------------------
@@ -620,7 +622,7 @@
         Deltaq = Difq + Deltaq
         Dtheta = Dtet + Dtheta
       ENDDO
-!     Figures of merit
+! Figures of merit
       Deltaq = Deltaq/nini
       Dtheta = Dtheta/nini
       fwolff = q(n)/(2.*nposs*Deltaq)
@@ -637,9 +639,9 @@
 99020   FORMAT (//10X,'* FIGURES OF MERIT'/17X,'1.- M(',I3,') =',F7.1,25X,'(REF. 4)'/17X,'2.- F(',I3,') =',F7.1,   &
      &          '(',F6.4,',',I4,')',12X,'(REF. 5)'/)
         IF ( Llave.EQ.2 ) GOTO 600
-!TEST N. 2 : FIGURES DE MERITE (A ENLEVER ?)
+! TEST N. 2 : FIGURES DE MERITE (A ENLEVER ?)
         R = 2.*dth*nposs
-!                  DTH= ERREUR SUR 2THETA
+! DTH= ERREUR SUR 2THETA
         Fwtest = TAN(th(n)/2.)/R
         Fitest = 2.*nini/R
         IF ( Fwtest.LE.fwolff .AND. Fitest.LE.Findex ) GOTO 600
@@ -685,14 +687,14 @@
 99022 FORMAT (2x,'=====>  CELL VOLUME = ',F7.1,' A**3     M(',I2,')=',F6.1,'  F(',I2,')=',F6.1,'(',F6.4,',',I3,')')
 
 99999 END SUBROUTINE AFFPAR
-!*==PASAJE.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE PASAJE(Ind)
 
       USE DICVAR
 
       IMPLICIT NONE
-!
-!*** Start of declarations rewritten by SPAG
 !
 ! Dummy arguments
 !
@@ -702,9 +704,7 @@
 ! Local variables
 !
       REAL :: Cosa, Cosb, Cosg, Sina, Sinb, Sing, Svol, Vol
-!
-!*** End of declarations rewritten by SPAG
-!
+
       rec(1) = 1./par(1)
       SELECT CASE (Ind)
       CASE (1) ! Cubic ?
@@ -739,3 +739,6 @@
       END SELECT
 
       END SUBROUTINE PASAJE
+!
+!*****************************************************************************
+!
