@@ -24,8 +24,7 @@
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
 !
       COMMON /SAREFLNS/ AIOBS(MSAREF), AICALC(MSAREF)
-      COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), S2S(MCHIHS), S4S(MCHIHS),     &
-     &                IKKOR(MCHIHS), JKKOR(MCHIHS)
+      COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 !
       LOGICAL IHMINLT0, IKMINLT0, ILMINLT0
       COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0
@@ -38,7 +37,6 @@
 !
       OPEN (121,FILE=FILENAM(:Lenfil),STATUS='OLD',ERR=998)
       KK = 0
-      MREF = MSAREF
       KKOR = 0
       MINCOR = 20
       IER = 0
@@ -58,7 +56,7 @@
       ENDDO
       NCOR = NCOR - 1
       BACKSPACE (121)
-      DO IR = 1, MREF
+      DO IR = 1, MSAREF
         READ (121,*,END=100,ERR=998) (IREFH(I,IR),I=1,3), AIOBS(IR),    &
      &                               WTI(IR), KL, (ICOR(I),I=1,NCOR)
         KK = IR
