@@ -12,7 +12,6 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
 
       INTEGER         MAXK
       REAL                  FOB
@@ -91,13 +90,10 @@
         IIMIN = MIN(ITEM,IIMIN)
         IIMAX = MAX(ITEM,IIMAX)
       ENDDO
-!
   200 CONTINUE
-!
       IHMINLT0 = IHMIN.LT.0
       IKMINLT0 = IKMIN.LT.0
       ILMINLT0 = ILMIN.LT.0
-!
       IF (ABS(ihmin).GT.ABS(ihmax)) THEN
         ihmax = ABS(ihmin)
       ENDIF
@@ -107,7 +103,6 @@
       IF (ABS(ilmin).GT.ABS(ilmax)) THEN
         ilmax = ABS(ilmin)
       ENDIF
-!
 !
 ! JvdS Replaced include by its contents (the include file was used only once)
 !O      include 'GET_LOGREF.inc'
@@ -137,7 +132,6 @@
 !     they hold the result of some modulus style calculation performed
 !     on the related variable.  Hence K_m=2*(K_/2) followed by a test
 !     of "does K_ equal K_m?" tests whether or not k is even.
-!
 !
       SELECT CASE (NumberSGTable)
       CASE (1,2,40,58,430,433,434,435,356,449,451,462,468)      ! P1,P-1,C 1 2 1,C 1 2/m 1,P3,P-3,R3(hex),R-3(hex),I-4,P-31m, P-3m1, P6, P-6

@@ -11,8 +11,6 @@
 
       TYPE(WIN_STYLE)   :: MAIN_WINDOW
 
-      INCLUDE 'STATLOG.INC'
-
       INTEGER :: IWIDTHS(10)
       INTEGER :: IWID
 

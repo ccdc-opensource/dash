@@ -6,18 +6,22 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
+      IMPLICIT NONE
+
       INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
-      INCLUDE 'statlog.inc'
 
       REAL ChiGetLattice
       EXTERNAL ChiGetLattice
 
+      INTEGER    MPAR,   MMPAR
       PARAMETER (MPAR=50,MMPAR=MPAR*MPAR)
       REAL XDD(MPAR),DXDD(MPAR),COVDD(MMPAR)
 
-      COMMON /FUNVAL/ NVAL,XVAL(MVAL),YVAL(MVAL),ZVAL(MVAL),EVAL(MVAL)
+      INTEGER         NVAL
+      REAL                  XVAL,       YVAL,       ZVAL,       EVAL
+      COMMON /FUNVAL/ NVAL, XVAL(MVAL), YVAL(MVAL), ZVAL(MVAL), EVAL(MVAL)
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
@@ -32,12 +36,14 @@
 
       INTEGER IASS(6)
       LOGICAL NOCREF
-      REAL GReal(3,3),GRec(3,3)
+      REAL    GReal(3,3), GRec(3,3)
       INTEGER KELPT(6,10)
       DATA KELPT /2,3,4,5,6,7, 2,3,4,5,10,10, 2,3,4,10,5,10, 2,3,4,10,10,5, &
       2,3,4,10,10,10, 2,2,3,10,10,10, 2,2,3,9,10,10, &
       2,2,2,3,3,3, 2,2,3,9,10,10, 2,2,2,10,10,10/ 
       LOGICAL FnWaveLengthOK, FnUnitCellOK ! Function
+      INTEGER I, II, Iord, NDD
+      REAL    DDMAX
 
 ! JCC Check the wavelength: if the user has not set it, then
 ! we should not be here!

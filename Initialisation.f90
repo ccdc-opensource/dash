@@ -527,7 +527,6 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
       INCLUDE 'lattice.inc'
       INCLUDE 'Poly_Colours.inc'
 
@@ -720,7 +719,6 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
       INCLUDE 'lattice.inc'
       INCLUDE 'Poly_Colours.inc'
 

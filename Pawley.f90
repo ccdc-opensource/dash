@@ -759,14 +759,17 @@
       USE DRUID_HEADER
       USE VARIABLES
 
+      IMPLICIT NONE
+
       CHARACTER*(*), INTENT (IN   ) :: SDIFileName
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+
+      INTEGER LSDI, iDot, I, L1, L4
 !
 !.. First copy the .pik .tic and .hcv files
 !

@@ -164,7 +164,6 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,        YCAL,        YBAK,        EOBS
