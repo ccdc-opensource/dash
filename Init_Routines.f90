@@ -18,10 +18,69 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE Clear_PO
+      SUBROUTINE Clear_Bins
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+
+      LBIN = 1
+!      CALL Update_Bins
+
+      END SUBROUTINE Clear_Bins
+
+!
+!*****************************************************************************
+!
+      SUBROUTINE Update_Solutions
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE SOLVAR
+
+      IMPLICIT NONE
+
+      LOGICAL         RESTART
+      INTEGER                  Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                                    ChiMult
+      COMMON /MULRUN/ RESTART, Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      INTEGER iSol
+      CHARACTER*2 RowLabelStr
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
+      DO iSol = 1, NumOf_SA_Runs
+        WRITE(RowLabelStr,'(I2)') iSol
+        CALL WGridLabelRow(IDF_SA_summary,iSol,RowLabelStr)
+        CALL WGridPutCellInteger (IDF_SA_Summary,1,iSol,iSolOrder(iSol)) 
+        CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSolOrder(iSol)))
+        CALL WGridPutCellReal    (IDF_SA_Summary,4,iSol,ProfileChiSqd(iSolOrder(iSol)),'(F7.2)')
+        CALL WGridPutCellReal    (IDF_SA_Summary,5,iSol,IntensityChiSqd(iSolOrder(iSol)),'(F7.2)')
+      ENDDO
+      CALL WDialogSelect(IDD_Summary)
+      CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
+      DO iSol = 1, NumOf_SA_Runs
+        WRITE(RowLabelStr,'(I2)') iSol
+        CALL WGridLabelRow(IDF_SA_summary,iSol,RowLabelStr)
+        CALL WGridPutCellInteger (IDF_SA_Summary,1,iSol,iSolOrder(iSol)) 
+        CALL WGridPutCellCheckBox(IDF_SA_Summary,3,iSol,iSolTicked(iSolOrder(iSol)))
+        CALL WGridPutCellReal    (IDF_SA_Summary,4,iSol,ProfileChiSqd(iSolOrder(iSol)),'(F7.2)')
+        CALL WGridPutCellReal    (IDF_SA_Summary,5,iSol,IntensityChiSqd(iSolOrder(iSol)),'(F7.2)')
+      ENDDO
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Update_Solutions
+!
+!*****************************************************************************
+!
+      SUBROUTINE Clear_PO
+
       USE PO_VAR
 
       IMPLICIT NONE
@@ -122,19 +181,12 @@
 
       INCLUDE 'PARAMS.INC'
 
-      INTEGER          NOBS
-      REAL                         XOBS,       YOBS,       YBAK,        EOBS
-      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), YBAK(MOBS),  EOBS(MOBS)
-
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
 
       INTEGER I
 
-      DO I = 1, NOBS
-        YBAK(I) = 0.0
-      ENDDO
       DO I = 1, NBIN
         YBBIN(I) = 0.0
       ENDDO
