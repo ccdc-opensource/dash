@@ -62,6 +62,11 @@
 !
 !   Open the plotting window, iHandle is the window's unique identifier
 !     
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) &
+        RETURN
       TheRunNr = iSol2Run(TheSolutionNr)
       CALL WindowOpenChild(iHandle, x=10, y=450, width=800, height=400, title='Solution number '//Integer2String(TheSolutionNr))
       IF (iHandle .EQ. -1) THEN
@@ -138,6 +143,12 @@
       INTEGER II
       REAL    YADD
       REAL    diff(1:MOBS)
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) &
+        RETURN
 !
 !  Calculate offset for difference plot.  Position will move as zoom in on profile plot.
 !
