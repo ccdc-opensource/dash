@@ -496,6 +496,8 @@
       CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL WDialogSelect(IDD_Index_Preparation)
       CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
+      CALL WDialogSelect(IDD_PW_Page1)
+      CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL WDialogSelect(IDD_PW_Page8)
       CALL WDialogPutReal(IDF_ZeroPoint,ZeroPoint,'(F10.4)')
       CALL PopActiveWindowID
