@@ -504,14 +504,6 @@ DEP_F90_PROFI=\
 # End Source File
 # Begin Source File
 
-SOURCE=.\PutSimplexChisq.f90
-DEP_F90_PUTSI=\
-	".\DRUID_HEADER.mod"\
-	"c:\wint\lib.vf\WINTERACTER.mod"\
-	
-# End Source File
-# Begin Source File
-
 SOURCE=.\read_one_zm.for
 DEP_F90_READ_=\
 	".\params.inc"\
