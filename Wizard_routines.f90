@@ -196,11 +196,11 @@
 ! @@ ?
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
-      CALL WDialogSelect(IDD_ViewPawley)
-      CALL WDialogFieldState(IDF_Sigma1,Enabled)
-      CALL WDialogFieldState(IDF_Sigma2,Enabled)
-      CALL WDialogFieldState(IDF_Gamma1,Enabled)
-      CALL WDialogFieldState(IDF_Gamma2,Enabled)
+!O      CALL WDialogSelect(IDD_ViewPawley)
+!O      CALL WDialogFieldState(IDF_Sigma1,Enabled)
+!O      CALL WDialogFieldState(IDF_Sigma2,Enabled)
+!O      CALL WDialogFieldState(IDF_Gamma1,Enabled)
+!O      CALL WDialogFieldState(IDF_Gamma2,Enabled)
       IPTYPE = 1
       CALL Profile_Plot
 
@@ -681,8 +681,26 @@
 
       IMPLICIT NONE
 
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
+                       XGGMIN,    XGGMAX
+
+      INTEGER          IPMIN, IPMAX
+      COMMON /PROFIPM/ IPMIN, IPMAX
+
       INTEGER tInt1, tInt2, tFieldState
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      REAL             tXPMIN,     tXPMAX,     tYPMIN,     tYPMAX,       &
+                       tXPGMIN,    tXPGMAX,    tYPGMIN,    tYPGMAX,      &
+                       tXPGMINOLD, tXPGMAXOLD, tYPGMINOLD, tYPGMAXOLD,   &
+                       tXGGMIN,    tXGGMAX
+      INTEGER          tIPMIN, tIPMAX
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
@@ -702,6 +720,22 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDF_Preview)
+              tXPMIN     = XPMIN
+              tXPMAX     = XPMAX
+              tYPMIN     = YPMIN
+              tYPMAX     = YPMAX
+              tXPGMIN    = XPGMIN
+              tXPGMAX    = XPGMAX
+              tYPGMIN    = YPGMIN
+              tYPGMAX    = YPGMAX
+              tXPGMINOLD = XPGMINOLD
+              tXPGMAXOLD = XPGMAXOLD
+              tYPGMINOLD = YPGMINOLD
+              tYPGMAXOLD = YPGMAXOLD
+              tXGGMIN    = XGGMIN
+              tXGGMAX    = XGGMAX
+              tIPMIN     = IPMIN
+              tIPMAX     = IPMAX
               CALL WizardApplyProfileRange
               IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
                 CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
@@ -713,6 +747,22 @@
 ! Force display of background
               CALL WDialogSelect(IDD_Plot_Option_Dialog)
               CALL WDialogPutCheckBoxLogical(IDF_background_check,.TRUE.)
+              XPMIN     = tXPMIN
+              XPMAX     = tXPMAX
+              YPMIN     = tYPMIN
+              YPMAX     = tYPMAX
+              XPGMIN    = tXPGMIN
+              XPGMAX    = tXPGMAX
+              YPGMIN    = tYPGMIN
+              YPGMAX    = tYPGMAX
+              XPGMINOLD = tXPGMINOLD
+              XPGMAXOLD = tXPGMAXOLD
+              YPGMINOLD = tYPGMINOLD
+              YPGMAXOLD = tYPGMAXOLD
+              XGGMIN    = tXGGMIN
+              XGGMAX    = tXGGMAX
+              IPMIN     = tIPMIN
+              IPMAX     = tIPMAX
               CALL Profile_Plot
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
