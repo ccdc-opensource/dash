@@ -2303,8 +2303,8 @@
       INCLUDE 'PARAMS.INC'
 
       INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -2319,6 +2319,7 @@
       COMMON /PROFIPM/ IPMIN, IPMAX
 
       INTEGER I
+      REAL ESD_SUM
  
       XPMIN = XBIN(1)
       XPMAX = XBIN(NBIN)
@@ -2339,6 +2340,12 @@
       YPGMAXOLD = YPMAX
       IPMIN = 1
       IPMAX = NBIN
+      ! Calculate average ESD
+      ESD_SUM = 0.0
+      DO I = 1, NBIN
+        ESD_SUM = ESD_SUM + EBIN(I)
+      ENDDO
+      AVGESD = ESD_SUM / NBIN
 
       END SUBROUTINE GetProfileLimits
 !
@@ -2376,8 +2383,8 @@
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       INCLUDE 'statlog.inc'
 

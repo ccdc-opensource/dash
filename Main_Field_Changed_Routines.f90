@@ -67,7 +67,7 @@
         CASE (FieldChanged)
           IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2) THEN
             SELECT CASE (EventInfo%VALUE1)
-              CASE (IDF_ErrorBar_Check, IDF_Background_Check, IDF_ConnectObsPoints, IDF_PlotPeakFitDif, IDF_ShowCumChiSqd)
+              CASE (IDF_ErrorBar_Check, IDF_Background_Check, IDF_ConnectObsPoints, IDF_PlotPeakFitDif, IDF_ShowCumChiSqd, IDF_DivDiffByEsd)
                 CALL Profile_Plot
             END SELECT
           ENDIF
