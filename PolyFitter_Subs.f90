@@ -54,8 +54,11 @@
       YPGMAXOLD = YPGMAX
       CALL IGrFillPattern(0,1,1)
       CALL IGrPlotMode('EOR')
+      CALL IGrColourN(KolNumRectSelect)
+      ! Draw new
       CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
-      CALL IGrPlotMode(' ')
+      CALL IGrPlotMode('Normal')
+      CALL IGrColourN(InfoGrScreen(PrevColReq))
       DO WHILE (.TRUE.)
         CALL GetEvent
         IF (EventInfo%WIN .EQ. 0) THEN
@@ -88,22 +91,27 @@
               CALL IGrPlotMode('EOR')
               CALL IGrColourN(KolNumRectSelect)
               CALL IGrFillPattern(0,1,1)
+              ! Remove old
               CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+              ! Draw new
               CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
               xgcurold = xgcur(2)
               ygcurold = ygcur(2)
-              CALL IGrPlotMode(' ')
+              CALL IGrPlotMode('Normal')
               CALL IGrColourN(InfoGrScreen(PrevColReq))
             CASE (MouseButUp)
               xgcur(2) = EventInfo%GX
               ygcur(2) = EventInfo%GY
-              CALL IGrPlotMode(' ')
-              CALL IGrColourN(KolNumRectSelect)
               CALL WMessageEnable(MouseMove, Disabled)
               CALL WMessageEnable(MouseButUp, Disabled)
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
+                CALL IGrColourN(KolNumRectSelect)
+                CALL IGrPlotMode('EOR')
                 CALL IGrFillPattern(0,1,1)
-                CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
+                ! Remove old
+                CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+                CALL IGrPlotMode('Normal')
+                CALL IGrColourN(InfoGrScreen(PrevColReq))
                 IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(XPGMAX-XPGMIN)) RETURN
                 IF (ABS(YCUR(2)-YCUR(1)).LT.0.003*(YPGMAX-YPGMIN)) RETURN
                 XPGMIN = MIN(XCUR(1),XCUR(2))
@@ -111,7 +119,6 @@
                 YPGMIN = MIN(YCUR(1),YCUR(2))
                 YPGMAX = MAX(YCUR(1),YCUR(2))
               ENDIF
-              CALL IGrColourN(InfoGrScreen(PrevColReq))
               CALL Get_IPMaxMin()
               CALL Profile_Plot
               RETURN  
@@ -317,7 +324,9 @@
 !*****************************************************************************
 !
       SUBROUTINE Move_CrossHair_Fit
-
+!
+! Draws peak fit ranges ("hatched areas")
+!
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -394,7 +403,8 @@
       CALL IGrFillPattern(Hatched,Medium,DiagUp)
       CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
       CALL IGrFillPattern(Outline,Medium,DiagUp)
-      CALL IGrPlotMode(' ')
+      CALL IGrPlotMode('Normal')
+      CALL IGrColourN(InfoGrScreen(PrevColReq))
       DO WHILE (.TRUE.)
         CALL GetEvent
         xgcur(2) = EventInfo%GX
@@ -411,13 +421,12 @@
             CALL IGrColourN(KolNumLargeCrossHair)
             CALL IGrFillPattern(Hatched,Medium,DiagUp)
             CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
-            CALL IGrFillPattern(Outline,Medium,DiagUp)
 ! Paint new cross-hair
-            CALL IGrFillPattern(Hatched,Medium,DiagUp)
             CALL IGrRectangle(xgcur(1),gymin,xgcur(2),gymax)
-            CALL IGrFillPattern(Outline,Medium,DiagUp)
+            CALL IGrFillPattern(Outline)
             xgcurold = xgcur(2)
-            CALL IGrPlotMode(' ')
+            CALL IGrPlotMode('Normal')
+            CALL IGrColourN(InfoGrScreen(PrevColReq))
             CALL IRealToString(xcur(2),statbarstr(2)(1:),'(F10.3)')
             IF (ypgmax-ypgmin.le.100.) THEN
               CALL IRealToString(ycur(2),statbarstr(3)(1:),'(F10.3)')
@@ -431,10 +440,12 @@
 ! MouseButUp action for selecting the peak fitting region
 ! Remove old cross-hair
             CALL IGrPlotMode('EOR')
+            CALL IGrColourN(KolNumLargeCrossHair)
             CALL IGrFillPattern(Hatched,Medium,DiagUp)
             CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
-            CALL IGrFillPattern(Outline,Medium,DiagUp)
-            CALL IGrPlotMode(' ')
+            CALL IGrFillPattern(Outline)
+            CALL IGrPlotMode('Normal')
+            CALL IGrColourN(InfoGrScreen(PrevColReq))
             XPFR1 = MIN(xcur(1),xcur(2))
             XPFR2 = MAX(xcur(1),xcur(2))
 ! Determine peak fitting range
@@ -475,11 +486,11 @@
                 statbarstr(isb) = '          '
                 CALL WindowOutStatusBar(ISB,STATBARSTR(ISB))
               ENDDO                
-!O              CALL Profile_Plot
               CALL IGrColourN(KolNumPanelDark)
               CALL IGrFillPattern(Hatched,Medium,DiagUp)
               CALL IGrRectangle(xgcur(1),gymin,xgcurold,gymax)
-              CALL IGrFillPattern(Outline,Medium,DiagUp)
+              CALL IGrFillPattern(Outline)
+              CALL IGrColourN(InfoGrScreen(PrevColReq))
             ENDIF
             RETURN 
         END SELECT
@@ -658,7 +669,6 @@
             IPF_Range(II) = 0                            
           ENDIF ! WInfoDialog(4).EQ.CommonYes
         ENDIF ! NumPeakFitRange.eq.0
-        CALL IGrPlotMode(' ')
         CALL Profile_Plot
         CALL Upload_Positions
         CALL Upload_Widths
@@ -705,9 +715,7 @@
           ENDIF ! InRange.ne.0
         ENDIF ! NumPeakFitRange.gt.0
 ! We've got ourselves a new initial peak position
-        CALL IGrPlotMode(' ')
         CALL Profile_Plot
-        CALL IGrPlotMode('EOR')
       ELSE IF (EventInfo%VALUE1.EQ.48 .OR. EventInfo%VALUE1.EQ.KeyReturn) THEN
 ! KeyNumber=0 or KeyReturn: get ready to fit peaks ...
 ! Check if in a peak range - if not tell the user...
@@ -732,10 +740,7 @@
             CALL WCursorShape(CurCrossHair)
           ENDIF ! InRange.eq.0
         ENDIF ! NumPeakFitRange.gt.0                
-        CALL IGrPlotMode(' ')
         CALL Profile_Plot
-      ELSE
-        CALL IGrPlotMode(' ')
       ENDIF
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL CheckIfWeCanIndex
