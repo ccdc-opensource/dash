@@ -583,6 +583,26 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION SavePDB
+
+! When .TRUE., a file in .pdb format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      SavePDB = .TRUE. ! WDialogGetCheckBoxLogical(IDF_OutputPDB)
+      CALL PopActiveWindowID
+
+      END FUNCTION SavePDB
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION SaveCSSR
 
 ! When .TRUE., a file in .cssr format is written out for each SA solution
