@@ -1,15 +1,14 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GET_LOGREF(FILE,ier)
-
+      SUBROUTINE GET_LOGREF
+!
+! This routine relies on the tick marks file having been read in.
+!
       USE ATMVAR
       USE REFVAR
 
       IMPLICIT NONE
-
-      CHARACTER*(*), INTENT (IN   ) :: FILE
-      INTEGER,       INTENT (  OUT) :: ier
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -24,8 +23,6 @@
       INTEGER         IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
       COMMON /CSQINT/ IHMIN, IHMAX, IKMIN, IKMAX, ILMIN, ILMAX, IIMIN, IIMAX
 
-!     These declarations are needed for the get_logref.inc
-!     file to work correctly
 !     The following integers represent h,k,l,h+k,h+l,k+l and h+k+l
       INTEGER H_, K_, L_, HPK, HPL, KPL, HPKPL
 !     The following integers represent the previous integers, divided by 2
@@ -34,8 +31,6 @@
       INTEGER IR, JHMAX, JHMIN, Item, IREMAIN, LL, LLM
       INTEGER, EXTERNAL :: GETTIC
 
-      ier = GETTIC(FILE)
-      IF (ier .NE. 0) RETURN
       IHMIN = 9999
       IKMIN = 9999
       ILMIN = 9999

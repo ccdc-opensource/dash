@@ -107,7 +107,7 @@
 
       INTEGER i
       INTEGER ihcver,ipiker,iloger,idsler, isst, ised
-      INTEGER, EXTERNAL :: GetCrystalSystem
+      INTEGER, EXTERNAL :: GetCrystalSystem, GETTIC
       INTEGER tFileHandle
       LOGICAL TicExists
       LOGICAL HcvExists
@@ -176,19 +176,19 @@
  100  CONTINUE
       CLOSE(tFileHandle)
       IF (DslExists) THEN
-        CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
+        CALL GETDSL(DashDslFile,idsler)
         DslExists = (idsler .EQ. 0)
       ENDIF
       IF (TicExists) THEN
-        CALL GET_LOGREF(DashTicFile,iloger)
-        TicExists = (iloger .EQ. 0)
+        TicExists = (GETTIC(DashTicFile) .EQ. 0)
+        CALL GET_LOGREF
       ENDIF
       IF (HcvExists) THEN
-        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
+        CALL GETHCV(DashHcvFile,ihcver)
         HcvExists = (ihcver .EQ. 0)
       ENDIF
       IF (PikExists) THEN
-        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
+        CALL GETPIK(DashPikFile,ipiker)
         PikExists = (ipiker .EQ. 0)
         IF (PikExists) THEN
           FNAME = ''
@@ -211,7 +211,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETDSL(FileName,LenFn,Ierr)
+      SUBROUTINE GETDSL(TheFileName,Ierr)
 ! Routines for reading a 'DSL' file. This file contains
 ! The additional data that is part of the Winteracter front end: Namely
 ! radiation type/wavelength etc.
@@ -225,8 +225,7 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
-      CHARACTER*(*), INTENT (IN   ) :: FileName
-      INTEGER,       INTENT (IN   ) :: LenFn
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (  OUT) :: Ierr
 
       CHARACTER*128 line
@@ -239,7 +238,7 @@
       Ierr = 0
 ! Open the file
       hFile = 77
-      OPEN (UNIT=hFile, FILE=FileName(1:LenFn), STATUS='OLD', ERR=999)
+      OPEN (UNIT=hFile, FILE=TheFileName, STATUS='OLD', ERR=999)
 ! Loop over all records
       DO WHILE ( .TRUE. )
  10     READ(hFile,'(A)',END=100,ERR=999) line
@@ -315,7 +314,7 @@
       GETTIC = 1
       hFile = 31
       iLen = LEN_TRIM(TheFileName)
-      OPEN(UNIT=hFile,FILE=TheFileName(1:iLen),STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       NumOfRef = 0
       DO iR = 1, MaxRef
         READ (hFile,*,ERR=999,END=200) (iHKL(I,iR),I=1,3), RefArgK(iR), DSTAR(iR)
@@ -330,15 +329,14 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETHCV(FILENAM,lenfil,ier)
+      SUBROUTINE GETHCV(TheFileName,ier)
 
       USE ATMVAR
       USE REFVAR
 
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (IN   ) :: FILENAM
-      INTEGER,       INTENT (IN   ) :: lenfil
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (  OUT) :: ier
 
       INCLUDE 'PARAMS.INC'
@@ -354,10 +352,10 @@
       INTEGER         IHCOV
       COMMON /CORHES/ IHCOV(30,MaxRef)
 
-      INTEGER KK, I, NLIN, NCOR, IR, II, JJ, IK, MINCOR, KL
+      INTEGER KK, I, NLIN, NCOR, iR, II, JJ, IK, MINCOR, KL
       INTEGER, EXTERNAL :: GetNumOfColumns
 
-      OPEN (121,FILE=FILENAM(:Lenfil),STATUS='OLD',ERR=998)
+      OPEN (121,FILE=TheFileName,STATUS='OLD',ERR=998)
       KK = 0
       KKOR = 0
       MINCOR = 20
@@ -366,11 +364,9 @@
         READ (121,2121,END=100,ERR=998) NLIN, LINE
    2121 FORMAT (Q,A)
         NCOR = GetNumOfColumns(LINE) - 6
-        READ (LINE(1:NLIN),*,END=998,ERR=998) (iHKL(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (IHCOV(I,iR),I=1,NCOR)
+        READ (LINE(1:NLIN),*,END=998,ERR=998) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
         KK = iR
-!
-!.. Now work out which terms should be kept for the chi-squared calculation
-!
+! Now work out which terms should be kept for the chi-squared calculation
         KKOR = KKOR + 1
         IKKOR(KKOR) = iR
         JKKOR(KKOR) = iR
@@ -388,7 +384,7 @@
       DO IK = 1, KKOR
         II = IKKOR(IK)
         JJ = JKKOR(IK)
-        IF (II.EQ.JJ) THEN
+        IF (II .EQ. JJ) THEN
           WTIJ(IK) = WTI(II) * WTI(JJ)
         ELSE
           WTIJ(IK) = 0.02*WTI(II)*WTI(JJ)*FLOAT(NKKOR(IK))
@@ -402,14 +398,13 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETPIK(FILE,lenfil,ier)
+      SUBROUTINE GETPIK(TheFileName,ier)
 
       USE VARIABLES
       
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (IN   ) :: FILE
-      INTEGER,       INTENT (IN   ) :: lenfil
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (  OUT) :: ier
 
       INCLUDE 'PARAMS.INC'
@@ -437,7 +432,7 @@
 
       WrongValuesPresent = .FALSE.
       ier = 0
-      OPEN (21,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998)
+      OPEN (21,FILE=TheFileName,STATUS='OLD',ERR=998)
       NFITA = 0
       NBIN = 0
       DO I = 1, MOBS
