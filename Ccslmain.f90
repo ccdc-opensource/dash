@@ -694,7 +694,7 @@
       CALL GMREV(V(1,1),V(1,1),1,3)
 !
       COSY = SCALPR(V(1,1),V(1,2))
-      ANG(1) = -SIGN(ARCCOS(COSY),FLOAT(NLR))
+      ANG(1) = -SIGN(ACOS(COSY),FLOAT(NLR))
       GOTO (50,50,50,50,50,20,20,11,50,50,20), IGEOM
 !
 !  GENERAL NORMAL BEAM CASE
@@ -710,7 +710,7 @@
    20 CALL VECPRD(V(1,2),V(1,1),T)
       CALL UNIVEC(T,D)
 !  CHI FROM Z COORDINATE OF T
-      ANG(3) = ARCCOS(T(3))
+      ANG(3) = ACOS(T(3))
 !  TT IS THE NORMAL TO THE CHI CIRCLE (T X Z)
       TT(1) = -T(2)
       TT(2) = T(1)
@@ -725,7 +725,7 @@
       ENDIF
       CALL VECPRD(V(1,1),TT,XP)
       SCS2 = SCALPR(T,XP)
-      ANG(2) = ARCCOS(ABS(CS2))
+      ANG(2) = ACOS(ABS(CS2))
       IF (SCS2.LT.0) ANG(2) = -ANG(2)
       ANG(4) = ATAN2(-TT(2),TT(1))
       IF (ABS(NLR).EQ.1) GOTO 100
@@ -876,7 +876,7 @@
       C = SCLPRD(A,B,IR)
       C = C/(VCTMOD(1.0,A,IR)*VCTMOD(1.0,B,IR))
       IF (IR.EQ.1) C = -C
-      ANGRAD = ARCCOS(C)
+      ANGRAD = ACOS(C)
       RETURN
       END FUNCTION ANGRAD
 !*==ANITF.f90  processed by SPAG 6.11Dc at 14:22 on 17 Sep 2001
@@ -1391,7 +1391,7 @@
       COSTH = (B2*B2+B3*B3-B1*B1)/(2.*B2*B3)
       CALL SINCOS(COSTH,SINTH,'BONCOS')
 ! ANGLE IN RADIANS:
-      ANGLE = (ARCCOS(COSTH))
+      ANGLE = (ACOS(COSTH))
 !
 ! DERIVATIVES OF COS THETA WRT B1, THEN B2, THEN B3
       DADB(1) = -B1/(B2*B3)
@@ -2014,7 +2014,7 @@
       ENDIF
 !
       DO I = 1, 3
-        ANG(I) = DEGREE(ARCCOS(CELL(I,2,1)))
+        ANG(I) = DEGREE(ACOS(CELL(I,2,1)))
       ENDDO
       WRITE (NEWIN,2000) (CELL(I,1,1),I=1,3), (ANG(I),I=1,3)
  2000 FORMAT ('C ',3F10.5,3F10.3)
@@ -5742,7 +5742,7 @@
         D = 2.*B1*B3*SINTH2*SINTH3
         C = B/D + COTTH2*COTTH3
         CALL SINCOS(C,S,'GEOMLS')
-        YCALC = ARCCOS(C)
+        YCALC = ACOS(C)
 !
 ! DERIVATIVES OF C WRT ALL 6 BONDS:
         CSEQ2 = 1./(SINTH2*SINTH2)
