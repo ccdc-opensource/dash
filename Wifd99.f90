@@ -169,60 +169,14 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE HCVOUT(HKL,IC,X,HX,N,NCORL,POSDEF)
-
-      IMPLICIT NONE
-
-      REAL HKL(3,*)
-      INTEGER IC(*)
-      INTEGER N
-      REAL    X(*), HX(N,N)
-      INTEGER NCORL
-      LOGICAL POSDEF
-
-      INTEGER     IREFSM
-      PARAMETER ( IREFSM = 2000 )
-      INTEGER         LCV, ICORL,            ICLUMP
-      COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
-      INTEGER         IHCOV
-      COMMON /CORHES/ IHCOV(30,10000)
-      INTEGER         KOUNT
-      COMMON /COUNTE/ KOUNT
-
-      INTEGER J
-      REAL    SIGX, SIGXX
-      INTEGER I, K
-      INTEGER NumOfCorrel
-
-      DO J = 1, N
-        SIGXX = HX(J,J)
-        IF (SIGXX.LE.1.0E-20) THEN
-          SIGX = 0.0
-        ELSE
-          SIGX = SQRT(SIGXX)
-          IF (.NOT.POSDEF) SIGX = -SIGX
-        ENDIF
-        KOUNT = KOUNT + 1
-! Starting at the end, count the number of zeros (these needn't be written out)
-        NumOfCorrel = NCORL
-        DO WHILE ((NumOfCorrel .GE. 2) .AND. (IHCOV(NumOfCorrel,KOUNT) .EQ. 0))
-          NumOfCorrel = NumOfCorrel - 1
-        ENDDO
-        WRITE (LCV,100) (NINT(HKL(I,J)),I=1,3), X(J), SIGX, IC(J), (IHCOV(K,KOUNT),K=1,NumOfCorrel)
-  100   FORMAT (3I5,1X,F12.3,1X,F12.4,1X,I5,15I4)
-      ENDDO
-
-      END SUBROUTINE HCVOUT
-!
-!*****************************************************************************
-!
       SUBROUTINE HESCOR(ALSQ,MATSZ)
 
+      USE REFVAR
 !
 ! *** HESCOR from HKLOUT ***
 !
 !H Writes h,k,l list, possibly plus other info, to unit LKH
-!P On entry, reflection indices must be in REFH in /REFLNS/
+!P On entry, reflection indices must be in rHKL in /REFLNS/
 !P IREF, various LOGICALS in /REFIPR give type of refinement -
 !P in particular RIET, CAIL, SAPS, APES . .
 !
@@ -263,8 +217,8 @@
      &                MAG, MPL, FIXED, DONE, CONV
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
+      LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      LOGICAL RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
 
       INCLUDE 'REFLNS.INC'
       COMMON /SCRACH/ MESSAG, NAMFIL
@@ -278,7 +232,8 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
                       NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
-      COMMON /CORHES/ IHCOV(30,10000)
+      INTEGER         IHCOV
+      COMMON /CORHES/ IHCOV(30,MaxRef)
 
       DIMENSION IH(3), ADIAG(MaxBVar), ICOV(30)
       CHARACTER*80 FMT2
@@ -364,7 +319,9 @@
       INTEGER NJ
       DATA NHSMAX/50/
       COMMON /COUNTE/ KOUNT
-      COMMON /CORHES/ IHCOV(30,10000)
+
+      INTEGER         IHCOV
+      COMMON /CORHES/ IHCOV(30,MaxRef)
 
       KOUNT = 0
       NHKL = MAXKK(JPHASE)
@@ -393,6 +350,59 @@
       ENDDO
 
       END SUBROUTINE HKL2HCV
+!
+!*****************************************************************************
+!
+      SUBROUTINE HCVOUT(TheHKL,IC,X,HX,NJ,NCORL,POSDEF)
+
+      USE REFVAR
+
+      IMPLICIT NONE
+
+      REAL    TheHKL(3,*)
+      INTEGER IC(*)
+      INTEGER NJ
+      REAL    X(*), HX(NJ,NJ)
+      INTEGER NCORL
+      LOGICAL POSDEF
+
+      INTEGER     IREFSM
+      PARAMETER ( IREFSM = 2000 )
+      INTEGER         LCV, ICORL,            ICLUMP
+      COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
+
+      INTEGER         IHCOV
+      COMMON /CORHES/ IHCOV(30,MaxRef)
+
+      INTEGER         KOUNT
+      COMMON /COUNTE/ KOUNT
+
+      INTEGER J
+      REAL    SIGX, SIGXX
+      INTEGER I, K
+      INTEGER NumOfCorrel
+
+      DO J = 1, NJ
+        SIGXX = HX(J,J)
+        IF (SIGXX.LE.1.0E-20) THEN
+          SIGX = 0.0
+        ELSE
+          SIGX = SQRT(SIGXX)
+          IF (.NOT.POSDEF) SIGX = -SIGX
+        ENDIF
+        KOUNT = KOUNT + 1
+! Starting at the end, count the number of zeros (these needn't be written out)
+        NumOfCorrel = NCORL
+        DO WHILE ((NumOfCorrel .GE. 2) .AND. (IHCOV(NumOfCorrel,KOUNT) .EQ. 0))
+          NumOfCorrel = NumOfCorrel - 1
+        ENDDO
+        WRITE (LCV,100) (NINT(TheHKL(I,J)),I=1,3), X(J), SIGX, IC(J), (IHCOV(K,KOUNT),K=1,NumOfCorrel)
+  100   FORMAT (3I5,1X,F12.3,1X,F12.4,1X,I5,15I4)
+        AIOBS(KOUNT) = X(J)
+        WTI(KOUNT) = SIGX
+      ENDDO
+
+      END SUBROUTINE HCVOUT
 !
 !*****************************************************************************
 !
@@ -459,7 +469,7 @@
         DO J = 1, N
           IF (ABS(A(I,J)).GT.AAMAX) AAMAX = ABS(A(I,J))
         ENDDO
-        IF (AAMAX.EQ.0.0) PAUSE ' Singular matrix!'
+        IF (AAMAX.EQ.0.0) CALL DebugErrorMessage(' Singular matrix!')
         VV(I) = 1.0/AAMAX
       ENDDO
       DO J = 1, N
@@ -573,7 +583,7 @@
       COMMON /PFNINF/ PFNVAR(8,9,5)
 
       INTEGER NUMPFP
-!
+
 ! FOR NOW, IMPOSE PHASE 1, SOURCE 1 WHICH WE HOPE STAY THERE:
       JPHASE = 1
       JSOURC = 1
