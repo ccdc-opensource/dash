@@ -1458,9 +1458,9 @@
       LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
       LOGICAL, EXTERNAL :: NearlyEqual
       REAL    xtem
-      INTEGER JPOS, NMOVES, IFCOl, IFRow, ICHK
+      INTEGER NMOVES, IFCOl, IFRow, ICHK
       REAL    rpos
-      INTEGER ipos, tMaxRuns, tFieldState, I
+      INTEGER tMaxRuns, I
       INTEGER iRow, iStatus
       INTEGER iFrg, iFrgCopy
       INTEGER kk, iOption, jFrg
@@ -1496,40 +1496,19 @@
               ENDIF
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
-              CALL WDialogSelect(IDD_SA_input3)
+              CALL WDialogSelect(IDD_SA_input3_2)
               RPOS = T0
               CALL WDialogPutReal(IDF_SA_T0,RPOS,'(F7.2)')
-              IPOS = 1000 - NINT(RPOS)
-              CALL WDialogPutTrackbar(IDF_SA_T0_trackbar,IPOS)
               RPOS = RT
               CALL WDialogPutReal(IDF_SA_Tredrate,RPOS,'(F6.3)')
-              IPOS = 501 - NINT(1000.*RPOS)
-              CALL WDialogPutTrackbar(IDF_SA_Tredrate_trackbar,IPOS)
-              JPOS = 20
-              CALL WDialogPutInteger(IDF_SA_NS,JPOS)
-              IPOS = 101 - JPOS
-              NS = JPOS
-              CALL WDialogPutTrackbar(IDF_SA_NS_trackbar,IPOS)
-              JPOS = 25
-              CALL WDialogPutInteger(IDF_SA_NT,JPOS)
-              IPOS = 101 - JPOS
-              NT = JPOS
-              CALL WDialogPutTrackbar(IDF_SA_NT_trackbar,IPOS)
+              NS = 20
+              CALL WDialogPutInteger(IDF_SA_NS, NS)
+              NT = 25
+              CALL WDialogPutInteger(IDF_SA_NT, NT)
               NMoves = NT * NS * NVAR
-              CALL WDialogPutInteger(IDF_SA_Moves,NMoves)
-              CALL WDialogGetInteger(IDF_SA_MaxRepeats,tMaxRuns)
-              IF (tMaxRuns .EQ. 1) THEN
-                tFieldState = Disabled
-              ELSE
-                tFieldState = Enabled
-              ENDIF
-              CALL WDialogFieldState(IDF_SA_ChiTest_Label,tFieldState)
-              CALL WDialogFieldState(IDF_SA_ChiTest,tFieldState)
-              CALL WDialogFieldState(IDF_SA_MaxMoves_Label,tFieldState)
-              CALL WDialogFieldState(IDF_MaxMoves1,tFieldState)
-              CALL WDialogFieldState(IDF_LABEL21,tFieldState)
-              CALL WDialogFieldState(IDF_MaxMoves2,tFieldState)
-              CALL WizardWindowShow(IDD_SA_input3)
+              CALL WDialogPutInteger(IDF_SA_Moves, NMoves)
+              CALL WDialogGetInteger(IDF_SA_MaxRepeats, tMaxRuns)
+              CALL WizardWindowShow(IDD_SA_input3_2)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_Relabel)
@@ -1694,25 +1673,21 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      INTEGER IHANDLE, JPOS, KPOS
-      REAL    rpos
-      INTEGER ipos
+      INTEGER IHANDLE, KPOS
       INTEGER, EXTERNAL :: WriteSAParametersToFile
-      INTEGER tMaxRuns, tFieldState
       LOGICAL, EXTERNAL :: Get_AutoAlign
 
 
 ! We are now on window number 3
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input3)
+      CALL WDialogSelect(IDD_SA_input3_2)
       SELECT CASE (EventType)
 ! Interact with the main window and look at the Pawley refinement...
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the 2nd window
-!!O              CALL WizardWindowShow(IDD_SA_input2)
-              CALL WizardWindowShow(IDD_SA_Modal_input2)
+            CALL WizardWindowShow(IDD_SA_Modal_input2)
             CASE (IDB_SA3_finish) ! 'Solve >' button
 ! We've finished the SA input
               CALL WizardWindowHide
@@ -1733,97 +1708,26 @@
 ! two 'Print' outputs on screen. The possibility of editing the file is probably more useful.
                 CALL SetChildWinAutoClose(IHANDLE)
               ENDIF
-            CASE (IDB_Configuration)
-              CALL PushActiveWindowID
-              CALL WDialogSelect(IDD_Configuration)
-              CALL WDialogShow(-1,-1,0,Modeless)
-              CALL PopActiveWindowID
+        !F    CASE (IDB_Configuration)
+        !F      CALL PushActiveWindowID
+        !F      CALL WDialogSelect(IDD_Configuration)
+        !F      CALL WDialogShow(-1,-1,0,Modeless)
+        !F      CALL PopActiveWindowID
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE(IDF_SA_T0_trackbar)
-              IF (EventInfo%VALUE2 .EQ. IDF_SA_T0_trackbar) THEN
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetTrackBar(IDF_SA_T0_trackbar,IPOS)
-                RPOS = 1000 - IPOS
-                T0 = RPOS
-                CALL WDialogPutReal(IDF_SA_T0,RPOS,'(F7.2)')
-              ENDIF
-            CASE (IDF_SA_T0) 
-              CALL WDialogSelect(IDD_SA_input3)
-              CALL WDialogGetReal(IDF_SA_T0,RPOS)
-              T0 = RPOS
-              IPOS = 1000 - NINT(RPOS)
-              CALL WDialogPutTrackbar(IDF_SA_T0_trackbar,IPOS)
-            CASE (IDF_SA_Tredrate_trackbar)
-              IF (EventInfo%VALUE2 .EQ. IDF_SA_Tredrate_trackbar) THEN
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetTrackBar(IDF_SA_Tredrate_trackbar,IPOS)
-                RPOS = 0.001 * (501.-FLOAT(IPOS))
-                RT = RPOS
-                CALL WDialogPutReal(IDF_SA_Tredrate,RPOS,'(F6.3)')
-              ENDIF
-            CASE (IDF_SA_Tredrate) 
-              CALL WDialogSelect(IDD_SA_input3)
-              CALL WDialogGetReal(IDF_SA_Tredrate,RPOS)
-              RT = RPOS
-              IPOS = 501 - NINT(1000.0 * RPOS)
-              CALL WDialogPutTrackbar(IDF_SA_Tredrate_trackbar,IPOS)
-            CASE (IDF_SA_NS_trackbar)
-              IF (EventInfo%VALUE2 .EQ. IDF_SA_NS_trackbar) THEN
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetTrackBar(IDF_SA_NS_trackbar,IPOS)
-                JPOS = 101 - IPOS
-                CALL WDialogPutInteger(IDF_SA_NS,JPOS)
-                NS = JPOS
-                KPOS = NS * NT * NVAR
-                CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
-              ENDIF
             CASE (IDF_SA_NS) 
-              CALL WDialogSelect(IDD_SA_input3)
-              CALL WDialogGetInteger(IDF_SA_NS,JPOS)
-              IPOS =101 - JPOS
-              NS = JPOS
-              CALL WDialogPutTrackbar(IDF_SA_NS_trackbar,IPOS)
+              CALL WDialogGetInteger(IDF_SA_NS, NS)
               KPOS = NS * NT * NVAR
-              CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
-            CASE (IDF_SA_NT_trackbar)
-              IF (EventInfo%VALUE2 .EQ. IDF_SA_NT_trackbar) THEN
-                CALL WDialogSelect(IDD_SA_input3)
-                CALL WDialogGetTrackBar(IDF_SA_NT_trackbar,IPOS)
-                JPOS = 101 - IPOS
-                CALL WDialogPutInteger(IDF_SA_NT,JPOS)
-                NT = JPOS
-                KPOS = NS * NT * NVAR
-                CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
-              ENDIF
+              CALL WDialogPutInteger(IDF_SA_Moves, KPOS)
             CASE (IDF_SA_NT) 
-              CALL WDialogSelect(IDD_SA_input3)
-              CALL WDialogGetInteger(IDF_SA_NT,JPOS)
-              IPOS = 101 - JPOS
-              NT = JPOS
-              CALL WDialogPutTrackbar(IDF_SA_NT_trackbar,IPOS)
+              CALL WDialogGetInteger(IDF_SA_NT, NT)
               KPOS = NS * NT * NVAR
-              CALL WDialogPutInteger(IDF_SA_Moves,KPOS)
-            CASE (IDF_SA_MaxRepeats)
-              CALL WDialogGetInteger(IDF_SA_MaxRepeats,tMaxRuns)
-              IF (tMaxRuns .EQ. 1) THEN
-                tFieldState = Disabled
-              ELSE
-                tFieldState = Enabled
-              ENDIF
-                CALL WDialogFieldState(IDF_SA_ChiTest_Label,tFieldState)
-                CALL WDialogFieldState(IDF_SA_ChiTest,tFieldState)
-                CALL WDialogFieldState(IDF_SA_MaxMoves_Label,tFieldState)
-                CALL WDialogFieldState(IDF_MaxMoves1,tFieldState)
-                CALL WDialogFieldState(IDF_LABEL21,tFieldState)
-                CALL WDialogFieldState(IDF_MaxMoves2,tFieldState)
+              CALL WDialogPutInteger(IDF_SA_Moves, KPOS)
             CASE (IDF_SA_RandomSeed1) 
-              CALL WDialogSelect(IDD_SA_input3)
-              CALL WDialogGetInteger(IDF_SA_RandomSeed1,ISeed1)
+              CALL WDialogGetInteger(IDF_SA_RandomSeed1, ISeed1)
             CASE (IDF_SA_RandomSeed2) 
-              CALL WDialogSelect(IDD_SA_input3)
-              CALL WDialogGetInteger(IDF_SA_RandomSeed2,ISeed2)
+              CALL WDialogGetInteger(IDF_SA_RandomSeed2, ISeed2)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
