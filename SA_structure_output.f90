@@ -22,29 +22,37 @@
       CHARACTER*3     asym
       CHARACTER*5                          OriginalLabel
       COMMON /zmcomc/ asym(maxatm,maxfrg), OriginalLabel(maxatm,maxfrg)
-      COMMON /zmcomi/ ntatm, natoms(maxfrg), ioptb(maxatm,maxfrg),      &
-     &                iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),       &
-     &                iz1(maxatm,maxfrg), iz2(maxatm,maxfrg),           &
-     &                iz3(maxatm,maxfrg)
-!
-      CHARACTER*36 czmpar
-      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg),    &
-     &                kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
-!
-      INTEGER ipcount
-      INTEGER CheckedFragNo
-!
+
+      INTEGER         ntatm, natoms
+      INTEGER         ioptb,                iopta,                ioptt
+      INTEGER         iz1,                  iz2,                  iz3
+      COMMON /zmcomi/ ntatm, natoms(maxfrg),                                             &
+     &                ioptb(maxatm,maxfrg), iopta(maxatm,maxfrg), ioptt(maxatm,maxfrg),  &
+     &                iz1(maxatm,maxfrg),   iz2(maxatm,maxfrg),   iz3(maxatm,maxfrg)
+
+      INTEGER         izmpar
+      CHARACTER*36                    czmpar
+      INTEGER                                                kzmpar
+      REAL                                                                          xzmpar
+      COMMON /zmnpar/ izmpar(maxfrg), czmpar(MaxDOF,maxfrg), kzmpar(MaxDOF,maxfrg), xzmpar(MaxDOF,maxfrg)
+
+      INTEGER         nfrag
       COMMON /frgcom/ nfrag
-      REAL tiso, occ
+
+      REAL            tiso,                occ
       COMMON /zmcomo/ tiso(maxatm,maxfrg), occ(maxatm,maxfrg)
-      DOUBLE PRECISION blen, alph, bet, f2cmat
-      COMMON /zmcomr/ blen(maxatm,maxfrg), alph(maxatm,maxfrg),         &
-     &                bet(maxatm,maxfrg), f2cmat(3,3)
+
+      DOUBLE PRECISION blen,                alph,                bet,                f2cmat
+      COMMON /zmcomr/  blen(maxatm,maxfrg), alph(maxatm,maxfrg), bet(maxatm,maxfrg), f2cmat(3,3)
+
       DOUBLE PRECISION inv(3,3)
+
       COMMON /posopt/ XATOPT(3,150)
+
       COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
      &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
      &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
       CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
       COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
       INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
@@ -56,11 +64,14 @@
 !
 ! The original atom ids to list in the labels and the back mapping
       COMMON /zmjcmp/ izmoid(maxatm,maxfrg), izmbid(maxatm,maxfrg)
+
       REAL qvals(4), qnrm
 ! Use standard PDB orthogonalisation
       DOUBLE PRECISION f2cpdb
       COMMON /pdbcat/ f2cpdb(3,3)
-      LOGICAL tSavePDB, tSaveCSSR, tSaveCCL, tSaveRES
+      LOGICAL tSavePDB, tSaveCSSR, tSaveCCL
+      INTEGER ipcount
+      INTEGER CheckedFragNo
 !
       ntem = NumberSGTable
 !
@@ -72,7 +83,6 @@
       tSavePDB = SavePDB
       tSaveCSSR = SaveCSSR
       tSaveCCL = SaveCCL
-      tSaveRES = SaveRES
 !
 !       Output a CSSR file to fort.64
 !       Output a PDB  file to fort.65
@@ -89,10 +99,8 @@
  1010   FORMAT ('   ALPHA,BETA,GAMMA =',3F8.3,'    SPGR = ',A3)
         WRITE (64,"(' ',I3,'   0  DASH solution')") natom
         WRITE (64,1030) SNGL(t), -SNGL(fopt), cpb, ntotmov
- 1030   FORMAT (' T=',F6.2,', chi**2=',F7.2,' and profile chi**2=',F7.2,&
-     &          ' after ',I8,' moves')
+ 1030   FORMAT (' T=',F6.2,', chi**2=',F7.2,' and profile chi**2=',F7.2,' after ',I8,' moves')
       ENDIF
-!
 !       Now the PDB...
       IF (tSavePDB) THEN
         OPEN (UNIT=65,FILE=pdb_file(1:pdb_flen),STATUS='unknown')
@@ -219,18 +227,14 @@
           xc = xatopt(1,ii)*SNGL(f2cpdb(1,1)) + xatopt(2,ii)*SNGL(f2cpdb(1,2)) + xatopt(3,ii)*SNGL(f2cpdb(1,3))
           yc = xatopt(2,ii)*SNGL(f2cpdb(2,2)) + xatopt(3,ii)*SNGL(f2cpdb(2,3))
           zc = xatopt(3,ii)*SNGL(f2cpdb(3,3))
-! Note that element are right-justified
-! (important for distinction between Calcium "Ca   " and alpha carbon " Ca  ".
-!HETATM   23  S15 NONE    1       5.565   4.481   6.518  1.00  0.00
-!HETATM   24  S16 NONE    1       0.201   4.300   5.816  1.00  0.00
-!HETATM   25 Cl17 NONE    1       5.887   3.389   3.431  1.00  0.00
+! Note that elements are right-justified
           IF (tSavePDB) THEN
             IF (asym(iorig,CheckedFragNo)(2:2).EQ.' ') THEN
-              WRITE (65,1120) iiact, OriginalLabel(iorig,CheckedFragNo)(1:4), xc, yc, zc
- 1120         FORMAT ('HETATM',I5,'  ',A4,'NONE    1    ',3F8.3,'  1.00  0.00')
+              WRITE (65,1120) iiact, OriginalLabel(iorig,CheckedFragNo)(1:5), xc, yc, zc, asym(iorig,CheckedFragNo)(1:1)
+ 1120         FORMAT ('HETATM',I5,' ',A5,'NONE    1    ',3F8.3,'  1.00  0.00           ',A1)
             ELSE
-              WRITE (65,1130) iiact, OriginalLabel(iorig,CheckedFragNo)(1:5), xc, yc, zc
- 1130         FORMAT ('HETATM',I5,' ',A5,'NONE    1    ',3F8.3,'  1.00  0.00')
+              WRITE (65,1130) iiact, OriginalLabel(iorig,CheckedFragNo)(1:5), xc, yc, zc, asym(iorig,CheckedFragNo)(1:2)
+ 1130         FORMAT ('HETATM',I5,' ',A5,'NONE    1    ',3F8.3,'  1.00  0.00          ',A2)
             ENDIF
           ENDIF
 !       The CCL atom lines
