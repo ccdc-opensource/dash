@@ -29,6 +29,7 @@
               CALL SA_STRUCTURE_OUTPUT_PDB(Curr_SA_Run)
               CALL ViewStructure('SA_best.pdb')
             CASE (IDF_Pause_Annealing) ! 'Pause'
+              CALL WDialogFieldState(IDF_Pause_Annealing,Disabled)
               iMyExit = 6
               CALL WDialogLoad(IDD_Pause)
               CALL WDialogSelect(IDD_Pause)
@@ -41,18 +42,18 @@
             CASE (IDF_StopSA, IDCANCEL) ! 'Stop'
 ! Go to the SA results
               iMyExit = 3
-            CASE (IDB_Edit)
+            CASE (IDB_Edit)             ! 'Edit'
 ! Close Chi Squared plot window
               CALL Close_Chisq_plot
               iMyExit = 5
             CASE (IDF_SA_Simplex_Button) ! 'Local minimisation'
               CALL LocalMinimise(.FALSE.)
-            CASE (IDB_Summary)
+            CASE (IDB_Summary)           ! 'Solutions'
               CALL WDialogFieldState(IDB_Summary,Disabled)
               CALL WDialogSelect(IDD_Summary)
               CALL WDialogShow(-1,-1,0,Modeless)
           END SELECT
-      END SELECT  ! EventType
+      END SELECT
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithSAStatusWindow

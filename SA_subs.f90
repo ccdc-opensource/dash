@@ -520,6 +520,7 @@
             CALL WDialogSelect(IDD_Pause)
             CALL WDialogUnload
             CALL WDialogSelect(IDD_SA_Action1)
+              CALL WDialogFieldState(IDF_Pause_Annealing,Enabled)
             iMyExit = 0
           ENDIF
         ENDDO
