@@ -1686,6 +1686,328 @@ C
 !
 ! Originally in Mvec.f90
 !
+!*==MB11A.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!
+!
+!
+! LEVEL 3      SUBROUTINE MB11A(M,N,A,IA,W)
+      SUBROUTINE MB11A(M,N,A,IA,W)
+!
+! *** MB11A from HARWELL 25 May 79 ***
+!
+!C 12C
+!H Inverts a rectangular matrix whose order is the smaller dimension;
+!H used by the Harwell refinement routine VA05A.
+!
+      DIMENSION A(IA,1), W(1)
+!     PARTITION THE WORKING SPACE ARRAY W
+!     THE FIRST PARTITION HOLDS THE FIRST COMPONENTS OF THE VECTORS OF
+!     THE ELEMENTARY TRANSFORMATIONS
+      NRW = M
+!     THE SECOND PARTITION RECORDS ROW INTERCHANGES
+      NCW = M + M
+!     THE THIRD PARTITION RECORDS COLUMN INTERCHANGES
+!     SET THE INITIAL RECORDS OF ROW AND COLUMN INTERCHANGES
+      DO I = 1, M
+        N1 = NRW + I
+        W(N1) = 0.5 + FLOAT(I)
+      ENDDO
+      DO I = 1, N
+        N1 = NCW + I
+        W(N1) = 0.5 + FLOAT(I)
+      ENDDO
+!     'KK' COUNTS THE SEPARATE ELEMENTARY TRANSFORMATIONS
+      KK = 1
+!     FIND LARGEST ROW AND MAKE ROW INTERCHANGES
+    3 RMAX = 0.0
+      DO I = KK, M
+        SUM = 0.
+        DO J = KK, N
+          SUM = SUM + A(I,J)**2
+        ENDDO
+        IF (RMAX.LT.SUM) THEN
+          RMAX = SUM
+          IR = I
+        ENDIF
+      ENDDO
+      IF (RMAX.EQ.0.0) CALL ERRIN2(M-KK,0,'in MB11A:',                  &
+     &                             'reduced rows found to be zero')
+      IF (IR.LE.KK) GOTO 7
+      N3 = NRW + KK
+      SUM = W(N3)
+      N4 = NRW + IR
+      W(N3) = W(N4)
+      W(N4) = SUM
+      DO J = 1, N
+        SUM = A(KK,J)
+        A(KK,J) = A(IR,J)
+        A(IR,J) = SUM
+      ENDDO
+!     FIND LARGEST ELEMENT OF PIVOTAL ROW, AND MAKE COLUMN INTERCHANGES
+    7 RMAX = 0.
+      SUM = 0.
+      DO J = KK, N
+        SUM = SUM + A(KK,J)**2
+        IF (RMAX.GE.ABS(A(KK,J))) GOTO 10
+        RMAX = ABS(A(KK,J))
+        IR = J
+   10 ENDDO
+      IF (IR.LE.KK) GOTO 12
+      N5 = NCW + KK
+      RMAX = W(N5)
+      N6 = NCW + IR
+      W(N5) = W(N6)
+      W(N6) = RMAX
+      DO I = 1, M
+        RMAX = A(I,KK)
+        A(I,KK) = A(I,IR)
+        A(I,IR) = RMAX
+      ENDDO
+!     REPLACE THE PIVOTAL ROW BY THE VECTOR OF THE TRANSFORMATION
+   12 SIGMA = SQRT(SUM)
+      BSQ = SQRT(SUM+SIGMA*ABS(A(KK,KK)))
+      W(KK) = SIGN(SIGMA+ABS(A(KK,KK)),A(KK,KK))/BSQ
+      A(KK,KK) = -SIGN(SIGMA,A(KK,KK))
+      KP = KK + 1
+      IF (KP.GT.N) GOTO 16
+      DO J = KP, N
+        A(KK,J) = A(KK,J)/BSQ
+      ENDDO
+!     APPLY THE TRANSFORMATION TO THE REMAINING ROWS OF A
+      IF (KP.GT.M) GOTO 16
+      DO I = KP, M
+        SUM = W(KK)*A(I,KK)
+        DO J = KP, N
+          SUM = SUM + A(KK,J)*A(I,J)
+        ENDDO
+        A(I,KK) = A(I,KK) - SUM*W(KK)
+        DO J = KP, N
+          A(I,J) = A(I,J) - SUM*A(KK,J)
+        ENDDO
+      ENDDO
+      KK = KP
+      GOTO 3
+!     AT THIS STAGE THE REDUCTION OF A IS COMPLETE
+!     NOW WE BUILD UP THE GENERALIZED INVERSE
+!     APPLY THE FIRST ELEMENTARY TRANSFORMATION
+   16 KK = M
+      KP = M + 1
+      SUM = W(M)/A(M,M)
+      IF (N.LE.M) GOTO 33
+      DO J = KP, N
+        A(M,J) = -SUM*A(M,J)
+      ENDDO
+   33 A(M,M) = 1./A(M,M) - SUM*W(M)
+!     NOW APPLY THE OTHER (M-1) TRANSFORMATIONS
+   36 KP = KK
+      KK = KP - 1
+      IF (KK.LE.0) GOTO 37
+!     FIRST TRANSFORM THE LAST (M-KK) ROWS
+      DO I = KP, M
+        SUM = 0.
+        DO J = KP, N
+          SUM = SUM + A(KK,J)*A(I,J)
+        ENDDO
+        DO J = KP, N
+          A(I,J) = A(I,J) - SUM*A(KK,J)
+        ENDDO
+        W(I) = -SUM*W(KK)
+      ENDDO
+!     THEN CALCULATE THE NEW ROW IN POSITION KK
+      DO J = KP, N
+        SUM = -W(KK)*A(KK,J)
+        DO I = KP, M
+          SUM = SUM - A(I,KK)*A(I,J)
+        ENDDO
+        A(KK,J) = SUM/A(KK,KK)
+      ENDDO
+!     AND REVISE THE COLUMN IN POSITION KK
+      SUM = 1. - W(KK)**2
+      DO I = KP, M
+        SUM = SUM - A(I,KK)*W(I)
+        A(I,KK) = W(I)
+      ENDDO
+      A(KK,KK) = SUM/A(KK,KK)
+      GOTO 36
+!     RESTORE THE ROW INTERCHANGES
+   37 DO I = 1, M
+   46   N1 = NRW + I
+        IR = IFIX(W(N1))
+        IF (I.GE.IR) GOTO 45
+        SUM = W(N1)
+        N2 = NRW + IR
+        W(N1) = W(N2)
+        W(N2) = SUM
+        DO J = 1, N
+          SUM = A(I,J)
+          A(I,J) = A(IR,J)
+          A(IR,J) = SUM
+        ENDDO
+        GOTO 46
+   45 ENDDO
+!     RESTORE THE COLUMN INTERCHANGES
+      DO J = 1, N
+   50   N1 = NCW + J
+        IR = IFIX(W(N1))
+        IF (J.GE.IR) GOTO 49
+        SUM = W(N1)
+        N2 = NCW + IR
+        W(N1) = W(N2)
+        W(N2) = SUM
+        DO I = 1, M
+          SUM = A(I,J)
+          A(I,J) = A(I,IR)
+          A(I,IR) = SUM
+        ENDDO
+        GOTO 50
+   49 ENDDO
+      RETURN
+      END SUBROUTINE MB11A
+!*==NB01A.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!
+!
+!
+! LEVEL 1      SUBROUTINE NB01A(K,AZ,BZ,E2,X,Y,MAXIT)
+      SUBROUTINE NB01A(K,AZ,BZ,E2,X,Y,MAXIT)
+!
+! *** NB01A updated by PJB 15-Nov-1994  ***
+!
+!X
+!C 9C
+!H Harwell routine NB01A to find the zero of a function.
+!D Finds the value of X in the range AZ <= X <= BZ for which Y(X)=0
+!A Called initially with K=0, AZ and BZ set to the minimum and maximum values
+!A of X to be searched, E2 to the precision in X required and ABS(MAXIT) to
+!A the maximum number of iterations allowed.
+!A Subsequent calls depend on the value of K returned
+!A     K=0 Initial call as above
+!A     K=1 calculate Y for the value of X returned and call again
+!A     K=2 The value of X retuned is the required solution
+!A     K=3 No zero value of Y was found X=AZ and BZ
+!A     K=4 MAXIT calls have been made without finding the zero value within the
+!A         required precision
+!N the private common /NB01AP has been included (C43) to preserve the values
+!N of A,B,IT AND THE Js between calls
+      COMMON /NB01AP/ A, B, IT, J1, J2, J3
+!
+      IF (K.GT.0) GOTO 30
+!
+!     CALCULATE Y(X) AT X=AZ.
+      A = AZ
+      B = BZ
+      X = A
+      J1 = 1
+      IT = 1
+      M = IABS(MAXIT)
+   10 K = J1
+      GOTO 100
+!
+!     PRINT X AND Y(X) WHEN REQUESTED.
+   30 IF (MAXIT.LE.0) WRITE (6,2000) X, Y
+ 2000 FORMAT (2X,'NB01A   X=',E16.7,'  Y(X)=',E16.7)
+!
+!     TEST WHETHER Y(X) IS SUFFICIENTLY SMALL.
+      IF (ABS(Y).GT.E2) GOTO 50
+   45 K = 2
+      GOTO 100
+!
+!     BRANCH DEPENDING ON THE VALUE OF J1.
+   50 GOTO (60,70,88,170), J1
+!
+!     CALCULATE Y(X) AT X=BZ.
+   60 YA = Y
+      X = B
+      J1 = 2
+      GOTO 100
+!
+!     TEST WHETHER THE SIGNS OF Y(AZ) AND Y(BZ) ARE DIFFERENT.
+   70 IF (YA*Y.LT.0.) GOTO 120
+!
+!     BEGIN THE BINARY SUBDIVISION TO SEARCH FOR A BRACKET.
+      X1 = A
+      Y1 = YA
+      J1 = 3
+      H = B - A
+      J2 = 1
+   80 X2 = A + 0.5*H
+      J3 = 1
+!
+!     CHECK WHETHER MAXIT FUNCTION VALUES HAVE BEEN CALCULATED.
+   90 IT = IT + 1
+      IF (IT.GE.M) GOTO 10
+      X = X2
+      GOTO 100
+!
+!     TEST WHETHER A BRACKET HAS BEEN FOUND.
+   88 IF (YA*Y.LT.0.) GOTO 120
+!
+!     CONTINUE THE SEARCH FOR A BRACKET.
+      IF (J3.GE.J2) GOTO 110
+      A = X
+      YA = Y
+      X2 = X + H
+      J3 = J3 + 1
+      GOTO 90
+  110 A = X1
+      YA = Y1
+      H = 0.5*H
+      J2 = J2 + J2
+      GOTO 80
+!
+!     AT THIS POINT THE FIRST BRACKET HAS BEEN FOUND.
+  120 B = X
+      YB = Y
+      J1 = 4
+!
+!     CALCULATE THE NEXT X BY THE SECANT METHOD BASED ON THE BRACKET.
+  130 IF (ABS(YA).LE.ABS(YB)) GOTO 140
+      X1 = A
+      Y1 = YA
+      X = B
+      Y = YB
+      GOTO 150
+  140 X1 = B
+      Y1 = YB
+      X = A
+      Y = YA
+!
+!     USE THE SECANT METHOD BASED ON THE FUNCTION VALUES Y1 AND Y.
+  150 U = Y*(X-X1)/(Y-Y1)
+  155 X2 = X - U
+      IF (X2.EQ.X) GOTO 195
+      X1 = X
+      Y1 = Y
+      YTEST = 0.5*AMIN1(ABS(YA),ABS(YB))
+!
+!     CHECK THAT X2 IS INSIDE THE INTERVAL (A,B).
+      IF ((X2-A)*(X2-B).LT.0.) GOTO 90
+!
+!     CALCULATE THE NEXT VALUE OF X BY BISECTION.
+  160 X2 = 0.5*(A+B)
+      YTEST = 0.
+!
+!     CHECK WHETHER THE MAXIMUM ACCURACY HAS BEEN ACHIEVED.
+      IF ((X2-A)*(X2-B)) 90, 45, 45
+!
+!     REVISE THE BRACKET (A,B).
+  170 IF (YA*Y.GE.0.) GOTO 180
+      B = X
+      YB = Y
+      GOTO 190
+  180 A = X
+      YA = Y
+!
+!     USE YTEST TO DECIDE THE METHOD FOR THE NEXT VALUE OF X.
+  190 IF (YTEST.LE.0.) GOTO 130
+      IF (ABS(Y)-YTEST) 150, 150, 160
+  195 IF (U.EQ.0.) GOTO 45
+      U = U + U
+      GOTO 155
+!
+  100 RETURN
+      END SUBROUTINE NB01A
 !*==CGMPRD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !
@@ -3294,255 +3616,10 @@ C
 !
 !*****************************************************************************
 !
-! Originally in Pawley.f90
-!
-!
-!*****************************************************************************
-!
-      INTEGER FUNCTION New_Pawley_Refinement()
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      INCLUDE 'DialogPosCmn.inc'
-
-      CALL WDialogSelect(IDD_Pawley_Status)
-      CALL WDialogShow(IXPos_IDD_Pawley_Status,                         &
-     &IYPos_IDD_Pawley_Status,0,Modeless)
-
-      CALL Quick_Pawley_ReRefine() 
-      New_Pawley_Refinement = Quick_Pawley_Fit()
-
-      END FUNCTION New_Pawley_Refinement
-!
-!*****************************************************************************
-!
-      SUBROUTINE Quick_Pawley_ReRefine
-!.. This is the routine that reads the CCN file, checks for changes from 
-!.. the Pawley status dialogue and writes out a new CCL file
-!..
-!.. Multiple checks before attempting to perform quick Pawley
-!.. We need 
-!..    (i)   lattice constants
-!..    (ii)  space group
-!..    (iii) wavelength
-!..    (iv)  diffraction file for range limits 
-!..            (strictly not necessary - we could put in a 2 theta max of 60 degrees
-!..             and redo the tic marks when we load in the data.)
-!..   Check the lattice constants
-!..   Check the wavelength
-!..   Check the space group
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-!
-!   Type declarations
-!
-      INTEGER :: IDNUMBER
-      INCLUDE 'statlog.inc'
-      INCLUDE 'params.inc'
-      INCLUDE 'Lattice.inc'
-!
-      CHARACTER(LEN=80) :: Line
-      LOGICAL :: FirstVaryLine
-!
-      COMMON /PEAKFIT2/PkFnVal(MPkDes,Max_NPFR),                        &
-     &PkFnEsd(MPkDes,Max_NPFR),PkFnCal(MPkDes,Max_NPFR),                &
-     &PkFnVarVal(3,MPkDes),PkFnVarEsd(3,MPkDes),                        &
-     &PkAreaVal(MAX_NPPR,MAX_NPFR),PkAreaEsd(MAX_NPPR,MAX_NPFR),        &
-     &PkPosVal(MAX_NPPR,MAX_NPFR),PkPosEsd(MAX_NPPR,MAX_NPFR),          &
-     &PkPosAv(MAX_NPFR)
-
-      PARAMETER (msymmin=10)
-      CHARACTER*20 symline
-      common /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
-
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),                      &
-     &YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),                            &
-     &YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,           &
-     &YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD,            &
-     &XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-      COMMON /PAWREFCMN/ XRANMIN,XRANMAX,NPawBack
-
-      IF (.NOT. BACKREF) NPawBack = 2
-!
-!... Check what's happening in IDD_Pawley_Status
-!
-! Now check on which button was pressed ...
-      If (NumPawleyRef.EQ.0) THEN
-        CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Disabled)
-        CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefWid_Check,Disabled)
-        CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Unchecked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
-        NTCycles=3
-        CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
-        IF (.NOT. BACKREF) THEN
-            CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
-          CALL WDialogFieldState(IDF_IDF_PawRef_NBack,Disabled)
-        ENDIF
-      ELSE
-        CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefBack_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefCell_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefZero_Check,Enabled)
-        CALL WDialogFieldState(IDF_PawRef_RefWid_Check,Enabled)
-        CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Checked)
-        CALL WDialogPutCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
-        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,NPawBack)
-        NTCycles=5
-        CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,NTCycles)
-        IF (.NOT. BACKREF) THEN
-          CALL WDialogFieldState(IDF_IDF_PawRef_NBack,Disabled)
-        ENDIF
-      END IF
-      CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
-      SkipPawleyRef=.false.
-      DO WHILE(.NOT.SkipPawleyRef)
-        CALL GetEvent
-        SELECT CASE (EventType)
-          CASE (PushButton)
-            IDNumber=EventInfo%Value1
-            SELECT CASE (EventInfo%Value1)
-              CASE(IDF_PawRef_Refine)
-                Goto 888
-              CASE(IDCLOSE)
-                SkipPawleyRef=.true.
-            END SELECT
-!          CASE(FieldChanged)
-!            IDNumber=EventInfo%Value1
-!            SELECT CASE (IDNumber)
-!              CASE (IDF_IDF_PawRef_NBack)
-!                CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
-!              CASE (IDF_Pawley_Total_Cycles)
-!                CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)
-!              CASE (IDF_PawRef_UseInts_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Checked)
-!              CASE (IDF_PawRef_RefInts_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefInts_Check,Checked)
-!              CASE (IDF_PawRef_RefBack_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefBack_Check,Checked)
-!              CASE (IDF_PawRef_RefCell_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefCell_Check,Checked)
-!              CASE (IDF_PawRef_RefZero_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefZero_Check,Checked)
-!              CASE (IDF_PawRef_RefWid_Check)
-!        CALL WDialogGetCheckBox(IDF_PawRef_RefWid_Check,Unchecked)
-!            END SELECT
-        END SELECT
-      END DO
-      If (SkipPawleyRef) RETURN
- 888  NumPawleyRef = NumPawleyRef + 1
-      Call WDialogGetCheckBox(IDF_PawRef_RefWid_Check,IWid_Check)
-      If (IWid_Check.EQ.Checked) CALL WDialogGetRadioButton(IDF_PawRef_RefWid_Radio1,IWid_Option)
-      CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
-      CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
-!
-!... End of check in IDD_Pawley_Status
-!
-!.. We should only proceed with this if we have good cell constants 
-!.. If no wavelength then assume Cu Ka1 wvln=1.54051
-!..
-!
-      OPEN(42,file='polyp.ccl',status='unknown')
-      OPEN(43,file='polyp.ccn',status='old')
-      FirstVaryLine=.true.
-!..
-   10 READ(43,5300,END=900) nl,line
- 5300 FORMAT(q,a)
-      SELECT CASE (line(1:1))
-        CASE ('I')
-          WRITE(42,4240) NTCycles
- 4240     FORMAT('I NCYC ',I3,' PRCV 14 MCOR 0 FRIE 1 PRPR 0')
-        CASE ('L')
-          SELECT CASE (line(3:6))
-            CASE('RTYP')
-              CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check,Item)
-              IRtyp=2-Item
-              WRITE(42,4245) IRTYP,xranmin,xranmax
- 4245         FORMAT('L RTYP  'i3,2f10.3,'  0.001')
-            CASE('VARY')
-              IF (FirstVaryLine) THEN
-                WRITE(42,4300) 
- 4300 FORMAT('L VARY ONLY ALL INTS')
-                CALL WDialogGetCheckBox(IDF_PawRef_RefBack_Check,Item)
-                IF (Item.eq.1) WRITE(42,4310)
- 4310 FORMAT('L VARY ALL BACK ')
-                CALL WDialogGetCheckBox(IDF_PawRef_RefCell_Check,Item)
-                IF (Item.eq.1) WRITE(42,4320)
- 4320 FORMAT('L VARY ALL CELL ')
-                CALL WDialogGetCheckBox(IDF_PawRef_RefZero_Check,Item)
-                IF (Item.eq.1) WRITE(42,4330)
- 4330 FORMAT('L VARY ZERO 1 ')
-             CALL WDialogGetCheckBox(IDF_PawRef_RefWid_Check,IWid_Check)
-                IF (IWid_Check.eq.Checked) THEN
-        CALL WDialogGetRadioButton(IDF_PawRef_RefWid_Radio1,IWid_Option)
-                  SELECT CASE (IWid_Option)
-                    CASE(1)
-                      WRITE(42,4410)
- 4410     FORMAT('L VARY SIGM 1')
-                    CASE(2)
-                      WRITE(42,4420)
- 4420     FORMAT('L VARY SIGM 2')
-                    CASE(3)
-                      WRITE(42,4430)
- 4430     FORMAT('L VARY GAMM 1')
-                    CASE(4)
-                      WRITE(42,4440)
- 4440     FORMAT('L VARY GAMM 2')
-                  END SELECT 
-                END IF
-              END IF
-              FirstVaryLine=.FALSE.
-            CASE DEFAULT
-              WRITE(42,5310) line(:nl)              
-          END SELECT
-        CASE DEFAULT
-          WRITE(42,5310) line(:nl)
- 5310     FORMAT(a)
-      END SELECT
-!      nblin=1+(NPawBack-1)/5
-!      do inb=1,nblin
-!        n1=5*(inb-1)
-!        n2=min(n1+5,NPawBack)-n1
-!        backstr='L BACK 2'
-!        knb=7
-!        if (inb.eq.1) knb=9
-!        do jnb=1,n2
-!          k1=knb+4*(jnb-1)
-!          backstr(k1:k1+4)=' 0.0'
-!        end do
-!        write(42,4280) backstr
-! 4280 format(a)
-!      end do
-      GOTO 10
- 900  CLOSE(42)
-      CLOSE(43)    
-
-      END SUBROUTINE Quick_Pawley_ReRefine
-!
-!*****************************************************************************
-!
 ! Originally in Plot_SA_Profile.f90
 !
       subroutine Plot_SA_profile()
-!************
-!
-!
+
       CALL IGrArea(0.0,0.0,1.0,1.0)
       CALL IGrUnits(0.,0.,1.,1.)
       CALL IGrAreaClear
@@ -15273,14 +15350,12 @@ c          log_bounds=.true.
               torfile(iv)=' '
               read(line(itorf+12:132),5020,err=999) torfile(iv)
  5020         format(a)
-ccc	write(6,*) iv,torfile(iv)(1:60)
             else if (gaussb(iv)) then
               read(line(1:ig-1),*,err=999) lb(iv),ub(iv),vm(iv)
               read(line(ig+1:132),*,err=999) cen(iv),sig(iv)
             else
               read(line(1:132),*,err=999) lb(iv),ub(iv),vm(iv)
             end if
-ccc            write(6,*) lb(iv),ub(iv),vm(iv),cen(iv),sig(iv)
           end do
           log_bounds=.true.
         else
