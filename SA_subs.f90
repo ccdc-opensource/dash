@@ -113,7 +113,7 @@
       CHARACTER*3 CNruns,CMruns
       LOGICAL PrevRejected, CurrParsInclPO, PrevParsInclPO
       INTEGER TotNumTrials
-      CHARACTER*2 RowLabelStr
+      CHARACTER*3 RowLabelStr
       REAL XP(MVAR)
       REAL xtem, tempupper, templower, tempupper2
       REAL Initial_T ! As calculated during intial run, not as set by the user.
@@ -127,7 +127,7 @@
       IF (.NOT. Resume_SA) THEN
         Curr_SA_Run = 0
         NumOf_SA_Runs = 0
-        DO I = 1, 99
+        DO I = 1, MaxRun
           iSol2Run(I) = I
         ENDDO
       ENDIF
@@ -244,7 +244,7 @@
         CALL ChiSqPlot_UpdateIterAndChiProBest(1)
         CALL WDialogSelect(IDD_Summary)
         CALL WGridRows(IDF_SA_Summary, Curr_SA_Run)
-        WRITE(RowLabelStr,'(I2)') Curr_SA_Run
+        WRITE(RowLabelStr,'(I3)') Curr_SA_Run
         CALL WGridLabelRow(IDF_SA_summary, Curr_SA_Run, RowLabelStr)
         CALL WGridPutCellInteger (IDF_SA_Summary, 1, Curr_SA_Run, NumOf_SA_Runs+1) 
         CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, Curr_SA_Run, 1)
