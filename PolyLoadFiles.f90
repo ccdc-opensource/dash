@@ -39,7 +39,7 @@
 !               'DASH powder diffraction files (*.xye)|*.xye|'//&
 !               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
       FILTER = 'All files (*.*)|*.*|'//&
-               'All powder diffraction files|*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye;*.x01|'//&
+               'All powder diffraction files|*.cpi;*.pod;*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye;*.x01|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
@@ -172,17 +172,9 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
-      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
-      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
-                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX
-
       INTEGER          KLEN
       CHARACTER(LEN=4) EXT4
+      INTEGER, EXTERNAL :: Load_cpi_File
       INTEGER, EXTERNAL :: Load_dat_File
       INTEGER, EXTERNAL :: Load_raw_File
       INTEGER, EXTERNAL :: Load_pod_File
@@ -198,6 +190,7 @@
       REAL             INTEGRATED_GUESS
       INTEGER          MAX_INTENSITY_INDEX
       LOGICAL, EXTERNAL :: ChrIsDigit
+      REAL             tYPMIN, tYPMAX
 
 ! Initialise to failure
       DiffractionFileLoad = 0
@@ -218,6 +211,8 @@
       ESDsFilled = .FALSE.
       NoWavelengthInXYE = .FALSE.
       SELECT CASE (EXT4)
+        CASE ('cpi ')
+          ISTAT = Load_cpi_File(TheFileName,ESDsFilled)
         CASE ('dat ', 'txt ')
           ISTAT = Load_dat_File(TheFileName,ESDsFilled)
         CASE ('pod ')
@@ -268,13 +263,13 @@
       CALL Clear_PeakFitRanges
 ! Ungrey 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
-      YPMIN = YOBS(1)
-      YPMAX = YOBS(1)
+      tYPMIN = YOBS(1)
+      tYPMAX = YOBS(1)
       DO I = 1, NOBS
-        YPMIN = MIN(YOBS(I),YPMIN)
-        IF (YPMAX .LT. YOBS(I)) THEN
+        tYPMIN = MIN(YOBS(I),tYPMIN)
+        IF (tYPMAX .LT. YOBS(I)) THEN
           MAX_INTENSITY_INDEX = I
-          YPMAX = YOBS(I)
+          tYPMAX = YOBS(I)
         ENDIF
       ENDDO
       INTEGRATED_GUESS = 0.0
@@ -283,8 +278,8 @@
       ENDDO
       IF (INTEGRATED_GUESS .GT. 250000.0) THEN
         SCALFAC = 0.01 * INTEGRATED_GUESS/250000.0
-      ELSE IF (YPMAX .GT. 100000) THEN
-        SCALFAC = 0.01 * YPMAX/100000.0
+      ELSE IF (tYPMAX .GT. 100000) THEN
+        SCALFAC = 0.01 * tYPMAX/100000.0
       ENDIF
       BackupXOBS = 0.0
       BackupYOBS = 0.0
@@ -307,6 +302,161 @@
 !      CALL FourierPattern(1,1000)
 
       END FUNCTION DiffractionFileLoad
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION Load_cpi_File(TheFileName,ESDsFilled)
+!
+! This function tries to load a *.dat file (ASCII format used by Armel Le Bail).
+! The routine basically assumes that the file is OK.
+!
+! Note that this function should only be called from DiffractionFileLoad
+!
+! INPUT   : TheFileName = the file name
+!
+! OUTPUT  : ESDsFilled set to .TRUE. if the file contained ESDs, .FALSE. otherwise
+!
+! RETURNS : 1 for success
+!           0 for error (could be file not found/file in use/no valid data)
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      LOGICAL,       INTENT (  OUT) :: ESDsFilled
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
+      CHARACTER*255 tString ! String containing last line read from file
+      INTEGER       I, NumOfBins, FLEN ! Length of TheFileName
+      REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
+      INTEGER       hFile
+      INTEGER, EXTERNAL :: GetNumOfColumns
+      REAL          Lambda1
+      CHARACTER*2   Anode
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption
+
+! Current status, initialise to 'error'
+      Load_cpi_File = 0
+      hFile = 10
+      Lambda1       = 0.0
+      Anode         = 'Xx'
+      TwoThetaStart = 0.0
+      TwoThetaEnd   = 0.0
+      TwoThetaStep  = 0.0
+      FLEN = LEN_TRIM(TheFileName)
+      OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+! *.cpi files look like this:
+!
+!SIETRONICS XRD SCAN               ! File identification marker (copy exactly)
+!5.000                             ! Start angle
+!77.000                            ! End angle
+!0.020                             ! Step size
+!Cu                                ! Tube anode
+!1.54060                           ! Wavelength
+!29-4-2002                         ! Date of scan
+!0.080                             ! Scan speed
+!SMRR-1                            ! Comment
+!SCANDATA                          ! Start of scan data marker (upper case)
+!3410
+!3537
+!3406
+!3278
+! <SNIP>
+!367
+!369
+!373
+!328
+!
+
+! Read the header line
+      READ(hFile,FMT='(A)',ERR=999,END=999) tString
+      IF (tString .NE. 'SIETRONICS XRD SCAN') THEN
+        CALL ErrorMessage('File identification marker missing.')
+        GOTO 999
+      ENDIF
+      READ(hFile,*,ERR=999,END=999) TwoThetaStart
+      READ(hFile,*,ERR=999,END=999) TwoThetaEnd
+      READ(hFile,*,ERR=999,END=999) TwoThetaStep
+      READ(hFile,'(A2)',ERR=999,END=999) Anode
+      READ(hFile,*,ERR=999,END=999) Lambda1
+      READ(hFile,FMT='(A)',ERR=999,END=999) tString
+      DO WHILE (tString .NE. 'SCANDATA')
+        READ(hFile,FMT='(A)',ERR=999,END=999) tString
+      ENDDO
+! Calculate how many bins we expect.
+! Quick check if values have been read at all.
+      IF (TwoThetaStart .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta starting value not found.')
+        GOTO 999
+      ENDIF
+      IF (TwoThetaEnd   .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta end value not found.')
+        GOTO 999
+      ENDIF
+      IF (TwoThetaStep  .LT. 0.000001) THEN
+        CALL ErrorMessage('2 theta step size not found.')
+        GOTO 999
+      ENDIF
+! Note that NINT correctly rounds to the nearest whole number
+      NumOfBins = 1 + NINT((TwoThetaEnd - TwoThetaStart) / TwoThetaStep)
+! Check that we will not read more than MOBS data points
+      IF (NumOfBins .GT. MOBS) THEN
+! Warn the user
+        CALL ProfileRead_TruncationWarning(TheFileName,MOBS)
+        NumOfBins = MOBS
+      ENDIF
+! Check that we will not read less than 1 data point
+      IF (NumOfBins .EQ. 0) THEN
+! The user should be warned here
+        CALL ErrorMessage("The file does not contain enough data points.")
+        GOTO 999
+      ENDIF
+! Fill the 2theta values first
+      CurrTwoTheta = TwoThetaStart
+      DO I = 1, NumOfBins
+        XOBS(I) = CurrTwoTheta
+        CurrTwoTheta = CurrTwoTheta + TwoThetaStep
+      ENDDO
+      DO I = 1, NumOfBins
+        READ(hFile,*,ERR=999,END=100) YOBS(I)
+      ENDDO
+  100 CLOSE(hFile)
+      NOBS = I - 1
+      IF (NOBS .LT. NumOfBins) CALL WarningMessage('File contained less data points than expected.'//CHAR(13)// &
+                                                   'Will continue with points actually read only.')
+      IF (NOBS .EQ. 0) THEN
+! The user should be warned here
+        CALL ErrorMessage("The file does not contain enough data points.")
+        GOTO 999
+      ENDIF
+      ESDsFilled = .FALSE.
+! If wavelength present in file add in a test: if wavelength close to known anode material,
+! set source to laboratory. Otherwise, source is synchrotron.
+      IF (Lambda1 .GT. 0.01) THEN
+! Initialise source material to synchrotron
+        JRadOption = 2
+        DO I = 2, 6
+          IF (ABS(Lambda1 - FnWavelengthOfMenuOption(I)) .LT. 0.0003) JRadOption = 1
+        ENDDO
+        CALL Upload_Source
+        CALL Set_Wavelength(Lambda1)
+      ENDIF
+      Load_cpi_File = 1
+      RETURN
+ 999  CONTINUE
+! Exit code is error by default, so we can simply return
+      CLOSE(hFile)
+
+      END FUNCTION Load_cpi_File
 !
 !*****************************************************************************
 !
@@ -344,16 +494,17 @@
       INTEGER       I, J, NumOfBins, FLEN ! Length of TheFileName
       REAL          TwoThetaStart, TwoThetaEnd, TwoThetaStep, CurrTwoTheta
       REAL          TempInput(8) ! Max. num. of columns is 8
-      INTEGER       NumOfColumns2Read
-      INTEGER       GetNumOfColumns ! Function
+      INTEGER       NumOfColumns2Read, hFile
+      INTEGER, EXTERNAL :: GetNumOfColumns
 
 ! Current status, initialise to 'error'
       Load_dat_File = 0
+      hFile = 10
       TwoThetaStart = 0.0
       TwoThetaEnd   = 0.0
       TwoThetaStep  = 0.0
       FLEN = LEN_TRIM(TheFileName)
-      OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
 ! *.dat files look like this:
 !
 
@@ -371,7 +522,7 @@
 
 
 ! Read the header line
-    9 READ(10,*,ERR=999,END=999) TwoThetaStart, TwoThetaStep, TwoThetaEnd
+    9 READ(hFile,*,ERR=999,END=999) TwoThetaStart, TwoThetaStep, TwoThetaEnd
 ! The number of counts per 2theta should commence from here.
 ! Calculate how many bins we expect.
 ! Quick check if values have been read at all.
@@ -407,7 +558,7 @@
         XOBS(I) = CurrTwoTheta
         CurrTwoTheta = CurrTwoTheta + TwoThetaStep
       ENDDO
-      READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
+      READ(UNIT=hFile,FMT='(A)',ERR=999,END=100) Cline
       I = 0
 ! Next, we have to determine how many columns to read from the next line.
 ! There are two conditions:
@@ -422,7 +573,7 @@
       I = I + NumOfColumns2Read
       READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
       GOTO 11
-  100 CLOSE(10)
+  100 CLOSE(hFile)
       NOBS = I
       IF (NOBS .LT. NumOfBins) CALL WarningMessage('File contained less data points than expected.'//CHAR(13)// &
                                                    'Will continue with points actually read only.')
@@ -439,7 +590,7 @@
       RETURN
  999  CONTINUE
 ! Exit code is error by default, so we can simply return
-      CLOSE(10)
+      CLOSE(hFile)
 
       END FUNCTION Load_dat_File
 !
@@ -1062,7 +1213,7 @@
       PARAMETER    (COUNTS = 1, THETACOUNTS = 2, THETACOUNTSTIME = 3)
       INTEGER       MaxNumOfColumns, NumOfColumns2Read
       INTEGER       GetNumOfColumns ! Function
-      CHARACTER*1   ChrLowerCase, ChrUpperCase ! Functions
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
       REAL, EXTERNAL :: WavelengthOf
       INTEGER       KeyWordPos, KeyWordLen, StrLen, I
 
@@ -1342,7 +1493,7 @@
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
       CHARACTER*255 Cline
-      INTEGER       I, IS, FLEN ! Length of TheFileName
+      INTEGER       I, IS, hFile, FLEN ! Length of TheFileName
       LOGICAL       ReadWarning
       REAL, EXTERNAL :: FnWavelengthOfMenuOption
       INTEGER, EXTERNAL :: GetNumOfColumns
@@ -1350,13 +1501,14 @@
 
 ! Initialise to failure
       Load_xye_File = 0
+      hFile         = 10
       Lambda1       = 0.0
       ReadWarning   = .FALSE.
       FLEN = LEN_TRIM(TheFileName)
       OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
       I = 1
 ! Check if wavelength available on very first line
-      READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
+      READ(UNIT=hFile,FMT='(A)',ERR=999,END=999) Cline
       IF (GetNumOfColumns(Cline) .EQ. 1) THEN
         READ(Cline,*,ERR=999,END=999) Lambda1
         IF ((Lambda1 .LT. 0.0001) .OR. (Lambda1 .GT. 20.0)) THEN
@@ -1365,25 +1517,25 @@
         ENDIF
 ! JvdS Q & D hack enabling the cell parameters to be stored on the second line of the .xye file.
 ! ####################
-        READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
+        READ(UNIT=hFile,FMT='(A)',ERR=999,END=999) Cline
         IF (GetNumOfColumns(Cline) .EQ. 6) THEN
           READ(Cline,*,ERR=999,END=999) CellPar(1), CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6)
           CALL Upload_Cell_Constants
         ELSE
-          CLOSE(10)
-          OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-          READ(UNIT=10,FMT='(A)',ERR=999,END=999) Cline
+          CLOSE(hFile)
+          OPEN(UNIT=hFile,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+          READ(UNIT=hFile,FMT='(A)',ERR=999,END=999) Cline
         ENDIF
 ! JvdS End of Q & D hack.
 ! ####################
       ELSE
 ! If we are here, the .xye file didn't contain the wavelength
         NoWavelengthInXYE = .TRUE.
-        CLOSE(10)
-        OPEN(UNIT=10,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
+        CLOSE(hFile)
+        OPEN(UNIT=hFile,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
       ENDIF
 ! Modified to handle files without esds - used to read in YOBS as the esd
- 10   READ(UNIT=10,FMT='(A)',ERR=999,END=100) Cline
+ 10   READ(UNIT=hFile,FMT='(A)',ERR=999,END=100) Cline
       READ(Cline,*, IOSTAT = IS) XOBS(I),YOBS(I),EOBS(I)
       IF (IS .NE. 0) THEN
         READ(Cline,*, ERR=100,END=100) XOBS(I),YOBS(I)
@@ -1416,7 +1568,7 @@
       ENDIF
       GOTO 10
  100  NOBS = I - 1
-      CLOSE(10)
+      CLOSE(hFile)
       ESDsFilled = .TRUE.
 ! JvdS Added check for number of observations = 0
       IF (NOBS .EQ. 0) THEN
@@ -1437,7 +1589,7 @@
       Load_xye_File = 1
       RETURN
  999  CONTINUE
-      CLOSE(10)
+      CLOSE(hFile)
 
       END FUNCTION Load_xye_File
 !
