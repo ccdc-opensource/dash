@@ -83,9 +83,9 @@
 
       tNumberOfDays = TheNumberOfDays
       Year  = TheDate / 10000
-      TheDate = TheDate - Year
+      TheDate = TheDate - (Year*10000)
       Month = TheDate /   100
-      TheDate = TheDate - Month
+      TheDate = TheDate - (Month*100)
       Day   = TheDate
       IF (IsLeapYear(Year)) THEN
         DaysOfMonth(2) = 29
