@@ -79,7 +79,7 @@
 
 ! frag_file = name of the .zmatrix file containing fragment number ifrag
 
-      INTEGER         zmNumberOfCopies(1:maxfrg)
+      INTEGER         zmNumberOfCopies(0:maxfrg)
 
 ! zmNumberOfCopies  =  number of copies of this Z-matrix used during the SA.
 !                      This way, it is easy e.g. to solve salts or solve structures in P1
@@ -94,10 +94,10 @@
 !               Set to .FALSE. after SA parameter boundaries dialogue has been initialised
 
       INTEGER          icomflg(0:maxfrg)
-      REAL             AtomicWeighting(1:maxatm,1:maxfrg)
-      LOGICAL          UseQuaternions(1:maxfrg)
-      REAL             zmSingleRotationAxis(1:3,1:maxfrg)
-      DOUBLE PRECISION zmSingleRotationQs(0:3,1:maxfrg)
+      REAL             AtomicWeighting(1:maxatm,0:maxfrg)
+      LOGICAL          UseQuaternions(0:maxfrg)
+      REAL             zmSingleRotationAxis(1:3,0:maxfrg)
+      DOUBLE PRECISION zmSingleRotationQs(0:3,0:maxfrg)
 
 ! icomflg         = Centre of mass flag.
 !                   0 = use centre of mass of molecule as centre of rotation
@@ -110,11 +110,11 @@
 ! zmSingleRotationQs   = Factors in the quaternion-expression of the rotation about a single axis
 !                        which are due to the orientation of the single axis
     
-      INTEGER         izmpar(1:maxfrg)
-      CHARACTER*36    czmpar(1:MaxDOF,1:maxfrg)
-      INTEGER         kzmpar(1:MaxDOF,1:maxfrg)
+      INTEGER         izmpar(0:maxfrg)
+      CHARACTER*36    czmpar(1:MaxDOF,0:maxfrg)
+      INTEGER         kzmpar(1:MaxDOF,0:maxfrg)
       INTEGER         kzmpar2(1:100)
-      REAL            xzmpar(1:MaxDOF,1:maxfrg)
+      REAL            xzmpar(1:MaxDOF,0:maxfrg)
 
 ! izmpar = number of degrees of freedom ('parameters') per Z-matrix
 ! czmpar = Character string associated with this parameter value
