@@ -43,6 +43,11 @@
       CALL WMessageEnable(FieldChanged, Enabled)
       CALL WMessageEnable(TabChanged, Enabled)
       CALL Check_Licence
+! Grey out al buttons to do with project file.
+      CALL WMenuSetState(IDB_New,ItemEnabled,WintOff)
+      CALL WMenuSetState(IDB_Open,ItemEnabled,WintOff)
+      CALL WMenuSetState(IDB_Save,ItemEnabled,WintOff)
+      CALL WMenuSetState(IDB_SaveAs,ItemEnabled,WintOff)
 ! Main message loop
 ! Go through the PolyFitter wizard
 ! Comment this next line out to remove the wizard
