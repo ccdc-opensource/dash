@@ -402,8 +402,7 @@
       KKOR = 0
       MINCOR = 20
       DO iR = 1, MFCSTO
-        READ(hFile,2121,END=100,ERR=999) NLIN, LINE
-   2121 FORMAT (Q,A)
+        READ(hFile,'(Q,A)',END=100,ERR=999) NLIN, LINE
         NCOR = GetNumOfColumns(LINE) - 6
         READ(LINE(1:NLIN),*,END=999,ERR=999) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
         KK = iR
@@ -432,7 +431,7 @@
         ENDIF
       ENDDO
       iErr = 0
-  999 CLOSE (hFile)
+  999 CLOSE(hFile)
 
       END SUBROUTINE GETHCV
 !
@@ -488,7 +487,7 @@
         KREFT(I) = MIN(50,KTEM)
         NOBS = NOBS + 1
         WTSA(I) = 1.0/EOBS(I)**2
-        IF (KTEM.GT.0) THEN
+        IF (KTEM .GT. 0) THEN
           READ (hFile,*,ERR=999) (tKNIPT(K),tPIKVAL(K),K=1,KTEM)
           DO j = 1, MIN(50,KTEM)
             KNIPT(j,I)  = tKNIPT(j)
