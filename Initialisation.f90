@@ -94,7 +94,6 @@
       CALL WDialogLoad(IDD_PW_Page10)
       CALL WDialogLoad(IDD_Pawley_Status)
       CALL WDialogLoad(IDD_Pawley_ErrorLog)
-!F      CALL WDialogLoad(IDD_ExclRegions)
       CALL WDialogLoad(IDD_SAW_Page1)
       CALL WDialogLoad(IDD_zmEdit)
       CALL WDialogLoad(IDD_zmEditRotations)
@@ -256,8 +255,15 @@
       LOGICAL         InSA
       COMMON /SADATA/ InSA
 
-      REAL            UR,     UI
-      COMMON /FFTDA / UR(15), UI(15)
+      REAL           UR,     UI
+      COMMON /FFTDA/ UR(15), UI(15)
+
+      LOGICAL            ShowAgain
+      INTEGER                       Counter
+      COMMON  / DBGMSG / ShowAgain, Counter
+
+      INTEGER                ModalFlag
+      COMMON /ModalTorsions/ ModalFlag(100)
 
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
@@ -267,20 +273,13 @@
       INTEGER iRed, iGreen, iBlue, iRGBvalue
       REAL    UM, TH
 
-      LOGICAL            ShowAgain
-      COMMON  / DBGMSG / ShowAgain
-
-!Elna
-      INTEGER                 ModalFlag
-      COMMON / ModalTorsions/ ModalFlag(100)
-
+! The initialisations should be split up into 'one off initialisations' (at the start up
+! of DASH only) and 'whenever a new project file is opened'
       DO I = 1,MVar
         ModalFlag = 1
       ENDDO
-
-! The initialisations should be split up into 'one off initialisations' (at the start up
-! of DASH only) and 'whenever a new project file is opened'
       ShowAgain = .TRUE.
+      Counter   = 0
       PI     = 4.0*ATAN(1.0)
       RAD    = PI/180.0
       DEG    = 180.0/PI
