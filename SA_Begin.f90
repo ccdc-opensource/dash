@@ -65,7 +65,6 @@
       CALL Init_MultiRun
 ! Grey out "start next" button if not multirun
       CALL WDialogFieldStateLogical(IDF_StartNext,RESTART)
-      CALL WDialogFieldState(IDB_Summary,Disabled)
       IPTYPE = 2
 !C Clear Chi-sqd array between starting sets of SA Runs
       Chi_sqd = 0.0
@@ -80,25 +79,16 @@
       SA_DurationStr = ""
       DSLen = LEN_TRIM(SA_DurationStr)
       NItems = 0
-      IF (DaysElapsed .EQ. 0) THEN
-        DiffSecs = EndTime - StartTime
-      ELSE
-        DaysElapsed = DaysElapsed - 1
-        DiffSecs = OneDay - StartTime + EndTime
-        IF (DiffSecs .GT. OneDay) THEN
-          DaysElapsed = DaysElapsed + 1
-          DiffSecs = DiffSecs - OneDay
-        ENDIF
-      ENDIF
-!C Divide number of days into weeks and days
+      DiffSecs = EndTime - StartTime
       IF (DaysElapsed .GT. 0) THEN
+        IF (DiffSecs .LT. 0) THEN
+          DaysElapsed = DaysElapsed - 1
+          DiffSecs = DiffSecs + OneDay
+        ENDIF
+!C Divide number of days into weeks and days
         nweeks = DaysElapsed / 7
         IF (nweeks .NE. 0) THEN
           DaysElapsed = DaysElapsed - nweeks*7
-          IF (NItems .GT. 0) THEN
-            SA_DurationStr = SA_DurationStr(1:DSLen)//", "
-            DSLen = DSLen + 2
-          ENDIF
           tIntStr = Integer2String(nweeks)
           SA_DurationStr = SA_DurationStr(1:DSLen)//tIntStr(1:LEN_TRIM(tIntStr))//" weeks"
           DSLen = LEN_TRIM(SA_DurationStr)
