@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GET_LOGREF(FILE,lenfil,ier)
+      SUBROUTINE GET_LOGREF(FILE,ier)
 
       USE ATMVAR
       USE REFVAR
@@ -9,7 +9,6 @@
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: FILE
-      INTEGER,       INTENT (IN   ) :: lenfil
       INTEGER,       INTENT (  OUT) :: ier
 
       INCLUDE 'PARAMS.INC'
@@ -55,8 +54,12 @@
 !     and then multiplied by 2
       INTEGER H_m, K_m, L_m, HPKm, HPLm, KPLm, HPKPLm
 
-      INTEGER IR, I, JHMAX, JHMIN, Item, IREMAIN, LL, LLM
+      INTEGER IR, JHMAX, JHMIN, Item, IREMAIN, LL, LLM
+      INTEGER, EXTERNAL :: GETTIC
 
+      ier = GETTIC(FILE)
+      IF (ier .NE. 0) RETURN
+      MAXK = NumOfRef
       IHMIN = 9999
       IKMIN = 9999
       ILMIN = 9999
@@ -65,33 +68,24 @@
       IKMAX = -9999
       ILMAX = -9999
       IIMAX = -9999
-      ier = 0
-      OPEN (31,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998)
-      MAXK = 0
-      DO IR = 1, MFCSTO
-        READ (31,*,ERR=998,END=200) (iHKL(I,IR),I=1,3), RefArgK(IR),DSTAR(IR)
-        MAXK = MAXK + 1
+      DO iR = 1, MAXK
         IHMIN = MIN(iHKL(1,IR),IHMIN)
         IKMIN = MIN(iHKL(2,IR),IKMIN)
         ILMIN = MIN(iHKL(3,IR),ILMIN)
         IHMAX = MAX(iHKL(1,IR),IHMAX)
         IKMAX = MAX(iHKL(2,IR),IKMAX)
         ILMAX = MAX(iHKL(3,IR),ILMAX)
-!       Now calculate 'i' index for hexagonals
+! Now calculate 'i' index for hexagonals
         ITEM = -(iHKL(1,IR) + iHKL(2,IR))
         IIMIN = MIN(ITEM,IIMIN)
         IIMAX = MAX(ITEM,IIMAX)
       ENDDO
-  200 CONTINUE
       IHMINLT0 = IHMIN.LT.0
       IKMINLT0 = IKMIN.LT.0
       ILMINLT0 = ILMIN.LT.0
-      IF (ABS(ihmin).GT.ABS(ihmax)) ihmax = ABS(ihmin)
-      IF (ABS(ikmin).GT.ABS(ikmax)) ikmax = ABS(ikmin)
-      IF (ABS(ilmin).GT.ABS(ilmax)) ilmax = ABS(ilmin)
-!
-! JvdS Replaced include by its contents (the include file was used only once)
-!O      include 'GET_LOGREF.inc'
+      IF (ABS(IHMIN).GT.ABS(IHMAX)) IHMAX = ABS(IHMIN)
+      IF (ABS(IKMIN).GT.ABS(IKMAX)) IKMAX = ABS(IKMIN)
+      IF (ABS(ILMIN).GT.ABS(ILMAX)) ILMAX = ABS(ILMIN)
 !
 !     Decides for each space group, which structure factor
 !     calculation should be invoked for each particular reflection.
@@ -120,249 +114,208 @@
 !     of "does K_ equal K_m?" tests whether or not k is even.
 !
       SELECT CASE (NumberSGTable)
-      CASE (1,2,40,58,430,433,434,435,356,449,451,462,468)      ! P1,P-1,C 1 2 1,C 1 2/m 1,P3,P-3,R3(hex),R-3(hex),I-4,P-31m, P-3m1, P6, P-6
-        NLGREF = 0
-      CASE (469,471,481,483,485)             ! P6/m, P622, P-6m2, P-62m, P6/mmm
-        NLGREF = 0
-      CASE (39,57)                           ! P 1 21 1, P 1 21/m 1
-        NLGREF = 1
-        DO IR = 1, MAXK
-          K_ = iHKL(2,IR)
-          K_m = 2*(K_/2)
-          LOGREF(1,IR) = K_.EQ.K_m ! k=2n
-        ENDDO
-      CASE (44,50,61,67,116,176,298)         ! P 1 c 1, C 1 c 1, P 1 2/c 1, C 1 21/c 1, C 2 2 21
-        NLGREF = 1                          ! C m c 21,C m c m,
-        DO IR = 1, MAXK
-          L_ = iHKL(3,IR)
-          L_m = 2*(L_/2)
-          LOGREF(1,IR) = (L_.EQ.L_m) ! l=2n
-        ENDDO
-      CASE (64,304)                          ! P 1 21/c 1 , C m c a
-        NLGREF = 1
-        DO IR = 1, MAXK
-          KPL = iHKL(2,IR) + iHKL(3,IR)
-          KPLm = 2*(KPL/2)
-          LOGREF(1,IR) = KPL.EQ.KPLm ! k+l=2n
-        ENDDO
-      CASE (65)                              ! P 1 21/n 1
-        NLGREF = 1
-        DO IR = 1, MAXK
-          HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
-          HPKPLm = 2*(HPKPL/2)
-          LOGREF(1,IR) = HPKPL.EQ.HPKPLm ! h+k+l=2n
-        ENDDO
-      CASE (66)                              ! P 1 21/a 1
-        NLGREF = 1
-        DO IR = 1, MAXK
-          HPK = iHKL(1,IR) + iHKL(2,IR)
-          HPKm = 2*(HPK/2)
-          LOGREF(1,IR) = HPK.EQ.HPKm ! h+k=2n
-        ENDDO
-      CASE (52,69)                           ! I 1 a 1,I 1 2/a 1
-        NLGREF = 1
-        DO IR = 1, MAXK
-          H_ = iHKL(1,IR)
-          H_m = 2*(H_/2)
-          LOGREF(1,IR) = (H_.EQ.H_m) ! h=2n
-        ENDDO
-      CASE (112)                             ! P 21 21 2
-        NLGREF = 1
-        DO IR = 1, MAXK
-          HPK = iHKL(1,IR) + iHKL(2,IR)
-          HPKm = 2*(HPK/2)
-          LOGREF(1,IR) = (HPK.EQ.HPKm) ! h+k=2n
-        ENDDO
-      CASE (115,290)                         ! P21 21 21, P b c a
-        NLGREF = 4
-        DO IR = 1, MAXK
-          HPK = iHKL(1,IR) + iHKL(2,IR)
-          KPL = iHKL(2,IR) + iHKL(3,IR)
-          HPKm = 2*(HPK/2)
-          KPLm = 2*(KPL/2)
-          LOGREF(1,IR) = (HPK.EQ.HPKm) .AND. (KPL.EQ.KPLm)
-                                                         !h+k=2n,  k+l=2n
-          LOGREF(2,IR) = (HPK.EQ.HPKm) .AND. (KPL.NE.KPLm)
-                                                         !h+k=2n,  k+l=2n+1
-          LOGREF(3,IR) = (HPK.NE.HPKm) .AND. (KPL.EQ.KPLm)
-                                                         !h+k=2n+1,k+l=2n
-          LOGREF(4,IR) = (HPK.NE.HPKm) .AND. (KPL.NE.KPLm)
-                                                         !h+k=2n+1,k+l=2n+1
-        ENDDO
-      CASE (143)                             ! P c a 21
-        NLGREF = 4
-        DO IR = 1, MAXK
-          H_ = iHKL(1,IR)
-          L_ = iHKL(3,IR)
-          H_m = 2*(H_/2)
-          L_m = 2*(L_/2)
-          LOGREF(1,IR) = (H_.EQ.H_m) .AND. (L_.EQ.L_m)
-                                                     ! h=2n  ,l=2n
-          LOGREF(2,IR) = (H_.EQ.H_m) .AND. (L_.NE.L_m)
-                                                     ! h=2n  ,l=2n+1
-          LOGREF(3,IR) = (H_.NE.H_m) .AND. (L_.EQ.L_m)
-                                                     ! h=2n+1,l=2n
-          LOGREF(4,IR) = (H_.NE.H_m) .AND. (L_.NE.L_m)
-                                                     ! h=2n+1,l=2n+1
-        ENDDO
-      CASE (164,284)                         ! P n a 21, P b c n
-        NLGREF = 4
-        DO IR = 1, MAXK
-          HPK = iHKL(1,IR) + iHKL(2,IR)
-          L_ = iHKL(3,IR)
-          HPKm = 2*(HPK/2)
-          L_m = 2*(L_/2)
-          LOGREF(1,IR) = (HPK.EQ.HPKm) .AND. (L_.EQ.L_m)
-                                                       !h+k=2n,  l=2n
-          LOGREF(2,IR) = (HPK.EQ.HPKm) .AND. (L_.NE.L_m)
-                                                       !h+k=2n,  l=2n+1
-          LOGREF(3,IR) = (HPK.NE.HPKm) .AND. (L_.EQ.L_m)
-                                                       !h+k=2n+1,l=2n
-          LOGREF(4,IR) = (HPK.NE.HPKm) .AND. (L_.NE.L_m)
-                                                       !h+k=2n+1,l=2n+1
-        ENDDO
-      CASE (212)                             ! F d d 2
-        NLGREF = 4
-        DO IR = 1, MAXK
-          HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
-          IREMAIN = MOD(HPKPL,4)
-          LOGREF(1,IR) = (IREMAIN.EQ.0) !h+k+l=4n
-          LOGREF(2,IR) = (IREMAIN.EQ.1) !h+k+l=4n+1
-          LOGREF(3,IR) = (IREMAIN.EQ.2) !h+k+l=4n+2
-          LOGREF(4,IR) = (IREMAIN.EQ.3) !h+k+l=4n+3
-        ENDDO
-      CASE (266)                             ! P c c n
-        NLGREF = 4
-        DO IR = 1, MAXK
-          HPK = iHKL(1,IR) + iHKL(2,IR)
-          HPL = iHKL(1,IR) + iHKL(3,IR)
-          HPKm = 2*(HPK/2)
-          HPLm = 2*(HPL/2)
-          LOGREF(1,IR) = (HPK.EQ.HPKm) .AND. (HPL.EQ.HPLm)
-                                                         ! h+k=2n  ,h+l=2n
-          LOGREF(2,IR) = (HPK.EQ.HPKm) .AND. (HPL.NE.HPLm)
-                                                         ! h+k=2n  ,h+l=2n+1
-          LOGREF(3,IR) = (HPK.NE.HPKm) .AND. (HPL.EQ.HPLm)
-                                                         ! h+k=2n+1,h+l=2n
-          LOGREF(4,IR) = (HPK.NE.HPKm) .AND. (HPL.NE.HPLm)
-                                                         ! h+k=2n+1,h+l=2n+1
-        ENDDO
-      CASE (269)                             ! P b c m
-        NLGREF = 4
-        DO IR = 1, MAXK
-          K_ = iHKL(2,IR)
-          L_ = iHKL(3,IR)
-          K_m = 2*(K_/2)
-          L_m = 2*(L_/2)
-          LOGREF(1,IR) = (K_.EQ.K_m) .AND. (L_.EQ.L_m)
-                                                     ! k=2n  ,l=2n
-          LOGREF(2,IR) = (K_.EQ.K_m) .AND. (L_.NE.L_m)
-                                                     ! k=2n  ,l=2n+1
-          LOGREF(3,IR) = (K_.NE.K_m) .AND. (L_.EQ.L_m)
-                                                     ! k=2n+1,l=2n
-          LOGREF(4,IR) = (K_.NE.K_m) .AND. (L_.NE.L_m)
-                                                     ! k=2n+1,l=2n+1
-        ENDDO
-      CASE (292)                             ! P n m a
-        NLGREF = 4
-        DO IR = 1, MAXK
-          HPL = iHKL(1,IR) + iHKL(3,IR)
-          K_ = iHKL(2,IR)
-          HPLm = 2*(HPL/2)
-          K_m = 2*(K_/2)
-          LOGREF(1,IR) = (HPL.EQ.HPLm) .AND. (K_.EQ.K_m)
-                                                       !h+l=2n,  k=2n
-          LOGREF(2,IR) = (HPL.EQ.HPLm) .AND. (K_.NE.K_m)
-                                                       !h+l=2n,  k=2n+1
-          LOGREF(3,IR) = (HPL.NE.HPLm) .AND. (K_.EQ.K_m)
-                                                       !h+l=2n+1,k=2n
-          LOGREF(4,IR) = (HPL.NE.HPLm) .AND. (K_.NE.K_m)
-                                                       !h+l=2n+1,k=2n+1
-        ENDDO
-      CASE (365)                             ! I 41/a (origin choice 2)
-        NLGREF = 8
-        DO IR = 1, MAXK
-          H_ = iHKL(1,IR)
-          K_ = iHKL(2,IR)
-          H_m = 2*(H_/2)
-          K_m = 2*(K_/2)
-          HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
-          IREMAIN = MOD(HPKPL,4)
-          LOGREF(1,IR) = (H_.EQ.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.0)
-          LOGREF(2,IR) = (H_.EQ.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.0)
-          LOGREF(3,IR) = (H_.NE.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.0)
-          LOGREF(4,IR) = (H_.NE.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.0)
-          LOGREF(5,IR) = (H_.EQ.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.2)
-          LOGREF(6,IR) = (H_.EQ.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.2)
-          LOGREF(7,IR) = (H_.NE.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.2)
-          LOGREF(8,IR) = (H_.NE.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.2)
-          IF (H_.EQ.2 .AND. K_.EQ.2 .AND. IREMAIN.EQ.2) THEN
+        CASE (1,2,40,58,430,433,434,435,356,449,451,462,468)  ! P1,P-1,C 1 2 1,C 1 2/m 1,P3,P-3,R3(hex),R-3(hex),I-4,P-31m, P-3m1, P6, P-6
+          NLGREF = 0
+        CASE (469,471,481,483,485)             ! P6/m, P622, P-6m2, P-62m, P6/mmm
+          NLGREF = 0
+        CASE (39,57)                           ! P 1 21 1, P 1 21/m 1
+          NLGREF = 1
+          DO IR = 1, MAXK
+            K_ = iHKL(2,IR)
+            K_m = 2*(K_/2)
+            LOGREF(1,IR) = K_.EQ.K_m ! k=2n
+          ENDDO
+        CASE (44,50,61,67,116,176,298)         ! P 1 c 1, C 1 c 1, P 1 2/c 1, C 1 21/c 1, C 2 2 21
+          NLGREF = 1                          ! C m c 21, C m c m,
+          DO IR = 1, MAXK
+            L_ = iHKL(3,IR)
+            L_m = 2*(L_/2)
+            LOGREF(1,IR) = (L_.EQ.L_m) ! l=2n
+          ENDDO
+        CASE (64,304)                          ! P 1 21/c 1, C m c a
+          NLGREF = 1
+          DO IR = 1, MAXK
+            KPL = iHKL(2,IR) + iHKL(3,IR)
+            KPLm = 2*(KPL/2)
+            LOGREF(1,IR) = KPL.EQ.KPLm ! k+l=2n
+          ENDDO
+        CASE (65)                              ! P 1 21/n 1
+          NLGREF = 1
+          DO IR = 1, MAXK
+            HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
+            HPKPLm = 2*(HPKPL/2)
+            LOGREF(1,IR) = HPKPL.EQ.HPKPLm ! h+k+l=2n
+          ENDDO
+        CASE (66)                              ! P 1 21/a 1
+          NLGREF = 1
+          DO IR = 1, MAXK
+            HPK = iHKL(1,IR) + iHKL(2,IR)
+            HPKm = 2*(HPK/2)
+            LOGREF(1,IR) = HPK.EQ.HPKm ! h+k=2n
+          ENDDO
+        CASE (52,69)                           ! I 1 a 1, I 1 2/a 1
+          NLGREF = 1
+          DO IR = 1, MAXK
+            H_ = iHKL(1,IR)
+            H_m = 2*(H_/2)
+            LOGREF(1,IR) = (H_.EQ.H_m) ! h=2n
+          ENDDO
+        CASE (112)                             ! P 21 21 2
+          NLGREF = 1
+          DO IR = 1, MAXK
+            HPK = iHKL(1,IR) + iHKL(2,IR)
+            HPKm = 2*(HPK/2)
+            LOGREF(1,IR) = (HPK.EQ.HPKm) ! h+k=2n
+          ENDDO
+        CASE (115,290)                         ! P21 21 21, P b c a
+          NLGREF = 4
+          DO IR = 1, MAXK
+            HPK = iHKL(1,IR) + iHKL(2,IR)
+            KPL = iHKL(2,IR) + iHKL(3,IR)
+            HPKm = 2*(HPK/2)
+            KPLm = 2*(KPL/2)
+            LOGREF(1,IR) = (HPK.EQ.HPKm) .AND. (KPL.EQ.KPLm) !h+k=2n,   k+l=2n
+            LOGREF(2,IR) = (HPK.EQ.HPKm) .AND. (KPL.NE.KPLm) !h+k=2n,   k+l=2n+1
+            LOGREF(3,IR) = (HPK.NE.HPKm) .AND. (KPL.EQ.KPLm) !h+k=2n+1, k+l=2n
+            LOGREF(4,IR) = (HPK.NE.HPKm) .AND. (KPL.NE.KPLm) !h+k=2n+1, k+l=2n+1
+          ENDDO
+        CASE (143)                             ! P c a 21
+          NLGREF = 4
+          DO IR = 1, MAXK
+            H_ = iHKL(1,IR)
+            L_ = iHKL(3,IR)
+            H_m = 2*(H_/2)
+            L_m = 2*(L_/2)
+            LOGREF(1,IR) = (H_.EQ.H_m) .AND. (L_.EQ.L_m) ! h=2n  ,l=2n
+            LOGREF(2,IR) = (H_.EQ.H_m) .AND. (L_.NE.L_m) ! h=2n  ,l=2n+1
+            LOGREF(3,IR) = (H_.NE.H_m) .AND. (L_.EQ.L_m) ! h=2n+1,l=2n
+            LOGREF(4,IR) = (H_.NE.H_m) .AND. (L_.NE.L_m) ! h=2n+1,l=2n+1
+          ENDDO
+        CASE (164,284)                         ! P n a 21, P b c n
+          NLGREF = 4
+          DO IR = 1, MAXK
+            HPK = iHKL(1,IR) + iHKL(2,IR)
+            L_ = iHKL(3,IR)
+            HPKm = 2*(HPK/2)
+            L_m = 2*(L_/2)
+            LOGREF(1,IR) = (HPK.EQ.HPKm) .AND. (L_.EQ.L_m) !h+k=2n,  l=2n
+            LOGREF(2,IR) = (HPK.EQ.HPKm) .AND. (L_.NE.L_m) !h+k=2n,  l=2n+1
+            LOGREF(3,IR) = (HPK.NE.HPKm) .AND. (L_.EQ.L_m) !h+k=2n+1,l=2n
+            LOGREF(4,IR) = (HPK.NE.HPKm) .AND. (L_.NE.L_m) !h+k=2n+1,l=2n+1
+          ENDDO
+        CASE (212)                             ! F d d 2
+          NLGREF = 4
+          DO IR = 1, MAXK
+            HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
+            IREMAIN = MOD(HPKPL,4)
+            LOGREF(1,IR) = (IREMAIN.EQ.0) !h+k+l=4n
+            LOGREF(2,IR) = (IREMAIN.EQ.1) !h+k+l=4n+1
+            LOGREF(3,IR) = (IREMAIN.EQ.2) !h+k+l=4n+2
+            LOGREF(4,IR) = (IREMAIN.EQ.3) !h+k+l=4n+3
+          ENDDO
+        CASE (266)                             ! P c c n
+          NLGREF = 4
+          DO IR = 1, MAXK
+            HPK = iHKL(1,IR) + iHKL(2,IR)
+            HPL = iHKL(1,IR) + iHKL(3,IR)
+            HPKm = 2*(HPK/2)
+            HPLm = 2*(HPL/2)
+            LOGREF(1,IR) = (HPK.EQ.HPKm) .AND. (HPL.EQ.HPLm) ! h+k=2n  , h+l=2n
+            LOGREF(2,IR) = (HPK.EQ.HPKm) .AND. (HPL.NE.HPLm) ! h+k=2n  , h+l=2n+1
+            LOGREF(3,IR) = (HPK.NE.HPKm) .AND. (HPL.EQ.HPLm) ! h+k=2n+1, h+l=2n
+            LOGREF(4,IR) = (HPK.NE.HPKm) .AND. (HPL.NE.HPLm) ! h+k=2n+1, h+l=2n+1
+          ENDDO
+        CASE (269)                             ! P b c m
+          NLGREF = 4
+          DO IR = 1, MAXK
+            K_ = iHKL(2,IR)
+            L_ = iHKL(3,IR)
+            K_m = 2*(K_/2)
+            L_m = 2*(L_/2)
+            LOGREF(1,IR) = (K_.EQ.K_m) .AND. (L_.EQ.L_m) ! k=2n  , l=2n
+            LOGREF(2,IR) = (K_.EQ.K_m) .AND. (L_.NE.L_m) ! k=2n  , l=2n+1
+            LOGREF(3,IR) = (K_.NE.K_m) .AND. (L_.EQ.L_m) ! k=2n+1, l=2n
+            LOGREF(4,IR) = (K_.NE.K_m) .AND. (L_.NE.L_m) ! k=2n+1, l=2n+1
+          ENDDO
+        CASE (292)                             ! P n m a
+          NLGREF = 4
+          DO IR = 1, MAXK
+            HPL = iHKL(1,IR) + iHKL(3,IR)
+            K_ = iHKL(2,IR)
+            HPLm = 2*(HPL/2)
+            K_m = 2*(K_/2)
+            LOGREF(1,IR) = (HPL.EQ.HPLm) .AND. (K_.EQ.K_m) !h+l=2n,   k=2n
+            LOGREF(2,IR) = (HPL.EQ.HPLm) .AND. (K_.NE.K_m) !h+l=2n,   k=2n+1
+            LOGREF(3,IR) = (HPL.NE.HPLm) .AND. (K_.EQ.K_m) !h+l=2n+1, k=2n
+            LOGREF(4,IR) = (HPL.NE.HPLm) .AND. (K_.NE.K_m) !h+l=2n+1, k=2n+1
+          ENDDO
+        CASE (365)                             ! I 41/a (origin choice 2)
+          NLGREF = 8
+          DO IR = 1, MAXK
+            H_ = iHKL(1,IR)
+            K_ = iHKL(2,IR)
+            H_m = 2*(H_/2)
+            K_m = 2*(K_/2)
+            HPKPL = iHKL(1,IR) + iHKL(2,IR) + iHKL(3,IR)
+            IREMAIN = MOD(HPKPL,4)
+            LOGREF(1,IR) = (H_.EQ.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.0)
+            LOGREF(2,IR) = (H_.EQ.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.0)
+            LOGREF(3,IR) = (H_.NE.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.0)
+            LOGREF(4,IR) = (H_.NE.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.0)
+            LOGREF(5,IR) = (H_.EQ.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.2)
+            LOGREF(6,IR) = (H_.EQ.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.2)
+            LOGREF(7,IR) = (H_.NE.H_m) .AND. (K_.EQ.K_m) .AND. (IREMAIN.EQ.2)
+            LOGREF(8,IR) = (H_.NE.H_m) .AND. (K_.NE.K_m) .AND. (IREMAIN.EQ.2)
+            IF (H_.EQ.2 .AND. K_.EQ.2 .AND. IREMAIN.EQ.2) THEN
+            ENDIF
+          ENDDO
+        CASE (369)                             ! P 41 21 2
+          NLGREF = 4
+          DO IR = 1, MAXK
+            H_ = iHKL(1,IR)
+            K_ = iHKL(2,IR)
+            L_ = iHKL(3,IR)
+            IREMAIN = MOD(2*H_+2*K_+L_,4)
+            LOGREF(1,IR) = (IREMAIN.EQ.0) !2h+2k+l=4n
+            LOGREF(2,IR) = (IREMAIN.EQ.1) !2h+2k+l=4n+1
+            LOGREF(3,IR) = (IREMAIN.EQ.2) !2h+2k+l=4n+2
+            LOGREF(4,IR) = (IREMAIN.EQ.3) !2h+2k+l=4n+3
+          ENDDO
+        CASE (431,432)                         ! P31, P32
+          NLGREF = 3
+          DO IR = 1, MAXK
+            LL = MOD(iHKL(3,IR)+300,3)
+            LLM = 3*(LL/3)
+            LOGREF(1,IR) = (LL.EQ.0)
+            LOGREF(2,IR) = (LL.EQ.1)
+            LOGREF(3,IR) = (LL.EQ.2)
+          ENDDO
+      END SELECT
+      SELECT CASE (NumberSGTable)
+! adjustments for presence of kx and hy terms
+        CASE (356,365,369)
+          JHMIN = MIN(IHMIN,IKMIN)
+          JHMAX = MAX(IHMAX,IKMAX)
+          IHMIN = JHMIN
+          IKMIN = JHMIN
+          IHMAX = JHMAX
+          IKMAX = JHMAX
+          IHMINLT0 = IHMIN.LT.0
+          IKMINLT0 = IKMIN.LT.0
+! adjustments for presence of 'i' index
+        CASE (430:435,449,451,462,468,469,471,481,483,485)
+          JHMIN = MIN(IIMIN,IHMIN,IKMIN)
+          JHMAX = MAX(IIMAX,IHMAX,IKMAX)
+          IF (ABS(JHMIN).GT.ABS(JHMAX)) THEN
+            JHMAX = ABS(JHMIN)
           ENDIF
-        ENDDO
-      CASE (369)                             ! P 41 21 2
-        NLGREF = 4
-        DO IR = 1, MAXK
-          H_ = iHKL(1,IR)
-          K_ = iHKL(2,IR)
-          L_ = iHKL(3,IR)
-          IREMAIN = MOD(2*H_+2*K_+L_,4)
-          LOGREF(1,IR) = (IREMAIN.EQ.0) !2h+2k+l=4n
-          LOGREF(2,IR) = (IREMAIN.EQ.1) !2h+2k+l=4n+1
-          LOGREF(3,IR) = (IREMAIN.EQ.2) !2h+2k+l=4n+2
-          LOGREF(4,IR) = (IREMAIN.EQ.3) !2h+2k+l=4n+3
-        ENDDO
-      CASE (431,432)                         ! P31, P32
-        NLGREF = 3
-        DO IR = 1, MAXK
-          LL = MOD(iHKL(3,IR)+300,3)
-          LLM = 3*(LL/3)
-          LOGREF(1,IR) = (LL.EQ.0)
-          LOGREF(2,IR) = (LL.EQ.1)
-          LOGREF(3,IR) = (LL.EQ.2)
-        ENDDO
-      CASE DEFAULT
+          IHMIN = JHMIN
+          IKMIN = JHMIN
+          IHMAX = JHMAX
+          IKMAX = JHMAX
+          IHMINLT0 = IHMIN.LT.0
+          IKMINLT0 = IKMIN.LT.0
       END SELECT
-      SELECT CASE (NumberSGTable)    ! adjustments for presence of 'i' index
-      CASE (430,431,432,433,434,435,449,451,462,468)
-        JHMIN = MIN(IIMIN,IHMIN,IKMIN)
-        JHMAX = MAX(IIMAX,IHMAX,IKMAX)
-        IF (ABS(jhmin).GT.ABS(jhmax)) THEN
-          jhmax = ABS(jhmin)
-        ENDIF
-        IHMIN = JHMIN
-        IKMIN = JHMIN
-        IHMAX = JHMAX
-        IKMAX = JHMAX
-        IHMINLT0 = IHMIN.LT.0
-        IKMINLT0 = IKMIN.LT.0
-      CASE (469,471,481,483,485)
-        JHMIN = MIN(IIMIN,IHMIN,IKMIN)
-        JHMAX = MAX(IIMAX,IHMAX,IKMAX)
-        IF (ABS(jhmin).GT.ABS(jhmax)) THEN
-          jhmax = ABS(jhmin)
-        ENDIF
-        IHMIN = JHMIN
-        IKMIN = JHMIN
-        IHMAX = JHMAX
-        IKMAX = JHMAX
-        IHMINLT0 = IHMIN.LT.0
-        IKMINLT0 = IKMIN.LT.0
-      CASE DEFAULT
-      END SELECT
-      SELECT CASE (NumberSGTable)    ! adjustments for presence of kx and hy terms
-      CASE (356,365,369)
-        jhmin = MIN(ihmin,ikmin)
-        jhmax = MAX(ihmax,ikmax)
-        ihmin = jhmin
-        ikmin = jhmin
-        ihmax = jhmax
-        ikmax = jhmax
-        IHMINLT0 = IHMIN.LT.0
-        IKMINLT0 = IKMIN.LT.0
-      END SELECT
-      GOTO 999
-  998 ier = 1
-  999 CLOSE (31)
 
       END SUBROUTINE GET_LOGREF
 !
