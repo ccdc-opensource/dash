@@ -1,6 +1,42 @@
 !
 !*****************************************************************************
 !
+! Originally in sa_subs.f90
+!*==RANXGI.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
+!
+      SUBROUTINE ranxgi
+
+      COMMON /x2gran/ xs, ygran(200)
+
+      xs = 0.05
+      DO i = 1, 200
+        xi = xs*float(i-1)
+        ygran(i) = erf(xi)
+      ENDDO
+
+      END SUBROUTINE RANXGI
+!*==ERF.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
+!
+      FUNCTION erf(x)
+!
+      a = abs(x)
+      t = 1./(1+0.5*a)
+      erf = t*exp(-a*a-1.26551223+                                      &
+     &      t*(1.00002368+t*(.37409196+t*(.09678418+                    &
+     &      t*(-0.18628806+t*(.27886807+                                &
+     &      t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277))))&
+     &      )))))
+      erf = 1. - erf
+      IF (x.LT.0) erf = -erf
+!
+      END FUNCTION ERF
+!
+!*****************************************************************************
+!
 ! Originally in PF_Simplex.f90
 !
 !*==CHIQUAD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
