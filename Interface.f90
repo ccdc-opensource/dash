@@ -968,7 +968,7 @@
       REAL    PkArgK(MTPeak), PkTicDif(MTPeak)
       REAL    TwoThetaDiff, AbsTwoThetaDiff
       INTEGER IArgK(MTPeak)
-      INTEGER J, I, II, IR, IR1, IA, IRef1, IRef2, IOrd, Item
+      INTEGER J, I, II, IR, IR1, IA, IRef1, IRef2, iOrd, iTem
       REAL    xnew, anew, SigmDif, PfTDMin, PfTDMax, DifTem, ProbTot, ProbTop, DifMin
       REAL    DifMinSq, ArgBot, ArgTop, ProbAdd
 
@@ -976,14 +976,13 @@
       CALL WDialogSelect(IDD_Peak_Positions)
       CALL WDialogClearField(IDF_Peak_Positions_Grid)
       NTPeak = 0
-! JvdS Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
+! Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
 ! Store all peaks thus found in one flat array: AllPkPosVal
-! @@ I don't understand why PkPosVal(I,J) is used for this, I would have used XPF_Pos
-      IF (NumPeakFitRange .GE. 1) THEN
+      IF (NumPeakFitRange .GT. 0) THEN
         DO J = 1, NumPeakFitRange
-          IF (NumInPFR(J) .GE. 1) THEN
+          IF (RangeFitYN(J)) THEN
             DO I = 1, NumInPFR(J)
-              NTPeak = NTPeak + 1
+              CALL INC(NTPeak)
               AllPkPosVal(NTPeak) = PkPosVal(I,J)
               AllPkPosEsd(NTPeak) = PkPosEsd(I,J)
             ENDDO
@@ -1005,15 +1004,15 @@
 ! Let's find the closest peaks and their distribution around the observed peak positions
         IR1 = 1 ! Pointer into list of reflections
         DO I = 1, NTPeak
-          IOrd = IOrdTem(I) ! IOrd is now a pointer into AllPkPosVal to the next peak position
-          TwoThetaDiff = ARGK(IR1) - AllPkPosVal(IOrd)
+          iOrd = IOrdTem(I) ! IOrd is now a pointer into AllPkPosVal to the next peak position
+          TwoThetaDiff = ARGK(IR1) - AllPkPosVal(iOrd)
           AbsTwoThetaDiff = ABS(TwoThetaDiff)
-          item = IR1
+          iTem = IR1
           DO IR = IR1, NTic
-            xnew = ARGK(IR) - AllPkPosVal(IOrd)
+            xnew = ARGK(IR) - AllPkPosVal(iOrd)
             anew = ABS(xnew)
             IF (anew .LE. AbsTwoThetaDiff) THEN
-              item = IR
+              iTem = IR
               AbsTwoThetaDiff = anew
               TwoThetaDiff = xnew
             ENDIF
@@ -1025,10 +1024,10 @@
           ENDDO
  20       PkTicDif(I) = TwoThetaDiff
           DO II = 1, 3
-            IHPk(II,I) = IH(II,item)
+            IHPk(II,I) = IH(II,iTem)
           ENDDO
-          PkArgK(I) = ARGK(Item)
-          IArgK(I) = Item
+          PkArgK(I) = ARGK(iTem)
+          IArgK(I) = iTem
         ENDDO
         IF (NTPeak .EQ. 1) THEN
           SigmDif = 0.01
@@ -1039,48 +1038,44 @@
             PfTDMin = MIN(PfTDMin,PkTicDif(II))
             PfTDMax = MAX(PfTDMax,PkTicDif(II))
           ENDDO
-          SigmDif = 0.2886751345948*Abs(PfTDMax-PfTDMin)
+          SigmDif = 0.2886751345948*ABS(PfTDMax-PfTDMin)
         ENDIF
         DO I = 1, NTPeak
-          IOrd = IOrdTem(I)
+          iOrd = IOrdTem(I)
           IA = IArgK(I)
           IRef1 = MAX(1,IA-5)
           IRef2 = MIN(NTic,IA+5)
           ProbTot = 0.0
           ProbTop = 0.0
-          DifMin = ABS(AllPkPosVal(IOrd)-ArgK(IA))
+          DifMin = ABS(AllPkPosVal(iOrd)-ArgK(IA))
           DifMinSq = DifMin**2
-          ArgBot = 0.5/(SigmDif**2+AllPkPosEsd(IOrd)**2)
+          ArgBot = 0.5/(SigmDif**2+AllPkPosEsd(iOrd)**2)
           DO IR = IRef1, IRef2
-            ArgTop = (AllPkPosVal(IOrd)-ARGK(IR))**2
+            ArgTop = (AllPkPosVal(iOrd)-ARGK(IR))**2
             ProbAdd = EXP(-ArgTop*ArgBot)
-            IF (ABS(ArgTop-DifMinSq).LT.1.e-10) THEN
+            IF (ABS(ArgTop-DifMinSq).LT.1.0E-10) THEN
               ProbTop = ProbTop + ProbAdd
             ENDIF
             ProbTot = ProbTot + ProbAdd
           ENDDO
-          PkProb(IOrd) = ProbTop / ProbTot
+          PkProb(iOrd) = ProbTop / ProbTot
         ENDDO
       ENDIF
 ! Write out all the peak positions in an ordered list ...
       CALL WGridRows(IDF_Peak_Positions_Grid,NTPeak)
-      IF (NTPeak .GT. 0) THEN
-        CALL WDialogFieldState(ID_Index_Output,Enabled)
-        DO I = 1, NTPeak
-          IOrd = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_Peak_Positions_Grid,1,I,AllPkPosVal(IOrd),'(F12.4)')
-          CALL WGridPutCellReal(IDF_Peak_Positions_Grid,2,I,AllPkPosEsd(IOrd),'(F12.4)')
-          CALL WGridPutCellReal(IDF_Peak_Positions_Grid,3,I,PkArgK(I),'(F12.4)')
-          DifTem = AllPkPosVal(IOrd) - PkArgK(I)
-          CALL WGridPutCellReal(IDF_Peak_Positions_Grid,4,I,DifTem,'(F12.4)')
-          CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,5,I,IHPk(1,I))
-          CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,6,I,IHPk(2,I))
-          CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,7,I,IHPk(3,I))
-          CALL WGridPutCellReal(IDF_Peak_Positions_Grid,8,I,PkProb(IOrd),'(F8.3)')
-        ENDDO
-      ELSE
-        CALL WDialogFieldState(ID_Index_Output,Disabled)
-      ENDIF
+      CALL WDialogFieldState(ID_Index_Output,Enabled)
+      DO I = 1, NTPeak
+        iOrd = IOrdTem(I)
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,1,I,AllPkPosVal(iOrd),'(F12.4)')
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,2,I,AllPkPosEsd(iOrd),'(F12.4)')
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,3,I,PkArgK(I),'(F12.4)')
+        DifTem = AllPkPosVal(iOrd) - PkArgK(I)
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,4,I,DifTem,'(F12.4)')
+        CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,5,I,IHPk(1,I))
+        CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,6,I,IHPk(2,I))
+        CALL WGridPutCellInteger(IDF_Peak_Positions_Grid,7,I,IHPk(3,I))
+        CALL WGridPutCellReal(IDF_Peak_Positions_Grid,8,I,PkProb(iOrd),'(F8.3)')
+      ENDDO
 ! Now do a refinement ...
       CALL RefineLattice()
       CALL PopActiveWindowID
