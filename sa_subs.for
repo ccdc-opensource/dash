@@ -267,7 +267,7 @@ C.. output the structure coordinates in different formats
 c                     CALL SA_STRUCTURE_OUTPUT(t,fopt,ntotmov)
 c.. plot the profile
 c                    call SA_PROFILE_PLOT(num_sa_profile_plot)
-                     call valchipro(cpb)
+                     CALL valchipro(cpb)
                      CHIPROBEST(iteration)=cpb
                      FOPT = FP
          CALL SA_OUTPUT(0,SNGL(T),-SNGL(fopt),-SNGL(FPAV),SNGL(FPSD),
@@ -303,6 +303,7 @@ C  acceptance or rejection.
             CALL sa_move_status(1,nmpert,movenow)
             CALL sa_refresh(imyexit,iteration,num_new_min,cpb)
             IF ((imyexit .GT. 0) .AND. (imyexit .LE. 3)) THEN
+! If we are here, the user pressed 'Stop & Edit'
               IF ( RESTART ) THEN
                 IF (AutoLocalMinimisation) THEN
                   CALL AutoLocalMinimise(iteration,num_new_min,cpb)
@@ -418,7 +419,7 @@ C in the subroutine Chi_sq_plot.
       ELSE IF ((iteration .LT. MaxIter) .AND. (T .GT. 0.0)) THEN
         GOTO 100
       ELSE
-        CALL AddSingleSolution(cpb,-sngl(fopt))
+        CALL AddSingleSolution(cpb,-SNGL(fopt))
       END IF
       imyexit = 3
  998  CONTINUE
