@@ -494,7 +494,7 @@
       REAL Difference(1:MAX_FITPT)
       INTEGER JJ, iord_peak, I, ipf1, ipf2, II, ix1, ix2, IPresColN, J
       LOGICAL, EXTERNAL :: PlotPeakFitDifferenceProfile
-      REAL gxleft, gybot, gxright, gytop, xgtem, ygtem, yt1, yt2, xg1, yg1, yg2
+      REAL gxleft, gybot, gxright, gytop, xgtem, ygtem, yt1, yt2, xg1, yg1, yg2, AveESD
 
       iord_peak = 0
       DO i = 1, NumPeakFitRange
@@ -533,8 +533,15 @@
 ! ix2 is now a pointer into XPeakFit, YPeakFit, pointing to the end of the range
  120        CONTINUE
             IF (PlotPeakFitDifferenceProfile()) THEN
+! Calculate average ESD
+              AveESD = 0.0
               DO JJ = ipf1, ipf2
-                 Difference(JJ) = YOBIN(IPF_Lo(i)+JJ-ipf1) - YPeakFit(JJ) + 0.5*(YPGMAX+YPGMIN)
+                 AveESD = AveESD + EBIN(IPF_Lo(i)+JJ-ipf1)
+              ENDDO
+              AveESD = AveESD / SNGL(1+ipf2-ipf1)
+              DO JJ = ipf1, ipf2
+                 Difference(JJ) = (((YOBIN(IPF_Lo(i)+JJ-ipf1) - YPeakFit(JJ)) * 2.50 * AveESD) / EBIN(IPF_Lo(i)+JJ-ipf1)) + 0.5*(YPGMAX+YPGMIN)
+!O                 Difference(JJ) = ((YOBIN(IPF_Lo(i)+JJ-ipf1) - YPeakFit(JJ))) + 0.5*(YPGMAX+YPGMIN)
               ENDDO
               CALL IPgNewPlot(PgPolyLine,2, (1+ix2-ix1) )
               CALL IPgStyle(1,0,0,0,KolNumPeakFit,0)
