@@ -35,6 +35,11 @@
       CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
+      IF (SpaceGroupDetermination) THEN
+        CALL WDialogPutString(IDF_PawRef_Solve, 'Run>')
+      ELSE
+        CALL WDialogPutString(IDF_PawRef_Solve, '&Solve>')
+      ENDIF
       CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
       CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
       CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
@@ -183,15 +188,22 @@
       CHARACTER(MaxPathLength) SDIFile
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER Inum
+      CHARACTER(MaxPathLength) :: CurrentDirectory
+      LOGICAL Exists
 
+      Exists = .FALSE.
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Pawley_Status)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              IF (SpaceGroupDetermination) THEN
-                CALL SpaceGroupFileDialog
+              IF (SpaceGroupDetermination) THEN 
+                CALL IosDirName(CurrentDirectory)
+                INQUIRE(FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'table.asc',EXIST=exists)
+                IF (exists) THEN
+                  CALL SpaceGroupFileDialog
+                ENDIF
               ENDIF
               IPTYPE = 1
               CALL Profile_Plot
@@ -252,10 +264,12 @@
               CALL WDialogFieldState(IDB_PawRef_Reject,Enabled)
               CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
               CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
-              
-              
-              CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
-
+! ep added
+              IF (SpaceGroupDetermination) THEN
+                CALL WDialogFieldState(IDF_PawRef_Solve, Disabled)
+              ELSE
+               CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
+              ENDIF
             CASE (IDB_PawRef_Accept)
 ! update the profile and stay with the Pawley refinement
               IPTYPE = 2
@@ -328,17 +342,18 @@
 ! to save sdi file.  Can only perform Pawley Refinement then go back to cell parameters
 ! window
                 IF(SpaceGroupDetermination) THEN 
-                CALL WDialogGetInteger(IDF_Pawley_Refinement_Number,Inum)
-                  IF (Inum .LE. 1) THEN
-                    CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
-                  ELSE
+                  CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
+                  CALL WDialogGetInteger(IDF_Pawley_Refinement_Number,Inum)
+                    IF (Inum .LE. 1) THEN
+                      CALL WDialogFieldState(IDF_PawRef_Solve, Disabled)
+                    ELSE
 ! Have hit "Refine" at least twice so are now able to call Space Group Determination program
-                   IF (Inum .gt. 1) THEN
-                     CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd
-                     CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
-                     CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
-                   END IF
-                  END IF
+                      IF (Inum .gt. 1) THEN
+!!ep                     CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd
+                       CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
+                       CALL WDialogFieldState(IDF_PawRef_Solve, Enabled)
+                      END IF
+                    END IF
                 END IF
             CASE (IDB_PawRef_Reject)
               CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
@@ -359,23 +374,36 @@
               CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
               NumPawleyRef = NumPawleyRef - 1
               CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
+              IF (SpaceGroupDetermination) THEN
+                CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
+              ENDIF
             CASE (IDB_PawRef_Save)
-              IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
+!!              IF (SpaceGroupDetermination) THEN
+!!                CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd                
+!!                CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+!!              ELSE
+                IF (SaveProject()) CALL WDialogFieldState(IDF_PawRef_Solve,Enabled)
+!!              ENDIF
             CASE (IDF_PawRef_Solve)
+              IF (SpaceGroupDetermination) THEN
+                CALL SpaceGroupDeterminationCode(LatBrav, RLastValues(2)) ! RlastValues(2) = Pawley chisqd                
+                CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
+              ELSE
 ! Emulate loading .SDI file for next window
-              CALL WDialogSelect(IDD_SAW_Page1)
+                CALL WDialogSelect(IDD_SAW_Page1)
 ! Read in the HCV, PIK and TIC files from POLYP
-              Ilen = LEN_TRIM(DashPikFile)
-              SDIFile = DashPikFile(1:Ilen-3)//'sdi'
-              CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
-              CALL GETHCV(DashHcvFile,IER)
-              CALL GETPIK(DashPikFile,IER)
-              CALL WDialogSelect(IDD_ExclRegions)
-              CALL WDialogHide
-              CALL ShowWizardWindowZmatrices
+                Ilen = LEN_TRIM(DashPikFile)
+                SDIFile = DashPikFile(1:Ilen-3)//'sdi'
+                CALL WDialogPutString(IDF_SA_Project_Name,SDIFile)
+                CALL GETHCV(DashHcvFile,IER)
+                CALL GETPIK(DashPikFile,IER)
+                CALL WDialogSelect(IDD_ExclRegions)
+                CALL WDialogHide
+                CALL ShowWizardWindowZmatrices
 !O            CASE (IDB_ExclRegions)
 !O              CALL WDialogSelect(IDD_ExclRegions)
 !O              CALL WDialogShow(-1,-1,0,Modeless)
+              ENDIF
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
