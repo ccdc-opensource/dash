@@ -1,4 +1,4 @@
-! Winteracter module created : 01/Dec/2001 17:47:14
+! Winteracter module created : 02/Dec/2001 17:29:05
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -349,7 +349,7 @@
           INTEGER, PARAMETER :: IDF_License_Key                 =  1353
           INTEGER, PARAMETER :: ID_Licence_Request              =  1354
           INTEGER, PARAMETER :: ID_Licensing_Exit               =  1355
-          INTEGER, PARAMETER :: ID_Enter_License                =  1356
+          INTEGER, PARAMETER :: IDD_LicenceAgreement            =   155
           INTEGER, PARAMETER :: IDF_License_Site                =  1359
           INTEGER, PARAMETER :: IDF_License_SiteCode            =  1358
           INTEGER, PARAMETER :: IDF_License_SiteCodeLabel       =  1357
@@ -481,4 +481,7 @@
           INTEGER, PARAMETER :: IDF_SubtractBackground          =  1100
           INTEGER, PARAMETER :: IDF_CrystallographicCoM         =  1215
           INTEGER, PARAMETER :: IDF_Align                       =  1224
+          INTEGER, PARAMETER :: IDF_Agreement                   =  1225
+          INTEGER, PARAMETER :: IDB_DemoLicence                 =  1229
+          INTEGER, PARAMETER :: IDB_IAgree                      =  1228
       END MODULE Druid_Header
