@@ -981,18 +981,13 @@
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL WizardWindowBackNext(IDD_PW_Page10)
             CASE (IDAPPLY)
+              CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+              CALL Upload_ZeroPoint               
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Space_Group_Menu)
-              CALL Download_SpaceGroup(IDD_PW_Page1)
-              CALL Generate_TicMarks
-            CASE (IDF_Crystal_System_Menu)
-              CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
-              CALL Upload_CrystalSystem
-              CALL Generate_TicMarks
             CASE (IDF_a_latt)
               CALL WDialogGetReal(IDF_a_latt,CellPar(1))
               CALL UpdateCell
@@ -1011,6 +1006,17 @@
             CASE (IDF_gam_latt)
               CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
               CALL UpdateCell
+            CASE (IDF_Crystal_System_Menu)
+              CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
+              CALL Upload_CrystalSystem
+              CALL Generate_TicMarks
+            CASE (IDF_Space_Group_Menu)
+              CALL Download_SpaceGroup(IDD_PW_Page1)
+              CALL Generate_TicMarks
+            CASE (IDF_ZeroPoint)
+              CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+              CALL Upload_ZeroPoint               
+              CALL Generate_TicMarks
           END SELECT                
       END SELECT
       CALL PopActiveWindowID
