@@ -1,4 +1,4 @@
-! Winteracter module created : 07/Sep/2001 11:48:42
+! Winteracter module created : 07/Sep/2001 15:18:42
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -565,4 +565,8 @@
           INTEGER, PARAMETER :: IDAPPLY                         =  1227
           INTEGER, PARAMETER :: IDF_Preview                     =  1230
           INTEGER, PARAMETER :: IDF_ZeroPoint                   =  1231
+          INTEGER, PARAMETER :: IDD_AddWavelengthToXYE          =   146
+          INTEGER, PARAMETER :: IDF_REAL3                       =  1232
+          INTEGER, PARAMETER :: IDF_LABEL3                      =  1233
+          INTEGER, PARAMETER :: ID_Home                         = 40009
       END MODULE Druid_Header
