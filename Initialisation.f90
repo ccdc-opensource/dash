@@ -272,7 +272,8 @@
       LOGICAL            ShowAgain
       COMMON  / DBGMSG / ShowAgain
 
-      CALL Clear_SA
+! The initialisations should be split up into 'one off initialisations' (at the start up
+! of DASH only) and 'whenever a new project file is opened'
       ShowAgain = .TRUE.
       PI     = 4.0*ATAN(1.0)
       RAD    = PI/180.0
@@ -291,10 +292,17 @@
         UR(I) = COS(TH)
         UI(I) = SIN(TH)
       ENDDO
-      UseQuaternions = .TRUE.
+      CALL MakRHm
+      CALL CalCosArx
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
       CALL GetPathToMercuryFromRegistry
+      DO I = 0, maxfrg
+        izmoid(0,I) = 0
+        izmbid(0,I) = 0
+      ENDDO
+      CALL Clear_SA
+      UseQuaternions = .TRUE.
 ! Initialise arrays to do with administration of open child windows
       ChildWinAutoClose = .FALSE.
       ChildWinHandlerSet = .FALSE.
