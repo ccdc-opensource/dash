@@ -10,7 +10,8 @@
       COMMON /FCSPEC/ NLGREF, IREFH(3,MFCSPE), LOGREF(8,MFCSPE)
       COMMON /CSQSTO/ COSQS(-20:20,3,150),SINQS(-20:20,3,150)
 
-      LOGICAL HYDNOT
-      COMMON /HIDDAT/ HYDNOT(150),NSATOM,ISATOM(150)
       LOGICAL LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
+
+      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:150)
