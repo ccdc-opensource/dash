@@ -1432,6 +1432,11 @@
 ! two 'Print' outputs on screen. The possibility of editing the file is probably more useful.
                 CALL SetChildWinAutoClose(IHANDLE)
               ENDIF
+            CASE (IDB_Configuration)
+              CALL PushActiveWindowID
+              CALL WDialogSelect(IDD_Configuration)
+              CALL WDialogShow(-1,-1,0,Modeless)
+              CALL PopActiveWindowID
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
