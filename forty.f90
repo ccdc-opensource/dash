@@ -124,6 +124,10 @@
       INTEGER IBMBER
       COMMON /CCSLER/ IBMBER
 
+! JvdS I set ZBAKIN to .TRUE.
+! With the excluded regions code reinstated, this is necessary to 
+! ensure that we obtain the same results as with the release version.
+      ZBAKIN = .TRUE.
       ICalled = 0
 ! JCC Initialise return value to successful (=1) any other value is failure
       FORTY = 1
@@ -166,10 +170,14 @@
 ! *** Winteracter calls ***
         CALL WDialogPutInteger(IDF_Pawley_Cycle_Number,ICYC)
         CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,LASTCY)
-        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPts)
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPTS)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MaxK)
 ! JCC Add in check on number of reflections here, so that code doesn't bomb out in the Pawley attempt
-        IF (MaxK.GT.400) GOTO 910
+        IF (MaxK.GT.400) THEN
+          FORTY = -1
+          IF (IPK.NE.0) CLOSE (ipk,IOSTAT=istat)
+          RETURN
+        ENDIF
         IF (PRECYC .AND. ICYC.NE.NCYC1) THEN
           SIMUL = .FALSE.
           PRECYC = .FALSE.
@@ -224,8 +232,8 @@
 ! THE CORRESPONDING DERIVATIVES OF YCALC WRT ALL VARIABLES:
 ! (DONE HERE IN CASE NO CONTRIBUTING REFLNS)
 ! *** Winteracter call ***
-        CALL WDialogRangeProgressBar(IDF_Pawley_Progress_Bar,1,Npts)
-        Npt30 = Npts/30
+        CALL WDialogRangeProgressBar(IDF_Pawley_Progress_Bar,1,NPTS)
+        Npt30 = NPTS/30
         DO IPT = 1, NPTS
           IF (npt30*(ipt/npt30).EQ.ipt) THEN
             CALL WDialogPutProgressBar(IDF_Pawley_Progress_Bar,ipt,Absolute)
@@ -245,10 +253,6 @@
 ! DEAL WITH CASE YCALC=0 (EITHER BY BEING EXCLUDED OR BY HAVING NO CONTRIBUTING
 ! REFLECTIONS) - NB ICODE IS NON-ZERO FOR DO **NOT** USE:
 
-! JvdS I set ZBAKIN to .TRUE.
-! With the excluded regions code reinstated, this is necessary to 
-! ensure that we obtain the same results as with the release version.
-          ZBAKIN = .TRUE.
           IF (KMAX.EQ.0 .AND. .NOT.ZBAKIN) ICODE = -1
 ! When we are here
 !   ICODE = -1   : no contributing reflections
@@ -356,9 +360,6 @@
 ! JCC Added in error handling here
   900 CONTINUE
       FORTY = 0
-      IF (IPK.NE.0) CLOSE (ipk,IOSTAT=istat)
-      RETURN
-  910 FORTY = -1
       IF (IPK.NE.0) CLOSE (ipk,IOSTAT=istat)
       RETURN
   950 FORTY = -2
