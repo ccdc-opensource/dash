@@ -1,0 +1,48 @@
+# This is a generated file.
+# Editing SEED1 and SEED2 is safe and may be necessary,
+# editing the items near the end of the file is bound to crash your DASH run.
+# Input file
+SDI C:\Program Files\CCDC\DASH 3.0\Documentation\Example.sdi
+# Ouput file
+OUT C:\Program Files\CCDC\DASH 3.0\Documentation\Example.dash
+T0 0.0
+COOL 0.020
+N1 20
+N2 25
+# When starting multiple jobs with the same .sdi file, make sure that
+# SEED1 and SEED2 have different values in every file.
+# DASH increments SEED1 and SEED2 with the number of the run at the start of
+# each run.
+SEED1 315
+SEED2 159
+# On a distributed system, this should probably be set to:
+#     (total number of runs / number of processors)
+NRUNS 99
+# Maximum number of moves: real followed by integer e.g. "3.0 7" means "3.0E7"
+MAXMOVES 3.0 7
+# Termination criterion: SA stops when chi-sqrd lower than MULTIPLIER times Pawley chi-sqrd
+MULTIPLIER 5.0
+# Randomise initial values
+RANDOMISE TRUE
+# WARNING beyond this point the number and order of the lines becomes important.
+# Do not edit beyond this point.
+#Preferred Orientation DIRection
+#PO_DIR 0 0 1
+ZMATRIX C:\Program Files\CCDC\DASH 3.0\Documentation\Example_1.zmatrix
+# Other Z-matrices follow:
+#ZMATRIX C:\Program Files\CCDC\DASH 3.0\Documentation\Example_1.zmatrix
+#ZMATRIX C:\Program Files\CCDC\DASH 3.0\Documentation\Example_1.zmatrix
+# Need limits for all parameters. Since these are by index, we need to write all of them out
+# CASE 1: initial value, lower bound, upper bound
+# 0.0000 UBLB 0.000 1.000
+# CASE 2: initial value, fixed
+# 0.0000 FIXED
+# CASE 3: initial value, bimodal
+# 0.0000 BIMODAL 120.000 150.000
+# CASE 4: initial value, trimodal
+# 0.0000 TRIMODAL -30.000 30.000
+LIMITS 20
+0.0000 LBUB 0.000 1.000
+0.0000 FIXED
+0.0000 BIMODAL 120.000 150.000
+0.0000 TRIMODAL -30.000 30.000
