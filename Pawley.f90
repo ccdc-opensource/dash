@@ -43,43 +43,43 @@
       ELSE
         CALL WDialogPutString(IDF_PawRef_Solve, '&Solve>')
       ENDIF
-      CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
-      CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
-      CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
-      CALL WDialogFieldState(IDB_PawRef_Save,Disabled)
-      CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+      CALL WDialogFieldState(IDF_PawRef_Refine, Enabled)
+      CALL WDialogFieldState(IDB_PawRef_Accept, Disabled)
+      CALL WDialogFieldState(IDB_PawRef_Reject, Disabled)
+      CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
+      CALL WDialogFieldState(IDF_PawRef_Solve, Disabled)
 !!ep added
 !!      CALL WDialogFieldState(IDF_Paw_Ref_SgDet_Proceed,Disabled)
 ! If the background has been subtracted after the pattern was read in, then the
 ! order of the background polynomial defaults to 2, otherwise to 10.
       IF (.NOT. BACKREF) THEN
         PR_NumBack = 2
-        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,PR_NumBack)
-        CALL WDialogRangeInteger(IDF_IDF_PawRef_NBack,2,6)
+        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack, PR_NumBack)
+        CALL WDialogRangeInteger(IDF_IDF_PawRef_NBack, 2, 6)
       ELSE
         PR_NumBack = 10
-        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack,PR_NumBack)
-        CALL WDialogRangeInteger(IDF_IDF_PawRef_NBack,2,10)
+        CALL WDialogPutInteger(IDF_IDF_PawRef_NBack, PR_NumBack)
+        CALL WDialogRangeInteger(IDF_IDF_PawRef_NBack, 2, 10)
       ENDIF
       PR_BackGround = 0.0
-      CALL WDialogPutReal(IDF_Slim_Parameter,SLIMVALUE)
+      CALL WDialogPutReal(IDF_Slim_Parameter, SLIMVALUE)
       CALL WDialogClearField(IDF_Pawley_Cycle_Number)
       CALL WDialogClearField(IDF_Pawley_Refinement_Number)
       IDUMMY = PawleyErrorLog(2) ! Reset the log messages
       NumPawleyRef = 0
-      CALL WDialogFieldState(IDF_PawRef_UseInts_Check,Disabled)
-      CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check,Disabled)
-      CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check,Disabled)
-      CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check,Disabled)
-      CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check,Disabled)
-      CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check,Unchecked)
-      CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check,Checked)
-      CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check,Unchecked)
-      CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check,Unchecked)
-      CALL WDialogPutCheckBox(IDF_PawRef_RefSigm1_Check,Unchecked)
-      CALL WDialogPutCheckBox(IDF_PawRef_RefSigm2_Check,Unchecked)
-      CALL WDialogPutCheckBox(IDF_PawRef_RefGamm1_Check,Unchecked)
-      CALL WDialogPutCheckBox(IDF_PawRef_RefGamm2_Check,Unchecked)
+      CALL WDialogFieldState(IDF_PawRef_UseInts_Check, Disabled)
+      CALL WDialogFieldState(IDF_PawRef_RefSigm1_Check, Disabled)
+      CALL WDialogFieldState(IDF_PawRef_RefSigm2_Check, Disabled)
+      CALL WDialogFieldState(IDF_PawRef_RefGamm1_Check, Disabled)
+      CALL WDialogFieldState(IDF_PawRef_RefGamm2_Check, Disabled)
+      CALL WDialogPutCheckBox(IDF_PawRef_UseInts_Check, Unchecked)
+      CALL WDialogPutCheckBox(IDF_PawRef_RefBack_Check, Checked)
+      CALL WDialogPutCheckBox(IDF_PawRef_RefCell_Check, Unchecked)
+      CALL WDialogPutCheckBox(IDF_PawRef_RefZero_Check, Unchecked)
+      CALL WDialogPutCheckBox(IDF_PawRef_RefSigm1_Check, Unchecked)
+      CALL WDialogPutCheckBox(IDF_PawRef_RefSigm2_Check, Unchecked)
+      CALL WDialogPutCheckBox(IDF_PawRef_RefGamm1_Check, Unchecked)
+      CALL WDialogPutCheckBox(IDF_PawRef_RefGamm2_Check, Unchecked)
       CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,3)
       CALL WizardWindowShow(IDD_Pawley_Status)
       CALL CHKMAXREF
@@ -197,9 +197,9 @@
       SAVE    LastValuesSet
       INTEGER Ilen, IER
       CHARACTER(MaxPathLength) SDIFile
-      INTEGER Inum
+      INTEGER Inum, I
       CHARACTER(MaxPathLength) :: CurrentDirectory
-      LOGICAL Exists
+      LOGICAL Exists, all_ranges_fitted
 
       Exists = .FALSE.
       CALL PushActiveWindowID
@@ -222,6 +222,14 @@
               SpaceGroupDetermination = .FALSE.
               CALL EndWizard
             CASE (IDF_PawRef_Refine)
+              ! Check if all peak fit ranges have been fitted. If not, warn the user.
+              all_ranges_fitted = .TRUE.
+              IF (NumPeakFitRange .NE. 0) THEN
+                DO I = 1, NumPeakFitRange
+                  IF (.NOT. RangeFitYN(I)) all_ranges_fitted = .FALSE.
+                ENDDO
+              ENDIF
+              IF (.NOT. all_ranges_fitted) CALL WarningMessage("Please note that not all the peaks that were picked have been fitted yet.")
               CALL WritePawleyRefinementFile
               ieocc = Quick_Pawley_Fit()
               ipt = 0
@@ -235,25 +243,25 @@
                                     "or bad data at high angles.")
 ! Reset the R-values if possible
                   IF (LastValuesSet) THEN
-                    CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RLastValues(1),'(F12.2)') 
-                    CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,RLastValues(2),'(F12.3)')
-                    CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RLastValues(3),'(F12.2)')
-                    CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,ILastValues(1))
-                    CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,ILastValues(2))
+                    CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp, RLastValues(1), '(F12.2)') 
+                    CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq, RLastValues(2), '(F12.3)')
+                    CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp, RLastValues(3), '(F12.2)')
+                    CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts, ILastValues(1))
+                    CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs, ILastValues(2))
                     CALL retrieve_polybackup
                   ENDIF
 ! JCC Need to back-copy the arrays here 
 ! Also decrement the number of Pawley refinements since it failed
                   NumPawleyRef = NumPawleyRef - 1
-                  CALL WDialogPutInteger(IDF_Pawley_Refinement_Number,NumPawleyRef)
+                  CALL WDialogPutInteger(IDF_Pawley_Refinement_Number, NumPawleyRef)
                   CALL WDialogClearField(IDF_Pawley_Cycle_Number)
                   IDUMMY = PawleyErrorLog(2) ! Reset the log messages
-                  CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
-                  CALL WDialogFieldState(IDB_PawRef_Accept,Disabled)
-                  CALL WDialogFieldState(IDB_PawRef_Reject,Disabled)
+                  CALL WDialogFieldState(IDF_PawRef_Refine, Enabled)
+                  CALL WDialogFieldState(IDB_PawRef_Accept, Disabled)
+                  CALL WDialogFieldState(IDB_PawRef_Reject, Disabled)
                   IF (NumPawleyRef .GT. 0) THEN
-                    CALL WDialogFieldState(IDB_PawRef_Save,Enabled)
-                    CALL WDialogFieldState(IDF_PawRef_Solve,Disabled)
+                    CALL WDialogFieldState(IDB_PawRef_Save, Enabled)
+                    CALL WDialogFieldState(IDF_PawRef_Solve, Disabled)
                   ENDIF
                   CALL PopActiveWindowID
                   RETURN

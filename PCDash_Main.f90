@@ -165,7 +165,6 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
@@ -178,32 +177,11 @@
       INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
       COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
 
-      REAL              XPF_Range
-      LOGICAL                                       RangeFitYN
-      INTEGER           IPF_Lo,                     IPF_Hi
-      INTEGER           NumPeakFitRange,            CurrentRange
-      INTEGER           IPF_Range
-      INTEGER           NumInPFR
-      REAL              XPF_Pos,                    YPF_Pos
-      INTEGER           IPF_RPt
-      REAL              XPeakFit,                   YPeakFit
-      REAL              PF_FWHM,                    PF_IntBreadth
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
-                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
-                        NumPeakFitRange,            CurrentRange,                &
-                        IPF_Range(MAX_NPFR),                                     &
-                        NumInPFR(MAX_NPFR),                                      & 
-                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
-                        IPF_RPt(MAX_NPFR),                                       &
-                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
-                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
-
       LOGICAL, EXTERNAL :: Confirm
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: DiffractionFileBrowse
       REAL xpgdif, ypgdif
       INTEGER ISTAT, tInt1, tInt2
-      INTEGER tCurrentRange
 
 ! Branch depending on chosen menu item
 
@@ -254,20 +232,7 @@
           CALL WDialogPutRadioButton(IDF_PW_Option4)
           CALL WizardWindowShow(IDD_SAW_Page5)
         CASE (ID_FitPeaks)
-          CALL WCursorShape(CurHourGlass)
-          DO tCurrentRange = 1, NumPeakFitRange
-            IF (.NOT. RangeFitYN(tCurrentRange)) THEN
-              CurrentRange = tCurrentRange
-              CALL MultiPeak_Fitter
-              CALL Profile_Plot
-            ENDIF
-          ENDDO
-          CALL WCursorShape(CurCrossHair)
-! Grey out 'Fit Peaks' button on toolbar
-          CALL UpdateFitPeaksButtonState
-! Disable Pawley refinement button and 'Next >' button in Wizard window
-          CALL CheckIfWeCanDoAPawleyRefinement
-          CALL CheckIfWeCanIndex
+          CALL FitPeaks
         CASE (ID_ClearPeakFitRanges)
           IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Clear_PeakFitRanges
         CASE (ID_Delabc)

@@ -152,16 +152,14 @@
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
       CALL WDialogPutRadioButton(IDF_PW_Option4)
       PastPawley = .FALSE.
-! Ungrey 'Delete peak fit ranges' button on toolbar
-      IF (NumPeakFitRange .GT. 0) CALL WMenuSetState(ID_ClearPeakFitRanges, ItemEnabled, WintOn)
 ! Ungrey 'Clear cell parameters' button on toolbar
-      CALL WMenuSetState(ID_Delabc,ItemEnabled,WintOn)
+      CALL WMenuSetState(ID_Delabc, ItemEnabled, WintOn)
 ! Ungrey 'Remove background' button on toolbar
       IF (.NOT. NoData) CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOn)
 ! Ungrey 'Load diffraction pattern' button on toolbar
       CALL WMenuSetState(ID_import_xye_file, ItemEnabled, WintOn)
 ! Ungrey 'Fit Peaks' button on toolbar
-      CALL UpdateFitPeaksButtonState
+      CALL UpdatePeaksButtonsStates
 ! Ungrey 'Load DASH Pawley file' button on toolbar
       CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOn)
 ! Make unit cell etc. under 'View' no longer read only 
@@ -182,7 +180,7 @@
       CALL WDialogFieldState(IDF_TOF_source, Disabled)
 ! @@ ?
       CALL WDialogSelect(IDD_Peak_Positions)
-      CALL WDialogFieldState(ID_Index_Output,DialogReadOnly)
+      CALL WDialogFieldState(ID_Index_Output, DialogReadOnly)
       CALL WDialogSelect(IDD_ViewPawley)
       CALL WDialogFieldState(IDF_Sigma1, Enabled)
       CALL WDialogFieldState(IDF_Sigma2, Enabled)
@@ -522,7 +520,7 @@
 ! If the user doesn't want to truncate the data, just restore the old values
         tMax = 90.0
       ENDIF
-      CALL TruncateData(tMin,tMax)
+      CALL TruncateData(tMin, tMax)
 ! Now check if we have reasonable data left. If not, don't allow pressing 'Next >'
       IF (FnPatternOK()) THEN
 ! Update the values in the min/max fields to reflect what has actually happened
@@ -536,6 +534,8 @@
           CALL WDialogSelect(IDD_ViewPawley)
           CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
         ENDIF
+        CALL WDialogSelect(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
       ENDIF
       CALL PopActiveWindowID
 
@@ -720,7 +720,7 @@
               CALL WizardApplyProfileRange
               CALL WizardApplyBackground
               CALL Profile_Plot
-              CALL CheckIfWeCanIndex
+              CALL UpdatePeaksButtonsStates
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
@@ -830,9 +830,9 @@
 ! If this is synchrotron data, then set the default error in the peak positions to 0.02 rather than 0.03.
 ! This decreases the number of solutions and increases the speed of the search.
                   IF (JRadOption .EQ. 2) THEN
-                    CALL WDialogPutReal(IDF_eps,0.02,'(F5.3)')
+                    CALL WDialogPutReal(IDF_eps, 0.02, '(F5.3)')
                   ELSE
-                    CALL WDialogPutReal(IDF_eps,0.03,'(F5.3)')
+                    CALL WDialogPutReal(IDF_eps, 0.03, '(F5.3)')
                   ENDIF
                   CALL WizardWindowShow(IDD_PW_Page8)
                 CASE (2) ! Enter known unit cell parameters
@@ -845,7 +845,7 @@
               CALL EndWizard
           END SELECT
         CASE (FieldChanged)
-          CALL CheckIfWeCanIndex
+          CALL UpdatePeaksButtonsStates
       END SELECT
       CALL PopActiveWindowID
 
@@ -966,9 +966,9 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
-              CALL CheckIfWeCanIndex
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDNEXT)
+              CALL CheckIfPeaksFitted
               CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
               CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
               CALL WDialogGetReal(IDF_Indexing_Maxa,   amax)
