@@ -54,7 +54,8 @@
       CALL WizardWindowHide
 !ep SASummary presents a grid summarising results of the Simulated
 !   Annealing runs.  
-      CALL SaSummary()
+      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
+      CALL WDialogShow(-1,-1,0,Modeless)
       Ierrflag =  InfoError(1)
       DoSaRedraw = .FALSE.
 

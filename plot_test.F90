@@ -41,6 +41,8 @@
 ! the number of columns in the store-arrays is set to the maximum number of 
 ! child windows allowed
       COMMON /ProFilePlotStore/ store_ycalc(MOBS,MaxNumChildWin), store_diff(MOBS,MaxNumChildWin)
+
+      EXTERNAL DealWithProfilePlot
 !
 !   reading in the data from the saved .pro files
 !
@@ -60,10 +62,10 @@
 !
 !   calculate the offset for the difference plot
 !
-    YADD=0.5*(YPGMAX+YPGMIN)
+      YADD=0.5*(YPGMAX+YPGMIN)
       DO II=IPMIN,IPMAX
-      YDIF(II)=YADD+yobsep(II)-ycalcep(II)
-      END DO
+        YDIF(II)=YADD+yobsep(II)-ycalcep(II)
+      ENDDO
 !
 !
 !   open the plotting window, ihandle is the window's unique identifier
@@ -73,6 +75,7 @@
         CALL ErrorMessage("Exceeded Maximum Number of Allowed Windows.  Close a profile window")
         RETURN
       END IF 
+      CALL RegisterChildWindow(ihandle,DealWithProfilePlot)
       SAUsedChildWindows(ihandle) = 1
       CALL WindowSelect(ihandle)
 !
