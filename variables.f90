@@ -32,7 +32,7 @@
       CHARACTER(20)            :: VIEWARG
 
       CHARACTER(8) :: ProgramVersion
-      DATA ProgramVersion / 'DASH 2.1' /
+      DATA ProgramVersion / 'DASH 3.0' /
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER(MaxPathLength)  DashTicFile
