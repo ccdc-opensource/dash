@@ -376,6 +376,9 @@
         CASE (IDD_SA_Multi_Completed_ep)
           CALL DealWithSaSummary
           GOTO 10
+        CASE (IDD_Rietveld)
+          CALL DealWithWindowRietveld
+          GOTO 10
       END SELECT
       DealWithEvent = .FALSE.
       RETURN
