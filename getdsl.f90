@@ -316,10 +316,14 @@
       INTEGER nl
       CHARACTER*12 KeyChar
 
-      INTEGER i, KLEN
+      INTEGER i
       INTEGER ihcver,ipiker,iloger,idsler, isst, ised
       INTEGER, EXTERNAL :: GetCrystalSystem
       INTEGER tFileHandle
+      LOGICAL TicExists
+      LOGICAL HcvExists
+      LOGICAL PikExists
+      LOGICAL DslExists
 
 ! JCC Set to success in all cases
       ihcver = 0
@@ -335,9 +339,7 @@
       CALL sa_SetOutputFiles(SDIFile)
       TicExists = .FALSE.
       HcvExists = .FALSE.
-      HklExists = .FALSE.
       PikExists = .FALSE.
-      RawExists = .FALSE.
       DslExists = .FALSE.
  10   line = ' '
       READ(tFileHandle,'(A)',END=100) line
@@ -356,7 +358,6 @@
         CASE ('hkl')
           CALL ILocateString(line,isst,ised)
           DashHklFile = line(isst:)
-          HklExists = .TRUE.
         CASE ('pik')
           CALL ILocateString(line,isst,ised)
           DashPikFile = line(isst:)
@@ -364,7 +365,6 @@
         CASE ('raw')
           CALL ILocateString(line,isst,ised)
           DashRawFile = line(isst:)
-          RawExists = .TRUE.      
         CASE ('dsl')
           CALL ILocateString(line,isst,ised)
           DashDslFile = line(isst:)
@@ -390,9 +390,9 @@
         CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
         DslExists = (idsler .EQ. 0)
       ENDIF
-      klen = LEN_TRIM(DashTicFile)
       IF (TicExists) THEN
-        CALL GET_LOGREF(DashTicFile,klen,iloger)
+        CALL GET_LOGREF(DashTicFile,iloger)
+        TicExists = (iloger .EQ. 0)
       ENDIF
       IF (HcvExists) THEN
         CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
@@ -422,32 +422,35 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION GETTIC(FLEN,TheFileName)
-
+      INTEGER FUNCTION GETTIC(TheFileName)
+!
+! Reads the tick mark file (h, k, l, 2theta and d* per reflection)
+!
+! RETURNS 1 for failure
+!         0 for success
+!
       USE REFVAR
 
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
-      INTEGER,       INTENT (IN   ) :: FLEN
 
-      INCLUDE 'PARAMS.INC'
+      INTEGER iR, I, iLen, hFile
 
-      INTEGER I, II
-
-! JCC - set return status
+! Initialise to failure
       GETTIC = 1
-! JCC - add in an error trap for bad file opening
-      OPEN(11,FILE=TheFileName(1:FLEN),STATUS='OLD',ERR=999)
-      I = 1
- 10   READ(11,*,ERR=100,END=100) (iHKL(II,I),II=1,3), RefArgK(I), DSTAR(I)
-      I = I + 1
-      IF (I .GT. MFCSTO) GOTO 100
-      GOTO 10
- 100  NumOfRef = I - 1
-      CLOSE(11)
-      RETURN
- 999  GETTIC = 0
+      hFile = 31
+      iLen = LEN_TRIM(TheFileName)
+      OPEN(UNIT=hFile,FILE=TheFileName(1:iLen),STATUS='OLD',ERR=999)
+      NumOfRef = 0
+      DO iR = 1, MaxRef
+        READ (hFile,*,ERR=999,END=200) (iHKL(I,iR),I=1,3), RefArgK(iR), DSTAR(iR)
+        CALL INC(NumOfRef)
+      ENDDO
+  200 CONTINUE
+      CLOSE(hFile)
+      GETTIC = 0
+ 999  RETURN
 
       END FUNCTION GETTIC
 !
