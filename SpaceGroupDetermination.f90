@@ -67,11 +67,11 @@
       WRITE(220,*)('           "d" - cubic')
       CLOSE(220)
 ! Calculate increase in error: (PawleyChisqd)^1/2 * sigma
-     IF ((PawleyChiSqd .GT. 1.0) .AND. (PawleyChiSqd .LT. 100)) THEN
+     IF ( PawleyChiSqd .GT. 1.0 ) THEN
        Correction = (SQRT(PawleyChiSqd))*3
      ELSE 
-      Correction = 1.0
-     END IF
+       Correction = 1.0
+     ENDIF
 
 ! Write ADVANCED.ASC to working directory
       OPEN(220,FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'ADVANCED.asc',STATUS='UNKNOWN', ERR = 999)
