@@ -235,11 +235,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_052(IR)
+      REAL FUNCTION FFCALC_052(IR)                  ! I 1 a 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group I 1 a 1
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -266,11 +265,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_057(IR)
+      REAL FUNCTION FFCALC_057(IR)                  ! P1 21/m 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P1 21/m 1
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -292,11 +290,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_058(IR)
+      REAL FUNCTION FFCALC_058(IR)                  ! C 1 2/m 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group C 1 2/m 1
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -311,11 +308,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_061(IR)
+      REAL FUNCTION FFCALC_061(IR)                  ! P 1 2/c 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P 1 2/c 1
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -337,11 +333,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_062(IR)
+      REAL FUNCTION FFCALC_062(IR)                  ! P 1 2/n 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P 1 2/n 1
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -363,11 +358,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_064(IR)
+      REAL FUNCTION FFCALC_064(IR)                  ! P 1 21/c 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P 1 21/c 1
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -389,11 +383,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_065(IR)
+      REAL FUNCTION FFCALC_065(IR)                  ! P 1 21/n 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P 1 21/n 1
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -415,11 +408,9 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_066(IR)
+      REAL FUNCTION FFCALC_066(IR)                  ! P 1 21/a 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
-
-! Structure factor calculations for space group P 1 21/a 1
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -442,11 +433,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_067(IR)
+      REAL FUNCTION FFCALC_067(IR)                  ! C 1 2/c 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group c 1 2/c 1
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -468,11 +458,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_069(IR)
+      REAL FUNCTION FFCALC_069(IR)                  ! I 1 2/a 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group I 1 2/a 1
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -494,11 +483,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_112(IR)
+      REAL FUNCTION FFCALC_112(IR)                  ! P 21 21 2
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P 21 21 2
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -521,11 +509,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_115(IR)
+      REAL FUNCTION FFCALC_115(IR)                  ! P 21 21 21
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P 21 21 21
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -558,11 +545,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_116(IR)
+      REAL FUNCTION FFCALC_116(IR)                  ! C 2 2 21
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group C 2 2 21
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -585,11 +571,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_143(IR)
+      REAL FUNCTION FFCALC_143(IR)                  ! P c a 21
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P c a 21
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -622,11 +607,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_164(IR)
+      REAL FUNCTION FFCALC_164(IR)                  ! P n a 21
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P n a 21
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -659,11 +643,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_176(IR)
+      REAL FUNCTION FFCALC_176(IR)                  ! C m c 21
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group C m c 21
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -686,12 +669,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_212(IR)
+      REAL FUNCTION FFCALC_212(IR)                  ! F d d 2
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group F d d 2
-!
 ! Note the use here of a prefactor of '2' for logrefs of 1 and 3
 ! to take into account the double weighting of these SF expression
 ! as seen in Vol B
@@ -744,11 +725,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_266(IR)
+      REAL FUNCTION FFCALC_266(IR)                  ! P c c n
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P c c n
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -776,11 +756,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_269(IR)
+      REAL FUNCTION FFCALC_269(IR)                  ! P b c m
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P b c m
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -808,11 +787,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_284(IR)
+      REAL FUNCTION FFCALC_284(IR)                  ! P b c n
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P b c n
       AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
@@ -840,12 +818,11 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_290(IR)
+      REAL FUNCTION FFCALC_290(IR)                  ! P b c a
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P b c a
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -872,12 +849,11 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_292(IR)
+      REAL FUNCTION FFCALC_292(IR)                  ! P n m a
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P n m a
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -904,12 +880,11 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_298(IR)
+      REAL FUNCTION FFCALC_298(IR)                  ! C m c m
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group C m c m
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -928,14 +903,11 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_304(IR)
+      REAL FUNCTION FFCALC_304(IR)                  ! C m c a
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group C m c a
-! Loop is performed over the atoms in the asymmetric unit
-! See get_logref.inc for a description of the LOGREF conditions
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -954,13 +926,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_356(IR)
+      REAL FUNCTION FFCALC_356(IR)                  ! I-4
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group I-4
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -1119,7 +1090,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group I 41/a (origin choice 2)
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -1198,13 +1169,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_369(IR)
+      REAL FUNCTION FFCALC_369(IR)                  ! P 41 21 2
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P 41 21 2
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
@@ -1267,11 +1237,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_391(IR)
+      REAL FUNCTION FFCALC_391(IR)                  ! P -4 21 c
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P -4 21 c
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1302,13 +1271,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_430(IR)
+      REAL FUNCTION FFCALC_430(IR)                  ! P 3
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!.. For P3
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1333,13 +1301,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_431(IR)
+      REAL FUNCTION FFCALC_431(IR)                  ! P 31
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!.. For P31
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       RH = 6.283185307179*FLOAT(iHKL(1,IR))
       RK = 6.283185307179*FLOAT(iHKL(2,IR))
       RI = -(RH+RK)
@@ -1361,13 +1328,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_432(IR)
+      REAL FUNCTION FFCALC_432(IR)                  ! P 32
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-!.. For P32
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       RH = 6.283185307179*FLOAT(iHKL(1,IR))
       RK = 6.283185307179*FLOAT(iHKL(2,IR))
       RI = -(RH+RK)
@@ -1389,13 +1355,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_433(IR)
+      REAL FUNCTION FFCALC_433(IR)                  ! R 3, hexagonal axes
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group R3 hexagonal axes
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1420,12 +1385,11 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_434(IR)
+      REAL FUNCTION FFCALC_434(IR)                  ! P -3
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P-3
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1449,12 +1413,11 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_435(IR)
+      REAL FUNCTION FFCALC_435(IR)                  ! R -3, hexagonal axes
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group R-3 hexagonal axes
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1483,7 +1446,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P-31m
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1522,7 +1485,7 @@
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
 ! Structure factor calculations for space group P-3m1
-      AFCAL = 0.
+      AFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1556,13 +1519,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_462(IR)
+      REAL FUNCTION FFCALC_462(IR)                  ! P 6
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P6
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1583,13 +1545,12 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_468(IR)
+      REAL FUNCTION FFCALC_468(IR)                  ! P -6
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P-6
-      AFCAL = 0.
-      BFCAL = 0.
+      AFCAL = 0.0
+      BFCAL = 0.0
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       II = -(IH+IK)
@@ -1710,11 +1671,10 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_483(IR)
+      REAL FUNCTION FFCALC_483(IR)                  ! P -6 2 m
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
-! Structure factor calculations for space group P -6 2 m
       AFCAL = 0.0
       BFCAL = 0.0
       IH = iHKL(1,IR)
