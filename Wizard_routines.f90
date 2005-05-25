@@ -830,12 +830,12 @@
               SELECT CASE (IndexOption)
                 CASE (1) ! Index pattern now
                   CALL WDialogSelect(IDD_PW_Page8)
-! If this is synchrotron data, then set the default error in the peak positions to 0.02 rather than 0.03.
+! If this is synchrotron data, then set the default error in the peak positions to 0.03 rather than 0.04.
 ! This decreases the number of solutions and increases the speed of the search.
                   IF (JRadOption .EQ. 2) THEN
-                    CALL WDialogPutReal(IDF_eps, 0.02, '(F5.3)')
-                  ELSE
                     CALL WDialogPutReal(IDF_eps, 0.03, '(F5.3)')
+                  ELSE
+                    CALL WDialogPutReal(IDF_eps, 0.04, '(F5.3)')
                   ENDIF
                   CALL WizardWindowShow(IDD_PW_Page8)
                 CASE (2) ! Enter known unit cell parameters
