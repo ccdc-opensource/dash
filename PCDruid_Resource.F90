@@ -1,4 +1,4 @@
-! Winteracter module created : 23/May/2005 10:21:26
+! Winteracter module created : 26/May/2005 10:30:34
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -651,4 +651,5 @@
           INTEGER, PARAMETER :: IDB_BatchFile                   =  1155
           INTEGER, PARAMETER :: IDD_SA_input4                   =   126
           INTEGER, PARAMETER :: IDC_OuputDASH                   =  1248
+          INTEGER, PARAMETER :: IDB_Zoom                        =  1296
       END MODULE Druid_Header
