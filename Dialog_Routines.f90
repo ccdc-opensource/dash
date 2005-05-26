@@ -67,8 +67,8 @@
       CALL IntegerToString(item2,chrfmt(inext:inext),'(I1)')
       inext = inext + 1
       chrfmt(inext:inext) = ')'
-      CALL WDialogPutReal(IDF_ymin,ypmin,chrfmt(1:inext))
-      CALL WDialogPutReal(IDF_ymax,ypmax,chrfmt(1:inext))
+      CALL WDialogPutReal(IDF_ymin, ypmin, chrfmt(1:inext))
+      CALL WDialogPutReal(IDF_ymax, ypmax, chrfmt(1:inext))
       CALL PopActiveWindowID
 
       END SUBROUTINE UPLOAD_RANGE
