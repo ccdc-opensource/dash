@@ -705,7 +705,7 @@
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER tInt1, tInt2, tFieldState
-      REAL             tXPMIN,     tXPMAX,     tYPMIN,     tYPMAX,       &
+      REAL             tYPMIN,     tYPMAX,       &
                        tXPGMIN,    tXPGMAX,    tYPGMIN,    tYPGMAX,      &
                        tXPGMINOLD, tXPGMAXOLD, tYPGMINOLD, tYPGMAXOLD
       INTEGER          tIPMIN, tIPMAX, tiStart, tiStop, tnPoints
@@ -731,8 +731,6 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDB_Preview)
-!C              tXPMIN     = XPMIN
-!C              tXPMAX     = XPMAX
               tYPMIN     = YPMIN
               tYPMAX     = YPMAX
               tXPGMIN    = XPGMIN
@@ -759,10 +757,6 @@
 ! Force display of background
               CALL WDialogSelect(IDD_Plot_Option_Dialog)
               CALL WDialogPutCheckBoxLogical(IDF_background_check, .TRUE.)
-!C              XPMIN     = tXPMIN
-!C              XPMAX     = tXPMAX
-!C              YPMIN     = tYPMIN
-!C              YPMAX     = tYPMAX
               XPGMIN    = tXPGMIN
               XPGMAX    = tXPGMAX
               YPGMIN    = tYPGMIN
@@ -778,10 +772,6 @@
               nPoints   = tnPoints
               CALL Profile_Plot
             CASE (IDB_Zoom)
-!C              tXPMIN     = XPMIN
-!C              tXPMAX     = XPMAX
-!C              tYPMIN     = YPMIN
-!C              tYPMAX     = YPMAX
               tXPGMIN    = XPGMIN
               tXPGMAX    = XPGMAX
               tYPGMIN    = YPGMIN
@@ -790,11 +780,6 @@
               tXPGMAXOLD = XPGMAXOLD
               tYPGMINOLD = YPGMINOLD
               tYPGMAXOLD = YPGMAXOLD
-!C              tIPMIN     = IPMIN
-!C              tIPMAX     = IPMAX
-!C              tiStart    = iStart
-!C              tiStop     = iStop
-!C              tnPoints   = nPoints
               CALL WizardApplyProfileRange
               IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
                 CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
@@ -808,9 +793,9 @@
                 DO I = 2, NBIN
                   IF ( YBBIN(I) .GT. tYPGMAX ) tYPGMAX = YBBIN(I)
                 ENDDO
-                DELTA = 0.1 * (tYPGMAX-tYPGMIN)
-                tYPGMIN = tYPGMIN - DELTA
-                tYPGMAX = tYPGMAX + DELTA
+                DELTA = tYPGMAX-tYPGMIN
+                tYPGMIN = tYPGMIN - 0.1*DELTA
+                tYPGMAX = tYPGMAX + 0.2*DELTA
               ELSE
                 CALL Clear_BackGround
                 tYPGMIN = YPMIN
@@ -819,10 +804,6 @@
 ! Force display of background
               CALL WDialogSelect(IDD_Plot_Option_Dialog)
               CALL WDialogPutCheckBoxLogical(IDF_background_check, .TRUE.)
-!C              XPMIN     = tXPMIN
-!C              XPMAX     = tXPMAX
-!C              YPMIN     = tYPMIN
-!C              YPMAX     = tYPMAX
               XPGMIN    = XBIN(1)
               XPGMAX    = XBIN(NBIN)
               YPGMIN    = tYPGMIN
@@ -1302,7 +1283,7 @@
           RETURN
       END SELECT
       DO iRow = 1, NumOfDICVOLSolutions
-        CALL WGridGetCellCheckBox(IDF_DV_Summary_0,1,iRow,iStatus)
+        CALL WGridGetCellCheckBox(IDF_DV_Summary_0, 1, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
 ! Import the unit cell parameters into DASH
           CellPar(1) = DICVOLSolutions(iRow)%a
@@ -1313,6 +1294,8 @@
           CellPar(6) = DICVOLSolutions(iRow)%gamma
           LatBrav = DICVOLSolutions(iRow)%CrystalSystem
           CALL WGridPutCellCheckBox(IDF_DV_Summary_0, 1, iRow, 0)
+!C Reset the space group to "no systematic absences"
+          NumberSGTable = 1
           CALL Upload_CrystalSystem
           CALL UpdateCell
         ENDIF
