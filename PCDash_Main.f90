@@ -134,7 +134,7 @@
           CASE ('SDI    ')
             CALL SDIFileOpen(ArgString)
             CALL ShowWizardWindowZmatrices
-          CASE ('PDB    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'CSSR   ', 'CIF    ')
+          CASE ('PDB    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'XYZ    ', 'CSSR   ', 'CIF    ')
             CALL WDialogSelect(IDD_SAW_Page1)
             iFrg = 1
             CALL zmConvert(ArgString, tNumZMatrices, tZmatrices)
@@ -225,8 +225,8 @@
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_Background_Fit)
 ! Initialise the background
-          CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
-          CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
+          CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
+          CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
           CALL CalculateBackground(tInt1, tInt2, WDialogGetCheckBoxLogical(IDF_UseMCYN))
           CALL Profile_Plot
           CALL WDialogShow(-1, -1, 0, Modeless)
