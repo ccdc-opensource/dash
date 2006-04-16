@@ -617,6 +617,8 @@
           fmt = '-mol2'
         CASE ('res ')
           fmt = '-res'
+        CASE ('xyz ')
+          fmt = '-xyz'
         CASE ('pdb ')
           fmt = '-pdb'
         CASE ('mol2','ml2 ')
