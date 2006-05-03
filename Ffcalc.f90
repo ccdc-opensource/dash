@@ -265,7 +265,7 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION FFCALC_057(IR)                  ! P1 21/m 1
+      REAL FUNCTION FFCALC_057(IR)                  ! P 1 21/m 1
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
 
@@ -316,7 +316,7 @@
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
-      IF (LOGREF(1,IR)) THEN
+      IF ( LOGREF(1,IR) ) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
                   *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
@@ -341,7 +341,7 @@
       IH = iHKL(1,IR)
       IK = iHKL(2,IR)
       IL = iHKL(3,IR)
-      IF (LOGREF(1,IR)) THEN
+      IF ( LOGREF(1,IR) ) THEN
         DO N = 1, NATOM
           AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
                   *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
@@ -355,6 +355,31 @@
       FFCALC_062 = AFCAL*AFCAL
 
       END FUNCTION FFCALC_062
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_063(IR)                  ! P 1 2/a 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF ( LOGREF(1,IR) ) THEN ! h is even
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_063 = AFCAL*AFCAL
+
+      END FUNCTION FFCALC_063
 !
 !*****************************************************************************
 !

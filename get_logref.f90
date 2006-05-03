@@ -127,14 +127,14 @@
             HPKm = 2*(HPK/2)
             LOGREF(1,IR) = HPK.EQ.HPKm ! h+k = 2n
           ENDDO
-        CASE (46,52,69)                        ! P 1 a 1, I 1 a 1, I 1 2/a 1
+        CASE (46,52,63,69)                     ! P 1 a 1, I 1 a 1, P 1 2/a 1, I 1 2/a 1
           NLGREF = 1
           DO IR = 1, NumOfRef
             H_ = iHKL(1,IR)
             H_m = 2*(H_/2)
             LOGREF(1,IR) = (H_.EQ.H_m) ! h = 2n
           ENDDO
-        CASE (115,290)                         ! P21 21 21, P b c a
+        CASE (115,290)                         ! P 21 21 21, P b c a
           NLGREF = 4
           DO IR = 1, NumOfRef
             HPK = iHKL(1,IR) + iHKL(2,IR)
