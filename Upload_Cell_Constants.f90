@@ -40,9 +40,9 @@
       REAL    GReal(3,3), GRec(3,3)
       INTEGER KELPT(6,10)
       DATA KELPT /   2,  3,  4,  5,  6,  7, &  ! Triclinic
-                     2,  3,  4,  5, 10, 10, &
-                     2,  3,  4, 10,  5, 10, &
-                     2,  3,  4, 10, 10,  5, &
+                     2,  3,  4, 10, 10,  5, &  ! Monoclinic-a
+                     2,  3,  4, 10,  5, 10, &  ! Monoclinic-b
+                     2,  3,  4,  5, 10, 10, &  ! Monoclinic-c
                      2,  3,  4, 10, 10, 10, &  ! Orthorhombic
                      2,  2,  3, 10, 10, 10, &  ! Tetragonal
                      2,  2,  3,  9, 10, 10, &
@@ -60,7 +60,7 @@
 
       LOGICAL, EXTERNAL :: FnWaveLengthOK, FnUnitCellOK
       REAL, EXTERNAL :: ChiGetLattice
-      INTEGER I, II, iOrd, NDD
+      INTEGER I, II, iOrd, nDOF
       REAL    DDMAX
 
 ! JCC Check the wavelength: if the user has not set it, then
@@ -92,22 +92,23 @@
 ! Number of degrees of freedom, including the zero point.
       SELECT CASE (LatBrav)
         CASE (1)        ! Triclinic
-          NDD = 7
+          nDOF = 7
         CASE (2,3,4)    ! Monoclinic (a/b/c-axis)
-          NDD = 5
+          nDOF = 5
         CASE (5)        ! Orthorhombic
-          NDD = 4
+          nDOF = 4
         CASE (6,7,8,9)  ! Tetragonal/Trigonal/Rhombohedral/Hexagonal
-          NDD = 3
+          nDOF = 3
         CASE (10)       ! Cubic
-          NDD = 2
+          nDOF = 2
       END SELECT
 ! NVal is the number of peaks indexed with a probability over 95% (the Number of VALid peaks)
       IF (NVal .EQ. 0) THEN
-        IF (NTPeak .GT. NDD) CALL ErrorMessage('Problems with cell refinement.'//CHAR(13)// &
+        IF (NTPeak .GT. nDOF) CALL ErrorMessage('Problems with cell refinement.'//CHAR(13)// &
                                                'Are the unit cell parameters correct?')
         RETURN
       ENDIF
+      IF (NVal .LE. nDOF) RETURN
       DO I = 1, 3
         GREAL(I,I) = CELLPAR(I)**2
       ENDDO
@@ -136,9 +137,9 @@
         CASE ( 1) ! Triclinic
           XDD(3) = GREC(2,2) 
           XDD(4) = GREC(3,3)
-          XDD(5) = GREC(1,2)
-          XDD(6) = GREC(1,3)
-          XDD(7) = GREC(2,3)
+          XDD(5) = GREC(1,2) ! gamma
+          XDD(6) = GREC(1,3) ! beta
+          XDD(7) = GREC(2,3) ! alpha
           NOCREF = .FALSE.
           DO I = 1, 6
             NOCREF = NOCREF .OR. (IASS(I) .EQ. 0)
@@ -146,17 +147,17 @@
         CASE ( 2) ! Monoclinic a
           XDD(3) = GREC(2,2) 
           XDD(4) = GREC(3,3)
-          XDD(5) = GREC(2,3)
+          XDD(5) = GREC(2,3) ! alpha
           NOCREF = (IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(6).EQ.0)
         CASE ( 3) ! Monoclinic b
           XDD(3) = GREC(2,2) 
           XDD(4) = GREC(3,3)
-          XDD(5) = GREC(1,3)
+          XDD(5) = GREC(1,3) ! beta
           NOCREF = (IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(5).EQ.0)
         CASE ( 4) ! Monoclinic c
           XDD(3) = GREC(2,2) 
           XDD(4) = GREC(3,3)
-          XDD(5) = GREC(1,2)
+          XDD(5) = GREC(1,2) ! gamma
           NOCREF = (IASS(1).EQ.0).OR.(IASS(2).EQ.0).OR.(IASS(3).EQ.0).OR.(IASS(4).EQ.0)
         CASE ( 5) ! Orthorhombic
           XDD(3) = GREC(2,2) 
@@ -169,28 +170,26 @@
           XDD(3) = GREC(3,3)
           NOCREF = ((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
         CASE ( 8) ! Rhombohedral
-          XDD(2) = GREC(1,1)
           XDD(3) = GREC(1,2)
           NOCREF = ((IASS(1).EQ.0).AND.(IASS(2).EQ.0).AND.(IASS(3).EQ.0)) & 
-               .OR. ((IASS(4).EQ.0).AND.(IASS(5).EQ.0).AND.(IASS(6).EQ.0))
+              .OR. ((IASS(4).EQ.0).AND.(IASS(5).EQ.0).AND.(IASS(6).EQ.0))
         CASE ( 9) ! Hexagonal
           XDD(3) = GREC(3,3)
           NOCREF = ((IASS(1).EQ.0).AND.(IASS(2).EQ.0)).OR.(IASS(3).EQ.0) 
         CASE (10) ! Cubic
       END SELECT
       IF (NOCREF) RETURN
-      IF (NVal .LE. NDD) RETURN
       DDMAX = 0.0
-      DO I = 2, NDD
+      DO I = 2, nDOF
         DDMAX = MAX(DDMAX,1.0E-4*ABS(XDD(I)))
       ENDDO
-      DO I = 2, NDD
+      DO I = 2, nDOF
         DXDD(I) = DDMAX
       ENDDO
 ! Perform simplex
       IBMBER = 0
       CALL WCursorShape(CurHourGlass)
-      CALL SIMOPT(XDD,DXDD,COVDD,NDD,ChiGetLattice)
+      CALL SIMOPT(XDD,DXDD,COVDD,nDOF,ChiGetLattice)
       CALL WCursorShape(CurCrossHair)
       IF (IBMBER .NE. 0) THEN
         IBMBER = 0
@@ -198,7 +197,7 @@
         RETURN
       ENDIF
       XDD(9) = 0.5 * XDD(2)
-      XDD(10) = 0.0
+      XDD(10) = 0.0 ! Means COS(ANGLE)=0.0, i.e. ANGLE = 90.0 degrees.
       DO I = 1, 3
         GREC(I,I) = XDD(KELPT(I, LatBrav))
       ENDDO
@@ -219,8 +218,8 @@
       CALL Upload_Cell_Constants
       CALL Upload_ZeroPoint
       CALL Generate_TicMarks
-      IF (NVal .LE. NDD+2) RETURN
-! Now attempt a quick Pawley refinement
+      IF (NVal .LE. nDOF+2) RETURN
+! We now have fitted enough peaks to go to the Pawley refinement
       CALL ShowPawleyFitWindow
 
       END SUBROUTINE RefineLattice
@@ -255,31 +254,32 @@
       p1 = p(2)
       p2 = p(2)
       p3 = p(2)
-! p4, p5 and p6 are the dot products ab, ac and ab
+! p4, p5 and p6 are the dot products ab, ac and bc
 ! setting them to zero means: angle is 90.0
-      p4 = 0.0
-      p5 = 0.0
-      p6 = 0.0
+! ######### CONFUSING: 4, 5, 6, is gamma, alpha, beta !!! #################
+      p4 = 0.0 ! gamma
+      p5 = 0.0 ! beta
+      p6 = 0.0 ! alpha
 ! Adjust values if not cubic
       SELECT CASE (LatBrav)
         CASE ( 1) ! Triclinic
           p2 = p(3)
           p3 = p(4)
-          p4 = p(5)
-          p5 = p(6)
-          p6 = p(7)
+          p4 = p(5) ! gamma
+          p5 = p(6) ! beta
+          p6 = p(7) ! alpha
         CASE ( 2) ! Monoclinic a
           p2 = p(3)
           p3 = p(4)
-          p6 = p(5)
+          p6 = p(5) ! alpha
         CASE ( 3) ! Monoclinic b
           p2 = p(3)
           p3 = p(4)
-          p5 = p(5)
+          p5 = p(5) ! beta
         CASE ( 4) ! Monoclinic c
           p2 = p(3)
           p3 = p(4)
-          p4 = p(5)
+          p4 = p(5) ! gamma
         CASE ( 5) ! Orthorhombic
           p2 = p(3)
           p3 = p(4)
@@ -287,11 +287,11 @@
           p3 = p(3)
         CASE ( 7, 9) ! Trigonal / Hexagonal
           p3 = p(3)
-          p4 =0.5*p(2)
+          p4 =0.5*p(2) ! Is this right?
         CASE ( 8) ! Rhombohedral
-          p4 = p(3)
-          p5 = p(3)
-          p6 = p(3)
+          p4 = p(3) ! gamma
+          p5 = p(3) ! beta
+          p6 = p(3) ! alpha
         CASE (10) ! Cubic
       END SELECT
       DO I = 1, NVAL
@@ -302,9 +302,13 @@
         dd = vh*vh*p1 + vk*vk*p2 + vl*vl*p3 + 2.0 * (vh*vk*p4 + vh*vl*p5 + vk*vl*p6)
 ! 2 theta value
         SinArg = 0.5 * ALambda * SQRT(dd)
-        IF (SinArg .GT.  1.0) SinArg =  1.0
-        IF (SinArg .LT. -1.0) SinArg = -1.0
-        tthc = 2.0 * ASIND(SinArg)
+        IF ( SinArg .GT. 0.99999 ) THEN
+          tthc = 180.0
+        ELSE IF ( SinArg .LT. -0.99999 ) THEN
+          tthc = -180.0
+        ELSE
+          tthc = 2.0 * ASIND(SinArg)
+        ENDIF
 ! Correct for zero-point error
         ZVAL(I) = tthc + zp
         CTem = (ZVAL(I) - YVAL(I)) / EVAL(I)
