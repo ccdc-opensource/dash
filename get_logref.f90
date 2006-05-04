@@ -85,7 +85,7 @@
           NLGREF = 0
         CASE (469,471,481,483,485)             ! P6/m, P622, P-6m2, P-62m, P6/mmm
           NLGREF = 0
-        CASE (39,57)                           ! P 1 21 1, P 1 21/m 1
+        CASE (39,57,81)                        ! P 1 21 1, P 1 21/m 1, P 1 1 b
           NLGREF = 1
           DO IR = 1, NumOfRef
             K_ = iHKL(2,IR)
