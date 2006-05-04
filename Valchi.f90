@@ -50,8 +50,8 @@
       REAL, EXTERNAL :: FFCALC_001, FFCALC_002, FFCALC_039, FFCALC_040, FFCALC_044, FFCALC_045, &
                         FFCALC_046, FFCALC_050, FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061
       REAL, EXTERNAL :: FFCALC_062, FFCALC_063, FFCALC_064, FFCALC_065, FFCALC_066, FFCALC_067, &
-                        FFCALC_069, FFCALC_112, FFCALC_115, FFCALC_116, FFCALC_143, FFCALC_164, &
-                        FFCALC_176
+                        FFCALC_069, FFCALC_081, FFCALC_112, FFCALC_115, FFCALC_116, FFCALC_143, &
+                        FFCALC_164, FFCALC_176
       REAL, EXTERNAL :: FFCALC_212, FFCALC_266, FFCALC_269, FFCALC_284, FFCALC_290, FFCALC_292, &
                         FFCALC_298, FFCALC_304, FFCALC_356, FFCALC_360, FFCALC_362, FFCALC_365
       REAL, EXTERNAL :: FFCALC_369, FFCALC_391, FFCALC_430, FFCALC_431, FFCALC_432, FFCALC_433, &
@@ -146,6 +146,10 @@
           CASE (69)            ! I 1 2/a 1
             DO IR = 1, NumOfRef
               AICALC(IR) = FFCALC_069(IR)
+            ENDDO
+          CASE (81)            ! P 1 1 b
+            DO IR = 1, NumOfRef
+              AICALC(IR) = FFCALC_081(IR)
             ENDDO
           CASE (112)           ! P 21 21 2
             DO IR = 1, NumOfRef

@@ -508,6 +508,36 @@
 !
 !*****************************************************************************
 !
+      REAL FUNCTION FFCALC_081(IR)                  ! P 1 1 b
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)-SINQS(IH,1,N)  &
+                  *SINQS(IK,2,N))*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IK,2,N)+COSQS(IH,1,N)  &
+                  *SINQS(IK,2,N))*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IK,2,N)+COSQS(IH,1,N)  &
+                  *SINQS(IK,2,N))*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)-SINQS(IH,1,N)  &
+                  *SINQS(IK,2,N))*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_081 = AFCAL*AFCAL + BFCAL*BFCAL
+
+      END FUNCTION FFCALC_081
+!
+!*****************************************************************************
+!
       REAL FUNCTION FFCALC_112(IR)                  ! P 21 21 2
 
       INCLUDE 'SGinc\FFCALCTOP.inc'
