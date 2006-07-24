@@ -31,12 +31,12 @@
       CALL WindowSelect(0)
       CALL WMessageEnable(MouseButUp, Enabled)
 ! Set the scale correctly. 
-      CALL IGrUnits(0.0,0.0,1.0,1.0)
+      CALL IGrUnits(0.0, 0.0, 1.0, 1.0)
       CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
-      CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
+      CALL IPgUnits(xpgmin, ypgmin, xpgmax, ypgmax)
       xgcur(1) = EventInfo%GX
       ygcur(1) = EventInfo%GY
-      CALL IPgUnitsFromGrUnits(xgcur(1),ygcur(1),xcur(1),ycur(1))
+      CALL IPgUnitsFromGrUnits(xgcur(1), ygcur(1), xcur(1), ycur(1))
       xgcurold = xgcur(1)
       ygcurold = ygcur(1)
       XPGMINOLD = XPGMIN
@@ -50,12 +50,12 @@
       CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
       CALL IGrPlotMode('Normal')
       CALL IGrColourN(InfoGrScreen(PrevColReq))
-      DO WHILE (.TRUE.)
+      DO WHILE ( .TRUE. )
         CALL GetEvent
-        IF (EventInfo%WIN .EQ. 0) THEN
-          CALL IGrUnits(0.0,0.0,1.0,1.0)
-          CALL IPgArea(XPG1,YPG1,XPG2,YPG2)
-          CALL IPgUnits(xpgmin,ypgmin,xpgmax,ypgmax)
+        IF ( EventInfo%WIN .EQ. 0 ) THEN
+          CALL IGrUnits(0.0 ,0.0, 1.0, 1.0)
+          CALL IPgArea(XPG1, YPG1, XPG2, YPG2)
+          CALL IPgUnits(xpgmin, ypgmin, xpgmax, ypgmax)
           CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xcur(2),ycur(2))
           SELECT CASE (EventType)
             CASE (MouseMove)
@@ -63,11 +63,11 @@
               ygcur(2) = EventInfo%GY
               CALL IGrPlotMode('EOR')
               CALL IGrColourN(KolNumRectSelect)
-              CALL IGrFillPattern(0,1,1)
+              CALL IGrFillPattern(0, 1, 1)
               ! Remove old
-              CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+              CALL IGrRectangle(xgcur(1), ygcur(1), xgcurold, ygcurold)
               ! Draw new
-              CALL IGrRectangle(xgcur(1),ygcur(1),xgcur(2),ygcur(2))
+              CALL IGrRectangle(xgcur(1), ygcur(1), xgcur(2), ygcur(2))
               xgcurold = xgcur(2)
               ygcurold = ygcur(2)
               CALL IGrPlotMode('Normal')
@@ -79,9 +79,9 @@
               IF (EventInfo%VALUE1 .EQ. LeftButton) THEN
                 CALL IGrColourN(KolNumRectSelect)
                 CALL IGrPlotMode('EOR')
-                CALL IGrFillPattern(0,1,1)
+                CALL IGrFillPattern(0, 1, 1)
                 ! Remove old
-                CALL IGrRectangle(xgcur(1),ygcur(1),xgcurold,ygcurold)
+                CALL IGrRectangle(xgcur(1), ygcur(1), xgcurold, ygcurold)
                 CALL IGrPlotMode('Normal')
                 CALL IGrColourN(InfoGrScreen(PrevColReq))
                 IF (ABS(XCUR(2)-XCUR(1)).LT.0.003*(XPGMAX-XPGMIN)) RETURN
@@ -949,11 +949,15 @@
         CALL WDialogFieldState(IDNEXT, Enabled)
         CALL WDialogSelect(IDD_PW_Page8)
         CALL WDialogFieldState(IDNEXT, Enabled) ! The 'Run >' button
+        CALL WDialogSelect(IDD_PW_Page8b)
+        CALL WDialogFieldState(IDNEXT, Enabled) ! The 'Run >' button
       ELSE
         CALL WDialogSelect(IDD_PW_Page7)
-        CALL WDialogGetRadioButton(IDF_RADIO3, IndexOption) ! 'Index now' or 'Enter known cell'
-        CALL WDialogFieldStateLogical(IDNEXT, IndexOption .EQ. 2)
+        CALL WDialogGetRadioButton(IDF_RADIO1, IndexOption) ! 'Index now' or 'Enter known cell'
+        CALL WDialogFieldStateLogical(IDNEXT, IndexOption .EQ. 3)
         CALL WDialogSelect(IDD_PW_Page8)
+        CALL WDialogFieldState(IDNEXT, Disabled) ! The 'Run >' button
+        CALL WDialogSelect(IDD_PW_Page8b)
         CALL WDialogFieldState(IDNEXT, Disabled) ! The 'Run >' button
       ENDIF
       CALL PopActiveWindowID
@@ -1067,8 +1071,8 @@
       INTEGER IFTYPE
       INTEGER iFlags
       CHARACTER(LEN=75) :: FILTER
-      REAL    Rvpar(2), Rcpar(5), Lambda, Rdens, Rmolwt, Rfom, Rexpzp, Reps
-      INTEGER Isystem(6), UseErr, I, iOrd, hFile
+      REAL    Rvpar(2), Rcpar(5), Lambda, Rdens, Rmolwt, tFoM, Rexpzp, Reps
+      INTEGER iSystem(6), UseErr, I, iOrd, hFile
       REAL    Epsilon
       CHARACTER(MaxPathLength) tFileName
 
@@ -1080,7 +1084,7 @@
       tFileName = ' '
       IFTYPE = 2
       hFile = 117
-      CALL WSelectFile(FILTER,iFlags,tFileName,'Enter DICVOL file name',IFTYPE)
+      CALL WSelectFile(FILTER, iFlags, tFileName, 'Enter DICVOL file name', IFTYPE)
       IF ((LEN_TRIM(tFileName) .EQ. 0) .OR. (WInfoDialog(ExitButtonCommon) .NE. CommonOK)) RETURN
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Index_Preparation)
@@ -1094,20 +1098,20 @@
       CALL WDialogGetReal(IDF_Indexing_MaxAng, Rcpar(5))
       CALL WDialogGetReal(IDF_Indexing_Density, Rdens)
       CALL WDialogGetReal(IDF_Indexing_MolWt,   Rmolwt)
-      CALL WDialogGetReal(IDF_Indexing_Fom,     Rfom)
+      CALL WDialogGetReal(IDF_Indexing_Fom,     tFoM)
       CALL WDialogGetReal(IDF_ZeroPoint,        Rexpzp)
-      CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      Isystem(1))
-      CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      Isystem(2))
-      CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       Isystem(3))
-      CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      Isystem(4))
-      CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, Isystem(5))
-      CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  Isystem(6))
+      CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      iSystem(1))
+      CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      iSystem(2))
+      CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       iSystem(3))
+      CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      iSystem(4))
+      CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, iSystem(5))
+      CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  iSystem(6))
       CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
       CALL WDialogGetReal(IDF_eps,Epsilon)
 ! Write it out 
-      OPEN(UNIT=hFile,FILE=tFileName,STATUS='UNKNOWN',ERR=999)
+      OPEN(UNIT=hFile, FILE=tFileName, STATUS='UNKNOWN', ERR=999)
       WRITE(hFile,*,ERR=999) 'DICVOL input file created by DASH'
-      WRITE(hFile,'(8(I3,1X))',ERR=999)  NTPeak, 2, (Isystem(i),i=1,6)
+      WRITE(hFile,'(8(I3,1X))',ERR=999)  NTPeak, 2, (iSystem(i),i=1,6)
       WRITE(hFile,'(7(F8.2,1X))',ERR=999)  Rcpar(1),Rcpar(2),Rcpar(3),Rvpar(1),Rvpar(2),Rcpar(4),Rcpar(5)
       WRITE(hFile,'(F10.6,1X,3(F8.4,1X))',ERR=999)  Lambda, Rmolwt, Rdens, Rdens/50.0
       IF (UseErr .EQ. 2) THEN
@@ -1115,7 +1119,7 @@
       ELSE
         Reps = Epsilon
       ENDIF
-      WRITE(hFile,'(F5.3,1X,F6.2,1X,F9.6)',ERR=999) Reps, Rfom, Rexpzp
+      WRITE(hFile,'(F5.3,1X,F6.2,1X,F9.6)',ERR=999) Reps, tFoM, Rexpzp
       IF (UseErr .EQ. 2) THEN
         DO I = 1, NTPeak
           iOrd = iOrdTem(i)
