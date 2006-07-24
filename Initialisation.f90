@@ -73,7 +73,11 @@
 
       IMPLICIT NONE
 
-      CALL WDialogLoad(IDD_Background_Fit)
+! Problem here: apparently, WinterActer can only deal with up to 39 dialogue windows being
+! loaded. We have quite a few more than that. As a result, some dialogues need to be
+! swapped in and out of memory. Thisis ugly and error-prone, but that's the way it is.
+! Currently those dialogues are IDD_SX_Page1a, IDD_SAW_Page6a and IDD_RR_TOPAS.
+
       CALL WDialogLoad(IDD_Structural_Information)
       CALL WDialogLoad(IDD_Configuration)
       CALL WDialogLoad(IDD_Index_Preparation)
@@ -90,13 +94,12 @@
       CALL WDialogLoad(IDD_PW_Page6)
       CALL WDialogLoad(IDD_PW_Page7)
       CALL WDialogLoad(IDD_PW_Page8)
+      CALL WDialogLoad(IDD_PW_Page8b)
       CALL WDialogLoad(IDD_PW_Page9)
       CALL WDialogLoad(IDD_PW_Page10)
       CALL WDialogLoad(IDD_SX_Page1)
-      CALL WDialogLoad(IDD_SX_Page1a)
       CALL WDialogLoad(IDD_SX_Page2)
       CALL WDialogLoad(IDD_Pawley_Status)
-      CALL WDialogLoad(IDD_Pawley_ErrorLog)
       CALL WDialogLoad(IDD_SAW_Page1)
       CALL WDialogLoad(IDD_zmEdit)
       CALL WDialogLoad(IDD_zmEditRotations)
@@ -292,6 +295,10 @@
 ! The initialisations should be split up into 'one off initialisations' (at the start up
 ! of DASH only) and 'whenever a new project file is opened'
       in_batch = .FALSE.
+      For_TOPAS = .FALSE.
+      SXMaxResolution = 1.75
+      iRietveldMethod = 1
+      RR_SA_Sol = 1
       CALL WDialogSelect(IDD_SA_input3_2)
       NS = 20
       CALL WDialogPutInteger(IDF_SA_NS, NS)
@@ -562,7 +569,7 @@
                            PlotPeakFitDifferenceProfile,                  &
                            WDialogGetCheckBoxLogical,                     &
                            Get_SavePRO, Get_OutputChi2vsMoves, &
-                           Get_DivideByEsd
+                           Get_DivideByEsd, Get_SavePrjAtEnd
       LOGICAL, EXTERNAL :: Get_ShowCumChiSqd, Get_AutoAlign
       REAL, EXTERNAL :: WavelengthOf
       CHARACTER*MaxPathLength tFileName
@@ -746,8 +753,8 @@
 ! Following is new in DASH 3.0
 ! Save the mogul path
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetString(IDF_MogulExe, MogulExe)
-      CALL FileWriteString(hFile, RecNr, MogulExe)
+      CALL WDialogGetString(IDF_MogulExe, MOGULEXE)
+      CALL FileWriteString(hFile, RecNr, MOGULEXE)
 ! Use Mogul
       CALL FileWriteLogical(hFile, RecNr, UseMogul)
 ! Single crystal options
@@ -757,6 +764,21 @@
       CALL WDialogGetReal(IDF_CutOff, tReal)
       CALL FileWriteReal(hFile, RecNr, tReal)
       CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_AvgFriedelPairs))
+! Following is new in DASH 3.1
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogGetString(IDF_DICVOLExe, DICVOL04EXE)
+      CALL FileWriteString(hFile, RecNr, DICVOL04EXE)
+! Save defaults for background subtraction
+      CALL WDialogSelect(IDD_PW_Page6)
+  ! Use window smooth YES / NO
+      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_UseSmooth))
+  ! Window
+      CALL WDialogGetInteger(IDF_SmoothWindow, tInteger)
+      CALL FileWriteInteger(hFile, RecNr, tInteger)
+! Save .dash file at end of SA?
+      CALL FileWriteLogical(hFile, RecNr, Get_SavePrjAtEnd())
+
+
   999 CLOSE(hFile)
 
       END SUBROUTINE WriteConfigurationFile
@@ -938,6 +960,7 @@
 ! Colour flexible torsions (in Z-matrix viewer) YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors, tLogical)
+      CALL WDialogSelect(IDD_SA_input4)
 ! Read YES / NO which molecular file formats are to be written out when a best solution is found
       CALL FileReadLogical(hFile, RecNr, tLogical)   ! 1. .pdb  ?
       CALL WDialogPutCheckBoxLogical(IDF_OutputPDB, tLogical)
@@ -1019,13 +1042,13 @@
       CALL Set_AutoAlign(tLogical)
 ! Following is new in DASH 3.0
 ! Read the Mogul path
-      CALL FileReadString(hFile, RecNr, MogulExe)
+      CALL FileReadString(hFile, RecNr, MOGULEXE)
       IF (GetBFIOError() .NE. 0) THEN
         CLOSE(hFile)
         RETURN
       ENDIF
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutString(IDF_MogulExe, MogulExe)
+      CALL WDialogPutString(IDF_MogulExe, MOGULEXE)
 ! Use Mogul
       CALL FileReadLogical(hFile, RecNr, UseMogul)
 ! Single crystal options
@@ -1038,6 +1061,25 @@
       CALL WDialogPutReal(IDF_CutOff, tReal)
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogPutCheckBoxLogical(IDF_AvgFriedelPairs, tLogical)
+! Following is new in DASH 3.1
+! Read the DICVOL04 path
+      CALL FileReadString(hFile, RecNr, DICVOL04EXE)
+      IF (GetBFIOError() .NE. 0) THEN
+        CLOSE(hFile)
+        RETURN
+      ENDIF
+      CALL WDialogSelect(IDD_Configuration)
+      CALL WDialogPutString(IDF_DICVOLExe, DICVOL04EXE)
+! Read defaults for background subtraction
+      CALL WDialogSelect(IDD_PW_Page6)
+      CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use Monte Carlo YES / NO
+      CALL WDialogPutCheckBoxLogical(IDF_UseSmooth, tLogical)
+      CALL FileReadInteger(hFile, RecNr, tInteger)      ! Window
+      CALL WDialogPutInteger(IDF_SmoothWindow, tInteger)
+      CALL WDialogSelect(IDD_SA_input4)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDC_OuputDASH, tLogical)
+
       CLOSE(hFile)
       RETURN
   999 CALL DebugErrorMessage('Error while opening config file')
