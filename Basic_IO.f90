@@ -419,6 +419,9 @@
         CASE (IDD_PW_Page8)
           CALL DealWithWizardWindowIndexing2
           GOTO 10
+        CASE (IDD_PW_Page8b)
+          CALL DealWithWizardWindowDICVOL04
+          GOTO 10
         CASE (IDD_PW_Page9)
           CALL DealWithWizardWindowDICVOLResults
           GOTO 10
@@ -487,6 +490,12 @@
           GOTO 10
         CASE (IDD_Rietveld2)
           CALL DealWithWindowRietveld
+          GOTO 10
+        CASE (IDD_SAW_Page6a)
+          CALL DealWithWizardChooseRietveldRefinementMethod
+          GOTO 10
+        CASE (IDD_RR_TOPAS)
+          CALL DealWithWizardTOPAS
           GOTO 10
         CASE (IDD_RR_PO_Dialog)
           CALL DealWithRR_PO_Settings
