@@ -253,7 +253,8 @@
       GOTO 10 
  100  CLOSE(iHandle)
       nFrag = iFrg
-      !C Basically a Q&D hack: fill BestValuesDoF(:,1) because we already have a routine that can 
+      !C Basically a Q&D hack: fill BestValuesDoF(:,1) (where "1" is the first SA run) because
+      !C we already have a routine that can
       !C translate BestValuesDoF into a fully functional Rietveld refinement window.
       KK = 0
       DO iFrg = 1, nFrag
