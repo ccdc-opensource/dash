@@ -31,6 +31,7 @@
       CHARACTER(MaxPathLength) :: VIEWEXE
       CHARACTER(20)            :: VIEWARG
 	  CHARACTER(MaxPathLength) :: MOGULEXE
+	  CHARACTER(MaxPathLength) :: DICVOL04EXE
 
 	  LOGICAL UseMogul
 	  DATA UseMogul / .TRUE. /
@@ -82,7 +83,29 @@
       REAL DefaultMaxResolution
 ! The maximum resolution cut-off, in Angstrom, for this powder pattern.
 ! This is equal to DASHDefaultMaxResolution for new patterns, and equal to whatever was used
-! for patterns from a .sdi file.
+! for patterns from a .sdi file. 
+
+      REAL SXMaxResolution 
+! The maximum resolution cut-off, in Angstrom, for Single Crystal data.
+! The reason this must be held in a variable is that we have too many dialogue windows to keep in memory,
+! and the dialogue window displaying this variable must therefore be swapped in and out of memory.
+
+      INTEGER iRietveldMethod
+! The chosen Rietveld refinement method, either "Rigid-body" or "TOPAS".
+! The reason this must be held in a variable is that we have too many dialogue windows to keep in memory,
+! and the dialogue window displaying this variable must therefore be swapped in and out of memory.
+
+      INTEGER RR_SA_Sol
+! The SA solution that will be used for Rietveld refinement. Crystal structures read in from an external
+! file are stored in RR_SA_Sol = 1
+
+      LOGICAL For_TOPAS
+
+      INTEGER TOPAS_stage
+! The "Rietveld refinement with TOPAS" dialogue window has three stages:
+! Stage 1. Write input file for Pawley in TOPAS
+! Stage 2. Read output file from TOPAS back into DASH
+! Stage 3. Write input file for Rietveld in TOPAS
 
       LOGICAL PastPawley
 ! The code used to calculate the tickmarks does so by emulating a Rietveld refinement.
