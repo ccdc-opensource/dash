@@ -153,3 +153,27 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE SavePrjAtEnd
+
+      USE VARIABLES
+      USE PRJVAR
+
+      IMPLICIT NONE
+
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
+      LOGICAL, EXTERNAL :: Get_SavePrjAtEnd
+      CHARACTER*(255) tPrjFileName
+
+      IF ( Get_SavePrjAtEnd() ) THEN
+        tPrjFileName = OutputFilesBaseName(1:OFBN_Len)//'.dash'
+        CALL PrjReadWrite(tPrjFileName, cWrite)
+      ENDIF
+
+      END SUBROUTINE SavePrjAtEnd
+!
+!*****************************************************************************
+!
