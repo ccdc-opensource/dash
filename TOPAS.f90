@@ -234,6 +234,13 @@
       ENDIF
       WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    ga '//tChar//' ', CELLPAR(6)
 !      WRITE(hFileTOPAS, '(A,A)', ERR=999) 'phase_name ', 
+
+      ! By writing the space group name last, the extra information on hkl's and intensities
+      ! will be appended at the end of the file. That makes it a lot easier to read the .out
+      ! file back in again and to just discard everything following after the space group.
+
+      ! TODO ##### for space groups higher than orthorhombic we're almost certainly better off
+      ! using the format space_group 222:1 rather than the space-group name. 
       WRITE(hFileTOPAS, '(A)', ERR=999) '    space_group "'//SGHMaStr(NumberSGTable)(1:LEN_TRIM(SGHMaStr(NumberSGTable)))//'"' 
       WriteTOPASFilePawley = 0
       CLOSE(hFileTOPAS)
