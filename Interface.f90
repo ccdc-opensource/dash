@@ -534,6 +534,26 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION Get_SavePrjAtEnd
+
+! When .TRUE., a file containing the calculated profile is saved for each SA run
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input4)
+      Get_SavePrjAtEnd = WDialogGetCheckBoxLogical(IDC_OuputDASH)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_SavePrjAtEnd
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION Get_ColourFlexibleTorsions
 
 ! When .TRUE., flexible torsions are coloured when viewing a Z-matrix
@@ -1042,6 +1062,7 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
+!      REAL, EXTERNAL :: TwoTheta2dSpacing     
       REAL    PkArgK(MTPeak), PkTicDif(MTPeak)
       REAL    TwoThetaDiff, AbsTwoThetaDiff
       INTEGER IArgK(MTPeak)
@@ -1150,6 +1171,7 @@
         DifTem = AllPkPosVal(iOrd) - PkArgK(I)
 
       !  DifTem = AllPkAreaVal(iOrd)
+      !  DifTem = TwoTheta2dSpacing(AllPkPosVal(iOrd))
 
         CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 4, I, DifTem, '(F12.4)')
         CALL WGridPutCellInteger(IDF_Peak_Positions_Grid, 5, I, IHPk(1,I))

@@ -6,6 +6,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE PRJVAR
 
       IMPLICIT NONE
 
@@ -84,10 +85,11 @@
       EndDate = DateToday()
       EndTime = TimeNowSeconds()
       CALL TimeElapsed(StartDate, StartTime, EndDate, EndTime, SA_DurationStr, DSLen)
-      CALL InfoMessage('The Simulated Annealing took '//SA_DurationStr(1:DSLen))
 !C After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       CALL OutputChi2vsMoves
+      CALL SavePrjAtEnd
+      CALL InfoMessage('The Simulated Annealing took '//SA_DurationStr(1:DSLen))
       CALL SetModeMenuState(0,0)
 !O      Ierrflag = InfoError(1)
 !O      CALL WindowSelect(0)
