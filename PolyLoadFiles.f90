@@ -168,6 +168,7 @@
       INTEGER          MAX_INTENSITY_INDEX
       REAL             tYPMIN, tYPMAX
 
+      IF ( For_TOPAS ) CALL CopyPattern2Backup
 ! Initialise to failure
       DiffractionFileLoad = 1
       Is_SX = .FALSE. ! Should not be necessary
@@ -224,9 +225,11 @@
         DO I = 1, NOBS
 ! Number of counts can be zero, especially at low theta due to a variable slit
 ! @ quick fix
-          EOBS(I) = SQRT(MAX(4.4,MAX(0.0,YOBS(I))))
-! The minimum error is approx. 1%
-!F          EOBS(I) = MAX(SQRT(MAX(1.0,YOBS(I))),0.01*YOBS(I))
+          
+          EOBS(I) = MAX(4.4, SQRT(MAX(1.0,YOBS(I))))
+          IF ( YOBS(I) .GT. 10000.0 )     &
+              EOBS(I) = 0.01 * YOBS(I)
+
         ENDDO
       ENDIF
 ! Reset points that have not been read to zero.
@@ -237,30 +240,7 @@
           EOBS(I) = 0.0
         ENDDO
       ENDIF
-      DataSetChange = DataSetChange + 1
-      BackRef = .TRUE.
-      CALL Clear_UnitCell
-! Ungrey 'Remove background' button on toolbar if Wizard is not up
-!O      IF (CurrentWizardWindow .EQ. 0) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
-      CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOn)
-      tYPMIN = YOBS(1)
-      tYPMAX = YOBS(1)
-      DO I = 1, NOBS
-        tYPMIN = MIN(YOBS(I),tYPMIN)
-        IF (tYPMAX .LT. YOBS(I)) THEN
-          MAX_INTENSITY_INDEX = I
-          tYPMAX = YOBS(I)
-        ENDIF
-      ENDDO
-      INTEGRATED_GUESS = 0.0
-      DO I = MAX(1,MAX_INTENSITY_INDEX - 5), MIN(NOBS,MAX_INTENSITY_INDEX + 5)
-        INTEGRATED_GUESS = INTEGRATED_GUESS + YOBS(I)
-      ENDDO
-      IF (INTEGRATED_GUESS .GT. 250000.0) THEN
-        ScalFac = 0.01 * INTEGRATED_GUESS/250000.0
-      ELSE IF (tYPMAX .GT. 100000.0) THEN
-        ScalFac = 0.01 * tYPMAX/100000.0
-      ENDIF
+
       BackupXOBS = 0.0
       BackupYOBS = 0.0
       BackupEOBS = 0.0
@@ -270,15 +250,42 @@
         BackupYOBS(I) = YOBS(I)
         BackupEOBS(I) = EOBS(I)
       ENDDO
+
+
+      IF ( .NOT. For_TOPAS ) THEN
+        DataSetChange = DataSetChange + 1
+        BackRef = .TRUE.
+        CALL Clear_UnitCell
+        CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOn)
+        tYPMIN = YOBS(1)
+        tYPMAX = YOBS(1)
+        DO I = 1, NOBS
+          tYPMIN = MIN(YOBS(I),tYPMIN)
+          IF (tYPMAX .LT. YOBS(I)) THEN
+            MAX_INTENSITY_INDEX = I
+            tYPMAX = YOBS(I)
+          ENDIF
+        ENDDO
+        INTEGRATED_GUESS = 0.0
+        DO I = MAX(1,MAX_INTENSITY_INDEX - 5), MIN(NOBS,MAX_INTENSITY_INDEX + 5)
+          INTEGRATED_GUESS = INTEGRATED_GUESS + YOBS(I)
+        ENDDO
+        IF (INTEGRATED_GUESS .GT. 250000.0) THEN
+          ScalFac = 0.01 * INTEGRATED_GUESS/250000.0
+        ELSE IF (tYPMAX .GT. 100000.0) THEN
+          ScalFac = 0.01 * tYPMAX/100000.0
+        ENDIF
 ! Assume no knowledge on background
+        CALL Clear_SA
+        CALL sa_SetOutputFiles(TheFileName)
+      ENDIF ! For_TOPAS
+
       CALL Clear_BackGround
       CALL Clear_Bins
-      CALL Clear_SA
       CALL Rebin_Profile
       IPTYPE = 1
       NoData = .FALSE.
       CALL Clear_PeakFitRanges
-      CALL sa_SetOutputFiles(TheFileName)
       CALL ScrUpdateFileName
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
       CALL PushActiveWindowID
@@ -1862,7 +1869,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_uxd_File(TheFileName,ESDsFilled)
+      INTEGER FUNCTION Load_uxd_File(TheFileName, ESDsFilled)
 !
 ! This function tries to load a *.uxd file (ASCII format from Bruker conversion programs).
 ! The routine basically assumes that the file is OK.
@@ -2155,7 +2162,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_xye_File(TheFileName,ESDsFilled)
+      INTEGER FUNCTION Load_xye_File(TheFileName, ESDsFilled)
 !
 ! This function tries to load a *.xye file (standard DASH ASCII powder pattern format).
 !
@@ -2208,19 +2215,6 @@
           CALL ErrorMessage('First line contains only one column, but not a valid wavelength.')
           GOTO 999
         ENDIF
-!O! JvdS Q & D hack enabling the cell parameters to be stored on the second line of the .xye file.
-!O! ####################
-!O        READ(UNIT=hFile,FMT='(A)',ERR=999,END=999) Cline
-!O        IF (GetNumOfColumns(Cline) .EQ. 6) THEN
-!O          READ(Cline,*,ERR=999,END=999) CellPar(1), CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6)
-!O          CALL Upload_Cell_Constants
-!O        ELSE
-!O          CLOSE(hFile)
-!O          OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
-!O          READ(UNIT=hFile,FMT='(A)',ERR=999,END=999) Cline
-!O        ENDIF
-!O! JvdS End of Q & D hack.
-!O! ####################
       ELSE
 ! If we are here, the .xye file didn't contain the wavelength
         NoWavelengthInXYE = .TRUE.
@@ -2237,7 +2231,7 @@
         IF (ABS(YOBS(I)) .LT. 0.0000001) THEN
           EOBS(I) = 1
         ELSE IF (YOBS(I) .GE. 0.0000001) THEN
-          EOBS(I) = SQRT(YOBS(I))
+          EOBS(I) = MAX(SQRT(YOBS(I)), YOBS(I)/100.0)
         ENDIF
       ENDIF
 ! Skip negative 2-theta data
@@ -2286,7 +2280,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_x01_File(TheFileName,ESDsFilled)
+      INTEGER FUNCTION Load_x01_File(TheFileName, ESDsFilled)
 !
 ! This function tries to load a *.x01 file (Bede ASCII powder pattern format).
 !
@@ -2461,7 +2455,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE TruncateData(TheMin2Theta,TheMax2Theta)
+      SUBROUTINE TruncateData(TheMin2Theta, TheMax2Theta)
 !
 ! This subroutine truncates data both at the start and at the end.
 ! Setting TheMin2Theta to 0.0 / TheMax2Theta to 90.0 effectively 
