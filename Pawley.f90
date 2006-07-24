@@ -483,10 +483,10 @@
 !
 ! Write out the data file ...
 ! We should check if there are data to write out!
-      IF (.NOT. FnPatternOK()) RETURN
-      IF (.NOT. FnUnitCellOK()) RETURN
-      IF (NumOfRef .EQ. 0) RETURN
-      IF (NumInternalDSC .NE. DataSetChange) THEN
+      IF ( .NOT. FnPatternOK() ) RETURN
+      IF ( .NOT. FnUnitCellOK() ) RETURN
+      IF ( NumOfRef .EQ. 0 ) RETURN
+      IF ( NumInternalDSC .NE. DataSetChange ) THEN
         tFileHandle = 41
         OPEN(tFileHandle,file='polyp.dat',status='unknown',ERR=999)
         DO I = 1, NBIN
@@ -508,7 +508,7 @@
  4220 FORMAT('C ',3F10.5,3F10.3)
       WRITE(hFile,4230,ERR=999) 
  4230 FORMAT('F C 2 2.31 20.8439 1.02 10.2075 1.5886 0.5687 0.865 51.6512 .2156'/'A C1 0 0 0 0') 
-      IF (NumberSGTable .GE. 1) THEN
+      IF ( NumberSGTable .GE. 1 ) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin .GT. 0) THEN
           DO isym = 1, nsymmin
@@ -572,10 +572,10 @@
  4273 FORMAT('L PKFN HPSL ',F8.4)
  4274 FORMAT('L PKFN HMSL ',F8.4)
       IF (NPawBack .LE. 5) THEN
-        WRITE(hFile,"('L BACK    2',4X,6(F10.5,1X))",ERR=999) (PR_BackGround(J),J=1,NPawBack)
+        WRITE(hFile,"('L BACK    2',4X,6(F13.5,1X))",ERR=999) (PR_BackGround(J),J=1,NPawBack)
       ELSE
-        WRITE(hFile,"('L BACK    2',4X,6(F10.5,1X))",ERR=999) (PR_BackGround(J),J=1,5)
-        WRITE(hFile,"('L BACK ',7(F10.5,1X))",ERR=999) (PR_BackGround(J),J=6,NPawBack)
+        WRITE(hFile,"('L BACK    2',4X,6(F13.5,1X))",ERR=999) (PR_BackGround(J),J=1,5)
+        WRITE(hFile,"('L BACK ',7(F13.5,1X))",ERR=999) (PR_BackGround(J),J=6,NPawBack)
       ENDIF
       WRITE(hFile,'(A)',ERR=999) 'L VARY ONLY ALL INTS'
       IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL BACK'
@@ -786,7 +786,7 @@
         LSDI = MaxPathLength
       ENDIF
 ! First copy the .pik, .tic and .hcv files
-	DashPikFile = ' '
+      DashPikFile = ' '
       DashTicFile = ' '
       DashHcvFile = ' '
       DashDslFile = ' '
