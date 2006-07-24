@@ -44,14 +44,14 @@
       EQUIVALENCE (C4,I4)
 
       tActualLength = LEN_TRIM(TheString)
-      CALL FileWriteInteger(TheFileHandle,TheRecNr,tActualLength)
+      CALL FileWriteInteger(TheFileHandle, TheRecNr, tActualLength)
       IF (BFIOErrorCode .NE. 0) RETURN
 ! Find out how many 4 byte records we can write
       NumOfFourByteRecs = tActualLength / 4
       IF (NumOfFourByteRecs .NE. 0) THEN
         DO I = 1, NumOfFourByteRecs
           C4(1:4) = TheString((I-1)*4+1:(I-1)*4+4)
-          CALL FileWriteInteger(TheFileHandle,TheRecNr,I4)
+          CALL FileWriteInteger(TheFileHandle, TheRecNr, I4)
           IF (BFIOErrorCode .NE. 0) RETURN
         ENDDO
       ENDIF
@@ -91,13 +91,13 @@
 
       TheString = ''
 ! Read length
-      CALL FileReadInteger(TheFileHandle,TheRecNr,tActualLength)
+      CALL FileReadInteger(TheFileHandle, TheRecNr, tActualLength)
       IF (BFIOErrorCode .NE. 0) RETURN
 ! Find out how many 4 byte records we can read
       NumOfFourByteRecs = tActualLength / 4
       IF (NumOfFourByteRecs .NE. 0) THEN
         DO I = 1, NumOfFourByteRecs
-          CALL FileReadInteger(TheFileHandle,TheRecNr,I4)
+          CALL FileReadInteger(TheFileHandle, TheRecNr, I4)
           IF (BFIOErrorCode .NE. 0) RETURN
           TheString((I-1)*4+1:(I-1)*4+4) = C4(1:4)
         ENDDO
@@ -243,7 +243,7 @@
       INTEGER*4 I4
       EQUIVALENCE (L4,I4)
 
-      CALL FileReadInteger(TheFileHandle,TheRecNr,I4)
+      CALL FileReadInteger(TheFileHandle, TheRecNr, I4)
       TheLogical = L4
 
       END SUBROUTINE FileReadLogical
@@ -260,9 +260,9 @@
       CHARACTER*(*), INTENT (INOUT) :: TheString
 
       IF (RW .EQ. 1) THEN
-        CALL FileReadString(TheFileHandle,TheRecNr,TheString)
+        CALL FileReadString(TheFileHandle, TheRecNr, TheString)
       ELSE
-        CALL FileWriteString(TheFileHandle,TheRecNr,TheString)
+        CALL FileWriteString(TheFileHandle, TheRecNr, TheString)
       ENDIF
 
       END SUBROUTINE FileRWString
@@ -279,9 +279,9 @@
       INTEGER*4, INTENT (INOUT) :: TheInteger
 
       IF (RW .EQ. 1) THEN
-        CALL FileReadInteger(TheFileHandle,TheRecNr,TheInteger)
+        CALL FileReadInteger(TheFileHandle, TheRecNr, TheInteger)
       ELSE
-        CALL FileWriteInteger(TheFileHandle,TheRecNr,TheInteger)
+        CALL FileWriteInteger(TheFileHandle, TheRecNr, TheInteger)
       ENDIF
 
       END SUBROUTINE FileRWInteger
@@ -298,9 +298,9 @@
       REAL*4,  INTENT (INOUT) :: TheReal
 
       IF (RW .EQ. 1) THEN
-        CALL FileReadReal(TheFileHandle,TheRecNr,TheReal)
+        CALL FileReadReal(TheFileHandle, TheRecNr, TheReal)
       ELSE
-        CALL FileWriteReal(TheFileHandle,TheRecNr,TheReal)
+        CALL FileWriteReal(TheFileHandle, TheRecNr, TheReal)
       ENDIF
 
       END SUBROUTINE FileRWReal
@@ -317,9 +317,9 @@
       LOGICAL*4, INTENT (INOUT) :: TheLogical
 
       IF (RW .EQ. 1) THEN
-        CALL FileReadLogical(TheFileHandle,TheRecNr,TheLogical)
+        CALL FileReadLogical(TheFileHandle, TheRecNr, TheLogical)
       ELSE
-        CALL FileWriteLogical(TheFileHandle,TheRecNr,TheLogical)
+        CALL FileWriteLogical(TheFileHandle, TheRecNr, TheLogical)
       ENDIF
 
       END SUBROUTINE FileRWLogical
