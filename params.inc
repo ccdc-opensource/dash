@@ -45,7 +45,7 @@
 ! Used in common blocks SACHILDWINDOWS and CHISQDWINDOWSUSED
 
       INTEGER     maxiter
-      PARAMETER ( maxiter = 10000 )
+      PARAMETER ( maxiter = 20000 )
 ! maxiter = maximum number of simulated annealing iterations (per individual run when multi run).
 
       INTEGER     MaxRun
