@@ -33,11 +33,13 @@
       CHARACTER*4 C4
       INTEGER iRange, CurrRange
       INTEGER tNumOfRanges
-      CHARACTER*80 TitleOfRange(250) ! 8 = maximum number of ranges in a STOE file
+      CHARACTER*85 TitleOfRange(250) ! 8 = maximum number of ranges in a STOE file
       REAL    t2ThetaStep(250)
+      REAL    tStepTime(250)
       INTEGER iHighlightList(250)
       LOGICAL LoadRange(250), AtLeastOneSelected
       REAL    Smallest2ThetaStep
+      REAL    SmallestStepTime
       INTEGER I, hFile
 
 ! Current status, initialise to 'error'
@@ -61,7 +63,7 @@
         CASE ('_')
 ! STOE files can contain multiple data ranges, up to a maximum of eight.
 ! Scan the file, get the number of data ranges and their titles.
-          CALL GetDataRangesSTOE(TheFileName,tNumOfRanges,TitleOfRange)
+          CALL GetDataRangesSTOE(TheFileName, tNumOfRanges, TitleOfRange)
           IF (tNumOfRanges .EQ. 0) THEN
             CALL ErrorMessage('File contains no data.')
             RETURN
@@ -92,7 +94,7 @@
         CASE (' ','1','2')
 ! Bruker files can contain multiple data ranges.
 ! Scan the file, get the number of data ranges and their titles.
-          CALL GetDataRangesBruker(TheFileName, tNumOfRanges, TitleOfRange, t2ThetaStep)
+          CALL GetDataRangesBruker(TheFileName, tNumOfRanges, TitleOfRange, t2ThetaStep, tStepTime)
           IF (tNumOfRanges .EQ. 0) THEN
             CALL ErrorMessage('File contains no data.')
             RETURN
@@ -129,11 +131,17 @@
             ENDIF
           ENDIF
           Smallest2ThetaStep = 90.0
+          SmallestStepTime = 10000000.0
           DO I = 1, tNumOfRanges
-            IF (t2ThetaStep(I) .LT. Smallest2ThetaStep) Smallest2ThetaStep = t2ThetaStep(I)
+            IF ( LoadRange(I) ) THEN
+              IF ( t2ThetaStep(I) .LT. Smallest2ThetaStep ) &
+                Smallest2ThetaStep = t2ThetaStep(I)
+              IF ( tStepTime(I) .LT. SmallestStepTime ) &
+                SmallestStepTime = tStepTime(I)
+            ENDIF
           ENDDO
           Smallest2ThetaStep = Smallest2ThetaStep - 0.00005 ! In case of rounding errors
-          Load_raw_File = Load_rawBruker_File(TheFileName, LoadRange, Smallest2ThetaStep)
+          Load_raw_File = Load_rawBruker_File(TheFileName, LoadRange, Smallest2ThetaStep, SmallestStepTime)
           ESDsFilled = .TRUE.
           IF (Load_raw_File .NE. 1) RETURN
       END SELECT
@@ -149,7 +157,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GetDataRangesBruker(TheFileName, TheNumOfRanges, TitleOfRange, The2ThetaStep)
+      SUBROUTINE GetDataRangesBruker(TheFileName, TheNumOfRanges, TitleOfRange, The2ThetaStep, TheStepTime)
 !
 ! This function tries to build a list of 'dataranges' present in a *.raw file (binary format from Bruker machines).
 ! The routine basically assumes that the file is OK.
@@ -161,6 +169,7 @@
 !
 ! OUTPUT  : TheNumOfRanges = the number of valid data ranges (i.e. including those with e.g. zero data points)
 !           TitleOfRange = some sort of identifier for that range
+!           TheStepTime = number of seconds counted per step according to documentation
 !
       USE WINTERACTER
       USE VARIABLES
@@ -169,8 +178,9 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (  OUT) :: TheNumOfRanges
-      CHARACTER*80,  INTENT (  OUT) :: TitleOfRange(*)
+      CHARACTER*85,  INTENT (  OUT) :: TitleOfRange(*)
       REAL,          INTENT (  OUT) :: The2ThetaStep(*)
+      REAL,          INTENT (  OUT) :: TheStepTime(*)
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -196,7 +206,7 @@
       INTEGER*4   NumOfDataRanges  ! 1 data range = 1 powder pattern
       INTEGER*4   Offset, CurrDataRange
       INTEGER*2   SizeOfHeader
-      CHARACTER*80 tString
+      CHARACTER*85 tString
       REAL StepTime
 
       TwoThetaStart = 0.0
@@ -256,6 +266,7 @@
             TwoThetaStep = R8
             IF (TwoThetaStep .LT. 0.000001) GOTO 999
             READ(hFile,REC=Offset+49,ERR=999) StepTime
+            TheStepTime(CurrDataRange) = StepTime
             The2ThetaStep(CurrDataRange) = SNGL(TwoThetaStep)
             t2ThetaEnd = t2ThetaStart + SNGL(TwoThetaStep) * NumOfBins
 ! Next REAL*8 contains primary wavelength (Angstroms) for this data range
@@ -289,8 +300,8 @@
               CALL ErrorMessage("Length of Supplementary Header is not a multiple of 4.")
               GOTO 999
             ENDIF
-            WRITE(tString,'(I3,1X,A1,2(F8.3,1X,A1),F9.6,1X,A1,F7.2)') CurrDataRange, CHAR(9), t2ThetaStart, &
-              CHAR(9), t2ThetaEnd, CHAR(9), The2ThetaStep(CurrDataRange), CHAR(9), StepTime
+            WRITE(tString,'(I3,1X,A1,2(F8.3,1X,A1),F9.6,1X,A1,F10.2)') CurrDataRange, CHAR(9), t2ThetaStart, &
+              CHAR(9), t2ThetaEnd, CHAR(9), The2ThetaStep(CurrDataRange), CHAR(9), TheStepTime(CurrDataRange)
             TitleOfRange(CurrDataRange) = tString
 ! Skip all supplementary headers of the current data range
             Offset = Offset + I4 / 4
@@ -393,7 +404,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Load_rawBruker_File(TheFileName,LoadRange,Smallest2ThetaStep)
+      INTEGER FUNCTION Load_rawBruker_File(TheFileName, LoadRange, Smallest2ThetaStep, SmallestStepTime)
 !
 ! This function tries to load a *.raw file (binary format from Bruker machines).
 ! The routine basically assumes that the file is OK.
@@ -417,6 +428,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (IN   ) :: LoadRange(*)
       REAL,          INTENT (IN   ) :: Smallest2ThetaStep
+      REAL,          INTENT (IN   ) :: SmallestStepTime
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -447,7 +459,7 @@
       INTEGER*4   Offset, CurrDataRange
       INTEGER*2   SizeOfHeader
       REAL        StepTime, Last2Theta
-      LOGICAL     IsFirstRange
+      LOGICAL     IsFirstRange, NumOfRangesToBeLoaded
 
 ! Current status, initialise to 'error'
       Load_rawBruker_File = 1
@@ -483,6 +495,11 @@
 ! 1. Measure the same range over and over again (time series)
 ! 2. Measure different ranges at different resolutions / counting times
           READ(hFile,REC=4,ERR=999) NumOfDataRanges
+          NumOfRangesToBeLoaded = 0
+          DO I = 1, NumOfDataRanges
+             IF ( LoadRange(I) ) &
+               CALL INC(NumOfRangesToBeLoaded)
+          ENDDO
 ! The complete file header is 712 bytes, so start reading at record (712 DIV 4) + RecNumber
           Offset = 178
 ! Loop over the number of data ranges
@@ -523,7 +540,6 @@
             IF (TwoThetaStep .LT. 0.000001) GOTO 999
             READ(hFile,REC=Offset+49,ERR=999) StepTime
 ! Next line to avoid DASH from unexpectedly rescaling the data if only a single pattern is present
-            IF (NumOfDataRanges .EQ. 1) StepTime = 1.0
 ! Next REAL*8 contains primary wavelength (Angstroms) for this data range
 ! Assuming a monochromated beam, this is the wavelength we would want
             READ(hFile,REC=Offset+61,ERR=999) RecReal(1)
@@ -531,8 +547,8 @@
 ! Due to the EQUIVALENCE statement, R8 now holds the wavelength in Angstroms
             Lambda1 = R8
 ! Check that the same wavelength has been used for all data ranges
-            IF (LoadRange(CurrDataRange)) THEN
-              IF (IsFirstRange) THEN
+            IF ( LoadRange(CurrDataRange) ) THEN
+              IF ( IsFirstRange ) THEN
 ! Store this value as the experimental wavelength
                 CALL Set_Wavelength(Lambda1)
                 IsFirstRange = .FALSE.
@@ -545,7 +561,7 @@
             ENDIF
 ! Data record length. Must be 4.
             READ(hFile,REC=Offset+64,ERR=999) I4
-            IF (I4 .NE. 4) THEN
+            IF ( I4 .NE. 4 ) THEN
 ! The user should be warned here
               CALL ErrorMessage("Record length must be 4.")
               GOTO 999
@@ -553,7 +569,7 @@
 ! Length of supplementary header (bytes)
             READ(hFile,REC=Offset+65,ERR=999) I4
 ! Check if length of supplementary header is a multiple of four.
-            IF (MOD(I4,4) .NE. 0) THEN
+            IF ( MOD(I4,4) .NE. 0 ) THEN
 ! The user should be warned here
               CALL ErrorMessage("Length of Supplementary Header is not a multiple of 4.")
               GOTO 999
@@ -609,12 +625,30 @@
 ! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
           ENDDO
           NumOfBins = tNOBS1
-          DO I = 1, NumOfBins
-            XOBS(I) = tXOBS1(I)
+          IF ( NumOfRangesToBeLoaded .EQ. 1 ) THEN
+            DO I = 1, NumOfBins
+              XOBS(I) = tXOBS1(I)
 ! Poisson statistics
-            YOBS(I) = tYOBS1(I) / tSECS1(I)
-            EOBS(I) = SQRT(tYOBS1(I)) / tSECS1(I)
-          ENDDO
+              YOBS(I) = tYOBS1(I)
+              EOBS(I) = MAX(4.4,SQRT( MAX(1.0,tYOBS1(I)) ))
+              IF ( tYOBS1(I) .GT. 10000.0 )     &
+                EOBS(I) = (0.01 * tYOBS1(I))
+            ENDDO
+          ELSE
+            DO I = 1, NumOfBins
+              XOBS(I) = tXOBS1(I)
+! Poisson statistics
+              YOBS(I) = tYOBS1(I) / tSECS1(I)
+              EOBS(I) = MAX(4.4,SQRT( MAX(1.0,tYOBS1(I)) )) / tSECS1(I)
+              IF ( tYOBS1(I) .GT. 10000.0 )     &
+                  EOBS(I) = (0.01 * tYOBS1(I)) / tSECS1(I)
+
+            ! #######################  CORRECTION ADDED
+              YOBS(I) = SmallestStepTime * YOBS(I)
+              EOBS(I) = SmallestStepTime * EOBS(I)
+
+            ENDDO
+          ENDIF
         CASE ('2')
 ! A version 2 file.
 ! Next two bytes are the number of data ranges
@@ -702,7 +736,9 @@
           ENDDO
 ! *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
           DO I = 1, NumOfBins
-            EOBS(I) = MAX(4.4, SQRT(MAX(0.0, YOBS(I))))
+            EOBS(I) = MAX(4.4, SQRT(MAX(1.0, YOBS(I))))
+            IF ( YOBS(I) .GT. 10000.0 )     &
+                EOBS(I) = 0.01 * YOBS(I)
           ENDDO
         CASE DEFAULT
           CALL ErrorMessage('Unrecognised *.raw format.')
@@ -739,7 +775,7 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (  OUT) :: tNumOfRanges
-      CHARACTER*80,  INTENT (  OUT) :: TitleOfRange(8)
+      CHARACTER*85,  INTENT (  OUT) :: TitleOfRange(8)
 
 ! ------------------------------------------------
 ! MAX_RANGE : maximum number of ranges in one file
@@ -879,9 +915,9 @@
         IF (RangeInfo%NPoints .NE. 0) THEN
           tNumOfRanges = tNumOfRanges + 1
           tString = ' '
-          WRITE(tString(1:80),'(A9,I1,A12,F7.3,A3,F7.3,A7,F6.2)') &
+          WRITE(tString(1:85),'(A9,I1,A12,F7.3,A3,F7.3,A7,F6.2)') &
  'Range nr ',tNumOfRanges,', 2 theta = ',RangeInfo%Begin(1),' - ',RangeInfo%End(1),' <T> = ',RangeInfo%T_Avg
-          TitleOfRange(tNumOfRanges)(1:80) = tString(1:80)
+          TitleOfRange(tNumOfRanges)(1:85) = tString(1:85)
         ENDIF
       ENDDO
  999  CLOSE(hFile)
