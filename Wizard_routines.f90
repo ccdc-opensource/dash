@@ -325,7 +325,11 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+              IF ( For_TOPAS ) THEN
+                CALL WizardWindowShow(IDD_RR_TOPAS)
+              ELSE
+                CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+              ENDIF
             CASE (IDNEXT, IDB_Bin)
               CALL WizardApplyDiffractionFileInput
               CALL Profile_Plot
@@ -559,10 +563,19 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
       REAL, EXTERNAL :: TwoTheta2dSpacing, dSpacing2TwoTheta
+      INTEGER, EXTERNAL :: WriteTOPASFilePawley
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
       REAL tReal, tMin, tMax
       INTEGER tFieldState
+      CHARACTER(MaxPathLength) :: TOPASFileName
+      CHARACTER(LEN=45) :: FILTER
+      INTEGER iFlags
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
@@ -576,13 +589,29 @@
             CASE (IDNEXT)
               CALL WizardApplyProfileRange
 ! Check if we have reasonable data left. If not, don't allow pressing 'Next >'
-              IF (FnPatternOK()) THEN
-                CALL WizardWindowShow(IDD_PW_Page6)
-              ELSE
+              IF ( .NOT. FnPatternOK()) THEN
                 CALL ErrorMessage('Invalid profile range.')
                 tMin = 0.0
                 tMax = 90.0
                 CALL TruncateData(tMin,tMax)
+              ELSE
+                IF ( For_TOPAS ) THEN
+                  iFlags = SaveDialog + AppendExt + PromptOn
+                  FILTER = 'TOPAS input file (*.inp)|*.inp|'
+                  TOPASFileName = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
+                  CALL WSelectFile(FILTER, iFlags, TOPASFileName, 'Save TOPAS input file (Pawley)')
+                  IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPASFileName) .NE. 0)) THEN
+                    IF ( WriteTOPASFilePawley(TOPASFileName) .EQ. 0 ) THEN
+                      TOPAS_stage = 2 ! I think this variable is redundant
+                      CALL WDialogSelect(IDD_RR_TOPAS)
+                      CALL WDialogFieldStateLogical(IDB_Write_Pawley, .FALSE.)
+                      CALL WDialogFieldStateLogical(IDB_Browse,       .TRUE.)
+                    ENDIF
+                  ENDIF
+                  CALL WizardWindowShow(IDD_RR_TOPAS)
+                ELSE
+                  CALL WizardWindowShow(IDD_PW_Page6)
+                ENDIF
               ENDIF
               CALL Profile_Plot
             CASE (IDCANCEL, IDCLOSE)
@@ -658,14 +687,17 @@
       INCLUDE 'lattice.inc'
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      INTEGER tInt1, tInt2
+      INTEGER tInt1, tInt2, tInt3
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
       IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
         CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
         CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
-        CALL SubtractBackground(tInt1, tInt2, WDialogGetCheckBoxLogical(IDF_UseMCYN))
+        CALL WDialogGetInteger(IDF_SmoothWindow, tInt3)
+        CALL SubtractBackground(tInt1, tInt2, &
+                                WDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                WDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
       ELSE
         CALL Clear_BackGround
         BACKREF = .TRUE.
@@ -704,14 +736,11 @@
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      INTEGER tInt1, tInt2, tFieldState
+      INTEGER tInt1, tInt2, tInt3, tFieldState
       REAL             tYPMIN,     tYPMAX,       &
                        tXPGMIN,    tXPGMAX,    tYPGMIN,    tYPGMAX,      &
                        tXPGMINOLD, tXPGMAXOLD, tYPGMINOLD, tYPGMAXOLD
       INTEGER          tIPMIN, tIPMAX, tiStart, tiStop, tnPoints
-
-      INTEGER I
-      REAL    DELTA
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page6)
@@ -750,7 +779,10 @@
               IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
                 CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
                 CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
-                CALL CalculateBackground(tInt1, tInt2, WDialogGetCheckBoxLogical(IDF_UseMCYN))
+                CALL WDialogGetInteger(IDF_SmoothWindow, tInt3)
+                CALL CalculateBackground(tInt1, tInt2, &
+                                         WDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                         WDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
               ELSE
                 CALL Clear_BackGround
               ENDIF
@@ -770,54 +802,6 @@
               iStart    = tiStart
               iStop     = tiStop
               nPoints   = tnPoints
-              CALL Profile_Plot
-            CASE (IDB_Zoom)
-              tXPGMIN    = XPGMIN
-              tXPGMAX    = XPGMAX
-              tYPGMIN    = YPGMIN
-              tYPGMAX    = YPGMAX
-              tXPGMINOLD = XPGMINOLD
-              tXPGMAXOLD = XPGMAXOLD
-              tYPGMINOLD = YPGMINOLD
-              tYPGMAXOLD = YPGMAXOLD
-              CALL WizardApplyProfileRange
-              IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
-                CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
-                CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
-                CALL CalculateBackground(tInt1, tInt2, WDialogGetCheckBoxLogical(IDF_UseMCYN))
-                tYPGMIN = YBBIN(1)
-                DO I = 2, NBIN
-                  IF ( YBBIN(I) .LT. tYPGMIN ) tYPGMIN = YBBIN(I)
-                ENDDO
-                tYPGMAX = YBBIN(1)
-                DO I = 2, NBIN
-                  IF ( YBBIN(I) .GT. tYPGMAX ) tYPGMAX = YBBIN(I)
-                ENDDO
-                DELTA = tYPGMAX-tYPGMIN
-                tYPGMIN = tYPGMIN - 0.1*DELTA
-                tYPGMAX = tYPGMAX + 0.2*DELTA
-              ELSE
-                CALL Clear_BackGround
-                tYPGMIN = YPMIN
-                tYPGMAX = YPMAX
-              ENDIF
-! Force display of background
-              CALL WDialogSelect(IDD_Plot_Option_Dialog)
-              CALL WDialogPutCheckBoxLogical(IDF_background_check, .TRUE.)
-              XPGMIN    = XBIN(1)
-              XPGMAX    = XBIN(NBIN)
-              YPGMIN    = tYPGMIN
-              YPGMAX    = tYPGMAX
-              XPGMINOLD = tXPGMINOLD
-              XPGMAXOLD = tXPGMAXOLD
-              YPGMINOLD = tYPGMINOLD
-              YPGMAXOLD = tYPGMAXOLD
-
-              IPMIN     = 1
-              IPMAX     = NBIN
-              iStart    = 1
-              iStop     = NBIN
-              nPoints   = NBIN
               CALL Profile_Plot
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
@@ -871,7 +855,7 @@
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_PW_Page6)
             CASE (IDNEXT)
-              CALL WDialogGetRadioButton(IDF_RADIO3, IndexOption) ! 'Index now' or 'Enter known cell'
+              CALL WDialogGetRadioButton(IDF_RADIO1, IndexOption) ! 'Index now', 'DICVOL04' or 'Enter known cell'
               SELECT CASE (IndexOption)
                 CASE (1) ! Index pattern now
                   CALL WDialogSelect(IDD_PW_Page8)
@@ -883,7 +867,17 @@
                     CALL WDialogPutReal(IDF_eps, 0.04, '(F5.3)')
                   ENDIF
                   CALL WizardWindowShow(IDD_PW_Page8)
-                CASE (2) ! Enter known unit cell parameters
+                CASE (2) ! DICVOL04
+                  CALL WDialogSelect(IDD_PW_Page8b)
+! If this is synchrotron data, then set the default error in the peak positions to 0.03 rather than 0.04.
+! This decreases the number of solutions and increases the speed of the search.
+                  IF (JRadOption .EQ. 2) THEN
+                    CALL WDialogPutReal(IDF_eps, 0.03, '(F5.3)')
+                  ELSE
+                    CALL WDialogPutReal(IDF_eps, 0.04, '(F5.3)')
+                  ENDIF
+                  CALL WizardWindowShow(IDD_PW_Page8b)
+                CASE (3) ! Enter known unit cell parameters
                   CALL WDialogSelect(IDD_PW_Page1)
 ! If the cell is OK, the Next> button should be enabled
                   CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
@@ -1229,6 +1223,209 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DealWithWizardWindowDICVOL04
+
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
+
+      INTEGER           NTPeak
+      REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              AllPkAreaVal
+      REAL              PkProb
+      INTEGER           IOrdTem
+      INTEGER           IHPk
+      COMMON /ALLPEAKS/ NTPeak,                                                  &
+                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        AllPkAreaVal(MTPeak),                                    &
+                        PkProb(MTPeak),                                          &
+                        IOrdTem(MTPeak),                                         &
+                        IHPk(3,MTPeak)
+
+      LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm
+      REAL,    EXTERNAL :: TwoTheta2dSpacing
+      REAL    Rvpar(2), Rdens, Rmolwt, Rexpzp
+      INTEGER iSystem(6), hFile, MaxImpurityLines
+      INTEGER I, iOrd, iHandle, NumDoF
+      REAL    Epsilon, MaxLen, MaxSinBeta, tBeta, tFoM, wave
+      CHARACTER(MaxPathLength) tFileName
+      LOGICAL exists
+      INTEGER M, iEstimateZeroPointError, iRefineZeroPointError 
+      REAL Amax, Bmax, Cmax, Bemin, Bemax, DV_ScaleFactor
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page8b)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_PW_Page7)
+            CASE (IDNEXT)
+              CALL CheckIfPeaksFitted
+              CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
+              CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
+              CALL WDialogGetReal(IDF_Indexing_Maxa,   Amax)
+              Bmax = Amax
+              Cmax = Amax
+              CALL WDialogGetReal(IDF_Indexing_MinAng,      Bemin)
+              CALL WDialogGetReal(IDF_Indexing_MaxAng,      Bemax)
+              CALL WDialogGetReal(IDF_Indexing_Density,     Rdens)
+              CALL WDialogGetReal(IDF_Indexing_MolWt,       Rmolwt)
+              CALL WDialogGetReal(IDF_ZeroPoint,            Rexpzp)
+              CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      iSystem(1))
+              CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      iSystem(2))
+              CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       iSystem(3))
+              CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      iSystem(4))
+              CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, iSystem(5))
+              CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  iSystem(6))
+              CALL WDialogGetReal(IDF_eps,                  Epsilon)
+              CALL WDialogGetReal(IDF_Indexing_Fom,         tFoM)
+              CALL WDialogGetReal(IDF_Indexing_ScaleFactor, DV_ScaleFactor)
+              CALL WDialogGetInteger(IDF_MaxImpLines, MaxImpurityLines)
+              CALL WDialogGetCheckBox(IDC_Estimate_zp, iEstimateZeroPointError)
+              CALL WDialogGetCheckBox(IDC_Refine_zp, iRefineZeroPointError)
+! Number of degrees of freedom, we don't even count the zero point
+              NumDoF = 0
+              IF ( iSystem(1) .EQ. 1 ) NumDof = MAX(NumDoF, 1)
+              IF ( iSystem(2) .EQ. 1 ) NumDof = MAX(NumDoF, 2)
+              IF ( iSystem(3) .EQ. 1 ) NumDof = MAX(NumDoF, 2)
+              IF ( iSystem(4) .EQ. 1 ) NumDof = MAX(NumDoF, 3)
+              IF ( iSystem(5) .EQ. 1 ) NumDof = MAX(NumDoF, 4)
+              IF ( iSystem(6) .EQ. 1 ) NumDof = MAX(NumDoF, 6)
+! Check if any crystal system checked at all
+              IF ( NumDoF .EQ. 0 ) THEN
+                CALL ErrorMessage('Please check at least one crystal system.')
+                GOTO 999
+              ENDIF
+! Check if the number of observed lines is consistent with the crystal systems
+              IF ( NTPeak .LT. NumDoF ) THEN
+                CALL ErrorMessage('The number of observed lines is less than the number of degrees of freedom.')
+                GOTO 999
+              ENDIF
+! Warn the user if we have less observed lines than twice the number of degrees of freedom including the zero point
+              IF ( (2*(NumDoF+1)) .GT. NTPeak ) THEN
+                IF (.NOT. Confirm('The number of observed lines is less than twice the number of degrees of freedom,'//CHAR(13)//&
+                                  'do you wish to continue anyway?')) THEN
+                  GOTO 999
+                ENDIF
+              ENDIF
+              IF ( DV_ScaleFactor .LT. 0.1 ) DV_ScaleFactor = 0.1
+              IF ( DV_ScaleFactor .GT. 5.0 ) DV_ScaleFactor = 5.0
+! Check if the maximum angle has a reasonable value. Only necessary when monoclinic is searched
+              IF ( iSystem(5) .EQ. 1 ) THEN
+                IF (Bemin .GT. Bemax) THEN
+                  tBeta = Bemin
+                  Bemin = Bemax
+                  Bemax = tBeta
+                ENDIF
+                IF ((Bemin .LT. 45.0) .OR. (Bemax .GT. 150.0)) THEN
+                  CALL ErrorMessage('The range of the angle beta does not make sense.')
+                  GOTO 999
+                ELSE
+! Correct maximum cell length for the angle beta
+ ! If 90.0 is inside the range, then that's the maximum
+                  IF ((Bemin .LT. 90.0) .AND. (Bemax .GT. 90.0)) THEN
+                    MaxSinBeta = 1.0 ! Beta = 90.0
+                  ELSE         
+                    MaxSinBeta = MAX(SIN(Bemin),SIN(Bemax))
+                  ENDIF
+                ENDIF
+              ELSE
+                MaxSinBeta = 1.0 ! Beta = 90.0
+              ENDIF
+! Add in very quick check: is the d-spacing belonging to the first peak greater
+! than the maximum cell length requested? If so, tell the user he/she is a moron.
+              MaxLen = MaxSinBeta*amax
+! Lowest 2 theta value for which a peak has been fitted: AllPkPosVal(IOrdTem(1))
+              IF ((TwoTheta2dSpacing(AllPkPosVal(IOrdTem(1)))*DV_ScaleFactor) .GT. MaxLen) THEN
+                CALL ErrorMessage('The maximum cell axis length is shorter than required for indexing the first peak.')
+                GOTO 999
+              ENDIF
+              wave = ALambda * DV_ScaleFactor
+              CALL WCursorShape(CurHourGlass)
+! Write it out 
+              tFileName = 'DICVOL.in'
+              hFile = 117
+              OPEN(UNIT=hFile, FILE=tFileName, STATUS='UNKNOWN', ERR=997)
+              WRITE(hFile,*,ERR=997) 'DICVOL input file created by DASH'
+              WRITE(hFile,'(8(I3,1X))',ERR=997) NTPeak, 2, (iSystem(i),i=1,6)
+              WRITE(hFile,'(7(F8.2,1X))',ERR=997) amax, Bmax, Cmax, Rvpar(1), Rvpar(2), Bemin, Bemax
+              WRITE(hFile,'(F10.6,1X,3(F8.4,1X))',ERR=997) wave, Rmolwt, Rdens, Rdens/50.0
+              WRITE(hFile,'(F5.3,1X,F6.2,1X,I3,1X,I1,1X,I1)',ERR=997) Epsilon * DV_ScaleFactor, tFoM, MaxImpurityLines, iEstimateZeroPointError, iRefineZeroPointError
+              DO I = 1, NTPeak
+                iOrd = iOrdTem(i)
+                WRITE(hFile,'(F12.4)',ERR=997) AllPkPosVal(iOrd)-Rexpzp
+              ENDDO
+              CLOSE(hFile)
+              ! Launch DICVOL04 and wait for it to return
+              CALL PushActiveWindowID
+              CALL WDialogSelect(IDD_Configuration)
+              CALL WDialogGetString(IDF_DICVOLExe, DICVOL04EXE)
+              CALL PopActiveWindowID
+              I = LEN_TRIM(DICVOL04EXE)
+              IF ( I .EQ. 0 ) THEN
+                CALL ErrorMessage("DASH could not launch your DICVOL04. No executable is currently specified."//CHAR(13)//&
+                                  "This can be changed in the Configuration... window"//CHAR(13)//&
+                                  "under Options in the menu bar.")
+                CALL PopActiveWindowID
+                CALL WCursorShape(CurCrossHair)
+                RETURN
+              ENDIF
+              INQUIRE(FILE = DICVOL04EXE(1:I),EXIST=exists)
+              IF (.NOT. exists) GOTO 998
+              M = InfoError(1) ! Clear errors
+              CALL IOSCommand(DICVOL04EXE(1:I)//' DICVOL.in DICVOL.out', ProcBlocked)
+              IF (InfoError(1) .NE. 0) GOTO 998
+! Pop up a window showing the DICVOL output file in a text editor
+              CALL WindowOpenChild(iHandle)
+              CALL WEditFile('DICVOL.out', Modeless, 0, FileMustExist+ViewOnly+NoToolBar, 4)
+! If 'ViewOnly' is specified:
+! 1. The file can be accessed while it is displayed.
+! 2. There is no 'Save as...' option in the menu.
+! If the output file is viewed without 'ViewOnly', the file cannot be accessed, which means that
+! DICVOL returns with an error message which means that there are no solutions.
+! Hence, this way, DICVOL can be run several times in succession and the results can be compared
+! on screen. To save one of the output files (that all have the same name),
+! the user must use the "Save As..." button from the same window.
+              CALL SetChildWinAutoClose(iHandle)
+              CALL WCursorShape(CurCrossHair)
+              CALL WDialogSelect(IDD_PW_Page1)
+! If the cell is OK, the Next> button should be enabled
+              CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
+              CALL WizardWindowShow(IDD_PW_Page1)
+          END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDF_ZeroPoint)
+              CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+              CALL Upload_ZeroPoint               
+          END SELECT
+      END SELECT
+  999 CALL PopActiveWindowID
+      RETURN
+  998 CALL ErrorMessage("DASH could not launch DICVOL04. The executable is currently configured"//CHAR(13)//&
+                        "to launch the program "//DICVOL04EXE(1:I)//CHAR(13)//&
+                        "This can be changed in the Configuration... window"//CHAR(13)//&
+                        "under Options in the menu bar.")
+      CALL PopActiveWindowID
+      CALL WCursorShape(CurCrossHair)
+      RETURN
+  997 CALL ErrorMessage("Error writing DICVOL input file.")
+      CLOSE(hFile)
+      CALL PopActiveWindowID
+      CALL WCursorShape(CurCrossHair)
+
+      END SUBROUTINE DealWithWizardWindowDICVOL04
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardWindowDICVOLResults
 
       USE WINTERACTER
@@ -1527,6 +1724,61 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowPawley1
+!
+!*****************************************************************************
+!
+      SUBROUTINE Unload_SX_Page1a
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SX_Page1a)
+      CALL WDialogGetReal(IDF_MaxResolution, SXMaxResolution)
+      CALL WizardWindowHide
+      CALL WDialogUnload(IDD_SX_Page1a)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Unload_SX_Page1a
+!
+!*****************************************************************************
+!
+      SUBROUTINE Unload_SAW_Page6a
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SAW_Page6a)
+      CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethod)
+      CALL WizardWindowHide
+      CALL WDialogUnload(IDD_SAW_Page6a)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Unload_SAW_Page6a
+!
+!*****************************************************************************
+!
+      SUBROUTINE Unload_RR_TOPAS
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WizardWindowHide
+      CALL WDialogUnload(IDD_RR_TOPAS)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Unload_RR_TOPAS
 !
 !*****************************************************************************
 !
