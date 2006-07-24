@@ -213,14 +213,13 @@
       INTEGER iAtom, AtomicNumber
       REAL    TotalAtomicWeighting
 
+      TotalAtomicWeighting = 0.0
       DO iAtom = 1, natoms(iFrg)
         AtomicNumber = atnr(zmElementCSD(iAtom,iFrg))
         IF (HydrogenTreatment .EQ. 2) AtomicNumber = AtomicNumber + NumOfBondedHydrogens(iAtom, iFrg)
         IF ((HydrogenTreatment .NE. 3) .AND. (AtomicNumber .EQ. 1)) AtomicNumber = 0
         AtomicWeighting(iAtom,iFrg) = FLOAT(AtomicNumber)**2
-      ENDDO
-      TotalAtomicWeighting = 0.0
-      DO iAtom = 1, natoms(iFrg)
+!F        AtomicWeighting(iAtom,iFrg) = FLOAT(AtomicNumber)
         TotalAtomicWeighting = TotalAtomicWeighting + AtomicWeighting(iAtom,iFrg) 
       ENDDO
       DO iAtom = 1, natoms(iFrg)
