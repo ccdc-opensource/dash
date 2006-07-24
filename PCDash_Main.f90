@@ -210,7 +210,7 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: DiffractionFileBrowse
       REAL xpgdif, ypgdif
-      INTEGER ISTAT, tInt1, tInt2
+      INTEGER ISTAT, tInt1, tInt2, tInt3
 
 ! Branch depending on chosen menu item
 
@@ -223,11 +223,14 @@
           CALL SDIFileBrowse
         CASE (ID_Remove_Background)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Background_Fit)
+          CALL WDialogLoad(IDD_Background_Fit)
 ! Initialise the background
           CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
           CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
-          CALL CalculateBackground(tInt1, tInt2, WDialogGetCheckBoxLogical(IDF_UseMCYN))
+          CALL WDialogGetInteger(IDF_SmoothWindow, tInt3)
+          CALL CalculateBackground(tInt1, tInt2, &
+                                   WDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                   WDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
           CALL Profile_Plot
           CALL WDialogShow(-1, -1, 0, Modeless)
           CALL PopActiveWindowID
