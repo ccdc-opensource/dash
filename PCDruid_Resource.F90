@@ -1,4 +1,4 @@
-! Winteracter module created : 26/May/2005 10:30:34
+! Winteracter module created : 23/Jul/2006 15:42:08
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -147,7 +147,6 @@
           INTEGER, PARAMETER :: IDF_WelcomeWizard               =  1203
           INTEGER, PARAMETER :: IDF_PW_Option1                  =  1199
           INTEGER, PARAMETER :: IDF_PW_Logo1                    =  1204
-          INTEGER, PARAMETER :: IDB_SA_Project_Import           =  1214
           INTEGER, PARAMETER :: IDD_PW_Page3                    =   124
           INTEGER, PARAMETER :: IDF_PWa_Data_Group              =  1261
           INTEGER, PARAMETER :: IDF_PWa_Data_fFilename          =  1262
@@ -316,11 +315,6 @@
           INTEGER, PARAMETER :: IDD_Background_Fit              =   129
           INTEGER, PARAMETER :: IDF_background_text             =  1360
           INTEGER, PARAMETER :: IDF_background_check            =  1364
-          INTEGER, PARAMETER :: IDD_Pawley_ErrorLog             =   157
-          INTEGER, PARAMETER :: IDF_Pawley_ErrorLog_Intro       =  1369
-          INTEGER, PARAMETER :: IDF_Pawley_ErrorLog_Intro2      =  1370
-          INTEGER, PARAMETER :: IDF_Pawley_ErrorLog_intro3      =  1371
-          INTEGER, PARAMETER :: ID_Edit_PawleyLog               =  1372
           INTEGER, PARAMETER :: IDF_SA_ChiTest                  =  1378
           INTEGER, PARAMETER :: IDF_SA_ChiTest_Label            =  1377
           INTEGER, PARAMETER :: IDD_SA_RunLabel                 =  1383
@@ -394,8 +388,8 @@
           INTEGER, PARAMETER :: IDD_PW_Page8                    =   150
           INTEGER, PARAMETER :: IDF_LABEL19                     =  1297
           INTEGER, PARAMETER :: IDD_DIALOG006                   =   152
-          INTEGER, PARAMETER :: IDF_RADIO3                      =  1129
-          INTEGER, PARAMETER :: IDF_RADIO4                      =  1130
+          INTEGER, PARAMETER :: IDF_RADIO2                      =  1129
+          INTEGER, PARAMETER :: IDF_RADIO3                      =  1130
           INTEGER, PARAMETER :: IDF_ColFlexTors                 =  1131
           INTEGER, PARAMETER :: IDF_ConnectObsPoints            =  1132
           INTEGER, PARAMETER :: IDF_PlotPeakFitDif              =  1133
@@ -651,5 +645,17 @@
           INTEGER, PARAMETER :: IDB_BatchFile                   =  1155
           INTEGER, PARAMETER :: IDD_SA_input4                   =   126
           INTEGER, PARAMETER :: IDC_OuputDASH                   =  1248
-          INTEGER, PARAMETER :: IDB_Zoom                        =  1296
+          INTEGER, PARAMETER :: IDF_UseSmooth                   =  1299
+          INTEGER, PARAMETER :: IDF_SmoothWindow                =  1300
+          INTEGER, PARAMETER :: IDD_PW_Page8b                   =   136
+          INTEGER, PARAMETER :: IDC_Estimate_zp                 =  1351
+          INTEGER, PARAMETER :: IDC_Refine_zp                   =  1380
+          INTEGER, PARAMETER :: IDF_MaxImpLines                 =  1393
+          INTEGER, PARAMETER :: IDF_DICVOLExe                   =  1369
+          INTEGER, PARAMETER :: IDBBROWSE3                      =  1554
+          INTEGER, PARAMETER :: IDD_SAW_Page6a                  =   138
+          INTEGER, PARAMETER :: IDD_RR_TOPAS                    =   139
+          INTEGER, PARAMETER :: IDB_Write_Pawley                =  1214
+          INTEGER, PARAMETER :: IDB_Browse                      =  1296
+          INTEGER, PARAMETER :: IDB_Write_RR                    =  1370
       END MODULE Druid_Header
