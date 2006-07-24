@@ -34,19 +34,26 @@
       USE WINTERACTER
       USE DRUID_HEADER
 
-      INTEGER IRetVal
-      INTEGER IHan
+      INTEGER IRetVal, IHan
+      CHARACTER*4 NextLine
+      CHARACTER*5000 text
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Pawley_ErrorLog)
-      CALL WDialogShow(-1, -1, 0, Modal)
-      IretVal = WInfoDialog(ExitButton)
-      IF (IRetVal .EQ. ID_Edit_PawleyLog) THEN
+      NextLine = CHAR(13)//CHAR(10)
+      text = 'The extracted intensities are ill conditioned due to a high degree of'//NextLine// &
+             'overlap in the data set and so could be unreliable in certain ranges.'//NextLine// &
+             'Full details of the problems are recorded in the fit list file, polyp.lis.'//NextLine// &
+             'You may be able to fix the problem by decreasing the data range in'//NextLine// &
+             '2-theta or by increasing the overlap criterion.'//NextLine//NextLine// &
+             'To proceed, click Yes, to view the list file, click No.'
+
+      CALL WMessageBox(YesNo, QuestionIcon, CommonOK, text(1:LEN_TRIM(text)), 'Errors detected during Pawley fit')
+
+      IF ( WInfoDialog(ExitButtonCommon) .NE. CommonYes ) THEN
         CALL WindowOpenChild(WIN_STYLE(HideWindow,-1,-1,-1,-1,0,'View pawley fit log file'),IHan)
         CALL WEditFile('polyp.lis', Modal, 0, 0, SystemFixed)
         IRetVal = InfoError(1)
       ENDIF 
-      CALL PopActiveWindowID
+   !   CALL PopActiveWindowID
             
       END SUBROUTINE PawleyWarning
 !
