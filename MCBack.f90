@@ -1,12 +1,13 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SubtractBackground(nbruckwin, mbruckiter, UseMC)
+      SUBROUTINE SubtractBackground(nbruckwin, mbruckiter, UseMC, UseSmooth, SmoothWindow)
 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
-      LOGICAL, INTENT (IN   ) :: UseMc
+      LOGICAL, INTENT (IN   ) :: UseMc, UseSmooth
+      INTEGER, INTENT (IN   ) :: SmoothWindow
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
@@ -25,7 +26,7 @@
       INTEGER I
 
 ! Calculate the background
-      CALL CalculateBackground(nbruckwin, mbruckiter, UseMC)
+      CALL CalculateBackground(nbruckwin, mbruckiter, UseMC, UseSmooth, SmoothWindow)
 ! Subtract the background
       DO I = 1, NBIN
         YOBIN(I) = YOBIN(I) - YBBIN(I)
@@ -47,7 +48,7 @@
       IMPLICIT NONE
 
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      INTEGER tInt1, tInt2
+      INTEGER tInt1, tInt2, tInt3
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Background_Fit)
@@ -55,20 +56,28 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_Preview)
-              CALL WDialogGetInteger(IDF_NumOfIterations,tInt2)
-              CALL WDialogGetInteger(IDF_WindowWidth,tInt1)
-              CALL CalculateBackground(tInt1,tInt2,WDialogGetCheckBoxLogical(IDF_UseMCYN))
+              CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
+              CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
+              CALL WDialogGetInteger(IDF_SmoothWindow, tInt3)
+              CALL CalculateBackground(tInt1, tInt2, &
+                                       WDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                       WDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
               CALL Profile_Plot
             CASE (IDOK)
               CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
               CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
-              CALL SubtractBackground(tInt1, tInt2, WDialogGetCheckBoxLogical(IDF_UseMCYN))
+              CALL WDialogGetInteger(IDF_SmoothWindow, tInt3)
+              CALL CalculateBackground(tInt1, tInt2, &
+                                       WDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                       WDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
               CALL WDialogHide
+              CALL WDialogUnload(IDD_Background_Fit)
               CALL Profile_Plot
             CASE (IDCANCEL)
 ! If user Cancels, assume no knowledge on background
               CALL Clear_BackGround
               CALL WDialogHide
+              CALL WDialogUnload(IDD_Background_Fit)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -77,14 +86,15 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE CalculateBackground(nbruckwin, mbruckiter, UseMC)
+      SUBROUTINE CalculateBackground(nbruckwin, mbruckiter, UseMC, UseSmooth, SmoothWindow)
 
       USE WINTERACTER
 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
-      LOGICAL, INTENT (IN   ) :: UseMc
+      LOGICAL, INTENT (IN   ) :: UseMc, UseSmooth
+      INTEGER, INTENT (IN   ) :: SmoothWindow
 
       INCLUDE 'PARAMS.INC'
 
@@ -106,6 +116,10 @@
       INTEGER knotem, npartem
       INTRINSIC MOD
       REAL    rat, stem
+
+      REAL copy_of_YOBIN(MOBS), tempYOBIN(MOBS)
+      INTEGER Window, J
+      REAL Sum
 !
 !  This subroutine determines the background using a smoothing
 !  procedure published by Sergio Brueckner in J. Appl. Cryst. (2000) 33, 977-979
@@ -113,14 +127,37 @@
 !  and raise background to correct value using a Monte Carlo sampling procedure
 !
       CALL WCursorShape(CurHourGlass)
+      DO I = 1, MOBS
+        copy_of_YOBIN(I) = YOBIN(I)
+      ENDDO
+!C Smooth the pattern
+      IF ( UseSmooth ) THEN
+        Window = SmoothWindow
+        DO I = 1+Window, NBIN-Window
+          Sum = 0.0
+          DO J = -Window, Window
+            Sum = Sum + YOBIN(I+J)
+          ENDDO
+          tempYOBIN(I) = Sum / (2.0*Window+1.0)
+        ENDDO
+        DO I = 1, Window
+          copy_of_YOBIN(I) = tempYOBIN(1+Window)
+        ENDDO
+        DO I = 1+Window, NBIN-Window
+          copy_of_YOBIN(I) = tempYOBIN(I)
+        ENDDO            
+        DO I = NBIN-Window+1, NBIN
+          copy_of_YOBIN(I) = tempYOBIN(NBIN-Window)
+        ENDDO          
+      ENDIF    
       DO I = 1-nbruckwin, 0
-        ys(I) = YOBIN(1)
+        ys(I) = copy_of_YOBIN(1)
       ENDDO
       DO I = 1, NBIN
-        ys(I) = YOBIN(I)
+        ys(I) = copy_of_YOBIN(I)
       ENDDO
       DO I = NBIN+1, NBIN+nbruckwin
-        ys(I) = YOBIN(NBIN)
+        ys(I) = copy_of_YOBIN(NBIN)
       ENDDO
       DO iter = 1, mbruckiter
 ! Loop over data points
@@ -158,7 +195,7 @@
         knotem  =  0  
         npartem =  0
         DO i = 1, NBIN
-          IF (YBBIN(i) .EQ. YOBIN(i)) THEN
+          IF (YBBIN(i) .EQ. copy_of_YOBIN(i)) THEN
             es(i) = 1.E6 * EBIN(i)
           ELSE
             es(i) = EBIN(i)
