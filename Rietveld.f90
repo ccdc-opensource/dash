@@ -1698,6 +1698,48 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE DealWithWizardChooseRietveldRefinementMethod
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SAW_Page6a)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              CALL Unload_SAW_Page6a
+              CALL WizardWindowShow(IDD_SAW_Page5)
+            CASE (IDNEXT)
+              CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethod)
+              CALL Unload_SAW_Page6a
+              IF ( iRietveldMethod .EQ. 1 ) THEN
+                ! Rigid-body Rietveld refinement in DASH
+                CALL ShowWizardWindowRietveld(RR_SA_Sol)
+              ELSE
+                ! TOPAS
+                CALL WDialogLoad(IDD_RR_TOPAS)
+                TOPAS_stage = 1
+                CALL WDialogFieldStateLogical(IDB_Write_Pawley, TOPAS_stage .EQ. 1)
+                CALL WDialogFieldStateLogical(IDB_Browse,       TOPAS_stage .EQ. 2)
+                CALL WDialogFieldStateLogical(IDB_Write_RR,     TOPAS_stage .EQ. 3)
+                CALL WizardWindowShow(IDD_RR_TOPAS)
+              ENDIF
+            CASE (IDCANCEL, IDCLOSE)
+              CALL Unload_SAW_Page6a
+              CALL EndWizardPastPawley
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardChooseRietveldRefinementMethod
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithWizardRietveldRefinement
 
       USE WINTERACTER
@@ -1730,7 +1772,7 @@
               CALL WizardWindowHide
               CALL ShowWizardWindowRietveld(Curr_SA_Run)
             CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizard
+              CALL EndWizardPastPawley
             CASE (IDB_SDI_file_Browse)
               CALL SDIFileBrowse
             CASE (IDB_SDI_file_Open)
