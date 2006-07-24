@@ -31,6 +31,8 @@
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
               IF (NumberSGTable .EQ. LPosSG(LatBrav)) CALL WarningMessage('Space-group symmetry has not been reset.')
+              CALL WDialogLoad(IDD_SX_Page1a)
+              CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
               CALL WizardWindowShow(IDD_SX_Page1a)
             CASE (IDAPPLY)
               CALL Download_SpaceGroup(IDD_SX_Page1)
@@ -90,21 +92,21 @@
 
       IMPLICIT NONE
 
-      REAL Resolution
-
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SX_Page1a)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCLOSE, IDCANCEL)
+              CALL Unload_SX_Page1a
               CALL EndWizard
             CASE (IDBACK)
+              CALL Unload_SX_Page1a
               CALL WizardWindowShow(IDD_SX_Page1)
             CASE (IDNEXT)
-              CALL WDialogGetReal(IDF_MaxResolution, Resolution)
+              CALL Unload_SX_Page1a
               CALL WDialogSelect(IDD_ViewPawley)
-              CALL WDialogPutReal(IDF_MaxResolution, Resolution)
+              CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
               CALL WDialogSelect(IDD_SX_Page2)
               CALL WDialogFieldStateLogical(IDNEXT, .FALSE.)
               PastPawley = .TRUE.
@@ -139,6 +141,8 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
+              CALL WDialogLoad(IDD_SX_Page1a)
+              CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
               CALL WizardWindowShow(IDD_SX_Page1a)
             CASE (IDNEXT)
               IF (SaveProject()) CALL ShowWizardWindowZmatrices
