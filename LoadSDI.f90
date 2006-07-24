@@ -454,7 +454,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETPIK(TheFileName,iErr)
+      SUBROUTINE GETPIK(TheFileName, iErr)
 
       USE VARIABLES
       
