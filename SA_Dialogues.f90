@@ -150,9 +150,6 @@
             CASE (IDB_SA_Project_Open)
               CALL WDialogGetString(IDF_SA_Project_Name, SDIFile)
               CALL SDIFileOpen(SDIFile)
-            CASE (IDB_SA_Project_Import)
-! Import .. convert a mol/pdb/mol2 file into a Z-matrix
-              CALL ImportZmatrix('')
             CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
                 DelFrg = 1
@@ -841,6 +838,7 @@
       CHARACTER(MaxPathLength) tOldFileName
 
 ! Initialise to failure
+      tNumZMatrices = 0
       zmRebuild = 1
       iFrg = 0
       CALL zmCopyDialog2Temp
@@ -865,11 +863,20 @@
       CALL IOsCopyFile('Rebuild_temp_1.zmatrix','Rebuild_temp.zmatrix')
       frag_file(iFrg) = 'Rebuild_temp.zmatrix'
 ! Reading a Z-matrix is going to reset all the rotational stuff that isn't present in a .zmatrix file
-      CALL zmRotCopyTemp2Dialog
+      IF (tNumZMatrices .EQ. 1) THEN
+        CALL zmRotCopyTemp2Dialog
+        CALL zmCopyTemp2Dialog
+      ENDIF
       IF (Read_One_ZM(iFrg) .NE. 0) GOTO 999 ! reading failed
       zmAtomDeleted = .FALSE.
       zmRebuild = 0
-  999 CALL zmRotCopyDialog2Temp
+  999 CONTINUE
+      IF (tNumZMatrices .EQ. 1) THEN
+        CALL zmRotCopyDialog2Temp
+        CALL zmCopyDialog2Temp
+      ENDIF
+      CALL zmRotCopyTemp2Dialog
+      CALL zmCopyTemp2Dialog
       frag_file(iFrg) = tOldFileName
 
       END FUNCTION zmRebuild
@@ -1599,7 +1606,7 @@
                 CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X_init(I))
                 CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, I, LB(I))
                 CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, I, UB(I))
-          !F      CALL ParseRawInput(I)
+                CALL ParseRawInput(I)
               ENDDO
               CALL ShowWithWizardWindowSASettings
             CASE (IDCANCEL, IDCLOSE)
@@ -2203,13 +2210,6 @@
               CALL WDialogGetReal(IDF_ModalLower, lb(RowNumber))
               CALL WDialogGetReal(IDF_ModalUpper, ub(RowNumber))
 !             Check that x is in bounds
-              IF (OutOfBounds(RowNumber, X_init(RowNumber))) THEN
-                CALL WarningMessage('Initial value does not fall within defined ranges')
-                IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOk) THEN
-                  CALL PopActiveWindowID
-                  RETURN
-                ENDIF 
-              ENDIF
               CALL WDialogHide
               CALL WDialogSelect(IDD_SA_Modal_Input2)
               CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))  
@@ -2357,102 +2357,4 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION OutOfBounds(iPar, XIn)
 
-! This Subroutine determines if a trial torsion angle value is within
-! modal torsion angle ranges defined.
-
-      IMPLICIT NONE      
-
-      INTEGER, INTENT (IN   ) :: iPar
-      REAL,    INTENT (INOUT) :: XIn
-
-      INCLUDE 'PARAMS.INC'
-
-      REAL            X_init,       x_unique,       lb,       ub
-      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
-
-      INTEGER                ModalFlag,       RowNumber, iRadio
-      REAL                                                       iX, iUB, iLB  
-      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
-
-      REAL, DIMENSION (3,2) :: TempBounds
-      COMMON /TriModalBounds/  TempBounds 
-           
-      INTEGER I, Upper, Lower
-      LOGICAL OneEightyScale
-      REAL xtem, tempupper, templower, tempupper2, templower2
-
-      Upper = 1
-      Lower = 2
-      OutOfBounds = .FALSE.
-      SELECT CASE(ModalFlag(iPar))
-        CASE (2) ! Bimodal ranges
-          IF ((XIn .LT. -180.0) .OR. (XIn .GT. 180.0)) THEN
-            OutOfBounds = .TRUE.
-            RETURN
-          ENDIF
-          IF (UB(iPar) * LB(iPar) .LT. 0.0) THEN ! Range such as -10 to 10 defined                                                  
-            TempLower = LB(iPar)                 ! so use 0 to 360 degree scale
-            TempUpper = UB(iPar)
-            TempLower2 = TempUpper - 180.00
-            TempUpper2 = TempLower + 180.00
-
-     !F       TempLower2 = TempLower + 180.00
-     !F       TempUpper2 = TempUpper + 180.00
-
-            CALL OneEightyToThreeSixty(TempLower)
-            CALL OneEightyToThreeSixty(TempUpper)
-            CALL OneEightyToThreeSixty(TempLower2)
-            CALL OneEightyToThreeSixty(TempUpper2)
-            xtem = XIn                                                                                     
-            CALL OneEightytoThreeSixty(xtem)
-            IF (((xtem .LT. MAX(TempLower, TempLower2)) .AND. &
-                 (xtem .GT. MIN(TempLower, TempLower2))) .OR. &
-                ((xtem .LT. MAX(TempUpper, TempUpper2)) .AND. &
-                 (xtem .GT. MIN(TempUpper, TempUpper2)))) THEN
-              OutOfBounds = .TRUE.                                       
-            ENDIF
-          ELSE ! Range such as 30 to 90 degs or -30 to -90 defined
-            IF ((XIn .LT. LB(iPar)) .OR. (XIn .GT. UB(iPar))) THEN
-              IF (((XIn .LT. -UB(iPar)) .OR. (XIn .GT. -LB(iPar)))) THEN ! Out of bounds            
-                OutOfBounds = .TRUE.
-              ENDIF
-            ENDIF
-          ENDIF
-        CASE (3) !trimodal ranges
-          xtem = XIn
-          CALL DetermineTriModalBounds(UB(iPar), Upper)
-          CALL DetermineTriModalBounds(LB(iPar), Lower)
-          IF ((xtem .LT. -180.0) .OR. (xtem .GT.180.0)) THEN
-            OutOfBounds = .TRUE.
-          ELSE                 
-            CALL CheckTriModalBounds(OneEightyScale)
-            IF (.NOT. OneEightyScale) THEN ! A range such as -10 to 10 has been defined
-              CALL OneEightytoThreeSixty(xtem)    ! so use 0 to 360 scale
-              DO I = 1, 3
-                CALL OneEightyToThreeSixty(TempBounds(I,Upper))
-                CALL OneEightyToThreeSixty(TempBounds(I,Lower))
-              ENDDO
-            ENDIF
-!           Determine if XP is in any of the three torsion angle ranges              
-            TempUpper = MAX(Tempbounds(1,Upper), Tempbounds(1,Lower))!!UB(H)
-            TempLower = MIN(Tempbounds(1,Lower), Tempbounds(1,Upper))!!LB(H)
-            IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN
-              TempUpper = MAX(Tempbounds(2,Upper), Tempbounds(2,Lower))
-              TempLower = MIN(Tempbounds(2,Upper), Tempbounds(2,Lower))
-              IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN
-                TempUpper = MAX(Tempbounds(3,Upper), Tempbounds(3,Lower))
-                TempLower = MIN(Tempbounds(3,Upper), Tempbounds(3,Lower))
-                IF((xtem .LT. TempLower) .OR. (xtem .GT. TempUpper)) THEN        
-                  OutOfBounds = .TRUE.
-                ENDIF
-              ENDIF
-            ENDIF
-          ENDIF
-      END SELECT
-
-      END FUNCTION OutOfBounds
-!
-!*****************************************************************************
-!
