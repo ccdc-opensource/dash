@@ -777,7 +777,7 @@
               tiStop     = iStop
               tnPoints   = nPoints
               CALL WizardApplyProfileRange
-              IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
+              IF ( WDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
                 CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
                 CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
                 CALL WDialogGetInteger(IDF_SmoothWindow, tInt3)
@@ -811,9 +811,9 @@
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_SubtractBackground)
+            CASE ( IDF_SubtractBackground )
 ! If set to 'TRUE', ungrey value field and vice versa
-              IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
+              IF ( WDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
                 tFieldState = Enabled
               ELSE
                 tFieldState = Disabled
@@ -828,6 +828,15 @@
               CALL WDialogFieldState(IDF_UseMCYN, tFieldState)
               CALL WDialogFieldState(IDB_Preview, tFieldState)
               CALL WDialogFieldState(IDAPPLY, tFieldState)
+              CALL WDialogFieldState(IDF_UseSmooth, tFieldState)
+              CALL WDialogFieldState(IDF_LABEL3, tFieldState)
+              CALL WDialogFieldState(IDF_SmoothWindow, tFieldState)
+            CASE ( IDF_UseSmooth )
+              IF ( WDialogGetCheckBoxLogical(IDF_UseSmooth) ) THEN
+                CALL WDialogFieldState(IDF_SmoothWindow, Enabled)
+              ELSE
+                CALL WDialogFieldState(IDF_SmoothWindow, Disabled)
+              ENDIF
           END SELECT
       END SELECT
       CALL PopActiveWindowID
