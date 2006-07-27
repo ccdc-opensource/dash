@@ -208,7 +208,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE StrReplace(TheString,TheListIn,TheListOut)
+      SUBROUTINE StrReplace(TheString, TheListIn, TheListOut)
 !
 ! This subroutine replaces all occurences of a list of characters by another list of characters
 !
@@ -318,6 +318,44 @@
       ENDDO
 
       END SUBROUTINE StrClean
+!
+!*****************************************************************************
+!
+      SUBROUTINE StrRemoveSpaces(TheString, TheLength)
+!
+! This function removes all spaces from the input string TheString
+!
+! INPUT   : TheString = the string
+!        
+! OUTPUT  : TheString = the cleaned up version of the string
+!           TheLength = the length of the final string
+!
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (INOUT) :: TheString
+      INTEGER,       INTENT (  OUT) :: TheLength
+
+      INTEGER i, j
+      INTEGER OriginalLength
+
+      TheLength = LEN_TRIM(TheString)
+      OriginalLength = TheLength
+      i = 1
+      DO j = 1, TheLength
+        IF ( TheString(j:j) .NE. ' ' ) THEN
+          TheString(i:i) = TheString(j:j)
+          i = i + 1
+        ENDIF
+      ENDDO
+      TheLength = i - 1
+      IF ( TheLength .NE. OriginalLength ) THEN
+! Pad rest of the old string with spaces
+        DO j = TheLength+1, OriginalLength
+          TheString(j:j) = ' '
+        ENDDO
+      ENDIF
+
+      END SUBROUTINE StrRemoveSpaces
 !
 !*****************************************************************************
 !
