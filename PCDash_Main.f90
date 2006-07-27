@@ -227,10 +227,9 @@
 ! Initialise the background
           CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
           CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
-          CALL WDialogGetInteger(IDF_SmoothWindow, tInt3)
           CALL CalculateBackground(tInt1, tInt2, &
                                    WDialogGetCheckBoxLogical(IDF_UseMCYN), &
-                                   WDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
+                                   .FALSE., 5)
           CALL Profile_Plot
           CALL WDialogShow(-1, -1, 0, Modeless)
           CALL PopActiveWindowID
