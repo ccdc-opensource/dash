@@ -88,7 +88,11 @@
       CALL WDialogLoad(IDD_PW_Page1)
       CALL WDialogLoad(IDD_PW_Page2)
       CALL WDialogLoad(IDD_PW_Page3)
+
+      ! This is the rebin Wizard window; it should be dynamically loaded
       CALL WDialogLoad(IDD_PW_Page3a)
+
+
       CALL WDialogLoad(IDD_PW_Page4)
       CALL WDialogLoad(IDD_PW_Page5)
       CALL WDialogLoad(IDD_PW_Page6)
@@ -568,8 +572,9 @@
                            PlotErrorBars, PlotBackground,                 &
                            PlotPeakFitDifferenceProfile,                  &
                            WDialogGetCheckBoxLogical,                     &
-                           Get_SavePRO, Get_OutputChi2vsMoves, &
+                           Get_SavePRO, Get_OutputChi2vsMoves,            &
                            Get_DivideByEsd, Get_SavePrjAtEnd
+      LOGICAL, EXTERNAL :: Get_WriteWavelength2XYEFile
       LOGICAL, EXTERNAL :: Get_ShowCumChiSqd, Get_AutoAlign
       REAL, EXTERNAL :: WavelengthOf
       CHARACTER*MaxPathLength tFileName
@@ -768,6 +773,7 @@
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogGetString(IDF_DICVOLExe, DICVOL04EXE)
       CALL FileWriteString(hFile, RecNr, DICVOL04EXE)
+      CALL FileWriteLogical(hFile, RecNr, Get_WriteWavelength2XYEFile())
 ! Save defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
   ! Use window smooth YES / NO
@@ -777,7 +783,6 @@
       CALL FileWriteInteger(hFile, RecNr, tInteger)
 ! Save .dash file at end of SA?
       CALL FileWriteLogical(hFile, RecNr, Get_SavePrjAtEnd())
-
 
   999 CLOSE(hFile)
 
@@ -1070,6 +1075,8 @@
       ENDIF
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogPutString(IDF_DICVOLExe, DICVOL04EXE)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDC_wl_in_xye, tLogical)
 ! Read defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
       CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use Monte Carlo YES / NO

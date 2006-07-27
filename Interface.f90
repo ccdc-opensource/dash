@@ -574,6 +574,28 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION Get_WriteWavelength2XYEFile
+
+! When .TRUE. (the default), the wavelength is automatically written to the first line of
+! every .xye file that is written. This is the DASH default, but disagrees with .xye
+! files written and read by other programs.
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      Get_WriteWavelength2XYEFile = WDialogGetCheckBoxLogical(IDC_wl_in_xye)
+      CALL PopActiveWindowID
+
+      END FUNCTION Get_WriteWavelength2XYEFile
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION PlotErrorBars
 !
 ! This function retrieves the value of the 'plot error bars' checkbox in the plot options panel
@@ -910,14 +932,14 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
-      LOGICAL, EXTERNAL :: NearlyEqual, Confirm
+      LOGICAL, EXTERNAL :: NearlyEqual, Confirm, Get_WriteWavelength2XYEFile
       INTEGER tFileHandle, I
 
-      IF ((TheWaveLength .LT. 0.01) .OR. (TheWaveLength .GT. 20.0)) THEN
+      IF ( (TheWaveLength .LT. 0.01) .OR. (TheWaveLength .GT. 20.0) ) THEN
         CALL ErrorMessage('Invalid wavelength')
         RETURN
       ENDIF
-      IF (NoWavelengthInXYE) THEN
+      IF ( NoWavelengthInXYE .AND. Get_WriteWavelength2XYEFile() ) THEN
 ! Only ask this once per file.
         NoWavelengthInXYE = .FALSE.
         IF (Confirm('For ease of use, DASH now interprets a single number on the first line of an .xye file as a wavelength.'//CHAR(13)// &
@@ -935,7 +957,7 @@
       GOTO 10
   999 CALL ErrorMessage('Error accessing file '//FNAME(1:LEN_TRIM(FNAME)))
    10 CLOSE(tFileHandle)
-      IF (NearlyEqual(TheWaveLength,ALambda)) RETURN
+      IF ( NearlyEqual(TheWaveLength,ALambda) ) RETURN
       ALambda = TheWaveLength
       CALL Upload_Wavelength
 

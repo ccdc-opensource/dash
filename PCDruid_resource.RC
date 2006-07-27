@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 23/Jul/2006 15:42:08
+// Modified : 27/Jul/2006 17:29:32
 //
 ///////////////////////////////////////////////////
 //
@@ -671,6 +671,11 @@
 #define IDB_Write_Pawley                 1214
 #define IDB_Browse                       1296
 #define IDB_Write_RR                     1370
+#define IDD_Test                          140
+#define IDB_WRITE                        1371
+#define IDF_REAL1                        1372
+#define IDF_CHECK4                       1399
+#define IDC_wl_in_xye                    1439
 
 ///////////////////////////////////////////////////
 //
@@ -704,9 +709,9 @@ END
 IDD_Plot_Option_Dialog RCDATA
 BEGIN
 "[Checks] \n"
-" 1014 1 \n"
+" 1014 0 \n"
 " 1364 1 \n"
-" 1132 0 \n"
+" 1132 1 \n"
 " 1133 0 \n"
 " 1408 0 \n"
 " 1513 0 \n"
@@ -1998,7 +2003,7 @@ BEGIN
 ,0
 END
 
-IDD_Configuration DIALOG 0, 0,  281,  129
+IDD_Configuration DIALOG 0, 0,  281,  144
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Configuration"
@@ -2008,7 +2013,7 @@ BEGIN
     CONTROL "B&rowse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  234,    9,   40,   14
     CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    9,   11,   27,    8
     CONTROL "Arguments for viewer",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,    6,   31,   74,    8
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  120,  107,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  120,  123,   40,   14
     CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   87,   84,   14
     CONTROL "",IDF_MogulExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   44,  180,   14
     CONTROL "Mogul",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    7,   47,   26,    8
@@ -2016,12 +2021,14 @@ BEGIN
     CONTROL "DICVOL04",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   68,   38,    8
     CONTROL "",IDF_DICVOLExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   65,  180,   14
     CONTROL "B&rowse...",IDBBROWSE3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,   65,   40,   14
+    CONTROL "Write wavelength to .xye files",IDC_wl_in_xye,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  100,  120,   14
 END
 
 IDD_Configuration RCDATA
 BEGIN
 "[Checks] \n"
 " 1131 0 \n"
+" 1439 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -2139,7 +2146,7 @@ END
 IDD_PW_Page8 RCDATA
 BEGIN
 "[Checks] \n"
-" 1311 1 \n"
+" 1311 0 \n"
 " 1312 1 \n"
 " 1313 1 \n"
 " 1314 1 \n"
@@ -3687,7 +3694,7 @@ BEGIN
 " 1092 0 \n"
 " 1090 1 \n"
 " 1550 0 \n"
-" 1248 0 \n"
+" 1248 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -3748,7 +3755,7 @@ END
 IDD_PW_Page8b RCDATA
 BEGIN
 "[Checks] \n"
-" 1311 1 \n"
+" 1311 0 \n"
 " 1312 1 \n"
 " 1313 1 \n"
 " 1314 1 \n"
@@ -3827,6 +3834,40 @@ IDD_RR_TOPAS RCDATA
 BEGIN
 "[Checks] \n"
 "[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_Test DIALOG 0, 0,  375,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Rietveld refinement with TOPAS"
+BEGIN
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "&Write",IDB_WRITE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  318,  150,   40,   14
+    CONTROL "",IDF_MENU1,"LISTBOX",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_USETABSTOPS,  102,   20,  170,   30
+    CONTROL "Penalties K1",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  116,   60,   60,    8
+    CONTROL "5.0000",IDF_REAL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  183,   57,   40,   14
+    CONTROL "Recycle .inp file",IDF_CHECK4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  124,  120,  100,   14
+END
+
+IDD_Test RCDATA
+BEGIN
+"[Checks] \n"
+" 1399 0 \n"
+"[Menus] \n"
+" 1546     3     0 \n"
+"1. Scale only \n"
+"2. Scale + atomic parameters \n"
+" \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
