@@ -596,6 +596,7 @@
                 CALL TruncateData(tMin,tMax)
               ELSE
                 IF ( For_TOPAS ) THEN
+                  CALL WDialogLoad(IDD_RR_TOPAS)
                   iFlags = SaveDialog + AppendExt + PromptOn
                   FILTER = 'TOPAS input file (*.inp)|*.inp|'
                   TOPASFileName = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
@@ -1350,6 +1351,25 @@
               ENDIF
               wave = ALambda * DV_ScaleFactor
               CALL WCursorShape(CurHourGlass)
+              ! DICVOL04 no longer accepts command line arguments, which means that the user must type
+              ! the input and output file names *while DICVOL04 is running*
+              ! Fortunately, this can be fed to the program using I/O redirection.
+              ! Therefore, we write out a little file that contains the names of the input and the output file
+              ! and then I/O redirect the contents of the file to DICVOL04.
+              ! Note that
+              !
+              ! CALL IOSCommand(DICVOL04EXE(1:I)//' < in.txt', ProcBlocked)
+              !
+              ! does not work, but instead we must start a new CMD:
+              !
+              ! CALL IOSCommand('CMD.EXE /C '//DICVOL04EXE(1:I)//' < in.txt', ProcBlocked)
+              !
+              ! The switch /C causes the CMD.exe to exit when it's finished
+              hFile = 116
+              OPEN(UNIT=hFile, FILE='in.txt', STATUS='UNKNOWN', ERR=997)
+              WRITE(hFile,'(A)',ERR=997) 'DICVOL.in'
+              WRITE(hFile,'(A)',ERR=997) 'DICVOL.out'
+              CLOSE(hFile)
 ! Write it out 
               tFileName = 'DICVOL.in'
               hFile = 117
@@ -1381,7 +1401,7 @@
               INQUIRE(FILE = DICVOL04EXE(1:I),EXIST=exists)
               IF (.NOT. exists) GOTO 998
               M = InfoError(1) ! Clear errors
-              CALL IOSCommand(DICVOL04EXE(1:I)//' DICVOL.in DICVOL.out', ProcBlocked)
+              CALL IOSCommand('CMD.EXE /C '//DICVOL04EXE(1:I)//' < in.txt', ProcBlocked)
               IF (InfoError(1) .NE. 0) GOTO 998
 ! Pop up a window showing the DICVOL output file in a text editor
               CALL WindowOpenChild(iHandle)
