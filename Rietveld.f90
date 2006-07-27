@@ -47,7 +47,16 @@
       REAL ChiSqd, ChiProSqd 
       INTEGER tFieldState
 
+
+      IF ( .NOT. For_TOPAS ) THEN
+
+
       CALL WDialogSelect(IDD_Rietveld2)
+
+
+      ENDIF  ! For_TOPAS
+
+
       LOG_HYDROGENS = .TRUE.
       CALL CREATE_FOB(.FALSE.)
 ! Load all values of all bonds, angles etc. into RRVAR variables
@@ -99,12 +108,17 @@
         ENDDO
       ENDDO
       RR_ITF = 1.0
-      IF (PrefParExists) THEN
+      IF ( PrefParExists ) THEN
         KK = KK + 1
         RR_PO = BestValuesDoF(KK, Curr_SA_Run)
       ELSE
         RR_PO = 1.0
       ENDIF
+
+
+      IF ( .NOT. For_TOPAS ) THEN
+
+
       RR_iopttran = 0
       RR_ioptrot = 0
       CALL WDialogPutInteger(IDI_Num1, 0)
@@ -185,8 +199,18 @@
       IF (PrefParExists) CALL PO_PRECFC(RR_PO)
       ! Initialise ITF
       CALL CreateFobITF
+
+
+      ENDIF  ! For_TOPAS
+
+
       ! Initialise XATO(1:3,1:150)
       CALL RR_MAKEFRAC
+
+
+      IF ( .NOT. For_TOPAS ) THEN
+
+
       ! Store initial crystal structure for comparison
       DO I = 1, NATOM
         DO J = 1, 3
@@ -201,6 +225,9 @@
       IPTYPE = 2
       CALL Profile_Plot
       CALL WizardWindowShow(IDD_Rietveld2)
+
+
+      ENDIF  ! For_TOPAS
 
       END SUBROUTINE ShowWizardWindowRietveld
 !
@@ -1398,7 +1425,7 @@
                'SHELX (*.res)|*.res|'// &
                'Profile (*.pro)|*.pro|'
       tFileName = ''
-      CALL WSelectFile(FILTER,iFlags,tFileName,'Save final structure',iFType)
+      CALL WSelectFile(FILTER, iFlags, tFileName, 'Save final structure', iFType)
       IF ((WInfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
         hFile = 10
         OPEN(UNIT=hFile,FILE=tFileName,ERR=999)

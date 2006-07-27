@@ -79,8 +79,9 @@
       INTEGER, EXTERNAL :: DiffractionFileBrowse
       LOGICAL, EXTERNAL :: FnPatternOK
       CHARACTER(MaxPathLength) :: TOPASFileName
-      CHARACTER(LEN=45) :: FILTER
-      INTEGER iFlags
+      CHARACTER(LEN=60) :: FILTER
+      INTEGER iFlags, iFType
+      CHARACTER(LEN=MaxPathLength) tFileName
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_RR_TOPAS)
@@ -101,15 +102,27 @@
               CALL EndWizardPastPawley
             CASE (IDB_Write_Pawley)
               For_TOPAS = .TRUE.
+              CALL Unload_RR_TOPAS
               CALL WizardWindowShow(IDD_PW_Page3)
-
-
             CASE (IDB_Browse) ! The TOPAS Pawley refinement output file
-
+              iFlags = LoadDialog + DirChange + PromptOn + AppendExt
+              FILTER = 'All files (*.*)|*.*|'//&
+                       'TOPAS ouput files (*.out)|*.out|'
+              tFileName = ' '
+! iFType specifies which of the file types in the list is the default
+              iFType = 2
+              CALL WSelectFile(FILTER, iFlags, tFileName, 'Open TOPAS output file', iFType)
+! Did the user press cancel?
+              IF ( (WInfoDialog(ExitButtonCommon) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0) ) THEN
+                TOPAS_output_file_name = tFileName
+                TOPAS_stage = 3 ! I think this variable is redundant
+                CALL WDialogFieldStateLogical(IDB_Browse,   .FALSE.)
+                CALL WDialogFieldStateLogical(IDB_Write_RR, .TRUE.)
+              ENDIF
             CASE (IDB_Write_RR)
               iFlags = SaveDialog + AppendExt + PromptOn
               FILTER = 'TOPAS input file (*.inp)|*.inp|'
-                  TOPASFileName = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
+              TOPASFileName = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
               CALL WSelectFile(FILTER, iFlags, TOPASFileName, 'Save TOPAS input file (Rietveld)')
               IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPASFileName) .NE. 0)) THEN
                 IF ( WriteTOPASFileRietveld(TOPASFileName) .EQ. 0 ) THEN
@@ -146,6 +159,8 @@
       INTEGER iLen, i
       CHARACTER*(1) tChar
       CHARACTER*(MaxPathLength) temp_file_name
+      CHARACTER*(40) space_group_str
+      INTEGER tStrLen
 
       ! The way this code has curently been written, this routine can only be called
       ! from one of the Wizard windows as part of a "For_TOPAS" Rietveld refinement
@@ -234,6 +249,7 @@
       ENDIF
       WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    ga '//tChar//' ', CELLPAR(6)
 !      WRITE(hFileTOPAS, '(A,A)', ERR=999) 'phase_name ', 
+      WRITE(hFileTOPAS, '(A)', ERR=999) "' When editing this file, leave space group as the last keyword: DASH uses it to detect the end of the input file" 
 
       ! By writing the space group name last, the extra information on hkl's and intensities
       ! will be appended at the end of the file. That makes it a lot easier to read the .out
@@ -241,7 +257,10 @@
 
       ! TODO ##### for space groups higher than orthorhombic we're almost certainly better off
       ! using the format space_group 222:1 rather than the space-group name. 
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    space_group "'//SGHMaStr(NumberSGTable)(1:LEN_TRIM(SGHMaStr(NumberSGTable)))//'"' 
+
+      space_group_str = SGHMaStr(NumberSGTable)(1:LEN_TRIM(SGHMaStr(NumberSGTable)))
+      CALL StrRemoveSpaces(space_group_str, tStrLen)
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    space_group '//space_group_str(1:tStrLen)
       WriteTOPASFilePawley = 0
       CLOSE(hFileTOPAS)
       RETURN
@@ -257,35 +276,120 @@
 ! 
       INTEGER FUNCTION WriteTOPASFileRietveld(tFileName)
 
+      USE VARIABLES
+      USE ATMVAR
+      USE ZMVAR
+      USE PO_VAR
+      USE RRVAR
+
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: tFileName
 
-      INTEGER hFileTOPAS
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
+      INTEGER         NATOM
+      REAL                   Xato
+      INTEGER                             KX
+      REAL                                           AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
+                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
+                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
+
+      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
+
+      INTEGER, EXTERNAL :: StrFind
+      INTEGER hFileTOPAS, hOutputFile
+      INTEGER iLen, iPos, iStrPos
+      LOGICAL is_last_line
+      CHARACTER(255) tLine
+      CHARACTER(6) hkl_str
+      CHARACTER(11) space_group_str
+      CHARACTER(5) b_str
+      INTEGER b_str_len, tElement
+      INTEGER ii, iiact, iTotal, iFrg, iOrig, iAtom
 
       ! Initialise to failure
       WriteTOPASFileRietveld = 1
-      hFileTOPAS = 117
-      OPEN(UNIT=hFileTOPAS,FILE=tFileName,STATUS='unknown',ERR=999)
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp 1.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp_dash 1.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'r_wp 1.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'r_wp_dash 1.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'r_p 1.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'r_p_dash 1.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'weighted_Durbin_Watson 1.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'gof 1.0'
-      ! Next line contains the file name of the file containing the diffraction data
-      ! TOPAS can read .raw files, but not if they contain multiple ranges, and
-      ! TOPAS can read .xye files, but not if they contain a wavelength on the first line
-      ! We need to write out the data to a temporary file, although this has the downside that
-      ! the we can only use the background-subtracted data, and only out to the resolution
-      ! that we used for Pawley... Hmmm... must come up with something different.
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'gof 1.0'
-
+      hkl_str = 'hkl_Is'
+      space_group_str = 'space_group'
+      hFileTOPAS = 116
+      hOutputFile = 117 ! This is the file that is being *read*
+      OPEN(UNIT=hFileTOPAS, FILE=tFileName, STATUS='unknown', ERR=999)
+      OPEN(UNIT=hOutputFile, FILE=TOPAS_output_file_name, STATUS='unknown', ERR=998)
+      ! Basically, read and write every line up to and including the space_group line.
+      is_last_line = .FALSE.
+   10 CONTINUE
+      READ(hOutputFile, '(A)', ERR=998) tLine
+      iLen = LEN_TRIM(tLine)
+      iPos = StrFind(tLine, iLen, hkl_str, 6)
+      IF ( iPos .NE. 0 ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '  str'
+      ELSE
+        iPos = StrFind(tLine, iLen, space_group_str, 11)
+        is_last_line = ( iPos .NE. 0 ) 
+        ! We only want to refine the overall scale, so change all the other @'s to spaces.
+        DO iStrPos = 1, iLen
+          IF (tLine(iStrPos:iStrPos) .EQ. '@') &
+            tLine(iStrPos:iStrPos) = ' '
+        ENDDO
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ENDIF
+      IF ( .NOT. is_last_line ) GOTO 10
+      CLOSE(hOutputFile)
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 1.0'
+! We must call ShowWizardWindowRietveld() here, which will fill
+! Xato (and all the RR variables). The Wizard window is suppressed because of the For_TOPAS flag.
+      CALL ShowWizardWindowRietveld(1)
+! Also need to write out PO if used during SA
+      IF ( PrefParExists ) THEN
+        WRITE(hFileTOPAS, '(A,F5.3,A,I3,1X,I3,1X,I3,1X,A)', ERR=999) '    PO( , ', RR_PO, ', , ', PO_Direction(1), PO_Direction(2), PO_Direction(3), ')'
+      ELSE
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    PO( , 1.0, , 1 0 0)'
+      ENDIF
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
+      iiact = 0
+      itotal = 0
+      DO iFrg = 1, nFrag
+        itotal = iiact
+        DO iAtom = 1, natoms(iFrg)
+          iiact = iiact + 1
+          iOrig = izmbid(iAtom,iFrg)
+          ii = OrderedAtm(itotal + iOrig)
+          tElement = zmElementCSD(iOrig,iFrg)
+          IF ( (tElement .EQ. 2) .OR. (tElement .EQ. 27) ) THEN
+            ! Hydrogen or deuterium
+            b_str = 'bh'
+            b_str_len = 2
+          ELSE
+            b_str = 'bnonh'
+            b_str_len = 5
+          ENDIF
+          WRITE(hFileTOPAS, '(A,A5,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,F6.3)', ERR=999) '    site  ', OriginalLabel(iOrig,iFrg), ' x ref_flag ', &
+            Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
+            occ(iOrig,iFrg), ' beq '//b_str(1:b_str_len), tiso(iOrig,iFrg)
+        ENDDO
+      ENDDO
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    do_errors'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//OutputFilesBaseName(1:OFBN_Len)//'.cif")'
       WriteTOPASFileRietveld = 0
+      CLOSE(hFileTOPAS)
       RETURN
   999 CALL ErrorMessage("Error writing TOPAS input file (Rietveld)")
+      CLOSE(hFileTOPAS)
+      RETURN
+  998 CALL ErrorMessage("Error reading TOPAS output file")
+      CLOSE(hOutputFile)
+      CLOSE(hFileTOPAS)
 
       END FUNCTION WriteTOPASFileRietveld
 !
