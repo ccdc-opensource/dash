@@ -26,11 +26,11 @@
 
       INTEGER, EXTERNAL :: DiffractionFileOpen
       CHARACTER(LEN=200)  FILTER
-      INTEGER             IFLAGS
+      INTEGER             iFlags
       INTEGER             IFTYPE    ! Needed for Winteracter routine
       CHARACTER(LEN=MaxPathLength) tFileName
 
-      IFLAGS = LoadDialog + DirChange + PromptOn
+      iFlags = LoadDialog + DirChange + PromptOn
 ! It seems that Winteracter cannot cope with strings of this length (> 255 bytes)
 !      FILTER = 'All files (*.*)|*.*|'//&
 !               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
@@ -43,7 +43,7 @@
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
       tFileName = ' '
-      CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Open Powder Diffraction File', IFTYPE)
+      CALL WSelectFile(FILTER, iFlags, tFileName, 'Open Powder Diffraction File', IFTYPE)
 ! Did the user press cancel?
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) THEN
         DiffractionFileBrowse = 2
