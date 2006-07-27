@@ -101,6 +101,8 @@
 
       LOGICAL For_TOPAS
 
+      CHARACTER(MaxPathLength) TOPAS_output_file_name
+
       INTEGER TOPAS_stage
 ! The "Rietveld refinement with TOPAS" dialogue window has three stages:
 ! Stage 1. Write input file for Pawley in TOPAS
