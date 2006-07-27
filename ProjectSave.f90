@@ -46,17 +46,17 @@
       IMPLICIT NONE
 
       CHARACTER(LEN=60) FILTER
-      INTEGER           IFLAGS, iFType 
+      INTEGER           iFlags, iFType 
       CHARACTER(LEN=MaxPathLength) tFileName
 
-      IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
+      iFlags = LoadDialog + DirChange + PromptOn + AppendExt
       FILTER = 'All files (*.*)|*.*|'//&
                'DASH project files (*.dash)|*.dash|'
       tFileName = ''
 ! iFType specifies which of the file types in the list is the default
       iFType = 2
       tFileName = PrjFileName
-      CALL WSelectFile(FILTER,IFLAGS,tFileName,'Open DASH project file',iFType)
+      CALL WSelectFile(FILTER, iFlags, tFileName, 'Open DASH project file', iFType)
 ! Did the user press cancel?
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
 ! Note that up to this point, none of the global variables had changed. Baling out was no problem.
