@@ -363,7 +363,7 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-      LOGICAL, EXTERNAL :: FnWavelengthOK
+      LOGICAL, EXTERNAL :: FnWavelengthOK, Get_WriteWavelength2XYEFile
       CHARACTER(MaxPathLength) :: tFileName
       CHARACTER(LEN=45) :: FILTER
       INTEGER iFlags, hFile, I
@@ -375,7 +375,7 @@
       IF ((WInfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
         hFile = 10
         OPEN(UNIT=hFile,FILE=tFileName,ERR=999)
-        IF (FnWavelengthOK()) WRITE(hFile,'(F9.5)',ERR=999) ALambda
+        IF ( FnWavelengthOK() .AND. Get_WriteWavelength2XYEFile() ) WRITE(hFile,'(F9.5)',ERR=999) ALambda
         DO I = 1, NBIN
           WRITE(hFile,'(F6.3,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
         ENDDO

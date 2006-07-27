@@ -1,4 +1,4 @@
-! Winteracter module created : 23/Jul/2006 15:42:08
+! Winteracter module created : 27/Jul/2006 17:29:32
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -658,4 +658,9 @@
           INTEGER, PARAMETER :: IDB_Write_Pawley                =  1214
           INTEGER, PARAMETER :: IDB_Browse                      =  1296
           INTEGER, PARAMETER :: IDB_Write_RR                    =  1370
+          INTEGER, PARAMETER :: IDD_Test                        =   140
+          INTEGER, PARAMETER :: IDB_WRITE                       =  1371
+          INTEGER, PARAMETER :: IDF_REAL1                       =  1372
+          INTEGER, PARAMETER :: IDF_CHECK4                      =  1399
+          INTEGER, PARAMETER :: IDC_wl_in_xye                   =  1439
       END MODULE Druid_Header
