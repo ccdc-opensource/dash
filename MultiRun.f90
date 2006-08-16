@@ -167,11 +167,25 @@
 
       LOGICAL, EXTERNAL :: Get_SavePrjAtEnd
       CHARACTER*(255) tPrjFileName
+      INTEGER iRunNumber
+      LOGICAL OutputExists
+      CHARACTER*(3) RunNumStr
 
-      IF ( Get_SavePrjAtEnd() ) THEN
-        tPrjFileName = OutputFilesBaseName(1:OFBN_Len)//'.dash'
-        CALL PrjReadWrite(tPrjFileName, cWrite)
-      ENDIF
+      IF ( .NOT. Get_SavePrjAtEnd() ) RETURN
+      tPrjFileName = OutputFilesBaseName(1:OFBN_Len)//'.dash'
+      ! Check if the file name already exists. If it does, keep appending numbers
+      ! until we run out of file names.
+      DO iRunNumber = 1, 999
+        WRITE (RunNumStr,'(I3.3)') iRunNumber
+        tPrjFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//RunNumStr//'.dash'
+        INQUIRE(FILE=tPrjFileName, EXIST=OutputExists)
+        IF ( .NOT. OutputExists ) GOTO 10
+      ENDDO
+      ! When we are here, all 999 file names already existed
+      CALL ErrorMessage(".dash file could not be written: all names already exist")
+      RETURN
+   10 CONTINUE ! We have found a file name that did not exist yet.
+      CALL PrjReadWrite(tPrjFileName, cWrite)
 
       END SUBROUTINE SavePrjAtEnd
 !
