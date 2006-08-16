@@ -1081,6 +1081,13 @@
       CALL WDialogSelect(IDD_PW_Page6)
       CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use Monte Carlo YES / NO
       CALL WDialogPutCheckBoxLogical(IDF_UseSmooth, tLogical)
+      IF ( tLogical ) THEN
+        CALL WDialogFieldState(IDF_LABEL3, Enabled)
+        CALL WDialogFieldState(IDF_SmoothWindow, Enabled)
+      ELSE
+        CALL WDialogFieldState(IDF_LABEL3, Disabled)
+        CALL WDialogFieldState(IDF_SmoothWindow, Disabled)
+      ENDIF
       CALL FileReadInteger(hFile, RecNr, tInteger)      ! Window
       CALL WDialogPutInteger(IDF_SmoothWindow, tInteger)
       CALL WDialogSelect(IDD_SA_input4)
