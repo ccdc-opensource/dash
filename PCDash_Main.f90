@@ -210,7 +210,7 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: DiffractionFileBrowse
       REAL xpgdif, ypgdif
-      INTEGER ISTAT, tInt1, tInt2, tInt3
+      INTEGER ISTAT, tInt1, tInt2
 
 ! Branch depending on chosen menu item
 
