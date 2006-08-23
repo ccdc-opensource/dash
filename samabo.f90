@@ -11,9 +11,9 @@
 !
 ! The following variables should be filled:
 !
-!   natcry                = number of atoms (must be < MAXATM_2)
-!   axyzo(1:MAXATM_2,1:3) = atomic Cartesian (orthogonal) co-ordinates
-!   aelem(1:MAXATM_2)     = element number, CSD style. See SAMVAR for definitions
+!   natcry                 = number of atoms (must be < MAXATM_2)
+!   axyzo(1:3, 1:MAXATM_2) = atomic Cartesian (orthogonal) co-ordinates
+!   aelem(1:MAXATM_2)      = element number, CSD style. See SAMVAR for definitions
 ! (SUBROUTINE AssignCSDElement assigns CSD elements given a list of element symbols [e.g. 'C', 'Br', 'CL'].)
 !
 ! OUTPUT : 
@@ -73,9 +73,9 @@
 !
 ! The following variables should be filled:
 !
-!   natcry                = number of atoms (must be < MAXATM_2)
-!   axyzo(1:MAXATM_2,1:3) = atomic Cartesian (orthogonal) co-ordinates
-!   aelem(1:MAXATM_2)     = element number, CSD style. See SAMVAR for definitions
+!   natcry                 = number of atoms (must be < MAXATM_2)
+!   axyzo(1:3, 1:MAXATM_2) = atomic Cartesian (orthogonal) co-ordinates
+!   aelem(1:MAXATM_2)      = element number, CSD style. See SAMVAR for definitions
 ! (SUBROUTINE AssignCSDElement assigns CSD elements given a list of element symbols [e.g. 'C ', 'Br', 'CL'].)
 !
 ! OUTPUT : 
@@ -173,7 +173,7 @@
         IF (aelem(I).EQ.27) aelem(I) = 2
       ENDDO
 ! Generate bonds using a distance criterion
-      CALL MakeBonds
+      CALL MakeBonds()
       IF (nbocry .EQ. 0) RETURN
 ! set up 3D connectivity arrays NHYC, NCAC etc in common
 ! using BOND() as input
@@ -556,7 +556,7 @@
           ENDDO
         ENDIF
 ! look for ring starting on atom Iat - at least 2 connections with bond type 0
-! SAMRIQ looks for a ring  restricted to bond type 0, max size 6
+! SAMRIQ looks for a ring restricted to bond type 0, max size 6
         Tormax = 999.
         Torave = 999.
         IF (ncac(Iat).GE.2 .AND. Nz.GE.2) THEN
@@ -1225,7 +1225,7 @@
 !
       SUBROUTINE SAMBFG
 ! Function:  Bond assignment for groups. Assign standard patterns
-!            to  certain functional groups as in CSD
+!            to certain functional groups as in CSD
 ! Version:   29.9.95           Sam Motherwell   18.9.95
 ! Notes:
 ! 1. Auxiliary to SAMABO.  This is called in the stage 2 (Tidy Up)
@@ -1235,13 +1235,13 @@
 !    NCAC     number of connections other than terminal H 
 !    ATRESN   residue number 
 !    BOND     list of bonds Iat, Jat   
-!      BTYPE    nbt          
+!    BTYPE    nbt          
 !    NATCRY   number of atoms
 !    NBOCRY   number of bonds 
 !
 ! 2. scan is made for those functional groups known to give 
 !    trouble with the automatic bond assignment in SAMABO. For
-!    example  carboxylate.  Also groups like perchlorate  ClO4- are 
+!    example carboxylate. Also groups like perchlorate ClO4- are 
 !    explicity recognised and assigned a pattern of 3 double, one single bond
 !
 ! 3. Charges.  In some simple cases one can deduce an ionic change.
