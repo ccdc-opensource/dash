@@ -1,4 +1,4 @@
-! Winteracter module created : 27/Jul/2006 17:29:32
+! Winteracter module created : 01/Aug/2006 11:14:34
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -663,4 +663,8 @@
           INTEGER, PARAMETER :: IDF_REAL1                       =  1372
           INTEGER, PARAMETER :: IDF_CHECK4                      =  1399
           INTEGER, PARAMETER :: IDC_wl_in_xye                   =  1439
+          INTEGER, PARAMETER :: IDD_SA_input5                   =   142
+          INTEGER, PARAMETER :: IDF_STRING1                     =  1442
+          INTEGER, PARAMETER :: IDF_NumOfIterations2            =  1212
+          INTEGER, PARAMETER :: IDF_NumOfIterations3            =  1213
       END MODULE Druid_Header
