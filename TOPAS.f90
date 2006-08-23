@@ -281,6 +281,7 @@
       USE ZMVAR
       USE PO_VAR
       USE RRVAR
+      USE SAMVAR
 
       IMPLICIT NONE
 
@@ -315,8 +316,9 @@
       CHARACTER(6) hkl_str
       CHARACTER(11) space_group_str
       CHARACTER(5) b_str
-      INTEGER b_str_len, tElement
+      INTEGER b_str_len, tElement, J
       INTEGER ii, iiact, iTotal, iFrg, iOrig, iAtom
+      REAL    distance
 
       ! Initialise to failure
       WriteTOPASFileRietveld = 1
@@ -326,6 +328,7 @@
       hOutputFile = 117 ! This is the file that is being *read*
       OPEN(UNIT=hFileTOPAS, FILE=tFileName, STATUS='unknown', ERR=999)
       OPEN(UNIT=hOutputFile, FILE=TOPAS_output_file_name, STATUS='unknown', ERR=998)
+      WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 5'
       ! Basically, read and write every line up to and including the space_group line.
       is_last_line = .FALSE.
    10 CONTINUE
@@ -349,13 +352,14 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 1.0'
 ! We must call ShowWizardWindowRietveld() here, which will fill
 ! Xato (and all the RR variables). The Wizard window is suppressed because of the For_TOPAS flag.
-      CALL ShowWizardWindowRietveld(1)
+      CALL ShowWizardWindowRietveld(RR_SA_Sol)
 ! Also need to write out PO if used during SA
       IF ( PrefParExists ) THEN
         WRITE(hFileTOPAS, '(A,F5.3,A,I3,1X,I3,1X,I3,1X,A)', ERR=999) '    PO( , ', RR_PO, ', , ', PO_Direction(1), PO_Direction(2), PO_Direction(3), ')'
       ELSE
         WRITE(hFileTOPAS, '(A)', ERR=999) '    PO( , 1.0, , 1 0 0)'
       ENDIF
+      WRITE(hFileTOPAS, '(A)', ERR=999) "'   Insert @ in the curly brackets to refine structural parameters"
       WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
       iiact = 0
       itotal = 0
@@ -379,6 +383,29 @@
             occ(iOrig,iFrg), ' beq '//b_str(1:b_str_len), tiso(iOrig,iFrg)
         ENDDO
       ENDDO
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_width 0'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_weight 10000'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_width 1'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_weight 1'
+      DO iFrg = 1, nFrag
+        ! Convert internal coordinates to orthogonal coordinates
+        CALL makexyz(natoms(iFrg),RR_blen(1,iFrg),RR_alph(1,iFrg),RR_bet(1,iFrg),        &
+                     IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),axyzo)
+        DO iAtom = 1, natoms(iFrg)
+          aelem(iAtom) = zmElementCSD(iAtom,iFrg)
+        ENDDO
+        natcry = natoms(iFrg)
+        ! Detect bonds and their types (to find benzene rings for Flatten macro)
+        CALL SAMABO()
+        DO J = 1, nbocry
+          CALL PLUDIJ(bond(J,1), bond(J,2), distance)
+          WRITE(hFileTOPAS, '(A,A5,1X,A5,A,F9.5,A)', ERR=999) 'Distance_Restrain(', OriginalLabel(bond(J,1),iFrg), OriginalLabel(bond(J,2),iFrg), &
+            ', ', distance, ', 1.0, bond_width, bond_weight)'
+        ENDDO
+
+      ENDDO
+
+
       WRITE(hFileTOPAS, '(A)', ERR=999) '    do_errors'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//OutputFilesBaseName(1:OFBN_Len)//'.cif")'
       WriteTOPASFileRietveld = 0
