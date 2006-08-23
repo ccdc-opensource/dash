@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 27/Jul/2006 17:29:32
+// Modified : 01/Aug/2006 11:14:34
 //
 ///////////////////////////////////////////////////
 //
@@ -676,6 +676,10 @@
 #define IDF_REAL1                        1372
 #define IDF_CHECK4                       1399
 #define IDC_wl_in_xye                    1439
+#define IDD_SA_input5                     142
+#define IDF_STRING1                      1442
+#define IDF_NumOfIterations2             1212
+#define IDF_NumOfIterations3             1213
 
 ///////////////////////////////////////////////////
 //
@@ -3870,6 +3874,43 @@ BEGIN
 " \n"
 "[Tabs] \n"
 "[Ranges] \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_SA_input5 DIALOG 0, 0,  375,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Generating GRID batch files"
+BEGIN
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Write >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "10",IDF_NumOfIterations,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  193,   58,   32,   14
+    CONTROL "Number of runs per node",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   85,   61,  100,    8
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "famot",IDF_STRING1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,  104,   94,  150,   14
+    CONTROL "Base name for batch and output files:",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  105,   83,  140,    8
+    CONTROL "Batch and output files will be called base_name_nnn.duff and base_name_nnn.dash respectively, where nnn is the node number, e.g. base_name_078.dash",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  105,  114,  218,   30
+    CONTROL "500",IDF_NumOfIterations2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  193,   22,   32,   14
+    CONTROL "Number of SA runs",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   85,   25,  100,    8
+    CONTROL "Conve&rt",IDB_Convert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  235,   50,   40,   14
+    CONTROL "50",IDF_NumOfIterations3,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  193,   42,   32,   14
+    CONTROL "Number of nodes to use",IDF_LABEL9,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   85,   45,  100,    8
+END
+
+IDD_SA_input5 RCDATA
+BEGIN
+"[Checks] \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1211               1             999 \n"
+" 1212               1             999 \n"
+" 1213               1             999 \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
