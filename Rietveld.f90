@@ -1781,7 +1781,7 @@
 
       INTEGER, EXTERNAL :: XtalFileOpen, XtalFileBrowse 
       CHARACTER(MaxPathLength) SDIFile, XtalFile
-      INTEGER Curr_SA_Run, iStat, IV
+      INTEGER iStat, IV
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page6)
@@ -1795,9 +1795,20 @@
               CALL WDialogPutRadioButton(IDF_PW_Option6)
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
-              Curr_SA_Run = 1
-              CALL WizardWindowHide
-              CALL ShowWizardWindowRietveld(Curr_SA_Run)
+              CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethod)
+              RR_SA_Sol = 1
+              IF ( iRietveldMethod .EQ. 1 ) THEN
+                ! Rigid-body Rietveld refinement in DASH
+                CALL ShowWizardWindowRietveld(RR_SA_Sol)
+              ELSE
+                ! TOPAS
+                CALL WDialogLoad(IDD_RR_TOPAS)
+                TOPAS_stage = 1
+                CALL WDialogFieldStateLogical(IDB_Write_Pawley, TOPAS_stage .EQ. 1)
+                CALL WDialogFieldStateLogical(IDB_Browse,       TOPAS_stage .EQ. 2)
+                CALL WDialogFieldStateLogical(IDB_Write_RR,     TOPAS_stage .EQ. 3)
+                CALL WizardWindowShow(IDD_RR_TOPAS)
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_SDI_file_Browse)
