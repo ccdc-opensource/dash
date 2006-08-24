@@ -78,47 +78,46 @@
 ! swapped in and out of memory. This is ugly and error-prone, but that's the way it is.
 ! Currently those dialogues are IDD_SX_Page1a, IDD_SAW_Page6a and IDD_RR_TOPAS.
 
-      CALL WDialogLoad(IDD_Structural_Information)
-      CALL WDialogLoad(IDD_Configuration)
-      CALL WDialogLoad(IDD_Index_Preparation)
-      CALL WDialogLoad(IDD_DV_Results)
+      CALL WDialogLoad(IDD_Structural_Information)         !  1
+      CALL WDialogLoad(IDD_Configuration)                  !  2
+      CALL WDialogLoad(IDD_Index_Preparation)              !  3
+      CALL WDialogLoad(IDD_DV_Results)                     !  4
 ! Set the colours of the grid manually
-      CALL WDialogLoad(IDD_Plot_Option_Dialog)
-      CALL WDialogLoad(IDD_Polyfitter_Wizard_01)
-      CALL WDialogLoad(IDD_PW_Page1)
-      CALL WDialogLoad(IDD_PW_Page3)
+      CALL WDialogLoad(IDD_Plot_Option_Dialog)             !  5
+      CALL WDialogLoad(IDD_Polyfitter_Wizard_01)           !  6
+      CALL WDialogLoad(IDD_PW_Page1)                       !  7
+      CALL WDialogLoad(IDD_PW_Page3)                       !  8
 
       ! This is the rebin Wizard window; it should be dynamically loaded
-      CALL WDialogLoad(IDD_PW_Page3a)
+      CALL WDialogLoad(IDD_PW_Page3a)                      !  9
 
-
-      CALL WDialogLoad(IDD_PW_Page4)
-      CALL WDialogLoad(IDD_PW_Page5)
-      CALL WDialogLoad(IDD_PW_Page6)
-      CALL WDialogLoad(IDD_PW_Page7)
-      CALL WDialogLoad(IDD_PW_Page8)
-      CALL WDialogLoad(IDD_PW_Page8b)
-      CALL WDialogLoad(IDD_PW_Page9)
-      CALL WDialogLoad(IDD_PW_Page10)
-      CALL WDialogLoad(IDD_SX_Page1)
-      CALL WDialogLoad(IDD_SX_Page2)
-      CALL WDialogLoad(IDD_Pawley_Status)
-      CALL WDialogLoad(IDD_SAW_Page1)
-      CALL WDialogLoad(IDD_zmEdit)
-      CALL WDialogLoad(IDD_zmEditRotations)
-      CALL WDialogLoad(IDD_SAW_Page2)
-      CALL WDialogLoad(IDD_SA_Modal_input2)
-      CALL WDialogLoad(IDD_ModalDialog)
-      CALL WDialogLoad(IDD_SA_input3_2)
-      CALL WDialogLoad(IDD_SA_input4)
-      CALL WDialogLoad(IDD_SA_Action1)
-      CALL WDialogLoad(IDD_Summary)
-      CALL WDialogLoad(IDD_SAW_Page5)
-      CALL WDialogLoad(IDD_SAW_Page6)
+      CALL WDialogLoad(IDD_PW_Page4)                       ! 10
+      CALL WDialogLoad(IDD_PW_Page5)                       ! 11
+      CALL WDialogLoad(IDD_PW_Page6)                       ! 12
+      CALL WDialogLoad(IDD_PW_Page7)                       ! 13
+      CALL WDialogLoad(IDD_PW_Page8)                       ! 14
+      CALL WDialogLoad(IDD_PW_Page8b)                      ! 15
+      CALL WDialogLoad(IDD_PW_Page9)                       ! 16
+      CALL WDialogLoad(IDD_PW_Page10)                      ! 17
+      CALL WDialogLoad(IDD_SX_Page1)                       ! 18
+      CALL WDialogLoad(IDD_SX_Page2)                       ! 19
+      CALL WDialogLoad(IDD_Pawley_Status)                  ! 20
+      CALL WDialogLoad(IDD_SAW_Page1)                      ! 21
+      CALL WDialogLoad(IDD_zmEdit)                         ! 22
+      CALL WDialogLoad(IDD_zmEditRotations)                ! 23
+      CALL WDialogLoad(IDD_SAW_Page2)                      ! 24
+      CALL WDialogLoad(IDD_SA_Modal_input2)                ! 25
+      CALL WDialogLoad(IDD_ModalDialog)                    ! 26
+      CALL WDialogLoad(IDD_SA_input3_2)                    ! 27
+      CALL WDialogLoad(IDD_SA_input4)                      ! 28
+      CALL WDialogLoad(IDD_SA_Action1)                     ! 29
+      CALL WDialogLoad(IDD_Summary)                        ! 30
+      CALL WDialogLoad(IDD_SAW_Page5)                      ! 31
+      CALL WDialogLoad(IDD_SAW_Page6)                      ! 32
 !      CALL WDialogLoad(IDD_Parameter_Status_2)
-      CALL WDialogLoad(IDD_OutputSolutions)
-      CALL WDialogLoad(IDD_Rietveld2)
-      CALL WDialogLoad(IDD_RR_PO_Dialog)
+      CALL WDialogLoad(IDD_OutputSolutions)                ! 33
+      CALL WDialogLoad(IDD_Rietveld2)                      ! 34
+      CALL WDialogLoad(IDD_RR_PO_Dialog)                   ! 35
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
