@@ -133,8 +133,6 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page3)
       CALL WDialogPutString(IDF_PWa_DataFileName_String, FNAME)
-      CALL WDialogSelect(IDD_PW_Page2)
-      CALL WDialogPutString(IDF_PW_DataFileName_String, FNAME)
       CALL PopActiveWindowID
 ! Update the status bar at the bottom of the screen.
       CALL WindowOutStatusBar(1, FNAME)
@@ -976,8 +974,6 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Data_Properties)
       CALL WDialogPutOption(IDF_Wavelength_Menu, IRadSelection)
-      CALL WDialogSelect(IDD_PW_Page2)
-      CALL WDialogPutOption(IDF_Wavelength_Menu, IRadSelection)
       CALL WDialogSelect(IDD_PW_Page4)
       CALL WDialogPutOption(IDF_Wavelength_Menu, IRadSelection)
       CALL PopActiveWindowID
@@ -1005,8 +1001,6 @@
 ! adjust the setting of the maximum resolution to maximum possible.
       CALL Update_TruncationLimits
       CALL WDialogSelect(IDD_Data_Properties)
-      CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
-      CALL WDialogSelect(IDD_PW_Page2)
       CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
       CALL WDialogSelect(IDD_PW_Page4)
       CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
@@ -1228,13 +1222,11 @@
       ELSE
         NotDisabled = Enabled
       ENDIF
-      DO WindowNr = 1, 3
+      DO WindowNr = 1, 2
         SELECT CASE (WindowNr)
           CASE (1) 
-            CALL WDialogSelect(IDD_PW_Page2)
-          CASE (2) 
             CALL WDialogSelect(IDD_PW_Page4)
-          CASE (3) 
+          CASE (2) 
             CALL WDialogSelect(IDD_Data_Properties)
         END SELECT
         SELECT CASE (JRadOption)

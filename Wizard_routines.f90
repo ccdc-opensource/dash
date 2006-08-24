@@ -221,7 +221,7 @@
               CALL EndWizard
             CASE (IDNEXT)
 ! We're off the main page and on to new pages depending on the option.
-              CALL WDialogGetRadioButton(IDF_PW_Option1,IPW_Option)
+              CALL WDialogGetRadioButton(IDF_PW_Option1, IPW_Option)
               SELECT CASE (IPW_Option)
                 CASE (1) ! View data / determine peaks positions
                   CALL WDialogSelect(IDD_PW_Page3)
@@ -229,23 +229,18 @@
                   CALL WDialogFieldStateLogical(IDNEXT, FnPatternOK())
                   CALL WDialogFieldStateLogical(IDB_Bin, FnPatternOK())
                   CALL WizardWindowShow(IDD_PW_Page3)
-                CASE (2) ! Preparation for Pawley refinement
-                  CALL WDialogSelect(IDD_PW_Page2)
-! If we have loaded a powder pattern, the Next > button should be enabled
-                  CALL WDialogFieldStateLogical(IDNEXT, FnPatternOK())
-                  CALL WizardWindowShow(IDD_PW_Page2)
-                CASE (3) ! Single crystal
+                CASE (2) ! Single crystal
                   CALL WDialogSelect(IDD_SX_Page1)
                   ZeroPoint = 0.0
                   CALL Upload_ZeroPoint               
                   CALL Generate_TicMarks
                   CALL WizardWindowShow(IDD_SX_Page1)
-                CASE (4) ! Simulated annealing structure solution
+                CASE (3) ! Simulated annealing structure solution
                   CALL ShowWizardWindowZmatrices
-                CASE (5) ! Analyse solutions
+                CASE (4) ! Analyse solutions
                   CALL WizardWindowShow(IDD_SAW_Page5)
                   CALL SelectMode(IDB_AnalyseSolutions)
-                CASE (6) ! Rietveld refinement
+                CASE (5) ! Rietveld refinement
                   CALL WizardWindowShow(IDD_SAW_Page6)
                   CALL WDialogFieldState(IDNEXT, Disabled)
                   CALL WDialogFieldState(IDB_Restart, Disabled)
@@ -833,8 +828,10 @@
               CALL WDialogFieldState(IDF_SmoothWindow, tFieldState)
             CASE ( IDF_UseSmooth )
               IF ( WDialogGetCheckBoxLogical(IDF_UseSmooth) ) THEN
+                CALL WDialogFieldState(IDF_LABEL3, Enabled)
                 CALL WDialogFieldState(IDF_SmoothWindow, Enabled)
               ELSE
+                CALL WDialogFieldState(IDF_LABEL3, Disabled)
                 CALL WDialogFieldState(IDF_SmoothWindow, Disabled)
               ENDIF
           END SELECT
@@ -1412,6 +1409,19 @@
               M = InfoError(1) ! Clear errors
               CALL IOSCommand('CMD.EXE /C '//DICVOL04EXE(1:I)//' < in.txt', ProcBlocked)
               IF (InfoError(1) .NE. 0) GOTO 998
+              CALL WCursorShape(CurCrossHair)
+
+
+              CALL ParseDICVOL04OutputFile()
+
+
+              ! #### TODO need to reconsider the following. Ideally, we should fill the
+              !  "Results from DICVOL" Wizard window and jump to that window.
+
+              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
+              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
+              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
+
 ! Pop up a window showing the DICVOL output file in a text editor
               CALL WindowOpenChild(iHandle)
               CALL WEditFile('DICVOL.out', Modeless, 0, FileMustExist+ViewOnly+NoToolBar, 4)
@@ -1424,11 +1434,17 @@
 ! on screen. To save one of the output files (that all have the same name),
 ! the user must use the "Save As..." button from the same window.
               CALL SetChildWinAutoClose(iHandle)
-              CALL WCursorShape(CurCrossHair)
+
               CALL WDialogSelect(IDD_PW_Page1)
 ! If the cell is OK, the Next> button should be enabled
               CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
               CALL WizardWindowShow(IDD_PW_Page1)
+
+              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
+              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
+              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
+
+!F              CALL WizardWindowShow(IDD_PW_Page9)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -1452,6 +1468,71 @@
       CALL WCursorShape(CurCrossHair)
 
       END SUBROUTINE DealWithWizardWindowDICVOL04
+!
+!*****************************************************************************
+!
+      SUBROUTINE ParseDICVOL04OutputFile
+
+      IMPLICIT NONE
+
+      INTEGER, EXTERNAL :: StrFind
+      INTEGER hFile
+      INTEGER iLen, iPos
+      CHARACTER(10) tFileName
+      CHARACTER(255) tLine
+      CHARACTER(17) direct_parameters_str
+      CHARACTER(18) FoM_str
+      INTEGER       FoM_stage ! 1 = first to follow, 2 = second to follow, 0 = not pertinent
+      REAL          a, b, c, alpha, beta, gamma, M, F
+
+      CALL PushActiveWindowID
+      direct_parameters_str = 'DIRECT PARAMETERS'
+      FoM_str = '* FIGURES OF MERIT'
+      tFileName = 'DICVOL.out'
+      FoM_stage = 0
+      hFile = 117
+      OPEN(UNIT=hFile, FILE=tFileName, STATUS='UNKNOWN', ERR=999)
+   10 CONTINUE
+      READ(hFile, '(A)', ERR=999, END=100) tLine
+      iLen = LEN_TRIM(tLine)
+      iPos = StrFind(tLine, iLen, direct_parameters_str, 17)
+      IF ( iPos .NE. 0 ) THEN
+        READ(tLine(28:37), *, ERR=999, END=100) a 
+        READ(tLine(41:50), *, ERR=999, END=100) b 
+        READ(tLine(54:63), *, ERR=999, END=100) c 
+        READ(tLine(28:37), *, ERR=999, END=100) alpha 
+        READ(tLine(28:37), *, ERR=999, END=100) beta 
+        READ(tLine(28:37), *, ERR=999, END=100) gamma 
+
+        GOTO 10
+      ENDIF
+
+      iPos = StrFind(tLine, iLen, FoM_str, 18)
+      IF ( iPos .NE. 0 ) THEN
+        FoM_stage = 1
+        GOTO 10
+      ENDIF
+      IF ( FoM_stage .EQ. 1 ) THEN
+        READ(tLine(28:37), *, ERR=999, END=100) M 
+        FoM_stage = 2
+        GOTO 10
+      ENDIF
+      IF ( FoM_stage .EQ. 2 ) THEN
+        READ(tLine(28:37), *, ERR=999, END=100) F 
+        FoM_stage = 0
+      ENDIF
+      GOTO 10
+  100 CLOSE(hFile)
+
+
+
+      CALL PopActiveWindowID
+      RETURN
+  999 CALL ErrorMessage("Error reading DICVOL04 output file.")
+      CLOSE(hFile)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE ParseDICVOL04OutputFile
 !
 !*****************************************************************************
 !
@@ -1532,72 +1613,6 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE DealWithWizardWindowDiffractionSetup2
-!
-! The above 9 windows have taken me months to program.
-! This window bypasses all of them, because Elna wants that.
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
-
-      INTEGER, EXTERNAL :: DiffractionFileBrowse, DiffractionFileOpen
-      INTEGER IRadSelection
-      CHARACTER(LEN=MaxPathLength) CTEMP
-      REAL    Temp
-      INTEGER ISTAT
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page2)
-      SELECT CASE (EventType)
-        CASE (PushButton) ! one of the buttons was pushed
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDBACK)
-              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
-            CASE (IDNEXT)
-              CALL WizardWindowShow(IDD_PW_Page1)
-            CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizard
-            CASE (ID_PW_DF_Open)
-              CALL WDialogGetString(IDF_PW_DataFileName_String, CTEMP)
-              ISTAT = DiffractionFileOpen(CTEMP)
-              CALL WDialogFieldStateLogical(IDNEXT,ISTAT .EQ. 1)
-            CASE (IDBBROWSE)
-              ISTAT = DiffractionFileBrowse()
-! Don't change if the user pressed 'Cancel' (ISTAT = 2)
-              IF      (ISTAT .EQ. 0) THEN
-                CALL WDialogFieldState(IDNEXT, Enabled)
-              ELSE IF (ISTAT .EQ. 1) THEN
-                CALL WDialogFieldState(IDNEXT, Disabled)
-              ENDIF
-          END SELECT
-        CASE (FieldChanged)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_LabX_Source,IDF_SynX_Source, IDF_CWN_Source, IDF_TOF_source)
-              CALL WDialogGetRadioButton(IDF_LabX_Source, JRadOption)
-              CALL Upload_Source
-              CALL Generate_TicMarks 
-            CASE (IDF_wavelength1)
-              CALL WDialogGetReal(IDF_wavelength1, Temp)
-              CALL Set_Wavelength(Temp)
-              CALL Generate_TicMarks 
-            CASE (IDF_Wavelength_Menu)
-              CALL WDialogGetMenu(IDF_Wavelength_Menu, IRadSelection)
-              CALL SetWavelengthToSelection(IRadSelection)
-              CALL Generate_TicMarks 
-          END SELECT                
-      END SELECT
-      CALL PopActiveWindowID
-
-      END SUBROUTINE DealWithWizardWindowDiffractionSetup2
-!
-!*****************************************************************************
-!
       SUBROUTINE DealWithWizardWindowUnitCellParameters
 
       USE WINTERACTER
@@ -1611,7 +1626,7 @@
       LOGICAL SpaceGroupDetermination
       COMMON /SGFLAG/ SpaceGroupDetermination
 
-      INTEGER IOption
+      INTEGER iOption
       LOGICAL, EXTERNAL :: Confirm
 
       CALL PushActiveWindowID
@@ -1627,24 +1642,16 @@
             CASE (IDBACK)
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
-! There were three ways to get here:
-!   1. choose option 2 in main Wizard window
-!   2. choose 'Enter known cell' in wizard window Indexing I
-!   3. after DICVOL, after choosing 'Index now' in wizard window Indexing I
-! Did we get here from the main wizard window?
-              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
-              CALL WDialogGetRadioButton(IDF_PW_Option1, IOption)
-              IF (IOption .EQ. 2) THEN
-                CALL WizardWindowShow(IDD_PW_Page2)
-              ELSE
+! There were two ways to get here:
+!   1. choose 'Enter known cell' in wizard window Indexing I
+!   2. after DICVOL, after choosing 'Index now' in wizard window Indexing I
 ! Did we get here from 'Enter known cell' in wizard window Indexing I?
-                CALL WDialogSelect(IDD_PW_Page7)
-                CALL WDialogGetRadioButton(IDF_RADIO3, IOption) ! 'Index now' or 'Enter known cell'
-                IF (IOption .EQ. 1) THEN
-                  CALL WizardWindowShow(IDD_PW_Page9)
-                ELSE
-                  CALL WizardWindowShow(IDD_PW_Page7)
-                ENDIF
+              CALL WDialogSelect(IDD_PW_Page7)
+              CALL WDialogGetRadioButton(IDF_RADIO3, iOption) ! 'Index now' or 'Enter known cell'
+              IF (iOption .EQ. 1) THEN
+                CALL WizardWindowShow(IDD_PW_Page9)
+              ELSE
+                CALL WizardWindowShow(IDD_PW_Page7)
               ENDIF
             CASE (IDNEXT)
               CALL Download_SpaceGroup(IDD_PW_Page1)

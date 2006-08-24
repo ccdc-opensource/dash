@@ -1,4 +1,4 @@
-! Winteracter module created : 01/Aug/2006 11:14:34
+! Winteracter module created : 24/Aug/2006 10:57:18
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -140,7 +140,6 @@
           INTEGER, PARAMETER :: IDD_PW_Page9                    =   151
           INTEGER, PARAMETER :: ID_PW_DF_Open                   =  1210
           INTEGER, PARAMETER :: IDD_PW_Page1                    =   122
-          INTEGER, PARAMETER :: IDD_PW_Page2                    =   123
           INTEGER, PARAMETER :: IDF_PW_Data_Group               =  1239
           INTEGER, PARAMETER :: IDF_PW_Data_Filename            =  1143
           INTEGER, PARAMETER :: IDF_PW_DataFileName_String      =  1201
@@ -151,7 +150,6 @@
           INTEGER, PARAMETER :: IDF_PWa_Data_Group              =  1261
           INTEGER, PARAMETER :: IDF_PWa_Data_fFilename          =  1262
           INTEGER, PARAMETER :: IDF_PWa_DataFileName_String     =  1263
-          INTEGER, PARAMETER :: IDF_PW_Option2                  =  1252
           INTEGER, PARAMETER :: IDF_PW_Option3                  =  1253
           INTEGER, PARAMETER :: IDF_PW_Option4                  =  1254
           INTEGER, PARAMETER :: IDF_PW_Option5                  =  1255

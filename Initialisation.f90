@@ -75,7 +75,7 @@
 
 ! Problem here: apparently, WinterActer can only deal with up to 39 dialogue windows being
 ! loaded. We have quite a few more than that. As a result, some dialogues need to be
-! swapped in and out of memory. Thisis ugly and error-prone, but that's the way it is.
+! swapped in and out of memory. This is ugly and error-prone, but that's the way it is.
 ! Currently those dialogues are IDD_SX_Page1a, IDD_SAW_Page6a and IDD_RR_TOPAS.
 
       CALL WDialogLoad(IDD_Structural_Information)
@@ -86,7 +86,6 @@
       CALL WDialogLoad(IDD_Plot_Option_Dialog)
       CALL WDialogLoad(IDD_Polyfitter_Wizard_01)
       CALL WDialogLoad(IDD_PW_Page1)
-      CALL WDialogLoad(IDD_PW_Page2)
       CALL WDialogLoad(IDD_PW_Page3)
 
       ! This is the rebin Wizard window; it should be dynamically loaded
