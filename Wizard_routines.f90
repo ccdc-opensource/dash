@@ -13,10 +13,6 @@
 
       CALL SetModeMenuState(1,0)
       CALL SelectMode(ID_Peak_Fitting_Mode)
-!O! Grey out "Subtract Background" button in Toolbar
-!O      CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOff)
-!O      CALL WDialogSelect(IDD_Background_Fit)
-!O      CALL WDialogHide
       CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
 
       END SUBROUTINE StartWizard
@@ -108,8 +104,6 @@
       ENDIF
       CALL SelectMode(ID_Peak_Fitting_Mode)
       CALL WMenuSetState(ID_Start_Wizard, ItemEnabled, WintOn)
-!O! Ungrey "Subtract Background" button in Toolbar
-!O      IF (FnPatternOK()) CALL WMenuSetState(ID_Remove_Background,ItemEnabled,WintOn)
 
       END SUBROUTINE EndWizard
 !
