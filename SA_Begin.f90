@@ -47,11 +47,10 @@
       INTEGER StartDate, EndDate, DSLen
       INTEGER StartTime, EndTime
 
-      IF (CheckOverwriteSaOutput() .EQ. 0) THEN
-        CALL WizardWindowShow(IDD_SA_input3_2)
+      IF ( CheckOverwriteSaOutput() .EQ. 0 ) THEN
+        CALL WizardWindowShow(IDD_SA_input4)
         RETURN
       ENDIF
-      CALL WDialogSelect(IDD_SA_input3_2)
       ! Initialise LOGICALs that tell us if this parameter is either a translation or a torsion
       ! angle that is allowed to vary over its full range. Because if so, e.g. a translation of, say, 1.10
       ! should be renormalised to 0.10 during the SA
