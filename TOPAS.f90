@@ -309,17 +309,25 @@
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
       INTEGER, EXTERNAL :: StrFind
+      CHARACTER*20, EXTERNAL :: Integer2String
       INTEGER hFileTOPAS, hOutputFile
       INTEGER iLen, iPos, iStrPos
       LOGICAL is_last_line
       CHARACTER(255) tLine
       CHARACTER(6) hkl_str
       CHARACTER(11) space_group_str
-      CHARACTER(5) b_str
+      CHARACTER(6) b_str
       INTEGER b_str_len, tElement, J
-      INTEGER ii, iiact, iTotal, iFrg, iOrig, iAtom
+      INTEGER ii, iTotal, iFrg, iAtom, iAtom1, iAtom2
       REAL    distance
+      LOGICAL refine_Biso
+      CHARACTER(7) LabelStr, LabelStr1, LabelStr2
+      CHARACTER*20 tStr
+      INTEGER iLen1, iLen2
+      CHARACTER*3 tElementStr
 
+      ! This needs to be in the GUI somewhere.
+      refine_Biso = .FALSE.
       ! Initialise to failure
       WriteTOPASFileRietveld = 1
       hkl_str = 'hkl_Is'
@@ -361,15 +369,15 @@
       ENDIF
       WRITE(hFileTOPAS, '(A)', ERR=999) "'   Insert @ in the curly brackets to refine structural parameters"
       WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
-      iiact = 0
-      itotal = 0
+      ! #########################################################################################
+      ! TOPAS needs unique atom labels ("site labels"), especially when applying restraints.
+      ! This is a problem for DASH where we use user-supplied labels.
+      ! This is especially a problem if there is more than one Z-matrix in the asymmetric unit.
+      ! #########################################################################################
+      iTotal = 0
       DO iFrg = 1, nFrag
-        itotal = iiact
         DO iAtom = 1, natoms(iFrg)
-          iiact = iiact + 1
-          iOrig = izmbid(iAtom,iFrg)
-          ii = OrderedAtm(itotal + iOrig)
-          tElement = zmElementCSD(iOrig,iFrg)
+          tElement = zmElementCSD(iAtom,iFrg)
           IF ( (tElement .EQ. 2) .OR. (tElement .EQ. 27) ) THEN
             ! Hydrogen or deuterium
             b_str = 'bh'
@@ -378,15 +386,27 @@
             b_str = 'bnonh'
             b_str_len = 5
           ENDIF
-          WRITE(hFileTOPAS, '(A,A5,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,F6.3)', ERR=999) '    site  ', OriginalLabel(iOrig,iFrg), ' x ref_flag ', &
+          IF ( .NOT. refine_Biso ) THEN
+            b_str = '!'//b_str
+            b_str_len = b_str_len + 1
+          ENDIF
+          tStr = Integer2String(iTotal + iAtom)
+          iLen1 = LEN_TRIM(tStr)
+          tElementStr = ElementStr(tElement)
+          iLen2 = LEN_TRIM(tElementStr)
+          LabelStr = tElementStr(1:iLen2)//tStr(1:iLen1)
+          ii = OrderedAtm(iTotal + iAtom) ! For Xato()
+          WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,1X,F6.3)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
             Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
-            occ(iOrig,iFrg), ' beq '//b_str(1:b_str_len), tiso(iOrig,iFrg)
+            occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len), tiso(iAtom,iFrg)
         ENDDO
+        iTotal = iTotal + natoms(iFrg)
       ENDDO
       WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_width 0'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_weight 10000'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_width 1'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_weight 1'
+      iTotal = 0
       DO iFrg = 1, nFrag
         ! Convert internal coordinates to orthogonal coordinates
         CALL makexyz(natoms(iFrg),RR_blen(1,iFrg),RR_alph(1,iFrg),RR_bet(1,iFrg),        &
@@ -397,15 +417,31 @@
         natcry = natoms(iFrg)
         ! Detect bonds and their types (to find benzene rings for Flatten macro)
         CALL SAMABO()
+        ! ##### Distance restraints #####
         DO J = 1, nbocry
-          CALL PLUDIJ(bond(J,1), bond(J,2), distance)
-          WRITE(hFileTOPAS, '(A,A5,1X,A5,A,F9.5,A)', ERR=999) 'Distance_Restrain(', OriginalLabel(bond(J,1),iFrg), OriginalLabel(bond(J,2),iFrg), &
+          iAtom1 = bond(J,1)
+          iAtom2 = bond(J,2)
+          CALL PLUDIJ(iAtom1, iAtom2, distance)
+          tStr = Integer2String(iTotal + iAtom1)
+          iLen1 = LEN_TRIM(tStr)
+          tElementStr = ElementStr(zmElementCSD(iAtom1,iFrg))
+          iLen2 = LEN_TRIM(tElementStr)
+          LabelStr1 = tElementStr(1:iLen2)//tStr(1:iLen1)
+          tStr = Integer2String(iTotal + iAtom2)
+          iLen1 = LEN_TRIM(tStr)
+          tElementStr = ElementStr(zmElementCSD(iAtom2,iFrg))
+          iLen2 = LEN_TRIM(tElementStr)
+          LabelStr2 = tElementStr(1:iLen2)//tStr(1:iLen1)
+          WRITE(hFileTOPAS, '(A,A7,1X,A7,A,F9.5,A)', ERR=999) 'Distance_Restrain(', LabelStr1, LabelStr2, &
             ', ', distance, ', 1.0, bond_width, bond_weight)'
         ENDDO
 
+        ! ##### Angle restraints #####
+
+        ! ##### Flatten #####
+
+        iTotal = iTotal + natoms(iFrg)
       ENDDO
-
-
       WRITE(hFileTOPAS, '(A)', ERR=999) '    do_errors'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//OutputFilesBaseName(1:OFBN_Len)//'.cif")'
       WriteTOPASFileRietveld = 0
