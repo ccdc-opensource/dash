@@ -79,16 +79,15 @@
           ENDIF
           OrderedAtm(tAtomNumber) = item ! To make life easier, we just use a mapping in MAKEFRAC
           AtomicNumber = atnr(zmElementCSD(iAtom,iFrg))
-          IF (AbsorbHydrogens) AtomicNumber = AtomicNumber + NumOfBondedHydrogens(iAtom, iFrg)
           Element = ElmNumber2CSD(AtomicNumber)
           DO iRef = 1, NumOfRef
             ssq = 0.25*DSTAR(iRef)**2
-            atem(item,iRef) = occ(iAtom,iFrg) * AScFac(ssq,Element)
-            IF (AbsorbHydrogens) THEN
-              btem(item,iRef) = tiso(iAtom,iFrg)*ssq * (1.0 + FLOAT(NumOfBondedHydrogens(iAtom, iFrg))/10.0)
+            IF ( AbsorbHydrogens ) THEN
+              atem(item,iRef) = occ(iAtom,iFrg) * AScFac(ssq,Element) * (1.0 + (FLOAT(NumOfBondedHydrogens(iAtom, iFrg))/FLOAT(AtomicNumber)))
             ELSE
-              btem(item,iRef) = tiso(iAtom,iFrg)*ssq
+              atem(item,iRef) = occ(iAtom,iFrg) * AScFac(ssq,Element)
             ENDIF
+            btem(item,iRef) = tiso(iAtom,iFrg)*ssq
             FOB(item,iRef) = atem(item,iRef)*EXP(-btem(item,iRef))
           ENDDO
         ENDDO
