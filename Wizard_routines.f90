@@ -585,20 +585,28 @@
                 CALL TruncateData(tMin,tMax)
               ELSE
                 IF ( For_TOPAS ) THEN
-                  CALL WDialogLoad(IDD_RR_TOPAS)
+!O                  CALL WDialogLoad(IDD_RR_TOPAS)
                   iFlags = SaveDialog + AppendExt + PromptOn
                   FILTER = 'TOPAS input file (*.inp)|*.inp|'
                   TOPASFileName = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
                   CALL WSelectFile(FILTER, iFlags, TOPASFileName, 'Save TOPAS input file (Pawley)')
                   IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPASFileName) .NE. 0)) THEN
+!O                    IF ( WriteTOPASFilePawley(TOPASFileName) .EQ. 0 ) THEN
+!O                      TOPAS_stage = 2 ! I think this variable is redundant
+!O                      CALL WDialogSelect(IDD_RR_TOPAS)
+!O                      CALL WDialogFieldStateLogical(IDB_Write_Pawley, .FALSE.)
+!O                      CALL WDialogFieldStateLogical(IDB_Browse,       .TRUE.)
+!O                      CALL WizardWindowShow(IDD_SAW_Page7)
+!O                    ENDIF
                     IF ( WriteTOPASFilePawley(TOPASFileName) .EQ. 0 ) THEN
-                      TOPAS_stage = 2 ! I think this variable is redundant
-                      CALL WDialogSelect(IDD_RR_TOPAS)
-                      CALL WDialogFieldStateLogical(IDB_Write_Pawley, .FALSE.)
-                      CALL WDialogFieldStateLogical(IDB_Browse,       .TRUE.)
+                      TOPAS_stage = 2
+                      CALL WDialogSelect(IDD_SAW_Page7)
+                      CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPASFileName)
+                      CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
+                      CALL UpdateTOPASCheckBoxes()
+                      CALL WizardWindowShow(IDD_SAW_Page7)
                     ENDIF
                   ENDIF
-                  CALL WizardWindowShow(IDD_RR_TOPAS)
                 ELSE
                   CALL WizardWindowShow(IDD_PW_Page6)
                 ENDIF

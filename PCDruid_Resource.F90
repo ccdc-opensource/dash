@@ -1,4 +1,4 @@
-! Winteracter module created : 24/Aug/2006 10:57:18
+! Winteracter module created : 28/Aug/2006 15:46:08
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -656,13 +656,23 @@
           INTEGER, PARAMETER :: IDB_Write_Pawley                =  1214
           INTEGER, PARAMETER :: IDB_Browse                      =  1296
           INTEGER, PARAMETER :: IDB_Write_RR                    =  1370
-          INTEGER, PARAMETER :: IDD_Test                        =   140
+          INTEGER, PARAMETER :: IDF_TOPAS_inp_file_name         =  1372
           INTEGER, PARAMETER :: IDB_WRITE                       =  1371
-          INTEGER, PARAMETER :: IDF_REAL1                       =  1372
-          INTEGER, PARAMETER :: IDF_CHECK4                      =  1399
+          INTEGER, PARAMETER :: IDB_UsePrevious                 =  1399
           INTEGER, PARAMETER :: IDC_wl_in_xye                   =  1439
           INTEGER, PARAMETER :: IDD_SA_input5                   =   142
           INTEGER, PARAMETER :: IDF_STRING1                     =  1442
           INTEGER, PARAMETER :: IDF_NumOfIterations2            =  1212
           INTEGER, PARAMETER :: IDF_NumOfIterations3            =  1213
+          INTEGER, PARAMETER :: IDD_SAW_Page7                   =   123
+          INTEGER, PARAMETER :: IDC_Scale                       =  1252
+          INTEGER, PARAMETER :: IDC_Background                  =  1443
+          INTEGER, PARAMETER :: IDC_Coordinates                 =  1444
+          INTEGER, PARAMETER :: IDC_PeakShape                   =  1445
+          INTEGER, PARAMETER :: IDC_UnitCell                    =  1446
+          INTEGER, PARAMETER :: IDC_Biso                        =  1447
+          INTEGER, PARAMETER :: IDC_WriteCIF                    =  1448
+          INTEGER, PARAMETER :: IDC_IncludeESDs                 =  1449
+          INTEGER, PARAMETER :: IDC_UseDASHRecommendation       =  1450
+          INTEGER, PARAMETER :: IDC_IncludeFlatten              =  1451
       END MODULE Druid_Header
