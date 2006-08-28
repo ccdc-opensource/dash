@@ -75,7 +75,7 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-      INTEGER, EXTERNAL :: WriteTOPASFileRietveld
+      INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
       INTEGER, EXTERNAL :: DiffractionFileBrowse
       LOGICAL, EXTERNAL :: FnPatternOK
       CHARACTER(MaxPathLength) :: TOPASFileName
@@ -100,6 +100,13 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL Unload_RR_TOPAS
               CALL EndWizardPastPawley
+            CASE (IDB_UsePrevious)
+              CALL Unload_RR_TOPAS
+              TOPAS_stage = 2
+              CALL WDialogSelect(IDD_SAW_Page7)
+              CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
+              CALL UpdateTOPASCheckBoxes()
+              CALL WizardWindowShow(IDD_SAW_Page7)
             CASE (IDB_Write_Pawley)
               For_TOPAS = .TRUE.
               CALL Unload_RR_TOPAS
@@ -125,7 +132,7 @@
               TOPASFileName = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
               CALL WSelectFile(FILTER, iFlags, TOPASFileName, 'Save TOPAS input file (Rietveld)')
               IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPASFileName) .NE. 0)) THEN
-                IF ( WriteTOPASFileRietveld(TOPASFileName) .EQ. 0 ) THEN
+                IF ( WriteTOPASFileRietveld2(TOPASFileName) .EQ. 0 ) THEN
                   TOPAS_stage = 1 ! I think this variable is redundant
                   CALL WDialogFieldStateLogical(IDB_Write_RR,     .FALSE.)
                   CALL WDialogFieldStateLogical(IDB_Write_Pawley, .TRUE.)
@@ -274,8 +281,123 @@
 !
 !*****************************************************************************
 ! 
-      INTEGER FUNCTION WriteTOPASFileRietveld(tFileName)
+      SUBROUTINE UpdateTOPASCheckBoxes
 
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SAW_Page7)
+      IF ( .NOT. WDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) RETURN
+      SELECT CASE ( TOPAS_stage )
+        CASE ( 2 ) ! First Rietveld refinement: refine scale only
+          CALL WDialogPutCheckBoxLogical(IDC_Scale, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_IncludeFlatten, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso, .FALSE.)
+!          CALL WDialogPutCheckBoxLogical(IDC_PeakShape, .FALSE.)
+!          CALL WDialogPutCheckBoxLogical(IDC_UnitCell, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+        CASE ( 3 ) ! First Rietveld refinement: refine scale only
+          CALL WDialogPutCheckBoxLogical(IDC_Scale, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_IncludeFlatten, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso, .FALSE.)
+!          CALL WDialogPutCheckBoxLogical(IDC_PeakShape, .FALSE.)
+!          CALL WDialogPutCheckBoxLogical(IDC_UnitCell, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+        CASE ( 4 ) ! First Rietveld refinement: refine scale only
+          CALL WDialogPutCheckBoxLogical(IDC_Scale, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_IncludeFlatten, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso, .FALSE.)
+!          CALL WDialogPutCheckBoxLogical(IDC_PeakShape, .FALSE.)
+!          CALL WDialogPutCheckBoxLogical(IDC_UnitCell, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+        CASE ( 5 ) ! First Rietveld refinement: refine scale only
+          CALL WDialogPutCheckBoxLogical(IDC_Scale, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
+   !       CALL WDialogPutCheckBoxLogical(IDC_IncludeFlatten, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso, .TRUE.)
+!          CALL WDialogPutCheckBoxLogical(IDC_PeakShape, .FALSE.)
+!          CALL WDialogPutCheckBoxLogical(IDC_UnitCell, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .TRUE.)
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE UpdateTOPASCheckBoxes
+!
+!*****************************************************************************
+! 
+! The initialisation of this window is done in DealWithWizardWindowProfileRange()
+! in Wizard_routines.f90
+      SUBROUTINE DealWithRR_TOPAS
+
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
+      CHARACTER*255 TOPASFileName, tDirName, tFileName, tExtension
+      INTEGER ExtLength
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SAW_Page7)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              ! ###### TODO: we could decide to move the loading of Wizard
+              ! dialogues that are swapped in and out of memory to WizardWindowShow() 
+              CALL WDialogLoad(IDD_RR_TOPAS)
+              CALL WizardWindowShow(IDD_RR_TOPAS)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (IDBBROWSE)
+
+            CASE (IDB_WRITE)
+              CALL WDialogGetString(IDF_TOPAS_inp_file_name, TOPASFileName)
+              IF ( LEN_TRIM(TOPASFileName) .EQ. 0 ) THEN
+                CALL ErrorMessage('No file name given.')
+                RETURN
+              ENDIF
+              ExtLength = 3
+              CALL SplitPath2(TOPASFileName, tDirName, tFileName, tExtension, ExtLength)
+              CALL StrUpperCase(tExtension)
+              TOPASFileName = tDirName(1:LEN_TRIM(tDirName))//tFileName(1:LEN_TRIM(tFileName))//'.inp'
+              TOPAS_output_file_name  = tDirName(1:LEN_TRIM(tDirName))//tFileName(1:LEN_TRIM(tFileName))//'.out'
+              CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPAS_output_file_name)
+              IF ( WriteTOPASFileRietveld2(TOPASFileName) .EQ. 0 ) THEN
+                CALL InfoMessage('TOPAS .inp file has been written.')
+                TOPAS_stage = TOPAS_stage + 1
+                CALL UpdateTOPASCheckBoxes()
+              ENDIF
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithRR_TOPAS
+!
+!*****************************************************************************
+! 
+! This function only writes files for stage 2, i.e. it can only read the output file
+! from the Pawley refinement and write out the very first Rietveld refinement file.
+      INTEGER FUNCTION WriteTOPASFileRietveld2(tFileName)
+
+      USE DRUID_HEADER
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR
@@ -308,28 +430,47 @@
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
-      INTEGER, EXTERNAL :: StrFind
+      INTEGER MaxAAStack
+      PARAMETER (MaxAAStack = 150)
+
+      INTEGER            AAStackPtr, AAStack
+      COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)
+
+      INTEGER, EXTERNAL :: StrFind, assembly_size
       CHARACTER*20, EXTERNAL :: Integer2String
+      LOGICAL, EXTERNAL :: assembly_contains, has_aromatic_bond, WDialogGetCheckBoxLogical
       INTEGER hFileTOPAS, hOutputFile
       INTEGER iLen, iPos, iStrPos
       LOGICAL is_last_line
-      CHARACTER(255) tLine
+      CHARACTER(512) tLine
       CHARACTER(6) hkl_str
+!      CHARACTER(10) word
+!      INTEGER       word_len
       CHARACTER(11) space_group_str
       CHARACTER(6) b_str
       INTEGER b_str_len, tElement, J
       INTEGER ii, iTotal, iFrg, iAtom, iAtom1, iAtom2
-      REAL    distance
+      REAL    distance, angle
       LOGICAL refine_Biso
       CHARACTER(7) LabelStr, LabelStr1, LabelStr2
       CHARACTER*20 tStr
-      INTEGER iLen1, iLen2
+      INTEGER iLen1, iLen2, K
       CHARACTER*3 tElementStr
+      INTEGER Ncon, J1, J2
+      INTEGER Icon(30), Icob(30)
+      LOGICAL include_flatten
+      CHARACTER(7) flatten_labels(MaxAtm_3)
+      INTEGER nFlatten
+      ! We need to remember which atoms have been assigned to an assembly
+      INTEGER sum_of_assemblies(1:MaxAtm_3)
+      INTEGER current_assembly(1:MaxAtm_3)
 
       ! This needs to be in the GUI somewhere.
       refine_Biso = .FALSE.
+      include_flatten = .TRUE.
+      CALL WDialogSelect(IDD_SAW_Page7)
       ! Initialise to failure
-      WriteTOPASFileRietveld = 1
+      WriteTOPASFileRietveld2 = 1
       hkl_str = 'hkl_Is'
       space_group_str = 'space_group'
       hFileTOPAS = 116
@@ -348,16 +489,25 @@
       ELSE
         iPos = StrFind(tLine, iLen, space_group_str, 11)
         is_last_line = ( iPos .NE. 0 ) 
-        ! We only want to refine the overall scale, so change all the other @'s to spaces.
+        ! Change all the @'s to spaces.
         DO iStrPos = 1, iLen
           IF (tLine(iStrPos:iStrPos) .EQ. '@') &
             tLine(iStrPos:iStrPos) = ' '
         ENDDO
+        IF ( tLine(1:6) .EQ. '  bkg ' ) THEN
+          IF ( WDialogGetCheckBoxLogical(IDC_Background) ) THEN
+            tLine(7:7) = '@'
+          ENDIF 
+        ENDIF
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ENDIF
       IF ( .NOT. is_last_line ) GOTO 10
       CLOSE(hOutputFile)
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 1.0'
+      IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 1.0'
+      ELSE
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    scale   1.0'
+      ENDIF
 ! We must call ShowWizardWindowRietveld() here, which will fill
 ! Xato (and all the RR variables). The Wizard window is suppressed because of the For_TOPAS flag.
       CALL ShowWizardWindowRietveld(RR_SA_Sol)
@@ -368,11 +518,17 @@
         WRITE(hFileTOPAS, '(A)', ERR=999) '    PO( , 1.0, , 1 0 0)'
       ENDIF
       WRITE(hFileTOPAS, '(A)', ERR=999) "'   Insert @ in the curly brackets to refine structural parameters"
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
+      IF ( WDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag { @ }'
+      ELSE
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
+      ENDIF
       ! #########################################################################################
       ! TOPAS needs unique atom labels ("site labels"), especially when applying restraints.
       ! This is a problem for DASH where we use user-supplied labels.
       ! This is especially a problem if there is more than one Z-matrix in the asymmetric unit.
+      ! (Would it have been possible to solve this using the "scopes" in TOPAS?, I.e. define each
+      ! Z-matrix in its own scope and then define its restraints within the same scope?)
       ! #########################################################################################
       iTotal = 0
       DO iFrg = 1, nFrag
@@ -386,7 +542,7 @@
             b_str = 'bnonh'
             b_str_len = 5
           ENDIF
-          IF ( .NOT. refine_Biso ) THEN
+          IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
             b_str = '!'//b_str
             b_str_len = b_str_len + 1
           ENDIF
@@ -395,7 +551,7 @@
           tElementStr = ElementStr(tElement)
           iLen2 = LEN_TRIM(tElementStr)
           LabelStr = tElementStr(1:iLen2)//tStr(1:iLen1)
-          ii = OrderedAtm(iTotal + iAtom) ! For Xato()
+          ii = OrderedAtm(iTotal + iAtom) ! Needed for Xato()
           WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,1X,F6.3)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
             Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
             occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len), tiso(iAtom,iFrg)
@@ -422,29 +578,77 @@
           iAtom1 = bond(J,1)
           iAtom2 = bond(J,2)
           CALL PLUDIJ(iAtom1, iAtom2, distance)
-          tStr = Integer2String(iTotal + iAtom1)
-          iLen1 = LEN_TRIM(tStr)
-          tElementStr = ElementStr(zmElementCSD(iAtom1,iFrg))
-          iLen2 = LEN_TRIM(tElementStr)
-          LabelStr1 = tElementStr(1:iLen2)//tStr(1:iLen1)
-          tStr = Integer2String(iTotal + iAtom2)
-          iLen1 = LEN_TRIM(tStr)
-          tElementStr = ElementStr(zmElementCSD(iAtom2,iFrg))
-          iLen2 = LEN_TRIM(tElementStr)
-          LabelStr2 = tElementStr(1:iLen2)//tStr(1:iLen1)
+          CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, LabelStr1)
+          CALL GenerateAtomLabel(zmElementCSD(iAtom2,iFrg), iTotal+iAtom2, LabelStr2)
           WRITE(hFileTOPAS, '(A,A7,1X,A7,A,F9.5,A)', ERR=999) 'Distance_Restrain(', LabelStr1, LabelStr2, &
             ', ', distance, ', 1.0, bond_width, bond_weight)'
         ENDDO
-
         ! ##### Angle restraints #####
+        DO iAtom = 1, natoms(iFrg)
+          CALL SAMCON(iAtom, Ncon, Icon, Icob, 0)
+! NCON        output number of connected atoms for iAtom
+! ICON (1:30) output list of atoms connected to iAtom
+! ICOB (1:30) output bond types for each connection in ICON
+          DO J1 = 1, Ncon-1
+            DO J2 = J1+1, Ncon
+              iAtom1 = Icon(J1)
+              iAtom2 = Icon(J2)
+              CALL SAMANF(iAtom1, iAtom, iAtom2, angle)
+              CALL GenerateAtomLabel(zmElementCSD(iAtom,iFrg), iTotal+iAtom, LabelStr)
+              CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, LabelStr1)
+              CALL GenerateAtomLabel(zmElementCSD(iAtom2,iFrg), iTotal+iAtom2, LabelStr2)
+              WRITE(hFileTOPAS, '(A,A7,1X,A7,1X,A7,A,F9.5,A)', ERR=999) 'Angle_Restrain(', LabelStr1, &
+                LabelStr, LabelStr2, ', ', angle, ', 1.0, angle_width, angle_weight)'
+            ENDDO
+          ENDDO
+        ENDDO
 
         ! ##### Flatten #####
-
+        IF ( .NOT. WDialogGetCheckBoxLogical(IDC_IncludeFlatten) ) GOTO 30
+        sum_of_assemblies = 0
+        ! Loop over atoms
+        DO iAtom = 1, natoms(iFrg)
+          ! If in a previous assembly, continue to next atom
+          IF ( assembly_contains(sum_of_assemblies, iAtom) ) GOTO 20
+          ! If atom does not have any aromatic bond attached to it, continue to next atom
+          IF ( .NOT. has_aromatic_bond(iAtom) ) GOTO 20
+          ! Otherwise, use this atom as the start of the algorithm.
+          current_assembly = 0 ! Empty the current assembly
+          AAStackPtr = MaxAAStack ! Empty the stack
+          ! Push the atom onto the stack
+          CALL PushAA(iAtom)
+          ! Then call the subroutine who does all the work.
+          CALL find_aromatic_assembly(current_assembly)
+          ! Write out this assembly with a flatten command
+          ! We could add a test to check that the atoms that we have added are in a plane to start with
+          ! This is not necessarily so: e.g. in a buckyball or in one of those fused benzene rings spiral
+          nFlatten = 0
+          DO J = 1, MaxAtm_3
+            iAtom1 = current_assembly(J)
+            IF ( iAtom1 .NE. 0 ) THEN
+              CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, flatten_labels(J))
+              nFlatten = nFlatten + 1
+            ENDIF
+          ENDDO
+          IF ( nFlatten .GT. 3 ) THEN
+            WRITE(hFileTOPAS, '(A,999(1X,A7))', ERR=999) 'Flatten(', (flatten_labels(K),K=1,nFlatten), ', 0, 0,', '1000000',')      '
+          ENDIF
+          ! Add current assembly to sum_of_assemblies
+          DO J = 1, nFlatten
+            CALL assembly_add(sum_of_assemblies, current_assembly(J))
+          ENDDO
+   20     CONTINUE
+        ENDDO
+   30   CONTINUE
         iTotal = iTotal + natoms(iFrg)
       ENDDO
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    do_errors'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//OutputFilesBaseName(1:OFBN_Len)//'.cif")'
-      WriteTOPASFileRietveld = 0
+      IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    do_errors'
+      ENDIF
+      IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//OutputFilesBaseName(1:OFBN_Len)//'.cif")'
+      ENDIF
+      WriteTOPASFileRietveld2 = 0
       CLOSE(hFileTOPAS)
       RETURN
   999 CALL ErrorMessage("Error writing TOPAS input file (Rietveld)")
@@ -454,7 +658,124 @@
       CLOSE(hOutputFile)
       CLOSE(hFileTOPAS)
 
-      END FUNCTION WriteTOPASFileRietveld
+      END FUNCTION WriteTOPASFileRietveld2
+!
+!*****************************************************************************
+!
+      SUBROUTINE find_aromatic_assembly(the_assembly)
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: the_assembly(1:MaxAtm_3)
+
+      INTEGER MaxAAStack
+      PARAMETER (MaxAAStack = 150)
+
+      INTEGER            AAStackPtr, AAStack
+      COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)
+
+      INTEGER, EXTERNAL :: PopAA
+      LOGICAL, EXTERNAL :: assembly_contains, AAStackEmpty, has_aromatic_bond
+      INTEGER Ncon, I, iAtom, iAtom2
+      INTEGER Icon(30), Icob(30)
+
+   10 CONTINUE
+      ! Get the atom from the top of the stack...
+      iAtom = PopAA()
+      ! Check that it is not yet in the assembly
+      IF ( assembly_contains(the_assembly, iAtom) ) GOTO 20
+      ! Add the atom to the assembly
+      CALL assembly_add(the_assembly, iAtom)
+      ! Get its neighbours
+      CALL SAMCON(iAtom, Ncon, Icon, Icob, 0)
+      ! Loop over neighbours
+      DO I = 1, Ncon
+        iAtom2 = Icon(I)
+        ! Check that the neighbour is not in the assembly yet
+        IF ( .NOT. assembly_contains(the_assembly, iAtom2) ) THEN
+          ! If the neighbour has no aromatic bonds, add it to the assembly
+          IF ( .NOT. has_aromatic_bond(iAtom2) ) THEN
+            CALL assembly_add(the_assembly, iAtom2)
+          ELSE
+            ! Otherwise, push the neighbour onto the stack
+            CALL PushAA(iAtom2)
+          ENDIF
+        ENDIF
+      ENDDO
+   20 CONTINUE
+      ! If stack now empty, RETURN
+      IF ( AAStackEmpty() ) RETURN
+      GOTO 10
+
+      END SUBROUTINE find_aromatic_assembly
+!
+!*****************************************************************************
+!
+      SUBROUTINE PushAA(the_value)
+! AA = Aromatic Assembly
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: the_value
+
+      INTEGER MaxAAStack
+      PARAMETER (MaxAAStack = 150)
+
+      INTEGER            AAStackPtr, AAStack
+      COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)
+
+! Check if stack full
+      IF ( AAStackPtr .EQ. 0 ) THEN
+        CALL DebugErrorMessage('AAStackPtr full.')
+        RETURN
+      ENDIF
+! If not, store value
+      AAStack(AAStackPtr) = the_value
+! Dec(StackPtr)
+      AAStackPtr = AAStackPtr - 1
+
+      END SUBROUTINE PushAA
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION PopAA()
+
+      IMPLICIT NONE
+
+      INTEGER MaxAAStack
+      PARAMETER (MaxAAStack = 150)
+
+      INTEGER            AAStackPtr, AAStack
+      COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)
+
+! Check if stack empty
+      IF ( AAStackPtr .EQ. MaxAAStack ) THEN
+        CALL DebugErrorMessage('AAStack empty.')
+        PopAA = 0
+        RETURN
+      ENDIF
+! If not, Inc(StackPtr)
+      AAStackPtr = AAStackPtr + 1
+      PopAA = (AAStack(AAStackPtr))
+
+      END FUNCTION PopAA
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION AAStackEmpty()
+
+      IMPLICIT NONE
+
+      INTEGER MaxAAStack
+      PARAMETER (MaxAAStack = 150)
+
+      INTEGER            AAStackPtr, AAStack
+      COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)
+
+      AAStackEmpty = ( AAStackPtr .EQ. MaxAAStack )
+
+      END FUNCTION AAStackEmpty
 !
 !*****************************************************************************
 !
