@@ -217,3 +217,103 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE GenerateAtomLabel(TheElement, TheNumber, TheLabelStr)
+
+! Converts a CCDC element number + serial number to an atom label string, e.g.:
+! "1" + "12" gives "C12"
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER,       INTENT (IN   ) :: TheElement
+      INTEGER,       INTENT (IN   ) :: TheNumber
+      CHARACTER*(*), INTENT (  OUT) :: TheLabelStr
+
+      CHARACTER*20, EXTERNAL :: Integer2String
+      CHARACTER*3 tElementStr
+      CHARACTER*20 tStr
+      INTEGER iLen1, iLen2
+
+      tStr = Integer2String(TheNumber)
+      iLen1 = LEN_TRIM(tStr)
+      tElementStr = ElementStr(TheElement)
+      iLen2 = LEN_TRIM(tElementStr)
+      TheLabelStr = tElementStr(1:iLen2)//tStr(1:iLen1)
+
+      END SUBROUTINE GenerateAtomLabel
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION assembly_contains(the_assembly, the_value)
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: the_assembly(1:MaxAtm_3)
+      INTEGER, INTENT (IN   ) :: the_value
+
+      INTEGER I
+
+      DO I = 1, MaxAtm_3
+        IF ( the_assembly(I) .EQ. 0 ) THEN
+          assembly_contains = .FALSE.
+          RETURN
+        ENDIF
+        IF ( the_assembly(I) .EQ. the_value ) THEN
+          assembly_contains = .TRUE.
+          RETURN
+        ENDIF
+      ENDDO
+      assembly_contains = .FALSE.
+
+      END FUNCTION assembly_contains
+!
+!*****************************************************************************
+!
+      SUBROUTINE assembly_add(the_assembly, the_value)
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (INOUT) :: the_assembly(1:MaxAtm_3)
+      INTEGER, INTENT (IN   ) :: the_value
+
+      INTEGER I
+
+      DO I = 1, MaxAtm_3
+        IF ( the_assembly(I) .EQ. 0 ) THEN
+          the_assembly(I) = the_value
+          RETURN
+        ENDIF
+      ENDDO
+      CALL DebugErrorMessage('assembly_add() overflow.')
+
+      END SUBROUTINE assembly_add
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION assembly_size(the_assembly)
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (INOUT) :: the_assembly(1:MaxAtm_3)
+
+      INTEGER I
+
+      DO I = 1, MaxAtm_3
+        IF ( the_assembly(I) .EQ. 0 ) THEN
+          assembly_size = I-1
+          RETURN
+        ENDIF
+      ENDDO
+      assembly_size = MaxAtm_3
+
+      END FUNCTION assembly_size
+!
+!*****************************************************************************
+!
