@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 24/Aug/2006 10:57:18
+// Modified : 28/Aug/2006 15:46:08
 //
 ///////////////////////////////////////////////////
 //
@@ -669,15 +669,25 @@
 #define IDB_Write_Pawley                 1214
 #define IDB_Browse                       1296
 #define IDB_Write_RR                     1370
-#define IDD_Test                          140
+#define IDF_TOPAS_inp_file_name          1372
 #define IDB_WRITE                        1371
-#define IDF_REAL1                        1372
-#define IDF_CHECK4                       1399
+#define IDB_UsePrevious                  1399
 #define IDC_wl_in_xye                    1439
 #define IDD_SA_input5                     142
 #define IDF_STRING1                      1442
 #define IDF_NumOfIterations2             1212
 #define IDF_NumOfIterations3             1213
+#define IDD_SAW_Page7                     123
+#define IDC_Scale                        1252
+#define IDC_Background                   1443
+#define IDC_Coordinates                  1444
+#define IDC_PeakShape                    1445
+#define IDC_UnitCell                     1446
+#define IDC_Biso                         1447
+#define IDC_WriteCIF                     1448
+#define IDC_IncludeESDs                  1449
+#define IDC_UseDASHRecommendation        1450
+#define IDC_IncludeFlatten               1451
 
 ///////////////////////////////////////////////////
 //
@@ -1092,19 +1102,6 @@ FONT    8, "MS Sans Serif"
 BEGIN
     CONTROL "",IDF_Width_Equations,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE | SS_SUNKEN,   22,   40,  196,   55
     CONTROL "The X-ray lineshape is modelled as a convolution of Gaussian, Lorentzian and axial divergence (asymmetry) terms. The angular dependences of the peak shape variables are given in the panel below.",IDF_PeakShape_Explanation,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,    4,    8,  230,   24
-END
-
-IDD_Width_Equations RCDATA
-BEGIN
-"[Checks] \n"
-"[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
 END
 
 IDD_Gamma_Info DIALOG 0, 0,  240,  112
@@ -3786,46 +3783,13 @@ BEGIN
     CONTROL "2. The second step is to read the TOPAS output file back into DASH.",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  102,   76,  180,   20
     CONTROL "3. DASH is then able to generate an input file for Rietveld refinement in TOPAS",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  102,  106,  178,   20
     CONTROL "Rietveld refinement with TOPAS is done in three steps:",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   90,   23,  264,  120
+    CONTROL "Use previous >",IDB_UsePrevious,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  296,  150,   60,   14
 END
 
 IDD_RR_TOPAS RCDATA
 BEGIN
 "[Checks] \n"
 "[Menus] \n"
-"[Tabs] \n"
-"[Ranges] \n"
-"[Trackbars] \n"
-"[Grids] \n"
-"[Colours] \n"
-"[Lengths] \n"
-,0
-END
-
-IDD_Test DIALOG 0, 0,  375,  170
-STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
-FONT    8, "MS Sans Serif"
-CAPTION "DASH Wizard : Rietveld refinement with TOPAS"
-BEGIN
-    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
-    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "&Write",IDB_WRITE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  318,  150,   40,   14
-    CONTROL "",IDF_MENU1,"LISTBOX",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP | LBS_NOTIFY | LBS_HASSTRINGS | LBS_USETABSTOPS,  102,   20,  170,   30
-    CONTROL "Penalties K1",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  116,   60,   60,    8
-    CONTROL "5.0000",IDF_REAL1,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  183,   57,   40,   14
-    CONTROL "Recycle .inp file",IDF_CHECK4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  124,  120,  100,   14
-END
-
-IDD_Test RCDATA
-BEGIN
-"[Checks] \n"
-" 1399 0 \n"
-"[Menus] \n"
-" 1546     3     0 \n"
-"1. Scale only \n"
-"2. Scale + atomic parameters \n"
-" \n"
 "[Tabs] \n"
 "[Ranges] \n"
 "[Trackbars] \n"
@@ -3865,6 +3829,58 @@ BEGIN
 " 1211               1             999 \n"
 " 1212               1             999 \n"
 " 1213               1             999 \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_SAW_Page7 DIALOG 0, 0,  375,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Rietveld refinement with TOPAS"
+BEGIN
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "Refine",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  249,   35,  112,  123
+    CONTROL "Scale",IDC_Scale,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   47,   40,   14
+    CONTROL "Background",IDC_Background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   60,   80,   14
+    CONTROL "Coordinates",IDC_Coordinates,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   86,   80,   14
+    CONTROL "Include Flatten",IDC_IncludeFlatten,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  270,   99,   80,   14
+    CONTROL "Peak shape",IDC_PeakShape,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  127,   80,   14
+    CONTROL "Unit cell",IDC_UnitCell,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  140,   80,   14
+    CONTROL "Write",IDB_WRITE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   90,  126,   40,   14
+    CONTROL "new .inp file (reads .out file)",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  133,  128,  110,   10
+    CONTROL "Write out .cif file",IDC_WriteCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   89,   80,   14
+    CONTROL "Include ESDs in output",IDC_IncludeESDs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,  104,  100,   14
+    CONTROL "Use DASH recommendation",IDC_UseDASHRecommendation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   49,  120,   14
+    CONTROL "String",IDF_TOPAS_inp_file_name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   93,   13,  220,   14
+    CONTROL "Browse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  321,   13,   40,   14
+    CONTROL "File name",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   95,   29,   80,    8
+    CONTROL "Biso",IDC_Biso,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  114,   40,   14
+    CONTROL "Preferred orientation",IDC_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   73,   90,   14
+END
+
+IDD_SAW_Page7 RCDATA
+BEGIN
+"[Checks] \n"
+" 1252 1 \n"
+" 1443 0 \n"
+" 1444 0 \n"
+" 1451 1 \n"
+" 1445 0 \n"
+" 1446 0 \n"
+" 1448 1 \n"
+" 1449 0 \n"
+" 1450 1 \n"
+" 1447 0 \n"
+" 1508 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"

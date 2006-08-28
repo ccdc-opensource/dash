@@ -277,10 +277,10 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
-      LOGICAL MseBtnPressed, OldEventWaiting
 ! The routines that act on the mousebutton presses are non-reentrant
 ! and the one should not be called when the other is active, so we must keep a flag if we are dealing
 ! with a mouse button press. 
+      LOGICAL         MseBtnPressed, OldEventWaiting
       COMMON /Events/ MseBtnPressed, OldEventWaiting
 
 ! For child windows that are an editor, the only event DASH has to handle itself
@@ -497,6 +497,9 @@
         CASE (IDD_RR_PO_Dialog)
           CALL DealWithRR_PO_Settings
           GOTO 10
+        CASE (IDD_SAW_Page7)
+          CALL DealWithRR_TOPAS
+          GOTO 10
       END SELECT
       DealWithEvent = .FALSE.
       RETURN
@@ -547,7 +550,7 @@
 
       IMPLICIT NONE
 
-      LOGICAL MseBtnPressed, OldEventWaiting
+      LOGICAL         MseBtnPressed, OldEventWaiting
       COMMON /Events/ MseBtnPressed, OldEventWaiting
 
       LOGICAL, EXTERNAL :: DealWithEvent
@@ -578,7 +581,7 @@
 
       IMPLICIT NONE
 
-      LOGICAL MseBtnPressed, OldEventWaiting
+      LOGICAL         MseBtnPressed, OldEventWaiting
       COMMON /Events/ MseBtnPressed, OldEventWaiting
 
       IF (OldEventWaiting) THEN
@@ -652,14 +655,13 @@
       COMMON /COMWS/ WinStackPtr, WinStack(1:MaxWinStack)
 
 ! Check if stack empty
-      IF (WinStackPtr .EQ. 25) THEN
+      IF (WinStackPtr .EQ. MaxWinStack) THEN
         CALL DebugErrorMessage('WinStack empty.')
         RETURN
       ENDIF
 ! If not, Inc(StackPtr)
       WinStackPtr = WinStackPtr + 1
 ! Restore current window ID
-!O      IF (WinStack(WinStackPtr) .NE. 0) CALL WDialogSelect(WinStack(WinStackPtr))
       CALL WDialogSelect(WinStack(WinStackPtr))
 
       END SUBROUTINE PopActiveWindowID
