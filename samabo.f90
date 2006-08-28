@@ -947,7 +947,7 @@
 ! Function: Get list of connected atoms for given atom Iat.
 ! Version:  27.9.94
 ! Notes:
-! 1. This uses just the list of bonds (in any order) in IBON(*,3).
+! 1. This uses just the list of bonds (in any order) in bond(*,2).
 !    Output atoms number in ICON(), count in NCON
 ! 2. Skip pi-bonds           (bond type 9 ) if IPIB <=0
 !
@@ -2131,6 +2131,31 @@
       ENDDO
 
       END SUBROUTINE SAMPIQ
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION has_aromatic_bond(iAtom)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iAtom
+
+      INTEGER Ncon, I
+      INTEGER Icon(30), Icob(30)
+
+      CALL SAMCON(iAtom, Ncon, Icon, Icob, 0)
+! NCON        output number of connected atoms for iAtom
+! ICON (1:30) output list of atoms connected to iAtom
+! ICOB (1:30) output bond types for each connection in ICON
+      DO I = 1, Ncon
+        IF ( ICOB(I) .EQ. 5 ) THEN
+          has_aromatic_bond = .TRUE.
+          RETURN
+        ENDIF
+      ENDDO
+      has_aromatic_bond = .FALSE.
+
+      END FUNCTION
 !
 !*****************************************************************************
 !
