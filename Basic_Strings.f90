@@ -242,6 +242,48 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE FirstWord(TheString, TheWord, TheWordLength)
+! Skip all leading spaces and tabs, finds first consecutive string of non-spaces and returns that as the first word.
+! On entrance, TheWordLength contains the maximum length of the keyword required: if the string exceeds
+! this length, a null string is returned.
+! This function is useful to scan lines for keywords in SHELX .res and TOPAS .out files.
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheString
+      CHARACTER*(*), INTENT (  OUT) :: TheWord
+      INTEGER,       INTENT (INOUT) :: TheWordLength
+
+      INTEGER StrLen, POS1, POS2
+
+      StrLen = LEN_TRIM(TheString)
+! Skip spaces
+      POS1 = 1
+      DO WHILE ((POS1 .LE. StrLen) .AND. ((TheString(POS1:POS1) .EQ. ' ') .OR. (TheString(POS1:POS1) .EQ. CHAR(9))))
+        POS1 = POS1 + 1
+      ENDDO
+      POS2 = POS1
+! Scan past rest of column (find next space / end of string)
+      DO WHILE ((POS2 .LE. StrLen) .AND. (POS2-POS1+1 .LE. TheWordLength) .AND. ((TheString(POS2:POS2) .NE. ' ') .AND. (TheString(POS2:POS2) .NE. CHAR(9))))
+        POS2 = POS2 + 1
+      ENDDO
+      ! Have we reached the end?
+      IF ( POS2 .EQ. StrLen+1 ) THEN
+        TheWord = TheString(POS1:POS2-1)
+        TheWordLength = POS2-POS1
+        RETURN
+      ENDIF
+      IF ( ((TheString(POS2:POS2) .EQ. ' ') .OR. (TheString(POS2:POS2) .EQ. CHAR(9))) .AND. (POS2-POS1 .LE. TheWordLength) ) THEN
+        TheWord = TheString(POS1:POS2-1)
+        TheWordLength = POS2-POS1
+        RETURN
+      ENDIF
+      TheWord = ' '
+      TheWordLength = 0
+
+      END SUBROUTINE FirstWord
+!
+!*****************************************************************************
+!
       SUBROUTINE StrClean(TheString, TheLength)
 !
 ! This function cleans up a string
