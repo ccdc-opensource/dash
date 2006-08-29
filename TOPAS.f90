@@ -90,12 +90,6 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL Unload_RR_TOPAS
-              CALL WDialogLoad(IDD_SAW_Page6a)
-              IF ( iRietveldMethod .EQ. 1 ) THEN
-                CALL WDialogPutRadioButton(IDF_RADIO1)
-              ELSE
-                CALL WDialogPutRadioButton(IDF_RADIO2)
-              ENDIF
               CALL WizardWindowShow(IDD_SAW_Page6a)
             CASE (IDCANCEL, IDCLOSE)
               CALL Unload_RR_TOPAS
@@ -133,7 +127,7 @@
               CALL WSelectFile(FILTER, iFlags, TOPASFileName, 'Save TOPAS input file (Rietveld)')
               IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPASFileName) .NE. 0)) THEN
                 IF ( WriteTOPASFileRietveld2(TOPASFileName) .EQ. 0 ) THEN
-                  TOPAS_stage = 1 ! I think this variable is redundant
+                  TOPAS_stage = 1
                   CALL WDialogFieldStateLogical(IDB_Write_RR,     .FALSE.)
                   CALL WDialogFieldStateLogical(IDB_Write_Pawley, .TRUE.)
                 ENDIF
@@ -353,6 +347,8 @@
       INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
       CHARACTER*255 TOPASFileName, tDirName, tFileName, tExtension
       INTEGER ExtLength
+      CHARACTER(LEN=75) FILTER
+      INTEGER           iFlags, iFType 
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page7)
@@ -360,14 +356,20 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              ! ###### TODO: we could decide to move the loading of Wizard
-              ! dialogues that are swapped in and out of memory to WizardWindowShow() 
-              CALL WDialogLoad(IDD_RR_TOPAS)
               CALL WizardWindowShow(IDD_RR_TOPAS)
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBBROWSE)
-
+              iFlags = LoadDialog + DirChange + PromptOn
+              FILTER = 'All files (*.*)|*.*|'//&
+                       'TOPAS input/output files (*.inp, *.out)|*.inp;*.out|'
+              ! iFType specifies which of the file types in the list is the default
+              iFType = 2
+              tFileName = ' '
+              CALL WSelectFile(FILTER, iFlags, tFileName, 'Open TOPAS file', iFType)
+              ! Did the user press cancel?
+              IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
+              CALL WDialogPutString(IDF_TOPAS_inp_file_name, tFileName)
             CASE (IDB_WRITE)
               CALL WDialogGetString(IDF_TOPAS_inp_file_name, TOPASFileName)
               IF ( LEN_TRIM(TOPASFileName) .EQ. 0 ) THEN
@@ -395,7 +397,7 @@
 ! 
 ! This function only writes files for stage 2, i.e. it can only read the output file
 ! from the Pawley refinement and write out the very first Rietveld refinement file.
-      INTEGER FUNCTION WriteTOPASFileRietveld2(tFileName)
+      INTEGER FUNCTION WriteTOPASFileRietveld2(FileNameBase)
 
       USE DRUID_HEADER
       USE VARIABLES
@@ -407,12 +409,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (IN   ) :: tFileName
-
-      INTEGER                  OFBN_Len
-      CHARACTER(MaxPathLength)           OutputFilesBaseName
-      CHARACTER(3)                                            SA_RunNumberStr
-      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+      CHARACTER*(*), INTENT (INOUT) :: FileNameBase
 
       INTEGER         NATOM
       REAL                   Xato
@@ -451,32 +448,35 @@
       INTEGER b_str_len, tElement, J
       INTEGER ii, iTotal, iFrg, iAtom, iAtom1, iAtom2
       REAL    distance, angle
-      LOGICAL refine_Biso
       CHARACTER(7) LabelStr, LabelStr1, LabelStr2
       CHARACTER*20 tStr
       INTEGER iLen1, iLen2, K
       CHARACTER*3 tElementStr
       INTEGER Ncon, J1, J2
       INTEGER Icon(30), Icob(30)
-      LOGICAL include_flatten
       CHARACTER(7) flatten_labels(MaxAtm_3)
       INTEGER nFlatten
       ! We need to remember which atoms have been assigned to an assembly
       INTEGER sum_of_assemblies(1:MaxAtm_3)
       INTEGER current_assembly(1:MaxAtm_3)
+      CHARACTER(MaxPathLength) FileNameToRead, FileNameToWrite
+      CHARACTER*255 tDirName, tFileName, tExtension
+      INTEGER ExtLength
 
-      ! This needs to be in the GUI somewhere.
-      refine_Biso = .FALSE.
-      include_flatten = .TRUE.
       CALL WDialogSelect(IDD_SAW_Page7)
       ! Initialise to failure
       WriteTOPASFileRietveld2 = 1
+      ExtLength = 3
+      CALL SplitPath2(FileNameBase, tDirName, tFileName, tExtension, ExtLength)
+      FileNameBase = tDirName(1:LEN_TRIM(tDirName))//tFileName
+      FileNameToRead = FileNameBase(1:LEN_TRIM(FileNameBase))//'.out'
+      FileNameToWrite = FileNameBase(1:LEN_TRIM(FileNameBase))//'.inp'
       hkl_str = 'hkl_Is'
       space_group_str = 'space_group'
       hFileTOPAS = 116
       hOutputFile = 117 ! This is the file that is being *read*
-      OPEN(UNIT=hFileTOPAS, FILE=tFileName, STATUS='unknown', ERR=999)
-      OPEN(UNIT=hOutputFile, FILE=TOPAS_output_file_name, STATUS='unknown', ERR=998)
+      OPEN(UNIT=hFileTOPAS, FILE=FileNameToWrite, STATUS='unknown', ERR=999)
+      OPEN(UNIT=hOutputFile, FILE=FileNameToRead, STATUS='unknown', ERR=998)
       WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 5'
       ! Basically, read and write every line up to and including the space_group line.
       is_last_line = .FALSE.
@@ -646,7 +646,7 @@
         WRITE(hFileTOPAS, '(A)', ERR=999) '    do_errors'
       ENDIF
       IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//OutputFilesBaseName(1:OFBN_Len)//'.cif")'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//FileNameBase(1:LEN_TRIM(FileNameBase))//'.cif")'
       ENDIF
       WriteTOPASFileRietveld2 = 0
       CLOSE(hFileTOPAS)
