@@ -1749,11 +1749,7 @@
                 CALL ShowWizardWindowRietveld(RR_SA_Sol)
               ELSE
                 ! TOPAS
-                CALL WDialogLoad(IDD_RR_TOPAS)
                 TOPAS_stage = 1
-                CALL WDialogFieldStateLogical(IDB_Write_Pawley, TOPAS_stage .EQ. 1)
-                CALL WDialogFieldStateLogical(IDB_Browse,       TOPAS_stage .EQ. 2)
-                CALL WDialogFieldStateLogical(IDB_Write_RR,     TOPAS_stage .EQ. 3)
                 CALL WizardWindowShow(IDD_RR_TOPAS)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
@@ -1802,11 +1798,7 @@
                 CALL ShowWizardWindowRietveld(RR_SA_Sol)
               ELSE
                 ! TOPAS
-                CALL WDialogLoad(IDD_RR_TOPAS)
                 TOPAS_stage = 1
-                CALL WDialogFieldStateLogical(IDB_Write_Pawley, TOPAS_stage .EQ. 1)
-                CALL WDialogFieldStateLogical(IDB_Browse,       TOPAS_stage .EQ. 2)
-                CALL WDialogFieldStateLogical(IDB_Write_RR,     TOPAS_stage .EQ. 3)
                 CALL WizardWindowShow(IDD_RR_TOPAS)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)

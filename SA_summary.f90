@@ -168,12 +168,6 @@
         IF ( iStatus .EQ. 1 ) THEN
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 7, iRow, Unchecked)
           CALL CloseOutputSolutionsChildWindows
-          CALL WDialogLoad(IDD_SAW_Page6a)
-          IF ( iRietveldMethod .EQ. 1 ) THEN
-            CALL WDialogPutRadioButton(IDF_RADIO1)
-          ELSE
-            CALL WDialogPutRadioButton(IDF_RADIO2)
-          ENDIF
           RR_SA_Sol = iSol2Run(iRow)
           CALL WizardWindowShow(IDD_SAW_Page6a)
           CALL PopActiveWindowID

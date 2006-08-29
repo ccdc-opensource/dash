@@ -57,6 +57,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -75,6 +76,25 @@
         RETURN
 ! Hide any visible Wizard window
       CALL WizardWindowHide
+! Because of limitations in WinterActer, some Wizard windows need to be swapped
+! out of memory and back again.
+      SELECT CASE ( TheDialogID )
+        CASE ( IDD_RR_TOPAS )
+          CALL WDialogLoad(IDD_RR_TOPAS)
+          CALL WDialogFieldStateLogical(IDB_Write_Pawley, TOPAS_stage .EQ. 1)
+          CALL WDialogFieldStateLogical(IDB_Browse,       TOPAS_stage .EQ. 2)
+          CALL WDialogFieldStateLogical(IDB_Write_RR,     TOPAS_stage .EQ. 3)
+        CASE ( IDD_SX_Page1a )
+          CALL WDialogLoad(IDD_SX_Page1a)
+          CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
+        CASE ( IDD_SAW_Page6a )
+          CALL WDialogLoad(IDD_SAW_Page6a)
+          IF ( iRietveldMethod .EQ. 1 ) THEN
+            CALL WDialogPutRadioButton(IDF_RADIO1)
+          ELSE
+            CALL WDialogPutRadioButton(IDF_RADIO2)
+          ENDIF
+      END SELECT
       CALL WDialogSelect(TheDialogID)
       CurrentWizardWindow = TheDialogID
       CALL WDialogShow(IXPos_IDD_Wizard, IYPos_IDD_Wizard, IDNEXT, Modeless)

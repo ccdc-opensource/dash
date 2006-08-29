@@ -31,8 +31,6 @@
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
               IF (NumberSGTable .EQ. LPosSG(LatBrav)) CALL WarningMessage('Space-group symmetry has not been reset.')
-              CALL WDialogLoad(IDD_SX_Page1a)
-              CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
               CALL WizardWindowShow(IDD_SX_Page1a)
             CASE (IDAPPLY)
               CALL Download_SpaceGroup(IDD_SX_Page1)
@@ -141,8 +139,6 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WDialogLoad(IDD_SX_Page1a)
-              CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
               CALL WizardWindowShow(IDD_SX_Page1a)
             CASE (IDNEXT)
               IF (SaveProject()) CALL ShowWizardWindowZmatrices
