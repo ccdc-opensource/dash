@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 28/Aug/2006 15:46:08
+// Modified : 28/Aug/2006 16:49:38
 //
 ///////////////////////////////////////////////////
 //
@@ -3857,7 +3857,7 @@ BEGIN
     CONTROL "Write out .cif file",IDC_WriteCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   89,   80,   14
     CONTROL "Include ESDs in output",IDC_IncludeESDs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,  104,  100,   14
     CONTROL "Use DASH recommendation",IDC_UseDASHRecommendation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   49,  120,   14
-    CONTROL "String",IDF_TOPAS_inp_file_name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   93,   13,  220,   14
+    CONTROL "",IDF_TOPAS_inp_file_name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   93,   13,  220,   14
     CONTROL "Browse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  321,   13,   40,   14
     CONTROL "File name",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   95,   29,   80,    8
     CONTROL "Biso",IDC_Biso,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  114,   40,   14
