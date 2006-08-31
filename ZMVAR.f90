@@ -54,7 +54,7 @@
       INTEGER zm2Par(1:MaxDOF, 1:maxfrg)
 ! Mapping of parameters per degree of freedom per Z-matrix
 
-      INTEGER          nfrag
+      INTEGER          nFrag
 ! nfrag = number of fragments
 
       CHARACTER*255    frag_file(0:maxfrg)
