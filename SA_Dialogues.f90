@@ -1884,7 +1884,7 @@
 
       INTEGER, EXTERNAL :: BatchFileSaveAs
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      INTEGER tInteger, iDummy
+      INTEGER tInteger
 
 ! ##### TODO: when *resuming* the SA, it is probably smart not to allow changing of the settings for
 ! hydrogen treatment.
@@ -1905,7 +1905,8 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_BatchFile)
-              iDummy = BatchFileSaveAs()
+! Go to the 5th window
+              CALL WizardWindowShow(IDD_SA_input5)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -1919,6 +1920,125 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowSAOptions
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowWriteGrid
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
+      INTEGER         nVar, ns, nt, iSeed1, iSeed2
+      COMMON /sapars/ nVar, ns, nt, iSeed1, iSeed2
+
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      INTEGER, EXTERNAL :: BatchFileSaveAs
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER iFrg, nRuns, nRunsPerNode, iPackage, nPackages
+      CHARACTER*(3) PackageStr
+      CHARACTER(MaxPathLength) Old_OutputFilesBaseName
+      CHARACTER(MaxPathLength) Rel_OutputFilesBaseName
+      INTEGER Old_OFBN_Len, Old_MaxRuns
+      INTEGER Rel_OFBN_Len
+      INTEGER Old_iSeed1, Old_iSeed2, iHandle
+      CHARACTER(MaxPathLength) DuffFileName
+      CHARACTER*255 tDirName, tFileName, tExtension
+      INTEGER ExtLength
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_SA_input5)
+      SELECT CASE (EventType)
+        CASE (PushButton)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+! Go back to the 4th window
+              CALL WizardWindowShow(IDD_SA_input4)
+            CASE (IDB_WRITE)
+              ! Create subdirectory
+              CALL IOsDirMake('temp')
+              ! Copy .sdi files
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.sdi', '.\temp\')
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.tic', '.\temp\')
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.hcv', '.\temp\')
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.hkl', '.\temp\')
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.pik', '.\temp\')
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.dsl', '.\temp\')
+              ! Copy Z-matrix files
+              DO iFrg = 1, nFrag
+                ! If we rename the Z-matrix files here,
+                ! that would make it easier to write out relative paths later
+
+                ! ######### We probably have a problem here if two Z-matrices have the same file name?
+                CALL IOsCopyFile(frag_file(iFrg), '.\temp\')
+              ENDDO
+              CALL WDialogGetInteger(IDF_NumOfRuns, nRuns)
+              CALL WDialogGetInteger(IDF_NumOfRunsPerNode, nRunsPerNode)
+              ! This gives rounding problems, of course
+              nPackages = nRuns / nRunsPerNode
+              Old_MaxRuns = MaxRuns
+              MaxRuns = nRunsPerNode
+              Old_OutputFilesBaseName = OutputFilesBaseName
+              Old_OFBN_Len = OFBN_Len
+              ! This needs to be made relative
+              ExtLength = 0
+              CALL SplitPath2(OutputFilesBaseName, tDirName, tFileName, tExtension, ExtLength)
+              Rel_OutputFilesBaseName = tFileName
+              Rel_OFBN_Len = LEN_TRIM(Rel_OutputFilesBaseName)
+              OFBN_Len = LEN_TRIM(Rel_OutputFilesBaseName)+4
+              Old_iSeed1 = iSeed1
+              Old_iSeed2 = iSeed2
+              CALL IOsDirChange('.\temp\')
+              DO iPackage = 1, nPackages
+                ! Need to make paths of Z-matrix files relative.
+                ! Perhaps this is easy because we have just copied them and so can now rename them?
+
+                ! Temporarily change OutputFilesBaseName
+                WRITE (PackageStr,'(I3.3)') iPackage
+                OutputFilesBaseName = Rel_OutputFilesBaseName(1:Rel_OFBN_Len)//'_'//PackageStr
+                iSeed1 = Old_iSeed1 + (iPackage-1)*nRunsPerNode
+                iSeed2 = Old_iSeed2 + (iPackage-1)*nRunsPerNode
+                DuffFileName = Rel_OutputFilesBaseName(1:Rel_OFBN_Len)//'_'//PackageStr//'.duff'
+                CALL WriteBatchFile(DuffFileName, .TRUE.)
+              ENDDO
+              ! Write out .grd file
+              iHandle = 10
+              OPEN(UNIT=iHandle, FILE=Rel_OutputFilesBaseName(1:Rel_OFBN_Len)//'.grd', ERR=999)
+              DO iPackage = 1, nPackages
+                WRITE (PackageStr,'(I3.3)') iPackage
+                tFileName = Rel_OutputFilesBaseName(1:Rel_OFBN_Len)//'_'//PackageStr//'.duff'
+                WRITE(iHandle,'(A)',ERR=999) tFileName(1:LEN_TRIM(tFileName))
+              ENDDO
+              CLOSE(iHandle)
+              ! Restore variables
+              MaxRuns = Old_MaxRuns
+              OutputFilesBaseName = Old_OutputFilesBaseName
+              OFBN_Len = Old_OFBN_Len
+              iSeed1 = Old_iSeed1
+              iSeed2 = Old_iSeed2
+              CALL InfoMessgae('GRID batch files written.')
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizardPastPawley
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+      RETURN
+  999 CONTINUE
+      CALL ErrorMessage('Error writing .grd file.')
+      CLOSE(iHandle)
+
+      END SUBROUTINE DealWithWizardWindowWriteGrid
 !
 !*****************************************************************************
 !
