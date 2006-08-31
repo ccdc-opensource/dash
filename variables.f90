@@ -95,6 +95,12 @@
 ! The reason this must be held in a variable is that we have too many dialogue windows to keep in memory,
 ! and the dialogue window displaying this variable must therefore be swapped in and out of memory.
 
+      LOGICAL lRebin
+      INTEGER iBinWidth
+! Whether or not to re-bin and with what bin-width
+! The reason these must be held in variables is that we have too many dialogue windows to keep in memory,
+! and the dialogue window displaying these variables must therefore be swapped in and out of memory.
+
       INTEGER RR_SA_Sol
 ! The SA solution that will be used for Rietveld refinement. Crystal structures read in from an external
 ! file are stored in RR_SA_Sol = 1

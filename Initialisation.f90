@@ -76,7 +76,7 @@
 ! Problem here: apparently, WinterActer can only deal with up to 39 dialogue windows being
 ! loaded. We have quite a few more than that. As a result, some dialogues need to be
 ! swapped in and out of memory. This is ugly and error-prone, but that's the way it is.
-! Currently those dialogues are IDD_SX_Page1a, IDD_SAW_Page6a and IDD_RR_TOPAS.
+! Currently those dialogues are IDD_SX_Page1a, IDD_PW_Page3a, D_SAW_Page6a and IDD_RR_TOPAS.
 
       CALL WDialogLoad(IDD_Structural_Information)         !  1
       CALL WDialogLoad(IDD_Configuration)                  !  2
@@ -87,29 +87,26 @@
       CALL WDialogLoad(IDD_Polyfitter_Wizard_01)           !  6
       CALL WDialogLoad(IDD_PW_Page1)                       !  7
       CALL WDialogLoad(IDD_PW_Page3)                       !  8
-
-      ! This is the rebin Wizard window; it should be dynamically loaded
-      CALL WDialogLoad(IDD_PW_Page3a)                      !  9
-
-      CALL WDialogLoad(IDD_PW_Page4)                       ! 10
-      CALL WDialogLoad(IDD_PW_Page5)                       ! 11
-      CALL WDialogLoad(IDD_PW_Page6)                       ! 12
-      CALL WDialogLoad(IDD_PW_Page7)                       ! 13
-      CALL WDialogLoad(IDD_PW_Page8)                       ! 14
-      CALL WDialogLoad(IDD_PW_Page8b)                      ! 15
-      CALL WDialogLoad(IDD_PW_Page9)                       ! 16
-      CALL WDialogLoad(IDD_PW_Page10)                      ! 17
-      CALL WDialogLoad(IDD_SX_Page1)                       ! 18
-      CALL WDialogLoad(IDD_SX_Page2)                       ! 19
-      CALL WDialogLoad(IDD_Pawley_Status)                  ! 20
-      CALL WDialogLoad(IDD_SAW_Page1)                      ! 21
-      CALL WDialogLoad(IDD_zmEdit)                         ! 22
-      CALL WDialogLoad(IDD_zmEditRotations)                ! 23
-      CALL WDialogLoad(IDD_SAW_Page2)                      ! 24
-      CALL WDialogLoad(IDD_SA_Modal_input2)                ! 25
-      CALL WDialogLoad(IDD_ModalDialog)                    ! 26
-      CALL WDialogLoad(IDD_SA_input3_2)                    ! 27
-      CALL WDialogLoad(IDD_SA_input4)                      ! 28
+      CALL WDialogLoad(IDD_PW_Page4)                       !  9
+      CALL WDialogLoad(IDD_PW_Page5)                       ! 10
+      CALL WDialogLoad(IDD_PW_Page6)                       ! 11
+      CALL WDialogLoad(IDD_PW_Page7)                       ! 12
+      CALL WDialogLoad(IDD_PW_Page8)                       ! 13
+      CALL WDialogLoad(IDD_PW_Page8b)                      ! 14
+      CALL WDialogLoad(IDD_PW_Page9)                       ! 15
+      CALL WDialogLoad(IDD_PW_Page10)                      ! 16
+      CALL WDialogLoad(IDD_SX_Page1)                       ! 17
+      CALL WDialogLoad(IDD_SX_Page2)                       ! 18
+      CALL WDialogLoad(IDD_Pawley_Status)                  ! 19
+      CALL WDialogLoad(IDD_SAW_Page1)                      ! 20
+      CALL WDialogLoad(IDD_zmEdit)                         ! 21
+      CALL WDialogLoad(IDD_zmEditRotations)                ! 22
+      CALL WDialogLoad(IDD_SAW_Page2)                      ! 23
+      CALL WDialogLoad(IDD_SA_Modal_input2)                ! 24
+      CALL WDialogLoad(IDD_ModalDialog)                    ! 25
+      CALL WDialogLoad(IDD_SA_input3_2)                    ! 26
+      CALL WDialogLoad(IDD_SA_input4)                      ! 27
+      CALL WDialogLoad(IDD_SA_input5)                      ! 28
       CALL WDialogLoad(IDD_SA_Action1)                     ! 29
       CALL WDialogLoad(IDD_Summary)                        ! 30
       CALL WDialogLoad(IDD_SAW_Page5)                      ! 31
@@ -118,7 +115,7 @@
       CALL WDialogLoad(IDD_OutputSolutions)                ! 33
       CALL WDialogLoad(IDD_Rietveld2)                      ! 34
       CALL WDialogLoad(IDD_RR_PO_Dialog)                   ! 35
-      CALL WDialogLoad(IDD_SAW_Page7)                   ! 36
+      CALL WDialogLoad(IDD_SAW_Page7)                      ! 36
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
@@ -301,6 +298,8 @@
       For_TOPAS = .FALSE.
       SXMaxResolution = 1.75
       iRietveldMethod = 1
+      lRebin = .FALSE.
+      iBinWidth = 1
       RR_SA_Sol = 1
       CALL WDialogSelect(IDD_SA_input3_2)
       NS = 20
