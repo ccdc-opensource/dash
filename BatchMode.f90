@@ -274,7 +274,7 @@
       tFileName = OutputFilesBaseName(1:OFBN_Len)//'.duff'
       CALL WSelectFile(FILTER,iFLAGS,tFileName,'Save project file')
       IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
-        CALL WriteBatchFile(tFileName)
+        CALL WriteBatchFile(tFileName, .FALSE.)
         BatchFileSaveAs = 0
       ENDIF
 
@@ -282,7 +282,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE WriteBatchFile(FileName)
+      SUBROUTINE WriteBatchFile(FileName, TruncateSDIFileName)
 
       USE VARIABLES
       USE PO_VAR
@@ -291,6 +291,7 @@
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: FileName
+      LOGICAL,       INTENT (IN   ) :: TruncateSDIFileName ! Quick hack
 
       INCLUDE 'PARAMS.INC'
 
@@ -299,8 +300,8 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-      INTEGER         nvar, ns, nt, iseed1, iseed2
-      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+      INTEGER         nvar, ns, nt, iSeed1, iSeed2
+      COMMON /sapars/ nvar, ns, nt, iSeed1, iSeed2
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -331,15 +332,19 @@
       WRITE(iHandle,'(A)',ERR=999) '# Editing OUT, SEED1, SEED2 and NRUNS is safe and may be necessary,'
       WRITE(iHandle,'(A)',ERR=999) '# editing the items near the end of the file is bound to crash your DASH run.'
       WRITE(iHandle,'(A)',ERR=999) '# Input file'
-      WRITE(iHandle,'(A)',ERR=999) 'SDI '//OutputFilesBaseName(1:OFBN_Len)//'.sdi'
+      IF ( TruncateSDIFileName ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'SDI '//OutputFilesBaseName(1:OFBN_Len-4)//'.sdi'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) 'SDI '//OutputFilesBaseName(1:OFBN_Len)//'.sdi'
+      ENDIF
       WRITE(iHandle,'(A)',ERR=999) '# Ouput file'
       WRITE(iHandle,'(A)',ERR=999) 'OUT '//OutputFilesBaseName(1:OFBN_Len)//'.dash'
       WRITE(iHandle,'(A)',ERR=999) '# When starting multiple jobs with the same .sdi file, make sure that'
       WRITE(iHandle,'(A)',ERR=999) '# SEED1 and SEED2 have different values in every file.'
       WRITE(iHandle,'(A)',ERR=999) '# DASH increments SEED1 and SEED2 with the number of the run at the start of'
       WRITE(iHandle,'(A)',ERR=999) '# each run.'
-      WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED1', iseed1
-      WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED2', iseed2
+      WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED1', iSeed1
+      WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED2', iSeed2
       WRITE(iHandle,'(A)',ERR=999) '# On a distributed system, NRUNS should probably be set to:'
       WRITE(iHandle,'(A)',ERR=999) '#     (total number of runs / number of processors)'
       WRITE(iHandle,'(A,X,I3)',ERR=999) 'NRUNS', MaxRuns
