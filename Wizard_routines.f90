@@ -23,6 +23,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -31,6 +32,8 @@
 
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
 
       IF (CurrentWizardWindow .EQ. 0) RETURN
 ! Things go all wrong if some intelligent part of DASH decides that the current Wizard window should be
@@ -46,7 +49,25 @@
         IXPos_IDD_Wizard = WInfoDialog(6)
         IYPos_IDD_Wizard = WInfoDialog(7)
       ENDIF
-      CALL WDialogHide
+      CALL WDialogHide()
+
+! Because of limitations in WinterActer, some Wizard windows need to be swapped
+! out of memory and back again.
+      SELECT CASE ( CurrentWizardWindow )
+        CASE ( IDD_RR_TOPAS )
+          CALL WDialogUnload(IDD_RR_TOPAS)
+        CASE ( IDD_SX_Page1a )
+          CALL WDialogGetReal(IDF_MaxResolution, SXMaxResolution)
+          CALL WDialogUnload(IDD_SX_Page1a)
+        CASE ( IDD_SAW_Page6a )
+          CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethod)
+          CALL WDialogUnload(IDD_SAW_Page6a)
+        CASE ( IDD_PW_Page3a )
+          lRebin = WDialogGetCheckBoxLogical(IDF_BinData)
+          CALL WDialogGetInteger(IDF_LBIN, iBinWidth)
+          CALL WDialogUnload(IDD_PW_Page3a)
+      END SELECT
+
       CurrentWizardWindow = 0
 
       END SUBROUTINE WizardWindowHide
@@ -76,6 +97,7 @@
         RETURN
 ! Hide any visible Wizard window
       CALL WizardWindowHide
+
 ! Because of limitations in WinterActer, some Wizard windows need to be swapped
 ! out of memory and back again.
       SELECT CASE ( TheDialogID )
@@ -94,7 +116,13 @@
           ELSE
             CALL WDialogPutRadioButton(IDF_RADIO2)
           ENDIF
+        CASE ( IDD_PW_Page3a )
+          CALL WDialogLoad(IDD_PW_Page3a)
+          CALL WDialogPutCheckBoxLogical(IDF_BinData, lRebin)
+          CALL WDialogPutInteger(IDF_LBIN, iBinWidth)
+          CALL WDialogFieldStateLogical(IDF_LBIN, lRebin)
       END SELECT
+
       CALL WDialogSelect(TheDialogID)
       CurrentWizardWindow = TheDialogID
       CALL WDialogShow(IXPos_IDD_Wizard, IYPos_IDD_Wizard, IDNEXT, Modeless)
@@ -489,6 +517,9 @@
                 IF ( For_TOPAS ) THEN
                   CALL WDialogSelect(IDD_PW_Page5)
                   CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN, .FALSE.)
+                  CALL WDialogFieldState(IDF_Max2Theta, Disabled)
+                  CALL WDialogFieldState(IDF_MaxResolution, Disabled)
+                  CALL WDialogFieldState(IDB_Convert, Disabled)
                 ENDIF
                 CALL WizardWindowShow(IDD_PW_Page5)
               ENDIF
@@ -609,19 +640,11 @@
                 CALL TruncateData(tMin,tMax)
               ELSE
                 IF ( For_TOPAS ) THEN
-!O                  CALL WDialogLoad(IDD_RR_TOPAS)
                   iFlags = SaveDialog + AppendExt + PromptOn
                   FILTER = 'TOPAS input file (*.inp)|*.inp|'
                   TOPASFileName = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
                   CALL WSelectFile(FILTER, iFlags, TOPASFileName, 'Save TOPAS input file (Pawley)')
                   IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPASFileName) .NE. 0)) THEN
-!O                    IF ( WriteTOPASFilePawley(TOPASFileName) .EQ. 0 ) THEN
-!O                      TOPAS_stage = 2 ! I think this variable is redundant
-!O                      CALL WDialogSelect(IDD_RR_TOPAS)
-!O                      CALL WDialogFieldStateLogical(IDB_Write_Pawley, .FALSE.)
-!O                      CALL WDialogFieldStateLogical(IDB_Browse,       .TRUE.)
-!O                      CALL WizardWindowShow(IDD_SAW_Page7)
-!O                    ENDIF
                     IF ( WriteTOPASFilePawley(TOPASFileName) .EQ. 0 ) THEN
                       TOPAS_stage = 2
                       CALL WDialogSelect(IDD_SAW_Page7)
@@ -1786,61 +1809,6 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowPawley1
-!
-!*****************************************************************************
-!
-      SUBROUTINE Unload_SX_Page1a
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SX_Page1a)
-      CALL WDialogGetReal(IDF_MaxResolution, SXMaxResolution)
-      CALL WizardWindowHide
-      CALL WDialogUnload(IDD_SX_Page1a)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Unload_SX_Page1a
-!
-!*****************************************************************************
-!
-      SUBROUTINE Unload_SAW_Page6a
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page6a)
-      CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethod)
-      CALL WizardWindowHide
-      CALL WDialogUnload(IDD_SAW_Page6a)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Unload_SAW_Page6a
-!
-!*****************************************************************************
-!
-      SUBROUTINE Unload_RR_TOPAS
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      IMPLICIT NONE
-
-      CALL PushActiveWindowID
-      CALL WizardWindowHide
-      CALL WDialogUnload(IDD_RR_TOPAS)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Unload_RR_TOPAS
 !
 !*****************************************************************************
 !

@@ -1739,11 +1739,9 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL Unload_SAW_Page6a
               CALL WizardWindowShow(IDD_SAW_Page5)
             CASE (IDNEXT)
               CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethod)
-              CALL Unload_SAW_Page6a
               IF ( iRietveldMethod .EQ. 1 ) THEN
                 ! Rigid-body Rietveld refinement in DASH
                 CALL ShowWizardWindowRietveld(RR_SA_Sol)
@@ -1753,7 +1751,6 @@
                 CALL WizardWindowShow(IDD_RR_TOPAS)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
-              CALL Unload_SAW_Page6a
               CALL EndWizardPastPawley
           END SELECT
       END SELECT
