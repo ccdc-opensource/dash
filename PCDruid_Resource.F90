@@ -1,4 +1,4 @@
-! Winteracter module created : 28/Aug/2006 16:49:38
+! Winteracter module created : 30/Aug/2006 17:21:00
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -668,11 +668,8 @@
           INTEGER, PARAMETER :: IDC_Scale                       =  1252
           INTEGER, PARAMETER :: IDC_Background                  =  1443
           INTEGER, PARAMETER :: IDC_Coordinates                 =  1444
-          INTEGER, PARAMETER :: IDC_PeakShape                   =  1445
-          INTEGER, PARAMETER :: IDC_UnitCell                    =  1446
           INTEGER, PARAMETER :: IDC_Biso                        =  1447
           INTEGER, PARAMETER :: IDC_WriteCIF                    =  1448
           INTEGER, PARAMETER :: IDC_IncludeESDs                 =  1449
           INTEGER, PARAMETER :: IDC_UseDASHRecommendation       =  1450
-          INTEGER, PARAMETER :: IDC_IncludeFlatten              =  1451
       END MODULE Druid_Header
