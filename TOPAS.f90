@@ -89,13 +89,10 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL Unload_RR_TOPAS
               CALL WizardWindowShow(IDD_SAW_Page6a)
             CASE (IDCANCEL, IDCLOSE)
-              CALL Unload_RR_TOPAS
               CALL EndWizardPastPawley
             CASE (IDB_UsePrevious)
-              CALL Unload_RR_TOPAS
               TOPAS_stage = 2
               CALL WDialogSelect(IDD_SAW_Page7)
               CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
@@ -103,7 +100,6 @@
               CALL WizardWindowShow(IDD_SAW_Page7)
             CASE (IDB_Write_Pawley)
               For_TOPAS = .TRUE.
-              CALL Unload_RR_TOPAS
               CALL WizardWindowShow(IDD_PW_Page3)
             CASE (IDB_Browse) ! The TOPAS Pawley refinement output file
               iFlags = LoadDialog + DirChange + PromptOn + AppendExt
@@ -200,7 +196,13 @@
       WRITE(hFileTOPAS, '(A,F12.4)', ERR=999) '  finish_X ', XBIN(NBIN)
       ! We do not write out the zero-point error in case the user has decided to use a different data set
       WRITE(hFileTOPAS, '(A)', ERR=999) '  Zero_Error(@, 0.0)'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '  LP_Factor( 26)'
+      IF ( JRadOption .EQ. 1 ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '  LP_Factor( 26)'
+      ELSE IF ( JRadOption .EQ. 2 ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '  LP_Factor( 90)'
+      ELSE
+        CALL ErrorMessage('Unknown radiation type.')
+      ENDIF
       WRITE(hFileTOPAS, '(A)', ERR=999) '  auto_sparse_CG'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  Rp 217.5'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  Rs 217.5'
@@ -430,7 +432,6 @@
       CHARACTER(512) tLine
       CHARACTER(12) word
       INTEGER       word_len
-      CHARACTER(11) space_group_str
       CHARACTER(6) b_str
       INTEGER b_str_len, tElement, J
       INTEGER ii, iTotal, iFrg, iAtom, iAtom1, iAtom2
