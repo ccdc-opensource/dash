@@ -169,6 +169,7 @@
       WriteTOPASFilePawley = 1
       hFileTOPAS = 116
       OPEN(UNIT=hFileTOPAS,FILE=tFileName,STATUS='unknown',ERR=999)
+      WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 5'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp 1.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp_dash 1.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_wp 1.0'
@@ -250,7 +251,6 @@
       ENDIF
       WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    ga '//tChar//' ', CELLPAR(6)
 !      WRITE(hFileTOPAS, '(A,A)', ERR=999) 'phase_name ', 
-      WRITE(hFileTOPAS, '(A)', ERR=999) "' When editing this file, leave space group as the last keyword: DASH uses it to detect the end of the input file" 
 
       ! By writing the space group name last, the extra information on hkl's and intensities
       ! will be appended at the end of the file. That makes it a lot easier to read the .out
@@ -289,45 +289,33 @@
       IF ( .NOT. WDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) RETURN
       SELECT CASE ( TOPAS_stage )
         CASE ( 2 ) ! First Rietveld refinement: refine scale only
-          CALL WDialogPutCheckBoxLogical(IDC_Scale, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Background, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background,  .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_IncludeFlatten, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Biso, .FALSE.)
-!          CALL WDialogPutCheckBoxLogical(IDC_PeakShape, .FALSE.)
-!          CALL WDialogPutCheckBoxLogical(IDC_UnitCell, .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 3 ) ! First Rietveld refinement: refine scale only
-          CALL WDialogPutCheckBoxLogical(IDC_Scale, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Background, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_IncludeFlatten, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Biso, .FALSE.)
-!          CALL WDialogPutCheckBoxLogical(IDC_PeakShape, .FALSE.)
-!          CALL WDialogPutCheckBoxLogical(IDC_UnitCell, .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 4 ) ! First Rietveld refinement: refine scale only
-          CALL WDialogPutCheckBoxLogical(IDC_Scale, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Background, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_IncludeFlatten, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Biso, .FALSE.)
-!          CALL WDialogPutCheckBoxLogical(IDC_PeakShape, .FALSE.)
-!          CALL WDialogPutCheckBoxLogical(IDC_UnitCell, .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 5 ) ! First Rietveld refinement: refine scale only
-          CALL WDialogPutCheckBoxLogical(IDC_Scale, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Background, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
-   !       CALL WDialogPutCheckBoxLogical(IDC_IncludeFlatten, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Biso, .TRUE.)
-!          CALL WDialogPutCheckBoxLogical(IDC_PeakShape, .FALSE.)
-!          CALL WDialogPutCheckBoxLogical(IDC_UnitCell, .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso,        .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
       END SELECT
       CALL PopActiveWindowID
 
@@ -440,9 +428,8 @@
       INTEGER iLen, iPos, iStrPos
       LOGICAL is_last_line
       CHARACTER(512) tLine
-      CHARACTER(6) hkl_str
-!      CHARACTER(10) word
-!      INTEGER       word_len
+      CHARACTER(12) word
+      INTEGER       word_len
       CHARACTER(11) space_group_str
       CHARACTER(6) b_str
       INTEGER b_str_len, tElement, J
@@ -462,7 +449,9 @@
       CHARACTER(MaxPathLength) FileNameToRead, FileNameToWrite
       CHARACTER*255 tDirName, tFileName, tExtension
       INTEGER ExtLength
+      LOGICAL was_Pawley
 
+      was_Pawley = .FALSE.
       CALL WDialogSelect(IDD_SAW_Page7)
       ! Initialise to failure
       WriteTOPASFileRietveld2 = 1
@@ -471,183 +460,255 @@
       FileNameBase = tDirName(1:LEN_TRIM(tDirName))//tFileName
       FileNameToRead = FileNameBase(1:LEN_TRIM(FileNameBase))//'.out'
       FileNameToWrite = FileNameBase(1:LEN_TRIM(FileNameBase))//'.inp'
-      hkl_str = 'hkl_Is'
-      space_group_str = 'space_group'
       hFileTOPAS = 116
       hOutputFile = 117 ! This is the file that is being *read*
       OPEN(UNIT=hFileTOPAS, FILE=FileNameToWrite, STATUS='unknown', ERR=999)
       OPEN(UNIT=hOutputFile, FILE=FileNameToRead, STATUS='unknown', ERR=998)
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 5'
-      ! Basically, read and write every line up to and including the space_group line.
       is_last_line = .FALSE.
    10 CONTINUE
-      READ(hOutputFile, '(A)', ERR=998) tLine
+      READ(hOutputFile, '(A)', ERR=998, END=40) tLine
       iLen = LEN_TRIM(tLine)
-      iPos = StrFind(tLine, iLen, hkl_str, 6)
-      IF ( iPos .NE. 0 ) THEN
+      word_len = 12
+      CALL FirstWord(tLine, word, word_len)
+      CALL StrUpperCase(word)
+      IF ( word(1:6) .EQ. 'HKL_IS' ) THEN
+        was_Pawley = .TRUE.
         WRITE(hFileTOPAS, '(A)', ERR=999) '  str'
+      ELSE IF ( word(1:11) .EQ. 'SPACE_GROUP' ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+        IF ( was_Pawley ) THEN
+          ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
+          !                             BEGIN
+          ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
+          IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 1.0'
+          ELSE
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale   1.0'
+          ENDIF
+! We must call ShowWizardWindowRietveld() here, which will fill
+! Xato (and all the RR variables). The Wizard window is suppressed because of the For_TOPAS flag.
+          CALL ShowWizardWindowRietveld(RR_SA_Sol)
+! Also need to write out PO if used during SA
+          IF ( PrefParExists ) THEN
+            WRITE(hFileTOPAS, '(A,F5.3,A,I3,1X,I3,1X,I3,1X,A)', ERR=999) '    PO( , ', RR_PO, ', , ', PO_Direction(1), PO_Direction(2), PO_Direction(3), ')'
+          ELSE
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    PO( , 1.0, , 1 0 0)'
+          ENDIF
+          IF ( WDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag { @ }'
+          ELSE
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
+          ENDIF
+          ! #########################################################################################
+          ! TOPAS needs unique atom labels ("site labels"), especially when applying restraints.
+          ! This is a problem for DASH where we use user-supplied labels.
+          ! This is especially a problem if there is more than one Z-matrix in the asymmetric unit.
+          ! (Would it have been possible to solve this using the "scopes" in TOPAS?, I.e. define each
+          ! Z-matrix in its own scope and then define its restraints within the same scope?)
+          ! #########################################################################################
+          iTotal = 0
+          DO iFrg = 1, nFrag
+            DO iAtom = 1, natoms(iFrg)
+              tElement = zmElementCSD(iAtom,iFrg)
+              IF ( (tElement .EQ. 2) .OR. (tElement .EQ. 27) ) THEN
+                ! Hydrogen or deuterium
+                b_str = 'bh'
+                b_str_len = 2
+              ELSE
+                b_str = 'bnonh'
+                b_str_len = 5
+              ENDIF
+              IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
+                b_str = '!'//b_str
+                b_str_len = b_str_len + 1
+              ENDIF
+              tStr = Integer2String(iTotal + iAtom)
+              iLen1 = LEN_TRIM(tStr)
+              tElementStr = ElementStr(tElement)
+              iLen2 = LEN_TRIM(tElementStr)
+              LabelStr = tElementStr(1:iLen2)//tStr(1:iLen1)
+              ii = OrderedAtm(iTotal + iAtom) ! Needed for Xato()
+              WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,1X,F6.3)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
+                Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
+                occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len), tiso(iAtom,iFrg)
+            ENDDO
+            iTotal = iTotal + natoms(iFrg)
+          ENDDO
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_width 0'
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_weight 10000'
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_width 1'
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_weight 1'
+          iTotal = 0
+          DO iFrg = 1, nFrag
+            ! Convert internal coordinates to orthogonal coordinates
+            CALL makexyz(natoms(iFrg),RR_blen(1,iFrg),RR_alph(1,iFrg),RR_bet(1,iFrg),        &
+                         IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),axyzo)
+            DO iAtom = 1, natoms(iFrg)
+              aelem(iAtom) = zmElementCSD(iAtom,iFrg)
+            ENDDO
+            natcry = natoms(iFrg)
+            ! Detect bonds and their types (to find benzene rings for Flatten macro)
+            CALL SAMABO()
+            ! ##### Distance restraints #####
+            DO J = 1, nbocry
+              iAtom1 = bond(J,1)
+              iAtom2 = bond(J,2)
+              CALL PLUDIJ(iAtom1, iAtom2, distance)
+              CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, LabelStr1)
+              CALL GenerateAtomLabel(zmElementCSD(iAtom2,iFrg), iTotal+iAtom2, LabelStr2)
+              WRITE(hFileTOPAS, '(A,A7,1X,A7,A,F9.5,A)', ERR=999) 'Distance_Restrain(', LabelStr1, LabelStr2, &
+                ', ', distance, ', 1.0, bond_width, bond_weight)'
+            ENDDO
+            ! ##### Angle restraints #####
+            DO iAtom = 1, natoms(iFrg)
+              CALL SAMCON(iAtom, Ncon, Icon, Icob, 0)
+! NCON        output number of connected atoms for iAtom
+! ICON (1:30) output list of atoms connected to iAtom
+! ICOB (1:30) output bond types for each connection in ICON
+              DO J1 = 1, Ncon-1
+                DO J2 = J1+1, Ncon
+                  iAtom1 = Icon(J1)
+                  iAtom2 = Icon(J2)
+                  CALL SAMANF(iAtom1, iAtom, iAtom2, angle)
+                  CALL GenerateAtomLabel(zmElementCSD(iAtom,iFrg), iTotal+iAtom, LabelStr)
+                  CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, LabelStr1)
+                  CALL GenerateAtomLabel(zmElementCSD(iAtom2,iFrg), iTotal+iAtom2, LabelStr2)
+                  WRITE(hFileTOPAS, '(A,A7,1X,A7,1X,A7,A,F9.5,A)', ERR=999) 'Angle_Restrain(', LabelStr1, &
+                    LabelStr, LabelStr2, ', ', angle, ', 1.0, angle_width, angle_weight)'
+                ENDDO
+              ENDDO
+            ENDDO
+            ! ##### Flatten #####
+            sum_of_assemblies = 0
+            ! Loop over atoms
+            DO iAtom = 1, natoms(iFrg)
+              ! If in a previous assembly, continue to next atom
+              IF ( assembly_contains(sum_of_assemblies, iAtom) ) GOTO 20
+              ! If atom does not have any aromatic bond attached to it, continue to next atom
+              IF ( .NOT. has_aromatic_bond(iAtom) ) GOTO 20
+              ! Otherwise, use this atom as the start of the algorithm.
+              current_assembly = 0 ! Empty the current assembly
+              AAStackPtr = MaxAAStack ! Empty the stack
+              ! Push the atom onto the stack
+              CALL PushAA(iAtom)
+              ! Then call the subroutine who does all the work.
+              CALL find_aromatic_assembly(current_assembly)
+              ! Write out this assembly with a flatten command
+              ! We could add a test to check that the atoms that we have added are in a plane to start with
+              ! This is not necessarily so: e.g. in a buckyball or in one of those fused benzene rings spiral
+              nFlatten = 0
+              DO J = 1, MaxAtm_3
+                iAtom1 = current_assembly(J)
+                IF ( iAtom1 .NE. 0 ) THEN
+                  CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, flatten_labels(J))
+                  nFlatten = nFlatten + 1
+                ENDIF
+              ENDDO
+              IF ( nFlatten .GT. 3 ) THEN
+                WRITE(hFileTOPAS, '(A,999(1X,A7))', ERR=999) 'Flatten(', (flatten_labels(K),K=1,nFlatten), ', 0, 0,', '1000000',')      '
+              ENDIF
+              ! Add current assembly to sum_of_assemblies
+              DO J = 1, nFlatten
+                CALL assembly_add(sum_of_assemblies, current_assembly(J))
+              ENDDO
+   20         CONTINUE
+            ENDDO
+   30       CONTINUE
+            iTotal = iTotal + natoms(iFrg)
+          ENDDO
+          ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
+          !                            END
+          ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
+
+          ! Probably need to improve mechanism to indicate end
+          is_last_line = .TRUE.
+        ENDIF
+      ELSE IF ( word(1:3) .EQ. 'BKG' ) THEN
+        IF ( WDialogGetCheckBoxLogical(IDC_Background) ) THEN
+          tLine(7:7) = '@'
+        ELSE
+          tLine(7:7) = ' '
+        ENDIF 
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( word(1:5) .EQ. 'SCALE' ) THEN
+        IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
+          tLine(11:11) = '@'
+        ELSE
+          tLine(11:11) = ' '
+        ENDIF 
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( word(1:11) .EQ. 'OUT_CIF_STR' ) THEN
+        ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( word(1:9) .EQ. 'DO_ERRORS' ) THEN
+        ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( word(1:4) .EQ. 'SITE' ) THEN
+        ! Several possibilities here.
+        ! The only thing that really needs to be done here is to insert or erase the !
+        ! to indicate whether Biso is to be refined
+        ! But we could also read the fractional coordinates back in and use them to
+        ! overlay the refined solution with the original one.
+        iPos = StrFind(tLine, iLen, '!', 1)
+        IF ( iPos .NE. 0 ) THEN
+          IF ( WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
+            tLine(iPos:iPos) = ' '
+            WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+          ELSE
+            ! Don't change anything if ! already present and Biso not to be refined
+            WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+          ENDIF
+        ELSE
+          IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
+            ! Find 'beq  bnonh' or 'beq  bh'
+            iPos = StrFind(tLine, iLen, 'beq  bnonh', 10)
+            IF ( iPos .EQ. 0 ) THEN
+              iPos = StrFind(tLine, iLen, 'beq  bh', 7)
+              IF ( iPos .EQ. 0 ) THEN
+                CALL ErrorMessage('"beq" keyword not found on "site" line.')
+              ELSE
+                tLine(iPos+4:iPos+4) = '!'
+              ENDIF
+            ELSE
+              tLine(iPos+4:iPos+4) = '!'
+            ENDIF
+            WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+          ELSE
+            ! Don't change anything if ! not present and Biso requested to be refined
+            WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+          ENDIF
+        ENDIF
+      ELSE IF ( word(1:5) .EQ. 'MACRO' ) THEN
+        ! Check if rest is ref_flag
+        IF ( StrFind(tLine, iLen, 'ref_flag', 8) .NE. 0 ) THEN
+          IF ( WDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag { @ }'
+          ELSE
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
+          ENDIF
+        ENDIF
+      ELSE IF ( word(1:2) .EQ. 'PO' ) THEN
+
+         ! ######### TODO ##########
+
       ELSE
-        iPos = StrFind(tLine, iLen, space_group_str, 11)
-        is_last_line = ( iPos .NE. 0 ) 
         ! Change all the @'s to spaces.
+        ! This switches off refinement of a, b, c, al, be, ga, zero-point error,
+        ! CS_L, CS_G, Strain_L, Strain_G
         DO iStrPos = 1, iLen
           IF (tLine(iStrPos:iStrPos) .EQ. '@') &
             tLine(iStrPos:iStrPos) = ' '
         ENDDO
-        IF ( tLine(1:6) .EQ. '  bkg ' ) THEN
-          IF ( WDialogGetCheckBoxLogical(IDC_Background) ) THEN
-            tLine(7:7) = '@'
-          ENDIF 
-        ENDIF
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ENDIF
       IF ( .NOT. is_last_line ) GOTO 10
-      CLOSE(hOutputFile)
-      IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 1.0'
-      ELSE
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    scale   1.0'
-      ENDIF
-! We must call ShowWizardWindowRietveld() here, which will fill
-! Xato (and all the RR variables). The Wizard window is suppressed because of the For_TOPAS flag.
-      CALL ShowWizardWindowRietveld(RR_SA_Sol)
-! Also need to write out PO if used during SA
-      IF ( PrefParExists ) THEN
-        WRITE(hFileTOPAS, '(A,F5.3,A,I3,1X,I3,1X,I3,1X,A)', ERR=999) '    PO( , ', RR_PO, ', , ', PO_Direction(1), PO_Direction(2), PO_Direction(3), ')'
-      ELSE
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    PO( , 1.0, , 1 0 0)'
-      ENDIF
-      WRITE(hFileTOPAS, '(A)', ERR=999) "'   Insert @ in the curly brackets to refine structural parameters"
-      IF ( WDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag { @ }'
-      ELSE
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
-      ENDIF
-      ! #########################################################################################
-      ! TOPAS needs unique atom labels ("site labels"), especially when applying restraints.
-      ! This is a problem for DASH where we use user-supplied labels.
-      ! This is especially a problem if there is more than one Z-matrix in the asymmetric unit.
-      ! (Would it have been possible to solve this using the "scopes" in TOPAS?, I.e. define each
-      ! Z-matrix in its own scope and then define its restraints within the same scope?)
-      ! #########################################################################################
-      iTotal = 0
-      DO iFrg = 1, nFrag
-        DO iAtom = 1, natoms(iFrg)
-          tElement = zmElementCSD(iAtom,iFrg)
-          IF ( (tElement .EQ. 2) .OR. (tElement .EQ. 27) ) THEN
-            ! Hydrogen or deuterium
-            b_str = 'bh'
-            b_str_len = 2
-          ELSE
-            b_str = 'bnonh'
-            b_str_len = 5
-          ENDIF
-          IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
-            b_str = '!'//b_str
-            b_str_len = b_str_len + 1
-          ENDIF
-          tStr = Integer2String(iTotal + iAtom)
-          iLen1 = LEN_TRIM(tStr)
-          tElementStr = ElementStr(tElement)
-          iLen2 = LEN_TRIM(tElementStr)
-          LabelStr = tElementStr(1:iLen2)//tStr(1:iLen1)
-          ii = OrderedAtm(iTotal + iAtom) ! Needed for Xato()
-          WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,1X,F6.3)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
-            Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
-            occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len), tiso(iAtom,iFrg)
-        ENDDO
-        iTotal = iTotal + natoms(iFrg)
-      ENDDO
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_width 0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_weight 10000'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_width 1'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_weight 1'
-      iTotal = 0
-      DO iFrg = 1, nFrag
-        ! Convert internal coordinates to orthogonal coordinates
-        CALL makexyz(natoms(iFrg),RR_blen(1,iFrg),RR_alph(1,iFrg),RR_bet(1,iFrg),        &
-                     IZ1(1,iFrg),IZ2(1,iFrg),IZ3(1,iFrg),axyzo)
-        DO iAtom = 1, natoms(iFrg)
-          aelem(iAtom) = zmElementCSD(iAtom,iFrg)
-        ENDDO
-        natcry = natoms(iFrg)
-        ! Detect bonds and their types (to find benzene rings for Flatten macro)
-        CALL SAMABO()
-        ! ##### Distance restraints #####
-        DO J = 1, nbocry
-          iAtom1 = bond(J,1)
-          iAtom2 = bond(J,2)
-          CALL PLUDIJ(iAtom1, iAtom2, distance)
-          CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, LabelStr1)
-          CALL GenerateAtomLabel(zmElementCSD(iAtom2,iFrg), iTotal+iAtom2, LabelStr2)
-          WRITE(hFileTOPAS, '(A,A7,1X,A7,A,F9.5,A)', ERR=999) 'Distance_Restrain(', LabelStr1, LabelStr2, &
-            ', ', distance, ', 1.0, bond_width, bond_weight)'
-        ENDDO
-        ! ##### Angle restraints #####
-        DO iAtom = 1, natoms(iFrg)
-          CALL SAMCON(iAtom, Ncon, Icon, Icob, 0)
-! NCON        output number of connected atoms for iAtom
-! ICON (1:30) output list of atoms connected to iAtom
-! ICOB (1:30) output bond types for each connection in ICON
-          DO J1 = 1, Ncon-1
-            DO J2 = J1+1, Ncon
-              iAtom1 = Icon(J1)
-              iAtom2 = Icon(J2)
-              CALL SAMANF(iAtom1, iAtom, iAtom2, angle)
-              CALL GenerateAtomLabel(zmElementCSD(iAtom,iFrg), iTotal+iAtom, LabelStr)
-              CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, LabelStr1)
-              CALL GenerateAtomLabel(zmElementCSD(iAtom2,iFrg), iTotal+iAtom2, LabelStr2)
-              WRITE(hFileTOPAS, '(A,A7,1X,A7,1X,A7,A,F9.5,A)', ERR=999) 'Angle_Restrain(', LabelStr1, &
-                LabelStr, LabelStr2, ', ', angle, ', 1.0, angle_width, angle_weight)'
-            ENDDO
-          ENDDO
-        ENDDO
+   40 CLOSE(hOutputFile)
 
-        ! ##### Flatten #####
-        IF ( .NOT. WDialogGetCheckBoxLogical(IDC_IncludeFlatten) ) GOTO 30
-        sum_of_assemblies = 0
-        ! Loop over atoms
-        DO iAtom = 1, natoms(iFrg)
-          ! If in a previous assembly, continue to next atom
-          IF ( assembly_contains(sum_of_assemblies, iAtom) ) GOTO 20
-          ! If atom does not have any aromatic bond attached to it, continue to next atom
-          IF ( .NOT. has_aromatic_bond(iAtom) ) GOTO 20
-          ! Otherwise, use this atom as the start of the algorithm.
-          current_assembly = 0 ! Empty the current assembly
-          AAStackPtr = MaxAAStack ! Empty the stack
-          ! Push the atom onto the stack
-          CALL PushAA(iAtom)
-          ! Then call the subroutine who does all the work.
-          CALL find_aromatic_assembly(current_assembly)
-          ! Write out this assembly with a flatten command
-          ! We could add a test to check that the atoms that we have added are in a plane to start with
-          ! This is not necessarily so: e.g. in a buckyball or in one of those fused benzene rings spiral
-          nFlatten = 0
-          DO J = 1, MaxAtm_3
-            iAtom1 = current_assembly(J)
-            IF ( iAtom1 .NE. 0 ) THEN
-              CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, flatten_labels(J))
-              nFlatten = nFlatten + 1
-            ENDIF
-          ENDDO
-          IF ( nFlatten .GT. 3 ) THEN
-            WRITE(hFileTOPAS, '(A,999(1X,A7))', ERR=999) 'Flatten(', (flatten_labels(K),K=1,nFlatten), ', 0, 0,', '1000000',')      '
-          ENDIF
-          ! Add current assembly to sum_of_assemblies
-          DO J = 1, nFlatten
-            CALL assembly_add(sum_of_assemblies, current_assembly(J))
-          ENDDO
-   20     CONTINUE
-        ENDDO
-   30   CONTINUE
-        iTotal = iTotal + natoms(iFrg)
-      ENDDO
       IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
         WRITE(hFileTOPAS, '(A)', ERR=999) '    do_errors'
       ENDIF
       IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
         WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//FileNameBase(1:LEN_TRIM(FileNameBase))//'.cif")'
       ENDIF
+
       WriteTOPASFileRietveld2 = 0
       CLOSE(hFileTOPAS)
       RETURN
