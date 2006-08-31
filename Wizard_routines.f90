@@ -486,6 +486,10 @@
               ELSE
                 CALL WDialogGetReal(IDF_wavelength1, Temp)
                 CALL Set_Wavelength(Temp)
+                IF ( For_TOPAS ) THEN
+                  CALL WDialogSelect(IDD_PW_Page5)
+                  CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN, .FALSE.)
+                ENDIF
                 CALL WizardWindowShow(IDD_PW_Page5)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
