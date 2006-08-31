@@ -2027,7 +2027,7 @@
               OFBN_Len = Old_OFBN_Len
               iSeed1 = Old_iSeed1
               iSeed2 = Old_iSeed2
-              CALL InfoMessgae('GRID batch files written.')
+              CALL InfoMessage('GRID batch files written.')
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
           END SELECT
