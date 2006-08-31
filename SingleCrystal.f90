@@ -96,13 +96,10 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCLOSE, IDCANCEL)
-              CALL Unload_SX_Page1a
               CALL EndWizard
             CASE (IDBACK)
-              CALL Unload_SX_Page1a
               CALL WizardWindowShow(IDD_SX_Page1)
             CASE (IDNEXT)
-              CALL Unload_SX_Page1a
               CALL WDialogSelect(IDD_ViewPawley)
               CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
               CALL WDialogSelect(IDD_SX_Page2)
