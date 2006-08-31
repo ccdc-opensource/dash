@@ -1,4 +1,4 @@
-! Winteracter module created : 30/Aug/2006 17:21:00
+! Winteracter module created : 31/Aug/2006 13:00:26
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -662,8 +662,7 @@
           INTEGER, PARAMETER :: IDC_wl_in_xye                   =  1439
           INTEGER, PARAMETER :: IDD_SA_input5                   =   142
           INTEGER, PARAMETER :: IDF_STRING1                     =  1442
-          INTEGER, PARAMETER :: IDF_NumOfIterations2            =  1212
-          INTEGER, PARAMETER :: IDF_NumOfIterations3            =  1213
+          INTEGER, PARAMETER :: IDF_NumOfRuns                   =  1445
           INTEGER, PARAMETER :: IDD_SAW_Page7                   =   123
           INTEGER, PARAMETER :: IDC_Scale                       =  1252
           INTEGER, PARAMETER :: IDC_Background                  =  1443
@@ -672,4 +671,5 @@
           INTEGER, PARAMETER :: IDC_WriteCIF                    =  1448
           INTEGER, PARAMETER :: IDC_IncludeESDs                 =  1449
           INTEGER, PARAMETER :: IDC_UseDASHRecommendation       =  1450
+          INTEGER, PARAMETER :: IDF_NumOfRunsPerNode            =  1446
       END MODULE Druid_Header

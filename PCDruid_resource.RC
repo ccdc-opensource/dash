@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 30/Aug/2006 17:21:00
+// Modified : 31/Aug/2006 13:00:26
 //
 ///////////////////////////////////////////////////
 //
@@ -675,8 +675,7 @@
 #define IDC_wl_in_xye                    1439
 #define IDD_SA_input5                     142
 #define IDF_STRING1                      1442
-#define IDF_NumOfIterations2             1212
-#define IDF_NumOfIterations3             1213
+#define IDF_NumOfRuns                    1445
 #define IDD_SAW_Page7                     123
 #define IDC_Scale                        1252
 #define IDC_Background                   1443
@@ -685,6 +684,7 @@
 #define IDC_WriteCIF                     1448
 #define IDC_IncludeESDs                  1449
 #define IDC_UseDASHRecommendation        1450
+#define IDF_NumOfRunsPerNode             1446
 
 ///////////////////////////////////////////////////
 //
@@ -1446,12 +1446,12 @@ BEGIN
     CONTROL "Cycle number",IDF_Pawley_Cycle_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,   98,   46,    8
     CONTROL "",IDF_Pawley_Cycle_Number,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  156,   96,   16,   12
     CONTROL "of",IDF_Pawley_Cycle_Label2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  178,   98,   12,    8
-    CONTROL "reflections",IDF_Pawley_Cycle_Refs_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  130,  130,   34,    8
+    CONTROL "reflections",IDF_Pawley_Cycle_Refs_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  130,  130,   36,    8
     CONTROL "",IDF_Pawley_Cycle_NumRefs,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  104,  128,   24,   12
-    CONTROL "points",IDF_Pawley_Cycle_Pts_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  193,  130,   20,    8
+    CONTROL "points",IDF_Pawley_Cycle_Pts_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  193,  130,   22,    8
     CONTROL "",IDF_Pawley_Cycle_NumPts,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  168,  128,   24,   12
     CONTROL "Refinement status",IDF_Pawley_Status_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,   84,  298,   60
-    CONTROL "Refinement number",IDF_Pawley_RefNum_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  302,   98,   62,    8
+    CONTROL "Refinement number",IDF_Pawley_RefNum_Label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  296,   98,   68,    8
     CONTROL "",IDF_Pawley_Refinement_Number,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  366,   96,   16,   12
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  176,  150,   36,   14
     CONTROL "&Refine",IDF_PawRef_Refine,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  220,  150,   36,   14
@@ -1474,9 +1474,9 @@ BEGIN
     CONTROL "G&amma(size)",IDF_PawRef_RefGamm1_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  161,   48,   54,   14
     CONTROL "Ga&mma(strain)",IDF_PawRef_RefGamm2_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  161,   62,   60,   14
     CONTROL "Refinement control",IDF_Pawley_Options_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   94,    6,  298,   74
-    CONTROL "Overlap criterion",IDF_SlimLabel,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  300,   54,   52,    8
+    CONTROL "Overlap criterion",IDF_SlimLabel,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  296,   54,   56,    8
     CONTROL "1.0",IDF_Slim_Parameter,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  355,   51,   30,   14
-    CONTROL "Step size damping factor",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  272,   37,   80,    8
+    CONTROL "Step size damping factor",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  268,   37,   84,    8
     CONTROL "1.0",IDF_FudgeFactor,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  355,   34,   30,   14
     CONTROL "chi",IDF_Pawley_Cycle_ChiSq_Label1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  335,  130,   12,    8
     CONTROL "",IDF_Pawley_Cycle_ChiSq,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_READONLY,  354,  128,   28,   12
@@ -2670,9 +2670,9 @@ BEGIN
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "Rebin the profile",IDF_BinData,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  106,   44,   64,   14
+    CONTROL "Rebin the profile",IDF_BinData,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  106,   44,   75,   14
     CONTROL "1",IDF_LBIN,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  152,   66,   40,   14
-    CONTROL "Bin width:",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  113,   68,   36,    8
+    CONTROL "Bin width:",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,  109,   68,   40,    8
     CONTROL "&Apply",IDAPPLY,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  286,  148,   40,   14
 END
 
@@ -3803,18 +3803,16 @@ CAPTION "DASH Wizard : Generating GRID batch files"
 BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
-    CONTROL "&Write >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "10",IDF_NumOfIterations,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  213,   58,   32,   14
-    CONTROL "Number of runs per node",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   93,   61,  110,    8
+    CONTROL "&Write >",IDB_WRITE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "10",IDF_NumOfRunsPerNode,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  215,   42,   32,   14
+    CONTROL "Split runs into packages containing",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   85,   45,  124,    8
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "famot",IDF_STRING1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,  104,   94,  150,   14
-    CONTROL "Base name for .duff and .dash files:",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  105,   83,  140,    8
-    CONTROL ".duff and .dash files will be called base_name_nnn.duff and base_name_nnn.dash respectively, where nnn is the node number, e.g. base_name_078.dash",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  105,  114,  218,   30
-    CONTROL "500",IDF_NumOfIterations2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  209,   22,   36,   14
-    CONTROL "Total number of SA runs to perform",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   93,   25,  110,    8
-    CONTROL "Conve&rt",IDB_Convert,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  255,   50,   40,   14
-    CONTROL "50",IDF_NumOfIterations3,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  213,   42,   32,   14
-    CONTROL "Number of nodes to use",IDF_LABEL9,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   93,   45,  110,    8
+    CONTROL "",IDF_STRING1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,  100,   90,  250,   14
+    CONTROL "Base name for .duff and .dash files:",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  101,   79,  140,    8
+    CONTROL ".duff and .dash files will be called base_name_nnn.duff and base_name_nnn.dash respectively, where nnn is the node number, e.g. base_name_078.dash",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  101,  110,  218,   30
+    CONTROL "500",IDF_NumOfRuns,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  211,   24,   36,   14
+    CONTROL "Total number of SA runs to perform",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   85,   27,  120,    8
+    CONTROL "SA run(s) each",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  254,   44,   60,    8
 END
 
 IDD_SA_input5 RCDATA
@@ -3823,9 +3821,8 @@ BEGIN
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
-" 1211               1             999 \n"
-" 1212               1             999 \n"
-" 1213               1             999 \n"
+" 1446               1             999 \n"
+" 1445               1             999 \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"
