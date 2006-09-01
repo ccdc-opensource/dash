@@ -1954,10 +1954,11 @@
       INTEGER Rel_OFBN_Len
       INTEGER Old_iSeed1, Old_iSeed2, iHandle
       CHARACTER(MaxPathLength) DuffFileName
-      CHARACTER*255 tDirName, tFileName, tExtension
+      CHARACTER*255 tDirName, tFileName, tExtension, current_directory
       INTEGER ExtLength
 
       CALL PushActiveWindowID
+      CALL IOsDirName(current_directory)
       CALL WDialogSelect(IDD_SA_input5)
       SELECT CASE (EventType)
         CASE (PushButton)
@@ -2020,6 +2021,7 @@
                 tFileName = Rel_OutputFilesBaseName(1:Rel_OFBN_Len)//'_'//PackageStr//'.duff'
                 WRITE(iHandle,'(A)',ERR=999) tFileName(1:LEN_TRIM(tFileName))
               ENDDO
+              CALL IOsDirChange(current_directory)
               CLOSE(iHandle)
               ! Restore variables
               MaxRuns = Old_MaxRuns
@@ -2035,8 +2037,10 @@
       CALL PopActiveWindowID
       RETURN
   999 CONTINUE
+      CALL IOsDirChange(current_directory)
       CALL ErrorMessage('Error writing .grd file.')
       CLOSE(iHandle)
+      CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowWriteGrid
 !
