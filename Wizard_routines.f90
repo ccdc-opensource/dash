@@ -371,8 +371,7 @@
               CALL WizardApplyDiffractionFileInput
               CALL Profile_Plot
 ! If the user is re-binning this profile, make sure we pass the binning
-              CALL WDialogSelect(IDD_PW_Page3a)
-              IF ((EventInfo%VALUE1 .EQ. IDB_Bin) .OR. WDialogGetCheckBoxLogical(IDF_BinData)) THEN
+              IF ((EventInfo%VALUE1 .EQ. IDB_Bin) .OR. lRebin) THEN
                 CALL WizardWindowShow(IDD_PW_Page3a)
               ELSE
                 CALL WizardWindowShow(IDD_PW_Page4)
