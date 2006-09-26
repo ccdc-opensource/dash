@@ -1748,6 +1748,7 @@
               ELSE
                 ! TOPAS
                 TOPAS_stage = 1
+                CALL CopyPattern2Backup()
                 CALL WizardWindowShow(IDD_RR_TOPAS)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
@@ -1796,6 +1797,7 @@
               ELSE
                 ! TOPAS
                 TOPAS_stage = 1
+                CALL CopyPattern2Backup()
                 CALL WizardWindowShow(IDD_RR_TOPAS)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)

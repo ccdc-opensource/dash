@@ -168,7 +168,6 @@
       INTEGER          MAX_INTENSITY_INDEX
       REAL             tYPMIN, tYPMAX
 
-      IF ( For_TOPAS ) CALL CopyPattern2Backup
 ! Initialise to failure
       DiffractionFileLoad = 1
       Is_SX = .FALSE. ! Should not be necessary
