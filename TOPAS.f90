@@ -70,19 +70,6 @@
 
       IMPLICIT NONE
 
-      INTEGER                  OFBN_Len
-      CHARACTER(MaxPathLength)           OutputFilesBaseName
-      CHARACTER(3)                                            SA_RunNumberStr
-      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
-
-      INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
-      INTEGER, EXTERNAL :: DiffractionFileBrowse
-      LOGICAL, EXTERNAL :: FnPatternOK
-      CHARACTER(MaxPathLength) :: TOPASFileName
-      CHARACTER(LEN=60) :: FILTER
-      INTEGER iFlags, iFType
-      CHARACTER(LEN=MaxPathLength) tFileName
-
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_RR_TOPAS)
       SELECT CASE (EventType)
@@ -101,33 +88,6 @@
             CASE (IDB_Write_Pawley)
               For_TOPAS = .TRUE.
               CALL WizardWindowShow(IDD_PW_Page3)
-            CASE (IDB_Browse) ! The TOPAS Pawley refinement output file
-              iFlags = LoadDialog + DirChange + PromptOn + AppendExt
-              FILTER = 'All files (*.*)|*.*|'//&
-                       'TOPAS ouput files (*.out)|*.out|'
-              tFileName = ' '
-! iFType specifies which of the file types in the list is the default
-              iFType = 2
-              CALL WSelectFile(FILTER, iFlags, tFileName, 'Open TOPAS output file', iFType)
-! Did the user press cancel?
-              IF ( (WInfoDialog(ExitButtonCommon) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0) ) THEN
-                TOPAS_output_file_name = tFileName
-                TOPAS_stage = 3 ! I think this variable is redundant
-                CALL WDialogFieldStateLogical(IDB_Browse,   .FALSE.)
-                CALL WDialogFieldStateLogical(IDB_Write_RR, .TRUE.)
-              ENDIF
-            CASE (IDB_Write_RR)
-              iFlags = SaveDialog + AppendExt + PromptOn
-              FILTER = 'TOPAS input file (*.inp)|*.inp|'
-              TOPASFileName = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
-              CALL WSelectFile(FILTER, iFlags, TOPASFileName, 'Save TOPAS input file (Rietveld)')
-              IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPASFileName) .NE. 0)) THEN
-                IF ( WriteTOPASFileRietveld2(TOPASFileName) .EQ. 0 ) THEN
-                  TOPAS_stage = 1
-                  CALL WDialogFieldStateLogical(IDB_Write_RR,     .FALSE.)
-                  CALL WDialogFieldStateLogical(IDB_Write_Pawley, .TRUE.)
-                ENDIF
-              ENDIF
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -297,21 +257,21 @@
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
-        CASE ( 3 ) ! First Rietveld refinement: refine scale only
+        CASE ( 3 ) ! Second Rietveld refinement: include background
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
-        CASE ( 4 ) ! First Rietveld refinement: refine scale only
+        CASE ( 4 ) ! Third Rietveld refinement: include coordinates
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
-        CASE ( 5 ) ! First Rietveld refinement: refine scale only
+        CASE ( 5 ) ! Fourth Rietveld refinement: include Biso
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
