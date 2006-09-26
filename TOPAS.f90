@@ -3,6 +3,9 @@
 !
       SUBROUTINE CopyPattern2Backup
 
+      USE DRUID_HEADER
+      USE WINTERACTER
+
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
@@ -17,18 +20,30 @@
       REAL                                              TAXOBS,       TAYOBS,       TAEOBS
       COMMON /TAPROFOBS/ TALAMBDA, TARADIATION, TANOBS, TAXOBS(MOBS), TAYOBS(MOBS), TAEOBS(MOBS)
 
+      ! Perhaps this pair of functions should also set and reset the For_TOPAS variable
       TANOBS = NOBS
       TAXOBS(1:NOBS) = XOBS(1:NOBS)
       TAYOBS(1:NOBS) = YOBS(1:NOBS)
       TAEOBS(1:NOBS) = EOBS(1:NOBS)
       TALAMBDA = ALambda
       TARADIATION = JRadOption
+      ! Uncheck the "Truncate pattern at end" checkbox (but we don't store its current state)
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page5)
+      CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN, .FALSE.)
+      CALL WDialogFieldState(IDF_Max2Theta, Disabled)
+      CALL WDialogFieldState(IDF_MaxResolution, Disabled)
+      CALL WDialogFieldState(IDB_Convert, Disabled)
+      CALL PopActiveWindowID
 
       END SUBROUTINE CopyPattern2Backup
 !
 !*****************************************************************************
 !
       SUBROUTINE CopyBackup2Pattern
+
+      USE DRUID_HEADER
+      USE WINTERACTER
 
       IMPLICIT NONE
 
@@ -54,9 +69,17 @@
       EOBS(1:NOBS) = TAEOBS(1:NOBS)
       ALambda = TALAMBDA
       JRadOption = TARADIATION
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page5)
+      CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN, .TRUE.)
+      CALL WDialogFieldState(IDF_Max2Theta, Enabled)
+      CALL WDialogFieldState(IDF_MaxResolution, Enabled)
+      CALL WDialogFieldState(IDB_Convert, Enabled)
+      CALL PopActiveWindowID
       ! Must also restore Rebin_Profile
       LBIN = 1
       CALL Rebin_Profile()
+      CALL Profile_Plot
 
       END SUBROUTINE CopyBackup2Pattern
 !
@@ -78,6 +101,10 @@
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_SAW_Page6a)
             CASE (IDCANCEL, IDCLOSE)
+              IF ( For_TOPAS ) THEN
+                CALL CopyBackup2Pattern()
+                For_TOPAS = .FALSE.
+              ENDIF
               CALL EndWizardPastPawley
             CASE (IDB_UsePrevious)
               TOPAS_stage = 2
@@ -308,7 +335,11 @@
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_RR_TOPAS)
             CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizard
+              IF ( For_TOPAS ) THEN
+                CALL CopyBackup2Pattern()
+                For_TOPAS = .FALSE.
+              ENDIF
+              CALL EndWizardPastPawley
             CASE (IDBBROWSE)
               iFlags = LoadDialog + DirChange + PromptOn
               FILTER = 'All files (*.*)|*.*|'//&
