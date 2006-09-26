@@ -374,6 +374,10 @@
                 CALL WizardWindowShow(IDD_PW_Page4)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
+              IF ( For_TOPAS ) THEN
+                CALL CopyBackup2Pattern()
+                For_TOPAS = .FALSE.
+              ENDIF
               CALL EndWizard
             CASE (ID_PWa_DF_Open)
               CALL WDialogGetString(IDF_PWa_DataFileName_String, CTEMP)
@@ -451,6 +455,10 @@
               CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDCANCEL, IDCLOSE)
+              IF ( For_TOPAS ) THEN
+                CALL CopyBackup2Pattern()
+                For_TOPAS = .FALSE.
+              ENDIF
               CALL EndWizard
             CASE (IDAPPLY)
               CALL WizardApplyRebin
@@ -494,12 +502,12 @@
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page4)
       SELECT CASE (EventType)
-        CASE (PushButton) ! one of the buttons was pushed
+        CASE ( PushButton ) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! If the user is re-binning this profile, make sure we pass the binning
               CALL WDialogSelect(IDD_PW_Page3a)
-              IF (WDialogGetCheckBoxLogical(IDF_BinData)) THEN
+              IF ( WDialogGetCheckBoxLogical(IDF_BinData) ) THEN
                 CALL WizardWindowShow(IDD_PW_Page3a)
               ELSE
                 CALL WizardWindowShow(IDD_PW_Page3)
@@ -510,16 +518,13 @@
               ELSE
                 CALL WDialogGetReal(IDF_wavelength1, Temp)
                 CALL Set_Wavelength(Temp)
-                IF ( For_TOPAS ) THEN
-                  CALL WDialogSelect(IDD_PW_Page5)
-                  CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN, .FALSE.)
-                  CALL WDialogFieldState(IDF_Max2Theta, Disabled)
-                  CALL WDialogFieldState(IDF_MaxResolution, Disabled)
-                  CALL WDialogFieldState(IDB_Convert, Disabled)
-                ENDIF
                 CALL WizardWindowShow(IDD_PW_Page5)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
+              IF ( For_TOPAS ) THEN
+                CALL CopyBackup2Pattern()
+                For_TOPAS = .FALSE.
+              ENDIF
               CALL EndWizard
           END SELECT
         CASE (FieldChanged)
@@ -656,6 +661,10 @@
               ENDIF
               CALL Profile_Plot
             CASE (IDCANCEL, IDCLOSE)
+              IF ( For_TOPAS ) THEN
+                CALL CopyBackup2Pattern()
+                For_TOPAS = .FALSE.
+              ENDIF
               CALL EndWizard
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
