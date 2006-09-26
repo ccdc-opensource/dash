@@ -552,7 +552,7 @@
       tFileName = OutputFilesBaseName(1:OFBN_Len)//'.chi'
       OPEN(UNIT=hFile,FILE=tFileName(1:OFBN_Len+4),ERR=999)
       DO I = 1, MaxIterationSoFar
-        WRITE(hFile,'(I10,(1X,F9.2))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
+        WRITE(hFile,'(I10,999(1X,F9.2))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
       ENDDO
       CLOSE(hFile)
       RETURN
