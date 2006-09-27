@@ -376,8 +376,7 @@
 !
 !*****************************************************************************
 ! 
-! This function only writes files for stage 2, i.e. it can only read the output file
-! from the Pawley refinement and write out the very first Rietveld refinement file.
+! This function read and writes the file for Rietveld refinement (as opposed to Pawley).
       INTEGER FUNCTION WriteTOPASFileRietveld2(FileNameBase)
 
       USE DRUID_HEADER
@@ -482,7 +481,10 @@
           CALL ShowWizardWindowRietveld(RR_SA_Sol)
 ! Also need to write out PO if used during SA
           IF ( PrefParExists ) THEN
-            WRITE(hFileTOPAS, '(A,F5.3,A,I3,1X,I3,1X,I3,1X,A)', ERR=999) '    PO( , ', RR_PO, ', , ', PO_Direction(1), PO_Direction(2), PO_Direction(3), ')'
+            WRITE(hFileTOPAS, '(A,F5.3,A,I3,1X,I3,1X,I3,1X,A)', ERR=999) '    PO(@, ', RR_PO, ', , ', PO_Direction(1), PO_Direction(2), PO_Direction(3), ')'
+            CALL InfoMessage('The preferred orientation that was used during the Simulated Annealing'//CHAR(13)//&
+                             'has been written out to the TOPAS .inp file: if you are using'//CHAR(13)//&
+                             'a different experimental pattern, you may need to remove this.')
           ELSE
             WRITE(hFileTOPAS, '(A)', ERR=999) '    PO( , 1.0, , 1 0 0)'
           ENDIF
@@ -678,9 +680,7 @@
           ENDIF
         ENDIF
       ELSE IF ( word(1:2) .EQ. 'PO' ) THEN
-
-         ! ######### TODO ##########
-
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ELSE
         ! Change all the @'s to spaces.
         ! This switches off refinement of a, b, c, al, be, ga, zero-point error,
