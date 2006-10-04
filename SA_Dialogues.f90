@@ -591,7 +591,7 @@
                 CASE (1) ! C.O.M.
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
                   COM = 0.0
-                  IF (UseCCoM) THEN
+                  IF ( UseCCoM ) THEN
                     CALL zmCreate_AtomicWeightings(iFrg, HydrogenTreatment)
                   ELSE
                     DO iAtomNr = 1, natcry

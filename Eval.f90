@@ -118,7 +118,7 @@
           XC = 0.0
           YC = 0.0
           ZC = 0.0
-          IF (UseCCoM) THEN
+          IF ( UseCCoM ) THEN
             DO I = 1, NATS
               XC = XC + AtomicWeighting(I,iFrg)*axyzo(1,I)
               YC = YC + AtomicWeighting(I,iFrg)*axyzo(2,I)
