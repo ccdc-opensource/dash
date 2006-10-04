@@ -302,9 +302,9 @@
         dd = vh*vh*p1 + vk*vk*p2 + vl*vl*p3 + 2.0 * (vh*vk*p4 + vh*vl*p5 + vk*vl*p6)
 ! 2 theta value
         SinArg = 0.5 * ALambda * SQRT(dd)
-        IF ( SinArg .GT. 0.99999 ) THEN
+        IF ( SinArg .GT. 0.999 ) THEN
           tthc = 180.0
-        ELSE IF ( SinArg .LT. -0.99999 ) THEN
+        ELSE IF ( SinArg .LT. -0.999 ) THEN
           tthc = -180.0
         ELSE
           tthc = 2.0 * ASIND(SinArg)
