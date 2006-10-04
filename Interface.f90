@@ -1245,7 +1245,7 @@
             CALL WDialogPutRadioButton(IDF_LabX_Source)
           CASE (2, 3) ! Synchrotron X-ray & CW neutron  
             CALL WDialogFieldState(IDF_CW_group, NotDisabled)
-            CALL WDialogFieldState(IDF_radiation_label, Disabled)
+            CALL WDialogFieldState(IDF_radiation_label, NotDisabled)
             CALL WDialogFieldState(IDF_Wavelength_Menu, Disabled)
             CALL WDialogFieldState(IDF_wavelength1, NotDisabled)
             CALL WDialogFieldState(IDF_TOF_group, Disabled)
