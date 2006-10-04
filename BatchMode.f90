@@ -397,7 +397,7 @@
       WRITE(iHandle,'(A)',ERR=999) '# Do not edit beyond this point.'
       IF ( PrefParExists ) THEN
         WRITE(iHandle,'(A)',ERR=999) '#Preferred Orientation DIRection'
-        WRITE(iHandle,'(A,3(X,I3))',ERR=999) '#PO_DIR', (PO_Direction(i),i=1,3)
+        WRITE(iHandle,'(A,3(X,I3))',ERR=999) 'PO_DIR', (PO_Direction(i),i=1,3)
       ENDIF
       DO iFrg = 1, nfrag
         IF ( TruncateSDIFileName ) THEN
