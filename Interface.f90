@@ -1217,7 +1217,7 @@
       INTEGER NotDisabled
 
       CALL PushActiveWindowID
-      IF (PastPawley) THEN
+      IF ( PastPawley ) THEN
         NotDisabled = DialogReadOnly
       ELSE
         NotDisabled = Enabled
@@ -1226,8 +1226,10 @@
         SELECT CASE (WindowNr)
           CASE (1) 
             CALL WDialogSelect(IDD_PW_Page4)
+            IF ( For_TOPAS ) NotDisabled = Enabled
           CASE (2) 
             CALL WDialogSelect(IDD_Data_Properties)
+            IF ( For_TOPAS ) NotDisabled = DialogReadOnly
         END SELECT
         SELECT CASE (JRadOption)
           CASE (1) ! Lab X-ray
