@@ -188,6 +188,9 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       REAL, EXTERNAL :: Degrees2Radians
       CHARACTER*36 parlabel(mvar)
@@ -333,8 +336,10 @@
         ENDDO
       ENDDO
       NStPar = kk
-      CALL WDialogSelect(IDD_SAW_Page2)
-      PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
+      IF ( .NOT. in_batch ) THEN
+        CALL WDialogSelect(IDD_SAW_Page2)
+        PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
+      ENDIF
 ! Set up preferred orientation. This can't be the first parameter: it must be appended to the rest.
       IF ( PrefParExists ) THEN
         CALL WDialogGetInteger(IDF_PO_a, PO_Direction(1))
