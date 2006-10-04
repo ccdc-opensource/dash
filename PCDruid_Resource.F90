@@ -1,4 +1,4 @@
-! Winteracter module created : 26/Sep/2006 16:36:59
+! Winteracter module created : 03/Oct/2006 11:23:29
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -653,7 +653,6 @@
           INTEGER, PARAMETER :: IDBBROWSE3                      =  1554
           INTEGER, PARAMETER :: IDD_SAW_Page6a                  =   138
           INTEGER, PARAMETER :: IDD_RR_TOPAS                    =   139
-          INTEGER, PARAMETER :: IDB_Write_Pawley                =  1214
           INTEGER, PARAMETER :: IDF_TOPAS_inp_file_name         =  1372
           INTEGER, PARAMETER :: IDB_WRITE                       =  1371
           INTEGER, PARAMETER :: IDB_UsePrevious                 =  1399
