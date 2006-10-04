@@ -221,7 +221,7 @@
             RETURN
           ENDIF ! If the read on the Z-matrix was ok
         CASE ('cen')                                ! "Centre of mass"
-          IF (.NOT. UseCCoM) THEN
+          IF ( .NOT. UseCCoM ) THEN
             IF (iFrg .NE. 0) THEN
             ! @@ This will go wrong if the filename contains a space
               CALL INextString(line, KeyChar)
@@ -232,7 +232,7 @@
             ENDIF
           ENDIF
         CASE ('cry')                                ! "Crystallographic centre of mass"
-          IF (UseCCoM) THEN
+          IF ( UseCCoM ) THEN
             IF (iFrg .NE. 0) THEN
               CALL INextString(line, keychar)
               CALL INextString(line, keychar)

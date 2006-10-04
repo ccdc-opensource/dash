@@ -30,7 +30,7 @@
       WRITE(220,'("LAUE CLASS:")')
       SELECT CASE(LatBrav)
          CASE(1)
-           CALL ErrorMessage('Triclinic- Space Group Determination program not applicable')
+           CALL ErrorMessage('Triclinic--Space Group Determination program not applicable')
            CLOSE(220)
            CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'parameter_input.asc')
           RETURN

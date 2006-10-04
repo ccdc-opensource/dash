@@ -577,7 +577,7 @@
       REAL, EXTERNAL :: WavelengthOf
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
-      INTEGER    RecNr
+      INTEGER   RecNr
       INTEGER*4 tInteger
       REAL*4    tReal
       INTEGER RW, hFile
