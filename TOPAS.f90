@@ -106,15 +106,15 @@
                 For_TOPAS = .FALSE.
               ENDIF
               CALL EndWizardPastPawley
+            CASE (IDNEXT)
+              For_TOPAS = .TRUE.
+              CALL WizardWindowShow(IDD_PW_Page3)
             CASE (IDB_UsePrevious)
               TOPAS_stage = 2
               CALL WDialogSelect(IDD_SAW_Page7)
               CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
               CALL UpdateTOPASCheckBoxes()
               CALL WizardWindowShow(IDD_SAW_Page7)
-            CASE (IDB_Write_Pawley)
-              For_TOPAS = .TRUE.
-              CALL WizardWindowShow(IDD_PW_Page3)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -253,6 +253,7 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) '    space_group '//space_group_str(1:tStrLen)
       WriteTOPASFilePawley = 0
       CLOSE(hFileTOPAS)
+      CALL InfoMessage('TOPAS .inp file has been written.')
       RETURN
   999 CALL ErrorMessage("Error writing TOPAS input file (Pawley).")
       CLOSE(hFileTOPAS)
@@ -467,6 +468,7 @@
         WRITE(hFileTOPAS, '(A)', ERR=999) '  str'
       ELSE IF ( word(1:11) .EQ. 'SPACE_GROUP' ) THEN
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+        ! This is where the very first Rietveld file is written out
         IF ( was_Pawley ) THEN
           ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
           !                             BEGIN
