@@ -34,6 +34,11 @@
       CALL WDialogFieldState(IDF_Max2Theta, Disabled)
       CALL WDialogFieldState(IDF_MaxResolution, Disabled)
       CALL WDialogFieldState(IDB_Convert, Disabled)
+
+!      CALL WDialogSelect(IDD_PW_Page3)
+!      CALL WDialogGetString(IDF_PWa_DataFileName_String, .FALSE.)
+!      CALL WDialogPutString(IDF_PWa_DataFileName_String, '')
+
       CALL PopActiveWindowID
 
       END SUBROUTINE CopyPattern2Backup
@@ -203,42 +208,47 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) '    CS_G(@, 200.00)'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    Strain_G(@, 0.1)'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    Strain_L(@, 0.01)'
-      IF ( CellParConstrained(1) ) THEN
-        tChar = ' '
+      IF ( LatBrav .LT. 6 ) THEN ! Triclinic through orthorhombic: no contraints on a, b or c.
+        WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    a  @ ', CELLPAR(1)
+        WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    b  @ ', CELLPAR(2)
+        WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    c  @ ', CELLPAR(3)
       ELSE
-        tChar = '@'
+        ! Unit-cell parameters b or c or both are constrained:
+        ! we must define a in terms of a TOPAS "parameter".
+        WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    a  uc_prm ', CELLPAR(1)
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    b = uc_prm;'
+        IF ( CellParConstrained(3) ) THEN
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    c = uc_prm;'
+        ELSE
+          WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    c  @ ', CELLPAR(3)
+        ENDIF
       ENDIF
-      WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    a  '//tChar//' ', CELLPAR(1)
-      IF ( CellParConstrained(2) ) THEN
-        tChar = ' '
+      IF ( LatBrav .EQ. 8 ) THEN ! Rhombohedral
+        ! Unit-cell parameters beta and gamma are constrained:
+        ! we must define alpha in terms of a TOPAS "parameter".
+        WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    al  uc_ang_prm ', CELLPAR(4)
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    be = uc_ang_prm;'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    ga = uc_ang_prm;'
       ELSE
-        tChar = '@'
+        IF ( CellParConstrained(4) ) THEN
+          tChar = ' '
+        ELSE
+          tChar = '@'
+        ENDIF
+        WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    al '//tChar//' ', CELLPAR(4)
+        IF ( CellParConstrained(5) ) THEN
+          tChar = ' '
+        ELSE
+          tChar = '@'
+        ENDIF
+        WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    be '//tChar//' ', CELLPAR(5)
+        IF ( CellParConstrained(6) ) THEN
+          tChar = ' '
+        ELSE
+          tChar = '@'
+        ENDIF
+        WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    ga '//tChar//' ', CELLPAR(6)
       ENDIF
-      WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    b  '//tChar//' ', CELLPAR(2)
-      IF ( CellParConstrained(3) ) THEN
-        tChar = ' '
-      ELSE
-        tChar = '@'
-      ENDIF
-      WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    c  '//tChar//' ', CELLPAR(3)
-      IF ( CellParConstrained(4) ) THEN
-        tChar = ' '
-      ELSE
-        tChar = '@'
-      ENDIF
-      WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    al '//tChar//' ', CELLPAR(4)
-      IF ( CellParConstrained(5) ) THEN
-        tChar = ' '
-      ELSE
-        tChar = '@'
-      ENDIF
-      WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    be '//tChar//' ', CELLPAR(5)
-      IF ( CellParConstrained(6) ) THEN
-        tChar = ' '
-      ELSE
-        tChar = '@'
-      ENDIF
-      WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    ga '//tChar//' ', CELLPAR(6)
 !      WRITE(hFileTOPAS, '(A,A)', ERR=999) 'phase_name ', 
 
       ! By writing the space group name last, the extra information on hkl's and intensities
@@ -253,7 +263,7 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) '    space_group '//space_group_str(1:tStrLen)
       WriteTOPASFilePawley = 0
       CLOSE(hFileTOPAS)
-      CALL InfoMessage('TOPAS .inp file has been written.')
+      CALL InfoMessage('TOPAS .inp file for Pawley has been written.')
       RETURN
   999 CALL ErrorMessage("Error writing TOPAS input file (Pawley).")
       CLOSE(hFileTOPAS)
@@ -323,10 +333,12 @@
       IMPLICIT NONE
 
       INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
+      CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*255 TOPASFileName, tDirName, tFileName, tExtension
       INTEGER ExtLength
       CHARACTER(LEN=75) FILTER
       INTEGER           iFlags, iFType 
+      CHARACTER*20 stage_str
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page7)
@@ -365,7 +377,8 @@
               TOPAS_output_file_name  = tDirName(1:LEN_TRIM(tDirName))//tFileName(1:LEN_TRIM(tFileName))//'.out'
               CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPAS_output_file_name)
               IF ( WriteTOPASFileRietveld2(TOPASFileName) .EQ. 0 ) THEN
-                CALL InfoMessage('TOPAS .inp file has been written.')
+                stage_str = Integer2String(TOPAS_stage)
+                CALL InfoMessage('TOPAS .inp file '//stage_str(1:LEN_TRIM(stage_str))//' has been written.')
                 TOPAS_stage = TOPAS_stage + 1
                 CALL UpdateTOPASCheckBoxes()
               ENDIF
@@ -391,6 +404,8 @@
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (INOUT) :: FileNameBase
+
+      INCLUDE 'Lattice.inc'
 
       INTEGER         NATOM
       REAL                   Xato
@@ -423,7 +438,7 @@
       CHARACTER(512) tLine
       CHARACTER(12) word
       INTEGER       word_len
-      CHARACTER(6) b_str
+      CHARACTER(18) b_str
       INTEGER b_str_len, tElement, J
       INTEGER ii, iTotal, iFrg, iAtom, iAtom1, iAtom2
       REAL    distance, angle
@@ -463,10 +478,10 @@
       word_len = 12
       CALL FirstWord(tLine, word, word_len)
       CALL StrUpperCase(word)
-      IF ( word(1:6) .EQ. 'HKL_IS' ) THEN
+      IF ( (word_len .EQ. 6) .AND. (word(1:6) .EQ. 'HKL_IS') ) THEN
         was_Pawley = .TRUE.
         WRITE(hFileTOPAS, '(A)', ERR=999) '  str'
-      ELSE IF ( word(1:11) .EQ. 'SPACE_GROUP' ) THEN
+      ELSE IF ( (word_len .EQ. 11) .AND. (word(1:11) .EQ. 'SPACE_GROUP') ) THEN
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
         ! This is where the very first Rietveld file is written out
         IF ( was_Pawley ) THEN
@@ -488,7 +503,7 @@
                              'has been written out to the TOPAS .inp file: if you are using'//CHAR(13)//&
                              'a different experimental pattern, you may need to remove this.')
           ELSE
-            WRITE(hFileTOPAS, '(A)', ERR=999) '    PO( , 1.0, , 1 0 0)'
+            WRITE(hFileTOPAS, '(A)', ERR=999) "'    PO( , 1.0, , 0 0 1)"
           ENDIF
           IF ( WDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
             WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag { @ }'
@@ -506,27 +521,30 @@
           DO iFrg = 1, nFrag
             DO iAtom = 1, natoms(iFrg)
               tElement = zmElementCSD(iAtom,iFrg)
-              IF ( (tElement .EQ. 2) .OR. (tElement .EQ. 27) ) THEN
-                ! Hydrogen or deuterium
-                b_str = 'bh'
-                b_str_len = 2
-              ELSE
-                b_str = 'bnonh'
-                b_str_len = 5
-              ENDIF
-              IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
-                b_str = '!'//b_str
-                b_str_len = b_str_len + 1
-              ENDIF
               tStr = Integer2String(iTotal + iAtom)
               iLen1 = LEN_TRIM(tStr)
               tElementStr = ElementStr(tElement)
               iLen2 = LEN_TRIM(tElementStr)
               LabelStr = tElementStr(1:iLen2)//tStr(1:iLen1)
               ii = OrderedAtm(iTotal + iAtom) ! Needed for Xato()
-              WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,1X,F6.3)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
-                Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
-                occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len), tiso(iAtom,iFrg)
+              IF ( (tElement .EQ. 2) .OR. (tElement .EQ. 27) ) THEN
+                ! Hydrogen or deuterium
+                b_str = ' bh = 1.2 * bnonh;'
+                b_str_len = 18
+                WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
+                  Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
+                  occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len)
+              ELSE
+                b_str = 'bnonh'
+                b_str_len = 5
+                IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
+                  b_str = '!'//b_str
+                  b_str_len = b_str_len + 1
+                ENDIF
+                WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,1X,F6.3)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
+                  Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
+                  occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len), tiso(iAtom,iFrg)
+              ENDIF
             ENDDO
             iTotal = iTotal + natoms(iFrg)
           ENDDO
@@ -619,25 +637,25 @@
           ! Probably need to improve mechanism to indicate end
           is_last_line = .TRUE.
         ENDIF
-      ELSE IF ( word(1:3) .EQ. 'BKG' ) THEN
+      ELSE IF ( (word_len .EQ. 3) .AND. (word(1:3) .EQ. 'BKG') ) THEN
         IF ( WDialogGetCheckBoxLogical(IDC_Background) ) THEN
           tLine(7:7) = '@'
         ELSE
           tLine(7:7) = ' '
         ENDIF 
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
-      ELSE IF ( word(1:5) .EQ. 'SCALE' ) THEN
+      ELSE IF ( (word_len .EQ. 5) .AND. (word(1:5) .EQ. 'SCALE') ) THEN
         IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
           tLine(11:11) = '@'
         ELSE
           tLine(11:11) = ' '
         ENDIF 
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
-      ELSE IF ( word(1:11) .EQ. 'OUT_CIF_STR' ) THEN
+      ELSE IF ( (word_len .EQ. 11) .AND. (word(1:11) .EQ. 'OUT_CIF_STR') ) THEN
         ! Do nothing: it will be added at the end if necessary
-      ELSE IF ( word(1:9) .EQ. 'DO_ERRORS' ) THEN
+      ELSE IF ( (word_len .EQ. 9) .AND. (word(1:9) .EQ. 'DO_ERRORS') ) THEN
         ! Do nothing: it will be added at the end if necessary
-      ELSE IF ( word(1:4) .EQ. 'SITE' ) THEN
+      ELSE IF ( (word_len .EQ. 4) .AND. (word(1:4) .EQ. 'SITE') ) THEN
         ! Several possibilities here.
         ! The only thing that really needs to be done here is to insert or erase the !
         ! to indicate whether Biso is to be refined
@@ -672,7 +690,7 @@
             WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
           ENDIF
         ENDIF
-      ELSE IF ( word(1:5) .EQ. 'MACRO' ) THEN
+      ELSE IF ( (word_len .EQ. 5) .AND. (word(1:5) .EQ. 'MACRO') ) THEN
         ! Check if rest is ref_flag
         IF ( StrFind(tLine, iLen, 'ref_flag', 8) .NE. 0 ) THEN
           IF ( WDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
@@ -681,12 +699,87 @@
             WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
           ENDIF
         ENDIF
-      ELSE IF ( word(1:2) .EQ. 'PO' ) THEN
+      ELSE IF ( (word_len .EQ. 2) .AND. (word(1:2) .EQ. 'PO') ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( (word_len .EQ. 1) .AND. (word(1:1) .EQ. 'A') ) THEN
+        iPos = StrFind(tLine, iLen, 'uc_prm', 6)
+        IF ( iPos .NE. 0 ) THEN
+          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+            tLine(iPos-1:iPos-1) = ' '
+          ELSE
+            tLine(iPos-1:iPos-1) = '!'
+          ENDIF
+        ELSE
+          iPos = StrFind(tLine, iLen, 'a', 1)
+          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+            tLine(iPos+3:iPos+3) = '@'
+          ELSE
+            tLine(iPos+3:iPos+3) = ' '
+          ENDIF
+        ENDIF
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( (word_len .EQ. 1) .AND. (word(1:1) .EQ. 'B') ) THEN
+        IF ( .NOT. CellParConstrained(2) ) THEN
+          iPos = StrFind(tLine, iLen, 'b', 1)
+          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+            tLine(iPos+3:iPos+3) = '@'
+          ELSE
+            tLine(iPos+3:iPos+3) = ' '
+          ENDIF
+        ENDIF
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( (word_len .EQ. 1) .AND. (word(1:1) .EQ. 'C') ) THEN
+        IF ( .NOT. CellParConstrained(3) ) THEN
+          iPos = StrFind(tLine, iLen, 'c', 1)
+          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+            tLine(iPos+3:iPos+3) = '@'
+          ELSE
+            tLine(iPos+3:iPos+3) = ' '
+          ENDIF
+        ENDIF
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( (word_len .EQ. 2) .AND. (word(1:2) .EQ. 'AL') ) THEN
+        iPos = StrFind(tLine, iLen, 'uc_ang_prm', 10)
+        IF ( iPos .NE. 0 ) THEN
+          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+            tLine(iPos-1:iPos-1) = ' '
+          ELSE
+            tLine(iPos-1:iPos-1) = '!'
+          ENDIF
+        ELSE
+          iPos = StrFind(tLine, iLen, 'al', 2)
+          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) .AND. (.NOT. CellParConstrained(4)) ) THEN
+            tLine(iPos+3:iPos+3) = '@'
+          ELSE
+            tLine(iPos+3:iPos+3) = ' '
+          ENDIF
+        ENDIF
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( (word_len .EQ. 2) .AND. (word(1:2) .EQ. 'BE') ) THEN
+        iPos = StrFind(tLine, iLen, 'uc_ang_prm', 10)
+        IF ( iPos .EQ. 0 ) THEN
+          iPos = StrFind(tLine, iLen, 'be', 2)
+          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) .AND. (.NOT. CellParConstrained(5)) ) THEN
+            tLine(iPos+3:iPos+3) = '@'
+          ELSE
+            tLine(iPos+3:iPos+3) = ' '
+          ENDIF
+        ENDIF
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( (word_len .EQ. 2) .AND. (word(1:2) .EQ. 'GA') ) THEN
+        iPos = StrFind(tLine, iLen, 'uc_ang_prm', 10)
+        IF ( iPos .EQ. 0 ) THEN
+          iPos = StrFind(tLine, iLen, 'ga', 2)
+          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) .AND. (.NOT. CellParConstrained(6)) ) THEN
+            tLine(iPos+3:iPos+3) = '@'
+          ELSE
+            tLine(iPos+3:iPos+3) = ' '
+          ENDIF
+        ENDIF
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ELSE
         ! Change all the @'s to spaces.
-        ! This switches off refinement of a, b, c, al, be, ga, zero-point error,
-        ! CS_L, CS_G, Strain_L, Strain_G
+        ! This switches off refinement of zero-point error, CS_L, CS_G, Strain_L, Strain_G
         DO iStrPos = 1, iLen
           IF (tLine(iStrPos:iStrPos) .EQ. '@') &
             tLine(iStrPos:iStrPos) = ' '
@@ -695,14 +788,12 @@
       ENDIF
       IF ( .NOT. is_last_line ) GOTO 10
    40 CLOSE(hOutputFile)
-
       IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
         WRITE(hFileTOPAS, '(A)', ERR=999) '    do_errors'
       ENDIF
       IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
         WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//FileNameBase(1:LEN_TRIM(FileNameBase))//'.cif")'
       ENDIF
-
       WriteTOPASFileRietveld2 = 0
       CLOSE(hFileTOPAS)
       RETURN
