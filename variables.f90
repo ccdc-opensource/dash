@@ -32,6 +32,7 @@
       CHARACTER(20)            :: VIEWARG
 	  CHARACTER(MaxPathLength) :: MOGULEXE
 	  CHARACTER(MaxPathLength) :: DICVOL04EXE
+	  CHARACTER(MaxPathLength) :: TOPASEXE
 
 	  LOGICAL UseMogul
 	  DATA UseMogul / .TRUE. /

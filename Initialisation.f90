@@ -771,6 +771,8 @@
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogGetString(IDF_DICVOLExe, DICVOL04EXE)
       CALL FileWriteString(hFile, RecNr, DICVOL04EXE)
+      CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
+      CALL FileWriteString(hFile, RecNr, TOPASEXE)
       CALL FileWriteLogical(hFile, RecNr, Get_WriteWavelength2XYEFile())
 ! Save defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
@@ -1073,6 +1075,8 @@
       ENDIF
       CALL WDialogSelect(IDD_Configuration)
       CALL WDialogPutString(IDF_DICVOLExe, DICVOL04EXE)
+      CALL FileReadString(hFile, RecNr, TOPASEXE)
+      CALL WDialogPutString(IDF_TOPASExe, TOPASEXE)
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogPutCheckBoxLogical(IDC_wl_in_xye, tLogical)
 ! Read defaults for background subtraction
