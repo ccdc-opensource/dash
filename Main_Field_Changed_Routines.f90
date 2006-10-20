@@ -107,7 +107,7 @@
               tFileName = ViewExe
               CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select Viewer', IFTYPE)
 ! Did the user press cancel?
-              IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOK) THEN
+              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
                 VIEWEXE = tFileName
                 CALL WDialogPutString(IDF_ViewExe, VIEWEXE)
               ENDIF
@@ -120,7 +120,7 @@
               tFileName = MOGULEXE
               CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select Mogul Executable', IFTYPE)
 ! Did the user press cancel?
-              IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOK) THEN
+              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
                 MOGULEXE = tFileName
                 CALL WDialogPutString(IDF_MogulExe, MOGULEXE)
               ENDIF
@@ -133,9 +133,22 @@
               tFileName = DICVOL04EXE
               CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select DICVOL04 Executable', IFTYPE)
 ! Did the user press cancel?
-              IF (WInfoDialog(ExitButtonCommon) .EQ. CommonOK) THEN
+              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
                 DICVOL04EXE = tFileName
                 CALL WDialogPutString(IDF_DICVOLExe, DICVOL04EXE)
+              ENDIF
+            CASE (IDBBROWSE4)
+              IFLAGS = LoadDialog + PromptOn
+              FILTER = 'All files (*.*)|*.*|'//&
+                       'All executables (*.exe)|*.exe|'
+! IFTYPE specifies which of the file types in the list is the default
+              IFTYPE = 2
+              tFileName = TOPASEXE
+              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select TOPAS Executable', IFTYPE)
+! Did the user press cancel?
+              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+                TOPASEXE = tFileName
+                CALL WDialogPutString(IDF_TOPASExe, TOPASEXE)
               ENDIF
           END SELECT
         CASE (FieldChanged)
