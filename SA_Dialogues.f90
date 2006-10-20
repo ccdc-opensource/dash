@@ -1954,8 +1954,10 @@
       INTEGER Rel_OFBN_Len
       INTEGER Old_iSeed1, Old_iSeed2, iHandle
       CHARACTER(MaxPathLength) DuffFileName
-      CHARACTER*255 tDirName, tFileName, tExtension, current_directory
+      CHARACTER*255 tDirName, tDirName_2, tFileName, tFileName_2, tExtension, current_directory
       INTEGER ExtLength
+      CHARACTER(LEN=45) :: FILTER
+      INTEGER iFlags
 
       CALL PushActiveWindowID
       CALL IOsDirName(current_directory)
@@ -1967,22 +1969,32 @@
 ! Go back to the 4th window
               CALL WizardWindowShow(IDD_SA_input4)
             CASE (IDB_WRITE)
-              ! Create subdirectory
-              CALL IOsDirMake('temp')
+              iFlags = SaveDialog + AppendExt + PromptOn
+! Note that we have not added "DirChange", which means that even though the user is allowed
+! to change the directory, the working directory is not changed. We must, however, figure out
+! what the destination directory is from the file name that the user has supplied.
+              FILTER = 'DASH grid files (*.grd)|*.grd|'
+              tFileName_2 = OutputFilesBaseName(1:OFBN_Len)//'.grd'
+              CALL WSelectFile(FILTER, iFlags, tFileName_2, 'Save DASH grid file')
+              IF ((WInfoDialog(4) .NE. CommonOK) .OR. (LEN_TRIM(tFileName) .EQ. 0)) THEN
+                 CALL PopActiveWindowID
+                 RETURN
+              ENDIF
+              CALL SplitPath(tFileName_2, tDirName, tFileName)
               ! Copy .sdi files
-              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.sdi', '.\temp\')
-              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.tic', '.\temp\')
-              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.hcv', '.\temp\')
-              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.hkl', '.\temp\')
-              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.pik', '.\temp\')
-              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.dsl', '.\temp\')
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.sdi', tDirName)
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.tic', tDirName)
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.hcv', tDirName)
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.hkl', tDirName)
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.pik', tDirName)
+              CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.dsl', tDirName)
               ! Copy Z-matrix files
               DO iFrg = 1, nFrag
                 ! If we rename the Z-matrix files here,
                 ! that would make it easier to write out relative paths later
 
                 ! ######### We probably have a problem here if two Z-matrices have the same file name?
-                CALL IOsCopyFile(frag_file(iFrg), '.\temp\')
+                CALL IOsCopyFile(frag_file(iFrg), tDirName)
               ENDDO
               CALL WDialogGetInteger(IDF_NumOfRuns, nRuns)
               CALL WDialogGetInteger(IDF_NumOfRunsPerNode, nRunsPerNode)
@@ -1994,13 +2006,13 @@
               Old_OFBN_Len = OFBN_Len
               ! This needs to be made relative
               ExtLength = 0
-              CALL SplitPath2(OutputFilesBaseName, tDirName, tFileName, tExtension, ExtLength)
+              CALL SplitPath2(OutputFilesBaseName, tDirName_2, tFileName, tExtension, ExtLength)
               Rel_OutputFilesBaseName = tFileName
               Rel_OFBN_Len = LEN_TRIM(Rel_OutputFilesBaseName)
               OFBN_Len = LEN_TRIM(Rel_OutputFilesBaseName)+4
               Old_iSeed1 = iSeed1
               Old_iSeed2 = iSeed2
-              CALL IOsDirChange('.\temp\')
+              CALL IOsDirChange(tDirName)
               DO iPackage = 1, nPackages
                 ! Need to make paths of Z-matrix files relative.
                 ! Perhaps this is easy because we have just copied them and so can now rename them?
