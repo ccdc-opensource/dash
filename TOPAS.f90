@@ -195,7 +195,6 @@
       ELSE
         CALL ErrorMessage('Unknown radiation type.')
       ENDIF
-      WRITE(hFileTOPAS, '(A)', ERR=999) '  auto_sparse_CG'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  Rp 217.5'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  Rs 217.5'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  Simple_Axial_Model(@, 9.0)'
