@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/Oct/2006 11:46:10
+// Modified : 20/Oct/2006 18:45:58
 //
 ///////////////////////////////////////////////////
 //
@@ -671,7 +671,6 @@
 #define IDB_UsePrevious                  1399
 #define IDC_wl_in_xye                    1439
 #define IDD_SA_input5                     142
-#define IDF_STRING1                      1442
 #define IDF_NumOfRuns                    1445
 #define IDD_SAW_Page7                     123
 #define IDC_Scale                        1252
@@ -682,6 +681,8 @@
 #define IDC_IncludeESDs                  1449
 #define IDC_UseDASHRecommendation        1450
 #define IDF_NumOfRunsPerNode             1446
+#define IDF_TOPASExe                     1214
+#define IDBBROWSE4                       1555
 
 ///////////////////////////////////////////////////
 //
@@ -1952,7 +1953,7 @@ BEGIN
 ,0
 END
 
-IDD_Configuration DIALOG 0, 0,  281,  144
+IDD_Configuration DIALOG 0, 0,  281,  168
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Configuration"
@@ -1960,17 +1961,20 @@ BEGIN
     CONTROL "Debug message",IDF_ViewExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,    9,  180,   14
     CONTROL "Debug message",IDF_ViewArg,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,   88,   28,   73,   14
     CONTROL "B&rowse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  234,    9,   40,   14
-    CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    9,   11,   27,    8
+    CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   11,   38,    8
     CONTROL "Arguments for viewer",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,    6,   31,   74,    8
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  120,  123,   40,   14
-    CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   87,   84,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  120,  145,   40,   14
+    CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  111,   84,   14
     CONTROL "",IDF_MogulExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   44,  180,   14
-    CONTROL "Mogul",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    7,   47,   26,    8
+    CONTROL "Mogul",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   47,   38,    8
     CONTROL "B&rowse...",IDBBROWSE2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,   44,   40,   14
     CONTROL "DICVOL04",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   68,   38,    8
     CONTROL "",IDF_DICVOLExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   65,  180,   14
     CONTROL "B&rowse...",IDBBROWSE3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,   65,   40,   14
-    CONTROL "Write wavelength to .xye files",IDC_wl_in_xye,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  100,  120,   14
+    CONTROL "Write wavelength to .xye files",IDC_wl_in_xye,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  124,  120,   14
+    CONTROL "TOPAS",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   89,   38,    8
+    CONTROL "",IDF_TOPASExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   86,  180,   14
+    CONTROL "B&rowse...",IDBBROWSE4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,   86,   40,   14
 END
 
 IDD_Configuration RCDATA
@@ -3605,7 +3609,7 @@ BEGIN
     CONTROL "&Solve >",IDB_Solve,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "Create batch file...",IDB_BatchFile,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  294,  150,   80,   14
+    CONTROL "Create batch file >",IDB_BatchFile,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  294,  150,   80,   14
     CONTROL "Auto local &minimise",IDF_AutoLocalOptimise,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   94,   73,   76,   14
     CONTROL ".c&ssr file",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  191,   75,   54,   14
     CONTROL ".cc&l file",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  248,   62,   54,   14
@@ -3800,9 +3804,8 @@ BEGIN
     CONTROL "10",IDF_NumOfRunsPerNode,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  215,   42,   32,   14
     CONTROL "Split runs into packages containing",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   85,   45,  124,    8
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "",IDF_STRING1,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,  100,   90,  250,   14
-    CONTROL "Base name for .duff and .dash files:",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  101,   79,  140,    8
-    CONTROL ".duff and .dash files will be called base_name_nnn.duff and base_name_nnn.dash respectively, where nnn is the node number, e.g. base_name_078.dash",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  101,  110,  218,   30
+    CONTROL "You will be prompted for the directory and name of a .grd file. The base name for .duff and .dash files will be taken from the file name that you choose.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  100,   76,  218,   32
+    CONTROL ".duff and .dash files will be called base_name_nnn.duff and base_name_nnn.dash respectively, where nnn is the node number, e.g. base_name_078.dash",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  100,  110,  218,   35
     CONTROL "500",IDF_NumOfRuns,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  211,   24,   36,   14
     CONTROL "Total number of SA runs to perform",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   85,   27,  120,    8
     CONTROL "SA run(s) each",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  254,   44,   60,    8
@@ -3840,7 +3843,7 @@ BEGIN
     CONTROL "new .inp file (reads .out file)",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  133,  128,  110,   10
     CONTROL "Write out .cif file",IDC_WriteCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   89,   80,   14
     CONTROL "Include ESDs in output",IDC_IncludeESDs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,  104,  100,   14
-    CONTROL "Use DASH recommendation",IDC_UseDASHRecommendation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   49,  120,   14
+    CONTROL "Use DASH recommendation [this can go]",IDC_UseDASHRecommendation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   49,  150,   14
     CONTROL "",IDF_TOPAS_inp_file_name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   93,   13,  220,   14
     CONTROL "Browse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  321,   13,   40,   14
     CONTROL "File name",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   95,   29,   80,    8
