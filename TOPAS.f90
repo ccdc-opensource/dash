@@ -247,7 +247,7 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) '    100.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
-      DO i = 1, 11
+      DO i = 1, 16
         WRITE(hFileTOPAS, '(A)', ERR=999) '    0.0'
       ENDDO
       WRITE(hFileTOPAS, '(A,F12.4)', ERR=999) '  start_X ', XBIN(1)
@@ -489,6 +489,13 @@
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
+      INTEGER     mpdbops
+      PARAMETER ( mpdbops = 192 )
+
+      INTEGER         npdbops
+      CHARACTER*20             cpdbops
+      COMMON /pdbops/ npdbops, cpdbops(mpdbops)
+
       INTEGER MaxAAStack
       PARAMETER (MaxAAStack = 150)
 
@@ -521,8 +528,9 @@
       INTEGER current_assembly(1:MaxAtm_3)
       CHARACTER(MaxPathLength) FileNameToRead, FileNameToWrite
       CHARACTER*255 tDirName, tFileName, tExtension
-      INTEGER ExtLength
+      INTEGER ExtLength, hSP_in_file, hSP_out_file, tLen
       LOGICAL was_Pawley
+      CHARACTER*80 tString
 
       was_Pawley = .FALSE.
       CALL WDialogSelect(IDD_SAW_Page7)
@@ -535,6 +543,8 @@
       FileNameToWrite = FileNameBase(1:LEN_TRIM(FileNameBase))//'.inp'
       hFileTOPAS = 116
       hOutputFile = 117 ! This is the file that is being *read*
+      hSP_in_file = 115 ! Special positions input file
+      hSP_out_file = 60 ! Special positions output file
       OPEN(UNIT=hFileTOPAS, FILE=FileNameToWrite, STATUS='unknown', ERR=999)
       OPEN(UNIT=hOutputFile, FILE=FileNameToRead, STATUS='unknown', ERR=998)
       is_last_line = .FALSE.
@@ -583,6 +593,15 @@
           ! (Would it have been possible to solve this using the "scopes" in TOPAS?, I.e. define each
           ! Z-matrix in its own scope and then define its restraints within the same scope?)
           ! #########################################################################################
+
+          OPEN(UNIT=hSP_in_file, FILE="special_positions.in", STATUS='unknown', ERR=997)
+          WRITE(hSP_in_file, '(A)', ERR=997) 'TOLE 0.05'
+          WRITE(hSP_in_file, '(A,6(F8.4,1X))', ERR=997) 'CELL ', (CellPar(ii),ii=1,6)
+          DO ii = 1, npdbops
+            tString = cpdbops(ii)
+            tLen = LEN_TRIM(tString)
+            WRITE (hSP_in_file, '(A)', ERR=997) 'SYMM '//tString(1:tLen)
+          ENDDO
           iTotal = 0
           DO iFrg = 1, nFrag
             DO iAtom = 1, natoms(iFrg)
@@ -593,27 +612,40 @@
               iLen2 = LEN_TRIM(tElementStr)
               LabelStr = tElementStr(1:iLen2)//tStr(1:iLen1)
               ii = OrderedAtm(iTotal + iAtom) ! Needed for Xato()
-              IF ( (tElement .EQ. 2) .OR. (tElement .EQ. 27) ) THEN
-                ! Hydrogen or deuterium
-                b_str = ' bh = 1.2 * bnonh;'
-                b_str_len = 18
-                WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
-                  Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
-                  occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len)
-              ELSE
-                b_str = 'bnonh'
-                b_str_len = 5
-                IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
-                  b_str = '!'//b_str
-                  b_str_len = b_str_len + 1
-                ENDIF
-                WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,1X,F6.3)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
-                  Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
-                  occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len), tiso(iAtom,iFrg)
-              ENDIF
+              WRITE(hSP_in_file, '(A,F9.5,X,F9.5,X,F9.5,X,F6.3,X,F6.3)', ERR=999) 'SITE '//LabelStr//' ', Xato(1,ii), Xato(2,ii), &
+                Xato(3,ii), occ(iAtom,iFrg), tiso(iAtom,iFrg)
+
+!              IF ( (tElement .EQ. 2) .OR. (tElement .EQ. 27) ) THEN
+!                ! Hydrogen or deuterium
+!                b_str = ' bh = 1.2 * bnonh;'
+!                b_str_len = 18
+!                WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
+!                  Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
+!                  occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len)
+!              ELSE
+!                b_str = 'bnonh'
+!                b_str_len = 5
+!                IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
+!                  b_str = '!'//b_str
+!                  b_str_len = b_str_len + 1
+!                ENDIF
+!                WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,1X,F6.3)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
+!                  Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
+!                  occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len), tiso(iAtom,iFrg)
+!              ENDIF
             ENDDO
             iTotal = iTotal + natoms(iFrg)
           ENDDO
+          CLOSE(hSP_in_file)
+          ! Run the special positions program
+
+          OPEN(UNIT=hSP_out_file, FILE="special_positions.out", STATUS='unknown', ERR=996)
+       45 CONTINUE
+          READ(hSP_out_file, '(A)', ERR=996, END=50) tLine
+          WRITE(hFileTOPAS, '(A)', ERR=999) tLine
+          GOTO 45
+       50 CONTINUE
+          CLOSE(hSP_out_file)
           WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_width 0'
           WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_weight 10000'
           WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_width 1'
@@ -705,11 +737,10 @@
         ENDIF
       ELSE IF ( (word_len .EQ. 3) .AND. (word(1:3) .EQ. 'BKG') ) THEN
         IF ( WDialogGetCheckBoxLogical(IDC_Background) ) THEN
-          tLine(7:7) = '@'
+          WRITE(hFileTOPAS, '(A)', ERR=999) '  bkg @ '
         ELSE
-          tLine(7:7) = ' '
+          WRITE(hFileTOPAS, '(A)', ERR=999) '  bkg '
         ENDIF 
-        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ELSE IF ( (word_len .EQ. 5) .AND. (word(1:5) .EQ. 'SCALE') ) THEN
         IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
           tLine(11:11) = '@'
@@ -878,6 +909,12 @@
       RETURN
   998 CALL ErrorMessage("Error reading TOPAS output file")
       CLOSE(hOutputFile)
+      CLOSE(hFileTOPAS)
+  997 CALL ErrorMessage("Error writing special positions input file")
+      CLOSE(hSP_in_file)
+      CLOSE(hFileTOPAS)
+  996 CALL ErrorMessage("Error reading special positions output file")
+      CLOSE(hSP_out_file)
       CLOSE(hFileTOPAS)
 
       END FUNCTION WriteTOPASFileRietveld2
