@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 20/Oct/2006 18:45:58
+// Modified : 30/Oct/2006 09:38:37
 //
 ///////////////////////////////////////////////////
 //
@@ -683,6 +683,7 @@
 #define IDF_NumOfRunsPerNode             1446
 #define IDF_TOPASExe                     1214
 #define IDBBROWSE4                       1555
+#define IDC_TOPAS_in_background          1296
 
 ///////////////////////////////////////////////////
 //
@@ -1975,6 +1976,7 @@ BEGIN
     CONTROL "TOPAS",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   89,   38,    8
     CONTROL "",IDF_TOPASExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   86,  180,   14
     CONTROL "B&rowse...",IDBBROWSE4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,   86,   40,   14
+    CONTROL "Run TOPAS in background",IDC_TOPAS_in_background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  160,  111,  110,   14
 END
 
 IDD_Configuration RCDATA
@@ -1982,6 +1984,7 @@ BEGIN
 "[Checks] \n"
 " 1131 0 \n"
 " 1439 1 \n"
+" 1296 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"

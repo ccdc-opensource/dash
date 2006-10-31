@@ -1,4 +1,4 @@
-! Winteracter module created : 20/Oct/2006 18:45:58
+! Winteracter module created : 30/Oct/2006 09:38:37
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -670,4 +670,5 @@
           INTEGER, PARAMETER :: IDF_NumOfRunsPerNode            =  1446
           INTEGER, PARAMETER :: IDF_TOPASExe                    =  1214
           INTEGER, PARAMETER :: IDBBROWSE4                      =  1555
+          INTEGER, PARAMETER :: IDC_TOPAS_in_background         =  1296
       END MODULE Druid_Header

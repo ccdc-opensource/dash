@@ -1,6 +1,64 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE Launch_TOPAS(input_file_name)
+
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: input_file_name
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      CHARACTER*20, EXTERNAL :: Integer2String
+      LOGICAL exists, run_TOPAS_in_background
+      INTEGER M, I, tLen
+      CHARACTER*20 stage_str
+      CHARACTER*(255) tDirName, tFileName
+
+      ! Launch DICVOL04 and wait for it to return
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      run_TOPAS_in_background = WDialogGetCheckBoxLogical(IDC_TOPAS_in_background)
+      CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
+      CALL PopActiveWindowID
+      IF ( run_TOPAS_in_background ) THEN
+        I = LEN_TRIM(TOPASEXE)
+        IF ( I .EQ. 0 ) THEN
+          CALL ErrorMessage("DASH could not launch TOPAS. No executable is currently specified."//CHAR(13)//&
+                            "This can be changed in the Configuration... window"//CHAR(13)//&
+                            "under Options in the menu bar.")
+          CALL WCursorShape(CurCrossHair)
+          RETURN
+        ENDIF
+        INQUIRE(FILE = TOPASEXE(1:I),EXIST=exists)
+        IF (.NOT. exists) GOTO 998
+        M = InfoError(1) ! Clear errors
+        tLen = LEN_TRIM(input_file_name)
+        CALL SplitPath(TOPASEXE(1:I), tDirName, tFileName)
+        CALL IOsDirChange(tDirName)
+!        CALL IOSCommand('CMD.EXE /C '//TOPASEXE(1:I)//' '//input_file_name(1:tLen), ProcBlocked)
+        CALL IOSCommand(TOPASEXE(1:I)//' '//'"'//input_file_name(1:tLen)//'"', ProcBlocked)
+        IF (InfoError(1) .NE. 0) GOTO 998
+        CALL WCursorShape(CurCrossHair)
+      ELSE
+!      CALL InfoMessage('TOPAS .inp file for Pawley has been written.')
+        stage_str = Integer2String(TOPAS_stage)
+        CALL InfoMessage('TOPAS .inp file '//stage_str(1:LEN_TRIM(stage_str))//' has been written.')
+      ENDIF
+      RETURN
+  998 CALL ErrorMessage("DASH could not launch TOPAS. The executable is currently configured"//CHAR(13)//&
+                        "to launch the program "//TOPASEXE(1:I)//CHAR(13)//&
+                        "This can be changed in the Configuration... window"//CHAR(13)//&
+                        "under Options in the menu bar.")
+      CALL WCursorShape(CurCrossHair)
+      RETURN
+
+      END SUBROUTINE Launch_TOPAS
+!
+!*****************************************************************************
+!
       SUBROUTINE CopyPattern2Backup
 
       USE DRUID_HEADER
@@ -128,13 +186,13 @@
 !
 !*****************************************************************************
 ! 
-      INTEGER FUNCTION WriteTOPASFilePawley(tFileName)
+      INTEGER FUNCTION WriteTOPASFilePawley(TheFileName)
 
       USE VARIABLES
 
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (IN   ) :: tFileName
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
@@ -145,9 +203,9 @@
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       INTEGER hFileTOPAS, hTempFile
-      INTEGER iLen, i
+      INTEGER iLen, iLen_1, i, tLen
       CHARACTER*(1) tChar
-      CHARACTER*(MaxPathLength) temp_file_name
+      CHARACTER*(MaxPathLength) tDirName, tFileName
       CHARACTER*(40) space_group_str
       INTEGER tStrLen
 
@@ -156,7 +214,8 @@
       ! Initialise to failure
       WriteTOPASFilePawley = 1
       hFileTOPAS = 116
-      OPEN(UNIT=hFileTOPAS,FILE=tFileName,STATUS='unknown',ERR=999)
+      tLen = LEN_TRIM(TheFileName)
+      OPEN(UNIT=hFileTOPAS, FILE=TheFileName(1:tLen), STATUS='unknown', ERR=999)
       WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 5'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp 1.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp_dash 1.0'
@@ -173,17 +232,24 @@
       ! This also has the advantage that the user can choose a different file
       ! from the one they used for structure solution.
       hTempFile = 117
-      CALL IOsDirName(temp_file_name)
-      iLen = LEN_TRIM(temp_file_name)
-      temp_file_name = temp_file_name(1:iLen)//DIRSPACER//'temp.xye'
-      iLen = iLen + 9
-      OPEN(UNIT=hTempFile,FILE=temp_file_name(1:iLen),STATUS='unknown',ERR=998)
+      CALL SplitPath(TheFileName, tDirName, tFileName)
+      iLen = LEN_TRIM(tDirName)
+      tFileName = tDirName(1:iLen)//'temp.xye'
+      iLen_1 = iLen + 8
+      OPEN(UNIT=hTempFile,FILE=tFileName(1:iLen_1),STATUS='unknown',ERR=998)
       DO i = 1, NBIN
         WRITE(hTempFile, '(F10.5,1X,F12.4,1X,F12.5)', ERR=998) XBIN(i), YOBIN(i), EBIN(i)
       ENDDO
       CLOSE(hTempFile)
-      WRITE(hFileTOPAS, '(A)', ERR=999) 'xdd "'//temp_file_name(1:iLen)//'"'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '  bkg @ 100.0 100.0 100.0 100.0 100.0 100.0 100.0 100.0 100.0 100.0 100.0'
+      WRITE(hFileTOPAS, '(A)', ERR=999) 'xdd "'//tFileName(1:iLen_1)//'" xye_format'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '  bkg @ '
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    100.0'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    100.0'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
+      DO i = 1, 11
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    0.0'
+      ENDDO
       WRITE(hFileTOPAS, '(A,F12.4)', ERR=999) '  start_X ', XBIN(1)
       WRITE(hFileTOPAS, '(A,F12.4)', ERR=999) '  finish_X ', XBIN(NBIN)
       ! We do not write out the zero-point error in case the user has decided to use a different data set
@@ -248,8 +314,7 @@
         ENDIF
         WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    ga '//tChar//' ', CELLPAR(6)
       ENDIF
-!      WRITE(hFileTOPAS, '(A,A)', ERR=999) 'phase_name ', 
-
+!      WRITE(hFileTOPAS, '(A)', ERR=999) '    phase_name dummy'
       ! By writing the space group name last, the extra information on hkl's and intensities
       ! will be appended at the end of the file. That makes it a lot easier to read the .out
       ! file back in again and to just discard everything following after the space group.
@@ -260,9 +325,13 @@
       space_group_str = SGHMaStr(NumberSGTable)(1:LEN_TRIM(SGHMaStr(NumberSGTable)))
       CALL StrRemoveSpaces(space_group_str, tStrLen)
       WRITE(hFileTOPAS, '(A)', ERR=999) '    space_group '//space_group_str(1:tStrLen)
+!      WRITE(hFileTOPAS, '(A,A,A)', ERR=999) '    Out_X_Ycalc("', tDirName(1:iLen), 'temp.txt")'
       WriteTOPASFilePawley = 0
       CLOSE(hFileTOPAS)
-      CALL InfoMessage('TOPAS .inp file for Pawley has been written.')
+   
+!      CALL InfoMessage(TheFileName(1:tLen-4))
+
+      CALL Launch_TOPAS(TheFileName(1:tLen-4))
       RETURN
   999 CALL ErrorMessage("Error writing TOPAS input file (Pawley).")
       CLOSE(hFileTOPAS)
@@ -332,12 +401,10 @@
       IMPLICIT NONE
 
       INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
-      CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*255 TOPASFileName, tDirName, tFileName, tExtension
       INTEGER ExtLength
       CHARACTER(LEN=75) FILTER
       INTEGER           iFlags, iFType 
-      CHARACTER*20 stage_str
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page7)
@@ -376,10 +443,10 @@
               TOPAS_output_file_name  = tDirName(1:LEN_TRIM(tDirName))//tFileName(1:LEN_TRIM(tFileName))//'.out'
               CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPAS_output_file_name)
               IF ( WriteTOPASFileRietveld2(TOPASFileName) .EQ. 0 ) THEN
-                stage_str = Integer2String(TOPAS_stage)
-                CALL InfoMessage('TOPAS .inp file '//stage_str(1:LEN_TRIM(stage_str))//' has been written.')
                 TOPAS_stage = TOPAS_stage + 1
                 CALL UpdateTOPASCheckBoxes()
+!                CALL InfoMessage(TOPASFileName)
+                CALL Launch_TOPAS(TOPASFileName)
               ENDIF
           END SELECT
       END SELECT
@@ -435,7 +502,7 @@
       INTEGER iLen, iPos, iStrPos
       LOGICAL is_last_line
       CHARACTER(512) tLine
-      CHARACTER(12) word
+      CHARACTER(30) word
       INTEGER       word_len
       CHARACTER(18) b_str
       INTEGER b_str_len, tElement, J
@@ -474,7 +541,7 @@
    10 CONTINUE
       READ(hOutputFile, '(A)', ERR=998, END=40) tLine
       iLen = LEN_TRIM(tLine)
-      word_len = 12
+      word_len = 30
       CALL FirstWord(tLine, word, word_len)
       CALL StrUpperCase(word)
       IF ( (word_len .EQ. 6) .AND. (word(1:6) .EQ. 'HKL_IS') ) THEN
@@ -652,6 +719,14 @@
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ELSE IF ( (word_len .EQ. 11) .AND. (word(1:11) .EQ. 'OUT_CIF_STR') ) THEN
         ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( (word_len .EQ. 11) .AND. (word(1:11) .EQ. 'OUT_X_YCALC') ) THEN
+        ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( (word_len .EQ. 10) .AND. (word(1:10) .EQ. 'OUT_X_YOBS') ) THEN
+        ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( (word_len .EQ. 16) .AND. (word(1:16) .EQ. 'OUT_X_DIFFERENCE') ) THEN
+        ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( (word_len .EQ. 29) .AND. (word(1:29) .EQ. 'OUT_YOBS_YCALC_AND_DIFFERENCE') ) THEN
+        ! Do nothing: it will be added at the end if necessary
       ELSE IF ( (word_len .EQ. 9) .AND. (word(1:9) .EQ. 'DO_ERRORS') ) THEN
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( (word_len .EQ. 4) .AND. (word(1:4) .EQ. 'SITE') ) THEN
@@ -793,6 +868,8 @@
       IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
         WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//FileNameBase(1:LEN_TRIM(FileNameBase))//'.cif")'
       ENDIF
+!      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_X_Ycalc("'//FileNameBase(1:LEN_TRIM(FileNameBase))//'.pp")'
+!      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_Yobs_Ycalc_and_Difference("'//FileNameBase(1:LEN_TRIM(FileNameBase))//'_1.xco")'
       WriteTOPASFileRietveld2 = 0
       CLOSE(hFileTOPAS)
       RETURN
