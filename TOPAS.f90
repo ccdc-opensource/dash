@@ -244,7 +244,7 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) 'xdd "'//tFileName(1:iLen_1)//'" xye_format'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  bkg @ '
       WRITE(hFileTOPAS, '(A)', ERR=999) '    100.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    100.0'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
       DO i = 1, 16
@@ -595,7 +595,7 @@
           ! #########################################################################################
 
           OPEN(UNIT=hSP_in_file, FILE="special_positions.in", STATUS='unknown', ERR=997)
-          WRITE(hSP_in_file, '(A)', ERR=997) 'TOLE 0.05'
+          WRITE(hSP_in_file, '(A)', ERR=997) 'TOLE 0.15'
           WRITE(hSP_in_file, '(A,6(F8.4,1X))', ERR=997) 'CELL ', (CellPar(ii),ii=1,6)
           DO ii = 1, npdbops
             tString = cpdbops(ii)
@@ -638,6 +638,8 @@
           ENDDO
           CLOSE(hSP_in_file)
           ! Run the special positions program
+          CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'special_positions.exe '// &
+            '"special_positions.in"', ProcSilent+ProcBlocked)
 
           OPEN(UNIT=hSP_out_file, FILE="special_positions.out", STATUS='unknown', ERR=996)
        45 CONTINUE
