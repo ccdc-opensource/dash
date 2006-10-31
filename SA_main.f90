@@ -576,7 +576,7 @@
       ENDDO
       CALL WCursorShape(CurHourGlass)
       CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'zmconv.exe'// &
-        ' '//fmt(1:LEN_TRIM(fmt))//' "'//tInputFile(iStart:iLen)//'"',3)
+        ' '//fmt(1:LEN_TRIM(fmt))//' "'//tInputFile(iStart:iLen)//'"', ProcSilent+ProcBlocked)
 ! Check return status
       OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = iStat)
       IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (iStat .NE. 0)) THEN
