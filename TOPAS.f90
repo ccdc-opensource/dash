@@ -13,18 +13,21 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       CHARACTER*20, EXTERNAL :: Integer2String
       LOGICAL exists, run_TOPAS_in_background
-      INTEGER M, I, tLen
+      INTEGER M, I, tLen, dLen
       CHARACTER*20 stage_str
       CHARACTER*(255) tDirName, tFileName
+      INTEGER hFile
 
-      ! Launch DICVOL04 and wait for it to return
+      ! Launch TOPAS and wait for it to return
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Configuration)
       run_TOPAS_in_background = WDialogGetCheckBoxLogical(IDC_TOPAS_in_background)
       CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
       CALL PopActiveWindowID
+      tLen = LEN_TRIM(input_file_name)
+      I = LEN_TRIM(TOPASEXE)
+      CALL SplitPath(TOPASEXE(1:I), tDirName, tFileName)
       IF ( run_TOPAS_in_background ) THEN
-        I = LEN_TRIM(TOPASEXE)
         IF ( I .EQ. 0 ) THEN
           CALL ErrorMessage("DASH could not launch TOPAS. No executable is currently specified."//CHAR(13)//&
                             "This can be changed in the Configuration... window"//CHAR(13)//&
@@ -35,15 +38,21 @@
         INQUIRE(FILE = TOPASEXE(1:I),EXIST=exists)
         IF (.NOT. exists) GOTO 998
         M = InfoError(1) ! Clear errors
-        tLen = LEN_TRIM(input_file_name)
-        CALL SplitPath(TOPASEXE(1:I), tDirName, tFileName)
         CALL IOsDirChange(tDirName)
 !        CALL IOSCommand('CMD.EXE /C '//TOPASEXE(1:I)//' '//input_file_name(1:tLen), ProcBlocked)
         CALL IOSCommand(TOPASEXE(1:I)//' '//'"'//input_file_name(1:tLen)//'"', ProcBlocked)
-        IF (InfoError(1) .NE. 0) GOTO 998
+        IF ( InfoError(1) .NE. 0 ) GOTO 998
         CALL WCursorShape(CurCrossHair)
       ELSE
-!      CALL InfoMessage('TOPAS .inp file for Pawley has been written.')
+        ! Write out the launch_file.txt file
+        IF ( (TOPAS_stage .EQ. 1) .AND. (I .NE. 0) ) THEN
+          hFile = 112
+          dLen = LEN_TRIM(tDirName)
+          OPEN(UNIT=hFile, FILE=tDirName(1:dLen)//'launch_file.txt', STATUS='unknown', ERR=999)
+          WRITE(hFile, '(A)', ERR=999) '"'//input_file_name(1:tLen)//'.inp"'
+          CLOSE(hFile) 
+        ENDIF
+!        CALL InfoMessage('TOPAS .inp file for Pawley has been written.')
         stage_str = Integer2String(TOPAS_stage)
         CALL InfoMessage('TOPAS .inp file '//stage_str(1:LEN_TRIM(stage_str))//' has been written.')
       ENDIF
@@ -54,6 +63,9 @@
                         "under Options in the menu bar.")
       CALL WCursorShape(CurCrossHair)
       RETURN
+  999 CONTINUE ! Error writing out launch_file.txt: we don't really care.
+      CALL InfoMessage("launch_file.txt could not be written.")
+      CLOSE(hFile) 
 
       END SUBROUTINE Launch_TOPAS
 !
@@ -456,7 +468,7 @@
 !
 !*****************************************************************************
 ! 
-! This function read and writes the file for Rietveld refinement (as opposed to Pawley).
+! This function reads and writes the file for Rietveld refinement (as opposed to Pawley).
       INTEGER FUNCTION WriteTOPASFileRietveld2(FileNameBase)
 
       USE DRUID_HEADER
@@ -565,9 +577,9 @@
           !                             BEGIN
           ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
           IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
-            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 1.0'
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 0.01'
           ELSE
-            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale   1.0'
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale   0.01'
           ENDIF
 ! We must call ShowWizardWindowRietveld() here, which will fill
 ! Xato (and all the RR variables). The Wizard window is suppressed because of the For_TOPAS flag.
@@ -651,7 +663,7 @@
               CALL PLUDIJ(iAtom1, iAtom2, distance)
               CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, LabelStr1)
               CALL GenerateAtomLabel(zmElementCSD(iAtom2,iFrg), iTotal+iAtom2, LabelStr2)
-              WRITE(hFileTOPAS, '(A,A7,1X,A7,A,F9.5,A)', ERR=999) 'Distance_Restrain(', LabelStr1, LabelStr2, &
+              WRITE(hFileTOPAS, '(A,A7,1X,A7,A,F9.5,A)', ERR=999) '    Distance_Restrain(', LabelStr1, LabelStr2, &
                 ', ', distance, ', 1.0, bond_width, bond_weight)'
             ENDDO
             ! ##### Angle restraints #####
@@ -668,7 +680,7 @@
                   CALL GenerateAtomLabel(zmElementCSD(iAtom,iFrg), iTotal+iAtom, LabelStr)
                   CALL GenerateAtomLabel(zmElementCSD(iAtom1,iFrg), iTotal+iAtom1, LabelStr1)
                   CALL GenerateAtomLabel(zmElementCSD(iAtom2,iFrg), iTotal+iAtom2, LabelStr2)
-                  WRITE(hFileTOPAS, '(A,A7,1X,A7,1X,A7,A,F9.5,A)', ERR=999) 'Angle_Restrain(', LabelStr1, &
+                  WRITE(hFileTOPAS, '(A,A7,1X,A7,1X,A7,A,F9.5,A)', ERR=999) '    Angle_Restrain(', LabelStr1, &
                     LabelStr, LabelStr2, ', ', angle, ', 1.0, angle_width, angle_weight)'
                 ENDDO
               ENDDO
@@ -700,7 +712,7 @@
                 ENDIF
               ENDDO
               IF ( nFlatten .GT. 3 ) THEN
-                WRITE(hFileTOPAS, '(A,999(1X,A7))', ERR=999) 'Flatten(', (flatten_labels(K),K=1,nFlatten), ', 0, 0,', '1000000',')      '
+                WRITE(hFileTOPAS, '(A,999(1X,A7))', ERR=999) '    Flatten(', (flatten_labels(K),K=1,nFlatten), ', 0, 0,', '1000000',')      '
               ENDIF
               ! Add current assembly to sum_of_assemblies
               DO J = 1, nFlatten
@@ -743,41 +755,21 @@
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( (word_len .EQ. 9) .AND. (word(1:9) .EQ. 'DO_ERRORS') ) THEN
         ! Do nothing: it will be added at the end if necessary
-      ELSE IF ( (word_len .EQ. 4) .AND. (word(1:4) .EQ. 'SITE') ) THEN
-        ! Several possibilities here.
-        ! The only thing that really needs to be done here is to insert or erase the !
-        ! to indicate whether Biso is to be refined
-        ! But we could also read the fractional coordinates back in and use them to
-        ! overlay the refined solution with the original one.
-        iPos = StrFind(tLine, iLen, '!', 1)
+      ELSE IF ( (word_len .EQ. 3) .AND. (word(1:3) .EQ. 'PRM') ) THEN
+        ! Need to check if this is the "prm bnonh 3.000" line.
+        iPos = StrFind(tLine, iLen, 'bnonh', 5)
         IF ( iPos .NE. 0 ) THEN
           IF ( WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
-            tLine(iPos:iPos) = ' '
-            WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+            tLine(iPos-1:iPos-1) = ' '
           ELSE
-            ! Don't change anything if ! already present and Biso not to be refined
-            WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
-          ENDIF
-        ELSE
-          IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
-            ! Find 'beq  bnonh' or 'beq  bh'
-            iPos = StrFind(tLine, iLen, 'beq  bnonh', 10)
-            IF ( iPos .EQ. 0 ) THEN
-              iPos = StrFind(tLine, iLen, 'beq  bh', 7)
-              IF ( iPos .EQ. 0 ) THEN
-                CALL ErrorMessage('"beq" keyword not found on "site" line.')
-              ELSE
-                tLine(iPos+4:iPos+4) = '!'
-              ENDIF
-            ELSE
-              tLine(iPos+4:iPos+4) = '!'
-            ENDIF
-            WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
-          ELSE
-            ! Don't change anything if ! not present and Biso requested to be refined
-            WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+            tLine(iPos-1:iPos-1) = '!'
           ENDIF
         ENDIF
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( (word_len .EQ. 4) .AND. (word(1:4) .EQ. 'SITE') ) THEN
+        ! We could read the fractional coordinates back in and use them to
+        ! overlay the refined solution with the original one.
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ELSE IF ( (word_len .EQ. 5) .AND. (word(1:5) .EQ. 'MACRO') ) THEN
         ! Check if rest is ref_flag
         IF ( StrFind(tLine, iLen, 'ref_flag', 8) .NE. 0 ) THEN
@@ -876,14 +868,14 @@
       ENDIF
       IF ( .NOT. is_last_line ) GOTO 10
    40 CLOSE(hOutputFile)
-      IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    do_errors'
-      ENDIF
       IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
         WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//FileNameBase(1:LEN_TRIM(FileNameBase))//'.cif")'
       ENDIF
 !      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_X_Ycalc("'//FileNameBase(1:LEN_TRIM(FileNameBase))//'.pp")'
 !      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_Yobs_Ycalc_and_Difference("'//FileNameBase(1:LEN_TRIM(FileNameBase))//'_1.xco")'
+      IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors'
+      ENDIF
       WriteTOPASFileRietveld2 = 0
       CLOSE(hFileTOPAS)
       RETURN
