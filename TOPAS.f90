@@ -244,7 +244,7 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) 'xdd "'//tFileName(1:iLen_1)//'" xye_format'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  bkg @ '
       WRITE(hFileTOPAS, '(A)', ERR=999) '    100.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '   -100.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
       DO i = 1, 16
@@ -614,25 +614,6 @@
               ii = OrderedAtm(iTotal + iAtom) ! Needed for Xato()
               WRITE(hSP_in_file, '(A,F9.5,X,F9.5,X,F9.5,X,F6.3,X,F6.3)', ERR=999) 'SITE '//LabelStr//' ', Xato(1,ii), Xato(2,ii), &
                 Xato(3,ii), occ(iAtom,iFrg), tiso(iAtom,iFrg)
-
-!              IF ( (tElement .EQ. 2) .OR. (tElement .EQ. 27) ) THEN
-!                ! Hydrogen or deuterium
-!                b_str = ' bh = 1.2 * bnonh;'
-!                b_str_len = 18
-!                WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
-!                  Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
-!                  occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len)
-!              ELSE
-!                b_str = 'bnonh'
-!                b_str_len = 5
-!                IF ( .NOT. WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
-!                  b_str = '!'//b_str
-!                  b_str_len = b_str_len + 1
-!                ENDIF
-!                WRITE(hFileTOPAS, '(A,A7,A,F9.5,A,F9.5,A,F9.5,A,F6.3,A,1X,F6.3)', ERR=999) '    site  ', LabelStr, ' x ref_flag ', &
-!                  Xato(1,ii), ' y ref_flag ', Xato(2,ii), ' z ref_flag ', Xato(3,ii), ' occ '//ElementStr(tElement)//'  ', & 
-!                  occ(iAtom,iFrg), ' beq '//b_str(1:b_str_len), tiso(iAtom,iFrg)
-!              ENDIF
             ENDDO
             iTotal = iTotal + natoms(iFrg)
           ENDDO
@@ -640,11 +621,11 @@
           ! Run the special positions program
           CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'special_positions.exe '// &
             '"special_positions.in"', ProcSilent+ProcBlocked)
-
           OPEN(UNIT=hSP_out_file, FILE="special_positions.out", STATUS='unknown', ERR=996)
        45 CONTINUE
           READ(hSP_out_file, '(A)', ERR=996, END=50) tLine
-          WRITE(hFileTOPAS, '(A)', ERR=999) tLine
+          tLen = LEN_TRIM(tLine)
+          WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:tLen)
           GOTO 45
        50 CONTINUE
           CLOSE(hSP_out_file)
