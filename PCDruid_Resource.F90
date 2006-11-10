@@ -1,4 +1,4 @@
-! Winteracter module created : 30/Oct/2006 09:38:37
+! Winteracter module created : 09/Nov/2006 13:53:47
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -655,7 +655,6 @@
           INTEGER, PARAMETER :: IDD_RR_TOPAS                    =   139
           INTEGER, PARAMETER :: IDF_TOPAS_inp_file_name         =  1372
           INTEGER, PARAMETER :: IDB_WRITE                       =  1371
-          INTEGER, PARAMETER :: IDB_UsePrevious                 =  1399
           INTEGER, PARAMETER :: IDC_wl_in_xye                   =  1439
           INTEGER, PARAMETER :: IDD_SA_input5                   =   142
           INTEGER, PARAMETER :: IDF_NumOfRuns                   =  1445
@@ -671,4 +670,6 @@
           INTEGER, PARAMETER :: IDF_TOPASExe                    =  1214
           INTEGER, PARAMETER :: IDBBROWSE4                      =  1555
           INTEGER, PARAMETER :: IDC_TOPAS_in_background         =  1296
+          INTEGER, PARAMETER :: IDC_Anisotropic_broadening      =  1370
+          INTEGER, PARAMETER :: IDF_K1                          =  1399
       END MODULE Druid_Header
