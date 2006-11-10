@@ -343,6 +343,7 @@
 
       USE DRUID_HEADER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -430,6 +431,7 @@
 
       USE DRUID_HEADER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -483,6 +485,7 @@
 !
       USE DRUID_HEADER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -599,6 +602,7 @@
 
       USE DRUID_HEADER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
