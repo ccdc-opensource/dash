@@ -32,7 +32,6 @@
       CHARACTER(20)            :: VIEWARG
 	  CHARACTER(MaxPathLength) :: MOGULEXE
 	  CHARACTER(MaxPathLength) :: DICVOL04EXE
-	  CHARACTER(MaxPathLength) :: TOPASEXE
 
 	  LOGICAL UseMogul
 	  DATA UseMogul / .TRUE. /
@@ -105,16 +104,6 @@
       INTEGER RR_SA_Sol
 ! The SA solution that will be used for Rietveld refinement. Crystal structures read in from an external
 ! file are stored in RR_SA_Sol = 1
-
-      LOGICAL For_TOPAS
-
-      CHARACTER(MaxPathLength) TOPAS_output_file_name
-
-      INTEGER TOPAS_stage
-! The "Rietveld refinement with TOPAS" dialogue window has three stages:
-! Stage 1. Write input file for Pawley in TOPAS
-! Stage 2. Read output file from TOPAS back into DASH
-! Stage 3. Write input file for Rietveld in TOPAS
 
       LOGICAL PastPawley
 ! The code used to calculate the tickmarks does so by emulating a Rietveld refinement.
