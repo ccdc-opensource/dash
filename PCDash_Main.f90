@@ -411,7 +411,7 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=512) :: CABOUT
+      CHARACTER(LEN=712) :: CABOUT
       INTEGER tLen
 
       CABOUT = 'DASH: A structure solution package for X-ray powder '//CHAR(13)//&
@@ -422,6 +422,10 @@
                'terms and conditions of a valid software licence, obtainable'//CHAR(13)//&
                'from the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
                CHAR(13)//&
+               'Reference:'//CHAR(13)//&
+               'W.I.F. David, K. Shankland, J. van de Streek, E. Pidcock,'//CHAR(13)//&
+               'W.D.S. Motherwell & J.C. Cole (2006). J. Appl. Cryst. 39, '//CHAR(13)//&
+               CHAR(13)//&
                ProgramVersion
       tLen = LEN_TRIM(CABOUT)
 !DEC$ IF DEFINED (ONTBUG)
@@ -429,7 +433,7 @@
       tLen = LEN_TRIM(CABOUT)
 !DEC$ ENDIF
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
-               'Copyright July 2005'
+               'Copyright February 2007'
       CALL WMessageBox(OkOnly, InformationIcon, CommonOk, CABOUT, 'About DASH')
 
       END SUBROUTINE About
