@@ -988,6 +988,8 @@
           ENDIF
         ENDIF
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( word(1:1) .EQ. "'" ) THEN ! It's a comment
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ELSE
         ! Change all the @'s to spaces.
         ! This switches off refinement of zero-point error, CS_L, CS_G, Strain_L, Strain_G
