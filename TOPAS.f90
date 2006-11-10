@@ -232,6 +232,7 @@
       hFileTOPAS = 116
       tLen = LEN_TRIM(TheFileName)
       OPEN(UNIT=hFileTOPAS, FILE=TheFileName(1:tLen), STATUS='unknown', ERR=999)
+      ! Ideally, we need to figure out if penalties_weighting_K1 can be made local to the "str" keyword.
       WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 5'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp 1.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp_dash 1.0'
@@ -375,6 +376,7 @@
       SELECT CASE ( TOPAS_stage )
         ! CASE ( 2 ) is the anisotropic Pawley refinement
         CASE ( 3 ) ! First Rietveld refinement: refine scale only
+          CALL WDialogFieldState(IDC_Anisotropic_broadening, Disabled)
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
@@ -422,7 +424,9 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
       INTEGER, EXTERNAL :: WriteTOPASPawleyAnisotropic
+      CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*255 TOPASFileName, tDirName, tFileName, tExtension
+      CHARACTER*20 stage_str
       INTEGER ExtLength
 
       CALL PushActiveWindowID
@@ -439,16 +443,12 @@
               ENDIF
               CALL EndWizardPastPawley
             CASE (IDB_WRITE)
-              CALL WDialogGetString(IDF_TOPAS_inp_file_name, TOPASFileName)
-              IF ( LEN_TRIM(TOPASFileName) .EQ. 0 ) THEN
-                CALL ErrorMessage('No file name given.')
-                RETURN
-              ENDIF
-              ExtLength = 3
-              CALL SplitPath2(TOPASFileName, tDirName, tFileName, tExtension, ExtLength)
-              CALL StrUpperCase(tExtension)
-              TOPAS_input_file_name  = tDirName(1:LEN_TRIM(tDirName))//tFileName(1:LEN_TRIM(tFileName))//'.inp'
-              CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPAS_input_file_name)
+              ! ## The way I have programmed it at the moment (inserting an extra stage "2" that
+              ! is simply skipped when no aniso) means that we could move the two lines:
+              !      TOPAS_stage = TOPAS_stage + 1
+              !      CALL UpdateTOPASCheckBoxes()
+              ! to Launch_TOPAS()
+
               IF ( TOPAS_stage .EQ. 2 ) THEN
                 ! Anisotropic broadening...
                 use_anisotropic_broadening = WDialogGetCheckBoxLogical(IDC_Anisotropic_broadening)
@@ -456,16 +456,18 @@
                   IF ( WriteTOPASPawleyAnisotropic(TOPAS_input_file_name) .EQ. 0 ) THEN
                     CALL Launch_TOPAS(TOPAS_input_file_name)
                     TOPAS_stage = TOPAS_stage + 1
+                    CALL UpdateTOPASCheckBoxes()
                   ENDIF
                   CALL PopActiveWindowID
                   RETURN
                 ENDIF
                 TOPAS_stage = TOPAS_stage + 1
+                CALL UpdateTOPASCheckBoxes()
               ENDIF
               IF ( WriteTOPASFileRietveld2(TOPAS_input_file_name) .EQ. 0 ) THEN
                 CALL Launch_TOPAS(TOPAS_input_file_name)
-                CALL UpdateTOPASCheckBoxes()
                 TOPAS_stage = TOPAS_stage + 1
+                CALL UpdateTOPASCheckBoxes()
               ENDIF
           END SELECT
       END SELECT
@@ -627,8 +629,15 @@
       LOGICAL in_spherical_harmonics
 
       was_Pawley = .FALSE. ! This is a remnant from when it was still possible
-                           ! to start from a previously generated .inp file.
-                           ! We could now use TOPAS_stage .EQ. 3.
+      ! to start from a previously generated .inp file.
+      ! In principle, it looks at first glance as if we could now use TOPAS_stage .EQ. 3.
+      ! However, it is much better to keep the existing mechanism based on interpreting the
+      ! .out file: that way, if the user clicked "Write" twice in a row *without having run TOPAS*,
+      ! either by accident or because they feel that scale and background can be refined together,
+      ! the correct new .inp will be written out. If we used TOPAS_stage .EQ. 3,
+      ! we would inadvertently miss the stage where the atomic coordinates are written out,
+      ! which would be a disaster.
+
       CALL WDialogSelect(IDD_SAW_Page7)
       ! Initialise to failure
       WriteTOPASFileRietveld2 = 1
@@ -676,6 +685,11 @@
           ENDIF
         ENDIF
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( (word_len .EQ. 22) .AND. (word(1:22) .EQ. 'PENALTIES_WEIGHTING_K1') ) THEN
+        CALL WDialogGetInteger(IDF_K1, K)
+        IF ( K .LT. 0 ) K = 1
+        tStr = Integer2String(K)
+        WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 '//tStr(1:LEN_TRIM(tStr))
       ELSE IF ( (word_len .EQ. 6) .AND. (word(1:6) .EQ. 'HKL_IS') ) THEN
         was_Pawley = .TRUE.
         WRITE(hFileTOPAS, '(A)', ERR=999) '  str'
