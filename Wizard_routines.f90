@@ -622,7 +622,6 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
       REAL tReal, tMin, tMax
       INTEGER tFieldState
-      CHARACTER(MaxPathLength) :: TOPASFileName
 !      CHARACTER(MaxPathLength) :: DirName
 !      CHARACTER(MaxPathLength) :: FileName
 !      CHARACTER(3) :: Extension
@@ -650,9 +649,7 @@
                 CALL TruncateData(tMin,tMax)
               ELSE
                 IF ( For_TOPAS ) THEN
-                  iFlags = SaveDialog + AppendExt + PromptOn
-                  FILTER = 'TOPAS input file (*.inp)|*.inp|'
-                  TOPASFileName = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
+                  TOPAS_input_file_name = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
                   ! It turns out that TOPAS cannot cope with file names that have dots in them,
                   ! e.g. the following gives an error message:
                   ! "Daresbury9.1_Nov2006.inp"
@@ -660,40 +657,43 @@
                   ! after the first "." was assumed to be the file extension.
 !    10            CONTINUE
 !                  ExtLength = 3
-!                  CALL SplitPath2(TOPASFileName, DirName, FileName, Extension, ExtLength)
+!                  CALL SplitPath2(TOPAS_input_file_name, DirName, FileName, Extension, ExtLength)
 !                  iLen = LEN_TRIM(FileName)
 !                  iPos = StrFind(FileName, iLen, '.', 1)
 !                  IF ( iPos .NE. 0 ) THEN
 !                    FileName(iPos:iPos) = "_"
 !                    dLen = LEN_TRIM(DirName)
-!                    TOPASFileName = DirName(1:dLen)//FileName(1:iLen)//'.inp'
+!                    TOPAS_input_file_name = DirName(1:dLen)//FileName(1:iLen)//'.inp'
 !                    ! There could be more "." in the file name
 !                    GOTO 10
 !                  ENDIF
-                  CALL WSelectFile(FILTER, iFlags, TOPASFileName, 'Save TOPAS input file')
-                  IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPASFileName) .NE. 0)) THEN
+                  iFlags = SaveDialog + AppendExt + PromptOn
+                  FILTER = 'TOPAS input file (*.inp)|*.inp|'
+                  CALL WSelectFile(FILTER, iFlags, TOPAS_input_file_name, 'Save TOPAS input file')
+                  IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPAS_input_file_name) .NE. 0)) THEN
 !                    something_changed = .FALSE.
 !    20              CONTINUE
 !                    ExtLength = 3
-!                    CALL SplitPath2(TOPASFileName, DirName, FileName, Extension, ExtLength)
+!                    CALL SplitPath2(TOPAS_input_file_name, DirName, FileName, Extension, ExtLength)
 !                    iLen = LEN_TRIM(FileName)
 !                    iPos = StrFind(FileName, iLen, '.', 1)
 !                    IF ( iPos .NE. 0 ) THEN
 !                      FileName(iPos:iPos) = "_"
 !                      dLen = LEN_TRIM(DirName)
-!                      TOPASFileName = DirName(1:dLen)//FileName(1:iLen)//'.inp'
+!                      TOPAS_input_file_name = DirName(1:dLen)//FileName(1:iLen)//'.inp'
 !                      something_changed = .TRUE.
 !                      ! There could be more "." in the file name
 !                      GOTO 20
 !                    ENDIF
 !                    IF ( something_changed ) &
 !                      CALL InfoMessage("TOPAS cannot cope with file names containing dots,"//CHAR(13)//&
-!                                       "DASH has replaced these by an underscore.")
-                    IF ( WriteTOPASFilePawley(TOPASFileName) .EQ. 0 ) THEN
+!                                       "DASH has replaced these by underscores.")
+                    IF ( WriteTOPASFilePawley(TOPAS_input_file_name) .EQ. 0 ) THEN
                       TOPAS_stage = 2
                       CALL WDialogSelect(IDD_SAW_Page7)
-                      CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPASFileName)
+                      CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPAS_input_file_name)
                       CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
+                      CALL WDialogFieldState(IDC_Anisotropic_broadening, Enabled)
                       CALL UpdateTOPASCheckBoxes()
                       CALL WizardWindowShow(IDD_SAW_Page7)
                     ENDIF
