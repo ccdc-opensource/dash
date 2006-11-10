@@ -4,7 +4,8 @@
       SUBROUTINE Launch_TOPAS(input_file_name)
 
       USE DRUID_HEADER
-      USE VARIABLES
+      USE WINTERACTER
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -45,12 +46,19 @@
         CALL WCursorShape(CurCrossHair)
       ELSE
         ! Write out the launch_file.txt file
-        IF ( (TOPAS_stage .EQ. 1) .AND. (I .NE. 0) ) THEN
-          hFile = 112
-          dLen = LEN_TRIM(tDirName)
-          OPEN(UNIT=hFile, FILE=tDirName(1:dLen)//'launch_file.txt', STATUS='unknown', ERR=999)
-          WRITE(hFile, '(A)', ERR=999) '"'//input_file_name(1:tLen)//'.inp"'
-          CLOSE(hFile) 
+        IF ( TOPAS_stage .EQ. 1 ) THEN
+          IF ( I .EQ. 0 ) THEN
+            CALL InfoMessage("The launch_file.txt could not be written,"//CHAR(13)//&
+                             "because no TOPAS directory has been entered."//CHAR(13)//&
+                             "This can be changed in the Configuration... window"//CHAR(13)//&
+                             "under Options in the menu bar.")
+          ELSE
+            hFile = 112
+            dLen = LEN_TRIM(tDirName)
+            OPEN(UNIT=hFile, FILE=tDirName(1:dLen)//'launch_file.txt', STATUS='unknown', ERR=999)
+            WRITE(hFile, '(A)', ERR=999) '"'//input_file_name(1:tLen)//'.inp"'
+            CLOSE(hFile) 
+          ENDIF
         ENDIF
 !        CALL InfoMessage('TOPAS .inp file for Pawley has been written.')
         stage_str = Integer2String(TOPAS_stage)
@@ -165,6 +173,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -183,13 +192,8 @@
               CALL EndWizardPastPawley
             CASE (IDNEXT)
               For_TOPAS = .TRUE.
+              TOPAS_stage = 1
               CALL WizardWindowShow(IDD_PW_Page3)
-            CASE (IDB_UsePrevious)
-              TOPAS_stage = 2
-              CALL WDialogSelect(IDD_SAW_Page7)
-              CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
-              CALL UpdateTOPASCheckBoxes()
-              CALL WizardWindowShow(IDD_SAW_Page7)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -285,7 +289,7 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) '    CS_G(@, 200.00)'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    Strain_G(@, 0.1)'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    Strain_L(@, 0.01)'
-      IF ( LatBrav .LT. 6 ) THEN ! Triclinic through orthorhombic: no contraints on a, b or c.
+      IF ( LatBrav .LT. 6 ) THEN ! Triclinic through orthorhombic: no constraints on a, b or c.
         WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    a  @ ', CELLPAR(1)
         WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    b  @ ', CELLPAR(2)
         WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    c  @ ', CELLPAR(3)
@@ -359,6 +363,7 @@
 
       USE DRUID_HEADER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -368,28 +373,29 @@
       CALL WDialogSelect(IDD_SAW_Page7)
       IF ( .NOT. WDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) RETURN
       SELECT CASE ( TOPAS_stage )
-        CASE ( 2 ) ! First Rietveld refinement: refine scale only
+        ! CASE ( 2 ) is the anisotropic Pawley refinement
+        CASE ( 3 ) ! First Rietveld refinement: refine scale only
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
-        CASE ( 3 ) ! Second Rietveld refinement: include background
+        CASE ( 4 ) ! Second Rietveld refinement: include background
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
-        CASE ( 4 ) ! Third Rietveld refinement: include coordinates
+        CASE ( 5 ) ! Third Rietveld refinement: include coordinates
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
-        CASE ( 5 ) ! Fourth Rietveld refinement: include Biso
+        CASE ( 6 ) ! Fourth Rietveld refinement: include Biso
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
@@ -409,14 +415,15 @@
 
       USE DRUID_HEADER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
+      INTEGER, EXTERNAL :: WriteTOPASPawleyAnisotropic
       CHARACTER*255 TOPASFileName, tDirName, tFileName, tExtension
       INTEGER ExtLength
-      CHARACTER(LEN=75) FILTER
-      INTEGER           iFlags, iFType 
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page7)
@@ -431,17 +438,6 @@
                 For_TOPAS = .FALSE.
               ENDIF
               CALL EndWizardPastPawley
-            CASE (IDBBROWSE)
-              iFlags = LoadDialog + DirChange + PromptOn
-              FILTER = 'All files (*.*)|*.*|'//&
-                       'TOPAS input/output files (*.inp, *.out)|*.inp;*.out|'
-              ! iFType specifies which of the file types in the list is the default
-              iFType = 2
-              tFileName = ' '
-              CALL WSelectFile(FILTER, iFlags, tFileName, 'Open TOPAS file', iFType)
-              ! Did the user press cancel?
-              IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) RETURN
-              CALL WDialogPutString(IDF_TOPAS_inp_file_name, tFileName)
             CASE (IDB_WRITE)
               CALL WDialogGetString(IDF_TOPAS_inp_file_name, TOPASFileName)
               IF ( LEN_TRIM(TOPASFileName) .EQ. 0 ) THEN
@@ -451,20 +447,106 @@
               ExtLength = 3
               CALL SplitPath2(TOPASFileName, tDirName, tFileName, tExtension, ExtLength)
               CALL StrUpperCase(tExtension)
-              TOPASFileName = tDirName(1:LEN_TRIM(tDirName))//tFileName(1:LEN_TRIM(tFileName))//'.inp'
-              TOPAS_output_file_name  = tDirName(1:LEN_TRIM(tDirName))//tFileName(1:LEN_TRIM(tFileName))//'.out'
-              CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPAS_output_file_name)
-              IF ( WriteTOPASFileRietveld2(TOPASFileName) .EQ. 0 ) THEN
+              TOPAS_input_file_name  = tDirName(1:LEN_TRIM(tDirName))//tFileName(1:LEN_TRIM(tFileName))//'.inp'
+              CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPAS_input_file_name)
+              IF ( TOPAS_stage .EQ. 2 ) THEN
+                ! Anisotropic broadening...
+                use_anisotropic_broadening = WDialogGetCheckBoxLogical(IDC_Anisotropic_broadening)
+                IF ( use_anisotropic_broadening ) THEN
+                  IF ( WriteTOPASPawleyAnisotropic(TOPAS_input_file_name) .EQ. 0 ) THEN
+                    CALL Launch_TOPAS(TOPAS_input_file_name)
+                    TOPAS_stage = TOPAS_stage + 1
+                  ENDIF
+                  CALL PopActiveWindowID
+                  RETURN
+                ENDIF
                 TOPAS_stage = TOPAS_stage + 1
+              ENDIF
+              IF ( WriteTOPASFileRietveld2(TOPAS_input_file_name) .EQ. 0 ) THEN
+                CALL Launch_TOPAS(TOPAS_input_file_name)
                 CALL UpdateTOPASCheckBoxes()
-!                CALL InfoMessage(TOPASFileName)
-                CALL Launch_TOPAS(TOPASFileName)
+                TOPAS_stage = TOPAS_stage + 1
               ENDIF
           END SELECT
       END SELECT
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithRR_TOPAS
+!
+!*****************************************************************************
+! 
+! This function reads the Pawley refinement file and and writes the file for
+! Pawley refinement with anisotropic broadening.
+      INTEGER FUNCTION WriteTOPASPawleyAnisotropic(FileNameBase)
+
+      ! If we have just done the Pawley refinement with isotropic broadening, then the
+      ! next step could be Pawley refinement with anisotropic broadening.
+      ! To be written out after "Strain_L". All other parameters remain variable.
+
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ATMVAR
+      USE ZMVAR
+      USE PO_VAR
+      USE RRVAR
+      USE SAMVAR
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (INOUT) :: FileNameBase
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER hFileTOPAS, hOutputFile
+      INTEGER iLen
+      LOGICAL is_last_line
+      CHARACTER(512) tLine
+      CHARACTER(30) word
+      INTEGER       word_len
+      CHARACTER(MaxPathLength) FileNameToRead, FileNameToWrite
+      CHARACTER*255 tDirName, tFileName, tExtension
+      INTEGER ExtLength
+
+      ! Initialise to failure
+      WriteTOPASPawleyAnisotropic = 1
+      ExtLength = 3
+      CALL SplitPath2(FileNameBase, tDirName, tFileName, tExtension, ExtLength)
+      FileNameBase = tDirName(1:LEN_TRIM(tDirName))//tFileName
+      FileNameToRead = FileNameBase(1:LEN_TRIM(FileNameBase))//'.out'
+      FileNameToWrite = FileNameBase(1:LEN_TRIM(FileNameBase))//'.inp'
+      hFileTOPAS = 116
+      hOutputFile = 117 ! This is the file that is being *read*
+      OPEN(UNIT=hFileTOPAS, FILE=FileNameToWrite, STATUS='unknown', ERR=999)
+      OPEN(UNIT=hOutputFile, FILE=FileNameToRead, STATUS='unknown', ERR=998)
+      is_last_line = .FALSE.
+   10 CONTINUE
+      READ(hOutputFile, '(A)', ERR=998, END=40) tLine
+      iLen = LEN_TRIM(tLine)
+      word_len = 30
+      CALL FirstWord(tLine, word, word_len)
+      CALL StrUpperCase(word)
+      WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      IF ( (word_len .EQ. 8) .AND. (word(1:8) .EQ. 'STRAIN_L') ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    prm    sh_scale 0.01 min 0.0001'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    spherical_harmonics_hkl sh'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '      sh_order 6'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    lor_fwhm = sh_scale * sh;'
+      ENDIF
+      GOTO 10
+   40 CLOSE(hOutputFile)
+!      IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+!        WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors'
+!      ENDIF
+      WriteTOPASPawleyAnisotropic = 0
+      CLOSE(hFileTOPAS)
+      RETURN
+  999 CALL ErrorMessage("Error writing TOPAS input file (Pawley anisotropic)")
+      CLOSE(hFileTOPAS)
+      RETURN
+  998 CALL ErrorMessage("Error reading TOPAS output file (Pawley anisotropic)")
+      CLOSE(hOutputFile)
+      CLOSE(hFileTOPAS)
+
+      END FUNCTION WriteTOPASPawleyAnisotropic
 !
 !*****************************************************************************
 ! 
@@ -523,8 +605,7 @@
       CHARACTER(512) tLine
       CHARACTER(30) word
       INTEGER       word_len
-      CHARACTER(18) b_str
-      INTEGER b_str_len, tElement, J
+      INTEGER tElement, J
       INTEGER ii, iTotal, iFrg, iAtom, iAtom1, iAtom2
       REAL    distance, angle
       CHARACTER(7) LabelStr, LabelStr1, LabelStr2
@@ -543,8 +624,11 @@
       INTEGER ExtLength, hSP_in_file, hSP_out_file, tLen
       LOGICAL was_Pawley
       CHARACTER*80 tString
+      LOGICAL in_spherical_harmonics
 
-      was_Pawley = .FALSE.
+      was_Pawley = .FALSE. ! This is a remnant from when it was still possible
+                           ! to start from a previously generated .inp file.
+                           ! We could now use TOPAS_stage .EQ. 3.
       CALL WDialogSelect(IDD_SAW_Page7)
       ! Initialise to failure
       WriteTOPASFileRietveld2 = 1
@@ -560,13 +644,39 @@
       OPEN(UNIT=hFileTOPAS, FILE=FileNameToWrite, STATUS='unknown', ERR=999)
       OPEN(UNIT=hOutputFile, FILE=FileNameToRead, STATUS='unknown', ERR=998)
       is_last_line = .FALSE.
+      in_spherical_harmonics = .FALSE.
    10 CONTINUE
       READ(hOutputFile, '(A)', ERR=998, END=40) tLine
       iLen = LEN_TRIM(tLine)
       word_len = 30
       CALL FirstWord(tLine, word, word_len)
       CALL StrUpperCase(word)
-      IF ( (word_len .EQ. 6) .AND. (word(1:6) .EQ. 'HKL_IS') ) THEN
+      IF ( in_spherical_harmonics ) THEN
+!!!!  prm sh_scale   0.00907`_0.00078 min .0001
+!     spherical_harmonics_hkl sh
+!       sh_order  6 load sh_Cij_prm {
+!          y00   !sh_c00  1.00000
+!          y20   sh_c20  -0.65363`_0.15875
+!          y22p  sh_c22p -2.09821`_0.24794
+!          y40   sh_c40  -1.90493`_0.23022
+!          y42p  sh_c42p -0.59773`_0.09433
+!          y44p  sh_c44p -1.38602`_0.17287
+!          y60   sh_c60   0.11779`_0.02838
+!          y62p  sh_c62p  0.03288`_0.18446
+!          y64p  sh_c64p -0.25236`_0.14136
+!          y66p  sh_c66p  0.19174`_0.15399
+!          } 
+!!!!  lor_fwhm = sh_scale * sh;
+        IF ( (word_len .EQ. 8) .AND. (word(1:8) .EQ. 'LOR_FWHM') ) THEN
+          in_spherical_harmonics = .FALSE.
+        ELSE
+          IF ( word(1:1) .EQ. 'Y' ) THEN
+            iPos = StrFind(tLine, iLen, '  sh_', 5)
+            IF ( iPos .NE. 0 ) tLine(iPos+1:iPos+1) = '!'
+          ENDIF
+        ENDIF
+        WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
+      ELSE IF ( (word_len .EQ. 6) .AND. (word(1:6) .EQ. 'HKL_IS') ) THEN
         was_Pawley = .TRUE.
         WRITE(hFileTOPAS, '(A)', ERR=999) '  str'
       ELSE IF ( (word_len .EQ. 11) .AND. (word(1:11) .EQ. 'SPACE_GROUP') ) THEN
@@ -577,9 +687,9 @@
           !                             BEGIN
           ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
           IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
-            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 0.01'
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 0.001'
           ELSE
-            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale   0.01'
+            WRITE(hFileTOPAS, '(A)', ERR=999) '    scale   0.001'
           ENDIF
 ! We must call ShowWizardWindowRietveld() here, which will fill
 ! Xato (and all the RR variables). The Wizard window is suppressed because of the For_TOPAS flag.
@@ -591,7 +701,7 @@
                              'has been written out to the TOPAS .inp file: if you are using'//CHAR(13)//&
                              'a different experimental pattern, you may need to remove this.')
           ELSE
-            WRITE(hFileTOPAS, '(A)', ERR=999) "'    PO( , 1.0, , 0 0 1)"
+            WRITE(hFileTOPAS, '(A)', ERR=999) "'    PO(@, 1.0, , 0 0 1)"
           ENDIF
           IF ( WDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
             WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag { @ }'
@@ -756,13 +866,20 @@
       ELSE IF ( (word_len .EQ. 9) .AND. (word(1:9) .EQ. 'DO_ERRORS') ) THEN
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( (word_len .EQ. 3) .AND. (word(1:3) .EQ. 'PRM') ) THEN
-        ! Need to check if this is the "prm bnonh 3.000" line.
-        iPos = StrFind(tLine, iLen, 'bnonh', 5)
+        ! Need to check if this is the "prm sh_scale 1.0 min 0.0001" line.
+        iPos = StrFind(tLine, iLen, 'sh_scale', 8)
         IF ( iPos .NE. 0 ) THEN
-          IF ( WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
-            tLine(iPos-1:iPos-1) = ' '
-          ELSE
-            tLine(iPos-1:iPos-1) = '!'
+          tLine(iPos-1:iPos-1) = '!'
+          in_spherical_harmonics = .TRUE.
+        ELSE
+          ! Need to check if this is the "prm bnonh 3.000" line.
+          iPos = StrFind(tLine, iLen, 'bnonh', 5)
+          IF ( iPos .NE. 0 ) THEN
+            IF ( WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
+              tLine(iPos-1:iPos-1) = ' '
+            ELSE
+              tLine(iPos-1:iPos-1) = '!'
+            ENDIF
           ENDIF
         ENDIF
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
@@ -879,16 +996,16 @@
       WriteTOPASFileRietveld2 = 0
       CLOSE(hFileTOPAS)
       RETURN
-  999 CALL ErrorMessage("Error writing TOPAS input file (Rietveld)")
+  999 CALL ErrorMessage("Error writing TOPAS input file (Rietveld).")
       CLOSE(hFileTOPAS)
       RETURN
-  998 CALL ErrorMessage("Error reading TOPAS output file")
+  998 CALL ErrorMessage("Error reading TOPAS output file (Rietveld).")
       CLOSE(hOutputFile)
       CLOSE(hFileTOPAS)
-  997 CALL ErrorMessage("Error writing special positions input file")
+  997 CALL ErrorMessage("Error writing special positions input file (Rietveld).")
       CLOSE(hSP_in_file)
       CLOSE(hFileTOPAS)
-  996 CALL ErrorMessage("Error reading special positions output file")
+  996 CALL ErrorMessage("Error reading special positions output file (Rietveld).")
       CLOSE(hSP_out_file)
       CLOSE(hFileTOPAS)
 
