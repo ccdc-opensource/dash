@@ -83,6 +83,8 @@
 
       USE DRUID_HEADER
       USE WINTERACTER
+      USE TAVAR
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -105,18 +107,24 @@
       TAEOBS(1:NOBS) = EOBS(1:NOBS)
       TALAMBDA = ALambda
       TARADIATION = JRadOption
-      ! Uncheck the "Truncate pattern at end" checkbox (but we don't store its current state)
+      old_NumOfRef = NumOfRef 
+      NumOfRef = 0
+      CALL Profile_Plot
       CALL PushActiveWindowID
+      ! Must clear old file name and grey out the 'Next' button
+      CALL WDialogSelect(IDD_PW_Page3)
+      CALL WDialogGetString(IDF_PWa_DataFileName_String, old_diffraction_data_file_name)
+      CALL WDialogClearField(IDF_PWa_DataFileName_String)
+      CALL WDialogFieldState(IDNEXT, Disabled)
+      ! Uncheck the "Truncate pattern at end" checkbox (but we don't store its current state)
       CALL WDialogSelect(IDD_PW_Page5)
       CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN, .FALSE.)
       CALL WDialogFieldState(IDF_Max2Theta, Disabled)
       CALL WDialogFieldState(IDF_MaxResolution, Disabled)
       CALL WDialogFieldState(IDB_Convert, Disabled)
-
-!      CALL WDialogSelect(IDD_PW_Page3)
-!      CALL WDialogGetString(IDF_PWa_DataFileName_String, .FALSE.)
-!      CALL WDialogPutString(IDF_PWa_DataFileName_String, '')
-
+      ! Enable the "Monochromated" checkbox
+      CALL WDialogSelect(IDD_PW_Page4)
+      CALL WDialogFieldState(IDC_Monochromated, Enabled)
       CALL PopActiveWindowID
 
       END SUBROUTINE CopyPattern2Backup
@@ -127,6 +135,8 @@
 
       USE DRUID_HEADER
       USE WINTERACTER
+      USE TAVAR
+      USE REFVAR
 
       IMPLICIT NONE
 
@@ -152,12 +162,19 @@
       EOBS(1:NOBS) = TAEOBS(1:NOBS)
       ALambda = TALAMBDA
       JRadOption = TARADIATION
+      NumOfRef = old_NumOfRef
       CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_PW_Page3)
+      CALL WDialogPutString(IDF_PWa_DataFileName_String, old_diffraction_data_file_name)
       CALL WDialogSelect(IDD_PW_Page5)
       CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN, .TRUE.)
       CALL WDialogFieldState(IDF_Max2Theta, Enabled)
       CALL WDialogFieldState(IDF_MaxResolution, Enabled)
       CALL WDialogFieldState(IDB_Convert, Enabled)
+      ! Disable the "Monochromated" checkbox
+      CALL WDialogSelect(IDD_PW_Page4)
+      CALL WDialogPutCheckBox(IDC_Monochromated, Checked)
+      CALL WDialogFieldState(IDC_Monochromated, Disabled)
       CALL PopActiveWindowID
       ! Must also restore Rebin_Profile
       LBIN = 1
@@ -204,6 +221,8 @@
 ! 
       INTEGER FUNCTION WriteTOPASFilePawley(TheFileName)
 
+      USE DRUID_HEADER
+      USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -218,12 +237,15 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      REAL, EXTERNAL :: FnWavelengthOfMenuOption
       INTEGER hFileTOPAS, hTempFile
       INTEGER iLen, iLen_1, i, tLen
       CHARACTER*(1) tChar
       CHARACTER*(MaxPathLength) tDirName, tFileName
       CHARACTER*(40) space_group_str
       INTEGER tStrLen
+      INTEGER tIRadSelection
 
       ! The way this code has curently been written, this routine can only be called
       ! from one of the Wizard windows as part of a "For_TOPAS" Rietveld refinement
@@ -283,7 +305,35 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) '  Simple_Axial_Model(@, 9.0)'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  lam'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    ymin_on_ymax 0.001'
-      WRITE(hFileTOPAS, '(A,F9.6)', ERR=999) '    la 1 lo ', ALambda
+      CALL WDialogSelect(IDD_PW_Page4)
+      IF ( WDialogGetCheckBoxLogical(IDC_Monochromated) .OR. (JRadOption .NE. 1) ) THEN
+        WRITE(hFileTOPAS, '(A,F9.6)', ERR=999) '    la 1 lo ', ALambda
+      ELSE
+        tIRadSelection = -1
+        DO I = 2, 6
+          IF (ABS(ALambda - FnWavelengthOfMenuOption(I)) .LT. 0.0003) tIRadSelection = I
+        ENDDO
+        SELECT CASE (tIRadSelection)
+        CASE (2) ! Cu
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.6666667 lo 1.54060'
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.3333333 lo 1.54439'
+        CASE (3) ! Mo
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.6666667 lo 0.70930'
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.3333333 lo 0.71359'
+        CASE (4) ! Co
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.6666667 lo 1.78897'
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.3333333 lo 1.79285'
+        CASE (5) ! Cr
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.6666667 lo 2.28970'
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.3333333 lo 2.29361'
+        CASE (6) ! Fe
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.6666667 lo 1.93604'
+          WRITE(hFileTOPAS, '(A)', ERR=999) '    la 0.3333333 lo 1.93998'
+        CASE DEFAULT
+          CALL InfoMessage("Wavelength not recognised as a standard anode material--monochromated assumed.")
+          WRITE(hFileTOPAS, '(A,F9.6)', ERR=999) '    la 1 lo ', ALambda
+        END SELECT
+      ENDIF
       WRITE(hFileTOPAS, '(A,F8.6)', ERR=999) '  x_calculation_step ', (XBIN(NBIN) - XBIN(1)) / (NBIN - 1)
       WRITE(hFileTOPAS, '(A)', ERR=999) '  hkl_Is'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    CS_L(@, 200.00)'
@@ -374,7 +424,15 @@
       CALL WDialogSelect(IDD_SAW_Page7)
       IF ( .NOT. WDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) RETURN
       SELECT CASE ( TOPAS_stage )
-        ! CASE ( 2 ) is the anisotropic Pawley refinement
+        CASE ( 2 ) ! Anisotropic Pawley refinement
+          CALL WDialogFieldState(IDC_Anisotropic_broadening, Enabled)
+          CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Scale,       .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background,  .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 3 ) ! First Rietveld refinement: refine scale only
           CALL WDialogFieldState(IDC_Anisotropic_broadening, Disabled)
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
@@ -424,10 +482,6 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
       INTEGER, EXTERNAL :: WriteTOPASPawleyAnisotropic
-      CHARACTER*20, EXTERNAL :: Integer2String
-      CHARACTER*255 TOPASFileName, tDirName, tFileName, tExtension
-      CHARACTER*20 stage_str
-      INTEGER ExtLength
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page7)

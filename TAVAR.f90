@@ -17,6 +17,9 @@
 
       LOGICAL use_anisotropic_broadening
 
+      CHARACTER(255) old_diffraction_data_file_name
+
+      INTEGER old_NumOfRef
   
       END MODULE TAVAR
 !
