@@ -926,6 +926,7 @@ DEP_F90_TOPAS=\
 	".\Release\ATMVAR.mod"\
 	".\Release\DRUID_HEADER.mod"\
 	".\Release\PO_VAR.mod"\
+	".\Release\REFVAR.mod"\
 	".\Release\RRVAR.mod"\
 	".\Release\SAMVAR.mod"\
 	".\Release\TAVAR.mod"\
@@ -1134,14 +1135,6 @@ SOURCE=.\res\WizardWelcome.bmp
 SOURCE=.\SGinc\ffcalctop.inc
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\Buglist.txt
-# End Source File
-# Begin Source File
-
-SOURCE=.\Interface.txt
-# End Source File
 # Begin Source File
 
 SOURCE=.\ToDoBeforeRelease.txt
