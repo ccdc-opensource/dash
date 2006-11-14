@@ -509,8 +509,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! If the user is re-binning this profile, make sure we pass the binning
-              CALL WDialogSelect(IDD_PW_Page3a)
-              IF ( WDialogGetCheckBoxLogical(IDF_BinData) ) THEN
+              IF ( lRebin ) THEN
                 CALL WizardWindowShow(IDD_PW_Page3a)
               ELSE
                 CALL WizardWindowShow(IDD_PW_Page3)
