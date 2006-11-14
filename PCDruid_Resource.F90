@@ -1,4 +1,4 @@
-! Winteracter module created : 10/Nov/2006 14:55:50
+! Winteracter module created : 13/Nov/2006 17:35:10
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -672,4 +672,5 @@
           INTEGER, PARAMETER :: IDC_TOPAS_in_background         =  1296
           INTEGER, PARAMETER :: IDC_Anisotropic_broadening      =  1370
           INTEGER, PARAMETER :: IDF_K1                          =  1399
+          INTEGER, PARAMETER :: IDC_Monochromated               =  1442
       END MODULE Druid_Header
