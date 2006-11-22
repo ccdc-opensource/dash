@@ -535,6 +535,9 @@
               CALL WDialogGetRadioButton(IDF_LabX_Source, JRadOption)
               CALL Upload_Source
               CALL Generate_TicMarks 
+              IF ( For_TOPAS ) THEN ! Enable/disable "Monochromated" check box
+                CALL WDialogFieldStateLogical(IDC_Monochromated, JRadOption .EQ. 1)
+              ENDIF
             CASE (IDF_wavelength1)
               CALL WDialogGetReal(IDF_wavelength1, Temp)
               CALL Set_Wavelength(Temp)
