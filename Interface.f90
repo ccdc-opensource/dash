@@ -33,7 +33,7 @@
       INTEGER, INTENT (IN   ) :: TheFieldIdentifier
       LOGICAL, INTENT (IN   ) :: TheLogical
 
-      IF (TheLogical) THEN
+      IF ( TheLogical ) THEN
         CALL WDialogFieldState(TheFieldIdentifier, Enabled)
       ELSE
         CALL WDialogFieldState(TheFieldIdentifier, Disabled)
