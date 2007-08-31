@@ -87,20 +87,27 @@ proc MakeAddPhaseBox {} {
     afterputontop
 }
 
-proc addphase {np} {
+proc addphase {np {title {}} {input {}} {confirm 1}} {
     global expgui expmap
     # validate the input
     set err {}
-    set title [$np.t1 get]
+    if {$title == ""} {
+      set guimode 1
+      set title [$np.t1 get]
+    } else {
+      set guimode 0
+      set np .tmpphasewin
+      if ![winfo exists $np] {label $np}
+    }
     if {[string trim $title] == ""} {
 	append err "  Title cannot be blank\n"
     }
-    set spg [$np.t2 get]
+    set spg [expr {$guimode? [$np.t2 get] : [lindex $input 0]}]
     if {[string trim $spg] == ""} {
 	append err "  Space group cannot be blank\n"
     }
-    foreach i {a b c} {
-	set cell($i) [$np.f.e1$i get]
+    foreach i {a b c} j {0 1 2} {
+	set cell($i) [expr {$guimode? [$np.f.e1$i get] : [lindex [lindex $input 1] $j]}]
 	if {[string trim $cell($i)] == ""} {
 	    append err "  $i cannot be blank\n"
 	} elseif {[catch {expr $cell($i)}]} {
@@ -108,8 +115,8 @@ proc addphase {np} {
 	}
     }
 
-    foreach i {a b g} lbl {alpha beta gamma} {
-	set cell($lbl) [$np.f.e2$i get]
+    foreach i {a b g} lbl {alpha beta gamma} j {3 4 5} {
+	set cell($lbl) [expr {$guimode? [$np.f.e2$i get] : [lindex [lindex $input 1] $j]}]
 	if {[string trim $cell($lbl)] == ""} {
 	    append err "  $lbl cannot be blank\n"
 	} elseif {[catch {expr $cell($lbl)}]} {
@@ -122,7 +129,7 @@ proc addphase {np} {
 		-message "The following error(s) were found in your input:\n$err" \
 		-icon error
 	set expgui(oldphaselist) -1
-	return
+	return 1
     }
 
     # check the space group
@@ -153,8 +160,8 @@ proc addphase {np} {
 		 "Error processing space group\nReview error message below" \
 		 $b OK "" 1
 	set expgui(oldphaselist) -1
-	return
-    } else {
+	return 1
+    } elseif {$confirm} {
 	# show the result and confirm
 	set opt [ShowBigMessage \
 		$np.check \
@@ -163,7 +170,7 @@ proc addphase {np} {
 		{Continue Redo} ]
 	if {$opt > 1} {
 	    set expgui(oldphaselist) -1
-	    return
+	    return 1
 	}
     }
     file delete spg.in spg.out
@@ -221,7 +228,10 @@ proc addphase {np} {
 	append expgui(needpowpref_why) "\t$msg\n"
     }
     # now select the new phase
-    SelectOnePhase [lindex $expmap(phaselist) end]    
+    if $guimode {
+    	SelectOnePhase [lindex $expmap(phaselist) end]
+    }
+		return 0
 }
 
 #----------- Add Histogram routines --------------------------------------
@@ -444,13 +454,20 @@ proc getrawfile {np} {
 proc validaterawfile {np inp} {
     global expgui newhist
     if {$inp == ""} return
+    if {$np != ""} {
+      set guimode 1
+    } else {
+      set guimode 0
+      set np .tmprawwin
+      if ![winfo exists $np] {label $np}
+    }
     if [catch {set in [open $inp r]}] {
 	MyMessageBox -parent $np -title "Open error" \
 		-message "Unable to open file $inp" -icon error
-	return 
+	return 1
     }
     set newhist(banklist) {}
-    foreach child [winfo children $np.bank] {destroy $child}
+    if $guimode {foreach child [winfo children $np.bank] {destroy $child}}
     # is this a properly formatted file?
     # -- are lines the correct length & terminated with a CR-LF?    
     fconfigure $in -translation lf
@@ -470,7 +487,7 @@ proc validaterawfile {np inp} {
 		fconfigure $in -translation lf
 		set line {}
 	    } else {
-		return
+		return 1
 	    }
 	}
 	# scan for BANK lines
@@ -490,9 +507,11 @@ proc validaterawfile {np inp} {
 	}
 	# check for "Instrument parameter file" line
 	if {$i == 2 && [string first "Instrument parameter" $line] == 0} {
-	    validateinstfile $np \
-		    [file join [file dirname $inp] \
-		    [string trim [string range $line 26 end]]]
+      set insfile [string trim [string range $line 26 end]]
+      if {[file dirname $inp] != "."} {
+        set insfile [file join [file dirname $inp] $insfile]
+      }
+      validateinstfile [expr {$guimode? $np : {}}] $insfile
 	}
     }
     # were banks found?
@@ -500,7 +519,7 @@ proc validaterawfile {np inp} {
 	MyMessageBox -parent $np -title "Read error" \
 		-message "File $inp has no BANK lines.\nThis is not a valid GSAS data file." \
 		-icon warning
-	return
+	return 1
     }
     # don't use a full path unless needed
     if {[pwd] == [file dirname $inp]} {
@@ -516,10 +535,12 @@ proc validaterawfile {np inp} {
 	    set col -1
 	    incr row
 	}
-	grid [radiobutton $np.bank.$i -text $i -command SetTmax \
+	if $guimode {
+  grid [radiobutton $np.bank.$i -text $i -command SetTmax \
 		-variable newhist(banknum) -value $i] \
 		-column [incr col] -row $row -sticky w
-	# only 1 choice, so set it
+	}
+# only 1 choice, so set it
 	if {[llength $newhist(banklist)] == 1} {
 	    set newhist(banknum) $i
 	    SetTmax
@@ -531,7 +552,8 @@ proc validaterawfile {np inp} {
 	set newhist(2tLimit) {}
 	set newhist(LimitMode) {}
     }
-    SetMultipleAdd $np
+  if $guimode {SetMultipleAdd $np}
+	return 0
 }
 
 proc SetTmax {} {
@@ -573,14 +595,21 @@ proc getinstfile {np} {
 
 proc validateinstfile {np inp} {
     global expgui newhist
+    if {$np != ""} {
+      set guimode 1
+    } else {
+      set guimode 0
+      set np .tmpinstwin
+      if ![winfo exists $np] {label $np}
+    }
     if {$inp == ""} return
     if [catch {set in [open $inp r]}] {
 	MyMessageBox -parent $np -title "Open error" \
 		-message "Unable to open file $inp" -icon error
-	return 
+	return 1
     }
     set newhist(instbanks) {}
-    foreach child [winfo children $np.set] {destroy $child}
+    if $guimode {foreach child [winfo children $np.set] {destroy $child}}
     # is this a properly formatted file?
     # -- are lines the correct length & terminated with a CR-LF?    
     fconfigure $in -translation lf
@@ -597,7 +626,7 @@ proc validateinstfile {np inp} {
 		fconfigure $in -translation lf
 		set line {}
 	    } else {
-		return
+		return 1
 	    }
 	}
 	# scan for the INS   BANK line
@@ -636,7 +665,7 @@ proc validateinstfile {np inp} {
 	MyMessageBox -parent $np -title "Read error" -message \
 		"File $inp has no \"INS   BANK\" line.\nThis is not a valid GSAS Instrument Parameter file." \
 		-icon warning
-	return
+	return 1
     }
     # don't use a full path unless needed
     if {[pwd] == [file dirname $inp]} {
@@ -651,22 +680,34 @@ proc validateinstfile {np inp} {
 	    set col -1
 	    incr row
 	}
-	grid [radiobutton $np.set.$i -text $i \
+  if $guimode {
+  grid [radiobutton $np.set.$i -text $i \
 		-command "PostDummyOpts $np; ValidateDummyHist $np" \
 		-variable newhist(setnum) -value $i] \
 		-column [incr col] -row $row -sticky w
+  }
 	if {$newhist(instbanks) == 1} {set newhist(setnum) $i}
     }
     if {$newhist(dummy)} {PostDummyOpts $np; ValidateDummyHist $np}
+    if $guimode {
     LabelInstParm
     SetMultipleAdd $np
+    }
+	return 0
 }
 
-proc addhist {np} {
+proc addhist {"np {}"} {
     global expgui newhist tcl_platform expmap
-    if {$newhist(dummy)} {
+    if {$np != ""} {
+      set guimode 1
+    } else {
+      set guimode 0
+      set np .tmphistwin
+      if ![winfo exists $np] {label $np}
+    }
+if {$newhist(dummy)} {
 	AddDummyHist $np
-	return
+	return 0
     }
     # validate the input
     set err {}
@@ -702,7 +743,7 @@ proc addhist {np} {
 		-message "The following error(s) were found in your input:\n$err" \
 		-icon error -type ok -default ok \
 		-helplink "expgui3.html AddHistErr"
-	return
+	return 1
     }
 
     # ok do it!
@@ -776,7 +817,7 @@ proc addhist {np} {
 	append expgui(needpowpref_why) "\t$msg\n"
     }
     # select the most recently added histogram
-    if {!$err} {
+    if {$guimode && !$err} {
 	set i [llength $expmap(histlistboxcontents)]
 	if {$i > 0} {
 	    incr i -1
@@ -784,6 +825,7 @@ proc addhist {np} {
 	    sethistlist
 	}
     }
+return 0
 }
 
 proc RunRawplot {parent} {
@@ -1517,13 +1559,22 @@ proc ValidateAtomsBox {top np} {
     return $atomlist
 }
 
-proc addatom {phase top} {
+proc addatom {phase top "atomlist {}"} {
     global expgui env expmap
-    set np $top.canvas.fr
-    # validate the atoms info
-    set atomlist [ValidateAtomsBox $top $np]
-    if {$atomlist == ""} return
+    if {$top != ""} {
+      set guimode 1
+      set np $top.canvas.fr
+      set atomlist [ValidateAtomsBox $top $np]
+    } else {
+      set guimode 0
+      set np .tmpatomtwin
+      if ![winfo exists $np] {label $np}
+    }
 
+   	# validate the atoms info
+    if {$atomlist == ""} {
+      return 0
+    }
     # ok add the atoms!
     set fp [open exptool.in w]
     puts $fp "A"
@@ -1578,6 +1629,7 @@ proc addatom {phase top} {
 	ShowBigMessage $top $msg $errmsg OK "" $err
     }
     file delete exptool.in exptool.out
+    return 0
 }
 
 #---------------------------------------------------------------------------

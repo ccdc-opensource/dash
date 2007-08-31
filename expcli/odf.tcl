@@ -220,7 +220,7 @@ proc SetODFSym {i} {
     SetODFTerms
 }
 
-proc SetODFTerms {} {
+proc SetODFTerms {{guimod 1}} {
     global expgui
     if {$expgui(curPhase) == ""} return
     set curterms [phaseinfo $expgui(curPhase) ODFterms]
@@ -235,7 +235,7 @@ proc SetODFTerms {} {
 	phaseinfo $expgui(curPhase) ODFcoef$i set 0.
    }
     incr expgui(changed)
-    SelectODFPhase $expgui(curPhase)
+    if $guimod {SelectODFPhase $expgui(curPhase)}
 }
 
 proc DisplayODFPane {} {
