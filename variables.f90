@@ -90,8 +90,8 @@
 ! The reason this must be held in a variable is that we have too many dialogue windows to keep in memory,
 ! and the dialogue window displaying this variable must therefore be swapped in and out of memory.
 
-      INTEGER iRietveldMethod
-! The chosen Rietveld refinement method, either "Rigid-body" or "TOPAS".
+      INTEGER iRietveldMethodOpt
+! The chosen Rietveld refinement method, "Rigid-body", "TOPAS"......
 ! The reason this must be held in a variable is that we have too many dialogue windows to keep in memory,
 ! and the dialogue window displaying this variable must therefore be swapped in and out of memory.
 

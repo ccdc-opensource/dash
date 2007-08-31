@@ -1227,10 +1227,10 @@
         SELECT CASE (WindowNr)
           CASE (1) 
             CALL WDialogSelect(IDD_PW_Page4)
-            IF ( For_TOPAS ) NotDisabled = Enabled
+            IF ( iRietveldMethod .NE. INTERNAL_RB ) NotDisabled = Enabled
           CASE (2) 
             CALL WDialogSelect(IDD_Data_Properties)
-            IF ( For_TOPAS ) NotDisabled = DialogReadOnly
+            IF ( iRietveldMethod .NE. INTERNAL_RB ) NotDisabled = DialogReadOnly
         END SELECT
         SELECT CASE (JRadOption)
           CASE (1) ! Lab X-ray

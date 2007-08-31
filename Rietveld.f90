@@ -48,13 +48,13 @@
       INTEGER tFieldState
 
 
-      IF ( .NOT. For_TOPAS ) THEN
+      IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
 
 
       CALL WDialogSelect(IDD_Rietveld2)
 
 
-      ENDIF  ! For_TOPAS
+      ENDIF  ! iRietveldMethod
 
 
       LOG_HYDROGENS = .TRUE.
@@ -116,7 +116,7 @@
       ENDIF
 
 
-      IF ( .NOT. For_TOPAS ) THEN
+      IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
 
 
       RR_iopttran = 0
@@ -201,14 +201,14 @@
       CALL CreateFobITF
 
 
-      ENDIF  ! For_TOPAS
+      ENDIF  ! iRietveldMethod
 
 
       ! Initialise XATO(1:3,1:150)
       CALL RR_MAKEFRAC
 
 
-      IF ( .NOT. For_TOPAS ) THEN
+      IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
 
 
       ! Store initial crystal structure for comparison
@@ -227,7 +227,7 @@
       CALL WizardWindowShow(IDD_Rietveld2)
 
 
-      ENDIF  ! For_TOPAS
+      ENDIF  ! iRietveldMethod
 
       END SUBROUTINE ShowWizardWindowRietveld
 !
@@ -1742,15 +1742,25 @@
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_SAW_Page5)
             CASE (IDNEXT)
-              CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethod)
-              IF ( iRietveldMethod .EQ. 1 ) THEN
+              CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethodOpt)
+              SELECT CASE (iRietveldMethodOpt)
+                CASE (2)
+                  iRietveldMethod = FOR_TOPAS
+                CASE (3)
+                  iRietveldMethod = FOR_GSAS
+                CASE (4)
+                  iRietveldMethod = FOR_RIETAN
+                CASE DEFAULT
+                  iRietveldMethod = INTERNAL_RB
+              END SELECT
+              IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
                 ! Rigid-body Rietveld refinement in DASH
                 CALL ShowWizardWindowRietveld(RR_SA_Sol)
               ELSE
-                ! TOPAS
-                TOPAS_stage = 1
+                ! External
+                ext_RR_stage = 1
                 CALL CopyPattern2Backup()
-                CALL WizardWindowShow(IDD_RR_TOPAS)
+                CALL WizardWindowShow(IDD_RR_External)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
@@ -1791,16 +1801,26 @@
               CALL WDialogPutRadioButton(IDF_PW_Option6)
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
-              CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethod)
+              CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethodOpt)
+              SELECT CASE (iRietveldMethodOpt)
+                CASE (2)
+                  iRietveldMethod = FOR_TOPAS
+                CASE (3)
+                  iRietveldMethod = FOR_GSAS
+                CASE (4)
+                  iRietveldMethod = FOR_RIETAN
+                CASE DEFAULT
+                  iRietveldMethod = INTERNAL_RB
+              END SELECT
               RR_SA_Sol = 1
-              IF ( iRietveldMethod .EQ. 1 ) THEN
+              IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
                 ! Rigid-body Rietveld refinement in DASH
                 CALL ShowWizardWindowRietveld(RR_SA_Sol)
               ELSE
-                ! TOPAS
-                TOPAS_stage = 1
+                ! External
+                ext_RR_stage = 1
                 CALL CopyPattern2Backup()
-                CALL WizardWindowShow(IDD_RR_TOPAS)
+                CALL WizardWindowShow(IDD_RR_External)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley

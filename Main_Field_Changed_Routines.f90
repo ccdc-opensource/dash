@@ -98,6 +98,10 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCLOSE, IDCANCEL)
+! Update with user's editing
+              CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
+              CALL WDialogGetString(IDF_EXPGUIExe, EXPGUIEXE)
+              CALL WDialogGetString(IDF_RIETANExe, RIETANEXE)
               CALL WDialogHide()
             CASE (IDBBROWSE)
               IFLAGS = LoadDialog + PromptOn
@@ -150,6 +154,32 @@
               IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
                 TOPASEXE = tFileName
                 CALL WDialogPutString(IDF_TOPASExe, TOPASEXE)
+              ENDIF
+            CASE (IDBBROWSE5)
+              IFLAGS = LoadDialog + PromptOn
+              FILTER = 'All files (*.*)|*.*|'//&
+                       'All executables (*.exe)|*.exe|'
+! IFTYPE specifies which of the file types in the list is the default
+              IFTYPE = 2
+              tFileName = EXPGUIEXE
+              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select EXPGUI Tcl Executable', IFTYPE)
+! Did the user press cancel?
+              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+                EXPGUIEXE = tFileName
+                CALL WDialogPutString(IDF_EXPGUIExe, EXPGUIEXE)
+              ENDIF
+            CASE (IDBBROWSE6)
+              IFLAGS = LoadDialog + PromptOn
+              FILTER = 'All files (*.*)|*.*|'//&
+                       'All executables (*.exe)|*.exe|'
+! IFTYPE specifies which of the file types in the list is the default
+              IFTYPE = 2
+              tFileName = RIETANEXE
+              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select RIETAN Executable', IFTYPE)
+! Did the user press cancel?
+              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+                RIETANEXE = tFileName
+                CALL WDialogPutString(IDF_RIETANExe, RIETANEXE)
               ENDIF
           END SELECT
         CASE (FieldChanged)

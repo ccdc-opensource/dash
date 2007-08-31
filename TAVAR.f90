@@ -1,19 +1,20 @@
 !
 !*****************************************************************************
 !
-! This module contains all TOPAS related data
+! This module contains all external RR related data
 !
       MODULE TAVAR
 
       IMPLICIT NONE
 
-      LOGICAL For_TOPAS
+      INTEGER iRietveldMethod, INTERNAL_RB, FOR_TOPAS, FOR_GSAS, FOR_RIETAN
+      PARAMETER (INTERNAL_RB=0, FOR_TOPAS=1, FOR_GSAS=2, FOR_RIETAN=3)
 
-	  CHARACTER(255) :: TOPASEXE
+	  CHARACTER(255) :: TOPASEXE, EXPGUIEXE, RIETANEXE
 
-      CHARACTER(255) TOPAS_input_file_name
+      CHARACTER(255) ext_RR_input_file_name
 
-      INTEGER TOPAS_stage
+      INTEGER ext_RR_stage
 
       LOGICAL use_anisotropic_broadening
 

@@ -494,14 +494,20 @@
         CASE (IDD_SAW_Page6a)
           CALL DealWithWizardChooseRietveldRefinementMethod
           GOTO 10
-        CASE (IDD_RR_TOPAS)
-          CALL DealWithWizardTOPAS
+        CASE (IDD_RR_External)
+          CALL DealWithWizardExtRR
           GOTO 10
         CASE (IDD_RR_PO_Dialog)
           CALL DealWithRR_PO_Settings
           GOTO 10
-        CASE (IDD_SAW_Page7)
+        CASE (IDD_SAW_Page7_TOPAS)
           CALL DealWithRR_TOPAS
+          GOTO 10
+        CASE (IDD_SAW_Page7_GSAS)
+          CALL DealWithRR_GSAS
+          GOTO 10
+        CASE (IDD_SAW_Page7_RIETAN)
+          CALL DealWithRR_RIETAN
           GOTO 10
       END SELECT
       DealWithEvent = .FALSE.

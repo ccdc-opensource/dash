@@ -1,4 +1,4 @@
-! Winteracter module created : 22/Nov/2006 14:53:43
+! Winteracter module created : 23/Aug/2007 17:48:53
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -652,13 +652,13 @@
           INTEGER, PARAMETER :: IDF_DICVOLExe                   =  1369
           INTEGER, PARAMETER :: IDBBROWSE3                      =  1554
           INTEGER, PARAMETER :: IDD_SAW_Page6a                  =   138
-          INTEGER, PARAMETER :: IDD_RR_TOPAS                    =   139
-          INTEGER, PARAMETER :: IDF_TOPAS_inp_file_name         =  1372
+          INTEGER, PARAMETER :: IDD_RR_External                 =   139
+          INTEGER, PARAMETER :: IDD_SAW_Page7_RIETAN            =   157
           INTEGER, PARAMETER :: IDB_WRITE                       =  1371
           INTEGER, PARAMETER :: IDC_wl_in_xye                   =  1439
           INTEGER, PARAMETER :: IDD_SA_input5                   =   142
           INTEGER, PARAMETER :: IDF_NumOfRuns                   =  1445
-          INTEGER, PARAMETER :: IDD_SAW_Page7                   =   123
+          INTEGER, PARAMETER :: IDD_SAW_Page7_TOPAS             =   123
           INTEGER, PARAMETER :: IDC_Scale                       =  1252
           INTEGER, PARAMETER :: IDC_Background                  =  1443
           INTEGER, PARAMETER :: IDC_Coordinates                 =  1444
@@ -673,4 +673,24 @@
           INTEGER, PARAMETER :: IDC_Anisotropic_broadening      =  1370
           INTEGER, PARAMETER :: IDF_K1                          =  1399
           INTEGER, PARAMETER :: IDC_Monochromated               =  1442
+          INTEGER, PARAMETER :: IDD_SAW_Page7_GSAS              =   140
+          INTEGER, PARAMETER :: IDC_Initialisation              =  1451
+          INTEGER, PARAMETER :: IDF_NCYCL                       =  1452
+          INTEGER, PARAMETER :: IDF_EXPGUIExe                   =  1454
+          INTEGER, PARAMETER :: IDBBROWSE5                      =  1556
+          INTEGER, PARAMETER :: IDF_RIETANExe                   =  1455
+          INTEGER, PARAMETER :: IDBBROWSE6                      =  1557
+          INTEGER, PARAMETER :: IDC_Coordinates_H               =  1475
+          INTEGER, PARAMETER :: IDC_Coordinates_Non_H           =  1372
+          INTEGER, PARAMETER :: IDF_RADIO4                      =  1131
+          INTEGER, PARAMETER :: IDF_Ext_RR_inp_file_name        =  1456
+          INTEGER, PARAMETER :: IDB_FG_EXPGUI                   =  1453
+          INTEGER, PARAMETER :: IDF_REAL_GSAS_FACTR_DIST        =  1476
+          INTEGER, PARAMETER :: IDF_REAL_GSAS_FACTR_ANGLE       =  1477
+          INTEGER, PARAMETER :: IDF_REAL_GSAS_FACTR_PLANE       =  1478
+          INTEGER, PARAMETER :: IDF_REAL_RIETAN_WEIGHT_TK       =  1481
+          INTEGER, PARAMETER :: IDF_REAL_RIETAN_WEIGHT_FINC     =  1488
+          INTEGER, PARAMETER :: IDF_REAL_TOPAS_WSCALE_DIST      =  1536
+          INTEGER, PARAMETER :: IDF_REAL_TOPAS_WSCALE_ANGLE     =  1544
+          INTEGER, PARAMETER :: IDF_REAL_TOPAS_WSCALE_FLATTEN   =  1545
       END MODULE Druid_Header
