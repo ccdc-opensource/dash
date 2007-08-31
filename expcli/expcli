@@ -1,0 +1,607 @@
+#!/bin/sh
+#############################
+# START_LICENSE_TEXT
+# This code is Copyright (C) 2007 The Cambridge Crystallographic Data Centre (CCDC)
+# of 12 Union Road, Cambridge CB2 1EZ, UK and a proprietary work of CCDC. This
+# code may not be used, reproduced, translated, modified, disassembled or
+# copied, except in accordance with a valid licence agreement with CCDC and
+# may NOT be disclosed or redistributed in any form, either in whole or in
+# part, to any third party. All copies of this code made in accordance with a
+# valid licence agreement as referred to above must contain this copyright
+# notice.
+# 
+# No representations, warranties, or liabilities are expressed or implied in
+# the supply of this code by CCDC, its servants or agents, except where such
+# exclusion or limitation is prohibited, void or unenforceable under governing
+# law.
+# END_LICENSE_TEXT
+#############################
+#
+# EXPCLI:  Part of DASH to GSAS command line interface.
+#
+# Tcl/Tk script for DASH to create and manipulate GSAS .exp file.
+#
+# Based on EXPGUI package of B. H. Toby
+#
+#############################
+# the next line restarts this script using wish found in the path\
+exec wish "$0" "$@"
+
+package require Tk
+
+if {$tcl_version < 8.0} {
+    tk_dialog .expFileErrorMsg "Version Error" \
+	    "EXPCLI requires Tcl/Tk version 8.0 or higher" error 0 "Exit"
+    exit 1
+}
+
+proc parse_opt {opt} {
+	global taskmasks
+	set words {}
+	foreach mask [lsort [array names taskmasks]] {
+		if [expr $opt & $mask] {
+			lappend words $taskmasks($mask)
+		}
+	}
+	return $words
+}
+
+proc error_quit {msg} {
+	tk_messageBox -message $msg -icon error
+	exit 1
+}
+
+# tidy up archived exp
+proc normal_end {bn} {
+	global expgui
+	# output a pdb for Mercury only
+	catch {exec [file join $expgui(gsasexe) gsas2pdb.exe] $bn << "N\nN\n"}
+	delete_archives $bn 1
+	exit 0
+}
+
+proc delete_archives {bn "noask 0"} {
+	if {$noask || [tk_messageBox -message "Sure to delete all archive files in the directory?" \
+		-icon question -type yesno] == yes} {
+			foreach f [glob -nocomplain $bn.{O\[0-9A-F\]\[0-9A-F\]}] {
+				file delete $f
+		}
+	}
+}
+
+proc search_gsas_dir {plist {level 2}} {
+	foreach path $plist {
+		set n $level
+		while {$n > 0} {
+			set path [file dirname $path]
+			if [regexp -nocase ^gsas$ [file tail $path]] {
+				return $path
+			}
+			incr n -1
+		}
+	}
+	error_quit {Cannot find GSAS directory.}
+}
+
+# debug: show some global varibles in console
+proc show_global {} {
+	console eval {
+		consoleinterp eval {
+			puts EXPGUI:\n[array get expgui]
+			puts EXPARRAY:\n[array get exparray]
+			puts "PWD: [pwd]\nARGUMENTS: $basename $optlist"
+		}
+	}
+	console show
+}
+
+# for gsas2cif
+proc add_cif_rec {hist "auth Unknown"} {
+	global expgui
+	set key "HST  $hist INAME"
+	makeexprec $key
+	setexp $key "Unknown" 3 10
+	set key "CIF AUTHOR"
+	makeexprec $key
+	setexp $key $auth 3 [string length $auth]
+	incr expgui(changed)
+}
+
+proc exp_del_all_rest {} {
+	global exparray
+	set nhst [string trim [readexp { EXPR  NHST }]]
+	if {$nhst <= 1} {
+		return $nhst
+	}
+	while {$nhst > 1} {
+		foreach key [array names exparray -regexp "^HST  $nhst"] {
+			delexp $key
+		}
+		incr nhst -1
+	}
+	set line [readexp { EXPR  HTYP1}]
+	setexp { EXPR  HTYP1} [string range $line 2 6 ] 3 4
+	setexp { EXPR  NHST } $nhst 
+	return $nhst
+}
+
+proc read_factr {fname} {
+	global factrs
+	if ![file exists $fname] return
+	set fact [lindex [parse_dash_pha_file $fname FACT] 0]
+	if [llength $fact] {
+		foreach {k v} [lindex $fact 0] {
+			set factrs($k) $v 
+		}
+	}
+}
+
+proc exp_set_factr {factrfile} {
+	global expmap factrs
+	read_factr $factrfile
+	set i $expmap(nhst)
+	while {$i} {
+		set key "HST  $i FACTR"
+		switch -regexp $expmap(htype_$i) {
+			^RSN {
+				setexp $key $factrs(DIST) 2 14
+			}
+			^ANG {
+				setexp $key $factrs(ANGL) 2 14
+			}
+			^FLT {
+				setexp $key $factrs(PLAN) 2 14
+			}
+		}
+		incr i -1
+	}
+}
+
+proc exp_add_restr {parm rest fact} {
+	global exparray
+	set nhst [string trim [readexp { EXPR  NHST }]]
+	if {$nhst < 1} {
+		return $nhst
+	}
+	set keyp "HST  [expr $nhst + 1]"
+	switch -glob $parm {
+		DIST {
+			set type RSN
+			set key "$keyp  HNAM"
+			makeexprec $key
+			setexp $key {Bond distance restraints} 3 60
+			set key "$keyp FACTR"
+			makeexprec $key
+			setexp $key $fact 2 14
+			set key "$keyp NBNDS"  
+			makeexprec $key
+			setexp $key [format %5d [llength $rest]] 1 5
+			set b 0
+			foreach line $rest {
+			foreach {a1 a2 d e} $line {
+				incr b
+				set key [format %sBD%04X $keyp $b]  
+				makeexprec $key
+				setexp $key  [format %3d%5d%5d%3d%3d%3d%3d%3d%6.3f%6.3f \
+					1 $a1 $a2 1 0 0 0 0 $d $e] 1 68
+			}
+			}
+		}
+		ANGL {
+			set type ANG
+			set key "$keyp  HNAM"
+			makeexprec $key
+			setexp $key {Bond algle restraints} 3 60
+			set key "$keyp FACTR"
+			makeexprec $key
+			setexp $key $fact 2 14
+			set key "$keyp NANGS"  
+			makeexprec $key
+			setexp $key [format %5d [llength $rest]] 1 5
+			set b 0
+			foreach line $rest {
+			foreach {a1 a2 a3 ang e} $line {
+				incr b
+				set key [format %sAN%4d $keyp $b]  
+				makeexprec $key
+				setexp $key  [format "%5d%5d%10.2f%10.2f  %04X  %04X  %04X" \
+					1 3 $ang $e $a1 $a2 $a3] 1 68
+			}
+			}
+		}
+		PLAN {
+			set type FLT
+			set key "$keyp  HNAM"
+			makeexprec $key
+			setexp $key {Planar group restraints} 3 60
+			set key "$keyp FACTR"
+			makeexprec $key
+			setexp $key $fact 2 14
+			set key "$keyp NPLNS"  
+			makeexprec $key
+			setexp $key [format %5d [llength $rest]] 1 5
+			set b 0
+			foreach line $rest {
+				incr b
+				set key [format %sPL%4d $keyp $b]  
+				makeexprec $key
+				set v [format %5d%5d%5.3f 1 [expr [llength $line] - 1] [lindex $line end]]
+				foreach a [lrange $line 0 end-1] {
+					append v [format %04X $a]
+				}
+				setexp $key $v 1 68
+			}
+		}
+		default {
+			return 0
+		}
+	}
+	set line [string replace [readexp { EXPR  HTYP1}] [expr 2+5*$nhst] end $type]
+	setexp { EXPR  HTYP1} $line 0 [string length $line]
+	incr nhst
+	setexp { EXPR  NHST } $nhst 5 2
+	return $nhst
+}
+
+proc process_restr {restfile factrfile} {
+	global factrs
+	read_factr $factrfile
+	foreach {dist angl plan prefo} [parse_dash_pha_file $restfile {DIST ANGL PLAN PREFO}] {
+		if [llength $dist] {
+			exp_add_restr DIST $dist $factrs(DIST)
+		}
+		if [llength $angl] {
+			exp_add_restr ANGL $angl $factrs(ANGL)
+		}
+		if [llength $plan] {
+			exp_add_restr PLAN $plan $factrs(PLAN)
+		}
+		if [llength $prefo] {
+			exp_set_MD_po $prefo
+#			exp_set_SH_po
+		}
+	} 
+	mapexp
+}
+
+proc exp_set_MD_po {rec {h 1} {p 1}} {
+	set n 1
+	foreach line $rec {
+		if ![string length [MDprefinfo $h $p $n ratio]] {
+			MDprefinfo $h $p $n new set
+		}
+		foreach {r t h k l} $line {
+			MDprefinfo $h $p $n ratio set $r
+			MDprefinfo $h $p $n type set $t
+			MDprefinfo $h $p $n h set $h
+			MDprefinfo $h $p $n k set $k
+			MDprefinfo $h $p $n l set $l
+		}
+		incr n
+	}
+}
+
+proc exp_set_SH_po {{ord 2} {sym 0} {p 1}} {
+	global expgui
+	set expgui(curPhase) $p
+	set expgui(ODFsym) $sym
+	set expgui(ODForder) $ord
+	SetODFTerms 0
+	foreach var {omega chi phi} {
+		phaseinfo $p ODF$var set 0.0
+	}
+	foreach var {omegaRef chiRef phiRef dampC dampA Refcoef} {
+		phaseinfo $p ODF$var set 0
+	}
+}
+
+proc set_po_flags {{on 0} {h 1} {p 1}} {
+	MDprefinfo $h $p 1 ratioref set $on
+#	MDprefinfo $h $p 1 damp set 5
+#	if ![phaseinfo $p ODForder] {
+#		if !$on return
+#		exp_set_SH_po
+#	}
+#	foreach var {omegaRef chiRef phiRef Refcoef} {
+#		phaseinfo $p ODF$var set $on
+#	}
+#	foreach var {dampC dampA} {
+#		phaseinfo $p ODF$var set 5
+#	}
+}
+
+proc parse_dash_pha_file {fname keywds} {
+	if ![llength $keywds] {
+		return {}
+	}
+	foreach key $keywds {
+		set tmparray($key) {}
+		if [string length $key] {
+			lappend kw $key
+		}
+	}
+	if [catch {set fil [open "$fname" r]}] {
+		error_quit "Unable to open file: $fname"
+	}
+#  fconfigure $fil -translation lf
+	while {![eof $fil]} {
+		set line [split [regsub -all \\s+ [string trim [gets $fil]] { }]]
+		foreach key $kw {
+			if [regexp -nocase ^$key [lindex $line 0]] {
+				lappend tmparray($key) [lrange $line 1 end]
+				break
+			}
+		}
+	}
+	close $fil
+	foreach key $keywds {
+	lappend all $tmparray($key)
+	}
+	return $all
+}
+
+proc run_pawley {uvw "h 1" "p 1"} {
+	global expgui
+	setexp { EXPR NPHAS} 10 [expr ($p - 1)*5+4] 2
+	hapinfo $h $p extmeth set 2
+	incr expgui(changed)
+	runGSASwEXP {POWPREF GENLES}
+#	histinfo $h ddamp set 5
+	histinfo $h zref set 1
+	incr expgui(changed)
+	runGSASwEXP GENLES
+	histinfo $h zref set 0
+	if {$uvw >=0} {
+		#hapinfo $h $p pdamp set 5
+		foreach i {1 2 3 7 4 5} {
+			hapinfo $h $p pref$i set 1
+			incr expgui(changed)
+			runGSASwEXP GENLES
+			hapinfo $h $p pref$i set 0
+		}
+	}
+	setexp { EXPR NPHAS} 1 [expr ($p - 1)*5+4] 2
+	hapinfo $h $p extmeth set 0
+	incr expgui(changed)
+}
+
+proc set_atom_flags {opts {p 1}} {
+	global expmap
+	set uiso    [expr [lsearch $opts uiso   ] >= 0]
+	set xyznoh  [expr [lsearch $opts xyznoh ] >= 0]
+	set xyzh    [expr [lsearch $opts xyzh   ] >= 0]
+	foreach a $expmap(atomlist_$p) {
+		atominfo $p $a uref set $uiso
+		if {[atominfo $p $a type] != "H"} {
+			atominfo $p $a xref set $xyznoh
+		} else {
+			atominfo $p $a xref set $xyzh
+		}
+	}
+}
+
+proc reformat_atomlist {alist} {
+	foreach atom $alist {
+		foreach {a1 a2 a3 a4 a5 a6 a7} $atom {
+			lappend atomlist [list $a5 $a2 $a3 $a4 $a6 $a1 I $a7]
+		}
+	}
+	return $atomlist
+}
+	
+# replace those in expgui script
+proc loadexp {expfile} {
+	expload $expfile
+	mapexp
+}
+
+proc whenidle {{back 0}} {
+# the functionality is moved to gsastcl.bat
+#	global expgui
+#	append bf $expgui(expfile) .bak
+#	if {!$back && [file exists $bf]} {
+#		switch -exact [tk_dialog .bakexp Confirm {Keep .EXP file for this result?} \
+#			info 0 Accept Reject Quit] {
+#			0 {}
+#			1 {catch {file rename -force $bf $expgui(expfile)}}
+#			default {exit 1}
+#		}
+#	}
+#	file copy -force $expgui(expfile) $bf
+}
+
+#############################
+
+# option masks
+array set taskmasks {
+	0x0001 initial 
+	0x0002 profile 
+	0x0004 bkg 
+	0x0008 scal
+	0x0010 prefo 
+	0x0020 uiso 
+	0x0040 xyznoh 
+	0x0080 xyzh 
+	0x0100 cif 
+}
+# init FACTR
+array set factrs {
+	DIST 100.0
+	ANGL 100.0
+	PLAN 100.0
+}
+
+# basic setting needed by EXPGUI routines
+array set expgui {
+	Revision Special
+	changed 0
+	archive 0
+	autoexpload 1
+	autoiconify 0
+	debug 0
+	showexptool 0
+	expfile {}
+	needpowpref_why {}
+	guiless 1
+}
+set expgui(scriptdir) [file dirname [info script]]
+#set expgui(gsasdir) [file normalize $expgui(scriptdir)/.. ]
+#set expgui(gsasdir) [file dirname $expgui(scriptdir)]
+set expgui(gsasdir) [search_gsas_dir [list [info nameofexecutable] [info script]]]
+set expgui(gsasexe) $expgui(gsasdir)/exe
+#set env(path) "$env(path);[regsub -all / $expgui(gsasexe) \\]"
+# default
+set phase 1
+set hist 1
+# for liveplot
+set wishshell [info nameofexecutable] 
+set liveplot(hst) $hist
+set liveplot(legend) 1
+
+wm geometry . =1x1+0+0
+wm iconify .
+
+if [expr $argc < 2] {
+	error_quit "Expecting arguments: base_name option [ncycle]"
+}
+set optstr [lindex $argv 1]
+#if {[catch {expr $optstr < 0}] || [expr $optstr < 0]}
+if {[scan $optstr 0x%x optvalue] < 1} {
+	if {[scan $optstr 0X%x optvalue] < 1} {
+		if {[scan $optstr %x optvalue] < 1} {
+			error_quit "Option must be a HEX integer: $optstr"
+		}
+	}
+}
+set optlist [parse_opt $optvalue]
+if ![llength $optlist] {
+	error_quit "No option given"
+}
+
+#regsub .EXP$ [string toupper [lindex $argv 0]] {} basename
+set basename [file rootname [file tail [lindex $argv 0]]]
+if [regexp \\s $basename] {
+	error_quit "\"$basename\"\nGSAS can't handle file name contains space(s)"
+}
+cd [file dirname [lindex $argv 0]]
+
+if {![expr $argc > 2] || [scan [lindex $argv 2] %d ncycle] < 1} {
+	set ncycle 3
+}
+
+# source script files
+# note: load gsascmds.tcl after import_cif.tcl, as browsecif.tcl
+# sourced from import_cif.tcl having another copy of MyMessageBox()
+# it should be overridden by the one modified in gsascmds.tcl
+#source $expgui(scriptdir)/import_cif.tcl
+source $expgui(scriptdir)/readexp.tcl
+source $expgui(scriptdir)/gsascmds.tcl
+source $expgui(scriptdir)/addcmds.tcl
+#source $expgui(scriptdir)/odf.tcl
+
+set expgui(expfile) [append expname	$basename .EXP]
+#catch {file delete -force $expgui(expfile).bak}
+
+#show_global
+#tk_dialog .debug debug "MODE: $expgui(script)\nPWD: [pwd]\nOPTs: $basename $optlist $ncycle" info 0 OK
+
+# initial
+if {[lsearch $optlist initial] >= 0} {
+	createexp $expname $basename
+	mapexp
+	# backup
+#	whenidle 1
+
+	# add phase from pha file
+	append cnam  $basename .pha
+#	set phaseinp [ReadCIFFile $cnam]
+	set phaseinp [parse_dash_pha_file $cnam {SPG CELL ATOM NFRG}]
+	if {[llength $phaseinp] < 3 || ![string length [lindex $phaseinp 0]]} {
+		error_quit "Error occured while read the cif file, quit"
+	}
+	if [addphase {} $basename [join [lrange $phaseinp 0 1]] 0] {
+		error_quit "Error occured while add the phase, quit"
+	}
+
+	# add a historgram
+	if {[validaterawfile {} $basename.gsa] || \
+	    [validateinstfile {} $basename.ins] || [addhist {}]} {
+		error_quit "Error occured while add the histogram, quit"
+	}
+
+	# do Pawley before add atom
+	histinfo $hist backtype set 1
+	histinfo $hist backterms set 15
+#	histinfo $hist bref set 1
+	incr expgui(changed)
+	expinfo cycles set $ncycle
+	run_pawley [lsearch $optlist profile] $hist $phase
+
+	catch {liveplot [file dirname [info nameofexecutable]]}
+	after 1000
+	
+	# add atom list from pha file
+	if [addatom $phase {} [reformat_atomlist [lindex $phaseinp 2]]] {
+		error_quit "Error occured while add the atoms, quit"
+	}
+	# damp xyz if nmol > 1
+	if {[lindex $phaseinp 3] > 1} {
+		foreach atom $expmap(atomlist_$phase) {
+			atominfo $phase $atom xdamp set 5
+		}
+	}
+	# add restraints from pha file and factr from fct file
+	process_restr $cnam $basename.fct
+
+	# constraint
+	constrinfo atom set 1 [list [list $hist ALL UISO 1.0]]
+	
+	add_cif_rec $hist $env(USERNAME)
+	incr expgui(changed)
+	if {[llength $optlist] == 1 || [lsearch $optlist profile] >= 0} {
+		savearchiveexp
+		normal_end $basename
+	}
+} else {
+# load existing EXP
+	loadexp $expname
+	# backup
+#	whenidle 1
+}
+
+# set/unset for each stage
+histinfo $hist bref set [expr [lsearch $optlist bkg] >= 0]
+histinfo $hist sref set [expr [lsearch $optlist scal] >= 0]
+set_po_flags [expr [lsearch $optlist prefo] >= 0]
+set_atom_flags $optlist $phase
+
+#if {[lsearch $optlist Profile] >= 0} {
+#	#hapinfo $hist $phase proftype set 2
+#	#hapinfo $hist $phase profterms set 18
+#	#hapinfo $hist $phase pdamp set 5
+#	foreach i {1 2 3} {
+#		hapinfo $hist $phase pref$i set 1
+#	}
+#} else {
+#	foreach i {1 2 3} {
+#		hapinfo $hist $phase pref$i set 0
+#	}
+#}
+#phaseinfo $phase cellref set [expr [lsearch $optlist cell] >= 0]
+
+# LS
+expinfo cycles set $ncycle
+exp_set_factr $basename.fct
+set cmds {POWPREF GENLES}
+if {[lsearch $optlist cif] >= 0} {
+	# output CIF
+	lappend cmds DISAGL GSAS2CIF
+}
+incr expgui(changed)
+# no bother to load exp again
+set expgui(autoexpload) 0
+runGSASwEXP $cmds
+
+# normal end, never return
+normal_end $basename
+

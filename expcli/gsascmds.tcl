@@ -1070,7 +1070,7 @@ proc showhelp {} {
 # utilities
 #------------------------------------------------------------------------------
 # run liveplot
-proc liveplot {} {
+proc liveplot {{dir {}}} {
     global expgui liveplot wishshell expmap
     set expnam [file root [file tail $expgui(expfile)]]
     # which histograms are ready for use?
@@ -1087,12 +1087,15 @@ proc liveplot {} {
 		-icon warning -helplink "expguierr.html NoValidHist"
 	return
     }
+    if {$dir == ""} {
+    	set dir $expgui(scriptdir)
+    }
     # use $liveplot(hst) if valid, the 1st entry otherwise
     if {[lsearch $validlist $liveplot(hst)] != -1} {
-	exec $wishshell [file join $expgui(scriptdir) liveplot] \
+	exec $wishshell [file join $dir liveplot] \
 		$expnam $liveplot(hst) $liveplot(legend) &
     } else {
-	exec $wishshell [file join $expgui(scriptdir) liveplot] \
+	exec $wishshell [file join $dir liveplot] \
 		$expnam [lindex $validlist 0] $liveplot(legend) &
     }
 }
@@ -1307,7 +1310,7 @@ proc archiveexp {} {
 proc savearchiveexp {} {
     global expgui expmap
     if {$expgui(expfile) == ""} {
-	SaveAsFile
+	if {[catch {expr !$expgui(guiless)} rst] || $rst} SaveAsFile
 	return
     }
     if !$expgui(changed) return
@@ -1327,7 +1330,7 @@ proc savearchiveexp {} {
     wm title . $expgui(expfile)
     set expgui(titleunchanged) 1
     # set convergence criterion
-    InitLSvars
+    if {[catch {expr !$expgui(guiless)} rst] || $rst} InitLSvars
 }
 
 #------------------------------------------------------------------------------
@@ -1342,7 +1345,11 @@ proc runGSASprog {proglist "concurrent 1"} {
     foreach prog $proglist {
 	StartGRWND $prog
 	if {$tcl_platform(platform) == "windows"} {
-	    append cmd " \"$expgui(gsasexe)/${prog}.exe \" "
+	    if {$tcl_platform(os) == "Windows 95"} {
+		    append cmd " \"$expgui(gsasexe)/${prog}.exe \" "
+	    } else {
+		    lappend cmd [list $expgui(gsasexe)/${prog}.exe]
+	    }
 	} else {
 	    if {$cmd != ""} {append cmd "\;"}
 	    append cmd "[file join $expgui(gsasexe) $prog]"
@@ -1382,7 +1389,11 @@ proc runGSASwEXP {proglist "concurrent 0"} {
 		set expgui(needpowpref) 0
 		set expgui(needpowpref_why) ""
 		if {$tcl_platform(platform) == "windows"} {
-		    append cmd " \"$expgui(gsasexe)/powpref.exe $expnam \" "
+		    if {$tcl_platform(os) == "Windows 95"} {
+			    append cmd " \"$expgui(gsasexe)/powpref.exe $expnam \" "
+		    } else {
+			    lappend cmd [list $expgui(gsasexe)/powpref.exe $expnam]
+		    }
 		} else {
 		    if {$cmd != ""} {append cmd "\;"}
 		    append cmd "[file join $expgui(gsasexe) powpref] $expnam"
@@ -1391,7 +1402,11 @@ proc runGSASwEXP {proglist "concurrent 0"} {
 	}
 	StartGRWND $prog
 	if {$tcl_platform(platform) == "windows"} {
-	    append cmd " \"$expgui(gsasexe)/${prog}.exe $expnam \" "
+	    if {$tcl_platform(os) == "Windows 95"} {
+		    append cmd " \"$expgui(gsasexe)/${prog}.exe $expnam \" "
+	    } else {
+		    lappend cmd [list $expgui(gsasexe)/${prog}.exe $expnam]
+	    }
 	} else {
 	    if {$cmd != ""} {append cmd "\;"}
 	    append cmd "[file join $expgui(gsasexe) $prog] $expnam"
@@ -2512,6 +2527,14 @@ if {$tcl_platform(platform) == "windows" && $tcl_platform(os) == "Windows 95"} {
 } elseif {$tcl_platform(platform) == "windows"} {
     # now for Windows-NT, where we can run synchronously
     #
+    # if path contains space, return its shortname
+    proc checkpath {path} {
+    	if [regexp \s $path] {
+    		return [file nativename [file attrib $path -shortname]]
+    	}
+    	return [file nativename $path]
+    }
+    
     # this creates a DOS box to run a program in
     proc forknewterm {title command  "wait 1" "scrollbar 1"} {
 	global env expgui
@@ -2539,10 +2562,18 @@ if {$tcl_platform(platform) == "windows" && $tcl_platform(os) == "Windows 95"} {
 	    # loop over commands
 	    foreach cmd $command {
 		# replace the forward slashes with backward
-		regsub -all / $cmd \\ cmd
-		exec $env(COMSPEC) /c \
-			"start [file join $expgui(scriptdir) gsastcl.bat] $cmd"
-	    }
+#		regsub -all / $cmd \\ cmd
+		if [catch {
+			exec $env(COMSPEC) /c "start \
+			[checkpath [file join $expgui(scriptdir) gsastcl.bat]] \
+			[checkpath [lindex $cmd 0]] [lrange $cmd 1 end]"
+		} err_mes] {
+			set ans [MyMessageBox -parent . -title "exec error" \
+				-message "$err_mes occurred while running:\ngsastcl.bat $cmd" \
+				-icon error -type okcancel -default cancel]
+			if {$ans == "cancel"} return
+		}
+	    } 
 	    file delete -force expgui.lck
 	    if {$expgui(autoiconify)} {wm deiconify .}
 	    # check for changes in the .EXP file immediately
@@ -2551,10 +2582,19 @@ if {$tcl_platform(platform) == "windows" && $tcl_platform(os) == "Windows 95"} {
 	    # loop over commands
 	    foreach cmd $command {
 		# replace the forward slashes with backward
-		regsub -all / $cmd \\ cmd
+#		regsub -all / $cmd \\ cmd
 		# run in background
-		exec $env(COMSPEC) /c \
-			"start [file join $expgui(scriptdir) gsastcl.bat] $cmd" &
+		if [catch {
+			exec $env(COMSPEC) /c "start \
+			[checkpath [file join $expgui(scriptdir) gsastcl.bat]] \
+			[checkpath [lindex $cmd 0]] [lrange $cmd 1 end]" &
+		} err_mes] {
+			set ans [MyMessageBox -parent . -title "exec error" \
+				-message "$err_mes occurred while running:\ngsastcl.bat $cmd" \
+				-icon error -type okcancel -default cancel]
+			if {$ans == "cancel"} return
+		}
+		 
 	    }
 	}
     }

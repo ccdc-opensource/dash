@@ -616,7 +616,7 @@ proc phaseinfo {phase parm "action get" "value {}"} {
 
 	ODForder-get {
 	    set val [string trim [string range [readexp "CRS$phase  OD "] 0 4]]
-	    if {$val == " "} {return 0}
+	    if {$val == ""} {return 0}
 	    return $val
 	}
 	ODForder-set {
@@ -2557,7 +2557,7 @@ proc MDprefinfo {histlist phaselist axislist parm "action get" "value {}"} {
 	    }
 	    h-set {
 		if ![validreal value 10 2] {return 0}
-		setexp $key $value 21 10
+		setexp $key [format %10.5f $value] 21 10
 	    }
 	    k-get {
 		set k [string trim [string range [readexp $key] 30 39]]
@@ -2566,7 +2566,7 @@ proc MDprefinfo {histlist phaselist axislist parm "action get" "value {}"} {
 	    }
 	    k-set {
 		if ![validreal value 10 2] {return 0}
-		setexp $key $value 31 10
+		setexp $key [format %10.5f $value] 31 10
 	    }
 	    l-get {
 		set l [string trim [string range [readexp $key] 40 49]]
@@ -2575,7 +2575,7 @@ proc MDprefinfo {histlist phaselist axislist parm "action get" "value {}"} {
 	    }
 	    l-set {
 		if ![validreal value 10 2] {return 0}
-		setexp $key $value 41 10
+		setexp $key [format %10.5f $value] 41 10
 	    }
 	    ratioref-get {
 		if {[string toupper \
