@@ -172,6 +172,8 @@
           CALL INextInteger(line,NumberSGTable)
 ! Set the crystal system
           LatBrav = GetCrystalSystem(NumberSGTable)
+! Update cpdbops, required by special_position.exe for most external Rietveld programs 
+          CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
           CALL Upload_CrystalSystem
         CASE ('paw')
           CALL INextReal(line, PAWLEYCHISQ)

@@ -2,7 +2,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 22/Nov/2006 14:53:43
+// Modified : 23/Aug/2007 17:48:53
 //
 ///////////////////////////////////////////////////
 //
@@ -665,13 +665,13 @@
 #define IDF_DICVOLExe                    1369
 #define IDBBROWSE3                       1554
 #define IDD_SAW_Page6a                    138
-#define IDD_RR_TOPAS                      139
-#define IDF_TOPAS_inp_file_name          1372
+#define IDD_RR_External                   139
+#define IDD_SAW_Page7_RIETAN              157
 #define IDB_WRITE                        1371
 #define IDC_wl_in_xye                    1439
 #define IDD_SA_input5                     142
 #define IDF_NumOfRuns                    1445
-#define IDD_SAW_Page7                     123
+#define IDD_SAW_Page7_TOPAS               123
 #define IDC_Scale                        1252
 #define IDC_Background                   1443
 #define IDC_Coordinates                  1444
@@ -686,6 +686,26 @@
 #define IDC_Anisotropic_broadening       1370
 #define IDF_K1                           1399
 #define IDC_Monochromated                1442
+#define IDD_SAW_Page7_GSAS                140
+#define IDC_Initialisation               1451
+#define IDF_NCYCL                        1452
+#define IDF_EXPGUIExe                    1454
+#define IDBBROWSE5                       1556
+#define IDF_RIETANExe                    1455
+#define IDBBROWSE6                       1557
+#define IDC_Coordinates_H                1475
+#define IDC_Coordinates_Non_H            1372
+#define IDF_RADIO4                       1131
+#define IDF_Ext_RR_inp_file_name         1456
+#define IDB_FG_EXPGUI                    1453
+#define IDF_REAL_GSAS_FACTR_DIST         1476
+#define IDF_REAL_GSAS_FACTR_ANGLE        1477
+#define IDF_REAL_GSAS_FACTR_PLANE        1478
+#define IDF_REAL_RIETAN_WEIGHT_TK        1481
+#define IDF_REAL_RIETAN_WEIGHT_FINC      1488
+#define IDF_REAL_TOPAS_WSCALE_DIST       1536
+#define IDF_REAL_TOPAS_WSCALE_ANGLE      1544
+#define IDF_REAL_TOPAS_WSCALE_FLATTEN    1545
 
 ///////////////////////////////////////////////////
 //
@@ -906,7 +926,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1020     8     50   108 \n"
+" 1020     8    50   108 \n"
 "   20 \n"
 "1 \n"
 "2 \n"
@@ -1044,7 +1064,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1074     4     20   111 \n"
+" 1074     4    20   111 \n"
 "   20 \n"
 "1 \n"
 "2 \n"
@@ -1124,7 +1144,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1075     4     20   117 \n"
+" 1075     4    20   117 \n"
 "   20 \n"
 "1 \n"
 "2 \n"
@@ -1191,7 +1211,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1019     4     20   116 \n"
+" 1019     4    20   116 \n"
 "   20 \n"
 "1 \n"
 "2 \n"
@@ -1258,7 +1278,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1076     4     20   118 \n"
+" 1076     4    20   118 \n"
 "   20 \n"
 "1 \n"
 "2 \n"
@@ -1890,7 +1910,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1232    11     30   146 \n"
+" 1232    11    30   146 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -1958,7 +1978,7 @@ BEGIN
 ,0
 END
 
-IDD_Configuration DIALOG 0, 0,  281,  168
+IDD_Configuration DIALOG 0, 0,  281,  195
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Configuration"
@@ -1966,21 +1986,27 @@ BEGIN
     CONTROL "Debug message",IDF_ViewExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,    9,  180,   14
     CONTROL "Debug message",IDF_ViewArg,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT,   88,   28,   73,   14
     CONTROL "B&rowse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  234,    9,   40,   14
-    CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   11,   38,    8
-    CONTROL "Arguments for viewer",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,    6,   31,   74,    8
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  120,  145,   40,   14
-    CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  111,   84,   14
     CONTROL "",IDF_MogulExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   44,  180,   14
-    CONTROL "Mogul",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   47,   38,    8
     CONTROL "B&rowse...",IDBBROWSE2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,   44,   40,   14
-    CONTROL "DICVOL04",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   68,   38,    8
     CONTROL "",IDF_DICVOLExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   65,  180,   14
     CONTROL "B&rowse...",IDBBROWSE3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,   65,   40,   14
-    CONTROL "Write wavelength to .xye files",IDC_wl_in_xye,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  124,  120,   14
-    CONTROL "TOPAS",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   89,   38,    8
     CONTROL "",IDF_TOPASExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   86,  180,   14
     CONTROL "B&rowse...",IDBBROWSE4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,   86,   40,   14
-    CONTROL "Run TOPAS in background",IDC_TOPAS_in_background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  160,  111,  110,   14
+    CONTROL "",IDF_EXPGUIExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,  104,  180,   14
+    CONTROL "B&rowse...",IDBBROWSE5,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,  104,   40,   14
+    CONTROL "",IDF_RIETANExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,  124,  180,   14
+    CONTROL "B&rowse...",IDBBROWSE6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,  124,   40,   14
+    CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  145,   84,   14
+    CONTROL "Write wavelength to .xye files",IDC_wl_in_xye,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  158,  120,   14
+    CONTROL "Run TOPAS in background",IDC_TOPAS_in_background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  160,  145,  110,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  120,  179,   40,   14
+    CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   11,   38,    8
+    CONTROL "Arguments for viewer",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_RIGHT,    6,   31,   74,    8
+    CONTROL "Mogul",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   47,   38,    8
+    CONTROL "DICVOL04",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   68,   38,    8
+    CONTROL "TOPAS",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   89,   38,    8
+    CONTROL "EXPGUI Tcl",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    2,  108,   41,   11
+    CONTROL "RIETAN",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,  127,   38,    8
 END
 
 IDD_Configuration RCDATA
@@ -2156,7 +2182,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1232    11     30   152 \n"
+" 1232    11    30   152 \n"
 "   16 \n"
 "1 \n"
 "2 \n"
@@ -2336,7 +2362,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1401     8     40   158 \n"
+" 1401     8    40   158 \n"
 "   60 \n"
 "parameter 1 \n"
 "parameter 2 \n"
@@ -2520,7 +2546,7 @@ BEGIN
 " 1394      0.0000           10.000      \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1381     5    150   161 \n"
+" 1381     5   150   161 \n"
 "   24 \n"
 "[Colours] \n"
 "[Lengths] \n"
@@ -2744,7 +2770,7 @@ BEGIN
 " 1220               1             999 \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1136     7    999   176 \n"
+" 1136     7   999   176 \n"
 "   32 \n"
 "[Colours] \n"
 "[Lengths] \n"
@@ -2817,7 +2843,7 @@ BEGIN
 " 1220               1             999 \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1136     5    999   178 \n"
+" 1136     5   999   178 \n"
 "   32 \n"
 "[Colours] \n"
 "[Lengths] \n"
@@ -3035,7 +3061,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1363     5     99   162 \n"
+" 1363     5    99   162 \n"
 "  100 \n"
 "[Colours] \n"
 "[Lengths] \n"
@@ -3189,13 +3215,13 @@ BEGIN
 " 1528               0             200 \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1397     2    100   189 \n"
+" 1397     2   100   189 \n"
 "   34 \n"
-" 1440     2    100   191 \n"
+" 1440     2   100   191 \n"
 "   76 \n"
-" 1438     2    100   192 \n"
+" 1438     2   100   192 \n"
 "   59 \n"
-" 1441     2    100   193 \n"
+" 1441     2   100   193 \n"
 "   47 \n"
 "[Colours] \n"
 " 1510 000 000 000 255 255 255 \n"
@@ -3295,23 +3321,26 @@ END
 IDD_SAW_Page6 DIALOG 0, 0,  375,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "DASH Wizard : Rigid-Body Rietveld Refinement"
+CAPTION "DASH Wizard : Rietveld Refinement"
 BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "",IDF_SDI_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   95,   24,  260,   14
-    CONTROL "B&rowse...",IDB_SDI_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  318,   42,   40,   14
-    CONTROL "&Open",IDB_SDI_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  274,   42,   40,   14
-    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "<&Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "",IDF_Xtal_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   95,   72,  260,   14
-    CONTROL "B&rowse...",IDB_xtal_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  318,   90,   40,   14
-    CONTROL "O&pen",IDB_xtal_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  274,   90,   40,   14
     CONTROL "Start &SA",IDB_Restart,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  288,  150,   40,   14
+    CONTROL "",IDF_SDI_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   95,   24,  260,   14
+    CONTROL "B&rowse...",IDB_SDI_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  318,   41,   40,   14
+    CONTROL "&Open",IDB_SDI_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  274,   41,   40,   14
+    CONTROL "",IDF_Xtal_File_Name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,   95,   68,  260,   14
+    CONTROL "B&rowse...",IDB_xtal_file_Browse,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  318,   86,   40,   14
+    CONTROL "O&pen",IDB_xtal_file_Open,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  274,   86,   40,   14
+    CONTROL "Rigid-body Rietveld refinement",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   94,  102,  136,   14
+    CONTROL "Rietveld refinement with &TOPAS",IDF_RADIO2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,   94,  116,  136,   14
+    CONTROL "Rietveld refinement with &GSAS",IDF_RADIO3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  231,  102,  136,   14
+    CONTROL "Rietveld refinement with &RIETAN",IDF_RADIO4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  231,  116,  136,   14
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "SDI file",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   97,   13,   40,   10
-    CONTROL "Crystal structure",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   97,   61,   60,   10
-    CONTROL "Rigid-body Rietveld refinement",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  156,  107,  136,   14
-    CONTROL "Rietveld refinement with &TOPAS",IDF_RADIO2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  156,  122,  136,   14
+    CONTROL "Crystal structure",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   97,   57,   60,   10
+    CONTROL "Note: options for external programs only enabled for those given in Configuration dialog box",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   94,  129,  252,   16
 END
 
 IDD_SAW_Page6 RCDATA
@@ -3319,6 +3348,8 @@ BEGIN
 "[Checks] \n"
 " 1140 1 \n"
 " 1129 0 \n"
+" 1130 0 \n"
+" 1131 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -3438,7 +3469,7 @@ BEGIN
 "[Ranges] \n"
 "[Trackbars] \n"
 "[Grids] \n"
-" 1396     3     20   164 \n"
+" 1396     3    20   164 \n"
 "   20 \n"
 "1 \n"
 "2 \n"
@@ -3746,15 +3777,18 @@ END
 IDD_SAW_Page6a DIALOG 0, 0,  375,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "DASH Wizard : Rietveld refinement"
+CAPTION "DASH Wizard : Rietveld Refinement"
 BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "Rigid-body Rietveld refinement",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   68,  140,   14
-    CONTROL "Rietveld refinement with TOPAS",IDF_RADIO2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   84,  140,   14
-    CONTROL "Choose refinement method",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  122,   44,  188,   72
+    CONTROL "Rigid-body Rietveld refinement",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   59,  140,   14
+    CONTROL "Rietveld refinement with TOPAS",IDF_RADIO2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   72,  140,   14
+    CONTROL "Rietveld refinement with GSAS",IDF_RADIO3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   85,  140,   14
+    CONTROL "Rietveld refinement with RIETAN",IDF_RADIO4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   98,  140,   14
+    CONTROL "Choose refinement method",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  122,   35,  188,  105
+    CONTROL "Note: options for external programs only enabled for those given in Configuration dialog box",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  130,  116,  174,   20
 END
 
 IDD_SAW_Page6a RCDATA
@@ -3762,6 +3796,8 @@ BEGIN
 "[Checks] \n"
 " 1140 1 \n"
 " 1129 0 \n"
+" 1130 0 \n"
+" 1131 0 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
@@ -3772,21 +3808,21 @@ BEGIN
 ,0
 END
 
-IDD_RR_TOPAS DIALOG 0, 0,  375,  170
+IDD_RR_External DIALOG 0, 0,  375,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "DASH Wizard : Rietveld refinement with TOPAS"
+CAPTION "DASH Wizard : Rietveld Refinement"
 BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "The first step is to do a Pawley refinement in TOPAS, with an input file generated by DASH.",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,   54,  234,   20
+    CONTROL "The first step is to do a Pawley or Le Bail refinement in external refinement program, with an input file generated by DASH.",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,   54,  234,   20
     CONTROL "You may want to use a different data set or a different data range for the Rietveld refinement, so DASH will first ask you for the file with the diffraction data to use.",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  104,   85,  234,   30
-    CONTROL "Pawley refinement",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   92,   35,  264,   89
+    CONTROL "Pawley/Le Bail refinement",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   92,   35,  264,   89
 END
 
-IDD_RR_TOPAS RCDATA
+IDD_RR_External RCDATA
 BEGIN
 "[Checks] \n"
 "[Menus] \n"
@@ -3832,49 +3868,170 @@ BEGIN
 ,0
 END
 
-IDD_SAW_Page7 DIALOG 0, 0,  375,  170
+IDD_SAW_Page7_TOPAS DIALOG 0, 0,  375,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
-CAPTION "DASH Wizard : Rietveld refinement with TOPAS"
+CAPTION "DASH Wizard : Rietveld Refinement with TOPAS"
 BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "Refine",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  249,   35,  112,  102
-    CONTROL "Scale",IDC_Scale,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   62,   40,   14
-    CONTROL "Background",IDC_Background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   75,   80,   14
-    CONTROL "Coordinates",IDC_Coordinates,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  115,   80,   14
-    CONTROL "Write",IDB_WRITE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   90,  126,   40,   14
-    CONTROL "new .inp file (reads .out file)",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  133,  128,  110,   10
-    CONTROL "Write out .cif file",IDC_WriteCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   89,   80,   14
-    CONTROL "Include ESDs in output",IDC_IncludeESDs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,  104,  100,   14
-    CONTROL "Use DASH recommendation",IDC_UseDASHRecommendation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   49,  150,   14
-    CONTROL "",IDF_TOPAS_inp_file_name,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,   91,   13,  270,   14
+    CONTROL "Use DASH recommendation",IDC_UseDASHRecommendation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   40,  150,   14
+    CONTROL "5",IDF_K1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  185,   53,   40,   14
+    CONTROL "Anisotropic broadening",IDC_Anisotropic_broadening,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   40,   95,   14
+    CONTROL "Scale",IDC_Scale,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   53,   40,   14
+    CONTROL "Background",IDC_Background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   66,   80,   14
+    CONTROL "Preferred orientation",IDC_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   79,   90,   14
+    CONTROL "Biso",IDC_Biso,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   93,   40,   14
+    CONTROL "Coordinates",IDC_Coordinates,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  106,   80,   14
+    CONTROL "Write out .cif file",IDC_WriteCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  258,  120,   80,   12
+    CONTROL "Include ESDs in output",IDC_IncludeESDs,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  134,  100,   14
+    CONTROL "Write",IDB_WRITE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   90,  129,   40,   14
+    CONTROL "penalties_weighting_K1",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   87,   56,   92,   10
+    CONTROL "Refine",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  249,   33,  112,  120
+    CONTROL "new .inp file (reads .out file)",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  133,  132,  106,    9
+    CONTROL "",IDF_Ext_RR_inp_file_name,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,   91,   13,  270,   14,WS_EX_STATICEDGE
     CONTROL "File name",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   95,   29,   80,    8
-    CONTROL "Biso",IDC_Biso,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  102,   40,   14
-    CONTROL "Preferred orientation",IDC_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   88,   90,   14
-    CONTROL "Anisotropic broadening",IDC_Anisotropic_broadening,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   49,   95,   14
-    CONTROL "5",IDF_K1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  185,   72,   40,   14
-    CONTROL "penalties_weighting_K1",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   87,   75,   92,   10
+    CONTROL "Weight on restraints (wscale)",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   91,   71,  150,   53
+    CONTROL "Distance",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  107,   82,   62,    8
+    CONTROL "Angle",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  107,   95,   62,    8
+    CONTROL "Flatten",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  107,  108,   62,    8
+    CONTROL "10000.",IDF_REAL_TOPAS_WSCALE_DIST,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  174,   80,   51,   14
+    CONTROL "1.0000",IDF_REAL_TOPAS_WSCALE_ANGLE,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  174,   93,   51,   14
+    CONTROL "0.10000E+07",IDF_REAL_TOPAS_WSCALE_FLATTEN,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  174,  106,   51,   14
 END
 
-IDD_SAW_Page7 RCDATA
+IDD_SAW_Page7_TOPAS RCDATA
 BEGIN
 "[Checks] \n"
+" 1450 1 \n"
+" 1370 1 \n"
 " 1252 1 \n"
 " 1443 0 \n"
+" 1508 0 \n"
+" 1447 0 \n"
 " 1444 0 \n"
 " 1448 1 \n"
 " 1449 0 \n"
-" 1450 1 \n"
-" 1447 0 \n"
-" 1508 0 \n"
-" 1370 1 \n"
 "[Menus] \n"
 "[Tabs] \n"
 "[Ranges] \n"
 " 1399               0         9999999 \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_SAW_Page7_GSAS DIALOG 0, 0,  375,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Rietveld Refinement with GSAS"
+BEGIN
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "",IDF_Ext_RR_inp_file_name,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,   91,   13,  270,   14,WS_EX_STATICEDGE
+    CONTROL "Use DASH recommendation",IDC_UseDASHRecommendation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   91,   39,  150,   14
+    CONTROL "3",IDF_NCYCL,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  193,   52,   28,   14
+    CONTROL "100.00",IDF_REAL_GSAS_FACTR_DIST,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  181,   74,   40,   12
+    CONTROL "100.00",IDF_REAL_GSAS_FACTR_ANGLE,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  181,   86,   40,   12
+    CONTROL "100.00",IDF_REAL_GSAS_FACTR_PLANE,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  181,   98,   40,   12
+    CONTROL "Initialisation + Pawley",IDC_Initialisation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   44,   95,   14
+    CONTROL "Scale",IDC_Scale,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   57,   40,   14
+    CONTROL "Background",IDC_Background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   70,   80,   14
+    CONTROL "Preferred orientation",IDC_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   83,   90,   14
+    CONTROL "Biso",IDC_Biso,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,   96,   40,   14
+    CONTROL "Coordinates (Non-H)",IDC_Coordinates_Non_H,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  109,   80,   14
+    CONTROL "Coordinates (H)",IDC_Coordinates_H,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  122,   80,   14
+    CONTROL "Write out .cif file",IDC_WriteCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  259,  135,   95,   14
+    CONTROL "Refine",IDB_WRITE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   91,  113,   46,   14
+    CONTROL "View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   91,  131,   46,   14
+    CONTROL "Launch an EXPGUI",IDB_FG_EXPGUI,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  142,  131,   78,   14
+    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "Number of cycles",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   92,   53,   64,   12
+    CONTROL "Refine options",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  249,   33,  112,  120
+    CONTROL "File name",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   95,   29,   80,    8
+    CONTROL "(update .exp file then call GSAS)",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  142,  116,  104,   12
+    CONTROL "Weight on restraints (FACTR)",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   91,   64,  150,   48
+    CONTROL "Distance",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  107,   75,   62,    8
+    CONTROL "Angle",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  107,   87,   62,    8
+    CONTROL "Planar group",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  107,  100,   62,    8
+END
+
+IDD_SAW_Page7_GSAS RCDATA
+BEGIN
+"[Checks] \n"
+" 1450 1 \n"
+" 1451 1 \n"
+" 1252 0 \n"
+" 1443 0 \n"
+" 1508 0 \n"
+" 1447 0 \n"
+" 1372 0 \n"
+" 1475 0 \n"
+" 1448 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1452               0         9999999 \n"
+"[Trackbars] \n"
+"[Grids] \n"
+"[Colours] \n"
+"[Lengths] \n"
+,0
+END
+
+IDD_SAW_Page7_RIETAN DIALOG 0, 0,  375,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Rietveld Refinement with RIETAN"
+BEGIN
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "",IDF_Ext_RR_inp_file_name,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,   91,   13,  270,   14,WS_EX_STATICEDGE
+    CONTROL "Use DASH recommendation",IDC_UseDASHRecommendation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   40,  150,   14
+    CONTROL "10",IDF_NCYCL,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  193,   56,   28,   14
+    CONTROL "650.00",IDF_REAL_RIETAN_WEIGHT_TK,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  193,   75,   40,   12
+    CONTROL "2.0000",IDF_REAL_RIETAN_WEIGHT_FINC,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  193,   92,   40,   12
+    CONTROL "Initialisation + Le Bail + ORFFE",IDC_Initialisation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  252,   43,  110,   14
+    CONTROL "Scale",IDC_Scale,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  252,   57,   40,   14
+    CONTROL "Background",IDC_Background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  252,   70,   80,   14
+    CONTROL "Preferred orientation",IDC_PO,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  252,   83,   90,   14
+    CONTROL "Biso",IDC_Biso,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  252,   96,   40,   14
+    CONTROL "Coordinates (Non-H)",IDC_Coordinates_Non_H,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  252,  109,   80,   14
+    CONTROL "Coordinates (H)",IDC_Coordinates_H,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  252,  122,   80,   14
+    CONTROL "Write out .cif file",IDC_WriteCIF,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  252,  135,   95,   14
+    CONTROL "Refine",IDB_WRITE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   93,  113,   46,   14
+    CONTROL "View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   93,  132,   46,   14
+    CONTROL "Number of cycles",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   93,   57,   62,   12
+    CONTROL "Refine options",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  246,   32,  120,  120
+    CONTROL "File name",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   95,   29,   80,    8
+    CONTROL "(update .ins file then call RIETAN)",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  142,  113,  104,   16
+    CONTROL "Penalty parameter (TK)",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   93,   76,   92,   12
+    CONTROL "TK increasing multiplier (FINC)",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   93,   93,   96,   14
+END
+
+IDD_SAW_Page7_RIETAN RCDATA
+BEGIN
+"[Checks] \n"
+" 1450 1 \n"
+" 1451 1 \n"
+" 1252 0 \n"
+" 1443 0 \n"
+" 1508 0 \n"
+" 1447 0 \n"
+" 1372 0 \n"
+" 1475 0 \n"
+" 1448 0 \n"
+"[Menus] \n"
+"[Tabs] \n"
+"[Ranges] \n"
+" 1452               0         9999999 \n"
 "[Trackbars] \n"
 "[Grids] \n"
 "[Colours] \n"

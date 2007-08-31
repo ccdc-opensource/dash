@@ -252,7 +252,7 @@
       ENDDO
 
 
-      IF ( .NOT. For_TOPAS ) THEN
+      IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
         DataSetChange = DataSetChange + 1
         BackRef = .TRUE.
         CALL Clear_UnitCell
@@ -278,7 +278,7 @@
 ! Assume no knowledge on background
         CALL Clear_SA
         CALL sa_SetOutputFiles(TheFileName)
-      ENDIF ! For_TOPAS
+      ENDIF ! iRietveldMethod
 
       CALL Clear_BackGround
       CALL Clear_Bins

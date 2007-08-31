@@ -76,7 +76,7 @@
 ! Problem here: apparently, WinterActer can only deal with up to 39 dialogue windows being
 ! loaded. We have quite a few more than that. As a result, some dialogues need to be
 ! swapped in and out of memory. This is ugly and error-prone, but that's the way it is.
-! Currently those dialogues are IDD_SX_Page1a, IDD_PW_Page3a, D_SAW_Page6a and IDD_RR_TOPAS.
+! Currently those dialogues are IDD_SX_Page1a, IDD_PW_Page3a, D_SAW_Page6a and IDD_RR_External.
 
       CALL WDialogLoad(IDD_Structural_Information)         !  1
       CALL WDialogLoad(IDD_Configuration)                  !  2
@@ -115,7 +115,7 @@
       CALL WDialogLoad(IDD_OutputSolutions)                ! 33
       CALL WDialogLoad(IDD_Rietveld2)                      ! 34
       CALL WDialogLoad(IDD_RR_PO_Dialog)                   ! 35
-      CALL WDialogLoad(IDD_SAW_Page7)                      ! 36
+      CALL WDialogLoad(IDD_SAW_Page7_TOPAS)                ! 36
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
@@ -296,9 +296,9 @@
 ! The initialisations should be split up into 'one off initialisations' (at the start up
 ! of DASH only) and 'whenever a new project file is opened'
       in_batch = .FALSE.
-      For_TOPAS = .FALSE.
       SXMaxResolution = 1.75
-      iRietveldMethod = 1
+      iRietveldMethod = INTERNAL_RB
+      iRietveldMethodOpt = 1
       lRebin = .FALSE.
       iBinWidth = 1
       RR_SA_Sol = 1
@@ -341,6 +341,9 @@
       VIEWARG = ''
       VIEWEXE = ''
       MOGULEXE = ' '
+      TOPASEXE = ''
+      EXPGUIEXE = ''
+      RIETANEXE = ''
       CALL GetPathToMercuryFromRegistry
       CALL GetPathToMogulFromRegistry
       DO I = 0, maxfrg
@@ -775,6 +778,10 @@
       CALL FileWriteString(hFile, RecNr, DICVOL04EXE)
       CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
       CALL FileWriteString(hFile, RecNr, TOPASEXE)
+      CALL WDialogGetString(IDF_EXPGUIExe, EXPGUIEXE)
+      CALL FileWriteString(hFile, RecNr, EXPGUIEXE)
+      CALL WDialogGetString(IDF_RIETANExe, RIETANEXE)
+      CALL FileWriteString(hFile, RecNr, RIETANEXE)
       CALL FileWriteLogical(hFile, RecNr, Get_WriteWavelength2XYEFile())
 ! Save defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
@@ -1080,6 +1087,10 @@
       CALL WDialogPutString(IDF_DICVOLExe, DICVOL04EXE)
       CALL FileReadString(hFile, RecNr, TOPASEXE)
       CALL WDialogPutString(IDF_TOPASExe, TOPASEXE)
+      CALL FileReadString(hFile, RecNr, EXPGUIEXE)
+      CALL WDialogPutString(IDF_EXPGUIExe, EXPGUIEXE)
+      CALL FileReadString(hFile, RecNr, RIETANEXE)
+      CALL WDialogPutString(IDF_RIETANExe, RIETANEXE)
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogPutCheckBoxLogical(IDC_wl_in_xye, tLogical)
 ! Read defaults for background subtraction

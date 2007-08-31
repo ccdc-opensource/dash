@@ -54,13 +54,13 @@
 ! Because of limitations in WinterActer, some Wizard windows need to be swapped
 ! out of memory and back again.
       SELECT CASE ( CurrentWizardWindow )
-        CASE ( IDD_RR_TOPAS )
-          CALL WDialogUnload(IDD_RR_TOPAS)
+        CASE ( IDD_RR_External )
+          CALL WDialogUnload(IDD_RR_External)
         CASE ( IDD_SX_Page1a )
           CALL WDialogGetReal(IDF_MaxResolution, SXMaxResolution)
           CALL WDialogUnload(IDD_SX_Page1a)
         CASE ( IDD_SAW_Page6a )
-          CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethod)
+          CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethodOpt)
           CALL WDialogUnload(IDD_SAW_Page6a)
         CASE ( IDD_PW_Page3a )
           lRebin = WDialogGetCheckBoxLogical(IDF_BinData)
@@ -79,6 +79,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -86,7 +87,7 @@
 
       INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
       COMMON /DialoguePosCmn/ IXPos_IDD_Wizard, IYPos_IDD_Wizard
- 
+
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
@@ -101,18 +102,23 @@
 ! Because of limitations in WinterActer, some Wizard windows need to be swapped
 ! out of memory and back again.
       SELECT CASE ( TheDialogID )
-        CASE ( IDD_RR_TOPAS )
-          CALL WDialogLoad(IDD_RR_TOPAS)
+        CASE ( IDD_RR_External )
+          CALL WDialogLoad(IDD_RR_External)
         CASE ( IDD_SX_Page1a )
           CALL WDialogLoad(IDD_SX_Page1a)
           CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
         CASE ( IDD_SAW_Page6a )
           CALL WDialogLoad(IDD_SAW_Page6a)
-          IF ( iRietveldMethod .EQ. 1 ) THEN
-            CALL WDialogPutRadioButton(IDF_RADIO1)
-          ELSE
-            CALL WDialogPutRadioButton(IDF_RADIO2)
-          ENDIF
+          SELECT CASE ( iRietveldMethodOpt )
+             CASE ( 2 )
+               CALL WDialogPutRadioButton(IDF_RADIO2)
+             CASE ( 3 )
+               CALL WDialogPutRadioButton(IDF_RADIO3)
+             CASE ( 4 )
+               CALL WDialogPutRadioButton(IDF_RADIO4)
+             CASE DEFAULT
+               CALL WDialogPutRadioButton(IDF_RADIO1)
+          END SELECT
         CASE ( IDD_PW_Page3a )
           CALL WDialogLoad(IDD_PW_Page3a)
           CALL WDialogPutCheckBoxLogical(IDF_BinData, lRebin)
@@ -124,6 +130,24 @@
       CurrentWizardWindow = TheDialogID
       CALL WDialogShow(IXPos_IDD_Wizard, IYPos_IDD_Wizard, IDNEXT, Modeless)
       CALL WMenuSetState(ID_Start_Wizard, ItemEnabled, WintOff)
+
+      IF ( TheDialogID .EQ. IDD_SAW_Page6a .OR. TheDialogID .EQ. IDD_SAW_Page6 ) THEN
+        IF ( LEN_TRIM(TOPASEXE) .GT. 0 ) THEN
+          CALL WDialogFieldState(IDF_RADIO2, 1)
+        ELSE
+          CALL WDialogFieldState(IDF_RADIO2, 0)
+        ENDIF
+        IF ( LEN_TRIM(EXPGUIEXE) .GT. 0 ) THEN
+          CALL WDialogFieldState(IDF_RADIO3, 1)
+        ELSE
+          CALL WDialogFieldState(IDF_RADIO3, 0)
+        ENDIF
+        IF ( LEN_TRIM(RIETANEXE) .GT. 0 ) THEN
+          CALL WDialogFieldState(IDF_RADIO4, 1)
+        ELSE
+          CALL WDialogFieldState(IDF_RADIO4, 0)
+        ENDIF
+      ENDIF
 
       END SUBROUTINE WizardWindowShow
 !
@@ -191,7 +215,7 @@
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
       LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
-   
+
       CALL EndWizard
       CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
       CALL WDialogPutRadioButton(IDF_PW_Option4)
@@ -299,11 +323,11 @@
       IMPLICIT NONE
 
       INCLUDE 'PARAMS.INC'
-   
+
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
-      
+
 ! Not too pretty, but safe
       INTEGER                BackupNOBS
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
@@ -360,8 +384,8 @@
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              IF ( For_TOPAS ) THEN
-                CALL WizardWindowShow(IDD_RR_TOPAS)
+              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
+                CALL WizardWindowShow(IDD_RR_External)
               ELSE
                 CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
               ENDIF
@@ -375,9 +399,9 @@
                 CALL WizardWindowShow(IDD_PW_Page4)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
-              IF ( For_TOPAS ) THEN
+              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
-                For_TOPAS = .FALSE.
+                iRietveldMethod = INTERNAL_RB
               ENDIF
               CALL EndWizard
             CASE (ID_PWa_DF_Open)
@@ -457,9 +481,9 @@
               CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page4)
             CASE (IDCANCEL, IDCLOSE)
-              IF ( For_TOPAS ) THEN
+              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
-                For_TOPAS = .FALSE.
+                iRietveldMethod = INTERNAL_RB
               ENDIF
               CALL EndWizard
             CASE (IDAPPLY)
@@ -523,9 +547,9 @@
                 CALL WizardWindowShow(IDD_PW_Page5)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
-              IF ( For_TOPAS ) THEN
+              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
-                For_TOPAS = .FALSE.
+                iRietveldMethod = INTERNAL_RB
               ENDIF
               CALL EndWizard
           END SELECT
@@ -535,7 +559,7 @@
               CALL WDialogGetRadioButton(IDF_LabX_Source, JRadOption)
               CALL Upload_Source
               CALL Generate_TicMarks 
-              IF ( For_TOPAS ) THEN ! Enable/disable "Monochromated" check box
+              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN ! Enable/disable "Monochromated" check box
                 CALL WDialogFieldStateLogical(IDC_Monochromated, JRadOption .EQ. 1)
               ENDIF
             CASE (IDF_wavelength1)
@@ -614,23 +638,10 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
-      INTEGER                  OFBN_Len
-      CHARACTER(MaxPathLength)           OutputFilesBaseName
-      CHARACTER(3)                                            SA_RunNumberStr
-      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
-
       REAL, EXTERNAL :: TwoTheta2dSpacing, dSpacing2TwoTheta
-      INTEGER, EXTERNAL :: WriteTOPASFilePawley
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
       REAL tReal, tMin, tMax
       INTEGER tFieldState
-!      CHARACTER(MaxPathLength) :: DirName
-!      CHARACTER(MaxPathLength) :: FileName
-!      CHARACTER(3) :: Extension
-      CHARACTER(LEN=45) :: FILTER
-      INTEGER iFlags
-!      INTEGER iLen, dLen, iPos
-!      LOGICAL something_changed
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page5)
@@ -650,65 +661,17 @@
                 tMax = 90.0
                 CALL TruncateData(tMin,tMax)
               ELSE
-                IF ( For_TOPAS ) THEN
-                  TOPAS_input_file_name = OutputFilesBaseName(1:LEN_TRIM(OutputFilesBaseName))//'.inp'
-                  ! It turns out that TOPAS cannot cope with file names that have dots in them,
-                  ! e.g. the following gives an error message:
-                  ! "Daresbury9.1_Nov2006.inp"
-                  ! The error message refers to "Daresbury9", indicating that everything
-                  ! after the first "." was assumed to be the file extension.
-!    10            CONTINUE
-!                  ExtLength = 3
-!                  CALL SplitPath2(TOPAS_input_file_name, DirName, FileName, Extension, ExtLength)
-!                  iLen = LEN_TRIM(FileName)
-!                  iPos = StrFind(FileName, iLen, '.', 1)
-!                  IF ( iPos .NE. 0 ) THEN
-!                    FileName(iPos:iPos) = "_"
-!                    dLen = LEN_TRIM(DirName)
-!                    TOPAS_input_file_name = DirName(1:dLen)//FileName(1:iLen)//'.inp'
-!                    ! There could be more "." in the file name
-!                    GOTO 10
-!                  ENDIF
-                  iFlags = SaveDialog + AppendExt + PromptOn
-                  FILTER = 'TOPAS input file (*.inp)|*.inp|'
-                  CALL WSelectFile(FILTER, iFlags, TOPAS_input_file_name, 'Save TOPAS input file')
-                  IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(TOPAS_input_file_name) .NE. 0)) THEN
-!                    something_changed = .FALSE.
-!    20              CONTINUE
-!                    ExtLength = 3
-!                    CALL SplitPath2(TOPAS_input_file_name, DirName, FileName, Extension, ExtLength)
-!                    iLen = LEN_TRIM(FileName)
-!                    iPos = StrFind(FileName, iLen, '.', 1)
-!                    IF ( iPos .NE. 0 ) THEN
-!                      FileName(iPos:iPos) = "_"
-!                      dLen = LEN_TRIM(DirName)
-!                      TOPAS_input_file_name = DirName(1:dLen)//FileName(1:iLen)//'.inp'
-!                      something_changed = .TRUE.
-!                      ! There could be more "." in the file name
-!                      GOTO 20
-!                    ENDIF
-!                    IF ( something_changed ) &
-!                      CALL InfoMessage("TOPAS cannot cope with file names containing dots,"//CHAR(13)//&
-!                                       "DASH has replaced these by underscores.")
-                    IF ( WriteTOPASFilePawley(TOPAS_input_file_name) .EQ. 0 ) THEN
-                      TOPAS_stage = 2
-                      CALL WDialogSelect(IDD_SAW_Page7)
-                      CALL WDialogPutString(IDF_TOPAS_inp_file_name, TOPAS_input_file_name)
-                      CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
-                      CALL WDialogFieldState(IDC_Anisotropic_broadening, Enabled)
-                      CALL UpdateTOPASCheckBoxes()
-                      CALL WizardWindowShow(IDD_SAW_Page7)
-                    ENDIF
-                  ENDIF
-                ELSE
+                IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
                   CALL WizardWindowShow(IDD_PW_Page6)
+                ELSE
+                  CALL StartExternalRR
                 ENDIF
               ENDIF
               CALL Profile_Plot
             CASE (IDCANCEL, IDCLOSE)
-              IF ( For_TOPAS ) THEN
+              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
-                For_TOPAS = .FALSE.
+                iRietveldMethod = INTERNAL_RB
               ENDIF
               CALL EndWizard
             CASE (IDAPPLY)
