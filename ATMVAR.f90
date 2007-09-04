@@ -8,7 +8,7 @@
       IMPLICIT NONE
 
       INTEGER     MaxAtm_3
-      PARAMETER ( MaxAtm_3 = 300 )
+      PARAMETER ( MaxAtm_3 = 150 )
 
       INTEGER     MaxElm
       PARAMETER ( MaxElm = 106 )
