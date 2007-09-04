@@ -91,6 +91,8 @@
 !*****************************************************************************
 !
       SUBROUTINE ADDATM(NAME,IA,XA,ISA,ILA,CELA,N)
+
+      USE ATMVAR
 !
 ! *** ADDATM updated by JCM 9 Jun 91 ***
 !
@@ -125,9 +127,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, Xato(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
@@ -595,6 +597,8 @@
 !*****************************************************************************
 !
       SUBROUTINE ANGLST(I1)
+
+      USE ATMVAR
 !
 ! *** ANGLST updated by JCM 11 Sep 92 ***
 !
@@ -619,7 +623,7 @@
 !
       CHARACTER*16 CH1, CH2
       DIMENSION K1(6), K2(6), XD1(3), XD2(3)
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       COMMON /BONDLA/ NB, BSAVE(100), DXSAVE(3,100), NBSAVE(100),       &
      &                N2SAVE(100), N3SAVE(100), I1LAST, BMAX, BMIN,     &
@@ -637,9 +641,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
       CHARACTER*4 ATTNAM, BONNAM, ANGNAM, TORNAM
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
@@ -737,6 +741,8 @@
 !*****************************************************************************
 !
       FUNCTION ANITF(H,N)
+
+      USE ATMVAR
 !
 ! *** ANITF by JCM 19 Jul 83 ***
 !
@@ -757,7 +763,7 @@
 !N Note the 2's in the expression.
 !
       DIMENSION H(3)
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
 !
       IA = IAPT(N)
       ANITF = 1.
@@ -830,6 +836,8 @@
 !*****************************************************************************
 !
       SUBROUTINE ATOPOS
+
+      USE ATMVAR
 !
 ! ***  ATOPOS by JCM 15 Jul 83 ***
 !
@@ -865,7 +873,7 @@
       CHARACTER*4 LABA, LABS
       LOGICAL LATVEC
       DIMENSION XIN(3)
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
@@ -873,8 +881,8 @@
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       COMMON /FONAM / FONA(20,9), FONAME(20)
       CHARACTER*4 FONAME, FONA
       COMMON /FORMD2/ NBKF(20,9), NMFNM(9)
@@ -898,9 +906,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /POSNS2/ NATO(9)
       COMMON /SCRAT / NTORD(24), Z(6)
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   KOM26
@@ -937,7 +945,7 @@
         ID = ID + NYZ
 ! ADD ATOM NAME TO TABLE - THE NAME WILL NOT USUALLY BE THERE ALREADY,
 ! BUT WE DO NOT AT THIS STAGE MIND IF IT IS:
-        N = LMATCH(LABA,ATNAME,NUMANM,150)
+        N = LMATCH(LABA,ATNAME,NUMANM,MaxAtm_3)
 ! WAS THIS AN SD CARD OR AN ORDINARY A CARD?
         IF (SDREAD) THEN
           CALL GMEQ(XIN,SDX(1,N),1,3)
@@ -947,7 +955,7 @@
           GOTO 1
         ENDIF
 ! ATOMIC POSITON:
-        CALL ERRCHK(2,NATOM,150,0,'atomic positions')
+        CALL ERRCHK(2,NATOM,MaxAtm_3,0,'atomic positions')
         IF (IBMBER .NE. 0) RETURN
         NATO(JPHASE) = NATOM
         CALL GMEQ(XIN,X(1,N),1,3)
@@ -1176,6 +1184,8 @@
 !*****************************************************************************
 !
       FUNCTION BONDA(I1,I2,I3)
+
+      USE ATMVAR
 !
 ! *** BONDA by JCM 1 Oct 86 ***
 !
@@ -1201,9 +1211,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 
       DO I = 1, 3
         D12(I) = X(I,I1) - X(I,I2)
@@ -1948,6 +1958,8 @@
 !*****************************************************************************
 !
       FUNCTION CONATF(N,IA)
+
+      USE ATMVAR
 !
 ! *** CONATF by JCM 16 Nov 84 ***
 !
@@ -1962,7 +1974,7 @@
 !A On exit CONATF is the required muliplicative conversion factor.
 !N It is inefficient, but not often used.
 !
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -2358,6 +2370,8 @@
 !*****************************************************************************
 !
       SUBROUTINE ERRATM(NAME,NACT,MESS)
+
+      USE ATMVAR
 !
 ! *** ERRATM by JCM 25 Sep 89 ***
 !
@@ -2760,6 +2774,8 @@
 !*****************************************************************************
 !
       SUBROUTINE EXTINC(N,F)
+
+      USE ATMVAR
 !
 ! *** EXTINC by JCM 23 Jan 85 ***
 !
@@ -2868,6 +2884,8 @@
 !*****************************************************************************
 !
       SUBROUTINE F2NEW(L)
+
+      USE ATMVAR
 !
 ! *** F2NEW updated by JCM 6 Feb 90 ***
 !
@@ -2882,15 +2900,15 @@
 !
       CHARACTER*4 LABA, LABS, LABF
       DIMENSION A(6)
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       INTEGER         NATOM
@@ -2902,9 +2920,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -2985,6 +3003,8 @@
 !*****************************************************************************
 !
       SUBROUTINE F2RELA(IFAM,ISPVEC)
+
+      USE ATMVAR
 !
 ! *** F2RELA updated by JCM 8 Sep 88 ***
 !
@@ -3014,15 +3034,15 @@
       DIMENSION ISPVEC(10)
       DIMENSION RMAT(3,3), NFIX3(3), FIX3(3), NFIX6(6), FIX6(6)
       DIMENSION KK1(2), AM(2), NCOUNT(6)
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -3039,9 +3059,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
      &                KOM26
 !
@@ -3135,6 +3155,8 @@
 !*****************************************************************************
 !
       SUBROUTINE F2SHFT
+
+      USE ATMVAR
 !
 ! *** F2SHFT updated by JCM 10 Feb 87 ***
 !
@@ -3146,9 +3168,9 @@
 !P       SHIFT is the LSQ matrix inversion shift
 !P       ESD is the its esd.
 !
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
      &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
       INTEGER         NATOM
@@ -3160,9 +3182,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 !
       GOTO (1,1,1,4,4,4,4,4,4,10,11,12), ISPC
 ! X, Y OR Z:
@@ -3195,6 +3217,8 @@
 !*****************************************************************************
 !
       SUBROUTINE F2VAR8(NG,NS,NV)
+
+      USE ATMVAR
 !
 ! *** F2VAR8 by JCM 17 Nov 90 ***
 !
@@ -3207,12 +3231,12 @@
 !A          NV is which variable it will be
 !D Records the information for future consultation
 !
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 !
       GOTO (1,1,1,4,4,4,4,4,4,10,11,12), NS
 ! X, Y OR Z:
@@ -3232,7 +3256,7 @@
       GOTO 100
 ! TO CLEAR ALL FAMILY 2 VARIABLES TO BE FIXED:
       ENTRY F2VAR9
-      DO IR = 1, 150
+      DO IR = 1, MaxAtm_3
         DO I = 1, 3
           KX(I,IR) = 0
         ENDDO
@@ -3315,6 +3339,8 @@
 !*****************************************************************************
 !
       COMPLEX FUNCTION FCALC(H)
+
+      USE ATMVAR
 !
 ! *** FCALC by JCM 19 Jul 83 ***
 !
@@ -3339,8 +3365,8 @@
       EQUIVALENCE (STHLMX,STHMXX(1))
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
       INTEGER         NATOM
@@ -3352,9 +3378,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
      &                KOM26
 !
@@ -4117,6 +4143,8 @@
 !*****************************************************************************
 !
       COMPLEX FUNCTION FORMFA(AK,II)
+
+      USE ATMVAR
 !
 ! *** FORMFA updated by JCM 25 Jan 91 ***
 !
@@ -4144,8 +4172,8 @@
 !
       COMMON /ANSCAT/ NAMODE(20), FDASH(20), KOM2
       COMPLEX FDASH
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
 !
@@ -4547,6 +4575,8 @@
 !*****************************************************************************
 !
       SUBROUTINE GEOMCO(N)
+
+      USE ATMVAR
 !
 ! *** GEOMCO updated by JCM 24 Jan 90 ***
 !
@@ -4569,7 +4599,7 @@
       
       LOGICAL ONCARD
       CHARACTER*4 NAME
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
@@ -4637,6 +4667,8 @@
 !*****************************************************************************
 !
       SUBROUTINE GEOMIN(N)
+
+      USE ATMVAR
 !
 ! *** GEOMIN updated by JCM 8 Mar 91 ***
 !
@@ -4671,7 +4703,7 @@
 !
       CHARACTER*4 NAME, ANAME, BNAME
       DIMENSION XS(3), CS(3), NEND(2), NIN(20)
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
@@ -4692,9 +4724,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
@@ -5014,6 +5046,7 @@
 !*****************************************************************************
 !
       SUBROUTINE GEOMLS(ALSQ,MATSZ)
+
 !
 ! *** GEOMLS updated by JCM 2 Oct 90 ***
 !
@@ -5084,9 +5117,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MAXATM_4), KX(3,MAXATM_4), AMULT(MAXATM_4), TF(MAXATM_4),  &
+     &                KTF(MAXATM_4), SITE(MAXATM_4), KSITE(MAXATM_4), ISGEN(3,MAXATM_4),    &
+     &                SDX(3,MAXATM_4), SDTF(MAXATM_4), SDSITE(MAXATM_4), KOM17
 
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
@@ -5403,6 +5436,8 @@
 !*****************************************************************************
 !
       FUNCTION IATOM(ANAME)
+
+      USE ATMVAR
 !
 ! *** IATOM updated for MK4 by JCM 8 Feb 90 ***
 !
@@ -5416,11 +5451,11 @@
 !P The list must be set up in array ATNAME in /ATNAM by, e.g. ATOPOS
 !
       CHARACTER*4 ANAME
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 !
       IF (NATOM.EQ.0) THEN
         IATOM = 0
@@ -6687,6 +6722,8 @@
 !*****************************************************************************
 !
       FUNCTION ISCAT(FNAME)
+
+	  USE ATMVAR
 !
 ! *** ISCAT updated by JCM 23 Sep 86 ***
 !
@@ -6702,8 +6739,8 @@
       CHARACTER*4 FNAME
       COMMON /FONAM / FONA(20,9), FONAME(20)
       CHARACTER*4 FONAME, FONA
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
 !
       IF (NUMFNM.EQ.0) THEN
         ISCAT = 0
@@ -7042,6 +7079,8 @@
 !*****************************************************************************
 !
       SUBROUTINE LFCALC(H)
+
+	  USE ATMVAR
 !
 ! *** LFCALC updated by JCM 22 Sep 87 ***
 !
@@ -7071,7 +7110,7 @@
       COMPLEX SUM1, TERM, FORM, HR, FORMFA
       LOGICAL TESTOV, LATABS
       DIMENSION RH(3), H(3)
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
 
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
@@ -7085,8 +7124,8 @@
       COMPLEX                                                   DERIVT
       COMMON /FCAL  / FC, FCMOD, COSAL, SINAL, FCDERS(MaxF2VA), DERIVT(MaxF2VA)
 
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
 
@@ -7099,9 +7138,9 @@
       INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
       COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
 
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /PRBLEM/ NFAM, NGENPS(6,9), NSPCPS(6,9), LF1SP(5),         &
      &                LF3SP(10,9,5), LVFST1(6,9,5), LBFST1(6,9,5),      &
      &                NVARF(6,9,5), NBARF(6,9,5), LF6SP(3,5)
@@ -9307,6 +9346,8 @@
 !*****************************************************************************
 !
       SUBROUTINE PARNAM(IPNAM1,IPNAM2,N,M)
+
+	  USE ATMVAR
 !
 ! *** PARNAM updated by JCM 8 May 90 ***
 !
@@ -9332,14 +9373,14 @@
       CHARACTER*4 IPNAM1, IPNAM2
       LOGICAL ONENAM
       DIMENSION LPAK(5)
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       INTEGER         NINIT, NBATCH, NSYSTM
       LOGICAL                                MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      COMMON /MPODA / NMPAT, NMPOL, MPATAB(20), MPNMTB(150), NCLUMP,    &
+      COMMON /MPODA / NMPAT, NMPOL, MPATAB(20), MPNMTB(MaxAtm_3), NCLUMP,    &
      &                KCLUMP(100), MPTAB(21), POLAMP(200,6), KPOLMP(200)&
      &                , NCMAT, CONMAT(600,2)
       COMMON /MPODAC/ MPNAM(200)
@@ -9457,6 +9498,8 @@
 !*****************************************************************************
 !
       SUBROUTINE PARRD(IPT1,IPT2,K,IFAM,IGEN,ISPC)
+
+      USE ATMVAR
 !
 ! *** PARRD updated by JCM 3 Aug 92 ***
 !
@@ -9498,7 +9541,7 @@
 !D    wherever it makes sense.
 !
       CHARACTER*4 LWD1, LWD2
-      COMMON /MPODA / NMPAT, NMPOL, MPATAB(20), MPNMTB(150), NCLUMP,    &
+      COMMON /MPODA / NMPAT, NMPOL, MPATAB(20), MPNMTB(MaxAtm_3), NCLUMP,    &
      &                KCLUMP(100), MPTAB(21), POLAMP(200,6), KPOLMP(200)&
      &                , NCMAT, CONMAT(600,2)
       COMMON /MPODAC/ MPNAM(200)
@@ -10603,6 +10646,8 @@
 !*****************************************************************************
 !
       SUBROUTINE RDATOM(IPT,IA,XACT,ISYMM,ILATT,CS)
+
+	  USE ATMVAR
 !
 ! *** RDATOM updated by JCM 7 Sep 90 ***
 !
@@ -10625,7 +10670,7 @@
 !
       DIMENSION XACT(3), CS(3)
       CHARACTER*4 NAME
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
@@ -10705,6 +10750,8 @@
 !*****************************************************************************
 !
       SUBROUTINE RDBOND(IPT,NEND,IE)
+
+	  USE ATMVAR
 !
 ! *** RDBOND by JCM 15 Oct 1990 ***
 !
@@ -10726,11 +10773,11 @@
 !
       CHARACTER*4 NAME
       DIMENSION NEND(2), CZ(3)
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SLKGEC/ ATTNAM(500), BONNAM(500), ANGNAM(100), TORNAM(100)
       CHARACTER*4 ATTNAM, BONNAM, ANGNAM, TORNAM
       COMMON /SLKGEO/ NSTYP, BOBS(500), EOBS(500), IATM(500,2),         &
@@ -12462,6 +12509,8 @@
 !*****************************************************************************
 !
       SUBROUTINE SETANI
+
+	  USE ATMVAR
 !
 ! *** SETANI by JCM 23 Sep 83 ***
 !
@@ -12491,7 +12540,7 @@
 !
       CHARACTER*4 LABB
       DIMENSION ACOEFF(6)
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
       COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
@@ -12504,9 +12553,9 @@
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 
 ! IT IS NECESSARY THAT ATOPOS HAS SET UP THE ATOM LABELS:
       IF (INREAD(1).GE.0) CALL ATOPOS
@@ -12583,6 +12632,8 @@
 !*****************************************************************************
 !
       SUBROUTINE SETFOR
+
+	  USE ATMVAR
 !
 ! *** SETFOR updated by JCM 24 Nov 91 ***
 !
@@ -12647,7 +12698,7 @@
       LOGICAL ANOM
       COMMON /ANSCAT/ NAMODE(20), FDASH(20), KOM2
       COMPLEX FDASH
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
       LOGICAL                                                                             SDREAD
@@ -12657,14 +12708,14 @@
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
       COMMON /FONAM / FONA(20,9), FONAME(20)
       CHARACTER*4 FONAME, FONA
-      COMMON /FORGRP/ NATFOR(20,150), NAFPNT(20)
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORGRP/ NATFOR(20,MaxAtm_3), NAFPNT(20)
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -12693,7 +12744,7 @@
 ! CLEAR FACTORS-ATOMS TABLES:
       DO I = 1, 20
         NAFPNT(I) = 0
-        DO J = 1, 150
+        DO J = 1, MaxAtm_3
           NATFOR(I,J) = 0
         ENDDO
       ENDDO
@@ -14746,6 +14797,8 @@
 !*****************************************************************************
 !
       SUBROUTINE TBLFND(NAME,IANS,IFAM,IGEN,ISPC,KP,KS)
+
+      USE ATMVAR
 !
 ! *** TBLFND updated by JCM 8 May 90 ***
 !
@@ -14777,14 +14830,14 @@
 !
       CHARACTER*4 NAME, ITB(2)
       DIMENSION ITBSPC(2)
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       COMMON /CHARS / LETUP(26), LETLOW(26), ISPCE, IDIGIT(10), ISMBOL(21)
       CHARACTER*1 LETUP, LETLOW, ISPCE, IDIGIT, ISMBOL
       COMMON /FONAM / FONA(20,9), FONAME(20)
       CHARACTER*4 FONAME, FONA
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       COMMON /FORMD2/ NBKF(20,9), NMFNM(9)
       INTEGER         NINIT, NBATCH, NSYSTM
       LOGICAL                                MULFAS, MULSOU, MULONE
@@ -15792,6 +15845,8 @@
 !*****************************************************************************
 !
       SUBROUTINE XROOT(IA,XX,IS,IL,C)
+
+	  USE ATMVAR
 !
 ! *** XROOT updated by JCM 18 Oct 87 ***
 !
@@ -15821,9 +15876,9 @@
       LOGICAL GMSAME
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
       LOGICAL CENTRC
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 !
 ! CYCLE OVER CENTRE
@@ -15863,6 +15918,8 @@
 !*****************************************************************************
 !
       SUBROUTINE XTRANS(IAT,XX,IS,IL,C)
+
+	  USE ATMVAR
 !
 ! *** XTRANS corrected by JCM 18 Oct 87 ***
 !
@@ -15885,9 +15942,9 @@
 !N because this has awkward repercussions in slack constraints
 !
       DIMENSION XX(3), C(3)
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 !
 ! ROTATE BY SYMMETRY OPERATOR:

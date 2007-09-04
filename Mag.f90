@@ -68,6 +68,8 @@
 !*****************************************************************************
 !
       LOGICAL FUNCTION MAGABS(H,IK)
+
+      USE ATMVAR
 !
 ! *** MAGABS modified by PJB Jan 91 ***
 !X
@@ -84,7 +86,7 @@
 !
       DIMENSION H(3), TEST(3)
       LOGICAL M, LATABS
-      COMMON /MAGDAT/ NMAG, MAGAT(150), JMAGAT(10), NMFORM(10),         &
+      COMMON /MAGDAT/ NMAG, MAGAT(MaxAtm_3), JMAGAT(10), NMFORM(10),         &
      &                ANGM(4,10), KANGM(4,10), SMOD(2,10), KSMOD(2,10), &
      &                PHIH(4,10), KPHIH(4,10), LPHI(4,10), NPHI(10),    &
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
@@ -113,6 +115,8 @@
 !*****************************************************************************
 !
       SUBROUTINE MAGCNC
+
+	  USE ATMVAR
 !
 ! *** MAGCNC uodated by PJB 17-Jan-95 ***
 !
@@ -124,7 +128,7 @@
 !
       DIMENSION IPSFIX(4)
       LOGICAL LMFIX(3), FIRST
-      COMMON /MAGDAT/ NMAG, MAGAT(150), JMAGAT(10), NMFORM(10),         &
+      COMMON /MAGDAT/ NMAG, MAGAT(MaxAtm_3), JMAGAT(10), NMFORM(10),         &
      &                ANGM(4,10), KANGM(4,10), SMOD(2,10), KSMOD(2,10), &
      &                PHIH(4,10), KPHIH(4,10), LPHI(4,10), NPHI(10),    &
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
@@ -152,6 +156,8 @@
 !*****************************************************************************
 !
       SUBROUTINE MAGCON(IATO,LMFIX,FIRST)
+
+      USE ATMVAR
 !
 ! *** MAGCON corrected by PJB 4 30-Nov-1994 ***
 !
@@ -166,13 +172,13 @@
       LOGICAL FIRST, LMFIX(3), NONE
       DIMENSION RMAT(3,3), NFIX(3), FIX(3), IATAB(24), RX(3), SCON(3)
       DIMENSION VEC(3), TVEC(3,2)
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
-      COMMON /MAGDAT/ NMAG, MAGAT(150), JMAGAT(10), NMFORM(10),         &
+      COMMON /MAGDAT/ NMAG, MAGAT(MaxAtm_3), JMAGAT(10), NMFORM(10),         &
      &                ANGM(4,10), KANGM(4,10), SMOD(2,10), KSMOD(2,10), &
      &                PHIH(4,10), KPHIH(4,10), LPHI(4,10), NPHI(10),    &
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
@@ -187,9 +193,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SATELL/ PROP(3), KPROP(3), KSTAB(24), NKSTAR, IPROP,      &
      &                FKSTAR, NKC, KCENT, INCOM, KOM21
       LOGICAL INCOM
@@ -614,6 +620,8 @@
 !*****************************************************************************
 !
       SUBROUTINE MF5ADD(ISPC,IG,IS,N)
+
+      USE ATMVAR
 !
 ! *** MF5ADD by JCM 13 Jun 88 ***
 !
@@ -628,7 +636,7 @@
 !P Table MPNAM must have been set up to contain species names, and
 !P       MPTAB to point in it for each genus of family 5.
 !
-      COMMON /MPODA / NMPAT, NMPOL, MPATAB(20), MPNMTB(150), NCLUMP,    &
+      COMMON /MPODA / NMPAT, NMPOL, MPATAB(20), MPNMTB(MaxAtm_3), NCLUMP,    &
      &                KCLUMP(100), MPTAB(21), POLAMP(200,6), KPOLMP(200)&
      &                , NCMAT, CONMAT(600,2)
 !
@@ -874,6 +882,8 @@
 !*****************************************************************************
 !
       SUBROUTINE PSICON(MGAT,IPSFIX)
+
+      USE ATMVAR
 !
 ! *** PSICON corrected by PJB/JBF 13-Jan-1995 ***
 !
@@ -903,11 +913,11 @@
 !
       DIMENSION XEQ(3,24), IPSFIX(4), TPHI(4), LTPHI(4)
       DIMENSION XR(3), XT(3), CELLT(3)
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
-      COMMON /MAGDAT/ NMAG, MAGAT(150), JMAGAT(10), NMFORM(10),         &
+      COMMON /MAGDAT/ NMAG, MAGAT(MaxAtm_3), JMAGAT(10), NMFORM(10),         &
      &                ANGM(4,10), KANGM(4,10), SMOD(2,10), KSMOD(2,10), &
      &                PHIH(4,10), KPHIH(4,10), LPHI(4,10), NPHI(10),    &
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
@@ -922,9 +932,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       COMMON /SATELL/ PROP(3), KPROP(3), KSTAB(24), NKSTAR, IPROP,      &
      &                FKSTAR, NKC, KCENT, INCOM, KOM21
       LOGICAL INCOM
@@ -1082,6 +1092,8 @@
 !*****************************************************************************
 !
       SUBROUTINE SPHELI(IM,MODE)
+
+      USE ATMVAR
 !
 ! *** SPHELI updated by PJB 30-May-95 ***
 !
@@ -1095,9 +1107,9 @@
 !
       DIMENSION C(4), KK(4), PERP(3)
       LOGICAL TESTOV
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
-      COMMON /MAGDAT/ NMAG, MAGAT(150), JMAGAT(10), NMFORM(10),         &
+      COMMON /MAGDAT/ NMAG, MAGAT(MaxAtm_3), JMAGAT(10), NMFORM(10),         &
      &                ANGM(4,10), KANGM(4,10), SMOD(2,10), KSMOD(2,10), &
      &                PHIH(4,10), KPHIH(4,10), LPHI(4,10), NPHI(10),    &
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19

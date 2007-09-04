@@ -792,7 +792,7 @@
       SUBROUTINE CALPR(PCXX,PFXX)
 
       USE REFVAR
-
+      USE ATMVAR
 !
 !  *** CALPR updated by JCM 17 Apr 89 ***
 !
@@ -886,9 +886,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 
       COMMON /PRABSC/ NABTYP(5), ABSPR(2,5), KABSPR(2,5), ABSCOR,       &
      &                DERABQ(2), NABSPR(5)
@@ -1289,8 +1289,10 @@
 !A DFLTPR on exit is TRUE if the parameter is by default varied, FALSE fixed
 !D Called as substitute for DEFALT out of VARMAK
 !
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
-      COMMON /MAGDAT/ NMAG, MAGAT(150), JMAGAT(10), NMFORM(10),         &
+      USE ATMVAR
+
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
+      COMMON /MAGDAT/ NMAG, MAGAT(MaxAtm_3), JMAGAT(10), NMFORM(10),         &
      &                ANGM(4,10), KANGM(4,10), SMOD(2,10), KSMOD(2,10), &
      &                PHIH(4,10), KPHIH(4,10), LPHI(4,10), NPHI(10),    &
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
@@ -4588,6 +4590,7 @@
       SUBROUTINE PHMOVE(IO,N)
 
       USE REFVAR
+	  USE ATMVAR
 !
 ! *** PHMOVE BY JCM 7 FEB 88 ***
 !
@@ -4602,7 +4605,7 @@
 !
       INCLUDE 'PARAMS.INC'
 
-      COMMON /ATNAM / ATNAME(150), ATNA(150,9)
+      COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
       INTEGER         NINIT, NBATCH, NSYSTM
       LOGICAL                                MULFAS, MULSOU, MULONE
@@ -4620,7 +4623,7 @@
       LOGICAL SIMUL, MAG, MPL, FIXED, DONE
       EQUIVALENCE (MODER,MODERR(1))
 
-      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(150), IATYP(50), KOM1
+      COMMON /ANISO / ATF(6,50), KATF(6,50), IAPT(MaxAtm_3), IATYP(50), KOM1
       DIMENSION KOMM1(1)
       EQUIVALENCE (KOMM1(1),ATF(1,1))
       COMMON /ANSCAT/ NAMODE(20), FDASH(20), KOM2
@@ -4634,8 +4637,8 @@
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       DIMENSION KOMM4(1)
       EQUIVALENCE (KOMM4(1),CELL(1,1,1))
-      COMMON /FORMDA/ NFORMF(150), MODE(20), NT(20), F(40,20), S(40,20),&
-     &                CMULT(20), KCMULT(150), NBAKF(20), NUMFNM, KOM7
+      COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
+     &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       DIMENSION KOMM7(1)
       EQUIVALENCE (KOMM7(1),NFORMF(1))
       COMMON /FORMD2/ NBKF(20,9), NMFNM(9)
@@ -4662,7 +4665,7 @@
       EQUIVALENCE (ILREAD(1),ILREA(1,1))
       DIMENSION KOMM18(1)
       EQUIVALENCE (KOMM18(1),ILREA(1,1))
-      COMMON /MAGDAT/ NMAG, MAGAT(150), JMAGAT(10), NMFORM(10),         &
+      COMMON /MAGDAT/ NMAG, MAGAT(MaxAtm_3), JMAGAT(10), NMFORM(10),         &
      &                ANGM(4,10), KANGM(4,10), SMOD(2,10), KSMOD(2,10), &
      &                PHIH(4,10), KPHIH(4,10), LPHI(4,10), NPHI(10),    &
      &                TPTAB(25,10), IPTAB(25,10), SPIND(3,3,2,10), KOM19
@@ -4698,9 +4701,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
       DIMENSION KOMM17(1)
       EQUIVALENCE (KOMM17(1),NATOM)
       COMMON /POSNS2/ NATO(9)

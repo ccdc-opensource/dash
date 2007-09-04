@@ -48,7 +48,7 @@
       ZERO = 0.0
       ITER = 0
 ! Zero things ...
-      DO I = 1, 150
+      DO I = 1, MaxAtm_3
         EX(I) = 0.0
       ENDDO
       DO I = 1, 51

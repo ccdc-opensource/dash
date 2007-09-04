@@ -258,7 +258,7 @@
       INTEGER, INTENT (IN   ) :: the_assembly(1:MaxAtm_3)
 
       INTEGER MaxAAStack
-      PARAMETER (MaxAAStack = 150)
+      PARAMETER (MaxAAStack = 300)
 
       INTEGER            AAStackPtr, AAStack
       COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)
@@ -307,7 +307,7 @@
       INTEGER, INTENT (IN   ) :: the_value
 
       INTEGER MaxAAStack
-      PARAMETER (MaxAAStack = 150)
+      PARAMETER (MaxAAStack = 300)
 
       INTEGER            AAStackPtr, AAStack
       COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)
@@ -331,7 +331,7 @@
       IMPLICIT NONE
 
       INTEGER MaxAAStack
-      PARAMETER (MaxAAStack = 150)
+      PARAMETER (MaxAAStack = 300)
 
       INTEGER            AAStackPtr, AAStack
       COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)
@@ -355,7 +355,7 @@
       IMPLICIT NONE
 
       INTEGER MaxAAStack
-      PARAMETER (MaxAAStack = 150)
+      PARAMETER (MaxAAStack = 300)
 
       INTEGER            AAStackPtr, AAStack
       COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)
@@ -450,9 +450,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, Xato(3,150), KX(3,150), AMULT(150), TF(150),  &
-                      KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-                      SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, Xato(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+                      KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+                      SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
@@ -493,7 +493,7 @@
       LOGICAL, EXTERNAL :: WriteDistance, WriteAngle, WritePlane
 
       INTEGER MaxAAStack
-      PARAMETER (MaxAAStack = 150)
+      PARAMETER (MaxAAStack = 300)
 
       INTEGER            AAStackPtr, AAStack
       COMMON  /AROMATIC/ AAStackPtr, AAStack(1:MaxAAStack)

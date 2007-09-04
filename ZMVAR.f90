@@ -21,7 +21,7 @@
 ! c2fmat = 3x3 matrix for conversion from Cartesian  to fractional coordinates 
 
       INTEGER     maxatm
-      PARAMETER ( maxatm = 150 )
+      PARAMETER ( maxatm = 300 )
 
       INTEGER     maxfrg
       PARAMETER ( maxfrg = 32 )
