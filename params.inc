@@ -91,7 +91,7 @@
 ! For use in common block IPKCMN
 
       INTEGER     MaxAtm_4
-      PARAMETER	( MaxAtm_4 = 150)
+      PARAMETER	( MaxAtm_4 = 300)
 ! Maximum number of atoms
 
       INTEGER     MaxNumT

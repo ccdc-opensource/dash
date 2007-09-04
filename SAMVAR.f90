@@ -7,7 +7,7 @@
 
 ! PARAMETER definitions
 
-      INTEGER, PARAMETER :: MAXATM_2 = 150
+      INTEGER, PARAMETER :: MAXATM_2 = 300
       INTEGER, PARAMETER :: MAXBND   = 1500
 
       REAL atchg(1:MAXATM_2)

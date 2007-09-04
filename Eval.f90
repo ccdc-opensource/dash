@@ -26,9 +26,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, XATO(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, XATO(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 
       LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
       INTEGER                                                                    HydrogenTreatment

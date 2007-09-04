@@ -9,7 +9,7 @@
       PARAMETER ( RR_MVAR = 200 )
 
       INTEGER     RR_maxatm
-      PARAMETER ( RR_maxatm = 150 )
+      PARAMETER ( RR_maxatm = 300 )
 
       INTEGER     RR_maxfrg
       PARAMETER ( RR_maxfrg = 32 )
