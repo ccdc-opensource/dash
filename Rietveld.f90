@@ -1419,6 +1419,7 @@
       REAL    x_pdb(1:3)
       CHARACTER*80 tString, tString1, tString2
       CHARACTER*2  LATT
+	  REAL TOUISO
 
       iFlags = SaveDialog + AppendExt + PromptOn
       FILTER = 'pdb (*.pdb)|*.pdb|'// &
@@ -1610,17 +1611,21 @@
             WRITE (hFile, '("  _atom_site_fract_z")', ERR=999)
             WRITE (hFile, '("  _atom_site_occupancy")', ERR=999)
             WRITE (hFile, '("  _atom_site_adp_type")', ERR=999)
-            WRITE (hFile, '("  _atom_site_B_iso_or_equiv")', ERR=999)
+            WRITE (hFile, '("  _atom_site_U_iso_or_equiv")', ERR=999)
             iiact = 0
             itotal = 0
+            
+!C          This is 1/( 8 * pi^2)          
+            TOUISO = 0.01266514796 
+                        
             DO iFrg = 1, nFrag
               itotal = iiact
               DO i = 1, natoms(iFrg)
                 iiact = iiact + 1
                 iOrig = izmbid(i,iFrg)
                 ii = OrderedAtm(itotal + iOrig)
-                WRITE (hFile,1034,ERR=999) OriginalLabel(iOrig,iFrg), (Xato(k,ii),k=1,3), occ(iOrig,iFrg), RR_ITF*tiso(iOrig,iFrg) 
- 1034           FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F5.2)
+                WRITE (hFile,1034,ERR=999) OriginalLabel(iOrig,iFrg), (Xato(k,ii),k=1,3), occ(iOrig,iFrg), TOUISO * RR_ITF * tiso(iOrig,iFrg) 
+ 1034           FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Uiso ',F6.4)
               ENDDO ! loop over atoms
             ENDDO ! loop over Z-matrices
           CASE (5) ! res

@@ -735,6 +735,7 @@
       REAL                      tIntChiSqd, tProChiSqd
       INTEGER                   tRunNr
       LOGICAL tLOG_HYDROGENS
+	  REAL TOUISO
 
       tRunNr = iSol2Run(TheSolutionNr)
       WRITE (DASHRemarkStr,100,ERR=999) IntensityChiSqd(tRunNr), ProfileChiSqd(tRunNr), MaxMoves
@@ -925,9 +926,9 @@
 !C        _atom_site_fract_z
 !C        _atom_site_occupancy
 !C        _atom_site_adp_type
-!C        _atom_site_B_iso_or_equiv
-!C      C1     -0.10853   0.45223   0.14604  1.0 Biso 3.0
-!C      C2     -0.05898   0.41596   0.27356  1.0 Biso 3.0
+!C        _atom_site_U_iso_or_equiv
+!C      C1     -0.10853   0.45223   0.14604  1.0 Uiso 0.038
+!C      C2     -0.05898   0.41596   0.27356  1.0 Uiso 0.038
 
         WRITE (hFileCIF,'("loop_")',ERR=999)
         WRITE (hFileCIF,'("  _atom_site_label")',ERR=999)
@@ -936,7 +937,7 @@
         WRITE (hFileCIF,'("  _atom_site_fract_z")',ERR=999)
         WRITE (hFileCIF,'("  _atom_site_occupancy")',ERR=999)
         WRITE (hFileCIF,'("  _atom_site_adp_type")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_B_iso_or_equiv")',ERR=999)
+        WRITE (hFileCIF,'("  _atom_site_U_iso_or_equiv")',ERR=999)
       ENDIF
 ! RES ...
       IF (tSaveRES) THEN
@@ -1068,11 +1069,13 @@
 !C        _atom_site_occupancy
 !C        _atom_site_adp_type
 !C        _atom_site_B_iso_or_equiv
-!C      C1     -0.10853   0.45223   0.14604  1.0 Biso 3.0
-!C      C2     -0.05898   0.41596   0.27356  1.0 Biso 3.0
+!C      C1     -0.10853   0.45223   0.14604  1.0 Uiso 0.038
+!C      C2     -0.05898   0.41596   0.27356  1.0 Uiso 0.038
           IF (tSaveCIF) THEN
-            WRITE (hFileCIF,1034,ERR=999) OriginalLabel(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), occ(iOrig,iFrg), tiso(iOrig,iFrg) 
- 1034       FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F5.2)
+!C          This is 1/( 8 * pi^2)          
+            TOUISO = 0.01266514796 
+            WRITE (hFileCIF,1034,ERR=999) OriginalLabel(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), occ(iOrig,iFrg), TOUISO * tiso(iOrig,iFrg) 
+ 1034       FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F6.4)
           ENDIF
           IF (tSaveRES) THEN
 ! Determine this atom's entry number in the scattering factor list
