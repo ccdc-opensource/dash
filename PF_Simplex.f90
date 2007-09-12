@@ -48,10 +48,10 @@
       ZERO = 0.0
       ITER = 0
 ! Zero things ...
-      DO I = 1, MaxAtm_3
+      DO I = 1, 3*MVAR
         EX(I) = 0.0
       ENDDO
-      DO I = 1, 51
+      DO I = 1, MVAR+1
         IR(I) = 0
         C(I) = 0.0
       ENDDO
