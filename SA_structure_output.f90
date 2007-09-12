@@ -410,8 +410,8 @@
 !C        _atom_site_occupancy
 !C        _atom_site_adp_type
 !C        _atom_site_U_iso_or_equiv
-!C      C1     -0.10853   0.45223   0.14604  1.0 Biso 3.0
-!C      C2     -0.05898   0.41596   0.27356  1.0 Biso 3.0
+!C      C1     -0.10853   0.45223   0.14604  1.0 Uiso 3.0
+!C      C2     -0.05898   0.41596   0.27356  1.0 Uiso 3.0
           IF (tSaveCIF) THEN
 !C          This is 1/( 8 * pi^2)          
             TOUISO = 0.01266514796 

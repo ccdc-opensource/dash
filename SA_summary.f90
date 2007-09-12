@@ -1075,7 +1075,7 @@
 !C          This is 1/( 8 * pi^2)          
             TOUISO = 0.01266514796 
             WRITE (hFileCIF,1034,ERR=999) OriginalLabel(iOrig,iFrg), (XAtmCoords(k,ii,tRunNr),k=1,3), occ(iOrig,iFrg), TOUISO * tiso(iOrig,iFrg) 
- 1034       FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Biso ',F6.4)
+ 1034       FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Uiso ',F6.4)
           ENDIF
           IF (tSaveRES) THEN
 ! Determine this atom's entry number in the scattering factor list
