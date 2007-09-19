@@ -106,6 +106,7 @@
       CALL InitialiseVariables
       CALL WMessageEnable(TabChanged, Enabled)
       CALL WMessageEnable(MouseMove, Enabled)
+      CALL IOsDirChange(StartUpDirectory)
 ! Main message loop
       IF (NARGS() .GT. 1) THEN
         CALL GetArg(1,ArgString) 

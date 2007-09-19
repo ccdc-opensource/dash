@@ -21,7 +21,9 @@
 ! DASH has been invoked.
       CALL SplitPath(tString, InstallationDirectory, tFile)
       IF (LEN_TRIM(InstallationDirectory) .EQ. 0) InstallationDirectory = '.'//DIRSPACER
-      CALL IOsDirChange(InstallationDirectory)
+      
+	  CALL IOsDirName(StartUpDirectory)
+	  CALL IOsDirChange(InstallationDirectory)
       CALL IOsDirName(InstallationDirectory)
       InstallationDirectory = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//DIRSPACER
 

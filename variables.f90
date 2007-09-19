@@ -24,6 +24,7 @@
       DATA FNAME / ' ' /     ! Current filename
 
       CHARACTER(MaxPathLength) ::  InstallationDirectory
+      CHARACTER(MaxPathLength) ::  StartUpDirectory
 
       CHARACTER                ::  DIRSPACER
       DATA DIRSPACER / '\' / ! Windows spacer
