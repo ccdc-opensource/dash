@@ -23,6 +23,7 @@
       IF (LEN_TRIM(InstallationDirectory) .EQ. 0) InstallationDirectory = '.'//DIRSPACER
       
 	  CALL IOsDirName(StartUpDirectory)
+      StartUpDirectory = StartUpDirectory(1:LEN_TRIM(StartUpDirectory))//DIRSPACER
 	  CALL IOsDirChange(InstallationDirectory)
       CALL IOsDirName(InstallationDirectory)
       InstallationDirectory = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//DIRSPACER
