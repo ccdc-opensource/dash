@@ -2367,7 +2367,7 @@
               CALL WDialogSelect(IDD_SA_Modal_Input2)
               CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))                                              
           END SELECT
-          CALL WDialogClearField(IDF_MogulText)
+          IF  (.NOT. UseMogul) CALL WDialogClearField(IDF_MogulText)
           prevub(RowNumber) = UB(RowNumber)
           prevlb(RowNumber) = LB(RowNumber)
           CALL WDialogSelect(IDD_SA_Modal_Input2)
