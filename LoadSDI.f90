@@ -481,7 +481,7 @@
 
       INTEGER         KNIPT
       REAL                            PIKVAL
-      COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
+      COMMON /FPINF1/ KNIPT(MaxKTem,MOBS), PIKVAL(MaxKTem,MOBS)
 
       INTEGER         KREFT
       COMMON /FPINF2/ KREFT(MOBS)
@@ -491,7 +491,7 @@
       REAL tPIKVAL(1:500)
       LOGICAL WrongValuesPresent
       INTEGER KTEM, hFile
-
+      REAL EOBSSQ
       iErr = 1
       hFile = 21
       OPEN (hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
@@ -502,13 +502,21 @@
         READ (hFile,*,END=200,ERR=999) XOBS(I), YOBS(I), EOBS(I), KTEM
 ! JvdS Rather a serious error here, I think. KTEM can be as much as 70.
 ! Some of the reflections contribute 0.000000E+00 ???
-        IF (KTEM .GT. 50) WrongValuesPresent = .TRUE.
-        KREFT(I) = MIN(50,KTEM)
+        IF (KTEM .GT. MaxKTem) WrongValuesPresent = .TRUE.
+        KREFT(I) = MIN(MaxKTem,KTEM)
         NOBS = NOBS + 1
-        WTSA(I) = 1.0/EOBS(I)**2
+
+! JCC Another error: it seems that EOBS can be zero,
+!
+        EOBSSQ = EOBS(I)**2
+		IF ( EOBSSQ .LT. 0.0000001 ) THEN
+		   EOBSSQ = 0.0000001
+        ENDIF
+
+        WTSA(I) = 1.0/EOBSSQ
         IF (KTEM .GT. 0) THEN
           READ (hFile,*,ERR=999) (tKNIPT(K),tPIKVAL(K),K=1,KTEM)
-          DO j = 1, MIN(50,KTEM)
+          DO j = 1, MIN(MaxPik,KTEM)
             KNIPT(j,I)  = tKNIPT(j)
             PIKVAL(j,I) = tPIKVAL(j)
           ENDDO
