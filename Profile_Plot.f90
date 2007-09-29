@@ -287,7 +287,7 @@
       INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
       COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
 
-      LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs
+      LOGICAL, EXTERNAL :: PlotObservedErrorBars, ConnectPointsObs
       INTEGER I
       REAL sizmtem, xtem, ytem, xgtem, ygtem
 
@@ -295,7 +295,7 @@
       CALL IPgYLabelLeft('Observed profile','C9')
 ! Do the error bars - we've precalculated the min & max pointers
       CALL IGrColourN(KolNumObs)
-      IF ( PlotErrorBars() ) THEN
+      IF ( PlotObservedErrorBars() ) THEN
         DO I = IPMIN, IPMAX
           xtem = XBIN(I)
           ytem = MAX(YOBIN(I)-EBIN(I), ypgmin)
@@ -364,10 +364,12 @@
       REAL            CummChiSqd
       COMMON /CMN007/ CummChiSqd(MOBS)
 
-      LOGICAL, EXTERNAL :: PlotErrorBars, ConnectPointsObs, Get_ShowCumChiSqd, Get_DivideByEsd
-      REAL    YDIF(MOBS), YADD
+      LOGICAL, EXTERNAL :: PlotObservedErrorBars, PlotDifferenceErrorBars 
+	  LOGICAL, EXTERNAL :: ConnectPointsObs, Get_ShowCumChiSqd, Get_DivideByEsd
+      REAL, EXTERNAL :: PlotEsdMultiplier
+	  REAL    YDIF(MOBS), YADD
       INTEGER I, II 
-      REAL    sizmtem, xptem, yptem, xgtem, ygtem
+      REAL    sizmtem, xptem, yptem, xgtem, ygtem, esdmul
       LOGICAL tGet_ShowCumChiSqd, tGet_DivideByEsd
 
       tGet_ShowCumChiSqd = Get_ShowCumChiSqd()
@@ -411,16 +413,32 @@
       CALL IPgXYPairs(XBIN(iStart:), YOBIN(iStart:))
 ! Now draw the difference plofile
       CALL IPgXYPairs(XBIN(iStart:), YDIF(iStart:))
-! Do the error bars - we've precalculated the min & max pointers
-      CALL IGrColourN(KolNumObs)
-      IF (PlotErrorBars()) THEN
+! Do the error bars on the difference profile - we've precalculated the min & max pointers
+      IF (PlotDifferenceErrorBars()) THEN
+	    esdmul = PlotEsdMultiplier()
+        CALL IGrColourN(KolNumDif)
         DO I = IPMIN, IPMAX
-          xptem = XBIN(I)
-          yptem = MAX(YOBIN(I)-EBIN(I), ypgmin)
+          xptem = XBIN(I)          
+          yptem = MAX(YDIF(I) - (EBIN(I) * esdmul), ypgmin)
           yptem = MIN(yptem,ypgmax)
           CALL IPgUnitsToGrUnits(xptem, yptem, xgtem, ygtem)
           CALL IGrMoveTo(xgtem,ygtem)
-          yptem = MIN(YOBIN(I)+EBIN(I), ypgmax)
+          yptem = MIN(YDIF(I) + (EBIN(I) * esdmul), ypgmax)
+          yptem = MAX(yptem, ypgmin)
+          CALL IPgUnitsToGrUnits(xptem, yptem, xgtem, ygtem)
+          CALL IGrLineTo(xgtem, ygtem)
+        ENDDO
+      ENDIF
+! Do the error bars on the observed profile - we've precalculated the min & max pointers
+      CALL IGrColourN(KolNumObs)
+      IF (PlotObservedErrorBars()) THEN
+        DO I = IPMIN, IPMAX
+          xptem = XBIN(I)
+          yptem = MAX(YOBIN(I) - ( EBIN(I)  * esdmul ), ypgmin)
+          yptem = MIN(yptem,ypgmax)
+          CALL IPgUnitsToGrUnits(xptem, yptem, xgtem, ygtem)
+          CALL IGrMoveTo(xgtem,ygtem)
+          yptem = MIN(YOBIN(I) + ( EBIN(I)  * esdmul ), ypgmax)
           yptem = MAX(yptem, ypgmin)
           CALL IPgUnitsToGrUnits(xptem, yptem, xgtem, ygtem)
           CALL IGrLineTo(xgtem, ygtem)

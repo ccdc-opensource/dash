@@ -1,4 +1,4 @@
-! Winteracter module created : 23/Aug/2007 17:48:53
+! Winteracter module created : 26/Sep/2007 21:50:48
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -693,4 +693,7 @@
           INTEGER, PARAMETER :: IDF_REAL_TOPAS_WSCALE_DIST      =  1536
           INTEGER, PARAMETER :: IDF_REAL_TOPAS_WSCALE_ANGLE     =  1544
           INTEGER, PARAMETER :: IDF_REAL_TOPAS_WSCALE_FLATTEN   =  1545
+          INTEGER, PARAMETER :: IDF_DifferenceErrorBar_Check    =  1558
+          INTEGER, PARAMETER :: IDF_ErrorMultiplier_RealEntry   =  1559
+          INTEGER, PARAMETER :: IDF_ErroBarMultiplier_Label     =  1560
       END MODULE Druid_Header

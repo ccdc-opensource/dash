@@ -575,14 +575,14 @@
 
       LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, SaveCCL, SaveCIF, SaveRES,  &
                            Get_ColourFlexibleTorsions, ConnectPointsObs,  &
-                           PlotErrorBars, PlotBackground,                 &
-                           PlotPeakFitDifferenceProfile,                  &
+                           PlotObservedErrorBars, PlotDifferenceErrorBars, &
+						   PlotBackground, PlotPeakFitDifferenceProfile,  &
                            WDialogGetCheckBoxLogical,                     &
                            Get_SavePRO, Get_OutputChi2vsMoves,            &
                            Get_DivideByEsd, Get_SavePrjAtEnd
       LOGICAL, EXTERNAL :: Get_WriteWavelength2XYEFile
       LOGICAL, EXTERNAL :: Get_ShowCumChiSqd, Get_AutoAlign
-      REAL, EXTERNAL :: WavelengthOf
+      REAL, EXTERNAL :: WavelengthOf, PlotEsdMultiplier
       CHARACTER*MaxPathLength tFileName
       CHARACTER*MaxPathLength DefaultWorkingDir
       INTEGER   RecNr
@@ -675,7 +675,7 @@
       CALL FileRWInteger(hFile, RecNr, RW, KolBack%IGreen)
       CALL FileRWInteger(hFile, RecNr, RW, KolBack%IBlue)
 ! Show error bars YES / NO
-      CALL FileWriteLogical(hFile, RecNr, PlotErrorBars())
+      CALL FileWriteLogical(hFile, RecNr, PlotObservedErrorBars())
 ! Show background YES / NO
       CALL FileWriteLogical(hFile, RecNr, PlotBackground())
 ! Connect data points with lines YES / NO
@@ -795,6 +795,10 @@
       CALL FileWriteInteger(hFile, RecNr, tInteger)
 ! Save .dash file at end of SA?
       CALL FileWriteLogical(hFile, RecNr, Get_SavePrjAtEnd())
+
+! Save difference profile?
+      CALL FileWriteLogical(hFile, RecNr, PlotDifferenceErrorBars())
+      CALL FileWriteReal(hFile, RecNr, PlotEsdMultiplier())
 
   999 CLOSE(hFile)
 
@@ -1112,6 +1116,12 @@
       CALL WDialogSelect(IDD_SA_input4)
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogPutCheckBoxLogical(IDC_OuputDASH, tLogical)
+
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDF_DifferenceErrorBar_Check, tLogical)
+
+      CALL FileReadReal(hFile, RecNr, tReal)
+      CALL WDialogPutReal(IDF_ErrorMultiplier_RealEntry, tReal)
 
       CLOSE(hFile)
       RETURN

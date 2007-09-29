@@ -594,7 +594,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION PlotErrorBars
+      LOGICAL FUNCTION PlotObservedErrorBars
 !
 ! This function retrieves the value of the 'plot error bars' checkbox in the plot options panel
 !
@@ -610,10 +610,49 @@
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      PlotErrorBars = WDialogGetCheckBoxLogical(IDF_ErrorBar_Check) 
+      PlotObservedErrorBars = WDialogGetCheckBoxLogical(IDF_ErrorBar_Check) 
       CALL PopActiveWindowID
 
-      END FUNCTION PlotErrorBars
+      END FUNCTION PlotObservedErrorBars
+
+	  LOGICAL FUNCTION PlotDifferenceErrorBars
+!
+! This function retrieves the value of the 'plot difference error bars' checkbox in the plot options panel
+!
+! RETURNS : .TRUE.  if user requested the error bars     to be plotted
+!           .FALSE. if user requested the error bars not to be plotted
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      PlotDifferenceErrorBars = WDialogGetCheckBoxLogical(IDF_DifferenceErrorBar_Check) 
+      CALL PopActiveWindowID
+      END FUNCTION PlotDifferenceErrorBars
+
+
+	  REAL FUNCTION PlotEsdMultiplier
+!
+! This function retrieves the value of the 'plot error multiplier field' checkbox in the plot options panel
+!
+! RETURNS : .TRUE.  if user requested the error bars     to be plotted
+!           .FALSE. if user requested the error bars not to be plotted
+!
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+      CALL WDialogGetReal(IDF_ErrorMultiplier_RealEntry, PlotEsdMultiplier) 
+      CALL PopActiveWindowID
+      END FUNCTION PlotEsdMultiplier
 !
 !*****************************************************************************
 !
