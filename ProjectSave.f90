@@ -146,7 +146,7 @@
 
       INTEGER         KNIPT
       REAL                            PIKVAL
-      COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
+      COMMON /FPINF1/ KNIPT(MaxKTem,MOBS), PIKVAL(MaxKTem,MOBS)
 
       INTEGER          NFITA, IFITA
       REAL                                 WTSA

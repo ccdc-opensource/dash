@@ -301,7 +301,7 @@
 
       INTEGER         KNIPT
       REAL                            PIKVAL
-      COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
+      COMMON /FPINF1/ KNIPT(MaxKTem,MOBS), PIKVAL(MaxKTem,MOBS)
 
       INTEGER         KREFT
       COMMON /FPINF2/ KREFT(MOBS)
@@ -432,11 +432,14 @@
         ELSE
           NFITA = NFITA + 1
           IFITA(NFITA) = I
-          KREFT(I) = MIN(50, 1 + KXIMAX(I) - KXIMIN(I))
+          KREFT(I) = MIN(MaxPik, 1 + KXIMAX(I) - KXIMIN(I))
           J = 0
           DO K = KXIMIN(I), KXIMAX(I)
             ARGT = (XBIN(I)-RefArgK(K)) / (FWHM)
             J = J + 1
+!C JCC - needs bound check on J here
+            IF ( J .GT. MaxPik ) GOTO 567
+
             KNIPT(J,I) = K
             Gaussian = (SQRT(C0)/(FWHM*SQRT(PI))) * EXP(-C0*(ARGT**2))
         !    Lorentzian = (2.0/(PI*FWHM)) * (1.0/(1.0+(4.0*(ARGT**2))))
@@ -490,6 +493,9 @@
       RETURN
   999 CLOSE(hFile)
       CALL ErrorMessage("Error writing .pik/.hcv file.")
+      RETURN
+  567 CLOSE(hFile)
+      CALL ErrorMessage("Error writing .pik/.hcv file: Bounds exceeded ")
 
       END FUNCTION HKLFFileLoad
 !

@@ -23,6 +23,10 @@
       PARAMETER ( MOBS = 15000 )
 ! For common block PROFOBS and PROFBIN
 
+      INTEGER MaxKtem
+	  PARAMETER ( MaxKtem = 50 )
+! Maximum dimension of KNIPT
+
       INTEGER     MAX_NPFR,      MAX_NPPR,      MAX_FITPT,         MPkDes
       PARAMETER ( MAX_NPFR = 50, MAX_NPPR = 10, MAX_FITPT = 10000, MPkDes = 6 )
 ! For common block PEAKFIT2
