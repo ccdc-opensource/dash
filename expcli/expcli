@@ -55,7 +55,8 @@ proc error_quit {msg} {
 proc normal_end {bn} {
 	global expgui
 	# output a pdb for Mercury only
-	catch {exec [file join $expgui(gsasexe) gsas2pdb.exe] $bn << "N\nN\n"}
+	#catch {exec [file join $expgui(gsasexe) gsas2pdb.exe] $bn << "N\nN\n"}
+	exp2cif 1
 	delete_archives $bn 1
 	exit 0
 }
@@ -453,6 +454,7 @@ set expgui(gsasexe) $expgui(gsasdir)/exe
 # default
 set phase 1
 set hist 1
+set expgui(export_phase) $phase
 # for liveplot
 set wishshell [info nameofexecutable] 
 set liveplot(hst) $hist
@@ -497,6 +499,7 @@ if {![expr $argc > 2] || [scan [lindex $argv 2] %d ncycle] < 1} {
 source $expgui(scriptdir)/readexp.tcl
 source $expgui(scriptdir)/gsascmds.tcl
 source $expgui(scriptdir)/addcmds.tcl
+source $expgui(scriptdir)/export_cif.tcl
 #source $expgui(scriptdir)/odf.tcl
 
 set expgui(expfile) [append expname	$basename .EXP]
