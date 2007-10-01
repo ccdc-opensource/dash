@@ -77,8 +77,7 @@
       CHARACTER*(*), INTENT (  OUT) :: ScriptName
       CHARACTER*(*), INTENT (IN   ) :: ExeName
 
-      CHARACTER*(*) SCRIPT_FILE
-      PARAMETER ( SCRIPT_FILE = 'RIETAN.CMD' )
+      CHARACTER*(*), PARAMETER :: ctScriptFile = 'RIETAN.CMD'
       CHARACTER(MaxPathLength) :: tDirName, tFileName
       LOGICAL exists
       INTEGER ExtLength
@@ -95,7 +94,7 @@
       CALL StrUpperCase(tExtension)
       IF ( tExtension .NE. 'EXE' ) goto 998
 
-      ScriptName = TRIM(InstallationDirectory)//SCRIPT_FILE
+      ScriptName = TRIM(InstallationDirectory)//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 999
  10   CheckRIETANExe = 0
@@ -114,7 +113,7 @@
       RETURN
  999  CALL ErrorMessage('DASH could not launch RIETAN script. '// &
                         'No script'//CHAR(13)//&
-                        '"'//SCRIPT_FILE//'" can be found at default locations.'//CHAR(13))
+                        '"'//ctScriptFile//'" can be found at default locations.'//CHAR(13))
       ScriptName = ''
       RETURN
 
@@ -250,7 +249,7 @@
                 CALL UpdateRIETANCheckBoxes
               ENDIF
             CASE (IDB_View)
-              CALL Launch_Viewer(ext_RR_input_file_name, 'cif')
+              CALL Launch_Viewer(ext_RR_input_file_name, '.cif')
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -269,9 +268,8 @@
       CHARACTER*(*), INTENT (IN) :: TheFileName
       INTEGER, INTENT (IN) :: OptWord
  
-      CHARACTER*(*) P_MARK
-      INTEGER hFileW, hFileR, iPMarkLen
-      PARAMETER ( hFileW = 116, hFileR = 117, P_MARK = ' #@DASH@MARK@P ', iPMarkLen = LEN(P_MARK) )
+      CHARACTER*(*), PARAMETER :: ctPMark = ' #@DASH@MARK@P '
+      INTEGER, PARAMETER :: chFileW = 116, chFileR = 117, ciPMarkLen = LEN(ctPMark)
       INTEGER p, flag, nCycle, kLen
       REAL tk, finc
       CHARACTER (40) tKeyWord
@@ -279,42 +277,42 @@
 
       ! Initialise to failure
       SetRefineParameters = 1
-      OPEN(UNIT=hFileW,FILE=TRIM(TheFileName)//'.tmp',STATUS='unknown',ERR=998)
-      OPEN(UNIT=hFileR,FILE=TRIM(TheFileName),STATUS='old',ERR=997)
+      OPEN(UNIT=chFileW,FILE=TRIM(TheFileName)//'.tmp',STATUS='unknown',ERR=998)
+      OPEN(UNIT=chFileR,FILE=TRIM(TheFileName),STATUS='old',ERR=997)
 
-      DO WHILE ( .NOT. EOF(hFileR) )
-        READ(hFileR, '(A)', ERR=997) tLine
-        WRITE(hFileW, '(A)', ERR=998) TRIM(tLine)
-        IF ( tLine(1:iPMarkLen) .NE. P_MARK ) CYCLE
-        READ(tLine(iPMarkLen+1:),*, ERR=998) tKeyWord
+      DO WHILE ( .NOT. EOF(chFileR) )
+        READ(chFileR, '(A)', ERR=997) tLine
+        WRITE(chFileW, '(A)', ERR=998) TRIM(tLine)
+        IF ( tLine(1:ciPMarkLen) .NE. ctPMark ) CYCLE
+        READ(tLine(ciPMarkLen+1:),*, ERR=998) tKeyWord
         kLen = LEN_TRIM(tKeyWord)
         IF ( kLen .LE. 0 ) CYCLE
-        READ(hFileR, '(A)', ERR=997) tLine2
+        READ(chFileR, '(A)', ERR=997) tLine2
 
         IF ( tKeyWord .EQ. 'NCYCL') THEN
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_SAW_Page7_RIETAN)
           CALL WDialogGetInteger(IDF_NCYCL, nCycle)
           CALL PopActiveWindowID
-          WRITE(hFileW, '(A,I3)', ERR=998) ' NCYCL = ', nCycle
+          WRITE(chFileW, '(A,I3)', ERR=998) ' NCYCL = ', nCycle
           CYCLE
         ELSE IF ( tKeyWord .EQ. 'TK') THEN
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_SAW_Page7_RIETAN)
           CALL WDialogGetReal(IDF_REAL_RIETAN_WEIGHT_TK, tk)
           CALL PopActiveWindowID
-          WRITE(hFileW, '(A,F10.2)', ERR=998) ' TK = ', tk
+          WRITE(chFileW, '(A,F10.2)', ERR=998) ' TK = ', tk
           CYCLE
         ELSE IF ( tKeyWord .EQ. 'FINC') THEN
           CALL PushActiveWindowID
           CALL WDialogSelect(IDD_SAW_Page7_RIETAN)
           CALL WDialogGetReal(IDF_REAL_RIETAN_WEIGHT_FINC, finc)
           CALL PopActiveWindowID
-          WRITE(hFileW, '(A,F10.2)', ERR=998) ' FINC = ', finc
+          WRITE(chFileW, '(A,F10.2)', ERR=998) ' FINC = ', finc
           CYCLE
         ELSE IF ( IAND(OptWord, Z'01') .NE. 0 ) THEN
 ! Initial: Replace next line
-          WRITE(hFileW, '(A)', ERR=998) TRIM(tLine(iPMarkLen+1:))
+          WRITE(chFileW, '(A)', ERR=998) TRIM(tLine(ciPMarkLen+1:))
           CYCLE
         ENDIF
 
@@ -337,7 +335,7 @@
         CASE DEFAULT
 !          p = SCAN(tLine, '/')
 !          IF ( p .GT. 0 ) THEN
-          p = iPMarkLen + SCAN(tLine(iPMarkLen+1:),tKeyWord(1:1)) + kLen
+          p = ciPMarkLen + SCAN(tLine(ciPMarkLen+1:),tKeyWord(1:1)) + kLen
           IF ( tLine(p:p) .EQ. '/' ) THEN
             ! Atoms
             IF ( tLine(p+1:p+2) .NE. 'H ' ) THEN
@@ -347,19 +345,19 @@
             ENDIF
             CALL set_parameter_id(flag, 2, 4)
             CALL set_parameter_id(IAND(OptWord, Z'20'), 5, 5)
-            WRITE(hFileW, '(A)', ERR=998) TRIM(tLine2)
+            WRITE(chFileW, '(A)', ERR=998) TRIM(tLine2)
             CYCLE
           ENDIF
           ! If any left
           flag = 0
         END SELECT
         CALL set_parameter_id(flag)
-        WRITE(hFileW, '(A)', ERR=998) TRIM(tLine2)
+        WRITE(chFileW, '(A)', ERR=998) TRIM(tLine2)
 
       ENDDO
 
-      CLOSE(hFileW)
-      CLOSE(hFileR, STATUS='delete')
+      CLOSE(chFileW)
+      CLOSE(chFileR, STATUS='delete')
 !      CALL IOSCommand('CMD.exe /C copy /Y "'//TRIM(TheFileName)//'.tmp" '// &
 !                      '"'//TRIM(TheFileName)//'"', ProcSilent+ProcBlocked)
 !      CALL IOsDeleteFile(TRIM(TheFileName))
@@ -368,8 +366,8 @@
       IF ( InfoError(1) .NE. 0 ) GOTO 996
       SetRefineParameters = 0
 
-  999 CLOSE(hFileW)
-      CLOSE(hFileR)
+  999 CLOSE(chFileW)
+      CLOSE(chFileR)
       RETURN
 
   996 CALL ErrorMessage('Error renaming ins file.')
@@ -440,9 +438,8 @@
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
       REAL, EXTERNAL :: FnWavelengthOfMenuOption
-      CHARACTER*(*) MARK
-      INTEGER hFileTmp, hFileIns, iMarkLen
-      PARAMETER ( hFileIns = 116, hFileTmp = 117, MARK = ' #@DASH@MARK@ ', iMarkLen = LEN(MARK) )
+      CHARACTER*(*), PARAMETER :: ctMark = ' #@DASH@MARK@ '
+      INTEGER, PARAMETER :: chFileIns = 116, chFileTmp = 117, ciMarkLen = LEN(ctMark)
       INTEGER iBaseLen, i, tLen, ExtLength
       CHARACTER (MaxPathLength) tDirName, tFileName, FileNameBase
       CHARACTER (40) tExtension, tKeyWord
@@ -462,18 +459,18 @@
       iBaseLen = LEN_TRIM(FileNameBase)
       tFileName = FileNameBase(1:iBaseLen)//'.int'
       tLen = iBaseLen + 4
-      OPEN(UNIT=hFileTmp,FILE=tFileName(1:tLen),STATUS='unknown',ERR=993)
+      OPEN(UNIT=chFileTmp,FILE=tFileName(1:tLen),STATUS='unknown',ERR=993)
       ! RIETAN int file
-      WRITE(hFileTmp, '(A,F10.6,A)', ERR=993) '* ', ALambda, ' Exported by DASH'
-      WRITE(hFileTmp, *, ERR=993) NBIN, XBIN(1), XBIN(2) - XBIN(1)
+      WRITE(chFileTmp, '(A,F10.6,A)', ERR=993) '* ', ALambda, ' Exported by DASH'
+      WRITE(chFileTmp, *, ERR=993) NBIN, XBIN(1), XBIN(2) - XBIN(1)
       yMax = 0.0
       DO I = 1, NBIN
         y = YOBIN(I)
         IF ( y .EQ. 0.0 ) y = 1E-8 ! Rietan does not accept zero
-        WRITE(hFileTmp, *, ERR=993) y
+        WRITE(chFileTmp, *, ERR=993) y
         yMax = max(yMax, y)
       ENDDO
-      CLOSE(hFileTmp)
+      CLOSE(chFileTmp)
       IF ( XBIN(1) .LT. 1E-1 ) CALL InfoMessage('The diffraction pattern starts at '// &
                               'an extremely low point ( < 0.1 degree two-theta ).'//CHAR(13)// &
                               'If Rietan complains with "Bad diffraction angle(s)", you may '//&
@@ -481,30 +478,30 @@
       ! RIETAN Gnuplot file
       tFileName = FileNameBase(1:iBaseLen)//'.plt'
       tLen = iBaseLen + 4
-      OPEN(UNIT=hFileTmp,FILE=tFileName(1:tLen),STATUS='unknown',ERR=993)
-      WRITE(hFileTmp, '(A)') '# GNUPLOT script for plotting RIETAN2000 itx file'
-      WRITE(hFileTmp, '(3(A,F10.2))') 'xmin=',XBIN(1),'; xmax=',XBIN(NBIN),'; ymax=', yMax
-      WRITE(hFileTmp, '(A)') 'ymin=-ymax/4; offset_delta=-0.11*(ymax-ymin)'
-      WRITE(hFileTmp, '(A)') 'len_bar=0.011*(ymax-ymin); y_phase1=-0.03*(ymax-ymin)'
-      WRITE(hFileTmp, '(A)') 'set xrange [xmin:xmax]'
-      WRITE(hFileTmp, '(A)') 'set yrange [ymin:ymax]'
-      WRITE(hFileTmp, '(A)') 'set pointsize 0.7'
-      WRITE(hFileTmp, '(A)') 'set mxtics 2'
-      WRITE(hFileTmp, '(A)') 'set mytics 2'
-      WRITE(hFileTmp, '(A)') 'set bar 0'
-      WRITE(hFileTmp, '(A)') 'set ticscale 1 1'
-      WRITE(hFileTmp, '(A)') 'set xlabel "2-theta/deg" 0.0, 0.2 font "Helvetica, 12"'
-      WRITE(hFileTmp, '(A)') 'set ylabel "Intensity" 0.5, 0.0 font "Helvetica, 12"'
-      WRITE(hFileTmp, '(A)') 'set terminal windows color "Helvetica" 10'
-      WRITE(hFileTmp, '(A)') 'plot \'
-      WRITE(hFileTmp, '(A)') ' "'//FileNameBase(LEN_TRIM(tDirName)+1:iBaseLen)//'.itx'// &
-                             '" using 1:2 notitle with points 2, \'
-      WRITE(hFileTmp, '(A)') ' "" using 1:3 notitle with lines linetype 8 linewidth 1, \'
-      WRITE(hFileTmp, '(A)') ' "" using  1:($2 - $3 + offset_delta) notitle with lines '// &
-                             'linetype 4 linewidth 1, \'
-      WRITE(hFileTmp, '(A)') ' "" using  8:(y_phase1):(len_bar) notitle with yerrorbars '// &
-                             'linetype 3 linewidth 1 pointtype 0'
-      CLOSE(hFileTmp)
+      OPEN(UNIT=chFileTmp,FILE=tFileName(1:tLen),STATUS='unknown',ERR=993)
+      WRITE(chFileTmp, '(A)') '# GNUPLOT script for plotting RIETAN2000 itx file'
+      WRITE(chFileTmp, '(3(A,F10.2))') 'xmin=',XBIN(1),'; xmax=',XBIN(NBIN),'; ymax=', yMax
+      WRITE(chFileTmp, '(A)') 'ymin=-ymax/4; offset_delta=-0.11*(ymax-ymin)'
+      WRITE(chFileTmp, '(A)') 'len_bar=0.011*(ymax-ymin); y_phase1=-0.03*(ymax-ymin)'
+      WRITE(chFileTmp, '(A)') 'set xrange [xmin:xmax]'
+      WRITE(chFileTmp, '(A)') 'set yrange [ymin:ymax]'
+      WRITE(chFileTmp, '(A)') 'set pointsize 0.7'
+      WRITE(chFileTmp, '(A)') 'set mxtics 2'
+      WRITE(chFileTmp, '(A)') 'set mytics 2'
+      WRITE(chFileTmp, '(A)') 'set bar 0'
+      WRITE(chFileTmp, '(A)') 'set ticscale 1 1'
+      WRITE(chFileTmp, '(A)') 'set xlabel "2-theta/deg" 0.0, 0.2 font "Helvetica, 12"'
+      WRITE(chFileTmp, '(A)') 'set ylabel "Intensity" 0.5, 0.0 font "Helvetica, 12"'
+      WRITE(chFileTmp, '(A)') 'set terminal windows color "Helvetica" 10'
+      WRITE(chFileTmp, '(A)') 'plot \'
+      WRITE(chFileTmp, '(A)') ' "'//FileNameBase(LEN_TRIM(tDirName)+1:iBaseLen)//'.itx'// &
+                              '" using 1:2 notitle with points 2, \'
+      WRITE(chFileTmp, '(A)') ' "" using 1:3 notitle with lines linetype 8 linewidth 1, \'
+      WRITE(chFileTmp, '(A)') ' "" using  1:($2 - $3 + offset_delta) notitle with lines '// &
+                              'linetype 4 linewidth 1, \'
+      WRITE(chFileTmp, '(A)') ' "" using  8:(y_phase1):(len_bar) notitle with yerrorbars '// &
+                              'linetype 3 linewidth 1 pointtype 0'
+      CLOSE(chFileTmp)
       CALL WDialogSelect(IDD_PW_Page4)
       r12 = 0.5
       IF ( JRadOption .EQ. 1 ) THEN
@@ -546,29 +543,28 @@
         RETURN
       ENDIF
       ! RIETAN instruction file: copy/fill template file
-      IF ( INDEX(RIETANEXE, '-FP') .GT. 0 .OR. INDEX(RIETANEXE, '-fp') .GT. 0 ) THEN
+      IF ( is_Rietan_FP ) THEN
         tFileName = TRIM(InstallationDirectory)//'rietanfp.tem'
       ELSE
         tFileName = TRIM(InstallationDirectory)//'rietan2000.tem'
       ENDIF
-      CALL PopActiveWindowID
-      OPEN(UNIT=hFileTmp,FILE=TRIM(tFileName),STATUS='old',ERR=997)
+      OPEN(UNIT=chFileTmp,FILE=TRIM(tFileName),STATUS='old',ERR=997)
       tFileName = FileNameBase(1:iBaseLen)//'.ins'
       tLen = iBaseLen + 4
-      OPEN(UNIT=hFileIns,FILE=tFileName(1:tLen),STATUS='unknown',ERR=998)
+      OPEN(UNIT=chFileIns,FILE=tFileName(1:tLen),STATUS='unknown',ERR=998)
       NumOfAtmPerElm = 0
       DO iFrg = 1, nFrag
         DO i = 1, natoms(iFrg)
           CALL INC(NumOfAtmPerElm(zmElementCSD(i,iFrg)))
         ENDDO
       ENDDO
-      DO WHILE ( .NOT. EOF(hFileTmp) )
-        READ(hFileTmp, '(A)', ERR=997) tLine
-        IF ( tLine(1:iMarkLen) .NE. MARK ) THEN
-          WRITE(hFileIns, '(A)', ERR=998) TRIM(tLine)
+      DO WHILE ( .NOT. EOF(chFileTmp) )
+        READ(chFileTmp, '(A)', ERR=997) tLine
+        IF ( tLine(1:ciMarkLen) .NE. ctMark ) THEN
+          WRITE(chFileIns, '(A)', ERR=998) TRIM(tLine)
           CYCLE
         ENDIF
-        READ(tLine(iMarkLen+1:),*, ERR=998) tKeyWord
+        READ(tLine(ciMarkLen+1:),*, ERR=998) tKeyWord
         SELECT CASE (tKeyWord)
         CASE ('NBEAM')
           WRITE(tLine, '(A,I1)', ERR=998) 'NBEAM = ', nBeam
@@ -584,7 +580,7 @@
           WRITE(tLine, '(A,F6.4)', ERR=998) ' CTHM2 = ', Pola
         CASE ('SPECIES')
 ! DASH seems doesn't keep the chemical state of each species, use element
-          WRITE(hFileIns, '(A)', ERR=998) ' # No chemical state kept by DASH, use element.'
+          WRITE(chFileIns, '(A)', ERR=998) ' # No chemical state kept by DASH, use element.'
           tLine = ''
           tLen = 1
           DO i = 1, MaxElm
@@ -596,10 +592,10 @@
           tLine = tLine(1:tLen)//' /'
         CASE ('SPECIES2')
 ! Can't find lamda dependent deltf' deltf'' for synchrotron, set to 0.0
-          WRITE(hFileIns, '(A)', ERR=998) " # No Deltf' Deltf'' kept by DASH, set to zero."
+          WRITE(chFileIns, '(A)', ERR=998) " # No Deltf' Deltf'' kept by DASH, set to zero."
           DO i = 1, MaxElm
             IF (NumOfAtmPerElm(i) .GT. 0) &
-                WRITE(hFileIns, '(A)', ERR=998) ' 0.0 0.0'
+                WRITE(chFileIns, '(A)', ERR=998) ' 0.0 0.0'
           ENDDO
           CYCLE
         CASE ('VNS1')
@@ -636,19 +632,19 @@
         CASE ('ILP1')
           WRITE(tLine, '(A,I3)', ERR=998) 'ILP1 = ', PO_Direction(3)
         CASE ('ATOMS')
-          IF ( WriteRIETANPhaseInfo(FileNameBase, hFileIns) ) GOTO 998
+          IF ( WriteRIETANPhaseInfo(FileNameBase, chFileIns) ) GOTO 998
           CYCLE
         CASE DEFAULT
           CYCLE
         END SELECT
 ! Replace next line
-        WRITE(hFileIns, '(A)', ERR=998) TRIM(tLine)
-        READ(hFileTmp, '(A)', ERR=997)
+        WRITE(chFileIns, '(A)', ERR=998) TRIM(tLine)
+        READ(chFileTmp, '(A)', ERR=997)
       ENDDO
       WriteRIETANFiles = 0
 
-  999 CLOSE(hFileIns)
-      CLOSE(hFileTmp)
+  999 CLOSE(chFileIns)
+      CLOSE(chFileTmp)
       RETURN
 
   990 CALL ErrorMessage('The non-standard space group:'//CHAR(13)//CHAR(13)// &
@@ -656,7 +652,7 @@
                         'is used but can not be mapped to any one defined in '//CHAR(13)// &
                         'RIETAN spgra file (up to v1.51b).')
       GOTO 999
-  993 CALL ErrorMessage('Error writing RIETAN int/plt file.')
+  993 CALL ErrorMessage('Error writing RIETAN int or plt file.')
       GOTO 999
   997 CALL ErrorMessage('Error opening/reading RIETAN template file.')
       GOTO 999
@@ -724,8 +720,7 @@
 
       LOGICAL, EXTERNAL :: PutAtomsForSpecailPosition
       LOGICAL, EXTERNAL :: PutRestraints, RIETANWriteDistance, RIETANWriteAngle, RIETANWritePlane
-      INTEGER hSP_file, hFileTmp
-      PARAMETER ( hFileTmp = 118, hSP_file = 60 )
+      INTEGER, PARAMETER :: chFileTmp = 118, chSPFile = 60
       INTEGER I, iNumAtom, id(4), p1, p2, prm_seq
       REAL xyz(3), sof, biso, biso0, biso1, prm_value
       CHARACTER*(120) tLine
@@ -741,15 +736,15 @@
 ! Xato (and all the RR variables). The Wizard window is suppressed because of the iRietveldMethod flag.
       CALL ShowWizardWindowRietveld(RR_SA_Sol)
       IF ( PutAtomsForSpecailPosition() ) GOTO 996
-      OPEN(UNIT=hSP_file, FILE="special_positions.out", STATUS='old', ERR=996)
-      OPEN(UNIT=hFileTmp, STATUS='SCRATCH', ERR=996)
+      OPEN(UNIT=chSPFile, FILE="special_positions.out", STATUS='old', ERR=996)
+      OPEN(UNIT=chFileTmp, STATUS='SCRATCH', ERR=996)
 
-      READ(hSP_file, *, ERR=996) word, word, biso0
-      READ(hSP_file, *, ERR=996)
+      READ(chSPFile, *, ERR=996) word, word, biso0
+      READ(chSPFile, *, ERR=996)
       iNumAtom = 0
       id(4) = 1
-      DO WHILE ( .NOT. EOF(hSP_file) )
-        READ(hSP_file, '(A)', ERR=996) tLine
+      DO WHILE ( .NOT. EOF(chSPFile) )
+        READ(chSPFile, '(A)', ERR=996) tLine
         READ(tLine, *, ERR=996) word
         IF ( word .EQ. 'prm' ) THEN
           READ(tLine, *, ERR=996) word, prm_name, prm_value
@@ -774,8 +769,8 @@
         IF ( sof .GT. 1.0 ) sof = 1.0
         biso = biso0
         IF ( symbol .EQ. 'H ' ) biso = 1.2 * biso0
-        WRITE(tLine, '(A,1X,F4.2,1X,4F10.6,1X,1H0,4I1)', ERR=999) TRIM(lab)//'/'//symbol, &
-                                                                  sof,xyz(1:3),biso,id
+        WRITE(tLine, '(A,1X,F4.2,1X,4F10.6,1X,1H0,4I1)', ERR=999) &
+                     TRIM(lab)//'/'//symbol, sof,xyz(1:3),biso,id
         WRITE(hFileIns, '(A/A)', ERR=999) ' #@DASH@MARK@P  '//TRIM(tLine), TRIM(tLine)
         IF ( iNumAtom .EQ. 0 ) THEN
           id(4) = 2
@@ -784,43 +779,43 @@
         ELSE
 ! constraint Biso to the first atom's
           WRITE(word, '(F6.2)', ERR=999) biso / biso1
-          WRITE(hFileTmp, '(1X,A)', ERR=999) 'A('//TRIM(lab)//',B)='//TRIM(word)// &
+          WRITE(chFileTmp, '(1X,A)', ERR=999) 'A('//TRIM(lab)//',B)='//TRIM(word)// &
                                              '*A('//TRIM(lab1)//',B)'
         ENDIF
         iNumAtom = iNumAtom + 1
       END DO
-      CLOSE(hSP_file)
+      CLOSE(chSPFile)
       WRITE(hFileIns, '(/A/A/)', ERR=999) 'end if', '} End of atoms'
       WRITE(hFileIns, '(A)', ERR=999) 'If NMODE <> 1 and NMODE <> 4 then'
       WRITE(hFileIns, '(A/)', ERR=999) 'Constraints {'
-      REWIND (hFileTmp)
-      DO WHILE ( .NOT. EOF(hFileTmp) )
-        READ(hFileTmp, '(A)', ERR=999) tLine
+      REWIND (chFileTmp)
+      DO WHILE ( .NOT. EOF(chFileTmp) )
+        READ(chFileTmp, '(A)', ERR=999) tLine
         WRITE(hFileIns, '(A)', ERR=999) tLine
       ENDDO
       IF ( iNumAtom .GT. 1 ) WRITE(hFileIns, '(/A/)', ERR=999) '} End of constraints'
-      CLOSE(hFileTmp)
+      CLOSE(chFileTmp)
 
-      OPEN(UNIT=hFileTmp, FILE=TRIM(FileNameBase)//'.pha', &
+      OPEN(UNIT=chFileTmp, FILE=TRIM(FileNameBase)//'.pha', &
            STATUS='unknown', ERR=997)
-      WRITE(hFileTmp, '(A)', ERR=997) '# restraints'
-      IF ( PutRestraints(hFileTmp, RIETANWriteDistance, RIETANWriteAngle, &
+      WRITE(chFileTmp, '(A)', ERR=997) '# restraints'
+      IF ( PutRestraints(chFileTmp, RIETANWriteDistance, RIETANWriteAngle, &
                          RIETANWritePlane) ) GOTO 997
-      CLOSE(hFileTmp)
+      CLOSE(chFileTmp)
 
       WriteRIETANPhaseInfo = 0
       RETURN
 
   996 CALL ErrorMessage('Error writing/reading special_positions (Rietveld).')
-      CLOSE(hSP_file)
-      CLOSE(hFileTmp)
+      CLOSE(chSPFile)
+      CLOSE(chFileTmp)
       RETURN
   997 CALL ErrorMessage('Error writing restraint file for RIETAN (Rietveld).')
-      CLOSE(hFileTmp)
+      CLOSE(chFileTmp)
       RETURN
   999 CALL ErrorMessage('Error writing RIETAN ins file (Rietveld).')
-      CLOSE(hSP_file)
-      CLOSE(hFileTmp)
+      CLOSE(chSPFile)
+      CLOSE(chFileTmp)
       RETURN
 
       CONTAINS
@@ -852,7 +847,7 @@
 ! constrainted
           READ(string(p:), *, ERR=10) word
           IF ( word .NE. prm_name ) GOTO 10
-          WRITE(hFileTmp, '(1X,A)') 'A('//TRIM(lab)//','//tKwStr(i)(2:2)//')'//string(:p-1)// &
+          WRITE(chFileTmp, '(1X,A)') 'A('//TRIM(lab)//','//tKwStr(i)(2:2)//')'//string(:p-1)// &
                                     'A('//TRIM(lab)//','//tKwStr(prm_seq)(2:2)//')'// &
                                     string(p+LEN_TRIM(word):)
           xyz(i) = 0.0
@@ -898,10 +893,9 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      CHARACTER*(*) R_MARK
-      INTEGER iRMarkLen, hFileFfe, hFileInsR, hFileInsW, hFilePha
-      PARAMETER ( R_MARK = ' #@DASH@MARK@R ', iRMarkLen = LEN(R_MARK) )
-      PARAMETER ( hFileFfe = 60, hFileInsR = 116, hFileInsW = 117, hFilePha = 118 )
+      CHARACTER*(*), PARAMETER :: ctRMark = ' #@DASH@MARK@R '
+      INTEGER, PARAMETER :: ciRMarkLen = LEN(ctRMark), chFileFfe = 60, &
+                            chFileInsR = 116, chFileInsW = 117, chFilePha = 118
       CHARACTER(MaxPathLength) :: tDirName, tFileName, FileNameBase
       CHARACTER*8 tExtension
       CHARACTER*120 tLine
@@ -915,7 +909,7 @@
 
 ! width of atom sequence, different between 2000 and fp
       w = '2'
-      IF ( INDEX(RIETANEXE, '-FP') .GT. 0 .OR. INDEX(RIETANEXE, '-fp') .GT. 0 ) w = '3'
+      IF ( is_Rietan_FP ) w = '3'
 
       INQUIRE(FILE=TheFileName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 996
@@ -926,23 +920,23 @@
       INQUIRE(FILE=FileNameBase(:iBaseLen)//'.ffe', EXIST=exists)
       IF ( .NOT. exists ) GOTO 998
 ! Wind ffe file
-      OPEN(UNIT=hFileFfe, FILE=FileNameBase(:iBaseLen)//'.ffe', STATUS='unknown', ERR=998)
-      DO WHILE ( .NOT. EOF(hFileFfe) )
-        READ(hFileFfe, '(A)', ERR=998) tLine
+      OPEN(UNIT=chFileFfe, FILE=FileNameBase(:iBaseLen)//'.ffe', STATUS='unknown', ERR=998)
+      DO WHILE ( .NOT. EOF(chFileFfe) )
+        READ(chFileFfe, '(A)', ERR=998) tLine
         IF ( tLine(1:34) .EQ. ' INTERATOMIC DISTANCE IN ANGSTROMS') EXIT
       END DO
 ! Copy ins up to restraint record
-      OPEN(UNIT=hFileInsR, FILE=TheFileName, STATUS='old', ERR=996)
-      OPEN(UNIT=hFileInsW, FILE=TRIM(TheFileName)//'.tmp', &
+      OPEN(UNIT=chFileInsR, FILE=TheFileName, STATUS='old', ERR=996)
+      OPEN(UNIT=chFileInsW, FILE=TRIM(TheFileName)//'.tmp', &
            STATUS='unknown', ERR=996)
-      DO WHILE ( .NOT. EOF(hFileInsR) )
-        READ(hFileInsR, '(A)', Err=996) tLine
-        WRITE(hFileInsW, '(A)', Err=996) TRIM(tLine)
-        IF ( tLine(:iRMarkLen) .EQ. R_Mark ) THEN
-          DO WHILE ( .NOT. EOF(hFileInsR) )
-            READ(hFileInsR, '(A)', Err=996) tLine
-            IF ( tLine(:iRMarkLen+3) .EQ. R_Mark//'END' ) THEN
-              BACKSPACE(hFileInsR)
+      DO WHILE ( .NOT. EOF(chFileInsR) )
+        READ(chFileInsR, '(A)', Err=996) tLine
+        WRITE(chFileInsW, '(A)', Err=996) TRIM(tLine)
+        IF ( tLine(:ciRMarkLen) .EQ. ctRMark ) THEN
+          DO WHILE ( .NOT. EOF(chFileInsR) )
+            READ(chFileInsR, '(A)', Err=996) tLine
+            IF ( tLine(:ciRMarkLen+3) .EQ. ctRMark//'END' ) THEN
+              BACKSPACE(chFileInsR)
               GOTO 20
             ENDIF
           END DO
@@ -951,45 +945,45 @@
       END DO
       GOTO 996
 ! Copy distance and angle restraints from pha to ins and ffe files
-  20  OPEN(UNIT=hFilePha, FILE=FileNameBase(:iBaseLen)//'.pha', STATUS='old', ERR=997)
+  20  OPEN(UNIT=chFilePha, FILE=FileNameBase(:iBaseLen)//'.pha', STATUS='old', ERR=997)
       n = 0
-      DO WHILE ( .NOT. EOF(hFilePha) )
-        READ(hFilePha, '(A)', Err=997) tLine
+      DO WHILE ( .NOT. EOF(chFilePha) )
+        READ(chFilePha, '(A)', Err=997) tLine
         IF ( tLine(1:4) .NE. 'DIST') CYCLE
         READ(tLine(5:), *, Err=997) a1, a2, value, std
         n = n + 1
-        WRITE(hFileFfe,'(I6,4X,2(A,I'//w//'),A/)', ERR=998) n,' (', a1,',    0) (',a2,',    0)'
-        WRITE(hFileInsW,'(I6,2(X,F8.4))', Err=996) n, value, std
+        WRITE(chFileFfe,'(I6,4X,2(A,I'//w//'),A/)', ERR=998) n,' (', a1,',    0) (',a2,',    0)'
+        WRITE(chFileInsW,'(I6,2(X,F8.4))', Err=996) n, value, std
       END DO
-      WRITE(hFileFfe,'(//A)') ' BOND ANGLE IN DEGREES.  CENTRAL ATOM IS VERTEX'
-      REWIND(hFilePha, Err=997)
-      DO WHILE ( .NOT. EOF(hFilePha) )
-        READ(hFilePha, '(A)', Err=997) tLine
+      WRITE(chFileFfe,'(//A)') ' BOND ANGLE IN DEGREES.  CENTRAL ATOM IS VERTEX'
+      REWIND(chFilePha, Err=997)
+      DO WHILE ( .NOT. EOF(chFilePha) )
+        READ(chFilePha, '(A)', Err=997) tLine
         IF ( tLine(1:4) .NE. 'ANGL') CYCLE
         READ(tLine(5:), *, Err=997) a1, a2, a3, value, std
         n = n + 1
-        WRITE(hFileFfe,'(I6,4X,3(A,I'//w//'),A/)', ERR=998) n,' (', a1,',    0) (',a2, &
+        WRITE(chFileFfe,'(I6,4X,3(A,I'//w//'),A/)', ERR=998) n,' (', a1,',    0) (',a2, &
                          ',    0) (', a3,',    0)'
-        WRITE(hFileInsW,'(I6,2(X,F8.2))', Err=996) n, value, std
+        WRITE(chFileInsW,'(I6,2(X,F8.2))', Err=996) n, value, std
       END DO
-      CLOSE(hFileFfe)
-      CLOSE(hFilePha)
+      CLOSE(chFileFfe)
+      CLOSE(chFilePha)
 ! Copy rest of ins
-      DO WHILE ( .NOT. EOF(hFileInsR) )
-        READ(hFileInsR, '(A)', Err=996) tLine
-        WRITE(hFileInsW, '(A)', Err=996) TRIM(tLine)
+      DO WHILE ( .NOT. EOF(chFileInsR) )
+        READ(chFileInsR, '(A)', Err=996) tLine
+        WRITE(chFileInsW, '(A)', Err=996) TRIM(tLine)
       END DO
-      CLOSE(hFileInsW)
-      CLOSE(hFileInsR, STATUS='delete')
+      CLOSE(chFileInsW)
+      CLOSE(chFileInsR, STATUS='delete')
       CALL InfoError(1)
       CALL IOsRenameFile(TRIM(TheFileName)//'.tmp', TRIM(TheFileName))
       IF ( InfoError(1) .NE. 0 ) GOTO 996
       CopyRIETANRestraints = 0
 
-  999 CLOSE(hFileFfe)
-      CLOSE(hFilePha)
-      CLOSE(hFileInsW)
-      CLOSE(hFileInsR)
+  999 CLOSE(chFileFfe)
+      CLOSE(chFilePha)
+      CLOSE(chFileInsW)
+      CLOSE(chFileInsR)
       RETURN
 
   996 CALL ErrorMessage('Error copying RIETAN ins file (Rietveld).')
