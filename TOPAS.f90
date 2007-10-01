@@ -14,7 +14,7 @@
       LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
       CHARACTER*20, EXTERNAL :: Integer2String
       LOGICAL exists, run_TOPAS_in_background
-      INTEGER M, I, tLen, dLen
+      INTEGER M, I, tLen
       CHARACTER*20 stage_str
       CHARACTER*(255) tDirName, tFileName
       INTEGER hFile
@@ -113,8 +113,11 @@
       hFileTOPAS = 116
       tLen = LEN_TRIM(TheFileName)
       OPEN(UNIT=hFileTOPAS, FILE=TheFileName(1:tLen), STATUS='unknown', ERR=999)
+      WRITE(hFileTOPAS, '(A)', ERR=999) '#include "'// &
+                                        TRIM(InstallationDirectory)//'TOPAS.inc"'
       ! Ideally, we need to figure out if penalties_weighting_K1 can be made local to the "str" keyword.
       WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 5'
+      WRITE(hFileTOPAS, '(A)', ERR=999) "'do_errors"
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp 1.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp_dash 1.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_wp 1.0'
@@ -136,7 +139,7 @@
       iLen_1 = iLen + 8
       OPEN(UNIT=hTempFile,FILE=tFileName(1:iLen_1),STATUS='unknown',ERR=998)
       DO i = 1, NBIN
-        WRITE(hTempFile, '(F10.5,1X,F12.4,1X,F12.5)', ERR=998) XBIN(i), YOBIN(i), EBIN(i)
+        WRITE(hTempFile, '(F12.7,1X,F12.4,1X,F12.5)', ERR=998) XBIN(i), YOBIN(i), EBIN(i)
       ENDDO
       CLOSE(hTempFile)
       WRITE(hFileTOPAS, '(A)', ERR=999) 'xdd "'//tFileName(1:iLen_1)//'" xye_format'
@@ -161,7 +164,19 @@
       ENDIF
       WRITE(hFileTOPAS, '(A)', ERR=999) '  Rp 217.5'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  Rs 217.5'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '  Simple_Axial_Model(@, 9.0)'
+!      WRITE(hFileTOPAS, '(A)', ERR=999) '  Simple_Axial_Model(@, 9.0)'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '  axial_conv'
+      IF ( JRadOption .EQ. 1 ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    filament_length   @   6.0'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    sample_length   @   3.5'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    receiving_slit_length   @  12.0'
+      ELSE
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    filament_length   @   1.0'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    sample_length   @   1.0'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    receiving_slit_length   @  3.0'
+      ENDIF
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    axial_n_beta  20'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    axial_del  0.0053'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  lam'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    ymin_on_ymax 0.001'
       CALL WDialogSelect(IDD_PW_Page4)
@@ -195,10 +210,14 @@
       ENDIF
       WRITE(hFileTOPAS, '(A,F8.6)', ERR=999) '  x_calculation_step ', (XBIN(NBIN) - XBIN(1)) / (NBIN - 1)
       WRITE(hFileTOPAS, '(A)', ERR=999) '  hkl_Is'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    CS_L(@, 200.00)'
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    CS_L(@, 5000.00)' !200.00
       WRITE(hFileTOPAS, '(A)', ERR=999) '    CS_G(@, 200.00)'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    Strain_G(@, 0.1)'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    Strain_L(@, 0.01)'
+      IF ( JRadOption .EQ. 1 ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    Strain_G(@, 0.2)'
+      ELSE
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    Strain_G(@, 0.01)'
+      ENDIF
+      WRITE(hFileTOPAS, '(A)', ERR=999) '    Strain_L(@, 0.1)' !0.01
       IF ( LatBrav .LT. 6 ) THEN ! Triclinic through orthorhombic: no constraints on a, b or c.
         WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    a  @ ', CELLPAR(1)
         WRITE(hFileTOPAS, '(A,F10.5)', ERR=999) '    b  @ ', CELLPAR(2)
@@ -495,10 +514,10 @@
       ! We need to remember which atoms have been assigned to an assembly
       CHARACTER(MaxPathLength) FileNameToRead, FileNameToWrite
       CHARACTER*255 tDirName, tFileName, tExtension
-      INTEGER ExtLength, hSP_out_file, tLen
+      INTEGER ExtLength, hSP_out_file
       LOGICAL was_Pawley
       LOGICAL in_spherical_harmonics
-      REAL wscale_bond, wscale_angle, wscale_flatten
+      INTEGER wscale_bond, wscale_angle, wscale_flatten
 
       was_Pawley = .FALSE. ! This is a remnant from when it was still possible
       ! to start from a previously generated .inp file.
@@ -609,15 +628,15 @@
           GOTO 45
        50 CONTINUE
           CLOSE(hSP_out_file)
-          CALL WDialogGetReal(IDF_REAL_TOPAS_WSCALE_DIST, wscale_bond)
-          CALL WDialogGetReal(IDF_REAL_TOPAS_WSCALE_ANGLE, wscale_angle)
-          CALL WDialogGetReal(IDF_REAL_TOPAS_WSCALE_FLATTEN, wscale_flatten)
+          CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_DIST, wscale_bond)
+          CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_ANGLE, wscale_angle)
+          CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_FLAT, wscale_flatten)
           WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_width 0'
-          WRITE(hFileTOPAS, '(A,F10.0)', ERR=999) '    prm !bond_weight ', wscale_bond !10000
+          WRITE(hFileTOPAS, '(A,I10)', ERR=999) '    prm !bond_weight ', wscale_bond !10000
           WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_width 1'
-          WRITE(hFileTOPAS, '(A,F10.0)', ERR=999) '    prm !angle_weight ', wscale_angle !1
+          WRITE(hFileTOPAS, '(A,I10)', ERR=999) '    prm !angle_weight ', wscale_angle !1
           WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !flatten_width 0'
-          WRITE(hFileTOPAS, '(A,F10.0)', ERR=999) '    prm !flatten_weight ', wscale_flatten !1000000
+          WRITE(hFileTOPAS, '(A,I10)', ERR=999) '    prm !flatten_weight ', wscale_flatten !1000000
           IF ( PutRestraints(hFileTOPAS, TOPASWriteDistance, TOPASWriteAngle, TOPASWritePlane) ) GOTO 999
           ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
           !                            END
@@ -641,6 +660,8 @@
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ELSE IF ( (word_len .EQ. 11) .AND. (word(1:11) .EQ. 'OUT_CIF_STR') ) THEN
         ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( (word_len .EQ. 16) .AND. (word(1:16) .EQ. 'OUT_CIF_STR_UISO') ) THEN
+        ! Do nothing: it will be added at the end if necessary
       ELSE IF ( (word_len .EQ. 11) .AND. (word(1:11) .EQ. 'OUT_X_YCALC') ) THEN
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( (word_len .EQ. 10) .AND. (word(1:10) .EQ. 'OUT_X_YOBS') ) THEN
@@ -649,8 +670,13 @@
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( (word_len .EQ. 29) .AND. (word(1:29) .EQ. 'OUT_YOBS_YCALC_AND_DIFFERENCE') ) THEN
         ! Do nothing: it will be added at the end if necessary
-      ELSE IF ( (word_len .EQ. 9) .AND. (word(1:9) .EQ. 'DO_ERRORS') ) THEN
-        ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( ((word_len .EQ. 9) .AND. (word(1:9) .EQ. 'DO_ERRORS')) &
+          .OR.  ((word_len .EQ. 10) .AND. (word(1:10) .EQ. "'DO_ERRORS")) ) THEN
+        IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+          WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors'
+        ELSE
+          WRITE(hFileTOPAS, '(A)', ERR=999) "'do_errors"
+        ENDIF
       ELSE IF ( (word_len .EQ. 3) .AND. (word(1:3) .EQ. 'PRM') ) THEN
         ! Need to check if this is the "prm sh_scale 1.0 min 0.0001" line.
         iPos = StrFind(tLine, iLen, 'sh_scale', 8)
@@ -668,15 +694,14 @@
             ENDIF
           ELSE
             IF ( INDEX(tLine, '!bond_weight') .GT. 0 ) THEN
-              CALL WDialogGetReal(IDF_REAL_TOPAS_WSCALE_DIST, wscale_bond)
-              WRITE(tLine, '(A,F10.0)', ERR=999) '    prm !bond_weight ', wscale_bond
+              CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_DIST, wscale_bond)
+              WRITE(tLine, '(A,I10)', ERR=999) '    prm !bond_weight ', wscale_bond
             ELSE IF ( INDEX(tLine, '!angle_weight') .GT. 0 ) THEN
-              tLine = '    prm !angle_weight 3'
-              CALL WDialogGetReal(IDF_REAL_TOPAS_WSCALE_ANGLE, wscale_angle)
-              WRITE(tLine, '(A,F10.0)', ERR=999) '    prm !flatten_weight ', wscale_angle
+              CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_ANGLE, wscale_angle)
+              WRITE(tLine, '(A,I10)', ERR=999) '    prm !angle_weight ', wscale_angle
             ELSE IF ( INDEX(tLine, '!flatten_weight') .GT. 0 ) THEN
-              CALL WDialogGetReal(IDF_REAL_TOPAS_WSCALE_FLATTEN, wscale_flatten)
-              WRITE(tLine, '(A,F10.0)', ERR=999) '    prm !flatten_weight ', wscale_flatten
+              CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_FLAT, wscale_flatten)
+              WRITE(tLine, '(A,I10)', ERR=999) '    prm !flatten_weight ', wscale_flatten
             ENDIF
           ENDIF
         ENDIF
@@ -786,13 +811,11 @@
       IF ( .NOT. is_last_line ) GOTO 10
    40 CLOSE(hOutputFile)
       IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//TRIM(FileNameBase)//'.cif")'
+!        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//TRIM(FileNameBase)//'.cif")'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR_Uiso("'//TRIM(FileNameBase)//'.cif")'
       ENDIF
 !      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_X_Ycalc("'//TRIM(FileNameBase)//'.pp")'
 !      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_Yobs_Ycalc_and_Difference("'//TRIM(FileNameBase)//'_1.xco")'
-      IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
-        WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors'
-      ENDIF
       WriteTOPASFileRietveld2 = 0
       CLOSE(hFileTOPAS)
       RETURN
@@ -908,7 +931,13 @@
         CALL GenerateAtomLabel(iElements(I), members(I), Label)
         WRITE(hFile, '(1X,A7$)', ERR=999) Label
       ENDDO
-      WRITE(hFile, '(A)', ERR=999) ', 0, flatten_width, flatten_weight)'
+! There are two flatten macros in TOPAS3:
+!   Flatten(sites, c, t_calc, tol, wscale)
+!   Flatten(sites, t_calc, tol, wscale) and
+! The second one is only a wrapper of the first. But it seems the arguments t_calc
+! and tol were put in wrong place. Call the first one instead 
+!      WRITE(hFile, '(A)', ERR=999) ', 0, flatten_width, flatten_weight)'
+      WRITE(hFile, '(A)', ERR=999) ',, 0, flatten_width, flatten_weight)'
       TOPASWritePlane = .FALSE.
   999 RETURN
 

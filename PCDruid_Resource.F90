@@ -690,10 +690,13 @@
           INTEGER, PARAMETER :: IDF_REAL_GSAS_FACTR_PLANE       =  1478
           INTEGER, PARAMETER :: IDF_REAL_RIETAN_WEIGHT_TK       =  1481
           INTEGER, PARAMETER :: IDF_REAL_RIETAN_WEIGHT_FINC     =  1488
-          INTEGER, PARAMETER :: IDF_REAL_TOPAS_WSCALE_DIST      =  1536
-          INTEGER, PARAMETER :: IDF_REAL_TOPAS_WSCALE_ANGLE     =  1544
-          INTEGER, PARAMETER :: IDF_REAL_TOPAS_WSCALE_FLATTEN   =  1545
+          INTEGER, PARAMETER :: IDF_INTEGER_TOPAS_WSCALE_DIST      =  1536
+          INTEGER, PARAMETER :: IDF_INTEGER_TOPAS_WSCALE_ANGLE     =  1544
+          INTEGER, PARAMETER :: IDF_INTEGER_TOPAS_WSCALE_FLAT   =  1545
           INTEGER, PARAMETER :: IDF_DifferenceErrorBar_Check    =  1558
           INTEGER, PARAMETER :: IDF_ErrorMultiplier_RealEntry   =  1559
           INTEGER, PARAMETER :: IDF_ErroBarMultiplier_Label     =  1560
+          INTEGER, PARAMETER :: IDC_Exhaustive                  =  1561
+          INTEGER, PARAMETER :: IDC_cif_for_viewer              =  1562
+
       END MODULE Druid_Header
