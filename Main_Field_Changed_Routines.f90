@@ -99,6 +99,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCLOSE, IDCANCEL)
 ! Update with user's editing
+              CALL WDialogGetString(IDF_DICVOLExe, DICVOLEXE)
               CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
               CALL WDialogGetString(IDF_EXPGUIExe, EXPGUIEXE)
               CALL WDialogGetString(IDF_RIETANExe, RIETANEXE)
@@ -135,12 +136,12 @@
                        'All executables (*.exe)|*.exe|'
 ! IFTYPE specifies which of the file types in the list is the default
               IFTYPE = 2
-              tFileName = DICVOL04EXE
-              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select DICVOL04 Executable', IFTYPE)
+              tFileName = DICVOLEXE
+              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select DICVOL04 or later Executable', IFTYPE)
 ! Did the user press cancel?
               IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
-                DICVOL04EXE = tFileName
-                CALL WDialogPutString(IDF_DICVOLExe, DICVOL04EXE)
+                DICVOLEXE = tFileName
+                CALL WDialogPutString(IDF_DICVOLExe, DICVOLEXE)
               ENDIF
             CASE (IDBBROWSE4)
               IFLAGS = LoadDialog + PromptOn

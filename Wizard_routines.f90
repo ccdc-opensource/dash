@@ -147,6 +147,12 @@
         ELSE
           CALL WDialogFieldState(IDF_RADIO4, 0)
         ENDIF
+      ELSE IF ( TheDialogID .EQ. IDD_PW_Page7 ) THEN
+        IF ( LEN_TRIM(DICVOLEXE) .GT. 0 ) THEN
+          CALL WDialogFieldState(IDF_RADIO2, 1)
+        ELSE
+          CALL WDialogFieldState(IDF_RADIO2, 0)
+        ENDIF
       ENDIF
 
       END SUBROUTINE WizardWindowShow
@@ -914,7 +920,7 @@
       INCLUDE 'GLBVAR.INC'
 
       LOGICAL, EXTERNAL :: FnUnitCellOK
-      INTEGER IndexOption
+      INTEGER IndexOption, p
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page7)
@@ -928,6 +934,7 @@
               SELECT CASE (IndexOption)
                 CASE (1) ! Index pattern now
                   CALL WDialogSelect(IDD_PW_Page8)
+                  DICVOL_ver = DICVOL_internal
 ! If this is synchrotron data, then set the default error in the peak positions to 0.03 rather than 0.04.
 ! This decreases the number of solutions and increases the speed of the search.
                   IF (JRadOption .EQ. 2) THEN
@@ -936,8 +943,18 @@
                     CALL WDialogPutReal(IDF_eps, 0.04, '(F5.3)')
                   ENDIF
                   CALL WizardWindowShow(IDD_PW_Page8)
-                CASE (2) ! DICVOL04
+                CASE (2) ! external DICVOL
                   CALL WDialogSelect(IDD_PW_Page8b)
+                  p = LEN_TRIM(DICVOLEXE)
+                  IF ( p .GE. 6 .AND. (DICVOLEXE(p-5:p) .EQ. '06.exe' .OR. &
+                       DICVOLEXE(p-5:p) .EQ. '06.EXE') ) THEN
+                    DICVOL_ver = DICVOL06
+                    CALL WDialogFieldState(IDC_Exhaustive,Enabled)
+                  ELSE
+                    DICVOL_ver = DICVOL04
+                    CALL WDialogPutCheckBoxLogical(IDC_Exhaustive, .FALSE.)
+                    CALL WDialogFieldState(IDC_Exhaustive,Disabled)
+                  ENDIF
 ! If this is synchrotron data, then set the default error in the peak positions to 0.03 rather than 0.04.
 ! This decreases the number of solutions and increases the speed of the search.
                   IF (JRadOption .EQ. 2) THEN
@@ -1292,10 +1309,11 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE DealWithWizardWindowDICVOL04
+      SUBROUTINE DealWithWizardWindowExtDICVOL
 
       USE DRUID_HEADER
       USE VARIABLES
+      USE DICVAR
 
       IMPLICIT NONE
 
@@ -1318,14 +1336,17 @@
 
       LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm
       REAL,    EXTERNAL :: TwoTheta2dSpacing
+      INTEGER ParseDICVOLOutputFile
       REAL    Rvpar(2), Rdens, Rmolwt, Rexpzp
       INTEGER iSystem(6), hFile, MaxImpurityLines
       INTEGER I, iOrd, iHandle, NumDoF
       REAL    Epsilon, MaxLen, MaxSinBeta, tBeta, tFoM, wave
       CHARACTER(MaxPathLength) tFileName
       LOGICAL exists
-      INTEGER M, iEstimateZeroPointError, iRefineZeroPointError 
-      REAL Amax, Bmax, Cmax, Bemin, Bemax, DV_ScaleFactor
+      INTEGER M, iEstimateZeroPointError, iRefineZeroPointError, iExhaustive
+!      REAL Amax, Bmax, Cmax, Bemin, Bemax, DV_ScaleFactor
+      CHARACTER*2 nStr
+      INTEGER nFOM, iLen
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_PW_Page8b)
@@ -1360,6 +1381,7 @@
               CALL WDialogGetInteger(IDF_MaxImpLines, MaxImpurityLines)
               CALL WDialogGetCheckBox(IDC_Estimate_zp, iEstimateZeroPointError)
               CALL WDialogGetCheckBox(IDC_Refine_zp, iRefineZeroPointError)
+              CALL WDialogGetCheckBox(IDC_Exhaustive, iExhaustive)
 ! Number of degrees of freedom, we don't even count the zero point
               NumDoF = 0
               IF ( iSystem(1) .EQ. 1 ) NumDof = MAX(NumDoF, 1)
@@ -1426,87 +1448,107 @@
               ! and then I/O redirect the contents of the file to DICVOL04.
               ! Note that
               !
-              ! CALL IOSCommand(DICVOL04EXE(1:I)//' < in.txt', ProcBlocked)
+              ! CALL IOSCommand(DICVOLEXE(1:I)//' < in.txt', ProcBlocked)
               !
               ! does not work, but instead we must start a new CMD:
               !
-              ! CALL IOSCommand('CMD.EXE /C '//DICVOL04EXE(1:I)//' < in.txt', ProcBlocked)
+              ! CALL IOSCommand('CMD.EXE /C '//DICVOLEXE(1:I)//' < in.txt', ProcBlocked)
               !
               ! The switch /C causes the CMD.exe to exit when it's finished
               hFile = 116
               OPEN(UNIT=hFile, FILE='in.txt', STATUS='UNKNOWN', ERR=997)
-              WRITE(hFile,'(A)',ERR=997) 'DICVOL.in'
-              WRITE(hFile,'(A)',ERR=997) 'DICVOL.out'
+              WRITE(hFile,'(A)',ERR=997) 'DASHDV.in'  !'DICVOL.in'
+              WRITE(hFile,'(A)',ERR=997)  DV_FileName !'DICVOL.out'
               CLOSE(hFile)
+              CALL IOsDeleteFile(DV_FileName)
 ! Write it out 
-              tFileName = 'DICVOL.in'
+              tFileName = 'DASHDV.in'
               hFile = 117
               OPEN(UNIT=hFile, FILE=tFileName, STATUS='UNKNOWN', ERR=997)
               WRITE(hFile,*,ERR=997) 'DICVOL input file created by DASH'
               WRITE(hFile,'(8(I3,1X))',ERR=997) NTPeak, 2, (iSystem(i),i=1,6)
               WRITE(hFile,'(7(F8.2,1X))',ERR=997) amax, Bmax, Cmax, Rvpar(1), Rvpar(2), Bemin, Bemax
               WRITE(hFile,'(F10.6,1X,3(F8.4,1X))',ERR=997) wave, Rmolwt, Rdens, Rdens/50.0
-              WRITE(hFile,'(F5.3,1X,F6.2,1X,I3,1X,I1,1X,I1)',ERR=997) Epsilon * DV_ScaleFactor, tFoM, MaxImpurityLines, iEstimateZeroPointError, iRefineZeroPointError
+              WRITE(hFile,'(F5.3,1X,F6.2,1X,I3,3(1X,I1))',ERR=997) Epsilon * DV_ScaleFactor, &
+                                            tFoM, MaxImpurityLines, iEstimateZeroPointError, &
+                                            iRefineZeroPointError, iExhaustive
               DO I = 1, NTPeak
                 iOrd = iOrdTem(i)
                 WRITE(hFile,'(F12.4)',ERR=997) AllPkPosVal(iOrd)-Rexpzp
               ENDDO
               CLOSE(hFile)
-              ! Launch DICVOL04 and wait for it to return
+              ! Launch external DICVOL and wait for it to return
               CALL PushActiveWindowID
               CALL WDialogSelect(IDD_Configuration)
-              CALL WDialogGetString(IDF_DICVOLExe, DICVOL04EXE)
+              CALL WDialogGetString(IDF_DICVOLExe, DICVOLEXE)
               CALL PopActiveWindowID
-              I = LEN_TRIM(DICVOL04EXE)
+              I = LEN_TRIM(DICVOLEXE)
               IF ( I .EQ. 0 ) THEN
-                CALL ErrorMessage("DASH could not launch your DICVOL04. No executable is currently specified."//CHAR(13)//&
+                CALL ErrorMessage("DASH could not launch your DICVOL. No executable is currently specified."//CHAR(13)//&
                                   "This can be changed in the Configuration... window"//CHAR(13)//&
                                   "under Options in the menu bar.")
                 CALL PopActiveWindowID
                 CALL WCursorShape(CurCrossHair)
                 RETURN
               ENDIF
-              INQUIRE(FILE = DICVOL04EXE(1:I),EXIST=exists)
+              INQUIRE(FILE = DICVOLEXE(1:I),EXIST=exists)
               IF (.NOT. exists) GOTO 998
               M = InfoError(1) ! Clear errors
-              CALL IOSCommand('CMD.EXE /C '//DICVOL04EXE(1:I)//' < in.txt', ProcBlocked)
+              CALL IOSCommand('CMD.EXE /C "'//DICVOLEXE(1:I)//'" < in.txt', ProcBlocked)
               IF (InfoError(1) .NE. 0) GOTO 998
               CALL WCursorShape(CurCrossHair)
-
-
-              CALL ParseDICVOL04OutputFile()
-
-
-              ! #### TODO need to reconsider the following. Ideally, we should fill the
-              !  "Results from DICVOL" Wizard window and jump to that window.
-
-              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
-              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
-              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
-
+              NumOfDICVOLSolutions = ParseDICVOLOutputFile(nFOM)
+              IF ( NumOfDICVOLSolutions .LE. 0 ) THEN
 ! Pop up a window showing the DICVOL output file in a text editor
-              CALL WindowOpenChild(iHandle)
-              CALL WEditFile('DICVOL.out', Modeless, 0, FileMustExist+ViewOnly+NoToolBar, 4)
-! If 'ViewOnly' is specified:
-! 1. The file can be accessed while it is displayed.
-! 2. There is no 'Save as...' option in the menu.
-! If the output file is viewed without 'ViewOnly', the file cannot be accessed, which means that
-! DICVOL returns with an error message which means that there are no solutions.
-! Hence, this way, DICVOL can be run several times in succession and the results can be compared
-! on screen. To save one of the output files (that all have the same name),
-! the user must use the "Save As..." button from the same window.
-              CALL SetChildWinAutoClose(iHandle)
-
-              CALL WDialogSelect(IDD_PW_Page1)
-! If the cell is OK, the Next> button should be enabled
-              CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
-              CALL WizardWindowShow(IDD_PW_Page1)
-
-              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
-              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
-              ! =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
-
-!F              CALL WizardWindowShow(IDD_PW_Page9)
+                CALL WindowOpenChild(iHandle)
+                CALL WEditFile(DV_FileName, Modeless, 0, FileMustExist+ViewOnly+NoToolBar, 4)
+                CALL SetChildWinAutoClose(iHandle)
+! Grey out the "Previous Results >" button in the DICVOL Wizard window
+                CALL WDialogFieldState(IDB_PrevRes, Disabled)
+                CALL ErrorMessage('No solutions were found.')
+                GOTO 999
+              ENDIF
+! If only a single solution, and no valid cell available, import that solution by default
+              IF ((NumOfDICVOLSolutions.EQ.1) .AND. (.NOT. FnUnitCellOK())) THEN
+! Import the unit cell parameters into DASH
+                CellPar(1) = DICVOLSolutions(1)%a
+                CellPar(2) = DICVOLSolutions(1)%b
+                CellPar(3) = DICVOLSolutions(1)%c
+                CellPar(4) = DICVOLSolutions(1)%alpha
+                CellPar(5) = DICVOLSolutions(1)%beta
+                CellPar(6) = DICVOLSolutions(1)%gamma
+                LatBrav = DICVOLSolutions(1)%CrystalSystem
+                CALL Upload_CrystalSystem
+                CALL UpdateCell
+              ENDIF
+! Pop up the next Wizard window showing the solutions, so that the user can choose one to be imported into DASH
+              CALL WDialogSelect(IDD_PW_Page9)
+! Clear all fields in the grid
+              CALL WDialogClearField(IDF_DV_Summary_0)
+              WRITE(nStr,'(I2)') nFOM
+              CALL StrClean(nStr,iLen)
+              CALL WGridLabelColumn(IDF_DV_Summary_0,10,'M('//nStr(1:iLen)//')')
+              CALL WGridLabelColumn(IDF_DV_Summary_0,11,'F('//nStr(1:iLen)//')')
+! Set the number of rows in the grid to the number of solutions.
+              CALL WGridRows(IDF_DV_Summary_0,NumOfDICVOLSolutions)
+              DO I = 1, NumOfDICVOLSolutions
+                CALL WGridPutCellString(IDF_DV_Summary_0, 2, I, CrystalSystemString(DICVOLSolutions(I)%CrystalSystem))
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 3, I, DICVOLSolutions(I)%a,'(F8.4)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 4, I, DICVOLSolutions(I)%b,'(F8.4)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 5, I, DICVOLSolutions(I)%c,'(F8.4)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 6, I, DICVOLSolutions(I)%alpha,'(F7.3)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 7, I, DICVOLSolutions(I)%beta,'(F7.3)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 8, I, DICVOLSolutions(I)%gamma,'(F7.3)')
+                CALL WGridPutCellReal  (IDF_DV_Summary_0, 9, I, DICVOLSolutions(I)%Volume,'(F9.2)')
+                IF (DICVOLSolutions(I)%M .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0, 10, I, DICVOLSolutions(I)%M,'(F7.1)')
+                IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0, 11, I, DICVOLSolutions(I)%F,'(F7.1)')
+              ENDDO
+! Ungrey the "Previous Results >" button in the DICVOL Wizard window
+              CALL WDialogSelect(IDD_PW_Page8b)
+              CALL WDialogFieldState(IDB_PrevRes,Enabled)
+              CALL WizardWindowShow(IDD_PW_Page9)
+            CASE (IDB_PrevRes)
+              CALL WizardWindowShow(IDD_PW_Page9)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
@@ -1517,8 +1559,8 @@
       END SELECT
   999 CALL PopActiveWindowID
       RETURN
-  998 CALL ErrorMessage("DASH could not launch DICVOL04. The executable is currently configured"//CHAR(13)//&
-                        "to launch the program "//DICVOL04EXE(1:I)//CHAR(13)//&
+  998 CALL ErrorMessage("DASH could not launch DICVOL. The executable is currently configured"//CHAR(13)//&
+                        "to launch the program "//TRIM(DICVOLEXE)//CHAR(13)//&
                         "This can be changed in the Configuration... window"//CHAR(13)//&
                         "under Options in the menu bar.")
       CALL PopActiveWindowID
@@ -1529,72 +1571,227 @@
       CALL PopActiveWindowID
       CALL WCursorShape(CurCrossHair)
 
-      END SUBROUTINE DealWithWizardWindowDICVOL04
+      END SUBROUTINE DealWithWizardWindowExtDICVOL
 !
 !*****************************************************************************
 !
-      SUBROUTINE ParseDICVOL04OutputFile
+      INTEGER FUNCTION ParseDICVOLOutputFile(nFOM)
+
+      USE DICVAR
 
       IMPLICIT NONE
 
-      INTEGER, EXTERNAL :: StrFind
+      INTEGER, INTENT (OUT) :: nFOM
+
+      CHARACTER*1, EXTERNAL ::  ChrUpperCase, ChrLowerCase
       INTEGER hFile
-      INTEGER iLen, iPos
-      CHARACTER(10) tFileName
+      PARAMETER ( hFile = 117 )
+      INTEGER iLen, iPos, iStage, nSolutions, i, j
+      LOGICAL SolutionAppend
       CHARACTER(255) tLine
-      CHARACTER(17) direct_parameters_str
-      CHARACTER(18) FoM_str
-      INTEGER       FoM_stage ! 1 = first to follow, 2 = second to follow, 0 = not pertinent
-      REAL          a, b, c, alpha, beta, gamma, M, F
+      CHARACTER(10) sys_str
+      REAL          a, b, c, alpha, betaa, gamma, Volume, M, F
 
-      CALL PushActiveWindowID
-      direct_parameters_str = 'DIRECT PARAMETERS'
-      FoM_str = '* FIGURES OF MERIT'
-      tFileName = 'DICVOL.out'
-      FoM_stage = 0
-      hFile = 117
-      OPEN(UNIT=hFile, FILE=tFileName, STATUS='UNKNOWN', ERR=999)
-   10 CONTINUE
-      READ(hFile, '(A)', ERR=999, END=100) tLine
-      iLen = LEN_TRIM(tLine)
-      iPos = StrFind(tLine, iLen, direct_parameters_str, 17)
-      IF ( iPos .NE. 0 ) THEN
-        READ(tLine(28:37), *, ERR=999, END=100) a 
-        READ(tLine(41:50), *, ERR=999, END=100) b 
-        READ(tLine(54:63), *, ERR=999, END=100) c 
-        READ(tLine(28:37), *, ERR=999, END=100) alpha 
-        READ(tLine(28:37), *, ERR=999, END=100) beta 
-        READ(tLine(28:37), *, ERR=999, END=100) gamma 
+      ParseDICVOLOutputFile = 0
+      nSolutions = 0
+      nFOM = 0
+      SolutionAppend = .FALSE.
+      iStage = 0
+      OPEN(UNIT=hFile, FILE=DV_FileName, STATUS='OLD', ERR=999)
+      DO WHILE ( .NOT. EOF(hFile) )
+        READ(hFile, '(A)', ERR=999, END=100) tLine
+        iLen = LEN_TRIM(tLine)
+        IF ( iLen .LT. 1 ) CYCLE
+    
+!        iPos =  INDEX(tLine, 'S Y S T E M', back=.TRUE.)
+        iPos =  MatchAnchoredString(tLine, 'S Y S T E M', .FALSE.)
+        IF ( iPos .GT. 1 ) THEN
+          IF ( SolutionAppend ) CALL AddOneSolution(nSolutions)
+          iPos = iPos - 1
+          j = 0
+          sys_str = ' '
+          DO i = 1, iPos
+            IF ( tLine(i:i) .EQ. ' ' ) CYCLE
+            j = j + 1
+            IF ( j .GT. LEN(sys_str) ) EXIT
+            sys_str(j:j) = tLine(i:i)
+!            IF ( j .EQ. 1 ) THEN
+!              sys_str(j:j) = ChrUpperCase(tLine(i:i))
+!            ELSE
+!              sys_str(j:j) = ChrLowerCase(tLine(i:i))
+!            ENDIF
+          ENDDO
+          IF ( j .GT. 0 ) iStage = 1
+          CYCLE
+        ENDIF
+  
+        SELECT CASE (iStage)
+          CASE (1)
+ !           iPos = INDEX(tLine, 'DIRECT PARAMETERS')
+            iPos = MatchAnchoredString(tLine, 'DIRECT PARAMETERS', .TRUE.)
+            IF ( iPos .LE. 0 ) CYCLE
+            M = 0.0
+            F = 0.0
+! DICVOL does not test for Trigonal and Rhombohedral systems
+            a = 0.0
+            alpha = 90.0
+            betaa = 90.0
+            gamma = 90.0
+            IF ( sys_str(1:4) .EQ. 'HEXA' ) gamma = 120.0
+            iPos = INDEX(tLine, ' A=')
+            IF ( iPos .GT. 0 ) THEN
+              iPos = INDEX(tLine, ' ALPHA=')
+              IF ( iPos .GT. 0 ) READ(tLine(iPos+7:), *, ERR=999, END=100) alpha 
+              iPos = INDEX(tLine, ' BETA=')
+              IF ( iPos .GT. 0 ) READ(tLine(iPos+6:), *, ERR=999, END=100) betaa
+              iPos = INDEX(tLine, ' GAMMA=')
+              IF ( iPos .GT. 0 ) READ(tLine(iPos+7:), *, ERR=999, END=100) gamma
+              iPos = INDEX(tLine, ' VOLUME=')
+              IF ( iPos .GT. 0 ) READ(tLine(iPos+8:), *, ERR=999, END=100) Volume
+            ELSE
+              READ(hFile, '(A)', ERR=999, END=100) tLine
+              iPos = INDEX(tLine, ' ALP=')
+              IF ( iPos .GT. 0 ) READ(tLine(iPos+5:), *, ERR=999, END=100) alpha 
+              iPos = INDEX(tLine, ' BET=')
+              IF ( iPos .GT. 0 ) READ(tLine(iPos+5:), *, ERR=999, END=100) betaa
+              iPos = INDEX(tLine, ' GAM=')
+              IF ( iPos .GT. 0 ) READ(tLine(iPos+5:), *, ERR=999, END=100) gamma
+              iPos = INDEX(tLine, ' VOL=')
+              IF ( iPos .GT. 0 ) READ(tLine(iPos+5:), *, ERR=999, END=100) Volume
+            ENDIF
+            iPos = INDEX(tLine, ' A=')
+            IF ( iPos .GT. 0 ) READ(tLine(iPos+3:), *, ERR=999, END=100) a
+            b = a
+            c = a
+            iPos = INDEX(tLine, ' B=')
+            IF ( iPos .GT. 0 ) READ(tLine(iPos+3:), *, ERR=999, END=100) b 
+            iPos = INDEX(tLine, ' C=')
+            IF ( iPos .GT. 0 ) READ(tLine(iPos+3:), *, ERR=999, END=100) c 
+            IF ( a .EQ. 0.0 ) GOTO 999
+            nSolutions = nSolutions + 1
+            IF ( nSolutions .GT. MaxDICVOLSolutions ) GOTO 996
+            SolutionAppend = .TRUE.
+            iStage = 2
+          CASE (2)
+!            iPos = INDEX(tLine, '* FIGURES OF MERIT')
+            iPos = MatchAnchoredString(tLine, '* FIGURES OF MERIT', .TRUE.)
+            IF ( iPos .LE. 0 ) CYCLE
+            READ(hFile, '(A)', ERR=999, END=100) tLine
+            IF ( nFOM .EQ. 0 ) THEN
+              iPos = INDEX(tLine,'M(') + 2
+              READ(tLine(iPos:), *, ERR=999, END=100) nFOM
+            ENDIF
+            iPos = INDEX(tLine,'=') + 1
+            READ(tLine(iPos:), *, ERR=999, END=100) M 
+    
+            READ(hFile, '(A)', ERR=999, END=100) tLine
+            iPos = INDEX(tLine,'=') + 1
+            READ(tLine(iPos:iPos+6), *, ERR=999, END=100) F 
+            iStage = 0
+        END SELECT
+      ENDDO
 
-        GOTO 10
-      ENDIF
-
-      iPos = StrFind(tLine, iLen, FoM_str, 18)
-      IF ( iPos .NE. 0 ) THEN
-        FoM_stage = 1
-        GOTO 10
-      ENDIF
-      IF ( FoM_stage .EQ. 1 ) THEN
-        READ(tLine(28:37), *, ERR=999, END=100) M 
-        FoM_stage = 2
-        GOTO 10
-      ENDIF
-      IF ( FoM_stage .EQ. 2 ) THEN
-        READ(tLine(28:37), *, ERR=999, END=100) F 
-        FoM_stage = 0
-      ENDIF
-      GOTO 10
   100 CLOSE(hFile)
+      IF ( SolutionAppend ) CALL AddOneSolution(nSolutions)
 
-
-
-      CALL PopActiveWindowID
+      ParseDICVOLOutputFile = nSolutions
       RETURN
-  999 CALL ErrorMessage("Error reading DICVOL04 output file.")
-      CLOSE(hFile)
-      CALL PopActiveWindowID
 
-      END SUBROUTINE ParseDICVOL04OutputFile
+996   WRITE(sys_str,'(I2)') MaxDICVOLSolutions
+      CALL WarningMessage('More than '//TRIM(sys_str)// &
+                          ' solutions found, please check your data.')
+      GOTO 100
+999   CALL ErrorMessage("Error reading DICVOL output file.")
+      SolutionAppend = .FALSE.
+      nSolutions = 0
+      GOTO 100
+
+      CONTAINS
+      
+! Match 'string' anchored at left/right of 'line' (exclude lead/tail spaces)
+! Return its position if matched, 0 otherwise
+      INTEGER FUNCTION MatchAnchoredString(line, string, left)
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN) :: line, string
+      LOGICAL, INTENT (IN) :: left
+      INTEGER p, l
+
+      MatchAnchoredString = 0
+      l = LEN(string)
+      IF (left) THEN
+        p = VERIFY(line,' '//CHAR(9)) ! space or tab
+        IF ( l .GT. 0 .AND. p .GT. 0 .AND. LEN(line) .GE. l+p-1 ) THEN
+          IF ( line(p:p+l-1) .EQ. string ) MatchAnchoredString = p
+        ENDIF
+      ELSE
+        p = LEN_TRIM(line) - l + 1
+        IF ( l .GT. 0 .AND. p .GT. 0 ) THEN
+          IF ( line(p:p+l-1) .EQ. string ) MatchAnchoredString = p
+        ENDIF
+      ENDIF
+      RETURN
+
+      END FUNCTION MatchAnchoredString
+      
+! Map DICVOL crystal system string to DASH
+      INTEGER FUNCTION MapLatBrav(str, alpha, gamma)
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN) :: str
+      REAL, INTENT (IN) :: alpha, gamma
+
+      SELECT CASE (str(1:4))
+        CASE ('MONO')
+          IF ( ABS(alpha-90.0) .GT. 1E-7 ) THEN
+            MapLatBrav = 2
+          ELSE IF ( ABS(gamma-90.0) .GT. 1E-7 ) THEN
+            MapLatBrav = 4
+          ELSE
+            MapLatBrav = 3
+          ENDIF
+        CASE ('ORTH')
+          MapLatBrav = 5
+        CASE ('TETR')
+          MapLatBrav = 6
+        CASE ('TRIG')
+          MapLatBrav = 7
+        CASE ('RHOM')
+          MapLatBrav = 8
+        CASE ('HEXA')
+          MapLatBrav = 9
+        CASE ('CUBI')
+          MapLatBrav = 10
+        CASE DEFAULT
+          MapLatBrav = 1
+      END SELECT
+      RETURN
+
+      END FUNCTION MapLatBrav
+
+      SUBROUTINE AddOneSolution(I)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN) :: I
+
+      DICVOLSolutions(I)%a = a
+      DICVOLSolutions(I)%b = b
+      DICVOLSolutions(I)%c = c
+      DICVOLSolutions(I)%alpha = alpha
+      DICVOLSolutions(I)%beta = betaa
+      DICVOLSolutions(I)%gamma = gamma
+      DICVOLSolutions(I)%Volume = Volume
+      DICVOLSolutions(I)%CrystalSystem = MapLatBrav(sys_str(1:4), alpha, gamma)
+      DICVOLSolutions(I)%M = M
+      DICVOLSolutions(I)%F = F
+      SolutionAppend = .FALSE.
+      
+      END SUBROUTINE AddOneSolution
+
+      END FUNCTION ParseDICVOLOutputFile
 !
 !*****************************************************************************
 !
@@ -1622,7 +1819,13 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (IDBACK)
-              CALL WizardWindowShow(IDD_PW_Page8)
+              CALL PushActiveWindowID
+              IF (DICVOL_ver .EQ. DICVOL_internal) THEN
+                CALL WizardWindowShow(IDD_PW_Page8)
+              ELSE
+                CALL WizardWindowShow(IDD_PW_Page8b)
+              ENDIF
+              CALL PopActiveWindowID
             CASE (IDNEXT)
               CALL WizardWindowShow(IDD_PW_Page1)
             CASE (IDB_View)
@@ -1710,10 +1913,10 @@
 ! Did we get here from 'Enter known cell' in wizard window Indexing I?
               CALL WDialogSelect(IDD_PW_Page7)
               CALL WDialogGetRadioButton(IDF_RADIO3, iOption) ! 'Index now' or 'Enter known cell'
-              IF (iOption .EQ. 1) THEN
-                CALL WizardWindowShow(IDD_PW_Page9)
-              ELSE
+              IF (iOption .EQ. 3) THEN
                 CALL WizardWindowShow(IDD_PW_Page7)
+              ELSE
+                CALL WizardWindowShow(IDD_PW_Page9)
               ENDIF
             CASE (IDNEXT)
               CALL Download_SpaceGroup(IDD_PW_Page1)

@@ -344,11 +344,14 @@
       VIEWARG = ''
       VIEWEXE = ''
       MOGULEXE = ' '
+      DICVOLEXE = ''
       TOPASEXE = ''
       EXPGUIEXE = ''
       RIETANEXE = ''
       CALL GetPathToMercuryFromRegistry
       CALL GetPathToMogulFromRegistry
+      CALL GetPathToTopasFromRegistry
+      CALL GetPathToExpguiFromRegistry
       DO I = 0, maxfrg
         izmoid(0,I) = 0
         izmbid(0,I) = 0
@@ -389,6 +392,8 @@
       CALL WDialogPutString(IDF_ViewExe, ViewExe)
       CALL WDialogPutString(IDF_ViewArg, ViewArg)
       CALL WDialogPutString(IDF_MogulExe, MogulExe)
+      CALL WDialogPutString(IDF_TopasExe, TopasExe)
+      CALL WDialogPutString(IDF_EXPGUIExe, ExpguiExe)
       CALL Set_AutoLocalMinimisation(.TRUE.)
       CALL Set_UseHydrogensDuringAutoLocalMinimise(.TRUE.)
       CALL Set_UseCrystallographicCoM(.TRUE.)
@@ -777,8 +782,8 @@
       CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_AvgFriedelPairs))
 ! Following is new in DASH 3.1
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetString(IDF_DICVOLExe, DICVOL04EXE)
-      CALL FileWriteString(hFile, RecNr, DICVOL04EXE)
+      CALL WDialogGetString(IDF_DICVOLExe, DICVOLEXE)
+      CALL FileWriteString(hFile, RecNr, DICVOLEXE)
       CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
       CALL FileWriteString(hFile, RecNr, TOPASEXE)
       CALL WDialogGetString(IDF_EXPGUIExe, EXPGUIEXE)
@@ -1085,13 +1090,13 @@
       CALL WDialogPutCheckBoxLogical(IDF_AvgFriedelPairs, tLogical)
 ! Following is new in DASH 3.1
 ! Read the DICVOL04 path
-      CALL FileReadString(hFile, RecNr, DICVOL04EXE)
+      CALL FileReadString(hFile, RecNr, DICVOLEXE)
       IF (GetBFIOError() .NE. 0) THEN
         CLOSE(hFile)
         RETURN
       ENDIF
       CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutString(IDF_DICVOLExe, DICVOL04EXE)
+      CALL WDialogPutString(IDF_DICVOLExe, DICVOLEXE)
       CALL FileReadString(hFile, RecNr, TOPASEXE)
       CALL WDialogPutString(IDF_TOPASExe, TOPASEXE)
       CALL FileReadString(hFile, RecNr, EXPGUIEXE)
