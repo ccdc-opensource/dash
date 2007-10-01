@@ -7,8 +7,8 @@
 
       IMPLICIT NONE
 
-      INTEGER iRietveldMethod, INTERNAL_RB, FOR_TOPAS, FOR_GSAS, FOR_RIETAN
-      PARAMETER (INTERNAL_RB=0, FOR_TOPAS=1, FOR_GSAS=2, FOR_RIETAN=3)
+      INTEGER iRietveldMethod
+      INTEGER, PARAMETER :: INTERNAL_RB=0, FOR_TOPAS=1, FOR_GSAS=2, FOR_RIETAN=3
 
 	  CHARACTER(255) :: TOPASEXE, EXPGUIEXE, RIETANEXE
 
@@ -16,7 +16,7 @@
 
       INTEGER ext_RR_stage
 
-      LOGICAL use_anisotropic_broadening
+      LOGICAL use_anisotropic_broadening, is_Rietan_FP
 
       CHARACTER(255) old_diffraction_data_file_name
 
