@@ -1,0 +1,825 @@
+###############################################################
+# This template file is part of DASH to RIETAN-2000 interface.
+#
+# Warning: 
+#     The line begin with " #@DASH@MARK@" is for DASH ONLY.
+#     Don't change or remove!
+# 
+###############################################################
+#### Original header #####
+# 
+# This is a template file for RIETAN-2000 for angle-dispersive X-ray and neutron
+# diffraction.
+
+# Many comments are sprinkled in this file for beginners.  Power users may
+# delete part of them to shorten it.  Addition of memorandums is also fine.
+# Comments can be input in the following manner:
+
+# (1) # comment
+# (2) Comment {
+# (3) } comment
+# (4) Variable name = value: comment
+# (5) Variable name = value! comment
+
+# Form (1) may in input from the middle of a line.  Lines with a top character
+# of '#' or forms (2) and (5) are regarded as comment lines as a whole.
+# Form (2), which is usually used in combination with form (3), is optional;
+# that is, it is a mere comment line without any effect during refinement.
+# Form (3) is used to indicate the end of a series of input lines.  Variable
+# names in Forms (4) and (5) should appear only once in one file.  The first
+# character of an integer variable should be I, J, K, L, M, or N whereas that
+# of a real variable capital letters other than these characters.
+
+ #@DASH@MARK@ TITLE (CHARACTER*80)
+DASH solution
+
+NBEAM = 0! Neutron powder diffraction.
+NBEAM = 1! Conventional X-ray powder diffraction with characteristic X rays.
+NBEAM = 2! Synchrotron X-ray powder diffraction.
+ #@DASH@MARK@ NBEAM 1 2
+NBEAM = 1
+
+NMODE = 0! Rietveld analysis of powder diffraction data.
+NMODE = 1! Calculation of powder diffraction intensities (plus simulation).
+NMODE = 2! Total-pattern fitting where structure factors are fixed at Fc(MEM)'s.
+NMODE = 3! The same as NMODE = 2 but refine |Fc|'s for relaxed reflections.
+NMODE = 4! Conventional Le Bail analysis.
+NMODE = 5! Le Bail analysis using a partial structure.
+NMODE = 6! Individual profile fitting.
+ #@DASH@MARK@P NMODE = 4
+NMODE = 0
+
+NPRINT = 0! Minimal output.
+NPRINT = 1! Standard output.
+NPRINT = 2! Detailed output.
+NPRINT = 0
+
+If NBEAM = 0 then
+   XLMDN = 1.5401: Neutron wavelength/Angstrom.
+   RADIUS = 0.5: Radius/cm of the cylindrical cell.
+   ABSORP =  1.0! Positive --> Density/g.cm-3 of the sample.*
+   ABSORP =  0.0: Zero --> Neglect absorption.
+   ABSORP = -1.0! Negative --> -(Linear absorption coefficient)*(radius).
+   # * Calculated from the inner diameter, height, and mass of the sample.
+else if NBEAM = 1 then
+   NTARG = 1! Ag K_alpha radiation.
+   NTARG = 2! Mo K_alpha radiation.
+   NTARG = 3! Cu K_beta radiation.
+   NTARG = 4! Cu K_alpha radiation.
+   NTARG = 5! Co K_alpha radiation.
+   NTARG = 6! Fe K_alpha radiation.
+   NTARG = 7! Cr K_alpha radiation.
+ #@DASH@MARK@ NTARG
+   NTARG = 4: Cu K_alpha radiation.
+
+   R12 = 0.5! R12 = Intensity(K_alpha2)/Intensity(K_alpha1) for K_alpha radiation, and R12 = 0.0 for Cu K_beta radiation.
+ #@DASH@MARK@    R12  ! Set 0.0 for K_alpha1 (confirmed by Dr Fujio Izumi)
+   R12 = 0.5
+
+ #@DASH@MARK@ CTHM1 0.7998 mono 1.0 no-mono
+   CTHM1 = 0.7998: (cos(2*alpha))**n for the monochromator.*
+   # * alpha: Bragg angle of the monochromator. CTHM1 = 1.0 if no monochromator is installed.
+   NSURFR = 0: Do not correct for surface roughness.
+   NSURFR = 1! Correct for surface roughness by combining NSURFR = 2 and 3.
+   NSURFR = 2! Correct for surface roughness with Sparks et al.'s model.
+   NSURFR = 3! Correct for surface roughness with Suortti's model.
+   NSURFR = 4! Correct for surface roughness with Pitschke et al.'s model.
+
+   NTRAN = 0! Bragg-Brentano geometry (conventional divergence slit).
+   NTRAN = 1! Bragg-Brentano geometry (automatic divergence slit*).
+   NTRAN = 2! Transmission geometry (e.g., Guinier diffractometer).
+   NTRAN = 3! Debye-Scherrer geometry.
+   NTRAN = 3
+   # * This slit gives variable divergence angles and a fixed irradiation width.
+else if NBEAM = 2 then
+ #@DASH@MARK@ XLMDX 
+   XLMDX = 1.5401: X-Ray wavelength/Angstrom.
+   PCOR2 = 0.05: I0(perpendicular)/I0(parallel). I0: incident intensity.
+   # Refer to D.E. Cox, "Synchrotron Radiation Crystallography," ed by
+   # P. Coppens, Academic Press, London (1992), p. 233.
+ #@DASH@MARK@ CTHM2 1.0 no-mono
+   CTHM2 = 1.0: cos(2*alpha)**2 for the crystal monochromator (see above).
+   XMUR2 = 0.0: (Linear absorption coefficient)*(radius).
+end if
+
+If NBEAM = 1 and NTRAN = 1 then
+   DSANG = 0.5: Angle/degree of the divergence slit at the minimum 2-theta.
+   RGON = 185.0: Goniometer radius/mm.
+   SWIDTH = 20.0: Irradiation width/mm for the sample.
+else if NBEAM = 1 and NTRAN = 2 then
+   PCOR1 = 0.5: Fraction of the perfect crystal contribution.
+   SABS = 1.0: (Linear absorption coefficient)*(effective thickness).
+else if NBEAM = 1 and NTRAN = 3 then
+   XMUR1 = 0.0: (Linear absorption coefficient)*(radius).
+end if
+
+If NBEAM = 0 then
+   # Real neutral chemical species, amounts of substances, plus '/'.  Names of
+   # 'real chemical species' are recorded in the database file asfdc.  The
+   # amounts of substances are used to calculate absorption factors.  When
+   # magnetic scattering is observed, attach '*' to magnetic atoms if any,
+   # e.g., 'Fe*' and 'Mn*'.
+   'O' 12.0  'P' 3.0  'Ca' 5.0  'F' 1.0 /
+
+   # Input LCMFF (= 0) and CMFF(I) (I = 1-7) for magnetic atoms attached with
+   # '*'.  LCMFF and CMFF corresponds to l and seven coefficients in Eqs.
+   # (4.4.5.2) and (4.4.5.3) in "International Tables," Vol. C (1999), p. 456.
+   # The total number of these lines equals the number of magnetic atoms.
+   # The following line is input for Fe2+ (l = 0):
+   # 0 0.0263 34.960 0.3668 15.943 0.6188 5.594 -0.0119
+   # '}' is unnecessary because the number of atoms attached with '*." has
+   # already been known.
+else if NBEAM >= 1 then
+   # Real chemical species plus '/'.
+   # Refer to the data base file asfdc for chemical species to be input here.
+ #@DASH@MARK@ SPECIES 
+   'O-'  'P'  'Ca2+'  'F-' /
+end if
+
+If NBEAM = 0 then
+   # Skip
+else if NBEAM = 2 or NTARG = 3 then
+   # Read pairs of anomalous dispersion corrections, Delta-f' and Delta-f''.
+   # Input statements in RIETAN: READ(5,*) (DELTF1(J), DELTF2(J), J=1, NREAL).
+   # NREAL: Number of real chemical species.
+   # Neither '/' nor '}' is required bacause the number of input data (2*NREAL)
+   # has been already known.
+ #@DASH@MARK@ SPECIES2 
+
+end if
+
+# When a site is occupied by two or more chemical species as in solid
+# solutions, supposing an 'virtual' chemical species where these chemical
+# species are mixed with each other in definite amount-of-substance
+# fractions (total = 1) serves to decrease the total number of sites.
+# Of course, such virtual species can be used only when their occupancies
+# are fixed.  Input one virtual species plus '/' per line and '}' (plus comment)
+# in the last line in the following way:
+
+# Virtual chemical species
+# 'M1' 'Ba' 0.633 'Nd' 0.367 / # Metal on the rock-salt layer
+# 'M2' 'Nd' 0.675 'Ce' 0.325 / # Eight-coordinated atom in the fluorite block
+# } End of virtual chemical species.
+
+# 'M1' and 'M2' are names of virtual chemical species, 'Ba', 'Nd,' and 'Ce' are
+# names of real chemical species input above, and numbers are amount-of-
+# substance fractions of constituent elements.  For the above species, Refer to
+# F. Izumi et al., Physica C 160 (1989) 235.
+# When no virtual species are used, all the lines must be commented out.
+
+Data concerning crystalline phases contained in the sample {
+
+# Phase No. 1
+
+PHNAME1 = 'DASH solution': Phase name (CHARACTER*25).
+
+ #@DASH@MARK@ VNS1
+VNS1 = 'A-176': (Vol.No. of Int.Tables: A or I)-(Space group No)-(Setting No).
+
+LSPSYM1 = 0: Information on the space group is read from the data base.
+LSPSYM1 = 1! In addition to LSPSYM = 0, reflection conditions are specified.
+LSPSYM1 = 2! A non-standard axes-setting method is adopted.
+# Additional input data are required when SSPSYM1 > 0 but not described here
+# because of its rare use.
+
+If NBEAM >= 1 then
+   LPAIR1 = 0: No Bijvoet pairs (hkl & -h-k-l) are generated.
+   LPAIR1 = 1! Bijvoet pairs (hkl & -h-k-l) are generated.
+   # Set at 0 in a centrosymmetric space group.  Note that in 24 centrosymmetric
+   # space groups, e.g., origin choice 1 for Pnnn (No. 48), descriptions with
+   # points of higher symmetry as origin are also provided.  Setting this value
+   # at 0 for a noncentrosymmetric space group increases the calculation speed
+   # with lowering accuracy of structure factors.
+end if
+
+INDIV1 = 0! The overall isotropic atomic displacement parameter is input.
+INDIV1 = 1: Atomic displacement parameters are assinged to all the sites.
+# Neither B's nor beta_ij's are input if INDIV1 = 0.  Input zero for the
+# overal isotropic atomic displacement parameter, Q, when INDIV1 = 1.
+
+# Correction of perferred orientation
+NPROR1 = 0! Preferred orientation is not corrected for.
+NPROR1 = 1! Sasa-Uda function for plate crystals.
+NPROR1 = 2! Sasa-Uda function for needle-like crystals.
+NPROR1 = 3: March-Dollase function.*
+# * Note that the preferred orientation effect disappears in March-Dollase
+#   function when r = 1.
+
+ #@DASH@MARK@ IHP1 
+IHP1 = 1: \
+ #@DASH@MARK@ IKP1 
+IKP1 = 0:   --> Preferred-orientation vector, hp, kp, lp.
+ #@DASH@MARK@ ILP1 
+ILP1 = 0: /
+# The preferred-orientation vector should be set in such a way that it is
+# a reciprocal-lattice vector, hpa* + kpb* + lpc*, perpendicular to a cleavage
+# plane for a plate crystal and parallel with an extention direction for a
+# needle-like crystal.  They are dummies when NPROR1 = 0.
+
+LSUM1 = 0! No summation when calculating the March-Dollase function.
+LSUM1 = 1: Summation when calculating the March-Dollase function.*
+# * Required when the symmetry is cubic, or the preferred-orientation vector
+#   does not lie along the unique axis.  Dummy unless NPROR1 = 3.
+
+IHA1 = 0: \
+IKA1 = 0:   --> Anisotropic-broadening axis, ha, ka, la.
+ILA1 = 1: /
+# They are dummies when parameters related to anisotropic profile
+# broadening are set at null.
+
+# If two or more phases are included in the sample, repeat their date below.
+# Note that the same label should not be input repeatedly.
+
+# Place '}" (+ comment) after the input of information on all the phases.
+} End of information about phases.
+
+# Selection of the profile function.
+NPRFN = 0! Pseudo-Voigt function of Thompson et al.*
+NPRFN = 1! Split pseudo-Voigt function of Toraya.**
+NPRFN = 2! Modified split pseudo-Voigt function*** for relaxed reflections.
+NPRFN = 3! Split Pearson VII function of Toraya.**
+#   * P. Thompson et al., J. Appl. Crystallogr. 20 (1987) 79.
+#  ** H. Taraya, J. Appl. Crystallogr., 23 (1990) 485.
+# *** FWHM(Lorentz) <> FWHM(Gauss).  The split pseudo-Voigt function is
+#     applied for the other reflections.  Refer to the following paper:
+#     F. Izumi and T. Ikeda, Mater. Sci. Forum, 321-324 (2000) 198.
+NPRFN = 0
+
+If NPRFN = 0 then
+   NASYM = 0! Made asymmetric according to the procudure of Finger et al.*
+   NASYM = 1! Made asymmetric according to the procudure of Howard.**
+   #  * L. W. Finger et al., J. Appl. Crystallogr. 27 (1994) 892.
+   # ** C. J. Howard, J. Appl. Crystallogr. 15 (1982) 615.
+   NASYM = 1
+end if
+
+If NPRFN >= 1 then
+   # Selection of the peak-shift function.
+   # t0 - t3: Peak-shift parameters; x: 2-theta.
+   NSHIFT = 0! t0.
+   NSHIFT = 1! t0 + t1*cos(x) + t2*sin(x) + t3*tan(theta).
+   NSHIFT = 2! t0 + t1*x + t2*x^2 + t3*x^3.
+   NSHIFT = 3! t0 + t1*tan(theta) + t2*(tan(theta))^2 + t3*(tan(theta))^3.
+   NSHIFT = 4: Legendre polynomials where 2-theta is normalized as -1 to 1.
+   NSHIFT = 5! Legendre polynomials where tan(theta) is normalized as -1 to 1.
+end if
+
+# Labels (CHARACTER*25), parameters, A(I), to calculate diffraction intensities,
+# and refinement identifiers, ID(I).  ID(I)'s are input without inserting any
+# spaces between them only when NMODE = 0 (no problem even if they are input
+# when NMODE = 1).
+
+# In what follows, PPP and SPP denote a primary profile parameter and a
+# secondary profile parameter, respectively.  For example, when calculating
+# the FWHM, H, with the equation H = [U(tan(theta)**2 + Vtan(theta) + W]^0.5,
+# H is a PPP, the FWHM parameters U, V, and W are SPPs.  In conventional
+# Rietveld analysis, SPP's which are common to the whole 2-theta range are
+# refined whereas PPPs are locally refined for relaxed reflections.
+
+# ID(I) = 0: Fix parameter A(I) at the value input by the user.
+# ID(I) = 1: Refine parameter A(I).
+# ID(I) = 2: Impose a constraint to parameter A(I).
+# ID(I) = 3: Fix a PPP at the value calculated from SPP's.
+# If A(I) is set at zero by the user, A(I) is calculated from the SPP's in each
+# cycle. In this case, if A(I) should actually be fixed at zero, input a value
+# which is nearly zero, e.g., 10^(-15).
+
+# Relations between ID(I)'s, NPRFN, and partial profile relaxation:
+# (1) Partial profile relaxation cannot be used when NPRFN = 0.
+# (2) ID(I)'s are 1-3 when NPRFN = 1, 3 under partial profile relaxation.
+# (3) ID(I)'s are 1 or 2 when NPRFN = 2 under partial profile relaxation.
+
+Label, A(I), and ID(I) now starts here {
+
+# (1) Parameters common to all the phases.
+
+# Peak-shift parameters.
+# NPRFN = 0: Z, Ds, Ts & dummy1 (Ds = Ts = 0 in neutron diffraction).
+# NPRFN > 0: t0, t1, t2 & t3.
+
+If NPRFN = 0 then
+ #@DASH@MARK@P SHIFT0 0.0  0.0  0.0  0.0  1000
+   SHIFT0  0.14849  -1.14695E-1  1.28877E-2  0.0  1110
+else
+   SHIFTN  7.12052E-2  2.42176E-2  3.77026E-3  0.0  1000
+end if
+ 
+# Surface-roughness parameters.
+ROUGH  0.0  0.0  0.0  0.0  0000
+ 
+# Background parameters, b_j (j = 0-11).
+ #@DASH@MARK@P BKGD1 0.0 0.0 0.0 111
+BKGD1  114.734  -1.26692E2  139.221   111
+ #@DASH@MARK@P BKGD2 0.0 0.0 0.0  111
+BKGD2  -1.01947E2  68.0669  -3.9368E1  111
+ #@DASH@MARK@P BKGD3 0.0 0.0 0.0 111
+BKGD3  23.2964  -7.4435  -2.01147 111
+ #@DASH@MARK@P BKGD4 0.0 0.0 0.0 111
+BKGD4  3.56749  0.0  0.0  100
+ 
+# PPP's of relaxed reflections (input as requied.  May be lacking).
+# Format of each label: PPPn_h.k.l (n: phase number, hkl: diffraction index).
+ 
+# PPP's refined in relaxed reflections:
+# NPRFN = 1 (split pseudo-Voigt function): W, A, eta_L, eta_H.
+# NPRFN = 2 (modified split pseudo-Voigt function): W1, W2, A, eta_L, eta_H.
+# NPRFN = 3 (split Pearson VII function): W, A, mL, mH.
+
+# PPP1_1.0.0   0.123836  6.79726E-2  0.936762  0.228537  0.186868  11111
+# PPP1_-1.0.0  0.123836  6.79726E-2  0.936762  0.228537  0.186868  22222
+
+# (2) Parameters relevant to the first phase.
+ 
+# Scale factor, s.
+ #@DASH@MARK@P SCALE 1.0 1
+SCALE  3.55591  1
+ 
+# Profile parameters.
+ 
+If NPRFN = 0 and NASYM = 1 then
+ 
+   # TCH's pseudo-Voigt function made asymmetric by Howard's method.
+ 
+   # FWHM parameters of the Gauss function, U, V, W, and P.
+ #@DASH@MARK@P GAUSS01 1.E-4 1.E-4 1.E-4 0.0 1110
+   GAUSS01  1.49395E-4  7.401285E-5  2.558033E-4  0.0  1110
+ 
+   # FWHM parameters of the Lorentz function, X, Xe, Y, and Ye.
+ #@DASH@MARK@P LORENTZ01 1.E-2  0.0  1.E-2  0.0  1010
+   LORENTZ01  3.157068E-2  2.282011E-3  2.879626E-2  -1.928188E-3  1111
+ 
+   # Asymmetry parameter, As, plus five dummies.
+ #@DASH@MARK@P ASYM 0.0  0.0  0.0  0.0  0.0  0.0  100000
+   ASYM  2.800001E-2  0.0  0.0  0.0  0.0  0.0  100000
+
+else if NPRFN = 0 and NASYM = 0 then
+
+   # TCH's pseudo-Voigt function made asymmetric by Finger et al.'s method.
+
+   # FWHM parameters of the Gauss function, U, V, W, and P.
+   GAUSS00  1.49395E-4  1.41366E-4  2.07988E-4  0.0  0110
+
+   # FWHM parameters of the Lorentz function, X, Xe, Y, and Ye.
+   LORENTZ00  3.3918E-2  1.85408E-3  2.48941E-2  -1.11746E-3  1010
+
+   # Asymmetry parameters, rs and rd, plus four dummies.
+   ASYM00  2.82968E-2  9.34981E-3  0.0  0.0  0.0  0.0  110000
+
+else if NPRFN = 1 or NPRFN = 2 then
+
+   # Non-relaxed reflections: split pseudo-Voigt function
+   # Relaxed reflections: Modified split pseudo-Voigt function.
+
+   # FWHM parameters, U, V, and W, plus a dummy.
+   FWHM12  5.74605E-3  -1.62541E-3  5.65685E-3  0.0  1110
+ 
+   # Asymmetry parameters, a0, a1, and a2 plus a dummy.
+   ASYM12  1.0391  0.142103  -4.11524E-2  0.0  1110
+ 
+   # Decay parameters, eta_L0, eta_L1, eta_H0, and eta_H1.
+   ETA12  0.610908  0.141857  0.499591  0.177812  1111
+
+   # Asymmetric-broadening parameters, Ue and Pe.
+   ANISOBR12  0.0  0.0  00
+
+else if NPRFN = 3 then
+
+   # Split Pearson VII function
+
+   # FWHM parameters, U, V, W, plus a dummy.
+   FWHM3  5.874843E-3  -2.614835E-3  5.290567E-3  0.0  1110
+
+   # Asymmetry parameters, a0, a1, and a2, plus a dummy.
+   ASYM3  0.976399  0.184397  -4.801547E-2  0.0  1110
+
+   # Decay parameters, eta_L0, eta_L1, eta_H0, and eta_H1.
+   M3  0.712220  0.219749  0.630807  0.125848  1111
+
+   # Asymmetric-broadening parameter, Ue and Pe.
+   ANISOBR3  0.0  0.0  00
+
+end if
+
+# Preferred-orientation parameter, r, dummy9 (March-Dollase function);
+# p1, p2 (Sasa-Uda function).
+If NMODE = 4 then
+   PREF  1.0  0.0  00
+else
+ #@DASH@MARK@P PREF  1.0  0.0  10
+   PREF  0.998391  0.0  10
+end if
+
+# Lattice parameters, a, b, c, alpha, beta, & gamma.
+# Overall isotropic atomic displacement parameter, Q.
+ #@DASH@MARK@ CELLQ
+CELLQ  9.36903  9.36903  6.88385  90.0  90.0  120.0  0.0  1010000
+
+# Lable/(chemical species name), occupancy (g) , fractional coordinates
+# (x,y,z), istropic atomic displacement parameter (B), ID(I)'s.
+# One label is given to each site.  'Chemical species' include virtual ones
+# (should not enclosed by ' ').  On the calculation of anisotropic atomic
+# displacement parameters, input beta_11, beta_22, beta_33, beta_12,
+# beta_13 and beta_23.  If a dummy '+' is input just before the value of B,
+# RIETAN will determine the corresponding beta_ij.  Of course, six ID(I)'s
+# must be input in this case.
+ 
+If NMODE <> 4 then
+ #@DASH@MARK@ ATOMS
+
+# Input linear constraints for parameters with ID(I) = 2.  A parameter with
+# ID(I) = 2 is place at the left side, and equations to calculate it from other
+# parameters with ID = 1.  "Linear" means that the equation is linear with
+# respect to parameters contained in the right side.  Linear constraints can
+# be imposed on PPPs, SPPs, and structure parameters.  In the case of SPPs,
+# the linear constraints are used to set SPPs for two or more phases equal
+# to each other.  Refer to the user's manual for the method of describing
+# linear constraints.
+
+# For example, linear constraints imposed among anisotropic atomic displacement
+# parameters, beta_ij, are described in the following ways:
+# A(X,B22)=A(X,B11) #5
+# A(X,B22)=A(X,B11); A(X,B23)=A(X,B13) #6
+# A(X,B22)=A(X,B11); A(X,B23)=-A(X,B13) #7
+# A(X,B22)=A(X,B11) #8
+# A(X,B33)=A(X,B22) #9
+# A(X,B33)=A(X,B22); A(X,B13)=A(X,B12) #10
+# A(X,B33)=A(X,B22); A(X,B13)=-A(X,B12) #11
+# A(X,B33)=A(X,B22) #12
+# A(X,B12)=0.5*A(X,B22) #13
+# A(X,B12)=0.5*A(X,B22) #14
+# A(X,B12)=0.5*A(X,B22); A(X,B23)=2.0*A(X,B13) #15
+# A(X,B22)=A(X,B11); A(X,B12)=0.5*A(X,B11) #16
+# A(X,B22)=A(X,B11); A(X,B33)=A(X,B11) #17
+# A(X,B22)=A(X,B11); A(X,B33)=A(X,B11); A(X,B13)=A(X,B12); A(X,B23)=A(X,B12) #18
+# where 'X' is a label (site name).  Please replace it with another label.
+# Comments ('#'+integer) at the tails of these lines denote reference numbers in
+# W. J. A. M. Peterson and J. H. Palm, Acta Crystallogr. 20 (1966) 147.
+
+# Place '}" + comment after the input of all the linear constraints.
+# When no constraints are given, comment out them, including '}.'
+#} End of linear constraints.
+end if
+
+NCUT = 0! The profile range for relaxed reflections is determined by RIETAN.
+NCUT = 1! The profile range for relaxed reflections is input by the user.
+NCUT = 0
+# NCUT = 0 when NPRFN = 0.
+
+If NCUT = 1 then
+   # 2-theta ranges for the profiles of relaxed reflections in the same order
+   # as PPn_h.k.l+PPP.  The total number of 2-theta pairs is equal to that of
+   # the PPn_h.k.l+PPP+ID lines. in the same order.  No '}' is necessary
+   # because the number of the relaxed reflections has been already known.
+    5.10    9.40
+   11.00   14.10
+   18.20   21.80
+   19.40   24.10
+   21.60   23.40
+end if
+
+If NMODE <> 1 then
+   NEXC = 0: Parameters are refined using all the data points.
+   NEXC = 1! Parameters are refined by excluding part of the data points.
+end if
+
+If NMODE <> 1 and NEXC = 1 then
+   2-theta range not to be used for the refinement {
+   } End of excluded 2-theta ranges.
+end if
+
+If NMODE <> 1 then
+   NRANGE = 0: Refine background parameters.
+   NRANGE = 1! Fix backgrounds at (interpolated) values at specified 2-theta's.
+   NRANGE = 2! Fix backgrounds of all the points at values in *.bkg.
+   NRANGE = 3! Background = (background in *.bkg) * (Legendre polynomials).
+end if
+
+# When NRANGE > 0, 2-theta and background pairs are read in from *.bkg.
+# (1) NRANGE = 1
+# If a background is zero, it is set at a smoothed value at that data point.
+# Backgrounds at other data points are fixed at interpolated values.  Such a
+# manner is useful for the analysis of diffraction patterns where the number of
+# reflections are relatively small and the background curve is complex, for
+# example, having humps.
+# List-directed READ statement in RIETAN-2000: READ(4,*) (X(J),Y(J), J=1,100).
+# That is, we can input up to 100 diffraction points.  To show the end of data
+# points, place '/' after the last data point.
+# (2) NRANGE = 2
+# Input 2-theta and background pairs whose total number should be equal to
+# that of observed diffraction intensities in *.int.
+# List-directed READ statement in RIETAN-2000:
+# READ(8,*,END=9) (DEG(J),BG(J), J=1,NP)
+# (3) NRANGE = 3
+# This composite background function is particularly useful for the Debye-
+# Scherrer geometry where samples are charged in capillaries, which makes the
+# shape of the background complex.
+
+If NMODE <> 1 then
+   NPAT = 0! Output no file to plot Rietveld-refinement patterns.
+   NPAT = 1! Not implemented.
+   NPAT = 2! Ouput a RietPlot file to plot Rietveld-refinement patterns.
+   NPAT = 3! Not implemented.
+   NPAT = 4: Output a gnuplot text file to plot Rietveld-refinement patterns.
+   NPAT = 5! Output an Igor text file to plot Rietveld-refinement patterns.
+   # NPAT = 4 (every OS) or 5 (Mac OS and Windows) is recommended.
+end if
+
+If NMODE <> 1 and NPAT = 5 then
+   IWIDTH = 800: Width of the graph.
+   IHEIGHT = 400: Height of the graph.
+   IYMIN = -2500: Minimum value for the y axis (default for zero).
+   IYMAX = 20000: Maximum value for the y axis (default for zero).
+
+   LBG = 0: Do not plot the background.
+   LBG = 1! Plot the background.
+
+   # Kind of a residual curve
+   LDEL = 0: Plot Delta_y = (observed intensity - calculated intensity).
+   LDEL = 1! Plot Delta_y/(standard deviation).
+   LDEL = 2! Plot [Delta_y/(observed intenstiy)]/(standard deviation).*
+   # * Refer to Eq. (1.13) in R. A. Young, "The Rietveld Method," p. 24.
+
+   IOFFSETD = -1500: Offset for the residual curve.
+   IPSIZE = 3: Length of tick marks to show peak positions.
+   IFSIZE = 12: Size of numerial values attached to the x and y axes.
+   ILSIZE = 14: Size of labels for axes.
+
+   INDREF = 0: Do not output waves XREF or YREF.
+   INDREF = 1! The profile of each reflection is output to waves XREF and YREF.
+
+   IOFFSET1 = -300: Offset for tick marks (peak positions) for the first phase.
+   # If other phases are contained, input offsets in the above way.
+   / # Place '/' if the number of phases whose offsets are input is less than 8.
+
+   # You may also edit Igor procedures at the tail of *.itx with an editor.
+end if
+
+If NMODE = 1 then
+   DEG1 = 10.0: Minimum 2-theta in the calculated (simulated) pattern.
+   DEG2 = 60.0: Maximum 2-theta in the calculated (simulated) pattern.
+
+   USTP = 0.01: Step width/degree.
+
+   NPAT = 0! Only the reflection list is output.
+   NPAT = 1! Not implemented.
+   NPAT = 2! Output a RietPlot file to plot a simulated pattern.
+   NPAT = 3! Not implemented.
+   NPAT = 4: Output a gnuplot text file to plot a simulated pattern.
+   NPAT = 5! Output an Igor text file to plot a simulated pattern.
+   # NPAT = 4 (every OS) or 5 (Mac OS and Windows) is recommended.
+end if
+
+If NMODE = 1 and NPAT = 5 then
+   IWIDTH = 800: Width of the graph.
+   IHEIGHT = 400: Height of the graph.
+
+   LBG = 0: Plot no bakcground (fixed).
+
+   IPIZE = 3: Length of tick marks (peak positions).
+   IFSIZE = 12: Size of numerial values attached to the x and y axes.
+   ILSIZE = 14: Size of labels for axes.
+end if
+
+# PC: A constant to determine a 2-theta range for calculating profiles.
+# PC < 1 ==> A region where the profile function exceeds peak intensity X PC.
+#            If NPRFN = 0, PC < 1.
+# PC > 1 ==> A region within peak position +/- FWHM*PC.
+If NPRFN = 0 then
+   PC = 0.002
+else if NPRFN = 1 then
+   PC = 7.00
+else if NPRFN >= 2 then
+   PC = 7.00
+end if
+
+# Skip the remaining part if NMODE = 1
+If NMODE = 1 then
+   Go to *Quit
+end if
+
+##############################################################################
+#        All the data have been input in the case of NMODE = 1.  Bye!        #
+##############################################################################
+
+If NMODE = 4 then
+   # Initial values of multiplicity X |Fc|**2 for the 1st phase are
+   NSFF = 0! estimated according to the Wilson statistics.
+   NSFF = 1! read in from *.ffi.
+   NSFF = 2! all set at 100.0.
+   NSFF = 0
+end if
+
+If NMODE = 4 and NSFF <> 1 then
+   INCMULT = 0! The integrated intensity is regarded as |F|**2.
+   INCMULT = 1! The integrated intensity is regarded as multiplicity X |F|**2.
+   INCMULT = 0
+
+   CHGPC = 1.0: Cut-off is at first set at CHGPC*PC.*
+   # * Restored when lattice or profile parameters are refined.
+end if
+
+If NMODE = 4 and NSFF = 1 then
+   NCONST = 0! |Fc|'s are varied during least-squares fitting.
+   NCONST = 1! |Fc|'s remain constant during least-squares fitting.*
+   # * |Fo|'s are calculated from final refined parameters.
+   NCONST = 0
+end if
+
+If NMODE <> 1 then
+   # Nonlinear least-squares methods
+   NLESQ = 0! Marquardt method (recommended in most cases).
+   NLESQ = 1! Gauss-Newton method.
+   NLESQ = 2! Conjugate-direction method (stable but very slow).
+   NLESQ = 0
+
+   NESD = 0: Standard deviations are estimated by the conventional method.
+   NESD = 1! Standard deviations are estimated by Scott's method.*
+   # * Much larger standard deviations will result in comparison with NESD = 0.
+end if
+
+If NLESQ <= 1 then
+   NAUTO = 0! Refine all the variable parameters simultaneously.
+   NAUTO = 1! Refine incrementally (specify variable parameters in each cycle).
+   NAUTO = 2! Refine incrementally (automatic; recommended in most cases).
+   NAUTO = 3! In addition to NAUTO = 2, check convergence to the global min.
+   NAUTO = 2
+   # Set NAUTO at 2 usually and at zero near the convergence.
+
+   NCYCL = 10! Maximum number of cycles.
+ #@DASH@MARK@P NCYCL = 10
+   NCYCL = 10
+   CONV = 0.0001: Small positive number used for convergence judgement.
+   NCONV = 6: Number of cycles used for convergence judgement.
+end if
+
+If NLESQ <= 1 and NMODE = 4 then
+   NC = 0: No nonlinear restraints are imposed on geometric parameters.
+   NC = 1! Nonlinear restraints are imposed on geometric parameters.
+else if NLESQ <= 1 then
+ #@DASH@MARK@P NC = 1
+   NC = 0
+end if
+
+If NLESQ <= 1 then
+   TK = 650.0! Penalty parameter.
+ #@DASH@MARK@P      TK = 650.0
+   TK = 650.0
+   FINC = 2.0! Factor by which TK is multiplied when TK is increased.
+ #@DASH@MARK@P      FINC = 2.0
+   FINC = 2.0
+end if
+
+If NLESQ <= 1 and NAUTO = 1 then
+   # Specify parameters to be refined in each cycle plus '/'.
+   # In addition to absolute parameter numbers, "label,number/symbol" may be
+   # used (Refer to user's manual).
+   Parameters refined in each cycle {
+   BKGD,1 BKGD,2 BKGD,3 BKGD,4 BKGD,5 BKGD,6 BKGD,7 BKGD,8 BKGD,9 BKGD,10
+   SCALE,1 /
+   CELLQ,1 CELLQ,3 /
+   # Place '}' (+ comment) after the last cycle.
+   } End of inputs for numbers of refinable parameters.
+end if
+
+If NLESQ <=1 and NAUTO = 3 then
+   # Input data for the conjugate-direction method (used to check the
+   # convergence at a local minimum).
+   MITER = 4: Maximum number of iterations.
+   STEP = 0.02: Coefficient to calculate the initial step interval.
+   ACC = 1.0E-6: Small positive number used for convergence judgement.
+end if
+
+If NLESQ = 2 then
+   MITER = 4: Maximum number of iterations.
+   STEP = 0.02: Coefficient to calculate the initial step interval.
+   ACC = 1.0E-6: Small positive number used for convergence judgement.
+
+   NC = 0: No nonlinear restraints are imposed on geometric parameters.
+   NC = 1! Nonlinear restraints are imposed on geometric parameters.
+
+   TK = 650.0: Penalty parameter.
+end if
+
+If NC = 1 and NMODE <> 4 then
+   # To specify nonlinear restraints, an input file for ORFFE, Filename.xyz,
+   # must be created by inputting non-zero NDA (described below).  Then, ORFFE
+   # is executed to output Filename.ffe, which is referred to learn serial
+   # numbers for various interatomic distances and bond angles to enter them
+   # in addition to their expected values and allowed deviations below.
+   # If Filename.ffe has already been created, it is not created at all.
+   # Therefore, note that Filename.ffe must be wasted to make it again.
+
+   Ser. No.  Exp. value  Allowed dev. {
+ #@DASH@MARK@R Restraints on distance/angle
+#   122       1.47        0.01
+ #@DASH@MARK@R END Restraints on distance/angle
+
+   # Place '}' (+ comment) after the last restraint.
+   } End of nonlinear restraints.
+end if
+
+NUPDT = 0! Variable parameters (ID = 1, 2) in the input file remain unchanged.
+NUPDT = 1! Variable parameters (ID = 1, 2) are updated in the packing mode.
+NUPDT = 1
+# In the case of NUPDT = 1, parameters are updated by inserting two spaces
+# between data.
+
+NFR = 0! No file is output for Fourier/D synthesis.
+NFR = 1! Filename.hkl for Fourier/D synthesis is output for the first phase.
+NFR = 2! Filename.hkl for Fourier/D synthesis is output for the second phase.
+NFR = 0
+
+NMEM = 0! No file is output for MEM analysis.
+NMEM = 1! Filename.fos for MEM analysis is output for the first phase.
+NMEM = 2! Filename.fos for MEM analysis is output for the second phase.
+NMEM = 0
+
+If NMODE = 4 then
+   NDA = 0
+else
+   NDA = 0! No file is output which store ORFFE data.
+   NDA = 1! Filename.xyz for ORFFE is output for the first phase.
+   NDA = 2! Filename.xyz for ORFFE is output for the second phase.
+ #@DASH@MARK@P NDA = 1
+NDA = 0
+end if
+
+If NFR > 0 then
+   NPIXAF = 32: Number of pixels along the a axis.
+   NPIXBF = 32: Number of pixels along the b axis.
+   NPIXCF = 128: Number of pixels along the c axis.
+
+   TSCAT = 232.01: Total number of electrons (X-ray) or sum of b_c (N).
+   # b_c: coherent scattering length (International Tables, Vol. C, p. 384).
+end if
+
+If NMEM > 0 then
+   # Title (CHARACTER*70) written in *.fos.
+   TITLE = 'DASH solution'
+
+   LANOM = 0: Calculate esd's from I's without contributions of a.d.
+   LANOM = 1! Calculate esd's from I's with contributions of a.d.
+   # esd: estimated standard deviation, I: integrated intensity,
+   # a.d.: anomalous dispersion
+
+   NPIXA = 32: Number of pixels along the a axis.
+   NPIXB = 32: Number of pixels along the b axis.
+   NPIXC = 128: Number of pixels along the c axis.
+
+   LGR = 0: All the reflections are output independently.
+   LGR = 1! Reflections overlapped heavily are output by being grouped.
+
+   LFOFC = 0: Using calculated F'o' based on Rietveld refinement.
+   LFOFC = 1! Using Fcal (dependent on the model) in Rietveld refinement.
+
+   EPSD = 0.001: Maximum difference in d/Angstrom in grouped reflections.
+   TSCAT1 = 232.01: Total number of electrons (X-ray diffraction) or
+                    # sum of positive b_c (neutron diffraction).
+   TSCAT2 = 0.0: Zero (X-ray diffraction) or
+                 # sum of negative b_c (Neutron diffraction).
+end if
+
+If NDA > 0 then
+# Input ORFFE instructions as required and place '}' (+ comment) at the tail.
+# Refer to the user's manual for ORFFE instructions used frequently.  ORFFE
+# instructions must be input with a fixed column format; note not to set input
+# data at erroneous positions.  If NDA > 0, Filename.xyz is output.  This file
+# is used as an input file for ORFFE to calculate interatomic distances and bond
+# angles.  ORFFE instructions in Filename.xyz can be modified and/or added by
+# the user.
+
+ORFFE instructions start {
+# Note that the formats of ORFFE instructions differ from original ones!
+#        1         2         3         4         5         6         7         8
+#2345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+# Instruction 201, FORMAT(2I5,15X,I5).  Output a list of interatomic distances
+# for all the sites.  The second number is the number of sites.  The third
+# integer is 10 X (maximum distance in Angstroms).
+# Interatomic distances less than 3.1 angstroms are listed
+  201    7                  31
+# Instruction 2, FORMAT(7I5).  Calculate a bond angle.  Three sets of A and
+# 1000*C + S (refer to the output of ORFFE) follow after instruction 2.
+# O3-P-O1
+#    2    3    0    4    0    1    0
+# O3-P-O2
+#    2    3    0    4    0    2    0
+} End of ORFFE instructions.
+# ORFFE instructions can be modified and added by editing *.xyz directly.
+end if
+
+# Cite the following reference whenever you report scientific results obtained
+# with RIETAN-2000:
+# F. Izumi and T. Ikeda, Mater. Sci. Forum, 321-324 (2000) 198.
+# Giving credit to RIETAN-2000 is fine in the case of abstracts, reports, etc.
+
+# If you like RIETAN-2000, please send me a postcard of your home town.
+# Is that too much to ask?
+
+# Fujio IZUMI
+# Advanced Materials Laboratory
+# National Institute for Materials Science
+# 1-1 Namiki, Tsukuba, Ibaraki 305-0044, Japan
+# E-mail: IZUMI.Fujio@nims.go.jp
+
+*Quit
