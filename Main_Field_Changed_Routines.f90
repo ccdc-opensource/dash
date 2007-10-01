@@ -419,7 +419,8 @@
         CALL WGridGetCellCheckBox(IDF_SA_summary, 2, iRow, istatus)
         IF (istatus .EQ. 1) THEN
 ! Calls subroutine which opens Mercury window with .pdb file.
-          CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow), file_name)
+!         CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow), file_name)
+          CALL SA_STRUCTURE_OUTPUT_NON_OVERLAP(iSol2Run(iRow), file_name)
           CALL ViewStructure(file_name)
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
         ENDIF

@@ -474,6 +474,38 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE SA_STRUCTURE_OUTPUT_NON_OVERLAP(TheRunNr, file_name)
+
+! This subroutine implements the option of write CIF format for viewer 
+! by wrapping existing subs 
+
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER,        INTENT (IN   ) :: TheRunNr
+      CHARACTER*(*), INTENT (  OUT) :: file_name
+
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      CHARACTER(3) RunStr
+
+      CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      IF ( WDialogGetCheckBoxLogical(IDC_cif_for_viewer) ) THEN
+        WRITE(RunStr, '(I3.3)') TheRunNr
+        file_name = "DASH_tmp"//RunStr//".cif"
+        CALL SA_structure_output_2(0, TheRunNr, file_name, 4)
+      ELSE
+        CALL SA_STRUCTURE_OUTPUT_PDB(TheRunNr, file_name)
+      ENDIF
+      CALL PopActiveWindowID
+
+      RETURN
+
+      END SUBROUTINE SA_STRUCTURE_OUTPUT_NON_OVERLAP
+!
+!*****************************************************************************
+!
       SUBROUTINE SA_STRUCTURE_OUTPUT_PDB(TheRunNr, file_name)
 !
 ! This subroutine writes out a single solution to a temporary file for viewing.

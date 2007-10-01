@@ -129,7 +129,8 @@
         IF (iStatus .EQ. 1) THEN
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
 ! Calls subroutine which opens Mercury window with .pdb file
-          CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow), file_name)
+!         CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow), file_name)
+          CALL SA_STRUCTURE_OUTPUT_NON_OVERLAP(iSol2Run(iRow), file_name)
           CALL ViewStructure(file_name)
 ! Calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(iRow)
@@ -606,7 +607,7 @@
               INQUIRE(FILE=tFileName,EXIST=OutputExists)
               WriteThisFile = .NOT. OutputExists
             ENDIF
-            IF (WriteThisFile) CALL SA_structure_output_2(1, tFileName, Ext2Type(J))
+            IF (WriteThisFile) CALL SA_structure_output_2(1, -1, tFileName, Ext2Type(J))
           ENDDO
         CASE (2) ! Selected Solutions
           CALL WDialogSelect(IDD_SAW_Page5)
@@ -620,7 +621,7 @@
                   INQUIRE(FILE=tFileName,EXIST=OutputExists) 
                   WriteThisFile = .NOT. OutputExists
                 ENDIF
-                IF (WriteThisFile) CALL SA_structure_output_2(I, tFileName, Ext2Type(J))
+                IF (WriteThisFile) CALL SA_structure_output_2(I, -1, tFileName, Ext2Type(J))
               ENDDO
             ENDIF
           ENDDO
@@ -633,7 +634,7 @@
                 INQUIRE(FILE=tFileName,EXIST=OutputExists) 
                 WriteThisFile = .NOT. OutputExists
               ENDIF
-              IF (WriteThisFile) CALL SA_structure_output_2(I, tFileName, Ext2Type(J))
+              IF (WriteThisFile) CALL SA_structure_output_2(I, -1, tFileName, Ext2Type(J))
             ENDDO
           ENDDO
       END SELECT
@@ -644,7 +645,7 @@
 !
 !*******************************************************************************
 !
-      SUBROUTINE SA_structure_output_2(TheSolutionNr, TheFileName, TheFileType)
+      SUBROUTINE SA_structure_output_2(TheSolutionNr, TheRunNr, TheFileName, TheFileType)
 
       USE DRUID_HEADER
       USE VARIABLES
@@ -656,6 +657,7 @@
       IMPLICIT NONE
 
       INTEGER,       INTENT (IN   ) :: TheSolutionNr
+      INTEGER,       INTENT (IN   ) :: TheRunNr
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (IN   ) :: TheFileType
 ! 1 = pdb
@@ -737,7 +739,11 @@
       LOGICAL tLOG_HYDROGENS
 	  REAL TOUISO
 
-      tRunNr = iSol2Run(TheSolutionNr)
+      IF ( TheRunNr .GE. 0 ) THEN
+        tRunNr = TheRunNr
+      ELSE
+        tRunNr = iSol2Run(TheSolutionNr)
+      ENDIF
       WRITE (DASHRemarkStr,100,ERR=999) IntensityChiSqd(tRunNr), ProfileChiSqd(tRunNr), MaxMoves
   100 FORMAT ('chi**2=',F7.2,' and profile chi**2=',F7.2,' max. moves=',I8)
 ! Just in case the user decides to change this in the options menu just while we are in this routine:

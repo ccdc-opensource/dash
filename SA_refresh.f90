@@ -28,7 +28,8 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_View) ! 'View'
 ! Calls subroutine which opens Mercury window with .pdb file
-              CALL SA_STRUCTURE_OUTPUT_PDB(Curr_SA_Run, file_name)
+!             CALL SA_STRUCTURE_OUTPUT_PDB(Curr_SA_Run, file_name)
+              CALL SA_STRUCTURE_OUTPUT_NON_OVERLAP(Curr_SA_Run, file_name)
               CALL ViewStructure(file_name)
             CASE (IDF_Pause_Annealing) ! 'Pause'
               CALL WDialogFieldState(IDF_Pause_Annealing,Disabled)
