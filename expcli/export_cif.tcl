@@ -3,8 +3,9 @@
 set label "coords-only CIF"
 set action exp2cif
 # write coordinates in an XML for FOX
-proc exp2cif {} {
+proc exp2cif {"alt 0"} {
     global expmap expgui
+    set guimode !$alt
     # don't bother if there are no phases to write
     if {[llength $expmap(phaselist)] == 0} {
 	MyMessageBox -parent . -title "No phases" \
@@ -12,6 +13,7 @@ proc exp2cif {} {
 		-icon warning
 	return
     }
+    if $guimode {
     MakeExportBox .export "Export coordinates (only) in CIF" \
 	    "MakeWWWHelp expgui.html ExportCIF"
     # force the window to stay on top
@@ -19,6 +21,7 @@ proc exp2cif {} {
     # Wait for the Write or Quit button to be pressed
     tkwait window .export
     afterputontop
+    }
     # test for Quit
     if {$expgui(export_phase) == 0} {return}
     # 
@@ -28,6 +31,7 @@ proc exp2cif {} {
 	set filnam [file rootname $expgui(expfile)]_${phase}.cif
 	set fp [open $filnam w]
 	puts $fp "\# from $expgui(expfile) "
+	puts $fp "data_global"
 	puts $fp "_audit_creation_date                [clock format [clock seconds] -format "%Y-%m-%dT%T"]"
 
 	set spacegroup [phaseinfo $phase spacegroup]
@@ -60,7 +64,7 @@ proc exp2cif {} {
 	    # remove spaces
 	    regsub -all " " $label "" label
 	    regsub -all " " $elem "" elem
-	    set Biso [expr 8 * 3.14159 * 3.14159 * [$cmd $phase $atom Uiso]]
+	    set Biso [format %.5f [expr 8 * 3.14159 * 3.14159 * [$cmd $phase $atom Uiso]]]
 	    foreach var {x y z frac} {
 		set $var  [format %.5f [$cmd $phase $atom $var]]
 	    }
@@ -70,7 +74,7 @@ proc exp2cif {} {
     } errmsg] {
 	MyMessageBox -parent . -title "Export error" \
 		-message "Export error: $errmsg" -icon warning
-    } else {
+    } elseif $guimode {
 	MyMessageBox -parent . -title "Done" \
 	    -message "File [file tail $filnam] was written"
     }
