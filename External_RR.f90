@@ -15,7 +15,7 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-      LOGICAL, EXTERNAL :: CheckTOPASFileName
+      LOGICAL, EXTERNAL :: CheckTOPASFileName, WDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteTOPASFilePawley, WriteGSASFiles, Launch_GSAS
       INTEGER, EXTERNAL :: WriteRIETANFiles, Launch_RIETAN
       CHARACTER(LEN=45) :: FILTER
@@ -66,6 +66,7 @@
           ENDIF
         ENDIF
       CASE ( FOR_RIETAN )
+        is_Rietan_FP = ( INDEX(RIETANEXE, '-FP') .GT. 0 .OR. INDEX(RIETANEXE, '-fp') .GT. 0 )
         ext_RR_input_file_name = TRIM(OutputFilesBaseName)//'.ins'
         FILTER = 'RIETAN ins file (*.ins)|*.ins|'
         CALL WSelectFile(FILTER, iFlags, ext_RR_input_file_name, 'Save RIETAN ins file')
@@ -132,7 +133,6 @@
       SUBROUTINE CopyPattern2Backup
 
       USE DRUID_HEADER
-      USE WINTERACTER
       USE TAVAR
       USE REFVAR
       USE VARIABLES
@@ -154,6 +154,7 @@
       INTEGER ExtLength
       CHARACTER(MaxPathLength) tDirName, tFileNameRoot
       CHARACTER*8 tExtension
+      LOGICAL exists
 
       ! Perhaps this pair of functions should also set and reset the iRietveldMethod variable
       TANOBS = NOBS
@@ -174,8 +175,12 @@
         ExtLength = MIN(LEN_TRIM(old_diffraction_data_file_name), LEN(tExtension))
         CALL SplitPath2(old_diffraction_data_file_name, tDirName, tFileNameRoot, &
                         tExtension, ExtLength)
-        IF ( tExtension .EQ. 'dash' ) CALL WDialogPutString(IDF_PWa_DataFileName_String, &
-                                      TRIM(tFileNameRoot)//'.xye')
+        IF ( tExtension .EQ. 'dash' ) THEN
+          tFileNameRoot = TRIM(tFileNameRoot)//'.xye'
+          INQUIRE(FILE=tFileNameRoot, EXIST=exists)
+          IF ( .NOT. exists ) tFileNameRoot = ' '
+          CALL WDialogPutString(IDF_PWa_DataFileName_String, TRIM(tFileNameRoot))
+        ENDIF
       ELSE IF ( LEN_TRIM(DashRawFile) .GT. 0 ) THEN
         CALL WDialogPutString(IDF_PWa_DataFileName_String, DashRawFile)
       ENDIF
@@ -605,19 +610,19 @@
 
       CHARACTER(MaxPathLength) tDirName, tFileName
       CHARACTER*8 tExtension
-      INTEGER ExtLength, tLen
+      INTEGER ExtLength
       LOGICAL exists
 
       ExtLength = LEN(tExtension)
       CALL SplitPath2(file_name, tDirName, tFileName, tExtension, ExtLength)
-      tLen = LEN_TRIM(file_name)-ExtLength
-      INQUIRE(FILE=file_name(:tLen)//ext_str, EXIST=exists)
+      tFileName = TRIM(tDirName)//TRIM(tFileName)//ext_str
+      INQUIRE(FILE=tFileName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 999
-      CALL ViewStructure(file_name(:tLen)//ext_str)
+      CALL ViewStructure(tFileName)
       RETURN
 999   CALL ErrorMessage('DASH could not launch viewer because the required file does not '//&
                         'exist:'//CHAR(13)//&
-                        file_name(:tLen)//ext_str//CHAR(13)// &
+                        TRIM(tFileName)//CHAR(13)// &
                         'To produce this file, run the external refine program '// &
                         CHAR(13)// &
                         'at least once with atoms included')
