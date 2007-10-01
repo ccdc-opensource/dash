@@ -420,7 +420,7 @@
           CALL DealWithWizardWindowIndexing2
           GOTO 10
         CASE (IDD_PW_Page8b)
-          CALL DealWithWizardWindowDICVOL04
+          CALL DealWithWizardWindowExtDICVOL
           GOTO 10
         CASE (IDD_PW_Page9)
           CALL DealWithWizardWindowDICVOLResults

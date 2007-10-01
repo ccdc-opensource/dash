@@ -32,7 +32,9 @@
       CHARACTER(MaxPathLength) :: VIEWEXE
       CHARACTER(20)            :: VIEWARG
 	  CHARACTER(MaxPathLength) :: MOGULEXE
-	  CHARACTER(MaxPathLength) :: DICVOL04EXE
+	  CHARACTER(MaxPathLength) :: DICVOLEXE
+      INTEGER                  :: DICVOL_ver
+      INTEGER, PARAMETER       :: DICVOL_internal = 0, DICVOL04 = 4, DICVOL06 = 6
 
 	  LOGICAL UseMogul
 	  DATA UseMogul / .TRUE. /
