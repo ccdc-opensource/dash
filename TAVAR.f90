@@ -20,7 +20,7 @@
 
       CHARACTER(255) old_diffraction_data_file_name
 
-      INTEGER old_NumOfRef
+      INTEGER old_NumOfRef, old_SubtractBkg
   
       END MODULE TAVAR
 !

@@ -440,13 +440,14 @@
       REAL, EXTERNAL :: FnWavelengthOfMenuOption
       CHARACTER*(*), PARAMETER :: ctMark = ' #@DASH@MARK@ '
       INTEGER, PARAMETER :: chFileIns = 116, chFileTmp = 117, ciMarkLen = LEN(ctMark)
-      INTEGER iBaseLen, i, tLen, ExtLength
+      INTEGER iBaseLen, i, j, tLen, ExtLength, i1, i2, iNRec
       CHARACTER (MaxPathLength) tDirName, tFileName, FileNameBase
       CHARACTER (40) tExtension, tKeyWord
       INTEGER tIRadSelection, iRad
       CHARACTER (80) tLine
-      REAL Pola, yMax, y, r12
+      REAL Pola, yMax, y, r12, YScale, tmpY(5), tmpE(5)
       INTEGER NumOfAtmPerElm(1:MaxElm), iFrg, spg_set, nBeam
+      LOGICAL YScaled
 
       ! The way this code has curently been written, this routine can only be called
       ! from one of the Wizard windows as part of a "iRietveldMethod" Rietveld refinement
@@ -460,21 +461,60 @@
       tFileName = FileNameBase(1:iBaseLen)//'.int'
       tLen = iBaseLen + 4
       OPEN(UNIT=chFileTmp,FILE=tFileName(1:tLen),STATUS='unknown',ERR=993)
-      ! RIETAN int file
-      WRITE(chFileTmp, '(A,F10.6,A)', ERR=993) '* ', ALambda, ' Exported by DASH'
-      WRITE(chFileTmp, *, ERR=993) NBIN, XBIN(1), XBIN(2) - XBIN(1)
-      yMax = 0.0
-      DO I = 1, NBIN
-        y = YOBIN(I)
-        IF ( y .EQ. 0.0 ) y = 1E-8 ! Rietan does not accept zero
-        WRITE(chFileTmp, *, ERR=993) y
-        yMax = max(yMax, y)
-      ENDDO
+      IF ( is_Rietan_FP ) THEN
+        ! RIETAN-FP supports GSAS ESD file and reads its esd data
+        ! GSAS Raw file: assume CONS and ESD
+        WRITE(tLine, '(F10.6,5X,A)', ERR=993) ALambda, 'Exported by DASH'
+        WRITE(chFileTmp, '(A80)', ERR=993) tLine
+        iNRec = NBIN / 5
+        IF ( MOD(NBIN,5) .NE. 0 ) iNRec = iNRec + 1
+        WRITE(tLine, '(A,2(I6,1X),A,1X,2(F10.4,1X),A)', ERR=993) 'BANK 1 ', NBIN, iNRec, 'CONS', &
+              XBIN(1) * 100.0,(XBIN(2) - XBIN(1)) * 100.0,'0.0 0.0 ESD'
+        WRITE(chFileTmp, '(A80)', ERR=993) tLine
+        ! Scale YOBIN, EBIN to fit F8.2, allowing negative values
+        YScale = 1.0
+        YScaled = .FALSE.
+        YMax = MAX(MAXVAL(YOBIN(1:NBIN)), MAXVAL(EBIN(1:NBIN)))
+        DO WHILE ( YMax * YScale .GE. 1E4 )
+          YScale = YScale / 10.0
+          YScaled = .TRUE.
+        ENDDO
+        YMax = YMax * YScale
+        i1 = 0
+        DO I = 1, iNRec
+          DO J = 1, 5
+            i1 = i1 + 1
+            IF ( i1 .GT. NBIN ) EXIT
+            tmpY(j) = YOBIN(i1) * YScale
+            tmpE(j) =  EBIN(i1) * YScale
+            ! Rietan does not accept zero, fix to 0.01 (F8.2)
+            IF ( ABS(tmpY(j)) .LT. 0.01 ) tmpY(j) = SIGN(0.01, tmpY(j))
+          END DO
+          IF ( J .GT. 1 ) THEN
+            i2 = J - 1
+            WRITE(tLine, '(10F8.2)', ERR=993) (tmpY(J), tmpE(J), J = 1, i2)
+            WRITE(chFileTmp, '(A80)', ERR=993) tLine
+          ENDIF
+        ENDDO
+        IF ( YScaled ) CALL DebugErrorMessage('Intensity is rescaled to fit GSAS ESD format')
+      ELSE
+        ! RIETAN format int file
+        WRITE(chFileTmp, '(A,F10.6,A)', ERR=993) '* ', ALambda, ' Exported by DASH'
+        WRITE(chFileTmp, *, ERR=993) NBIN, XBIN(1), XBIN(2) - XBIN(1)
+        yMax = 0.0
+        DO I = 1, NBIN
+ !         IF ( y .EQ. 0.0 ) y = 1E-8
+          y = MAX(ABS(YOBIN(I)), 1E-8) ! Rietan does not accept zero
+          WRITE(chFileTmp, *, ERR=993) y
+          yMax = MAX(yMax, y)
+        ENDDO
+      ENDIF
       CLOSE(chFileTmp)
-      IF ( XBIN(1) .LT. 1E-1 ) CALL InfoMessage('The diffraction pattern starts at '// &
-                              'an extremely low point ( < 0.1 degree two-theta ).'//CHAR(13)// &
-                              'If Rietan complains with "Bad diffraction angle(s)", you may '//&
-                              'go back to truncate the data. ' )
+      IF ( XBIN(1) .LT. 0.1 ) CALL InfoMessage( &
+         'The diffraction pattern starts at '// &
+         'an extremely low point ( < 0.1 degree two-theta ).'//CHAR(13)// &
+         'If Rietan complains with "Bad diffraction angle(s)", you may '//&
+         'go back to truncate the data. ' )
       ! RIETAN Gnuplot file
       tFileName = FileNameBase(1:iBaseLen)//'.plt'
       tLen = iBaseLen + 4

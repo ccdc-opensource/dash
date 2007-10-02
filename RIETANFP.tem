@@ -1,13 +1,14 @@
 ###############################################################
-# This template file is part of DASH to RIETAN-2000 interface.
+# This template file is part of DASH to RIETAN interface.
 #
 # Warning: 
 #     The line begin with " #@DASH@MARK@" is for DASH ONLY.
 #     Don't change or remove!
 # 
 ###############################################################
-#### Original header #####
-# # This is a template file for RIETAN-FP for angle-dispersive X-ray and neutron
+##### Original header #####
+#
+# This is a template file for RIETAN-FP for angle-dispersive X-ray and neutron
 # diffraction.
 
 # Many comments are sprinkled in this file for beginners.  Power users may
@@ -526,7 +527,7 @@ case default
    NINT =  8! HRPD (JAERI, JRR-3M) formats. Two types are supported.
    NINT =  9! RIGAKU RINT2000 ASCII format.
    NINT = 10! MAC Science format.
-   NINT = 0
+   NINT = 7
 
    NRANGE = 0: Refine background parameters.
    NRANGE = 1! Fix backgrounds at (interpolated) values at specified 2-theta's.

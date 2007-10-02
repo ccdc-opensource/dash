@@ -667,11 +667,7 @@
                 tMax = 90.0
                 CALL TruncateData(tMin,tMax)
               ELSE
-                IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
-                  CALL WizardWindowShow(IDD_PW_Page6)
-                ELSE
-                  CALL StartExternalRR
-                ENDIF
+                CALL WizardWindowShow(IDD_PW_Page6)
               ENDIF
               CALL Profile_Plot
             CASE (IDCANCEL, IDCLOSE)
@@ -776,6 +772,7 @@
 
       USE DRUID_HEADER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -820,8 +817,16 @@
               CALL WizardApplyBackground
               CALL Profile_Plot
               CALL UpdatePeaksButtonsStates
-              CALL WizardWindowShow(IDD_PW_Page7)
+              IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
+                CALL WizardWindowShow(IDD_PW_Page7)
+              ELSE
+                CALL StartExternalRR
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
+              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
+                CALL CopyBackup2Pattern()
+                iRietveldMethod = INTERNAL_RB
+              ENDIF
               CALL EndWizard
             CASE (IDB_Preview)
               tYPMIN     = YPMIN

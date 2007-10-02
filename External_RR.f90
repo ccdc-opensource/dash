@@ -67,6 +67,14 @@
         ENDIF
       CASE ( FOR_RIETAN )
         is_Rietan_FP = ( INDEX(RIETANEXE, '-FP') .GT. 0 .OR. INDEX(RIETANEXE, '-fp') .GT. 0 )
+!        CALL WDialogSelect(IDD_PW_Page6)
+        IF ( .NOT. is_Rietan_FP .AND. WDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
+          CALL WMessageBox(YesNo, ExclamationIcon, CommonNo, &
+               'As RIETAN-2000 .int file does not include ESD data,'//CHAR(13)// &
+               'subtracting background will affect counting statistics.'//CHAR(13)// &
+               'Do you want continue?', 'Background Subtraction')
+          IF ( WinfoDialog(ExitButtonCommon) .EQ. CommonNo ) RETURN
+        ENDIF
         ext_RR_input_file_name = TRIM(OutputFilesBaseName)//'.ins'
         FILTER = 'RIETAN ins file (*.ins)|*.ins|'
         CALL WSelectFile(FILTER, iFlags, ext_RR_input_file_name, 'Save RIETAN ins file')
@@ -98,7 +106,6 @@
 !
       SUBROUTINE DealWithWizardExtRR
 
-      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE TAVAR
@@ -194,6 +201,24 @@
       ! Enable the "Monochromated" checkbox
       CALL WDialogSelect(IDD_PW_Page4)
       CALL WDialogFieldState(IDC_Monochromated, Enabled)
+      CALL WDialogSelect(IDD_PW_Page6)
+      ! Save "Subtract background" checkbox
+      CALL WDialogGetCheckBox(IDF_SubtractBackground, old_SubtractBkg)
+      ! Uncheck and disable "Subtract background" checkbox for Rietan-2000
+      IF ( iRietveldMethod .EQ. FOR_RIETAN .AND. INDEX(RIETANEXE, '-FP') .LE. 0 .AND. INDEX(RIETANEXE, '-fp') .LE. 0 ) THEN
+        CALL WDialogPutCheckBox(IDF_SubtractBackground, Unchecked)
+        CALL WDialogFieldState(IDF_SubtractBackground, Disabled)
+        CALL WDialogFieldState(IDF_LABEL7, Disabled)
+        CALL WDialogFieldState(IDF_NumOfIterations, Disabled)
+        CALL WDialogFieldState(IDF_LABEL8, Disabled)
+        CALL WDialogFieldState(IDF_WindowWidth, Disabled)
+        CALL WDialogFieldState(IDF_UseMCYN, Disabled)
+        CALL WDialogFieldState(IDB_Preview, Disabled)
+        CALL WDialogFieldState(IDAPPLY, Disabled)
+        CALL WDialogFieldState(IDF_UseSmooth, Disabled)
+        CALL WDialogFieldState(IDF_LABEL3, Disabled)
+        CALL WDialogFieldState(IDF_SmoothWindow, Disabled)
+      ENDIF
       CALL PopActiveWindowID
 
       END SUBROUTINE CopyPattern2Backup
@@ -225,6 +250,8 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
+      INTEGER tFieldState
+
       NOBS = TANOBS
       XOBS(1:NOBS) = TAXOBS(1:NOBS)
       YOBS(1:NOBS) = TAYOBS(1:NOBS)
@@ -244,6 +271,22 @@
       CALL WDialogSelect(IDD_PW_Page4)
       CALL WDialogPutCheckBox(IDC_Monochromated, Checked)
       CALL WDialogFieldState(IDC_Monochromated, Disabled)
+      ! Restore "Subtract background" checkbox
+      CALL WDialogSelect(IDD_PW_Page6)
+      CALL WDialogPutCheckBox(IDF_SubtractBackground, old_SubtractBkg)
+      tFieldState = Enabled
+      IF ( old_SubtractBkg .EQ. Unchecked ) tFieldState = Disabled
+      CALL WDialogFieldState(IDF_SubtractBackground, Enabled)
+      CALL WDialogFieldState(IDF_LABEL7, tFieldState)
+      CALL WDialogFieldState(IDF_NumOfIterations, tFieldState)
+      CALL WDialogFieldState(IDF_LABEL8, tFieldState)
+      CALL WDialogFieldState(IDF_WindowWidth, tFieldState)
+      CALL WDialogFieldState(IDF_UseMCYN, tFieldState)
+      CALL WDialogFieldState(IDB_Preview, tFieldState)
+      CALL WDialogFieldState(IDAPPLY, tFieldState)
+      CALL WDialogFieldState(IDF_UseSmooth, tFieldState)
+      CALL WDialogFieldState(IDF_LABEL3, tFieldState)
+      CALL WDialogFieldState(IDF_SmoothWindow, tFieldState)
       CALL PopActiveWindowID
       ! Must also restore Rebin_Profile
       LBIN = 1
