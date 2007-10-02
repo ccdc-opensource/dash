@@ -791,6 +791,7 @@
       CALL WDialogGetString(IDF_RIETANExe, RIETANEXE)
       CALL FileWriteString(hFile, RecNr, RIETANEXE)
       CALL FileWriteLogical(hFile, RecNr, Get_WriteWavelength2XYEFile())
+      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDC_cif_for_viewer))
 ! Save defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
   ! Use window smooth YES / NO
@@ -1105,6 +1106,8 @@
       CALL WDialogPutString(IDF_RIETANExe, RIETANEXE)
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogPutCheckBoxLogical(IDC_wl_in_xye, tLogical)
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL WDialogPutCheckBoxLogical(IDC_cif_for_viewer, tLogical)
 ! Read defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
       CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use Monte Carlo YES / NO

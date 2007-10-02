@@ -489,6 +489,7 @@
       CALL IOsDeleteFile('polyo.lis')
 !      CALL IOsDeleteFile('SA_best.pdb')
       CALL IOsDeleteFile(DV_FileName)
+      CALL IOsDeleteFile('DASHDV.*')
       CALL IOSDeleteFile('MakeZmatrix.log')
       CALL IOSDeleteFile('SA_PARAMS.TXT')
       CALL IOSDeleteFile('Overlap_Temp.pdb')
@@ -496,6 +497,7 @@
       CALL IOSDeleteFile('*.glob')
       CALL IOSDeleteFile('Rebuild_temp.mol2')
       CALL IOSDeleteFile('DASH_tmp*.pdb')
+      CALL IOSDeleteFile('DASH_tmp*.cif')
 
       END SUBROUTINE DeleteTempFiles
 !

@@ -491,7 +491,8 @@
                   XAtmCoords(J,I,0) = XATO(J,I)
                 ENDDO
               ENDDO
-              CALL SA_STRUCTURE_OUTPUT_PDB(0, file_name)
+!             CALL SA_STRUCTURE_OUTPUT_PDB(0, file_name)
+              CALL SA_STRUCTURE_OUTPUT_NON_OVERLAP(0, file_name)
               CALL ViewStructure(file_name)
             CASE (IDB_Compare)
               CALL Dialog2RRVAR
