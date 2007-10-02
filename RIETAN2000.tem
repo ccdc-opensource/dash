@@ -1,12 +1,12 @@
 ###############################################################
-# This template file is part of DASH to RIETAN-2000 interface.
+# This template file is part of DASH to RIETAN interface.
 #
 # Warning: 
 #     The line begin with " #@DASH@MARK@" is for DASH ONLY.
 #     Don't change or remove!
 # 
 ###############################################################
-#### Original header #####
+##### Original header #####
 # 
 # This is a template file for RIETAN-2000 for angle-dispersive X-ray and neutron
 # diffraction.
