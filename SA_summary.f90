@@ -719,7 +719,7 @@
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       REAL, EXTERNAL         :: UnitCellVolume
-      INTEGER, EXTERNAL      :: WritePDBCommon
+      INTEGER, EXTERNAL      :: WritePDBCommon, WriteCIFCommon
       CHARACTER*1, EXTERNAL  :: ChrLowerCase
       CHARACTER*20, EXTERNAL :: Integer2String
       REAL                     qvals(4), qnrm
@@ -728,7 +728,7 @@
       INTEGER hFileCSSR, hFilePDB, hFileCCL, hFileCIF, hFileRES, hFilePRO
       INTEGER I, J, II, K, iiact, iTotal, iFrg, IJ, iOrig
       REAL    x_pdb(1:3)
-      INTEGER TotNumBonds, NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen, iRadSelection
+      INTEGER TotNumBonds, NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen
       INTEGER                   tLen1, tLen2
       CHARACTER*80              tString, tString1, tString2
       CHARACTER*2               LATT
@@ -822,128 +822,7 @@
         OPEN (UNIT=hFileCIF,FILE=TheFileName,STATUS='unknown',ERR=999)
         WRITE (hFileCIF,'("data_global")',ERR=999)
         WRITE (hFileCIF,'(A)',ERR=999) '# '//DASHRemarkStr
-        tString = CrystalSystemString(LatBrav)
-        tString(1:1) = ChrLowerCase(tString(1:1))
-        tLen = LEN_TRIM(tString)
-! Remove '-a' etc. from monoclinic
-        IF (LatBrav .EQ. 2 .OR. LatBrav .EQ. 3 .OR. LatBrav .EQ. 4) tLen = tLen -2
-        WRITE (hFileCIF,'("_symmetry_cell_setting ",A)',ERR=999) tString(1:tLen)
-! Following line: issues with ":" in certain space group names
-        tString = SGHMaStr(NumberSGTable)
-        tLen = LEN_TRIM(tString)
-        DO WHILE ((tLen .GT. 1) .AND. (tString(tLen:tLen) .NE. ':'))
-          tLen = tLen - 1
-        ENDDO
-        IF (tString(tLen:tLen) .EQ. ':') THEN
-          tLen = tLen - 1
-        ELSE
-          tLen = LEN_TRIM(tString)
-        ENDIF
-        tString = "'"//tString(1:tLen)//"'"
-        tLen = tLen + 2
-        WRITE (hFileCIF,"('_symmetry_space_group_name_H-M ',A)",ERR=999) tString(1:tLen)
-        WRITE (hFileCIF,'("loop_")',ERR=999)
-        WRITE (hFileCIF,'("  _symmetry_equiv_pos_as_xyz")',ERR=999)
-        DO i = 1, npdbops
-          tString = cpdbops(i)
-          tLen = LEN_TRIM(tString)
-          tString = "  '"//tString(1:tLen)//"'"
-          tLen = tLen + 4
-          WRITE (hFileCIF,"(A)",ERR=999) tString(1:tLen)
-        ENDDO
-        WRITE (hFileCIF,'("_cell_length_a    ",F8.4)',ERR=999) CellPar(1)
-        WRITE (hFileCIF,'("_cell_length_b    ",F8.4)',ERR=999) CellPar(2)
-        WRITE (hFileCIF,'("_cell_length_c    ",F8.4)',ERR=999) CellPar(3)
-        WRITE (hFileCIF,'("_cell_angle_alpha ",F8.4)',ERR=999) CellPar(4)
-        WRITE (hFileCIF,'("_cell_angle_beta  ",F8.4)',ERR=999) CellPar(5)
-        WRITE (hFileCIF,'("_cell_angle_gamma ",F8.4)',ERR=999) CellPar(6)
-        WRITE (hFileCIF,'("_cell_volume",F7.1)',ERR=999) UnitCellVolume(CellPar(1),CellPar(2),CellPar(3),CellPar(4),CellPar(5),CellPar(6))
-        WRITE (hFileCIF,'("_cell_formula_units_Z  ?")',ERR=999)
-        SELECT CASE (JRadOption)
-          CASE (1) ! X-ray lab data
-            CALL PushActiveWindowID
-            CALL WDialogSelect(IDD_Data_Properties)
-            CALL WDialogGetMenu(IDF_Wavelength_Menu,iRadSelection)
-            CALL PopActiveWindowID
-            SELECT CASE (iRadSelection)
-! Winteracter menu:
-!     1 = <...>
-!     2 = Cu      <==  DEFAULT
-!     3 = Mo
-!     4 = Co
-!     5 = Cr
-!     6 = Fe
-              CASE (1)
-                tString = 'Xx'
-              CASE (2)
-                tString = 'Cu'
-              CASE (3)
-                tString = 'Mo'
-              CASE (4)
-                tString = 'Co'
-              CASE (5)
-                tString = 'Cr'
-              CASE (6)
-                tString = 'Fe'
-            END SELECT
-            tString = "'"//tString(1:2)//" K\a'"
-          CASE (2) ! X-ray synchrotron data
-            tString = 'synchrotron'
-          CASE (3) ! Constant Wavelength Neutrons
-          CASE (4) ! Time-of-Flight Neutrons
-        END SELECT
-        tLen = LEN_TRIM(tString)
-        WRITE (hFileCIF,'("_diffrn_radiation_type ",A)',ERR=999) tString(1:tLen)
-        WRITE (hFileCIF,'("_diffrn_radiation_wavelength",F10.5)',ERR=999) ALambda
-        WRITE (hFileCIF,'("_refine_ls_goodness_of_fit_all ",F7.3)',ERR=999) SQRT(MAX(0.0,IntensityChiSqd(tRunNr)))
-        IF (PrefParExists) THEN
-          WRITE (hFileCIF,'("_pd_proc_ls_pref_orient_corr")',ERR=999)               
-          WRITE (hFileCIF,'(";")',ERR=999)
-          WRITE (hFileCIF,'("  March-Dollase function")',ERR=999)
-          WRITE (hFileCIF,'("  Orientation =",3(1X,I3))',ERR=999) (PO_Direction(ii),ii=1,3)
-          WRITE (hFileCIF,'("  Magnitude   = ",F6.3)',ERR=999) BestValuesDoF(iPrfPar,tRunNr)
-          WRITE (hFileCIF,'(";")',ERR=999)
-        ENDIF
-!C data_FILENAME
-!C _symmetry_cell_setting            monoclinic
-!C _symmetry_space_group_name_H-M    'P 1 21/n 1'
-!C loop_
-!C _symmetry_equiv_pos_as_xyz
-!C   '   +x,   +y,   +z'
-!C   '1/2-x,1/2+y,1/2-z'
-!C   '   -x,   -y,   -z'
-!C   'x+1/2,1/2-y,1/2+z'
-!C _cell_length_a                    20.9674(3)
-!C _cell_length_b                    14.5059(2)
-!C _cell_length_c                    10.9862(1)
-!C _cell_angle_alpha                 90.0
-!C _cell_angle_beta                  117.825(2)
-!C _cell_angle_gamma                 90.0
-!C _cell_volume                      2955.0
-!C _cell_formula_units_Z             4
-!C _diffrn_radiation_wavelength      0.80008
-!C # The following item is the same as CHI, the square root of 'CHI squared'
-!C _refine_ls_goodness_of_fit_all    3.26
-!C # 9. ATOMIC COORDINATES AND DISPLACEMENT PARAMETERS
-!C loop_
-!C        _atom_site_label
-!C        _atom_site_fract_x
-!C        _atom_site_fract_y
-!C        _atom_site_fract_z
-!C        _atom_site_occupancy
-!C        _atom_site_adp_type
-!C        _atom_site_U_iso_or_equiv
-!C      C1     -0.10853   0.45223   0.14604  1.0 Uiso 0.038
-!C      C2     -0.05898   0.41596   0.27356  1.0 Uiso 0.038
-
-        WRITE (hFileCIF,'("loop_")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_label")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_fract_x")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_fract_y")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_fract_z")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_occupancy")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_adp_type")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_U_iso_or_equiv")',ERR=999)
+        IF (WriteCIFCommon(hFileCIF, IntensityChiSqd(tRunNr), BestValuesDoF(iPrfPar,tRunNr), .FALSE.) .NE. 0) GOTO 999
       ENDIF
 ! RES ...
       IF (tSaveRES) THEN

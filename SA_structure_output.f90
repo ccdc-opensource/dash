@@ -64,7 +64,7 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
-      INTEGER, EXTERNAL :: WritePDBCommon
+      INTEGER, EXTERNAL :: WritePDBCommon, WriteCIFCommon
       REAL, EXTERNAL :: UnitCellVolume
       CHARACTER*20, EXTERNAL :: Integer2String
       CHARACTER*1, EXTERNAL :: ChrLowerCase
@@ -75,7 +75,7 @@
       INTEGER hFileCSSR, hFilePDB, hFileCCL, hFileCIF, hFileRES
       INTEGER I, J, II, K, iiact, iTotal, iFrg, IJ, iOrig
       REAL    x_pdb(1:3)
-      INTEGER NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen, iRadSelection
+      INTEGER NumOfAtomsSoFar, iBond1, iBond2, iTem, tLen
       INTEGER tLen1, tLen2
       CHARACTER(MaxPathLength) tFileName
       CHARACTER(8) TemperatureStr
@@ -156,129 +156,8 @@
         OPEN (UNIT=hFileCIF,FILE=tFileName(1:OFBN_Len+8),STATUS='unknown',ERR=999)
         WRITE (hFileCIF,'("data_global")',ERR=999)
         WRITE (hFileCIF,'(A)',ERR=999) '# '//DASHRemarkStr
-        tString = CrystalSystemString(LatBrav)
-        tString(1:1) = ChrLowerCase(tString(1:1))
-        tLen = LEN_TRIM(tString)
-! Remove '-a' etc. from monoclinic
-        IF (LatBrav .EQ. 2 .OR. LatBrav .EQ. 3 .OR. LatBrav .EQ. 4) tLen = tLen -2
-        WRITE (hFileCIF,'("_symmetry_cell_setting ",A)',ERR=999) tString(1:tLen)
-! Following line: issues with ":" in certain space group names
-        tString = SGHMaStr(NumberSGTable)
-        tLen = LEN_TRIM(tString)
-        DO WHILE ((tLen .GT. 1) .AND. (tString(tLen:tLen) .NE. ':'))
-          tLen = tLen - 1
-        ENDDO
-        IF (tString(tLen:tLen) .EQ. ':') THEN
-          tLen = tLen - 1
-        ELSE
-          tLen = LEN_TRIM(tString)
-        ENDIF
-        tString = "'"//tString(1:tLen)//"'"
-        tLen = tLen + 2
-        WRITE (hFileCIF,"('_symmetry_space_group_name_H-M ',A)",ERR=999) tString(1:tLen)
-        WRITE (hFileCIF,'("loop_")',ERR=999)
-        WRITE (hFileCIF,'("  _symmetry_equiv_pos_as_xyz")',ERR=999)
-        DO i = 1, npdbops
-          tString = cpdbops(i)
-          tLen = LEN_TRIM(tString)
-          tString = "  '"//tString(1:tLen)//"'"
-          tLen = tLen + 4
-          WRITE (hFileCIF,"(A)",ERR=999) tString(1:tLen)
-        ENDDO
-        WRITE (hFileCIF,'("_cell_length_a    ",F8.4)',ERR=999) CellPar(1)
-        WRITE (hFileCIF,'("_cell_length_b    ",F8.4)',ERR=999) CellPar(2)
-        WRITE (hFileCIF,'("_cell_length_c    ",F8.4)',ERR=999) CellPar(3)
-        WRITE (hFileCIF,'("_cell_angle_alpha ",F8.4)',ERR=999) CellPar(4)
-        WRITE (hFileCIF,'("_cell_angle_beta  ",F8.4)',ERR=999) CellPar(5)
-        WRITE (hFileCIF,'("_cell_angle_gamma ",F8.4)',ERR=999) CellPar(6)
-        WRITE (hFileCIF,'("_cell_volume",F7.1)',ERR=999) UnitCellVolume(CellPar(1),CellPar(2),CellPar(3),CellPar(4),CellPar(5),CellPar(6))
-        WRITE (hFileCIF,'("_cell_formula_units_Z  ?")',ERR=999)
-        SELECT CASE (JRadOption)
-          CASE (1) ! X-ray lab data
-            CALL PushActiveWindowID
-            CALL WDialogSelect(IDD_Data_Properties)
-            CALL WDialogGetMenu(IDF_Wavelength_Menu,iRadSelection)
-            CALL PopActiveWindowID
-            SELECT CASE (iRadSelection)
-! Winteracter menu:
-!     1 = <...>
-!     2 = Cu      <==  DEFAULT
-!     3 = Mo
-!     4 = Co
-!     5 = Cr
-!     6 = Fe
-              CASE (1)
-                tString = 'Xx'
-              CASE (2)
-                tString = 'Cu'
-              CASE (3)
-                tString = 'Mo'
-              CASE (4)
-                tString = 'Co'
-              CASE (5)
-                tString = 'Cr'
-              CASE (6)
-                tString = 'Fe'
-            END SELECT
-            tString = "'"//tString(1:2)//" K\a'"
-          CASE (2) ! X-ray synchrotron data
-            tString = 'synchrotron'
-          CASE (3) ! Constant Wavelength Neutrons
-          CASE (4) ! Time-of-Flight Neutrons
-        END SELECT
-        tLen = LEN_TRIM(tString)
-        WRITE (hFileCIF,'("_diffrn_radiation_type ",A)',ERR=999) tString(1:tLen)
-        WRITE (hFileCIF,'("_diffrn_radiation_wavelength",F10.5)',ERR=999) ALambda
-        WRITE (hFileCIF,'("_refine_ls_goodness_of_fit_all ",F7.3)',ERR=999) SQRT(MAX(0.0,FOPT))
-        IF (PrefParExists) THEN
-          WRITE (hFileCIF,'("_pd_proc_ls_pref_orient_corr")',ERR=999)               
-          WRITE (hFileCIF,'(";")',ERR=999)
-          WRITE (hFileCIF,'("  March-Dollase function")',ERR=999)
-          WRITE (hFileCIF,'("  Orientation =",3(1X,I3))',ERR=999) (PO_Direction(ii),ii=1,3)
-          WRITE (hFileCIF,'("  Magnitude   = ",F6.3)',ERR=999) BestValuesDoF(iPrfPar,Curr_SA_Run)
-          WRITE (hFileCIF,'(";")',ERR=999)
-        ENDIF
-!C data_FILENAME
-!C _symmetry_cell_setting            monoclinic
-!C _symmetry_space_group_name_H-M    'P 1 21/n 1'
-!C loop_
-!C _symmetry_equiv_pos_as_xyz
-!C   '   +x,   +y,   +z'
-!C   '1/2-x,1/2+y,1/2-z'
-!C   '   -x,   -y,   -z'
-!C   'x+1/2,1/2-y,1/2+z'
-!C _cell_length_a                    20.9674(3)
-!C _cell_length_b                    14.5059(2)
-!C _cell_length_c                    10.9862(1)
-!C _cell_angle_alpha                 90.0
-!C _cell_angle_beta                  117.825(2)
-!C _cell_angle_gamma                 90.0
-!C _cell_volume                      2955.0
-!C _cell_formula_units_Z             4
-!C _diffrn_radiation_wavelength      0.80008
-!C # The following item is the same as CHI, the square root of 'CHI squared'
-!C _refine_ls_goodness_of_fit_all    3.26
-!C # 9. ATOMIC COORDINATES AND DISPLACEMENT PARAMETERS
-!C loop_
-!C        _atom_site_label
-!C        _atom_site_fract_x
-!C        _atom_site_fract_y
-!C        _atom_site_fract_z
-!C        _atom_site_occupancy
-!C        _atom_site_adp_type
-!C        _atom_site_U_iso_or_equiv
-!C      C1     -0.10853   0.45223   0.14604  1.0 Uiso 0.038
-!C      C2     -0.05898   0.41596   0.27356  1.0 Uiso 0.038
-
-        WRITE (hFileCIF,'("loop_")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_label")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_fract_x")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_fract_y")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_fract_z")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_occupancy")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_adp_type")',ERR=999)
-        WRITE (hFileCIF,'("  _atom_site_U_iso_or_equiv")',ERR=999)
-      ENDIF
+        IF (WriteCIFCommon(hFileCIF, FOPT, BestValuesDoF(iPrfPar,Curr_SA_Run), .FALSE.) .NE. 0) GOTO 999
+       ENDIF
 ! RES ...
       IF ( tSaveRES ) THEN
         tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.res'
@@ -594,6 +473,7 @@
       USE ZMVAR
       USE ATMVAR
       USE SOLVAR
+      USE PO_VAR
 
       IMPLICIT NONE
 
@@ -625,35 +505,44 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
-      LOGICAL, EXTERNAL :: Get_AutoAlign
-      INTEGER, EXTERNAL :: WritePDBCommon
+      LOGICAL, EXTERNAL :: Get_AutoAlign, WDialogGetCheckBoxLogical
+      INTEGER, EXTERNAL :: WritePDBCommon, WriteCIFCommon
       INTEGER iSol, TickedRunNr, NumOfOverlaidStructures
       INTEGER pdbBond(1:maxbnd_2*maxfrg,1:2)
       INTEGER TotNumBonds, NumOfAtomsSoFar
-      CHARACTER*4 LabelStr
+      CHARACTER*5 LabelStr
       CHARACTER*2 ColourStr
       CHARACTER*3 SolStr
       INTEGER AtomLabelOption, AtomColourOption
       INTEGER I, iFrg, J, iiact, ISTATUS, BondNr, ilen
       REAL    x_pdb(1:3)
       INTEGER iAtom
-      INTEGER hFilePDB
       INTEGER tNumOf_SA_Runs
+      LOGICAL tUseCif
+      INTEGER, PARAMETER :: chFile = 65
+      REAL, PARAMETER :: TOUISO = 0.01266514796 
+      CHARACTER*(*), PARAMETER :: PDBFileName = 'Overlap_Temp.pdb', CIFFileName =  'Overlap_Temp.cif'
 
       CALL PushActiveWindowID
+      CALL WDialogSelect(IDD_Configuration)
+      tUseCif = WDialogGetCheckBoxLogical(IDC_cif_for_viewer)
       CALL WDialogSelect(DialogueID)
       tNumOf_SA_Runs = NumOf_SA_Runs
       ! If DialogueID .EQ. IDD_Summary, then we could add 1 to the NumOfSARuns, because
       ! there is currently a run in progress which also stores its intermediate optima
       ! in XAtmCoords.
       IF (DialogueID .EQ. IDD_Summary) tNumOf_SA_Runs = tNumOf_SA_Runs + 1
-      hFilePDB = 65
+      IF ( tUseCif ) THEN
+        OPEN (UNIT=chFile,FILE=CIFFileName,STATUS='unknown',ERR=999)
+        WRITE (chFile,1036,ERR=999) '# CIF '
+      ELSE
 ! Write the file headers first
-      OPEN (UNIT=hFilePDB,FILE='Overlap_Temp.pdb',STATUS='unknown',ERR=999)
+        OPEN (UNIT=chFile,FILE=PDBFileName,STATUS='unknown',ERR=999)
 ! Add in a Header record
-      WRITE (hFilePDB,1036,ERR=999)
- 1036 FORMAT ('HEADER    PDB Solution File generated by DASH')
-      IF (WritePDBCommon(hFilePDB) .NE. 0) GOTO 999
+        WRITE (chFile,1036,ERR=999) 'HEADER    PDB '
+        IF (WritePDBCommon(chFile) .NE. 0) GOTO 999
+      ENDIF
+ 1036 FORMAT (A, 'Solution File generated by DASH')
 ! Get atom label option from dialogue. Two options: 
 ! 1. "Element + solution #"
 ! 2. "Original atom labels"
@@ -684,8 +573,11 @@
         CALL WGridGetCellCheckBox(IDF_SA_summary, 3, iSol, istatus)
         IF (istatus .EQ. 1) THEN
           NumOfOverlaidStructures = NumOfOverlaidStructures + 1
+          IF ( tUseCif ) THEN
+            WRITE (chFile,'(/"data_solution_",A)',ERR=999) SolStr
+            IF (WriteCIFCommon(chFile, IntensityChiSqd(iSol2Run(iSol)), BestValuesDoF(iPrfPar,iSol2Run(iSol)), .FALSE.) .NE. 0) GOTO 999
 ! Note that elements are right-justified
-          IF (AtomColourOption .EQ. 1) THEN ! Colour by solution
+          ELSE IF (AtomColourOption .EQ. 1) THEN ! Colour by solution
             TickedRunNr = TickedRunNr + 1 ! Number of ticked runs, counter used for choosing the colour
             IF (TickedRunNr .EQ. 11) TickedRunNr = 1 ! Re-use colours.
             SELECT CASE (TickedRunNr)
@@ -716,26 +608,32 @@
             DO i = 1, natoms(iFrg)
               iiact = iiact + 1
               iAtom = iAtom + 1
-              CALL PremultiplyVectorByMatrix(f2cpdb, XAtmCoords(1,OrderedAtm(iAtom),iSol2Run(iSol)), x_pdb)
-! Note that elements are right-justified
-              IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
-                IF (ElSym(i,iFrg)(2:2) .EQ. ' ') THEN
-                  ColourStr(1:2) = ' '//ElSym(i,iFrg)(1:1)
-                ELSE
-                  ColourStr = ElSym(i,iFrg)
-                ENDIF
-              ENDIF
               IF (AtomLabelOption .EQ. 1) THEN ! Element symbol + solution number
-                LabelStr = ElSym(i,iFrg)(1:LEN_TRIM(ElSym(i,iFrg)))//SolStr
+                LabelStr = TRIM(ElSym(i,iFrg))//SolStr
               ELSE  ! Orignal atom labels
-                LabelStr(1:4) = OriginalLabel(i,iFrg)(1:4)
+                LabelStr = OriginalLabel(i,iFrg)
               ENDIF
-              WRITE (hFilePDB,1120,ERR=999) iiact, LabelStr(1:4), x_pdb(1), x_pdb(2), x_pdb(3), occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
- 1120         FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+              IF ( tUseCif ) THEN
+                WRITE (chFile,1034,ERR=999) LabelStr, XAtmCoords(1:3,OrderedAtm(iAtom),iSol2Run(iSol)), occ(i,iFrg), TOUISO * tiso(i,iFrg) 
+ 1034           FORMAT ('  ',A5,1X,3(F10.5,1X),F5.3,' Uiso ',F6.4)
+              ELSE
+! Note that elements are right-justified
+                IF (AtomColourOption .EQ. 2) THEN ! Colour by Element
+                  IF (ElSym(i,iFrg)(2:2) .EQ. ' ') THEN
+                    ColourStr(1:2) = ' '//ElSym(i,iFrg)(1:1)
+                  ELSE
+                    ColourStr = ElSym(i,iFrg)
+                  ENDIF
+                ENDIF
+                CALL PremultiplyVectorByMatrix(f2cpdb, XAtmCoords(1,OrderedAtm(iAtom),iSol2Run(iSol)), x_pdb)
+                WRITE (chFile,1120,ERR=999) iiact, LabelStr(1:4), x_pdb(1:3), occ(i,iFrg), tiso(i,iFrg), ColourStr(1:2)
+ 1120           FORMAT ('HETATM',I5,' ',A4' NON     1    ',3F8.3,2F6.2,'          ',A2,'  ')
+              ENDIF
             ENDDO ! loop over atoms
           ENDDO ! loop over Z-matrices
         ENDIF ! Was this solution ticked to be displayed?
       ENDDO ! loop over runs
+      IF ( tUseCif ) GOTO 200
 ! Per Z-matrix, determine the connectivity. This has to be done only once.
       TotNumBonds = 0
       NumOfAtomsSoFar = 0
@@ -751,19 +649,209 @@
       ENDDO ! loop over Z-matrices
       DO iSol = 1, NumOfOverlaidStructures
         DO BondNr = 1, TotNumBonds
-          WRITE(hFilePDB,'(A6,I5,I5)',ERR=999) 'CONECT', (pdbBond(BondNr,1)+NATOM*(iSol-1)), (pdbBond(BondNr,2)+NATOM*(iSol-1))
+          WRITE(chFile,'(A6,I5,I5)',ERR=999) 'CONECT', (pdbBond(BondNr,1)+NATOM*(iSol-1)), (pdbBond(BondNr,2)+NATOM*(iSol-1))
         ENDDO
       ENDDO ! loop over runs
-      WRITE (hFilePDB,"('END')",ERR=999)
-      CLOSE (hFilePDB)
-      CALL ViewStructure('Overlap_Temp.pdb')
+      WRITE (chFile,"('END')",ERR=999)
+  200 CLOSE (chFile)
+      IF ( tUseCif ) THEN
+        CALL ViewStructure(CIFFileName)
+      ELSE
+        CALL ViewStructure(PDBFileName)
+      ENDIF
       CALL PopActiveWindowID
       RETURN
   999 CALL ErrorMessage('Error writing temporary file.')
-      CLOSE (hFilePDB)
+      CLOSE (chFile)
       CALL PopActiveWindowID
 
       END SUBROUTINE SA_STRUCTURE_OUTPUT_OVERLAP
+!
+!*****************************************************************************
+!
+! Merged from SA_structure_output, SA_structure_output_2 and RR_SaveAs
+! Note: if FromRR, GoodnessOfFit line is bypassed
+!
+! RETURNS : 0 for success
+!
+     INTEGER FUNCTION WriteCIFCommon(hFileCIF, GoodnessOfFit, POMagnitude, FromRR)
+
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ATMVAR
+      USE ZMVAR
+      USE SOLVAR
+      USE PO_VAR
+
+      IMPLICIT NONE
+
+      INTEGER,       INTENT (IN   ) :: hFileCIF
+      REAL,          INTENT (IN   ) :: GoodnessOfFit, POMagnitude
+      LOGICAL,       INTENT (IN   ) :: FromRR
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'Lattice.inc'
+
+      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
+
+      INTEGER     mpdbops
+      PARAMETER ( mpdbops = 192 )
+
+      INTEGER         npdbops
+      CHARACTER*20             cpdbops
+      COMMON /pdbops/ npdbops, cpdbops(mpdbops)
+
+      INTEGER         NATOM
+      REAL                   Xato
+      INTEGER                             KX
+      REAL                                           AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, Xato(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+                      KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+                      SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
+
+      REAL, EXTERNAL         :: UnitCellVolume
+      CHARACTER*1, EXTERNAL  :: ChrLowerCase
+      INTEGER I, tLen, iRadSelection
+      CHARACTER*80              tString
+
+! Initialise to failure
+      WriteCIFCommon = 1
+
+      tString = CrystalSystemString(LatBrav)
+      tString(1:1) = ChrLowerCase(tString(1:1))
+      tLen = LEN_TRIM(tString)
+! Remove '-a' etc. from monoclinic
+      IF (LatBrav .EQ. 2 .OR. LatBrav .EQ. 3 .OR. LatBrav .EQ. 4) tLen = tLen -2
+      WRITE (hFileCIF,'("_symmetry_cell_setting ",A)',ERR=999) tString(1:tLen)
+! Following line: issues with ":" in certain space group names
+      tString = SGHMaStr(NumberSGTable)
+      tLen = LEN_TRIM(tString)
+      DO WHILE ((tLen .GT. 1) .AND. (tString(tLen:tLen) .NE. ':'))
+        tLen = tLen - 1
+      ENDDO
+      IF (tString(tLen:tLen) .EQ. ':') THEN
+        tLen = tLen - 1
+      ELSE
+        tLen = LEN_TRIM(tString)
+      ENDIF
+      tString = "'"//tString(1:tLen)//"'"
+      tLen = tLen + 2
+      WRITE (hFileCIF,"('_symmetry_space_group_name_H-M ',A)",ERR=999) tString(1:tLen)
+      WRITE (hFileCIF,'("loop_")',ERR=999)
+      WRITE (hFileCIF,'("  _symmetry_equiv_pos_as_xyz")',ERR=999)
+      DO i = 1, npdbops
+        tString = cpdbops(i)
+        tLen = LEN_TRIM(tString)
+        tString = "  '"//tString(1:tLen)//"'"
+        tLen = tLen + 4
+        WRITE (hFileCIF,"(A)",ERR=999) tString(1:tLen)
+      ENDDO
+      WRITE (hFileCIF,'("_cell_length_a    ",F8.4)',ERR=999) CellPar(1)
+      WRITE (hFileCIF,'("_cell_length_b    ",F8.4)',ERR=999) CellPar(2)
+      WRITE (hFileCIF,'("_cell_length_c    ",F8.4)',ERR=999) CellPar(3)
+      WRITE (hFileCIF,'("_cell_angle_alpha ",F8.4)',ERR=999) CellPar(4)
+      WRITE (hFileCIF,'("_cell_angle_beta  ",F8.4)',ERR=999) CellPar(5)
+      WRITE (hFileCIF,'("_cell_angle_gamma ",F8.4)',ERR=999) CellPar(6)
+      WRITE (hFileCIF,'("_cell_volume",F7.1)',ERR=999) UnitCellVolume(CellPar(1),CellPar(2),CellPar(3),CellPar(4),CellPar(5),CellPar(6))
+      WRITE (hFileCIF,'("_cell_formula_units_Z  ?")',ERR=999)
+      SELECT CASE (JRadOption)
+        CASE (1) ! X-ray lab data
+          CALL PushActiveWindowID
+          CALL WDialogSelect(IDD_Data_Properties)
+          CALL WDialogGetMenu(IDF_Wavelength_Menu,iRadSelection)
+          CALL PopActiveWindowID
+          SELECT CASE (iRadSelection)
+! Winteracter menu:
+!     1 = <...>
+!     2 = Cu      <==  DEFAULT
+!     3 = Mo
+!     4 = Co
+!     5 = Cr
+!     6 = Fe
+            CASE (1)
+              tString = 'Xx'
+            CASE (2)
+              tString = 'Cu'
+            CASE (3)
+              tString = 'Mo'
+            CASE (4)
+              tString = 'Co'
+            CASE (5)
+              tString = 'Cr'
+            CASE (6)
+              tString = 'Fe'
+          END SELECT
+          tString = "'"//tString(1:2)//" K\a'"
+        CASE (2) ! X-ray synchrotron data
+          tString = 'synchrotron'
+        CASE (3) ! Constant Wavelength Neutrons
+        CASE (4) ! Time-of-Flight Neutrons
+      END SELECT
+      tLen = LEN_TRIM(tString)
+      WRITE (hFileCIF,'("_diffrn_radiation_type ",A)',ERR=999) tString(1:tLen)
+      WRITE (hFileCIF,'("_diffrn_radiation_wavelength",F10.5)',ERR=999) ALambda
+      IF ( .NOT. FromRR ) &
+        WRITE (hFileCIF,'("_refine_ls_goodness_of_fit_all ",F7.3)',ERR=999) SQRT(MAX(0.0, GoodnessOfFit))
+      IF (PrefParExists) THEN
+        WRITE (hFileCIF,'("_pd_proc_ls_pref_orient_corr")',ERR=999)               
+        WRITE (hFileCIF,'(";")',ERR=999)
+        WRITE (hFileCIF,'("  March-Dollase function")',ERR=999)
+        WRITE (hFileCIF,'("  Orientation =",3(1X,I3))',ERR=999) PO_Direction(1:3)
+        WRITE (hFileCIF,'("  Magnitude   = ",F6.3)',ERR=999) POMagnitude
+        WRITE (hFileCIF,'(";")',ERR=999)
+      ENDIF
+!C data_FILENAME
+!C _symmetry_cell_setting            monoclinic
+!C _symmetry_space_group_name_H-M    'P 1 21/n 1'
+!C loop_
+!C _symmetry_equiv_pos_as_xyz
+!C   '   +x,   +y,   +z'
+!C   '1/2-x,1/2+y,1/2-z'
+!C   '   -x,   -y,   -z'
+!C   'x+1/2,1/2-y,1/2+z'
+!C _cell_length_a                    20.9674(3)
+!C _cell_length_b                    14.5059(2)
+!C _cell_length_c                    10.9862(1)
+!C _cell_angle_alpha                 90.0
+!C _cell_angle_beta                  117.825(2)
+!C _cell_angle_gamma                 90.0
+!C _cell_volume                      2955.0
+!C _cell_formula_units_Z             4
+!C _diffrn_radiation_wavelength      0.80008
+!C # The following item is the same as CHI, the square root of 'CHI squared'
+!C _refine_ls_goodness_of_fit_all    3.26
+!C # 9. ATOMIC COORDINATES AND DISPLACEMENT PARAMETERS
+!C loop_
+!C        _atom_site_label
+!C        _atom_site_fract_x
+!C        _atom_site_fract_y
+!C        _atom_site_fract_z
+!C        _atom_site_occupancy
+!C        _atom_site_adp_type
+!C        _atom_site_U_iso_or_equiv
+!C      C1     -0.10853   0.45223   0.14604  1.0 Uiso 0.038
+!C      C2     -0.05898   0.41596   0.27356  1.0 Uiso 0.038
+
+      WRITE (hFileCIF,'("loop_")',ERR=999)
+      WRITE (hFileCIF,'("  _atom_site_label")',ERR=999)
+      WRITE (hFileCIF,'("  _atom_site_fract_x")',ERR=999)
+      WRITE (hFileCIF,'("  _atom_site_fract_y")',ERR=999)
+      WRITE (hFileCIF,'("  _atom_site_fract_z")',ERR=999)
+      WRITE (hFileCIF,'("  _atom_site_occupancy")',ERR=999)
+      WRITE (hFileCIF,'("  _atom_site_adp_type")',ERR=999)
+      WRITE (hFileCIF,'("  _atom_site_U_iso_or_equiv")',ERR=999)
+
+      WriteCIFCommon = 0
+  999 RETURN
+
+      END FUNCTION WriteCIFCommon
 !
 !*****************************************************************************
 !
