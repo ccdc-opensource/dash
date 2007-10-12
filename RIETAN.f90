@@ -461,7 +461,7 @@
       tFileName = FileNameBase(1:iBaseLen)//'.int'
       tLen = iBaseLen + 4
       OPEN(UNIT=chFileTmp,FILE=tFileName(1:tLen),STATUS='unknown',ERR=993)
-      IF ( is_Rietan_FP ) THEN
+      IF ( Rietan_FP ) THEN
         ! RIETAN-FP supports GSAS ESD file and reads its esd data
         ! GSAS Raw file: assume CONS and ESD
         WRITE(tLine, '(F10.6,5X,A)', ERR=993) ALambda, 'Exported by DASH'
@@ -583,7 +583,7 @@
         RETURN
       ENDIF
       ! RIETAN instruction file: copy/fill template file
-      IF ( is_Rietan_FP ) THEN
+      IF ( Rietan_FP ) THEN
         tFileName = TRIM(InstallationDirectory)//'rietanfp.tem'
       ELSE
         tFileName = TRIM(InstallationDirectory)//'rietan2000.tem'
@@ -888,8 +888,8 @@
           READ(string(p:), *, ERR=10) word
           IF ( word .NE. prm_name ) GOTO 10
           WRITE(chFileTmp, '(1X,A)') 'A('//TRIM(lab)//','//tKwStr(i)(2:2)//')'//string(:p-1)// &
-                                    'A('//TRIM(lab)//','//tKwStr(prm_seq)(2:2)//')'// &
-                                    string(p+LEN_TRIM(word):)
+                                     'A('//TRIM(lab)//','//tKwStr(prm_seq)(2:2)//')'// &
+                                     string(p+LEN_TRIM(word):)
           xyz(i) = 0.0
           code = 2
         ELSE
@@ -949,7 +949,7 @@
 
 ! width of atom sequence, different between 2000 and fp
       w = '2'
-      IF ( is_Rietan_FP ) w = '3'
+      IF ( Rietan_FP ) w = '3'
 
       INQUIRE(FILE=TheFileName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 996
