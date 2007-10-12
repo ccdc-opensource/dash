@@ -518,7 +518,7 @@ if {[lsearch $optlist initial] >= 0} {
 	# add phase from pha file
 	append cnam  $basename .pha
 #	set phaseinp [ReadCIFFile $cnam]
-	set phaseinp [parse_dash_pha_file $cnam {SPG CELL ATOM NFRG}]
+	set phaseinp [parse_dash_pha_file $cnam {SPG CELL ATOM NFRG NBKG}]
 	if {[llength $phaseinp] < 3 || ![string length [lindex $phaseinp 0]]} {
 		error_quit "Error occured while read the cif file, quit"
 	}
@@ -534,7 +534,7 @@ if {[lsearch $optlist initial] >= 0} {
 
 	# do Pawley before add atom
 	histinfo $hist backtype set 1
-	histinfo $hist backterms set 15
+	histinfo $hist backterms set [lindex $phaseinp 4]
 #	histinfo $hist bref set 1
 	incr expgui(changed)
 	expinfo cycles set $ncycle
