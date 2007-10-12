@@ -407,6 +407,14 @@
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
       CALL WDialogSelect(IDD_PW_Page8)
       CALL WDialogFieldState(IDB_PrevRes,Disabled)
+! Hide bkg term
+      CALL WDialogSelect(IDD_PW_Page6)
+      CALL WDialogFieldState(IDF_LABEL4, DialogHidden)
+      CALL WDialogFieldState(IDF_BKG_TERM_TOPAS, DialogHidden)
+      CALL WDialogFieldState(IDF_LABEL5, DialogHidden)
+      CALL WDialogFieldState(IDF_BKG_TERM_GSAS, DialogHidden)
+      CALL WDialogFieldState(IDF_LABEL6, DialogHidden)
+      CALL WDialogFieldState(IDF_BKG_TERM_RIETAN, DialogHidden)
 ! Grey out 'Remove background' button on toolbar
       CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOff)
       SlimValue = 1.0

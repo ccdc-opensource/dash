@@ -473,7 +473,7 @@
       WRITE(chFileIns, '(A80)', ERR=998) tLine
       WRITE(tLine, '(A,2A5,A10)', ERR=998) 'INS  1PRCF1 ', '2', '6', '0.01000'
       WRITE(chFileIns, '(A80)', ERR=998) tLine
-      WRITE(tLine, '(A,4E15.6E3)', ERR=998) 'INS  1PRCF11', (UVW(i), i=1,3), LXY(1)
+      WRITE(tLine, '(A,4E15.6E3)', ERR=998) 'INS  1PRCF11', UVW(1:3), LXY(1)
       WRITE(chFileIns, '(A80)', ERR=998) tLine
       WRITE(tLine, '(A,E15.6E3,A15)', ERR=998) 'INS  1PRCF12', LXY(2), '0.000000E+000'
       WRITE(chFileIns, '(A80)', ERR=998) tLine
@@ -481,7 +481,7 @@
 !        WRITE(tLine, '(A,I1,4A15)', ERR=998) 'INS  1PRCF1', I, ('0.000000E+000', J=1,4)
 !        WRITE(chFileIns, '(A80)', ERR=998) tLine
 !      ENDDO
-      WRITE(tLine, '(A,4A15)', ERR=998) 'INS  1PRCF15', ('0.000000E+000', I=1,2)
+      WRITE(tLine, '(A,4A15)', ERR=998) 'INS  1PRCF13', ('0.000000E+000', I=1,2)
       WRITE(chFileIns, '(A80)', ERR=998) tLine
       CLOSE(chFileIns)
 
@@ -507,6 +507,7 @@
       USE ZMVAR
       USE PO_VAR
       USE RRVAR
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -552,18 +553,19 @@
       ENDDO
       IF ( PutAtoms(chFileGSAS, GSASWriteAtom) ) GOTO 999
       ! number of fragments for setting up atom damp factor
-      WRITE(chFileGSAS, '(A,I)', ERR=999) 'NFRG ', nFrag
+      WRITE(chFileGSAS, '(A,I3)', ERR=999) 'NFRG ', nFrag
 ! Also need to write out PO if used during SA
       IF ( PrefParExists ) THEN
         WRITE(chFileGSAS, '(A)', ERR=999) '# MD preferred orientation'
         ! PREFO type 0
-        WRITE(chFileGSAS, '(A,F5.3,3(1X,I3))', ERR=999) 'PREFO 0 ', RR_PO, &
-              PO_Direction(1), PO_Direction(2), PO_Direction(3)
+        WRITE(chFileGSAS, '(A,F5.3,3(1X,I3))', ERR=999) 'PREFO 0 ', RR_PO, PO_Direction(1:3)
         CALL InfoMessage('The preferred orientation that was used during the '// &
                          'Simulated Annealing'//CHAR(13)//&
                          'will be written out to the GSAS .exp file: if you are using'//CHAR(13)//&
                          'a different experimental pattern, you may need to remove this.')
       ENDIF
+      WRITE(chFileGSAS, '(A)', ERR=999) '# number of background terms'
+      WRITE(chFileGSAS, '(A, I3)', ERR=999) 'NBKG ', NumOfBkgTerm
       WRITE(chFileGSAS, '(A)', ERR=999) '# restraints'
       ! default weights
 !      WRITE(chFileGSAS, '(A)', ERR=999) 'FACT DIST 100.0 ANGL 100.0 PLAN 100.0'

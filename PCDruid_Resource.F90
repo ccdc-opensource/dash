@@ -1,4 +1,4 @@
-! Winteracter module created : 01/Oct/2007 13:20:47
+! Winteracter module created : 11/Oct/2007 19:47:43
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -698,4 +698,8 @@
           INTEGER, PARAMETER :: IDF_ErroBarMultiplier_Label     =  1560
           INTEGER, PARAMETER :: IDC_Exhaustive                  =  1561
           INTEGER, PARAMETER :: IDC_cif_for_viewer              =  1562
+          INTEGER, PARAMETER :: IDC_SaveProfile                 =  1563
+          INTEGER, PARAMETER :: IDF_BKG_TERM_TOPAS              =  1564
+          INTEGER, PARAMETER :: IDF_BKG_TERM_GSAS               =  1565
+          INTEGER, PARAMETER :: IDF_BKG_TERM_RIETAN             =  1566
       END MODULE Druid_Header
