@@ -493,6 +493,7 @@
       CALL IOSDeleteFile('MakeZmatrix.log')
       CALL IOSDeleteFile('SA_PARAMS.TXT')
       CALL IOSDeleteFile('Overlap_Temp.pdb')
+      CALL IOSDeleteFile('Overlap_Temp.cif')
       CALL IOSDeleteFile('Rebuild_temp*.zmatrix')
       CALL IOSDeleteFile('*.glob')
       CALL IOSDeleteFile('Rebuild_temp.mol2')
