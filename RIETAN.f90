@@ -262,6 +262,7 @@
 
       USE DRUID_HEADER
       USE WINTERACTER
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -270,15 +271,17 @@
  
       CHARACTER*(*), PARAMETER :: ctPMark = ' #@DASH@MARK@P '
       INTEGER, PARAMETER :: chFileW = 116, chFileR = 117, ciPMarkLen = LEN(ctPMark)
-      INTEGER p, flag, nCycle, kLen
+      INTEGER p, flag, nCycle, kLen, iNBT
       REAL tk, finc
       CHARACTER (40) tKeyWord
       CHARACTER (80) tLine, tLine2
 
       ! Initialise to failure
       SetRefineParameters = 1
+
       OPEN(UNIT=chFileW,FILE=TRIM(TheFileName)//'.tmp',STATUS='unknown',ERR=998)
       OPEN(UNIT=chFileR,FILE=TRIM(TheFileName),STATUS='old',ERR=997)
+      iNBT = NumOfBkgTerm
 
       DO WHILE ( .NOT. EOF(chFileR) )
         READ(chFileR, '(A)', ERR=997) tLine
@@ -311,8 +314,20 @@
           WRITE(chFileW, '(A,F10.2)', ERR=998) ' FINC = ', finc
           CYCLE
         ELSE IF ( IAND(OptWord, Z'01') .NE. 0 ) THEN
-! Initial: Replace next line
-          WRITE(chFileW, '(A)', ERR=998) TRIM(tLine(ciPMarkLen+1:))
+! Initial: Replace next line. 
+! Note: The ctPMark line in template file for refine parameters gives the initial values 
+!       and their refine IDs (with all refinable set to on). As the initial run is LeBail 
+!       when those should not present (eg. atoms) are excluded by if-then, the IDs will
+!       only be toggled according to GUI setting in the following runs.
+          IF ( tKeyWord(:4) .EQ. 'BKGD' ) THEN
+! As the number of bkg terms is set by user, we also need to limit it at initial stage
+            tLine2 = tLine(ciPMarkLen+1:)
+            IF ( iNBT .LE. 0 ) CALL set_parameter_id(0)
+            iNBT = iNBT - 1
+            WRITE(chFileW, '(A)', ERR=998) TRIM(tLine2)
+          ELSE
+            WRITE(chFileW, '(A)', ERR=998) TRIM(tLine(ciPMarkLen+1:))
+          ENDIF
           CYCLE
         ENDIF
 
@@ -320,8 +335,11 @@
         SELECT CASE (tKeyWord)
         CASE ('NMODE')
           flag = IAND(OptWord, Z'01')
-        CASE ('BKGD1','BKGD2','BKGD3','BKGD4')
+        CASE ('BKGD0','BKGD1','BKGD2','BKGD3','BKGD4','BKGD5', &
+              'BKGD6','BKGD7','BKGD8','BKGD9','BKGD10','BKGD11')
           flag = IAND(OptWord, Z'04')
+          IF ( iNBT .LE. 0 ) flag = 0
+          iNBT = iNBT - 1
         CASE ('SCALE')
           flag = IAND(OptWord, Z'08')
         CASE ('SHIFT0','GAUSS01','LORENTZ01','ASYM')

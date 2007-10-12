@@ -6,6 +6,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE PO_VAR
       USE TAVAR
 
       IMPLICIT NONE
@@ -26,6 +27,7 @@
       ext_RR_stage = 1
       SELECT CASE ( iRietveldMethod ) 
         CASE ( FOR_TOPAS )
+          CALL WDialogGetInteger(IDF_BKG_TERM_TOPAS, NumOfBkgTerm)
           ext_RR_input_file_name = TRIM(OutputFilesBaseName)//'.inp'
 !         CALL CheckTOPASFileName(ext_RR_input_file_name)
           FILTER = 'TOPAS input file (*.inp)|*.inp|'
@@ -41,10 +43,16 @@
             CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
             CALL WDialogFieldState(IDC_Anisotropic_broadening, Enabled)
             CALL UpdateTOPASCheckBoxes()
+            IF ( PrefParExists ) THEN
+              CALL WDialogFieldState(IDC_PO, Enabled)
+            ELSE
+              CALL WDialogFieldState(IDC_PO, Disabled)
+            ENDIF
             CALL WizardWindowShow(IDD_SAW_Page7_TOPAS)
           ENDIF
         ENDIF
       CASE ( FOR_GSAS )
+        CALL WDialogGetInteger(IDF_BKG_TERM_GSAS, NumOfBkgTerm)
         ext_RR_input_file_name = TRIM(OutputFilesBaseName)//'.exp'
         FILTER = 'GSAS exp file (*.exp)|*.exp|'
         CALL WSelectFile(FILTER, iFlags, ext_RR_input_file_name, 'Save GSAS exp file')
@@ -61,12 +69,18 @@
               CALL WDialogPutString(IDF_Ext_RR_inp_file_name, ext_RR_input_file_name)
               CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
               CALL UpdateGSASCheckBoxes()
+              IF ( PrefParExists ) THEN
+                CALL WDialogFieldState(IDC_PO, Enabled)
+              ELSE
+                CALL WDialogFieldState(IDC_PO, Disabled)
+              ENDIF
               CALL WizardWindowShow(IDD_SAW_Page7_GSAS)
             ENDIF
           ENDIF
         ENDIF
       CASE ( FOR_RIETAN )
 !        CALL WDialogSelect(IDD_PW_Page6)
+        CALL WDialogGetInteger(IDF_BKG_TERM_RIETAN, NumOfBkgTerm)
         IF ( .NOT. Rietan_FP .AND. WDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
           CALL WMessageBox(YesNo, ExclamationIcon, CommonNo, &
                'As RIETAN-2000 .int file does not include ESD data,'//CHAR(13)// &
@@ -88,6 +102,11 @@
               CALL WDialogPutString(IDF_Ext_RR_inp_file_name, ext_RR_input_file_name)
               CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
               CALL UpdateRIETANCheckBoxes()
+              IF ( PrefParExists ) THEN
+                CALL WDialogFieldState(IDC_PO, Enabled)
+              ELSE
+                CALL WDialogFieldState(IDC_PO, Disabled)
+              ENDIF
               CALL WizardWindowShow(IDD_SAW_Page7_RIETAN)
             ENDIF
           ENDIF
@@ -218,6 +237,17 @@
         CALL WDialogFieldState(IDF_LABEL3, Disabled)
         CALL WDialogFieldState(IDF_SmoothWindow, Disabled)
       ENDIF
+! Show bkg term
+      IF ( iRietveldMethod .EQ. FOR_TOPAS ) THEN
+       CALL WDialogFieldState(IDF_LABEL4, Enabled)
+       CALL WDialogFieldState(IDF_BKG_TERM_TOPAS, Enabled)
+      ELSE IF ( iRietveldMethod .EQ. FOR_GSAS ) THEN
+       CALL WDialogFieldState(IDF_LABEL5, Enabled)
+       CALL WDialogFieldState(IDF_BKG_TERM_GSAS, Enabled)
+      ELSE IF ( iRietveldMethod .EQ. FOR_RIETAN ) THEN
+       CALL WDialogFieldState(IDF_LABEL6, Enabled)
+       CALL WDialogFieldState(IDF_BKG_TERM_RIETAN, Enabled)
+      ENDIF
       CALL PopActiveWindowID
 
       END SUBROUTINE CopyPattern2Backup
@@ -286,6 +316,13 @@
       CALL WDialogFieldState(IDF_UseSmooth, tFieldState)
       CALL WDialogFieldState(IDF_LABEL3, tFieldState)
       CALL WDialogFieldState(IDF_SmoothWindow, tFieldState)
+! Hide bkg term
+      CALL WDialogFieldState(IDF_LABEL4, DialogHidden)
+      CALL WDialogFieldState(IDF_BKG_TERM_TOPAS, DialogHidden)
+      CALL WDialogFieldState(IDF_LABEL5, DialogHidden)
+      CALL WDialogFieldState(IDF_BKG_TERM_GSAS, DialogHidden)
+      CALL WDialogFieldState(IDF_LABEL6, DialogHidden)
+      CALL WDialogFieldState(IDF_BKG_TERM_RIETAN, DialogHidden)
       CALL PopActiveWindowID
       ! Must also restore Rebin_Profile
       LBIN = 1

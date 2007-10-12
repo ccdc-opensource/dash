@@ -83,6 +83,7 @@
       USE DRUID_HEADER
       USE WINTERACTER
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -105,6 +106,8 @@
       CHARACTER*(40) space_group_str
       INTEGER tStrLen
       INTEGER tIRadSelection
+      CHARACTER*(6) bkg(4)
+      DATA bkg/' 100.0', '-100.0', ' 10.0', ' 10.0'/
 
       ! The way this code has curently been written, this routine can only be called
       ! from one of the Wizard windows as part of a "iRietveldMethod" Rietveld refinement
@@ -139,17 +142,17 @@
       iLen_1 = iLen + 8
       OPEN(UNIT=hTempFile,FILE=tFileName(1:iLen_1),STATUS='unknown',ERR=998)
       DO i = 1, NBIN
-        WRITE(hTempFile, '(F12.7,1X,F12.4,1X,F12.5)', ERR=998) XBIN(i), YOBIN(i), EBIN(i)
+        WRITE(hTempFile, '(F10.5,1X,F12.4,1X,F12.5)', ERR=998) XBIN(i), YOBIN(i), EBIN(i)
       ENDDO
       CLOSE(hTempFile)
       WRITE(hFileTOPAS, '(A)', ERR=999) 'xdd "'//tFileName(1:iLen_1)//'" xye_format'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  bkg @ '
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    100.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '   -100.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
-      WRITE(hFileTOPAS, '(A)', ERR=999) '    10.0'
-      DO i = 1, 16
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    0.0'
+      DO i = 1, NumOfBkgTerm
+        IF ( i .LE. 4 ) THEN
+          WRITE(hFileTOPAS, '(3X,A)', ERR=999) bkg(i)
+        ELSE
+          WRITE(hFileTOPAS, '(3X,A)', ERR=999) ' 0.0'
+        ENDIF
       ENDDO
       WRITE(hFileTOPAS, '(A,F12.4)', ERR=999) '  start_X ', XBIN(1)
       WRITE(hFileTOPAS, '(A,F12.4)', ERR=999) '  finish_X ', XBIN(NBIN)
@@ -310,6 +313,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 3 ) ! First Rietveld refinement: refine scale only
           CALL WDialogFieldState(IDC_Anisotropic_broadening, Disabled)
@@ -318,6 +322,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 4 ) ! Second Rietveld refinement: include background
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
@@ -325,6 +330,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 5 ) ! Third Rietveld refinement: include Biso
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
@@ -332,6 +338,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 6 ) ! Fourth Rietveld refinement: include coordinates
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
@@ -339,6 +346,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
       END SELECT
       CALL PopActiveWindowID
@@ -507,7 +515,7 @@
       INTEGER iLen, iPos, iStrPos
       LOGICAL is_last_line
       CHARACTER(512) tLine
-      CHARACTER(30) word
+      CHARACTER(60) word
       INTEGER       word_len
       CHARACTER*20 tStr
       INTEGER K
@@ -547,7 +555,7 @@
    10 CONTINUE
       READ(hOutputFile, '(A)', ERR=998, END=40) tLine
       iLen = LEN_TRIM(tLine)
-      word_len = 30
+      word_len = LEN(word)
       CALL FirstWord(tLine, word, word_len)
       CALL StrUpperCase(word)
       IF ( in_spherical_harmonics ) THEN
@@ -600,7 +608,7 @@
           CALL ShowWizardWindowRietveld(RR_SA_Sol)
 ! Also need to write out PO if used during SA
           IF ( PrefParExists ) THEN
-            WRITE(hFileTOPAS, '(A,F5.3,A,I3,1X,I3,1X,I3,1X,A)', ERR=999) '    PO(@, ', RR_PO, ', , ', PO_Direction(1), PO_Direction(2), PO_Direction(3), ')'
+            WRITE(hFileTOPAS, '(A,F5.3,A,I3,1X,I3,1X,I3,1X,A)', ERR=999) '    PO(@, ', RR_PO, ', , ', PO_Direction(1:3), ')'
             CALL InfoMessage('The preferred orientation that was used during the Simulated Annealing'//CHAR(13)//&
                              'has been written out to the TOPAS .inp file: if you are using'//CHAR(13)//&
                              'a different experimental pattern, you may need to remove this.')
@@ -669,6 +677,9 @@
       ELSE IF ( (word_len .EQ. 16) .AND. (word(1:16) .EQ. 'OUT_X_DIFFERENCE') ) THEN
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( (word_len .EQ. 29) .AND. (word(1:29) .EQ. 'OUT_YOBS_YCALC_AND_DIFFERENCE') ) THEN
+        ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( (word_len .EQ. 51) .AND. (word(1:51) .EQ. &
+                'OUT_X_YOBS_YCALC_AND_DIFFERENCE_DIVIDE_BY_SIGMAYOBS') ) THEN
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( ((word_len .EQ. 9) .AND. (word(1:9) .EQ. 'DO_ERRORS')) &
           .OR.  ((word_len .EQ. 10) .AND. (word(1:10) .EQ. "'DO_ERRORS")) ) THEN
@@ -813,6 +824,10 @@
       IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
 !        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//TRIM(FileNameBase)//'.cif")'
         WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR_Uiso("'//TRIM(FileNameBase)//'.cif")'
+      ENDIF
+      IF ( WDialogGetCheckBoxLogical(IDC_SaveProfile) ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_X_Yobs_Ycalc_and_Difference_divide_by_SigmaYobs'// &
+                                               '("'//TRIM(FileNameBase)//'.pro")'
       ENDIF
 !      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_X_Ycalc("'//TRIM(FileNameBase)//'.pp")'
 !      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_Yobs_Ycalc_and_Difference("'//TRIM(FileNameBase)//'_1.xco")'
