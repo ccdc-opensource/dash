@@ -171,9 +171,9 @@
               IF (iFrg .GT. nFrag) iFrg = nFrag + 1
               iFlags = LoadDialog + PromptOn + DirChange + AppendExt
               FilterStr = "All files (*.*)|*.*|"//&
-                          "Z-matrix and molecular model files|*.zmatrix;*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"//&
+                          "Z-matrix and molecular model files|*.zmatrix;*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr;*.xyz|"//&
                           "Z-matrix files (*.zmatrix)|*.zmatrix|"//&
-                          "Molecular model files|*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|"
+                          "Molecular model files|*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr;*.xyz|"
               iSelection = 2
               CALL WSelectFile(FilterStr, iFlags, tFileName, 'Load Z-matrix file', iSelection)
 ! Did the user press cancel?

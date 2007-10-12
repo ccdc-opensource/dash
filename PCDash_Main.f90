@@ -162,7 +162,7 @@
             nFrag = iFrg - 1
             CALL ShowWizardWindowZmatrices
           CASE ('RAW    ', 'CPI    ', 'DAT    ', 'TXT    ', 'MDI    ', 'POD    ', &
-                'RD     ', 'SD     ', 'UDF    ', 'UXD    ', 'XYE    ', 'X01    ')
+                'RD     ', 'SD     ', 'UDF    ', 'UXD    ', 'XYE    ', 'X01    ', 'ASC    ')
             iDummy = DiffractionFileOpen(ArgString)
             CALL WDialogSelect(IDD_PW_Page3)
             CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
@@ -377,7 +377,8 @@
         OPEN(UNIT=hFile,FILE=tFileName,ERR=999)
         IF ( FnWavelengthOK() .AND. Get_WriteWavelength2XYEFile() ) WRITE(hFile,'(F9.5)',ERR=999) ALambda
         DO I = 1, NBIN
-          WRITE(hFile,'(F6.3,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
+!          WRITE(hFile,'(F6.3,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
+          WRITE(hFile,'(F10.5,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
         ENDDO
         CLOSE(hFile)
       ENDIF
