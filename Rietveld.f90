@@ -1723,7 +1723,7 @@
 
       INTEGER, EXTERNAL :: XtalFileOpen, XtalFileBrowse 
       CHARACTER(MaxPathLength) SDIFile, XtalFile
-      INTEGER iStat, IV
+      INTEGER iStat, IV, iOpt
 
       CALL PushActiveWindowID
       CALL WDialogSelect(IDD_SAW_Page6)
@@ -1737,8 +1737,8 @@
               CALL WDialogPutRadioButton(IDF_PW_Option6)
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
             CASE (IDNEXT)
-              CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethodOpt)
-              SELECT CASE (iRietveldMethodOpt)
+              CALL WDialogGetRadioButton(IDF_RADIO1, iOpt)
+              SELECT CASE (iOpt)
                 CASE (2)
                   iRietveldMethod = FOR_TOPAS
                 CASE (3)

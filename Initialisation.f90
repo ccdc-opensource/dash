@@ -348,6 +348,7 @@
       TOPASEXE = ''
       EXPGUIEXE = ''
       RIETANEXE = ''
+      Rietan_FP = .FALSE.
       CALL GetPathToMercuryFromRegistry
       CALL GetPathToMogulFromRegistry
       CALL GetPathToTopasFromRegistry
@@ -831,6 +832,7 @@
       REAL, EXTERNAL :: WavelengthOf
       REAL, EXTERNAL :: dSpacing2TwoTheta
       INTEGER, EXTERNAL :: GetBFIOError
+      LOGICAL, EXTERNAL :: SetRRMethodRadioState
       CHARACTER*MaxPathLength tFileName
       INTEGER   RecNr, RW
       INTEGER   hFile
@@ -1108,6 +1110,29 @@
       CALL WDialogPutCheckBoxLogical(IDC_wl_in_xye, tLogical)
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL WDialogPutCheckBoxLogical(IDC_cif_for_viewer, tLogical)
+! Update state of related radio/check
+      CALL WDialogSelect(IDD_PW_Page7)
+      IF ( LEN_TRIM(DICVOLEXE) .GT. 0 ) THEN
+        CALL WDialogFieldState(IDF_RADIO2, Enabled)
+      ELSE
+        CALL WDialogFieldState(IDF_RADIO2, Disabled)
+      ENDIF
+! As loaded by WizardWindowShow, IDD_SAW_Page6a has to be handled there
+      CALL WDialogSelect(IDD_SAW_Page6)
+      IF ( SetRRMethodRadioState() ) CALL WDialogPutRadioButton(IDF_RADIO1)
+      IF ( tLogical ) THEN
+        CALL WDialogSelect(IDD_Summary)
+        CALL WDialogFieldState(IDF_ColourBySolution, Disabled)
+        CALL WDialogPutRadioButton(IDF_ColourByElement)
+        CALL WDialogSelect(IDD_SAW_Page5)
+        CALL WDialogFieldState(IDF_ColourBySolution, Disabled)
+        CALL WDialogPutRadioButton(IDF_ColourByElement)
+      ELSE
+        CALL WDialogSelect(IDD_Summary)
+        CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
+        CALL WDialogSelect(IDD_SAW_Page5)
+        CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
+      ENDIF
 ! Read defaults for background subtraction
       CALL WDialogSelect(IDD_PW_Page6)
       CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use Monte Carlo YES / NO

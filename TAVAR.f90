@@ -16,7 +16,7 @@
 
       INTEGER ext_RR_stage
 
-      LOGICAL use_anisotropic_broadening, is_Rietan_FP
+      LOGICAL use_anisotropic_broadening, Rietan_FP
 
       CHARACTER(255) old_diffraction_data_file_name
 

@@ -66,9 +66,8 @@
           ENDIF
         ENDIF
       CASE ( FOR_RIETAN )
-        is_Rietan_FP = ( INDEX(RIETANEXE, '-FP') .GT. 0 .OR. INDEX(RIETANEXE, '-fp') .GT. 0 )
 !        CALL WDialogSelect(IDD_PW_Page6)
-        IF ( .NOT. is_Rietan_FP .AND. WDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
+        IF ( .NOT. Rietan_FP .AND. WDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
           CALL WMessageBox(YesNo, ExclamationIcon, CommonNo, &
                'As RIETAN-2000 .int file does not include ESD data,'//CHAR(13)// &
                'subtracting background will affect counting statistics.'//CHAR(13)// &
@@ -205,7 +204,7 @@
       ! Save "Subtract background" checkbox
       CALL WDialogGetCheckBox(IDF_SubtractBackground, old_SubtractBkg)
       ! Uncheck and disable "Subtract background" checkbox for Rietan-2000
-      IF ( iRietveldMethod .EQ. FOR_RIETAN .AND. INDEX(RIETANEXE, '-FP') .LE. 0 .AND. INDEX(RIETANEXE, '-fp') .LE. 0 ) THEN
+      IF ( iRietveldMethod .EQ. FOR_RIETAN .AND. ( .NOT. Rietan_FP ) ) THEN
         CALL WDialogPutCheckBox(IDF_SubtractBackground, Unchecked)
         CALL WDialogFieldState(IDF_SubtractBackground, Disabled)
         CALL WDialogFieldState(IDF_LABEL7, Disabled)

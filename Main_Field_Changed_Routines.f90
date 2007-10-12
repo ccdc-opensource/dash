@@ -87,8 +87,9 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
-      INTEGER IFLAGS, IFTYPE
+      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, SetRRMethodRadioState
+      LOGICAL tLogical
+      INTEGER IFLAGS, IFTYPE, iOpt
       CHARACTER*MaxPathLength tFileName
       CHARACTER*75  FILTER
 
@@ -103,7 +104,41 @@
               CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
               CALL WDialogGetString(IDF_EXPGUIExe, EXPGUIEXE)
               CALL WDialogGetString(IDF_RIETANExe, RIETANEXE)
+              tLogical = WDialogGetCheckBoxLogical(IDC_cif_for_viewer)
               CALL WDialogHide()
+! Update state of related radio/check
+              CALL WDialogSelect(IDD_PW_Page7)
+              IF ( LEN_TRIM(DICVOLEXE) .GT. 0 ) THEN
+                CALL WDialogFieldState(IDF_RADIO2, Enabled)
+              ELSE
+                CALL WDialogGetRadioButton(IDF_RADIO1, iOpt)
+                IF ( iOpt .EQ. 2 ) CALL WDialogPutRadioButton(IDF_RADIO1)
+                CALL WDialogFieldState(IDF_RADIO2, Disabled)
+              ENDIF
+              CALL WDialogSelect(IDD_SAW_Page6)
+              IF ( SetRRMethodRadioState() ) CALL WDialogPutRadioButton(IDF_RADIO1)
+              CALL InfoError(1) ! Clear errors
+              CALL WDialogSelect(IDD_SAW_Page6a)
+! As loaded by WizardWindowShow, select IDD_SAW_Page6a may fail
+              IF ( InfoError(1) .EQ. 0 ) THEN
+                IF ( SetRRMethodRadioState() ) THEN
+                  iRietveldMethodOpt = 1
+                  CALL WDialogPutRadioButton(IDF_RADIO1)
+                ENDIF
+              ENDIF
+              IF ( tLogical ) THEN
+                CALL WDialogSelect(IDD_Summary)
+                CALL WDialogPutRadioButton(IDF_ColourByElement)
+                CALL WDialogFieldState(IDF_ColourBySolution, Disabled)
+                CALL WDialogSelect(IDD_SAW_Page5)
+                CALL WDialogPutRadioButton(IDF_ColourByElement)
+                CALL WDialogFieldState(IDF_ColourBySolution, Disabled)
+              ELSE
+                CALL WDialogSelect(IDD_Summary)
+                CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
+                CALL WDialogSelect(IDD_SAW_Page5)
+                CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
+              ENDIF
             CASE (IDBBROWSE)
               IFLAGS = LoadDialog + PromptOn
               FILTER = 'All files (*.*)|*.*|'//&
@@ -189,6 +224,49 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithConfiguration
+!
+!*****************************************************************************
+!
+! Enable/disable Rietveld method ratio buttons on IDD_SAW_Page6 or IDD_SAW_Page6a
+! Return if the currently selected radio botton is disabled
+!
+      LOGICAL FUNCTION SetRRMethodRadioState
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE TAVAR
+
+      IMPLICIT NONE
+
+      INTEGER iOpt
+
+      CALL WDialogGetRadioButton(IDF_RADIO1, iOpt)
+      SetRRMethodRadioState = .FALSE.
+      IF ( LEN_TRIM(TOPASEXE) .GT. 0 ) THEN
+        CALL WDialogFieldState(IDF_RADIO2, Enabled)
+      ELSE
+        CALL WDialogFieldState(IDF_RADIO2, Disabled)
+        IF ( iOpt .EQ. 2 ) SetRRMethodRadioState = .TRUE.
+      ENDIF
+      IF ( LEN_TRIM(EXPGUIEXE) .GT. 0 ) THEN
+        CALL WDialogFieldState(IDF_RADIO3, Enabled)
+      ELSE
+        CALL WDialogFieldState(IDF_RADIO3, Disabled)
+        IF ( iOpt .EQ. 3 ) SetRRMethodRadioState = .TRUE.
+      ENDIF
+      IF ( LEN_TRIM(RIETANEXE) .GT. 0 ) THEN
+        CALL WDialogFieldState(IDF_RADIO4, Enabled)
+        Rietan_FP = ( INDEX(RIETANEXE, '-FP') .GT. 0 .OR. &
+                         INDEX(RIETANEXE, '-fp') .GT. 0 )
+      ELSE
+        CALL WDialogFieldState(IDF_RADIO4, Disabled)
+        IF ( iOpt .EQ. 4 ) SetRRMethodRadioState = .TRUE.
+        Rietan_FP = .FALSE.
+      ENDIF
+
+      RETURN
+
+      END FUNCTION SetRRMethodRadioState
 !
 !*****************************************************************************
 !

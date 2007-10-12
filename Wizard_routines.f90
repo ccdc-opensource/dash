@@ -93,6 +93,7 @@
 
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
+      LOGICAL, EXTERNAL :: SetRRMethodRadioState
 
       IF ( in_batch ) &
         RETURN
@@ -109,6 +110,7 @@
           CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
         CASE ( IDD_SAW_Page6a )
           CALL WDialogLoad(IDD_SAW_Page6a)
+          IF ( SetRRMethodRadioState() ) iRietveldMethodOpt = 1
           SELECT CASE ( iRietveldMethodOpt )
              CASE ( 2 )
                CALL WDialogPutRadioButton(IDF_RADIO2)
@@ -130,30 +132,6 @@
       CurrentWizardWindow = TheDialogID
       CALL WDialogShow(IXPos_IDD_Wizard, IYPos_IDD_Wizard, IDNEXT, Modeless)
       CALL WMenuSetState(ID_Start_Wizard, ItemEnabled, WintOff)
-
-      IF ( TheDialogID .EQ. IDD_SAW_Page6a .OR. TheDialogID .EQ. IDD_SAW_Page6 ) THEN
-        IF ( LEN_TRIM(TOPASEXE) .GT. 0 ) THEN
-          CALL WDialogFieldState(IDF_RADIO2, 1)
-        ELSE
-          CALL WDialogFieldState(IDF_RADIO2, 0)
-        ENDIF
-        IF ( LEN_TRIM(EXPGUIEXE) .GT. 0 ) THEN
-          CALL WDialogFieldState(IDF_RADIO3, 1)
-        ELSE
-          CALL WDialogFieldState(IDF_RADIO3, 0)
-        ENDIF
-        IF ( LEN_TRIM(RIETANEXE) .GT. 0 ) THEN
-          CALL WDialogFieldState(IDF_RADIO4, 1)
-        ELSE
-          CALL WDialogFieldState(IDF_RADIO4, 0)
-        ENDIF
-      ELSE IF ( TheDialogID .EQ. IDD_PW_Page7 ) THEN
-        IF ( LEN_TRIM(DICVOLEXE) .GT. 0 ) THEN
-          CALL WDialogFieldState(IDF_RADIO2, 1)
-        ELSE
-          CALL WDialogFieldState(IDF_RADIO2, 0)
-        ENDIF
-      ENDIF
 
       END SUBROUTINE WizardWindowShow
 !
