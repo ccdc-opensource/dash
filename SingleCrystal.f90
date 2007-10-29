@@ -566,6 +566,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE REFVAR
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -596,7 +597,7 @@
       REAL   DStarTem(MFCSTO)
       INTEGER iR, jR, I, hFile
       INTEGER iOrdTem(MFCSTO), KK
-      REAL    H(1:3), DERS(1:6), ArgKKtem(MFCSTO), Resolution, cut_off_2theta
+      REAL    H(1:3), DERS(1:6), ArgKKtem(MFCSTO), cut_off_2theta
 
       filnam_root = filnmr
       NINIT = 1
@@ -623,11 +624,7 @@
         DStarTem(iR) = 2.0 * sthl
       ENDDO
       CALL Sort_Real(ArgKKtem, iOrdTem, NumOfRef)
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SX_Page1a)
-      CALL WDialogGetReal(IDF_MaxResolution, Resolution)
-      CALL PopActiveWindowID
-      cut_off_2theta = 2.0 * ASIND(1.0/(2.0*Resolution))
+      cut_off_2theta = 2.0 * ASIND(1.0/(2.0*SXMaxResolution))
       KK = 0
       DO iR = 1, NumOfRef
         jR = iOrdTem(iR)
