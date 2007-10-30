@@ -15,7 +15,7 @@
       USE ZMVAR
       USE RRVAR
       USE SOLVAR
-	  USE ATMVAR
+      USE ATMVAR
       USE REFVAR
       USE PO_VAR
       USE TAVAR
@@ -426,7 +426,7 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE RRVAR
-	  USE ATMVAR
+      USE ATMVAR
       USE SOLVAR
       USE PO_VAR
 
@@ -1078,7 +1078,7 @@
       USE ZMVAR
       USE RRVAR
       USE SAMVAR
-	  USE ATMVAR
+      USE ATMVAR
 
       IMPLICIT NONE
 
