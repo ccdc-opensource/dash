@@ -3365,7 +3365,7 @@ BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "SDI file",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   97,   13,   40,   10
     CONTROL "Crystal structure",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   97,   57,   60,   10
-    CONTROL "Note: options for external programs only enabled for those given in Configuration dialog box",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   94,  129,  252,   16
+    CONTROL "Hint: options for external programs only enabled for those given in Configuration dialog box",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,   94,  129,  252,   16
 END
 
 IDD_SAW_Page6 RCDATA
@@ -3816,7 +3816,7 @@ BEGIN
     CONTROL "Rietveld refinement with GSAS",IDF_RADIO3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   85,  140,   14
     CONTROL "Rietveld refinement with RIETAN",IDF_RADIO4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   98,  140,   14
     CONTROL "Choose refinement method",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  122,   35,  188,  105
-    CONTROL "Note: options for external programs only enabled for those given in Configuration dialog box",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  130,  116,  174,   20
+    CONTROL "Hint: options for external programs only enabled for those given in Configuration dialog box",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  130,  116,  174,   20
 END
 
 IDD_SAW_Page6a RCDATA
