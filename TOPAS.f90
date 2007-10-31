@@ -56,7 +56,11 @@
             hFile = 112
             OPEN(UNIT=hFile, FILE=TRIM(tDirName)//'launch_file.txt', STATUS='unknown', ERR=999)
             WRITE(hFile, '(A)', ERR=999) '"'//input_file_name(1:tLen)//'.inp"'
-            CLOSE(hFile) 
+            GOTO 100
+  999       CONTINUE ! Error writing out launch_file.txt: we don't really care.
+!           CALL InfoMessage("launch_file.txt could not be written.")
+            CALL DebugErrorMessage("launch_file.txt could not be written.")
+  100       CLOSE(hFile) 
           ENDIF
         ENDIF
 !        CALL InfoMessage('TOPAS .inp file for Pawley has been written.')
@@ -70,9 +74,6 @@
                         "under Options in the menu bar.")
       CALL WCursorShape(CurCrossHair)
       RETURN
-  999 CONTINUE ! Error writing out launch_file.txt: we don't really care.
-      CALL InfoMessage("launch_file.txt could not be written.")
-      CLOSE(hFile) 
 
       END SUBROUTINE Launch_TOPAS
 !
