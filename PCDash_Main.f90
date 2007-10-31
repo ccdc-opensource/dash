@@ -75,8 +75,18 @@
 ! Check if there are any command line arguments
 ! Try to redirect stdout - change working directory if unsuccessful
       IF (NARGS() .EQ. 0) CALL Init_StdOut
+      IF ( in_batch ) THEN
+! Open root window in hidden mode to allow dialogs being initialised properly.
+! This is required, as set in 3.1.1 of Winteracter User Guide.
+! Otherwise WDialogLoad will generate ErrLoadDialog while
+! loading most dialogs. As error-check is usually not carried out,
+! further operations on these dialogs may lead to more errors, even crash.
+        CALL WindowOpen(FLAGS = HideWindow + SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
+                        Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
+                        HEIGHT = (WInfoScreen(2)*3)/8, MENUID = IDR_MENU1, &
+                        TITLE = "DASH", NCOL256=128)
+      ELSE
 ! Open root window
-      IF ( .NOT. in_batch ) THEN
         CALL WindowOpen(FLAGS = SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
                         Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
                         HEIGHT = (WInfoScreen(2)*3)/8, MENUID = IDR_MENU1, &
@@ -426,7 +436,7 @@
                CHAR(13)//&
                'Reference:'//CHAR(13)//&
                'W.I.F. David, K. Shankland, J. van de Streek, E. Pidcock,'//CHAR(13)//&
-               'W.D.S. Motherwell & J.C. Cole (2006). J. Appl. Cryst. 39, '//CHAR(13)//&
+               'W.D.S. Motherwell & J.C. Cole (2006). J. Appl. Cryst. 39, 910-915.'//CHAR(13)//&
                CHAR(13)//&
                ProgramVersion
       tLen = LEN_TRIM(CABOUT)
@@ -435,7 +445,7 @@
       tLen = LEN_TRIM(CABOUT)
 !DEC$ ENDIF
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
-               'Copyright February 2007'
+               'Copyright November 2007'
       CALL WMessageBox(OkOnly, InformationIcon, CommonOk, CABOUT, 'About DASH')
 
       END SUBROUTINE About
