@@ -236,7 +236,6 @@
               IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
                 iRietveldMethod = INTERNAL_RB
-                CALL WDialogUnload(IDD_SAW_Page7_RIETAN)
               ENDIF
               CALL EndWizardPastPawley
             CASE (IDB_WRITE)

@@ -59,7 +59,7 @@
         IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(ext_RR_input_file_name) .NE. 0)) THEN
           CALL SplitPath(ext_RR_input_file_name, tDirName, tFileName)
           IF ( scan(TRIM(tFileName), ' ') .NE. 0 ) GOTO 999
-          CALL WDialogLoad(IDD_SAW_Page7_GSAS)
+          CALL WDialogSelect(IDD_SAW_Page7_GSAS)
           CALL UpdateGSASCheckBoxes()
           CALL WDialogPutInteger(IDF_NCYCL, 3)
           IF ( WriteGSASFiles(ext_RR_input_file_name) .EQ. 0 ) THEN
@@ -92,7 +92,7 @@
         FILTER = 'RIETAN ins file (*.ins)|*.ins|'
         CALL WSelectFile(FILTER, iFlags, ext_RR_input_file_name, 'Save RIETAN ins file')
         IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(ext_RR_input_file_name) .NE. 0)) THEN
-          CALL WDialogLoad(IDD_SAW_Page7_RIETAN)
+          CALL WDialogSelect(IDD_SAW_Page7_RIETAN)
           CALL UpdateRIETANCheckBoxes()
           CALL WDialogPutInteger(IDF_NCYCL, 10)
           IF ( WriteRIETANFiles(ext_RR_input_file_name) .EQ. 0 ) THEN
