@@ -20,8 +20,9 @@
         SELECT CASE (Info%Valid)
           CASE (-1)
             CALL ErrorMessage("Could not find or open the licence file"//CHAR(13)//&
-              InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"License.dat or "//CHAR(13)//&
-              StartUpDirectory(1:LEN_TRIM(StartUpDirectory))//"DashLicense.dat")
+              TRIM(AllUsersProfileDirectory)//"DashLicense.dat or "//CHAR(13)//&
+              TRIM(InstallationDirectory)//"License.dat or "//CHAR(13)//&
+              TRIM(StartUpDirectory)//"DashLicense.dat")
           CASE (-2) ! Checksum not OK
             CALL ErrorMessage("Your DASH licence key is not valid.")
           CASE (-3)
@@ -60,13 +61,13 @@
       Info%KeyStr = ''
       hFile = 10
 
-      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='OLD',ERR=9)
-
+      OPEN(UNIT=hFile,FILE=TRIM(AllUsersProfileDirectory)//'DashLicense.dat',STATUS='OLD',ERR=6)
       GOTO 10
-
+    6 CLOSE(hFile,iostat=dummy)
+      OPEN(UNIT=hFile,FILE=TRIM(InstallationDirectory)//'License.dat',STATUS='OLD',ERR=9)
+      GOTO 10
     9 CLOSE(hFile,iostat=dummy)
-      OPEN(UNIT=hFile,FILE=StartUpDirectory(1:LEN_TRIM(StartUpDirectory))//'DashLicense.dat',STATUS='OLD',ERR=999)
-
+      OPEN(UNIT=hFile,FILE=TRIM(StartUpDirectory)//'DashLicense.dat',STATUS='OLD',ERR=999)
    10 READ(hFile,'(A)',ERR=999,END=999) line
       IF (line(1:1) .EQ. '#') GOTO 10
       CALL INextString(line,CLString)
@@ -521,7 +522,8 @@
       INTEGER*2 CheckSum
       INTEGER*2 VersionDependentMangler
       INTEGER dummy
-      
+      CHARACTER*MaxPathLength tLicenseFile
+     
       CALL DecodeLicence(LString,Info)
       IF (Info%Valid .LE. 0) GOTO 99
       SELECT CASE ( Info%LicenceType ) 
@@ -535,10 +537,17 @@
           GOTO 99
       END SELECT
       hFile = 10
-      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'License.dat',STATUS='UNKNOWN',ERR=9)
+      tLicenseFile = TRIM(AllUsersProfileDirectory)//'DashLicense.dat'
+      OPEN(UNIT=hFile,FILE=tLicenseFile,STATUS='UNKNOWN',ERR=6)
+      GOTO 10
+    6 CLOSE(hFile,IOSTAT=dummy)
+      tLicenseFile = TRIM(InstallationDirectory)//'License.dat'
+      OPEN(UNIT=hFile,FILE=tLicenseFile,STATUS='UNKNOWN',ERR=9)
+      GOTO 10
     9 CLOSE(hFile, IOSTAT=dummy)
-      OPEN(UNIT=hFile,FILE=StartUpDirectory(1:LEN_TRIM(StartUpDirectory))//'DashLicense.dat',STATUS='UNKNOWN',ERR=99)
-      WRITE(hFile,'(A)',ERR=99)     "# Licence File for "//ProgramVersion
+      tLicenseFile = TRIM(StartUpDirectory)//'DashLicense.dat'
+      OPEN(UNIT=hFile,FILE=tLicenseFile,STATUS='UNKNOWN',ERR=99)
+   10 WRITE(hFile,'(A)',ERR=99)     "# Licence File for "//ProgramVersion
       WRITE(hFile,'(A)',ERR=99)     "#"
       WRITE(hFile,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' licence '
       IF      (Info%LicenceType .EQ. NodeKey) THEN
@@ -573,6 +582,10 @@
         WRITE(LString, '(2Z8.8,Z4.4)') w(1), w(2), checksum
       ENDIF
       WRITE(hFile,'(A)',ERR=99) LString(1:LEN_TRIM(LString))
+      CLOSE(hFile)
+      CALL InfoMessage('Licence has been written to file: '//CHAR(13)// &
+                        TRIM(tLicenseFile))
+      RETURN
    99 CONTINUE
       CLOSE(hFile)
 

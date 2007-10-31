@@ -25,6 +25,7 @@
 
       CHARACTER(MaxPathLength) ::  InstallationDirectory
       CHARACTER(MaxPathLength) ::  StartUpDirectory
+      CHARACTER(MaxPathLength) ::  AllUsersProfileDirectory
 
       CHARACTER                ::  DIRSPACER
       DATA DIRSPACER / '\' / ! Windows spacer

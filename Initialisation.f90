@@ -23,10 +23,23 @@
       IF (LEN_TRIM(InstallationDirectory) .EQ. 0) InstallationDirectory = '.'//DIRSPACER
       
 	  CALL IOsDirName(StartUpDirectory)
-      StartUpDirectory = StartUpDirectory(1:LEN_TRIM(StartUpDirectory))//DIRSPACER
+      StartUpDirectory = TRIM(StartUpDirectory)//DIRSPACER
 	  CALL IOsDirChange(InstallationDirectory)
       CALL IOsDirName(InstallationDirectory)
-      InstallationDirectory = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//DIRSPACER
+      InstallationDirectory = TRIM(InstallationDirectory)//DIRSPACER
+
+      ! Operating system version number (e.g. 400=4.00)
+      IF ( InfoOpSystem(OSVersion) .LT. 600 ) THEN
+        CALL IOsVariable('ALLUSERSPROFILE', AllUsersProfileDirectory)
+      ELSE
+! Vista  'C:\Users\Public\'
+        CALL IOsVariable('PUBLIC', AllUsersProfileDirectory)
+      ENDIF
+      IF ( LEN_TRIM(AllUsersProfileDirectory) .GT. 0 ) THEN
+        AllUsersProfileDirectory = TRIM(AllUsersProfileDirectory)//DIRSPACER
+      ELSE
+        AllUsersProfileDirectory = InstallationDirectory
+      ENDIF
 
       END SUBROUTINE GetInstallationDirectory
 !
@@ -155,7 +168,7 @@
       LPosSG(10) = 489
       LPosSG(11) = MaxSPGR+1
 ! Get the space group symbols ...
-      OPEN(110,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 999)
+      OPEN(110,FILE=TRIM(InstallationDirectory)//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 999)
       i = 0
  10   lintem=' '
       READ(110,1100,END=100) nl, lintem
@@ -198,7 +211,7 @@
       CALL ErrorMessage("Sorry, DASH is not installed correctly: could not find the file"//CHAR(13) &
                           //'SpaceGroupSymbols.dat'//CHAR(13)// &
                           "in the installation directory"//CHAR(13)//&
-                          InstallationDirectory(1:LEN_TRIM(InstallationDirectory)))              
+                          TRIM(InstallationDirectory))              
       CALL WindowClose
       STOP
 
@@ -612,10 +625,15 @@
       IF ( in_batch ) &
         RETURN
       RW = 0
-      tFileName = 'D3.cfg'
+      CALL IOsVariable('APPDATA', tFileName)
+      IF ( LEN_TRIM(tFileName) .GT. 0 ) THEN
+        tFileName = TRIM(tFileName)//DIRSPACER//'D3.cfg'
+      ELSE
+        tFileName = TRIM(StartUpDirectory)//'D3.cfg'
+      ENDIF
       hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=hFile,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Write a header
       CALL FileWriteString(hFile, RecNr, ProgramVersion//' configuration file')
@@ -856,12 +874,17 @@
       INTEGER   tLen, MainVersionLen, SubVersionLen
 
       RW = 1
-      tFileName = 'D3.cfg'
-      INQUIRE(FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,EXIST=FExists)
+      CALL IOsVariable('APPDATA', tFileName)
+      IF ( LEN_TRIM(tFileName) .GT. 0 ) THEN
+        tFileName = TRIM(tFileName)//DIRSPACER//'D3.cfg'
+      ELSE
+        tFileName = TRIM(StartUpDirectory)//'D3.cfg'
+      ENDIF
+      INQUIRE(FILE=tFileName,EXIST=FExists)
       IF (.NOT. FExists) RETURN
       hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=hFile,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=hFile,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Read the header
       CALL FileReadString(hFile,RecNr,tString) ! E.g. 'DASH 2.1.1 configuration file'
