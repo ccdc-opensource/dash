@@ -27,18 +27,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "tmp"=.\tmp\tmp.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "wEncoder"=.\wEncoder\wEncoder.dsp - Package Owner=<4>
 
 Package=<5>
